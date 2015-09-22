@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PoeEye", "PoeEye\PoeEye.csproj", "{C6188345-F8DC-4CDC-8C01-ADD0A03BBF1C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PoeShared", "PoeShared\PoeShared.csproj", "{12DF53DD-7144-4D2D-B7A1-B4BC5BBDFB69}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C6188345-F8DC-4CDC-8C01-ADD0A03BBF1C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C6188345-F8DC-4CDC-8C01-ADD0A03BBF1C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C6188345-F8DC-4CDC-8C01-ADD0A03BBF1C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C6188345-F8DC-4CDC-8C01-ADD0A03BBF1C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{12DF53DD-7144-4D2D-B7A1-B4BC5BBDFB69}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{12DF53DD-7144-4D2D-B7A1-B4BC5BBDFB69}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{12DF53DD-7144-4D2D-B7A1-B4BC5BBDFB69}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{12DF53DD-7144-4D2D-B7A1-B4BC5BBDFB69}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
