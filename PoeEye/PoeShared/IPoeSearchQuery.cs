@@ -2,6 +2,6 @@
 {
     public interface IPoeSearchQuery
     {
-        string Name { get; } 
+        string Name { get; }
     }
 }

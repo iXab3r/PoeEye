@@ -1,12 +1,12 @@
-﻿using System.IO;
-
-namespace PoeEye.Tests.PoeTrade.TestData
+﻿namespace PoeEye.Tests.PoeTrade.TestData
 {
+    using System.IO;
+
     internal sealed class TestDataProvider
     {
-        public string AncientWhiteResult
-        {
-            get { return File.ReadAllText(@"PoeTrade.AncientWhite.Sample.xml"); }
-        } 
+        public static string AncientWhiteResult
+            => File.ReadAllText(@"PoeTrade\TestData\PoeTrade.AncientWhite.Sample.xml");
+
+        public static string ModernResult => File.ReadAllText(@"PoeTrade\TestData\PoeTrade.Modern.Sample.xml");
     }
 }

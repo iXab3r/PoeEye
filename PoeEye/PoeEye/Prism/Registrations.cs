@@ -1,11 +1,8 @@
-﻿using Microsoft.Practices.Unity;
-
-namespace PoeEye.Prism
+﻿namespace PoeEye.Prism
 {
+    using Microsoft.Practices.Unity;
+
     internal sealed class Registrations : UnityContainer
     {
-        public Registrations()
-        {
-        }
     }
 }

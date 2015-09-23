@@ -1,7 +1,7 @@
-﻿using System;
-
-namespace PoeShared
+﻿namespace PoeShared
 {
+    using System;
+
     public interface IPoeApi
     {
         IObservable<IPoeSearchResult> IssueQuery(IPoeSearchQuery query);

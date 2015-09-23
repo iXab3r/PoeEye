@@ -1,22 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Common.Logging;
-using Common.Logging.Simple;
-using PoeEye.PoeTrade;
+﻿using ILog = Common.Logging.ILog;
+using LogManager = Common.Logging.LogManager;
 
 namespace PoeEye
 {
-    class Program
+    using System;
+
+    using PoeTrade;
+
+    internal class Program
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(Program));
+        private static readonly ILog Log = LogManager.GetLogger(typeof (Program));
 
-        static void Main()
+        private static void Main()
         {
-            
-
             try
             {
                 Log.InfoFormat("Application started");
@@ -24,7 +20,7 @@ namespace PoeEye
 
                 var poeTradeApi = new PoeTradeApi();
 
-                poeTradeApi.IssueQuery(null).Subscribe(x => Log.DebugFormat("Result: {0}", x.Raw));
+                poeTradeApi.IssueQuery(null).Subscribe(x => Log.Debug($"Result: {x.Raw}"));
             }
             catch (Exception ex)
             {
@@ -36,7 +32,7 @@ namespace PoeEye
             }
         }
 
-        static void ResizeConsole()
+        private static void ResizeConsole()
         {
             try
             {
@@ -46,7 +42,6 @@ namespace PoeEye
             catch (Exception ex)
             {
                 Log.Error("Failed to resize Console window", ex);
-
             }
         }
     }

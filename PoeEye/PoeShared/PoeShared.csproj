@@ -61,6 +61,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IPoeApi.cs" />
+    <Compile Include="IPoeItem.cs" />
     <Compile Include="IPoeSearchQuery.cs" />
     <Compile Include="IPoeSearchResult.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
