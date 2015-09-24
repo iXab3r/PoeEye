@@ -2,20 +2,22 @@
 {
     public interface IPoeItem
     {
-        string ItemName { get; set; }
+        string ItemName { get; }
 
-        string ItemIconUri { get; set; }
+        string ItemIconUri { get; }
 
-        string TradeForumUri { get; set; }
+        string TradeForumUri { get; }
 
-        string UserForumUri { get; set; }
+        string UserForumUri { get; }
 
-        string UserForumName { get; set; }
+        string UserForumName { get; }
 
-        string UserIgn { get; set; }
+        string UserIgn { get; }
 
-        string Price { get; set; }
+        string Price { get; }
 
-        string League { get; set; }
+        string League { get; }
+
+        IPoeItemMod[] Mods { get; }
     }
 }

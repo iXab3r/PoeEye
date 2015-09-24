@@ -5,5 +5,7 @@
     public interface IPoeApi
     {
         IObservable<IPoeSearchResult> IssueQuery(IPoeSearchQuery query);
+
+        string[] ExtractCurrenciesList();
     }
 }

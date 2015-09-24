@@ -18,7 +18,7 @@ namespace PoeEye
                 Log.InfoFormat("Application started");
                 ResizeConsole();
 
-                var poeTradeApi = new PoeTradeApi();
+                var poeTradeApi = new PoeTradeApi(new PoeTradeParserModern());
 
                 poeTradeApi.IssueQuery(null).Subscribe(x => Log.Debug($"Result: {x.Raw}"));
             }

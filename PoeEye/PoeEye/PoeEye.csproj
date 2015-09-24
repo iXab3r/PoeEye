@@ -49,6 +49,10 @@
       <HintPath>..\packages\EasyHttp.1.6.78.0\lib\net40\EasyHttp.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="JetBrains.Annotations, Version=9.2.0.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
+      <HintPath>..\packages\JetBrains.Annotations.9.2.0\lib\net20\JetBrains.Annotations.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="JsonFx, Version=2.0.1209.2802, Culture=neutral, PublicKeyToken=315052dd637f8a52, processorArchitecture=MSIL">
       <HintPath>..\packages\JsonFx.2.0.1209.2802\lib\net40\JsonFx.dll</HintPath>
       <Private>True</Private>
@@ -97,12 +101,18 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="ToString, Version=1.7.2.0, Culture=neutral, PublicKeyToken=15432f00798e61a4, processorArchitecture=MSIL">
+      <HintPath>..\packages\ToString.Fody.1.7.2.0\Lib\portable-net4+sl4+wp7+win8+MonoAndroid16+MonoTouch40\ToString.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Common\PoeCurrency.cs" />
     <Compile Include="Common\PoeItem.cs" />
-    <Compile Include="PoeTrade\IPoeTradeParser.cs" />
+    <Compile Include="Common\PoeItemMod.cs" />
+    <Compile Include="Common\PoeQueryResult.cs" />
+    <Compile Include="Log.cs" />
     <Compile Include="PoeTrade\PoeTradeApi.cs" />
-    <Compile Include="PoeTrade\PoeTradeParserAncientWhite.cs" />
     <Compile Include="PoeTrade\PoeTradeParserModern.cs" />
     <Compile Include="Prism\Registrations.cs" />
     <Compile Include="Program.cs" />

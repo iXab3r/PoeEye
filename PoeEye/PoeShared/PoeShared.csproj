@@ -61,9 +61,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IPoeApi.cs" />
+    <Compile Include="IPoeCurrency.cs" />
     <Compile Include="IPoeItem.cs" />
+    <Compile Include="IPoeItemMod.cs" />
+    <Compile Include="IPoeQueryResult.cs" />
     <Compile Include="IPoeSearchQuery.cs" />
     <Compile Include="IPoeSearchResult.cs" />
+    <Compile Include="IPoeTradeParser.cs" />
+    <Compile Include="PoeModType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -2,6 +2,7 @@
 {
     using PoeShared;
 
+    [ToString]
     internal sealed class PoeItem : IPoeItem
     {
         public string ItemName { get; set; }
@@ -19,5 +20,7 @@
         public string Price { get; set; }
 
         public string League { get; set; }
+
+        public IPoeItemMod[] Mods { get; set; }
     }
 }

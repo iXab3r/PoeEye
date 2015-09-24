@@ -19,17 +19,45 @@
         }
 
         [Test]
-        public void ShouldParseModernItems()
+        public void ShouldParseItems()
         {
             //Given
             var rawHtml = TestDataProvider.ModernResult;
             var instance = CreateInstance();
 
             //When
-            var items = instance.ParseQueryResult(rawHtml);
+            var result = instance.ParseQueryResult(rawHtml);
 
             //Then
-            items.Count().ShouldBe(99);
+            result.ItemsList.Count().ShouldBe(99);
+        }
+
+        [Test]
+        public void ShouldParseCurrenciesList()
+        {
+            //Given
+            var rawHtml = TestDataProvider.ModernResult;
+            var instance = CreateInstance();
+
+            //When
+            var result = instance.ParseQueryResult(rawHtml);
+
+            //Then
+            result.CurrenciesList.Length.ShouldBe(15);
+        }
+
+        [Test]
+        public void ShouldParseModsList()
+        {
+            //Given
+            var rawHtml = TestDataProvider.ModernResult;
+            var instance = CreateInstance();
+
+            //When
+            var result = instance.ParseQueryResult(rawHtml);
+
+            //Then
+            result.ModsList.Length.ShouldBe(1);
         }
 
         private PoeTradeParserModern CreateInstance()
