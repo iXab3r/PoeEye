@@ -1,4 +1,4 @@
-namespace PoeShared
+namespace PoeShared.Query
 {
     public interface IPoeQueryResult
     {

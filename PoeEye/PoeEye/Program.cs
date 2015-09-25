@@ -1,35 +1,71 @@
-﻿using ILog = Common.Logging.ILog;
-using LogManager = Common.Logging.LogManager;
-
-namespace PoeEye
+﻿namespace PoeEye
 {
     using System;
+    using System.Linq;
+    using System.Reactive.Linq;
 
-    using PoeTrade;
+    using Common;
+
+    using ConsoleDump;
+
+    using DumpToText;
+
+    using Microsoft.Practices.Unity;
+
+    using PoeShared;
+    using PoeShared.Query;
+
+    using Prism;
 
     internal class Program
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof (Program));
+        private static readonly Options options = new Options();
 
-        private static void Main()
+        private static void Main(string[] args)
         {
             try
             {
-                Log.InfoFormat("Application started");
+                Log.Instance.InfoFormat("Application started");
                 ResizeConsole();
 
-                var poeTradeApi = new PoeTradeApi(new PoeTradeParserModern());
+                CommandLine.Parser.Default.ParseArgumentsStrict(args, options);
 
-                poeTradeApi.IssueQuery(null).Subscribe(x => Log.Debug($"Result: {x.Raw}"));
+                var mainUnityBlock = options.Mode == Options.ProgramMode.Mock
+                    ? (UnityContainerExtension) new MockRegistrations()
+                    : new LiveRegistrations();
+
+                Log.Instance.Debug($"Unity main block: {mainUnityBlock.DumpToText()}");
+
+                var unityContainer = new UnityContainer()
+                    .AddExtension(new CommonRegistrations())
+                    .AddExtension(mainUnityBlock);
+
+                var poeApi = unityContainer.Resolve<IPoeApi>();
+
+                poeApi
+                    .IssueQuery(new PoeQuery())
+                    .Subscribe(DumpQueryResults);
             }
             catch (Exception ex)
             {
-                Log.Error(ex);
+                Log.Instance.Error(ex);
             }
             finally
             {
                 Console.ReadKey();
             }
+        }
+
+        private static void DumpQueryResults(IPoeQueryResult queryResult)
+        {
+            Log.Instance.Debug(queryResult.DumpToText());
+
+            var items =
+                queryResult.ItemsList
+                            .Where(x => !string.IsNullOrWhiteSpace(x.Price))
+                           .Select(x => new {x.Price, x.ItemName, x.UserIgn})
+                           .ToArray();
+            items.Dump();
         }
 
         private static void ResizeConsole()
@@ -41,7 +77,7 @@ namespace PoeEye
             }
             catch (Exception ex)
             {
-                Log.Error("Failed to resize Console window", ex);
+                Log.Instance.Error("Failed to resize Console window", ex);
             }
         }
     }

@@ -6,6 +6,6 @@
         
         string Name { get; }
         
-        string Uri { get; } 
+        string IconUri { get; } 
     }
 }

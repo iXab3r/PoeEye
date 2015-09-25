@@ -2,10 +2,10 @@
 {
     using System;
 
+    using Query;
+
     public interface IPoeApi
     {
-        IObservable<IPoeSearchResult> IssueQuery(IPoeSearchQuery query);
-
-        string[] ExtractCurrenciesList();
+        IObservable<IPoeQueryResult> IssueQuery(IPoeQuery query);
     }
 }

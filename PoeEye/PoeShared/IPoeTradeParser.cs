@@ -1,10 +1,9 @@
 namespace PoeShared
 {
-    using JetBrains.Annotations;
+    using Query;
 
     public interface IPoeTradeParser
     {
-        [NotNull]
-        IPoeQueryResult ParseQueryResult([NotNull] string rawHtml);
+        IPoeQueryResult ParseQueryResult(string rawHtml);
     }
 }

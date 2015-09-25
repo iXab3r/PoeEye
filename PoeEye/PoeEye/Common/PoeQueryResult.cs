@@ -1,6 +1,7 @@
 namespace PoeEye.Common
 {
     using PoeShared;
+    using PoeShared.Query;
 
     [ToString]
     internal sealed class PoeQueryResult : IPoeQueryResult

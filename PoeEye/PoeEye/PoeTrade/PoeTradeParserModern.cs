@@ -7,12 +7,17 @@ namespace PoeEye.PoeTrade
 
     using CsQuery;
 
+    using Guards;
+
     using PoeShared;
+    using PoeShared.Query;
 
     internal sealed class PoeTradeParserModern : IPoeTradeParser
     {
         public IPoeQueryResult ParseQueryResult(string rawHtml)
         {
+            Guard.ArgumentNotNull(() => rawHtml);
+            
             var parser = new CQ(new StringReader(rawHtml));
 
             var result = new PoeQueryResult
