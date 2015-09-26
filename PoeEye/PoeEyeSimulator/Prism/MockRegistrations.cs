@@ -2,6 +2,7 @@
 {
     using Microsoft.Practices.Unity;
 
+    using PoeShared;
     using PoeShared.PoeTrade;
 
     using PoeTrade;
@@ -11,6 +12,7 @@
         protected override void Initialize()
         {
             Container
+                .RegisterType<IClock, Clock>()
                 .RegisterType<IPoeApi, PoeTradeApi>();
         }
     }

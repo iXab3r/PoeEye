@@ -9,6 +9,7 @@
         protected override void Initialize()
         {
             Container
+                .RegisterType(typeof (IFactory<,>), typeof (Factory<,>))
                 .RegisterType(typeof (IFactory<>), typeof (Factory<>));
         }
     }

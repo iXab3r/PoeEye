@@ -6,6 +6,7 @@
 
     using Microsoft.Practices.Unity;
 
+    using PoeShared;
     using PoeShared.Http;
     using PoeShared.PoeTrade;
     using PoeShared.PoeTrade.Query;
@@ -25,6 +26,8 @@
                 .RegisterType<IPoeApi, PoeTradeApi>()
                 .RegisterType<IConverter<NameValueCollection, string>, NameValueCollectionToStringConverter>()
                 .RegisterType<IConverter<IPoeQuery, NameValueCollection>, PoeQueryConverter>()
+                .RegisterType<IPoeLiveHistoryProvider, PoeLiveHistoryProvider>()
+                .RegisterType<IClock, Clock>()
                 .RegisterType<IPoeTradeParser, PoeTradeParserModern>();
         }
     }

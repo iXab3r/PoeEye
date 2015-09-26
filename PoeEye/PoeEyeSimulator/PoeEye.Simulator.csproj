@@ -94,6 +94,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Clock.cs" />
     <Compile Include="PoeTrade\PoeTradeApi.cs" />
     <Compile Include="Prism\MockRegistrations.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

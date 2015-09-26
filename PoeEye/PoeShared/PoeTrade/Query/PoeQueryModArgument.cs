@@ -9,7 +9,7 @@ namespace PoeShared.PoeTrade.Query
             Name = name;
         }
 
-        public string Name { get; private set; }
+        public string Name { get; }
 
         public bool Excluded { get; set; }
     }

@@ -2,15 +2,19 @@
 {
     using System;
     using System.Linq;
+    using System.Threading;
 
     using ConsoleDump;
 
     using DumpToText;
 
+    using Factory;
+
     using Microsoft.Practices.Unity;
     using Microsoft.Practices.Unity.Utility;
 
     using PoeShared;
+    using PoeShared.Common;
     using PoeShared.PoeTrade;
     using PoeShared.PoeTrade.Query;
     using PoeShared.Prism;
@@ -46,22 +50,30 @@
                     .AddExtension(new CommonRegistrations())
                     .AddExtension(mainUnityBlock);
 
-                var poeApi = unityContainer.Resolve<IPoeApi>();
 
-                poeApi
-                    .IssueQuery(new PoeQuery()
+                var query = new PoeQuery()
+                {
+                    Arguments = new IPoeQueryArgument[]
                     {
-                        Arguments = new IPoeQueryArgument[]
-                        {
-                            new PoeQueryStringArgument("league", WellKnownLeagues.Warbands),
-                            new PoeQueryStringArgument("name", "Temple map"),
-                            new PoeQueryStringArgument("online", "x"),
-                            new PoeQueryStringArgument("buyout", "x"),
-                            new PoeQueryModArgument("Area is a large Maze"),
-                            new PoeQueryModArgument("Area is #% larger") { Excluded = true },
-                        },
-                    })
-                    .Subscribe(DumpQueryResults);
+                        new PoeQueryStringArgument("league", WellKnownLeagues.Warbands),
+                        new PoeQueryStringArgument("name", "Temple map"),
+                        new PoeQueryStringArgument("online", "x"),
+                        new PoeQueryStringArgument("buyout", "x"),
+                        new PoeQueryModArgument("Area is a large Maze"),
+                        new PoeQueryModArgument("Area is #% larger") {Excluded = true},
+                    },
+                };
+
+                var poeApiFactory = unityContainer.Resolve<IFactory<IPoeLiveHistoryProvider, IPoeQuery>>();
+                var poeApi = poeApiFactory.Create(query);
+
+                poeApi.Items.Subscribe(DumpQueryResults);
+                poeApi.RecheckPeriod = TimeSpan.FromSeconds(10);
+
+                Thread.Sleep(15000);
+
+                poeApi.RecheckPeriod = TimeSpan.Zero;
+
             }
             catch (Exception ex)
             {
@@ -73,13 +85,19 @@
             }
         }
 
+        private static void DumpQueryResults(IPoeItem item)
+        {
+            var itemInfo = new { item.Price, item.ItemName, item.UserIgn};
+            Log.Instance.Debug($"Item: {itemInfo.DumpToText()}");
+        }
+
         private static void DumpQueryResults(IPoeQueryResult queryResult)
         {
             Log.Instance.Debug(queryResult.DumpToText());
 
             var items =
                 queryResult.ItemsList
-                            .Where(x => !string.IsNullOrWhiteSpace(x.Price))
+                           .Where(x => !string.IsNullOrWhiteSpace(x.Price))
                            .Select(x => new { x.Price, x.ItemName, x.UserIgn })
                            .ToArray();
             items.Dump();
