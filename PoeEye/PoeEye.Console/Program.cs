@@ -2,6 +2,7 @@
 {
     using System;
     using System.Linq;
+    using System.Reactive.Linq;
     using System.Threading;
 
     using ConsoleDump;
@@ -67,13 +68,8 @@
                 var poeApiFactory = unityContainer.Resolve<IFactory<IPoeLiveHistoryProvider, IPoeQuery>>();
                 var poeApi = poeApiFactory.Create(query);
 
-                poeApi.Items.Subscribe(DumpQueryResults);
+                poeApi.ItemsPacks.SelectMany(x => x).Subscribe(DumpQueryResults);
                 poeApi.RecheckPeriod = TimeSpan.FromSeconds(10);
-
-                Thread.Sleep(15000);
-
-                poeApi.RecheckPeriod = TimeSpan.Zero;
-
             }
             catch (Exception ex)
             {

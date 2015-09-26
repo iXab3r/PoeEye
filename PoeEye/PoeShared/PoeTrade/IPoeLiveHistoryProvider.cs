@@ -8,7 +8,7 @@
 
     public interface IPoeLiveHistoryProvider
     {
-        IObservable<IPoeItem> Items {[NotNull] get; }
+        IObservable<IPoeItem[]> ItemsPacks {[NotNull] get; }
 
         TimeSpan RecheckPeriod { get; set; }
 

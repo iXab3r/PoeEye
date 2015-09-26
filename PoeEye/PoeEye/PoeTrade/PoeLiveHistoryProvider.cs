@@ -25,7 +25,7 @@
         private TimeSpan recheckPeriod;
         private DateTime lastUpdateTimestamp;
 
-        private ISubject<IPoeItem> itemsSubject = new Subject<IPoeItem>(); 
+        private ISubject<IPoeItem[]> itemPacksSubject = new Subject<IPoeItem>(); 
 
         public PoeLiveHistoryProvider(
                 [NotNull] IPoeQuery query,
@@ -51,11 +51,11 @@
                 .Select(x => poeApi.IssueQuery(query))
                 .Switch()
                 .Do(UpdateItems, HandleUpdateError)
-                .SelectMany(x => x.ItemsList)
-                .Subscribe(itemsSubject);
+                .Select(x => x.ItemsList)
+                .Subscribe(itemPacksSubject);
         }
 
-        public IObservable<IPoeItem> Items => itemsSubject;
+        public IObservable<IPoeItem[]> ItemPacks => itemPacksSubject;
 
         public TimeSpan RecheckPeriod
         {
