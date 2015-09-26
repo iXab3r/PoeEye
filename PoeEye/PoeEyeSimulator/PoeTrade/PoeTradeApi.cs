@@ -1,4 +1,4 @@
-﻿namespace PoeEyeSimulator.PoeTrade
+﻿namespace PoeEye.Simulator.PoeTrade
 {
     using System;
     using System.Linq;
@@ -6,10 +6,8 @@
 
     using Guards;
 
-    using PoeEye.Common;
     using PoeEye.PoeTrade;
 
-    using PoeShared;
     using PoeShared.Common;
     using PoeShared.PoeTrade;
 

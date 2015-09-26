@@ -1,10 +1,10 @@
-﻿namespace PoeEye.Prism
+﻿namespace PoeShared.Prism
 {
     using Factory;
 
     using Microsoft.Practices.Unity;
 
-    internal sealed class CommonRegistrations : UnityContainerExtension
+    public sealed class CommonRegistrations : UnityContainerExtension
     {
         protected override void Initialize()
         {

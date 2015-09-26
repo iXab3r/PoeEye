@@ -2,12 +2,14 @@ namespace PoeShared.PoeTrade
 {
     using Common;
 
+    using JetBrains.Annotations;
+
     public interface IPoeQueryResult
     {
-        IPoeItem[] ItemsList { get; }
+        IPoeItem[] ItemsList { [NotNull] get; }
 
-        IPoeCurrency[] CurrenciesList { get; }
+        IPoeCurrency[] CurrenciesList { [NotNull] get; }
 
-        IPoeItemMod[] ModsList { get; }
+        IPoeItemMod[] ModsList { [NotNull] get; }
     }
 }

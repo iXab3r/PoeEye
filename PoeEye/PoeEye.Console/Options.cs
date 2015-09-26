@@ -1,4 +1,4 @@
-﻿namespace PoeEye
+﻿namespace PoeEye.Console
 {
     using CommandLine;
 
@@ -9,8 +9,8 @@
 
         public enum ProgramMode
         {
+            Live,
             Mock,
-            Live
         }
     }
 }

@@ -13,7 +13,7 @@
         public IDictionary<string, object> Convert(IPoeQuery value)
         {
             Guard.ArgumentNotNull(() => value);
-            
+
             var queryPostData = new Dictionary<string, object>
             {
                 {"league", "Warbands"},

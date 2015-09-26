@@ -1,9 +1,6 @@
-﻿namespace PoeEye.Common
+﻿namespace PoeShared.Common
 {
-    using PoeShared.Common;
-
-    [ToString]
-    internal sealed class PoeItem : IPoeItem
+    public sealed class PoeItem : IPoeItem
     {
         public string ItemName { get; set; }
 

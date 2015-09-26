@@ -4,9 +4,12 @@
     using System.Collections.Generic;
     using System.Net;
 
+    using JetBrains.Annotations;
+
     public interface IHttpClient
     {
-        IObservable<string> PostQuery(string uri, IDictionary<string, object> args);
+        [NotNull] 
+        IObservable<string> PostQuery([NotNull] string uri, [NotNull] IDictionary<string, object> args);
 
         CookieCollection Cookies { get; set; } 
     }

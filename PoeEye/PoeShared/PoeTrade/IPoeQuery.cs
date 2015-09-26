@@ -1,7 +1,9 @@
 ﻿namespace PoeShared.PoeTrade
 {
+    using JetBrains.Annotations;
+
     public interface IPoeQuery
     {   
-         IPoeQueryArgument[] Arguments { get; }
+         IPoeQueryArgument[] Arguments { [NotNull] get; }
     }
 }

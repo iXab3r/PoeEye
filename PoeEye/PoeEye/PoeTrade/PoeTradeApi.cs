@@ -7,22 +7,21 @@
 
     using Factory;
 
-    using PoeShared;
+    using Guards;
+
     using PoeShared.Http;
     using PoeShared.PoeTrade;
 
     using TypeConverter;
-
-    using Guard = Guards.Guard;
 
     internal sealed class PoeTradeApi : IPoeApi
     {
         private static readonly string PoeTradeUri = @"http://poe.trade/search";
 
         private readonly IFactory<IHttpClient> httpClientFactory;
-        private readonly IConverter<IPoeQuery, IDictionary<string, object>> queryConverter;
 
         private readonly IPoeTradeParser poeTradeParser;
+        private readonly IConverter<IPoeQuery, IDictionary<string, object>> queryConverter;
 
         public PoeTradeApi(
             IPoeTradeParser poeTradeParser,
@@ -32,7 +31,7 @@
             Guard.ArgumentNotNull(() => poeTradeParser);
             Guard.ArgumentNotNull(() => httpClientFactory);
             Guard.ArgumentNotNull(() => queryConverter);
-            
+
             this.poeTradeParser = poeTradeParser;
             this.httpClientFactory = httpClientFactory;
             this.queryConverter = queryConverter;
@@ -41,7 +40,7 @@
         public IObservable<IPoeQueryResult> IssueQuery(IPoeQuery query)
         {
             Guard.ArgumentNotNull(() => query);
-            
+
             var client = CreateClient();
 
             var queryPostData = queryConverter.Convert(query);

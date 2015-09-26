@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{12DF53DD-7144-4D2D-B7A1-B4BC5BBDFB69}</ProjectGuid>
+    <ProjectGuid>{785DC21D-42F1-4DB9-883F-4D02CCF73FF0}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>PoeShared</RootNamespace>
-    <AssemblyName>PoeShared</AssemblyName>
+    <RootNamespace>PoeEye.Simulator</RootNamespace>
+    <AssemblyName>PoeEye.Simulator</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <NuGetPackageImportStamp>
@@ -94,28 +94,22 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Common\IPoeCurrency.cs" />
-    <Compile Include="Common\IPoeItem.cs" />
-    <Compile Include="Common\IPoeItemMod.cs" />
-    <Compile Include="Common\PoeCurrency.cs" />
-    <Compile Include="Common\PoeItem.cs" />
-    <Compile Include="Common\PoeItemMod.cs" />
-    <Compile Include="Common\PoeModType.cs" />
-    <Compile Include="DumpToText\DumpToText.cs" />
-    <Compile Include="Http\IHttpClient.cs" />
-    <Compile Include="Log.cs" />
-    <Compile Include="PoeTrade\IPoeApi.cs" />
-    <Compile Include="PoeTrade\IPoeQuery.cs" />
-    <Compile Include="PoeTrade\IPoeQueryResult.cs" />
-    <Compile Include="PoeTrade\IPoeTradeParser.cs" />
-    <Compile Include="PoeTrade\PoeQuery.cs" />
-    <Compile Include="PoeTrade\PoeQueryArg.cs" />
-    <Compile Include="PoeTrade\PoeQueryResult.cs" />
-    <Compile Include="Prism\CommonRegistrations.cs" />
-    <Compile Include="Prism\Factory.cs" />
+    <Compile Include="PoeTrade\PoeTradeApi.cs" />
+    <Compile Include="Prism\MockRegistrations.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\PoeEye\PoeEye.csproj">
+      <Project>{c6188345-f8dc-4cdc-8c01-add0a03bbf1c}</Project>
+      <Name>PoeEye</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PoeShared\PoeShared.csproj">
+      <Project>{12df53dd-7144-4d2d-b7a1-b4bc5bbdfb69}</Project>
+      <Name>PoeShared</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

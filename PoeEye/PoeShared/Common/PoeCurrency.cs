@@ -1,9 +1,6 @@
-﻿namespace PoeEye.Common
+﻿namespace PoeShared.Common
 {
-    using PoeShared.Common;
-
-    [ToString]
-    internal sealed class PoeCurrency : IPoeCurrency
+    public sealed class PoeCurrency : IPoeCurrency
     {
         public string CodeName { get; set; }
 

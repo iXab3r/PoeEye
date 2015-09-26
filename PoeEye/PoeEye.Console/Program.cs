@@ -1,21 +1,26 @@
-﻿namespace PoeEye
+﻿namespace PoeEye.Console
 {
     using System;
     using System.Linq;
-    using System.Reactive.Linq;
 
     using ConsoleDump;
 
     using DumpToText;
 
     using Microsoft.Practices.Unity;
+    using Microsoft.Practices.Unity.Utility;
 
     using PoeShared;
     using PoeShared.PoeTrade;
+    using PoeShared.Prism;
 
     using PoeTrade;
 
     using Prism;
+
+    using Simulator.Prism;
+
+    using Guard = Guards.Guard;
 
     internal class Program
     {
@@ -28,11 +33,12 @@
                 Log.Instance.InfoFormat("Application started");
                 ResizeConsole();
 
-                CommandLine.Parser.Default.ParseArgumentsStrict(args, options);
+                var parsedOptions = CommandLine.Parser.Default.ParseArgumentsStrict(args, options);
+                Guard.ArgumentIsTrue(() => parsedOptions);
 
                 var mainUnityBlock = options.Mode == Options.ProgramMode.Mock
                     ? (UnityContainerExtension) new MockRegistrations()
-                    : new LiveRegistrations();
+                    : (UnityContainerExtension) new LiveRegistrations();
 
                 Log.Instance.Debug($"Unity main block: {mainUnityBlock.DumpToText()}");
 

@@ -1,4 +1,4 @@
-﻿namespace PoeEye.Prism
+﻿namespace PoeShared.Prism
 {
     using Factory;
 

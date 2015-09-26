@@ -13,6 +13,7 @@
 
     using Guards;
 
+    using PoeShared;
     using PoeShared.Http;
 
     internal sealed class GenericHttpClient : IHttpClient
@@ -23,7 +24,7 @@
         {
             Guard.ArgumentNotNullOrEmpty(() => uri);
             Guard.ArgumentNotNull(() => args);
-            
+
             return Task
                 .Run(() => PostQueryInternal(uri, args))
                 .ToObservable();
@@ -36,7 +37,8 @@
 
             Log.Instance.Debug($"[HttpClient] Querying uri '{uri}', args: \r\n{args.DumpToTextValue()}...");
             var response = httpClient.Post(uri, args, HttpContentTypes.ApplicationXWwwFormUrlEncoded);
-            Log.Instance.Debug($"[HttpClient] Received response, status: {response.StatusCode}, length: {response.RawText?.Length}");
+            Log.Instance.Debug(
+                $"[HttpClient] Received response, status: {response.StatusCode}, length: {response.RawText?.Length}");
 
             CheckResponseStatusOrThrow(response);
 
@@ -50,7 +52,8 @@
                 return;
             }
 
-            throw new HttpException(response.StatusCode, $"Wrong status code, expected 200 OK, got {response.StatusCode}");
+            throw new HttpException(response.StatusCode,
+                $"Wrong status code, expected 200 OK, got {response.StatusCode}");
         }
     }
 }

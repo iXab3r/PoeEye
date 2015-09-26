@@ -11,7 +11,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PoeEye.Tests", "PoeTests\Po
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PoeEyeUi", "PoeEyeUi\PoeEyeUi.csproj", "{9BC98190-3DB1-48CD-84F7-96DC843718AE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PoeEyeSimulator", "PoeEyeSimulator\PoeEyeSimulator.csproj", "{785DC21D-42F1-4DB9-883F-4D02CCF73FF0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PoeEye.Simulator", "PoeEyeSimulator\PoeEye.Simulator.csproj", "{785DC21D-42F1-4DB9-883F-4D02CCF73FF0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PoeEye.Console", "PoeEye.Console\PoeEye.Console.csproj", "{B3EE260B-E1BA-4F99-8991-60A3015F2CFF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{785DC21D-42F1-4DB9-883F-4D02CCF73FF0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{785DC21D-42F1-4DB9-883F-4D02CCF73FF0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{785DC21D-42F1-4DB9-883F-4D02CCF73FF0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B3EE260B-E1BA-4F99-8991-60A3015F2CFF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B3EE260B-E1BA-4F99-8991-60A3015F2CFF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B3EE260B-E1BA-4F99-8991-60A3015F2CFF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B3EE260B-E1BA-4F99-8991-60A3015F2CFF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

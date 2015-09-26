@@ -3,13 +3,10 @@ namespace PoeEye.PoeTrade
     using System.IO;
     using System.Linq;
 
-    using Common;
-
     using CsQuery;
 
     using Guards;
 
-    using PoeShared;
     using PoeShared.Common;
     using PoeShared.PoeTrade;
 
@@ -18,14 +15,14 @@ namespace PoeEye.PoeTrade
         public IPoeQueryResult ParseQueryResult(string rawHtml)
         {
             Guard.ArgumentNotNull(() => rawHtml);
-            
+
             var parser = new CQ(new StringReader(rawHtml));
 
             var result = new PoeQueryResult
             {
                 CurrenciesList = ExtractCurrenciesList(parser),
                 ItemsList = ExtractItems(parser),
-                ModsList = ExtractModsList(parser),
+                ModsList = ExtractModsList(parser)
             };
 
             return result;
@@ -66,7 +63,6 @@ namespace PoeEye.PoeTrade
             var explicitModsRows = parser["select[name=mods] option"].ToList();
             var explicitMods = explicitModsRows.Select(x => ParseItemModRow(x, PoeModType.Explicit)).ToArray();
 
-
             var allMods = implicitMods
                 .Concat(explicitMods)
                 .Where(IsValid)
@@ -77,11 +73,11 @@ namespace PoeEye.PoeTrade
 
         private IPoeItemMod ParseItemModRow(IDomObject row, PoeModType modType)
         {
-            var result = new PoeItemMod()
+            var result = new PoeItemMod
             {
                 ModType = modType,
                 Name = row.InnerText,
-                CodeName = row["value"],
+                CodeName = row["value"]
             };
 
             return result;
@@ -119,7 +115,7 @@ namespace PoeEye.PoeTrade
                 UserIgn = parser.Attr("data-ign"),
                 Price = parser.Attr("data-buyout"),
                 League = parser.Attr("data-league"),
-                Mods = parser["ul[class=mods] li"].Select(ExtractItemMods).ToArray(),
+                Mods = parser["ul[class=mods] li"].Select(ExtractItemMods).ToArray()
             };
 
             return result;
@@ -129,14 +125,14 @@ namespace PoeEye.PoeTrade
         {
             CQ parser = itemModRow.Render();
 
-            var result = new PoeItemMod()
+            var result = new PoeItemMod
             {
                 ModType = PoeModType.Unknown,
                 CodeName = parser.Attr("data-name")?.Trim('#'),
-                Name = parser.Text(),
+                Name = parser.Text()
             };
 
             return result;
-        } 
+        }
     }
 }

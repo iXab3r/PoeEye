@@ -4,13 +4,12 @@
 
     using Microsoft.Practices.Unity;
 
-    using PoeShared;
     using PoeShared.Http;
     using PoeShared.PoeTrade;
 
     using PoeTrade;
 
-    internal sealed class LiveRegistrations : UnityContainerExtension
+    public sealed class LiveRegistrations : UnityContainerExtension
     {
         protected override void Initialize()
         {

@@ -1,9 +1,11 @@
 ﻿namespace PoeShared.PoeTrade
 {
+    using JetBrains.Annotations;
     using System;
 
     public interface IPoeApi
     {
-        IObservable<IPoeQueryResult> IssueQuery(IPoeQuery query);
+        [NotNull] 
+        IObservable<IPoeQueryResult> IssueQuery([NotNull] IPoeQuery query);
     }
 }

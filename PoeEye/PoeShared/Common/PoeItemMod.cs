@@ -1,9 +1,6 @@
-namespace PoeEye.Common
+namespace PoeShared.Common
 {
-    using PoeShared.Common;
-
-    [ToString]
-    internal sealed class PoeItemMod : IPoeItemMod
+    public sealed class PoeItemMod : IPoeItemMod
     {
         public PoeModType ModType { get; set; }
 
