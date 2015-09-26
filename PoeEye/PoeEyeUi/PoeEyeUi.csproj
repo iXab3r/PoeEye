@@ -57,6 +57,10 @@
       <HintPath>..\packages\JetBrains.Annotations.9.2.0\lib\net20\JetBrains.Annotations.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="MahApps.Metro, Version=1.1.2.0, Culture=neutral, PublicKeyToken=f4fb5a3c4d1e5b4f, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.1.1.2.0\lib\net45\MahApps.Metro.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.Practices.Unity, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Unity.3.5.1404.0\lib\net45\Microsoft.Practices.Unity.dll</HintPath>
       <Private>True</Private>
@@ -99,6 +103,10 @@
       <HintPath>..\packages\Rx-XAML.2.2.5\lib\net45\System.Reactive.Windows.Threading.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.1.1.2.0\lib\net45\System.Windows.Interactivity.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -127,10 +135,16 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MainWindow.xaml.cs">
+      <DependentUpon>MainWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="MainWindowTabViewModel.cs" />
+    <Compile Include="MainWindowViewModel.cs" />
     <Compile Include="PoeTrade\PoeTradeState.cs" />
     <Compile Include="PoeTrade\ViewModels\IPoeTradeViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\PoeTradeViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\TradesListViewModel.cs" />
+    <Compile Include="Prism\UiRegistrations.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -163,10 +177,24 @@
     <Folder Include="PoeTrade\Views\" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\PoeEyeSimulator\PoeEye.Simulator.csproj">
+      <Project>{785dc21d-42f1-4db9-883f-4d02ccf73ff0}</Project>
+      <Name>PoeEye.Simulator</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PoeEye\PoeEye.csproj">
+      <Project>{c6188345-f8dc-4cdc-8c01-add0a03bbf1c}</Project>
+      <Name>PoeEye</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PoeShared\PoeShared.csproj">
       <Project>{12DF53DD-7144-4D2D-B7A1-B4BC5BBDFB69}</Project>
       <Name>PoeShared</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="MainWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
