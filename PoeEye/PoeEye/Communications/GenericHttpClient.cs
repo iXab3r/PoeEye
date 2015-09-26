@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.Specialized;
     using System.Net;
     using System.Reactive.Threading.Tasks;
     using System.Threading.Tasks;
@@ -13,14 +14,27 @@
 
     using Guards;
 
+    using JetBrains.Annotations;
+
     using PoeShared;
     using PoeShared.Http;
 
+    using TypeConverter;
+
     internal sealed class GenericHttpClient : IHttpClient
     {
+        private readonly IConverter<NameValueCollection, string> nameValueConverter;
+
         public CookieCollection Cookies { get; set; }
 
-        public IObservable<string> PostQuery(string uri, IDictionary<string, object> args)
+        public GenericHttpClient([NotNull] IConverter<NameValueCollection, string> nameValueConverter)
+        {
+            Guard.ArgumentNotNull(() => nameValueConverter);
+            
+            this.nameValueConverter = nameValueConverter;
+        }
+
+        public IObservable<string> PostQuery(string uri, NameValueCollection args)
         {
             Guard.ArgumentNotNullOrEmpty(() => uri);
             Guard.ArgumentNotNull(() => args);
@@ -30,13 +44,15 @@
                 .ToObservable();
         }
 
-        private string PostQueryInternal(string uri, IDictionary<string, object> args)
+        private string PostQueryInternal(string uri, NameValueCollection args)
         {
             var httpClient = new HttpClient();
             httpClient.Request.Cookies = Cookies;
 
-            Log.Instance.Debug($"[HttpClient] Querying uri '{uri}', args: \r\n{args.DumpToTextValue()}...");
-            var response = httpClient.Post(uri, args, HttpContentTypes.ApplicationXWwwFormUrlEncoded);
+            var postData = nameValueConverter.Convert(args);
+            Log.Instance.Debug($"[HttpClient] Querying uri '{uri}', args: \r\n{postData}...");
+            
+            var response = httpClient.Post(uri, postData, HttpContentTypes.ApplicationXWwwFormUrlEncoded);
             Log.Instance.Debug(
                 $"[HttpClient] Received response, status: {response.StatusCode}, length: {response.RawText?.Length}");
 

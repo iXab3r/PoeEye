@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.Specialized;
     using System.Net;
     using System.Reactive.Linq;
 
@@ -11,6 +12,7 @@
 
     using PoeShared.Http;
     using PoeShared.PoeTrade;
+    using PoeShared.PoeTrade.Query;
 
     using TypeConverter;
 
@@ -21,12 +23,12 @@
         private readonly IFactory<IHttpClient> httpClientFactory;
 
         private readonly IPoeTradeParser poeTradeParser;
-        private readonly IConverter<IPoeQuery, IDictionary<string, object>> queryConverter;
+        private readonly IConverter<IPoeQuery, NameValueCollection> queryConverter;
 
         public PoeTradeApi(
             IPoeTradeParser poeTradeParser,
             IFactory<IHttpClient> httpClientFactory,
-            IConverter<IPoeQuery, IDictionary<string, object>> queryConverter)
+            IConverter<IPoeQuery, NameValueCollection> queryConverter)
         {
             Guard.ArgumentNotNull(() => poeTradeParser);
             Guard.ArgumentNotNull(() => httpClientFactory);

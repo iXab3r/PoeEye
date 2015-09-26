@@ -57,7 +57,7 @@
             var result = instance.ParseQueryResult(rawHtml);
 
             //Then
-            result.ModsList.Length.ShouldBe(1);
+            result.ModsList.Length.ShouldBe(2985);
         }
 
         private PoeTradeParserModern CreateInstance()

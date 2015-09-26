@@ -1,4 +1,4 @@
-﻿namespace PoeShared.PoeTrade
+﻿namespace PoeShared.PoeTrade.Query
 {
     public sealed class PoeQuery : IPoeQuery
     {
@@ -7,7 +7,7 @@
         public IPoeQueryArgument[] Arguments
         {
             get { return arguments; }
-            private set { arguments = value ?? new IPoeQueryArgument[0]; }
+            set { arguments = value ?? new IPoeQueryArgument[0]; }
         }
     }
 }

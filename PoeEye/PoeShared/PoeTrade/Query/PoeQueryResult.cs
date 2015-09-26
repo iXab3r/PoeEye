@@ -1,4 +1,4 @@
-namespace PoeShared.PoeTrade
+namespace PoeShared.PoeTrade.Query
 {
     using Common;
 

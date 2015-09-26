@@ -105,15 +105,23 @@
     <Compile Include="Http\IHttpClient.cs" />
     <Compile Include="Log.cs" />
     <Compile Include="PoeTrade\IPoeApi.cs" />
-    <Compile Include="PoeTrade\IPoeQuery.cs" />
-    <Compile Include="PoeTrade\IPoeQueryResult.cs" />
     <Compile Include="PoeTrade\IPoeTradeParser.cs" />
-    <Compile Include="PoeTrade\PoeQuery.cs" />
-    <Compile Include="PoeTrade\PoeQueryArg.cs" />
-    <Compile Include="PoeTrade\PoeQueryResult.cs" />
+    <Compile Include="PoeTrade\Query\IPoeQuery.cs" />
+    <Compile Include="PoeTrade\Query\IPoeQueryFloatArgument.cs" />
+    <Compile Include="PoeTrade\Query\IPoeQueryIntArgument.cs" />
+    <Compile Include="PoeTrade\Query\IPoeQueryModArgument.cs" />
+    <Compile Include="PoeTrade\Query\IPoeQueryRangeModArgument.cs" />
+    <Compile Include="PoeTrade\Query\IPoeQueryResult.cs" />
+    <Compile Include="PoeTrade\Query\IPoeQueryStringArgument.cs" />
+    <Compile Include="PoeTrade\Query\PoeQuery.cs" />
+    <Compile Include="PoeTrade\Query\IPoeQueryArgument.cs" />
+    <Compile Include="PoeTrade\Query\PoeQueryModArgument.cs" />
+    <Compile Include="PoeTrade\Query\PoeQueryResult.cs" />
+    <Compile Include="PoeTrade\Query\PoeQueryStringArgument.cs" />
     <Compile Include="Prism\CommonRegistrations.cs" />
     <Compile Include="Prism\Factory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="WellKnownLeagues.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

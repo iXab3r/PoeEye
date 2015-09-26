@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.Specialized;
     using System.Net;
 
     using JetBrains.Annotations;
@@ -9,7 +10,7 @@
     public interface IHttpClient
     {
         [NotNull] 
-        IObservable<string> PostQuery([NotNull] string uri, [NotNull] IDictionary<string, object> args);
+        IObservable<string> PostQuery([NotNull] string uri, [NotNull] NameValueCollection args);
 
         CookieCollection Cookies { get; set; } 
     }

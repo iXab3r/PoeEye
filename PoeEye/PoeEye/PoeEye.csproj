@@ -121,6 +121,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Communications\GenericHttpClient.cs" />
+    <Compile Include="Communications\NameValueCollectionToStringConverter.cs" />
     <Compile Include="PoeTrade\PoeQueryConverter.cs" />
     <Compile Include="PoeTrade\PoeTradeApi.cs" />
     <Compile Include="PoeTrade\PoeTradeParserModern.cs" />
@@ -136,6 +137,9 @@
       <Project>{12df53dd-7144-4d2d-b7a1-b4bc5bbdfb69}</Project>
       <Name>PoeShared</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="PoeTrade\Query\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

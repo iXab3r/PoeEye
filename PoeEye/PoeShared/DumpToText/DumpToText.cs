@@ -133,7 +133,7 @@ namespace DumpToText
 						sb.Append("| ");
 						sb.Append(string.Format("{0," + maxPropertyNameWidth + "}", child.PropertyInfo.Name));
 						sb.Append(" | ");
-						sb.Append(string.Format("{0,-" + (valueColumnWidth) + "}", eachRowInChildItem.First()));
+						sb.Append(string.Format("{0,-" + (valueColumnWidth) + "}", eachRowInChildItem.FirstOrDefault()));
 						sb.AppendLine(" |");
 
 						foreach (var row in eachRowInChildItem.Skip(1))

@@ -12,6 +12,7 @@
 
     using PoeShared;
     using PoeShared.PoeTrade;
+    using PoeShared.PoeTrade.Query;
     using PoeShared.Prism;
 
     using PoeTrade;
@@ -33,12 +34,11 @@
                 Log.Instance.InfoFormat("Application started");
                 ResizeConsole();
 
-                var parsedOptions = CommandLine.Parser.Default.ParseArgumentsStrict(args, options);
-                Guard.ArgumentIsTrue(() => parsedOptions);
+                CommandLine.Parser.Default.ParseArguments(args, options);
 
                 var mainUnityBlock = options.Mode == Options.ProgramMode.Mock
-                    ? (UnityContainerExtension) new MockRegistrations()
-                    : (UnityContainerExtension) new LiveRegistrations();
+                    ? (UnityContainerExtension)new MockRegistrations()
+                    : (UnityContainerExtension)new LiveRegistrations();
 
                 Log.Instance.Debug($"Unity main block: {mainUnityBlock.DumpToText()}");
 
@@ -49,7 +49,18 @@
                 var poeApi = unityContainer.Resolve<IPoeApi>();
 
                 poeApi
-                    .IssueQuery(new PoeQuery())
+                    .IssueQuery(new PoeQuery()
+                    {
+                        Arguments = new IPoeQueryArgument[]
+                        {
+                            new PoeQueryStringArgument("league", WellKnownLeagues.Warbands),
+                            new PoeQueryStringArgument("name", "Temple map"),
+                            new PoeQueryStringArgument("online", "x"),
+                            new PoeQueryStringArgument("buyout", "x"),
+                            new PoeQueryModArgument("Area is a large Maze"),
+                            new PoeQueryModArgument("Area is #% larger") { Excluded = true },
+                        },
+                    })
                     .Subscribe(DumpQueryResults);
             }
             catch (Exception ex)
@@ -69,7 +80,7 @@
             var items =
                 queryResult.ItemsList
                             .Where(x => !string.IsNullOrWhiteSpace(x.Price))
-                           .Select(x => new {x.Price, x.ItemName, x.UserIgn})
+                           .Select(x => new { x.Price, x.ItemName, x.UserIgn })
                            .ToArray();
             items.Dump();
         }

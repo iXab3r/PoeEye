@@ -10,6 +10,7 @@
 
     using PoeShared.Common;
     using PoeShared.PoeTrade;
+    using PoeShared.PoeTrade.Query;
 
     internal sealed class PoeTradeApi : IPoeApi
     {
