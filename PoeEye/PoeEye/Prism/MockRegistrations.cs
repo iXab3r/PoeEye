@@ -3,8 +3,7 @@
     using Microsoft.Practices.Unity;
 
     using PoeShared;
-
-    using Simulator;
+    using PoeShared.PoeTrade;
 
     internal sealed class MockRegistrations : UnityContainerExtension
     {

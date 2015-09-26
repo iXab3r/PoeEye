@@ -130,13 +130,13 @@
     <Compile Include="Common\PoeCurrency.cs" />
     <Compile Include="Common\PoeItem.cs" />
     <Compile Include="Common\PoeItemMod.cs" />
-    <Compile Include="Common\PoeQuery.cs" />
-    <Compile Include="Common\PoeQueryResult.cs" />
     <Compile Include="Communications\GenericHttpClient.cs" />
     <Compile Include="DumpToText\DumpToText.cs" />
     <Compile Include="Log.cs" />
     <Compile Include="Options.cs" />
+    <Compile Include="PoeTrade\PoeQuery.cs" />
     <Compile Include="PoeTrade\PoeQueryConverter.cs" />
+    <Compile Include="PoeTrade\PoeQueryResult.cs" />
     <Compile Include="PoeTrade\PoeTradeApi.cs" />
     <Compile Include="PoeTrade\PoeTradeParserModern.cs" />
     <Compile Include="Prism\Factory.cs" />
@@ -145,7 +145,6 @@
     <Compile Include="Prism\MockRegistrations.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Simulator\PoeApi.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

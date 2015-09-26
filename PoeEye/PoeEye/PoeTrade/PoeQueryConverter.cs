@@ -4,7 +4,7 @@
 
     using Guards;
 
-    using PoeShared.Query;
+    using PoeShared.PoeTrade;
 
     using TypeConverter;
 

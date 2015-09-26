@@ -1,5 +1,7 @@
-namespace PoeShared.Query
+namespace PoeShared.PoeTrade
 {
+    using Common;
+
     public interface IPoeQueryResult
     {
         IPoeItem[] ItemsList { get; }

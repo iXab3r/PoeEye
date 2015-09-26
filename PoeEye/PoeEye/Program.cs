@@ -4,8 +4,6 @@
     using System.Linq;
     using System.Reactive.Linq;
 
-    using Common;
-
     using ConsoleDump;
 
     using DumpToText;
@@ -13,7 +11,9 @@
     using Microsoft.Practices.Unity;
 
     using PoeShared;
-    using PoeShared.Query;
+    using PoeShared.PoeTrade;
+
+    using PoeTrade;
 
     using Prism;
 

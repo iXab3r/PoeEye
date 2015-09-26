@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{12DF53DD-7144-4D2D-B7A1-B4BC5BBDFB69}</ProjectGuid>
+    <ProjectGuid>{785DC21D-42F1-4DB9-883F-4D02CCF73FF0}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>PoeShared</RootNamespace>
-    <AssemblyName>PoeShared</AssemblyName>
+    <RootNamespace>PoeEyeSimulator</RootNamespace>
+    <AssemblyName>PoeEyeSimulator</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -32,14 +32,6 @@
   <ItemGroup>
     <Reference Include="Guards, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Guards.1.0.0\lib\portable-net45+wp8+wpa81+netcore45+monoandroid1+xamarin.ios10\Guards.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="IFactory, Version=0.1.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\IFactory.0.1.2\lib\net45\IFactory.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="JetBrains.Annotations, Version=9.2.0.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
-      <HintPath>..\packages\JetBrains.Annotations.9.2.0\lib\net20\JetBrains.Annotations.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.Practices.Unity, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -80,17 +72,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Common\IPoeCurrency.cs" />
-    <Compile Include="Common\IPoeItem.cs" />
-    <Compile Include="Common\IPoeItemMod.cs" />
-    <Compile Include="Common\PoeModType.cs" />
-    <Compile Include="Http\IHttpClient.cs" />
-    <Compile Include="PoeTrade\IPoeApi.cs" />
-    <Compile Include="PoeTrade\IPoeQuery.cs" />
-    <Compile Include="PoeTrade\IPoeQueryResult.cs" />
-    <Compile Include="PoeTrade\IPoeTradeParser.cs" />
-    <Compile Include="PoeTrade\PoeQueryArg.cs" />
+    <Compile Include="PoeTrade\PoeTradeApi.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\PoeEye\PoeEye.csproj">
+      <Project>{c6188345-f8dc-4cdc-8c01-add0a03bbf1c}</Project>
+      <Name>PoeEye</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PoeShared\PoeShared.csproj">
+      <Project>{12df53dd-7144-4d2d-b7a1-b4bc5bbdfb69}</Project>
+      <Name>PoeShared</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

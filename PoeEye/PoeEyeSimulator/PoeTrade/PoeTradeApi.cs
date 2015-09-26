@@ -1,17 +1,19 @@
-﻿namespace PoeEye.Simulator
+﻿namespace PoeEyeSimulator.PoeTrade
 {
     using System;
     using System.Linq;
     using System.Reactive.Linq;
 
-    using Common;
-
     using Guards;
 
-    using PoeShared;
-    using PoeShared.Query;
+    using PoeEye.Common;
+    using PoeEye.PoeTrade;
 
-    internal sealed class PoeApi : IPoeApi
+    using PoeShared;
+    using PoeShared.Common;
+    using PoeShared.PoeTrade;
+
+    internal sealed class PoeTradeApi : IPoeApi
     {
         public IObservable<IPoeQueryResult> IssueQuery(IPoeQuery query)
         {

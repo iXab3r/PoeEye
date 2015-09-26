@@ -1,4 +1,4 @@
-namespace PoeShared
+namespace PoeShared.Common
 {
     public enum PoeModType
     {

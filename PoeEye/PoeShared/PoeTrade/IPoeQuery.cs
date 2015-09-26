@@ -1,4 +1,4 @@
-﻿namespace PoeShared.Query
+﻿namespace PoeShared.PoeTrade
 {
     public interface IPoeQuery
     {   

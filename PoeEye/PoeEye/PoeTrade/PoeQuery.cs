@@ -1,6 +1,6 @@
-﻿namespace PoeEye.Common
+﻿namespace PoeEye.PoeTrade
 {
-    using PoeShared.Query;
+    using PoeShared.PoeTrade;
 
     internal sealed class PoeQuery : IPoeQuery
     {

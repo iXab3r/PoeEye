@@ -1,6 +1,6 @@
 ﻿namespace PoeEye.Common
 {
-    using PoeShared;
+    using PoeShared.Common;
 
     [ToString]
     internal sealed class PoeItem : IPoeItem

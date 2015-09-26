@@ -10,7 +10,8 @@ namespace PoeEye.PoeTrade
     using Guards;
 
     using PoeShared;
-    using PoeShared.Query;
+    using PoeShared.Common;
+    using PoeShared.PoeTrade;
 
     internal sealed class PoeTradeParserModern : IPoeTradeParser
     {

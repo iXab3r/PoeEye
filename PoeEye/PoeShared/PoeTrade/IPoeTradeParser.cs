@@ -1,7 +1,5 @@
-namespace PoeShared
+namespace PoeShared.PoeTrade
 {
-    using Query;
-
     public interface IPoeTradeParser
     {
         IPoeQueryResult ParseQueryResult(string rawHtml);

@@ -6,6 +6,7 @@
 
     using PoeShared;
     using PoeShared.Http;
+    using PoeShared.PoeTrade;
 
     using PoeTrade;
 

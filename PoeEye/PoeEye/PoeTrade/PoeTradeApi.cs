@@ -9,7 +9,7 @@
 
     using PoeShared;
     using PoeShared.Http;
-    using PoeShared.Query;
+    using PoeShared.PoeTrade;
 
     using TypeConverter;
 

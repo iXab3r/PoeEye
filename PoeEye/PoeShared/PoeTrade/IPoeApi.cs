@@ -1,8 +1,6 @@
-﻿namespace PoeShared
+﻿namespace PoeShared.PoeTrade
 {
     using System;
-
-    using Query;
 
     public interface IPoeApi
     {
