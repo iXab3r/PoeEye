@@ -30,6 +30,10 @@
             command.Subscribe(SearchCommandExecute);
 
             searchCommand = command;
+
+            tradesListViewModel
+                .WhenAnyValue(x => x.LastUpdateTimestamp)
+                .Subscribe(_ => this.RaisePropertyChanged(nameof(this.LastUpdateTimestamp)));
         }
 
         private void SearchCommandExecute(object o)
@@ -51,9 +55,11 @@
             TradesListViewModel.Query = query;
         }
 
-        public TradesListViewModel TradesListViewModel { get; set; }
+        public TradesListViewModel TradesListViewModel { get; }
 
         public ICommand SearchCommand => searchCommand;
+
+        public DateTime LastUpdateTimestamp => TradesListViewModel.LastUpdateTimestamp;
 
         public string TabName
         {

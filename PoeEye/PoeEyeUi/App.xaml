@@ -11,9 +11,15 @@
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Colors.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/Blue.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseDark.xaml" />
+                <ResourceDictionary Source="Resources/Icons.xaml" />
+                <ResourceDictionary Source="PoeTrade/Views/PoeTradeView.xaml" />
+                <ResourceDictionary Source="PoeTrade/Views/MainWindowTabView.xaml" />
+                <ResourceDictionary Source="PoeTrade/Views/PoeItemModView.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
-          
+            <SolidColorBrush x:Key="PoeTradeRemovedItemColor" Color="#55FF9298" />
+            <SolidColorBrush x:Key="PoeTradeNewItemColor" Color="#5592FF98" />
+
         </ResourceDictionary>
     </Application.Resources>
 </Application>

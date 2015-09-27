@@ -1,5 +1,9 @@
 ﻿namespace PoeShared.Prism
 {
+    using System.Collections.Generic;
+
+    using Common;
+
     using Factory;
 
     using Microsoft.Practices.Unity;
@@ -9,7 +13,8 @@
         protected override void Initialize()
         {
             Container
-                .RegisterType(typeof (IFactory<,>), typeof (Factory<,>))
+                .RegisterType(typeof (IEqualityComparer<IPoeItem>), typeof (PoeItemEqualityComparer))
+                .RegisterType(typeof (IFactory<,>), typeof(Factory<,>))
                 .RegisterType(typeof (IFactory<>), typeof (Factory<>));
         }
     }

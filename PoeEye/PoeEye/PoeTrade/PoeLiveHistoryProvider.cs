@@ -21,24 +21,19 @@
     {
         private readonly IPoeQuery query;
         private readonly IPoeApi poeApi;
-        private readonly IClock clock;
         private TimeSpan recheckPeriod;
-        private DateTime lastUpdateTimestamp;
 
         private readonly ISubject<IPoeItem[]> itemPacksSubject = new Subject<IPoeItem[]>(); 
 
         public PoeLiveHistoryProvider(
                 [NotNull] IPoeQuery query,
-                [NotNull] IPoeApi poeApi,
-                [NotNull] IClock clock)
+                [NotNull] IPoeApi poeApi)
         {
             Guard.ArgumentNotNull(() => query);
             Guard.ArgumentNotNull(() => poeApi);
-            Guard.ArgumentNotNull(() => clock);
 
             this.query = query;
             this.poeApi = poeApi;
-            this.clock = clock;
 
             this.ObservableForProperty(x => x.RecheckPeriod)
                 .Select(x => x.Value)
@@ -63,12 +58,6 @@
             set { this.RaiseAndSetIfChanged(ref recheckPeriod, value); }
         }
 
-        public DateTime LastUpdateTimestamp
-        {
-            get { return lastUpdateTimestamp; }
-            set { this.RaiseAndSetIfChanged(ref lastUpdateTimestamp, value); }
-        }
-
         private void LogTimestamp()
         {
             Log.Instance.Debug($"[PoeLiveHistoryProvider] Updating (period: {recheckPeriod})...");
@@ -82,7 +71,6 @@
         private void UpdateItems(IPoeQueryResult queryResult)
         {
             Log.Instance.Debug($"[PoeLiveHistoryProvider] Update received, itemsCount: {queryResult.ItemsList.Length}");
-            LastUpdateTimestamp = clock.CurrentTime;
         }
 
         private void HandleUpdateError(Exception ex)

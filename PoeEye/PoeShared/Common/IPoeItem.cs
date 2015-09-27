@@ -1,5 +1,7 @@
 ﻿namespace PoeShared.Common
 {
+    using JetBrains.Annotations;
+
     public interface IPoeItem
     {
         string ItemName { get; }
@@ -18,6 +20,6 @@
 
         string League { get; }
 
-        IPoeItemMod[] Mods { get; }
+        IPoeItemMod[] Mods { [NotNull] get; }
     }
 }

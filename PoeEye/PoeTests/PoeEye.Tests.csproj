@@ -102,6 +102,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Common\PoeItemEqualityComparerFixture.cs" />
+    <Compile Include="Common\PoeItemModEqualityComparerFixture.cs" />
     <Compile Include="Communications\NameValueCollectionToStringConverterFixture.cs" />
     <Compile Include="PoeTrade\PoeTradeParserModernFixture.cs" />
     <Compile Include="PoeTrade\TestData\TestDataProvider.cs" />

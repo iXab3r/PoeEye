@@ -11,7 +11,5 @@
         IObservable<IPoeItem[]> ItemsPacks {[NotNull] get; }
 
         TimeSpan RecheckPeriod { get; set; }
-
-        DateTime LastUpdateTimestamp { get; }
     }
 }

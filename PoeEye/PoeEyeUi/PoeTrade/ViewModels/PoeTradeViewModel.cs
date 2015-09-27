@@ -32,6 +32,8 @@
 
         public string Price => poeItem.Price;
 
+        public IPoeItemMod[] Mods => poeItem.Mods;
+
         public IPoeItem Trade => poeItem;
     }
 }

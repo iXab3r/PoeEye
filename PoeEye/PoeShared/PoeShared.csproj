@@ -44,6 +44,10 @@
       <HintPath>..\packages\Guards.1.0.0\lib\portable-net45+wp8+wpa81+netcore45+monoandroid1+xamarin.ios10\Guards.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="HashCalculator, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\HashCodeGenerator.1.0.1\lib\HashCalculator.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="IFactory, Version=0.1.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\IFactory.0.1.2\lib\net45\IFactory.dll</HintPath>
       <Private>True</Private>
@@ -99,7 +103,9 @@
     <Compile Include="Common\IPoeItemMod.cs" />
     <Compile Include="Common\PoeCurrency.cs" />
     <Compile Include="Common\PoeItem.cs" />
+    <Compile Include="Common\PoeItemEqualityComparer.cs" />
     <Compile Include="Common\PoeItemMod.cs" />
+    <Compile Include="Common\PoeItemModEqualityComparer.cs" />
     <Compile Include="Common\PoeModType.cs" />
     <Compile Include="DumpToText\DumpToText.cs" />
     <Compile Include="Http\IHttpClient.cs" />

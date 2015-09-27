@@ -2,6 +2,8 @@
 {
     public sealed class PoeItem : IPoeItem
     {
+        private IPoeItemMod[] mods = new IPoeItemMod[0];
+
         public string ItemName { get; set; }
 
         public string ItemIconUri { get; set; }
@@ -18,6 +20,10 @@
 
         public string League { get; set; }
 
-        public IPoeItemMod[] Mods { get; set; }
+        public IPoeItemMod[] Mods
+        {
+            get { return mods; }
+            set { mods = value ?? new IPoeItemMod[0]; }
+        }
     }
 }

@@ -5,38 +5,79 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PoeEyeUi"
         xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
+        xmlns:system="clr-namespace:System;assembly=mscorlib"
         mc:Ignorable="d"
-        Title="MainWindow" MinHeight="300" MinWidth="400" Height="300" Width="400" d:DataContext="{d:DesignInstance local:MainWindowViewModel}">
+        Title="MainWindow" 
+                      MinWidth="400" 
+                      MinHeight="300" 
+                      Width="800" 
+                      Height="600" 
+                      d:DataContext="{d:DesignInstance local:MainWindowViewModel}">
 
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="20"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <controls:MetroTabControl Grid.RowSpan="2" ItemsSource="{Binding TabsList}">
+        
+       <controls:MetroContentControl Grid.Row="0">
+           <StackPanel>
+                <Button Width="50"
+                        Height="50"
+                        Style="{DynamicResource MetroCircleButtonStyle}"
+                        Command="{Binding CreateNewTabCommand}">
+
+                    <Rectangle Width="20"
+                               Height="20"
+                               Fill="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Button}}}">
+                        <Rectangle.OpacityMask>
+                            <VisualBrush Stretch="Fill"
+                                         Visual="{DynamicResource appbar_newspaper_create}" />
+                        </Rectangle.OpacityMask>
+                    </Rectangle>
+                </Button>
+           </StackPanel>
+        </controls:MetroContentControl>
+        
+        <controls:MetroTabControl Grid.Row="1"
+                                  ItemsSource="{Binding TabsList}" 
+                                  SelectedItem="{Binding SelectedItem}"
+                                  controls:TabControlHelper.IsUnderlined="True"
+                                  controls:TabControlHelper.Transition="RightReplace" >
             <controls:MetroTabControl.ItemTemplate>
                 <DataTemplate DataType="{x:Type local:MainWindowTabViewModel}">
-                    <StackPanel>
+                    <StackPanel Orientation="Horizontal">
                         <TextBlock Text="{Binding TabName}"/>
+                        <Button Width="30" Height="30"
+                                Style="{DynamicResource MetroCircleButtonStyle}"
+                                Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type controls:MetroTabControl}}, Path=DataContext.CloseTabCommand}"
+                                CommandParameter="{Binding}">
+                            <Rectangle Width="10" Height="10" Fill="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Button}}}">
+                                <Rectangle.OpacityMask>
+                                    <VisualBrush Stretch="Fill" Visual="{DynamicResource appbar_xbox}" />
+                                </Rectangle.OpacityMask>
+                            </Rectangle>
+
+                        </Button>
                     </StackPanel>
                 </DataTemplate>
             </controls:MetroTabControl.ItemTemplate>
-
-            <controls:MetroTabControl.ContentTemplate>
-                <DataTemplate DataType="{x:Type local:MainWindowTabViewModel}">
-                    <StackPanel>
-                        <Button Command="{Binding SearchCommand}" Content="Search"></Button>
-                        <TextBlock Text="{Binding TradesListViewModel}"></TextBlock>
-
-                        <DataGrid ItemsSource="{Binding TradesListViewModel.TradesList}"></DataGrid>
-                    </StackPanel>
-                </DataTemplate>
-            </controls:MetroTabControl.ContentTemplate>
-
         </controls:MetroTabControl>
 
-        <StatusBar Grid.Row="1">
-            <Button Command="{Binding CreateNewTabCommand}" Height="15" MinHeight="10">234123412341234</Button>
+        <StatusBar Grid.Row="2">
+            <StatusBar.Resources>
+                <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource MetroTextBlock}">
+                    <Setter Property="FontSize" Value="20"></Setter>
+                </Style>
+            </StatusBar.Resources>
+            <StatusBar.Items>
+                <Label Content="status" ></Label>
+
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="{Binding SelectedItem.LastUpdateTimestamp, Mode=OneWay, StringFormat='Last update: {0:MMM dd HH:mm:ss.fff}'}"/>
+                </StackPanel>
+            </StatusBar.Items>
         </StatusBar>
     </Grid>
 </controls:MetroWindow>

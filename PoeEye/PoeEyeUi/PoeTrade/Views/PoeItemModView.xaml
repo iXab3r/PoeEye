@@ -1,0 +1,14 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:viewModels="clr-namespace:PoeEyeUi.PoeTrade.ViewModels"
+                    xmlns:poeEyeUi="clr-namespace:PoeEyeUi"
+                    xmlns:common="clr-namespace:PoeShared.Common;assembly=PoeShared"
+                    xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls">
+
+    <DataTemplate DataType="{x:Type common:PoeItemMod}">
+        <controls:MetroContentControl>
+            <Label Content="{Binding Name}"/>
+        </controls:MetroContentControl>
+    </DataTemplate>
+
+</ResourceDictionary>

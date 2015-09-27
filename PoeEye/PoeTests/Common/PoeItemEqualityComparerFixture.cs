@@ -1,0 +1,142 @@
+﻿namespace PoeEye.Tests.Common
+{
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+
+    using NUnit.Framework;
+
+    using Moq;
+
+    using PoeShared.Common;
+
+    using Shouldly;
+
+    [TestFixture]
+    public class PoeItemEqualityComparerFixture
+    {
+        [SetUp]
+        public void SetUp()
+        {
+        }
+
+        [Test]
+        [TestCaseSource(nameof(ShouldReturnTrueTestCaseSource))]
+        public void ShouldReturnTrue(Tuple<IPoeItem, IPoeItem> pair)
+        {
+            //Given
+            var instance = CreateInstance();
+
+            //When
+            var result = instance.Equals(pair.Item1, pair.Item2);
+
+            //Then
+            result.ShouldBe(true);
+        }
+
+        [Test]
+        [TestCaseSource(nameof(ShouldReturnFalseTestCaseSource))]
+        public void ShouldReturnFalse(Tuple<IPoeItem, IPoeItem> pair)
+        {
+            //Given
+            var instance = CreateInstance();
+
+            //When
+            var result = instance.Equals(pair.Item1, pair.Item2);
+
+            //Then
+            result.ShouldBe(false);
+        }
+
+        private IEnumerable<Tuple<IPoeItem, IPoeItem>> ShouldReturnTrueTestCaseSource()
+        {
+            yield return new Tuple<IPoeItem, IPoeItem>(
+                Mock.Of<IPoeItem>(x => x.UserForumUri == "1"),
+                Mock.Of<IPoeItem>(x => x.UserForumUri == "1"));
+            yield return new Tuple<IPoeItem, IPoeItem>(
+                Mock.Of<IPoeItem>(x => x.Price == "1"),
+                Mock.Of<IPoeItem>(x => x.Price == "1"));
+            yield return new Tuple<IPoeItem, IPoeItem>(
+                Mock.Of<IPoeItem>(x => x.ItemName == "1"),
+                Mock.Of<IPoeItem>(x => x.ItemName == "1"));
+            yield return new Tuple<IPoeItem, IPoeItem>(
+                Mock.Of<IPoeItem>(x => x.UserIgn == "1"),
+                Mock.Of<IPoeItem>(x => x.UserIgn == "1"));
+            yield return new Tuple<IPoeItem, IPoeItem>(
+                Mock.Of<IPoeItem>(x => x.League == "1"),
+                Mock.Of<IPoeItem>(x => x.League == "1"));
+            yield return new Tuple<IPoeItem, IPoeItem>(
+                Mock.Of<IPoeItem>(x => x.UserForumName == "1"),
+                Mock.Of<IPoeItem>(x => x.UserForumName == "1"));
+            yield return new Tuple<IPoeItem, IPoeItem>(
+                Mock.Of<IPoeItem>(x => x.TradeForumUri == "1"),
+                Mock.Of<IPoeItem>(x => x.TradeForumUri == "1"));
+            yield return new Tuple<IPoeItem, IPoeItem>(
+                Mock.Of<IPoeItem>(x => x.ItemIconUri == "1"),
+                Mock.Of<IPoeItem>(x => x.ItemIconUri == "1"));
+
+            yield return new Tuple<IPoeItem, IPoeItem>(
+               CreateItemWithMods("1"),
+               CreateItemWithMods("1"));
+
+            yield return new Tuple<IPoeItem, IPoeItem>(
+               CreateItemWithMods("1", "2"),
+               CreateItemWithMods("1", "2"));
+        }
+
+        private IEnumerable<Tuple<IPoeItem, IPoeItem>> ShouldReturnFalseTestCaseSource()
+        {
+            yield return new Tuple<IPoeItem, IPoeItem>(
+               Mock.Of<IPoeItem>(x => x.UserForumUri == "1"),
+               Mock.Of<IPoeItem>(x => x.UserForumUri == "2"));
+            yield return new Tuple<IPoeItem, IPoeItem>(
+                Mock.Of<IPoeItem>(x => x.Price == "1"),
+                Mock.Of<IPoeItem>(x => x.Price == "2"));
+            yield return new Tuple<IPoeItem, IPoeItem>(
+                Mock.Of<IPoeItem>(x => x.ItemName == "1"),
+                Mock.Of<IPoeItem>(x => x.ItemName == "2"));
+            yield return new Tuple<IPoeItem, IPoeItem>(
+                Mock.Of<IPoeItem>(x => x.UserIgn == "1"),
+                Mock.Of<IPoeItem>(x => x.UserIgn == "2"));
+            yield return new Tuple<IPoeItem, IPoeItem>(
+                Mock.Of<IPoeItem>(x => x.League == "1"),
+                Mock.Of<IPoeItem>(x => x.League == "2"));
+            yield return new Tuple<IPoeItem, IPoeItem>(
+                Mock.Of<IPoeItem>(x => x.UserForumName == "1"),
+                Mock.Of<IPoeItem>(x => x.UserForumName == "2"));
+            yield return new Tuple<IPoeItem, IPoeItem>(
+               Mock.Of<IPoeItem>(x => x.ItemIconUri == "1"),
+               Mock.Of<IPoeItem>(x => x.ItemIconUri == "2"));
+            yield return new Tuple<IPoeItem, IPoeItem>(
+                Mock.Of<IPoeItem>(x => x.TradeForumUri == "1"),
+                Mock.Of<IPoeItem>(x => x.TradeForumUri == "2"));
+
+            yield return new Tuple<IPoeItem, IPoeItem>(
+                CreateItemWithMods("1"),
+                CreateItemWithMods("2"));
+
+            yield return new Tuple<IPoeItem, IPoeItem>(
+               CreateItemWithMods("1"),
+               CreateItemWithMods("1", "2"));
+
+            yield return new Tuple<IPoeItem, IPoeItem>(
+               CreateItemWithMods("1", "2"),
+               CreateItemWithMods("1", "22"));
+        }
+
+        private IPoeItem CreateItemWithMods(params string[] mods)
+        {
+            return Mock.Of<IPoeItem>(x => x.Mods == mods.Select(CreateItemMod).ToArray());
+        }
+
+        private IPoeItemMod CreateItemMod(string name)
+        {
+            return Mock.Of<IPoeItemMod>(x => x.Name == name);
+        }
+
+        private PoeItemEqualityComparer CreateInstance()
+        {
+            return new PoeItemEqualityComparer();
+        }
+    }
+}
