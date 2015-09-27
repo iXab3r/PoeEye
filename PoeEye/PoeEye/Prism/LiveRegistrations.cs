@@ -12,6 +12,7 @@
     using PoeShared.PoeTrade.Query;
 
     using PoeTrade;
+    using PoeTrade.Query;
 
     using TypeConverter;
 
@@ -27,6 +28,7 @@
                 .RegisterType<IConverter<NameValueCollection, string>, NameValueCollectionToStringConverter>()
                 .RegisterType<IConverter<IPoeQuery, NameValueCollection>, PoeQueryConverter>()
                 .RegisterType<IPoeLiveHistoryProvider, PoeLiveHistoryProvider>()
+                .RegisterType<IPoeQueryInfoProvider, PoeQueryInfoProvider>()
                 .RegisterType<IClock, Clock>()
                 .RegisterType<IPoeTradeParser, PoeTradeParserModern>();
         }

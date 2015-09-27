@@ -101,11 +101,13 @@
     <Compile Include="Common\IPoeCurrency.cs" />
     <Compile Include="Common\IPoeItem.cs" />
     <Compile Include="Common\IPoeItemMod.cs" />
+    <Compile Include="Common\IPoeItemType.cs" />
     <Compile Include="Common\PoeCurrency.cs" />
     <Compile Include="Common\PoeItem.cs" />
     <Compile Include="Common\PoeItemEqualityComparer.cs" />
     <Compile Include="Common\PoeItemMod.cs" />
     <Compile Include="Common\PoeItemModEqualityComparer.cs" />
+    <Compile Include="Common\PoeItemType.cs" />
     <Compile Include="Common\PoeModType.cs" />
     <Compile Include="DumpToText\DumpToText.cs" />
     <Compile Include="Http\IHttpClient.cs" />
@@ -116,6 +118,7 @@
     <Compile Include="PoeTrade\IPoeTradeParser.cs" />
     <Compile Include="PoeTrade\Query\IPoeQuery.cs" />
     <Compile Include="PoeTrade\Query\IPoeQueryFloatArgument.cs" />
+    <Compile Include="PoeTrade\Query\IPoeQueryInfoProvider.cs" />
     <Compile Include="PoeTrade\Query\IPoeQueryIntArgument.cs" />
     <Compile Include="PoeTrade\Query\IPoeQueryModArgument.cs" />
     <Compile Include="PoeTrade\Query\IPoeQueryRangeModArgument.cs" />
@@ -123,6 +126,9 @@
     <Compile Include="PoeTrade\Query\IPoeQueryStringArgument.cs" />
     <Compile Include="PoeTrade\Query\PoeQuery.cs" />
     <Compile Include="PoeTrade\Query\IPoeQueryArgument.cs" />
+    <Compile Include="PoeTrade\Query\PoeQueryArgumentBase.cs" />
+    <Compile Include="PoeTrade\Query\PoeQueryFloatArgument.cs" />
+    <Compile Include="PoeTrade\Query\PoeQueryIntArgument.cs" />
     <Compile Include="PoeTrade\Query\PoeQueryModArgument.cs" />
     <Compile Include="PoeTrade\Query\PoeQueryResult.cs" />
     <Compile Include="PoeTrade\Query\PoeQueryStringArgument.cs" />

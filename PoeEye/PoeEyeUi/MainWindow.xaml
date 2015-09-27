@@ -5,7 +5,6 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PoeEyeUi"
         xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
-        xmlns:system="clr-namespace:System;assembly=mscorlib"
         mc:Ignorable="d"
         Title="MainWindow" 
                       MinWidth="400" 
@@ -58,7 +57,6 @@
                                     <VisualBrush Stretch="Fill" Visual="{DynamicResource appbar_xbox}" />
                                 </Rectangle.OpacityMask>
                             </Rectangle>
-
                         </Button>
                     </StackPanel>
                 </DataTemplate>
@@ -68,7 +66,7 @@
         <StatusBar Grid.Row="2">
             <StatusBar.Resources>
                 <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource MetroTextBlock}">
-                    <Setter Property="FontSize" Value="20"></Setter>
+                    <Setter Property="FontSize" Value="20"/>
                 </Style>
             </StatusBar.Resources>
             <StatusBar.Items>

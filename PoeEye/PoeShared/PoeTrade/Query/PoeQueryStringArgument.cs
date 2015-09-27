@@ -2,19 +2,13 @@
 {
     using Guards;
 
-    public sealed class PoeQueryStringArgument : IPoeQueryStringArgument
+    public sealed class PoeQueryStringArgument : PoeQueryArgumentBase, IPoeQueryStringArgument
     {
-        public PoeQueryStringArgument(string name, string value) 
+        public PoeQueryStringArgument(string name, string value) : base(name)
         {
-            Guard.ArgumentNotNullOrEmpty(() => name);
-            Guard.ArgumentNotNullOrEmpty(() => value);
-
-            Name = name;
             Value = value;
         }
 
         public string Value { get; }
-
-        public string Name { get; }
     }
 }

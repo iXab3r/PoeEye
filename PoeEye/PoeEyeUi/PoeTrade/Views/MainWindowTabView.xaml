@@ -5,16 +5,23 @@
     <DataTemplate DataType="{x:Type poeEyeUi:MainWindowTabViewModel}">
         <Grid Margin="0, 10, 0, 10">
             <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="30"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-            <Button Grid.Row="0"
-                    Command="{Binding SearchCommand}" Content="Search"></Button>
 
-            <controls:MetroContentControl Grid.Row="1">
+            <controls:MetroContentControl Grid.Row="0" Content="{Binding QueryViewModel}">
+                
+            </controls:MetroContentControl >
+
+            <Button Grid.Row="1"
+                    Command="{Binding SearchCommand}" 
+                    CommandParameter="{Binding QueryViewModel.PoeQueryBuilder}" 
+                    Content="Search"/>
+
+            <controls:MetroContentControl Grid.Row="2">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
-                    <ItemsControl 
-                     ItemsSource="{Binding TradesListViewModel.TradesList}" />
+                    <ItemsControl ItemsSource="{Binding TradesListViewModel.TradesList}" />
                 </ScrollViewer>
             </controls:MetroContentControl>
         </Grid>

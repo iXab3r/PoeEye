@@ -140,6 +140,7 @@
     <Compile Include="PoeTrade\PoeQueryConverter.cs" />
     <Compile Include="PoeTrade\PoeTradeApi.cs" />
     <Compile Include="PoeTrade\PoeTradeParserModern.cs" />
+    <Compile Include="PoeTrade\Query\PoeQueryInfoProvider.cs" />
     <Compile Include="Prism\LiveRegistrations.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -153,9 +154,7 @@
       <Name>PoeShared</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="PoeTrade\Query\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

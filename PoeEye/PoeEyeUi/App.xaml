@@ -2,6 +2,7 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:PoeEyeUi"
+             xmlns:converters="clr-namespace:PoeEyeUi.Converters"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
         <ResourceDictionary>
@@ -15,6 +16,7 @@
                 <ResourceDictionary Source="PoeTrade/Views/PoeTradeView.xaml" />
                 <ResourceDictionary Source="PoeTrade/Views/MainWindowTabView.xaml" />
                 <ResourceDictionary Source="PoeTrade/Views/PoeItemModView.xaml" />
+                <ResourceDictionary Source="PoeTrade/Views/PoeQueryView.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
             <SolidColorBrush x:Key="PoeTradeRemovedItemColor" Color="#55FF9298" />

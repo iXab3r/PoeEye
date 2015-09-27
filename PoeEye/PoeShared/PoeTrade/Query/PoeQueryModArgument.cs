@@ -2,14 +2,11 @@ namespace PoeShared.PoeTrade.Query
 {
     using JetBrains.Annotations;
 
-    public class PoeQueryModArgument : IPoeQueryModArgument
+    public class PoeQueryModArgument : PoeQueryArgumentBase, IPoeQueryModArgument
     {
-        public PoeQueryModArgument([NotNull] string name)
+        public PoeQueryModArgument([NotNull] string name) : base(name)
         {
-            Name = name;
         }
-
-        public string Name { get; }
 
         public bool Excluded { get; set; }
     }

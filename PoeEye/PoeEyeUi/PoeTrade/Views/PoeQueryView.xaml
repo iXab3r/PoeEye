@@ -1,0 +1,237 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:viewModels="clr-namespace:PoeEyeUi.PoeTrade.ViewModels"
+                    xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
+                    xmlns:converters="clr-namespace:PoeEyeUi.Converters">
+    <DataTemplate DataType="{x:Type viewModels:PoeQueryViewModel}">
+        <Grid>
+            <Grid.Resources>
+                <converters:ComboBoxEmptyItemConverter x:Key="ComboBoxEmptyItemConverterKey"/>
+
+                <Style TargetType="TextBlock" BasedOn="{StaticResource MetroTextBlock}" x:Key="TextBlockHeader">
+                    <Setter Property="FontSize" Value="18"/>
+                    <Setter Property="Foreground" Value="{StaticResource LabelTextBrush}"/>
+                    <Setter Property="Margin" Value="3,0,3,0"/>
+                </Style>
+
+                <Style TargetType="controls:NumericUpDown" BasedOn="{StaticResource {x:Type controls:NumericUpDown}}" x:Key="NumericUpDownBase">
+                    <Setter Property="Foreground" Value="{StaticResource LabelTextBrush}"/>
+                    <Setter Property="VerticalContentAlignment" Value="Center"/>
+                    <Setter Property="Width" Value="80"/>
+                    <Setter Property="Minimum" Value="0"/>
+                    <Setter Property="Maximum" Value="9999"/>
+                    <Setter Property="Margin" Value="3,0,3,0"/>
+                </Style>
+
+                <Style TargetType="controls:NumericUpDown" BasedOn="{StaticResource NumericUpDownBase}" x:Key="NumericUpDownMin">
+                    <Style.Triggers>
+                        <Trigger Property="controls:TextBoxHelper.HasText" Value="False">
+                            <Setter Property="controls:TextBoxHelper.Watermark" Value="Min" />
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+
+                <Style TargetType="controls:NumericUpDown" BasedOn="{StaticResource NumericUpDownBase}" x:Key="NumericUpDownMax">
+                    <Style.Triggers>
+                        <Trigger Property="controls:TextBoxHelper.HasText" Value="False">
+                            <Setter Property="controls:TextBoxHelper.Watermark" Value="Max" />
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+
+                <Style TargetType="ComboBox" BasedOn="{StaticResource {x:Type ComboBox}}" >
+                    <Setter Property="VerticalContentAlignment" Value="Center"/>
+                    <Setter Property="Width" Value="80"/>
+                    <Setter Property="Margin" Value="3,0,3,0"/>
+                </Style>
+
+                <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}"  x:Key="TextBoxKey" >
+                    <Setter Property="VerticalContentAlignment" Value="Center"/>
+                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                    <Setter Property="Width" Value="80"/>
+                    <Setter Property="Margin" Value="3,0,3,0"/>
+                </Style>
+
+                <Style TargetType="StackPanel">
+                    <Setter Property="Orientation" Value="Horizontal"/>
+                </Style>
+            </Grid.Resources>
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="30" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <controls:MetroContentControl Grid.Row="0">
+                <StackPanel>
+                    <StackPanel>
+                        <TextBlock Text="League" Style="{StaticResource TextBlockHeader}" />
+                        <ComboBox Width="100" ItemsSource="{Binding LeaguesList}" SelectedItem="{Binding League}"></ComboBox>
+                    </StackPanel>
+
+                    <StackPanel>
+                        <TextBlock Text="Type" Style="{StaticResource TextBlockHeader}" />
+                        <ComboBox Width="200" 
+                                  SelectedItem="{Binding ItemType}"
+                                  DisplayMemberPath="Name" 
+                                  ItemsSource="{Binding ItemTypes, Converter={StaticResource ComboBoxEmptyItemConverterKey}}">
+                        </ComboBox>
+                    </StackPanel>
+                </StackPanel>
+            </controls:MetroContentControl>
+
+            <controls:MetroContentControl Grid.Row="1">
+                <DockPanel>
+                    <TextBlock Text="Name" Style="{StaticResource TextBlockHeader}" />
+                    <TextBox Text="{Binding ItemName}" Width="NaN" Style="{StaticResource TextBoxKey}"/>
+                </DockPanel>
+            </controls:MetroContentControl>
+
+            <controls:MetroContentControl Grid.Row="2">
+                <StackPanel>
+                    <StackPanel>
+                        <TextBlock Text="Damage" Style="{StaticResource TextBlockHeader}" />
+                        <controls:NumericUpDown Style="{StaticResource NumericUpDownMin}" Value="{Binding DamageMin}"/>
+                        <controls:NumericUpDown Style="{StaticResource NumericUpDownMax}" Value="{Binding DamageMax}"/>
+                    </StackPanel>
+
+                    <StackPanel>
+                        <TextBlock Text="APS" Style="{StaticResource TextBlockHeader}" />
+                        <controls:NumericUpDown Style="{StaticResource NumericUpDownMin}" Value="{Binding ApsMin}"/>
+                        <controls:NumericUpDown Style="{StaticResource NumericUpDownMax}" Value="{Binding ApsMax}"/>
+                    </StackPanel>
+
+                    <StackPanel>
+                        <TextBlock Text="Crit.Strike" Style="{StaticResource TextBlockHeader}" />
+                        <controls:NumericUpDown Style="{StaticResource NumericUpDownMin}" Value="{Binding CritMin}"/>
+                        <controls:NumericUpDown Style="{StaticResource NumericUpDownMax}" Value="{Binding CritMax}"/>
+                    </StackPanel>
+                </StackPanel>
+            </controls:MetroContentControl>
+
+            <controls:MetroContentControl Grid.Row="3">
+                <StackPanel>
+                    <StackPanel>
+                        <TextBlock Text="DPS" Style="{StaticResource TextBlockHeader}" />
+                        <controls:NumericUpDown Style="{StaticResource NumericUpDownMin}" Value="{Binding DpsMin}"/>
+                        <controls:NumericUpDown Style="{StaticResource NumericUpDownMax}" Value="{Binding DpsMax}"/>
+                    </StackPanel>
+
+                    <StackPanel>
+                        <TextBlock Text="eDPS" Style="{StaticResource TextBlockHeader}" />
+                        <controls:NumericUpDown Style="{StaticResource NumericUpDownMin}" Value="{Binding EdpsMin}"/>
+                        <controls:NumericUpDown Style="{StaticResource NumericUpDownMax}" Value="{Binding EdpsMax}"/>
+                    </StackPanel>
+
+                    <StackPanel>
+                        <TextBlock Text="pDPS" Style="{StaticResource TextBlockHeader}" />
+                        <controls:NumericUpDown Style="{StaticResource NumericUpDownMin}" Value="{Binding PdpsMin}"/>
+                        <controls:NumericUpDown Style="{StaticResource NumericUpDownMax}" Value="{Binding PdpsMax}"/>
+                    </StackPanel>
+                </StackPanel>
+            </controls:MetroContentControl>
+
+            <controls:MetroContentControl Grid.Row="4">
+                <StackPanel>
+                    <StackPanel>
+                        <TextBlock Text="Armour" Style="{StaticResource TextBlockHeader}" />
+                        <controls:NumericUpDown Style="{StaticResource NumericUpDownMin}" Value="{Binding ArmourMin}"/>
+                        <controls:NumericUpDown Style="{StaticResource NumericUpDownMax}" Value="{Binding ArmourMax}"/>
+                    </StackPanel>
+
+                    <StackPanel>
+                        <TextBlock Text="Evasion" Style="{StaticResource TextBlockHeader}" />
+                        <controls:NumericUpDown Style="{StaticResource NumericUpDownMin}" Value="{Binding EvasionMin}"/>
+                        <controls:NumericUpDown Style="{StaticResource NumericUpDownMax}" Value="{Binding EvasionMax}"/>
+                    </StackPanel>
+
+                    <StackPanel>
+                        <TextBlock Text="Shield" Style="{StaticResource TextBlockHeader}" />
+                        <controls:NumericUpDown Style="{StaticResource NumericUpDownMin}" Value="{Binding ShieldMin}"/>
+                        <controls:NumericUpDown Style="{StaticResource NumericUpDownMax}" Value="{Binding ShieldMax}"/>
+                    </StackPanel>
+
+                    <StackPanel>
+                        <TextBlock Text="Block" Style="{StaticResource TextBlockHeader}" />
+                        <controls:NumericUpDown Style="{StaticResource NumericUpDownMin}" Value="{Binding BlockMin}"/>
+                        <controls:NumericUpDown Style="{StaticResource NumericUpDownMax}" Value="{Binding BlockMax}"/>
+                    </StackPanel>
+                </StackPanel>
+            </controls:MetroContentControl>
+
+            <controls:MetroContentControl Grid.Row="5">
+                <StackPanel>
+                    <StackPanel>
+                        <TextBlock Text="Sockets" Style="{StaticResource TextBlockHeader}" />
+                        <controls:NumericUpDown Style="{StaticResource NumericUpDownMin}" Value="{Binding SocketsMin}"/>
+                        <controls:NumericUpDown Style="{StaticResource NumericUpDownMax}" Value="{Binding SocketsMax}"/>
+                    </StackPanel>
+
+                    <StackPanel>
+                        <TextBlock Text="Links" Style="{StaticResource TextBlockHeader}" />
+                        <controls:NumericUpDown Style="{StaticResource NumericUpDownMin}" Value="{Binding LinkMin}"/>
+                        <controls:NumericUpDown Style="{StaticResource NumericUpDownMax}" Value="{Binding LinkMax}"/>
+                    </StackPanel>
+                </StackPanel>
+            </controls:MetroContentControl>
+
+            <controls:MetroContentControl Grid.Row="6">
+                <StackPanel>
+                    <StackPanel>
+                        <TextBlock Text="Colors" Style="{StaticResource TextBlockHeader}" />
+                        <TextBox Style="{StaticResource TextBoxKey}" Width="30" controls:TextBoxHelper.Watermark="R" Text="{Binding SocketsR}"/>
+                        <TextBox Style="{StaticResource TextBoxKey}" Width="30" controls:TextBoxHelper.Watermark="G" Text="{Binding SocketsG}"/>
+                        <TextBox Style="{StaticResource TextBoxKey}" Width="30" controls:TextBoxHelper.Watermark="B" Text="{Binding SocketsB}"/>
+                        <TextBox Style="{StaticResource TextBoxKey}" Width="30" controls:TextBoxHelper.Watermark="W" Text="{Binding SocketsW}"/>
+                    </StackPanel>
+
+                    <StackPanel>
+                        <TextBlock Text="Linked" Style="{StaticResource TextBlockHeader}" />
+                        <TextBox Style="{StaticResource TextBoxKey}" Width="30" controls:TextBoxHelper.Watermark="R" Text="{Binding LinkedR}"/>
+                        <TextBox Style="{StaticResource TextBoxKey}" Width="30" controls:TextBoxHelper.Watermark="G" Text="{Binding LinkedG}"/>
+                        <TextBox Style="{StaticResource TextBoxKey}" Width="30" controls:TextBoxHelper.Watermark="B" Text="{Binding LinkedB}"/>
+                        <TextBox Style="{StaticResource TextBoxKey}" Width="30" controls:TextBoxHelper.Watermark="W" Text="{Binding LinkedW}"/>
+                    </StackPanel>
+                </StackPanel>
+            </controls:MetroContentControl>
+
+            <controls:MetroContentControl Grid.Row="7">
+                <StackPanel>
+                    <StackPanel>
+                        <TextBlock Text="Level" Style="{StaticResource TextBlockHeader}" />
+                        <controls:NumericUpDown Style="{StaticResource NumericUpDownMin}" Value="{Binding LevelMin}"/>
+                        <controls:NumericUpDown Style="{StaticResource NumericUpDownMax}" Value="{Binding LevelMax}"/>
+                    </StackPanel>
+
+                    <StackPanel>
+                        <TextBlock Text="Strength" Style="{StaticResource TextBlockHeader}" />
+                        <controls:NumericUpDown Style="{StaticResource NumericUpDownMin}" Value="{Binding RStrMin}"/>
+                        <controls:NumericUpDown Style="{StaticResource NumericUpDownMax}" Value="{Binding RStrMax}"/>
+                    </StackPanel>
+
+                    <StackPanel>
+                        <TextBlock Text="Dexterity" Style="{StaticResource TextBlockHeader}" />
+                        <controls:NumericUpDown Style="{StaticResource NumericUpDownMin}" Value="{Binding RDexMin}"/>
+                        <controls:NumericUpDown Style="{StaticResource NumericUpDownMax}" Value="{Binding RDexMax}"/>
+                    </StackPanel>
+
+                    <StackPanel>
+                        <TextBlock Text="Intelligence" Style="{StaticResource TextBlockHeader}" />
+                        <controls:NumericUpDown Style="{StaticResource NumericUpDownMin}" Value="{Binding RIntMin}"/>
+                        <controls:NumericUpDown Style="{StaticResource NumericUpDownMax}" Value="{Binding RIntMax}"/>
+                    </StackPanel>
+                </StackPanel>
+            </controls:MetroContentControl>
+
+
+        </Grid>
+
+    </DataTemplate>
+</ResourceDictionary>

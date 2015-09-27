@@ -21,9 +21,12 @@
         private ICommand searchCommand;
         private string tabName;
 
-        public MainWindowTabViewModel(TradesListViewModel tradesListViewModel)
+        public MainWindowTabViewModel(
+            [NotNull] TradesListViewModel tradesListViewModel,
+            [NotNull] PoeQueryViewModel queryViewModel)
         {
             Guard.ArgumentNotNull(() => tradesListViewModel);
+            Guard.ArgumentNotNull(() => queryViewModel);
 
             TradesListViewModel = tradesListViewModel;
             var command = ReactiveCommand.Create();
@@ -34,11 +37,19 @@
             tradesListViewModel
                 .WhenAnyValue(x => x.LastUpdateTimestamp)
                 .Subscribe(_ => this.RaisePropertyChanged(nameof(this.LastUpdateTimestamp)));
+
+            QueryViewModel = queryViewModel;
         }
 
-        private void SearchCommandExecute(object o)
+        private void SearchCommandExecute(object arg)
         {
-            var query = new PoeQuery()
+            var queryBuilder = arg as Func<IPoeQuery>;
+            if (queryBuilder == null)
+            {
+                return;
+            }
+            var query = queryBuilder();
+            /*var query = new PoeQueryBuilder()
             {
                 Arguments = new IPoeQueryArgument[]
                 {
@@ -49,7 +60,7 @@
                     new PoeQueryModArgument("Area is a large Maze"),
                     new PoeQueryModArgument("Area is #% larger") {Excluded = true},
                 },
-            };
+            };*/
 
             TradesListViewModel.RecheckTimeout = TimeSpan.FromSeconds(30);
             TradesListViewModel.Query = query;
@@ -66,5 +77,7 @@
             get { return tabName; }
             set { this.RaiseAndSetIfChanged(ref tabName, value); }
         }
+
+        public PoeQueryViewModel QueryViewModel { get; }
     }
 }
