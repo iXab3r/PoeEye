@@ -4,6 +4,8 @@
     using System.Collections.Generic;
     using System.Collections.Specialized;
     using System.Net;
+    using System.Reactive.Concurrency;
+    using System.Reactive.Linq;
     using System.Reactive.Threading.Tasks;
     using System.Threading.Tasks;
 
@@ -27,7 +29,8 @@
 
         public CookieCollection Cookies { get; set; }
 
-        public GenericHttpClient([NotNull] IConverter<NameValueCollection, string> nameValueConverter)
+        public GenericHttpClient(
+                [NotNull] IConverter<NameValueCollection, string> nameValueConverter)
         {
             Guard.ArgumentNotNull(() => nameValueConverter);
             
@@ -39,10 +42,9 @@
             Guard.ArgumentNotNullOrEmpty(() => uri);
             Guard.ArgumentNotNull(() => args);
 
-            return Task
-                .Run(() => PostQueryInternal(uri, args))
-                .ToObservable();
+            return Observable.Start(() => PostQueryInternal(uri, args), Scheduler.Default);
         }
+
 
         private string PostQueryInternal(string uri, NameValueCollection args)
         {

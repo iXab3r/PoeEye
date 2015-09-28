@@ -36,7 +36,11 @@
 
             tradesListViewModel
                 .WhenAnyValue(x => x.LastUpdateTimestamp)
-                .Subscribe(_ => this.RaisePropertyChanged(nameof(this.LastUpdateTimestamp)));
+                .Subscribe(_ => this.RaisePropertyChanged(nameof(LastUpdateTimestamp)));
+
+            tradesListViewModel
+                .WhenAnyValue(x => x.RecheckTimeout)
+                .Subscribe(_ => this.RaisePropertyChanged(nameof(RecheckTimeout)));
 
             QueryViewModel = queryViewModel;
         }
@@ -62,8 +66,14 @@
                 },
             };*/
 
-            TradesListViewModel.RecheckTimeout = TimeSpan.FromSeconds(30);
+            RecheckTimeout = TimeSpan.FromSeconds(30);
             TradesListViewModel.Query = query;
+        }
+
+        public TimeSpan RecheckTimeout
+        {
+            get { return TradesListViewModel.RecheckTimeout; }
+            set { TradesListViewModel.RecheckTimeout = value; }
         }
 
         public TradesListViewModel TradesListViewModel { get; }

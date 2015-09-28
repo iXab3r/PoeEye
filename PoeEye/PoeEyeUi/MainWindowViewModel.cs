@@ -39,6 +39,8 @@
             this.tabsList
                 .ItemsAdded
                 .Subscribe(x => SelectedItem = x);
+
+            createNewTabCommand.Execute(null);
         }
 
         public ICommand CreateNewTabCommand => createNewTabCommand;

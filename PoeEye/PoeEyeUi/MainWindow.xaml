@@ -66,15 +66,14 @@
         <StatusBar Grid.Row="2">
             <StatusBar.Resources>
                 <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource MetroTextBlock}">
-                    <Setter Property="FontSize" Value="20"/>
+                    <Setter Property="FontSize" Value="18"/>
                 </Style>
             </StatusBar.Resources>
             <StatusBar.Items>
-                <Label Content="status" ></Label>
+                <TextBlock Text="{Binding SelectedItem.LastUpdateTimestamp, Mode=OneWay, StringFormat='Last update: {0:MMM dd HH:mm:ss.fff}'}"/>
 
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="{Binding SelectedItem.LastUpdateTimestamp, Mode=OneWay, StringFormat='Last update: {0:MMM dd HH:mm:ss.fff}'}"/>
-                </StackPanel>
+                <TextBlock HorizontalAlignment="Right" Text="{Binding SelectedItem.RecheckTimeout, Mode=OneWay, StringFormat='Recheck timeout: {0}'}"/>
+
             </StatusBar.Items>
         </StatusBar>
     </Grid>
