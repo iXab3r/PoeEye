@@ -18,11 +18,10 @@
 
     internal sealed class MainWindowTabViewModel : ReactiveObject
     {
-        private ICommand searchCommand;
         private string tabName;
 
         public MainWindowTabViewModel(
-            [NotNull] TradesListViewModel tradesListViewModel,
+            [NotNull] PoeTradesListViewModel tradesListViewModel,
             [NotNull] PoeQueryViewModel queryViewModel)
         {
             Guard.ArgumentNotNull(() => tradesListViewModel);
@@ -32,7 +31,7 @@
             var command = ReactiveCommand.Create();
             command.Subscribe(SearchCommandExecute);
 
-            searchCommand = command;
+            SearchCommand = command;
 
             tradesListViewModel
                 .WhenAnyValue(x => x.LastUpdateTimestamp)
@@ -80,9 +79,9 @@
             set { TradesListViewModel.RecheckTimeout = value; }
         }
 
-        public TradesListViewModel TradesListViewModel { get; }
+        public PoeTradesListViewModel TradesListViewModel { get; }
 
-        public ICommand SearchCommand => searchCommand;
+        public ICommand SearchCommand { get; }
 
         public DateTime LastUpdateTimestamp => TradesListViewModel.LastUpdateTimestamp;
 

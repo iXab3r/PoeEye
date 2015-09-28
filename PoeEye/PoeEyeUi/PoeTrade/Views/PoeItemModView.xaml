@@ -6,9 +6,9 @@
                     xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls">
 
     <DataTemplate DataType="{x:Type common:PoeItemMod}">
-        <controls:MetroContentControl>
+        <ContentControl>
             <Label Content="{Binding Name}"/>
-        </controls:MetroContentControl>
+        </ContentControl>
     </DataTemplate>
 
 </ResourceDictionary>

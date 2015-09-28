@@ -14,8 +14,8 @@
                 <Setter Property="VerticalAlignment" Value="Center" />
             </Style>
         </DataTemplate.Resources>
-        
-        <controls:MetroContentControl Margin="10" >
+
+        <ContentControl Margin="10" >
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="40"/>
@@ -27,15 +27,16 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
-                <controls:MetroContentControl Grid.Row="1" Grid.Column="0">
+                <ContentControl Grid.Row="1" Grid.Column="0">
                     <Label VerticalContentAlignment="Center" 
                            HorizontalContentAlignment="Center"
                            Content="IMG"
                            BorderBrush="{StaticResource ControlBorderBrush}"
-                           BorderThickness="1"/>
-                </controls:MetroContentControl>
+                           BorderThickness="1"
+                           Margin="0,0,10,0"/>
+                </ContentControl>
 
-                <controls:MetroContentControl Grid.Row="0"  Grid.Column="1">
+                <ContentControl Grid.Row="0"  Grid.Column="1">
                     <Border BorderThickness="0,0,0,2" BorderBrush="{StaticResource ControlBorderBrush}">
                         
                         <StackPanel Orientation="Horizontal">
@@ -60,26 +61,25 @@
                         </StackPanel>
                         
                     </Border>
-                </controls:MetroContentControl>
+                </ContentControl>
 
-                <controls:MetroContentControl Grid.Row="1"  Grid.Column="1">
+                <ContentControl Grid.Row="1"  Grid.Column="1">
                     <ItemsControl ItemsSource="{Binding Mods, Mode=OneWay}"/>
-                </controls:MetroContentControl>
+                </ContentControl>
 
-                <controls:MetroContentControl Grid.Row="2"  Grid.Column="1">
+                <ContentControl Grid.Row="2"  Grid.Column="1">
                     <Border BorderThickness="0,2,0,0" BorderBrush="{DynamicResource ControlBorderBrush}">
                         <Border.Resources>
                             <Style TargetType="TextBlock" BasedOn="{StaticResource MetroTextBlockHeaderStyle}"/>
                         </Border.Resources>
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="{Binding Path=Price, Mode=OneWay, StringFormat='Buyout: {0}'}" />
-                            <TextBlock Text="{Binding Path=TradeState, Mode=OneWay, StringFormat='Status: {0}'}" HorizontalAlignment="Right"/>
                         </StackPanel>
                     </Border>
-                </controls:MetroContentControl>
+                </ContentControl>
 
             </Grid>
-        </controls:MetroContentControl>
+        </ContentControl>
     </DataTemplate>
 
 </ResourceDictionary>

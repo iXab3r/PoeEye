@@ -586,15 +586,15 @@
             }
             if (typeof (T) == typeof (float?))
             {
-                return new PoeQueryFloatArgument(name, (float) ConvertToType<float?>(value));
+                return new PoeQueryFloatArgument(name, value is float ? ConvertToType<float>(value) :(float) ConvertToType<float?>(value));
             }
             if (typeof (T) == typeof (string))
             {
                 return new PoeQueryStringArgument(name, ConvertToType<string>(value) ?? string.Empty);
             }
-            if (typeof (T) == typeof (bool))
+            if (typeof (T) == typeof (bool?))
             {
-                return new PoeQueryStringArgument(name, ConvertToType<bool>(value) ? "x" : string.Empty);
+                return new PoeQueryStringArgument(name, (value is bool ? ConvertToType<bool>(value) : (bool)ConvertToType<bool?>(value)) ? "x" : string.Empty);
             }
             throw new NotSupportedException($"Type {typeof (T)} is not supported, parameter name: {name}");
         }

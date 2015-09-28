@@ -157,7 +157,7 @@
     <Compile Include="PoeTrade\PoeTradeState.cs" />
     <Compile Include="PoeTrade\ViewModels\IPoeTradeViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\PoeTradeViewModel.cs" />
-    <Compile Include="PoeTrade\ViewModels\TradesListViewModel.cs" />
+    <Compile Include="PoeTrade\ViewModels\PoeTradesListViewModel.cs" />
     <Compile Include="Prism\UiRegistrations.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>

@@ -69,7 +69,7 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <controls:MetroContentControl Grid.Row="0">
+            <ContentControl Grid.Row="0">
                 <StackPanel>
                     <StackPanel>
                         <TextBlock Text="League" Style="{StaticResource TextBlockHeader}" />
@@ -85,16 +85,21 @@
                         </ComboBox>
                     </StackPanel>
                 </StackPanel>
-            </controls:MetroContentControl>
+            </ContentControl>
 
-            <controls:MetroContentControl Grid.Row="1">
+            <ContentControl Grid.Row="1">
                 <DockPanel>
                     <TextBlock Text="Name" Style="{StaticResource TextBlockHeader}" />
-                    <TextBox Text="{Binding ItemName}" Width="NaN" Style="{StaticResource TextBoxKey}" HorizontalContentAlignment="Left"/>
+                    <TextBox Text="{Binding ItemName}" 
+                             Width="NaN" 
+                             Style="{StaticResource TextBoxKey}" 
+                             HorizontalContentAlignment="Left"
+                             controls:TextBoxHelper.Watermark="item name, e.g. Temple map"
+                             />
                 </DockPanel>
-            </controls:MetroContentControl>
+            </ContentControl>
 
-            <controls:MetroContentControl Grid.Row="2">
+            <ContentControl Grid.Row="2">
                 <StackPanel>
                     <StackPanel>
                         <TextBlock Text="Damage" Style="{StaticResource TextBlockHeader}" />
@@ -114,9 +119,9 @@
                         <controls:NumericUpDown Style="{StaticResource NumericUpDownMax}" Value="{Binding CritMax}"/>
                     </StackPanel>
                 </StackPanel>
-            </controls:MetroContentControl>
+            </ContentControl>
 
-            <controls:MetroContentControl Grid.Row="3">
+            <ContentControl Grid.Row="3">
                 <StackPanel>
                     <StackPanel>
                         <TextBlock Text="DPS" Style="{StaticResource TextBlockHeader}" />
@@ -136,9 +141,9 @@
                         <controls:NumericUpDown Style="{StaticResource NumericUpDownMax}" Value="{Binding PdpsMax}"/>
                     </StackPanel>
                 </StackPanel>
-            </controls:MetroContentControl>
+            </ContentControl>
 
-            <controls:MetroContentControl Grid.Row="4">
+            <ContentControl Grid.Row="4">
                 <StackPanel>
                     <StackPanel>
                         <TextBlock Text="Armour" Style="{StaticResource TextBlockHeader}" />
@@ -164,9 +169,9 @@
                         <controls:NumericUpDown Style="{StaticResource NumericUpDownMax}" Value="{Binding BlockMax}"/>
                     </StackPanel>
                 </StackPanel>
-            </controls:MetroContentControl>
+            </ContentControl>
 
-            <controls:MetroContentControl Grid.Row="5">
+            <ContentControl Grid.Row="5">
                 <StackPanel>
                     <StackPanel>
                         <TextBlock Text="Sockets" Style="{StaticResource TextBlockHeader}" />
@@ -180,9 +185,9 @@
                         <controls:NumericUpDown Style="{StaticResource NumericUpDownMax}" Value="{Binding LinkMax}"/>
                     </StackPanel>
                 </StackPanel>
-            </controls:MetroContentControl>
+            </ContentControl>
 
-            <controls:MetroContentControl Grid.Row="6">
+            <ContentControl Grid.Row="6">
                 <StackPanel>
                     <StackPanel>
                         <TextBlock Text="Colors" Style="{StaticResource TextBlockHeader}" />
@@ -200,9 +205,9 @@
                         <TextBox Style="{StaticResource TextBoxKey}" Width="30" controls:TextBoxHelper.Watermark="W" Text="{Binding LinkedW}"/>
                     </StackPanel>
                 </StackPanel>
-            </controls:MetroContentControl>
+            </ContentControl>
 
-            <controls:MetroContentControl Grid.Row="7">
+            <ContentControl Grid.Row="7">
                 <StackPanel>
                     <StackPanel>
                         <TextBlock Text="Level" Style="{StaticResource TextBlockHeader}" />
@@ -228,7 +233,7 @@
                         <controls:NumericUpDown Style="{StaticResource NumericUpDownMax}" Value="{Binding RIntMax}"/>
                     </StackPanel>
                 </StackPanel>
-            </controls:MetroContentControl>
+            </ContentControl>
 
 
         </Grid>

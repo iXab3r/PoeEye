@@ -20,7 +20,7 @@
 
     using ReactiveUI;
 
-    internal sealed class TradesListViewModel : ReactiveObject
+    internal sealed class PoeTradesListViewModel : ReactiveObject
     {
         private readonly IClock clock;
         private readonly IEqualityComparer<IPoeItem> poeItemsComparer;
@@ -32,7 +32,7 @@
         private IPoeQuery query;
         private TimeSpan recheckTimeout;
 
-        public TradesListViewModel(
+        public PoeTradesListViewModel(
             [NotNull] IFactory<IPoeLiveHistoryProvider, IPoeQuery> poeLiveHistoryFactory,
             [NotNull] IFactory<IPoeTradeViewModel, IPoeItem> poeTradeViewModelFactory,
             [NotNull] IEqualityComparer<IPoeItem> poeItemsComparer,

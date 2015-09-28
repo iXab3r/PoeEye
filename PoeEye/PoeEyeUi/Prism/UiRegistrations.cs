@@ -4,6 +4,8 @@
 
     using PoeTrade.ViewModels;
 
+    using MainWindowTabViewModel = PoeEyeUi.MainWindowTabViewModel;
+
     internal sealed class UiRegistrations : UnityContainerExtension
     {
         protected override void Initialize()
@@ -11,7 +13,7 @@
             Container
                     .RegisterType<MainWindowViewModel, MainWindowViewModel>()
                     .RegisterType<MainWindowTabViewModel, MainWindowTabViewModel>()
-                    .RegisterType<TradesListViewModel, TradesListViewModel>()
+                    .RegisterType<MainWindowTabViewModel, MainWindowTabViewModel>()
                     .RegisterType<IPoeTradeViewModel, PoeTradeViewModel>();
         }
     }
