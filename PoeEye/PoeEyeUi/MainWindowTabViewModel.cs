@@ -42,6 +42,10 @@
                 .WhenAnyValue(x => x.RecheckTimeout)
                 .Subscribe(_ => this.RaisePropertyChanged(nameof(RecheckTimeout)));
 
+            tradesListViewModel
+                .WhenAnyValue(x => x.IsBusy)
+                .Subscribe(_ => this.RaisePropertyChanged(nameof(IsBusy)));
+
             QueryViewModel = queryViewModel;
         }
 
@@ -81,6 +85,8 @@
         public ICommand SearchCommand => searchCommand;
 
         public DateTime LastUpdateTimestamp => TradesListViewModel.LastUpdateTimestamp;
+
+        public bool IsBusy => TradesListViewModel.IsBusy;
 
         public string TabName
         {

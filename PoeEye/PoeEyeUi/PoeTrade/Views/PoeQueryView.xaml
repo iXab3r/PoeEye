@@ -90,7 +90,7 @@
             <controls:MetroContentControl Grid.Row="1">
                 <DockPanel>
                     <TextBlock Text="Name" Style="{StaticResource TextBlockHeader}" />
-                    <TextBox Text="{Binding ItemName}" Width="NaN" Style="{StaticResource TextBoxKey}"/>
+                    <TextBox Text="{Binding ItemName}" Width="NaN" Style="{StaticResource TextBoxKey}" HorizontalContentAlignment="Left"/>
                 </DockPanel>
             </controls:MetroContentControl>
 

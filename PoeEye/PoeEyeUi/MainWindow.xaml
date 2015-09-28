@@ -19,9 +19,9 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        
-       <controls:MetroContentControl Grid.Row="0">
-           <StackPanel>
+
+        <controls:MetroContentControl Grid.Row="0">
+            <StackPanel>
                 <Button Width="50"
                         Height="50"
                         Style="{DynamicResource MetroCircleButtonStyle}"
@@ -36,9 +36,9 @@
                         </Rectangle.OpacityMask>
                     </Rectangle>
                 </Button>
-           </StackPanel>
+            </StackPanel>
         </controls:MetroContentControl>
-        
+
         <controls:MetroTabControl Grid.Row="1"
                                   ItemsSource="{Binding TabsList}" 
                                   SelectedItem="{Binding SelectedItem}"
@@ -70,10 +70,13 @@
                 </Style>
             </StatusBar.Resources>
             <StatusBar.Items>
+                <StackPanel Orientation="Horizontal" Visibility="{Binding SelectedItem.IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <controls:ProgressRing Height="20" Width="20" IsActive="true" Foreground="{StaticResource TextBrush}"  />
+                    <TextBlock Text="Updating..."/>
+                </StackPanel>
+
                 <TextBlock Text="{Binding SelectedItem.LastUpdateTimestamp, Mode=OneWay, StringFormat='Last update: {0:MMM dd HH:mm:ss.fff}'}"/>
-
                 <TextBlock HorizontalAlignment="Right" Text="{Binding SelectedItem.RecheckTimeout, Mode=OneWay, StringFormat='Recheck timeout: {0}'}"/>
-
             </StatusBar.Items>
         </StatusBar>
     </Grid>

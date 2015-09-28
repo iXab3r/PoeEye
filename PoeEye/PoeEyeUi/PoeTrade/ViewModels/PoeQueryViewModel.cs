@@ -144,6 +144,8 @@
             ItemTypes = queryInfoProvider.ItemTypes.ToArray();
             ExplicitModsList = queryInfoProvider.ModsList.Where(x => x.ModType == PoeModType.Explicit).ToArray();
             ImplicitModsList = queryInfoProvider.ModsList.Where(x => x.ModType == PoeModType.Implicit).ToArray();
+
+            League = LeaguesList.First();
         }
 
         public float? DamageMin
@@ -580,7 +582,7 @@
 
             if (typeof (T) == typeof (int?))
             {
-                return new PoeQueryIntArgument(name, (int) ConvertToType<int?>(value));
+                return new PoeQueryIntArgument(name, value is int ? ConvertToType<int>(value) : (int) ConvertToType<int?>(value));
             }
             if (typeof (T) == typeof (float?))
             {

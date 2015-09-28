@@ -10,6 +10,7 @@
 
     using Guards;
 
+    using PoeShared;
     using PoeShared.Http;
     using PoeShared.PoeTrade;
     using PoeShared.PoeTrade.Query;

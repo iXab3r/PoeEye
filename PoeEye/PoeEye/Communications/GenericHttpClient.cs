@@ -45,7 +45,6 @@
             return Observable.Start(() => PostQueryInternal(uri, args), Scheduler.Default);
         }
 
-
         private string PostQueryInternal(string uri, NameValueCollection args)
         {
             var httpClient = new HttpClient();
