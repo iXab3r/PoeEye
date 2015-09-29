@@ -64,7 +64,7 @@
                      CreateItemMod(string.Empty, "2"));
             yield return new Tuple<IPoeItemMod, IPoeItemMod>(
                     CreateItemMod("1", string.Empty),
-                     CreateItemMod("1", string.Empty));
+                     CreateItemMod("2", string.Empty));
         }
 
         private IPoeItemMod CreateItemMod(string codeName, string name)
