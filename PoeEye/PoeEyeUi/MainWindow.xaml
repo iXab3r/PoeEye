@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:PoeEyeUi"
         xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
         mc:Ignorable="d"
-        Title="MainWindow" 
+        Title="{Binding MainWindowTitle}" 
         MinWidth="1000" 
         MinHeight="300" 
         Width="1000" 
@@ -22,7 +22,7 @@
         </Grid.RowDefinitions>
 
         <ContentControl Grid.Row="0">
-            <StackPanel HorizontalAlignment="Left">
+            <StackPanel HorizontalAlignment="Left" Orientation="Horizontal">
                 <Button Width="50"
                         Height="50"
                         Style="{DynamicResource MetroCircleButtonStyle}"
@@ -37,6 +37,7 @@
                         </Rectangle.OpacityMask>
                     </Rectangle>
                 </Button>
+                <Button Content="Check for updates..." Command="{Binding CheckForUpdatesCommand}"/>
             </StackPanel>
         </ContentControl>
 

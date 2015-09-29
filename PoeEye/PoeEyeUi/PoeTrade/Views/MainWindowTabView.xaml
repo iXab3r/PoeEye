@@ -21,7 +21,12 @@
             </Expander>
 
             <controls:MetroContentControl Grid.Row="1">
-                <ItemsControl ItemsSource="{Binding TradesListViewModel.TradesList}" Style="{StaticResource VirtualizedItemsControlStyle}"/>
+                
+                <ItemsControl Style="{StaticResource VirtualizedItemsControlStyle}">
+                    <ItemsControl.ItemsSource>
+                        <Binding Path="TradesListViewModel.TradesList" />
+                    </ItemsControl.ItemsSource>
+                </ItemsControl>
             </controls:MetroContentControl>
         </Grid>
     </DataTemplate>

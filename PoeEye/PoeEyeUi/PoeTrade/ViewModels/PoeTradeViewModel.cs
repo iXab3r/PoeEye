@@ -19,6 +19,7 @@
         private readonly IPoeItem poeItem;
         private PoeTradeState tradeState;
         private readonly ReactiveCommand<object> copyPmMessageToClipboardCommand;
+        private readonly ReactiveCommand<object> markAsReadCommand;
 
         public PoeTradeViewModel([NotNull] IPoeItem poeItem)
         {
@@ -27,6 +28,9 @@
             this.poeItem = poeItem;
             copyPmMessageToClipboardCommand = ReactiveCommand.Create();
             copyPmMessageToClipboardCommand.Subscribe(CopyPmMessageToClipboardCommandExecute);
+
+            markAsReadCommand = ReactiveCommand.Create();
+            markAsReadCommand.Subscribe(MarkAsReadCommandExecute);
         }
 
         public PoeTradeState TradeState
@@ -47,10 +51,17 @@
 
         public ICommand CopyPmMessageToClipboardCommand => copyPmMessageToClipboardCommand;
 
+        public ICommand MarkAsReadCommand => markAsReadCommand;
+
         private void CopyPmMessageToClipboardCommandExecute(object arg)
         {
             var message = $"@{UserIgn} Hi, I would like to buy your {Name} listed for {Price} in {poeItem.League}";
             Clipboard.SetText(message);
+        }
+
+        private void MarkAsReadCommandExecute(object arg)
+        {
+            this.TradeState = PoeTradeState.Normal;
         }
     }
 }

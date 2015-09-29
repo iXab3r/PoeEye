@@ -69,7 +69,7 @@
                 },
             };*/
             RecheckTimeout = TimeSpan.FromSeconds(30);
-            TradesListViewModel.TradesList.Clear();
+            TradesListViewModel.ClearTradesList();
             TradesListViewModel.Query = query;
         }
 

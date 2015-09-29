@@ -3,8 +3,10 @@
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
+    using System.ComponentModel;
     using System.Linq;
     using System.Reactive.Linq;
+    using System.Windows.Data;
     using System.Windows.Threading;
 
     using Factory;
@@ -31,6 +33,9 @@
         private DateTime lastUpdateTimestamp;
         private IPoeQuery query;
         private TimeSpan recheckTimeout;
+        private readonly ObservableCollection<IPoeTradeViewModel> tradesList = new ObservableCollection<IPoeTradeViewModel>();
+
+        private readonly ICollectionView wrappedTradesList;
 
         public PoeTradesListViewModel(
             [NotNull] IFactory<IPoeLiveHistoryProvider, IPoeQuery> poeLiveHistoryFactory,
@@ -56,10 +61,14 @@
                 .Switch()
                 .ObserveOn(Dispatcher.CurrentDispatcher)
                 .Subscribe(OnNextItemsPackReceived);
+
+            wrappedTradesList = CollectionViewSource.GetDefaultView(tradesList);
+            wrappedTradesList.SortDescriptions.Add(new SortDescription(nameof(IPoeTradeViewModel.TradeState), ListSortDirection.Descending));
+            Guard.ArgumentIsTrue(() => wrappedTradesList.CanSort);
         }
 
-        public ObservableCollection<IPoeTradeViewModel> TradesList { get; } =
-            new ObservableCollection<IPoeTradeViewModel>();
+
+        public ICollectionView TradesList => wrappedTradesList;
 
         public IPoeQuery Query
         {
@@ -83,14 +92,14 @@
 
         private void OnNextItemsPackReceived(IPoeItem[] itemsPack)
         {
-            var existingItems = TradesList.Select(x => x.Trade).ToArray();
+            var existingItems = tradesList.Select(x => x.Trade).ToArray();
 
             var removedItems = existingItems.Except(itemsPack, poeItemsComparer).ToArray();
             var newItems = itemsPack.Except(existingItems, poeItemsComparer).ToArray();
 
             foreach (
                 var itemViewModel in
-                    removedItems.Select(item => TradesList.Single(x => poeItemsComparer.Equals(x.Trade, item))))
+                    removedItems.Select(item => tradesList.Single(x => poeItemsComparer.Equals(x.Trade, item))))
             {
                 itemViewModel.TradeState = PoeTradeState.Removed;
             }
@@ -99,7 +108,7 @@
             {
                 var itemViewModel = poeTradeViewModelFactory.Create(item);
                 itemViewModel.TradeState = PoeTradeState.New;
-                TradesList.Add(itemViewModel);
+                tradesList.Add(itemViewModel);
             }
 
             LastUpdateTimestamp = clock.CurrentTime;
@@ -122,6 +131,11 @@
                .Subscribe(_ => this.RaisePropertyChanged(nameof(IsBusy)));
 
             poeLiveHistoryProvider.RecheckPeriod = recheckTimeout;
+        }
+
+        public void ClearTradesList()
+        {
+            tradesList.Clear();
         }
     }
 }

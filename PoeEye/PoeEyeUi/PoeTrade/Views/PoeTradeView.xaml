@@ -52,11 +52,25 @@
                                                 <Setter Property="Background" Value="{DynamicResource PoeTradeRemovedItemColor}"/>
                                                 <Setter Property="BorderThickness" Value="1"/>
                                             </DataTrigger>
+                                            <DataTrigger Binding="{Binding TradeState}" Value="{x:Static poeTrade:PoeTradeState.Normal}">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                            </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
                                 </Border.Style>
                             </Border>
-                           
+
+                            <Button 
+                                    Command="{Binding MarkAsReadCommand}"
+                                    Style="{StaticResource MetroCircleButtonStyle}"
+                                    Height="30" Width="30" ToolTip="Mark as Read">
+                                <Rectangle Width="11" Height="11" Fill="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Button}}}">
+                                    <Rectangle.OpacityMask>
+                                        <VisualBrush Stretch="Fill" Visual="{DynamicResource appbar_newspaper}" />
+                                    </Rectangle.OpacityMask>
+                                </Rectangle>
+                            </Button>
+
                             <TextBlock Text="{Binding Name, Mode=OneWay}" Style="{StaticResource MetroTextBlockHeaderStyle}"/>
                         </StackPanel>
                         

@@ -4,7 +4,7 @@
     {
         Unknown,
         New,
-        Actual,
+        Normal,
         Removed
     }
 }
