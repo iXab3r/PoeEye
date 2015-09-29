@@ -18,9 +18,7 @@
                     Content="Search"/>
 
             <ContentControl Grid.Row="2">
-                <ScrollViewer VerticalScrollBarVisibility="Auto">
-                    <ItemsControl ItemsSource="{Binding TradesListViewModel.TradesList}" />
-                </ScrollViewer>
+                <ItemsControl ItemsSource="{Binding TradesListViewModel.TradesList}" Style="{StaticResource VirtualizedItemsControlStyle}"/>
             </ContentControl>
         </Grid>
     </DataTemplate>

@@ -41,11 +41,11 @@
         </ContentControl>
 
         <Border Grid.Row="1">
-            <TabControl
-                    ItemsSource="{Binding TabsList}" 
-                    SelectedItem="{Binding SelectedItem}"
-                    controls:TabControlHelper.IsUnderlined="True" >
-                <TabControl.ItemTemplate>
+            <controls:MetroTabControl ItemsSource="{Binding TabsList}" 
+                        SelectedItem="{Binding SelectedItem}"
+                        controls:TabControlHelper.Transition="LeftReplace"
+                        controls:TabControlHelper.IsUnderlined="True" >
+                <controls:MetroTabControl.ItemTemplate>
                     <DataTemplate DataType="{x:Type local:MainWindowTabViewModel}">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="{Binding TabName}"/>
@@ -61,8 +61,8 @@
                             </Button>
                         </StackPanel>
                     </DataTemplate>
-                </TabControl.ItemTemplate>
-            </TabControl>
+                </controls:MetroTabControl.ItemTemplate>
+            </controls:MetroTabControl>
 
         </Border>
 
