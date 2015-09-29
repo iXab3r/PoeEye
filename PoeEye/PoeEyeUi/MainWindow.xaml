@@ -7,12 +7,12 @@
         xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
         mc:Ignorable="d"
         Title="MainWindow" 
-        MinWidth="400" 
+        MinWidth="1000" 
         MinHeight="300" 
-        Width="800" 
+        Width="1000" 
         Height="600" 
         d:DataContext="{d:DesignInstance local:MainWindowViewModel}"
-        WindowTransitionsEnabled="False">
+        BorderThickness="1" BorderBrush="{StaticResource AccentColorBrush}">
 
     <Grid>
         <Grid.RowDefinitions>
@@ -22,7 +22,7 @@
         </Grid.RowDefinitions>
 
         <ContentControl Grid.Row="0">
-            <StackPanel>
+            <StackPanel HorizontalAlignment="Left">
                 <Button Width="50"
                         Height="50"
                         Style="{DynamicResource MetroCircleButtonStyle}"
@@ -41,48 +41,58 @@
         </ContentControl>
 
         <Border Grid.Row="1">
-            <controls:MetroTabControl ItemsSource="{Binding TabsList}" 
+            <controls:MetroAnimatedTabControl ItemsSource="{Binding TabsList}" 
                         SelectedItem="{Binding SelectedItem}"
-                        controls:TabControlHelper.Transition="LeftReplace"
-                        controls:TabControlHelper.IsUnderlined="True" >
-                <controls:MetroTabControl.ItemTemplate>
+                        controls:TabControlHelper.IsUnderlined="True"
+                        controls:TabControlHelper.Transition="Up"
+                                              TabStripMargin="5,0,0,0"
+                        TabStripPlacement="Left" >
+                <controls:MetroAnimatedTabControl.ItemTemplate>
                     <DataTemplate DataType="{x:Type local:MainWindowTabViewModel}">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="{Binding TabName}"/>
-                            <Button Width="30" Height="30"
-                                Style="{DynamicResource MetroCircleButtonStyle}"
-                                Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type controls:MetroTabControl}}, Path=DataContext.CloseTabCommand}"
+                        <StackPanel Orientation="Horizontal" Width="110" >
+                            <controls:ProgressRing Height="20" Width="20" IsActive="true" Foreground="{StaticResource TextBrush}"  Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                            <TextBlock Text="{Binding TabName}" FontSize="18"/>
+                            <Button Width="24" Height="24"
+                                Style="{StaticResource MetroCircleButtonStyle}"
+                                Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type controls:MetroAnimatedTabControl}}, Path=DataContext.CloseTabCommand}"
                                 CommandParameter="{Binding}">
-                                <Rectangle Width="10" Height="10" Fill="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Button}}}">
+                                <Rectangle Width="8" Height="8" Fill="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Button}}}">
                                     <Rectangle.OpacityMask>
-                                        <VisualBrush Stretch="Fill" Visual="{DynamicResource appbar_xbox}" />
+                                        <VisualBrush Stretch="Fill" Visual="{DynamicResource appbar_close}" />
                                     </Rectangle.OpacityMask>
                                 </Rectangle>
                             </Button>
                         </StackPanel>
                     </DataTemplate>
-                </controls:MetroTabControl.ItemTemplate>
-            </controls:MetroTabControl>
+                </controls:MetroAnimatedTabControl.ItemTemplate>
+            </controls:MetroAnimatedTabControl>
 
         </Border>
 
-       
-        <StatusBar Grid.Row="2">
-            <StatusBar.Resources>
-                <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource MetroTextBlock}">
-                    <Setter Property="FontSize" Value="18"/>
-                </Style>
-            </StatusBar.Resources>
-            <StatusBar.Items>
-                <StackPanel Orientation="Horizontal" Visibility="{Binding SelectedItem.IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}">
-                    <controls:ProgressRing Height="20" Width="20" IsActive="true" Foreground="{StaticResource TextBrush}"  />
-                    <TextBlock Text="Updating..."/>
-                </StackPanel>
 
-                <TextBlock Text="{Binding SelectedItem.LastUpdateTimestamp, Mode=OneWay, StringFormat='Last update: {0:MMM dd HH:mm:ss.fff}'}"/>
-                <TextBlock HorizontalAlignment="Right" Text="{Binding SelectedItem.RecheckTimeout, Mode=OneWay, StringFormat='Recheck timeout: {0}'}"/>
-            </StatusBar.Items>
-        </StatusBar>
+        <Border Grid.Row="2" BorderThickness="0,1,0,0" BorderBrush="{StaticResource AccentColorBrush}" Margin="5,1,10,5">
+            <Border.Resources>
+                <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource MetroTextBlock}">
+                    <Setter Property="FontSize" Value="16"/>
+                </Style>
+            </Border.Resources>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                        <ColumnDefinition Width="*"></ColumnDefinition>
+                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" Visibility="{Binding SelectedItem.IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <controls:ProgressRing Height="20" Width="20" IsActive="true" Foreground="{StaticResource TextBrush}"  />
+                        <TextBlock Text="Updating..."/>
+                    </StackPanel>
+
+                    <TextBlock Margin="10,0,0,0" Grid.Column="1" Text="{Binding SelectedItem.LastUpdateTimestamp, Mode=OneWay, StringFormat='Last update: {0:MMM dd HH:mm:ss.fff}'}"/>
+                    
+                    <TextBlock Margin="10,0,0,0" Grid.Column="2" Text="{Binding SelectedItem.RecheckTimeout, Mode=OneWay, StringFormat='Recheck timeout: {0}'}"/>
+                </Grid>
+        </Border>
     </Grid>
 </controls:MetroWindow>
     

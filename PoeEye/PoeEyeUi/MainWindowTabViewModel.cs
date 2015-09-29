@@ -68,8 +68,8 @@
                     new PoeQueryModArgument("Area is #% larger") {Excluded = true},
                 },
             };*/
-
             RecheckTimeout = TimeSpan.FromSeconds(30);
+            TradesListViewModel.TradesList.Clear();
             TradesListViewModel.Query = query;
         }
 

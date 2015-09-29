@@ -9,9 +9,10 @@
                 <converters:ComboBoxEmptyItemConverter x:Key="ComboBoxEmptyItemConverterKey"/>
 
                 <Style TargetType="TextBlock" BasedOn="{StaticResource MetroTextBlock}" x:Key="TextBlockHeader">
-                    <Setter Property="FontSize" Value="18"/>
+                    <Setter Property="FontSize" Value="14"/>
                     <Setter Property="Foreground" Value="{StaticResource LabelTextBrush}"/>
                     <Setter Property="Margin" Value="3,0,3,0"/>
+                    <Setter Property="HorizontalAlignment" Value="Right"/>
                 </Style>
 
                 <Style TargetType="controls:NumericUpDown" BasedOn="{StaticResource {x:Type controls:NumericUpDown}}" x:Key="NumericUpDownBase">
@@ -58,184 +59,262 @@
             </Grid.Resources>
 
             <Grid.RowDefinitions>
-                <RowDefinition Height="30" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="10"></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="10"></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="10"></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
             </Grid.RowDefinitions>
 
-            <ContentControl Grid.Row="0">
-                <StackPanel>
-                    <StackPanel>
-                        <TextBlock Text="League" Style="{StaticResource TextBlockHeader}" />
-                        <ComboBox Width="100" ItemsSource="{Binding LeaguesList}" SelectedItem="{Binding League}"></ComboBox>
-                    </StackPanel>
 
-                    <StackPanel>
-                        <TextBlock Text="Type" Style="{StaticResource TextBlockHeader}" />
-                        <ComboBox Width="200" 
-                                  SelectedItem="{Binding ItemType}"
-                                  DisplayMemberPath="Name" 
-                                  ItemsSource="{Binding ItemTypes, Converter={StaticResource ComboBoxEmptyItemConverterKey}}">
-                        </ComboBox>
-                    </StackPanel>
+            <Grid Row="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="5" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="80"/>
+                    <ColumnDefinition Width="180"/>
+                    <ColumnDefinition Width="80"/>
+                    <ColumnDefinition Width="180"/>
+                    <ColumnDefinition Width="80"/>
+                    <ColumnDefinition Width="180"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock  Grid.Row="0" Grid.Column="0" 
+                        Text="League" Style="{StaticResource TextBlockHeader}" />
+                <ComboBox   Grid.Row="0" Grid.Column="1" 
+                        ItemsSource="{Binding LeaguesList}" 
+                        Width="NaN"
+                        SelectedItem="{Binding League}"/>
+
+                <TextBlock  Grid.Row="0" Grid.Column="2" 
+                        Text="Type" Style="{StaticResource TextBlockHeader}" />
+                <ComboBox   Grid.Row="0" Grid.Column="3" 
+                        SelectedItem="{Binding ItemType}"
+                        DisplayMemberPath="Name" 
+                        Width="NaN"
+                        ItemsSource="{Binding ItemTypes, Converter={StaticResource ComboBoxEmptyItemConverterKey}}">
+                </ComboBox>
+
+                <TextBlock   Grid.Row="2" Grid.Column="0"
+                             Text="Name" Style="{StaticResource TextBlockHeader}" />
+                <TextBox  Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="5"
+                          Text="{Binding ItemName}" 
+                          Width="NaN" 
+                          Style="{StaticResource TextBoxKey}" 
+                          HorizontalContentAlignment="Left"
+                          controls:TextBoxHelper.Watermark="item name, e.g. Temple map" />
+            </Grid>
+
+            <Grid Row="2">
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="5" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="80"/>
+                    <ColumnDefinition Width="180"/>
+                    <ColumnDefinition Width="80"/>
+                    <ColumnDefinition Width="180"/>
+                    <ColumnDefinition Width="80"/>
+                    <ColumnDefinition Width="180"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Row="0" Grid.Column="0" 
+                           Text="Damage" Style="{StaticResource TextBlockHeader}" />
+                <StackPanel Grid.Row="0" Grid.Column="1">
+                    <controls:NumericUpDown Style="{StaticResource NumericUpDownMin}" Value="{Binding DamageMin}"/>
+                    <controls:NumericUpDown Style="{StaticResource NumericUpDownMax}" Value="{Binding DamageMax}"/>
                 </StackPanel>
-            </ContentControl>
 
-            <ContentControl Grid.Row="1">
-                <DockPanel>
-                    <TextBlock Text="Name" Style="{StaticResource TextBlockHeader}" />
-                    <TextBox Text="{Binding ItemName}" 
-                             Width="NaN" 
-                             Style="{StaticResource TextBoxKey}" 
-                             HorizontalContentAlignment="Left"
-                             controls:TextBoxHelper.Watermark="item name, e.g. Temple map"
-                             />
-                </DockPanel>
-            </ContentControl>
 
-            <ContentControl Grid.Row="2">
-                <StackPanel>
-                    <StackPanel>
-                        <TextBlock Text="Damage" Style="{StaticResource TextBlockHeader}" />
-                        <controls:NumericUpDown Style="{StaticResource NumericUpDownMin}" Value="{Binding DamageMin}"/>
-                        <controls:NumericUpDown Style="{StaticResource NumericUpDownMax}" Value="{Binding DamageMax}"/>
-                    </StackPanel>
-
-                    <StackPanel>
-                        <TextBlock Text="APS" Style="{StaticResource TextBlockHeader}" />
-                        <controls:NumericUpDown Style="{StaticResource NumericUpDownMin}" Value="{Binding ApsMin}"/>
-                        <controls:NumericUpDown Style="{StaticResource NumericUpDownMax}" Value="{Binding ApsMax}"/>
-                    </StackPanel>
-
-                    <StackPanel>
-                        <TextBlock Text="Crit.Strike" Style="{StaticResource TextBlockHeader}" />
-                        <controls:NumericUpDown Style="{StaticResource NumericUpDownMin}" Value="{Binding CritMin}"/>
-                        <controls:NumericUpDown Style="{StaticResource NumericUpDownMax}" Value="{Binding CritMax}"/>
-                    </StackPanel>
+                <TextBlock Grid.Row="0" Grid.Column="2" 
+                           Text="APS" Style="{StaticResource TextBlockHeader}" />
+                <StackPanel Grid.Row="0" Grid.Column="3" >
+                    <controls:NumericUpDown Style="{StaticResource NumericUpDownMin}" Value="{Binding ApsMin}"/>
+                    <controls:NumericUpDown Style="{StaticResource NumericUpDownMax}" Value="{Binding ApsMax}"/>
                 </StackPanel>
-            </ContentControl>
 
-            <ContentControl Grid.Row="3">
-                <StackPanel>
-                    <StackPanel>
-                        <TextBlock Text="DPS" Style="{StaticResource TextBlockHeader}" />
-                        <controls:NumericUpDown Style="{StaticResource NumericUpDownMin}" Value="{Binding DpsMin}"/>
-                        <controls:NumericUpDown Style="{StaticResource NumericUpDownMax}" Value="{Binding DpsMax}"/>
-                    </StackPanel>
-
-                    <StackPanel>
-                        <TextBlock Text="eDPS" Style="{StaticResource TextBlockHeader}" />
-                        <controls:NumericUpDown Style="{StaticResource NumericUpDownMin}" Value="{Binding EdpsMin}"/>
-                        <controls:NumericUpDown Style="{StaticResource NumericUpDownMax}" Value="{Binding EdpsMax}"/>
-                    </StackPanel>
-
-                    <StackPanel>
-                        <TextBlock Text="pDPS" Style="{StaticResource TextBlockHeader}" />
-                        <controls:NumericUpDown Style="{StaticResource NumericUpDownMin}" Value="{Binding PdpsMin}"/>
-                        <controls:NumericUpDown Style="{StaticResource NumericUpDownMax}" Value="{Binding PdpsMax}"/>
-                    </StackPanel>
+                <TextBlock  Grid.Row="0" Grid.Column="4" 
+                            Text="Crit.Strike" Style="{StaticResource TextBlockHeader}" />
+                <StackPanel Grid.Row="0" Grid.Column="5" >
+                    <controls:NumericUpDown Style="{StaticResource NumericUpDownMin}" Value="{Binding CritMin}"/>
+                    <controls:NumericUpDown Style="{StaticResource NumericUpDownMax}" Value="{Binding CritMax}"/>
                 </StackPanel>
-            </ContentControl>
 
-            <ContentControl Grid.Row="4">
-                <StackPanel>
-                    <StackPanel>
-                        <TextBlock Text="Armour" Style="{StaticResource TextBlockHeader}" />
-                        <controls:NumericUpDown Style="{StaticResource NumericUpDownMin}" Value="{Binding ArmourMin}"/>
-                        <controls:NumericUpDown Style="{StaticResource NumericUpDownMax}" Value="{Binding ArmourMax}"/>
-                    </StackPanel>
-
-                    <StackPanel>
-                        <TextBlock Text="Evasion" Style="{StaticResource TextBlockHeader}" />
-                        <controls:NumericUpDown Style="{StaticResource NumericUpDownMin}" Value="{Binding EvasionMin}"/>
-                        <controls:NumericUpDown Style="{StaticResource NumericUpDownMax}" Value="{Binding EvasionMax}"/>
-                    </StackPanel>
-
-                    <StackPanel>
-                        <TextBlock Text="Shield" Style="{StaticResource TextBlockHeader}" />
-                        <controls:NumericUpDown Style="{StaticResource NumericUpDownMin}" Value="{Binding ShieldMin}"/>
-                        <controls:NumericUpDown Style="{StaticResource NumericUpDownMax}" Value="{Binding ShieldMax}"/>
-                    </StackPanel>
-
-                    <StackPanel>
-                        <TextBlock Text="Block" Style="{StaticResource TextBlockHeader}" />
-                        <controls:NumericUpDown Style="{StaticResource NumericUpDownMin}" Value="{Binding BlockMin}"/>
-                        <controls:NumericUpDown Style="{StaticResource NumericUpDownMax}" Value="{Binding BlockMax}"/>
-                    </StackPanel>
+                <TextBlock Grid.Row="2" Grid.Column="0" 
+                           Text="DPS" Style="{StaticResource TextBlockHeader}" />
+                <StackPanel Grid.Row="2" Grid.Column="1" >
+                    <controls:NumericUpDown Style="{StaticResource NumericUpDownMin}" Value="{Binding DpsMin}"/>
+                    <controls:NumericUpDown Style="{StaticResource NumericUpDownMax}" Value="{Binding DpsMax}"/>
                 </StackPanel>
-            </ContentControl>
 
-            <ContentControl Grid.Row="5">
-                <StackPanel>
-                    <StackPanel>
-                        <TextBlock Text="Sockets" Style="{StaticResource TextBlockHeader}" />
-                        <controls:NumericUpDown Style="{StaticResource NumericUpDownMin}" Value="{Binding SocketsMin}"/>
-                        <controls:NumericUpDown Style="{StaticResource NumericUpDownMax}" Value="{Binding SocketsMax}"/>
-                    </StackPanel>
-
-                    <StackPanel>
-                        <TextBlock Text="Links" Style="{StaticResource TextBlockHeader}" />
-                        <controls:NumericUpDown Style="{StaticResource NumericUpDownMin}" Value="{Binding LinkMin}"/>
-                        <controls:NumericUpDown Style="{StaticResource NumericUpDownMax}" Value="{Binding LinkMax}"/>
-                    </StackPanel>
+                <TextBlock Grid.Row="2" Grid.Column="2" 
+                           Text="eDPS" Style="{StaticResource TextBlockHeader}" />
+                <StackPanel Grid.Row="2" Grid.Column="3" >
+                    <controls:NumericUpDown Style="{StaticResource NumericUpDownMin}" Value="{Binding EdpsMin}"/>
+                    <controls:NumericUpDown Style="{StaticResource NumericUpDownMax}" Value="{Binding EdpsMax}"/>
                 </StackPanel>
-            </ContentControl>
 
-            <ContentControl Grid.Row="6">
-                <StackPanel>
-                    <StackPanel>
-                        <TextBlock Text="Colors" Style="{StaticResource TextBlockHeader}" />
-                        <TextBox Style="{StaticResource TextBoxKey}" Width="30" controls:TextBoxHelper.Watermark="R" Text="{Binding SocketsR}"/>
-                        <TextBox Style="{StaticResource TextBoxKey}" Width="30" controls:TextBoxHelper.Watermark="G" Text="{Binding SocketsG}"/>
-                        <TextBox Style="{StaticResource TextBoxKey}" Width="30" controls:TextBoxHelper.Watermark="B" Text="{Binding SocketsB}"/>
-                        <TextBox Style="{StaticResource TextBoxKey}" Width="30" controls:TextBoxHelper.Watermark="W" Text="{Binding SocketsW}"/>
-                    </StackPanel>
-
-                    <StackPanel>
-                        <TextBlock Text="Linked" Style="{StaticResource TextBlockHeader}" />
-                        <TextBox Style="{StaticResource TextBoxKey}" Width="30" controls:TextBoxHelper.Watermark="R" Text="{Binding LinkedR}"/>
-                        <TextBox Style="{StaticResource TextBoxKey}" Width="30" controls:TextBoxHelper.Watermark="G" Text="{Binding LinkedG}"/>
-                        <TextBox Style="{StaticResource TextBoxKey}" Width="30" controls:TextBoxHelper.Watermark="B" Text="{Binding LinkedB}"/>
-                        <TextBox Style="{StaticResource TextBoxKey}" Width="30" controls:TextBoxHelper.Watermark="W" Text="{Binding LinkedW}"/>
-                    </StackPanel>
+                <TextBlock Grid.Row="2" Grid.Column="4" 
+                           Text="pDPS" Style="{StaticResource TextBlockHeader}" />
+                <StackPanel Grid.Row="2" Grid.Column="5" >
+                    <controls:NumericUpDown Style="{StaticResource NumericUpDownMin}" Value="{Binding PdpsMin}"/>
+                    <controls:NumericUpDown Style="{StaticResource NumericUpDownMax}" Value="{Binding PdpsMax}"/>
                 </StackPanel>
-            </ContentControl>
+            </Grid>
 
-            <ContentControl Grid.Row="7">
-                <StackPanel>
-                    <StackPanel>
-                        <TextBlock Text="Level" Style="{StaticResource TextBlockHeader}" />
-                        <controls:NumericUpDown Style="{StaticResource NumericUpDownMin}" Value="{Binding LevelMin}"/>
-                        <controls:NumericUpDown Style="{StaticResource NumericUpDownMax}" Value="{Binding LevelMax}"/>
-                    </StackPanel>
+            <Grid Row="4">
 
-                    <StackPanel>
-                        <TextBlock Text="Strength" Style="{StaticResource TextBlockHeader}" />
-                        <controls:NumericUpDown Style="{StaticResource NumericUpDownMin}" Value="{Binding RStrMin}"/>
-                        <controls:NumericUpDown Style="{StaticResource NumericUpDownMax}" Value="{Binding RStrMax}"/>
-                    </StackPanel>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="5" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
 
-                    <StackPanel>
-                        <TextBlock Text="Dexterity" Style="{StaticResource TextBlockHeader}" />
-                        <controls:NumericUpDown Style="{StaticResource NumericUpDownMin}" Value="{Binding RDexMin}"/>
-                        <controls:NumericUpDown Style="{StaticResource NumericUpDownMax}" Value="{Binding RDexMax}"/>
-                    </StackPanel>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="80"/>
+                    <ColumnDefinition Width="180"/>
+                    <ColumnDefinition Width="80"/>
+                    <ColumnDefinition Width="180"/>
+                </Grid.ColumnDefinitions>
 
-                    <StackPanel>
-                        <TextBlock Text="Intelligence" Style="{StaticResource TextBlockHeader}" />
-                        <controls:NumericUpDown Style="{StaticResource NumericUpDownMin}" Value="{Binding RIntMin}"/>
-                        <controls:NumericUpDown Style="{StaticResource NumericUpDownMax}" Value="{Binding RIntMax}"/>
-                    </StackPanel>
+                <TextBlock Grid.Row="0" Grid.Column="0" 
+                           Text="Sockets" Style="{StaticResource TextBlockHeader}" />
+                <StackPanel Grid.Row="0" Grid.Column="1">
+                    <controls:NumericUpDown Style="{StaticResource NumericUpDownMin}" Value="{Binding SocketsMin}"/>
+                    <controls:NumericUpDown Style="{StaticResource NumericUpDownMax}" Value="{Binding SocketsMax}"/>
                 </StackPanel>
-            </ContentControl>
 
 
+                <TextBlock Grid.Row="0" Grid.Column="2" 
+                           Text="Links" Style="{StaticResource TextBlockHeader}" />
+                <StackPanel Grid.Row="0" Grid.Column="3" >
+                    <controls:NumericUpDown Style="{StaticResource NumericUpDownMin}" Value="{Binding LinkMin}"/>
+                    <controls:NumericUpDown Style="{StaticResource NumericUpDownMax}" Value="{Binding LinkMax}"/>
+                </StackPanel>
+
+                <TextBlock Grid.Row="2" Grid.Column="0" 
+                           Text="Colors" Style="{StaticResource TextBlockHeader}" />
+                <StackPanel Grid.Row="2" Grid.Column="1" >
+                    <TextBox Style="{StaticResource TextBoxKey}" Width="30" controls:TextBoxHelper.Watermark="R" Text="{Binding SocketsR}"/>
+                    <TextBox Style="{StaticResource TextBoxKey}" Width="30" controls:TextBoxHelper.Watermark="G" Text="{Binding SocketsG}"/>
+                    <TextBox Style="{StaticResource TextBoxKey}" Width="30" controls:TextBoxHelper.Watermark="B" Text="{Binding SocketsB}"/>
+                    <TextBox Style="{StaticResource TextBoxKey}" Width="30" controls:TextBoxHelper.Watermark="W" Text="{Binding SocketsW}"/>
+                </StackPanel>
+
+                <TextBlock Grid.Row="2" Grid.Column="2" 
+                           Text="Linked" Style="{StaticResource TextBlockHeader}" />
+                <StackPanel Grid.Row="2" Grid.Column="3" >
+                    <TextBox Style="{StaticResource TextBoxKey}" Width="30" controls:TextBoxHelper.Watermark="R" Text="{Binding LinkedR}"/>
+                    <TextBox Style="{StaticResource TextBoxKey}" Width="30" controls:TextBoxHelper.Watermark="G" Text="{Binding LinkedG}"/>
+                    <TextBox Style="{StaticResource TextBoxKey}" Width="30" controls:TextBoxHelper.Watermark="B" Text="{Binding LinkedB}"/>
+                    <TextBox Style="{StaticResource TextBoxKey}" Width="30" controls:TextBoxHelper.Watermark="W" Text="{Binding LinkedW}"/>
+                </StackPanel>
+            </Grid>
+
+            <Grid Row="4">
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="5" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="80"/>
+                    <ColumnDefinition Width="180"/>
+                    <ColumnDefinition Width="80"/>
+                    <ColumnDefinition Width="180"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Row="0" Grid.Column="0" 
+                           Text="Sockets" Style="{StaticResource TextBlockHeader}" />
+                <StackPanel Grid.Row="0" Grid.Column="1">
+                    <controls:NumericUpDown Style="{StaticResource NumericUpDownMin}" Value="{Binding SocketsMin}"/>
+                    <controls:NumericUpDown Style="{StaticResource NumericUpDownMax}" Value="{Binding SocketsMax}"/>
+                </StackPanel>
+
+
+                <TextBlock Grid.Row="0" Grid.Column="2" 
+                           Text="Links" Style="{StaticResource TextBlockHeader}" />
+                <StackPanel Grid.Row="0" Grid.Column="3" >
+                    <controls:NumericUpDown Style="{StaticResource NumericUpDownMin}" Value="{Binding LinkMin}"/>
+                    <controls:NumericUpDown Style="{StaticResource NumericUpDownMax}" Value="{Binding LinkMax}"/>
+                </StackPanel>
+
+                <TextBlock Grid.Row="2" Grid.Column="0" 
+                           Text="Colors" Style="{StaticResource TextBlockHeader}" />
+                <StackPanel Grid.Row="2" Grid.Column="1" >
+                    <TextBox Style="{StaticResource TextBoxKey}" Width="30" controls:TextBoxHelper.Watermark="R" Text="{Binding SocketsR}"/>
+                    <TextBox Style="{StaticResource TextBoxKey}" Width="30" controls:TextBoxHelper.Watermark="G" Text="{Binding SocketsG}"/>
+                    <TextBox Style="{StaticResource TextBoxKey}" Width="30" controls:TextBoxHelper.Watermark="B" Text="{Binding SocketsB}"/>
+                    <TextBox Style="{StaticResource TextBoxKey}" Width="30" controls:TextBoxHelper.Watermark="W" Text="{Binding SocketsW}"/>
+                </StackPanel>
+
+                <TextBlock Grid.Row="2" Grid.Column="2" 
+                           Text="Linked" Style="{StaticResource TextBlockHeader}" />
+                <StackPanel Grid.Row="2" Grid.Column="3" >
+                    <TextBox Style="{StaticResource TextBoxKey}" Width="30" controls:TextBoxHelper.Watermark="R" Text="{Binding LinkedR}"/>
+                    <TextBox Style="{StaticResource TextBoxKey}" Width="30" controls:TextBoxHelper.Watermark="G" Text="{Binding LinkedG}"/>
+                    <TextBox Style="{StaticResource TextBoxKey}" Width="30" controls:TextBoxHelper.Watermark="B" Text="{Binding LinkedB}"/>
+                    <TextBox Style="{StaticResource TextBoxKey}" Width="30" controls:TextBoxHelper.Watermark="W" Text="{Binding LinkedW}"/>
+                </StackPanel>
+            </Grid>
+
+            <Grid Row="6">
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="5" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="80"/>
+                    <ColumnDefinition Width="180"/>
+                    <ColumnDefinition Width="80"/>
+                    <ColumnDefinition Width="180"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Row="0" Grid.Column="0" 
+                           Text="Level" Style="{StaticResource TextBlockHeader}" />
+                <StackPanel Grid.Row="0" Grid.Column="1">
+                    <controls:NumericUpDown Style="{StaticResource NumericUpDownMin}" Value="{Binding LevelMin}"/>
+                    <controls:NumericUpDown Style="{StaticResource NumericUpDownMax}" Value="{Binding LevelMax}"/>
+                </StackPanel>
+
+
+                <TextBlock Grid.Row="0" Grid.Column="2" 
+                           Text="Strength" Style="{StaticResource TextBlockHeader}" />
+                <StackPanel Grid.Row="0" Grid.Column="3" >
+                    <controls:NumericUpDown Style="{StaticResource NumericUpDownMin}" Value="{Binding RStrMin}"/>
+                    <controls:NumericUpDown Style="{StaticResource NumericUpDownMax}" Value="{Binding RStrMax}"/>
+                </StackPanel>
+
+                <TextBlock  Grid.Row="2" Grid.Column="0" 
+                            Text="Dexterity" Style="{StaticResource TextBlockHeader}" />
+                <StackPanel Grid.Row="2" Grid.Column="1" >
+                    <controls:NumericUpDown Style="{StaticResource NumericUpDownMin}" Value="{Binding RDexMin}"/>
+                    <controls:NumericUpDown Style="{StaticResource NumericUpDownMax}" Value="{Binding RDexMax}"/>
+                </StackPanel>
+
+                <TextBlock Grid.Row="2" Grid.Column="2" 
+                           Text="Intelligence" Style="{StaticResource TextBlockHeader}" />
+                <StackPanel Grid.Row="2" Grid.Column="3" >
+                    <controls:NumericUpDown Style="{StaticResource NumericUpDownMin}" Value="{Binding RIntMin}"/>
+                    <controls:NumericUpDown Style="{StaticResource NumericUpDownMax}" Value="{Binding RIntMax}"/>
+                </StackPanel>
+            </Grid>
+            
         </Grid>
 
     </DataTemplate>

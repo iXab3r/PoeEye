@@ -6,20 +6,23 @@
         <Grid Margin="0, 10, 0, 10">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
-                <RowDefinition Height="30"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <ContentControl Grid.Row="0" Content="{Binding QueryViewModel}"/>
+            <Expander Header="Query" IsExpanded="true">
+                <StackPanel>
+                    <controls:MetroContentControl Content="{Binding QueryViewModel}"/>
+                    <DockPanel>
+                        <Button HorizontalAlignment="Right" Width="150" Command="{Binding SearchCommand}" 
+                            CommandParameter="{Binding QueryViewModel.PoeQueryBuilder}" 
+                            Content="Search"/>
+                    </DockPanel>
+                </StackPanel>
+            </Expander>
 
-            <Button Grid.Row="1"
-                    Command="{Binding SearchCommand}" 
-                    CommandParameter="{Binding QueryViewModel.PoeQueryBuilder}" 
-                    Content="Search"/>
-
-            <ContentControl Grid.Row="2">
+            <controls:MetroContentControl Grid.Row="1">
                 <ItemsControl ItemsSource="{Binding TradesListViewModel.TradesList}" Style="{StaticResource VirtualizedItemsControlStyle}"/>
-            </ContentControl>
+            </controls:MetroContentControl>
         </Grid>
     </DataTemplate>
 </ResourceDictionary>
