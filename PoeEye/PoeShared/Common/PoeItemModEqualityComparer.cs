@@ -22,12 +22,12 @@ namespace PoeShared.Common
             {
                 return false;
             }
-            return string.Equals(x.Name, y.Name);
+            return string.Equals(x.CodeName, y.CodeName);
         }
 
         public int GetHashCode(IPoeItemMod obj)
         {
-            return (obj.Name != null ? obj.Name.GetHashCode() : 0);
+            return obj.CodeName?.GetHashCode() ?? 0;
         }
     }
 }
