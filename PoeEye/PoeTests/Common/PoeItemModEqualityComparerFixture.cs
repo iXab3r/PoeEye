@@ -53,18 +53,18 @@
                     CreateItemMod(string.Empty, string.Empty),
                      CreateItemMod(string.Empty, string.Empty));
             yield return new Tuple<IPoeItemMod, IPoeItemMod>(
-                    CreateItemMod("1", string.Empty),
-                     CreateItemMod("1", string.Empty));
+                    CreateItemMod(string.Empty, "1"),
+                     CreateItemMod(string.Empty, "1"));
         }
 
         private IEnumerable<Tuple<IPoeItemMod, IPoeItemMod>> ShouldReturnFalseTestCaseSource()
         {
             yield return new Tuple<IPoeItemMod, IPoeItemMod>(
-                    CreateItemMod(string.Empty, string.Empty),
-                     CreateItemMod("2", string.Empty));
+                    CreateItemMod(string.Empty, "1"),
+                     CreateItemMod(string.Empty, "2"));
             yield return new Tuple<IPoeItemMod, IPoeItemMod>(
                     CreateItemMod("1", string.Empty),
-                     CreateItemMod("2", string.Empty));
+                     CreateItemMod("1", "1"));
         }
 
         private IPoeItemMod CreateItemMod(string codeName, string name)
