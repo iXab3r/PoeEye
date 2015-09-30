@@ -37,7 +37,6 @@
                         </Rectangle.OpacityMask>
                     </Rectangle>
                 </Button>
-                <Button Content="Check for updates..." Command="{Binding CheckForUpdatesCommand}"/>
             </StackPanel>
         </ContentControl>
 

@@ -13,6 +13,8 @@
 
     using JetBrains.Annotations;
 
+    using PoeTrade.ViewModels;
+
     using ReactiveUI;
 
     using Squirrel;
@@ -26,25 +28,26 @@
         private MainWindowTabViewModel selectedItem;
         private readonly ReactiveCommand<object> createNewTabCommand;
         private readonly ReactiveCommand<object> closeTabCommand;
-        private readonly ReactiveCommand<object> checkForUpdatesCommand;
 
         public MainWindowViewModel(
-            [NotNull] IFactory<MainWindowTabViewModel> tabFactory)
+            [NotNull] IFactory<MainWindowTabViewModel> tabFactory,
+            [NotNull] ApplicationUpdaterViewModel applicationUpdaterViewModel)
         {
             Guard.ArgumentNotNull(() => tabFactory);
+            Guard.ArgumentNotNull(() => applicationUpdaterViewModel);
+            
 
             var executingAssembly = Assembly.GetExecutingAssembly();
             MainWindowTitle = $"{executingAssembly.GetName().Name} v{executingAssembly.GetName().Version}";
 
             this.tabFactory = tabFactory;
+            this.ApplicationUpdater = applicationUpdaterViewModel;
             createNewTabCommand = ReactiveCommand.Create();
             createNewTabCommand.Subscribe(CreateNewTabCommandExecuted);
 
             closeTabCommand = ReactiveCommand.Create();
             closeTabCommand.Subscribe(RemoveTabCommandExecuted);
 
-            checkForUpdatesCommand = ReactiveCommand.Create();
-            checkForUpdatesCommand.Subscribe(CheckForUpdatesCommandExecuted);
 
             this.tabsList
                 .ItemsAdded
@@ -59,7 +62,7 @@
 
         public ICommand CloseTabCommand => closeTabCommand;
 
-        public ICommand CheckForUpdatesCommand => checkForUpdatesCommand;
+        public ApplicationUpdaterViewModel ApplicationUpdater { get; }
 
         public ReactiveList<MainWindowTabViewModel> TabsList => tabsList;
 
@@ -86,15 +89,6 @@
                 return;
             }
             tabsList.Remove(tab);
-        }
-
-        private async void CheckForUpdatesCommandExecuted(object arg)
-        {
-            var appName = typeof (PoeEye.Prism.LiveRegistrations).Assembly.GetName().Name;
-            using (var mgr = new UpdateManager(@"C:\Work\Poe.trade.monitor\PoeEye\Releases", appName))
-            {
-                await mgr.UpdateApp();
-            }
         }
     }
 }

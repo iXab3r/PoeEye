@@ -3,13 +3,10 @@
     using System;
     using System.Windows.Input;
 
-    using Factory;
-
     using Guards;
 
     using JetBrains.Annotations;
 
-    using PoeShared;
     using PoeShared.PoeTrade.Query;
 
     using PoeTrade.ViewModels;
@@ -48,6 +45,28 @@
             QueryViewModel = queryViewModel;
         }
 
+        public TimeSpan RecheckTimeout
+        {
+            get { return TradesListViewModel.RecheckTimeout; }
+            set { TradesListViewModel.RecheckTimeout = value; }
+        }
+
+        public PoeTradesListViewModel TradesListViewModel { get; }
+
+        public ICommand SearchCommand { get; }
+
+        public DateTime LastUpdateTimestamp => TradesListViewModel.LastUpdateTimestamp;
+
+        public bool IsBusy => TradesListViewModel.IsBusy;
+
+        public string TabName
+        {
+            get { return tabName; }
+            set { this.RaiseAndSetIfChanged(ref tabName, value); }
+        }
+
+        public PoeQueryViewModel QueryViewModel { get; }
+
         private void SearchCommandExecute(object arg)
         {
             var queryBuilder = arg as Func<IPoeQuery>;
@@ -72,27 +91,5 @@
             TradesListViewModel.ClearTradesList();
             TradesListViewModel.Query = query;
         }
-
-        public TimeSpan RecheckTimeout
-        {
-            get { return TradesListViewModel.RecheckTimeout; }
-            set { TradesListViewModel.RecheckTimeout = value; }
-        }
-
-        public PoeTradesListViewModel TradesListViewModel { get; }
-
-        public ICommand SearchCommand { get; }
-
-        public DateTime LastUpdateTimestamp => TradesListViewModel.LastUpdateTimestamp;
-
-        public bool IsBusy => TradesListViewModel.IsBusy;
-
-        public string TabName
-        {
-            get { return tabName; }
-            set { this.RaiseAndSetIfChanged(ref tabName, value); }
-        }
-
-        public PoeQueryViewModel QueryViewModel { get; }
     }
 }
