@@ -4,6 +4,7 @@ namespace PoeEye.PoeTrade
     using System.Linq;
 
     using CsQuery;
+    using CsQuery.ExtensionMethods;
 
     using Guards;
 
@@ -107,6 +108,8 @@ namespace PoeEye.PoeTrade
         {
             CQ parser = row.Render();
 
+            var implicitMods = ExtractImplicitMods(row);
+            var explicitMods = ExtractExplicitMods(row);
             var result = new PoeItem
             {
                 ItemIconUri = parser["div[class=icon] img"].Attr("src"),
@@ -116,13 +119,25 @@ namespace PoeEye.PoeTrade
                 UserIgn = parser.Attr("data-ign"),
                 Price = parser.Attr("data-buyout"),
                 League = parser.Attr("data-league"),
-                Mods = parser["ul[class=mods] li"].Select(ExtractItemMods).ToArray()
+                Mods = implicitMods.Concat(explicitMods).ToArray(),
             };
 
             return result;
         }
 
-        private static IPoeItemMod ExtractItemMods(IDomObject itemModRow)
+        private static IPoeItemMod[] ExtractExplicitMods(IDomObject row)
+        {
+            CQ parser = row.Render();
+            return parser["ul[class=mods] li"].Select(x => ExtractItemMods(x, PoeModType.Explicit)).ToArray();
+        }
+
+        private static IPoeItemMod[] ExtractImplicitMods(IDomObject row)
+        {
+            CQ parser = row.Render();
+            return parser["ul[class=mods withline] li"].Select(x => ExtractItemMods(x, PoeModType.Implicit)).ToArray();
+        }
+
+        private static IPoeItemMod ExtractItemMods(IDomObject itemModRow, PoeModType modType = PoeModType.Unknown)
         {
             CQ parser = itemModRow.Render();
 
