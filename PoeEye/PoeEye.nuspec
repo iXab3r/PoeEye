@@ -8,7 +8,9 @@
         <description>My package description.</description>
     </metadata>
     <files>
+        <file src="PoeEyeUi\bin\Release\NuGet.Squirrel.dll" target="lib\.net45\NuGet.Squirrel.dll" />
         <file src="PoeEyeUi\bin\Release\PoeEyeUi.exe" target="lib\.net45\PoeEyeUi.exe" />
         <file src="PoeEyeUi\bin\Release\PoeEyeUi.exe.config" target="lib\.net45\PoeEyeUi.exe.config" />
+        <file src="PoeEyeUi\bin\Release\Squirrel.dll" target="lib\.net45\Squirrel.dll" />
     </files>
 </package>
