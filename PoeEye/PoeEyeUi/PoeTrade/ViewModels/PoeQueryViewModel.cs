@@ -145,6 +145,7 @@
             ExplicitModsList = queryInfoProvider.ModsList.Where(x => x.ModType == PoeModType.Explicit).ToArray();
             ImplicitModsList = queryInfoProvider.ModsList.Where(x => x.ModType == PoeModType.Implicit).ToArray();
 
+            League = LeaguesList.First();
         }
 
         public float? DamageMin

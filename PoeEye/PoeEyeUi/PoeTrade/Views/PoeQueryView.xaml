@@ -43,6 +43,7 @@
                 <Style TargetType="ComboBox" BasedOn="{StaticResource {x:Type ComboBox}}" >
                     <Setter Property="VerticalContentAlignment" Value="Center"/>
                     <Setter Property="Width" Value="80"/>
+                    <Setter Property="IsEditable" Value="true"/>
                     <Setter Property="Margin" Value="3,0,3,0"/>
                 </Style>
 
@@ -92,6 +93,7 @@
                 <ComboBox   Grid.Row="0" Grid.Column="1" 
                         ItemsSource="{Binding LeaguesList}" 
                         Width="NaN"
+                        IsEditable="False"
                         SelectedItem="{Binding League}"/>
 
                 <TextBlock  Grid.Row="0" Grid.Column="2" 
@@ -100,7 +102,7 @@
                         SelectedItem="{Binding ItemType}"
                         DisplayMemberPath="Name" 
                         Width="NaN"
-                        ItemsSource="{Binding ItemTypes, Converter={StaticResource ComboBoxEmptyItemConverterKey}}">
+                        ItemsSource="{Binding ItemTypes}">
                 </ComboBox>
 
                 <TextBlock   Grid.Row="2" Grid.Column="0"

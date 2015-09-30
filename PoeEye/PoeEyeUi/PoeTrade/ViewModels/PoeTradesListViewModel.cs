@@ -63,10 +63,7 @@
                 .Subscribe(OnNextItemsPackReceived);
 
             wrappedTradesList = CollectionViewSource.GetDefaultView(tradesList);
-            wrappedTradesList.SortDescriptions.Add(new SortDescription(nameof(IPoeTradeViewModel.TradeState), ListSortDirection.Descending));
-            Guard.ArgumentIsTrue(() => wrappedTradesList.CanSort);
         }
-
 
         public ICollectionView TradesList => wrappedTradesList;
 
