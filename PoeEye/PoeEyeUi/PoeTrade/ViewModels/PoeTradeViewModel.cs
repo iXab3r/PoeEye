@@ -1,6 +1,7 @@
 ﻿namespace PoeEyeUi.PoeTrade.ViewModels
 {
     using System;
+    using System.Linq;
     using System.Windows;
     using System.Windows.Input;
 
@@ -45,7 +46,9 @@
 
         public string Price => poeItem.Price;
 
-        public IPoeItemMod[] Mods => poeItem.Mods;
+        public IPoeItemMod[] ImplicitMods => poeItem.Mods.Where(x => x.ModType == PoeModType.Implicit).ToArray();
+
+        public IPoeItemMod[] ExplicitMods => poeItem.Mods.Where(x => x.ModType == PoeModType.Explicit).ToArray();
 
         public IPoeItem Trade => poeItem;
 

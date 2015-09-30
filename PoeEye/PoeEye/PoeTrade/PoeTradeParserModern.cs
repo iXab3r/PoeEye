@@ -143,7 +143,7 @@ namespace PoeEye.PoeTrade
 
             var result = new PoeItemMod
             {
-                ModType = PoeModType.Unknown,
+                ModType = modType,
                 CodeName = parser.Attr("data-name")?.Trim('#'),
                 Name = parser.Text()
             };
