@@ -95,6 +95,6 @@
             Log.Instance.Debug($"[ApplicationUpdaterViewModel.OnFirstRun] App started for the first time");
         }
 
-        public TimeSpan UpdatePeriod => TimeSpan.FromMinutes(30);
+        public TimeSpan UpdatePeriod => TimeSpan.FromMinutes(5);
     }
 }
