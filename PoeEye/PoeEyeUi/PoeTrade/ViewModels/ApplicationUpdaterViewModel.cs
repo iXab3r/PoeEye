@@ -7,6 +7,7 @@
     using Squirrel;
     using System;
     using System.Reactive.Linq;
+    using System.Windows;
     using System.Windows.Input;
 
     using DumpToText;
@@ -39,6 +40,7 @@
 
 #if DEBUG
             Log.Instance.Debug($"[ApplicationUpdaterViewModel] Debug mode detected...");
+            return;
 #endif
             try
             {
@@ -54,12 +56,12 @@
                     {
                         return;
                     }
-
                     Log.Instance.Debug($"[ApplicationUpdaterViewModel] Downloading releases...");
-                    await mgr.DownloadReleases(updateInfo.ReleasesToApply);
+                    await mgr.DownloadReleases(updateInfo.ReleasesToApply, UpdateProgress);
                     Log.Instance.Debug($"[ApplicationUpdaterViewModel] Applying releases...");
                     await mgr.ApplyReleases(updateInfo);
                     Log.Instance.Debug($"[ApplicationUpdaterViewModel] Update completed");
+                    MessageBox.Show("Application updated, new version will take place on next application startup", "Update completed",MessageBoxButton.OK,MessageBoxImage.Information);
                 }
             }
             catch (Exception ex)

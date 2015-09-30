@@ -42,6 +42,7 @@
                 .Select(x => poeApi.IssueQuery(query))
                 .Switch()
                 .Do(HandleUpdate, HandleUpdateError)
+                .Catch(Observable.Empty<IPoeQueryResult>())
                 .Select(x => x.ItemsList)
                 .Subscribe(itemPacksSubject);
         }
@@ -77,11 +78,13 @@
         {
             Log.Instance.Debug($"[PoeLiveHistoryProvider] Update received, itemsCount: {queryResult.ItemsList.Length}");
             IsBusy = false;
+            updateExceptionsSubject.OnNext(null);
         }
 
         private void HandleUpdateError(Exception ex)
         {
             Log.Instance.Error($"[PoeLiveHistoryProvider] Update failed", ex);
+            IsBusy = false;
             updateExceptionsSubject.OnNext(ex);
         }
     }
