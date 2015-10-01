@@ -40,6 +40,10 @@
 
         private bool buyoutOnly;
 
+        private bool alternativeArt;
+
+        private bool normalizeQuality;
+
         private float? critMax;
 
         private float? critMin;
@@ -154,6 +158,10 @@
             ExplicitModsEditorViewModel = poeExplicitModsEditorViewModel;
 
             League = LeaguesList.First();
+
+            OnlineOnly = true;
+            BuyoutOnly = true;
+            NormalizeQuality = true;
         }
 
         public float? DamageMin
@@ -456,6 +464,18 @@
             set { this.RaiseAndSetIfChanged(ref buyoutOnly, value); }
         }
 
+        public bool NormalizeQuality
+        {
+            get { return normalizeQuality; }
+            set { this.RaiseAndSetIfChanged(ref normalizeQuality, value); }
+        }
+
+        public bool AlternativeArt
+        {
+            get { return alternativeArt; }
+            set { this.RaiseAndSetIfChanged(ref alternativeArt, value); }
+        }
+
         public string ItemName
         {
             get { return itemName; }
@@ -560,6 +580,8 @@
                 CreateArgument("buyout_max", buyoutMax),
                 CreateArgument("buyout", buyoutOnly),
                 CreateArgument("online", onlineOnly),
+                CreateArgument("altart", alternativeArt),
+                CreateArgument("capquality", normalizeQuality),
                 CreateArgument("base", itemBase),
                 CreateArgument("name", itemName),
                 CreateArgument("league", league),
@@ -637,9 +659,9 @@
             {
                 return new PoeQueryStringArgument(name, ConvertToType<string>(value) ?? string.Empty);
             }
-            if (typeof (T) == typeof (bool?))
+            if (typeof (T) == typeof (bool))
             {
-                return new PoeQueryStringArgument(name, (value is bool ? ConvertToType<bool>(value) : (bool)ConvertToType<bool?>(value)) ? "x" : string.Empty);
+                return new PoeQueryStringArgument(name, ConvertToType<bool>(value) ? "x" : string.Empty);
             }
             throw new NotSupportedException($"Type {typeof (T)} is not supported, parameter name: {name}");
         }

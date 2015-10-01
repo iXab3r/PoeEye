@@ -13,7 +13,7 @@
     using Shouldly;
 
     [TestFixture]
-    public class NameValueCollectionToStringConverterFixture
+    public class NameValueCollectionToQueryStringConverterFixture
     {
         [SetUp]
         public void SetUp()
@@ -85,9 +85,9 @@
               "a=1&b=2&c=3&d=4&a=11&b=22&c=33&d=44&a=111&b=222&c=333&d=444");
         }
 
-        private NameValueCollectionToStringConverter CreateInstance()
+        private NameValueCollectionToQueryStringConverter CreateInstance()
         {
-            return new NameValueCollectionToStringConverter();
+            return new NameValueCollectionToQueryStringConverter();
         }
     }
 }

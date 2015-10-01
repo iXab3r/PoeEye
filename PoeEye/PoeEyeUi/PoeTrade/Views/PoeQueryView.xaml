@@ -13,6 +13,7 @@
                     <Setter Property="Foreground" Value="{StaticResource LabelTextBrush}"/>
                     <Setter Property="Margin" Value="3,0,3,0"/>
                     <Setter Property="HorizontalAlignment" Value="Right"/>
+                    <Setter Property="VerticalAlignment" Value="Center"/>
                 </Style>
 
                 <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}"  x:Key="TextBoxKey" >
@@ -28,6 +29,8 @@
             </Grid.Resources>
 
             <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="10"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="10"/>
                 <RowDefinition Height="Auto"/>
@@ -252,7 +255,44 @@
             <Grid Row="12">
                 <ContentControl Content="{Binding ExplicitModsEditorViewModel}"/>
             </Grid>
-            
+
+            <Grid Row="14">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="80"/>
+                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="80"/>
+                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="80"/>
+                    <ColumnDefinition Width="120"/>
+                    <ColumnDefinition Width="80"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Row="0" Grid.Column="0" 
+                           Text="Buyout" Style="{StaticResource TextBlockHeader}" />
+                <StackPanel Grid.Row="0" Grid.Column="1">
+                    <controls:ToggleSwitch IsChecked="{Binding BuyoutOnly}"  OffLabel="" OnLabel=""/>
+                </StackPanel>
+
+                <TextBlock Grid.Row="0" Grid.Column="2" 
+                           Text="Online" Style="{StaticResource TextBlockHeader}" />
+                <StackPanel Grid.Row="0" Grid.Column="3" >
+                    <controls:ToggleSwitch IsChecked="{Binding OnlineOnly}" OffLabel="" OnLabel=""/>
+                </StackPanel>
+
+                <TextBlock Grid.Row="0" Grid.Column="4" 
+                           Text="Alt. art" Style="{StaticResource TextBlockHeader}" />
+                <StackPanel Grid.Row="2" Grid.Column="5" >
+                    <controls:ToggleSwitch IsChecked="{Binding AlternativeArt}" OffLabel="" OnLabel=""/>
+                </StackPanel>
+
+                <TextBlock Grid.Row="0" Grid.Column="6" 
+                           Text="Normalize quality" Style="{StaticResource TextBlockHeader}" />
+                <StackPanel Grid.Row="0" Grid.Column="7" >
+                    <controls:ToggleSwitch IsChecked="{Binding NormalizeQuality}" OffLabel="" OnLabel="" />
+                </StackPanel>
+            </Grid>
+
         </Grid>
 
     </DataTemplate>

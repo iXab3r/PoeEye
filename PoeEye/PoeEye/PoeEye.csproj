@@ -141,7 +141,7 @@
   <ItemGroup>
     <Compile Include="Clock.cs" />
     <Compile Include="Communications\GenericHttpClient.cs" />
-    <Compile Include="Communications\NameValueCollectionToStringConverter.cs" />
+    <Compile Include="Communications\NameValueCollectionToQueryStringConverter.cs" />
     <Compile Include="PoeTrade\PoeLiveHistoryProvider.cs" />
     <Compile Include="PoeTrade\PoeQueryConverter.cs" />
     <Compile Include="PoeTrade\PoeTradeApi.cs" />
