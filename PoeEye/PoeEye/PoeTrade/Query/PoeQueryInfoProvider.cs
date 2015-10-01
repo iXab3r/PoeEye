@@ -1,5 +1,8 @@
 ﻿namespace PoeEye.PoeTrade.Query
 {
+    using System;
+    using System.Linq;
+
     using PoeShared;
     using PoeShared.Common;
     using PoeShared.PoeTrade.Query;
@@ -8,7 +11,7 @@
     {
         public PoeQueryInfoProvider()
         {
-            LeaguesList = new string[]
+            LeaguesList = new[]
             {
                 WellKnownLeagues.Warbands,
                 WellKnownLeagues.Tempest,
@@ -16,15 +19,7 @@
                 WellKnownLeagues.Hardcore,
             };
 
-            ModsList = new IPoeItemMod[]
-            {
-                new PoeItemMod()
-                {
-                    Name = "test",
-                    CodeName = "test1",
-                    ModType = PoeModType.Explicit
-                },
-            };
+            ModsList = PoeKnownModsList.GetImplicitModsList().Concat(PoeKnownModsList.GetExplicitModsList()).ToArray();
 
             CurrenciesList = new IPoeCurrency[]
             {

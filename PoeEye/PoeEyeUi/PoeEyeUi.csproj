@@ -201,6 +201,9 @@
     </Compile>
     <Compile Include="Converters\ComboBoxEmptyItemConverter.cs" />
     <Compile Include="PoeTrade\ViewModels\ApplicationUpdaterViewModel.cs" />
+    <Compile Include="PoeTrade\ViewModels\PoeExplicitModsEditorViewModel.cs" />
+    <Compile Include="PoeTrade\ViewModels\PoeExplicitModViewModel.cs" />
+    <Compile Include="PoeTrade\ViewModels\PoeImplicitModViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\PoeQueryViewModel.cs" />
     <Compile Include="ResourceKeys.cs" />
   </ItemGroup>
@@ -269,11 +272,27 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="PoeTrade\Views\PoeExplicitModsEditorViewModel.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="PoeTrade\Views\PoeExplicitModViewModel.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="PoeTrade\Views\PoeImplicitModViewModel.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="PoeTrade\Views\PoeItemModView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
     <Page Include="PoeTrade\Views\PoeQueryView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="PoeTrade\Views\PoeQueryViewStyles.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

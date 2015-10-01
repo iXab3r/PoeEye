@@ -103,5 +103,10 @@
         {
             return source.ToString(CultureInfo.InvariantCulture);
         }
+
+        private string Convert(float? source)
+        {
+            return source == null ? string.Empty : Convert((float)source);
+        }
     }
 }

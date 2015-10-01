@@ -137,6 +137,7 @@
     <Compile Include="PoeTrade\Query\PoeQueryFloatArgument.cs" />
     <Compile Include="PoeTrade\Query\PoeQueryIntArgument.cs" />
     <Compile Include="PoeTrade\Query\PoeQueryModArgument.cs" />
+    <Compile Include="PoeTrade\Query\PoeQueryRangeModArgument.cs" />
     <Compile Include="PoeTrade\Query\PoeQueryResult.cs" />
     <Compile Include="PoeTrade\Query\PoeQueryStringArgument.cs" />
     <Compile Include="Prism\CommonRegistrations.cs" />

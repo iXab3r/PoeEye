@@ -2,12 +2,13 @@
 {
     using System.Collections.Generic;
     using System.Collections.Specialized;
+    using System.Web;
 
     using Guards;
 
     using TypeConverter;
 
-    internal sealed class NameValueCollectionToStringConverter : IConverter<NameValueCollection, string>
+    internal sealed class NameValueCollectionToQueryStringConverter : IConverter<NameValueCollection, string>
     {
         public string Convert(NameValueCollection source)
         {
@@ -33,7 +34,8 @@
                         needAnotherRun = values.Length - 1 > 0;
                     }
                     var value = values[idx];
-                    parameters.Add(Convert(key, value));
+                    var valueEncoded = HttpUtility.UrlEncode(value);
+                    parameters.Add(Convert(key, valueEncoded));
                 }
                 idx++;
             }

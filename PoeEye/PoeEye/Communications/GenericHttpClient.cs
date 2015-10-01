@@ -7,12 +7,15 @@
     using System.Reactive.Concurrency;
     using System.Reactive.Linq;
     using System.Reactive.Threading.Tasks;
+    using System.Security.Policy;
     using System.Threading.Tasks;
+    using System.Web;
+
+    using CsQuery.ExtensionMethods.Internal;
 
     using DumpToText;
 
     using EasyHttp.Http;
-    using EasyHttp.Infrastructure;
 
     using Guards;
 
@@ -22,6 +25,9 @@
     using PoeShared.Http;
 
     using TypeConverter;
+
+    using HttpException = EasyHttp.Infrastructure.HttpException;
+    using HttpResponse = EasyHttp.Http.HttpResponse;
 
     internal sealed class GenericHttpClient : IHttpClient
     {
@@ -51,7 +57,7 @@
             httpClient.Request.Cookies = Cookies;
 
             var postData = nameValueConverter.Convert(args);
-            Log.Instance.Debug($"[HttpClient] Querying uri '{uri}', args: \r\n{postData}...");
+            Log.Instance.Debug($"[HttpClient] Querying uri '{uri}', args: \r\nPOST: {postData}\r\nSplitted: {postData.SplitClean('&').DumpToTextValue()}");
             
             var response = httpClient.Post(uri, postData, HttpContentTypes.ApplicationXWwwFormUrlEncoded);
             Log.Instance.Debug(

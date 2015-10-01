@@ -15,38 +15,6 @@
                     <Setter Property="HorizontalAlignment" Value="Right"/>
                 </Style>
 
-                <Style TargetType="controls:NumericUpDown" BasedOn="{StaticResource {x:Type controls:NumericUpDown}}" x:Key="NumericUpDownBase">
-                    <Setter Property="Foreground" Value="{StaticResource LabelTextBrush}"/>
-                    <Setter Property="VerticalContentAlignment" Value="Center"/>
-                    <Setter Property="Width" Value="80"/>
-                    <Setter Property="Minimum" Value="0"/>
-                    <Setter Property="Maximum" Value="9999"/>
-                    <Setter Property="Margin" Value="3,0,3,0"/>
-                </Style>
-
-                <Style TargetType="controls:NumericUpDown" BasedOn="{StaticResource NumericUpDownBase}" x:Key="NumericUpDownMin">
-                    <Style.Triggers>
-                        <Trigger Property="controls:TextBoxHelper.HasText" Value="False">
-                            <Setter Property="controls:TextBoxHelper.Watermark" Value="Min" />
-                        </Trigger>
-                    </Style.Triggers>
-                </Style>
-
-                <Style TargetType="controls:NumericUpDown" BasedOn="{StaticResource NumericUpDownBase}" x:Key="NumericUpDownMax">
-                    <Style.Triggers>
-                        <Trigger Property="controls:TextBoxHelper.HasText" Value="False">
-                            <Setter Property="controls:TextBoxHelper.Watermark" Value="Max" />
-                        </Trigger>
-                    </Style.Triggers>
-                </Style>
-
-                <Style TargetType="ComboBox" BasedOn="{StaticResource {x:Type ComboBox}}" >
-                    <Setter Property="VerticalContentAlignment" Value="Center"/>
-                    <Setter Property="Width" Value="80"/>
-                    <Setter Property="IsEditable" Value="true"/>
-                    <Setter Property="Margin" Value="3,0,3,0"/>
-                </Style>
-
                 <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}"  x:Key="TextBoxKey" >
                     <Setter Property="VerticalContentAlignment" Value="Center"/>
                     <Setter Property="HorizontalContentAlignment" Value="Center"/>
@@ -60,15 +28,19 @@
             </Grid.Resources>
 
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"></RowDefinition>
-                <RowDefinition Height="10"></RowDefinition>
-                <RowDefinition Height="Auto"></RowDefinition>
-                <RowDefinition Height="10"></RowDefinition>
-                <RowDefinition Height="Auto"></RowDefinition>
-                <RowDefinition Height="10"></RowDefinition>
-                <RowDefinition Height="Auto"></RowDefinition>
-                <RowDefinition Height="10"></RowDefinition>
-                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="10"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="10"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="10"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="10"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="10"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="10"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
 
@@ -98,11 +70,14 @@
 
                 <TextBlock  Grid.Row="0" Grid.Column="2" 
                         Text="Type" Style="{StaticResource TextBlockHeader}" />
-                <ComboBox   Grid.Row="0" Grid.Column="3" 
+                <ComboBox Grid.Row="0" Grid.Column="3" 
+                          Style="{StaticResource QueryComboBox}"
                         SelectedItem="{Binding ItemType}"
                         DisplayMemberPath="Name" 
                         Width="NaN"
-                        ItemsSource="{Binding ItemTypes}">
+                        ItemsSource="{Binding ItemTypes}"
+                        controls:TextBoxHelper.Watermark="any"
+                            >
                 </ComboBox>
 
                 <TextBlock   Grid.Row="2" Grid.Column="0"
@@ -135,44 +110,44 @@
                 <TextBlock Grid.Row="0" Grid.Column="0" 
                            Text="Damage" Style="{StaticResource TextBlockHeader}" />
                 <StackPanel Grid.Row="0" Grid.Column="1">
-                    <controls:NumericUpDown Style="{StaticResource NumericUpDownMin}" Value="{Binding DamageMin}"/>
-                    <controls:NumericUpDown Style="{StaticResource NumericUpDownMax}" Value="{Binding DamageMax}"/>
+                    <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}" Value="{Binding DamageMin}"/>
+                    <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}" Value="{Binding DamageMax}"/>
                 </StackPanel>
 
 
                 <TextBlock Grid.Row="0" Grid.Column="2" 
                            Text="APS" Style="{StaticResource TextBlockHeader}" />
                 <StackPanel Grid.Row="0" Grid.Column="3" >
-                    <controls:NumericUpDown Style="{StaticResource NumericUpDownMin}" Value="{Binding ApsMin}"/>
-                    <controls:NumericUpDown Style="{StaticResource NumericUpDownMax}" Value="{Binding ApsMax}"/>
+                    <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}" Value="{Binding ApsMin}"/>
+                    <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}" Value="{Binding ApsMax}"/>
                 </StackPanel>
 
                 <TextBlock  Grid.Row="0" Grid.Column="4" 
                             Text="Crit.Strike" Style="{StaticResource TextBlockHeader}" />
                 <StackPanel Grid.Row="0" Grid.Column="5" >
-                    <controls:NumericUpDown Style="{StaticResource NumericUpDownMin}" Value="{Binding CritMin}"/>
-                    <controls:NumericUpDown Style="{StaticResource NumericUpDownMax}" Value="{Binding CritMax}"/>
+                    <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}" Value="{Binding CritMin}"/>
+                    <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}" Value="{Binding CritMax}"/>
                 </StackPanel>
 
                 <TextBlock Grid.Row="2" Grid.Column="0" 
                            Text="DPS" Style="{StaticResource TextBlockHeader}" />
                 <StackPanel Grid.Row="2" Grid.Column="1" >
-                    <controls:NumericUpDown Style="{StaticResource NumericUpDownMin}" Value="{Binding DpsMin}"/>
-                    <controls:NumericUpDown Style="{StaticResource NumericUpDownMax}" Value="{Binding DpsMax}"/>
+                    <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}" Value="{Binding DpsMin}"/>
+                    <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}" Value="{Binding DpsMax}"/>
                 </StackPanel>
 
                 <TextBlock Grid.Row="2" Grid.Column="2" 
                            Text="eDPS" Style="{StaticResource TextBlockHeader}" />
                 <StackPanel Grid.Row="2" Grid.Column="3" >
-                    <controls:NumericUpDown Style="{StaticResource NumericUpDownMin}" Value="{Binding EdpsMin}"/>
-                    <controls:NumericUpDown Style="{StaticResource NumericUpDownMax}" Value="{Binding EdpsMax}"/>
+                    <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}" Value="{Binding EdpsMin}"/>
+                    <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}" Value="{Binding EdpsMax}"/>
                 </StackPanel>
 
                 <TextBlock Grid.Row="2" Grid.Column="4" 
                            Text="pDPS" Style="{StaticResource TextBlockHeader}" />
                 <StackPanel Grid.Row="2" Grid.Column="5" >
-                    <controls:NumericUpDown Style="{StaticResource NumericUpDownMin}" Value="{Binding PdpsMin}"/>
-                    <controls:NumericUpDown Style="{StaticResource NumericUpDownMax}" Value="{Binding PdpsMax}"/>
+                    <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}" Value="{Binding PdpsMin}"/>
+                    <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}" Value="{Binding PdpsMax}"/>
                 </StackPanel>
             </Grid>
 
@@ -194,30 +169,30 @@
                 <TextBlock Grid.Row="0" Grid.Column="0" 
                            Text="Armour" Style="{StaticResource TextBlockHeader}" />
                 <StackPanel Grid.Row="0" Grid.Column="1">
-                    <controls:NumericUpDown Style="{StaticResource NumericUpDownMin}" Value="{Binding ArmourMin}"/>
-                    <controls:NumericUpDown Style="{StaticResource NumericUpDownMax}" Value="{Binding ArmourMax}"/>
+                    <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}" Value="{Binding ArmourMin}"/>
+                    <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}" Value="{Binding ArmourMax}"/>
                 </StackPanel>
 
 
                 <TextBlock Grid.Row="0" Grid.Column="2" 
                            Text="Evasion" Style="{StaticResource TextBlockHeader}" />
                 <StackPanel Grid.Row="0" Grid.Column="3" >
-                    <controls:NumericUpDown Style="{StaticResource NumericUpDownMin}" Value="{Binding EvasionMin}"/>
-                    <controls:NumericUpDown Style="{StaticResource NumericUpDownMax}" Value="{Binding EvasionMax}"/>
+                    <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}" Value="{Binding EvasionMin}"/>
+                    <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}" Value="{Binding EvasionMax}"/>
                 </StackPanel>
 
                 <TextBlock Grid.Row="2" Grid.Column="0" 
                            Text="Shield" Style="{StaticResource TextBlockHeader}" />
                 <StackPanel Grid.Row="2" Grid.Column="1" >
-                    <controls:NumericUpDown Style="{StaticResource NumericUpDownMin}" Value="{Binding ShieldMin}"/>
-                    <controls:NumericUpDown Style="{StaticResource NumericUpDownMax}" Value="{Binding ShieldMax}"/>
+                    <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}" Value="{Binding ShieldMin}"/>
+                    <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}" Value="{Binding ShieldMax}"/>
                 </StackPanel>
 
                 <TextBlock Grid.Row="2" Grid.Column="2" 
                            Text="Block" Style="{StaticResource TextBlockHeader}" />
                 <StackPanel Grid.Row="2" Grid.Column="3" >
-                    <controls:NumericUpDown Style="{StaticResource NumericUpDownMin}" Value="{Binding BlockMin}"/>
-                    <controls:NumericUpDown Style="{StaticResource NumericUpDownMax}" Value="{Binding BlockMax}"/>
+                    <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}" Value="{Binding BlockMin}"/>
+                    <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}" Value="{Binding BlockMax}"/>
                 </StackPanel>
             </Grid>
 
@@ -239,16 +214,16 @@
                 <TextBlock Grid.Row="0" Grid.Column="0" 
                            Text="Sockets" Style="{StaticResource TextBlockHeader}" />
                 <StackPanel Grid.Row="0" Grid.Column="1">
-                    <controls:NumericUpDown Style="{StaticResource NumericUpDownMin}" Value="{Binding SocketsMin}"/>
-                    <controls:NumericUpDown Style="{StaticResource NumericUpDownMax}" Value="{Binding SocketsMax}"/>
+                    <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}" Value="{Binding SocketsMin}"/>
+                    <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}" Value="{Binding SocketsMax}"/>
                 </StackPanel>
 
 
                 <TextBlock Grid.Row="0" Grid.Column="2" 
                            Text="Links" Style="{StaticResource TextBlockHeader}" />
                 <StackPanel Grid.Row="0" Grid.Column="3" >
-                    <controls:NumericUpDown Style="{StaticResource NumericUpDownMin}" Value="{Binding LinkMin}"/>
-                    <controls:NumericUpDown Style="{StaticResource NumericUpDownMax}" Value="{Binding LinkMax}"/>
+                    <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}" Value="{Binding LinkMin}"/>
+                    <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}" Value="{Binding LinkMax}"/>
                 </StackPanel>
 
                 <TextBlock Grid.Row="2" Grid.Column="0" 
@@ -270,49 +245,12 @@
                 </StackPanel>
             </Grid>
 
-            <Grid Row="8">
+            <Grid Row="10">
+                <ContentControl Content="{Binding ImplicitModViewModel}"/>
+            </Grid>
 
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="5" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
-
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="80"/>
-                    <ColumnDefinition Width="180"/>
-                    <ColumnDefinition Width="80"/>
-                    <ColumnDefinition Width="180"/>
-                </Grid.ColumnDefinitions>
-
-                <TextBlock Grid.Row="0" Grid.Column="0" 
-                           Text="Level" Style="{StaticResource TextBlockHeader}" />
-                <StackPanel Grid.Row="0" Grid.Column="1">
-                    <controls:NumericUpDown Style="{StaticResource NumericUpDownMin}" Value="{Binding LevelMin}"/>
-                    <controls:NumericUpDown Style="{StaticResource NumericUpDownMax}" Value="{Binding LevelMax}"/>
-                </StackPanel>
-
-
-                <TextBlock Grid.Row="0" Grid.Column="2" 
-                           Text="Strength" Style="{StaticResource TextBlockHeader}" />
-                <StackPanel Grid.Row="0" Grid.Column="3" >
-                    <controls:NumericUpDown Style="{StaticResource NumericUpDownMin}" Value="{Binding RStrMin}"/>
-                    <controls:NumericUpDown Style="{StaticResource NumericUpDownMax}" Value="{Binding RStrMax}"/>
-                </StackPanel>
-
-                <TextBlock  Grid.Row="2" Grid.Column="0" 
-                            Text="Dexterity" Style="{StaticResource TextBlockHeader}" />
-                <StackPanel Grid.Row="2" Grid.Column="1" >
-                    <controls:NumericUpDown Style="{StaticResource NumericUpDownMin}" Value="{Binding RDexMin}"/>
-                    <controls:NumericUpDown Style="{StaticResource NumericUpDownMax}" Value="{Binding RDexMax}"/>
-                </StackPanel>
-
-                <TextBlock Grid.Row="2" Grid.Column="2" 
-                           Text="Intelligence" Style="{StaticResource TextBlockHeader}" />
-                <StackPanel Grid.Row="2" Grid.Column="3" >
-                    <controls:NumericUpDown Style="{StaticResource NumericUpDownMin}" Value="{Binding RIntMin}"/>
-                    <controls:NumericUpDown Style="{StaticResource NumericUpDownMax}" Value="{Binding RIntMax}"/>
-                </StackPanel>
+            <Grid Row="12">
+                <ContentControl Content="{Binding ExplicitModsEditorViewModel}"/>
             </Grid>
             
         </Grid>

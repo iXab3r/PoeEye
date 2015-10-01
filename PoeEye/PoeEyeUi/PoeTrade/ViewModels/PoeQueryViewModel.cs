@@ -19,6 +19,7 @@
 
         private const string AnyKey = "any";
         private readonly IPoeQueryInfoProvider queryInfoProvider;
+        private readonly PoeExplicitModsEditorViewModel poeExplicitModsEditorViewModel;
         private float? apsMax;
 
         private float? apsMin;
@@ -131,19 +132,26 @@
 
         private int? socketsW;
 
-        public PoeQueryViewModel([NotNull] IPoeQueryInfoProvider queryInfoProvider)
+        public PoeQueryViewModel(
+                [NotNull] IPoeQueryInfoProvider queryInfoProvider,
+                [NotNull] PoeImplicitModViewModel poeImplicitModViewModel,
+                [NotNull] PoeExplicitModsEditorViewModel poeExplicitModsEditorViewModel)
         {
             Guard.ArgumentNotNull(() => queryInfoProvider);
-
+            Guard.ArgumentNotNull(() => poeImplicitModViewModel);
+            Guard.ArgumentNotNull(() => poeExplicitModsEditorViewModel);
+            
             this.queryInfoProvider = queryInfoProvider;
+            this.poeExplicitModsEditorViewModel = poeExplicitModsEditorViewModel;
 
             LeaguesList = queryInfoProvider.LeaguesList.ToArray();
 
             CurrenciesList = queryInfoProvider.CurrenciesList.ToArray();
 
             ItemTypes = queryInfoProvider.ItemTypes.ToArray();
-            ExplicitModsList = queryInfoProvider.ModsList.Where(x => x.ModType == PoeModType.Explicit).ToArray();
-            ImplicitModsList = queryInfoProvider.ModsList.Where(x => x.ModType == PoeModType.Implicit).ToArray();
+
+            ImplicitModViewModel = poeImplicitModViewModel;
+            ExplicitModsEditorViewModel = poeExplicitModsEditorViewModel;
 
             League = LeaguesList.First();
         }
@@ -488,9 +496,9 @@
 
         public IPoeCurrency[] CurrenciesList { get; }
 
-        public IPoeItemMod[] ExplicitModsList { get; }
+        public PoeImplicitModViewModel ImplicitModViewModel { get; }
 
-        public IPoeItemMod[] ImplicitModsList { get; }
+        public PoeExplicitModsEditorViewModel ExplicitModsEditorViewModel { get; }
 
         public IPoeItemType[] ItemTypes { get; }
 
@@ -567,10 +575,47 @@
                 CreateArgument("type", itemType?.CodeName),
             };
 
+            if (ImplicitModViewModel.SelectedMod != null)
+            {
+                args.AddRange(new[]
+                {
+                    CreateArgument("impl", ImplicitModViewModel.SelectedMod.CodeName),
+                    CreateArgument("impl_min", ImplicitModViewModel.Min),
+                    CreateArgument("impl_max", ImplicitModViewModel.Max),
+                });
+            }
+
+            args.AddRange(new[]
+                {
+                    CreateArgument("mods", string.Empty),
+                    CreateArgument("modexclude", string.Empty),
+                    CreateArgument("modmin", string.Empty),
+                    CreateArgument("modmax", string.Empty),
+                });
+
+            foreach (var poeExplicitModViewModel in ExplicitModsEditorViewModel.Mods.Where(x => x.SelectedMod != null))
+            {
+                var modArg = CreateModArgument(
+                                            poeExplicitModViewModel.SelectedMod,
+                                            poeExplicitModViewModel.Min,
+                                            poeExplicitModViewModel.Max);
+                args.Add(modArg);
+            }
+
             Guard.ArgumentIsTrue(() => args.ToDictionary(x => x.Name, x => default(int?)).Count() == args.Count());
 
             result.Arguments = args.ToArray();
             return result;
+        }
+
+        private IPoeQueryArgument CreateModArgument(IPoeItemMod mod, float? min, float? max)
+        {
+            var arg = new PoeQueryRangeModArgument(mod.CodeName)
+            {
+                Min = min,
+                Max = max,
+            };
+            return arg;
         }
 
         private IPoeQueryArgument CreateArgument<T>(string name, T value)

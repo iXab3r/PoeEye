@@ -2,8 +2,8 @@ namespace PoeShared.PoeTrade.Query
 {
     public interface IPoeQueryRangeModArgument : IPoeQueryModArgument
     {
-        int Min { get; }
+        float? Min { get; }
 
-        int Max { get; }
+        float? Max { get; }
     }
 }

@@ -1,0 +1,41 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:viewModels="clr-namespace:PoeEyeUi.PoeTrade.ViewModels"
+                    xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls">
+    <DataTemplate DataType="{x:Type viewModels:PoeExplicitModsEditorViewModel}">
+        <Grid x:Name="PoeExplicitModsEditorViewModelGrid">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="auto"/>
+            </Grid.ColumnDefinitions>
+
+
+            <ItemsControl Grid.Column="0" 
+                          ItemsSource="{Binding Mods}" Style="{StaticResource VirtualizedItemsControlStyle}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="auto"/>
+                            </Grid.ColumnDefinitions>
+                            
+                            <ContentControl Grid.Column="0"
+                                            Content="{Binding}" />
+                            <Button Grid.Column="1"
+                                    Content="Remove" 
+                                    Command="{Binding ElementName=PoeExplicitModsEditorViewModelGrid, Path=DataContext.RemoveModCommand}"
+                                    CommandParameter="{Binding}"
+                                    Height="20"/>
+                        </Grid>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+
+            </ItemsControl>
+
+            <Button Grid.Column="1" 
+                    Margin="5"
+                    Command="{Binding AddModCommand}" Content="Add" />
+        </Grid>
+    </DataTemplate>
+</ResourceDictionary>

@@ -125,6 +125,7 @@
       <HintPath>..\packages\Rx-XAML.2.2.5\lib\net45\System.Reactive.Windows.Threading.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="System.Web" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -145,6 +146,7 @@
     <Compile Include="PoeTrade\PoeQueryConverter.cs" />
     <Compile Include="PoeTrade\PoeTradeApi.cs" />
     <Compile Include="PoeTrade\PoeTradeParserModern.cs" />
+    <Compile Include="PoeTrade\Query\PoeKnownModsList.cs" />
     <Compile Include="PoeTrade\Query\PoeQueryInfoProvider.cs" />
     <Compile Include="Prism\LiveRegistrations.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

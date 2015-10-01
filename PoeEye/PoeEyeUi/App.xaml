@@ -3,12 +3,14 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:PoeEyeUi"
              xmlns:converters="clr-namespace:PoeEyeUi.Converters"
+             xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
         <ResourceDictionary>
             <SolidColorBrush x:Key="PoeTradeRemovedItemColor" Color="#55FF9298" />
             <SolidColorBrush x:Key="PoeTradeNewItemColor" Color="#5592FF98" />
-            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></BooleanToVisibilityConverter>
+            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+
 
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
@@ -21,9 +23,14 @@
                 <ResourceDictionary Source="Resources/Icons.xaml" />
                 <ResourceDictionary Source="Themes/VirtualizedItemsControl.xaml" />
 
-                <ResourceDictionary Source="PoeTrade/Views/PoeTradeView.xaml" />
                 <ResourceDictionary Source="PoeTrade/Views/MainWindowTabView.xaml" />
+
+                <ResourceDictionary Source="PoeTrade/Views/PoeTradeView.xaml" />
                 <ResourceDictionary Source="PoeTrade/Views/PoeItemModView.xaml" />
+                <ResourceDictionary Source="PoeTrade/Views/PoeQueryViewStyles.xaml" />
+                <ResourceDictionary Source="PoeTrade/Views/PoeImplicitModViewModel.xaml" />
+                <ResourceDictionary Source="PoeTrade/Views/PoeExplicitModViewModel.xaml" />
+                <ResourceDictionary Source="PoeTrade/Views/PoeExplicitModsEditorViewModel.xaml" />
                 <ResourceDictionary Source="PoeTrade/Views/PoeQueryView.xaml" />
 
             </ResourceDictionary.MergedDictionaries>

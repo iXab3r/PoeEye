@@ -25,7 +25,7 @@
             
             Container
                 .RegisterType<IPoeApi, PoeTradeApi>()
-                .RegisterType<IConverter<NameValueCollection, string>, NameValueCollectionToStringConverter>()
+                .RegisterType<IConverter<NameValueCollection, string>, NameValueCollectionToQueryStringConverter>()
                 .RegisterType<IConverter<IPoeQuery, NameValueCollection>, PoeQueryConverter>()
                 .RegisterType<IPoeLiveHistoryProvider, PoeLiveHistoryProvider>()
                 .RegisterType<IPoeQueryInfoProvider, PoeQueryInfoProvider>()

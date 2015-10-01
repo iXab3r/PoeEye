@@ -1,0 +1,26 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:viewModels="clr-namespace:PoeEyeUi.PoeTrade.ViewModels"
+                    xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls">
+    <DataTemplate DataType="{x:Type viewModels:PoeImplicitModViewModel}">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="auto"/>
+            </Grid.ColumnDefinitions>
+            
+            <ComboBox Grid.Column="0" 
+                      ItemsSource="{Binding KnownMods}" 
+                      DisplayMemberPath="Name" 
+                      SelectedItem="{Binding SelectedMod}"
+                      Style="{StaticResource QueryComboBox}"
+                      Margin="10,0,10,0">
+            </ComboBox>
+
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="10,0,10,0">
+                <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}" Value="{Binding Min}"/>
+                <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}" Value="{Binding Max}"/>
+            </StackPanel>
+        </Grid>
+    </DataTemplate>
+</ResourceDictionary>

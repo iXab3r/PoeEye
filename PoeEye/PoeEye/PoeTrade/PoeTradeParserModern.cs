@@ -69,7 +69,6 @@ namespace PoeEye.PoeTrade
                 .Concat(explicitMods)
                 .Where(IsValid)
                 .ToArray();
-
             return allMods;
         }
 
