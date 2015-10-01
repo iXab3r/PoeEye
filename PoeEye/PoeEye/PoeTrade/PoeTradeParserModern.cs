@@ -111,17 +111,26 @@ namespace PoeEye.PoeTrade
             var explicitMods = ExtractExplicitMods(row);
             var result = new PoeItem
             {
-                ItemIconUri = parser["div[class=icon] img"].Attr("src"),
+                ItemIconUri = parser["div[class=icon] img"]?.Attr("src"),
                 ItemName = parser.Attr("data-name"),
-                TradeForumUri = parser["td[class=item-cell] a[class^=title]"].Attr("href"),
+                TradeForumUri = parser["td[class=item-cell] a[class^=title]"]?.Attr("href"),
                 UserForumName = parser.Attr("data-seller"),
                 UserIgn = parser.Attr("data-ign"),
                 Price = parser.Attr("data-buyout"),
                 League = parser.Attr("data-league"),
                 Mods = implicitMods.Concat(explicitMods).ToArray(),
+                Links = ExtractLinksInfo(row),
             };
 
             return result;
+        }
+
+        private static IPoeLinksInfo ExtractLinksInfo(IDomObject row)
+        {
+            CQ parser = row.Render();
+
+            var rawLinksText = parser["span[class=sockets-raw]"]?.Text();
+            return string.IsNullOrWhiteSpace(rawLinksText) ? null : new PoeLinksInfo(rawLinksText);
         }
 
         private static IPoeItemMod[] ExtractExplicitMods(IDomObject row)

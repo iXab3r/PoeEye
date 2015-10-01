@@ -21,5 +21,7 @@
         string League { get; }
 
         IPoeItemMod[] Mods { [NotNull] get; }
+
+        IPoeLinksInfo Links { get; }
     }
 }

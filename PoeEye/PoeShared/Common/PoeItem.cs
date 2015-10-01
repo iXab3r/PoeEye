@@ -25,5 +25,7 @@
             get { return mods; }
             set { mods = value ?? new IPoeItemMod[0]; }
         }
+
+        public IPoeLinksInfo Links { get; set; }
     }
 }

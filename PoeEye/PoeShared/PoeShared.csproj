@@ -109,12 +109,14 @@
     <Compile Include="Common\IPoeItem.cs" />
     <Compile Include="Common\IPoeItemMod.cs" />
     <Compile Include="Common\IPoeItemType.cs" />
+    <Compile Include="Common\IPoeLinksInfo.cs" />
     <Compile Include="Common\PoeCurrency.cs" />
     <Compile Include="Common\PoeItem.cs" />
     <Compile Include="Common\PoeItemEqualityComparer.cs" />
     <Compile Include="Common\PoeItemMod.cs" />
     <Compile Include="Common\PoeItemModEqualityComparer.cs" />
     <Compile Include="Common\PoeItemType.cs" />
+    <Compile Include="Common\PoeLinksInfo.cs" />
     <Compile Include="Common\PoeModType.cs" />
     <Compile Include="DumpToText\DumpToText.cs" />
     <Compile Include="Http\IHttpClient.cs" />

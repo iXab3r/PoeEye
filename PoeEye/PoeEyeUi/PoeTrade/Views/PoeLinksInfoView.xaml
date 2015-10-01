@@ -1,0 +1,12 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:viewModels="clr-namespace:PoeEyeUi.PoeTrade.ViewModels"
+                    xmlns:poeEyeUi="clr-namespace:PoeEyeUi"
+                    xmlns:common="clr-namespace:PoeShared.Common;assembly=PoeShared"
+                    xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls">
+
+    <DataTemplate DataType="{x:Type common:PoeLinksInfo}">
+        <TextBlock TextWrapping="WrapWithOverflow" Text="{Binding RawSockets}" FontSize="24"/>
+    </DataTemplate>
+
+</ResourceDictionary>

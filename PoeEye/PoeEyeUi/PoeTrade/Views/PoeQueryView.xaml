@@ -268,27 +268,27 @@
                     <ColumnDefinition Width="80"/>
                 </Grid.ColumnDefinitions>
 
-                <TextBlock Grid.Row="0" Grid.Column="0" 
+                <TextBlock Grid.Column="0" 
                            Text="Buyout" Style="{StaticResource TextBlockHeader}" />
-                <StackPanel Grid.Row="0" Grid.Column="1">
+                <StackPanel Grid.Column="1">
                     <controls:ToggleSwitch IsChecked="{Binding BuyoutOnly}"  OffLabel="" OnLabel=""/>
                 </StackPanel>
 
-                <TextBlock Grid.Row="0" Grid.Column="2" 
+                <TextBlock Grid.Column="2" 
                            Text="Online" Style="{StaticResource TextBlockHeader}" />
-                <StackPanel Grid.Row="0" Grid.Column="3" >
+                <StackPanel Grid.Column="3" >
                     <controls:ToggleSwitch IsChecked="{Binding OnlineOnly}" OffLabel="" OnLabel=""/>
                 </StackPanel>
 
-                <TextBlock Grid.Row="0" Grid.Column="4" 
+                <TextBlock Grid.Column="4" 
                            Text="Alt. art" Style="{StaticResource TextBlockHeader}" />
-                <StackPanel Grid.Row="2" Grid.Column="5" >
+                <StackPanel Grid.Column="5" >
                     <controls:ToggleSwitch IsChecked="{Binding AlternativeArt}" OffLabel="" OnLabel=""/>
                 </StackPanel>
 
-                <TextBlock Grid.Row="0" Grid.Column="6" 
+                <TextBlock Grid.Column="6" 
                            Text="Normalize quality" Style="{StaticResource TextBlockHeader}" />
-                <StackPanel Grid.Row="0" Grid.Column="7" >
+                <StackPanel Grid.Column="7" >
                     <controls:ToggleSwitch IsChecked="{Binding NormalizeQuality}" OffLabel="" OnLabel="" />
                 </StackPanel>
             </Grid>

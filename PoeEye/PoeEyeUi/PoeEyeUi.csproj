@@ -284,6 +284,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="PoeTrade\Views\PoeLinksInfoView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="PoeTrade\Views\PoeItemModView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
