@@ -22,6 +22,7 @@
 
                 <ResourceDictionary Source="Resources/Icons.xaml" />
                 <ResourceDictionary Source="Themes/VirtualizedItemsControl.xaml" />
+                <ResourceDictionary Source="Themes/WpfAutoCompleteTextBoxStyle.xaml" />
 
                 <ResourceDictionary Source="PoeTrade/Views/MainWindowTabView.xaml" />
 
@@ -33,6 +34,8 @@
                 <ResourceDictionary Source="PoeTrade/Views/PoeExplicitModViewModel.xaml" />
                 <ResourceDictionary Source="PoeTrade/Views/PoeExplicitModsEditorViewModel.xaml" />
                 <ResourceDictionary Source="PoeTrade/Views/PoeQueryView.xaml" />
+                
+                
 
             </ResourceDictionary.MergedDictionaries>
 

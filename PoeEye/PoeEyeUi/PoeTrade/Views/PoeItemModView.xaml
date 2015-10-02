@@ -7,8 +7,7 @@
 
     <DataTemplate DataType="{x:Type common:PoeItemMod}">
         <ContentControl>
-            <Label Content="{Binding Name}"/>
+            <TextBlock Text="{Binding Name}" Style="{StaticResource MetroTextBlock}" FontSize="15"/>
         </ContentControl>
     </DataTemplate>
-
 </ResourceDictionary>

@@ -1,10 +1,20 @@
 ﻿namespace PoeEyeUi.PoeTrade.ViewModels
 {
+    using System;
+
+    using Factory;
+
     using Guards;
+
+    using JetBrains.Annotations;
+
+    using Models;
 
     using PoeShared.Common;
 
     using ReactiveUI;
+
+    using WpfControls;
 
     internal sealed class PoeExplicitModViewModel : ReactiveObject
     {
@@ -14,14 +24,19 @@
 
         private IPoeItemMod selectedMod;
 
-        public PoeExplicitModViewModel(IPoeItemMod[] explicitMods)
+        public PoeExplicitModViewModel(
+                IPoeItemMod[] explicitMods,
+                [NotNull] IFactory<PoeItemModeSuggestionProvider, IPoeItemMod[]> suggestionProviderFactory)
         {
             Guard.ArgumentNotNull(() => explicitMods);
 
             KnownMods = explicitMods;
+            SuggestionProvider = suggestionProviderFactory.Create(KnownMods);
         }
 
         public IPoeItemMod[] KnownMods { get; }
+
+        public ISuggestionProvider SuggestionProvider { get; }
 
         public IPoeItemMod SelectedMod
         {
