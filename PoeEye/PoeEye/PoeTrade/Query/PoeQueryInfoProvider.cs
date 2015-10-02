@@ -1,6 +1,7 @@
 ﻿namespace PoeEye.PoeTrade.Query
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
 
     using PoeShared;
@@ -19,7 +20,11 @@
                 WellKnownLeagues.Hardcore,
             };
 
-            ModsList = PoeKnownModsList.GetImplicitModsList().Concat(PoeKnownModsList.GetExplicitModsList()).ToArray();
+            ModsList = PoeKnownModsList
+                .GetImplicitModsList()
+                .Concat(PoeKnownModsList.GetExplicitModsList())
+                .Distinct(new ModsComparer())
+                .ToArray();
 
             CurrenciesList = new IPoeCurrency[]
             {
@@ -83,5 +88,20 @@
         public IPoeCurrency[] CurrenciesList { get; }
 
         public IPoeItemType[] ItemTypes { get; }
+
+        private class ModsComparer : IEqualityComparer<IPoeItemMod>
+        {
+            public bool Equals(IPoeItemMod x, IPoeItemMod y)
+            {
+                var codeNameX = x.CodeName.Trim().ToLowerInvariant();
+                var codeNameY = y.CodeName.Trim().ToLowerInvariant();
+                return x.ModType == y.ModType && string.Equals(codeNameX, codeNameY);
+            }
+
+            public int GetHashCode(IPoeItemMod obj)
+            {
+                return 0;
+            }
+        }
     }
 }
