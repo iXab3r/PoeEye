@@ -13,8 +13,8 @@
         {
             LeaguesList = new[]
             {
-                WellKnownLeagues.Warbands,
-                WellKnownLeagues.Tempest,
+                WellKnownLeagues.FlashbackEventIC001,
+                WellKnownLeagues.FlashbackEventHCIC002,
                 WellKnownLeagues.Standard,
                 WellKnownLeagues.Hardcore,
             };
