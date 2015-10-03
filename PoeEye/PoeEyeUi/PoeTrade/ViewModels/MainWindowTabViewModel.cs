@@ -104,7 +104,7 @@
         {
             TabName = QueryViewModel.ItemName == null
                 ? $"Tab #{tabIdx}"
-                : $"Tab #{tabIdx}: '{QueryViewModel.ItemName}'";
+                : $"Tab #{tabIdx}:\r\n{QueryViewModel.ItemName}";
         }
 
         private void SearchCommandExecute(object arg)

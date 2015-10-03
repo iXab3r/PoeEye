@@ -4,7 +4,8 @@
                     xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
                     xmlns:xcdg="http://schemas.xceed.com/wpf/xaml/datagrid"
                     xmlns:componentModel="clr-namespace:System.ComponentModel;assembly=WindowsBase"
-                    xmlns:viewModels="clr-namespace:PoeEyeUi.PoeTrade.ViewModels">
+                    xmlns:viewModels="clr-namespace:PoeEyeUi.PoeTrade.ViewModels"
+                    xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit">
     <DataTemplate DataType="{x:Type viewModels:MainWindowTabViewModel}">
         <Grid Margin="0, 10, 0, 10">
             <Grid.RowDefinitions>
@@ -23,21 +24,16 @@
                 </StackPanel>
             </Expander>
 
-            <controls:MetroContentControl Grid.Row="1">
-
-                <controls:MetroContentControl.Resources>
-                    <CollectionViewSource x:Key="cvsActors" Source="{Binding TradesListViewModel.TradesList}" >
-                        <CollectionViewSource.GroupDescriptions>
-                            <PropertyGroupDescription  PropertyName="TradeState"/>
-                        </CollectionViewSource.GroupDescriptions>
-                    </CollectionViewSource>
-                </controls:MetroContentControl.Resources>
-
-                <ItemsControl Margin="15" 
-                              ItemsSource="{Binding Source={StaticResource cvsActors}}"
-                              Style="{StaticResource VirtualizedItemsControlStyle}">
-                </ItemsControl>
-            </controls:MetroContentControl>
+            <ItemsControl Grid.Row="1" 
+                          Margin="15" 
+                          ItemsSource="{Binding TradesListViewModel.TradesList}"
+                          Style="{StaticResource VirtualizedItemsControlStyle}" >
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <xctk:WrapPanel Orientation="Horizontal" ItemWidth="600" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+            </ItemsControl>
         </Grid>
     </DataTemplate>
 </ResourceDictionary>
