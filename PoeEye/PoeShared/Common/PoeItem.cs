@@ -48,6 +48,8 @@
 
         public string Requirements { get; set; }
 
+        public PoeItemRarity Rarity { get; set; }
+
         public IPoeItemMod[] Mods
         {
             get { return mods; }

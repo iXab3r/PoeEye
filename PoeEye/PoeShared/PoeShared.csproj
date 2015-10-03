@@ -113,6 +113,7 @@
     <Compile Include="Common\PoeCurrency.cs" />
     <Compile Include="Common\PoeItem.cs" />
     <Compile Include="Common\PoeItemEqualityComparer.cs" />
+    <Compile Include="Common\PoeItemRarity.cs" />
     <Compile Include="Common\PoeItemMod.cs" />
     <Compile Include="Common\PoeItemModEqualityComparer.cs" />
     <Compile Include="Common\PoeItemType.cs" />

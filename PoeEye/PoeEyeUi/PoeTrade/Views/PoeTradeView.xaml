@@ -4,7 +4,8 @@
                     xmlns:poeEyeUi="clr-namespace:PoeEyeUi"
                     xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
                     xmlns:system="clr-namespace:System;assembly=mscorlib"
-                    xmlns:poeTrade="clr-namespace:PoeEyeUi.PoeTrade">
+                    xmlns:poeTrade="clr-namespace:PoeEyeUi.PoeTrade"
+                    xmlns:common="clr-namespace:PoeShared.Common;assembly=PoeShared">
 
     <DataTemplate DataType="{x:Type viewModels:PoeTradeViewModel}">
         <DataTemplate.Resources>
@@ -71,7 +72,26 @@
                                 </Rectangle>
                             </Button>
 
-                            <TextBlock Text="{Binding Name, Mode=OneWay}" Style="{StaticResource MetroTextBlockHeaderStyle}"/>
+                            <TextBlock Text="{Binding Name, Mode=OneWay}" >
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock" BasedOn="{StaticResource MetroTextBlockHeaderStyle}">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Trade.Rarity}" Value="{x:Static common:PoeItemRarity.Normal}">
+                                                <Setter Property="Foreground" Value="{DynamicResource PoeItemRarityColorNormal}"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Trade.Rarity}" Value="{x:Static common:PoeItemRarity.Magic}">
+                                                <Setter Property="Foreground" Value="{DynamicResource PoeItemRarityColorMagic}"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Trade.Rarity}" Value="{x:Static common:PoeItemRarity.Rare}">
+                                                <Setter Property="Foreground" Value="{DynamicResource PoeItemRarityColorRare}"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Trade.Rarity}" Value="{x:Static common:PoeItemRarity.Unique}">
+                                                <Setter Property="Foreground" Value="{DynamicResource PoeItemRarityColorUnique}"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
 
                             <Label Content="{Binding Trade.Requirements, Mode=OneWay}" 
                                    BorderBrush="{StaticResource AccentColorBrush}" 
@@ -85,7 +105,7 @@
                 </ContentControl>
 
                 <ContentControl Grid.Row="1"  Grid.Column="1">
-                    
+
                     <StackPanel Orientation="Horizontal">
                         <Grid>
                             <Grid.RowDefinitions>
@@ -212,7 +232,7 @@
                             </StackPanel>
                         </Grid>
                     </StackPanel>
-                   
+
                 </ContentControl>
 
                 <ContentControl Grid.Row="2"  Grid.Column="1">

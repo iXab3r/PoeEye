@@ -139,6 +139,8 @@ namespace PoeEye.PoeTrade
 
                 Mods = implicitMods.Concat(explicitMods).ToArray(),
                 Links = ExtractLinksInfo(row),
+
+                Rarity = ExtractItemRarity(row),
             };
             TrimProperties(result);
             return result;
@@ -168,6 +170,21 @@ namespace PoeEye.PoeTrade
                 newValue = newValue.Trim();
 
                 propertyInfo.SetValue(item, newValue);
+            }
+        }
+
+        private static PoeItemRarity ExtractItemRarity(IDomObject row)
+        {
+            CQ parser = row.Render();
+
+            var titleClass = parser["td[class=item-cell] a[class^=title]"]?.Attr("class");
+            switch (titleClass)
+            {
+                case "title itemframe0": return PoeItemRarity.Normal;
+                case "title itemframe1": return PoeItemRarity.Magic;
+                case "title itemframe2": return PoeItemRarity.Rare;
+                case "title itemframe3": return PoeItemRarity.Unique;
+                default: return PoeItemRarity.Unknown;
             }
         }
 

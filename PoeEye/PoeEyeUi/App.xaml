@@ -9,6 +9,11 @@
         <ResourceDictionary>
             <SolidColorBrush x:Key="PoeTradeRemovedItemColor" Color="#55FF9298" />
             <SolidColorBrush x:Key="PoeTradeNewItemColor" Color="#5592FF98" />
+            
+            <SolidColorBrush x:Key="PoeItemRarityColorNormal" Color="White" />
+            <SolidColorBrush x:Key="PoeItemRarityColorMagic" Color="CornflowerBlue" />
+            <SolidColorBrush x:Key="PoeItemRarityColorRare" Color="Yellow" />
+            <SolidColorBrush x:Key="PoeItemRarityColorUnique" Color="OrangeRed" />
 
             
             <ResourceDictionary.MergedDictionaries>
