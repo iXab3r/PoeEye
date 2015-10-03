@@ -5,6 +5,8 @@
     using System.Windows;
     using System.Windows.Input;
 
+    using Factory;
+
     using Guards;
 
     using JetBrains.Annotations;
@@ -18,20 +20,31 @@
     internal sealed class PoeTradeViewModel : ReactiveObject, IPoeTradeViewModel
     {
         private readonly IPoeItem poeItem;
+        private readonly IFactory<ImageViewModel, Uri> imageViewModelFactory;
         private PoeTradeState tradeState;
         private readonly ReactiveCommand<object> copyPmMessageToClipboardCommand;
         private readonly ReactiveCommand<object> markAsReadCommand;
 
-        public PoeTradeViewModel([NotNull] IPoeItem poeItem)
+        public PoeTradeViewModel(
+            [NotNull] IPoeItem poeItem,
+            [NotNull] IFactory<ImageViewModel, Uri> imageViewModelFactory )
         {
             Guard.ArgumentNotNull(() => poeItem);
+            Guard.ArgumentNotNull(() => imageViewModelFactory);
 
             this.poeItem = poeItem;
+            this.imageViewModelFactory = imageViewModelFactory;
             copyPmMessageToClipboardCommand = ReactiveCommand.Create();
             copyPmMessageToClipboardCommand.Subscribe(CopyPmMessageToClipboardCommandExecute);
 
             markAsReadCommand = ReactiveCommand.Create();
             markAsReadCommand.Subscribe(MarkAsReadCommandExecute);
+
+            Uri imageUri;
+            if (!string.IsNullOrWhiteSpace(poeItem.ItemIconUri) && Uri.TryCreate(poeItem.ItemIconUri, UriKind.Absolute, out imageUri))
+            {
+                ImageViewModel = imageViewModelFactory.Create(imageUri);
+            }
         }
 
         public PoeTradeState TradeState
@@ -39,6 +52,8 @@
             get { return tradeState; }
             set { this.RaiseAndSetIfChanged(ref tradeState, value); }
         }
+
+        public ImageViewModel ImageViewModel { get; }
 
         public string Name => poeItem.ItemName;
 

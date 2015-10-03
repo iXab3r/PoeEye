@@ -28,11 +28,17 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
+                <ContentControl Grid.Row="1" Grid.Column="0" 
+                                Margin="0,0,10,0"
+                                Content="{Binding ImageViewModel}"/>
+                
                 <ContentControl Grid.Row="1" Grid.Column="0">
                     <Label VerticalContentAlignment="Center" 
                            HorizontalContentAlignment="Center"
                            Content="{Binding Trade.Links}"
+                           Foreground="{StaticResource AccentColorBrush}"
                            BorderBrush="{StaticResource ControlBorderBrush}"
+                           FontWeight="Bold"
                            BorderThickness="1"
                            Margin="0,0,10,0"/>
                 </ContentControl>
