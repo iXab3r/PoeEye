@@ -28,11 +28,6 @@
                           Margin="15" 
                           ItemsSource="{Binding TradesListViewModel.TradesList}"
                           Style="{StaticResource VirtualizedItemsControlStyle}" >
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <xctk:WrapPanel Orientation="Horizontal" ItemWidth="600" />
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
             </ItemsControl>
         </Grid>
     </DataTemplate>

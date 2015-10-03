@@ -15,7 +15,7 @@
             </Style>
         </DataTemplate.Resources>
 
-        <ContentControl Margin="10" MaxWidth="800" >
+        <ContentControl Margin="10" MaxWidth="800">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="40"/>
@@ -78,19 +78,134 @@
                 </ContentControl>
 
                 <ContentControl Grid.Row="1"  Grid.Column="1">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="5"/>
-                            <RowDefinition Height="Auto"/>
-                        </Grid.RowDefinitions>
-                        <ItemsControl Grid.Row="0"
+                    
+                    <StackPanel Orientation="Horizontal">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="5"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <ItemsControl Grid.Row="0" Grid.Column="0"
                                       ItemsSource="{Binding ImplicitMods, Mode=OneWay}" FontStyle="Italic"/>
-                        <Border Grid.Row="1"
+                            <Border Grid.Row="1" Grid.Column="0"
                                 Height="5" BorderBrush="{StaticResource AccentColorBrush}" BorderThickness="0,1,0,0"/>
-                        <ItemsControl Grid.Row="2"
+                            <ItemsControl Grid.Row="2"  Grid.Column="0"
                                       ItemsSource="{Binding ExplicitMods, Mode=OneWay}"/>
-                    </Grid>
+                        </Grid>
+
+                        <!-- Stats -->
+                        <Grid Margin="50,10,0,10">
+                            <Grid.Resources>
+                                <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+                                    <Setter Property="Margin" Value="10, 5, 10, 5"/>
+                                    <Setter Property="HorizontalAlignment" Value="Center"/>
+                                </Style>
+
+                                <Style TargetType="Label" BasedOn="{StaticResource {x:Type Label}}">
+                                    <Setter Property="HorizontalAlignment" Value="Center"/>
+                                    <Setter Property="FontWeight" Value="Bold"/>
+                                    <Setter Property="BorderThickness" Value="0,0,0,2"/>
+                                    <Setter Property="BorderBrush" Value="{StaticResource AccentColorBrush}"/>
+                                </Style>
+                            </Grid.Resources>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="60*"/>
+                                <ColumnDefinition Width="60*"/>
+                                <ColumnDefinition Width="60*"/>
+                                <ColumnDefinition Width="60*"/>
+                                <ColumnDefinition Width="60*"/>
+                                <ColumnDefinition Width="60*"/>
+                                <ColumnDefinition Width="60*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="80*"/>
+                                <RowDefinition Height="80*"/>
+                            </Grid.RowDefinitions>
+
+                            <StackPanel Grid.Column="0" Grid.Row="0"
+                                        Orientation="Vertical">
+                                <Label Content="Quality"/>
+                                <TextBlock Text="{Binding Trade.Quality}"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="1" Grid.Row="0"
+                                        Orientation="Vertical">
+                                <Label Content="Phys."/>
+                                <TextBlock Text="{Binding Trade.Physical}"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="2" Grid.Row="0"
+                                        Orientation="Vertical">
+                                <Label Content="Elem."/>
+                                <TextBlock Text="{Binding Trade.Elemental}"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="3" Grid.Row="0"
+                                        Orientation="Vertical">
+                                <Label Content="APS"/>
+                                <TextBlock Text="{Binding Trade.AttacksPerSecond}"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="4" Grid.Row="0"
+                                        Orientation="Vertical">
+                                <Label Content="DPS"/>
+                                <TextBlock Text="{Binding Trade.DamagePerSecond}"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="5" Grid.Row="0"
+                                        Orientation="Vertical">
+                                <Label Content="pDPS"/>
+                                <TextBlock Text="{Binding Trade.PhysicalDamagePerSecond}"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="6" Grid.Row="0"
+                                        Orientation="Vertical">
+                                <Label Content="eDPS"/>
+                                <TextBlock Text="{Binding Trade.ElementalDamagePerSecond}"/>
+                            </StackPanel>
+
+                            <!-- Row 2 -->
+
+                            <StackPanel Grid.Column="0" Grid.Row="1"
+                                        Orientation="Vertical">
+                                <Label Content="Armour"/>
+                                <TextBlock Text="{Binding Trade.Armour}"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="1" Grid.Row="1"
+                                        Orientation="Vertical">
+                                <Label Content="Evasion"/>
+                                <TextBlock Text="{Binding Trade.Evasion}"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="2" Grid.Row="1"
+                                        Orientation="Vertical">
+                                <Label Content="Shield"/>
+                                <TextBlock Text="{Binding Trade.Shield}"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="3" Grid.Row="1"
+                                        Orientation="Vertical">
+                                <Label Content="Block"/>
+                                <TextBlock Text="{Binding Trade.BlockChance}"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="4" Grid.Row="1"
+                                        Orientation="Vertical">
+                                <Label Content="Crit."/>
+                                <TextBlock Text="{Binding Trade.CriticalChance}"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="5" Grid.Row="1" 
+                                        Orientation="Vertical">
+                                <Label Content="Level"/>
+                                <TextBlock Text="{Binding Trade.Level}"/>
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                   
                 </ContentControl>
 
                 <ContentControl Grid.Row="2"  Grid.Column="1">

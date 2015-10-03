@@ -20,6 +20,32 @@
 
         string League { get; }
 
+        string Quality { get; }
+
+        string Physical { get; }
+
+        string Elemental { get; }
+
+        string AttacksPerSecond { get; }
+
+        string DamagePerSecond { get; }
+
+        string PhysicalDamagePerSecond { get; }
+
+        string ElementalDamagePerSecond { get; }
+
+        string Armour { get; }
+
+        string Evasion { get; }
+
+        string Shield { get; }
+
+        string BlockChance { get; }
+
+        string CriticalChance { get; }
+
+        string Level { get; }
+
         IPoeItemMod[] Mods { [NotNull] get; }
 
         IPoeLinksInfo Links { get; }

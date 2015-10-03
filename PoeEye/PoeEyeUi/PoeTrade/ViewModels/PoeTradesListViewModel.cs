@@ -5,6 +5,7 @@
     using System.Collections.ObjectModel;
     using System.ComponentModel;
     using System.Linq;
+    using System.Reactive;
     using System.Reactive.Linq;
     using System.Windows.Data;
     using System.Windows.Threading;
@@ -101,6 +102,12 @@
             {
                 var itemViewModel = poeTradeViewModelFactory.Create(item);
                 itemViewModel.TradeState = PoeTradeState.New;
+
+                itemViewModel
+                    .WhenAnyValue(x => x.TradeState)
+                    .Where(x => x == PoeTradeState.Removed)
+                    .CombineLatest(itemViewModel.WhenAnyValue(x => x.TradeState).Where(x => x == PoeTradeState.Normal), (x, y) => Unit.Default)
+                    .Subscribe(_ => RemoveTrade(itemViewModel));
                 tradesList.Add(itemViewModel);
             }
 
@@ -129,6 +136,11 @@
         public void ClearTradesList()
         {
             tradesList.Clear();
+        }
+
+        private void RemoveTrade(IPoeTradeViewModel trade)
+        {
+            tradesList.Remove(trade);
         }
     }
 }

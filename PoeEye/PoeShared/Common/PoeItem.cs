@@ -20,6 +20,32 @@
 
         public string League { get; set; }
 
+        public string Quality { get; set; }
+
+        public string Physical { get; set; }
+
+        public string Elemental { get; set; }
+
+        public string AttacksPerSecond { get; set; }
+
+        public string DamagePerSecond { get; set; }
+
+        public string PhysicalDamagePerSecond { get; set; }
+
+        public string ElementalDamagePerSecond { get; set; }
+
+        public string Armour { get; set; }
+
+        public string Evasion { get; set; }
+
+        public string Shield { get; set; }
+
+        public string BlockChance { get; set; }
+
+        public string CriticalChance { get; set; }
+
+        public string Level { get; set; }
+
         public IPoeItemMod[] Mods
         {
             get { return mods; }

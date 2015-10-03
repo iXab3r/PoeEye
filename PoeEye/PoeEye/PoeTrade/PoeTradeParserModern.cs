@@ -1,7 +1,9 @@
 namespace PoeEye.PoeTrade
 {
+    using System;
     using System.IO;
     using System.Linq;
+    using System.Web;
 
     using CsQuery;
     using CsQuery.ExtensionMethods;
@@ -118,11 +120,53 @@ namespace PoeEye.PoeTrade
                 UserIgn = parser.Attr("data-ign"),
                 Price = parser.Attr("data-buyout"),
                 League = parser.Attr("data-league"),
+
+                Quality = parser["td[class=table-stats] td[data-name=q]"]?.Text(),
+                Physical = parser["td[class=table-stats] td[data-name=quality_pd]"]?.Text(),
+                Elemental = parser["td[class=table-stats] td[data-name=ed]"]?.Text(),
+                AttacksPerSecond = parser["td[class=table-stats] td[data-name=aps]"]?.Text(),
+                DamagePerSecond = parser["td[class=table-stats] td[data-name=quality_dps]"]?.Text(),
+                PhysicalDamagePerSecond = parser["td[class=table-stats] td[data-name=quality_pdps]"]?.Text(),
+                ElementalDamagePerSecond = parser["td[class=table-stats] td[data-name=edps]"]?.Text(),
+                Armour = parser["td[class=table-stats] td[data-name=quality_armour]"]?.Text(),
+                Evasion = parser["td[class=table-stats] td[data-name=quality_evasion]"]?.Text(),
+                Shield = parser["td[class=table-stats] td[data-name=quality_shield]"]?.Text(),
+                BlockChance = parser["td[class=table-stats] td[data-name=block]"]?.Text(),
+                CriticalChance = parser["td[class=table-stats] td[data-name=crit]"]?.Text(),
+                Level = parser["td[class=table-stats] td[data-name=level]"]?.Text(),
+
                 Mods = implicitMods.Concat(explicitMods).ToArray(),
                 Links = ExtractLinksInfo(row),
             };
-
+            TrimProperties(result);
             return result;
+        }
+
+        private static float? ParseFloat(string rawValue)
+        {
+            float result;
+            return !float.TryParse(rawValue, out result)
+                ? (float?)null
+                : result;
+        }
+
+        private static void TrimProperties(PoeItem item)
+        {
+            var propertiesToProcess = typeof (PoeItem)
+                .GetProperties()
+                .Where(x => x.PropertyType == typeof (string))
+                .Where(x => x.CanRead && x.CanWrite)
+                .ToArray();
+
+            foreach (var propertyInfo in propertiesToProcess)
+            {
+                var currentValue = (string)propertyInfo.GetValue(item);
+                var newValue = (currentValue ?? string.Empty)
+                    .Trim();
+                newValue = HttpUtility.HtmlDecode(newValue);
+
+                propertyInfo.SetValue(item, newValue);
+            }
         }
 
         private static IPoeLinksInfo ExtractLinksInfo(IDomObject row)
