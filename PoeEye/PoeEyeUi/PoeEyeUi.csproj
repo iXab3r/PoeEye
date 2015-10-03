@@ -246,18 +246,18 @@
     <Compile Include="Converters\ComboBoxEmptyItemConverter.cs" />
     <Compile Include="PoeTrade\Models\PoeItemModeSuggestionProvider.cs" />
     <Compile Include="PoeTrade\ViewModels\ApplicationUpdaterViewModel.cs" />
+    <Compile Include="PoeTrade\ViewModels\MainWindowTabViewModel.cs" />
+    <Compile Include="PoeTrade\ViewModels\MainWindowViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\PoeExplicitModsEditorViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\PoeExplicitModViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\PoeImplicitModViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\PoeQueryViewModel.cs" />
+    <Compile Include="PoeTrade\Views\MainWindow.xaml.cs">
+      <DependentUpon>MainWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ResourceKeys.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="MainWindow.xaml.cs">
-      <DependentUpon>MainWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="MainWindowTabViewModel.cs" />
-    <Compile Include="MainWindowViewModel.cs" />
     <Compile Include="PoeTrade\PoeTradeState.cs" />
     <Compile Include="PoeTrade\ViewModels\IPoeTradeViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\PoeTradeViewModel.cs" />
@@ -307,9 +307,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Page Include="MainWindow.xaml">
-      <SubType>Designer</SubType>
+    <Page Include="PoeTrade\Views\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="PoeTrade\Views\MainWindowTabView.xaml">
       <SubType>Designer</SubType>

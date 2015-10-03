@@ -1,9 +1,6 @@
-﻿namespace PoeEyeUi
+﻿namespace PoeEyeUi.PoeTrade.ViewModels
 {
     using System;
-    using System.Collections.ObjectModel;
-    using System.Collections.Specialized;
-    using System.Reactive.Linq;
     using System.Reflection;
     using System.Windows.Input;
 
@@ -13,18 +10,13 @@
 
     using JetBrains.Annotations;
 
-    using PoeTrade.ViewModels;
-
     using ReactiveUI;
-
-    using Squirrel;
 
     internal sealed class MainWindowViewModel : ReactiveObject
     {
         private readonly IFactory<MainWindowTabViewModel> tabFactory;
         private readonly ReactiveList<MainWindowTabViewModel> tabsList = new ReactiveList<MainWindowTabViewModel>();
 
-        private int tabIdx = 0;
         private MainWindowTabViewModel selectedItem;
         private readonly ReactiveCommand<object> createNewTabCommand;
         private readonly ReactiveCommand<object> closeTabCommand;
@@ -54,8 +46,6 @@
                 .Subscribe(x => SelectedItem = x);
 
             createNewTabCommand.Execute(null);
-
-
         }
 
         public ICommand CreateNewTabCommand => createNewTabCommand;
@@ -77,7 +67,6 @@
         private void CreateNewTabCommandExecuted(object o)
         {
             var newTab = tabFactory.Create();
-            newTab.TabName = $"Tab #{tabIdx++}";
             tabsList.Add(newTab);
         }
 

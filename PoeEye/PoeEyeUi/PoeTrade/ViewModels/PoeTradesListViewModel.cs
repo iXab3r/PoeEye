@@ -33,7 +33,7 @@
         private DateTime lastUpdateTimestamp;
         private IPoeQuery query;
         private TimeSpan recheckTimeout;
-        private readonly ReactiveList<IPoeTradeViewModel> tradesList = new ReactiveList<IPoeTradeViewModel>();
+        private readonly ReactiveList<IPoeTradeViewModel> tradesList = new ReactiveList<IPoeTradeViewModel>() {ChangeTrackingEnabled = true};
 
         public PoeTradesListViewModel(
             [NotNull] IFactory<IPoeLiveHistoryProvider, IPoeQuery> poeLiveHistoryFactory,
@@ -59,7 +59,6 @@
                 .Switch()
                 .ObserveOn(Dispatcher.CurrentDispatcher)
                 .Subscribe(OnNextItemsPackReceived);
-
         }
 
         public ReactiveList<IPoeTradeViewModel> TradesList => tradesList;

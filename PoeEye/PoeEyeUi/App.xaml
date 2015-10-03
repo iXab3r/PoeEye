@@ -4,7 +4,7 @@
              xmlns:local="clr-namespace:PoeEyeUi"
              xmlns:converters="clr-namespace:PoeEyeUi.Converters"
              xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
-             StartupUri="MainWindow.xaml">
+             StartupUri="PoeTrade/Views/MainWindow.xaml">
     <Application.Resources>
         <ResourceDictionary>
             <SolidColorBrush x:Key="PoeTradeRemovedItemColor" Color="#55FF9298" />

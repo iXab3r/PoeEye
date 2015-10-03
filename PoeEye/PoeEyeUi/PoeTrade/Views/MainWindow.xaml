@@ -1,17 +1,18 @@
-﻿<controls:MetroWindow x:Class="PoeEyeUi.MainWindow"
+﻿<controls:MetroWindow x:Class="PoeEyeUi.PoeTrade.Views.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PoeEyeUi"
         xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
+        xmlns:viewModels="clr-namespace:PoeEyeUi.PoeTrade.ViewModels"
         mc:Ignorable="d"
         Title="{Binding MainWindowTitle}" 
         MinWidth="1000" 
         MinHeight="300" 
         Width="1000" 
         Height="600" 
-        d:DataContext="{d:DesignInstance local:MainWindowViewModel}"
+        d:DataContext="{d:DesignInstance viewModels:MainWindowViewModel}"
         BorderThickness="1" BorderBrush="{StaticResource AccentColorBrush}">
 
     <Grid>
@@ -48,12 +49,24 @@
                                               TabStripMargin="5,0,0,0"
                         TabStripPlacement="Left" >
                 <controls:MetroAnimatedTabControl.ItemTemplate>
-                    <DataTemplate DataType="{x:Type local:MainWindowTabViewModel}">
-                        <StackPanel Orientation="Horizontal" Width="110" >
+                    <DataTemplate DataType="{x:Type viewModels:MainWindowTabViewModel}">
+                        <StackPanel Orientation="Horizontal" MinWidth="120" MaxWidth="200" >
                             <controls:ProgressRing Height="20" Width="20" IsActive="true" Foreground="{StaticResource TextBrush}"  Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}" />
-                            <TextBlock Text="{Binding TabName}" FontSize="18"/>
+                            
+                            <TextBlock Text="{Binding TabName}" FontSize="18" TextWrapping="Wrap" MaxWidth="120"/>
+
+                            <TextBlock FontSize="16" Margin="10,0,0,0">
+                                <TextBlock.Inlines>
+                                    <Run Text="{Binding NewItemsCount, Mode=OneWay}" Foreground="{StaticResource PoeTradeNewItemColor}"/> /
+                                    <Run Text="{Binding RemovedItemsCount, Mode=OneWay}" Foreground="{StaticResource PoeTradeRemovedItemColor}"/> /
+                                    <Run Text="{Binding NormalItemsCount, Mode=OneWay}"/>
+                                </TextBlock.Inlines>
+                                
+                            </TextBlock>
+
                             <Button Width="24" Height="24"
                                 Style="{StaticResource MetroCircleButtonStyle}"
+                                HorizontalAlignment="Right"
                                 Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type controls:MetroAnimatedTabControl}}, Path=DataContext.CloseTabCommand}"
                                 CommandParameter="{Binding}">
                                 <Rectangle Width="8" Height="8" Fill="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Button}}}">

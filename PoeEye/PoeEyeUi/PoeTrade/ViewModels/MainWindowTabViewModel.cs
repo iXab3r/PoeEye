@@ -1,6 +1,9 @@
-﻿namespace PoeEyeUi
+﻿namespace PoeEyeUi.PoeTrade.ViewModels
 {
     using System;
+    using System.Linq;
+    using System.Reactive;
+    using System.Reactive.Linq;
     using System.Windows.Input;
 
     using Guards;
@@ -9,12 +12,11 @@
 
     using PoeShared.PoeTrade.Query;
 
-    using PoeTrade.ViewModels;
-
     using ReactiveUI;
 
     internal sealed class MainWindowTabViewModel : ReactiveObject
     {
+        private static int tabIdx = 0;
         private string tabName;
 
         public MainWindowTabViewModel(
@@ -23,6 +25,8 @@
         {
             Guard.ArgumentNotNull(() => tradesListViewModel);
             Guard.ArgumentNotNull(() => queryViewModel);
+
+            tabIdx++;
 
             TradesListViewModel = tradesListViewModel;
             var command = ReactiveCommand.Create();
@@ -43,6 +47,20 @@
                 .Subscribe(_ => this.RaisePropertyChanged(nameof(IsBusy)));
 
             QueryViewModel = queryViewModel;
+
+            Observable.Merge(
+                TradesListViewModel.TradesList.ItemChanged.Select(x => Unit.Default),
+                TradesListViewModel.TradesList.Changed.Select(x => Unit.Default))
+                .Subscribe(_ =>
+                                                                 {
+                                                                     this.RaisePropertyChanged(nameof(NewItemsCount));
+                                                                     this.RaisePropertyChanged(nameof(RemovedItemsCount));
+                                                                     this.RaisePropertyChanged(nameof(NormalItemsCount));
+                                                                 });
+
+            TradesListViewModel
+                .WhenAnyValue(x => x.Query)
+                .Subscribe(_ => RebuildTabName());
         }
 
         public TimeSpan RecheckTimeout
@@ -65,7 +83,29 @@
             set { this.RaiseAndSetIfChanged(ref tabName, value); }
         }
 
+        public int NewItemsCount
+        {
+            get { return TradesListViewModel.TradesList.Count(x => x.TradeState == PoeTradeState.New); }
+        }
+
+        public int RemovedItemsCount
+        {
+            get { return TradesListViewModel.TradesList.Count(x => x.TradeState == PoeTradeState.Removed); }
+        }
+
+        public int NormalItemsCount
+        {
+            get { return TradesListViewModel.TradesList.Count(x => x.TradeState == PoeTradeState.Normal); }
+        }
+
         public PoeQueryViewModel QueryViewModel { get; }
+
+        private void RebuildTabName()
+        {
+            TabName = QueryViewModel.ItemName == null
+                ? $"Tab #{tabIdx}"
+                : $"Tab #{tabIdx}: '{QueryViewModel.ItemName}'";
+        }
 
         private void SearchCommandExecute(object arg)
         {
@@ -75,21 +115,12 @@
                 return;
             }
             var query = queryBuilder();
-            /*var query = new PoeQueryBuilder()
-            {
-                Arguments = new IPoeQueryArgument[]
-                {
-                    new PoeQueryStringArgument("league", WellKnownLeagues.Warbands),
-                    new PoeQueryStringArgument("name", "Temple map"),
-                    new PoeQueryStringArgument("online", "x"),
-                    new PoeQueryStringArgument("buyout", "x"),
-                    new PoeQueryModArgument("Area is a large Maze"),
-                    new PoeQueryModArgument("Area is #% larger") {Excluded = true},
-                },
-            };*/
+
             RecheckTimeout = TimeSpan.FromSeconds(30);
             TradesListViewModel.ClearTradesList();
             TradesListViewModel.Query = query;
         }
+
+
     }
 }

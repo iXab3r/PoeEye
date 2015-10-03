@@ -3,8 +3,9 @@
                     xmlns:poeEyeUi="clr-namespace:PoeEyeUi"
                     xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
                     xmlns:xcdg="http://schemas.xceed.com/wpf/xaml/datagrid"
-                    xmlns:componentModel="clr-namespace:System.ComponentModel;assembly=WindowsBase">
-    <DataTemplate DataType="{x:Type poeEyeUi:MainWindowTabViewModel}">
+                    xmlns:componentModel="clr-namespace:System.ComponentModel;assembly=WindowsBase"
+                    xmlns:viewModels="clr-namespace:PoeEyeUi.PoeTrade.ViewModels">
+    <DataTemplate DataType="{x:Type viewModels:MainWindowTabViewModel}">
         <Grid Margin="0, 10, 0, 10">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
