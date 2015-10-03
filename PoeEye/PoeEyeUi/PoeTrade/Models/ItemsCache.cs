@@ -9,6 +9,7 @@
     using System.Reactive.Threading.Tasks;
     using System.Security.Cryptography;
     using System.Text;
+    using System.Threading;
     using System.Windows.Controls;
     using System.Windows.Media.Imaging;
     using System.Windows.Threading;
@@ -46,15 +47,19 @@
             var result = httpClient
                 .GetStreamAsync(imageUri)
                 .ToObservable()
-                .Select(x => LoadImageFromStream(outputFilePath, x));
+                .Select(x => LoadImageFromStream(outputFilePath, x))
+                .Publish();
 
             loadingImages[outputFilePath] = result;
+
+            result.Connect();
 
             return result;
         }
 
         private FileInfo LoadImageFromStream(string outputFilePath, Stream dataStream)
         {
+            Log.Instance.Debug($"[ItemsCache.ResolveImageByUri] Starting downloading image to cache...\r\n\tFilePath: '{outputFilePath}'");
             var outputDirectory = Path.GetDirectoryName(outputFilePath);
             if (!Directory.Exists(outputFilePath))
             {
@@ -67,14 +72,14 @@
             }
             loadingImages.Remove(outputFilePath);
 
-                Log.Instance.Debug($"[ItemsCache.ResolveImageByUri] Image was saved to file '{outputFilePath}'");
+            Log.Instance.Debug($"[ItemsCache.ResolveImageByUri] Image was saved to file '{outputFilePath}'");
             return new FileInfo(outputFilePath);
         }
 
         private string ConstructPath(string imageUri)
         {
             var cachePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, CacheFolderName);
-            var uriHash = ToBase64String(imageUri);
+            var uriHash = Sha256(imageUri);
 
             var extension = Path.HasExtension(imageUri) ? Path.GetExtension(imageUri) : string.Empty;
 
@@ -90,6 +95,18 @@
         public static string ToBase64String(String source)
         {
             return Convert.ToBase64String(Encoding.Unicode.GetBytes(source));
+        }
+
+        static string Sha256(string password)
+        {
+            SHA256Managed crypt = new SHA256Managed();
+            string hash = String.Empty;
+            byte[] crypto = crypt.ComputeHash(Encoding.ASCII.GetBytes(password), 0, Encoding.ASCII.GetByteCount(password));
+            foreach (byte theByte in crypto)
+            {
+                hash += theByte.ToString("x2");
+            }
+            return hash;
         }
     }
 }
