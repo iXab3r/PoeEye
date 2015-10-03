@@ -33,9 +33,7 @@
         private DateTime lastUpdateTimestamp;
         private IPoeQuery query;
         private TimeSpan recheckTimeout;
-        private readonly ObservableCollection<IPoeTradeViewModel> tradesList = new ObservableCollection<IPoeTradeViewModel>();
-
-        private readonly ICollectionView wrappedTradesList;
+        private readonly ReactiveList<IPoeTradeViewModel> tradesList = new ReactiveList<IPoeTradeViewModel>();
 
         public PoeTradesListViewModel(
             [NotNull] IFactory<IPoeLiveHistoryProvider, IPoeQuery> poeLiveHistoryFactory,
@@ -62,10 +60,9 @@
                 .ObserveOn(Dispatcher.CurrentDispatcher)
                 .Subscribe(OnNextItemsPackReceived);
 
-            wrappedTradesList = CollectionViewSource.GetDefaultView(tradesList);
         }
 
-        public ICollectionView TradesList => wrappedTradesList;
+        public ReactiveList<IPoeTradeViewModel> TradesList => tradesList;
 
         public IPoeQuery Query
         {

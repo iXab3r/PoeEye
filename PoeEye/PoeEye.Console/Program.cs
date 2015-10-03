@@ -56,7 +56,7 @@
                 {
                     Arguments = new IPoeQueryArgument[]
                     {
-                        new PoeQueryStringArgument("league", WellKnownLeagues.Warbands),
+                        new PoeQueryStringArgument("league", WellKnownLeagues.FlashbackEventHCIC002),
                         new PoeQueryStringArgument("name", "Temple map"),
                         new PoeQueryStringArgument("online", "x"),
                         new PoeQueryStringArgument("buyout", "x"),
