@@ -244,6 +244,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Converters\ComboBoxEmptyItemConverter.cs" />
+    <Compile Include="Converters\NullNotNullToVisibilityConverter.cs" />
     <Compile Include="PoeTrade\Models\PoeItemModeSuggestionProvider.cs" />
     <Compile Include="PoeTrade\ViewModels\ApplicationUpdaterViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\MainWindowTabViewModel.cs" />
@@ -348,6 +349,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Resources\Icons.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\Converters.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

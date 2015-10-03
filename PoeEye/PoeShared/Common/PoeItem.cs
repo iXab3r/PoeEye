@@ -46,6 +46,8 @@
 
         public string Level { get; set; }
 
+        public string Requirements { get; set; }
+
         public IPoeItemMod[] Mods
         {
             get { return mods; }

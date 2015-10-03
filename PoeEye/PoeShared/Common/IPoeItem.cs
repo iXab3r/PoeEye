@@ -46,6 +46,8 @@
 
         string Level { get; }
 
+        string Requirements { get; }
+
         IPoeItemMod[] Mods { [NotNull] get; }
 
         IPoeLinksInfo Links { get; }

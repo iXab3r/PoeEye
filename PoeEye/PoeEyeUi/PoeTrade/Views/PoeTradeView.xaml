@@ -72,6 +72,13 @@
                             </Button>
 
                             <TextBlock Text="{Binding Name, Mode=OneWay}" Style="{StaticResource MetroTextBlockHeaderStyle}"/>
+
+                            <Label Content="{Binding Trade.Requirements, Mode=OneWay}" 
+                                   BorderBrush="{StaticResource AccentColorBrush}" 
+                                   BorderThickness="2,0,2,0" 
+                                   VerticalContentAlignment="Center"
+                                   Margin="10,5,10,5" 
+                                   Visibility="{Binding Trade.Requirements, Converter={StaticResource NullNotNullToVisibilityConverter}}" />
                         </StackPanel>
 
                     </Border>

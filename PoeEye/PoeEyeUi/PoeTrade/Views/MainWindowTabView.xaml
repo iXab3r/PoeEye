@@ -27,7 +27,7 @@
             <ItemsControl Grid.Row="1" 
                           Margin="15" 
                           ItemsSource="{Binding TradesListViewModel.TradesList}"
-                          Style="{StaticResource VirtualizedItemsControlStyle}" >
+                          Style="{StaticResource VirtualizedItemsControlStyle}">
             </ItemsControl>
         </Grid>
     </DataTemplate>

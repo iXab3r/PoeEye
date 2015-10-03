@@ -135,6 +135,8 @@ namespace PoeEye.PoeTrade
                 CriticalChance = parser["td[class=table-stats] td[data-name=crit]"]?.Text(),
                 Level = parser["td[class=table-stats] td[data-name=level]"]?.Text(),
 
+                Requirements = parser["td[class=item-cell] p[class=requirements]"]?.Text(),
+
                 Mods = implicitMods.Concat(explicitMods).ToArray(),
                 Links = ExtractLinksInfo(row),
             };
@@ -161,9 +163,9 @@ namespace PoeEye.PoeTrade
             foreach (var propertyInfo in propertiesToProcess)
             {
                 var currentValue = (string)propertyInfo.GetValue(item);
-                var newValue = (currentValue ?? string.Empty)
-                    .Trim();
+                var newValue = (currentValue ?? string.Empty);
                 newValue = HttpUtility.HtmlDecode(newValue);
+                newValue = newValue.Trim();
 
                 propertyInfo.SetValue(item, newValue);
             }
