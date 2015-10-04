@@ -24,7 +24,7 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <Expander Header="Query" IsExpanded="{Binding QueryViewModel.IsExpanded}">
+            <Expander Header="Query parameters" IsExpanded="{Binding QueryViewModel.IsExpanded}">
                 <StackPanel>
                     <controls:MetroContentControl Content="{Binding QueryViewModel}"/>
                     <DockPanel>
@@ -35,11 +35,18 @@
                 </StackPanel>
             </Expander>
 
-            <Grid Grid.Row="1" Margin="10">
+            <Grid Grid.Row="1" Margin="5">
                 <Border BorderBrush="{StaticResource AccentColorBrush}" BorderThickness="1">
                     <StackPanel Orientation="Horizontal" Margin="10">
                         <TextBlock Text="Quick commands: " VerticalAlignment="Center"/>
                         <Button Content="Mark All as Read" Command="{Binding MarkAllAsRead}"/>
+                        
+                        <StackPanel Margin="10,0,0,0" Orientation="Horizontal">
+                            <TextBlock Text="Sorted by: " VerticalAlignment="Center"/>
+                            <ItemsControl ItemsSource="{Binding Source={StaticResource tradesListSource}, Path=SortDescriptions}" 
+                                          VerticalAlignment="Center"
+                                          DisplayMemberPath="PropertyName"/>
+                        </StackPanel>
                     </StackPanel>
                 </Border>
             </Grid>
