@@ -13,6 +13,7 @@
         {
             Container.RegisterType<ItemsCache, ItemsCache>(new ContainerControlledLifetimeManager());
             Container.RegisterType<IDialogCoordinator, DialogCoordinator>(new ContainerControlledLifetimeManager());
+            Container.RegisterType<IPoePriceCalculcator, PoePriceCalculcator>(new ContainerControlledLifetimeManager());
 
             Container
                     .RegisterType<MainWindowViewModel, MainWindowViewModel>()

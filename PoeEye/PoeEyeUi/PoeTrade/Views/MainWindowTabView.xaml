@@ -8,6 +8,16 @@
                     xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit">
     <DataTemplate DataType="{x:Type viewModels:MainWindowTabViewModel}">
         <Grid Margin="0, 10, 0, 10">
+            
+            <Grid.Resources>
+                <CollectionViewSource x:Key='tradesListSource' Source="{Binding TradesListViewModel.TradesList}">
+                    <CollectionViewSource.SortDescriptions>
+                        <componentModel:SortDescription PropertyName="PriceInChaosOrbs" Direction="Ascending" />
+                    </CollectionViewSource.SortDescriptions>
+
+                </CollectionViewSource>
+            </Grid.Resources>
+            
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
@@ -26,11 +36,11 @@
 
             <Image Grid.Row="1" 
                    Source="pack://application:,,,/Resources/mainIcon.png"
-                   Opacity="0.4"/>
+                   Opacity="0.2"/>
             
             <ItemsControl Grid.Row="1" 
                           Margin="15" 
-                          ItemsSource="{Binding TradesListViewModel.TradesList}"
+                          ItemsSource="{Binding Source={StaticResource tradesListSource}}"
                           Style="{StaticResource VirtualizedItemsControlStyle}">
             </ItemsControl>
         </Grid>

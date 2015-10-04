@@ -115,6 +115,7 @@
     <Compile Include="Common\IPoeItemType.cs" />
     <Compile Include="Common\IPoeLinksInfo.cs" />
     <Compile Include="Common\PoeCurrency.cs" />
+    <Compile Include="Common\PoeCurrencyType.cs" />
     <Compile Include="Common\PoeItem.cs" />
     <Compile Include="Common\PoeItemEqualityComparer.cs" />
     <Compile Include="Common\PoeItemRarity.cs" />

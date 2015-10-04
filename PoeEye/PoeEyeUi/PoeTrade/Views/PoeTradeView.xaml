@@ -243,6 +243,7 @@
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="Auto" />
@@ -250,10 +251,15 @@
 
                             <TextBlock Grid.Column="0"
                                        Text="{Binding Path=Price, Mode=OneWay, StringFormat='Buyout: {0}'}" />
-                            <TextBlock Grid.Column="2"
+
+                            <TextBlock Grid.Column="1"
+                                       Text="{Binding Path=PriceInChaosOrbs, Mode=OneWay, StringFormat=' (~ {0} chaos)'}" 
+                                       Visibility="{Binding PriceInChaosOrbs, Converter={StaticResource NullNotNullToVisibilityConverter}}"/>
+
+                            <TextBlock Grid.Column="3"
                                        Text="{Binding Path=UserIgn, Mode=OneWay, StringFormat='IGN: {0}'}" />
 
-                            <Button Grid.Column="3" 
+                            <Button Grid.Column="4" 
                                     Command="{Binding CopyPmMessageToClipboardCommand}"
                                     Width="30" Height="30" Style="{StaticResource MetroCircleButtonStyle}"
                                     ToolTip="Copy PM to clipboard">

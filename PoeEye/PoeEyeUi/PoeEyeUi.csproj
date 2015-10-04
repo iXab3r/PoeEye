@@ -257,8 +257,10 @@
     <Compile Include="MetroModels\DialogCoordinator.cs" />
     <Compile Include="MetroModels\IDialogCoordinator.cs" />
     <Compile Include="PoeTrade\Models\GenericSuggestionProvider.cs" />
+    <Compile Include="PoeTrade\Models\IPoePriceCalculcator.cs" />
     <Compile Include="PoeTrade\Models\ItemsCache.cs" />
     <Compile Include="PoeTrade\Models\PoeItemModeSuggestionProvider.cs" />
+    <Compile Include="PoeTrade\Models\PoePriceCalculcator.cs" />
     <Compile Include="PoeTrade\ViewModels\ApplicationUpdaterViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\PoeLinksInfoViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\ImageViewModel.cs" />

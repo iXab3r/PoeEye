@@ -13,6 +13,8 @@
 
     using MahApps.Metro.Controls.Dialogs;
 
+    using Models;
+
     using PoeShared.Common;
 
     using ReactiveUI;
@@ -20,21 +22,25 @@
     internal sealed class PoeTradeViewModel : ReactiveObject, IPoeTradeViewModel
     {
         private readonly IPoeItem poeItem;
+        private readonly IPoePriceCalculcator poePriceCalculcator;
         private PoeTradeState tradeState;
         private readonly ReactiveCommand<object> copyPmMessageToClipboardCommand;
         private readonly ReactiveCommand<object> markAsReadCommand;
 
         public PoeTradeViewModel(
             [NotNull] IPoeItem poeItem,
+            [NotNull] IPoePriceCalculcator poePriceCalculcator,
             [NotNull] IFactory<ImageViewModel, Uri> imageViewModelFactory,
             [NotNull] IFactory<PoeLinksInfoViewModel, IPoeLinksInfo> linksViewModelFactory)
         {
             Guard.ArgumentNotNull(() => poeItem);
+            Guard.ArgumentNotNull(() => poePriceCalculcator);
             Guard.ArgumentNotNull(() => imageViewModelFactory);
             Guard.ArgumentNotNull(() => linksViewModelFactory);
 
 
             this.poeItem = poeItem;
+            this.poePriceCalculcator = poePriceCalculcator;
             copyPmMessageToClipboardCommand = ReactiveCommand.Create();
             copyPmMessageToClipboardCommand.Subscribe(CopyPmMessageToClipboardCommandExecute);
 
@@ -51,6 +57,8 @@
             {
                 LinksViewModel = linksViewModelFactory.Create(poeItem.Links);
             }
+
+            PriceInChaosOrbs = poePriceCalculcator.GetEquivalentInChaosOrbs(poeItem.Price);
         }
 
         public PoeTradeState TradeState
@@ -68,6 +76,8 @@
         public string UserIgn => poeItem.UserIgn;
 
         public string Price => poeItem.Price;
+
+        public float? PriceInChaosOrbs { get; }
 
         public IPoeItemMod[] ImplicitMods => poeItem.Mods.Where(x => x.ModType == PoeModType.Implicit).ToArray();
 
