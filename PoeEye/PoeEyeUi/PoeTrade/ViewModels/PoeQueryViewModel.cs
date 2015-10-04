@@ -632,7 +632,7 @@
             {
                 args.AddRange(new[]
                 {
-                    CreateArgument("impl", ImplicitModViewModel.SelectedMod.CodeName),
+                    CreateArgument("impl", ImplicitModViewModel.SelectedMod),
                     CreateArgument("impl_min", ImplicitModViewModel.Min),
                     CreateArgument("impl_max", ImplicitModViewModel.Max)
                 });
@@ -661,14 +661,19 @@
             return result;
         }
 
-        private IPoeQueryArgument CreateModArgument(IPoeItemMod mod, float? min, float? max)
+        private IPoeQueryArgument CreateModArgument(string modName, float? min, float? max)
         {
-            var arg = new PoeQueryRangeModArgument(mod.CodeName)
+            var arg = new PoeQueryRangeModArgument(modName)
             {
                 Min = min,
                 Max = max
             };
             return arg;
+        }
+
+        private IPoeQueryArgument CreateModArgument(IPoeItemMod mod, float? min, float? max)
+        {
+            return CreateModArgument(mod.CodeName, min, max);
         }
 
         private IPoeQueryArgument CreateArgument<T>(string name, T value)

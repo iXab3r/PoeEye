@@ -20,7 +20,7 @@
     internal sealed class PoeExplicitModsEditorViewModel
     {
         private readonly IFactory<PoeExplicitModViewModel, IPoeItemMod[]> modsViewModelsFactor;
-        private readonly ReactiveList<PoeExplicitModViewModel> modsCollection = new ReactiveList<PoeExplicitModViewModel>();
+        private readonly ReactiveList<PoeExplicitModViewModel> modsCollection = new ReactiveList<PoeExplicitModViewModel>() {ChangeTrackingEnabled = true};
         private readonly ReactiveCommand<object> addModCommand = ReactiveCommand.Create();
         private readonly ReactiveCommand<object> removeModCommand = ReactiveCommand.Create();
 

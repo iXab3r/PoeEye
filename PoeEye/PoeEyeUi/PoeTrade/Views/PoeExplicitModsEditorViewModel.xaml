@@ -11,7 +11,7 @@
 
 
             <ItemsControl Grid.Column="0" 
-                          ItemsSource="{Binding Mods}" Style="{StaticResource VirtualizedItemsControlStyle}">
+                          ItemsSource="{Binding Mods}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <Grid>

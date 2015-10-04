@@ -15,9 +15,7 @@
 
             <wpfControls:AutoCompleteTextBox  Grid.Column="0"
                                               Provider="{Binding SuggestionProvider}"
-                                              SelectedItem="{Binding SelectedMod, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                                              DisplayMember="Name"
-                                              
+                                              Text="{Binding SelectedMod, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                               Margin="10,0,10,0"
                                               Watermark="any">
             </wpfControls:AutoCompleteTextBox>

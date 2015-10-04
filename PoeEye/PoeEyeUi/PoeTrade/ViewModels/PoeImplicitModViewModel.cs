@@ -23,23 +23,27 @@
 
         private float? min;
 
-        private IPoeItemMod selectedMod;
+        private string selectedMod;
 
         public PoeImplicitModViewModel(
                 [NotNull] IPoeQueryInfoProvider queryInfoProvider,
-                [NotNull] IFactory<PoeItemModeSuggestionProvider, IPoeItemMod[]> suggestionProviderFactory)
+                [NotNull] IFactory<GenericSuggestionProvider, string[]> suggestionProviderFactory)
         {
             Guard.ArgumentNotNull(() => queryInfoProvider);
 
-            KnownMods = queryInfoProvider.ModsList.Where(x => x.ModType == PoeModType.Implicit).ToArray();
+            KnownMods = queryInfoProvider
+                .ModsList
+                .Where(x => x.ModType == PoeModType.Implicit)
+                .Select(x => x.Name)
+                .ToArray();
             SuggestionProvider = suggestionProviderFactory.Create(KnownMods);
         }
 
-        public IPoeItemMod[] KnownMods { get; }
+        public string[] KnownMods { get; }
 
         public ISuggestionProvider SuggestionProvider { get; }
 
-        public IPoeItemMod SelectedMod
+        public string SelectedMod
         {
             get { return selectedMod; }
             set { this.RaiseAndSetIfChanged(ref selectedMod, value); }
