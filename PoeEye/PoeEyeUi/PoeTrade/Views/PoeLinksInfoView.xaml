@@ -28,7 +28,7 @@
 
                 <Style TargetType="Rectangle" x:Key="VerticalLink">
                     <Setter Property="Width" Value="6"/>
-                    <Setter Property="Height" Value="20"/>
+                    <Setter Property="Height" Value="24"/>
                     <Setter Property="Fill" Value="Yellow"/>
                 </Style>
 
@@ -38,13 +38,16 @@
                     <Setter Property="StrokeThickness" Value="4"/>
                     <Style.Triggers>
                         <Trigger Property="Tag" Value="R">
-                            <Setter Property="Stroke" Value="IndianRed"></Setter>
+                            <Setter Property="Stroke" Value="IndianRed"/>
                         </Trigger>
                         <Trigger Property="Tag" Value="G">
-                            <Setter Property="Stroke" Value="DarkOliveGreen"></Setter>
+                            <Setter Property="Stroke" Value="DarkOliveGreen"/>
                         </Trigger>
                         <Trigger Property="Tag" Value="B">
-                            <Setter Property="Stroke" Value="CornflowerBlue"></Setter>
+                            <Setter Property="Stroke" Value="CornflowerBlue"/>
+                        </Trigger>
+                        <Trigger Property="Tag" Value="W">
+                            <Setter Property="Stroke" Value="White"/>
                         </Trigger>
                     </Style.Triggers>
                 </Style>
