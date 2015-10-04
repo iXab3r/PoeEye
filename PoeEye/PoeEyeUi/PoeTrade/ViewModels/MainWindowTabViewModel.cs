@@ -119,6 +119,7 @@
             RecheckTimeout = TimeSpan.FromSeconds(30);
             TradesListViewModel.ClearTradesList();
             TradesListViewModel.Query = query;
+            QueryViewModel.IsExpanded = false;
         }
 
 

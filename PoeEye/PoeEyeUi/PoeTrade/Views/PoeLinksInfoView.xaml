@@ -5,8 +5,116 @@
                     xmlns:common="clr-namespace:PoeShared.Common;assembly=PoeShared"
                     xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls">
 
-    <DataTemplate DataType="{x:Type common:PoeLinksInfo}">
-        <TextBlock TextWrapping="WrapWithOverflow" Text="{Binding RawSockets}" FontSize="24"/>
+    <DataTemplate DataType="{x:Type viewModels:PoeLinksInfoViewModel}">
+        <Grid>
+            <Grid.Resources>
+                <Style TargetType="Label" BasedOn="{StaticResource {x:Type Label}}">
+                    <Setter Property="FontSize" Value="30"/>
+                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                    <Setter Property="VerticalContentAlignment" Value="Center"/>
+                    <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                    <Setter Property="VerticalAlignment" Value="Stretch"/>
+                    
+                    <Style.Triggers>
+                        
+                    </Style.Triggers>
+                </Style>
+                
+                <Style TargetType="Rectangle" x:Key="HorizontalLink">
+                    <Setter Property="Width" Value="20"/>
+                    <Setter Property="Height" Value="6"/>
+                    <Setter Property="Fill" Value="Yellow"/>
+                </Style>
+
+                <Style TargetType="Rectangle" x:Key="VerticalLink">
+                    <Setter Property="Width" Value="6"/>
+                    <Setter Property="Height" Value="20"/>
+                    <Setter Property="Fill" Value="Yellow"/>
+                </Style>
+
+                <Style TargetType="Ellipse">
+                    <Setter Property="Width" Value="30"/>
+                    <Setter Property="Height" Value="30"/>
+                    <Setter Property="StrokeThickness" Value="4"/>
+                    <Style.Triggers>
+                        <Trigger Property="Tag" Value="R">
+                            <Setter Property="Stroke" Value="IndianRed"></Setter>
+                        </Trigger>
+                        <Trigger Property="Tag" Value="G">
+                            <Setter Property="Stroke" Value="DarkOliveGreen"></Setter>
+                        </Trigger>
+                        <Trigger Property="Tag" Value="B">
+                            <Setter Property="Stroke" Value="CornflowerBlue"></Setter>
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </Grid.Resources>
+            
+            <Grid.RowDefinitions>
+                <RowDefinition Height="30*"/>
+                <RowDefinition Height="30*"/>
+                <RowDefinition Height="30*"/>
+            </Grid.RowDefinitions>
+            
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="30*"/>
+                <ColumnDefinition Width="30*"/>
+            </Grid.ColumnDefinitions>
+            
+            <!-- Links -->
+
+            <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
+                       Visibility="{Binding Link1, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <Rectangle Style="{StaticResource HorizontalLink}" />
+            </Label>
+
+            <Label Grid.Row="0" Grid.Column="1" Grid.RowSpan="2"
+                       Visibility="{Binding Link2, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <Rectangle Style="{StaticResource VerticalLink}" />
+            </Label>
+
+            <Label Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+                       Visibility="{Binding Link3, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <Rectangle Style="{StaticResource HorizontalLink}" />
+            </Label>
+
+            <Label Grid.Row="1"  Grid.Column="0" Grid.RowSpan="2"
+                       Visibility="{Binding Link4, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <Rectangle Style="{StaticResource VerticalLink}" />
+            </Label>
+
+            <Label Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
+                       Visibility="{Binding Link5, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <Rectangle Style="{StaticResource HorizontalLink}" />
+            </Label>
+
+            <!-- Soekets -->
+
+            <Label Grid.Row="0" Grid.Column="0" Visibility="{Binding Socket1, Converter={StaticResource NullNotNullToVisibilityConverter}}">
+                <Ellipse Tag="{Binding Socket1}" />
+            </Label>
+
+            <Label Grid.Row="0" Grid.Column="1" Visibility="{Binding Socket2, Converter={StaticResource NullNotNullToVisibilityConverter}}">
+                <Ellipse Tag="{Binding Socket2}" />
+            </Label>
+
+            <Label Grid.Row="1" Grid.Column="1" Visibility="{Binding Socket3, Converter={StaticResource NullNotNullToVisibilityConverter}}">
+                <Ellipse Tag="{Binding Socket3}" />
+            </Label>
+
+            <Label Grid.Row="1" Grid.Column="0" Visibility="{Binding Socket4, Converter={StaticResource NullNotNullToVisibilityConverter}}">
+                <Ellipse Tag="{Binding Socket4}"  />
+            </Label>
+
+            <Label Grid.Row="2" Grid.Column="0" Visibility="{Binding Socket5, Converter={StaticResource NullNotNullToVisibilityConverter}}">
+                <Ellipse Tag="{Binding Socket5}" />
+            </Label>
+
+            <Label Grid.Row="2" Grid.Column="1" Visibility="{Binding Socket6, Converter={StaticResource NullNotNullToVisibilityConverter}}">
+                <Ellipse Tag="{Binding Socket6}" />
+            </Label>
+
+        </Grid>
     </DataTemplate>
 
 </ResourceDictionary>

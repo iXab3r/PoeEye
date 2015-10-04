@@ -31,17 +31,8 @@
                 <ContentControl Grid.Row="1" Grid.Column="0" 
                                 Margin="0,0,10,0"
                                 Content="{Binding ImageViewModel}"/>
-                
-                <ContentControl Grid.Row="1" Grid.Column="0">
-                    <Label VerticalContentAlignment="Center" 
-                           HorizontalContentAlignment="Center"
-                           Content="{Binding Trade.Links}"
-                           Foreground="{StaticResource AccentColorBrush}"
-                           BorderBrush="{StaticResource ControlBorderBrush}"
-                           FontWeight="Bold"
-                           BorderThickness="1"
-                           Margin="0,0,10,0"/>
-                </ContentControl>
+
+                <ContentControl Grid.Row="1" Grid.Column="0" Content="{Binding LinksViewModel}" Margin="0,0,10,0"/>
 
                 <ContentControl Grid.Row="0"  Grid.Column="1">
                     <Border BorderThickness="0,0,0,2" BorderBrush="{StaticResource ControlBorderBrush}">

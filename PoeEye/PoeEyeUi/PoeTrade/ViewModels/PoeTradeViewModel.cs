@@ -20,20 +20,21 @@
     internal sealed class PoeTradeViewModel : ReactiveObject, IPoeTradeViewModel
     {
         private readonly IPoeItem poeItem;
-        private readonly IFactory<ImageViewModel, Uri> imageViewModelFactory;
         private PoeTradeState tradeState;
         private readonly ReactiveCommand<object> copyPmMessageToClipboardCommand;
         private readonly ReactiveCommand<object> markAsReadCommand;
 
         public PoeTradeViewModel(
             [NotNull] IPoeItem poeItem,
-            [NotNull] IFactory<ImageViewModel, Uri> imageViewModelFactory )
+            [NotNull] IFactory<ImageViewModel, Uri> imageViewModelFactory,
+            [NotNull] IFactory<PoeLinksInfoViewModel, IPoeLinksInfo> linksViewModelFactory)
         {
             Guard.ArgumentNotNull(() => poeItem);
             Guard.ArgumentNotNull(() => imageViewModelFactory);
+            Guard.ArgumentNotNull(() => linksViewModelFactory);
+            
 
             this.poeItem = poeItem;
-            this.imageViewModelFactory = imageViewModelFactory;
             copyPmMessageToClipboardCommand = ReactiveCommand.Create();
             copyPmMessageToClipboardCommand.Subscribe(CopyPmMessageToClipboardCommandExecute);
 
@@ -45,6 +46,8 @@
             {
                 ImageViewModel = imageViewModelFactory.Create(imageUri);
             }
+
+            LinksViewModel = linksViewModelFactory.Create(poeItem.Links);
         }
 
         public PoeTradeState TradeState
@@ -54,6 +57,8 @@
         }
 
         public ImageViewModel ImageViewModel { get; }
+
+        public PoeLinksInfoViewModel LinksViewModel { get; }
 
         public string Name => poeItem.ItemName;
 

@@ -13,7 +13,7 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <Expander Header="Query" IsExpanded="true">
+            <Expander Header="Query" IsExpanded="{Binding QueryViewModel.IsExpanded}">
                 <StackPanel>
                     <controls:MetroContentControl Content="{Binding QueryViewModel}"/>
                     <DockPanel>

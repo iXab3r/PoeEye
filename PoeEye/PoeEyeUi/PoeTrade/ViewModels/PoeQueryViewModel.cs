@@ -15,11 +15,12 @@
 
     internal sealed class PoeQueryViewModel : ReactiveObject
     {
-        public static IPoeItemType AnyItemType = new PoeItemType() {Name = AnyKey};
-
         private const string AnyKey = "any";
-        private readonly IPoeQueryInfoProvider queryInfoProvider;
+        public static IPoeItemType AnyItemType = new PoeItemType {Name = AnyKey};
         private readonly PoeExplicitModsEditorViewModel poeExplicitModsEditorViewModel;
+        private readonly IPoeQueryInfoProvider queryInfoProvider;
+
+        private bool alternativeArt;
         private float? apsMax;
 
         private float? apsMin;
@@ -39,10 +40,6 @@
         private float? buyoutMin;
 
         private bool buyoutOnly;
-
-        private bool alternativeArt;
-
-        private bool normalizeQuality;
 
         private float? critMax;
 
@@ -72,9 +69,13 @@
 
         private int? incQuantityMin;
 
+        private bool isExpanded = true;
+
         private string itemBase;
 
         private string itemName;
+
+        private IPoeItemType itemType;
 
         private string league;
 
@@ -93,6 +94,8 @@
         private int? linkMax;
 
         private int? linkMin;
+
+        private bool normalizeQuality;
 
         private bool onlineOnly;
 
@@ -137,14 +140,14 @@
         private int? socketsW;
 
         public PoeQueryViewModel(
-                [NotNull] IPoeQueryInfoProvider queryInfoProvider,
-                [NotNull] PoeImplicitModViewModel poeImplicitModViewModel,
-                [NotNull] PoeExplicitModsEditorViewModel poeExplicitModsEditorViewModel)
+            [NotNull] IPoeQueryInfoProvider queryInfoProvider,
+            [NotNull] PoeImplicitModViewModel poeImplicitModViewModel,
+            [NotNull] PoeExplicitModsEditorViewModel poeExplicitModsEditorViewModel)
         {
             Guard.ArgumentNotNull(() => queryInfoProvider);
             Guard.ArgumentNotNull(() => poeImplicitModViewModel);
             Guard.ArgumentNotNull(() => poeExplicitModsEditorViewModel);
-            
+
             this.queryInfoProvider = queryInfoProvider;
             this.poeExplicitModsEditorViewModel = poeExplicitModsEditorViewModel;
 
@@ -512,6 +515,12 @@
             set { this.RaiseAndSetIfChanged(ref linkedW, value); }
         }
 
+        public bool IsExpanded
+        {
+            get { return isExpanded; }
+            set { this.RaiseAndSetIfChanged(ref isExpanded, value); }
+        }
+
         public string[] LeaguesList { get; }
 
         public IPoeCurrency[] CurrenciesList { get; }
@@ -523,8 +532,6 @@
         public IPoeItemType[] ItemTypes { get; }
 
         public Func<IPoeQuery> PoeQueryBuilder => ConstructQuery;
-
-        private IPoeItemType itemType;
 
         public IPoeItemType ItemType
         {
@@ -593,8 +600,7 @@
                 CreateArgument("linked_g", linkedG),
                 CreateArgument("linked_b", linkedB),
                 CreateArgument("linked_w", linkedW),
-
-                CreateArgument("type", itemType?.CodeName),
+                CreateArgument("type", itemType?.CodeName)
             };
 
             if (ImplicitModViewModel.SelectedMod != null)
@@ -603,24 +609,24 @@
                 {
                     CreateArgument("impl", ImplicitModViewModel.SelectedMod.CodeName),
                     CreateArgument("impl_min", ImplicitModViewModel.Min),
-                    CreateArgument("impl_max", ImplicitModViewModel.Max),
+                    CreateArgument("impl_max", ImplicitModViewModel.Max)
                 });
             }
 
             args.AddRange(new[]
-                {
-                    CreateArgument("mods", string.Empty),
-                    CreateArgument("modexclude", string.Empty),
-                    CreateArgument("modmin", string.Empty),
-                    CreateArgument("modmax", string.Empty),
-                });
+            {
+                CreateArgument("mods", string.Empty),
+                CreateArgument("modexclude", string.Empty),
+                CreateArgument("modmin", string.Empty),
+                CreateArgument("modmax", string.Empty)
+            });
 
             foreach (var poeExplicitModViewModel in ExplicitModsEditorViewModel.Mods.Where(x => x.SelectedMod != null))
             {
                 var modArg = CreateModArgument(
-                                            poeExplicitModViewModel.SelectedMod,
-                                            poeExplicitModViewModel.Min,
-                                            poeExplicitModViewModel.Max);
+                    poeExplicitModViewModel.SelectedMod,
+                    poeExplicitModViewModel.Min,
+                    poeExplicitModViewModel.Max);
                 args.Add(modArg);
             }
 
@@ -635,7 +641,7 @@
             var arg = new PoeQueryRangeModArgument(mod.CodeName)
             {
                 Min = min,
-                Max = max,
+                Max = max
             };
             return arg;
         }
@@ -649,11 +655,13 @@
 
             if (typeof (T) == typeof (int?))
             {
-                return new PoeQueryIntArgument(name, value is int ? ConvertToType<int>(value) : (int) ConvertToType<int?>(value));
+                return new PoeQueryIntArgument(name,
+                    value is int ? ConvertToType<int>(value) : (int) ConvertToType<int?>(value));
             }
             if (typeof (T) == typeof (float?))
             {
-                return new PoeQueryFloatArgument(name, value is float ? ConvertToType<float>(value) :(float) ConvertToType<float?>(value));
+                return new PoeQueryFloatArgument(name,
+                    value is float ? ConvertToType<float>(value) : (float) ConvertToType<float?>(value));
             }
             if (typeof (T) == typeof (string))
             {
