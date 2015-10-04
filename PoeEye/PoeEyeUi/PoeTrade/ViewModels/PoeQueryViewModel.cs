@@ -19,6 +19,7 @@
     using ReactiveUI;
 
     using WpfControls;
+    using WpfControls.Editors;
 
     internal sealed class PoeQueryViewModel : ReactiveObject
     {

@@ -92,7 +92,7 @@
                                                   Provider="{Binding NameSuggestionProvider}"
                                                   Width="NaN" 
                                                   HorizontalContentAlignment="Left"
-                                                  Text="{Binding ItemName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                                  SelectedItem="{Binding ItemName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                                                   Margin="0,0,10,0"
                                                   Height="26"
                                                   Watermark="item name, e.g. Temple map">

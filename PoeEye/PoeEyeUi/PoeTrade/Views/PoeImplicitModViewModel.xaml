@@ -15,7 +15,7 @@
                                               SelectedItem="{Binding SelectedMod, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                               DisplayMember="Name"
                                               Margin="10,0,10,0"
-                                              Watermark="any">
+                                              Watermark="start typing to get compatible mods list">
             </wpfControls:AutoCompleteTextBox>
 
             <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="10,0,10,0">

@@ -16,6 +16,7 @@
     using ReactiveUI;
 
     using WpfControls;
+    using WpfControls.Editors;
 
     internal sealed class PoeImplicitModViewModel : ReactiveObject
     {

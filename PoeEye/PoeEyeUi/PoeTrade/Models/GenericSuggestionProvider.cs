@@ -12,6 +12,7 @@
     using JetBrains.Annotations;
 
     using WpfControls;
+    using WpfControls.Editors;
 
     internal sealed class GenericSuggestionProvider : ISuggestionProvider
     {
