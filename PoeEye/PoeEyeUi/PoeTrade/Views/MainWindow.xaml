@@ -69,7 +69,7 @@
 
                             <TextBlock Grid.Column="2" 
                                        FontSize="16" Margin="10,0,10,0"
-                                       VerticalAlignment="Center">
+                                       VerticalAlignment="Top">
                                 <TextBlock.Inlines>
                                     <Run Text="{Binding NewItemsCount, Mode=OneWay}" Foreground="{StaticResource PoeTradeNewItemColor}"/> /
                                     <Run Text="{Binding RemovedItemsCount, Mode=OneWay}" Foreground="{StaticResource PoeTradeRemovedItemColor}"/> /

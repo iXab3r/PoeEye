@@ -703,5 +703,51 @@
         {
             return (T) Convert.ChangeType(value, typeof (T));
         }
+
+        private string[] FormatQueryDescriptionArray()
+        {
+            var blackList = new[]
+            {
+                nameof(League),
+            };
+            var nullableProperties = typeof (PoeQueryViewModel)
+                .GetProperties()
+                .Where(x => !blackList.Contains(x.Name))
+                .Where(x => x.PropertyType == typeof (int?)
+                            || x.PropertyType == typeof (float?)
+                            || x.PropertyType == typeof (string)
+                            || x.PropertyType == typeof (IPoeItemType)
+                            || x.PropertyType == typeof(PoeItemRarity?))
+                .Where(x => x.CanRead)
+                .ToArray();
+
+            var result = new List<string>();
+            foreach (var nullableProperty in nullableProperties)
+            {
+                var value = nullableProperty.GetValue(this);
+                if (value == null)
+                {
+                    continue;
+                }
+                if (value is string && string.IsNullOrWhiteSpace(value as string))
+                {
+                    continue;
+                }
+
+                var formattedValue = $"{nullableProperty.Name}: {value}";
+                result.Add(formattedValue);
+            }
+            return result.ToArray();
+        }
+
+        public string FormatQueryDescription()
+        {
+            var descriptions = FormatQueryDescriptionArray();
+            if (!descriptions.Any())
+            {
+                return null;
+            }
+            return String.Join("\r\n", descriptions);
+        }
     }
 }

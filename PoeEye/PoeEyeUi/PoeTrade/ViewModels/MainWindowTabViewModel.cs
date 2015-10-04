@@ -107,9 +107,10 @@
 
         private void RebuildTabName()
         {
-            TabName = QueryViewModel.ItemName == null
+            var queryDescription = QueryViewModel.FormatQueryDescription(); 
+            TabName = string.IsNullOrWhiteSpace(queryDescription)
                 ? $"Tab #{tabIdx}"
-                : $"Tab #{tabIdx}:\r\n{QueryViewModel.ItemName}";
+                : $"Tab #{tabIdx}:\r\n{queryDescription}";
         }
 
         private void SearchCommandExecute(object arg)
