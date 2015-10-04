@@ -262,6 +262,7 @@
     <Compile Include="PoeTrade\Models\PoeItemModeSuggestionProvider.cs" />
     <Compile Include="PoeTrade\Models\PoePriceCalculcator.cs" />
     <Compile Include="PoeTrade\ViewModels\ApplicationUpdaterViewModel.cs" />
+    <Compile Include="PoeTrade\ViewModels\IPoeTradeViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\PoeLinksInfoViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\ImageViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\MainWindowTabViewModel.cs" />
@@ -277,7 +278,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="PoeTrade\PoeTradeState.cs" />
-    <Compile Include="PoeTrade\ViewModels\IPoeTradeViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\PoeTradeViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\PoeTradesListViewModel.cs" />
     <Compile Include="Prism\UiRegistrations.cs" />

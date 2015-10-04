@@ -18,6 +18,8 @@
     {
         private static int tabIdx = 0;
         private string tabName;
+        private readonly ReactiveCommand<object> searchCommand;
+        private readonly ReactiveCommand<object> markAllAsRead;
 
         public MainWindowTabViewModel(
             [NotNull] PoeTradesListViewModel tradesListViewModel,
@@ -29,10 +31,11 @@
             tabIdx++;
 
             TradesListViewModel = tradesListViewModel;
-            var command = ReactiveCommand.Create();
-            command.Subscribe(SearchCommandExecute);
+            searchCommand = ReactiveCommand.Create();
+            searchCommand.Subscribe(SearchCommandExecute);
 
-            SearchCommand = command;
+            markAllAsRead = ReactiveCommand.Create();
+            markAllAsRead.Subscribe(MarkAllAsReadExecute);
 
             tradesListViewModel
                 .WhenAnyValue(x => x.LastUpdateTimestamp)
@@ -71,7 +74,9 @@
 
         public PoeTradesListViewModel TradesListViewModel { get; }
 
-        public ICommand SearchCommand { get; }
+        public ICommand SearchCommand => searchCommand;
+
+        public ICommand MarkAllAsRead => markAllAsRead;
 
         public DateTime LastUpdateTimestamp => TradesListViewModel.LastUpdateTimestamp;
 
@@ -122,6 +127,12 @@
             QueryViewModel.IsExpanded = false;
         }
 
-
+        private void MarkAllAsReadExecute(object arg)
+        {
+            foreach (var trade in TradesListViewModel.TradesList)
+            {
+                trade.MarkAsReadCommand.Execute(null);
+            }
+        }
     }
 }
