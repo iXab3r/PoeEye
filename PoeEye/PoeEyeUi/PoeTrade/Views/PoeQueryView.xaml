@@ -3,7 +3,9 @@
                     xmlns:viewModels="clr-namespace:PoeEyeUi.PoeTrade.ViewModels"
                     xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
                     xmlns:converters="clr-namespace:PoeEyeUi.Converters"
-                    xmlns:wpfControls="http://wpfcontrols.com/">
+                    xmlns:wpfControls="http://wpfcontrols.com/"
+                    xmlns:System="clr-namespace:System;assembly=mscorlib"
+                    xmlns:common="clr-namespace:PoeShared.Common;assembly=PoeShared">
     <DataTemplate DataType="{x:Type viewModels:PoeQueryViewModel}">
         <Grid>
             <Grid.Resources>
@@ -28,6 +30,8 @@
             </Grid.Resources>
 
             <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="10"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="10"/>
                 <RowDefinition Height="Auto"/>
@@ -259,6 +263,63 @@
             </Grid>
 
             <Grid Row="14">
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="5" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="120"/>
+                    <ColumnDefinition Width="180"/>
+                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="180"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Row="0" Grid.Column="0" 
+                           Text="Quality" Style="{StaticResource TextBlockHeader}" />
+                <StackPanel Grid.Row="0" Grid.Column="1">
+                    <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}" Value="{Binding QualityMin, Converter={StaticResource NullableConverter}}"/>
+                    <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}" Value="{Binding QualityMax, Converter={StaticResource NullableConverter}}"/>
+                </StackPanel>
+
+
+                <TextBlock Grid.Row="0" Grid.Column="2" 
+                           Text="Gem\map level" Style="{StaticResource TextBlockHeader}" />
+                <StackPanel Grid.Row="0" Grid.Column="3" >
+                    <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}" Value="{Binding GemOrMapLevelMin, Converter={StaticResource NullableConverter}}"/>
+                    <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}" Value="{Binding GemOrMapLevelMax, Converter={StaticResource NullableConverter}}"/>
+                </StackPanel>
+
+                <TextBlock Grid.Row="2" Grid.Column="0" 
+                           Text="Inc. Quantity" Style="{StaticResource TextBlockHeader}" />
+                <StackPanel Grid.Row="2" Grid.Column="1" >
+                    <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}" Value="{Binding IncQuantityMin, Converter={StaticResource NullableConverter}}"/>
+                    <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}" Value="{Binding IncQuantityMax, Converter={StaticResource NullableConverter}}"/>
+                </StackPanel>
+
+                <TextBlock Grid.Row="2" Grid.Column="2" 
+                           Text="Rarity" Style="{StaticResource TextBlockHeader}" />
+                <StackPanel Grid.Row="2" Grid.Column="3" >
+                    <StackPanel.Resources>
+                        <ObjectDataProvider x:Key="PoeItemRarityFromEnum" MethodName="GetValues"
+                            ObjectType="{x:Type System:Enum}">
+                            <ObjectDataProvider.MethodParameters>
+                                <x:Type TypeName="common:PoeItemRarity"/>
+                            </ObjectDataProvider.MethodParameters>
+                        </ObjectDataProvider>
+                    </StackPanel.Resources>
+                    <ComboBox Style="{StaticResource QueryComboBox}"
+                              SelectedItem="{Binding ItemRarity}"
+                              Width="NaN"
+                              ItemsSource="{Binding Source={StaticResource PoeItemRarityFromEnum}}"
+                              controls:TextBoxHelper.Watermark="any" >    
+                    </ComboBox>
+                </StackPanel>
+            </Grid>
+
+            <Grid Row="16">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="100"/>
                     <ColumnDefinition Width="80"/>

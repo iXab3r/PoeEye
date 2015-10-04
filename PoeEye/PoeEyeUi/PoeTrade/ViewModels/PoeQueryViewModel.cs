@@ -146,6 +146,8 @@
 
         private int? socketsW;
 
+        private PoeItemRarity? itemRarity;
+
         public PoeQueryViewModel(
             [NotNull] IPoeQueryInfoProvider queryInfoProvider,
             [NotNull] PoeImplicitModViewModel poeImplicitModViewModel,
@@ -529,6 +531,12 @@
             set { this.RaiseAndSetIfChanged(ref linkedW, value); }
         }
 
+        public PoeItemRarity? ItemRarity
+        {
+            get { return itemRarity; }
+            set { this.RaiseAndSetIfChanged(ref itemRarity, value); }
+        }
+
         public bool IsExpanded
         {
             get { return isExpanded; }
@@ -616,7 +624,8 @@
                 CreateArgument("linked_g", linkedG),
                 CreateArgument("linked_b", linkedB),
                 CreateArgument("linked_w", linkedW),
-                CreateArgument("type", itemType?.CodeName)
+                CreateArgument("type", itemType?.CodeName),
+                CreateArgument("rarity", itemRarity?.ToString() ?? string.Empty),
             };
 
             if (ImplicitModViewModel.SelectedMod != null)
