@@ -10,6 +10,8 @@
 
     using JetBrains.Annotations;
 
+    using Models;
+
     using PoeShared.PoeTrade.Query;
 
     using ReactiveUI;
@@ -24,9 +26,11 @@
 
         public MainWindowTabViewModel(
             [NotNull] PoeTradesListViewModel tradesListViewModel,
+            [NotNull] IAudioNotificationsManager audioNotificationsManager,
             [NotNull] PoeQueryViewModel queryViewModel)
         {
             Guard.ArgumentNotNull(() => tradesListViewModel);
+            Guard.ArgumentNotNull(() => audioNotificationsManager);
             Guard.ArgumentNotNull(() => queryViewModel);
 
             tabIdx++;
@@ -60,11 +64,17 @@
                                                                      this.RaisePropertyChanged(nameof(NewItemsCount));
                                                                      this.RaisePropertyChanged(nameof(RemovedItemsCount));
                                                                      this.RaisePropertyChanged(nameof(NormalItemsCount));
+                                                                     this.RaisePropertyChanged(nameof(HasNewTrades));
                                                                  });
 
             TradesListViewModel
                 .WhenAnyValue(x => x.Query)
                 .Subscribe(_ => RebuildTabName());
+
+            this.WhenAnyValue(x => x.HasNewTrades)
+                .DistinctUntilChanged()
+                .Where(x => x == true)
+                .Subscribe(_ => audioNotificationsManager.PlayNotificationCommand.Execute(null));
         }
 
         public double RecheckTimeoutInSeconds
@@ -88,6 +98,8 @@
             get { return tabName; }
             set { this.RaiseAndSetIfChanged(ref tabName, value); }
         }
+
+        public bool HasNewTrades => NewItemsCount > 0;
 
         public int NewItemsCount
         {

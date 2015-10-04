@@ -11,32 +11,36 @@
 
     using JetBrains.Annotations;
 
+    using Models;
+
     using ReactiveUI;
 
     internal sealed class MainWindowViewModel : ReactiveObject
     {
-        private readonly TimeSpan UpdateTimeout = TimeSpan.FromSeconds(30);
+        private readonly ReactiveCommand<object> closeTabCommand;
+        private readonly ReactiveCommand<object> createNewTabCommand;
 
         private readonly IFactory<MainWindowTabViewModel> tabFactory;
-        private readonly ReactiveList<MainWindowTabViewModel> tabsList = new ReactiveList<MainWindowTabViewModel>();
+        private readonly TimeSpan UpdateTimeout = TimeSpan.FromSeconds(30);
+
+        private bool isMainWindowActive;
 
         private MainWindowTabViewModel selectedItem;
-        private readonly ReactiveCommand<object> createNewTabCommand;
-        private readonly ReactiveCommand<object> closeTabCommand;
 
         public MainWindowViewModel(
             [NotNull] IFactory<MainWindowTabViewModel> tabFactory,
-            [NotNull] ApplicationUpdaterViewModel applicationUpdaterViewModel)
+            [NotNull] ApplicationUpdaterViewModel applicationUpdaterViewModel,
+            [NotNull] IAudioNotificationsManager audioNotificationsManager)
         {
             Guard.ArgumentNotNull(() => tabFactory);
             Guard.ArgumentNotNull(() => applicationUpdaterViewModel);
-            
+            Guard.ArgumentNotNull(() => audioNotificationsManager);
 
             var executingAssembly = Assembly.GetExecutingAssembly();
             MainWindowTitle = $"{executingAssembly.GetName().Name} v{executingAssembly.GetName().Version}";
 
             this.tabFactory = tabFactory;
-            this.ApplicationUpdater = applicationUpdaterViewModel;
+            ApplicationUpdater = applicationUpdaterViewModel;
             createNewTabCommand = ReactiveCommand.Create();
             createNewTabCommand.Subscribe(CreateNewTabCommandExecuted);
 
@@ -46,12 +50,16 @@
             Observable
                 .Timer(DateTimeOffset.Now, UpdateTimeout)
                 .Subscribe(_ => applicationUpdaterViewModel.CheckForUpdatesCommand.Execute(this));
-            
-            this.tabsList
+
+            TabsList
                 .ItemsAdded
                 .Subscribe(x => SelectedItem = x);
 
             createNewTabCommand.Execute(null);
+
+            this.WhenAnyValue(x => x.IsMainWindowActive)
+                .DistinctUntilChanged()
+                .Subscribe(active => audioNotificationsManager.IsEnabled = !active);
         }
 
         public ICommand CreateNewTabCommand => createNewTabCommand;
@@ -60,9 +68,15 @@
 
         public ApplicationUpdaterViewModel ApplicationUpdater { get; }
 
-        public ReactiveList<MainWindowTabViewModel> TabsList => tabsList;
+        public ReactiveList<MainWindowTabViewModel> TabsList { get; } = new ReactiveList<MainWindowTabViewModel>();
 
         public string MainWindowTitle { get; }
+
+        public bool IsMainWindowActive
+        {
+            get { return isMainWindowActive; }
+            set { this.RaiseAndSetIfChanged(ref isMainWindowActive, value); }
+        }
 
         public MainWindowTabViewModel SelectedItem
         {
@@ -73,7 +87,7 @@
         private void CreateNewTabCommandExecuted(object o)
         {
             var newTab = tabFactory.Create();
-            tabsList.Add(newTab);
+            TabsList.Add(newTab);
         }
 
         private void RemoveTabCommandExecuted(object o)
@@ -83,7 +97,7 @@
             {
                 return;
             }
-            tabsList.Remove(tab);
+            TabsList.Remove(tab);
         }
     }
 }

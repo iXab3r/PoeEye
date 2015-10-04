@@ -8,6 +8,7 @@
     using System.Reactive;
     using System.Reactive.Linq;
     using System.Windows.Data;
+    using System.Windows.Input;
     using System.Windows.Threading;
 
     using Factory;
@@ -15,6 +16,8 @@
     using Guards;
 
     using JetBrains.Annotations;
+
+    using Models;
 
     using PoeShared;
     using PoeShared.Common;
@@ -52,14 +55,14 @@
             this.clock = clock;
 
             this.WhenAnyValue(x => x.Query)
-                .DistinctUntilChanged()
-                .Where(x => x != null)
-                .Select(poeLiveHistoryFactory.Create)
-                .Do(OnNextHistoryProviderCreated)
-                .Select(x => x.ItemsPacks)
-                .Switch()
-                .ObserveOn(Dispatcher.CurrentDispatcher)
-                .Subscribe(OnNextItemsPackReceived);
+                                     .DistinctUntilChanged()
+                                     .Where(x => x != null)
+                                     .Select(poeLiveHistoryFactory.Create)
+                                     .Do(OnNextHistoryProviderCreated)
+                                     .Select(x => x.ItemsPacks)
+                                     .Switch()
+                                     .ObserveOn(Dispatcher.CurrentDispatcher)
+                                     .Subscribe(OnNextItemsPackReceived);
         }
 
         public ReactiveList<IPoeTradeViewModel> TradesList => tradesList;

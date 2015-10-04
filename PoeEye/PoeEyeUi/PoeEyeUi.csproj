@@ -243,8 +243,10 @@
     <Compile Include="MetroModels\DialogParticipation.cs" />
     <Compile Include="MetroModels\DialogCoordinator.cs" />
     <Compile Include="MetroModels\IDialogCoordinator.cs" />
+    <Compile Include="PoeTrade\Models\AudioNotificationsManager.cs" />
     <Compile Include="PoeTrade\Models\FuzzySearchService.cs" />
     <Compile Include="PoeTrade\Models\GenericSuggestionProvider.cs" />
+    <Compile Include="PoeTrade\Models\IAudioNotificationsManager.cs" />
     <Compile Include="PoeTrade\Models\IPoePriceCalculcator.cs" />
     <Compile Include="PoeTrade\Models\ItemsCache.cs" />
     <Compile Include="PoeTrade\Models\PoePriceCalculcator.cs" />
@@ -262,6 +264,9 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="ResourceKeys.cs" />
+    <Compile Include="Utilities\DataPiping.cs" />
+    <Compile Include="Utilities\DataPipe.cs" />
+    <Compile Include="Utilities\DataPipeCollection.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="PoeTrade\PoeTradeState.cs" />
@@ -284,6 +289,7 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">

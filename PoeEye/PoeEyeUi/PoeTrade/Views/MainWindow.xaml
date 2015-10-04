@@ -7,6 +7,7 @@
         xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
         xmlns:viewModels="clr-namespace:PoeEyeUi.PoeTrade.ViewModels"
         xmlns:metroModels="clr-namespace:PoeEyeUi.MetroModels"
+        xmlns:utilities="clr-namespace:PoeEyeUi.Utilities"
         mc:Ignorable="d"
         Title="{Binding MainWindowTitle}" 
         MinWidth="1000" 
@@ -18,6 +19,14 @@
         metroModels:DialogParticipation.Register="{Binding}">
 
     <Grid>
+
+        <utilities:DataPiping.DataPipes>
+            <utilities:DataPipeCollection>
+                <utilities:DataPipe Source="{Binding RelativeSource={RelativeSource AncestorType={x:Type controls:MetroWindow}}, Path=IsActive}"
+                         Target="{Binding Path=IsMainWindowActive, Mode=OneWayToSource}"/>
+            </utilities:DataPipeCollection>
+        </utilities:DataPiping.DataPipes>
+
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
@@ -54,30 +63,40 @@
                     <DataTemplate DataType="{x:Type viewModels:MainWindowTabViewModel}">
 
                         <Grid>
-
+                            
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="100*"/>
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
-                            <controls:ProgressRing Grid.Column="0"  
-                                                   Height="20" Width="20" IsActive="true" Foreground="{StaticResource TextBrush}"  Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}" />
 
-                            <TextBlock Grid.Column="1" 
-                                       Text="{Binding TabName}" FontSize="18" TextWrapping="Wrap" />
+                            <!-- tab header content -->
+                          
+                            <TextBlock Grid.Row="0" Grid.Column="1" 
+                                       Text="{Binding TabName}" FontSize="16" TextWrapping="Wrap" />
 
-                            <TextBlock Grid.Column="2" 
-                                       FontSize="16" Margin="10,0,10,0"
-                                       VerticalAlignment="Top">
-                                <TextBlock.Inlines>
-                                    <Run Text="{Binding NewItemsCount, Mode=OneWay}" Foreground="{StaticResource PoeTradeNewItemColor}"/> /
-                                    <Run Text="{Binding RemovedItemsCount, Mode=OneWay}" Foreground="{StaticResource PoeTradeRemovedItemColor}"/> /
-                                    <Run Text="{Binding NormalItemsCount, Mode=OneWay}"/>
-                                </TextBlock.Inlines>
-                            </TextBlock>
+                            <StackPanel Grid.Row="0" Grid.Column="2" 
+                                        Orientation="Horizontal"
+                                        VerticalAlignment="Center">
+                                
+                                <TextBlock 
+                                       FontSize="16" Margin="10,0,10,0">
+                                    <TextBlock.Inlines>
+                                        <Run Text="{Binding NewItemsCount, Mode=OneWay}" Foreground="{StaticResource PoeTradeNewItemColor}"/> /
+                                        <Run Text="{Binding RemovedItemsCount, Mode=OneWay}" Foreground="{StaticResource PoeTradeRemovedItemColor}"/> /
+                                        <Run Text="{Binding NormalItemsCount, Mode=OneWay}"/>
+                                    </TextBlock.Inlines>
+                                </TextBlock>
+                            </StackPanel>
+                           
 
-                            <Button Grid.Column="3" 
+                            <Button Grid.Row="0" Grid.Column="3" 
                                     Width="24" Height="24"
                                     Style="{StaticResource MetroCircleButtonStyle}"
                                     HorizontalAlignment="Right"
@@ -89,6 +108,11 @@
                                     </Rectangle.OpacityMask>
                                 </Rectangle>
                             </Button>
+
+                            <controls:MetroProgressBar Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4" 
+                                                       Foreground="{StaticResource TextBrush}"  
+                                                       IsIndeterminate="true"
+                                                       Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}" /> 
                         </Grid>
                     </DataTemplate>
                 </controls:MetroAnimatedTabControl.ItemTemplate>
@@ -145,6 +169,11 @@
                     CommandParameter="{Binding}"
                     IsEnabled="{Binding ApplicationUpdater.IsBusy, Converter={StaticResource InvertedBoolToVisibilityConverter}}"
                     Content="Check for updates" />
+
+                <Button 
+                    CommandParameter="{Binding}"
+                    Content="Sound">
+                </Button>
             </StackPanel>
         </controls:WindowCommands>
     </controls:MetroWindow.RightWindowCommands>

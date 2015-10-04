@@ -19,6 +19,8 @@
             Container.RegisterType<IDialogCoordinator, DialogCoordinator>(new ContainerControlledLifetimeManager());
             Container.RegisterType<IPoePriceCalculcator, PoePriceCalculcator>(new ContainerControlledLifetimeManager());
 
+            Container.RegisterType<IAudioNotificationsManager, AudioNotificationsManager>(new ContainerControlledLifetimeManager());
+            
             Container
                     .RegisterType<MainWindowViewModel, MainWindowViewModel>()
                     .RegisterType<MainWindowTabViewModel, MainWindowTabViewModel>()
