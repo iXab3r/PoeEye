@@ -18,11 +18,13 @@
 
     internal sealed class MainWindowTabViewModel : ReactiveObject
     {
-        private static int tabIdx = 0;
+        private static int tabIdx;
+        private readonly ReactiveCommand<object> markAllAsRead;
+        private readonly ReactiveCommand<object> searchCommand;
+
+        private bool audioNotificationEnabled;
 
         private string tabName;
-        private readonly ReactiveCommand<object> searchCommand;
-        private readonly ReactiveCommand<object> markAllAsRead;
 
         public MainWindowTabViewModel(
             [NotNull] PoeTradesListViewModel tradesListViewModel,
@@ -56,16 +58,15 @@
 
             QueryViewModel = queryViewModel;
 
-            Observable.Merge(
-                TradesListViewModel.TradesList.ItemChanged.Select(x => Unit.Default),
-                TradesListViewModel.TradesList.Changed.Select(x => Unit.Default))
-                .Subscribe(_ =>
-                                                                 {
-                                                                     this.RaisePropertyChanged(nameof(NewItemsCount));
-                                                                     this.RaisePropertyChanged(nameof(RemovedItemsCount));
-                                                                     this.RaisePropertyChanged(nameof(NormalItemsCount));
-                                                                     this.RaisePropertyChanged(nameof(HasNewTrades));
-                                                                 });
+            TradesListViewModel.TradesList.ItemChanged.Select(x => Unit.Default)
+                               .Merge(TradesListViewModel.TradesList.Changed.Select(x => Unit.Default))
+                               .Subscribe(_ =>
+                                          {
+                                              this.RaisePropertyChanged(nameof(NewItemsCount));
+                                              this.RaisePropertyChanged(nameof(RemovedItemsCount));
+                                              this.RaisePropertyChanged(nameof(NormalItemsCount));
+                                              this.RaisePropertyChanged(nameof(HasNewTrades));
+                                          });
 
             TradesListViewModel
                 .WhenAnyValue(x => x.Query)
@@ -73,7 +74,7 @@
 
             this.WhenAnyValue(x => x.HasNewTrades)
                 .DistinctUntilChanged()
-                .Where(x => x == true)
+                .Where(x => x && audioNotificationEnabled)
                 .Subscribe(_ => audioNotificationsManager.PlayNotificationCommand.Execute(null));
         }
 
@@ -92,6 +93,12 @@
         public DateTime LastUpdateTimestamp => TradesListViewModel.LastUpdateTimestamp;
 
         public bool IsBusy => TradesListViewModel.IsBusy;
+
+        public bool AudioNotificationEnabled
+        {
+            get { return audioNotificationEnabled; }
+            set { this.RaiseAndSetIfChanged(ref audioNotificationEnabled, value); }
+        }
 
         public string TabName
         {
@@ -120,7 +127,7 @@
 
         private void RebuildTabName()
         {
-            var queryDescription = QueryViewModel.FormatQueryDescription(); 
+            var queryDescription = QueryViewModel.FormatQueryDescription();
             TabName = string.IsNullOrWhiteSpace(queryDescription)
                 ? $"Tab #{tabIdx}"
                 : $"Tab #{tabIdx}:\r\n{queryDescription}";

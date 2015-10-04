@@ -23,6 +23,8 @@
         private readonly IFactory<MainWindowTabViewModel> tabFactory;
         private readonly TimeSpan UpdateTimeout = TimeSpan.FromSeconds(30);
 
+        private bool audioNotificationsEnabled = true;
+
         private bool isMainWindowActive;
 
         private MainWindowTabViewModel selectedItem;
@@ -59,7 +61,7 @@
 
             this.WhenAnyValue(x => x.IsMainWindowActive)
                 .DistinctUntilChanged()
-                .Subscribe(active => audioNotificationsManager.IsEnabled = !active);
+                .Subscribe(active => audioNotificationsManager.IsEnabled = audioNotificationsEnabled && !active);
         }
 
         public ICommand CreateNewTabCommand => createNewTabCommand;
@@ -67,6 +69,12 @@
         public ICommand CloseTabCommand => closeTabCommand;
 
         public ApplicationUpdaterViewModel ApplicationUpdater { get; }
+
+        public bool AudioNotificationsEnabled
+        {
+            get { return audioNotificationsEnabled; }
+            set { this.RaiseAndSetIfChanged(ref audioNotificationsEnabled, value); }
+        }
 
         public ReactiveList<MainWindowTabViewModel> TabsList { get; } = new ReactiveList<MainWindowTabViewModel>();
 

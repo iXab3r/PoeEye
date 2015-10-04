@@ -35,20 +35,7 @@
 
         <ContentControl Grid.Row="0">
             <StackPanel HorizontalAlignment="Left" Orientation="Horizontal">
-                <Button Width="50"
-                        Height="50"
-                        Style="{DynamicResource MetroCircleButtonStyle}"
-                        Command="{Binding CreateNewTabCommand}">
 
-                    <Rectangle Width="20"
-                               Height="20"
-                               Fill="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Button}}}">
-                        <Rectangle.OpacityMask>
-                            <VisualBrush Stretch="Fill"
-                                         Visual="{DynamicResource appbar_newspaper_create}" />
-                        </Rectangle.OpacityMask>
-                    </Rectangle>
-                </Button>
             </StackPanel>
         </ContentControl>
 
@@ -63,12 +50,12 @@
                     <DataTemplate DataType="{x:Type viewModels:MainWindowTabViewModel}">
 
                         <Grid>
-                            
+
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="*"/>
                                 <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
-                            
+
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="100*"/>
                                 <ColumnDefinition Width="Auto"/>
@@ -77,14 +64,14 @@
                             </Grid.ColumnDefinitions>
 
                             <!-- tab header content -->
-                          
+
                             <TextBlock Grid.Row="0" Grid.Column="1" 
-                                       Text="{Binding TabName}" FontSize="16" TextWrapping="Wrap" />
+                                       Text="{Binding TabName}" FontSize="16" TextWrapping="Wrap" VerticalAlignment="Center"/>
 
                             <StackPanel Grid.Row="0" Grid.Column="2" 
                                         Orientation="Horizontal"
                                         VerticalAlignment="Center">
-                                
+
                                 <TextBlock 
                                        FontSize="16" Margin="10,0,10,0">
                                     <TextBlock.Inlines>
@@ -94,25 +81,43 @@
                                     </TextBlock.Inlines>
                                 </TextBlock>
                             </StackPanel>
-                           
 
-                            <Button Grid.Row="0" Grid.Column="3" 
+
+                            <StackPanel Grid.Row="0" Grid.Column="3" 
+                                        Orientation="Horizontal">
+
+                                <ToggleButton Width="40" Height="40"
+                                              Style="{DynamicResource MetroCircleToggleButtonStyle}"
+                                              ToolTip="Audio notifications for this tab"
+                                              IsChecked="{Binding AudioNotificationEnabled}" >
+                                    <Rectangle Width="20" Height="20" Fill="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ToggleButton}}}">
+                                        <Rectangle.OpacityMask>
+                                            <VisualBrush Stretch="Fill" Visual="{DynamicResource appbar_speakerphone}" />
+                                        </Rectangle.OpacityMask>
+                                    </Rectangle>
+                                </ToggleButton>
+
+                                <Button 
                                     Width="24" Height="24"
                                     Style="{StaticResource MetroCircleButtonStyle}"
                                     HorizontalAlignment="Right"
                                     Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type controls:MetroAnimatedTabControl}}, Path=DataContext.CloseTabCommand}"
                                     CommandParameter="{Binding}">
-                                <Rectangle Width="8" Height="8" Fill="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Button}}}">
-                                    <Rectangle.OpacityMask>
-                                        <VisualBrush Stretch="Fill" Visual="{DynamicResource appbar_close}" />
-                                    </Rectangle.OpacityMask>
-                                </Rectangle>
-                            </Button>
+                                    <Rectangle Width="8" Height="8" Fill="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Button}}}">
+                                        <Rectangle.OpacityMask>
+                                            <VisualBrush Stretch="Fill" Visual="{DynamicResource appbar_close}" />
+                                        </Rectangle.OpacityMask>
+                                    </Rectangle>
+                                </Button>
+
+                            </StackPanel>
+
+
 
                             <controls:MetroProgressBar Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4" 
                                                        Foreground="{StaticResource TextBrush}"  
                                                        IsIndeterminate="true"
-                                                       Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}" /> 
+                                                       Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}" />
                         </Grid>
                     </DataTemplate>
                 </controls:MetroAnimatedTabControl.ItemTemplate>
@@ -155,9 +160,25 @@
 
             </Grid>
         </Border>
-        
-        
+
+
     </Grid>
+
+    <controls:MetroWindow.LeftWindowCommands>
+        <controls:WindowCommands>
+            <StackPanel Orientation="Horizontal">
+
+                <Button 
+                        ToolTip="Create new tab"
+                        Command="{Binding CreateNewTabCommand}"
+                        Content="Create new tab"
+                        FontWeight="Bold">
+                </Button>
+            </StackPanel>
+
+        </controls:WindowCommands>
+
+    </controls:MetroWindow.LeftWindowCommands>
 
     <controls:MetroWindow.RightWindowCommands>
         <controls:WindowCommands>
@@ -170,10 +191,13 @@
                     IsEnabled="{Binding ApplicationUpdater.IsBusy, Converter={StaticResource InvertedBoolToVisibilityConverter}}"
                     Content="Check for updates" />
 
-                <Button 
-                    CommandParameter="{Binding}"
-                    Content="Sound">
-                </Button>
+                <StackPanel Orientation="Horizontal" Height="24">
+                    <TextBlock Text="Audio:" VerticalAlignment="Center"/>
+                    <CheckBox Height="16" Width="16" Opacity="0.5" Margin="5,0,0,0"
+                              VerticalAlignment="Center" VerticalContentAlignment="Center"
+                              ToolTip="Audio notification for new items" 
+                              IsChecked="{Binding AudioNotificationsEnabled}"/>
+                </StackPanel>
             </StackPanel>
         </controls:WindowCommands>
     </controls:MetroWindow.RightWindowCommands>
