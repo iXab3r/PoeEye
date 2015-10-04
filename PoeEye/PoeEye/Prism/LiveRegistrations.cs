@@ -22,15 +22,17 @@
         {
             Container
                 .RegisterType<IHttpClient, GenericHttpClient>();
-            
+
             Container
                 .RegisterType<IPoeApi, PoeTradeApi>()
                 .RegisterType<IConverter<NameValueCollection, string>, NameValueCollectionToQueryStringConverter>()
                 .RegisterType<IConverter<IPoeQuery, NameValueCollection>, PoeQueryConverter>()
-                .RegisterType<IPoeLiveHistoryProvider, PoeLiveHistoryProvider>()
-                .RegisterType<IPoeQueryInfoProvider, PoeQueryInfoProvider>()
-                .RegisterType<IClock, Clock>()
-                .RegisterType<IPoeTradeParser, PoeTradeParserModern>();
+                .RegisterType<IPoeLiveHistoryProvider, PoeLiveHistoryProvider>();
+
+            Container
+                .RegisterType<IClock, Clock>(new ContainerControlledLifetimeManager())
+                .RegisterType<IPoeTradeParser, PoeTradeParserModern>(new ContainerControlledLifetimeManager())
+                .RegisterType<IPoeQueryInfoProvider, PoeQueryInfoProvider>(new ContainerControlledLifetimeManager());
         }
     }
 }

@@ -4,8 +4,12 @@
 
     using Microsoft.Practices.Unity;
 
+    using PoeShared.Common;
+
     using PoeTrade.Models;
     using PoeTrade.ViewModels;
+
+    using WpfControls;
 
     internal sealed class UiRegistrations : UnityContainerExtension
     {
@@ -14,6 +18,9 @@
             Container.RegisterType<ItemsCache, ItemsCache>(new ContainerControlledLifetimeManager());
             Container.RegisterType<IDialogCoordinator, DialogCoordinator>(new ContainerControlledLifetimeManager());
             Container.RegisterType<IPoePriceCalculcator, PoePriceCalculcator>(new ContainerControlledLifetimeManager());
+
+            Container.RegisterType<GenericSuggestionProvider, GenericSuggestionProvider>(new ContainerControlledLifetimeManager());
+            Container.RegisterType<PoeItemModeSuggestionProvider, PoeItemModeSuggestionProvider>(new ContainerControlledLifetimeManager());
 
             Container
                     .RegisterType<MainWindowViewModel, MainWindowViewModel>()
