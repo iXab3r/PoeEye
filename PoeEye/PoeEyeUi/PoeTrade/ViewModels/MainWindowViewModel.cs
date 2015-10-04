@@ -1,6 +1,7 @@
 ﻿namespace PoeEyeUi.PoeTrade.ViewModels
 {
     using System;
+    using System.Reactive.Linq;
     using System.Reflection;
     using System.Windows.Input;
 
@@ -14,6 +15,8 @@
 
     internal sealed class MainWindowViewModel : ReactiveObject
     {
+        private readonly TimeSpan UpdateTimeout = TimeSpan.FromSeconds(30);
+
         private readonly IFactory<MainWindowTabViewModel> tabFactory;
         private readonly ReactiveList<MainWindowTabViewModel> tabsList = new ReactiveList<MainWindowTabViewModel>();
 
@@ -40,7 +43,10 @@
             closeTabCommand = ReactiveCommand.Create();
             closeTabCommand.Subscribe(RemoveTabCommandExecuted);
 
-
+            Observable
+                .Timer(DateTimeOffset.Now, UpdateTimeout)
+                .Subscribe(_ => applicationUpdaterViewModel.CheckForUpdatesCommand.Execute(this));
+            
             this.tabsList
                 .ItemsAdded
                 .Subscribe(x => SelectedItem = x);

@@ -1,5 +1,7 @@
 ﻿namespace PoeEyeUi.Prism
 {
+    using MetroModels;
+
     using Microsoft.Practices.Unity;
 
     using PoeTrade.Models;
@@ -10,6 +12,7 @@
         protected override void Initialize()
         {
             Container.RegisterType<ItemsCache, ItemsCache>(new ContainerControlledLifetimeManager());
+            Container.RegisterType<IDialogCoordinator, DialogCoordinator>(new ContainerControlledLifetimeManager());
 
             Container
                     .RegisterType<MainWindowViewModel, MainWindowViewModel>()

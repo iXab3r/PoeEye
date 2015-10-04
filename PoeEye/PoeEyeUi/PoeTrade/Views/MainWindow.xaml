@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:PoeEyeUi"
         xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
         xmlns:viewModels="clr-namespace:PoeEyeUi.PoeTrade.ViewModels"
+        xmlns:metroModels="clr-namespace:PoeEyeUi.MetroModels"
         mc:Ignorable="d"
         Title="{Binding MainWindowTitle}" 
         MinWidth="1000" 
@@ -13,7 +14,8 @@
         Width="1000" 
         Height="600" 
         d:DataContext="{d:DesignInstance viewModels:MainWindowViewModel}"
-        BorderThickness="1" BorderBrush="{StaticResource AccentColorBrush}">
+        BorderThickness="1" BorderBrush="{StaticResource AccentColorBrush}"
+        metroModels:DialogParticipation.Register="{Binding}">
 
     <Grid>
         <Grid.RowDefinitions>
@@ -50,9 +52,9 @@
                         TabStripPlacement="Left" >
                 <controls:MetroAnimatedTabControl.ItemTemplate>
                     <DataTemplate DataType="{x:Type viewModels:MainWindowTabViewModel}">
-                        
+
                         <Grid>
-                            
+
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="Auto"/>
@@ -101,24 +103,40 @@
                     <Setter Property="FontSize" Value="16"/>
                 </Style>
             </Border.Resources>
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"></ColumnDefinition>
-                        <ColumnDefinition Width="*"></ColumnDefinition>
-                        <ColumnDefinition Width="Auto"></ColumnDefinition>
-                    </Grid.ColumnDefinitions>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"></ColumnDefinition>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition Width="Auto"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
 
-                    <StackPanel Grid.Column="0" Orientation="Horizontal" Visibility="{Binding SelectedItem.IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}">
-                        <controls:ProgressRing Height="20" Width="20" IsActive="true" Foreground="{StaticResource TextBrush}"  />
-                        <TextBlock Text="Updating..."/>
-                    </StackPanel>
+                <StackPanel Grid.Column="0" Orientation="Horizontal" Visibility="{Binding SelectedItem.IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <controls:ProgressRing Height="20" Width="20" IsActive="true" Foreground="{StaticResource TextBrush}"  />
+                    <TextBlock Text="Updating..."/>
+                </StackPanel>
 
-                    <TextBlock Margin="10,0,0,0" Grid.Column="1" Text="{Binding SelectedItem.LastUpdateTimestamp, Mode=OneWay, StringFormat='Last update: {0:MMM dd HH:mm:ss.fff}'}"/>
-                    
-                    <TextBlock Margin="10,0,0,0" Grid.Column="2" Text="{Binding SelectedItem.RecheckTimeout, Mode=OneWay, StringFormat='Recheck timeout: {0}'}"/>
-                </Grid>
+                <TextBlock Margin="10,0,0,0" Grid.Column="1" Text="{Binding SelectedItem.LastUpdateTimestamp, Mode=OneWay, StringFormat='Last update: {0:MMM dd HH:mm:ss.fff}'}"/>
+
+                <TextBlock Margin="10,0,0,0" Grid.Column="2" Text="{Binding SelectedItem.RecheckTimeout, Mode=OneWay, StringFormat='Recheck timeout: {0}'}"/>
+            </Grid>
         </Border>
+        
+        
     </Grid>
+
+    <controls:MetroWindow.RightWindowCommands>
+        <controls:WindowCommands>
+            <StackPanel Orientation="Horizontal">
+                <controls:ProgressRing Height="20" Width="20" IsActive="true" 
+                                       Foreground="{StaticResource TextBrush}" 
+                                       Visibility="{Binding ApplicationUpdater.IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                <Button Command="{Binding ApplicationUpdater.CheckForUpdatesCommand}"
+                    CommandParameter="{Binding}"
+                    IsEnabled="{Binding ApplicationUpdater.IsBusy, Converter={StaticResource InvertedBoolToVisibilityConverter}}"
+                    Content="Check for updates" />
+            </StackPanel>
+        </controls:WindowCommands>
+    </controls:MetroWindow.RightWindowCommands>
 </controls:MetroWindow>
     
 

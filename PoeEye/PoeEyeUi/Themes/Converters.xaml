@@ -1,7 +1,10 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:converters="clr-namespace:PoeEyeUi.Converters">
+                    xmlns:converters="clr-namespace:PoeEyeUi.Converters"
+                    xmlns:blue="http://www.nuget.org/Blue.MVVM">
 
     <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
     <converters:NullNotNullToVisibilityConverter x:Key="NullNotNullToVisibilityConverter"/>
+    <converters:NullableConverter x:Key="NullableConverter"/>
+    <blue:BoolToVisibilityConverter x:Key="InvertedBoolToVisibilityConverter" TrueValue="Collapsed" FalseValue="Visible"/>
 </ResourceDictionary>

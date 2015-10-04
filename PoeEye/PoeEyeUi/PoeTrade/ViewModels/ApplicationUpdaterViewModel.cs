@@ -6,25 +6,40 @@
 
     using Squirrel;
     using System;
+    using System.Reactive.Concurrency;
     using System.Reactive.Linq;
+    using System.Threading;
     using System.Windows;
     using System.Windows.Input;
 
     using DumpToText;
 
+    using Guards;
+
+    using JetBrains.Annotations;
+
+    using MetroModels;
+
     internal sealed class ApplicationUpdaterViewModel : ReactiveObject
     {
+        private readonly IDialogCoordinator dialogCoordinator;
         private const string PoeEyeUri = @"http://coderush.net/files/PoeEye";
         private readonly ReactiveCommand<object> checkForUpdatesCommand;
+        private readonly SynchronizationContext uiContext;
 
-        public ApplicationUpdaterViewModel()
+        public ApplicationUpdaterViewModel([NotNull] IDialogCoordinator dialogCoordinator)
         {
-            checkForUpdatesCommand = ReactiveCommand.Create();
-            checkForUpdatesCommand.Subscribe(CheckForUpdatesCommandExecuted);
+            Guard.ArgumentNotNull(() => dialogCoordinator);
 
-            Observable
-                .Timer(DateTimeOffset.Now, UpdatePeriod)
-                .Subscribe(_ => CheckForUpdatesCommandExecuted(null));
+            this.dialogCoordinator = dialogCoordinator;
+            checkForUpdatesCommand = ReactiveCommand.Create();
+
+            uiContext = SynchronizationContext.Current;
+
+            checkForUpdatesCommand
+                .Where(x => !IsBusy)
+                .ObserveOn(NewThreadScheduler.Default)
+                .Subscribe(CheckForUpdatesCommandExecuted);
 
             SquirrelAwareApp.HandleEvents(
                       onInitialInstall: OnInitialInstall,
@@ -35,38 +50,58 @@
 
         public ICommand CheckForUpdatesCommand => checkForUpdatesCommand;
 
-        private async void CheckForUpdatesCommandExecuted(object arg)
+        private bool isBusy;
+
+        public bool IsBusy
+        {
+            get { return isBusy; }
+            set { this.RaiseAndSetIfChanged(ref isBusy, value); }
+        }
+
+        private async void CheckForUpdatesCommandExecuted(object context)
         {
 
-#if DEBUG
-            Log.Instance.Debug($"[ApplicationUpdaterViewModel] Debug mode detected...");
-            return;
-#endif
             try
             {
-                var appName = typeof(PoeEye.Prism.LiveRegistrations).Assembly.GetName().Name;
-                using (var mgr = new UpdateManager(PoeEyeUri, appName))
+                IsBusy = true;
+
+#if DEBUG
+                Log.Instance.Debug($"[ApplicationUpdaterViewModel] Debug mode detected...");
+                Thread.Sleep(5000);
+                return;
+#endif
+                try
                 {
-                    Log.Instance.Debug($"[ApplicationUpdaterViewModel] Checking for updates...");
-
-                    var updateInfo = await mgr.CheckForUpdate();
-
-                    Log.Instance.Debug($"[ApplicationUpdaterViewModel] UpdateInfo:\r\n{updateInfo?.DumpToTextValue()}");
-                    if (updateInfo == null || updateInfo.ReleasesToApply.Count == 0)
+                    var appName = typeof(PoeEye.Prism.LiveRegistrations).Assembly.GetName().Name;
+                    using (var mgr = new UpdateManager(PoeEyeUri, appName))
                     {
-                        return;
+                        Log.Instance.Debug($"[ApplicationUpdaterViewModel] Checking for updates...");
+
+                        var updateInfo = await mgr.CheckForUpdate();
+
+                        Log.Instance.Debug($"[ApplicationUpdaterViewModel] UpdateInfo:\r\n{updateInfo?.DumpToTextValue()}");
+                        if (updateInfo == null || updateInfo.ReleasesToApply.Count == 0)
+                        {
+                            return;
+                        }
+                        Log.Instance.Debug($"[ApplicationUpdaterViewModel] Downloading releases...");
+                        await mgr.DownloadReleases(updateInfo.ReleasesToApply, UpdateProgress);
+                        Log.Instance.Debug($"[ApplicationUpdaterViewModel] Applying releases...");
+                        await mgr.ApplyReleases(updateInfo);
+                        Log.Instance.Debug($"[ApplicationUpdaterViewModel] Update completed");
+
+                        uiContext.Post(state => dialogCoordinator.ShowMessageAsync(context, "Update completed", "Application updated, new version will take place on next application startup"), null);
                     }
-                    Log.Instance.Debug($"[ApplicationUpdaterViewModel] Downloading releases...");
-                    await mgr.DownloadReleases(updateInfo.ReleasesToApply, UpdateProgress);
-                    Log.Instance.Debug($"[ApplicationUpdaterViewModel] Applying releases...");
-                    await mgr.ApplyReleases(updateInfo);
-                    Log.Instance.Debug($"[ApplicationUpdaterViewModel] Update completed");
-                    MessageBox.Show("Application updated, new version will take place on next application startup", "Update completed",MessageBoxButton.OK,MessageBoxImage.Information);
                 }
+                catch (Exception ex)
+                {
+                    Log.Instance.Debug($"[ApplicationUpdaterViewModel] Update failed", ex);
+                }
+
             }
-            catch (Exception ex)
+            finally
             {
-                Log.Instance.Debug($"[ApplicationUpdaterViewModel] Update failed", ex);
+                IsBusy = false;
             }
         }
 
@@ -94,7 +129,5 @@
         {
             Log.Instance.Debug($"[ApplicationUpdaterViewModel.OnFirstRun] App started for the first time");
         }
-
-        public TimeSpan UpdatePeriod => TimeSpan.FromMinutes(5);
     }
 }

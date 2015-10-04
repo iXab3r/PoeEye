@@ -21,6 +21,8 @@
 
         private void Initialize()
         {
+            Log.Instance.Debug($"[PoeDatabaseReader] Loading database...");
+
             knownEntities.Clear();
             var resources = new HashSet<string>
             {
@@ -86,6 +88,7 @@
                 }
             }
 
+            Log.Instance.Debug($"[PoeDatabaseReader] Loaded {knownEntities.Count} entries");
         }
 
         public string[] KnownEntitiesNames { get; }

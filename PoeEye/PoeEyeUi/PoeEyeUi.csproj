@@ -56,6 +56,10 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Blue.MVVM.Converter, Version=1.4.3.26888, Culture=neutral, PublicKeyToken=1bb1db17d606db59, processorArchitecture=MSIL">
+      <HintPath>..\packages\Blue.MVVM.Converter.1.4.3\lib\net45\Blue.MVVM.Converter.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Common.Logging, Version=3.3.0.0, Culture=neutral, PublicKeyToken=af08829b84f0328e, processorArchitecture=MSIL">
       <HintPath>..\packages\Common.Logging.3.3.0\lib\net40\Common.Logging.dll</HintPath>
       <Private>True</Private>
@@ -243,7 +247,11 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Converters\NullableConverter.cs" />
     <Compile Include="Converters\NullNotNullToVisibilityConverter.cs" />
+    <Compile Include="MetroModels\DialogParticipation.cs" />
+    <Compile Include="MetroModels\DialogCoordinator.cs" />
+    <Compile Include="MetroModels\IDialogCoordinator.cs" />
     <Compile Include="PoeTrade\Models\GenericSuggestionProvider.cs" />
     <Compile Include="PoeTrade\Models\ItemsCache.cs" />
     <Compile Include="PoeTrade\Models\PoeItemModeSuggestionProvider.cs" />
