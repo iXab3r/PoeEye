@@ -7,5 +7,10 @@ namespace PoeShared.Common
         public string Name { get; set; }
 
         public string CodeName { get; set; }
+
+        public override string ToString()
+        {
+            return $"ModType: {ModType}, Name: {Name}";
+        }
     }
 }

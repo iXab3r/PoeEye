@@ -19,9 +19,6 @@
             Container.RegisterType<IDialogCoordinator, DialogCoordinator>(new ContainerControlledLifetimeManager());
             Container.RegisterType<IPoePriceCalculcator, PoePriceCalculcator>(new ContainerControlledLifetimeManager());
 
-            Container.RegisterType<GenericSuggestionProvider, GenericSuggestionProvider>(new ContainerControlledLifetimeManager());
-            Container.RegisterType<PoeItemModeSuggestionProvider, PoeItemModeSuggestionProvider>(new ContainerControlledLifetimeManager());
-
             Container
                     .RegisterType<MainWindowViewModel, MainWindowViewModel>()
                     .RegisterType<MainWindowTabViewModel, MainWindowTabViewModel>()

@@ -15,21 +15,12 @@
 
             <wpfControls:AutoCompleteTextBox  Grid.Column="0"
                                               Provider="{Binding SuggestionProvider}"
-                                              SelectedItem="{Binding SelectedMod, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                              SelectedItem="{Binding SelectedMod, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                               DisplayMember="Name"
+                                              
                                               Margin="10,0,10,0"
                                               Watermark="any">
             </wpfControls:AutoCompleteTextBox>
-
-
-            <!--
-            <ComboBox Grid.Column="0" 
-                      ItemsSource="{Binding KnownMods}" 
-                      DisplayMemberPath="Name" 
-                      SelectedItem="{Binding SelectedMod}"
-                      Style="{StaticResource QueryComboBox}"
-                      Margin="10,0,10,0">
-            </ComboBox>-->
 
             <CheckBox Grid.Column="1" 
                       Margin="10,0,10,0"

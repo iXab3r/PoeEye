@@ -1,6 +1,7 @@
 ﻿namespace PoeEyeUi.PoeTrade.ViewModels
 {
     using System;
+    using System.Linq;
 
     using Factory;
 
@@ -29,6 +30,7 @@
                 [NotNull] IFactory<PoeItemModeSuggestionProvider, IPoeItemMod[]> suggestionProviderFactory)
         {
             Guard.ArgumentNotNull(() => explicitMods);
+            Guard.ArgumentIsTrue(() => explicitMods.All(x => x.ModType == PoeModType.Explicit));
 
             KnownMods = explicitMods;
             SuggestionProvider = suggestionProviderFactory.Create(KnownMods);
