@@ -8,10 +8,15 @@
 
     using Microsoft.Practices.Unity;
 
+    using PoeDatabase;
+
     public sealed class CommonRegistrations : UnityContainerExtension
     {
         protected override void Initialize()
         {
+            Container
+                .RegisterType<IPoeDatabaseReader, PoeDatabaseReader>(new ContainerControlledLifetimeManager());
+
             Container
                 .RegisterType(typeof (IEqualityComparer<IPoeItem>), typeof (PoeItemEqualityComparer))
                 .RegisterType(typeof (IFactory<,>), typeof(Factory<,>))

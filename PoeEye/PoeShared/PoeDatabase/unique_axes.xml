@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Root>
+<Entity Type="Weapon" Category="Axe">
+  <Property id="Name">The Screaming Eagle</Property>
+  <Property id="Type">Axe</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Jade Hatchet</Property>
+  <Property id="Level">6</Property>
+  <Property id="Strength">21</Property>
+  <Property id="Dexterity">0</Property>
+  <Property id="PhysicalDamage">(15–32 to 21–36)</Property>
+  <Property id="FireDamage">0</Property>
+  <Property id="ColdDamage">0</Property>
+  <Property id="LightningDamage">0</Property>
+  <Property id="ChaosDamage">0</Property>
+  <Property id="CriticalStrikeChance">5%</Property>
+  <Property id="AttacksPerSecond">1.25</Property>
+  <Property id="Mods">Adds (8–18 to 12–22) Physical Damage | +(10 to 15) to maximum Life | +(5 to 7) Life gained on Kill | 10% increased Movement Speed | Gems in this item are supported by level 2 Chance to Flee</Property>
+</Entity>
+<Entity Type="Weapon" Category="Axe">
+  <Property id="Name">Soul Taker</Property>
+  <Property id="Type">Axe</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Siege Axe</Property>
+  <Property id="Level">59</Property>
+  <Property id="Strength">119</Property>
+  <Property id="Dexterity">82</Property>
+  <Property id="PhysicalDamage">(84–158 to 101–190)</Property>
+  <Property id="FireDamage">0</Property>
+  <Property id="ColdDamage">0</Property>
+  <Property id="LightningDamage">0</Property>
+  <Property id="ChaosDamage">0</Property>
+  <Property id="CriticalStrikeChance">5%</Property>
+  <Property id="AttacksPerSecond">(1.80 to 1.88)</Property>
+  <Property id="Mods">(100 to 140)% increased Physical Damage | Adds 10–20 Physical Damage | (20 to 25)% increased Attack Speed | +(20 to 25)% to Cold Resistance | Insufficient Mana doesn't prevent your Melee Attacks | Your Physical Damage can Chill</Property>
+</Entity>
+<Entity Type="Weapon" Category="Axe">
+  <Property id="Name">Dyadus</Property>
+  <Property id="Type">Axe</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Infernal Axe</Property>
+  <Property id="Level">69</Property>
+  <Property id="Strength">158</Property>
+  <Property id="Dexterity">76</Property>
+  <Property id="PhysicalDamage">45–75</Property>
+  <Property id="FireDamage">(170–200 to 190–220)</Property>
+  <Property id="ColdDamage">(170–200 to 190–220)</Property>
+  <Property id="LightningDamage">0</Property>
+  <Property id="ChaosDamage">0</Property>
+  <Property id="CriticalStrikeChance">5%</Property>
+  <Property id="AttacksPerSecond">(1.38 to 1.44)</Property>
+  <Property id="Mods">Adds (170–200 to 190–220) Fire Damage in Main Hand | Adds (170–200 to 190–220) Cold Damage in Off Hand | (10 to 15)% increased Attack Speed | Enemies Chilled by you take 40% increased Burning Damage | 25% Chance to Ignite when in Main Hand | 100% increased Chill Duration on enemies when in Off Hand</Property>
+</Entity>
+<Entity Type="Weapon" Category="Axe">
+  <Property id="Name">Atziri's Disfavour</Property>
+  <Property id="Type">Axe</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Vaal Axe</Property>
+  <Property id="Level">75</Property>
+  <Property id="Strength">158</Property>
+  <Property id="Dexterity">76</Property>
+  <Property id="PhysicalDamage">(305–411 to 320–431)</Property>
+  <Property id="FireDamage">0</Property>
+  <Property id="ColdDamage">0</Property>
+  <Property id="LightningDamage">0</Property>
+  <Property id="ChaosDamage">0</Property>
+  <Property id="CriticalStrikeChance">5%</Property>
+  <Property id="AttacksPerSecond">(1.28 to 1.33)</Property>
+  <Property id="Mods">Adds (220–270 to 235–290) Physical Damage | (12 to 16)% increased Attack Speed | Causes Bleeding on Hit | +2 to Weapon range | +2 to Level of Support Gems in this item</Property>
+</Entity>
+<Entity Type="Weapon" Category="Axe">
+  <Property id="Name">The Blood Reaper</Property>
+  <Property id="Type">Axe</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Headsman Axe</Property>
+  <Property id="Level">45</Property>
+  <Property id="Strength">99</Property>
+  <Property id="Dexterity">57</Property>
+  <Property id="PhysicalDamage">(120–182 to 132–200)</Property>
+  <Property id="FireDamage">0</Property>
+  <Property id="ColdDamage">0</Property>
+  <Property id="LightningDamage">0</Property>
+  <Property id="ChaosDamage">0</Property>
+  <Property id="CriticalStrikeChance">5%</Property>
+  <Property id="AttacksPerSecond">1.25</Property>
+  <Property id="Mods">(100 to 120)% increased Physical Damage | 5% of Physical Damage Leeched as Life | +100 to maximum Life | 10.0 Life Regenerated per second | 50% increased Mana Cost of Skills | Causes Bleeding on Hit</Property>
+</Entity>
+<Entity Type="Weapon" Category="Axe">
+  <Property id="Name">The Harvest</Property>
+  <Property id="Type">Axe</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Jasper Chopper</Property>
+  <Property id="Level">37</Property>
+  <Property id="Strength">100</Property>
+  <Property id="Dexterity">29</Property>
+  <Property id="PhysicalDamage">(145–227 to 158–247)</Property>
+  <Property id="FireDamage">0</Property>
+  <Property id="ColdDamage">0</Property>
+  <Property id="LightningDamage">0</Property>
+  <Property id="ChaosDamage">0</Property>
+  <Property id="CriticalStrikeChance">5%</Property>
+  <Property id="AttacksPerSecond">1.00</Property>
+  <Property id="Mods">(120 to 140)% increased Physical Damage | 3% increased Global Critical Strike Chance per Level | Gain Flask Charges when you deal a Critical Strike | 6% of Damage leeched as Life on Critical Strike</Property>
+</Entity>
+<Entity Type="Weapon" Category="Axe">
+  <Property id="Name">Kaom's Primacy</Property>
+  <Property id="Type">Axe</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Karui Chopper</Property>
+  <Property id="Level">58</Property>
+  <Property id="Strength">151</Property>
+  <Property id="Dexterity">43</Property>
+  <Property id="PhysicalDamage">(252–395 to 310–486)</Property>
+  <Property id="FireDamage">(16–32 to 21–38)</Property>
+  <Property id="ColdDamage">0</Property>
+  <Property id="LightningDamage">0</Property>
+  <Property id="ChaosDamage">0</Property>
+  <Property id="CriticalStrikeChance">5%</Property>
+  <Property id="AttacksPerSecond">1.00</Property>
+  <Property id="Mods">(160 to 220)% increased Physical Damage | Adds (16–32 to 21–38) Fire Damage | +(150 to 250) to Accuracy Rating | +20 Life gained on Kill | Culling Strike</Property>
+</Entity>
+<Entity Type="Weapon" Category="Axe">
+  <Property id="Name">Limbsplit</Property>
+  <Property id="Type">Axe</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Woodsplitter</Property>
+  <Property id="Level">13</Property>
+  <Property id="Strength">36</Property>
+  <Property id="Dexterity">17</Property>
+  <Property id="PhysicalDamage">(43–90 to 48–100)</Property>
+  <Property id="FireDamage">0</Property>
+  <Property id="ColdDamage">0</Property>
+  <Property id="LightningDamage">0</Property>
+  <Property id="ChaosDamage">0</Property>
+  <Property id="CriticalStrikeChance">5%</Property>
+  <Property id="AttacksPerSecond">1.20</Property>
+  <Property id="Mods">+1 to Level of Strength Gems in this item | (80 to 100)% increased Physical Damage | Adds 5–10 Physical Damage | +(15 to 30) to Strength | Culling Strike</Property>
+</Entity>
+<Entity Type="Weapon" Category="Axe">
+  <Property id="Name">Reaper's Pursuit</Property>
+  <Property id="Type">Axe</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Shadow Axe</Property>
+  <Property id="Level">33</Property>
+  <Property id="Strength">80</Property>
+  <Property id="Dexterity">37</Property>
+  <Property id="PhysicalDamage">(94–142 to 106–160)</Property>
+  <Property id="FireDamage">0</Property>
+  <Property id="ColdDamage">0</Property>
+  <Property id="LightningDamage">0</Property>
+  <Property id="ChaosDamage">0</Property>
+  <Property id="CriticalStrikeChance">5%</Property>
+  <Property id="AttacksPerSecond">1.20</Property>
+  <Property id="Mods">(100 to 125)% increased Physical Damage | +10 Life Gained on Kill | (30 to 40)% increased Rarity of Items found | 15% increased Movement Speed when on Full Life | Culling Strike | Hits can't be Evaded</Property>
+</Entity>
+<Entity Type="Weapon" Category="Axe">
+  <Property id="Name">Wideswing</Property>
+  <Property id="Type">Axe</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Poleaxe</Property>
+  <Property id="Level">18</Property>
+  <Property id="Strength">44</Property>
+  <Property id="Dexterity">25</Property>
+  <Property id="PhysicalDamage">(62–92 to 73–111)</Property>
+  <Property id="FireDamage">0</Property>
+  <Property id="ColdDamage">0</Property>
+  <Property id="LightningDamage">0</Property>
+  <Property id="ChaosDamage">0</Property>
+  <Property id="CriticalStrikeChance">5%</Property>
+  <Property id="AttacksPerSecond">1.25</Property>
+  <Property id="Mods">Gems in this item are Supported by level 20 Increased Area of Effect | (120 to 160)% increased Physical Damage | +10 to Strength | +(50 to 80) to Accuracy Rating | +10 Mana Gained on Kill | +2 to Weapon range</Property>
+</Entity>
+<Entity Type="Weapon" Category="Axe">
+  <Property id="Name">Wings of Entropy</Property>
+  <Property id="Type">Axe</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Sundering Axe</Property>
+  <Property id="Level">60</Property>
+  <Property id="Strength">149</Property>
+  <Property id="Dexterity">76</Property>
+  <Property id="PhysicalDamage">(121–248 to 147–304)</Property>
+  <Property id="FireDamage">(55–100 to 65–120)</Property>
+  <Property id="ColdDamage">0</Property>
+  <Property id="LightningDamage">0</Property>
+  <Property id="ChaosDamage">(55–100 to 65–120)</Property>
+  <Property id="CriticalStrikeChance">5%</Property>
+  <Property id="AttacksPerSecond">1.20</Property>
+  <Property id="Mods">25% of Block Chance applied to Spells | 8% additional Chance to Block while Dual Wielding | (80 to 120)% increased Physical Damage | Adds (55–100 to 65–120) Fire Damage in Main Hand | Adds (55–100 to 65–120) Chaos Damage in Off Hand | Counts as Dual Wielding</Property>
+</Entity>
+</Root>

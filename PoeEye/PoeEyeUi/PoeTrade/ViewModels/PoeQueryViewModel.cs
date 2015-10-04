@@ -4,14 +4,21 @@
     using System.Collections.Generic;
     using System.Linq;
 
+    using Factory;
+
     using Guards;
 
     using JetBrains.Annotations;
 
+    using Models;
+
     using PoeShared.Common;
+    using PoeShared.PoeDatabase;
     using PoeShared.PoeTrade.Query;
 
     using ReactiveUI;
+
+    using WpfControls;
 
     internal sealed class PoeQueryViewModel : ReactiveObject
     {
@@ -142,11 +149,15 @@
         public PoeQueryViewModel(
             [NotNull] IPoeQueryInfoProvider queryInfoProvider,
             [NotNull] PoeImplicitModViewModel poeImplicitModViewModel,
-            [NotNull] PoeExplicitModsEditorViewModel poeExplicitModsEditorViewModel)
+            [NotNull] PoeExplicitModsEditorViewModel poeExplicitModsEditorViewModel,
+            [NotNull] IFactory<GenericSuggestionProvider, string[]> suggestionProviderFactory,
+            [NotNull] IPoeDatabaseReader poeDatabaseReader)
         {
             Guard.ArgumentNotNull(() => queryInfoProvider);
             Guard.ArgumentNotNull(() => poeImplicitModViewModel);
             Guard.ArgumentNotNull(() => poeExplicitModsEditorViewModel);
+            Guard.ArgumentNotNull(() => suggestionProviderFactory);
+            Guard.ArgumentNotNull(() => poeDatabaseReader);
 
             this.queryInfoProvider = queryInfoProvider;
             this.poeExplicitModsEditorViewModel = poeExplicitModsEditorViewModel;
@@ -165,6 +176,9 @@
             OnlineOnly = true;
             BuyoutOnly = true;
             NormalizeQuality = true;
+
+            var knownNames = poeDatabaseReader.KnownEntitiesNames;
+            NameSuggestionProvider = suggestionProviderFactory.Create(knownNames);
         }
 
         public float? DamageMin
@@ -528,6 +542,8 @@
         public PoeImplicitModViewModel ImplicitModViewModel { get; }
 
         public PoeExplicitModsEditorViewModel ExplicitModsEditorViewModel { get; }
+
+        public ISuggestionProvider NameSuggestionProvider { get; }
 
         public IPoeItemType[] ItemTypes { get; }
 

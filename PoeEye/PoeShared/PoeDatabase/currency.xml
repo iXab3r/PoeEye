@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Root>
+<Entity Type="Currency">
+  <Property id="Name">Scroll of Wisdom</Property>
+  <Property id="Description">Identifies an item</Property>
+</Entity>
+<Entity Type="Currency">
+  <Property id="Name">Portal Scroll</Property>
+  <Property id="Description">Creates a portal to town</Property>
+</Entity>
+<Entity Type="Currency">
+  <Property id="Name">Armourer's Scrap</Property>
+  <Property id="Description">Improves the quality of an armour</Property>
+</Entity>
+<Entity Type="Currency">
+  <Property id="Name">Blacksmith's Whetstone</Property>
+  <Property id="Description">Improves the quality of a weapon</Property>
+</Entity>
+<Entity Type="Currency">
+  <Property id="Name">Glassblower's Bauble</Property>
+  <Property id="Description">Improves the quality of a flask</Property>
+</Entity>
+<Entity Type="Currency">
+  <Property id="Name">Cartographer's Chisel</Property>
+  <Property id="Description">Improves the quality of a map</Property>
+</Entity>
+<Entity Type="Currency">
+  <Property id="Name">Gemcutter's Prism</Property>
+  <Property id="Description">Improves the quality of a gem</Property>
+</Entity>
+<Entity Type="Currency">
+  <Property id="Name">Jeweller's Orb</Property>
+  <Property id="Description">Reforges the number of sockets on an item</Property>
+</Entity>
+<Entity Type="Currency">
+  <Property id="Name">Chromatic Orb</Property>
+  <Property id="Description">Reforges the colour of sockets on an item</Property>
+</Entity>
+<Entity Type="Currency">
+  <Property id="Name">Orb of Fusing</Property>
+  <Property id="Description">Reforges the links between sockets on an item</Property>
+</Entity>
+<Entity Type="Currency">
+  <Property id="Name">Orb of Transmutation</Property>
+  <Property id="Description">Upgrades a normal item to a magic item</Property>
+</Entity>
+<Entity Type="Currency">
+  <Property id="Name">Orb of Chance</Property>
+  <Property id="Description">Upgrades a normal item to a random rarity</Property>
+</Entity>
+<Entity Type="Currency">
+  <Property id="Name">Orb of Alchemy</Property>
+  <Property id="Description">Upgrades a normal item to rare item</Property>
+</Entity>
+<Entity Type="Currency">
+  <Property id="Name">Regal Orb</Property>
+  <Property id="Description">Upgrades a magic item to rare item</Property>
+</Entity>
+<Entity Type="Currency">
+  <Property id="Name">Orb of Augmentation</Property>
+  <Property id="Description">Enchants a magic item with a new random property</Property>
+</Entity>
+<Entity Type="Currency">
+  <Property id="Name">Exalted Orb</Property>
+  <Property id="Description">Enchants a rare item with a new random property</Property>
+</Entity>
+<Entity Type="Currency">
+  <Property id="Name">Orb of Alteration</Property>
+  <Property id="Description">Reforges a magic item with new random properties</Property>
+</Entity>
+<Entity Type="Currency">
+  <Property id="Name">Chaos Orb</Property>
+  <Property id="Description">Reforges a rare item with new random properties</Property>
+</Entity>
+<Entity Type="Currency">
+  <Property id="Name">Blessed Orb</Property>
+  <Property id="Description">Randomises the numeric values of the implicit properties of an item</Property>
+</Entity>
+<Entity Type="Currency">
+  <Property id="Name">Divine Orb</Property>
+  <Property id="Description">Randomises the numeric values of the random properties of an item</Property>
+</Entity>
+<Entity Type="Currency">
+  <Property id="Name">Orb of Scouring</Property>
+  <Property id="Description">Removes all properties from an item</Property>
+</Entity>
+<Entity Type="Currency">
+  <Property id="Name">Mirror of Kalandra</Property>
+  <Property id="Description">Creates a mirrored copy of an item</Property>
+</Entity>
+<Entity Type="Currency">
+  <Property id="Name">Eternal Orb</Property>
+  <Property id="Description">Creates an imprint of an item for later restoration</Property>
+</Entity>
+<Entity Type="Currency">
+  <Property id="Name">Orb of Regret</Property>
+  <Property id="Description">Grants a passive skill refund point</Property>
+</Entity>
+<Entity Type="Currency">
+  <Property id="Name">Vaal Orb</Property>
+  <Property id="Description">Corrupts an item, modifying it unpredictably</Property>
+</Entity>
+<Entity Type="Currency">
+  <Property id="Name">Scroll Fragment</Property>
+  <Property id="Description">A stack of 5 fragments becomes a Scroll of Wisdom.  Shift click to unstack.</Property>
+</Entity>
+<Entity Type="Currency">
+  <Property id="Name">Transmutation Shard</Property>
+  <Property id="Description">A stack of 20 shards becomes an Orb of Transmutation.  Shift click to unstack.</Property>
+</Entity>
+<Entity Type="Currency">
+  <Property id="Name">Alteration Shard</Property>
+  <Property id="Description">A stack of 20 shards becomes an Orb of Alteration.  Shift click to unstack.</Property>
+</Entity>
+<Entity Type="Currency">
+  <Property id="Name">Alchemy Shard</Property>
+  <Property id="Description">A stack of 20 shards becomes an Orb of Alchemy.  Shift click to unstack.</Property>
+</Entity>
+</Root>

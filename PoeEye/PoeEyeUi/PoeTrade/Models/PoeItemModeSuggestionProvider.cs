@@ -43,7 +43,7 @@
             return filteredMods;
         }
 
-        public bool IsMatch(string filter, IPoeItemMod mod)
+        private bool IsMatch(string filter, IPoeItemMod mod)
         {
             string[] words;
             if (!wordsDictionary.TryGetValue(mod, out words))

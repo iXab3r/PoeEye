@@ -2,12 +2,11 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:viewModels="clr-namespace:PoeEyeUi.PoeTrade.ViewModels"
                     xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
-                    xmlns:converters="clr-namespace:PoeEyeUi.Converters">
+                    xmlns:converters="clr-namespace:PoeEyeUi.Converters"
+                    xmlns:wpfControls="http://wpfcontrols.com/">
     <DataTemplate DataType="{x:Type viewModels:PoeQueryViewModel}">
         <Grid>
             <Grid.Resources>
-                <converters:ComboBoxEmptyItemConverter x:Key="ComboBoxEmptyItemConverterKey"/>
-
                 <Style TargetType="TextBlock" BasedOn="{StaticResource MetroTextBlock}" x:Key="TextBlockHeader">
                     <Setter Property="FontSize" Value="14"/>
                     <Setter Property="Foreground" Value="{StaticResource LabelTextBrush}"/>
@@ -84,12 +83,16 @@
 
                 <TextBlock   Grid.Row="2" Grid.Column="0"
                              Text="Name" Style="{StaticResource TextBlockHeader}" />
-                <TextBox  Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="5"
-                          Text="{Binding ItemName}" 
-                          Width="NaN" 
-                          Style="{StaticResource TextBoxKey}" 
-                          HorizontalContentAlignment="Left"
-                          controls:TextBoxHelper.Watermark="item name, e.g. Temple map" />
+
+                <wpfControls:AutoCompleteTextBox  Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="5"
+                                                  Provider="{Binding NameSuggestionProvider}"
+                                                  Width="NaN" 
+                                                  Text="{Binding ItemName}" 
+                                                  HorizontalContentAlignment="Left"
+                                                  Margin="0,0,10,0"
+                                                  Height="26"
+                                                  Watermark="item name, e.g. Temple map">
+                </wpfControls:AutoCompleteTextBox>
             </Grid>
 
             <Grid Row="2">

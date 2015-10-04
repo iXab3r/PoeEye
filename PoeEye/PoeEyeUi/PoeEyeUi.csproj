@@ -243,8 +243,8 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Converters\ComboBoxEmptyItemConverter.cs" />
     <Compile Include="Converters\NullNotNullToVisibilityConverter.cs" />
+    <Compile Include="PoeTrade\Models\GenericSuggestionProvider.cs" />
     <Compile Include="PoeTrade\Models\ItemsCache.cs" />
     <Compile Include="PoeTrade\Models\PoeItemModeSuggestionProvider.cs" />
     <Compile Include="PoeTrade\ViewModels\ApplicationUpdaterViewModel.cs" />

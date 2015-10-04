@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Root>
+<Entity Name="Abandoned Wealth" Type="DivinationCard">
+  <Property Name="Set">5</Property>
+  <Property Name="Mods">3× Exalted Orb</Property>
+  <Property Name="DropLocations">Arsenal</Property>
+</Entity>
+<Entity Name="The Artist" Type="DivinationCard">
+  <Property Name="Set">11</Property>
+  <Property Name="Mods">Level 4 Enhance | Corrupted</Property>
+  <Property Name="DropLocations"/></Entity>
+<Entity Name="The Avenger" Type="DivinationCard">
+  <Property Name="Set">12</Property>
+  <Property Name="Mods">Mjölner  |  Corrupted</Property>
+  <Property Name="DropLocations">Torture Chamber ,  Bazaar</Property>
+</Entity>
+<Entity Name="The Battle Born" Type="DivinationCard">
+  <Property Name="Set">5</Property>
+  <Property Name="Mods">Axe</Property>
+  <Property Name="DropLocations">Kaom's Dream (All) ,  Kaom's Path (All) ,  Kaom's Stronghold (All) ,  Volcano</Property>
+</Entity>
+<Entity Name="The Betrayal" Type="DivinationCard">
+  <Property Name="Set">9</Property>
+  <Property Name="Mods">Maligaro's Virtuosity</Property>
+  <Property Name="DropLocations">The Broken Bridge (Merciless) ,  The Wetlands (Merciless)</Property>
+</Entity>
+<Entity Name="Birth of the Three" Type="DivinationCard">
+  <Property Name="Set">3</Property>
+  <Property Name="Mods">The Goddess Bound</Property>
+  <Property Name="DropLocations">The Coast (Cruel)</Property>
+</Entity>
+<Entity Name="The Brittle Emperor" Type="DivinationCard">
+  <Property Name="Set">8</Property>
+  <Property Name="Mods">Voll's Devotion  |  Corrupted</Property>
+  <Property Name="DropLocations">The Dried Lake (All)</Property>
+</Entity>
+<Entity Name="The Carrion Crow" Type="DivinationCard">
+  <Property Name="Set">4</Property>
+  <Property Name="Mods">Life Armour</Property>
+  <Property Name="DropLocations">The Western Forest (Cruel, Merciless),  The City of Sarn (All) ,  The Sewer Waterway (All),  The Battlefront (All),  The Aqueduct (All),  The Ebony Barracks (All),  Colonnade</Property>
+</Entity>
+<Entity Name="The Cataclysm" Type="DivinationCard">
+  <Property Name="Set">13</Property>
+  <Property Name="Mods">Level 21 Spell Gem  |  Corrupted</Property>
+  <Property Name="DropLocations">Corrupted areas</Property>
+</Entity>
+<Entity Name="The Celestial Justicar" Type="DivinationCard">
+  <Property Name="Set">6</Property>
+  <Property Name="Mods">Six-Link Astral Plate</Property>
+  <Property Name="DropLocations">The Fellshrine Ruins (Merciless) ,  Graveyard</Property>
+</Entity>
+<Entity Name="The Chains that Bind" Type="DivinationCard">
+  <Property Name="Set">11</Property>
+  <Property Name="Mods">Six-Link Body Armour</Property>
+  <Property Name="DropLocations">The Crematorium (Merciless) ,  Crematorium</Property>
+</Entity>
+<Entity Name="Chaotic Disposition" Type="DivinationCard">
+  <Property Name="Set">1</Property>
+  <Property Name="Mods">5× Chaos Orb</Property>
+  <Property Name="DropLocations">Poorjoy's Asylum</Property>
+</Entity>
+<Entity Name="Coveted Possession" Type="DivinationCard">
+  <Property Name="Set">9</Property>
+  <Property Name="Mods">5× Regal Orb</Property>
+  <Property Name="DropLocations">The Catacombs (Merciless), Catacomb</Property>
+</Entity>
+<Entity Name="The Dark Mage" Type="DivinationCard">
+  <Property Name="Set">6</Property>
+  <Property Name="Mods">Six-Link Staff</Property>
+  <Property Name="DropLocations">The Chamber of Sins Level 2 (Cruel, Merciless) ,  Overgrown Ruin Map</Property>
+</Entity>
+<Entity Name="The Doctor" Type="DivinationCard">
+  <Property Name="Set">8</Property>
+  <Property Name="Mods">Headhunter</Property>
+  <Property Name="DropLocations">Springs</Property>
+</Entity>
+<Entity Name="Doedre's Madness" Type="DivinationCard">
+  <Property Name="Set">9</Property>
+  <Property Name="Mods">Doedre Item</Property>
+  <Property Name="DropLocations">The Harvest (All)</Property>
+</Entity>
+<Entity Name="The Drunken Aristocrat" Type="DivinationCard">
+  <Property Name="Set">8</Property>
+  <Property Name="Mods">Divination Distillate</Property>
+  <Property Name="DropLocations">The Sceptre of God (Normal, Cruel) ,  The Upper Sceptre of God (All) ,  Palace ,  Residence ,  Villa</Property>
+</Entity>
+<Entity Name="Emperor's Luck" Type="DivinationCard">
+  <Property Name="Set">5</Property>
+  <Property Name="Mods">5× Currency</Property>
+  <Property Name="DropLocations">The Imperial Gardens (All) ,  Courtyard ,  Orchard</Property>
+</Entity>
+<Entity Name="The Encroaching Darkness" Type="DivinationCard">
+  <Property Name="Set">8</Property>
+  <Property Name="Mods">Map | Corrupted</Property>
+  <Property Name="DropLocations">The Vaal Ruins (Merciless)</Property>
+</Entity>
+<Entity Name="The Explorer" Type="DivinationCard">
+  <Property Name="Set">6</Property>
+  <Property Name="Mods">Map  |  Corrupted</Property>
+  <Property Name="DropLocations">The Dread Thicket (Merciless)</Property>
+</Entity>
+<Entity Name="The Feast" Type="DivinationCard">
+  <Property Name="Set">5</Property>
+  <Property Name="Mods">Romira's Banquet  |  Corrupted</Property>
+  <Property Name="DropLocations">The Slums Sewers (All) ,  The Warehouse Sewers (All) ,  Sewer ,  Waste Pool</Property>
+</Entity>
+<Entity Name="The Fiend" Type="DivinationCard">
+  <Property Name="Set">11</Property>
+  <Property Name="Mods">Headhunter  |  Corrupted</Property>
+  <Property Name="DropLocations">Shrine</Property>
+</Entity>
+<Entity Name="The Flora's Gift" Type="DivinationCard">
+  <Property Name="Set">5</Property>
+  <Property Name="Mods">Five-Link Staff | Item Level: 66</Property>
+  <Property Name="DropLocations">Tropical Island</Property>
+</Entity>
+<Entity Name="The Gambler" Type="DivinationCard">
+  <Property Name="Set">5</Property>
+  <Property Name="Mods">Divination Card</Property>
+  <Property Name="DropLocations">Any map</Property>
+</Entity>
+<Entity Name="The Gemcutter" Type="DivinationCard">
+  <Property Name="Set">3</Property>
+  <Property Name="Mods">Gemcutter's Prism</Property>
+  <Property Name="DropLocations">The Mines Level 1 (All) ,  The Mines Level 2 (All) ,  The Crystal Veins (All) ,  Excavation ,  Quarry</Property>
+</Entity>
+<Entity Name="Gemcutter's Promise" Type="DivinationCard">
+  <Property Name="Set">3</Property>
+  <Property Name="Mods">Superior Gem  |  Quality: +20%</Property>
+  <Property Name="DropLocations">The Ebony Barracks (All) ,  Promenade ,  Colonnade</Property>
+</Entity>
+<Entity Name="The Gladiator" Type="DivinationCard">
+  <Property Name="Set">5</Property>
+  <Property Name="Mods">Nightmare Bascinet</Property>
+  <Property Name="DropLocations">Daresso's Dream (All) , The Grand Arena (All) ,  Pit ,  Arena ,  Colosseum</Property>
+</Entity>
+<Entity Name="The Hermit" Type="DivinationCard">
+  <Property Name="Set">9</Property>
+  <Property Name="Mods">Lifesprig</Property>
+  <Property Name="DropLocations">The Broken Bridge (Cruel, Merciless) ,  The Crossroads (Cruel, Merciless) ,  The Dread Thicket (Cruel, Merciless) ,  The Fellshrine Ruins (Cruel, Merciless) ,  The Northern Forest (Cruel, Merciless) ,  The Old Fields (Cruel, Merciless) ,  The Riverways (Cruel, Merciless) ,  The Southern Forest (Cruel, Merciless) ,  The Western Forest (Cruel, Merciless) ,  The Wetlands (Cruel, Merciless)</Property>
+</Entity>
+<Entity Name="The Hoarder" Type="DivinationCard">
+  <Property Name="Set">12</Property>
+  <Property Name="Mods">Exalted Orb</Property>
+  <Property Name="DropLocations">The Belly of the Beast Level 1 (All) ,  The Belly of the Beast Level 2 (All) ,  The Harvest (All)</Property>
+</Entity>
+<Entity Name="Hope" Type="DivinationCard">
+  <Property Name="Set">5</Property>
+  <Property Name="Mods">Prismatic Ring  |  Corrupted</Property>
+  <Property Name="DropLocations">Desert ,  Tropical Island</Property>
+</Entity>
+<Entity Name="The Hunger" Type="DivinationCard">
+  <Property Name="Set">9</Property>
+  <Property Name="Mods">Taste of Hate</Property>
+  <Property Name="DropLocations">The Harvest (Normal) ,  The Belly of the Beast (Normal) ,  Phantasmagoria Map</Property>
+</Entity>
+<Entity Name="Humility" Type="DivinationCard">
+  <Property Name="Set">9</Property>
+  <Property Name="Mods">Tabula Rasa</Property>
+  <Property Name="DropLocations">The Aqueduct (All) ,  Channel</Property>
+</Entity>
+<Entity Name="The Incantation" Type="DivinationCard">
+  <Property Name="Set">4</Property>
+  <Property Name="Mods">The Whispering Ice</Property>
+  <Property Name="DropLocations">The Western Forest (Cruel, Merciless) ,  Springs</Property>
+</Entity>
+<Entity Name="The Inventor" Type="DivinationCard">
+  <Property Name="Set">6</Property>
+  <Property Name="Mods">10× Vaal Orb</Property>
+  <Property Name="DropLocations">The Ancient Pyramid (Cruel, Merciless) ,  Vaal Pyramid ,  Maze Map</Property>
+</Entity>
+<Entity Name="Jack in the Box" Type="DivinationCard">
+  <Property Name="Set">4</Property>
+  <Property Name="Mods">Item</Property>
+  <Property Name="DropLocations">The Battlefront (Cruel, Merciless) ,  The City of Sarn (Cruel, Merciless) ,  The Docks (Cruel, Merciless) ,  The Ebony Barracks (Cruel, Merciless) ,  The Marketplace (Cruel?, Merciless) ,  The Slums (Cruel) ,  The Warehouse District (Cruel, Merciless) ,  Arsenal</Property>
+</Entity>
+<Entity Name="The King's Blade" Type="DivinationCard">
+  <Property Name="Set">5</Property>
+  <Property Name="Mods">Bloodthisty Eternal Sword | Item Level: 66</Property>
+  <Property Name="DropLocations">Pit ,  Daresso's Dream (Merciless)</Property>
+</Entity>
+<Entity Name="The King's Heart" Type="DivinationCard">
+  <Property Name="Set">8</Property>
+  <Property Name="Mods">Kaom's Heart</Property>
+  <Property Name="DropLocations">Abyss Map ,  Volcano</Property>
+</Entity>
+<Entity Name="Lantador's Lost Love" Type="DivinationCard">
+  <Property Name="Set">7</Property>
+  <Property Name="Mods">Two-Stone Ring</Property>
+  <Property Name="DropLocations">The Mud Flats (Cruel) ,  The Ledge (Cruel) ,  The Lower Prison (Cruel) ,  The Ship Graveyard (Cruel)</Property>
+</Entity>
+<Entity Name="The Last One Standing" Type="DivinationCard">
+  <Property Name="Set">10</Property>
+  <Property Name="Mods">Atziri's Disfavour</Property>
+  <Property Name="DropLocations"/></Entity>
+<Entity Name="The Lover" Type="DivinationCard">
+  <Property Name="Set">2</Property>
+  <Property Name="Mods">Jewelry  |  Item Level: 79</Property>
+  <Property Name="DropLocations">Graveyard ,  Necropolis ,  Maelström of Chaos</Property>
+</Entity>
+<Entity Name="Lucky Connections" Type="DivinationCard">
+  <Property Name="Set">7</Property>
+  <Property Name="Mods">20× Orb of Fusing</Property>
+  <Property Name="DropLocations">The Docks (All) ,  Wharf ,  Pier ,  Shipyard</Property>
+</Entity>
+<Entity Name="The Metalsmith's Gift" Type="DivinationCard">
+  <Property Name="Set">6</Property>
+  <Property Name="Mods">Prismatic Ring</Property>
+  <Property Name="DropLocations">The Fetid Pool (All) ,  The Mud Flats (All) ,  Temple Map</Property>
+</Entity>
+<Entity Name="The One With All" Type="DivinationCard">
+  <Property Name="Set">6</Property>
+  <Property Name="Mods">Le Heup of All | Corrupted</Property>
+  <Property Name="DropLocations">Tidal Island (Merciless)</Property>
+</Entity>
+<Entity Name="The Pack Leader" Type="DivinationCard">
+  <Property Name="Set">5</Property>
+  <Property Name="Mods">Alpha's Howl</Property>
+  <Property Name="DropLocations">Jungle Valley</Property>
+</Entity>
+<Entity Name="The Pact" Type="DivinationCard">
+  <Property Name="Set">9</Property>
+  <Property Name="Mods">Pledge of Hands</Property>
+  <Property Name="DropLocations">The Docks (Merciless) ,  Shipyard</Property>
+</Entity>
+<Entity Name="The Poet" Type="DivinationCard">
+  <Property Name="Set">9</Property>
+  <Property Name="Mods">Blood of Corruption  |  Corrupted</Property>
+  <Property Name="DropLocations">The Marketplace (Normal) ,  Arcade</Property>
+</Entity>
+<Entity Name="The Queen" Type="DivinationCard">
+  <Property Name="Set">16</Property>
+  <Property Name="Mods">Atziri's Acuity</Property>
+  <Property Name="DropLocations">Vaults of Atziri</Property>
+</Entity>
+<Entity Name="Rain of Chaos" Type="DivinationCard">
+  <Property Name="Set">8</Property>
+  <Property Name="Mods">Chaos Orb</Property>
+  <Property Name="DropLocations">The Crossroads (Cruel, Merciless) ,  Village Ruin</Property>
+</Entity>
+<Entity Name="The Road to Power" Type="DivinationCard">
+  <Property Name="Set">7</Property>
+  <Property Name="Mods">Runic One-Hand Weapon  |  Item Level: 100</Property>
+  <Property Name="DropLocations">The Fellshrine Ruins (Cruel) ,  Shore ,  Orchard</Property>
+</Entity>
+<Entity Name="The Scarred Meadow" Type="DivinationCard">
+  <Property Name="Set">9</Property>
+  <Property Name="Mods">Wake of Destruction</Property>
+  <Property Name="DropLocations">The Old Fields ,  Dry Peninsula</Property>
+</Entity>
+<Entity Name="The Scholar" Type="DivinationCard">
+  <Property Name="Set">3</Property>
+  <Property Name="Mods">40× Scroll of Wisdom</Property>
+  <Property Name="DropLocations">The Archives (Normal) ,  The Library (All) ,  Museum ,  Academy</Property>
+</Entity>
+<Entity Name="The Siren" Type="DivinationCard">
+  <Property Name="Set">7</Property>
+  <Property Name="Mods">The Whispering Ice | Corrupted</Property>
+  <Property Name="DropLocations">Graveyard map</Property>
+</Entity>
+<Entity Name="The Spoiled Prince" Type="DivinationCard">
+  <Property Name="Set">4</Property>
+  <Property Name="Mods">Dictator's Prophecy Wand | Item Level: 100</Property>
+  <Property Name="DropLocations">Museum map</Property>
+</Entity>
+<Entity Name="The Summoner" Type="DivinationCard">
+  <Property Name="Set">6</Property>
+  <Property Name="Mods">Superior Minion Gem  |  Quality: +20%</Property>
+  <Property Name="DropLocations">The Fetid Pool (Cruel, Merciless) ,  The Lower Prison (Cruel, Merciless) ,  The Upper Prison (Cruel, Merciless) ,  The Catacombs (Merciless) ,  The Chamber of Sins Level 1 (Cruel, Merciless),  The Chamber of Sins Level 2 (Cruel, Merciless) ,  The Crypt Level 2 (Cruel, Merciless) ,  Acton's Nightmare ,  The Coward's Trial ,  Dungeon ,  Necropolis</Property>
+</Entity>
+<Entity Name="The Sun" Type="DivinationCard">
+  <Property Name="Set">7</Property>
+  <Property Name="Mods">Rise of the Phoenix</Property>
+  <Property Name="DropLocations">The Solaris Temple (All) ,  Temple</Property>
+</Entity>
+<Entity Name="Three Faces in the Dark" Type="DivinationCard">
+  <Property Name="Set">7</Property>
+  <Property Name="Mods">3× Chaos Orb</Property>
+  <Property Name="DropLocations">The Warehouse District (All) ,  The Marketplace ,  Arsenal ,  Village Ruin</Property>
+</Entity>
+<Entity Name="Time-Lost Relic" Type="DivinationCard">
+  <Property Name="Set">10</Property>
+  <Property Name="Mods">League-Specific Item</Property>
+  <Property Name="DropLocations">Excavation Map</Property>
+</Entity>
+<Entity Name="The Union" Type="DivinationCard">
+  <Property Name="Set">7</Property>
+  <Property Name="Mods">10× Gemcutter's Prism</Property>
+  <Property Name="DropLocations">The Fellshrine Ruins (Cruel, Merciless)</Property>
+</Entity>
+<Entity Name="Vinia's Token" Type="DivinationCard">
+  <Property Name="Set">5</Property>
+  <Property Name="Mods">10× Orb of Regret</Property>
+  <Property Name="DropLocations">The Crematorium (Merciless) ,  The Lunaris Temple Level 1 (Merciless) ,  The Lunaris Temple Level 2 (Merciless) ,  Temple</Property>
+</Entity>
+<Entity Name="The Warden" Type="DivinationCard">
+  <Property Name="Set">4</Property>
+  <Property Name="Mods">Amulet  |  Corrupted</Property>
+  <Property Name="DropLocations">The Lower Prison (Cruel, Merciless) ,  The Upper Prison (Cruel, Merciless) ,  Dungeon</Property>
+</Entity>
+<Entity Name="The Watcher" Type="DivinationCard">
+  <Property Name="Set">12</Property>
+  <Property Name="Mods">Crown of Eyes</Property>
+  <Property Name="DropLocations">Quarry</Property>
+</Entity>
+<Entity Name="The Wind" Type="DivinationCard">
+  <Property Name="Set">7</Property>
+  <Property Name="Mods">Windripper</Property>
+  <Property Name="DropLocations">Jungle Valley</Property>
+</Entity>
+<Entity Name="The Wrath" Type="DivinationCard">
+  <Property Name="Set">8</Property>
+  <Property Name="Mods">10x Chaos Orb</Property>
+  <Property Name="DropLocations">The Cavern of Wrath (Cruel)</Property>
+</Entity>
+</Root>

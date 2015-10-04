@@ -1,0 +1,467 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Root>
+<Entity Type="Armour" Category="Body Armour">
+  <Property id="Name">Ambu's Charge</Property>
+  <Property id="Type">Body Armour</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Crusader Chainmail</Property>
+  <Property id="Level">43</Property>
+  <Property id="Strength">64</Property>
+  <Property id="Dexterity">0</Property>
+  <Property id="Intelligence">64</Property>
+  <Property id="ArmourValue">(406 to 473)</Property>
+  <Property id="EvasionValue">0</Property>
+  <Property id="EnergyShieldValue">(120 to 140)</Property>
+  <Property id="Mods">(140 to 180)% increased Armour and Energy Shield | +10% to all Elemental Resistances | Gain an Endurance Charge when an enemy Scores a Critical Strike on You | 2% of Life Regenerated per Second while on Low Life | Share Endurance Charges with nearby party members</Property>
+</Entity>
+<Entity Type="Armour" Category="Body Armour">
+  <Property id="Name">Ashrend</Property>
+  <Property id="Type">Body Armour</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Buckskin Tunic</Property>
+  <Property id="Level">17</Property>
+  <Property id="Strength">0</Property>
+  <Property id="Dexterity">53</Property>
+  <Property id="Intelligence">0</Property>
+  <Property id="ArmourValue">0</Property>
+  <Property id="EvasionValue">(227 to 252)</Property>
+  <Property id="EnergyShieldValue">0</Property>
+  <Property id="Mods">(80 to 100)% increased Evasion Rating | +(40 to 50)% to Fire Resistance | Cannot be Ignited | (10 to 15)% increased Physical Damage with Ranged Weapons | −(5 to 7) Physical Damage taken from Attacks</Property>
+</Entity>
+<Entity Type="Armour" Category="Body Armour">
+  <Property id="Name">Atziri's Splendour</Property>
+  <Property id="Type">Body Armour</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Sacrificial Garb</Property>
+  <Property id="Level">75</Property>
+  <Property id="Strength">66</Property>
+  <Property id="Dexterity">66</Property>
+  <Property id="Intelligence">66</Property>
+  <Property id="ArmourValue">(234 to 1217)</Property>
+  <Property id="EvasionValue">(234 to 1217)</Property>
+  <Property id="EnergyShieldValue">(69 to 676)</Property>
+  <Property id="Mods">[Style Variant] | [see notes] | +(20 to 24)% | to all Elemental Resistances | +100 Life Gained on Kill | +100 Mana Gained on Kill</Property>
+</Entity>
+<Entity Type="Armour" Category="Body Armour">
+  <Property id="Name">Belly of the Beast</Property>
+  <Property id="Type">Body Armour</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Full Wyrmscale</Property>
+  <Property id="Level">46</Property>
+  <Property id="Strength">68</Property>
+  <Property id="Dexterity">68</Property>
+  <Property id="Intelligence">0</Property>
+  <Property id="ArmourValue">(453 to 543)</Property>
+  <Property id="EvasionValue">181</Property>
+  <Property id="EnergyShieldValue">0</Property>
+  <Property id="Mods">(150 to 200)% increased Armour | (30 to 40)% increased maximum Life | +(10 to 15)% to all Elemental Resistances | 50% increased Flask Life Recovery rate | Extra Gore</Property>
+</Entity>
+<Entity Type="Armour" Category="Body Armour">
+  <Property id="Name">Bramblejack</Property>
+  <Property id="Type">Body Armour</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Plate Vest</Property>
+  <Property id="Level">0</Property>
+  <Property id="Strength">0</Property>
+  <Property id="Dexterity">0</Property>
+  <Property id="Intelligence">0</Property>
+  <Property id="ArmourValue">14</Property>
+  <Property id="EvasionValue">0</Property>
+  <Property id="EnergyShieldValue">0</Property>
+  <Property id="Mods">Adds 2–4 Physical Damage | +(12 to 20) to maximum Life | −2 Physical Damage taken from Attacks | 40% of Melee Physical Damage taken reflected to Attacker</Property>
+</Entity>
+<Entity Type="Armour" Category="Body Armour">
+  <Property id="Name">Briskwrap</Property>
+  <Property id="Type">Body Armour</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Strapped Leather</Property>
+  <Property id="Level">9</Property>
+  <Property id="Strength">0</Property>
+  <Property id="Dexterity">32</Property>
+  <Property id="Intelligence">0</Property>
+  <Property id="ArmourValue">0</Property>
+  <Property id="EvasionValue">(190 to 250)</Property>
+  <Property id="EnergyShieldValue">0</Property>
+  <Property id="Mods">5% increased Attack Speed | +(120 to 180) to Evasion Rating | +(30 to 40)% to Cold Resistance | 5% increased Movement Speed | (20 to 25)% increased Mana Recovery from Flasks | 5% increased Dexterity</Property>
+</Entity>
+<Entity Type="Armour" Category="Body Armour">
+  <Property id="Name">Bronn's Lithe</Property>
+  <Property id="Type">Body Armour</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Cutthroat's Garb</Property>
+  <Property id="Level">53</Property>
+  <Property id="Strength">0</Property>
+  <Property id="Dexterity">144</Property>
+  <Property id="Intelligence">0</Property>
+  <Property id="ArmourValue">0</Property>
+  <Property id="EvasionValue">(1134 to 1323)</Property>
+  <Property id="EnergyShieldValue">0</Property>
+  <Property id="Mods">+2 to Level of Movement Gems in this item | 10% increased Attack Speed | (200 to 250)% increased Evasion Rating | 10% increased Movement Speed</Property>
+</Entity>
+<Entity Type="Armour" Category="Body Armour">
+  <Property id="Name">Carcass Jack</Property>
+  <Property id="Type">Body Armour</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Varnished Coat</Property>
+  <Property id="Level">62</Property>
+  <Property id="Strength">0</Property>
+  <Property id="Dexterity">96</Property>
+  <Property id="Intelligence">96</Property>
+  <Property id="ArmourValue">0</Property>
+  <Property id="EvasionValue">(607 to 690)</Property>
+  <Property id="EnergyShieldValue">(178 to 203)</Property>
+  <Property id="Mods">(120 to 150)% increased Evasion and Energy Shield | +(50 to 70) to maximum Life | +(9 to 12)% to all Elemental Resistances | 20% increased Radius of Area Skills | 12% increased Area Damage | Extra gore</Property>
+</Entity>
+<Entity Type="Armour" Category="Body Armour">
+  <Property id="Name">Cherrubim's Maleficence</Property>
+  <Property id="Type">Body Armour</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Triumphant Lamellar</Property>
+  <Property id="Level">69</Property>
+  <Property id="Strength">95</Property>
+  <Property id="Dexterity">116</Property>
+  <Property id="Intelligence">0</Property>
+  <Property id="ArmourValue">(704 to 813)</Property>
+  <Property id="EvasionValue">(884 to 1020)</Property>
+  <Property id="EnergyShieldValue">0</Property>
+  <Property id="Mods">(10-20)% increased Chaos Damage | (160-200)% increased Armour and Evasion | +(70-100) to maximum Life | 30% increased Life Leech Rate</Property>
+</Entity>
+<Entity Type="Armour" Category="Body Armour">
+  <Property id="Name">Cloak of Flame</Property>
+  <Property id="Type">Body Armour</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Scholar's Robe</Property>
+  <Property id="Level">18</Property>
+  <Property id="Strength">0</Property>
+  <Property id="Dexterity">0</Property>
+  <Property id="Intelligence">55</Property>
+  <Property id="ArmourValue">0</Property>
+  <Property id="EvasionValue">0</Property>
+  <Property id="EnergyShieldValue">41</Property>
+  <Property id="Mods">+(30 to 50)% to Fire Resistance | (30 to 50)% increased Ignite Duration on enemies | 10% chance to Ignite | Reflects 15 Fire Damage to Melee Attackers | 20% of Physical Damage taken as Fire Damage</Property>
+</Entity>
+<Entity Type="Armour" Category="Body Armour">
+  <Property id="Name">Cloak of Defiance</Property>
+  <Property id="Type">Body Armour</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Lacquered Garb</Property>
+  <Property id="Level">52</Property>
+  <Property id="Strength">0</Property>
+  <Property id="Dexterity">76</Property>
+  <Property id="Intelligence">76</Property>
+  <Property id="ArmourValue">0</Property>
+  <Property id="EvasionValue">(428 to 510)</Property>
+  <Property id="EnergyShieldValue">(126 to 150)</Property>
+  <Property id="Mods">(110 to 150)% increased Evasion and Energy Shield | +(90 to 110) to maximum Mana | (40 to 50)% increased Mana Regeneration Rate | Mind Over Matter</Property>
+</Entity>
+<Entity Type="Armour" Category="Body Armour">
+  <Property id="Name">The Covenant</Property>
+  <Property id="Type">Body Armour</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Spidersilk Robe</Property>
+  <Property id="Level">49</Property>
+  <Property id="Strength">0</Property>
+  <Property id="Dexterity">0</Property>
+  <Property id="Intelligence">134</Property>
+  <Property id="ArmourValue">0</Property>
+  <Property id="EvasionValue">0</Property>
+  <Property id="EnergyShieldValue">(288 to 330)</Property>
+  <Property id="Mods">Gems in this item are Supported by level 15 Added Chaos Damage | +(20 to 30) to Intelligence | 20% reduced maximum Life | (180 to 220)% increased Energy Shield | Blood Magic</Property>
+</Entity>
+<Entity Type="Armour" Category="Body Armour">
+  <Property id="Name">Daresso's Defiance</Property>
+  <Property id="Type">Body Armour</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Full Dragonscale</Property>
+  <Property id="Level">63</Property>
+  <Property id="Strength">115</Property>
+  <Property id="Dexterity">94</Property>
+  <Property id="Intelligence">0</Property>
+  <Property id="ArmourValue">(871 to 1005)</Property>
+  <Property id="EvasionValue">(692 to 798)</Property>
+  <Property id="EnergyShieldValue">0</Property>
+  <Property id="Mods">(160 to 200)% increased Armour and Evasion | +(40 to 60) to maximum Life | (2 to 3)% of Physical Attack Damage Leeched as Life | 6% Chance to Dodge Attacks | You lose all Endurance Charges when Hit | You gain an Endurance Charge on Kill | You gain Onslaught for 1 second per Endurance Charge when Hit</Property>
+</Entity>
+<Entity Type="Armour" Category="Body Armour">
+  <Property id="Name">Death's Oath</Property>
+  <Property id="Type">Body Armour</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Astral Plate</Property>
+  <Property id="Level">62</Property>
+  <Property id="Strength">180</Property>
+  <Property id="Dexterity">0</Property>
+  <Property id="Intelligence">0</Property>
+  <Property id="ArmourValue">(1420 to 1622)</Property>
+  <Property id="EvasionValue">0</Property>
+  <Property id="EnergyShieldValue">0</Property>
+  <Property id="Mods">+(8 to 12)% to all Elemental Resistances | +(40 to 50) to all Attributes | (10 to 15)% increased Attack Speed | (180 to 220)% increased Armour | 5% of Physical Attack Damage Leeched as Life | Deals 450.0 Chaos Damage per second to nearby enemies | You take 450 Chaos Damage per second for 10 seconds on Kill | Gore Footprints</Property>
+  <Property id="HasImplicitMod">True</Property>
+</Entity>
+<Entity Type="Armour" Category="Body Armour">
+  <Property id="Name">Foxshade</Property>
+  <Property id="Type">Body Armour</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Wild Leather</Property>
+  <Property id="Level">25</Property>
+  <Property id="Strength">0</Property>
+  <Property id="Dexterity">73</Property>
+  <Property id="Intelligence">0</Property>
+  <Property id="ArmourValue">0</Property>
+  <Property id="EvasionValue">(273 to 309)</Property>
+  <Property id="EnergyShieldValue">0</Property>
+  <Property id="Mods">Adds 5–12 Physical Damage | +(20 to 30) to Dexterity | You gain 150 Evasion Rating when on Full Life | (50 to 70)% increased Evasion Rating | 10% increased Movement Speed</Property>
+</Entity>
+<Entity Type="Armour" Category="Body Armour">
+  <Property id="Name">Greed's Embrace</Property>
+  <Property id="Type">Body Armour</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Golden Plate</Property>
+  <Property id="Level">56</Property>
+  <Property id="Strength">106</Property>
+  <Property id="Dexterity">0</Property>
+  <Property id="Intelligence">0</Property>
+  <Property id="ArmourValue">399</Property>
+  <Property id="EvasionValue">0</Property>
+  <Property id="EnergyShieldValue">0</Property>
+  <Property id="Mods">(10 to 15)% increased Quantity of Items found | (30 to 50)% increased Rarity of Items found | −10% to Fire Resistance | +(20 to 30)% to Cold Resistance | −20% to Lightning Resistance | 20% reduced Movement Speed | 30% reduced Strength Requirement</Property>
+</Entity>
+<Entity Type="Armour" Category="Body Armour">
+  <Property id="Name">Hyrri's Ire</Property>
+  <Property id="Type">Body Armour</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Zodiac Leather</Property>
+  <Property id="Level">65</Property>
+  <Property id="Strength">0</Property>
+  <Property id="Dexterity">197</Property>
+  <Property id="Intelligence">0</Property>
+  <Property id="ArmourValue">0</Property>
+  <Property id="EvasionValue">(1462 to 1949)</Property>
+  <Property id="EnergyShieldValue">0</Property>
+  <Property id="Mods">+(20 to 30) to Dexterity | Adds 13–24 Cold Damage | (140 to 220)% increased Evasion Rating | 25% increased Chill Duration on enemies | Acrobatics</Property>
+</Entity>
+<Entity Type="Armour" Category="Body Armour">
+  <Property id="Name">Icetomb</Property>
+  <Property id="Type">Body Armour</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Latticed Ringmail</Property>
+  <Property id="Level">39</Property>
+  <Property id="Strength">59</Property>
+  <Property id="Dexterity">0</Property>
+  <Property id="Intelligence">59</Property>
+  <Property id="ArmourValue">(370 to 400)</Property>
+  <Property id="EvasionValue">0</Property>
+  <Property id="EnergyShieldValue">(110 to 120)</Property>
+  <Property id="Mods">+15 to Strength | +15 to Intelligence | (140 to 160)% increased Armour and Energy Shield | +(50 to 75)% to Cold Resistance | Cannot be Chilled | 150% increased Chill Duration on enemies</Property>
+</Entity>
+<Entity Type="Armour" Category="Body Armour">
+  <Property id="Name">Incandescent Heart</Property>
+  <Property id="Type">Body Armour</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Saintly Chainmail</Property>
+  <Property id="Level">70</Property>
+  <Property id="Strength">99</Property>
+  <Property id="Dexterity">0</Property>
+  <Property id="Intelligence">115</Property>
+  <Property id="ArmourValue">(761 to 878)</Property>
+  <Property id="EvasionValue">0</Property>
+  <Property id="EnergyShieldValue">(216 to 235)</Property>
+  <Property id="Mods">+(60 to 80) to Armour | (120 to 140)% increased Armour and Energy Shield | +(80 to 90) to maximum Life | (4 to 5)% of Physical Attack Damage Leeched as Life | 25% of Elemental Damage taken as Chaos Damage | (20 to 30)% increased Light Radius | Light Radius is based on Energy Shield instead of Life</Property>
+</Entity>
+<Entity Type="Armour" Category="Body Armour">
+  <Property id="Name">Infernal Mantle</Property>
+  <Property id="Type">Body Armour</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Occultist's Vestment</Property>
+  <Property id="Level">62</Property>
+  <Property id="Strength">0</Property>
+  <Property id="Dexterity">0</Property>
+  <Property id="Intelligence">180</Property>
+  <Property id="ArmourValue">0</Property>
+  <Property id="EvasionValue">0</Property>
+  <Property id="EnergyShieldValue">(406 to 462)</Property>
+  <Property id="Mods">(3 to 10)% increased Spell Damage | +1 to Level of Fire Gems in this item | (25 to 35)% increased Fire Damage | 100% increased Global Critical Strike Chance | (190 to 230)% increased Energy Shield | 25% of Fire Damage Converted to Chaos Damage | 100% increased Spell Damage taken when on Low Mana</Property>
+  <Property id="HasImplicitMod">True</Property>
+</Entity>
+<Entity Type="Armour" Category="Body Armour">
+  <Property id="Name">Kaom's Heart</Property>
+  <Property id="Type">Body Armour</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Glorious Plate</Property>
+  <Property id="Level">68</Property>
+  <Property id="Strength">191</Property>
+  <Property id="Dexterity">0</Property>
+  <Property id="Intelligence">0</Property>
+  <Property id="ArmourValue">553</Property>
+  <Property id="EvasionValue">0</Property>
+  <Property id="EnergyShieldValue">0</Property>
+  <Property id="Mods">Has no Sockets | +500 to maximum Life | (20 to 40)% increased Fire Damage</Property>
+</Entity>
+<Entity Type="Armour" Category="Body Armour">
+  <Property id="Name">Lightbane Raiment</Property>
+  <Property id="Type">Body Armour</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Ornate Ringmail</Property>
+  <Property id="Level">47</Property>
+  <Property id="Strength">69</Property>
+  <Property id="Dexterity">0</Property>
+  <Property id="Intelligence">69</Property>
+  <Property id="ArmourValue">(407 to 444)</Property>
+  <Property id="EvasionValue">0</Property>
+  <Property id="EnergyShieldValue">(119 to 130)</Property>
+  <Property id="Mods">(120 to 140)% increased Armour and Energy Shield | 10% of Physical Damage Converted to Chaos Damage | Reflects 30 Chaos Damage to Melee Attackers | 25% reduced Light Radius | 100% chance on Block to create Desecrated Ground</Property>
+</Entity>
+<Entity Type="Armour" Category="Body Armour">
+  <Property id="Name">Lightning Coil</Property>
+  <Property id="Type">Body Armour</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Desert Brigandine</Property>
+  <Property id="Level">60</Property>
+  <Property id="Strength">96</Property>
+  <Property id="Dexterity">96</Property>
+  <Property id="Intelligence">0</Property>
+  <Property id="ArmourValue">(509 to 590)</Property>
+  <Property id="EvasionValue">(509 to 590)</Property>
+  <Property id="EnergyShieldValue">0</Property>
+  <Property id="Mods">Adds (1–20 to 1–30) Lightning Damage | (90 to 120)% increased Armour and Evasion | +(60 to 80) to maximum Life | −60% to Lightning Resistance | 30% of Physical Damage taken as Lightning Damage</Property>
+</Entity>
+<Entity Type="Armour" Category="Body Armour">
+  <Property id="Name">Queen of the Forest</Property>
+  <Property id="Type">Body Armour</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Destiny Leather</Property>
+  <Property id="Level">59</Property>
+  <Property id="Strength">0</Property>
+  <Property id="Dexterity">160</Property>
+  <Property id="Intelligence">0</Property>
+  <Property id="ArmourValue">0</Property>
+  <Property id="EvasionValue">(1455 to 2054)</Property>
+  <Property id="EnergyShieldValue">0</Property>
+  <Property id="Mods">(240 to 380)% increased Evasion Rating | +(60 to 70) to maximum Life | +(6 to 10)% to Fire Resistance | +(26 to 40)% to Cold Resistance | +(11 to 25)% to Lightning Resistance | 25% reduced Movement Speed | 1% increased Movement Speed per 450 Evasion Rating | −(50 to 40) Physical Damage taken when hit by Animals</Property>
+</Entity>
+<Entity Type="Armour" Category="Body Armour">
+  <Property id="Name">The Rat Cage</Property>
+  <Property id="Type">Body Armour</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Sharkskin Tunic</Property>
+  <Property id="Level">56</Property>
+  <Property id="Strength">0</Property>
+  <Property id="Dexterity">152</Property>
+  <Property id="Intelligence">0</Property>
+  <Property id="ArmourValue">0</Property>
+  <Property id="EvasionValue">(798 to 877)</Property>
+  <Property id="EnergyShieldValue">0</Property>
+  <Property id="Mods">(100 to 120)% increased Evasion Rating | +(160 to 200) to maximum Life | −5% to maximum Fire Resistance | 15% increased Movement Speed | 20% increased Fire Damage taken | 10% of Fire Damage taken as Physical Damage</Property>
+</Entity>
+<Entity Type="Armour" Category="Body Armour">
+  <Property id="Name">Shavronne's Wrappings</Property>
+  <Property id="Type">Body Armour</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Occultist's Vestment</Property>
+  <Property id="Level">62</Property>
+  <Property id="Strength">0</Property>
+  <Property id="Dexterity">0</Property>
+  <Property id="Intelligence">180</Property>
+  <Property id="ArmourValue">0</Property>
+  <Property id="EvasionValue">0</Property>
+  <Property id="EnergyShieldValue">(336 to 420)</Property>
+  <Property id="Mods">(3 to 10)% increased Spell Damage | (140 to 200)% increased Energy Shield | 10% faster start of Energy Shield Recharge | +(30 to 40)% to Lightning Resistance | Reflects 1–250 Lightning Damage to Melee Attackers | Chaos Damage does not bypass Energy Shield</Property>
+  <Property id="HasImplicitMod">True</Property>
+</Entity>
+<Entity Type="Armour" Category="Body Armour">
+  <Property id="Name">Solaris Lorica</Property>
+  <Property id="Type">Body Armour</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Copper Plate</Property>
+  <Property id="Level">17</Property>
+  <Property id="Strength">53</Property>
+  <Property id="Dexterity">0</Property>
+  <Property id="Intelligence">0</Property>
+  <Property id="ArmourValue">(202 to 227)</Property>
+  <Property id="EvasionValue">0</Property>
+  <Property id="EnergyShieldValue">0</Property>
+  <Property id="Mods">+(10 to 20) to Strength | (60 to 80)% increased Armour | 25% increased Light Radius | Chaos Damage does not bypass Energy Shield | −10 Chaos Damage taken</Property>
+</Entity>
+<Entity Type="Armour" Category="Body Armour">
+  <Property id="Name">Soul Mantle</Property>
+  <Property id="Type">Body Armour</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Spidersilk Robe</Property>
+  <Property id="Level">49</Property>
+  <Property id="Strength">0</Property>
+  <Property id="Dexterity">0</Property>
+  <Property id="Intelligence">134</Property>
+  <Property id="ArmourValue">0</Property>
+  <Property id="EvasionValue">0</Property>
+  <Property id="EnergyShieldValue">(206 to 227)</Property>
+  <Property id="Mods">Gems in this item are Supported by level 14 Spell Totem | (20 to 25)% increased Spell Damage | (100 to 120)% increased Energy Shield | 50% increased Totem Life | Can summon up to 1 additional totem | Inflicts a random level 20 Curse on you when your Totems die</Property>
+</Entity>
+<Entity Type="Armour" Category="Body Armour">
+  <Property id="Name">Tabula Rasa</Property>
+  <Property id="Type">Body Armour</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Simple Robe</Property>
+  <Property id="Level">0</Property>
+  <Property id="Strength">0</Property>
+  <Property id="Dexterity">0</Property>
+  <Property id="Intelligence">0</Property>
+  <Property id="ArmourValue">0</Property>
+  <Property id="EvasionValue">0</Property>
+  <Property id="EnergyShieldValue">0</Property>
+  <Property id="Mods"/></Entity>
+<Entity Type="Armour" Category="Body Armour">
+  <Property id="Name">Thousand Ribbons</Property>
+  <Property id="Type">Body Armour</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Simple Robe</Property>
+  <Property id="Level">0</Property>
+  <Property id="Strength">0</Property>
+  <Property id="Dexterity">0</Property>
+  <Property id="Intelligence">17</Property>
+  <Property id="ArmourValue">0</Property>
+  <Property id="EvasionValue">(10 to 20)</Property>
+  <Property id="EnergyShieldValue">(21 to 31)</Property>
+  <Property id="Mods">Gems in this item are Supported by level 5 Elemental Proliferation | Adds 2–3 Fire Damage | Adds 2–3 Cold Damage | Adds 1–4 Lightning Damage | +(10 to 20) to Evasion Rating | +6 to maximum Life | +6 to maximum Mana | +(10 to 20) to maximum Energy Shield | +(5 to 10)% to Fire Resistance | +(5 to 10)% to Cold Resistance | +(5 to 10)% to Lightning Resistance | 10% reduced Cast Speed</Property>
+</Entity>
+<Entity Type="Armour" Category="Body Armour">
+  <Property id="Name">Vis Mortis</Property>
+  <Property id="Type">Body Armour</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Necromancer Silks</Property>
+  <Property id="Level">59</Property>
+  <Property id="Strength">0</Property>
+  <Property id="Dexterity">0</Property>
+  <Property id="Intelligence">160</Property>
+  <Property id="ArmourValue">0</Property>
+  <Property id="EvasionValue">0</Property>
+  <Property id="EnergyShieldValue">(250 to 275)</Property>
+  <Property id="Mods">+(20 to 30) to maximum Mana | (100 to 120)% increased Energy Shield | Minions have 20% reduced Maximum Life | Minions deal 15% increased Damage | +1 to Maximum number of Spectres | Minions gain Unholy Might for 5 seconds on Kill</Property>
+</Entity>
+<Entity Type="Armour" Category="Body Armour">
+  <Property id="Name">Voll's Protector</Property>
+  <Property id="Type">Body Armour</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Holy Chainmail</Property>
+  <Property id="Level">35</Property>
+  <Property id="Strength">53</Property>
+  <Property id="Dexterity">0</Property>
+  <Property id="Intelligence">53</Property>
+  <Property id="ArmourValue">221</Property>
+  <Property id="EvasionValue">0</Property>
+  <Property id="EnergyShieldValue">66</Property>
+  <Property id="Mods">60% increased Armour and Energy Shield | 50% reduced maximum Mana | Gain a Power Charge for each Enemy you hit with a Critical Strike</Property>
+</Entity>
+<Entity Type="Armour" Category="Body Armour">
+  <Property id="Name">Zahndethus' Cassock</Property>
+  <Property id="Type">Body Armour</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Sage's Robe</Property>
+  <Property id="Level">37</Property>
+  <Property id="Strength">0</Property>
+  <Property id="Dexterity">0</Property>
+  <Property id="Intelligence">104</Property>
+  <Property id="ArmourValue">0</Property>
+  <Property id="EvasionValue">0</Property>
+  <Property id="EnergyShieldValue">(138 to 158)</Property>
+  <Property id="Mods">Adds 1–40 Lightning Damage | (75 to 100)% increased Energy Shield | +(40 to 50) to Chaos Resistance | 25% increased Light Radius | 100% chance on Block to create Consecrated Ground</Property>
+</Entity>
+</Root>

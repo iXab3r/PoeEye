@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Root>
+<Entity Type="Weapon" Category="Staff">
+  <Property id="Name">Agnerod East</Property>
+  <Property id="Type">Staff</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Imperial Staff</Property>
+  <Property id="Level">66</Property>
+  <Property id="Strength">158</Property>
+  <Property id="Intelligence">113</Property>
+  <Property id="PhysicalDamage">58–175</Property>
+  <Property id="FireDamage">0</Property>
+  <Property id="ColdDamage">0</Property>
+  <Property id="LightningDamage">0</Property>
+  <Property id="ChaosDamage">0</Property>
+  <Property id="CriticalStrikeChance">6.68%</Property>
+  <Property id="AttacksPerSecond">1.00</Property>
+  <Property id="Mods">12% Chance to Block | +1 to Level of Socketed Lightning Gems | +(80 to 120) to Intelligence | (30 to 50)% increased Lightning Damage | 100% increased Shock Duration on enemies | 40% increased Strength Requirement | Damage Penetrates 20% Lightning Resistance</Property>
+  <Property id="HasImplicitMod">True</Property>
+</Entity>
+<Entity Type="Weapon" Category="Staff">
+  <Property id="Name">Agnerod North</Property>
+  <Property id="Type">Staff</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Imperial Staff</Property>
+  <Property id="Level">66</Property>
+  <Property id="Strength">158</Property>
+  <Property id="Intelligence">113</Property>
+  <Property id="PhysicalDamage">58–175</Property>
+  <Property id="FireDamage">0</Property>
+  <Property id="ColdDamage">0</Property>
+  <Property id="LightningDamage">0</Property>
+  <Property id="ChaosDamage">0</Property>
+  <Property id="CriticalStrikeChance">6.68%</Property>
+  <Property id="AttacksPerSecond">1.00</Property>
+  <Property id="Mods">12% Chance to Block | +1 to Level of Socketed Lightning Gems | +(80 to 120) to Intelligence | (30 to 50)% increased Lightning Damage | 15% chance to Shock | 40% increased Strength Requirement | Damage Penetrates 20% Lightning Resistance</Property>
+  <Property id="HasImplicitMod">True</Property>
+</Entity>
+<Entity Type="Weapon" Category="Staff">
+  <Property id="Name">The Blood Thorn</Property>
+  <Property id="Type">Staff</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Gnarled Branch</Property>
+  <Property id="Level">0</Property>
+  <Property id="Strength">0</Property>
+  <Property id="Intelligence">0</Property>
+  <Property id="PhysicalDamage">11–23</Property>
+  <Property id="FireDamage">0</Property>
+  <Property id="ColdDamage">0</Property>
+  <Property id="LightningDamage">0</Property>
+  <Property id="ChaosDamage">0</Property>
+  <Property id="CriticalStrikeChance">6.5%</Property>
+  <Property id="AttacksPerSecond">1.10</Property>
+  <Property id="Mods">12% Chance to Block | 12% Chance to Block | 100% increased Physical Damage | (5 to 10)% increased Attack Speed | Reflects (22 to 44) Physical Damage to Attackers on Block | Curse Enemies with level 5 Vulnerability on Block</Property>
+  <Property id="HasImplicitMod">True</Property>
+</Entity>
+<Entity Type="Weapon" Category="Staff">
+  <Property id="Name">Dying Breath</Property>
+  <Property id="Type">Staff</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Coiled Staff</Property>
+  <Property id="Level">23</Property>
+  <Property id="Strength">43</Property>
+  <Property id="Intelligence">43</Property>
+  <Property id="PhysicalDamage">29–60</Property>
+  <Property id="FireDamage">0</Property>
+  <Property id="ColdDamage">0</Property>
+  <Property id="LightningDamage">0</Property>
+  <Property id="ChaosDamage">0</Property>
+  <Property id="CriticalStrikeChance">6.5%</Property>
+  <Property id="AttacksPerSecond">1.10</Property>
+  <Property id="Mods">18% Chance to Block | 18% increased Cast Speed | 18% increased maximum Mana | 18% increased Radius of Auras | 18% increased Radius of Curses | Nearby enemies have 18% increased Effect of Curses on them | 18% increased effect of Auras you Cast | Nearby allies gain 18% increased Damage</Property>
+  <Property id="HasImplicitMod">True</Property>
+</Entity>
+<Entity Type="Weapon" Category="Staff">
+  <Property id="Name">Fencoil</Property>
+  <Property id="Type">Staff</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Gnarled Branch</Property>
+  <Property id="Level">0</Property>
+  <Property id="Strength">0</Property>
+  <Property id="Intelligence">0</Property>
+  <Property id="PhysicalDamage">11–23</Property>
+  <Property id="FireDamage">0</Property>
+  <Property id="ColdDamage">0</Property>
+  <Property id="LightningDamage">0</Property>
+  <Property id="ChaosDamage">0</Property>
+  <Property id="CriticalStrikeChance">6.5%</Property>
+  <Property id="AttacksPerSecond">1.10</Property>
+  <Property id="Mods">12% Chance to Block | Gems in this item are Supported by level 8 Trap | (40 to 50)% increased Damage | (10 to 20)% increased maximum Life | (10 to 20)% increased maximum Mana</Property>
+  <Property id="HasImplicitMod">True</Property>
+</Entity>
+<Entity Type="Weapon" Category="Staff">
+  <Property id="Name">Hegemony's Era</Property>
+  <Property id="Type">Staff</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Judgement Staff</Property>
+  <Property id="Level">68</Property>
+  <Property id="Strength">113</Property>
+  <Property id="Intelligence">113</Property>
+  <Property id="PhysicalDamage">(245–311 to 255–341)</Property>
+  <Property id="FireDamage">0</Property>
+  <Property id="ColdDamage">0</Property>
+  <Property id="LightningDamage">0</Property>
+  <Property id="ChaosDamage">0</Property>
+  <Property id="CriticalStrikeChance">(8.02 to 8.68)%</Property>
+  <Property id="AttacksPerSecond">(1.34 to 1.39)</Property>
+  <Property id="Mods">12% Chance to Block | 6% Chance to Block | Adds (180-190 to 190-220) Physical Damage | (12-16)% increased Attack Speed | (20-30)% increased Critical Strike Chance | +1 maximum Power Charge | 10% chance to gain a Power Charge if you Knock an enemy Back with Melee Damage</Property>
+  <Property id="HasImplicitMod">True</Property>
+</Entity>
+<Entity Type="Weapon" Category="Staff">
+  <Property id="Name">Pillar of the Caged God</Property>
+  <Property id="Type">Staff</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Long Staff</Property>
+  <Property id="Level">13</Property>
+  <Property id="Strength">27</Property>
+  <Property id="Intelligence">27</Property>
+  <Property id="PhysicalDamage">20–33</Property>
+  <Property id="FireDamage">0</Property>
+  <Property id="ColdDamage">0</Property>
+  <Property id="LightningDamage">0</Property>
+  <Property id="ChaosDamage">0</Property>
+  <Property id="CriticalStrikeChance">6.5%</Property>
+  <Property id="AttacksPerSecond">1.25</Property>
+  <Property id="Mods">12% Chance to Block | 1% increased Area of Effect Radius per 20 Intelligence | 1% increased Attack Speed per 10 Dexterity | 16% increased Physical Weapon Damage per 10 Strength</Property>
+  <Property id="HasImplicitMod">True</Property>
+</Entity>
+<Entity Type="Weapon" Category="Staff">
+  <Property id="Name">Pledge of Hands</Property>
+  <Property id="Type">Staff</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Judgement Staff</Property>
+  <Property id="Level">68</Property>
+  <Property id="Strength">113</Property>
+  <Property id="Intelligence">113</Property>
+  <Property id="PhysicalDamage">65–121</Property>
+  <Property id="FireDamage">0</Property>
+  <Property id="ColdDamage">0</Property>
+  <Property id="LightningDamage">0</Property>
+  <Property id="ChaosDamage">0</Property>
+  <Property id="CriticalStrikeChance">6.68%</Property>
+  <Property id="AttacksPerSecond">1.20</Property>
+  <Property id="Mods">12% Chance to Block | Gems in this item are Supported by level 30 Spell Echo | (120 to 160)% increased Spell Damage | 100% increased Maximum Mana</Property>
+  <Property id="HasImplicitMod">True</Property>
+</Entity>
+<Entity Type="Weapon" Category="Staff">
+  <Property id="Name">The Searing Touch</Property>
+  <Property id="Type">Staff</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Long Staff</Property>
+  <Property id="Level">13</Property>
+  <Property id="Strength">27</Property>
+  <Property id="Intelligence">27</Property>
+  <Property id="PhysicalDamage">19–32</Property>
+  <Property id="FireDamage">0</Property>
+  <Property id="ColdDamage">0</Property>
+  <Property id="LightningDamage">0</Property>
+  <Property id="ChaosDamage">0</Property>
+  <Property id="CriticalStrikeChance">6.5%</Property>
+  <Property id="AttacksPerSecond">1.25</Property>
+  <Property id="Mods">12% Chance to Block | +2 to Level of Fire Gems in this item | (30 to 50)% increased Spell Damage | (20 to 40)% increased Fire Damage | 70% increased Burning Damage | 10% increased Cast Speed</Property>
+  <Property id="HasImplicitMod">True</Property>
+</Entity>
+<Entity Type="Weapon" Category="Staff">
+  <Property id="Name">Taryn's Shiver</Property>
+  <Property id="Type">Staff</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Maelström Staff</Property>
+  <Property id="Level">64</Property>
+  <Property id="Strength">113</Property>
+  <Property id="Intelligence">113</Property>
+  <Property id="PhysicalDamage">62–129</Property>
+  <Property id="FireDamage">0</Property>
+  <Property id="ColdDamage">0</Property>
+  <Property id="LightningDamage">0</Property>
+  <Property id="ChaosDamage">0</Property>
+  <Property id="CriticalStrikeChance">6.68%</Property>
+  <Property id="AttacksPerSecond">1.10</Property>
+  <Property id="Mods">18% Chance to Block | +1 to Level of Cold Gems in this item | (40 to 50)% increased Spell Damage | (40 to 50)% increased Cold Damage | (10 to 20)% increased Cast Speed | 8% Chance to Freeze | Enemies Frozen by you take 20% increased Damage</Property>
+  <Property id="HasImplicitMod">True</Property>
+</Entity>
+</Root>

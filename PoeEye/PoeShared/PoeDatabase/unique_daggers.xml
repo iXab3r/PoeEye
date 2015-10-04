@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Root>
+<Entity Type="Weapon" Category="Dagger">
+  <Property id="Name">Bino's Kitchen Knife</Property>
+  <Property id="Type">Dagger</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Slaughter Knife</Property>
+  <Property id="Level">65</Property>
+  <Property id="Dexterity">81</Property>
+  <Property id="Intelligence">117</Property>
+  <Property id="PhysicalDamage">(59–198 to 69–218)</Property>
+  <Property id="FireDamage">0</Property>
+  <Property id="ColdDamage">0</Property>
+  <Property id="LightningDamage">0</Property>
+  <Property id="ChaosDamage">0</Property>
+  <Property id="CriticalStrikeChance">(9.52 to 10.20)%</Property>
+  <Property id="AttacksPerSecond">1.40</Property>
+  <Property id="Mods">40% increased Global Critical Strike Chance | 30% increased Damage over Time | Adds (50–120 to 60–140) Physical Damage | (40 to 50)% increased Critical Strike Chance | (10 to 15)% increased Global Critical Strike Multiplier | +(8 to 12)% to Chaos Resistance | On killing a Poisoned enemy, nearby enemies are Poisoned | On killing a Poisoned enemy, nearby allies Regenerate Life</Property>
+  <Property id="HasImplicitMod">True</Property>
+</Entity>
+<Entity Type="Weapon" Category="Dagger">
+  <Property id="Name">Divinarius</Property>
+  <Property id="Type">Dagger</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Imperial Skean</Property>
+  <Property id="Level">66</Property>
+  <Property id="Dexterity">95</Property>
+  <Property id="Intelligence">131</Property>
+  <Property id="PhysicalDamage">17–67</Property>
+  <Property id="FireDamage">0</Property>
+  <Property id="ColdDamage">0</Property>
+  <Property id="LightningDamage">0</Property>
+  <Property id="ChaosDamage">0</Property>
+  <Property id="CriticalStrikeChance">6.98%</Property>
+  <Property id="AttacksPerSecond">1.50</Property>
+  <Property id="Mods">40% increased Global Critical Strike Chance | (50 to 70)% increased Spell Damage | (80 to 100)% increased Critical Strike Chance for Spells | +10 Life gained on Kill |  +5 Mana gained on Kill | 10% increased Radius of Area Skills</Property>
+  <Property id="HasImplicitMod">True</Property>
+</Entity>
+<Entity Type="Weapon" Category="Dagger">
+  <Property id="Name">Heartbreaker</Property>
+  <Property id="Type">Dagger</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Royal Skean</Property>
+  <Property id="Level">50</Property>
+  <Property id="Dexterity">71</Property>
+  <Property id="Intelligence">102</Property>
+  <Property id="PhysicalDamage">14–57</Property>
+  <Property id="FireDamage">0</Property>
+  <Property id="ColdDamage">0</Property>
+  <Property id="LightningDamage">0</Property>
+  <Property id="ChaosDamage">0</Property>
+  <Property id="CriticalStrikeChance">6.8%</Property>
+  <Property id="AttacksPerSecond">1.50</Property>
+  <Property id="Mods">40% increased Global Critical Strike Chance | (40 to 50)% increased Spell Damage | +(40 to 50) to maximum Mana | +50 to maximum Energy Shield | 10% faster start of Energy Shield Recharge | Your Spells have Culling Strike</Property>
+  <Property id="HasImplicitMod">True</Property>
+</Entity>
+<Entity Type="Weapon" Category="Dagger">
+  <Property id="Name">Mark of the Doubting Knight</Property>
+  <Property id="Type">Dagger</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Platinum Kris</Property>
+  <Property id="Level">64</Property>
+  <Property id="Dexterity">76</Property>
+  <Property id="Intelligence">149</Property>
+  <Property id="PhysicalDamage">(56–221 to 62–245)</Property>
+  <Property id="FireDamage">0</Property>
+  <Property id="ColdDamage">0</Property>
+  <Property id="LightningDamage">0</Property>
+  <Property id="ChaosDamage">0</Property>
+  <Property id="CriticalStrikeChance">7.28%</Property>
+  <Property id="AttacksPerSecond">1.08</Property>
+  <Property id="Mods">80% increased Global Critical Strike Chance | 5% Additional Chance to Block while Dual Wielding | (180 to 210)% increased Physical Damage | 10% reduced Attack Speed | +(6 to 10)% to all Elemental Resistances | Melee critical Strikes have 25% chance to cause Bleeding | Melee critical Strikes have 25% chance to Poison the enemy</Property>
+  <Property id="HasImplicitMod">True</Property>
+</Entity>
+<Entity Type="Weapon" Category="Dagger">
+  <Property id="Name">Mightflay</Property>
+  <Property id="Type">Dagger</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Flaying Knife</Property>
+  <Property id="Level">35</Property>
+  <Property id="Dexterity">73</Property>
+  <Property id="Intelligence">51</Property>
+  <Property id="PhysicalDamage">(47–142 to 52–158)</Property>
+  <Property id="FireDamage">0</Property>
+  <Property id="ColdDamage">0</Property>
+  <Property id="LightningDamage">0</Property>
+  <Property id="ChaosDamage">0</Property>
+  <Property id="CriticalStrikeChance">6.2%</Property>
+  <Property id="AttacksPerSecond">1.20</Property>
+  <Property id="Mods">40% increased Global Critical Strike Chance | (80 to 100)% increased Physical Damage | Adds 12–24 Physical Damage | +25 to Strength | +10 Life gained for each enemy hit by your Attacks</Property>
+  <Property id="HasImplicitMod">True</Property>
+</Entity>
+<Entity Type="Weapon" Category="Dagger">
+  <Property id="Name">Ungil's Gauche</Property>
+  <Property id="Type">Dagger</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Boot Knife</Property>
+  <Property id="Level">20</Property>
+  <Property id="Dexterity">31</Property>
+  <Property id="Intelligence">45</Property>
+  <Property id="PhysicalDamage">(13–52 to 14–58)</Property>
+  <Property id="FireDamage">0</Property>
+  <Property id="ColdDamage">0</Property>
+  <Property id="LightningDamage">3–30</Property>
+  <Property id="ChaosDamage">0</Property>
+  <Property id="CriticalStrikeChance">6.8%</Property>
+  <Property id="AttacksPerSecond">1.54</Property>
+  <Property id="Mods">40% increased Global Critical Strike Chance | 12% additional Chance to Block while Dual Wielding | (80 to 100)% increased Physical Damage | +(10 to 20) to Dexterity | Adds 3–30 Lightning Damage | 10% increased Attack Speed | 50% increased Global Critical Strike Chance</Property>
+  <Property id="HasImplicitMod">True</Property>
+</Entity>
+</Root>

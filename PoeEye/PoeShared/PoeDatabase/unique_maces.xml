@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Root>
+<Entity Type="Weapon" Category="Mace">
+  <Property id="Name">Brightbeak</Property>
+  <Property id="Type">Mace</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">War Hammer</Property>
+  <Property id="Level">20</Property>
+  <Property id="Strength">71</Property>
+  <Property id="Intelligence">0</Property>
+  <Property id="PhysicalDamage">(18–42 to 21–49)</Property>
+  <Property id="FireDamage">0</Property>
+  <Property id="ColdDamage">0</Property>
+  <Property id="LightningDamage">0</Property>
+  <Property id="ChaosDamage">0</Property>
+  <Property id="CriticalStrikeChance">6.25%</Property>
+  <Property id="AttacksPerSecond">1.95</Property>
+  <Property id="Mods">20% increased Stun Duration on enemies | (50 to 75)% increased Physical Damage | 50% increased Attack Speed | 25% increased Critical Strike Chance | +(20 to 30)% to Fire Resistance | +(20 to 30)% to Lightning Resistance</Property>
+  <Property id="HasImplicitMod">True</Property>
+</Entity>
+<Entity Type="Weapon" Category="Mace">
+  <Property id="Name">Mjolner</Property>
+  <Property id="Type">Mace</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Gavel</Property>
+  <Property id="Level">60</Property>
+  <Property id="Strength">412</Property>
+  <Property id="Intelligence">300</Property>
+  <Property id="PhysicalDamage">(81–151 to 99–185)</Property>
+  <Property id="FireDamage">0</Property>
+  <Property id="ColdDamage">0</Property>
+  <Property id="LightningDamage">0</Property>
+  <Property id="ChaosDamage">0</Property>
+  <Property id="CriticalStrikeChance">5%</Property>
+  <Property id="AttacksPerSecond">1.05</Property>
+  <Property id="Mods">40% increased Stun Duration on enemies | (80 to 120)% increased Physical Damage | Skills Chain +1 times | (30 to 40)% increased Lightning Damage with Weapons | +200 Strength Requirement | +300 Intelligence Requirement | 50% chance to Cast Socketed Lightning Spells on Hit</Property>
+  <Property id="HasImplicitMod">True</Property>
+</Entity>
+<Entity Type="Weapon" Category="Mace">
+  <Property id="Name">Brutus' Lead Sprinkler</Property>
+  <Property id="Type">Mace</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Ritual Sceptre</Property>
+  <Property id="Level">28</Property>
+  <Property id="Strength">51</Property>
+  <Property id="Intelligence">51</Property>
+  <Property id="PhysicalDamage">36–85</Property>
+  <Property id="FireDamage">0</Property>
+  <Property id="ColdDamage">0</Property>
+  <Property id="LightningDamage">0</Property>
+  <Property id="ChaosDamage">0</Property>
+  <Property id="CriticalStrikeChance">8.77%</Property>
+  <Property id="AttacksPerSecond">1.32</Property>
+  <Property id="Mods">10% increased Elemental Damage | 20% increased Physical Damage | Adds 15–25 Fire Damage against Ignited Enemies | Adds (8–26 to 13–31) Physical Damage | 30% increased Fire Damage | (15 to 20)% increased Attack Speed | (30 to 40)% increased Critical Strike Chance</Property>
+  <Property id="HasImplicitMod">True</Property>
+</Entity>
+<Entity Type="Weapon" Category="Mace">
+  <Property id="Name">Doon Cuebiyari</Property>
+  <Property id="Type">Mace</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Vaal Sceptre</Property>
+  <Property id="Level">64</Property>
+  <Property id="Strength">113</Property>
+  <Property id="Intelligence">113</Property>
+  <Property id="PhysicalDamage">31–58</Property>
+  <Property id="FireDamage">0</Property>
+  <Property id="ColdDamage">0</Property>
+  <Property id="LightningDamage">0</Property>
+  <Property id="ChaosDamage">0</Property>
+  <Property id="CriticalStrikeChance">6.68%</Property>
+  <Property id="AttacksPerSecond">1.40</Property>
+  <Property id="Mods">10% increased Elemental Damage | +(50 to 70) to Strength | (15 to 18)% increased Cast Speed | +(20 to 30) to maximum Mana | Gems in this item are Supported by level 30 Iron Will | 1% increased Damage per 8 Strength when in Main Hand | 1% increased Armour per 16 Strength when in Off Hand</Property>
+  <Property id="HasImplicitMod">True</Property>
+</Entity>
+<Entity Type="Weapon" Category="Mace">
+  <Property id="Name">Mon'tregul's Grasp</Property>
+  <Property id="Type">Mace</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Void Sceptre</Property>
+  <Property id="Level">68</Property>
+  <Property id="Strength">104</Property>
+  <Property id="Intelligence">122</Property>
+  <Property id="PhysicalDamage">44–66</Property>
+  <Property id="FireDamage">0</Property>
+  <Property id="ColdDamage">0</Property>
+  <Property id="LightningDamage">0</Property>
+  <Property id="ChaosDamage">0</Property>
+  <Property id="CriticalStrikeChance">6.83%</Property>
+  <Property id="AttacksPerSecond">1.20</Property>
+  <Property id="Mods">15% increased Elemental Damage | 50% reduced number of Zombies allowed | +2000 to Zombie maximum Life | (25 to 30)% increased Zombie Resistances | 25% increased Zombie Size | Zombies deal (80 to 100)% increased Physical Damage | Enemies killed by Zombies explode dealing Fire Damage</Property>
+  <Property id="HasImplicitMod">True</Property>
+</Entity>
+<Entity Type="Weapon" Category="Mace">
+  <Property id="Name">Nycta's Lantern</Property>
+  <Property id="Type">Mace</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Crystal Sceptre</Property>
+  <Property id="Level">41</Property>
+  <Property id="Strength">59</Property>
+  <Property id="Intelligence">85</Property>
+  <Property id="PhysicalDamage">30–45</Property>
+  <Property id="FireDamage">0</Property>
+  <Property id="ColdDamage">0</Property>
+  <Property id="LightningDamage">0</Property>
+  <Property id="ChaosDamage">0</Property>
+  <Property id="CriticalStrikeChance">6.8%</Property>
+  <Property id="AttacksPerSecond">1.20</Property>
+  <Property id="Mods">20% increased Elemental Damage | Gems in this item are Supported by level 10 Added Fire Damage | Gems in this item are Supported by level 10 Cold to Fire | Gems in this item are Supported by level 10 Fire Penetration | (20 to 30)% increased Spell Damage | +(6 to 10) Life gained for each enemy hit by your Attacks | 25% increased Light Radius</Property>
+  <Property id="HasImplicitMod">True</Property>
+</Entity>
+<Entity Type="Weapon" Category="Mace">
+  <Property id="Name">The Dark Seer</Property>
+  <Property id="Type">Mace</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Shadow Sceptre</Property>
+  <Property id="Level">32</Property>
+  <Property id="Strength">52</Property>
+  <Property id="Intelligence">62</Property>
+  <Property id="PhysicalDamage">25–38</Property>
+  <Property id="FireDamage">0</Property>
+  <Property id="ColdDamage">0</Property>
+  <Property id="LightningDamage">0</Property>
+  <Property id="ChaosDamage">0</Property>
+  <Property id="CriticalStrikeChance">6.65%</Property>
+  <Property id="AttacksPerSecond">1.20</Property>
+  <Property id="Mods">15% increased Elemental Damage | (30 to 50)% increased Damage | 7% Global chance to Blind enemies on hit | +1 Mana gained on Kill per Level | +1 Energy Shield gained on Kill per Level | Cannot be Blinded</Property>
+  <Property id="HasImplicitMod">True</Property>
+</Entity>
+<Entity Type="Weapon" Category="Mace">
+  <Property id="Name">The Supreme Truth</Property>
+  <Property id="Type">Mace</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Crystal Sceptre</Property>
+  <Property id="Level">41</Property>
+  <Property id="Strength">59</Property>
+  <Property id="Intelligence">136</Property>
+  <Property id="PhysicalDamage">(54–81 to 60–90)</Property>
+  <Property id="FireDamage">0</Property>
+  <Property id="ColdDamage">0</Property>
+  <Property id="LightningDamage">0</Property>
+  <Property id="ChaosDamage">0</Property>
+  <Property id="CriticalStrikeChance">6.8%</Property>
+  <Property id="AttacksPerSecond">(1.32 to 1.44)</Property>
+  <Property id="Mods">20% increased Elemental Damage | +1 to Level of Gems in this item | (80 to 100)% increased Physical Damage | (10 to 20)% increased Attack Speed | 5% increased Experience gain | 20% increased Elemental Damage | 60% increased Intelligence Requirement</Property>
+  <Property id="HasImplicitMod">True</Property>
+</Entity>
+<Entity Type="Weapon" Category="Mace">
+  <Property id="Name">Doryani's Catalyst</Property>
+  <Property id="Type">Mace</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Vaal Sceptre</Property>
+  <Property id="Level">75</Property>
+  <Property id="Strength">113</Property>
+  <Property id="Intelligence">113</Property>
+  <Property id="PhysicalDamage">(96–158 to 116–218)</Property>
+  <Property id="FireDamage">0</Property>
+  <Property id="ColdDamage">0</Property>
+  <Property id="LightningDamage">0</Property>
+  <Property id="ChaosDamage">0</Property>
+  <Property id="CriticalStrikeChance">6.68%</Property>
+  <Property id="AttacksPerSecond">(1.55 to 1.61)</Property>
+  <Property id="Mods">10% increased Elemental Damage | Adds (65–100 to 85–160) Physical Damage | (6 to 10)% increased Cast Speed | (11 to 15)% increased Attack Speed | (30 to 40)% increased Global Critical Strike Chance | (80 to 100)% increased Elemental Damage | Gems in this item are Supported by level 20 Elemental Proliferation | 1% of Elemental Damage Leeched as Life</Property>
+  <Property id="HasImplicitMod">True</Property>
+</Entity>
+<Entity Type="Weapon" Category="Mace">
+  <Property id="Name">Chober Chaber</Property>
+  <Property id="Type">Mace</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Great Mallet</Property>
+  <Property id="Level">40</Property>
+  <Property id="Strength">104</Property>
+  <Property id="PhysicalDamage">(82–172 to 90–189)</Property>
+  <Property id="FireDamage">0</Property>
+  <Property id="ColdDamage">0</Property>
+  <Property id="LightningDamage">0</Property>
+  <Property id="ChaosDamage">0</Property>
+  <Property id="CriticalStrikeChance">5%</Property>
+  <Property id="AttacksPerSecond">1.20</Property>
+  <Property id="Mods">20% Increased Stun Duration on enemies | +1 to Level of Melee Gems in this item | +1 to Level of Minion Gems in this item | (100 to 120)% increased Physical Damage | 25% increased Maximum Mana | Minions have (20 to 40)% increased maximum Life | 15% increased Skill Effect Duration | 20% reduced Strength Requirement</Property>
+  <Property id="HasImplicitMod">True</Property>
+</Entity>
+<Entity Type="Weapon" Category="Mace">
+  <Property id="Name">Geofri's Baptism</Property>
+  <Property id="Type">Mace</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Brass Maul</Property>
+  <Property id="Level">27</Property>
+  <Property id="Strength">92</Property>
+  <Property id="PhysicalDamage">126–189</Property>
+  <Property id="FireDamage">0</Property>
+  <Property id="ColdDamage">11–23</Property>
+  <Property id="LightningDamage">0</Property>
+  <Property id="ChaosDamage">0</Property>
+  <Property id="CriticalStrikeChance">5%</Property>
+  <Property id="AttacksPerSecond">1.10</Property>
+  <Property id="Mods">20% increased Stun Duration on enemies | 200% increased Physical Damage | Adds 11–23 Cold Damage | (10 to 20)% increased Stun Duration on enemies | Never deal Critical Strikes</Property>
+  <Property id="HasImplicitMod">True</Property>
+</Entity>
+<Entity Type="Weapon" Category="Mace">
+  <Property id="Name">Hrimnor's Hymn</Property>
+  <Property id="Type">Mace</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Sledgehammer</Property>
+  <Property id="Level">17</Property>
+  <Property id="Strength">62</Property>
+  <Property id="PhysicalDamage">(60 to 75)-(91 to 114)</Property>
+  <Property id="FireDamage">0</Property>
+  <Property id="ColdDamage">0</Property>
+  <Property id="LightningDamage">0</Property>
+  <Property id="ChaosDamage">0</Property>
+  <Property id="CriticalStrikeChance">5%</Property>
+  <Property id="AttacksPerSecond">1.25</Property>
+  <Property id="Mods">40% increased Stun Duration on enemies | (140 to 200)% increased Physical Damage | +10 to Strength | 15% reduced Enemy Stun Threshold | 5% of Physical Attack Damage Leeched as Life | (40 to 50)% increased Stun Duration on enemies</Property>
+  <Property id="HasImplicitMod">True</Property>
+</Entity>
+<Entity Type="Weapon" Category="Mace">
+  <Property id="Name">Kongor's Undying Rage</Property>
+  <Property id="Type">Mace</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Terror Maul</Property>
+  <Property id="Level">67</Property>
+  <Property id="Strength">212</Property>
+  <Property id="PhysicalDamage">(104–374 to 113–464)</Property>
+  <Property id="FireDamage">0</Property>
+  <Property id="ColdDamage">0</Property>
+  <Property id="LightningDamage">0</Property>
+  <Property id="ChaosDamage">0</Property>
+  <Property id="CriticalStrikeChance">5%</Property>
+  <Property id="AttacksPerSecond">1.20</Property>
+  <Property id="Mods">20% increased Stun Duration on enemies | Adds (27–270 to 36–360) Physical Damage | +(15 to 20)% to all Elemental Resistances | Hits can't be Evaded | Your Critical Strikes do not deal increased Damage | You gain Onslaught for 2 seconds on Critical Strike</Property>
+  <Property id="HasImplicitMod">True</Property>
+</Entity>
+<Entity Type="Weapon" Category="Mace">
+  <Property id="Name">Marohi Erqi</Property>
+  <Property id="Type">Mace</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Karui Maul</Property>
+  <Property id="Level">57</Property>
+  <Property id="Strength">182</Property>
+  <Property id="PhysicalDamage">(326–506 to 357–553)</Property>
+  <Property id="FireDamage">0</Property>
+  <Property id="ColdDamage">0</Property>
+  <Property id="LightningDamage">0</Property>
+  <Property id="ChaosDamage">0</Property>
+  <Property id="CriticalStrikeChance">5%</Property>
+  <Property id="AttacksPerSecond">0.85</Property>
+  <Property id="Mods">20% increased Stun Duration on enemies | Gems in this item are supported by level 15 Increased Area of Effect | (220 to 250)% increased Physical Damage | Adds 10–20 Physical Damage | 10% reduced Attack Speed | −100 to Accuracy Rating | 10% reduced Movement Speed | (40 to 50)% increased Stun Duration on enemies</Property>
+  <Property id="HasImplicitMod">True</Property>
+</Entity>
+<Entity Type="Weapon" Category="Mace">
+  <Property id="Name">Quecholli</Property>
+  <Property id="Type">Mace</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Spiked Maul</Property>
+  <Property id="Level">22</Property>
+  <Property id="Strength">77</Property>
+  <Property id="PhysicalDamage">(49–92 to 54–102)</Property>
+  <Property id="FireDamage">0</Property>
+  <Property id="ColdDamage">0</Property>
+  <Property id="LightningDamage">0</Property>
+  <Property id="ChaosDamage">0</Property>
+  <Property id="CriticalStrikeChance">5%</Property>
+  <Property id="AttacksPerSecond">1.20</Property>
+  <Property id="Mods">20% increased Stun Duration on enemies | (80 to 100)% increased Physical Damage | Adds 5–25 Physical Damage | +(25 to 50) to all Attributes | +10 Life gained on Kill | Enemies killed explode dealing 10% of their Life as Fire Damage</Property>
+  <Property id="HasImplicitMod">True</Property>
+</Entity>
+<Entity Type="Weapon" Category="Mace">
+  <Property id="Name">Voidhome</Property>
+  <Property id="Type">Mace</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Dread Maul</Property>
+  <Property id="Level">54</Property>
+  <Property id="Strength">173</Property>
+  <Property id="PhysicalDamage">175–238</Property>
+  <Property id="FireDamage">0</Property>
+  <Property id="ColdDamage">0</Property>
+  <Property id="LightningDamage">0</Property>
+  <Property id="ChaosDamage">0</Property>
+  <Property id="CriticalStrikeChance">5%</Property>
+  <Property id="AttacksPerSecond">1.80</Property>
+  <Property id="Mods">20% increased Stun Duration on enemies | 150% increased Physical Damage | 50% increased Attack Speed | 2% of Physical Attack Damage Leeched as Mana | (30 to 50)% reduced Rarity of Items found | (30 to 50)% reduced Experience gain</Property>
+  <Property id="HasImplicitMod">True</Property>
+</Entity>
+</Root>

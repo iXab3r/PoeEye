@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Root>
+<Entity Type="Accessory" Category="Amulet">
+  <Property id="Name">The Anvil</Property>
+  <Property id="Type">Amulet</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Amber Amulet</Property>
+  <Property id="Level">45</Property>
+  <Property id="Mods">+(20 to 30) to Strength | 10% reduced Attack Speed | 10% reduced Cast Speed | +(400 to 500) to Armour | +(34 to 48) Life gained when you Block | +(10 to 24) Mana gained when you Block | 20% reduced Movement Speed | +3% to maximum Block Chance | 8% Chance to Block | Reflects 240–300 Physical Damage to Attackers on Block</Property>
+  <Property id="HasImplicitMod">True</Property>
+</Entity>
+<Entity Type="Accessory" Category="Amulet">
+  <Property id="Name">Araku Tiki</Property>
+  <Property id="Type">Amulet</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Coral Amulet</Property>
+  <Property id="Level">0</Property>
+  <Property id="Mods">(2.0 to 4.0) Life Regenerated per second | You gain 100 Evasion Rating when on Low Life | +(30 to 50) to maximum Life | +(20 to 30)% to Fire Resistance | 1.0% of Life Regenerated per Second while on Low Life</Property>
+  <Property id="HasImplicitMod">True</Property>
+</Entity>
+<Entity Type="Accessory" Category="Amulet">
+  <Property id="Name">Astramentis</Property>
+  <Property id="Type">Amulet</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Onyx Amulet</Property>
+  <Property id="Level">20</Property>
+  <Property id="Mods">+(10 to 16) to all Attributes | +(80 to 100) to all Attributes | −4 Physical Damage taken from Attacks</Property>
+  <Property id="HasImplicitMod">True</Property>
+</Entity>
+<Entity Type="Accessory" Category="Amulet">
+  <Property id="Name">Atziri's Foible</Property>
+  <Property id="Type">Amulet</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Paua Amulet</Property>
+  <Property id="Level">16</Property>
+  <Property id="Mods">(20 to 30)% increased Mana Regeneration Rate | +50 to maximum Mana | (8 to 12)% increased maximum Mana | (40 to 60)% increased Mana Regeneration Rate | Items and Gems have 25% reduced Attribute Requirements</Property>
+  <Property id="HasImplicitMod">True</Property>
+</Entity>
+<Entity Type="Accessory" Category="Amulet">
+  <Property id="Name">Carnage Heart</Property>
+  <Property id="Type">Amulet</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Onyx Amulet</Property>
+  <Property id="Level">20</Property>
+  <Property id="Mods">+(10 to 16) to all Attributes | +(20 to 40) to all Attributes | 25% reduced maximum Life | 25% reduced maximum Energy Shield | +(10 to 20)% to all Elemental Resistances | (6 to 10)% of Physical Attack Damage Leeched as Life | Extra Gore</Property>
+  <Property id="HasImplicitMod">True</Property>
+</Entity>
+<Entity Type="Accessory" Category="Amulet">
+  <Property id="Name">Daresso's Salute</Property>
+  <Property id="Type">Amulet</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Citrine Amulet</Property>
+  <Property id="Level">16</Property>
+  <Property id="Mods">+(16 to 24) to Strength and Dexterity | 50% reduced maximum Energy Shield | +(30 to 40)% to Fire Resistance | +(30 to 40)% to Cold Resistance | 10% increased Movement Speed when on Full Life | +2 to Melee Weapon and Unarmed range | 60% increased Melee Damage when on Full Life</Property>
+  <Property id="HasImplicitMod">True</Property>
+</Entity>
+<Entity Type="Accessory" Category="Amulet">
+  <Property id="Name">Demigod's Presence</Property>
+  <Property id="Type">Amulet</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Gold Amulet</Property>
+  <Property id="Level">8</Property>
+  <Property id="Mods">(12 to 20)% increased Rarity of Items found | +20% to all Elemental Resistances | 20% increased Character Size</Property>
+  <Property id="HasImplicitMod">True</Property>
+</Entity>
+<Entity Type="Accessory" Category="Amulet">
+  <Property id="Name">Eye of Chayula</Property>
+  <Property id="Type">Amulet</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Onyx Amulet</Property>
+  <Property id="Level">20</Property>
+  <Property id="Mods">+(10 to 16) to all Attributes | 20% reduced maximum Life | 30% increased Rarity of Items found | Cannot be Stunned</Property>
+  <Property id="HasImplicitMod">True</Property>
+</Entity>
+<Entity Type="Accessory" Category="Amulet">
+  <Property id="Name">The Ignomon</Property>
+  <Property id="Type">Amulet</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Gold Amulet</Property>
+  <Property id="Level">8</Property>
+  <Property id="Mods">(12 to 20)% increased Rarity of Items found | +10 to Dexterity | Adds 12–24 Fire Damage | +(100 to 150) to Accuracy Rating | +(100 to 150) to Evasion Rating | +20% to Fire Resistance</Property>
+  <Property id="HasImplicitMod">True</Property>
+</Entity>
+<Entity Type="Accessory" Category="Amulet">
+  <Property id="Name">Karui Ward</Property>
+  <Property id="Type">Amulet</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Jade Amulet</Property>
+  <Property id="Level">5</Property>
+  <Property id="Mods">+(20 to 30) to Dexterity | +(20 to 30) to Strength | +100 to Accuracy Rating | 30% increased Projectile Speed | 10% increased Movement Speed</Property>
+  <Property id="HasImplicitMod">True</Property>
+</Entity>
+<Entity Type="Accessory" Category="Amulet">
+  <Property id="Name">Marylene's Fallacy</Property>
+  <Property id="Type">Amulet</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Lapis Amulet</Property>
+  <Property id="Level">40</Property>
+  <Property id="Mods">+(20 to 30) to Intelligence | +(80 to 120) to Accuracy Rating | (140 to 160)% increased Global Critical Strike Multiplier | +(80 to 100) to Evasion Rating | (10 to 15)% increased Light Radius | Non | -critical strikes deal 25% Damage | 50% less Critical Strike Chance | Your Critical Strikes have Culling Strike</Property>
+  <Property id="HasImplicitMod">True</Property>
+</Entity>
+<Entity Type="Accessory" Category="Amulet">
+  <Property id="Name">Rashkaldor's Patience</Property>
+  <Property id="Type">Amulet</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Jade Amulet</Property>
+  <Property id="Level">61</Property>
+  <Property id="Mods">+(20 to 30) to Dexterity | +(40 to 80) to maximum Life | +(20 to 40) to maximum Mana | 20% increased Duration of Elemental Status Ailments on Enemies | Items and Gems have 10% reduced Attribute Requirements | 5% chance to Freeze, Shock and Ignite | Cannot gain Power Charges</Property>
+  <Property id="HasImplicitMod">True</Property>
+</Entity>
+<Entity Type="Accessory" Category="Amulet">
+  <Property id="Name">Sidhebreath</Property>
+  <Property id="Type">Amulet</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Paua Amulet</Property>
+  <Property id="Level">0</Property>
+  <Property id="Mods">(20 to 30)% increased Mana Regeneration Rate | 1% of Physical Attack Damage Leeched as Mana | +25% to Cold Resistance | Minions have (10 to 15)% increased maximum Life | Minions have (10 to 15)% increased Movement Speed | Minions deal (10 to 15)% increased Damage</Property>
+  <Property id="HasImplicitMod">True</Property>
+</Entity>
+<Entity Type="Accessory" Category="Amulet">
+  <Property id="Name">Stone of Lazhwar</Property>
+  <Property id="Type">Amulet</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Lapis Amulet</Property>
+  <Property id="Level">5</Property>
+  <Property id="Mods">+(20 to 30) to Intelligence | 50% of Block Chance applied to Spells | (10 to 15)% increased Cast Speed | +(30 to 50) to maximum Mana</Property>
+  <Property id="HasImplicitMod">True</Property>
+</Entity>
+<Entity Type="Accessory" Category="Amulet">
+  <Property id="Name">Talisman of the Victor</Property>
+  <Property id="Type">Amulet</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Jet Amulet</Property>
+  <Property id="Level">12</Property>
+  <Property id="Mods">12% to all Elemental Resistances | 6% increased Movement Speed | 6% increased Global Defences</Property>
+  <Property id="HasImplicitMod">True</Property>
+</Entity>
+<Entity Type="Accessory" Category="Amulet">
+  <Property id="Name">Ungil's Harmony</Property>
+  <Property id="Type">Amulet</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Turquoise Amulet</Property>
+  <Property id="Level">23</Property>
+  <Property id="Mods">+(16 to 24) to Dexterity and Intelligence | 100% increased Global Critical Strike Chance | 50% reduced Global Critical Strike Multiplier | +(30 to 50) to maximum Life | +(30 to 50) to maximum Mana | 40% increased Stun Recovery</Property>
+  <Property id="HasImplicitMod">True</Property>
+</Entity>
+<Entity Type="Accessory" Category="Amulet">
+  <Property id="Name">Victario's Acuity</Property>
+  <Property id="Type">Amulet</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Turquoise Amulet</Property>
+  <Property id="Level">16</Property>
+  <Property id="Mods">+(16 to 24) to Dexterity and Intelligence | +(30 to 40)% to Lightning Resistance | +(8 to 10)% to Chaos Resistance | 10% Chance to gain a Frenzy Charge on Kill | 10% Chance to gain a Power Charge on Kill | 5% increased Projectile Speed per Frenzy Charge | 5% increased Projectile Damage per Power Charge</Property>
+  <Property id="HasImplicitMod">True</Property>
+</Entity>
+<Entity Type="Accessory" Category="Amulet">
+  <Property id="Name">Voll's Devotion</Property>
+  <Property id="Type">Amulet</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Agate Amulet</Property>
+  <Property id="Level">32</Property>
+  <Property id="Mods">+(16 to 24) to Strength and Intelligence | +(30 to 40) to maximum Life | +(20 to 30) to maximum Energy Shield | +(15 to 20)% to all Elemental Resistances | 30% reduced Endurance Charge Duration | 30% reduced Power Charge Duration | Gain an Endurance Charge when a Power Charge expires or is consumed</Property>
+  <Property id="HasImplicitMod">True</Property>
+</Entity>
+<Entity Type="Accessory" Category="Amulet">
+  <Property id="Name">Warped Timepiece</Property>
+  <Property id="Type">Amulet</Property>
+  <Property id="Rarity">Unique</Property>
+  <Property id="Base">Turquoise Amulet</Property>
+  <Property id="Level">50</Property>
+  <Property id="Mods">+(16 to 24) to Dexterity and Intelligence | (8 to 12)% increased Attack Speed | (8 to 12)% increased Cast Speed | 12% increased Movement Speed | (8 to 12)% reduced Skill Effect Duration | 30% increased Life Leech Rate | 30% increased Mana Leech Rate</Property>
+  <Property id="HasImplicitMod">True</Property>
+</Entity>
+</Root>
