@@ -22,6 +22,7 @@
 
     internal sealed class ApplicationUpdaterViewModel : ReactiveObject
     {
+        private static readonly TimeSpan ArtificialDelay = TimeSpan.FromSeconds(5);
         private readonly IDialogCoordinator dialogCoordinator;
         private const string PoeEyeUri = @"http://coderush.net/files/PoeEye";
         private readonly ReactiveCommand<object> checkForUpdatesCommand;
@@ -63,11 +64,14 @@
 
             try
             {
+                Log.Instance.Debug($"[ApplicationUpdaterViewModel] Update check requested");
                 IsBusy = true;
+
+                // delaying update so the user could see the progressring
+                Thread.Sleep(ArtificialDelay); 
 
 #if DEBUG
                 Log.Instance.Debug($"[ApplicationUpdaterViewModel] Debug mode detected...");
-                Thread.Sleep(5000);
                 return;
 #endif
                 try
