@@ -24,6 +24,10 @@
                 </StackPanel>
             </Expander>
 
+            <Image Grid.Row="1" 
+                   Source="pack://application:,,,/Resources/mainIcon.png"
+                   Opacity="0.4"/>
+            
             <ItemsControl Grid.Row="1" 
                           Margin="15" 
                           ItemsSource="{Binding TradesListViewModel.TradesList}"
