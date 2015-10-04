@@ -19,8 +19,8 @@
             </wpfControls:AutoCompleteTextBox>
 
             <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="10,0,10,0">
-                <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}" Value="{Binding Min}"/>
-                <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}" Value="{Binding Max}"/>
+                <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}" Value="{Binding Min, Converter={StaticResource NullableConverter}}"/>
+                <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}" Value="{Binding Max, Converter={StaticResource NullableConverter}}"/>
             </StackPanel>
         </Grid>
     </DataTemplate>
