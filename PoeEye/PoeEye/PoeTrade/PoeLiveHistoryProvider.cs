@@ -18,6 +18,8 @@
 
     internal sealed class PoeLiveHistoryProvider : ReactiveObject, IPoeLiveHistoryProvider
     {
+        private TimeSpan recheckPeriodThrottling = TimeSpan.FromMilliseconds(3000);
+
         private readonly ISubject<IPoeItem[]> itemPacksSubject = new Subject<IPoeItem[]>();
         private readonly ISubject<Exception> updateExceptionsSubject = new Subject<Exception>();
 
@@ -33,11 +35,14 @@
 
             this.ObservableForProperty(x => x.RecheckPeriod)
                 .Select(x => x.Value)
+                .DistinctUntilChanged()
+                .Throttle(recheckPeriodThrottling)
                 .Do(LogRecheckPeriodChange)
                 .Select(timeout => timeout == TimeSpan.Zero
                     ? Observable.Never<Unit>()
                     : Observable.Timer(DateTimeOffset.Now, timeout).Select(x => Unit.Default))
                 .Switch()
+                .Where(x => !IsBusy)
                 .Do(StartUpdate)
                 .Select(x => poeApi.IssueQuery(query))
                 .Switch()

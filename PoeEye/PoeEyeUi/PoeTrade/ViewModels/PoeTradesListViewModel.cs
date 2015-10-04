@@ -33,7 +33,7 @@
 
         private DateTime lastUpdateTimestamp;
         private IPoeQuery query;
-        private TimeSpan recheckTimeout;
+        private TimeSpan recheckTimeout = TimeSpan.FromSeconds(60);
         private readonly ReactiveList<IPoeTradeViewModel> tradesList = new ReactiveList<IPoeTradeViewModel>() {ChangeTrackingEnabled = true};
 
         public PoeTradesListViewModel(

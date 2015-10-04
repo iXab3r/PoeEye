@@ -108,6 +108,7 @@
                     <ColumnDefinition Width="Auto"></ColumnDefinition>
                     <ColumnDefinition Width="*"></ColumnDefinition>
                     <ColumnDefinition Width="Auto"></ColumnDefinition>
+                    <ColumnDefinition Width="Auto"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
 
                 <StackPanel Grid.Column="0" Orientation="Horizontal" Visibility="{Binding SelectedItem.IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}">
@@ -115,9 +116,19 @@
                     <TextBlock Text="Updating..."/>
                 </StackPanel>
 
-                <TextBlock Margin="10,0,0,0" Grid.Column="1" Text="{Binding SelectedItem.LastUpdateTimestamp, Mode=OneWay, StringFormat='Last update: {0:MMM dd HH:mm:ss.fff}'}"/>
+                <TextBlock Grid.Column="1"  
+                           Margin="10,0,0,0" Text="{Binding SelectedItem.LastUpdateTimestamp, Mode=OneWay, StringFormat='Last update: {0:MMM dd HH:mm:ss.fff}'}"/>
 
-                <TextBlock Margin="10,0,0,0" Grid.Column="2" Text="{Binding SelectedItem.RecheckTimeout, Mode=OneWay, StringFormat='Recheck timeout: {0}'}"/>
+                <Slider Grid.Column="2" 
+                        Width="150"
+                        Margin="10,0,0,0" 
+                        Minimum="30"
+                        Maximum="300"
+                        Value="{Binding SelectedItem.RecheckTimeoutInSeconds}"/>
+
+                <TextBlock Grid.Column="3"  
+                           Margin="10,0,0,0" Text="{Binding SelectedItem.RecheckTimeoutInSeconds, Mode=OneWay, StringFormat='Recheck timeout: {0:F0}s'}"/>
+
             </Grid>
         </Border>
         

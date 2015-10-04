@@ -17,6 +17,7 @@
     internal sealed class MainWindowTabViewModel : ReactiveObject
     {
         private static int tabIdx = 0;
+
         private string tabName;
         private readonly ReactiveCommand<object> searchCommand;
         private readonly ReactiveCommand<object> markAllAsRead;
@@ -43,7 +44,7 @@
 
             tradesListViewModel
                 .WhenAnyValue(x => x.RecheckTimeout)
-                .Subscribe(_ => this.RaisePropertyChanged(nameof(RecheckTimeout)));
+                .Subscribe(_ => this.RaisePropertyChanged(nameof(RecheckTimeoutInSeconds)));
 
             tradesListViewModel
                 .WhenAnyValue(x => x.IsBusy)
@@ -66,10 +67,10 @@
                 .Subscribe(_ => RebuildTabName());
         }
 
-        public TimeSpan RecheckTimeout
+        public double RecheckTimeoutInSeconds
         {
-            get { return TradesListViewModel.RecheckTimeout; }
-            set { TradesListViewModel.RecheckTimeout = value; }
+            get { return TradesListViewModel.RecheckTimeout.TotalSeconds; }
+            set { TradesListViewModel.RecheckTimeout = TimeSpan.FromSeconds(value); }
         }
 
         public PoeTradesListViewModel TradesListViewModel { get; }
@@ -122,7 +123,6 @@
             }
             var query = queryBuilder();
 
-            RecheckTimeout = TimeSpan.FromSeconds(30);
             TradesListViewModel.ClearTradesList();
             TradesListViewModel.Query = query;
             QueryViewModel.IsExpanded = false;
