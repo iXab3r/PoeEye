@@ -32,7 +32,7 @@
             Guard.ArgumentNotNull(() => poeItem);
             Guard.ArgumentNotNull(() => imageViewModelFactory);
             Guard.ArgumentNotNull(() => linksViewModelFactory);
-            
+
 
             this.poeItem = poeItem;
             copyPmMessageToClipboardCommand = ReactiveCommand.Create();
@@ -47,7 +47,10 @@
                 ImageViewModel = imageViewModelFactory.Create(imageUri);
             }
 
-            LinksViewModel = linksViewModelFactory.Create(poeItem.Links);
+            if (poeItem.Links != null)
+            {
+                LinksViewModel = linksViewModelFactory.Create(poeItem.Links);
+            }
         }
 
         public PoeTradeState TradeState
