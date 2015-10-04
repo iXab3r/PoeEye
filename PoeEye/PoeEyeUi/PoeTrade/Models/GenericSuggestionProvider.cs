@@ -16,38 +16,23 @@
     internal sealed class GenericSuggestionProvider : ISuggestionProvider
     {
         private readonly IEnumerable<string> haystack;
-        private readonly IDictionary<string, string[]> wordsDictionary = new Dictionary<string, string[]>();
+        private readonly FuzzySearchService searchService;
 
         public GenericSuggestionProvider([NotNull] string[] haystack)
         {
             Guard.ArgumentNotNull(() => haystack);
-            
-            this.haystack = haystack;
-            foreach (var item in haystack)
-            {
-                var wordsFromName = item.Split(new[] { " ", ", " }, StringSplitOptions.RemoveEmptyEntries);
 
-                var allWords = wordsFromName.Distinct().ToArray();
-                wordsDictionary[item] = allWords;
-            }
+            searchService = new FuzzySearchService(haystack);
         }
 
         public IEnumerable GetSuggestions(string filter)
         {
-            var filteredMods = haystack
-                .Where(x => IsMatch(filter, x))
+            var filteredStrings = searchService
+                .Search(filter)
+                .Where(x => x.Score > 15)
+                .Select(x => x.Result)
                 .ToArray();
-            return filteredMods;
-        }
-
-        private bool IsMatch(string filter, string item)
-        {
-            string[] words;
-            if (!wordsDictionary.TryGetValue(item, out words))
-            {
-                return false;
-            }
-            return words.Any(x => x.FuzzyMatch(filter) >= 0.33);
+            return filteredStrings;
         }
     }
 }

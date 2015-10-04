@@ -256,6 +256,7 @@
     <Compile Include="MetroModels\DialogParticipation.cs" />
     <Compile Include="MetroModels\DialogCoordinator.cs" />
     <Compile Include="MetroModels\IDialogCoordinator.cs" />
+    <Compile Include="PoeTrade\Models\FuzzySearchService.cs" />
     <Compile Include="PoeTrade\Models\GenericSuggestionProvider.cs" />
     <Compile Include="PoeTrade\Models\IPoePriceCalculcator.cs" />
     <Compile Include="PoeTrade\Models\ItemsCache.cs" />
