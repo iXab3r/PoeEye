@@ -12,33 +12,46 @@
 
     using JetBrains.Annotations;
 
+    using Models;
+
     using PoeShared.Common;
     using PoeShared.PoeTrade.Query;
 
     using ReactiveUI;
 
+    using WpfControls.Editors;
+
     internal sealed class PoeExplicitModsEditorViewModel
     {
-        private readonly IFactory<PoeExplicitModViewModel, IPoeItemMod[]> modsViewModelsFactor;
+        private readonly IFactory<PoeExplicitModViewModel, ISuggestionProvider> modsViewModelsFactor;
         private readonly ReactiveList<PoeExplicitModViewModel> modsCollection = new ReactiveList<PoeExplicitModViewModel>() { ChangeTrackingEnabled = true };
         private readonly ReactiveCommand<object> addModCommand = ReactiveCommand.Create();
         private readonly ReactiveCommand<object> removeModCommand = ReactiveCommand.Create();
         private readonly ReactiveCommand<object> clearModsCommand = ReactiveCommand.Create();
 
         private readonly IPoeItemMod[] knownPoeItemMods;
+        private readonly ISuggestionProvider modsSuggestionProvider;
 
         public PoeExplicitModsEditorViewModel(
             [NotNull] IPoeQueryInfoProvider queryInfoProvider,
-            [NotNull] IFactory<PoeExplicitModViewModel, IPoeItemMod[]> modsViewModelsFactor)
+            [NotNull] IFactory<PoeExplicitModViewModel, ISuggestionProvider> modsViewModelsFactor,
+            [NotNull] IFactory<GenericSuggestionProvider, string[]> suggestionProviderFactory)
         {
             Guard.ArgumentNotNull(() => modsViewModelsFactor);
             Guard.ArgumentNotNull(() => queryInfoProvider);
+            Guard.ArgumentNotNull(() => suggestionProviderFactory);
 
             this.modsViewModelsFactor = modsViewModelsFactor;
 
             Mods = modsCollection;
 
-            knownPoeItemMods = queryInfoProvider.ModsList.Where(x => x.ModType == PoeModType.Explicit).ToArray();
+            KnownMods = queryInfoProvider
+                .ModsList
+                .Where(x => x.ModType == PoeModType.Explicit)
+                .Select(x => x.Name)
+                .ToArray();
+
+            modsSuggestionProvider = suggestionProviderFactory.Create(KnownMods);
 
             addModCommand
                 .Subscribe((_) => AddModCommandExecuted());
@@ -62,6 +75,8 @@
 
         public ICommand ClearModsCommand => clearModsCommand;
 
+        public string[] KnownMods { get; }
+
         private void AddModCommandExecuted()
         {
             AddMod();
@@ -81,7 +96,7 @@
 
         public PoeExplicitModViewModel AddMod()
         {
-            var newMod = modsViewModelsFactor.Create(knownPoeItemMods);
+            var newMod = modsViewModelsFactor.Create(modsSuggestionProvider);
 
             Mods.Add(newMod);
 

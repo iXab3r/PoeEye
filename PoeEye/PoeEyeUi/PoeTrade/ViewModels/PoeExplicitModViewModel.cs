@@ -1,43 +1,22 @@
 ﻿namespace PoeEyeUi.PoeTrade.ViewModels
 {
-    using System;
-    using System.Linq;
-
-    using Factory;
-
-    using Guards;
-
-    using JetBrains.Annotations;
-
-    using Models;
-
-    using PoeShared.Common;
-
     using ReactiveUI;
 
-    using WpfControls;
     using WpfControls.Editors;
 
     internal sealed class PoeExplicitModViewModel : ReactiveObject
     {
+        private bool excluded;
         private float? max;
 
         private float? min;
 
         private string selectedMod;
 
-        public PoeExplicitModViewModel(
-                IPoeItemMod[] explicitMods,
-                [NotNull] IFactory<GenericSuggestionProvider, string[]> suggestionProviderFactory)
+        public PoeExplicitModViewModel(ISuggestionProvider suggestionProvider)
         {
-            Guard.ArgumentNotNull(() => explicitMods);
-            Guard.ArgumentIsTrue(() => explicitMods.All(x => x.ModType == PoeModType.Explicit));
-
-            KnownMods = explicitMods.Select(x => x.Name).ToArray();
-            SuggestionProvider = suggestionProviderFactory.Create(KnownMods);
+            SuggestionProvider = suggestionProvider;
         }
-
-        public string[] KnownMods { get; }
 
         public ISuggestionProvider SuggestionProvider { get; }
 
@@ -58,8 +37,6 @@
             get { return max; }
             set { this.RaiseAndSetIfChanged(ref max, value); }
         }
-
-        private bool excluded;
 
         public bool Excluded
         {

@@ -31,6 +31,7 @@
             var filteredStrings = searchService
                 .Search(filter)
                 .Where(x => x.Score > 15)
+                .OrderByDescending(x => x.Score)
                 .Select(x => x.Result)
                 .ToArray();
             return filteredStrings;
