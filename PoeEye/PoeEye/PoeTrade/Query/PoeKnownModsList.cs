@@ -114,7 +114,6 @@
             yield return new PoeItemMod() { ModType = PoeModType.Implicit, CodeName = "Adds #-# Physical Damage to Attacks", Name = "Adds #-# Physical Damage to Attacks" };
             yield return new PoeItemMod() { ModType = PoeModType.Implicit, CodeName = "Adds #-# Physical Damage to Attacks with Bows", Name = "Adds #-# Physical Damage to Attacks with Bows" };
             yield return new PoeItemMod() { ModType = PoeModType.Implicit, CodeName = "Adds #-# Physical Damage to attacks with Bows", Name = "Adds #-# Physical Damage to attacks with Bows" };
-            yield return new PoeItemMod() { ModType = PoeModType.Implicit, CodeName = "Adds 1-4 Physical Damage", Name = "Adds 1-4 Physical Damage" };
             yield return new PoeItemMod() { ModType = PoeModType.Implicit, CodeName = "Adds an additional Arrow", Name = "Adds an additional Arrow" };
             yield return new PoeItemMod() { ModType = PoeModType.Implicit, CodeName = "Can set up to 1 additional trap", Name = "Can set up to 1 additional trap" };
             yield return new PoeItemMod() { ModType = PoeModType.Implicit, CodeName = "Cannot be Knocked Back", Name = "Cannot be Knocked Back" };
