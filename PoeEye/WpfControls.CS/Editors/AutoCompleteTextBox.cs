@@ -59,7 +59,7 @@
 
         private SuggestionsAdapter _suggestionsAdapter;
 
-        
+
         #endregion
 
         #region "Constructors"
@@ -320,6 +320,8 @@
 
         private void OnEditorTextChanged(object sender, TextChangedEventArgs e)
         {
+            Text = Editor.Text;
+
             if (_isUpdatingText)
                 return;
             if (FetchTimer == null)
@@ -419,7 +421,6 @@
         {
             _isUpdatingText = true;
             SelectedItem = item;
-            Text = GetDisplayText(ItemsSelector.SelectedItem);
             _isUpdatingText = false;
         }
         #endregion
@@ -454,9 +455,9 @@
                 ParameterizedThreadStart thInfo = new ParameterizedThreadStart(GetSuggestionsAsync);
                 Thread th = new Thread(thInfo);
                 th.Start(new object[] {
-				searchText,
-				_actb.Provider
-			});
+                searchText,
+                _actb.Provider
+            });
             }
 
             private void DisplaySuggestions(IEnumerable suggestions, string filter)
@@ -481,9 +482,9 @@
                 ISuggestionProvider provider = args[1] as ISuggestionProvider;
                 IEnumerable list = provider.GetSuggestions(searchText);
                 _actb.Dispatcher.BeginInvoke(new Action<IEnumerable, string>(DisplaySuggestions), DispatcherPriority.Background, new object[] {
-				list,
-				searchText
-			});
+                list,
+                searchText
+            });
             }
 
             #endregion
