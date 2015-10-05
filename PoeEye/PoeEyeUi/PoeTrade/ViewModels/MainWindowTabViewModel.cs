@@ -45,10 +45,6 @@
             markAllAsRead.Subscribe(MarkAllAsReadExecute);
 
             tradesListViewModel
-                .WhenAnyValue(x => x.LastUpdateTimestamp)
-                .Subscribe(_ => this.RaisePropertyChanged(nameof(LastUpdateTimestamp)));
-
-            tradesListViewModel
                 .WhenAnyValue(x => x.RecheckTimeout)
                 .Subscribe(_ => this.RaisePropertyChanged(nameof(RecheckTimeoutInSeconds)));
 
@@ -89,8 +85,6 @@
         public ICommand SearchCommand => searchCommand;
 
         public ICommand MarkAllAsRead => markAllAsRead;
-
-        public DateTime LastUpdateTimestamp => TradesListViewModel.LastUpdateTimestamp;
 
         public bool IsBusy => TradesListViewModel.IsBusy;
 

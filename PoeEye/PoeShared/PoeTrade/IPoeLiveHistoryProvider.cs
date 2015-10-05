@@ -10,9 +10,9 @@
     {
         IObservable<IPoeItem[]> ItemsPacks {[NotNull] get; }
 
-        TimeSpan RecheckPeriod { get; set; }
-
         IObservable<Exception> UpdateExceptions { [NotNull] get; }
+
+        TimeSpan RecheckPeriod { get; set; }
 
         bool IsBusy { get; }
     }

@@ -6,5 +6,6 @@
     <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
     <converters:NullNotNullToVisibilityConverter x:Key="NullNotNullToVisibilityConverter"/>
     <converters:NullableConverter x:Key="NullableConverter"/>
+    <converters:ExceptionToMessageConverter x:Key="ExceptionToMessageConverter"/>
     <blue:BoolToVisibilityConverter x:Key="InvertedBoolToVisibilityConverter" TrueValue="Collapsed" FalseValue="Visible"/>
 </ResourceDictionary>

@@ -57,13 +57,24 @@
                             </Grid.RowDefinitions>
 
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="100*"/>
                                 <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="100*"/>
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
 
                             <!-- tab header content -->
+
+                            <DockPanel Grid.Row="0" Grid.Column="0" >
+                                <Rectangle Height="20" Width="20" Margin="5"
+                                           Visibility="{Binding TradesListViewModel.LastUpdateException, Converter={StaticResource NullNotNullToVisibilityConverter}}"
+                                           ToolTip="{Binding TradesListViewModel.LastUpdateException, Converter={StaticResource ExceptionToMessageConverter}}">
+                                    <Rectangle.Fill>
+                                            <VisualBrush Stretch="Fill" Visual="{DynamicResource appbar_transit_hazard}"  />
+                                    </Rectangle.Fill>
+                                </Rectangle>
+
+                            </DockPanel>
 
                             <TextBlock Grid.Row="0" Grid.Column="1" 
                                        Text="{Binding TabName}" FontSize="16" TextWrapping="Wrap" VerticalAlignment="Center"/>
@@ -146,7 +157,7 @@
                 </StackPanel>
 
                 <TextBlock Grid.Column="1"  
-                           Margin="10,0,0,0" Text="{Binding SelectedItem.LastUpdateTimestamp, Mode=OneWay, StringFormat='Last update: {0:MMM dd HH:mm:ss.fff}'}"/>
+                           Margin="10,0,0,0" Text="{Binding SelectedItem.TradesListViewModel.LastUpdateTimestamp, Mode=OneWay, StringFormat='Last update: {0:HH:mm:ss}'}"/>
 
                 <Slider Grid.Column="2" 
                         Width="150"

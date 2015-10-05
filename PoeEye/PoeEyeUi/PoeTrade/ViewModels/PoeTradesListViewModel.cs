@@ -11,6 +11,8 @@
     using System.Windows.Input;
     using System.Windows.Threading;
 
+    using DumpToText;
+
     using Factory;
 
     using Guards;
@@ -73,6 +75,14 @@
             set { this.RaiseAndSetIfChanged(ref query, value); }
         }
 
+        private Exception lastUpdateException;
+
+        public Exception LastUpdateException
+        {
+            get { return lastUpdateException; }
+            set { this.RaiseAndSetIfChanged(ref lastUpdateException, value); }
+        }
+
         public DateTime LastUpdateTimestamp
         {
             get { return lastUpdateTimestamp; }
@@ -133,7 +143,15 @@
                .DistinctUntilChanged()
                .Subscribe(_ => this.RaisePropertyChanged(nameof(IsBusy)));
 
+            poeLiveHistoryProvider.UpdateExceptions.Subscribe(OnErrorReceived);
+
             poeLiveHistoryProvider.RecheckPeriod = recheckTimeout;
+        }
+
+        private void OnErrorReceived(Exception error)
+        {
+            Log.Instance.Debug($"[TradesListViewModel] Received an exception from history provider\r\nQuery: {Query?.DumpToTextValue() }");
+            LastUpdateException = error;
         }
 
         public void ClearTradesList()
