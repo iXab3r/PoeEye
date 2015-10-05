@@ -247,6 +247,7 @@
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
 
                             <TextBlock Grid.Column="0"
@@ -256,10 +257,15 @@
                                        Text="{Binding Path=PriceInChaosOrbs, Mode=OneWay, StringFormat=' (~ {0} chaos)'}" 
                                        Visibility="{Binding PriceInChaosOrbs, Converter={StaticResource NullNotNullToVisibilityConverter}}"/>
 
-                            <TextBlock Grid.Column="3"
+                            <Button Grid.Column="3" 
+                                    Margin="10,0,10,0"
+                                    Height="16"
+                                    Content="Go to forum thread" Command="{Binding OpenForumUriCommand}" />
+
+                            <TextBlock Grid.Column="4"
                                        Text="{Binding Path=UserIgn, Mode=OneWay, StringFormat='IGN: {0}'}" />
 
-                            <Button Grid.Column="4" 
+                            <Button Grid.Column="5" 
                                     Command="{Binding CopyPmMessageToClipboardCommand}"
                                     Width="30" Height="30" Style="{StaticResource MetroCircleButtonStyle}"
                                     ToolTip="Copy PM to clipboard">

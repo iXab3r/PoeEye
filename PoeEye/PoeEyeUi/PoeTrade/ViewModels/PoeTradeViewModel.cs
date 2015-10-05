@@ -1,7 +1,10 @@
 ﻿namespace PoeEyeUi.PoeTrade.ViewModels
 {
     using System;
+    using System.Diagnostics;
     using System.Linq;
+    using System.Reactive.Linq;
+    using System.Threading.Tasks;
     using System.Windows;
     using System.Windows.Input;
 
@@ -15,6 +18,7 @@
 
     using Models;
 
+    using PoeShared;
     using PoeShared.Common;
 
     using ReactiveUI;
@@ -22,10 +26,10 @@
     internal sealed class PoeTradeViewModel : ReactiveObject, IPoeTradeViewModel
     {
         private readonly IPoeItem poeItem;
-        private readonly IPoePriceCalculcator poePriceCalculcator;
         private PoeTradeState tradeState;
-        private readonly ReactiveCommand<object> copyPmMessageToClipboardCommand;
-        private readonly ReactiveCommand<object> markAsReadCommand;
+        private readonly ReactiveCommand<object> copyPmMessageToClipboardCommand = ReactiveCommand.Create();
+        private readonly ReactiveCommand<object> markAsReadCommand = ReactiveCommand.Create();
+        private readonly ReactiveCommand<object> openForumUriCommand;
 
         public PoeTradeViewModel(
             [NotNull] IPoeItem poeItem,
@@ -40,11 +44,11 @@
 
 
             this.poeItem = poeItem;
-            this.poePriceCalculcator = poePriceCalculcator;
-            copyPmMessageToClipboardCommand = ReactiveCommand.Create();
             copyPmMessageToClipboardCommand.Subscribe(CopyPmMessageToClipboardCommandExecute);
 
-            markAsReadCommand = ReactiveCommand.Create();
+            openForumUriCommand = ReactiveCommand.Create(Observable.Return(OpenForumUriCommandCanExecute()));
+            openForumUriCommand.Subscribe(OpenForumUriCommandExecute);
+
             markAsReadCommand.Subscribe(MarkAsReadCommandExecute);
 
             Uri imageUri;
@@ -87,7 +91,21 @@
 
         public ICommand CopyPmMessageToClipboardCommand => copyPmMessageToClipboardCommand;
 
+        public ICommand OpenForumUriCommand => openForumUriCommand;
+
         public ICommand MarkAsReadCommand => markAsReadCommand;
+
+        private void OpenForumUriCommandExecute(object arg)
+        {
+            Guard.ArgumentIsTrue(() => OpenForumUriCommandCanExecute());
+
+            Task.Run(() => OpenUri(Trade.TradeForumUri));
+        }
+
+        private bool OpenForumUriCommandCanExecute()
+        {
+            return !string.IsNullOrWhiteSpace(Trade.TradeForumUri);
+        }
 
         private void CopyPmMessageToClipboardCommandExecute(object arg)
         {
@@ -98,6 +116,18 @@
         private void MarkAsReadCommandExecute(object arg)
         {
             this.TradeState = PoeTradeState.Normal;
+        }
+
+        private void OpenUri(string uri)
+        {
+            try
+            {
+                Process.Start(uri);
+            }
+            catch (Exception ex)
+            {
+                Log.Instance.Warn($"Failed to open forum Uri '{uri}'", ex);
+            }
         }
     }
 }

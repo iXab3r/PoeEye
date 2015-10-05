@@ -1,17 +1,13 @@
 ﻿namespace PoeEyeUi.PoeTrade.Models
 {
-    using System;
     using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
-
-    using DuoVia.FuzzyStrings;
 
     using Guards;
 
     using JetBrains.Annotations;
 
-    using WpfControls;
     using WpfControls.Editors;
 
     internal sealed class GenericSuggestionProvider : ISuggestionProvider
