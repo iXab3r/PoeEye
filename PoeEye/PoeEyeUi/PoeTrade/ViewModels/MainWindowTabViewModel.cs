@@ -126,7 +126,7 @@
             var queryDescription = QueryViewModel.FormatQueryDescription();
             TabName = string.IsNullOrWhiteSpace(queryDescription)
                 ? tabHeader
-                : $"{tabHeader}:\r\n{queryDescription}";
+                : $"{queryDescription}";
         }
 
         private void SearchCommandExecute(object arg)
