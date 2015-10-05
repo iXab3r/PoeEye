@@ -33,7 +33,8 @@
             Guard.ArgumentNotNull(() => query);
             Guard.ArgumentNotNull(() => poeApi);
 
-            this.ObservableForProperty(x => x.RecheckPeriod)
+
+            var periodObservable = this.ObservableForProperty(x => x.RecheckPeriod)
                 .Select(x => x.Value)
                 .DistinctUntilChanged()
                 .Throttle(recheckPeriodThrottling)
@@ -42,14 +43,22 @@
                     ? Observable.Never<Unit>()
                     : Observable.Timer(DateTimeOffset.Now, timeout).Select(x => Unit.Default))
                 .Switch()
+                .Publish();
+
+            var queryObservable = periodObservable
                 .Where(x => !IsBusy)
                 .Do(StartUpdate)
                 .Select(x => poeApi.IssueQuery(query))
                 .Switch()
-                .Do(HandleUpdate, HandleUpdateError)
-                .Catch(Observable.Empty<IPoeQueryResult>())
                 .Select(x => x.ItemsList)
-                .Subscribe(itemPacksSubject);
+                .Do(HandleUpdate, HandleUpdateError);
+
+            Observable
+                .Defer(() => queryObservable)
+                .Retry()
+                .Subscribe();
+
+            periodObservable.Connect();
         }
 
         public IObservable<IPoeItem[]> ItemsPacks => itemPacksSubject;
@@ -79,15 +88,19 @@
             Log.Instance.Debug($"[PoeLiveHistoryProvider] Update period changed: {newRecheckPeriod}");
         }
 
-        private void HandleUpdate(IPoeQueryResult queryResult)
+        private void HandleUpdate(IPoeItem[] queryResult)
         {
-            Log.Instance.Debug($"[PoeLiveHistoryProvider] Update received, itemsCount: {queryResult.ItemsList.Length}");
+            Guard.ArgumentNotNull(() => queryResult);
+            
+            Log.Instance.Debug($"[PoeLiveHistoryProvider] Update received, itemsCount: {queryResult.Length}");
             IsBusy = false;
             updateExceptionsSubject.OnNext(null);
         }
 
         private void HandleUpdateError(Exception ex)
         {
+            Guard.ArgumentNotNull(() => ex);
+            
             Log.Instance.Error($"[PoeLiveHistoryProvider] Update failed", ex);
             IsBusy = false;
             updateExceptionsSubject.OnNext(ex);
