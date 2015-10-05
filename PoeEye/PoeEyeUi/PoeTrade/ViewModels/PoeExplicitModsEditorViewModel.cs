@@ -20,9 +20,10 @@
     internal sealed class PoeExplicitModsEditorViewModel
     {
         private readonly IFactory<PoeExplicitModViewModel, IPoeItemMod[]> modsViewModelsFactor;
-        private readonly ReactiveList<PoeExplicitModViewModel> modsCollection = new ReactiveList<PoeExplicitModViewModel>() {ChangeTrackingEnabled = true};
+        private readonly ReactiveList<PoeExplicitModViewModel> modsCollection = new ReactiveList<PoeExplicitModViewModel>() { ChangeTrackingEnabled = true };
         private readonly ReactiveCommand<object> addModCommand = ReactiveCommand.Create();
         private readonly ReactiveCommand<object> removeModCommand = ReactiveCommand.Create();
+        private readonly ReactiveCommand<object> clearModsCommand = ReactiveCommand.Create();
 
         private readonly IPoeItemMod[] knownPoeItemMods;
 
@@ -47,6 +48,9 @@
                 .Where(x => x != null)
                 .Subscribe(RemoveModCommandExecuted);
 
+            clearModsCommand
+                .Subscribe(_ => ClearModsCommandExecuted());
+
             AddModCommandExecuted();
         }
 
@@ -56,11 +60,11 @@
 
         public ICommand RemoveModCommand => removeModCommand;
 
+        public ICommand ClearModsCommand => clearModsCommand;
+
         private void AddModCommandExecuted()
         {
-            var newMod = modsViewModelsFactor.Create(knownPoeItemMods);
-
-            Mods.Add(newMod);
+            AddMod();
         }
 
         private void RemoveModCommandExecuted(PoeExplicitModViewModel modToRemove)
@@ -70,6 +74,24 @@
             Mods.Remove(modToRemove);
         }
 
-        
+        private void ClearModsCommandExecuted()
+        {
+            ClearMods();
+        }
+
+        public PoeExplicitModViewModel AddMod()
+        {
+            var newMod = modsViewModelsFactor.Create(knownPoeItemMods);
+
+            Mods.Add(newMod);
+
+            return newMod;
+        }
+
+        public void ClearMods()
+        {
+                Mods.Clear();
+        }
+
     }
 }

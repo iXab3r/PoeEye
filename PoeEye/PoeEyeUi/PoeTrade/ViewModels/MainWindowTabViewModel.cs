@@ -18,12 +18,14 @@
 
     internal sealed class MainWindowTabViewModel : ReactiveObject
     {
-        private static int tabIdx;
+        private static int GlobalTabIdx = 0;
+
         private readonly ReactiveCommand<object> markAllAsRead;
         private readonly ReactiveCommand<object> searchCommand;
 
         private bool audioNotificationEnabled;
 
+        private readonly string tabHeader;
         private string tabName;
 
         public MainWindowTabViewModel(
@@ -35,7 +37,7 @@
             Guard.ArgumentNotNull(() => audioNotificationsManager);
             Guard.ArgumentNotNull(() => queryViewModel);
 
-            tabIdx++;
+            tabHeader = $"Tab #{GlobalTabIdx++}";
 
             TradesListViewModel = tradesListViewModel;
             searchCommand = ReactiveCommand.Create();
@@ -97,7 +99,7 @@
         public string TabName
         {
             get { return tabName; }
-            set { this.RaiseAndSetIfChanged(ref tabName, value); }
+            private set { this.RaiseAndSetIfChanged(ref tabName, value); }
         }
 
         public bool HasNewTrades => NewItemsCount > 0;
@@ -123,8 +125,8 @@
         {
             var queryDescription = QueryViewModel.FormatQueryDescription();
             TabName = string.IsNullOrWhiteSpace(queryDescription)
-                ? $"Tab #{tabIdx}"
-                : $"Tab #{tabIdx}:\r\n{queryDescription}";
+                ? tabHeader
+                : $"{tabHeader}:\r\n{queryDescription}";
         }
 
         private void SearchCommandExecute(object arg)

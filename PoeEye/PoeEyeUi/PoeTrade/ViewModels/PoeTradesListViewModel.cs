@@ -155,7 +155,7 @@
 
         private void OnErrorReceived(Exception error)
         {
-            if (error != null || true)
+            if (error != null)
             {
                 Log.Instance.Debug($"[TradesListViewModel] Received an exception from history provider\r\nQuery: {queryInfo?.DumpToTextValue() }");
             }

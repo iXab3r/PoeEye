@@ -1,5 +1,7 @@
 ﻿namespace PoeEyeUi.Prism
 {
+    using Config;
+
     using MetroModels;
 
     using Microsoft.Practices.Unity;
@@ -23,7 +25,9 @@
             Container.RegisterType<IPoePriceCalculcator, PoePriceCalculcator>(new ContainerControlledLifetimeManager());
             Container.RegisterType<IConverter<IPoeQueryInfo, IPoeQuery>, PoeQueryInfoToQueryConverter>(new ContainerControlledLifetimeManager());
             Container.RegisterType<IAudioNotificationsManager, AudioNotificationsManager>(new ContainerControlledLifetimeManager());
-            
+
+            Container.RegisterType<IPoeEyeConfigProvider<IPoeEyeConfig>, PoeEyeConfigProviderFromFile>(new ContainerControlledLifetimeManager());
+
             Container
                     .RegisterType<MainWindowViewModel, MainWindowViewModel>()
                     .RegisterType<MainWindowTabViewModel, MainWindowTabViewModel>()

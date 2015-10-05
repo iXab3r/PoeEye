@@ -143,6 +143,10 @@
       <HintPath>..\packages\Mono.Cecil.0.9.6.1\lib\net45\Mono.Cecil.Rocks.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="NuGet.Squirrel">
       <HintPath>..\packages\squirrel.windows.1.0.2\lib\Net45\NuGet.Squirrel.dll</HintPath>
     </Reference>
@@ -238,6 +242,12 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Config\ConcreteListTypeConverter.cs" />
+    <Compile Include="Config\IPoeEyeConfig.cs" />
+    <Compile Include="Config\IPoeEyeConfigProvider.cs" />
+    <Compile Include="Config\PoeEyeConfig.cs" />
+    <Compile Include="Config\PoeEyeConfigProvider.cs" />
+    <Compile Include="Config\PoeEyeTabConfig.cs" />
     <Compile Include="Converters\NullableConverter.cs" />
     <Compile Include="Converters\ExceptionToMessageConverter.cs" />
     <Compile Include="Converters\NullNotNullToVisibilityConverter.cs" />

@@ -67,8 +67,6 @@
 
         string League { get; }
 
-        string[] LeaguesList { get; }
-
         int? LevelMax { get; }
 
         int? LevelMin { get; }

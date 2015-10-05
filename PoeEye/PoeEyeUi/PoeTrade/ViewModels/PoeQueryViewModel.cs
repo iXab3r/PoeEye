@@ -3,6 +3,9 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reflection;
+
+    using DumpToText;
 
     using Factory;
 
@@ -12,6 +15,7 @@
 
     using Models;
 
+    using PoeShared;
     using PoeShared.Common;
     using PoeShared.PoeDatabase;
     using PoeShared.PoeTrade.Query;
@@ -23,9 +27,6 @@
 
     internal sealed class PoeQueryViewModel : ReactiveObject, IPoeQueryInfo
     {
-        private const string AnyKey = "any";
-        public static IPoeItemType AnyItemType = new PoeItemType {Name = AnyKey};
-
         private bool alternativeArt;
         private float? apsMax;
 
@@ -555,7 +556,7 @@
 
         public IPoeItemType[] ItemTypes { get; }
 
-        public Func<IPoeQueryInfo> PoeQueryBuilder => ConstructQueryInfo;
+        public Func<IPoeQueryInfo> PoeQueryBuilder => GetQueryInfo;
 
         public IPoeItemType ItemType
         {
@@ -563,30 +564,92 @@
             set { this.RaiseAndSetIfChanged(ref itemType, value); }
         }
 
-        private IPoeQueryInfo ConstructQueryInfo()
+        private IPoeQueryInfo GetQueryInfo()
         {
             var result = new PoeQueryInfo();
 
-            var settableProperties = typeof (PoeQueryInfo)
-                .GetProperties()
-                .Where(x => x.CanRead && x.CanWrite)
-                .ToArray();
+            TransferProperties((IPoeQueryInfo)this, result);
 
-            var propetiesToSet = typeof (IPoeQueryInfo)
-                .GetProperties()
+            return result;
+        }
+
+        public void SetQueryInfo([NotNull] IPoeQueryInfo source)
+        {
+            Guard.ArgumentNotNull(() => source);
+
+            TransferProperties(source, this);
+
+            if (source.ImplicitMod != null)
+            {
+                ImplicitModViewModel.Min = source.ImplicitMod.Min;
+                ImplicitModViewModel.Max = source.ImplicitMod.Max;
+                ImplicitModViewModel.SelectedMod = source.ImplicitMod.Name;
+            }
+
+            if (source.ExplicitMods != null && source.ExplicitMods.Any())
+            {
+                ExplicitModsEditorViewModel.ClearMods();
+                foreach (var mod in source.ExplicitMods.Where(x => !string.IsNullOrWhiteSpace(x.Name)))
+                {
+                    var newMod = ExplicitModsEditorViewModel.AddMod();
+                    newMod.SelectedMod = mod.Name;
+                    newMod.Max = mod.Max;
+                    newMod.Min = mod.Min;
+                    newMod.Excluded = mod.Excluded;
+                }
+            }
+
+            if (source.ItemType != null)
+            {
+                var mappedItemType = ItemTypes.FirstOrDefault(x => x.CodeName == source.ItemType.CodeName);
+                if (mappedItemType != null)
+                {
+                    ItemType = mappedItemType;
+                }
+            }
+        }
+
+        private static void TransferProperties<TSource, TTarget>(TSource source, TTarget target)
+            where TTarget : class, TSource
+        {
+            var settableProperties = typeof(TTarget)
+              .GetProperties(BindingFlags.Instance | BindingFlags.Public)
+              .Where(x => x.CanRead && x.CanWrite)
+              .ToArray();
+
+            var propertiesToSet = typeof(TSource)
+                .GetProperties(BindingFlags.Instance | BindingFlags.Public)
                 .Where(x => x.CanRead)
                 .ToArray();
 
-
-            foreach (var property in propetiesToSet)
+            var skippedProperties = new List<PropertyInfo>();
+            foreach (var property in propertiesToSet)
             {
-                var currentValue = property.GetValue(this);
+                try
+                {
+                    var currentValue = property.GetValue(source);
 
-                var settableProperty = settableProperties.First(x => x.Name == property.Name);
-                settableProperty.SetValue(result, currentValue);
+                    var settableProperty = settableProperties.FirstOrDefault(x => x.Name == property.Name);
+                    if (settableProperty == null)
+                    {
+                        skippedProperties.Add(property);
+                        continue;
+                    }
+                    settableProperty.SetValue(target, currentValue);
+                }
+                catch (Exception ex)
+                {
+                    throw new ApplicationException(
+                        $"Exception occurred, property: {property}\r\n" +
+                        $"Settable properties: {settableProperties.Select(x => $"{x.PropertyType} {x.Name}").DumpToTextValue()}\r\n" +
+                        $"PropertiesToSet: {propertiesToSet.Select(x => $"{x.PropertyType} {x.Name}").DumpToTextValue()}",
+                        ex);
+                }
             }
-
-            return result;
+            if (skippedProperties.Any())
+            {
+                Log.Instance.Debug($"[TransferProperties] Skipped following properties:\r\n{skippedProperties.Select(x => $"{x.PropertyType} {x.Name}").DumpToTextValue()}");
+            }
         }
 
         private IPoeQueryRangeModArgument GetImplicitMod()
@@ -630,13 +693,13 @@
             {
                 nameof(League),
             };
-            var nullableProperties = typeof (PoeQueryViewModel)
+            var nullableProperties = typeof(PoeQueryViewModel)
                 .GetProperties()
                 .Where(x => !blackList.Contains(x.Name))
-                .Where(x => x.PropertyType == typeof (int?)
-                            || x.PropertyType == typeof (float?)
-                            || x.PropertyType == typeof (string)
-                            || x.PropertyType == typeof (IPoeItemType)
+                .Where(x => x.PropertyType == typeof(int?)
+                            || x.PropertyType == typeof(float?)
+                            || x.PropertyType == typeof(string)
+                            || x.PropertyType == typeof(IPoeItemType)
                             || x.PropertyType == typeof(PoeItemRarity?))
                 .Where(x => x.CanRead)
                 .ToArray();

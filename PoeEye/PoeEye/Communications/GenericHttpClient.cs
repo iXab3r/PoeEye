@@ -57,8 +57,10 @@
             httpClient.Request.Cookies = Cookies;
 
             var postData = nameValueConverter.Convert(args);
-            Log.Instance.Debug($"[HttpClient] Querying uri '{uri}', args: \r\nPOST: {postData}\r\nSplitted: {postData.SplitClean('&').DumpToTextValue()}");
-            
+
+            Log.Instance.Debug($"[HttpClient] Querying uri '{uri}', args: \r\nPOST: {postData}");
+            Log.Instance.Trace($"[HttpClient] Splitted POST data dump: {postData.SplitClean('&').DumpToTextValue()}");
+
             var response = httpClient.Post(uri, postData, HttpContentTypes.ApplicationXWwwFormUrlEncoded);
             Log.Instance.Debug(
                 $"[HttpClient] Received response, status: {response.StatusCode}, length: {response.RawText?.Length}");
