@@ -32,7 +32,7 @@
 
     internal sealed class PoeTradesListViewModel : ReactiveObject
     {
-        private TimeSpan timeSinceLastUpdateRefreshTimeout = TimeSpan.FromSeconds(1);
+        private static readonly TimeSpan TimeSinceLastUpdateRefreshTimeout = TimeSpan.FromSeconds(1);
 
         private readonly IClock clock;
         private readonly IEqualityComparer<IPoeItem> poeItemsComparer;
@@ -75,7 +75,7 @@
                                      .Subscribe(OnNextItemsPackReceived);
 
             Observable
-                .Timer(DateTimeOffset.Now, timeSinceLastUpdateRefreshTimeout)
+                .Timer(DateTimeOffset.Now, TimeSinceLastUpdateRefreshTimeout)
                 .Subscribe(_ => this.RaisePropertyChanged(nameof(TimeSinceLastUpdate)));
         }
 
