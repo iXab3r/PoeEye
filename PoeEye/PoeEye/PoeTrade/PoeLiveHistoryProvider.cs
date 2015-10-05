@@ -20,7 +20,7 @@
     {
         private TimeSpan recheckPeriodThrottling = TimeSpan.FromMilliseconds(1000);
 
-        private readonly ISubject<IPoeItem[]> itemPacksSubject = new Subject<IPoeItem[]>();
+        private readonly ISubject<IPoeItem[]> itemsPacksSubject = new Subject<IPoeItem[]>();
         private readonly ISubject<Exception> updateExceptionsSubject = new Subject<Exception>();
 
         private bool isBusy;
@@ -61,7 +61,7 @@
             periodObservable.Connect();
         }
 
-        public IObservable<IPoeItem[]> ItemsPacks => itemPacksSubject;
+        public IObservable<IPoeItem[]> ItemsPacks => itemsPacksSubject;
 
         public IObservable<Exception> UpdateExceptions => updateExceptionsSubject;
 
@@ -95,6 +95,7 @@
             Log.Instance.Debug($"[PoeLiveHistoryProvider] Update received, itemsCount: {queryResult.Length}");
             IsBusy = false;
             updateExceptionsSubject.OnNext(null);
+            itemsPacksSubject.OnNext(queryResult);
         }
 
         private void HandleUpdateError(Exception ex)

@@ -13,7 +13,6 @@
             <wpfControls:AutoCompleteTextBox  Grid.Column="0"
                                               Provider="{Binding SuggestionProvider}"
                                               Text="{Binding SelectedMod, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                              DisplayMember="Name"
                                               Margin="10,0,10,0"
                                               Watermark="start typing to get compatible mods list">
             </wpfControls:AutoCompleteTextBox>
