@@ -419,6 +419,7 @@
         {
             _isUpdatingText = true;
             SelectedItem = item;
+            Text = GetDisplayText(ItemsSelector.SelectedItem);
             _isUpdatingText = false;
         }
         #endregion
