@@ -32,6 +32,8 @@
 
     internal sealed class PoeTradesListViewModel : ReactiveObject
     {
+        private TimeSpan timeSinceLastUpdateRefreshTimeout = TimeSpan.FromSeconds(1);
+
         private readonly IClock clock;
         private readonly IEqualityComparer<IPoeItem> poeItemsComparer;
         private readonly IFactory<IPoeTradeViewModel, IPoeItem> poeTradeViewModelFactory;
@@ -62,6 +64,7 @@
 
             this.WhenAnyValue(x => x.QueryInfo)
                                      .DistinctUntilChanged()
+                                     .Do(_ => lastUpdateTimestamp = clock.CurrentTime)
                                      .Where(x => x != null)
                                      .Select(poeQueryInfoToQueryConverter.Convert)
                                      .Select(poeLiveHistoryFactory.Create)
@@ -70,6 +73,10 @@
                                      .Switch()
                                      .ObserveOn(Dispatcher.CurrentDispatcher)
                                      .Subscribe(OnNextItemsPackReceived);
+
+            Observable
+                .Timer(DateTimeOffset.Now, timeSinceLastUpdateRefreshTimeout)
+                .Subscribe(_ => this.RaisePropertyChanged(nameof(TimeSinceLastUpdate)));
         }
 
         public ReactiveList<IPoeTradeViewModel> TradesList => tradesList;
@@ -88,11 +95,7 @@
             set { this.RaiseAndSetIfChanged(ref lastUpdateException, value); }
         }
 
-        public DateTime LastUpdateTimestamp
-        {
-            get { return lastUpdateTimestamp; }
-            set { this.RaiseAndSetIfChanged(ref lastUpdateTimestamp, value); }
-        }
+        public TimeSpan TimeSinceLastUpdate => clock.CurrentTime - lastUpdateTimestamp;
 
         public TimeSpan RecheckTimeout
         {
@@ -129,7 +132,7 @@
                 tradesList.Add(itemViewModel);
             }
 
-            LastUpdateTimestamp = clock.CurrentTime;
+            lastUpdateTimestamp = clock.CurrentTime;
         }
 
         private void OnNextHistoryProviderCreated(IPoeLiveHistoryProvider poeLiveHistoryProvider)

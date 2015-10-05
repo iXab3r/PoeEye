@@ -157,7 +157,9 @@
                 </StackPanel>
 
                 <TextBlock Grid.Column="1"  
-                           Margin="10,0,0,0" Text="{Binding SelectedItem.TradesListViewModel.LastUpdateTimestamp, Mode=OneWay, StringFormat='Last update: {0:HH:mm:ss}'}"/>
+                           Margin="10,0,0,0" 
+                           Visibility="{Binding SelectedItem.TradesListViewModel.QueryInfo, Converter={StaticResource NullNotNullToVisibilityConverter}}"
+                           Text="{Binding SelectedItem.TradesListViewModel.TimeSinceLastUpdate.TotalSeconds, Mode=OneWay, StringFormat='Elapsed since last update: {0:F0}s'}"/>
 
                 <Slider Grid.Column="2" 
                         Width="150"
