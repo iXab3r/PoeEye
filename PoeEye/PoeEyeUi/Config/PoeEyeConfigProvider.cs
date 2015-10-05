@@ -18,7 +18,11 @@ namespace PoeEyeUi.Config
 
     internal sealed class PoeEyeConfigProviderFromFile : IPoeEyeConfigProvider<IPoeEyeConfig>
     {
+#if DEBUG
+        private static readonly string ConfigFilePath = Environment.ExpandEnvironmentVariables($@"%APPDATA%\PoeEye\configDebugMode.cfg");
+#else
         private static readonly string ConfigFilePath = Environment.ExpandEnvironmentVariables($@"%APPDATA%\PoeEye\config.cfg");
+#endif
 
         private readonly JsonSerializerSettings jsonSerializerSettings;
 
