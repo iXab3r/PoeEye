@@ -96,9 +96,9 @@
                 .Sample(ConfigSaveSampingTimeout)
                 .Subscribe(_ => SaveConfig());
 
-            /*Observable
+            Observable
                 .Timer(DateTimeOffset.Now, CheckForUpdatesTimeout)
-                .Subscribe(_ => applicationUpdaterViewModel.CheckForUpdatesCommand.Execute(this));*/    
+                .Subscribe(_ => applicationUpdaterViewModel.CheckForUpdatesCommand.Execute(this)); 
         }
 
         public ICommand CreateNewTabCommand => createNewTabCommand;
