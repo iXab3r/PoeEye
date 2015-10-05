@@ -65,7 +65,7 @@
                                           });
 
             TradesListViewModel
-                .WhenAnyValue(x => x.Query)
+                .WhenAnyValue(x => x.QueryInfo)
                 .Subscribe(_ => RebuildTabName());
 
             this.WhenAnyValue(x => x.HasNewTrades)
@@ -129,7 +129,7 @@
 
         private void SearchCommandExecute(object arg)
         {
-            var queryBuilder = arg as Func<IPoeQuery>;
+            var queryBuilder = arg as Func<IPoeQueryInfo>;
             if (queryBuilder == null)
             {
                 return;
@@ -137,7 +137,7 @@
             var query = queryBuilder();
 
             TradesListViewModel.ClearTradesList();
-            TradesListViewModel.Query = query;
+            TradesListViewModel.QueryInfo = query;
             QueryViewModel.IsExpanded = false;
         }
 

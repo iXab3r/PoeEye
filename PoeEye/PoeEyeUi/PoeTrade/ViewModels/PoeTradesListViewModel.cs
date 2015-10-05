@@ -28,6 +28,8 @@
 
     using ReactiveUI;
 
+    using TypeConverter;
+
     internal sealed class PoeTradesListViewModel : ReactiveObject
     {
         private readonly IClock clock;
@@ -37,7 +39,7 @@
         private IPoeLiveHistoryProvider activeHistoryProvider;
 
         private DateTime lastUpdateTimestamp;
-        private IPoeQuery query;
+        private IPoeQueryInfo queryInfo;
         private TimeSpan recheckTimeout = TimeSpan.FromSeconds(60);
         private readonly ReactiveList<IPoeTradeViewModel> tradesList = new ReactiveList<IPoeTradeViewModel>() {ChangeTrackingEnabled = true};
 
@@ -45,10 +47,12 @@
             [NotNull] IFactory<IPoeLiveHistoryProvider, IPoeQuery> poeLiveHistoryFactory,
             [NotNull] IFactory<IPoeTradeViewModel, IPoeItem> poeTradeViewModelFactory,
             [NotNull] IEqualityComparer<IPoeItem> poeItemsComparer,
+            [NotNull] IConverter<IPoeQueryInfo, IPoeQuery> poeQueryInfoToQueryConverter,
             [NotNull] IClock clock)
         {
             Guard.ArgumentNotNull(() => poeLiveHistoryFactory);
             Guard.ArgumentNotNull(() => poeTradeViewModelFactory);
+            Guard.ArgumentNotNull(() => poeQueryInfoToQueryConverter);
             Guard.ArgumentNotNull(() => poeItemsComparer);
             Guard.ArgumentNotNull(() => clock);
 
@@ -56,9 +60,10 @@
             this.poeItemsComparer = poeItemsComparer;
             this.clock = clock;
 
-            this.WhenAnyValue(x => x.Query)
+            this.WhenAnyValue(x => x.QueryInfo)
                                      .DistinctUntilChanged()
                                      .Where(x => x != null)
+                                     .Select(poeQueryInfoToQueryConverter.Convert)
                                      .Select(poeLiveHistoryFactory.Create)
                                      .Do(OnNextHistoryProviderCreated)
                                      .Select(x => x.ItemsPacks)
@@ -69,10 +74,10 @@
 
         public ReactiveList<IPoeTradeViewModel> TradesList => tradesList;
 
-        public IPoeQuery Query
+        public IPoeQueryInfo QueryInfo
         {
-            get { return query; }
-            set { this.RaiseAndSetIfChanged(ref query, value); }
+            get { return queryInfo; }
+            set { this.RaiseAndSetIfChanged(ref queryInfo, value); }
         }
 
         private Exception lastUpdateException;
@@ -150,7 +155,10 @@
 
         private void OnErrorReceived(Exception error)
         {
-            Log.Instance.Debug($"[TradesListViewModel] Received an exception from history provider\r\nQuery: {Query?.DumpToTextValue() }");
+            if (error != null || true)
+            {
+                Log.Instance.Debug($"[TradesListViewModel] Received an exception from history provider\r\nQuery: {queryInfo?.DumpToTextValue() }");
+            }
             LastUpdateException = error;
         }
 

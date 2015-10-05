@@ -21,12 +21,10 @@
     using WpfControls;
     using WpfControls.Editors;
 
-    internal sealed class PoeQueryViewModel : ReactiveObject
+    internal sealed class PoeQueryViewModel : ReactiveObject, IPoeQueryInfo
     {
         private const string AnyKey = "any";
         public static IPoeItemType AnyItemType = new PoeItemType {Name = AnyKey};
-        private readonly PoeExplicitModsEditorViewModel poeExplicitModsEditorViewModel;
-        private readonly IPoeQueryInfoProvider queryInfoProvider;
 
         private bool alternativeArt;
         private float? apsMax;
@@ -161,9 +159,6 @@
             Guard.ArgumentNotNull(() => poeExplicitModsEditorViewModel);
             Guard.ArgumentNotNull(() => suggestionProviderFactory);
             Guard.ArgumentNotNull(() => poeDatabaseReader);
-
-            this.queryInfoProvider = queryInfoProvider;
-            this.poeExplicitModsEditorViewModel = poeExplicitModsEditorViewModel;
 
             LeaguesList = queryInfoProvider.LeaguesList.ToArray();
 
@@ -345,6 +340,10 @@
             get { return socketsW; }
             set { this.RaiseAndSetIfChanged(ref socketsW, value); }
         }
+
+        IPoeQueryRangeModArgument IPoeQueryInfo.ImplicitMod => GetImplicitMod();
+
+        IPoeQueryRangeModArgument[] IPoeQueryInfo.ExplicitMods => GetExplicitMods();
 
         public int? SocketsB
         {
@@ -556,7 +555,7 @@
 
         public IPoeItemType[] ItemTypes { get; }
 
-        public Func<IPoeQuery> PoeQueryBuilder => ConstructQuery;
+        public Func<IPoeQueryInfo> PoeQueryBuilder => ConstructQueryInfo;
 
         public IPoeItemType ItemType
         {
@@ -564,150 +563,65 @@
             set { this.RaiseAndSetIfChanged(ref itemType, value); }
         }
 
-        private IPoeQuery ConstructQuery()
+        private IPoeQueryInfo ConstructQueryInfo()
         {
-            var result = new PoeQuery();
+            var result = new PoeQueryInfo();
 
-            var args = new List<IPoeQueryArgument>
-            {
-                CreateArgument("dmg_min", damageMax),
-                CreateArgument("dmg_max", damageMax),
-                CreateArgument("aps_min", apsMin),
-                CreateArgument("aps_max", apsMax),
-                CreateArgument("crit_min", critMin),
-                CreateArgument("crit_max", critMax),
-                CreateArgument("dps_min", dpsMin),
-                CreateArgument("dps_max", dpsMax),
-                CreateArgument("edps_min", edpsMin),
-                CreateArgument("edps_max", edpsMax),
-                CreateArgument("pdps_min", pdpsMin),
-                CreateArgument("pdps_max", pdpsMax),
-                CreateArgument("armour_min", armourMin),
-                CreateArgument("armour_max", armourMax),
-                CreateArgument("evasion_min", evasionMin),
-                CreateArgument("evasion_max", evasionMax),
-                CreateArgument("shield_min", shieldMin),
-                CreateArgument("shield_max", shieldMax),
-                CreateArgument("block_min", blockMin),
-                CreateArgument("block_max", blockMax),
-                CreateArgument("sockets_min", socketsMin),
-                CreateArgument("sockets_max", socketsMax),
-                CreateArgument("link_min", linkMin),
-                CreateArgument("link_max", linkMin),
-                CreateArgument("rlevel_min", rLevelMin),
-                CreateArgument("rlevel_max", rLevelMax),
-                CreateArgument("rstr_min", rStrMin),
-                CreateArgument("rstr_max", rStrMax),
-                CreateArgument("rdex_min", rDexMin),
-                CreateArgument("rdex_max", rDexMax),
-                CreateArgument("rint_min", rIntMin),
-                CreateArgument("rint_max", rIntMax),
-                CreateArgument("q_min", qualityMin),
-                CreateArgument("q_max", qualityMax),
-                CreateArgument("level_min", levelMin),
-                CreateArgument("level_max", levelMax),
-                CreateArgument("mapq_min", GemOrMapLevelMin),
-                CreateArgument("mapq_max", GemOrMapLevelMax),
-                CreateArgument("buyout_min", buyoutMin),
-                CreateArgument("buyout_max", buyoutMax),
-                CreateArgument("buyout", buyoutOnly),
-                CreateArgument("online", onlineOnly),
-                CreateArgument("altart", alternativeArt),
-                CreateArgument("capquality", normalizeQuality),
-                CreateArgument("base", itemBase),
-                CreateArgument("name", itemName),
-                CreateArgument("league", league),
-                CreateArgument("sockets_r", socketsR),
-                CreateArgument("sockets_g", socketsG),
-                CreateArgument("sockets_b", socketsB),
-                CreateArgument("sockets_w", socketsW),
-                CreateArgument("linked_r", linkedR),
-                CreateArgument("linked_g", linkedG),
-                CreateArgument("linked_b", linkedB),
-                CreateArgument("linked_w", linkedW),
-                CreateArgument("type", itemType?.CodeName),
-                CreateArgument("rarity", itemRarity?.ToString() ?? string.Empty),
-            };
+            var settableProperties = typeof (PoeQueryInfo)
+                .GetProperties()
+                .Where(x => x.CanRead && x.CanWrite)
+                .ToArray();
 
-            if (ImplicitModViewModel.SelectedMod != null)
+            var propetiesToSet = typeof (IPoeQueryInfo)
+                .GetProperties()
+                .Where(x => x.CanRead)
+                .ToArray();
+
+
+            foreach (var property in propetiesToSet)
             {
-                args.AddRange(new[]
-                {
-                    CreateArgument("impl", ImplicitModViewModel.SelectedMod),
-                    CreateArgument("impl_min", ImplicitModViewModel.Min),
-                    CreateArgument("impl_max", ImplicitModViewModel.Max)
-                });
+                var currentValue = property.GetValue(this);
+
+                var settableProperty = settableProperties.First(x => x.Name == property.Name);
+                settableProperty.SetValue(result, currentValue);
             }
 
-            args.AddRange(new[]
-            {
-                CreateArgument("mods", string.Empty),
-                CreateArgument("modexclude", string.Empty),
-                CreateArgument("modmin", string.Empty),
-                CreateArgument("modmax", string.Empty)
-            });
-
-            foreach (var poeExplicitModViewModel in ExplicitModsEditorViewModel.Mods.Where(x => x.SelectedMod != null))
-            {
-                var modArg = CreateModArgument(
-                    poeExplicitModViewModel.SelectedMod,
-                    poeExplicitModViewModel.Min,
-                    poeExplicitModViewModel.Max);
-                args.Add(modArg);
-            }
-
-            Guard.ArgumentIsTrue(() => args.ToDictionary(x => x.Name, x => default(int?)).Count() == args.Count());
-
-            result.Arguments = args.ToArray();
             return result;
         }
 
-        private IPoeQueryArgument CreateModArgument(string modName, float? min, float? max)
+        private IPoeQueryRangeModArgument GetImplicitMod()
         {
-            var arg = new PoeQueryRangeModArgument(modName)
+            if (string.IsNullOrWhiteSpace(ImplicitModViewModel.SelectedMod))
             {
-                Min = min,
-                Max = max
+                return null;
+            }
+            return new PoeQueryRangeModArgument(ImplicitModViewModel.SelectedMod)
+            {
+                Min = ImplicitModViewModel.Min,
+                Max = ImplicitModViewModel.Max,
             };
-            return arg;
         }
 
-        private IPoeQueryArgument CreateModArgument(IPoeItemMod mod, float? min, float? max)
+        private IPoeQueryRangeModArgument[] GetExplicitMods()
         {
-            return CreateModArgument(mod.CodeName, min, max);
-        }
+            var result = new List<IPoeQueryRangeModArgument>();
+            foreach (var poeExplicitModViewModel in ExplicitModsEditorViewModel.Mods)
+            {
+                if (string.IsNullOrWhiteSpace(poeExplicitModViewModel.SelectedMod))
+                {
+                    continue;
+                }
 
-        private IPoeQueryArgument CreateArgument<T>(string name, T value)
-        {
-            if (value == null || Equals(value, default(T)))
-            {
-                return new PoeQueryStringArgument(name, string.Empty);
-            }
+                var explicitMod = new PoeQueryRangeModArgument(poeExplicitModViewModel.SelectedMod)
+                {
+                    Excluded = poeExplicitModViewModel.Excluded,
+                    Min = poeExplicitModViewModel.Min,
+                    Max = poeExplicitModViewModel.Max,
+                };
 
-            if (typeof (T) == typeof (int?))
-            {
-                return new PoeQueryIntArgument(name,
-                    value is int ? ConvertToType<int>(value) : (int) ConvertToType<int?>(value));
+                result.Add(explicitMod);
             }
-            if (typeof (T) == typeof (float?))
-            {
-                return new PoeQueryFloatArgument(name,
-                    value is float ? ConvertToType<float>(value) : (float) ConvertToType<float?>(value));
-            }
-            if (typeof (T) == typeof (string))
-            {
-                return new PoeQueryStringArgument(name, ConvertToType<string>(value) ?? string.Empty);
-            }
-            if (typeof (T) == typeof (bool))
-            {
-                return new PoeQueryStringArgument(name, ConvertToType<bool>(value) ? "x" : string.Empty);
-            }
-            throw new NotSupportedException($"Type {typeof (T)} is not supported, parameter name: {name}");
-        }
-
-        private T ConvertToType<T>(object value)
-        {
-            return (T) Convert.ChangeType(value, typeof (T));
+            return result.ToArray();
         }
 
         private string[] FormatQueryDescriptionArray()

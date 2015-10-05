@@ -101,9 +101,9 @@ namespace DumpToText
 				{
 					var sb = new StringBuilder();
 
-
-					var maxPropertyNameWidth = Properties.Max(p => p.PropertyInfo.Name.Length);
-					var maxPropertyValueWidth = Properties.Max(p => p.Value.ValueWidth);
+				    var properties = BuildProperties();
+					var maxPropertyNameWidth = properties.Any() ? properties.Max(p => p.PropertyInfo.Name.Length) : 0;
+					var maxPropertyValueWidth = properties.Any() ? properties.Max(p => p.Value.ValueWidth) : 0;
 					var totalWidth = new[] { Name.Length, (maxPropertyNameWidth + 3 + maxPropertyValueWidth) }.Max();
 
 					Action writeDividerLine = () =>
@@ -126,7 +126,7 @@ namespace DumpToText
 
 					var valueColumnWidth = totalWidth - (maxPropertyNameWidth + 3);
 
-					foreach (var child in Properties)
+					foreach (var child in properties)
 					{
 						var eachRowInChildItem = child.Value.Value.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
 
@@ -161,19 +161,20 @@ namespace DumpToText
 				}
 			}
 
-			public IEnumerable<Property> Properties
-			{
-				get
-				{
-					return Item.GetType()
-						.GetProperties(BindingFlags.Public | BindingFlags.Instance)
-						.Select(propertyInfo => new Property
-						{
-							PropertyInfo = propertyInfo,
-							Value = ObjectTypeFactory.Create(propertyInfo.GetValue(Item, new object[0]))
-						});
-				}
-			}
+		    private Property[] BuildProperties()
+		    {
+                return Item.GetType()
+                        .GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                        .Where(propertyInfo => !typeof(MethodBase).IsAssignableFrom(propertyInfo.PropertyType))
+                        .Where(propertyInfo => !typeof(Action).IsAssignableFrom(propertyInfo.PropertyType))
+                        .Where(propertyInfo => !typeof(Func<>).IsAssignableFrom(propertyInfo.PropertyType))
+                        .Select(propertyInfo => new Property
+                        {
+                            PropertyInfo = propertyInfo,
+                            Value = ObjectTypeFactory.Create(propertyInfo.GetValue(Item, new object[0]))
+                        })
+                        .ToArray();
+            }
 		}
 
 		public abstract class DumpItemBase
