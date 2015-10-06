@@ -3,6 +3,7 @@
     using System;
     using System.Linq;
     using System.Reactive;
+    using System.Reactive.Concurrency;
     using System.Reactive.Linq;
     using System.Reactive.Subjects;
     using System.Reflection;
@@ -97,7 +98,7 @@
                 .Subscribe(_ => SaveConfig());
 
             Observable
-                .Timer(DateTimeOffset.Now, CheckForUpdatesTimeout)
+                .Timer(DateTimeOffset.Now, CheckForUpdatesTimeout, TaskPoolScheduler.Default)
                 .Subscribe(_ => applicationUpdaterViewModel.CheckForUpdatesCommand.Execute(this)); 
         }
 

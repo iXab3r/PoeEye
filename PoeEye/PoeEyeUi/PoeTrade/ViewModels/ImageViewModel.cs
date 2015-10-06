@@ -8,6 +8,7 @@
     using System.Threading.Tasks;
     using System.Windows.Controls;
     using System.Windows.Media.Imaging;
+    using System.Windows.Threading;
 
     using Guards;
 
@@ -34,13 +35,12 @@
             this.imageUri = imageUri;
 
             image = new Image();
-            var syncContext = SynchronizationContext.Current;
 
             IsLoading = true;
             cache
                 .ResolveImageByUri(imageUri)
                 .Finally(() => IsLoading = false)
-                .ObserveOn(syncContext)
+                .ObserveOn(Dispatcher.CurrentDispatcher)
                 .Subscribe(LoadImage);
         }
 

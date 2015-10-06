@@ -60,6 +60,11 @@
         private FileInfo LoadImageFromStream(string outputFilePath, Stream dataStream)
         {
             Log.Instance.Debug($"[ItemsCache.ResolveImageByUri] Starting downloading image to cache...\r\n\tFilePath: '{outputFilePath}'");
+
+#if DEBUG
+            Log.Instance.Debug($"[ItemsCache.ResolveImageByUri] Atrificial delay");
+            Thread.Sleep(3000);
+#endif
             var outputDirectory = Path.GetDirectoryName(outputFilePath);
             if (!Directory.Exists(outputFilePath))
             {

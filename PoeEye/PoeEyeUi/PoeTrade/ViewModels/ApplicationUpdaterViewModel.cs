@@ -39,7 +39,7 @@
 
             checkForUpdatesCommand
                 .Where(x => !IsBusy)
-                .ObserveOn(NewThreadScheduler.Default)
+                .ObserveOn(TaskPoolScheduler.Default)
                 .Subscribe(CheckForUpdatesCommandExecuted);
 
             SquirrelAwareApp.HandleEvents(
@@ -71,7 +71,8 @@
                 Thread.Sleep(ArtificialDelay); 
 
 #if DEBUG
-                Log.Instance.Debug($"[ApplicationUpdaterViewModel] Debug mode detected...");
+                Log.Instance.Debug($"[ApplicationUpdaterViewModel] Debug mode detected, update will be skipped");
+                uiContext.Post(state => dialogCoordinator.ShowMessageAsync(context, "DEBUG", "Application updated, new version will take place on next application startup"), null);
                 return;
 #endif
                 try
