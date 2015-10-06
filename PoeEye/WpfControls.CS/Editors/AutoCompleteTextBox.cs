@@ -1,115 +1,114 @@
 ﻿namespace WpfControls.Editors
 {
-
     using System;
     using System.Collections;
+    using System.Reactive.Linq;
+    using System.Text;
     using System.Threading;
     using System.Windows;
     using System.Windows.Controls;
     using System.Windows.Controls.Primitives;
-    using System.Windows.Data;
+    using System.Windows.Forms;
     using System.Windows.Input;
     using System.Windows.Threading;
 
-    [TemplatePart(Name = AutoCompleteTextBox.PartEditor, Type = typeof(TextBox))]
-    [TemplatePart(Name = AutoCompleteTextBox.PartPopup, Type = typeof(Popup))]
-    [TemplatePart(Name = AutoCompleteTextBox.PartSelector, Type = typeof(Selector))]
+    using Binding = System.Windows.Data.Binding;
+    using Control = System.Windows.Controls.Control;
+    using KeyEventArgs = System.Windows.Input.KeyEventArgs;
+    using ListBox = System.Windows.Controls.ListBox;
+    using TextBox = System.Windows.Controls.TextBox;
+
+    [TemplatePart(Name = PartEditor, Type = typeof (TextBox))]
+    [TemplatePart(Name = PartPopup, Type = typeof (Popup))]
+    [TemplatePart(Name = PartSelector, Type = typeof (Selector))]
     public class AutoCompleteTextBox : Control
     {
-
-        #region "Fields"
-
+        
+        static AutoCompleteTextBox()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof (AutoCompleteTextBox),
+                new FrameworkPropertyMetadata(typeof (AutoCompleteTextBox)));
+        }
+        
         public const string PartEditor = "PART_Editor";
         public const string PartPopup = "PART_Popup";
 
         public const string PartSelector = "PART_Selector";
-        public static readonly DependencyProperty DelayProperty = DependencyProperty.Register("Delay", typeof(int), typeof(AutoCompleteTextBox), new FrameworkPropertyMetadata(200));
-        public static readonly DependencyProperty DisplayMemberProperty = DependencyProperty.Register("DisplayMember", typeof(string), typeof(AutoCompleteTextBox), new FrameworkPropertyMetadata(string.Empty));
-        public static readonly DependencyProperty IconPlacementProperty = DependencyProperty.Register("IconPlacement", typeof(IconPlacement), typeof(AutoCompleteTextBox), new FrameworkPropertyMetadata(IconPlacement.Left));
-        public static readonly DependencyProperty IconProperty = DependencyProperty.Register("Icon", typeof(object), typeof(AutoCompleteTextBox), new FrameworkPropertyMetadata(null));
-        public static readonly DependencyProperty IconVisibilityProperty = DependencyProperty.Register("IconVisibility", typeof(Visibility), typeof(AutoCompleteTextBox), new FrameworkPropertyMetadata(Visibility.Visible));
-        public static readonly DependencyProperty IsDropDownOpenProperty = DependencyProperty.Register("IsDropDownOpen", typeof(bool), typeof(AutoCompleteTextBox), new FrameworkPropertyMetadata(false));
-        public static readonly DependencyProperty IsLoadingProperty = DependencyProperty.Register("IsLoading", typeof(bool), typeof(AutoCompleteTextBox), new FrameworkPropertyMetadata(false));
-        public static readonly DependencyProperty IsReadOnlyProperty = DependencyProperty.Register("IsReadOnly", typeof(bool), typeof(AutoCompleteTextBox), new FrameworkPropertyMetadata(false));
-        public static readonly DependencyProperty ItemTemplateProperty = DependencyProperty.Register("ItemTemplate", typeof(DataTemplate), typeof(AutoCompleteTextBox), new FrameworkPropertyMetadata(null));
-        public static readonly DependencyProperty ItemTemplateSelectorProperty = DependencyProperty.Register("ItemTemplateSelector", typeof(DataTemplateSelector), typeof(AutoCompleteTextBox));
-        public static readonly DependencyProperty LoadingContentProperty = DependencyProperty.Register("LoadingContent", typeof(object), typeof(AutoCompleteTextBox), new FrameworkPropertyMetadata(null));
-        public static readonly DependencyProperty ProviderProperty = DependencyProperty.Register("Provider", typeof(ISuggestionProvider), typeof(AutoCompleteTextBox), new FrameworkPropertyMetadata(null));
-        public static readonly DependencyProperty SelectedItemProperty = DependencyProperty.Register("SelectedItem", typeof(object), typeof(AutoCompleteTextBox), new FrameworkPropertyMetadata(null, OnSelectedItemChanged));
-        public static readonly DependencyProperty TextProperty = DependencyProperty.Register("Text", typeof(string), typeof(AutoCompleteTextBox), new FrameworkPropertyMetadata(string.Empty));
 
-        public static readonly DependencyProperty WatermarkProperty = DependencyProperty.Register("Watermark", typeof(string), typeof(AutoCompleteTextBox), new FrameworkPropertyMetadata(string.Empty));
-        private BindingEvaluator _bindingEvaluator;
+        public static readonly DependencyProperty DelayProperty = DependencyProperty.Register("Delay", typeof (int),
+            typeof (AutoCompleteTextBox), new FrameworkPropertyMetadata(200));
 
-        private TextBox _editor;
+        public static readonly DependencyProperty DisplayMemberProperty = DependencyProperty.Register("DisplayMember",
+            typeof (string), typeof (AutoCompleteTextBox), new FrameworkPropertyMetadata(string.Empty));
 
-        private DispatcherTimer _fetchTimer;
+        public static readonly DependencyProperty IconPlacementProperty = DependencyProperty.Register("IconPlacement",
+            typeof (IconPlacement), typeof (AutoCompleteTextBox), new FrameworkPropertyMetadata(IconPlacement.Left));
 
-        private string _filter;
+        public static readonly DependencyProperty IconProperty = DependencyProperty.Register("Icon", typeof (object),
+            typeof (AutoCompleteTextBox), new FrameworkPropertyMetadata(null));
 
-        private bool _isUpdatingText;
+        public static readonly DependencyProperty IconVisibilityProperty = DependencyProperty.Register(
+            "IconVisibility", typeof (Visibility), typeof (AutoCompleteTextBox),
+            new FrameworkPropertyMetadata(Visibility.Visible));
 
-        private Selector _itemsSelector;
+        public static readonly DependencyProperty IsDropDownOpenProperty = DependencyProperty.Register(
+            "IsDropDownOpen", typeof (bool), typeof (AutoCompleteTextBox), new FrameworkPropertyMetadata(false));
 
-        private Popup _popup;
+        public static readonly DependencyProperty IsLoadingProperty = DependencyProperty.Register("IsLoading",
+            typeof (bool), typeof (AutoCompleteTextBox), new FrameworkPropertyMetadata(false));
 
-        private SelectionAdapter _selectionAdapter;
+        public static readonly DependencyProperty IsReadOnlyProperty = DependencyProperty.Register("IsReadOnly",
+            typeof (bool), typeof (AutoCompleteTextBox), new FrameworkPropertyMetadata(false));
 
-        private bool _selectionCancelled;
+        public static readonly DependencyProperty ItemTemplateProperty = DependencyProperty.Register("ItemTemplate",
+            typeof (DataTemplate), typeof (AutoCompleteTextBox), new FrameworkPropertyMetadata(null));
 
-        private SuggestionsAdapter _suggestionsAdapter;
+        public static readonly DependencyProperty ItemTemplateSelectorProperty =
+            DependencyProperty.Register("ItemTemplateSelector", typeof (DataTemplateSelector),
+                typeof (AutoCompleteTextBox));
 
+        public static readonly DependencyProperty LoadingContentProperty = DependencyProperty.Register(
+            "LoadingContent", typeof (object), typeof (AutoCompleteTextBox), new FrameworkPropertyMetadata(null));
 
-        #endregion
+        public static readonly DependencyProperty ProviderProperty = DependencyProperty.Register("Provider",
+            typeof (ISuggestionProvider), typeof (AutoCompleteTextBox), new FrameworkPropertyMetadata(null));
 
-        #region "Constructors"
+        public static readonly DependencyProperty SelectedItemProperty = DependencyProperty.Register("SelectedItem",
+            typeof (object), typeof (AutoCompleteTextBox), new FrameworkPropertyMetadata(null, OnSelectedItemChanged));
 
-        static AutoCompleteTextBox()
-        {
-            DefaultStyleKeyProperty.OverrideMetadata(typeof(AutoCompleteTextBox), new FrameworkPropertyMetadata(typeof(AutoCompleteTextBox)));
-        }
+        public static readonly DependencyProperty TextProperty = DependencyProperty.Register("Text", typeof (string),
+            typeof (AutoCompleteTextBox), new FrameworkPropertyMetadata(string.Empty));
 
-        #endregion
+        public static readonly DependencyProperty WatermarkProperty = DependencyProperty.Register("Watermark",
+            typeof (string), typeof (AutoCompleteTextBox), new FrameworkPropertyMetadata(string.Empty));
 
-        #region "Properties"
+        private bool isUpdatingText;
 
-        public BindingEvaluator BindingEvaluator
-        {
-            get { return _bindingEvaluator; }
-            set { _bindingEvaluator = value; }
-        }
+        private bool selectionCancelled;
+
+        private SuggestionsAdapter suggestionsAdapter;
+
+        public BindingEvaluator BindingEvaluator { get; set; }
 
         public int Delay
         {
-            get { return (int)GetValue(DelayProperty); }
+            get { return (int) GetValue(DelayProperty); }
 
             set { SetValue(DelayProperty, value); }
         }
 
         public string DisplayMember
         {
-            get { return (string)GetValue(DisplayMemberProperty); }
+            get { return (string) GetValue(DisplayMemberProperty); }
 
             set { SetValue(DisplayMemberProperty, value); }
         }
 
-        public TextBox Editor
-        {
-            get { return _editor; }
-            set { _editor = value; }
-        }
+        public TextBox Editor { get; set; }
 
-        public DispatcherTimer FetchTimer
-        {
-            get { return _fetchTimer; }
-            set { _fetchTimer = value; }
-        }
+        public DispatcherTimer FetchTimer { get; set; }
 
-        public string Filter
-        {
-            get { return _filter; }
-            set { _filter = value; }
-        }
+        public string Filter { get; set; }
 
         public object Icon
         {
@@ -120,56 +119,52 @@
 
         public IconPlacement IconPlacement
         {
-            get { return (IconPlacement)GetValue(IconPlacementProperty); }
+            get { return (IconPlacement) GetValue(IconPlacementProperty); }
 
             set { SetValue(IconPlacementProperty, value); }
         }
 
         public Visibility IconVisibility
         {
-            get { return (Visibility)GetValue(IconVisibilityProperty); }
+            get { return (Visibility) GetValue(IconVisibilityProperty); }
 
             set { SetValue(IconVisibilityProperty, value); }
         }
 
         public bool IsDropDownOpen
         {
-            get { return (bool)GetValue(IsDropDownOpenProperty); }
+            get { return (bool) GetValue(IsDropDownOpenProperty); }
 
             set { SetValue(IsDropDownOpenProperty, value); }
         }
 
         public bool IsLoading
         {
-            get { return (bool)GetValue(IsLoadingProperty); }
+            get { return (bool) GetValue(IsLoadingProperty); }
 
             set { SetValue(IsLoadingProperty, value); }
         }
 
         public bool IsReadOnly
         {
-            get { return (bool)GetValue(IsReadOnlyProperty); }
+            get { return (bool) GetValue(IsReadOnlyProperty); }
 
             set { SetValue(IsReadOnlyProperty, value); }
         }
 
-        public Selector ItemsSelector
-        {
-            get { return _itemsSelector; }
-            set { _itemsSelector = value; }
-        }
+        public Selector ItemsSelector { get; set; }
 
         public DataTemplate ItemTemplate
         {
-            get { return (DataTemplate)GetValue(ItemTemplateProperty); }
+            get { return (DataTemplate) GetValue(ItemTemplateProperty); }
 
             set { SetValue(ItemTemplateProperty, value); }
         }
 
         public DataTemplateSelector ItemTemplateSelector
         {
-            get { return ((DataTemplateSelector)(GetValue(AutoCompleteTextBox.ItemTemplateSelectorProperty))); }
-            set { SetValue(AutoCompleteTextBox.ItemTemplateSelectorProperty, value); }
+            get { return ((DataTemplateSelector) (GetValue(ItemTemplateSelectorProperty))); }
+            set { SetValue(ItemTemplateSelectorProperty, value); }
         }
 
         public object LoadingContent
@@ -179,15 +174,11 @@
             set { SetValue(LoadingContentProperty, value); }
         }
 
-        public Popup Popup
-        {
-            get { return _popup; }
-            set { _popup = value; }
-        }
+        public Popup Popup { get; set; }
 
         public ISuggestionProvider Provider
         {
-            get { return (ISuggestionProvider)GetValue(ProviderProperty); }
+            get { return (ISuggestionProvider) GetValue(ProviderProperty); }
 
             set { SetValue(ProviderProperty, value); }
         }
@@ -199,50 +190,46 @@
             set { SetValue(SelectedItemProperty, value); }
         }
 
-        public SelectionAdapter SelectionAdapter
-        {
-            get { return _selectionAdapter; }
-            set { _selectionAdapter = value; }
-        }
+        public SelectionAdapter SelectionAdapter { get; set; }
 
         public string Text
         {
-            get { return (string)GetValue(TextProperty); }
+            get { return (string) GetValue(TextProperty); }
 
             set { SetValue(TextProperty, value); }
         }
 
         public string Watermark
         {
-            get { return (string)GetValue(WatermarkProperty); }
+            get { return (string) GetValue(WatermarkProperty); }
 
             set { SetValue(WatermarkProperty, value); }
         }
-
-        #endregion
-
-        #region "Methods"
 
         public static void OnSelectedItemChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             AutoCompleteTextBox act = null;
             act = d as AutoCompleteTextBox;
-            if (act != null)
+            if (act == null)
             {
-                if (act.Editor != null & !act._isUpdatingText)
-                {
-                    act._isUpdatingText = true;
-                    act.Editor.Text = act.BindingEvaluator.Evaluate(e.NewValue);
-                    act._isUpdatingText = false;
-                }
+                return;
+            }
+
+            if (act.Editor != null & !act.isUpdatingText)
+            {
+                act.isUpdatingText = true;
+                act.Editor.Text = act.BindingEvaluator.Evaluate(e.NewValue);
+                act.isUpdatingText = false;
             }
         }
 
         private void ScrollToSelectedItem()
         {
-            ListBox listBox = ItemsSelector as ListBox;
-            if (listBox != null && listBox.SelectedItem != null)
+            var listBox = ItemsSelector as ListBox;
+            if (listBox?.SelectedItem != null)
+            {
                 listBox.ScrollIntoView(listBox.SelectedItem);
+            }
         }
 
         public override void OnApplyTemplate()
@@ -261,11 +248,10 @@
 
                 if (SelectedItem != null)
                 {
-                    _isUpdatingText = true;
+                    isUpdatingText = true;
                     Editor.Text = BindingEvaluator.Evaluate(SelectedItem);
-                    _isUpdatingText = false;
+                    isUpdatingText = false;
                 }
-
             }
 
             if (Popup != null)
@@ -282,6 +268,7 @@
                 SelectionAdapter.SelectionChanged += OnSelectionAdapterSelectionChanged;
             }
         }
+
         private string GetDisplayText(object dataItem)
         {
             if (BindingEvaluator == null)
@@ -301,12 +288,22 @@
 
         private void OnEditorKeyDown(object sender, KeyEventArgs e)
         {
-            if (SelectionAdapter != null)
+            if (SelectionAdapter == null)
             {
-                if (IsDropDownOpen)
-                    SelectionAdapter.HandleKeyDown(e);
-                else
-                    IsDropDownOpen = e.Key == Key.Down || e.Key == Key.Up;
+                return;
+            }
+            if (IsDropDownOpen)
+            {
+                SelectionAdapter.HandleKeyDown(e);
+            }
+            else
+            {
+                KeysConverter kc = new KeysConverter();
+                var keyChar = kc.ConvertToString(e.Key);
+
+                var isUpOrDownKey = e.Key == Key.Down || e.Key == Key.Up;
+                var isSymbol = !string.IsNullOrEmpty(keyChar) && !Char.IsControl(keyChar, 0);
+                IsDropDownOpen = isUpOrDownKey || isSymbol;
             }
         }
 
@@ -320,10 +317,19 @@
 
         private void OnEditorTextChanged(object sender, TextChangedEventArgs e)
         {
+            if (!isUpdatingText)
+            {
+                isUpdatingText = true;
+                Text = Editor.Text;
+                isUpdatingText = false;
+            }
+
             Text = Editor.Text;
 
-            if (_isUpdatingText)
+            if (isUpdatingText)
+            {
                 return;
+            }
             if (FetchTimer == null)
             {
                 FetchTimer = new DispatcherTimer();
@@ -354,17 +360,17 @@
             if (Provider != null && ItemsSelector != null)
             {
                 Filter = Editor.Text;
-                if (_suggestionsAdapter == null)
+                if (suggestionsAdapter == null)
                 {
-                    _suggestionsAdapter = new SuggestionsAdapter(this);
+                    suggestionsAdapter = new SuggestionsAdapter(this);
                 }
-                _suggestionsAdapter.GetSuggestions(Filter);
+                suggestionsAdapter.GetSuggestions(Filter);
             }
         }
 
         private void OnPopupClosed(object sender, EventArgs e)
         {
-            if (!_selectionCancelled)
+            if (!selectionCancelled)
             {
                 OnSelectionAdapterCommit();
             }
@@ -372,19 +378,19 @@
 
         private void OnPopupOpened(object sender, EventArgs e)
         {
-            _selectionCancelled = false;
+            selectionCancelled = false;
             ItemsSelector.SelectedItem = SelectedItem;
         }
 
         private void OnSelectionAdapterCancel()
         {
-            _isUpdatingText = true;
+            isUpdatingText = true;
             Editor.Text = SelectedItem == null ? Filter : GetDisplayText(SelectedItem);
             Editor.SelectionStart = Editor.Text.Length;
             Editor.SelectionLength = 0;
-            _isUpdatingText = false;
+            isUpdatingText = false;
             IsDropDownOpen = false;
-            _selectionCancelled = true;
+            selectionCancelled = true;
         }
 
         private void OnSelectionAdapterCommit()
@@ -392,17 +398,17 @@
             if (ItemsSelector.SelectedItem != null)
             {
                 SelectedItem = ItemsSelector.SelectedItem;
-                _isUpdatingText = true;
+                isUpdatingText = true;
                 Editor.Text = GetDisplayText(ItemsSelector.SelectedItem);
                 SetSelectedItem(ItemsSelector.SelectedItem);
-                _isUpdatingText = false;
+                isUpdatingText = false;
                 IsDropDownOpen = false;
             }
         }
 
         private void OnSelectionAdapterSelectionChanged()
         {
-            _isUpdatingText = true;
+            isUpdatingText = true;
             if (ItemsSelector.SelectedItem == null)
             {
                 Editor.Text = Filter;
@@ -414,50 +420,38 @@
             Editor.SelectionStart = Editor.Text.Length;
             Editor.SelectionLength = 0;
             ScrollToSelectedItem();
-            _isUpdatingText = false;
+            isUpdatingText = false;
         }
 
         private void SetSelectedItem(object item)
         {
-            _isUpdatingText = true;
+            isUpdatingText = true;
             SelectedItem = item;
-            _isUpdatingText = false;
+            isUpdatingText = false;
         }
-        #endregion
-
-        #region "Nested Types"
 
         private class SuggestionsAdapter
         {
-
-            #region "Fields"
-
-            private AutoCompleteTextBox _actb;
-
-            private string _filter;
-            #endregion
-
-            #region "Constructors"
-
             public SuggestionsAdapter(AutoCompleteTextBox actb)
             {
                 _actb = actb;
             }
 
-            #endregion
+            private readonly AutoCompleteTextBox _actb;
 
-            #region "Methods"
+            private string _filter;
 
             public void GetSuggestions(string searchText)
             {
                 _filter = searchText;
                 _actb.IsLoading = true;
-                ParameterizedThreadStart thInfo = new ParameterizedThreadStart(GetSuggestionsAsync);
-                Thread th = new Thread(thInfo);
-                th.Start(new object[] {
-                searchText,
-                _actb.Provider
-            });
+                ParameterizedThreadStart thInfo = GetSuggestionsAsync;
+                var th = new Thread(thInfo);
+                th.Start(new object[]
+                {
+                    searchText,
+                    _actb.Provider
+                });
             }
 
             private void DisplaySuggestions(IEnumerable suggestions, string filter)
@@ -472,27 +466,18 @@
                     _actb.ItemsSelector.ItemsSource = suggestions;
                     _actb.IsDropDownOpen = _actb.ItemsSelector.HasItems;
                 }
-
             }
 
             private void GetSuggestionsAsync(object param)
             {
-                object[] args = param as object[];
-                string searchText = Convert.ToString(args[0]);
-                ISuggestionProvider provider = args[1] as ISuggestionProvider;
-                IEnumerable list = provider.GetSuggestions(searchText);
-                _actb.Dispatcher.BeginInvoke(new Action<IEnumerable, string>(DisplaySuggestions), DispatcherPriority.Background, new object[] {
-                list,
-                searchText
-            });
+                var args = param as object[];
+                var searchText = Convert.ToString(args[0]);
+                var provider = args[1] as ISuggestionProvider;
+                var list = provider.GetSuggestions(searchText);
+                _actb.Dispatcher.BeginInvoke(new Action<IEnumerable, string>(DisplaySuggestions),
+                    DispatcherPriority.Background, list, searchText);
             }
-
-            #endregion
-
         }
 
-        #endregion
-
     }
-
 }
