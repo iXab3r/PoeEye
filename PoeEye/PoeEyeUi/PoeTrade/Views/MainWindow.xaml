@@ -57,7 +57,7 @@
                     </ListBox.Resources>
                     <ListBox.ItemTemplate>
                         <DataTemplate DataType="{x:Type viewModels:MainWindowTabViewModel}">
-                            <Grid >
+                            <Grid Margin="0,3,0,3">
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="*"/>
                                     <RowDefinition Height="Auto"/>
@@ -84,55 +84,49 @@
                                 </DockPanel>
 
                                 <TextBlock Grid.Row="0" Grid.Column="1" 
-                                       Text="{Binding TabName}" 
-                                       MaxWidth="200"    
-                                       FontSize="16" TextWrapping="Wrap" VerticalAlignment="Center"/>
+                                           Text="{Binding TabName}" 
+                                           MaxWidth="200"    
+                                           FontSize="16" TextWrapping="Wrap" VerticalAlignment="Center"/>
 
-                                <StackPanel Grid.Row="0" Grid.Column="2" 
-                                        Orientation="Horizontal"
-                                        VerticalAlignment="Center">
-
-                                    <TextBlock 
-                                       FontSize="16" Margin="10,0,10,0">
-                                        <TextBlock.Inlines>
-                                            <Run Text="{Binding NewItemsCount, Mode=OneWay}" Foreground="{StaticResource PoeTradeNewItemColor}"/> /
-                                            <Run Text="{Binding RemovedItemsCount, Mode=OneWay}" Foreground="{StaticResource PoeTradeRemovedItemColor}"/> /
-                                            <Run Text="{Binding NormalItemsCount, Mode=OneWay}"/>
-                                        </TextBlock.Inlines>
-                                    </TextBlock>
-                                </StackPanel>
+                                <TextBlock Grid.Row="0" Grid.Column="2" 
+                                           FontSize="16" Margin="10,0,10,0"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Right">
+                                    <TextBlock.Inlines>
+                                        <Run Text="{Binding NewItemsCount, Mode=OneWay}" Foreground="{StaticResource PoeTradeNewItemColor}"/> /
+                                        <Run Text="{Binding RemovedItemsCount, Mode=OneWay}" Foreground="{StaticResource PoeTradeRemovedItemColor}"/> /
+                                        <Run Text="{Binding NormalItemsCount, Mode=OneWay}"/>
+                                    </TextBlock.Inlines>
+                                </TextBlock>
 
 
                                 <StackPanel Grid.Row="0" Grid.Column="3" 
-                                        Orientation="Horizontal">
-
+                                            Orientation="Horizontal">
                                     <ToggleButton Width="40" Height="40"
-                                              Style="{DynamicResource MetroCircleToggleButtonStyle}"
-                                              ToolTip="Audio notifications for this tab"
-                                              IsChecked="{Binding AudioNotificationEnabled}" >
-                                        <Rectangle Width="20" Height="20" Fill="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ToggleButton}}}">
+                                                  Style="{DynamicResource MetroCircleToggleButtonStyle}"
+                                                  ToolTip="Audio notifications for this tab"
+                                                  IsChecked="{Binding AudioNotificationEnabled}" >
+                                        <Rectangle Width="20" Height="20" 
+                                                   Fill="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ToggleButton}}}">
                                             <Rectangle.OpacityMask>
                                                 <VisualBrush Stretch="Fill" Visual="{DynamicResource appbar_speakerphone}" />
                                             </Rectangle.OpacityMask>
                                         </Rectangle>
                                     </ToggleButton>
 
-                                    <Button 
-                                    Width="24" Height="24"
-                                    Style="{StaticResource MetroCircleButtonStyle}"
-                                    HorizontalAlignment="Right"
-                                    Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type controls:MetroAnimatedTabControl}}, Path=DataContext.CloseTabCommand}"
-                                    CommandParameter="{Binding}">
-                                        <Rectangle Width="8" Height="8" Fill="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Button}}}">
+                                    <Button Width="24" Height="24"
+                                            Style="{StaticResource MetroCircleButtonStyle}"
+                                            HorizontalAlignment="Right"
+                                            Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type ListBox}}, Path=DataContext.CloseTabCommand}"
+                                            CommandParameter="{Binding}">
+                                        <Rectangle Width="8" Height="8" 
+                                                   Fill="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Button}}}">
                                             <Rectangle.OpacityMask>
                                                 <VisualBrush Stretch="Fill" Visual="{DynamicResource appbar_close}" />
                                             </Rectangle.OpacityMask>
                                         </Rectangle>
                                     </Button>
-
                                 </StackPanel>
-
-
 
                                 <controls:MetroProgressBar Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4" 
                                                        Foreground="{StaticResource TextBrush}"  
