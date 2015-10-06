@@ -2,6 +2,8 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <Style x:Key="VirtualizedItemsControlStyle" TargetType="ItemsControl">
         <Setter Property="VirtualizingStackPanel.IsVirtualizing" Value="True"/>
+        <Setter Property="VirtualizingPanel.ScrollUnit" Value="Pixel"/>
+        
         <Setter Property="ScrollViewer.CanContentScroll" Value="True"/>
         <Setter Property="ItemsPanel">
             <Setter.Value>

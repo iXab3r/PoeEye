@@ -57,7 +57,7 @@
                    Opacity="0.2"/>
 
                 <ItemsControl
-                          Margin="15" 
+                          Margin="0,10,0,0" 
                           ItemsSource="{Binding Source={StaticResource tradesListSource}}"
                           Style="{StaticResource VirtualizedItemsControlStyle}">
                 </ItemsControl>
