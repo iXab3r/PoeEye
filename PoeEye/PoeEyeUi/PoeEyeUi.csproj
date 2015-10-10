@@ -75,6 +75,10 @@
       <HintPath>..\packages\Common.Logging.Log4Net1211.3.3.0\lib\net40\Common.Logging.Log4Net1211.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Custom.Windows, Version=1.1.0.1, Culture=neutral, PublicKeyToken=8816f6d3bef7aa8b, processorArchitecture=MSIL">
+      <HintPath>..\packages\Custom.Windows.1.1.0.1\lib\net40\Custom.Windows.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="DeltaCompressionDotNet, Version=1.0.0.0, Culture=neutral, PublicKeyToken=1d14d6e5194e7f4a, processorArchitecture=MSIL">
       <HintPath>..\packages\DeltaCompressionDotNet.1.0.0\lib\net45\DeltaCompressionDotNet.dll</HintPath>
       <Private>True</Private>

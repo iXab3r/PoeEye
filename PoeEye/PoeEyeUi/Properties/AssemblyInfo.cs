@@ -8,13 +8,14 @@ using System.Windows;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("PoeEyeUi")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Path of Exile trade monitor")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Xab3r")]
 [assembly: AssemblyProduct("PoeEyeUi")]
 [assembly: AssemblyCopyright("Copyright ©  2015")]
-[assembly: AssemblyTrademark("")]
+[assembly: AssemblyTrademark("Xab3r")]
 [assembly: AssemblyCulture("")]
+[assembly: Guid("4921FE24-B866-4CD3-860A-090B34794754")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
 // to COM components.  If you need to access a type in this assembly from 
