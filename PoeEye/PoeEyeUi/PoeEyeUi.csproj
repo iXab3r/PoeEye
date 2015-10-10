@@ -252,6 +252,7 @@
     <Compile Include="Config\PoeEyeConfig.cs" />
     <Compile Include="Config\PoeEyeConfigProvider.cs" />
     <Compile Include="Config\PoeEyeTabConfig.cs" />
+    <Compile Include="Converters\TimeSpanToHumanReadableStringConverter.cs" />
     <Compile Include="Converters\NullableConverter.cs" />
     <Compile Include="Converters\ExceptionToMessageConverter.cs" />
     <Compile Include="Converters\NullNotNullToVisibilityConverter.cs" />

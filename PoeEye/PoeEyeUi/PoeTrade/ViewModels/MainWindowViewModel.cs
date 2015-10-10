@@ -22,6 +22,7 @@
     using Models;
 
     using PoeShared;
+    using PoeShared.Utilities;
 
     using ReactiveUI;
 
@@ -62,7 +63,7 @@
             this.poeEyeConfigProvider = poeEyeConfigProvider;
             ApplicationUpdater = applicationUpdaterViewModel;
             createNewTabCommand = ReactiveCommand.Create();
-            createNewTabCommand.Subscribe(_ => CreateNewTabCommandExecuted());
+            createNewTabCommand.Subscribe(CreateNewTabCommandExecuted);
 
             closeTabCommand = ReactiveCommand.Create();
             closeTabCommand
@@ -86,8 +87,8 @@
                 .Subscribe(active => audioNotificationsManager.IsEnabled = audioNotificationsEnabled && !active);
 
             TabsList
-                .Changed
-                .Select(x => Unit.Default).Merge(TabsList
+                .Changed.ToUnit()
+                .Merge(TabsList
                     .ItemChanged
                     .Where(x => x.PropertyName == nameof(MainWindowTabViewModel.RecheckTimeoutInSeconds))
                     .Select(x => Unit.Default)
@@ -95,11 +96,11 @@
 
             configUpdateSubject
                 .Sample(ConfigSaveSampingTimeout)
-                .Subscribe(_ => SaveConfig());
+                .Subscribe(SaveConfig);
 
             Observable
                 .Timer(DateTimeOffset.Now, CheckForUpdatesTimeout, TaskPoolScheduler.Default)
-                .Subscribe(_ => applicationUpdaterViewModel.CheckForUpdatesCommand.Execute(this)); 
+                .Subscribe(() => applicationUpdaterViewModel.CheckForUpdatesCommand.Execute(this)); 
         }
 
         public ICommand CreateNewTabCommand => createNewTabCommand;

@@ -15,7 +15,6 @@
 
         public AudioNotificationsManager()
         {
-
             playNotificationCommand = ReactiveCommand.Create();
             playNotificationCommand.Subscribe(_ => PlayNotificationCommandExecuted());
         }

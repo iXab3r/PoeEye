@@ -37,10 +37,21 @@
                 <ContentControl Grid.Row="0"  Grid.Column="1">
                     <Border BorderThickness="0,0,0,2" BorderBrush="{StaticResource ControlBorderBrush}">
 
-                        <StackPanel Orientation="Horizontal">
-                            <Border Width="50" Margin="5" BorderBrush="{StaticResource ControlBorderBrush}">
-                                <Border.Style>
-                                    <Style TargetType="Border">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Button Grid.Column="0"
+                                    Command="{Binding MarkAsReadCommand}"
+                                    Width="30" Height="30" ToolTip="Mark as Read"
+                                    Margin="10,0">
+                                <Button.Style>
+                                    <Style TargetType="Button">
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding TradeState}" Value="{x:Static poeTrade:PoeTradeState.New}">
                                                 <Setter Property="Background" Value="{DynamicResource PoeTradeNewItemColor}"/>
@@ -55,21 +66,11 @@
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
-                                </Border.Style>
-                            </Border>
-
-                            <Button 
-                                    Command="{Binding MarkAsReadCommand}"
-                                    Style="{StaticResource MetroCircleButtonStyle}"
-                                    Height="30" Width="30" ToolTip="Mark as Read">
-                                <Rectangle Width="11" Height="11" Fill="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Button}}}">
-                                    <Rectangle.OpacityMask>
-                                        <VisualBrush Stretch="Fill" Visual="{DynamicResource appbar_newspaper}" />
-                                    </Rectangle.OpacityMask>
-                                </Rectangle>
+                                </Button.Style>
                             </Button>
 
-                            <TextBlock Text="{Binding Name, Mode=OneWay}" >
+                            <TextBlock Grid.Column="1"
+                                       Text="{Binding Name, Mode=OneWay}" >
                                 <TextBlock.Style>
                                     <Style TargetType="TextBlock" BasedOn="{StaticResource MetroTextBlockHeaderStyle}">
                                         <Style.Triggers>
@@ -90,13 +91,24 @@
                                 </TextBlock.Style>
                             </TextBlock>
 
-                            <Label Content="{Binding Trade.Requirements, Mode=OneWay}" 
+                            <Label Grid.Column="2" Content="{Binding Trade.Requirements, Mode=OneWay}" 
                                    BorderBrush="{StaticResource AccentColorBrush}" 
                                    BorderThickness="2,0,2,0" 
                                    VerticalContentAlignment="Center"
                                    Margin="10,5,10,5" 
                                    Visibility="{Binding Trade.Requirements, Converter={StaticResource NullNotNullToVisibilityConverter}}" />
-                        </StackPanel>
+
+                            <StackPanel Grid.Column="4" 
+                                        Orientation="Horizontal"
+                                        VerticalAlignment="Center">
+                                <Label Content="Last seen: "/>
+                                <Label Content="{Binding TimeElapsedSinceLastIndexation, Mode=OneWay, StringFormat='Last seen: {0} ago', Converter={StaticResource TimeSpanToHumanReadableStringConverter}}" 
+                                   BorderBrush="{StaticResource AccentColorBrush}" 
+                                   Margin="2, 0"  />
+                                <Label Content="ago"/>
+                            </StackPanel>
+                           
+                        </Grid>
 
                     </Border>
                 </ContentControl>

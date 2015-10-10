@@ -13,6 +13,7 @@
     using PoeShared.Common;
     using PoeShared.PoeTrade;
     using PoeShared.PoeTrade.Query;
+    using PoeShared.Utilities;
 
     using ReactiveUI;
 
@@ -41,7 +42,7 @@
                 .Do(LogRecheckPeriodChange)
                 .Select(timeout => timeout == TimeSpan.Zero
                     ? Observable.Never<Unit>()
-                    : Observable.Timer(DateTimeOffset.Now, timeout).Select(x => Unit.Default))
+                    : Observable.Timer(DateTimeOffset.Now, timeout).ToUnit())
                 .Switch()
                 .Publish();
 

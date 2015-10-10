@@ -14,8 +14,6 @@
 
     using JetBrains.Annotations;
 
-    using MahApps.Metro.Controls.Dialogs;
-
     using Models;
 
     using PoeShared;
@@ -23,27 +21,35 @@
 
     using ReactiveUI;
 
+    using Utilities;
+
     internal sealed class PoeTradeViewModel : ReactiveObject, IPoeTradeViewModel
     {
-        private readonly IPoeItem poeItem;
-        private PoeTradeState tradeState;
+        private static readonly TimeSpan RefreshTimeout = TimeSpan.FromSeconds(10);
+
+        private readonly IClock clock;
         private readonly ReactiveCommand<object> copyPmMessageToClipboardCommand = ReactiveCommand.Create();
         private readonly ReactiveCommand<object> markAsReadCommand = ReactiveCommand.Create();
         private readonly ReactiveCommand<object> openForumUriCommand;
+
+        private DateTime indexedAtTimestamp;
+        private PoeTradeState tradeState;
 
         public PoeTradeViewModel(
             [NotNull] IPoeItem poeItem,
             [NotNull] IPoePriceCalculcator poePriceCalculcator,
             [NotNull] IFactory<ImageViewModel, Uri> imageViewModelFactory,
-            [NotNull] IFactory<PoeLinksInfoViewModel, IPoeLinksInfo> linksViewModelFactory)
+            [NotNull] IFactory<PoeLinksInfoViewModel, IPoeLinksInfo> linksViewModelFactory,
+            [NotNull] IClock clock)
         {
+            this.clock = clock;
             Guard.ArgumentNotNull(() => poeItem);
             Guard.ArgumentNotNull(() => poePriceCalculcator);
             Guard.ArgumentNotNull(() => imageViewModelFactory);
             Guard.ArgumentNotNull(() => linksViewModelFactory);
+            Guard.ArgumentNotNull(() => clock);
 
-
-            this.poeItem = poeItem;
+            this.Trade = poeItem;
             copyPmMessageToClipboardCommand.Subscribe(CopyPmMessageToClipboardCommandExecute);
 
             openForumUriCommand = ReactiveCommand.Create(Observable.Return(OpenForumUriCommandCanExecute()));
@@ -63,7 +69,20 @@
             }
 
             PriceInChaosOrbs = poePriceCalculcator.GetEquivalentInChaosOrbs(poeItem.Price);
+
+            PoeShared.Utilities.ObservableExtensions.Subscribe(PoeShared.Utilities.ObservableExtensions.ToUnit(this.WhenAnyValue(x => x.IndexedAtTimestamp))
+                                    .Merge(PoeShared.Utilities.ObservableExtensions.ToUnit(Observable.Timer(DateTimeOffset.Now, RefreshTimeout))), () => this.RaisePropertyChanged(nameof(TimeElapsedSinceLastIndexation)));
         }
+
+        public DateTime IndexedAtTimestamp
+        {
+            get { return indexedAtTimestamp; }
+            set { this.RaiseAndSetIfChanged(ref indexedAtTimestamp, value); }
+        }
+
+        public TimeSpan TimeElapsedSinceLastIndexation => IndexedAtTimestamp == DateTime.MinValue ? TimeSpan.Zero : clock.CurrentTime - IndexedAtTimestamp;
+
+        public ICommand OpenForumUriCommand => openForumUriCommand;
 
         public PoeTradeState TradeState
         {
@@ -75,23 +94,21 @@
 
         public PoeLinksInfoViewModel LinksViewModel { get; }
 
-        public string Name => poeItem.ItemName;
+        public string Name => Trade.ItemName;
 
-        public string UserIgn => poeItem.UserIgn;
+        public string UserIgn => Trade.UserIgn;
 
-        public string Price => poeItem.Price;
+        public string Price => Trade.Price;
 
         public float? PriceInChaosOrbs { get; }
 
-        public IPoeItemMod[] ImplicitMods => poeItem.Mods.Where(x => x.ModType == PoeModType.Implicit).ToArray();
+        public IPoeItemMod[] ImplicitMods => Trade.Mods.Where(x => x.ModType == PoeModType.Implicit).ToArray();
 
-        public IPoeItemMod[] ExplicitMods => poeItem.Mods.Where(x => x.ModType == PoeModType.Explicit).ToArray();
+        public IPoeItemMod[] ExplicitMods => Trade.Mods.Where(x => x.ModType == PoeModType.Explicit).ToArray();
 
-        public IPoeItem Trade => poeItem;
+        public IPoeItem Trade { get; }
 
         public ICommand CopyPmMessageToClipboardCommand => copyPmMessageToClipboardCommand;
-
-        public ICommand OpenForumUriCommand => openForumUriCommand;
 
         public ICommand MarkAsReadCommand => markAsReadCommand;
 
@@ -109,13 +126,13 @@
 
         private void CopyPmMessageToClipboardCommandExecute(object arg)
         {
-            var message = $"@{UserIgn} Hi, I would like to buy your {Name} listed for {Price} in {poeItem.League}";
+            var message = $"@{UserIgn} Hi, I would like to buy your {Name} listed for {Price} in {Trade.League}";
             Clipboard.SetText(message);
         }
 
         private void MarkAsReadCommandExecute(object arg)
         {
-            this.TradeState = PoeTradeState.Normal;
+            TradeState = PoeTradeState.Normal;
         }
 
         private void OpenUri(string uri)

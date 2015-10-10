@@ -13,6 +13,7 @@
     using Models;
 
     using PoeShared.PoeTrade.Query;
+    using PoeShared.Utilities;
 
     using ReactiveUI;
 
@@ -48,17 +49,17 @@
 
             tradesListViewModel
                 .WhenAnyValue(x => x.RecheckTimeout)
-                .Subscribe(_ => this.RaisePropertyChanged(nameof(RecheckTimeoutInSeconds)));
+                .Subscribe(() => this.RaisePropertyChanged(nameof(RecheckTimeoutInSeconds)));
 
             tradesListViewModel
                 .WhenAnyValue(x => x.IsBusy)
-                .Subscribe(_ => this.RaisePropertyChanged(nameof(IsBusy)));
+                .Subscribe(() => this.RaisePropertyChanged(nameof(IsBusy)));
 
             QueryViewModel = queryViewModel;
 
-            TradesListViewModel.TradesList.ItemChanged.Select(x => Unit.Default)
-                               .Merge(TradesListViewModel.TradesList.Changed.Select(x => Unit.Default))
-                               .Subscribe(_ =>
+            TradesListViewModel.TradesList.ItemChanged.ToUnit()
+                               .Merge(TradesListViewModel.TradesList.Changed.ToUnit())
+                               .Subscribe(() =>
                                           {
                                               this.RaisePropertyChanged(nameof(NewItemsCount));
                                               this.RaisePropertyChanged(nameof(RemovedItemsCount));
@@ -68,12 +69,12 @@
 
             TradesListViewModel
                 .WhenAnyValue(x => x.QueryInfo)
-                .Subscribe(_ => RebuildTabName());
+                .Subscribe(RebuildTabName);
 
             this.WhenAnyValue(x => x.HasNewTrades)
                 .DistinctUntilChanged()
                 .Where(x => x && audioNotificationEnabled)
-                .Subscribe(_ => audioNotificationsManager.PlayNotificationCommand.Execute(null));
+                .Subscribe(() => audioNotificationsManager.PlayNotificationCommand.Execute(null));
         }
 
         public double RecheckTimeoutInSeconds

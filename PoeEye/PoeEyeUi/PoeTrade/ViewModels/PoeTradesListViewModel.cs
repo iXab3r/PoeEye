@@ -25,6 +25,7 @@
     using PoeShared.Common;
     using PoeShared.PoeTrade;
     using PoeShared.PoeTrade.Query;
+    using PoeShared.Utilities;
 
     using ReactiveUI;
 
@@ -128,11 +129,15 @@
                     .WhenAnyValue(x => x.TradeState)
                     .Where(x => x == PoeTradeState.Removed)
                     .CombineLatest(itemViewModel.WhenAnyValue(x => x.TradeState).Where(x => x == PoeTradeState.Normal), (x, y) => Unit.Default)
-                    .Subscribe(_ => RemoveTrade(itemViewModel));
+                    .Subscribe(() => RemoveTrade(itemViewModel));
                 tradesList.Add(itemViewModel);
             }
 
             lastUpdateTimestamp = clock.CurrentTime;
+            foreach (var source in tradesList.Where(x => x.TradeState == PoeTradeState.Normal || x.TradeState == PoeTradeState.New))
+            {
+                source.IndexedAtTimestamp = lastUpdateTimestamp;
+            }
         }
 
         private void OnNextHistoryProviderCreated(IPoeLiveHistoryProvider poeLiveHistoryProvider)
@@ -149,7 +154,7 @@
             poeLiveHistoryProvider
                .WhenAnyValue(x => x.IsBusy)
                .DistinctUntilChanged()
-               .Subscribe(_ => this.RaisePropertyChanged(nameof(IsBusy)));
+               .Subscribe(() => this.RaisePropertyChanged(nameof(IsBusy)));
 
             poeLiveHistoryProvider.UpdateExceptions.Subscribe(OnErrorReceived);
 

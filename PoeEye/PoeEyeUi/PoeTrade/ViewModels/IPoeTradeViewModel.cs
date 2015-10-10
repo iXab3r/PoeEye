@@ -3,6 +3,8 @@ using PoeShared.Common;
 
 namespace PoeEyeUi.PoeTrade.ViewModels
 {
+    using System;
+
     internal interface IPoeTradeViewModel
     {
         ICommand CopyPmMessageToClipboardCommand { get; }
@@ -15,7 +17,9 @@ namespace PoeEyeUi.PoeTrade.ViewModels
         string Price { get; }
         float? PriceInChaosOrbs { get; }
         IPoeItem Trade { get; }
-        PoeTradeState TradeState { get; set; }
         string UserIgn { get; }
+
+        DateTime IndexedAtTimestamp { get; set; }
+        PoeTradeState TradeState { get; set; }
     }
 }
