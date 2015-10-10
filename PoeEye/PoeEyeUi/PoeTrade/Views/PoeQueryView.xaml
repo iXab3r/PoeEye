@@ -268,6 +268,8 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="5" />
                     <RowDefinition Height="Auto" />
+                    <RowDefinition Height="5" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
                 <Grid.ColumnDefinitions>
@@ -315,6 +317,22 @@
                               Width="NaN"
                               ItemsSource="{Binding Source={StaticResource PoeItemRarityFromEnum}}"
                               controls:TextBoxHelper.Watermark="any" >    
+                    </ComboBox>
+                </StackPanel>
+
+                <TextBlock Grid.Row="4" Grid.Column="0" 
+                           Text="Buyout" Style="{StaticResource TextBlockHeader}" />
+                <StackPanel Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="3">
+                    <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}" Value="{Binding BuyoutMin, Converter={StaticResource NullableConverter}}"/>
+                    <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}" Value="{Binding BuyoutMax, Converter={StaticResource NullableConverter}}"/>
+                    <ComboBox Style="{StaticResource QueryComboBox}"
+                              Width="150"
+                              ItemsSource="{Binding CurrenciesList}"
+                              SelectedValue="{Binding BuyoutCurrencyType}"
+                              DisplayMemberPath="Name"
+                              SelectedValuePath="CodeName" 
+                              IsEditable="False" 
+                              controls:TextBoxHelper.Watermark="select currency">
                     </ComboBox>
                 </StackPanel>
             </Grid>

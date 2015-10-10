@@ -170,11 +170,11 @@
             ImplicitModViewModel = poeImplicitModViewModel;
             ExplicitModsEditorViewModel = poeExplicitModsEditorViewModel;
 
-            League = LeaguesList.First();
 
             OnlineOnly = true;
             BuyoutOnly = true;
             NormalizeQuality = true;
+            League = LeaguesList.First();
 
             var knownNames = poeDatabaseReader.KnownEntitiesNames;
             NameSuggestionProvider = suggestionProviderFactory.Create(knownNames);

@@ -43,7 +43,7 @@ namespace PoeEyeUi.Config
 
             try
             {
-                Log.Instance.Debug($"[PoeEyeConfigProviderFromFile.Save] Serializing config data...\r\n{config.DumpToTextValue()}");
+                Log.Instance.Debug($"[PoeEyeConfigProviderFromFile.Save] Serializing config data...");
                 var serializedData = JsonConvert.SerializeObject(config, jsonSerializerSettings);
 
                 Log.Instance.Debug($"[PoeEyeConfigProviderFromFile.Save] Successfully serialized config, got {serializedData.Length} chars:\r\n{serializedData.DumpToTextValue()}");
@@ -82,7 +82,7 @@ namespace PoeEyeUi.Config
                 Log.Instance.Debug($"[PoeEyeConfigProviderFromFile.Load] Successfully read {fileData.Length} chars, deserializing...:{fileData.DumpToTextValue()}");
 
                 result = JsonConvert.DeserializeObject<PoeEyeConfig>(fileData, jsonSerializerSettings);
-                Log.Instance.Debug($"[PoeEyeConfigProviderFromFile.Load] Successfully deserialized config data:\r\n{result.DumpToTextValue()}");
+                Log.Instance.Debug($"[PoeEyeConfigProviderFromFile.Load] Successfully deserialized config data");
             }
             catch (Exception ex)
             {

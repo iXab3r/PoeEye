@@ -61,6 +61,7 @@
                 CreateArgument("mapq_max", source. GemOrMapLevelMax),
                 CreateArgument("buyout_min", source. BuyoutMin),
                 CreateArgument("buyout_max", source. BuyoutMax),
+                CreateArgument("buyout_currency", source.BuyoutCurrencyType),
                 CreateArgument("buyout", source. BuyoutOnly),
                 CreateArgument("online", source. OnlineOnly),
                 CreateArgument("altart", source. AlternativeArt),
