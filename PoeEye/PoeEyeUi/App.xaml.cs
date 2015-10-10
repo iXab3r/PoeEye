@@ -15,6 +15,8 @@ namespace PoeEyeUi
     /// </summary>
     public partial class App
     {
+
+#if !DEBUG
         protected override void OnStartup(StartupEventArgs e, bool? isFirstInstance)
         {
             base.OnStartup(e, isFirstInstance);
@@ -38,5 +40,6 @@ namespace PoeEyeUi
                 Shutdown(1);
             }
         }
+#endif
     }
 }

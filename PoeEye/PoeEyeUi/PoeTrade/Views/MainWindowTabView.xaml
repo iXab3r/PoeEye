@@ -10,8 +10,12 @@
         <Grid>
             
             <Grid.Resources>
-                <CollectionViewSource x:Key='tradesListSource' Source="{Binding TradesListViewModel.TradesList}">
+                <CollectionViewSource x:Key='tradesListSource' 
+                                      Source="{Binding TradesListViewModel.TradesList}"
+                                      IsLiveFilteringRequested="True"
+                                      IsLiveSortingRequested="True">
                     <CollectionViewSource.SortDescriptions>
+                        <componentModel:SortDescription PropertyName="TradeState" Direction="Ascending" />
                         <componentModel:SortDescription PropertyName="PriceInChaosOrbs" Direction="Ascending" />
                     </CollectionViewSource.SortDescriptions>
 

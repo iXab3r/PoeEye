@@ -71,9 +71,10 @@
                 .WhenAnyValue(x => x.QueryInfo)
                 .Subscribe(RebuildTabName);
 
-            this.WhenAnyValue(x => x.HasNewTrades)
+            this.WhenAnyValue(x => x.NewItemsCount)
                 .DistinctUntilChanged()
-                .Where(x => x && audioNotificationEnabled)
+                .Where(x => x > 0)
+                .Where(x => audioNotificationEnabled)
                 .Subscribe(() => audioNotificationsManager.PlayNotificationCommand.Execute(null));
         }
 
