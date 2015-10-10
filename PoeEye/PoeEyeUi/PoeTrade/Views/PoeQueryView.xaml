@@ -313,8 +313,9 @@
                         </ObjectDataProvider>
                     </StackPanel.Resources>
                     <ComboBox Style="{StaticResource QueryComboBox}"
-                              SelectedItem="{Binding ItemRarity}"
-                              Width="NaN"
+                              SelectedValue="{Binding ItemRarity}"
+                              Width="100"
+                              IsEditable="False" 
                               ItemsSource="{Binding Source={StaticResource PoeItemRarityFromEnum}}"
                               controls:TextBoxHelper.Watermark="any" >    
                     </ComboBox>

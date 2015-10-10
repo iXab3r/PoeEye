@@ -8,5 +8,6 @@
     <converters:NullableConverter x:Key="NullableConverter"/>
     <converters:ExceptionToMessageConverter x:Key="ExceptionToMessageConverter"/>
     <converters:TimeSpanToHumanReadableStringConverter x:Key="TimeSpanToHumanReadableStringConverter"/>
+    <converters:ObjectToLowercaseConverter x:Key="ObjectToLowercaseConverter"/>
     <blue:BoolToVisibilityConverter x:Key="InvertedBoolToVisibilityConverter" TrueValue="Collapsed" FalseValue="Visible"/>
 </ResourceDictionary>

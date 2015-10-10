@@ -78,7 +78,7 @@
                 CreateArgument("linked_b", source. LinkedB),
                 CreateArgument("linked_w", source. LinkedW),
                 CreateArgument("type", source. ItemType?.CodeName),
-                CreateArgument("rarity", source. ItemRarity?.ToString() ?? string.Empty),
+                CreateArgument("rarity", source. ItemRarity?.ToString().ToLowerInvariant() ?? string.Empty),
             };
 
             if (!string.IsNullOrWhiteSpace(source.ImplicitMod?.Name))

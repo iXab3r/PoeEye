@@ -131,13 +131,11 @@
                     .CombineLatest(itemViewModel.WhenAnyValue(x => x.TradeState).Where(x => x == PoeTradeState.Normal), (x, y) => Unit.Default)
                     .Subscribe(() => RemoveTrade(itemViewModel));
                 tradesList.Add(itemViewModel);
+
+                itemViewModel.IndexedAtTimestamp = clock.CurrentTime;
             }
 
             lastUpdateTimestamp = clock.CurrentTime;
-            foreach (var source in tradesList.Where(x => x.TradeState == PoeTradeState.Normal || x.TradeState == PoeTradeState.New))
-            {
-                source.IndexedAtTimestamp = lastUpdateTimestamp;
-            }
         }
 
         private void OnNextHistoryProviderCreated(IPoeLiveHistoryProvider poeLiveHistoryProvider)
