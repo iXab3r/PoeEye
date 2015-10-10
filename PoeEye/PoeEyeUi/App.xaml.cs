@@ -15,11 +15,6 @@ namespace PoeEyeUi
     /// </summary>
     public partial class App
     {
-        public App()
-        {
-
-        }
-
         protected override void OnStartup(StartupEventArgs e, bool? isFirstInstance)
         {
             base.OnStartup(e, isFirstInstance);

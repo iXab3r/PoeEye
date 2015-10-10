@@ -25,6 +25,7 @@ namespace PoeEyeUi.Config
 #endif
 
         private readonly JsonSerializerSettings jsonSerializerSettings;
+        private readonly Lazy<IPoeEyeConfig> poeEyeConfigLoader; 
 
         public PoeEyeConfigProviderFromFile()
         {
@@ -35,6 +36,8 @@ namespace PoeEyeUi.Config
             jsonSerializerSettings.Converters.Add(new ConcreteListTypeConverter<IPoeQueryInfo, PoeQueryInfo>());
             jsonSerializerSettings.Converters.Add(new ConcreteListTypeConverter<IPoeItemType, PoeItemType>());
             jsonSerializerSettings.Converters.Add(new ConcreteListTypeConverter<IPoeQueryRangeModArgument, PoeQueryRangeModArgument>());
+
+            poeEyeConfigLoader = new Lazy<IPoeEyeConfig>(LoadInternal);
         }
 
         public void Save(IPoeEyeConfig config)
@@ -66,6 +69,11 @@ namespace PoeEyeUi.Config
         }
 
         public IPoeEyeConfig Load()
+        {
+            return poeEyeConfigLoader.Value;
+        }
+
+        private IPoeEyeConfig LoadInternal()
         {
             Log.Instance.Debug($"[PoeEyeConfigProviderFromFile.Load] Loading config from file '{ConfigFilePath}'...");
 

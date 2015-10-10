@@ -6,15 +6,12 @@
 
     using Microsoft.Practices.Unity;
 
-    using PoeShared.Common;
     using PoeShared.PoeTrade.Query;
 
     using PoeTrade.Models;
     using PoeTrade.ViewModels;
 
     using TypeConverter;
-
-    using WpfControls;
 
     internal sealed class UiRegistrations : UnityContainerExtension
     {
@@ -27,6 +24,7 @@
             Container.RegisterType<IAudioNotificationsManager, AudioNotificationsManager>(new ContainerControlledLifetimeManager());
 
             Container.RegisterType<IPoeEyeConfigProvider<IPoeEyeConfig>, PoeEyeConfigProviderFromFile>(new ContainerControlledLifetimeManager());
+            Container.RegisterType<IPoeEyeConfig>(new InjectionFactory(x => x.Resolve<IPoeEyeConfigProvider<IPoeEyeConfig>>().Load()));
 
             Container
                     .RegisterType<MainWindowViewModel, MainWindowViewModel>()

@@ -9,5 +9,10 @@
         public TimeSpan RecheckTimeout { get; set; }
 
         public IPoeQueryInfo QueryInfo { get; set; }
+
+        public override string ToString()
+        {
+            return $"[Timeout: {RecheckTimeout}] Query: {QueryInfo}";
+        }
     }
 }
