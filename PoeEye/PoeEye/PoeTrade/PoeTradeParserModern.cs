@@ -216,6 +216,7 @@ namespace PoeEye.PoeTrade
             {
                 ModType = modType,
                 CodeName = parser.Attr("data-name")?.Trim('#'),
+                IsCrafted = parser.Select("u").Any(),
                 Name = parser.Text()
             };
 

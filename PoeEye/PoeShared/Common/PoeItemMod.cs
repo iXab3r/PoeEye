@@ -8,9 +8,11 @@ namespace PoeShared.Common
 
         public string CodeName { get; set; }
 
+        public bool IsCrafted { get; set; }
+
         public override string ToString()
         {
-            return $"ModType: {ModType}, Name: {Name}";
+            return $"ModType: {ModType}, CodeName: {CodeName}, IsCrafted: {IsCrafted}";
         }
     }
 }
