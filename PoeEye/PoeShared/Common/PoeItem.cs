@@ -48,6 +48,8 @@
 
         public string Requirements { get; set; }
 
+        public bool IsCorrupted { get; set; }
+
         public PoeItemRarity Rarity { get; set; }
 
         public IPoeItemMod[] Mods

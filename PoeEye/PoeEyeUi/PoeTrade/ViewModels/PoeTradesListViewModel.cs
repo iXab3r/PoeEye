@@ -6,6 +6,7 @@
     using System.ComponentModel;
     using System.Linq;
     using System.Reactive;
+    using System.Reactive.Disposables;
     using System.Reactive.Linq;
     using System.Windows.Data;
     using System.Windows.Input;
@@ -42,6 +43,7 @@
         private readonly IFactory<IPoeTradeViewModel, IPoeItem> poeTradeViewModelFactory;
 
         private IPoeLiveHistoryProvider activeHistoryProvider;
+        private readonly SerialDisposable activeHistoryProviderDisposable = new SerialDisposable();
 
         private DateTime lastUpdateTimestamp;
         private IPoeQueryInfo queryInfo;
@@ -64,6 +66,8 @@
             this.poeTradeViewModelFactory = poeTradeViewModelFactory;
             this.poeItemsComparer = poeItemsComparer;
             this.clock = clock;
+
+            Anchors.Add(activeHistoryProviderDisposable);
 
             this.WhenAnyValue(x => x.QueryInfo)
                                      .DistinctUntilChanged()
@@ -150,7 +154,8 @@
             Log.Instance.Debug(
                 $"[TradesListViewModel] Setting up new HistoryProvider (updateTimeout: {recheckTimeout})...");
             activeHistoryProvider = poeLiveHistoryProvider;
-            
+            activeHistoryProviderDisposable.Disposable = poeLiveHistoryProvider;
+
             this.WhenAnyValue(x => x.RecheckTimeout)
                 .DistinctUntilChanged()
                 .Subscribe(x => poeLiveHistoryProvider.RecheckPeriod = x)

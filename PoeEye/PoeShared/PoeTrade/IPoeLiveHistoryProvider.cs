@@ -6,7 +6,7 @@
 
     using JetBrains.Annotations;
 
-    public interface IPoeLiveHistoryProvider
+    public interface IPoeLiveHistoryProvider : IDisposable
     {
         IObservable<IPoeItem[]> ItemsPacks {[NotNull] get; }
 

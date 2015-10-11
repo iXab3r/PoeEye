@@ -137,6 +137,8 @@ namespace PoeEye.PoeTrade
 
                 Requirements = parser["td[class=item-cell] p[class=requirements]"]?.Text(),
 
+                IsCorrupted = parser["td[class=item-cell] span[class~=corrupted]"].Any(),
+
                 Mods = implicitMods.Concat(explicitMods).ToArray(),
                 Links = ExtractLinksInfo(row),
 

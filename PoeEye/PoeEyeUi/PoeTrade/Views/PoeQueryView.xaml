@@ -290,8 +290,8 @@
                 <TextBlock Grid.Row="0" Grid.Column="2" 
                            Text="Gem\map level" Style="{StaticResource TextBlockHeader}" />
                 <StackPanel Grid.Row="0" Grid.Column="3" >
-                    <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}" Value="{Binding GemOrMapLevelMin, Converter={StaticResource NullableConverter}}"/>
-                    <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}" Value="{Binding GemOrMapLevelMax, Converter={StaticResource NullableConverter}}"/>
+                    <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}" Value="{Binding LevelMin, Converter={StaticResource NullableConverter}}"/>
+                    <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}" Value="{Binding LevelMax, Converter={StaticResource NullableConverter}}"/>
                 </StackPanel>
 
                 <TextBlock Grid.Row="2" Grid.Column="0" 
