@@ -53,10 +53,6 @@
 
         public float? EvasionMin { get; set; }
 
-        public int? GemOrMapLevelMax { get; set; }
-
-        public int? GemOrMapLevelMin { get; set; }
-
         public int? IncQuantityMax { get; set; }
 
         public int? IncQuantityMin { get; set; }

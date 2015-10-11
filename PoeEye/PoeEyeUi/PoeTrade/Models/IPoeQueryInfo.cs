@@ -47,10 +47,6 @@
 
         float? EvasionMin { get; }
 
-        int? GemOrMapLevelMax { get; }
-
-        int? GemOrMapLevelMin { get; }
-
         int? IncQuantityMax { get; }
 
         int? IncQuantityMin { get; }
