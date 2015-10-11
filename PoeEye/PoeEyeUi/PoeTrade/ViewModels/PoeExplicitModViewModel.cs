@@ -1,10 +1,12 @@
 ﻿namespace PoeEyeUi.PoeTrade.ViewModels
 {
+    using PoeShared.Utilities;
+
     using ReactiveUI;
 
     using WpfControls.Editors;
 
-    internal sealed class PoeExplicitModViewModel : ReactiveObject
+    internal sealed class PoeExplicitModViewModel : DisposableReactiveObject
     {
         private bool excluded;
         private float? max;

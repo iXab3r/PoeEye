@@ -16,12 +16,15 @@
 
     using PoeShared.Common;
     using PoeShared.PoeTrade.Query;
+    using PoeShared.Utilities;
 
     using ReactiveUI;
 
+    using Utilities;
+
     using WpfControls.Editors;
 
-    internal sealed class PoeExplicitModsEditorViewModel
+    internal sealed class PoeExplicitModsEditorViewModel : DisposableReactiveObject
     {
         private readonly IFactory<PoeExplicitModViewModel, ISuggestionProvider> modsViewModelsFactor;
         private readonly ReactiveList<PoeExplicitModViewModel> modsCollection = new ReactiveList<PoeExplicitModViewModel>() { ChangeTrackingEnabled = true };
@@ -59,10 +62,12 @@
             removeModCommand
                 .Select(x => x as PoeExplicitModViewModel)
                 .Where(x => x != null)
-                .Subscribe(RemoveModCommandExecuted);
+                .Subscribe(RemoveModCommandExecuted)
+                .AddTo(Anchors);
 
             clearModsCommand
-                .Subscribe(_ => ClearModsCommandExecuted());
+                .Subscribe(_ => ClearModsCommandExecuted())
+                .AddTo(Anchors);
 
             AddModCommandExecuted();
         }

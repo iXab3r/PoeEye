@@ -5,7 +5,7 @@ namespace PoeEyeUi.PoeTrade.ViewModels
 {
     using System;
 
-    internal interface IPoeTradeViewModel
+    internal interface IPoeTradeViewModel : IDisposable
     {
         ICommand CopyPmMessageToClipboardCommand { get; }
         IPoeItemMod[] ExplicitMods { get; }

@@ -20,7 +20,11 @@
 
     using MetroModels;
 
-    internal sealed class ApplicationUpdaterViewModel : ReactiveObject
+    using PoeShared.Utilities;
+
+    using Utilities;
+
+    internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject
     {
         private static readonly TimeSpan ArtificialDelay = TimeSpan.FromSeconds(5);
         private readonly IDialogCoordinator dialogCoordinator;
@@ -40,7 +44,8 @@
             checkForUpdatesCommand
                 .Where(x => !IsBusy)
                 .ObserveOn(TaskPoolScheduler.Default)
-                .Subscribe(CheckForUpdatesCommandExecuted);
+                .Subscribe(CheckForUpdatesCommandExecuted)
+                .AddTo(Anchors);
 
             SquirrelAwareApp.HandleEvents(
                       onInitialInstall: OnInitialInstall,

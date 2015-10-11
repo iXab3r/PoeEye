@@ -17,7 +17,9 @@
 
     using ReactiveUI;
 
-    internal sealed class MainWindowTabViewModel : ReactiveObject
+    using Utilities;
+
+    internal sealed class MainWindowTabViewModel : DisposableReactiveObject
     {
         private static int GlobalTabIdx = 0;
 
@@ -65,17 +67,20 @@
                                               this.RaisePropertyChanged(nameof(RemovedItemsCount));
                                               this.RaisePropertyChanged(nameof(NormalItemsCount));
                                               this.RaisePropertyChanged(nameof(HasNewTrades));
-                                          });
+                                          })
+                               .AddTo(Anchors);
 
             TradesListViewModel
                 .WhenAnyValue(x => x.QueryInfo)
-                .Subscribe(RebuildTabName);
+                .Subscribe(RebuildTabName)
+                .AddTo(Anchors);
 
             this.WhenAnyValue(x => x.NewItemsCount)
                 .DistinctUntilChanged()
                 .Where(x => x > 0)
                 .Where(x => audioNotificationEnabled)
-                .Subscribe(() => audioNotificationsManager.PlayNotificationCommand.Execute(null));
+                .Subscribe(() => audioNotificationsManager.PlayNotificationCommand.Execute(null))
+                .AddTo(Anchors);
         }
 
         public double RecheckTimeoutInSeconds

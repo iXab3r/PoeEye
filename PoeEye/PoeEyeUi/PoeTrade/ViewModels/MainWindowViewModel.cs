@@ -156,6 +156,7 @@
         private void RemoveTabCommandExecuted(MainWindowTabViewModel tab)
         {
             TabsList.Remove(tab);
+            tab.Dispose();
         }
 
         private void SaveConfig()

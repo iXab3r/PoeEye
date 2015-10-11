@@ -12,13 +12,14 @@
 
     using PoeShared.Common;
     using PoeShared.PoeTrade.Query;
+    using PoeShared.Utilities;
 
     using ReactiveUI;
 
     using WpfControls;
     using WpfControls.Editors;
 
-    internal sealed class PoeImplicitModViewModel : ReactiveObject
+    internal sealed class PoeImplicitModViewModel : DisposableReactiveObject
     {
         private float? max;
 

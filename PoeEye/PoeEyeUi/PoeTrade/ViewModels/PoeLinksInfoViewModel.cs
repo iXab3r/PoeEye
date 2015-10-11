@@ -17,10 +17,11 @@
 
     using PoeShared;
     using PoeShared.Common;
+    using PoeShared.Utilities;
 
     using ReactiveUI;
 
-    internal sealed class PoeLinksInfoViewModel : ReactiveObject
+    internal sealed class PoeLinksInfoViewModel : DisposableReactiveObject
     {
         private readonly IPoeLinksInfo linksInfo;
 

@@ -17,10 +17,13 @@
     using Models;
 
     using PoeShared;
+    using PoeShared.Utilities;
 
     using ReactiveUI;
 
-    internal sealed class ImageViewModel : ReactiveObject
+    using Utilities;
+
+    internal sealed class ImageViewModel : DisposableReactiveObject
     {
         private readonly ItemsCache cache;
         private readonly Uri imageUri;
@@ -41,7 +44,8 @@
                 .ResolveImageByUri(imageUri)
                 .Finally(() => IsLoading = false)
                 .ObserveOn(Dispatcher.CurrentDispatcher)
-                .Subscribe(LoadImage);
+                .Subscribe(LoadImage)
+                .AddTo(Anchors);
         }
 
         private Image image;

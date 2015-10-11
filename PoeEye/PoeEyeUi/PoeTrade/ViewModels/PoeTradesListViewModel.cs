@@ -31,7 +31,9 @@
 
     using TypeConverter;
 
-    internal sealed class PoeTradesListViewModel : ReactiveObject
+    using Utilities;
+
+    internal sealed class PoeTradesListViewModel : DisposableReactiveObject
     {
         private static readonly TimeSpan TimeSinceLastUpdateRefreshTimeout = TimeSpan.FromSeconds(1);
 
@@ -73,11 +75,13 @@
                                      .Select(x => x.ItemsPacks)
                                      .Switch()
                                      .ObserveOn(Dispatcher.CurrentDispatcher)
-                                     .Subscribe(OnNextItemsPackReceived);
+                                     .Subscribe(OnNextItemsPackReceived)
+                                     .AddTo(Anchors);
 
             Observable
                 .Timer(DateTimeOffset.Now, TimeSinceLastUpdateRefreshTimeout)
-                .Subscribe(_ => this.RaisePropertyChanged(nameof(TimeSinceLastUpdate)));
+                .Subscribe(_ => this.RaisePropertyChanged(nameof(TimeSinceLastUpdate)))
+                .AddTo(Anchors);
         }
 
         public ReactiveList<IPoeTradeViewModel> TradesList => tradesList;
@@ -123,13 +127,16 @@
             foreach (var item in newItems)
             {
                 var itemViewModel = poeTradeViewModelFactory.Create(item);
+                Anchors.Add(itemViewModel);
                 itemViewModel.TradeState = PoeTradeState.New;
 
                 itemViewModel
                     .WhenAnyValue(x => x.TradeState)
                     .Where(x => x == PoeTradeState.Removed)
                     .CombineLatest(itemViewModel.WhenAnyValue(x => x.TradeState).Where(x => x == PoeTradeState.Normal), (x, y) => Unit.Default)
-                    .Subscribe(() => RemoveTrade(itemViewModel));
+                    .Subscribe(() => RemoveTrade(itemViewModel))
+                    .AddTo(Anchors);
+
                 tradesList.Add(itemViewModel);
 
                 itemViewModel.IndexedAtTimestamp = clock.CurrentTime;
@@ -143,18 +150,22 @@
             Log.Instance.Debug(
                 $"[TradesListViewModel] Setting up new HistoryProvider (updateTimeout: {recheckTimeout})...");
             activeHistoryProvider = poeLiveHistoryProvider;
-
-            //TODO Memory leak
+            
             this.WhenAnyValue(x => x.RecheckTimeout)
                 .DistinctUntilChanged()
-                .Subscribe(x => poeLiveHistoryProvider.RecheckPeriod = x);
+                .Subscribe(x => poeLiveHistoryProvider.RecheckPeriod = x)
+                .AddTo(Anchors);
 
             poeLiveHistoryProvider
                .WhenAnyValue(x => x.IsBusy)
                .DistinctUntilChanged()
-               .Subscribe(() => this.RaisePropertyChanged(nameof(IsBusy)));
+               .Subscribe(() => this.RaisePropertyChanged(nameof(IsBusy)))
+               .AddTo(Anchors);
 
-            poeLiveHistoryProvider.UpdateExceptions.Subscribe(OnErrorReceived);
+            poeLiveHistoryProvider
+                .UpdateExceptions
+                .Subscribe(OnErrorReceived)
+                .AddTo(Anchors);
 
             poeLiveHistoryProvider.RecheckPeriod = recheckTimeout;
         }

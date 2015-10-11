@@ -17,7 +17,7 @@
 
     using ReactiveUI;
 
-    internal sealed class PoeLiveHistoryProvider : ReactiveObject, IPoeLiveHistoryProvider
+    internal sealed class PoeLiveHistoryProvider : DisposableReactiveObject, IPoeLiveHistoryProvider
     {
         private TimeSpan recheckPeriodThrottling = TimeSpan.FromMilliseconds(1000);
 
@@ -57,9 +57,10 @@
             Observable
                 .Defer(() => queryObservable)
                 .Retry()
-                .Subscribe();
+                .Subscribe()
+                .AddTo(Anchors);
 
-            periodObservable.Connect();
+            periodObservable.Connect().AddTo(Anchors);
         }
 
         public IObservable<IPoeItem[]> ItemsPacks => itemsPacksSubject;

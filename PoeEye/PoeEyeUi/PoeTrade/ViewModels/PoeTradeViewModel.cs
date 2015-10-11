@@ -22,8 +22,9 @@
     using ReactiveUI;
 
     using Utilities;
+    using PoeShared.Utilities;
 
-    internal sealed class PoeTradeViewModel : ReactiveObject, IPoeTradeViewModel
+    internal sealed class PoeTradeViewModel : DisposableReactiveObject, IPoeTradeViewModel
     {
         private static readonly TimeSpan RefreshTimeout = TimeSpan.FromSeconds(10);
 
@@ -53,25 +54,29 @@
             copyPmMessageToClipboardCommand.Subscribe(CopyPmMessageToClipboardCommandExecute);
 
             openForumUriCommand = ReactiveCommand.Create(Observable.Return(OpenForumUriCommandCanExecute()));
-            openForumUriCommand.Subscribe(OpenForumUriCommandExecute);
+            openForumUriCommand.Subscribe(OpenForumUriCommandExecute).AddTo(Anchors);
 
-            markAsReadCommand.Subscribe(MarkAsReadCommandExecute);
+            markAsReadCommand.Subscribe(MarkAsReadCommandExecute).AddTo(Anchors);
 
             Uri imageUri;
             if (!string.IsNullOrWhiteSpace(poeItem.ItemIconUri) && Uri.TryCreate(poeItem.ItemIconUri, UriKind.Absolute, out imageUri))
             {
                 ImageViewModel = imageViewModelFactory.Create(imageUri);
+                Anchors.Add(ImageViewModel);
             }
 
             if (poeItem.Links != null)
             {
                 LinksViewModel = linksViewModelFactory.Create(poeItem.Links);
+                Anchors.Add(LinksViewModel);
             }
 
             PriceInChaosOrbs = poePriceCalculcator.GetEquivalentInChaosOrbs(poeItem.Price);
 
-            PoeShared.Utilities.ObservableExtensions.Subscribe(PoeShared.Utilities.ObservableExtensions.ToUnit(this.WhenAnyValue(x => x.IndexedAtTimestamp))
-                                    .Merge(PoeShared.Utilities.ObservableExtensions.ToUnit(Observable.Timer(DateTimeOffset.Now, RefreshTimeout))), () => this.RaisePropertyChanged(nameof(TimeElapsedSinceLastIndexation)));
+            this.WhenAnyValue(x => x.IndexedAtTimestamp).ToUnit()
+                .Merge(Observable.Timer(DateTimeOffset.Now, RefreshTimeout).ToUnit())
+                .Subscribe(() => this.RaisePropertyChanged(nameof(TimeElapsedSinceLastIndexation)))
+                .AddTo(Anchors);
         }
 
         public DateTime IndexedAtTimestamp
