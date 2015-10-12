@@ -8,11 +8,12 @@
         xmlns:viewModels="clr-namespace:PoeEyeUi.PoeTrade.ViewModels"
         xmlns:metroModels="clr-namespace:PoeEyeUi.MetroModels"
         xmlns:utilities="clr-namespace:PoeEyeUi.Utilities"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         mc:Ignorable="d"
         Title="{Binding MainWindowTitle}" 
         MinWidth="1000" 
         MinHeight="800" 
-        Width="1000" 
+        Width="1100" 
         Height="800" 
         d:DataContext="{d:DesignInstance viewModels:MainWindowViewModel}"
         BorderThickness="1" BorderBrush="{StaticResource AccentColorBrush}"
@@ -73,14 +74,44 @@
                                 <!-- tab header content -->
 
                                 <DockPanel Grid.Row="0" Grid.Column="0" >
-                                    <Rectangle Height="20" Width="20" Margin="5"
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <Rectangle Grid.Column="0"
+                                                   Height="20" Width="20" Margin="5"
                                            Visibility="{Binding TradesListViewModel.LastUpdateException, Converter={StaticResource NullNotNullToVisibilityConverter}}"
                                            ToolTip="{Binding TradesListViewModel.LastUpdateException, Converter={StaticResource ExceptionToMessageConverter}}">
-                                        <Rectangle.Fill>
-                                            <VisualBrush Stretch="Fill" Visual="{DynamicResource appbar_transit_hazard}"  />
-                                        </Rectangle.Fill>
-                                    </Rectangle>
+                                            <Rectangle.Fill>
+                                                <VisualBrush Stretch="Fill" Visual="{DynamicResource appbar_transit_hazard}"  />
+                                            </Rectangle.Fill>
+                                        </Rectangle>
 
+                                        <Button Grid.Column="1" 
+                                                Margin="10,0"
+                                                Style="{DynamicResource MetroCircleButtonStyle}"
+                                                Width="40" Height="40"
+                                                HorizontalAlignment="Right"
+                                                Command="{Binding SearchCommand}"
+                                                CommandParameter="{Binding QueryViewModel.PoeQueryBuilder}" >
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="Click">
+                                                    <utilities:SetPropertyAction PropertyName="Visibility" 
+                                                                                 PropertyValue="{x:Static Visibility.Collapsed}"
+                                                                                 TargetObject="{Binding RelativeSource={RelativeSource AncestorType={x:Type Button}, Mode=FindAncestor}}"/>
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+
+                                            <Rectangle Width="20" Height="20" 
+                                                       Fill="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Button}}}">
+                                                <Rectangle.OpacityMask>
+                                                    <VisualBrush Stretch="Fill" Visual="{DynamicResource appbar_magnify_forward}" />
+                                                </Rectangle.OpacityMask>
+                                            </Rectangle>
+                                        </Button>
+                                    </Grid>
                                 </DockPanel>
 
                                 <TextBlock Grid.Row="0" Grid.Column="1" 
@@ -113,7 +144,7 @@
                                         </TextBlock>
                                     </Border>
                                 </Border>
-                               
+
 
 
                                 <StackPanel Grid.Row="0" Grid.Column="3" 

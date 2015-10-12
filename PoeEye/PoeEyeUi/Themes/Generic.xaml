@@ -1,0 +1,28 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+
+
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="ListBoxAsTabCotrolStyle.xaml" />
+
+        <ResourceDictionary Source="VirtualizedItemsControl.xaml" />
+        <ResourceDictionary Source="WpfAutoCompleteTextBoxStyle.xaml" />
+
+        <ResourceDictionary Source="../PoeTrade/Views/ImageView.xaml" />
+        <ResourceDictionary Source="../PoeTrade/Views/MainWindowTabItemView.xaml" />
+        <ResourceDictionary Source="../PoeTrade/Views/MainWindowTabView.xaml" />
+
+        <ResourceDictionary Source="../PoeTrade/Views/PoeLinksInfoView.xaml" />
+        <ResourceDictionary Source="../PoeTrade/Views/PoeTradeView.xaml" />
+        <ResourceDictionary Source="../PoeTrade/Views/PoeItemModView.xaml" />
+        <ResourceDictionary Source="../PoeTrade/Views/PoeQueryViewStyles.xaml" />
+        <ResourceDictionary Source="../PoeTrade/Views/PoeImplicitModViewModel.xaml" />
+        <ResourceDictionary Source="../PoeTrade/Views/PoeExplicitModViewModel.xaml" />
+        <ResourceDictionary Source="../PoeTrade/Views/PoeExplicitModsEditorViewModel.xaml" />
+        <ResourceDictionary Source="../PoeTrade/Views/PoeQueryView.xaml" />
+
+
+
+    </ResourceDictionary.MergedDictionaries>
+</ResourceDictionary>

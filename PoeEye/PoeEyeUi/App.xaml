@@ -7,15 +7,7 @@
              StartupUri="PoeTrade/Views/MainWindow.xaml">
     <Application.Resources>
         <ResourceDictionary>
-            <SolidColorBrush x:Key="PoeTradeRemovedItemColor" Color="#55FF9298" />
-            <SolidColorBrush x:Key="PoeTradeNewItemColor" Color="#5592FF98" />
-            
-            <SolidColorBrush x:Key="PoeItemRarityColorNormal" Color="White" />
-            <SolidColorBrush x:Key="PoeItemRarityColorMagic" Color="CornflowerBlue" />
-            <SolidColorBrush x:Key="PoeItemRarityColorRare" Color="Yellow" />
-            <SolidColorBrush x:Key="PoeItemRarityColorUnique" Color="OrangeRed" />
 
-            
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
@@ -24,16 +16,15 @@
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseDark.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Themes/ProgressRing.xaml" />
 
-
-                <ResourceDictionary Source="Themes/ListBoxAsTabCotrolStyle.xaml" />
-                <ResourceDictionary Source="Themes/Converters.xaml" />
                 <ResourceDictionary Source="Resources/Icons.xaml" />
+                <ResourceDictionary Source="Themes/Colors.xaml" />
+                <ResourceDictionary Source="Themes/Converters.xaml" />
+                <ResourceDictionary Source="Themes/ListBoxAsTabCotrolStyle.xaml" />
                 <ResourceDictionary Source="Themes/VirtualizedItemsControl.xaml" />
                 <ResourceDictionary Source="Themes/WpfAutoCompleteTextBoxStyle.xaml" />
 
                 <ResourceDictionary Source="PoeTrade/Views/ImageView.xaml" />
                 <ResourceDictionary Source="PoeTrade/Views/MainWindowTabView.xaml" />
-                
                 <ResourceDictionary Source="PoeTrade/Views/PoeLinksInfoView.xaml" />
                 <ResourceDictionary Source="PoeTrade/Views/PoeTradeView.xaml" />
                 <ResourceDictionary Source="PoeTrade/Views/PoeItemModView.xaml" />
@@ -42,8 +33,6 @@
                 <ResourceDictionary Source="PoeTrade/Views/PoeExplicitModViewModel.xaml" />
                 <ResourceDictionary Source="PoeTrade/Views/PoeExplicitModsEditorViewModel.xaml" />
                 <ResourceDictionary Source="PoeTrade/Views/PoeQueryView.xaml" />
-                
-                
 
             </ResourceDictionary.MergedDictionaries>
 
