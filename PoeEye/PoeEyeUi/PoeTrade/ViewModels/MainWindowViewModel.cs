@@ -22,6 +22,7 @@
     using Models;
 
     using PoeShared;
+    using PoeShared.PoeTrade;
     using PoeShared.Utilities;
 
     using ReactiveUI;

@@ -1,4 +1,4 @@
-﻿namespace PoeEyeUi.PoeTrade.Models
+﻿namespace PoeEye.PoeTrade
 {
     using System;
     using System.Collections.Generic;
@@ -7,6 +7,7 @@
     using Guards;
 
     using PoeShared.Common;
+    using PoeShared.PoeTrade;
     using PoeShared.PoeTrade.Query;
 
     using TypeConverter;

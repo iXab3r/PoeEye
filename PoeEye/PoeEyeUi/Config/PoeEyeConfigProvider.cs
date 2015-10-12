@@ -12,6 +12,7 @@ namespace PoeEyeUi.Config
 
     using PoeShared;
     using PoeShared.Common;
+    using PoeShared.PoeTrade;
     using PoeShared.PoeTrade.Query;
 
     using PoeTrade.Models;

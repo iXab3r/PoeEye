@@ -12,6 +12,7 @@
 
     using Models;
 
+    using PoeShared.PoeTrade;
     using PoeShared.PoeTrade.Query;
     using PoeShared.Utilities;
 

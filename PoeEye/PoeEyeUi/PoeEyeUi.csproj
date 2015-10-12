@@ -265,11 +265,8 @@
     <Compile Include="PoeTrade\Models\GenericSuggestionProvider.cs" />
     <Compile Include="PoeTrade\Models\IAudioNotificationsManager.cs" />
     <Compile Include="PoeTrade\Models\IPoePriceCalculcator.cs" />
-    <Compile Include="PoeTrade\Models\IPoeQueryInfo.cs" />
     <Compile Include="PoeTrade\Models\ItemsCache.cs" />
     <Compile Include="PoeTrade\Models\PoePriceCalculcator.cs" />
-    <Compile Include="PoeTrade\Models\PoeQueryInfo.cs" />
-    <Compile Include="PoeTrade\Models\PoeQueryInfoToQueryConverter.cs" />
     <Compile Include="PoeTrade\ViewModels\ApplicationUpdaterViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\IPoeTradeViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\PoeLinksInfoViewModel.cs" />

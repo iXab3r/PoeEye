@@ -142,8 +142,10 @@
     <Compile Include="Clock.cs" />
     <Compile Include="Communications\GenericHttpClient.cs" />
     <Compile Include="Communications\NameValueCollectionToQueryStringConverter.cs" />
+    <Compile Include="PoeTrade\PoeClipboardParser.cs" />
     <Compile Include="PoeTrade\PoeLiveHistoryProvider.cs" />
     <Compile Include="PoeTrade\PoeQueryConverter.cs" />
+    <Compile Include="PoeTrade\PoeQueryInfoToQueryConverter.cs" />
     <Compile Include="PoeTrade\PoeTradeApi.cs" />
     <Compile Include="PoeTrade\PoeTradeParserModern.cs" />
     <Compile Include="PoeTrade\Query\PoeKnownModsList.cs" />

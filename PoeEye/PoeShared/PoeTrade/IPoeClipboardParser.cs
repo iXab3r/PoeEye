@@ -4,9 +4,9 @@ namespace PoeShared.PoeTrade
 
     using Query;
 
-    public interface IPoeTradeParser
+    public interface IPoeClipboardParser
     {
         [NotNull] 
-        IPoeQueryResult Parse([NotNull] string rawHtml);
+        IPoeQueryInfo Parse([NotNull] string clipboardContent);
     }
 }

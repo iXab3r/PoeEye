@@ -1,9 +1,10 @@
-﻿namespace PoeEyeUi.PoeTrade.Models
+﻿namespace PoeShared.PoeTrade
 {
-    using PoeShared.Common;
-    using PoeShared.PoeTrade.Query;
+    using Common;
 
-    internal interface IPoeQueryInfo
+    using Query;
+
+    public interface IPoeQueryInfo
     {
         bool AlternativeArt { get; }
 

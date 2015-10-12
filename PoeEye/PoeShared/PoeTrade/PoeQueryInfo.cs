@@ -1,15 +1,14 @@
-﻿namespace PoeEyeUi.PoeTrade.Models
+﻿namespace PoeShared.PoeTrade
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
 
-    using PoeShared.Common;
-    using PoeShared.PoeTrade.Query;
+    using Common;
 
-    using ViewModels;
+    using Query;
 
-    internal sealed class PoeQueryInfo : IPoeQueryInfo
+    public sealed class PoeQueryInfo : IPoeQueryInfo
     {
         public bool AlternativeArt { get; set; }
 

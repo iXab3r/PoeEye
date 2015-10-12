@@ -18,6 +18,7 @@
     using PoeShared;
     using PoeShared.Common;
     using PoeShared.PoeDatabase;
+    using PoeShared.PoeTrade;
     using PoeShared.PoeTrade.Query;
 
     using ReactiveUI;

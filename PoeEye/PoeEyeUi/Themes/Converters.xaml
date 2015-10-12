@@ -4,7 +4,8 @@
                     xmlns:blue="http://www.nuget.org/Blue.MVVM">
 
     <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
-    <converters:NullNotNullToVisibilityConverter x:Key="NullNotNullToVisibilityConverter"/>
+    <converters:NullNotNullToVisibilityConverter x:Key="NullNotNullToVisibilityConverter" />
+    <converters:NullNotNullToVisibilityConverter x:Key="InvertedNullNotNullToVisibilityConverter" IsInverted="True"/>
     <converters:NullableConverter x:Key="NullableConverter"/>
     <converters:ExceptionToMessageConverter x:Key="ExceptionToMessageConverter"/>
     <converters:TimeSpanToHumanReadableStringConverter x:Key="TimeSpanToHumanReadableStringConverter"/>

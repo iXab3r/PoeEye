@@ -95,15 +95,8 @@
                                                 Width="40" Height="40"
                                                 HorizontalAlignment="Right"
                                                 Command="{Binding SearchCommand}"
-                                                CommandParameter="{Binding QueryViewModel.PoeQueryBuilder}" >
-                                            <i:Interaction.Triggers>
-                                                <i:EventTrigger EventName="Click">
-                                                    <utilities:SetPropertyAction PropertyName="Visibility" 
-                                                                                 PropertyValue="{x:Static Visibility.Collapsed}"
-                                                                                 TargetObject="{Binding RelativeSource={RelativeSource AncestorType={x:Type Button}, Mode=FindAncestor}}"/>
-                                                </i:EventTrigger>
-                                            </i:Interaction.Triggers>
-
+                                                CommandParameter="{Binding QueryViewModel.PoeQueryBuilder}" 
+                                                Visibility="{Binding TradesListViewModel.QueryInfo, Converter={StaticResource InvertedNullNotNullToVisibilityConverter}}">
                                             <Rectangle Width="20" Height="20" 
                                                        Fill="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Button}}}">
                                                 <Rectangle.OpacityMask>
@@ -116,7 +109,6 @@
 
                                 <TextBlock Grid.Row="0" Grid.Column="1" 
                                            Text="{Binding TabName}" 
-                                           MaxWidth="200"    
                                            FontSize="16" TextWrapping="Wrap" VerticalAlignment="Center"/>
 
                                 <Border Grid.Row="0" Grid.Column="2"

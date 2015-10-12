@@ -50,7 +50,7 @@
 
             return client
                 .PostQuery(PoeTradeUri, queryPostData)
-                .Select(poeTradeParser.ParseQueryResult);
+                .Select(poeTradeParser.Parse);
         }
 
         private IHttpClient CreateClient()

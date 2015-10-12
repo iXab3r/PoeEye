@@ -24,9 +24,10 @@
                 .RegisterType<IHttpClient, GenericHttpClient>();
 
             Container
-                .RegisterType<IPoeApi, PoeTradeApi>()
-                .RegisterType<IConverter<NameValueCollection, string>, NameValueCollectionToQueryStringConverter>()
-                .RegisterType<IConverter<IPoeQuery, NameValueCollection>, PoeQueryConverter>()
+                .RegisterType<IPoeApi, PoeTradeApi>(new ContainerControlledLifetimeManager())
+                .RegisterType<IConverter<NameValueCollection, string>, NameValueCollectionToQueryStringConverter>(new ContainerControlledLifetimeManager())
+                .RegisterType<IConverter<IPoeQueryInfo, IPoeQuery>, PoeQueryInfoToQueryConverter>(new ContainerControlledLifetimeManager())
+                .RegisterType<IConverter<IPoeQuery, NameValueCollection>, PoeQueryConverter>(new ContainerControlledLifetimeManager())
                 .RegisterType<IPoeLiveHistoryProvider, PoeLiveHistoryProvider>();
 
             Container

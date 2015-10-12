@@ -2,6 +2,8 @@
 {
     using System;
 
+    using PoeShared.PoeTrade;
+
     using PoeTrade.Models;
 
     internal struct PoeEyeTabConfig

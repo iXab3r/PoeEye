@@ -16,7 +16,7 @@ namespace PoeEye.PoeTrade
 
     internal sealed class PoeTradeParserModern : IPoeTradeParser
     {
-        public IPoeQueryResult ParseQueryResult(string rawHtml)
+        public IPoeQueryResult Parse(string rawHtml)
         {
             Guard.ArgumentNotNull(() => rawHtml);
 
