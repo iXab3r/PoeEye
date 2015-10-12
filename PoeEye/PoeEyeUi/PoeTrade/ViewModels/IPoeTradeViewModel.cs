@@ -1,25 +1,32 @@
-﻿using System.Windows.Input;
-using PoeShared.Common;
-
-namespace PoeEyeUi.PoeTrade.ViewModels
+﻿namespace PoeEyeUi.PoeTrade.ViewModels
 {
     using System;
+    using System.Windows.Input;
+
+    using JetBrains.Annotations;
+
+    using PoeShared.Common;
 
     internal interface IPoeTradeViewModel : IDisposable
     {
-        ICommand CopyPmMessageToClipboardCommand { get; }
-        IPoeItemMod[] ExplicitMods { get; }
-        ImageViewModel ImageViewModel { get; }
-        IPoeItemMod[] ImplicitMods { get; }
-        PoeLinksInfoViewModel LinksViewModel { get; }
-        ICommand MarkAsReadCommand { get; }
-        string Name { get; }
-        string Price { get; }
+        ICommand CopyPmMessageToClipboardCommand { [NotNull] get; }
+
+        IPoeItemMod[] ExplicitMods { [NotNull] get; }
+
+        ImageViewModel ImageViewModel { [NotNull] get; }
+
+        IPoeItemMod[] ImplicitMods { [NotNull] get; }
+
+        PoeLinksInfoViewModel LinksViewModel { [NotNull] get; }
+
+        ICommand MarkAsReadCommand { [NotNull] get; }
+
         float? PriceInChaosOrbs { get; }
-        IPoeItem Trade { get; }
-        string UserIgn { get; }
+
+        IPoeItem Trade { [NotNull] get; }
 
         DateTime IndexedAtTimestamp { get; set; }
+
         PoeTradeState TradeState { get; set; }
     }
 }

@@ -136,8 +136,8 @@
 
                 itemViewModel
                     .WhenAnyValue(x => x.TradeState)
-                    .Where(x => x == PoeTradeState.Removed)
-                    .CombineLatest(itemViewModel.WhenAnyValue(x => x.TradeState).Where(x => x == PoeTradeState.Normal), (x, y) => Unit.Default)
+                    .WithPrevious((prev,curr) => new {prev,curr})
+                    .Where(x => x.curr == PoeTradeState.Normal && x.prev == PoeTradeState.Removed)
                     .Subscribe(() => RemoveTrade(itemViewModel))
                     .AddTo(Anchors);
 

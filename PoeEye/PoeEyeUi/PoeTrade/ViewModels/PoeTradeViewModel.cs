@@ -21,7 +21,6 @@
 
     using ReactiveUI;
 
-    using Utilities;
     using PoeShared.Utilities;
 
     internal sealed class PoeTradeViewModel : DisposableReactiveObject, IPoeTradeViewModel
@@ -99,12 +98,6 @@
 
         public PoeLinksInfoViewModel LinksViewModel { get; }
 
-        public string Name => Trade.ItemName;
-
-        public string UserIgn => Trade.UserIgn;
-
-        public string Price => Trade.Price;
-
         public float? PriceInChaosOrbs { get; }
 
         public IPoeItemMod[] ImplicitMods => Trade.Mods.Where(x => x.ModType == PoeModType.Implicit).ToArray();
@@ -131,7 +124,7 @@
 
         private void CopyPmMessageToClipboardCommandExecute(object arg)
         {
-            var message = $"@{UserIgn} Hi, I would like to buy your {Name} listed for {Price} in {Trade.League}";
+            var message = $"@{Trade.UserIgn} Hi, I would like to buy your {Trade.ItemName} listed for {Trade.Price} in {Trade.League}";
             Clipboard.SetText(message);
         }
 

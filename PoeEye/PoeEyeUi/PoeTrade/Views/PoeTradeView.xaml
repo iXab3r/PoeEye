@@ -83,7 +83,7 @@
                                    Visibility="{Binding Trade.IsCorrupted, Converter={StaticResource BooleanToVisibilityConverter}}"/>
 
                             <TextBlock Grid.Column="2"
-                                       Text="{Binding Name, Mode=OneWay}" >
+                                       Text="{Binding Trade.ItemName, Mode=OneWay}" >
                                 <TextBlock.Style>
                                     <Style TargetType="TextBlock" BasedOn="{StaticResource MetroTextBlockHeaderStyle}">
                                         <Style.Triggers>
@@ -273,24 +273,43 @@
                                 <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
 
                             <TextBlock Grid.Column="0"
-                                       Text="{Binding Path=Price, Mode=OneWay, StringFormat='Buyout: {0}'}" />
+                                       Text="{Binding Path=Trade.Price, Mode=OneWay, StringFormat='Buyout: {0}'}" />
 
                             <TextBlock Grid.Column="1"
                                        Text="{Binding Path=PriceInChaosOrbs, Mode=OneWay, StringFormat=' (~ {0} chaos)'}" 
                                        Visibility="{Binding PriceInChaosOrbs, Converter={StaticResource NullNotNullToVisibilityConverter}}"/>
 
                             <Button Grid.Column="3" 
-                                    Margin="10,0,10,0"
+                                    Margin="10,2"
                                     Height="16"
                                     Content="Go to forum thread" Command="{Binding OpenForumUriCommand}" />
 
-                            <TextBlock Grid.Column="4"
-                                       Text="{Binding Path=UserIgn, Mode=OneWay, StringFormat='IGN: {0}'}" />
+                            <Ellipse Grid.Column="4" 
+                                     Width="14" Height="14" 
+                                     Margin="10,2,5,0"
+                                     StrokeThickness="1"
+                                     Stroke="{StaticResource LabelTextBrush}"
+                                     VerticalAlignment="Center">
+                                <Ellipse.Style>
+                                    <Style TargetType="Ellipse">
+                                        <Setter Property="Fill" Value="{DynamicResource PoeTradeNewItemColor}"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Trade.UserIsOnline}" Value="False">
+                                                <Setter Property="Fill" Value="{DynamicResource PoeTradeRemovedItemColor}"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Ellipse.Style>
+                            </Ellipse>
 
-                            <Button Grid.Column="5" 
+                            <TextBlock Grid.Column="5"
+                                       Text="{Binding Path=Trade.UserIgn, Mode=OneWay, StringFormat='IGN: {0}'}" />
+
+                            <Button Grid.Column="6" 
                                     Command="{Binding CopyPmMessageToClipboardCommand}"
                                     Width="30" Height="30" Style="{StaticResource MetroCircleButtonStyle}"
                                     ToolTip="Copy PM to clipboard">

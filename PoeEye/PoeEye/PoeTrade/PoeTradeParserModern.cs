@@ -118,6 +118,8 @@ namespace PoeEye.PoeTrade
                 TradeForumUri = parser["td[class=item-cell] a[class^=title]"]?.Attr("href"),
                 UserForumName = parser.Attr("data-seller"),
                 UserIgn = parser.Attr("data-ign"),
+                UserIsOnline = parser["tr[class=bottom-row] span[class~=success]"].Any(),
+
                 Price = parser.Attr("data-buyout"),
                 League = parser.Attr("data-league"),
 
@@ -138,6 +140,7 @@ namespace PoeEye.PoeTrade
                 Requirements = parser["td[class=item-cell] p[class=requirements]"]?.Text(),
 
                 IsCorrupted = parser["td[class=item-cell] span[class~=corrupted]"].Any(),
+
 
                 Mods = implicitMods.Concat(explicitMods).ToArray(),
                 Links = ExtractLinksInfo(row),

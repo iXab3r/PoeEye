@@ -74,7 +74,12 @@
             yield return new Tuple<IPoeItem, IPoeItem>(
                 Mock.Of<IPoeItem>(x => x.ItemIconUri == "1"),
                 Mock.Of<IPoeItem>(x => x.ItemIconUri == "1"));
-
+            yield return new Tuple<IPoeItem, IPoeItem>(
+                Mock.Of<IPoeItem>(x => x.UserIsOnline == true),
+                Mock.Of<IPoeItem>(x => x.UserIsOnline == true));
+            yield return new Tuple<IPoeItem, IPoeItem>(
+               Mock.Of<IPoeItem>(x => x.IsCorrupted == true),
+               Mock.Of<IPoeItem>(x => x.IsCorrupted == true));
             yield return new Tuple<IPoeItem, IPoeItem>(
                CreateItemWithMods("1"),
                CreateItemWithMods("1"));
@@ -110,7 +115,12 @@
             yield return new Tuple<IPoeItem, IPoeItem>(
                 Mock.Of<IPoeItem>(x => x.TradeForumUri == "1"),
                 Mock.Of<IPoeItem>(x => x.TradeForumUri == "2"));
-
+            yield return new Tuple<IPoeItem, IPoeItem>(
+                Mock.Of<IPoeItem>(x => x.UserIsOnline == true),
+                Mock.Of<IPoeItem>(x => x.UserIsOnline == false));
+            yield return new Tuple<IPoeItem, IPoeItem>(
+               Mock.Of<IPoeItem>(x => x.IsCorrupted == true),
+               Mock.Of<IPoeItem>(x => x.IsCorrupted == false));
             yield return new Tuple<IPoeItem, IPoeItem>(
                 CreateItemWithMods("1"),
                 CreateItemWithMods("2"));

@@ -16,6 +16,8 @@
 
         public string UserIgn { get; set; }
 
+        public bool UserIsOnline { get; set; }
+
         public string Price { get; set; }
 
         public string League { get; set; }

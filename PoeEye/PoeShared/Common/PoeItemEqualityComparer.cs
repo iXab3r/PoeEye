@@ -37,6 +37,8 @@ namespace PoeShared.Common
                    string.Equals(x.League, y.League, StringComparison.InvariantCultureIgnoreCase);
 
             result &= x.Mods.SequenceEqual(y.Mods, itemModEqualityComparer);
+            result &= x.IsCorrupted;
+            result &= x.UserIsOnline;
             return result;
         }
 
