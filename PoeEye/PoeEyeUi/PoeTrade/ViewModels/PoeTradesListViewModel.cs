@@ -79,7 +79,7 @@
                                      .Select(x => x.ItemsPacks)
                                      .Switch()
                                      .ObserveOn(Dispatcher.CurrentDispatcher)
-                                     .Subscribe(OnNextItemsPackReceived, Log.HandleException)
+                                     .Subscribe(OnNextItemsPackReceived)
                                      .AddTo(Anchors);
 
             Observable

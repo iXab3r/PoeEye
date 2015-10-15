@@ -56,7 +56,7 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>Resources\mainIcon.ico</ApplicationIcon>
+    <ApplicationIcon>Resources\mainIconNegative.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Blue.MVVM.Converter, Version=1.4.3.26888, Culture=neutral, PublicKeyToken=1bb1db17d606db59, processorArchitecture=MSIL">
