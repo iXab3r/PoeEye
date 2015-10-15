@@ -60,9 +60,6 @@
                 Mock.Of<IPoeItem>(x => x.ItemName == "1"),
                 Mock.Of<IPoeItem>(x => x.ItemName == "1"));
             yield return new Tuple<IPoeItem, IPoeItem>(
-                Mock.Of<IPoeItem>(x => x.UserIgn == "1"),
-                Mock.Of<IPoeItem>(x => x.UserIgn == "1"));
-            yield return new Tuple<IPoeItem, IPoeItem>(
                 Mock.Of<IPoeItem>(x => x.League == "1"),
                 Mock.Of<IPoeItem>(x => x.League == "1"));
             yield return new Tuple<IPoeItem, IPoeItem>(
@@ -100,9 +97,6 @@
             yield return new Tuple<IPoeItem, IPoeItem>(
                 Mock.Of<IPoeItem>(x => x.ItemName == "1"),
                 Mock.Of<IPoeItem>(x => x.ItemName == "2"));
-            yield return new Tuple<IPoeItem, IPoeItem>(
-                Mock.Of<IPoeItem>(x => x.UserIgn == "1"),
-                Mock.Of<IPoeItem>(x => x.UserIgn == "2"));
             yield return new Tuple<IPoeItem, IPoeItem>(
                 Mock.Of<IPoeItem>(x => x.League == "1"),
                 Mock.Of<IPoeItem>(x => x.League == "2"));
