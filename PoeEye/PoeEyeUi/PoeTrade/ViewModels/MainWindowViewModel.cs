@@ -174,7 +174,8 @@
             config.TabConfigs = TabsList.Select(tab => new PoeEyeTabConfig
             {
                 RecheckTimeout = tab.TradesListViewModel.RecheckTimeout,
-                QueryInfo = tab.TradesListViewModel.QueryInfo
+                QueryInfo = tab.TradesListViewModel.QueryInfo,
+                AudioNotificationEnabled = tab.AudioNotificationEnabled,
             }).ToArray();
 
             poeEyeConfigProvider.Save(config);
@@ -200,6 +201,8 @@
                 {
                     tab.QueryViewModel.SetQueryInfo(tabConfig.QueryInfo);
                 }
+
+                tab.AudioNotificationEnabled = tabConfig.AudioNotificationEnabled;
             }
 
             Log.Instance.Debug($"[MainWindowViewModel.LoadConfig] Sucessfully loaded config\r\nTabs count: {TabsList.Count}");

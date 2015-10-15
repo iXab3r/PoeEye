@@ -12,6 +12,8 @@
 
         public IPoeQueryInfo QueryInfo { get; set; }
 
+        public bool AudioNotificationEnabled { get; set; }
+
         public override string ToString()
         {
             return $"[Timeout: {RecheckTimeout}] Query: {QueryInfo}";

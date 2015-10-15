@@ -50,7 +50,7 @@ namespace PoeEyeUi.Config
                 Log.Instance.Debug($"[PoeEyeConfigProviderFromFile.Save] Serializing config data...");
                 var serializedData = JsonConvert.SerializeObject(config, jsonSerializerSettings);
 
-                Log.Instance.Debug($"[PoeEyeConfigProviderFromFile.Save] Successfully serialized config, got {serializedData.Length} chars:\r\n{serializedData.DumpToTextValue()}");
+                Log.Instance.Debug($"[PoeEyeConfigProviderFromFile.Save] Successfully serialized config, got {serializedData.Length} chars");
 
                 Log.Instance.Debug($"[PoeEyeConfigProviderFromFile.Save] Saving config to file '{ConfigFilePath}'...");
 
