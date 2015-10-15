@@ -12,6 +12,7 @@
 
     using Models;
 
+    using PoeShared;
     using PoeShared.PoeTrade;
     using PoeShared.PoeTrade.Query;
     using PoeShared.Utilities;
@@ -52,11 +53,13 @@
 
             tradesListViewModel
                 .WhenAnyValue(x => x.RecheckTimeout)
-                .Subscribe(() => this.RaisePropertyChanged(nameof(RecheckTimeoutInSeconds)));
+                .Subscribe(() => this.RaisePropertyChanged(nameof(RecheckTimeoutInSeconds)))
+                .AddTo(Anchors);
 
             tradesListViewModel
                 .WhenAnyValue(x => x.IsBusy)
-                .Subscribe(() => this.RaisePropertyChanged(nameof(IsBusy)));
+                .Subscribe(() => this.RaisePropertyChanged(nameof(IsBusy)))
+                .AddTo(Anchors);
 
             QueryViewModel = queryViewModel;
 
@@ -80,7 +83,7 @@
                 .DistinctUntilChanged()
                 .Where(x => x > 0)
                 .Where(x => audioNotificationEnabled)
-                .Subscribe(() => audioNotificationsManager.PlayNotificationCommand.Execute(null))
+                .Subscribe(x => audioNotificationsManager.PlayNotificationCommand.Execute(null), Log.HandleException)
                 .AddTo(Anchors);
         }
 

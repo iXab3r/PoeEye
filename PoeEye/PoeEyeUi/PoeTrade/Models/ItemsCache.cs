@@ -16,6 +16,8 @@
 
     using PoeShared;
 
+    using ReactiveUI;
+
     internal sealed class ItemsCache
     {
         private readonly string CacheFolderName = "Cache";

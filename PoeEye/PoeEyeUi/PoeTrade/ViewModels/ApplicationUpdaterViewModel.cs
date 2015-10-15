@@ -44,7 +44,7 @@
             checkForUpdatesCommand
                 .Where(x => !IsBusy)
                 .ObserveOn(TaskPoolScheduler.Default)
-                .Subscribe(CheckForUpdatesCommandExecuted)
+                .Subscribe(CheckForUpdatesCommandExecuted, Log.HandleException)
                 .AddTo(Anchors);
 
             SquirrelAwareApp.HandleEvents(

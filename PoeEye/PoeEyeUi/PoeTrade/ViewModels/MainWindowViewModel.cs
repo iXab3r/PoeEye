@@ -27,7 +27,7 @@
 
     using ReactiveUI;
 
-    internal sealed class MainWindowViewModel : ReactiveObject
+    internal sealed class MainWindowViewModel : DisposableReactiveObject
     {
         private static readonly TimeSpan CheckForUpdatesTimeout = TimeSpan.FromSeconds(600);
         private static readonly TimeSpan ConfigSaveSampingTimeout = TimeSpan.FromSeconds(30);
@@ -70,11 +70,13 @@
             closeTabCommand
                 .Where(x => x is MainWindowTabViewModel)
                 .Select(x => x as MainWindowTabViewModel)
-                .Subscribe(RemoveTabCommandExecuted);
+                .Subscribe(RemoveTabCommandExecuted)
+                .AddTo(Anchors);
 
             TabsList
                 .ItemsAdded
-                .Subscribe(x => SelectedItem = x);
+                .Subscribe(x => SelectedItem = x)
+                .AddTo(Anchors);
 
             LoadConfig();
 
@@ -85,7 +87,8 @@
 
             this.WhenAnyValue(x => x.IsMainWindowActive)
                 .DistinctUntilChanged()
-                .Subscribe(active => audioNotificationsManager.IsEnabled = audioNotificationsEnabled && !active);
+                .Subscribe(active => audioNotificationsManager.IsEnabled = audioNotificationsEnabled && !active, Log.HandleException)
+                .AddTo(Anchors);
 
             TabsList
                 .Changed.ToUnit()
@@ -93,15 +96,18 @@
                     .ItemChanged
                     .Where(x => x.PropertyName == nameof(MainWindowTabViewModel.RecheckTimeoutInSeconds))
                     .Select(x => Unit.Default)
-                ).Subscribe(configUpdateSubject);
+                )
+                .Subscribe(configUpdateSubject)
+                .AddTo(Anchors);
 
             configUpdateSubject
                 .Sample(ConfigSaveSampingTimeout)
-                .Subscribe(SaveConfig);
+                .Subscribe(SaveConfig, Log.HandleException)
+                .AddTo(Anchors);
 
             Observable
                 .Timer(DateTimeOffset.Now, CheckForUpdatesTimeout, TaskPoolScheduler.Default)
-                .Subscribe(() => applicationUpdaterViewModel.CheckForUpdatesCommand.Execute(this)); 
+                .Subscribe(() => applicationUpdaterViewModel.CheckForUpdatesCommand.Execute(this), Log.HandleException); 
         }
 
         public ICommand CreateNewTabCommand => createNewTabCommand;

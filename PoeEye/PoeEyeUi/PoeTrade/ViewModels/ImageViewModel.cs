@@ -44,7 +44,7 @@
                 .ResolveImageByUri(imageUri)
                 .Finally(() => IsLoading = false)
                 .ObserveOn(Dispatcher.CurrentDispatcher)
-                .Subscribe(LoadImage)
+                .Subscribe(LoadImage, Log.HandleException)
                 .AddTo(Anchors);
         }
 

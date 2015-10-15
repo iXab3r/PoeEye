@@ -8,9 +8,14 @@
 
     public static class ObservableExtensions
     {
-        public static IDisposable Subscribe<T>(this IObservable<T> observable, [NotNull] Action action)
+        public static IDisposable Subscribe<T>(this IObservable<T> observable, [NotNull] Action onNext)
         {
-            return observable.Subscribe(_ => action());
+            return observable.Subscribe(_ => onNext());
+        }
+
+        public static IDisposable Subscribe<T>(this IObservable<T> observable, [NotNull] Action onNext, [NotNull] Action<Exception> onError)
+        {
+            return observable.Subscribe(_ => onNext(), onError);
         }
 
         public static IObservable<Unit> ToUnit<T>(this IObservable<T> observable)
