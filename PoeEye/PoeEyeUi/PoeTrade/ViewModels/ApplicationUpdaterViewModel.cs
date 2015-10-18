@@ -29,18 +29,21 @@
     {
         private static readonly TimeSpan ArtificialDelay = TimeSpan.FromSeconds(5);
         private readonly IDialogCoordinator dialogCoordinator;
-        private readonly IScheduler bgScheduler;
+        private readonly IScheduler uiScheduler;
         private const string PoeEyeUri = @"http://coderush.net/files/PoeEye";
         private readonly ReactiveCommand<object> checkForUpdatesCommand;
 
         public ApplicationUpdaterViewModel(
                 [NotNull] IDialogCoordinator dialogCoordinator,
+                [NotNull] [Dependency(WellKnownSchedulers.Ui)] IScheduler uiScheduler,
                 [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler)
         {
             Guard.ArgumentNotNull(() => dialogCoordinator);
+            Guard.ArgumentNotNull(() => uiScheduler);
+            Guard.ArgumentNotNull(() => bgScheduler);
 
             this.dialogCoordinator = dialogCoordinator;
-            this.bgScheduler = bgScheduler;
+            this.uiScheduler = uiScheduler;
             checkForUpdatesCommand = ReactiveCommand.Create();
 
             checkForUpdatesCommand
@@ -100,7 +103,7 @@
                     mgr.ApplyReleases(updateInfo).Wait();
                     Log.Instance.Debug($"[ApplicationUpdaterViewModel] Update completed");
 
-                    bgScheduler.Schedule(
+                    uiScheduler.Schedule(
                         () => dialogCoordinator.ShowMessageAsync(context, "Update completed", "Application updated, new version will take place on next application startup"));
                 }
             }
