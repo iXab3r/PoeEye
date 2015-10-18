@@ -64,7 +64,7 @@
             set { this.RaiseAndSetIfChanged(ref isBusy, value); }
         }
 
-        private async void CheckForUpdatesCommandExecuted(object context)
+        private void CheckForUpdatesCommandExecuted(object context)
         {
 
             try
@@ -86,7 +86,7 @@
                     {
                         Log.Instance.Debug($"[ApplicationUpdaterViewModel] Checking for updates...");
 
-                        var updateInfo = await mgr.CheckForUpdate();
+                        var updateInfo = mgr.CheckForUpdate().Result;
 
                         Log.Instance.Debug($"[ApplicationUpdaterViewModel] UpdateInfo:\r\n{updateInfo?.DumpToTextValue()}");
                         if (updateInfo == null || updateInfo.ReleasesToApply.Count == 0)
@@ -94,9 +94,9 @@
                             return;
                         }
                         Log.Instance.Debug($"[ApplicationUpdaterViewModel] Downloading releases...");
-                        await mgr.DownloadReleases(updateInfo.ReleasesToApply, UpdateProgress);
+                        mgr.DownloadReleases(updateInfo.ReleasesToApply, UpdateProgress).RunSynchronously();
                         Log.Instance.Debug($"[ApplicationUpdaterViewModel] Applying releases...");
-                        await mgr.ApplyReleases(updateInfo);
+                        mgr.ApplyReleases(updateInfo).RunSynchronously();
                         Log.Instance.Debug($"[ApplicationUpdaterViewModel] Update completed");
 
                         uiContext.Post(state => dialogCoordinator.ShowMessageAsync(context, "Update completed", "Application updated, new version will take place on next application startup"), null);
@@ -106,7 +106,6 @@
                 {
                     Log.Instance.Debug($"[ApplicationUpdaterViewModel] Update failed", ex);
                 }
-
             }
             finally
             {

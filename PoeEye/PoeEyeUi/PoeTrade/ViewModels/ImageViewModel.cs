@@ -42,8 +42,8 @@
             IsLoading = true;
             cache
                 .ResolveImageByUri(imageUri)
-                .Finally(() => IsLoading = false)
                 .ObserveOn(Dispatcher.CurrentDispatcher)
+                .Finally(() => IsLoading = false)
                 .Subscribe(LoadImage, Log.HandleException)
                 .AddTo(Anchors);
         }

@@ -33,7 +33,7 @@
         {
             Guard.ArgumentNotNull(() => query);
             Guard.ArgumentNotNull(() => poeApi);
-
+            
             var periodObservable = this.ObservableForProperty(x => x.RecheckPeriod)
                 .Select(x => x.Value)
                 .DistinctUntilChanged()
@@ -49,7 +49,6 @@
                 .Where(x => !IsBusy)
                 .Do(StartUpdate)
                 .Select(x => poeApi.IssueQuery(query))
-                .Catch(Observable.Empty<IObservable<IPoeQueryResult>>())
                 .Switch()
                 .Select(x => x.ItemsList)
                 .Do(HandleUpdate, HandleUpdateError);
