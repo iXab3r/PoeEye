@@ -14,10 +14,14 @@
 
     using JetBrains.Annotations;
 
+    using Microsoft.Practices.Unity;
+
     using Models;
 
     using PoeShared;
     using PoeShared.Utilities;
+
+    using Prism;
 
     using ReactiveUI;
 
@@ -25,16 +29,15 @@
 
     internal sealed class ImageViewModel : DisposableReactiveObject
     {
-        private readonly ItemsCache cache;
         private readonly Uri imageUri;
 
         public ImageViewModel(
-            [NotNull] ItemsCache cache,
+            [NotNull] ImagesCache cache,
+            [NotNull] [Dependency(WellKnownSchedulers.Ui)] IScheduler uiScheduler,
             [CanBeNull] Uri imageUri)
         {
             Guard.ArgumentNotNull(() => cache);
             
-            this.cache = cache;
             this.imageUri = imageUri;
 
             image = new Image();
@@ -42,7 +45,7 @@
             IsLoading = true;
             cache
                 .ResolveImageByUri(imageUri)
-                .ObserveOn(Dispatcher.CurrentDispatcher)
+                .ObserveOn(uiScheduler)
                 .Finally(() => IsLoading = false)
                 .Subscribe(LoadImage, Log.HandleException)
                 .AddTo(Anchors);

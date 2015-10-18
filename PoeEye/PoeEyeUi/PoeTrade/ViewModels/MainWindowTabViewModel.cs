@@ -134,6 +134,7 @@
 
         private void RebuildTabName()
         {
+            Log.Instance.Debug($"[MainWindowTabViewModel.RebuildTabName] Rebuilding tab name, tabQueryMode: {QueryViewModel}...");
             var queryDescription = QueryViewModel.FormatQueryDescription();
             TabName = string.IsNullOrWhiteSpace(queryDescription)
                 ? tabHeader
@@ -147,6 +148,7 @@
             {
                 return;
             }
+            Log.Instance.Debug($"[MainWindowTabViewModel.SearchCommandExecute] Search command executed, running query {QueryViewModel}");
             var query = queryBuilder();
 
             TradesListViewModel.ClearTradesList();

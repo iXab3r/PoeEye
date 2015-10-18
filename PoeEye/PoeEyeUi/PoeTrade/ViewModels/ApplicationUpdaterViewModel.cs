@@ -9,7 +9,6 @@
     using System.Reactive.Concurrency;
     using System.Reactive.Linq;
     using System.Threading;
-    using System.Windows;
     using System.Windows.Input;
 
     using DumpToText;
@@ -20,30 +19,33 @@
 
     using MetroModels;
 
+    using Microsoft.Practices.Unity;
+
     using PoeShared.Utilities;
 
-    using Utilities;
+    using Prism;
 
     internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject
     {
         private static readonly TimeSpan ArtificialDelay = TimeSpan.FromSeconds(5);
         private readonly IDialogCoordinator dialogCoordinator;
+        private readonly IScheduler bgScheduler;
         private const string PoeEyeUri = @"http://coderush.net/files/PoeEye";
         private readonly ReactiveCommand<object> checkForUpdatesCommand;
-        private readonly SynchronizationContext uiContext;
 
-        public ApplicationUpdaterViewModel([NotNull] IDialogCoordinator dialogCoordinator)
+        public ApplicationUpdaterViewModel(
+                [NotNull] IDialogCoordinator dialogCoordinator,
+                [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler)
         {
             Guard.ArgumentNotNull(() => dialogCoordinator);
 
             this.dialogCoordinator = dialogCoordinator;
+            this.bgScheduler = bgScheduler;
             checkForUpdatesCommand = ReactiveCommand.Create();
-
-            uiContext = SynchronizationContext.Current;
 
             checkForUpdatesCommand
                 .Where(x => !IsBusy)
-                .ObserveOn(TaskPoolScheduler.Default)
+                .ObserveOn(bgScheduler)
                 .Subscribe(CheckForUpdatesCommandExecuted, Log.HandleException)
                 .AddTo(Anchors);
 
@@ -74,7 +76,7 @@
 
                 // delaying update so the user could see the progressring
                 Thread.Sleep(ArtificialDelay); 
-
+                
 #if DEBUG
                 Log.Instance.Debug($"[ApplicationUpdaterViewModel] Debug mode detected, update will be skipped");
                 return;
@@ -99,7 +101,7 @@
                         mgr.ApplyReleases(updateInfo).RunSynchronously();
                         Log.Instance.Debug($"[ApplicationUpdaterViewModel] Update completed");
 
-                        uiContext.Post(state => dialogCoordinator.ShowMessageAsync(context, "Update completed", "Application updated, new version will take place on next application startup"), null);
+                        bgScheduler.Schedule(() => dialogCoordinator.ShowMessageAsync(context, "Update completed", "Application updated, new version will take place on next application startup"));
                     }
                 }
                 catch (Exception ex)

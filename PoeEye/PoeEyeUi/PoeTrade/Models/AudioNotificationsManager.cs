@@ -1,17 +1,21 @@
 ﻿namespace PoeEyeUi.PoeTrade.Models
 {
-    using System.Media;
-
-    using ReactiveUI;
     using System;
     using System.IO;
+    using System.Media;
     using System.Windows.Input;
 
     using PoeShared;
 
+    using Properties;
+
+    using ReactiveUI;
+
     internal sealed class AudioNotificationsManager : ReactiveObject, IAudioNotificationsManager
     {
-        private readonly ReactiveCommand<object> playNotificationCommand; 
+        private readonly ReactiveCommand<object> playNotificationCommand;
+
+        private bool isEnabled;
 
         public AudioNotificationsManager()
         {
@@ -20,8 +24,6 @@
         }
 
         public ICommand PlayNotificationCommand => playNotificationCommand;
-
-        private bool isEnabled;
 
         public bool IsEnabled
         {
@@ -40,9 +42,9 @@
             }
 
             Log.Instance.Debug($"[AudioNotificationsManager] Starting playback...");
-            using (var stream = new MemoryStream(Properties.Resources.whistle))
+            using (var stream = new MemoryStream(Resources.whistle))
+            using (var notificationSound = new SoundPlayer(stream))
             {
-                var notificationSound = new SoundPlayer(stream);
                 notificationSound.Play();
             }
         }

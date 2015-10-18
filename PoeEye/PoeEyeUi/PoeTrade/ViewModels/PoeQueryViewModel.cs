@@ -171,7 +171,6 @@
             ImplicitModViewModel = poeImplicitModViewModel;
             ExplicitModsEditorViewModel = poeExplicitModsEditorViewModel;
 
-
             OnlineOnly = true;
             BuyoutOnly = true;
             NormalizeQuality = true;

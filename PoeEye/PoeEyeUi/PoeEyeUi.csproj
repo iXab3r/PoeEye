@@ -265,7 +265,7 @@
     <Compile Include="PoeTrade\Models\GenericSuggestionProvider.cs" />
     <Compile Include="PoeTrade\Models\IAudioNotificationsManager.cs" />
     <Compile Include="PoeTrade\Models\IPoePriceCalculcator.cs" />
-    <Compile Include="PoeTrade\Models\ItemsCache.cs" />
+    <Compile Include="PoeTrade\Models\ImagesCache.cs" />
     <Compile Include="PoeTrade\Models\PoePriceCalculcator.cs" />
     <Compile Include="PoeTrade\ViewModels\ApplicationUpdaterViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\IPoeTradeViewModel.cs" />
@@ -280,6 +280,7 @@
     <Compile Include="PoeTrade\Views\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Prism\WellKnownSchedulers.cs" />
     <Compile Include="ResourceKeys.cs" />
     <Compile Include="Utilities\DataPiping.cs" />
     <Compile Include="Utilities\DataPipe.cs" />

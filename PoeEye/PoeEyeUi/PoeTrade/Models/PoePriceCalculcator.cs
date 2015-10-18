@@ -19,8 +19,7 @@
     {
         private readonly IDictionary<string, float> currencyByType;
 
-        private readonly Regex currencyParser = new Regex(@"(?'value'[\d\.\,]*)\s*(?'type'\w*)",
-            RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private readonly Regex currencyParser = new Regex(@"(?'value'[\d\.\,]*)\s*(?'type'\w*)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         public PoePriceCalculcator([NotNull] IPoeEyeConfig config)
         {

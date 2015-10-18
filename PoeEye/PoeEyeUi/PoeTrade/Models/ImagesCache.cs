@@ -1,8 +1,10 @@
 ﻿namespace PoeEyeUi.PoeTrade.Models
 {
     using System;
+    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
     using System.Net.Http;
     using System.Reactive.Concurrency;
     using System.Reactive.Linq;
@@ -10,21 +12,40 @@
     using System.Security.Cryptography;
     using System.Text;
     using System.Threading;
-    using System.Windows.Controls;
-    using System.Windows.Media.Imaging;
-    using System.Windows.Threading;
+
+    using Factory;
+
+    using Guards;
+
+    using JetBrains.Annotations;
+
+    using Microsoft.Practices.Unity;
 
     using PoeShared;
+    using PoeShared.Http;
 
-    using ReactiveUI;
+    using Prism;
 
-    internal sealed class ItemsCache
+    internal sealed class ImagesCache
     {
+        private readonly IFactory<IHttpClient> httpClientFactory;
+        private readonly IScheduler bgScheduler;
+        private static readonly TimeSpan ArtificialDelay = TimeSpan.FromSeconds(5);
+
         private readonly string CacheFolderName = "Cache";
 
-        private readonly SHA256Managed hashManaged = new SHA256Managed();
+        private readonly IDictionary<string, IObservable<FileInfo>> loadingImages = new ConcurrentDictionary<string, IObservable<FileInfo>>();
 
-        private readonly IDictionary<string, IObservable<FileInfo>> loadingImages = new Dictionary<string, IObservable<FileInfo>>();
+        public ImagesCache(
+                [NotNull] IFactory<IHttpClient> httpClientFactory,
+                [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler)
+        {
+            Guard.ArgumentNotNull(() => httpClientFactory);
+            Guard.ArgumentNotNull(() => bgScheduler);
+            
+            this.httpClientFactory = httpClientFactory;
+            this.bgScheduler = bgScheduler;
+        }
 
         public IObservable<FileInfo> ResolveImageByUri(Uri imageUri)
         {
@@ -45,10 +66,10 @@
             }
 
             Log.Instance.Debug($"[ItemsCache.ResolveImageByUri] Image '{imageUri}' is not loaded, downloading it...");
-            var httpClient = new HttpClient();
+            var httpClient = httpClientFactory.Create();
             var result = httpClient
                 .GetStreamAsync(imageUri)
-                .ToObservable()
+                .ObserveOn(bgScheduler)
                 .Select(x => LoadImageFromStream(outputFilePath, x))
                 .Publish();
 
@@ -65,8 +86,9 @@
 
 #if DEBUG
             Log.Instance.Debug($"[ItemsCache.ResolveImageByUri] Atrificial delay");
-            Thread.Sleep(3000);
+            Thread.Sleep(ArtificialDelay);
 #endif
+
             var outputDirectory = Path.GetDirectoryName(outputFilePath);
             if (!Directory.Exists(outputFilePath))
             {
@@ -99,21 +121,14 @@
             return Path.Combine(cachePath, fileName);
         }
 
-        public static string ToBase64String(String source)
+        private static string Sha256(string password)
         {
-            return Convert.ToBase64String(Encoding.Unicode.GetBytes(source));
-        }
-
-        static string Sha256(string password)
-        {
-            SHA256Managed crypt = new SHA256Managed();
-            string hash = String.Empty;
-            byte[] crypto = crypt.ComputeHash(Encoding.ASCII.GetBytes(password), 0, Encoding.ASCII.GetByteCount(password));
-            foreach (byte theByte in crypto)
+            using (var crypt = new SHA256Managed())
             {
-                hash += theByte.ToString("x2");
+                var hash = string.Empty;
+                var crypto = crypt.ComputeHash(Encoding.ASCII.GetBytes(password), 0, Encoding.ASCII.GetByteCount(password));
+                return crypto.Aggregate(hash, (current, theByte) => current + theByte.ToString("x2"));
             }
-            return hash;
         }
     }
 }

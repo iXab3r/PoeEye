@@ -29,7 +29,7 @@
 
         public PoeImplicitModViewModel(
                 [NotNull] IPoeQueryInfoProvider queryInfoProvider,
-                [NotNull] IFactory<GenericSuggestionProvider, string[]> suggestionProviderFactory)
+                [NotNull] IFactory<ISuggestionProvider, string[]> suggestionProviderFactory)
         {
             Guard.ArgumentNotNull(() => queryInfoProvider);
 

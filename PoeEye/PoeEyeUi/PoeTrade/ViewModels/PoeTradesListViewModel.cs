@@ -6,6 +6,7 @@
     using System.ComponentModel;
     using System.Linq;
     using System.Reactive;
+    using System.Reactive.Concurrency;
     using System.Reactive.Disposables;
     using System.Reactive.Linq;
     using System.Windows.Data;
@@ -20,6 +21,8 @@
 
     using JetBrains.Annotations;
 
+    using Microsoft.Practices.Unity;
+
     using Models;
 
     using PoeShared;
@@ -27,6 +30,8 @@
     using PoeShared.PoeTrade;
     using PoeShared.PoeTrade.Query;
     using PoeShared.Utilities;
+
+    using Prism;
 
     using ReactiveUI;
 
@@ -40,21 +45,24 @@
 
         private readonly IClock clock;
         private readonly IEqualityComparer<IPoeItem> poeItemsComparer;
+        private readonly IScheduler uiScheduler;
         private readonly IFactory<IPoeTradeViewModel, IPoeItem> poeTradeViewModelFactory;
 
-        private IPoeLiveHistoryProvider activeHistoryProvider;
+        private ActiveProviderInfo activeProviderInfo;
+
         private readonly SerialDisposable activeHistoryProviderDisposable = new SerialDisposable();
 
         private DateTime lastUpdateTimestamp;
         private IPoeQueryInfo queryInfo;
         private TimeSpan recheckTimeout = TimeSpan.FromSeconds(60);
-        private readonly ReactiveList<IPoeTradeViewModel> tradesList = new ReactiveList<IPoeTradeViewModel>() {ChangeTrackingEnabled = true};
+        private readonly ReactiveList<IPoeTradeViewModel> tradesList = new ReactiveList<IPoeTradeViewModel>() { ChangeTrackingEnabled = true };
 
         public PoeTradesListViewModel(
             [NotNull] IFactory<IPoeLiveHistoryProvider, IPoeQuery> poeLiveHistoryFactory,
             [NotNull] IFactory<IPoeTradeViewModel, IPoeItem> poeTradeViewModelFactory,
             [NotNull] IEqualityComparer<IPoeItem> poeItemsComparer,
             [NotNull] IConverter<IPoeQueryInfo, IPoeQuery> poeQueryInfoToQueryConverter,
+            [NotNull] [Dependency(WellKnownSchedulers.Ui)] IScheduler uiScheduler,
             [NotNull] IClock clock)
         {
             Guard.ArgumentNotNull(() => poeLiveHistoryFactory);
@@ -65,25 +73,27 @@
 
             this.poeTradeViewModelFactory = poeTradeViewModelFactory;
             this.poeItemsComparer = poeItemsComparer;
+            this.uiScheduler = uiScheduler;
             this.clock = clock;
 
             Anchors.Add(activeHistoryProviderDisposable);
 
             this.WhenAnyValue(x => x.QueryInfo)
                                      .DistinctUntilChanged()
-                                     .Do(_ => lastUpdateTimestamp = clock.CurrentTime)
                                      .Where(x => x != null)
+                                     .Do(_ => lastUpdateTimestamp = clock.CurrentTime)
                                      .Select(poeQueryInfoToQueryConverter.Convert)
                                      .Select(poeLiveHistoryFactory.Create)
                                      .Do(OnNextHistoryProviderCreated)
                                      .Select(x => x.ItemsPacks)
                                      .Switch()
-                                     .ObserveOn(Dispatcher.CurrentDispatcher)
-                                     .Subscribe(OnNextItemsPackReceived)
+                                     .ObserveOn(uiScheduler)
+                                     .Subscribe(OnNextItemsPackReceived, Log.HandleException)
                                      .AddTo(Anchors);
 
             Observable
                 .Timer(DateTimeOffset.Now, TimeSinceLastUpdateRefreshTimeout)
+                .ObserveOn(uiScheduler)
                 .Subscribe(_ => this.RaisePropertyChanged(nameof(TimeSinceLastUpdate)))
                 .AddTo(Anchors);
         }
@@ -112,38 +122,51 @@
             set { this.RaiseAndSetIfChanged(ref recheckTimeout, value); }
         }
 
-        public bool IsBusy => activeHistoryProvider?.IsBusy ?? false;
+        public bool IsBusy => activeProviderInfo.HistoryProvider?.IsBusy ?? false;
 
         private void OnNextItemsPackReceived(IPoeItem[] itemsPack)
         {
-            var existingItems = tradesList.Select(x => x.Trade).ToArray();
+            var activeProvider = activeProviderInfo;
+            if (activeProvider.HistoryProvider == null)
+            {
+                return;
+            }
 
+            var existingItems = tradesList.Select(x => x.Trade).ToArray();
             var removedItems = existingItems.Except(itemsPack, poeItemsComparer).ToArray();
             var newItems = itemsPack.Except(existingItems, poeItemsComparer).ToArray();
 
-            foreach (
-                var itemViewModel in
-                    removedItems.Select(item => tradesList.Single(x => poeItemsComparer.Equals(x.Trade, item))))
+            Log.Instance.Debug($"[TradesListViewModel] Next items pack received, existingItems: {existingItems.Length}, newItems: {newItems.Length}, removedItems: {removedItems.Length}");
+
+            foreach (var itemViewModel in removedItems.Select(item => tradesList.Single(x => poeItemsComparer.Equals(x.Trade, item))))
             {
                 itemViewModel.TradeState = PoeTradeState.Removed;
             }
 
-            foreach (var item in newItems)
+            if (newItems.Any())
             {
-                var itemViewModel = poeTradeViewModelFactory.Create(item);
-                Anchors.Add(itemViewModel);
-                itemViewModel.TradeState = PoeTradeState.New;
+                using (TradesList.SuppressChangeNotifications())
+                {
+                    foreach (var item in newItems)
+                    {
+                        // 
+                        var itemViewModel = poeTradeViewModelFactory.Create(item);
+                        itemViewModel.AddTo(activeProvider.Anchors);
 
-                itemViewModel
-                    .WhenAnyValue(x => x.TradeState)
-                    .WithPrevious((prev,curr) => new {prev,curr})
-                    .Where(x => x.curr == PoeTradeState.Normal && x.prev == PoeTradeState.Removed)
-                    .Subscribe(() => RemoveTrade(itemViewModel))
-                    .AddTo(Anchors);
+                        itemViewModel.TradeState = PoeTradeState.New;
 
-                tradesList.Add(itemViewModel);
+                        itemViewModel
+                            .WhenAnyValue(x => x.TradeState)
+                            .WithPrevious((prev, curr) => new { prev, curr })
+                            .Where(x => x.curr == PoeTradeState.Normal && x.prev == PoeTradeState.Removed)
+                            .Subscribe(() => RemoveTrade(itemViewModel))
+                            .AddTo(activeProvider.Anchors);
 
-                itemViewModel.IndexedAtTimestamp = clock.CurrentTime;
+                        tradesList.Add(itemViewModel);
+
+                        itemViewModel.IndexedAtTimestamp = clock.CurrentTime;
+                    }
+                }
             }
 
             lastUpdateTimestamp = clock.CurrentTime;
@@ -151,26 +174,29 @@
 
         private void OnNextHistoryProviderCreated(IPoeLiveHistoryProvider poeLiveHistoryProvider)
         {
-            Log.Instance.Debug(
-                $"[TradesListViewModel] Setting up new HistoryProvider (updateTimeout: {recheckTimeout})...");
-            activeHistoryProvider = poeLiveHistoryProvider;
-            activeHistoryProviderDisposable.Disposable = poeLiveHistoryProvider;
+            Log.Instance.Debug($"[TradesListViewModel] Setting up new HistoryProvider (updateTimeout: {recheckTimeout})...");
+
+            activeProviderInfo = new ActiveProviderInfo(poeLiveHistoryProvider);
+            activeHistoryProviderDisposable.Disposable = activeProviderInfo;
 
             this.WhenAnyValue(x => x.RecheckTimeout)
                 .DistinctUntilChanged()
+                .ObserveOn(uiScheduler)
                 .Subscribe(x => poeLiveHistoryProvider.RecheckPeriod = x)
-                .AddTo(Anchors);
+                .AddTo(activeProviderInfo.Anchors);
 
             poeLiveHistoryProvider
                .WhenAnyValue(x => x.IsBusy)
                .DistinctUntilChanged()
+               .ObserveOn(uiScheduler)
                .Subscribe(() => this.RaisePropertyChanged(nameof(IsBusy)))
-               .AddTo(Anchors);
+               .AddTo(activeProviderInfo.Anchors);
 
             poeLiveHistoryProvider
                 .UpdateExceptions
+                .ObserveOn(uiScheduler)
                 .Subscribe(OnErrorReceived)
-                .AddTo(Anchors);
+                .AddTo(activeProviderInfo.Anchors);
 
             poeLiveHistoryProvider.RecheckPeriod = recheckTimeout;
         }
@@ -192,6 +218,25 @@
         private void RemoveTrade(IPoeTradeViewModel trade)
         {
             tradesList.Remove(trade);
+        }
+
+        private struct ActiveProviderInfo : IDisposable
+        {
+            public CompositeDisposable Anchors { get; }
+
+            public IPoeLiveHistoryProvider HistoryProvider { get; }
+
+            public ActiveProviderInfo(IPoeLiveHistoryProvider provider)
+            {
+                HistoryProvider = provider;
+
+                Anchors = new CompositeDisposable {HistoryProvider};
+            }
+
+            public void Dispose()
+            {
+                Anchors.Dispose();
+            }
         }
     }
 }

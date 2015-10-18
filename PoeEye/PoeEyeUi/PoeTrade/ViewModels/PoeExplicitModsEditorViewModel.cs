@@ -32,13 +32,12 @@
         private readonly ReactiveCommand<object> removeModCommand = ReactiveCommand.Create();
         private readonly ReactiveCommand<object> clearModsCommand = ReactiveCommand.Create();
 
-        private readonly IPoeItemMod[] knownPoeItemMods;
         private readonly ISuggestionProvider modsSuggestionProvider;
 
         public PoeExplicitModsEditorViewModel(
             [NotNull] IPoeQueryInfoProvider queryInfoProvider,
             [NotNull] IFactory<PoeExplicitModViewModel, ISuggestionProvider> modsViewModelsFactor,
-            [NotNull] IFactory<GenericSuggestionProvider, string[]> suggestionProviderFactory)
+            [NotNull] IFactory<ISuggestionProvider, string[]> suggestionProviderFactory)
         {
             Guard.ArgumentNotNull(() => modsViewModelsFactor);
             Guard.ArgumentNotNull(() => queryInfoProvider);
@@ -57,7 +56,8 @@
             modsSuggestionProvider = suggestionProviderFactory.Create(KnownMods);
 
             addModCommand
-                .Subscribe((_) => AddModCommandExecuted());
+                .Subscribe((_) => AddModCommandExecuted())
+                .AddTo(Anchors);
 
             removeModCommand
                 .Select(x => x as PoeExplicitModViewModel)
@@ -91,7 +91,10 @@
         {
             Guard.ArgumentNotNull(() => modToRemove);
 
-            Mods.Remove(modToRemove);
+            using (Mods.SuppressChangeNotifications())
+            {
+                Mods.Remove(modToRemove);
+            }
         }
 
         private void ClearModsCommandExecuted()
@@ -110,7 +113,7 @@
 
         public void ClearMods()
         {
-                Mods.Clear();
+            Mods.Clear();
         }
 
     }

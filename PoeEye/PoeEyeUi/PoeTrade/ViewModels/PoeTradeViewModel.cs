@@ -3,6 +3,7 @@
     using System;
     using System.Diagnostics;
     using System.Linq;
+    using System.Reactive.Concurrency;
     using System.Reactive.Linq;
     using System.Threading.Tasks;
     using System.Windows;
@@ -14,6 +15,8 @@
 
     using JetBrains.Annotations;
 
+    using Microsoft.Practices.Unity;
+
     using Models;
 
     using PoeShared;
@@ -22,6 +25,8 @@
     using ReactiveUI;
 
     using PoeShared.Utilities;
+
+    using Prism;
 
     internal sealed class PoeTradeViewModel : DisposableReactiveObject, IPoeTradeViewModel
     {
@@ -40,6 +45,7 @@
             [NotNull] IPoePriceCalculcator poePriceCalculcator,
             [NotNull] IFactory<ImageViewModel, Uri> imageViewModelFactory,
             [NotNull] IFactory<PoeLinksInfoViewModel, IPoeLinksInfo> linksViewModelFactory,
+            [NotNull] [Dependency(WellKnownSchedulers.Ui)] IScheduler uiScheduler,
             [NotNull] IClock clock)
         {
             this.clock = clock;
@@ -47,6 +53,7 @@
             Guard.ArgumentNotNull(() => poePriceCalculcator);
             Guard.ArgumentNotNull(() => imageViewModelFactory);
             Guard.ArgumentNotNull(() => linksViewModelFactory);
+            Guard.ArgumentNotNull(() => uiScheduler);
             Guard.ArgumentNotNull(() => clock);
 
             this.Trade = poeItem;
@@ -74,6 +81,7 @@
 
             this.WhenAnyValue(x => x.IndexedAtTimestamp).ToUnit()
                 .Merge(Observable.Timer(DateTimeOffset.Now, RefreshTimeout).ToUnit())
+                .ObserveOn(uiScheduler)
                 .Subscribe(() => this.RaisePropertyChanged(nameof(TimeElapsedSinceLastIndexation)))
                 .AddTo(Anchors);
         }

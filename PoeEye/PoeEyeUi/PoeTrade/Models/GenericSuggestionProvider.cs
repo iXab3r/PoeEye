@@ -12,6 +12,8 @@
 
     internal sealed class GenericSuggestionProvider : ISuggestionProvider
     {
+        private const double MinScore = 15.0;
+
         private readonly IEnumerable<string> haystack;
         private readonly FuzzySearchService searchService;
 
@@ -26,7 +28,7 @@
         {
             var filteredStrings = searchService
                 .Search(filter)
-                .Where(x => x.Score > 15)
+                .Where(x => x.Score > MinScore)
                 .OrderByDescending(x => x.Score)
                 .Select(x => x.Result)
                 .ToArray();

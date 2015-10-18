@@ -92,11 +92,8 @@
 
             TabsList
                 .Changed.ToUnit()
-                .Merge(TabsList
-                    .ItemChanged
-                    .Where(x => x.PropertyName == nameof(MainWindowTabViewModel.RecheckTimeoutInSeconds))
-                    .Select(x => Unit.Default)
-                )
+                .Merge(TabsList.ItemChanged.Where(x => x.PropertyName == nameof(MainWindowTabViewModel.RecheckTimeoutInSeconds)).ToUnit())
+                .Merge(TabsList.ItemChanged.Where(x => x.PropertyName == nameof(MainWindowTabViewModel.AudioNotificationEnabled)).ToUnit())
                 .Subscribe(configUpdateSubject)
                 .AddTo(Anchors);
 

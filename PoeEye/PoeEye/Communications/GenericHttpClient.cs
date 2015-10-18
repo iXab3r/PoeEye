@@ -1,21 +1,19 @@
 ﻿namespace PoeEye.Communications
 {
     using System;
-    using System.Collections.Generic;
     using System.Collections.Specialized;
+    using System.IO;
     using System.Net;
     using System.Reactive.Concurrency;
     using System.Reactive.Linq;
     using System.Reactive.Threading.Tasks;
-    using System.Security.Policy;
-    using System.Threading.Tasks;
-    using System.Web;
 
     using CsQuery.ExtensionMethods.Internal;
 
     using DumpToText;
 
     using EasyHttp.Http;
+    using EasyHttp.Infrastructure;
 
     using Guards;
 
@@ -26,21 +24,28 @@
 
     using TypeConverter;
 
-    using HttpException = EasyHttp.Infrastructure.HttpException;
-    using HttpResponse = EasyHttp.Http.HttpResponse;
+    using HttpClient = System.Net.Http.HttpClient;
 
     internal sealed class GenericHttpClient : IHttpClient
     {
         private readonly IConverter<NameValueCollection, string> nameValueConverter;
 
-        public CookieCollection Cookies { get; set; }
-
         public GenericHttpClient(
-                [NotNull] IConverter<NameValueCollection, string> nameValueConverter)
+            [NotNull] IConverter<NameValueCollection, string> nameValueConverter)
         {
             Guard.ArgumentNotNull(() => nameValueConverter);
-            
+
             this.nameValueConverter = nameValueConverter;
+        }
+
+        public CookieCollection Cookies { get; set; }
+
+        public IObservable<Stream> GetStreamAsync(Uri requestUri)
+        {
+            Guard.ArgumentNotNull(() => requestUri);
+
+            var httpClient = new HttpClient();
+            return httpClient.GetStreamAsync(requestUri).ToObservable();
         }
 
         public IObservable<string> PostQuery(string uri, NameValueCollection args)
@@ -53,7 +58,7 @@
 
         private string PostQueryInternal(string uri, NameValueCollection args)
         {
-            var httpClient = new HttpClient();
+            var httpClient = new EasyHttp.Http.HttpClient();
             httpClient.Request.Cookies = Cookies;
 
             var postData = nameValueConverter.Convert(args);
