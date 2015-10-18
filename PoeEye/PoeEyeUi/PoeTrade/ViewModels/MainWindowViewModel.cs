@@ -19,11 +19,15 @@
 
     using JetBrains.Annotations;
 
+    using Microsoft.Practices.Unity;
+
     using Models;
 
     using PoeShared;
     using PoeShared.PoeTrade;
     using PoeShared.Utilities;
+
+    using Prism;
 
     using ReactiveUI;
 
@@ -50,12 +54,14 @@
             [NotNull] IFactory<MainWindowTabViewModel> tabFactory,
             [NotNull] ApplicationUpdaterViewModel applicationUpdaterViewModel,
             [NotNull] IPoeEyeConfigProvider<IPoeEyeConfig> poeEyeConfigProvider,
-            [NotNull] IAudioNotificationsManager audioNotificationsManager)
+            [NotNull] IAudioNotificationsManager audioNotificationsManager,
+            [NotNull] [Dependency(WellKnownSchedulers.Ui)] IScheduler uiScheduler)
         {
             Guard.ArgumentNotNull(() => tabFactory);
             Guard.ArgumentNotNull(() => applicationUpdaterViewModel);
             Guard.ArgumentNotNull(() => poeEyeConfigProvider);
             Guard.ArgumentNotNull(() => audioNotificationsManager);
+            Guard.ArgumentNotNull(() => uiScheduler);
 
             var executingAssembly = Assembly.GetExecutingAssembly();
             MainWindowTitle = $"{executingAssembly.GetName().Name} v{executingAssembly.GetName().Version}";
@@ -104,6 +110,7 @@
 
             Observable
                 .Timer(DateTimeOffset.Now, CheckForUpdatesTimeout, TaskPoolScheduler.Default)
+                .ObserveOn(uiScheduler)
                 .Subscribe(() => applicationUpdaterViewModel.CheckForUpdatesCommand.Execute(this), Log.HandleException); 
         }
 

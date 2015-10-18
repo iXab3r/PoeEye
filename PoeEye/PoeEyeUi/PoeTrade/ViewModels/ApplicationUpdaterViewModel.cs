@@ -46,7 +46,10 @@
             checkForUpdatesCommand
                 .Where(x => !IsBusy)
                 .ObserveOn(bgScheduler)
-                .Subscribe(CheckForUpdatesCommandExecuted, Log.HandleException)
+                .Do(_ => IsBusy = true)
+                .Do(CheckForUpdatesCommandExecuted, Log.HandleException)
+                .Do(_ => IsBusy = false)
+                .Subscribe()
                 .AddTo(Anchors);
 
             SquirrelAwareApp.HandleEvents(
@@ -68,50 +71,42 @@
 
         private void CheckForUpdatesCommandExecuted(object context)
         {
+            Log.Instance.Debug($"[ApplicationUpdaterViewModel] Update check requested");
 
+            // delaying update so the user could see the progressring
+            Thread.Sleep(ArtificialDelay);
+
+#if DEBUG
+            Log.Instance.Debug($"[ApplicationUpdaterViewModel] Debug mode detected, update will be skipped");
+            return;
+#endif
             try
             {
-                Log.Instance.Debug($"[ApplicationUpdaterViewModel] Update check requested");
-                IsBusy = true;
-
-                // delaying update so the user could see the progressring
-                Thread.Sleep(ArtificialDelay); 
-                
-#if DEBUG
-                Log.Instance.Debug($"[ApplicationUpdaterViewModel] Debug mode detected, update will be skipped");
-                return;
-#endif
-                try
+                var appName = typeof (PoeEye.Prism.LiveRegistrations).Assembly.GetName().Name;
+                using (var mgr = new UpdateManager(PoeEyeUri, appName))
                 {
-                    var appName = typeof(PoeEye.Prism.LiveRegistrations).Assembly.GetName().Name;
-                    using (var mgr = new UpdateManager(PoeEyeUri, appName))
+                    Log.Instance.Debug($"[ApplicationUpdaterViewModel] Checking for updates...");
+
+                    var updateInfo = mgr.CheckForUpdate().Result;
+
+                    Log.Instance.Debug($"[ApplicationUpdaterViewModel] UpdateInfo:\r\n{updateInfo?.DumpToTextValue()}");
+                    if (updateInfo == null || updateInfo.ReleasesToApply.Count == 0)
                     {
-                        Log.Instance.Debug($"[ApplicationUpdaterViewModel] Checking for updates...");
-
-                        var updateInfo = mgr.CheckForUpdate().Result;
-
-                        Log.Instance.Debug($"[ApplicationUpdaterViewModel] UpdateInfo:\r\n{updateInfo?.DumpToTextValue()}");
-                        if (updateInfo == null || updateInfo.ReleasesToApply.Count == 0)
-                        {
-                            return;
-                        }
-                        Log.Instance.Debug($"[ApplicationUpdaterViewModel] Downloading releases...");
-                        mgr.DownloadReleases(updateInfo.ReleasesToApply, UpdateProgress).RunSynchronously();
-                        Log.Instance.Debug($"[ApplicationUpdaterViewModel] Applying releases...");
-                        mgr.ApplyReleases(updateInfo).RunSynchronously();
-                        Log.Instance.Debug($"[ApplicationUpdaterViewModel] Update completed");
-
-                        bgScheduler.Schedule(() => dialogCoordinator.ShowMessageAsync(context, "Update completed", "Application updated, new version will take place on next application startup"));
+                        return;
                     }
-                }
-                catch (Exception ex)
-                {
-                    Log.Instance.Debug($"[ApplicationUpdaterViewModel] Update failed", ex);
+                    Log.Instance.Debug($"[ApplicationUpdaterViewModel] Downloading releases...");
+                    mgr.DownloadReleases(updateInfo.ReleasesToApply, UpdateProgress).Wait();
+                    Log.Instance.Debug($"[ApplicationUpdaterViewModel] Applying releases...");
+                    mgr.ApplyReleases(updateInfo).Wait();
+                    Log.Instance.Debug($"[ApplicationUpdaterViewModel] Update completed");
+
+                    bgScheduler.Schedule(
+                        () => dialogCoordinator.ShowMessageAsync(context, "Update completed", "Application updated, new version will take place on next application startup"));
                 }
             }
-            finally
+            catch (Exception ex)
             {
-                IsBusy = false;
+                Log.Instance.Debug($"[ApplicationUpdaterViewModel] Update failed", ex);
             }
         }
 
