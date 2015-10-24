@@ -3,7 +3,8 @@
                     xmlns:viewModels="clr-namespace:PoeEyeUi.PoeTrade.ViewModels"
                     xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
                     xmlns:wpfControls="http://wpfcontrols.com/"
-                    xmlns:common="clr-namespace:PoeShared.Common;assembly=PoeShared">
+                    xmlns:common="clr-namespace:PoeShared.Common;assembly=PoeShared"
+                    xmlns:editors="https://github.com/iXab3r/WpfAutoCompleteControls">
     <DataTemplate DataType="{x:Type viewModels:PoeExplicitModViewModel}">
         <Grid Margin="0,5,0,5">
             <Grid.ColumnDefinitions>
@@ -12,12 +13,12 @@
                 <ColumnDefinition Width="auto"/>
             </Grid.ColumnDefinitions>
 
-            <wpfControls:AutoCompleteTextBox  Grid.Column="0"
+            <editors:AutoCompleteTextBox  Grid.Column="0"
                                               Provider="{Binding SuggestionProvider}"
                                               Text="{Binding SelectedMod, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                               Margin="10,0,10,0"
                                               Watermark="start typing to get compatible mods list">
-            </wpfControls:AutoCompleteTextBox>
+            </editors:AutoCompleteTextBox>
 
             <CheckBox Grid.Column="1" 
                       Margin="10,0,10,0"

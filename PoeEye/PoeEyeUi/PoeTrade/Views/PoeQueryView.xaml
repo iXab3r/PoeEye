@@ -5,7 +5,8 @@
                     xmlns:converters="clr-namespace:PoeEyeUi.Converters"
                     xmlns:wpfControls="http://wpfcontrols.com/"
                     xmlns:System="clr-namespace:System;assembly=mscorlib"
-                    xmlns:common="clr-namespace:PoeShared.Common;assembly=PoeShared">
+                    xmlns:common="clr-namespace:PoeShared.Common;assembly=PoeShared"
+                    xmlns:editors="https://github.com/iXab3r/WpfAutoCompleteControls">
     <DataTemplate DataType="{x:Type viewModels:PoeQueryViewModel}">
         <Grid>
             <Grid.Resources>
@@ -88,7 +89,7 @@
                 <TextBlock   Grid.Row="2" Grid.Column="0"
                              Text="Name" Style="{StaticResource TextBlockHeader}" />
 
-                <wpfControls:AutoCompleteTextBox  Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="5"
+                <editors:AutoCompleteTextBox  Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="5"
                                                   Provider="{Binding NameSuggestionProvider}"
                                                   Width="NaN" 
                                                   HorizontalContentAlignment="Left"
@@ -96,7 +97,7 @@
                                                   Margin="0,0,10,0"
                                                   Height="26"
                                                   Watermark="item name, e.g. Temple map">
-                </wpfControls:AutoCompleteTextBox>
+                </editors:AutoCompleteTextBox>
             </Grid>
 
             <Grid Row="2">

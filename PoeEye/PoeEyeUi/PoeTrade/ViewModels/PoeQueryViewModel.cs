@@ -23,8 +23,7 @@
 
     using ReactiveUI;
 
-    using WpfControls;
-    using WpfControls.Editors;
+    using WpfAutoCompleteControls.Editors;
 
     internal sealed class PoeQueryViewModel : ReactiveObject, IPoeQueryInfo
     {

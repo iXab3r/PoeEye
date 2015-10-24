@@ -22,7 +22,7 @@
                 <ResourceDictionary Source="Themes/ListBoxAsTabCotrolStyle.xaml" />
                 <ResourceDictionary Source="Themes/VirtualizedItemsControl.xaml" />
                 <ResourceDictionary Source="Themes/WpfAutoCompleteTextBoxStyle.xaml" />
-
+                
                 <ResourceDictionary Source="PoeTrade/Views/ImageView.xaml" />
                 <ResourceDictionary Source="PoeTrade/Views/MainWindowTabView.xaml" />
                 <ResourceDictionary Source="PoeTrade/Views/PoeLinksInfoView.xaml" />

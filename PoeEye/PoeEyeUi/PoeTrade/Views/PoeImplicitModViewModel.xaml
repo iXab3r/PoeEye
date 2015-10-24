@@ -2,7 +2,8 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:viewModels="clr-namespace:PoeEyeUi.PoeTrade.ViewModels"
                     xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
-                    xmlns:wpfControls="http://wpfcontrols.com/">
+                    xmlns:wpfControls="http://wpfcontrols.com/"
+                    xmlns:editors="https://github.com/iXab3r/WpfAutoCompleteControls">
     <DataTemplate DataType="{x:Type viewModels:PoeImplicitModViewModel}">
         <Grid>
             <Grid.ColumnDefinitions>
@@ -10,12 +11,12 @@
                 <ColumnDefinition Width="auto"/>
             </Grid.ColumnDefinitions>
 
-            <wpfControls:AutoCompleteTextBox  Grid.Column="0"
+            <editors:AutoCompleteTextBox  Grid.Column="0"
                                               Provider="{Binding SuggestionProvider}"
                                               Text="{Binding SelectedMod, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                               Margin="10,0,10,0"
                                               Watermark="start typing to get compatible mods list">
-            </wpfControls:AutoCompleteTextBox>
+            </editors:AutoCompleteTextBox>
 
             <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="10,0,10,0">
                 <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}" Value="{Binding Min, Converter={StaticResource NullableConverter}}"/>

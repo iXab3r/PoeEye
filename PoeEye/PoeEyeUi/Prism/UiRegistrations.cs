@@ -18,7 +18,7 @@
 
     using TypeConverter;
 
-    using WpfControls.Editors;
+    using WpfAutoCompleteControls.Editors;
 
     internal sealed class UiRegistrations : UnityContainerExtension
     {

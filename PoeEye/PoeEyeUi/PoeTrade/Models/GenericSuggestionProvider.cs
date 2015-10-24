@@ -8,13 +8,12 @@
 
     using JetBrains.Annotations;
 
-    using WpfControls.Editors;
+    using WpfAutoCompleteControls.Editors;
 
     internal sealed class GenericSuggestionProvider : ISuggestionProvider
     {
         private const double MinScore = 15.0;
 
-        private readonly IEnumerable<string> haystack;
         private readonly FuzzySearchService searchService;
 
         public GenericSuggestionProvider([NotNull] string[] haystack)

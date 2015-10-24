@@ -22,7 +22,7 @@
 
     using Utilities;
 
-    using WpfControls.Editors;
+    using WpfAutoCompleteControls.Editors;
 
     internal sealed class PoeExplicitModsEditorViewModel : DisposableReactiveObject
     {

@@ -209,8 +209,9 @@
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
-    <Reference Include="WpfControls">
-      <HintPath>..\..\wpfautocomplete\WpfControls.CS\bin\Debug\WpfControls.dll</HintPath>
+    <Reference Include="WpfAutoCompleteControls, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\WpfAutoCompleteControls.0.6\lib\net45\WpfAutoCompleteControls.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Xceed.Wpf.AvalonDock, Version=2.5.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
       <HintPath>..\packages\Extended.Wpf.Toolkit.2.5\lib\net40\Xceed.Wpf.AvalonDock.dll</HintPath>
@@ -333,10 +334,6 @@
     <ProjectReference Include="..\PoeShared\PoeShared.csproj">
       <Project>{12DF53DD-7144-4D2D-B7A1-B4BC5BBDFB69}</Project>
       <Name>PoeShared</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\WpfControls.CS\WpfControls.CS.csproj">
-      <Project>{bb2abb74-ba58-4812-83aa-ec8171f42df4}</Project>
-      <Name>WpfControls.CS</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

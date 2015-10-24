@@ -4,7 +4,7 @@
 
     using ReactiveUI;
 
-    using WpfControls.Editors;
+    using WpfAutoCompleteControls.Editors;
 
     internal sealed class PoeExplicitModViewModel : DisposableReactiveObject
     {
