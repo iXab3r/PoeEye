@@ -6,8 +6,6 @@
     using System.Reflection;
     using System.Xml;
 
-    using Resourcer;
-
     public sealed class PoeDatabaseReader : IPoeDatabaseReader
     {
         private readonly HashSet<PoeDatabaseEntity> knownEntities = new HashSet<PoeDatabaseEntity>();
@@ -16,7 +14,17 @@
         {
             Initialize();
 
-            KnownEntitiesNames = knownEntities.Select(x => x.Name).ToArray();
+            var uniqueNames = knownEntities
+                .Select(x => x.Name)
+                .Where(x => !string.IsNullOrWhiteSpace(x))
+                .ToArray();
+
+            var baseNames = knownEntities
+                .Select(x => x.Base)
+                .Where(x => !string.IsNullOrWhiteSpace(x))
+                .ToArray();
+
+            KnownEntitiesNames = Enumerable.Concat(uniqueNames, baseNames).Distinct().ToArray();
         }
 
         private void Initialize()
