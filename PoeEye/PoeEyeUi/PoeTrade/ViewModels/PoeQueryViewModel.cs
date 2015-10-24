@@ -152,7 +152,7 @@
             [NotNull] IPoeQueryInfoProvider queryInfoProvider,
             [NotNull] PoeImplicitModViewModel poeImplicitModViewModel,
             [NotNull] PoeExplicitModsEditorViewModel poeExplicitModsEditorViewModel,
-            [NotNull] IFactory<GenericSuggestionProvider, string[]> suggestionProviderFactory,
+            [NotNull] IFactory<FuzzySuggestionProvider, string[]> suggestionProviderFactory,
             [NotNull] IPoeDatabaseReader poeDatabaseReader)
         {
             Guard.ArgumentNotNull(() => queryInfoProvider);

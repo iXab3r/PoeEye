@@ -1,8 +1,9 @@
 ﻿namespace PoeEyeUi.PoeTrade.Models
 {
     using System.Collections;
-    using System.Collections.Generic;
     using System.Linq;
+
+    using FuzzySearch;
 
     using Guards;
 
@@ -10,26 +11,26 @@
 
     using WpfAutoCompleteControls.Editors;
 
-    internal sealed class GenericSuggestionProvider : ISuggestionProvider
+    internal sealed class FuzzySuggestionProvider : ISuggestionProvider
     {
-        private const double MinScore = 15.0;
+        private const int MaxResults = 20;
+        private readonly IFuzzySearchService searchService;
 
-        private readonly FuzzySearchService searchService;
 
-        public GenericSuggestionProvider([NotNull] string[] haystack)
+        public FuzzySuggestionProvider([NotNull] string[] haystack)
         {
             Guard.ArgumentNotNull(() => haystack);
 
-            searchService = new FuzzySearchService(haystack);
+            searchService = new LcsSearchService(haystack);
         }
 
         public IEnumerable GetSuggestions(string filter)
         {
             var filteredStrings = searchService
                 .Search(filter)
-                .Where(x => x.Score > MinScore)
                 .OrderByDescending(x => x.Score)
                 .Select(x => x.Result)
+                .Take(MaxResults)
                 .ToArray();
             return filteredStrings;
         }

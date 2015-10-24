@@ -262,8 +262,7 @@
     <Compile Include="MetroModels\DialogCoordinator.cs" />
     <Compile Include="MetroModels\IDialogCoordinator.cs" />
     <Compile Include="PoeTrade\Models\AudioNotificationsManager.cs" />
-    <Compile Include="PoeTrade\Models\FuzzySearchService.cs" />
-    <Compile Include="PoeTrade\Models\GenericSuggestionProvider.cs" />
+    <Compile Include="PoeTrade\Models\FuzzySuggestionProvider.cs" />
     <Compile Include="PoeTrade\Models\IAudioNotificationsManager.cs" />
     <Compile Include="PoeTrade\Models\IPoePriceCalculcator.cs" />
     <Compile Include="PoeTrade\Models\ImagesCache.cs" />
@@ -323,6 +322,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\FuzzySearch\FuzzySearch.csproj">
+      <Project>{9cee14a8-1436-4947-9c62-ff3ba83a330d}</Project>
+      <Name>FuzzySearch</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PoeEyeSimulator\PoeEye.Simulator.csproj">
       <Project>{785dc21d-42f1-4db9-883f-4d02ccf73ff0}</Project>
       <Name>PoeEye.Simulator</Name>
@@ -413,7 +416,9 @@
     <Resource Include="Resources\Entypo-license.txt" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="FodyWeavers.xml" />
+    <Resource Include="FodyWeavers.xml">
+      <SubType>Designer</SubType>
+    </Resource>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5.2">
