@@ -109,7 +109,6 @@
                 args.Add(modArg);
             }
 
-            // verify, that there are no duplicates
             Guard.ArgumentIsTrue(() => args.ToDictionary(x => x.Name, x => default(int?)).Count() == args.Count());
 
             result.Arguments = args.ToArray();
@@ -124,11 +123,6 @@
                 Max = max
             };
             return arg;
-        }
-
-        private IPoeQueryArgument CreateModArgument(IPoeItemMod mod, float? min, float? max)
-        {
-            return CreateModArgument(mod.CodeName, min, max);
         }
 
         private IPoeQueryArgument CreateArgument<T>(string name, T value)

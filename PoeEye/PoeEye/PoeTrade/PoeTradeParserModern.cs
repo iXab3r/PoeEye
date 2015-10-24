@@ -1,12 +1,10 @@
 namespace PoeEye.PoeTrade
 {
-    using System;
     using System.IO;
     using System.Linq;
     using System.Web;
 
     using CsQuery;
-    using CsQuery.ExtensionMethods;
 
     using Guards;
 

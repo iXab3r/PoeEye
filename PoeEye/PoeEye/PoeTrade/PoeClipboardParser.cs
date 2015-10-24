@@ -3,7 +3,6 @@
     using Guards;
 
     using PoeShared.PoeTrade;
-    using PoeShared.PoeTrade.Query;
 
     internal sealed class PoeClipboardParser : IPoeClipboardParser
     {

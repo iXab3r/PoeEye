@@ -19,7 +19,7 @@
 
     internal sealed class PoeLiveHistoryProvider : DisposableReactiveObject, IPoeLiveHistoryProvider
     {
-        private TimeSpan recheckPeriodThrottling = TimeSpan.FromMilliseconds(1000);
+        private readonly TimeSpan recheckPeriodThrottling = TimeSpan.FromMilliseconds(1000);
 
         private readonly ISubject<IPoeItem[]> itemsPacksSubject = new Subject<IPoeItem[]>();
         private readonly ISubject<Exception> updateExceptionsSubject = new Subject<Exception>();

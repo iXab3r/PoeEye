@@ -1,6 +1,5 @@
 ﻿namespace PoeEye.Tests.Common
 {
-    using System;
     using System.Collections.Generic;
 
     using NUnit.Framework;
@@ -21,13 +20,13 @@
 
         [Test]
         [TestCaseSource(nameof(ShouldReturnTrueTestCaseSource))]
-        public void ShouldReturnTrue(Tuple<IPoeItemMod, IPoeItemMod> pair)
+        public void ShouldReturnTrue(IPoeItemMod item1, IPoeItemMod item2)
         {
             //Given
             var instance = CreateInstance();
 
             //When
-            var result = instance.Equals(pair.Item1, pair.Item2);
+            var result = instance.Equals(item1, item2);
 
             //Then
             result.ShouldBe(true);
@@ -35,36 +34,36 @@
 
         [Test]
         [TestCaseSource(nameof(ShouldReturnFalseTestCaseSource))]
-        public void ShouldReturnFalse(Tuple<IPoeItemMod, IPoeItemMod> pair)
+        public void ShouldReturnFalse(IPoeItemMod item1, IPoeItemMod item2)
         {
             //Given
             var instance = CreateInstance();
 
             //When
-            var result = instance.Equals(pair.Item1, pair.Item2);
+            var result = instance.Equals(item1, item2);
 
             //Then
             result.ShouldBe(false);
         }
 
-        private IEnumerable<Tuple<IPoeItemMod, IPoeItemMod>> ShouldReturnTrueTestCaseSource()
+        private IEnumerable<TestCaseData> ShouldReturnTrueTestCaseSource()
         {
-            yield return new Tuple<IPoeItemMod, IPoeItemMod>(
+            yield return new TestCaseData(
                     CreateItemMod(string.Empty, string.Empty),
-                     CreateItemMod(string.Empty, string.Empty));
-            yield return new Tuple<IPoeItemMod, IPoeItemMod>(
+                    CreateItemMod(string.Empty, string.Empty));
+            yield return new TestCaseData(
                     CreateItemMod(string.Empty, "1"),
-                     CreateItemMod(string.Empty, "1"));
+                    CreateItemMod(string.Empty, "1"));
         }
 
-        private IEnumerable<Tuple<IPoeItemMod, IPoeItemMod>> ShouldReturnFalseTestCaseSource()
+        private IEnumerable<TestCaseData> ShouldReturnFalseTestCaseSource()
         {
-            yield return new Tuple<IPoeItemMod, IPoeItemMod>(
+            yield return new TestCaseData(
                     CreateItemMod(string.Empty, "1"),
-                     CreateItemMod(string.Empty, "2"));
-            yield return new Tuple<IPoeItemMod, IPoeItemMod>(
+                    CreateItemMod(string.Empty, "2"));
+            yield return new TestCaseData(
                     CreateItemMod("1", string.Empty),
-                     CreateItemMod("1", "1"));
+                    CreateItemMod("1", "1"));
         }
 
         private IPoeItemMod CreateItemMod(string codeName, string name)

@@ -442,6 +442,9 @@
   <ItemGroup>
     <Resource Include="Resources\mainIcon.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="Resources\whistle.wav" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Fody.1.29.3\build\portable-net+sl+win+wpa+wp\Fody.targets" Condition="Exists('..\packages\Fody.1.29.3\build\portable-net+sl+win+wpa+wp\Fody.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
