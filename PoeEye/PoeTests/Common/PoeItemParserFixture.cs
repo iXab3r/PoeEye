@@ -48,6 +48,48 @@
             result.ItemName.ShouldBe(expectedItem.ItemName);
         }
 
+        [Test]
+        [TestCaseSource(nameof(KnownItems))]
+        public void ShouldParseIsCorrupted(string data, IPoeItem expectedItem)
+        {
+            //Given
+            var instance = CreateInstance();
+
+            //When
+            var result = instance.Parse(data);
+
+            //Then
+            result.IsCorrupted.ShouldBe(expectedItem.IsCorrupted);
+        }
+
+        [Test]
+        [TestCaseSource(nameof(KnownItems))]
+        public void ShouldParseLinks(string data, IPoeItem expectedItem)
+        {
+            //Given
+            var instance = CreateInstance();
+
+            //When
+            var result = instance.Parse(data);
+
+            //Then
+            result.Links.ShouldBe(expectedItem.Links);
+        }
+
+        [Test]
+        [TestCaseSource(nameof(KnownItems))]
+        public void ShouldParseRarity(string data, IPoeItem expectedItem)
+        {
+            //Given
+            var instance = CreateInstance();
+
+            //When
+            var result = instance.Parse(data);
+
+            //Then
+            result.Rarity.ShouldBe(expectedItem.Rarity);
+        }
+
         private IEnumerable<TestCaseData> KnownItems()
         {
             yield return new TestCaseData(
@@ -80,7 +122,7 @@
                 Mock.Of<IPoeItem>(x => x.Rarity == PoeItemRarity.Rare && 
                                        x.ItemName == "Gloom Nails" &&
                                        x.Quality == "1%" &&
-                                       x.Links == Mock.Of<IPoeLinksInfo>(y => y.RawSockets == "B-R-B-R")));
+                                       x.Links == new PoeLinksInfo("B-R-B-R")));
 
             yield return new TestCaseData(
                  @"Rarity: Gem
@@ -102,8 +144,7 @@
                   You cannot use this Attack directly
                   --------
                   Place into an item socket of the right colour to gain this skill. Right click to remove from a socket.",
-                Mock.Of<IPoeItem>(x => x.Rarity == PoeItemRarity.Rare && 
-                                       x.ItemName == "Vengeance" &&
+                Mock.Of<IPoeItem>(x => x.ItemName == "Vengeance" &&
                                        x.Quality == "14% (augmented)"));
 
             yield return new TestCaseData(
@@ -139,7 +180,7 @@
                 Mock.Of<IPoeItem>(x => x.Rarity == PoeItemRarity.Unique && 
                                        x.ItemName == "Lightning Coil" &&
                                        x.Quality == "20% (augmented)" &&
-                                       x.Links == Mock.Of<IPoeLinksInfo>(y => y.RawSockets == "B-B-B-R-G G")));
+                                       x.Links == new PoeLinksInfo("B-B-B-R-G G")));
 
             yield return new TestCaseData(
                @"Rarity: Rare
@@ -166,7 +207,7 @@
                 Corrupted",
                Mock.Of<IPoeItem>(x => x.Rarity == PoeItemRarity.Rare && 
                                       x.ItemName == "Torment Veil" &&
-                                      x.Links == Mock.Of<IPoeLinksInfo>(y => y.RawSockets == "R-B-B-R-B-G") &&
+                                      x.Links == new PoeLinksInfo("R-B-B-R-B-G") &&
                                       x.IsCorrupted == true));
 
             yield return new TestCaseData(

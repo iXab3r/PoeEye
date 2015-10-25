@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Text.RegularExpressions;
 
     using Guards;
 
@@ -13,6 +14,9 @@
     public sealed class PoeItemParser : IPoeItemParser
     {
         private const string BlocksSeparator = "--------";
+
+        private readonly Regex rarityRegex = new Regex(@"^\s*Rarity\:\s*(.*?)\s*$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private readonly Regex linksRegex = new Regex(@"^\s*Sockets\:\s*(.*?)\s*$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         private readonly IPoeQueryInfoProvider queryInfoProvider;
 
@@ -26,20 +30,17 @@
         public IPoeItem Parse([NotNull] string serializedItem)
         {
             Guard.ArgumentNotNull(() => serializedItem);
-            
-            var result = new PoeItem();
-
-            var itemBlocks = PrepareString(serializedItem)
-                .Split(new [] { BlocksSeparator }, StringSplitOptions.RemoveEmptyEntries)
-                .Where(x => !string.IsNullOrWhiteSpace(x))
-                .ToArray();
 
             var blockParsers = new List<Func<string, PoeItem, bool>>()
             {
                 ParseItemRarityAndName,
-                ParseItemCorruptionState
+                ParseItemCorruptionState,
+                ParseItemLinks
             };
 
+            var result = new PoeItem();
+
+            var itemBlocks = SplitToBlocks(serializedItem);
             foreach (var block in itemBlocks)
             {
                 var parsersToRemove = blockParsers
@@ -60,15 +61,23 @@
 
         private bool ParseItemRarityAndName(string block, PoeItem item)
         {
-            if (block.IndexOf("Rarity", StringComparison.OrdinalIgnoreCase) < 0)
-            {
-                return false;
-            }
             var splittedBlock = SplitToStrings(block);
 
             if (splittedBlock.Length < 2)
             {
                 return false;
+            }
+
+            var rarityMatch = rarityRegex.Match(splittedBlock[0]);
+            if (!rarityMatch.Success)
+            {
+                return false;
+            }
+
+            PoeItemRarity rarity;
+            if (Enum.TryParse(rarityMatch.Groups[1].Value, out rarity))
+            {
+                item.Rarity = rarity;
             }
 
             item.ItemName = splittedBlock[1];
@@ -78,24 +87,46 @@
 
         private bool ParseItemCorruptionState(string block, PoeItem item)
         {
-            if (block.IndexOf("Corrupted", StringComparison.OrdinalIgnoreCase) != 0)
+            if (block.IndexOf("Corrupted", StringComparison.OrdinalIgnoreCase) < 0)
             {
                 return false;
             }
+            item.IsCorrupted = true;
             return true;
         }
 
-        private string[] SplitToStrings(string block)
+        private bool ParseItemLinks(string block, PoeItem item)
+        {
+            var linksMatch = linksRegex.Match(block);
+            if (!linksMatch.Success)
+            {
+                return false;
+            }
+            item.Links = new PoeLinksInfo(linksMatch.Groups[1].Value);
+            return true;
+        }
+
+        private static string[] SplitToBlocks(string serializedItem)
+        {
+            var rawBlocks = PrepareString(serializedItem)
+               .Split(new[] { BlocksSeparator }, StringSplitOptions.RemoveEmptyEntries)
+               .Where(x => !string.IsNullOrWhiteSpace(x))
+               .ToArray();
+            return rawBlocks;
+        }
+
+        private static string[] SplitToStrings(string block)
         {
             return block
-                .Split(new[] {Environment.NewLine}, StringSplitOptions.RemoveEmptyEntries)
+                .Split(new[] { "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries)
                 .Select(PrepareString)
+                .Where(x => !string.IsNullOrEmpty(x))
                 .ToArray();
         }
 
         private static string PrepareString(string data)
         {
-            return data.Trim(' ', '\t');
+            return data.Trim(' ', '\t', '\n', '\r');
         }
 
         private static void TrimProperties<T>(T item)
