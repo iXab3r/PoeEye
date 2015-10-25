@@ -125,6 +125,7 @@
     <Compile Include="Common\IPoeCurrency.cs" />
     <Compile Include="Common\IPoeItem.cs" />
     <Compile Include="Common\IPoeItemMod.cs" />
+    <Compile Include="Common\IPoeItemParser.cs" />
     <Compile Include="Common\IPoeItemType.cs" />
     <Compile Include="Common\IPoeLinksInfo.cs" />
     <Compile Include="Common\PoeCurrency.cs" />
@@ -145,8 +146,8 @@
     <Compile Include="PoeDatabase\PoeDatabaseEntity.cs" />
     <Compile Include="PoeDatabase\PoeDatabaseExtensions.cs" />
     <Compile Include="PoeDatabase\PoeDatabaseReader.cs" />
+    <Compile Include="Common\PoeItemParser.cs" />
     <Compile Include="PoeTrade\IPoeApi.cs" />
-    <Compile Include="PoeTrade\IPoeClipboardParser.cs" />
     <Compile Include="PoeTrade\IPoeLiveHistoryProvider.cs" />
     <Compile Include="PoeTrade\IPoeQueryInfo.cs" />
     <Compile Include="PoeTrade\IPoeTradeParser.cs" />

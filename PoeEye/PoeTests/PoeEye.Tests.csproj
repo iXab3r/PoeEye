@@ -114,6 +114,7 @@
     <Compile Include="Common\PoeItemEqualityComparerFixture.cs" />
     <Compile Include="Common\PoeItemModEqualityComparerFixture.cs" />
     <Compile Include="Communications\NameValueCollectionToQueryStringConverterFixture.cs" />
+    <Compile Include="Common\PoeItemParserFixture.cs" />
     <Compile Include="PoeTrade\PoeTradeParserModernFixture.cs" />
     <Compile Include="PoeTrade\TestData\TestDataProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

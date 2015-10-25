@@ -606,6 +606,11 @@
                     ItemType = mappedItemType;
                 }
             }
+
+            if (league == null)
+            {
+                League = LeaguesList.First();
+            }
         }
 
         private static void TransferProperties<TSource, TTarget>(TSource source, TTarget target)

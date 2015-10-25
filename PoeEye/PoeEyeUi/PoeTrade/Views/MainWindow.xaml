@@ -19,6 +19,11 @@
         BorderThickness="1" BorderBrush="{StaticResource AccentColorBrush}"
         metroModels:DialogParticipation.Register="{Binding}">
 
+    <Window.InputBindings>
+        <KeyBinding Command="{Binding PasteClipboardCommand}"
+              Gesture="CTRL+V" />
+    </Window.InputBindings>
+
     <Grid>
 
         <utilities:DataPiping.DataPipes>

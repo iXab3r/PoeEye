@@ -134,7 +134,6 @@
 
         public IPoeQueryRangeModArgument[] ExplicitMods { get; set; }
 
-
         private string[] FormatQueryDescriptionArray()
         {
             var blackList = new[]

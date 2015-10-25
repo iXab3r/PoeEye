@@ -18,6 +18,9 @@
                 .RegisterType<IPoeDatabaseReader, PoeDatabaseReader>(new ContainerControlledLifetimeManager());
 
             Container
+                .RegisterType<IPoeItemParser, PoeItemParser>(new ContainerControlledLifetimeManager());
+
+            Container
                 .RegisterType(typeof (IEqualityComparer<IPoeItem>), typeof (PoeItemEqualityComparer))
                 .RegisterType(typeof (IFactory<,>), typeof(Factory<,>))
                 .RegisterType(typeof (IFactory<>), typeof (Factory<>));

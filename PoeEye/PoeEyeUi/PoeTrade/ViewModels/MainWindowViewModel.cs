@@ -7,6 +7,7 @@
     using System.Reactive.Linq;
     using System.Reactive.Subjects;
     using System.Reflection;
+    using System.Windows;
     using System.Windows.Input;
 
     using Config;
@@ -24,12 +25,15 @@
     using Models;
 
     using PoeShared;
+    using PoeShared.Common;
     using PoeShared.PoeTrade;
     using PoeShared.Utilities;
 
     using Prism;
 
     using ReactiveUI;
+
+    using TypeConverter;
 
     internal sealed class MainWindowViewModel : DisposableReactiveObject
     {
@@ -38,7 +42,10 @@
 
         private readonly ReactiveCommand<object> closeTabCommand;
         private readonly ReactiveCommand<object> createNewTabCommand;
+        private readonly ReactiveCommand<object> pasteClipboardCommand;
         private readonly IPoeEyeConfigProvider<IPoeEyeConfig> poeEyeConfigProvider;
+        private readonly IPoeItemParser itemParser;
+        private readonly IConverter<IPoeItem, IPoeQueryInfo> itemToQueryConverter;
 
         private readonly IFactory<MainWindowTabViewModel> tabFactory;
 
@@ -55,12 +62,16 @@
             [NotNull] ApplicationUpdaterViewModel applicationUpdaterViewModel,
             [NotNull] IPoeEyeConfigProvider<IPoeEyeConfig> poeEyeConfigProvider,
             [NotNull] IAudioNotificationsManager audioNotificationsManager,
+            [NotNull] IPoeItemParser itemParser,
+            [NotNull] IConverter<IPoeItem, IPoeQueryInfo> itemToQueryConverter,
             [NotNull] [Dependency(WellKnownSchedulers.Ui)] IScheduler uiScheduler)
         {
             Guard.ArgumentNotNull(() => tabFactory);
             Guard.ArgumentNotNull(() => applicationUpdaterViewModel);
             Guard.ArgumentNotNull(() => poeEyeConfigProvider);
             Guard.ArgumentNotNull(() => audioNotificationsManager);
+            Guard.ArgumentNotNull(() => itemParser);
+            Guard.ArgumentNotNull(() => itemToQueryConverter);
             Guard.ArgumentNotNull(() => uiScheduler);
 
             var executingAssembly = Assembly.GetExecutingAssembly();
@@ -68,7 +79,10 @@
 
             this.tabFactory = tabFactory;
             this.poeEyeConfigProvider = poeEyeConfigProvider;
+            this.itemParser = itemParser;
+            this.itemToQueryConverter = itemToQueryConverter;
             ApplicationUpdater = applicationUpdaterViewModel;
+
             createNewTabCommand = ReactiveCommand.Create();
             createNewTabCommand.Subscribe(CreateNewTabCommandExecuted);
 
@@ -77,6 +91,12 @@
                 .Where(x => x is MainWindowTabViewModel)
                 .Select(x => x as MainWindowTabViewModel)
                 .Subscribe(RemoveTabCommandExecuted)
+                .AddTo(Anchors);
+
+
+            pasteClipboardCommand = ReactiveCommand.Create();
+            pasteClipboardCommand
+                .Subscribe(PasteClipboardCommandExecuted)
                 .AddTo(Anchors);
 
             TabsList
@@ -117,6 +137,8 @@
         public ICommand CreateNewTabCommand => createNewTabCommand;
 
         public ICommand CloseTabCommand => closeTabCommand;
+
+        public ICommand PasteClipboardCommand => pasteClipboardCommand;
 
         public ApplicationUpdaterViewModel ApplicationUpdater { get; }
 
@@ -212,5 +234,32 @@
             Log.Instance.Debug($"[MainWindowViewModel.LoadConfig] Sucessfully loaded config\r\nTabs count: {TabsList.Count}");
         }
 
+        private void PasteClipboardCommandExecuted()
+        {
+            try
+            {
+                var clipboardData = Clipboard.GetText();
+                if (string.IsNullOrWhiteSpace(clipboardData))
+                {
+                    return;
+                }
+
+                var item = itemParser.Parse(clipboardData);
+                if (string.IsNullOrWhiteSpace(item.ItemName))
+                {
+                    return;
+                }
+
+                var query = itemToQueryConverter.Convert(item);
+
+                var tab = CreateAndAddTab();
+                tab.QueryViewModel.SetQueryInfo(query);
+            }
+            catch (Exception ex)
+            {
+                Log.Instance.Error(ex);
+            }
+          
+        }
     }
 }

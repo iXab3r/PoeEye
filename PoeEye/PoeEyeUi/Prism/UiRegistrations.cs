@@ -4,14 +4,14 @@
 
     using Config;
 
+    using Converters;
+
     using MetroModels;
 
     using Microsoft.Practices.Unity;
 
-    using PoeEye.PoeTrade;
-
+    using PoeShared.Common;
     using PoeShared.PoeTrade;
-    using PoeShared.PoeTrade.Query;
 
     using PoeTrade.Models;
     using PoeTrade.ViewModels;
@@ -24,22 +24,22 @@
     {
         protected override void Initialize()
         {
-            Container.RegisterType<ImagesCache, ImagesCache>(new ContainerControlledLifetimeManager());
-            Container.RegisterType<IDialogCoordinator, DialogCoordinator>(new ContainerControlledLifetimeManager());
-            Container.RegisterType<IPoePriceCalculcator, PoePriceCalculcator>(new ContainerControlledLifetimeManager());
-            Container.RegisterType<IAudioNotificationsManager, AudioNotificationsManager>(new ContainerControlledLifetimeManager());
-            Container.RegisterType<ISuggestionProvider, FuzzySuggestionProvider>();
-
-            Container.RegisterType<IScheduler>(WellKnownSchedulers.Ui, new InjectionFactory(x => DispatcherScheduler.Current));
-            Container.RegisterType<IScheduler>(WellKnownSchedulers.Background, new InjectionFactory(x => TaskPoolScheduler.Default));
-
-            Container.RegisterType<IPoeEyeConfigProvider<IPoeEyeConfig>, PoeEyeConfigProviderFromFile>(new ContainerControlledLifetimeManager());
-            Container.RegisterType<IPoeEyeConfig>(new InjectionFactory(x => x.Resolve<IPoeEyeConfigProvider<IPoeEyeConfig>>().Load()));
+            Container
+                .RegisterType<ImagesCache, ImagesCache>(new ContainerControlledLifetimeManager())
+                .RegisterType<IPoePriceCalculcator, PoePriceCalculcator>(new ContainerControlledLifetimeManager())
+                .RegisterType<IAudioNotificationsManager, AudioNotificationsManager>(new ContainerControlledLifetimeManager())
+                .RegisterType<IConverter<IPoeItem, IPoeQueryInfo>, PoeItemToPoeQueryConverter>(new ContainerControlledLifetimeManager())
+                .RegisterType<IPoeEyeConfigProvider<IPoeEyeConfig>, PoeEyeConfigProviderFromFile>(new ContainerControlledLifetimeManager())
+                .RegisterType<IDialogCoordinator, DialogCoordinator>(new ContainerControlledLifetimeManager());
 
             Container
-                    .RegisterType<MainWindowViewModel, MainWindowViewModel>()
-                    .RegisterType<MainWindowTabViewModel, MainWindowTabViewModel>()
-                    .RegisterType<IPoeTradeViewModel, PoeTradeViewModel>();
+                .RegisterType<IScheduler>(WellKnownSchedulers.Ui, new InjectionFactory(x => DispatcherScheduler.Current))
+                .RegisterType<IScheduler>(WellKnownSchedulers.Background, new InjectionFactory(x => TaskPoolScheduler.Default));
+
+            Container
+                .RegisterType<IPoeTradeViewModel, PoeTradeViewModel>()
+                .RegisterType<ISuggestionProvider, FuzzySuggestionProvider>()
+                .RegisterType<IPoeEyeConfig>(new InjectionFactory(x => x.Resolve<IPoeEyeConfigProvider<IPoeEyeConfig>>().Load()));
         }
     }
 }
