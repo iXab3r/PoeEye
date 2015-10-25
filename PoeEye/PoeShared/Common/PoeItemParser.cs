@@ -95,7 +95,7 @@
 
         private static string PrepareString(string data)
         {
-            return data.Trim(' ', '\n', '\r', '\t');
+            return data.Trim(' ', '\t');
         }
 
         private static void TrimProperties<T>(T item)
