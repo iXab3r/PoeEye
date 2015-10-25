@@ -111,27 +111,27 @@
 
             <!-- Soekets -->
 
-            <Label Grid.Row="0" Grid.Column="0" Visibility="{Binding Socket1, Converter={StaticResource NullNotNullToVisibilityConverter}}">
+            <Label Grid.Row="0" Grid.Column="0" Visibility="{Binding Socket1, Converter={StaticResource NullToCollapsedConverter}}">
                 <Ellipse Tag="{Binding Socket1}" />
             </Label>
 
-            <Label Grid.Row="0" Grid.Column="1" Visibility="{Binding Socket2, Converter={StaticResource NullNotNullToVisibilityConverter}}">
+            <Label Grid.Row="0" Grid.Column="1" Visibility="{Binding Socket2, Converter={StaticResource NullToCollapsedConverter}}">
                 <Ellipse Tag="{Binding Socket2}" />
             </Label>
 
-            <Label Grid.Row="1" Grid.Column="1" Visibility="{Binding Socket3, Converter={StaticResource NullNotNullToVisibilityConverter}}">
+            <Label Grid.Row="1" Grid.Column="1" Visibility="{Binding Socket3, Converter={StaticResource NullToCollapsedConverter}}">
                 <Ellipse Tag="{Binding Socket3}" />
             </Label>
 
-            <Label Grid.Row="1" Grid.Column="0" Visibility="{Binding Socket4, Converter={StaticResource NullNotNullToVisibilityConverter}}">
+            <Label Grid.Row="1" Grid.Column="0" Visibility="{Binding Socket4, Converter={StaticResource NullToCollapsedConverter}}">
                 <Ellipse Tag="{Binding Socket4}"  />
             </Label>
 
-            <Label Grid.Row="2" Grid.Column="0" Visibility="{Binding Socket5, Converter={StaticResource NullNotNullToVisibilityConverter}}">
+            <Label Grid.Row="2" Grid.Column="0" Visibility="{Binding Socket5, Converter={StaticResource NullToCollapsedConverter}}">
                 <Ellipse Tag="{Binding Socket5}" />
             </Label>
 
-            <Label Grid.Row="2" Grid.Column="1" Visibility="{Binding Socket6, Converter={StaticResource NullNotNullToVisibilityConverter}}">
+            <Label Grid.Row="2" Grid.Column="1" Visibility="{Binding Socket6, Converter={StaticResource NullToCollapsedConverter}}">
                 <Ellipse Tag="{Binding Socket6}" />
             </Label>
 

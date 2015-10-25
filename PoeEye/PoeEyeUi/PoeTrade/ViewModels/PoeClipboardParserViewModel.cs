@@ -3,6 +3,7 @@
     using System;
     using System.Reactive.Concurrency;
     using System.Reactive.Linq;
+    using System.Threading;
     using System.Windows;
 
     using Factory;
@@ -58,12 +59,9 @@
             this.poeTradeViewModelFactory = poeTradeViewModelFactory;
             this.itemToQueryConverter = itemToQueryConverter;
 
-            this.WhenAnyValue(x => x.ItemFromClipboard)
-                .Subscribe(() => this.RaisePropertyChanged(nameof(ItemFromClipboard)))
-                .AddTo(Anchors);
-
-            this.WhenAnyValue(x => x.IsBusyInternal)
-                .Throttle(IsBusyThrottlingPeriod)
+            Observable.Merge(
+                this.WhenAnyValue(x => x.IsBusyInternal).Throttle(IsBusyThrottlingPeriod),
+                this.WhenAnyValue(x => x.IsOpen))
                 .Subscribe(() => this.RaisePropertyChanged(nameof(IsBusy)))
                 .AddTo(Anchors);
 
@@ -76,6 +74,7 @@
                 .Publish();
 
             textFromClipboard
+                .Do(_ => SetItemViewModel(null, null))
                 .Do(_ => IsBusyInternal = true)
                 .Do(_ => IsOpen = true)
                 .Select(clipboardContent => Observable.Start(() => ParseItemData(clipboardContent), bgScheduler).Catch<IPoeItem, Exception>(HandleException))
@@ -170,6 +169,7 @@
             else
             {
                 var trade = poeTradeViewModelFactory.Create(item);
+                trade.TradeState = PoeTradeState.Normal;
                 ItemFromClipboard = trade;
                 ItemQueryInfo = query;
             }

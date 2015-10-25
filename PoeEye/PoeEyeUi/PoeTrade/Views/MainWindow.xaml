@@ -89,7 +89,7 @@
 
                                         <Rectangle Grid.Column="0"
                                                    Height="20" Width="20" Margin="5"
-                                           Visibility="{Binding TradesListViewModel.LastUpdateException, Converter={StaticResource NullNotNullToVisibilityConverter}}"
+                                           Visibility="{Binding TradesListViewModel.LastUpdateException, Converter={StaticResource NullToCollapsedConverter}}"
                                            ToolTip="{Binding TradesListViewModel.LastUpdateException, Converter={StaticResource ExceptionToMessageConverter}}">
                                             <Rectangle.Fill>
                                                 <VisualBrush Stretch="Fill" Visual="{DynamicResource appbar_transit_hazard}"  />
@@ -104,7 +104,7 @@
                                                 Command="{Binding SearchCommand}"
                                                 Focusable="False"
                                                 CommandParameter="{Binding QueryViewModel.PoeQueryBuilder}" 
-                                                Visibility="{Binding TradesListViewModel.QueryInfo, Converter={StaticResource InvertedNullNotNullToVisibilityConverter}}">
+                                                Visibility="{Binding TradesListViewModel.QueryInfo, Converter={StaticResource NotNullToCollapsedConverter}}">
                                             <Rectangle Width="20" Height="20" 
                                                        Fill="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Button}}}">
                                                 <Rectangle.OpacityMask>
@@ -213,7 +213,7 @@
 
                 <TextBlock Grid.Column="1"  
                            Margin="10,0,0,0" 
-                           Visibility="{Binding SelectedItem.TradesListViewModel.QueryInfo, Converter={StaticResource NullNotNullToVisibilityConverter}}"
+                           Visibility="{Binding SelectedItem.TradesListViewModel.QueryInfo, Converter={StaticResource NullToCollapsedConverter}}"
                            Text="{Binding SelectedItem.TradesListViewModel.TimeSinceLastUpdate.TotalSeconds, Mode=OneWay, StringFormat='Elapsed since last update: {0:F0}s'}"/>
 
                 <Slider Grid.Column="2" 
@@ -294,7 +294,8 @@
 
                         <Button Grid.Column="1" Content="Import" 
                                 Command="{Binding CreateNewTabCommand}" 
-                                CommandParameter="{Binding ClipboardParserViewModel.ItemQueryInfo}">
+                                CommandParameter="{Binding ClipboardParserViewModel.ItemQueryInfo}"
+                                Margin="15">
                             <i:Interaction.Triggers>
                                 <i:EventTrigger EventName="Click">
                                     <utilities:SetPropertyAction PropertyName="IsOpen" TargetObject="{Binding ElementName=ClipboardFlyout}">

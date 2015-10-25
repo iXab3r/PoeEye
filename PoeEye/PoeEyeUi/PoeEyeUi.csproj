@@ -263,7 +263,7 @@
     <Compile Include="Converters\TimeSpanToHumanReadableStringConverter.cs" />
     <Compile Include="Converters\NullableConverter.cs" />
     <Compile Include="Converters\ExceptionToMessageConverter.cs" />
-    <Compile Include="Converters\NullNotNullToVisibilityConverter.cs" />
+    <Compile Include="Converters\NullToVisibilityConverter.cs" />
     <Compile Include="MetroModels\DialogParticipation.cs" />
     <Compile Include="MetroModels\DialogCoordinator.cs" />
     <Compile Include="MetroModels\IDialogCoordinator.cs" />
