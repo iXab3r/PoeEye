@@ -9,9 +9,9 @@
 
     using JetBrains.Annotations;
 
-    using PoeTrade.Query;
+    using PoeTrade;
 
-    public sealed class PoeItemParser : IPoeItemParser
+    internal sealed class PoeItemParser : IPoeItemParser
     {
         private const string BlocksSeparator = "--------";
 
@@ -19,13 +19,11 @@
         private readonly Regex linksRegex = new Regex(@"^\s*Sockets\:\s*(.*?)\s*$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         private readonly Regex itemLevelRegex = new Regex(@"^\s*Item Level\:\s*(.*?)\s*$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
-        private readonly PoeModInfo[] modsRegexes;
+        private readonly PoeModParser[] modsRegexes;
 
-        public PoeItemParser([NotNull] IPoeQueryInfoProvider queryInfoProvider)
+        public PoeItemParser([NotNull] IPoeModsProcessor modsProcessor)
         {
-            Guard.ArgumentNotNull(() => queryInfoProvider);
-
-            modsRegexes = PrepareModsInfo(queryInfoProvider);
+            modsRegexes = modsProcessor.GetKnownParsers();
         }
 
         public IPoeItem Parse(string serializedItem)
@@ -200,7 +198,7 @@
             return false;
         }
 
-        private IPoeItemMod ParseItemMod(string possibleModString, PoeModInfo[] mods)
+        private IPoeItemMod ParseItemMod(string possibleModString, PoeModParser[] mods)
         {
             foreach (var poeModInfo in mods)
             {
@@ -264,34 +262,6 @@
                 var newValue = currentValue.Trim();
                 propertyInfo.SetValue(item, newValue);
             }
-        }
-
-        private static PoeModInfo[] PrepareModsInfo(IPoeQueryInfoProvider provider)
-        {
-            var mods = provider.ModsList;
-            return mods.Select(PrepareModInfo).ToArray();
-        }
-
-        private static PoeModInfo PrepareModInfo(IPoeItemMod mod)
-        {
-            const string digitPlaceholder = "DIGITPLACEHOLDER";
-            var escapedRegexText = Regex.Escape(mod.CodeName.Replace("#", digitPlaceholder));
-            var regexText = "^" + escapedRegexText.Replace(digitPlaceholder, "(.*?)") + "$";
-            var regex = new Regex(regexText, RegexOptions.Compiled | RegexOptions.IgnoreCase);
-            return new PoeModInfo(mod, regex);
-        }
-
-        private struct PoeModInfo
-        {
-            public PoeModInfo(IPoeItemMod mod, Regex matchingRegex)
-            {
-                Mod = mod;
-                MatchingRegex = matchingRegex;
-            }
-
-            public IPoeItemMod Mod { get; }
-
-            public Regex MatchingRegex { get; }
         }
     }
 }

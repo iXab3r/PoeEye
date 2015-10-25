@@ -8,6 +8,7 @@
     using NUnit.Framework;
 
     using PoeShared.Common;
+    using PoeShared.PoeTrade;
     using PoeShared.PoeTrade.Query;
 
     using Shouldly;
@@ -395,6 +396,79 @@
                                                ModType = PoeModType.Implicit,
                                            },
                                        }));
+
+            yield return new TestCaseData(
+                @"Rarity: Unique
+                Lioneye's Remorse
+                Pinnacle Tower Shield
+                --------
+                Quality: +20% (augmented)
+                Chance to Block: 30% (augmented)
+                Armour: 1502 (augmented)
+                --------
+                Requirements:
+                Level: 70
+                Str: 159
+                Int: 68
+                --------
+                Sockets: R-R-R 
+                --------
+                Item Level: 70
+                --------
+                250% increased Armour
+                +83 to maximum Life
+                5% reduced Movement Speed
+                20% increased Stun Recovery
+                -25 Physical Damage taken from Projectile Attacks
+                +5% Chance to Block
+                --------
+                Marceus' unblemished shield is a testament
+                to his arrogance... and his fate.
+                ",
+                Mock.Of<IPoeItem>(x => x.Rarity == PoeItemRarity.Unique &&
+                                       x.ItemName == "Lioneye's Remorse" &&
+                                       x.Level == "70" &&
+                                       x.Requirements == "Level: 70 Str: 159 Int: 68" &&
+                                       x.Links == new PoeLinksInfo("R-R-R") &&
+                                       x.Mods == new[]
+                                       {
+                                           new PoeItemMod()
+                                           {
+                                               Name = @"250% increased Armour",
+                                               CodeName = @"#% increased Armour",
+                                               ModType = PoeModType.Explicit,
+                                           },
+                                           new PoeItemMod()
+                                           {
+                                               Name = @"+83 to maximum Life",
+                                               CodeName = @"+# to maximum Life",
+                                               ModType = PoeModType.Explicit,
+                                           },
+                                           new PoeItemMod()
+                                           {
+                                               Name = @"5% reduced Movement Speed",
+                                               CodeName = @"#% reduced Movement Speed",
+                                               ModType = PoeModType.Explicit,
+                                           },
+                                           new PoeItemMod()
+                                           {
+                                               Name = @"20% increased Stun Recovery",
+                                               CodeName = @"#% increased Stun Recovery",
+                                               ModType = PoeModType.Explicit,
+                                           },
+                                           new PoeItemMod()
+                                           {
+                                               Name = @"-25 Physical Damage taken from Projectile Attacks",
+                                               CodeName = @"-# Physical Damage taken from Projectile Attacks",
+                                               ModType = PoeModType.Explicit,
+                                           },
+                                           new PoeItemMod()
+                                           {
+                                               Name = @"+5% Chance to Block",
+                                               CodeName = @"+#% Chance to Block",
+                                               ModType = PoeModType.Explicit,
+                                           },
+                                       }));
         }
 
         [Test]
@@ -524,7 +598,7 @@
 
         private PoeItemParser CreateInstance()
         {
-            return new PoeItemParser(queryInfoProvider.Object);
+            return new PoeItemParser(new PoeModsProcessor(queryInfoProvider.Object));
         }
     }
 }

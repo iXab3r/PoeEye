@@ -259,7 +259,6 @@
     <Compile Include="Config\PoeEyeTabConfig.cs" />
     <Compile Include="Converters\NullToBoolConverter.cs" />
     <Compile Include="Converters\ObjectToLowercaseConverter.cs" />
-    <Compile Include="Converters\PoeItemToPoeQueryConverter.cs" />
     <Compile Include="Converters\TimeSpanToHumanReadableStringConverter.cs" />
     <Compile Include="Converters\NullableConverter.cs" />
     <Compile Include="Converters\ExceptionToMessageConverter.cs" />

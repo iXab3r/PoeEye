@@ -149,8 +149,12 @@
     <Compile Include="Common\PoeItemParser.cs" />
     <Compile Include="PoeTrade\IPoeApi.cs" />
     <Compile Include="PoeTrade\IPoeLiveHistoryProvider.cs" />
+    <Compile Include="PoeTrade\IPoeModsProcessor.cs" />
     <Compile Include="PoeTrade\IPoeQueryInfo.cs" />
     <Compile Include="PoeTrade\IPoeTradeParser.cs" />
+    <Compile Include="PoeTrade\PoeItemToPoeQueryConverter.cs" />
+    <Compile Include="PoeTrade\PoeModParser.cs" />
+    <Compile Include="PoeTrade\PoeModsProcessor.cs" />
     <Compile Include="PoeTrade\PoeQueryInfo.cs" />
     <Compile Include="PoeTrade\Query\IPoeQuery.cs" />
     <Compile Include="PoeTrade\Query\IPoeQueryFloatArgument.cs" />

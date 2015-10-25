@@ -4,19 +4,12 @@
 
     using Config;
 
-    using Converters;
-
     using MetroModels;
 
     using Microsoft.Practices.Unity;
 
-    using PoeShared.Common;
-    using PoeShared.PoeTrade;
-
     using PoeTrade.Models;
     using PoeTrade.ViewModels;
-
-    using TypeConverter;
 
     using WpfAutoCompleteControls.Editors;
 
@@ -28,7 +21,6 @@
                 .RegisterType<ImagesCache, ImagesCache>(new ContainerControlledLifetimeManager())
                 .RegisterType<IPoePriceCalculcator, PoePriceCalculcator>(new ContainerControlledLifetimeManager())
                 .RegisterType<IAudioNotificationsManager, AudioNotificationsManager>(new ContainerControlledLifetimeManager())
-                .RegisterType<IConverter<IPoeItem, IPoeQueryInfo>, PoeItemToPoeQueryConverter>(new ContainerControlledLifetimeManager())
                 .RegisterType<IPoeEyeConfigProvider<IPoeEyeConfig>, PoeEyeConfigProviderFromFile>(new ContainerControlledLifetimeManager())
                 .RegisterType<IDialogCoordinator, DialogCoordinator>(new ContainerControlledLifetimeManager());
 

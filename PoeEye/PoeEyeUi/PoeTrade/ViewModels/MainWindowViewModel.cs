@@ -106,6 +106,8 @@
                 .Changed.ToUnit()
                 .Merge(TabsList.ItemChanged.Where(x => x.PropertyName == nameof(MainWindowTabViewModel.RecheckTimeoutInSeconds)).ToUnit())
                 .Merge(TabsList.ItemChanged.Where(x => x.PropertyName == nameof(MainWindowTabViewModel.AudioNotificationEnabled)).ToUnit())
+                .Merge(this.WhenAnyValue(x => x.AudioNotificationsEnabled).ToUnit())
+                .Merge(clipboardParserViewModel.WhenAnyValue(x => x.MonitoringEnabled).ToUnit())
                 .Subscribe(configUpdateSubject)
                 .AddTo(Anchors);
 

@@ -1,30 +1,30 @@
-﻿namespace PoeEyeUi.Converters
+﻿namespace PoeShared.PoeTrade
 {
     using System;
     using System.Linq;
     using System.Text.RegularExpressions;
 
+    using Common;
+
     using Guards;
 
     using JetBrains.Annotations;
 
-    using PoeShared.Common;
-    using PoeShared.PoeTrade;
-    using PoeShared.PoeTrade.Query;
+    using Query;
 
     using TypeConverter;
 
     internal sealed class PoeItemToPoeQueryConverter : IConverter<IPoeItem, IPoeQueryInfo>
     {
-        private readonly PoeModInfo[] modsRegexes;
+        private readonly PoeModParser[] modsRegexes;
 
         private readonly float valueRangeModifier = 0.5f;
 
-        public PoeItemToPoeQueryConverter([NotNull] IPoeQueryInfoProvider queryInfoProvider)
+        public PoeItemToPoeQueryConverter([NotNull] IPoeModsProcessor modsProcessor)
         {
-            Guard.ArgumentNotNull(() => queryInfoProvider);
-            
-            modsRegexes = PrepareModsInfo(queryInfoProvider);
+            Guard.ArgumentNotNull(() => modsProcessor);
+
+            modsRegexes = modsProcessor.GetKnownParsers();
         }
 
         public IPoeQueryInfo Convert(IPoeItem value)
@@ -96,34 +96,6 @@
             }
 
             return result;
-        }
-
-        private static PoeModInfo[] PrepareModsInfo(IPoeQueryInfoProvider provider)
-        {
-            var mods = provider.ModsList;
-            return mods.Select(PrepareModInfo).ToArray();
-        }
-
-        private static PoeModInfo PrepareModInfo(IPoeItemMod mod)
-        {
-            const string digitPlaceholder = "DIGITPLACEHOLDER";
-            var escapedRegexText = Regex.Escape(mod.CodeName.Replace("#", digitPlaceholder));
-            var regexText = "^" + escapedRegexText.Replace(digitPlaceholder, "(.*?)") + "$";
-            var regex = new Regex(regexText, RegexOptions.Compiled | RegexOptions.IgnoreCase);
-            return new PoeModInfo(mod, regex);
-        }
-
-        private struct PoeModInfo
-        {
-            public PoeModInfo(IPoeItemMod mod, Regex matchingRegex)
-            {
-                Mod = mod;
-                MatchingRegex = matchingRegex;
-            }
-
-            public IPoeItemMod Mod { get; }
-
-            public Regex MatchingRegex { get; }
         }
     }
 }
