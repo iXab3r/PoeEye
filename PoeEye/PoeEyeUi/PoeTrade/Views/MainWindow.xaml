@@ -101,6 +101,7 @@
                                                 Width="40" Height="40"
                                                 HorizontalAlignment="Right"
                                                 Command="{Binding SearchCommand}"
+                                                Focusable="False"
                                                 CommandParameter="{Binding QueryViewModel.PoeQueryBuilder}" 
                                                 Visibility="{Binding TradesListViewModel.QueryInfo, Converter={StaticResource InvertedNullNotNullToVisibilityConverter}}">
                                             <Rectangle Width="20" Height="20" 
@@ -150,6 +151,7 @@
                                     <ToggleButton Width="40" Height="40"
                                                   Style="{DynamicResource MetroCircleToggleButtonStyle}"
                                                   ToolTip="Audio notifications for this tab"
+                                                  Focusable="False"
                                                   IsChecked="{Binding AudioNotificationEnabled}" >
                                         <Rectangle Width="20" Height="20" 
                                                    Fill="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ToggleButton}}}">

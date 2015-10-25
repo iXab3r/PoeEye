@@ -8,7 +8,7 @@
                     xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit">
     <DataTemplate DataType="{x:Type viewModels:MainWindowTabViewModel}">
         <Grid>
-            
+
             <Grid.Resources>
                 <CollectionViewSource x:Key='tradesListSource' 
                                       Source="{Binding TradesListViewModel.TradesList}"
@@ -21,7 +21,7 @@
 
                 </CollectionViewSource>
             </Grid.Resources>
-            
+
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
@@ -44,7 +44,7 @@
                     <StackPanel Orientation="Horizontal" Margin="10">
                         <TextBlock Text="Quick commands: " VerticalAlignment="Center"/>
                         <Button Content="Mark All as Read" Command="{Binding MarkAllAsRead}"/>
-                        
+
                         <StackPanel Margin="10,0,0,0" Orientation="Horizontal">
                             <TextBlock Text="Sorted by: " VerticalAlignment="Center"/>
                             <ItemsControl ItemsSource="{Binding Source={StaticResource tradesListSource}, Path=SortDescriptions}" 
@@ -60,7 +60,7 @@
                    Source="pack://application:,,,/Resources/mainIcon.png"
                    Opacity="0.2"/>
 
-                <ItemsControl
+                <ItemsControl Focusable="False" IsTabStop="False"
                           Margin="0,10,0,0" 
                           ItemsSource="{Binding Source={StaticResource tradesListSource}}"
                           Style="{StaticResource VirtualizedItemsControlStyle}">

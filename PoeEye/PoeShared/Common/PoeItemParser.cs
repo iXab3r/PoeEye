@@ -268,7 +268,7 @@
         {
             const string digitPlaceholder = "DIGITPLACEHOLDER";
             var escapedRegexText = Regex.Escape(mod.CodeName.Replace("#", digitPlaceholder));
-            var regexText = escapedRegexText.Replace(digitPlaceholder, "(.*?)");
+            var regexText = "^" + escapedRegexText.Replace(digitPlaceholder, "(.*?)") + "$";
             var regex = new Regex(regexText, RegexOptions.Compiled | RegexOptions.IgnoreCase);
             return new PoeModInfo(mod, regex);
         }

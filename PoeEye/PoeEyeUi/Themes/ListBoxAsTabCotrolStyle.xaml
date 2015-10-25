@@ -12,6 +12,8 @@
                 Value="{Binding VerticalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}" />
         <Setter Property="BorderThickness"
                 Value="0" />
+        <Setter Property="IsTabStop"
+                Value="False" />
         <Setter Property="MinHeight"
                 Value="25" />
         <Setter Property="Margin"
