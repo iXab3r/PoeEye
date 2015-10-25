@@ -7,7 +7,6 @@
     using System.Reactive.Linq;
     using System.Reactive.Subjects;
     using System.Reflection;
-    using System.Windows;
     using System.Windows.Input;
 
     using Config;
@@ -25,7 +24,6 @@
     using Models;
 
     using PoeShared;
-    using PoeShared.Common;
     using PoeShared.PoeTrade;
     using PoeShared.Utilities;
 
@@ -33,22 +31,20 @@
 
     using ReactiveUI;
 
-    using TypeConverter;
-
     internal sealed class MainWindowViewModel : DisposableReactiveObject
     {
         private static readonly TimeSpan CheckForUpdatesTimeout = TimeSpan.FromSeconds(600);
         private static readonly TimeSpan ConfigSaveSampingTimeout = TimeSpan.FromSeconds(30);
 
         private readonly ReactiveCommand<object> closeTabCommand;
+
+        private readonly ISubject<Unit> configUpdateSubject = new Subject<Unit>();
         private readonly ReactiveCommand<object> createNewTabCommand;
         private readonly IPoeEyeConfigProvider<IPoeEyeConfig> poeEyeConfigProvider;
 
         private readonly IFactory<MainWindowTabViewModel> tabFactory;
 
         private bool audioNotificationsEnabled = true;
-
-        private readonly ISubject<Unit> configUpdateSubject = new Subject<Unit>();
 
         private bool isMainWindowActive;
 
@@ -121,7 +117,7 @@
             Observable
                 .Timer(DateTimeOffset.Now, CheckForUpdatesTimeout, TaskPoolScheduler.Default)
                 .ObserveOn(uiScheduler)
-                .Subscribe(() => applicationUpdaterViewModel.CheckForUpdatesCommand.Execute(this), Log.HandleException); 
+                .Subscribe(() => applicationUpdaterViewModel.CheckForUpdatesCommand.Execute(this), Log.HandleException);
         }
 
         public ICommand CreateNewTabCommand => createNewTabCommand;
@@ -192,12 +188,16 @@
             Log.Instance.Debug($"[MainWindowViewModel.SaveConfig] Saving config (provider: {poeEyeConfigProvider})...\r\nTabs count: {TabsList.Count}");
 
             var config = new PoeEyeConfig();
-            config.TabConfigs = TabsList.Select(tab => new PoeEyeTabConfig
-            {
-                RecheckTimeout = tab.TradesListViewModel.RecheckTimeout,
-                QueryInfo = tab.TradesListViewModel.QueryInfo,
-                AudioNotificationEnabled = tab.AudioNotificationEnabled,
-            }).ToArray();
+            config.TabConfigs = TabsList.Select(
+                tab => new PoeEyeTabConfig
+                {
+                    RecheckTimeout = tab.TradesListViewModel.RecheckTimeout,
+                    QueryInfo = tab.TradesListViewModel.QueryInfo,
+                    AudioNotificationEnabled = tab.AudioNotificationEnabled
+                }).ToArray();
+
+            config.AudioNotificationsEnabled = AudioNotificationsEnabled;
+            config.ClipboardMonitoringEnabled = ClipboardParserViewModel.MonitoringEnabled;
 
             poeEyeConfigProvider.Save(config);
         }
@@ -225,6 +225,9 @@
 
                 tab.AudioNotificationEnabled = tabConfig.AudioNotificationEnabled;
             }
+
+            this.audioNotificationsEnabled = config.AudioNotificationsEnabled;
+            this.ClipboardParserViewModel.MonitoringEnabled = config.ClipboardMonitoringEnabled;
 
             Log.Instance.Debug($"[MainWindowViewModel.LoadConfig] Sucessfully loaded config\r\nTabs count: {TabsList.Count}");
         }

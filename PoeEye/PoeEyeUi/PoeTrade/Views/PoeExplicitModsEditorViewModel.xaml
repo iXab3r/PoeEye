@@ -23,10 +23,11 @@
                             <ContentControl Grid.Column="0"
                                             Content="{Binding}" />
                             <Button Grid.Column="1"
+                                    Focusable="False"
                                     Content="Remove" 
                                     Command="{Binding ElementName=PoeExplicitModsEditorViewModelGrid, Path=DataContext.RemoveModCommand}"
                                     CommandParameter="{Binding}"
-                                    Height="20"/>
+                                    Height="28"/>
                         </Grid>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
@@ -34,6 +35,7 @@
             </ItemsControl>
 
             <Button Grid.Column="1" 
+                    Focusable="False"
                     Margin="5"
                     Command="{Binding AddModCommand}" Content="Add" />
         </Grid>

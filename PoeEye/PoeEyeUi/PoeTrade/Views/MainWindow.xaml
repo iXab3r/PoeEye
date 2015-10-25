@@ -258,7 +258,15 @@
                     IsEnabled="{Binding ApplicationUpdater.IsBusy, Converter={StaticResource InvertedBoolToVisibilityConverter}}"
                     Content="Check for updates" />
 
-                <StackPanel Orientation="Horizontal" Height="24">
+                <StackPanel Orientation="Horizontal" Height="24" Margin="5,0">
+                    <TextBlock Text="Clipboard monitoring:" VerticalAlignment="Center"/>
+                    <CheckBox Height="16" Width="16" Opacity="0.5" Margin="5,0,0,0"
+                              VerticalAlignment="Center" VerticalContentAlignment="Center"
+                              ToolTip="Enable clipboard monitoring" 
+                              IsChecked="{Binding ClipboardParserViewModel.MonitoringEnabled}"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Height="24" Margin="5,0">
                     <TextBlock Text="Audio:" VerticalAlignment="Center"/>
                     <CheckBox Height="16" Width="16" Opacity="0.5" Margin="5,0,0,0"
                               VerticalAlignment="Center" VerticalContentAlignment="Center"

@@ -9,6 +9,7 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="auto"/>
             </Grid.ColumnDefinitions>
 
             <editors:AutoCompleteTextBox  Grid.Column="0"
@@ -22,6 +23,14 @@
                 <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}" Value="{Binding Min, Converter={StaticResource NullableConverter}}"/>
                 <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}" Value="{Binding Max, Converter={StaticResource NullableConverter}}"/>
             </StackPanel>
+
+            <Button Grid.Column="2"
+                    Content="Clear" 
+                    Width="85"
+                    Margin="5,0"
+                    Focusable="False"
+                    Command="{Binding ResetCommand}"
+                    Height="28"/>
         </Grid>
     </DataTemplate>
 </ResourceDictionary>

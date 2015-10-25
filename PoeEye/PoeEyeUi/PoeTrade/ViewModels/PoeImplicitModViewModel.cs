@@ -1,6 +1,7 @@
 ﻿namespace PoeEyeUi.PoeTrade.ViewModels
 {
     using System.Linq;
+    using System.Windows.Input;
 
     using Factory;
 
@@ -26,6 +27,8 @@
 
         private string selectedMod;
 
+        private readonly ReactiveCommand<object> resetCommand; 
+
         public PoeImplicitModViewModel(
                 [NotNull] IPoeQueryInfoProvider queryInfoProvider,
                 [NotNull] IFactory<ISuggestionProvider, string[]> suggestionProviderFactory)
@@ -38,11 +41,16 @@
                 .Select(x => x.Name)
                 .ToArray();
             SuggestionProvider = suggestionProviderFactory.Create(KnownMods);
+
+            resetCommand = ReactiveCommand.Create();
+            resetCommand.Subscribe(Reset).AddTo(Anchors);
         }
 
         public string[] KnownMods { get; }
 
         public ISuggestionProvider SuggestionProvider { get; }
+
+        public ICommand ResetCommand => resetCommand;
 
         public string SelectedMod
         {
@@ -60,6 +68,12 @@
         {
             get { return max; }
             set { this.RaiseAndSetIfChanged(ref max, value); }
+        }
+
+        public void Reset()
+        {
+            SelectedMod = null;
+            Min = Max = null;
         }
     }
 }

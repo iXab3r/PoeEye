@@ -37,5 +37,9 @@ namespace PoeEyeUi.Config
             get { return currenciesPriceInChaos; }
             set { currenciesPriceInChaos = value ?? DefaultCurrenciesPriceInChaos; }
         }
+
+        public bool ClipboardMonitoringEnabled { get; set; } = true;
+
+        public bool AudioNotificationsEnabled { get; set; } = true;
     }
 }

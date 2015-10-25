@@ -3,7 +3,6 @@
     using System;
     using System.Reactive.Concurrency;
     using System.Reactive.Linq;
-    using System.Threading;
     using System.Windows;
     using System.Windows.Input;
 
@@ -42,7 +41,9 @@
 
         private IPoeTradeViewModel itemFromClipboard;
         private IPoeQueryInfo itemQueryInfo;
-        private ReactiveCommand<object> parseClipboard; 
+
+        private bool monitoringEnabled;
+        private readonly ReactiveCommand<object> parseClipboard;
 
         public PoeClipboardParserViewModel(
             [NotNull] IPoeItemParser itemParser,
@@ -61,9 +62,7 @@
             this.poeTradeViewModelFactory = poeTradeViewModelFactory;
             this.itemToQueryConverter = itemToQueryConverter;
 
-            Observable.Merge(
-                this.WhenAnyValue(x => x.IsBusyInternal).Throttle(IsBusyThrottlingPeriod),
-                this.WhenAnyValue(x => x.IsOpen))
+            this.WhenAnyValue(x => x.IsBusyInternal).Throttle(IsBusyThrottlingPeriod).Merge(this.WhenAnyValue(x => x.IsOpen))
                 .Subscribe(() => this.RaisePropertyChanged(nameof(IsBusy)))
                 .AddTo(Anchors);
 
@@ -73,6 +72,7 @@
                 .FromEventPattern<EventHandler, EventArgs>(
                     h => ClipboardNotifications.ClipboardUpdate += h,
                     h => ClipboardNotifications.ClipboardUpdate -= h)
+                .Where(x => monitoringEnabled)
                 .Merge(parseClipboard)
                 .Select(x => GetTextFromClipboard())
                 .Where(x => !string.IsNullOrWhiteSpace(x))
@@ -114,6 +114,12 @@
         public bool IsBusy => IsBusyInternal;
 
         public ICommand ParseClipboard => parseClipboard;
+
+        public bool MonitoringEnabled
+        {
+            get { return monitoringEnabled; }
+            set { this.RaiseAndSetIfChanged(ref monitoringEnabled, value); }
+        }
 
         private bool IsBusyInternal
         {
