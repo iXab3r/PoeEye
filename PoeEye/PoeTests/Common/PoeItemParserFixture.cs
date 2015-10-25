@@ -1,6 +1,7 @@
 ﻿namespace PoeEye.Tests.Common
 {
     using System.Collections.Generic;
+    using System.Linq;
 
     using Moq;
 
@@ -14,81 +15,7 @@
     [TestFixture]
     public class PoeItemParserFixture
     {
-        [SetUp]
-        public void SetUp()
-        {
-        }
-
-        [Test]
-        [TestCase("")]
-        [TestCase("RNGSTR")]
-        public void ShouldReturnNullNameOnUnexpectedInput(string data)
-        {
-            //Given
-            var instance = CreateInstance();
-
-            //When
-            var result = instance.Parse(data);
-
-            //Then
-            result.ItemName.ShouldBe(null);
-        }
-
-        [Test]
-        [TestCaseSource(nameof(KnownItems))]
-        public void ShouldParseItemName(string data, IPoeItem expectedItem)
-        {
-            //Given
-            var instance = CreateInstance();
-
-            //When
-            var result = instance.Parse(data);
-
-            //Then
-            result.ItemName.ShouldBe(expectedItem.ItemName);
-        }
-
-        [Test]
-        [TestCaseSource(nameof(KnownItems))]
-        public void ShouldParseIsCorrupted(string data, IPoeItem expectedItem)
-        {
-            //Given
-            var instance = CreateInstance();
-
-            //When
-            var result = instance.Parse(data);
-
-            //Then
-            result.IsCorrupted.ShouldBe(expectedItem.IsCorrupted);
-        }
-
-        [Test]
-        [TestCaseSource(nameof(KnownItems))]
-        public void ShouldParseLinks(string data, IPoeItem expectedItem)
-        {
-            //Given
-            var instance = CreateInstance();
-
-            //When
-            var result = instance.Parse(data);
-
-            //Then
-            result.Links.ShouldBe(expectedItem.Links);
-        }
-
-        [Test]
-        [TestCaseSource(nameof(KnownItems))]
-        public void ShouldParseRarity(string data, IPoeItem expectedItem)
-        {
-            //Given
-            var instance = CreateInstance();
-
-            //When
-            var result = instance.Parse(data);
-
-            //Then
-            result.Rarity.ShouldBe(expectedItem.Rarity);
-        }
+        private Mock<IPoeQueryInfoProvider> queryInfoProvider = new Mock<IPoeQueryInfoProvider>();
 
         private IEnumerable<TestCaseData> KnownItems()
         {
@@ -119,13 +46,54 @@
                   63% increased Armour and Evasion
                   --------
                   Has Infernal Gloves",
-                Mock.Of<IPoeItem>(x => x.Rarity == PoeItemRarity.Rare && 
-                                       x.ItemName == "Gloom Nails" &&
-                                       x.Quality == "1%" &&
-                                       x.Links == new PoeLinksInfo("B-R-B-R")));
+                Mock.Of<IPoeItem>(
+                    x => x.Rarity == PoeItemRarity.Rare &&
+                         x.ItemName == "Gloom Nails" &&
+                         x.Quality == "1%" &&
+                         x.Requirements == "Level: 70 Str: 155 Dex: 38 Int: 111" &&
+                         x.Links == new PoeLinksInfo("B-R-B-R") &&
+                         x.Mods == new[]
+                                       {
+                                           new PoeItemMod()
+                                           {
+                                               Name = @"Adds 1-5 Lightning Damage to Attacks",
+                                               CodeName = @"Adds #-# Lightning Damage to Attacks",
+                                               ModType = PoeModType.Explicit,
+                                           },
+                                           new PoeItemMod()
+                                           {
+                                               Name = @"+64 to maximum Life",
+                                               CodeName = @"+# to maximum Life",
+                                               ModType = PoeModType.Explicit,
+                                           },
+                                           new PoeItemMod()
+                                           {
+                                               Name = @"+39% to Fire Resistance",
+                                               CodeName = @"+#% to Fire Resistance",
+                                               ModType = PoeModType.Explicit,
+                                           },
+                                           new PoeItemMod()
+                                           {
+                                               Name = @"+42% to Cold Resistance",
+                                               CodeName = @"+#% to Cold Resistance",
+                                               ModType = PoeModType.Explicit,
+                                           },
+                                           new PoeItemMod()
+                                           {
+                                               Name = @"+25% to Chaos Resistance",
+                                               CodeName = @"+#% to Chaos Resistance",
+                                               ModType = PoeModType.Explicit,
+                                           },
+                                           new PoeItemMod()
+                                           {
+                                               Name = @"63% increased Armour and Evasion",
+                                               CodeName = @"#% increased Armour and Evasion",
+                                               ModType = PoeModType.Explicit,
+                                           },
+                                       }));
 
             yield return new TestCaseData(
-                 @"Rarity: Gem
+                @"Rarity: Gem
                   Vengeance
                   --------
                   Trigger, Attack, AoE, Melee
@@ -144,11 +112,34 @@
                   You cannot use this Attack directly
                   --------
                   Place into an item socket of the right colour to gain this skill. Right click to remove from a socket.",
-                Mock.Of<IPoeItem>(x => x.ItemName == "Vengeance" &&
-                                       x.Quality == "14% (augmented)"));
+                Mock.Of<IPoeItem>(
+                    x => x.ItemName == "Vengeance" &&
+                         x.Requirements == "Level: 24 Str: 58" &&
+                         x.Quality == "14% (augmented)" &&
+                         x.Mods == new[]
+                                       {
+                                           new PoeItemMod()
+                                           {
+                                               Name = @"Deals 75% of Base Attack Damage",
+                                               CodeName = @"Deals #% of Base Attack Damage",
+                                               ModType = PoeModType.Explicit,
+                                           },
+                                           new PoeItemMod()
+                                           {
+                                               Name = @"37% chance to Counterattack with this Skill when Hit",
+                                               CodeName = @"#% chance to Counterattack with this Skill when Hit",
+                                               ModType = PoeModType.Explicit,
+                                           },
+                                           new PoeItemMod()
+                                           {
+                                               Name = @"You cannot use this Attack directly",
+                                               CodeName = @"You cannot use this Attack directly",
+                                               ModType = PoeModType.Explicit,
+                                           },
+                                       }));
 
             yield return new TestCaseData(
-                  @"Rarity: Unique
+                @"Rarity: Unique
                   Lightning Coil
                   Desert Brigandine
                   --------
@@ -177,13 +168,48 @@
                   - Malachai the Soulless.
                   --------
                   Has Infernal Body Armour",
-                Mock.Of<IPoeItem>(x => x.Rarity == PoeItemRarity.Unique && 
-                                       x.ItemName == "Lightning Coil" &&
-                                       x.Quality == "20% (augmented)" &&
-                                       x.Links == new PoeLinksInfo("B-B-B-R-G G")));
+                Mock.Of<IPoeItem>(
+                    x => x.Rarity == PoeItemRarity.Unique &&
+                         x.ItemName == "Lightning Coil" &&
+                         x.Quality == "20% (augmented)" &&
+                         x.Requirements == "Level: 70 Str: 108 Dex: 111 Int: 155" &&
+                         x.Links == new PoeLinksInfo("B-B-B-R-G G") &&
+                         x.Mods == new[]
+                                       {
+                                           new PoeItemMod()
+                                           {
+                                               Name = @"Adds 1-30 Lightning Damage to Attacks",
+                                               CodeName = @"Adds #-# Lightning Damage to Attacks",
+                                               ModType = PoeModType.Explicit,
+                                           },
+                                           new PoeItemMod()
+                                           {
+                                               Name = @"107% increased Armour and Evasion",
+                                               CodeName = @"#% increased Armour and Evasion",
+                                               ModType = PoeModType.Explicit,
+                                           },
+                                           new PoeItemMod()
+                                           {
+                                               Name = @"+63 to maximum Life",
+                                               CodeName = @"+# to maximum Life",
+                                               ModType = PoeModType.Explicit,
+                                           },
+                                           new PoeItemMod()
+                                           {
+                                               Name = @"-60% to Lightning Resistance",
+                                               CodeName = @"-#% to Lightning Resistance",
+                                               ModType = PoeModType.Explicit,
+                                           },
+                                           new PoeItemMod()
+                                           {
+                                               Name = @"30% of Physical Damage taken as Lightning Damage",
+                                               CodeName = @"#% of Physical Damage taken as Lightning Damage",
+                                               ModType = PoeModType.Explicit,
+                                           },
+                                       }));
 
             yield return new TestCaseData(
-               @"Rarity: Rare
+                @"Rarity: Rare
                 Torment Veil
                 Spidersilk Robe
                 --------
@@ -205,10 +231,12 @@
                 +22% to Chaos Resistance
                 --------
                 Corrupted",
-               Mock.Of<IPoeItem>(x => x.Rarity == PoeItemRarity.Rare && 
-                                      x.ItemName == "Torment Veil" &&
-                                      x.Links == new PoeLinksInfo("R-B-B-R-B-G") &&
-                                      x.IsCorrupted == true));
+                Mock.Of<IPoeItem>(
+                    x => x.Rarity == PoeItemRarity.Rare &&
+                         x.ItemName == "Torment Veil" &&
+                         x.Requirements == "Level: 49 Int: 134" &&
+                         x.Links == new PoeLinksInfo("R-B-B-R-B-G") &&
+                         x.IsCorrupted));
 
             yield return new TestCaseData(
                 @"Rarity: Normal
@@ -219,7 +247,9 @@
                 Only those who aspire can dare to hope.
                 --------
                 Can be used in the Eternal Laboratory or a personal Map Device.",
-               Mock.Of<IPoeItem>(x => x.Rarity == PoeItemRarity.Normal && x.ItemName == "Sacrifice at Dawn"));
+                Mock.Of<IPoeItem>(
+                    x => x.Rarity == PoeItemRarity.Normal &&
+                         x.ItemName == "Sacrifice at Dawn"));
 
             yield return new TestCaseData(
                 @"Rarity: Normal
@@ -231,12 +261,61 @@
                 --------
                 The house always wins.
                 --------
-
                 Shift click to unstack.",
-               Mock.Of<IPoeItem>(x => x.Rarity == PoeItemRarity.Normal && x.ItemName == "Emperor's Luck"));
+                Mock.Of<IPoeItem>(
+                    x => x.Rarity == PoeItemRarity.Normal &&
+                         x.ItemName == "Emperor's Luck"));
 
             yield return new TestCaseData(
-                  @"Rarity: Magic
+                @"Rarity: Rare
+                Corruption Clasp
+                Agate Amulet
+                --------
+                Requirements:
+                Level: 28
+                --------
+                Item Level: 44
+                --------
+                +19 to Strength and Intelligence
+                --------
+                17% increased Fire Damage
+                10% increased Global Critical Strike Chance
+                -6 to Mana Cost of Skills",
+                Mock.Of<IPoeItem>(
+                    x => x.Rarity == PoeItemRarity.Rare &&
+                         x.ItemName == "Corruption Clasp" &&
+                         x.Requirements == "Level: 28" &&
+                         x.Level == "44" &&
+                         x.Mods == new[]
+                                       {
+                                           new PoeItemMod()
+                                           {
+                                               Name = @"+19 to Strength and Intelligence",
+                                               CodeName = @"+# to Strength and Intelligence",
+                                               ModType = PoeModType.Implicit,
+                                           },
+                                           new PoeItemMod()
+                                           {
+                                               Name = @"17% increased Fire Damage",
+                                               CodeName = @"#% increased Fire Damage",
+                                               ModType = PoeModType.Explicit,
+                                           },
+                                           new PoeItemMod()
+                                           {
+                                               Name = @"10% increased Global Critical Strike Chance",
+                                               CodeName = @"#% increased Global Critical Strike Chance",
+                                               ModType = PoeModType.Explicit,
+                                           },
+                                           new PoeItemMod()
+                                           {
+                                               Name = @"-6 to Mana Cost of Skills",
+                                               CodeName = @"-# to Mana Cost of Skills",
+                                               ModType = PoeModType.Explicit,
+                                           },
+                                       }));
+
+            yield return new TestCaseData(
+                @"Rarity: Magic
                 Perpetual Ruby Flask of Heat
                 --------
                 Quality: +20% (augmented)
@@ -256,12 +335,35 @@
                 Removes Freeze and Chill on use
                 --------
                 Right click to drink. Can only hold charges while in belt. Refills as you kill monsters.",
-               Mock.Of<IPoeItem>(x => x.Rarity == PoeItemRarity.Magic && 
-                                      x.ItemName == "Perpetual Ruby Flask of Heat" && 
-                                      x.Quality == "20% (augmented)"));
+                Mock.Of<IPoeItem>(
+                    x => x.Rarity == PoeItemRarity.Magic &&
+                         x.Requirements == "Level: 18" &&
+                         x.ItemName == "Perpetual Ruby Flask of Heat" &&
+                         x.Quality == "20% (augmented)" &&
+                         x.Mods == new[]
+                                       {
+                                           new PoeItemMod()
+                                           {
+                                               Name = @"27% increased Charge Recovery",
+                                               CodeName = @"#% increased Charge Recovery",
+                                               ModType = PoeModType.Explicit,
+                                           },
+                                           new PoeItemMod()
+                                           {
+                                               Name = @"Immunity to Freeze and Chill during flask effect",
+                                               CodeName = @"Immunity to Freeze and Chill during flask effect",
+                                               ModType = PoeModType.Explicit,
+                                           },
+                                           new PoeItemMod()
+                                           {
+                                               Name = @"Removes Freeze and Chill on use",
+                                               CodeName = @"Removes Freeze and Chill on use",
+                                               ModType = PoeModType.Explicit,
+                                           },
+                                       }));
 
             yield return new TestCaseData(
-                  @"Rarity: Currency
+                @"Rarity: Currency
                   Jeweller's Orb
                   --------
                   Stack Size: 5/20
@@ -270,7 +372,7 @@
                   --------
                   Right click this item then left click a socketed item to apply it. The item's quality value is consumed to increase the chances of obtaining more sockets.
                   Shift click to unstack.",
-               Mock.Of<IPoeItem>(x => x.ItemName == "Jeweller's Orb"));
+                Mock.Of<IPoeItem>(x => x.ItemName == "Jeweller's Orb"));
 
             yield return new TestCaseData(
                 @"Rarity: Rare
@@ -281,12 +383,128 @@
                   +14% to Fire and Cold Resistances
                   --------
                   Unidentified",
-               Mock.Of<IPoeItem>(x => x.Rarity == PoeItemRarity.Rare && x.ItemName == "Two-Stone Ring"));
+                Mock.Of<IPoeItem>(x => x.Rarity == PoeItemRarity.Rare &&
+                                       x.ItemName == "Two-Stone Ring" &&
+                                       x.Level == "74" &&
+                                       x.Mods == new[]
+                                       {
+                                           new PoeItemMod()
+                                           {
+                                               Name = @"+14% to Fire and Cold Resistances",
+                                               CodeName = @"+#% to Fire and Cold Resistances",
+                                               ModType = PoeModType.Implicit,
+                                           },
+                                       }));
+        }
+
+        [Test]
+        [TestCaseSource(nameof(KnownItems))]
+        public void ShouldParseIsCorrupted(string data, IPoeItem expectedItem)
+        {
+            //Given
+            var instance = CreateInstance();
+
+            //When
+            var result = instance.Parse(data);
+
+            //Then
+            result.IsCorrupted.ShouldBe(expectedItem.IsCorrupted);
+        }
+
+        [Test]
+        [TestCaseSource(nameof(KnownItems))]
+        public void ShouldParseItemName(string data, IPoeItem expectedItem)
+        {
+            //Given
+            var instance = CreateInstance();
+
+            //When
+            var result = instance.Parse(data);
+
+            //Then
+            result.ItemName.ShouldBe(expectedItem.ItemName);
+        }
+
+        [Test]
+        [TestCaseSource(nameof(KnownItems))]
+        public void ShouldParseLinks(string data, IPoeItem expectedItem)
+        {
+            //Given
+            var instance = CreateInstance();
+
+            //When
+            var result = instance.Parse(data);
+
+            //Then
+            result.Links.ShouldBe(expectedItem.Links);
+        }
+
+        [Test]
+        [TestCaseSource(nameof(KnownItems))]
+        public void ShouldParseRarity(string data, IPoeItem expectedItem)
+        {
+            //Given
+            var instance = CreateInstance();
+
+            //When
+            var result = instance.Parse(data);
+
+            //Then
+            result.Rarity.ShouldBe(expectedItem.Rarity);
+        }
+
+        [Test]
+        [TestCaseSource(nameof(KnownItems))]
+        public void ShouldParseRequirements(string data, IPoeItem expectedItem)
+        {
+            //Given
+            var instance = CreateInstance();
+
+            //When
+            var result = instance.Parse(data);
+
+            //Then
+            result.Requirements.ShouldBe(expectedItem.Requirements);
+        }
+
+        [Test]
+        [TestCaseSource(nameof(KnownItems))]
+        public void ShouldParseImplicitMods(string data, IPoeItem expectedItem)
+        {
+            //Given
+            var modsList = expectedItem.Mods.Where(x => x.ModType == PoeModType.Implicit).ToArray();
+            queryInfoProvider.SetupGet(x => x.ModsList).Returns(modsList);
+
+            var instance = CreateInstance();
+
+            //When
+            var result = instance.Parse(data);
+
+            //Then
+            var exprectedImplicitMods = expectedItem.Mods.Where(x => x.ModType == PoeModType.Implicit).ToArray();
+            var resultMods = result.Mods.Where(x => x.ModType == PoeModType.Implicit).ToArray();
+
+            CollectionAssert.AreEqual(exprectedImplicitMods, resultMods, new PoeItemModEqualityComparer());
+        }
+
+        [Test]
+        [TestCase("")]
+        [TestCase("RNGSTR")]
+        public void ShouldReturnNullNameOnUnexpectedInput(string data)
+        {
+            //Given
+            var instance = CreateInstance();
+
+            //When
+            var result = instance.Parse(data);
+
+            //Then
+            result.ItemName.ShouldBe(null);
         }
 
         private PoeItemParser CreateInstance()
         {
-            return new PoeItemParser(Mock.Of<IPoeQueryInfoProvider>());
+            return new PoeItemParser(queryInfoProvider.Object);
         }
     }
 }

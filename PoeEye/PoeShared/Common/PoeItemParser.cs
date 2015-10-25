@@ -17,17 +17,18 @@
 
         private readonly Regex rarityRegex = new Regex(@"^\s*Rarity\:\s*(.*?)\s*$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         private readonly Regex linksRegex = new Regex(@"^\s*Sockets\:\s*(.*?)\s*$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private readonly Regex itemLevelRegex = new Regex(@"^\s*Item Level\:\s*(.*?)\s*$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
-        private readonly IPoeQueryInfoProvider queryInfoProvider;
+        private readonly PoeModInfo[] modsRegexes;
 
         public PoeItemParser([NotNull] IPoeQueryInfoProvider queryInfoProvider)
         {
             Guard.ArgumentNotNull(() => queryInfoProvider);
-            
-            this.queryInfoProvider = queryInfoProvider;
+
+            modsRegexes = PrepareModsInfo(queryInfoProvider);
         }
 
-        public IPoeItem Parse([NotNull] string serializedItem)
+        public IPoeItem Parse(string serializedItem)
         {
             Guard.ArgumentNotNull(() => serializedItem);
 
@@ -35,7 +36,11 @@
             {
                 ParseItemRarityAndName,
                 ParseItemCorruptionState,
-                ParseItemLinks
+                ParseRequirements,
+                ParseItemLinks,
+                ParseItemLevel,
+                ParseItemImplicitMods,
+                ParseItemExplicitMods,
             };
 
             var result = new PoeItem();
@@ -43,15 +48,20 @@
             var itemBlocks = SplitToBlocks(serializedItem);
             foreach (var block in itemBlocks)
             {
-                var parsersToRemove = blockParsers
-                    .Select(x => new { Parser = x, IsMatch = x(block, result) })
-                    .Where(x => x.IsMatch)
-                    .Select(x => x.Parser)
-                    .ToArray();
+                var matchedParser = blockParsers.FirstOrDefault(x => x(block, result));
 
-                foreach (var parser in parsersToRemove)
+                if (matchedParser == null)
                 {
-                    blockParsers.Remove(parser);
+                    continue;
+                }
+
+                foreach (var parser in blockParsers.ToArray())
+                {
+                    blockParsers.Remove(matchedParser);
+                    if (parser == matchedParser)
+                    {
+                        break;
+                    }
                 }
             }
 
@@ -106,6 +116,81 @@
             return true;
         }
 
+        private bool ParseRequirements(string block, PoeItem item)
+        {
+            var splittedBlock = SplitToStrings(block);
+
+            if (splittedBlock.Length < 2)
+            {
+                return false;
+            }
+
+            if (splittedBlock[0].IndexOf("Requirements:", StringComparison.OrdinalIgnoreCase) < 0)
+            {
+                return false;
+            }
+
+            item.Requirements = string.Join(" ", splittedBlock.Skip(1));
+
+            return true;
+        }
+
+        private bool ParseItemLevel(string block, PoeItem item)
+        {
+            var itemLevelMatch = itemLevelRegex.Match(block);
+            if (!itemLevelMatch.Success)
+            {
+                return false;
+            }
+            item.Level = itemLevelMatch.Groups[1].Value;
+            return true;
+        }
+
+        private bool ParseItemImplicitMods(string block, PoeItem item)
+        {
+            var splittedBlock = SplitToStrings(block);
+
+            if (splittedBlock.Length != 1)
+            {
+                return false;
+            }
+
+            var implicitMods = modsRegexes.Where(x => x.Mod.ModType == PoeModType.Implicit).ToArray();
+
+            var possibleModString = splittedBlock[0];
+            foreach (var poeModInfo in implicitMods)
+            {
+                var match = poeModInfo.MatchingRegex.Match(possibleModString);
+                if (!match.Success)
+                {
+                    continue;
+                }
+
+                var mod = new PoeItemMod()
+                {
+                    ModType = PoeModType.Implicit,
+                    CodeName = poeModInfo.Mod.CodeName,
+                    Name = possibleModString
+                };
+
+                item.Mods = item.Mods.Concat(new[] { mod }).ToArray();
+                return true;
+            }
+            return false;
+        }
+
+        private bool ParseItemExplicitMods(string block, PoeItem item)
+        {
+            var splittedBlock = SplitToStrings(block);
+            var mods = modsRegexes.Where(x => x.Mod.ModType == PoeModType.Explicit).ToArray();
+            return false;
+            foreach (var modString in splittedBlock)
+            {
+
+
+            }
+        }
+
         private static string[] SplitToBlocks(string serializedItem)
         {
             var rawBlocks = PrepareString(serializedItem)
@@ -148,6 +233,34 @@
                 var newValue = currentValue.Trim();
                 propertyInfo.SetValue(item, newValue);
             }
+        }
+
+        private static PoeModInfo[] PrepareModsInfo(IPoeQueryInfoProvider provider)
+        {
+            var mods = provider.ModsList;
+            return mods.Select(PrepareModInfo).ToArray();
+        }
+
+        private static PoeModInfo PrepareModInfo(IPoeItemMod mod)
+        {
+            const string digitPlaceholder = "DIGITPLACEHOLDER";
+            var escapedRegexText = Regex.Escape(mod.CodeName.Replace("#", digitPlaceholder));
+            var regexText = escapedRegexText.Replace(digitPlaceholder, "(.*?)");
+            var regex = new Regex(regexText, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            return new PoeModInfo(mod, regex);
+        }
+
+        private struct PoeModInfo
+        {
+            public PoeModInfo(IPoeItemMod mod, Regex matchingRegex)
+            {
+                Mod = mod;
+                MatchingRegex = matchingRegex;
+            }
+
+            public IPoeItemMod Mod { get; }
+
+            public Regex MatchingRegex { get; }
         }
     }
 }
