@@ -21,5 +21,11 @@ namespace PoeShared
 
             Log.Instance.Error("Exception occurred", exception);
         }
+
+        public static void HandleUiException([NotNull] Exception exception)
+        {
+            Guard.ArgumentNotNull(() => exception);
+            HandleException(exception);
+        }
     }
 }

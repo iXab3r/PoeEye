@@ -10,5 +10,7 @@
     <converters:ExceptionToMessageConverter x:Key="ExceptionToMessageConverter"/>
     <converters:TimeSpanToHumanReadableStringConverter x:Key="TimeSpanToHumanReadableStringConverter"/>
     <converters:ObjectToLowercaseConverter x:Key="ObjectToLowercaseConverter"/>
+    <converters:NullToBoolConverter x:Key="NullToBoolConverter" NullValue="True"/>
+    <converters:NullToBoolConverter x:Key="InvertedNullToBoolConverter" NullValue="False"/>
     <blue:BoolToVisibilityConverter x:Key="InvertedBoolToVisibilityConverter" TrueValue="Collapsed" FalseValue="Visible"/>
 </ResourceDictionary>

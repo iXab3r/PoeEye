@@ -257,6 +257,7 @@
     <Compile Include="Config\PoeEyeConfig.cs" />
     <Compile Include="Config\PoeEyeConfigProvider.cs" />
     <Compile Include="Config\PoeEyeTabConfig.cs" />
+    <Compile Include="Converters\NullToBoolConverter.cs" />
     <Compile Include="Converters\ObjectToLowercaseConverter.cs" />
     <Compile Include="Converters\PoeItemToPoeQueryConverter.cs" />
     <Compile Include="Converters\TimeSpanToHumanReadableStringConverter.cs" />
@@ -274,6 +275,7 @@
     <Compile Include="PoeTrade\Models\PoePriceCalculcator.cs" />
     <Compile Include="PoeTrade\ViewModels\ApplicationUpdaterViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\IPoeTradeViewModel.cs" />
+    <Compile Include="PoeTrade\ViewModels\PoeClipboardParserViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\PoeLinksInfoViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\ImageViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\MainWindowTabViewModel.cs" />
@@ -342,6 +344,10 @@
     <ProjectReference Include="..\PoeShared\PoeShared.csproj">
       <Project>{12DF53DD-7144-4D2D-B7A1-B4BC5BBDFB69}</Project>
       <Name>PoeShared</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\WpfClipboardMonitor\WpfClipboardMonitor.csproj">
+      <Project>{5f3ed2a3-406b-43c4-bc91-5367c0158828}</Project>
+      <Name>WpfClipboardMonitor</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

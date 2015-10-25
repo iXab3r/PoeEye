@@ -42,9 +42,7 @@
 
         private readonly ReactiveCommand<object> closeTabCommand;
         private readonly ReactiveCommand<object> createNewTabCommand;
-        private readonly ReactiveCommand<object> pasteClipboardCommand;
         private readonly IPoeEyeConfigProvider<IPoeEyeConfig> poeEyeConfigProvider;
-        private readonly IPoeItemParser itemParser;
         private readonly IConverter<IPoeItem, IPoeQueryInfo> itemToQueryConverter;
 
         private readonly IFactory<MainWindowTabViewModel> tabFactory;
@@ -62,7 +60,7 @@
             [NotNull] ApplicationUpdaterViewModel applicationUpdaterViewModel,
             [NotNull] IPoeEyeConfigProvider<IPoeEyeConfig> poeEyeConfigProvider,
             [NotNull] IAudioNotificationsManager audioNotificationsManager,
-            [NotNull] IPoeItemParser itemParser,
+            [NotNull] PoeClipboardParserViewModel clipboardParserViewModel,
             [NotNull] IConverter<IPoeItem, IPoeQueryInfo> itemToQueryConverter,
             [NotNull] [Dependency(WellKnownSchedulers.Ui)] IScheduler uiScheduler)
         {
@@ -70,7 +68,6 @@
             Guard.ArgumentNotNull(() => applicationUpdaterViewModel);
             Guard.ArgumentNotNull(() => poeEyeConfigProvider);
             Guard.ArgumentNotNull(() => audioNotificationsManager);
-            Guard.ArgumentNotNull(() => itemParser);
             Guard.ArgumentNotNull(() => itemToQueryConverter);
             Guard.ArgumentNotNull(() => uiScheduler);
 
@@ -79,24 +76,21 @@
 
             this.tabFactory = tabFactory;
             this.poeEyeConfigProvider = poeEyeConfigProvider;
-            this.itemParser = itemParser;
             this.itemToQueryConverter = itemToQueryConverter;
+
             ApplicationUpdater = applicationUpdaterViewModel;
+            ClipboardParserViewModel = clipboardParserViewModel;
 
             createNewTabCommand = ReactiveCommand.Create();
-            createNewTabCommand.Subscribe(CreateNewTabCommandExecuted);
+            createNewTabCommand
+                .Subscribe(arg => CreateNewTabCommandExecuted(arg))
+                .AddTo(Anchors);
 
             closeTabCommand = ReactiveCommand.Create();
             closeTabCommand
                 .Where(x => x is MainWindowTabViewModel)
                 .Select(x => x as MainWindowTabViewModel)
                 .Subscribe(RemoveTabCommandExecuted)
-                .AddTo(Anchors);
-
-
-            pasteClipboardCommand = ReactiveCommand.Create();
-            pasteClipboardCommand
-                .Subscribe(PasteClipboardCommandExecuted)
                 .AddTo(Anchors);
 
             TabsList
@@ -108,7 +102,7 @@
 
             if (!TabsList.Any())
             {
-                CreateNewTabCommandExecuted();
+                CreateNewTabCommandExecuted(null);
             }
 
             this.WhenAnyValue(x => x.IsMainWindowActive)
@@ -138,9 +132,9 @@
 
         public ICommand CloseTabCommand => closeTabCommand;
 
-        public ICommand PasteClipboardCommand => pasteClipboardCommand;
-
         public ApplicationUpdaterViewModel ApplicationUpdater { get; }
+
+        public PoeClipboardParserViewModel ClipboardParserViewModel { get; }
 
         public bool AudioNotificationsEnabled
         {
@@ -167,9 +161,15 @@
             set { this.RaiseAndSetIfChanged(ref selectedItem, value); }
         }
 
-        private void CreateNewTabCommandExecuted()
+        private void CreateNewTabCommandExecuted([CanBeNull] object arg)
         {
-            CreateAndAddTab();
+            var tab = CreateAndAddTab();
+
+            if (arg is IPoeItem)
+            {
+                var query = itemToQueryConverter.Convert(arg as IPoeItem);
+                tab.QueryViewModel.SetQueryInfo(query);
+            }
         }
 
         private MainWindowTabViewModel CreateAndAddTab()
@@ -232,34 +232,6 @@
             }
 
             Log.Instance.Debug($"[MainWindowViewModel.LoadConfig] Sucessfully loaded config\r\nTabs count: {TabsList.Count}");
-        }
-
-        private void PasteClipboardCommandExecuted()
-        {
-            try
-            {
-                var clipboardData = Clipboard.GetText();
-                if (string.IsNullOrWhiteSpace(clipboardData))
-                {
-                    return;
-                }
-
-                var item = itemParser.Parse(clipboardData);
-                if (string.IsNullOrWhiteSpace(item.ItemName))
-                {
-                    return;
-                }
-
-                var query = itemToQueryConverter.Convert(item);
-
-                var tab = CreateAndAddTab();
-                tab.QueryViewModel.SetQueryInfo(query);
-            }
-            catch (Exception ex)
-            {
-                Log.Instance.Error(ex);
-            }
-          
         }
     }
 }
