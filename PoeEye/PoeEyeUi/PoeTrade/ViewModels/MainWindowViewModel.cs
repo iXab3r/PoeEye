@@ -43,7 +43,6 @@
         private readonly ReactiveCommand<object> closeTabCommand;
         private readonly ReactiveCommand<object> createNewTabCommand;
         private readonly IPoeEyeConfigProvider<IPoeEyeConfig> poeEyeConfigProvider;
-        private readonly IConverter<IPoeItem, IPoeQueryInfo> itemToQueryConverter;
 
         private readonly IFactory<MainWindowTabViewModel> tabFactory;
 
@@ -61,14 +60,12 @@
             [NotNull] IPoeEyeConfigProvider<IPoeEyeConfig> poeEyeConfigProvider,
             [NotNull] IAudioNotificationsManager audioNotificationsManager,
             [NotNull] PoeClipboardParserViewModel clipboardParserViewModel,
-            [NotNull] IConverter<IPoeItem, IPoeQueryInfo> itemToQueryConverter,
             [NotNull] [Dependency(WellKnownSchedulers.Ui)] IScheduler uiScheduler)
         {
             Guard.ArgumentNotNull(() => tabFactory);
             Guard.ArgumentNotNull(() => applicationUpdaterViewModel);
             Guard.ArgumentNotNull(() => poeEyeConfigProvider);
             Guard.ArgumentNotNull(() => audioNotificationsManager);
-            Guard.ArgumentNotNull(() => itemToQueryConverter);
             Guard.ArgumentNotNull(() => uiScheduler);
 
             var executingAssembly = Assembly.GetExecutingAssembly();
@@ -76,14 +73,13 @@
 
             this.tabFactory = tabFactory;
             this.poeEyeConfigProvider = poeEyeConfigProvider;
-            this.itemToQueryConverter = itemToQueryConverter;
 
             ApplicationUpdater = applicationUpdaterViewModel;
             ClipboardParserViewModel = clipboardParserViewModel;
 
             createNewTabCommand = ReactiveCommand.Create();
             createNewTabCommand
-                .Subscribe(arg => CreateNewTabCommandExecuted(arg))
+                .Subscribe(arg => CreateNewTabCommandExecuted(arg as IPoeQueryInfo))
                 .AddTo(Anchors);
 
             closeTabCommand = ReactiveCommand.Create();
@@ -161,13 +157,12 @@
             set { this.RaiseAndSetIfChanged(ref selectedItem, value); }
         }
 
-        private void CreateNewTabCommandExecuted([CanBeNull] object arg)
+        private void CreateNewTabCommandExecuted([CanBeNull] IPoeQueryInfo query)
         {
             var tab = CreateAndAddTab();
 
-            if (arg is IPoeItem)
+            if (query != null)
             {
-                var query = itemToQueryConverter.Convert(arg as IPoeItem);
                 tab.QueryViewModel.SetQueryInfo(query);
             }
         }

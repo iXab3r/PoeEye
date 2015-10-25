@@ -294,7 +294,7 @@
 
                         <Button Grid.Column="1" Content="Import" 
                                 Command="{Binding CreateNewTabCommand}" 
-                                CommandParameter="{Binding ClipboardParserViewModel.ItemFromClipboard.Trade}">
+                                CommandParameter="{Binding ClipboardParserViewModel.ItemQueryInfo}">
                             <i:Interaction.Triggers>
                                 <i:EventTrigger EventName="Click">
                                     <utilities:SetPropertyAction PropertyName="IsOpen" TargetObject="{Binding ElementName=ClipboardFlyout}">

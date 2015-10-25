@@ -519,7 +519,7 @@
             var result = instance.Parse(data);
 
             //Then
-            result.ItemName.ShouldBe(null);
+            result.ShouldBe(null);
         }
 
         private PoeItemParser CreateInstance()

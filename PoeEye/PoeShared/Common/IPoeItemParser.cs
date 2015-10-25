@@ -4,7 +4,7 @@ namespace PoeShared.Common
 {
     public interface IPoeItemParser
     {
-        [NotNull] 
+        [CanBeNull] 
         IPoeItem Parse([NotNull] string serializedItem);
     }
 }

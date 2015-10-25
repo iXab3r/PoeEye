@@ -44,6 +44,7 @@
             };
 
             var result = new PoeItem();
+            var parsedSuccessfully = false;
 
             var itemBlocks = SplitToBlocks(serializedItem);
             foreach (var block in itemBlocks)
@@ -55,6 +56,8 @@
                     continue;
                 }
 
+                parsedSuccessfully = true;
+
                 foreach (var parser in blockParsers.ToArray())
                 {
                     blockParsers.Remove(matchedParser);
@@ -63,6 +66,11 @@
                         break;
                     }
                 }
+            }
+
+            if (!parsedSuccessfully)
+            {
+                return null;
             }
 
             TrimProperties(result);
