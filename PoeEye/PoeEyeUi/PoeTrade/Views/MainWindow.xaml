@@ -21,8 +21,7 @@
         metroModels:DialogParticipation.Register="{Binding}">
 
     <Window.InputBindings>
-        <KeyBinding Command="{Binding PasteClipboardCommand}"
-              Gesture="CTRL+V" />
+        <KeyBinding Command="{Binding ClipboardParserViewModel.ParseClipboard}" Gesture="CTRL+V" />
     </Window.InputBindings>
 
     <Grid>

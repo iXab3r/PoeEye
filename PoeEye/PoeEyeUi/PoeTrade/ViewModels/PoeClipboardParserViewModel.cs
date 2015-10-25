@@ -5,6 +5,7 @@
     using System.Reactive.Linq;
     using System.Threading;
     using System.Windows;
+    using System.Windows.Input;
 
     using Factory;
 
@@ -41,6 +42,7 @@
 
         private IPoeTradeViewModel itemFromClipboard;
         private IPoeQueryInfo itemQueryInfo;
+        private ReactiveCommand<object> parseClipboard; 
 
         public PoeClipboardParserViewModel(
             [NotNull] IPoeItemParser itemParser,
@@ -65,10 +67,13 @@
                 .Subscribe(() => this.RaisePropertyChanged(nameof(IsBusy)))
                 .AddTo(Anchors);
 
+            parseClipboard = ReactiveCommand.Create();
+
             var textFromClipboard = Observable
                 .FromEventPattern<EventHandler, EventArgs>(
                     h => ClipboardNotifications.ClipboardUpdate += h,
                     h => ClipboardNotifications.ClipboardUpdate -= h)
+                .Merge(parseClipboard)
                 .Select(x => GetTextFromClipboard())
                 .Where(x => !string.IsNullOrWhiteSpace(x))
                 .Publish();
@@ -107,6 +112,8 @@
         }
 
         public bool IsBusy => IsBusyInternal;
+
+        public ICommand ParseClipboard => parseClipboard;
 
         private bool IsBusyInternal
         {
