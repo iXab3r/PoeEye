@@ -488,6 +488,26 @@
         }
 
         [Test]
+        [TestCaseSource(nameof(KnownItems))]
+        public void ShouldParseExplicitMods(string data, IPoeItem expectedItem)
+        {
+            //Given
+            var modsList = expectedItem.Mods.Where(x => x.ModType == PoeModType.Explicit).ToArray();
+            queryInfoProvider.SetupGet(x => x.ModsList).Returns(modsList);
+
+            var instance = CreateInstance();
+
+            //When
+            var result = instance.Parse(data);
+
+            //Then
+            var exprectedImplicitMods = expectedItem.Mods.Where(x => x.ModType == PoeModType.Explicit).ToArray();
+            var resultMods = result.Mods.Where(x => x.ModType == PoeModType.Explicit).ToArray();
+
+            CollectionAssert.AreEqual(exprectedImplicitMods, resultMods, new PoeItemModEqualityComparer());
+        }
+
+        [Test]
         [TestCase("")]
         [TestCase("RNGSTR")]
         public void ShouldReturnNullNameOnUnexpectedInput(string data)

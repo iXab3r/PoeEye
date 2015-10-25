@@ -155,24 +155,13 @@
                 return false;
             }
 
-            var implicitMods = modsRegexes.Where(x => x.Mod.ModType == PoeModType.Implicit).ToArray();
+            var mods = modsRegexes.Where(x => x.Mod.ModType == PoeModType.Implicit).ToArray();
 
             var possibleModString = splittedBlock[0];
-            foreach (var poeModInfo in implicitMods)
+
+            var mod = ParseItemMod(possibleModString, mods);
+            if (mod != null)
             {
-                var match = poeModInfo.MatchingRegex.Match(possibleModString);
-                if (!match.Success)
-                {
-                    continue;
-                }
-
-                var mod = new PoeItemMod()
-                {
-                    ModType = PoeModType.Implicit,
-                    CodeName = poeModInfo.Mod.CodeName,
-                    Name = possibleModString
-                };
-
                 item.Mods = item.Mods.Concat(new[] { mod }).ToArray();
                 return true;
             }
@@ -183,12 +172,46 @@
         {
             var splittedBlock = SplitToStrings(block);
             var mods = modsRegexes.Where(x => x.Mod.ModType == PoeModType.Explicit).ToArray();
-            return false;
-            foreach (var modString in splittedBlock)
+
+            var parsedMods = new List<IPoeItemMod>();
+            foreach (var possibleModString in splittedBlock)
             {
-
-
+                var mod = ParseItemMod(possibleModString, mods);
+                if (mod == null)
+                {
+                    continue;
+                }
+                parsedMods.Add(mod);
             }
+
+            if (parsedMods.Any())
+            {
+                item.Mods = item.Mods.Concat(parsedMods).ToArray();
+                return true;
+            }
+            return false;
+        }
+
+        private IPoeItemMod ParseItemMod(string possibleModString, PoeModInfo[] mods)
+        {
+            foreach (var poeModInfo in mods)
+            {
+                var match = poeModInfo.MatchingRegex.Match(possibleModString);
+                if (!match.Success)
+                {
+                    continue;
+                }
+
+                var mod = new PoeItemMod()
+                {
+                    ModType = poeModInfo.Mod.ModType,
+                    CodeName = poeModInfo.Mod.CodeName,
+                    Name = possibleModString
+                };
+
+                return mod;
+            }
+            return null;
         }
 
         private static string[] SplitToBlocks(string serializedItem)

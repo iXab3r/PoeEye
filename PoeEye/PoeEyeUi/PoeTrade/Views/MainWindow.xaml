@@ -57,6 +57,7 @@
                          SelectedItem="{Binding SelectedItem}"
                          SelectionMode="Single"
                          Margin="10,10,5,10"
+                         Focusable="False"
                          HorizontalContentAlignment="Stretch">
                     <ListBox.Resources>
                         <Style TargetType="ListBoxItem" BasedOn="{StaticResource ListBoxAsTabControl}" />
