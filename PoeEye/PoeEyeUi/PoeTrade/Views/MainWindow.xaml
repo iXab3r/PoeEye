@@ -10,6 +10,7 @@
         xmlns:utilities="clr-namespace:PoeEyeUi.Utilities"
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         xmlns:system="clr-namespace:System;assembly=mscorlib"
+        xmlns:net="clr-namespace:FontAwesome.Net;assembly=FontAwesome.Net"
         mc:Ignorable="d"
         Title="{Binding MainWindowTitle}" 
         MinWidth="1000" 
@@ -97,20 +98,14 @@
 
                                         <Button Grid.Column="1" 
                                                 Margin="10,0"
-                                                Style="{DynamicResource MetroCircleButtonStyle}"
+                                                Style="{StaticResource CircleButton}"
                                                 Width="40" Height="40"
                                                 HorizontalAlignment="Right"
                                                 Command="{Binding SearchCommand}"
                                                 Focusable="False"
                                                 CommandParameter="{Binding QueryViewModel.PoeQueryBuilder}" 
-                                                Visibility="{Binding TradesListViewModel.QueryInfo, Converter={StaticResource NotNullToCollapsedConverter}}">
-                                            <Rectangle Width="20" Height="20" 
-                                                       Fill="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Button}}}">
-                                                <Rectangle.OpacityMask>
-                                                    <VisualBrush Stretch="Fill" Visual="{DynamicResource appbar_magnify_forward}" />
-                                                </Rectangle.OpacityMask>
-                                            </Rectangle>
-                                        </Button>
+                                                Content="{x:Static net:FontAwesome.search}"
+                                                Visibility="{Binding TradesListViewModel.QueryInfo, Converter={StaticResource NotNullToCollapsedConverter}}" />
                                     </Grid>
                                 </DockPanel>
 
@@ -149,30 +144,19 @@
                                 <StackPanel Grid.Row="0" Grid.Column="3" 
                                             Orientation="Horizontal">
                                     <ToggleButton Width="40" Height="40"
-                                                  Style="{DynamicResource MetroCircleToggleButtonStyle}"
+                                                  Style="{StaticResource ToggleCircleButton}"
                                                   ToolTip="Audio notifications for this tab"
                                                   Focusable="False"
-                                                  IsChecked="{Binding AudioNotificationEnabled}" >
-                                        <Rectangle Width="20" Height="20" 
-                                                   Fill="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ToggleButton}}}">
-                                            <Rectangle.OpacityMask>
-                                                <VisualBrush Stretch="Fill" Visual="{DynamicResource appbar_speakerphone}" />
-                                            </Rectangle.OpacityMask>
-                                        </Rectangle>
-                                    </ToggleButton>
+                                                  Content="{x:Static net:FontAwesome.volume_up}"
+                                                  IsChecked="{Binding AudioNotificationEnabled}" />
 
                                     <Button Width="24" Height="24"
-                                            Style="{StaticResource MetroCircleButtonStyle}"
+                                            Style="{StaticResource CircleButton}"
                                             HorizontalAlignment="Right"
                                             Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type ListBox}}, Path=DataContext.CloseTabCommand}"
-                                            CommandParameter="{Binding}">
-                                        <Rectangle Width="8" Height="8" 
-                                                   Fill="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Button}}}">
-                                            <Rectangle.OpacityMask>
-                                                <VisualBrush Stretch="Fill" Visual="{DynamicResource appbar_close}" />
-                                            </Rectangle.OpacityMask>
-                                        </Rectangle>
-                                    </Button>
+                                            CommandParameter="{Binding}"
+                                            FontSize="10"
+                                            Content="{x:Static net:FontAwesome.close}" />
                                 </StackPanel>
 
                                 <controls:MetroProgressBar Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4" 
@@ -284,7 +268,7 @@
                              BorderThickness="0,1,0,0"
                              BorderBrush="{StaticResource AccentColorBrush}"
                              IsOpen="{Binding  ClipboardParserViewModel.IsOpen, Mode=TwoWay}">
-                
+
                 <Grid>
                     <controls:MetroProgressBar IsIndeterminate="True" 
                                                Foreground="{StaticResource TextBrush}"  
@@ -316,8 +300,8 @@
                         </Button>
                     </Grid>
                 </Grid>
-                
-              
+
+
             </controls:Flyout>
         </controls:FlyoutsControl>
     </controls:MetroWindow.Flyouts>

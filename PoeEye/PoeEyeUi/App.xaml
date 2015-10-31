@@ -16,7 +16,6 @@
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseDark.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Themes/ProgressRing.xaml" />
 
-                <ResourceDictionary Source="Resources/Icons.xaml" />
                 <ResourceDictionary Source="Themes/Colors.xaml" />
                 <ResourceDictionary Source="Themes/Converters.xaml" />
                 <ResourceDictionary Source="Themes/ListBoxAsTabCotrolStyle.xaml" />
@@ -35,12 +34,27 @@
                 <ResourceDictionary Source="PoeTrade/Views/PoeQueryView.xaml" />
 
             </ResourceDictionary.MergedDictionaries>
-            
+
             <Style TargetType="ContentControl">
                 <Setter Property="Focusable" Value="False"/>
                 <Setter Property="IsTabStop" Value="False"/>
             </Style>
 
+            <FontFamily x:Key="FontAwesome">pack://application:,,,/FontAwesome.Net;component/Fonts/#FontAwesome</FontFamily>
+
+            <Style TargetType="Button" x:Key="CircleButton" BasedOn="{StaticResource MetroCircleButtonStyle}">
+                <Setter Property="FontFamily" Value="{StaticResource FontAwesome}"/>
+                <Setter Property="FontSize" Value="16"/>
+                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                <Setter Property="VerticalContentAlignment" Value="Center"/>
+            </Style>
+
+            <Style TargetType="ToggleButton" x:Key="ToggleCircleButton" BasedOn="{StaticResource MetroCircleToggleButtonStyle}">
+                <Setter Property="FontFamily" Value="{StaticResource FontAwesome}"/>
+                <Setter Property="FontSize" Value="16"/>
+                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                <Setter Property="VerticalContentAlignment" Value="Center"/>
+            </Style>
         </ResourceDictionary>
     </Application.Resources>
 </InstanceAwareApplication>
