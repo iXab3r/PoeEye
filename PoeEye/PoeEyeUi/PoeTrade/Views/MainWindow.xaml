@@ -11,6 +11,7 @@
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         xmlns:system="clr-namespace:System;assembly=mscorlib"
         xmlns:net="clr-namespace:FontAwesome.Net;assembly=FontAwesome.Net"
+        xmlns:generic="clr-namespace:System.Collections.Generic;assembly=mscorlib"
         mc:Ignorable="d"
         Title="{Binding MainWindowTitle}" 
         MinWidth="1000" 
@@ -87,17 +88,19 @@
                                             <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
 
-                                        <Rectangle Grid.Column="0"
-                                                   Height="20" Width="20" Margin="5"
-                                           Visibility="{Binding TradesListViewModel.LastUpdateException, Converter={StaticResource NullToCollapsedConverter}}"
-                                           ToolTip="{Binding TradesListViewModel.LastUpdateException, Converter={StaticResource ExceptionToMessageConverter}}">
-                                            <Rectangle.Fill>
-                                                <VisualBrush Stretch="Fill" Visual="{DynamicResource appbar_transit_hazard}"  />
-                                            </Rectangle.Fill>
-                                        </Rectangle>
+                                        <Label Grid.Column="0"
+                                               ToolTip="{Binding TradesListViewModel.LastUpdateException, Converter={StaticResource ExceptionToMessageConverter}}"
+                                               Visibility="{Binding TradesListViewModel.LastUpdateException, Converter={StaticResource NullToCollapsedConverter}}"
+                                               FontFamily="{StaticResource FontAwesome}"
+                                               VerticalAlignment="Stretch"
+                                               HorizontalAlignment="Stretch"
+                                               VerticalContentAlignment="Center"
+                                               HorizontalContentAlignment="Center"
+                                               FontSize="20"
+                                               Content="{x:Static net:FontAwesome.warning}"/>
 
                                         <Button Grid.Column="1" 
-                                                Margin="10,0"
+                                                Margin="5,0"
                                                 Style="{StaticResource CircleButton}"
                                                 Width="40" Height="40"
                                                 HorizontalAlignment="Right"
@@ -144,11 +147,20 @@
                                 <StackPanel Grid.Row="0" Grid.Column="3" 
                                             Orientation="Horizontal">
                                     <ToggleButton Width="40" Height="40"
-                                                  Style="{StaticResource ToggleCircleButton}"
                                                   ToolTip="Audio notifications for this tab"
                                                   Focusable="False"
-                                                  Content="{x:Static net:FontAwesome.volume_up}"
-                                                  IsChecked="{Binding AudioNotificationEnabled}" />
+                                                  IsChecked="{Binding AudioNotificationEnabled}">
+                                        <ToggleButton.Style>
+                                            <Style TargetType="ToggleButton" BasedOn="{StaticResource ToggleCircleButton}">
+                                                <Setter Property="Content" Value="{x:Static net:FontAwesome.volume_off}"></Setter>
+                                                <Style.Triggers>
+                                                    <Trigger Property="IsChecked" Value="True">
+                                                        <Setter Property="Content" Value="{x:Static net:FontAwesome.volume_up}"></Setter>
+                                                    </Trigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </ToggleButton.Style>
+                                    </ToggleButton>
 
                                     <Button Width="24" Height="24"
                                             Style="{StaticResource CircleButton}"
@@ -243,27 +255,26 @@
                     Content="Check for updates" />
 
                 <StackPanel Orientation="Horizontal" Height="24" Margin="5,0">
-                    <TextBlock Text="Clipboard monitoring:" VerticalAlignment="Center"/>
-                    <CheckBox Height="16" Width="16" Opacity="0.5" Margin="5,0,0,0"
-                              VerticalAlignment="Center" VerticalContentAlignment="Center"
-                              ToolTip="Enable clipboard monitoring" 
-                              IsChecked="{Binding ClipboardParserViewModel.MonitoringEnabled}"/>
-                </StackPanel>
-
-                <StackPanel Orientation="Horizontal" Height="24" Margin="5,0">
-                    <TextBlock Text="Audio:" VerticalAlignment="Center"/>
-                    <CheckBox Height="16" Width="16" Opacity="0.5" Margin="5,0,0,0"
-                              VerticalAlignment="Center" VerticalContentAlignment="Center"
-                              ToolTip="Audio notification for new items" 
-                              IsChecked="{Binding AudioNotificationsEnabled}"/>
+                    <Button Content="&#xF085; Settings" FontFamily="{StaticResource FontAwesome}">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="Click">
+                                <utilities:SetPropertyAction PropertyName="IsOpen" 
+                                                             TargetObject="{Binding ElementName=SettingsFlyout}"
+                                                             PropertyValue="{Binding ElementName=SettingsFlyout, Path=IsOpen, Converter={StaticResource BoolInversionConverter}}" >
+                                    
+                                </utilities:SetPropertyAction>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </Button>
                 </StackPanel>
             </StackPanel>
         </controls:WindowCommands>
     </controls:MetroWindow.RightWindowCommands>
 
-    <controls:MetroWindow.Flyouts>
-        <controls:FlyoutsControl>
-            <controls:Flyout Header="Clipboard" x:Name="ClipboardFlyout"
+    <controls:MetroWindow.Flyouts >
+        <controls:FlyoutsControl >
+            <controls:Flyout Header="&#xF0EA; Clipboard" x:Name="ClipboardFlyout"
+                             FontFamily="{StaticResource FontAwesome}"
                              Position="Bottom"
                              BorderThickness="0,1,0,0"
                              BorderBrush="{StaticResource AccentColorBrush}"
@@ -299,6 +310,61 @@
                             </i:Interaction.Triggers>
                         </Button>
                     </Grid>
+                </Grid>
+
+
+            </controls:Flyout>
+
+            <controls:Flyout Header="&#xF085; Settings" x:Name="SettingsFlyout"
+                             FontFamily="{StaticResource FontAwesome}"
+                             Position="Right"
+                             Width="300"
+                             Margin="0, 20"
+                             BorderBrush="{StaticResource AccentColorBrush}">
+
+                <Grid Margin="5,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    
+                    <StackPanel Grid.Row="0" 
+                                Orientation="Horizontal" Height="24">
+                        <Label  Style="{StaticResource IconLabel}" Content="Clipboard monitoring:" />
+                        <controls:ToggleSwitchButton ToolTip="Enable clipboard monitoring" Height="26"
+                                                     IsChecked="{Binding ClipboardParserViewModel.MonitoringEnabled}"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="1" 
+                                Orientation="Horizontal" Height="24" >
+                        <Label Style="{StaticResource IconLabel}" Content="Audio:" />
+                        <controls:ToggleSwitchButton ToolTip="Audio notification for new items"  Height="26"
+                                                     IsChecked="{Binding AudioNotificationsEnabled}"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="2" 
+                                Orientation="Vertical" >
+                        <Label Content="Currencies rate (in Chaos orbs)" Margin="0,5,0,2" Style="{StaticResource IconLabel}"/>
+                        <ItemsControl ItemsSource="{Binding CurrenciesPriceInChaosOrbs}" BorderThickness="0,1" BorderBrush="{StaticResource AccentColorBrush}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal" Margin="0,2">
+                                        <Label Width="100" 
+                                               HorizontalContentAlignment="Right" HorizontalAlignment="Stretch" 
+                                               Content="{Binding Item1, Mode=OneWay}"/>
+                                        <controls:NumericUpDown Width="100" 
+                                                                Style="{StaticResource QueryNumericUpDownMax}" 
+                                                                Value="{Binding Item2, Converter={StaticResource NullableConverter}}" StringFormat="{}{0:F2}"/>
+                                    </StackPanel>
+                                    
+                                </DataTemplate>
+                                
+                            </ItemsControl.ItemTemplate>
+                            
+                        </ItemsControl>
+                    </StackPanel>
                 </Grid>
 
 

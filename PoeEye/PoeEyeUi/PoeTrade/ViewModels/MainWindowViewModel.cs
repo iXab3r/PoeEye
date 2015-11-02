@@ -1,6 +1,8 @@
 ﻿namespace PoeEyeUi.PoeTrade.ViewModels
 {
     using System;
+    using System.Collections.Generic;
+    using System.ComponentModel;
     using System.Linq;
     using System.Reactive;
     using System.Reactive.Concurrency;
@@ -31,6 +33,8 @@
 
     using ReactiveUI;
 
+    using Utilities;
+
     internal sealed class MainWindowViewModel : DisposableReactiveObject
     {
         private static readonly TimeSpan CheckForUpdatesTimeout = TimeSpan.FromSeconds(600);
@@ -45,6 +49,8 @@
         private readonly IFactory<MainWindowTabViewModel> tabFactory;
 
         private bool audioNotificationsEnabled = true;
+
+        private EditableTuple<string, float>[] currenciesPriceInChaosOrbs;
 
         private bool isMainWindowActive;
 
@@ -149,6 +155,12 @@
             set { this.RaiseAndSetIfChanged(ref isMainWindowActive, value); }
         }
 
+        public EditableTuple<string,float>[] CurrenciesPriceInChaosOrbs
+        {
+            get { return currenciesPriceInChaosOrbs; }
+            set { this.RaiseAndSetIfChanged(ref currenciesPriceInChaosOrbs, value); }
+        }
+
         public MainWindowTabViewModel SelectedItem
         {
             get { return selectedItem; }
@@ -188,7 +200,7 @@
         private void SaveConfig()
         {
             Log.Instance.Debug($"[MainWindowViewModel.SaveConfig] Saving config (provider: {poeEyeConfigProvider})...\r\nTabs count: {TabsList.Count}");
-
+            
             var config = new PoeEyeConfig();
             config.TabConfigs = TabsList.Select(
                 tab => new PoeEyeTabConfig
@@ -200,6 +212,8 @@
 
             config.AudioNotificationsEnabled = AudioNotificationsEnabled;
             config.ClipboardMonitoringEnabled = ClipboardParserViewModel.MonitoringEnabled;
+
+            config.CurrenciesPriceInChaos = CurrenciesPriceInChaosOrbs.ToDictionary(x => x.Item1, x => x.Item2);
 
             poeEyeConfigProvider.Save(config);
         }
@@ -228,8 +242,12 @@
                 tab.AudioNotificationEnabled = tabConfig.AudioNotificationEnabled;
             }
 
-            this.audioNotificationsEnabled = config.AudioNotificationsEnabled;
-            this.ClipboardParserViewModel.MonitoringEnabled = config.ClipboardMonitoringEnabled;
+            audioNotificationsEnabled = config.AudioNotificationsEnabled;
+            ClipboardParserViewModel.MonitoringEnabled = config.ClipboardMonitoringEnabled;
+            CurrenciesPriceInChaosOrbs = config
+                .CurrenciesPriceInChaos
+                .Select(x => new EditableTuple<string, float> { Item1 = x.Key, Item2 = x.Value })
+                .ToArray();
 
             Log.Instance.Debug($"[MainWindowViewModel.LoadConfig] Sucessfully loaded config\r\nTabs count: {TabsList.Count}");
         }

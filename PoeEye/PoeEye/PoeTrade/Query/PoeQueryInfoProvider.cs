@@ -14,8 +14,8 @@
         {
             LeaguesList = new[]
             {
-                WellKnownLeagues.FlashbackEventIC001,
-                WellKnownLeagues.FlashbackEventHCIC002,
+                WellKnownLeagues.DarkshrineIC003,
+                WellKnownLeagues.DarkshrineHCIC004,
                 WellKnownLeagues.Standard,
                 WellKnownLeagues.Hardcore,
             };

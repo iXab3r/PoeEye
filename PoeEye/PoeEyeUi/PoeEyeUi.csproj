@@ -238,6 +238,7 @@
     <Compile Include="Config\PoeEyeConfig.cs" />
     <Compile Include="Config\PoeEyeConfigProvider.cs" />
     <Compile Include="Config\PoeEyeTabConfig.cs" />
+    <Compile Include="Converters\BoolInversionConverter.cs" />
     <Compile Include="Converters\NullToBoolConverter.cs" />
     <Compile Include="Converters\ObjectToLowercaseConverter.cs" />
     <Compile Include="Converters\TimeSpanToHumanReadableStringConverter.cs" />
@@ -272,6 +273,7 @@
     <Compile Include="Utilities\DataPiping.cs" />
     <Compile Include="Utilities\DataPipe.cs" />
     <Compile Include="Utilities\DataPipeCollection.cs" />
+    <Compile Include="Utilities\EditableTuple.cs" />
     <Compile Include="Utilities\SetPropertyAction.cs" />
   </ItemGroup>
   <ItemGroup>
