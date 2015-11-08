@@ -10,7 +10,6 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="auto"/>
-                <ColumnDefinition Width="auto"/>
             </Grid.ColumnDefinitions>
 
             <editors:AutoCompleteTextBox  Grid.Column="0"
@@ -20,12 +19,7 @@
                                               Watermark="start typing to get compatible mods list">
             </editors:AutoCompleteTextBox>
 
-            <CheckBox Grid.Column="1" 
-                      Margin="10,0,10,0"
-                      Content="Excluded" 
-                      IsChecked="{Binding Excluded}"/>
-
-            <StackPanel Grid.Column="2" 
+            <StackPanel Grid.Column="1" 
                         Orientation="Horizontal" 
                         Margin="10,0,10,0">
                 <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}" Value="{Binding Min, Converter={StaticResource NullableConverter}}"/>

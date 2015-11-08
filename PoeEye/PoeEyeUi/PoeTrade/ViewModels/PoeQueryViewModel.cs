@@ -594,7 +594,6 @@
                     newMod.SelectedMod = mod.Name;
                     newMod.Max = mod.Max;
                     newMod.Min = mod.Min;
-                    newMod.Excluded = mod.Excluded;
                 }
             }
 
@@ -681,7 +680,6 @@
 
                 var explicitMod = new PoeQueryRangeModArgument(poeExplicitModViewModel.SelectedMod)
                 {
-                    Excluded = poeExplicitModViewModel.Excluded,
                     Min = poeExplicitModViewModel.Min,
                     Max = poeExplicitModViewModel.Max,
                 };

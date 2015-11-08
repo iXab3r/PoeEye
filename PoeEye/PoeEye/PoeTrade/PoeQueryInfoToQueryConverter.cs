@@ -100,14 +100,16 @@
                 CreateArgument("modmax", string.Empty)
             });
 
-            foreach (var poeExplicitModViewModel in (source.ExplicitMods??new IPoeQueryRangeModArgument[0]).Where(x => !string.IsNullOrWhiteSpace(x.Name)))
-            {
-                var modArg = CreateModArgument(
-                    poeExplicitModViewModel.Name,
-                    poeExplicitModViewModel.Min,
-                    poeExplicitModViewModel.Max);
-                args.Add(modArg);
-            }
+            var explicitMods = source.ExplicitMods ?? new IPoeQueryRangeModArgument[0].Where(x => !string.IsNullOrWhiteSpace(x.Name)).ToArray();
+            args.AddRange(explicitMods.Select(poeExplicitModViewModel => CreateModArgument(poeExplicitModViewModel.Name, poeExplicitModViewModel.Min, poeExplicitModViewModel.Max)));
+
+            args.AddRange(new[]
+           {
+                CreateArgument("group_type", "And"),
+                CreateArgument("group_min", string.Empty),
+                CreateArgument("group_max", string.Empty),
+                CreateArgument("group_count", explicitMods.Count())
+            });
 
             Guard.ArgumentIsTrue(() => args.ToDictionary(x => x.Name, x => default(int?)).Count() == args.Count());
 
@@ -132,7 +134,7 @@
                 return new PoeQueryStringArgument(name, string.Empty);
             }
 
-            if (typeof(T) == typeof(int?))
+            if (typeof(T) == typeof(int?) || typeof(T) == typeof(int))
             {
                 return new PoeQueryIntArgument(name,
                     value is int ? ConvertToType<int>(value) : (int)ConvertToType<int?>(value));

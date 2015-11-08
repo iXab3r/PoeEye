@@ -71,26 +71,17 @@
 
         private void Convert(IPoeQueryModArgument source, NameValueCollection values)
         {
-            values.Add("mods", source.Name);
-            if (source.Excluded)
+            values.Add("mod_name", source.Name);
+            var argument = source as IPoeQueryRangeModArgument;
+            if (argument != null)
             {
-                values.Add("modexclude", "x");
+                values.Add("mod_min", Convert(argument.Min));
+                values.Add("mod_max", Convert(argument.Max));
             }
             else
             {
-                values.Add("modexclude", string.Empty);
-
-                var argument = source as IPoeQueryRangeModArgument;
-                if (argument != null)
-                {
-                    values.Add("modmin", Convert(argument.Min));
-                    values.Add("modmax", Convert(argument.Max));
-                }
-                else
-                {
-                    values.Add("modmin", string.Empty);
-                    values.Add("modmax", string.Empty);
-                }
+                values.Add("mod_min", string.Empty);
+                values.Add("mod_max", string.Empty);
             }
         }
 

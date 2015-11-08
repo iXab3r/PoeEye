@@ -1,7 +1,6 @@
 ﻿namespace PoeEyeUi.PoeTrade.ViewModels
 {
     using System;
-    using System.Collections.ObjectModel;
     using System.Linq;
     using System.Reactive.Linq;
     using System.Windows.Input;
@@ -12,15 +11,11 @@
 
     using JetBrains.Annotations;
 
-    using Models;
-
     using PoeShared.Common;
     using PoeShared.PoeTrade.Query;
     using PoeShared.Utilities;
 
     using ReactiveUI;
-
-    using Utilities;
 
     using WpfAutoCompleteControls.Editors;
 

@@ -8,7 +8,6 @@
 
     internal sealed class PoeExplicitModViewModel : DisposableReactiveObject
     {
-        private bool excluded;
         private float? max;
 
         private float? min;
@@ -38,12 +37,6 @@
         {
             get { return max; }
             set { this.RaiseAndSetIfChanged(ref max, value); }
-        }
-
-        public bool Excluded
-        {
-            get { return excluded; }
-            set { this.RaiseAndSetIfChanged(ref excluded, value); }
         }
     }
 }
