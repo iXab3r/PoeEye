@@ -6,6 +6,8 @@
     using System.Reactive.Linq;
     using System.Windows.Input;
 
+    using DumpToText;
+
     using Guards;
 
     using JetBrains.Annotations;
@@ -80,6 +82,10 @@
                 .Where(x => audioNotificationEnabled)
                 .Subscribe(x => audioNotificationsManager.PlayNotificationCommand.Execute(null), Log.HandleException)
                 .AddTo(Anchors);
+
+            QueryViewModel.ObservableForProperty(x => x.PoeQueryBuilder)
+                          .Subscribe(RebuildTabName)
+                          .AddTo(Anchors);
         }
 
         public double RecheckTimeoutInSeconds
@@ -130,7 +136,7 @@
         private void RebuildTabName()
         {
             Log.Instance.Debug($"[MainWindowTabViewModel.RebuildTabName] Rebuilding tab name, tabQueryMode: {QueryViewModel}...");
-            var queryDescription = QueryViewModel.FormatQueryDescription();
+            var queryDescription = QueryViewModel.Description;
             TabName = string.IsNullOrWhiteSpace(queryDescription)
                 ? tabHeader
                 : $"{queryDescription}";
@@ -143,8 +149,8 @@
             {
                 return;
             }
-            Log.Instance.Debug($"[MainWindowTabViewModel.SearchCommandExecute] Search command executed, running query {QueryViewModel}");
             var query = queryBuilder();
+            Log.Instance.Debug($"[MainWindowTabViewModel.SearchCommandExecute] Search command executed, running query\r\n{query.DumpToText()}");
 
             TradesListViewModel.ClearTradesList();
             TradesListViewModel.ActiveQuery = query;

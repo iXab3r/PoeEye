@@ -101,15 +101,23 @@
             });
 
             var explicitMods = source.ExplicitMods ?? new IPoeQueryRangeModArgument[0].Where(x => !string.IsNullOrWhiteSpace(x.Name)).ToArray();
-            args.AddRange(explicitMods.Select(poeExplicitModViewModel => CreateModArgument(poeExplicitModViewModel.Name, poeExplicitModViewModel.Min, poeExplicitModViewModel.Max)));
 
-            args.AddRange(new[]
-           {
-                CreateArgument("group_type", "And"),
-                CreateArgument("group_min", string.Empty),
-                CreateArgument("group_max", string.Empty),
-                CreateArgument("group_count", explicitMods.Count())
-            });
+            if (explicitMods.Any())
+            {
+                args.AddRange(
+                    explicitMods.Select(poeExplicitModViewModel =>
+                        CreateModArgument(poeExplicitModViewModel.Name,
+                                          poeExplicitModViewModel.Min,
+                                          poeExplicitModViewModel.Max)));
+
+                args.AddRange(new[]
+                {
+                    CreateArgument("group_type", "And"),
+                    CreateArgument("group_min", string.Empty),
+                    CreateArgument("group_max", string.Empty),
+                    CreateArgument("group_count", explicitMods.Count())
+                });
+            }
 
             Guard.ArgumentIsTrue(() => args.ToDictionary(x => x.Name, x => default(int?)).Count() == args.Count());
 

@@ -6,6 +6,8 @@
 
     using Common;
 
+    using Guards;
+
     using Query;
 
     public sealed class PoeQueryInfo : IPoeQueryInfo
@@ -133,51 +135,5 @@
         public IPoeQueryRangeModArgument ImplicitMod { get; set; }
 
         public IPoeQueryRangeModArgument[] ExplicitMods { get; set; }
-
-        private string[] FormatQueryDescriptionArray()
-        {
-            var blackList = new[]
-            {
-                nameof(League),
-            };
-            var nullableProperties = typeof(PoeQueryInfo)
-                .GetProperties()
-                .Where(x => !blackList.Contains(x.Name))
-                .Where(x => x.PropertyType == typeof(int?)
-                            || x.PropertyType == typeof(float?)
-                            || x.PropertyType == typeof(string)
-                            || x.PropertyType == typeof(IPoeItemType)
-                            || x.PropertyType == typeof(PoeItemRarity?))
-                .Where(x => x.CanRead)
-                .ToArray();
-
-            var result = new List<string>();
-            foreach (var nullableProperty in nullableProperties)
-            {
-                var value = nullableProperty.GetValue(this);
-                if (value == null)
-                {
-                    continue;
-                }
-                if (value is string && string.IsNullOrWhiteSpace(value as string))
-                {
-                    continue;
-                }
-
-                var formattedValue = $"{nullableProperty.Name}: {value}";
-                result.Add(formattedValue);
-            }
-            return result.ToArray();
-        }
-
-        public override string ToString()
-        {
-            var descriptions = FormatQueryDescriptionArray();
-            if (!descriptions.Any())
-            {
-                return null;
-            }
-            return String.Join("\r\n", descriptions);
-        }
     }
 }

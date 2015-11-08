@@ -345,6 +345,8 @@
 
         IPoeQueryRangeModArgument[] IPoeQueryInfo.ExplicitMods => GetExplicitMods();
 
+        public string Description => GetQueryDescription();
+
         public int? SocketsB
         {
             get { return socketsB; }
@@ -610,6 +612,8 @@
             {
                 League = LeaguesList.First();
             }
+
+            this.RaisePropertyChanged(nameof(PoeQueryBuilder));
         }
 
         private static void TransferProperties<TSource, TTarget>(TSource source, TTarget target)
@@ -689,9 +693,58 @@
             return result.ToArray();
         }
 
-        public string FormatQueryDescription()
+        private IList<string> FormatQueryDescriptionArray()
         {
-            return GetQueryInfo().ToString();
+            var blackList = new[]
+            {
+                nameof(League),
+                nameof(ItemName),
+            };
+            var nullableProperties = typeof(IPoeQueryInfo)
+                .GetProperties()
+                .Where(x => !blackList.Contains(x.Name))
+                .Where(x => x.PropertyType == typeof(int?)
+                            || x.PropertyType == typeof(float?)
+                            || x.PropertyType == typeof(string)
+                            || x.PropertyType == typeof(IPoeItemType)
+                            || x.PropertyType == typeof(PoeItemRarity?))
+                .Where(x => x.CanRead)
+                .ToArray();
+
+            var result = new List<string>();
+            foreach (var nullableProperty in nullableProperties)
+            {
+                var value = nullableProperty.GetValue(this);
+                if (value == null)
+                {
+                    continue;
+                }
+                if (value is string && string.IsNullOrWhiteSpace(value as string))
+                {
+                    continue;
+                }
+
+                var formattedValue = $"{nullableProperty.Name}: {value}";
+                result.Add(formattedValue);
+            }
+            return result;
+        }
+
+        public string GetQueryDescription()
+        {
+            var descriptions = FormatQueryDescriptionArray();
+            if (!string.IsNullOrEmpty(itemName))
+            {
+                descriptions.Insert(0, itemName);
+            }
+
+            if (!descriptions.Any())
+            {
+                return null;
+            }
+
+            var result = String.Join("\r\n", descriptions);
+            return result;
         }
     }
 }
