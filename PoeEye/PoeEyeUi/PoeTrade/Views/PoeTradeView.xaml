@@ -17,7 +17,7 @@
         </DataTemplate.Resources>
 
         <ContentControl Margin="10">
-            <Grid>
+            <Grid HorizontalAlignment="Center" MinWidth="800">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="40"/>
                     <RowDefinition Height="*"/>
@@ -25,7 +25,7 @@
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="100"/>
-                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*" SharedSizeGroup="Content"/>
                 </Grid.ColumnDefinitions>
 
                 <ContentControl Grid.Row="1" Grid.Column="0" 
@@ -145,7 +145,7 @@
                             </Grid>
 
                             <!-- Stats -->
-                            <Grid Margin="50,10,0,10">
+                            <Grid Margin="10,5">
                                 <Grid.Resources>
                                     <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
                                         <Setter Property="Margin" Value="10, 5, 10, 5"/>

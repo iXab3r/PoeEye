@@ -84,6 +84,8 @@
                 .AddTo(Anchors);
 
             QueryViewModel.ObservableForProperty(x => x.PoeQueryBuilder)
+                          .ToUnit()
+                          .StartWith(Unit.Default)
                           .Subscribe(RebuildTabName)
                           .AddTo(Anchors);
         }

@@ -8,7 +8,6 @@
                     xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit">
     <DataTemplate DataType="{x:Type viewModels:MainWindowTabViewModel}">
         <Grid>
-
             <Grid.Resources>
                 <CollectionViewSource x:Key='tradesListSource' 
                                       Source="{Binding TradesListViewModel.TradesList}"
@@ -28,16 +27,22 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <Expander Header="Query parameters" IsExpanded="{Binding QueryViewModel.IsExpanded}">
-                <StackPanel>
-                    <controls:MetroContentControl Content="{Binding QueryViewModel}"/>
-                    <DockPanel>
-                        <Button HorizontalAlignment="Right" Width="150" Command="{Binding SearchCommand}" 
+            <ScrollViewer VerticalScrollBarVisibility="Visible"
+                          IsTabStop="False"
+                          Focusable="False"
+                          MaxHeight="{Binding ActualHeight, RelativeSource={RelativeSource FindAncestor, AncestorType=ContentPresenter}, Mode=OneWay}">
+                <Expander Header="Query parameters" IsExpanded="{Binding QueryViewModel.IsExpanded}">
+
+                    <StackPanel Orientation="Vertical">
+                        <controls:MetroContentControl Content="{Binding QueryViewModel}"/>
+                        <DockPanel>
+                            <Button HorizontalAlignment="Right" Width="150" Command="{Binding SearchCommand}" 
                             CommandParameter="{Binding QueryViewModel.PoeQueryBuilder}" 
                             Content="Search"/>
-                    </DockPanel>
-                </StackPanel>
-            </Expander>
+                        </DockPanel>
+                    </StackPanel>
+                </Expander>
+            </ScrollViewer>
 
             <Grid Grid.Row="1" Margin="5">
                 <Border BorderBrush="{StaticResource AccentColorBrush}" BorderThickness="1">
@@ -66,7 +71,7 @@
                           Style="{StaticResource VirtualizedItemsControlStyle}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <ContentControl MaxWidth="800" Content="{Binding}"/>
+                            <ContentControl Content="{Binding}"/>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>

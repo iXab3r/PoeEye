@@ -14,7 +14,7 @@
         xmlns:generic="clr-namespace:System.Collections.Generic;assembly=mscorlib"
         mc:Ignorable="d"
         Title="{Binding MainWindowTitle}" 
-        MinWidth="1000" 
+        MinWidth="1100" 
         MinHeight="800" 
         Width="1100" 
         Height="800" 
