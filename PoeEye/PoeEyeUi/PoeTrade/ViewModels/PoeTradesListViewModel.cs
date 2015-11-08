@@ -53,7 +53,7 @@
         private readonly SerialDisposable activeHistoryProviderDisposable = new SerialDisposable();
 
         private DateTime lastUpdateTimestamp;
-        private IPoeQueryInfo queryInfo;
+        private IPoeQueryInfo activeQuery;
         private TimeSpan recheckTimeout = TimeSpan.FromSeconds(60);
         private readonly ReactiveList<IPoeTradeViewModel> tradesList = new ReactiveList<IPoeTradeViewModel>() { ChangeTrackingEnabled = true };
 
@@ -78,7 +78,7 @@
 
             Anchors.Add(activeHistoryProviderDisposable);
 
-            this.WhenAnyValue(x => x.QueryInfo)
+            this.WhenAnyValue(x => x.ActiveQuery)
                                      .DistinctUntilChanged()
                                      .Where(x => x != null)
                                      .Do(_ => lastUpdateTimestamp = clock.CurrentTime)
@@ -100,10 +100,10 @@
 
         public ReactiveList<IPoeTradeViewModel> TradesList => tradesList;
 
-        private IPoeQueryInfo QueryInfo
+        public IPoeQueryInfo ActiveQuery
         {
-            get { return queryInfo; }
-            set { this.RaiseAndSetIfChanged(ref queryInfo, value); }
+            get { return activeQuery; }
+            set { this.RaiseAndSetIfChanged(ref activeQuery, value); }
         }
 
         private Exception lastUpdateException;
@@ -123,12 +123,6 @@
         }
 
         public bool IsBusy => activeProviderInfo.HistoryProvider?.IsBusy ?? false;
-
-        public void SetQueryInfo([NotNull] IPoeQueryInfo queryInfo)
-        {
-            Guard.ArgumentNotNull(() => queryInfo);
-            QueryInfo = queryInfo;
-        }
 
         private void OnNextItemsPackReceived(IPoeItem[] itemsPack)
         {
@@ -211,7 +205,7 @@
         {
             if (error != null)
             {
-                Log.Instance.Debug($"[TradesListViewModel] Received an exception from history provider\r\nQuery: {queryInfo?.DumpToTextValue() }");
+                Log.Instance.Debug($"[TradesListViewModel] Received an exception from history provider\r\nQuery: {activeQuery?.DumpToTextValue() }");
             }
             LastUpdateException = error;
         }

@@ -147,7 +147,7 @@
             var query = queryBuilder();
 
             TradesListViewModel.ClearTradesList();
-            TradesListViewModel.SetQueryInfo(query);
+            TradesListViewModel.ActiveQuery = query;
             RebuildTabName();
             QueryViewModel.IsExpanded = false;
         }

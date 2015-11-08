@@ -108,7 +108,7 @@
                                                 Focusable="False"
                                                 CommandParameter="{Binding QueryViewModel.PoeQueryBuilder}" 
                                                 Content="{x:Static net:FontAwesome.search}"
-                                                Visibility="{Binding TradesListViewModel.QueryInfo, Converter={StaticResource NotNullToCollapsedConverter}}" />
+                                                Visibility="{Binding TradesListViewModel.ActiveQuery, Converter={StaticResource NotNullToCollapsedConverter}}" />
                                     </Grid>
                                 </DockPanel>
 
@@ -208,7 +208,7 @@
 
                 <TextBlock Grid.Column="1"  
                            Margin="10,0,0,0" 
-                           Visibility="{Binding SelectedItem.TradesListViewModel.QueryInfo, Converter={StaticResource NullToCollapsedConverter}}"
+                           Visibility="{Binding SelectedItem.TradesListViewModel.ActiveQuery, Converter={StaticResource NullToCollapsedConverter}}"
                            Text="{Binding SelectedItem.TradesListViewModel.TimeSinceLastUpdate.TotalSeconds, Mode=OneWay, StringFormat='Elapsed since last update: {0:F0}s'}"/>
 
                 <Slider Grid.Column="2" 
