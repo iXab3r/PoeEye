@@ -100,7 +100,7 @@
 
         public ReactiveList<IPoeTradeViewModel> TradesList => tradesList;
 
-        public IPoeQueryInfo QueryInfo
+        private IPoeQueryInfo QueryInfo
         {
             get { return queryInfo; }
             set { this.RaiseAndSetIfChanged(ref queryInfo, value); }
@@ -123,6 +123,12 @@
         }
 
         public bool IsBusy => activeProviderInfo.HistoryProvider?.IsBusy ?? false;
+
+        public void SetQueryInfo([NotNull] IPoeQueryInfo queryInfo)
+        {
+            Guard.ArgumentNotNull(() => queryInfo);
+            QueryInfo = queryInfo;
+        }
 
         private void OnNextItemsPackReceived(IPoeItem[] itemsPack)
         {

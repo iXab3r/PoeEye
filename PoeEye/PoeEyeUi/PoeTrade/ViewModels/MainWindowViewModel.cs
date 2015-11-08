@@ -182,8 +182,8 @@
             var newTab = tabFactory.Create();
 
             newTab
-                .TradesListViewModel
-                .WhenAnyValue(x => x.QueryInfo)
+                .QueryViewModel
+                .Changed
                 .Select(x => Unit.Default)
                 .Subscribe(configUpdateSubject);
 
@@ -206,7 +206,7 @@
                 tab => new PoeEyeTabConfig
                 {
                     RecheckTimeout = tab.TradesListViewModel.RecheckTimeout,
-                    QueryInfo = tab.TradesListViewModel.QueryInfo,
+                    QueryInfo = tab.QueryViewModel.PoeQueryBuilder(),
                     AudioNotificationEnabled = tab.AudioNotificationEnabled
                 }).ToArray();
 

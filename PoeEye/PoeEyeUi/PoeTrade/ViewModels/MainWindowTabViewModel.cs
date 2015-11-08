@@ -74,11 +74,6 @@
                                           })
                                .AddTo(Anchors);
 
-            TradesListViewModel
-                .WhenAnyValue(x => x.QueryInfo)
-                .Subscribe(RebuildTabName)
-                .AddTo(Anchors);
-
             this.WhenAnyValue(x => x.NewItemsCount)
                 .DistinctUntilChanged()
                 .Where(x => x > 0)
@@ -152,7 +147,8 @@
             var query = queryBuilder();
 
             TradesListViewModel.ClearTradesList();
-            TradesListViewModel.QueryInfo = query;
+            TradesListViewModel.SetQueryInfo(query);
+            RebuildTabName();
             QueryViewModel.IsExpanded = false;
         }
 
