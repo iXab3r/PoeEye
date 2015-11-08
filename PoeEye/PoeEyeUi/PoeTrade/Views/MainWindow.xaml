@@ -60,18 +60,14 @@
                          SelectionMode="Single"
                          Margin="10,10,5,10"
                          Focusable="False"
-                         HorizontalContentAlignment="Stretch">
+                         HorizontalContentAlignment="Stretch"
+                         ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                     <ListBox.Resources>
                         <Style TargetType="ListBoxItem" BasedOn="{StaticResource ListBoxAsTabControl}" />
                     </ListBox.Resources>
                     <ListBox.ItemTemplate>
                         <DataTemplate DataType="{x:Type viewModels:MainWindowTabViewModel}">
                             <Grid Margin="0,3,0,3">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="*"/>
-                                    <RowDefinition Height="Auto"/>
-                                </Grid.RowDefinitions>
-
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="*"/>
@@ -79,16 +75,21 @@
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
 
-                                <!-- tab header content -->
+                                <DockPanel Grid.Column="0"  Grid.ColumnSpan="4"
+                                           VerticalAlignment="Bottom"
+                                           Margin="0,5,0,0">
+                                    <ProgressBar Height="4"
+                                                 IsIndeterminate="true"
+                                                 Visibility="{Binding IsBusy, Converter={StaticResource BoolToHiddenConverter}}" />
+                                </DockPanel>
 
-                                <DockPanel Grid.Row="0" Grid.Column="0" >
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto"/>
-                                            <ColumnDefinition Width="Auto"/>
-                                        </Grid.ColumnDefinitions>
+                                <Grid Grid.Column="0" >
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
 
-                                        <Label Grid.Column="0"
+                                    <Label Grid.Column="0"
                                                ToolTip="{Binding TradesListViewModel.LastUpdateException, Converter={StaticResource ExceptionToMessageConverter}}"
                                                Visibility="{Binding TradesListViewModel.LastUpdateException, Converter={StaticResource NullToCollapsedConverter}}"
                                                FontFamily="{StaticResource FontAwesome}"
@@ -99,7 +100,7 @@
                                                FontSize="20"
                                                Content="{x:Static net:FontAwesome.warning}"/>
 
-                                        <Button Grid.Column="1" 
+                                    <Button Grid.Column="1" 
                                                 Margin="5,0"
                                                 Style="{StaticResource CircleButton}"
                                                 Width="40" Height="40"
@@ -109,14 +110,13 @@
                                                 CommandParameter="{Binding QueryViewModel.PoeQueryBuilder}" 
                                                 Content="{x:Static net:FontAwesome.search}"
                                                 Visibility="{Binding TradesListViewModel.ActiveQuery, Converter={StaticResource NotNullToCollapsedConverter}}" />
-                                    </Grid>
-                                </DockPanel>
+                                </Grid>
 
-                                <TextBlock Grid.Row="0" Grid.Column="1" 
+                                <TextBlock Grid.Column="1" 
                                            Text="{Binding TabName}" 
                                            FontSize="16" TextWrapping="Wrap" VerticalAlignment="Center"/>
 
-                                <Border Grid.Row="0" Grid.Column="2"
+                                <Border Grid.Column="2"
                                         Margin="10,0,10,0">
                                     <Border Height="30" VerticalAlignment="Center">
                                         <Border.Style>
@@ -142,9 +142,7 @@
                                     </Border>
                                 </Border>
 
-
-
-                                <StackPanel Grid.Row="0" Grid.Column="3" 
+                                <StackPanel Grid.Column="3" 
                                             Orientation="Horizontal">
                                     <ToggleButton Width="40" Height="40"
                                                   ToolTip="Audio notifications for this tab"
@@ -170,11 +168,6 @@
                                             FontSize="10"
                                             Content="{x:Static net:FontAwesome.close}" />
                                 </StackPanel>
-
-                                <controls:MetroProgressBar Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4" 
-                                                       Foreground="{StaticResource TextBrush}"  
-                                                       IsIndeterminate="true"
-                                                       Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}" />
                             </Grid>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
@@ -187,7 +180,9 @@
         </Border>
 
 
-        <Border Grid.Row="2" BorderThickness="0,1,0,0" BorderBrush="{StaticResource AccentColorBrush}" Margin="5,1,10,5">
+        <Border Grid.Row="2" 
+                BorderThickness="0,1,0,0" BorderBrush="{StaticResource AccentColorBrush}" Margin="5,1,10,5"
+                Visibility="{Binding SelectedItem, Converter={StaticResource NullToHiddenConverter}}">
             <Border.Resources>
                 <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource MetroTextBlock}">
                     <Setter Property="FontSize" Value="16"/>
@@ -261,7 +256,7 @@
                                 <utilities:SetPropertyAction PropertyName="IsOpen" 
                                                              TargetObject="{Binding ElementName=SettingsFlyout}"
                                                              PropertyValue="{Binding ElementName=SettingsFlyout, Path=IsOpen, Converter={StaticResource BoolInversionConverter}}" >
-                                    
+
                                 </utilities:SetPropertyAction>
                             </i:EventTrigger>
                         </i:Interaction.Triggers>
@@ -329,7 +324,7 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
-                    
+
                     <StackPanel Grid.Row="0" 
                                 Orientation="Horizontal" Height="24">
                         <Label  Style="{StaticResource IconLabel}" Content="Clipboard monitoring:" />
@@ -358,11 +353,11 @@
                                                                 Style="{StaticResource QueryNumericUpDownMax}" 
                                                                 Value="{Binding Item2, Converter={StaticResource NullableConverter}}" StringFormat="{}{0:F2}"/>
                                     </StackPanel>
-                                    
+
                                 </DataTemplate>
-                                
+
                             </ItemsControl.ItemTemplate>
-                            
+
                         </ItemsControl>
                     </StackPanel>
                 </Grid>

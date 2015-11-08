@@ -15,6 +15,7 @@
     <converters:NullToBoolConverter x:Key="NullToBoolConverter" NullValue="True"/>
     <converters:NullToBoolConverter x:Key="InvertedNullToBoolConverter" NullValue="False"/>
     <converters:BoolInversionConverter x:Key="BoolInversionConverter" />
-    
+
     <blue:BoolToVisibilityConverter x:Key="InvertedBoolToVisibilityConverter" TrueValue="Collapsed" FalseValue="Visible"/>
+    <blue:BoolToVisibilityConverter x:Key="BoolToHiddenConverter" TrueValue="Visible" FalseValue="Hidden"/>
 </ResourceDictionary>
