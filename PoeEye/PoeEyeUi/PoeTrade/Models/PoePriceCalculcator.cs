@@ -7,13 +7,12 @@
 
     using Config;
 
-    using DumpToText;
-
     using Guards;
 
     using JetBrains.Annotations;
 
     using PoeShared;
+    using PoeShared.DumpToText;
 
     internal sealed class PoePriceCalculcator : IPoePriceCalculcator
     {

@@ -13,8 +13,6 @@
 
     using Config;
 
-    using DumpToText;
-
     using Factory;
 
     using Guards;
@@ -26,6 +24,7 @@
     using Models;
 
     using PoeShared;
+    using PoeShared.DumpToText;
     using PoeShared.PoeTrade;
     using PoeShared.Utilities;
 
@@ -207,7 +206,8 @@
                 {
                     RecheckTimeout = tab.TradesListViewModel.RecheckTimeout,
                     QueryInfo = tab.QueryViewModel.PoeQueryBuilder(),
-                    AudioNotificationEnabled = tab.AudioNotificationEnabled
+                    AudioNotificationEnabled = tab.AudioNotificationEnabled,
+                    SoldOrRemovedItems = tab.TradesListViewModel.HistoricalTrades.ToArray(),
                 }).ToArray();
 
             config.AudioNotificationsEnabled = AudioNotificationsEnabled;
@@ -234,9 +234,15 @@
                     tab.TradesListViewModel.RecheckTimeout = tabConfig.RecheckTimeout;
                 }
 
-                if (tabConfig.QueryInfo != default(IPoeQueryInfo))
+                if (tabConfig.QueryInfo != null)
                 {
                     tab.QueryViewModel.SetQueryInfo(tabConfig.QueryInfo);
+                }
+
+                if (tabConfig.SoldOrRemovedItems != null)
+                {
+                    tab.TradesListViewModel.HistoricalTrades.Clear();
+                    tab.TradesListViewModel.HistoricalTrades.AddRange(tabConfig.SoldOrRemovedItems);
                 }
 
                 tab.AudioNotificationEnabled = tabConfig.AudioNotificationEnabled;

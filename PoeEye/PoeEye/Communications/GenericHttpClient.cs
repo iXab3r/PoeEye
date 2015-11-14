@@ -10,8 +10,6 @@
 
     using CsQuery.ExtensionMethods.Internal;
 
-    using DumpToText;
-
     using EasyHttp.Http;
     using EasyHttp.Infrastructure;
 
@@ -20,6 +18,7 @@
     using JetBrains.Annotations;
 
     using PoeShared;
+    using PoeShared.DumpToText;
     using PoeShared.Http;
 
     using TypeConverter;

@@ -2,15 +2,16 @@
 {
     using System;
 
+    using PoeShared.Common;
     using PoeShared.PoeTrade;
-
-    using PoeTrade.Models;
 
     internal struct PoeEyeTabConfig
     {
         public TimeSpan RecheckTimeout { get; set; }
 
         public IPoeQueryInfo QueryInfo { get; set; }
+
+        public IPoeItem[] SoldOrRemovedItems { get; set; }
 
         public bool AudioNotificationEnabled { get; set; }
 

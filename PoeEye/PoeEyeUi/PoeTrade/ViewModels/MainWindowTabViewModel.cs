@@ -6,8 +6,6 @@
     using System.Reactive.Linq;
     using System.Windows.Input;
 
-    using DumpToText;
-
     using Guards;
 
     using JetBrains.Annotations;
@@ -15,6 +13,7 @@
     using Models;
 
     using PoeShared;
+    using PoeShared.DumpToText;
     using PoeShared.PoeTrade;
     using PoeShared.PoeTrade.Query;
     using PoeShared.Utilities;
@@ -154,7 +153,7 @@
             var query = queryBuilder();
             Log.Instance.Debug($"[MainWindowTabViewModel.SearchCommandExecute] Search command executed, running query\r\n{query.DumpToText()}");
 
-            TradesListViewModel.ClearTradesList();
+            TradesListViewModel.TradesList.Clear();
             TradesListViewModel.ActiveQuery = query;
             RebuildTabName();
             QueryViewModel.IsExpanded = false;

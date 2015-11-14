@@ -2,9 +2,12 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Linq;
 
     using Common;
+
+    using DumpToText;
 
     using Guards;
 
@@ -135,5 +138,10 @@
         public IPoeQueryRangeModArgument ImplicitMod { get; set; }
 
         public IPoeQueryRangeModArgument[] ExplicitMods { get; set; }
+
+        public override string ToString()
+        {
+            return this.DumpToTextValue();
+        }
     }
 }

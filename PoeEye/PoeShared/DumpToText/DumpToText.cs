@@ -1,14 +1,14 @@
-﻿using System;
-using System.Collections;
-using System.Diagnostics;
-using System.Linq;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Text;
-
-namespace DumpToText
+﻿namespace PoeShared.DumpToText
 {
-	public static class DumpToTextExtensions
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.Linq;
+    using System.Reflection;
+    using System.Text;
+
+    public static class DumpToTextExtensions
 	{
 		/// <summary>
 		/// After the DumpToText extension is called and the string representation of the object has been created,
@@ -48,7 +48,6 @@ namespace DumpToText
 		{
 			return ObjectTypeFactory.Create(item).Value;
 		}
-
 
 		public class ValueObject : DumpItemBase
 		{

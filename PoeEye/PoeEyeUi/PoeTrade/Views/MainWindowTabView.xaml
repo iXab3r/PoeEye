@@ -56,6 +56,12 @@
                                           VerticalAlignment="Center"
                                           DisplayMemberPath="PropertyName"/>
                         </StackPanel>
+
+                        <Expander Header="Historical trades" >
+                            <StackPanel Orientation="Vertical">
+                                <ItemsControl ItemsSource="{Binding TradesListViewModel.HistoricalTrades}"/>
+                            </StackPanel>
+                        </Expander>
                     </StackPanel>
                 </Border>
             </Grid>

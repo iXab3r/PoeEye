@@ -1,13 +1,14 @@
 ﻿namespace PoeEyeUi.PoeTrade.ViewModels
 {
     using System;
+    using System.ComponentModel;
     using System.Windows.Input;
 
     using JetBrains.Annotations;
 
     using PoeShared.Common;
 
-    internal interface IPoeTradeViewModel : IDisposable
+    internal interface IPoeTradeViewModel : IDisposable, INotifyPropertyChanged
     {
         ICommand CopyPmMessageToClipboardCommand { [NotNull] get; }
 

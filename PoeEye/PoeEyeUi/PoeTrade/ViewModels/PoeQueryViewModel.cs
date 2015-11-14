@@ -5,8 +5,6 @@
     using System.Linq;
     using System.Reflection;
 
-    using DumpToText;
-
     using Factory;
 
     using Guards;
@@ -17,6 +15,7 @@
 
     using PoeShared;
     using PoeShared.Common;
+    using PoeShared.DumpToText;
     using PoeShared.PoeDatabase;
     using PoeShared.PoeTrade;
     using PoeShared.PoeTrade.Query;

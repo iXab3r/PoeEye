@@ -11,8 +11,6 @@
     using System.Threading;
     using System.Windows.Input;
 
-    using DumpToText;
-
     using Guards;
 
     using JetBrains.Annotations;
@@ -21,6 +19,7 @@
 
     using Microsoft.Practices.Unity;
 
+    using PoeShared.DumpToText;
     using PoeShared.Utilities;
 
     using Prism;

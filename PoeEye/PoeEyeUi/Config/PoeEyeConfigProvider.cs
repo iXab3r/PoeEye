@@ -4,14 +4,13 @@ namespace PoeEyeUi.Config
     using System.IO;
     using System.Text;
 
-    using DumpToText;
-
     using Guards;
 
     using Newtonsoft.Json;
 
     using PoeShared;
     using PoeShared.Common;
+    using PoeShared.DumpToText;
     using PoeShared.PoeTrade;
     using PoeShared.PoeTrade.Query;
 

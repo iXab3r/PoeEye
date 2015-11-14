@@ -7,8 +7,6 @@
 
     using ConsoleDump;
 
-    using DumpToText;
-
     using Factory;
 
     using Microsoft.Practices.Unity;
@@ -16,6 +14,7 @@
 
     using PoeShared;
     using PoeShared.Common;
+    using PoeShared.DumpToText;
     using PoeShared.PoeTrade;
     using PoeShared.PoeTrade.Query;
     using PoeShared.Prism;
