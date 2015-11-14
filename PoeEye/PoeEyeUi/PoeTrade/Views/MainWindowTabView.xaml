@@ -69,10 +69,16 @@
                     </StackPanel>
 
                     <Expander Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="3"
-                              Visibility="{Binding TradesListViewModel.HistoricalTrades.Count, Converter={StaticResource ZeroToCollapsedConverter}}"
+                              IsExpanded="{Binding TradesListViewModel.HistoricalTradesViewModel.IsExpanded}"
                               Margin="5">
                         <Expander.Header>
-                            <TextBlock Text="{Binding TradesListViewModel.HistoricalTrades.Count, StringFormat='Historical trades ({0})'}" />
+                            <TextBlock>
+                                <TextBlock.Inlines>
+                                    Trades history (
+                                    <Run Text="{Binding TradesListViewModel.HistoricalTradesViewModel.HistoricalPoints.Count, Mode=OneWay, StringFormat='{}{0} historical'}"/>+
+                                    <Run Text="{Binding TradesListViewModel.HistoricalTradesViewModel.ActualPoints.Count, Mode=OneWay, StringFormat='{}{0} actual'}"/> )
+                                </TextBlock.Inlines>
+                            </TextBlock>
                         </Expander.Header>
                         <ContentControl Content="{Binding TradesListViewModel.HistoricalTradesViewModel}"/>
                     </Expander>

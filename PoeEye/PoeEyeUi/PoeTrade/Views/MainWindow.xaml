@@ -75,21 +75,26 @@
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
 
-                                <DockPanel Grid.Column="0"  Grid.ColumnSpan="4"
+                                <DockPanel Grid.Column="0" 
                                            VerticalAlignment="Bottom"
                                            Margin="0,5,0,0">
-                                    <ProgressBar Height="4"
-                                                 IsIndeterminate="true"
-                                                 Visibility="{Binding IsBusy, Converter={StaticResource BoolToHiddenConverter}}" />
+                                  
                                 </DockPanel>
 
                                 <Grid Grid.Column="0" >
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="Auto"/>
                                         <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
                                     </Grid.ColumnDefinitions>
 
-                                    <Label Grid.Column="0"
+                                    <ProgressBar Grid.Column="0" Width="10" Height="NaN"
+                                                 Margin="0,0,5,0"
+                                                 IsIndeterminate="true"
+                                                 Orientation="Vertical"
+                                                 Visibility="{Binding IsBusy, Converter={StaticResource BoolToHiddenConverter}}" />
+
+                                    <Label Grid.Column="1"
                                                ToolTip="{Binding TradesListViewModel.LastUpdateException, Converter={StaticResource ExceptionToMessageConverter}}"
                                                Visibility="{Binding TradesListViewModel.LastUpdateException, Converter={StaticResource NullToCollapsedConverter}}"
                                                FontFamily="{StaticResource FontAwesome}"
@@ -100,7 +105,7 @@
                                                FontSize="20"
                                                Content="{x:Static net:FontAwesome.warning}"/>
 
-                                    <Button Grid.Column="1" 
+                                    <Button Grid.Column="2" 
                                                 Margin="5,0"
                                                 Style="{StaticResource CircleButton}"
                                                 Width="40" Height="40"

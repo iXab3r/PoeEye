@@ -161,9 +161,12 @@
 
         private void MarkAllAsReadExecute(object arg)
         {
-            foreach (var trade in TradesListViewModel.TradesList)
+            using (TradesListViewModel.TradesList.SuppressChangeNotifications())
             {
-                trade.TradeState = PoeTradeState.Normal;
+                foreach (var trade in TradesListViewModel.TradesList.ToArray())
+                {
+                    trade.TradeState = PoeTradeState.Normal;
+                }
             }
         }
     }

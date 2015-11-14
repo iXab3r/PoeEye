@@ -11,5 +11,7 @@
         IReactiveList<PoeItemPricePoint> HistoricalPoints { [NotNull] get; }
 
         IReactiveList<PoeItemPricePoint> ActualPoints { [NotNull] get; }
+
+        bool IsExpanded { get; }
     }
 }
