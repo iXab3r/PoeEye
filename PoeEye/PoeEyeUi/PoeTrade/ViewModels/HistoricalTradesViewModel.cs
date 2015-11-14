@@ -2,6 +2,7 @@
 {
     using System;
     using System.Linq;
+    using System.Reactive;
     using System.Reactive.Linq;
 
     using Guards;
@@ -23,6 +24,14 @@
 
         private bool isExpanded;
 
+        private double maxPrice;
+
+        private DateTime maxTimestamp;
+
+        private double minPrice;
+
+        private DateTime minTimestamp;
+
         public HistoricalTradesViewModel(
             [NotNull] IReactiveList<IPoeItem> historicalTrades,
             [NotNull] IReactiveList<IPoeTradeViewModel> actualTrades,
@@ -37,8 +46,33 @@
             this.poePriceCalculcator = poePriceCalculcator;
 
             historicalTrades.Changed.ToUnit().Merge(actualTrades.Changed.ToUnit())
+                            .StartWith(Unit.Default)
                             .Subscribe(RefreshPoints)
                             .AddTo(Anchors);
+        }
+
+        public double MinPrice
+        {
+            get { return minPrice; }
+            set { this.RaiseAndSetIfChanged(ref minPrice, value); }
+        }
+
+        public DateTime MinTimestamp
+        {
+            get { return minTimestamp; }
+            set { this.RaiseAndSetIfChanged(ref minTimestamp, value); }
+        }
+
+        public double MaxPrice
+        {
+            get { return maxPrice; }
+            set { this.RaiseAndSetIfChanged(ref maxPrice, value); }
+        }
+
+        public DateTime MaxTimestamp
+        {
+            get { return maxTimestamp; }
+            set { this.RaiseAndSetIfChanged(ref maxTimestamp, value); }
         }
 
         public bool IsExpanded
@@ -53,20 +87,60 @@
 
         private void RefreshPoints()
         {
+            RefreshActualPoints();
+            RefreshHistoricalPoints();
+
+            var newMinPrice = 0d;
+            var newMaxPrice = 0d;
+            var newMinTimestamp = DateTime.MaxValue;
+            var newMaxTimestamp = DateTime.MinValue;
+
+            var pointsToAnalyze = ActualPoints.Concat(HistoricalPoints).ToArray();
+            if (pointsToAnalyze.Any())
+            {
+                foreach (var source in pointsToAnalyze)
+                {
+                    newMinPrice = Math.Min(source.Price, newMinPrice);
+                    newMaxPrice = Math.Max(source.Price, newMaxPrice);
+
+                    if (source.Timestamp < newMinTimestamp)
+                    {
+                        newMinTimestamp = source.Timestamp;
+                    }
+
+                    if (source.Timestamp > newMaxTimestamp)
+                    {
+                        newMaxTimestamp = source.Timestamp;
+                    }
+                }
+            }
+
+            MinPrice = newMinPrice - newMinPrice * 0.1;
+            MaxPrice = newMaxPrice + newMaxPrice * 0.1;
+            MinTimestamp = newMinTimestamp;
+            MaxTimestamp = newMaxTimestamp;
+        }
+
+        private void RefreshHistoricalPoints()
+        {
+            var historicalPoints = historicalTrades
+               .Select(ToPoint)
+               .Where(x => x != null)
+               .Select(x => x.Value)
+               .ToArray();
+            ActualizeList(HistoricalPoints, historicalPoints);
+        }
+
+        private void RefreshActualPoints()
+        {
             var actualPoints = actualTrades
-                .Select(ToPoint)
-                .Where(x => x != null)
-                .Select(x => x.Value)
-                .ToArray();
+               .Select(ToPoint)
+               .Where(x => x != null)
+               .Select(x => x.Value)
+               .ToArray();
 
             ActualizeList(ActualPoints, actualPoints);
 
-            var historicalPoints = historicalTrades
-                .Select(ToPoint)
-                .Where(x => x != null)
-                .Select(x => x.Value)
-                .ToArray();
-            ActualizeList(HistoricalPoints, historicalPoints);
         }
 
         private static void ActualizeList(IReactiveList<PoeItemPricePoint> list, PoeItemPricePoint[] points)

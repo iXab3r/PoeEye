@@ -129,7 +129,7 @@
                                                 <Style.Triggers>
                                                     <DataTrigger Binding="{Binding HasNewTrades}" Value="True">
                                                         <Setter Property="BorderThickness" Value="0,0,0,2"/>
-                                                        <Setter Property="BorderBrush" Value="{StaticResource PoeTradeNewItemColor}"/>
+                                                        <Setter Property="BorderBrush" Value="{StaticResource PoeTradeNewItemBrush}"/>
                                                     </DataTrigger>
                                                 </Style.Triggers>
                                             </Style>
@@ -139,8 +139,8 @@
                                            VerticalAlignment="Center"
                                            HorizontalAlignment="Right" >
                                             <TextBlock.Inlines>
-                                                <Run Text="{Binding NewItemsCount, Mode=OneWay, StringFormat='{}{0,2}'}" Foreground="{StaticResource PoeTradeNewItemColor}"/> /
-                                                <Run Text="{Binding RemovedItemsCount, Mode=OneWay, StringFormat='{}{0,2}'}" Foreground="{StaticResource PoeTradeRemovedItemColor}"/> /
+                                                <Run Text="{Binding NewItemsCount, Mode=OneWay, StringFormat='{}{0,2}'}" Foreground="{StaticResource PoeTradeNewItemBrush}"/> /
+                                                <Run Text="{Binding RemovedItemsCount, Mode=OneWay, StringFormat='{}{0,2}'}" Foreground="{StaticResource PoeTradeRemovedItemBrush}"/> /
                                                 <Run Text="{Binding NormalItemsCount, Mode=OneWay, StringFormat='{}{0,2}'}"/>
                                             </TextBlock.Inlines>
                                         </TextBlock>

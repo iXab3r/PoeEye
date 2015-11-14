@@ -54,11 +54,11 @@
                                     <Style TargetType="Button">
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding TradeState}" Value="{x:Static poeTrade:PoeTradeState.New}">
-                                                <Setter Property="Background" Value="{StaticResource PoeTradeNewItemColor}"/>
+                                                <Setter Property="Background" Value="{StaticResource PoeTradeNewItemBrush}"/>
                                                 <Setter Property="BorderThickness" Value="1"/>
                                             </DataTrigger>
                                             <DataTrigger Binding="{Binding TradeState}" Value="{x:Static poeTrade:PoeTradeState.Removed}">
-                                                <Setter Property="Background" Value="{StaticResource PoeTradeRemovedItemColor}"/>
+                                                <Setter Property="Background" Value="{StaticResource PoeTradeRemovedItemBrush}"/>
                                                 <Setter Property="BorderThickness" Value="1"/>
                                             </DataTrigger>
                                             <DataTrigger Binding="{Binding TradeState}" Value="{x:Static poeTrade:PoeTradeState.Normal}">
@@ -96,16 +96,16 @@
                                     <Style TargetType="TextBlock" BasedOn="{StaticResource MetroTextBlockHeaderStyle}">
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding Trade.Rarity}" Value="{x:Static common:PoeItemRarity.Normal}">
-                                                <Setter Property="Foreground" Value="{StaticResource PoeItemRarityColorNormal}"/>
+                                                <Setter Property="Foreground" Value="{StaticResource PoeItemRarityNormalBrush}"/>
                                             </DataTrigger>
                                             <DataTrigger Binding="{Binding Trade.Rarity}" Value="{x:Static common:PoeItemRarity.Magic}">
-                                                <Setter Property="Foreground" Value="{StaticResource PoeItemRarityColorMagic}"/>
+                                                <Setter Property="Foreground" Value="{StaticResource PoeItemRarityMagicBrush}"/>
                                             </DataTrigger>
                                             <DataTrigger Binding="{Binding Trade.Rarity}" Value="{x:Static common:PoeItemRarity.Rare}">
-                                                <Setter Property="Foreground" Value="{StaticResource PoeItemRarityColorRare}"/>
+                                                <Setter Property="Foreground" Value="{StaticResource PoeItemRarityRareBrush}"/>
                                             </DataTrigger>
                                             <DataTrigger Binding="{Binding Trade.Rarity}" Value="{x:Static common:PoeItemRarity.Unique}">
-                                                <Setter Property="Foreground" Value="{StaticResource PoeItemRarityColorUnique}"/>
+                                                <Setter Property="Foreground" Value="{StaticResource PoeItemRarityUniqueBrush}"/>
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
@@ -307,10 +307,10 @@
                                      VerticalAlignment="Center">
                                 <Ellipse.Style>
                                     <Style TargetType="Ellipse">
-                                        <Setter Property="Fill" Value="{StaticResource PoeTradeNewItemColor}"/>
+                                        <Setter Property="Fill" Value="{StaticResource PoeTradeNewItemBrush}"/>
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding Trade.UserIsOnline}" Value="False">
-                                                <Setter Property="Fill" Value="{StaticResource PoeTradeRemovedItemColor}"/>
+                                                <Setter Property="Fill" Value="{StaticResource PoeTradeRemovedItemBrush}"/>
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>

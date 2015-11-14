@@ -118,7 +118,7 @@
             {
                 return false;
             }
-            item.Links = new PoeLinksInfo(linksMatch.Groups[1].Value);
+            item.Links = new PoeLinksInfo { RawSockets = linksMatch.Groups[1].Value };
             return true;
         }
 

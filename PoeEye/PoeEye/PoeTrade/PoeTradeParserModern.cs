@@ -196,7 +196,7 @@ namespace PoeEye.PoeTrade
             CQ parser = row.Render();
 
             var rawLinksText = parser["span[class=sockets-raw]"]?.Text();
-            return string.IsNullOrWhiteSpace(rawLinksText) ? null : new PoeLinksInfo(rawLinksText);
+            return string.IsNullOrWhiteSpace(rawLinksText) ? default(IPoeLinksInfo) : new PoeLinksInfo() { RawSockets = rawLinksText };
         }
 
         private static IPoeItemMod[] ExtractExplicitMods(IDomObject row)

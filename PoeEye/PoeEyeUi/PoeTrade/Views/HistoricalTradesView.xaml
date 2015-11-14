@@ -4,24 +4,34 @@
                     xmlns:sparrowToolkit="http://sparrowtoolkit.codeplex.com/wpf">
 
     <DataTemplate DataType="{x:Type viewModels:HistoricalTradesViewModel}">
-        <Grid>
+
+        <Grid Margin="10,5">
             <sparrowToolkit:SparrowChart Height="300" 
-                                         OverlayMode="AxisFirst" 
+                                         RenderingMode="WritableBitmap"
                                          Theme="Metro" >
 
                 <sparrowToolkit:SparrowChart.XAxis>
-                    <sparrowToolkit:DateTimeXAxis ShowCrossLines="True" StringFormat="HH:mm" />
+                    <sparrowToolkit:DateTimeXAxis StringFormat="HH:mm" />
                 </sparrowToolkit:SparrowChart.XAxis>
                 <sparrowToolkit:SparrowChart.YAxis>
-                    <sparrowToolkit:LinearYAxis ShowCrossLines="True" StringFormat="0"  />
+                    <sparrowToolkit:LinearYAxis MinValue="{Binding MinPrice}" MaxValue="{Binding MaxPrice}"
+                                                StringFormat="0.0" />
                 </sparrowToolkit:SparrowChart.YAxis>
 
                 <sparrowToolkit:SparrowChart.Series>
-                    <sparrowToolkit:LineSeries PointsSource="{Binding ActualPoints}" XPath="Timestamp" YPath="Price"
-                                               Stroke="{StaticResource AccentColorBrush}" StrokeThickness="2" />
+                    <sparrowToolkit:AreaSeries PointsSource="{Binding ActualPoints}" XPath="Timestamp" YPath="Price"
+                                               Stroke="{StaticResource PoeTradeNewItemBrush}" StrokeThickness="2" >
+                        <sparrowToolkit:AreaSeries.Fill>
+                            <SolidColorBrush Opacity="0.5" Color="{StaticResource PoeTradeNewItemColor}" />
+                        </sparrowToolkit:AreaSeries.Fill>
+                    </sparrowToolkit:AreaSeries>
 
-                    <sparrowToolkit:LineSeries PointsSource="{Binding HistoricalPoints}" XPath="Timestamp" YPath="Price"
-                                               Stroke="{StaticResource WhiteColorBrush}" StrokeThickness="1" />
+                    <sparrowToolkit:AreaSeries PointsSource="{Binding HistoricalPoints}" XPath="Timestamp" YPath="Price"
+                    	Stroke="{StaticResource PoeTradeRemovedItemBrush}" StrokeThickness="1">
+                        <sparrowToolkit:AreaSeries.Fill>
+                            <SolidColorBrush Opacity="0.5" Color="{StaticResource PoeTradeRemovedItemColor}" />
+                        </sparrowToolkit:AreaSeries.Fill>
+                    </sparrowToolkit:AreaSeries>
                 </sparrowToolkit:SparrowChart.Series>
             </sparrowToolkit:SparrowChart>
         </Grid>

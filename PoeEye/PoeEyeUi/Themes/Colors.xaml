@@ -3,12 +3,15 @@
                     xmlns:converters="clr-namespace:PoeEyeUi.Converters"
                     xmlns:blue="http://www.nuget.org/Blue.MVVM">
 
-    <SolidColorBrush x:Key="PoeTradeRemovedItemColor" Color="#55FF9298" />
-    <SolidColorBrush x:Key="PoeTradeNewItemColor" Color="#5592FF98" />
+    <Color x:Key="PoeTradeRemovedItemColor" >#55FF9298</Color>
+    <Color x:Key="PoeTradeNewItemColor" >#5592FF98</Color>
 
-    <SolidColorBrush x:Key="PoeItemRarityColorNormal" Color="White" />
-    <SolidColorBrush x:Key="PoeItemRarityColorMagic" Color="CornflowerBlue" />
-    <SolidColorBrush x:Key="PoeItemRarityColorRare" Color="Yellow" />
-    <SolidColorBrush x:Key="PoeItemRarityColorUnique" Color="OrangeRed" />
+    <SolidColorBrush x:Key="PoeTradeRemovedItemBrush" Color="{StaticResource PoeTradeRemovedItemColor}" />
+    <SolidColorBrush x:Key="PoeTradeNewItemBrush" Color="{StaticResource PoeTradeNewItemColor}" />
+
+    <SolidColorBrush x:Key="PoeItemRarityNormalBrush" Color="White" />
+    <SolidColorBrush x:Key="PoeItemRarityMagicBrush" Color="CornflowerBlue" />
+    <SolidColorBrush x:Key="PoeItemRarityRareBrush" Color="Yellow" />
+    <SolidColorBrush x:Key="PoeItemRarityUniqueBrush" Color="OrangeRed" />
 
 </ResourceDictionary>
