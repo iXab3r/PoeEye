@@ -35,6 +35,7 @@ namespace PoeEyeUi.Config
             };
             jsonSerializerSettings.Converters.Add(new ConcreteListTypeConverter<IPoeQueryInfo, PoeQueryInfo>());
             jsonSerializerSettings.Converters.Add(new ConcreteListTypeConverter<IPoeItemType, PoeItemType>());
+            jsonSerializerSettings.Converters.Add(new ConcreteListTypeConverter<IPoeItem, PoeItem>());
             jsonSerializerSettings.Converters.Add(new ConcreteListTypeConverter<IPoeQueryRangeModArgument, PoeQueryRangeModArgument>());
 
             poeEyeConfigLoader = new Lazy<IPoeEyeConfig>(LoadInternal);
