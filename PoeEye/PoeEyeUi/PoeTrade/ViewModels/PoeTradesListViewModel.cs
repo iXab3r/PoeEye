@@ -6,6 +6,7 @@
     using System.Reactive.Concurrency;
     using System.Reactive.Disposables;
     using System.Reactive.Linq;
+    using System.Windows.Input;
 
     using Factory;
 
@@ -27,7 +28,7 @@
 
     using TypeConverter;
 
-    internal sealed class PoeTradesListViewModel : DisposableReactiveObject
+    internal sealed class PoeTradesListViewModel : DisposableReactiveObject, IPoeTradesListViewModel
     {
         private static readonly TimeSpan TimeSinceLastUpdateRefreshTimeout = TimeSpan.FromSeconds(1);
 
@@ -49,6 +50,7 @@
         public PoeTradesListViewModel(
             [NotNull] IFactory<IPoeLiveHistoryProvider, IPoeQuery> poeLiveHistoryFactory,
             [NotNull] IFactory<IPoeTradeViewModel, IPoeItem> poeTradeViewModelFactory,
+            [NotNull] IFactory<IHistoricalTradesViewModel, IReactiveList<IPoeItem>, IReactiveList<IPoeTradeViewModel>> historicalTradesViewModelFactory,
             [NotNull] IEqualityComparer<IPoeItem> poeItemsComparer,
             [NotNull] IConverter<IPoeQueryInfo, IPoeQuery> poeQueryInfoToQueryConverter,
             [NotNull] IClock clock,
@@ -56,6 +58,7 @@
         {
             Guard.ArgumentNotNull(() => poeLiveHistoryFactory);
             Guard.ArgumentNotNull(() => poeTradeViewModelFactory);
+            Guard.ArgumentNotNull(() => historicalTradesViewModelFactory);
             Guard.ArgumentNotNull(() => poeQueryInfoToQueryConverter);
             Guard.ArgumentNotNull(() => poeItemsComparer);
             Guard.ArgumentNotNull(() => clock);
@@ -64,6 +67,8 @@
             this.poeItemsComparer = poeItemsComparer;
             this.uiScheduler = uiScheduler;
             this.clock = clock;
+
+            HistoricalTradesViewModel = historicalTradesViewModelFactory.Create(HistoricalTrades, TradesList);
 
             Anchors.Add(activeHistoryProviderDisposable);
 
@@ -90,6 +95,8 @@
         public ReactiveList<IPoeTradeViewModel> TradesList { get; } = new ReactiveList<IPoeTradeViewModel> { ChangeTrackingEnabled = true };
 
         public ReactiveList<IPoeItem> HistoricalTrades { get; } = new ReactiveList<IPoeItem>() { ChangeTrackingEnabled = true };
+
+        public IHistoricalTradesViewModel HistoricalTradesViewModel { get; }
 
         public IPoeQueryInfo ActiveQuery
         {
@@ -155,7 +162,7 @@
 
                         TradesList.Add(itemViewModel);
 
-                        itemViewModel.IndexedAtTimestamp = clock.CurrentTime;
+                        itemViewModel.Trade.Timestamp = clock.CurrentTime;
                     }
                 }
             }

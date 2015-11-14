@@ -1,5 +1,7 @@
 ﻿namespace PoeShared.Common
 {
+    using System;
+
     using JetBrains.Annotations;
 
     public interface IPoeItem
@@ -57,5 +59,7 @@
         IPoeItemMod[] Mods { [NotNull] get; }
 
         IPoeLinksInfo Links { get; }
+
+        DateTime Timestamp { get; set; }
     }
 }

@@ -20,13 +20,9 @@
 
         PoeLinksInfoViewModel LinksViewModel { [NotNull] get; }
 
-        ICommand MarkAsReadCommand { [NotNull] get; }
-
         float? PriceInChaosOrbs { get; }
 
         IPoeItem Trade { [NotNull] get; }
-
-        DateTime IndexedAtTimestamp { get; set; }
 
         PoeTradeState TradeState { get; set; }
     }

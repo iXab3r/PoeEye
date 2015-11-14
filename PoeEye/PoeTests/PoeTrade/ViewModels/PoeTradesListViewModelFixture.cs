@@ -23,6 +23,8 @@
     using PoeShared.PoeTrade;
     using PoeShared.PoeTrade.Query;
 
+    using ReactiveUI;
+
     using Shouldly;
 
     using TypeConverter;
@@ -34,6 +36,7 @@
         private Mock<IEqualityComparer<IPoeItem>> poeItemsComparer;
         private Mock<IFactory<IPoeTradeViewModel, IPoeItem>> poeTradeViewModelFactory;
         private Mock<IFactory<IPoeLiveHistoryProvider, IPoeQuery>> poeLiveHistoryFactory;
+        private Mock<IFactory<IHistoricalTradesViewModel, IReactiveList<IPoeItem>, IReactiveList<IPoeTradeViewModel>>> poeHistoricalTradesViewModelFactory;
 
         private Mock<IPoeLiveHistoryProvider> poeLiveHistory;
         private ISubject<IPoeItem[]> poeLiveHistoryItems; 
@@ -74,6 +77,8 @@
             poeLiveHistoryFactory
                 .Setup(x => x.Create(It.IsAny<IPoeQuery>()))
                 .Returns(poeLiveHistory.Object);
+
+            poeHistoricalTradesViewModelFactory = new Mock<IFactory<IHistoricalTradesViewModel, IReactiveList<IPoeItem>, IReactiveList<IPoeTradeViewModel>>>();
         }
 
         [Test]
@@ -303,6 +308,7 @@
             return new PoeTradesListViewModel( 
                 poeLiveHistoryFactory.Object,
                 poeTradeViewModelFactory.Object,
+                poeHistoricalTradesViewModelFactory.Object,
                 poeItemsComparer.Object,
                 poeQueryInfoToQueryConverter.Object,
                 clock.Object,

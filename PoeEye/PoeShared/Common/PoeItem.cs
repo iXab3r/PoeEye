@@ -1,5 +1,7 @@
 ﻿namespace PoeShared.Common
 {
+    using System;
+
     public sealed class PoeItem : IPoeItem
     {
         private IPoeItemMod[] mods = new IPoeItemMod[0];
@@ -61,5 +63,7 @@
         }
 
         public IPoeLinksInfo Links { get; set; }
+
+        public DateTime Timestamp { get; set; }
     }
 }

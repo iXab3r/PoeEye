@@ -1,11 +1,8 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:poeEyeUi="clr-namespace:PoeEyeUi"
                     xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
-                    xmlns:xcdg="http://schemas.xceed.com/wpf/xaml/datagrid"
                     xmlns:componentModel="clr-namespace:System.ComponentModel;assembly=WindowsBase"
-                    xmlns:viewModels="clr-namespace:PoeEyeUi.PoeTrade.ViewModels"
-                    xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit">
+                    xmlns:viewModels="clr-namespace:PoeEyeUi.PoeTrade.ViewModels">
     <DataTemplate DataType="{x:Type viewModels:MainWindowTabViewModel}">
         <Grid>
             <Grid.Resources>
@@ -37,34 +34,50 @@
                         <controls:MetroContentControl Content="{Binding QueryViewModel}"/>
                         <DockPanel>
                             <Button HorizontalAlignment="Right" Width="150" Command="{Binding SearchCommand}" 
-                            CommandParameter="{Binding QueryViewModel.PoeQueryBuilder}" 
-                            Content="Search"/>
+                                    CommandParameter="{Binding QueryViewModel.PoeQueryBuilder}" 
+                                    Content="Search"/>
                         </DockPanel>
                     </StackPanel>
                 </Expander>
             </ScrollViewer>
 
-            <Grid Grid.Row="1" Margin="5">
-                <Border BorderBrush="{StaticResource AccentColorBrush}" BorderThickness="1">
-                    <StackPanel Orientation="Horizontal" Margin="10">
+            <Border Grid.Row="1" 
+                    BorderBrush="{StaticResource AccentColorBrush}" BorderThickness="1">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Grid.Column="0" Grid.Row="0"
+                                    Margin="5" Orientation="Horizontal">
                         <TextBlock Text="Quick commands: " VerticalAlignment="Center"/>
                         <Button Content="Mark All as Read" Command="{Binding MarkAllAsRead}"/>
+                    </StackPanel>
 
-                        <StackPanel Margin="10,0,0,0" Orientation="Horizontal">
-                            <TextBlock Text="Sorted by: " VerticalAlignment="Center"/>
-                            <ItemsControl ItemsSource="{Binding Source={StaticResource tradesListSource}, Path=SortDescriptions}" 
+                    <StackPanel Grid.Column="1" Grid.Row="0"
+                                    Margin="5" Orientation="Horizontal">
+                        <TextBlock Text="Sorted by: " VerticalAlignment="Center"/>
+                        <ItemsControl ItemsSource="{Binding Source={StaticResource tradesListSource}, Path=SortDescriptions}" 
                                           VerticalAlignment="Center"
                                           DisplayMemberPath="PropertyName"/>
-                        </StackPanel>
-
-                        <Expander Header="Historical trades" >
-                            <StackPanel Orientation="Vertical">
-                                <ItemsControl ItemsSource="{Binding TradesListViewModel.HistoricalTrades}"/>
-                            </StackPanel>
-                        </Expander>
                     </StackPanel>
-                </Border>
-            </Grid>
+
+                    <Expander Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="3"
+                              Visibility="{Binding TradesListViewModel.HistoricalTrades.Count, Converter={StaticResource ZeroToCollapsedConverter}}"
+                              Margin="5">
+                        <Expander.Header>
+                            <TextBlock Text="{Binding TradesListViewModel.HistoricalTrades.Count, StringFormat='Historical trades ({0})'}" />
+                        </Expander.Header>
+                        <ContentControl Content="{Binding TradesListViewModel.HistoricalTradesViewModel}"/>
+                    </Expander>
+                </Grid>
+            </Border>
 
             <Grid Grid.Row="2">
                 <Image

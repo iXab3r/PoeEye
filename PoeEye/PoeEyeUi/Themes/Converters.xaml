@@ -18,4 +18,9 @@
 
     <blue:BoolToVisibilityConverter x:Key="InvertedBoolToVisibilityConverter" TrueValue="Collapsed" FalseValue="Visible"/>
     <blue:BoolToVisibilityConverter x:Key="BoolToHiddenConverter" TrueValue="Visible" FalseValue="Hidden"/>
+    <blue:Int32ToVisibilityConverter x:Key="ZeroToCollapsedConverter" TrueValue="Collapsed" FalseValue="Visible">
+        <blue:Int32ToVisibilityConverter.ComparisonStrategy>
+            <blue:Int32ComparisonStrategy Mode="Equal" Comparand="0"></blue:Int32ComparisonStrategy>
+        </blue:Int32ToVisibilityConverter.ComparisonStrategy>
+    </blue:Int32ToVisibilityConverter>
 </ResourceDictionary>

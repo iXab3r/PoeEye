@@ -163,7 +163,7 @@
         {
             foreach (var trade in TradesListViewModel.TradesList)
             {
-                trade.MarkAsReadCommand.Execute(null);
+                trade.TradeState = PoeTradeState.Normal;
             }
         }
     }

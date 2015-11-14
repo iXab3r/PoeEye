@@ -34,10 +34,8 @@
 
         private readonly IClock clock;
         private readonly ReactiveCommand<object> copyPmMessageToClipboardCommand = ReactiveCommand.Create();
-        private readonly ReactiveCommand<object> markAsReadCommand = ReactiveCommand.Create();
         private readonly ReactiveCommand<object> openForumUriCommand;
 
-        private DateTime indexedAtTimestamp;
         private PoeTradeState tradeState;
 
         public PoeTradeViewModel(
@@ -62,7 +60,6 @@
             openForumUriCommand = ReactiveCommand.Create(Observable.Return(OpenForumUriCommandCanExecute()));
             openForumUriCommand.Subscribe(OpenForumUriCommandExecute).AddTo(Anchors);
 
-            markAsReadCommand.Subscribe(MarkAsReadCommandExecute).AddTo(Anchors);
 
             Uri imageUri;
             if (!string.IsNullOrWhiteSpace(poeItem.ItemIconUri) && Uri.TryCreate(poeItem.ItemIconUri, UriKind.Absolute, out imageUri))
@@ -79,20 +76,13 @@
 
             PriceInChaosOrbs = poePriceCalculcator.GetEquivalentInChaosOrbs(poeItem.Price);
 
-            this.WhenAnyValue(x => x.IndexedAtTimestamp).ToUnit()
-                .Merge(Observable.Timer(DateTimeOffset.Now, RefreshTimeout).ToUnit())
+            Observable.Timer(DateTimeOffset.Now, RefreshTimeout).ToUnit()
                 .ObserveOn(uiScheduler)
                 .Subscribe(() => this.RaisePropertyChanged(nameof(TimeElapsedSinceLastIndexation)))
                 .AddTo(Anchors);
         }
 
-        public DateTime IndexedAtTimestamp
-        {
-            get { return indexedAtTimestamp; }
-            set { this.RaiseAndSetIfChanged(ref indexedAtTimestamp, value); }
-        }
-
-        public TimeSpan TimeElapsedSinceLastIndexation => IndexedAtTimestamp == DateTime.MinValue ? TimeSpan.Zero : clock.CurrentTime - IndexedAtTimestamp;
+        public TimeSpan TimeElapsedSinceLastIndexation => Trade.Timestamp == DateTime.MinValue ? TimeSpan.Zero : clock.CurrentTime - Trade.Timestamp;
 
         public ICommand OpenForumUriCommand => openForumUriCommand;
 
@@ -116,8 +106,6 @@
 
         public ICommand CopyPmMessageToClipboardCommand => copyPmMessageToClipboardCommand;
 
-        public ICommand MarkAsReadCommand => markAsReadCommand;
-
         private void OpenForumUriCommandExecute(object arg)
         {
             Guard.ArgumentIsTrue(() => OpenForumUriCommandCanExecute());
@@ -134,11 +122,6 @@
         {
             var message = $"@{Trade.UserIgn} Hi, I would like to buy your {Trade.ItemName} listed for {Trade.Price} in {Trade.League}";
             Clipboard.SetText(message);
-        }
-
-        private void MarkAsReadCommandExecute(object arg)
-        {
-            TradeState = PoeTradeState.Normal;
         }
 
         private void OpenUri(string uri)

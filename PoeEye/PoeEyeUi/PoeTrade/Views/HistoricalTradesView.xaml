@@ -1,0 +1,29 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:viewModels="clr-namespace:PoeEyeUi.PoeTrade.ViewModels"
+                    xmlns:sparrowToolkit="http://sparrowtoolkit.codeplex.com/wpf">
+
+    <DataTemplate DataType="{x:Type viewModels:HistoricalTradesViewModel}">
+        <Grid>
+            <sparrowToolkit:SparrowChart Height="300" 
+                                         OverlayMode="AxisFirst" 
+                                         Theme="Metro" >
+
+                <sparrowToolkit:SparrowChart.XAxis>
+                    <sparrowToolkit:DateTimeXAxis ShowCrossLines="True" StringFormat="HH:mm" />
+                </sparrowToolkit:SparrowChart.XAxis>
+                <sparrowToolkit:SparrowChart.YAxis>
+                    <sparrowToolkit:LinearYAxis ShowCrossLines="True" StringFormat="0"  />
+                </sparrowToolkit:SparrowChart.YAxis>
+
+                <sparrowToolkit:SparrowChart.Series>
+                    <sparrowToolkit:LineSeries PointsSource="{Binding ActualPoints}" XPath="Timestamp" YPath="Price"
+                                               Stroke="{StaticResource AccentColorBrush}" StrokeThickness="2" />
+
+                    <sparrowToolkit:LineSeries PointsSource="{Binding HistoricalPoints}" XPath="Timestamp" YPath="Price"
+                                               Stroke="{StaticResource WhiteColorBrush}" StrokeThickness="1" />
+                </sparrowToolkit:SparrowChart.Series>
+            </sparrowToolkit:SparrowChart>
+        </Grid>
+    </DataTemplate>
+</ResourceDictionary>

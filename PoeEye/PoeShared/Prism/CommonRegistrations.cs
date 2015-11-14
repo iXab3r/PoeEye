@@ -29,6 +29,7 @@
                 .RegisterType(typeof (IConverter<IPoeItem, IPoeQueryInfo>), typeof (PoeItemToPoeQueryConverter))
                 .RegisterType(typeof (IPoeModsProcessor), typeof(PoeModsProcessor))
                 .RegisterType(typeof (IFactory<,>), typeof(Factory<,>))
+                .RegisterType(typeof (IFactory<,,>), typeof(Factory<,,>))
                 .RegisterType(typeof (IFactory<>), typeof (Factory<>));
         }
     }
