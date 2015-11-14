@@ -29,6 +29,7 @@
 
     internal sealed class PoeClipboardParserViewModel : DisposableReactiveObject
     {
+        private static readonly string PathOfExileWindowTitle = "Path of Exile";
         private static readonly TimeSpan IsBusyThrottlingPeriod = TimeSpan.FromSeconds(1);
 
         private readonly IPoeItemParser itemParser;
@@ -74,6 +75,7 @@
                     h => ClipboardNotifications.ClipboardUpdate -= h)
                 .Where(x => monitoringEnabled)
                 .Merge(parseClipboard)
+                .Where(x => ClipboardNotifications.GetActiveWindowTitle() == PathOfExileWindowTitle)
                 .Select(x => GetTextFromClipboard())
                 .Where(x => !string.IsNullOrWhiteSpace(x))
                 .Publish();
