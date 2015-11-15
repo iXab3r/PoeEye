@@ -1,4 +1,4 @@
-namespace PoeEyeUi.Config
+namespace PoeEyeUi.Converters
 {
     using System;
 

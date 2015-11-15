@@ -24,6 +24,7 @@
                 <ResourceDictionary Source="Themes/PoeQueryViewStyles.xaml" />
 
                 <ResourceDictionary Source="PoeTrade/Views/ImageView.xaml" />
+                <ResourceDictionary Source="PoeTrade/Views/CurrencyView.xaml" />
                 <ResourceDictionary Source="PoeTrade/Views/PoeLinksInfoView.xaml" />
                 <ResourceDictionary Source="PoeTrade/Views/PoeTradeView.xaml" />
                 <ResourceDictionary Source="PoeTrade/Views/PoeItemModView.xaml" />

@@ -16,6 +16,8 @@
     <converters:NullToBoolConverter x:Key="InvertedNullToBoolConverter" NullValue="False"/>
     <converters:BoolInversionConverter x:Key="BoolInversionConverter" />
 
+    <converters:PriceToImageUriConverter x:Key="PriceToImageUriConverter" />
+
     <blue:BoolToVisibilityConverter x:Key="InvertedBoolToVisibilityConverter" TrueValue="Collapsed" FalseValue="Visible"/>
     <blue:BoolToVisibilityConverter x:Key="BoolToHiddenConverter" TrueValue="Visible" FalseValue="Hidden"/>
     <blue:Int32ToVisibilityConverter x:Key="ZeroToCollapsedConverter" TrueValue="Collapsed" FalseValue="Visible">

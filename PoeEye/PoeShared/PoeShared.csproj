@@ -130,6 +130,7 @@
     <Compile Include="Common\PoeItemType.cs" />
     <Compile Include="Common\PoeLinksInfo.cs" />
     <Compile Include="Common\PoeModType.cs" />
+    <Compile Include="Common\PoePrice.cs" />
     <Compile Include="DumpToText\DumpToText.cs" />
     <Compile Include="Http\IHttpClient.cs" />
     <Compile Include="IClock.cs" />

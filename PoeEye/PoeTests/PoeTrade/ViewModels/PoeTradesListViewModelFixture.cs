@@ -82,7 +82,7 @@
 
             historicalTradesViewModel = new Mock<IHistoricalTradesViewModel>();
             var historicalTrades = new ReactiveList<IPoeItem>();
-            historicalTradesViewModel.SetupGet(x => x.Items).Returns(historicalTrades);
+            historicalTradesViewModel.SetupGet(x => x.Items).Returns(() => historicalTrades.ToArray());
             historicalTradesViewModel.Setup(x => x.AddItems(It.IsAny<IPoeItem[]>())).Callback((IPoeItem[] items) => historicalTrades.AddRange(items));
             historicalTradesViewModel.Setup(x => x.Clear()).Callback(() => historicalTrades.Clear());
 

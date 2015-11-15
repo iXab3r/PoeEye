@@ -7,6 +7,8 @@
 
     using Config;
 
+    using Converters;
+
     using Guards;
 
     using JetBrains.Annotations;
@@ -18,7 +20,6 @@
     {
         private readonly IDictionary<string, float> currencyByType;
 
-        private readonly Regex currencyParser = new Regex(@"(?'value'[\d\.\,]*)\s*(?'type'\w*)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         public PoePriceCalculcator([NotNull] IPoeEyeConfig config)
         {
@@ -35,32 +36,21 @@
                 return null;
             }
 
-            var match = currencyParser.Match(rawPrice);
-            if (!match.Success)
+            var price = PriceToCurrencyConverter.Instance.Convert(rawPrice);
+            if (price == null)
             {
-                return null;
-            }
-
-            var currencyValueString = match.Groups["value"].Value;
-            var currencyTypeString = match.Groups["type"].Value;
-            float currencyValue;
-
-            if (!float.TryParse(currencyValueString, NumberStyles.Any, CultureInfo.InvariantCulture, out currencyValue))
-            {
-                Log.Instance.Debug(
-                    $"[PriceCalculcator] Could not convert value '{currencyValueString}' to float, rawPrice: {rawPrice}");
                 return null;
             }
 
             float currencyMultilplier;
-            if (!currencyByType.TryGetValue(currencyTypeString, out currencyMultilplier))
+            if (!currencyByType.TryGetValue(price.CurrencyType, out currencyMultilplier))
             {
                 Log.Instance.Debug(
-                    $"[PriceCalculcator] Could not convert currency type '{currencyTypeString}' to multiplier, rawPrice: {rawPrice}\r\nMultipliers:{currencyByType.DumpToTextValue()}");
+                    $"[PriceCalculcator] Could not convert currency type '{price.CurrencyType}' to multiplier, rawPrice: {rawPrice}\r\nMultipliers:{currencyByType.DumpToTextValue()}");
                 return null;
             }
 
-            return currencyValue*currencyMultilplier;
+            return price.Value * currencyMultilplier;
         }
     }
 }

@@ -48,12 +48,12 @@
                                 <StackPanel Orientation="Horizontal">
                                     <StackPanel.Resources>
                                         <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
-                                            <Setter Property="FontSize" Value="14"/>
+                                            <Setter Property="FontSize" Value="13"/>
                                         </Style>
                                     </StackPanel.Resources>
                                     
                                     <TextBlock Text="{Binding Trade.Timestamp, StringFormat='dd MMMM(ddd) HH:mm'}" Margin="5,0"/>
-                                    <TextBlock Text="{Binding Trade.Price}" Margin="5,0"/>
+                                    <ContentPresenter Margin="5,0" Content="{Binding Trade.Price}" ContentTemplate="{StaticResource CurrencyViewKey}" />
                                     <TextBlock Text="{Binding Trade.UserIgn, StringFormat='sold by {0}'}" Margin="5,0"/>
                                 </StackPanel>
                             </Border>
