@@ -138,6 +138,7 @@
             foreach (var itemViewModel in TradesList.Where(x => removedItems.Contains(x.Trade)))
             {
                 itemViewModel.TradeState = PoeTradeState.Removed;
+                itemViewModel.Trade.Timestamp = clock.CurrentTime;
             }
 
             if (newItems.Any())
@@ -150,6 +151,7 @@
                         itemViewModel.AddTo(activeProvider.Anchors);
 
                         itemViewModel.TradeState = PoeTradeState.New;
+                        itemViewModel.Trade.Timestamp = clock.CurrentTime;
 
                         itemViewModel
                             .WhenAnyValue(x => x.TradeState)
@@ -159,8 +161,6 @@
                             .AddTo(activeProvider.Anchors);
 
                         TradesList.Add(itemViewModel);
-
-                        itemViewModel.Trade.Timestamp = clock.CurrentTime;
                     }
                 }
             }

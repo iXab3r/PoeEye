@@ -71,6 +71,16 @@ namespace PoeEyeUi.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap ponyRainbowVomit {
+            get {
+                object obj = ResourceManager.GetObject("ponyRainbowVomit", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
         internal static byte[] whistle {

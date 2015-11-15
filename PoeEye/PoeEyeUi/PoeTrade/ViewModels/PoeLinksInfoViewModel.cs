@@ -23,14 +23,10 @@
 
     internal sealed class PoeLinksInfoViewModel : DisposableReactiveObject
     {
-        private readonly IPoeLinksInfo linksInfo;
-
         public PoeLinksInfoViewModel([NotNull] IPoeLinksInfo linksInfo)
         {
             Guard.ArgumentNotNull(() => linksInfo);
             
-            this.linksInfo = linksInfo;
-
             var rawSockets = linksInfo.RawSockets ?? string.Empty;
             rawSockets = rawSockets.PadRight(11, ' ');
 

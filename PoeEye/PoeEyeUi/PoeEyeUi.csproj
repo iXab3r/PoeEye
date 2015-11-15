@@ -437,6 +437,7 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\Entypo-license.txt" />
+    <Resource Include="Resources\ponyRainbowVomit.jpg" />
     <Content Include="Resources\whistle.wav" />
     <Resource Include="Resources\WindowsIcons-license.txt" />
   </ItemGroup>
