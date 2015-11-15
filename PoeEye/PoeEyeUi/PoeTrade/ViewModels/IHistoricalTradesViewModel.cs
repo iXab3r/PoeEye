@@ -1,17 +1,13 @@
 ﻿namespace PoeEyeUi.PoeTrade.ViewModels
 {
-    using JetBrains.Annotations;
-
-    using Models;
+    using PoeShared.Common;
 
     using ReactiveUI;
 
     internal interface IHistoricalTradesViewModel
     {
-        IReactiveList<PoeItemPricePoint> HistoricalPoints { [NotNull] get; }
-
-        IReactiveList<PoeItemPricePoint> ActualPoints { [NotNull] get; }
-
         bool IsExpanded { get; }
+
+        IReactiveList<IPoeItem> HistoricalTrades { get; } 
     }
 }

@@ -146,8 +146,6 @@
                 {
                     foreach (var item in newItems)
                     {
-                        EnsureItemIsNotInRemovedItemsList(item);
-                        // 
                         var itemViewModel = poeTradeViewModelFactory.Create(item);
                         itemViewModel.AddTo(activeProvider.Anchors);
 
@@ -168,19 +166,6 @@
             }
 
             lastUpdateTimestamp = clock.CurrentTime;
-        }
-
-        private void EnsureItemIsNotInRemovedItemsList(IPoeItem itemToRemove)
-        {
-            for (var idx = 0; idx < HistoricalTrades.Count; idx++)
-            {
-                var itemToCompare = HistoricalTrades[idx];
-                if (poeItemsComparer.Equals(itemToRemove, itemToCompare))
-                {
-                    HistoricalTrades.RemoveAt(idx);
-                    idx--;
-                }
-            }
         }
 
         private void RemoveItem(IPoeTradeViewModel tradeViewModel)

@@ -166,10 +166,6 @@
       <HintPath>..\packages\reactiveui-core.6.5.0\lib\Net45\ReactiveUI.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Sparrow.Chart.Wpf.40, Version=13.1.0.118, Culture=neutral, PublicKeyToken=50f33fb8697e9a92, processorArchitecture=MSIL">
-      <HintPath>..\packages\Sparrow.Chart.Wpf.13.1.0.118\lib\net40\Sparrow.Chart.Wpf.40.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="Splat, Version=1.6.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Splat.1.6.2\lib\Net45\Splat.dll</HintPath>
       <Private>True</Private>
@@ -281,6 +277,9 @@
     <Compile Include="Utilities\DataPipe.cs" />
     <Compile Include="Utilities\DataPipeCollection.cs" />
     <Compile Include="Utilities\EditableTuple.cs" />
+    <Compile Include="Utilities\FilterExtension\CollectionViewSourceFilteringBehavior.cs" />
+    <Compile Include="Utilities\FilterExtension\IFilter.cs" />
+    <Compile Include="Utilities\FilterExtension\PropertyFilter.cs" />
     <Compile Include="Utilities\SetPropertyAction.cs" />
   </ItemGroup>
   <ItemGroup>

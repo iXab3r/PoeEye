@@ -1,39 +1,39 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:viewModels="clr-namespace:PoeEyeUi.PoeTrade.ViewModels"
-                    xmlns:sparrowToolkit="http://sparrowtoolkit.codeplex.com/wpf">
+                    xmlns:common="clr-namespace:PoeShared.Common;assembly=PoeShared">
 
     <DataTemplate DataType="{x:Type viewModels:HistoricalTradesViewModel}">
 
         <Grid Margin="10,5">
-            <sparrowToolkit:SparrowChart Height="300" 
-                                         RenderingMode="WritableBitmap"
-                                         Theme="Metro" >
+            <ItemsControl Focusable="False" IsTabStop="False"
+                          MaxHeight="300"
+                          Margin="0,10,0,0" 
+                          ItemsSource="{Binding HistoricalTrades}"
+                          Style="{StaticResource VirtualizedItemsControlStyle}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="{x:Type common:IPoeItem}">
+                        <StackPanel Orientation="Horizontal" >
+                            <TextBlock Text="{Binding Timestamp}" Margin="5,0"/>
+                            <TextBlock Text="{Binding Price}" Margin="5,0"/>
+                            <StackPanel.ToolTip>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
 
-                <sparrowToolkit:SparrowChart.XAxis>
-                    <sparrowToolkit:DateTimeXAxis StringFormat="HH:mm" />
-                </sparrowToolkit:SparrowChart.XAxis>
-                <sparrowToolkit:SparrowChart.YAxis>
-                    <sparrowToolkit:LinearYAxis MinValue="{Binding MinPrice}" MaxValue="{Binding MaxPrice}"
-                                                StringFormat="0.0" />
-                </sparrowToolkit:SparrowChart.YAxis>
+                                    <ContentControl Grid.Column="0"
+                                                    Content="{Binding}" ContentTemplate="{StaticResource PoeItemModsTemplateKey}"/>
+                                    <ContentControl Grid.Column="1"
+                                                    Content="{Binding}" ContentTemplate="{StaticResource PoeItemStatsTemplateKey}"/>
 
-                <sparrowToolkit:SparrowChart.Series>
-                    <sparrowToolkit:AreaSeries PointsSource="{Binding ActualPoints}" XPath="Timestamp" YPath="Price"
-                                               Stroke="{StaticResource PoeTradeNewItemBrush}" StrokeThickness="2" >
-                        <sparrowToolkit:AreaSeries.Fill>
-                            <SolidColorBrush Opacity="0.5" Color="{StaticResource PoeTradeNewItemColor}" />
-                        </sparrowToolkit:AreaSeries.Fill>
-                    </sparrowToolkit:AreaSeries>
-
-                    <sparrowToolkit:AreaSeries PointsSource="{Binding HistoricalPoints}" XPath="Timestamp" YPath="Price"
-                    	Stroke="{StaticResource PoeTradeRemovedItemBrush}" StrokeThickness="1">
-                        <sparrowToolkit:AreaSeries.Fill>
-                            <SolidColorBrush Opacity="0.5" Color="{StaticResource PoeTradeRemovedItemColor}" />
-                        </sparrowToolkit:AreaSeries.Fill>
-                    </sparrowToolkit:AreaSeries>
-                </sparrowToolkit:SparrowChart.Series>
-            </sparrowToolkit:SparrowChart>
+                                </Grid>
+                            </StackPanel.ToolTip>
+                        </StackPanel>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
         </Grid>
     </DataTemplate>
 </ResourceDictionary>

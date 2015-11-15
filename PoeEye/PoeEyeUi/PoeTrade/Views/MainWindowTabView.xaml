@@ -78,14 +78,10 @@
                         <TextBlock>
                             <TextBlock.Inlines>
                                 Trades history (
-                                <Run ToolTip="Actual trades" 
-                                     Text="{Binding TradesListViewModel.HistoricalTradesViewModel.ActualPoints.Count, Mode=OneWay, StringFormat='{}{0}'}"
-                                     Foreground="{StaticResource PoeTradeNewItemBrush}"
-                                     FontWeight="Bold" /> +
                                 <Run ToolTip="Historical trades" 
-                                     Text="{Binding TradesListViewModel.HistoricalTradesViewModel.HistoricalPoints.Count, Mode=OneWay, StringFormat='{}{0}'}"
-                                     Foreground="{StaticResource PoeTradeRemovedItemBrush}"
-                                     FontWeight="Bold" />)
+                                     Text="{Binding TradesListViewModel.HistoricalTradesViewModel.HistoricalTrades.Count, Mode=OneWay, StringFormat='{}{0}'}"
+                                     Foreground="{StaticResource PoeTradeNewItemBrush}"
+                                     FontWeight="Bold" /> )
                             </TextBlock.Inlines>
                         </TextBlock>
                     </controls:ToggleSwitch>
