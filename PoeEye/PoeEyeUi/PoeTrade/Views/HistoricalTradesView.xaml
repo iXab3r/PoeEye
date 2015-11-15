@@ -1,7 +1,6 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:viewModels="clr-namespace:PoeEyeUi.PoeTrade.ViewModels"
-                    xmlns:common="clr-namespace:PoeShared.Common;assembly=PoeShared"
                     xmlns:componentModel="clr-namespace:System.ComponentModel;assembly=WindowsBase">
 
     <DataTemplate DataType="{x:Type viewModels:HistoricalTradesViewModel}">
@@ -9,10 +8,10 @@
         <Grid Margin="10,5">
             <Grid.Resources>
                 <CollectionViewSource x:Key="HistoricalTradesViewSource" 
-                                      Source="{Binding HistoricalTrades}"
+                                      Source="{Binding ItemsViewModels}"
                                       IsLiveSortingRequested="True">
                     <CollectionViewSource.SortDescriptions>
-                        <componentModel:SortDescription PropertyName="Timestamp" Direction="Descending" />
+                        <componentModel:SortDescription PropertyName="Trade.Timestamp" Direction="Descending"/>
                     </CollectionViewSource.SortDescriptions>
                 </CollectionViewSource>
             </Grid.Resources>
@@ -24,10 +23,12 @@
                           Margin="0,10,0,0" 
                           ItemsSource="{Binding Source={StaticResource HistoricalTradesViewSource}}"
                           Style="{StaticResource VirtualizedItemsControlStyle}">
+               
+                
                 <ItemsControl.ItemTemplate>
-                    <DataTemplate DataType="{x:Type common:IPoeItem}">
+                    <DataTemplate DataType="{x:Type viewModels:IPoeTradeViewModel}">
                         <Grid>
-                            <Border>
+                            <Border ToolTipService.InitialShowDelay="0" ToolTipService.BetweenShowDelay="0">
                                 <Border.Style>
                                     <Style TargetType="{x:Type Border}">
                                         <Setter Property="BorderThickness" Value="0,2"/>
@@ -41,24 +42,19 @@
                                 </Border.Style>
 
                                 <Border.ToolTip>
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto"/>
-                                            <ColumnDefinition Width="*"/>
-                                        </Grid.ColumnDefinitions>
-
-                                        <ContentControl Grid.Column="0"
-                                                    Content="{Binding}" ContentTemplate="{StaticResource PoeItemModsTemplateKey}"/>
-                                        <ContentControl Grid.Column="1"
-                                                    Content="{Binding}" ContentTemplate="{StaticResource PoeItemStatsTemplateKey}"/>
-                                    </Grid>
+                                    <ContentControl Content="{Binding}"/>
                                 </Border.ToolTip>
 
-                                <StackPanel Orientation="Horizontal" 
-                                        ToolTipService.InitialShowDelay="0" ToolTipService.BetweenShowDelay="0">
-                                    <TextBlock Text="{Binding Timestamp, StringFormat='dd MMMM(ddd) HH:mm'}" Margin="5,0"/>
-                                    <TextBlock Text="{Binding Price}" Margin="5,0"/>
-                                    <TextBlock Text="{Binding UserIgn, StringFormat='sold by {0}'}" Margin="5,0"/>
+                                <StackPanel Orientation="Horizontal">
+                                    <StackPanel.Resources>
+                                        <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
+                                            <Setter Property="FontSize" Value="14"/>
+                                        </Style>
+                                    </StackPanel.Resources>
+                                    
+                                    <TextBlock Text="{Binding Trade.Timestamp, StringFormat='dd MMMM(ddd) HH:mm'}" Margin="5,0"/>
+                                    <TextBlock Text="{Binding Trade.Price}" Margin="5,0"/>
+                                    <TextBlock Text="{Binding Trade.UserIgn, StringFormat='sold by {0}'}" Margin="5,0"/>
                                 </StackPanel>
                             </Border>
                         </Grid>

@@ -79,7 +79,7 @@
                             <TextBlock.Inlines>
                                 Trades history (
                                 <Run ToolTip="Historical trades" 
-                                     Text="{Binding TradesListViewModel.HistoricalTradesViewModel.HistoricalTrades.Count, Mode=OneWay, StringFormat='{}{0}'}"
+                                     Text="{Binding TradesListViewModel.HistoricalTradesViewModel.Items.Length, Mode=OneWay, StringFormat='{}{0}'}"
                                      Foreground="{StaticResource PoeTradeNewItemBrush}"
                                      FontWeight="Bold" /> )
                             </TextBlock.Inlines>

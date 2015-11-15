@@ -10,7 +10,7 @@
     {
         bool IsExpanded { get; }
 
-        IEnumerable<IPoeItem> Items { [NotNull] get; } 
+        IPoeItem[] Items { [NotNull] get; } 
 
         void AddItems(params IPoeItem[] items);
 

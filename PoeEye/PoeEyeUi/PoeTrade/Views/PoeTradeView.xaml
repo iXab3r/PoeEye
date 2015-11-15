@@ -215,6 +215,9 @@
                                             <DataTrigger Binding="{Binding TradeState}" Value="{x:Static poeTrade:PoeTradeState.Normal}">
                                                 <Setter Property="Visibility" Value="Collapsed"/>
                                             </DataTrigger>
+                                            <DataTrigger Binding="{Binding TradeState}" Value="{x:Static poeTrade:PoeTradeState.Unknown}">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                            </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
                                 </Button.Style>

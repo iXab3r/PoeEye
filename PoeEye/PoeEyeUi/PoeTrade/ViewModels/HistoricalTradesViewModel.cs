@@ -1,18 +1,13 @@
 ﻿namespace PoeEyeUi.PoeTrade.ViewModels
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Reactive;
-    using System.Reactive.Linq;
 
     using Factory;
 
     using Guards;
 
     using JetBrains.Annotations;
-
-    using Models;
 
     using PoeShared.Common;
     using PoeShared.Utilities;
@@ -21,16 +16,16 @@
 
     internal sealed class HistoricalTradesViewModel : DisposableReactiveObject, IHistoricalTradesViewModel
     {
-        private readonly IPoePriceCalculcator poePriceCalculcator;
-        private readonly IReactiveList<IPoeItem> itemsList = new ReactiveList<IPoeItem>();
+        private readonly IFactory<IPoeTradeViewModel, IPoeItem> poeTradeViewModelFactory;
+        private readonly IReactiveList<IPoeTradeViewModel> itemsList = new ReactiveList<IPoeTradeViewModel>();
 
         private bool isExpanded;
 
-        public HistoricalTradesViewModel([NotNull] IPoePriceCalculcator poePriceCalculcator)
+        public HistoricalTradesViewModel([NotNull] IFactory<IPoeTradeViewModel, IPoeItem> poeTradeViewModelFactory)
         {
-            Guard.ArgumentNotNull(() => poePriceCalculcator);
+            Guard.ArgumentNotNull(() => poeTradeViewModelFactory);
 
-            this.poePriceCalculcator = poePriceCalculcator;
+            this.poeTradeViewModelFactory = poeTradeViewModelFactory;
         }
 
         public bool IsExpanded
@@ -39,13 +34,16 @@
             set { this.RaiseAndSetIfChanged(ref isExpanded, value); }
         }
 
-        public IEnumerable<IPoeItem> Items => itemsList;
+        public IPoeItem[] Items => itemsList.Select(x => x.Trade).ToArray();
+
+        public IEnumerable<IPoeTradeViewModel> ItemsViewModels => itemsList;
 
         public void AddItems(params IPoeItem[] items)
         {
             Guard.ArgumentNotNull(() => items);
 
-            this.itemsList.AddRange(items);
+            var viewModels = items.Select(poeTradeViewModelFactory.Create).ToArray();
+            this.itemsList.AddRange(viewModels);
         }
 
         public void Clear()
