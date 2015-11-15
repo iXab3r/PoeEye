@@ -120,6 +120,29 @@
         </Grid>
     </DataTemplate>
 
+    <DataTemplate x:Key="PoeItemNameTemplateKey" DataType="{x:Type common:IPoeItem}">
+        <TextBlock Text="{Binding ItemName, Mode=OneWay}"  >
+            <TextBlock.Style>
+                <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Rarity}" Value="{x:Static common:PoeItemRarity.Normal}">
+                            <Setter Property="Foreground" Value="{StaticResource PoeItemRarityNormalBrush}"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding Rarity}" Value="{x:Static common:PoeItemRarity.Magic}">
+                            <Setter Property="Foreground" Value="{StaticResource PoeItemRarityMagicBrush}"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding Rarity}" Value="{x:Static common:PoeItemRarity.Rare}">
+                            <Setter Property="Foreground" Value="{StaticResource PoeItemRarityRareBrush}"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding Rarity}" Value="{x:Static common:PoeItemRarity.Unique}">
+                            <Setter Property="Foreground" Value="{StaticResource PoeItemRarityUniqueBrush}"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBlock.Style>
+        </TextBlock>
+    </DataTemplate>
+
     <DataTemplate x:Key="PoeItemModsTemplateKey" DataType="{x:Type common:IPoeItem}" >
         <Grid>
             <Grid.Resources>
@@ -159,14 +182,6 @@
     </DataTemplate>
 
     <DataTemplate DataType="{x:Type viewModels:PoeTradeViewModel}">
-        <DataTemplate.Resources>
-            <Style x:Key="MetroTextBlockHeaderStyle" TargetType="TextBlock">
-                <Setter Property="FontSize" Value="16" />
-                <Setter Property="Foreground" Value="{StaticResource LabelTextBrush}" />
-                <Setter Property="VerticalAlignment" Value="Center" />
-            </Style>
-        </DataTemplate.Resources>
-
         <ContentControl Margin="10">
             <Grid HorizontalAlignment="Center" MinWidth="800">
                 <Grid.RowDefinitions>
@@ -245,27 +260,11 @@
                                    VerticalAlignment="Center"
                                    Visibility="{Binding Trade.IsCorrupted, Converter={StaticResource BooleanToVisibilityConverter}}"/>
 
-                            <TextBlock Grid.Column="2"
-                                       Text="{Binding Trade.ItemName, Mode=OneWay}" >
-                                <TextBlock.Style>
-                                    <Style TargetType="TextBlock" BasedOn="{StaticResource MetroTextBlockHeaderStyle}">
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding Trade.Rarity}" Value="{x:Static common:PoeItemRarity.Normal}">
-                                                <Setter Property="Foreground" Value="{StaticResource PoeItemRarityNormalBrush}"/>
-                                            </DataTrigger>
-                                            <DataTrigger Binding="{Binding Trade.Rarity}" Value="{x:Static common:PoeItemRarity.Magic}">
-                                                <Setter Property="Foreground" Value="{StaticResource PoeItemRarityMagicBrush}"/>
-                                            </DataTrigger>
-                                            <DataTrigger Binding="{Binding Trade.Rarity}" Value="{x:Static common:PoeItemRarity.Rare}">
-                                                <Setter Property="Foreground" Value="{StaticResource PoeItemRarityRareBrush}"/>
-                                            </DataTrigger>
-                                            <DataTrigger Binding="{Binding Trade.Rarity}" Value="{x:Static common:PoeItemRarity.Unique}">
-                                                <Setter Property="Foreground" Value="{StaticResource PoeItemRarityUniqueBrush}"/>
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </TextBlock.Style>
-                            </TextBlock>
+                            <ContentPresenter Grid.Column="2"
+                                              Content="{Binding Trade}" 
+                                              ContentTemplate="{StaticResource PoeItemNameTemplateKey}" 
+                                              VerticalAlignment="Center"
+                                              TextBlock.FontSize="16" />
 
                             <Label Grid.Column="3" Content="{Binding Trade.Requirements, Mode=OneWay}" 
                                    BorderBrush="{StaticResource AccentColorBrush}" 
