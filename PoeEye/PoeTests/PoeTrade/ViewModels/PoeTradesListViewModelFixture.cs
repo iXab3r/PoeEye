@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.ComponentModel;
     using System.Linq;
     using System.Reactive.Concurrency;
@@ -36,9 +37,10 @@
         private Mock<IEqualityComparer<IPoeItem>> poeItemsComparer;
         private Mock<IFactory<IPoeTradeViewModel, IPoeItem>> poeTradeViewModelFactory;
         private Mock<IFactory<IPoeLiveHistoryProvider, IPoeQuery>> poeLiveHistoryFactory;
-        private Mock<IFactory<IHistoricalTradesViewModel, IReactiveList<IPoeItem>, IReactiveList<IPoeTradeViewModel>>> poeHistoricalTradesViewModelFactory;
+        private Mock<IFactory<IHistoricalTradesViewModel>> poeHistoricalTradesViewModelFactory;
 
         private Mock<IPoeLiveHistoryProvider> poeLiveHistory;
+        private Mock<IHistoricalTradesViewModel> historicalTradesViewModel;
         private ISubject<IPoeItem[]> poeLiveHistoryItems; 
         private ISubject<Exception> poeLiveHistoryUpdateExceptions;
 
@@ -78,7 +80,14 @@
                 .Setup(x => x.Create(It.IsAny<IPoeQuery>()))
                 .Returns(poeLiveHistory.Object);
 
-            poeHistoricalTradesViewModelFactory = new Mock<IFactory<IHistoricalTradesViewModel, IReactiveList<IPoeItem>, IReactiveList<IPoeTradeViewModel>>>();
+            historicalTradesViewModel = new Mock<IHistoricalTradesViewModel>();
+            var historicalTrades = new ReactiveList<IPoeItem>();
+            historicalTradesViewModel.SetupGet(x => x.Items).Returns(historicalTrades);
+            historicalTradesViewModel.Setup(x => x.AddItems(It.IsAny<IPoeItem[]>())).Callback((IPoeItem[] items) => historicalTrades.AddRange(items));
+            historicalTradesViewModel.Setup(x => x.Clear()).Callback(() => historicalTrades.Clear());
+
+            poeHistoricalTradesViewModelFactory = new Mock<IFactory<IHistoricalTradesViewModel>>();
+            poeHistoricalTradesViewModelFactory.Setup(x => x.Create()).Returns(historicalTradesViewModel.Object);
         }
 
         [Test]
@@ -261,7 +270,7 @@
 
             //Then
             CollectionAssert.AreEqual(new IPoeTradeViewModel[0], instance.TradesList);
-            CollectionAssert.AreEqual(new[] { trade.Trade }, instance.HistoricalTrades);
+            historicalTradesViewModel.Verify(x => x.AddItems(new[] { trade.Trade }), Times.Once);
         }
 
         [Test]
@@ -283,11 +292,14 @@
                 .Setup(x => x.Equals(It.IsAny<IPoeItem>(), It.IsAny<IPoeItem>()))
                 .Returns(true);
 
+            historicalTradesViewModel.Reset();
+
             //When
             poeLiveHistoryItems.OnNext(new[] { item });
 
             //Then
-            CollectionAssert.AreEqual(new[] { item }, instance.HistoricalTrades);
+            historicalTradesViewModel.Verify(x => x.AddItems(It.IsAny<IPoeItem[]>()), Times.Never);
+            historicalTradesViewModel.Verify(x => x.Clear(), Times.Never);
 
             var actualItems = instance.TradesList.Select(x => x.Trade).ToArray();
             CollectionAssert.AreEqual(new[] { item }, actualItems);

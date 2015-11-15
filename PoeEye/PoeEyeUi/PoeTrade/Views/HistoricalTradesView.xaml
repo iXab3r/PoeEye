@@ -1,43 +1,33 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:viewModels="clr-namespace:PoeEyeUi.PoeTrade.ViewModels"
-                    xmlns:common="clr-namespace:PoeShared.Common;assembly=PoeShared">
+                    xmlns:common="clr-namespace:PoeShared.Common;assembly=PoeShared"
+                    xmlns:componentModel="clr-namespace:System.ComponentModel;assembly=WindowsBase">
 
     <DataTemplate DataType="{x:Type viewModels:HistoricalTradesViewModel}">
 
         <Grid Margin="10,5">
+            <Grid.Resources>
+                <CollectionViewSource x:Key="HistoricalTradesViewSource" 
+                                      Source="{Binding HistoricalTrades}"
+                                      IsLiveSortingRequested="True">
+                    <CollectionViewSource.SortDescriptions>
+                        <componentModel:SortDescription PropertyName="Timestamp" Direction="Descending" />
+                    </CollectionViewSource.SortDescriptions>
+                </CollectionViewSource>
+            </Grid.Resources>
+            
             <Image Source="pack://application:,,,/Resources/ponyRainbowVomit.jpg" Opacity="0.2"/>
 
             <ItemsControl Focusable="False" IsTabStop="False"
                           MaxHeight="300"
                           Margin="0,10,0,0" 
-                          ItemsSource="{Binding HistoricalTrades}"
+                          ItemsSource="{Binding Source={StaticResource HistoricalTradesViewSource}}"
                           Style="{StaticResource VirtualizedItemsControlStyle}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate DataType="{x:Type common:IPoeItem}">
                         <Grid>
                             <Border>
-                                <StackPanel Orientation="Horizontal" 
-                                        ToolTipService.InitialShowDelay="0" ToolTipService.BetweenShowDelay="0">
-                                    <TextBlock Text="{Binding Timestamp, StringFormat='yyyy.MM.dd HH:mm'}" Margin="5,0"/>
-                                    <TextBlock Text="{Binding Price}" Margin="5,0"/>
-                                    <TextBlock Text="{Binding UserIgn, StringFormat='sold by {0}'}" Margin="5,0"/>
-
-                                    <StackPanel.ToolTip>
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="Auto"/>
-                                                <ColumnDefinition Width="*"/>
-                                            </Grid.ColumnDefinitions>
-
-                                            <ContentControl Grid.Column="0"
-                                                    Content="{Binding}" ContentTemplate="{StaticResource PoeItemModsTemplateKey}"/>
-                                            <ContentControl Grid.Column="1"
-                                                    Content="{Binding}" ContentTemplate="{StaticResource PoeItemStatsTemplateKey}"/>
-                                        </Grid>
-                                    </StackPanel.ToolTip>
-                                </StackPanel>
-                                
                                 <Border.Style>
                                     <Style TargetType="{x:Type Border}">
                                         <Setter Property="BorderThickness" Value="0,2"/>
@@ -49,10 +39,29 @@
                                         </Style.Triggers>
                                     </Style>
                                 </Border.Style>
+
+                                <Border.ToolTip>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <ContentControl Grid.Column="0"
+                                                    Content="{Binding}" ContentTemplate="{StaticResource PoeItemModsTemplateKey}"/>
+                                        <ContentControl Grid.Column="1"
+                                                    Content="{Binding}" ContentTemplate="{StaticResource PoeItemStatsTemplateKey}"/>
+                                    </Grid>
+                                </Border.ToolTip>
+
+                                <StackPanel Orientation="Horizontal" 
+                                        ToolTipService.InitialShowDelay="0" ToolTipService.BetweenShowDelay="0">
+                                    <TextBlock Text="{Binding Timestamp, StringFormat='dd MMMM(ddd) HH:mm'}" Margin="5,0"/>
+                                    <TextBlock Text="{Binding Price}" Margin="5,0"/>
+                                    <TextBlock Text="{Binding UserIgn, StringFormat='sold by {0}'}" Margin="5,0"/>
+                                </StackPanel>
                             </Border>
-                           
                         </Grid>
-                    
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>

@@ -50,7 +50,7 @@
         public PoeTradesListViewModel(
             [NotNull] IFactory<IPoeLiveHistoryProvider, IPoeQuery> poeLiveHistoryFactory,
             [NotNull] IFactory<IPoeTradeViewModel, IPoeItem> poeTradeViewModelFactory,
-            [NotNull] IFactory<IHistoricalTradesViewModel, IReactiveList<IPoeItem>, IReactiveList<IPoeTradeViewModel>> historicalTradesViewModelFactory,
+            [NotNull] IFactory<IHistoricalTradesViewModel> historicalTradesViewModelFactory,
             [NotNull] IEqualityComparer<IPoeItem> poeItemsComparer,
             [NotNull] IConverter<IPoeQueryInfo, IPoeQuery> poeQueryInfoToQueryConverter,
             [NotNull] IClock clock,
@@ -68,12 +68,22 @@
             this.uiScheduler = uiScheduler;
             this.clock = clock;
 
-            HistoricalTradesViewModel = historicalTradesViewModelFactory.Create(HistoricalTrades, TradesList);
+            HistoricalTradesViewModel = historicalTradesViewModelFactory.Create();
 
             Anchors.Add(activeHistoryProviderDisposable);
 
             this.WhenAnyValue(x => x.ActiveQuery)
                 .DistinctUntilChanged()
+                .WithPrevious((prev, curr) => new { prev, curr })
+                .Do(
+                    prevcurr =>
+                    {
+                        if (prevcurr.prev != null && prevcurr.curr != null)
+                        {
+                            HistoricalTradesViewModel.Clear();
+                        }
+                    })
+                .Select(x => x.curr)
                 .Where(x => x != null)
                 .Do(_ => lastUpdateTimestamp = clock.CurrentTime)
                 .Select(poeQueryInfoToQueryConverter.Convert)
@@ -92,9 +102,7 @@
                 .AddTo(Anchors);
         }
 
-        public ReactiveList<IPoeTradeViewModel> TradesList { get; } = new ReactiveList<IPoeTradeViewModel> { ChangeTrackingEnabled = true };
-
-        public ReactiveList<IPoeItem> HistoricalTrades { get; } = new ReactiveList<IPoeItem>() { ChangeTrackingEnabled = true };
+        public IReactiveList<IPoeTradeViewModel> TradesList { get; } = new ReactiveList<IPoeTradeViewModel> { ChangeTrackingEnabled = true };
 
         public IHistoricalTradesViewModel HistoricalTradesViewModel { get; }
 
@@ -171,7 +179,7 @@
         private void RemoveItem(IPoeTradeViewModel tradeViewModel)
         {
             TradesList.Remove(tradeViewModel);
-            HistoricalTrades.Add(tradeViewModel.Trade);
+            HistoricalTradesViewModel.AddItems(tradeViewModel.Trade);
         }
 
         private void OnNextHistoryProviderCreated(IPoeLiveHistoryProvider poeLiveHistoryProvider)
@@ -180,7 +188,7 @@
 
             activeProviderInfo = new ActiveProviderInfo(poeLiveHistoryProvider);
             activeHistoryProviderDisposable.Disposable = activeProviderInfo;
-
+            
             poeLiveHistoryProvider
                 .WhenAnyValue(x => x.IsBusy)
                 .DistinctUntilChanged()

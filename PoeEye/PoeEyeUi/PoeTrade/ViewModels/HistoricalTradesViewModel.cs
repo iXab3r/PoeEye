@@ -1,6 +1,7 @@
 ﻿namespace PoeEyeUi.PoeTrade.ViewModels
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Reactive;
     using System.Reactive.Linq;
@@ -21,21 +22,15 @@
     internal sealed class HistoricalTradesViewModel : DisposableReactiveObject, IHistoricalTradesViewModel
     {
         private readonly IPoePriceCalculcator poePriceCalculcator;
+        private readonly IReactiveList<IPoeItem> itemsList = new ReactiveList<IPoeItem>();
 
         private bool isExpanded;
 
-        public HistoricalTradesViewModel(
-            [NotNull] IReactiveList<IPoeItem> historicalTrades,
-            [NotNull] IReactiveList<IPoeTradeViewModel> actualTrades,
-            [NotNull] IPoePriceCalculcator poePriceCalculcator)
+        public HistoricalTradesViewModel([NotNull] IPoePriceCalculcator poePriceCalculcator)
         {
-            Guard.ArgumentNotNull(() => actualTrades);
-            Guard.ArgumentNotNull(() => historicalTrades);
             Guard.ArgumentNotNull(() => poePriceCalculcator);
 
             this.poePriceCalculcator = poePriceCalculcator;
-
-            HistoricalTrades = historicalTrades;
         }
 
         public bool IsExpanded
@@ -44,6 +39,18 @@
             set { this.RaiseAndSetIfChanged(ref isExpanded, value); }
         }
 
-        public IReactiveList<IPoeItem> HistoricalTrades { get; } 
+        public IEnumerable<IPoeItem> Items => itemsList;
+
+        public void AddItems(params IPoeItem[] items)
+        {
+            Guard.ArgumentNotNull(() => items);
+
+            this.itemsList.AddRange(items);
+        }
+
+        public void Clear()
+        {
+            itemsList.Clear();
+        }
     }
 }

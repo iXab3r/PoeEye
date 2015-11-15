@@ -2,7 +2,8 @@
 {
     using System;
 
-    using PoeShared.Common;
+    using JetBrains.Annotations;
+
     using PoeShared.PoeTrade;
 
     using ReactiveUI;
@@ -11,7 +12,7 @@
     {
         IPoeQueryInfo ActiveQuery { get; set; }
 
-        ReactiveList<IPoeItem> HistoricalTrades { get; }
+        IHistoricalTradesViewModel HistoricalTradesViewModel { [NotNull] get; }
 
         bool IsBusy { get; }
 
@@ -21,6 +22,6 @@
 
         TimeSpan TimeSinceLastUpdate { get; }
 
-        ReactiveList<IPoeTradeViewModel> TradesList { get; }
+        IReactiveList<IPoeTradeViewModel> TradesList { [NotNull] get; }
     }
 }

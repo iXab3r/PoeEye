@@ -207,7 +207,7 @@
                     RecheckTimeout = tab.TradesListViewModel.RecheckTimeout,
                     QueryInfo = tab.QueryViewModel.PoeQueryBuilder(),
                     AudioNotificationEnabled = tab.AudioNotificationEnabled,
-                    SoldOrRemovedItems = tab.TradesListViewModel.HistoricalTrades.ToArray(),
+                    SoldOrRemovedItems = tab.TradesListViewModel.HistoricalTradesViewModel.Items.ToArray(),
                 }).ToArray();
 
             config.AudioNotificationsEnabled = AudioNotificationsEnabled;
@@ -241,8 +241,8 @@
 
                 if (tabConfig.SoldOrRemovedItems != null)
                 {
-                    tab.TradesListViewModel.HistoricalTrades.Clear();
-                    tab.TradesListViewModel.HistoricalTrades.AddRange(tabConfig.SoldOrRemovedItems);
+                    tab.TradesListViewModel.HistoricalTradesViewModel.Clear();
+                    tab.TradesListViewModel.HistoricalTradesViewModel.AddItems(tabConfig.SoldOrRemovedItems);
                 }
 
                 tab.AudioNotificationEnabled = tabConfig.AudioNotificationEnabled;
