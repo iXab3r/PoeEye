@@ -24,8 +24,6 @@
     using PoeShared.PoeTrade;
     using PoeShared.PoeTrade.Query;
 
-    using ReactiveUI;
-
     using Shouldly;
 
     using TypeConverter;
@@ -81,10 +79,6 @@
                 .Returns(poeLiveHistory.Object);
 
             historicalTradesViewModel = new Mock<IHistoricalTradesViewModel>();
-            var historicalTrades = new ReactiveList<IPoeItem>();
-            historicalTradesViewModel.SetupGet(x => x.Items).Returns(() => historicalTrades.ToArray());
-            historicalTradesViewModel.Setup(x => x.AddItems(It.IsAny<IPoeItem[]>())).Callback((IPoeItem[] items) => historicalTrades.AddRange(items));
-            historicalTradesViewModel.Setup(x => x.Clear()).Callback(() => historicalTrades.Clear());
 
             poeHistoricalTradesViewModelFactory = new Mock<IFactory<IHistoricalTradesViewModel>>();
             poeHistoricalTradesViewModelFactory.Setup(x => x.Create()).Returns(historicalTradesViewModel.Object);

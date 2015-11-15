@@ -1,16 +1,14 @@
 ﻿namespace PoeEyeUi.PoeTrade.ViewModels
 {
-    using System.Collections.Generic;
-
-    using JetBrains.Annotations;
-
     using PoeShared.Common;
+
+    using ReactiveUI;
 
     internal interface IHistoricalTradesViewModel
     {
         bool IsExpanded { get; }
 
-        IPoeItem[] Items { [NotNull] get; } 
+        IReactiveList<IPoeTradeViewModel> ItemsViewModels { get; }
 
         void AddItems(params IPoeItem[] items);
 

@@ -17,7 +17,6 @@
     internal sealed class HistoricalTradesViewModel : DisposableReactiveObject, IHistoricalTradesViewModel
     {
         private readonly IFactory<IPoeTradeViewModel, IPoeItem> poeTradeViewModelFactory;
-        private readonly IReactiveList<IPoeTradeViewModel> itemsList = new ReactiveList<IPoeTradeViewModel>();
 
         private bool isExpanded;
 
@@ -34,21 +33,19 @@
             set { this.RaiseAndSetIfChanged(ref isExpanded, value); }
         }
 
-        public IPoeItem[] Items => itemsList.Select(x => x.Trade).ToArray();
-
-        public IEnumerable<IPoeTradeViewModel> ItemsViewModels => itemsList;
+        public IReactiveList<IPoeTradeViewModel> ItemsViewModels { get; } = new ReactiveList<IPoeTradeViewModel>();
 
         public void AddItems(params IPoeItem[] items)
         {
             Guard.ArgumentNotNull(() => items);
 
             var viewModels = items.Select(poeTradeViewModelFactory.Create).ToArray();
-            this.itemsList.AddRange(viewModels);
+            this.ItemsViewModels.AddRange(viewModels);
         }
 
         public void Clear()
         {
-            itemsList.Clear();
+            ItemsViewModels.Clear();
         }
     }
 }

@@ -147,6 +147,7 @@
             {
                 itemViewModel.TradeState = PoeTradeState.Removed;
                 itemViewModel.Trade.Timestamp = clock.CurrentTime;
+                HistoricalTradesViewModel.AddItems(itemViewModel.Trade);
             }
 
             if (newItems.Any())
@@ -179,7 +180,6 @@
         private void RemoveItem(IPoeTradeViewModel tradeViewModel)
         {
             TradesList.Remove(tradeViewModel);
-            HistoricalTradesViewModel.AddItems(tradeViewModel.Trade);
         }
 
         private void OnNextHistoryProviderCreated(IPoeLiveHistoryProvider poeLiveHistoryProvider)

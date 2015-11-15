@@ -207,7 +207,7 @@
                     RecheckTimeout = tab.TradesListViewModel.RecheckTimeout,
                     QueryInfo = tab.QueryViewModel.PoeQueryBuilder(),
                     AudioNotificationEnabled = tab.AudioNotificationEnabled,
-                    SoldOrRemovedItems = tab.TradesListViewModel.HistoricalTradesViewModel.Items.ToArray(),
+                    SoldOrRemovedItems = tab.TradesListViewModel.HistoricalTradesViewModel.ItemsViewModels.Select(x => x.Trade).ToArray(),
                 }).ToArray();
 
             config.AudioNotificationsEnabled = AudioNotificationsEnabled;

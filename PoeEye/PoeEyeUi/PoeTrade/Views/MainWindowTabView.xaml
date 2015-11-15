@@ -28,8 +28,14 @@
                           IsTabStop="False"
                           Focusable="False"
                           MaxHeight="{Binding ActualHeight, RelativeSource={RelativeSource FindAncestor, AncestorType=ContentPresenter}, Mode=OneWay}">
-                <Expander Header="Query parameters" IsExpanded="{Binding QueryViewModel.IsExpanded}">
-
+                <Expander IsExpanded="{Binding QueryViewModel.IsExpanded}">
+                    <Expander.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Query parameters" Margin="5,0" VerticalAlignment="Center"/>
+                            <Button Content="Mark All as Read" Command="{Binding MarkAllAsRead}"/>
+                        </StackPanel>
+                    </Expander.Header>
+                    
                     <StackPanel Orientation="Vertical">
                         <controls:MetroContentControl Content="{Binding QueryViewModel}"/>
                         <DockPanel>
@@ -41,58 +47,16 @@
                 </Expander>
             </ScrollViewer>
 
-            <Border Grid.Row="1" 
-                    Margin="5"
-                    BorderBrush="{StaticResource AccentColorBrush}" BorderThickness="1">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
-
-                    <StackPanel Grid.Column="0" Grid.Row="0"
-                                    Margin="5" Orientation="Horizontal">
-                        <TextBlock Text="Quick commands: " VerticalAlignment="Center"/>
-                        <Button Content="Mark All as Read" Command="{Binding MarkAllAsRead}"/>
-                    </StackPanel>
-
-                    <StackPanel Grid.Column="1" Grid.Row="0"
-                                    Margin="5" Orientation="Horizontal">
-                        <TextBlock Text="Sorted by: " VerticalAlignment="Center"/>
-                        <ItemsControl ItemsSource="{Binding Source={StaticResource tradesListSource}, Path=SortDescriptions}" 
-                                          VerticalAlignment="Center"
-                                          DisplayMemberPath="PropertyName"/>
-                    </StackPanel>
-
-                    <controls:ToggleSwitch Grid.Column="2" Grid.Row="0" 
-                                  Margin="5"
-                                  HorizontalContentAlignment="Left"
-                                  HorizontalAlignment="Left"
-                                  FontSize="12"
-                                  FontFamily="Segoe UI"
-                                  IsChecked="{Binding TradesListViewModel.HistoricalTradesViewModel.IsExpanded}"  ContentDirection="RightToLeft">
-                        <TextBlock>
-                            <TextBlock.Inlines>
-                                Trades history (
-                                <Run ToolTip="Historical trades" 
-                                     Text="{Binding TradesListViewModel.HistoricalTradesViewModel.Items.Length, Mode=OneWay, StringFormat='{}{0}'}"
-                                     Foreground="{StaticResource PoeTradeNewItemBrush}"
-                                     FontWeight="Bold" /> )
-                            </TextBlock.Inlines>
-                        </TextBlock>
-                    </controls:ToggleSwitch>
-
-                    <DockPanel Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="3" 
-                               Visibility="{Binding TradesListViewModel.HistoricalTradesViewModel.IsExpanded, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
-                        <ContentControl Content="{Binding TradesListViewModel.HistoricalTradesViewModel}"/>
-                    </DockPanel>
-                </Grid>
-            </Border>
+            <Expander Grid.Row="1"
+                      IsExpanded="{Binding TradesListViewModel.HistoricalTradesViewModel.IsExpanded}">
+                <Expander.Header>
+                    <TextBlock><Run Text="Trades history ( "/><Run ToolTip="Historical trades" 
+            				Text="{Binding TradesListViewModel.HistoricalTradesViewModel.ItemsViewModels.Count, Mode=OneWay, StringFormat=\{0\}}"
+            				Foreground="{StaticResource PoeTradeRemovedItemBrush}"
+            				FontWeight="Bold" /><Run Text=" )"/></TextBlock>
+                </Expander.Header>
+                <ContentControl Content="{Binding TradesListViewModel.HistoricalTradesViewModel}"/>
+            </Expander>
 
             <Grid Grid.Row="2">
                 <Image
