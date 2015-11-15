@@ -48,14 +48,14 @@
             </ScrollViewer>
 
             <Expander Grid.Row="1"
-                      IsExpanded="{Binding TradesListViewModel.HistoricalTradesViewModel.IsExpanded}">
+                      IsExpanded="{Binding TradesListViewModel.HistoricalTradesViewModel.IsExpanded}"
+                      Visibility="{Binding TradesListViewModel.HistoricalTradesViewModel.ItemsViewModels.Count, Converter={StaticResource ZeroToCollapsedConverter}}">
                 <Expander.Header>
                     <TextBlock><Run Text="Trades history ( "/><Run ToolTip="Historical trades" 
             				Text="{Binding TradesListViewModel.HistoricalTradesViewModel.ItemsViewModels.Count, Mode=OneWay, StringFormat=\{0\}}"
-            				Foreground="{StaticResource PoeTradeRemovedItemBrush}"
             				FontWeight="Bold" /><Run Text=" )"/></TextBlock>
                 </Expander.Header>
-                <ContentControl Content="{Binding TradesListViewModel.HistoricalTradesViewModel}"/>
+                <ContentControl Content="{Binding TradesListViewModel.HistoricalTradesViewModel}" Margin="0"/>
             </Expander>
 
             <Grid Grid.Row="2">

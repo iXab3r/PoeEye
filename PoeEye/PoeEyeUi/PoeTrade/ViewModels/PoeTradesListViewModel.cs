@@ -143,7 +143,7 @@
             Log.Instance.Debug(
                 $"[TradesListViewModel] Next items pack received, existingItems: {existingItems.Length}, newItems: {newItems.Length}, removedItems: {removedItems.Length}");
 
-            foreach (var itemViewModel in TradesList.Where(x => removedItems.Contains(x.Trade)))
+            foreach (var itemViewModel in TradesList.Where(x => removedItems.Contains(x.Trade)).Where(x => x.TradeState != PoeTradeState.Removed))
             {
                 itemViewModel.TradeState = PoeTradeState.Removed;
                 itemViewModel.Trade.Timestamp = clock.CurrentTime;
