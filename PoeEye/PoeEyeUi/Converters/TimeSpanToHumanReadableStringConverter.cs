@@ -14,17 +14,21 @@
             }
             var timeSpan = (TimeSpan)value;
 
-            if (timeSpan.TotalMinutes > 120)
+            if (timeSpan.TotalHours > 24)
             {
-                return $"{timeSpan:%h}h";
+                return $"{timeSpan.TotalDays:F0}d {timeSpan.Hours:F0}h";
+            }
+            else if (timeSpan.TotalMinutes > 120)
+            {
+                return $"{timeSpan.TotalHours:F0}h";
             }
             else if (timeSpan.TotalSeconds > 120)
             {
-                return $"{timeSpan:%m}m";
+                return $"{timeSpan.TotalMinutes:F0}m";
             }
             else
             {
-                return $"{timeSpan:%s}s";
+                return $"{timeSpan.TotalSeconds:F0}s";
             }
         }
 
