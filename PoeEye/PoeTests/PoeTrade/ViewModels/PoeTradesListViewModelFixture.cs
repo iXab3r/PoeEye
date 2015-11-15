@@ -265,7 +265,7 @@
         }
 
         [Test]
-        public void ShouldRemoveItemFromHistoricalTradesIfArrivedAgain()
+        public void ShouldNotRemoveItemFromHistoricalTradesIfArrivedAgain()
         {
             //Given
             var instance = CreateInstance();
@@ -287,7 +287,7 @@
             poeLiveHistoryItems.OnNext(new[] { item });
 
             //Then
-            CollectionAssert.AreEqual(new IPoeItem[0], instance.HistoricalTrades);
+            CollectionAssert.AreEqual(new[] { item }, instance.HistoricalTrades);
 
             var actualItems = instance.TradesList.Select(x => x.Trade).ToArray();
             CollectionAssert.AreEqual(new[] { item }, actualItems);
