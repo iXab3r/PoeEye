@@ -16,8 +16,6 @@
                 </CollectionViewSource>
             </Grid.Resources>
             
-            <Image Source="pack://application:,,,/Resources/ponyRainbowVomit.jpg" Opacity="0.2"/>
-
             <ItemsControl Focusable="False" IsTabStop="False"
                           MaxHeight="300"
                           Margin="0,10,0,0" 

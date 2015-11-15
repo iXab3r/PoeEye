@@ -181,6 +181,7 @@
 
                 <ContentControl Grid.Row="1" Grid.Column="0" 
                                 Margin="0,0,10,0"
+                                MaxHeight="130"
                                 Content="{Binding ImageViewModel}"/>
 
                 <ContentControl Grid.Row="1" Grid.Column="0" Content="{Binding LinksViewModel}" Margin="0,0,10,0"/>

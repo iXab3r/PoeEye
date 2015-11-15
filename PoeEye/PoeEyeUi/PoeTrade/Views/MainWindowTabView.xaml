@@ -24,7 +24,7 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <ScrollViewer VerticalScrollBarVisibility="Visible"
+            <ScrollViewer VerticalScrollBarVisibility="Auto"
                           IsTabStop="False"
                           Focusable="False"
                           MaxHeight="{Binding ActualHeight, RelativeSource={RelativeSource FindAncestor, AncestorType=ContentPresenter}, Mode=OneWay}">
@@ -42,6 +42,7 @@
             </ScrollViewer>
 
             <Border Grid.Row="1" 
+                    Margin="5"
                     BorderBrush="{StaticResource AccentColorBrush}" BorderThickness="1">
                 <Grid>
                     <Grid.ColumnDefinitions>
