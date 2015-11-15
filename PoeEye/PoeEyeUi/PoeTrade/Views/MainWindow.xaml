@@ -3,7 +3,6 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:PoeEyeUi"
         xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
         xmlns:viewModels="clr-namespace:PoeEyeUi.PoeTrade.ViewModels"
         xmlns:metroModels="clr-namespace:PoeEyeUi.MetroModels"
@@ -20,6 +19,12 @@
         d:DataContext="{d:DesignInstance viewModels:MainWindowViewModel}"
         BorderThickness="1" BorderBrush="{StaticResource AccentColorBrush}"
         metroModels:DialogParticipation.Register="{Binding}">
+
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Closing">
+            <i:InvokeCommandAction Command="{Binding SaveConfigCommand}"/>
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
 
     <Window.InputBindings>
         <KeyBinding Command="{Binding ClipboardParserViewModel.ParseClipboard}" Gesture="CTRL+V" />

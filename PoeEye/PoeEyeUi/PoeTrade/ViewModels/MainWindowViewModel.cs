@@ -54,6 +54,7 @@
         private bool isMainWindowActive;
 
         private MainWindowTabViewModel selectedItem;
+        private ReactiveCommand<object> saveConfigCommand;
 
         public MainWindowViewModel(
             [NotNull] IFactory<MainWindowTabViewModel> tabFactory,
@@ -90,6 +91,8 @@
                 .Subscribe(RemoveTabCommandExecuted)
                 .AddTo(Anchors);
 
+            saveConfigCommand = ReactiveCommand.Create();
+
             TabsList
                 .ItemsAdded
                 .Subscribe(x => SelectedItem = x)
@@ -118,6 +121,7 @@
 
             configUpdateSubject
                 .Sample(ConfigSaveSampingTimeout)
+                .Merge(saveConfigCommand.ToUnit())
                 .Subscribe(SaveConfig, Log.HandleException)
                 .AddTo(Anchors);
 
@@ -130,6 +134,8 @@
         public ICommand CreateNewTabCommand => createNewTabCommand;
 
         public ICommand CloseTabCommand => closeTabCommand;
+
+        public ICommand SaveConfigCommand => saveConfigCommand;
 
         public ApplicationUpdaterViewModel ApplicationUpdater { get; }
 
