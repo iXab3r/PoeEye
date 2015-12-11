@@ -14,8 +14,8 @@
         {
             LeaguesList = new[]
             {
-                WellKnownLeagues.DarkshrineIC003,
-                WellKnownLeagues.DarkshrineHCIC004,
+                WellKnownLeagues.Talisman,
+                WellKnownLeagues.TalismanHC,
                 WellKnownLeagues.Standard,
                 WellKnownLeagues.Hardcore,
             };
