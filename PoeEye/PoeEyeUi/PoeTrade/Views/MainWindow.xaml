@@ -102,6 +102,7 @@
                                                ToolTip="{Binding TradesListViewModel.LastUpdateException, Converter={StaticResource ExceptionToMessageConverter}}"
                                                Visibility="{Binding TradesListViewModel.LastUpdateException, Converter={StaticResource NullToCollapsedConverter}}"
                                                FontFamily="{StaticResource FontAwesome}"
+                                               Foreground="{StaticResource ValidationSummaryColor1}"
                                                VerticalAlignment="Stretch"
                                                HorizontalAlignment="Stretch"
                                                VerticalContentAlignment="Center"
