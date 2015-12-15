@@ -357,10 +357,9 @@
                             <Button Grid.Column="7" 
                                     Command="{Binding CopyPmMessageToClipboardCommand}"
                                     Width="30" Height="30" Style="{StaticResource MetroCircleButtonStyle}"
-                                    FontFamily="{StaticResource FontAwesome}"
+                                    FontFamily="{DynamicResource FontAwesome}"
                                     Content="{x:Static net:FontAwesome.clipboard}"
-                                    ToolTip="Copy PM to clipboard">
-                            </Button>
+                                    ToolTip="Copy PM to clipboard"/>
                         </Grid>
                     </Border>
                 </ContentControl>
