@@ -45,7 +45,7 @@
         private Exception lastUpdateException;
 
         private DateTime lastUpdateTimestamp;
-        private TimeSpan recheckTimeout = TimeSpan.FromSeconds(60);
+        private TimeSpan recheckTimeout = TimeSpan.FromSeconds(120);
 
         public PoeTradesListViewModel(
             [NotNull] IFactory<IPoeLiveHistoryProvider, IPoeQuery> poeLiveHistoryFactory,

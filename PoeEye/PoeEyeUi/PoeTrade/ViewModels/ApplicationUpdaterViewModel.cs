@@ -6,14 +6,21 @@
 
     using Squirrel;
     using System;
+    using System.Diagnostics;
+    using System.IO;
+    using System.Linq;
     using System.Reactive.Concurrency;
     using System.Reactive.Linq;
     using System.Threading;
+    using System.Threading.Tasks;
+    using System.Windows;
     using System.Windows.Input;
 
     using Guards;
 
     using JetBrains.Annotations;
+
+    using MahApps.Metro.Controls.Dialogs;
 
     using MetroModels;
 
@@ -80,7 +87,7 @@
 
             try
             {
-                var appName = typeof (PoeEye.Prism.LiveRegistrations).Assembly.GetName().Name;
+                var appName = typeof(PoeEye.Prism.LiveRegistrations).Assembly.GetName().Name;
                 using (var mgr = new UpdateManager(PoeEyeUri, appName))
                 {
                     Log.Instance.Debug($"[ApplicationUpdaterViewModel] Checking for updates...");
@@ -93,24 +100,29 @@
                         return;
                     }
 
-#if DEBUG
-                    Log.Instance.Debug($"[ApplicationUpdaterViewModel] Debug mode detected, update will be skipped");
-                    return;
-#endif
-
                     Log.Instance.Debug($"[ApplicationUpdaterViewModel] Downloading releases...");
                     mgr.DownloadReleases(updateInfo.ReleasesToApply, UpdateProgress).Wait();
                     Log.Instance.Debug($"[ApplicationUpdaterViewModel] Applying releases...");
-                    mgr.ApplyReleases(updateInfo).Wait();
-                    Log.Instance.Debug($"[ApplicationUpdaterViewModel] Update completed");
 
-                    uiScheduler.Schedule(
-                        () => dialogCoordinator.ShowMessageAsync(context, "Update completed", "Application updated, new version will take place on next application startup"));
+
+                    var newVersionFolder = mgr.ApplyReleases(updateInfo).Result;
+                    var lastAppliedRelease = updateInfo.ReleasesToApply.Last();
+
+                    Log.Instance.Debug($"[ApplicationUpdaterViewModel] Update completed to v{lastAppliedRelease.Version}, result: {newVersionFolder}");
+
+                    if (string.IsNullOrWhiteSpace(newVersionFolder))
+                    {
+                        throw new ApplicationException("Expected non-empty new version folder path");
+                    }
+
+                    uiScheduler.Schedule(() => ShowUpdateCompletedMessageAndTerminate(context, newVersionFolder, lastAppliedRelease.Version));
                 }
             }
             catch (Exception ex)
             {
                 Log.Instance.Debug($"[ApplicationUpdaterViewModel] Update failed", ex);
+
+                uiScheduler.Schedule(() => ShowUpdateFailedMessageAndTerminate(context));
             }
         }
 
@@ -137,6 +149,65 @@
         private void OnFirstRun()
         {
             Log.Instance.Debug($"[ApplicationUpdaterViewModel.OnFirstRun] App started for the first time");
+        }
+
+        private void ShowUpdateCompletedMessageAndTerminate(object context, string updatedVersionDir, Version updatedVersion)
+        {
+            var applicationName = Process.GetCurrentProcess().ProcessName + ".exe";
+            var updatedExePath = new FileInfo(Path.Combine(updatedVersionDir, applicationName));
+
+            if (updatedExePath.Exists)
+            {
+                dialogCoordinator
+                   .ShowMessageAsync(
+                        context, 
+                        "Update completed", 
+                        $"Application was successfully updated to v{updatedVersion}",
+#if DEBUG
+                        MessageDialogStyle.AffirmativeAndNegative,
+#else
+                        MessageDialogStyle.Affirmative, 
+#endif
+                        new MetroDialogSettings { AffirmativeButtonText = "Restart", NegativeButtonText = "Cancel" })
+                   .ContinueWith(
+                       (Task<MessageDialogResult> dialogResultTask) =>
+                       {
+                           var messageBoxResult = dialogResultTask.Result;
+                           if (messageBoxResult == MessageDialogResult.Affirmative)
+                           {
+                               Log.Instance.Debug("[ApplicationUpdaterViewModel] App updated, restarting...");
+                               Process.Start(updatedExePath.FullName);
+                               Environment.Exit(0);
+                           }
+                           else
+                           {
+                               Log.Instance.Debug("[ApplicationUpdaterViewModel] App updated, restart was cancelled");
+                           }
+                       });
+            }
+            else
+            {
+                dialogCoordinator
+                    .ShowMessageAsync(context, "Update was partially completed", "Application updated, new version will take place on next application startup", MessageDialogStyle.Affirmative, new MetroDialogSettings { AffirmativeButtonText = "Exit" })
+                    .ContinueWith(
+                        (x) =>
+                        {
+                            Log.Instance.Debug("[ApplicationUpdaterViewModel] App updated, terminating this instance");
+                            Environment.Exit(0);
+                        });
+            }
+        }
+
+        private void ShowUpdateFailedMessageAndTerminate(object context)
+        {
+            dialogCoordinator
+                .ShowMessageAsync(context, "System error", "Failed to connect to update server, application will be terminated due to security reasons", MessageDialogStyle.Affirmative, new MetroDialogSettings { AffirmativeButtonText = "Exit" })
+                .ContinueWith(
+                    (x) =>
+                    {
+                        Log.Instance.Debug("[ApplicationUpdaterViewModel] App failed to update, terminating this instance");
+                        Environment.Exit(-1);
+                    });
         }
     }
 }

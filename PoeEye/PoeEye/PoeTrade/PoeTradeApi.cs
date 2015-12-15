@@ -9,12 +9,9 @@
 
     using Guards;
 
-    using PoeShared;
     using PoeShared.Http;
     using PoeShared.PoeTrade;
     using PoeShared.PoeTrade.Query;
-
-    using Properties;
 
     using TypeConverter;
 
@@ -51,6 +48,7 @@
 
             return client
                 .PostQuery(PoeTradeUri, queryPostData)
+                .Select(ThrowIfNotParseable)
                 .Select(poeTradeParser.Parse);
         }
 
@@ -64,6 +62,31 @@
             };
             client.Cookies = cookies;
             return client;
+        }
+
+        private string ThrowIfNotParseable(string queryResult)
+        {
+            if (string.IsNullOrWhiteSpace(queryResult))
+            {
+                throw new ApplicationException("Malformed query result - empty string");
+            }
+
+            if (IsCaptcha(queryResult))
+            {
+                throw new ApplicationException("CAPTCHA detected, query will not be processed");
+            }
+
+            return queryResult;
+        }
+
+        private bool IsCaptcha(string queryResult)
+        {
+            if (string.IsNullOrWhiteSpace(queryResult))
+            {
+                return false;
+            }
+
+            return queryResult.Contains("Enter captcha and press the button");
         }
     }
 }
