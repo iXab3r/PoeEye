@@ -7,6 +7,7 @@
     using System.Reactive.Concurrency;
     using System.Reactive.Linq;
     using System.Reactive.Threading.Tasks;
+    using System.Threading;
 
     using CsQuery.ExtensionMethods.Internal;
 
@@ -21,6 +22,8 @@
     using PoeShared.DumpToText;
     using PoeShared.Http;
 
+    using Properties;
+
     using TypeConverter;
 
     using HttpClient = System.Net.Http.HttpClient;
@@ -28,6 +31,8 @@
     internal sealed class GenericHttpClient : IHttpClient
     {
         private readonly IConverter<NameValueCollection, string> nameValueConverter;
+        private static readonly int MaxSimultaneousRequestsCount;
+        private static readonly SemaphoreSlim RequestsSemaphore;
 
         public GenericHttpClient(
             [NotNull] IConverter<NameValueCollection, string> nameValueConverter)
@@ -35,6 +40,13 @@
             Guard.ArgumentNotNull(() => nameValueConverter);
 
             this.nameValueConverter = nameValueConverter;
+        }
+
+        static GenericHttpClient()
+        {
+            MaxSimultaneousRequestsCount = Settings.Default.MaxSimultaneousRequestsCount;
+            Log.Instance.Debug($"[GenericHttpClient..staticctor] MaxSimultaneousRequestsCount: {MaxSimultaneousRequestsCount}");
+            RequestsSemaphore = new SemaphoreSlim(MaxSimultaneousRequestsCount);
         }
 
         public CookieCollection Cookies { get; set; }
@@ -57,21 +69,31 @@
 
         private string PostQueryInternal(string uri, NameValueCollection args)
         {
-            var httpClient = new EasyHttp.Http.HttpClient();
-            httpClient.Request.Cookies = Cookies;
+            try
+            {
+                var postData = nameValueConverter.Convert(args);
+                Log.Instance.Debug($"[HttpClient] Querying uri '{uri}', args: \r\nPOST: {postData}");
+                Log.Instance.Trace($"[HttpClient] Splitted POST data dump: {postData.SplitClean('&').DumpToTextValue()}");
+                Log.Instance.Trace($"[HttpClient] Awaiting for semaphore slot (max: {MaxSimultaneousRequestsCount}, atm: {RequestsSemaphore.CurrentCount})");
 
-            var postData = nameValueConverter.Convert(args);
+                RequestsSemaphore.Wait();
 
-            Log.Instance.Debug($"[HttpClient] Querying uri '{uri}', args: \r\nPOST: {postData}");
-            Log.Instance.Trace($"[HttpClient] Splitted POST data dump: {postData.SplitClean('&').DumpToTextValue()}");
+                var httpClient = new EasyHttp.Http.HttpClient();
+                httpClient.Request.Cookies = Cookies;
 
-            var response = httpClient.Post(uri, postData, HttpContentTypes.ApplicationXWwwFormUrlEncoded);
-            Log.Instance.Debug(
-                $"[HttpClient] Received response, status: {response.StatusCode}, length: {response.RawText?.Length}");
+                var response = httpClient.Post(uri, postData, HttpContentTypes.ApplicationXWwwFormUrlEncoded);
+                Log.Instance.Debug(
+                    $"[HttpClient] Received response, status: {response.StatusCode}, length: {response.RawText?.Length}");
 
-            CheckResponseStatusOrThrow(response);
+                CheckResponseStatusOrThrow(response);
 
-            return response.RawText;
+                return response.RawText;
+            }
+            finally
+            {
+                RequestsSemaphore.Release();
+            }
+            
         }
 
         private static void CheckResponseStatusOrThrow(HttpResponse response)

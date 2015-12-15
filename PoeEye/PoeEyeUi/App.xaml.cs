@@ -1,20 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows;
-
-namespace PoeEyeUi
+﻿namespace PoeEyeUi
 {
-    using System.Reflection;
+    using log4net;
 
     /// <summary>
-    /// Interaction logic for App.xaml
+    ///     Interaction logic for App.xaml
     /// </summary>
     public partial class App
     {
+        public App()
+        {
+#if DEBUG
+            GlobalContext.Properties["configuration"] = "Debug";
+#else
+            GlobalContext.Properties["configuration"] = "Release";
+#endif
+        }
 
 #if !DEBUG
         protected override void OnStartup(StartupEventArgs e, bool? isFirstInstance)

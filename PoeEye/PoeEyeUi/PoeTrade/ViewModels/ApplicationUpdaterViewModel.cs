@@ -78,10 +78,6 @@
             // delaying update so the user could see the progressring
             Thread.Sleep(ArtificialDelay);
 
-#if DEBUG
-            Log.Instance.Debug($"[ApplicationUpdaterViewModel] Debug mode detected, update will be skipped");
-            return;
-#endif
             try
             {
                 var appName = typeof (PoeEye.Prism.LiveRegistrations).Assembly.GetName().Name;
@@ -96,6 +92,12 @@
                     {
                         return;
                     }
+
+#if DEBUG
+                    Log.Instance.Debug($"[ApplicationUpdaterViewModel] Debug mode detected, update will be skipped");
+                    return;
+#endif
+
                     Log.Instance.Debug($"[ApplicationUpdaterViewModel] Downloading releases...");
                     mgr.DownloadReleases(updateInfo.ReleasesToApply, UpdateProgress).Wait();
                     Log.Instance.Debug($"[ApplicationUpdaterViewModel] Applying releases...");
