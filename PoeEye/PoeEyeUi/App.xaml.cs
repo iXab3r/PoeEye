@@ -1,5 +1,8 @@
 ﻿namespace PoeEyeUi
 {
+    using System.Reflection;
+    using System.Windows;
+
     using log4net;
 
     /// <summary>
@@ -15,8 +18,8 @@
             GlobalContext.Properties["configuration"] = "Release";
 #endif
         }
-
 #if !DEBUG
+
         protected override void OnStartup(StartupEventArgs e, bool? isFirstInstance)
         {
             base.OnStartup(e, isFirstInstance);
