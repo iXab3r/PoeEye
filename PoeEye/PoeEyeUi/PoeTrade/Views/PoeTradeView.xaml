@@ -5,7 +5,8 @@
                     xmlns:common="clr-namespace:PoeShared.Common;assembly=PoeShared"
                     xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
                     xmlns:utilities="clr-namespace:PoeEyeUi.Utilities"
-                    xmlns:filterExtension="clr-namespace:PoeEyeUi.Utilities.FilterExtension">
+                    xmlns:filterExtension="clr-namespace:PoeEyeUi.Utilities.FilterExtension"
+                    xmlns:net="clr-namespace:FontAwesome.Net;assembly=FontAwesome.Net">
 
     <DataTemplate x:Key="PoeItemStatsTemplateKey" DataType="{x:Type common:IPoeItem}" >
         <!-- Stats -->
@@ -356,12 +357,9 @@
                             <Button Grid.Column="7" 
                                     Command="{Binding CopyPmMessageToClipboardCommand}"
                                     Width="30" Height="30" Style="{StaticResource MetroCircleButtonStyle}"
+                                    FontFamily="{StaticResource FontAwesome}"
+                                    Content="{x:Static net:FontAwesome.clipboard}"
                                     ToolTip="Copy PM to clipboard">
-                                <Rectangle Width="11" Height="11" Fill="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Button}}}">
-                                    <Rectangle.OpacityMask>
-                                        <VisualBrush Stretch="Fill" Visual="{DynamicResource appbar_clipboard_edit}" />
-                                    </Rectangle.OpacityMask>
-                                </Rectangle>
                             </Button>
                         </Grid>
                     </Border>
