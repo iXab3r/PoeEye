@@ -70,7 +70,15 @@
         private void LoadImage(FileInfo cachedImageFilePath)
         {
             Log.Instance.Debug($"[ImageViewModel] Loading image...\r\n\tBase URI: '{imageUri}'\r\n\tFilePath: '{cachedImageFilePath.FullName}'");
-            image.Source = LoadBitmapImage(cachedImageFilePath.FullName);
+            try
+            {
+                var bitmap = LoadBitmapImage(cachedImageFilePath.FullName);
+                image.Source = bitmap;
+            }
+            catch (Exception ex)
+            {
+                Log.HandleException(ex);
+            }
         }
 
         private BitmapImage LoadBitmapImage(string filePath)
