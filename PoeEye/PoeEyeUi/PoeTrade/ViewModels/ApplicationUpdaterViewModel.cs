@@ -11,6 +11,7 @@
     using System.Linq;
     using System.Reactive.Concurrency;
     using System.Reactive.Linq;
+    using System.Reflection;
     using System.Threading;
     using System.Threading.Tasks;
     using System.Windows;
@@ -102,10 +103,15 @@
 
                     Log.Instance.Debug($"[ApplicationUpdaterViewModel] Downloading releases...");
                     mgr.DownloadReleases(updateInfo.ReleasesToApply, UpdateProgress).Wait();
+
+#if DEBUG
+                    Log.Instance.Debug($"[ApplicationUpdaterViewModel] Debug mode detected, skipping update");
+                    var newVersionFolder = AppDomain.CurrentDomain.BaseDirectory;
+#else
                     Log.Instance.Debug($"[ApplicationUpdaterViewModel] Applying releases...");
-
-
                     var newVersionFolder = mgr.ApplyReleases(updateInfo).Result;
+#endif
+
                     var lastAppliedRelease = updateInfo.ReleasesToApply.Last();
 
                     Log.Instance.Debug($"[ApplicationUpdaterViewModel] Update completed to v{lastAppliedRelease.Version}, result: {newVersionFolder}");
