@@ -79,8 +79,6 @@
                 Log.Instance.Trace($"[HttpClient] Awaiting for semaphore slot (max: {MaxSimultaneousRequestsCount}, atm: {RequestsSemaphore.CurrentCount})");
 
                 RequestsSemaphore.Wait();
-                Log.Instance.Trace($"[HttpClient] Entered semaphore, awainting {DelayBetweenRequests.TotalSeconds}s before issuing query...");
-                Thread.Sleep(DelayBetweenRequests); 
 
                 var httpClient = new EasyHttp.Http.HttpClient();
                 httpClient.Request.Cookies = Cookies;
@@ -95,6 +93,8 @@
             }
             finally
             {
+                Log.Instance.Trace($"[HttpClient] Awainting {DelayBetweenRequests.TotalSeconds}s before releasing semaphore slot...");
+                Thread.Sleep(DelayBetweenRequests);
                 RequestsSemaphore.Release();
             }
             
