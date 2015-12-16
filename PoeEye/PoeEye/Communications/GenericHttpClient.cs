@@ -18,29 +18,35 @@
 
     using JetBrains.Annotations;
 
-    using PoeShared;
     using PoeShared.DumpToText;
     using PoeShared.Http;
 
     using Properties;
 
+    using ProxyProvider;
+
     using TypeConverter;
 
     using HttpClient = System.Net.Http.HttpClient;
+    using Log = PoeShared.Log;
 
     internal sealed class GenericHttpClient : IHttpClient
     {
         private readonly IConverter<NameValueCollection, string> nameValueConverter;
+        private readonly IProxyProvider proxyProdiver;
         private static readonly int MaxSimultaneousRequestsCount;
         private static readonly TimeSpan DelayBetweenRequests;
         private static readonly SemaphoreSlim RequestsSemaphore;
 
         public GenericHttpClient(
-            [NotNull] IConverter<NameValueCollection, string> nameValueConverter)
+            [NotNull] IConverter<NameValueCollection, string> nameValueConverter,
+            [NotNull] IProxyProvider proxyProdiver)
         {
             Guard.ArgumentNotNull(() => nameValueConverter);
+            Guard.ArgumentNotNull(() => proxyProdiver);
 
             this.nameValueConverter = nameValueConverter;
+            this.proxyProdiver = proxyProdiver;
         }
 
         static GenericHttpClient()
@@ -85,6 +91,7 @@
                 var httpClient = new EasyHttp.Http.HttpClient();
                 httpClient.Request.Cookies = Cookies;
 
+                var client = new WebClient();
                 var response = httpClient.Post(uri, postData, HttpContentTypes.ApplicationXWwwFormUrlEncoded);
                 Log.Instance.Debug(
                     $"[HttpClient] Received response, status: {response.StatusCode}, length: {response.RawText?.Length}");

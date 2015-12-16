@@ -34,7 +34,7 @@ namespace PoeEye.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("00:00:05")]
+        [global::System.Configuration.DefaultSettingValueAttribute("00:00:15")]
         public global::System.TimeSpan DelayBetweenRequests {
             get {
                 return ((global::System.TimeSpan)(this["DelayBetweenRequests"]));
