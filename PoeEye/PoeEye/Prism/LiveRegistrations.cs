@@ -14,8 +14,6 @@
     using PoeTrade;
     using PoeTrade.Query;
 
-    using ProxyProvider;
-
     using TypeConverter;
 
     public sealed class LiveRegistrations : UnityContainerExtension
