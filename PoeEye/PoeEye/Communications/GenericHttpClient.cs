@@ -86,12 +86,11 @@
 
                 RequestsSemaphore.Wait();
                 Log.Instance.Trace($"[HttpClient] Entered semaphore, awainting {DelayBetweenRequests.TotalSeconds}s before issuing query...");
-                Thread.Sleep(DelayBetweenRequests);
+                Thread.Sleep(DelayBetweenRequests); 
 
                 var httpClient = new EasyHttp.Http.HttpClient();
                 httpClient.Request.Cookies = Cookies;
 
-                var client = new WebClient();
                 var response = httpClient.Post(uri, postData, HttpContentTypes.ApplicationXWwwFormUrlEncoded);
                 Log.Instance.Debug(
                     $"[HttpClient] Received response, status: {response.StatusCode}, length: {response.RawText?.Length}");
