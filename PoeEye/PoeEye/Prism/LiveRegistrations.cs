@@ -14,6 +14,8 @@
     using PoeTrade;
     using PoeTrade.Query;
 
+    using ProxyProvider;
+
     using TypeConverter;
 
     public sealed class LiveRegistrations : UnityContainerExtension
@@ -32,6 +34,7 @@
 
             Container
                 .RegisterType<IClock, Clock>(new ContainerControlledLifetimeManager())
+                .RegisterType<IProxyProvider, GenericProxyProvider>(new ContainerControlledLifetimeManager(), new InjectionFactory(unity => new GenericProxyProvider()))
                 .RegisterType<IPoeTradeParser, PoeTradeParserModern>(new ContainerControlledLifetimeManager())
                 .RegisterType<IPoeQueryInfoProvider, PoeQueryInfoProvider>(new ContainerControlledLifetimeManager());
         }

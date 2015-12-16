@@ -7,12 +7,11 @@
     using System.Reactive.Concurrency;
     using System.Reactive.Linq;
     using System.Reactive.Threading.Tasks;
+    using System.Text;
     using System.Threading;
+    using System.Web;
 
     using CsQuery.ExtensionMethods.Internal;
-
-    using EasyHttp.Http;
-    using EasyHttp.Infrastructure;
 
     using Guards;
 
@@ -23,6 +22,8 @@
 
     using Properties;
 
+    using ProxyProvider;
+
     using TypeConverter;
 
     using HttpClient = System.Net.Http.HttpClient;
@@ -31,16 +32,20 @@
     internal sealed class GenericHttpClient : IHttpClient
     {
         private readonly IConverter<NameValueCollection, string> nameValueConverter;
+        private readonly IProxyProvider proxyProvider;
         private static readonly int MaxSimultaneousRequestsCount;
         private static readonly TimeSpan DelayBetweenRequests;
         private static readonly SemaphoreSlim RequestsSemaphore;
 
         public GenericHttpClient(
-            [NotNull] IConverter<NameValueCollection, string> nameValueConverter)
+            [NotNull] IConverter<NameValueCollection, string> nameValueConverter,
+            [NotNull] IProxyProvider proxyProvider)
         {
             Guard.ArgumentNotNull(() => nameValueConverter);
+            Guard.ArgumentNotNull(() => proxyProvider);
 
             this.nameValueConverter = nameValueConverter;
+            this.proxyProvider = proxyProvider;
         }
 
         static GenericHttpClient()
@@ -80,16 +85,35 @@
 
                 RequestsSemaphore.Wait();
 
-                var httpClient = new EasyHttp.Http.HttpClient();
-                httpClient.Request.Cookies = Cookies;
+                var httpClient = WebRequest.CreateHttp(uri);
+                httpClient.CookieContainer = new CookieContainer();
+                httpClient.CookieContainer.Add(Cookies);
+                httpClient.ContentType = "application/x-www-form-urlencoded";
 
-                var response = httpClient.Post(uri, postData, HttpContentTypes.ApplicationXWwwFormUrlEncoded);
+                httpClient.Method = WebRequestMethods.Http.Post;
+
+                var data = Encoding.ASCII.GetBytes(postData);
+                using (var stream = httpClient.GetRequestStream())
+                {
+                    stream.Write(data, 0, data.Length);
+                }
+
+                var response = (HttpWebResponse)httpClient.GetResponse();
+
+                var responseStream = response.GetResponseStream();
+
+                string rawResponse = string.Empty;
+                if (responseStream != null)
+                {
+                    rawResponse = new StreamReader(responseStream).ReadToEnd();
+                }
+
                 Log.Instance.Debug(
-                    $"[HttpClient] Received response, status: {response.StatusCode}, length: {response.RawText?.Length}");
+                    $"[HttpClient] Received response, status: {response.StatusCode}, length: {rawResponse?.Length}");
 
                 CheckResponseStatusOrThrow(response);
 
-                return response.RawText;
+                return rawResponse;
             }
             finally
             {
@@ -97,18 +121,16 @@
                 Thread.Sleep(DelayBetweenRequests);
                 RequestsSemaphore.Release();
             }
-            
         }
 
-        private static void CheckResponseStatusOrThrow(HttpResponse response)
+        private static void CheckResponseStatusOrThrow(HttpWebResponse response)
         {
             if (response.StatusCode == HttpStatusCode.OK)
             {
                 return;
             }
 
-            throw new HttpException(response.StatusCode,
-                $"Wrong status code, expected 200 OK, got {response.StatusCode}");
+            throw new HttpException((int)response.StatusCode, $"Wrong status code, expected 200 OK, got {response.StatusCode}");
         }
     }
 }
