@@ -134,13 +134,15 @@
             var instance = CreateInstance();
             instance.ActiveQuery = Mock.Of<IPoeQueryInfo>();
 
+            var now = new DateTime(2015,1,1);
+            clock.Setup(x => x.CurrentTime).Returns(now);
             var exception = new Exception("msg");
 
             //When
             poeLiveHistoryUpdateExceptions.OnNext(exception);
 
             //Then
-            instance.Errors.ShouldBeSameAs(exception);
+            instance.Errors.ShouldBe($"[{now}] msg");
         }
 
         [Test]
