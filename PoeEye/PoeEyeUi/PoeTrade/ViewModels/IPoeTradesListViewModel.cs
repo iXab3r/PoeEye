@@ -16,7 +16,7 @@
 
         bool IsBusy { get; }
 
-        Exception LastUpdateException { get; }
+        string Errors { get; }
 
         TimeSpan RecheckTimeout { get; set; }
 

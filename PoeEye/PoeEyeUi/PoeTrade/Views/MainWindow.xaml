@@ -99,8 +99,8 @@
                                                  Visibility="{Binding IsBusy, Converter={StaticResource BoolToHiddenConverter}}" />
 
                                     <Label Grid.Column="1"
-                                               ToolTip="{Binding TradesListViewModel.LastUpdateException, Converter={StaticResource ExceptionToMessageConverter}}"
-                                               Visibility="{Binding TradesListViewModel.LastUpdateException, Converter={StaticResource NullToCollapsedConverter}}"
+                                               ToolTip="{Binding TradesListViewModel.Errors}"
+                                               Visibility="{Binding TradesListViewModel.Errors, Converter={StaticResource NullToCollapsedConverter}}"
                                                FontFamily="{StaticResource FontAwesome}"
                                                Foreground="{StaticResource ValidationSummaryColor3}"
                                                VerticalAlignment="Stretch"

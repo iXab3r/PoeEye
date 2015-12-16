@@ -62,7 +62,14 @@
 
         public override string ToString()
         {
-            return $"[WebProxy] {address} (desc. '{description}')";
+            if (string.IsNullOrWhiteSpace(description))
+            {
+                return $"[Prx] {address}";
+            }
+            else
+            {
+                return $"[Prx] {address} (desc. '{description}')";
+            }
         }
     }
 }

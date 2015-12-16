@@ -123,10 +123,14 @@
 
                     return rawResponse;
                 }
-                catch (WebException)
+                catch (WebException ex)
                 {
-                    proxyToken?.ReportBroken();
-                    throw;
+                    if (proxyToken == null)
+                    {
+                        throw;
+                    }
+                    proxyToken.ReportBroken();
+                    throw new WebException($"{ex.Message} (Proxy {proxyToken.Proxy})");
                 }
             }
             finally

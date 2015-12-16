@@ -99,20 +99,27 @@
                     proxiesList[proxyToken.Proxy] = proxyToken;
                 }
 
-                var client = new WebClient { Proxy = proxyToken.Proxy };
-
-                var response = client.DownloadString(@"http://poe.trade/");
-
-                if (response.Contains("Path of Exile shops indexer"))
+                var checks = new[]
                 {
-                    proxyToken.ReportSuccess();
-                    Log.Instance.Debug($"[GenericProxyProvider.CheckProxySafe] Proxy is active, {proxyToken.Proxy}");
-                }
-                else
+                    new { Uri = @"http://poe.trade/", Checker = new Func<string, bool>(x => x != null && x.Contains("Path of Exile")) },
+                    new { Uri = @"http://exile.tools/", Checker = new Func<string, bool>(x => x != null && x.Contains("Path of Exile")) },
+                    //new { Uri = @"http://www.google.com:80/", Checker = new Func<string, bool>(x => x != null && x.Contains("Google")) },
+                };
+
+                foreach (var check in checks)
                 {
-                    proxyToken.ReportBroken();
-                    Log.Instance.Debug($"[GenericProxyProvider.CheckProxySafe] Failed to get expected result from proxy {proxyToken.Proxy}");
+                    var client = new WebClient { Proxy = proxyToken.Proxy };
+
+                    var response = client.DownloadString(check.Uri);
+
+                    if (!check.Checker(response))
+                    {
+                        throw new FormatException($"Failed to get expected result from proxy {proxyToken.Proxy}");
+                    }
                 }
+
+                Log.Instance.Debug($"[GenericProxyProvider.CheckProxySafe] Proxy is active, {proxyToken.Proxy}");
+                proxyToken.ReportSuccess();
             }
             catch (Exception ex)
             {
@@ -130,7 +137,7 @@
 
             public IWebProxy Proxy { get; }
 
-            public bool IsBroken { get; private set; }
+            public bool IsBroken { get; private set; } = true;
 
             public void ReportBroken()
             {

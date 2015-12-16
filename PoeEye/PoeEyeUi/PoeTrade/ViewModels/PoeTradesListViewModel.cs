@@ -42,7 +42,7 @@
         private ActiveProviderInfo activeProviderInfo;
         private IPoeQueryInfo activeQuery;
 
-        private Exception lastUpdateException;
+        private string errors;
 
         private DateTime lastUpdateTimestamp;
         private TimeSpan recheckTimeout = TimeSpan.FromSeconds(120);
@@ -112,10 +112,10 @@
             set { this.RaiseAndSetIfChanged(ref activeQuery, value); }
         }
 
-        public Exception LastUpdateException
+        public string Errors
         {
-            get { return lastUpdateException; }
-            private set { this.RaiseAndSetIfChanged(ref lastUpdateException, value); }
+            get { return errors; }
+            private set { this.RaiseAndSetIfChanged(ref errors, value); }
         }
 
         public TimeSpan TimeSinceLastUpdate => clock.CurrentTime - lastUpdateTimestamp;
@@ -209,13 +209,24 @@
                 .AddTo(activeProviderInfo.Anchors);
         }
 
-        private void OnErrorReceived(Exception error)
+        private void OnErrorReceived(Exception exception)
         {
-            if (error != null)
+            if (exception != null)
             {
-                Log.Instance.Debug($"[TradesListViewModel] Received an exception from history provider", error);
+                Log.Instance.Debug($"[TradesListViewModel] Received an exception from history provider", exception);
+                var errorMsg = $"[{clock.CurrentTime}] {exception.Message}";
+
+                if (errors?.Length > 1024)
+                {
+                    errors = string.Empty;
+                }
+
+                Errors = string.IsNullOrEmpty(errors) ? $"{errorMsg}" : $"{errorMsg}\r\n{errors}";
             }
-            LastUpdateException = error;
+            else
+            {
+                Errors = string.Empty;
+            }
         }
         
         private struct ActiveProviderInfo : IDisposable

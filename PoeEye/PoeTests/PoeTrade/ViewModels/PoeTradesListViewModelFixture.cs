@@ -140,7 +140,7 @@
             poeLiveHistoryUpdateExceptions.OnNext(exception);
 
             //Then
-            instance.LastUpdateException.ShouldBeSameAs(exception);
+            instance.Errors.ShouldBeSameAs(exception);
         }
 
         [Test]
