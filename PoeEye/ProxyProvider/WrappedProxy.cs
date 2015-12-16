@@ -6,7 +6,36 @@
     internal sealed class WrappedProxy : IWebProxy
     {
         private readonly Uri address;
+        private readonly string description;
         private readonly WebProxy proxy;
+
+        public WrappedProxy(Uri address, string description = null)
+        {
+            if (address == null)
+            {
+                throw new ArgumentNullException(nameof(address));
+            }
+            this.address = address;
+            this.description = description;
+
+            proxy = new WebProxy(address, true);
+        }
+
+        public Uri GetProxy(Uri destination)
+        {
+            return proxy.GetProxy(destination);
+        }
+
+        public bool IsBypassed(Uri host)
+        {
+            return proxy.IsBypassed(host);
+        }
+
+        public ICredentials Credentials
+        {
+            get { return proxy.Credentials; }
+            set { proxy.Credentials = value; }
+        }
 
         private bool Equals(WrappedProxy other)
         {
@@ -31,35 +60,9 @@
             return address?.GetHashCode() ?? 0;
         }
 
-        public WrappedProxy(Uri address)
-        {
-            this.address = address;
-            if (address == null)
-            {
-                throw new ArgumentNullException(nameof(address));
-            }
-            proxy = new WebProxy(address, true);
-        }
-
-        public Uri GetProxy(Uri destination)
-        {
-            return proxy.GetProxy(destination);
-        }
-
-        public bool IsBypassed(Uri host)
-        {
-            return proxy.IsBypassed(host);
-        }
-
-        public ICredentials Credentials
-        {
-            get { return proxy.Credentials; }
-            set { proxy.Credentials = value; }
-        }
-
         public override string ToString()
         {
-            return $"[WebProxy] {address}";
+            return $"[WebProxy] {address} (desc. '{description}')";
         }
     }
 }

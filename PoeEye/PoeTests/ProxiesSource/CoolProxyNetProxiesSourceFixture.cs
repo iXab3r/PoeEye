@@ -1,10 +1,10 @@
-﻿namespace PoeEye.Tests
+﻿namespace PoeEye.Tests.ProxiesSource
 {
     using System.Linq;
 
     using NUnit.Framework;
 
-    using ProxyProvider;
+    using ProxyProvider.ProxiesSource;
 
     using Shouldly;
 

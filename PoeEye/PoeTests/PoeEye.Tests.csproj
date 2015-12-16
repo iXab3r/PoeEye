@@ -132,7 +132,8 @@
     <Compile Include="Common\PoeItemModEqualityComparerFixture.cs" />
     <Compile Include="Communications\NameValueCollectionToQueryStringConverterFixture.cs" />
     <Compile Include="Common\PoeItemParserFixture.cs" />
-    <Compile Include="CoolProxyNetProxiesSourceFixture.cs" />
+    <Compile Include="ProxiesSource\CoolProxyNetProxiesSourceFixture.cs" />
+    <Compile Include="ProxiesSource\FoxToolsFixture.cs" />
     <Compile Include="Helpers\MockExtensions.cs" />
     <Compile Include="PoeTrade\PoeTradeParserModernFixture.cs" />
     <Compile Include="PoeTrade\TestData\TestDataProvider.cs" />

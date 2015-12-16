@@ -251,6 +251,9 @@
     <controls:MetroWindow.RightWindowCommands>
         <controls:WindowCommands>
             <StackPanel Orientation="Horizontal">
+                
+                <ContentPresenter Content="{Binding ProxyProviderViewModel}" />
+                
                 <controls:ProgressRing Height="20" Width="20" IsActive="true" 
                                        Foreground="{StaticResource TextBrush}" 
                                        Visibility="{Binding ApplicationUpdater.IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}" />

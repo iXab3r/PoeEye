@@ -9,6 +9,10 @@
     using System.Threading;
     using System.Threading.Tasks;
 
+    using ProxiesSource;
+    using ProxiesSource.FoxTools;
+    using ProxiesSource.RawList;
+
     public sealed class GenericProxyProvider : IProxyProvider
     {
         public static readonly TimeSpan DefaultRecheckTimeout = TimeSpan.FromMinutes(10);
@@ -20,7 +24,7 @@
 
         private readonly ConcurrentDictionary<IWebProxy, WebProxyToken> proxiesList = new ConcurrentDictionary<IWebProxy, WebProxyToken>();
 
-        public GenericProxyProvider() : this(new CoolProxyNetProxiesSource())
+        public GenericProxyProvider() : this(new RawProxiesSource())
         {
         }
 
@@ -54,11 +58,15 @@
             }
             
             var proxyToReturn = activeProxies.PickRandom();
-            Log.Instance.Warn($"[GenericProxyProvider.TryGetProxy] Returning proxy {proxyToReturn}");
+            Log.Instance.Debug($"[GenericProxyProvider.TryGetProxy({activeProxies.Length} / {proxiesList.Count})] Returning proxy {proxyToReturn}");
 
             proxy = proxyToReturn;
             return true;
         }
+
+        public int ActiveProxiesCount => proxiesList.Count(x => !x.Value.IsBroken);
+
+        public int TotalProxiesCount => proxiesList.Count();
 
         private void ActualizeProxiesList()
         {
@@ -70,7 +78,9 @@
                     .Select(x => new WebProxyToken(x))
                     .ToArray();
 
-                Parallel.ForEach(proxiesToCheck, CheckProxySafe);
+                Log.Instance.Debug($"[GenericProxyProvider] Proxies to check: \r\n\t{string.Join<object>("\r\n\t", proxiesToCheck)}");
+
+                Parallel.ForEach(proxiesToCheck, new ParallelOptions() { MaxDegreeOfParallelism = 4}, (proxy,_,__) => CheckProxySafe(proxy));
 
                 Log.Instance.Debug($"[GenericProxyProvider] Proxies checked, active: {proxiesList.Count(x => !x.Value.IsBroken)} / {proxiesList.Count}\r\n\tActive proxies:\r\n\t{string.Join<object>("\r\n\t", proxiesList.Values.Where(x => !x.IsBroken))}");
             }
@@ -84,29 +94,29 @@
         {
             try
             {
-                var client = new WebClient { Proxy = proxyToken.Proxy };
-
-                var response = client.DownloadString(@"https://www.google.com");
-
-                if (response.Contains("<title>Google</title>"))
-                {
-                    proxyToken.ReportSuccess();
-                    Log.Instance.Debug($"[GenericProxyProvider.CheckProxySafe] Proxy is active, {proxyToken}");
-                }
-                else
-                {
-                    proxyToken.ReportBroken();
-                    Log.Instance.Debug($"[GenericProxyProvider.CheckProxySafe] Failed to get expected result from proxy {proxyToken}");
-                }
-
                 if (!proxiesList.ContainsKey(proxyToken.Proxy))
                 {
                     proxiesList[proxyToken.Proxy] = proxyToken;
                 }
+
+                var client = new WebClient { Proxy = proxyToken.Proxy };
+
+                var response = client.DownloadString(@"http://poe.trade/");
+
+                if (response.Contains("Path of Exile shops indexer"))
+                {
+                    proxyToken.ReportSuccess();
+                    Log.Instance.Debug($"[GenericProxyProvider.CheckProxySafe] Proxy is active, {proxyToken.Proxy}");
+                }
+                else
+                {
+                    proxyToken.ReportBroken();
+                    Log.Instance.Debug($"[GenericProxyProvider.CheckProxySafe] Failed to get expected result from proxy {proxyToken.Proxy}");
+                }
             }
             catch (Exception ex)
             {
-                Log.Instance.Debug($"[GenericProxyProvider.CheckProxySafe] Proxy failed({proxyToken}),  msg '{ex.Message}'");
+                Log.Instance.Debug($"[GenericProxyProvider.CheckProxySafe] Proxy failed({proxyToken.Proxy}),  msg '{ex.Message}'");
                 proxyToken.ReportBroken();
             }
         }

@@ -270,6 +270,7 @@
     <Compile Include="PoeTrade\ViewModels\PoeExplicitModViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\PoeImplicitModViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\PoeQueryViewModel.cs" />
+    <Compile Include="PoeTrade\ViewModels\ProxyProviderViewModel.cs" />
     <Compile Include="PoeTrade\Views\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
@@ -334,6 +335,10 @@
       <Project>{12DF53DD-7144-4D2D-B7A1-B4BC5BBDFB69}</Project>
       <Name>PoeShared</Name>
     </ProjectReference>
+    <ProjectReference Include="..\ProxyProvider\ProxyProvider.csproj">
+      <Project>{9d93f624-aaef-4079-9743-2fc0f6713cb5}</Project>
+      <Name>ProxyProvider</Name>
+    </ProjectReference>
     <ProjectReference Include="..\WpfClipboardMonitor\WpfClipboardMonitor.csproj">
       <Project>{5f3ed2a3-406b-43c4-bc91-5367c0158828}</Project>
       <Name>WpfClipboardMonitor</Name>
@@ -381,6 +386,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="PoeTrade\Views\PoeQueryView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="PoeTrade\Views\ProxyProviderView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

@@ -62,11 +62,14 @@
             [NotNull] IPoeEyeConfigProvider<IPoeEyeConfig> poeEyeConfigProvider,
             [NotNull] IAudioNotificationsManager audioNotificationsManager,
             [NotNull] PoeClipboardParserViewModel clipboardParserViewModel,
+            [NotNull] ProxyProviderViewModel proxyProviderViewModel,
             [NotNull] [Dependency(WellKnownSchedulers.Ui)] IScheduler uiScheduler)
         {
             Guard.ArgumentNotNull(() => tabFactory);
             Guard.ArgumentNotNull(() => applicationUpdaterViewModel);
+            Guard.ArgumentNotNull(() => proxyProviderViewModel);
             Guard.ArgumentNotNull(() => poeEyeConfigProvider);
+            Guard.ArgumentNotNull(() => clipboardParserViewModel);
             Guard.ArgumentNotNull(() => audioNotificationsManager);
             Guard.ArgumentNotNull(() => uiScheduler);
 
@@ -78,6 +81,7 @@
 
             ApplicationUpdater = applicationUpdaterViewModel;
             ClipboardParserViewModel = clipboardParserViewModel;
+            ProxyProviderViewModel = proxyProviderViewModel;
 
             createNewTabCommand = ReactiveCommand.Create();
             createNewTabCommand
@@ -140,6 +144,8 @@
         public ApplicationUpdaterViewModel ApplicationUpdater { get; }
 
         public PoeClipboardParserViewModel ClipboardParserViewModel { get; }
+
+        public ProxyProviderViewModel ProxyProviderViewModel { get; }
 
         public bool AudioNotificationsEnabled
         {

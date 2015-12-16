@@ -213,7 +213,7 @@
         {
             if (error != null)
             {
-                Log.Instance.Debug($"[TradesListViewModel] Received an exception from history provider\r\nQuery: {activeQuery}");
+                Log.Instance.Debug($"[TradesListViewModel] Received an exception from history provider", error);
             }
             LastUpdateException = error;
         }

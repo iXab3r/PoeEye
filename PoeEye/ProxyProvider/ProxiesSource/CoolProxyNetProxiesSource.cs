@@ -1,4 +1,4 @@
-﻿namespace ProxyProvider
+﻿namespace ProxyProvider.ProxiesSource
 {
     using System;
     using System.Collections.Generic;

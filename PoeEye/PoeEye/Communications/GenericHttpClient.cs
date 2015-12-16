@@ -89,31 +89,45 @@
                 httpClient.CookieContainer = new CookieContainer();
                 httpClient.CookieContainer.Add(Cookies);
                 httpClient.ContentType = "application/x-www-form-urlencoded";
-
                 httpClient.Method = WebRequestMethods.Http.Post;
 
-                var data = Encoding.ASCII.GetBytes(postData);
-                using (var stream = httpClient.GetRequestStream())
+                IProxyToken proxyToken;
+                if (proxyProvider.TryGetProxy(out proxyToken))
                 {
-                    stream.Write(data, 0, data.Length);
+                    Log.Instance.Debug($"[HttpClient] Using proxy {proxyToken.Proxy} for uri '{uri}'");
+                    httpClient.Proxy = proxyToken.Proxy;
                 }
 
-                var response = (HttpWebResponse)httpClient.GetResponse();
-
-                var responseStream = response.GetResponseStream();
-
-                string rawResponse = string.Empty;
-                if (responseStream != null)
+                try
                 {
-                    rawResponse = new StreamReader(responseStream).ReadToEnd();
+
+                    var data = Encoding.ASCII.GetBytes(postData);
+                    using (var stream = httpClient.GetRequestStream())
+                    {
+                        stream.Write(data, 0, data.Length);
+                    }
+
+                    var response = (HttpWebResponse)httpClient.GetResponse();
+                    var responseStream = response.GetResponseStream();
+
+                    string rawResponse = string.Empty;
+                    if (responseStream != null)
+                    {
+                        rawResponse = new StreamReader(responseStream).ReadToEnd();
+                    }
+
+                    Log.Instance.Debug(
+                        $"[HttpClient] Received response, status: {response.StatusCode}, length: {rawResponse?.Length}");
+
+                    CheckResponseStatusOrThrow(response);
+
+                    return rawResponse;
                 }
-
-                Log.Instance.Debug(
-                    $"[HttpClient] Received response, status: {response.StatusCode}, length: {rawResponse?.Length}");
-
-                CheckResponseStatusOrThrow(response);
-
-                return rawResponse;
+                catch (WebException)
+                {
+                    proxyToken?.ReportBroken();
+                    throw;
+                }
             }
             finally
             {

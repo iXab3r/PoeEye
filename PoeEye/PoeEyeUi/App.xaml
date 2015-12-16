@@ -44,7 +44,8 @@
                 <ResourceDictionary Source="Themes/VirtualizedItemsControl.xaml" />
                 <ResourceDictionary Source="Themes/WpfAutoCompleteTextBoxStyle.xaml" />
                 <ResourceDictionary Source="Themes/PoeQueryViewStyles.xaml" />
-
+                
+                <ResourceDictionary Source="PoeTrade/Views/ProxyProviderView.xaml" />
                 <ResourceDictionary Source="PoeTrade/Views/ImageView.xaml" />
                 <ResourceDictionary Source="PoeTrade/Views/CurrencyView.xaml" />
                 <ResourceDictionary Source="PoeTrade/Views/PoeLinksInfoView.xaml" />
