@@ -23,8 +23,6 @@
 
     using Properties;
 
-    using ProxyProvider;
-
     using TypeConverter;
 
     using HttpClient = System.Net.Http.HttpClient;
@@ -33,20 +31,16 @@
     internal sealed class GenericHttpClient : IHttpClient
     {
         private readonly IConverter<NameValueCollection, string> nameValueConverter;
-        private readonly IProxyProvider proxyProdiver;
         private static readonly int MaxSimultaneousRequestsCount;
         private static readonly TimeSpan DelayBetweenRequests;
         private static readonly SemaphoreSlim RequestsSemaphore;
 
         public GenericHttpClient(
-            [NotNull] IConverter<NameValueCollection, string> nameValueConverter,
-            [NotNull] IProxyProvider proxyProdiver)
+            [NotNull] IConverter<NameValueCollection, string> nameValueConverter)
         {
             Guard.ArgumentNotNull(() => nameValueConverter);
-            Guard.ArgumentNotNull(() => proxyProdiver);
 
             this.nameValueConverter = nameValueConverter;
-            this.proxyProdiver = proxyProdiver;
         }
 
         static GenericHttpClient()
