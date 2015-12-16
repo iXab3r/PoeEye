@@ -176,6 +176,8 @@
                            if (messageBoxResult == MessageDialogResult.Affirmative)
                            {
                                Log.Instance.Debug("[ApplicationUpdaterViewModel] App updated, restarting...");
+
+                               //FIXME Race condition, it's possible that application will be loaded BEFORE this instance will be unloaded => mutex conflict
                                Process.Start(updatedExePath.FullName);
                                Environment.Exit(0);
                            }

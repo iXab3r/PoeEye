@@ -42,10 +42,11 @@
         private readonly ReactiveCommand<object> closeTabCommand;
 
         private readonly ISubject<Unit> configUpdateSubject = new Subject<Unit>();
-        private readonly ReactiveCommand<object> createNewTabCommand;
         private readonly IPoeEyeConfigProvider<IPoeEyeConfig> poeEyeConfigProvider;
 
         private readonly IFactory<MainWindowTabViewModel> tabFactory;
+        private readonly ReactiveCommand<object> saveConfigCommand;
+        private readonly ReactiveCommand<object> createNewTabCommand;
 
         private bool audioNotificationsEnabled = true;
 
@@ -54,7 +55,6 @@
         private bool isMainWindowActive;
 
         private MainWindowTabViewModel selectedItem;
-        private ReactiveCommand<object> saveConfigCommand;
 
         public MainWindowViewModel(
             [NotNull] IFactory<MainWindowTabViewModel> tabFactory,
