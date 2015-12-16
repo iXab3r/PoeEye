@@ -25,10 +25,19 @@ namespace PoeEye.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("3")]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
         public int MaxSimultaneousRequestsCount {
             get {
                 return ((int)(this["MaxSimultaneousRequestsCount"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("00:00:05")]
+        public global::System.TimeSpan DelayBetweenRequests {
+            get {
+                return ((global::System.TimeSpan)(this["DelayBetweenRequests"]));
             }
         }
     }

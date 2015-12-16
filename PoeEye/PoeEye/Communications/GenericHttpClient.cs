@@ -32,6 +32,7 @@
     {
         private readonly IConverter<NameValueCollection, string> nameValueConverter;
         private static readonly int MaxSimultaneousRequestsCount;
+        private static readonly TimeSpan DelayBetweenRequests;
         private static readonly SemaphoreSlim RequestsSemaphore;
 
         public GenericHttpClient(
@@ -45,7 +46,8 @@
         static GenericHttpClient()
         {
             MaxSimultaneousRequestsCount = Settings.Default.MaxSimultaneousRequestsCount;
-            Log.Instance.Debug($"[GenericHttpClient..staticctor] MaxSimultaneousRequestsCount: {MaxSimultaneousRequestsCount}");
+            DelayBetweenRequests = Settings.Default.DelayBetweenRequests;
+            Log.Instance.Debug($"[GenericHttpClient..staticctor] {new { MaxSimultaneousRequestsCount, DelayBetweenRequests }}");
             RequestsSemaphore = new SemaphoreSlim(MaxSimultaneousRequestsCount);
         }
 
@@ -77,6 +79,8 @@
                 Log.Instance.Trace($"[HttpClient] Awaiting for semaphore slot (max: {MaxSimultaneousRequestsCount}, atm: {RequestsSemaphore.CurrentCount})");
 
                 RequestsSemaphore.Wait();
+                Log.Instance.Trace($"[HttpClient] Entered semaphore, awainting {DelayBetweenRequests.TotalSeconds}s before issuing query...");
+                Thread.Sleep(DelayBetweenRequests);
 
                 var httpClient = new EasyHttp.Http.HttpClient();
                 httpClient.Request.Cookies = Cookies;
