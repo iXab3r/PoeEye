@@ -3,6 +3,18 @@
                     xmlns:viewModels="clr-namespace:PoeEyeUi.PoeTrade.ViewModels"
                     xmlns:net="clr-namespace:FontAwesome.Net;assembly=FontAwesome.Net">
     <DataTemplate DataType="{x:Type viewModels:MainWindowTabViewModel}" x:Key="MainWindowTabItemViewTemplate">
+        <DataTemplate.Resources>
+            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource CircleButton}" x:Key="AutoRecheckButtonStyle">
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding RecheckPeriodViewModel.IsAutoRecheckEnabled}" Value="True">
+                        <Setter Property="Foreground" Value="Green"/>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+
+        </DataTemplate.Resources>
+        
+        
         <Grid Margin="0,3,0,3">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
@@ -42,10 +54,11 @@
 
                 <Button Grid.Column="2"
                         Margin="5,0"
-                        Style="{StaticResource CircleButton}"
+                        Style="{StaticResource AutoRecheckButtonStyle}"
                         Width="40" Height="40"
                         HorizontalAlignment="Right"
                         Command="{Binding SearchCommand}"
+                        ToolTip="Init query"
                         Focusable="False"
                         CommandParameter="{Binding QueryViewModel.PoeQueryBuilder}"
                         Content="{x:Static net:FontAwesome.search}"
@@ -57,17 +70,10 @@
                         HorizontalAlignment="Right"
                         Command="{Binding RefreshCommand}"
                         Focusable="False"
+                        ToolTip="Force refresh"
                         Content="{x:Static net:FontAwesome.refresh}"
-                        Visibility="{Binding TradesListViewModel.ActiveQuery, Converter={StaticResource NullToCollapsedConverter}}">
-                    <Button.Style>
-                        <Style TargetType="{x:Type Button}" BasedOn="{StaticResource CircleButton}">
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding RecheckPeriodViewModel.IsAutoRecheckEnabled}" Value="True">
-                                    <Setter Property="Foreground" Value="Green"/>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Button.Style>
+                        Visibility="{Binding TradesListViewModel.ActiveQuery, Converter={StaticResource NullToCollapsedConverter}}"
+                        Style="{StaticResource AutoRecheckButtonStyle}">
                 </Button>
             </Grid>
 

@@ -35,16 +35,12 @@
 
             var periodObservable = this.ObservableForProperty(x => x.RecheckPeriod)
                 .Select(x => x.Value)
-                .DistinctUntilChanged()
                 .Do(LogRecheckPeriodChange)
-                .Select(timeout =>
-                    Observable.Merge(timeout == TimeSpan.Zero
-                        ? Observable.Never<Unit>()
-                        : Observable.Timer(DateTimeOffset.Now, timeout).ToUnit(), forceUpdatesSubject))
+                .Select(ToTimer)
                 .Switch()
                 .Publish();
 
-            var queryObservable = periodObservable
+            var queryObservable = Observable.Merge(periodObservable, forceUpdatesSubject)
                 .Where(x => !IsBusy)
                 .Do(StartUpdate)
                 .Select(x => poeApi.IssueQuery(query))
@@ -79,7 +75,21 @@
 
         public void Refresh()
         {
-            forceUpdatesSubject.OnNext(Unit.Default);
+            if (recheckPeriod == TimeSpan.Zero)
+            {
+                forceUpdatesSubject.OnNext(Unit.Default); // forcing refresh
+            }
+            else
+            {
+                RecheckPeriod = recheckPeriod; // restarting timer 
+            }
+        }
+
+        private IObservable<Unit> ToTimer(TimeSpan timeout)
+        {
+            return timeout == TimeSpan.Zero
+                ? Observable.Never<Unit>()
+                : Observable.Timer(DateTimeOffset.Now, timeout).ToUnit();
         }
 
         private void StartUpdate(Unit unit)
