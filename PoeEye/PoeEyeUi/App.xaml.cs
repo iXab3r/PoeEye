@@ -8,6 +8,8 @@
 
     using PoeShared;
 
+    using PoeTrade.Views;
+
     /// <summary>
     ///     Interaction logic for App.xaml
     /// </summary>
@@ -30,16 +32,15 @@
             Log.Instance.Error($"Unhandled application exception", unhandledExceptionEventArgs.ExceptionObject as Exception);
         }
 
-#if !DEBUG
-
         protected override void OnStartup(StartupEventArgs e, bool? isFirstInstance)
         {
             base.OnStartup(e, isFirstInstance);
 
             if (isFirstInstance == false)
             {
+                Log.Instance.Warn($"Application is already running !");
+#if !DEBUG
                 var assemblyName = Assembly.GetExecutingAssembly().GetName();
-
                 var window = MainWindow;
                 var title = $"{assemblyName.Name} v{assemblyName.Version}";
                 var message = "Application is already running !";
@@ -51,10 +52,15 @@
                 {
                     MessageBox.Show(message, title, MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
-
+                Log.Instance.Warn($"Shutting down...");
                 Shutdown(1);
+#endif
             }
         }
-#endif
+
+        private void App_OnStartup(object sender, StartupEventArgs e)
+        {
+            new MainWindow().Show();
+        }
     }
 }

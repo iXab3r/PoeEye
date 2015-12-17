@@ -9,7 +9,6 @@
         xmlns:utilities="clr-namespace:PoeEyeUi.Utilities"
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         xmlns:system="clr-namespace:System;assembly=mscorlib"
-        xmlns:net="clr-namespace:FontAwesome.Net;assembly=FontAwesome.Net"
         mc:Ignorable="d"
         Title="{Binding MainWindowTitle}" 
         MinWidth="1200" 
@@ -65,132 +64,11 @@
                          Margin="10,10,5,10"
                          Focusable="False"
                          HorizontalContentAlignment="Stretch"
-                         ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                         ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                         ItemTemplate="{StaticResource MainWindowTabItemViewTemplate}">
                     <ListBox.Resources>
                         <Style TargetType="ListBoxItem" BasedOn="{StaticResource ListBoxAsTabControl}" />
                     </ListBox.Resources>
-                    <ListBox.ItemTemplate>
-                        <DataTemplate DataType="{x:Type viewModels:MainWindowTabViewModel}">
-                            <Grid Margin="0,3,0,3">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
-
-                                <DockPanel Grid.Column="0" 
-                                           VerticalAlignment="Bottom"
-                                           Margin="0,5,0,0">
-                                  
-                                </DockPanel>
-
-                                <Grid Grid.Column="0" >
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto"/>
-                                        <ColumnDefinition Width="Auto"/>
-                                        <ColumnDefinition Width="Auto"/>
-                                    </Grid.ColumnDefinitions>
-
-                                    <ProgressBar Grid.Column="0" Width="10" Height="NaN"
-                                                 Margin="0,0,5,0"
-                                                 IsIndeterminate="true"
-                                                 Orientation="Vertical"
-                                                 Visibility="{Binding IsBusy, Converter={StaticResource BoolFalseToHiddenConverter}}" />
-
-                                    <Label Grid.Column="1"
-                                               ToolTip="{Binding TradesListViewModel.Errors}"
-                                               Visibility="{Binding TradesListViewModel.Errors, Converter={StaticResource NullToCollapsedConverter}}"
-                                               FontFamily="{StaticResource FontAwesome}"
-                                               Foreground="{StaticResource ValidationSummaryColor3}"
-                                               VerticalAlignment="Stretch"
-                                               HorizontalAlignment="Stretch"
-                                               VerticalContentAlignment="Center"
-                                               HorizontalContentAlignment="Center"
-                                               FontSize="20"
-                                               Content="{x:Static net:FontAwesome.warning}"/>
-
-                                    <Button Grid.Column="2" 
-                                           Margin="5,0"
-                                           Style="{StaticResource CircleButton}"
-                                           Width="40" Height="40"
-                                           HorizontalAlignment="Right"
-                                           Command="{Binding SearchCommand}"
-                                           Focusable="False"
-                                           CommandParameter="{Binding QueryViewModel.PoeQueryBuilder}" 
-                                           Content="{x:Static net:FontAwesome.search}"
-                                           Visibility="{Binding TradesListViewModel.ActiveQuery, Converter={StaticResource NotNullToCollapsedConverter}}" />
-
-                                    <Button Grid.Column="2" 
-                                           Margin="5,0"
-                                           Style="{StaticResource CircleButton}"
-                                           Width="40" Height="40"
-                                           HorizontalAlignment="Right"
-                                           Command="{Binding RefreshCommand}"
-                                           Focusable="False"
-                                           Content="{x:Static net:FontAwesome.refresh}"
-                                           Visibility="{Binding TradesListViewModel.ActiveQuery, Converter={StaticResource NullToCollapsedConverter}}" />
-                                </Grid>
-
-                                <TextBlock Grid.Column="1" 
-                                           Text="{Binding TabName}" 
-                                           FontSize="16" TextWrapping="Wrap" VerticalAlignment="Center"/>
-
-                                <Border Grid.Column="2"
-                                        Margin="10,0,10,0">
-                                    <Border Height="30" VerticalAlignment="Center">
-                                        <Border.Style>
-                                            <Style TargetType="Border">
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding HasNewTrades}" Value="True">
-                                                        <Setter Property="BorderThickness" Value="0,0,0,2"/>
-                                                        <Setter Property="BorderBrush" Value="{StaticResource PoeTradeNewItemBrush}"/>
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </Border.Style>
-                                        <TextBlock 
-                                           FontSize="16" 
-                                           VerticalAlignment="Center"
-                                           HorizontalAlignment="Right" >
-                                            <TextBlock.Inlines>
-                                                <Run Text="{Binding NewItemsCount, Mode=OneWay, StringFormat='{}{0,2}'}" Foreground="{StaticResource PoeTradeNewItemBrush}"/> /
-                                                <Run Text="{Binding RemovedItemsCount, Mode=OneWay, StringFormat='{}{0,2}'}" Foreground="{StaticResource PoeTradeRemovedItemBrush}"/> /
-                                                <Run Text="{Binding NormalItemsCount, Mode=OneWay, StringFormat='{}{0,2}'}"/>
-                                            </TextBlock.Inlines>
-                                        </TextBlock>
-                                    </Border>
-                                </Border>
-
-                                <StackPanel Grid.Column="3" 
-                                            Orientation="Horizontal">
-                                    <ToggleButton Width="40" Height="40"
-                                                  ToolTip="Audio notifications for this tab"
-                                                  Focusable="False"
-                                                  IsChecked="{Binding AudioNotificationEnabled}">
-                                        <ToggleButton.Style>
-                                            <Style TargetType="ToggleButton" BasedOn="{StaticResource ToggleCircleButton}">
-                                                <Setter Property="Content" Value="{x:Static net:FontAwesome.volume_off}"></Setter>
-                                                <Style.Triggers>
-                                                    <Trigger Property="IsChecked" Value="True">
-                                                        <Setter Property="Content" Value="{x:Static net:FontAwesome.volume_up}"></Setter>
-                                                    </Trigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </ToggleButton.Style>
-                                    </ToggleButton>
-
-                                    <Button Width="24" Height="24"
-                                            Style="{StaticResource CircleButton}"
-                                            HorizontalAlignment="Right"
-                                            Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type ListBox}}, Path=DataContext.CloseTabCommand}"
-                                            CommandParameter="{Binding}"
-                                            FontSize="10"
-                                            Content="{x:Static net:FontAwesome.close}" />
-                                </StackPanel>
-                            </Grid>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
                 </ListBox>
 
                 <ContentControl Grid.Column="1" 

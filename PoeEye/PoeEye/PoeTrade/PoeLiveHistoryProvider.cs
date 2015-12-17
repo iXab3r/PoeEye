@@ -32,19 +32,19 @@
         {
             Guard.ArgumentNotNull(() => query);
             Guard.ArgumentNotNull(() => poeApi);
-            
+
             var periodObservable = this.ObservableForProperty(x => x.RecheckPeriod)
                 .Select(x => x.Value)
                 .DistinctUntilChanged()
                 .Do(LogRecheckPeriodChange)
-                .Select(timeout => timeout == TimeSpan.Zero
-                    ? Observable.Never<Unit>()
-                    : Observable.Timer(DateTimeOffset.Now, timeout).ToUnit())
+                .Select(timeout =>
+                    Observable.Merge(timeout == TimeSpan.Zero
+                        ? Observable.Never<Unit>()
+                        : Observable.Timer(DateTimeOffset.Now, timeout).ToUnit(), forceUpdatesSubject))
                 .Switch()
-                .ToUnit()
                 .Publish();
-            
-            var queryObservable = Observable.Merge(forceUpdatesSubject, periodObservable)
+
+            var queryObservable = periodObservable
                 .Where(x => !IsBusy)
                 .Do(StartUpdate)
                 .Select(x => poeApi.IssueQuery(query))
@@ -96,7 +96,7 @@
         private void HandleUpdate(IPoeItem[] queryResult)
         {
             Guard.ArgumentNotNull(() => queryResult);
-            
+
             Log.Instance.Debug($"[PoeLiveHistoryProvider] Update received, itemsCount: {queryResult.Length}");
             IsBusy = false;
             updateExceptionsSubject.OnNext(null);
@@ -106,7 +106,7 @@
         private void HandleUpdateError(Exception ex)
         {
             Guard.ArgumentNotNull(() => ex);
-            
+
             Log.Instance.Error($"[PoeLiveHistoryProvider] Update failed", ex);
             IsBusy = false;
             updateExceptionsSubject.OnNext(ex);
