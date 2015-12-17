@@ -12,7 +12,7 @@
 
     public sealed class GenericProxyProvider : IProxyProvider
     {
-        public static readonly TimeSpan DefaultRecheckTimeout = TimeSpan.FromMinutes(10);
+        public static readonly TimeSpan DefaultRecheckTimeout = TimeSpan.FromMinutes(30);
 
         private readonly TimeSpan proxiesActualizationPeriod;
         private readonly IProxiesSource[] proxiesSources;

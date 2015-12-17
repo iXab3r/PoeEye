@@ -31,7 +31,7 @@
 
         public GenericHttpClient(
             [NotNull] IConverter<NameValueCollection, string> nameValueConverter,
-            [CanBeNull] IWebProxy proxy)
+            [CanBeNull] IWebProxy proxy = null)
         {
             Guard.ArgumentNotNull(() => nameValueConverter);
 

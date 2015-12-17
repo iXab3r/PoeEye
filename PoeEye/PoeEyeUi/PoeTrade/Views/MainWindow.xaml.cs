@@ -33,12 +33,6 @@
 
             DataContext = unityContainer.Resolve<MainWindowViewModel>();
 
-            AppDomain.CurrentDomain.UnhandledException += CurrentDomainOnUnhandledException;
-        }
-
-        private void CurrentDomainOnUnhandledException(object sender, UnhandledExceptionEventArgs unhandledExceptionEventArgs)
-        {
-            Log.Instance.Error($"Unhandled application exception", unhandledExceptionEventArgs.ExceptionObject as Exception);
         }
     }
 }

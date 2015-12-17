@@ -1,9 +1,12 @@
 ﻿namespace PoeEyeUi
 {
+    using System;
     using System.Reflection;
     using System.Windows;
 
     using log4net;
+
+    using PoeShared;
 
     /// <summary>
     ///     Interaction logic for App.xaml
@@ -17,7 +20,16 @@
 #else
             GlobalContext.Properties["configuration"] = "Release";
 #endif
+
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomainOnUnhandledException;
         }
+
+
+        private void CurrentDomainOnUnhandledException(object sender, UnhandledExceptionEventArgs unhandledExceptionEventArgs)
+        {
+            Log.Instance.Error($"Unhandled application exception", unhandledExceptionEventArgs.ExceptionObject as Exception);
+        }
+
 #if !DEBUG
 
         protected override void OnStartup(StartupEventArgs e, bool? isFirstInstance)
