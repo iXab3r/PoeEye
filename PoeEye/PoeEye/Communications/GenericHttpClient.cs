@@ -27,19 +27,18 @@
     internal sealed class GenericHttpClient : IHttpClient
     {
         private readonly IConverter<NameValueCollection, string> nameValueConverter;
-        private readonly IWebProxy proxy;
 
         public GenericHttpClient(
-            [NotNull] IConverter<NameValueCollection, string> nameValueConverter,
-            [CanBeNull] IWebProxy proxy = null)
+            [NotNull] IConverter<NameValueCollection, string> nameValueConverter)
         {
             Guard.ArgumentNotNull(() => nameValueConverter);
 
             this.nameValueConverter = nameValueConverter;
-            this.proxy = proxy;
         }
 
         public CookieCollection Cookies { get; set; }
+
+        public IWebProxy Proxy { get; set; }
 
         public IObservable<Stream> GetStreamAsync(Uri requestUri)
         {
@@ -69,6 +68,7 @@
             httpClient.ContentType = "application/x-www-form-urlencoded";
             httpClient.Method = WebRequestMethods.Http.Post;
 
+            var proxy = Proxy;
             if (proxy != null)
             {
                 Log.Instance.Debug($"[HttpClient] Using proxy {proxy} for uri '{uri}'");

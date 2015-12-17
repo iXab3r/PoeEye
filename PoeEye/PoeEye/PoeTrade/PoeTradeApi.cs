@@ -25,7 +25,7 @@
     {
         private static readonly string PoeTradeUri = @"http://poe.trade/search";
 
-        private readonly IFactory<IHttpClient, IWebProxy> httpClientFactory;
+        private readonly IFactory<IHttpClient> httpClientFactory;
 
         private readonly IPoeTradeParser poeTradeParser;
         private readonly IProxyProvider proxyProvider;
@@ -39,7 +39,7 @@
         public PoeTradeApi(
             IPoeTradeParser poeTradeParser,
             IProxyProvider proxyProvider,
-            IFactory<IHttpClient, IWebProxy> httpClientFactory,
+            IFactory<IHttpClient> httpClientFactory,
             IConverter<IPoeQuery, NameValueCollection> queryConverter)
         {
             Guard.ArgumentNotNull(() => poeTradeParser);
@@ -49,7 +49,6 @@
 
             this.poeTradeParser = poeTradeParser;
             this.proxyProvider = proxyProvider;
-            this.httpClientFactory = httpClientFactory;
             this.queryConverter = queryConverter;
         }
 
@@ -71,19 +70,18 @@
             {
                 var queryPostData = queryConverter.Convert(query);
 
-                IWebProxy proxyToUse = WebRequest.DefaultWebProxy;
+                var client = CreateClient();
                 if (ProxyEnabled && proxyProvider.TryGetProxy(out proxyToken))
                 {
                     Log.Instance.Debug($"[PoeTradeApi] Got proxy {proxyToken} from proxy provider {proxyProvider}");
-                    proxyToUse = proxyToken.Proxy;
+                    client.Proxy = proxyToken.Proxy;
                 }
                 else
                 {
-                    Log.Instance.Debug($"[PoeTradeApi] Using default system web proxy: {proxyToUse}");
+                    var systemProxy = WebRequest.DefaultWebProxy;
+                    Log.Instance.Debug($"[PoeTradeApi] Using default system web proxy: {systemProxy}");
+                    client.Proxy = systemProxy;
                 }
-
-                var client = CreateClient(proxyToUse);
-
 
                 try
                 {
@@ -114,9 +112,9 @@
             }
         }
 
-        private IHttpClient CreateClient(IWebProxy proxy)
+        private IHttpClient CreateClient()
         {
-            var client = httpClientFactory.Create(proxy);
+            var client = httpClientFactory.Create();
             var cookies = new CookieCollection
             {
                 new Cookie("interface", "simple", @"/", "poe.trade"),

@@ -1,6 +1,7 @@
 ﻿namespace PoeEye.Prism
 {
     using System.Collections.Specialized;
+    using System.Net;
 
     using Communications;
 
