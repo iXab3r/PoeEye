@@ -33,8 +33,9 @@
             Guard.ArgumentNotNull(() => query);
             Guard.ArgumentNotNull(() => poeApi);
 
-            var periodObservable = this.ObservableForProperty(x => x.RecheckPeriod)
-                .Select(x => x.Value)
+            var periodObservable = Observable.Merge(
+                    this.WhenAnyValue(x => x.RecheckPeriod), 
+                    forceUpdatesSubject.Where(x => recheckPeriod != TimeSpan.Zero).Select(x => recheckPeriod))
                 .Do(LogRecheckPeriodChange)
                 .Select(ToTimer)
                 .Switch()
@@ -75,14 +76,7 @@
 
         public void Refresh()
         {
-            if (recheckPeriod == TimeSpan.Zero)
-            {
-                forceUpdatesSubject.OnNext(Unit.Default); // forcing refresh
-            }
-            else
-            {
-                this.RaisePropertyChanged(nameof(RecheckPeriod)); // restarting timer 
-            }
+            forceUpdatesSubject.OnNext(Unit.Default); // forcing refresh
         }
 
         private IObservable<Unit> ToTimer(TimeSpan timeout)
