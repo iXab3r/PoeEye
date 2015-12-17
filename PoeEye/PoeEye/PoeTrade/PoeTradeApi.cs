@@ -50,6 +50,7 @@
             this.poeTradeParser = poeTradeParser;
             this.proxyProvider = proxyProvider;
             this.queryConverter = queryConverter;
+            this.httpClientFactory = httpClientFactory;
         }
 
         static PoeTradeApi()
