@@ -5,7 +5,7 @@ namespace ProxyProvider
 {
     using System;
 
-    public static class Log
+    internal static class Log
     {
         private static readonly Lazy<ILog> instance = new Lazy<ILog>(() => LogManager.GetLogger(typeof(Log))); 
 

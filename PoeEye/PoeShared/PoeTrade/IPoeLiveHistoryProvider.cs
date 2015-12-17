@@ -15,5 +15,7 @@
         TimeSpan RecheckPeriod { get; set; }
 
         bool IsBusy { get; }
+
+        void Refresh();
     }
 }

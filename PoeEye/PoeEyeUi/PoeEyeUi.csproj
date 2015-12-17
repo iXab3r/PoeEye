@@ -243,6 +243,7 @@
     <Compile Include="Converters\PriceToCurrencyConverter.cs" />
     <Compile Include="Converters\PriceToImageUriConverter.cs" />
     <Compile Include="Converters\TimeSpanToHumanReadableStringConverter.cs" />
+    <Compile Include="Converters\TimeSpanToSecondsConverter.cs" />
     <Compile Include="Converters\NullableConverter.cs" />
     <Compile Include="Converters\ExceptionToMessageConverter.cs" />
     <Compile Include="Converters\NullToVisibilityConverter.cs" />
@@ -261,6 +262,7 @@
     <Compile Include="PoeTrade\ViewModels\IHistoricalTradesViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\IPoeTradesListViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\IPoeTradeViewModel.cs" />
+    <Compile Include="PoeTrade\ViewModels\IRecheckPeriodViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\PoeClipboardParserViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\PoeLinksInfoViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\ImageViewModel.cs" />
@@ -271,6 +273,7 @@
     <Compile Include="PoeTrade\ViewModels\PoeImplicitModViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\PoeQueryViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\ProxyProviderViewModel.cs" />
+    <Compile Include="PoeTrade\ViewModels\RecheckPeriodViewModel.cs" />
     <Compile Include="PoeTrade\Views\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
@@ -390,6 +393,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="PoeTrade\Views\ProxyProviderView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="PoeTrade\Views\RecheckPeriodView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

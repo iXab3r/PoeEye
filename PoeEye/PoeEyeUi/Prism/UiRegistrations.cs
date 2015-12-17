@@ -31,6 +31,7 @@
             Container
                 .RegisterType<IPoeTradeViewModel, PoeTradeViewModel>()
                 .RegisterType<IHistoricalTradesViewModel, HistoricalTradesViewModel>()
+                .RegisterType<IRecheckPeriodViewModel, RecheckPeriodViewModel>()
                 .RegisterType<ISuggestionProvider, FuzzySuggestionProvider>()
                 .RegisterType<IPoeEyeConfig>(new InjectionFactory(x => x.Resolve<IPoeEyeConfigProvider<IPoeEyeConfig>>().Load()));
         }

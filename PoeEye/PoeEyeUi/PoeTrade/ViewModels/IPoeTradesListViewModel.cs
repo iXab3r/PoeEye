@@ -18,8 +18,6 @@
 
         string Errors { get; }
 
-        TimeSpan RecheckTimeout { get; set; }
-
         TimeSpan TimeSinceLastUpdate { get; }
 
         IReactiveList<IPoeTradeViewModel> TradesList { [NotNull] get; }

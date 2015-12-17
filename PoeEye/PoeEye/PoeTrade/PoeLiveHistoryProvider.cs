@@ -19,10 +19,9 @@
 
     internal sealed class PoeLiveHistoryProvider : DisposableReactiveObject, IPoeLiveHistoryProvider
     {
-        private readonly TimeSpan recheckPeriodThrottling = TimeSpan.FromMilliseconds(1000);
-
         private readonly ISubject<IPoeItem[]> itemsPacksSubject = new Subject<IPoeItem[]>();
         private readonly ISubject<Exception> updateExceptionsSubject = new Subject<Exception>();
+        private readonly ISubject<Unit> forceUpdatesSubject = new Subject<Unit>();
 
         private bool isBusy;
         private TimeSpan recheckPeriod;
@@ -37,15 +36,15 @@
             var periodObservable = this.ObservableForProperty(x => x.RecheckPeriod)
                 .Select(x => x.Value)
                 .DistinctUntilChanged()
-                .Throttle(recheckPeriodThrottling)
                 .Do(LogRecheckPeriodChange)
                 .Select(timeout => timeout == TimeSpan.Zero
                     ? Observable.Never<Unit>()
                     : Observable.Timer(DateTimeOffset.Now, timeout).ToUnit())
                 .Switch()
+                .ToUnit()
                 .Publish();
-
-            var queryObservable = periodObservable
+            
+            var queryObservable = Observable.Merge(forceUpdatesSubject, periodObservable)
                 .Where(x => !IsBusy)
                 .Do(StartUpdate)
                 .Select(x => poeApi.IssueQuery(query))
@@ -76,6 +75,11 @@
         {
             get { return recheckPeriod; }
             set { this.RaiseAndSetIfChanged(ref recheckPeriod, value); }
+        }
+
+        public void Refresh()
+        {
+            forceUpdatesSubject.OnNext(Unit.Default);
         }
 
         private void StartUpdate(Unit unit)

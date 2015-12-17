@@ -6,7 +6,7 @@
     <DataTemplate DataType="{x:Type viewModels:ImageViewModel}">
         <Grid>
             <controls:ProgressRing Height="20" Width="20" IsActive="true" 
-                                   Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                                   Visibility="{Binding IsLoading, Converter={StaticResource BoolFalseToCollapsedConverter}}" />
             <ContentControl Content="{Binding Image}"/>
         </Grid>
     </DataTemplate>

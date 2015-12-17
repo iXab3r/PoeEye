@@ -96,7 +96,7 @@
                                                  Margin="0,0,5,0"
                                                  IsIndeterminate="true"
                                                  Orientation="Vertical"
-                                                 Visibility="{Binding IsBusy, Converter={StaticResource BoolToHiddenConverter}}" />
+                                                 Visibility="{Binding IsBusy, Converter={StaticResource BoolFalseToHiddenConverter}}" />
 
                                     <Label Grid.Column="1"
                                                ToolTip="{Binding TradesListViewModel.Errors}"
@@ -111,15 +111,25 @@
                                                Content="{x:Static net:FontAwesome.warning}"/>
 
                                     <Button Grid.Column="2" 
-                                                Margin="5,0"
-                                                Style="{StaticResource CircleButton}"
-                                                Width="40" Height="40"
-                                                HorizontalAlignment="Right"
-                                                Command="{Binding SearchCommand}"
-                                                Focusable="False"
-                                                CommandParameter="{Binding QueryViewModel.PoeQueryBuilder}" 
-                                                Content="{x:Static net:FontAwesome.search}"
-                                                Visibility="{Binding TradesListViewModel.ActiveQuery, Converter={StaticResource NotNullToCollapsedConverter}}" />
+                                           Margin="5,0"
+                                           Style="{StaticResource CircleButton}"
+                                           Width="40" Height="40"
+                                           HorizontalAlignment="Right"
+                                           Command="{Binding SearchCommand}"
+                                           Focusable="False"
+                                           CommandParameter="{Binding QueryViewModel.PoeQueryBuilder}" 
+                                           Content="{x:Static net:FontAwesome.search}"
+                                           Visibility="{Binding TradesListViewModel.ActiveQuery, Converter={StaticResource NotNullToCollapsedConverter}}" />
+
+                                    <Button Grid.Column="2" 
+                                           Margin="5,0"
+                                           Style="{StaticResource CircleButton}"
+                                           Width="40" Height="40"
+                                           HorizontalAlignment="Right"
+                                           Command="{Binding RefreshCommand}"
+                                           Focusable="False"
+                                           Content="{x:Static net:FontAwesome.refresh}"
+                                           Visibility="{Binding TradesListViewModel.ActiveQuery, Converter={StaticResource NullToCollapsedConverter}}" />
                                 </Grid>
 
                                 <TextBlock Grid.Column="1" 
@@ -203,10 +213,9 @@
                     <ColumnDefinition Width="Auto"></ColumnDefinition>
                     <ColumnDefinition Width="*"></ColumnDefinition>
                     <ColumnDefinition Width="Auto"></ColumnDefinition>
-                    <ColumnDefinition Width="Auto"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
 
-                <StackPanel Grid.Column="0" Orientation="Horizontal" Visibility="{Binding SelectedItem.IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <StackPanel Grid.Column="0" Orientation="Horizontal" Visibility="{Binding SelectedItem.IsBusy, Converter={StaticResource BoolFalseToCollapsedConverter}}">
                     <controls:ProgressRing Height="20" Width="20" IsActive="true" Foreground="{StaticResource TextBrush}"  />
                     <TextBlock Text="Updating..."/>
                 </StackPanel>
@@ -216,15 +225,7 @@
                            Visibility="{Binding SelectedItem.TradesListViewModel.ActiveQuery, Converter={StaticResource NullToCollapsedConverter}}"
                            Text="{Binding SelectedItem.TradesListViewModel.TimeSinceLastUpdate.TotalSeconds, Mode=OneWay, StringFormat='Elapsed since last update: {0:F0}s'}"/>
 
-                <Slider Grid.Column="2" 
-                        Width="150"
-                        Margin="10,0,0,0" 
-                        Minimum="30"
-                        Maximum="300"
-                        Value="{Binding SelectedItem.RecheckTimeoutInSeconds}"/>
-
-                <TextBlock Grid.Column="3"  
-                           Margin="10,0,0,0" Text="{Binding SelectedItem.RecheckTimeoutInSeconds, Mode=OneWay, StringFormat='Recheck timeout: {0:F0}s'}"/>
+                <ContentPresenter Grid.Column="2"  Content="{Binding SelectedItem.RecheckPeriodViewModel}" />
 
             </Grid>
         </Border>
@@ -256,10 +257,10 @@
                 
                 <controls:ProgressRing Height="20" Width="20" IsActive="true" 
                                        Foreground="{StaticResource TextBrush}" 
-                                       Visibility="{Binding ApplicationUpdater.IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                                       Visibility="{Binding ApplicationUpdater.IsBusy, Converter={StaticResource BoolFalseToCollapsedConverter}}" />
                 <Button Command="{Binding ApplicationUpdater.CheckForUpdatesCommand}"
                     CommandParameter="{Binding}"
-                    IsEnabled="{Binding ApplicationUpdater.IsBusy, Converter={StaticResource InvertedBoolToVisibilityConverter}}"
+                    IsEnabled="{Binding ApplicationUpdater.IsBusy, Converter={StaticResource BoolTrueToCollapsedConverter}}"
                     Content="Check for updates" />
 
                 <StackPanel Orientation="Horizontal" Height="24" Margin="5,0">
@@ -291,10 +292,10 @@
                 <Grid>
                     <controls:MetroProgressBar IsIndeterminate="True" 
                                                Foreground="{StaticResource TextBrush}"  
-                                               Visibility="{Binding ClipboardParserViewModel.IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                                               Visibility="{Binding ClipboardParserViewModel.IsBusy, Converter={StaticResource BoolFalseToCollapsedConverter}}"/>
 
                     <Grid MaxWidth="1000"
-                          Visibility="{Binding ClipboardParserViewModel.IsBusy, Converter={StaticResource InvertedBoolToVisibilityConverter}}">
+                          Visibility="{Binding ClipboardParserViewModel.IsBusy, Converter={StaticResource BoolTrueToCollapsedConverter}}">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>

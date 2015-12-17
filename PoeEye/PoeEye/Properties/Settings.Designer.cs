@@ -40,5 +40,14 @@ namespace PoeEye.Properties {
                 return ((global::System.TimeSpan)(this["DelayBetweenRequests"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ProxyEnabled {
+            get {
+                return ((bool)(this["ProxyEnabled"]));
+            }
+        }
     }
 }

@@ -175,7 +175,7 @@
                           x:Name="ImplicitModsItemsControl"
                           ItemsSource="{Binding Source={StaticResource ImplicitMods}}" FontStyle="Italic"/>
             <Border Grid.Row="1" Grid.Column="0"
-                    Visibility="{Binding ElementName=ImplicitModsItemsControl, Path=HasItems, Converter={StaticResource BooleanToVisibilityConverter}}"
+                    Visibility="{Binding ElementName=ImplicitModsItemsControl, Path=HasItems, Converter={StaticResource BoolFalseToCollapsedConverter}}"
                     Height="5" BorderBrush="{StaticResource AccentColorBrush}" BorderThickness="0,1,0,0"/>
             <ItemsControl Grid.Row="2"  Grid.Column="0"
                           ItemsSource="{Binding Source={StaticResource ExplicitMods}}"/>
@@ -259,7 +259,7 @@
                                    Margin="10,0"
                                    VerticalContentAlignment="Center"
                                    VerticalAlignment="Center"
-                                   Visibility="{Binding Trade.IsCorrupted, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                                   Visibility="{Binding Trade.IsCorrupted, Converter={StaticResource BoolFalseToCollapsedConverter}}"/>
 
                             <ContentPresenter Grid.Column="2"
                                               Content="{Binding Trade}" 

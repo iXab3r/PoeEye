@@ -3,7 +3,6 @@
                     xmlns:converters="clr-namespace:PoeEyeUi.Converters"
                     xmlns:blue="http://www.nuget.org/Blue.MVVM">
 
-    <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
     <converters:NullToVisibilityConverter x:Key="NullToCollapsedConverter" NullValue="Collapsed" NotNullValue="Visible"/>
     <converters:NullToVisibilityConverter x:Key="NotNullToCollapsedConverter" NullValue="Visible" NotNullValue="Collapsed" />
     <converters:NullToVisibilityConverter x:Key="NullToHiddenConverter" NullValue="Hidden" NotNullValue="Visible" />
@@ -15,11 +14,13 @@
     <converters:NullToBoolConverter x:Key="NullToBoolConverter" NullValue="True"/>
     <converters:NullToBoolConverter x:Key="InvertedNullToBoolConverter" NullValue="False"/>
     <converters:BoolInversionConverter x:Key="BoolInversionConverter" />
+    <converters:TimeSpanToSecondsConverter x:Key="TimeSpanToSecondsConverter" />
 
     <converters:PriceToImageUriConverter x:Key="PriceToImageUriConverter" />
 
-    <blue:BoolToVisibilityConverter x:Key="InvertedBoolToVisibilityConverter" TrueValue="Collapsed" FalseValue="Visible"/>
-    <blue:BoolToVisibilityConverter x:Key="BoolToHiddenConverter" TrueValue="Visible" FalseValue="Hidden"/>
+    <blue:BoolToVisibilityConverter x:Key="BoolTrueToCollapsedConverter" TrueValue="Collapsed" FalseValue="Visible"/>
+    <blue:BoolToVisibilityConverter x:Key="BoolFalseToHiddenConverter" TrueValue="Visible" FalseValue="Hidden"/>
+    <blue:BoolToVisibilityConverter x:Key="BoolFalseToCollapsedConverter" TrueValue="Visible" FalseValue="Collapsed"/>
     <blue:Int32ToVisibilityConverter x:Key="ZeroToCollapsedConverter" TrueValue="Collapsed" FalseValue="Visible">
         <blue:Int32ToVisibilityConverter.ComparisonStrategy>
             <blue:Int32ComparisonStrategy Mode="Equal" Comparand="0"></blue:Int32ComparisonStrategy>

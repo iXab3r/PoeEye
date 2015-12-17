@@ -9,6 +9,8 @@
     {
         public TimeSpan RecheckTimeout { get; set; }
 
+        public bool IsAutoRecheckEnabled { get; set; }
+
         public IPoeQueryInfo QueryInfo { get; set; }
 
         public IPoeItem[] SoldOrRemovedItems { get; set; }

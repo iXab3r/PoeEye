@@ -28,6 +28,7 @@
 
         private readonly ReactiveCommand<object> markAllAsRead;
         private readonly ReactiveCommand<object> searchCommand;
+        private readonly ReactiveCommand<object> refreshCommand;
 
         private bool audioNotificationEnabled;
 
@@ -37,6 +38,7 @@
         public MainWindowTabViewModel(
             [NotNull] PoeTradesListViewModel tradesListViewModel,
             [NotNull] IAudioNotificationsManager audioNotificationsManager,
+            [NotNull] IRecheckPeriodViewModel recheckPeriodViewModel,
             [NotNull] PoeQueryViewModel queryViewModel)
         {
             Guard.ArgumentNotNull(() => tradesListViewModel);
@@ -46,16 +48,16 @@
             tabHeader = $"Tab #{GlobalTabIdx++}";
 
             TradesListViewModel = tradesListViewModel;
+            RecheckPeriodViewModel = recheckPeriodViewModel;
+
             searchCommand = ReactiveCommand.Create();
             searchCommand.Subscribe(SearchCommandExecute);
 
             markAllAsRead = ReactiveCommand.Create();
             markAllAsRead.Subscribe(MarkAllAsReadExecute);
 
-            tradesListViewModel
-                .WhenAnyValue(x => x.RecheckTimeout)
-                .Subscribe(() => this.RaisePropertyChanged(nameof(RecheckTimeoutInSeconds)))
-                .AddTo(Anchors);
+            refreshCommand = ReactiveCommand.Create(TradesListViewModel.WhenAnyValue(x => x.IsBusy).Select(x => !x));
+            refreshCommand.Subscribe(RefreshCommandExecuted);
 
             tradesListViewModel
                 .WhenAnyValue(x => x.IsBusy)
@@ -87,17 +89,20 @@
                           .StartWith(Unit.Default)
                           .Subscribe(RebuildTabName)
                           .AddTo(Anchors);
-        }
 
-        public double RecheckTimeoutInSeconds
-        {
-            get { return TradesListViewModel.RecheckTimeout.TotalSeconds; }
-            set { TradesListViewModel.RecheckTimeout = TimeSpan.FromSeconds(value); }
+            RecheckPeriodViewModel
+                .WhenAny(x => x.RecheckValue, x => x.IsAutoRecheckEnabled, (x, y) => Unit.Default)
+                .Subscribe(x => TradesListViewModel.RecheckPeriod = RecheckPeriodViewModel.IsAutoRecheckEnabled ? RecheckPeriodViewModel.RecheckValue : TimeSpan.Zero)
+                .AddTo(Anchors);
         }
 
         public PoeTradesListViewModel TradesListViewModel { get; }
 
+        public IRecheckPeriodViewModel RecheckPeriodViewModel { get; }
+
         public ICommand SearchCommand => searchCommand;
+
+        public ICommand RefreshCommand => refreshCommand;
 
         public ICommand MarkAllAsRead => markAllAsRead;
 
@@ -143,6 +148,11 @@
                 : $"{queryDescription}";
         }
 
+        private void RefreshCommandExecuted(object arg)
+        {
+            TradesListViewModel.Refresh();
+        }
+
         private void SearchCommandExecute(object arg)
         {
             var queryBuilder = arg as Func<IPoeQueryInfo>;
@@ -157,6 +167,12 @@
             TradesListViewModel.ActiveQuery = query;
             RebuildTabName();
             QueryViewModel.IsExpanded = false;
+
+            if (TradesListViewModel.RecheckPeriod == TimeSpan.Zero)
+            {
+                Log.Instance.Debug($"[MainWindowTabViewModel.SearchCommandExecute] Auto-recheck is disabled, refreshing query manually...");
+                TradesListViewModel.Refresh();
+            }
         }
 
         private void MarkAllAsReadExecute(object arg)

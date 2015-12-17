@@ -116,7 +116,6 @@
 
             TabsList
                 .Changed.ToUnit()
-                .Merge(TabsList.ItemChanged.Where(x => x.PropertyName == nameof(MainWindowTabViewModel.RecheckTimeoutInSeconds)).ToUnit())
                 .Merge(TabsList.ItemChanged.Where(x => x.PropertyName == nameof(MainWindowTabViewModel.AudioNotificationEnabled)).ToUnit())
                 .Merge(this.WhenAnyValue(x => x.AudioNotificationsEnabled).ToUnit())
                 .Merge(clipboardParserViewModel.WhenAnyValue(x => x.MonitoringEnabled).ToUnit())
@@ -216,7 +215,8 @@
             config.TabConfigs = TabsList.Select(
                 tab => new PoeEyeTabConfig
                 {
-                    RecheckTimeout = tab.TradesListViewModel.RecheckTimeout,
+                    RecheckTimeout = tab.RecheckPeriodViewModel.RecheckValue,
+                    IsAutoRecheckEnabled = tab.RecheckPeriodViewModel.IsAutoRecheckEnabled,
                     QueryInfo = tab.QueryViewModel.PoeQueryBuilder(),
                     AudioNotificationEnabled = tab.AudioNotificationEnabled,
                     SoldOrRemovedItems = tab.TradesListViewModel.HistoricalTradesViewModel.ItemsViewModels.Select(x => x.Trade).ToArray(),
@@ -243,7 +243,7 @@
 
                 if (tabConfig.RecheckTimeout != default(TimeSpan))
                 {
-                    tab.TradesListViewModel.RecheckTimeout = tabConfig.RecheckTimeout;
+                    tab.RecheckPeriodViewModel.RecheckValue = tabConfig.RecheckTimeout;
                 }
 
                 if (tabConfig.QueryInfo != null)
