@@ -81,7 +81,7 @@
             }
             else
             {
-                RecheckPeriod = recheckPeriod; // restarting timer 
+                this.RaisePropertyChanged(nameof(RecheckPeriod)); // restarting timer 
             }
         }
 
