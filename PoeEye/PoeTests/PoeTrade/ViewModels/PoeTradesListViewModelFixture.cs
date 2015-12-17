@@ -36,10 +36,8 @@
         private Mock<IFactory<IPoeTradeViewModel, IPoeItem>> poeTradeViewModelFactory;
         private Mock<IFactory<IPoeLiveHistoryProvider, IPoeQuery>> poeLiveHistoryFactory;
 
-        private Mock<IHistoricalTradesViewModel> poeHistoricalTradesViewModel;
         private Mock<IPoeLiveHistoryProvider> poeLiveHistory;
         private Mock<IHistoricalTradesViewModel> historicalTradesViewModel;
-        private Mock<IRecheckPeriodViewModel> recheckPeriodViewModel;
         private ISubject<IPoeItem[]> poeLiveHistoryItems; 
         private ISubject<Exception> poeLiveHistoryUpdateExceptions;
 
@@ -52,8 +50,6 @@
             clock
                 .SetupGet(x => x.CurrentTime)
                 .Returns(new DateTime(2015, 1, 1));
-
-            recheckPeriodViewModel = new Mock<IRecheckPeriodViewModel>();
 
             poeTradeViewModelFactory = new Mock<IFactory<IPoeTradeViewModel, IPoeItem>>();
             poeTradeViewModelFactory
@@ -81,7 +77,7 @@
                 .Setup(x => x.Create(It.IsAny<IPoeQuery>()))
                 .Returns(poeLiveHistory.Object);
 
-            poeHistoricalTradesViewModel = new Mock<IHistoricalTradesViewModel>();
+            historicalTradesViewModel = new Mock<IHistoricalTradesViewModel>();
         }
 
         [Test]
@@ -316,11 +312,10 @@
             return new PoeTradesListViewModel( 
                 poeLiveHistoryFactory.Object,
                 poeTradeViewModelFactory.Object,
-                poeHistoricalTradesViewModel.Object,
+                historicalTradesViewModel.Object,
                 poeItemsComparer.Object,
                 poeQueryInfoToQueryConverter.Object,
                 clock.Object,
-                recheckPeriodViewModel.Object,
                 Scheduler.Immediate);
         }
     }

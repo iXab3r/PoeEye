@@ -8,7 +8,7 @@
 
     using Shouldly;
 
-    [TestFixture()]
+    [TestFixture("Integration")]
     public sealed class CoolProxyNetProxiesSourceFixture
     {
         [SetUp]

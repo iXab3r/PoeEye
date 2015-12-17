@@ -4,11 +4,11 @@
 
     using NUnit.Framework;
 
-    using ProxyProvider.ProxiesSource;
     using ProxyProvider.ProxiesSource.FoxTools;
 
     using Shouldly;
 
+    [TestFixture("Integration")]
     internal sealed class FoxToolsFixture
     {
         [SetUp]
