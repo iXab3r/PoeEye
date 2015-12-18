@@ -11,8 +11,11 @@ https://github.com/iXab3r/PoeEye</description>
     </metadata>
     <files>
         <file src="PoeEyeUi\bin\Release\NuGet.Squirrel.dll" target="lib\.net45\NuGet.Squirrel.dll" />
+        <file src="PoeEyeUi\bin\Release\Squirrel.dll" target="lib\.net45\Squirrel.dll" />
         <file src="PoeEyeUi\bin\Release\PoeEyeUi.exe" target="lib\.net45\PoeEyeUi.exe" />
+        <file src="PoeEyeUi\bin\Release\PoeEyeUi.exe.config" target="lib\.net45\PoeEyeUi.exe.config" />
         <file src="PoeEyeUi\bin\Release\pdf_js.pak" target="lib\.net45\pdf_js.pak" />
+        <file src="PoeEyeUi\bin\Release\inspector.pak" target="lib\.net45\inspector.pak" />
         <file src="PoeEyeUi\bin\Release\Awesomium.Core.dll" target="lib\.net45\Awesomium.Core.dll" />
         <file src="PoeEyeUi\bin\Release\Awesomium.Windows.Controls.dll" target="lib\.net45\Awesomium.Windows.Controls.dll" />
         <file src="PoeEyeUi\bin\Release\Awesomium.Windows.Forms.dll" target="lib\.net45\Awesomium.Windows.Forms.dll" />
@@ -20,7 +23,6 @@ https://github.com/iXab3r/PoeEye</description>
         <file src="PoeEyeUi\bin\Release\avformat-53.dll" target="lib\.net45\avformat-53.dll" />
         <file src="PoeEyeUi\bin\Release\avutil-51.dll" target="lib\.net45\avutil-51.dll" />
         <file src="PoeEyeUi\bin\Release\awesomium_process" target="lib\.net45\awesomium_process" />
-        <file src="PoeEyeUi\bin\Release\inspector.pak" target="lib\.net45\inspector.pak" />
         <file src="PoeEyeUi\bin\Release\icudt.dll" target="lib\.net45\icudt.dll" />
         <file src="PoeEyeUi\bin\Release\libEGL.dll" target="lib\.net45\libEGL.dll" />
         <file src="PoeEyeUi\bin\Release\libGLESv2.dll" target="lib\.net45\libGLESv2.dll" />

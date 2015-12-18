@@ -63,7 +63,9 @@
 
             browserSubscriptions.AddTo(Anchors);
 
-            WebCore.Initialize(WebConfig.Default);
+            var webConfig = WebConfig.Default;
+            webConfig.LogLevel = LogLevel.None;
+            WebCore.Initialize(webConfig);
             Anchors.Add(new DisposableAction(DisposeBrowser));
         }
 
