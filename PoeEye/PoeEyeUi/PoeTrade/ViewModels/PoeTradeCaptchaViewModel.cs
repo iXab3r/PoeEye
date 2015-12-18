@@ -5,6 +5,7 @@
     using System.Reactive.Disposables;
     using System.Reactive.Linq;
     using System.Windows.Controls;
+    using System.Windows.Media.Animation;
 
     using Awesomium.Core;
     using Awesomium.Windows.Forms;
@@ -30,22 +31,28 @@
 
     internal sealed class PoeTradeCaptchaViewModel : DisposableReactiveObject, IPoeTradeCaptchaViewModel
     {
-        private readonly TimeSpan RequestsThrottlePeriod = TimeSpan.FromMinutes(1);
+        private static readonly TimeSpan RequestsThrottlePeriod = TimeSpan.FromSeconds(10);
 
+        private readonly IClock clock;
         private readonly IAudioNotificationsManager notificationsManager;
         private readonly SerialDisposable browserSubscriptions = new SerialDisposable();
 
+        private DateTime lastRequestTimestamp;
+
         public PoeTradeCaptchaViewModel(
                 [NotNull] IDialogCoordinator dialogCoordinator,
+                [NotNull] IClock clock,
                 [NotNull] IPoeCaptchaRegistrator captchaRegistrator,
                 [NotNull] IAudioNotificationsManager notificationsManager,
                 [NotNull] [Dependency(WellKnownSchedulers.Ui)] IScheduler uiScheduler)
         {
             Guard.ArgumentNotNull(() => dialogCoordinator);
+            Guard.ArgumentNotNull(() => clock);
             Guard.ArgumentNotNull(() => captchaRegistrator);
             Guard.ArgumentNotNull(() => notificationsManager);
             Guard.ArgumentNotNull(() => uiScheduler);
 
+            this.clock = clock;
             this.notificationsManager = notificationsManager;
 
             captchaRegistrator
@@ -53,7 +60,7 @@
                 .Where(x => !IsOpen)
                 .Where(x => browser != null)
                 .Where(x => !string.IsNullOrWhiteSpace(x))
-                .Throttle(RequestsThrottlePeriod)
+                .Where(x => clock.CurrentTime - lastRequestTimestamp > RequestsThrottlePeriod)
                 .Subscribe(HandleRequest)
                 .AddTo(Anchors);
 
@@ -105,6 +112,7 @@
         {
             IsOpen = true;
             CaptchaUri = uri;
+            lastRequestTimestamp = clock.CurrentTime;
 
             notificationsManager.PlayNotificationCommand.Execute(AudioNotificationType.Captcha);
             browser.Source = new Uri(uri, UriKind.RelativeOrAbsolute);

@@ -264,6 +264,7 @@
                 if (tabConfig.RecheckTimeout != default(TimeSpan))
                 {
                     tab.RecheckPeriodViewModel.RecheckValue = tabConfig.RecheckTimeout;
+                    tab.RecheckPeriodViewModel.IsAutoRecheckEnabled = tabConfig.IsAutoRecheckEnabled;
                 }
 
                 if (tabConfig.QueryInfo != null)
