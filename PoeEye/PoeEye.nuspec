@@ -20,6 +20,7 @@ https://github.com/iXab3r/PoeEye</description>
         <file src="PoeEyeUi\bin\Release\avformat-53.dll" target="lib\.net45\avformat-53.dll" />
         <file src="PoeEyeUi\bin\Release\avutil-51.dll" target="lib\.net45\avutil-51.dll" />
         <file src="PoeEyeUi\bin\Release\awesomium_process" target="lib\.net45\awesomium_process" />
+        <file src="PoeEyeUi\bin\Release\inspector.pak" target="lib\.net45\inspector.pak" />
         <file src="PoeEyeUi\bin\Release\icudt.dll" target="lib\.net45\icudt.dll" />
         <file src="PoeEyeUi\bin\Release\libEGL.dll" target="lib\.net45\libEGL.dll" />
         <file src="PoeEyeUi\bin\Release\libGLESv2.dll" target="lib\.net45\libGLESv2.dll" />
