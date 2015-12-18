@@ -1,10 +1,5 @@
 ﻿namespace PoeEyeUi.PoeTrade.ViewModels
 {
-    using PoeShared;
-
-    using ReactiveUI;
-
-    using Squirrel;
     using System;
     using System.Diagnostics;
     using System.IO;
@@ -13,7 +8,6 @@
     using System.Reactive.Linq;
     using System.Reflection;
     using System.Threading;
-    using System.Threading.Tasks;
     using System.Windows;
     using System.Windows.Input;
 
@@ -27,23 +21,41 @@
 
     using Microsoft.Practices.Unity;
 
+    using PoeEye.Prism;
+
+    using PoeShared;
     using PoeShared.DumpToText;
     using PoeShared.Utilities;
 
     using Prism;
 
+    using ReactiveUI;
+
+    using Squirrel;
+
     internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject
     {
-        private static readonly TimeSpan ArtificialDelay = TimeSpan.FromSeconds(5);
-        private readonly IDialogCoordinator dialogCoordinator;
-        private readonly IScheduler uiScheduler;
         private const string PoeEyeUri = @"http://coderush.net/files/PoeEye";
+        private static readonly TimeSpan ArtificialDelay = TimeSpan.FromSeconds(5);
         private readonly ReactiveCommand<object> checkForUpdatesCommand;
 
+        private readonly Version defaultVersion;
+        private readonly IDialogCoordinator dialogCoordinator;
+        private readonly ReactiveCommand<object> restartCommand;
+        private readonly IScheduler uiScheduler;
+
+        private bool isBusy;
+
+        private bool isOpen;
+
+        private Version mostRecentVersion;
+
+        private string mostRecentVersionAppFolder;
+
         public ApplicationUpdaterViewModel(
-                [NotNull] IDialogCoordinator dialogCoordinator,
-                [NotNull] [Dependency(WellKnownSchedulers.Ui)] IScheduler uiScheduler,
-                [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler)
+            [NotNull] IDialogCoordinator dialogCoordinator,
+            [NotNull] [Dependency(WellKnownSchedulers.Ui)] IScheduler uiScheduler,
+            [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler)
         {
             Guard.ArgumentNotNull(() => dialogCoordinator);
             Guard.ArgumentNotNull(() => uiScheduler);
@@ -51,27 +63,32 @@
 
             this.dialogCoordinator = dialogCoordinator;
             this.uiScheduler = uiScheduler;
-            checkForUpdatesCommand = ReactiveCommand.Create();
 
+            checkForUpdatesCommand = ReactiveCommand.Create();
             checkForUpdatesCommand
                 .Where(x => !IsBusy)
                 .ObserveOn(bgScheduler)
-                .Do(_ => IsBusy = true)
-                .Do(CheckForUpdatesCommandExecuted, Log.HandleException)
-                .Do(_ => IsBusy = false)
-                .Subscribe()
+                .Subscribe(_ => CheckForUpdatesCommandExecuted(), Log.HandleException)
                 .AddTo(Anchors);
 
             SquirrelAwareApp.HandleEvents(
-                      onInitialInstall: OnInitialInstall,
-                      onAppUpdate: OnAppUpdate,
-                      onAppUninstall: OnAppUninstall,
-                      onFirstRun: OnFirstRun);
+                OnInitialInstall,
+                OnAppUpdate,
+                onAppUninstall: OnAppUninstall,
+                onFirstRun: OnFirstRun);
+
+            defaultVersion = Assembly.GetExecutingAssembly().GetName().Version;
+
+            MostRecentVersionAppFolder = AppDomain.CurrentDomain.BaseDirectory;
+            MostRecentVersion = defaultVersion;
+
+            restartCommand = ReactiveCommand.Create();
+            restartCommand.Subscribe(RestartCommandExecuted).AddTo(Anchors);
         }
 
         public ICommand CheckForUpdatesCommand => checkForUpdatesCommand;
 
-        private bool isBusy;
+        public ICommand RestartCommand => restartCommand;
 
         public bool IsBusy
         {
@@ -79,16 +96,36 @@
             set { this.RaiseAndSetIfChanged(ref isBusy, value); }
         }
 
-        private void CheckForUpdatesCommandExecuted(object context)
+        public bool IsOpen
+        {
+            get { return isOpen; }
+            set { this.RaiseAndSetIfChanged(ref isOpen, value); }
+        }
+
+        public string MostRecentVersionAppFolder
+        {
+            get { return mostRecentVersionAppFolder; }
+            set { this.RaiseAndSetIfChanged(ref mostRecentVersionAppFolder, value); }
+        }
+
+        public Version MostRecentVersion
+        {
+            get { return mostRecentVersion; }
+            set { this.RaiseAndSetIfChanged(ref mostRecentVersion, value); }
+        }
+
+        private void CheckForUpdatesCommandExecuted()
         {
             Log.Instance.Debug($"[ApplicationUpdaterViewModel] Update check requested");
+
+            IsBusy = true;
 
             // delaying update so the user could see the progressring
             Thread.Sleep(ArtificialDelay);
 
             try
             {
-                var appName = typeof(PoeEye.Prism.LiveRegistrations).Assembly.GetName().Name;
+                var appName = typeof (LiveRegistrations).Assembly.GetName().Name;
                 using (var mgr = new UpdateManager(PoeEyeUri, appName))
                 {
                     Log.Instance.Debug($"[ApplicationUpdaterViewModel] Checking for updates...");
@@ -121,14 +158,20 @@
                         throw new ApplicationException("Expected non-empty new version folder path");
                     }
 
-                    uiScheduler.Schedule(() => ShowUpdateCompletedMessageAndTerminate(context, newVersionFolder, lastAppliedRelease.Version));
+                    MostRecentVersionAppFolder = newVersionFolder;
+                    MostRecentVersion = lastAppliedRelease.Version;
+                    IsOpen = true;
                 }
             }
             catch (Exception ex)
             {
                 Log.Instance.Debug($"[ApplicationUpdaterViewModel] Update failed", ex);
 
-                uiScheduler.Schedule(() => ShowUpdateFailedMessageAndTerminate(context));
+                uiScheduler.Schedule(ShowUpdateFailedMessageAndTerminate);
+            }
+            finally
+            {
+                IsBusy = false;
             }
         }
 
@@ -157,65 +200,39 @@
             Log.Instance.Debug($"[ApplicationUpdaterViewModel.OnFirstRun] App started for the first time");
         }
 
-        private void ShowUpdateCompletedMessageAndTerminate(object context, string updatedVersionDir, Version updatedVersion)
+        private void ShowUpdateFailedMessageAndTerminate()
         {
-            var applicationName = Process.GetCurrentProcess().ProcessName + ".exe";
-            var updatedExePath = new FileInfo(Path.Combine(updatedVersionDir, applicationName));
-
-            if (updatedExePath.Exists)
+            var mainWindow = dialogCoordinator.MainWindow;
+            if (mainWindow == null)
             {
-                dialogCoordinator
-                   .ShowMessageAsync(
-                        context, 
-                        "Update completed", 
-                        $"Application was successfully updated to v{updatedVersion}",
-#if DEBUG
-                        MessageDialogStyle.AffirmativeAndNegative,
-#else
-                        MessageDialogStyle.Affirmative, 
-#endif
-                        new MetroDialogSettings { AffirmativeButtonText = "Restart", NegativeButtonText = "Cancel" })
-                   .ContinueWith(
-                       (Task<MessageDialogResult> dialogResultTask) =>
-                       {
-                           var messageBoxResult = dialogResultTask.Result;
-                           if (messageBoxResult == MessageDialogResult.Affirmative)
-                           {
-                               Log.Instance.Debug("[ApplicationUpdaterViewModel] App updated, restarting...");
-
-                               //FIXME Race condition, it's possible that application will be loaded BEFORE this instance will be unloaded => mutex conflict
-                               Process.Start(updatedExePath.FullName);
-                               Environment.Exit(0);
-                           }
-                           else
-                           {
-                               Log.Instance.Debug("[ApplicationUpdaterViewModel] App updated, restart was cancelled");
-                           }
-                       });
+                throw new ApplicationException("Main window is not set");
             }
-            else
-            {
-                dialogCoordinator
-                    .ShowMessageAsync(context, "Update was partially completed", "Application updated, new version will take place on next application startup", MessageDialogStyle.Affirmative, new MetroDialogSettings { AffirmativeButtonText = "Exit" })
-                    .ContinueWith(
-                        (x) =>
-                        {
-                            Log.Instance.Debug("[ApplicationUpdaterViewModel] App updated, terminating this instance");
-                            Environment.Exit(0);
-                        });
-            }
-        }
 
-        private void ShowUpdateFailedMessageAndTerminate(object context)
-        {
             dialogCoordinator
-                .ShowMessageAsync(context, "System error", "Failed to connect to update server, application will be terminated due to security reasons", MessageDialogStyle.Affirmative, new MetroDialogSettings { AffirmativeButtonText = "Exit" })
+                .ShowMessageAsync(
+                    mainWindow,
+                    "System error",
+                    "Failed to connect to update server, application will be terminated due to security reasons",
+                    MessageDialogStyle.Affirmative,
+                    new MetroDialogSettings {AffirmativeButtonText = "Exit"})
                 .ContinueWith(
-                    (x) =>
+                    x =>
                     {
                         Log.Instance.Debug("[ApplicationUpdaterViewModel] App failed to update, terminating this instance");
-                        Environment.Exit(-1);
+                        Application.Current.Shutdown(-1);
                     });
+        }
+
+        private void RestartCommandExecuted()
+        {
+            var applicationName = Process.GetCurrentProcess().ProcessName + ".exe";
+
+            Log.Instance.Debug($"[ApplicationUpdaterViewModel] Restarting app, folder: {mostRecentVersionAppFolder}, appName: {applicationName}...");
+            var updatedExePath = new FileInfo(Path.Combine(mostRecentVersionAppFolder, applicationName));
+
+            //FIXME Race condition, it's possible that application will be loaded BEFORE this instance will be unloaded => mutex conflict
+            Process.Start(updatedExePath.FullName);
+            Application.Current.Shutdown(0);
         }
     }
 }

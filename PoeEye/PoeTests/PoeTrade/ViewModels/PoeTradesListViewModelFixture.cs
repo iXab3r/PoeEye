@@ -17,6 +17,7 @@
     using Moq;
 
     using PoeEyeUi.PoeTrade;
+    using PoeEyeUi.PoeTrade.Models;
     using PoeEyeUi.PoeTrade.ViewModels;
 
     using PoeShared;
@@ -38,6 +39,7 @@
 
         private Mock<IPoeLiveHistoryProvider> poeLiveHistory;
         private Mock<IHistoricalTradesViewModel> historicalTradesViewModel;
+        private Mock<IPoeCaptchaRegistrator> captchaService;
         private ISubject<IPoeItem[]> poeLiveHistoryItems; 
         private ISubject<Exception> poeLiveHistoryUpdateExceptions;
 
@@ -78,6 +80,7 @@
                 .Returns(poeLiveHistory.Object);
 
             historicalTradesViewModel = new Mock<IHistoricalTradesViewModel>();
+            captchaService = new Mock<IPoeCaptchaRegistrator>();
         }
 
         [Test]
@@ -312,6 +315,7 @@
             return new PoeTradesListViewModel( 
                 poeLiveHistoryFactory.Object,
                 poeTradeViewModelFactory.Object,
+                captchaService.Object,
                 historicalTradesViewModel.Object,
                 poeItemsComparer.Object,
                 poeQueryInfoToQueryConverter.Object,

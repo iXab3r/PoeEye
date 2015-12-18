@@ -29,7 +29,10 @@
                 .RegisterType<IScheduler>(WellKnownSchedulers.Background, new InjectionFactory(x => TaskPoolScheduler.Default));
 
             Container
+                .RegisterType<IMainWindowViewModel, MainWindowViewModel>(new ContainerControlledLifetimeManager())
+                .RegisterType<IPoeCaptchaRegistrator, PoeCaptchaRegistrator>(new ContainerControlledLifetimeManager())
                 .RegisterType<IPoeTradeViewModel, PoeTradeViewModel>()
+                .RegisterType<IPoeTradeCaptchaViewModel, PoeTradeCaptchaViewModel>()
                 .RegisterType<IHistoricalTradesViewModel, HistoricalTradesViewModel>()
                 .RegisterType<IRecheckPeriodViewModel, RecheckPeriodViewModel>()
                 .RegisterType<ISuggestionProvider, FuzzySuggestionProvider>()

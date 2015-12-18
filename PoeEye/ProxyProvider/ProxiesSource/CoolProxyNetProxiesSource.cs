@@ -38,7 +38,7 @@
                         result.Add(proxy);
                     }
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     continue;
                 }

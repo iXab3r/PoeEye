@@ -3,6 +3,8 @@
     using System;
     using System.Threading.Tasks;
 
+    using JetBrains.Annotations;
+
     using MahApps.Metro.Controls.Dialogs;
 
     /// <summary>
@@ -84,5 +86,7 @@
         /// </summary>
         /// <param name="context">Typically this should be the view model, which you register in XAML using <see cref="DialogParticipation.SetRegister"/>.</param>
         Task<TDialog> GetCurrentDialogAsync<TDialog>(object context) where TDialog : BaseMetroDialog;
+
+        object MainWindow { get; set; }
     }
 }

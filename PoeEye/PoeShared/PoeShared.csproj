@@ -132,6 +132,7 @@
     <Compile Include="Common\PoeModType.cs" />
     <Compile Include="Common\PoePrice.cs" />
     <Compile Include="DumpToText\DumpToText.cs" />
+    <Compile Include="Exceptions\CaptchaException.cs" />
     <Compile Include="Http\IHttpClient.cs" />
     <Compile Include="IClock.cs" />
     <Compile Include="Log.cs" />

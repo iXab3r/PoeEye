@@ -15,8 +15,11 @@
 
     using Microsoft.Practices.Unity;
 
+    using Models;
+
     using PoeShared;
     using PoeShared.Common;
+    using PoeShared.Exceptions;
     using PoeShared.PoeTrade;
     using PoeShared.PoeTrade.Query;
     using PoeShared.Utilities;
@@ -37,6 +40,7 @@
         private readonly IClock clock;
         private readonly IEqualityComparer<IPoeItem> poeItemsComparer;
         private readonly IFactory<IPoeTradeViewModel, IPoeItem> poeTradeViewModelFactory;
+        private readonly IPoeCaptchaRegistrator captchaRegistrator;
         private readonly IScheduler uiScheduler;
 
         private ActiveProviderInfo activeProviderInfo;
@@ -51,6 +55,7 @@
         public PoeTradesListViewModel(
             [NotNull] IFactory<IPoeLiveHistoryProvider, IPoeQuery> poeLiveHistoryFactory,
             [NotNull] IFactory<IPoeTradeViewModel, IPoeItem> poeTradeViewModelFactory,
+            [NotNull] IPoeCaptchaRegistrator captchaRegistrator,
             [NotNull] IHistoricalTradesViewModel historicalTradesViewModel,
             [NotNull] IEqualityComparer<IPoeItem> poeItemsComparer,
             [NotNull] IConverter<IPoeQueryInfo, IPoeQuery> poeQueryInfoToQueryConverter,
@@ -59,6 +64,7 @@
         {
             Guard.ArgumentNotNull(() => poeLiveHistoryFactory);
             Guard.ArgumentNotNull(() => poeTradeViewModelFactory);
+            Guard.ArgumentNotNull(() => captchaRegistrator);
             Guard.ArgumentNotNull(() => poeQueryInfoToQueryConverter);
             Guard.ArgumentNotNull(() => poeItemsComparer);
             Guard.ArgumentNotNull(() => clock);
@@ -67,6 +73,7 @@
             this.poeItemsComparer = poeItemsComparer;
             this.uiScheduler = uiScheduler;
             this.clock = clock;
+            this.captchaRegistrator = captchaRegistrator;
 
             HistoricalTradesViewModel = historicalTradesViewModel;
 
@@ -232,6 +239,12 @@
                 }
 
                 Errors = string.IsNullOrEmpty(errors) ? $"{errorMsg}" : $"{errorMsg}\r\n{errors}";
+
+                if (exception is CaptchaException)
+                {
+                    var captchaException = (CaptchaException)exception;
+                    captchaRegistrator.CaptchaRequests.OnNext(captchaException.ResolutionUri);
+                }
             }
             else
             {

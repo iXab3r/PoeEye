@@ -81,7 +81,7 @@
                 .DistinctUntilChanged()
                 .Where(x => x > 0)
                 .Where(x => audioNotificationEnabled)
-                .Subscribe(x => audioNotificationsManager.PlayNotificationCommand.Execute(null), Log.HandleException)
+                .Subscribe(x => audioNotificationsManager.PlayNotificationCommand.Execute(AudioNotificationType.NewItem), Log.HandleException)
                 .AddTo(Anchors);
 
             QueryViewModel.ObservableForProperty(x => x.PoeQueryBuilder)

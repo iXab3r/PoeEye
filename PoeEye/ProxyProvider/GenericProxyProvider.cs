@@ -21,7 +21,7 @@
 
         private readonly ConcurrentDictionary<IWebProxy, WebProxyToken> proxiesList = new ConcurrentDictionary<IWebProxy, WebProxyToken>();
 
-        public GenericProxyProvider() : this(new RawProxiesSource())
+        public GenericProxyProvider() : this (new IProxiesSource[0])
         {
         }
 
@@ -36,6 +36,12 @@
             if (proxiesSources == null)
             {
                 throw new ArgumentNullException(nameof(proxiesSources));
+            }
+
+            if (!proxiesSources.Any())
+            {
+                Log.Instance.Warn($"[GenericProxyProvider..ctor] Proxy sources are not supplied");
+                return;
             }
 
             proxiesRequestTimer = new Timer(state => ActualizeProxiesList());

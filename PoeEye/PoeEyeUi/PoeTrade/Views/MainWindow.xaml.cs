@@ -1,6 +1,7 @@
 ﻿namespace PoeEyeUi.PoeTrade.Views
 {
     using System;
+    using System.Windows;
 
     using MahApps.Metro.Controls;
 
@@ -22,6 +23,8 @@
     {
         private UnityContainer unityContainer = new UnityContainer();
 
+        private readonly IMainWindowViewModel mainWindowViewModel;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -31,8 +34,14 @@
             unityContainer.AddExtension(new LiveRegistrations());
             unityContainer.AddExtension(new UiRegistrations());
 
-            DataContext = unityContainer.Resolve<MainWindowViewModel>();
+            mainWindowViewModel = unityContainer.Resolve<IMainWindowViewModel>();
+            DataContext = mainWindowViewModel;
+            Application.Current.Exit += ApplicationOnExit;
+        }
 
+        private void ApplicationOnExit(object sender, ExitEventArgs exitEventArgs)
+        {
+            mainWindowViewModel?.Dispose();
         }
     }
 }

@@ -9,7 +9,7 @@
     {
         protected CompositeDisposable Anchors { get; } = new CompositeDisposable();
 
-        public void Dispose()
+        public virtual void Dispose()
         {
             Anchors.Dispose();
         }

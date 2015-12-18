@@ -11,6 +11,7 @@
     using Guards;
 
     using PoeShared;
+    using PoeShared.Exceptions;
     using PoeShared.Http;
     using PoeShared.PoeTrade;
     using PoeShared.PoeTrade.Query;
@@ -134,7 +135,7 @@
 
             if (IsCaptcha(queryResult))
             {
-                throw new ApplicationException("CAPTCHA detected, query will not be processed");
+                throw new CaptchaException("CAPTCHA detected, query will not be processed", "http://poe.trade/search");
             }
 
             return queryResult;

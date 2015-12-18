@@ -19,11 +19,6 @@
         BorderThickness="1" BorderBrush="{StaticResource AccentColorBrush}"
         metroModels:DialogParticipation.Register="{Binding}">
 
-    <i:Interaction.Triggers>
-        <i:EventTrigger EventName="Closing">
-            <i:InvokeCommandAction Command="{Binding SaveConfigCommand}"/>
-        </i:EventTrigger>
-    </i:Interaction.Triggers>
 
     <Window.InputBindings>
         <KeyBinding Command="{Binding ClipboardParserViewModel.ParseClipboard}" Gesture="CTRL+V" />
@@ -255,6 +250,30 @@
                 </Grid>
 
 
+            </controls:Flyout>
+
+            <controls:Flyout Header="&#xF188; You must resolve CAPTCHA to proceed" x:Name="CaptchaFlyout"
+                             FontFamily="{StaticResource FontAwesome}"
+                             Position="Right"
+                             Margin="0, 20"
+                             AnimateOpacity="True"
+                             Width="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=controls:MetroWindow}, Path=ActualWidth, Mode=OneWay}"
+                             BorderBrush="{StaticResource AccentColorBrush}"
+                             IsOpen="{Binding PoeTradeCaptchaViewModel.IsOpen}">
+
+                <ContentPresenter Content="{Binding PoeTradeCaptchaViewModel}"/>
+            </controls:Flyout>
+
+            <controls:Flyout Header="&#xF093; Update completed" x:Name="ApplicationUpdatedFlyout"
+                             FontFamily="{StaticResource FontAwesome}"
+                             Position="Bottom"
+                             AnimateOpacity="True"
+                             Margin="0, 20"
+                             BorderThickness="0,0,0,1"
+                             BorderBrush="{StaticResource AccentColorBrush}"
+                             IsOpen="{Binding ApplicationUpdater.IsOpen}">
+
+                <ContentPresenter Content="{Binding ApplicationUpdater}"/>
             </controls:Flyout>
         </controls:FlyoutsControl>
     </controls:MetroWindow.Flyouts>

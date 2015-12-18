@@ -1,9 +1,23 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Weavers>
-    <Costura>
+    <Costura CreateTemporaryAssemblies='true' >
         <ExcludeAssemblies>
             Squirrel
             NuGet.Squirrel
+            pdf_js
+            inspector
+            awesomium_process
+            Awesomium.Core
+            Awesomium.Windows.Controls
+            Awesomium.Windows.Forms
+            avcodec-53
+            avformat-53
+            avutil-51
+            icudt
+            libEGL
+            libGLESv2
+            xinput9_1_0
+            awesomium
         </ExcludeAssemblies>
     </Costura>
 </Weavers>

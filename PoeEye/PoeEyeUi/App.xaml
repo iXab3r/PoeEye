@@ -30,6 +30,8 @@
                 <ResourceDictionary Source="PoeTrade/Views/PoeImplicitModViewModel.xaml" />
                 <ResourceDictionary Source="PoeTrade/Views/PoeExplicitModViewModel.xaml" />
                 <ResourceDictionary Source="PoeTrade/Views/PoeExplicitModsEditorViewModel.xaml" />
+                <ResourceDictionary Source="PoeTrade/Views/PoeTradeCaptchaView.xaml" />
+                <ResourceDictionary Source="PoeTrade/Views/ApplicationUpdaterView.xaml" />
 
                 <ResourceDictionary Source="PoeTrade/Views/HistoricalTradesView.xaml" />
                 <ResourceDictionary Source="PoeTrade/Views/MainWindowTabItemView.xaml" />

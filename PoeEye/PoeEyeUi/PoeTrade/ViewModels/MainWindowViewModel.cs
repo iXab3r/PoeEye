@@ -19,6 +19,8 @@
 
     using JetBrains.Annotations;
 
+    using MetroModels;
+
     using Microsoft.Practices.Unity;
 
     using Models;
@@ -34,7 +36,7 @@
 
     using Utilities;
 
-    internal sealed class MainWindowViewModel : DisposableReactiveObject
+    internal sealed class MainWindowViewModel : DisposableReactiveObject, IMainWindowViewModel
     {
         private static readonly TimeSpan CheckForUpdatesTimeout = TimeSpan.FromSeconds(600);
         private static readonly TimeSpan ConfigSaveSampingTimeout = TimeSpan.FromSeconds(30);
@@ -63,6 +65,8 @@
             [NotNull] IAudioNotificationsManager audioNotificationsManager,
             [NotNull] PoeClipboardParserViewModel clipboardParserViewModel,
             [NotNull] ProxyProviderViewModel proxyProviderViewModel,
+            [NotNull] IPoeTradeCaptchaViewModel captchaViewModel,
+            [NotNull] IDialogCoordinator dialogCoordinator,
             [NotNull] [Dependency(WellKnownSchedulers.Ui)] IScheduler uiScheduler)
         {
             Guard.ArgumentNotNull(() => tabFactory);
@@ -71,17 +75,31 @@
             Guard.ArgumentNotNull(() => poeEyeConfigProvider);
             Guard.ArgumentNotNull(() => clipboardParserViewModel);
             Guard.ArgumentNotNull(() => audioNotificationsManager);
+            Guard.ArgumentNotNull(() => captchaViewModel);
+            Guard.ArgumentNotNull(() => dialogCoordinator);
             Guard.ArgumentNotNull(() => uiScheduler);
 
             var executingAssembly = Assembly.GetExecutingAssembly();
             MainWindowTitle = $"{executingAssembly.GetName().Name} v{executingAssembly.GetName().Version}";
 
+            dialogCoordinator.MainWindow = this;
+
             this.tabFactory = tabFactory;
             this.poeEyeConfigProvider = poeEyeConfigProvider;
 
+            PoeTradeCaptchaViewModel = captchaViewModel;
+            captchaViewModel.AddTo(Anchors);
+
+            audioNotificationsManager.AddTo(Anchors);
+
             ApplicationUpdater = applicationUpdaterViewModel;
+            applicationUpdaterViewModel.AddTo(Anchors);
+
             ClipboardParserViewModel = clipboardParserViewModel;
+            clipboardParserViewModel.AddTo(Anchors);
+
             ProxyProviderViewModel = proxyProviderViewModel;
+            proxyProviderViewModel.AddTo(Anchors);
 
             createNewTabCommand = ReactiveCommand.Create();
             createNewTabCommand
@@ -94,8 +112,6 @@
                 .Select(x => x as MainWindowTabViewModel)
                 .Subscribe(RemoveTabCommandExecuted)
                 .AddTo(Anchors);
-
-            saveConfigCommand = ReactiveCommand.Create();
 
             TabsList
                 .ItemsAdded
@@ -122,6 +138,7 @@
                 .Subscribe(configUpdateSubject)
                 .AddTo(Anchors);
 
+            saveConfigCommand = ReactiveCommand.Create();
             configUpdateSubject
                 .Sample(ConfigSaveSampingTimeout)
                 .Merge(saveConfigCommand.ToUnit())
@@ -145,6 +162,8 @@
         public PoeClipboardParserViewModel ClipboardParserViewModel { get; }
 
         public ProxyProviderViewModel ProxyProviderViewModel { get; }
+
+        public IPoeTradeCaptchaViewModel PoeTradeCaptchaViewModel { get; }
 
         public bool AudioNotificationsEnabled
         {
@@ -203,6 +222,7 @@
 
         private void RemoveTabCommandExecuted(MainWindowTabViewModel tab)
         {
+            Log.Instance.Debug($"[MainWindowViewModel.RemoveTab] Removing tab {tab}...");
             TabsList.Remove(tab);
             tab.Dispose();
         }
@@ -268,6 +288,20 @@
                 .ToArray();
 
             Log.Instance.Debug($"[MainWindowViewModel.LoadConfig] Sucessfully loaded config\r\nTabs count: {TabsList.Count}");
+        }
+
+        public override void Dispose()
+        {
+            Log.Instance.Debug($"[MainWindowViewModel.Dispose] Disposing viewmodel...");
+
+            SaveConfig();
+            foreach (var mainWindowTabViewModel in TabsList)
+            {
+                mainWindowTabViewModel.Dispose();
+            }
+            base.Dispose();
+
+            Log.Instance.Debug($"[MainWindowViewModel.Dispose] Viewmodel disposed");
         }
     }
 }
