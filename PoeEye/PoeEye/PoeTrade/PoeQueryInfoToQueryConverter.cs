@@ -84,21 +84,16 @@
 
             if (!string.IsNullOrWhiteSpace(source.ImplicitMod?.Name))
             {
+                args.Add(CreateModArgument($"(implicit) {source.ImplicitMod.Name}", source.ImplicitMod.Min, source.ImplicitMod.Max));
+
                 args.AddRange(new[]
                 {
-                    CreateArgument("impl", source.ImplicitMod.Name),
-                    CreateArgument("impl_min", source.ImplicitMod.Min),
-                    CreateArgument("impl_max", source.ImplicitMod.Max)
+                    CreateArgument("group_type", "And"),
+                    CreateArgument("group_min", string.Empty),
+                    CreateArgument("group_max", string.Empty),
+                    CreateArgument("group_count", 1)
                 });
             }
-
-            args.AddRange(new[]
-            {
-                CreateArgument("mods", string.Empty),
-                CreateArgument("modexclude", string.Empty),
-                CreateArgument("modmin", string.Empty),
-                CreateArgument("modmax", string.Empty)
-            });
 
             var explicitMods = source.ExplicitMods ?? new IPoeQueryRangeModArgument[0].Where(x => !string.IsNullOrWhiteSpace(x.Name)).ToArray();
 
@@ -118,8 +113,6 @@
                     CreateArgument("group_count", explicitMods.Count())
                 });
             }
-
-            Guard.ArgumentIsTrue(() => args.ToDictionary(x => x.Name, x => default(int?)).Count() == args.Count());
 
             result.Arguments = args.ToArray();
             return result;
