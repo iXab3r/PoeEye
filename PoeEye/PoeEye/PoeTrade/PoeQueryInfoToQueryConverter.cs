@@ -156,7 +156,7 @@
                     CreateArgument("group_type", "Not"),
                     CreateArgument("group_min", string.Empty),
                     CreateArgument("group_max", string.Empty),
-                    CreateArgument("group_count", explicitMods.Count())
+                    CreateArgument("group_count", 1)
                 });
 
             result.Arguments = args.ToArray();
