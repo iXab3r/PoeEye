@@ -93,6 +93,16 @@ namespace PoeEyeUi.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
+        internal static byte[] sounds_940_pizzicato {
+            get {
+                object obj = ResourceManager.GetObject("sounds_940_pizzicato", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
         internal static byte[] whistle {
             get {
                 object obj = ResourceManager.GetObject("whistle", resourceCulture);

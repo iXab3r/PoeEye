@@ -602,6 +602,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <Content Include="Resources\minions-tadaa.wav" />
+    <None Include="Resources\sounds-940-pizzicato.wav" />
     <Content Include="Resources\whistle.wav" />
     <Resource Include="Resources\WindowsIcons-license.txt" />
   </ItemGroup>

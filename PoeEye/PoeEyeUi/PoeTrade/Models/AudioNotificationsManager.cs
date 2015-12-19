@@ -23,7 +23,7 @@
         private readonly IDictionary<AudioNotificationType, byte[]> knownNotifications = new Dictionary<AudioNotificationType, byte[]>()
         {
             { AudioNotificationType.NewItem, Resources.whistle },
-            { AudioNotificationType.Captcha, Resources.minions_tadaa },
+            { AudioNotificationType.Captcha, Resources.sounds_940_pizzicato },
         };
 
         public AudioNotificationsManager()
