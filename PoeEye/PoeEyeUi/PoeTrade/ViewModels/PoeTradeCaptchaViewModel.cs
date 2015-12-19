@@ -136,7 +136,34 @@
                    .Subscribe(isNavigating => browser.Visible = !isNavigating)
                    .AddTo(composite);
 
+            Observable
+                .FromEventPattern<LoadingFrameFailedEventHandler, LoadingFrameFailedEventArgs>(h => browser.LoadingFrameFailed += h, h => browser.LoadingFrameFailed -= h)
+                .Subscribe(x => Log.Instance.Warn($"[PoeTradeCaptchaViewModel.Error] Failed to load uri {x.EventArgs.Url}, errorCode; {x.EventArgs.ErrorCode}, desc: {x.EventArgs.ErrorCode}"))
+                .AddTo(composite);
+
+            Observable
+               .FromEventPattern<DocumentReadyEventHandler, DocumentReadyEventArgs>(h => browser.DocumentReady += h, h => browser.DocumentReady -= h)
+               .Select(x => new { x.EventArgs.Url, Html = browser.HTML ?? string.Empty })
+               .DistinctUntilChanged()
+               .Subscribe(x => ProcessDocumentLoaded(x.Url, x.Html))
+               .AddTo(composite);
+
             browserSubscriptions.Disposable = composite;
+        }
+
+        private void ProcessDocumentLoaded(Uri uri, string html)
+        {
+            Log.Instance.Debug($"[PoeTradeCaptchaViewModel.Complete] Loaded uri {uri}, doc.Length: {html.Length}");
+            if (string.IsNullOrWhiteSpace(html))
+            {
+                return;
+            }
+
+            if (html.Contains("Bad Request"))
+            {
+                Log.Instance.Warn($"[PoeTradeCaptchaViewModel.Complete] Detected bad request ! Closing panel...");
+                IsOpen = false;
+            }
         }
 
         private void DisposeBrowser()
