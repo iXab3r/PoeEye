@@ -22,7 +22,8 @@
                 .RegisterType<IPoeDatabaseReader, PoeDatabaseReader>(new ContainerControlledLifetimeManager());
 
             Container
-                .RegisterType<IPoeItemParser, PoeItemParser>(new ContainerControlledLifetimeManager());
+                .RegisterType<IPoeItemParser, PoeItemParser>(new ContainerControlledLifetimeManager())
+                .RegisterType<IRandomNumberGenerator, RandomNumberGenerator>(new ContainerControlledLifetimeManager());
 
             Container
                 .RegisterType(typeof (IEqualityComparer<IPoeItem>), typeof (PoeItemEqualityComparer))
