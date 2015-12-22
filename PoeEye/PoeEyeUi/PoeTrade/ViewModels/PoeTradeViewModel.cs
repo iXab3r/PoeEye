@@ -120,7 +120,16 @@
 
         private void CopyPmMessageToClipboardCommandExecute(object arg)
         {
-            var message = $"@{Trade.UserIgn} Hi, I would like to buy your {Trade.ItemName} listed for {Trade.Price} in {Trade.League}";
+            string message = null;
+            if (string.IsNullOrWhiteSpace(Trade.Price))
+            {
+                message = $"@{Trade.UserIgn} Hi, I would like to buy your {Trade.ItemName} listed in {Trade.League}, offer is ";
+            }
+            else
+            {
+                message = $"@{Trade.UserIgn} Hi, I would like to buy your {Trade.ItemName} listed for {Trade.Price} in {Trade.League}";
+            }
+
             Clipboard.SetText(message);
         }
 
