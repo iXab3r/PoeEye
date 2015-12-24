@@ -6,7 +6,7 @@ namespace PoeEyeUi.PoeTrade.Models
 
     using JetBrains.Annotations;
 
-    internal interface IAudioNotificationsManager : IDisposable
+    internal interface IAudioNotificationsManager 
     {
         ICommand PlayNotificationCommand { [NotNull] get; }
 

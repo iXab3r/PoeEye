@@ -48,6 +48,8 @@
             tabHeader = $"Tab #{GlobalTabIdx++}";
 
             TradesListViewModel = tradesListViewModel;
+            tradesListViewModel.AddTo(Anchors);
+
             RecheckPeriodViewModel = recheckPeriodViewModel;
 
             searchCommand = ReactiveCommand.Create();

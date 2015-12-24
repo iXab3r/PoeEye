@@ -90,8 +90,6 @@
             PoeTradeCaptchaViewModel = captchaViewModel;
             captchaViewModel.AddTo(Anchors);
 
-            audioNotificationsManager.AddTo(Anchors);
-
             ApplicationUpdater = applicationUpdaterViewModel;
             applicationUpdaterViewModel.AddTo(Anchors);
 
