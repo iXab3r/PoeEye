@@ -1,5 +1,6 @@
 ﻿namespace PoeEyeUi.Config
 {
+    using System;
     using System.Collections.Generic;
 
     using JetBrains.Annotations;
@@ -13,5 +14,7 @@
         bool ClipboardMonitoringEnabled { get; set; }
 
         bool AudioNotificationsEnabled { get; set; }
+
+        TimeSpan MinRefreshTimeout { get; set; }
     }
 }

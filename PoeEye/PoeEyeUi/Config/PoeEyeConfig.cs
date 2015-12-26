@@ -1,5 +1,6 @@
 namespace PoeEyeUi.Config
 {
+    using System;
     using System.Collections.Generic;
 
     internal sealed class PoeEyeConfig : IPoeEyeConfig
@@ -41,5 +42,7 @@ namespace PoeEyeUi.Config
         public bool ClipboardMonitoringEnabled { get; set; } = true;
 
         public bool AudioNotificationsEnabled { get; set; } = true;
+
+        public TimeSpan MinRefreshTimeout { get; set; } = TimeSpan.FromMinutes(5);
     }
 }

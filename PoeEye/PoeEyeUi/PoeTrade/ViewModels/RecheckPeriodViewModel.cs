@@ -3,6 +3,10 @@
     using System;
     using System.Reactive.Linq;
 
+    using Config;
+
+    using JetBrains.Annotations;
+
     using PoeShared.Utilities;
 
     using ReactiveUI;
@@ -17,7 +21,7 @@
 
         private TimeSpan recheckValue = TimeSpan.FromMinutes(5);
 
-        public RecheckPeriodViewModel()
+        public RecheckPeriodViewModel([NotNull] IPoeEyeConfig config)
         {
             this.WhenAnyValue(x => x.RecheckValue)
                 .Where(x => x == TimeSpan.Zero)
@@ -33,6 +37,11 @@
             this.WhenAnyValue(x => x.IsAutoRecheckEnabled)
                 .Subscribe(() => this.RaisePropertyChanged(nameof(RecheckValue)))
                 .AddTo(Anchors);
+
+            if (config.MinRefreshTimeout != TimeSpan.MinValue && config.MinRefreshTimeout != TimeSpan.Zero)
+            {
+                MinValue = config.MinRefreshTimeout;
+            }
         }
 
         public TimeSpan RecheckValue
