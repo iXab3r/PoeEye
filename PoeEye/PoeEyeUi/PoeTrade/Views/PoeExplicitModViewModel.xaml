@@ -5,7 +5,7 @@
                     xmlns:wpfControls="http://wpfcontrols.com/"
                     xmlns:common="clr-namespace:PoeShared.Common;assembly=PoeShared"
                     xmlns:editors="https://github.com/iXab3r/WpfAutoCompleteControls">
-    <DataTemplate DataType="{x:Type viewModels:PoeExplicitModViewModel}">
+    <DataTemplate DataType="{x:Type viewModels:PoeModViewModel}">
         <Grid Margin="0,5,0,5">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>

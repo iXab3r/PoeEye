@@ -178,7 +178,6 @@
     <Compile Include="Utilities\DisposableReactiveObject.cs" />
     <Compile Include="Utilities\EnumerableExtensions.cs" />
     <Compile Include="Utilities\IObservableExtensions.cs" />
-    <Compile Include="WellKnownLeagues.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

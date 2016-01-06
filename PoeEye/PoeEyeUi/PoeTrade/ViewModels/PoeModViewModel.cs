@@ -6,7 +6,7 @@
 
     using WpfAutoCompleteControls.Editors;
 
-    internal sealed class PoeExplicitModViewModel : DisposableReactiveObject
+    internal sealed class PoeModViewModel : DisposableReactiveObject
     {
         private float? max;
 
@@ -14,7 +14,7 @@
 
         private string selectedMod;
 
-        public PoeExplicitModViewModel(ISuggestionProvider suggestionProvider)
+        public PoeModViewModel(ISuggestionProvider suggestionProvider)
         {
             SuggestionProvider = suggestionProvider;
         }

@@ -19,19 +19,19 @@
 
     using WpfAutoCompleteControls.Editors;
 
-    internal sealed class PoeExplicitModsEditorViewModel : DisposableReactiveObject
+    internal sealed class PoeModsEditorViewModel : DisposableReactiveObject
     {
-        private readonly IFactory<PoeExplicitModViewModel, ISuggestionProvider> modsViewModelsFactor;
-        private readonly ReactiveList<PoeExplicitModViewModel> modsCollection = new ReactiveList<PoeExplicitModViewModel>() { ChangeTrackingEnabled = true };
+        private readonly IFactory<PoeModViewModel, ISuggestionProvider> modsViewModelsFactor;
+        private readonly ReactiveList<PoeModViewModel> modsCollection = new ReactiveList<PoeModViewModel>() { ChangeTrackingEnabled = true };
         private readonly ReactiveCommand<object> addModCommand = ReactiveCommand.Create();
         private readonly ReactiveCommand<object> removeModCommand = ReactiveCommand.Create();
         private readonly ReactiveCommand<object> clearModsCommand = ReactiveCommand.Create();
 
         private readonly ISuggestionProvider modsSuggestionProvider;
 
-        public PoeExplicitModsEditorViewModel(
+        public PoeModsEditorViewModel(
             [NotNull] IPoeQueryInfoProvider queryInfoProvider,
-            [NotNull] IFactory<PoeExplicitModViewModel, ISuggestionProvider> modsViewModelsFactor,
+            [NotNull] IFactory<PoeModViewModel, ISuggestionProvider> modsViewModelsFactor,
             [NotNull] IFactory<ISuggestionProvider, string[]> suggestionProviderFactory)
         {
             Guard.ArgumentNotNull(() => modsViewModelsFactor);
@@ -44,7 +44,6 @@
 
             KnownMods = queryInfoProvider
                 .ModsList
-                .Where(x => x.ModType == PoeModType.Explicit)
                 .Select(x => x.Name)
                 .ToArray();
 
@@ -55,7 +54,7 @@
                 .AddTo(Anchors);
 
             removeModCommand
-                .Select(x => x as PoeExplicitModViewModel)
+                .Select(x => x as PoeModViewModel)
                 .Where(x => x != null)
                 .Subscribe(RemoveModCommandExecuted)
                 .AddTo(Anchors);
@@ -67,7 +66,7 @@
             AddModCommandExecuted();
         }
 
-        public ReactiveList<PoeExplicitModViewModel> Mods { get; }
+        public ReactiveList<PoeModViewModel> Mods { get; }
 
         public ICommand AddModCommand => addModCommand;
 
@@ -82,7 +81,7 @@
             AddMod();
         }
 
-        private void RemoveModCommandExecuted(PoeExplicitModViewModel modToRemove)
+        private void RemoveModCommandExecuted(PoeModViewModel modToRemove)
         {
             Guard.ArgumentNotNull(() => modToRemove);
 
@@ -97,7 +96,7 @@
             ClearMods();
         }
 
-        public PoeExplicitModViewModel AddMod()
+        public PoeModViewModel AddMod()
         {
             var newMod = modsViewModelsFactor.Create(modsSuggestionProvider);
 

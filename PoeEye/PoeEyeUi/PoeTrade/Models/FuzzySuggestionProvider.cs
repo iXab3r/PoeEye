@@ -21,14 +21,13 @@
         {
             Guard.ArgumentNotNull(() => haystack);
 
-            searchService = new LcsSearchService(haystack);
+            searchService = new XSearchService(haystack);
         }
 
         public IEnumerable GetSuggestions(string filter)
         {
             var filteredStrings = searchService
                 .Search(filter)
-                .OrderByDescending(x => x.Score)
                 .Select(x => x.Result)
                 .Take(MaxResults)
                 .ToArray();
