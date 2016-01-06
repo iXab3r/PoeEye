@@ -27,7 +27,6 @@
                 <ResourceDictionary Source="PoeTrade/Views/PoeLinksInfoView.xaml" />
                 <ResourceDictionary Source="PoeTrade/Views/PoeTradeView.xaml" />
                 <ResourceDictionary Source="PoeTrade/Views/PoeItemModView.xaml" />
-                <ResourceDictionary Source="PoeTrade/Views/PoeImplicitModViewModel.xaml" />
                 <ResourceDictionary Source="PoeTrade/Views/PoeExplicitModViewModel.xaml" />
                 <ResourceDictionary Source="PoeTrade/Views/PoeExplicitModsEditorViewModel.xaml" />
                 <ResourceDictionary Source="PoeTrade/Views/PoeTradeCaptchaView.xaml" />

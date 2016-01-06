@@ -46,8 +46,6 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="10"/>
                 <RowDefinition Height="Auto"/>
-                <RowDefinition Height="10"/>
-                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
             <Grid Row="0">
@@ -255,14 +253,10 @@
             </Grid>
 
             <Grid Row="10">
-                <ContentControl Content="{Binding ImplicitModViewModel}"/>
+                <ContentControl Content="{Binding ModsEditorViewModel}"/>
             </Grid>
 
             <Grid Row="12">
-                <ContentControl Content="{Binding ExplicitModsEditorViewModel}"/>
-            </Grid>
-
-            <Grid Row="14">
 
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
@@ -338,7 +332,7 @@
                 </StackPanel>
             </Grid>
 
-            <Grid Row="16">
+            <Grid Row="14">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="100"/>
                     <ColumnDefinition Width="80"/>

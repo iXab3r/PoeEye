@@ -2,29 +2,32 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.Specialized;
     using System.Linq;
+    using System.Reactive.Linq;
+
+    using Guards;
+
+    using JetBrains.Annotations;
 
     using PoeShared;
     using PoeShared.Common;
+    using PoeShared.Http;
+    using PoeShared.PoeTrade;
     using PoeShared.PoeTrade.Query;
 
     internal sealed class PoeQueryInfoProvider : IPoeQueryInfoProvider
     {
-        public PoeQueryInfoProvider()
-        {
-            LeaguesList = new[]
-            {
-                WellKnownLeagues.Talisman,
-                WellKnownLeagues.TalismanHC,
-                WellKnownLeagues.Standard,
-                WellKnownLeagues.Hardcore,
-            };
+        private readonly IPoeApi poeApi;
 
-            ModsList = PoeKnownModsList
-                .GetImplicitModsList()
-                .Concat(PoeKnownModsList.GetExplicitModsList())
-                .Distinct(new ModsComparer())
-                .ToArray();
+        private readonly Lazy<IPoeQueryResult> lazyDataLoader;
+
+        public PoeQueryInfoProvider([NotNull] IPoeApi poeApi)
+        {
+            Guard.ArgumentNotNull(() => poeApi);
+            this.poeApi = poeApi;
+
+            lazyDataLoader = new Lazy<IPoeQueryResult>(RefreshData);
 
             CurrenciesList = new IPoeCurrency[]
             {
@@ -81,26 +84,25 @@
             };
         }
 
-        public string[] LeaguesList { get; }
+        public string[] LeaguesList => lazyDataLoader.Value.LeaguesList;
 
-        public IPoeItemMod[] ModsList { get; }
+        public IPoeItemMod[] ModsList => lazyDataLoader.Value.ModsList;
 
         public IPoeCurrency[] CurrenciesList { get; }
 
         public IPoeItemType[] ItemTypes { get; }
 
-        private class ModsComparer : IEqualityComparer<IPoeItemMod>
+        private IPoeQueryResult RefreshData()
         {
-            public bool Equals(IPoeItemMod x, IPoeItemMod y)
+            try
             {
-                var codeNameX = x.CodeName.Trim().ToLowerInvariant();
-                var codeNameY = y.CodeName.Trim().ToLowerInvariant();
-                return x.ModType == y.ModType && string.Equals(codeNameX, codeNameY);
+                var queryResult = poeApi.GetStaticData().Result;
+                return queryResult;
             }
-
-            public int GetHashCode(IPoeItemMod obj)
+            catch (Exception ex)
             {
-                return 0;
+                Log.HandleUiException(ex);
+                throw;
             }
         }
     }

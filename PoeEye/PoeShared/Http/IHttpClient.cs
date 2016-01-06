@@ -10,7 +10,10 @@
     public interface IHttpClient
     {
         [NotNull] 
-        IObservable<string> PostQuery([NotNull] string uri, [NotNull] NameValueCollection args);
+        IObservable<string> Post([NotNull] string uri, [NotNull] NameValueCollection args);
+
+        [NotNull]
+        IObservable<string> Get([NotNull] string uri);
 
         CookieCollection Cookies { get; set; }
 

@@ -43,7 +43,7 @@
             var result = instance.Parse(rawHtml);
 
             //Then
-            result.CurrenciesList.Length.ShouldBe(15);
+            result.CurrenciesList.Length.ShouldBe(16);
         }
 
         [Test]
@@ -57,7 +57,7 @@
             var result = instance.Parse(rawHtml);
 
             //Then
-            result.ModsList.Length.ShouldBe(2985);
+            result.ModsList.Length.ShouldBe(619);
         }
 
         private PoeTradeParserModern CreateInstance()

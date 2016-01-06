@@ -24,7 +24,8 @@ namespace PoeEye.PoeTrade
             {
                 CurrenciesList = ExtractCurrenciesList(parser),
                 ItemsList = ExtractItems(parser),
-                ModsList = ExtractModsList(parser)
+                ModsList = ExtractModsList(parser),
+                LeaguesList = ExtractLeaguesList(parser),
             };
 
             return result;
@@ -59,34 +60,48 @@ namespace PoeEye.PoeTrade
 
         private IPoeItemMod[] ExtractModsList(CQ parser)
         {
-            var implicitModsRows = parser["select[name=impl] option"].ToList();
-            var implicitMods = implicitModsRows.Select(x => ParseItemModRow(x, PoeModType.Implicit)).ToArray();
+            var allModRows = parser["div[class='row explicit'] select option"].ToList();
 
-            var explicitModsRows = parser["select[name=mods] option"].ToList();
-            var explicitMods = explicitModsRows.Select(x => ParseItemModRow(x, PoeModType.Explicit)).ToArray();
-
-            var allMods = implicitMods
-                .Concat(explicitMods)
+            var allMods = allModRows
+                .Select(ParseItemModRow)
                 .Where(IsValid)
+                .Distinct(PoeItemMod.CodeNameComparer)
+                .Cast<IPoeItemMod>()
                 .ToArray();
+
             return allMods;
         }
 
-        private IPoeItemMod ParseItemModRow(IDomObject row, PoeModType modType)
+        private string[] ExtractLeaguesList(CQ parser)
+        {
+            var leaguesRows = parser["select[name=league] option"].ToList();
+            var leaguesList = leaguesRows
+                    .Select(ParseLeagueRow)
+                    .Where(IsValid)
+                    .Distinct()
+                    .ToArray();
+            return leaguesList;
+        }
+
+        private PoeItemMod ParseItemModRow(IDomObject row)
         {
             var result = new PoeItemMod
             {
-                ModType = modType,
                 Name = row.InnerText,
                 CodeName = row["value"]
             };
+
+            var isImplicit = result.CodeName?.Contains("(implicit)");
+            result.ModType = isImplicit != null && isImplicit.Value 
+                ? PoeModType.Implicit 
+                : PoeModType.Explicit;
 
             return result;
         }
 
         private bool IsValid(IPoeItemMod mod)
         {
-            return !string.IsNullOrWhiteSpace(mod.CodeName);
+            return !string.IsNullOrWhiteSpace(mod.CodeName) && mod.ModType != PoeModType.Unknown;
         }
 
         private static IPoeCurrency ParseCurrencyRow(IDomObject row)
@@ -98,9 +113,21 @@ namespace PoeEye.PoeTrade
             return result;
         }
 
+        private static string ParseLeagueRow(IDomObject row)
+        {
+            CQ parser = row.Render();
+            var result = parser.Attr("value");
+            return result;
+        }
+
         private static bool IsValid(IPoeCurrency currency)
         {
             return !string.IsNullOrWhiteSpace(currency.CodeName);
+        }
+
+        private static bool IsValid(string value)
+        {
+            return !string.IsNullOrWhiteSpace(value);
         }
 
         private static IPoeItem ParseItemRow(IDomObject row)

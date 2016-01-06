@@ -124,8 +124,6 @@
 
         int? SocketsW { get; }
         
-        IPoeQueryRangeModArgument ImplicitMod { get; }
-        
-        IPoeQueryRangeModArgument[] ExplicitMods { get; }
+        IPoeQueryRangeModArgument[] Mods { get; }
     }
 }

@@ -135,9 +135,7 @@
 
         public int? SocketsW { get; set; }
 
-        public IPoeQueryRangeModArgument ImplicitMod { get; set; }
-
-        public IPoeQueryRangeModArgument[] ExplicitMods { get; set; }
+        public IPoeQueryRangeModArgument[] Mods { get; set; }
 
         public override string ToString()
         {

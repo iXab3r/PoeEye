@@ -26,6 +26,9 @@ namespace PoeShared
         {
             Guard.ArgumentNotNull(() => exception);
             HandleException(exception);
+
+            Log.Instance.Warn("Application will be terminated");
+            Environment.Exit(-1);
         }
     }
 }

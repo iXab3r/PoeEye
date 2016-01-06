@@ -2,12 +2,16 @@
 {
     using JetBrains.Annotations;
     using System;
+    using System.Threading.Tasks;
 
     using Query;
 
     public interface IPoeApi
     {
         [NotNull] 
-        IObservable<IPoeQueryResult> IssueQuery([NotNull] IPoeQuery query);
+        Task<IPoeQueryResult> IssueQuery([NotNull] IPoeQuery query);
+
+        [NotNull]
+        Task<IPoeQueryResult> GetStaticData();
     }
 }

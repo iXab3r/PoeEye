@@ -7,6 +7,7 @@ namespace PoeShared.PoeTrade.Query
         private IPoeCurrency[] currenciesList = new IPoeCurrency[0];
         private IPoeItem[] itemsList = new IPoeItem[0];
         private IPoeItemMod[] modsList = new IPoeItemMod[0];
+        private string[] leaguesList = new string[0];
 
         public IPoeItem[] ItemsList
         {
@@ -24,6 +25,12 @@ namespace PoeShared.PoeTrade.Query
         {
             get { return modsList; }
             set { modsList = value ?? new IPoeItemMod[0]; }
+        }
+
+        public string[] LeaguesList
+        {
+            get { return leaguesList; }
+            set { leaguesList = value ?? new string[0]; }
         }
     }
 }

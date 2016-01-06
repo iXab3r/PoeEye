@@ -1,12 +1,9 @@
 ﻿namespace PoeEye.Simulator.PoeTrade
 {
-    using System;
     using System.Linq;
-    using System.Reactive.Linq;
+    using System.Threading.Tasks;
 
     using Guards;
-
-    using PoeEye.PoeTrade;
 
     using PoeShared.Common;
     using PoeShared.PoeTrade;
@@ -14,11 +11,24 @@
 
     internal sealed class PoeTradeApi : IPoeApi
     {
-        public IObservable<IPoeQueryResult> IssueQuery(IPoeQuery query)
+        public Task<IPoeQueryResult> IssueQuery(IPoeQuery query)
         {
             Guard.ArgumentNotNull(() => query);
             
-            return Observable.Return(ProcessQuery(query));
+            return Task.Run(() => ProcessQuery(query));
+        }
+
+        public Task<IPoeQueryResult> GetStaticData()
+        {
+            return Task.Run(() => PrepareStatisData());
+        }
+
+        private IPoeQueryResult PrepareStatisData()
+        {
+            return new PoeQueryResult()
+            {
+                LeaguesList = new string[] { "League 1", "League 2" },
+            };
         }
 
         private IPoeQueryResult ProcessQuery(IPoeQuery query)

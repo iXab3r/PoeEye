@@ -48,12 +48,34 @@
             return httpClient.GetStreamAsync(requestUri).ToObservable();
         }
 
-        public IObservable<string> PostQuery(string uri, NameValueCollection args)
+        public IObservable<string> Post(string uri, NameValueCollection args)
         {
             Guard.ArgumentNotNullOrEmpty(() => uri);
             Guard.ArgumentNotNull(() => args);
 
             return Observable.Start(() => PostQueryInternal(uri, args), Scheduler.Default);
+        }
+
+        public IObservable<string> Get(string uri)
+        {
+            Guard.ArgumentNotNullOrEmpty(() => uri);
+
+            return Observable.Start(() => GetInternal(uri), Scheduler.Default);
+        }
+
+        private string GetInternal(string uri)
+        {
+            Log.Instance.Debug($"[HttpClient] Querying uri '{uri}' (GET)");
+
+            var httpClient = WebRequest.CreateHttp(uri);
+            httpClient.CookieContainer = new CookieContainer();
+            httpClient.CookieContainer.Add(Cookies);
+            httpClient.Method = WebRequestMethods.Http.Get;
+
+
+            var rawResponse = IssueRequest(httpClient, string.Empty);
+
+            return rawResponse;
         }
 
         private string PostQueryInternal(string uri, NameValueCollection args)
@@ -68,17 +90,28 @@
             httpClient.ContentType = "application/x-www-form-urlencoded";
             httpClient.Method = WebRequestMethods.Http.Post;
 
+            var rawResponse = IssueRequest(httpClient, postData);
+
+            return rawResponse;
+        }
+
+        private string IssueRequest(HttpWebRequest httpClient, string requestData)
+        {
             var proxy = Proxy;
             if (proxy != null)
             {
-                Log.Instance.Debug($"[HttpClient] Using proxy {proxy} for uri '{uri}'");
+                Log.Instance.Debug($"[HttpClient] Using proxy {proxy} for uri '{httpClient.RequestUri}'");
                 httpClient.Proxy = proxy;
             }
 
-            var data = Encoding.ASCII.GetBytes(postData);
-            using (var stream = httpClient.GetRequestStream())
+            if (httpClient.Method == WebRequestMethods.Http.Post && !string.IsNullOrEmpty(requestData))
             {
-                stream.Write(data, 0, data.Length);
+                Log.Instance.Debug($"[HttpClient] Preparing POST data...");
+                var data = Encoding.ASCII.GetBytes(requestData);
+                using (var stream = httpClient.GetRequestStream())
+                {
+                    stream.Write(data, 0, data.Length);
+                }
             }
 
             var response = (HttpWebResponse)httpClient.GetResponse();

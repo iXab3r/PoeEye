@@ -4,7 +4,9 @@
     using System.Collections.Specialized;
     using System.Net;
     using System.Reactive.Linq;
+    using System.Reactive.Threading.Tasks;
     using System.Threading;
+    using System.Threading.Tasks;
 
     using Factory;
 
@@ -24,7 +26,8 @@
 
     internal sealed class PoeTradeApi : IPoeApi
     {
-        private static readonly string PoeTradeUri = @"http://poe.trade/search";
+        private static readonly string PoeTradeSearchUri = @"http://poe.trade/search";
+        private static readonly string PoeTradeUri = @"http://poe.trade";
 
         private readonly IFactory<IHttpClient> httpClientFactory;
 
@@ -63,14 +66,29 @@
             RequestsSemaphore = new SemaphoreSlim(MaxSimultaneousRequestsCount);
         }
 
-        public IObservable<IPoeQueryResult> IssueQuery(IPoeQuery query)
+        public Task<IPoeQueryResult> IssueQuery(IPoeQuery query)
         {
             Guard.ArgumentNotNull(() => query);
 
+            var queryPostData = queryConverter.Convert(query);
+            return IssueQuery(PoeTradeSearchUri, queryPostData);
+        }
+
+        public Task<IPoeQueryResult> GetStaticData()
+        {
+            var client = CreateClient();
+            return client
+                .Get(PoeTradeUri)
+                .Select(ThrowIfNotParseable)
+                .Select(poeTradeParser.Parse)
+                .ToTask();
+        }
+
+        private Task<IPoeQueryResult> IssueQuery(string uri, NameValueCollection queryParameters)
+        {
             IProxyToken proxyToken = null;
             try
             {
-                var queryPostData = queryConverter.Convert(query);
 
                 var client = CreateClient();
                 if (ProxyEnabled && proxyProvider.TryGetProxy(out proxyToken))
@@ -92,13 +110,14 @@
                     RequestsSemaphore.Wait();
 
                     return client
-                      .PostQuery(PoeTradeUri, queryPostData)
+                      .Post(uri, queryParameters)
                       .Select(ThrowIfNotParseable)
-                      .Select(poeTradeParser.Parse);
+                      .Select(poeTradeParser.Parse)
+                      .ToTask();
                 }
                 finally
                 {
-                    Log.Instance.Trace($"[PoeTradeApi] Awainting {DelayBetweenRequests.TotalSeconds}s before releasing semaphore slot...");
+                    Log.Instance.Trace($"[PoeTradeApi] Awaiting {DelayBetweenRequests.TotalSeconds}s before releasing semaphore slot...");
                     Thread.Sleep(DelayBetweenRequests);
                     RequestsSemaphore.Release();
                 }

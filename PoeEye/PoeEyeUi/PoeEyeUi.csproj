@@ -294,9 +294,8 @@
     <Compile Include="PoeTrade\ViewModels\ImageViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\MainWindowTabViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\MainWindowViewModel.cs" />
-    <Compile Include="PoeTrade\ViewModels\PoeExplicitModsEditorViewModel.cs" />
-    <Compile Include="PoeTrade\ViewModels\PoeExplicitModViewModel.cs" />
-    <Compile Include="PoeTrade\ViewModels\PoeImplicitModViewModel.cs" />
+    <Compile Include="PoeTrade\ViewModels\PoeModsEditorViewModel.cs" />
+    <Compile Include="PoeTrade\ViewModels\PoeModViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\PoeQueryViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\PoeTradeCaptchaViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\ProxyProviderViewModel.cs" />
@@ -420,10 +419,6 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="PoeTrade\Views\PoeExplicitModViewModel.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="PoeTrade\Views\PoeImplicitModViewModel.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

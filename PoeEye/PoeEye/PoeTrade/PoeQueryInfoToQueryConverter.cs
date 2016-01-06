@@ -112,20 +112,7 @@
                 CreateArgument("rarity", source. ItemRarity?.ToString().ToLowerInvariant() ?? string.Empty),
             };
 
-            if (!string.IsNullOrWhiteSpace(source.ImplicitMod?.Name))
-            {
-                args.Add(CreateModArgument($"(implicit) {source.ImplicitMod.Name}", source.ImplicitMod.Min, source.ImplicitMod.Max));
-
-                args.AddRange(new[]
-                {
-                    CreateArgument("group_type", "And"),
-                    CreateArgument("group_min", string.Empty),
-                    CreateArgument("group_max", string.Empty),
-                    CreateArgument("group_count", 1)
-                });
-            }
-
-            var explicitMods = source.ExplicitMods ?? new IPoeQueryRangeModArgument[0].Where(x => !string.IsNullOrWhiteSpace(x.Name)).ToArray();
+            var explicitMods = source.Mods ?? new IPoeQueryRangeModArgument[0].Where(x => !string.IsNullOrWhiteSpace(x.Name)).ToArray();
 
             if (explicitMods.Any())
             {

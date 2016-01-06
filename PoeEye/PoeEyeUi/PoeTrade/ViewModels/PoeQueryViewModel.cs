@@ -149,14 +149,12 @@
 
         public PoeQueryViewModel(
             [NotNull] IPoeQueryInfoProvider queryInfoProvider,
-            [NotNull] PoeImplicitModViewModel poeImplicitModViewModel,
-            [NotNull] PoeExplicitModsEditorViewModel poeExplicitModsEditorViewModel,
+            [NotNull] PoeModsEditorViewModel poeModsEditorViewModel,
             [NotNull] IFactory<FuzzySuggestionProvider, string[]> suggestionProviderFactory,
             [NotNull] IPoeDatabaseReader poeDatabaseReader)
         {
             Guard.ArgumentNotNull(() => queryInfoProvider);
-            Guard.ArgumentNotNull(() => poeImplicitModViewModel);
-            Guard.ArgumentNotNull(() => poeExplicitModsEditorViewModel);
+            Guard.ArgumentNotNull(() => poeModsEditorViewModel);
             Guard.ArgumentNotNull(() => suggestionProviderFactory);
             Guard.ArgumentNotNull(() => poeDatabaseReader);
 
@@ -166,8 +164,7 @@
 
             ItemTypes = queryInfoProvider.ItemTypes.ToArray();
 
-            ImplicitModViewModel = poeImplicitModViewModel;
-            ExplicitModsEditorViewModel = poeExplicitModsEditorViewModel;
+            ModsEditorViewModel = poeModsEditorViewModel;
 
             OnlineOnly = true;
             BuyoutOnly = true;
@@ -340,9 +337,7 @@
             set { this.RaiseAndSetIfChanged(ref socketsW, value); }
         }
 
-        IPoeQueryRangeModArgument IPoeQueryInfo.ImplicitMod => GetImplicitMod();
-
-        IPoeQueryRangeModArgument[] IPoeQueryInfo.ExplicitMods => GetExplicitMods();
+        IPoeQueryRangeModArgument[] IPoeQueryInfo.Mods => GetMods();
 
         public string Description => GetQueryDescription();
 
@@ -548,9 +543,7 @@
 
         public IPoeCurrency[] CurrenciesList { get; }
 
-        public PoeImplicitModViewModel ImplicitModViewModel { get; }
-
-        public PoeExplicitModsEditorViewModel ExplicitModsEditorViewModel { get; }
+        public PoeModsEditorViewModel ModsEditorViewModel { get; }
 
         public ISuggestionProvider NameSuggestionProvider { get; }
 
@@ -579,19 +572,12 @@
 
             TransferProperties(source, this);
 
-            if (source.ImplicitMod != null)
+            if (source.Mods != null && source.Mods.Any())
             {
-                ImplicitModViewModel.Min = source.ImplicitMod.Min;
-                ImplicitModViewModel.Max = source.ImplicitMod.Max;
-                ImplicitModViewModel.SelectedMod = source.ImplicitMod.Name;
-            }
-
-            if (source.ExplicitMods != null && source.ExplicitMods.Any())
-            {
-                ExplicitModsEditorViewModel.ClearMods();
-                foreach (var mod in source.ExplicitMods.Where(x => !string.IsNullOrWhiteSpace(x.Name)))
+                ModsEditorViewModel.ClearMods();
+                foreach (var mod in source.Mods.Where(x => !string.IsNullOrWhiteSpace(x.Name)))
                 {
-                    var newMod = ExplicitModsEditorViewModel.AddMod();
+                    var newMod = ModsEditorViewModel.AddMod();
                     newMod.SelectedMod = mod.Name;
                     newMod.Max = mod.Max;
                     newMod.Min = mod.Min;
@@ -658,23 +644,10 @@
             }
         }
 
-        private IPoeQueryRangeModArgument GetImplicitMod()
-        {
-            if (string.IsNullOrWhiteSpace(ImplicitModViewModel.SelectedMod))
-            {
-                return null;
-            }
-            return new PoeQueryRangeModArgument(ImplicitModViewModel.SelectedMod)
-            {
-                Min = ImplicitModViewModel.Min,
-                Max = ImplicitModViewModel.Max,
-            };
-        }
-
-        private IPoeQueryRangeModArgument[] GetExplicitMods()
+        private IPoeQueryRangeModArgument[] GetMods()
         {
             var result = new List<IPoeQueryRangeModArgument>();
-            foreach (var poeExplicitModViewModel in ExplicitModsEditorViewModel.Mods)
+            foreach (var poeExplicitModViewModel in ModsEditorViewModel.Mods)
             {
                 if (string.IsNullOrWhiteSpace(poeExplicitModViewModel.SelectedMod))
                 {

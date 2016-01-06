@@ -41,14 +41,8 @@
                 IsExpanded = true
             };
 
-            var implicitMod = value.Mods.SingleOrDefault(x => x.ModType == PoeModType.Implicit);
-            if (implicitMod != null)
-            {
-                query.ImplicitMod = Convert(implicitMod);
-            }
-
-            var explicitMods = value.Mods.Where(x => x.ModType == PoeModType.Explicit).ToArray();
-            query.ExplicitMods = explicitMods.Select(Convert).OfType<IPoeQueryRangeModArgument>().ToArray();
+            var mods = value.Mods.ToArray();
+            query.Mods = mods.Select(Convert).OfType<IPoeQueryRangeModArgument>().ToArray();
 
             return query;
         }

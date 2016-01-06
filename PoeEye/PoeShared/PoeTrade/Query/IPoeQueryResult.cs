@@ -11,5 +11,7 @@ namespace PoeShared.PoeTrade.Query
         IPoeCurrency[] CurrenciesList { [NotNull] get; }
 
         IPoeItemMod[] ModsList { [NotNull] get; }
+
+        string[] LeaguesList {[NotNull] get; }
     }
 }
