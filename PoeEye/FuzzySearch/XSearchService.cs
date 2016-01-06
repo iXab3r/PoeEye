@@ -20,7 +20,7 @@
                 throw new ArgumentNullException(nameof(haystack));
             }
 
-            this.haystack = caseSensitive ? haystack : haystack.Select(x => x.ToLower()).ToArray();
+            this.haystack = haystack;
         }
 
         public IEnumerable<SearchResult> Search(string needle)
@@ -30,10 +30,15 @@
                 return new SearchResult[0];
             }
 
-            needle = caseSensitive ? needle : needle.ToLower();
             var words = needle.Split(new[] { "(", ")", "#", " ", ",", "." }, StringSplitOptions.RemoveEmptyEntries);
             var regexText = string.Join(".*?", words);
-            var regex = new Regex(regexText, RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
+            var regexOptions = RegexOptions.Compiled;
+            if (!caseSensitive)
+            {
+                regexOptions |= RegexOptions.IgnoreCase;
+            }
+            var regex = new Regex(regexText, regexOptions);
 
             return haystack
                 .Select(x => Search(x, regex))

@@ -18,32 +18,6 @@
 
     internal sealed class PoeQueryInfoToQueryConverter : IConverter<IPoeQueryInfo, IPoeQuery>
     {
-        private readonly IRandomNumberGenerator rng;
-
-        private static string[] randomMods =
-        {
-            "Gems in this item are Supported by level # Added Fire Damage",
-            "Gems in this item are Supported by level # Elemental Proliferation",
-            "Gems in this item are Supported by level # Faster Casting",
-            "Gems in this item are Supported by level # Increased Area of Effect",
-            "Gems in this item are supported by level # Additional Accuracy",
-            "Gems in this item are supported by level # Cast On Crit",
-            "Gems in this item are supported by level # Cast when Stunned",
-            "Gems in this item are supported by level # Fork",
-            "Gems in this item are supported by level # Increased Critical Damage",
-            "Gems in this item are supported by level # Life Leech",
-            "Gems in this item are supported by level # Melee Splash",
-            "Gems in this item are supported by level # Multistrike",
-            "Gems in this item are supported by level # Stun",
-            "Gems in this item are supported by level # Weapon Elemental Damage",
-        };
-
-        public PoeQueryInfoToQueryConverter([NotNull] IRandomNumberGenerator rng)
-        {
-            this.rng = rng;
-            Guard.ArgumentNotNull(() => rng);
-        }
-
         public IPoeQuery Convert(IPoeQueryInfo source)
         {
             Guard.ArgumentNotNull(() => source);
@@ -112,39 +86,20 @@
                 CreateArgument("rarity", source. ItemRarity?.ToString().ToLowerInvariant() ?? string.Empty),
             };
 
-            var explicitMods = source.Mods ?? new IPoeQueryRangeModArgument[0].Where(x => !string.IsNullOrWhiteSpace(x.Name)).ToArray();
+            var mods = source.Mods ?? new IPoeQueryRangeModArgument[0].Where(x => !string.IsNullOrWhiteSpace(x.Name)).ToArray();
 
-            if (explicitMods.Any())
+            if (mods.Any())
             {
-                args.AddRange(
-                    explicitMods.Select(poeExplicitModViewModel =>
-                        CreateModArgument(poeExplicitModViewModel.Name,
-                                          poeExplicitModViewModel.Min,
-                                          poeExplicitModViewModel.Max)));
+                args.AddRange(mods.Select(mod => CreateModArgument(mod.Name, mod.Min, mod.Max)));
 
                 args.AddRange(new[]
                 {
                     CreateArgument("group_type", "And"),
                     CreateArgument("group_min", string.Empty),
                     CreateArgument("group_max", string.Empty),
-                    CreateArgument("group_count", explicitMods.Count())
+                    CreateArgument("group_count", mods.Count())
                 });
             }
-
-            /* Anti-captcha */
-            args.AddRange(new[]
-            {
-                CreateArgument("mod_name", randomMods.PickRandom()),
-                CreateArgument("mod_min", 25 + rng.Next(1,20)),
-                CreateArgument("mod_max", string.Empty),
-            });
-            args.AddRange(new[]
-                {
-                    CreateArgument("group_type", "Not"),
-                    CreateArgument("group_min", string.Empty),
-                    CreateArgument("group_max", string.Empty),
-                    CreateArgument("group_count", 1)
-                });
 
             result.Arguments = args.ToArray();
             return result;
