@@ -1,0 +1,132 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:viewModels="clr-namespace:PoeEyeUi.PoeTrade.ViewModels"
+                    xmlns:System="clr-namespace:System;assembly=mscorlib"
+                    xmlns:query="clr-namespace:PoeShared.PoeTrade.Query;assembly=PoeShared"
+                    xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls">
+    <DataTemplate DataType="{x:Type viewModels:PoeModGroupsEditorViewModel}">
+
+        <DataTemplate.Resources>
+            <ObjectDataProvider x:Key="groupTypeEnum" MethodName="GetValues"
+                            ObjectType="{x:Type System:Enum}">
+                <ObjectDataProvider.MethodParameters>
+                    <x:Type TypeName="query:PoeQueryModsGroupType"/>
+                </ObjectDataProvider.MethodParameters>
+            </ObjectDataProvider>
+        </DataTemplate.Resources>
+        
+        <Grid x:Name="GroupsGrid">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="auto"/>
+            </Grid.ColumnDefinitions>
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <StackPanel Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" 
+                        Orientation="Horizontal"
+                        Margin="5">
+                <TextBlock Text="Mod groups" Style="{StaticResource MetroTextBlockHeaderStyle}"/>
+
+                <Button Focusable="False"
+                        Margin="10, 0"
+                        Command="{Binding AddGroupCommand}" Content="Add new group" />
+            </StackPanel>
+
+            <ItemsControl Grid.Column="0" Grid.Row="1"
+                          ItemsSource="{Binding Groups}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="{x:Type viewModels:PoeModsEditorViewModel}">
+                        <Border BorderBrush="{StaticResource AccentColorBrush4}" BorderThickness="1" Margin="5">
+                            <Grid Margin="5">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <ContentControl Grid.Column="0"
+                                            Content="{Binding}" />
+
+                                <Grid Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2"
+                                      Margin="0,5,0,0" >
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <ComboBox Grid.Column="0" 
+                                              SelectedItem="{Binding GroupType}"
+                                              MinWidth="100"
+                                              ItemsSource="{Binding Source={StaticResource groupTypeEnum}}"/>
+
+                                    <Label Grid.Column="1">
+                                        <Label.Style>
+                                            <Style TargetType="{x:Type Label}" BasedOn="{StaticResource {x:Type Label}}">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding GroupType}" Value="And">
+                                                        <Setter Property="Content" Value="All specified mods must exist and match their values."/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding GroupType}" Value="Not">
+                                                        <Setter Property="Content" Value="None of specified mods must exist."/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding GroupType}" Value="Count">
+                                                        <Setter Property="Content" Value="Specify the number of mods that should be matched."/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding GroupType}" Value="Sum">
+                                                        <Setter Property="Content" Value="The mods' values must add to the specified total value."/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding GroupType}" Value="If">
+                                                        <Setter Property="Content" Value="If a mod is present, its value must match the specified min/max."/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Label.Style>
+                                    </Label>
+
+                                    <StackPanel Grid.Column="2" 
+                                                Orientation="Horizontal" >
+                                        <StackPanel.Style>
+                                            <Style TargetType="{x:Type StackPanel}">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding GroupType}" Value="Count">
+                                                        <Setter Property="Visibility" Value="Visible"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding GroupType}" Value="Sum">
+                                                        <Setter Property="Visibility" Value="Visible"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </StackPanel.Style>
+                                        <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}" Value="{Binding MinGroupValue, Converter={StaticResource NullableConverter}}"/>
+                                        <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}" Value="{Binding MaxGroupValue, Converter={StaticResource NullableConverter}}"/>
+                                    </StackPanel>
+
+                                    <Button Grid.Column="3"
+                                            Focusable="False"
+                                            Content="Remove group" 
+                                            Command="{Binding ElementName=GroupsGrid, Path=DataContext.RemoveGroupCommand}"
+                                            CommandParameter="{Binding}"
+                                            Height="28"/>
+
+                                </Grid>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </Grid>
+
+
+    </DataTemplate>
+</ResourceDictionary>

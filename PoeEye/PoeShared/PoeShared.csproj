@@ -131,6 +131,7 @@
     <Compile Include="Common\PoeLinksInfo.cs" />
     <Compile Include="Common\PoeModType.cs" />
     <Compile Include="Common\PoePrice.cs" />
+    <Compile Include="Common\PoeQueryModsGroup.cs" />
     <Compile Include="DumpToText\DumpToText.cs" />
     <Compile Include="Exceptions\CaptchaException.cs" />
     <Compile Include="Http\IHttpClient.cs" />
@@ -156,6 +157,7 @@
     <Compile Include="PoeTrade\Query\IPoeQueryInfoProvider.cs" />
     <Compile Include="PoeTrade\Query\IPoeQueryIntArgument.cs" />
     <Compile Include="PoeTrade\Query\IPoeQueryModArgument.cs" />
+    <Compile Include="PoeTrade\Query\IPoeQueryModsGroup.cs" />
     <Compile Include="PoeTrade\Query\IPoeQueryRangeModArgument.cs" />
     <Compile Include="PoeTrade\Query\IPoeQueryResult.cs" />
     <Compile Include="PoeTrade\Query\IPoeQueryStringArgument.cs" />
@@ -165,6 +167,7 @@
     <Compile Include="PoeTrade\Query\PoeQueryFloatArgument.cs" />
     <Compile Include="PoeTrade\Query\PoeQueryIntArgument.cs" />
     <Compile Include="PoeTrade\Query\PoeQueryModArgument.cs" />
+    <Compile Include="PoeTrade\Query\PoeQueryModsGroupType.cs" />
     <Compile Include="PoeTrade\Query\PoeQueryRangeModArgument.cs" />
     <Compile Include="PoeTrade\Query\PoeQueryResult.cs" />
     <Compile Include="PoeTrade\Query\PoeQueryStringArgument.cs" />

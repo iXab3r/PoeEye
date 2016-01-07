@@ -1,6 +1,7 @@
-﻿namespace PoeEyeUi.PoeTrade.ViewModels
+namespace PoeEyeUi.PoeTrade.ViewModels
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Linq;
     using System.Windows.Input;
@@ -19,28 +20,30 @@
 
     using WpfAutoCompleteControls.Editors;
 
-    internal sealed class PoeModsEditorViewModel : DisposableReactiveObject
+    internal sealed class PoeModsEditorViewModel : DisposableReactiveObject, IPoeModsEditorViewModel
     {
-        private readonly IFactory<PoeModViewModel, ISuggestionProvider> modsViewModelsFactor;
-        private readonly ReactiveList<PoeModViewModel> modsCollection = new ReactiveList<PoeModViewModel>() { ChangeTrackingEnabled = true };
         private readonly ReactiveCommand<object> addModCommand = ReactiveCommand.Create();
-        private readonly ReactiveCommand<object> removeModCommand = ReactiveCommand.Create();
-        private readonly ReactiveCommand<object> clearModsCommand = ReactiveCommand.Create();
 
         private readonly ISuggestionProvider modsSuggestionProvider;
+        private readonly IFactory<IPoeModViewModel, ISuggestionProvider> modsViewModelsFactory;
+        private readonly ReactiveCommand<object> removeModCommand = ReactiveCommand.Create();
+
+        private PoeQueryModsGroupType groupType;
+
+        private float? maxGroupValue;
+
+        private float? minGroupValue;
 
         public PoeModsEditorViewModel(
             [NotNull] IPoeQueryInfoProvider queryInfoProvider,
-            [NotNull] IFactory<PoeModViewModel, ISuggestionProvider> modsViewModelsFactor,
+            [NotNull] IFactory<IPoeModViewModel, ISuggestionProvider> modsViewModelsFactory,
             [NotNull] IFactory<ISuggestionProvider, string[]> suggestionProviderFactory)
         {
-            Guard.ArgumentNotNull(() => modsViewModelsFactor);
+            Guard.ArgumentNotNull(() => modsViewModelsFactory);
             Guard.ArgumentNotNull(() => queryInfoProvider);
             Guard.ArgumentNotNull(() => suggestionProviderFactory);
 
-            this.modsViewModelsFactor = modsViewModelsFactor;
-
-            Mods = modsCollection;
+            this.modsViewModelsFactory = modsViewModelsFactory;
 
             KnownMods = queryInfoProvider
                 .ModsList
@@ -50,38 +53,72 @@
             modsSuggestionProvider = suggestionProviderFactory.Create(KnownMods);
 
             addModCommand
-                .Subscribe((_) => AddModCommandExecuted())
+                .Subscribe(_ => AddMod())
                 .AddTo(Anchors);
 
             removeModCommand
-                .Select(x => x as PoeModViewModel)
+                .Select(x => x as IPoeModViewModel)
                 .Where(x => x != null)
                 .Subscribe(RemoveModCommandExecuted)
                 .AddTo(Anchors);
 
-            clearModsCommand
-                .Subscribe(_ => ClearModsCommandExecuted())
-                .AddTo(Anchors);
-
-            AddModCommandExecuted();
+            AddMod();
         }
-
-        public ReactiveList<PoeModViewModel> Mods { get; }
 
         public ICommand AddModCommand => addModCommand;
 
         public ICommand RemoveModCommand => removeModCommand;
 
-        public ICommand ClearModsCommand => clearModsCommand;
+        public PoeQueryModsGroupType GroupType
+        {
+            get { return groupType; }
+            set { this.RaiseAndSetIfChanged(ref groupType, value); }
+        }
+
+        public float? MinGroupValue
+        {
+            get { return minGroupValue; }
+            set { this.RaiseAndSetIfChanged(ref minGroupValue, value); }
+        }
+
+        public float? MaxGroupValue
+        {
+            get { return maxGroupValue; }
+            set { this.RaiseAndSetIfChanged(ref maxGroupValue, value); }
+        }
 
         public string[] KnownMods { get; }
 
-        private void AddModCommandExecuted()
+        public IReactiveList<IPoeModViewModel> Mods { get; } = new ReactiveList<IPoeModViewModel> {ChangeTrackingEnabled = true};
+
+        public IPoeModViewModel AddMod()
         {
-            AddMod();
+            var newMod = modsViewModelsFactory.Create(modsSuggestionProvider);
+
+            Mods.Add(newMod);
+
+            return newMod;
         }
 
-        private void RemoveModCommandExecuted(PoeModViewModel modToRemove)
+        public IPoeQueryModsGroup ToGroup()
+        {
+            var group = new PoeQueryModsGroup
+            {
+                Mods = ToMods(),
+                GroupType = GroupType,
+            };
+
+            if (GroupType == PoeQueryModsGroupType.Count || GroupType == PoeQueryModsGroupType.Sum)
+            {
+                group.Min = minGroupValue;
+                group.Max = maxGroupValue;
+            }
+
+            return group;
+        }
+
+
+        private void RemoveModCommandExecuted(IPoeModViewModel modToRemove)
         {
             Guard.ArgumentNotNull(() => modToRemove);
 
@@ -91,24 +128,25 @@
             }
         }
 
-        private void ClearModsCommandExecuted()
+        private IPoeQueryRangeModArgument[] ToMods()
         {
-            ClearMods();
+            var result = new List<IPoeQueryRangeModArgument>();
+            foreach (var modModel in Mods)
+            {
+                if (string.IsNullOrWhiteSpace(modModel.SelectedMod))
+                {
+                    continue;
+                }
+
+                var mod = new PoeQueryRangeModArgument(modModel.SelectedMod)
+                {
+                    Min = modModel.Min,
+                    Max = modModel.Max
+                };
+
+                result.Add(mod);
+            }
+            return result.ToArray();
         }
-
-        public PoeModViewModel AddMod()
-        {
-            var newMod = modsViewModelsFactor.Create(modsSuggestionProvider);
-
-            Mods.Add(newMod);
-
-            return newMod;
-        }
-
-        public void ClearMods()
-        {
-            Mods.Clear();
-        }
-
     }
 }

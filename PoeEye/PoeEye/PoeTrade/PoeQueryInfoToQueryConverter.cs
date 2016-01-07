@@ -86,17 +86,18 @@
                 CreateArgument("rarity", source. ItemRarity?.ToString().ToLowerInvariant() ?? string.Empty),
             };
 
-            var mods = source.Mods ?? new IPoeQueryRangeModArgument[0].Where(x => !string.IsNullOrWhiteSpace(x.Name)).ToArray();
+            var groups = source.ModGroups ?? new IPoeQueryModsGroup[0];
 
-            if (mods.Any())
+            foreach (var group in groups.Where(x => x.Mods != null && x.Mods.Any()))
             {
+                var mods = group.Mods;
                 args.AddRange(mods.Select(mod => CreateModArgument(mod.Name, mod.Min, mod.Max)));
 
                 args.AddRange(new[]
                 {
-                    CreateArgument("group_type", "And"),
-                    CreateArgument("group_min", string.Empty),
-                    CreateArgument("group_max", string.Empty),
+                    CreateArgument("group_type", group.GroupType),
+                    CreateArgument("group_min", group.Min),
+                    CreateArgument("group_max", group.Max),
                     CreateArgument("group_count", mods.Count())
                 });
             }
@@ -117,7 +118,17 @@
 
         private IPoeQueryArgument CreateArgument<T>(string name, T value)
         {
-            if (value == null || Equals(value, default(T)))
+            if (value == null)
+            {
+                return new PoeQueryStringArgument(name, string.Empty);
+            }
+
+            if (typeof(T).IsEnum)
+            {
+                return new PoeQueryStringArgument(name, value.ToString());
+            }
+
+            if (Equals(value, default(T)))
             {
                 return new PoeQueryStringArgument(name, string.Empty);
             }
@@ -147,6 +158,6 @@
         {
             return (T)System.Convert.ChangeType(value, typeof(T));
         }
-        
+
     }
 }

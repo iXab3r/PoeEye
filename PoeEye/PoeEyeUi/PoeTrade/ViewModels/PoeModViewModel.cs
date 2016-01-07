@@ -6,7 +6,7 @@
 
     using WpfAutoCompleteControls.Editors;
 
-    internal sealed class PoeModViewModel : DisposableReactiveObject
+    internal sealed class PoeModViewModel : DisposableReactiveObject, IPoeModViewModel
     {
         private float? max;
 

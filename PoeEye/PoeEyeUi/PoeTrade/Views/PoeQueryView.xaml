@@ -253,7 +253,9 @@
             </Grid>
 
             <Grid Row="10">
-                <ContentControl Content="{Binding ModsEditorViewModel}"/>
+                <Border BorderBrush="{StaticResource AccentColorBrush2}" BorderThickness="0,2" Margin="0,5">
+                    <ContentControl Content="{Binding ModGroupsEditor}" />
+                </Border>
             </Grid>
 
             <Grid Row="12">

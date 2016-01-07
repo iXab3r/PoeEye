@@ -285,6 +285,9 @@
     <Compile Include="PoeTrade\ViewModels\HistoricalTradesViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\IHistoricalTradesViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\IMainWindowViewModel.cs" />
+    <Compile Include="PoeTrade\ViewModels\IPoeModGroupsEditorViewModel.cs" />
+    <Compile Include="PoeTrade\ViewModels\IPoeModsEditorViewModel.cs" />
+    <Compile Include="PoeTrade\ViewModels\IPoeModViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\IPoeTradeCaptchaViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\IPoeTradesListViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\IPoeTradeViewModel.cs" />
@@ -295,6 +298,7 @@
     <Compile Include="PoeTrade\ViewModels\MainWindowTabViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\MainWindowViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\PoeModsEditorViewModel.cs" />
+    <Compile Include="PoeTrade\ViewModels\PoeModGroupsEditorViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\PoeModViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\PoeQueryViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\PoeTradeCaptchaViewModel.cs" />
@@ -414,11 +418,15 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="PoeTrade\Views\PoeExplicitModsEditorViewModel.xaml">
+    <Page Include="PoeTrade\Views\PoeModsEditorView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="PoeTrade\Views\PoeExplicitModViewModel.xaml">
+    <Page Include="PoeTrade\Views\PoeModsGroupEditorView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="PoeTrade\Views\PoeModView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

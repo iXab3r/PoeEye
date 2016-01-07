@@ -149,12 +149,12 @@
 
         public PoeQueryViewModel(
             [NotNull] IPoeQueryInfoProvider queryInfoProvider,
-            [NotNull] PoeModsEditorViewModel poeModsEditorViewModel,
-            [NotNull] IFactory<FuzzySuggestionProvider, string[]> suggestionProviderFactory,
+            [NotNull] IPoeModGroupsEditorViewModel modGroupsEditor,
+            [NotNull] IFactory<ISuggestionProvider, string[]> suggestionProviderFactory,
             [NotNull] IPoeDatabaseReader poeDatabaseReader)
         {
             Guard.ArgumentNotNull(() => queryInfoProvider);
-            Guard.ArgumentNotNull(() => poeModsEditorViewModel);
+            Guard.ArgumentNotNull(() => modGroupsEditor);
             Guard.ArgumentNotNull(() => suggestionProviderFactory);
             Guard.ArgumentNotNull(() => poeDatabaseReader);
 
@@ -164,7 +164,7 @@
 
             ItemTypes = queryInfoProvider.ItemTypes.ToArray();
 
-            ModsEditorViewModel = poeModsEditorViewModel;
+            ModGroupsEditor = modGroupsEditor;
 
             OnlineOnly = true;
             BuyoutOnly = true;
@@ -337,7 +337,7 @@
             set { this.RaiseAndSetIfChanged(ref socketsW, value); }
         }
 
-        IPoeQueryRangeModArgument[] IPoeQueryInfo.Mods => GetMods();
+        public IPoeQueryModsGroup[] ModGroups => ModGroupsEditor.ToGroups();
 
         public string Description => GetQueryDescription();
 
@@ -543,7 +543,7 @@
 
         public IPoeCurrency[] CurrenciesList { get; }
 
-        public PoeModsEditorViewModel ModsEditorViewModel { get; }
+        public IPoeModGroupsEditorViewModel ModGroupsEditor { get; }
 
         public ISuggestionProvider NameSuggestionProvider { get; }
 
@@ -572,15 +572,24 @@
 
             TransferProperties(source, this);
 
-            if (source.Mods != null && source.Mods.Any())
+            if (source.ModGroups != null && source.ModGroups.Any())
             {
-                ModsEditorViewModel.ClearMods();
-                foreach (var mod in source.Mods.Where(x => !string.IsNullOrWhiteSpace(x.Name)))
+                ModGroupsEditor.Groups.Clear();
+                foreach (var group in source.ModGroups.Where(x => x.Mods != null && x.Mods.Any()))
                 {
-                    var newMod = ModsEditorViewModel.AddMod();
-                    newMod.SelectedMod = mod.Name;
-                    newMod.Max = mod.Max;
-                    newMod.Min = mod.Min;
+                    var newGroup = ModGroupsEditor.AddGroup();
+                    newGroup.Mods.Clear();
+                    newGroup.GroupType = group.GroupType;
+                    newGroup.MinGroupValue = group.Min;
+                    newGroup.MaxGroupValue = group.Max;
+
+                    foreach (var mod in group.Mods.Where(x => !string.IsNullOrWhiteSpace(x.Name)))
+                    {
+                        var newMod = newGroup.AddMod();
+                        newMod.SelectedMod = mod.Name;
+                        newMod.Max = mod.Max;
+                        newMod.Min = mod.Min;
+                    }
                 }
             }
 
@@ -642,27 +651,6 @@
             {
                 Log.Instance.Debug($"[TransferProperties] Skipped following properties:\r\n{skippedProperties.Select(x => $"{x.PropertyType} {x.Name}").DumpToTextValue()}");
             }
-        }
-
-        private IPoeQueryRangeModArgument[] GetMods()
-        {
-            var result = new List<IPoeQueryRangeModArgument>();
-            foreach (var poeExplicitModViewModel in ModsEditorViewModel.Mods)
-            {
-                if (string.IsNullOrWhiteSpace(poeExplicitModViewModel.SelectedMod))
-                {
-                    continue;
-                }
-
-                var explicitMod = new PoeQueryRangeModArgument(poeExplicitModViewModel.SelectedMod)
-                {
-                    Min = poeExplicitModViewModel.Min,
-                    Max = poeExplicitModViewModel.Max,
-                };
-
-                result.Add(explicitMod);
-            }
-            return result.ToArray();
         }
 
         private IList<string> FormatQueryDescriptionArray()

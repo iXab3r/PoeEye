@@ -9,12 +9,11 @@
                 <ColumnDefinition Width="auto"/>
             </Grid.ColumnDefinitions>
 
-
-            <ItemsControl Grid.Column="0" 
+            <ItemsControl Grid.Column="0" Grid.Row="0"
                           ItemsSource="{Binding Mods}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Grid>
+                        <Grid Margin="0,0,0,5">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="auto"/>
@@ -34,9 +33,9 @@
 
             </ItemsControl>
 
-            <Button Grid.Column="1" 
+            <Button Grid.Column="1" Grid.Row="0"
                     Focusable="False"
-                    Margin="5"
+                    Margin="5,0,0,5"
                     Command="{Binding AddModCommand}" Content="Add" />
         </Grid>
     </DataTemplate>

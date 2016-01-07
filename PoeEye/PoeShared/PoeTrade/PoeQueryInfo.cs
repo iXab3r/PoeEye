@@ -137,6 +137,8 @@
 
         public IPoeQueryRangeModArgument[] Mods { get; set; }
 
+        public IPoeQueryModsGroup[] ModGroups { get; set; }
+
         public override string ToString()
         {
             return this.DumpToTextValue();
