@@ -12,6 +12,8 @@
     using PoeShared;
     using PoeShared.Prism;
 
+    using PoeWhisperMonitor.Prism;
+
     using Prism;
 
     using ViewModels;
@@ -21,7 +23,7 @@
     /// </summary>
     public partial class MainWindow : MetroWindow
     {
-        private UnityContainer unityContainer = new UnityContainer();
+        private readonly UnityContainer unityContainer = new UnityContainer();
 
         private readonly IMainWindowViewModel mainWindowViewModel;
 
@@ -31,9 +33,10 @@
 
             Log.Instance.InfoFormat("Application started");
             unityContainer.AddExtension(new CommonRegistrations());
+            unityContainer.AddExtension(new PoeWhisperRegistrations());
             unityContainer.AddExtension(new LiveRegistrations());
             unityContainer.AddExtension(new UiRegistrations());
-
+            
             mainWindowViewModel = unityContainer.Resolve<IMainWindowViewModel>();
             DataContext = mainWindowViewModel;
             Application.Current.Exit += ApplicationOnExit;

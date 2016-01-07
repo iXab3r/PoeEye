@@ -35,6 +35,7 @@
 
         private readonly IClock clock;
         private readonly IAudioNotificationsManager notificationsManager;
+        private readonly IWindowTracker mainWindowTracker;
         private readonly SerialDisposable browserSubscriptions = new SerialDisposable();
 
         private DateTime lastRequestTimestamp;
@@ -44,16 +45,19 @@
                 [NotNull] IClock clock,
                 [NotNull] IPoeCaptchaRegistrator captchaRegistrator,
                 [NotNull] IAudioNotificationsManager notificationsManager,
+                [NotNull] [Dependency(WellKnownWindows.Main)] IWindowTracker mainWindowTracker,
                 [NotNull] [Dependency(WellKnownSchedulers.Ui)] IScheduler uiScheduler)
         {
             Guard.ArgumentNotNull(() => dialogCoordinator);
             Guard.ArgumentNotNull(() => clock);
+            Guard.ArgumentNotNull(() => mainWindowTracker);
             Guard.ArgumentNotNull(() => captchaRegistrator);
             Guard.ArgumentNotNull(() => notificationsManager);
             Guard.ArgumentNotNull(() => uiScheduler);
 
             this.clock = clock;
             this.notificationsManager = notificationsManager;
+            this.mainWindowTracker = mainWindowTracker;
 
             captchaRegistrator
                 .CaptchaRequests
@@ -114,7 +118,10 @@
             CaptchaUri = uri;
             lastRequestTimestamp = clock.CurrentTime;
 
-            notificationsManager.PlayNotificationCommand.Execute(AudioNotificationType.Captcha);
+            if (!mainWindowTracker.IsActive)
+            {
+                notificationsManager.PlayNotification(AudioNotificationType.Captcha);
+            }
             browser.Source = new Uri(uri, UriKind.RelativeOrAbsolute);
         }
 

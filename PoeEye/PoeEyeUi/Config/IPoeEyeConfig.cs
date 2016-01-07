@@ -15,6 +15,8 @@
 
         bool AudioNotificationsEnabled { get; set; }
 
+        bool WhisperNotificationsEnabled { get; set; }
+
         TimeSpan MinRefreshTimeout { get; set; }
     }
 }

@@ -30,6 +30,7 @@
         {
             { AudioNotificationType.NewItem, Resources.whistle },
             { AudioNotificationType.Captcha, Resources.sounds_940_pizzicato },
+            { AudioNotificationType.Whisper, Resources.icq },
         };
 
         public AudioNotificationsManager()
@@ -37,18 +38,12 @@
             var playNotificationCommandCanExecute = this.WhenAnyValue(x => x.isEnabled);
 
             playNotificationCommand = new ReactiveCommand<AudioNotificationType>(playNotificationCommandCanExecute, x => Observable.Return((AudioNotificationType)x));
-            playNotificationCommand.Subscribe(PlayNotificationCommandExecuted).AddTo(Anchors);
+            playNotificationCommand.Subscribe(PlayNotification).AddTo(Anchors);
         }
 
         public ICommand PlayNotificationCommand => playNotificationCommand;
 
-        public bool IsEnabled
-        {
-            get { return isEnabled; }
-            set { this.RaiseAndSetIfChanged(ref isEnabled, value); }
-        }
-
-        private void PlayNotificationCommandExecuted(AudioNotificationType notificationType)
+        public void PlayNotification(AudioNotificationType notificationType)
         {
             Log.Instance.Debug($"[AudioNotificationsManager] Notification of type {notificationType} requested...");
 
@@ -71,6 +66,12 @@
             {
                 notificationSound.Play();
             }
+        }
+
+        public bool IsEnabled
+        {
+            get { return isEnabled; }
+            set { this.RaiseAndSetIfChanged(ref isEnabled, value); }
         }
     }
 }

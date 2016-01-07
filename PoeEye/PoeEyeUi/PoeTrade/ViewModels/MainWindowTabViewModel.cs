@@ -10,17 +10,18 @@
 
     using JetBrains.Annotations;
 
+    using Microsoft.Practices.Unity;
+
     using Models;
 
     using PoeShared;
     using PoeShared.DumpToText;
     using PoeShared.PoeTrade;
-    using PoeShared.PoeTrade.Query;
     using PoeShared.Utilities;
 
-    using ReactiveUI;
+    using Prism;
 
-    using Utilities;
+    using ReactiveUI;
 
     internal sealed class MainWindowTabViewModel : DisposableReactiveObject
     {
@@ -39,9 +40,11 @@
             [NotNull] PoeTradesListViewModel tradesListViewModel,
             [NotNull] IAudioNotificationsManager audioNotificationsManager,
             [NotNull] IRecheckPeriodViewModel recheckPeriodViewModel,
+            [NotNull] [Dependency(WellKnownWindows.Main)] IWindowTracker mainWindowTracker,
             [NotNull] PoeQueryViewModel queryViewModel)
         {
             Guard.ArgumentNotNull(() => tradesListViewModel);
+            Guard.ArgumentNotNull(() => mainWindowTracker);
             Guard.ArgumentNotNull(() => audioNotificationsManager);
             Guard.ArgumentNotNull(() => queryViewModel);
 
@@ -83,7 +86,8 @@
                 .DistinctUntilChanged()
                 .Where(x => x > 0)
                 .Where(x => audioNotificationEnabled)
-                .Subscribe(x => audioNotificationsManager.PlayNotificationCommand.Execute(AudioNotificationType.NewItem), Log.HandleException)
+                .Where(x => !mainWindowTracker.IsActive)
+                .Subscribe(x => audioNotificationsManager.PlayNotification(AudioNotificationType.NewItem), Log.HandleException)
                 .AddTo(Anchors);
 
             QueryViewModel.ObservableForProperty(x => x.PoeQueryBuilder)

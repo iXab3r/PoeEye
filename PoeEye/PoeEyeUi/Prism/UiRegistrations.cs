@@ -27,6 +27,7 @@
                 .RegisterType<ImagesCache, ImagesCache>(new ContainerControlledLifetimeManager())
                 .RegisterType<IPoePriceCalculcator, PoePriceCalculcator>(new ContainerControlledLifetimeManager())
                 .RegisterType<IAudioNotificationsManager, AudioNotificationsManager>(new ContainerControlledLifetimeManager())
+                .RegisterType<IWhispersNotificationManager, WhispersNotificationManager>(new ContainerControlledLifetimeManager())
                 .RegisterType<IPoeEyeConfigProvider<IPoeEyeConfig>, PoeEyeConfigProviderFromFile>(new ContainerControlledLifetimeManager())
                 .RegisterType<IDialogCoordinator, DialogCoordinator>(new ContainerControlledLifetimeManager());
 

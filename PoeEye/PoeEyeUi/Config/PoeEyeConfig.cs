@@ -43,6 +43,8 @@ namespace PoeEyeUi.Config
 
         public bool AudioNotificationsEnabled { get; set; } = true;
 
+        public bool WhisperNotificationsEnabled { get; set; } = false;
+
         public TimeSpan MinRefreshTimeout { get; set; } = TimeSpan.FromMinutes(5);
     }
 }

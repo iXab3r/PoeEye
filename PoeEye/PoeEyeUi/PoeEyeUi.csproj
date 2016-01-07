@@ -298,10 +298,12 @@
     <Compile Include="PoeTrade\Models\IPoePriceCalculcator.cs" />
     <Compile Include="PoeTrade\Models\ImagesCache.cs" />
     <Compile Include="PoeTrade\Models\IPoeCaptchaRegistrator.cs" />
+    <Compile Include="PoeTrade\Models\IWhispersNotificationManager.cs" />
     <Compile Include="PoeTrade\Models\IWindowTracker.cs" />
     <Compile Include="PoeTrade\Models\PoeItemPricePoint.cs" />
     <Compile Include="PoeTrade\Models\PoePriceCalculcator.cs" />
     <Compile Include="PoeTrade\Models\PoeCaptchaRegistrator.cs" />
+    <Compile Include="PoeTrade\Models\WhispersNotificationManager.cs" />
     <Compile Include="PoeTrade\Models\WindowTracker.cs" />
     <Compile Include="PoeTrade\ViewModels\ApplicationUpdaterViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\HistoricalTradesViewModel.cs" />
@@ -402,6 +404,10 @@
     <ProjectReference Include="..\PoeShared\PoeShared.csproj">
       <Project>{12DF53DD-7144-4D2D-B7A1-B4BC5BBDFB69}</Project>
       <Name>PoeShared</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PoeWhisperMonitor\PoeWhisperMonitor.csproj">
+      <Project>{75b4a3db-45c0-4639-b5a3-4d180ad4b9fb}</Project>
+      <Name>PoeWhisperMonitor</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -619,6 +625,7 @@
       <Link>xinput9_1_0.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="Resources\icq.wav" />
     <Content Include="Resources\minions-tadaa.wav" />
     <None Include="Resources\sounds-940-pizzicato.wav" />
     <Content Include="Resources\whistle.wav" />

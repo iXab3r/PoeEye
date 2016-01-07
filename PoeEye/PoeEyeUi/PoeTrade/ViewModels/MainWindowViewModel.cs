@@ -1,8 +1,6 @@
 ﻿namespace PoeEyeUi.PoeTrade.ViewModels
 {
     using System;
-    using System.Collections.Generic;
-    using System.ComponentModel;
     using System.Linq;
     using System.Reactive;
     using System.Reactive.Concurrency;
@@ -44,17 +42,19 @@
         private readonly ReactiveCommand<object> closeTabCommand;
 
         private readonly ISubject<Unit> configUpdateSubject = new Subject<Unit>();
+        private readonly ReactiveCommand<object> createNewTabCommand;
         private readonly IPoeEyeConfigProvider<IPoeEyeConfig> poeEyeConfigProvider;
+        private readonly ReactiveCommand<object> saveConfigCommand;
 
         private readonly IFactory<MainWindowTabViewModel> tabFactory;
-        private readonly ReactiveCommand<object> saveConfigCommand;
-        private readonly ReactiveCommand<object> createNewTabCommand;
 
         private bool audioNotificationsEnabled = true;
 
         private EditableTuple<string, float>[] currenciesPriceInChaosOrbs;
 
         private MainWindowTabViewModel selectedItem;
+
+        private bool whisperNotificationsEnabled;
 
         public MainWindowViewModel(
             [NotNull] IFactory<MainWindowTabViewModel> tabFactory,
@@ -64,8 +64,8 @@
             [NotNull] PoeClipboardParserViewModel clipboardParserViewModel,
             [NotNull] ProxyProviderViewModel proxyProviderViewModel,
             [NotNull] IPoeTradeCaptchaViewModel captchaViewModel,
+            [NotNull] IWhispersNotificationManager whispersNotificationManager,
             [NotNull] IDialogCoordinator dialogCoordinator,
-            [NotNull] [Dependency(WellKnownWindows.Main)] IWindowTracker mainWindowTracker,
             [NotNull] [Dependency(WellKnownSchedulers.Ui)] IScheduler uiScheduler)
         {
             Guard.ArgumentNotNull(() => tabFactory);
@@ -74,6 +74,7 @@
             Guard.ArgumentNotNull(() => poeEyeConfigProvider);
             Guard.ArgumentNotNull(() => clipboardParserViewModel);
             Guard.ArgumentNotNull(() => audioNotificationsManager);
+            Guard.ArgumentNotNull(() => whispersNotificationManager);
             Guard.ArgumentNotNull(() => captchaViewModel);
             Guard.ArgumentNotNull(() => dialogCoordinator);
             Guard.ArgumentNotNull(() => uiScheduler);
@@ -122,16 +123,19 @@
                 CreateNewTabCommandExecuted(null);
             }
 
-            Observable.Merge(
-                    this.WhenAnyValue(x => x.AudioNotificationsEnabled).ToUnit(), 
-                    mainWindowTracker.WhenAnyValue(x => x.IsActive).ToUnit())
-                .Subscribe(active => audioNotificationsManager.IsEnabled = audioNotificationsEnabled && !mainWindowTracker.IsActive, Log.HandleException)
+            this.WhenAnyValue(x => x.AudioNotificationsEnabled)
+                .Subscribe(active => audioNotificationsManager.IsEnabled = active, Log.HandleException)
+                .AddTo(Anchors);
+
+            this.WhenAnyValue(x => x.WhisperNotificationsEnabled)
+                .Subscribe(active => whispersNotificationManager.IsEnabled = active, Log.HandleException)
                 .AddTo(Anchors);
 
             TabsList
                 .Changed.ToUnit()
                 .Merge(TabsList.ItemChanged.Where(x => x.PropertyName == nameof(MainWindowTabViewModel.AudioNotificationEnabled)).ToUnit())
                 .Merge(this.WhenAnyValue(x => x.AudioNotificationsEnabled).ToUnit())
+                .Merge(this.WhenAnyValue(x => x.WhisperNotificationsEnabled).ToUnit())
                 .Merge(clipboardParserViewModel.WhenAnyValue(x => x.MonitoringEnabled).ToUnit())
                 .Subscribe(configUpdateSubject)
                 .AddTo(Anchors);
@@ -169,6 +173,12 @@
             set { this.RaiseAndSetIfChanged(ref audioNotificationsEnabled, value); }
         }
 
+        public bool WhisperNotificationsEnabled
+        {
+            get { return whisperNotificationsEnabled; }
+            set { this.RaiseAndSetIfChanged(ref whisperNotificationsEnabled, value); }
+        }
+
         public ReactiveList<MainWindowTabViewModel> TabsList { get; } = new ReactiveList<MainWindowTabViewModel>
         {
             ChangeTrackingEnabled = true
@@ -176,7 +186,7 @@
 
         public string MainWindowTitle { get; }
 
-        public EditableTuple<string,float>[] CurrenciesPriceInChaosOrbs
+        public EditableTuple<string, float>[] CurrenciesPriceInChaosOrbs
         {
             get { return currenciesPriceInChaosOrbs; }
             set { this.RaiseAndSetIfChanged(ref currenciesPriceInChaosOrbs, value); }
@@ -186,6 +196,20 @@
         {
             get { return selectedItem; }
             set { this.RaiseAndSetIfChanged(ref selectedItem, value); }
+        }
+
+        public override void Dispose()
+        {
+            Log.Instance.Debug($"[MainWindowViewModel.Dispose] Disposing viewmodel...");
+
+            SaveConfig();
+            foreach (var mainWindowTabViewModel in TabsList)
+            {
+                mainWindowTabViewModel.Dispose();
+            }
+            base.Dispose();
+
+            Log.Instance.Debug($"[MainWindowViewModel.Dispose] Viewmodel disposed");
         }
 
         private void CreateNewTabCommandExecuted([CanBeNull] IPoeQueryInfo query)
@@ -222,7 +246,7 @@
         private void SaveConfig()
         {
             Log.Instance.Debug($"[MainWindowViewModel.SaveConfig] Saving config (provider: {poeEyeConfigProvider})...\r\nTabs count: {TabsList.Count}");
-            
+
             var config = new PoeEyeConfig();
             config.TabConfigs = TabsList.Select(
                 tab => new PoeEyeTabConfig
@@ -231,11 +255,12 @@
                     IsAutoRecheckEnabled = tab.RecheckPeriodViewModel.IsAutoRecheckEnabled,
                     QueryInfo = tab.QueryViewModel.PoeQueryBuilder(),
                     AudioNotificationEnabled = tab.AudioNotificationEnabled,
-                    SoldOrRemovedItems = tab.TradesListViewModel.HistoricalTradesViewModel.ItemsViewModels.Select(x => x.Trade).ToArray(),
+                    SoldOrRemovedItems = tab.TradesListViewModel.HistoricalTradesViewModel.ItemsViewModels.Select(x => x.Trade).ToArray()
                 }).ToArray();
 
             config.AudioNotificationsEnabled = AudioNotificationsEnabled;
             config.ClipboardMonitoringEnabled = ClipboardParserViewModel.MonitoringEnabled;
+            config.WhisperNotificationsEnabled = WhisperNotificationsEnabled;
 
             config.CurrenciesPriceInChaos = CurrenciesPriceInChaosOrbs.ToDictionary(x => x.Item1, x => x.Item2);
 
@@ -273,28 +298,15 @@
                 tab.AudioNotificationEnabled = tabConfig.AudioNotificationEnabled;
             }
 
-            audioNotificationsEnabled = config.AudioNotificationsEnabled;
+            AudioNotificationsEnabled = config.AudioNotificationsEnabled;
+            WhisperNotificationsEnabled = config.WhisperNotificationsEnabled;
             ClipboardParserViewModel.MonitoringEnabled = config.ClipboardMonitoringEnabled;
             CurrenciesPriceInChaosOrbs = config
                 .CurrenciesPriceInChaos
-                .Select(x => new EditableTuple<string, float> { Item1 = x.Key, Item2 = x.Value })
+                .Select(x => new EditableTuple<string, float> {Item1 = x.Key, Item2 = x.Value})
                 .ToArray();
 
             Log.Instance.Debug($"[MainWindowViewModel.LoadConfig] Sucessfully loaded config\r\nTabs count: {TabsList.Count}");
-        }
-
-        public override void Dispose()
-        {
-            Log.Instance.Debug($"[MainWindowViewModel.Dispose] Disposing viewmodel...");
-
-            SaveConfig();
-            foreach (var mainWindowTabViewModel in TabsList)
-            {
-                mainWindowTabViewModel.Dispose();
-            }
-            base.Dispose();
-
-            Log.Instance.Debug($"[MainWindowViewModel.Dispose] Viewmodel disposed");
         }
     }
 }

@@ -75,8 +75,8 @@
       <HintPath>..\packages\Resourcer.Fody.1.4.0\Lib\portable-net45+netcore45+wpa81+wp8\Resourcer.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Splat, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Splat.1.0.0\lib\Net45\Splat.dll</HintPath>
+    <Reference Include="Splat, Version=1.6.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Splat.1.6.2\lib\Net45\Splat.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -114,6 +114,8 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Chat\PoeMessage.cs" />
+    <Compile Include="Chat\PoeMessageType.cs" />
     <Compile Include="Common\IPoeCurrency.cs" />
     <Compile Include="Common\IPoeItem.cs" />
     <Compile Include="Common\IPoeItemMod.cs" />

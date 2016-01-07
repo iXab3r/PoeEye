@@ -3,6 +3,7 @@
     internal enum AudioNotificationType
     {
         NewItem,
+        Whisper,
         Captcha
     }
 }
