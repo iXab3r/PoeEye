@@ -16,7 +16,7 @@
         /// </summary>
         public static event EventHandler ClipboardUpdate = delegate { };
 
-        private static NotificationForm ClipboardForm;
+        private static NotificationForm clipboardForm;
 
         static ClipboardNotifications()
         {
@@ -31,12 +31,12 @@
 
         private static void InitializeForm()
         {
-            if (ClipboardForm != null)
+            if (clipboardForm != null)
             {
                 throw new InvalidOperationException("Already initialized");
             }
-            ClipboardForm = new NotificationForm();
-            Application.Run(ClipboardForm);
+            clipboardForm = new NotificationForm();
+            Application.Run(clipboardForm);
         }
 
         /// <summary>
@@ -45,7 +45,7 @@
         /// <param name="e">Event arguments for the event.</param>
         private static void OnClipboardUpdate()
         {
-            ClipboardUpdate(ClipboardForm, EventArgs.Empty);
+            ClipboardUpdate(clipboardForm, EventArgs.Empty);
         }
 
         /// <summary>
@@ -70,24 +70,11 @@
             }
         }
 
-        public static string GetActiveWindowTitle()
-        {
-            const int nChars = 256;
-            StringBuilder buffer = new StringBuilder(nChars);
-            IntPtr handle = NativeMethods.GetForegroundWindow();
-
-            if (NativeMethods.GetWindowText(handle, buffer, nChars) > 0)
-            {
-                return buffer.ToString();
-            }
-            return null;
-        }
-
         private static class NativeMethods
         {
             // See http://msdn.microsoft.com/en-us/library/ms649021%28v=vs.85%29.aspx
             public const int WM_CLIPBOARDUPDATE = 0x031D;
-            public static IntPtr HWND_MESSAGE = new IntPtr(-3);
+            public static readonly IntPtr HWND_MESSAGE = new IntPtr(-3);
 
             // See http://msdn.microsoft.com/en-us/library/ms632599%28VS.85%29.aspx#message_only
             [DllImport("user32.dll", SetLastError = true)]
@@ -98,12 +85,6 @@
             // See http://msdn.microsoft.com/en-us/library/ms649033%28VS.85%29.aspx
             [DllImport("user32.dll", SetLastError = true)]
             public static extern IntPtr SetParent(IntPtr hWndChild, IntPtr hWndNewParent);
-
-            [DllImport("user32.dll")]
-            public static extern IntPtr GetForegroundWindow();
-
-            [DllImport("user32.dll")]
-            public static extern int GetWindowText(IntPtr hWnd, StringBuilder text, int count);
         }
     }
 }

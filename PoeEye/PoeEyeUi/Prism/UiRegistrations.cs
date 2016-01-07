@@ -19,6 +19,8 @@
 
     internal sealed class UiRegistrations : UnityContainerExtension
     {
+        private static readonly string PathOfExileWindowTitle = "Path of Exile";
+
         protected override void Initialize()
         {
             Container
@@ -49,15 +51,25 @@
                 .RegisterType<IWindowTracker, WindowTracker>();
 
             RegisterMainWindowTracker();
+            RegisterPathOfExileWindowTracker();
         }
 
-        private void RegisterMainWindowTracker()
+        private IUnityContainer RegisterMainWindowTracker()
         {
-            Container
+            return Container
                 .RegisterType<IWindowTracker, WindowTracker>(
                     WellKnownWindows.Main, 
                     new ContainerControlledLifetimeManager(), 
                     new InjectionFactory(unity => unity.Resolve<IWindowTracker>(new DependencyOverride<Func<string>>(new Func<string>(GetMainWindowTitle)))));
+        }
+
+        private IUnityContainer RegisterPathOfExileWindowTracker()
+        {
+            return Container
+                .RegisterType<IWindowTracker, WindowTracker>(
+                    WellKnownWindows.PathOfExile,
+                    new ContainerControlledLifetimeManager(),
+                    new InjectionFactory(unity => unity.Resolve<IWindowTracker>(new DependencyOverride<Func<string>>(new Func<string>(() => PathOfExileWindowTitle)))));
         }
 
         private string GetMainWindowTitle()

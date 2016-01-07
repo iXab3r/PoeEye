@@ -132,8 +132,6 @@
     <Compile Include="Common\PoeItemModEqualityComparerFixture.cs" />
     <Compile Include="Communications\NameValueCollectionToQueryStringConverterFixture.cs" />
     <Compile Include="Common\PoeItemParserFixture.cs" />
-    <Compile Include="ProxiesSource\CoolProxyNetProxiesSourceFixture.cs" />
-    <Compile Include="ProxiesSource\FoxToolsFixture.cs" />
     <Compile Include="Helpers\MockExtensions.cs" />
     <Compile Include="PoeTrade\PoeTradeParserModernFixture.cs" />
     <Compile Include="PoeTrade\TestData\TestDataProvider.cs" />
@@ -172,10 +170,6 @@
     <ProjectReference Include="..\PoeShared\PoeShared.csproj">
       <Project>{12df53dd-7144-4d2d-b7a1-b4bc5bbdfb69}</Project>
       <Name>PoeShared</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\ProxyProvider\ProxyProvider.csproj">
-      <Project>{9d93f624-aaef-4079-9743-2fc0f6713cb5}</Project>
-      <Name>ProxyProvider</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -14,6 +14,8 @@
 
     using Microsoft.Practices.Unity;
 
+    using Models;
+
     using PoeShared;
     using PoeShared.Common;
     using PoeShared.PoeTrade;
@@ -25,11 +27,10 @@
 
     using TypeConverter;
 
-    using WpfClipboardMonitor;
+    using ClipboardMonitor;
 
     internal sealed class PoeClipboardParserViewModel : DisposableReactiveObject
     {
-        private static readonly string PathOfExileWindowTitle = "Path of Exile";
         private static readonly TimeSpan IsBusyThrottlingPeriod = TimeSpan.FromSeconds(1);
 
         private readonly IPoeItemParser itemParser;
@@ -50,11 +51,13 @@
             [NotNull] IPoeItemParser itemParser,
             [NotNull] IFactory<IPoeTradeViewModel, IPoeItem> poeTradeViewModelFactory,
             [NotNull] IConverter<IPoeItem, IPoeQueryInfo> itemToQueryConverter,
+            [NotNull] [Dependency(WellKnownWindows.PathOfExile)] IWindowTracker poeWindowTracker,
             [NotNull] [Dependency(WellKnownSchedulers.Ui)] IScheduler uiScheduler,
             [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler)
         {
             Guard.ArgumentNotNull(() => itemParser);
             Guard.ArgumentNotNull(() => poeTradeViewModelFactory);
+            Guard.ArgumentNotNull(() => poeWindowTracker);
             Guard.ArgumentNotNull(() => itemToQueryConverter);
             Guard.ArgumentNotNull(() => uiScheduler);
             Guard.ArgumentNotNull(() => bgScheduler);
@@ -75,7 +78,7 @@
                     h => ClipboardNotifications.ClipboardUpdate -= h)
                 .Where(x => monitoringEnabled)
                 .Merge(parseClipboard)
-                .Where(x => ClipboardNotifications.GetActiveWindowTitle() == PathOfExileWindowTitle)
+                .Where(x => poeWindowTracker.IsActive)
                 .Select(x => GetTextFromClipboard())
                 .Where(x => !string.IsNullOrWhiteSpace(x))
                 .Publish();
