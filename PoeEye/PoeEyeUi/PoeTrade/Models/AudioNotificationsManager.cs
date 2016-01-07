@@ -7,8 +7,14 @@
     using System.Reactive.Linq;
     using System.Windows.Input;
 
+    using JetBrains.Annotations;
+
+    using Microsoft.Practices.Unity;
+
     using PoeShared;
     using PoeShared.Utilities;
+
+    using Prism;
 
     using Properties;
 

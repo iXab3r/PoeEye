@@ -49,7 +49,7 @@
 
         public IObservable<FileInfo> ResolveImageByUri(Uri imageUri)
         {
-            Log.Instance.Debug($"[ItemsCache.ResolveImageByUri] Resolving image '{imageUri}'...");
+            Log.Instance.Trace($"[ItemsCache.ResolveImageByUri] Resolving image '{imageUri}'...");
             var outputFilePath = ConstructPath(imageUri.AbsolutePath);
 
             IObservable<FileInfo> inProgress;
@@ -61,7 +61,7 @@
 
             if (File.Exists(outputFilePath))
             {
-                Log.Instance.Debug($"[ItemsCache.ResolveImageByUri] Image is already loaded, cache path '{outputFilePath}'");
+                Log.Instance.Trace($"[ItemsCache.ResolveImageByUri] Image is already loaded, cache path '{outputFilePath}'");
                 return Observable.Return(new FileInfo(outputFilePath));
             }
 
@@ -121,12 +121,12 @@
             return Path.Combine(cachePath, fileName);
         }
 
-        private static string Sha256(string password)
+        private static string Sha256(string valueToHash)
         {
             using (var crypt = new SHA256Managed())
             {
                 var hash = string.Empty;
-                var crypto = crypt.ComputeHash(Encoding.ASCII.GetBytes(password), 0, Encoding.ASCII.GetByteCount(password));
+                var crypto = crypt.ComputeHash(Encoding.ASCII.GetBytes(valueToHash), 0, Encoding.ASCII.GetByteCount(valueToHash));
                 return crypto.Aggregate(hash, (current, theByte) => current + theByte.ToString("x2"));
             }
         }

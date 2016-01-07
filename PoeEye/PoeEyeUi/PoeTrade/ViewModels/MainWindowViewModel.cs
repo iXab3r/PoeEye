@@ -54,8 +54,6 @@
 
         private EditableTuple<string, float>[] currenciesPriceInChaosOrbs;
 
-        private bool isMainWindowActive;
-
         private MainWindowTabViewModel selectedItem;
 
         public MainWindowViewModel(
@@ -67,6 +65,7 @@
             [NotNull] ProxyProviderViewModel proxyProviderViewModel,
             [NotNull] IPoeTradeCaptchaViewModel captchaViewModel,
             [NotNull] IDialogCoordinator dialogCoordinator,
+            [NotNull] [Dependency(WellKnownWindows.Main)] IWindowTracker mainWindowTracker,
             [NotNull] [Dependency(WellKnownSchedulers.Ui)] IScheduler uiScheduler)
         {
             Guard.ArgumentNotNull(() => tabFactory);
@@ -123,9 +122,10 @@
                 CreateNewTabCommandExecuted(null);
             }
 
-            this.WhenAnyValue(x => x.IsMainWindowActive)
-                .DistinctUntilChanged()
-                .Subscribe(active => audioNotificationsManager.IsEnabled = audioNotificationsEnabled && !active, Log.HandleException)
+            Observable.Merge(
+                    this.WhenAnyValue(x => x.AudioNotificationsEnabled).ToUnit(), 
+                    mainWindowTracker.WhenAnyValue(x => x.IsActive).ToUnit())
+                .Subscribe(active => audioNotificationsManager.IsEnabled = audioNotificationsEnabled && !mainWindowTracker.IsActive, Log.HandleException)
                 .AddTo(Anchors);
 
             TabsList
@@ -175,12 +175,6 @@
         };
 
         public string MainWindowTitle { get; }
-
-        public bool IsMainWindowActive
-        {
-            get { return isMainWindowActive; }
-            set { this.RaiseAndSetIfChanged(ref isMainWindowActive, value); }
-        }
 
         public EditableTuple<string,float>[] CurrenciesPriceInChaosOrbs
         {

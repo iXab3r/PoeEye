@@ -69,7 +69,7 @@
 
         private void LoadImage(FileInfo cachedImageFilePath)
         {
-            Log.Instance.Debug($"[ImageViewModel] Loading image...\r\n\tBase URI: '{imageUri}'\r\n\tFilePath: '{cachedImageFilePath.FullName}'");
+            Log.Instance.Trace($"[ImageViewModel] Loading image...\r\n\tBase URI: '{imageUri}'\r\n\tFilePath: '{cachedImageFilePath.FullName}'");
             try
             {
                 var bitmap = LoadBitmapImage(cachedImageFilePath.FullName);

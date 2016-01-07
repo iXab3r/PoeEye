@@ -21,6 +21,8 @@
 
     using Microsoft.Practices.Unity;
 
+    using Models;
+
     using PoeEye.Prism;
 
     using PoeShared;

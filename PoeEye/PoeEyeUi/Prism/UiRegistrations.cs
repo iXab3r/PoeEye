@@ -1,6 +1,10 @@
 ﻿namespace PoeEyeUi.Prism
 {
+    using System;
+    using System.Diagnostics;
     using System.Reactive.Concurrency;
+    using System.Windows;
+    using System.Windows.Interop;
 
     using Config;
 
@@ -40,6 +44,25 @@
                 .RegisterType<IRecheckPeriodViewModel, RecheckPeriodViewModel>()
                 .RegisterType<ISuggestionProvider, FuzzySuggestionProvider>()
                 .RegisterType<IPoeEyeConfig>(new InjectionFactory(x => x.Resolve<IPoeEyeConfigProvider<IPoeEyeConfig>>().Load()));
+
+            Container
+                .RegisterType<IWindowTracker, WindowTracker>();
+
+            RegisterMainWindowTracker();
+        }
+
+        private void RegisterMainWindowTracker()
+        {
+            Container
+                .RegisterType<IWindowTracker, WindowTracker>(
+                    WellKnownWindows.Main, 
+                    new ContainerControlledLifetimeManager(), 
+                    new InjectionFactory(unity => unity.Resolve<IWindowTracker>(new DependencyOverride<Func<string>>(new Func<string>(GetMainWindowTitle)))));
+        }
+
+        private string GetMainWindowTitle()
+        {
+            return Process.GetCurrentProcess().MainWindowTitle;
         }
     }
 }

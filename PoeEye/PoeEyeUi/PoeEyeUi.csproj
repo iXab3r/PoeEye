@@ -278,9 +278,11 @@
     <Compile Include="PoeTrade\Models\IPoePriceCalculcator.cs" />
     <Compile Include="PoeTrade\Models\ImagesCache.cs" />
     <Compile Include="PoeTrade\Models\IPoeCaptchaRegistrator.cs" />
+    <Compile Include="PoeTrade\Models\IWindowTracker.cs" />
     <Compile Include="PoeTrade\Models\PoeItemPricePoint.cs" />
     <Compile Include="PoeTrade\Models\PoePriceCalculcator.cs" />
     <Compile Include="PoeTrade\Models\PoeCaptchaRegistrator.cs" />
+    <Compile Include="PoeTrade\Models\WindowTracker.cs" />
     <Compile Include="PoeTrade\ViewModels\ApplicationUpdaterViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\HistoricalTradesViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\IHistoricalTradesViewModel.cs" />
@@ -308,6 +310,7 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Prism\WellKnownSchedulers.cs" />
+    <Compile Include="Prism\WellKnownWindows.cs" />
     <Compile Include="ResourceKeys.cs" />
     <Compile Include="Utilities\DataPiping.cs" />
     <Compile Include="Utilities\DataPipe.cs" />

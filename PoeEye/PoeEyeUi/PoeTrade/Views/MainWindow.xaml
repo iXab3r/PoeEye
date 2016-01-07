@@ -26,13 +26,6 @@
 
     <Grid>
 
-        <utilities:DataPiping.DataPipes>
-            <utilities:DataPipeCollection>
-                <utilities:DataPipe Source="{Binding RelativeSource={RelativeSource AncestorType={x:Type controls:MetroWindow}}, Path=IsActive}"
-                         Target="{Binding Path=IsMainWindowActive, Mode=OneWayToSource}"/>
-            </utilities:DataPipeCollection>
-        </utilities:DataPiping.DataPipes>
-
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
