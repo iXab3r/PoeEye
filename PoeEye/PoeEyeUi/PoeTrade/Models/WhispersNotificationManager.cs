@@ -36,8 +36,9 @@
             this.audioNotificationsManager = audioNotificationsManager;
 
             whispers.Messages
-                    .Where(x => x.MessageType == PoeMessageType.Whisper)
+                    .Where(x => isEnabled)
                     .Where(x => !poeWindowTracker.IsActive)
+                    .Where(x => x.MessageType == PoeMessageType.Whisper)
                     .Subscribe(ProcessWhisper)
                     .AddTo(Anchors);
         }
