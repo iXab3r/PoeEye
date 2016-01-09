@@ -280,6 +280,7 @@
     <Compile Include="Config\PoeEyeTabConfig.cs" />
     <Compile Include="Converters\BoolInversionConverter.cs" />
     <Compile Include="Converters\NullToBoolConverter.cs" />
+    <Compile Include="Converters\ObjectToVisibilityConverter.cs" />
     <Compile Include="Converters\ObjectToLowercaseConverter.cs" />
     <Compile Include="Converters\PriceToCurrencyConverter.cs" />
     <Compile Include="Converters\PriceToImageUriConverter.cs" />
@@ -317,6 +318,7 @@
     <Compile Include="PoeTrade\ViewModels\IPoeTradeViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\IRecheckPeriodViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\PoeClipboardParserViewModel.cs" />
+    <Compile Include="PoeTrade\ViewModels\PoeItemVerificationState.cs" />
     <Compile Include="PoeTrade\ViewModels\PoeLinksInfoViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\ImageViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\MainWindowTabViewModel.cs" />
@@ -487,7 +489,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="PoeTrade\Views\PoeTradeView.xaml">
+    <Page Include="PoeTrade\Views\PoeItemView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -19,6 +19,8 @@
 
     using Models;
 
+    using PoeEye.PoeTrade;
+
     using PoeShared;
     using PoeShared.Common;
 
@@ -32,8 +34,10 @@
     {
         private static readonly TimeSpan RefreshTimeout = TimeSpan.FromSeconds(10);
 
+        private readonly IPoeItemVerifier itemVerifier;
         private readonly IClock clock;
         private readonly ReactiveCommand<object> copyPmMessageToClipboardCommand = ReactiveCommand.Create();
+        private readonly ReactiveCommand<object> verifyItemCommand = ReactiveCommand.Create();
         private readonly ReactiveCommand<object> openForumUriCommand;
 
         private PoeTradeState tradeState;
@@ -41,25 +45,30 @@
         public PoeTradeViewModel(
             [NotNull] IPoeItem poeItem,
             [NotNull] IPoePriceCalculcator poePriceCalculcator,
+            [NotNull] IPoeItemVerifier itemVerifier,
             [NotNull] IFactory<ImageViewModel, Uri> imageViewModelFactory,
             [NotNull] IFactory<PoeLinksInfoViewModel, IPoeLinksInfo> linksViewModelFactory,
             [NotNull] [Dependency(WellKnownSchedulers.Ui)] IScheduler uiScheduler,
             [NotNull] IClock clock)
         {
-            this.clock = clock;
             Guard.ArgumentNotNull(() => poeItem);
+            Guard.ArgumentNotNull(() => itemVerifier);
             Guard.ArgumentNotNull(() => poePriceCalculcator);
             Guard.ArgumentNotNull(() => imageViewModelFactory);
             Guard.ArgumentNotNull(() => linksViewModelFactory);
             Guard.ArgumentNotNull(() => uiScheduler);
             Guard.ArgumentNotNull(() => clock);
 
+            this.clock = clock;
+            this.itemVerifier = itemVerifier;
             this.Trade = poeItem;
             copyPmMessageToClipboardCommand.Subscribe(CopyPmMessageToClipboardCommandExecute);
 
             openForumUriCommand = ReactiveCommand.Create(Observable.Return(OpenForumUriCommandCanExecute()));
             openForumUriCommand.Subscribe(OpenForumUriCommandExecute).AddTo(Anchors);
 
+
+            verifyItemCommand.Subscribe(VerifyCommandExecuted).AddTo(Anchors);
 
             Uri imageUri;
             if (!string.IsNullOrWhiteSpace(poeItem.ItemIconUri) && Uri.TryCreate(poeItem.ItemIconUri, UriKind.Absolute, out imageUri))
@@ -106,6 +115,16 @@
 
         public ICommand CopyPmMessageToClipboardCommand => copyPmMessageToClipboardCommand;
 
+        public ICommand VerifyItemCommand => verifyItemCommand;
+
+        private PoeItemVerificationState verificationState;
+
+        public PoeItemVerificationState VerificationState
+        {
+            get { return verificationState; }
+            set { this.RaiseAndSetIfChanged(ref verificationState, value); }
+        }
+
         private void OpenForumUriCommandExecute(object arg)
         {
             Guard.ArgumentIsTrue(() => OpenForumUriCommandCanExecute());
@@ -142,6 +161,25 @@
             catch (Exception ex)
             {
                 Log.Instance.Warn($"Failed to open forum Uri '{uri}'", ex);
+            }
+        }
+
+        private async void VerifyCommandExecuted()
+        {
+            VerificationState = PoeItemVerificationState.InProgress;
+            var verificationResult = await itemVerifier.Verify(Trade);
+
+            if (verificationResult == true)
+            {
+                VerificationState = PoeItemVerificationState.Verified;
+            }
+            else if (verificationResult == false)
+            {
+                VerificationState = PoeItemVerificationState.Sold;
+            }
+            else
+            {
+                VerificationState = PoeItemVerificationState.Unknown;
             }
         }
     }

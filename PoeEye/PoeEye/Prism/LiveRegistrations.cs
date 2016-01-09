@@ -28,6 +28,7 @@
 
             Container
                 .RegisterType<IPoeApi, PoeTradeApi>(new ContainerControlledLifetimeManager())
+                .RegisterType<IPoeItemVerifier, PoeItemVerifier>(new ContainerControlledLifetimeManager())
                 .RegisterType<IConverter<NameValueCollection, string>, NameValueCollectionToQueryStringConverter>(new ContainerControlledLifetimeManager())
                 .RegisterType<IConverter<IPoeQueryInfo, IPoeQuery>, PoeQueryInfoToQueryConverter>(new ContainerControlledLifetimeManager())
                 .RegisterType<IConverter<IPoeQuery, NameValueCollection>, PoeQueryConverter>(new ContainerControlledLifetimeManager())

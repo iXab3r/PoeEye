@@ -150,6 +150,8 @@
     <Compile Include="Clock.cs" />
     <Compile Include="Communications\GenericHttpClient.cs" />
     <Compile Include="Communications\NameValueCollectionToQueryStringConverter.cs" />
+    <Compile Include="PoeTrade\IPoeItemVerifier.cs" />
+    <Compile Include="PoeTrade\PoeItemVerifier.cs" />
     <Compile Include="PoeTrade\PoeLiveHistoryProvider.cs" />
     <Compile Include="PoeTrade\PoeQueryConverter.cs" />
     <Compile Include="PoeTrade\PoeQueryInfoToQueryConverter.cs" />

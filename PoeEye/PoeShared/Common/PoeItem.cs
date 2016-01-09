@@ -52,6 +52,10 @@
 
         public string Requirements { get; set; }
 
+        public string ThreadId { get; set; }
+
+        public string Hash { get; set; }
+
         public bool IsCorrupted { get; set; }
 
         public PoeItemRarity Rarity { get; set; }

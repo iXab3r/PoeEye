@@ -6,7 +6,9 @@
                     xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
                     xmlns:utilities="clr-namespace:PoeEyeUi.Utilities"
                     xmlns:filterExtension="clr-namespace:PoeEyeUi.Utilities.FilterExtension"
-                    xmlns:net="clr-namespace:FontAwesome.Net;assembly=FontAwesome.Net">
+                    xmlns:net="clr-namespace:FontAwesome.Net;assembly=FontAwesome.Net"
+                    xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
+                    xmlns:converters="clr-namespace:PoeEyeUi.Converters">
 
     <DataTemplate x:Key="PoeItemStatsTemplateKey" DataType="{x:Type common:IPoeItem}" >
         <!-- Stats -->
@@ -166,7 +168,7 @@
                     </i:Interaction.Behaviors>
                 </CollectionViewSource>
             </Grid.Resources>
-           <Grid.RowDefinitions>
+            <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="5"/>
                 <RowDefinition Height="Auto"/>
@@ -312,6 +314,7 @@
                                 <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="Auto" />
@@ -328,12 +331,75 @@
                                        Text="{Binding Path=PriceInChaosOrbs, Mode=OneWay, StringFormat=' (~ {0} chaos)'}" 
                                        Visibility="{Binding PriceInChaosOrbs, Converter={StaticResource NullToCollapsedConverter}}"/>
 
-                            <Button Grid.Column="4" 
+                            <StackPanel Grid.Column="3" 
+                                        Margin="10,2">
+                                
+                                <StackPanel.Resources>
+                                    <converters:ObjectToVisibilityConverter x:Key="SoldToVisibleConverter" TrueValue="Visible" FalseValue="Collapsed" CompareTo="{x:Static viewModels:PoeItemVerificationState.Sold}"  />
+                                    <converters:ObjectToVisibilityConverter x:Key="VerifiedToVisibleConverter" TrueValue="Visible" FalseValue="Collapsed" CompareTo="{x:Static viewModels:PoeItemVerificationState.Verified}"  />
+                                </StackPanel.Resources>
+
+                                <Button Height="16" 
+                                        Command="{Binding VerifyItemCommand}">
+                                    <Button.Style>
+                                        <Style BasedOn="{StaticResource {x:Type Button}}" TargetType="{x:Type Button}">
+                                            <Setter Property="IsEnabled" Value="True"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding VerificationState}" Value="InProgress">
+                                                    <Setter Property="IsEnabled" Value="False"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Button.Style>
+                                    <Button.Content>
+
+                                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="5,0">
+
+                                            <Ellipse Fill="{StaticResource PoeTradeNewItemBrush}" 
+                                                 Stroke="{StaticResource AccentColorBrush4}" 
+                                                 ToolTip="Verified"
+                                                 Visibility="{Binding VerificationState, Converter={StaticResource VerifiedToVisibleConverter}}"
+                                                 Width="10" Height="10">
+                                            </Ellipse>
+                                            <Ellipse Fill="{StaticResource PoeTradeRemovedItemBrush}" 
+                                                 Stroke="{StaticResource AccentColorBrush4}" 
+                                                 ToolTip="Sold"
+                                                 Visibility="{Binding VerificationState, Converter={StaticResource SoldToVisibleConverter}}"
+                                                 Width="10" Height="10">
+                                            </Ellipse>
+
+                                            <TextBlock Margin="5,0">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
+                                                        <Setter Property="Text" Value="Verify"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding VerificationState}" Value="Sold">
+                                                                <Setter Property="Text" Value="Sold"/>
+                                                                <Setter Property="Foreground" Value="{StaticResource PoeTradeRemovedItemBrush}"/>
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding VerificationState}" Value="Verified">
+                                                                <Setter Property="Text" Value="Verified"/>
+                                                                <Setter Property="Foreground" Value="{StaticResource PoeTradeNewItemBrush}"/>
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding VerificationState}" Value="InProgress">
+                                                                <Setter Property="Text" Value="Working..."/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
+                                        </StackPanel>
+                                    </Button.Content>
+                                </Button>
+                            </StackPanel>
+
+
+                            <Button Grid.Column="5" 
                                     Margin="10,2"
                                     Height="16"
                                     Content="Go to forum thread" Command="{Binding OpenForumUriCommand}" />
 
-                            <Ellipse Grid.Column="5" 
+                            <Ellipse Grid.Column="6" 
                                      Width="14" Height="14" 
                                      Margin="10,2,5,0"
                                      StrokeThickness="1"
@@ -351,10 +417,10 @@
                                 </Ellipse.Style>
                             </Ellipse>
 
-                            <TextBlock Grid.Column="6"
+                            <TextBlock Grid.Column="7"
                                        Text="{Binding Path=Trade.UserIgn, Mode=OneWay, StringFormat='IGN: {0}'}" />
 
-                            <Button Grid.Column="7" 
+                            <Button Grid.Column="8" 
                                     Command="{Binding CopyPmMessageToClipboardCommand}"
                                     Width="30" Height="30" Style="{StaticResource MetroCircleButtonStyle}"
                                     FontFamily="{DynamicResource FontAwesome}"

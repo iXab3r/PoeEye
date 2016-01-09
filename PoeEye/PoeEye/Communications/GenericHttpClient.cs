@@ -8,6 +8,7 @@
     using System.Reactive.Linq;
     using System.Reactive.Threading.Tasks;
     using System.Text;
+    using System.Threading.Tasks;
     using System.Web;
 
     using CsQuery.ExtensionMethods.Internal;
@@ -69,7 +70,10 @@
 
             var httpClient = WebRequest.CreateHttp(uri);
             httpClient.CookieContainer = new CookieContainer();
-            httpClient.CookieContainer.Add(Cookies);
+            if (Cookies != null)
+            {
+                httpClient.CookieContainer.Add(Cookies);
+            }
             httpClient.Method = WebRequestMethods.Http.Get;
 
 
@@ -86,7 +90,10 @@
 
             var httpClient = WebRequest.CreateHttp(uri);
             httpClient.CookieContainer = new CookieContainer();
-            httpClient.CookieContainer.Add(Cookies);
+            if (Cookies != null)
+            {
+                httpClient.CookieContainer.Add(Cookies);
+            }
             httpClient.ContentType = "application/x-www-form-urlencoded";
             httpClient.Method = WebRequestMethods.Http.Post;
 

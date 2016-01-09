@@ -147,6 +147,8 @@ namespace PoeEye.PoeTrade
 
                 Price = parser.Attr("data-buyout"),
                 League = parser.Attr("data-league"),
+                Hash = parser["span[class=click-button]"]?.Attr("data-hash"),
+                ThreadId = parser["span[class=click-button]"]?.Attr("data-thread"),
 
                 Quality = parser["td[class=table-stats] td[data-name=q]"]?.Text(),
                 Physical = parser["td[class=table-stats] td[data-name=quality_pd]"]?.Text(),
