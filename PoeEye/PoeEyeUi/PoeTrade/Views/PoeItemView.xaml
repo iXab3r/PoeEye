@@ -333,66 +333,34 @@
 
                             <StackPanel Grid.Column="3" 
                                         Margin="10,2">
-                                
-                                <StackPanel.Resources>
-                                    <converters:ObjectToVisibilityConverter x:Key="SoldToVisibleConverter" TrueValue="Visible" FalseValue="Collapsed" CompareTo="{x:Static viewModels:PoeItemVerificationState.Sold}"  />
-                                    <converters:ObjectToVisibilityConverter x:Key="VerifiedToVisibleConverter" TrueValue="Visible" FalseValue="Collapsed" CompareTo="{x:Static viewModels:PoeItemVerificationState.Verified}"  />
-                                </StackPanel.Resources>
 
                                 <Button Height="16" 
+                                        Width="100"
                                         Command="{Binding VerifyItemCommand}">
                                     <Button.Style>
                                         <Style BasedOn="{StaticResource {x:Type Button}}" TargetType="{x:Type Button}">
+                                            <Setter Property="Content" Value="Verify"/>
                                             <Setter Property="IsEnabled" Value="True"/>
                                             <Style.Triggers>
                                                 <DataTrigger Binding="{Binding VerificationState}" Value="InProgress">
                                                     <Setter Property="IsEnabled" Value="False"/>
                                                 </DataTrigger>
+                                                <DataTrigger Binding="{Binding VerificationState}" Value="Sold">
+                                                    <Setter Property="Content" Value="Sold"/>
+                                                    <Setter Property="Foreground" Value="{StaticResource PoeTradeRemovedItemBrush}"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding VerificationState}" Value="Verified">
+                                                    <Setter Property="Content" Value="Verified"/>
+                                                    <Setter Property="Foreground" Value="{StaticResource PoeTradeNewItemBrush}"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding VerificationState}" Value="InProgress">
+                                                    <Setter Property="Content" Value="Working..."/>
+                                                </DataTrigger>
                                             </Style.Triggers>
                                         </Style>
                                     </Button.Style>
-                                    <Button.Content>
-
-                                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="5,0">
-
-                                            <Ellipse Fill="{StaticResource PoeTradeNewItemBrush}" 
-                                                 Stroke="{StaticResource AccentColorBrush4}" 
-                                                 ToolTip="Verified"
-                                                 Visibility="{Binding VerificationState, Converter={StaticResource VerifiedToVisibleConverter}}"
-                                                 Width="10" Height="10">
-                                            </Ellipse>
-                                            <Ellipse Fill="{StaticResource PoeTradeRemovedItemBrush}" 
-                                                 Stroke="{StaticResource AccentColorBrush4}" 
-                                                 ToolTip="Sold"
-                                                 Visibility="{Binding VerificationState, Converter={StaticResource SoldToVisibleConverter}}"
-                                                 Width="10" Height="10">
-                                            </Ellipse>
-
-                                            <TextBlock Margin="5,0">
-                                                <TextBlock.Style>
-                                                    <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
-                                                        <Setter Property="Text" Value="Verify"/>
-                                                        <Style.Triggers>
-                                                            <DataTrigger Binding="{Binding VerificationState}" Value="Sold">
-                                                                <Setter Property="Text" Value="Sold"/>
-                                                                <Setter Property="Foreground" Value="{StaticResource PoeTradeRemovedItemBrush}"/>
-                                                            </DataTrigger>
-                                                            <DataTrigger Binding="{Binding VerificationState}" Value="Verified">
-                                                                <Setter Property="Text" Value="Verified"/>
-                                                                <Setter Property="Foreground" Value="{StaticResource PoeTradeNewItemBrush}"/>
-                                                            </DataTrigger>
-                                                            <DataTrigger Binding="{Binding VerificationState}" Value="InProgress">
-                                                                <Setter Property="Text" Value="Working..."/>
-                                                            </DataTrigger>
-                                                        </Style.Triggers>
-                                                    </Style>
-                                                </TextBlock.Style>
-                                            </TextBlock>
-                                        </StackPanel>
-                                    </Button.Content>
                                 </Button>
                             </StackPanel>
-
 
                             <Button Grid.Column="5" 
                                     Margin="10,2"
