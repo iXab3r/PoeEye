@@ -1,12 +1,6 @@
-﻿using JetBrains.Annotations;
-
-namespace PoeEyeUi.Config
+﻿namespace PoeEyeUi.Config
 {
-    internal interface IPoeEyeConfigProvider<TConfig> where TConfig : IPoeEyeConfig
+    internal interface IPoeEyeConfigProvider : IConfigProvider<IPoeEyeConfig>
     {
-        [NotNull] 
-        TConfig Load();
-
-        void Save([NotNull] TConfig config);
     }
 }

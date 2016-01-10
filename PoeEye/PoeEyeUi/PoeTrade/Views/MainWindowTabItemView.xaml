@@ -6,7 +6,7 @@
         <DataTemplate.Resources>
             <Style TargetType="{x:Type Button}" BasedOn="{StaticResource CircleButton}" x:Key="AutoRecheckButtonStyle">
                 <Style.Triggers>
-                    <DataTrigger Binding="{Binding RecheckPeriodViewModel.IsAutoRecheckEnabled}" Value="True">
+                    <DataTrigger Binding="{Binding RecheckPeriod.IsAutoRecheckEnabled}" Value="True">
                         <Setter Property="Foreground" Value="Green"/>
                     </DataTrigger>
                 </Style.Triggers>
@@ -41,8 +41,8 @@
                              Visibility="{Binding IsBusy, Converter={StaticResource BoolFalseToHiddenConverter}}" />
 
                 <Label Grid.Column="1"
-                       ToolTip="{Binding TradesListViewModel.Errors}"
-                       Visibility="{Binding TradesListViewModel.Errors, Converter={StaticResource NullToCollapsedConverter}}"
+                       ToolTip="{Binding TradesList.Errors}"
+                       Visibility="{Binding TradesList.Errors, Converter={StaticResource NullToCollapsedConverter}}"
                        FontFamily="{StaticResource FontAwesome}"
                        Foreground="{StaticResource ValidationSummaryColor3}"
                        VerticalAlignment="Stretch"
@@ -60,9 +60,9 @@
                         Command="{Binding SearchCommand}"
                         ToolTip="Init query"
                         Focusable="False"
-                        CommandParameter="{Binding QueryViewModel.PoeQueryBuilder}"
+                        CommandParameter="{Binding Query.PoeQueryBuilder}"
                         Content="{x:Static net:FontAwesome.search}"
-                        Visibility="{Binding TradesListViewModel.ActiveQuery, Converter={StaticResource NotNullToCollapsedConverter}}" />
+                        Visibility="{Binding TradesList.ActiveQuery, Converter={StaticResource NotNullToCollapsedConverter}}" />
 
                 <Button Grid.Column="2"
                         Margin="5,0"
@@ -72,7 +72,7 @@
                         Focusable="False"
                         ToolTip="Force refresh"
                         Content="{x:Static net:FontAwesome.refresh}"
-                        Visibility="{Binding TradesListViewModel.ActiveQuery, Converter={StaticResource NullToCollapsedConverter}}"
+                        Visibility="{Binding TradesList.ActiveQuery, Converter={StaticResource NullToCollapsedConverter}}"
                         Style="{StaticResource AutoRecheckButtonStyle}">
                 </Button>
             </Grid>

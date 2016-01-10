@@ -7,6 +7,10 @@
     using System.Reactive.Linq;
     using System.Windows.Input;
 
+    using Config;
+
+    using Guards;
+
     using JetBrains.Annotations;
 
     using Microsoft.Practices.Unity;
@@ -33,12 +37,21 @@
             { AudioNotificationType.Whisper, Resources.icq },
         };
 
-        public AudioNotificationsManager()
+        public AudioNotificationsManager([NotNull] IPoeEyeConfigProvider poeEyeConfigProvider)
         {
-            var playNotificationCommandCanExecute = this.WhenAnyValue(x => x.isEnabled);
+            Guard.ArgumentNotNull(() => poeEyeConfigProvider);
+            
+            var playNotificationCommandCanExecute = this.WhenAnyValue(x => x.IsEnabled);
 
             playNotificationCommand = new ReactiveCommand<AudioNotificationType>(playNotificationCommandCanExecute, x => Observable.Return((AudioNotificationType)x));
             playNotificationCommand.Subscribe(PlayNotification).AddTo(Anchors);
+
+            poeEyeConfigProvider
+                .WhenAnyValue(x => x.ActualConfig)
+                .Select(x => x.AudioNotificationsEnabled)
+                .DistinctUntilChanged()
+                .Subscribe(newValue => IsEnabled = newValue)
+                .AddTo(Anchors);
         }
 
         public ICommand PlayNotificationCommand => playNotificationCommand;
@@ -68,7 +81,7 @@
             }
         }
 
-        public bool IsEnabled
+        private bool IsEnabled
         {
             get { return isEnabled; }
             set { this.RaiseAndSetIfChanged(ref isEnabled, value); }

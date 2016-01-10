@@ -2,6 +2,5 @@
 {
     internal interface IWhispersNotificationManager
     {
-        bool IsEnabled { get; set; }
     }
 }

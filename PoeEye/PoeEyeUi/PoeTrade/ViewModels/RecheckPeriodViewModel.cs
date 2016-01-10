@@ -5,6 +5,8 @@
 
     using Config;
 
+    using Guards;
+
     using JetBrains.Annotations;
 
     using PoeShared.Utilities;
@@ -21,8 +23,10 @@
 
         private TimeSpan recheckValue = TimeSpan.FromMinutes(5);
 
-        public RecheckPeriodViewModel([NotNull] IPoeEyeConfig config)
+        public RecheckPeriodViewModel([NotNull] IPoeEyeConfigProvider configProvider)
         {
+            Guard.ArgumentNotNull(() => configProvider);
+
             this.WhenAnyValue(x => x.RecheckValue)
                 .Where(x => x == TimeSpan.Zero)
                 .Subscribe(() => IsAutoRecheckEnabled = false)
@@ -38,10 +42,14 @@
                 .Subscribe(() => this.RaisePropertyChanged(nameof(RecheckValue)))
                 .AddTo(Anchors);
 
-            if (config.MinRefreshTimeout != TimeSpan.MinValue && config.MinRefreshTimeout != TimeSpan.Zero)
-            {
-                MinValue = config.MinRefreshTimeout;
-            }
+            configProvider
+                .WhenAnyValue(x => x.ActualConfig)
+                .Select(x => x.MinRefreshTimeout)
+                .Where(x => x != TimeSpan.Zero)
+                .Where(x => x != TimeSpan.MinValue)
+                .DistinctUntilChanged()
+                .Subscribe(Reinitialize)
+                .AddTo(Anchors);
         }
 
         public TimeSpan RecheckValue
@@ -66,6 +74,11 @@
         {
             get { return isAutoRecheckEnabled; }
             set { this.RaiseAndSetIfChanged(ref isAutoRecheckEnabled, value); }
+        }
+
+        private void Reinitialize(TimeSpan minRefreshTimeout)
+        {
+            MinValue = minRefreshTimeout;
         }
     }
 }

@@ -37,29 +37,30 @@
     internal sealed class MainWindowViewModel : DisposableReactiveObject, IMainWindowViewModel
     {
         private static readonly TimeSpan CheckForUpdatesTimeout = TimeSpan.FromSeconds(600);
-        private static readonly TimeSpan ConfigSaveSampingTimeout = TimeSpan.FromSeconds(30);
+        private static readonly TimeSpan ConfigSaveSampingTimeout = TimeSpan.FromSeconds(10);
 
-        private readonly ReactiveCommand<object> closeTabCommand;
+        private readonly ReactiveCommand<object> closeTabCommand = ReactiveCommand.Create();
 
         private readonly ISubject<Unit> configUpdateSubject = new Subject<Unit>();
-        private readonly ReactiveCommand<object> createNewTabCommand;
-        private readonly IPoeEyeConfigProvider<IPoeEyeConfig> poeEyeConfigProvider;
-        private readonly ReactiveCommand<object> saveConfigCommand;
+        private readonly ReactiveCommand<object> createNewTabCommand = ReactiveCommand.Create();
+        private readonly IPoeEyeConfigProvider poeEyeConfigProvider;
 
-        private readonly IFactory<MainWindowTabViewModel> tabFactory;
+        private readonly IFactory<IMainWindowTabViewModel> tabFactory;
 
         private bool audioNotificationsEnabled = true;
 
         private EditableTuple<string, float>[] currenciesPriceInChaosOrbs;
 
-        private MainWindowTabViewModel selectedItem;
+        private IMainWindowTabViewModel selectedItem;
+
+        private bool settingsFlyoutIsOpen;
 
         private bool whisperNotificationsEnabled;
 
         public MainWindowViewModel(
-            [NotNull] IFactory<MainWindowTabViewModel> tabFactory,
+            [NotNull] IFactory<IMainWindowTabViewModel> tabFactory,
             [NotNull] ApplicationUpdaterViewModel applicationUpdaterViewModel,
-            [NotNull] IPoeEyeConfigProvider<IPoeEyeConfig> poeEyeConfigProvider,
+            [NotNull] IPoeEyeConfigProvider poeEyeConfigProvider,
             [NotNull] IAudioNotificationsManager audioNotificationsManager,
             [NotNull] PoeClipboardParserViewModel clipboardParserViewModel,
             [NotNull] ProxyProviderViewModel proxyProviderViewModel,
@@ -99,15 +100,13 @@
             ProxyProviderViewModel = proxyProviderViewModel;
             proxyProviderViewModel.AddTo(Anchors);
 
-            createNewTabCommand = ReactiveCommand.Create();
             createNewTabCommand
                 .Subscribe(arg => CreateNewTabCommandExecuted(arg as IPoeQueryInfo))
                 .AddTo(Anchors);
 
-            closeTabCommand = ReactiveCommand.Create();
             closeTabCommand
-                .Where(x => x is MainWindowTabViewModel)
-                .Select(x => x as MainWindowTabViewModel)
+                .Where(x => x is IMainWindowTabViewModel)
+                .Select(x => x as IMainWindowTabViewModel)
                 .Subscribe(RemoveTabCommandExecuted)
                 .AddTo(Anchors);
 
@@ -120,32 +119,26 @@
 
             if (!TabsList.Any())
             {
-                CreateNewTabCommandExecuted(null);
+                CreateAndAddTab();
             }
-
-            this.WhenAnyValue(x => x.AudioNotificationsEnabled)
-                .Subscribe(active => audioNotificationsManager.IsEnabled = active, Log.HandleException)
-                .AddTo(Anchors);
-
-            this.WhenAnyValue(x => x.WhisperNotificationsEnabled)
-                .Subscribe(active => whispersNotificationManager.IsEnabled = active, Log.HandleException)
-                .AddTo(Anchors);
 
             TabsList
                 .Changed.ToUnit()
-                .Merge(TabsList.ItemChanged.Where(x => x.PropertyName == nameof(MainWindowTabViewModel.AudioNotificationEnabled)).ToUnit())
-                .Merge(this.WhenAnyValue(x => x.AudioNotificationsEnabled).ToUnit())
-                .Merge(this.WhenAnyValue(x => x.WhisperNotificationsEnabled).ToUnit())
-                .Merge(clipboardParserViewModel.WhenAnyValue(x => x.MonitoringEnabled).ToUnit())
+                .Merge(TabsList.ItemChanged.Where(x => x.PropertyName == nameof(IMainWindowTabViewModel.AudioNotificationEnabled)).ToUnit())
                 .Subscribe(configUpdateSubject)
                 .AddTo(Anchors);
 
-            saveConfigCommand = ReactiveCommand.Create();
             configUpdateSubject
                 .Sample(ConfigSaveSampingTimeout)
-                .Merge(saveConfigCommand.ToUnit())
                 .Subscribe(SaveConfig, Log.HandleException)
                 .AddTo(Anchors);
+
+            this.ObservableForProperty(x => x.SettingsFlyoutIsOpen)
+                .Select(x => x.Value)
+                .DistinctUntilChanged()
+                .Where(x => x == false)
+                .ToUnit()
+                .Subscribe(configUpdateSubject);
 
             Observable
                 .Timer(DateTimeOffset.Now, CheckForUpdatesTimeout, TaskPoolScheduler.Default)
@@ -157,8 +150,6 @@
 
         public ICommand CloseTabCommand => closeTabCommand;
 
-        public ICommand SaveConfigCommand => saveConfigCommand;
-
         public ApplicationUpdaterViewModel ApplicationUpdater { get; }
 
         public PoeClipboardParserViewModel ClipboardParserViewModel { get; }
@@ -166,6 +157,12 @@
         public ProxyProviderViewModel ProxyProviderViewModel { get; }
 
         public IPoeTradeCaptchaViewModel PoeTradeCaptchaViewModel { get; }
+
+        public bool SettingsFlyoutIsOpen
+        {
+            get { return settingsFlyoutIsOpen; }
+            set { this.RaiseAndSetIfChanged(ref settingsFlyoutIsOpen, value); }
+        }
 
         public bool AudioNotificationsEnabled
         {
@@ -179,7 +176,7 @@
             set { this.RaiseAndSetIfChanged(ref whisperNotificationsEnabled, value); }
         }
 
-        public ReactiveList<MainWindowTabViewModel> TabsList { get; } = new ReactiveList<MainWindowTabViewModel>
+        public IReactiveList<IMainWindowTabViewModel> TabsList { get; } = new ReactiveList<IMainWindowTabViewModel>
         {
             ChangeTrackingEnabled = true
         };
@@ -192,7 +189,7 @@
             set { this.RaiseAndSetIfChanged(ref currenciesPriceInChaosOrbs, value); }
         }
 
-        public MainWindowTabViewModel SelectedItem
+        public IMainWindowTabViewModel SelectedItem
         {
             get { return selectedItem; }
             set { this.RaiseAndSetIfChanged(ref selectedItem, value); }
@@ -218,16 +215,16 @@
 
             if (query != null)
             {
-                tab.QueryViewModel.SetQueryInfo(query);
+                tab.Query.SetQueryInfo(query);
             }
         }
 
-        private MainWindowTabViewModel CreateAndAddTab()
+        private IMainWindowTabViewModel CreateAndAddTab()
         {
             var newTab = tabFactory.Create();
 
             newTab
-                .QueryViewModel
+                .Query
                 .Changed
                 .Select(x => Unit.Default)
                 .Subscribe(configUpdateSubject);
@@ -236,7 +233,7 @@
             return newTab;
         }
 
-        private void RemoveTabCommandExecuted(MainWindowTabViewModel tab)
+        private void RemoveTabCommandExecuted(IMainWindowTabViewModel tab)
         {
             Log.Instance.Debug($"[MainWindowViewModel.RemoveTab] Removing tab {tab}...");
             TabsList.Remove(tab);
@@ -251,11 +248,11 @@
             config.TabConfigs = TabsList.Select(
                 tab => new PoeEyeTabConfig
                 {
-                    RecheckTimeout = tab.RecheckPeriodViewModel.RecheckValue,
-                    IsAutoRecheckEnabled = tab.RecheckPeriodViewModel.IsAutoRecheckEnabled,
-                    QueryInfo = tab.QueryViewModel.PoeQueryBuilder(),
+                    RecheckTimeout = tab.RecheckPeriod.RecheckValue,
+                    IsAutoRecheckEnabled = tab.RecheckPeriod.IsAutoRecheckEnabled,
+                    QueryInfo = tab.Query.PoeQueryBuilder(),
                     AudioNotificationEnabled = tab.AudioNotificationEnabled,
-                    SoldOrRemovedItems = tab.TradesListViewModel.HistoricalTradesViewModel.ItemsViewModels.Select(x => x.Trade).ToArray()
+                    SoldOrRemovedItems = tab.TradesList.HistoricalTradesViewModel.ItemsViewModels.Select(x => x.Trade).ToArray()
                 }).ToArray();
 
             config.AudioNotificationsEnabled = AudioNotificationsEnabled;
@@ -270,7 +267,8 @@
         private void LoadConfig()
         {
             Log.Instance.Debug($"[MainWindowViewModel.LoadConfig] Loading config (provider: {poeEyeConfigProvider})...");
-            var config = poeEyeConfigProvider.Load();
+            var config = poeEyeConfigProvider.ActualConfig;
+            poeEyeConfigProvider.Save(config);
 
             Log.Instance.Debug($"[MainWindowViewModel.LoadConfig] Received configuration DTO:\r\n{config.DumpToTextValue()}");
 
@@ -280,19 +278,19 @@
 
                 if (tabConfig.RecheckTimeout != default(TimeSpan))
                 {
-                    tab.RecheckPeriodViewModel.RecheckValue = tabConfig.RecheckTimeout;
-                    tab.RecheckPeriodViewModel.IsAutoRecheckEnabled = tabConfig.IsAutoRecheckEnabled;
+                    tab.RecheckPeriod.RecheckValue = tabConfig.RecheckTimeout;
+                    tab.RecheckPeriod.IsAutoRecheckEnabled = tabConfig.IsAutoRecheckEnabled;
                 }
 
                 if (tabConfig.QueryInfo != null)
                 {
-                    tab.QueryViewModel.SetQueryInfo(tabConfig.QueryInfo);
+                    tab.Query.SetQueryInfo(tabConfig.QueryInfo);
                 }
 
                 if (tabConfig.SoldOrRemovedItems != null)
                 {
-                    tab.TradesListViewModel.HistoricalTradesViewModel.Clear();
-                    tab.TradesListViewModel.HistoricalTradesViewModel.AddItems(tabConfig.SoldOrRemovedItems);
+                    tab.TradesList.HistoricalTradesViewModel.Clear();
+                    tab.TradesList.HistoricalTradesViewModel.AddItems(tabConfig.SoldOrRemovedItems);
                 }
 
                 tab.AudioNotificationEnabled = tabConfig.AudioNotificationEnabled;

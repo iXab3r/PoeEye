@@ -7,7 +7,7 @@
         <Grid>
             <Grid.Resources>
                 <CollectionViewSource x:Key='tradesListSource' 
-                                      Source="{Binding TradesListViewModel.TradesList}"
+                                      Source="{Binding TradesList.TradesList}"
                                       IsLiveFilteringRequested="True"
                                       IsLiveSortingRequested="True">
                     <CollectionViewSource.SortDescriptions>
@@ -28,7 +28,7 @@
                           IsTabStop="False"
                           Focusable="False"
                           MaxHeight="{Binding ActualHeight, RelativeSource={RelativeSource FindAncestor, AncestorType=ContentPresenter}, Mode=OneWay}">
-                <Expander IsExpanded="{Binding QueryViewModel.IsExpanded}">
+                <Expander IsExpanded="{Binding Query.IsExpanded}">
                     <Expander.Header>
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="Query parameters" Margin="5,0" VerticalAlignment="Center"/>
@@ -37,10 +37,10 @@
                     </Expander.Header>
                     
                     <StackPanel Orientation="Vertical">
-                        <controls:MetroContentControl Content="{Binding QueryViewModel}"/>
+                        <controls:MetroContentControl Content="{Binding Query}"/>
                         <DockPanel>
                             <Button HorizontalAlignment="Right" Width="150" Command="{Binding SearchCommand}" 
-                                    CommandParameter="{Binding QueryViewModel.PoeQueryBuilder}" 
+                                    CommandParameter="{Binding Query.PoeQueryBuilder}" 
                                     Content="Search"/>
                         </DockPanel>
                     </StackPanel>
@@ -48,14 +48,14 @@
             </ScrollViewer>
 
             <Expander Grid.Row="1"
-                      IsExpanded="{Binding TradesListViewModel.HistoricalTradesViewModel.IsExpanded}"
-                      Visibility="{Binding TradesListViewModel.HistoricalTradesViewModel.ItemsViewModels.Count, Converter={StaticResource ZeroToCollapsedConverter}}">
+                      IsExpanded="{Binding TradesList.HistoricalTradesViewModel.IsExpanded}"
+                      Visibility="{Binding TradesList.HistoricalTradesViewModel.ItemsViewModels.Count, Converter={StaticResource ZeroToCollapsedConverter}}">
                 <Expander.Header>
                     <TextBlock><Run Text="Trades history ( "/><Run ToolTip="Historical trades" 
-            				Text="{Binding TradesListViewModel.HistoricalTradesViewModel.ItemsViewModels.Count, Mode=OneWay, StringFormat=\{0\}}"
+            				Text="{Binding TradesList.HistoricalTradesViewModel.ItemsViewModels.Count, Mode=OneWay, StringFormat=\{0\}}"
             				FontWeight="Bold" /><Run Text=" )"/></TextBlock>
                 </Expander.Header>
-                <ContentControl Content="{Binding TradesListViewModel.HistoricalTradesViewModel}" Margin="0"/>
+                <ContentControl Content="{Binding TradesList.HistoricalTradesViewModel}" Margin="0"/>
             </Expander>
 
             <Grid Grid.Row="2">

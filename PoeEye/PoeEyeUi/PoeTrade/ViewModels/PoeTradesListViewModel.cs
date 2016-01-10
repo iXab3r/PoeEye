@@ -65,9 +65,11 @@
             Guard.ArgumentNotNull(() => poeLiveHistoryFactory);
             Guard.ArgumentNotNull(() => poeTradeViewModelFactory);
             Guard.ArgumentNotNull(() => captchaRegistrator);
+            Guard.ArgumentNotNull(() => historicalTradesViewModel);
             Guard.ArgumentNotNull(() => poeQueryInfoToQueryConverter);
             Guard.ArgumentNotNull(() => poeItemsComparer);
             Guard.ArgumentNotNull(() => clock);
+            Guard.ArgumentNotNull(() => uiScheduler);
 
             this.poeTradeViewModelFactory = poeTradeViewModelFactory;
             this.poeItemsComparer = poeItemsComparer;
@@ -219,11 +221,7 @@
         public void Refresh()
         {
             var activeProvider = activeProviderInfo;
-            if (activeProvider.HistoryProvider == null)
-            {
-                return;
-            }
-            activeProvider.HistoryProvider.Refresh();
+            activeProvider.HistoryProvider?.Refresh();
         }
 
         private void OnErrorReceived(Exception exception)

@@ -2,6 +2,8 @@ namespace PoeEyeUi.Config
 {
     using System;
     using System.IO;
+    using System.Reactive.Linq;
+    using System.Reactive.Subjects;
     using System.Text;
 
     using Converters;
@@ -15,10 +17,13 @@ namespace PoeEyeUi.Config
     using PoeShared.DumpToText;
     using PoeShared.PoeTrade;
     using PoeShared.PoeTrade.Query;
+    using PoeShared.Utilities;
 
     using PoeTrade.Models;
 
-    internal sealed class PoeEyeConfigProviderFromFile : IPoeEyeConfigProvider<IPoeEyeConfig>
+    using ReactiveUI;
+
+    internal sealed class PoeEyeConfigProviderFromFile : DisposableReactiveObject, IPoeEyeConfigProvider
     {
 #if DEBUG
         private static readonly string ConfigFilePath = Environment.ExpandEnvironmentVariables($@"%APPDATA%\PoeEye\configDebugMode.cfg");
@@ -27,7 +32,9 @@ namespace PoeEyeUi.Config
 #endif
 
         private readonly JsonSerializerSettings jsonSerializerSettings;
-        private readonly Lazy<IPoeEyeConfig> poeEyeConfigLoader; 
+        private readonly IObservable<IPoeEyeConfig> actualConfigSubject;
+
+        private Lazy<IPoeEyeConfig> poeEyeConfigLoader;
 
         public PoeEyeConfigProviderFromFile()
         {
@@ -43,7 +50,15 @@ namespace PoeEyeUi.Config
             jsonSerializerSettings.Converters.Add(new ConcreteListTypeConverter<IPoeQueryModsGroup, PoeQueryModsGroup>());
             jsonSerializerSettings.Converters.Add(new ConcreteListTypeConverter<IPoeQueryRangeModArgument, PoeQueryRangeModArgument>());
 
+            Reload();
+        }
+
+        public IPoeEyeConfig ActualConfig => poeEyeConfigLoader.Value;
+
+        public void Reload()
+        {
             poeEyeConfigLoader = new Lazy<IPoeEyeConfig>(LoadInternal);
+            this.RaisePropertyChanged(nameof(ActualConfig));
         }
 
         public void Save(IPoeEyeConfig config)
@@ -65,6 +80,8 @@ namespace PoeEyeUi.Config
                     Directory.CreateDirectory(directoryPath);
                 }
                 File.WriteAllText(ConfigFilePath, serializedData, Encoding.Unicode);
+
+                Reload();
             }
             catch (Exception ex)
             {
@@ -72,11 +89,6 @@ namespace PoeEyeUi.Config
                     $"[PoeEyeConfigProviderFromFile.Save] Exception occurred, config was not save correctly",
                     ex);
             }
-        }
-
-        public IPoeEyeConfig Load()
-        {
-            return poeEyeConfigLoader.Value;
         }
 
         private IPoeEyeConfig LoadInternal()

@@ -28,7 +28,7 @@
                 .RegisterType<IPoePriceCalculcator, PoePriceCalculcator>(new ContainerControlledLifetimeManager())
                 .RegisterType<IAudioNotificationsManager, AudioNotificationsManager>(new ContainerControlledLifetimeManager())
                 .RegisterType<IWhispersNotificationManager, WhispersNotificationManager>(new ContainerControlledLifetimeManager())
-                .RegisterType<IPoeEyeConfigProvider<IPoeEyeConfig>, PoeEyeConfigProviderFromFile>(new ContainerControlledLifetimeManager())
+                .RegisterType<IPoeEyeConfigProvider, PoeEyeConfigProviderFromFile>(new ContainerControlledLifetimeManager())
                 .RegisterType<IDialogCoordinator, DialogCoordinator>(new ContainerControlledLifetimeManager());
 
             Container
@@ -39,14 +39,14 @@
                 .RegisterType<IMainWindowViewModel, MainWindowViewModel>(new ContainerControlledLifetimeManager())
                 .RegisterType<IPoeCaptchaRegistrator, PoeCaptchaRegistrator>(new ContainerControlledLifetimeManager())
                 .RegisterType<IPoeTradeViewModel, PoeTradeViewModel>()
+                .RegisterType<IMainWindowTabViewModel, MainWindowTabViewModel>()
                 .RegisterType<IPoeModViewModel, PoeModViewModel>()
                 .RegisterType<IPoeModsEditorViewModel, PoeModsEditorViewModel>()
                 .RegisterType<IPoeModGroupsEditorViewModel, PoeModGroupsEditorViewModel>()
                 .RegisterType<IPoeTradeCaptchaViewModel, PoeTradeCaptchaViewModel>()
                 .RegisterType<IHistoricalTradesViewModel, HistoricalTradesViewModel>()
                 .RegisterType<IRecheckPeriodViewModel, RecheckPeriodViewModel>()
-                .RegisterType<ISuggestionProvider, FuzzySuggestionProvider>()
-                .RegisterType<IPoeEyeConfig>(new InjectionFactory(x => x.Resolve<IPoeEyeConfigProvider<IPoeEyeConfig>>().Load()));
+                .RegisterType<ISuggestionProvider, FuzzySuggestionProvider>();
 
             Container
                 .RegisterType<IWindowTracker, WindowTracker>();

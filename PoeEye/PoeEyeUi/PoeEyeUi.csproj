@@ -272,6 +272,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Config\IConfigProvider.cs" />
     <Compile Include="Converters\ConcreteListTypeConverter.cs" />
     <Compile Include="Config\IPoeEyeConfig.cs" />
     <Compile Include="Config\IPoeEyeConfigProvider.cs" />
@@ -309,6 +310,7 @@
     <Compile Include="PoeTrade\ViewModels\ApplicationUpdaterViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\HistoricalTradesViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\IHistoricalTradesViewModel.cs" />
+    <Compile Include="PoeTrade\ViewModels\IMainWindowTabViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\IMainWindowViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\IPoeModGroupsEditorViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\IPoeModsEditorViewModel.cs" />

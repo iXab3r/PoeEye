@@ -23,7 +23,7 @@
 
     using ReactiveUI;
 
-    internal sealed class MainWindowTabViewModel : DisposableReactiveObject
+    internal sealed class MainWindowTabViewModel : DisposableReactiveObject, IMainWindowTabViewModel
     {
         private static int GlobalTabIdx = 0;
 
@@ -37,23 +37,23 @@
         private string tabName;
 
         public MainWindowTabViewModel(
-            [NotNull] PoeTradesListViewModel tradesListViewModel,
+            [NotNull] PoeTradesListViewModel tradesList,
             [NotNull] IAudioNotificationsManager audioNotificationsManager,
-            [NotNull] IRecheckPeriodViewModel recheckPeriodViewModel,
+            [NotNull] IRecheckPeriodViewModel recheckPeriod,
             [NotNull] [Dependency(WellKnownWindows.Main)] IWindowTracker mainWindowTracker,
-            [NotNull] PoeQueryViewModel queryViewModel)
+            [NotNull] PoeQueryViewModel query)
         {
-            Guard.ArgumentNotNull(() => tradesListViewModel);
+            Guard.ArgumentNotNull(() => tradesList);
             Guard.ArgumentNotNull(() => mainWindowTracker);
             Guard.ArgumentNotNull(() => audioNotificationsManager);
-            Guard.ArgumentNotNull(() => queryViewModel);
+            Guard.ArgumentNotNull(() => query);
 
             tabHeader = $"Tab #{GlobalTabIdx++}";
 
-            TradesListViewModel = tradesListViewModel;
-            tradesListViewModel.AddTo(Anchors);
+            TradesList = tradesList;
+            tradesList.AddTo(Anchors);
 
-            RecheckPeriodViewModel = recheckPeriodViewModel;
+            RecheckPeriod = recheckPeriod;
 
             searchCommand = ReactiveCommand.Create();
             searchCommand.Subscribe(SearchCommandExecute);
@@ -61,18 +61,18 @@
             markAllAsRead = ReactiveCommand.Create();
             markAllAsRead.Subscribe(MarkAllAsReadExecute);
 
-            refreshCommand = ReactiveCommand.Create(TradesListViewModel.WhenAnyValue(x => x.IsBusy).Select(x => !x));
+            refreshCommand = ReactiveCommand.Create(TradesList.WhenAnyValue(x => x.IsBusy).Select(x => !x));
             refreshCommand.Subscribe(RefreshCommandExecuted);
 
-            tradesListViewModel
+            tradesList
                 .WhenAnyValue(x => x.IsBusy)
                 .Subscribe(() => this.RaisePropertyChanged(nameof(IsBusy)))
                 .AddTo(Anchors);
 
-            QueryViewModel = queryViewModel;
+            Query = query;
 
-            TradesListViewModel.TradesList.ItemChanged.ToUnit()
-                               .Merge(TradesListViewModel.TradesList.Changed.ToUnit())
+            TradesList.TradesList.ItemChanged.ToUnit()
+                               .Merge(TradesList.TradesList.Changed.ToUnit())
                                .Subscribe(() =>
                                           {
                                               this.RaisePropertyChanged(nameof(NewItemsCount));
@@ -90,21 +90,21 @@
                 .Subscribe(x => audioNotificationsManager.PlayNotification(AudioNotificationType.NewItem), Log.HandleException)
                 .AddTo(Anchors);
 
-            QueryViewModel.ObservableForProperty(x => x.PoeQueryBuilder)
+            Query.ObservableForProperty(x => x.PoeQueryBuilder)
                           .ToUnit()
                           .StartWith(Unit.Default)
                           .Subscribe(RebuildTabName)
                           .AddTo(Anchors);
 
-            RecheckPeriodViewModel
+            RecheckPeriod
                 .WhenAny(x => x.RecheckValue, x => x.IsAutoRecheckEnabled, (x, y) => Unit.Default)
-                .Subscribe(x => TradesListViewModel.RecheckPeriod = RecheckPeriodViewModel.IsAutoRecheckEnabled ? RecheckPeriodViewModel.RecheckValue : TimeSpan.Zero)
+                .Subscribe(x => TradesList.RecheckPeriod = RecheckPeriod.IsAutoRecheckEnabled ? RecheckPeriod.RecheckValue : TimeSpan.Zero)
                 .AddTo(Anchors);
         }
 
-        public PoeTradesListViewModel TradesListViewModel { get; }
+        public IPoeTradesListViewModel TradesList { get; }
 
-        public IRecheckPeriodViewModel RecheckPeriodViewModel { get; }
+        public IRecheckPeriodViewModel RecheckPeriod { get; }
 
         public ICommand SearchCommand => searchCommand;
 
@@ -112,7 +112,7 @@
 
         public ICommand MarkAllAsRead => markAllAsRead;
 
-        public bool IsBusy => TradesListViewModel.IsBusy;
+        public bool IsBusy => TradesList.IsBusy;
 
         public bool AudioNotificationEnabled
         {
@@ -130,25 +130,25 @@
 
         public int NewItemsCount
         {
-            get { return TradesListViewModel.TradesList.Count(x => x.TradeState == PoeTradeState.New); }
+            get { return TradesList.TradesList.Count(x => x.TradeState == PoeTradeState.New); }
         }
 
         public int RemovedItemsCount
         {
-            get { return TradesListViewModel.TradesList.Count(x => x.TradeState == PoeTradeState.Removed); }
+            get { return TradesList.TradesList.Count(x => x.TradeState == PoeTradeState.Removed); }
         }
 
         public int NormalItemsCount
         {
-            get { return TradesListViewModel.TradesList.Count(x => x.TradeState == PoeTradeState.Normal); }
+            get { return TradesList.TradesList.Count(x => x.TradeState == PoeTradeState.Normal); }
         }
 
-        public PoeQueryViewModel QueryViewModel { get; }
+        public PoeQueryViewModel Query { get; }
 
         private void RebuildTabName()
         {
-            Log.Instance.Debug($"[MainWindowTabViewModel.RebuildTabName] Rebuilding tab name, tabQueryMode: {QueryViewModel}...");
-            var queryDescription = QueryViewModel.Description;
+            Log.Instance.Debug($"[MainWindowTabViewModel.RebuildTabName] Rebuilding tab name, tabQueryMode: {Query}...");
+            var queryDescription = Query.Description;
             TabName = string.IsNullOrWhiteSpace(queryDescription)
                 ? tabHeader
                 : $"{queryDescription}";
@@ -156,7 +156,7 @@
 
         private void RefreshCommandExecuted(object arg)
         {
-            TradesListViewModel.Refresh();
+            TradesList.Refresh();
         }
 
         private void SearchCommandExecute(object arg)
@@ -169,23 +169,23 @@
             var query = queryBuilder();
             Log.Instance.Debug($"[MainWindowTabViewModel.SearchCommandExecute] Search command executed, running query\r\n{query.DumpToText()}");
 
-            TradesListViewModel.TradesList.Clear();
-            TradesListViewModel.ActiveQuery = query;
+            TradesList.TradesList.Clear();
+            TradesList.ActiveQuery = query;
             RebuildTabName();
-            QueryViewModel.IsExpanded = false;
+            Query.IsExpanded = false;
 
-            if (TradesListViewModel.RecheckPeriod == TimeSpan.Zero)
+            if (TradesList.RecheckPeriod == TimeSpan.Zero)
             {
                 Log.Instance.Debug($"[MainWindowTabViewModel.SearchCommandExecute] Auto-recheck is disabled, refreshing query manually...");
-                TradesListViewModel.Refresh();
+                TradesList.Refresh();
             }
         }
 
         private void MarkAllAsReadExecute(object arg)
         {
-            using (TradesListViewModel.TradesList.SuppressChangeNotifications())
+            using (TradesList.TradesList.SuppressChangeNotifications())
             {
-                foreach (var trade in TradesListViewModel.TradesList.ToArray())
+                foreach (var trade in TradesList.TradesList.ToArray())
                 {
                     trade.TradeState = PoeTradeState.Normal;
                 }

@@ -334,8 +334,7 @@
                             <StackPanel Grid.Column="3" 
                                         Margin="10,2">
 
-                                <Button Height="16" 
-                                        Width="100"
+                                <Button Width="80"
                                         Command="{Binding VerifyItemCommand}">
                                     <Button.Style>
                                         <Style BasedOn="{StaticResource {x:Type Button}}" TargetType="{x:Type Button}">
@@ -364,7 +363,6 @@
 
                             <Button Grid.Column="5" 
                                     Margin="10,2"
-                                    Height="16"
                                     Content="Go to forum thread" Command="{Binding OpenForumUriCommand}" />
 
                             <Ellipse Grid.Column="6" 

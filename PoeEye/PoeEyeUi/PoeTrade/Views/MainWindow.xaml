@@ -88,10 +88,10 @@
 
                 <TextBlock Grid.Column="1"  
                            Margin="10,0,0,0" 
-                           Visibility="{Binding SelectedItem.TradesListViewModel.ActiveQuery, Converter={StaticResource NullToCollapsedConverter}}"
-                           Text="{Binding SelectedItem.TradesListViewModel.TimeSinceLastUpdate.TotalSeconds, Mode=OneWay, StringFormat='Elapsed since last update: {0:F0}s'}"/>
+                           Visibility="{Binding SelectedItem.TradesList.ActiveQuery, Converter={StaticResource NullToCollapsedConverter}}"
+                           Text="{Binding SelectedItem.TradesList.TimeSinceLastUpdate.TotalSeconds, Mode=OneWay, StringFormat='Elapsed since last update: {0:F0}s'}"/>
 
-                <ContentPresenter Grid.Column="2"  Content="{Binding SelectedItem.RecheckPeriodViewModel}" />
+                <ContentPresenter Grid.Column="2"  Content="{Binding SelectedItem.RecheckPeriod}" />
 
             </Grid>
         </Border>
@@ -195,6 +195,7 @@
                              Position="Right"
                              Width="300"
                              Margin="0, 20"
+                             IsOpen="{Binding SettingsFlyoutIsOpen}"
                              BorderBrush="{StaticResource AccentColorBrush}">
 
                 <Grid Margin="5,0">
