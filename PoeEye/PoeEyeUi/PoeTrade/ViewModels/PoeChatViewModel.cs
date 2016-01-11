@@ -29,6 +29,7 @@
             
             whispers.Messages
                 .ObserveOn(uiScheduler)
+                .Where(x => x.MessageType == PoeMessageType.Whisper)
                 .Subscribe(ProcessMessage)
                 .AddTo(Anchors);
         } 

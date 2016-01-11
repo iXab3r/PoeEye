@@ -6,6 +6,7 @@
     using System.Reactive.Linq;
     using System.Reactive.Subjects;
     using System.Runtime.CompilerServices;
+    using System.Text;
 
     using Guards;
 
@@ -17,6 +18,8 @@
 
     internal sealed class StreamTracker : DisposableReactiveObject
     {
+        private static readonly int BufferSize = 2048;
+
         private readonly TrackingStream trackingStream;
 
         public ISubject<string> Lines { get; } = new Subject<string>();
@@ -59,7 +62,7 @@
                 return new string[0];
             }
 
-            using (var reader = new StreamLinesReader(trackingStream))
+            using (var reader = new StreamLinesReader(trackingStream, Encoding.UTF8, BufferSize))
             {
                 var lines = reader.ReadLines().ToArray();
 

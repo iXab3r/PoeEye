@@ -12,6 +12,7 @@
                 <Setter Property="Background" Value="Transparent"/>
                 <Setter Property="Padding" Value="0,0,0,0"/>
                 <Setter Property="TextWrapping" Value="WrapWithOverflow"/>
+                <Setter Property="FontFamily" Value="Segoe UI"/>
             </Style>
         </DataTemplate.Resources>
         
@@ -35,8 +36,6 @@
                 </TextBox.Text>
             </TextBox>
         </Grid>
-
-    
     </DataTemplate>
 
     <DataTemplate DataType="{x:Type viewModels:PoeChatViewModel}">
