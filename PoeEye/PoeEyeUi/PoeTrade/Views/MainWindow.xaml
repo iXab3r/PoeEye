@@ -130,6 +130,18 @@
                     Content="Check for updates" />
 
                 <StackPanel Orientation="Horizontal" Height="24" Margin="5,0">
+                    <Button Content="&#xF1D7; Chat" FontFamily="{StaticResource FontAwesome}">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="Click">
+                                <utilities:SetPropertyAction PropertyName="IsOpen" 
+                                                             TargetObject="{Binding ElementName=ChatFlyout}"
+                                                             PropertyValue="{Binding ElementName=ChatFlyout, Path=IsOpen, Converter={StaticResource BoolInversionConverter}}" >
+
+                                </utilities:SetPropertyAction>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </Button>
+
                     <Button Content="&#xF085; Settings" FontFamily="{StaticResource FontAwesome}">
                         <i:Interaction.Triggers>
                             <i:EventTrigger EventName="Click">
@@ -250,8 +262,21 @@
                         </ItemsControl>
                     </StackPanel>
                 </Grid>
+            </controls:Flyout>
 
-
+            <controls:Flyout Header="&#xF1D7; Chat" x:Name="ChatFlyout"
+                             FontFamily="{StaticResource FontAwesome}"
+                             Position="Right"
+                             Width="500"
+                             Margin="0, 20"
+                             BorderBrush="{StaticResource AccentColorBrush}">
+                <Grid Margin="5,0">
+                    <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Visible">
+                        <ScrollViewer.Content>
+                            <ContentPresenter Content="{Binding Chat}" Margin="10" HorizontalAlignment="Stretch" />
+                        </ScrollViewer.Content>
+                    </ScrollViewer>
+                </Grid>
             </controls:Flyout>
 
             <controls:Flyout Header="&#xF188; You must resolve CAPTCHA to proceed" x:Name="CaptchaFlyout"

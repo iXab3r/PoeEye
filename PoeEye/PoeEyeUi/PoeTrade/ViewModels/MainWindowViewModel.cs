@@ -65,6 +65,7 @@
             [NotNull] PoeClipboardParserViewModel clipboardParserViewModel,
             [NotNull] ProxyProviderViewModel proxyProviderViewModel,
             [NotNull] IPoeTradeCaptchaViewModel captchaViewModel,
+            [NotNull] IPoeChatViewModel chatViewModel,
             [NotNull] IWhispersNotificationManager whispersNotificationManager,
             [NotNull] IDialogCoordinator dialogCoordinator,
             [NotNull] [Dependency(WellKnownSchedulers.Ui)] IScheduler uiScheduler)
@@ -90,6 +91,9 @@
 
             PoeTradeCaptchaViewModel = captchaViewModel;
             captchaViewModel.AddTo(Anchors);
+
+            Chat = chatViewModel;
+            chatViewModel.AddTo(Anchors);
 
             ApplicationUpdater = applicationUpdaterViewModel;
             applicationUpdaterViewModel.AddTo(Anchors);
@@ -157,6 +161,8 @@
         public ProxyProviderViewModel ProxyProviderViewModel { get; }
 
         public IPoeTradeCaptchaViewModel PoeTradeCaptchaViewModel { get; }
+
+        public IPoeChatViewModel Chat { get; }
 
         public bool SettingsFlyoutIsOpen
         {

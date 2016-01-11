@@ -41,6 +41,7 @@
                 .RegisterType<IPoeTradeViewModel, PoeTradeViewModel>()
                 .RegisterType<IMainWindowTabViewModel, MainWindowTabViewModel>()
                 .RegisterType<IPoeModViewModel, PoeModViewModel>()
+                .RegisterType<IPoeChatViewModel, PoeChatViewModel>()
                 .RegisterType<IPoeModsEditorViewModel, PoeModsEditorViewModel>()
                 .RegisterType<IPoeModGroupsEditorViewModel, PoeModGroupsEditorViewModel>()
                 .RegisterType<IPoeTradeCaptchaViewModel, PoeTradeCaptchaViewModel>()
