@@ -67,6 +67,8 @@
       <HintPath>..\packages\Unity.3.5.1404.0\lib\net45\Microsoft.Practices.Unity.RegistrationByConvention.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
     <Reference Include="ReactiveUI, Version=6.5.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\reactiveui-core.6.5.0\lib\Net45\ReactiveUI.dll</HintPath>
       <Private>True</Private>
@@ -180,6 +182,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RandomNumberGenerator.cs" />
     <Compile Include="Utilities\CompositeDisposableExtensions.cs" />
+    <Compile Include="Utilities\DataPipe.cs" />
+    <Compile Include="Utilities\DataPipeCollection.cs" />
+    <Compile Include="Utilities\DataPiping.cs" />
     <Compile Include="Utilities\DisposableReactiveObject.cs" />
     <Compile Include="Utilities\EnumerableExtensions.cs" />
     <Compile Include="Utilities\IObservableExtensions.cs" />

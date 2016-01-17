@@ -1,4 +1,4 @@
-namespace PoeEyeUi.Utilities
+namespace PoeShared.Utilities
 {
     using System.Windows;
 

@@ -182,7 +182,6 @@
                     }
                 }
             }
-
             lastUpdateTimestamp = clock.CurrentTime;
         }
 

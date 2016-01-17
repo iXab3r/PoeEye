@@ -62,18 +62,6 @@
     <StartupObject>PoeEyeUi.App</StartupObject>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Awesomium.Core">
-      <HintPath>..\packages\Awesomium.NetWrapper.Unofficial.1.7.5.0\lib\Awesomium.Core.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Awesomium.Windows.Controls">
-      <HintPath>..\packages\Awesomium.NetWrapper.Unofficial.1.7.5.0\lib\Awesomium.Windows.Controls.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Awesomium.Windows.Forms">
-      <HintPath>..\packages\Awesomium.NetWrapper.Unofficial.1.7.5.0\lib\Awesomium.Windows.Forms.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="Blue.MVVM.Converter, Version=1.4.3.26888, Culture=neutral, PublicKeyToken=1bb1db17d606db59, processorArchitecture=MSIL">
       <HintPath>..\packages\Blue.MVVM.Converter.1.4.3\lib\net45\Blue.MVVM.Converter.dll</HintPath>
       <Private>True</Private>
@@ -340,9 +328,6 @@
     <Compile Include="Prism\WellKnownSchedulers.cs" />
     <Compile Include="Prism\WellKnownWindows.cs" />
     <Compile Include="ResourceKeys.cs" />
-    <Compile Include="Utilities\DataPiping.cs" />
-    <Compile Include="Utilities\DataPipe.cs" />
-    <Compile Include="Utilities\DataPipeCollection.cs" />
     <Compile Include="Utilities\EditableTuple.cs" />
     <Compile Include="Utilities\FilterExtension\CollectionViewSourceFilteringBehavior.cs" />
     <Compile Include="Utilities\FilterExtension\IFilter.cs" />
@@ -372,18 +357,6 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <None Include="..\packages\Awesomium.NetWrapper.Unofficial.1.7.5.0\lib\awesomium_process">
-      <Link>awesomium_process</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\packages\Awesomium.NetWrapper.Unofficial.1.7.5.0\lib\inspector.pak">
-      <Link>inspector.pak</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="..\packages\Awesomium.NetWrapper.Unofficial.1.7.5.0\lib\pdf_js.pak">
-      <Link>pdf_js.pak</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -414,6 +387,10 @@
     <ProjectReference Include="..\PoeWhisperMonitor\PoeWhisperMonitor.csproj">
       <Project>{75b4a3db-45c0-4639-b5a3-4d180ad4b9fb}</Project>
       <Name>PoeWhisperMonitor</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\WpfAwesomium\WpfAwesomium.csproj">
+      <Project>{61497f0d-f122-4a25-81c0-53c27c699f0c}</Project>
+      <Name>WpfAwesomium</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -603,38 +580,6 @@
     <Resource Include="Resources\Currencies\Cartographer%27s_Chisel.png" />
     <Resource Include="Resources\Currencies\Chaos_Orb.png" />
     <Resource Include="Resources\Currencies\Chromatic_Orb.png" />
-    <None Include="..\packages\Awesomium.NetWrapper.Unofficial.1.7.5.0\lib\avcodec-53.dll">
-      <Link>avcodec-53.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\packages\Awesomium.NetWrapper.Unofficial.1.7.5.0\lib\avformat-53.dll">
-      <Link>avformat-53.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\packages\Awesomium.NetWrapper.Unofficial.1.7.5.0\lib\avutil-51.dll">
-      <Link>avutil-51.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\packages\Awesomium.NetWrapper.Unofficial.1.7.5.0\lib\awesomium.dll">
-      <Link>awesomium.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\packages\Awesomium.NetWrapper.Unofficial.1.7.5.0\lib\icudt.dll">
-      <Link>icudt.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\packages\Awesomium.NetWrapper.Unofficial.1.7.5.0\lib\libEGL.dll">
-      <Link>libEGL.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\packages\Awesomium.NetWrapper.Unofficial.1.7.5.0\lib\libGLESv2.dll">
-      <Link>libGLESv2.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\packages\Awesomium.NetWrapper.Unofficial.1.7.5.0\lib\xinput9_1_0.dll">
-      <Link>xinput9_1_0.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Include="Resources\icq.wav" />
     <Content Include="Resources\minions-tadaa.wav" />
     <None Include="Resources\sounds-940-pizzicato.wav" />
@@ -684,11 +629,7 @@ foreach (var item in filesToCleanup)
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\Fody.1.29.3\build\portable-net+sl+win+wpa+wp\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Fody.1.29.3\build\portable-net+sl+win+wpa+wp\Fody.targets'))" />
-    <Error Condition="!Exists('..\packages\cef.redist.x64.3.2454.1344\build\cef.redist.x64.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\cef.redist.x64.3.2454.1344\build\cef.redist.x64.targets'))" />
-    <Error Condition="!Exists('..\packages\cef.redist.x86.3.2454.1344\build\cef.redist.x86.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\cef.redist.x86.3.2454.1344\build\cef.redist.x86.targets'))" />
   </Target>
-  <Import Project="..\packages\cef.redist.x64.3.2454.1344\build\cef.redist.x64.targets" Condition="Exists('..\packages\cef.redist.x64.3.2454.1344\build\cef.redist.x64.targets')" />
-  <Import Project="..\packages\cef.redist.x86.3.2454.1344\build\cef.redist.x86.targets" Condition="Exists('..\packages\cef.redist.x86.3.2454.1344\build\cef.redist.x86.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

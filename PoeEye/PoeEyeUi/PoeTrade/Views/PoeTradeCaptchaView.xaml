@@ -1,25 +1,24 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:viewModels="clr-namespace:PoeEyeUi.PoeTrade.ViewModels"
-                    xmlns:utilities="clr-namespace:PoeEyeUi.Utilities"
                     xmlns:sd="clr-namespace:System.Drawing;assembly=System.Drawing"
-                    xmlns:forms="clr-namespace:Awesomium.Windows.Forms;assembly=Awesomium.Windows.Forms"
-                    xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls">
-    <DataTemplate DataType="{x:Type viewModels:PoeTradeCaptchaViewModel}">
-        <Grid>
-            <utilities:DataPiping.DataPipes>
-                <utilities:DataPipeCollection>
-                    <utilities:DataPipe Source="{Binding ElementName=WebBrowser}"
-                                        Target="{Binding Browser, Mode=OneWayToSource}"/>
-                </utilities:DataPipeCollection>
-            </utilities:DataPiping.DataPipes>
+                    xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
+                    xmlns:wpfAwesomium="clr-namespace:WpfAwesomium;assembly=WpfAwesomium"
+                    xmlns:utilities="clr-namespace:PoeShared.Utilities;assembly=PoeShared">
+  <DataTemplate DataType="{x:Type viewModels:PoeTradeCaptchaViewModel}">
+    <Grid>
+      <utilities:DataPiping.DataPipes>
+        <utilities:DataPipeCollection>
+          <utilities:DataPipe Source="{Binding ElementName=WebBrowser}" Target="{Binding Browser, Mode=OneWayToSource}"/>
+        </utilities:DataPipeCollection>
+      </utilities:DataPiping.DataPipes>
 
-            <controls:ProgressRing IsActive="{Binding IsBusy}" Visibility="{Binding IsBusy, Converter={StaticResource BoolFalseToCollapsedConverter}}" />
+      <controls:ProgressRing IsActive="{Binding IsBusy}" Visibility="{Binding IsBusy, Converter={StaticResource BoolFalseToCollapsedConverter}}" />
 
-            <WindowsFormsHost Margin="10,10" IsEnabled="{Binding IsBusy, Converter={StaticResource BoolInversionConverter}}" Visibility="{Binding IsBusy, Converter={StaticResource BoolTrueToCollapsedConverter}}">
-                <forms:WebControl x:Name="WebBrowser" BackgroundImageLayout="None" IsTransparent="True" ViewType="Offscreen" Dock="Fill"/>
-            </WindowsFormsHost>
-
-        </Grid>
-    </DataTemplate>
+      <wpfAwesomium:WpfChromium x:Name="WebBrowser" Margin="10,10" 
+                                IsEnabled="{Binding IsBusy, Converter={StaticResource BoolInversionConverter}}"
+                                Visibility="{Binding IsBusy, Converter={StaticResource BoolTrueToCollapsedConverter}}"
+                                IsBusy="{Binding IsBusy, Mode=OneWayToSource}"  />
+    </Grid>
+  </DataTemplate>
 </ResourceDictionary>

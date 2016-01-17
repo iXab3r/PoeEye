@@ -166,7 +166,6 @@
             {
                 return false;
             }
-
             return queryResult.Contains("Enter captcha and press the button");
         }
     }
