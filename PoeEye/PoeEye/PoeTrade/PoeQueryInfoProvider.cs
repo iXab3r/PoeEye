@@ -1,10 +1,6 @@
-﻿namespace PoeEye.PoeTrade.Query
+﻿namespace PoeEye.PoeTrade
 {
     using System;
-    using System.Collections.Generic;
-    using System.Collections.Specialized;
-    using System.Linq;
-    using System.Reactive.Linq;
 
     using Guards;
 
@@ -12,7 +8,6 @@
 
     using PoeShared;
     using PoeShared.Common;
-    using PoeShared.Http;
     using PoeShared.PoeTrade;
     using PoeShared.PoeTrade.Query;
 

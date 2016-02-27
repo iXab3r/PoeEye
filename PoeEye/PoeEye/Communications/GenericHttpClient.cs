@@ -17,8 +17,8 @@
 
     using JetBrains.Annotations;
 
-    using PoeShared.DumpToText;
     using PoeShared.Http;
+    using PoeShared.Utilities;
 
     using TypeConverter;
 
@@ -86,7 +86,7 @@
         {
             var postData = nameValueConverter.Convert(args);
             Log.Instance.Debug($"[HttpClient] Querying uri '{uri}', args: \r\nPOST: {postData}");
-            Log.Instance.Trace($"[HttpClient] Splitted POST data dump: {postData.SplitClean('&').DumpToTextValue()}");
+            Log.Instance.Trace($"[HttpClient] Splitted POST data dump: {postData.SplitClean('&').DumpToText()}");
 
             var httpClient = WebRequest.CreateHttp(uri);
             httpClient.CookieContainer = new CookieContainer();

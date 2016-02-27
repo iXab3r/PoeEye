@@ -1,8 +1,6 @@
-﻿namespace PoeEye
+﻿namespace PoeShared
 {
     using System;
-
-    using PoeShared;
 
     internal sealed class Clock : IClock
     {

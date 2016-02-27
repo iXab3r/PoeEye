@@ -18,7 +18,6 @@
     using JetBrains.Annotations;
 
     using PoeShared;
-    using PoeShared.DumpToText;
     using PoeShared.Utilities;
 
     using ReactiveUI;
@@ -53,7 +52,7 @@
             {
                 currencyByType[kvp.Key] = kvp.Value;
             }
-            Log.Instance.Debug($"[PriceCalculcator] Currencies list:\r\n{currencyByType.DumpToTextValue()}");
+            Log.Instance.Debug($"[PriceCalculcator] Currencies list:\r\n{currencyByType.DumpToText()}");
         }
 
         public float? GetEquivalentInChaosOrbs(string rawPrice)
@@ -73,7 +72,7 @@
             if (!currencyByType.TryGetValue(price.CurrencyType, out currencyMultilplier))
             {
                 Log.Instance.Debug(
-                    $"[PriceCalculcator] Could not convert currency type '{price.CurrencyType}' to multiplier, rawPrice: {rawPrice}\r\nMultipliers:{currencyByType.DumpToTextValue()}");
+                    $"[PriceCalculcator] Could not convert currency type '{price.CurrencyType}' to multiplier, rawPrice: {rawPrice}\r\nMultipliers:{currencyByType.DumpToText()}");
                 return null;
             }
 

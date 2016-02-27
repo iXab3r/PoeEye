@@ -118,10 +118,6 @@
       <HintPath>..\packages\squirrel.windows.1.0.2\lib\Net45\ICSharpCode.SharpZipLib.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="IFactory, Version=0.1.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\IFactory.0.1.2\lib\net45\IFactory.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="JetBrains.Annotations, Version=10.0.0.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
       <HintPath>..\packages\JetBrains.Annotations.10.0.0\lib\net20\JetBrains.Annotations.dll</HintPath>
       <Private>True</Private>
@@ -265,7 +261,7 @@
     <Compile Include="Config\IPoeEyeConfig.cs" />
     <Compile Include="Config\IPoeEyeConfigProvider.cs" />
     <Compile Include="Config\PoeEyeConfig.cs" />
-    <Compile Include="Config\PoeEyeConfigProvider.cs" />
+    <Compile Include="Config\PoeEyeConfigProviderFromFile.cs" />
     <Compile Include="Config\PoeEyeTabConfig.cs" />
     <Compile Include="Converters\BoolInversionConverter.cs" />
     <Compile Include="Converters\NullToBoolConverter.cs" />

@@ -11,8 +11,6 @@
 
     using Config;
 
-    using Factory;
-
     using Guards;
 
     using JetBrains.Annotations;
@@ -24,8 +22,8 @@
     using Models;
 
     using PoeShared;
-    using PoeShared.DumpToText;
     using PoeShared.PoeTrade;
+    using PoeShared.Prism;
     using PoeShared.Utilities;
 
     using Prism;
@@ -276,7 +274,7 @@
             var config = poeEyeConfigProvider.ActualConfig;
             poeEyeConfigProvider.Save(config);
 
-            Log.Instance.Debug($"[MainWindowViewModel.LoadConfig] Received configuration DTO:\r\n{config.DumpToTextValue()}");
+            Log.Instance.Debug($"[MainWindowViewModel.LoadConfig] Received configuration DTO:\r\n{config.DumpToText()}");
 
             foreach (var tabConfig in config.TabConfigs)
             {

@@ -7,17 +7,15 @@
 
     using ConsoleDump;
 
-    using Factory;
-
     using Microsoft.Practices.Unity;
     using Microsoft.Practices.Unity.Utility;
 
     using PoeShared;
     using PoeShared.Common;
-    using PoeShared.DumpToText;
     using PoeShared.PoeTrade;
     using PoeShared.PoeTrade.Query;
     using PoeShared.Prism;
+    using PoeShared.Utilities;
 
     using PoeTrade;
 

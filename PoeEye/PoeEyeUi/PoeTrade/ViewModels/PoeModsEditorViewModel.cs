@@ -6,14 +6,13 @@ namespace PoeEyeUi.PoeTrade.ViewModels
     using System.Reactive.Linq;
     using System.Windows.Input;
 
-    using Factory;
-
     using Guards;
 
     using JetBrains.Annotations;
 
     using PoeShared.Common;
     using PoeShared.PoeTrade.Query;
+    using PoeShared.Prism;
     using PoeShared.Utilities;
 
     using ReactiveUI;

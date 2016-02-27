@@ -8,8 +8,6 @@
     using System.Reactive.Concurrency;
     using System.Reactive.Subjects;
 
-    using Factory;
-
     using Helpers;
 
     using NUnit.Framework;
@@ -24,6 +22,7 @@
     using PoeShared.Common;
     using PoeShared.PoeTrade;
     using PoeShared.PoeTrade.Query;
+    using PoeShared.Prism;
 
     using Shouldly;
 

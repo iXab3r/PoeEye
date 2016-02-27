@@ -4,8 +4,6 @@
 
     using Common;
 
-    using Factory;
-
     using Microsoft.Practices.Unity;
 
     using PoeDatabase;
@@ -26,6 +24,7 @@
                 .RegisterType<IRandomNumberGenerator, RandomNumberGenerator>(new ContainerControlledLifetimeManager());
 
             Container
+                .RegisterType<IClock, Clock>(new ContainerControlledLifetimeManager())
                 .RegisterType(typeof (IEqualityComparer<IPoeItem>), typeof (PoeItemEqualityComparer))
                 .RegisterType(typeof (IConverter<IPoeItem, IPoeQueryInfo>), typeof (PoeItemToPoeQueryConverter))
                 .RegisterType(typeof (IPoeModsProcessor), typeof(PoeModsProcessor))

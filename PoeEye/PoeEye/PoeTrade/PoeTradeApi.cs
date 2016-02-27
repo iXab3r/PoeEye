@@ -8,8 +8,6 @@
     using System.Threading;
     using System.Threading.Tasks;
 
-    using Factory;
-
     using Guards;
 
     using PoeShared;
@@ -17,6 +15,7 @@
     using PoeShared.Http;
     using PoeShared.PoeTrade;
     using PoeShared.PoeTrade.Query;
+    using PoeShared.Prism;
 
     using Properties;
 

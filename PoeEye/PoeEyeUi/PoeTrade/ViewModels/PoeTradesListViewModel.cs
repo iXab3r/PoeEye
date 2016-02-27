@@ -7,8 +7,6 @@
     using System.Reactive.Disposables;
     using System.Reactive.Linq;
 
-    using Factory;
-
     using Guards;
 
     using JetBrains.Annotations;
@@ -22,6 +20,7 @@
     using PoeShared.Exceptions;
     using PoeShared.PoeTrade;
     using PoeShared.PoeTrade.Query;
+    using PoeShared.Prism;
     using PoeShared.Utilities;
 
     using Prism;

@@ -14,7 +14,6 @@ namespace PoeEyeUi.Config
 
     using PoeShared;
     using PoeShared.Common;
-    using PoeShared.DumpToText;
     using PoeShared.PoeTrade;
     using PoeShared.PoeTrade.Query;
     using PoeShared.Utilities;
@@ -105,7 +104,7 @@ namespace PoeEyeUi.Config
             try
             {
                 var fileData = File.ReadAllText(ConfigFilePath);
-                Log.Instance.Debug($"[PoeEyeConfigProviderFromFile.Load] Successfully read {fileData.Length} chars, deserializing...:{fileData.DumpToTextValue()}");
+                Log.Instance.Debug($"[PoeEyeConfigProviderFromFile.Load] Successfully read {fileData.Length} chars, deserializing...:{fileData.DumpToText()}");
 
                 result = JsonConvert.DeserializeObject<PoeEyeConfig>(fileData, jsonSerializerSettings);
                 Log.Instance.Debug($"[PoeEyeConfigProviderFromFile.Load] Successfully deserialized config data");

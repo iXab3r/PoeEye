@@ -5,8 +5,6 @@
     using System.Linq;
     using System.Reflection;
 
-    using Factory;
-
     using Guards;
 
     using JetBrains.Annotations;
@@ -15,10 +13,11 @@
 
     using PoeShared;
     using PoeShared.Common;
-    using PoeShared.DumpToText;
     using PoeShared.PoeDatabase;
     using PoeShared.PoeTrade;
     using PoeShared.PoeTrade.Query;
+    using PoeShared.Prism;
+    using PoeShared.Utilities;
 
     using ReactiveUI;
 
@@ -642,14 +641,14 @@
                 {
                     throw new ApplicationException(
                         $"Exception occurred, property: {property}\r\n" +
-                        $"Settable properties: {settableProperties.Select(x => $"{x.PropertyType} {x.Name}").DumpToTextValue()}\r\n" +
-                        $"PropertiesToSet: {propertiesToSet.Select(x => $"{x.PropertyType} {x.Name}").DumpToTextValue()}",
+                        $"Settable properties: {settableProperties.Select(x => $"{x.PropertyType} {x.Name}").DumpToText()}\r\n" +
+                        $"PropertiesToSet: {propertiesToSet.Select(x => $"{x.PropertyType} {x.Name}").DumpToText()}",
                         ex);
                 }
             }
             if (skippedProperties.Any())
             {
-                Log.Instance.Debug($"[TransferProperties] Skipped following properties:\r\n{skippedProperties.Select(x => $"{x.PropertyType} {x.Name}").DumpToTextValue()}");
+                Log.Instance.Debug($"[TransferProperties] Skipped following properties:\r\n{skippedProperties.Select(x => $"{x.PropertyType} {x.Name}").DumpToText()}");
             }
         }
 

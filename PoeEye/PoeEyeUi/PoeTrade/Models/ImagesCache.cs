@@ -13,8 +13,6 @@
     using System.Text;
     using System.Threading;
 
-    using Factory;
-
     using Guards;
 
     using JetBrains.Annotations;
@@ -23,6 +21,7 @@
 
     using PoeShared;
     using PoeShared.Http;
+    using PoeShared.Prism;
 
     using Prism;
 

@@ -9,8 +9,6 @@
     using System.Windows;
     using System.Windows.Input;
 
-    using Factory;
-
     using Guards;
 
     using JetBrains.Annotations;
@@ -23,6 +21,7 @@
 
     using PoeShared;
     using PoeShared.Common;
+    using PoeShared.Prism;
 
     using ReactiveUI;
 

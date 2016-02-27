@@ -5,8 +5,6 @@
     using System.Reactive.Threading.Tasks;
     using System.Threading.Tasks;
 
-    using Factory;
-
     using Guards;
 
     using JetBrains.Annotations;
@@ -14,6 +12,7 @@
     using PoeShared;
     using PoeShared.Common;
     using PoeShared.Http;
+    using PoeShared.Prism;
 
     internal sealed class PoeItemVerifier : IPoeItemVerifier
     {

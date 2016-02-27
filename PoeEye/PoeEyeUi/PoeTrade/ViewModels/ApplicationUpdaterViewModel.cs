@@ -26,7 +26,6 @@
     using PoeEye.Prism;
 
     using PoeShared;
-    using PoeShared.DumpToText;
     using PoeShared.Utilities;
 
     using Prism;
@@ -134,7 +133,7 @@
 
                     var updateInfo = mgr.CheckForUpdate().Result;
 
-                    Log.Instance.Debug($"[ApplicationUpdaterViewModel] UpdateInfo:\r\n{updateInfo?.DumpToTextValue()}");
+                    Log.Instance.Debug($"[ApplicationUpdaterViewModel] UpdateInfo:\r\n{updateInfo?.DumpToText()}");
                     if (updateInfo == null || updateInfo.ReleasesToApply.Count == 0)
                     {
                         return;
@@ -214,15 +213,7 @@
                 .ShowMessageAsync(
                     mainWindow,
                     "System error",
-                    "Failed to connect to update server, application will be terminated due to security reasons",
-                    MessageDialogStyle.Affirmative,
-                    new MetroDialogSettings {AffirmativeButtonText = "Exit"})
-                .ContinueWith(
-                    x =>
-                    {
-                        Log.Instance.Debug("[ApplicationUpdaterViewModel] App failed to update, terminating this instance");
-                        Application.Current.Shutdown(-1);
-                    });
+                    "Failed to connect to update server");
         }
 
         private void RestartCommandExecuted()

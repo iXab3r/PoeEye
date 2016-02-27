@@ -6,8 +6,6 @@
     using System.Windows;
     using System.Windows.Input;
 
-    using Factory;
-
     using Guards;
 
     using JetBrains.Annotations;
@@ -28,6 +26,8 @@
     using TypeConverter;
 
     using ClipboardMonitor;
+
+    using PoeShared.Prism;
 
     internal sealed class PoeClipboardParserViewModel : DisposableReactiveObject
     {

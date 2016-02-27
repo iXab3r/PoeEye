@@ -3,13 +3,12 @@
     using System.Collections.Generic;
     using System.Linq;
 
-    using Factory;
-
     using Guards;
 
     using JetBrains.Annotations;
 
     using PoeShared.Common;
+    using PoeShared.Prism;
     using PoeShared.Utilities;
 
     using ReactiveUI;

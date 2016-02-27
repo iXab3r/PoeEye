@@ -1,12 +1,10 @@
 ﻿namespace PoeShared.Prism
 {
-    using Factory;
-
     using Guards;
 
     using Microsoft.Practices.Unity;
 
-    public sealed class Factory<T1, T2, T3> : IFactory<T1, T2, T3>
+    internal sealed class Factory<T1, T2, T3> : IFactory<T1, T2, T3>
     {
         private readonly IUnityContainer container;
 

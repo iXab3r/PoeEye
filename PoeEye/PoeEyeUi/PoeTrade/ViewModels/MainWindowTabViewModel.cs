@@ -15,7 +15,6 @@
     using Models;
 
     using PoeShared;
-    using PoeShared.DumpToText;
     using PoeShared.PoeTrade;
     using PoeShared.Utilities;
 
