@@ -10,6 +10,8 @@
 
     using Config;
 
+    using Exceptionless;
+
     using Guards;
 
     using JetBrains.Annotations;
@@ -185,6 +187,8 @@
                 trade.TradeState = PoeTradeState.Normal;
                 ItemFromClipboard = trade;
                 ItemQueryInfo = query;
+
+                ExceptionlessClient.Default.CreateFeatureUsage("ClipboardParser").Submit();
             }
         }
     }

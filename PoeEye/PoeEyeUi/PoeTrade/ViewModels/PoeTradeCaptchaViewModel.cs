@@ -5,6 +5,8 @@
     using System.Reactive.Disposables;
     using System.Reactive.Linq;
 
+    using Exceptionless;
+
     using Guards;
 
     using JetBrains.Annotations;
@@ -68,11 +70,13 @@
                 .Where(x => !IsOpen)
                 .Where(x => !string.IsNullOrWhiteSpace(x))
                 .Where(x => clock.CurrentTime - lastRequestTimestamp > RequestsThrottlePeriod)
+                .Do(_ => ExceptionlessClient.Default.CreateEvent().SetMessage("Encountered CAPTCHA").Submit())
                 .Subscribe(HandleRequest)
                 .AddTo(Anchors);
 
             this.WhenAnyValue(x => x.Browser)
-                .Subscribe(HandleBrowserChange);
+                .Subscribe(HandleBrowserChange)
+                .AddTo(Anchors);
 
             browserSubscriptions.AddTo(Anchors);
         }

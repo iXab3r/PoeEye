@@ -1,14 +1,15 @@
 ﻿namespace PoeEyeUi
 {
     using System;
+    using System.Reflection;
     using System.Windows;
+
+    using Exceptionless;
+    using Exceptionless.Models;
 
     using log4net;
 
     using Microsoft.Practices.Unity;
-
-    using NBug.Core.Submission.Web;
-    using NBug.Enums;
 
     using PoeEye.Prism;
 
@@ -29,9 +30,11 @@
     /// </summary>
     public partial class App
     {
+        private static readonly string AppVersion = $"v{Assembly.GetExecutingAssembly().GetName().Version}";
         private static readonly Lazy<UnityContainer> UnityContainerInstance = new Lazy<UnityContainer>();
 
         public static IUnityContainer Container => UnityContainerInstance.Value;
+
 
         public App()
         {
@@ -50,6 +53,10 @@
             Container.AddExtension(new PoeWhisperRegistrations());
             Container.AddExtension(new LiveRegistrations());
             Container.AddExtension(new UiRegistrations());
+
+            Log.Instance.Debug("Initializing exceptionless...");
+            ExceptionlessClient.Default.Configuration.ApiKey = "dkjcxnVxQO9Nx6zJdYYyAW66gHt5YP5XCmHNmjYj";
+            ExceptionlessClient.Default.SubmitEvent(new Event { Message = AppVersion, Type = "Version" });
         }
 
         private void CurrentDomainOnUnhandledException(object sender, UnhandledExceptionEventArgs unhandledExceptionEventArgs)
