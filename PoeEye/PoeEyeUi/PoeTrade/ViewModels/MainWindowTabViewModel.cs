@@ -38,7 +38,6 @@
 
         private bool audioNotificationEnabled;
         private string tabName;
-        private object prevcurr;
 
         public MainWindowTabViewModel(
             [NotNull] PoeTradesListViewModel tradesList,

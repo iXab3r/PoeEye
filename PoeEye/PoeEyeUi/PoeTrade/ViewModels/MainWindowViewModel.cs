@@ -145,7 +145,13 @@
             Observable
                 .Timer(DateTimeOffset.MinValue, CheckForUpdatesTimeout, bgScheduler)
                 .ObserveOn(uiScheduler)
-                .Subscribe(() => applicationUpdaterViewModel.CheckForUpdatesCommand.Execute(this), Log.HandleException);
+                .Subscribe(() => applicationUpdaterViewModel.CheckForUpdatesCommand.Execute(this), Log.HandleException)
+                .AddTo(Anchors);
+
+            this.WhenAnyValue(x => x.SelectedItem)
+                .Where(x => x == null && TabsList.Any())
+                .Subscribe(() => SelectedItem = TabsList.FirstOrDefault())
+                .AddTo(Anchors);
         }
 
         public ICommand CreateNewTabCommand => createNewTabCommand;
@@ -170,8 +176,6 @@
         };
 
         public string MainWindowTitle { get; }
-
-        
 
         public IMainWindowTabViewModel SelectedItem
         {
@@ -210,8 +214,9 @@
             newTab
                 .Query
                 .Changed
-                .Select(x => Unit.Default)
-                .Subscribe(configUpdateSubject);
+                .ToUnit()
+                .Subscribe(configUpdateSubject)
+                .AddTo(newTab.Anchors);
 
             TabsList.Add(newTab);
             return newTab;

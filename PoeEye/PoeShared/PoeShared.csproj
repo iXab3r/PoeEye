@@ -194,6 +194,7 @@
     <Compile Include="Scaffolding\DataPiping.cs" />
     <Compile Include="Scaffolding\DisposableReactiveObject.cs" />
     <Compile Include="Scaffolding\EnumerableExtensions.cs" />
+    <Compile Include="Scaffolding\IDisposableReactiveObject.cs" />
     <Compile Include="Scaffolding\ObjectExtensions.cs" />
     <Compile Include="Scaffolding\ObservableExtensions.cs" />
     <Compile Include="Scaffolding\UnityContainerExtensions.cs" />

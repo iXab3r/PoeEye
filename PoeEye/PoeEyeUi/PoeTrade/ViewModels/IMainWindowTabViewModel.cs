@@ -1,11 +1,10 @@
 ﻿namespace PoeEyeUi.PoeTrade.ViewModels
 {
-    using System;
-    using System.ComponentModel;
-
     using Config;
 
-    internal interface IMainWindowTabViewModel : IDisposable, INotifyPropertyChanged
+    using PoeShared.Scaffolding;
+
+    internal interface IMainWindowTabViewModel : IDisposableReactiveObject
     {
         bool AudioNotificationEnabled { get; set; }
 

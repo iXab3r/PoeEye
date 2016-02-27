@@ -1,13 +1,12 @@
 ﻿namespace PoeShared.Scaffolding
 {
-    using System;
     using System.Reactive.Disposables;
 
     using ReactiveUI;
 
-    public abstract class DisposableReactiveObject : ReactiveObject, IDisposable
+    public abstract class DisposableReactiveObject : ReactiveObject, IDisposableReactiveObject
     {
-        protected CompositeDisposable Anchors { get; } = new CompositeDisposable();
+        public CompositeDisposable Anchors { get; } = new CompositeDisposable();
 
         public virtual void Dispose()
         {
