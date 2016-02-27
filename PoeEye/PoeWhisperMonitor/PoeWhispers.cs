@@ -8,8 +8,9 @@
     using System.Reactive.Linq;
     using System.Reactive.Subjects;
 
+    using Chat;
+
     using PoeShared;
-    using PoeShared.Chat;
     using PoeShared.Scaffolding;
 
     internal sealed class PoeWhispers : DisposableReactiveObject, IPoeWhispers

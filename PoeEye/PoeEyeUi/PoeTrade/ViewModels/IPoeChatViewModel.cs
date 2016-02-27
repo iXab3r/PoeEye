@@ -5,7 +5,7 @@
 
     using JetBrains.Annotations;
 
-    using PoeShared.Chat;
+    using PoeWhisperMonitor.Chat;
 
     internal interface IPoeChatViewModel : IDisposable
     {

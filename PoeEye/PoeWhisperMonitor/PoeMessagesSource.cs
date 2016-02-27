@@ -7,12 +7,13 @@
     using System.Reactive.Subjects;
     using System.Text.RegularExpressions;
 
+    using Chat;
+
     using Guards;
 
     using JetBrains.Annotations;
 
     using PoeShared;
-    using PoeShared.Chat;
     using PoeShared.Scaffolding;
 
     using TrackingStreamLib;

@@ -2,9 +2,9 @@
 {
     using System;
 
-    using JetBrains.Annotations;
+    using Chat;
 
-    using PoeShared.Chat;
+    using JetBrains.Annotations;
 
     public interface IPoeWhispers
     {

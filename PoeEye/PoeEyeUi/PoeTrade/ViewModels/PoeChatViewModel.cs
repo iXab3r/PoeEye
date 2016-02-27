@@ -11,10 +11,10 @@
 
     using Microsoft.Practices.Unity;
 
-    using PoeShared.Chat;
     using PoeShared.Scaffolding;
 
     using PoeWhisperMonitor;
+    using PoeWhisperMonitor.Chat;
 
     using Prism;
 

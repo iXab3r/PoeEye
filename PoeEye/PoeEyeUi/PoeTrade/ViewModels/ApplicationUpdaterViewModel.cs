@@ -65,10 +65,10 @@
             checkForUpdatesCommand
                 .Where(x => !IsBusy)
                 .ObserveOn(bgScheduler)
-                .Subscribe(_ => CheckForUpdatesCommandExecuted(), Log.HandleException)
+                .Subscribe(_ => CheckForUpdatesCommandExecuted(), Log.HandleUiException)
                 .AddTo(Anchors);
 
-            SquirrelAwareApp.HandleEvents(
+            SquirrelAwareApp.HandleEvents(  
                 OnInitialInstall,
                 OnAppUpdate,
                 onAppUninstall: OnAppUninstall,
@@ -114,7 +114,6 @@
         private void CheckForUpdatesCommandExecuted()
         {
             Log.Instance.Debug($"[ApplicationUpdaterViewModel] Update check requested");
-
             IsBusy = true;
 
             // delaying update so the user could see the progressring
@@ -162,8 +161,7 @@
             }
             catch (Exception ex)
             {
-                Log.Instance.Debug($"[ApplicationUpdaterViewModel] Update failed", ex);
-
+                Log.HandleException(ex);
                 uiScheduler.Schedule(ShowUpdateFailedMessageAndTerminate);
             }
             finally

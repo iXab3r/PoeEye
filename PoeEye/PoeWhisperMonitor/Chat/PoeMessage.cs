@@ -1,4 +1,4 @@
-﻿namespace PoeShared.Chat
+﻿namespace PoeWhisperMonitor.Chat
 {
     using System;
 

@@ -1,4 +1,4 @@
-﻿namespace PoeShared.Chat
+﻿namespace PoeWhisperMonitor.Chat
 {
     public enum PoeMessageType
     {

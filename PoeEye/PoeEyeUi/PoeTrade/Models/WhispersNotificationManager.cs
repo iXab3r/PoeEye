@@ -11,20 +11,16 @@
 
     using Microsoft.Practices.Unity;
 
-    using PoeShared.Chat;
     using PoeShared.Scaffolding;
 
     using PoeWhisperMonitor;
+    using PoeWhisperMonitor.Chat;
 
     using Prism;
-
-    using ReactiveUI;
 
     internal sealed class WhispersNotificationManager : DisposableReactiveObject, IWhispersNotificationManager
     {
         private readonly IAudioNotificationsManager audioNotificationsManager;
-
-        private bool isEnabled;
 
         public WhispersNotificationManager(
             [NotNull] IPoeWhispers whispers,
@@ -39,14 +35,8 @@
 
             this.audioNotificationsManager = audioNotificationsManager;
 
-            poeEyeConfigProvider
-                .WhenAnyValue(x => x.ActualConfig)
-                .Select(x => x.WhisperNotificationsEnabled)
-                .Subscribe(newValue => isEnabled = newValue)
-                .AddTo(Anchors);
-
             whispers.Messages
-                    .Where(x => isEnabled)
+                    .Where(x => poeEyeConfigProvider.ActualConfig.WhisperNotificationsEnabled)
                     .Where(x => !poeWindowTracker.IsActive)
                     .Where(x => x.MessageType == PoeMessageType.Whisper)
                     .Subscribe(ProcessWhisper)

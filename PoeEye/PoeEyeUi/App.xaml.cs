@@ -7,6 +7,9 @@
 
     using Microsoft.Practices.Unity;
 
+    using NBug.Core.Submission.Web;
+    using NBug.Enums;
+
     using PoeEye.Prism;
 
     using PoeShared;
@@ -19,6 +22,8 @@
 
     using Prism;
 
+    using ReactiveUI;
+
     /// <summary>
     ///     Interaction logic for App.xaml
     /// </summary>
@@ -30,15 +35,17 @@
 
         public App()
         {
-            // Uncomment the following after testing to see that NBug is working as configured
-            // NBug.Settings.ReleaseMode = true;
-            // todo: add other configuration options here
+            // used for log4net configuration
+#if DEBUG
+            GlobalContext.Properties["configuration"] = "Debug";
+#else
+            GlobalContext.Properties["configuration"] = "Release";
+#endif
+            Log.Instance.Info("Application started");
 
-            AppDomain.CurrentDomain.UnhandledException += NBug.Handler.UnhandledException;
-            Application.Current.DispatcherUnhandledException += NBug.Handler.DispatcherUnhandledException;
             AppDomain.CurrentDomain.UnhandledException += CurrentDomainOnUnhandledException;
 
-            Log.Instance.InfoFormat("Application started");
+            Log.Instance.Debug("Initializing DI container...");
             Container.AddExtension(new CommonRegistrations());
             Container.AddExtension(new PoeWhisperRegistrations());
             Container.AddExtension(new LiveRegistrations());
