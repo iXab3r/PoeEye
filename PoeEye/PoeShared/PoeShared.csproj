@@ -189,6 +189,7 @@
     <Compile Include="Scaffolding\EnumerableExtensions.cs" />
     <Compile Include="Scaffolding\ObjectExtensions.cs" />
     <Compile Include="Scaffolding\ObservableExtensions.cs" />
+    <Compile Include="Scaffolding\UnityContainerExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

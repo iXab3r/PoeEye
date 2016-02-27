@@ -10,6 +10,8 @@
 
     using PoeTrade;
 
+    using Scaffolding;
+
     using TypeConverter;
 
     public sealed class CommonRegistrations : UnityContainerExtension
@@ -17,14 +19,14 @@
         protected override void Initialize()
         {
             Container
-                .RegisterType<IPoeDatabaseReader, PoeDatabaseReader>(new ContainerControlledLifetimeManager());
+                .RegisterSingleton<IPoeDatabaseReader, PoeDatabaseReader>();
 
             Container
-                .RegisterType<IPoeItemParser, PoeItemParser>(new ContainerControlledLifetimeManager())
-                .RegisterType<IRandomNumberGenerator, RandomNumberGenerator>(new ContainerControlledLifetimeManager());
+                .RegisterSingleton<IPoeItemParser, PoeItemParser>()
+                .RegisterSingleton<IRandomNumberGenerator, RandomNumberGenerator>();
 
             Container
-                .RegisterType<IClock, Clock>(new ContainerControlledLifetimeManager())
+                .RegisterSingleton<IClock, Clock>()
                 .RegisterType(typeof (IEqualityComparer<IPoeItem>), typeof (PoeItemEqualityComparer))
                 .RegisterType(typeof (IConverter<IPoeItem, IPoeQueryInfo>), typeof (PoeItemToPoeQueryConverter))
                 .RegisterType(typeof (IPoeModsProcessor), typeof (PoeModsProcessor))

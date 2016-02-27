@@ -10,6 +10,8 @@
 
     using Microsoft.Practices.Unity;
 
+    using PoeShared.Scaffolding;
+
     using PoeTrade.Models;
     using PoeTrade.ViewModels;
 
@@ -22,20 +24,20 @@
         protected override void Initialize()
         {
             Container
-                .RegisterType<ImagesCache, ImagesCache>(new ContainerControlledLifetimeManager())
-                .RegisterType<IPoePriceCalculcator, PoePriceCalculcator>(new ContainerControlledLifetimeManager())
-                .RegisterType<IAudioNotificationsManager, AudioNotificationsManager>(new ContainerControlledLifetimeManager())
-                .RegisterType<IWhispersNotificationManager, WhispersNotificationManager>(new ContainerControlledLifetimeManager())
-                .RegisterType<IPoeEyeConfigProvider, PoeEyeConfigProviderFromFile>(new ContainerControlledLifetimeManager())
-                .RegisterType<IDialogCoordinator, DialogCoordinator>(new ContainerControlledLifetimeManager());
+                .RegisterSingleton<ImagesCache, ImagesCache>()
+                .RegisterSingleton<IPoePriceCalculcator, PoePriceCalculcator>()
+                .RegisterSingleton<IAudioNotificationsManager, AudioNotificationsManager>()
+                .RegisterSingleton<IWhispersNotificationManager, WhispersNotificationManager>()
+                .RegisterSingleton<IPoeEyeConfigProvider, PoeEyeConfigProviderFromFile>()
+                .RegisterSingleton<IPoeCaptchaRegistrator, PoeCaptchaRegistrator>()
+                .RegisterSingleton<IDialogCoordinator, DialogCoordinator>();
 
             Container
                 .RegisterType<IScheduler>(WellKnownSchedulers.Ui, new InjectionFactory(x => DispatcherScheduler.Current))
                 .RegisterType<IScheduler>(WellKnownSchedulers.Background, new InjectionFactory(x => TaskPoolScheduler.Default));
 
             Container
-                .RegisterType<IMainWindowViewModel, MainWindowViewModel>(new ContainerControlledLifetimeManager())
-                .RegisterType<IPoeCaptchaRegistrator, PoeCaptchaRegistrator>(new ContainerControlledLifetimeManager())
+                .RegisterType<IMainWindowViewModel, MainWindowViewModel>()
                 .RegisterType<IPoeTradeViewModel, PoeTradeViewModel>()
                 .RegisterType<IMainWindowTabViewModel, MainWindowTabViewModel>()
                 .RegisterType<IPoeModViewModel, PoeModViewModel>()
@@ -47,34 +49,17 @@
                 .RegisterType<IRecheckPeriodViewModel, RecheckPeriodViewModel>()
                 .RegisterType<ISuggestionProvider, FuzzySuggestionProvider>();
 
-            Container
-                .RegisterType<IWindowTracker, WindowTracker>();
-
-            RegisterMainWindowTracker();
-            RegisterPathOfExileWindowTracker();
+            RegisterTracker(WellKnownWindows.Main, () => Process.GetCurrentProcess().MainWindowTitle);
+            RegisterTracker(WellKnownWindows.PathOfExile, () => PathOfExileWindowTitle);
         }
 
-        private IUnityContainer RegisterMainWindowTracker()
+        private IUnityContainer RegisterTracker(string dependencyName, Func<string> windowNameFunc)
         {
             return Container
-                .RegisterType<IWindowTracker, WindowTracker>(
-                    WellKnownWindows.Main,
-                    new ContainerControlledLifetimeManager(),
-                    new InjectionFactory(unity => unity.Resolve<IWindowTracker>(new DependencyOverride<Func<string>>(new Func<string>(GetMainWindowTitle)))));
-        }
-
-        private IUnityContainer RegisterPathOfExileWindowTracker()
-        {
-            return Container
-                .RegisterType<IWindowTracker, WindowTracker>(
-                    WellKnownWindows.PathOfExile,
-                    new ContainerControlledLifetimeManager(),
-                    new InjectionFactory(unity => unity.Resolve<IWindowTracker>(new DependencyOverride<Func<string>>(new Func<string>(() => PathOfExileWindowTitle)))));
-        }
-
-        private string GetMainWindowTitle()
-        {
-            return Process.GetCurrentProcess().MainWindowTitle;
+                 .RegisterType<IWindowTracker, WindowTracker>(
+                     dependencyName,
+                     new ContainerControlledLifetimeManager(),
+                     new InjectionFactory(unity => unity.Resolve<WindowTracker>(new DependencyOverride<Func<string>>(windowNameFunc))));
         }
     }
 }

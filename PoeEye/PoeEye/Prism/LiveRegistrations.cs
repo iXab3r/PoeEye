@@ -9,6 +9,7 @@
     using PoeShared.Http;
     using PoeShared.PoeTrade;
     using PoeShared.PoeTrade.Query;
+    using PoeShared.Scaffolding;
 
     using PoeTrade;
 
@@ -24,17 +25,17 @@
                 .RegisterType<IHttpClient, GenericHttpClient>();
 
             Container
-                .RegisterType<IPoeApi, PoeTradeApi>(new ContainerControlledLifetimeManager())
-                .RegisterType<IPoeItemVerifier, PoeItemVerifier>(new ContainerControlledLifetimeManager())
-                .RegisterType<IConverter<NameValueCollection, string>, NameValueCollectionToQueryStringConverter>(new ContainerControlledLifetimeManager())
-                .RegisterType<IConverter<IPoeQueryInfo, IPoeQuery>, PoeQueryInfoToQueryConverter>(new ContainerControlledLifetimeManager())
-                .RegisterType<IConverter<IPoeQuery, NameValueCollection>, PoeQueryConverter>(new ContainerControlledLifetimeManager())
+                .RegisterSingleton<IPoeApi, PoeTradeApi>()
+                .RegisterSingleton<IPoeItemVerifier, PoeItemVerifier>()
+                .RegisterSingleton<IConverter<NameValueCollection, string>, NameValueCollectionToQueryStringConverter>()
+                .RegisterSingleton<IConverter<IPoeQueryInfo, IPoeQuery>, PoeQueryInfoToQueryConverter>()
+                .RegisterSingleton<IConverter<IPoeQuery, NameValueCollection>, PoeQueryConverter>()
                 .RegisterType<IPoeLiveHistoryProvider, PoeLiveHistoryProvider>();
 
             Container
-                .RegisterType<IProxyProvider, GenericProxyProvider>(new ContainerControlledLifetimeManager(), new InjectionFactory(unity => new GenericProxyProvider()))
-                .RegisterType<IPoeTradeParser, PoeTradeParserModern>(new ContainerControlledLifetimeManager())
-                .RegisterType<IPoeQueryInfoProvider, PoeQueryInfoProvider>(new ContainerControlledLifetimeManager());
+                .RegisterSingleton<IProxyProvider, GenericProxyProvider>(new InjectionFactory(unity => new GenericProxyProvider()))
+                .RegisterSingleton<IPoeTradeParser, PoeTradeParserModern>()
+                .RegisterSingleton<IPoeQueryInfoProvider, PoeQueryInfoProvider>();
         }
     }
 }
