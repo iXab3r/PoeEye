@@ -56,6 +56,13 @@
 
             Log.Instance.Debug("Initializing exceptionless...");
             ExceptionlessClient.Default.Configuration.ApiKey = "dkjcxnVxQO9Nx6zJdYYyAW66gHt5YP5XCmHNmjYj";
+            ExceptionlessClient.Default.Configuration.DefaultTags.Add($".NET {Environment.Version}");
+            ExceptionlessClient.Default.Configuration.DefaultTags.Add($"OS:{Environment.OSVersion}");
+            ExceptionlessClient.Default.Configuration.DefaultTags.Add(AppVersion);
+            ExceptionlessClient.Default.Configuration.IncludePrivateInformation = true;
+            ExceptionlessClient.Default.Configuration.SetVersion(AppVersion);
+            ExceptionlessClient.Default.Configuration.SetUserIdentity($"{Environment.UserName}@{Environment.MachineName}");
+
             ExceptionlessClient.Default.SubmitEvent(new Event { Message = AppVersion, Type = "Version" });
         }
 

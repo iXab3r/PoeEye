@@ -5,6 +5,8 @@ namespace PoeShared
 {
     using System;
 
+    using Exceptionless;
+
     using Guards;
 
     using JetBrains.Annotations;
@@ -20,15 +22,15 @@ namespace PoeShared
             Guard.ArgumentNotNull(() => exception);
 
             Instance.Error("Exception occurred", exception);
+            exception.ToExceptionless().Submit();
         }
 
         public static void HandleUiException([NotNull] Exception exception)
         {
             Guard.ArgumentNotNull(() => exception);
-            HandleException(exception);
 
-            Instance.Warn("Application will be terminated");
-            Environment.Exit(-1);
+            Instance.Error("UI Exception occurred", exception);
+            exception.ToExceptionless().MarkAsCritical().Submit();
         }
     }
 }

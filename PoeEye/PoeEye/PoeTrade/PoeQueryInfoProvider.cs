@@ -96,7 +96,7 @@
             catch (Exception ex)
             {
                 Log.HandleUiException(ex);
-                throw;
+                return new PoeQueryResult();
             }
         }
     }

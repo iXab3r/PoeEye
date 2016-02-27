@@ -166,7 +166,7 @@
             OnlineOnly = true;
             BuyoutOnly = true;
             NormalizeQuality = true;
-            League = LeaguesList.First();
+            League = LeaguesList.FirstOrDefault();
 
             var knownNames = poeDatabaseReader.KnownEntitiesNames;
             NameSuggestionProvider = suggestionProviderFactory.Create(knownNames);
