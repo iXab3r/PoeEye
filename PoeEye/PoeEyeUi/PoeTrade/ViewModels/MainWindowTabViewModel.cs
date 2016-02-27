@@ -6,6 +6,8 @@
     using System.Reactive.Linq;
     using System.Windows.Input;
 
+    using Config;
+
     using Guards;
 
     using JetBrains.Annotations;
@@ -97,8 +99,8 @@
                  .AddTo(Anchors);
 
             RecheckPeriod
-                .WhenAny(x => x.RecheckValue, x => x.IsAutoRecheckEnabled, (x, y) => Unit.Default)
-                .Subscribe(x => TradesList.RecheckPeriod = RecheckPeriod.IsAutoRecheckEnabled ? RecheckPeriod.RecheckValue : TimeSpan.Zero)
+                .WhenAny(x => x.Period, x => x.IsAutoRecheckEnabled, (x, y) => Unit.Default)
+                .Subscribe(x => TradesList.RecheckPeriod = RecheckPeriod.IsAutoRecheckEnabled ? RecheckPeriod.Period : TimeSpan.Zero)
                 .AddTo(Anchors);
         }
 
@@ -144,6 +146,40 @@
         }
 
         public PoeQueryViewModel Query { get; }
+
+        public void Load(PoeEyeTabConfig config)
+        {
+            if (config.RecheckTimeout != default(TimeSpan))
+            {
+                RecheckPeriod.Period = config.RecheckTimeout;
+                RecheckPeriod.IsAutoRecheckEnabled = config.IsAutoRecheckEnabled;
+            }
+
+            if (config.QueryInfo != null)
+            {
+                Query.SetQueryInfo(config.QueryInfo);
+            }
+
+            if (config.SoldOrRemovedItems != null)
+            {
+                TradesList.HistoricalTradesViewModel.Clear();
+                TradesList.HistoricalTradesViewModel.AddItems(config.SoldOrRemovedItems);
+            }
+
+            AudioNotificationEnabled = config.AudioNotificationEnabled;
+        }
+
+        public PoeEyeTabConfig Save()
+        {
+            return new PoeEyeTabConfig
+            {
+                RecheckTimeout = RecheckPeriod.Period,
+                IsAutoRecheckEnabled = RecheckPeriod.IsAutoRecheckEnabled,
+                QueryInfo = Query.PoeQueryBuilder(),
+                AudioNotificationEnabled = AudioNotificationEnabled,
+                SoldOrRemovedItems = TradesList.HistoricalTradesViewModel.ItemsViewModels.Select(x => x.Trade).ToArray()
+            };
+        }
 
         private void RebuildTabName()
         {

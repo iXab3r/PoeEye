@@ -21,25 +21,25 @@
 
         private TimeSpan minValue = TimeSpan.FromMinutes(5);
 
-        private TimeSpan recheckValue = TimeSpan.FromMinutes(5);
+        private TimeSpan period = TimeSpan.FromMinutes(5);
 
         public RecheckPeriodViewModel([NotNull] IPoeEyeConfigProvider configProvider)
         {
             Guard.ArgumentNotNull(() => configProvider);
 
-            this.WhenAnyValue(x => x.RecheckValue)
+            this.WhenAnyValue(x => x.Period)
                 .Where(x => x == TimeSpan.Zero)
                 .Subscribe(() => IsAutoRecheckEnabled = false)
                 .AddTo(Anchors);
 
-            this.WhenAnyValue(x => x.RecheckValue)
+            this.WhenAnyValue(x => x.Period)
                 .Where(x => x != TimeSpan.Zero)
                 .Where(x => x > maxValue || x < minValue)
-                .Subscribe(() => RecheckValue = maxValue)
+                .Subscribe(() => Period = maxValue)
                 .AddTo(Anchors);
 
             this.WhenAnyValue(x => x.IsAutoRecheckEnabled)
-                .Subscribe(() => this.RaisePropertyChanged(nameof(RecheckValue)))
+                .Subscribe(() => this.RaisePropertyChanged(nameof(Period)))
                 .AddTo(Anchors);
 
             configProvider
@@ -64,10 +64,10 @@
             set { this.RaiseAndSetIfChanged(ref maxValue, value); }
         }
 
-        public TimeSpan RecheckValue
+        public TimeSpan Period
         {
-            get { return recheckValue; }
-            set { this.RaiseAndSetIfChanged(ref recheckValue, value); }
+            get { return period; }
+            set { this.RaiseAndSetIfChanged(ref period, value); }
         }
 
         public bool IsAutoRecheckEnabled

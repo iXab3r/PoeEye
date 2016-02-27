@@ -23,25 +23,25 @@
 
     using Prism;
 
-    internal sealed class ImagesCache
+    internal sealed class ImagesCacheService : IImagesCacheService
     {
         private static readonly TimeSpan ArtificialDelay = TimeSpan.FromSeconds(5);
-        private readonly IScheduler bgScheduler;
+        private readonly IScheduler uiScheduler;
 
         private readonly string CacheFolderName = "Cache";
         private readonly IFactory<IHttpClient> httpClientFactory;
 
-        private readonly IDictionary<string, IObservable<FileInfo>> loadingImages = new ConcurrentDictionary<string, IObservable<FileInfo>>();
+        private readonly IDictionary<string, IObservable<FileInfo>> imagesBeingLoaded = new ConcurrentDictionary<string, IObservable<FileInfo>>();
 
-        public ImagesCache(
+        public ImagesCacheService(
             [NotNull] IFactory<IHttpClient> httpClientFactory,
-            [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler)
+            [NotNull] [Dependency(WellKnownSchedulers.Ui)] IScheduler uiScheduler)
         {
             Guard.ArgumentNotNull(() => httpClientFactory);
-            Guard.ArgumentNotNull(() => bgScheduler);
+            Guard.ArgumentNotNull(() => uiScheduler);
 
             this.httpClientFactory = httpClientFactory;
-            this.bgScheduler = bgScheduler;
+            this.uiScheduler = uiScheduler;
         }
 
         public IObservable<FileInfo> ResolveImageByUri(Uri imageUri)
@@ -50,7 +50,7 @@
             var outputFilePath = ConstructPath(imageUri.AbsolutePath);
 
             IObservable<FileInfo> inProgress;
-            if (loadingImages.TryGetValue(outputFilePath, out inProgress))
+            if (imagesBeingLoaded.TryGetValue(outputFilePath, out inProgress))
             {
                 Log.Instance.Debug($"[ItemsCache.ResolveImageByUri] Image is currently loading, returning source");
                 return inProgress;
@@ -59,18 +59,18 @@
             if (File.Exists(outputFilePath))
             {
                 Log.Instance.Trace($"[ItemsCache.ResolveImageByUri] Image is already loaded, cache path '{outputFilePath}'");
-                return Observable.Return(new FileInfo(outputFilePath));
+                return Observable.Return(new FileInfo(outputFilePath)).ObserveOn(uiScheduler);
             }
 
             Log.Instance.Debug($"[ItemsCache.ResolveImageByUri] Image '{imageUri}' is not loaded, downloading it...");
             var httpClient = httpClientFactory.Create();
             var result = httpClient
                 .GetStreamAsync(imageUri)
-                .ObserveOn(bgScheduler)
                 .Select(x => LoadImageFromStream(outputFilePath, x))
+                .ObserveOn(uiScheduler)
                 .Publish();
 
-            loadingImages[outputFilePath] = result;
+            imagesBeingLoaded[outputFilePath] = result;
 
             result.Connect();
 
@@ -79,15 +79,15 @@
 
         private FileInfo LoadImageFromStream(string outputFilePath, Stream dataStream)
         {
-            Log.Instance.Debug($"[ItemsCache.ResolveImageByUri] Starting downloading image to cache...\r\n\tFilePath: '{outputFilePath}'");
+            Log.Instance.Debug($"[ItemsCache.ResolveImageByUri] Starting to download image to cache...\r\n\tFilePath: '{outputFilePath}'");
 
 #if DEBUG
-            Log.Instance.Debug($"[ItemsCache.ResolveImageByUri] Atrificial delay");
+            Log.Instance.Debug($"[ItemsCache.ResolveImageByUri] Atrificial delay: {ArtificialDelay}");
             Thread.Sleep(ArtificialDelay);
 #endif
 
             var outputDirectory = Path.GetDirectoryName(outputFilePath);
-            if (!Directory.Exists(outputFilePath))
+            if (outputDirectory != null && !Directory.Exists(outputDirectory))
             {
                 Directory.CreateDirectory(outputDirectory);
             }
@@ -96,7 +96,7 @@
             {
                 dataStream.CopyTo(outputStream);
             }
-            loadingImages.Remove(outputFilePath);
+            imagesBeingLoaded.Remove(outputFilePath);
 
             Log.Instance.Debug($"[ItemsCache.ResolveImageByUri] Image was saved to file '{outputFilePath}'");
             return new FileInfo(outputFilePath);

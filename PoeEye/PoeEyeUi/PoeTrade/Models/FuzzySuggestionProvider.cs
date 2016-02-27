@@ -16,7 +16,6 @@
         private const int MaxResults = 20;
         private readonly IFuzzySearchService searchService;
 
-
         public FuzzySuggestionProvider([NotNull] string[] haystack)
         {
             Guard.ArgumentNotNull(() => haystack);

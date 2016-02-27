@@ -1,4 +1,4 @@
-﻿namespace PoeEyeUi.PoeTrade.Models
+﻿namespace PoeEyeUi.PoeTrade
 {
     internal enum AudioNotificationType
     {

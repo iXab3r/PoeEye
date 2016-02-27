@@ -6,6 +6,6 @@
     {
         bool IsAutoRecheckEnabled { get; set; }
 
-        TimeSpan RecheckValue { get; set; }
+        TimeSpan Period { get; set; }
     }
 }

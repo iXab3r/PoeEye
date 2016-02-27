@@ -5,6 +5,7 @@
     using System.Reactive.Concurrency;
     using System.Reactive.Linq;
     using System.Windows.Controls;
+    using System.Windows.Forms;
     using System.Windows.Media.Imaging;
 
     using Guards;
@@ -18,35 +19,30 @@
     using PoeShared;
     using PoeShared.Scaffolding;
 
-    using Prism;
-
     using ReactiveUI;
 
     internal sealed class ImageViewModel : DisposableReactiveObject
     {
-        private readonly Uri imageUri;
-
-        private Image image;
+        private Image image = new Image();
 
         private bool isLoading;
 
         public ImageViewModel(
-            [NotNull] ImagesCache cache,
-            [NotNull] [Dependency(WellKnownSchedulers.Ui)] IScheduler uiScheduler,
+            [NotNull] IImagesCacheService cacheService,
             [CanBeNull] Uri imageUri)
         {
-            Guard.ArgumentNotNull(() => cache);
+            Guard.ArgumentNotNull(() => cacheService);
 
-            this.imageUri = imageUri;
-
-            image = new Image();
+            if (imageUri == null)
+            {
+                return;
+            }
 
             IsLoading = true;
-            cache
+            cacheService
                 .ResolveImageByUri(imageUri)
-                .ObserveOn(uiScheduler)
                 .Finally(() => IsLoading = false)
-                .Subscribe(LoadImage, Log.HandleException)
+                .Subscribe(filePath => LoadImage(filePath, imageUri), Log.HandleException)
                 .AddTo(Anchors);
         }
 
@@ -62,7 +58,7 @@
             set { this.RaiseAndSetIfChanged(ref isLoading, value); }
         }
 
-        private void LoadImage(FileInfo cachedImageFilePath)
+        private void LoadImage(FileInfo cachedImageFilePath, Uri imageUri)
         {
             Log.Instance.Trace($"[ImageViewModel] Loading image...\r\n\tBase URI: '{imageUri}'\r\n\tFilePath: '{cachedImageFilePath.FullName}'");
             try
@@ -72,7 +68,7 @@
             }
             catch (Exception ex)
             {
-                Log.HandleException(ex);
+                Log.HandleUiException(ex);
             }
         }
 

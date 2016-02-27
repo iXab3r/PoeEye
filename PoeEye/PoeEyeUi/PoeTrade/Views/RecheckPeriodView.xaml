@@ -17,13 +17,13 @@
               Visibility="{Binding IsAutoRecheckEnabled, Converter={StaticResource BoolFalseToCollapsedConverter}}"
               Minimum="{Binding MinValue, Converter={StaticResource TimeSpanToSecondsConverter}, Mode=OneWay}"
               Maximum="{Binding MaxValue, Converter={StaticResource TimeSpanToSecondsConverter}, Mode=OneWay}"
-              Value="{Binding RecheckValue, Converter={StaticResource TimeSpanToSecondsConverter}}" />
+              Value="{Binding Period, Converter={StaticResource TimeSpanToSecondsConverter}}" />
 
       <TextBlock Grid.Column="1"
                  VerticalAlignment="Center"
                  Margin="5,0"
                  Visibility="{Binding IsAutoRecheckEnabled, Converter={StaticResource BoolFalseToCollapsedConverter}}"
-                 Text="{Binding RecheckValue, StringFormat='Recheck timeout: {0:F0}', Converter={StaticResource TimeSpanToHumanReadableStringConverter}}" />
+                 Text="{Binding Period, StringFormat='Recheck timeout: {0:F0}', Converter={StaticResource TimeSpanToHumanReadableStringConverter}}" />
 
       <TextBlock Grid.Column="1"
                  VerticalAlignment="Center"

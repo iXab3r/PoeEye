@@ -3,6 +3,8 @@
     using System;
     using System.ComponentModel;
 
+    using Config;
+
     internal interface IMainWindowTabViewModel : IDisposable, INotifyPropertyChanged
     {
         bool AudioNotificationEnabled { get; set; }
@@ -12,5 +14,9 @@
         IRecheckPeriodViewModel RecheckPeriod { get; }
 
         PoeQueryViewModel Query { get; }
+
+        void Load(PoeEyeTabConfig config);
+
+        PoeEyeTabConfig Save();
     }
 }

@@ -2,7 +2,7 @@
 {
     using System;
 
-    internal interface IMainWindowViewModel : IDisposable
+    public interface IMainWindowViewModel : IDisposable
     {
     }
 }

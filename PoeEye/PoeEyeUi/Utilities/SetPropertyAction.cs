@@ -10,7 +10,7 @@
     ///     TargetObject is not supplied then the property is set on the object
     ///     to which the trigger is attached.
     /// </summary>
-    public class SetPropertyAction : TriggerAction<FrameworkElement>
+    internal class SetPropertyAction : TriggerAction<FrameworkElement>
     {
         public static readonly DependencyProperty PropertyNameProperty
             = DependencyProperty.Register(

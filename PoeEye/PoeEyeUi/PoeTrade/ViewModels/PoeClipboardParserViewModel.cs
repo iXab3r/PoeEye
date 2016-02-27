@@ -8,6 +8,8 @@
 
     using ClipboardMonitor;
 
+    using Config;
+
     using Guards;
 
     using JetBrains.Annotations;
@@ -44,12 +46,11 @@
         private IPoeTradeViewModel itemFromClipboard;
         private IPoeQueryInfo itemQueryInfo;
 
-        private bool monitoringEnabled;
-
         public PoeClipboardParserViewModel(
             [NotNull] IPoeItemParser itemParser,
             [NotNull] IFactory<IPoeTradeViewModel, IPoeItem> poeTradeViewModelFactory,
             [NotNull] IConverter<IPoeItem, IPoeQueryInfo> itemToQueryConverter,
+            [NotNull] IPoeEyeConfigProvider configProvider,
             [NotNull] [Dependency(WellKnownWindows.PathOfExile)] IWindowTracker poeWindowTracker,
             [NotNull] [Dependency(WellKnownSchedulers.Ui)] IScheduler uiScheduler,
             [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler)
@@ -57,6 +58,7 @@
             Guard.ArgumentNotNull(() => itemParser);
             Guard.ArgumentNotNull(() => poeTradeViewModelFactory);
             Guard.ArgumentNotNull(() => poeWindowTracker);
+            Guard.ArgumentNotNull(() => configProvider);
             Guard.ArgumentNotNull(() => itemToQueryConverter);
             Guard.ArgumentNotNull(() => uiScheduler);
             Guard.ArgumentNotNull(() => bgScheduler);
@@ -75,7 +77,7 @@
                 .FromEventPattern<EventHandler, EventArgs>(
                     h => ClipboardNotifications.ClipboardUpdate += h,
                     h => ClipboardNotifications.ClipboardUpdate -= h)
-                .Where(x => monitoringEnabled)
+                .Where(x => configProvider.ActualConfig.ClipboardMonitoringEnabled)
                 .Merge(parseClipboard)
                 .Where(x => poeWindowTracker.IsActive)
                 .Select(x => GetTextFromClipboard())
@@ -118,12 +120,6 @@
         public bool IsBusy => IsBusyInternal;
 
         public ICommand ParseClipboard => parseClipboard;
-
-        public bool MonitoringEnabled
-        {
-            get { return monitoringEnabled; }
-            set { this.RaiseAndSetIfChanged(ref monitoringEnabled, value); }
-        }
 
         private bool IsBusyInternal
         {

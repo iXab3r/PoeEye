@@ -20,6 +20,7 @@
         <ResourceDictionary Source="Themes/PoeQueryViewStyles.xaml" />
         <ResourceDictionary Source="Themes/Generic.xaml" />
 
+        <ResourceDictionary Source="PoeTrade/Views/PoeEyeSettingsView.xaml" />
         <ResourceDictionary Source="PoeTrade/Views/ProxyProviderView.xaml" />
         <ResourceDictionary Source="PoeTrade/Views/RecheckPeriodView.xaml" />
         <ResourceDictionary Source="PoeTrade/Views/ImageView.xaml" />

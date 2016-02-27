@@ -24,7 +24,7 @@
         protected override void Initialize()
         {
             Container
-                .RegisterSingleton<ImagesCache, ImagesCache>()
+                .RegisterSingleton<IImagesCacheService, ImagesCacheService>()
                 .RegisterSingleton<IPoePriceCalculcator, PoePriceCalculcator>()
                 .RegisterSingleton<IAudioNotificationsManager, AudioNotificationsManager>()
                 .RegisterSingleton<IWhispersNotificationManager, WhispersNotificationManager>()

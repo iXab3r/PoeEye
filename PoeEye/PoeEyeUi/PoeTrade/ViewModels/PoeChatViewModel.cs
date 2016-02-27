@@ -30,15 +30,10 @@
             whispers.Messages
                     .ObserveOn(uiScheduler)
                     .Where(x => x.MessageType == PoeMessageType.Whisper)
-                    .Subscribe(ProcessMessage)
+                    .Subscribe(Messages.Add)
                     .AddTo(Anchors);
         }
 
         public ObservableCollection<PoeMessage> Messages { get; } = new ObservableCollection<PoeMessage>();
-
-        private void ProcessMessage(PoeMessage message)
-        {
-            Messages.Add(message);
-        }
     }
 }
