@@ -15,12 +15,12 @@
     using PoeTrade.Models;
     using PoeTrade.ViewModels;
 
+    using Properties;
+
     using WpfAutoCompleteControls.Editors;
 
     internal sealed class UiRegistrations : UnityContainerExtension
     {
-        private static readonly string PathOfExileWindowTitle = "Path of Exile";
-
         protected override void Initialize()
         {
             Container
@@ -50,7 +50,7 @@
                 .RegisterType<ISuggestionProvider, FuzzySuggestionProvider>();
 
             RegisterTracker(WellKnownWindows.Main, () => Process.GetCurrentProcess().MainWindowTitle);
-            RegisterTracker(WellKnownWindows.PathOfExile, () => PathOfExileWindowTitle);
+            RegisterTracker(WellKnownWindows.PathOfExile, () => Settings.Default.PathOfExileWindowName);
         }
 
         private IUnityContainer RegisterTracker(string dependencyName, Func<string> windowNameFunc)

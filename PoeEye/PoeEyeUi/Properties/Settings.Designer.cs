@@ -22,5 +22,14 @@ namespace PoeEyeUi.Properties {
                 return defaultInstance;
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Path of Exile")]
+        public string PathOfExileWindowName {
+            get {
+                return ((string)(this["PathOfExileWindowName"]));
+            }
+        }
     }
 }
