@@ -4,11 +4,8 @@
     using System.IO;
     using System.Reactive.Concurrency;
     using System.Reactive.Linq;
-    using System.Threading;
-    using System.Threading.Tasks;
     using System.Windows.Controls;
     using System.Windows.Media.Imaging;
-    using System.Windows.Threading;
 
     using Guards;
 
@@ -25,11 +22,13 @@
 
     using ReactiveUI;
 
-    using Utilities;
-
     internal sealed class ImageViewModel : DisposableReactiveObject
     {
         private readonly Uri imageUri;
+
+        private Image image;
+
+        private bool isLoading;
 
         public ImageViewModel(
             [NotNull] ImagesCache cache,
@@ -37,7 +36,7 @@
             [CanBeNull] Uri imageUri)
         {
             Guard.ArgumentNotNull(() => cache);
-            
+
             this.imageUri = imageUri;
 
             image = new Image();
@@ -51,15 +50,11 @@
                 .AddTo(Anchors);
         }
 
-        private Image image;
-
         public Image Image
         {
             get { return image; }
             set { this.RaiseAndSetIfChanged(ref image, value); }
         }
-
-        private bool isLoading;
 
         public bool IsLoading
         {
@@ -86,6 +81,5 @@
             var loadedImage = new BitmapImage(new Uri(filePath));
             return loadedImage;
         }
-
     }
 }

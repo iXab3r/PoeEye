@@ -3,77 +3,81 @@
                     xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
                     xmlns:componentModel="clr-namespace:System.ComponentModel;assembly=WindowsBase"
                     xmlns:viewModels="clr-namespace:PoeEyeUi.PoeTrade.ViewModels">
-    <DataTemplate DataType="{x:Type viewModels:MainWindowTabViewModel}">
-        <Grid>
-            <Grid.Resources>
-                <CollectionViewSource x:Key='tradesListSource' 
-                                      Source="{Binding TradesList.TradesList}"
-                                      IsLiveFilteringRequested="True"
-                                      IsLiveSortingRequested="True">
-                    <CollectionViewSource.SortDescriptions>
-                        <componentModel:SortDescription PropertyName="TradeState" Direction="Ascending" />
-                        <componentModel:SortDescription PropertyName="PriceInChaosOrbs" Direction="Ascending" />
-                    </CollectionViewSource.SortDescriptions>
+  <DataTemplate DataType="{x:Type viewModels:MainWindowTabViewModel}">
+    <Grid>
+      <Grid.Resources>
+        <CollectionViewSource x:Key='tradesListSource'
+                              Source="{Binding TradesList.TradesList}"
+                              IsLiveFilteringRequested="True"
+                              IsLiveSortingRequested="True">
+          <CollectionViewSource.SortDescriptions>
+            <componentModel:SortDescription PropertyName="TradeState" Direction="Ascending" />
+            <componentModel:SortDescription PropertyName="PriceInChaosOrbs" Direction="Ascending" />
+          </CollectionViewSource.SortDescriptions>
 
-                </CollectionViewSource>
-            </Grid.Resources>
+        </CollectionViewSource>
+      </Grid.Resources>
 
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="*" />
+      </Grid.RowDefinitions>
 
-            <ScrollViewer VerticalScrollBarVisibility="Auto"
-                          IsTabStop="False"
-                          Focusable="False"
-                          MaxHeight="{Binding ActualHeight, RelativeSource={RelativeSource FindAncestor, AncestorType=ContentPresenter}, Mode=OneWay}">
-                <Expander IsExpanded="{Binding Query.IsExpanded}">
-                    <Expander.Header>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Query parameters" Margin="5,0" VerticalAlignment="Center"/>
-                            <Button Content="Mark All as Read" Command="{Binding MarkAllAsRead}"/>
-                        </StackPanel>
-                    </Expander.Header>
-                    
-                    <StackPanel Orientation="Vertical">
-                        <controls:MetroContentControl Content="{Binding Query}"/>
-                        <DockPanel>
-                            <Button HorizontalAlignment="Right" Width="150" Command="{Binding SearchCommand}" 
-                                    CommandParameter="{Binding Query.PoeQueryBuilder}" 
-                                    Content="Search"/>
-                        </DockPanel>
-                    </StackPanel>
-                </Expander>
-            </ScrollViewer>
+      <ScrollViewer VerticalScrollBarVisibility="Auto"
+                    IsTabStop="False"
+                    Focusable="False"
+                    MaxHeight="{Binding ActualHeight, RelativeSource={RelativeSource FindAncestor, AncestorType=ContentPresenter}, Mode=OneWay}">
+        <Expander IsExpanded="{Binding Query.IsExpanded}">
+          <Expander.Header>
+            <StackPanel Orientation="Horizontal">
+              <TextBlock Text="Query parameters" Margin="5,0" VerticalAlignment="Center" />
+              <Button Content="Mark All as Read" Command="{Binding MarkAllAsRead}" />
+            </StackPanel>
+          </Expander.Header>
 
-            <Expander Grid.Row="1"
-                      IsExpanded="{Binding TradesList.HistoricalTradesViewModel.IsExpanded}"
-                      Visibility="{Binding TradesList.HistoricalTradesViewModel.ItemsViewModels.Count, Converter={StaticResource ZeroToCollapsedConverter}}">
-                <Expander.Header>
-                    <TextBlock><Run Text="Trades history ( "/><Run ToolTip="Historical trades" 
-            				Text="{Binding TradesList.HistoricalTradesViewModel.ItemsViewModels.Count, Mode=OneWay, StringFormat=\{0\}}"
-            				FontWeight="Bold" /><Run Text=" )"/></TextBlock>
-                </Expander.Header>
-                <ContentControl Content="{Binding TradesList.HistoricalTradesViewModel}" Margin="0"/>
-            </Expander>
+          <StackPanel Orientation="Vertical">
+            <controls:MetroContentControl Content="{Binding Query}" />
+            <DockPanel>
+              <Button HorizontalAlignment="Right" Width="150" Command="{Binding SearchCommand}"
+                      CommandParameter="{Binding Query.PoeQueryBuilder}"
+                      Content="Search" />
+            </DockPanel>
+          </StackPanel>
+        </Expander>
+      </ScrollViewer>
 
-            <Grid Grid.Row="2">
-                <Image
-                   Source="pack://application:,,,/Resources/mainIcon.png"
-                   Opacity="0.2"/>
+      <Expander Grid.Row="1"
+                IsExpanded="{Binding TradesList.HistoricalTradesViewModel.IsExpanded}"
+                Visibility="{Binding TradesList.HistoricalTradesViewModel.ItemsViewModels.Count, Converter={StaticResource ZeroToCollapsedConverter}}">
+        <Expander.Header>
+          <TextBlock>
+            <Run Text="Trades history ( " />
+            <Run ToolTip="Historical trades"
+                 Text="{Binding TradesList.HistoricalTradesViewModel.ItemsViewModels.Count, Mode=OneWay, StringFormat=\{0\}}"
+                 FontWeight="Bold" />
+            <Run Text=" )" />
+          </TextBlock>
+        </Expander.Header>
+        <ContentControl Content="{Binding TradesList.HistoricalTradesViewModel}" Margin="0" />
+      </Expander>
 
-                <ItemsControl Focusable="False" IsTabStop="False"
-                          Margin="0,10,0,0" 
-                          ItemsSource="{Binding Source={StaticResource tradesListSource}}"
-                          Style="{StaticResource VirtualizedItemsControlStyle}">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <ContentControl Content="{Binding}"/>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </Grid>
-        </Grid>
-    </DataTemplate>
+      <Grid Grid.Row="2">
+        <Image
+          Source="pack://application:,,,/Resources/mainIcon.png"
+          Opacity="0.2" />
+
+        <ItemsControl Focusable="False" IsTabStop="False"
+                      Margin="0,10,0,0"
+                      ItemsSource="{Binding Source={StaticResource tradesListSource}}"
+                      Style="{StaticResource VirtualizedItemsControlStyle}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate>
+              <ContentControl Content="{Binding}" />
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </Grid>
+    </Grid>
+  </DataTemplate>
 </ResourceDictionary>

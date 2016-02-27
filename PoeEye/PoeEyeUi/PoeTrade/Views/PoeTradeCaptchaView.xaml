@@ -9,16 +9,17 @@
     <Grid>
       <utilities:DataPiping.DataPipes>
         <utilities:DataPipeCollection>
-          <utilities:DataPipe Source="{Binding ElementName=WebBrowser}" Target="{Binding Browser, Mode=OneWayToSource}"/>
+          <utilities:DataPipe Source="{Binding ElementName=WebBrowser}" Target="{Binding Browser, Mode=OneWayToSource}" />
         </utilities:DataPipeCollection>
       </utilities:DataPiping.DataPipes>
 
-      <controls:ProgressRing IsActive="{Binding IsBusy}" Visibility="{Binding IsBusy, Converter={StaticResource BoolFalseToCollapsedConverter}}" />
+      <controls:ProgressRing IsActive="{Binding IsBusy}"
+                             Visibility="{Binding IsBusy, Converter={StaticResource BoolFalseToCollapsedConverter}}" />
 
-      <wpfAwesomium:WpfChromium x:Name="WebBrowser" Margin="10,10" 
+      <wpfAwesomium:WpfChromium x:Name="WebBrowser" Margin="10,10"
                                 IsEnabled="{Binding IsBusy, Converter={StaticResource BoolInversionConverter}}"
                                 Visibility="{Binding IsBusy, Converter={StaticResource BoolTrueToCollapsedConverter}}"
-                                IsBusy="{Binding IsBusy, Mode=OneWayToSource}"  />
+                                IsBusy="{Binding IsBusy, Mode=OneWayToSource}" />
     </Grid>
   </DataTemplate>
 </ResourceDictionary>

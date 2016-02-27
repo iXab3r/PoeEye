@@ -1,8 +1,8 @@
-﻿using ReactiveUI;
-
-namespace PoeEyeUi.PoeTrade.ViewModels
+﻿namespace PoeEyeUi.PoeTrade.ViewModels
 {
     using PoeShared.PoeTrade.Query;
+
+    using ReactiveUI;
 
     internal interface IPoeModsEditorViewModel
     {

@@ -2,16 +2,12 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Globalization;
     using System.Linq;
     using System.Reactive.Linq;
-    using System.Text.RegularExpressions;
 
     using Config;
 
     using Converters;
-
-    using CsQuery.ExtensionMethods.Internal;
 
     using Guards;
 
@@ -39,22 +35,6 @@
                 .AddTo(Anchors);
         }
 
-        private IDictionary<string, float> ExtractDifference(IDictionary<string, float> existingDictionary, IDictionary<string, float> candidate)
-        {
-            return candidate
-                .Where(x => !existingDictionary.ContainsKey(x.Key) || Math.Abs(existingDictionary[x.Key] - x.Value) > float.Epsilon)
-                .ToDictionary(x => x.Key, x => x.Value);
-        } 
-
-        private void Reinitialize(IDictionary<string, float> pricesConfig)
-        {
-            foreach (var kvp in pricesConfig)
-            {
-                currencyByType[kvp.Key] = kvp.Value;
-            }
-            Log.Instance.Debug($"[PriceCalculcator] Currencies list:\r\n{currencyByType.DumpToText()}");
-        }
-
         public float? GetEquivalentInChaosOrbs(string rawPrice)
         {
             if (rawPrice == null)
@@ -77,6 +57,22 @@
             }
 
             return price.Value * currencyMultilplier;
+        }
+
+        private IDictionary<string, float> ExtractDifference(IDictionary<string, float> existingDictionary, IDictionary<string, float> candidate)
+        {
+            return candidate
+                .Where(x => !existingDictionary.ContainsKey(x.Key) || Math.Abs(existingDictionary[x.Key] - x.Value) > float.Epsilon)
+                .ToDictionary(x => x.Key, x => x.Value);
+        }
+
+        private void Reinitialize(IDictionary<string, float> pricesConfig)
+        {
+            foreach (var kvp in pricesConfig)
+            {
+                currencyByType[kvp.Key] = kvp.Value;
+            }
+            Log.Instance.Debug($"[PriceCalculcator] Currencies list:\r\n{currencyByType.DumpToText()}");
         }
     }
 }

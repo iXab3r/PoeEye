@@ -6,8 +6,8 @@ namespace PoeShared.PoeTrade.Query
     {
         private IPoeCurrency[] currenciesList = new IPoeCurrency[0];
         private IPoeItem[] itemsList = new IPoeItem[0];
-        private IPoeItemMod[] modsList = new IPoeItemMod[0];
         private string[] leaguesList = new string[0];
+        private IPoeItemMod[] modsList = new IPoeItemMod[0];
 
         public IPoeItem[] ItemsList
         {

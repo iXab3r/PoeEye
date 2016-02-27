@@ -1,6 +1,5 @@
 ﻿namespace PoeEye.PoeTrade
 {
-    using System;
     using System.Collections.Generic;
     using System.Collections.Specialized;
     using System.Globalization;
@@ -23,19 +22,19 @@
                 KeyValuePair<string, string> pair;
                 if (poeQueryArgument is IPoeQueryStringArgument)
                 {
-                    pair = Convert((IPoeQueryStringArgument)poeQueryArgument);
+                    pair = Convert((IPoeQueryStringArgument) poeQueryArgument);
                 }
                 else if (poeQueryArgument is IPoeQueryFloatArgument)
                 {
-                    pair = Convert((IPoeQueryFloatArgument)poeQueryArgument);
+                    pair = Convert((IPoeQueryFloatArgument) poeQueryArgument);
                 }
                 else if (poeQueryArgument is IPoeQueryIntArgument)
                 {
-                    pair = Convert((IPoeQueryIntArgument)poeQueryArgument);
+                    pair = Convert((IPoeQueryIntArgument) poeQueryArgument);
                 }
                 else if (poeQueryArgument is IPoeQueryModArgument)
                 {
-                    Convert((IPoeQueryModArgument)poeQueryArgument, result);
+                    Convert((IPoeQueryModArgument) poeQueryArgument, result);
                     continue;
                 }
                 else
@@ -95,7 +94,7 @@
 
         private string Convert(float? source)
         {
-            return source == null ? string.Empty : Convert((float)source);
+            return source == null ? string.Empty : Convert((float) source);
         }
     }
 }

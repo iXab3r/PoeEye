@@ -14,7 +14,7 @@
         public Task<IPoeQueryResult> IssueQuery(IPoeQuery query)
         {
             Guard.ArgumentNotNull(() => query);
-            
+
             return Task.Run(() => ProcessQuery(query));
         }
 
@@ -25,23 +25,23 @@
 
         private IPoeQueryResult PrepareStatisData()
         {
-            return new PoeQueryResult()
+            return new PoeQueryResult
             {
-                LeaguesList = new string[] { "League 1", "League 2" },
+                LeaguesList = new[] {"League 1", "League 2"}
             };
         }
 
         private IPoeQueryResult ProcessQuery(IPoeQuery query)
         {
-            return new PoeQueryResult()
+            return new PoeQueryResult
             {
                 ModsList = new IPoeItemMod[0],
                 CurrenciesList = new IPoeCurrency[]
                 {
-                    new PoeCurrency() { Name = "Test currency 1", CodeName = "TC1" },
-                    new PoeCurrency() { Name = "Test currency 2", CodeName = "TC2" },
+                    new PoeCurrency {Name = "Test currency 1", CodeName = "TC1"},
+                    new PoeCurrency {Name = "Test currency 2", CodeName = "TC2"}
                 },
-                ItemsList = CreateFakeItems(15),
+                ItemsList = CreateFakeItems(15)
             };
         }
 
@@ -55,13 +55,13 @@
 
         private IPoeItem CreateFakeItem(int idx)
         {
-            return new PoeItem()
+            return new PoeItem
             {
                 Price = $"10 TC{idx}",
                 ItemName = $"Test item {idx}",
                 League = $"Test league",
                 UserForumUri = $"UserForumUri {idx}",
-                UserIgn = $"UserIgn {idx}",
+                UserIgn = $"UserIgn {idx}"
             };
         }
     }

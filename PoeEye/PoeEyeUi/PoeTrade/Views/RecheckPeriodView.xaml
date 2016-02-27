@@ -2,40 +2,40 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:viewModels="clr-namespace:PoeEyeUi.PoeTrade.ViewModels"
                     xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls">
-    <DataTemplate DataType="{x:Type viewModels:RecheckPeriodViewModel}">
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
+  <DataTemplate DataType="{x:Type viewModels:RecheckPeriodViewModel}">
+    <Grid>
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="Auto" />
+        <ColumnDefinition Width="Auto" />
+        <ColumnDefinition Width="Auto" />
+      </Grid.ColumnDefinitions>
 
-            <Slider Grid.Column="0" 
-                    Width="150"
-                    Margin="5,0" 
-                    IsEnabled="{Binding IsAutoRecheckEnabled}"
-                    Visibility="{Binding IsAutoRecheckEnabled, Converter={StaticResource BoolFalseToCollapsedConverter}}"
-                    Minimum="{Binding MinValue, Converter={StaticResource TimeSpanToSecondsConverter}, Mode=OneWay}"
-                    Maximum="{Binding MaxValue, Converter={StaticResource TimeSpanToSecondsConverter}, Mode=OneWay}"
-                    Value="{Binding RecheckValue, Converter={StaticResource TimeSpanToSecondsConverter}}"/>
+      <Slider Grid.Column="0"
+              Width="150"
+              Margin="5,0"
+              IsEnabled="{Binding IsAutoRecheckEnabled}"
+              Visibility="{Binding IsAutoRecheckEnabled, Converter={StaticResource BoolFalseToCollapsedConverter}}"
+              Minimum="{Binding MinValue, Converter={StaticResource TimeSpanToSecondsConverter}, Mode=OneWay}"
+              Maximum="{Binding MaxValue, Converter={StaticResource TimeSpanToSecondsConverter}, Mode=OneWay}"
+              Value="{Binding RecheckValue, Converter={StaticResource TimeSpanToSecondsConverter}}" />
 
-            <TextBlock Grid.Column="1" 
-                       VerticalAlignment="Center"
-                       Margin="5,0" 
-                       Visibility="{Binding IsAutoRecheckEnabled, Converter={StaticResource BoolFalseToCollapsedConverter}}"
-                       Text="{Binding RecheckValue, StringFormat='Recheck timeout: {0:F0}', Converter={StaticResource TimeSpanToHumanReadableStringConverter}}"/>
+      <TextBlock Grid.Column="1"
+                 VerticalAlignment="Center"
+                 Margin="5,0"
+                 Visibility="{Binding IsAutoRecheckEnabled, Converter={StaticResource BoolFalseToCollapsedConverter}}"
+                 Text="{Binding RecheckValue, StringFormat='Recheck timeout: {0:F0}', Converter={StaticResource TimeSpanToHumanReadableStringConverter}}" />
 
-            <TextBlock Grid.Column="1" 
-                       VerticalAlignment="Center"
-                       Margin="5,0" 
-                       Visibility="{Binding IsAutoRecheckEnabled, Converter={StaticResource BoolTrueToCollapsedConverter}}"
-                       Text="Recheck disabled"/>
+      <TextBlock Grid.Column="1"
+                 VerticalAlignment="Center"
+                 Margin="5,0"
+                 Visibility="{Binding IsAutoRecheckEnabled, Converter={StaticResource BoolTrueToCollapsedConverter}}"
+                 Text="Recheck disabled" />
 
-            <controls:ToggleSwitchButton Grid.Column="2"
-                                         ToolTip="Auto refresh"  
-                                         Height="26" 
-                                         Margin="5,0"
-                                         IsChecked="{Binding IsAutoRecheckEnabled}"/>
-        </Grid>
-    </DataTemplate>
+      <controls:ToggleSwitchButton Grid.Column="2"
+                                   ToolTip="Auto refresh"
+                                   Height="26"
+                                   Margin="5,0"
+                                   IsChecked="{Binding IsAutoRecheckEnabled}" />
+    </Grid>
+  </DataTemplate>
 </ResourceDictionary>

@@ -5,20 +5,20 @@
                     xmlns:common="clr-namespace:PoeShared.Common;assembly=PoeShared"
                     xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls">
 
-    <DataTemplate DataType="{x:Type common:PoeItemMod}">
-        <ContentControl>
-            <TextBlock Text="{Binding Name}" FontSize="15">
-                <TextBlock.Style>
-                    <Style TargetType="TextBlock" BasedOn="{StaticResource MetroTextBlock}">
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding IsCrafted}" Value="True">
-                                <Setter Property="FontStyle" Value="Italic"></Setter>
-                                <Setter Property="FontWeight" Value="Bold"></Setter>
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </TextBlock.Style>
-            </TextBlock>
-        </ContentControl>
-    </DataTemplate>
+  <DataTemplate DataType="{x:Type common:PoeItemMod}">
+    <ContentControl>
+      <TextBlock Text="{Binding Name}" FontSize="15">
+        <TextBlock.Style>
+          <Style TargetType="TextBlock" BasedOn="{StaticResource MetroTextBlock}">
+            <Style.Triggers>
+              <DataTrigger Binding="{Binding IsCrafted}" Value="True">
+                <Setter Property="FontStyle" Value="Italic" />
+                <Setter Property="FontWeight" Value="Bold" />
+              </DataTrigger>
+            </Style.Triggers>
+          </Style>
+        </TextBlock.Style>
+      </TextBlock>
+    </ContentControl>
+  </DataTemplate>
 </ResourceDictionary>

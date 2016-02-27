@@ -28,16 +28,25 @@
         private static readonly string PoeTradeSearchUri = @"http://poe.trade/search";
         private static readonly string PoeTradeUri = @"http://poe.trade";
 
+        private static readonly int MaxSimultaneousRequestsCount;
+        private static readonly bool ProxyEnabled;
+        private static readonly TimeSpan DelayBetweenRequests;
+        private static readonly SemaphoreSlim RequestsSemaphore;
+
         private readonly IFactory<IHttpClient> httpClientFactory;
 
         private readonly IPoeTradeParser poeTradeParser;
         private readonly IProxyProvider proxyProvider;
         private readonly IConverter<IPoeQuery, NameValueCollection> queryConverter;
 
-        private static readonly int MaxSimultaneousRequestsCount;
-        private static readonly bool ProxyEnabled;
-        private static readonly TimeSpan DelayBetweenRequests;
-        private static readonly SemaphoreSlim RequestsSemaphore;
+        static PoeTradeApi()
+        {
+            MaxSimultaneousRequestsCount = Settings.Default.MaxSimultaneousRequestsCount;
+            DelayBetweenRequests = Settings.Default.DelayBetweenRequests;
+            ProxyEnabled = Settings.Default.ProxyEnabled;
+            Log.Instance.Debug($"[PoeTradeApi..staticctor] {new {MaxSimultaneousRequestsCount, DelayBetweenRequests, ProxyEnabled}}");
+            RequestsSemaphore = new SemaphoreSlim(MaxSimultaneousRequestsCount);
+        }
 
         public PoeTradeApi(
             IPoeTradeParser poeTradeParser,
@@ -54,15 +63,6 @@
             this.proxyProvider = proxyProvider;
             this.queryConverter = queryConverter;
             this.httpClientFactory = httpClientFactory;
-        }
-
-        static PoeTradeApi()
-        {
-            MaxSimultaneousRequestsCount = Settings.Default.MaxSimultaneousRequestsCount;
-            DelayBetweenRequests = Settings.Default.DelayBetweenRequests;
-            ProxyEnabled = Settings.Default.ProxyEnabled;
-            Log.Instance.Debug($"[PoeTradeApi..staticctor] {new { MaxSimultaneousRequestsCount, DelayBetweenRequests, ProxyEnabled }}");
-            RequestsSemaphore = new SemaphoreSlim(MaxSimultaneousRequestsCount);
         }
 
         public Task<IPoeQueryResult> IssueQuery(IPoeQuery query)
@@ -88,7 +88,6 @@
             IProxyToken proxyToken = null;
             try
             {
-
                 var client = CreateClient();
                 if (ProxyEnabled && proxyProvider.TryGetProxy(out proxyToken))
                 {
@@ -104,15 +103,14 @@
 
                 try
                 {
-
                     Log.Instance.Trace($"[PoeTradeApi] Awaiting for semaphore slot (max: {MaxSimultaneousRequestsCount}, atm: {RequestsSemaphore.CurrentCount})");
                     RequestsSemaphore.Wait();
 
                     return client
-                      .Post(uri, queryParameters)
-                      .Select(ThrowIfNotParseable)
-                      .Select(poeTradeParser.Parse)
-                      .ToTask();
+                        .Post(uri, queryParameters)
+                        .Select(ThrowIfNotParseable)
+                        .Select(poeTradeParser.Parse)
+                        .ToTask();
                 }
                 finally
                 {

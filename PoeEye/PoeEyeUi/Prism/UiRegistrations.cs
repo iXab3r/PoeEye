@@ -3,8 +3,6 @@
     using System;
     using System.Diagnostics;
     using System.Reactive.Concurrency;
-    using System.Windows;
-    using System.Windows.Interop;
 
     using Config;
 
@@ -60,8 +58,8 @@
         {
             return Container
                 .RegisterType<IWindowTracker, WindowTracker>(
-                    WellKnownWindows.Main, 
-                    new ContainerControlledLifetimeManager(), 
+                    WellKnownWindows.Main,
+                    new ContainerControlledLifetimeManager(),
                     new InjectionFactory(unity => unity.Resolve<IWindowTracker>(new DependencyOverride<Func<string>>(new Func<string>(GetMainWindowTitle)))));
         }
 

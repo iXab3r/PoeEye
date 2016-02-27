@@ -14,12 +14,12 @@
     internal sealed class PoeItemParser : IPoeItemParser
     {
         private const string BlocksSeparator = "--------";
-
-        private readonly Regex rarityRegex = new Regex(@"^\s*Rarity\:\s*(.*?)\s*$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-        private readonly Regex linksRegex = new Regex(@"^\s*Sockets\:\s*(.*?)\s*$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         private readonly Regex itemLevelRegex = new Regex(@"^\s*Item Level\:\s*(.*?)\s*$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private readonly Regex linksRegex = new Regex(@"^\s*Sockets\:\s*(.*?)\s*$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         private readonly PoeModParser[] modsRegexes;
+
+        private readonly Regex rarityRegex = new Regex(@"^\s*Rarity\:\s*(.*?)\s*$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         public PoeItemParser([NotNull] IPoeModsProcessor modsProcessor)
         {
@@ -30,7 +30,7 @@
         {
             Guard.ArgumentNotNull(() => serializedItem);
 
-            var blockParsers = new List<Func<string, PoeItem, bool>>()
+            var blockParsers = new List<Func<string, PoeItem, bool>>
             {
                 ParseItemRarityAndName,
                 ParseItemCorruptionState,
@@ -38,7 +38,7 @@
                 ParseItemLinks,
                 ParseItemLevel,
                 ParseItemImplicitMods,
-                ParseItemExplicitMods,
+                ParseItemExplicitMods
             };
 
             var result = new PoeItem();
@@ -118,7 +118,7 @@
             {
                 return false;
             }
-            item.Links = new PoeLinksInfo { RawSockets = linksMatch.Groups[1].Value };
+            item.Links = new PoeLinksInfo {RawSockets = linksMatch.Groups[1].Value};
             return true;
         }
 
@@ -168,7 +168,7 @@
             var mod = ParseItemMod(possibleModString, mods);
             if (mod != null)
             {
-                item.Mods = item.Mods.Concat(new[] { mod }).ToArray();
+                item.Mods = item.Mods.Concat(new[] {mod}).ToArray();
                 return true;
             }
             return false;
@@ -208,7 +208,7 @@
                     continue;
                 }
 
-                var mod = new PoeItemMod()
+                var mod = new PoeItemMod
                 {
                     ModType = poeModInfo.Mod.ModType,
                     CodeName = poeModInfo.Mod.CodeName,
@@ -223,16 +223,16 @@
         private static string[] SplitToBlocks(string serializedItem)
         {
             var rawBlocks = PrepareString(serializedItem)
-               .Split(new[] { BlocksSeparator }, StringSplitOptions.RemoveEmptyEntries)
-               .Where(x => !string.IsNullOrWhiteSpace(x))
-               .ToArray();
+                .Split(new[] {BlocksSeparator}, StringSplitOptions.RemoveEmptyEntries)
+                .Where(x => !string.IsNullOrWhiteSpace(x))
+                .ToArray();
             return rawBlocks;
         }
 
         private static string[] SplitToStrings(string block)
         {
             return block
-                .Split(new[] { "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries)
+                .Split(new[] {"\r", "\n"}, StringSplitOptions.RemoveEmptyEntries)
                 .Select(PrepareString)
                 .Where(x => !string.IsNullOrEmpty(x))
                 .ToArray();
@@ -245,15 +245,15 @@
 
         private static void TrimProperties<T>(T item)
         {
-            var propertiesToProcess = typeof(T)
+            var propertiesToProcess = typeof (T)
                 .GetProperties()
-                .Where(x => x.PropertyType == typeof(string))
+                .Where(x => x.PropertyType == typeof (string))
                 .Where(x => x.CanRead && x.CanWrite)
                 .ToArray();
 
             foreach (var propertyInfo in propertiesToProcess)
             {
-                var currentValue = (string)propertyInfo.GetValue(item);
+                var currentValue = (string) propertyInfo.GetValue(item);
                 if (currentValue == null)
                 {
                     continue;

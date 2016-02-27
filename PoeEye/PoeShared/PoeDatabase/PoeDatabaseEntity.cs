@@ -5,14 +5,16 @@ namespace PoeShared.PoeDatabase
     using System.Xml;
 
     /// <summary>
-    /// Generalizes every item in PoE
+    ///     Generalizes every item in PoE
     /// </summary>
     public class PoeDatabaseEntity
     {
         public static IEqualityComparer<PoeDatabaseEntity> Comparer { get; } = new CategoryNameBaseEqualityComparer();
 
         public string Category { get; private set; }
+
         public string Name { get; private set; }
+
         public string Base { get; private set; }
 
         public virtual void Deserialize(XmlNode node)
@@ -49,16 +51,17 @@ namespace PoeShared.PoeDatabase
                 {
                     return false;
                 }
-                return string.Equals(x.Category, y.Category, StringComparison.OrdinalIgnoreCase) && string.Equals(x.Name, y.Name, StringComparison.OrdinalIgnoreCase) && string.Equals(x.Base, y.Base, StringComparison.OrdinalIgnoreCase);
+                return string.Equals(x.Category, y.Category, StringComparison.OrdinalIgnoreCase) && string.Equals(x.Name, y.Name, StringComparison.OrdinalIgnoreCase) &&
+                       string.Equals(x.Base, y.Base, StringComparison.OrdinalIgnoreCase);
             }
 
             public int GetHashCode(PoeDatabaseEntity obj)
             {
                 unchecked
                 {
-                    var hashCode = (obj.Category != null ? StringComparer.OrdinalIgnoreCase.GetHashCode(obj.Category) : 0);
-                    hashCode = (hashCode*397) ^ (obj.Name != null ? StringComparer.OrdinalIgnoreCase.GetHashCode(obj.Name) : 0);
-                    hashCode = (hashCode*397) ^ (obj.Base != null ? StringComparer.OrdinalIgnoreCase.GetHashCode(obj.Base) : 0);
+                    var hashCode = obj.Category != null ? StringComparer.OrdinalIgnoreCase.GetHashCode(obj.Category) : 0;
+                    hashCode = (hashCode * 397) ^ (obj.Name != null ? StringComparer.OrdinalIgnoreCase.GetHashCode(obj.Name) : 0);
+                    hashCode = (hashCode * 397) ^ (obj.Base != null ? StringComparer.OrdinalIgnoreCase.GetHashCode(obj.Base) : 0);
                     return hashCode;
                 }
             }

@@ -1,273 +1,274 @@
-<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="utf-8"?>
+
 <Root>
-<Entity Type="Accessory" Category="Ring">
-  <Property id="Name">Andvarius</Property>
-  <Property id="Type">Ring</Property>
-  <Property id="Rarity">Unique</Property>
-  <Property id="Base">Gold Ring</Property>
-  <Property id="Level">8</Property>
-  <Property id="Mods">(6 to 15)% increased Rarity of Items found | +10 to Dexterity | (50 to 70)% increased Rarity of Items found | −20% to all Elemental Resistances</Property>
-  <Property id="HasImplicitMod">True</Property>
-</Entity>
-<Entity Type="Accessory" Category="Ring">
-  <Property id="Name">Berek's Grip</Property>
-  <Property id="Type">Ring</Property>
-  <Property id="Rarity">Unique</Property>
-  <Property id="Base">Two-Stone Ring</Property>
-  <Property id="Level">20</Property>
-  <Property id="Mods">(12 to 16)% to Cold and Lightning Resistances | (10 to 15)% increased Cold Damage | Adds (1–1 to 1–50) Lightning Damage | +(30 to 40) to maximum Life | 5% of Damage against Shocked enemies Leeched as Mana | 5% of Damage against Frozen enemies Leeched as Life</Property>
-  <Property id="HasImplicitMod">True</Property>
-</Entity>
-<Entity Type="Accessory" Category="Ring">
-  <Property id="Name">Berek's Pass</Property>
-  <Property id="Type">Ring</Property>
-  <Property id="Rarity">Unique</Property>
-  <Property id="Base">Two-Stone Ring</Property>
-  <Property id="Level">20</Property>
-  <Property id="Mods">(12 to 16)% to Fire and Cold Resistances | (10 to 15)% increased Fire Damage | Adds (1–10 to 1–30) Cold Damage | +(30 to 40) to maximum Energy Shield | 30% increased Damage while Ignited | +5000 to Armour while Frozen</Property>
-  <Property id="HasImplicitMod">True</Property>
-</Entity>
-<Entity Type="Accessory" Category="Ring">
-  <Property id="Name">Berek's Respite</Property>
-  <Property id="Type">Ring</Property>
-  <Property id="Rarity">Unique</Property>
-  <Property id="Base">Two-Stone Ring</Property>
-  <Property id="Level">20</Property>
-  <Property id="Mods">(12 to 16)% to Fire and Lightning Resistances | Adds (1–10 to 1–30) Fire Damage | (10 to 15)% increased Lightning Damage | +(30 to 40) to maximum Mana | Shock a nearby enemy for 2 seconds on killing a Shocked Enemy | Ignite a nearby enemy on killing an Ignited enemy</Property>
-  <Property id="HasImplicitMod">True</Property>
-</Entity>
-<Entity Type="Accessory" Category="Ring">
-  <Property id="Name">Blackheart</Property>
-  <Property id="Type">Ring</Property>
-  <Property id="Rarity">Unique</Property>
-  <Property id="Base">Iron Ring</Property>
-  <Property id="Level">0</Property>
-  <Property id="Mods">Adds 1–4 Physical Damage | 5% increased Physical Damage | Adds 1–3 Chaos Damage | +(20 to 30) to maximum Life | (2.0 to 4.0) Life Regenerated per second | 10% Chance to Cause Monsters to Flee</Property>
-  <Property id="HasImplicitMod">True</Property>
-</Entity>
-<Entity Type="Accessory" Category="Ring">
-  <Property id="Name">Bloodboil</Property>
-  <Property id="Type">Ring</Property>
-  <Property id="Rarity">Unique</Property>
-  <Property id="Base">Coral Ring</Property>
-  <Property id="Level">24</Property>
-  <Property id="Mods">+(20 to 30) to maximum Life | Adds (7–15 to 10–20) Fire Damage | +(20 to 40) to maximum Life | +(10 to 15)% to Cold Resistance | 45% reduced Effect of Chill on You | 100% increased Ignite Duration on You</Property>
-  <Property id="HasImplicitMod">True</Property>
-</Entity>
-<Entity Type="Accessory" Category="Ring">
-  <Property id="Name">Death Rush</Property>
-  <Property id="Type">Ring</Property>
-  <Property id="Rarity">Unique</Property>
-  <Property id="Base">Amethyst Ring</Property>
-  <Property id="Level">46</Property>
-  <Property id="Mods">+(9 to 13)% to Chaos Resistance | +(300 to 350) to Accuracy Rating | +(60 to 80) to Armour | +(15 to 20)% to Chaos Resistance | (3 to 4)% of Physical Attack Damage Leeched as Life | You gain Onslaught for 2.0 seconds on Kill</Property>
-  <Property id="HasImplicitMod">True</Property>
-</Entity>
-<Entity Type="Accessory" Category="Ring">
-  <Property id="Name">Demigod's Eye</Property>
-  <Property id="Type">Ring</Property>
-  <Property id="Rarity">Unique</Property>
-  <Property id="Base">Golden Hoop</Property>
-  <Property id="Level">12</Property>
-  <Property id="Mods">+(8 to 12) to All Attributes | (16 to 24)% increased Rarity of Items Found | (30 to 40)% increased Mana Regeneration Rate | 3% increased Character Size</Property>
-  <Property id="HasImplicitMod">True</Property>
-</Entity>
-<Entity Type="Accessory" Category="Ring">
-  <Property id="Name">Doedre's Damning</Property>
-  <Property id="Type">Ring</Property>
-  <Property id="Rarity">Unique</Property>
-  <Property id="Base">Paua Ring</Property>
-  <Property id="Level">0</Property>
-  <Property id="Mods">+(20 to 25) to maximum Mana | +(5 to 10) to Intelligence | +5 Mana Gained on Kill | +5% to all Elemental Resistances | Enemies can have 1 additional Curse</Property>
-  <Property id="HasImplicitMod">True</Property>
-</Entity>
-<Entity Type="Accessory" Category="Ring">
-  <Property id="Name">Dream Fragments</Property>
-  <Property id="Type">Ring</Property>
-  <Property id="Rarity">Unique</Property>
-  <Property id="Base">Sapphire Ring</Property>
-  <Property id="Level">11</Property>
-  <Property id="Mods">+(20 to 30)% to Cold Resistance | 20% increased maximum Mana | 50% increased Mana Regeneration Rate | Cannot be Frozen</Property>
-  <Property id="HasImplicitMod">True</Property>
-</Entity>
-<Entity Type="Accessory" Category="Ring">
-  <Property id="Name">Gifts from Above</Property>
-  <Property id="Type">Ring</Property>
-  <Property id="Rarity">Unique</Property>
-  <Property id="Base">Diamond Ring</Property>
-  <Property id="Level">28</Property>
-  <Property id="Mods">(20 to 30)% increased Global Critical Strike Chance | (30 to 35)% increased Global Critical Strike Chance | (10 to 15)% increased Light Radius | Creates Consecrated Ground on Critical Strike | (40 to 50)% increased Rarity of Items Dropped by enemies killed with a Critical Strike</Property>
-  <Property id="HasImplicitMod">True</Property>
-</Entity>
-<Entity Type="Accessory" Category="Ring">
-  <Property id="Name">Kaom's Sign</Property>
-  <Property id="Type">Ring</Property>
-  <Property id="Rarity">Unique</Property>
-  <Property id="Base">Coral Ring</Property>
-  <Property id="Level">0</Property>
-  <Property id="Mods">+(20 to 30) to maximum Life | +(10 to 20) to Strength | 2% of Physical Attack Damage Leeched as Life | +1 maximum Endurance Charge</Property>
-  <Property id="HasImplicitMod">True</Property>
-</Entity>
-<Entity Type="Accessory" Category="Ring">
-  <Property id="Name">Kikazaru</Property>
-  <Property id="Type">Ring</Property>
-  <Property id="Rarity">Unique</Property>
-  <Property id="Base">Topaz Ring</Property>
-  <Property id="Level">20</Property>
-  <Property id="Mods">+(20 to 30)% to Lightning Resistance | +(10 to 15) to all Attributes | (13 to 17) Life Regenerated per second | (20 to 40)% increased Mana Regeneration Rate | 20% reduced Effect of Curses on You</Property>
-  <Property id="HasImplicitMod">True</Property>
-</Entity>
-<Entity Type="Accessory" Category="Ring">
-  <Property id="Name">Le Heup of All</Property>
-  <Property id="Type">Ring</Property>
-  <Property id="Rarity">Unique</Property>
-  <Property id="Base">Iron Ring</Property>
-  <Property id="Level">24</Property>
-  <Property id="Mods">Adds 1–4 Physical Damage | (10 to 20)% increased Damage | +(10 to 20) to all Attributes | +(10 to 20)% to all Elemental Resistances | (10 to 20)% increased Rarity of Items found</Property>
-  <Property id="HasImplicitMod">True</Property>
-</Entity>
-<Entity Type="Accessory" Category="Ring">
-  <Property id="Name">Lori's Lantern</Property>
-  <Property id="Type">Ring</Property>
-  <Property id="Rarity">Unique</Property>
-  <Property id="Base">Prismatic Ring</Property>
-  <Property id="Level">30</Property>
-  <Property id="Mods">(8 to 10)% to all Elemental Resistances | 10% to all Elemental Resistances | (6 to 8)% increased Movement Speed when on Low Life | 31% increased Light Radius | +(20 to 25)% Chaos Resistance when on Low Life | While on Low Life, Enemies are Unlucky when Damaging you</Property>
-  <Property id="HasImplicitMod">True</Property>
-</Entity>
-<Entity Type="Accessory" Category="Ring">
-  <Property id="Name">Malachai's Artifice</Property>
-  <Property id="Type">Ring</Property>
-  <Property id="Rarity">Unique</Property>
-  <Property id="Base">Unset Ring</Property>
-  <Property id="Level">0</Property>
-  <Property id="Mods">Has 1 Socket | Socketed Gems have Elemental Equilibrium | Socketed Gems have 40% reduced Elemental Equilibrium effect | −25% to all Elemental Resistances | +(75 to 100)% to Fire Resistance when Socketed with a Red Gem | +(75 to 100)% to Cold Resistance when Socketed with a Green Gem | +(75 to 100)% to Lightning Resistance when Socketed with a Blue Gem | All Sockets are White</Property>
-  <Property id="HasImplicitMod">True</Property>
-</Entity>
-<Entity Type="Accessory" Category="Ring">
-  <Property id="Name">Ming's Heart</Property>
-  <Property id="Type">Ring</Property>
-  <Property id="Rarity">Unique</Property>
-  <Property id="Base">Amethyst Ring</Property>
-  <Property id="Level">69</Property>
-  <Property id="Mods">+(9 to 13)% to Chaos Resistance | 15% reduced maximum Life | 15% reduced maximum Energy Shield | +(40 to 50)% to Chaos Resistance | Gain 20% of Physical Damage as Extra Chaos Damage</Property>
-  <Property id="HasImplicitMod">True</Property>
-</Entity>
-<Entity Type="Accessory" Category="Ring">
-  <Property id="Name">Mokou's Embrace</Property>
-  <Property id="Type">Ring</Property>
-  <Property id="Rarity">Unique</Property>
-  <Property id="Base">Ruby Ring</Property>
-  <Property id="Level">11</Property>
-  <Property id="Mods">+(20 to 30)% to Fire Resistance | (15 to 25)% increased Fire Damage | +(25 to 40)% to Cold Resistance | (5 to 10)% chance to Ignite | 20% increased Attack Speed while Ignited | 20% increased Cast Speed while Ignited | +25% chance to be Ignited</Property>
-  <Property id="HasImplicitMod">True</Property>
-</Entity>
-<Entity Type="Accessory" Category="Ring">
-  <Property id="Name">Ngamahu's Sign</Property>
-  <Property id="Type">Ring</Property>
-  <Property id="Rarity">Unique</Property>
-  <Property id="Base">Ruby Ring</Property>
-  <Property id="Level">29</Property>
-  <Property id="Mods">+(20 to 30)% to Fire Resistance | +(15 to 25) to Strength | Adds (8–12 to 10–14) Fire Damage | +(4 to 5) Life gained for each Ignited Enemy hit by your Attacks | 15% increased Ignite Duration on Enemies | 5% chance to Ignite</Property>
-  <Property id="HasImplicitMod">True</Property>
-</Entity>
-<Entity Type="Accessory" Category="Ring">
-  <Property id="Name">Perandus Signet</Property>
-  <Property id="Type">Ring</Property>
-  <Property id="Rarity">Unique</Property>
-  <Property id="Base">Paua Ring</Property>
-  <Property id="Level">0</Property>
-  <Property id="Mods">+(20 to 25) to maximum Mana | +(25 to 30) to maximum Mana | (45 to 65)% increased Mana Regeneration Rate | 3% increased Experience gain | 3% increased Intelligence for each Unique Item you have equipped | 3% additional chance for slain monsters to drop Scrolls of Wisdom</Property>
-  <Property id="HasImplicitMod">True</Property>
-</Entity>
-<Entity Type="Accessory" Category="Ring">
-  <Property id="Name">Pyre</Property>
-  <Property id="Type">Ring</Property>
-  <Property id="Rarity">Unique</Property>
-  <Property id="Base">Sapphire Ring</Property>
-  <Property id="Level">11</Property>
-  <Property id="Mods">+(20 to 30)% to Cold Resistance | +(25 to 35)% to Fire Resistance | (25 to 35)% increased Burning Damage | 100% of Cold Damage Converted to Fire Damage | 10% increased Light Radius | Ignited enemies you hit are destroyed on Kill</Property>
-  <Property id="HasImplicitMod">True</Property>
-</Entity>
-<Entity Type="Accessory" Category="Ring">
-  <Property id="Name">Romira's Banquet</Property>
-  <Property id="Type">Ring</Property>
-  <Property id="Rarity">Unique</Property>
-  <Property id="Base">Diamond Ring</Property>
-  <Property id="Level">60</Property>
-  <Property id="Mods">(20 to 30)% increased Global Critical Strike Chance | +333 to Accuracy Rating | (10 to 15)% increased Global Critical Strike Multiplier | +(40 to 60) to maximum Mana | 2% of Physical Attack Damage Leeched as Mana | Gain a Power Charge on non | -Critical Strike | Lose all Power Charges on Critical Strike</Property>
-  <Property id="HasImplicitMod">True</Property>
-</Entity>
-<Entity Type="Accessory" Category="Ring">
-  <Property id="Name">Shavronne's Revelation</Property>
-  <Property id="Type">Ring</Property>
-  <Property id="Rarity">Unique</Property>
-  <Property id="Base">Moonstone Ring</Property>
-  <Property id="Level">30</Property>
-  <Property id="Mods">+(15 to 25) to maximum Energy Shield | +(60 to 75) to Intelligence | Right ring slot: You cannot Regenerate Mana | Right ring slot: 3.0% of Energy Shield Regenerated per second | Left ring slot: 100% increased Mana Regeneration Rate | Left ring slot: You cannot Recharge or Regenerate Energy Shield</Property>
-  <Property id="HasImplicitMod">True</Property>
-</Entity>
-<Entity Type="Accessory" Category="Ring">
-  <Property id="Name">Sibyl's Lament</Property>
-  <Property id="Type">Ring</Property>
-  <Property id="Rarity">Unique</Property>
-  <Property id="Base">Coral Ring</Property>
-  <Property id="Level">45</Property>
-  <Property id="Mods">+(20 to 30) to maximum Life | (20 to 30)% increased Elemental Damage with Weapons | Adds (8–20 to 15–28) Fire Damage | (20 to 40)% reduced Rarity of Items found | Left ring slot: 30% reduced Reflected Elemental Damage taken | Right ring slot: 30% reduced Reflected Physical Damage taken</Property>
-  <Property id="HasImplicitMod">True</Property>
-</Entity>
-<Entity Type="Accessory" Category="Ring">
-  <Property id="Name">The Taming</Property>
-  <Property id="Type">Ring</Property>
-  <Property id="Rarity">Unique</Property>
-  <Property id="Base">Prismatic Ring</Property>
-  <Property id="Level">30</Property>
-  <Property id="Mods">(8 to 10)% to all Elemental Resistances | 15% increased Elemental Damage with Weapons | +(10 to 15)% to all Elemental Resistances | 15% increased Elemental Damage | 5% chance to Freeze, Shock and Ignite | 10% increased damage per Freeze, Shock and Ignite on enemy</Property>
-  <Property id="HasImplicitMod">True</Property>
-</Entity>
-<Entity Type="Accessory" Category="Ring">
-  <Property id="Name">Tasalio's Sign</Property>
-  <Property id="Type">Ring</Property>
-  <Property id="Rarity">Unique</Property>
-  <Property id="Base">Sapphire Ring</Property>
-  <Property id="Level">20</Property>
-  <Property id="Mods">+(20 to 30)% to Cold Resistance | Adds 10–15 Physical Damage against Frozen Enemies | Adds (5–7 to 6–9) Cold Damage | +(200 to 300) to Evasion Rating | 20% reduced Chill Duration on You | 5% chance to Freeze</Property>
-  <Property id="HasImplicitMod">True</Property>
-</Entity>
-<Entity Type="Accessory" Category="Ring">
-  <Property id="Name">Thief's Torment</Property>
-  <Property id="Type">Ring</Property>
-  <Property id="Rarity">Unique</Property>
-  <Property id="Base">Prismatic Ring</Property>
-  <Property id="Level">30</Property>
-  <Property id="Mods">+(8 to 10)% to all Elemental Resistances | +(20 to 30) Life gained for each enemy hit by your Attacks | +15 Mana gained for each enemy hit by your Attacks | +(8 to 12)% to all Elemental Resistances | (10 to 16)% increased Quantity of Items found | 50% Reduced Effect of Curses on You | Can't use other Rings</Property>
-  <Property id="HasImplicitMod">True</Property>
-</Entity>
-<Entity Type="Accessory" Category="Ring">
-  <Property id="Name">Timeclasp</Property>
-  <Property id="Type">Ring</Property>
-  <Property id="Rarity">Unique</Property>
-  <Property id="Base">Moonstone Ring</Property>
-  <Property id="Level">22</Property>
-  <Property id="Mods">+(15 to 25) to maximum Energy Shield | (10 to 15)% increased Attack Speed | (5 to 8)% increased Cast Speed | 15% reduced Mana Regeneration Rate | +(10 to 25) to maximum Energy Shield | Temporal Chains has 30% reduced Effect on You</Property>
-  <Property id="HasImplicitMod">True</Property>
-</Entity>
-<Entity Type="Accessory" Category="Ring">
-  <Property id="Name">Valako's Sign</Property>
-  <Property id="Type">Ring</Property>
-  <Property id="Rarity">Unique</Property>
-  <Property id="Base">Topaz Ring</Property>
-  <Property id="Level">38</Property>
-  <Property id="Mods">+(20 to 30)% to Lightning Resistance | 15% increased Damage against Shocked Enemies | 20% increased Lightning Damage | +(20 to 40) to maximum Mana | 1% of Damage Leeched as Life against Shocked Enemies | 5% chance to Shock</Property>
-  <Property id="HasImplicitMod">True</Property>
-</Entity>
-<Entity Type="Accessory" Category="Ring">
-  <Property id="Name">Voideye</Property>
-  <Property id="Type">Ring</Property>
-  <Property id="Rarity">Unique</Property>
-  <Property id="Base">Unset Ring</Property>
-  <Property id="Level">45</Property>
-  <Property id="Mods">Has 1 Socket | +5 to Level of Gems in this item</Property>
-  <Property id="HasImplicitMod">True</Property>
-</Entity>
+  <Entity Type="Accessory" Category="Ring">
+    <Property id="Name">Andvarius</Property>
+    <Property id="Type">Ring</Property>
+    <Property id="Rarity">Unique</Property>
+    <Property id="Base">Gold Ring</Property>
+    <Property id="Level">8</Property>
+    <Property id="Mods">(6 to 15)% increased Rarity of Items found | +10 to Dexterity | (50 to 70)% increased Rarity of Items found | −20% to all Elemental Resistances</Property>
+    <Property id="HasImplicitMod">True</Property>
+  </Entity>
+  <Entity Type="Accessory" Category="Ring">
+    <Property id="Name">Berek's Grip</Property>
+    <Property id="Type">Ring</Property>
+    <Property id="Rarity">Unique</Property>
+    <Property id="Base">Two-Stone Ring</Property>
+    <Property id="Level">20</Property>
+    <Property id="Mods">(12 to 16)% to Cold and Lightning Resistances | (10 to 15)% increased Cold Damage | Adds (1–1 to 1–50) Lightning Damage | +(30 to 40) to maximum Life | 5% of Damage against Shocked enemies Leeched as Mana | 5% of Damage against Frozen enemies Leeched as Life</Property>
+    <Property id="HasImplicitMod">True</Property>
+  </Entity>
+  <Entity Type="Accessory" Category="Ring">
+    <Property id="Name">Berek's Pass</Property>
+    <Property id="Type">Ring</Property>
+    <Property id="Rarity">Unique</Property>
+    <Property id="Base">Two-Stone Ring</Property>
+    <Property id="Level">20</Property>
+    <Property id="Mods">(12 to 16)% to Fire and Cold Resistances | (10 to 15)% increased Fire Damage | Adds (1–10 to 1–30) Cold Damage | +(30 to 40) to maximum Energy Shield | 30% increased Damage while Ignited | +5000 to Armour while Frozen</Property>
+    <Property id="HasImplicitMod">True</Property>
+  </Entity>
+  <Entity Type="Accessory" Category="Ring">
+    <Property id="Name">Berek's Respite</Property>
+    <Property id="Type">Ring</Property>
+    <Property id="Rarity">Unique</Property>
+    <Property id="Base">Two-Stone Ring</Property>
+    <Property id="Level">20</Property>
+    <Property id="Mods">(12 to 16)% to Fire and Lightning Resistances | Adds (1–10 to 1–30) Fire Damage | (10 to 15)% increased Lightning Damage | +(30 to 40) to maximum Mana | Shock a nearby enemy for 2 seconds on killing a Shocked Enemy | Ignite a nearby enemy on killing an Ignited enemy</Property>
+    <Property id="HasImplicitMod">True</Property>
+  </Entity>
+  <Entity Type="Accessory" Category="Ring">
+    <Property id="Name">Blackheart</Property>
+    <Property id="Type">Ring</Property>
+    <Property id="Rarity">Unique</Property>
+    <Property id="Base">Iron Ring</Property>
+    <Property id="Level">0</Property>
+    <Property id="Mods">Adds 1–4 Physical Damage | 5% increased Physical Damage | Adds 1–3 Chaos Damage | +(20 to 30) to maximum Life | (2.0 to 4.0) Life Regenerated per second | 10% Chance to Cause Monsters to Flee</Property>
+    <Property id="HasImplicitMod">True</Property>
+  </Entity>
+  <Entity Type="Accessory" Category="Ring">
+    <Property id="Name">Bloodboil</Property>
+    <Property id="Type">Ring</Property>
+    <Property id="Rarity">Unique</Property>
+    <Property id="Base">Coral Ring</Property>
+    <Property id="Level">24</Property>
+    <Property id="Mods">+(20 to 30) to maximum Life | Adds (7–15 to 10–20) Fire Damage | +(20 to 40) to maximum Life | +(10 to 15)% to Cold Resistance | 45% reduced Effect of Chill on You | 100% increased Ignite Duration on You</Property>
+    <Property id="HasImplicitMod">True</Property>
+  </Entity>
+  <Entity Type="Accessory" Category="Ring">
+    <Property id="Name">Death Rush</Property>
+    <Property id="Type">Ring</Property>
+    <Property id="Rarity">Unique</Property>
+    <Property id="Base">Amethyst Ring</Property>
+    <Property id="Level">46</Property>
+    <Property id="Mods">+(9 to 13)% to Chaos Resistance | +(300 to 350) to Accuracy Rating | +(60 to 80) to Armour | +(15 to 20)% to Chaos Resistance | (3 to 4)% of Physical Attack Damage Leeched as Life | You gain Onslaught for 2.0 seconds on Kill</Property>
+    <Property id="HasImplicitMod">True</Property>
+  </Entity>
+  <Entity Type="Accessory" Category="Ring">
+    <Property id="Name">Demigod's Eye</Property>
+    <Property id="Type">Ring</Property>
+    <Property id="Rarity">Unique</Property>
+    <Property id="Base">Golden Hoop</Property>
+    <Property id="Level">12</Property>
+    <Property id="Mods">+(8 to 12) to All Attributes | (16 to 24)% increased Rarity of Items Found | (30 to 40)% increased Mana Regeneration Rate | 3% increased Character Size</Property>
+    <Property id="HasImplicitMod">True</Property>
+  </Entity>
+  <Entity Type="Accessory" Category="Ring">
+    <Property id="Name">Doedre's Damning</Property>
+    <Property id="Type">Ring</Property>
+    <Property id="Rarity">Unique</Property>
+    <Property id="Base">Paua Ring</Property>
+    <Property id="Level">0</Property>
+    <Property id="Mods">+(20 to 25) to maximum Mana | +(5 to 10) to Intelligence | +5 Mana Gained on Kill | +5% to all Elemental Resistances | Enemies can have 1 additional Curse</Property>
+    <Property id="HasImplicitMod">True</Property>
+  </Entity>
+  <Entity Type="Accessory" Category="Ring">
+    <Property id="Name">Dream Fragments</Property>
+    <Property id="Type">Ring</Property>
+    <Property id="Rarity">Unique</Property>
+    <Property id="Base">Sapphire Ring</Property>
+    <Property id="Level">11</Property>
+    <Property id="Mods">+(20 to 30)% to Cold Resistance | 20% increased maximum Mana | 50% increased Mana Regeneration Rate | Cannot be Frozen</Property>
+    <Property id="HasImplicitMod">True</Property>
+  </Entity>
+  <Entity Type="Accessory" Category="Ring">
+    <Property id="Name">Gifts from Above</Property>
+    <Property id="Type">Ring</Property>
+    <Property id="Rarity">Unique</Property>
+    <Property id="Base">Diamond Ring</Property>
+    <Property id="Level">28</Property>
+    <Property id="Mods">(20 to 30)% increased Global Critical Strike Chance | (30 to 35)% increased Global Critical Strike Chance | (10 to 15)% increased Light Radius | Creates Consecrated Ground on Critical Strike | (40 to 50)% increased Rarity of Items Dropped by enemies killed with a Critical Strike</Property>
+    <Property id="HasImplicitMod">True</Property>
+  </Entity>
+  <Entity Type="Accessory" Category="Ring">
+    <Property id="Name">Kaom's Sign</Property>
+    <Property id="Type">Ring</Property>
+    <Property id="Rarity">Unique</Property>
+    <Property id="Base">Coral Ring</Property>
+    <Property id="Level">0</Property>
+    <Property id="Mods">+(20 to 30) to maximum Life | +(10 to 20) to Strength | 2% of Physical Attack Damage Leeched as Life | +1 maximum Endurance Charge</Property>
+    <Property id="HasImplicitMod">True</Property>
+  </Entity>
+  <Entity Type="Accessory" Category="Ring">
+    <Property id="Name">Kikazaru</Property>
+    <Property id="Type">Ring</Property>
+    <Property id="Rarity">Unique</Property>
+    <Property id="Base">Topaz Ring</Property>
+    <Property id="Level">20</Property>
+    <Property id="Mods">+(20 to 30)% to Lightning Resistance | +(10 to 15) to all Attributes | (13 to 17) Life Regenerated per second | (20 to 40)% increased Mana Regeneration Rate | 20% reduced Effect of Curses on You</Property>
+    <Property id="HasImplicitMod">True</Property>
+  </Entity>
+  <Entity Type="Accessory" Category="Ring">
+    <Property id="Name">Le Heup of All</Property>
+    <Property id="Type">Ring</Property>
+    <Property id="Rarity">Unique</Property>
+    <Property id="Base">Iron Ring</Property>
+    <Property id="Level">24</Property>
+    <Property id="Mods">Adds 1–4 Physical Damage | (10 to 20)% increased Damage | +(10 to 20) to all Attributes | +(10 to 20)% to all Elemental Resistances | (10 to 20)% increased Rarity of Items found</Property>
+    <Property id="HasImplicitMod">True</Property>
+  </Entity>
+  <Entity Type="Accessory" Category="Ring">
+    <Property id="Name">Lori's Lantern</Property>
+    <Property id="Type">Ring</Property>
+    <Property id="Rarity">Unique</Property>
+    <Property id="Base">Prismatic Ring</Property>
+    <Property id="Level">30</Property>
+    <Property id="Mods">(8 to 10)% to all Elemental Resistances | 10% to all Elemental Resistances | (6 to 8)% increased Movement Speed when on Low Life | 31% increased Light Radius | +(20 to 25)% Chaos Resistance when on Low Life | While on Low Life, Enemies are Unlucky when Damaging you</Property>
+    <Property id="HasImplicitMod">True</Property>
+  </Entity>
+  <Entity Type="Accessory" Category="Ring">
+    <Property id="Name">Malachai's Artifice</Property>
+    <Property id="Type">Ring</Property>
+    <Property id="Rarity">Unique</Property>
+    <Property id="Base">Unset Ring</Property>
+    <Property id="Level">0</Property>
+    <Property id="Mods">Has 1 Socket | Socketed Gems have Elemental Equilibrium | Socketed Gems have 40% reduced Elemental Equilibrium effect | −25% to all Elemental Resistances | +(75 to 100)% to Fire Resistance when Socketed with a Red Gem | +(75 to 100)% to Cold Resistance when Socketed with a Green Gem | +(75 to 100)% to Lightning Resistance when Socketed with a Blue Gem | All Sockets are White</Property>
+    <Property id="HasImplicitMod">True</Property>
+  </Entity>
+  <Entity Type="Accessory" Category="Ring">
+    <Property id="Name">Ming's Heart</Property>
+    <Property id="Type">Ring</Property>
+    <Property id="Rarity">Unique</Property>
+    <Property id="Base">Amethyst Ring</Property>
+    <Property id="Level">69</Property>
+    <Property id="Mods">+(9 to 13)% to Chaos Resistance | 15% reduced maximum Life | 15% reduced maximum Energy Shield | +(40 to 50)% to Chaos Resistance | Gain 20% of Physical Damage as Extra Chaos Damage</Property>
+    <Property id="HasImplicitMod">True</Property>
+  </Entity>
+  <Entity Type="Accessory" Category="Ring">
+    <Property id="Name">Mokou's Embrace</Property>
+    <Property id="Type">Ring</Property>
+    <Property id="Rarity">Unique</Property>
+    <Property id="Base">Ruby Ring</Property>
+    <Property id="Level">11</Property>
+    <Property id="Mods">+(20 to 30)% to Fire Resistance | (15 to 25)% increased Fire Damage | +(25 to 40)% to Cold Resistance | (5 to 10)% chance to Ignite | 20% increased Attack Speed while Ignited | 20% increased Cast Speed while Ignited | +25% chance to be Ignited</Property>
+    <Property id="HasImplicitMod">True</Property>
+  </Entity>
+  <Entity Type="Accessory" Category="Ring">
+    <Property id="Name">Ngamahu's Sign</Property>
+    <Property id="Type">Ring</Property>
+    <Property id="Rarity">Unique</Property>
+    <Property id="Base">Ruby Ring</Property>
+    <Property id="Level">29</Property>
+    <Property id="Mods">+(20 to 30)% to Fire Resistance | +(15 to 25) to Strength | Adds (8–12 to 10–14) Fire Damage | +(4 to 5) Life gained for each Ignited Enemy hit by your Attacks | 15% increased Ignite Duration on Enemies | 5% chance to Ignite</Property>
+    <Property id="HasImplicitMod">True</Property>
+  </Entity>
+  <Entity Type="Accessory" Category="Ring">
+    <Property id="Name">Perandus Signet</Property>
+    <Property id="Type">Ring</Property>
+    <Property id="Rarity">Unique</Property>
+    <Property id="Base">Paua Ring</Property>
+    <Property id="Level">0</Property>
+    <Property id="Mods">+(20 to 25) to maximum Mana | +(25 to 30) to maximum Mana | (45 to 65)% increased Mana Regeneration Rate | 3% increased Experience gain | 3% increased Intelligence for each Unique Item you have equipped | 3% additional chance for slain monsters to drop Scrolls of Wisdom</Property>
+    <Property id="HasImplicitMod">True</Property>
+  </Entity>
+  <Entity Type="Accessory" Category="Ring">
+    <Property id="Name">Pyre</Property>
+    <Property id="Type">Ring</Property>
+    <Property id="Rarity">Unique</Property>
+    <Property id="Base">Sapphire Ring</Property>
+    <Property id="Level">11</Property>
+    <Property id="Mods">+(20 to 30)% to Cold Resistance | +(25 to 35)% to Fire Resistance | (25 to 35)% increased Burning Damage | 100% of Cold Damage Converted to Fire Damage | 10% increased Light Radius | Ignited enemies you hit are destroyed on Kill</Property>
+    <Property id="HasImplicitMod">True</Property>
+  </Entity>
+  <Entity Type="Accessory" Category="Ring">
+    <Property id="Name">Romira's Banquet</Property>
+    <Property id="Type">Ring</Property>
+    <Property id="Rarity">Unique</Property>
+    <Property id="Base">Diamond Ring</Property>
+    <Property id="Level">60</Property>
+    <Property id="Mods">(20 to 30)% increased Global Critical Strike Chance | +333 to Accuracy Rating | (10 to 15)% increased Global Critical Strike Multiplier | +(40 to 60) to maximum Mana | 2% of Physical Attack Damage Leeched as Mana | Gain a Power Charge on non | -Critical Strike | Lose all Power Charges on Critical Strike</Property>
+    <Property id="HasImplicitMod">True</Property>
+  </Entity>
+  <Entity Type="Accessory" Category="Ring">
+    <Property id="Name">Shavronne's Revelation</Property>
+    <Property id="Type">Ring</Property>
+    <Property id="Rarity">Unique</Property>
+    <Property id="Base">Moonstone Ring</Property>
+    <Property id="Level">30</Property>
+    <Property id="Mods">+(15 to 25) to maximum Energy Shield | +(60 to 75) to Intelligence | Right ring slot: You cannot Regenerate Mana | Right ring slot: 3.0% of Energy Shield Regenerated per second | Left ring slot: 100% increased Mana Regeneration Rate | Left ring slot: You cannot Recharge or Regenerate Energy Shield</Property>
+    <Property id="HasImplicitMod">True</Property>
+  </Entity>
+  <Entity Type="Accessory" Category="Ring">
+    <Property id="Name">Sibyl's Lament</Property>
+    <Property id="Type">Ring</Property>
+    <Property id="Rarity">Unique</Property>
+    <Property id="Base">Coral Ring</Property>
+    <Property id="Level">45</Property>
+    <Property id="Mods">+(20 to 30) to maximum Life | (20 to 30)% increased Elemental Damage with Weapons | Adds (8–20 to 15–28) Fire Damage | (20 to 40)% reduced Rarity of Items found | Left ring slot: 30% reduced Reflected Elemental Damage taken | Right ring slot: 30% reduced Reflected Physical Damage taken</Property>
+    <Property id="HasImplicitMod">True</Property>
+  </Entity>
+  <Entity Type="Accessory" Category="Ring">
+    <Property id="Name">The Taming</Property>
+    <Property id="Type">Ring</Property>
+    <Property id="Rarity">Unique</Property>
+    <Property id="Base">Prismatic Ring</Property>
+    <Property id="Level">30</Property>
+    <Property id="Mods">(8 to 10)% to all Elemental Resistances | 15% increased Elemental Damage with Weapons | +(10 to 15)% to all Elemental Resistances | 15% increased Elemental Damage | 5% chance to Freeze, Shock and Ignite | 10% increased damage per Freeze, Shock and Ignite on enemy</Property>
+    <Property id="HasImplicitMod">True</Property>
+  </Entity>
+  <Entity Type="Accessory" Category="Ring">
+    <Property id="Name">Tasalio's Sign</Property>
+    <Property id="Type">Ring</Property>
+    <Property id="Rarity">Unique</Property>
+    <Property id="Base">Sapphire Ring</Property>
+    <Property id="Level">20</Property>
+    <Property id="Mods">+(20 to 30)% to Cold Resistance | Adds 10–15 Physical Damage against Frozen Enemies | Adds (5–7 to 6–9) Cold Damage | +(200 to 300) to Evasion Rating | 20% reduced Chill Duration on You | 5% chance to Freeze</Property>
+    <Property id="HasImplicitMod">True</Property>
+  </Entity>
+  <Entity Type="Accessory" Category="Ring">
+    <Property id="Name">Thief's Torment</Property>
+    <Property id="Type">Ring</Property>
+    <Property id="Rarity">Unique</Property>
+    <Property id="Base">Prismatic Ring</Property>
+    <Property id="Level">30</Property>
+    <Property id="Mods">+(8 to 10)% to all Elemental Resistances | +(20 to 30) Life gained for each enemy hit by your Attacks | +15 Mana gained for each enemy hit by your Attacks | +(8 to 12)% to all Elemental Resistances | (10 to 16)% increased Quantity of Items found | 50% Reduced Effect of Curses on You | Can't use other Rings</Property>
+    <Property id="HasImplicitMod">True</Property>
+  </Entity>
+  <Entity Type="Accessory" Category="Ring">
+    <Property id="Name">Timeclasp</Property>
+    <Property id="Type">Ring</Property>
+    <Property id="Rarity">Unique</Property>
+    <Property id="Base">Moonstone Ring</Property>
+    <Property id="Level">22</Property>
+    <Property id="Mods">+(15 to 25) to maximum Energy Shield | (10 to 15)% increased Attack Speed | (5 to 8)% increased Cast Speed | 15% reduced Mana Regeneration Rate | +(10 to 25) to maximum Energy Shield | Temporal Chains has 30% reduced Effect on You</Property>
+    <Property id="HasImplicitMod">True</Property>
+  </Entity>
+  <Entity Type="Accessory" Category="Ring">
+    <Property id="Name">Valako's Sign</Property>
+    <Property id="Type">Ring</Property>
+    <Property id="Rarity">Unique</Property>
+    <Property id="Base">Topaz Ring</Property>
+    <Property id="Level">38</Property>
+    <Property id="Mods">+(20 to 30)% to Lightning Resistance | 15% increased Damage against Shocked Enemies | 20% increased Lightning Damage | +(20 to 40) to maximum Mana | 1% of Damage Leeched as Life against Shocked Enemies | 5% chance to Shock</Property>
+    <Property id="HasImplicitMod">True</Property>
+  </Entity>
+  <Entity Type="Accessory" Category="Ring">
+    <Property id="Name">Voideye</Property>
+    <Property id="Type">Ring</Property>
+    <Property id="Rarity">Unique</Property>
+    <Property id="Base">Unset Ring</Property>
+    <Property id="Level">45</Property>
+    <Property id="Mods">Has 1 Socket | +5 to Level of Gems in this item</Property>
+    <Property id="HasImplicitMod">True</Property>
+  </Entity>
 </Root>

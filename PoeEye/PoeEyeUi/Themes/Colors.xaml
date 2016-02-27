@@ -3,21 +3,21 @@
                     xmlns:converters="clr-namespace:PoeEyeUi.Converters"
                     xmlns:blue="http://www.nuget.org/Blue.MVVM">
 
-    <Color x:Key="PoeTradeRemovedItemColor" >#55FF9298</Color>
-    <Color x:Key="PoeTradeNewItemColor" >#5592FF98</Color>
+  <Color x:Key="PoeTradeRemovedItemColor">#55FF9298</Color>
+  <Color x:Key="PoeTradeNewItemColor">#5592FF98</Color>
 
-    <SolidColorBrush x:Key="PoeTradeRemovedItemBrush" Color="{StaticResource PoeTradeRemovedItemColor}" />
-    <SolidColorBrush x:Key="PoeTradeNewItemBrush" Color="{StaticResource PoeTradeNewItemColor}" />
+  <SolidColorBrush x:Key="PoeTradeRemovedItemBrush" Color="{StaticResource PoeTradeRemovedItemColor}" />
+  <SolidColorBrush x:Key="PoeTradeNewItemBrush" Color="{StaticResource PoeTradeNewItemColor}" />
 
-    <SolidColorBrush x:Key="PoeItemRarityNormalBrush" Color="White" />
-    <SolidColorBrush x:Key="PoeItemRarityMagicBrush" Color="CornflowerBlue" />
-    <SolidColorBrush x:Key="PoeItemRarityRareBrush" Color="Yellow" />
-    <SolidColorBrush x:Key="PoeItemRarityUniqueBrush" Color="OrangeRed" />
+  <SolidColorBrush x:Key="PoeItemRarityNormalBrush" Color="White" />
+  <SolidColorBrush x:Key="PoeItemRarityMagicBrush" Color="CornflowerBlue" />
+  <SolidColorBrush x:Key="PoeItemRarityRareBrush" Color="Yellow" />
+  <SolidColorBrush x:Key="PoeItemRarityUniqueBrush" Color="OrangeRed" />
 
-    <Style x:Key="MetroTextBlockHeaderStyle" TargetType="TextBlock">
-        <Setter Property="FontSize" Value="16" />
-        <Setter Property="Foreground" Value="{StaticResource LabelTextBrush}" />
-        <Setter Property="VerticalAlignment" Value="Center" />
-    </Style>
+  <Style x:Key="MetroTextBlockHeaderStyle" TargetType="TextBlock">
+    <Setter Property="FontSize" Value="16" />
+    <Setter Property="Foreground" Value="{StaticResource LabelTextBrush}" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+  </Style>
 
 </ResourceDictionary>

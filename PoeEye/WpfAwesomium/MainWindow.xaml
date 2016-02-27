@@ -7,6 +7,6 @@
         xmlns:forms="clr-namespace:Awesomium.Windows.Forms;assembly=Awesomium.Windows.Forms"
         mc:Ignorable="d"
         Title="MainWindow" Height="350" Width="525">
-  <local:WpfChromium Source="http://google.com"  />
+  <local:WpfChromium Source="http://google.com" />
 
 </Window>

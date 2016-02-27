@@ -1,6 +1,5 @@
 ﻿namespace PoeEyeUi.PoeTrade.ViewModels
 {
-    using System.Collections.Generic;
     using System.Linq;
 
     using Guards;
@@ -39,7 +38,7 @@
             Guard.ArgumentNotNull(() => items);
 
             var viewModels = items.Select(poeTradeViewModelFactory.Create).ToArray();
-            this.ItemsViewModels.AddRange(viewModels);
+            ItemsViewModels.AddRange(viewModels);
         }
 
         public void Clear()

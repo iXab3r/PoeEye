@@ -1,13 +1,11 @@
 ﻿namespace PoeEye.Prism
 {
     using System.Collections.Specialized;
-    using System.Net;
 
     using Communications;
 
     using Microsoft.Practices.Unity;
 
-    using PoeShared;
     using PoeShared.Http;
     using PoeShared.PoeTrade;
     using PoeShared.PoeTrade.Query;

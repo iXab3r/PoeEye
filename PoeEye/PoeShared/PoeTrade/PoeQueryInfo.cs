@@ -1,18 +1,15 @@
 ﻿namespace PoeShared.PoeTrade
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Diagnostics;
-    using System.Linq;
-
     using Common;
-
-    using Guards;
 
     using Query;
 
     public sealed class PoeQueryInfo : IPoeQueryInfo
     {
+        public string[] LeaguesList { get; set; }
+
+        public IPoeQueryRangeModArgument[] Mods { get; set; }
+
         public bool AlternativeArt { get; set; }
 
         public float? ApsMax { get; set; }
@@ -70,8 +67,6 @@
         public IPoeItemType ItemType { get; set; }
 
         public string League { get; set; }
-
-        public string[] LeaguesList { get; set; }
 
         public int? LevelMax { get; set; }
 
@@ -132,8 +127,6 @@
         public int? SocketsR { get; set; }
 
         public int? SocketsW { get; set; }
-
-        public IPoeQueryRangeModArgument[] Mods { get; set; }
 
         public IPoeQueryModsGroup[] ModGroups { get; set; }
     }

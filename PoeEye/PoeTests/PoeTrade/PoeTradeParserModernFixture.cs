@@ -18,18 +18,9 @@
         {
         }
 
-        [Test]
-        public void ShouldParseItems()
+        private PoeTradeParserModern CreateInstance()
         {
-            //Given
-            var rawHtml = TestDataProvider.ModernResult;
-            var instance = CreateInstance();
-
-            //When
-            var result = instance.Parse(rawHtml);
-
-            //Then
-            result.ItemsList.Count().ShouldBe(99);
+            return new PoeTradeParserModern();
         }
 
         [Test]
@@ -47,6 +38,20 @@
         }
 
         [Test]
+        public void ShouldParseItems()
+        {
+            //Given
+            var rawHtml = TestDataProvider.ModernResult;
+            var instance = CreateInstance();
+
+            //When
+            var result = instance.Parse(rawHtml);
+
+            //Then
+            result.ItemsList.Count().ShouldBe(99);
+        }
+
+        [Test]
         public void ShouldParseModsList()
         {
             //Given
@@ -58,11 +63,6 @@
 
             //Then
             result.ModsList.Length.ShouldBe(619);
-        }
-
-        private PoeTradeParserModern CreateInstance()
-        {
-            return new PoeTradeParserModern();
         }
     }
 }

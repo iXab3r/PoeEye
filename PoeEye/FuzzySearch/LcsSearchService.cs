@@ -29,7 +29,7 @@ namespace FuzzySearch
             }
 
             return haystack
-                .Select(itemToMatch => new { itemToMatch, Score = LongestCommonSubsequenceExtensions.LongestCommonSubsequence(itemToMatch, needle).Item2 }) 
+                .Select(itemToMatch => new {itemToMatch, Score = itemToMatch.LongestCommonSubsequence(needle).Item2})
                 .Where(x => x.Score > 0)
                 .Select(x => new SearchResult(x.itemToMatch, x.Score * 100));
         }

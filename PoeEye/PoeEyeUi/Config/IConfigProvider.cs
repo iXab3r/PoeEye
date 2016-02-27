@@ -1,12 +1,11 @@
 ﻿namespace PoeEyeUi.Config
 {
-    using System;
     using System.ComponentModel;
 
     using JetBrains.Annotations;
 
     internal interface IConfigProvider<TConfig> : INotifyPropertyChanged
-             where TConfig : class
+        where TConfig : class
     {
         TConfig ActualConfig { [NotNull] get; }
 

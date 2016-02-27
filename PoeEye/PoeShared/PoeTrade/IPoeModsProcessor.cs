@@ -4,7 +4,7 @@
 
     internal interface IPoeModsProcessor
     {
-        [NotNull] 
+        [NotNull]
         PoeModParser[] GetKnownParsers();
     }
 }

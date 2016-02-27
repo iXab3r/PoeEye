@@ -7,371 +7,407 @@
                     xmlns:System="clr-namespace:System;assembly=mscorlib"
                     xmlns:common="clr-namespace:PoeShared.Common;assembly=PoeShared"
                     xmlns:editors="https://github.com/iXab3r/WpfAutoCompleteControls">
-    <DataTemplate DataType="{x:Type viewModels:PoeQueryViewModel}">
-        <Grid>
-            <Grid.Resources>
-                <Style TargetType="TextBlock" BasedOn="{StaticResource MetroTextBlock}" x:Key="TextBlockHeader">
-                    <Setter Property="FontSize" Value="14"/>
-                    <Setter Property="Foreground" Value="{StaticResource LabelTextBrush}"/>
-                    <Setter Property="Margin" Value="3,0,3,0"/>
-                    <Setter Property="HorizontalAlignment" Value="Right"/>
-                    <Setter Property="VerticalAlignment" Value="Center"/>
-                </Style>
+  <DataTemplate DataType="{x:Type viewModels:PoeQueryViewModel}">
+    <Grid>
+      <Grid.Resources>
+        <Style TargetType="TextBlock" BasedOn="{StaticResource MetroTextBlock}" x:Key="TextBlockHeader">
+          <Setter Property="FontSize" Value="14" />
+          <Setter Property="Foreground" Value="{StaticResource LabelTextBrush}" />
+          <Setter Property="Margin" Value="3,0,3,0" />
+          <Setter Property="HorizontalAlignment" Value="Right" />
+          <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
 
-                <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}"  x:Key="TextBoxKey" >
-                    <Setter Property="VerticalContentAlignment" Value="Center"/>
-                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
-                    <Setter Property="Width" Value="80"/>
-                    <Setter Property="Margin" Value="3,0,3,0"/>
-                </Style>
+        <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}" x:Key="TextBoxKey">
+          <Setter Property="VerticalContentAlignment" Value="Center" />
+          <Setter Property="HorizontalContentAlignment" Value="Center" />
+          <Setter Property="Width" Value="80" />
+          <Setter Property="Margin" Value="3,0,3,0" />
+        </Style>
 
-                <Style TargetType="StackPanel">
-                    <Setter Property="Orientation" Value="Horizontal"/>
-                </Style>
-            </Grid.Resources>
+        <Style TargetType="StackPanel">
+          <Setter Property="Orientation" Value="Horizontal" />
+        </Style>
+      </Grid.Resources>
 
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="10"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="10"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="10"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="10"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="10"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="10"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="10"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="10" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="10" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="10" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="10" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="10" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="10" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="10" />
+        <RowDefinition Height="Auto" />
+      </Grid.RowDefinitions>
 
-            <Grid Row="0">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="5" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
+      <Grid Row="0">
+        <Grid.RowDefinitions>
+          <RowDefinition Height="Auto" />
+          <RowDefinition Height="5" />
+          <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
 
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="80"/>
-                    <ColumnDefinition Width="180"/>
-                    <ColumnDefinition Width="80"/>
-                    <ColumnDefinition Width="180"/>
-                    <ColumnDefinition Width="80"/>
-                    <ColumnDefinition Width="180"/>
-                </Grid.ColumnDefinitions>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="80" />
+          <ColumnDefinition Width="180" />
+          <ColumnDefinition Width="80" />
+          <ColumnDefinition Width="180" />
+          <ColumnDefinition Width="80" />
+          <ColumnDefinition Width="180" />
+        </Grid.ColumnDefinitions>
 
-                <TextBlock  Grid.Row="0" Grid.Column="0" 
-                        Text="League" Style="{StaticResource TextBlockHeader}" />
-                <ComboBox   Grid.Row="0" Grid.Column="1" 
-                        ItemsSource="{Binding LeaguesList}" 
-                        Width="NaN"
-                        IsEditable="False"
-                        SelectedItem="{Binding League}"/>
+        <TextBlock Grid.Row="0" Grid.Column="0"
+                   Text="League" Style="{StaticResource TextBlockHeader}" />
+        <ComboBox Grid.Row="0" Grid.Column="1"
+                  ItemsSource="{Binding LeaguesList}"
+                  Width="NaN"
+                  IsEditable="False"
+                  SelectedItem="{Binding League}" />
 
-                <TextBlock  Grid.Row="0" Grid.Column="2" 
-                        Text="Type" Style="{StaticResource TextBlockHeader}" />
-                <ComboBox Grid.Row="0" Grid.Column="3" 
-                          Style="{StaticResource QueryComboBox}"
-                        SelectedItem="{Binding ItemType}"
-                        DisplayMemberPath="Name" 
-                        Width="NaN"
-                        ItemsSource="{Binding ItemTypes}" 
-                        controls:TextBoxHelper.Watermark="any" >
-                </ComboBox>
+        <TextBlock Grid.Row="0" Grid.Column="2"
+                   Text="Type" Style="{StaticResource TextBlockHeader}" />
+        <ComboBox Grid.Row="0" Grid.Column="3"
+                  Style="{StaticResource QueryComboBox}"
+                  SelectedItem="{Binding ItemType}"
+                  DisplayMemberPath="Name"
+                  Width="NaN"
+                  ItemsSource="{Binding ItemTypes}"
+                  controls:TextBoxHelper.Watermark="any" />
 
-                <TextBlock   Grid.Row="2" Grid.Column="0"
-                             Text="Name" Style="{StaticResource TextBlockHeader}" />
+        <TextBlock Grid.Row="2" Grid.Column="0"
+                   Text="Name" Style="{StaticResource TextBlockHeader}" />
 
-                <editors:AutoCompleteTextBox  Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="5"
-                                                  Provider="{Binding NameSuggestionProvider}"
-                                                  Width="NaN" 
-                                                  HorizontalContentAlignment="Left"
-                                                  Text="{Binding ItemName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                                                  Margin="0,0,10,0"
-                                                  Height="26"
-                                                  Watermark="item name, e.g. Temple map">
-                </editors:AutoCompleteTextBox>
-            </Grid>
+        <editors:AutoCompleteTextBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="5"
+                                     Provider="{Binding NameSuggestionProvider}"
+                                     Width="NaN"
+                                     HorizontalContentAlignment="Left"
+                                     Text="{Binding ItemName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                     Margin="0,0,10,0"
+                                     Height="26"
+                                     Watermark="item name, e.g. Temple map" />
+      </Grid>
 
-            <Grid Row="2">
+      <Grid Row="2">
 
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="5" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
+        <Grid.RowDefinitions>
+          <RowDefinition Height="Auto" />
+          <RowDefinition Height="5" />
+          <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
 
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="80"/>
-                    <ColumnDefinition Width="180"/>
-                    <ColumnDefinition Width="80"/>
-                    <ColumnDefinition Width="180"/>
-                    <ColumnDefinition Width="80"/>
-                    <ColumnDefinition Width="180"/>
-                </Grid.ColumnDefinitions>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="80" />
+          <ColumnDefinition Width="180" />
+          <ColumnDefinition Width="80" />
+          <ColumnDefinition Width="180" />
+          <ColumnDefinition Width="80" />
+          <ColumnDefinition Width="180" />
+        </Grid.ColumnDefinitions>
 
-                <TextBlock Grid.Row="0" Grid.Column="0" 
-                           Text="Damage" Style="{StaticResource TextBlockHeader}" />
-                <StackPanel Grid.Row="0" Grid.Column="1">
-                    <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}" Value="{Binding DamageMin, Converter={StaticResource NullableConverter}}"/>
-                    <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}" Value="{Binding DamageMax, Converter={StaticResource NullableConverter}}"/>
-                </StackPanel>
-
-
-                <TextBlock Grid.Row="0" Grid.Column="2" 
-                           Text="APS" Style="{StaticResource TextBlockHeader}" />
-                <StackPanel Grid.Row="0" Grid.Column="3" >
-                    <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}" Value="{Binding ApsMin, Converter={StaticResource NullableConverter}}"/>
-                    <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}" Value="{Binding ApsMax, Converter={StaticResource NullableConverter}}"/>
-                </StackPanel>
-
-                <TextBlock  Grid.Row="0" Grid.Column="4" 
-                            Text="Crit.Strike" Style="{StaticResource TextBlockHeader}" />
-                <StackPanel Grid.Row="0" Grid.Column="5" >
-                    <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}" Value="{Binding CritMin, Converter={StaticResource NullableConverter}}"/>
-                    <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}" Value="{Binding CritMax, Converter={StaticResource NullableConverter}}"/>
-                </StackPanel>
-
-                <TextBlock Grid.Row="2" Grid.Column="0" 
-                           Text="DPS" Style="{StaticResource TextBlockHeader}" />
-                <StackPanel Grid.Row="2" Grid.Column="1" >
-                    <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}" Value="{Binding DpsMin, Converter={StaticResource NullableConverter}}"/>
-                    <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}" Value="{Binding DpsMax, Converter={StaticResource NullableConverter}}"/>
-                </StackPanel>
-
-                <TextBlock Grid.Row="2" Grid.Column="2" 
-                           Text="eDPS" Style="{StaticResource TextBlockHeader}" />
-                <StackPanel Grid.Row="2" Grid.Column="3" >
-                    <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}" Value="{Binding EdpsMin, Converter={StaticResource NullableConverter}}"/>
-                    <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}" Value="{Binding EdpsMax, Converter={StaticResource NullableConverter}}"/>
-                </StackPanel>
-
-                <TextBlock Grid.Row="2" Grid.Column="4" 
-                           Text="pDPS" Style="{StaticResource TextBlockHeader}" />
-                <StackPanel Grid.Row="2" Grid.Column="5" >
-                    <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}" Value="{Binding PdpsMin, Converter={StaticResource NullableConverter}}"/>
-                    <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}" Value="{Binding PdpsMax, Converter={StaticResource NullableConverter}}"/>
-                </StackPanel>
-            </Grid>
-
-            <Grid Row="4">
-
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="5" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
-
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="80"/>
-                    <ColumnDefinition Width="180"/>
-                    <ColumnDefinition Width="80"/>
-                    <ColumnDefinition Width="180"/>
-                </Grid.ColumnDefinitions>
-
-                <TextBlock Grid.Row="0" Grid.Column="0" 
-                           Text="Armour" Style="{StaticResource TextBlockHeader}" />
-                <StackPanel Grid.Row="0" Grid.Column="1">
-                    <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}" Value="{Binding ArmourMin, Converter={StaticResource NullableConverter}}"/>
-                    <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}" Value="{Binding ArmourMax, Converter={StaticResource NullableConverter}}"/>
-                </StackPanel>
+        <TextBlock Grid.Row="0" Grid.Column="0"
+                   Text="Damage" Style="{StaticResource TextBlockHeader}" />
+        <StackPanel Grid.Row="0" Grid.Column="1">
+          <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}"
+                                  Value="{Binding DamageMin, Converter={StaticResource NullableConverter}}" />
+          <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}"
+                                  Value="{Binding DamageMax, Converter={StaticResource NullableConverter}}" />
+        </StackPanel>
 
 
-                <TextBlock Grid.Row="0" Grid.Column="2" 
-                           Text="Evasion" Style="{StaticResource TextBlockHeader}" />
-                <StackPanel Grid.Row="0" Grid.Column="3" >
-                    <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}" Value="{Binding EvasionMin, Converter={StaticResource NullableConverter}}"/>
-                    <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}" Value="{Binding EvasionMax, Converter={StaticResource NullableConverter}}"/>
-                </StackPanel>
+        <TextBlock Grid.Row="0" Grid.Column="2"
+                   Text="APS" Style="{StaticResource TextBlockHeader}" />
+        <StackPanel Grid.Row="0" Grid.Column="3">
+          <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}"
+                                  Value="{Binding ApsMin, Converter={StaticResource NullableConverter}}" />
+          <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}"
+                                  Value="{Binding ApsMax, Converter={StaticResource NullableConverter}}" />
+        </StackPanel>
 
-                <TextBlock Grid.Row="2" Grid.Column="0" 
-                           Text="Shield" Style="{StaticResource TextBlockHeader}" />
-                <StackPanel Grid.Row="2" Grid.Column="1" >
-                    <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}" Value="{Binding ShieldMin, Converter={StaticResource NullableConverter}}"/>
-                    <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}" Value="{Binding ShieldMax, Converter={StaticResource NullableConverter}}"/>
-                </StackPanel>
+        <TextBlock Grid.Row="0" Grid.Column="4"
+                   Text="Crit.Strike" Style="{StaticResource TextBlockHeader}" />
+        <StackPanel Grid.Row="0" Grid.Column="5">
+          <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}"
+                                  Value="{Binding CritMin, Converter={StaticResource NullableConverter}}" />
+          <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}"
+                                  Value="{Binding CritMax, Converter={StaticResource NullableConverter}}" />
+        </StackPanel>
 
-                <TextBlock Grid.Row="2" Grid.Column="2" 
-                           Text="Block" Style="{StaticResource TextBlockHeader}" />
-                <StackPanel Grid.Row="2" Grid.Column="3" >
-                    <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}" Value="{Binding BlockMin, Converter={StaticResource NullableConverter}}"/>
-                    <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}" Value="{Binding BlockMax, Converter={StaticResource NullableConverter}}"/>
-                </StackPanel>
-            </Grid>
+        <TextBlock Grid.Row="2" Grid.Column="0"
+                   Text="DPS" Style="{StaticResource TextBlockHeader}" />
+        <StackPanel Grid.Row="2" Grid.Column="1">
+          <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}"
+                                  Value="{Binding DpsMin, Converter={StaticResource NullableConverter}}" />
+          <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}"
+                                  Value="{Binding DpsMax, Converter={StaticResource NullableConverter}}" />
+        </StackPanel>
 
-            <Grid Row="6">
+        <TextBlock Grid.Row="2" Grid.Column="2"
+                   Text="eDPS" Style="{StaticResource TextBlockHeader}" />
+        <StackPanel Grid.Row="2" Grid.Column="3">
+          <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}"
+                                  Value="{Binding EdpsMin, Converter={StaticResource NullableConverter}}" />
+          <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}"
+                                  Value="{Binding EdpsMax, Converter={StaticResource NullableConverter}}" />
+        </StackPanel>
 
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="5" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
+        <TextBlock Grid.Row="2" Grid.Column="4"
+                   Text="pDPS" Style="{StaticResource TextBlockHeader}" />
+        <StackPanel Grid.Row="2" Grid.Column="5">
+          <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}"
+                                  Value="{Binding PdpsMin, Converter={StaticResource NullableConverter}}" />
+          <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}"
+                                  Value="{Binding PdpsMax, Converter={StaticResource NullableConverter}}" />
+        </StackPanel>
+      </Grid>
 
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="80"/>
-                    <ColumnDefinition Width="180"/>
-                    <ColumnDefinition Width="80"/>
-                    <ColumnDefinition Width="180"/>
-                </Grid.ColumnDefinitions>
+      <Grid Row="4">
 
-                <TextBlock Grid.Row="0" Grid.Column="0" 
-                           Text="Sockets" Style="{StaticResource TextBlockHeader}" />
-                <StackPanel Grid.Row="0" Grid.Column="1">
-                    <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}" Value="{Binding SocketsMin, Converter={StaticResource NullableConverter}}"/>
-                    <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}" Value="{Binding SocketsMax, Converter={StaticResource NullableConverter}}"/>
-                </StackPanel>
+        <Grid.RowDefinitions>
+          <RowDefinition Height="Auto" />
+          <RowDefinition Height="5" />
+          <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
 
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="80" />
+          <ColumnDefinition Width="180" />
+          <ColumnDefinition Width="80" />
+          <ColumnDefinition Width="180" />
+        </Grid.ColumnDefinitions>
 
-                <TextBlock Grid.Row="0" Grid.Column="2" 
-                           Text="Links" Style="{StaticResource TextBlockHeader}" />
-                <StackPanel Grid.Row="0" Grid.Column="3" >
-                    <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}" Value="{Binding LinkMin, Converter={StaticResource NullableConverter}}"/>
-                    <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}" Value="{Binding LinkMax, Converter={StaticResource NullableConverter}}"/>
-                </StackPanel>
-
-                <TextBlock Grid.Row="2" Grid.Column="0" 
-                           Text="Colors" Style="{StaticResource TextBlockHeader}" />
-                <StackPanel Grid.Row="2" Grid.Column="1" >
-                    <TextBox Style="{StaticResource TextBoxKey}" Width="30" controls:TextBoxHelper.Watermark="R" Text="{Binding SocketsR}"/>
-                    <TextBox Style="{StaticResource TextBoxKey}" Width="30" controls:TextBoxHelper.Watermark="G" Text="{Binding SocketsG}"/>
-                    <TextBox Style="{StaticResource TextBoxKey}" Width="30" controls:TextBoxHelper.Watermark="B" Text="{Binding SocketsB}"/>
-                    <TextBox Style="{StaticResource TextBoxKey}" Width="30" controls:TextBoxHelper.Watermark="W" Text="{Binding SocketsW}"/>
-                </StackPanel>
-
-                <TextBlock Grid.Row="2" Grid.Column="2" 
-                           Text="Linked" Style="{StaticResource TextBlockHeader}" />
-                <StackPanel Grid.Row="2" Grid.Column="3" >
-                    <TextBox Style="{StaticResource TextBoxKey}" Width="30" controls:TextBoxHelper.Watermark="R" Text="{Binding LinkedR}"/>
-                    <TextBox Style="{StaticResource TextBoxKey}" Width="30" controls:TextBoxHelper.Watermark="G" Text="{Binding LinkedG}"/>
-                    <TextBox Style="{StaticResource TextBoxKey}" Width="30" controls:TextBoxHelper.Watermark="B" Text="{Binding LinkedB}"/>
-                    <TextBox Style="{StaticResource TextBoxKey}" Width="30" controls:TextBoxHelper.Watermark="W" Text="{Binding LinkedW}"/>
-                </StackPanel>
-            </Grid>
-
-            <Grid Row="10">
-                <Border BorderBrush="{StaticResource AccentColorBrush2}" BorderThickness="0,2" Margin="0,5">
-                    <ContentControl Content="{Binding ModGroupsEditor}" />
-                </Border>
-            </Grid>
-
-            <Grid Row="12">
-
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="5" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="5" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
-
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="120"/>
-                    <ColumnDefinition Width="180"/>
-                    <ColumnDefinition Width="100"/>
-                    <ColumnDefinition Width="180"/>
-                </Grid.ColumnDefinitions>
-
-                <TextBlock Grid.Row="0" Grid.Column="0" 
-                           Text="Quality" Style="{StaticResource TextBlockHeader}" />
-                <StackPanel Grid.Row="0" Grid.Column="1">
-                    <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}" Value="{Binding QualityMin, Converter={StaticResource NullableConverter}}"/>
-                    <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}" Value="{Binding QualityMax, Converter={StaticResource NullableConverter}}"/>
-                </StackPanel>
+        <TextBlock Grid.Row="0" Grid.Column="0"
+                   Text="Armour" Style="{StaticResource TextBlockHeader}" />
+        <StackPanel Grid.Row="0" Grid.Column="1">
+          <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}"
+                                  Value="{Binding ArmourMin, Converter={StaticResource NullableConverter}}" />
+          <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}"
+                                  Value="{Binding ArmourMax, Converter={StaticResource NullableConverter}}" />
+        </StackPanel>
 
 
-                <TextBlock Grid.Row="0" Grid.Column="2" 
-                           Text="Gem\map level" Style="{StaticResource TextBlockHeader}" />
-                <StackPanel Grid.Row="0" Grid.Column="3" >
-                    <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}" Value="{Binding LevelMin, Converter={StaticResource NullableConverter}}"/>
-                    <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}" Value="{Binding LevelMax, Converter={StaticResource NullableConverter}}"/>
-                </StackPanel>
+        <TextBlock Grid.Row="0" Grid.Column="2"
+                   Text="Evasion" Style="{StaticResource TextBlockHeader}" />
+        <StackPanel Grid.Row="0" Grid.Column="3">
+          <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}"
+                                  Value="{Binding EvasionMin, Converter={StaticResource NullableConverter}}" />
+          <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}"
+                                  Value="{Binding EvasionMax, Converter={StaticResource NullableConverter}}" />
+        </StackPanel>
 
-                <TextBlock Grid.Row="2" Grid.Column="0" 
-                           Text="Inc. Quantity" Style="{StaticResource TextBlockHeader}" />
-                <StackPanel Grid.Row="2" Grid.Column="1" >
-                    <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}" Value="{Binding IncQuantityMin, Converter={StaticResource NullableConverter}}"/>
-                    <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}" Value="{Binding IncQuantityMax, Converter={StaticResource NullableConverter}}"/>
-                </StackPanel>
+        <TextBlock Grid.Row="2" Grid.Column="0"
+                   Text="Shield" Style="{StaticResource TextBlockHeader}" />
+        <StackPanel Grid.Row="2" Grid.Column="1">
+          <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}"
+                                  Value="{Binding ShieldMin, Converter={StaticResource NullableConverter}}" />
+          <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}"
+                                  Value="{Binding ShieldMax, Converter={StaticResource NullableConverter}}" />
+        </StackPanel>
 
-                <TextBlock Grid.Row="2" Grid.Column="2" 
-                           Text="Rarity" Style="{StaticResource TextBlockHeader}" />
-                <StackPanel Grid.Row="2" Grid.Column="3" >
-                    <StackPanel.Resources>
-                        <ObjectDataProvider x:Key="PoeItemRarityFromEnum" MethodName="GetValues"
-                            ObjectType="{x:Type System:Enum}">
-                            <ObjectDataProvider.MethodParameters>
-                                <x:Type TypeName="common:PoeItemRarity"/>
-                            </ObjectDataProvider.MethodParameters>
-                        </ObjectDataProvider>
-                    </StackPanel.Resources>
-                    <ComboBox Style="{StaticResource QueryComboBox}"
-                              SelectedValue="{Binding ItemRarity}"
-                              Width="100"
-                              IsEditable="True" 
-                              ItemsSource="{Binding Source={StaticResource PoeItemRarityFromEnum}}"
-                              controls:TextBoxHelper.Watermark="any" >    
-                    </ComboBox>
-                </StackPanel>
+        <TextBlock Grid.Row="2" Grid.Column="2"
+                   Text="Block" Style="{StaticResource TextBlockHeader}" />
+        <StackPanel Grid.Row="2" Grid.Column="3">
+          <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}"
+                                  Value="{Binding BlockMin, Converter={StaticResource NullableConverter}}" />
+          <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}"
+                                  Value="{Binding BlockMax, Converter={StaticResource NullableConverter}}" />
+        </StackPanel>
+      </Grid>
 
-                <TextBlock Grid.Row="4" Grid.Column="0" 
-                           Text="Buyout" Style="{StaticResource TextBlockHeader}" />
-                <StackPanel Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="3">
-                    <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}" Value="{Binding BuyoutMin, Converter={StaticResource NullableConverter}}"/>
-                    <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}" Value="{Binding BuyoutMax, Converter={StaticResource NullableConverter}}"/>
-                    <ComboBox Style="{StaticResource QueryComboBox}"
-                              Width="150"
-                              ItemsSource="{Binding CurrenciesList}"
-                              SelectedValue="{Binding BuyoutCurrencyType}"
-                              DisplayMemberPath="Name"
-                              SelectedValuePath="CodeName" 
-                              IsEditable="True" 
-                              controls:TextBoxHelper.Watermark="select currency">
-                    </ComboBox>
-                </StackPanel>
-            </Grid>
+      <Grid Row="6">
 
-            <Grid Row="14">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="100"/>
-                    <ColumnDefinition Width="80"/>
-                    <ColumnDefinition Width="100"/>
-                    <ColumnDefinition Width="80"/>
-                    <ColumnDefinition Width="100"/>
-                    <ColumnDefinition Width="80"/>
-                    <ColumnDefinition Width="120"/>
-                    <ColumnDefinition Width="80"/>
-                </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+          <RowDefinition Height="Auto" />
+          <RowDefinition Height="5" />
+          <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
 
-                <TextBlock Grid.Column="0" 
-                           Text="Buyout" Style="{StaticResource TextBlockHeader}" />
-                <StackPanel Grid.Column="1">
-                    <controls:ToggleSwitch IsChecked="{Binding BuyoutOnly}"  OffLabel="" OnLabel=""/>
-                </StackPanel>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="80" />
+          <ColumnDefinition Width="180" />
+          <ColumnDefinition Width="80" />
+          <ColumnDefinition Width="180" />
+        </Grid.ColumnDefinitions>
 
-                <TextBlock Grid.Column="2" 
-                           Text="Online" Style="{StaticResource TextBlockHeader}" />
-                <StackPanel Grid.Column="3" >
-                    <controls:ToggleSwitch IsChecked="{Binding OnlineOnly}" OffLabel="" OnLabel=""/>
-                </StackPanel>
+        <TextBlock Grid.Row="0" Grid.Column="0"
+                   Text="Sockets" Style="{StaticResource TextBlockHeader}" />
+        <StackPanel Grid.Row="0" Grid.Column="1">
+          <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}"
+                                  Value="{Binding SocketsMin, Converter={StaticResource NullableConverter}}" />
+          <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}"
+                                  Value="{Binding SocketsMax, Converter={StaticResource NullableConverter}}" />
+        </StackPanel>
 
-                <TextBlock Grid.Column="4" 
-                           Text="Alt. art" Style="{StaticResource TextBlockHeader}" />
-                <StackPanel Grid.Column="5" >
-                    <controls:ToggleSwitch IsChecked="{Binding AlternativeArt}" OffLabel="" OnLabel=""/>
-                </StackPanel>
 
-                <TextBlock Grid.Column="6" 
-                           Text="Normalize quality" Style="{StaticResource TextBlockHeader}" />
-                <StackPanel Grid.Column="7" >
-                    <controls:ToggleSwitch IsChecked="{Binding NormalizeQuality}" OffLabel="" OnLabel="" />
-                </StackPanel>
-            </Grid>
+        <TextBlock Grid.Row="0" Grid.Column="2"
+                   Text="Links" Style="{StaticResource TextBlockHeader}" />
+        <StackPanel Grid.Row="0" Grid.Column="3">
+          <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}"
+                                  Value="{Binding LinkMin, Converter={StaticResource NullableConverter}}" />
+          <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}"
+                                  Value="{Binding LinkMax, Converter={StaticResource NullableConverter}}" />
+        </StackPanel>
 
-        </Grid>
+        <TextBlock Grid.Row="2" Grid.Column="0"
+                   Text="Colors" Style="{StaticResource TextBlockHeader}" />
+        <StackPanel Grid.Row="2" Grid.Column="1">
+          <TextBox Style="{StaticResource TextBoxKey}" Width="30" controls:TextBoxHelper.Watermark="R"
+                   Text="{Binding SocketsR}" />
+          <TextBox Style="{StaticResource TextBoxKey}" Width="30" controls:TextBoxHelper.Watermark="G"
+                   Text="{Binding SocketsG}" />
+          <TextBox Style="{StaticResource TextBoxKey}" Width="30" controls:TextBoxHelper.Watermark="B"
+                   Text="{Binding SocketsB}" />
+          <TextBox Style="{StaticResource TextBoxKey}" Width="30" controls:TextBoxHelper.Watermark="W"
+                   Text="{Binding SocketsW}" />
+        </StackPanel>
 
-    </DataTemplate>
+        <TextBlock Grid.Row="2" Grid.Column="2"
+                   Text="Linked" Style="{StaticResource TextBlockHeader}" />
+        <StackPanel Grid.Row="2" Grid.Column="3">
+          <TextBox Style="{StaticResource TextBoxKey}" Width="30" controls:TextBoxHelper.Watermark="R"
+                   Text="{Binding LinkedR}" />
+          <TextBox Style="{StaticResource TextBoxKey}" Width="30" controls:TextBoxHelper.Watermark="G"
+                   Text="{Binding LinkedG}" />
+          <TextBox Style="{StaticResource TextBoxKey}" Width="30" controls:TextBoxHelper.Watermark="B"
+                   Text="{Binding LinkedB}" />
+          <TextBox Style="{StaticResource TextBoxKey}" Width="30" controls:TextBoxHelper.Watermark="W"
+                   Text="{Binding LinkedW}" />
+        </StackPanel>
+      </Grid>
+
+      <Grid Row="10">
+        <Border BorderBrush="{StaticResource AccentColorBrush2}" BorderThickness="0,2" Margin="0,5">
+          <ContentControl Content="{Binding ModGroupsEditor}" />
+        </Border>
+      </Grid>
+
+      <Grid Row="12">
+
+        <Grid.RowDefinitions>
+          <RowDefinition Height="Auto" />
+          <RowDefinition Height="5" />
+          <RowDefinition Height="Auto" />
+          <RowDefinition Height="5" />
+          <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="120" />
+          <ColumnDefinition Width="180" />
+          <ColumnDefinition Width="100" />
+          <ColumnDefinition Width="180" />
+        </Grid.ColumnDefinitions>
+
+        <TextBlock Grid.Row="0" Grid.Column="0"
+                   Text="Quality" Style="{StaticResource TextBlockHeader}" />
+        <StackPanel Grid.Row="0" Grid.Column="1">
+          <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}"
+                                  Value="{Binding QualityMin, Converter={StaticResource NullableConverter}}" />
+          <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}"
+                                  Value="{Binding QualityMax, Converter={StaticResource NullableConverter}}" />
+        </StackPanel>
+
+
+        <TextBlock Grid.Row="0" Grid.Column="2"
+                   Text="Gem\map level" Style="{StaticResource TextBlockHeader}" />
+        <StackPanel Grid.Row="0" Grid.Column="3">
+          <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}"
+                                  Value="{Binding LevelMin, Converter={StaticResource NullableConverter}}" />
+          <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}"
+                                  Value="{Binding LevelMax, Converter={StaticResource NullableConverter}}" />
+        </StackPanel>
+
+        <TextBlock Grid.Row="2" Grid.Column="0"
+                   Text="Inc. Quantity" Style="{StaticResource TextBlockHeader}" />
+        <StackPanel Grid.Row="2" Grid.Column="1">
+          <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}"
+                                  Value="{Binding IncQuantityMin, Converter={StaticResource NullableConverter}}" />
+          <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}"
+                                  Value="{Binding IncQuantityMax, Converter={StaticResource NullableConverter}}" />
+        </StackPanel>
+
+        <TextBlock Grid.Row="2" Grid.Column="2"
+                   Text="Rarity" Style="{StaticResource TextBlockHeader}" />
+        <StackPanel Grid.Row="2" Grid.Column="3">
+          <StackPanel.Resources>
+            <ObjectDataProvider x:Key="PoeItemRarityFromEnum" MethodName="GetValues"
+                                ObjectType="{x:Type System:Enum}">
+              <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="common:PoeItemRarity" />
+              </ObjectDataProvider.MethodParameters>
+            </ObjectDataProvider>
+          </StackPanel.Resources>
+          <ComboBox Style="{StaticResource QueryComboBox}"
+                    SelectedValue="{Binding ItemRarity}"
+                    Width="100"
+                    IsEditable="True"
+                    ItemsSource="{Binding Source={StaticResource PoeItemRarityFromEnum}}"
+                    controls:TextBoxHelper.Watermark="any" />
+        </StackPanel>
+
+        <TextBlock Grid.Row="4" Grid.Column="0"
+                   Text="Buyout" Style="{StaticResource TextBlockHeader}" />
+        <StackPanel Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="3">
+          <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}"
+                                  Value="{Binding BuyoutMin, Converter={StaticResource NullableConverter}}" />
+          <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}"
+                                  Value="{Binding BuyoutMax, Converter={StaticResource NullableConverter}}" />
+          <ComboBox Style="{StaticResource QueryComboBox}"
+                    Width="150"
+                    ItemsSource="{Binding CurrenciesList}"
+                    SelectedValue="{Binding BuyoutCurrencyType}"
+                    DisplayMemberPath="Name"
+                    SelectedValuePath="CodeName"
+                    IsEditable="True"
+                    controls:TextBoxHelper.Watermark="select currency" />
+        </StackPanel>
+      </Grid>
+
+      <Grid Row="14">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="100" />
+          <ColumnDefinition Width="80" />
+          <ColumnDefinition Width="100" />
+          <ColumnDefinition Width="80" />
+          <ColumnDefinition Width="100" />
+          <ColumnDefinition Width="80" />
+          <ColumnDefinition Width="120" />
+          <ColumnDefinition Width="80" />
+        </Grid.ColumnDefinitions>
+
+        <TextBlock Grid.Column="0"
+                   Text="Buyout" Style="{StaticResource TextBlockHeader}" />
+        <StackPanel Grid.Column="1">
+          <controls:ToggleSwitch IsChecked="{Binding BuyoutOnly}" OffLabel="" OnLabel="" />
+        </StackPanel>
+
+        <TextBlock Grid.Column="2"
+                   Text="Online" Style="{StaticResource TextBlockHeader}" />
+        <StackPanel Grid.Column="3">
+          <controls:ToggleSwitch IsChecked="{Binding OnlineOnly}" OffLabel="" OnLabel="" />
+        </StackPanel>
+
+        <TextBlock Grid.Column="4"
+                   Text="Alt. art" Style="{StaticResource TextBlockHeader}" />
+        <StackPanel Grid.Column="5">
+          <controls:ToggleSwitch IsChecked="{Binding AlternativeArt}" OffLabel="" OnLabel="" />
+        </StackPanel>
+
+        <TextBlock Grid.Column="6"
+                   Text="Normalize quality" Style="{StaticResource TextBlockHeader}" />
+        <StackPanel Grid.Column="7">
+          <controls:ToggleSwitch IsChecked="{Binding NormalizeQuality}" OffLabel="" OnLabel="" />
+        </StackPanel>
+      </Grid>
+
+    </Grid>
+
+  </DataTemplate>
 </ResourceDictionary>

@@ -8,7 +8,7 @@
 
     public interface IPoeLiveHistoryProvider : IDisposable
     {
-        IObservable<IPoeItem[]> ItemsPacks {[NotNull] get; }
+        IObservable<IPoeItem[]> ItemsPacks { [NotNull] get; }
 
         IObservable<Exception> UpdateExceptions { [NotNull] get; }
 

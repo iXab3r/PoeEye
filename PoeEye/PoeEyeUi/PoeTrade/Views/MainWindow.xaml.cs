@@ -1,6 +1,5 @@
 ﻿namespace PoeEyeUi.PoeTrade.Views
 {
-    using System;
     using System.Windows;
 
     using MahApps.Metro.Controls;
@@ -19,13 +18,12 @@
     using ViewModels;
 
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    ///     Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : MetroWindow
     {
-        private readonly UnityContainer unityContainer = new UnityContainer();
-
         private readonly IMainWindowViewModel mainWindowViewModel;
+        private readonly UnityContainer unityContainer = new UnityContainer();
 
         public MainWindow()
         {
@@ -36,7 +34,7 @@
             unityContainer.AddExtension(new PoeWhisperRegistrations());
             unityContainer.AddExtension(new LiveRegistrations());
             unityContainer.AddExtension(new UiRegistrations());
-            
+
             mainWindowViewModel = unityContainer.Resolve<IMainWindowViewModel>();
             DataContext = mainWindowViewModel;
             Application.Current.Exit += ApplicationOnExit;

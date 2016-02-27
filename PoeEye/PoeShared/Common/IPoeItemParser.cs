@@ -1,10 +1,10 @@
-﻿using JetBrains.Annotations;
-
-namespace PoeShared.Common
+﻿namespace PoeShared.Common
 {
+    using JetBrains.Annotations;
+
     public interface IPoeItemParser
     {
-        [CanBeNull] 
+        [CanBeNull]
         IPoeItem Parse([NotNull] string serializedItem);
     }
 }

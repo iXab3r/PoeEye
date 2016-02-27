@@ -10,7 +10,7 @@ namespace PoeEyeUi.Converters
         {
             if (value is bool)
             {
-                return !((bool) value);
+                return !(bool) value;
             }
             return value;
         }
@@ -19,7 +19,7 @@ namespace PoeEyeUi.Converters
         {
             if (value is bool)
             {
-                return !((bool)value);
+                return !(bool) value;
             }
             return value;
         }

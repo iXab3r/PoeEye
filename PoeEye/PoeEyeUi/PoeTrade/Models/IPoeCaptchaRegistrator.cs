@@ -1,7 +1,7 @@
-﻿using System.Reactive.Subjects;
-
-namespace PoeEyeUi.PoeTrade.Models
+﻿namespace PoeEyeUi.PoeTrade.Models
 {
+    using System.Reactive.Subjects;
+
     using JetBrains.Annotations;
 
     internal interface IPoeCaptchaRegistrator

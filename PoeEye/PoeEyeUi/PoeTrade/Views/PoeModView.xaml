@@ -5,25 +5,26 @@
                     xmlns:wpfControls="http://wpfcontrols.com/"
                     xmlns:common="clr-namespace:PoeShared.Common;assembly=PoeShared"
                     xmlns:editors="https://github.com/iXab3r/WpfAutoCompleteControls">
-    <DataTemplate DataType="{x:Type viewModels:PoeModViewModel}">
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="auto"/>
-            </Grid.ColumnDefinitions>
+  <DataTemplate DataType="{x:Type viewModels:PoeModViewModel}">
+    <Grid>
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="auto" />
+      </Grid.ColumnDefinitions>
 
-            <editors:AutoCompleteTextBox  Grid.Column="0"
-                                              Provider="{Binding SuggestionProvider}"
-                                              Text="{Binding SelectedMod, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                              Watermark="start typing to get compatible mods list">
-            </editors:AutoCompleteTextBox>
+      <editors:AutoCompleteTextBox Grid.Column="0"
+                                   Provider="{Binding SuggestionProvider}"
+                                   Text="{Binding SelectedMod, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                   Watermark="start typing to get compatible mods list" />
 
-            <StackPanel Grid.Column="1" 
-                        Orientation="Horizontal" 
-                        Margin="10,0,0,0">
-                <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}" Value="{Binding Min, Converter={StaticResource NullableConverter}}"/>
-                <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}" Value="{Binding Max, Converter={StaticResource NullableConverter}}"/>
-            </StackPanel>
-        </Grid>
-    </DataTemplate>
+      <StackPanel Grid.Column="1"
+                  Orientation="Horizontal"
+                  Margin="10,0,0,0">
+        <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}"
+                                Value="{Binding Min, Converter={StaticResource NullableConverter}}" />
+        <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}"
+                                Value="{Binding Max, Converter={StaticResource NullableConverter}}" />
+      </StackPanel>
+    </Grid>
+  </DataTemplate>
 </ResourceDictionary>

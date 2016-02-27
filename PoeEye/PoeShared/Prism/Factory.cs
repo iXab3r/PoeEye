@@ -3,7 +3,7 @@
     using Guards;
 
     using Microsoft.Practices.Unity;
-    
+
     internal sealed class Factory<T> : IFactory<T>
     {
         private readonly IUnityContainer container;

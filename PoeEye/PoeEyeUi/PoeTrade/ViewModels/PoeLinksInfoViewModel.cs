@@ -1,32 +1,18 @@
 ﻿namespace PoeEyeUi.PoeTrade.ViewModels
 {
-    using System;
-    using System.IO;
-    using System.Reactive.Concurrency;
-    using System.Reactive.Linq;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using System.Windows.Controls;
-    using System.Windows.Media.Imaging;
-
     using Guards;
 
     using JetBrains.Annotations;
 
-    using Models;
-
-    using PoeShared;
     using PoeShared.Common;
     using PoeShared.Utilities;
-
-    using ReactiveUI;
 
     internal sealed class PoeLinksInfoViewModel : DisposableReactiveObject
     {
         public PoeLinksInfoViewModel([NotNull] IPoeLinksInfo linksInfo)
         {
             Guard.ArgumentNotNull(() => linksInfo);
-            
+
             var rawSockets = linksInfo.RawSockets ?? string.Empty;
             rawSockets = rawSockets.PadRight(11, ' ');
 
@@ -52,19 +38,28 @@
             Link4 = rawSockets[7] == '-';
             Link5 = rawSockets[9] == '-';
         }
-        
+
 
         public string Socket1 { get; }
+
         public string Socket2 { get; }
+
         public string Socket3 { get; }
+
         public string Socket4 { get; }
+
         public string Socket5 { get; }
+
         public string Socket6 { get; }
 
         public bool Link1 { get; }
+
         public bool Link2 { get; }
+
         public bool Link3 { get; }
+
         public bool Link4 { get; }
+
         public bool Link5 { get; }
     }
 }

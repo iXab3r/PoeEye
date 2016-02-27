@@ -8,7 +8,7 @@
 
     public interface IPoeItemVerifier
     {
-        [NotNull] 
+        [NotNull]
         Task<bool?> Verify([NotNull] IPoeItem item);
     }
 }

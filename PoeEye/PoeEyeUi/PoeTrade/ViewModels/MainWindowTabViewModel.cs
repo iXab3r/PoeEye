@@ -24,15 +24,15 @@
 
     internal sealed class MainWindowTabViewModel : DisposableReactiveObject, IMainWindowTabViewModel
     {
-        private static int GlobalTabIdx = 0;
+        private static int GlobalTabIdx;
 
         private readonly ReactiveCommand<object> markAllAsRead;
-        private readonly ReactiveCommand<object> searchCommand;
         private readonly ReactiveCommand<object> refreshCommand;
-
-        private bool audioNotificationEnabled;
+        private readonly ReactiveCommand<object> searchCommand;
 
         private readonly string tabHeader;
+
+        private bool audioNotificationEnabled;
         private string tabName;
 
         public MainWindowTabViewModel(
@@ -71,15 +71,16 @@
             Query = query;
 
             TradesList.TradesList.ItemChanged.ToUnit()
-                               .Merge(TradesList.TradesList.Changed.ToUnit())
-                               .Subscribe(() =>
-                                          {
-                                              this.RaisePropertyChanged(nameof(NewItemsCount));
-                                              this.RaisePropertyChanged(nameof(RemovedItemsCount));
-                                              this.RaisePropertyChanged(nameof(NormalItemsCount));
-                                              this.RaisePropertyChanged(nameof(HasNewTrades));
-                                          })
-                               .AddTo(Anchors);
+                      .Merge(TradesList.TradesList.Changed.ToUnit())
+                      .Subscribe(
+                          () =>
+                          {
+                              this.RaisePropertyChanged(nameof(NewItemsCount));
+                              this.RaisePropertyChanged(nameof(RemovedItemsCount));
+                              this.RaisePropertyChanged(nameof(NormalItemsCount));
+                              this.RaisePropertyChanged(nameof(HasNewTrades));
+                          })
+                      .AddTo(Anchors);
 
             this.WhenAnyValue(x => x.NewItemsCount)
                 .DistinctUntilChanged()
@@ -90,20 +91,16 @@
                 .AddTo(Anchors);
 
             Query.ObservableForProperty(x => x.PoeQueryBuilder)
-                          .ToUnit()
-                          .StartWith(Unit.Default)
-                          .Subscribe(RebuildTabName)
-                          .AddTo(Anchors);
+                 .ToUnit()
+                 .StartWith(Unit.Default)
+                 .Subscribe(RebuildTabName)
+                 .AddTo(Anchors);
 
             RecheckPeriod
                 .WhenAny(x => x.RecheckValue, x => x.IsAutoRecheckEnabled, (x, y) => Unit.Default)
                 .Subscribe(x => TradesList.RecheckPeriod = RecheckPeriod.IsAutoRecheckEnabled ? RecheckPeriod.RecheckValue : TimeSpan.Zero)
                 .AddTo(Anchors);
         }
-
-        public IPoeTradesListViewModel TradesList { get; }
-
-        public IRecheckPeriodViewModel RecheckPeriod { get; }
 
         public ICommand SearchCommand => searchCommand;
 
@@ -112,12 +109,6 @@
         public ICommand MarkAllAsRead => markAllAsRead;
 
         public bool IsBusy => TradesList.IsBusy;
-
-        public bool AudioNotificationEnabled
-        {
-            get { return audioNotificationEnabled; }
-            set { this.RaiseAndSetIfChanged(ref audioNotificationEnabled, value); }
-        }
 
         public string TabName
         {
@@ -140,6 +131,16 @@
         public int NormalItemsCount
         {
             get { return TradesList.TradesList.Count(x => x.TradeState == PoeTradeState.Normal); }
+        }
+
+        public IPoeTradesListViewModel TradesList { get; }
+
+        public IRecheckPeriodViewModel RecheckPeriod { get; }
+
+        public bool AudioNotificationEnabled
+        {
+            get { return audioNotificationEnabled; }
+            set { this.RaiseAndSetIfChanged(ref audioNotificationEnabled, value); }
         }
 
         public PoeQueryViewModel Query { get; }

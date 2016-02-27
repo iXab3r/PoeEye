@@ -30,6 +30,6 @@
         ScrollFragment,
         TransmutationShard,
         AlterationShard,
-        AlchemyShard,
+        AlchemyShard
     }
 }

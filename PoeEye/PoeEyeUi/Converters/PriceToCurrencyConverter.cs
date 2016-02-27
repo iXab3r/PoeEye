@@ -11,15 +11,13 @@
 
     internal sealed class PriceToCurrencyConverter : IConverter<string, PoePrice>
     {
+        private static readonly Lazy<IConverter<string, PoePrice>> instance = new Lazy<IConverter<string, PoePrice>>(() => new PriceToCurrencyConverter());
         private readonly Regex currencyParser = new Regex(@"(?'value'[\d\.\,]*)\s*(?'type'\w*)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-
-        private static Lazy<IConverter<string, PoePrice>> instance = new Lazy<IConverter<string, PoePrice>>(() => new PriceToCurrencyConverter());
 
         public static IConverter<string, PoePrice> Instance => instance.Value;
 
         public PoePrice Convert(string rawPrice)
         {
-
             var match = currencyParser.Match(rawPrice);
             if (!match.Success)
             {

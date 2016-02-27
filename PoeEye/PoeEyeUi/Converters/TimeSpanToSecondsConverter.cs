@@ -12,21 +12,21 @@
             {
                 return value;
             }
-            var timeSpan = (TimeSpan)value;
+            var timeSpan = (TimeSpan) value;
 
-            return (int)timeSpan.TotalSeconds;
+            return (int) timeSpan.TotalSeconds;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value is int)
             {
-                return TimeSpan.FromSeconds((int)value);
+                return TimeSpan.FromSeconds((int) value);
             }
 
             if (value is double)
             {
-                return TimeSpan.FromSeconds((double)value);
+                return TimeSpan.FromSeconds((double) value);
             }
 
             return Binding.DoNothing;

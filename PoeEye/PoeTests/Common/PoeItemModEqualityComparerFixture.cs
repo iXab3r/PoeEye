@@ -2,9 +2,9 @@
 {
     using System.Collections.Generic;
 
-    using NUnit.Framework;
-
     using Moq;
+
+    using NUnit.Framework;
 
     using PoeShared.Common;
 
@@ -18,18 +18,36 @@
         {
         }
 
-        [Test]
-        [TestCaseSource(nameof(ShouldReturnTrueTestCaseSource))]
-        public void ShouldReturnTrue(IPoeItemMod item1, IPoeItemMod item2)
+        private IEnumerable<TestCaseData> ShouldReturnTrueTestCaseSource()
         {
-            //Given
-            var instance = CreateInstance();
+            yield return new TestCaseData(
+                CreateItemMod(string.Empty, string.Empty),
+                CreateItemMod(string.Empty, string.Empty));
+            yield return new TestCaseData(
+                CreateItemMod(string.Empty, "1"),
+                CreateItemMod(string.Empty, "1"));
+        }
 
-            //When
-            var result = instance.Equals(item1, item2);
+        private IEnumerable<TestCaseData> ShouldReturnFalseTestCaseSource()
+        {
+            yield return new TestCaseData(
+                CreateItemMod(string.Empty, "1"),
+                CreateItemMod(string.Empty, "2"));
+            yield return new TestCaseData(
+                CreateItemMod("1", string.Empty),
+                CreateItemMod("1", "1"));
+        }
 
-            //Then
-            result.ShouldBe(true);
+        private IPoeItemMod CreateItemMod(string codeName, string name)
+        {
+            return Mock.Of<IPoeItemMod>(
+                x => x.Name == name &&
+                     x.CodeName == codeName);
+        }
+
+        private PoeItemModEqualityComparer CreateInstance()
+        {
+            return new PoeItemModEqualityComparer();
         }
 
         [Test]
@@ -46,36 +64,18 @@
             result.ShouldBe(false);
         }
 
-        private IEnumerable<TestCaseData> ShouldReturnTrueTestCaseSource()
+        [Test]
+        [TestCaseSource(nameof(ShouldReturnTrueTestCaseSource))]
+        public void ShouldReturnTrue(IPoeItemMod item1, IPoeItemMod item2)
         {
-            yield return new TestCaseData(
-                    CreateItemMod(string.Empty, string.Empty),
-                    CreateItemMod(string.Empty, string.Empty));
-            yield return new TestCaseData(
-                    CreateItemMod(string.Empty, "1"),
-                    CreateItemMod(string.Empty, "1"));
-        }
+            //Given
+            var instance = CreateInstance();
 
-        private IEnumerable<TestCaseData> ShouldReturnFalseTestCaseSource()
-        {
-            yield return new TestCaseData(
-                    CreateItemMod(string.Empty, "1"),
-                    CreateItemMod(string.Empty, "2"));
-            yield return new TestCaseData(
-                    CreateItemMod("1", string.Empty),
-                    CreateItemMod("1", "1"));
-        }
+            //When
+            var result = instance.Equals(item1, item2);
 
-        private IPoeItemMod CreateItemMod(string codeName, string name)
-        {
-            return Mock.Of<IPoeItemMod>(
-                x => x.Name == name &&
-                     x.CodeName == codeName);
-        }
-
-        private PoeItemModEqualityComparer CreateInstance()
-        {
-            return new PoeItemModEqualityComparer();
+            //Then
+            result.ShouldBe(true);
         }
     }
 }

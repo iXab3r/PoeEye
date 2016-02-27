@@ -25,7 +25,7 @@ namespace PoeEye.PoeTrade
                 CurrenciesList = ExtractCurrenciesList(parser),
                 ItemsList = ExtractItems(parser),
                 ModsList = ExtractModsList(parser),
-                LeaguesList = ExtractLeaguesList(parser),
+                LeaguesList = ExtractLeaguesList(parser)
             };
 
             return result;
@@ -76,10 +76,10 @@ namespace PoeEye.PoeTrade
         {
             var leaguesRows = parser["select[name=league] option"].ToList();
             var leaguesList = leaguesRows
-                    .Select(ParseLeagueRow)
-                    .Where(IsValid)
-                    .Distinct()
-                    .ToArray();
+                .Select(ParseLeagueRow)
+                .Where(IsValid)
+                .Distinct()
+                .ToArray();
             return leaguesList;
         }
 
@@ -92,8 +92,8 @@ namespace PoeEye.PoeTrade
             };
 
             var isImplicit = result.CodeName?.Contains("(implicit)");
-            result.ModType = isImplicit != null && isImplicit.Value 
-                ? PoeModType.Implicit 
+            result.ModType = isImplicit != null && isImplicit.Value
+                ? PoeModType.Implicit
                 : PoeModType.Explicit;
 
             return result;
@@ -144,12 +144,10 @@ namespace PoeEye.PoeTrade
                 UserForumName = parser.Attr("data-seller"),
                 UserIgn = parser.Attr("data-ign"),
                 UserIsOnline = parser["tr[class=bottom-row] span[class~=success]"].Any(),
-
                 Price = parser.Attr("data-buyout"),
                 League = parser.Attr("data-league"),
                 Hash = parser["span[class=click-button]"]?.Attr("data-hash"),
                 ThreadId = parser["span[class=click-button]"]?.Attr("data-thread"),
-
                 Quality = parser["td[class=table-stats] td[data-name=q]"]?.Text(),
                 Physical = parser["td[class=table-stats] td[data-name=quality_pd]"]?.Text(),
                 Elemental = parser["td[class=table-stats] td[data-name=ed]"]?.Text(),
@@ -163,16 +161,11 @@ namespace PoeEye.PoeTrade
                 BlockChance = parser["td[class=table-stats] td[data-name=block]"]?.Text(),
                 CriticalChance = parser["td[class=table-stats] td[data-name=crit]"]?.Text(),
                 Level = parser["td[class=table-stats] td[data-name=level]"]?.Text(),
-
                 Requirements = parser["td[class=item-cell] p[class=requirements]"]?.Text(),
-
                 IsCorrupted = parser["td[class=item-cell] span[class~=corrupted]"].Any(),
-
-
                 Mods = implicitMods.Concat(explicitMods).ToArray(),
                 Links = ExtractLinksInfo(row),
-
-                Rarity = ExtractItemRarity(row),
+                Rarity = ExtractItemRarity(row)
             };
             TrimProperties(result);
             return result;
@@ -182,7 +175,7 @@ namespace PoeEye.PoeTrade
         {
             float result;
             return !float.TryParse(rawValue, out result)
-                ? (float?)null
+                ? (float?) null
                 : result;
         }
 
@@ -196,8 +189,8 @@ namespace PoeEye.PoeTrade
 
             foreach (var propertyInfo in propertiesToProcess)
             {
-                var currentValue = (string)propertyInfo.GetValue(item);
-                var newValue = (currentValue ?? string.Empty);
+                var currentValue = (string) propertyInfo.GetValue(item);
+                var newValue = currentValue ?? string.Empty;
                 newValue = HttpUtility.HtmlDecode(newValue);
                 newValue = newValue.Trim();
 
@@ -212,11 +205,16 @@ namespace PoeEye.PoeTrade
             var titleClass = parser["td[class=item-cell] a[class^=title]"]?.Attr("class");
             switch (titleClass)
             {
-                case "title itemframe0": return PoeItemRarity.Normal;
-                case "title itemframe1": return PoeItemRarity.Magic;
-                case "title itemframe2": return PoeItemRarity.Rare;
-                case "title itemframe3": return PoeItemRarity.Unique;
-                default: return PoeItemRarity.Unknown;
+                case "title itemframe0":
+                    return PoeItemRarity.Normal;
+                case "title itemframe1":
+                    return PoeItemRarity.Magic;
+                case "title itemframe2":
+                    return PoeItemRarity.Rare;
+                case "title itemframe3":
+                    return PoeItemRarity.Unique;
+                default:
+                    return PoeItemRarity.Unknown;
             }
         }
 
@@ -225,7 +223,7 @@ namespace PoeEye.PoeTrade
             CQ parser = row.Render();
 
             var rawLinksText = parser["span[class=sockets-raw]"]?.Text();
-            return string.IsNullOrWhiteSpace(rawLinksText) ? default(IPoeLinksInfo) : new PoeLinksInfo() { RawSockets = rawLinksText };
+            return string.IsNullOrWhiteSpace(rawLinksText) ? default(IPoeLinksInfo) : new PoeLinksInfo {RawSockets = rawLinksText};
         }
 
         private static IPoeItemMod[] ExtractExplicitMods(IDomObject row)

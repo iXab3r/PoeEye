@@ -1,30 +1,26 @@
 ﻿namespace PoeEyeUi.PoeTrade.Models
 {
     using System;
-    using System.Collections.Generic;
-    using System.Reactive.Concurrency;
     using System.Reactive.Linq;
     using System.Runtime.InteropServices;
     using System.Text;
-
-    using PoeShared;
-    using PoeShared.Utilities;
-
-    using ReactiveUI;
     using System.Text.RegularExpressions;
 
     using Guards;
 
     using JetBrains.Annotations;
 
-    using Microsoft.Practices.Unity;
+    using PoeShared;
+    using PoeShared.Utilities;
 
-    using Prism;
+    using ReactiveUI;
 
     internal sealed class WindowTracker : DisposableReactiveObject, IWindowTracker
     {
-        private readonly Func<string> titleMatcherRegexFunc;
         private static readonly TimeSpan recheckPeriod = TimeSpan.FromSeconds(1);
+        private readonly Func<string> titleMatcherRegexFunc;
+
+        private bool isActive;
 
         public WindowTracker([NotNull] Func<string> titleMatcherRegexFunc)
         {
@@ -32,11 +28,17 @@
             Guard.ArgumentNotNull(() => titleMatcherRegexFunc);
 
             Observable
-              .Timer(DateTimeOffset.Now, recheckPeriod)
-              .Select(_ => NativeMethods.GetForegroundWindow())
-              .DistinctUntilChanged()
-              .Subscribe(WindowActivated)
-              .AddTo(Anchors);
+                .Timer(DateTimeOffset.Now, recheckPeriod)
+                .Select(_ => NativeMethods.GetForegroundWindow())
+                .DistinctUntilChanged()
+                .Subscribe(WindowActivated)
+                .AddTo(Anchors);
+        }
+
+        public bool IsActive
+        {
+            get { return isActive; }
+            private set { this.RaiseAndSetIfChanged(ref isActive, value); }
         }
 
         private void WindowActivated(IntPtr activeWindowHandle)
@@ -50,15 +52,11 @@
                        !string.IsNullOrWhiteSpace(targetTitle) &&
                        Regex.IsMatch(activeWindowTitle, targetTitle);
 
-            Log.Instance.DebugFormat("[WindowTracker] Target window is {0}ACTIVE (expected title is '{1}', got '{2}')", isActive ? string.Empty : "NOT ", targetTitle, activeWindowTitle);
-        }
-
-        private bool isActive;
-
-        public bool IsActive
-        {
-            get { return isActive; }
-            private set { this.RaiseAndSetIfChanged(ref isActive, value); }
+            Log.Instance.DebugFormat(
+                "[WindowTracker] Target window is {0}ACTIVE (expected title is '{1}', got '{2}')",
+                isActive ? string.Empty : "NOT ",
+                targetTitle,
+                activeWindowTitle);
         }
 
         private static class NativeMethods

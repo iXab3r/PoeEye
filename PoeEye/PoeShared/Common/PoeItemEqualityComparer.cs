@@ -27,13 +27,13 @@ namespace PoeShared.Common
                 return false;
             }
 
-            var result = string.Equals(x.ItemName, y.ItemName, StringComparison.InvariantCultureIgnoreCase) && 
-                   string.Equals(x.ItemIconUri, y.ItemIconUri, StringComparison.InvariantCultureIgnoreCase) && 
-                   string.Equals(x.TradeForumUri, y.TradeForumUri, StringComparison.InvariantCultureIgnoreCase) && 
-                   string.Equals(x.UserForumUri, y.UserForumUri, StringComparison.InvariantCultureIgnoreCase) && 
-                   string.Equals(x.UserForumName, y.UserForumName, StringComparison.InvariantCultureIgnoreCase) && 
-                   string.Equals(x.Price, y.Price, StringComparison.InvariantCultureIgnoreCase) && 
-                   string.Equals(x.League, y.League, StringComparison.InvariantCultureIgnoreCase);
+            var result = string.Equals(x.ItemName, y.ItemName, StringComparison.InvariantCultureIgnoreCase) &&
+                         string.Equals(x.ItemIconUri, y.ItemIconUri, StringComparison.InvariantCultureIgnoreCase) &&
+                         string.Equals(x.TradeForumUri, y.TradeForumUri, StringComparison.InvariantCultureIgnoreCase) &&
+                         string.Equals(x.UserForumUri, y.UserForumUri, StringComparison.InvariantCultureIgnoreCase) &&
+                         string.Equals(x.UserForumName, y.UserForumName, StringComparison.InvariantCultureIgnoreCase) &&
+                         string.Equals(x.Price, y.Price, StringComparison.InvariantCultureIgnoreCase) &&
+                         string.Equals(x.League, y.League, StringComparison.InvariantCultureIgnoreCase);
 
             result &= x.Mods.SequenceEqual(y.Mods, itemModEqualityComparer);
             result &= x.IsCorrupted == y.IsCorrupted;
@@ -45,7 +45,7 @@ namespace PoeShared.Common
         {
             unchecked
             {
-                var hashCode = (obj.ItemName != null ? StringComparer.OrdinalIgnoreCase.GetHashCode(obj.ItemName) : 0);
+                var hashCode = obj.ItemName != null ? StringComparer.OrdinalIgnoreCase.GetHashCode(obj.ItemName) : 0;
                 hashCode = (hashCode * 397) ^ (obj.ItemIconUri != null ? StringComparer.OrdinalIgnoreCase.GetHashCode(obj.ItemIconUri) : 0);
                 hashCode = (hashCode * 397) ^ (obj.TradeForumUri != null ? StringComparer.OrdinalIgnoreCase.GetHashCode(obj.TradeForumUri) : 0);
                 hashCode = (hashCode * 397) ^ (obj.UserForumUri != null ? StringComparer.OrdinalIgnoreCase.GetHashCode(obj.UserForumUri) : 0);

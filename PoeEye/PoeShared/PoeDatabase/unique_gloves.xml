@@ -1,298 +1,299 @@
-<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="utf-8"?>
+
 <Root>
-<Entity Type="Armour" Category="Gloves">
-  <Property id="Name">Asenath's Gentle Touch</Property>
-  <Property id="Type">Gloves</Property>
-  <Property id="Rarity">Unique</Property>
-  <Property id="Base">Silk Gloves</Property>
-  <Property id="Level">25</Property>
-  <Property id="Strength">0</Property>
-  <Property id="Dexterity">0</Property>
-  <Property id="Intelligence">0</Property>
-  <Property id="ArmourValue">0</Property>
-  <Property id="EvasionValue">0</Property>
-  <Property id="EnergyShieldValue">22</Property>
-  <Property id="Mods">+(20 to 30) to Intelligence | +(20 to 30) to Maximum Life | +(20 to 30) to Maximum Mana | Curse Enemies with Temporal Chains on Hit</Property>
-</Entity>
-<Entity Type="Armour" Category="Gloves">
-  <Property id="Name">Atziri's Acuity</Property>
-  <Property id="Type">Gloves</Property>
-  <Property id="Rarity">Unique</Property>
-  <Property id="Base">Vaal Gauntlets</Property>
-  <Property id="Level">75</Property>
-  <Property id="Strength">100</Property>
-  <Property id="Dexterity">0</Property>
-  <Property id="Intelligence">0</Property>
-  <Property id="ArmourValue">(603 to 643)</Property>
-  <Property id="EvasionValue">0</Property>
-  <Property id="EnergyShieldValue">0</Property>
-  <Property id="Mods">+(60 to 80) to Intelligence | +(60 to 75) to maximum Life | (200 to 220)% increased Armour | (25 to 35)% increased Global Critical Strike Chance | Leech applies instantly on Critical Strike at 60% effectiveness</Property>
-</Entity>
-<Entity Type="Armour" Category="Gloves">
-  <Property id="Name">Aurseize</Property>
-  <Property id="Type">Gloves</Property>
-  <Property id="Rarity">Unique</Property>
-  <Property id="Base">Steelscale Gauntlets</Property>
-  <Property id="Level">36</Property>
-  <Property id="Strength">29</Property>
-  <Property id="Dexterity">29</Property>
-  <Property id="Intelligence">0</Property>
-  <Property id="ArmourValue">(80 to 91)</Property>
-  <Property id="EvasionValue">(80 to 91)</Property>
-  <Property id="EnergyShieldValue">0</Property>
-  <Property id="Mods">(40 to 60)% increased Armour and Evasion | +15% to all Elemental Resistances | (40 to 50)% increased Rarity of Items found | 5% reduced Movement Speed</Property>
-</Entity>
-<Entity Type="Armour" Category="Gloves">
-  <Property id="Name">Demigod's Touch</Property>
-  <Property id="Type">Gloves</Property>
-  <Property id="Rarity">Unique</Property>
-  <Property id="Base">Golden Bracers</Property>
-  <Property id="Level">12</Property>
-  <Property id="Strength">0</Property>
-  <Property id="Dexterity">0</Property>
-  <Property id="Intelligence">0</Property>
-  <Property id="ArmourValue">0</Property>
-  <Property id="EvasionValue">0</Property>
-  <Property id="EnergyShieldValue">0</Property>
-  <Property id="Mods">+(20 to 30) to maximum Life | (10 to 16)% increased Attack Speed | (6 to 10)% increased Cast Speed</Property>
-  <Property id="HasImplicitMod">True</Property>
-</Entity>
-<Entity Type="Armour" Category="Gloves">
-  <Property id="Name">Meginord's Vise</Property>
-  <Property id="Type">Gloves</Property>
-  <Property id="Rarity">Unique</Property>
-  <Property id="Base">Steel Gauntlets</Property>
-  <Property id="Level">35</Property>
-  <Property id="Strength">52</Property>
-  <Property id="Dexterity">0</Property>
-  <Property id="Intelligence">0</Property>
-  <Property id="ArmourValue">(141 to 162)</Property>
-  <Property id="EvasionValue">0</Property>
-  <Property id="EnergyShieldValue">0</Property>
-  <Property id="Mods">10% increased Physical Damage | +100 to Strength | (40 to 60)% increased Armour</Property>
-</Entity>
-<Entity Type="Armour" Category="Gloves">
-  <Property id="Name">Doedre's Tenure</Property>
-  <Property id="Type">Gloves</Property>
-  <Property id="Rarity">Unique</Property>
-  <Property id="Base">Velvet Gloves</Property>
-  <Property id="Level">12</Property>
-  <Property id="Strength">0</Property>
-  <Property id="Dexterity">0</Property>
-  <Property id="Intelligence">21</Property>
-  <Property id="ArmourValue">0</Property>
-  <Property id="EvasionValue">0</Property>
-  <Property id="EnergyShieldValue">28</Property>
-  <Property id="Mods">(40 to 50)% increased Spell Damage | +10 to Intelligence | 20% reduced Cast Speed | +16 to maximum Energy Shield</Property>
-</Entity>
-<Entity Type="Armour" Category="Gloves">
-  <Property id="Name">Facebreaker</Property>
-  <Property id="Type">Gloves</Property>
-  <Property id="Rarity">Unique</Property>
-  <Property id="Base">Strapped Mitts</Property>
-  <Property id="Level">16</Property>
-  <Property id="Strength">0</Property>
-  <Property id="Dexterity">14</Property>
-  <Property id="Intelligence">14</Property>
-  <Property id="ArmourValue">0</Property>
-  <Property id="EvasionValue">26</Property>
-  <Property id="EnergyShieldValue">8</Property>
-  <Property id="Mods">60% increased Global Critical Strike Multiplier | 10% reduced Enemy Stun Threshold | (600 to 800)% more Unarmed Physical Damage | Extra Gore</Property>
-</Entity>
-<Entity Type="Armour" Category="Gloves">
-  <Property id="Name">Flesh and Spirit</Property>
-  <Property id="Type">Gloves</Property>
-  <Property id="Rarity">Unique</Property>
-  <Property id="Base">Ironscale Gauntlets</Property>
-  <Property id="Level">15</Property>
-  <Property id="Strength">0</Property>
-  <Property id="Dexterity">0</Property>
-  <Property id="Intelligence">0</Property>
-  <Property id="ArmourValue">(45 to 55)</Property>
-  <Property id="EvasionValue">(45 to 55)</Property>
-  <Property id="EnergyShieldValue">0</Property>
-  <Property id="Mods">(6 to 9)% increased Attack Speed | (80 to 120)% increased Armour and Evasion | (3 to 4) Life Regenerated per second | Recover 20% of your Maximum Life on Rampage | Gain 5 Souls for Vaal Skills on Rampage</Property>
-</Entity>
-<Entity Type="Armour" Category="Gloves">
-  <Property id="Name">Voidbringer</Property>
-  <Property id="Type">Gloves</Property>
-  <Property id="Rarity">Unique</Property>
-  <Property id="Base">Conjurer Gloves</Property>
-  <Property id="Level">55</Property>
-  <Property id="Strength">0</Property>
-  <Property id="Dexterity">0</Property>
-  <Property id="Intelligence">79</Property>
-  <Property id="ArmourValue">0</Property>
-  <Property id="EvasionValue">0</Property>
-  <Property id="EnergyShieldValue">(175 to 207)</Property>
-  <Property id="Mods">(125 to 150)% increased Critical Strike Chance for Spells | (280 to 350)% increased Energy Shield | 80% increased Mana Cost of Skills | +(15 to 20) Energy Shield gained on Kill | +1 to Level of Elemental Gems in this item</Property>
-</Entity>
-<Entity Type="Armour" Category="Gloves">
-  <Property id="Name">Hrimsorrow</Property>
-  <Property id="Type">Gloves</Property>
-  <Property id="Rarity">Unique</Property>
-  <Property id="Base">Goathide Gloves</Property>
-  <Property id="Level">9</Property>
-  <Property id="Strength">0</Property>
-  <Property id="Dexterity">17</Property>
-  <Property id="Intelligence">0</Property>
-  <Property id="ArmourValue">0</Property>
-  <Property id="EvasionValue">42</Property>
-  <Property id="EnergyShieldValue">0</Property>
-  <Property id="Mods">+(20 to 30) to Strength | 50% increased Evasion Rating | +(10 to 20)% to Cold Resistance | 25% of Physical Damage Converted to Cold Damage | Reflects 10 Cold Damage to Melee Attackers</Property>
-</Entity>
-<Entity Type="Armour" Category="Gloves">
-  <Property id="Name">Lochtonial Caress</Property>
-  <Property id="Type">Gloves</Property>
-  <Property id="Rarity">Unique</Property>
-  <Property id="Base">Iron Gauntlets</Property>
-  <Property id="Level">0</Property>
-  <Property id="Strength">0</Property>
-  <Property id="Dexterity">0</Property>
-  <Property id="Intelligence">0</Property>
-  <Property id="ArmourValue">(16 to 26)</Property>
-  <Property id="EvasionValue">0</Property>
-  <Property id="EnergyShieldValue">0</Property>
-  <Property id="Mods">(10 to 15)% increased Attack Speed | +(10 to 20) to Armour | (10 to 15)% reduced maximum Mana | (10 to 15)% increased Cast Speed | Conduit</Property>
-</Entity>
-<Entity Type="Armour" Category="Gloves">
-  <Property id="Name">Maligaro's Virtuosity</Property>
-  <Property id="Type">Gloves</Property>
-  <Property id="Rarity">Unique</Property>
-  <Property id="Base">Deerskin Gloves</Property>
-  <Property id="Level">21</Property>
-  <Property id="Strength">0</Property>
-  <Property id="Dexterity">33</Property>
-  <Property id="Intelligence">0</Property>
-  <Property id="ArmourValue">0</Property>
-  <Property id="EvasionValue">(99 to 112)</Property>
-  <Property id="EnergyShieldValue">0</Property>
-  <Property id="Mods">+(20 to 30) to Dexterity | 5% increased Attack Speed | 50% increased Global Critical Strike Chance | (28 to 36)% increased Global Critical Strike Multiplier | (60 to 80)% increased Evasion Rating</Property>
-</Entity>
-<Entity Type="Armour" Category="Gloves">
-  <Property id="Name">Null and Void</Property>
-  <Property id="Type">Gloves</Property>
-  <Property id="Rarity">Unique</Property>
-  <Property id="Base">Legion Gloves</Property>
-  <Property id="Level">57</Property>
-  <Property id="Strength">44</Property>
-  <Property id="Dexterity">0</Property>
-  <Property id="Intelligence">44</Property>
-  <Property id="ArmourValue">(222 to 240)</Property>
-  <Property id="EvasionValue">0</Property>
-  <Property id="EnergyShieldValue">(65 to 70)</Property>
-  <Property id="Mods">+(20 to 30) to Strength | (150 to 180)% increased Armour and Energy Shield | +(50 to 70) to maximum Life | (20 to 40)% increased mana Regeneration Rate | Dispels elemental Status Ailments on Rampage | Gain Immunity to Physical Damage for 1.5 seconds on Rampage</Property>
-</Entity>
-<Entity Type="Armour" Category="Gloves">
-  <Property id="Name">Ondar's Clasp</Property>
-  <Property id="Type">Gloves</Property>
-  <Property id="Rarity">Unique</Property>
-  <Property id="Base">Wrapped Mitts</Property>
-  <Property id="Level">5</Property>
-  <Property id="Strength">0</Property>
-  <Property id="Dexterity">0</Property>
-  <Property id="Intelligence">0</Property>
-  <Property id="ArmourValue">0</Property>
-  <Property id="EvasionValue">9</Property>
-  <Property id="EnergyShieldValue">3</Property>
-  <Property id="Mods">30% increased Attack Speed when on Full Life | Adds 1–13 Lightning Damage | +(50 to 80) to Accuracy Rating | 20% increased Movement Speed when on Low Life</Property>
-</Entity>
-<Entity Type="Armour" Category="Gloves">
-  <Property id="Name">Sadima's Touch</Property>
-  <Property id="Type">Gloves</Property>
-  <Property id="Rarity">Unique</Property>
-  <Property id="Base">Wool Gloves</Property>
-  <Property id="Level">11</Property>
-  <Property id="Strength">0</Property>
-  <Property id="Dexterity">0</Property>
-  <Property id="Intelligence">0</Property>
-  <Property id="ArmourValue">0</Property>
-  <Property id="EvasionValue">0</Property>
-  <Property id="EnergyShieldValue">22</Property>
-  <Property id="Mods">Adds 4–8 Fire Damage | Adds 1–13 Lightning Damage | +18 to maximum Energy Shield | (12 to 16)% increased Quantity of Items found</Property>
-</Entity>
-<Entity Type="Armour" Category="Gloves">
-  <Property id="Name">Shackles of the Wretched</Property>
-  <Property id="Type">Gloves</Property>
-  <Property id="Rarity">Unique</Property>
-  <Property id="Base">Chain Gloves</Property>
-  <Property id="Level">7</Property>
-  <Property id="Strength">0</Property>
-  <Property id="Dexterity">17</Property>
-  <Property id="Intelligence">0</Property>
-  <Property id="ArmourValue">12</Property>
-  <Property id="EvasionValue">0</Property>
-  <Property id="EnergyShieldValue">4</Property>
-  <Property id="Mods">(40 to 60)% increased Block and Stun Recovery | Curses in this item are reflected back to you | You cannot be Chilled for 3 seconds after being Chilled | You cannot be Frozen for 3 seconds after being Frozen | You cannot be Ignited for 3 seconds after being Ignited | You cannot be Shocked for 3 seconds after being Shocked | You grant (4 to 6) Frenzy Charges to allies on Death</Property>
-</Entity>
-<Entity Type="Armour" Category="Gloves">
-  <Property id="Name">Shadows and Dust</Property>
-  <Property id="Type">Gloves</Property>
-  <Property id="Rarity">Unique</Property>
-  <Property id="Base">Clasped Mitts</Property>
-  <Property id="Level">31</Property>
-  <Property id="Strength">0</Property>
-  <Property id="Dexterity">25</Property>
-  <Property id="Intelligence">25</Property>
-  <Property id="ArmourValue">0</Property>
-  <Property id="EvasionValue">(98 to 113)</Property>
-  <Property id="EnergyShieldValue">(30 to 35)</Property>
-  <Property id="Mods">(20 to 30)% increased Global Critical Strike Chance | (15 to 30)% increased Global Critical Strike Multiplier | (100 to 130)% increased Evasion and Energy Shield | 1% of Physical Attack Damage Leeched as Mana | Creates a Smoke Cloud on Rampage | Gain Unholy Might for 3 seconds on Rampage</Property>
-</Entity>
-<Entity Type="Armour" Category="Gloves">
-  <Property id="Name">Slitherpinch</Property>
-  <Property id="Type">Gloves</Property>
-  <Property id="Rarity">Unique</Property>
-  <Property id="Base">Bronzescale Gauntlets</Property>
-  <Property id="Level">27</Property>
-  <Property id="Strength">22</Property>
-  <Property id="Dexterity">22</Property>
-  <Property id="Intelligence">0</Property>
-  <Property id="ArmourValue">43</Property>
-  <Property id="EvasionValue">(69 to 86)</Property>
-  <Property id="EnergyShieldValue">0</Property>
-  <Property id="Mods">+(40 to 50) to Dexterity | 5% increased Attack Speed | 3% of Physical Attack Damage Leeched as Life | 2% of Physical Attack Damage Leeched as Mana | (60 to 100)% increased Evasion Rating</Property>
-</Entity>
-<Entity Type="Armour" Category="Gloves">
-  <Property id="Name">Snakebite</Property>
-  <Property id="Type">Gloves</Property>
-  <Property id="Rarity">Unique</Property>
-  <Property id="Base">Assassin's Mitts</Property>
-  <Property id="Level">58</Property>
-  <Property id="Strength">0</Property>
-  <Property id="Dexterity">45</Property>
-  <Property id="Intelligence">45</Property>
-  <Property id="ArmourValue">0</Property>
-  <Property id="EvasionValue">(227 to 255)</Property>
-  <Property id="EnergyShieldValue">27</Property>
-  <Property id="Mods">(150 to 180)% increased Evasion Rating | +(60 to 70) to maximum Life | 2% increased Attack Speed per Frenzy Charge | 6% increased Accuracy Rating per Frenzy Charge | 10% reduced Frenzy Charge Duration per Frenzy Charge | When at Maximum Frenzy Charges, Attacks Poison enemies</Property>
-</Entity>
-<Entity Type="Armour" Category="Gloves">
-  <Property id="Name">Thunderfist</Property>
-  <Property id="Type">Gloves</Property>
-  <Property id="Rarity">Unique</Property>
-  <Property id="Base">Murder Mitts</Property>
-  <Property id="Level">67</Property>
-  <Property id="Strength">0</Property>
-  <Property id="Dexterity">51</Property>
-  <Property id="Intelligence">51</Property>
-  <Property id="ArmourValue">0</Property>
-  <Property id="EvasionValue">105</Property>
-  <Property id="EnergyShieldValue">(56 to 61)</Property>
-  <Property id="Mods">Adds 1–40 Lightning Damage | 10% increased Attack Speed | +(25 to 30) to maximum Energy Shield | 100% increased Shock Duration on enemies | 10% increased Stun Duration on enemies | Gems in this item are Supported by level 18 Added Lightning Damage</Property>
-</Entity>
-<Entity Type="Armour" Category="Gloves">
-  <Property id="Name">Vaal Caress</Property>
-  <Property id="Type">Gloves</Property>
-  <Property id="Rarity">Unique</Property>
-  <Property id="Base">Bronzescale Gauntlets</Property>
-  <Property id="Level">27</Property>
-  <Property id="Strength">22</Property>
-  <Property id="Dexterity">22</Property>
-  <Property id="Intelligence">0</Property>
-  <Property id="ArmourValue">(95 to 103)</Property>
-  <Property id="EvasionValue">(95 to 103)</Property>
-  <Property id="EnergyShieldValue">0</Property>
-  <Property id="Mods">+2 to Level of Vaal Gems in this item | (120 to 140)% increased Armour and Evasion | +(30 to 40) to maximum Life | +30% to Cold Resistance | You gain Onslaught for 5 seconds on using a Vaal Skill</Property>
-</Entity>
+  <Entity Type="Armour" Category="Gloves">
+    <Property id="Name">Asenath's Gentle Touch</Property>
+    <Property id="Type">Gloves</Property>
+    <Property id="Rarity">Unique</Property>
+    <Property id="Base">Silk Gloves</Property>
+    <Property id="Level">25</Property>
+    <Property id="Strength">0</Property>
+    <Property id="Dexterity">0</Property>
+    <Property id="Intelligence">0</Property>
+    <Property id="ArmourValue">0</Property>
+    <Property id="EvasionValue">0</Property>
+    <Property id="EnergyShieldValue">22</Property>
+    <Property id="Mods">+(20 to 30) to Intelligence | +(20 to 30) to Maximum Life | +(20 to 30) to Maximum Mana | Curse Enemies with Temporal Chains on Hit</Property>
+  </Entity>
+  <Entity Type="Armour" Category="Gloves">
+    <Property id="Name">Atziri's Acuity</Property>
+    <Property id="Type">Gloves</Property>
+    <Property id="Rarity">Unique</Property>
+    <Property id="Base">Vaal Gauntlets</Property>
+    <Property id="Level">75</Property>
+    <Property id="Strength">100</Property>
+    <Property id="Dexterity">0</Property>
+    <Property id="Intelligence">0</Property>
+    <Property id="ArmourValue">(603 to 643)</Property>
+    <Property id="EvasionValue">0</Property>
+    <Property id="EnergyShieldValue">0</Property>
+    <Property id="Mods">+(60 to 80) to Intelligence | +(60 to 75) to maximum Life | (200 to 220)% increased Armour | (25 to 35)% increased Global Critical Strike Chance | Leech applies instantly on Critical Strike at 60% effectiveness</Property>
+  </Entity>
+  <Entity Type="Armour" Category="Gloves">
+    <Property id="Name">Aurseize</Property>
+    <Property id="Type">Gloves</Property>
+    <Property id="Rarity">Unique</Property>
+    <Property id="Base">Steelscale Gauntlets</Property>
+    <Property id="Level">36</Property>
+    <Property id="Strength">29</Property>
+    <Property id="Dexterity">29</Property>
+    <Property id="Intelligence">0</Property>
+    <Property id="ArmourValue">(80 to 91)</Property>
+    <Property id="EvasionValue">(80 to 91)</Property>
+    <Property id="EnergyShieldValue">0</Property>
+    <Property id="Mods">(40 to 60)% increased Armour and Evasion | +15% to all Elemental Resistances | (40 to 50)% increased Rarity of Items found | 5% reduced Movement Speed</Property>
+  </Entity>
+  <Entity Type="Armour" Category="Gloves">
+    <Property id="Name">Demigod's Touch</Property>
+    <Property id="Type">Gloves</Property>
+    <Property id="Rarity">Unique</Property>
+    <Property id="Base">Golden Bracers</Property>
+    <Property id="Level">12</Property>
+    <Property id="Strength">0</Property>
+    <Property id="Dexterity">0</Property>
+    <Property id="Intelligence">0</Property>
+    <Property id="ArmourValue">0</Property>
+    <Property id="EvasionValue">0</Property>
+    <Property id="EnergyShieldValue">0</Property>
+    <Property id="Mods">+(20 to 30) to maximum Life | (10 to 16)% increased Attack Speed | (6 to 10)% increased Cast Speed</Property>
+    <Property id="HasImplicitMod">True</Property>
+  </Entity>
+  <Entity Type="Armour" Category="Gloves">
+    <Property id="Name">Meginord's Vise</Property>
+    <Property id="Type">Gloves</Property>
+    <Property id="Rarity">Unique</Property>
+    <Property id="Base">Steel Gauntlets</Property>
+    <Property id="Level">35</Property>
+    <Property id="Strength">52</Property>
+    <Property id="Dexterity">0</Property>
+    <Property id="Intelligence">0</Property>
+    <Property id="ArmourValue">(141 to 162)</Property>
+    <Property id="EvasionValue">0</Property>
+    <Property id="EnergyShieldValue">0</Property>
+    <Property id="Mods">10% increased Physical Damage | +100 to Strength | (40 to 60)% increased Armour</Property>
+  </Entity>
+  <Entity Type="Armour" Category="Gloves">
+    <Property id="Name">Doedre's Tenure</Property>
+    <Property id="Type">Gloves</Property>
+    <Property id="Rarity">Unique</Property>
+    <Property id="Base">Velvet Gloves</Property>
+    <Property id="Level">12</Property>
+    <Property id="Strength">0</Property>
+    <Property id="Dexterity">0</Property>
+    <Property id="Intelligence">21</Property>
+    <Property id="ArmourValue">0</Property>
+    <Property id="EvasionValue">0</Property>
+    <Property id="EnergyShieldValue">28</Property>
+    <Property id="Mods">(40 to 50)% increased Spell Damage | +10 to Intelligence | 20% reduced Cast Speed | +16 to maximum Energy Shield</Property>
+  </Entity>
+  <Entity Type="Armour" Category="Gloves">
+    <Property id="Name">Facebreaker</Property>
+    <Property id="Type">Gloves</Property>
+    <Property id="Rarity">Unique</Property>
+    <Property id="Base">Strapped Mitts</Property>
+    <Property id="Level">16</Property>
+    <Property id="Strength">0</Property>
+    <Property id="Dexterity">14</Property>
+    <Property id="Intelligence">14</Property>
+    <Property id="ArmourValue">0</Property>
+    <Property id="EvasionValue">26</Property>
+    <Property id="EnergyShieldValue">8</Property>
+    <Property id="Mods">60% increased Global Critical Strike Multiplier | 10% reduced Enemy Stun Threshold | (600 to 800)% more Unarmed Physical Damage | Extra Gore</Property>
+  </Entity>
+  <Entity Type="Armour" Category="Gloves">
+    <Property id="Name">Flesh and Spirit</Property>
+    <Property id="Type">Gloves</Property>
+    <Property id="Rarity">Unique</Property>
+    <Property id="Base">Ironscale Gauntlets</Property>
+    <Property id="Level">15</Property>
+    <Property id="Strength">0</Property>
+    <Property id="Dexterity">0</Property>
+    <Property id="Intelligence">0</Property>
+    <Property id="ArmourValue">(45 to 55)</Property>
+    <Property id="EvasionValue">(45 to 55)</Property>
+    <Property id="EnergyShieldValue">0</Property>
+    <Property id="Mods">(6 to 9)% increased Attack Speed | (80 to 120)% increased Armour and Evasion | (3 to 4) Life Regenerated per second | Recover 20% of your Maximum Life on Rampage | Gain 5 Souls for Vaal Skills on Rampage</Property>
+  </Entity>
+  <Entity Type="Armour" Category="Gloves">
+    <Property id="Name">Voidbringer</Property>
+    <Property id="Type">Gloves</Property>
+    <Property id="Rarity">Unique</Property>
+    <Property id="Base">Conjurer Gloves</Property>
+    <Property id="Level">55</Property>
+    <Property id="Strength">0</Property>
+    <Property id="Dexterity">0</Property>
+    <Property id="Intelligence">79</Property>
+    <Property id="ArmourValue">0</Property>
+    <Property id="EvasionValue">0</Property>
+    <Property id="EnergyShieldValue">(175 to 207)</Property>
+    <Property id="Mods">(125 to 150)% increased Critical Strike Chance for Spells | (280 to 350)% increased Energy Shield | 80% increased Mana Cost of Skills | +(15 to 20) Energy Shield gained on Kill | +1 to Level of Elemental Gems in this item</Property>
+  </Entity>
+  <Entity Type="Armour" Category="Gloves">
+    <Property id="Name">Hrimsorrow</Property>
+    <Property id="Type">Gloves</Property>
+    <Property id="Rarity">Unique</Property>
+    <Property id="Base">Goathide Gloves</Property>
+    <Property id="Level">9</Property>
+    <Property id="Strength">0</Property>
+    <Property id="Dexterity">17</Property>
+    <Property id="Intelligence">0</Property>
+    <Property id="ArmourValue">0</Property>
+    <Property id="EvasionValue">42</Property>
+    <Property id="EnergyShieldValue">0</Property>
+    <Property id="Mods">+(20 to 30) to Strength | 50% increased Evasion Rating | +(10 to 20)% to Cold Resistance | 25% of Physical Damage Converted to Cold Damage | Reflects 10 Cold Damage to Melee Attackers</Property>
+  </Entity>
+  <Entity Type="Armour" Category="Gloves">
+    <Property id="Name">Lochtonial Caress</Property>
+    <Property id="Type">Gloves</Property>
+    <Property id="Rarity">Unique</Property>
+    <Property id="Base">Iron Gauntlets</Property>
+    <Property id="Level">0</Property>
+    <Property id="Strength">0</Property>
+    <Property id="Dexterity">0</Property>
+    <Property id="Intelligence">0</Property>
+    <Property id="ArmourValue">(16 to 26)</Property>
+    <Property id="EvasionValue">0</Property>
+    <Property id="EnergyShieldValue">0</Property>
+    <Property id="Mods">(10 to 15)% increased Attack Speed | +(10 to 20) to Armour | (10 to 15)% reduced maximum Mana | (10 to 15)% increased Cast Speed | Conduit</Property>
+  </Entity>
+  <Entity Type="Armour" Category="Gloves">
+    <Property id="Name">Maligaro's Virtuosity</Property>
+    <Property id="Type">Gloves</Property>
+    <Property id="Rarity">Unique</Property>
+    <Property id="Base">Deerskin Gloves</Property>
+    <Property id="Level">21</Property>
+    <Property id="Strength">0</Property>
+    <Property id="Dexterity">33</Property>
+    <Property id="Intelligence">0</Property>
+    <Property id="ArmourValue">0</Property>
+    <Property id="EvasionValue">(99 to 112)</Property>
+    <Property id="EnergyShieldValue">0</Property>
+    <Property id="Mods">+(20 to 30) to Dexterity | 5% increased Attack Speed | 50% increased Global Critical Strike Chance | (28 to 36)% increased Global Critical Strike Multiplier | (60 to 80)% increased Evasion Rating</Property>
+  </Entity>
+  <Entity Type="Armour" Category="Gloves">
+    <Property id="Name">Null and Void</Property>
+    <Property id="Type">Gloves</Property>
+    <Property id="Rarity">Unique</Property>
+    <Property id="Base">Legion Gloves</Property>
+    <Property id="Level">57</Property>
+    <Property id="Strength">44</Property>
+    <Property id="Dexterity">0</Property>
+    <Property id="Intelligence">44</Property>
+    <Property id="ArmourValue">(222 to 240)</Property>
+    <Property id="EvasionValue">0</Property>
+    <Property id="EnergyShieldValue">(65 to 70)</Property>
+    <Property id="Mods">+(20 to 30) to Strength | (150 to 180)% increased Armour and Energy Shield | +(50 to 70) to maximum Life | (20 to 40)% increased mana Regeneration Rate | Dispels elemental Status Ailments on Rampage | Gain Immunity to Physical Damage for 1.5 seconds on Rampage</Property>
+  </Entity>
+  <Entity Type="Armour" Category="Gloves">
+    <Property id="Name">Ondar's Clasp</Property>
+    <Property id="Type">Gloves</Property>
+    <Property id="Rarity">Unique</Property>
+    <Property id="Base">Wrapped Mitts</Property>
+    <Property id="Level">5</Property>
+    <Property id="Strength">0</Property>
+    <Property id="Dexterity">0</Property>
+    <Property id="Intelligence">0</Property>
+    <Property id="ArmourValue">0</Property>
+    <Property id="EvasionValue">9</Property>
+    <Property id="EnergyShieldValue">3</Property>
+    <Property id="Mods">30% increased Attack Speed when on Full Life | Adds 1–13 Lightning Damage | +(50 to 80) to Accuracy Rating | 20% increased Movement Speed when on Low Life</Property>
+  </Entity>
+  <Entity Type="Armour" Category="Gloves">
+    <Property id="Name">Sadima's Touch</Property>
+    <Property id="Type">Gloves</Property>
+    <Property id="Rarity">Unique</Property>
+    <Property id="Base">Wool Gloves</Property>
+    <Property id="Level">11</Property>
+    <Property id="Strength">0</Property>
+    <Property id="Dexterity">0</Property>
+    <Property id="Intelligence">0</Property>
+    <Property id="ArmourValue">0</Property>
+    <Property id="EvasionValue">0</Property>
+    <Property id="EnergyShieldValue">22</Property>
+    <Property id="Mods">Adds 4–8 Fire Damage | Adds 1–13 Lightning Damage | +18 to maximum Energy Shield | (12 to 16)% increased Quantity of Items found</Property>
+  </Entity>
+  <Entity Type="Armour" Category="Gloves">
+    <Property id="Name">Shackles of the Wretched</Property>
+    <Property id="Type">Gloves</Property>
+    <Property id="Rarity">Unique</Property>
+    <Property id="Base">Chain Gloves</Property>
+    <Property id="Level">7</Property>
+    <Property id="Strength">0</Property>
+    <Property id="Dexterity">17</Property>
+    <Property id="Intelligence">0</Property>
+    <Property id="ArmourValue">12</Property>
+    <Property id="EvasionValue">0</Property>
+    <Property id="EnergyShieldValue">4</Property>
+    <Property id="Mods">(40 to 60)% increased Block and Stun Recovery | Curses in this item are reflected back to you | You cannot be Chilled for 3 seconds after being Chilled | You cannot be Frozen for 3 seconds after being Frozen | You cannot be Ignited for 3 seconds after being Ignited | You cannot be Shocked for 3 seconds after being Shocked | You grant (4 to 6) Frenzy Charges to allies on Death</Property>
+  </Entity>
+  <Entity Type="Armour" Category="Gloves">
+    <Property id="Name">Shadows and Dust</Property>
+    <Property id="Type">Gloves</Property>
+    <Property id="Rarity">Unique</Property>
+    <Property id="Base">Clasped Mitts</Property>
+    <Property id="Level">31</Property>
+    <Property id="Strength">0</Property>
+    <Property id="Dexterity">25</Property>
+    <Property id="Intelligence">25</Property>
+    <Property id="ArmourValue">0</Property>
+    <Property id="EvasionValue">(98 to 113)</Property>
+    <Property id="EnergyShieldValue">(30 to 35)</Property>
+    <Property id="Mods">(20 to 30)% increased Global Critical Strike Chance | (15 to 30)% increased Global Critical Strike Multiplier | (100 to 130)% increased Evasion and Energy Shield | 1% of Physical Attack Damage Leeched as Mana | Creates a Smoke Cloud on Rampage | Gain Unholy Might for 3 seconds on Rampage</Property>
+  </Entity>
+  <Entity Type="Armour" Category="Gloves">
+    <Property id="Name">Slitherpinch</Property>
+    <Property id="Type">Gloves</Property>
+    <Property id="Rarity">Unique</Property>
+    <Property id="Base">Bronzescale Gauntlets</Property>
+    <Property id="Level">27</Property>
+    <Property id="Strength">22</Property>
+    <Property id="Dexterity">22</Property>
+    <Property id="Intelligence">0</Property>
+    <Property id="ArmourValue">43</Property>
+    <Property id="EvasionValue">(69 to 86)</Property>
+    <Property id="EnergyShieldValue">0</Property>
+    <Property id="Mods">+(40 to 50) to Dexterity | 5% increased Attack Speed | 3% of Physical Attack Damage Leeched as Life | 2% of Physical Attack Damage Leeched as Mana | (60 to 100)% increased Evasion Rating</Property>
+  </Entity>
+  <Entity Type="Armour" Category="Gloves">
+    <Property id="Name">Snakebite</Property>
+    <Property id="Type">Gloves</Property>
+    <Property id="Rarity">Unique</Property>
+    <Property id="Base">Assassin's Mitts</Property>
+    <Property id="Level">58</Property>
+    <Property id="Strength">0</Property>
+    <Property id="Dexterity">45</Property>
+    <Property id="Intelligence">45</Property>
+    <Property id="ArmourValue">0</Property>
+    <Property id="EvasionValue">(227 to 255)</Property>
+    <Property id="EnergyShieldValue">27</Property>
+    <Property id="Mods">(150 to 180)% increased Evasion Rating | +(60 to 70) to maximum Life | 2% increased Attack Speed per Frenzy Charge | 6% increased Accuracy Rating per Frenzy Charge | 10% reduced Frenzy Charge Duration per Frenzy Charge | When at Maximum Frenzy Charges, Attacks Poison enemies</Property>
+  </Entity>
+  <Entity Type="Armour" Category="Gloves">
+    <Property id="Name">Thunderfist</Property>
+    <Property id="Type">Gloves</Property>
+    <Property id="Rarity">Unique</Property>
+    <Property id="Base">Murder Mitts</Property>
+    <Property id="Level">67</Property>
+    <Property id="Strength">0</Property>
+    <Property id="Dexterity">51</Property>
+    <Property id="Intelligence">51</Property>
+    <Property id="ArmourValue">0</Property>
+    <Property id="EvasionValue">105</Property>
+    <Property id="EnergyShieldValue">(56 to 61)</Property>
+    <Property id="Mods">Adds 1–40 Lightning Damage | 10% increased Attack Speed | +(25 to 30) to maximum Energy Shield | 100% increased Shock Duration on enemies | 10% increased Stun Duration on enemies | Gems in this item are Supported by level 18 Added Lightning Damage</Property>
+  </Entity>
+  <Entity Type="Armour" Category="Gloves">
+    <Property id="Name">Vaal Caress</Property>
+    <Property id="Type">Gloves</Property>
+    <Property id="Rarity">Unique</Property>
+    <Property id="Base">Bronzescale Gauntlets</Property>
+    <Property id="Level">27</Property>
+    <Property id="Strength">22</Property>
+    <Property id="Dexterity">22</Property>
+    <Property id="Intelligence">0</Property>
+    <Property id="ArmourValue">(95 to 103)</Property>
+    <Property id="EvasionValue">(95 to 103)</Property>
+    <Property id="EnergyShieldValue">0</Property>
+    <Property id="Mods">+2 to Level of Vaal Gems in this item | (120 to 140)% increased Armour and Evasion | +(30 to 40) to maximum Life | +30% to Cold Resistance | You gain Onslaught for 5 seconds on using a Vaal Skill</Property>
+  </Entity>
 </Root>

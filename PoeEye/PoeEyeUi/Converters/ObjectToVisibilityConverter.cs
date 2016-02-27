@@ -8,6 +8,7 @@
     internal sealed class ObjectToVisibilityConverter : IValueConverter
     {
         public Visibility TrueValue { get; set; } = Visibility.Visible;
+
         public Visibility FalseValue { get; set; } = Visibility.Collapsed;
 
         public object CompareTo { get; set; }

@@ -15,13 +15,9 @@
 
     using JetBrains.Annotations;
 
-    using MahApps.Metro.Controls.Dialogs;
-
     using MetroModels;
 
     using Microsoft.Practices.Unity;
-
-    using Models;
 
     using PoeEye.Prism;
 

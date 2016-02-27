@@ -4,6 +4,6 @@
 
     public interface IClock
     {
-        DateTime CurrentTime { get; } 
+        DateTime CurrentTime { get; }
     }
 }

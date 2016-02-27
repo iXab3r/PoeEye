@@ -16,13 +16,13 @@
 
     internal sealed class PoeItemVerifier : IPoeItemVerifier
     {
-        private readonly IFactory<IHttpClient> clientsFactory;
         private static readonly string VerificationUri = "http://verify.xyz.is/";
+        private readonly IFactory<IHttpClient> clientsFactory;
 
         public PoeItemVerifier([NotNull] IFactory<IHttpClient> clientsFactory)
         {
             Guard.ArgumentNotNull(() => clientsFactory);
-            
+
             this.clientsFactory = clientsFactory;
         }
 
@@ -49,7 +49,7 @@
             Log.Instance.Debug($"[PoeItemVerifier] Requesting verification uri '{verificationUri}'...");
             return client
                 .Get(verificationUri)
-                .Select(response => new { response, isVerified = ExtractResult(response) })
+                .Select(response => new {response, isVerified = ExtractResult(response)})
                 .Do(result => PostProcess(verificationUri, result.response, result.isVerified))
                 .Select(x => x.isVerified)
                 .ToTask();
@@ -74,14 +74,11 @@
             {
                 return true;
             }
-            else if (rawHtml.Equals("(false);", StringComparison.OrdinalIgnoreCase))
+            if (rawHtml.Equals("(false);", StringComparison.OrdinalIgnoreCase))
             {
                 return false;
             }
-            else
-            {
-                return null;
-            }
+            return null;
         }
     }
 }

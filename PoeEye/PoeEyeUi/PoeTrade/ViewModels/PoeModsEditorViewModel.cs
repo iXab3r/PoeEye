@@ -68,6 +68,8 @@ namespace PoeEyeUi.PoeTrade.ViewModels
 
         public ICommand RemoveModCommand => removeModCommand;
 
+        public string[] KnownMods { get; }
+
         public PoeQueryModsGroupType GroupType
         {
             get { return groupType; }
@@ -86,8 +88,6 @@ namespace PoeEyeUi.PoeTrade.ViewModels
             set { this.RaiseAndSetIfChanged(ref maxGroupValue, value); }
         }
 
-        public string[] KnownMods { get; }
-
         public IReactiveList<IPoeModViewModel> Mods { get; } = new ReactiveList<IPoeModViewModel> {ChangeTrackingEnabled = true};
 
         public IPoeModViewModel AddMod()
@@ -104,7 +104,7 @@ namespace PoeEyeUi.PoeTrade.ViewModels
             var group = new PoeQueryModsGroup
             {
                 Mods = ToMods(),
-                GroupType = GroupType,
+                GroupType = GroupType
             };
 
             if (GroupType == PoeQueryModsGroupType.Count || GroupType == PoeQueryModsGroupType.Sum)

@@ -52,12 +52,6 @@
                 .AddTo(Anchors);
         }
 
-        public TimeSpan RecheckValue
-        {
-            get { return recheckValue; }
-            set { this.RaiseAndSetIfChanged(ref recheckValue, value); }
-        }
-
         public TimeSpan MinValue
         {
             get { return minValue; }
@@ -68,6 +62,12 @@
         {
             get { return maxValue; }
             set { this.RaiseAndSetIfChanged(ref maxValue, value); }
+        }
+
+        public TimeSpan RecheckValue
+        {
+            get { return recheckValue; }
+            set { this.RaiseAndSetIfChanged(ref recheckValue, value); }
         }
 
         public bool IsAutoRecheckEnabled

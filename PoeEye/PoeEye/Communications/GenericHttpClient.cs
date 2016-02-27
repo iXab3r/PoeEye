@@ -4,11 +4,11 @@
     using System.Collections.Specialized;
     using System.IO;
     using System.Net;
+    using System.Net.Http;
     using System.Reactive.Concurrency;
     using System.Reactive.Linq;
     using System.Reactive.Threading.Tasks;
     using System.Text;
-    using System.Threading.Tasks;
     using System.Web;
 
     using CsQuery.ExtensionMethods.Internal;
@@ -17,13 +17,11 @@
 
     using JetBrains.Annotations;
 
+    using PoeShared;
     using PoeShared.Http;
     using PoeShared.Utilities;
 
     using TypeConverter;
-
-    using HttpClient = System.Net.Http.HttpClient;
-    using Log = PoeShared.Log;
 
     internal sealed class GenericHttpClient : IHttpClient
     {
@@ -121,10 +119,10 @@
                 }
             }
 
-            var response = (HttpWebResponse)httpClient.GetResponse();
+            var response = (HttpWebResponse) httpClient.GetResponse();
             var responseStream = response.GetResponseStream();
 
-            string rawResponse = string.Empty;
+            var rawResponse = string.Empty;
             if (responseStream != null)
             {
                 rawResponse = new StreamReader(responseStream).ReadToEnd();
@@ -145,7 +143,7 @@
                 return;
             }
 
-            throw new HttpException((int)response.StatusCode, $"Wrong status code, expected 200 OK, got {response.StatusCode}");
+            throw new HttpException((int) response.StatusCode, $"Wrong status code, expected 200 OK, got {response.StatusCode}");
         }
     }
 }

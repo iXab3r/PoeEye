@@ -24,8 +24,10 @@
                 .Where(x => !string.IsNullOrWhiteSpace(x))
                 .ToArray();
 
-            KnownEntitiesNames = Enumerable.Concat(uniqueNames, baseNames).Distinct().ToArray();
+            KnownEntitiesNames = uniqueNames.Concat(baseNames).Distinct().ToArray();
         }
+
+        public string[] KnownEntitiesNames { get; }
 
         private void Initialize()
         {
@@ -57,10 +59,10 @@
                 "unique_maces.xml",
                 "unique_swords.xml",
                 "unique_staves.xml",
-                "unique_wands.xml",
+                "unique_wands.xml"
             };
 
-            foreach (string resource in resources)
+            foreach (var resource in resources)
             {
                 var resourcePath = $"{nameof(PoeDatabase)}.{resource}";
                 var resourceData = ReadResourceAsString(resourcePath);
@@ -75,12 +77,18 @@
 
                 // Get entity nodes
                 var entityNodes = doc.SelectNodes("Root/Entity");
-                if (entityNodes == null) continue;
+                if (entityNodes == null)
+                {
+                    continue;
+                }
 
                 // Loop through nodes
                 foreach (XmlNode node in entityNodes)
                 {
-                    if (node.Attributes == null) continue;
+                    if (node.Attributes == null)
+                    {
+                        continue;
+                    }
 
                     // Get entity type
                     var entity = new PoeDatabaseEntity();
@@ -99,8 +107,6 @@
             Log.Instance.Debug($"[PoeDatabaseReader] Loaded {knownEntities.Count} entries");
         }
 
-        public string[] KnownEntitiesNames { get; }
-
         private string ReadResourceAsString(string path)
         {
             var assembly = Assembly.GetExecutingAssembly();
@@ -108,9 +114,11 @@
             var assemblyName = assembly.GetName().Name;
             var resourcePath = $"{assemblyName}.{path}";
             using (var stream = assembly.GetManifestResourceStream(resourcePath))
-            using (var streamReader = new StreamReader(stream))
             {
-                return streamReader.ReadToEnd();
+                using (var streamReader = new StreamReader(stream))
+                {
+                    return streamReader.ReadToEnd();
+                }
             }
         }
     }

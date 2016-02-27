@@ -1,84 +1,85 @@
-<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="utf-8"?>
+
 <Root>
-<Entity Type="Accessory" Category="Quiver">
-  <Property id="Name">Asphyxia's Wrath</Property>
-  <Property id="Type">Quiver</Property>
-  <Property id="Rarity">Unique</Property>
-  <Property id="Base">Two-Point Arrow Quiver</Property>
-  <Property id="Level">10</Property>
-  <Property id="Mods">(20 to 30)% increased Accuracy Rating | (8 to 12)% increased Attack Speed | +(30 to 40)% to Cold Resistance | (30 to 40)% increased Chill Duration on enemies | 20% of Physical Damage Converted to Cold Damage | (7 to 10)% chance to Freeze | 40% reduced Radius of Curses | Curses on Slain enemies are transferred to a nearby enemy</Property>
-  <Property id="HasImplicitMod">True</Property>
-</Entity>
-<Entity Type="Accessory" Category="Quiver">
-  <Property id="Name">Blackgleam</Property>
-  <Property id="Type">Quiver</Property>
-  <Property id="Rarity">Unique</Property>
-  <Property id="Base">Fire Arrow Quiver</Property>
-  <Property id="Level">22</Property>
-  <Property id="Mods">Adds 4–8 Fire Damage to attacks with Bows | 10% increased Attack Speed | +20 to Evasion Rating | +(10 to 30) to maximum Mana | (30 to 50)% of Physical Damage Converted to Fire Damage</Property>
-  <Property id="HasImplicitMod">True</Property>
-</Entity>
-<Entity Type="Accessory" Category="Quiver">
-  <Property id="Name">Broadstroke</Property>
-  <Property id="Type">Quiver</Property>
-  <Property id="Rarity">Unique</Property>
-  <Property id="Base">Heavy Quiver</Property>
-  <Property id="Level">5</Property>
-  <Property id="Mods">Adds 1–4 Physical Damage | 30% increased Physical Damage | (10 to 15)% reduced Enemy Stun Threshold | (20 to 30)% increased Stun Duration on enemies</Property>
-  <Property id="HasImplicitMod">True</Property>
-</Entity>
-<Entity Type="Accessory" Category="Quiver">
-  <Property id="Name">Craghead</Property>
-  <Property id="Type">Quiver</Property>
-  <Property id="Rarity">Unique</Property>
-  <Property id="Base">Serrated Arrow Quiver</Property>
-  <Property id="Level">0</Property>
-  <Property id="Mods">Adds 1–4 Physical Damage to attacks with Bows | (20 to 25)% reduced Enemy Stun Threshold | 25% reduced Projectile Speed | (60 to 80)% increased Stun Duration on enemies | Adds 6–10 Physical Damage to attacks with Bows</Property>
-  <Property id="HasImplicitMod">True</Property>
-</Entity>
-<Entity Type="Accessory" Category="Quiver">
-  <Property id="Name">Drillneck</Property>
-  <Property id="Type">Quiver</Property>
-  <Property id="Rarity">Unique</Property>
-  <Property id="Base">Penetrating Arrow Quiver</Property>
-  <Property id="Level">36</Property>
-  <Property id="Mods">10% chance of Arrows Piercing | (8 to 12)% increased Attack Speed | +350 to Evasion Rating | +(40 to 50) to maximum Life | Adds (10–19 to 14–24) Physical Damage to attacks with Bows | Projectile Damage increased by Arrow Pierce Chance</Property>
-  <Property id="HasImplicitMod">True</Property>
-</Entity>
-<Entity Type="Accessory" Category="Quiver">
-  <Property id="Name">Hyrri's Bite</Property>
-  <Property id="Type">Quiver</Property>
-  <Property id="Rarity">Unique</Property>
-  <Property id="Base">Sharktooth Arrow Quiver</Property>
-  <Property id="Level">10</Property>
-  <Property id="Mods">+(3 to 4) Life gained for each enemy hit by your Attacks | +(15 to 25) to Strength | +(35 to 45) to Dexterity | +(15 to 25) to Intelligence | (7 to 10)% increased Attack Speed | +(2 to 3) Life gained for each enemy hit by your Attacks | 10% increased Radius of Area Skills</Property>
-  <Property id="HasImplicitMod">True</Property>
-</Entity>
-<Entity Type="Accessory" Category="Quiver">
-  <Property id="Name">Maloney's Nightfall</Property>
-  <Property id="Type">Quiver</Property>
-  <Property id="Rarity">Unique</Property>
-  <Property id="Base">Blunt Arrow Quiver</Property>
-  <Property id="Level">55</Property>
-  <Property id="Mods">(25 to 35)% increased Stun Duration on enemies | (8 to 10)% increased Attack Speed | +(50 to 70) to maximum Life | +(12 to 16)% to Chaos Resistance | Adds (5–8 to 7–10) Physical Damage to attacks with Bows | 10% chance to create a Smoke Cloud when Hit | ( 20 to 40 ) % increased Damage against Blinded Enemies</Property>
-  <Property id="HasImplicitMod">True</Property>
-</Entity>
-<Entity Type="Accessory" Category="Quiver">
-  <Property id="Name">Rearguard</Property>
-  <Property id="Type">Quiver</Property>
-  <Property id="Rarity">Unique</Property>
-  <Property id="Base">Broadhead Arrow Quiver</Property>
-  <Property id="Level">28</Property>
-  <Property id="Mods">Adds 6–12 Physical Damage to attacks with Bows | +(400 to 450) to Armour | (20 to 30)% increased Projectile Speed | 50% increased Block and Stun Recovery | (15 to 20)% increased Projectile Damage | (20 to 24)% Chance to Block | (12 to 15)% Chance to Block Spells</Property>
-  <Property id="HasImplicitMod">True</Property>
-</Entity>
-<Entity Type="Accessory" Category="Quiver">
-  <Property id="Name">Soul Strike</Property>
-  <Property id="Type">Quiver</Property>
-  <Property id="Rarity">Unique</Property>
-  <Property id="Base">Spike-Point Arrow Quiver</Property>
-  <Property id="Level">64</Property>
-  <Property id="Mods">(20 to 30)% increased Global Critical Strike Chance | +30 to Dexterity | Adds (13–18 to 26–32) Chaos Damage | (8 to 12)% increased Attack Speed | +(100 to 120) to maximum Energy Shield | 40% reduced Energy Shield Recharge Rate | 150% faster start of Energy Shield Recharge</Property>
-  <Property id="HasImplicitMod">True</Property>
-</Entity>
+  <Entity Type="Accessory" Category="Quiver">
+    <Property id="Name">Asphyxia's Wrath</Property>
+    <Property id="Type">Quiver</Property>
+    <Property id="Rarity">Unique</Property>
+    <Property id="Base">Two-Point Arrow Quiver</Property>
+    <Property id="Level">10</Property>
+    <Property id="Mods">(20 to 30)% increased Accuracy Rating | (8 to 12)% increased Attack Speed | +(30 to 40)% to Cold Resistance | (30 to 40)% increased Chill Duration on enemies | 20% of Physical Damage Converted to Cold Damage | (7 to 10)% chance to Freeze | 40% reduced Radius of Curses | Curses on Slain enemies are transferred to a nearby enemy</Property>
+    <Property id="HasImplicitMod">True</Property>
+  </Entity>
+  <Entity Type="Accessory" Category="Quiver">
+    <Property id="Name">Blackgleam</Property>
+    <Property id="Type">Quiver</Property>
+    <Property id="Rarity">Unique</Property>
+    <Property id="Base">Fire Arrow Quiver</Property>
+    <Property id="Level">22</Property>
+    <Property id="Mods">Adds 4–8 Fire Damage to attacks with Bows | 10% increased Attack Speed | +20 to Evasion Rating | +(10 to 30) to maximum Mana | (30 to 50)% of Physical Damage Converted to Fire Damage</Property>
+    <Property id="HasImplicitMod">True</Property>
+  </Entity>
+  <Entity Type="Accessory" Category="Quiver">
+    <Property id="Name">Broadstroke</Property>
+    <Property id="Type">Quiver</Property>
+    <Property id="Rarity">Unique</Property>
+    <Property id="Base">Heavy Quiver</Property>
+    <Property id="Level">5</Property>
+    <Property id="Mods">Adds 1–4 Physical Damage | 30% increased Physical Damage | (10 to 15)% reduced Enemy Stun Threshold | (20 to 30)% increased Stun Duration on enemies</Property>
+    <Property id="HasImplicitMod">True</Property>
+  </Entity>
+  <Entity Type="Accessory" Category="Quiver">
+    <Property id="Name">Craghead</Property>
+    <Property id="Type">Quiver</Property>
+    <Property id="Rarity">Unique</Property>
+    <Property id="Base">Serrated Arrow Quiver</Property>
+    <Property id="Level">0</Property>
+    <Property id="Mods">Adds 1–4 Physical Damage to attacks with Bows | (20 to 25)% reduced Enemy Stun Threshold | 25% reduced Projectile Speed | (60 to 80)% increased Stun Duration on enemies | Adds 6–10 Physical Damage to attacks with Bows</Property>
+    <Property id="HasImplicitMod">True</Property>
+  </Entity>
+  <Entity Type="Accessory" Category="Quiver">
+    <Property id="Name">Drillneck</Property>
+    <Property id="Type">Quiver</Property>
+    <Property id="Rarity">Unique</Property>
+    <Property id="Base">Penetrating Arrow Quiver</Property>
+    <Property id="Level">36</Property>
+    <Property id="Mods">10% chance of Arrows Piercing | (8 to 12)% increased Attack Speed | +350 to Evasion Rating | +(40 to 50) to maximum Life | Adds (10–19 to 14–24) Physical Damage to attacks with Bows | Projectile Damage increased by Arrow Pierce Chance</Property>
+    <Property id="HasImplicitMod">True</Property>
+  </Entity>
+  <Entity Type="Accessory" Category="Quiver">
+    <Property id="Name">Hyrri's Bite</Property>
+    <Property id="Type">Quiver</Property>
+    <Property id="Rarity">Unique</Property>
+    <Property id="Base">Sharktooth Arrow Quiver</Property>
+    <Property id="Level">10</Property>
+    <Property id="Mods">+(3 to 4) Life gained for each enemy hit by your Attacks | +(15 to 25) to Strength | +(35 to 45) to Dexterity | +(15 to 25) to Intelligence | (7 to 10)% increased Attack Speed | +(2 to 3) Life gained for each enemy hit by your Attacks | 10% increased Radius of Area Skills</Property>
+    <Property id="HasImplicitMod">True</Property>
+  </Entity>
+  <Entity Type="Accessory" Category="Quiver">
+    <Property id="Name">Maloney's Nightfall</Property>
+    <Property id="Type">Quiver</Property>
+    <Property id="Rarity">Unique</Property>
+    <Property id="Base">Blunt Arrow Quiver</Property>
+    <Property id="Level">55</Property>
+    <Property id="Mods">(25 to 35)% increased Stun Duration on enemies | (8 to 10)% increased Attack Speed | +(50 to 70) to maximum Life | +(12 to 16)% to Chaos Resistance | Adds (5–8 to 7–10) Physical Damage to attacks with Bows | 10% chance to create a Smoke Cloud when Hit | ( 20 to 40 ) % increased Damage against Blinded Enemies</Property>
+    <Property id="HasImplicitMod">True</Property>
+  </Entity>
+  <Entity Type="Accessory" Category="Quiver">
+    <Property id="Name">Rearguard</Property>
+    <Property id="Type">Quiver</Property>
+    <Property id="Rarity">Unique</Property>
+    <Property id="Base">Broadhead Arrow Quiver</Property>
+    <Property id="Level">28</Property>
+    <Property id="Mods">Adds 6–12 Physical Damage to attacks with Bows | +(400 to 450) to Armour | (20 to 30)% increased Projectile Speed | 50% increased Block and Stun Recovery | (15 to 20)% increased Projectile Damage | (20 to 24)% Chance to Block | (12 to 15)% Chance to Block Spells</Property>
+    <Property id="HasImplicitMod">True</Property>
+  </Entity>
+  <Entity Type="Accessory" Category="Quiver">
+    <Property id="Name">Soul Strike</Property>
+    <Property id="Type">Quiver</Property>
+    <Property id="Rarity">Unique</Property>
+    <Property id="Base">Spike-Point Arrow Quiver</Property>
+    <Property id="Level">64</Property>
+    <Property id="Mods">(20 to 30)% increased Global Critical Strike Chance | +30 to Dexterity | Adds (13–18 to 26–32) Chaos Damage | (8 to 12)% increased Attack Speed | +(100 to 120) to maximum Energy Shield | 40% reduced Energy Shield Recharge Rate | 150% faster start of Energy Shield Recharge</Property>
+    <Property id="HasImplicitMod">True</Property>
+  </Entity>
 </Root>

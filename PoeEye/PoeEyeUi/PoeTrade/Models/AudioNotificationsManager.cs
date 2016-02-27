@@ -13,12 +13,8 @@
 
     using JetBrains.Annotations;
 
-    using Microsoft.Practices.Unity;
-
     using PoeShared;
     using PoeShared.Utilities;
-
-    using Prism;
 
     using Properties;
 
@@ -26,24 +22,24 @@
 
     internal sealed class AudioNotificationsManager : DisposableReactiveObject, IAudioNotificationsManager
     {
+        private readonly IDictionary<AudioNotificationType, byte[]> knownNotifications = new Dictionary<AudioNotificationType, byte[]>
+        {
+            {AudioNotificationType.NewItem, Resources.whistle},
+            {AudioNotificationType.Captcha, Resources.sounds_940_pizzicato},
+            {AudioNotificationType.Whisper, Resources.icq}
+        };
+
         private readonly ReactiveCommand<AudioNotificationType> playNotificationCommand;
 
         private bool isEnabled;
 
-        private readonly IDictionary<AudioNotificationType, byte[]> knownNotifications = new Dictionary<AudioNotificationType, byte[]>()
-        {
-            { AudioNotificationType.NewItem, Resources.whistle },
-            { AudioNotificationType.Captcha, Resources.sounds_940_pizzicato },
-            { AudioNotificationType.Whisper, Resources.icq },
-        };
-
         public AudioNotificationsManager([NotNull] IPoeEyeConfigProvider poeEyeConfigProvider)
         {
             Guard.ArgumentNotNull(() => poeEyeConfigProvider);
-            
+
             var playNotificationCommandCanExecute = this.WhenAnyValue(x => x.IsEnabled);
 
-            playNotificationCommand = new ReactiveCommand<AudioNotificationType>(playNotificationCommandCanExecute, x => Observable.Return((AudioNotificationType)x));
+            playNotificationCommand = new ReactiveCommand<AudioNotificationType>(playNotificationCommandCanExecute, x => Observable.Return((AudioNotificationType) x));
             playNotificationCommand.Subscribe(PlayNotification).AddTo(Anchors);
 
             poeEyeConfigProvider
@@ -55,6 +51,12 @@
         }
 
         public ICommand PlayNotificationCommand => playNotificationCommand;
+
+        private bool IsEnabled
+        {
+            get { return isEnabled; }
+            set { this.RaiseAndSetIfChanged(ref isEnabled, value); }
+        }
 
         public void PlayNotification(AudioNotificationType notificationType)
         {
@@ -75,16 +77,12 @@
 
             Log.Instance.Debug($"[AudioNotificationsManager] Starting playback of {notificationType} ({notificationData.Length}b)...");
             using (var stream = new MemoryStream(notificationData))
-            using (var notificationSound = new SoundPlayer(stream))
             {
-                notificationSound.Play();
+                using (var notificationSound = new SoundPlayer(stream))
+                {
+                    notificationSound.Play();
+                }
             }
-        }
-
-        private bool IsEnabled
-        {
-            get { return isEnabled; }
-            set { this.RaiseAndSetIfChanged(ref isEnabled, value); }
         }
     }
 }

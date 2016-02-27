@@ -19,9 +19,9 @@
 
     internal sealed class PoeLiveHistoryProvider : DisposableReactiveObject, IPoeLiveHistoryProvider
     {
+        private readonly ISubject<Unit> forceUpdatesSubject = new Subject<Unit>();
         private readonly ISubject<IPoeItem[]> itemsPacksSubject = new Subject<IPoeItem[]>();
         private readonly ISubject<Exception> updateExceptionsSubject = new Subject<Exception>();
-        private readonly ISubject<Unit> forceUpdatesSubject = new Subject<Unit>();
 
         private bool isBusy;
         private TimeSpan recheckPeriod;
@@ -33,21 +33,19 @@
             Guard.ArgumentNotNull(() => query);
             Guard.ArgumentNotNull(() => poeApi);
 
-            var periodObservable = Observable.Merge(
-                    this.WhenAnyValue(x => x.RecheckPeriod), 
-                    forceUpdatesSubject.Where(x => recheckPeriod != TimeSpan.Zero).Select(x => recheckPeriod))
-                .Do(LogRecheckPeriodChange)
-                .Select(ToTimer)
-                .Switch()
-                .Publish();
+            var periodObservable = this.WhenAnyValue(x => x.RecheckPeriod).Merge(forceUpdatesSubject.Where(x => recheckPeriod != TimeSpan.Zero).Select(x => recheckPeriod))
+                                       .Do(LogRecheckPeriodChange)
+                                       .Select(ToTimer)
+                                       .Switch()
+                                       .Publish();
 
-            var queryObservable = Observable.Merge(periodObservable, forceUpdatesSubject)
-                .Where(x => !IsBusy)
-                .Do(StartUpdate)
-                .Select(x => poeApi.IssueQuery(query))
-                .Switch()
-                .Select(x => x.ItemsList)
-                .Do(HandleUpdate, HandleUpdateError);
+            var queryObservable = periodObservable.Merge(forceUpdatesSubject)
+                                                  .Where(x => !IsBusy)
+                                                  .Do(StartUpdate)
+                                                  .Select(x => poeApi.IssueQuery(query))
+                                                  .Switch()
+                                                  .Select(x => x.ItemsList)
+                                                  .Do(HandleUpdate, HandleUpdateError);
 
             Observable
                 .Defer(() => queryObservable)

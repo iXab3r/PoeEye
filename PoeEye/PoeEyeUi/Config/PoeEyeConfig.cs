@@ -24,8 +24,9 @@ namespace PoeEyeUi.Config
             {"regal", 1}
         };
 
-        private PoeEyeTabConfig[] tabConfigs = new PoeEyeTabConfig[0];
         private IDictionary<string, float> currenciesPriceInChaos = DefaultCurrenciesPriceInChaos;
+
+        private PoeEyeTabConfig[] tabConfigs = new PoeEyeTabConfig[0];
 
         public PoeEyeTabConfig[] TabConfigs
         {

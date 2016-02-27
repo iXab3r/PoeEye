@@ -11,12 +11,12 @@
     internal sealed class CollectionViewSourceFilteringBehavior : Behavior<CollectionViewSource>
     {
         public static readonly DependencyProperty FiltersProperty =
-            DependencyProperty.Register("Filters", typeof(IEnumerable<IFilter>), typeof(CollectionViewSourceFilteringBehavior), new UIPropertyMetadata(null));
+            DependencyProperty.Register("Filters", typeof (IEnumerable<IFilter>), typeof (CollectionViewSourceFilteringBehavior), new UIPropertyMetadata(null));
 
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
         public IEnumerable<IFilter> Filters
         {
-            get { return (IEnumerable<IFilter>)GetValue(FiltersProperty); }
+            get { return (IEnumerable<IFilter>) GetValue(FiltersProperty); }
             set { SetValue(FiltersProperty, value); }
         }
 

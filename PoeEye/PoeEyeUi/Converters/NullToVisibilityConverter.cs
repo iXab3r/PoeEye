@@ -10,6 +10,7 @@
     internal sealed class NullToVisibilityConverter : IValueConverter
     {
         public Visibility NullValue { get; set; } = Visibility.Collapsed;
+
         public Visibility NotNullValue { get; set; } = Visibility.Visible;
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
@@ -37,6 +38,11 @@
                 : NotNullValue;
         }
 
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+
         private bool IsNull(string value)
         {
             return string.IsNullOrWhiteSpace(value);
@@ -49,14 +55,9 @@
 
         private bool IsNull(IEnumerable collection)
         {
-            return collection == null 
-                ? true 
+            return collection == null
+                ? true
                 : !collection.OfType<object>().Any();
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException();
         }
     }
 }

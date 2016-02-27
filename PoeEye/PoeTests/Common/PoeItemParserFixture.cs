@@ -16,7 +16,7 @@
     [TestFixture]
     public class PoeItemParserFixture
     {
-        private Mock<IPoeQueryInfoProvider> queryInfoProvider = new Mock<IPoeQueryInfoProvider>();
+        private readonly Mock<IPoeQueryInfoProvider> queryInfoProvider = new Mock<IPoeQueryInfoProvider>();
 
         private IEnumerable<TestCaseData> KnownItems()
         {
@@ -54,44 +54,44 @@
                          x.Requirements == "Level: 70 Str: 155 Dex: 38 Int: 111" &&
                          x.Links == new PoeLinksInfo("B-R-B-R") &&
                          x.Mods == new[]
-                                       {
-                                           new PoeItemMod()
-                                           {
-                                               Name = @"Adds 1-5 Lightning Damage to Attacks",
-                                               CodeName = @"Adds #-# Lightning Damage to Attacks",
-                                               ModType = PoeModType.Explicit,
-                                           },
-                                           new PoeItemMod()
-                                           {
-                                               Name = @"+64 to maximum Life",
-                                               CodeName = @"+# to maximum Life",
-                                               ModType = PoeModType.Explicit,
-                                           },
-                                           new PoeItemMod()
-                                           {
-                                               Name = @"+39% to Fire Resistance",
-                                               CodeName = @"+#% to Fire Resistance",
-                                               ModType = PoeModType.Explicit,
-                                           },
-                                           new PoeItemMod()
-                                           {
-                                               Name = @"+42% to Cold Resistance",
-                                               CodeName = @"+#% to Cold Resistance",
-                                               ModType = PoeModType.Explicit,
-                                           },
-                                           new PoeItemMod()
-                                           {
-                                               Name = @"+25% to Chaos Resistance",
-                                               CodeName = @"+#% to Chaos Resistance",
-                                               ModType = PoeModType.Explicit,
-                                           },
-                                           new PoeItemMod()
-                                           {
-                                               Name = @"63% increased Armour and Evasion",
-                                               CodeName = @"#% increased Armour and Evasion",
-                                               ModType = PoeModType.Explicit,
-                                           },
-                                       }));
+                         {
+                             new PoeItemMod
+                             {
+                                 Name = @"Adds 1-5 Lightning Damage to Attacks",
+                                 CodeName = @"Adds #-# Lightning Damage to Attacks",
+                                 ModType = PoeModType.Explicit
+                             },
+                             new PoeItemMod
+                             {
+                                 Name = @"+64 to maximum Life",
+                                 CodeName = @"+# to maximum Life",
+                                 ModType = PoeModType.Explicit
+                             },
+                             new PoeItemMod
+                             {
+                                 Name = @"+39% to Fire Resistance",
+                                 CodeName = @"+#% to Fire Resistance",
+                                 ModType = PoeModType.Explicit
+                             },
+                             new PoeItemMod
+                             {
+                                 Name = @"+42% to Cold Resistance",
+                                 CodeName = @"+#% to Cold Resistance",
+                                 ModType = PoeModType.Explicit
+                             },
+                             new PoeItemMod
+                             {
+                                 Name = @"+25% to Chaos Resistance",
+                                 CodeName = @"+#% to Chaos Resistance",
+                                 ModType = PoeModType.Explicit
+                             },
+                             new PoeItemMod
+                             {
+                                 Name = @"63% increased Armour and Evasion",
+                                 CodeName = @"#% increased Armour and Evasion",
+                                 ModType = PoeModType.Explicit
+                             }
+                         }));
 
             yield return new TestCaseData(
                 @"Rarity: Gem
@@ -118,26 +118,26 @@
                          x.Requirements == "Level: 24 Str: 58" &&
                          x.Quality == "14% (augmented)" &&
                          x.Mods == new[]
-                                       {
-                                           new PoeItemMod()
-                                           {
-                                               Name = @"Deals 75% of Base Attack Damage",
-                                               CodeName = @"Deals #% of Base Attack Damage",
-                                               ModType = PoeModType.Explicit,
-                                           },
-                                           new PoeItemMod()
-                                           {
-                                               Name = @"37% chance to Counterattack with this Skill when Hit",
-                                               CodeName = @"#% chance to Counterattack with this Skill when Hit",
-                                               ModType = PoeModType.Explicit,
-                                           },
-                                           new PoeItemMod()
-                                           {
-                                               Name = @"You cannot use this Attack directly",
-                                               CodeName = @"You cannot use this Attack directly",
-                                               ModType = PoeModType.Explicit,
-                                           },
-                                       }));
+                         {
+                             new PoeItemMod
+                             {
+                                 Name = @"Deals 75% of Base Attack Damage",
+                                 CodeName = @"Deals #% of Base Attack Damage",
+                                 ModType = PoeModType.Explicit
+                             },
+                             new PoeItemMod
+                             {
+                                 Name = @"37% chance to Counterattack with this Skill when Hit",
+                                 CodeName = @"#% chance to Counterattack with this Skill when Hit",
+                                 ModType = PoeModType.Explicit
+                             },
+                             new PoeItemMod
+                             {
+                                 Name = @"You cannot use this Attack directly",
+                                 CodeName = @"You cannot use this Attack directly",
+                                 ModType = PoeModType.Explicit
+                             }
+                         }));
 
             yield return new TestCaseData(
                 @"Rarity: Unique
@@ -176,38 +176,38 @@
                          x.Requirements == "Level: 70 Str: 108 Dex: 111 Int: 155" &&
                          x.Links == new PoeLinksInfo("B-B-B-R-G G") &&
                          x.Mods == new[]
-                                       {
-                                           new PoeItemMod()
-                                           {
-                                               Name = @"Adds 1-30 Lightning Damage to Attacks",
-                                               CodeName = @"Adds #-# Lightning Damage to Attacks",
-                                               ModType = PoeModType.Explicit,
-                                           },
-                                           new PoeItemMod()
-                                           {
-                                               Name = @"107% increased Armour and Evasion",
-                                               CodeName = @"#% increased Armour and Evasion",
-                                               ModType = PoeModType.Explicit,
-                                           },
-                                           new PoeItemMod()
-                                           {
-                                               Name = @"+63 to maximum Life",
-                                               CodeName = @"+# to maximum Life",
-                                               ModType = PoeModType.Explicit,
-                                           },
-                                           new PoeItemMod()
-                                           {
-                                               Name = @"-60% to Lightning Resistance",
-                                               CodeName = @"-#% to Lightning Resistance",
-                                               ModType = PoeModType.Explicit,
-                                           },
-                                           new PoeItemMod()
-                                           {
-                                               Name = @"30% of Physical Damage taken as Lightning Damage",
-                                               CodeName = @"#% of Physical Damage taken as Lightning Damage",
-                                               ModType = PoeModType.Explicit,
-                                           },
-                                       }));
+                         {
+                             new PoeItemMod
+                             {
+                                 Name = @"Adds 1-30 Lightning Damage to Attacks",
+                                 CodeName = @"Adds #-# Lightning Damage to Attacks",
+                                 ModType = PoeModType.Explicit
+                             },
+                             new PoeItemMod
+                             {
+                                 Name = @"107% increased Armour and Evasion",
+                                 CodeName = @"#% increased Armour and Evasion",
+                                 ModType = PoeModType.Explicit
+                             },
+                             new PoeItemMod
+                             {
+                                 Name = @"+63 to maximum Life",
+                                 CodeName = @"+# to maximum Life",
+                                 ModType = PoeModType.Explicit
+                             },
+                             new PoeItemMod
+                             {
+                                 Name = @"-60% to Lightning Resistance",
+                                 CodeName = @"-#% to Lightning Resistance",
+                                 ModType = PoeModType.Explicit
+                             },
+                             new PoeItemMod
+                             {
+                                 Name = @"30% of Physical Damage taken as Lightning Damage",
+                                 CodeName = @"#% of Physical Damage taken as Lightning Damage",
+                                 ModType = PoeModType.Explicit
+                             }
+                         }));
 
             yield return new TestCaseData(
                 @"Rarity: Rare
@@ -288,32 +288,32 @@
                          x.Requirements == "Level: 28" &&
                          x.Level == "44" &&
                          x.Mods == new[]
-                                       {
-                                           new PoeItemMod()
-                                           {
-                                               Name = @"+19 to Strength and Intelligence",
-                                               CodeName = @"+# to Strength and Intelligence",
-                                               ModType = PoeModType.Implicit,
-                                           },
-                                           new PoeItemMod()
-                                           {
-                                               Name = @"17% increased Fire Damage",
-                                               CodeName = @"#% increased Fire Damage",
-                                               ModType = PoeModType.Explicit,
-                                           },
-                                           new PoeItemMod()
-                                           {
-                                               Name = @"10% increased Global Critical Strike Chance",
-                                               CodeName = @"#% increased Global Critical Strike Chance",
-                                               ModType = PoeModType.Explicit,
-                                           },
-                                           new PoeItemMod()
-                                           {
-                                               Name = @"-6 to Mana Cost of Skills",
-                                               CodeName = @"-# to Mana Cost of Skills",
-                                               ModType = PoeModType.Explicit,
-                                           },
-                                       }));
+                         {
+                             new PoeItemMod
+                             {
+                                 Name = @"+19 to Strength and Intelligence",
+                                 CodeName = @"+# to Strength and Intelligence",
+                                 ModType = PoeModType.Implicit
+                             },
+                             new PoeItemMod
+                             {
+                                 Name = @"17% increased Fire Damage",
+                                 CodeName = @"#% increased Fire Damage",
+                                 ModType = PoeModType.Explicit
+                             },
+                             new PoeItemMod
+                             {
+                                 Name = @"10% increased Global Critical Strike Chance",
+                                 CodeName = @"#% increased Global Critical Strike Chance",
+                                 ModType = PoeModType.Explicit
+                             },
+                             new PoeItemMod
+                             {
+                                 Name = @"-6 to Mana Cost of Skills",
+                                 CodeName = @"-# to Mana Cost of Skills",
+                                 ModType = PoeModType.Explicit
+                             }
+                         }));
 
             yield return new TestCaseData(
                 @"Rarity: Magic
@@ -342,26 +342,26 @@
                          x.ItemName == "Perpetual Ruby Flask of Heat" &&
                          x.Quality == "20% (augmented)" &&
                          x.Mods == new[]
-                                       {
-                                           new PoeItemMod()
-                                           {
-                                               Name = @"27% increased Charge Recovery",
-                                               CodeName = @"#% increased Charge Recovery",
-                                               ModType = PoeModType.Explicit,
-                                           },
-                                           new PoeItemMod()
-                                           {
-                                               Name = @"Immunity to Freeze and Chill during flask effect",
-                                               CodeName = @"Immunity to Freeze and Chill during flask effect",
-                                               ModType = PoeModType.Explicit,
-                                           },
-                                           new PoeItemMod()
-                                           {
-                                               Name = @"Removes Freeze and Chill on use",
-                                               CodeName = @"Removes Freeze and Chill on use",
-                                               ModType = PoeModType.Explicit,
-                                           },
-                                       }));
+                         {
+                             new PoeItemMod
+                             {
+                                 Name = @"27% increased Charge Recovery",
+                                 CodeName = @"#% increased Charge Recovery",
+                                 ModType = PoeModType.Explicit
+                             },
+                             new PoeItemMod
+                             {
+                                 Name = @"Immunity to Freeze and Chill during flask effect",
+                                 CodeName = @"Immunity to Freeze and Chill during flask effect",
+                                 ModType = PoeModType.Explicit
+                             },
+                             new PoeItemMod
+                             {
+                                 Name = @"Removes Freeze and Chill on use",
+                                 CodeName = @"Removes Freeze and Chill on use",
+                                 ModType = PoeModType.Explicit
+                             }
+                         }));
 
             yield return new TestCaseData(
                 @"Rarity: Currency
@@ -384,18 +384,19 @@
                   +14% to Fire and Cold Resistances
                   --------
                   Unidentified",
-                Mock.Of<IPoeItem>(x => x.Rarity == PoeItemRarity.Rare &&
-                                       x.ItemName == "Two-Stone Ring" &&
-                                       x.Level == "74" &&
-                                       x.Mods == new[]
-                                       {
-                                           new PoeItemMod()
-                                           {
-                                               Name = @"+14% to Fire and Cold Resistances",
-                                               CodeName = @"+#% to Fire and Cold Resistances",
-                                               ModType = PoeModType.Implicit,
-                                           },
-                                       }));
+                Mock.Of<IPoeItem>(
+                    x => x.Rarity == PoeItemRarity.Rare &&
+                         x.ItemName == "Two-Stone Ring" &&
+                         x.Level == "74" &&
+                         x.Mods == new[]
+                         {
+                             new PoeItemMod
+                             {
+                                 Name = @"+14% to Fire and Cold Resistances",
+                                 CodeName = @"+#% to Fire and Cold Resistances",
+                                 ModType = PoeModType.Implicit
+                             }
+                         }));
 
             yield return new TestCaseData(
                 @"Rarity: Unique
@@ -425,50 +426,96 @@
                 Marceus' unblemished shield is a testament
                 to his arrogance... and his fate.
                 ",
-                Mock.Of<IPoeItem>(x => x.Rarity == PoeItemRarity.Unique &&
-                                       x.ItemName == "Lioneye's Remorse" &&
-                                       x.Level == "70" &&
-                                       x.Requirements == "Level: 70 Str: 159 Int: 68" &&
-                                       x.Links == new PoeLinksInfo("R-R-R") &&
-                                       x.Mods == new[]
-                                       {
-                                           new PoeItemMod()
-                                           {
-                                               Name = @"250% increased Armour",
-                                               CodeName = @"#% increased Armour",
-                                               ModType = PoeModType.Explicit,
-                                           },
-                                           new PoeItemMod()
-                                           {
-                                               Name = @"+83 to maximum Life",
-                                               CodeName = @"+# to maximum Life",
-                                               ModType = PoeModType.Explicit,
-                                           },
-                                           new PoeItemMod()
-                                           {
-                                               Name = @"5% reduced Movement Speed",
-                                               CodeName = @"#% reduced Movement Speed",
-                                               ModType = PoeModType.Explicit,
-                                           },
-                                           new PoeItemMod()
-                                           {
-                                               Name = @"20% increased Stun Recovery",
-                                               CodeName = @"#% increased Stun Recovery",
-                                               ModType = PoeModType.Explicit,
-                                           },
-                                           new PoeItemMod()
-                                           {
-                                               Name = @"-25 Physical Damage taken from Projectile Attacks",
-                                               CodeName = @"-# Physical Damage taken from Projectile Attacks",
-                                               ModType = PoeModType.Explicit,
-                                           },
-                                           new PoeItemMod()
-                                           {
-                                               Name = @"+5% Chance to Block",
-                                               CodeName = @"+#% Chance to Block",
-                                               ModType = PoeModType.Explicit,
-                                           },
-                                       }));
+                Mock.Of<IPoeItem>(
+                    x => x.Rarity == PoeItemRarity.Unique &&
+                         x.ItemName == "Lioneye's Remorse" &&
+                         x.Level == "70" &&
+                         x.Requirements == "Level: 70 Str: 159 Int: 68" &&
+                         x.Links == new PoeLinksInfo("R-R-R") &&
+                         x.Mods == new[]
+                         {
+                             new PoeItemMod
+                             {
+                                 Name = @"250% increased Armour",
+                                 CodeName = @"#% increased Armour",
+                                 ModType = PoeModType.Explicit
+                             },
+                             new PoeItemMod
+                             {
+                                 Name = @"+83 to maximum Life",
+                                 CodeName = @"+# to maximum Life",
+                                 ModType = PoeModType.Explicit
+                             },
+                             new PoeItemMod
+                             {
+                                 Name = @"5% reduced Movement Speed",
+                                 CodeName = @"#% reduced Movement Speed",
+                                 ModType = PoeModType.Explicit
+                             },
+                             new PoeItemMod
+                             {
+                                 Name = @"20% increased Stun Recovery",
+                                 CodeName = @"#% increased Stun Recovery",
+                                 ModType = PoeModType.Explicit
+                             },
+                             new PoeItemMod
+                             {
+                                 Name = @"-25 Physical Damage taken from Projectile Attacks",
+                                 CodeName = @"-# Physical Damage taken from Projectile Attacks",
+                                 ModType = PoeModType.Explicit
+                             },
+                             new PoeItemMod
+                             {
+                                 Name = @"+5% Chance to Block",
+                                 CodeName = @"+#% Chance to Block",
+                                 ModType = PoeModType.Explicit
+                             }
+                         }));
+        }
+
+        private PoeItemParser CreateInstance()
+        {
+            return new PoeItemParser(new PoeModsProcessor(queryInfoProvider.Object));
+        }
+
+        [Test]
+        [TestCaseSource(nameof(KnownItems))]
+        public void ShouldParseExplicitMods(string data, IPoeItem expectedItem)
+        {
+            //Given
+            var modsList = expectedItem.Mods.Where(x => x.ModType == PoeModType.Explicit).ToArray();
+            queryInfoProvider.SetupGet(x => x.ModsList).Returns(modsList);
+
+            var instance = CreateInstance();
+
+            //When
+            var result = instance.Parse(data);
+
+            //Then
+            var exprectedImplicitMods = expectedItem.Mods.Where(x => x.ModType == PoeModType.Explicit).ToArray();
+            var resultMods = result.Mods.Where(x => x.ModType == PoeModType.Explicit).ToArray();
+
+            CollectionAssert.AreEqual(exprectedImplicitMods, resultMods, new PoeItemModEqualityComparer());
+        }
+
+        [Test]
+        [TestCaseSource(nameof(KnownItems))]
+        public void ShouldParseImplicitMods(string data, IPoeItem expectedItem)
+        {
+            //Given
+            var modsList = expectedItem.Mods.Where(x => x.ModType == PoeModType.Implicit).ToArray();
+            queryInfoProvider.SetupGet(x => x.ModsList).Returns(modsList);
+
+            var instance = CreateInstance();
+
+            //When
+            var result = instance.Parse(data);
+
+            //Then
+            var exprectedImplicitMods = expectedItem.Mods.Where(x => x.ModType == PoeModType.Implicit).ToArray();
+            var resultMods = result.Mods.Where(x => x.ModType == PoeModType.Implicit).ToArray();
+
+            CollectionAssert.AreEqual(exprectedImplicitMods, resultMods, new PoeItemModEqualityComparer());
         }
 
         [Test]
@@ -542,46 +589,6 @@
         }
 
         [Test]
-        [TestCaseSource(nameof(KnownItems))]
-        public void ShouldParseImplicitMods(string data, IPoeItem expectedItem)
-        {
-            //Given
-            var modsList = expectedItem.Mods.Where(x => x.ModType == PoeModType.Implicit).ToArray();
-            queryInfoProvider.SetupGet(x => x.ModsList).Returns(modsList);
-
-            var instance = CreateInstance();
-
-            //When
-            var result = instance.Parse(data);
-
-            //Then
-            var exprectedImplicitMods = expectedItem.Mods.Where(x => x.ModType == PoeModType.Implicit).ToArray();
-            var resultMods = result.Mods.Where(x => x.ModType == PoeModType.Implicit).ToArray();
-
-            CollectionAssert.AreEqual(exprectedImplicitMods, resultMods, new PoeItemModEqualityComparer());
-        }
-
-        [Test]
-        [TestCaseSource(nameof(KnownItems))]
-        public void ShouldParseExplicitMods(string data, IPoeItem expectedItem)
-        {
-            //Given
-            var modsList = expectedItem.Mods.Where(x => x.ModType == PoeModType.Explicit).ToArray();
-            queryInfoProvider.SetupGet(x => x.ModsList).Returns(modsList);
-
-            var instance = CreateInstance();
-
-            //When
-            var result = instance.Parse(data);
-
-            //Then
-            var exprectedImplicitMods = expectedItem.Mods.Where(x => x.ModType == PoeModType.Explicit).ToArray();
-            var resultMods = result.Mods.Where(x => x.ModType == PoeModType.Explicit).ToArray();
-
-            CollectionAssert.AreEqual(exprectedImplicitMods, resultMods, new PoeItemModEqualityComparer());
-        }
-
-        [Test]
         [TestCase("")]
         [TestCase("RNGSTR")]
         public void ShouldReturnNullNameOnUnexpectedInput(string data)
@@ -594,11 +601,6 @@
 
             //Then
             result.ShouldBe(null);
-        }
-
-        private PoeItemParser CreateInstance()
-        {
-            return new PoeItemParser(new PoeModsProcessor(queryInfoProvider.Object));
         }
     }
 }

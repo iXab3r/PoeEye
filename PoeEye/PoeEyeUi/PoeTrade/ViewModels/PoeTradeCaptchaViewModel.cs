@@ -33,6 +33,8 @@
         private readonly IWindowTracker mainWindowTracker;
         private readonly IAudioNotificationsManager notificationsManager;
 
+        private WpfChromium browser;
+
         private string captchaUri;
 
         private bool isBusy;
@@ -81,6 +83,12 @@
             set { this.RaiseAndSetIfChanged(ref isBusy, value); }
         }
 
+        public WpfChromium Browser
+        {
+            get { return browser; }
+            set { this.RaiseAndSetIfChanged(ref browser, value); }
+        }
+
         public bool IsOpen
         {
             get { return isOpen; }
@@ -91,14 +99,6 @@
         {
             get { return captchaUri; }
             set { this.RaiseAndSetIfChanged(ref captchaUri, value); }
-        }
-
-        private WpfChromium browser;
-
-        public WpfChromium Browser
-        {
-            get { return browser; }
-            set { this.RaiseAndSetIfChanged(ref browser, value); }
         }
 
         private void HandleRequest(string uri)
@@ -126,11 +126,11 @@
             var composite = new CompositeDisposable();
 
             Observable
-               .FromEventPattern<EventHandler<DocumentLoadedEventArgs>, DocumentLoadedEventArgs > (h => browser.DocumentLoaded += h, h => browser.DocumentLoaded -= h)
-               .Select(x => new { x.EventArgs.Uri, Html = x.EventArgs.Value ?? string.Empty })
-               .DistinctUntilChanged()
-               .Subscribe(x => ProcessDocumentLoaded(x.Uri, x.Html))
-               .AddTo(composite);
+                .FromEventPattern<EventHandler<DocumentLoadedEventArgs>, DocumentLoadedEventArgs>(h => browser.DocumentLoaded += h, h => browser.DocumentLoaded -= h)
+                .Select(x => new {x.EventArgs.Uri, Html = x.EventArgs.Value ?? string.Empty})
+                .DistinctUntilChanged()
+                .Subscribe(x => ProcessDocumentLoaded(x.Uri, x.Html))
+                .AddTo(composite);
 
             browserSubscriptions.Disposable = composite;
         }

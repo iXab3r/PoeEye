@@ -6,13 +6,13 @@
     {
         private T1 item1;
 
+        private T2 item2;
+
         public T1 Item1
         {
             get { return item1; }
             set { this.RaiseAndSetIfChanged(ref item1, value); }
         }
-
-        private T2 item2;
 
         public T2 Item2
         {

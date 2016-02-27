@@ -31,10 +31,9 @@
         {
             Guard.ArgumentNotNull(() => value);
 
-            var query = new PoeQueryInfo()
+            var query = new PoeQueryInfo
             {
                 ItemName = value.ItemName,
-
                 BuyoutOnly = true,
                 OnlineOnly = true,
                 NormalizeQuality = true,
@@ -82,11 +81,11 @@
                     continue;
                 }
 
-                var minRange = parsedValue - valueRangeModifier*parsedValue;
-                var maxRange = parsedValue + valueRangeModifier*parsedValue;
+                var minRange = parsedValue - valueRangeModifier * parsedValue;
+                var maxRange = parsedValue + valueRangeModifier * parsedValue;
 
-                result.Min = (float)Math.Round(minRange, 1);
-                result.Max = (float)Math.Round(maxRange, 1);
+                result.Min = (float) Math.Round(minRange, 1);
+                result.Max = (float) Math.Round(maxRange, 1);
             }
 
             return result;

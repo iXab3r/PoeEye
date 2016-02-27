@@ -3,12 +3,12 @@
     using System;
     using System.Linq;
     using System.Reactive.Linq;
-    using System.Threading;
+
+    using CommandLine;
 
     using ConsoleDump;
 
     using Microsoft.Practices.Unity;
-    using Microsoft.Practices.Unity.Utility;
 
     using PoeShared;
     using PoeShared.Common;
@@ -17,13 +17,9 @@
     using PoeShared.Prism;
     using PoeShared.Utilities;
 
-    using PoeTrade;
-
     using Prism;
 
     using Simulator.Prism;
-
-    using Guard = Guards.Guard;
 
     internal class Program
     {
@@ -36,11 +32,11 @@
                 Log.Instance.InfoFormat("Application started");
                 ResizeConsole();
 
-                CommandLine.Parser.Default.ParseArguments(args, options);
+                Parser.Default.ParseArguments(args, options);
 
                 var mainUnityBlock = options.Mode == Options.ProgramMode.Mock
-                    ? (UnityContainerExtension)new MockRegistrations()
-                    : (UnityContainerExtension)new LiveRegistrations();
+                    ? new MockRegistrations()
+                    : (UnityContainerExtension) new LiveRegistrations();
 
                 Log.Instance.Debug($"Unity main block: {mainUnityBlock.DumpToText()}");
 
@@ -49,7 +45,7 @@
                     .AddExtension(mainUnityBlock);
 
 
-                var query = new PoeQuery()
+                var query = new PoeQuery
                 {
                     Arguments = new IPoeQueryArgument[]
                     {
@@ -58,8 +54,8 @@
                         new PoeQueryStringArgument("online", "x"),
                         new PoeQueryStringArgument("buyout", "x"),
                         new PoeQueryModArgument("Area is a large Maze"),
-                        new PoeQueryModArgument("Area is #% larger") {Excluded = true},
-                    },
+                        new PoeQueryModArgument("Area is #% larger") {Excluded = true}
+                    }
                 };
 
                 var poeApiFactory = unityContainer.Resolve<IFactory<IPoeLiveHistoryProvider, IPoeQuery>>();
@@ -80,7 +76,7 @@
 
         private static void DumpQueryResults(IPoeItem item)
         {
-            var itemInfo = new { item.Price, item.ItemName, item.UserIgn};
+            var itemInfo = new {item.Price, item.ItemName, item.UserIgn};
             Log.Instance.Debug($"Item: {itemInfo.DumpToText()}");
         }
 
@@ -91,7 +87,7 @@
             var items =
                 queryResult.ItemsList
                            .Where(x => !string.IsNullOrWhiteSpace(x.Price))
-                           .Select(x => new { x.Price, x.ItemName, x.UserIgn })
+                           .Select(x => new {x.Price, x.ItemName, x.UserIgn})
                            .ToArray();
             items.Dump();
         }

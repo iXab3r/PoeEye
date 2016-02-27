@@ -39,7 +39,7 @@
                 }
                 idx++;
             }
-            
+
             return string.Join("&", parameters);
         }
 

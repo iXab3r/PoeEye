@@ -4,14 +4,14 @@
 
     using Microsoft.Practices.Unity;
 
-    internal sealed class Factory<T1,T2> : IFactory<T1,T2> 
+    internal sealed class Factory<T1, T2> : IFactory<T1, T2>
     {
         private readonly IUnityContainer container;
 
         public Factory(IUnityContainer container)
         {
             Guard.ArgumentNotNull(() => container);
-            
+
             this.container = container;
         }
 

@@ -3,7 +3,7 @@
     using JetBrains.Annotations;
 
     public interface IPoeQuery
-    {   
-         IPoeQueryArgument[] Arguments { [NotNull] get; }
+    {
+        IPoeQueryArgument[] Arguments { [NotNull] get; }
     }
 }

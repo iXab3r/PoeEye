@@ -2,38 +2,40 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:viewModels="clr-namespace:PoeEyeUi.PoeTrade.ViewModels"
                     xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls">
-    <DataTemplate  DataType="{x:Type viewModels:ApplicationUpdaterViewModel}">
-        <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-            
-            <controls:ProgressRing Grid.Column="0"
-                                   Width="15" Height="15"
-                                   Visibility="{Binding IsBusy, Converter={StaticResource BoolFalseToCollapsedConverter}}" IsActive="{Binding IsBusy}"/>
-            
-            <Label Grid.Column="1"
-                   FontSize="16"
-                   FontFamily="{StaticResource FontAwesome}"
-                   Visibility="{Binding IsBusy, Converter={StaticResource BoolTrueToCollapsedConverter}}"
-                   Content="{Binding MostRecentVersion}" ContentStringFormat="Application was successfully updated to v{0}, new version will take place after restart"/>
+  <DataTemplate DataType="{x:Type viewModels:ApplicationUpdaterViewModel}">
+    <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="Auto" />
+        <ColumnDefinition Width="Auto" />
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="Auto" />
+      </Grid.ColumnDefinitions>
 
-            <Label Grid.Column="1"
-                   FontSize="16"
-                   FontFamily="{StaticResource FontAwesome}"
-                   Visibility="{Binding IsBusy, Converter={StaticResource BoolFalseToCollapsedConverter}}"
-                   Content="Checking for updates..."/>
+      <controls:ProgressRing Grid.Column="0"
+                             Width="15" Height="15"
+                             Visibility="{Binding IsBusy, Converter={StaticResource BoolFalseToCollapsedConverter}}"
+                             IsActive="{Binding IsBusy}" />
 
-            <Button  Grid.Column="3" 
-                     HorizontalAlignment="Right"
-                     Content="Restart" 
-                     Margin="10, 0"
-                     Command="{Binding RestartCommand}" 
-                     IsEnabled="{Binding IsBusy, Converter={StaticResource BoolInversionConverter}}" />
-        </Grid>
+      <Label Grid.Column="1"
+             FontSize="16"
+             FontFamily="{StaticResource FontAwesome}"
+             Visibility="{Binding IsBusy, Converter={StaticResource BoolTrueToCollapsedConverter}}"
+             Content="{Binding MostRecentVersion}"
+             ContentStringFormat="Application was successfully updated to v{0}, new version will take place after restart" />
 
-    </DataTemplate>
+      <Label Grid.Column="1"
+             FontSize="16"
+             FontFamily="{StaticResource FontAwesome}"
+             Visibility="{Binding IsBusy, Converter={StaticResource BoolFalseToCollapsedConverter}}"
+             Content="Checking for updates..." />
+
+      <Button Grid.Column="3"
+              HorizontalAlignment="Right"
+              Content="Restart"
+              Margin="10, 0"
+              Command="{Binding RestartCommand}"
+              IsEnabled="{Binding IsBusy, Converter={StaticResource BoolInversionConverter}}" />
+    </Grid>
+
+  </DataTemplate>
 </ResourceDictionary>

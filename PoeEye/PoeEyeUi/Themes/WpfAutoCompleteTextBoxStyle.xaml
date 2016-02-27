@@ -3,15 +3,15 @@
                     xmlns:wpfControls="http://wpfcontrols.com/"
                     xmlns:editors="https://github.com/iXab3r/WpfAutoCompleteControls">
 
-    <Style TargetType="editors:AutoCompleteTextBox">
-        <Style.Resources>
-            <Style TargetType="Border">
-                <Setter Property="CornerRadius" Value="1"/>
-            </Style>
-        </Style.Resources>
-        <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
-        <Setter Property="BorderBrush" Value="{StaticResource ControlBorderBrush}"/>
-        <Setter Property="Background" Value="{StaticResource ControlBackgroundBrush}"/>
-    </Style>
+  <Style TargetType="editors:AutoCompleteTextBox">
+    <Style.Resources>
+      <Style TargetType="Border">
+        <Setter Property="CornerRadius" Value="1" />
+      </Style>
+    </Style.Resources>
+    <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
+    <Setter Property="BorderBrush" Value="{StaticResource ControlBorderBrush}" />
+    <Setter Property="Background" Value="{StaticResource ControlBackgroundBrush}" />
+  </Style>
 
 </ResourceDictionary>

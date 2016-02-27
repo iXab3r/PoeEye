@@ -4,20 +4,29 @@ namespace PoeShared.Utilities
 
     public class DataPipe : Freezable
     {
+        protected override Freezable CreateInstanceCore()
+        {
+            return new DataPipe();
+        }
+
         #region Source (DependencyProperty)
 
         public object Source
         {
-            get { return (object)GetValue(SourceProperty); }
+            get { return GetValue(SourceProperty); }
             set { SetValue(SourceProperty, value); }
         }
+
         public static readonly DependencyProperty SourceProperty =
-            DependencyProperty.Register("Source", typeof(object), typeof(DataPipe),
-                new FrameworkPropertyMetadata(null, new PropertyChangedCallback(OnSourceChanged)));
+            DependencyProperty.Register(
+                "Source",
+                typeof (object),
+                typeof (DataPipe),
+                new FrameworkPropertyMetadata(null, OnSourceChanged));
 
         private static void OnSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            ((DataPipe)d).OnSourceChanged(e);
+            ((DataPipe) d).OnSourceChanged(e);
         }
 
         protected virtual void OnSourceChanged(DependencyPropertyChangedEventArgs e)
@@ -31,18 +40,17 @@ namespace PoeShared.Utilities
 
         public object Target
         {
-            get { return (object)GetValue(TargetProperty); }
+            get { return GetValue(TargetProperty); }
             set { SetValue(TargetProperty, value); }
         }
+
         public static readonly DependencyProperty TargetProperty =
-            DependencyProperty.Register("Target", typeof(object), typeof(DataPipe),
+            DependencyProperty.Register(
+                "Target",
+                typeof (object),
+                typeof (DataPipe),
                 new FrameworkPropertyMetadata(null));
 
         #endregion
-
-        protected override Freezable CreateInstanceCore()
-        {
-            return new DataPipe();
-        }
     }
 }

@@ -6,7 +6,7 @@
 
     public interface IFuzzySearchService
     {
-        [NotNull] 
+        [NotNull]
         IEnumerable<SearchResult> Search(string needle);
     }
 }

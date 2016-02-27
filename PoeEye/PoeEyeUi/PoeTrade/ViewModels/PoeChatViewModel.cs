@@ -26,13 +26,13 @@
         {
             Guard.ArgumentNotNull(() => whispers);
             Guard.ArgumentNotNull(() => uiScheduler);
-            
+
             whispers.Messages
-                .ObserveOn(uiScheduler)
-                .Where(x => x.MessageType == PoeMessageType.Whisper)
-                .Subscribe(ProcessMessage)
-                .AddTo(Anchors);
-        } 
+                    .ObserveOn(uiScheduler)
+                    .Where(x => x.MessageType == PoeMessageType.Whisper)
+                    .Subscribe(ProcessMessage)
+                    .AddTo(Anchors);
+        }
 
         public ObservableCollection<PoeMessage> Messages { get; } = new ObservableCollection<PoeMessage>();
 

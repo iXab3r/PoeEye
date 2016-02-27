@@ -6,6 +6,6 @@ namespace PoeShared.PoeTrade.Query
         Not,
         Count,
         Sum,
-        If,
+        If
     }
 }

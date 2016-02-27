@@ -19,22 +19,23 @@
 
     internal sealed class PoeMessagesSource : DisposableReactiveObject
     {
-        private readonly FileInfo logFile;
+        private readonly ICollection<string> linesBuffer = new List<string>();
 
         private readonly StreamTracker linesStream;
-
-        private readonly ISubject<PoeMessage> messageSubject = new Subject<PoeMessage>(); 
-
-        private readonly ICollection<string> linesBuffer = new List<string>();
+        private readonly FileInfo logFile;
 
         private readonly Regex logRecordRegex = new Regex(@"^(?'timestamp'\d\d\d\d\/\d\d\/\d\d \d\d:\d\d:\d\d) (?'content'.*)$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
-        private readonly Regex messageParseRegex = new Regex(@"^(?'timestamp'\d\d\d\d\/\d\d\/\d\d \d\d:\d\d:\d\d).*?\[.*\] (?'prefix'[$@&])?(?'name'.*): (?'message'.*)$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private readonly Regex messageParseRegex = new Regex(
+            @"^(?'timestamp'\d\d\d\d\/\d\d\/\d\d \d\d:\d\d:\d\d).*?\[.*\] (?'prefix'[$@&])?(?'name'.*): (?'message'.*)$",
+            RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
+        private readonly ISubject<PoeMessage> messageSubject = new Subject<PoeMessage>();
 
         public PoeMessagesSource([NotNull] FileInfo logFile)
         {
             Guard.ArgumentNotNull(() => logFile);
-            
+
             this.logFile = logFile;
 
             Log.Instance.Debug($"[PoeMessagesSource] Tracking log file '{logFile.FullName}'...");
@@ -99,16 +100,16 @@
             if (!match.Success)
             {
                 // system message, error, etc
-                message = new PoeMessage()
+                message = new PoeMessage
                 {
                     Message = logRecordMatch.Groups["content"].Value,
                     MessageType = PoeMessageType.System,
-                    Timestamp = DateTime.Parse(logRecordMatch.Groups["timestamp"].Value),
+                    Timestamp = DateTime.Parse(logRecordMatch.Groups["timestamp"].Value)
                 };
                 return true;
             }
 
-            message = new PoeMessage()
+            message = new PoeMessage
             {
                 Message = match.Groups["message"].Value,
                 MessageType = ToMessageType(match.Groups["prefix"].Value),
@@ -123,11 +124,16 @@
         {
             switch (prefix)
             {
-                case "@": return PoeMessageType.Whisper;
-                case "$": return PoeMessageType.Trade;
-                case "&": return PoeMessageType.Guild;
-                case "": return PoeMessageType.Local;
-                default: return PoeMessageType.Unknown;
+                case "@":
+                    return PoeMessageType.Whisper;
+                case "$":
+                    return PoeMessageType.Trade;
+                case "&":
+                    return PoeMessageType.Guild;
+                case "":
+                    return PoeMessageType.Local;
+                default:
+                    return PoeMessageType.Unknown;
             }
         }
     }

@@ -10,7 +10,6 @@
     using Awesomium.Core;
     using Awesomium.Windows.Forms;
 
-    using PoeShared;
     using PoeShared.Utilities;
 
     using ReactiveUI;
@@ -32,13 +31,9 @@
             typeof (WpfChromium),
             new PropertyMetadata(default(bool)));
 
-        public bool IsBusy
-        {
-            get { return (bool) GetValue(IsBusyProperty); }
-            set { SetValue(IsBusyProperty, value); }
-        }
-
         private readonly SerialDisposable browserSubscriptions = new SerialDisposable();
+
+        private WebControl browser;
 
         static WpfChromium()
         {
@@ -57,7 +52,11 @@
                 .Subscribe(HandleBrowserChange);
         }
 
-        private WebControl browser;
+        public bool IsBusy
+        {
+            get { return (bool) GetValue(IsBusyProperty); }
+            set { SetValue(IsBusyProperty, value); }
+        }
 
         public WebControl Browser
         {
@@ -79,12 +78,12 @@
             }
         }
 
+        public event PropertyChangedEventHandler PropertyChanged = delegate { };
+
         private static void CurrentOnExit(object sender, ExitEventArgs exitEventArgs)
         {
             WebCore.Shutdown();
         }
-
-        public event PropertyChangedEventHandler PropertyChanged = delegate { };
 
         public event EventHandler<DocumentLoadedEventArgs> DocumentLoaded = delegate { };
 
@@ -107,16 +106,19 @@
                    .AddTo(composite);
 
             Observable
-               .FromEventPattern<DocumentReadyEventHandler, DocumentReadyEventArgs>(h => browser.DocumentReady += h, h => browser.DocumentReady -= h)
-               .Select(x => new { x.EventArgs.Url, Html = browser.HTML ?? string.Empty })
-               .DistinctUntilChanged()
-               .Subscribe(x => DocumentLoaded(this, new DocumentLoadedEventArgs()
-               {
-                   Uri = x.Url,
-                   Value = x.Html
-               }))
-               .AddTo(composite);
-               
+                .FromEventPattern<DocumentReadyEventHandler, DocumentReadyEventArgs>(h => browser.DocumentReady += h, h => browser.DocumentReady -= h)
+                .Select(x => new {x.EventArgs.Url, Html = browser.HTML ?? string.Empty})
+                .DistinctUntilChanged()
+                .Subscribe(
+                    x => DocumentLoaded(
+                        this,
+                        new DocumentLoadedEventArgs
+                        {
+                            Uri = x.Url,
+                            Value = x.Html
+                        }))
+                .AddTo(composite);
+
             browserSubscriptions.Disposable = composite;
         }
 

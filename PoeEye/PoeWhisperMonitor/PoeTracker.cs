@@ -24,7 +24,7 @@
                 .Timer(DateTimeOffset.Now, RecheckTimeout)
                 .Select(_ => GetPathOfExileProcesses())
                 .Select(x => x.Select(ToProcessInfo).ToArray())
-                .WithPrevious((prev, curr) => new { IsNew = !(prev??new PoeProcessInfo[0]).SequenceEqual(curr, PoeProcessInfo.ExecutableComparer), curr })
+                .WithPrevious((prev, curr) => new {IsNew = !(prev ?? new PoeProcessInfo[0]).SequenceEqual(curr, PoeProcessInfo.ExecutableComparer), curr})
                 .Where(x => x.IsNew)
                 .Select(x => x.curr)
                 .Do(LogProcesses)

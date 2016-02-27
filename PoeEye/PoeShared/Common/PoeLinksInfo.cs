@@ -2,8 +2,6 @@
 {
     public class PoeLinksInfo : IPoeLinksInfo
     {
-        public string RawSockets { get; set; }
-
         public PoeLinksInfo(string rawSockets)
         {
             RawSockets = rawSockets;
@@ -12,6 +10,8 @@
         public PoeLinksInfo()
         {
         }
+
+        public string RawSockets { get; set; }
 
         public override string ToString()
         {
@@ -33,7 +33,7 @@
             {
                 return true;
             }
-            if (obj.GetType() != this.GetType())
+            if (obj.GetType() != GetType())
             {
                 return false;
             }
@@ -42,7 +42,7 @@
 
         public override int GetHashCode()
         {
-            return (RawSockets != null ? RawSockets.GetHashCode() : 0);
+            return RawSockets != null ? RawSockets.GetHashCode() : 0;
         }
     }
 }

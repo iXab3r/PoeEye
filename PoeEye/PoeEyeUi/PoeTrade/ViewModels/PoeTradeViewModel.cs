@@ -22,24 +22,25 @@
     using PoeShared;
     using PoeShared.Common;
     using PoeShared.Prism;
-
-    using ReactiveUI;
-
     using PoeShared.Utilities;
 
     using Prism;
 
+    using ReactiveUI;
+
     internal sealed class PoeTradeViewModel : DisposableReactiveObject, IPoeTradeViewModel
     {
         private static readonly TimeSpan RefreshTimeout = TimeSpan.FromSeconds(10);
-
-        private readonly IPoeItemVerifier itemVerifier;
         private readonly IClock clock;
         private readonly ReactiveCommand<object> copyPmMessageToClipboardCommand = ReactiveCommand.Create();
-        private readonly ReactiveCommand<object> verifyItemCommand = ReactiveCommand.Create();
+
+        private readonly IPoeItemVerifier itemVerifier;
         private readonly ReactiveCommand<object> openForumUriCommand;
+        private readonly ReactiveCommand<object> verifyItemCommand = ReactiveCommand.Create();
 
         private PoeTradeState tradeState;
+
+        private PoeItemVerificationState verificationState;
 
         public PoeTradeViewModel(
             [NotNull] IPoeItem poeItem,
@@ -60,7 +61,7 @@
 
             this.clock = clock;
             this.itemVerifier = itemVerifier;
-            this.Trade = poeItem;
+            Trade = poeItem;
             copyPmMessageToClipboardCommand.Subscribe(CopyPmMessageToClipboardCommandExecute);
 
             openForumUriCommand = ReactiveCommand.Create(Observable.Return(OpenForumUriCommandCanExecute()));
@@ -85,14 +86,22 @@
             PriceInChaosOrbs = poePriceCalculcator.GetEquivalentInChaosOrbs(poeItem.Price);
 
             Observable.Timer(DateTimeOffset.Now, RefreshTimeout).ToUnit()
-                .ObserveOn(uiScheduler)
-                .Subscribe(() => this.RaisePropertyChanged(nameof(TimeElapsedSinceLastIndexation)))
-                .AddTo(Anchors);
+                      .ObserveOn(uiScheduler)
+                      .Subscribe(() => this.RaisePropertyChanged(nameof(TimeElapsedSinceLastIndexation)))
+                      .AddTo(Anchors);
         }
 
         public TimeSpan TimeElapsedSinceLastIndexation => Trade.Timestamp == DateTime.MinValue ? TimeSpan.Zero : clock.CurrentTime - Trade.Timestamp;
 
         public ICommand OpenForumUriCommand => openForumUriCommand;
+
+        public ICommand VerifyItemCommand => verifyItemCommand;
+
+        public PoeItemVerificationState VerificationState
+        {
+            get { return verificationState; }
+            set { this.RaiseAndSetIfChanged(ref verificationState, value); }
+        }
 
         public PoeTradeState TradeState
         {
@@ -113,16 +122,6 @@
         public IPoeItem Trade { get; }
 
         public ICommand CopyPmMessageToClipboardCommand => copyPmMessageToClipboardCommand;
-
-        public ICommand VerifyItemCommand => verifyItemCommand;
-
-        private PoeItemVerificationState verificationState;
-
-        public PoeItemVerificationState VerificationState
-        {
-            get { return verificationState; }
-            set { this.RaiseAndSetIfChanged(ref verificationState, value); }
-        }
 
         private void OpenForumUriCommandExecute(object arg)
         {

@@ -11,7 +11,7 @@ namespace PoeShared
 
     public static class Log
     {
-        private static readonly Lazy<ILog> instance = new Lazy<ILog>(() => LogManager.GetLogger(typeof(Log))); 
+        private static readonly Lazy<ILog> instance = new Lazy<ILog>(() => LogManager.GetLogger(typeof (Log)));
 
         public static ILog Instance => instance.Value;
 
@@ -19,7 +19,7 @@ namespace PoeShared
         {
             Guard.ArgumentNotNull(() => exception);
 
-            Log.Instance.Error("Exception occurred", exception);
+            Instance.Error("Exception occurred", exception);
         }
 
         public static void HandleUiException([NotNull] Exception exception)
@@ -27,7 +27,7 @@ namespace PoeShared
             Guard.ArgumentNotNull(() => exception);
             HandleException(exception);
 
-            Log.Instance.Warn("Application will be terminated");
+            Instance.Warn("Application will be terminated");
             Environment.Exit(-1);
         }
     }

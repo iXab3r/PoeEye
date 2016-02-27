@@ -14,9 +14,8 @@
 
     internal sealed class PoeWhispers : DisposableReactiveObject, IPoeWhispers
     {
-        private readonly IDictionary<string, IDisposable> sourcesByPath = new Dictionary<string, IDisposable>();
-
         private readonly ISubject<PoeMessage> messagesSubject = new Subject<PoeMessage>();
+        private readonly IDictionary<string, IDisposable> sourcesByPath = new Dictionary<string, IDisposable>();
 
         public PoeWhispers()
         {
@@ -43,7 +42,8 @@
                 return;
             }
 
-            Log.Instance.Debug($"[PoeWhispers] Log files list changed:\r\n\tLogs to add: {string.Join(", ", sourcesToAdd)}\r\n\tLogs to remove: {string.Join(", ", sourcesToRemove)}");
+            Log.Instance.Debug(
+                $"[PoeWhispers] Log files list changed:\r\n\tLogs to add: {string.Join(", ", sourcesToAdd)}\r\n\tLogs to remove: {string.Join(", ", sourcesToRemove)}");
 
             foreach (var logFilePath in sourcesToRemove)
             {
@@ -61,7 +61,6 @@
                 source.Messages.Subscribe(messagesSubject).AddTo(composite);
 
                 sourcesByPath.Add(logFilePath, composite);
-
             }
         }
     }

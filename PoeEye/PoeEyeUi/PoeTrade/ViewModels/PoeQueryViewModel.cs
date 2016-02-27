@@ -9,8 +9,6 @@
 
     using JetBrains.Annotations;
 
-    using Models;
-
     using PoeShared;
     using PoeShared.Common;
     using PoeShared.PoeDatabase;
@@ -80,6 +78,8 @@
 
         private string itemName;
 
+        private PoeItemRarity? itemRarity;
+
         private IPoeItemType itemType;
 
         private string league;
@@ -144,8 +144,6 @@
 
         private int? socketsW;
 
-        private PoeItemRarity? itemRarity;
-
         public PoeQueryViewModel(
             [NotNull] IPoeQueryInfoProvider queryInfoProvider,
             [NotNull] IPoeModGroupsEditorViewModel modGroupsEditor,
@@ -173,6 +171,32 @@
             var knownNames = poeDatabaseReader.KnownEntitiesNames;
             NameSuggestionProvider = suggestionProviderFactory.Create(knownNames);
         }
+
+        public string Description => GetQueryDescription();
+
+        public int? GemOrMapLevelMin
+        {
+            get { return gemOrMapLevelMin; }
+            set { this.RaiseAndSetIfChanged(ref gemOrMapLevelMin, value); }
+        }
+
+        public int? GemOrMapLevelMax
+        {
+            get { return gemOrMapLevelMax; }
+            set { this.RaiseAndSetIfChanged(ref gemOrMapLevelMax, value); }
+        }
+
+        public string[] LeaguesList { get; }
+
+        public IPoeCurrency[] CurrenciesList { get; }
+
+        public IPoeModGroupsEditorViewModel ModGroupsEditor { get; }
+
+        public ISuggestionProvider NameSuggestionProvider { get; }
+
+        public IPoeItemType[] ItemTypes { get; }
+
+        public Func<IPoeQueryInfo> PoeQueryBuilder => GetQueryInfo;
 
         public float? DamageMin
         {
@@ -338,8 +362,6 @@
 
         public IPoeQueryModsGroup[] ModGroups => ModGroupsEditor.ToGroups();
 
-        public string Description => GetQueryDescription();
-
         public int? SocketsB
         {
             get { return socketsB; }
@@ -416,18 +438,6 @@
         {
             get { return levelMax; }
             set { this.RaiseAndSetIfChanged(ref levelMax, value); }
-        }
-
-        public int? GemOrMapLevelMin
-        {
-            get { return gemOrMapLevelMin; }
-            set { this.RaiseAndSetIfChanged(ref gemOrMapLevelMin, value); }
-        }
-
-        public int? GemOrMapLevelMax
-        {
-            get { return gemOrMapLevelMax; }
-            set { this.RaiseAndSetIfChanged(ref gemOrMapLevelMax, value); }
         }
 
         public int? IncQuantityMin
@@ -538,18 +548,6 @@
             set { this.RaiseAndSetIfChanged(ref isExpanded, value); }
         }
 
-        public string[] LeaguesList { get; }
-
-        public IPoeCurrency[] CurrenciesList { get; }
-
-        public IPoeModGroupsEditorViewModel ModGroupsEditor { get; }
-
-        public ISuggestionProvider NameSuggestionProvider { get; }
-
-        public IPoeItemType[] ItemTypes { get; }
-
-        public Func<IPoeQueryInfo> PoeQueryBuilder => GetQueryInfo;
-
         public IPoeItemType ItemType
         {
             get { return itemType; }
@@ -560,7 +558,7 @@
         {
             var result = new PoeQueryInfo();
 
-            TransferProperties((IPoeQueryInfo)this, result);
+            TransferProperties((IPoeQueryInfo) this, result);
 
             return result;
         }
@@ -612,12 +610,12 @@
         private static void TransferProperties<TSource, TTarget>(TSource source, TTarget target)
             where TTarget : class, TSource
         {
-            var settableProperties = typeof(TTarget)
-              .GetProperties(BindingFlags.Instance | BindingFlags.Public)
-              .Where(x => x.CanRead && x.CanWrite)
-              .ToArray();
+            var settableProperties = typeof (TTarget)
+                .GetProperties(BindingFlags.Instance | BindingFlags.Public)
+                .Where(x => x.CanRead && x.CanWrite)
+                .ToArray();
 
-            var propertiesToSet = typeof(TSource)
+            var propertiesToSet = typeof (TSource)
                 .GetProperties(BindingFlags.Instance | BindingFlags.Public)
                 .Where(x => x.CanRead)
                 .ToArray();
@@ -657,16 +655,17 @@
             var blackList = new[]
             {
                 nameof(League),
-                nameof(ItemName),
+                nameof(ItemName)
             };
-            var nullableProperties = typeof(IPoeQueryInfo)
+            var nullableProperties = typeof (IPoeQueryInfo)
                 .GetProperties()
                 .Where(x => !blackList.Contains(x.Name))
-                .Where(x => x.PropertyType == typeof(int?)
-                            || x.PropertyType == typeof(float?)
-                            || x.PropertyType == typeof(string)
-                            || x.PropertyType == typeof(IPoeItemType)
-                            || x.PropertyType == typeof(PoeItemRarity?))
+                .Where(
+                    x => x.PropertyType == typeof (int?)
+                         || x.PropertyType == typeof (float?)
+                         || x.PropertyType == typeof (string)
+                         || x.PropertyType == typeof (IPoeItemType)
+                         || x.PropertyType == typeof (PoeItemRarity?))
                 .Where(x => x.CanRead)
                 .ToArray();
 
@@ -702,7 +701,7 @@
                 return null;
             }
 
-            var result = String.Join("\r\n", descriptions);
+            var result = string.Join("\r\n", descriptions);
             return result;
         }
     }

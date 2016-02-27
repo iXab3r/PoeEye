@@ -6,6 +6,8 @@
     using System.Windows;
     using System.Windows.Input;
 
+    using ClipboardMonitor;
+
     using Guards;
 
     using JetBrains.Annotations;
@@ -17,6 +19,7 @@
     using PoeShared;
     using PoeShared.Common;
     using PoeShared.PoeTrade;
+    using PoeShared.Prism;
     using PoeShared.Utilities;
 
     using Prism;
@@ -25,16 +28,13 @@
 
     using TypeConverter;
 
-    using ClipboardMonitor;
-
-    using PoeShared.Prism;
-
     internal sealed class PoeClipboardParserViewModel : DisposableReactiveObject
     {
         private static readonly TimeSpan IsBusyThrottlingPeriod = TimeSpan.FromSeconds(1);
 
         private readonly IPoeItemParser itemParser;
         private readonly IConverter<IPoeItem, IPoeQueryInfo> itemToQueryConverter;
+        private readonly ReactiveCommand<object> parseClipboard;
         private readonly IFactory<IPoeTradeViewModel, IPoeItem> poeTradeViewModelFactory;
 
         private bool isBusyInternal;
@@ -45,7 +45,6 @@
         private IPoeQueryInfo itemQueryInfo;
 
         private bool monitoringEnabled;
-        private readonly ReactiveCommand<object> parseClipboard;
 
         public PoeClipboardParserViewModel(
             [NotNull] IPoeItemParser itemParser,

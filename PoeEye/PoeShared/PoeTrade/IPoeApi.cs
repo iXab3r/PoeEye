@@ -1,14 +1,14 @@
 ﻿namespace PoeShared.PoeTrade
 {
-    using JetBrains.Annotations;
-    using System;
     using System.Threading.Tasks;
+
+    using JetBrains.Annotations;
 
     using Query;
 
     public interface IPoeApi
     {
-        [NotNull] 
+        [NotNull]
         Task<IPoeQueryResult> IssueQuery([NotNull] IPoeQuery query);
 
         [NotNull]

@@ -12,7 +12,7 @@ namespace PoeShared.PoeTrade
         {
             Guard.ArgumentNotNull(() => mod);
             Guard.ArgumentNotNull(() => matchingRegex);
-            
+
             Mod = mod;
             MatchingRegex = matchingRegex;
         }

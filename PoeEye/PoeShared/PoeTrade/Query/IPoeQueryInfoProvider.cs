@@ -6,11 +6,11 @@
 
     public interface IPoeQueryInfoProvider
     {
-        string[] LeaguesList {[NotNull] get; }
+        string[] LeaguesList { [NotNull] get; }
 
-        IPoeItemMod[] ModsList {[NotNull] get; }
+        IPoeItemMod[] ModsList { [NotNull] get; }
 
-        IPoeCurrency[] CurrenciesList {[NotNull] get; }
+        IPoeCurrency[] CurrenciesList { [NotNull] get; }
 
         IPoeItemType[] ItemTypes { [NotNull] get; }
     }

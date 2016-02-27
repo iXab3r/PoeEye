@@ -19,6 +19,12 @@
 
         private readonly IProxyProvider proxyProvider;
 
+        private int activeProxiesCount;
+
+        private bool isProxified;
+
+        private int totalProxiesCount;
+
         public ProxyProviderViewModel([NotNull] IProxyProvider proxyProvider)
         {
             Guard.ArgumentNotNull(() => proxyProvider);
@@ -31,23 +37,17 @@
                 .AddTo(Anchors);
         }
 
-        private int activeProxiesCount;
-
         public int ActiveProxiesCount
         {
             get { return activeProxiesCount; }
             set { this.RaiseAndSetIfChanged(ref activeProxiesCount, value); }
         }
 
-        private int totalProxiesCount;
-
         public int TotalProxiesCount
         {
             get { return totalProxiesCount; }
             set { this.RaiseAndSetIfChanged(ref totalProxiesCount, value); }
         }
-
-        private bool isProxified;
 
         public bool IsProxified
         {

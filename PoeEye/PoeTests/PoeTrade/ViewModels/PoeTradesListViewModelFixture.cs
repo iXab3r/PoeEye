@@ -2,17 +2,15 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Collections.ObjectModel;
-    using System.ComponentModel;
     using System.Linq;
     using System.Reactive.Concurrency;
     using System.Reactive.Subjects;
 
     using Helpers;
 
-    using NUnit.Framework;
-
     using Moq;
+
+    using NUnit.Framework;
 
     using PoeEyeUi.PoeTrade;
     using PoeEyeUi.PoeTrade.Models;
@@ -31,19 +29,6 @@
     [TestFixture]
     internal sealed class PoeTradesListViewModelFixture
     {
-        private Mock<IClock> clock;
-        private Mock<IEqualityComparer<IPoeItem>> poeItemsComparer;
-        private Mock<IFactory<IPoeTradeViewModel, IPoeItem>> poeTradeViewModelFactory;
-        private Mock<IFactory<IPoeLiveHistoryProvider, IPoeQuery>> poeLiveHistoryFactory;
-
-        private Mock<IPoeLiveHistoryProvider> poeLiveHistory;
-        private Mock<IHistoricalTradesViewModel> historicalTradesViewModel;
-        private Mock<IPoeCaptchaRegistrator> captchaService;
-        private ISubject<IPoeItem[]> poeLiveHistoryItems; 
-        private ISubject<Exception> poeLiveHistoryUpdateExceptions;
-
-        private Mock<IConverter<IPoeQueryInfo, IPoeQuery>> poeQueryInfoToQueryConverter;
-
         [SetUp]
         public void SetUp()
         {
@@ -82,25 +67,40 @@
             captchaService = new Mock<IPoeCaptchaRegistrator>();
         }
 
-        [Test]
-        public void ShouldCreateLiveHistoryProviderOnActiveQueryChange()
+        private Mock<IClock> clock;
+        private Mock<IEqualityComparer<IPoeItem>> poeItemsComparer;
+        private Mock<IFactory<IPoeTradeViewModel, IPoeItem>> poeTradeViewModelFactory;
+        private Mock<IFactory<IPoeLiveHistoryProvider, IPoeQuery>> poeLiveHistoryFactory;
+
+        private Mock<IPoeLiveHistoryProvider> poeLiveHistory;
+        private Mock<IHistoricalTradesViewModel> historicalTradesViewModel;
+        private Mock<IPoeCaptchaRegistrator> captchaService;
+        private ISubject<IPoeItem[]> poeLiveHistoryItems;
+        private ISubject<Exception> poeLiveHistoryUpdateExceptions;
+
+        private Mock<IConverter<IPoeQueryInfo, IPoeQuery>> poeQueryInfoToQueryConverter;
+
+        private IPoeTradeViewModel CreateTradeVm(IPoeItem item)
         {
-            //Given
-            var instance = CreateInstance();
-            
-            var queryInfo = Mock.Of<IPoeQueryInfo>();
-            var convertedQuery = Mock.Of<IPoeQuery>();
+            var result = new Mock<IPoeTradeViewModel>();
+            result.SetupGet(x => x.Trade).Returns(item);
+            result
+                .SetupSet(x => x.TradeState)
+                .Callback(value => result.SetPropertyAndNotify(x => x.TradeState, value));
+            return result.Object;
+        }
 
-            poeQueryInfoToQueryConverter
-               .Setup(x => x.Convert(It.IsAny<IPoeQueryInfo>()))
-               .Returns(convertedQuery);
-
-            //When
-            instance.ActiveQuery = queryInfo;
-
-            //Then
-            poeLiveHistoryFactory.Verify(x => x.Create(convertedQuery), Times.Once);
-            poeQueryInfoToQueryConverter.Verify(x => x.Convert(queryInfo), Times.Once);
+        private PoeTradesListViewModel CreateInstance()
+        {
+            return new PoeTradesListViewModel(
+                poeLiveHistoryFactory.Object,
+                poeTradeViewModelFactory.Object,
+                captchaService.Object,
+                historicalTradesViewModel.Object,
+                poeItemsComparer.Object,
+                poeQueryInfoToQueryConverter.Object,
+                clock.Object,
+                Scheduler.Immediate);
         }
 
 
@@ -126,21 +126,62 @@
         }
 
         [Test]
-        public void ShouldPropagateLiveHistoryExceptions()
+        public void ShouldChangeTradeStateToNormalWhenMarkedAsRead()
         {
             //Given
             var instance = CreateInstance();
             instance.ActiveQuery = Mock.Of<IPoeQueryInfo>();
 
-            var now = new DateTime(2015,1,1);
-            clock.Setup(x => x.CurrentTime).Returns(now);
-            var exception = new Exception("msg");
+            poeLiveHistoryItems.OnNext(new[] {Mock.Of<IPoeItem>()});
+
+            var trade = instance.TradesList.Single();
+            Assert.AreEqual(PoeTradeState.New, trade.TradeState);
 
             //When
-            poeLiveHistoryUpdateExceptions.OnNext(exception);
+            trade.TradeState = PoeTradeState.Normal;
 
             //Then
-            instance.Errors.ShouldBe($"[{now}] msg");
+            trade.TradeState.ShouldBe(PoeTradeState.Normal);
+        }
+
+        [Test]
+        public void ShouldChangeTradeStateToRemoved()
+        {
+            //Given
+            var instance = CreateInstance();
+            instance.ActiveQuery = Mock.Of<IPoeQueryInfo>();
+
+            poeLiveHistoryItems.OnNext(new[] {Mock.Of<IPoeItem>()});
+
+            var trade = instance.TradesList.Single();
+            Assert.AreEqual(PoeTradeState.New, trade.TradeState);
+
+            //When
+            poeLiveHistoryItems.OnNext(new[] {Mock.Of<IPoeItem>()});
+
+            //Then
+            trade.TradeState.ShouldBe(PoeTradeState.Removed);
+        }
+
+        [Test]
+        public void ShouldCreateLiveHistoryProviderOnActiveQueryChange()
+        {
+            //Given
+            var instance = CreateInstance();
+
+            var queryInfo = Mock.Of<IPoeQueryInfo>();
+            var convertedQuery = Mock.Of<IPoeQuery>();
+
+            poeQueryInfoToQueryConverter
+                .Setup(x => x.Convert(It.IsAny<IPoeQueryInfo>()))
+                .Returns(convertedQuery);
+
+            //When
+            instance.ActiveQuery = queryInfo;
+
+            //Then
+            poeLiveHistoryFactory.Verify(x => x.Create(convertedQuery), Times.Once);
+            poeQueryInfoToQueryConverter.Verify(x => x.Convert(queryInfo), Times.Once);
         }
 
         [Test]
@@ -160,22 +201,24 @@
         }
 
         [Test]
-        public void ShouldChangeTradeStateToRemoved()
+        public void ShouldMoveRemovedItemsToHistoricalTrades()
         {
             //Given
             var instance = CreateInstance();
             instance.ActiveQuery = Mock.Of<IPoeQueryInfo>();
 
-            poeLiveHistoryItems.OnNext(new[] { Mock.Of<IPoeItem>() });
+            poeLiveHistoryItems.OnNext(new[] {Mock.Of<IPoeItem>()});
 
             var trade = instance.TradesList.Single();
-            Assert.AreEqual(PoeTradeState.New, trade.TradeState);
+
+            poeLiveHistoryItems.OnNext(new IPoeItem[0]);
 
             //When
-            poeLiveHistoryItems.OnNext(new[] { Mock.Of<IPoeItem>() });
+            trade.TradeState = PoeTradeState.Normal;
 
             //Then
-            trade.TradeState.ShouldBe(PoeTradeState.Removed);
+            CollectionAssert.AreEqual(new IPoeTradeViewModel[0], instance.TradesList);
+            historicalTradesViewModel.Verify(x => x.AddItems(trade.Trade), Times.Once);
         }
 
         [Test]
@@ -187,39 +230,70 @@
             instance.ActiveQuery = Mock.Of<IPoeQueryInfo>();
 
             poeItemsComparer
-              .Setup(x => x.Equals(It.IsAny<IPoeItem>(), It.IsAny<IPoeItem>()))
-              .Returns(true);
+                .Setup(x => x.Equals(It.IsAny<IPoeItem>(), It.IsAny<IPoeItem>()))
+                .Returns(true);
 
-            poeLiveHistoryItems.OnNext(new[] { Mock.Of<IPoeItem>() });
+            poeLiveHistoryItems.OnNext(new[] {Mock.Of<IPoeItem>()});
 
             var trade = instance.TradesList.Single();
             Assert.AreEqual(PoeTradeState.New, trade.TradeState);
             trade.TradeState = state;
 
             //When
-            poeLiveHistoryItems.OnNext(new[] { Mock.Of<IPoeItem>() });
+            poeLiveHistoryItems.OnNext(new[] {Mock.Of<IPoeItem>()});
 
             //Then
             trade.TradeState.ShouldBe(state);
         }
 
         [Test]
-        public void ShouldChangeTradeStateToNormalWhenMarkedAsRead()
+        public void ShouldNotRemoveItemFromHistoricalTradesIfArrivedAgain()
         {
             //Given
             var instance = CreateInstance();
             instance.ActiveQuery = Mock.Of<IPoeQueryInfo>();
 
-            poeLiveHistoryItems.OnNext(new[] { Mock.Of<IPoeItem>() });
+            var item = Mock.Of<IPoeItem>();
+            poeLiveHistoryItems.OnNext(new[] {item});
+
+            poeLiveHistoryItems.OnNext(new IPoeItem[0]);
 
             var trade = instance.TradesList.Single();
-            Assert.AreEqual(PoeTradeState.New, trade.TradeState);
-
-            //When
             trade.TradeState = PoeTradeState.Normal;
 
+            poeItemsComparer
+                .Setup(x => x.Equals(It.IsAny<IPoeItem>(), It.IsAny<IPoeItem>()))
+                .Returns(true);
+
+            historicalTradesViewModel.Reset();
+
+            //When
+            poeLiveHistoryItems.OnNext(new[] {item});
+
             //Then
-            trade.TradeState.ShouldBe(PoeTradeState.Normal);
+            historicalTradesViewModel.Verify(x => x.AddItems(It.IsAny<IPoeItem[]>()), Times.Never);
+            historicalTradesViewModel.Verify(x => x.Clear(), Times.Never);
+
+            var actualItems = instance.TradesList.Select(x => x.Trade).ToArray();
+            CollectionAssert.AreEqual(new[] {item}, actualItems);
+        }
+
+        [Test]
+        public void ShouldPropagateLiveHistoryExceptions()
+        {
+            //Given
+            var instance = CreateInstance();
+            instance.ActiveQuery = Mock.Of<IPoeQueryInfo>();
+
+            var now = new DateTime(2015, 1, 1);
+            clock.Setup(x => x.CurrentTime).Returns(now);
+            var exception = new Exception("msg");
+
+            //When
+            poeLiveHistoryUpdateExceptions.OnNext(exception);
+
+            //Then
+            instance.Errors.ShouldBe($"[{now}] msg");
         }
 
         [Test]
@@ -229,7 +303,7 @@
             var instance = CreateInstance();
             instance.ActiveQuery = Mock.Of<IPoeQueryInfo>();
 
-            poeLiveHistoryItems.OnNext(new[] { Mock.Of<IPoeItem>() });
+            poeLiveHistoryItems.OnNext(new[] {Mock.Of<IPoeItem>()});
 
             var trade = instance.TradesList.Single();
             Assert.AreEqual(PoeTradeState.New, trade.TradeState);
@@ -244,82 +318,6 @@
             //Then
             trade.TradeState.ShouldBe(PoeTradeState.Normal);
             instance.TradesList.Count.ShouldBe(0);
-        }
-
-        [Test]
-        public void ShouldMoveRemovedItemsToHistoricalTrades()
-        {
-            //Given
-            var instance = CreateInstance();
-            instance.ActiveQuery = Mock.Of<IPoeQueryInfo>();
-
-            poeLiveHistoryItems.OnNext(new[] { Mock.Of<IPoeItem>() });
-
-            var trade = instance.TradesList.Single();
-
-            poeLiveHistoryItems.OnNext(new IPoeItem[0]);
-
-            //When
-            trade.TradeState = PoeTradeState.Normal;
-
-            //Then
-            CollectionAssert.AreEqual(new IPoeTradeViewModel[0], instance.TradesList);
-            historicalTradesViewModel.Verify(x => x.AddItems(new[] { trade.Trade }), Times.Once);
-        }
-
-        [Test]
-        public void ShouldNotRemoveItemFromHistoricalTradesIfArrivedAgain()
-        {
-            //Given
-            var instance = CreateInstance();
-            instance.ActiveQuery = Mock.Of<IPoeQueryInfo>();
-
-            var item = Mock.Of<IPoeItem>();
-            poeLiveHistoryItems.OnNext(new[] { item });
-
-            poeLiveHistoryItems.OnNext(new IPoeItem[0]);
-
-            var trade = instance.TradesList.Single();
-            trade.TradeState = PoeTradeState.Normal;
-
-            poeItemsComparer
-                .Setup(x => x.Equals(It.IsAny<IPoeItem>(), It.IsAny<IPoeItem>()))
-                .Returns(true);
-
-            historicalTradesViewModel.Reset();
-
-            //When
-            poeLiveHistoryItems.OnNext(new[] { item });
-
-            //Then
-            historicalTradesViewModel.Verify(x => x.AddItems(It.IsAny<IPoeItem[]>()), Times.Never);
-            historicalTradesViewModel.Verify(x => x.Clear(), Times.Never);
-
-            var actualItems = instance.TradesList.Select(x => x.Trade).ToArray();
-            CollectionAssert.AreEqual(new[] { item }, actualItems);
-        }
-
-        private IPoeTradeViewModel CreateTradeVm(IPoeItem item)
-        {
-            var result = new Mock<IPoeTradeViewModel>();
-            result.SetupGet(x => x.Trade).Returns(item);
-            result
-                .SetupSet(x => x.TradeState)
-                .Callback(value => result.SetPropertyAndNotify(x => x.TradeState, value));
-            return result.Object;
-        }
-
-        private PoeTradesListViewModel CreateInstance()
-        {
-            return new PoeTradesListViewModel( 
-                poeLiveHistoryFactory.Object,
-                poeTradeViewModelFactory.Object,
-                captchaService.Object,
-                historicalTradesViewModel.Object,
-                poeItemsComparer.Object,
-                poeQueryInfoToQueryConverter.Object,
-                clock.Object,
-                Scheduler.Immediate);
         }
     }
 }

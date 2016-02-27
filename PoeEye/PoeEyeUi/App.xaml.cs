@@ -1,7 +1,6 @@
 ﻿namespace PoeEyeUi
 {
     using System;
-    using System.Reflection;
     using System.Windows;
 
     using log4net;
@@ -61,7 +60,7 @@
         private void App_OnStartup(object sender, StartupEventArgs e)
         {
             var mainWindow = new MainWindow();
-            
+
             mainWindow.Show();
         }
     }

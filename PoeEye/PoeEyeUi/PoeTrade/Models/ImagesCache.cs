@@ -5,10 +5,8 @@
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using System.Net.Http;
     using System.Reactive.Concurrency;
     using System.Reactive.Linq;
-    using System.Reactive.Threading.Tasks;
     using System.Security.Cryptography;
     using System.Text;
     using System.Threading;
@@ -27,21 +25,21 @@
 
     internal sealed class ImagesCache
     {
-        private readonly IFactory<IHttpClient> httpClientFactory;
-        private readonly IScheduler bgScheduler;
         private static readonly TimeSpan ArtificialDelay = TimeSpan.FromSeconds(5);
+        private readonly IScheduler bgScheduler;
 
         private readonly string CacheFolderName = "Cache";
+        private readonly IFactory<IHttpClient> httpClientFactory;
 
         private readonly IDictionary<string, IObservable<FileInfo>> loadingImages = new ConcurrentDictionary<string, IObservable<FileInfo>>();
 
         public ImagesCache(
-                [NotNull] IFactory<IHttpClient> httpClientFactory,
-                [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler)
+            [NotNull] IFactory<IHttpClient> httpClientFactory,
+            [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler)
         {
             Guard.ArgumentNotNull(() => httpClientFactory);
             Guard.ArgumentNotNull(() => bgScheduler);
-            
+
             this.httpClientFactory = httpClientFactory;
             this.bgScheduler = bgScheduler;
         }

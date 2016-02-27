@@ -35,11 +35,11 @@
         private static readonly TimeSpan RecheckPeriodThrottleTimeout = TimeSpan.FromSeconds(1);
 
         private readonly SerialDisposable activeHistoryProviderDisposable = new SerialDisposable();
+        private readonly IPoeCaptchaRegistrator captchaRegistrator;
 
         private readonly IClock clock;
         private readonly IEqualityComparer<IPoeItem> poeItemsComparer;
         private readonly IFactory<IPoeTradeViewModel, IPoeItem> poeTradeViewModelFactory;
-        private readonly IPoeCaptchaRegistrator captchaRegistrator;
         private readonly IScheduler uiScheduler;
 
         private ActiveProviderInfo activeProviderInfo;
@@ -136,6 +136,12 @@
 
         public bool IsBusy => activeProviderInfo.HistoryProvider?.IsBusy ?? false;
 
+        public void Refresh()
+        {
+            var activeProvider = activeProviderInfo;
+            activeProvider.HistoryProvider?.Refresh();
+        }
+
         private void OnNextItemsPackReceived(IPoeItem[] itemsPack)
         {
             var activeProvider = activeProviderInfo;
@@ -216,12 +222,6 @@
                 .AddTo(activeProviderInfo.Anchors);
         }
 
-        public void Refresh()
-        {
-            var activeProvider = activeProviderInfo;
-            activeProvider.HistoryProvider?.Refresh();
-        }
-
         private void OnErrorReceived(Exception exception)
         {
             if (exception != null)
@@ -238,7 +238,7 @@
 
                 if (exception is CaptchaException)
                 {
-                    var captchaException = (CaptchaException)exception;
+                    var captchaException = (CaptchaException) exception;
                     captchaRegistrator.CaptchaRequests.OnNext(captchaException.ResolutionUri);
                 }
             }

@@ -123,7 +123,7 @@
         int? SocketsR { get; }
 
         int? SocketsW { get; }
-        
+
         IPoeQueryModsGroup[] ModGroups { get; }
     }
 }

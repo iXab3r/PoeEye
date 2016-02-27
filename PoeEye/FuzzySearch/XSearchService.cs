@@ -30,7 +30,7 @@
                 return new SearchResult[0];
             }
 
-            var words = needle.Split(new[] { "(", ")", "#", " ", ",", "." }, StringSplitOptions.RemoveEmptyEntries);
+            var words = needle.Split(new[] {"(", ")", "#", " ", ",", "."}, StringSplitOptions.RemoveEmptyEntries);
             var regexText = string.Join(".*?", words);
 
             var regexOptions = RegexOptions.Compiled;

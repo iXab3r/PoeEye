@@ -2,8 +2,6 @@ namespace PoeEyeUi.Config
 {
     using System;
     using System.IO;
-    using System.Reactive.Linq;
-    using System.Reactive.Subjects;
     using System.Text;
 
     using Converters;
@@ -17,8 +15,6 @@ namespace PoeEyeUi.Config
     using PoeShared.PoeTrade;
     using PoeShared.PoeTrade.Query;
     using PoeShared.Utilities;
-
-    using PoeTrade.Models;
 
     using ReactiveUI;
 
@@ -37,9 +33,9 @@ namespace PoeEyeUi.Config
 
         public PoeEyeConfigProviderFromFile()
         {
-            jsonSerializerSettings = new JsonSerializerSettings()
+            jsonSerializerSettings = new JsonSerializerSettings
             {
-                Formatting = Formatting.Indented,
+                Formatting = Formatting.Indented
             };
             jsonSerializerSettings.Converters.Add(new ConcreteListTypeConverter<IPoeQueryInfo, PoeQueryInfo>());
             jsonSerializerSettings.Converters.Add(new ConcreteListTypeConverter<IPoeItemType, PoeItemType>());

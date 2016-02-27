@@ -1,7 +1,6 @@
 ﻿namespace PoeEyeUi.PoeTrade.ViewModels
 {
     using System;
-    using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Linq;
     using System.Windows.Input;
@@ -18,9 +17,8 @@
 
     internal sealed class PoeModGroupsEditorViewModel : DisposableReactiveObject, IPoeModGroupsEditorViewModel
     {
-        private readonly IFactory<PoeModsEditorViewModel> groupsFactory;
-
         private readonly ReactiveCommand<object> addGrpCommand = ReactiveCommand.Create();
+        private readonly IFactory<PoeModsEditorViewModel> groupsFactory;
         private readonly ReactiveCommand<object> removeGrpCommand = ReactiveCommand.Create();
 
         public PoeModGroupsEditorViewModel([NotNull] IFactory<PoeModsEditorViewModel> groupsFactory)
@@ -30,8 +28,8 @@
             this.groupsFactory = groupsFactory;
 
             addGrpCommand
-              .Subscribe(_ => AddGroup())
-              .AddTo(Anchors);
+                .Subscribe(_ => AddGroup())
+                .AddTo(Anchors);
 
             removeGrpCommand
                 .OfType<PoeModsEditorViewModel>()
@@ -41,21 +39,11 @@
             AddGroup();
         }
 
-        public IReactiveList<IPoeModsEditorViewModel> Groups { get; } = new ReactiveList<IPoeModsEditorViewModel>() { ChangeTrackingEnabled = true };
-
         public ICommand AddGroupCommand => addGrpCommand;
 
         public ICommand RemoveGroupCommand => removeGrpCommand;
 
-        private void RemoveGroupCommandExecuted(IPoeModsEditorViewModel groupToRemove)
-        {
-            Guard.ArgumentNotNull(() => groupToRemove);
-
-            using (Groups.SuppressChangeNotifications())
-            {
-                Groups.Remove(groupToRemove);
-            }
-        }
+        public IReactiveList<IPoeModsEditorViewModel> Groups { get; } = new ReactiveList<IPoeModsEditorViewModel> {ChangeTrackingEnabled = true};
 
         public IPoeModsEditorViewModel AddGroup()
         {
@@ -69,6 +57,16 @@
         public IPoeQueryModsGroup[] ToGroups()
         {
             return Groups.Select(x => x.ToGroup()).ToArray();
+        }
+
+        private void RemoveGroupCommandExecuted(IPoeModsEditorViewModel groupToRemove)
+        {
+            Guard.ArgumentNotNull(() => groupToRemove);
+
+            using (Groups.SuppressChangeNotifications())
+            {
+                Groups.Remove(groupToRemove);
+            }
         }
     }
 }
