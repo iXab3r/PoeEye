@@ -68,7 +68,7 @@
 
             Log.Instance.Warn($"Application is already running !");
 #if !DEBUG
-            var assemblyName = Assembly.GetExecutingAssembly().GetName();
+            var assemblyName = System.Reflection.Assembly.GetExecutingAssembly().GetName();
             var window = MainWindow;
             var title = $"{assemblyName.Name} v{assemblyName.Version}";
             var message = "Application is already running !";
