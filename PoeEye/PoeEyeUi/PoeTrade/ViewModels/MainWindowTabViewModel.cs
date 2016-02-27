@@ -160,6 +160,7 @@
             if (config.QueryInfo != null)
             {
                 Query.SetQueryInfo(config.QueryInfo);
+                Query.IsExpanded = true;
             }
 
             if (config.SoldOrRemovedItems != null)

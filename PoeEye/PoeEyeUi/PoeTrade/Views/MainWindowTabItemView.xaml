@@ -99,12 +99,15 @@
             HorizontalAlignment="Right">
             <TextBlock.Inlines>
               <Run Text="{Binding NewItemsCount, Mode=OneWay, StringFormat='{}{0,2}'}"
+                   ToolTip="New items"
                    Foreground="{StaticResource PoeTradeNewItemBrush}" />
               /
               <Run Text="{Binding RemovedItemsCount, Mode=OneWay, StringFormat='{}{0,2}'}"
+                   ToolTip="Sold(or removed) items"
                    Foreground="{StaticResource PoeTradeRemovedItemBrush}" />
               /
-              <Run Text="{Binding NormalItemsCount, Mode=OneWay, StringFormat='{}{0,2}'}" />
+              <Run Text="{Binding NormalItemsCount, Mode=OneWay, StringFormat='{}{0,2}'}" 
+                   ToolTip="Items that haven't changed their state lately" />
             </TextBlock.Inlines>
           </TextBlock>
         </Border>
