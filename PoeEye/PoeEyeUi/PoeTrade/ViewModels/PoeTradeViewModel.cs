@@ -9,6 +9,8 @@
     using System.Windows;
     using System.Windows.Input;
 
+    using Exceptionless;
+
     using Guards;
 
     using JetBrains.Annotations;
@@ -137,6 +139,12 @@
 
         private void CopyPmMessageToClipboardCommandExecute(object arg)
         {
+            ExceptionlessClient.Default
+                .CreateFeatureUsage("TradeList")
+                .SetType("CopyToClipboard")
+                .SetProperty("Item", Trade.DumpToText())
+                .Submit();
+
             string message = null;
             if (string.IsNullOrWhiteSpace(Trade.Price))
             {
@@ -154,6 +162,12 @@
         {
             try
             {
+                ExceptionlessClient.Default
+                    .CreateFeatureUsage("TradeList")
+                    .SetType("OpenForumUri")
+                    .SetProperty("Item", Trade.DumpToText())
+                    .Submit();
+
                 Process.Start(uri);
             }
             catch (Exception ex)
@@ -164,6 +178,12 @@
 
         private async void VerifyCommandExecuted()
         {
+            ExceptionlessClient.Default
+                .CreateFeatureUsage("TradeList")
+                .SetType("Verify")
+                .SetProperty("Item", Trade.DumpToText())
+                .Submit();
+
             VerificationState = PoeItemVerificationState.InProgress;
             var verificationResult = await itemVerifier.Verify(Trade);
 

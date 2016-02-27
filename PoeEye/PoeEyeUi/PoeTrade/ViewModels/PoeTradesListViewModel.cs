@@ -7,6 +7,8 @@
     using System.Reactive.Disposables;
     using System.Reactive.Linq;
 
+    using Exceptionless;
+
     using Guards;
 
     using JetBrains.Annotations;
@@ -149,6 +151,12 @@
             {
                 return;
             }
+
+            ExceptionlessClient.Default
+                               .CreateFeatureUsage("TradeList")
+                               .SetType("Refresh")
+                               .SetProperty("Description", activeQuery?.DumpToText())
+                               .Submit();
 
             var existingItems = TradesList.Select(x => x.Trade).ToArray();
             var removedItems = existingItems.Except(itemsPack, poeItemsComparer).ToArray();

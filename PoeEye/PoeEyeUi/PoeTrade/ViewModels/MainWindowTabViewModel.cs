@@ -8,6 +8,8 @@
 
     using Config;
 
+    using Exceptionless;
+
     using Guards;
 
     using JetBrains.Annotations;
@@ -36,6 +38,7 @@
 
         private bool audioNotificationEnabled;
         private string tabName;
+        private object prevcurr;
 
         public MainWindowTabViewModel(
             [NotNull] PoeTradesListViewModel tradesList,
@@ -184,6 +187,7 @@
         private void RebuildTabName()
         {
             Log.Instance.Debug($"[MainWindowTabViewModel.RebuildTabName] Rebuilding tab name, tabQueryMode: {Query}...");
+            
             var queryDescription = Query.Description;
             TabName = string.IsNullOrWhiteSpace(queryDescription)
                 ? tabHeader
@@ -215,6 +219,14 @@
                 Log.Instance.Debug($"[MainWindowTabViewModel.SearchCommandExecute] Auto-recheck is disabled, refreshing query manually...");
                 TradesList.Refresh();
             }
+
+            ExceptionlessClient.Default
+                               .CreateFeatureUsage("TradeList")
+                               .SetType("Search")
+                               .SetMessage(Query.Description)
+                               .SetProperty("Description", Query.Description)
+                               .SetProperty("Query", query.DumpToText())
+                               .Submit();
         }
 
         private void MarkAllAsReadExecute(object arg)

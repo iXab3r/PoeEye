@@ -188,7 +188,10 @@
                 ItemFromClipboard = trade;
                 ItemQueryInfo = query;
 
-                ExceptionlessClient.Default.CreateFeatureUsage("ClipboardParser").Submit();
+                ExceptionlessClient.Default
+                    .CreateFeatureUsage("ClipboardParser")
+                    .SetProperty("Item", item.DumpToText())
+                    .Submit();
             }
         }
     }
