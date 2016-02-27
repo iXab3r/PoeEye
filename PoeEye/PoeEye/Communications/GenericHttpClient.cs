@@ -19,7 +19,7 @@
 
     using PoeShared;
     using PoeShared.Http;
-    using PoeShared.Utilities;
+    using PoeShared.Scaffolding;
 
     using TypeConverter;
 

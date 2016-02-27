@@ -24,7 +24,7 @@
     using PoeShared;
     using PoeShared.PoeTrade;
     using PoeShared.Prism;
-    using PoeShared.Utilities;
+    using PoeShared.Scaffolding;
 
     using Prism;
 

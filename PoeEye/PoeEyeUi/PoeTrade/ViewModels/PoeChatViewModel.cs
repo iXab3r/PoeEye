@@ -12,7 +12,7 @@
     using Microsoft.Practices.Unity;
 
     using PoeShared.Chat;
-    using PoeShared.Utilities;
+    using PoeShared.Scaffolding;
 
     using PoeWhisperMonitor;
 

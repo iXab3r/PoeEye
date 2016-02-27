@@ -1,4 +1,4 @@
-namespace PoeShared.Utilities
+namespace PoeShared.Scaffolding
 {
     using System.Windows;
 

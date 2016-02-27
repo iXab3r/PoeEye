@@ -22,7 +22,7 @@
     using PoeShared;
     using PoeShared.Common;
     using PoeShared.Prism;
-    using PoeShared.Utilities;
+    using PoeShared.Scaffolding;
 
     using Prism;
 

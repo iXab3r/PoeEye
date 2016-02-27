@@ -10,7 +10,7 @@
 
     using PoeShared;
     using PoeShared.Chat;
-    using PoeShared.Utilities;
+    using PoeShared.Scaffolding;
 
     internal sealed class PoeWhispers : DisposableReactiveObject, IPoeWhispers
     {

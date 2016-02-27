@@ -4,14 +4,14 @@
                     xmlns:sd="clr-namespace:System.Drawing;assembly=System.Drawing"
                     xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
                     xmlns:wpfAwesomium="clr-namespace:WpfAwesomium;assembly=WpfAwesomium"
-                    xmlns:utilities="clr-namespace:PoeShared.Utilities;assembly=PoeShared">
+                    xmlns:scaffolding="clr-namespace:PoeShared.Scaffolding;assembly=PoeShared">
   <DataTemplate DataType="{x:Type viewModels:PoeTradeCaptchaViewModel}">
     <Grid>
-      <utilities:DataPiping.DataPipes>
-        <utilities:DataPipeCollection>
-          <utilities:DataPipe Source="{Binding ElementName=WebBrowser}" Target="{Binding Browser, Mode=OneWayToSource}" />
-        </utilities:DataPipeCollection>
-      </utilities:DataPiping.DataPipes>
+      <scaffolding:DataPiping.DataPipes>
+        <scaffolding:DataPipeCollection>
+          <scaffolding:DataPipe Source="{Binding ElementName=WebBrowser}" Target="{Binding Browser, Mode=OneWayToSource}" />
+        </scaffolding:DataPipeCollection>
+      </scaffolding:DataPiping.DataPipes>
 
       <controls:ProgressRing IsActive="{Binding IsBusy}"
                              Visibility="{Binding IsBusy, Converter={StaticResource BoolFalseToCollapsedConverter}}" />

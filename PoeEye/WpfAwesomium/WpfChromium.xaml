@@ -4,14 +4,14 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:forms="clr-namespace:Awesomium.Windows.Forms;assembly=Awesomium.Windows.Forms"
-             xmlns:utilities="clr-namespace:PoeShared.Utilities;assembly=PoeShared"
+             xmlns:scaffolding="clr-namespace:PoeShared.Scaffolding;assembly=PoeShared"
              mc:Ignorable="d">
   <Grid DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=UserControl}}">
-    <utilities:DataPiping.DataPipes>
-      <utilities:DataPipeCollection>
-        <utilities:DataPipe Source="{Binding ElementName=WebBrowser}" Target="{Binding Browser, Mode=OneWayToSource}" />
-      </utilities:DataPipeCollection>
-    </utilities:DataPiping.DataPipes>
+    <scaffolding:DataPiping.DataPipes>
+      <scaffolding:DataPipeCollection>
+        <scaffolding:DataPipe Source="{Binding ElementName=WebBrowser}" Target="{Binding Browser, Mode=OneWayToSource}" />
+      </scaffolding:DataPipeCollection>
+    </scaffolding:DataPiping.DataPipes>
 
     <WindowsFormsHost>
       <forms:WebControl x:Name="WebBrowser" BackgroundImageLayout="None" IsTransparent="True" ViewType="Offscreen"

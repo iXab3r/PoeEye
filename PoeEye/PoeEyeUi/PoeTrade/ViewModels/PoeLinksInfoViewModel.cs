@@ -5,7 +5,7 @@
     using JetBrains.Annotations;
 
     using PoeShared.Common;
-    using PoeShared.Utilities;
+    using PoeShared.Scaffolding;
 
     internal sealed class PoeLinksInfoViewModel : DisposableReactiveObject
     {

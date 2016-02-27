@@ -1,6 +1,6 @@
 ﻿namespace PoeEyeUi.PoeTrade.ViewModels
 {
-    using PoeShared.Utilities;
+    using PoeShared.Scaffolding;
 
     using ReactiveUI;
 

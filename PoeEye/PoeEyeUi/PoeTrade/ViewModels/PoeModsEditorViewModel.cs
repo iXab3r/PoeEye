@@ -13,7 +13,7 @@ namespace PoeEyeUi.PoeTrade.ViewModels
     using PoeShared.Common;
     using PoeShared.PoeTrade.Query;
     using PoeShared.Prism;
-    using PoeShared.Utilities;
+    using PoeShared.Scaffolding;
 
     using ReactiveUI;
 

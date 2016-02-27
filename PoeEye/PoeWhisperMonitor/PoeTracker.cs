@@ -8,7 +8,7 @@
     using System.Reactive.Subjects;
 
     using PoeShared;
-    using PoeShared.Utilities;
+    using PoeShared.Scaffolding;
 
     internal sealed class PoeTracker : DisposableReactiveObject
     {

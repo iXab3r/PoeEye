@@ -13,7 +13,7 @@
     using PoeShared.Common;
     using PoeShared.PoeTrade;
     using PoeShared.PoeTrade.Query;
-    using PoeShared.Utilities;
+    using PoeShared.Scaffolding;
 
     using ReactiveUI;
 

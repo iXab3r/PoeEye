@@ -16,7 +16,7 @@
     using Models;
 
     using PoeShared;
-    using PoeShared.Utilities;
+    using PoeShared.Scaffolding;
 
     using Prism;
 

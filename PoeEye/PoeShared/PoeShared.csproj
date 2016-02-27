@@ -182,14 +182,13 @@
     <Compile Include="Prism\IFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RandomNumberGenerator.cs" />
-    <Compile Include="Utilities\CompositeDisposableExtensions.cs" />
-    <Compile Include="Utilities\DataPipe.cs" />
-    <Compile Include="Utilities\DataPipeCollection.cs" />
-    <Compile Include="Utilities\DataPiping.cs" />
-    <Compile Include="Utilities\DisposableReactiveObject.cs" />
-    <Compile Include="Utilities\EnumerableExtensions.cs" />
-    <Compile Include="Utilities\ObjectExtensions.cs" />
-    <Compile Include="Utilities\ObservableExtensions.cs" />
+    <Compile Include="Scaffolding\DataPipe.cs" />
+    <Compile Include="Scaffolding\DataPipeCollection.cs" />
+    <Compile Include="Scaffolding\DataPiping.cs" />
+    <Compile Include="Scaffolding\DisposableReactiveObject.cs" />
+    <Compile Include="Scaffolding\EnumerableExtensions.cs" />
+    <Compile Include="Scaffolding\ObjectExtensions.cs" />
+    <Compile Include="Scaffolding\ObservableExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

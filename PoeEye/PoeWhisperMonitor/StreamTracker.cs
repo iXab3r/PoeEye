@@ -11,7 +11,7 @@
 
     using JetBrains.Annotations;
 
-    using PoeShared.Utilities;
+    using PoeShared.Scaffolding;
 
     using TrackingStreamLib;
 

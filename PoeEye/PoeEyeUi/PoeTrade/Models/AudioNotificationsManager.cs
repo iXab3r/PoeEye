@@ -14,7 +14,7 @@
     using JetBrains.Annotations;
 
     using PoeShared;
-    using PoeShared.Utilities;
+    using PoeShared.Scaffolding;
 
     using Properties;
 

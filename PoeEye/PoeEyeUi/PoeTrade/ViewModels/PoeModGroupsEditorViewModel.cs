@@ -11,7 +11,7 @@
 
     using PoeShared.PoeTrade.Query;
     using PoeShared.Prism;
-    using PoeShared.Utilities;
+    using PoeShared.Scaffolding;
 
     using ReactiveUI;
 

@@ -10,7 +10,7 @@
     using Awesomium.Core;
     using Awesomium.Windows.Forms;
 
-    using PoeShared.Utilities;
+    using PoeShared.Scaffolding;
 
     using ReactiveUI;
 

@@ -13,7 +13,7 @@
 
     using PoeShared;
     using PoeShared.Chat;
-    using PoeShared.Utilities;
+    using PoeShared.Scaffolding;
 
     using TrackingStreamLib;
 
