@@ -12,7 +12,6 @@
         protected override void Initialize()
         {
             Container
-                .RegisterType<IClock, Clock>()
                 .RegisterType<IPoeApi, PoeTradeApi>();
         }
     }

@@ -95,7 +95,7 @@
                     })
                 .Select(x => x.curr)
                 .Where(x => x != null)
-                .Do(_ => lastUpdateTimestamp = clock.CurrentTime)
+                .Do(_ => lastUpdateTimestamp = clock.Now)
                 .Select(poeQueryInfoToQueryConverter.Convert)
                 .Select(poeLiveHistoryFactory.Create)
                 .Do(OnNextHistoryProviderCreated)
@@ -134,7 +134,7 @@
             private set { this.RaiseAndSetIfChanged(ref errors, value); }
         }
 
-        public TimeSpan TimeSinceLastUpdate => clock.CurrentTime - lastUpdateTimestamp;
+        public TimeSpan TimeSinceLastUpdate => clock.Now - lastUpdateTimestamp;
 
         public bool IsBusy => activeProviderInfo.HistoryProvider?.IsBusy ?? false;
 
@@ -168,7 +168,7 @@
             foreach (var itemViewModel in TradesList.Where(x => removedItems.Contains(x.Trade)).Where(x => x.TradeState != PoeTradeState.Removed))
             {
                 itemViewModel.TradeState = PoeTradeState.Removed;
-                itemViewModel.Trade.Timestamp = clock.CurrentTime;
+                itemViewModel.Trade.Timestamp = clock.Now;
                 HistoricalTradesViewModel.AddItems(itemViewModel.Trade);
             }
 
@@ -182,7 +182,7 @@
                         itemViewModel.AddTo(activeProvider.Anchors);
 
                         itemViewModel.TradeState = PoeTradeState.New;
-                        itemViewModel.Trade.Timestamp = clock.CurrentTime;
+                        itemViewModel.Trade.Timestamp = clock.Now;
 
                         itemViewModel
                             .WhenAnyValue(x => x.TradeState)
@@ -195,7 +195,7 @@
                     }
                 }
             }
-            lastUpdateTimestamp = clock.CurrentTime;
+            lastUpdateTimestamp = clock.Now;
         }
 
         private void RemoveItem(IPoeTradeViewModel tradeViewModel)
@@ -235,7 +235,7 @@
             if (exception != null)
             {
                 Log.Instance.Debug($"[TradesListViewModel] Received an exception from history provider", exception);
-                var errorMsg = $"[{clock.CurrentTime}] {exception.Message}";
+                var errorMsg = $"[{clock.Now}] {exception.Message}";
 
                 if (errors?.Length > 1024)
                 {

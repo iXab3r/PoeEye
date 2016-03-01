@@ -1,4 +1,4 @@
-﻿namespace PoeEye.Prism
+﻿namespace PoeEye.PoeTrade.Prism
 {
     using System.Collections.Specialized;
 
@@ -11,13 +11,11 @@
     using PoeShared.PoeTrade.Query;
     using PoeShared.Scaffolding;
 
-    using PoeTrade;
-
     using ProxyProvider;
 
     using TypeConverter;
 
-    public sealed class LiveRegistrations : UnityContainerExtension
+    internal sealed class LiveRegistrations : UnityContainerExtension
     {
         protected override void Initialize()
         {

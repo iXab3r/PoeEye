@@ -5,7 +5,7 @@
 
     using NUnit.Framework;
 
-    using PoeEye.Communications;
+    using PoeEye.PoeTrade.Communications;
 
     using Shouldly;
 

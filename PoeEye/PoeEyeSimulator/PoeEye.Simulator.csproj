@@ -99,15 +99,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Clock.cs" />
     <Compile Include="PoeTrade\PoeTradeApi.cs" />
     <Compile Include="Prism\MockRegistrations.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\PoeEye\PoeEye.csproj">
+    <ProjectReference Include="..\PoeEye\PoeEye.PoeTrade.csproj">
       <Project>{c6188345-f8dc-4cdc-8c01-add0a03bbf1c}</Project>
-      <Name>PoeEye</Name>
+      <Name>PoeEye.PoeTrade</Name>
     </ProjectReference>
     <ProjectReference Include="..\PoeShared\PoeShared.csproj">
       <Project>{12df53dd-7144-4d2d-b7a1-b4bc5bbdfb69}</Project>

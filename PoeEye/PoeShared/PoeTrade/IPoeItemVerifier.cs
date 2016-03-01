@@ -1,4 +1,4 @@
-﻿namespace PoeEye.PoeTrade
+﻿namespace PoeShared.PoeTrade
 {
     using System.Threading.Tasks;
 

@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PoeEye", "PoeEye\PoeEye.csproj", "{C6188345-F8DC-4CDC-8C01-ADD0A03BBF1C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PoeEye.PoeTrade", "PoeEye\PoeEye.PoeTrade.csproj", "{C6188345-F8DC-4CDC-8C01-ADD0A03BBF1C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PoeShared", "PoeShared\PoeShared.csproj", "{12DF53DD-7144-4D2D-B7A1-B4BC5BBDFB69}"
 EndProject
@@ -12,8 +12,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PoeEyeUi", "PoeEyeUi\PoeEyeUi.csproj", "{9BC98190-3DB1-48CD-84F7-96DC843718AE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PoeEye.Simulator", "PoeEyeSimulator\PoeEye.Simulator.csproj", "{785DC21D-42F1-4DB9-883F-4D02CCF73FF0}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PoeEye.Console", "PoeEye.Console\PoeEye.Console.csproj", "{B3EE260B-E1BA-4F99-8991-60A3015F2CFF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FuzzySearch", "FuzzySearch\FuzzySearch.csproj", "{9CEE14A8-1436-4947-9C62-FF3BA83A330D}"
 EndProject
@@ -47,10 +45,6 @@ Global
 		{785DC21D-42F1-4DB9-883F-4D02CCF73FF0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{785DC21D-42F1-4DB9-883F-4D02CCF73FF0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{785DC21D-42F1-4DB9-883F-4D02CCF73FF0}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B3EE260B-E1BA-4F99-8991-60A3015F2CFF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B3EE260B-E1BA-4F99-8991-60A3015F2CFF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B3EE260B-E1BA-4F99-8991-60A3015F2CFF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B3EE260B-E1BA-4F99-8991-60A3015F2CFF}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9CEE14A8-1436-4947-9C62-FF3BA83A330D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{9CEE14A8-1436-4947-9C62-FF3BA83A330D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9CEE14A8-1436-4947-9C62-FF3BA83A330D}.Release|Any CPU.ActiveCfg = Release|Any CPU

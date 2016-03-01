@@ -9,51 +9,23 @@
 
     using log4net;
 
-    using Microsoft.Practices.Unity;
-
-    using PoeEye.Prism;
-
     using PoeShared;
-    using PoeShared.Prism;
-
-    using PoeTrade.ViewModels;
-    using PoeTrade.Views;
-
-    using PoeWhisperMonitor.Prism;
 
     using Prism;
 
-    using ReactiveUI;
-
-    /// <summary>
-    ///     Interaction logic for App.xaml
-    /// </summary>
     public partial class App
     {
         private static readonly string AppVersion = $"v{Assembly.GetExecutingAssembly().GetName().Version}";
-        private static readonly Lazy<UnityContainer> UnityContainerInstance = new Lazy<UnityContainer>();
-
-        public static IUnityContainer Container => UnityContainerInstance.Value;
-
 
         public App()
         {
-            // used for log4net configuration
-#if DEBUG
-            GlobalContext.Properties["configuration"] = "Debug";
-#else
-            GlobalContext.Properties["configuration"] = "Release";
-#endif
-            Log.Instance.Info("Application started");
+            InitializeLogging();
 
-            AppDomain.CurrentDomain.UnhandledException += CurrentDomainOnUnhandledException;
+            InitializeExceptionless();
+        }
 
-            Log.Instance.Debug("Initializing DI container...");
-            Container.AddExtension(new CommonRegistrations());
-            Container.AddExtension(new PoeWhisperRegistrations());
-            Container.AddExtension(new LiveRegistrations());
-            Container.AddExtension(new UiRegistrations());
-
+        private static void InitializeExceptionless()
+        {
             Log.Instance.Debug("Initializing exceptionless...");
             ExceptionlessClient.Default.Configuration.ApiKey = "dkjcxnVxQO9Nx6zJdYYyAW66gHt5YP5XCmHNmjYj";
             ExceptionlessClient.Default.Configuration.DefaultTags.Add($".NET {Environment.Version}");
@@ -63,12 +35,25 @@
             ExceptionlessClient.Default.Configuration.SetVersion(AppVersion);
             ExceptionlessClient.Default.Configuration.SetUserIdentity($"{Environment.UserName}@{Environment.MachineName}");
 
-            ExceptionlessClient.Default.SubmitEvent(new Event { Message = AppVersion, Type = "Version" });
+            ExceptionlessClient.Default.SubmitEvent(new Event {Message = AppVersion, Type = "Version"});
         }
 
         private void CurrentDomainOnUnhandledException(object sender, UnhandledExceptionEventArgs unhandledExceptionEventArgs)
         {
             Log.Instance.Error($"Unhandled application exception", unhandledExceptionEventArgs.ExceptionObject as Exception);
+        }
+
+        private void InitializeLogging()
+        {
+            // used for log4net configuration
+#if DEBUG
+            GlobalContext.Properties["configuration"] = "Debug";
+#else
+            GlobalContext.Properties["configuration"] = "Release";
+#endif
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomainOnUnhandledException;
+
+            Log.Instance.Info("Application logging started");
         }
 
         protected override void OnStartup(StartupEventArgs e, bool? isFirstInstance)
@@ -77,6 +62,7 @@
 
             if (isFirstInstance != false)
             {
+                new PoeEyeBootstrapper().Run();
                 return;
             }
 
@@ -97,14 +83,6 @@
             Log.Instance.Warn($"Shutting down...");
             Shutdown(1);
 #endif
-        }
-
-        private void App_OnStartup(object sender, StartupEventArgs e)
-        {
-            var mainWindow = Container.Resolve<MainWindow>();
-            mainWindow.DataContext = Container.Resolve<IMainWindowViewModel>();
-
-            mainWindow.Show();
         }
     }
 }

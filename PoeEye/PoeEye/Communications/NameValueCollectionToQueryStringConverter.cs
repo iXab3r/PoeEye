@@ -1,4 +1,4 @@
-﻿namespace PoeEye.Communications
+﻿namespace PoeEye.PoeTrade.Communications
 {
     using System.Collections.Generic;
     using System.Collections.Specialized;

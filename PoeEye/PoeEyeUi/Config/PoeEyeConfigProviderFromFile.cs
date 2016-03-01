@@ -2,6 +2,7 @@ namespace PoeEyeUi.Config
 {
     using System;
     using System.IO;
+    using System.Linq;
     using System.Text;
 
     using Converters;
@@ -37,13 +38,18 @@ namespace PoeEyeUi.Config
             {
                 Formatting = Formatting.Indented
             };
-            jsonSerializerSettings.Converters.Add(new ConcreteListTypeConverter<IPoeQueryInfo, PoeQueryInfo>());
-            jsonSerializerSettings.Converters.Add(new ConcreteListTypeConverter<IPoeItemType, PoeItemType>());
-            jsonSerializerSettings.Converters.Add(new ConcreteListTypeConverter<IPoeItem, PoeItem>());
-            jsonSerializerSettings.Converters.Add(new ConcreteListTypeConverter<IPoeItemMod, PoeItemMod>());
-            jsonSerializerSettings.Converters.Add(new ConcreteListTypeConverter<IPoeLinksInfo, PoeLinksInfo>());
-            jsonSerializerSettings.Converters.Add(new ConcreteListTypeConverter<IPoeQueryModsGroup, PoeQueryModsGroup>());
-            jsonSerializerSettings.Converters.Add(new ConcreteListTypeConverter<IPoeQueryRangeModArgument, PoeQueryRangeModArgument>());
+
+            var converters = new JsonConverter[]
+            {
+                new ConcreteListTypeConverter<IPoeQueryInfo, PoeQueryInfo>(),
+                new ConcreteListTypeConverter<IPoeItemType, PoeItemType>(),
+                new ConcreteListTypeConverter<IPoeItem, PoeItem>(),
+                new ConcreteListTypeConverter<IPoeItemMod, PoeItemMod>(),
+                new ConcreteListTypeConverter<IPoeLinksInfo, PoeLinksInfo>(),
+                new ConcreteListTypeConverter<IPoeQueryModsGroup, PoeQueryModsGroup>(),
+                new ConcreteListTypeConverter<IPoeQueryRangeModArgument, PoeQueryRangeModArgument>()
+            };
+            converters.ToList().ForEach(jsonSerializerSettings.Converters.Add);
 
             Reload();
         }

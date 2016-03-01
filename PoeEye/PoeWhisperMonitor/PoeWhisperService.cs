@@ -13,12 +13,12 @@
     using PoeShared;
     using PoeShared.Scaffolding;
 
-    internal sealed class PoeWhispers : DisposableReactiveObject, IPoeWhispers
+    internal sealed class PoeWhisperService : DisposableReactiveObject, IPoeWhisperService
     {
         private readonly ISubject<PoeMessage> messagesSubject = new Subject<PoeMessage>();
         private readonly IDictionary<string, IDisposable> sourcesByPath = new Dictionary<string, IDisposable>();
 
-        public PoeWhispers()
+        public PoeWhisperService()
         {
             var tracker = new PoeTracker();
             var converter = new PoeProcessToLogFilePathConverter();

@@ -2,12 +2,12 @@
 {
     using Microsoft.Practices.Unity;
 
-    public sealed class PoeWhisperRegistrations : UnityContainerExtension
+    internal sealed class PoeWhisperRegistrations : UnityContainerExtension
     {
         protected override void Initialize()
         {
             Container
-                .RegisterType<IPoeWhispers, PoeWhispers>();
+                .RegisterType<IPoeWhisperService, PoeWhisperService>();
         }
     }
 }

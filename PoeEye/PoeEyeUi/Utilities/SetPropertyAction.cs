@@ -10,7 +10,7 @@
     ///     TargetObject is not supplied then the property is set on the object
     ///     to which the trigger is attached.
     /// </summary>
-    internal class SetPropertyAction : TriggerAction<FrameworkElement>
+    internal sealed class SetPropertyAction : TriggerAction<FrameworkElement>
     {
         public static readonly DependencyProperty PropertyNameProperty
             = DependencyProperty.Register(
@@ -30,8 +30,6 @@
                 typeof (object),
                 typeof (SetPropertyAction));
 
-        // PropertyName DependencyProperty.
-
         /// <summary>
         ///     The property to be executed in response to the trigger.
         /// </summary>
@@ -40,9 +38,6 @@
             get { return (string) GetValue(PropertyNameProperty); }
             set { SetValue(PropertyNameProperty, value); }
         }
-
-
-        // PropertyValue DependencyProperty.
 
         /// <summary>
         ///     The value to set the property to.
@@ -54,8 +49,6 @@
         }
 
 
-        // TargetObject DependencyProperty.
-
         /// <summary>
         ///     Specifies the object upon which to set the property.
         /// </summary>
@@ -64,9 +57,6 @@
             get { return GetValue(TargetObjectProperty); }
             set { SetValue(TargetObjectProperty, value); }
         }
-
-
-        // Private Implementation.
 
         protected override void Invoke(object parameter)
         {

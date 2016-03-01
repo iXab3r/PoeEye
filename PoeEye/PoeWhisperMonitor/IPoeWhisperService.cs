@@ -6,7 +6,7 @@
 
     using JetBrains.Annotations;
 
-    public interface IPoeWhispers
+    public interface IPoeWhisperService
     {
         IObservable<PoeMessage> Messages { [NotNull] get; }
     }

@@ -12,6 +12,7 @@
     using PoeShared;
     using PoeShared.Common;
     using PoeShared.Http;
+    using PoeShared.PoeTrade;
     using PoeShared.Prism;
 
     internal sealed class PoeItemVerifier : IPoeItemVerifier

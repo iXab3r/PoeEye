@@ -29,12 +29,25 @@
     [TestFixture]
     internal sealed class PoeTradesListViewModelFixture
     {
+        private Mock<IClock> clock;
+        private Mock<IEqualityComparer<IPoeItem>> poeItemsComparer;
+        private Mock<IFactory<IPoeTradeViewModel, IPoeItem>> poeTradeViewModelFactory;
+        private Mock<IFactory<IPoeLiveHistoryProvider, IPoeQuery>> poeLiveHistoryFactory;
+
+        private Mock<IPoeLiveHistoryProvider> poeLiveHistory;
+        private Mock<IHistoricalTradesViewModel> historicalTradesViewModel;
+        private Mock<IPoeCaptchaRegistrator> captchaService;
+        private ISubject<IPoeItem[]> poeLiveHistoryItems;
+        private ISubject<Exception> poeLiveHistoryUpdateExceptions;
+
+        private Mock<IConverter<IPoeQueryInfo, IPoeQuery>> poeQueryInfoToQueryConverter;
+
         [SetUp]
         public void SetUp()
         {
             clock = new Mock<IClock>();
             clock
-                .SetupGet(x => x.CurrentTime)
+                .SetupGet(x => x.Now)
                 .Returns(new DateTime(2015, 1, 1));
 
             poeTradeViewModelFactory = new Mock<IFactory<IPoeTradeViewModel, IPoeItem>>();
@@ -66,19 +79,6 @@
             historicalTradesViewModel = new Mock<IHistoricalTradesViewModel>();
             captchaService = new Mock<IPoeCaptchaRegistrator>();
         }
-
-        private Mock<IClock> clock;
-        private Mock<IEqualityComparer<IPoeItem>> poeItemsComparer;
-        private Mock<IFactory<IPoeTradeViewModel, IPoeItem>> poeTradeViewModelFactory;
-        private Mock<IFactory<IPoeLiveHistoryProvider, IPoeQuery>> poeLiveHistoryFactory;
-
-        private Mock<IPoeLiveHistoryProvider> poeLiveHistory;
-        private Mock<IHistoricalTradesViewModel> historicalTradesViewModel;
-        private Mock<IPoeCaptchaRegistrator> captchaService;
-        private ISubject<IPoeItem[]> poeLiveHistoryItems;
-        private ISubject<Exception> poeLiveHistoryUpdateExceptions;
-
-        private Mock<IConverter<IPoeQueryInfo, IPoeQuery>> poeQueryInfoToQueryConverter;
 
         private IPoeTradeViewModel CreateTradeVm(IPoeItem item)
         {
@@ -286,7 +286,7 @@
             instance.ActiveQuery = Mock.Of<IPoeQueryInfo>();
 
             var now = new DateTime(2015, 1, 1);
-            clock.Setup(x => x.CurrentTime).Returns(now);
+            clock.SetupGet(x => x.Now).Returns(now);
             var exception = new Exception("msg");
 
             //When

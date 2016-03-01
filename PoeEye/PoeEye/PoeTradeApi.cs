@@ -126,7 +126,7 @@
                     throw;
                 }
                 proxyToken.ReportBroken();
-                throw new WebException($"{ex.Message} (Proxy {proxyToken.Proxy})");
+                throw new WebException($"{ex.Message} (Proxy {proxyToken.Proxy})", ex);
             }
         }
 
