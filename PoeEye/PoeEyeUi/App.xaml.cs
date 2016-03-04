@@ -35,7 +35,7 @@
             ExceptionlessClient.Default.Configuration.SetVersion(AppVersion);
             ExceptionlessClient.Default.Configuration.SetUserIdentity($"{Environment.UserName}@{Environment.MachineName}");
 
-            ExceptionlessClient.Default.SubmitEvent(new Event {Message = AppVersion, Type = "Version"});
+            ExceptionlessClient.Default.SubmitEvent(new Event { Message = AppVersion, Type = "Version" });
         }
 
         private void CurrentDomainOnUnhandledException(object sender, UnhandledExceptionEventArgs unhandledExceptionEventArgs)
@@ -60,13 +60,19 @@
         {
             base.OnStartup(e, isFirstInstance);
 
-            if (isFirstInstance != false)
+            if (isFirstInstance != true)
             {
-                new PoeEyeBootstrapper().Run();
-                return;
+                Log.Instance.Warn($"Application is already running !");
+                ShutdownIfNotInDebugMode();
             }
 
-            Log.Instance.Warn($"Application is already running !");
+            Log.Instance.Info($"Initializing bootstrapper...");
+            var bootstrapper = new PoeEyeBootstrapper();
+            bootstrapper.Run();
+        }
+
+        private void ShutdownIfNotInDebugMode()
+        {
 #if !DEBUG
             var assemblyName = System.Reflection.Assembly.GetExecutingAssembly().GetName();
             var window = MainWindow;

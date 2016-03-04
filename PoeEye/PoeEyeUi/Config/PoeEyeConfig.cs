@@ -46,6 +46,6 @@ namespace PoeEyeUi.Config
 
         public bool WhisperNotificationsEnabled { get; set; } = false;
 
-        public TimeSpan MinRefreshTimeout { get; set; } = TimeSpan.FromMinutes(5);
+        public TimeSpan MinRefreshTimeout { get; set; } = TimeSpan.FromSeconds(30);
     }
 }
