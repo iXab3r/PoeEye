@@ -4,7 +4,7 @@ namespace PoeShared.Common
     using System.Collections.Generic;
     using System.Linq;
 
-    public sealed class PoeItemEqualityComparer : IEqualityComparer<IPoeItem>
+    internal sealed class PoeItemEqualityComparer : IEqualityComparer<IPoeItem>
     {
         private readonly PoeItemModEqualityComparer itemModEqualityComparer = new PoeItemModEqualityComparer();
 

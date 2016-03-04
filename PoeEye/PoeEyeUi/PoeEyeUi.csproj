@@ -38,7 +38,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>..\Bin\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -49,7 +49,7 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>..\Bin\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -398,11 +398,11 @@
       <Project>{9cee14a8-1436-4947-9c62-ff3ba83a330d}</Project>
       <Name>FuzzySearch</Name>
     </ProjectReference>
-    <ProjectReference Include="..\PoeEyeSimulator\PoeEye.Simulator.csproj">
+    <ProjectReference Include="..\PoeEye.Simulator\PoeEye.Simulator.csproj">
       <Project>{785dc21d-42f1-4db9-883f-4d02ccf73ff0}</Project>
       <Name>PoeEye.Simulator</Name>
     </ProjectReference>
-    <ProjectReference Include="..\PoeEye\PoeEye.PoeTrade.csproj">
+    <ProjectReference Include="..\PoeEye.PoeTrade\PoeEye.PoeTrade.csproj">
       <Project>{c6188345-f8dc-4cdc-8c01-add0a03bbf1c}</Project>
       <Name>PoeEye.PoeTrade</Name>
     </ProjectReference>

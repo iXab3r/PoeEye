@@ -7,6 +7,7 @@ namespace PoeEyeUi.Prism
     using System.Windows;
 
     using Microsoft.Practices.Unity;
+    using Microsoft.Practices.Unity.Configuration;
 
     using PoeShared;
     using PoeShared.Prism;

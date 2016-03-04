@@ -212,3 +212,5 @@ _Pvt_Extensions/
 ModelManifest.xml
 *.ncrunchproject
 *.ncrunchsolution
+.idea
+*.iml

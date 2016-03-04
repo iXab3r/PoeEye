@@ -3,7 +3,7 @@ namespace PoeShared.Common
     using System.Collections;
     using System.Collections.Generic;
 
-    public sealed class PoeItemModEqualityComparer : IEqualityComparer<IPoeItemMod>, IComparer
+    internal sealed class PoeItemModEqualityComparer : IEqualityComparer<IPoeItemMod>, IComparer
     {
         public int Compare(object x, object y)
         {
@@ -41,7 +41,7 @@ namespace PoeShared.Common
 
         public int GetHashCode(IPoeItemMod obj)
         {
-            return obj.Name != null ? obj.Name.GetHashCode() : 0;
+            return obj.Name?.GetHashCode() ?? 0;
         }
     }
 }

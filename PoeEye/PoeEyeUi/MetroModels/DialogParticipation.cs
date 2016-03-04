@@ -4,6 +4,8 @@ namespace PoeEyeUi.MetroModels
     using System.Collections.Generic;
     using System.Windows;
 
+    using Guards;
+
     internal static class DialogParticipation
     {
         private static readonly IDictionary<object, DependencyObject> ContextRegistrationIndex = new Dictionary<object, DependencyObject>();
@@ -39,20 +41,14 @@ namespace PoeEyeUi.MetroModels
 
         internal static bool IsRegistered(object context)
         {
-            if (context == null)
-            {
-                throw new ArgumentNullException("context");
-            }
-
+            Guard.ArgumentNotNull(() => context);
+            
             return ContextRegistrationIndex.ContainsKey(context);
         }
 
         internal static DependencyObject GetAssociation(object context)
         {
-            if (context == null)
-            {
-                throw new ArgumentNullException("context");
-            }
+            Guard.ArgumentNotNull(() => context);
 
             return ContextRegistrationIndex[context];
         }

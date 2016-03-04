@@ -151,6 +151,7 @@
             {
                 return;
             }
+            captchaRegistrator.CaptchaRequests.OnNext("http://google.com");
 
             ExceptionlessClient.Default
                                .CreateFeatureUsage("TradeList")
@@ -224,8 +225,8 @@
                 .AddTo(activeProviderInfo.Anchors);
 
             this.WhenAnyValue(x => x.RecheckPeriod)
-                .ObserveOn(uiScheduler)
                 .Throttle(RecheckPeriodThrottleTimeout)
+                .ObserveOn(uiScheduler)
                 .Subscribe(x => poeLiveHistoryProvider.RecheckPeriod = recheckPeriod)
                 .AddTo(activeProviderInfo.Anchors);
         }

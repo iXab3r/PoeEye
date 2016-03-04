@@ -28,7 +28,8 @@
                 .Where(x => x.IsNew)
                 .Select(x => x.curr)
                 .Do(LogProcesses)
-                .Subscribe(processeSubject);
+                .Subscribe(processeSubject)
+                .AddTo(Anchors);
         }
 
         public IObservable<PoeProcessInfo[]> ActiveProcesses => processeSubject;
