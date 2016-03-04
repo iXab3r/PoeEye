@@ -78,6 +78,7 @@
 
             historicalTradesViewModel = new Mock<IHistoricalTradesViewModel>();
             captchaService = new Mock<IPoeCaptchaRegistrator>();
+            captchaService.Setup(x => x.CaptchaRequests).Returns(new Subject<string>());
         }
 
         private IPoeTradeViewModel CreateTradeVm(IPoeItem item)
@@ -89,20 +90,6 @@
                 .Callback(value => result.SetPropertyAndNotify(x => x.TradeState, value));
             return result.Object;
         }
-
-        private PoeTradesListViewModel CreateInstance()
-        {
-            return new PoeTradesListViewModel(
-                poeLiveHistoryFactory.Object,
-                poeTradeViewModelFactory.Object,
-                captchaService.Object,
-                historicalTradesViewModel.Object,
-                poeItemsComparer.Object,
-                poeQueryInfoToQueryConverter.Object,
-                clock.Object,
-                Scheduler.Immediate);
-        }
-
 
         [Test]
         [TestCase(0)]
@@ -318,6 +305,19 @@
             //Then
             trade.TradeState.ShouldBe(PoeTradeState.Normal);
             instance.TradesList.Count.ShouldBe(0);
+        }
+
+        private PoeTradesListViewModel CreateInstance()
+        {
+            return new PoeTradesListViewModel(
+                poeLiveHistoryFactory.Object,
+                poeTradeViewModelFactory.Object,
+                captchaService.Object,
+                historicalTradesViewModel.Object,
+                poeItemsComparer.Object,
+                poeQueryInfoToQueryConverter.Object,
+                clock.Object,
+                Scheduler.Immediate);
         }
     }
 }
