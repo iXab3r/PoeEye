@@ -12,20 +12,20 @@
         <file src="Bin\NuGet.Squirrel.dll" target="lib\.net45\NuGet.Squirrel.dll" />
         <file src="Bin\Squirrel.dll" target="lib\.net45\Squirrel.dll" />
         <file src="Bin\PoeEyeUi.exe" target="lib\.net45\PoeEyeUi.exe" />
-        <file src="Bin\PoeEyeUi.exe.config" target="lib\.nuspect45\PoeEyeUi.exe.config" />
-        <file src="Bin\WpfAwesomium.exe" target="lib.net45\WpfAwesomium.exe" />
-        <file src="Bin\avcodec-53.dll" target="lib.net45\avcodec-53.dll" />
-        <file src="Bin\avformat-53.dll" target="lib.net45\avformat-53.dll" />
-        <file src="Bin\avutil-51.dll" target="lib.net45\avutil-51.dll" />
-        <file src="Bin\awesomium.dll" target="lib.net45\awesomium.dll" />
-        <file src="Bin\awesomium_process" target="lib.net45\awesomium_process" />
-        <file src="Bin\icudt.dll" target="lib.net45\icudt.dll" />
-        <file src="Bin\inspector.pak" target="lib.net45\inspector.pak" />
-        <file src="Bin\libEGL.dll" target="lib.net45\libEGL.dll" />
-        <file src="Bin\libGLESv2.dll" target="lib.net45\libGLESv2.dll" />
-        <file src="Bin\pdf_js.pak" target="lib.net45\pdf_js.pak" />
-        <file src="Bin\xinput9_1_0.dll" target="lib.net45\xinput9_1_0.dll" />
-        <file src="Bin\Awesomium.Core.dll" target="lib.net45\Awesomium.Core.dll" />
-        <file src="Bin\Awesomium.Windows.Forms.dll" target="lib.net45\Awesomium.Windows.Forms.dll" />
+        <file src="Bin\PoeEyeUi.exe.config" target="lib\.net45\PoeEyeUi.exe.config" />
+        <file src="Bin\WpfAwesomium.exe" target="lib\.net45\WpfAwesomium.exe" />
+        <file src="Bin\avcodec-53.dll" target="lib\.net45\avcodec-53.dll" />
+        <file src="Bin\avformat-53.dll" target="lib\.net45\avformat-53.dll" />
+        <file src="Bin\avutil-51.dll" target="lib\.net45\avutil-51.dll" />
+        <file src="Bin\awesomium.dll" target="lib\.net45\awesomium.dll" />
+        <file src="Bin\awesomium_process" target="lib\.net45\awesomium_process" />
+        <file src="Bin\icudt.dll" target="lib\.net45\icudt.dll" />
+        <file src="Bin\inspector.pak" target="lib\.net45\inspector.pak" />
+        <file src="Bin\libEGL.dll" target="lib\.net45\libEGL.dll" />
+        <file src="Bin\libGLESv2.dll" target="lib\.net45\libGLESv2.dll" />
+        <file src="Bin\pdf_js.pak" target="lib\.net45\pdf_js.pak" />
+        <file src="Bin\xinput9_1_0.dll" target="lib\.net45\xinput9_1_0.dll" />
+        <file src="Bin\Awesomium.Core.dll" target="lib\.net45\Awesomium.Core.dll" />
+        <file src="Bin\Awesomium.Windows.Forms.dll" target="lib\.net45\Awesomium.Windows.Forms.dll" />
     </files>
 </package>
