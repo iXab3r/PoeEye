@@ -26,7 +26,6 @@
         <file src="Bin\pdf_js.pak" target="lib.net45\pdf_js.pak" />
         <file src="Bin\xinput9_1_0.dll" target="lib.net45\xinput9_1_0.dll" />
         <file src="Bin\Awesomium.Core.dll" target="lib.net45\Awesomium.Core.dll" />
-        <file src="Bin\Awesomium.Windows.Controls.dll" target="lib.net45\Awesomium.Windows.Controls.dll" />
         <file src="Bin\Awesomium.Windows.Forms.dll" target="lib.net45\Awesomium.Windows.Forms.dll" />
     </files>
 </package>
