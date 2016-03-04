@@ -151,7 +151,6 @@
             {
                 return;
             }
-            captchaRegistrator.CaptchaRequests.OnNext("http://google.com");
 
             ExceptionlessClient.Default
                                .CreateFeatureUsage("TradeList")
