@@ -36,8 +36,16 @@
 
         private Process[] GetPathOfExileProcesses()
         {
-            var result = Process.GetProcessesByName(PathOfExileProcessName).OrderBy(x => x.Id).ToArray();
-            return result;
+            try
+            {
+                var result = Process.GetProcessesByName(PathOfExileProcessName).OrderBy(x => x.Id).ToArray();
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Log.HandleException(ex);
+                return new Process[0];
+            }
         }
 
         private void LogProcesses(PoeProcessInfo[] processes)
@@ -47,13 +55,22 @@
 
         public PoeProcessInfo ToProcessInfo(Process process)
         {
-            var result = new PoeProcessInfo
+            try
             {
-                ProcessId = process.Id,
-                Executable = new FileInfo(process.MainModule.FileName)
-            };
+                var result = new PoeProcessInfo
+                {
+                    ProcessId = process.Id,
+                    Executable = new FileInfo(process.MainModule.FileName)
+                };
 
-            return result;
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Log.HandleException(ex);
+                return new PoeProcessInfo();
+            }
+            
         }
     }
 }
