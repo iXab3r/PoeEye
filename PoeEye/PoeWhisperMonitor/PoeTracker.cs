@@ -7,6 +7,8 @@
     using System.Reactive.Linq;
     using System.Reactive.Subjects;
 
+    using JetBrains.Annotations;
+
     using PoeShared;
     using PoeShared.Scaffolding;
 
@@ -23,7 +25,7 @@
             Observable
                 .Timer(DateTimeOffset.Now, RecheckTimeout)
                 .Select(_ => GetPathOfExileProcesses())
-                .Select(x => x.Select(ToProcessInfo).ToArray())
+                .Select(x => x.Select(ToProcessInfo).Where(y => !default(PoeProcessInfo).Equals(y)).ToArray())
                 .WithPrevious((prev, curr) => new {IsNew = !(prev ?? new PoeProcessInfo[0]).SequenceEqual(curr, PoeProcessInfo.ExecutableComparer), curr})
                 .Where(x => x.IsNew)
                 .Select(x => x.curr)
@@ -53,7 +55,8 @@
             Log.Instance.Debug($"[PoeTracker] Processes list have changed(count: {processes.Length}): \r\n\t{string.Join("\r\n\t", processes)}");
         }
 
-        public PoeProcessInfo ToProcessInfo(Process process)
+        [CanBeNull]
+        private PoeProcessInfo ToProcessInfo(Process process)
         {
             try
             {
@@ -68,7 +71,7 @@
             catch (Exception ex)
             {
                 Log.HandleException(ex);
-                return new PoeProcessInfo();
+                return default(PoeProcessInfo);
             }
             
         }
