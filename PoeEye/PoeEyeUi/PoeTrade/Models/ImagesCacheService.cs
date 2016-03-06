@@ -28,7 +28,7 @@
         private static readonly TimeSpan ArtificialDelay = TimeSpan.FromSeconds(5);
         private readonly IScheduler uiScheduler;
 
-        private readonly string CacheFolderName = "Cache";
+        private static readonly string CachePath = Environment.ExpandEnvironmentVariables($@"%APPDATA%\PoeEye\Cache\");
         private readonly IFactory<IHttpClient> httpClientFactory;
 
         private readonly IDictionary<string, IObservable<FileInfo>> imagesBeingLoaded = new ConcurrentDictionary<string, IObservable<FileInfo>>();
@@ -104,7 +104,7 @@
 
         private string ConstructPath(string imageUri)
         {
-            var cachePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, CacheFolderName);
+            var cachePath = CachePath;
             var uriHash = Sha256(imageUri);
 
             var extension = Path.HasExtension(imageUri) ? Path.GetExtension(imageUri) : string.Empty;

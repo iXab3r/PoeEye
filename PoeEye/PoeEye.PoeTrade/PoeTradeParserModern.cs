@@ -161,7 +161,7 @@ namespace PoeEye.PoeTrade
                 BlockChance = parser["td[class=table-stats] td[data-name=block]"]?.Text(),
                 CriticalChance = parser["td[class=table-stats] td[data-name=crit]"]?.Text(),
                 Level = parser["td[class=table-stats] td[data-name=level]"]?.Text(),
-                Requirements = parser["td[class=item-cell] p[class=requirements]"]?.Text(),
+                Requirements = parser["td[class=item-cell] ul[class=requirements proplist]"]?.Text(),
                 IsCorrupted = parser["td[class=item-cell] span[class~=corrupted]"].Any(),
                 Mods = implicitMods.Concat(explicitMods).ToArray(),
                 Links = ExtractLinksInfo(row),
