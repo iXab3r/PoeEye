@@ -1,5 +1,8 @@
 namespace PoeEyeUi.PoeTrade.ViewModels
 {
+    using System;
+    using System.Reactive.Linq;
+
     using Guards;
 
     using JetBrains.Annotations;
@@ -18,17 +21,30 @@ namespace PoeEyeUi.PoeTrade.ViewModels
             Owner = owner;
             Trade = trade;
 
-            trade.WhenAnyValue(x => x.TradeState)
-                 .Subscribe(() => this.RaisePropertyChanged())
-                 .AddTo(Anchors);
-
-            owner.WhenAnyValue(x => x.AudioNotificationEnabled)
-                 .Subscribe(() => this.RaisePropertyChanged())
-                 .AddTo(Anchors);
+            Observable.Merge(
+                    trade.WhenAnyValue(x => x.TradeState).ToUnit(),
+                    trade.WhenAnyValue(x => x.PriceInChaosOrbs).ToUnit(),
+                    owner.WhenAnyValue(x => x.AudioNotificationEnabled).ToUnit(),
+                    owner.WhenAnyValue(x => x.Query).ToUnit())
+               .Subscribe(() => this.RaisePropertyChanged())
+               .AddTo(Anchors);
         }
+
+        public string Description => FormatDescription(Owner.Query?.Description);
 
         public IMainWindowTabViewModel Owner { [NotNull] get; }
 
         public IPoeTradeViewModel Trade { [NotNull] get; }
+
+        public PoeTradeState TradeState => Trade.TradeState;
+
+        public float? PriceInChaosOrbs => Trade.PriceInChaosOrbs;
+
+        public DateTime Timestamp => Trade.Trade.Timestamp;
+
+        private string FormatDescription(string description)
+        {
+            return description?.Replace(Environment.NewLine, " / ");
+        }
     }
 }

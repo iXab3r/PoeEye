@@ -194,7 +194,10 @@
                     itemsToAdd.Add(itemViewModel);
                 }
 
-                Items.AddRange(itemsToAdd);
+                using (Items.SuppressChangeNotifications())
+                {
+                    itemsToAdd.ForEach(Items.Add);
+                }
             }
             lastUpdateTimestamp = clock.Now;
         }

@@ -63,12 +63,8 @@
       </Expander>
 
       <Grid Grid.Row="2">
-        <Image
-          Source="pack://application:,,,/Resources/mainIcon.png"
-          Opacity="0.2" />
 
-        <ItemsControl Focusable="False" IsTabStop="False"
-                      Margin="0,10,0,0"
+        <ItemsControl Margin="0,10,0,0"
                       ItemsSource="{Binding Source={StaticResource tradesListSource}}"
                       Style="{StaticResource VirtualizedItemsControlStyle}">
           <ItemsControl.ItemTemplate>

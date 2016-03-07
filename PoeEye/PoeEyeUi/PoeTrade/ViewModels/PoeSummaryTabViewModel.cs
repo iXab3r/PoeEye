@@ -29,15 +29,18 @@
 
     internal sealed class PoeSummaryTabViewModel : DisposableReactiveObject
     {
-        private readonly IScheduler uiScheduler;
         private readonly IDictionary<IMainWindowTabViewModel, TabInfo> collectionByTab = new Dictionary<IMainWindowTabViewModel, TabInfo>();
 
-        private readonly ReactiveList<PoeFilteredTradeViewModel> tradesCollection = new ReactiveList<PoeFilteredTradeViewModel>()
+        private readonly ReactiveCommand<object> markAllAsReadCommand;
+
+        private readonly ReactiveList<PoeFilteredTradeViewModel> tradesCollection = new ReactiveList<PoeFilteredTradeViewModel>
         {
             ChangeTrackingEnabled = true
         };
 
-        private readonly ReactiveCommand<object> markAllAsReadCommand;
+        private readonly IScheduler uiScheduler;
+
+        private bool showAllTabs;
 
         public PoeSummaryTabViewModel(
             [NotNull] IReactiveList<IMainWindowTabViewModel> tabsList,
@@ -49,28 +52,44 @@
             markAllAsReadCommand = ReactiveCommand.Create();
             markAllAsReadCommand.Subscribe(MarkAllAsReadExecuted).AddTo(Anchors);
 
-            var source = new CollectionViewSource();
-            source.Source = tradesCollection;
-            source.IsLiveFilteringRequested = true;
-            source.IsLiveSortingRequested = true;
+            var source = new CollectionViewSource
+            {
+                IsLiveFilteringRequested = true,
+                IsLiveSortingRequested = true,
+                IsLiveGroupingRequested = true,
+                Source = tradesCollection,
+            };
+
+            source.SortDescriptions.Add(new SortDescription(nameof(PoeFilteredTradeViewModel.TradeState), ListSortDirection.Ascending));
+            source.SortDescriptions.Add(new SortDescription(nameof(PoeFilteredTradeViewModel.PriceInChaosOrbs), ListSortDirection.Ascending));
+
+            source.GroupDescriptions.Add(new PropertyGroupDescription(nameof(PoeFilteredTradeViewModel.Description)));
             source.LiveFilteringProperties.Add(null);
             source.LiveFilteringProperties.Add(string.Empty);
-            source.LiveFilteringProperties.Add(nameof(PoeFilteredTradeViewModel.Trade));
-            source.LiveFilteringProperties.Add(nameof(PoeFilteredTradeViewModel.Owner));
 
             TradesView = source.View;
             TradesView.Filter = TradeFilterPredicate;
 
-            tabsList.Changed
-                .Where(args => args != null)
-                .ObserveOn(uiScheduler)
-                .Subscribe(args => ProcessTabsCollectionChange(tabsList, args))
+            this.WhenAnyValue(x => x.ShowAllTabs)
+                .Subscribe(TradesView.Refresh)
                 .AddTo(Anchors);
+
+            tabsList.Changed
+                    .Where(args => args != null)
+                    .ObserveOn(uiScheduler)
+                    .Subscribe(args => ProcessTabsCollectionChange(tabsList, args))
+                    .AddTo(Anchors);
         }
 
         public ICollectionView TradesView { get; }
 
         public ICommand MarkAllAsReadCommand => markAllAsReadCommand;
+
+        public bool ShowAllTabs
+        {
+            get { return showAllTabs; }
+            set { this.RaiseAndSetIfChanged(ref showAllTabs, value); }
+        }
 
         private bool TradeFilterPredicate(object value)
         {
@@ -81,7 +100,7 @@
         private bool TradeFilterPredicate(PoeFilteredTradeViewModel value)
         {
             var tradeIsValid = value.Trade.TradeState == PoeTradeState.Removed || value.Trade.TradeState == PoeTradeState.New;
-            var tabIsValid = value.Owner.AudioNotificationEnabled;
+            var tabIsValid = showAllTabs || value.Owner.AudioNotificationEnabled;
             return tabIsValid && tradeIsValid;
         }
 
@@ -197,7 +216,7 @@
         {
             public CompositeDisposable Anchors { get; } = new CompositeDisposable();
 
-            public ICollection<IPoeTradeViewModel> Trades { get; }  = new HashSet<IPoeTradeViewModel>();
+            public ICollection<IPoeTradeViewModel> Trades { get; } = new HashSet<IPoeTradeViewModel>();
 
             public void Dispose()
             {

@@ -12,6 +12,8 @@
     {
         bool AudioNotificationEnabled { get; set; }
 
+        bool IsBusy { get; }
+
         IPoeTradesListViewModel TradesList { [NotNull] get; }
 
         IRecheckPeriodViewModel RecheckPeriod { [NotNull] get; }

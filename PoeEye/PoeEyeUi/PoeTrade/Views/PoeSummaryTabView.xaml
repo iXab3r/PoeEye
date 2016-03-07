@@ -9,8 +9,8 @@
                     xmlns:editors="https://github.com/iXab3r/WpfAutoCompleteControls"
                     xmlns:componentModel="clr-namespace:System.ComponentModel;assembly=WindowsBase">
   <DataTemplate DataType="{x:Type viewModels:PoeSummaryTabViewModel}">
-    
-    
+
+
     <Grid>
       <Grid.RowDefinitions>
         <RowDefinition Height="Auto"/>
@@ -18,10 +18,24 @@
       </Grid.RowDefinitions>
 
       <Border Grid.Row="0" BorderBrush="{StaticResource AccentColorBrush}" Margin="0,10" >
-        <Button Content="Mark All as Read" Command="{Binding MarkAllAsReadCommand}" />
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+          </Grid.ColumnDefinitions>
+          <Button Grid.Column="0" 
+                  Content="Mark All as Read" Command="{Binding MarkAllAsReadCommand}" Width="150" />
+          <CheckBox Grid.Column="2" 
+                    IsChecked="{Binding ShowAllTabs}" Content="Show all tabs, regardless of notification state" Margin="10,0"/>
+        </Grid>
       </Border>
+      
+      <Label Style="{StaticResource IconLabel}" FontSize="30" Content="No suitable items found yet" VerticalAlignment="Center" HorizontalAlignment="Center"
+             Grid.Row="1" 
+             Visibility="{Binding TradesView.IsEmpty, Converter={StaticResource BoolFalseToCollapsedConverter}}"/>
 
-      <ItemsControl Grid.Row="1" Focusable="False" IsTabStop="False"
+      <ItemsControl Grid.Row="1" 
                     Margin="0,10,0,0"
                     Style="{StaticResource VirtualizedItemsControlStyle}" ItemsSource="{Binding TradesView}">
         <ItemsControl.ItemTemplate>
@@ -29,6 +43,25 @@
             <ContentControl Content="{Binding Trade}" />
           </DataTemplate>
         </ItemsControl.ItemTemplate>
+
+        <ItemsControl.GroupStyle>
+          <GroupStyle>
+            <GroupStyle.Panel>
+              <ItemsPanelTemplate>
+                <VirtualizingStackPanel/>
+              </ItemsPanelTemplate>
+            </GroupStyle.Panel>
+
+            <GroupStyle.HeaderTemplate>
+              <DataTemplate>
+                <StackPanel Orientation="Horizontal" TextBlock.FontSize="14">
+                  <TextBlock Text="{Binding Name}" FontWeight="Bold" />
+                  <TextBlock Text="{Binding ItemCount, StringFormat='{}{0} item(s)'}" Margin="10,0,0,0" />
+                </StackPanel>
+              </DataTemplate>
+            </GroupStyle.HeaderTemplate>
+          </GroupStyle>
+        </ItemsControl.GroupStyle>
       </ItemsControl>
 
     </Grid>

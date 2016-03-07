@@ -57,11 +57,13 @@
           </ListBox.Resources>
         </ListBox>
 
+        <Image Grid.Column="1" Source="pack://application:,,,/Resources/mainIcon.png" Opacity="0.2" />
+
         <ContentControl Grid.Column="1"
                         Margin="5,10,10,10"
                         Visibility="{Binding SelectedTab, Converter={StaticResource NullToHiddenConverter}}"
                         Content="{Binding SelectedTab}" />
-
+        
         <ContentControl Grid.Column="1"
                         Margin="5,10,10,10"
                         Visibility="{Binding SelectedTab, Converter={StaticResource NotNullToHiddenConverter}}"
@@ -72,7 +74,7 @@
 
     <Border Grid.Row="2"
             BorderThickness="0,1,0,0" BorderBrush="{StaticResource AccentColorBrush}" Margin="5,1,10,5"
-            Visibility="{Binding SelectedTab, Converter={StaticResource NullToHiddenConverter}}">
+            Visibility="{Binding SelectedTab, Converter={StaticResource NullToCollapsedConverter}}">
       <Border.Resources>
         <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource MetroTextBlock}">
           <Setter Property="FontSize" Value="16" />
@@ -122,7 +124,7 @@
             <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
               <Style.Triggers>
                 <DataTrigger Binding="{Binding SelectedTab}" Value="{x:Null}">
-                  <Setter Property="Foreground" Value="{StaticResource AccentColorBrush4}"/>
+                  <Setter Property="Foreground" Value="{StaticResource ValidationSummaryColor4}"/>
                 </DataTrigger>
               </Style.Triggers>
             </Style>
