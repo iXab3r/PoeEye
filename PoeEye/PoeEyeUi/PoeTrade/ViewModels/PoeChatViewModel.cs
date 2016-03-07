@@ -21,13 +21,13 @@
     internal sealed class PoeChatViewModel : DisposableReactiveObject, IPoeChatViewModel
     {
         public PoeChatViewModel(
-            [NotNull] IPoeWhispers whispers,
+            [NotNull] IPoeWhisperService whisperService,
             [NotNull] [Dependency(WellKnownSchedulers.Ui)] IScheduler uiScheduler)
         {
-            Guard.ArgumentNotNull(() => whispers);
+            Guard.ArgumentNotNull(() => whisperService);
             Guard.ArgumentNotNull(() => uiScheduler);
 
-            whispers.Messages
+            whisperService.Messages
                     .ObserveOn(uiScheduler)
                     .Where(x => x.MessageType == PoeMessageType.Whisper)
                     .Subscribe(Messages.Add)

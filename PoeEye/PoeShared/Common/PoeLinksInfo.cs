@@ -11,7 +11,7 @@
         {
         }
 
-        public string RawSockets { get; set; }
+        public string RawSockets { get; }
 
         public override string ToString()
         {
@@ -42,7 +42,7 @@
 
         public override int GetHashCode()
         {
-            return RawSockets != null ? RawSockets.GetHashCode() : 0;
+            return RawSockets?.GetHashCode() ?? 0;
         }
     }
 }

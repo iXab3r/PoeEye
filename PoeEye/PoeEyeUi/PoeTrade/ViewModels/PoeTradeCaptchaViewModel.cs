@@ -69,7 +69,7 @@
                 .Where(x => browser != null)
                 .Where(x => !IsOpen)
                 .Where(x => !string.IsNullOrWhiteSpace(x))
-                .Where(x => clock.CurrentTime - lastRequestTimestamp > RequestsThrottlePeriod)
+                .Where(x => clock.Now - lastRequestTimestamp > RequestsThrottlePeriod)
                 .Do(_ => ExceptionlessClient.Default.CreateEvent().SetMessage("Encountered CAPTCHA").Submit())
                 .Subscribe(HandleRequest)
                 .AddTo(Anchors);
@@ -109,7 +109,7 @@
         {
             IsOpen = true;
             CaptchaUri = uri;
-            lastRequestTimestamp = clock.CurrentTime;
+            lastRequestTimestamp = clock.Now;
 
             if (!mainWindowTracker.IsActive)
             {

@@ -3,11 +3,11 @@
                     xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
                     xmlns:componentModel="clr-namespace:System.ComponentModel;assembly=WindowsBase"
                     xmlns:viewModels="clr-namespace:PoeEyeUi.PoeTrade.ViewModels">
-  <DataTemplate DataType="{x:Type viewModels:MainWindowTabViewModel}">
+  <DataTemplate DataType="{x:Type viewModels:MainWindowTabViewModel}" >
     <Grid>
       <Grid.Resources>
         <CollectionViewSource x:Key='tradesListSource'
-                              Source="{Binding TradesList.TradesList}"
+                              Source="{Binding TradesList.Items}"
                               IsLiveFilteringRequested="True"
                               IsLiveSortingRequested="True">
           <CollectionViewSource.SortDescriptions>
@@ -32,7 +32,7 @@
           <Expander.Header>
             <StackPanel Orientation="Horizontal">
               <TextBlock Text="Query parameters" Margin="5,0" VerticalAlignment="Center" />
-              <Button Content="Mark All as Read" Command="{Binding MarkAllAsRead}" />
+              <Button Content="Mark All as Read" Command="{Binding MarkAllAsReadCommand}" />
             </StackPanel>
           </Expander.Header>
 
@@ -48,27 +48,23 @@
       </ScrollViewer>
 
       <Expander Grid.Row="1"
-                IsExpanded="{Binding TradesList.HistoricalTradesViewModel.IsExpanded}"
-                Visibility="{Binding TradesList.HistoricalTradesViewModel.ItemsViewModels.Count, Converter={StaticResource ZeroToCollapsedConverter}}">
+                IsExpanded="{Binding TradesList.HistoricalTrades.IsExpanded}"
+                Visibility="{Binding TradesList.HistoricalTrades.ItemsViewModels.Count, Converter={StaticResource ZeroToCollapsedConverter}}">
         <Expander.Header>
           <TextBlock>
             <Run Text="Trades history ( " />
             <Run ToolTip="Historical trades"
-                 Text="{Binding TradesList.HistoricalTradesViewModel.ItemsViewModels.Count, Mode=OneWay, StringFormat=\{0\}}"
+                 Text="{Binding TradesList.HistoricalTrades.ItemsViewModels.Count, Mode=OneWay, StringFormat=\{0\}}"
                  FontWeight="Bold" />
             <Run Text=" )" />
           </TextBlock>
         </Expander.Header>
-        <ContentControl Content="{Binding TradesList.HistoricalTradesViewModel}" Margin="0" />
+        <ContentControl Content="{Binding TradesList.HistoricalTrades}" Margin="0" />
       </Expander>
 
       <Grid Grid.Row="2">
-        <Image
-          Source="pack://application:,,,/Resources/mainIcon.png"
-          Opacity="0.2" />
 
-        <ItemsControl Focusable="False" IsTabStop="False"
-                      Margin="0,10,0,0"
+        <ItemsControl Margin="0,10,0,0"
                       ItemsSource="{Binding Source={StaticResource tradesListSource}}"
                       Style="{StaticResource VirtualizedItemsControlStyle}">
           <ItemsControl.ItemTemplate>

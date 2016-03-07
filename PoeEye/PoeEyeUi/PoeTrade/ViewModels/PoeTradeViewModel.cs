@@ -23,6 +23,7 @@
 
     using PoeShared;
     using PoeShared.Common;
+    using PoeShared.PoeTrade;
     using PoeShared.Prism;
     using PoeShared.Scaffolding;
 
@@ -93,7 +94,7 @@
                       .AddTo(Anchors);
         }
 
-        public TimeSpan TimeElapsedSinceLastIndexation => Trade.Timestamp == DateTime.MinValue ? TimeSpan.Zero : clock.CurrentTime - Trade.Timestamp;
+        public TimeSpan TimeElapsedSinceLastIndexation => Trade.Timestamp == DateTime.MinValue ? TimeSpan.Zero : clock.Now - Trade.Timestamp;
 
         public ICommand OpenForumUriCommand => openForumUriCommand;
 

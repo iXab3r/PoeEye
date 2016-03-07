@@ -13,7 +13,7 @@ namespace PoeWhisperMonitor
         {
             public bool Equals(PoeProcessInfo x, PoeProcessInfo y)
             {
-                return Equals(x.Executable.FullName, y.Executable.FullName);
+                return Equals(x.Executable?.FullName, y.Executable?.FullName);
             }
 
             public int GetHashCode(PoeProcessInfo obj)
@@ -26,7 +26,7 @@ namespace PoeWhisperMonitor
 
         public override string ToString()
         {
-            return $"[PoE] '{Executable.FullName}' (PID 0x{ProcessId:X8})";
+            return $"[PoE] '{Executable?.FullName}' (PID 0x{ProcessId:X8})";
         }
     }
 }

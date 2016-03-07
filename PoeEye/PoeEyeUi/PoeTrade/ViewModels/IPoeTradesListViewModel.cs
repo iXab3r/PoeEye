@@ -14,7 +14,7 @@
 
         TimeSpan RecheckPeriod { get; set; }
 
-        IHistoricalTradesViewModel HistoricalTradesViewModel { [NotNull] get; }
+        IHistoricalTradesViewModel HistoricalTrades { [NotNull] get; }
 
         bool IsBusy { get; }
 
@@ -22,7 +22,7 @@
 
         TimeSpan TimeSinceLastUpdate { get; }
 
-        IReactiveList<IPoeTradeViewModel> TradesList { [NotNull] get; }
+        IReactiveList<IPoeTradeViewModel> Items { [NotNull] get; }
 
         void Refresh();
     }

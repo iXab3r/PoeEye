@@ -19,8 +19,6 @@
 
     using Microsoft.Practices.Unity;
 
-    using PoeEye.Prism;
-
     using PoeShared;
     using PoeShared.Scaffolding;
 
@@ -121,7 +119,7 @@
 
             try
             {
-                var appName = typeof (LiveRegistrations).Assembly.GetName().Name;
+                var appName = typeof (ApplicationUpdaterViewModel).Assembly.GetName().Name;
                 using (var mgr = new UpdateManager(PoeEyeUri, appName))
                 {
                     Log.Instance.Debug($"[ApplicationUpdaterViewModel] Checking for updates...");

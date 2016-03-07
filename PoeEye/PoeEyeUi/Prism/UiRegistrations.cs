@@ -17,6 +17,8 @@
 
     using Properties;
 
+    using ReactiveUI;
+
     using WpfAutoCompleteControls.Editors;
 
     internal sealed class UiRegistrations : UnityContainerExtension
@@ -33,8 +35,8 @@
                 .RegisterSingleton<IDialogCoordinator, DialogCoordinator>();
 
             Container
-                .RegisterType<IScheduler>(WellKnownSchedulers.Ui, new InjectionFactory(x => DispatcherScheduler.Current))
-                .RegisterType<IScheduler>(WellKnownSchedulers.Background, new InjectionFactory(x => TaskPoolScheduler.Default));
+                .RegisterType<IScheduler>(WellKnownSchedulers.Ui, new InjectionFactory(x => RxApp.MainThreadScheduler))
+                .RegisterType<IScheduler>(WellKnownSchedulers.Background, new InjectionFactory(x => RxApp.TaskpoolScheduler));
 
             Container
                 .RegisterType<IMainWindowViewModel, MainWindowViewModel>()

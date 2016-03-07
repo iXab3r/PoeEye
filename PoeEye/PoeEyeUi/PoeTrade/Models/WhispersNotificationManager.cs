@@ -23,19 +23,19 @@
         private readonly IAudioNotificationsManager audioNotificationsManager;
 
         public WhispersNotificationManager(
-            [NotNull] IPoeWhispers whispers,
+            [NotNull] IPoeWhisperService whisperService,
             [NotNull] IPoeEyeConfigProvider poeEyeConfigProvider,
             [NotNull] [Dependency(WellKnownWindows.PathOfExile)] IWindowTracker poeWindowTracker,
             [NotNull] IAudioNotificationsManager audioNotificationsManager)
         {
-            Guard.ArgumentNotNull(() => whispers);
+            Guard.ArgumentNotNull(() => whisperService);
             Guard.ArgumentNotNull(() => poeEyeConfigProvider);
             Guard.ArgumentNotNull(() => audioNotificationsManager);
             Guard.ArgumentNotNull(() => poeWindowTracker);
 
             this.audioNotificationsManager = audioNotificationsManager;
 
-            whispers.Messages
+            whisperService.Messages
                     .Where(x => poeEyeConfigProvider.ActualConfig.WhisperNotificationsEnabled)
                     .Where(x => !poeWindowTracker.IsActive)
                     .Where(x => x.MessageType == PoeMessageType.Whisper)

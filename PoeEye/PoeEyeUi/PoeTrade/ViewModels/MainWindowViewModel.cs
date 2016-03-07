@@ -45,10 +45,11 @@
 
         private readonly IFactory<IMainWindowTabViewModel> tabFactory;
 
-        private IMainWindowTabViewModel selectedItem;
+        private IMainWindowTabViewModel selectedTab;
 
         public MainWindowViewModel(
             [NotNull] IFactory<IMainWindowTabViewModel> tabFactory,
+            [NotNull] IFactory<PoeSummaryTabViewModel, IReactiveList<IMainWindowTabViewModel>> summaryTabFactory,
             [NotNull] ApplicationUpdaterViewModel applicationUpdaterViewModel,
             [NotNull] IPoeEyeConfigProvider poeEyeConfigProvider,
             [NotNull] IAudioNotificationsManager audioNotificationsManager,
@@ -63,6 +64,7 @@
             [NotNull] [Dependency(WellKnownSchedulers.Ui)] IScheduler uiScheduler)
         {
             Guard.ArgumentNotNull(() => tabFactory);
+            Guard.ArgumentNotNull(() => summaryTabFactory);
             Guard.ArgumentNotNull(() => applicationUpdaterViewModel);
             Guard.ArgumentNotNull(() => proxyProviderViewModel);
             Guard.ArgumentNotNull(() => poeEyeConfigProvider);
@@ -101,6 +103,9 @@
             ProxyProviderViewModel = proxyProviderViewModel;
             proxyProviderViewModel.AddTo(Anchors);
 
+            SummaryTab = summaryTabFactory.Create(TabsList);
+            SummaryTab.AddTo(Anchors);
+
             createNewTabCommand
                 .Subscribe(arg => CreateNewTabCommandExecuted(arg as IPoeQueryInfo))
                 .AddTo(Anchors);
@@ -113,7 +118,7 @@
 
             TabsList
                 .ItemsAdded
-                .Subscribe(x => SelectedItem = x)
+                .Subscribe(x => SelectedTab = x)
                 .AddTo(Anchors);
 
             LoadConfig();
@@ -147,11 +152,6 @@
                 .ObserveOn(uiScheduler)
                 .Subscribe(() => applicationUpdaterViewModel.CheckForUpdatesCommand.Execute(this), Log.HandleException)
                 .AddTo(Anchors);
-
-            this.WhenAnyValue(x => x.SelectedItem)
-                .Where(x => x == null && TabsList.Any())
-                .Subscribe(() => SelectedItem = TabsList.FirstOrDefault())
-                .AddTo(Anchors);
         }
 
         public ICommand CreateNewTabCommand => createNewTabCommand;
@@ -170,6 +170,8 @@
 
         public PoeEyeSettingsViewModel Settings { get; }
 
+        public PoeSummaryTabViewModel SummaryTab { get; }
+
         public IReactiveList<IMainWindowTabViewModel> TabsList { get; } = new ReactiveList<IMainWindowTabViewModel>
         {
             ChangeTrackingEnabled = true
@@ -177,10 +179,10 @@
 
         public string MainWindowTitle { get; }
 
-        public IMainWindowTabViewModel SelectedItem
+        public IMainWindowTabViewModel SelectedTab
         {
-            get { return selectedItem; }
-            set { this.RaiseAndSetIfChanged(ref selectedItem, value); }
+            get { return selectedTab; }
+            set { this.RaiseAndSetIfChanged(ref selectedTab, value); }
         }
 
         public override void Dispose()

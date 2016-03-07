@@ -1,6 +1,10 @@
 ﻿namespace PoeEyeUi.PoeTrade.ViewModels
 {
+    using System.Windows.Input;
+
     using Config;
+
+    using JetBrains.Annotations;
 
     using PoeShared.Scaffolding;
 
@@ -8,9 +12,13 @@
     {
         bool AudioNotificationEnabled { get; set; }
 
-        IPoeTradesListViewModel TradesList { get; }
+        bool IsBusy { get; }
 
-        IRecheckPeriodViewModel RecheckPeriod { get; }
+        IPoeTradesListViewModel TradesList { [NotNull] get; }
+
+        IRecheckPeriodViewModel RecheckPeriod { [NotNull] get; }
+
+        ICommand MarkAllAsReadCommand { [NotNull] get; }
 
         PoeQueryViewModel Query { get; }
 

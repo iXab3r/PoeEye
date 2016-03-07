@@ -1,6 +1,6 @@
 ﻿namespace PoeEyeUi.Utilities.FilterExtension
 {
-    public interface IFilter
+    internal interface IFilter
     {
         bool Filter(object item);
     }

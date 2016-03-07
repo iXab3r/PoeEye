@@ -57,7 +57,7 @@
             [NotNull] IFactory<IPoeLiveHistoryProvider, IPoeQuery> poeLiveHistoryFactory,
             [NotNull] IFactory<IPoeTradeViewModel, IPoeItem> poeTradeViewModelFactory,
             [NotNull] IPoeCaptchaRegistrator captchaRegistrator,
-            [NotNull] IHistoricalTradesViewModel historicalTradesViewModel,
+            [NotNull] IHistoricalTradesViewModel historicalTrades,
             [NotNull] IEqualityComparer<IPoeItem> poeItemsComparer,
             [NotNull] IConverter<IPoeQueryInfo, IPoeQuery> poeQueryInfoToQueryConverter,
             [NotNull] IClock clock,
@@ -66,7 +66,7 @@
             Guard.ArgumentNotNull(() => poeLiveHistoryFactory);
             Guard.ArgumentNotNull(() => poeTradeViewModelFactory);
             Guard.ArgumentNotNull(() => captchaRegistrator);
-            Guard.ArgumentNotNull(() => historicalTradesViewModel);
+            Guard.ArgumentNotNull(() => historicalTrades);
             Guard.ArgumentNotNull(() => poeQueryInfoToQueryConverter);
             Guard.ArgumentNotNull(() => poeItemsComparer);
             Guard.ArgumentNotNull(() => clock);
@@ -78,24 +78,24 @@
             this.clock = clock;
             this.captchaRegistrator = captchaRegistrator;
 
-            HistoricalTradesViewModel = historicalTradesViewModel;
+            HistoricalTrades = historicalTrades;
 
             Anchors.Add(activeHistoryProviderDisposable);
 
             this.WhenAnyValue(x => x.ActiveQuery)
                 .DistinctUntilChanged()
-                .WithPrevious((prev, curr) => new {prev, curr})
+                .WithPrevious((prev, curr) => new { prev, curr })
                 .Do(
                     prevcurr =>
                     {
                         if (prevcurr.prev != null && prevcurr.curr != null)
                         {
-                            HistoricalTradesViewModel.Clear();
+                            HistoricalTrades.Clear();
                         }
                     })
                 .Select(x => x.curr)
                 .Where(x => x != null)
-                .Do(_ => lastUpdateTimestamp = clock.CurrentTime)
+                .Do(_ => lastUpdateTimestamp = clock.Now)
                 .Select(poeQueryInfoToQueryConverter.Convert)
                 .Select(poeLiveHistoryFactory.Create)
                 .Do(OnNextHistoryProviderCreated)
@@ -118,9 +118,9 @@
             set { this.RaiseAndSetIfChanged(ref recheckPeriod, value); }
         }
 
-        public IReactiveList<IPoeTradeViewModel> TradesList { get; } = new ReactiveList<IPoeTradeViewModel> {ChangeTrackingEnabled = true};
+        public IReactiveList<IPoeTradeViewModel> Items { get; } = new ReactiveList<IPoeTradeViewModel> { ChangeTrackingEnabled = true };
 
-        public IHistoricalTradesViewModel HistoricalTradesViewModel { get; }
+        public IHistoricalTradesViewModel HistoricalTrades { get; }
 
         public IPoeQueryInfo ActiveQuery
         {
@@ -134,7 +134,7 @@
             private set { this.RaiseAndSetIfChanged(ref errors, value); }
         }
 
-        public TimeSpan TimeSinceLastUpdate => clock.CurrentTime - lastUpdateTimestamp;
+        public TimeSpan TimeSinceLastUpdate => clock.Now - lastUpdateTimestamp;
 
         public bool IsBusy => activeProviderInfo.HistoryProvider?.IsBusy ?? false;
 
@@ -158,49 +158,53 @@
                                .SetProperty("Description", activeQuery?.DumpToText())
                                .Submit();
 
-            var existingItems = TradesList.Select(x => x.Trade).ToArray();
+            var existingItems = Items.Select(x => x.Trade).ToArray();
             var removedItems = existingItems.Except(itemsPack, poeItemsComparer).ToArray();
             var newItems = itemsPack.Except(existingItems, poeItemsComparer).ToArray();
 
             Log.Instance.Debug(
                 $"[TradesListViewModel] Next items pack received, existingItems: {existingItems.Length}, newItems: {newItems.Length}, removedItems: {removedItems.Length}");
 
-            foreach (var itemViewModel in TradesList.Where(x => removedItems.Contains(x.Trade)).Where(x => x.TradeState != PoeTradeState.Removed))
+            foreach (var itemViewModel in Items.Where(x => removedItems.Contains(x.Trade)).Where(x => x.TradeState != PoeTradeState.Removed))
             {
                 itemViewModel.TradeState = PoeTradeState.Removed;
-                itemViewModel.Trade.Timestamp = clock.CurrentTime;
-                HistoricalTradesViewModel.AddItems(itemViewModel.Trade);
+                itemViewModel.Trade.Timestamp = clock.Now;
+                HistoricalTrades.AddItems(itemViewModel.Trade);
             }
 
             if (newItems.Any())
             {
-                using (TradesList.SuppressChangeNotifications())
+                var itemsToAdd = new List<IPoeTradeViewModel>();
+                foreach (var item in newItems)
                 {
-                    foreach (var item in newItems)
-                    {
-                        var itemViewModel = poeTradeViewModelFactory.Create(item);
-                        itemViewModel.AddTo(activeProvider.Anchors);
+                    var itemViewModel = poeTradeViewModelFactory.Create(item);
+                    itemViewModel.AddTo(activeProvider.Anchors);
 
-                        itemViewModel.TradeState = PoeTradeState.New;
-                        itemViewModel.Trade.Timestamp = clock.CurrentTime;
+                    itemViewModel.TradeState = PoeTradeState.New;
+                    itemViewModel.Trade.Timestamp = clock.Now;
 
-                        itemViewModel
-                            .WhenAnyValue(x => x.TradeState)
-                            .WithPrevious((prev, curr) => new {prev, curr})
-                            .Where(x => x.curr == PoeTradeState.Normal && x.prev == PoeTradeState.Removed)
-                            .Subscribe(() => RemoveItem(itemViewModel))
-                            .AddTo(activeProvider.Anchors);
+                    //FIXME Possible memory leak - this subscription will be alive till Provider change
+                    itemViewModel
+                        .WhenAnyValue(x => x.TradeState)
+                        .WithPrevious((prev, curr) => new { prev, curr })
+                        .Where(x => x.curr == PoeTradeState.Normal && x.prev == PoeTradeState.Removed)
+                        .Subscribe(() => RemoveItem(itemViewModel))
+                        .AddTo(activeProvider.Anchors);
 
-                        TradesList.Add(itemViewModel);
-                    }
+                    itemsToAdd.Add(itemViewModel);
+                }
+
+                using (Items.SuppressChangeNotifications())
+                {
+                    itemsToAdd.ForEach(Items.Add);
                 }
             }
-            lastUpdateTimestamp = clock.CurrentTime;
+            lastUpdateTimestamp = clock.Now;
         }
 
         private void RemoveItem(IPoeTradeViewModel tradeViewModel)
         {
-            TradesList.Remove(tradeViewModel);
+            Items.Remove(tradeViewModel);
         }
 
         private void OnNextHistoryProviderCreated(IPoeLiveHistoryProvider poeLiveHistoryProvider)
@@ -224,8 +228,8 @@
                 .AddTo(activeProviderInfo.Anchors);
 
             this.WhenAnyValue(x => x.RecheckPeriod)
-                .ObserveOn(uiScheduler)
                 .Throttle(RecheckPeriodThrottleTimeout)
+                .ObserveOn(uiScheduler)
                 .Subscribe(x => poeLiveHistoryProvider.RecheckPeriod = recheckPeriod)
                 .AddTo(activeProviderInfo.Anchors);
         }
@@ -235,7 +239,7 @@
             if (exception != null)
             {
                 Log.Instance.Debug($"[TradesListViewModel] Received an exception from history provider", exception);
-                var errorMsg = $"[{clock.CurrentTime}] {exception.Message}";
+                var errorMsg = $"[{clock.Now}] {exception.Message}";
 
                 if (errors?.Length > 1024)
                 {
@@ -246,7 +250,7 @@
 
                 if (exception is CaptchaException)
                 {
-                    var captchaException = (CaptchaException) exception;
+                    var captchaException = (CaptchaException)exception;
                     captchaRegistrator.CaptchaRequests.OnNext(captchaException.ResolutionUri);
                 }
             }
@@ -266,7 +270,7 @@
             {
                 HistoryProvider = provider;
 
-                Anchors = new CompositeDisposable {HistoryProvider};
+                Anchors = new CompositeDisposable { HistoryProvider };
             }
 
             public void Dispose()

@@ -22,6 +22,8 @@
 
         float? PriceInChaosOrbs { get; }
 
+        TimeSpan TimeElapsedSinceLastIndexation { get; }
+
         IPoeItem Trade { [NotNull] get; }
 
         PoeTradeState TradeState { get; set; }

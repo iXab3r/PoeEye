@@ -140,15 +140,18 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="..\packages\Awesomium.NetWrapper.Unofficial.1.7.5.0\lib\awesomium_process">
-      <Link>costura32\awesomium_process</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\packages\Awesomium.NetWrapper.Unofficial.1.7.5.0\lib\inspector.pak">
-      <Link>costura32\inspector.pak</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\packages\Awesomium.NetWrapper.Unofficial.1.7.5.0\lib\pdf_js.pak">
-      <Link>costura32\pdf_js.pak</Link>
-    </EmbeddedResource>
+    <None Include="..\packages\Awesomium.NetWrapper.Unofficial.1.7.5.0\lib\awesomium_process">
+      <Link>awesomium_process</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\packages\Awesomium.NetWrapper.Unofficial.1.7.5.0\lib\inspector.pak">
+      <Link>inspector.pak</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\packages\Awesomium.NetWrapper.Unofficial.1.7.5.0\lib\pdf_js.pak">
+      <Link>pdf_js.pak</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -160,33 +163,38 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="FodyWeavers.xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="..\packages\Awesomium.NetWrapper.Unofficial.1.7.5.0\lib\avcodec-53.dll">
-      <Link>costura32\avcodec-53.dll</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\packages\Awesomium.NetWrapper.Unofficial.1.7.5.0\lib\avformat-53.dll">
-      <Link>costura32\avformat-53.dll</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\packages\Awesomium.NetWrapper.Unofficial.1.7.5.0\lib\avutil-51.dll">
-      <Link>costura32\avutil-51.dll</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\packages\Awesomium.NetWrapper.Unofficial.1.7.5.0\lib\awesomium.dll">
-      <Link>costura32\awesomium.dll</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\packages\Awesomium.NetWrapper.Unofficial.1.7.5.0\lib\icudt.dll">
-      <Link>costura32\icudt.dll</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\packages\Awesomium.NetWrapper.Unofficial.1.7.5.0\lib\libEGL.dll">
-      <Link>costura32\libEGL.dll</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\packages\Awesomium.NetWrapper.Unofficial.1.7.5.0\lib\libGLESv2.dll">
-      <Link>costura32\libGLESv2.dll</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\packages\Awesomium.NetWrapper.Unofficial.1.7.5.0\lib\xinput9_1_0.dll">
-      <Link>costura32\xinput9_1_0.dll</Link>
-    </EmbeddedResource>
+    <None Include="..\packages\Awesomium.NetWrapper.Unofficial.1.7.5.0\lib\avcodec-53.dll">
+      <Link>avcodec-53.dll</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\packages\Awesomium.NetWrapper.Unofficial.1.7.5.0\lib\avformat-53.dll">
+      <Link>avformat-53.dll</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\packages\Awesomium.NetWrapper.Unofficial.1.7.5.0\lib\avutil-51.dll">
+      <Link>avutil-51.dll</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\packages\Awesomium.NetWrapper.Unofficial.1.7.5.0\lib\awesomium.dll">
+      <Link>awesomium.dll</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\packages\Awesomium.NetWrapper.Unofficial.1.7.5.0\lib\icudt.dll">
+      <Link>icudt.dll</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\packages\Awesomium.NetWrapper.Unofficial.1.7.5.0\lib\libEGL.dll">
+      <Link>libEGL.dll</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\packages\Awesomium.NetWrapper.Unofficial.1.7.5.0\lib\libGLESv2.dll">
+      <Link>libGLESv2.dll</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\packages\Awesomium.NetWrapper.Unofficial.1.7.5.0\lib\xinput9_1_0.dll">
+      <Link>xinput9_1_0.dll</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\PoeShared\PoeShared.csproj">
@@ -195,48 +203,10 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="..\packages\Fody.1.29.3\build\portable-net+sl+win+wpa+wp\Fody.targets" Condition="Exists('..\packages\Fody.1.29.3\build\portable-net+sl+win+wpa+wp\Fody.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\Fody.1.29.3\build\portable-net+sl+win+wpa+wp\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Fody.1.29.3\build\portable-net+sl+win+wpa+wp\Fody.targets'))" />
-  </Target>
-  <UsingTask TaskName="CosturaCleanup" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll" TaskFactory="CodeTaskFactory">
-    <ParameterGroup>
-      <Config Output="false" Required="true" ParameterType="Microsoft.Build.Framework.ITaskItem" />
-      <Files Output="false" Required="true" ParameterType="Microsoft.Build.Framework.ITaskItem[]" />
-    </ParameterGroup>
-    <Task Evaluate="true">
-      <Reference xmlns="http://schemas.microsoft.com/developer/msbuild/2003" Include="System.Xml" />
-      <Reference xmlns="http://schemas.microsoft.com/developer/msbuild/2003" Include="System.Xml.Linq" />
-      <Using xmlns="http://schemas.microsoft.com/developer/msbuild/2003" Namespace="System" />
-      <Using xmlns="http://schemas.microsoft.com/developer/msbuild/2003" Namespace="System.IO" />
-      <Using xmlns="http://schemas.microsoft.com/developer/msbuild/2003" Namespace="System.Xml.Linq" />
-      <Code xmlns="http://schemas.microsoft.com/developer/msbuild/2003" Type="Fragment" Language="cs"><![CDATA[
-var config = XElement.Load(Config.ItemSpec).Elements("Costura").FirstOrDefault();
-
-if (config == null) return true;
-
-var excludedAssemblies = new List<string>();
-var attribute = config.Attribute("ExcludeAssemblies");
-if (attribute != null)
-    foreach (var item in attribute.Value.Split('|').Select(x => x.Trim()).Where(x => x != string.Empty))
-        excludedAssemblies.Add(item);
-var element = config.Element("ExcludeAssemblies");
-if (element != null)
-    foreach (var item in element.Value.Split(new[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim()).Where(x => x != string.Empty))
-        excludedAssemblies.Add(item);
-
-var filesToCleanup = Files.Select(f => f.ItemSpec).Where(f => !excludedAssemblies.Contains(Path.GetFileNameWithoutExtension(f), StringComparer.InvariantCultureIgnoreCase));
-
-foreach (var item in filesToCleanup)
-  File.Delete(item);
-]]></Code>
-    </Task>
-  </UsingTask>
-  <Target Name="CleanReferenceCopyLocalPaths" AfterTargets="AfterBuild;NonWinFodyTarget">
-    <CosturaCleanup Config="FodyWeavers.xml" Files="@(ReferenceCopyLocalPaths->'$(OutDir)%(DestinationSubDirectory)%(Filename)%(Extension)')" />
   </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

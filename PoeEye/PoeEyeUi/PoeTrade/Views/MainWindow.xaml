@@ -9,6 +9,7 @@
                       xmlns:utilities="clr-namespace:PoeEyeUi.Utilities"
                       xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
                       xmlns:system="clr-namespace:System;assembly=mscorlib"
+                      xmlns:net="clr-namespace:FontAwesome.Net;assembly=FontAwesome.Net"
                       mc:Ignorable="d"
                       Title="{Binding MainWindowTitle}"
                       MinWidth="1200"
@@ -44,7 +45,7 @@
 
         <ListBox Grid.Column="0"
                  ItemsSource="{Binding TabsList}"
-                 SelectedItem="{Binding SelectedItem}"
+                 SelectedItem="{Binding SelectedTab}"
                  SelectionMode="Single"
                  Margin="10,10,5,10"
                  Focusable="False"
@@ -56,16 +57,24 @@
           </ListBox.Resources>
         </ListBox>
 
+        <Image Grid.Column="1" Source="pack://application:,,,/Resources/mainIcon.png" Opacity="0.2" />
+
         <ContentControl Grid.Column="1"
                         Margin="5,10,10,10"
-                        Content="{Binding SelectedItem}" />
+                        Visibility="{Binding SelectedTab, Converter={StaticResource NullToHiddenConverter}}"
+                        Content="{Binding SelectedTab}" />
+        
+        <ContentControl Grid.Column="1"
+                        Margin="5,10,10,10"
+                        Visibility="{Binding SelectedTab, Converter={StaticResource NotNullToHiddenConverter}}"
+                        Content="{Binding SummaryTab}" />
       </Grid>
     </Border>
 
 
     <Border Grid.Row="2"
             BorderThickness="0,1,0,0" BorderBrush="{StaticResource AccentColorBrush}" Margin="5,1,10,5"
-            Visibility="{Binding SelectedItem, Converter={StaticResource NullToHiddenConverter}}">
+            Visibility="{Binding SelectedTab, Converter={StaticResource NullToCollapsedConverter}}">
       <Border.Resources>
         <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource MetroTextBlock}">
           <Setter Property="FontSize" Value="16" />
@@ -79,17 +88,17 @@
         </Grid.ColumnDefinitions>
 
         <StackPanel Grid.Column="0" Orientation="Horizontal"
-                    Visibility="{Binding SelectedItem.IsBusy, Converter={StaticResource BoolFalseToCollapsedConverter}}">
+                    Visibility="{Binding SelectedTab.IsBusy, Converter={StaticResource BoolFalseToCollapsedConverter}}">
           <controls:ProgressRing Height="20" Width="20" IsActive="true" Foreground="{StaticResource TextBrush}" />
           <TextBlock Text="Updating..." />
         </StackPanel>
 
         <TextBlock Grid.Column="1"
                    Margin="10,0,0,0"
-                   Visibility="{Binding SelectedItem.TradesList.ActiveQuery, Converter={StaticResource NullToCollapsedConverter}}"
-                   Text="{Binding SelectedItem.TradesList.TimeSinceLastUpdate.TotalSeconds, Mode=OneWay, StringFormat='Elapsed since last update: {0:F0}s'}" />
+                   Visibility="{Binding SelectedTab.TradesList.ActiveQuery, Converter={StaticResource NullToCollapsedConverter}}"
+                   Text="{Binding SelectedTab.TradesList.TimeSinceLastUpdate.TotalSeconds, Mode=OneWay, StringFormat='Elapsed since last update: {0:F0}s'}" />
 
-        <ContentPresenter Grid.Column="2" Content="{Binding SelectedItem.RecheckPeriod}" />
+        <ContentPresenter Grid.Column="2" Content="{Binding SelectedTab.RecheckPeriod}" />
 
       </Grid>
     </Border>
@@ -102,10 +111,31 @@
       <StackPanel Orientation="Horizontal">
 
         <Button
-          ToolTip="Create new tab"
           Command="{Binding CreateNewTabCommand}"
           Content="Create new tab"
           FontWeight="Bold" />
+        
+        <Separator />
+
+        <Button
+          Content="Summary"
+          FontWeight="Bold">
+          <Button.Style>
+            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
+              <Style.Triggers>
+                <DataTrigger Binding="{Binding SelectedTab}" Value="{x:Null}">
+                  <Setter Property="Foreground" Value="{StaticResource ValidationSummaryColor4}"/>
+                </DataTrigger>
+              </Style.Triggers>
+            </Style>
+          </Button.Style>
+          <i:Interaction.Triggers>
+            <i:EventTrigger EventName="Click">
+              <utilities:SetPropertyAction PropertyName="SelectedTab" TargetObject="{Binding}" PropertyValue="{x:Null}" />
+            </i:EventTrigger>
+          </i:Interaction.Triggers>
+        </Button>
+
       </StackPanel>
 
     </controls:WindowCommands>
