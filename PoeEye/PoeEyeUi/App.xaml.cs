@@ -13,6 +13,8 @@
 
     using Prism;
 
+    using ReactiveUI;
+
     public partial class App
     {
         private static readonly string AppVersion = $"v{Assembly.GetExecutingAssembly().GetName().Version}";
@@ -22,6 +24,8 @@
             InitializeLogging();
 
             InitializeExceptionless();
+
+            RxApp.SupportsRangeNotifications = true;
         }
 
         private static void InitializeExceptionless()

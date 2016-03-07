@@ -337,6 +337,7 @@
     <Compile Include="PoeTrade\ViewModels\PoeChatViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\PoeClipboardParserViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\PoeEyeSettingsViewModel.cs" />
+    <Compile Include="PoeTrade\ViewModels\PoeFilteredTradeViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\PoeLinksInfoViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\ImageViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\MainWindowTabViewModel.cs" />
@@ -345,6 +346,7 @@
     <Compile Include="PoeTrade\ViewModels\PoeModGroupsEditorViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\PoeModViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\PoeQueryViewModel.cs" />
+    <Compile Include="PoeTrade\ViewModels\PoeSummaryTabViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\PoeTradeCaptchaViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\ProxyProviderViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\RecheckPeriodViewModel.cs" />
@@ -469,6 +471,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="PoeTrade\Views\PoeItemModView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="PoeTrade\Views\PoeSummaryTabView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

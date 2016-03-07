@@ -4,6 +4,7 @@
     using System.Linq;
     using System.Reactive;
     using System.Reactive.Linq;
+    using System.Windows.Data;
     using System.Windows.Input;
 
     using Config;
@@ -30,7 +31,7 @@
     {
         private static int GlobalTabIdx;
 
-        private readonly ReactiveCommand<object> markAllAsRead;
+        private readonly ReactiveCommand<object> markAllAsReadCommand;
         private readonly ReactiveCommand<object> refreshCommand;
         private readonly ReactiveCommand<object> searchCommand;
 
@@ -61,8 +62,8 @@
             searchCommand = ReactiveCommand.Create();
             searchCommand.Subscribe(SearchCommandExecute);
 
-            markAllAsRead = ReactiveCommand.Create();
-            markAllAsRead.Subscribe(MarkAllAsReadExecute);
+            markAllAsReadCommand = ReactiveCommand.Create();
+            markAllAsReadCommand.Subscribe(MarkAllAsReadExecute);
 
             refreshCommand = ReactiveCommand.Create(TradesList.WhenAnyValue(x => x.IsBusy).Select(x => !x));
             refreshCommand.Subscribe(RefreshCommandExecuted);
@@ -74,8 +75,8 @@
 
             Query = query;
 
-            TradesList.TradesList.ItemChanged.ToUnit()
-                      .Merge(TradesList.TradesList.Changed.ToUnit())
+            TradesList.Items.ItemChanged.ToUnit()
+                      .Merge(TradesList.Items.Changed.ToUnit())
                       .Subscribe(
                           () =>
                           {
@@ -110,7 +111,7 @@
 
         public ICommand RefreshCommand => refreshCommand;
 
-        public ICommand MarkAllAsRead => markAllAsRead;
+        public ICommand MarkAllAsReadCommand => markAllAsReadCommand;
 
         public bool IsBusy => TradesList.IsBusy;
 
@@ -124,17 +125,17 @@
 
         public int NewItemsCount
         {
-            get { return TradesList.TradesList.Count(x => x.TradeState == PoeTradeState.New); }
+            get { return TradesList.Items.Count(x => x.TradeState == PoeTradeState.New); }
         }
 
         public int RemovedItemsCount
         {
-            get { return TradesList.TradesList.Count(x => x.TradeState == PoeTradeState.Removed); }
+            get { return TradesList.Items.Count(x => x.TradeState == PoeTradeState.Removed); }
         }
 
         public int NormalItemsCount
         {
-            get { return TradesList.TradesList.Count(x => x.TradeState == PoeTradeState.Normal); }
+            get { return TradesList.Items.Count(x => x.TradeState == PoeTradeState.Normal); }
         }
 
         public IPoeTradesListViewModel TradesList { get; }
@@ -165,8 +166,8 @@
 
             if (config.SoldOrRemovedItems != null)
             {
-                TradesList.HistoricalTradesViewModel.Clear();
-                TradesList.HistoricalTradesViewModel.AddItems(config.SoldOrRemovedItems);
+                TradesList.HistoricalTrades.Clear();
+                TradesList.HistoricalTrades.AddItems(config.SoldOrRemovedItems);
             }
 
             AudioNotificationEnabled = config.AudioNotificationEnabled;
@@ -180,7 +181,7 @@
                 IsAutoRecheckEnabled = RecheckPeriod.IsAutoRecheckEnabled,
                 QueryInfo = Query.PoeQueryBuilder(),
                 AudioNotificationEnabled = AudioNotificationEnabled,
-                SoldOrRemovedItems = TradesList.HistoricalTradesViewModel.ItemsViewModels.Select(x => x.Trade).ToArray()
+                SoldOrRemovedItems = TradesList.HistoricalTrades.ItemsViewModels.Select(x => x.Trade).ToArray()
             };
         }
 
@@ -209,7 +210,7 @@
             var query = queryBuilder();
             Log.Instance.Debug($"[MainWindowTabViewModel.SearchCommandExecute] Search command executed, running query\r\n{query.DumpToText()}");
 
-            TradesList.TradesList.Clear();
+            TradesList.Items.Clear();
             TradesList.ActiveQuery = query;
             RebuildTabName();
             Query.IsExpanded = false;
@@ -231,9 +232,9 @@
 
         private void MarkAllAsReadExecute(object arg)
         {
-            using (TradesList.TradesList.SuppressChangeNotifications())
+            using (TradesList.Items.SuppressChangeNotifications())
             {
-                foreach (var trade in TradesList.TradesList.ToArray())
+                foreach (var trade in TradesList.Items.ToArray())
                 {
                     trade.TradeState = PoeTradeState.Normal;
                 }

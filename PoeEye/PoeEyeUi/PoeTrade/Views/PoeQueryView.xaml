@@ -259,26 +259,26 @@
                    Text="Colors" Style="{StaticResource TextBlockHeader}" />
         <StackPanel Grid.Row="2" Grid.Column="1">
           <TextBox Style="{StaticResource TextBoxKey}" Width="30" controls:TextBoxHelper.Watermark="R"
-                   Text="{Binding SocketsR}" />
+                   Text="{Binding SocketsR, Converter={StaticResource NullableConverter}}" />
           <TextBox Style="{StaticResource TextBoxKey}" Width="30" controls:TextBoxHelper.Watermark="G"
-                   Text="{Binding SocketsG}" />
+                   Text="{Binding SocketsG, Converter={StaticResource NullableConverter}}" />
           <TextBox Style="{StaticResource TextBoxKey}" Width="30" controls:TextBoxHelper.Watermark="B"
-                   Text="{Binding SocketsB}" />
+                   Text="{Binding SocketsB, Converter={StaticResource NullableConverter}}" />
           <TextBox Style="{StaticResource TextBoxKey}" Width="30" controls:TextBoxHelper.Watermark="W"
-                   Text="{Binding SocketsW}" />
+                   Text="{Binding SocketsW, Converter={StaticResource NullableConverter}}" />
         </StackPanel>
 
         <TextBlock Grid.Row="2" Grid.Column="2"
                    Text="Linked" Style="{StaticResource TextBlockHeader}" />
         <StackPanel Grid.Row="2" Grid.Column="3">
           <TextBox Style="{StaticResource TextBoxKey}" Width="30" controls:TextBoxHelper.Watermark="R"
-                   Text="{Binding LinkedR}" />
+                   Text="{Binding LinkedR, Converter={StaticResource NullableConverter}}" />
           <TextBox Style="{StaticResource TextBoxKey}" Width="30" controls:TextBoxHelper.Watermark="G"
-                   Text="{Binding LinkedG}" />
+                   Text="{Binding LinkedG, Converter={StaticResource NullableConverter}}" />
           <TextBox Style="{StaticResource TextBoxKey}" Width="30" controls:TextBoxHelper.Watermark="B"
-                   Text="{Binding LinkedB}" />
+                   Text="{Binding LinkedB, Converter={StaticResource NullableConverter}}" />
           <TextBox Style="{StaticResource TextBoxKey}" Width="30" controls:TextBoxHelper.Watermark="W"
-                   Text="{Binding LinkedW}" />
+                   Text="{Binding LinkedW, Converter={StaticResource NullableConverter}}" />
         </StackPanel>
       </Grid>
 

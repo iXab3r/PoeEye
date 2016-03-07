@@ -108,7 +108,7 @@
             poeLiveHistoryItems.OnNext(itemsPack);
 
             //Then
-            var actualItems = instance.TradesList.Select(x => x.Trade).ToArray();
+            var actualItems = instance.Items.Select(x => x.Trade).ToArray();
             CollectionAssert.AreEqual(itemsPack, actualItems);
         }
 
@@ -121,7 +121,7 @@
 
             poeLiveHistoryItems.OnNext(new[] {Mock.Of<IPoeItem>()});
 
-            var trade = instance.TradesList.Single();
+            var trade = instance.Items.Single();
             Assert.AreEqual(PoeTradeState.New, trade.TradeState);
 
             //When
@@ -140,7 +140,7 @@
 
             poeLiveHistoryItems.OnNext(new[] {Mock.Of<IPoeItem>()});
 
-            var trade = instance.TradesList.Single();
+            var trade = instance.Items.Single();
             Assert.AreEqual(PoeTradeState.New, trade.TradeState);
 
             //When
@@ -196,7 +196,7 @@
 
             poeLiveHistoryItems.OnNext(new[] {Mock.Of<IPoeItem>()});
 
-            var trade = instance.TradesList.Single();
+            var trade = instance.Items.Single();
 
             poeLiveHistoryItems.OnNext(new IPoeItem[0]);
 
@@ -204,7 +204,7 @@
             trade.TradeState = PoeTradeState.Normal;
 
             //Then
-            CollectionAssert.AreEqual(new IPoeTradeViewModel[0], instance.TradesList);
+            CollectionAssert.AreEqual(new IPoeTradeViewModel[0], instance.Items);
             historicalTradesViewModel.Verify(x => x.AddItems(trade.Trade), Times.Once);
         }
 
@@ -222,7 +222,7 @@
 
             poeLiveHistoryItems.OnNext(new[] {Mock.Of<IPoeItem>()});
 
-            var trade = instance.TradesList.Single();
+            var trade = instance.Items.Single();
             Assert.AreEqual(PoeTradeState.New, trade.TradeState);
             trade.TradeState = state;
 
@@ -245,7 +245,7 @@
 
             poeLiveHistoryItems.OnNext(new IPoeItem[0]);
 
-            var trade = instance.TradesList.Single();
+            var trade = instance.Items.Single();
             trade.TradeState = PoeTradeState.Normal;
 
             poeItemsComparer
@@ -261,7 +261,7 @@
             historicalTradesViewModel.Verify(x => x.AddItems(It.IsAny<IPoeItem[]>()), Times.Never);
             historicalTradesViewModel.Verify(x => x.Clear(), Times.Never);
 
-            var actualItems = instance.TradesList.Select(x => x.Trade).ToArray();
+            var actualItems = instance.Items.Select(x => x.Trade).ToArray();
             CollectionAssert.AreEqual(new[] {item}, actualItems);
         }
 
@@ -292,19 +292,19 @@
 
             poeLiveHistoryItems.OnNext(new[] {Mock.Of<IPoeItem>()});
 
-            var trade = instance.TradesList.Single();
+            var trade = instance.Items.Single();
             Assert.AreEqual(PoeTradeState.New, trade.TradeState);
 
             poeLiveHistoryItems.OnNext(new IPoeItem[0]);
             Assert.AreEqual(PoeTradeState.Removed, trade.TradeState);
-            Assert.AreEqual(1, instance.TradesList.Count);
+            Assert.AreEqual(1, instance.Items.Count);
 
             //When
             trade.TradeState = PoeTradeState.Normal;
 
             //Then
             trade.TradeState.ShouldBe(PoeTradeState.Normal);
-            instance.TradesList.Count.ShouldBe(0);
+            instance.Items.Count.ShouldBe(0);
         }
 
         private PoeTradesListViewModel CreateInstance()
