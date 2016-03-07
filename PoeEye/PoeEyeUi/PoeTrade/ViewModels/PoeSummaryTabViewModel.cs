@@ -151,7 +151,8 @@
 
         private void MarkAllAsReadExecuted()
         {
-            collectionByTab.Keys.ToArray().ForEach(x => x.MarkAllAsReadCommand.Execute(null));
+            var tabsToProcess = collectionByTab.Keys.Where(x => x.AudioNotificationEnabled || showAllTabs).ToArray();
+            tabsToProcess.ForEach(x => x.MarkAllAsReadCommand.Execute(null));
         }
 
         private void ProcessTabsCollectionChange(IEnumerable<IMainWindowTabViewModel> tabs, NotifyCollectionChangedEventArgs args)
