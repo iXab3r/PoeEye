@@ -40,7 +40,13 @@
 
         private readonly IScheduler uiScheduler;
 
+        private bool isGrouping = true;
+
         private bool showAllTabs;
+
+        private bool showNewItems = true;
+
+        private bool showRemovedItems;
 
         public PoeSummaryTabViewModel(
             [NotNull] IReactiveList<IMainWindowTabViewModel> tabsList,
@@ -57,20 +63,23 @@
                 IsLiveFilteringRequested = true,
                 IsLiveSortingRequested = true,
                 IsLiveGroupingRequested = true,
-                Source = tradesCollection,
+                Source = tradesCollection
             };
 
             source.SortDescriptions.Add(new SortDescription(nameof(PoeFilteredTradeViewModel.TradeState), ListSortDirection.Ascending));
             source.SortDescriptions.Add(new SortDescription(nameof(PoeFilteredTradeViewModel.PriceInChaosOrbs), ListSortDirection.Ascending));
 
-            source.GroupDescriptions.Add(new PropertyGroupDescription(nameof(PoeFilteredTradeViewModel.Description)));
             source.LiveFilteringProperties.Add(null);
             source.LiveFilteringProperties.Add(string.Empty);
 
             TradesView = source.View;
             TradesView.Filter = TradeFilterPredicate;
 
-            this.WhenAnyValue(x => x.ShowAllTabs)
+            this.WhenAnyValue(x => x.IsGrouping)
+                .Subscribe(HandleGrouping)
+                .AddTo(Anchors);
+
+            this.WhenAnyValue(x => x.ShowAllTabs, x => x.ShowNewItems, x => x.ShowRemovedItems)
                 .Subscribe(TradesView.Refresh)
                 .AddTo(Anchors);
 
@@ -91,6 +100,24 @@
             set { this.RaiseAndSetIfChanged(ref showAllTabs, value); }
         }
 
+        public bool ShowNewItems
+        {
+            get { return showNewItems; }
+            set { this.RaiseAndSetIfChanged(ref showNewItems, value); }
+        }
+
+        public bool ShowRemovedItems
+        {
+            get { return showRemovedItems; }
+            set { this.RaiseAndSetIfChanged(ref showRemovedItems, value); }
+        }
+
+        public bool IsGrouping
+        {
+            get { return isGrouping; }
+            set { this.RaiseAndSetIfChanged(ref isGrouping, value); }
+        }
+
         private bool TradeFilterPredicate(object value)
         {
             var trade = value as PoeFilteredTradeViewModel;
@@ -99,9 +126,27 @@
 
         private bool TradeFilterPredicate(PoeFilteredTradeViewModel value)
         {
-            var tradeIsValid = value.Trade.TradeState == PoeTradeState.Removed || value.Trade.TradeState == PoeTradeState.New;
-            var tabIsValid = showAllTabs || value.Owner.AudioNotificationEnabled;
-            return tabIsValid && tradeIsValid;
+            var tradeIsValid = true;
+
+            tradeIsValid &=
+                (value.Trade.TradeState == PoeTradeState.Removed && showRemovedItems) ||
+                (value.Trade.TradeState == PoeTradeState.New && showNewItems);
+
+            tradeIsValid &= value.Owner.AudioNotificationEnabled || showAllTabs;
+            return tradeIsValid;
+        }
+
+        private void HandleGrouping()
+        {
+            TradesView.GroupDescriptions.Clear();
+
+            if (isGrouping)
+            {
+                var groupingByDescription = new PropertyGroupDescription(nameof(PoeFilteredTradeViewModel.Description));
+                TradesView.GroupDescriptions.Add(groupingByDescription);
+            }
+
+            TradesView.Refresh();
         }
 
         private void MarkAllAsReadExecuted()

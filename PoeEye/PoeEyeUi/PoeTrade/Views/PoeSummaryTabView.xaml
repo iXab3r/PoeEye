@@ -26,8 +26,31 @@
           </Grid.ColumnDefinitions>
           <Button Grid.Column="0" 
                   Content="Mark All as Read" Command="{Binding MarkAllAsReadCommand}" Width="150" />
-          <CheckBox Grid.Column="2" 
-                    IsChecked="{Binding ShowAllTabs}" Content="Show all tabs, regardless of notification state" Margin="10,0"/>
+
+          <StackPanel Grid.Column="2" Orientation="Horizontal">
+
+            <CheckBox IsChecked="{Binding ShowNewItems}" Margin="10,0" Focusable="False" IsTabStop="False">
+              <CheckBox.Content>
+                <StackPanel Orientation="Horizontal">
+                  <Rectangle Width="10" Height="10" Fill="{StaticResource PoeTradeNewItemBrush}" Stroke="{StaticResource AccentColorBrush}"/>
+                  <TextBlock Text="New" Margin="3, 0"/>
+                </StackPanel>
+              </CheckBox.Content>
+            </CheckBox>
+            <CheckBox IsChecked="{Binding ShowRemovedItems}" Margin="10,0" Focusable="False" IsTabStop="False">
+                <CheckBox.Content>
+                  <StackPanel Orientation="Horizontal">
+                    <Rectangle Width="10" Height="10" Fill="{StaticResource PoeTradeRemovedItemBrush}" Stroke="{StaticResource AccentColorBrush}"/>
+                    <TextBlock Text="Removed" Margin="3, 0"/>
+                  </StackPanel>
+                </CheckBox.Content>
+            </CheckBox>
+
+            <controls:ToggleSwitch IsChecked="{Binding IsGrouping}" 
+                                   Content="Group by query" Margin="10,0" Focusable="False" IsTabStop="False"/>
+            <controls:ToggleSwitch IsChecked="{Binding ShowAllTabs}" 
+                                   Content="Show all tabs, regardless of notification state" Margin="10,0" Focusable="False" IsTabStop="False"/>
+          </StackPanel>
         </Grid>
       </Border>
       
