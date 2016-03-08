@@ -306,6 +306,7 @@
     <Compile Include="MetroModels\DialogCoordinator.cs" />
     <Compile Include="MetroModels\IDialogCoordinator.cs" />
     <Compile Include="PoeTrade\AudioNotificationType.cs" />
+    <Compile Include="PoeTrade\Common\SortDescriptionData.cs" />
     <Compile Include="PoeTrade\Models\AudioNotificationsManager.cs" />
     <Compile Include="PoeTrade\Models\FuzzySuggestionProvider.cs" />
     <Compile Include="PoeTrade\Models\IAudioNotificationsManager.cs" />

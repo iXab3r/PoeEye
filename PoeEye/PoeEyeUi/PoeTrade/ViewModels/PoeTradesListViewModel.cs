@@ -183,13 +183,12 @@
                     itemViewModel.TradeState = PoeTradeState.New;
                     itemViewModel.Trade.Timestamp = clock.Now;
 
-                    //FIXME Possible memory leak - this subscription will be alive till Provider change
                     itemViewModel
                         .WhenAnyValue(x => x.TradeState)
                         .WithPrevious((prev, curr) => new { prev, curr })
                         .Where(x => x.curr == PoeTradeState.Normal && x.prev == PoeTradeState.Removed)
                         .Subscribe(() => RemoveItem(itemViewModel))
-                        .AddTo(activeProvider.Anchors);
+                        .AddTo(itemViewModel.Anchors);
 
                     itemsToAdd.Add(itemViewModel);
                 }

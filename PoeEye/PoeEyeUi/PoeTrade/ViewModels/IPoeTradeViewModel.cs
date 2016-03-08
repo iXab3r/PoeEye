@@ -7,8 +7,9 @@
     using JetBrains.Annotations;
 
     using PoeShared.Common;
+    using PoeShared.Scaffolding;
 
-    internal interface IPoeTradeViewModel : IDisposable, INotifyPropertyChanged
+    internal interface IPoeTradeViewModel : IDisposableReactiveObject
     {
         ICommand CopyPmMessageToClipboardCommand { [NotNull] get; }
 

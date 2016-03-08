@@ -11,6 +11,8 @@
     using System.Windows.Data;
     using System.Windows.Input;
 
+    using Common;
+
     using CsQuery.ExtensionMethods;
 
     using Guards;
@@ -38,21 +40,17 @@
             ChangeTrackingEnabled = true
         };
 
-        private readonly IScheduler uiScheduler;
-
-        private bool isGrouping = true;
-
-        private bool showAllTabs;
+        private bool isGrouping;
 
         private bool showNewItems = true;
 
         private bool showRemovedItems;
 
+        private SortDescriptionData activeSortDescriptionData;
+
         public PoeSummaryTabViewModel(
-            [NotNull] IReactiveList<IMainWindowTabViewModel> tabsList,
-            [NotNull] [Dependency(WellKnownSchedulers.Ui)] IScheduler uiScheduler)
+            [NotNull] IReactiveList<IMainWindowTabViewModel> tabsList)
         {
-            this.uiScheduler = uiScheduler;
             Guard.ArgumentNotNull(() => tabsList);
 
             markAllAsReadCommand = ReactiveCommand.Create();
@@ -66,26 +64,35 @@
                 Source = tradesCollection
             };
 
-            source.SortDescriptions.Add(new SortDescription(nameof(PoeFilteredTradeViewModel.TradeState), ListSortDirection.Ascending));
-            source.SortDescriptions.Add(new SortDescription(nameof(PoeFilteredTradeViewModel.PriceInChaosOrbs), ListSortDirection.Ascending));
-
             source.LiveFilteringProperties.Add(null);
             source.LiveFilteringProperties.Add(string.Empty);
 
             TradesView = source.View;
             TradesView.Filter = TradeFilterPredicate;
 
+            SortingOptions = new[]
+            {
+                new SortDescriptionData(nameof(PoeFilteredTradeViewModel.Timestamp), ListSortDirection.Descending),
+                new SortDescriptionData(nameof(PoeFilteredTradeViewModel.Timestamp), ListSortDirection.Ascending),
+                new SortDescriptionData(nameof(PoeFilteredTradeViewModel.PriceInChaosOrbs), ListSortDirection.Descending),
+                new SortDescriptionData(nameof(PoeFilteredTradeViewModel.PriceInChaosOrbs), ListSortDirection.Ascending),
+            };
+            ActiveSortDescriptionData = SortingOptions.FirstOrDefault();
+
             this.WhenAnyValue(x => x.IsGrouping)
                 .Subscribe(HandleGrouping)
                 .AddTo(Anchors);
 
-            this.WhenAnyValue(x => x.ShowAllTabs, x => x.ShowNewItems, x => x.ShowRemovedItems)
+            this.WhenAnyValue(x => x.ActiveSortDescriptionData)
+                .Subscribe(HandleSorting)
+                .AddTo(Anchors);
+
+            this.WhenAnyValue(x => x.ShowNewItems, x => x.ShowRemovedItems)
                 .Subscribe(TradesView.Refresh)
                 .AddTo(Anchors);
 
             tabsList.Changed
                     .Where(args => args != null)
-                    .ObserveOn(uiScheduler)
                     .Subscribe(args => ProcessTabsCollectionChange(tabsList, args))
                     .AddTo(Anchors);
         }
@@ -93,12 +100,6 @@
         public ICollectionView TradesView { get; }
 
         public ICommand MarkAllAsReadCommand => markAllAsReadCommand;
-
-        public bool ShowAllTabs
-        {
-            get { return showAllTabs; }
-            set { this.RaiseAndSetIfChanged(ref showAllTabs, value); }
-        }
 
         public bool ShowNewItems
         {
@@ -118,6 +119,14 @@
             set { this.RaiseAndSetIfChanged(ref isGrouping, value); }
         }
 
+        public SortDescriptionData[] SortingOptions { get; }
+
+        public SortDescriptionData ActiveSortDescriptionData
+        {
+            get { return activeSortDescriptionData; }
+            set { this.RaiseAndSetIfChanged(ref activeSortDescriptionData, value); }
+        }
+
         private bool TradeFilterPredicate(object value)
         {
             var trade = value as PoeFilteredTradeViewModel;
@@ -132,8 +141,20 @@
                 (value.Trade.TradeState == PoeTradeState.Removed && showRemovedItems) ||
                 (value.Trade.TradeState == PoeTradeState.New && showNewItems);
 
-            tradeIsValid &= value.Owner.AudioNotificationEnabled || showAllTabs;
+            tradeIsValid &= value.Owner.AudioNotificationEnabled;
             return tradeIsValid;
+        }
+
+        private void HandleSorting()
+        {
+            TradesView.SortDescriptions.Clear();
+
+            if (activeSortDescriptionData != null)
+            {
+                TradesView.SortDescriptions.Add(activeSortDescriptionData.ToSortDescription());
+            }
+
+            TradesView.Refresh();
         }
 
         private void HandleGrouping()
@@ -151,7 +172,7 @@
 
         private void MarkAllAsReadExecuted()
         {
-            var tabsToProcess = collectionByTab.Keys.Where(x => x.AudioNotificationEnabled || showAllTabs).ToArray();
+            var tabsToProcess = collectionByTab.Keys.Where(x => x.AudioNotificationEnabled).ToArray();
             tabsToProcess.ForEach(x => x.MarkAllAsReadCommand.Execute(null));
         }
 
@@ -187,7 +208,6 @@
                 .TradesList
                 .Items
                 .Changed
-                .ObserveOn(uiScheduler)
                 .Subscribe(args => ProcessCollectionChange(tab, args))
                 .AddTo(tabInfo.Anchors);
         }
