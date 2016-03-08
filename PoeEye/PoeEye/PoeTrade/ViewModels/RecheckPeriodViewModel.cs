@@ -24,7 +24,7 @@
 
         private TimeSpan minValue = DefaultMinValue;
 
-        private TimeSpan period = DefaultMaxValue;
+        private TimeSpan period;
 
         public RecheckPeriodViewModel([NotNull] IPoeEyeConfigProvider configProvider)
         {
@@ -38,7 +38,7 @@
             this.WhenAnyValue(x => x.Period)
                 .Where(x => x != TimeSpan.Zero)
                 .Where(x => x > maxValue || x < minValue)
-                .Subscribe(() => Period = maxValue)
+                .Subscribe(() => Period = MiddleSplit(minValue, maxValue))
                 .AddTo(Anchors);
 
             this.WhenAnyValue(x => x.IsAutoRecheckEnabled)
@@ -75,6 +75,11 @@
         {
             get { return isAutoRecheckEnabled; }
             set { this.RaiseAndSetIfChanged(ref isAutoRecheckEnabled, value); }
+        }
+
+        private TimeSpan MiddleSplit(TimeSpan min, TimeSpan max)
+        {
+            return TimeSpan.FromTicks(Math.Abs(max.Ticks - min.Ticks));
         }
 
         private void Reinitialize(TimeSpan minRefreshTimeout, TimeSpan maxRefreshTimeout)
