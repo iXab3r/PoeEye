@@ -11,8 +11,8 @@
     <files>
         <file src="Bin\NuGet.Squirrel.dll" target="lib\.net45\NuGet.Squirrel.dll" />
         <file src="Bin\Squirrel.dll" target="lib\.net45\Squirrel.dll" />
-        <file src="Bin\PoeEyeUi.exe" target="lib\.net45\PoeEyeUi.exe" />
-        <file src="Bin\PoeEyeUi.exe.config" target="lib\.net45\PoeEyeUi.exe.config" />
+        <file src="Bin\PoeEye.exe" target="lib\.net45\PoeEye.exe" />
+        <file src="Bin\PoeEye.exe.config" target="lib\.net45\PoeEye.exe.config" />
         <file src="Bin\WpfAwesomium.dll" target="lib\.net45\WpfAwesomium.dll" />
         <file src="Bin\avcodec-53.dll" target="lib\.net45\avcodec-53.dll" />
         <file src="Bin\avformat-53.dll" target="lib\.net45\avformat-53.dll" />
