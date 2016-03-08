@@ -18,5 +18,7 @@
         bool WhisperNotificationsEnabled { get; set; }
 
         TimeSpan MinRefreshTimeout { get; set; }
+
+        TimeSpan MaxRefreshTimeout { get; set; }
     }
 }

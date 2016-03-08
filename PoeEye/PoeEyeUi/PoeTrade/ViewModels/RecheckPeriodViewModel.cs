@@ -15,13 +15,16 @@
 
     internal sealed class RecheckPeriodViewModel : DisposableReactiveObject, IRecheckPeriodViewModel
     {
+        private static readonly TimeSpan DefaultMaxValue = TimeSpan.FromMinutes(30);
+        private static readonly TimeSpan DefaultMinValue = TimeSpan.FromSeconds(30);
+
         private bool isAutoRecheckEnabled;
 
-        private TimeSpan maxValue = TimeSpan.FromMinutes(30);
+        private TimeSpan maxValue = DefaultMaxValue;
 
-        private TimeSpan minValue = TimeSpan.FromMinutes(5);
+        private TimeSpan minValue = DefaultMinValue;
 
-        private TimeSpan period = TimeSpan.FromMinutes(5);
+        private TimeSpan period = DefaultMaxValue;
 
         public RecheckPeriodViewModel([NotNull] IPoeEyeConfigProvider configProvider)
         {
@@ -44,11 +47,9 @@
 
             configProvider
                 .WhenAnyValue(x => x.ActualConfig)
-                .Select(x => x.MinRefreshTimeout)
-                .Where(x => x != TimeSpan.Zero)
-                .Where(x => x != TimeSpan.MinValue)
+                .Select(x => new { x.MinRefreshTimeout, x.MaxRefreshTimeout })
                 .DistinctUntilChanged()
-                .Subscribe(Reinitialize)
+                .Subscribe(x => Reinitialize(x.MinRefreshTimeout, x.MaxRefreshTimeout))
                 .AddTo(Anchors);
         }
 
@@ -76,9 +77,12 @@
             set { this.RaiseAndSetIfChanged(ref isAutoRecheckEnabled, value); }
         }
 
-        private void Reinitialize(TimeSpan minRefreshTimeout)
+        private void Reinitialize(TimeSpan minRefreshTimeout, TimeSpan maxRefreshTimeout)
         {
-            MinValue = minRefreshTimeout;
+            MinValue = minRefreshTimeout == TimeSpan.Zero ? DefaultMinValue : minRefreshTimeout;
+            MaxValue = maxRefreshTimeout == TimeSpan.Zero ? DefaultMaxValue : maxRefreshTimeout;
+
+            this.RaisePropertyChanged(nameof(Period));
         }
     }
 }
