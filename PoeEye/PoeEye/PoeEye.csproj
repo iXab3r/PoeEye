@@ -1,0 +1,673 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{9BC98190-3DB1-48CD-84F7-96DC843718AE}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>PoeEye</RootNamespace>
+    <AssemblyName>PoeEye</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <WarningLevel>4</WarningLevel>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+    <TargetFrameworkProfile />
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\Bin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>true</Prefer32Bit>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\Bin\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Resources\mainIconNegative.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>PoeEye.App</StartupObject>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Blue.MVVM.Converter, Version=1.4.3.26888, Culture=neutral, PublicKeyToken=1bb1db17d606db59, processorArchitecture=MSIL">
+      <HintPath>..\packages\Blue.MVVM.Converter.1.4.3\lib\net45\Blue.MVVM.Converter.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="ClipboardMonitor, Version=0.3.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ClipboardMonitor.0.3\lib\net40\ClipboardMonitor.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Common.Logging, Version=3.3.0.0, Culture=neutral, PublicKeyToken=af08829b84f0328e, processorArchitecture=MSIL">
+      <HintPath>..\packages\Common.Logging.3.3.0\lib\net40\Common.Logging.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Common.Logging.Core, Version=3.3.0.0, Culture=neutral, PublicKeyToken=af08829b84f0328e, processorArchitecture=MSIL">
+      <HintPath>..\packages\Common.Logging.Core.3.3.0\lib\net40\Common.Logging.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Common.Logging.Log4Net1211, Version=3.3.0.0, Culture=neutral, PublicKeyToken=af08829b84f0328e, processorArchitecture=MSIL">
+      <HintPath>..\packages\Common.Logging.Log4Net1211.3.3.0\lib\net40\Common.Logging.Log4Net1211.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="CsQuery, Version=1.3.3.249, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CsQuery.1.3.4\lib\net40\CsQuery.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Custom.Windows, Version=1.1.0.1, Culture=neutral, PublicKeyToken=8816f6d3bef7aa8b, processorArchitecture=MSIL">
+      <HintPath>..\packages\Custom.Windows.1.1.0.1\lib\net40\Custom.Windows.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="DeltaCompressionDotNet, Version=1.0.0.0, Culture=neutral, PublicKeyToken=1d14d6e5194e7f4a, processorArchitecture=MSIL">
+      <HintPath>..\packages\DeltaCompressionDotNet.1.0.0\lib\net45\DeltaCompressionDotNet.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="DeltaCompressionDotNet.MsDelta, Version=1.0.0.0, Culture=neutral, PublicKeyToken=46b2138a390abf55, processorArchitecture=MSIL">
+      <HintPath>..\packages\DeltaCompressionDotNet.1.0.0\lib\net45\DeltaCompressionDotNet.MsDelta.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="DeltaCompressionDotNet.PatchApi, Version=1.0.0.0, Culture=neutral, PublicKeyToken=3e8888ee913ed789, processorArchitecture=MSIL">
+      <HintPath>..\packages\DeltaCompressionDotNet.1.0.0\lib\net45\DeltaCompressionDotNet.PatchApi.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="DuoVia.FuzzyStrings, Version=1.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\DuoVia.FuzzyStrings.1.0.1\lib\net40\DuoVia.FuzzyStrings.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Exceptionless.Extras, Version=3.3.1590.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Exceptionless.Wpf.3.3.1590\lib\net45\Exceptionless.Extras.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Exceptionless.Portable, Version=3.3.1590.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Exceptionless.Portable.3.3.1590\lib\net45\Exceptionless.Portable.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Exceptionless.Wpf, Version=3.3.1590.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Exceptionless.Wpf.3.3.1590\lib\net45\Exceptionless.Wpf.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="FontAwesome.Net, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\FontAwesomeDotNet.1.0\lib\FontAwesome.Net.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Guards, Version=1.0.0.0, Culture=neutral, PublicKeyToken=ac6aedb73a72f46e, processorArchitecture=MSIL">
+      <HintPath>..\packages\Guards.1.0.8\lib\portable-net45+wp8+wpa81+win81+netcore45+monoandroid10+monotouch10+xamarin.ios10\Guards.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="ICSharpCode.SharpZipLib, Version=0.86.0.518, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\squirrel.windows.1.0.2\lib\Net45\ICSharpCode.SharpZipLib.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="JetBrains.Annotations, Version=10.0.0.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
+      <HintPath>..\packages\JetBrains.Annotations.10.0.0\lib\net20\JetBrains.Annotations.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="JsonFx, Version=2.0.1209.2802, Culture=neutral, PublicKeyToken=315052dd637f8a52, processorArchitecture=MSIL">
+      <HintPath>..\packages\JsonFx.2.0.1209.2802\lib\net40\JsonFx.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="log4net, Version=1.2.13.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\packages\log4net.2.0.3\lib\net40-full\log4net.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="MahApps.Metro, Version=1.1.2.0, Culture=neutral, PublicKeyToken=f4fb5a3c4d1e5b4f, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.1.1.2.0\lib\net45\MahApps.Metro.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Expression.Interactions, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Windows.Interactivity.WPF.2.0.20525\lib\net40\Microsoft.Expression.Interactions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Practices.ServiceLocation, Version=1.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\CommonServiceLocator.1.3\lib\portable-net4+sl5+netcore45+wpa81+wp8\Microsoft.Practices.ServiceLocation.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Practices.Unity, Version=4.0.0.0, Culture=neutral, PublicKeyToken=6d32ff45e0ccc69f, processorArchitecture=MSIL">
+      <HintPath>..\packages\Unity.4.0.1\lib\net45\Microsoft.Practices.Unity.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Practices.Unity.Configuration, Version=4.0.0.0, Culture=neutral, PublicKeyToken=6d32ff45e0ccc69f, processorArchitecture=MSIL">
+      <HintPath>..\packages\Unity.4.0.1\lib\net45\Microsoft.Practices.Unity.Configuration.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Practices.Unity.RegistrationByConvention, Version=4.0.0.0, Culture=neutral, PublicKeyToken=6d32ff45e0ccc69f, processorArchitecture=MSIL">
+      <HintPath>..\packages\Unity.4.0.1\lib\net45\Microsoft.Practices.Unity.RegistrationByConvention.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Mono.Cecil, Version=0.9.6.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
+      <HintPath>..\packages\Mono.Cecil.0.9.6.1\lib\net45\Mono.Cecil.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Mono.Cecil.Mdb, Version=0.9.6.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
+      <HintPath>..\packages\Mono.Cecil.0.9.6.1\lib\net45\Mono.Cecil.Mdb.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Mono.Cecil.Pdb, Version=0.9.6.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
+      <HintPath>..\packages\Mono.Cecil.0.9.6.1\lib\net45\Mono.Cecil.Pdb.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Mono.Cecil.Rocks, Version=0.9.6.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
+      <HintPath>..\packages\Mono.Cecil.0.9.6.1\lib\net45\Mono.Cecil.Rocks.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="NuGet.Squirrel">
+      <HintPath>..\packages\squirrel.windows.1.0.2\lib\Net45\NuGet.Squirrel.dll</HintPath>
+    </Reference>
+    <Reference Include="Prism, Version=6.1.0.0, Culture=neutral, PublicKeyToken=91a96d2a154366d8, processorArchitecture=MSIL">
+      <HintPath>..\packages\Prism.Core.6.1.0\lib\net45\Prism.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Prism.Unity.Wpf, Version=6.1.0.0, Culture=neutral, PublicKeyToken=91a96d2a154366d8, processorArchitecture=MSIL">
+      <HintPath>..\packages\Prism.Unity.6.1.1\lib\net45\Prism.Unity.Wpf.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Prism.Wpf, Version=6.1.0.0, Culture=neutral, PublicKeyToken=91a96d2a154366d8, processorArchitecture=MSIL">
+      <HintPath>..\packages\Prism.Wpf.6.1.0\lib\net45\Prism.Wpf.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="ProxyProvider, Version=0.3.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ProxyProvider.0.3\lib\net45\ProxyProvider.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="ReactiveUI, Version=6.5.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\reactiveui-core.6.5.0\lib\Net45\ReactiveUI.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="RestEase, Version=1.0.5.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\RestEase.1.0.5\lib\net45\RestEase.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Splat, Version=1.6.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Splat.1.6.2\lib\Net45\Splat.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Squirrel, Version=1.0.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\squirrel.windows.1.0.2\lib\Net45\Squirrel.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Reactive.Core, Version=2.2.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Rx-Core.2.2.5\lib\net45\System.Reactive.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Reactive.Interfaces, Version=2.2.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Rx-Interfaces.2.2.5\lib\net45\System.Reactive.Interfaces.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Reactive.Linq, Version=2.2.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Rx-Linq.2.2.5\lib\net45\System.Reactive.Linq.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Reactive.PlatformServices, Version=2.2.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Rx-PlatformServices.2.2.5\lib\net45\System.Reactive.PlatformServices.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Reactive.Windows.Threading, Version=2.2.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Rx-XAML.2.2.5\lib\net45\System.Reactive.Windows.Threading.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Windows.Forms">
+      <HintPath>..\..\..\..\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Windows.Forms.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Windows.Interactivity, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Windows.Interactivity.WPF.2.0.20525\lib\net40\System.Windows.Interactivity.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Xml" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xaml">
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="TypeConverter, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b1d2d39c48564dfb, processorArchitecture=MSIL">
+      <HintPath>..\packages\TypeConverter.1.0.22\lib\portable-net45+wp8+wpa81+win81+netcore45+monoandroid1+xamarin.ios10\TypeConverter.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="WindowsBase" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="WindowsFormsIntegration">
+      <HintPath>..\..\..\..\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\WindowsFormsIntegration.dll</HintPath>
+    </Reference>
+    <Reference Include="WpfAutoCompleteControls, Version=0.14.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\WpfAutoCompleteControls.0.14\lib\net45\WpfAutoCompleteControls.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ApplicationDefinition Include="App.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </ApplicationDefinition>
+    <Compile Include="App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Config\IConfigProvider.cs" />
+    <Compile Include="Converters\ConcreteListTypeConverter.cs" />
+    <Compile Include="Config\IPoeEyeConfig.cs" />
+    <Compile Include="Config\IPoeEyeConfigProvider.cs" />
+    <Compile Include="Config\PoeEyeConfig.cs" />
+    <Compile Include="Config\PoeEyeConfigProviderFromFile.cs" />
+    <Compile Include="Config\PoeEyeTabConfig.cs" />
+    <Compile Include="Converters\BoolInversionConverter.cs" />
+    <Compile Include="Converters\NullToBoolConverter.cs" />
+    <Compile Include="Converters\ObjectToVisibilityConverter.cs" />
+    <Compile Include="Converters\ObjectToLowercaseConverter.cs" />
+    <Compile Include="Converters\PriceToCurrencyConverter.cs" />
+    <Compile Include="Converters\PriceToImageUriConverter.cs" />
+    <Compile Include="Converters\TimeSpanToHumanReadableStringConverter.cs" />
+    <Compile Include="Converters\TimeSpanToSecondsConverter.cs" />
+    <Compile Include="Converters\NullableConverter.cs" />
+    <Compile Include="Converters\ExceptionToMessageConverter.cs" />
+    <Compile Include="Converters\NullToVisibilityConverter.cs" />
+    <Compile Include="MetroModels\DialogParticipation.cs" />
+    <Compile Include="MetroModels\DialogCoordinator.cs" />
+    <Compile Include="MetroModels\IDialogCoordinator.cs" />
+    <Compile Include="PoeTrade\AudioNotificationType.cs" />
+    <Compile Include="PoeTrade\Common\SortDescriptionData.cs" />
+    <Compile Include="PoeTrade\Models\AudioNotificationsManager.cs" />
+    <Compile Include="PoeTrade\Models\FuzzySuggestionProvider.cs" />
+    <Compile Include="PoeTrade\Models\IAudioNotificationsManager.cs" />
+    <Compile Include="PoeTrade\Models\IImagesCacheService.cs" />
+    <Compile Include="PoeTrade\Models\IPoePriceCalculcator.cs" />
+    <Compile Include="PoeTrade\Models\ImagesCacheService.cs" />
+    <Compile Include="PoeTrade\Models\IPoeCaptchaRegistrator.cs" />
+    <Compile Include="PoeTrade\Models\IWhispersNotificationManager.cs" />
+    <Compile Include="PoeTrade\Models\IWindowTracker.cs" />
+    <Compile Include="PoeTrade\Models\PoeItemPricePoint.cs" />
+    <Compile Include="PoeTrade\Models\PoePriceCalculcator.cs" />
+    <Compile Include="PoeTrade\Models\PoeCaptchaRegistrator.cs" />
+    <Compile Include="PoeTrade\Models\WhispersNotificationManager.cs" />
+    <Compile Include="PoeTrade\Models\WindowTracker.cs" />
+    <Compile Include="PoeTrade\PoeItemVerificationState.cs" />
+    <Compile Include="PoeTrade\ViewModels\ApplicationUpdaterViewModel.cs" />
+    <Compile Include="PoeTrade\ViewModels\HistoricalTradesViewModel.cs" />
+    <Compile Include="PoeTrade\ViewModels\IHistoricalTradesViewModel.cs" />
+    <Compile Include="PoeTrade\ViewModels\IMainWindowTabViewModel.cs" />
+    <Compile Include="PoeTrade\ViewModels\IMainWindowViewModel.cs" />
+    <Compile Include="PoeTrade\ViewModels\IPoeChatViewModel.cs" />
+    <Compile Include="PoeTrade\ViewModels\IPoeModGroupsEditorViewModel.cs" />
+    <Compile Include="PoeTrade\ViewModels\IPoeModsEditorViewModel.cs" />
+    <Compile Include="PoeTrade\ViewModels\IPoeModViewModel.cs" />
+    <Compile Include="PoeTrade\ViewModels\IPoeTradeCaptchaViewModel.cs" />
+    <Compile Include="PoeTrade\ViewModels\IPoeTradesListViewModel.cs" />
+    <Compile Include="PoeTrade\ViewModels\IPoeTradeViewModel.cs" />
+    <Compile Include="PoeTrade\ViewModels\IRecheckPeriodViewModel.cs" />
+    <Compile Include="PoeTrade\ViewModels\PoeChatViewModel.cs" />
+    <Compile Include="PoeTrade\ViewModels\PoeClipboardParserViewModel.cs" />
+    <Compile Include="PoeTrade\ViewModels\PoeEyeSettingsViewModel.cs" />
+    <Compile Include="PoeTrade\ViewModels\PoeFilteredTradeViewModel.cs" />
+    <Compile Include="PoeTrade\ViewModels\PoeLinksInfoViewModel.cs" />
+    <Compile Include="PoeTrade\ViewModels\ImageViewModel.cs" />
+    <Compile Include="PoeTrade\ViewModels\MainWindowTabViewModel.cs" />
+    <Compile Include="PoeTrade\ViewModels\MainWindowViewModel.cs" />
+    <Compile Include="PoeTrade\ViewModels\PoeModsEditorViewModel.cs" />
+    <Compile Include="PoeTrade\ViewModels\PoeModGroupsEditorViewModel.cs" />
+    <Compile Include="PoeTrade\ViewModels\PoeModViewModel.cs" />
+    <Compile Include="PoeTrade\ViewModels\PoeQueryViewModel.cs" />
+    <Compile Include="PoeTrade\ViewModels\PoeSummaryTabViewModel.cs" />
+    <Compile Include="PoeTrade\ViewModels\PoeTradeCaptchaViewModel.cs" />
+    <Compile Include="PoeTrade\ViewModels\ProxyProviderViewModel.cs" />
+    <Compile Include="PoeTrade\ViewModels\RecheckPeriodViewModel.cs" />
+    <Compile Include="PoeTrade\Views\MainWindow.xaml.cs">
+      <DependentUpon>MainWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Prism\PoeEyeBootstrapper.cs" />
+    <Compile Include="Prism\WellKnownSchedulers.cs" />
+    <Compile Include="Prism\WellKnownWindows.cs" />
+    <Compile Include="Utilities\EditableTuple.cs" />
+    <Compile Include="Utilities\FilterExtension\CollectionViewSourceFilteringBehavior.cs" />
+    <Compile Include="Utilities\FilterExtension\IFilter.cs" />
+    <Compile Include="Utilities\FilterExtension\PropertyFilter.cs" />
+    <Compile Include="Utilities\SetPropertyAction.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="PoeTrade\PoeTradeState.cs" />
+    <Compile Include="PoeTrade\ViewModels\PoeTradeViewModel.cs" />
+    <Compile Include="PoeTrade\ViewModels\PoeTradesListViewModel.cs" />
+    <Compile Include="Prism\UiRegistrations.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <AppDesigner Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FuzzySearch\FuzzySearch.csproj">
+      <Project>{9cee14a8-1436-4947-9c62-ff3ba83a330d}</Project>
+      <Name>FuzzySearch</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PoeEye.Simulator\PoeEye.Simulator.csproj">
+      <Project>{785dc21d-42f1-4db9-883f-4d02ccf73ff0}</Project>
+      <Name>PoeEye.Simulator</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PoeEye.PoeTrade\PoeEye.PoeTrade.csproj">
+      <Project>{c6188345-f8dc-4cdc-8c01-add0a03bbf1c}</Project>
+      <Name>PoeEye.PoeTrade</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PoeShared\PoeShared.csproj">
+      <Project>{12DF53DD-7144-4D2D-B7A1-B4BC5BBDFB69}</Project>
+      <Name>PoeShared</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PoeWhisperMonitor\PoeWhisperMonitor.csproj">
+      <Project>{75b4a3db-45c0-4639-b5a3-4d180ad4b9fb}</Project>
+      <Name>PoeWhisperMonitor</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\WpfAwesomium\WpfAwesomium.csproj">
+      <Project>{61497f0d-f122-4a25-81c0-53c27c699f0c}</Project>
+      <Name>WpfAwesomium</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="PoeTrade\Views\ApplicationUpdaterView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="PoeTrade\Views\CurrencyView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="PoeTrade\Views\HistoricalTradesView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="PoeTrade\Views\ImageView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="PoeTrade\Views\MainWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="PoeTrade\Views\MainWindowTabItemView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="PoeTrade\Views\MainWindowTabView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="PoeTrade\Views\PoeChatView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="PoeTrade\Views\PoeModsEditorView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="PoeTrade\Views\PoeModsGroupEditorView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="PoeTrade\Views\PoeModView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="PoeTrade\Views\PoeLinksInfoView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="PoeTrade\Views\PoeItemModView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="PoeTrade\Views\PoeSummaryTabView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="PoeTrade\Views\PoeQueryView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="PoeTrade\Views\PoeEyeSettingsView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="PoeTrade\Views\PoeTradeCaptchaView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="PoeTrade\Views\ProxyProviderView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="PoeTrade\Views\RecheckPeriodView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Resources\Icons.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\Generic.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\PoeQueryViewStyles.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="PoeTrade\Views\PoeItemView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Themes\Colors.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\Converters.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\ListBoxAsTabCotrolStyle.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\VirtualizedItemsControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\WpfAutoCompleteTextBoxStyle.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="FodyWeavers.xml">
+      <SubType>Designer</SubType>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.5.2">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4.5.2 %28x86 and x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\mainIcon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\mainIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Currencies\Currency %281%29.png" />
+    <Resource Include="Resources\Currencies\Currency %2810%29.png" />
+    <Resource Include="Resources\Currencies\Currency %2811%29.png" />
+    <Resource Include="Resources\Currencies\Currency %2812%29.png" />
+    <Resource Include="Resources\Currencies\Currency %2813%29.png" />
+    <Resource Include="Resources\Currencies\Currency %2814%29.png" />
+    <Resource Include="Resources\Currencies\Currency %2815%29.png" />
+    <Resource Include="Resources\Currencies\Currency %2816%29.png" />
+    <Resource Include="Resources\Currencies\Currency %2817%29.png" />
+    <Resource Include="Resources\Currencies\Currency %2818%29.png" />
+    <Resource Include="Resources\Currencies\Currency %2819%29.png" />
+    <Resource Include="Resources\Currencies\Currency %282%29.png" />
+    <Resource Include="Resources\Currencies\Currency %2820%29.png" />
+    <Resource Include="Resources\Currencies\Currency %2821%29.png" />
+    <Resource Include="Resources\Currencies\Currency %2822%29.png" />
+    <Resource Include="Resources\Currencies\Currency %2823%29.png" />
+    <Resource Include="Resources\Currencies\Currency %2824%29.png" />
+    <Resource Include="Resources\Currencies\Currency %2825%29.png" />
+    <Resource Include="Resources\Currencies\Currency %283%29.png" />
+    <Resource Include="Resources\Currencies\Currency %284%29.png" />
+    <Resource Include="Resources\Currencies\Currency %285%29.png" />
+    <Resource Include="Resources\Currencies\Currency %286%29.png" />
+    <Resource Include="Resources\Currencies\Currency %287%29.png" />
+    <Resource Include="Resources\Currencies\Currency %288%29.png" />
+    <Resource Include="Resources\Currencies\Currency %289%29.png" />
+    <Resource Include="Resources\Currencies\Divine_Orb.png" />
+    <Resource Include="Resources\Currencies\Eternal_Orb.png" />
+    <Resource Include="Resources\Currencies\Exalted_Orb.png" />
+    <Resource Include="Resources\Currencies\Gemcutter%27s_Prism.png" />
+    <Resource Include="Resources\Currencies\Glassblower%27s_Bauble.png" />
+    <Resource Include="Resources\Currencies\Jeweller%27s_Orb.png" />
+    <Resource Include="Resources\Currencies\Mirror_of_Kalandra.png" />
+    <Resource Include="Resources\Currencies\Orb_of_Alchemy.png" />
+    <Resource Include="Resources\Currencies\Orb_of_Alteration.png" />
+    <Resource Include="Resources\Currencies\Orb_of_Augmentation.png" />
+    <Resource Include="Resources\Currencies\Orb_of_Chance.png" />
+    <Resource Include="Resources\Currencies\Orb_of_Fusing.png" />
+    <Resource Include="Resources\Currencies\Orb_of_Regret.png" />
+    <Resource Include="Resources\Currencies\Orb_of_Scouring.png" />
+    <Resource Include="Resources\Currencies\Orb_of_Transmutation.png" />
+    <Resource Include="Resources\Currencies\Portal_Scroll.png" />
+    <Resource Include="Resources\Currencies\Regal_Orb.png" />
+    <Resource Include="Resources\Currencies\Scroll_Fragment.png" />
+    <Resource Include="Resources\Currencies\Scroll_of_Wisdom.png" />
+    <Resource Include="Resources\Currencies\Transmutation_Shard.png" />
+    <Resource Include="Resources\Currencies\Vaal_Orb.png" />
+    <Resource Include="Resources\Currencies\Alchemy_Shard.png" />
+    <Resource Include="Resources\Currencies\Alteration_Shard.png" />
+    <Resource Include="Resources\Currencies\Armourer%27s_Scrap.png" />
+    <Resource Include="Resources\Currencies\Blacksmith%27s_Whetstone.png" />
+    <Resource Include="Resources\Currencies\Blessed_Orb.png" />
+    <Resource Include="Resources\Currencies\Cartographer%27s_Chisel.png" />
+    <Resource Include="Resources\Currencies\Chaos_Orb.png" />
+    <Resource Include="Resources\Currencies\Chromatic_Orb.png" />
+    <None Include="Resources\icq.wav" />
+    <Content Include="Resources\minions-tadaa.wav" />
+    <None Include="Resources\sounds-940-pizzicato.wav" />
+    <Content Include="Resources\whistle.wav" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <UsingTask TaskName="CosturaCleanup" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll" TaskFactory="CodeTaskFactory">
+    <ParameterGroup>
+      <Config Output="false" Required="true" ParameterType="Microsoft.Build.Framework.ITaskItem" />
+      <Files Output="false" Required="true" ParameterType="Microsoft.Build.Framework.ITaskItem[]" />
+    </ParameterGroup>
+    <Task Evaluate="true">
+      <Reference xmlns="http://schemas.microsoft.com/developer/msbuild/2003" Include="System.Xml" />
+      <Reference xmlns="http://schemas.microsoft.com/developer/msbuild/2003" Include="System.Xml.Linq" />
+      <Using xmlns="http://schemas.microsoft.com/developer/msbuild/2003" Namespace="System" />
+      <Using xmlns="http://schemas.microsoft.com/developer/msbuild/2003" Namespace="System.IO" />
+      <Using xmlns="http://schemas.microsoft.com/developer/msbuild/2003" Namespace="System.Xml.Linq" />
+      <Code xmlns="http://schemas.microsoft.com/developer/msbuild/2003" Type="Fragment" Language="cs"><![CDATA[
+var config = XElement.Load(Config.ItemSpec).Elements("Costura").FirstOrDefault();
+
+if (config == null) return true;
+
+var excludedAssemblies = new List<string>();
+var attribute = config.Attribute("ExcludeAssemblies");
+if (attribute != null)
+    foreach (var item in attribute.Value.Split('|').Select(x => x.Trim()).Where(x => x != string.Empty))
+        excludedAssemblies.Add(item);
+var element = config.Element("ExcludeAssemblies");
+if (element != null)
+    foreach (var item in element.Value.Split(new[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim()).Where(x => x != string.Empty))
+        excludedAssemblies.Add(item);
+
+var filesToCleanup = Files.Select(f => f.ItemSpec).Where(f => !excludedAssemblies.Contains(Path.GetFileNameWithoutExtension(f), StringComparer.InvariantCultureIgnoreCase));
+
+foreach (var item in filesToCleanup)
+  File.Delete(item);
+]]></Code>
+    </Task>
+  </UsingTask>
+  <Target Name="CleanReferenceCopyLocalPaths" AfterTargets="AfterBuild;NonWinFodyTarget">
+    <CosturaCleanup Config="FodyWeavers.xml" Files="@(ReferenceCopyLocalPaths->'$(OutDir)%(DestinationSubDirectory)%(Filename)%(Extension)')" />
+  </Target>
+  <Import Project="..\packages\Fody.1.29.3\build\portable-net+sl+win+wpa+wp\Fody.targets" Condition="Exists('..\packages\Fody.1.29.3\build\portable-net+sl+win+wpa+wp\Fody.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Fody.1.29.3\build\portable-net+sl+win+wpa+wp\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Fody.1.29.3\build\portable-net+sl+win+wpa+wp\Fody.targets'))" />
+  </Target>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

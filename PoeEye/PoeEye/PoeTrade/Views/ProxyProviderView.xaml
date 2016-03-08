@@ -1,0 +1,41 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib"
+                    xmlns:viewModels="clr-namespace:PoeEye.PoeTrade.ViewModels">
+  <DataTemplate DataType="{x:Type viewModels:ProxyProviderViewModel}">
+
+    <Grid>
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="Auto" />
+        <ColumnDefinition Width="*" />
+      </Grid.ColumnDefinitions>
+      <Ellipse Grid.Column="0"
+               Width="12" Height="12" Stroke="Black" StrokeThickness="1">
+        <Ellipse.Style>
+          <Style TargetType="{x:Type Ellipse}">
+            <Setter Property="Fill" Value="Orange" />
+            <Style.Triggers>
+              <DataTrigger Binding="{Binding IsProxified}">
+                <DataTrigger.Value>
+                  <system:Boolean>True</system:Boolean>
+                </DataTrigger.Value>
+                <Setter Property="Fill" Value="Green" />
+              </DataTrigger>
+            </Style.Triggers>
+          </Style>
+        </Ellipse.Style>
+      </Ellipse>
+
+      <TextBlock Grid.Column="1"
+                 Margin="5,0"
+                 VerticalAlignment="Center">
+        <TextBlock.Inlines>
+          <Run Text="{Binding ActiveProxiesCount}" Foreground="DarkSeaGreen" /> /
+          <Run Text="{Binding TotalProxiesCount}" />
+        </TextBlock.Inlines>
+      </TextBlock>
+    </Grid>
+
+  </DataTemplate>
+
+</ResourceDictionary>

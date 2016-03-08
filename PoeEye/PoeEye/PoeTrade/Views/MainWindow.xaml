@@ -1,0 +1,279 @@
+﻿<controls:MetroWindow x:Class="PoeEye.PoeTrade.Views.MainWindow"
+                      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                      xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
+                      xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+                      xmlns:system="clr-namespace:System;assembly=mscorlib"
+                      xmlns:net="clr-namespace:FontAwesome.Net;assembly=FontAwesome.Net"
+                      xmlns:metroModels="clr-namespace:PoeEye.MetroModels"
+                      xmlns:utilities="clr-namespace:PoeEye.Utilities"
+                      mc:Ignorable="d"
+                      Title="{Binding MainWindowTitle}"
+                      MinWidth="1200"
+                      MinHeight="800"
+                      Width="1400"
+                      Height="800"
+                      d:DataContext="{d:DesignInstance viewModels:MainWindowViewModel}"
+                      BorderThickness="1" BorderBrush="{StaticResource AccentColorBrush}"
+                      metroModels:DialogParticipation.Register="{Binding}">
+
+  <Window.InputBindings>
+    <KeyBinding Command="{Binding ClipboardParserViewModel.ParseClipboard}" Gesture="CTRL+V" />
+  </Window.InputBindings>
+
+  <Grid>
+
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="*" />
+      <RowDefinition Height="Auto" />
+    </Grid.RowDefinitions>
+
+    <ContentControl Grid.Row="0">
+      <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" />
+    </ContentControl>
+
+    <Border Grid.Row="1">
+      <Grid>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <ListBox Grid.Column="0"
+                 ItemsSource="{Binding TabsList}"
+                 SelectedItem="{Binding SelectedTab}"
+                 SelectionMode="Single"
+                 Margin="10,10,5,10"
+                 Focusable="False"
+                 HorizontalContentAlignment="Stretch"
+                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                 ItemTemplate="{StaticResource MainWindowTabItemViewTemplate}">
+          <ListBox.Resources>
+            <Style TargetType="ListBoxItem" BasedOn="{StaticResource ListBoxAsTabControl}" />
+          </ListBox.Resources>
+        </ListBox>
+
+        <Image Grid.Column="1" Source="pack://application:,,,/Resources/mainIcon.png" Opacity="0.2" />
+
+        <ContentControl Grid.Column="1"
+                        Margin="5,10,10,10"
+                        Visibility="{Binding SelectedTab, Converter={StaticResource NullToHiddenConverter}}"
+                        Content="{Binding SelectedTab}" />
+        
+        <ContentControl Grid.Column="1"
+                        Margin="5,10,10,10"
+                        Visibility="{Binding SelectedTab, Converter={StaticResource NotNullToHiddenConverter}}"
+                        Content="{Binding SummaryTab}" />
+      </Grid>
+    </Border>
+
+
+    <Border Grid.Row="2"
+            BorderThickness="0,1,0,0" BorderBrush="{StaticResource AccentColorBrush}" Margin="5,1,10,5"
+            Visibility="{Binding SelectedTab, Converter={StaticResource NullToCollapsedConverter}}">
+      <Border.Resources>
+        <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource MetroTextBlock}">
+          <Setter Property="FontSize" Value="16" />
+        </Style>
+      </Border.Resources>
+      <Grid>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="*" />
+          <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+
+        <StackPanel Grid.Column="0" Orientation="Horizontal"
+                    Visibility="{Binding SelectedTab.IsBusy, Converter={StaticResource BoolFalseToCollapsedConverter}}">
+          <controls:ProgressRing Height="20" Width="20" IsActive="true" Foreground="{StaticResource TextBrush}" />
+          <TextBlock Text="Updating..." />
+        </StackPanel>
+
+        <TextBlock Grid.Column="1"
+                   Margin="10,0,0,0"
+                   Visibility="{Binding SelectedTab.TradesList.ActiveQuery, Converter={StaticResource NullToCollapsedConverter}}"
+                   Text="{Binding SelectedTab.TradesList.TimeSinceLastUpdate.TotalSeconds, Mode=OneWay, StringFormat='Elapsed since last update: {0:F0}s'}" />
+
+        <ContentPresenter Grid.Column="2" Content="{Binding SelectedTab.RecheckPeriod}" />
+
+      </Grid>
+    </Border>
+
+
+  </Grid>
+
+  <controls:MetroWindow.LeftWindowCommands>
+    <controls:WindowCommands>
+      <StackPanel Orientation="Horizontal">
+
+        <Button
+          Command="{Binding CreateNewTabCommand}"
+          Content="Create new tab"
+          FontWeight="Bold" />
+        
+        <Separator />
+
+        <Button
+          Content="Summary"
+          FontWeight="Bold">
+          <Button.Style>
+            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
+              <Style.Triggers>
+                <DataTrigger Binding="{Binding SelectedTab}" Value="{x:Null}">
+                  <Setter Property="Foreground" Value="{StaticResource ValidationSummaryColor4}"/>
+                </DataTrigger>
+              </Style.Triggers>
+            </Style>
+          </Button.Style>
+          <i:Interaction.Triggers>
+            <i:EventTrigger EventName="Click">
+              <utilities:SetPropertyAction PropertyName="SelectedTab" TargetObject="{Binding}" PropertyValue="{x:Null}" />
+            </i:EventTrigger>
+          </i:Interaction.Triggers>
+        </Button>
+
+      </StackPanel>
+
+    </controls:WindowCommands>
+
+  </controls:MetroWindow.LeftWindowCommands>
+
+  <controls:MetroWindow.RightWindowCommands>
+    <controls:WindowCommands>
+      <StackPanel Orientation="Horizontal">
+
+        <ContentPresenter Content="{Binding ProxyProviderViewModel}" />
+
+        <controls:ProgressRing Height="20" Width="20" IsActive="true"
+                               Foreground="{StaticResource TextBrush}"
+                               Visibility="{Binding ApplicationUpdater.IsBusy, Converter={StaticResource BoolFalseToCollapsedConverter}}" />
+        <Button Command="{Binding ApplicationUpdater.CheckForUpdatesCommand}"
+                CommandParameter="{Binding}"
+                IsEnabled="{Binding ApplicationUpdater.IsBusy, Converter={StaticResource BoolTrueToCollapsedConverter}}"
+                Content="Check for updates" />
+
+        <StackPanel Orientation="Horizontal" Height="24" Margin="5,0">
+          <Button Content="&#xF1D7; Chat" FontFamily="{StaticResource FontAwesome}">
+            <i:Interaction.Triggers>
+              <i:EventTrigger EventName="Click">
+                <utilities:SetPropertyAction PropertyName="IsOpen"
+                                             TargetObject="{Binding ElementName=ChatFlyout}"
+                                             PropertyValue="{Binding ElementName=ChatFlyout, Path=IsOpen, Converter={StaticResource BoolInversionConverter}}" />
+              </i:EventTrigger>
+            </i:Interaction.Triggers>
+          </Button>
+
+          <Button Content="&#xF085; Settings" FontFamily="{StaticResource FontAwesome}">
+            <i:Interaction.Triggers>
+              <i:EventTrigger EventName="Click">
+                <utilities:SetPropertyAction PropertyName="IsOpen"
+                                             TargetObject="{Binding ElementName=SettingsFlyout}"
+                                             PropertyValue="{Binding ElementName=SettingsFlyout, Path=IsOpen, Converter={StaticResource BoolInversionConverter}}" />
+              </i:EventTrigger>
+            </i:Interaction.Triggers>
+          </Button>
+        </StackPanel>
+      </StackPanel>
+    </controls:WindowCommands>
+  </controls:MetroWindow.RightWindowCommands>
+
+  <controls:MetroWindow.Flyouts>
+    <controls:FlyoutsControl>
+      <controls:Flyout Header="&#xF0EA; Clipboard" x:Name="ClipboardFlyout"
+                       FontFamily="{StaticResource FontAwesome}"
+                       Position="Bottom"
+                       BorderThickness="0,1,0,0"
+                       BorderBrush="{StaticResource AccentColorBrush}"
+                       IsOpen="{Binding  ClipboardParserViewModel.IsOpen, Mode=TwoWay}">
+
+        <Grid>
+          <controls:MetroProgressBar IsIndeterminate="True"
+                                     Foreground="{StaticResource TextBrush}"
+                                     Visibility="{Binding ClipboardParserViewModel.IsBusy, Converter={StaticResource BoolFalseToCollapsedConverter}}" />
+
+          <Grid MaxWidth="1000"
+                Visibility="{Binding ClipboardParserViewModel.IsBusy, Converter={StaticResource BoolTrueToCollapsedConverter}}">
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*" />
+              <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <ContentControl Grid.Column="0"
+                            Content="{Binding ClipboardParserViewModel.ItemFromClipboard}" />
+
+            <Button Grid.Column="1" Content="Import"
+                    Command="{Binding CreateNewTabCommand}"
+                    CommandParameter="{Binding ClipboardParserViewModel.ItemQueryInfo}"
+                    Margin="15">
+              <i:Interaction.Triggers>
+                <i:EventTrigger EventName="Click">
+                  <utilities:SetPropertyAction PropertyName="IsOpen"
+                                               TargetObject="{Binding ElementName=ClipboardFlyout}">
+                    <utilities:SetPropertyAction.PropertyValue>
+                      <system:Boolean>False</system:Boolean>
+                    </utilities:SetPropertyAction.PropertyValue>
+                  </utilities:SetPropertyAction>
+                </i:EventTrigger>
+              </i:Interaction.Triggers>
+            </Button>
+          </Grid>
+        </Grid>
+
+
+      </controls:Flyout>
+
+      <controls:Flyout Header="&#xF085; Settings" x:Name="SettingsFlyout"
+                       FontFamily="{StaticResource FontAwesome}"
+                       Position="Right"
+                       Width="300"
+                       Margin="0, 20"
+                       IsOpen="{Binding Settings.IsOpen}"
+                       BorderBrush="{StaticResource AccentColorBrush}">
+        <ContentPresenter Content="{Binding Settings}" />
+      </controls:Flyout>
+
+      <controls:Flyout Header="&#xF1D7; Chat" x:Name="ChatFlyout"
+                       FontFamily="{StaticResource FontAwesome}"
+                       Position="Right"
+                       Width="500"
+                       Margin="0, 20"
+                       BorderBrush="{StaticResource AccentColorBrush}">
+        <Grid Margin="5,0">
+          <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Visible">
+            <ScrollViewer.Content>
+              <ContentPresenter Content="{Binding Chat}" Margin="10" HorizontalAlignment="Stretch" />
+            </ScrollViewer.Content>
+          </ScrollViewer>
+        </Grid>
+      </controls:Flyout>
+
+      <controls:Flyout Header="&#xF188; You must resolve CAPTCHA to proceed" x:Name="CaptchaFlyout"
+                       FontFamily="{StaticResource FontAwesome}"
+                       Position="Right"
+                       Margin="0, 20"
+                       AnimateOpacity="True"
+                       Width="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=controls:MetroWindow}, Path=ActualWidth, Mode=OneWay}"
+                       BorderBrush="{StaticResource AccentColorBrush}"
+                       IsOpen="{Binding PoeTradeCaptchaViewModel.IsOpen}">
+
+        <ContentPresenter Content="{Binding PoeTradeCaptchaViewModel}" />
+      </controls:Flyout>
+
+      <controls:Flyout Header="&#xF093; Update completed" x:Name="ApplicationUpdatedFlyout"
+                       FontFamily="{StaticResource FontAwesome}"
+                       Position="Bottom"
+                       AnimateOpacity="True"
+                       Margin="0, 20"
+                       BorderThickness="0,0,0,1"
+                       BorderBrush="{StaticResource AccentColorBrush}"
+                       IsOpen="{Binding ApplicationUpdater.IsOpen}">
+
+        <ContentPresenter Content="{Binding ApplicationUpdater}" />
+      </controls:Flyout>
+    </controls:FlyoutsControl>
+  </controls:MetroWindow.Flyouts>
+
+</controls:MetroWindow>

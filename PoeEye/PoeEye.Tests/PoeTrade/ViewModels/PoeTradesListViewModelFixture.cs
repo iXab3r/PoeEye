@@ -13,9 +13,9 @@
 
     using NUnit.Framework;
 
-    using PoeEyeUi.PoeTrade;
-    using PoeEyeUi.PoeTrade.Models;
-    using PoeEyeUi.PoeTrade.ViewModels;
+    using PoeEye.PoeTrade;
+    using PoeEye.PoeTrade.Models;
+    using PoeEye.PoeTrade.ViewModels;
 
     using PoeShared;
     using PoeShared.Common;

@@ -155,9 +155,9 @@
       <Project>{9cee14a8-1436-4947-9c62-ff3ba83a330d}</Project>
       <Name>FuzzySearch</Name>
     </ProjectReference>
-    <ProjectReference Include="..\PoeEyeUi\PoeEyeUi.csproj">
+    <ProjectReference Include="..\PoeEye\PoeEye.csproj">
       <Project>{9bc98190-3db1-48cd-84f7-96dc843718ae}</Project>
-      <Name>PoeEyeUi</Name>
+      <Name>PoeEye</Name>
     </ProjectReference>
     <ProjectReference Include="..\PoeEye.PoeTrade\PoeEye.PoeTrade.csproj">
       <Project>{c6188345-f8dc-4cdc-8c01-add0a03bbf1c}</Project>

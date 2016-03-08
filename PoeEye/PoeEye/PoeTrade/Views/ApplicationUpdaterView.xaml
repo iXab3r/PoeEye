@@ -1,0 +1,41 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
+                    xmlns:viewModels="clr-namespace:PoeEye.PoeTrade.ViewModels">
+  <DataTemplate DataType="{x:Type viewModels:ApplicationUpdaterViewModel}">
+    <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="Auto" />
+        <ColumnDefinition Width="Auto" />
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="Auto" />
+      </Grid.ColumnDefinitions>
+
+      <controls:ProgressRing Grid.Column="0"
+                             Width="15" Height="15"
+                             Visibility="{Binding IsBusy, Converter={StaticResource BoolFalseToCollapsedConverter}}"
+                             IsActive="{Binding IsBusy}" />
+
+      <Label Grid.Column="1"
+             FontSize="16"
+             FontFamily="{StaticResource FontAwesome}"
+             Visibility="{Binding IsBusy, Converter={StaticResource BoolTrueToCollapsedConverter}}"
+             Content="{Binding MostRecentVersion}"
+             ContentStringFormat="Application was successfully updated to v{0}, new version will take place after restart" />
+
+      <Label Grid.Column="1"
+             FontSize="16"
+             FontFamily="{StaticResource FontAwesome}"
+             Visibility="{Binding IsBusy, Converter={StaticResource BoolFalseToCollapsedConverter}}"
+             Content="Checking for updates..." />
+
+      <Button Grid.Column="3"
+              HorizontalAlignment="Right"
+              Content="Restart"
+              Margin="10, 0"
+              Command="{Binding RestartCommand}"
+              IsEnabled="{Binding IsBusy, Converter={StaticResource BoolInversionConverter}}" />
+    </Grid>
+
+  </DataTemplate>
+</ResourceDictionary>

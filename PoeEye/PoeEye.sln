@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PoeShared", "PoeShared\PoeS
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PoeEye.Tests", "PoeEye.Tests\PoeEye.Tests.csproj", "{D9222C80-37C7-40F5-82CE-223F7FBBC724}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PoeEyeUi", "PoeEyeUi\PoeEyeUi.csproj", "{9BC98190-3DB1-48CD-84F7-96DC843718AE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PoeEye", "PoeEye\PoeEye.csproj", "{9BC98190-3DB1-48CD-84F7-96DC843718AE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PoeEye.Simulator", "PoeEye.Simulator\PoeEye.Simulator.csproj", "{785DC21D-42F1-4DB9-883F-4D02CCF73FF0}"
 EndProject
