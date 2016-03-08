@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Concurrency;
+    using System.Reactive.Disposables;
     using System.Reactive.Subjects;
 
     using Helpers;
@@ -85,6 +86,7 @@
         {
             var result = new Mock<IPoeTradeViewModel>();
             result.SetupGet(x => x.Trade).Returns(item);
+            result.SetupGet(x => x.Anchors).Returns(new CompositeDisposable());
             result
                 .SetupSet(x => x.TradeState)
                 .Callback(value => result.SetPropertyAndNotify(x => x.TradeState, value));
