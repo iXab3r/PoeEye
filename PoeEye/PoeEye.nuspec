@@ -3,7 +3,7 @@
     <metadata>
         <id>PoeEye</id>
         <version>1.0.0</version>
-        <title>Path of Exile Eye</title>
+        <title>PoeEye (Path of Exile Eye)</title>
         <authors>Xab3r</authors>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <description>Path of Exile trade monitor (https://github.com/iXab3r/PoeEye) </description>
@@ -13,7 +13,7 @@
         <file src="Bin\Squirrel.dll" target="lib\.net45\Squirrel.dll" />
         <file src="Bin\PoeEyeUi.exe" target="lib\.net45\PoeEyeUi.exe" />
         <file src="Bin\PoeEyeUi.exe.config" target="lib\.net45\PoeEyeUi.exe.config" />
-        <file src="Bin\WpfAwesomium.exe" target="lib\.net45\WpfAwesomium.exe" />
+        <file src="Bin\WpfAwesomium.dll" target="lib\.net45\WpfAwesomium.dll" />
         <file src="Bin\avcodec-53.dll" target="lib\.net45\avcodec-53.dll" />
         <file src="Bin\avformat-53.dll" target="lib\.net45\avformat-53.dll" />
         <file src="Bin\avutil-51.dll" target="lib\.net45\avutil-51.dll" />
