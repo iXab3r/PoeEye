@@ -235,13 +235,13 @@
         {
             Log.Instance.Debug($"[MainWindowViewModel.SaveConfig] Saving config (provider: {poeEyeConfigProvider})...\r\nTabs count: {TabsList.Count}");
 
-            var config = new PoeEyeConfig
+            var config = new PoeEyeConfig(poeEyeConfigProvider.ActualConfig)
             {
                 TabConfigs = TabsList.Select(tab => tab.Save()).ToArray(),
                 AudioNotificationsEnabled = Settings.AudioNotificationsEnabled,
                 ClipboardMonitoringEnabled = Settings.ClipboardMonitoringEnabled,
                 WhisperNotificationsEnabled = Settings.WhisperNotificationsEnabled,
-                CurrenciesPriceInChaos = Settings.CurrenciesPriceInChaosOrbs.ToDictionary(x => x.Item1, x => x.Item2)
+                CurrenciesPriceInChaos = Settings.CurrenciesPriceInChaosOrbs.ToDictionary(x => x.Item1, x => x.Item2),
             };
 
             poeEyeConfigProvider.Save(config);

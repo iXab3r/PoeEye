@@ -3,6 +3,12 @@ namespace PoeEyeUi.Config
     using System;
     using System.Collections.Generic;
 
+    using Guards;
+
+    using JetBrains.Annotations;
+
+    using PoeShared.Scaffolding;
+
     internal sealed class PoeEyeConfig : IPoeEyeConfig
     {
         private static readonly IDictionary<string, float> DefaultCurrenciesPriceInChaos = new Dictionary<string, float>
@@ -27,6 +33,17 @@ namespace PoeEyeUi.Config
         private IDictionary<string, float> currenciesPriceInChaos = DefaultCurrenciesPriceInChaos;
 
         private PoeEyeTabConfig[] tabConfigs = new PoeEyeTabConfig[0];
+
+        public PoeEyeConfig()
+        {
+        }
+
+        public PoeEyeConfig([NotNull] IPoeEyeConfig source)
+        {
+            Guard.ArgumentNotNull(() => source);
+
+            source.TransferPropertiesTo(this);
+        }
 
         public PoeEyeTabConfig[] TabConfigs
         {
