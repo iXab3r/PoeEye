@@ -336,6 +336,7 @@
                           Margin="10,2">
 
                 <Button Width="80"
+                        Visibility="{Binding Trade.Hash, Converter={StaticResource NullToCollapsedConverter}}"
                         Command="{Binding VerifyItemCommand}">
                   <Button.Style>
                     <Style BasedOn="{StaticResource {x:Type Button}}" TargetType="{x:Type Button}">
