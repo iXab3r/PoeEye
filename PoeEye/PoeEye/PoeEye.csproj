@@ -34,7 +34,7 @@
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x86</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -62,6 +62,18 @@
     <StartupObject>PoeEye.App</StartupObject>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Awesomium.Core">
+      <HintPath>..\packages\Awesomium.NetWrapper.Unofficial.1.7.5.0\lib\Awesomium.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Awesomium.Windows.Controls">
+      <HintPath>..\packages\Awesomium.NetWrapper.Unofficial.1.7.5.0\lib\Awesomium.Windows.Controls.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Awesomium.Windows.Forms">
+      <HintPath>..\packages\Awesomium.NetWrapper.Unofficial.1.7.5.0\lib\Awesomium.Windows.Forms.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Blue.MVVM.Converter, Version=1.4.3.26888, Culture=neutral, PublicKeyToken=1bb1db17d606db59, processorArchitecture=MSIL">
       <HintPath>..\packages\Blue.MVVM.Converter.1.4.3\lib\net45\Blue.MVVM.Converter.dll</HintPath>
       <Private>True</Private>
@@ -656,12 +668,12 @@ foreach (var item in filesToCleanup)
   <Target Name="CleanReferenceCopyLocalPaths" AfterTargets="AfterBuild;NonWinFodyTarget">
     <CosturaCleanup Config="FodyWeavers.xml" Files="@(ReferenceCopyLocalPaths->'$(OutDir)%(DestinationSubDirectory)%(Filename)%(Extension)')" />
   </Target>
-  <Import Project="..\packages\Fody.1.29.3\build\portable-net+sl+win+wpa+wp\Fody.targets" Condition="Exists('..\packages\Fody.1.29.3\build\portable-net+sl+win+wpa+wp\Fody.targets')" />
+  <Import Project="..\packages\Fody.1.29.2\build\dotnet\Fody.targets" Condition="Exists('..\packages\Fody.1.29.2\build\dotnet\Fody.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\Fody.1.29.3\build\portable-net+sl+win+wpa+wp\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Fody.1.29.3\build\portable-net+sl+win+wpa+wp\Fody.targets'))" />
+    <Error Condition="!Exists('..\packages\Fody.1.29.2\build\dotnet\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Fody.1.29.2\build\dotnet\Fody.targets'))" />
   </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

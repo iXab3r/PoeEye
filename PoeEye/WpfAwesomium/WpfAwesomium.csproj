@@ -19,7 +19,7 @@
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x86</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -43,8 +43,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Awesomium.Core, Version=1.7.5.0, Culture=neutral, PublicKeyToken=e1a0d7c8071a5214, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Awesomium.NetWrapper.Unofficial.1.7.5.0\lib\Awesomium.Core.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Awesomium.Windows.Controls, Version=1.7.5.0, Culture=neutral, PublicKeyToken=7a34e179b8b61c39, processorArchitecture=x86">
       <HintPath>..\packages\Awesomium.NetWrapper.Unofficial.1.7.5.0\lib\Awesomium.Windows.Controls.dll</HintPath>
@@ -52,6 +52,10 @@
     </Reference>
     <Reference Include="Awesomium.Windows.Forms, Version=1.7.5.0, Culture=neutral, PublicKeyToken=9bd24830fbe304a0, processorArchitecture=x86">
       <HintPath>..\packages\Awesomium.NetWrapper.Unofficial.1.7.5.0\lib\Awesomium.Windows.Forms.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="JetBrains.Annotations, Version=10.0.0.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
+      <HintPath>..\packages\JetBrains.Annotations.10.0.0\lib\net20\JetBrains.Annotations.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="ReactiveUI, Version=6.5.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -147,7 +151,9 @@
       <Link>pdf_js.pak</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -198,11 +204,6 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

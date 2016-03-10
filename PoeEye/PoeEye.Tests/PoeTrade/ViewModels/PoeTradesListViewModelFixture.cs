@@ -88,8 +88,8 @@
             result.SetupGet(x => x.Trade).Returns(item);
             result.SetupGet(x => x.Anchors).Returns(new CompositeDisposable());
             result
-                .SetupSet(x => x.TradeState)
-                .Callback(value => result.SetPropertyAndNotify(x => x.TradeState, value));
+                .SetupSet(x => x.TradeState = It.IsAny<PoeTradeState>())
+                .Callback((PoeTradeState value) => result.SetPropertyAndNotify(x => x.TradeState, value));
             return result.Object;
         }
 

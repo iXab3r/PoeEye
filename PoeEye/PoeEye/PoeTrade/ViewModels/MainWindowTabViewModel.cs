@@ -59,7 +59,7 @@
             RecheckPeriod = recheckPeriod;
 
             searchCommand = ReactiveCommand.Create();
-            searchCommand.Subscribe(SearchCommandExecute);
+            searchCommand.Subscribe(SearchCommandExecute).AddTo(Anchors);
 
             markAllAsReadCommand = ReactiveCommand.Create();
             markAllAsReadCommand.Subscribe(MarkAllAsReadExecute);
@@ -231,9 +231,15 @@
 
         private void MarkAllAsReadExecute(object arg)
         {
+            var tradesToAmend = TradesList.Items.Where(x => x.TradeState != PoeTradeState.Normal);
+            if (!tradesToAmend.Any())
+            {
+                return;
+            }
+
             using (TradesList.Items.SuppressChangeNotifications())
             {
-                foreach (var trade in TradesList.Items.ToArray())
+                foreach (var trade in tradesToAmend)
                 {
                     trade.TradeState = PoeTradeState.Normal;
                 }

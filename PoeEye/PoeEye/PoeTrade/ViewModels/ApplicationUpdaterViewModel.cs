@@ -120,7 +120,11 @@
             try
             {
                 var appName = typeof (ApplicationUpdaterViewModel).Assembly.GetName().Name;
-                using (var mgr = new UpdateManager(PoeEyeUri, appName))
+                var rootDirectory = default(string);
+#if DEBUG
+                rootDirectory = AppDomain.CurrentDomain.BaseDirectory;
+#endif
+                using (var mgr = new UpdateManager(PoeEyeUri, appName, rootDirectory))
                 {
                     Log.Instance.Debug($"[ApplicationUpdaterViewModel] Checking for updates...");
 

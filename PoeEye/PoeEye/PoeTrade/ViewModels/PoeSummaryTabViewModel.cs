@@ -196,7 +196,7 @@
 
         private void ProcessAddTab(IMainWindowTabViewModel tab)
         {
-            var tabInfo = new TabInfo();
+            var tabInfo = new TabInfo(tab);
             collectionByTab[tab] = tabInfo;
 
             tab
@@ -235,49 +235,103 @@
                     ProcessAddTrade(tab, newItems);
                     break;
                 case NotifyCollectionChangedAction.Reset:
-                    ProcessClearTabTrades(tab);
-                    ProcessAddTrade(tab, tab.TradesList.Items.ToArray());
+                    ProcessResetTabTrades(tab, tab.TradesList.Items.ToArray());
                     break;
             }
         }
 
-        private void ProcessAddTrade(IMainWindowTabViewModel tab, IPoeTradeViewModel[] trades)
+        private void ProcessAddTrade(IMainWindowTabViewModel tab, IPoeTradeViewModel[] tradesToAdd)
         {
+            if (!tradesToAdd.Any())
+            {
+                return;
+            }
+
             TabInfo tabInfo;
             if (!collectionByTab.TryGetValue(tab, out tabInfo))
             {
                 return;
             }
-            trades.ForEach(tabInfo.Trades.Add);
-            trades.ForEach(x => tradesCollection.Add(new PoeFilteredTradeViewModel(tab, x)));
+            foreach (var poeTradeViewModel in tradesToAdd)
+            {
+                var view = tabInfo.AddTrade(poeTradeViewModel);
+                tradesCollection.Add(view);
+            }
         }
 
-        private void ProcessRemoveTrade(IMainWindowTabViewModel tab, IPoeTradeViewModel[] trades)
+        private void ProcessRemoveTrade(IMainWindowTabViewModel tab, IPoeTradeViewModel[] tradesToRemove)
         {
+            if (!tradesToRemove.Any())
+            {
+                return;
+            }
+
             TabInfo tabInfo;
             if (!collectionByTab.TryGetValue(tab, out tabInfo))
             {
                 return;
             }
-            trades.ForEach(x => tabInfo.Trades.Remove(x));
-            tradesCollection.RemoveAll(x => trades.Contains(x.Trade));
+
+            foreach (var poeTradeViewModel in tradesToRemove)
+            {
+                PoeFilteredTradeViewModel view;
+                if (!tabInfo.TryRemoveTrade(poeTradeViewModel, out view))
+                {
+                    continue;
+                }
+                tradesCollection.Remove(view);
+            }
         }
 
-        private void ProcessClearTabTrades(IMainWindowTabViewModel tab)
+        private void ProcessResetTabTrades(IMainWindowTabViewModel tab, IPoeTradeViewModel[] actualTradesList)
         {
             TabInfo tabInfo;
             if (!collectionByTab.TryGetValue(tab, out tabInfo))
             {
                 return;
             }
-            ProcessRemoveTrade(tab, tabInfo.Trades.ToArray());
+
+            var currentTradesList = tabInfo.Trades;
+            var tradesToAdd = actualTradesList.Except(currentTradesList).ToArray();
+            var tradesToRemove = currentTradesList.Except(actualTradesList).ToArray();
+
+            ProcessRemoveTrade(tab, tradesToRemove);
+            ProcessAddTrade(tab, tradesToAdd);
         }
 
         private class TabInfo : IDisposable
         {
             public CompositeDisposable Anchors { get; } = new CompositeDisposable();
 
-            public ICollection<IPoeTradeViewModel> Trades { get; } = new HashSet<IPoeTradeViewModel>();
+            public IEnumerable<IPoeTradeViewModel> Trades => viewByViewModelMap.Keys;
+
+            private readonly IDictionary<IPoeTradeViewModel, PoeFilteredTradeViewModel> viewByViewModelMap = new Dictionary<IPoeTradeViewModel, PoeFilteredTradeViewModel>();
+
+            private readonly IMainWindowTabViewModel tab;
+
+            public TabInfo(IMainWindowTabViewModel tab)
+            {
+                this.tab = tab;
+            }
+
+            public PoeFilteredTradeViewModel AddTrade(IPoeTradeViewModel viewModel)
+            {
+                var result = viewByViewModelMap[viewModel] = new PoeFilteredTradeViewModel(tab, viewModel);
+                Anchors.Add(result);
+                return result;
+            }
+
+            public bool TryRemoveTrade(IPoeTradeViewModel viewModel, out PoeFilteredTradeViewModel view)
+            {
+                var result = viewByViewModelMap.TryGetValue(viewModel, out view);
+                if (result)
+                {
+                    viewByViewModelMap.Remove(viewModel);
+                    view.Dispose();
+                    Anchors.Remove(view);
+                }
+                return result;
+            }
 
             public void Dispose()
             {

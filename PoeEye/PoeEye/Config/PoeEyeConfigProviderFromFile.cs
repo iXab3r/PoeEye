@@ -28,7 +28,6 @@ namespace PoeEye.Config
 #endif
 
         private readonly JsonSerializerSettings jsonSerializerSettings;
-        private readonly IObservable<IPoeEyeConfig> actualConfigSubject;
 
         private Lazy<IPoeEyeConfig> poeEyeConfigLoader;
 
