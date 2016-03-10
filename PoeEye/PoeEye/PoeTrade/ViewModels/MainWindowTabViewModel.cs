@@ -231,7 +231,7 @@
 
         private void MarkAllAsReadExecute(object arg)
         {
-            var tradesToAmend = TradesList.Items.Where(x => x.TradeState != PoeTradeState.Normal);
+            var tradesToAmend = TradesList.Items.Where(x => x.TradeState != PoeTradeState.Normal).ToArray();
             if (!tradesToAmend.Any())
             {
                 return;
