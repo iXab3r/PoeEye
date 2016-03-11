@@ -1,0 +1,307 @@
+Rusted Hatchet	5	9	5%	1.5
+Jade Hatchet	9	14	5%	1.25
+Boarding Axe	9	17	5%	1.5
+Cleaver	11	33	5%	1.2
+Broad Axe	17	31	5%	1.3
+Arming Axe	12	36	5%	1.4
+Decorative Axe	25	47	5%	1.1
+Spectral Axe	26	43	5%	1.3
+Etched Hatchet	24	42	5%	1.35
+Jasper Axe	28	43	5%	1.3
+Tomahawk	22	41	5%	1.5
+Wrist Chopper	23	68	5%	1.2
+War Axe	30	55	5%	1.3
+Chest Splitter	20	61	5%	1.4
+Ceremonial Axe	41	76	5%	1.1
+Wraith Axe	41	68	5%	1.25
+Engraved Hatchet	35	63	5%	1.35
+Karui Axe	43	67	5%	1.25
+Siege Axe	32	59	5%	1.5
+Reaver Axe	34	101	5%	1.1
+Butcher Axe	40	74	5%	1.25
+Vaal Hatchet	25	74	5%	1.4
+Royal Axe	47	87	5%	1.1
+Infernal Axe	43	72	5%	1.3
+Runic Hatchet	38	68	5%	1.35
+Nailed Fist	4	9	6.20%	1.6
+Sharktooth Claw	6	15	6.5%	1.40
+Awl	6	20	6.3%	1.50
+Cat's Paw	10	19	6%	1.60
+Blinder	10	27	6.3%	1.50
+Timeworn Claw	14	36	6.5%	1.30
+Sparkling Claw	12	32	6%	1.60
+Fright Claw	9	37	6.3%	1.50
+Double Claw	13	40	6.3%	1.50
+Thresher Claw	18	48	6.5%	1.30
+Gouger	13	46	6.3%	1.50
+Tiger's Paw	21	38	6%	1.60
+Gut Ripper	18	48	6.3%	1.50
+Prehistoric Claw	23	61	6.5%	1.30
+Noble Claw	19	50	6%	1.60
+Eagle Claw	14	56	6.3%	1.50
+Twin Claw	20	60	6.3%	1.50
+Great White Claw	27	70	6.5%	1.30
+Throat Stabber	19	65	6.3%	1.50
+Hellion's Paw	27	51	6%	1.60
+Eye Gouger	23	61	6.3%	1.50
+Vaal Claw	27	72	6.5%	1.30
+Imperial Claw	22	57	6%	1.60
+Terror Claw	15	60	6.3%	1.50
+Gemini Claw	21	63	6.3%	1.50
+Glass Shank	3	10	6%	1.5
+Skinning Knife	4	16	6%	1.3
+Carving Knife	2	22	6.60%	1.4
+Stiletto	6	23	6.30%	1.5
+Boot Knife	8	30	6.60%	1.4
+Copper Kris	10	39	7%	1.2
+Skean	9	37	6.60%	1.45
+Imp Dagger	12	49	7%	1.2
+Prong Dagger	13	51	6.50%	1.3
+Flaying Knife	14	56	6%	1.2
+Butcher Knife	6	54	6.60%	1.4
+Poignard	12	48	6.30%	1.5
+Boot Blade	14	55	6.60%	1.4
+Golden Kris	16	65	7%	1.2
+Royal Skean	15	59	6.60%	1.45
+Fiend Dagger	19	76	7%	1.2
+Trisula	19	74	6.50%	1.3
+Gutting Knife	21	84	6%	1.2
+Slaughter Knife	9	78	6.60%	1.4
+Ambusher	17	67	6.30%	1.5
+Ezomyte Dagger	18	72	6.60%	1.4
+Platinum Kris	20	81	7%	1.2
+Imperial Skean	17	69	6.60%	1.45
+Demon Dagger	21	85	7%	1.2
+Sai	20	80	6.50%	1.3
+Driftwood Club	5	7	5%	1.45
+Tribal Club	7	12	5%	1.35
+Spiked Club	11	14	5%	1.40
+Stone Hammer	14	27	5%	1.15
+War Hammer	11	26	5%	1.40
+Bladed Mace	18	30	5%	1.30
+Ceremonial Mace	26	33	5%	1.20
+Dream Mace	17	35	5%	1.40
+Wyrm Mace	23	35	5%	1.35
+Petrified Club	25	41	5%	1.25
+Barbed Club	27	34	5%	1.40
+Rock Breaker	30	55	5%	1.15
+Battle Hammer	20	48	5%	1.40
+Flanged Mace	30	50	5%	1.30
+Ornate Mace	42	53	5%	1.20
+Phantom Mace	26	54	5%	1.40
+Dragon Mace	35	53	5%	1.35
+Ancestral Club	37	62	5%	1.25
+Tenderizer	38	49	5%	1.40
+Gavel	42	77	5%	1.15
+Legion Hammer	27	63	5%	1.40
+Pernarch	37	62	5%	1.30
+Auric Mace	49	63	5%	1.20
+Nightmare Mace	29	61	5%	1.40
+Behemoth Mace	38	57	5%	1.35
+Driftwood Sceptre	5	7	6%	1.40
+Darkwood Sceptre	7	10	6%	1.50
+Bronze Sceptre	10	19	6%	1.25
+Quartz Sceptre	14	21	7%	1.25
+Iron Sceptre	18	27	6%	1.25
+Ochre Sceptre	15	28	6%	1.40
+Ritual Sceptre	18	41	6%	1.20
+Shadow Sceptre	25	37	6.5%	1.25
+Grinning Fetish	21	32	6%	1.50
+Horned Sceptre	22	42	6%	1.30
+Sekhem	25	46	6%	1.25
+Crystal Sceptre	29	43	7%	1.25
+Lead Sceptre	32	48	6%	1.25
+Blood Sceptre	25	47	6%	1.40
+Royal Sceptre	29	67	6%	1.20
+Abyssal Sceptre	38	57	6.5%	1.25
+Stag Sceptre	32	60	6%	1.30
+Karui Sceptre	32	47	6%	1.50
+Tyrant's Sekhem	36	67	6%	1.25
+Opal Sceptre	40	60	7%	1.25
+Platinum Sceptre	42	63	6%	1.25
+Vaal Sceptre	31	58	6%	1.40
+Carnal Sceptre	34	78	6%	1.20
+Void Sceptre	42	63	6.5%	1.25
+Sambar Sceptre	35	65	6%	1.30
+Rusted Sword	4	8	5%	1.45
+Copper Sword	6	12	5%	1.40
+Sabre	4	18	5%	1.55
+Broad Sword	14	21	5%	1.30
+War Sword	16	30	5%	1.20
+Ancient Sword	17	31	5%	1.30
+Elegant Sword	17	27	5%	1.50
+Dusk Blade	15	43	5%	1.30
+Hook Sword	23	49	5.00%	1.15
+Variscite Blade	20	43	5%	1.30
+Cutlass	11	44	5%	1.55
+Baselard	29	42	5%	1.30
+Battle Sword	30	55	5%	1.20
+Elder Sword	28	52	5%	1.30
+Graceful Sword	27	44	5%	1.50
+Twilight Blade	23	66	5%	1.30
+Grappler	35	75	5.00%	1.15
+Gemstone Sword	30	64	5%	1.30
+Corsair Sword	16	63	5%	1.55
+Gladius	41	59	5%	1.30
+Legion Sword	39	73	5%	1.20
+Vaal Blade	35	65	5%	1.30
+Eternal Sword	32	52	5%	1.50
+Midnight Blade	26	74	5%	1.30
+Tiger Hook	43	92	5.00%	1.15
+Rusted Spike	4	10	5.5%	1.40
+Whalebone Rapier	4	15	5.5%	1.55
+Battered Foil	10	18	6%	1.40
+Basket Rapier	9	20	5%	1.55
+Jagged Foil	11	25	5.5%	1.60
+Antique Rapier	11	43	5%	1.20
+Elegant Foil	15	28	5.5%	1.60
+Thorn Rapier	16	38	5%	1.35
+Smallsword	17	36	6%	1.55
+Wyrmbone Rapier	11	44	5.5%	1.50
+Burnished Foil	22	41	6%	1.40
+Estoc	19	44	5.5%	1.50
+Serrated Foil	18	41	5.5%	1.60
+Primeval Rapier	17	67	6.5%	1.30
+Fancy Foil	24	45	5.5%	1.60
+Apex Rapier	24	55	5.7%	1.40
+Courtesan Sword	26	53	6%	1.55
+Dragonbone Rapier	16	65	5.5%	1.50
+Tempered Foil	31	58	6%	1.4
+Pecoraro	25	59	5.50%	1.5
+Spiraled Foil	24	55	5.5%	1.60
+Vaal Rapier	20	80	6.5%	1.30
+Jewelled Foil	27	51	5.5%	1.60
+Harpy Rapier	26	60	5.7%	1.4
+Dragoon Sword	28	58	6%	1.5
+Driftwood Wand	3	6	8%	1.40
+Goat's Horn	5	10	8%	1.20
+Carved Wand	6	11	8%	1.50
+Quartz Wand	9	17	8%	1.30
+Spiraled Wand	8	24	8%	1.30
+Sage Wand	15	28	9%	1.20
+Pagan Wand	14	26	8%	1.35
+Faun's Horn	17	32	8%	1.20
+Engraved Wand	14	27	8%	1.50
+Crystal Wand	19	35	8%	1.30
+Serpent Wand	15	44	8%	1.30
+Omen Wand	25	46	9%	1.20
+Heathen Wand	21	40	8%	1.35
+Demon's Horn	26	48	8%	1.20
+Imbued Wand	20	38	8%	1.50
+Opal Wand	24	45	8%	1.30
+Tornado Wand	17	52	8%	1.30
+Prophecy Wand	27	51	9%	1.20
+Profane Wand	23	43	8%	1.35
+Crude Bow	4	9	5%	1.4
+Short Bow	4	13	5%	1.5
+Long Bow	6	23	6%	1.3
+Composite Bow	11	26	6%	1.3
+Recurve Bow	12	36	6.50%	1.25
+Bone Bow	12	37	6%	1.35
+Royal Bow	10	41	5%	1.45
+Death Bow	20	53	5%	1.2
+Grove Bow	15	44	5%	1.5
+Reflex Bow	27	40	5.50%	1.4
+Decurve Bow	17	70	6%	1.25
+Compound Bow	24	56	6%	1.3
+Sniper Bow	23	68	6.50%	1.25
+Ivory Bow	21	64	6%	1.35
+Highborn Bow	17	66	5%	1.45
+Decimation Bow	31	81	5%	1.2
+Thicket Bow	22	66	5%	1.5
+Steelwood Bow	40	60	5.50%	1.4
+Citadel Bow	25	101	6%	1.25
+Ranger Bow	34	79	6%	1.3
+Assassin Bow	30	89	6.50%	1.25
+Spine Bow	27	80	6%	1.35
+Imperial Bow	19	78	5%	1.45
+Harbinger Bow	35	91	5%	1.2
+Maraketh Bow	44	65	5.50%	1.4
+Gnarled Branch	8	17	6.4%	1.30
+Primitive Staff	9	28	6.8%	1.25
+Long Staff	17	28	6.4%	1.30
+Iron Staff	16	47	7%	1.20
+Coiled Staff	23	48	6.4%	1.20
+Royal Staff	23	70	7.2%	1.15
+Vile Staff	33	62	6.6%	1.25
+Crescent Staff	35	73	6.4%	1.20
+Woodful Staff	29	88	6.8%	1.15
+Quarterstaff	41	68	6.4%	1.30
+Military Staff	34	101	7%	1.20
+Serpentine Staff	46	95	6.4%	1.20
+Highborn Staff	42	125	7.2%	1.15
+Foul Staff	55	103	6.6%	1.25
+Moon Staff	57	118	6.4%	1.20
+Primordial Staff	47	141	6.8%	1.15
+Lathi	62	103	6.4%	1.30
+Ezomyte Staff	46	138	7%	1.20
+Maelstrom Staff	57	119	6.4%	1.20
+Imperial Staff	49	147	7.2%	1.15
+Judgement Staff	61	113	6.6%	1.25
+Eclipse Staff	60	125	6.4%	1.20
+Stone Axe	10	17	5%	1.30
+Jade Chopper	17	27	5%	1.20
+Woodsplitter	17	35	5%	1.25
+Poleaxe	29	44	5%	1.25
+Double Axe	32	54	5%	1.20
+Gilded Axe	43	58	5%	1.25
+Shadow Axe	42	62	5%	1.25
+Jasper Chopper	50	78	5%	1.15
+Dagger Axe	45	71	5%	1.20
+Timber Axe	41	85	5%	1.25
+Headsman Axe	53	79	5%	1.30
+Labrys	71	118	5%	1.15
+Noble Axe	73	98	5%	1.25
+Abyssal Axe	69	104	5%	1.25
+Talon Axe	75	118	5%	1.20
+Karui Chopper	80	125	5%	1.15
+Sundering Axe	62	128	5%	1.25
+Ezomyte Axe	72	108	5%	1.30
+Vaal Axe	79	131	5%	1.20
+Despot Axe	76	103	5%	1.30
+Void Axe	76	114	5%	1.25
+Fleshripper	80	125	5%	1.20
+Driftwood Maul	9	13	5%	1.30
+Tribal Maul	15	23	5%	1.20
+Mallet	15	30	5%	1.25
+Sledgehammer	21	32	5%	1.30
+Jagged Maul	24	45	5%	1.25
+Brass Maul	34	51	5%	1.20
+Fright Maul	39	53	5%	1.25
+Morning Star	39	58	5%	1.25
+Totemic Maul	49	73	5%	1.10
+Great Mallet	37	76	5%	1.25
+Steelhead	47	70	5%	1.30
+Spiny Maul	47	88	5%	1.25
+Plated Maul	62	92	5%	1.20
+Dread Maul	66	89	5%	1.25
+Solar Maul	64	97	5%	1.25
+Karui Maul	79	118	5%	1.10
+Colossus Mallet	57	118	5%	1.25
+Piledriver	67	100	5%	1.30
+Meatgrinder	63	117	5%	1.25
+Imperial Maul	74	111	5%	1.20
+Terror Maul	75	102	5%	1.25
+Coronal Maul	74	110	5%	1.25
+Corroded Blade	7	14	5%	1.35
+Longsword	14	33	5%	1.10
+Bastard Sword	15	25	5%	1.35
+Two	Handed Sword	23	43	5%	1.20
+Etched Greatsword	29	61	5%	1.10
+Ornate Sword	32	53	5%	1.30
+Spectral Sword	35	73	5%	1.20
+Curved Blade	39	65	6.00%	1.25
+Butcher Sword	40	93	5%	1.10
+Footman Sword	42	70	5%	1.35
+Highland Blade	50	92	5%	1.20
+Engraved Greatsword	55	115	5%	1.10
+Tiger Sword	55	91	5%	1.30
+Wraith Sword	55	114	5%	1.20
+Lithe Blade	63	105	6.00%	1.25
+Headman's Sword	59	139	5%	1.10
+Reaver Sword	59	99	5%	1.35
+Ezomyte Blade	65	121	5%	1.20
+Vaal Greatsword	67	140	5%	1.10
+Lion Sword	63	105	5%	1.30
+Infernal Sword	60	126	5%	1.20
+Exquisite Blade	68	114	6.00%	1.25

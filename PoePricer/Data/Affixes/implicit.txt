@@ -1,0 +1,51 @@
+^(\.+)% of Physical Attack Damage Leeched as Life	LifeLeech
+^(\.+) Life Regenerated per Second
+^(\d+) Life gained for each enemy hit by your Attacks
+^(\d+)% Chance to Block	Block
+^(\d+)% chance of Arrows Piercing
+^(\d+)% chance to Dodge Attacks
+^(\d+)% chance to cause Bleeding on Hit
+^(\d+)% increased Accuracy Rating	LocalAccuracyRating
+^(\d+)% increased Attack Speed	IncAttackSpeed
+^(\d+)% increased Cast Speed	CastSpeed
+^(\d+)% increased Critical Strike Chance	Crit
+^(\d+)% increased Elemental Damage	LocalElemDamage
+^(\d+)% increased Elemental Damage with Weapons	WED
+^(\d+)% increased Global Critical Strike Chance	GlobalCrit
+^(\d+)% increased Global Critical Strike Multiplier	CritDamage
+^(\d+)% increased Mana Regeneration Rate
+^(\d+)% increased Movement Speed	MoveSpeed
+^(\d+)% increased Physical Damage	LocalPhys
+^(\d+)% increased Radius of Area Skills
+^(\d+)% increased Rarity of Items found	ItemRarity
+^(\d+)% increased Spell Damage	SpellDamage
+^(\d+)% increased Stun Duration on Enemies
+^(\d+)% increased Stun Duration on enemies
+^(\d+)% increased Stun Recovery	StunRecovery
+^(\d+)% to all Elemental Resistances
+^Damage Penetrates \d+% Elemental Resistances
+^\+(\d+) Life gained for each Enemy hit by your Attacks
+^\+(\d+) to Strength and Intelligence	Str	Int
+^\+(\d+) to Strength and Dexterity	Str	Dex
+^\+(\d+) to Dexterity and Intelligence	Dex	Int
+^\+(\d+) to Maximum Life	MaxLife
+^\+(\d+) to Maximum Mana	MaxMana
+^\+(\d+) to Strength	Str
+^\+(\d+) to Dexterity	Dex
+^\+(\d+) to Intelligence	Int
+^\+(\d+) to all Attributes	AllStat
+^\+(\d+) to maximum Energy Shield	FlatES
+^\+(\d+) to maximum Life	MaxLife
+^\+(\d+)% to Chaos Resistance	ChaosRes
+^\+(\d+)% to Cold Resistance	ColdRes
+^\+(\d+)% to Cold and Lightning Resistances	ColdRes	LightningRes
+^\+(\d+)% to Fire Resistance	FireRes
+^\+(\d+)% to Fire and Cold Resistances	FireRes	ColdRes
+^\+(\d+)% to Fire and Lightning Resistances	FireRes	LightningRes
+^\+(\d+)% to Lightning Resistance	LightningRes
+^\+(\d+)% to all Elemental Resistances	ColdRed	FireRes	LightningRes
+^Adds (\d+)–(\d+) Physical Damage to Attacks	FlatPhysDamage	FlatPhysDamage
+^Adds (\d+)-(\d+) Fire Damage to Attacks with Bows	FlatFire	FlatFire
+^Adds (\d+)-(\d+) Physical Damage to Attacks with Bows	FlatPhysDamage	FlatPhysDamage
+^\+(\d+)% to all Elemental Resistances	AllRes
+^Has 1 Socket

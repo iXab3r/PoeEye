@@ -1,0 +1,52 @@
+Iron Greaves	6
+Steel Greaves	28
+Plated Greaves	67
+Reinforced Greaves	95
+Antique Greaves	106
+Ancient Greaves	132
+Goliath Greaves	154
+Vaal Greaves	191
+Titan Greaves	210
+Rawhide Boots		11
+Goathide Boots		36
+Deerskin Boots		64
+Nubuck Boots		98
+Eelskin Boots		112
+Sharkskin Boots		126
+Shagreen Boots		157
+Stealth Boots		191
+Slink Boots		214
+Wool Shoes			4
+Velvet Slippers			9
+Silk Slippers			20
+Scholar Boots			28
+Satin Slippers			32
+Samite Slippers			37
+Conjurer Boots			44
+Arcanist Slippers			59
+Sorcerer Boots			64
+Leatherscale Boots	11	11
+Ironscale Boots	29	29
+Bronzescale Boots	48	48
+Steelscale Boots	57	57
+Serpentscale Boots	66	66
+Wyrmscale Boots	80	80
+Hydrascale Boots	92	92
+Dragonscale Boots	105	105
+Chain Boots	9		3
+Ringmail Boots	22		7
+Mesh Boots	45		13
+Riveted Boots	57		17
+Zealot Boots	63		19
+Soldier Boots	77		23
+Legion Boots	91		27
+Crusader Boots	105		31
+Wrapped Boots		11	4
+Strapped Boots		26	8
+Clasped Boots		43	13
+Shackled Boots		54	16
+Trapper Boots		65	19
+Ambush Boots		74	22
+Carnal Boots		86	25
+Assassin's Boots		105	31
+Murder Boots		161	22

@@ -1,0 +1,23 @@
+;Boots minvalue maxvalue craftvalue prefixes/suffixes weight target						
+;						
+!ClassType	Amulet
+!Score	300
+!ScoreHits4	250
+!ScoreHits5	200
+MaxLife	3	89	44	Prefixes	1	30
+GlobalCrit	10	38	32	Suffixes	1	10
+TotalRes	23	176	25	Suffixes	4	40
+LocalES	2	22	20	Prefixes	0.7	8
+FlatElem	3	36	40	Prefixes	1	14
+FlatPhysDamage	3	20	7	Prefixes	1	10
+SpellDamage	3	26			1	10
+CastSpeed	5	13			1	5
+CritDamage	10	38			1	10
+ItemRarity	6	54			6	16
+LocalElem	3	17			1	7
+FlatES	1	51	23	Prefixes	0.7	30
+WED	5	42			1	15
+Int	8	55	30	Suffixes	1	15
+Str	8	55	30	Suffixes	1	15
+Dex	8	55	30	Suffixes	1	15
+AllStat	1	32	11	Suffixes	1	6

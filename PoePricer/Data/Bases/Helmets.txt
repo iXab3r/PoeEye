@@ -1,0 +1,74 @@
+Leather Cap		17
+Tricorne		46
+Leather Hood		88
+Wolf Pelt		130
+Hunter Hood		176
+Noble Tricorne		201
+Ursine Pelt		240
+Silken Hood		301
+Sinner Tricorne		321
+Lion Pelt		331
+Name	Armour Rating
+Iron Hat	8
+Cone Helmet	33
+Barbute Helmet	80
+Close Helmet	113
+Gladiator Helmet	151
+Reaver Helmet	172
+Siege Helmet	206
+Samite Helmet	240
+Ezomyte Burgonet	301
+Royal Burgonet	328
+Eternal Burgonet	324
+Vine Circlet			7
+Iron Circlet			13
+Torture Cage			23
+Tribal Circlet			34
+Bone Circlet			44
+Lunaris Circlet			50
+Steel Circlet			61
+Necromancer Circlet			68
+Solaris Circlet			75
+Mind Cage			91
+Hubris Circlet			100
+Battered Helm	11	11
+Sallet	32	32
+Visored Sallet	55	55
+Gilded Sallet	78	78
+Secutor Helm	85	85
+Fencer Helm	102	102
+Lacquered Helmet	120	120
+Fluted Bascinet	139	139
+Pig-Faced Bascinet	199	139
+Nightmare Bascinet	141	203
+Battered Helm	11	11
+Sallet	32	32
+Visored Sallet	55	55
+Gilded Sallet	78	78
+Secutor Helm	85	85
+Fencer Helm	102	102
+Lacquered Helmet	120	120
+Fluted Bascinet	139	139
+Pig-Faced Bascinet	199	139
+Nightmare Bascinet	141	203
+Rusted Coif	14		5
+Soldier Helmet	30		10
+Great Helmet	53		16
+Crusader Helmet	74		22
+Aventail Helmet	88		26
+Zealot Helmet	104		31
+Great Crown	125		37
+Magistrate Crown		139	41
+Prophet Crown	195		40
+Praetor Crown	140		63
+Scare Mask		11	4
+Plague Mask		25	8
+Iron Mask		41	13
+Festival Mask		67	20
+Golden Mask		83	25
+Raven Mask		90	27
+Callous Mask		106	31
+Regicide Mask		122	36
+Harlequin Mask		137	40
+Vaal Mask		180	47
+Deicide Mask		166	59

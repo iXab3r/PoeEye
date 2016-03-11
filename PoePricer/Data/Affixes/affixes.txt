@@ -1,0 +1,6 @@
+^(\d+)% increased Accuracy Rating	LocalAccuracyRating	IsLocalAccuracyRating
+^\+(\d+) to Accuracy Rating	Accuracy	IsAccuracyRating
+^(\d+)% increased Rarity of Items found	ItemRarity	IsItemRarity
+^(\d+)% increased Stun Recovery	StunRecovery	IsStunRecovery
+^\+(\d+) to Maximum Mana	MaxMana	IsMaxMana	
+^\+(\d+) to maximum Mana	MaxMana	IsMaxMana

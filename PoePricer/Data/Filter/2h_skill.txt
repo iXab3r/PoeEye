@@ -1,0 +1,11 @@
+;Boots minvalue maxvalue craftvalue prefixes/suffixes weight target						
+;						
+!GripType	2h
+!Score	300
+!ScoreHits4	250
+!ScoreHits5	200
+BowGem	1	2			200	2
+ChaosGem	1	2			500	1
+LevelGem	1	2			500	1
+FireGem	1	2			500	2
+ChaosGem	1	2			500	1

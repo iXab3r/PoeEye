@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 
 namespace PoePricer
 {
+    using Extensions;
+
     class Program
     {
         static void Main()
@@ -19,16 +21,18 @@ namespace PoePricer
 
                 Console.WriteLine($"Samples to process: {StaticData.ItemSamples.Count()}");
 
+                var pricer = new PoePricer();
+
                 foreach (var itemSample in StaticData.ItemSamples)
                 {
                     try
                     {
                         Console.WriteLine("Processing next item...");
-                        WriteLine(itemSample, ConsoleColor.Yellow);
-                        var toolTip = CreateTooltip(itemSample);
+                        ConsoleExtensions.WriteLine(itemSample, ConsoleColor.Yellow);
+                        var toolTip = pricer.CreateTooltip(itemSample);
 
                         Console.WriteLine("========== TOOLTIP STARTS HERE ===========");
-                        WriteLine(toolTip, ConsoleColor.Green);
+                        ConsoleExtensions.WriteLine(toolTip, ConsoleColor.Green);
                         Console.WriteLine("========== TOOLTIP ENDS HERE   ===========");
 
                         Console.WriteLine($"Item was successfully processed\r\n\r\n");
@@ -49,19 +53,6 @@ namespace PoePricer
             {
                 Console.ReadKey();
             }
-        }
-
-        private static string CreateTooltip(string itemData)
-        {
-            var pricer = new PoePricer();
-            return pricer.CreateTooltip(itemData);
-        }
-
-        private static void WriteLine(string message, ConsoleColor textColor)
-        {
-            Console.ForegroundColor = textColor;
-            Console.WriteLine(message);
-            Console.ResetColor();
         }
     }
 }

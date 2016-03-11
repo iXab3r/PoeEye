@@ -1,0 +1,40 @@
+^(\d+)% increased Armour	LocalArmour	IsLocalArmour
+^(\d+)% increased Armour and Energy Shield	LocalArmour	IsLocalArmour
+^(\d+)% increased Armour and Evasion	LocalArmour	IsLocalArmour
+^(\d+)% increased Elemental Damage with Weapons	WED	IsWED
+^(\d+)% increased Energy Shield	LocalArmour	IsLocalArmour
+^(\d+)% increased Evasion	LocalArmour	IsLocalArmour
+^(\d+)% increased Evasion and Energy Shield	LocalArmour	IsLocalArmour
+^(\d+)% increased Flask Life Recovery rate
+^(\d+)% increased Flask Mana Recovery rate
+^(\d+)% increased Movement Speed	MoveSpeed	IsMoveSpeed
+^(\d+)% increased Physical Damage	LocalPhys	IsLocalPhys
+^(\d+)% increased Spell Damage	SpellDamage	IsSpellDamage
+^(.+)% of Physical Attack Damage Leeched as Life	LifeLeech	IsLifeLeech
+^(.+)% of Physical Attack Damage Leeched as Mana	ManaLeech	IsManaLeech
+^Adds (\d+)-(\d+) Chaos Damage	FlatChaos	FlatChaos	IsFlatChaos
+^Adds (\d+)-(\d+) Cold Damage to Spells	FlatSpellCold	FlatSpellCold	IsFlatSpellCold
+^Adds (\d+)-(\d+) Cold Damage to Attacks	FlatCold	FlatCold	IsFlatCold
+^Adds (\d+)-(\d+) Cold Damage	FlatCold	FlatCold	IsFlatCold
+^Adds (\d+)-(\d+) Fire Damage to Spells	FlatSpellFire	FlatSpellFire	IsFlatSpellFire
+^Adds (\d+)-(\d+) Fire Damage to Attacks	FlatFire	FlatFire	IsFlatFire
+^Adds (\d+)-(\d+) Fire Damage	FlatFire	FlatFire	IsFlatFire
+^Adds (\d+)-(\d+) Lightning Damage to Spells	FlatSpellLightning	FlatSpellLightning	IsFlatSpellLightning
+^Adds (\d+)-(\d+) Lightning Damage to Attacks	FlatLightning	FlatLightning	IsFlatLightning
+^Adds (\d+)-(\d+) Lightning Damage	FlatLightning	FlatLightning	IsFlatLightning
+^Adds (\d+)-(\d+) Physical Damage to Attacks	FlatPhysDamage	FlatPhysDamage	IsFlatPhysDamage
+^Adds (\d+)-(\d+) Physical Damage	FlatPhysDamage	FlatPhysDamage	IsFlatPhysDamage
+^Reflects (\d+) Physical Damage to Melee Attackers
+^\+(\d+) to Armour	FlatAR	IsFlatAR
+^\+(\d+) to Evasion	FlatEV	IsFlatEV
+^\+(\d+) to Level of Socketed Cold Gems	ColdGem	IsColdGem
+^\+(\d+) to Level of Socketed Fire Gems	FireGem	IsFireGem
+^\+(\d+) to Level of Socketed Chaos Gems	ChaosGem	IsChaosGem
+^\+(\d+) to Level of Socketed Gems	LevelGem	IsLevelGem
+^\+(\d+) to Level of Socketed Lightning Gems	LightningGem	IsLightningGem
+^\+(\d+) to Level of Socketed Melee Gems	MeleeGem	IsMeleeGem
+^\+(\d+) to Level of Socketed Minion Gems	MinionGem	IsMinionGem
+^\+(\d+) to Level of Socketed Bow Gems	BowGem	IsBowGem
+^\+(\d+) to maximum Energy Shield	FlatES	IsFlatES
+^\+(\d+) to maximum Life	MaxLife	IsMaxLife
+^(\d+)% increased Damage over Time	DOT	IsDOT

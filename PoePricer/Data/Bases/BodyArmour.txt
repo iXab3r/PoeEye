@@ -1,0 +1,102 @@
+Plate Vest	14
+Chestplate	49
+Copper Plate	126
+War Plate	154
+Full Plate	203
+Arena Plate	231
+Lordly Plate	252
+Bronze Plate	266
+Battle Plate	294
+Sun Plate	322
+Colosseum Plate	350
+Majestic Plate	378
+Golden Plate	399
+Crusader Plate	428
+Astral Plate	507
+Gladiator Plate	526
+Glorious Plate	553
+Shabby Jerkin		21
+Strapped Leather		70
+Buckskin Tunic		126
+Wild Leather		182
+Full Leather		203
+Sun Leather		231
+Thief's Garb		252
+Eelskin Tunic		266
+Frontier Leather		294
+Glorious Leather		322
+Coronal Leather		350
+Cutthroat's Garb		378
+Sharkskin Tunic		399
+Destiny Leather		428
+Exquisite Leather		502
+Zodiac Leather		609
+Assassin's Garb		525
+Simple Robe			11
+Silken Vest			27
+Scholar's Robe			41
+Silken Garb			55
+Mage's Vestment			61
+Silk Robe			69
+Cabalist Regalia			75
+Sage's Robe			79
+Silken Wrap			87
+Conjurer's Vestment			95
+Spidersilk Robe			103
+Destroyer Regalia			111
+Savant's Robe			117
+Necromancer Silks			125
+Occultist's Vestment			140
+Widowsilk Robe			161
+Vaal Regalia			175
+Scale Vest	19	19
+Light Brigandine	35	35
+Scale Doublet	69	69
+Infantry Brigandine	85	85
+Full Scale Armour	112	112
+Soldier's Brigandine	127	127
+Field Lamellar	138	138
+Wyrmscale Doublet	150	150
+Hussar Brigandine	165	165
+Full Wyrmscale	181	181
+Commander's Brigandine	196	196
+Battle Lamellar	212	212
+Dragonscale Doublet	223	223
+Desert Brigandine	268	268
+Full Dragonscale	335	266
+General's Brigandine	296	296
+Triumphant Lamellar	271	340
+Chainmail Vest	19		7
+Chainmail Tunic	35		11
+Ringmail Coat	69		21
+Chainmail Doublet	85		26
+Full Ringmail	112		33
+Full Chainmail	127		38
+Holy Chainmail	138		41
+Latticed Ringmail	154		46
+Crusader Chainmail	169		50
+Ornate Ringmail	185		54
+Chain Hauberk	200		59
+Devout Chainmail	215		63
+Loricated Ringmail	232		68
+Conquest Chainmail	276		81
+Elegant Ringmail	269		94
+Saint's Hauberk	315		78
+Saintly Chainmail	286		98
+Padded Vest		19	7
+Oiled Vest		38	13
+Padded Jacket		73	22
+Oiled Coat		88	27
+Scarlet Raiment		112	33
+Waxed Garb		127	38
+Bone Armour		138	41
+Quilted Jacket		158	47
+Sleek Coat		173	51
+Crimson Raiment		189	55
+Lacquered Garb		204	60
+Crypt Armour		219	64
+Sentinel Jacket		235	69
+Varnished Coat		276	81
+Blood Raiment		311	75
+Sadist Garb		304	95
+Carnal Armour		251	105
