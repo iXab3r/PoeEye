@@ -31,7 +31,7 @@
             var instance = CreateInstance();
 
             //When
-            var result = instance.Parse(rawHtml);
+            var result = instance.ParseStaticData(rawHtml);
 
             //Then
             result.CurrenciesList.Length.ShouldBe(16);
@@ -45,7 +45,7 @@
             var instance = CreateInstance();
 
             //When
-            var result = instance.Parse(rawHtml);
+            var result = instance.ParseQueryResponse(rawHtml);
 
             //Then
             result.ItemsList.Count().ShouldBe(99);
@@ -59,7 +59,7 @@
             var instance = CreateInstance();
 
             //When
-            var result = instance.Parse(rawHtml);
+            var result = instance.ParseStaticData(rawHtml);
 
             //Then
             result.ModsList.Length.ShouldBe(619);

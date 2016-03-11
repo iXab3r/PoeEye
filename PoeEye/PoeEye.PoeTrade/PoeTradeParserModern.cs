@@ -14,7 +14,7 @@ namespace PoeEye.PoeTrade
 
     internal sealed class PoeTradeParserModern : IPoeTradeParser
     {
-        public IPoeQueryResult Parse(string rawHtml)
+        public IPoeQueryResult ParseQueryResponse(string rawHtml)
         {
             Guard.ArgumentNotNull(() => rawHtml);
 
@@ -22,8 +22,21 @@ namespace PoeEye.PoeTrade
 
             var result = new PoeQueryResult
             {
-                CurrenciesList = ExtractCurrenciesList(parser),
                 ItemsList = ExtractItems(parser),
+            };
+
+            return result;
+        }
+
+        public IPoeStaticData ParseStaticData(string rawHtml)
+        {
+            Guard.ArgumentNotNull(() => rawHtml);
+
+            var parser = new CQ(new StringReader(rawHtml));
+
+            var result = new PoeStaticData
+            {
+                CurrenciesList = ExtractCurrenciesList(parser),
                 ModsList = ExtractModsList(parser),
                 LeaguesList = ExtractLeaguesList(parser)
             };

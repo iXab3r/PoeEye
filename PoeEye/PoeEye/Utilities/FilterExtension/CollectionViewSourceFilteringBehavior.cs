@@ -1,6 +1,5 @@
 ﻿namespace PoeEye.Utilities.FilterExtension
 {
-    using System.Collections.Generic;
     using System.ComponentModel;
     using System.Windows;
     using System.Windows.Data;
@@ -11,12 +10,12 @@
     internal sealed class CollectionViewSourceFilteringBehavior : Behavior<CollectionViewSource>
     {
         public static readonly DependencyProperty FiltersProperty =
-            DependencyProperty.Register("Filters", typeof (IEnumerable<IFilter>), typeof (CollectionViewSourceFilteringBehavior), new UIPropertyMetadata(null));
+            DependencyProperty.Register("Filters", typeof (IFilter[]), typeof (CollectionViewSourceFilteringBehavior), new UIPropertyMetadata(null));
 
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
-        public IEnumerable<IFilter> Filters
+        public IFilter[] Filters
         {
-            get { return (IEnumerable<IFilter>) GetValue(FiltersProperty); }
+            get { return (IFilter[]) GetValue(FiltersProperty); }
             set { SetValue(FiltersProperty, value); }
         }
 

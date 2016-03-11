@@ -12,6 +12,6 @@
         Task<IPoeQueryResult> IssueQuery([NotNull] IPoeQuery query);
 
         [NotNull]
-        Task<IPoeQueryResult> GetStaticData();
+        Task<IPoeStaticData> RequestStaticData();
     }
 }

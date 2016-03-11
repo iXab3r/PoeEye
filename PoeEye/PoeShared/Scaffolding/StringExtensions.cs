@@ -1,9 +1,9 @@
-namespace PoeShared.PoeDatabase
+﻿namespace PoeShared.Scaffolding
 {
     using System;
     using System.Linq;
 
-    internal static class PoeDatabaseExtensions
+    public static class StringExtensions
     {
         /// <summary>
         ///     Split string into substrings using separator string
@@ -12,7 +12,7 @@ namespace PoeShared.PoeDatabase
         public static string[] SplitTrim(this string str, string separator)
         {
             return str
-                .Split(new[] {separator}, StringSplitOptions.RemoveEmptyEntries)
+                .Split(new[] { separator }, StringSplitOptions.RemoveEmptyEntries)
                 .Select(sub => sub.Trim())
                 .ToArray();
         }

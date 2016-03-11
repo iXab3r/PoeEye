@@ -8,6 +8,7 @@
     using Exceptionless.Models;
 
     using log4net;
+    using log4net.Core;
 
     using PoeShared;
 
@@ -52,6 +53,10 @@
             // used for log4net configuration
 #if DEBUG
             GlobalContext.Properties["configuration"] = "Debug";
+
+            var repository = (log4net.Repository.Hierarchy.Hierarchy)LogManager.GetRepository();
+            repository.Root.Level = Level.Trace;
+            repository.RaiseConfigurationChanged(EventArgs.Empty);
 #else
             GlobalContext.Properties["configuration"] = "Release";
 #endif

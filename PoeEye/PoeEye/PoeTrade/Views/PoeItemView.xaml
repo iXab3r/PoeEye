@@ -3,7 +3,6 @@
                     xmlns:common="clr-namespace:PoeShared.Common;assembly=PoeShared"
                     xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
                     xmlns:net="clr-namespace:FontAwesome.Net;assembly=FontAwesome.Net"
-                    xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
                     xmlns:filterExtension="clr-namespace:PoeEye.Utilities.FilterExtension"
                     xmlns:viewModels="clr-namespace:PoeEye.PoeTrade.ViewModels"
                     xmlns:poeTrade="clr-namespace:PoeEye.PoeTrade"

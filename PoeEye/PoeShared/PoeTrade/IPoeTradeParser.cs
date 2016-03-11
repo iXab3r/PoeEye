@@ -7,6 +7,9 @@ namespace PoeShared.PoeTrade
     public interface IPoeTradeParser
     {
         [NotNull]
-        IPoeQueryResult Parse([NotNull] string rawHtml);
+        IPoeQueryResult ParseQueryResponse([NotNull] string rawHtml);
+
+        [NotNull]
+        IPoeStaticData ParseStaticData([NotNull] string rawHtml);
     }
 }

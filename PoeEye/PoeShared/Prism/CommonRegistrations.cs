@@ -20,7 +20,7 @@
         {
             Container
                 .RegisterSingleton<IClock, Clock>()
-                .RegisterSingleton<IPoeDatabaseReader, PoeDatabaseReader>()
+                .RegisterSingleton<IPoeDatabaseReader, StaticPoeDatabaseReader>()
                 .RegisterSingleton<IPoeItemParser, PoeItemParser>()
                 .RegisterSingleton<IEqualityComparer<IPoeItem>, PoeItemEqualityComparer>()
                 .RegisterSingleton<IConverter<IPoeItem, IPoeQueryInfo>, PoeItemToPoeQueryConverter>()

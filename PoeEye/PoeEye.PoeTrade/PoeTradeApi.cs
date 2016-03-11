@@ -73,13 +73,13 @@
             return IssueQuery(PoeTradeSearchUri, queryPostData);
         }
 
-        public Task<IPoeQueryResult> GetStaticData()
+        public Task<IPoeStaticData> RequestStaticData()
         {
             var client = CreateClient();
             return client
                 .Get(PoeTradeUri)
                 .Select(ThrowIfNotParseable)
-                .Select(poeTradeParser.Parse)
+                .Select(poeTradeParser.ParseStaticData)
                 .ToTask();
         }
 
@@ -109,7 +109,7 @@
                     return client
                         .Post(uri, queryParameters)
                         .Select(ThrowIfNotParseable)
-                        .Select(poeTradeParser.Parse)
+                        .Select(poeTradeParser.ParseQueryResponse)
                         .ToTask();
                 }
                 finally

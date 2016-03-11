@@ -18,16 +18,22 @@
             return Task.Run(() => ProcessQuery(query));
         }
 
-        public Task<IPoeQueryResult> GetStaticData()
+        public Task<IPoeStaticData> RequestStaticData()
         {
             return Task.Run(() => PrepareStatisData());
         }
 
-        private IPoeQueryResult PrepareStatisData()
+        private IPoeStaticData PrepareStatisData()
         {
-            return new PoeQueryResult
+            return new PoeStaticData()
             {
-                LeaguesList = new[] {"League 1", "League 2"}
+                LeaguesList = new[] {"League 1", "League 2"},
+                ModsList = new IPoeItemMod[0],
+                CurrenciesList = new IPoeCurrency[]
+                {
+                    new PoeCurrency {Name = "Test currency 1", CodeName = "TC1"},
+                    new PoeCurrency {Name = "Test currency 2", CodeName = "TC2"}
+                },
             };
         }
 
@@ -35,12 +41,6 @@
         {
             return new PoeQueryResult
             {
-                ModsList = new IPoeItemMod[0],
-                CurrenciesList = new IPoeCurrency[]
-                {
-                    new PoeCurrency {Name = "Test currency 1", CodeName = "TC1"},
-                    new PoeCurrency {Name = "Test currency 2", CodeName = "TC2"}
-                },
                 ItemsList = CreateFakeItems(15)
             };
         }

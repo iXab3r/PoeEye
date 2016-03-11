@@ -13,7 +13,7 @@
 
     internal sealed class PoeQueryInfoProvider : IPoeQueryInfoProvider
     {
-        private readonly Lazy<IPoeQueryResult> lazyDataLoader;
+        private readonly Lazy<IPoeStaticData> lazyDataLoader;
         private readonly IPoeApi poeApi;
 
         public PoeQueryInfoProvider([NotNull] IPoeApi poeApi)
@@ -21,7 +21,7 @@
             Guard.ArgumentNotNull(() => poeApi);
             this.poeApi = poeApi;
 
-            lazyDataLoader = new Lazy<IPoeQueryResult>(RefreshData);
+            lazyDataLoader = new Lazy<IPoeStaticData>(RefreshData);
 
             CurrenciesList = new IPoeCurrency[]
             {
@@ -86,17 +86,17 @@
 
         public IPoeItemType[] ItemTypes { get; }
 
-        private IPoeQueryResult RefreshData()
+        private IPoeStaticData RefreshData()
         {
             try
             {
-                var queryResult = poeApi.GetStaticData().Result;
+                var queryResult = poeApi.RequestStaticData().Result;
                 return queryResult;
             }
             catch (Exception ex)
             {
                 Log.HandleUiException(ex);
-                return new PoeQueryResult();
+                return new PoeStaticData();
             }
         }
     }
