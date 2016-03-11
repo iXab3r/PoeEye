@@ -37,7 +37,7 @@
                     continue;
                 }
 
-                var items = resourceData.SplitTrim("\r\n");
+                var items = resourceData.SplitTrim("\n");
 
                 foreach (var item in items)
                 {

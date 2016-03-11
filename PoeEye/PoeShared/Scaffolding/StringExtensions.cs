@@ -13,7 +13,7 @@
         {
             return str
                 .Split(new[] { separator }, StringSplitOptions.RemoveEmptyEntries)
-                .Select(sub => sub.Trim())
+                .Select(sub => sub.Trim('\n','\r',' '))
                 .ToArray();
         }
     }
