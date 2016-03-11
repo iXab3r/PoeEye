@@ -1,4 +1,4 @@
-﻿namespace PoePricer
+﻿namespace PoePricer.Parser
 {
     internal enum AffixBracketType
     {

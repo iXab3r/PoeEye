@@ -55,16 +55,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AffixBracket.cs" />
-    <Compile Include="AffixBracketType.cs" />
     <Compile Include="Extensions\ConsoleExtensions.cs" />
     <Compile Include="Extensions\ObjectExtensions.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Parser\AffixBracket.cs" />
-    <Compile Include="Parser\AffixBracketParser.cs" />
+    <Compile Include="Parser\AffixBracketsSource.cs" />
+    <Compile Include="Parser\AffixBracketType.cs" />
     <Compile Include="Parser\PricerDataReader.cs" />
     <Compile Include="IPoePricer.cs" />
-    <Compile Include="ItemSamples.cs" />
+    <Compile Include="StaticData.cs" />
     <Compile Include="PoePricer.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
