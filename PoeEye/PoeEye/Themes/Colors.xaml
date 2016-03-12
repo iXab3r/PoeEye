@@ -5,8 +5,23 @@
   <Color x:Key="PoeTradeRemovedItemColor">#55FF9298</Color>
   <Color x:Key="PoeTradeNewItemColor">#5592FF98</Color>
 
+  <Color x:Key="PoeItemElementalStatColor">#FF8CACBC</Color>
+  <Color x:Key="PoeItemPhysicalStatColor">#FFFFFB8C</Color>
+
+  <Color x:Key="PoeItemDexStatColor">#FF29BA55</Color>
+  <Color x:Key="PoeItemStrStatColor">#FFE16043</Color>
+  <Color x:Key="PoeItemIntStatColor">#FF4479A9</Color>
+
   <SolidColorBrush x:Key="PoeTradeRemovedItemBrush" Color="{StaticResource PoeTradeRemovedItemColor}" />
   <SolidColorBrush x:Key="PoeTradeNewItemBrush" Color="{StaticResource PoeTradeNewItemColor}" />
+
+  <SolidColorBrush x:Key="PoeItemElementalStatBrush" Color="{StaticResource PoeItemElementalStatColor}" />
+  <SolidColorBrush x:Key="PoeItemPhysicalStatBrush" Color="{StaticResource PoeItemPhysicalStatColor}" />
+
+
+  <SolidColorBrush x:Key="PoeItemDexStatBrush" Color="{StaticResource PoeItemDexStatColor}" />
+  <SolidColorBrush x:Key="PoeItemStrStatBrush" Color="{StaticResource PoeItemStrStatColor}" />
+  <SolidColorBrush x:Key="PoeItemIntStatBrush" Color="{StaticResource PoeItemIntStatColor}" />
 
   <SolidColorBrush x:Key="PoeItemRarityNormalBrush" Color="White" />
   <SolidColorBrush x:Key="PoeItemRarityMagicBrush" Color="CornflowerBlue" />

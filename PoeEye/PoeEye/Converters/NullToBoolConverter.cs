@@ -10,7 +10,7 @@ namespace PoeEye.Converters
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return value == null ? NullValue : !NullValue;
+            return ConverterHelpers.IsNullOrEmpty(value) ? NullValue : !NullValue;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

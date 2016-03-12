@@ -12,8 +12,8 @@
   <converters:ExceptionToMessageConverter x:Key="ExceptionToMessageConverter" />
   <converters:TimeSpanToHumanReadableStringConverter x:Key="TimeSpanToHumanReadableStringConverter" />
   <converters:ObjectToLowercaseConverter x:Key="ObjectToLowercaseConverter" />
-  <converters:NullToBoolConverter x:Key="NullToBoolConverter" NullValue="True" />
-  <converters:NullToBoolConverter x:Key="InvertedNullToBoolConverter" NullValue="False" />
+  <converters:NullToBoolConverter x:Key="NullToTrueConverter" NullValue="True" />
+  <converters:NullToBoolConverter x:Key="NullToFalseConverter" NullValue="False" />
   <converters:BoolInversionConverter x:Key="BoolInversionConverter" />
   <converters:TimeSpanToSecondsConverter x:Key="TimeSpanToSecondsConverter" />
 
@@ -27,6 +27,18 @@
       <blue:Int32ComparisonStrategy Mode="Equal" Comparand="0" />
     </blue:Int32ToVisibilityConverter.ComparisonStrategy>
   </blue:Int32ToVisibilityConverter>
+
+  <converters:NullToVisibilityMultiValueConverter x:Key="AllNullToCollapsedMultiValueConverter" TrueValue="Collapsed" FalseValue="Visible">
+    <converters:NullToVisibilityMultiValueConverter.Strategy>
+      <blue:AndStrategy/>
+    </converters:NullToVisibilityMultiValueConverter.Strategy>
+  </converters:NullToVisibilityMultiValueConverter>
+
+  <converters:NullToVisibilityMultiValueConverter x:Key="AnyNullToCollapsedMultiValueConverter" TrueValue="Collapsed" FalseValue="Visible">
+    <converters:NullToVisibilityMultiValueConverter.Strategy>
+      <blue:OrStrategy/>
+    </converters:NullToVisibilityMultiValueConverter.Strategy>
+  </converters:NullToVisibilityMultiValueConverter>
 
   <converters:MathAdditionConverter x:Key="MathAdditionConverter"/> 
 </ResourceDictionary>
