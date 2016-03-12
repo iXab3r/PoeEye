@@ -74,7 +74,7 @@
                         Content="{Binding SelectedTab}" />
         
         <ContentControl Grid.Column="1"
-                        Margin="5,10,10,10"
+                        Margin="10,0,0,0"
                         Visibility="{Binding SelectedTab, Converter={StaticResource NotNullToHiddenConverter}}"
                         Content="{Binding SummaryTab}" />
       </Grid>
