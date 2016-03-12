@@ -28,7 +28,7 @@
                     IsTabStop="False"
                     Focusable="False"
                     MaxHeight="{Binding ActualHeight, RelativeSource={RelativeSource FindAncestor, AncestorType=ContentPresenter}, Mode=OneWay}">
-        <Expander IsExpanded="{Binding Query.IsExpanded}">
+        <Expander IsExpanded="{Binding Query.IsExpanded}" Margin="0">
           <Expander.Header>
             <StackPanel Orientation="Horizontal">
               <TextBlock Text="Query parameters" Margin="5,0" VerticalAlignment="Center" />
@@ -67,11 +67,6 @@
         <ItemsControl Margin="0,10,0,0"
                       ItemsSource="{Binding Source={StaticResource tradesListSource}}"
                       Style="{StaticResource VirtualizedItemsControlStyle}">
-          <ItemsControl.ItemTemplate>
-            <DataTemplate>
-              <ContentControl Content="{Binding}" />
-            </DataTemplate>
-          </ItemsControl.ItemTemplate>
         </ItemsControl>
       </Grid>
     </Grid>

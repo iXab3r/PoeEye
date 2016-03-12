@@ -63,13 +63,12 @@
 
       <ItemsControl Grid.Row="1" 
                     Margin="0,10,0,0"
-                    Grid.IsSharedSizeScope="True"
                     Style="{StaticResource VirtualizedItemsControlStyle}" ItemsSource="{Binding TradesView}">
         <ItemsControl.ItemTemplate>
           <DataTemplate DataType="{x:Type viewModels:PoeFilteredTradeViewModel}">
             <Grid>
                <Grid.ColumnDefinitions>
-                 <ColumnDefinition Width="Auto" SharedSizeGroup="SummaryTradeItemWidth"/>
+                 <ColumnDefinition Width="Auto" SharedSizeGroup="ItemWidth"/>
                </Grid.ColumnDefinitions>
               <ContentControl Content="{Binding Trade}" />
             </Grid>

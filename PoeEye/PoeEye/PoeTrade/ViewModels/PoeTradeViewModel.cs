@@ -37,7 +37,7 @@
 
         private readonly IPoeItemVerifier itemVerifier;
         private readonly ReactiveCommand<object> openForumUriCommand;
-        private readonly ReactiveCommand<object> verifyItemCommand = ReactiveCommand.Create();
+        private readonly ReactiveCommand<object> verifyItemCommand;
 
         private PoeTradeState tradeState;
 
@@ -68,7 +68,7 @@
             openForumUriCommand = ReactiveCommand.Create(Observable.Return(OpenForumUriCommandCanExecute()));
             openForumUriCommand.Subscribe(OpenForumUriCommandExecute).AddTo(Anchors);
 
-
+            verifyItemCommand = ReactiveCommand.Create(Observable.Return(VerifyCommandCanExecute()));
             verifyItemCommand.Subscribe(VerifyCommandExecuted).AddTo(Anchors);
 
             Uri imageUri;
@@ -133,7 +133,13 @@
 
         private bool OpenForumUriCommandCanExecute()
         {
-            return !string.IsNullOrWhiteSpace(Trade.TradeForumUri);
+            Uri tradeForumUri;
+            return Uri.TryCreate(Trade.TradeForumUri, UriKind.Absolute, out tradeForumUri);
+        }
+
+        private bool VerifyCommandCanExecute()
+        {
+            return !string.IsNullOrWhiteSpace(Trade.Hash);
         }
 
         private void CopyPmMessageToClipboardCommandExecute(object arg)

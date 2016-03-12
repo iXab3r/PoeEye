@@ -12,112 +12,103 @@
     <!-- Stats -->
     <Grid Margin="10,5">
       <Grid.Resources>
-        <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
-          <Setter Property="Margin" Value="10, 5, 10, 5" />
+        <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}" x:Key="ItemStatValue">
+          <Setter Property="Margin" Value="10, 0" />
           <Setter Property="HorizontalAlignment" Value="Center" />
+          <Setter Property="VerticalAlignment" Value="Center" />
+          <Setter Property="FontWeight" Value="Bold" />
         </Style>
 
-        <Style TargetType="Label" BasedOn="{StaticResource {x:Type Label}}">
-          <Setter Property="HorizontalAlignment" Value="Center" />
+        <Style TargetType="{x:Type Label}" BasedOn="{StaticResource {x:Type Label}}" x:Key="ItemStatHeader">
+          <Setter Property="HorizontalContentAlignment" Value="Right" />
+          <Setter Property="VerticalContentAlignment" Value="Center" />
           <Setter Property="FontWeight" Value="Bold" />
-          <Setter Property="BorderThickness" Value="0,0,0,2" />
-          <Setter Property="BorderBrush" Value="{StaticResource AccentColorBrush}" />
+          <Setter Property="MinWidth" Value="50" />
+          <Setter Property="Padding" Value="0" />
+        </Style>
+
+        <Style TargetType="{x:Type StackPanel}">
+          <Setter Property="Orientation" Value="Horizontal"/>
         </Style>
       </Grid.Resources>
-      <Grid.ColumnDefinitions>
-        <ColumnDefinition Width="60*" />
-        <ColumnDefinition Width="60*" />
-        <ColumnDefinition Width="60*" />
-        <ColumnDefinition Width="60*" />
-        <ColumnDefinition Width="60*" />
-        <ColumnDefinition Width="60*" />
-        <ColumnDefinition Width="60*" />
-      </Grid.ColumnDefinitions>
+      <StackPanel Orientation="Vertical">
+
+        <StackPanel Visibility="{Binding Quality, Converter={StaticResource NullToCollapsedConverter}}">
+          <Label Content="Quality" Style="{StaticResource ItemStatHeader}" />
+          <TextBlock Text="{Binding Quality}" Style="{StaticResource ItemStatValue}"/>
+        </StackPanel>
+
+        <StackPanel Visibility="{Binding Level, Converter={StaticResource NullToCollapsedConverter}}">
+          <Label Content="Level" Style="{StaticResource ItemStatHeader}"/>
+          <TextBlock Text="{Binding Level}" Style="{StaticResource ItemStatValue}" />
+        </StackPanel>
+
+        <StackPanel Visibility="{Binding Physical, Converter={StaticResource NullToCollapsedConverter}}">
+          <Label Content="Phys." Style="{StaticResource ItemStatHeader}"/>
+          <TextBlock Text="{Binding Physical}" Style="{StaticResource ItemStatValue}" />
+        </StackPanel>
+
+        <StackPanel Visibility="{Binding Elemental, Converter={StaticResource NullToCollapsedConverter}}">
+          <Label Content="Elem." Style="{StaticResource ItemStatHeader}"/>
+          <TextBlock Text="{Binding Elemental}" Style="{StaticResource ItemStatValue}" />
+        </StackPanel>
+
+        <StackPanel Visibility="{Binding AttacksPerSecond, Converter={StaticResource NullToCollapsedConverter}}">
+          <Label Content="APS" Style="{StaticResource ItemStatHeader}"/>
+          <TextBlock Text="{Binding AttacksPerSecond}" Style="{StaticResource ItemStatValue}" />
+        </StackPanel>
+
+        <StackPanel Visibility="{Binding DamagePerSecond, Converter={StaticResource NullToCollapsedConverter}}">
+          <Label Content="DPS" Style="{StaticResource ItemStatHeader}"/>
+          <TextBlock Text="{Binding DamagePerSecond}" Style="{StaticResource ItemStatValue}" />
+        </StackPanel>
+
+        <StackPanel Visibility="{Binding PhysicalDamagePerSecond, Converter={StaticResource NullToCollapsedConverter}}">
+          <Label Content="pDPS" Style="{StaticResource ItemStatHeader}"/>
+          <TextBlock Text="{Binding PhysicalDamagePerSecond}" Style="{StaticResource ItemStatValue}" />
+        </StackPanel>
+
+        <StackPanel Visibility="{Binding ElementalDamagePerSecond, Converter={StaticResource NullToCollapsedConverter}}">
+          <Label Content="eDPS" Style="{StaticResource ItemStatHeader}"/>
+          <TextBlock Text="{Binding ElementalDamagePerSecond}" Style="{StaticResource ItemStatValue}" />
+        </StackPanel>
+
+        <StackPanel Visibility="{Binding Armour, Converter={StaticResource NullToCollapsedConverter}}">
+          <Label Content="Armour" Style="{StaticResource ItemStatHeader}"/>
+          <TextBlock Text="{Binding Armour}" Style="{StaticResource ItemStatValue}" />
+        </StackPanel>
+
+        <StackPanel Visibility="{Binding Evasion, Converter={StaticResource NullToCollapsedConverter}}">
+          <Label Content="Evasion" Style="{StaticResource ItemStatHeader}"/>
+          <TextBlock Text="{Binding Evasion}"  Style="{StaticResource ItemStatValue}"/>
+        </StackPanel>
+
+        <StackPanel Visibility="{Binding Shield, Converter={StaticResource NullToCollapsedConverter}}">
+          <Label Content="Shield" Style="{StaticResource ItemStatHeader}"/>
+          <TextBlock Text="{Binding Shield}" Style="{StaticResource ItemStatValue}" />
+        </StackPanel>
+
+        <StackPanel Visibility="{Binding BlockChance, Converter={StaticResource NullToCollapsedConverter}}">
+          <Label Content="Block" Style="{StaticResource ItemStatHeader}"/>
+          <TextBlock Text="{Binding BlockChance}" Style="{StaticResource ItemStatValue}" />
+        </StackPanel>
+
+        <StackPanel Visibility="{Binding CriticalChance, Converter={StaticResource NullToCollapsedConverter}}">
+          <Label Content="Crit." Style="{StaticResource ItemStatHeader}" />
+          <TextBlock Text="{Binding CriticalChance}" Style="{StaticResource ItemStatValue}" />
+        </StackPanel>
+      </StackPanel>
+
 
       <Grid.RowDefinitions>
         <RowDefinition Height="80*" />
         <RowDefinition Height="80*" />
       </Grid.RowDefinitions>
 
-      <StackPanel Grid.Column="0" Grid.Row="0"
-                  Orientation="Vertical">
-        <Label Content="Quality" />
-        <TextBlock Text="{Binding Quality}" />
-      </StackPanel>
 
-      <StackPanel Grid.Column="1" Grid.Row="0"
-                  Orientation="Vertical">
-        <Label Content="Phys." />
-        <TextBlock Text="{Binding Physical}" />
-      </StackPanel>
-
-      <StackPanel Grid.Column="2" Grid.Row="0"
-                  Orientation="Vertical">
-        <Label Content="Elem." />
-        <TextBlock Text="{Binding Elemental}" />
-      </StackPanel>
-
-      <StackPanel Grid.Column="3" Grid.Row="0"
-                  Orientation="Vertical">
-        <Label Content="APS" />
-        <TextBlock Text="{Binding AttacksPerSecond}" />
-      </StackPanel>
-
-      <StackPanel Grid.Column="4" Grid.Row="0"
-                  Orientation="Vertical">
-        <Label Content="DPS" />
-        <TextBlock Text="{Binding DamagePerSecond}" />
-      </StackPanel>
-
-      <StackPanel Grid.Column="5" Grid.Row="0"
-                  Orientation="Vertical">
-        <Label Content="pDPS" />
-        <TextBlock Text="{Binding PhysicalDamagePerSecond}" />
-      </StackPanel>
-
-      <StackPanel Grid.Column="6" Grid.Row="0"
-                  Orientation="Vertical">
-        <Label Content="eDPS" />
-        <TextBlock Text="{Binding ElementalDamagePerSecond}" />
-      </StackPanel>
 
       <!-- Row 2 -->
 
-      <StackPanel Grid.Column="0" Grid.Row="1"
-                  Orientation="Vertical">
-        <Label Content="Armour" />
-        <TextBlock Text="{Binding Armour}" />
-      </StackPanel>
-
-      <StackPanel Grid.Column="1" Grid.Row="1"
-                  Orientation="Vertical">
-        <Label Content="Evasion" />
-        <TextBlock Text="{Binding Evasion}" />
-      </StackPanel>
-
-      <StackPanel Grid.Column="2" Grid.Row="1"
-                  Orientation="Vertical">
-        <Label Content="Shield" />
-        <TextBlock Text="{Binding Shield}" />
-      </StackPanel>
-
-      <StackPanel Grid.Column="3" Grid.Row="1"
-                  Orientation="Vertical">
-        <Label Content="Block" />
-        <TextBlock Text="{Binding BlockChance}" />
-      </StackPanel>
-
-      <StackPanel Grid.Column="4" Grid.Row="1"
-                  Orientation="Vertical">
-        <Label Content="Crit." />
-        <TextBlock Text="{Binding CriticalChance}" />
-      </StackPanel>
-
-      <StackPanel Grid.Column="5" Grid.Row="1"
-                  Orientation="Vertical">
-        <Label Content="Level" />
-        <TextBlock Text="{Binding Level}" />
-      </StackPanel>
     </Grid>
   </DataTemplate>
 
@@ -184,7 +175,7 @@
 
   <DataTemplate DataType="{x:Type viewModels:PoeTradeViewModel}">
     <ContentControl Margin="10">
-      <Grid HorizontalAlignment="Center" MinWidth="800">
+      <Grid HorizontalAlignment="Center" >
         <Grid.RowDefinitions>
           <RowDefinition Height="40" />
           <RowDefinition Height="*" />
@@ -293,10 +284,16 @@
 
         <Border Grid.Row="1" Grid.Column="1"
                 BorderThickness="0,2,0,2" BorderBrush="{StaticResource ControlBorderBrush}">
-          <StackPanel Orientation="Horizontal">
-            <ContentControl Content="{Binding Trade}" ContentTemplate="{StaticResource PoeItemModsTemplateKey}" />
-            <ContentControl Content="{Binding Trade}" ContentTemplate="{StaticResource PoeItemStatsTemplateKey}" />
-          </StackPanel>
+          <Grid>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="Auto"/>
+              <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <ContentControl Grid.Column="0"  VerticalAlignment="Center"
+                            Content="{Binding Trade}" ContentTemplate="{StaticResource PoeItemStatsTemplateKey}"  />
+            <ContentControl Grid.Column="1" 
+                            Content="{Binding Trade}" ContentTemplate="{StaticResource PoeItemModsTemplateKey}" />
+          </Grid>
         </Border>
 
         <ContentControl Grid.Row="2" Grid.Column="1"
@@ -335,7 +332,7 @@
                           Margin="10,2">
 
                 <Button Width="80"
-                        Visibility="{Binding Trade.Hash, Converter={StaticResource NullToCollapsedConverter}}"
+                        Visibility="{Binding IsEnabled, RelativeSource={RelativeSource Self}, Converter={StaticResource BoolFalseToCollapsedConverter}}"
                         Command="{Binding VerifyItemCommand}">
                   <Button.Style>
                     <Style BasedOn="{StaticResource {x:Type Button}}" TargetType="{x:Type Button}">
@@ -364,6 +361,7 @@
 
               <Button Grid.Column="5"
                       Margin="10,2"
+                        Visibility="{Binding IsEnabled, RelativeSource={RelativeSource Self}, Converter={StaticResource BoolFalseToCollapsedConverter}}"
                       Content="Go to forum thread" Command="{Binding OpenForumUriCommand}" />
 
               <Ellipse Grid.Column="6"

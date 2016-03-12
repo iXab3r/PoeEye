@@ -304,6 +304,7 @@
     <Compile Include="Config\PoeEyeConfigProviderFromFile.cs" />
     <Compile Include="Config\PoeEyeTabConfig.cs" />
     <Compile Include="Converters\BoolInversionConverter.cs" />
+    <Compile Include="Converters\MathAdditionConverter.cs" />
     <Compile Include="Converters\NullToBoolConverter.cs" />
     <Compile Include="Converters\ObjectToVisibilityConverter.cs" />
     <Compile Include="Converters\ObjectToLowercaseConverter.cs" />

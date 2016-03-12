@@ -6,9 +6,9 @@
                       xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
                       xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
                       xmlns:system="clr-namespace:System;assembly=mscorlib"
-                      xmlns:net="clr-namespace:FontAwesome.Net;assembly=FontAwesome.Net"
                       xmlns:metroModels="clr-namespace:PoeEye.MetroModels"
                       xmlns:utilities="clr-namespace:PoeEye.Utilities"
+                      xmlns:viewModels="clr-namespace:PoeEye.PoeTrade.ViewModels"
                       mc:Ignorable="d"
                       Title="{Binding MainWindowTitle}"
                       MinWidth="1200"
@@ -36,30 +36,40 @@
     </ContentControl>
 
     <Border Grid.Row="1">
-      <Grid>
+      <Grid Margin="5,10">
         <Grid.ColumnDefinitions>
           <ColumnDefinition Width="Auto" />
           <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <ListBox Grid.Column="0"
+        <Expander Grid.Column="0" ExpandDirection="Right"  IsExpanded="True" Margin="0" >
+          <Expander.Header>
+            <TextBlock FontSize="14" Text="QUERIES LIST" RenderTransformOrigin="0.5,0.5" VerticalAlignment="Top" >
+              <TextBlock.LayoutTransform>
+                <TransformGroup>
+                  <RotateTransform Angle="-90"/>
+                </TransformGroup>
+              </TextBlock.LayoutTransform>
+            </TextBlock>
+          </Expander.Header>
+          <ListBox 
                  ItemsSource="{Binding TabsList}"
                  SelectedItem="{Binding SelectedTab}"
                  SelectionMode="Single"
-                 Margin="10,10,5,10"
                  Focusable="False"
                  HorizontalContentAlignment="Stretch"
                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                  ItemTemplate="{StaticResource MainWindowTabItemViewTemplate}">
-          <ListBox.Resources>
-            <Style TargetType="ListBoxItem" BasedOn="{StaticResource ListBoxAsTabControl}" />
-          </ListBox.Resources>
-        </ListBox>
+            <ListBox.Resources>
+              <Style TargetType="ListBoxItem" BasedOn="{StaticResource ListBoxAsTabControl}" />
+            </ListBox.Resources>
+          </ListBox>
+        </Expander>
 
         <Image Grid.Column="1" Source="pack://application:,,,/Resources/mainIcon.png" Opacity="0.2" />
 
         <ContentControl Grid.Column="1"
-                        Margin="5,10,10,10"
+                        Margin="10,0,0,0"
                         Visibility="{Binding SelectedTab, Converter={StaticResource NullToHiddenConverter}}"
                         Content="{Binding SelectedTab}" />
         

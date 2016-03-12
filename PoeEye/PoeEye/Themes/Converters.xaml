@@ -27,4 +27,6 @@
       <blue:Int32ComparisonStrategy Mode="Equal" Comparand="0" />
     </blue:Int32ToVisibilityConverter.ComparisonStrategy>
   </blue:Int32ToVisibilityConverter>
+
+  <converters:MathAdditionConverter x:Key="MathAdditionConverter"/> 
 </ResourceDictionary>

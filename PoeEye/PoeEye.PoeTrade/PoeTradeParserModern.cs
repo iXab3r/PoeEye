@@ -22,7 +22,7 @@ namespace PoeEye.PoeTrade
 
             var result = new PoeQueryResult
             {
-                ItemsList = ExtractItems(parser),
+                ItemsList = ExtractItems(parser)
             };
 
             return result;
@@ -44,33 +44,6 @@ namespace PoeEye.PoeTrade
             return result;
         }
 
-        private IPoeItem[] ExtractItems(CQ parser)
-        {
-            var rows = parser["tbody[id^=item-container-]"];
-
-            var items = rows
-                .Select(ParseItemRow)
-                .Where(IsValid)
-                .ToArray();
-            return items;
-        }
-
-        private bool IsValid(IPoeItem item)
-        {
-            return !string.IsNullOrWhiteSpace(item.ItemName);
-        }
-
-        private IPoeCurrency[] ExtractCurrenciesList(CQ parser)
-        {
-            var currenciesRows = parser["select[name=buyout_currency] option"].ToList();
-
-            var currencies = currenciesRows
-                .Select(ParseCurrencyRow)
-                .Where(IsValid)
-                .ToArray();
-            return currencies;
-        }
-
         private IPoeItemMod[] ExtractModsList(CQ parser)
         {
             var allModRows = parser["div[class='row explicit'] select option"].ToList();
@@ -85,7 +58,7 @@ namespace PoeEye.PoeTrade
             return allMods;
         }
 
-        private string[] ExtractLeaguesList(CQ parser)
+        private static string[] ExtractLeaguesList(CQ parser)
         {
             var leaguesRows = parser["select[name=league] option"].ToList();
             var leaguesList = leaguesRows
@@ -110,11 +83,6 @@ namespace PoeEye.PoeTrade
                 : PoeModType.Explicit;
 
             return result;
-        }
-
-        private bool IsValid(IPoeItemMod mod)
-        {
-            return !string.IsNullOrWhiteSpace(mod.CodeName) && mod.ModType != PoeModType.Unknown;
         }
 
         private static IPoeCurrency ParseCurrencyRow(IDomObject row)
@@ -176,7 +144,7 @@ namespace PoeEye.PoeTrade
                 Level = parser["td[class=table-stats] td[data-name=level]"]?.Text(),
                 Requirements = parser["td[class=item-cell] ul[class=requirements proplist]"]?.Text(),
                 IsCorrupted = parser["td[class=item-cell] span[class~=corrupted]"].Any(),
-                Mods = implicitMods.Concat(explicitMods).ToArray(),
+                Mods = implicitMods.Concat(explicitMods).Where(x => IsValid(x)).ToArray(),
                 Links = ExtractLinksInfo(row),
                 Rarity = ExtractItemRarity(row)
             };
@@ -194,9 +162,9 @@ namespace PoeEye.PoeTrade
 
         private static void TrimProperties(PoeItem item)
         {
-            var propertiesToProcess = typeof (PoeItem)
+            var propertiesToProcess = typeof(PoeItem)
                 .GetProperties()
-                .Where(x => x.PropertyType == typeof (string))
+                .Where(x => x.PropertyType == typeof(string))
                 .Where(x => x.CanRead && x.CanWrite)
                 .ToArray();
 
@@ -264,6 +232,38 @@ namespace PoeEye.PoeTrade
             };
 
             return result;
+        }
+
+        private static IPoeItem[] ExtractItems(CQ parser)
+        {
+            var rows = parser["tbody[id^=item-container-]"];
+
+            var items = rows
+                .Select(ParseItemRow)
+                .Where(IsValid)
+                .ToArray();
+            return items;
+        }
+
+        private static IPoeCurrency[] ExtractCurrenciesList(CQ parser)
+        {
+            var currenciesRows = parser["select[name=buyout_currency] option"].ToList();
+
+            var currencies = currenciesRows
+                .Select(ParseCurrencyRow)
+                .Where(IsValid)
+                .ToArray();
+            return currencies;
+        }
+
+        private static bool IsValid(IPoeItem item)
+        {
+            return !string.IsNullOrWhiteSpace(item.ItemName);
+        }
+
+        private static bool IsValid(IPoeItemMod mod)
+        {
+            return !string.IsNullOrWhiteSpace(mod.CodeName) && !string.IsNullOrWhiteSpace(mod.Name) && mod.ModType != PoeModType.Unknown;
         }
     }
 }
