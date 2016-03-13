@@ -575,31 +575,6 @@
     <Resource Include="Resources\mainIcon.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\Currencies\Currency %281%29.png" />
-    <Resource Include="Resources\Currencies\Currency %2810%29.png" />
-    <Resource Include="Resources\Currencies\Currency %2811%29.png" />
-    <Resource Include="Resources\Currencies\Currency %2812%29.png" />
-    <Resource Include="Resources\Currencies\Currency %2813%29.png" />
-    <Resource Include="Resources\Currencies\Currency %2814%29.png" />
-    <Resource Include="Resources\Currencies\Currency %2815%29.png" />
-    <Resource Include="Resources\Currencies\Currency %2816%29.png" />
-    <Resource Include="Resources\Currencies\Currency %2817%29.png" />
-    <Resource Include="Resources\Currencies\Currency %2818%29.png" />
-    <Resource Include="Resources\Currencies\Currency %2819%29.png" />
-    <Resource Include="Resources\Currencies\Currency %282%29.png" />
-    <Resource Include="Resources\Currencies\Currency %2820%29.png" />
-    <Resource Include="Resources\Currencies\Currency %2821%29.png" />
-    <Resource Include="Resources\Currencies\Currency %2822%29.png" />
-    <Resource Include="Resources\Currencies\Currency %2823%29.png" />
-    <Resource Include="Resources\Currencies\Currency %2824%29.png" />
-    <Resource Include="Resources\Currencies\Currency %2825%29.png" />
-    <Resource Include="Resources\Currencies\Currency %283%29.png" />
-    <Resource Include="Resources\Currencies\Currency %284%29.png" />
-    <Resource Include="Resources\Currencies\Currency %285%29.png" />
-    <Resource Include="Resources\Currencies\Currency %286%29.png" />
-    <Resource Include="Resources\Currencies\Currency %287%29.png" />
-    <Resource Include="Resources\Currencies\Currency %288%29.png" />
-    <Resource Include="Resources\Currencies\Currency %289%29.png" />
     <Resource Include="Resources\Currencies\Divine_Orb.png" />
     <Resource Include="Resources\Currencies\Eternal_Orb.png" />
     <Resource Include="Resources\Currencies\Exalted_Orb.png" />

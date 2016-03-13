@@ -34,7 +34,7 @@
 
     internal sealed class MainWindowViewModel : DisposableReactiveObject, IMainWindowViewModel
     {
-        private static readonly TimeSpan CheckForUpdatesTimeout = TimeSpan.FromSeconds(600);
+        private static readonly TimeSpan CheckForUpdatesTimeout = TimeSpan.FromHours(1);
         private static readonly TimeSpan ConfigSaveSampingTimeout = TimeSpan.FromSeconds(10);
 
         private readonly ReactiveCommand<object> closeTabCommand = ReactiveCommand.Create();

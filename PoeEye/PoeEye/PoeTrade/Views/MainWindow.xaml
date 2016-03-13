@@ -272,7 +272,7 @@
         <ContentPresenter Content="{Binding PoeTradeCaptchaViewModel}" />
       </controls:Flyout>
 
-      <controls:Flyout Header="&#xF093; Update completed" x:Name="ApplicationUpdatedFlyout"
+      <controls:Flyout Header="&#xF093; Update status" x:Name="ApplicationUpdatedFlyout"
                        FontFamily="{StaticResource FontAwesome}"
                        Position="Bottom"
                        AnimateOpacity="True"
