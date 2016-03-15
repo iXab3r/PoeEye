@@ -55,12 +55,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Parser\BaseItems.cs" />
     <Compile Include="Extensions\ConsoleExtensions.cs" />
     <Compile Include="Extensions\ObjectExtensions.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
+    <Compile Include="Item.cs" />
     <Compile Include="Parser\AffixBracket.cs" />
-    <Compile Include="Parser\AffixBracketsSource.cs" />
-    <Compile Include="Parser\AffixBracketType.cs" />
     <Compile Include="Parser\PricerDataReader.cs" />
     <Compile Include="IPoePricer.cs" />
     <Compile Include="StaticData.cs" />
@@ -91,6 +91,9 @@
     <Content Include="Data\AffixBrackets\ComboSpellMana.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Data\AffixBrackets\ComboStaffSpellMana.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Data\AffixBrackets\LocalPhys.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -98,9 +101,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Data\AffixBrackets\SpellDamage.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Data\AffixBrackets\StaffComboSpellMana.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Data\AffixBrackets\StaffSpellDamage.txt">

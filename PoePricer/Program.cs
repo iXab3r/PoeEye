@@ -23,7 +23,7 @@ namespace PoePricer
 
                 var pricer = new PoePricer();
 
-                foreach (var itemSample in StaticData.ItemSamples)
+                /*foreach (var itemSample in StaticData.ItemSamples)
                 {
                     try
                     {
@@ -41,10 +41,11 @@ namespace PoePricer
                     {
                         Console.WriteLine($"Failed to parse item, exception: {ex}\r\n\t{itemSample}");
                     }
-                }
-
+                }*/
                 Console.WriteLine("Press any key...");
+                pricer.TrashOutput();
             }
+            
             catch (Exception ex)
             {
                 Console.WriteLine($"Unhandled exception: {ex}");
