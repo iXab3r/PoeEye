@@ -19,7 +19,7 @@ namespace PoePricer.Parser
     using Extensions;
 
 
-    internal enum BaseItemTypes
+    public enum BaseItemTypes
     {
         BodyArmour,
         Boots,
@@ -30,7 +30,7 @@ namespace PoePricer.Parser
     }
 
 
-    internal struct BaseItemProperties
+    public struct BaseItemProperties
     {
         public string BaseName { get; set; }
 
@@ -51,7 +51,7 @@ namespace PoePricer.Parser
     }
 
 
-    internal class BaseItemsSource : PricerDataReader
+    public class BaseItemsSource : PricerDataReader
     {
         public bool IsWeapon { get; set; }
 

@@ -59,7 +59,7 @@ namespace PoePricer
 
             var item = new Item();
             
-            item.ParseItemDataText(itemData);
+            item.ParseItemDataText(itemData, knownAffixBrackets, knownBaseItems);
             item.Name.DumpToConsole();
             return "tooltip example";
         }

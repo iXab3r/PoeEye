@@ -8,8 +8,6 @@ using System.Threading.Tasks;
 
 namespace PoePricer.Parser
 {
-
-
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
@@ -17,7 +15,7 @@ namespace PoePricer.Parser
 
     using Extensions;
 
-    internal enum AffixBracketType
+    public enum AffixBracketType
     {
         AccuracyRating,
         Armour,
@@ -33,7 +31,7 @@ namespace PoePricer.Parser
         AccuracyLightRadius
     }
 
-    internal struct ValueBracket
+    public struct ValueBracket
     {
         public int ItemLevel { get; set; }
 
@@ -46,7 +44,7 @@ namespace PoePricer.Parser
         public int SecondAffixValueHi { get; set; }
     }
 
-    internal  class AffixBrackets : PricerDataReader
+    public  class AffixBrackets : PricerDataReader
     {
         public string FirstAffix { get; set; }
 

@@ -5,7 +5,7 @@
 
     using Guards;
 
-    internal abstract class PricerDataReader
+    public abstract class PricerDataReader
     {
         private readonly string dataRootDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data");
 

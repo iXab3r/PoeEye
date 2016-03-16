@@ -92,7 +92,7 @@ namespace PoePricer
 
 
 
-        public ParseResult ParseItemDataText(string itemDataText)
+        public ParseResult ParseItemDataText(string itemDataText, IDictionary<AffixBracketType, AffixBrackets> affixBrackets, IDictionary<BaseItemTypes, BaseItemsSource> baseItems)
         {
             //seperate DataText for blocks via splitting with char "`"
             var itemDataParts = itemDataText.Replace("\r\n--------\r\n", "`").Split('`');
