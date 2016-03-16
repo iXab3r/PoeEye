@@ -74,7 +74,23 @@ Adds 9-15 Physical Damage to Attacks
 +18 to Intelligence
 +76 to maximum Life
 +35% to Fire Resistance
-+21% to Lightning Resistance"
++21% to Lightning Resistance",
+@"Rarity: Rare
+Oblivion Whorl
+Amethyst Ring
+--------
+Requirements:
+Level: 32
+--------
+Item Level: 69
+--------
++11% to Chaos Resistance
+--------
+Adds 6-11 Physical Damage to Attacks
++173 to Accuracy Rating
+28% increased Rarity of Items found
+--------
+Note: ~b/o 7 chaos"
         };
     }
 }

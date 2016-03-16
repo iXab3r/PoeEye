@@ -23,16 +23,19 @@ namespace PoePricer
 
                 var pricer = new PoePricer();
 
-                /*foreach (var itemSample in StaticData.ItemSamples)
+                foreach (var itemSample in StaticData.ItemSamples)
                 {
                     try
                     {
                         Console.WriteLine("Processing next item...");
                         ConsoleExtensions.WriteLine(itemSample, ConsoleColor.Yellow);
-                        var toolTip = pricer.CreateTooltip(itemSample);
+                        
+                        
 
                         Console.WriteLine("========== TOOLTIP STARTS HERE ===========");
-                        ConsoleExtensions.WriteLine(toolTip, ConsoleColor.Green);
+                        pricer.CreateTooltip(itemSample);
+                        //ConsoleExtensions.WriteLine(toolTip, ConsoleColor.Green);
+
                         Console.WriteLine("========== TOOLTIP ENDS HERE   ===========");
 
                         Console.WriteLine($"Item was successfully processed\r\n\r\n");
@@ -41,9 +44,10 @@ namespace PoePricer
                     {
                         Console.WriteLine($"Failed to parse item, exception: {ex}\r\n\t{itemSample}");
                     }
-                }*/
+                }
                 Console.WriteLine("Press any key...");
-                pricer.TrashOutput();
+                
+
             }
             
             catch (Exception ex)

@@ -9,7 +9,7 @@ using System.Security.Policy;
 using System.Threading.Tasks;
 
 
-namespace PoePricer
+namespace PoePricer.Parser
 {
     using System.Collections.Generic;
     using System.IO;
@@ -51,13 +51,13 @@ namespace PoePricer
     }
 
 
-    internal class BaseItems : PricerDataReader
+    internal class BaseItemsSource : PricerDataReader
     {
-        public bool IsWeapon;
+        public bool IsWeapon { get; set; }
 
         public BaseItemProperties[] Items { get; set; }
 
-        public BaseItems(string fileName) : base(Path.Combine("Bases", fileName))
+        public BaseItemsSource(string fileName) : base(Path.Combine("Bases", fileName))
         {
             IsWeapon = (FileName == "Weapon") ? true : false;
             Items = Read(FileName);
@@ -118,7 +118,7 @@ namespace PoePricer
             Console.WriteLine($"[BaseItems.SetWeaponBaseProperties] Wrong baseType : [{baseTypeName}]");
         }
 
-        public void SetArmourBaseProperties(string baseTypeName, out int baseAR, out int baseEV, out int baseES)
+        public bool SetArmourBaseProperties(string baseTypeName, out int baseAR, out int baseEV, out int baseES)
         {
             baseAR = 0;
             baseEV = 0;
@@ -128,9 +128,10 @@ namespace PoePricer
                 baseAR = match.BaseAR;
                 baseEV = match.BaseEV;
                 baseES = match.BaseES;
-                return;
+                return true;
             }
             Console.WriteLine($"[BaseItems.SetArmourBaseProperties] Wrong baseType : [{baseTypeName}]");
+            return false;
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Runtime.Remoting.Metadata.W3cXsd2001;
+using System.Collections.Generic;
 
 namespace PoePricer
 {
@@ -10,11 +11,11 @@ namespace PoePricer
 
     using Parser;
 
-    public sealed class PoePricer : IPoePricer
+    public class PoePricer : IPoePricer
     {
         private readonly IDictionary<AffixBracketType, AffixBrackets> knownAffixBrackets;
 
-        private readonly IDictionary<BaseItemTypes, BaseItems> knownBaseItems;
+        private readonly IDictionary<BaseItemTypes, BaseItemsSource> knownBaseItems;
         
 
         public PoePricer()
@@ -39,7 +40,7 @@ namespace PoePricer
             */
 
             knownAffixBrackets = Enum.GetValues(typeof(AffixBracketType)).Cast<AffixBracketType>().ToDictionary(x => x, x => new AffixBrackets(x.ToString()));
-            knownBaseItems = Enum.GetValues(typeof(BaseItemTypes)).Cast<BaseItemTypes>().ToDictionary(x => x, x => new BaseItems(x.ToString()));
+            knownBaseItems = Enum.GetValues(typeof(BaseItemTypes)).Cast<BaseItemTypes>().ToDictionary(x => x, x => new BaseItemsSource(x.ToString()));
 
             foreach (var affixBracketsSource in knownAffixBrackets)
             {
@@ -53,59 +54,13 @@ namespace PoePricer
         }
 
 
-        public void TrashOutput()
-        {
-
-            var glovesBases = knownBaseItems[BaseItemTypes.Gloves];
-            int ar, ev, es;
-            glovesBases.SetArmourBaseProperties("Iron Gauntlets", out ar, out ev, out es);
-            Console.WriteLine($"Gloves AR: {ar} EV: {ev} ES: {es}");
-            //glovesBases.DumpToConsole();
-            //knownBaseItems[BaseItemTypes.Weapon].DumpToConsole();
-
-
-            var tArmourBracket = knownAffixBrackets[AffixBracketType.Armour];
-            var tPhysAccBracket = knownAffixBrackets[AffixBracketType.ComboLocalPhysAcc];
-            //tBracket.DumpToConsole();
-            //var tValue = knownAffixBrackets[AffixBracketType.Armour].GetRangeFromiLevel(40, "Armour_Hi");
-            //int Min, Max;
-            //tArmourBracket.GetAffixValueRangeFromAffixValue("Armour", 50,"Accuracy", out Min, out Max);
-            //tPhysAccBracket.GetAffixValueRangeFromAffixValue("Accuracy", 30, "Phys", out Min, out Max);
-            //Console.WriteLine($"Min: {Min} Max: {Max}");
-            
-
-            // RANGE
-
-            //tBracket.GetAffixRange("Armour", 140, out Min, out Max);
-            //Min.DumpToConsole();
-            //Max.DumpToConsole();
-
-
-            //tBracket.DumpToConsole();
-
-
-
-        }
-
-
-
-
-
         public string CreateTooltip(string itemData)
         {
-            var armourAffixes = knownAffixBrackets[AffixBracketType.Armour];
-            armourAffixes.DumpToConsole();
-            //knownAffixBrackets.DumpToConsole();
+
+            var item = new Item();
             
-            
-           //Console.WriteLine(knownAffixBrackets);
-            //var accuracyRatingAffixes = knownAffixBrackets[AffixBracketType.AccuracyRating];
-
-            //accuracyRatingAffixes.DumpToConsole();
-            //var comboLocalPhysAcc = knownAffixBrackets[AffixBracketType.ComboLocalPhysAcc];
-            //comboLocalPhysAcc.DumpToConsole();
-
-
+            item.ParseItemDataText(itemData);
+            item.Name.DumpToConsole();
             return "tooltip example";
         }
 

@@ -46,7 +46,7 @@ namespace PoePricer.Parser
         public int SecondAffixValueHi { get; set; }
     }
 
-    internal sealed class AffixBrackets : PricerDataReader
+    internal  class AffixBrackets : PricerDataReader
     {
         public string FirstAffix { get; set; }
 
