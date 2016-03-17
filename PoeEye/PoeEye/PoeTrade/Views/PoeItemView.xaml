@@ -332,8 +332,15 @@
             </Grid.ColumnDefinitions>
             <ContentControl Grid.Column="0"  VerticalAlignment="Center"
                             Content="{Binding Trade}" ContentTemplate="{StaticResource PoeItemStatsTemplateKey}"  />
-            <ContentControl Grid.Column="1" 
-                            Content="{Binding Trade}" ContentTemplate="{StaticResource PoeItemModsTemplateKey}" />
+
+            <StackPanel Grid.Column="1" Orientation="Vertical">
+              <ContentControl Content="{Binding Trade}" ContentTemplate="{StaticResource PoeItemModsTemplateKey}" />
+              <TextBlock Margin="0,5,0,0"  
+                         Style="{StaticResource IconTextBlock}"
+                         FontSize="16"
+                         Text="{Binding Trade.Note, StringFormat='&#xf040; {0}'}" 
+                         Visibility="{Binding Trade.Note, Converter={StaticResource NullToCollapsedConverter}}"/>
+            </StackPanel>
           </Grid>
         </Border>
 

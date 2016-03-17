@@ -56,6 +56,8 @@
 
         string Hash { get; }
 
+        string Note { get; }
+
         bool IsCorrupted { get; }
 
         PoeItemRarity Rarity { get; }

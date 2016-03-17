@@ -129,6 +129,7 @@ namespace PoeEye.PoeTrade
                 League = parser.Attr("data-league"),
                 Hash = parser["span[class=click-button]"]?.Attr("data-hash"),
                 ThreadId = parser["span[class=click-button]"]?.Attr("data-thread"),
+                Note = parser["span[class=item-note]"]?.Text(),
                 Quality = parser["td[class=table-stats] td[data-name=q]"]?.Text(),
                 Physical = parser["td[class=table-stats] td[data-name=quality_pd]"]?.Text(),
                 Elemental = parser["td[class=table-stats] td[data-name=ed]"]?.Text(),
@@ -144,7 +145,7 @@ namespace PoeEye.PoeTrade
                 Level = parser["td[class=table-stats] td[data-name=level]"]?.Text(),
                 Requirements = parser["td[class=item-cell] ul[class=requirements proplist]"]?.Text(),
                 IsCorrupted = parser["td[class=item-cell] span[class~=corrupted]"].Any(),
-                Mods = implicitMods.Concat(explicitMods).Where(x => IsValid(x)).ToArray(),
+                Mods = implicitMods.Concat(explicitMods).Where(IsValid).ToArray(),
                 Links = ExtractLinksInfo(row),
                 Rarity = ExtractItemRarity(row)
             };
