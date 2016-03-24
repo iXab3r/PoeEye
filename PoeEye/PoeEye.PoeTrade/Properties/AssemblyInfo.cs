@@ -40,3 +40,4 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyFileVersion("1.0.0.0")]
 [assembly: InternalsVisibleTo("PoeEye.Tests")]
 [assembly: InternalsVisibleTo("PoeEye.Simulator")]
+[assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
