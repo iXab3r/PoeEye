@@ -58,6 +58,8 @@
 
         string Note { get; }
 
+        DateTime? FirstSeen { get; }
+
         bool IsCorrupted { get; }
 
         PoeItemRarity Rarity { get; }

@@ -158,11 +158,13 @@
   <ItemGroup>
     <Compile Include="Communications\GenericHttpClient.cs" />
     <Compile Include="Communications\NameValueCollectionToQueryStringConverter.cs" />
+    <Compile Include="IPoeTradeDateTimeExtractor.cs" />
     <Compile Include="PoeItemVerifier.cs" />
     <Compile Include="PoeLiveHistoryProvider.cs" />
     <Compile Include="PoeQueryConverter.cs" />
     <Compile Include="PoeQueryInfoToQueryConverter.cs" />
     <Compile Include="PoeTradeApi.cs" />
+    <Compile Include="PoeTradeDateTimeExtractor.cs" />
     <Compile Include="PoeTradeParserModern.cs" />
     <Compile Include="PoeQueryInfoProvider.cs" />
     <Compile Include="Prism\LiveRegistrations.cs" />

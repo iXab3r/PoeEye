@@ -309,13 +309,18 @@
               <StackPanel Grid.Column="5"
                           Orientation="Horizontal"
                           VerticalAlignment="Center">
-                <Label Content="Last seen: " />
-                <Label
-                  Content="{Binding TimeElapsedSinceLastIndexation, Mode=OneWay, StringFormat='Last seen: {0} ago', Converter={StaticResource TimeSpanToHumanReadableStringConverter}}"
-                  BorderBrush="{StaticResource AccentColorBrush}"
+                <TextBlock
+                  Text="{Binding TimeElapsedSinceFirstIndexation, Mode=OneWay, StringFormat='First seen: {0} ago', Converter={StaticResource TimeSpanToHumanReadableStringConverter}}"
+                  Visibility="{Binding TimeElapsedSinceFirstIndexation, Converter={StaticResource NullToCollapsedConverter}}"
+                  ToolTip="{Binding Trade.FirstSeen}"
+                  Margin="2, 0" />
+
+                <Border Margin="5,0" Width="1" BorderThickness="2,0" BorderBrush="{StaticResource ControlBorderBrush}"/>
+
+                <TextBlock
+                  Text="{Binding TimeElapsedSinceLastIndexation, Mode=OneWay, StringFormat='Last seen: {0} ago', Converter={StaticResource TimeSpanToHumanReadableStringConverter}}"
                   ToolTip="{Binding Trade.Timestamp}"
                   Margin="2, 0" />
-                <Label Content="ago" />
               </StackPanel>
 
             </Grid>

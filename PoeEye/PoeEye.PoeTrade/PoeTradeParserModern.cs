@@ -1,5 +1,6 @@
 namespace PoeEye.PoeTrade
 {
+    using System;
     using System.IO;
     using System.Linq;
     using System.Web;
@@ -8,12 +9,23 @@ namespace PoeEye.PoeTrade
 
     using Guards;
 
+    using JetBrains.Annotations;
+
     using PoeShared.Common;
     using PoeShared.PoeTrade;
     using PoeShared.PoeTrade.Query;
 
     internal sealed class PoeTradeParserModern : IPoeTradeParser
     {
+        private readonly IPoeTradeDateTimeExtractor dateTimeExtractor;
+
+        public PoeTradeParserModern([NotNull] IPoeTradeDateTimeExtractor dateTimeExtractor)
+        {
+            Guard.ArgumentNotNull(() => dateTimeExtractor);
+            
+            this.dateTimeExtractor = dateTimeExtractor;
+        }
+
         public IPoeQueryResult ParseQueryResponse(string rawHtml)
         {
             Guard.ArgumentNotNull(() => rawHtml);
@@ -111,7 +123,7 @@ namespace PoeEye.PoeTrade
             return !string.IsNullOrWhiteSpace(value);
         }
 
-        private static IPoeItem ParseItemRow(IDomObject row)
+        private IPoeItem ParseItemRow(IDomObject row)
         {
             CQ parser = row.Render();
 
@@ -145,6 +157,7 @@ namespace PoeEye.PoeTrade
                 Level = parser["td[class=table-stats] td[data-name=level]"]?.Text(),
                 Requirements = parser["td[class=item-cell] ul[class=requirements proplist]"]?.Text(),
                 IsCorrupted = parser["td[class=item-cell] span[class~=corrupted]"].Any(),
+                FirstSeen = dateTimeExtractor.ExtractTimestamp(parser["td[class=item-cell] span[class~=found-time-ago]"]?.Text()),
                 Mods = implicitMods.Concat(explicitMods).Where(IsValid).ToArray(),
                 Links = ExtractLinksInfo(row),
                 Rarity = ExtractItemRarity(row)
@@ -161,9 +174,9 @@ namespace PoeEye.PoeTrade
                 : result;
         }
 
-        private static void TrimProperties(PoeItem item)
+        private static void TrimProperties<T>(T source)
         {
-            var propertiesToProcess = typeof(PoeItem)
+            var propertiesToProcess = typeof(T)
                 .GetProperties()
                 .Where(x => x.PropertyType == typeof(string))
                 .Where(x => x.CanRead && x.CanWrite)
@@ -171,16 +184,18 @@ namespace PoeEye.PoeTrade
 
             foreach (var propertyInfo in propertiesToProcess)
             {
-                var currentValue = (string) propertyInfo.GetValue(item);
+                var currentValue = (string) propertyInfo.GetValue(source);
                 var newValue = currentValue ?? string.Empty;
                 newValue = HttpUtility.HtmlDecode(newValue);
+                newValue = newValue.Replace("\n",string.Empty);
+                newValue = newValue.Replace("\r",string.Empty);
                 newValue = newValue.Trim();
 
-                propertyInfo.SetValue(item, newValue);
+                propertyInfo.SetValue(source, newValue);
             }
         }
 
-        private static PoeItemRarity ExtractItemRarity(IDomObject row)
+        private PoeItemRarity ExtractItemRarity(IDomObject row)
         {
             CQ parser = row.Render();
 
@@ -200,7 +215,7 @@ namespace PoeEye.PoeTrade
             }
         }
 
-        private static IPoeLinksInfo ExtractLinksInfo(IDomObject row)
+        private IPoeLinksInfo ExtractLinksInfo(IDomObject row)
         {
             CQ parser = row.Render();
 
@@ -208,19 +223,19 @@ namespace PoeEye.PoeTrade
             return string.IsNullOrWhiteSpace(rawLinksText) ? default(IPoeLinksInfo) : new PoeLinksInfo(rawLinksText);
         }
 
-        private static IPoeItemMod[] ExtractExplicitMods(IDomObject row)
+        private IPoeItemMod[] ExtractExplicitMods(IDomObject row)
         {
             CQ parser = row.Render();
             return parser["ul[class=mods] li"].Select(x => ExtractItemMods(x, PoeModType.Explicit)).ToArray();
         }
 
-        private static IPoeItemMod[] ExtractImplicitMods(IDomObject row)
+        private IPoeItemMod[] ExtractImplicitMods(IDomObject row)
         {
             CQ parser = row.Render();
             return parser["ul[class=mods withline] li"].Select(x => ExtractItemMods(x, PoeModType.Implicit)).ToArray();
         }
 
-        private static IPoeItemMod ExtractItemMods(IDomObject itemModRow, PoeModType modType = PoeModType.Unknown)
+        private IPoeItemMod ExtractItemMods(IDomObject itemModRow, PoeModType modType = PoeModType.Unknown)
         {
             CQ parser = itemModRow.Render();
 
@@ -229,13 +244,14 @@ namespace PoeEye.PoeTrade
                 ModType = modType,
                 CodeName = parser.Attr("data-name")?.Trim('#'),
                 IsCrafted = parser.Select("u").Any(),
-                Name = parser.Text()
+                Name = parser["li"]?.Text(),
             };
 
+            TrimProperties(result);
             return result;
         }
 
-        private static IPoeItem[] ExtractItems(CQ parser)
+        private IPoeItem[] ExtractItems(CQ parser)
         {
             var rows = parser["tbody[id^=item-container-]"];
 
@@ -246,7 +262,7 @@ namespace PoeEye.PoeTrade
             return items;
         }
 
-        private static IPoeCurrency[] ExtractCurrenciesList(CQ parser)
+        private IPoeCurrency[] ExtractCurrenciesList(CQ parser)
         {
             var currenciesRows = parser["select[name=buyout_currency] option"].ToList();
 

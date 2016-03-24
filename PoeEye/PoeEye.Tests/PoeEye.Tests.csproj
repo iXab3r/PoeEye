@@ -134,6 +134,7 @@
     <Compile Include="Communications\NameValueCollectionToQueryStringConverterFixture.cs" />
     <Compile Include="Common\PoeItemParserFixture.cs" />
     <Compile Include="Helpers\MockExtensions.cs" />
+    <Compile Include="PoeTrade\PoeTradeDateTimeExtractorFixture.cs" />
     <Compile Include="PoeTrade\PoeTradeParserModernFixture.cs" />
     <Compile Include="PoeTrade\TestData\TestDataProvider.cs" />
     <Compile Include="PoeTrade\ViewModels\PoeTradesListViewModelFixture.cs" />
