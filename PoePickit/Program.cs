@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
@@ -21,6 +22,13 @@ namespace PoePickit
 
         private static WindowTracker poeWindowTracker;
 
+        private static ItemParse itemParser = new ItemParse();
+
+        private static string lastItemTextdata;
+
+        private static Point lastTooltipCoor;
+        
+
         private static void Main()
         {
             try
@@ -35,6 +43,8 @@ namespace PoePickit
 
                 uiTaskThread = Task.Factory.StartNew(InitializeForm);
 
+
+               
                 Console.WriteLine("Press any key...");
             }
             catch (Exception ex)
@@ -52,8 +62,11 @@ namespace PoePickit
             toolTipForm = new TtForm();
             var monitor = new PoeItemMonitor();
             var uiContext = SynchronizationContext.Current;
-
+            
             var globalHook = Hook.GlobalEvents();
+
+            globalHook.MouseMoveExt += OnMouseMove; 
+            
             Observable
                 .FromEventPattern<KeyEventHandler, KeyEventArgs>(
                     h => globalHook.KeyUp += h,
@@ -70,14 +83,29 @@ namespace PoePickit
             Application.Run(toolTipForm);
         }
 
+        private static void OnMouseMove(object sender, MouseEventExtArgs e)
+        {
+            if (!toolTipForm.Visible)
+                return;
+
+            if (Math.Pow(Cursor.Position.X - lastTooltipCoor.X, 2) + Math.Pow(Cursor.Position.Y - lastTooltipCoor.Y, 2) >Math.Pow(45, 2))
+                toolTipForm.Hide();
+                
+        }
+
         private static void OnNextPoeItemArrived(string itemData)
         {
             if (toolTipForm == null)
             {
                 return;
             }
-            var itemTooltip = new ItemParse().CreateTooltip(itemData);
+            if ((itemData == lastItemTextdata) && toolTipForm.Visible)
+                return;
+            var itemTooltip = itemParser.CreateTooltip(itemData);
             toolTipForm.Initialize(itemTooltip);
+            lastTooltipCoor = Cursor.Position;
+            lastItemTextdata = itemData;
         }
+        
     }
 }

@@ -1,4 +1,4 @@
-Aff	Accuracy
+Aff	AccuracyRating
 1	5-15
 12	16-60
 20	61-100

@@ -33,12 +33,27 @@ namespace PoePickit
             }
             else
             {
-                Location = MousePosition;
+                //set tooltip location
+                var point = new Point();
+                if ((Size.Width/2 + MousePosition.X) > Screen.GetWorkingArea(MousePosition).Width)
+                    point.X = Screen.GetWorkingArea(MousePosition).Width - Size.Width/2;
+                else
+                    point.X = MousePosition.X - Size.Width/2;
+
+                if ((Size.Height + 40 + MousePosition.Y) > Screen.GetWorkingArea(MousePosition).Height)
+                    point.Y = MousePosition.Y - Size.Height - 40;
+                else
+                    point.Y = MousePosition.Y + 40;
+                Location = point;
+
+
+                BackColor = toolTip.BackColor;
                 SetText(toolTip.ArgText, toolTip.ValueText);
                 Show();
             }
         }
 
+        
         private void SetText(string leftText, string rightText)
         {
             this.LabelLeft.Text = leftText;

@@ -133,10 +133,10 @@ namespace PoePickit.Parser
         {
             if ((minMax != MinOrMax.Max) && (minMax != MinOrMax.Min))
             {
-                Console.WriteLine($"[{this.FileName}.GetValueFromiLevel()] Wrong value for arg MinOrMax.");
+                Console.WriteLine($"[{this.FileName}.GetAffixMinMaxFromiLevel()] Wrong value for arg MinOrMax.");
                 return 0;
             }
-                
+             
             if (affixName == FirstAffix)
             {
                 for (var i = Brackets.Length - 1; i > 0; i--)
@@ -162,7 +162,8 @@ namespace PoePickit.Parser
                     }
                 }
             }
-            Console.WriteLine($"[{this.FileName}.GetValueFromiLevel()] Wrong affixName: '{affixName}' .(example: GetValueFromiLevel(50, \"Armour_Hi\")");
+
+            Console.WriteLine($"[{this.FileName}.GetAffixMinMaxFromiLevel()] Wrong affixName: '{affixName}' ilevel: '{itemLevel}'. (example: GetValueFromiLevel(50, \"Armour_Hi\")");
             return 0;
         }
 

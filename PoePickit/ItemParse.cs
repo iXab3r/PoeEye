@@ -140,7 +140,7 @@ namespace PoePickit
                 {
                     ParseRegEx.RegexHelmClassLine,
                     new Regex(
-                        @" (Hat|Helm|Bascinet|Burgonet|Cap|Tricorne|Hood|Pelt|Circlet|Cage|Sallet|Coif|Crown|Mask)$",
+                        @" (Hat|Helm|Helmet|Bascinet|Burgonet|Cap|Tricorne|Hood|Pelt|Circlet|Cage|Sallet|Coif|Crown|Mask)$",
                         RegexOptions.Compiled)
                 },
                 {ParseRegEx.RegexGlovesClassLine, new Regex(@"(Gauntlets|Gloves|Mitts)$", RegexOptions.Compiled)},

@@ -3,7 +3,8 @@
 ^(?'valueFirst'\d+)% increased Armour and Evasion$	LocalArmour	IsLocalArmour
 ^(?'valueFirst'\d+)% increased Elemental Damage with Weapons$	WED	IsWED
 ^(?'valueFirst'\d+)% increased Energy Shield$	LocalArmour	IsLocalArmour
-^(?'valueFirst'\d+)% increased Evasion$	LocalArmour	IsLocalArmour
+^(?'valueFirst'\d+)% increased maximum Energy Shield$	LocalArmour	IsLocalArmour
+^(?'valueFirst'\d+)% increased Evasion Rating$	LocalArmour	IsLocalArmour
 ^(?'valueFirst'\d+)% increased Evasion and Energy Shield$	LocalArmour	IsLocalArmour
 ^(?'valueFirst'\d+)% increased Flask Life Recovery rate$
 ^(?'valueFirst'\d+)% increased Flask Mana Recovery rate$
@@ -26,7 +27,7 @@
 ^Adds (?'valueFirst'\d+)-(?'valueSecond'\d+) Physical Damage$	FlatPhys2	IsFlatPhys
 ^Reflects (?'valueFirst'\d+) Physical Damage to Melee Attackers$
 ^\+(?'valueFirst'\d+) to Armour$	FlatAR	IsFlatAR
-^\+(?'valueFirst'\d+) to Evasion$	FlatEV	IsFlatEV
+^\+(?'valueFirst'\d+) to Evasion Rating$	FlatEV	IsFlatEV
 ^\+(?'valueFirst'\d+) to Level of Socketed Cold Gems$	ColdGem	IsColdGem
 ^\+(?'valueFirst'\d+) to Level of Socketed Fire Gems$	FireGem	IsFireGem
 ^\+(?'valueFirst'\d+) to Level of Socketed Chaos Gems$	ChaosGem	IsChaosGem

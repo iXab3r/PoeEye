@@ -1,4 +1,4 @@
-Aff	Armour
+Aff	LocalArmour
 3	11-28
 17	29-46
 29	47-64

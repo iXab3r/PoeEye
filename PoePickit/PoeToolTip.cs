@@ -24,6 +24,8 @@ namespace PoePickit
         public string ArgText;
         public string ValueText;
 
+        public Color BackColor;
+
         public static readonly PoeToolTip Empty = new PoeToolTip();
 
         public PoeToolTip()
@@ -61,13 +63,9 @@ namespace PoePickit
             }
 
             if (item.FilterSuccess)
-            {
-                //Forma.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(213)))), ((int)(((byte)(52)))));
-            }
+                BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(213)))), ((int)(((byte)(52)))));
             else
-            {
-                //Forma.BackColor = System.Drawing.SystemColors.ScrollBar;
-            }
+                BackColor = System.Drawing.SystemColors.ScrollBar;
         }
 
         public void Clear()

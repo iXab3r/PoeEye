@@ -9,6 +9,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Security.Policy;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using System.Windows.Forms;
 using PoePickit.Parser;
 
 namespace PoePickit
@@ -559,6 +560,7 @@ namespace PoePickit
                         }
 
                     }
+                    
                     return true;
                 }
             }
@@ -569,6 +571,8 @@ namespace PoePickit
         {
             foreach (var line in ItemAffixData)
             {
+                if (line == "")
+                    return;
                 if (ParseAffixLine(line, knownAffixes[AffixTypes.affixes]))
                 {
                     Affixes++;
@@ -592,6 +596,7 @@ namespace PoePickit
 
                 }
                 Console.WriteLine($"[Item.ParseAffixData] Unknown AffixLnie : {line}");
+                MessageBox.Show($"UnknownAffixLine: {line}");
             }
         }
 
@@ -902,7 +907,7 @@ namespace PoePickit
             if (parseRegex.Match(BaseType).Success)
             {
                 baseItems[BaseItemTypes.Helmets].SetArmourBaseProperties(BaseType, out BaseAR, out BaseEV, out BaseES);
-                ClassType = "Helmet";
+                ClassType = "Helm";
                 IsArmour = true;
                 IsHelm = true;
                 return true;
@@ -1039,8 +1044,8 @@ namespace PoePickit
             
             CraftPCritLo = Math.Round(BaseCC * (100 + ImplicitCrit + tCraftCritLo) / 100, 1);
             CraftPCrit = Math.Round(BaseCC * (100 + ImplicitCrit + tCraftCritHi) / 100, 1);
-            CraftPCritDamageLo = (AffixCritDamage + tCraftCritDamageLo);
-            CraftPCritDamage = (AffixCritDamage + tCraftCritDamageHi);
+            CraftPCritDamageLo = (AffixCritDamage + ImplicitCritDamage +  tCraftCritDamageLo);
+            CraftPCritDamage = (AffixCritDamage + ImplicitCritDamage + tCraftCritDamageHi);
             CraftTtPDPS = tTTcraft;
             CraftTtPDPSPrice = tTTcraftPrice;
 
@@ -1066,8 +1071,7 @@ namespace PoePickit
             MultiTtPDPSPrice = CraftTtPDPSPrice;
 
             if (Suffixes > 2) return false;
-            MultiTtPDPS = "";
-            MultiTtPDPSPrice = "";
+           
 
             var tMultiPhysDamageLo = 0;
             var tMultiPhysDamageHi = 0;
@@ -1086,7 +1090,7 @@ namespace PoePickit
 
 
 
-            if ((!IsIAS || (IsIAS && IAS < 10)) && (!IsAffixCritDamage || (AffixCritDamage < 20)) && (!IsAffixCrit || (AffixCrit < 20)))
+            if ((IAS < 10) && (AffixCritDamage < 20) && (AffixCrit < 20))
             {
                 tTTmulti += "[ClearSuffixes]";
                 tTTmultiPrice += "[2exa][Scouring]";
@@ -1159,7 +1163,8 @@ namespace PoePickit
                     tTTmultiPrice += "[4alch]";
             }
 
-            
+            if (tTTmulti == "[MultiMod]")
+                return true;
             MultiPAPSLo = Math.Round(BaseAPS * (100 + tMultiIasLo) / 100,2);
             MultiPAPS = Math.Round(BaseAPS * (100 + tMultiIasHi) / 100,2);
             MultiPDPSLo =
@@ -1168,11 +1173,12 @@ namespace PoePickit
             MultiPDPS =
                 Math.Round((double) (BaseDamageLo/2 + BaseDamageHi/2 + FlatPhys + tMultiFlatPhysDamageHi)*
                            (120 + LocalPhys + tMultiPhysDamageHi)/100*MultiPAPS, 1);
-            
-            MultiPCritLo = Math.Round(BaseCC * (100  + tMultiCritLo) / 100, 1);
-            MultiPCrit = Math.Round(BaseCC * (100 +  tMultiCritHi) / 100, 1);
-            MultiPCritDamageLo = (AffixCritDamage + tMultiCritDamageLo);
-            MultiPCritDamage = (AffixCritDamage + tMultiCritDamageHi);
+
+
+            MultiPCritLo = Math.Round(BaseCC * (100 + ImplicitCrit + tMultiCritLo) / 100, 1);
+            MultiPCrit = Math.Round(BaseCC * (100 + ImplicitCrit + tMultiCritHi) / 100, 1);
+            MultiPCritDamageLo = (AffixCritDamage+ ImplicitCritDamage + tMultiCritDamageLo);
+            MultiPCritDamage = (AffixCritDamage + ImplicitCritDamage + tMultiCritDamageHi);
             MultiTtPDPS = tTTmulti;
             MultiTtPDPSPrice = tTTmultiPrice;
             return true;
@@ -1367,8 +1373,7 @@ namespace PoePickit
 
             if (Suffixes > 2) return false;
 
-            MultiTtEDPS = "";
-            MultiTtEDPSPrice = "";
+            
             var tMultiFlatElemDamageLo = 0d;
             var tMultiFlatElemDamageHi = 0d;
             var tMultiIasLo = 0;
@@ -1383,7 +1388,7 @@ namespace PoePickit
             var tTTMultiPrice = "";
 
 
-            if ((!IsIAS || (IsIAS && IAS < 10)) && (!IsAffixCritDamage || (AffixCritDamage < 20)) && (!IsAffixCrit || (AffixCrit < 20)))
+            if (( IAS < 10) && (AffixCritDamage < 20) && (AffixCrit < 20))
             {
                 tTTMulti += "[ClearSuffixes]";
                 tTTMultiPrice += "[2exa][Scouring]";
@@ -1525,7 +1530,8 @@ namespace PoePickit
                 tTTMultiPrice += "[4alch]";
             }
 
-
+            if (tTTMulti == "[MultiMod]")
+                return true;
             MultiEAPSLo = Math.Round(BaseAPS * (100 + IAS + tMultiIasLo) / 100, 2);
             MultiEAPS = Math.Round(BaseAPS * (100 + IAS + tMultiIasHi) / 100, 2);
             MultiEDPSLo = Math.Round((FlatElem + tMultiFlatElemDamageLo) * MultiEAPSLo, 1);
@@ -1698,8 +1704,7 @@ namespace PoePickit
             MultiTtSPDPrice = CraftTtSPDPrice;
 
             if (Suffixes > 2) return false;
-            MultiTtSPD = "";
-            MultiTtSPDPrice = "";
+           
 
             var tLocalElemDamage = (LocalFireDamage >= LocalColdDamage
                 ? (LocalFireDamage >= LocalLightDamage ? LocalFireDamage : LocalLightDamage)
@@ -1804,7 +1809,8 @@ namespace PoePickit
                 MultiTtSPD += "[AffixCritDamage]";
                 MultiTtSPDPrice += "[4alchemy]";
             }
-
+            if (tTTMulti == "[MultiMod]")
+                return true;
 
             MultiSPDLo = SPD + tMultiSpellDamageLo;
             MultiSPD = SPD + tMultiSpellDamage;
@@ -2094,8 +2100,9 @@ namespace PoePickit
                 tTTMultiPrice += "[10augmentation]";
                 
             }
+            if (tTTMulti == "[MultiMod]")
+                return true;
 
-            
             MultiCOCSPDLo = SPD + tMultiSpellDamageLo;
             MultiCOCSPD = SPD + tMultiSpellDamage;
             MultiCOCLocalElemDamageLo = tMultiLocalElemDamageLo + ImplicitLocalElemDamage;
@@ -2130,10 +2137,11 @@ namespace PoePickit
         private void DuCalcsMich()
         {
             //APS section
-            PAPS = EAPS = APS = BaseAPS * (100 + IAS) / 100;
+            PAPS = EAPS = APS = Math.Round(BaseAPS * (100 + IAS) / 100, 2);
+            
             
             //crit section
-            PCrit = ECrit = Crit = BaseCC * (100 + AffixCrit + ImplicitCrit)/100;
+            PCrit = ECrit = Crit = Math.Round(BaseCC*(100 + AffixCrit + ImplicitCrit)/100, 2);
             TotalCrit = GlobalCrit + ImplicitGlobalCrit;
             PCritDamage = ECritDamage = CritDamage = AffixCritDamage + ImplicitCritDamage;
             
@@ -2174,6 +2182,8 @@ namespace PoePickit
             CalcMultiElemDPS();
             CalcCraftSpellDamage();
             CalcMultiSpellDamage();
+            CalcCraftCOC();
+            CalcMultiCOC();
 
             //other calcs
             CalcLife();
@@ -2251,7 +2261,7 @@ namespace PoePickit
 
         private void CalcTotalRes()
         {
-            TotalRes = LightningRes + ColdRes + FireRes + ChaosRes;
+            TotalRes = LightningRes + ColdRes + FireRes + ChaosRes + AllRes*3;
             if (IsArmour)
                 if (Suffixes < 3)
                     CraftTotalRes = TotalRes + 30;
@@ -2998,8 +3008,9 @@ namespace PoePickit
                 AffixBracketsSource.MinOrMax.Max);
             var maxComboAcc = affixBrackets[AffixBracketType.ComboLocalPhysAcc].GetAffixMinMaxFromiLevel(iLevel, "AccuracyRating",
                 AffixBracketsSource.MinOrMax.Max);
-            var minComboAcc = affixBrackets[AffixBracketType.ComboLocalPhysAcc].GetAffixMinMaxFromiLevel(iLevel, "LocalPhys",
-                AffixBracketsSource.MinOrMax.Min);
+            var minComboAcc = affixBrackets[AffixBracketType.ComboLocalPhysAcc].GetAffixMinMaxFromiLevel(iLevel,
+                "AccuracyRating", AffixBracketsSource.MinOrMax.Min);
+           
 
             Affixes--;
             IsLocalPhysAff = AffixSolution.Uncertain;

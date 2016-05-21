@@ -30,6 +30,7 @@
 ^\+(?'valueFirst'\d+) to Dexterity and Intelligence$	Dex	Int
 ^\+(?'valueFirst'\d+) to Maximum Life$	MaxLife
 ^\+(?'valueFirst'\d+) to Maximum Mana$	MaxMana
+^\+(?'valueFirst'\d+) to maximum Mana$	MaxMana
 ^\+(?'valueFirst'\d+) to Strength$	Str
 ^\+(?'valueFirst'\d+) to Dexterity$	Dex
 ^\+(?'valueFirst'\d+) to Intelligence$	Int
