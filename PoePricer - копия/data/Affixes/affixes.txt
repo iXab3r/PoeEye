@@ -1,6 +1,0 @@
-^(?'valueFirst'\d+)% increased Rarity of Items found$	Rarity	IsRarity
-^(?'valueFirst'\d+)% increased Stun Recoveryf$	StunRecovery	IsStunRecovery
-^\+(?'valueFirst'\d+) to Maximum Mana$	MaxMana	IsMaxMana
-^\+(?'valueFirst'\d+) to maximum Mana$	MaxMana	IsMaxMana
-^\+(?'valueFirst'\d+) to Accuracy Rating$	AccuracyRating	IsAccuracyRating
-^(?'valueFirst'\d+)% increased Accuracy Rating$	LocalAccuracyRating	IsLocalAccuracyRating

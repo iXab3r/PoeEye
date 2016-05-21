@@ -175,7 +175,7 @@ namespace PoePickit
             return knownRegexps;
         }
 
-        public ToolTip CreateTooltip(string itemData)
+        public PoeToolTip CreateTooltip(string itemData)
         {
             if (itemData == null)
             {
@@ -183,7 +183,6 @@ namespace PoePickit
                 
                 return null;
             }
-            var _tt = new ToolTip();
             var item = new Item();
             var result = item.ParseItemDataText(itemData, KnownAffixBrackets, KnownBaseItems, KnownAffixes, KnownRegexes);
             if ((result == Item.ParseResult.WrongDataText) || (result == Item.ParseResult.NotRare))
@@ -193,8 +192,7 @@ namespace PoePickit
 
             if (result == Item.ParseResult.Unidentified)
             {
-                _tt.SetTtUnidentified();
-                return _tt;
+                return PoeToolTip.Empty;
             }
 
             FilterTypes type;
@@ -213,8 +211,7 @@ namespace PoePickit
                 }
             }
 
-            _tt.Create(item);
-            return _tt;
+            return new PoeToolTip(item);
         }
 
     }

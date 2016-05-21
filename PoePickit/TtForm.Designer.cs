@@ -105,10 +105,6 @@ namespace PoePickit
             this.PerformLayout();
 
 
-            //tray
-            trayMenu = new ContextMenu();
-            trayMenu.MenuItems.Add("Exit", OnExit);
-
             // Create a tray icon. In this example we use a
             // standard system icon for simplicity, but you
             // can of course use your own custom icon too.

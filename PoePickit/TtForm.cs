@@ -18,78 +18,39 @@ using MouseKeyboardActivityMonitor.WinApi;
 
 namespace PoePickit
 {
-    
-
     public partial class TtForm : Form
     {
-
-    
-
-
-
-
         public TtForm()
         {
             InitializeComponent();
-            
         }
 
+        public void Initialize(PoeToolTip toolTip)
+        {
+            if (toolTip == null)
+            {
+                Hide();
+            }
+            else
+            {
+                Location = MousePosition;
+                SetText(toolTip.ArgText, toolTip.ValueText);
+                Show();
+            }
+        }
 
-        public void SetText(string leftText, string rightText)
+        private void SetText(string leftText, string rightText)
         {
             this.LabelLeft.Text = leftText;
             this.LabelRight.Text = rightText;
         }
 
-        public void SetLocation(int coorX = 1000, int coorY = 0)
-        {
-            this.Location = new Point(coorX, coorY);
-        }
-
-        public void TtShow(string ArgText, string ValueText)
-        {
-            SetText(ArgText, ValueText);
-            SetLocation(Cursor.Position.X, Cursor.Position.Y);
-            this.Show();
-            Refresh();
-
-
-        }
-
-        public void TtHide()
-        {
-            this.Hide();
-
-
-        }
-
-
-        /*   protected override void WndProc(ref Message m)
-           {
-               base.WndProc(ref m);
-
-
-               if (m.Msg == WM_CLIPBOARDUPDATE)
-               {
-
-               }
-           }
-   */
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
 
             ShowInTaskbar = true; // Remove from taskbar.
-            this.TtHide();
-
-         
+            Hide();
         }
-
-        private void OnExit(object sender, EventArgs e)
-        {
-            Application.Exit();
-        }
-
-
     }
 }

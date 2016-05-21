@@ -8,56 +8,38 @@ using System.Runtime.Remoting.Channels;
 using System.Windows.Forms;
 using Microsoft.CSharp.RuntimeBinder;
 using Microsoft.JScript;
-using PoePricer.Extensions;
-using PoePricer.Parser;
+using PoePickit.Extensions;
 using System.Threading;
-namespace PoePricer
+using PoePickit.Parser;
+using static System.String;
+
+namespace PoePickit
 {
-    public class ToolTip
+    public class PoeToolTip
     {
         public List<ToolTipFrame> TtFrame = new List<ToolTipFrame>();
 
-        private string _itemClassType;
+        private string itemClassType;
 
-        private string _argText;
-        private string _valueText;
-        private TtForm _form = new TtForm();
+        public string ArgText;
+        public string ValueText;
 
-        /*  public ToolTip(Item item)
+        public static readonly PoeToolTip Empty = new PoeToolTip();
+
+        public PoeToolTip()
         {
-            
-            if (!item.TtTypes.Contains(ToolTipTypes.Unknown))
-            {
-                foreach (var type in item.TtTypes)
-                {
-                    TtFrame.Add(FillToolTip(item, type));
-                }
-                
-                _argText = _itemClassType + "\n";
-                _valueText = "\n";
-                foreach (var frame in TtFrame)
-                {
-                    foreach (var line in frame.TtLines)
-                    {
-                        _argText = _argText + line.Arg + "\n";
-                        _valueText = _valueText + line.Value + "\n";
-                    }
-                }
-                _form.SetLeftText(_argText);
-                _form.SetRightText(_valueText);
-               
-            }
-            if (item.FilterSuccess)
-            {
-                _form.BackColor = System.Drawing.Color.Khaki;
-            }
-            else
-            {
-                _form.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
-            }
-        }*/
+            ArgText = "Unidentified";
+            ValueText = string.Empty;
+        }
 
-        public void Create(Item item)
+        public PoeToolTip(Item item)
+        {
+            if (item == null) throw new ArgumentNullException(nameof(item));
+
+            Initialize(item);
+        }
+
+        private void Initialize(Item item)
         {
             if (!item.TtTypes.Contains(ToolTipTypes.Unknown))
             {
@@ -66,58 +48,46 @@ namespace PoePricer
                     TtFrame.Add(FillToolTip(item, type));
                 }
 
-                _argText = _itemClassType + "\n";
-                _valueText = "\n";
+                ArgText = itemClassType + "\n";
+                ValueText = "\n";
                 foreach (var frame in TtFrame)
                 {
                     foreach (var line in frame.TtLines)
                     {
-                        _argText = _argText + line.Arg + "\n";
-                        _valueText = _valueText + line.Value + "\n";
+                        ArgText = ArgText + line.Arg + "\n";
+                        ValueText = ValueText + line.Value + "\n";
                     }
                 }
-                _form.SetLeftText(_argText);
-                _form.SetRightText(_valueText);
             }
 
             if (item.FilterSuccess)
             {
-                _form.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(213)))), ((int)(((byte)(52)))));
+                //Forma.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(213)))), ((int)(((byte)(52)))));
             }
             else
             {
-                _form.BackColor = System.Drawing.SystemColors.ScrollBar;
+                //Forma.BackColor = System.Drawing.SystemColors.ScrollBar;
             }
         }
 
         public void Clear()
         {
-            if (_itemClassType == null)
+            if (itemClassType == null)
                 return;
             TtFrame.Clear();
-            _itemClassType = null;
-            _argText = null;
-            _valueText = null;
+            itemClassType = null;
+            ArgText = null;
+            ValueText = null;
         }
 
-        public bool ShowForm(int coorX, int coorY)
-        {
-            _form.SetLocation(coorX, coorY);
-            _form.Show();
-            return true;
-        }
-
-        public void HideForm()
-        {
-            _form.Hide();
-        }
-
+     
 
         public struct ToolTipFrame
         {
             public TtLine[] TtLines;
         }
 
+        
 
         public struct TtLine
         {
@@ -132,6 +102,12 @@ namespace PoePricer
             NoCraft,
             Craft,
             MultiCraft
+        }
+
+        public void SetTtUnidentified()
+        {
+            ArgText = "Unidentified";
+            ValueText = "";
         }
 
         private ToolTipFrame FillToolTip(Item item, ToolTipTypes ttType)
@@ -172,7 +148,7 @@ namespace PoePricer
 
 
             //AddSeparator(ref lines);
-            _itemClassType = item.ClassType;
+            itemClassType = item.ClassType;
 
             if (item.IsWeapon)
             {
@@ -184,7 +160,7 @@ namespace PoePricer
 
                 if (ttType == ToolTipTypes.PDPS)
                 {
-                    if (!string.IsNullOrEmpty(item.CraftTtPDPS))
+                    if (!IsNullOrEmpty(item.CraftTtPDPS))
                     {
                         AddFrameSeparator(ref lines);
                         AddToolTipLine(ref lines, "", item.CraftTtPDPS);
@@ -195,7 +171,7 @@ namespace PoePricer
                             FillToolTipLine(ref lines, item, arg, TtCraftTypes.Craft);
                         }
 
-                        if (!string.IsNullOrEmpty(item.MultiTtPDPS) && (item.MultiTtPDPS != item.CraftTtPDPS))
+                        if (!IsNullOrEmpty(item.MultiTtPDPS) && (item.MultiTtPDPS != item.CraftTtPDPS))
                         {
                             AddFrameSeparator(ref lines);
                             AddToolTipLine(ref lines, "", item.MultiTtPDPS);
@@ -212,7 +188,7 @@ namespace PoePricer
 
                 if (ttType == ToolTipTypes.COC)
                 {
-                    if (!string.IsNullOrEmpty(item.CraftTtCOC))
+                    if (!IsNullOrEmpty(item.CraftTtCOC))
                     {
                         AddFrameSeparator(ref lines);
                         AddToolTipLine(ref lines, item.CraftTtCOC);
@@ -223,7 +199,7 @@ namespace PoePricer
                             FillToolTipLine(ref lines, item, arg, TtCraftTypes.Craft);
                         }
 
-                        if (!string.IsNullOrEmpty(item.MultiTtCOC) && (item.MultiTtCOC != item.CraftTtCOC))
+                        if (!IsNullOrEmpty(item.MultiTtCOC) && (item.MultiTtCOC != item.CraftTtCOC))
                         {
                             AddFrameSeparator(ref lines);
                             AddToolTipLine(ref lines, item.MultiTtCOC);
@@ -240,7 +216,7 @@ namespace PoePricer
 
                 if (ttType == ToolTipTypes.EDPS)
                 {
-                    if (!string.IsNullOrEmpty(item.CraftTtEDPS))
+                    if (!IsNullOrEmpty(item.CraftTtEDPS))
                     {
                         AddFrameSeparator(ref lines);
                         AddToolTipLine(ref lines, item.CraftTtEDPS);
@@ -251,7 +227,7 @@ namespace PoePricer
                             FillToolTipLine(ref lines, item, arg, TtCraftTypes.Craft);
                         }
 
-                        if (!string.IsNullOrEmpty(item.MultiTtEDPS) && (item.MultiTtEDPS != item.CraftTtEDPS))
+                        if (!IsNullOrEmpty(item.MultiTtEDPS) && (item.MultiTtEDPS != item.CraftTtEDPS))
                         {
                             AddFrameSeparator(ref lines);
                             AddToolTipLine(ref lines, item.MultiTtEDPS);
@@ -274,7 +250,7 @@ namespace PoePricer
                         FillToolTip(ref lines, item, arg, TtCraftTypes.NoCraft);
                     }*/
 
-                    if (!string.IsNullOrEmpty(item.CraftTtSPD))
+                    if (!IsNullOrEmpty(item.CraftTtSPD))
                     {
                         AddFrameSeparator(ref lines);
                         AddToolTipLine(ref lines, item.CraftTtSPD);
@@ -285,7 +261,7 @@ namespace PoePricer
                             FillToolTipLine(ref lines, item, arg, TtCraftTypes.Craft);
                         }
 
-                        if (!string.IsNullOrEmpty(item.CraftTtSPD) && (item.CraftTtSPD != item.MultiTtSPD))
+                        if (!IsNullOrEmpty(item.CraftTtSPD) && (item.CraftTtSPD != item.MultiTtSPD))
                         {
                             AddFrameSeparator(ref lines);
                             AddToolTipLine(ref lines, item.MultiTtSPD);
@@ -306,7 +282,7 @@ namespace PoePricer
                 AddFrameSeparator(ref lines);
                 if (item.IsArmour)
                 {
-                    if (!string.IsNullOrEmpty(item.CraftTtArmour))
+                    if (!IsNullOrEmpty(item.CraftTtArmour))
                     {
                         AddToolTipLine(ref lines, item.CraftTtArmour , item.CraftTtArmourPrice);
                         //AddToolTipLine(ref lines, item.CraftTtArmourPrice);
@@ -387,7 +363,7 @@ namespace PoePricer
 
         private void AddToolTipLine(ref List<TtLine> lines, Item item, string firstValue, string secondValue)
         {
-            if (string.IsNullOrEmpty(firstValue) && string.IsNullOrEmpty(secondValue)) return;
+            if (IsNullOrEmpty(firstValue) && IsNullOrEmpty(secondValue)) return;
             lines.Add(new TtLine {Arg = firstValue, Value = secondValue});
         }
 
@@ -452,7 +428,7 @@ namespace PoePricer
             }
 
             var line = new TtLine();
-            if (!string.IsNullOrEmpty(argFirst))
+            if (!IsNullOrEmpty(argFirst))
             {
                 var valueFirst = item.Get(argFirst);
                 var valueFirstLo = item.Get(argFirst + "Lo");

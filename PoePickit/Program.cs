@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Linq;
+using System.Reactive.Concurrency;
+using System.Reactive.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
-
-
+using ClipboardMonitor;
+using Gma.System.MouseKeyHook;
 
 
 namespace PoePickit
@@ -11,6 +15,12 @@ namespace PoePickit
 
     public class Program
     {
+        private static TtForm toolTipForm;
+
+        private static Task uiTaskThread;
+
+        private static WindowTracker poeWindowTracker;
+
         private static void Main()
         {
             try
@@ -20,66 +30,12 @@ namespace PoePickit
                 Console.WindowWidth = 120;
                 
                 Console.WriteLine($"Samples to process: {StaticData.ItemSamples.Count()}");
-                
 
-                new TtHooks();
-                //Console.ReadLine();
+                poeWindowTracker = new WindowTracker(() => "Path of Exile");
 
-
-                //Thread ConsoleKeyListener = new Thread(new ThreadStart(ListerKeyBoardEvent(form)));
-                //ConsoleKeyListener.Start();
-
-                
-                foreach (var itemSample in StaticData.ItemSamples)
-                {
-                    try
-                    {
-                        Console.WriteLine("Processing next item...");
-                        ConsoleExtensions.WriteLine(itemSample, ConsoleColor.Yellow);
-
-                        /*
-                        var x = new Stopwatch();
-                        Console.WriteLine($"--------------------------------");
-                        Console.WriteLine($"StartItemParse: {x.ElapsedMilliseconds}");
-                        Console.WriteLine($"--------------------------------");
-                        x.Start();*/
-                        
-
-                        Console.WriteLine("========== TOOLTIP STARTS HERE ===========");
-                        
-                        
-                        while (true)
-                        {
-                            Application.DoEvents();
-                            
-                        }
-
-                        
-                        /*Console.WriteLine($"--------------------------------");
-                        Console.WriteLine($"StopItemParse: {x.ElapsedMilliseconds}");
-                        Console.WriteLine($"--------------------------------");
-                        x.Stop();*/
-
-                        //ConsoleExtensions.WriteLine(toolTip, ConsoleColor.Green);
-
-                        Console.WriteLine("========== TOOLTIP ENDS HERE   ===========");
-
-                        /*Console.WriteLine($"Item was successfully processed\r\n\r\n");*/
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"Failed to parse item, exception: {ex}\r\n\t{itemSample}");
-                    }
-
-                    
-                  
-                }
+                uiTaskThread = Task.Factory.StartNew(InitializeForm);
 
                 Console.WriteLine("Press any key...");
-
-        
-
-
             }
             catch (Exception ex)
             {
@@ -89,12 +45,39 @@ namespace PoePickit
             {
                 Console.ReadKey();
             }
-
-            
-          
         }
-        
 
-      
+        private static void InitializeForm()
+        {
+            toolTipForm = new TtForm();
+            var monitor = new PoeItemMonitor();
+            var uiContext = SynchronizationContext.Current;
+
+            var globalHook = Hook.GlobalEvents();
+            Observable
+                .FromEventPattern<KeyEventHandler, KeyEventArgs>(
+                    h => globalHook.KeyUp += h,
+                    h => globalHook.KeyUp -= h)
+                .Where(x => x.EventArgs.KeyData == (Keys.LControlKey | Keys.Control))
+                .ObserveOn(uiContext)
+                .Subscribe(_ => toolTipForm.Initialize(null));
+
+            monitor.PoeItemsSource
+                .Where(_ => poeWindowTracker.IsActive)
+                .ObserveOn(uiContext)
+                .Subscribe(OnNextPoeItemArrived);
+
+            Application.Run(toolTipForm);
+        }
+
+        private static void OnNextPoeItemArrived(string itemData)
+        {
+            if (toolTipForm == null)
+            {
+                return;
+            }
+            var itemTooltip = new ItemParse().CreateTooltip(itemData);
+            toolTipForm.Initialize(itemTooltip);
+        }
     }
 }
