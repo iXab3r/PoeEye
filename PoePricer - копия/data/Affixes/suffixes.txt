@@ -1,0 +1,34 @@
+^(?'valueFirst'.+) Life Regenerated per second$
+^(?'valueFirst'\d+)% additional Block Chance$	Block	IsBlock
+^(?'valueFirst'\d+)% increased Attack Speed$	IAS	IsIAS
+^(?'valueFirst'\d+)% increased Cast Speed$	CastSpeed	IsCastSpeed
+^(?'valueFirst'\d+)% increased Cold Damage$	LocalColdDamage	IsLocalColdDamage
+^(?'valueFirst'\d+)% increased Critical Strike Chance for Spells$	AffixSpellCrit	IsAffixSpellCrit
+^(?'valueFirst'\d+)% increased Critical Strike Chance$	AffixCrit	IsAffixCrit
+^(?'valueFirst'\d+)% increased Fire Damage$	LocalFireDamage	IsLocalFireDamage
+^(?'valueFirst'\d+)% increased Flask Charges gained$
+^(?'valueFirst'\d+)% increased Flask effect duration$
+^(?'valueFirst'\d+)% increased Global Critical Strike Chance$	GlobalCrit	IsGlobalCrit
+^\+(?'valueFirst'\d+)% to Global Critical Strike Multiplier$	AffixCritDamage	IsAffixCritDamage
+^(?'valueFirst'\d+)% increased Light Radius$	LightRadius	IsLightRadius
+^(?'valueFirst'\d+)% increased Lightning Damage$	LocalLightDamage	IsLocalLightDamage
+^(?'valueFirst'\d+)% increased Mana Regeneration Rate$
+^(?'valueFirst'\d+)% increased Projectile Speed$	ProjSpeed	IsProjSpeed
+^(?'valueFirst'\d+)% increased Stun Duration on Enemies$
+^(?'valueFirst'\d+)% reduced Attribute Requirements$
+^(?'valueFirst'\d+)% reduced Enemy Stun Threshold$	StunTreshold	IsStunTheshold
+^(?'valueFirst'\d+)% reduced Flask Charges used$
+^\+(?'valueFirst'\d+) Life gained for each Enemy hit by Attacks$
+^\+(?'valueFirst'\d+) Life gained on Kill$
+^\+(?'valueFirst'\d+) Life Gained on Kill$
+^\+(?'valueFirst'\d+) Mana gained on Kill$
+^\+(?'valueFirst'\d+) Mana Gained on Kill$
+^\+(?'valueFirst'\d+) to All Attributes$	AllStat	IsAllStat
+^\+(?'valueFirst'\d+) to Dexterity$	Dex	IsDex
+^\+(?'valueFirst'\d+) to Intelligence$	Int	IsInt
+^\+(?'valueFirst'\d+) to Strength$	Str	IsStr
+^\+(?'valueFirst'\d+)% to Chaos Resistance$	ChaosRes	IsChaosRes
+^\+(?'valueFirst'\d+)% to Cold Resistance$	ColdRes	IsColdRes
+^\+(?'valueFirst'\d+)% to Fire Resistance$	FireRes	IsFireRes
+^\+(?'valueFirst'\d+)% to Lightning Resistance$	LightningRes	IsLightningRes
+^\+(?'valueFirst'\d+)% to all Elemental Resistances$	AllRes	IsAllRes

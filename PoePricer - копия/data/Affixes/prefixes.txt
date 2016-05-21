@@ -1,0 +1,40 @@
+^(?'valueFirst'\d+)% increased Armour$	LocalArmour	IsLocalArmour
+^(?'valueFirst'\d+)% increased Armour and Energy Shield$	LocalArmour	IsLocalArmour
+^(?'valueFirst'\d+)% increased Armour and Evasion$	LocalArmour	IsLocalArmour
+^(?'valueFirst'\d+)% increased Elemental Damage with Weapons$	WED	IsWED
+^(?'valueFirst'\d+)% increased Energy Shield$	LocalArmour	IsLocalArmour
+^(?'valueFirst'\d+)% increased Evasion$	LocalArmour	IsLocalArmour
+^(?'valueFirst'\d+)% increased Evasion and Energy Shield$	LocalArmour	IsLocalArmour
+^(?'valueFirst'\d+)% increased Flask Life Recovery rate$
+^(?'valueFirst'\d+)% increased Flask Mana Recovery rate$
+^(?'valueFirst'\d+)% increased Movement Speed$	MoveSpeed	IsMoveSpeed
+^(?'valueFirst'\d+)% increased Physical Damage$	LocalPhys	IsLocalPhys
+^(?'valueFirst'\d+)% increased Spell Damage$	SPD	IsSPD
+^(?'valueFirst'.+)% of Physical Attack Damage Leeched as Life$	LifeLeech	IsLifeLeech
+^(?'valueFirst'.+)% of Physical Attack Damage Leeched as Mana$	ManaLeech	IsManaLeech
+^Adds (?'valueFirst'\d+)-(?'valueSecond'\d+) Chaos Damage$	FlatChaos2	IsFlatChaos
+^Adds (?'valueFirst'\d+)-(?'valueSecond'\d+) Cold Damage to Spells$	FlatColdSPD2	IsFlatColdSPD
+^Adds (?'valueFirst'\d+)-(?'valueSecond'\d+) Cold Damage to Attacks$	FlatCold2	IsFlatCold
+^Adds (?'valueFirst'\d+)-(?'valueSecond'\d+) Cold Damage$	FlatCold2	IsFlatCold
+^Adds (?'valueFirst'\d+)-(?'valueSecond'\d+) Fire Damage to Spells$	FlatFireSPD2	IsFlatFireSPD
+^Adds (?'valueFirst'\d+)-(?'valueSecond'\d+) Fire Damage to Attacks$	FlatFire2	IsFlatFire
+^Adds (?'valueFirst'\d+)-(?'valueSecond'\d+) Fire Damage$	FlatFire2	IsFlatFire
+^Adds (?'valueFirst'\d+)-(?'valueSecond'\d+) Lightning Damage to Spells$	FlatLightningSPD2	IsFlatLightningSPD
+^Adds (?'valueFirst'\d+)-(?'valueSecond'\d+) Lightning Damage to Attacks$	FlatLightning2	IsFlatLightning
+^Adds (?'valueFirst'\d+)-(?'valueSecond'\d+) Lightning Damage$	FlatLightning2	IsFlatLightning
+^Adds (?'valueFirst'\d+)-(?'valueSecond'\d+) Physical Damage to Attacks$	FlatPhys2	IsFlatPhys
+^Adds (?'valueFirst'\d+)-(?'valueSecond'\d+) Physical Damage$	FlatPhys2	IsFlatPhys
+^Reflects (?'valueFirst'\d+) Physical Damage to Melee Attackers$
+^\+(?'valueFirst'\d+) to Armour$	FlatAR	IsFlatAR
+^\+(?'valueFirst'\d+) to Evasion$	FlatEV	IsFlatEV
+^\+(?'valueFirst'\d+) to Level of Socketed Cold Gems$	ColdGem	IsColdGem
+^\+(?'valueFirst'\d+) to Level of Socketed Fire Gems$	FireGem	IsFireGem
+^\+(?'valueFirst'\d+) to Level of Socketed Chaos Gems$	ChaosGem	IsChaosGem
+^\+(?'valueFirst'\d+) to Level of Socketed Gems$	LevelGem	IsLevelGem
+^\+(?'valueFirst'\d+) to Level of Socketed Lightning Gems$	LightningGem	IsLightningGem
+^\+(?'valueFirst'\d+) to Level of Socketed Melee Gems$	MeleeGem	IsMeleeGem
+^\+(?'valueFirst'\d+) to Level of Socketed Minion Gems$	MinionGem	IsMinionGem
+^\+(?'valueFirst'\d+) to Level of Socketed Bow Gems$	BowGem	IsBowGem
+^\+(?'valueFirst'\d+) to maximum Energy Shield$	FlatES	IsFlatES
+^\+(?'valueFirst'\d+) to maximum Life$	MaxLife	IsMaxLife
+^(?'valueFirst'\d+)% increased Damage over Time$	DOT	IsDOT

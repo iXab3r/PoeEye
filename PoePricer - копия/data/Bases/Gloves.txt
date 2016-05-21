@@ -1,0 +1,51 @@
+Iron Gauntlets	6
+Plated Gauntlets	34
+Bronze Gauntlets	67
+Steel Gauntlets	101
+Antique Gauntlets	112
+Ancient Gauntlets	134
+Goliath Gauntlets	151
+Vaal Gauntlets	201
+Titan Gauntlets	210
+Rawhide Gloves		11
+Goathide Gloves		28
+Deerskin Gloves		62
+Nubuck Gloves		95
+Eelskin Gloves		109
+Sharkskin Gloves		129
+Shagreen Gloves		154
+Stealth Gloves		200
+Slink Gloves		210
+Wool Gloves			4
+Velvet Gloves			12
+Silk Gloves			22
+Embroidered Gloves			31
+Satin Gloves			35
+Samite Gloves			40
+Conjurer Gloves			46
+Arcanist Gloves			56
+Sorcerer Gloves			61
+Fishscale Gauntlets	8	8
+Ironscale Gauntlets	25	25
+Bronzescale Gauntlets	43	43
+Steelscale Gauntlets	57	57
+Serpentscale Gauntlets	68	68
+Wyrmscale Gauntlets	77	77
+Hydrascale Gauntlets	92	92
+Dragonscale Gauntlets	105	105
+Chain Gloves	12		4
+Ringmail Gloves	31		9
+Mesh Gloves	51		15
+Riveted Gloves	58		17
+Zealot Gloves	68		20
+Soldier Gloves	80		24
+Legion Gloves	89		26
+Crusader Gloves	105		31
+Wrapped Mitts		9	3
+Strapped Mitts		26	8
+Clasped Mitts		49	15
+Trapper Mitts		57	17
+Ambush Mitts		71	21
+Carnal Mitts		78	23
+Assassin's Mitts		91	27
+Murder Mitts		105	31

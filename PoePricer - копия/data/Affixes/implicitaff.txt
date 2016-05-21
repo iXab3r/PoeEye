@@ -1,0 +1,51 @@
+^(?'valueFirst'\.+)% of Physical Attack Damage Leeched as Life$	LifeLeech
+^(?'valueFirst'\.+) Life Regenerated per Second$
+^(?'valueFirst'\d+) Life gained for each enemy hit by your Attacks$
+^(?'valueFirst'\d+)% Chance to Block$	Block
+^(?'valueFirst'\d+)% chance of Arrows Piercing$
+^(?'valueFirst'\d+)% chance to Dodge Attacks$
+^(?'valueFirst'\d+)% chance to cause Bleeding on Hit$
+^(?'valueFirst'\d+)% increased Accuracy Rating$	LocalAccuracyRating
+^(?'valueFirst'\d+)% increased Attack Speed$	IncAttackSpeed
+^(?'valueFirst'\d+)% increased Cast Speed$	ImplicitCastSpeed
+^(?'valueFirst'\d+)% increased Critical Strike Chance$	ImplicitCrit
+^(?'valueFirst'\d+)% increased Elemental Damage$	ImplicitLocalElemDamage
+^(?'valueFirst'\d+)% increased Elemental Damage with Weapons$	WED
+^(?'valueFirst'\d+)% increased Global Critical Strike Chance$	ImplicitGlobalCrit
+^(?'valueFirst'\d+)% increased Global Critical Strike Multiplier$	ImplicitCritDamage
+^(?'valueFirst'\d+)% increased Mana Regeneration Rate$
+^(?'valueFirst'\d+)% increased Movement Speed$	MoveSpeed
+^(?'valueFirst'\d+)% increased Physical Damage$	LocalPhys
+^(?'valueFirst'\d+)% increased Radius of Area Skills$
+^(?'valueFirst'\d+)% increased Rarity of Items found$	Rarity
+^(?'valueFirst'\d+)% increased Spell Damage$	ImplicitSPD	IsImplicitSPD
+^(?'valueFirst'\d+)% increased Stun Duration on Enemies$
+^(?'valueFirst'\d+)% increased Stun Duration on enemies$
+^(?'valueFirst'\d+)% increased Stun Recovery$	StunRecovery
+^(?'valueFirst'\d+)% to all Elemental Resistances$
+^Damage Penetrates \d+% Elemental Resistances$
+^\+(?'valueFirst'\d+) Life gained for each Enemy hit by your Attacks$
+^\+(?'valueFirst'\d+) to Strength and Intelligence$	Str	Int
+^\+(?'valueFirst'\d+) to Strength and Dexterity$	Str	Dex
+^\+(?'valueFirst'\d+) to Dexterity and Intelligence$	Dex	Int
+^\+(?'valueFirst'\d+) to Maximum Life$	MaxLife
+^\+(?'valueFirst'\d+) to Maximum Mana$	MaxMana
+^\+(?'valueFirst'\d+) to Strength$	Str
+^\+(?'valueFirst'\d+) to Dexterity$	Dex
+^\+(?'valueFirst'\d+) to Intelligence$	Int
+^\+(?'valueFirst'\d+) to all Attributes$	AllStat
+^\+(?'valueFirst'\d+) to maximum Energy Shield$	FlatES
+^\+(?'valueFirst'\d+) to maximum Life$	MaxLife
+^\+(?'valueFirst'\d+)% to Chaos Resistance$	ChaosRes
+^\+(?'valueFirst'\d+)% to Cold Resistance$	ColdRes
+^\+(?'valueFirst'\d+)% to Cold and Lightning Resistances$	ColdRes	LightningRes
+^\+(?'valueFirst'\d+)% to Fire Resistance$	FireRes
+^\+(?'valueFirst'\d+)% to Fire and Cold Resistances$	FireRes	ColdRes
+^\+(?'valueFirst'\d+)% to Fire and Lightning Resistances$	FireRes	LightningRes
+^\+(?'valueFirst'\d+)% to Lightning Resistance$	LightningRes
+^\+(?'valueFirst'\d+)% to all Elemental Resistances$	ColdRed	FireRes	LightningRes
+^Adds (?'valueFirst'\d+)-(?'valueSecond'\d+) Fire Damage to Attacks with Bows$	FlatFire2
+^Adds (?'valueFirst'\d+)-(?'valueSecond'\d+) Physical Damage to Attacks	FlatPhys2
+^Adds (?'valueFirst'\d+)-(?'valueSecond'\d+) Physical Damage to Attacks with Bows$	FlatPhysDamage2
+^\+(?'valueFirst'\d+)% to all Elemental Resistances$	AllRes
+^Has 1 Socket
