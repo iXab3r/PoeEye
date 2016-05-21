@@ -2,6 +2,8 @@
 {
     using System.Linq;
 
+    using Moq;
+
     using NUnit.Framework;
 
     using PoeEye.PoeTrade;
@@ -20,7 +22,7 @@
 
         private PoeTradeParserModern CreateInstance()
         {
-            return new PoeTradeParserModern();
+            return new PoeTradeParserModern(Mock.Of<IPoeTradeDateTimeExtractor>());
         }
 
         [Test]

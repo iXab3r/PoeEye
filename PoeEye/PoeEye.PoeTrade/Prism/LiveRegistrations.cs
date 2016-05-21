@@ -28,6 +28,7 @@
                 .RegisterSingleton<IConverter<NameValueCollection, string>, NameValueCollectionToQueryStringConverter>()
                 .RegisterSingleton<IConverter<IPoeQueryInfo, IPoeQuery>, PoeQueryInfoToQueryConverter>()
                 .RegisterSingleton<IConverter<IPoeQuery, NameValueCollection>, PoeQueryConverter>()
+                .RegisterSingleton<IPoeTradeDateTimeExtractor, PoeTradeDateTimeExtractor>()
                 .RegisterType<IPoeLiveHistoryProvider, PoeLiveHistoryProvider>();
 
             Container

@@ -1,6 +1,7 @@
 ﻿namespace PoeEye.PoeTrade.ViewModels
 {
     using System;
+    using System.ComponentModel;
     using System.Diagnostics;
     using System.IO;
     using System.Linq;
@@ -40,8 +41,8 @@
         private readonly IScheduler uiScheduler;
 
         private bool isBusy;
-
         private bool isOpen;
+        private string error = string.Empty;
 
         private Version mostRecentVersion;
 
@@ -85,6 +86,12 @@
 
         public ICommand RestartCommand => restartCommand;
 
+        public string Error
+        {
+            get { return error; }
+            set { this.RaiseAndSetIfChanged(ref error, value); }
+        }
+
         public bool IsBusy
         {
             get { return isBusy; }
@@ -113,6 +120,7 @@
         {
             Log.Instance.Debug($"[ApplicationUpdaterViewModel] Update check requested");
             IsBusy = true;
+            Error = string.Empty;
 
             // delaying update so the user could see the progressring
             Thread.Sleep(ArtificialDelay);
@@ -164,7 +172,8 @@
             catch (Exception ex)
             {
                 Log.HandleException(ex);
-                uiScheduler.Schedule(ShowUpdateFailedMessageAndTerminate);
+                Error = $"Failed to connect to update server: {ex.Message}";
+                IsOpen = true;
             }
             finally
             {
@@ -196,22 +205,7 @@
         {
             Log.Instance.Debug($"[ApplicationUpdaterViewModel.OnFirstRun] App started for the first time");
         }
-
-        private void ShowUpdateFailedMessageAndTerminate()
-        {
-            var mainWindow = dialogCoordinator.MainWindow;
-            if (mainWindow == null)
-            {
-                throw new ApplicationException("Main window is not set");
-            }
-
-            dialogCoordinator
-                .ShowMessageAsync(
-                    mainWindow,
-                    "System error",
-                    "Failed to connect to update server");
-        }
-
+        
         private void RestartCommandExecuted()
         {
             var applicationName = Process.GetCurrentProcess().ProcessName + ".exe";

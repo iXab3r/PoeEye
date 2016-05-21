@@ -8,11 +8,19 @@
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (!(value is TimeSpan))
+            TimeSpan timeSpan;
+            if (value is TimeSpan)
             {
-                return value;
+                timeSpan = (TimeSpan) value;
             }
-            var timeSpan = (TimeSpan) value;
+            else if (value is TimeSpan?)
+            {
+                timeSpan = ((TimeSpan?)value).Value;
+            }
+            else
+            {
+                return Binding.DoNothing;
+            }
 
             if (timeSpan.TotalHours > 24)
             {

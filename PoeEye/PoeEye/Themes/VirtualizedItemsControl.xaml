@@ -10,14 +10,14 @@
     <Setter Property="ItemsPanel">
       <Setter.Value>
         <ItemsPanelTemplate>
-          <VirtualizingStackPanel />
+          <VirtualizingStackPanel HorizontalAlignment="Center" />
         </ItemsPanelTemplate>
       </Setter.Value>
     </Setter>
     <Setter Property="ItemTemplate">
       <Setter.Value>
         <DataTemplate>
-          <Grid>
+          <Grid HorizontalAlignment="Center">
             <Grid.ColumnDefinitions>
               <ColumnDefinition Width="Auto" SharedSizeGroup="ItemWidth"/>
             </Grid.ColumnDefinitions>

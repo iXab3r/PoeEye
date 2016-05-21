@@ -31,7 +31,7 @@
 
     internal sealed class PoeTradeViewModel : DisposableReactiveObject, IPoeTradeViewModel
     {
-        private static readonly TimeSpan RefreshTimeout = TimeSpan.FromSeconds(10);
+        private static readonly TimeSpan RefreshTimeout = TimeSpan.FromMinutes(1);
         private readonly IClock clock;
         private readonly ReactiveCommand<object> copyPmMessageToClipboardCommand = ReactiveCommand.Create();
 
@@ -91,6 +91,8 @@
                       .Subscribe(() => this.RaisePropertyChanged(nameof(TimeElapsedSinceLastIndexation)))
                       .AddTo(Anchors);
         }
+
+        public TimeSpan? TimeElapsedSinceFirstIndexation => Trade.FirstSeen == null ? default(TimeSpan?) : clock.Now - Trade.FirstSeen.Value;
 
         public TimeSpan TimeElapsedSinceLastIndexation => Trade.Timestamp == DateTime.MinValue ? TimeSpan.Zero : clock.Now - Trade.Timestamp;
 

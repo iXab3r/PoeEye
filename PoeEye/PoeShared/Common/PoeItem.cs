@@ -56,6 +56,10 @@
 
         public string Hash { get; set; }
 
+        public string Note { get; set; }
+
+        public DateTime? FirstSeen { get; set; }
+
         public bool IsCorrupted { get; set; }
 
         public PoeItemRarity Rarity { get; set; }

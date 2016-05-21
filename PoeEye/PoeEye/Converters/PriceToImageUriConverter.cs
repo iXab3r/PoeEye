@@ -26,7 +26,8 @@
             {"fusing", "Orb_of_Fusing"},
             {"regret", "Orb_of_Regret"},
             {"scouring", "Orb_of_Scouring"},
-            {"regal", "Regal_Orb"}
+            {"regal", "Regal_Orb"},
+            {"vaal", "Vaal_Orb"}
         };
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)

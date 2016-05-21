@@ -214,6 +214,7 @@
             {
                 return;
             }
+            ProcessResetTabTrades(tab, new IPoeTradeViewModel[0]);
             collectionByTab.Remove(tab);
             tabInfo.Dispose();
         }
@@ -291,7 +292,7 @@
                 return;
             }
 
-            var currentTradesList = tabInfo.Trades;
+            var currentTradesList = tabInfo.Trades.ToArray();
             var tradesToAdd = actualTradesList.Except(currentTradesList).ToArray();
             var tradesToRemove = currentTradesList.Except(actualTradesList).ToArray();
 
@@ -326,11 +327,16 @@
                 var result = viewByViewModelMap.TryGetValue(viewModel, out view);
                 if (result)
                 {
-                    viewByViewModelMap.Remove(viewModel);
-                    view.Dispose();
-                    Anchors.Remove(view);
+                   RemoveTrade(viewModel, view);
                 }
                 return result;
+            }
+
+            private void RemoveTrade(IPoeTradeViewModel viewModel, PoeFilteredTradeViewModel view)
+            {
+                viewByViewModelMap.Remove(viewModel);
+                view.Dispose();
+                Anchors.Remove(view);
             }
 
             public void Dispose()

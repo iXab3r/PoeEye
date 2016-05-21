@@ -74,7 +74,7 @@
                         Content="{Binding SelectedTab}" />
         
         <ContentControl Grid.Column="1"
-                        Margin="5,10,10,10"
+                        Margin="10,0,0,0"
                         Visibility="{Binding SelectedTab, Converter={StaticResource NotNullToHiddenConverter}}"
                         Content="{Binding SummaryTab}" />
       </Grid>
@@ -272,7 +272,7 @@
         <ContentPresenter Content="{Binding PoeTradeCaptchaViewModel}" />
       </controls:Flyout>
 
-      <controls:Flyout Header="&#xF093; Update completed" x:Name="ApplicationUpdatedFlyout"
+      <controls:Flyout Header="&#xF093; Update status" x:Name="ApplicationUpdatedFlyout"
                        FontFamily="{StaticResource FontAwesome}"
                        Position="Bottom"
                        AnimateOpacity="True"
