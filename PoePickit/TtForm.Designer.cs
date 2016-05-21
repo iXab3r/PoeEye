@@ -11,8 +11,6 @@ namespace PoePickit
         private System.ComponentModel.IContainer components = null;
         protected override bool ShowWithoutActivation { get { return true; } }
 
-        private NotifyIcon trayIcon;
-        private ContextMenu trayMenu;
         /// <summary>
         /// Clean up any resources being used.
         /// </summary>
@@ -22,7 +20,6 @@ namespace PoePickit
             if (disposing && (components != null))
             {
                 components.Dispose();
-                trayIcon.Dispose();
             }
             base.Dispose(disposing);
         }
@@ -103,20 +100,6 @@ namespace PoePickit
             this.TopMost = true;
             this.ResumeLayout(false);
             this.PerformLayout();
-
-
-            // Create a tray icon. In this example we use a
-            // standard system icon for simplicity, but you
-            // can of course use your own custom icon too.
-            trayIcon = new NotifyIcon();
-            trayIcon.Text = "MyTrayApp";
-            //trayIcon.Icon = new Icon(SystemIcons.Application, 40, 40);
-            trayIcon.Icon = new Icon("PoePickit.ico", 40, 40);
-
-            // Add menu to tray icon and show it.
-            trayIcon.ContextMenu = trayMenu;
-            trayIcon.Visible = true;
-
         }
 
 
