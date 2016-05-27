@@ -6,456 +6,383 @@ using System.Linq;
 using System.Net.Mime;
 using System.Security.Cryptography.X509Certificates;
 using System.Text.RegularExpressions;
+using System.Windows.Forms;
 using PoePickit.Extensions;
 
 namespace PoePickit.Parser
 {
-    public enum FilterTypes
+ 
+    public enum ArgOperators
     {
-        Dagger,
-        OneHandedSword,
-        OneHandedAxe,
-        OneHandedMace,
-        Sceptre,
-        Claw,
-        Wand,
-        TwoHandedAxe,
-        TwoHandedSword,
-        TwoHandedMace,
-        Staff,
-        Bow,
-        Boots,
-        Gloves,
-        Helm,
-        BodyArmour,
-        Ring,
-        Amulet,
-        Quiver,
-        Belt,
-        Shield
-    }
-   
-    public enum FilterOperators
-    {
+        Empty,
         More,
         MoreEqual,
         Less,
         LessEqual,
         Equal,
-        Exist,
-        NonExist
     }
 
     public enum ToolTipTypes
     {
         Unknown,
         Common,
-        PDPS,
-        EDPS,
+        Phys,
+        Elem,
         COC,
-        SPD,
+        Spell,
+        LINKS
     }
+
     public enum ArgTypes
     {
         NonCraft,
-        Craftable,
         Craft,
-        MultiCraft,
         NotExist,
         Exist
     }
 
+    public enum FilterTiers
+    {
+        high,
+        mid,
+        low
+    }
+
     public struct FilterLine
     {
-        public string[] ArgNames { get; set; }
+        public List<FilterArg> Args;
 
-        public FilterOperators[] ArgOperators { get; set; }
-
-        public double[] ArgValues { get; set; }
-
-        public string FilterTier { get; set; }
-
-        public ArgTypes[] ArgType { get; set; }
+        public FilterTiers Tier { get; set; }
 
         public ToolTipTypes ToolTipType { get; set; }
 
         public string RawLine { get; set; }
     }
 
+    public struct FilterArg
+    {
+        public string Name { get; set; }
 
+        public ArgOperators Operator { get; set; }
+
+        public double Value { get; set; }
+
+        public ArgTypes Type { get; set; }
+    }
 
     public class FilterSource : PricerDataReader
     {
         public FilterLine[] Filters { get; set; }
-        public string FilterName { get; set; }
+        public ItemClassType FilterClass { get; set; }
 
-        public FilterSource(string filterName) : base(Path.Combine("Filter","Filters"))
+        public FilterSource(ItemClassType className) : base(Path.Combine("Filters"))
         {
-            Filters = Read(filterName);
+            Filters = Read(className);
         }
 
-        private FilterLine[] Read(string filterName)
+        private FilterLine[] Read(ItemClassType filterName)
         {
+            var parseRegexLine = new Regex(@"^(?'filterArgs'([A-Za-z\+\-_!0-9,><=]+ {0,1})+) *$", RegexOptions.Compiled);
+            var parseArgRegex =
+                new Regex(
+                    @"^(?'argType'(\+|-|-|__|_)){0,1}(?'argName'[A-Za-z]+)(?'argOperator'(>|>=|>=|<|=)){0,1}(?'argValue'[0-9,\.]+){0,1}$",
+                    RegexOptions.Compiled);
+            var sectionName = ItemClassType.Unknown;
             var result = new List<FilterLine>();
             var lines = RawLines;
-            var parseRegexLine = new Regex(@"^(?'filterTier'mid|low|high){0,1} *(?'filterArgs'(((\+|\+\+|)[A-Za-z]+(>=|<=|<|>|=)[0-9\.,]+|(!|)[A-Za-z]) *)+) *(;|$)", RegexOptions.Compiled);
-            var parseArgRegex = new Regex(@"^(?'argType'\+|\+\+|-|\!){0,1}(?'argName'[A-Za-z]+)(?'operator'(>|>=|>=|<|=)){0,1}(?'argValue'[TFtruefals0-9,]+){0,1}$", RegexOptions.Compiled);
-            var sectionName = "";
+            var filterArg = new FilterArg();
             
+
+
             foreach (var line in lines)
             {
                 if ((line == "") || line.StartsWith(";") || line.StartsWith("#")) continue;
-                if (line.StartsWith("["))
+                if (line.StartsWith("[") && line.EndsWith("]"))
                 {
-                    var tLine = line.Replace("[", "").Replace("]", "");
-                    if (sectionName == "")
+                    ItemClassType type;
+                    if (!Enum.TryParse(line.Replace("[","").Replace("]",""), out type))
                     {
-                        if (tLine.Replace(" ","") != filterName)
-                            continue;
+                        Console.WriteLine($"[{filterName}]Wrong section name: {line}");
+                        continue;
+                    }
 
-                        FilterName = tLine;
-                        sectionName = tLine;
-                        continue;
-                    }
-                    {
-                        if (tLine.Replace(" ", "") != filterName)
-                            sectionName = "";
-                        continue;
-                    }
+                    sectionName = type;
+                    continue;
                 }
 
-                if (sectionName == "")
+                if (sectionName != filterName)
                     continue;
-               
 
                 var match = parseRegexLine.Match(line.Replace(".", ","));
-                if (!match.Success) 
+                if (!match.Success)
                 {
-                    Console.WriteLine($"[{filterName}]WrongFilterLine: {line}");
+                    Console.WriteLine($"[{filterName}]Wrong char(s) or excess space(s) at filter line: {line}");
                     continue;
                 }
 
-                var args = match.Groups["filterArgs"].Value.Split(' ');
-                var argTypes = new List<ArgTypes>();
-                var argNames = new List<string>();
-                var argValues = new List<double>();
-                var argOperators = new List<FilterOperators>();
-                var ttType = ToolTipTypes.Unknown;
-                var skipLine = false;
-                var tFilterTier = match.Groups["filterTier"].Success ? match.Groups["filterTier"].Value : "high";
 
-                foreach (var arg in args)
+                var argsMatch = match.Groups["filterArgs"].Value.Split(' ');
+                var filterArgs = new List<FilterArg>();
+                var ttType = ToolTipTypes.Common;
+                var skipLine = false;
+                var tFilterTier = FilterTiers.high;
+                
+
+                foreach (var arg in argsMatch)
                 {
                     var matcharg = parseArgRegex.Match(arg);
-                    if (arg == "")
+
+
+                    if (!matcharg.Success)
                     {
+                        skipLine = true;
+                        Console.WriteLine($"[{filterName}.FilterSource.Read] Wrong condition. {arg}");
+                        continue;
+                    }
+
+                    var item = new Item();
+                    var argOperator = ArgOperators.Empty;
+                    var argType = ArgTypes.NonCraft;
+                    double argValue = 0;
+                    var argName = matcharg.Groups["argName"].Value;
+
+                    if (matcharg.Groups["argType"].Success)
+                    {
+                        switch (matcharg.Groups["argType"].Value)
+                        {
+                            case "_":
+                                if (!(item.IsArgExist("Craft" + matcharg.Groups["argName"].Value)))
+                                {
+                                    skipLine = true;
+                                    Console.WriteLine(
+                                        $"[{filterName}.FilterSource.Read] That arg not exist:  {matcharg.Groups["argType"].Value}{matcharg.Groups["argName"]} in filter line: {line}");
+                                    continue;
+                                }
+                                argType = ArgTypes.Craft;
+                                argName = "Craft" + matcharg.Groups["argName"].Value;
+                                break;
+                            case "__":
+                                if (!item.IsArgExist("Multi" + matcharg.Groups["argName"].Value))
+                                {
+                                    skipLine = true;
+                                    Console.WriteLine(
+                                        $"[{filterName}.FilterSource.Read] That arg not exist:  {matcharg.Groups["argType"].Value}{matcharg.Groups["argName"]} in filter line: {line}");
+                                    continue;
+                                }
+                                argType = ArgTypes.Craft;
+                                argName = "Multi" + matcharg.Groups["argName"].Value;
+                                break;
+                            case "-":
+                                if (!item.IsArgExist("Is" + matcharg.Groups["argName"].Value))
+                                {
+                                    skipLine = true;
+                                    Console.WriteLine(
+                                        $"[{filterName}.FilterSource.Read] That arg not exist:  {matcharg.Groups["argType"].Value}{matcharg.Groups["argName"]} in filter line: {line}");
+                                    continue;
+                                }
+                                argType = ArgTypes.NotExist;
+                                argName = "Is" + matcharg.Groups["argName"].Value;
+                                goto endofargparse;
+                            case "+":
+                                if (!item.IsArgExist("Is" + matcharg.Groups["argName"].Value))
+                                {
+                                    skipLine = true;
+                                    Console.WriteLine(
+                                        $"[{filterName}.FilterSource.Read] That arg not exist:  {matcharg.Groups["argType"].Value}{matcharg.Groups["argName"]} in filter line: {line}");
+                                    continue;
+                                }
+                                argType = ArgTypes.Exist;
+                                argName = "Is" + matcharg.Groups["argName"].Value;
+                                goto endofargparse;
+                        }
+                    }
+
+                    if (!item.IsArgExist(matcharg.Groups["argName"].Value))
+                    {
+                        if ((arg == "mid") || (arg == "low") || (arg == "high"))
+                        {
+                            Enum.TryParse(arg, out tFilterTier);
+                            continue;
+                        }
+
+                        if ((arg == "COC") || (arg == "Phys") || (arg == "Elem") || (arg == "Spell") || (arg == "COC") || (arg == "LINKS"))
+                        {
+                            Enum.TryParse(arg, out ttType);
+
+                            continue;
+                        }
+                        Console.WriteLine($"[{filterName}.FilterSource.Read] Wrong arg name: {arg} at line: {line}");
                         skipLine = true;
                         continue;
                     }
-                    
-                    var item = new Item();
-                    switch (matcharg.Groups["argType"].Value)
-                    {
-                        case "+":
-                            if (item.Get("Craft" + matcharg.Groups["argName"].Value) == -1)
-                            {
-                                skipLine = true;
-                                Console.WriteLine(
-                                    $"[{filterName}.FilterSource.Read] Wrong arg:  {matcharg.Groups["argType"].Value}{matcharg.Groups["argName"]} in filter line: {line}");
-                                Console.ReadKey();
-                                continue;
-                            }
-                            argTypes.Add(ArgTypes.Craft);
-                            break;
-                        case "++":
-                            if (item.Get("Multi" + matcharg.Groups["argName"].Value) == -1)
-                            {
-                                skipLine = true;
-                                Console.WriteLine(
-                                    $"[{filterName}.FilterSource.Read] Wrong arg:  {matcharg.Groups["argType"].Value}{matcharg.Groups["argName"]} in filter line: {line}");
-                                Console.ReadKey();
-                                continue;
-                            }
-                            argTypes.Add(ArgTypes.MultiCraft);
-                            break;
-                        case "!":
-                            argTypes.Add(ArgTypes.NotExist);
-                            break;
-                        default:
-                            argTypes.Add(ArgTypes.Exist);
-                            break;
-                    }
 
-                    switch (matcharg.Groups["argName"].Value)
-                    {
-                        case "PDPS":
-                        case "PAPS":
-                        case "PCrit":
-                        case "PCritDamage":
-                            ttType = ToolTipTypes.PDPS;
-                            break;
-                        case "EDPS":
-                        case "EAPS":
-                        case "ECrit":
-                        case "ECritDamage":
-                        ttType = ToolTipTypes.EDPS;
-                            break;
-                        case "COCSPD":
-                        case "COCTotalSPD":
-                        case "COCCrit":
-                        case "COCCritDamage":
-                        case "COCSpellCrit":
-                        case "COCCAPS":
-                            ttType = ToolTipTypes.COC;
-                            break;
-                        case "SPD":
-                        case "TotalSPD":
-                        case "FlatSPD":
-                        case "CastSpeed":
-                            if (!item.IsWeapon)
-                                ttType = ToolTipTypes.SPD;
-                            else
-                                ttType = ToolTipTypes.Common;
-                            break;
-                        default:
-                            if (ttType == ToolTipTypes.Unknown)
-                                ttType = ToolTipTypes.Common;
-                            break;
-                    }
-                    
-                    if (!matcharg.Groups["operator"].Success)
-                    {
 
-                        if (item.Get("Is" + matcharg.Groups["argName"].Value) != false)
-                        {
-                            skipLine = true;
-                            Console.WriteLine(
-                                $"[{filterName}.FilterSource.Read] Wrong arg:  {matcharg.Groups["argType"].Value}{matcharg.Groups["argName"]} in filter line: {line}");
-                            Console.ReadKey();
-                        }
-                        argOperators.Add(matcharg.Groups["argType"].Value == "!"
-                            ? FilterOperators.NonExist
-                            : FilterOperators.Exist);
-                        argNames.Add("Is" + matcharg.Groups["argName"].Value);
-                        argValues.Add(-1);
-
-                    }
-                    else
+                    if (matcharg.Groups["argOperator"].Success)
                     {
-                        argNames.Add(matcharg.Groups["argName"].Value);
-                        switch (matcharg.Groups["operator"].Value)
+                        switch (matcharg.Groups["argOperator"].Value)
                         {
                             case ">":
-                                argOperators.Add(FilterOperators.More);
-                                break;
-                            case "<=":
-                                argOperators.Add(FilterOperators.LessEqual);
+                                argOperator = ArgOperators.More;
                                 break;
                             case "<":
-                                argOperators.Add(FilterOperators.Less);
+                                argOperator = ArgOperators.Less;
                                 break;
                             case ">=":
-                                argOperators.Add(FilterOperators.MoreEqual);
+                                argOperator = ArgOperators.MoreEqual;
                                 break;
-                            case "=":
-                                argOperators.Add(FilterOperators.Equal);
+                            case "<=":
+                                argOperator = ArgOperators.LessEqual;
                                 break;
                             default:
-                                Console.WriteLine(
-                                    $"[{filterName}.FilterSource.Read] Wrong operator {matcharg.Groups["operator"].Value} in line: {line}");
-                                skipLine = true;
+                                argOperator = ArgOperators.Equal;
                                 break;
                         }
-                        double argValue;
-
-                        if (double.TryParse(matcharg.Groups["argValue"].Value, out argValue))
-                        {
-                            argValues.Add(argValue);
-                        }
-                        else
-                        {
-                            Console.WriteLine(
-                                $"[{filterName}.FilterSource.Read] Wrong value for Arg: {arg} line :{matcharg.Groups["argValue"].Value}");
-                            skipLine = true;
-                        }
-
                     }
 
+
+                    if (!double.TryParse(matcharg.Groups["argValue"].Value, out argValue))
+                    {
+                        Console.WriteLine(
+                            $"[{filterName}.FilterSource.Read] Wrong value for Arg: {arg} line :{matcharg.Groups["argValue"].Value}");
+                        skipLine = true;
+                    }
+                    endofargparse:
+                    filterArg = new FilterArg
+                    {
+                        Name = argName,
+                        Type = argType,
+                        Operator = argOperator,
+                        Value = argValue
+                    };
+                    filterArgs.Add(filterArg);
                 }
 
                 if (skipLine)
                 {
-                    Console.WriteLine($"[{filterName}.FilterSource.Read] Error(s) in line: {line}");
                     continue;
                 }
 
+                FilterClass = filterName;
                 var filter = new FilterLine
                 {
-                    FilterTier = tFilterTier,
-                    ArgNames = argNames.ToArray(),
-                    ArgType = argTypes.ToArray(),
-                    ArgOperators = argOperators.ToArray(),
-                    ArgValues = argValues.ToArray(),
+                    Tier = tFilterTier,
+                    Args = filterArgs,
                     ToolTipType = ttType,
                     RawLine = line
                 };
                 result.Add(filter);
             }
-            
-            return result.ToArray();
 
-        }//read
+            return result.ToArray();
+        } //read
 
 
         public int Count => Filters.Length;
 
-        public void Scoring(Item item)
+        public void Scoring(Item item, FilterTiers tier = FilterTiers.low)
         {
-            
-            if (item.ClassType != FilterName)
-               return;
+            if (item.ClassType != FilterClass)
+                return;
+
+            string failArg = "";
             foreach (var filter in Filters)
             {
-                for (var i = 0; i < filter.ArgNames.Length; i++)
+                if (filter.Tier > tier)
                 {
-                    string tName;
+                    ConsoleExtensions.WriteLine(
+                        $"[{FilterClass}.Scoring] Inappropriate filter tier: {filter.RawLine}", ConsoleColor.Red);
+                    continue;
+                }
                     
-                    switch (filter.ArgType[i])
+                foreach (var arg in filter.Args)
+                {
+                    switch (arg.Type)
                     {
-                        case ArgTypes.Craft:
-                            tName = "Craft" + filter.ArgNames[i];
+                        case ArgTypes.Exist:
+                            if (item.Get(arg.Name) == true)
+                                continue;
                             break;
-                        case ArgTypes.MultiCraft:
-                            tName = "Multi" + filter.ArgNames[i];
+                        case ArgTypes.NotExist:
+                            if (item.Get(arg.Name) == false)
+                                continue;
+                            break;
+                        case ArgTypes.Craft:
+                            if (ArgCompare(item.Get(arg.Name), arg.Operator, arg.Value))
+                                continue;
+                            break;
+                        case ArgTypes.NonCraft:
+                            if (ArgCompare(item.Get(arg.Name), arg.Operator, arg.Value))
+                                continue;
+                            break;
+                    }
+
+                    string oper;
+                    switch (arg.Operator)
+                    {
+                        case ArgOperators.Equal:
+                            oper = "=";
+                            break;
+                        case ArgOperators.LessEqual:
+                            oper = "<=";
+                            break;
+                        case ArgOperators.MoreEqual:
+                            oper = ">=";
+                            break;
+                        case ArgOperators.Less:
+                            oper = "<";
+                            break;
+                        case ArgOperators.More:
+                            oper = ">";
                             break;
                         default:
-                            tName = filter.ArgNames[i];
+                            oper = "";
                             break;
                     }
-                    
-                    if (item.GetType().GetProperty(tName) != null)
-                    {
-                        Console.WriteLine(
-                            $"[{FilterName}.FilterSource.Scoring] Wrong arg or operator for that arg {tName} \n In FilterLine: {filter.RawLine}");
-                        continue;
-                    }
-
-                    if ((filter.ArgOperators[i] == FilterOperators.Exist) || (filter.ArgOperators[i] == FilterOperators.NonExist))
-                    {
-                        if (!ArgCompare(item.Get(tName), filter.ArgOperators[i]))
-                        {
-                            ConsoleExtensions.WriteLine(
-                                $"[{FilterName}.FilterSource.Scoring] Fail    : {tName} in {filter.RawLine}",ConsoleColor.Red);
-                            break;
-                        }
-                    }
-                    else
-                    {
-                        if (
-                            !ArgCompare(Convert.ToDouble(item.Get(tName)), filter.ArgOperators[i],
-                                filter.ArgValues[i]))
-                        {
-                            ConsoleExtensions.WriteLine(
-                                $"[{FilterName}.FilterSource.Scoring] Fail    : {tName}={Convert.ToDouble(item.Get(tName))} in {filter.RawLine}",ConsoleColor.Red);
-                            break;
-                        }
-                    }
-
-                    if (i == filter.ArgNames.Length - 1)
-                    {
-                        ConsoleExtensions.WriteLine($"[{FilterName}.FilterSource.Scoring] Success : {filter.RawLine} ", ConsoleColor.Green);
-                        item.FilterSuccess = true;
-                        item.TtTypes.Remove(ToolTipTypes.Common);
-                        if (!item.TtTypes.Contains(filter.ToolTipType))
-                            item.TtTypes.Add(filter.ToolTipType);
-                        
-                    }
+                    failArg = arg.Name + " " + oper + " " + arg.Value;
+                    goto skipfilter;
                 }
-                
-                
+                item.FilterSuccess = true;
+                item.TtTypes.Remove(ToolTipTypes.Common);
+
+                if (!item.TtTypes.Contains(filter.ToolTipType))
+                    item.TtTypes.Add(filter.ToolTipType);
+                ConsoleExtensions.WriteLine($"[{FilterClass}.FilterSource.Scoring] Success: {filter.RawLine} ",
+                    ConsoleColor.Green);
+                continue;
+                skipfilter:
+                ConsoleExtensions.WriteLine(
+                        $"[{FilterClass}.Scoring] {filter.RawLine}\n {failArg}", ConsoleColor.Red);
             }
         }
 
-        
 
-        public void CreateTempToolTip(Item item, ToolTipTypes ttType)
+        public bool ArgCompare(double fieldValue, ArgOperators argOperator, dynamic argValue)
         {
-            var tTt = "\n------------------- " + item.ClassType + " -------------------";
-            switch (ttType)
+            switch (argOperator)
             {
-                case ToolTipTypes.PDPS:
-                    tTt = tTt + "\nPhysDPS:".PadRight(20) + item.PDPS.ToString().PadLeft(20) + "\nAPS:".PadRight(20) + item.APS.ToString().PadLeft(20) + "\nCrit:".PadRight(20) + item.Crit.ToString().PadLeft(20) + "\n------------------------";
-                    if (item.MultiPDPS > item.PDPS)
-                    {
-                        tTt = tTt + "\nPhysDPS:".PadRight(20) + (item.MultiPDPSLo + "-" + item.MultiPDPS).PadLeft(20) + "    " + item.MultiTtPDPS +
-                              "\nAPS:".PadRight(20) + (item.MultiPAPSLo + "-" + item.MultiPAPS).PadLeft(20) + "\nCrit:".PadRight(20) + item.MultiPCrit.ToString().PadLeft(20) + "\n------------------------";
-                    }
-                    break;
-                case ToolTipTypes.EDPS:
-                    tTt = tTt + "\nElemDPS:".PadRight(20) + item.EDPS.ToString().PadLeft(20) + "\nAPS:".PadRight(20) + item.APS.ToString().PadLeft(20) + "\nCrit:".PadRight(20) + item.Crit.ToString().PadLeft(20) + "\n------------------------";
-                    if (item.MultiEDPS > item.EDPS)
-                    {
-                        tTt = tTt + "\nElemDPS:".PadRight(20) + (item.MultiEDPSLo + "-" + item.MultiEDPS).PadLeft(20) + "    " + item.MultiTtEDPS +
-                              "\nAPS:".PadRight(20) + (item.MultiEAPSLo + "-" + item.MultiEAPS).PadLeft(20) + "\nCrit:".PadRight(20) + item.Crit.ToString().PadLeft(20) + "\n------------------------";
-                    }
-
-                    break;
-                default:
-                    
-                    break;
-            }
-            item.Tt = item.Tt + "\n" + tTt;
-        }
-
-        public bool ArgCompare(bool fieldValue, FilterOperators filterOperator)
-        {
-            switch (filterOperator)
-            {
-                case FilterOperators.Exist:
-                    if (fieldValue == true)
-                        return true;
-                    return false;
-                case FilterOperators.NonExist:
-                    if (fieldValue == true)
-                        return false;
-                    return true;
-                default:
-                    Console.WriteLine($"[{FilterName}.FilterSource.ArgCompare(,)] Wrong operator for that method. {filterOperator}");
-                    break;
-            }
-            return false;
-        }
-
-        public bool ArgCompare(double fieldValue, FilterOperators filterOperator, dynamic argValue)
-        {
-            switch (filterOperator)
-            {
-                case FilterOperators.More:
+                case ArgOperators.More:
                     if (fieldValue > argValue)
                         return true;
                     return false;
-                case FilterOperators.MoreEqual:
+                case ArgOperators.MoreEqual:
                     if (fieldValue >= argValue)
                         return true;
                     return false;
-                case FilterOperators.Less:
+                case ArgOperators.Less:
                     if (fieldValue < argValue)
                         return true;
                     return false;
-                case FilterOperators.LessEqual:
+                case ArgOperators.LessEqual:
                     if (fieldValue <= argValue)
                         return true;
                     return false;
-                case FilterOperators.Equal:
-                    double tValue;
-                    if (double.TryParse(argValue, out tValue))
-                    {
-                        if (Math.Abs(fieldValue - argValue) < 0.0001)
-                            return true;
-                    }
+                case ArgOperators.Equal:
+                    if (Math.Abs(fieldValue - argValue) < 0.0001)
+                        return true;
                     return false;
                 default:
-                    Console.WriteLine($"[{FilterName}.FilterSource.ArgCompare(,,)] Wrong operator for that method. {filterOperator}");
+                    Console.WriteLine(
+                        $"[{FilterClass}.FilterSource.ArgCompare(,,)] Wrong operator for that method. {argOperator}");
                     break;
             }
             return false;

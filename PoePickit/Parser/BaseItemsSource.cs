@@ -75,7 +75,7 @@ namespace PoePickit.Parser
                 ? new Regex(
                     @"^(?'baseName'[A-Za-z ']+)\t+(?'damageLo'\d+)\t+(?'damageHi'\d+)\t+(?'baseCC'[0-9,]+)%\t+(?'baseAPS'[0-9,]+)[ ]*$", RegexOptions.Compiled)
                 : new Regex(
-                    @"^(?'baseName'[A-Za-z ']+)\t+(?'baseAR'\d*)\t*(?'baseEV'\d*)\t*(?'baseES'\d*)[ ]*$",RegexOptions.Compiled);
+                    @"^(?'baseName'[A-Za-z ']+)\t(?'baseAR'\d*)\t{0,1}(?'baseEV'\d*)\t{0,1}(?'baseES'\d*)[ ]*$", RegexOptions.Compiled);
 
 
 

@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Drawing.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Windows.Forms;
 
 namespace PoePickit
 {
@@ -36,7 +37,9 @@ namespace PoePickit
         RegexLightAffixBracketLine,
         RegexAffixBracketLine,
         RegexAffixFileLine,
-        RegexAffixFileArg
+        RegexAffixFileArg,
+        RegexUniqueValue,
+        RegexUniqueValueDouble
     }
 
     public class ItemParse 
@@ -47,13 +50,13 @@ namespace PoePickit
 
         public readonly IDictionary<AffixTypes, AffixesSource> KnownAffixes;
 
-        public readonly IDictionary<FilterTypes, FilterSource> KnownFilters;
+        public readonly IDictionary<ItemClassType, FilterSource> KnownFilters;
 
         public readonly IDictionary<ParseRegEx, Regex> KnownRegexes;
 
-    
-       
+        public FilterTiers FilterTier { get; set; }
 
+        public UniqueAffixSource Uniques;
         
 
         public ItemParse()
@@ -82,26 +85,18 @@ namespace PoePickit
             KnownAffixBrackets = Enum.GetValues(typeof(AffixBracketType)).Cast<AffixBracketType>().ToDictionary(x => x, x => new AffixBracketsSource(x.ToString(), KnownRegexes));
             KnownBaseItems = Enum.GetValues(typeof(BaseItemTypes)).Cast<BaseItemTypes>().ToDictionary(x => x, x => new BaseItemsSource(x.ToString()));
             KnownAffixes = Enum.GetValues(typeof(AffixTypes)).Cast<AffixTypes>().ToDictionary(x => x, x => new AffixesSource(x.ToString(), KnownRegexes));
-
-            KnownFilters = Enum.GetValues(typeof (FilterTypes)).Cast<FilterTypes>().ToDictionary(x => x, x => new FilterSource(x.ToString()));
-
+            KnownFilters = Enum.GetValues(typeof (ItemClassType)).Cast<ItemClassType>().ToDictionary(x => x, x => new FilterSource(x));
             
+            Uniques = new UniqueAffixSource();
 
-
-            foreach (var affixBracketsSource in KnownAffixBrackets)
-            {
-                ConsoleExtensions.WriteLine($"[PoePricer..ctor] Loaded affix brackets for '{affixBracketsSource.Key}', values count: {affixBracketsSource.Value.Brackets.Length}", ConsoleColor.DarkYellow);
-            }
-
-            foreach (var baseItem in KnownBaseItems)
-            {
-                ConsoleExtensions.WriteLine($"[PoePricer..ctor] Loaded base items for '{baseItem.Key}', values count: {baseItem.Value.Items.Length}", ConsoleColor.DarkYellow);
-            }
-            foreach (var knownAffixType in KnownAffixes)
-            {
-                ConsoleExtensions.WriteLine($"[PoePricer..ctor] Loaded affixes for '{knownAffixType.Key}', values count: {knownAffixType.Value.AffixesLines.Length}", ConsoleColor.DarkYellow);
-            }
+            FilterTier = FilterTiers.low;
+            
         }
+
+
+        
+
+        
 
         private static IDictionary<ParseRegEx, Regex> SetRegExps()
         {
@@ -111,7 +106,7 @@ namespace PoePickit
                 {ParseRegEx.RegexNoteMessageLine, new Regex(@"^Note: (?'noteMessage'.*)$", RegexOptions.Compiled)},
                 {
                     ParseRegEx.RegexSocket6,
-                    new Regex(@"^Sockets: [RGBW]-[RGBW]-[RGBW]-[RGBW]-[RGBW]-[RGBW]$", RegexOptions.Compiled)
+                    new Regex(@"^Sockets: [RGBW]-[RGBW]-[RGBW]-[RGBW]-[RGBW]-[RGBW] $", RegexOptions.Compiled)
                 },
                 {
                     ParseRegEx.RegexSocket5,
@@ -169,6 +164,14 @@ namespace PoePickit
                 {
                     ParseRegEx.RegexAffixFileArg,
                     new Regex(@"^(?'argName'[A-Za-z]+)(?'argMod'[23]{0,2})$", RegexOptions.Compiled)
+                },
+                {
+                    ParseRegEx.RegexUniqueValue, new Regex(@"(\+|^| )(?'value'[0-9\.,]+)(%| )", RegexOptions.Compiled)
+    
+                },
+                {
+                    ParseRegEx.RegexUniqueValueDouble, new Regex(@"(\+|^| )(?'valueLo'[0-9\.,]+)-(?'valueHi'[0-9\.,]+)(%| )", RegexOptions.Compiled)
+
                 }
             };
 
@@ -184,8 +187,8 @@ namespace PoePickit
                 return null;
             }
             var item = new Item();
-            var result = item.ParseItemDataText(itemData, KnownAffixBrackets, KnownBaseItems, KnownAffixes, KnownRegexes);
-            if ((result == Item.ParseResult.WrongDataText) || (result == Item.ParseResult.NotRare))
+            var result = item.ParseItemDataText(itemData, KnownAffixBrackets, KnownBaseItems, KnownAffixes, KnownRegexes, Uniques);
+            if ((result == Item.ParseResult.WrongDataText) || (result == Item.ParseResult.NotRareOrUnique))
             {
                 return null;
             }
@@ -195,22 +198,23 @@ namespace PoePickit
                 return PoeToolTip.Empty;
             }
 
-            FilterTypes type;
-            if (Enum.TryParse(item.ClassType.Replace(" ", ""), out type))
-            {
-                FilterSource filter;
-                if (KnownFilters.TryGetValue(type, out filter))
-                {
-                    item.TtTypes = new List<ToolTipTypes>() { ToolTipTypes.Common };
-                    filter.Scoring(item);
-                }
-                else
-                {
-                    Console.WriteLine($"[Item.Scoring] Wrong classtype: {item.ClassType}");
-                    return null;
-                }
-            }
+            
+            if (item.ClassType == ItemClassType.Unknown)
+                return null;
 
+            FilterSource filter;
+            if (KnownFilters.TryGetValue(item.ClassType, out filter))
+            {
+                item.TtTypes = new List<ToolTipTypes>() {ToolTipTypes.Common};
+                if (item.ItemRarity == Item.ItemRarityType.Rare)
+                    filter.Scoring(item);
+            }
+            else
+            {
+                Console.WriteLine($"[Item.Scoring] Wrong classtype: {item.ClassType}");
+                return null;
+            }
+            
             return new PoeToolTip(item);
         }
 

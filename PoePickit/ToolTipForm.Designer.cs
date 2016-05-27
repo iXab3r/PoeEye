@@ -3,7 +3,7 @@ using System.Windows.Forms;
 
 namespace PoePickit
 {
-    partial class TtForm
+    partial class ToolTipForm
     {
         /// <summary>
         /// Required designer variable.
@@ -57,9 +57,9 @@ namespace PoePickit
             // 
             // LabelLeft
             // 
-            this.LabelLeft.AutoSize = true;
+            //this.LabelLeft.AutoSize = true;
             this.LabelLeft.Location = new System.Drawing.Point(12, 9);
-            this.LabelLeft.Margin = new System.Windows.Forms.Padding(3, 0, 3, 9);
+            this.LabelLeft.Margin = new System.Windows.Forms.Padding(3, 3, 3, 3);
             this.LabelLeft.Name = "LabelLeft";
             this.LabelLeft.Size = new System.Drawing.Size(21, 13);
             this.LabelLeft.TabIndex = 3;
@@ -68,10 +68,10 @@ namespace PoePickit
             // 
             // LabelRight
             // 
-            this.LabelRight.AutoSize = true;
+            //this.LabelRight.AutoSize = true;
             this.LabelRight.BackColor = System.Drawing.Color.Transparent;
             this.LabelRight.Location = new System.Drawing.Point(94, 9);
-            this.LabelRight.Margin = new System.Windows.Forms.Padding(3, 0, 3, 9);
+            this.LabelRight.Margin = new System.Windows.Forms.Padding(3, 3, 3, 3);
             this.LabelRight.Name = "LabelRight";
             this.LabelRight.Size = new System.Drawing.Size(27, 13);
             this.LabelRight.TabIndex = 4;
@@ -80,9 +80,8 @@ namespace PoePickit
             // 
             // eventLog1
             // 
-            this.eventLog1.SynchronizingObject = this;
             // 
-            // TtForm
+            // ToolTipForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -93,7 +92,7 @@ namespace PoePickit
             this.Controls.Add(this.LabelRight);
             this.Controls.Add(this.LabelLeft);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
-            this.Name = "TtForm";
+            this.Name = "ToolTipForm";
             this.ShowInTaskbar = false;
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
@@ -106,11 +105,11 @@ namespace PoePickit
 
         #endregion
 
-    
+
 
         private Label LabelLeft;
         private Label LabelRight;
         private System.Diagnostics.EventLog eventLog1;
-        
+
     }
 }

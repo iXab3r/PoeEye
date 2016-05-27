@@ -24,6 +24,7 @@
 ^\+(?'valueFirst'\d+) Mana gained on Kill$
 ^\+(?'valueFirst'\d+) Mana Gained on Kill$
 ^\+(?'valueFirst'\d+) to All Attributes$	AllStat	IsAllStat
+^\+(?'valueFirst'\d+) to all Attributes$	AllStat	IsAllStat
 ^\+(?'valueFirst'\d+) to Dexterity$	Dex	IsDex
 ^\+(?'valueFirst'\d+) to Intelligence$	Int	IsInt
 ^\+(?'valueFirst'\d+) to Strength$	Str	IsStr

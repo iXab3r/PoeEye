@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using ClipboardMonitor;
 using Gma.System.MouseKeyHook;
+using Microsoft.VisualBasic;
+
 
 
 namespace PoePickit
@@ -16,7 +18,7 @@ namespace PoePickit
 
     public class Program
     {
-        private static TtForm toolTipForm;
+        private static ToolTipForm toolTipForm;
 
         private static Task uiTaskThread;
 
@@ -59,19 +61,26 @@ namespace PoePickit
 
         private static void InitializeForm()
         {
-            toolTipForm = new TtForm();
+            toolTipForm = new ToolTipForm();
             var monitor = new PoeItemMonitor();
             var uiContext = SynchronizationContext.Current;
             
             var globalHook = Hook.GlobalEvents();
 
-            globalHook.MouseMoveExt += OnMouseMove; 
             
+         
+
+
+            globalHook.MouseMoveExt += OnMouseMove;
+            //globalHook.KeyDown += OnKeyDown;
+            //globalHook.KeyPress += OnKeyPress;
+           // globalHook.KeyUp += GlobalHook_KeyUp;
+
             Observable
                 .FromEventPattern<KeyEventHandler, KeyEventArgs>(
                     h => globalHook.KeyUp += h,
                     h => globalHook.KeyUp -= h)
-                .Where(x => x.EventArgs.KeyData == (Keys.LControlKey | Keys.Control))
+                .Where(x => x.EventArgs.KeyData == (Keys.LWin | Keys.RWin))
                 .ObserveOn(uiContext)
                 .Subscribe(_ => toolTipForm.Initialize(null));
 
@@ -83,12 +92,43 @@ namespace PoePickit
             Application.Run(toolTipForm);
         }
 
+        private static void GlobalHook_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.KeyData == Keys.LWin)
+            {
+                
+                
+            }
+        }
+
+        private static void OnKeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar == (char)Keys.A)
+            {
+                
+                
+            }
+        }
+
+        
+        private static void OnKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyData == Keys.CapsLock)
+            {
+             
+                
+
+            }
+        }
+
+        
         private static void OnMouseMove(object sender, MouseEventExtArgs e)
         {
             if (!toolTipForm.Visible)
                 return;
 
-            if (Math.Pow(Cursor.Position.X - lastTooltipCoor.X, 2) + Math.Pow(Cursor.Position.Y - lastTooltipCoor.Y, 2) >Math.Pow(45, 2))
+            if (Math.Pow(Cursor.Position.X - lastTooltipCoor.X, 2) + Math.Pow(Cursor.Position.Y - lastTooltipCoor.Y, 2) >
+                Math.Pow(45, 2))
                 toolTipForm.Hide();
                 
         }
@@ -100,7 +140,9 @@ namespace PoePickit
                 return;
             }
             if ((itemData == lastItemTextdata) && toolTipForm.Visible)
+            {
                 return;
+            }
             var itemTooltip = itemParser.CreateTooltip(itemData);
             toolTipForm.Initialize(itemTooltip);
             lastTooltipCoor = Cursor.Position;

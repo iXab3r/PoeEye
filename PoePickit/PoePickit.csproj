@@ -34,6 +34,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Accessibility" />
+    <Reference Include="AutoHotkey.Interop">
+      <HintPath>packages\AutohotkeyDll\AutoHotkey.Interop.dll</HintPath>
+    </Reference>
     <Reference Include="ClipboardMonitor, Version=0.3.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\ClipboardMonitor.0.3\lib\net40\ClipboardMonitor.dll</HintPath>
       <Private>True</Private>
@@ -113,6 +116,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="HPTimer.cs" />
     <Compile Include="Parser\FilterSource.cs" />
     <Compile Include="Parser\AffixesSource.cs" />
     <Compile Include="Parser\BaseItemsSource.cs" />
@@ -123,6 +127,7 @@
     <Compile Include="Parser\AffixBracketSource.cs" />
     <Compile Include="Parser\PricerDataReader.cs" />
     <Compile Include="IPoePricer.cs" />
+    <Compile Include="Parser\UniqueAffixSource.cs" />
     <Compile Include="PoeItemMonitor.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="StaticData.cs" />
@@ -131,16 +136,19 @@
     <Compile Include="PoeToolTip.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="TtForm.cs">
+    <Compile Include="ToolTipForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="TtForm.Designer.cs">
-      <DependentUpon>TtForm.cs</DependentUpon>
+    <Compile Include="ToolTipForm.Designer.cs">
+      <DependentUpon>ToolTipForm.cs</DependentUpon>
     </Compile>
     <Compile Include="WindowTracker.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="functions.ahk">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -216,7 +224,10 @@
     <Content Include="Data\Bases\Weapon.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Data\Filter\Filters.txt">
+    <Content Include="Data\Filters.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\UniqueAffixes.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="PoePickit.ico">
@@ -224,8 +235,8 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="TtForm.resx">
-      <DependentUpon>TtForm.cs</DependentUpon>
+    <EmbeddedResource Include="ToolTipForm.resx">
+      <DependentUpon>ToolTipForm.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

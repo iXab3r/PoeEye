@@ -1,14 +1,15 @@
-    using System;
-    using System.ComponentModel;
-    using System.Reactive.Disposables;
-    using System.Reactive.Linq;
+    
+using System;
+using System.ComponentModel;
+using System.Reactive.Disposables;
+using System.Reactive.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
+using AutoHotkey.Interop;
 using Guards;
-    using JetBrains.Annotations;
-    using Microsoft.VisualBasic.Logging;
-    using ReactiveUI;
+using JetBrains.Annotations;
+using ReactiveUI;
 
 internal interface IWindowTracker
 {
@@ -38,8 +39,13 @@ internal sealed class WindowTracker : DisposableReactiveObject, IWindowTracker
 
     private bool isActive;
 
+    private AutoHotkeyEngine ahk;
+
     public WindowTracker([NotNull] Func<string> titleMatcherRegexFunc)
     {
+        ahk = new AutoHotkeyEngine();
+        ahk.Load("functions.ahk");
+
         this.titleMatcherRegexFunc = titleMatcherRegexFunc;
         Guard.ArgumentNotNull(() => titleMatcherRegexFunc);
 
@@ -53,7 +59,11 @@ internal sealed class WindowTracker : DisposableReactiveObject, IWindowTracker
     public bool IsActive
     {
         get { return isActive; }
-        private set { this.RaiseAndSetIfChanged(ref isActive, value); }
+        private set
+        {
+            ahk.SetVar("isActive", value.ToString());
+            this.RaiseAndSetIfChanged(ref isActive, value);
+        }
     }
 
     private void WindowActivated(IntPtr activeWindowHandle)

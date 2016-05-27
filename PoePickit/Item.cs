@@ -10,6 +10,7 @@ using System.Security.Policy;
 using System.Threading.Tasks;
 using System.Diagnostics;
 using System.Windows.Forms;
+using NHibernate.Param;
 using PoePickit.Parser;
 
 namespace PoePickit
@@ -19,15 +20,45 @@ namespace PoePickit
     using System.Text.RegularExpressions;
     using Extensions;
 
-    
+
+    public enum ItemClassType
+    {
+        Helm,
+        BodyArmour,
+        Gloves,
+        Boots,
+        Shield,
+        Belt,
+        Ring,
+        Amulet,
+        Dagger,
+        OneHandedSword,
+        OneHandedMace,
+        OneHandedAxe,
+        Wand,
+        Claw,
+        Sceptre,
+        TwoHandedSword,
+        TwoHandedMace,
+        TwoHandedAxe,
+        Bow,
+        Staff,
+        Quiver,
+        Map,
+        Jewel,
+        Talisman,
+        Rod,
+        Flask,
+        Unknown
+    };
 
 
     public class Item
     {
         public string Name;
         public string BaseType;
-        public string ClassType;
-        
+        public ItemClassType ClassType;
+
         public string GripType;
 
         public ItemRarityType ItemRarity;
@@ -37,20 +68,18 @@ namespace PoePickit
         public string Tt;
         public bool Success;
         public List<ToolTipTypes> TtTypes = new List<ToolTipTypes>() {ToolTipTypes.Unknown};
-    
+
         //ClassFlags
         public bool IsWeapon;
         public bool IsArmour;
-        public bool IsHelm;
-        public bool IsBodyArmour;
-        public bool IsGloves;
-        public bool IsBoots;
         public bool IsSpiritShield;
-        public bool IsBelt;
-        public bool IsRing;
-        public bool IsAmulet;
-        public bool IsQuiver;
+        public bool IsSceptre;
 
+        //unique affix text
+        public string UniqueTextLeft = "";
+        public string UniqueTextRight = "";
+        public string UniqueDescription = "";
+        public string UniqueText = "";
 
 
         //
@@ -76,11 +105,10 @@ namespace PoePickit
         public double APS;
         public double DPS;
         //phys
-        public double PDPS;
-        public double PAPS;
+        public double PDPS = 0;
+        public double PAPS = 0;
         public double PCrit;
         public double PCritDamage;
-        
 
 
         public double CraftPDPSLo;
@@ -137,7 +165,7 @@ namespace PoePickit
         public double Crit;
         public double TotalCrit;
         public double CritDamage;
-        
+
 
         //spell
         public double TotalCastSpeed;
@@ -221,8 +249,11 @@ namespace PoePickit
         //<<<<<<<<<<<<<<<<<<<<<<<<<<WEAPON STATS
 
         public double FlatElem;
-        public int TotalRes;
-        public int CraftTotalRes;
+        public double TotalRes;
+        public double CraftTotalRes;
+        public double CraftTotalResLo;
+        public string CraftTtTotalRes;
+        public string CraftTtTotalResPrice;
         //>>>>>>>>>>Armour stats
         public double AR;
         public double EV;
@@ -239,7 +270,6 @@ namespace PoePickit
         //<<<<<<<<<<<<Armour stats
 
         //comboflags 
-
 
 
         //ComboLocalArmourStunRecovery
@@ -421,11 +451,11 @@ namespace PoePickit
             WrongItem
         }
 
-     public enum ParseResult
+        public enum ParseResult
         {
             Success,
             Unidentified,
-            NotRare,
+            NotRareOrUnique,
             WrongDataText
         }
 
@@ -444,13 +474,19 @@ namespace PoePickit
             Uncertain
         };
 
+
+        public bool IsArgExist(string name)
+        {
+            return this.GetType().GetField(name) != null;
+        }
+
         public dynamic Get(string fieldName)
         {
             try
             {
                 return GetType().GetField(fieldName).GetValue(this);
             }
-            catch
+            catch (Exception)
             {
                 Console.WriteLine($"[Item.Get]Wrong arg:{fieldName}");
                 return -1;
@@ -509,7 +545,6 @@ namespace PoePickit
                 Console.WriteLine($"[Item.Set]Wrong fieldName: {fieldName}");
                 return false;
             }
-            
         }
 
         private bool ParseAffixLine(string line, AffixesSource affixes)
@@ -522,10 +557,9 @@ namespace PoePickit
                     for (var i = 0; i < affixLineSource.AffixLineArgs.Length; i++)
                     {
                         if (affixLineSource.AffixLineArgs[i] == "") continue;
-                        
+
                         if (affixLineSource.AffixLineArgs[i].StartsWith("Is"))
                         {
-                            
                             SetFlagValue(affixLineSource.AffixLineArgs[i], true);
                         }
                         else
@@ -541,7 +575,8 @@ namespace PoePickit
 
                             if (affixLineSource.ArgMods.Contains("2"))
                                 if (match.Groups["valueSecond"].Success)
-                                    SetNumericalValue(affixLineSource.AffixLineArgs[i],match.Groups["valueSecond"].Value);
+                                    SetNumericalValue(affixLineSource.AffixLineArgs[i],
+                                        match.Groups["valueSecond"].Value);
                                 else
                                 {
                                     Console.WriteLine(
@@ -558,9 +593,8 @@ namespace PoePickit
                                     return false;
                                 }
                         }
-
                     }
-                    
+
                     return true;
                 }
             }
@@ -593,7 +627,6 @@ namespace PoePickit
                         Suffixes++;
                         continue;
                     }
-
                 }
                 Console.WriteLine($"[Item.ParseAffixData] Unknown AffixLnie : {line}");
                 MessageBox.Show($"UnknownAffixLine: {line}");
@@ -609,17 +642,18 @@ namespace PoePickit
                     Console.WriteLine($"[Item.ParseAffixData] Unknown ImplicitAffixLine: {line}");
                 }
         }
-        
+
 
         public ParseResult ParseItemDataText(string itemDataText,
             IDictionary<AffixBracketType, AffixBracketsSource> affixBrackets,
-            IDictionary<BaseItemTypes, BaseItemsSource> baseItems, IDictionary<AffixTypes, AffixesSource> knownAffixes, IDictionary<ParseRegEx,Regex> knownRegexes)
+            IDictionary<BaseItemTypes, BaseItemsSource> baseItems, IDictionary<AffixTypes, AffixesSource> knownAffixes,
+            IDictionary<ParseRegEx, Regex> knownRegexes, UniqueAffixSource knownUniques)
         {
             //seperate DataText for blocks via splitting with char "`"
-            
+
 
             var itemDataParts = itemDataText.Replace("\r\n--------\r\n", "`").Split('`');
-            
+
             var lastPartIndex = itemDataParts.Length - 1;
 
 
@@ -628,8 +662,9 @@ namespace PoePickit
 
             if (ItemRarity == ItemRarityType.WrongItem)
                 return ParseResult.WrongDataText;
-            if (ItemRarity != ItemRarityType.Rare)
-                return ParseResult.NotRare;
+
+            if ((ItemRarity != ItemRarityType.Rare) && (ItemRarity != ItemRarityType.Unique))
+                return ParseResult.NotRareOrUnique;
 
 
             //check Identify
@@ -641,37 +676,58 @@ namespace PoePickit
 
             //parsing item level
             ParseItemLevel(itemDataParts);
-            
+
             //check TradingNote,Effects, MTX etc.
             ParseEffects(itemDataParts, ref lastPartIndex, knownRegexes);
-            
+
             //get Name,BaseType from first DataTextBlock
+            itemDataParts[0] = itemDataParts[0].Replace("<<set:MS>><<set:M>><<set:S>>", "");
             var nameDataPart = itemDataParts[0].Replace("\r\n", "`").Split('`');
+            
+            
             Name = nameDataPart[1];
             BaseType = nameDataPart[2];
             var firstDataStatLine = itemDataParts[1].Replace("\r\n", "`").Split('`')[0];
-            
+
             //parse ClassType
             ParseItemClassType(firstDataStatLine, baseItems, knownRegexes);
-            
+
             //parse text for Links
             Links = ParseLinks(itemDataParts, knownRegexes);
-            
+
+
             //assign affix parts
+            if (ClassType == ItemClassType.Flask)
+            {
+                lastPartIndex--;
+            }
             ItemAffixData = itemDataParts[lastPartIndex].Replace("\r\n", "`").Split('`');
 
-            if (ClassType == "Belt" || ClassType == "Amulet" || ClassType == "Ring" || ClassType == "Quiver")
+            if (ClassType == ItemClassType.Belt || ClassType == ItemClassType.Amulet || ClassType == ItemClassType.Ring ||
+                ClassType == ItemClassType.Quiver )
             {
                 ItemImplicitData = itemDataParts[lastPartIndex - 1].Replace("\r\n", "`").Split('`');
             }
-            else if ((ClassType == "BodyArmour" || ClassType == "Helm" || ClassType == "Shields" || ClassType == "Gloves" ||
-                      ClassType == "Boots" || IsWeapon) && (lastPartIndex == 6))
+            else if ((ClassType == ItemClassType.BodyArmour || ClassType == ItemClassType.Helm ||
+                      ClassType == ItemClassType.Shield || ClassType == ItemClassType.Gloves ||
+                      ClassType == ItemClassType.Boots || IsWeapon) && (lastPartIndex == 6))
             {
                 ItemImplicitData = itemDataParts[lastPartIndex - 1].Replace("\r\n", "`").Split('`');
+            }
+            
+
+
+            if (ItemRarity == ItemRarityType.Unique)
+            {
+                ParseUniqueAffixData(knownUniques, knownRegexes);
+                goto endofparse;
+            }
+            else
+            {
+                ParseAffixData(knownAffixes);
             }
 
-            ParseAffixData(knownAffixes);
-            
+
             //обязательно до парсинга имплисит мода
             SolveSpellDamageManaAffixes(affixBrackets);
             SolveItemRarityAffixes(affixBrackets);
@@ -682,21 +738,100 @@ namespace PoePickit
 
             //calculations
             DuCalcsMich();
-          
-            
-            
+
+
             //Console.WriteLine($"FreePrefixes: {3-Prefixes} FreeSuffixes: {3-Suffixes} UnsolvedAffixes: {Affixes}");
+            endofparse:
             return ParseResult.Success;
         }
 
+        public void ParseUniqueAffixData(UniqueAffixSource knownUniques, IDictionary<ParseRegEx, Regex> knownRegexes)
+        {
+            var uniqueItem = knownUniques.GetUnique(Name, ClassType);
 
-        //^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-        //^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-        //^^^               END OF PARSING ITEM DATA                ^^^
-        //^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-        //^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            UniqueDescription = uniqueItem.Desc;
+            if (ItemImplicitData != null)
+                foreach (var line in ItemImplicitData)
+                {
+                    if (line == "")
+                        continue;
+                    ParseUniqueAffix(line, uniqueItem.Affixes, knownRegexes, true);
+                }
+            if (ItemAffixData != null)
+                foreach (var line in ItemAffixData)
+                {
+                    if (line == "")
+                        continue;
+                    ParseUniqueAffix(line, uniqueItem.Affixes, knownRegexes, false);
+                }
+        }
 
-        public void ParseEffects(string[] itemDataParts, ref int lastPartIndex, IDictionary<ParseRegEx,Regex> knownRegexes )
+
+        public bool ParseUniqueAffix(string line, List<UniqueAffix> affixes, IDictionary<ParseRegEx, Regex> knownRegexes,
+            bool isImplicit)
+        {
+            if (affixes == null)
+                return false;
+            foreach (var affix in affixes)
+            {
+                if (!isImplicit.Equals(affix.IsImplicit))
+                    continue;
+                foreach (var word in affix.WordsInLine)
+                    if (!line.ToLower().Contains(word.ToLower()))
+                        goto skipknownaffixline;
+
+                Regex parseRegex;
+                //    ParseRegEx.RegexUniqueValue, new Regex(@"(\+|^| )(?'value'[0-9\.,]+)(%| )", RegexOptions.Compiled)
+                //    ParseRegEx.RegexUniqueValueDouble, new Regex(@"(\+|^| )(?'valueLo'[0-9\.,]+)-(?'valueHi'[0-9\.,]+)(%| )", RegexOptions.Compiled)
+                string left, right;
+                if (affix.IsDoubleAffix)
+                {
+                    knownRegexes.TryGetValue(ParseRegEx.RegexUniqueValueDouble, out parseRegex);
+                    var match = parseRegex.Match(line);
+
+                    //calc how good is roll
+                    var loMath = (affix.HighValue - affix.LoValue) == 0
+                        ? 1
+                        : (match.Groups["valueLo"].Value.ToInt() - affix.LoValue)/(affix.HighValue - affix.LoValue);
+
+                    var hiMath = (match.Groups["valueHi"].Value.ToInt() - affix.LowValueSecond)/
+                                 (affix.HighValueSecond - affix.LowValueSecond);
+
+                    var percent = Math.Round((loMath + hiMath)/2, 2)*100 + "%";
+
+                    left = affix.RawLine;
+                    right = match.Groups["valueLo"].Value + "-" + match.Groups["valueHi"].Value + " (" + affix.LoValue +
+                            "-" + affix.HighValue + ")" + "(" +
+                            affix.LowValueSecond + "-" + affix.HighValueSecond + ")  " + percent;
+                }
+                else
+                {
+                    knownRegexes.TryGetValue(ParseRegEx.RegexUniqueValue, out parseRegex);
+                    var match = parseRegex.Match(line);
+
+                    //calc how good is roll
+                    var value = 0d;
+                    double.TryParse(match.Groups["value"].Value, out value);
+
+                    var percent =
+                        Math.Round((value - affix.LoValue)/(affix.HighValue - affix.LoValue), 2)*100 + "%";
+                    left = affix.RawLine;
+                    right = match.Groups["value"].Value + "(" + affix.LoValue + "-" + affix.HighValue + ")  " + percent;
+                }
+                
+                UniqueTextLeft = UniqueTextLeft + (UniqueTextLeft != "" ? "\n" : "") + left;
+                UniqueTextRight = UniqueTextRight + (UniqueTextRight != "" ? "\n" : "") + right;
+                UniqueText = UniqueText + "\n" + left.PadRight(30) + right.PadLeft(30);
+                return true;
+
+                skipknownaffixline:
+                ;
+            }
+            return false;
+        }
+
+        public void ParseEffects(string[] itemDataParts, ref int lastPartIndex,
+            IDictionary<ParseRegEx, Regex> knownRegexes)
         {
             if (itemDataParts[lastPartIndex].Contains("Note:"))
             {
@@ -709,11 +844,13 @@ namespace PoePickit
             }
 
             //check MTX effect
+
             if (itemDataParts[lastPartIndex].Contains("Has"))
             {
                 IsHasMTXEffect = true;
                 lastPartIndex--;
             }
+
 
             //check mirror effect
             if (itemDataParts[lastPartIndex].Contains("Mirrored"))
@@ -728,7 +865,10 @@ namespace PoePickit
                 IsCorrupted = true;
                 lastPartIndex--;
             }
-            
+
+            //check unique description
+            if (ItemRarity == ItemRarityType.Unique)
+                lastPartIndex--;
         }
 
         public ItemRarityType ParseItemRarity(string itemDataPart, IDictionary<ParseRegEx, Regex> knownRegexes)
@@ -763,10 +903,13 @@ namespace PoePickit
 
         private void ParseItemLevel(string[] itemDataText)
         {
-            iLevel = (from line in itemDataText where line.StartsWith("Item Level:") select line.Replace("Item Level: ", "").ToInt()).FirstOrDefault();
+            iLevel =
+                (from line in itemDataText
+                    where line.StartsWith("Item Level:")
+                    select line.Replace("Item Level: ", "").ToInt()).FirstOrDefault();
         }
 
-        private int ParseLinks(string[] itemDataText, IDictionary<ParseRegEx,Regex> knownRegexes)
+        private int ParseLinks(string[] itemDataText, IDictionary<ParseRegEx, Regex> knownRegexes)
         {
             if ((!IsWeapon) && (!IsArmour)) return 0;
             foreach (var line in itemDataText)
@@ -792,9 +935,15 @@ namespace PoePickit
             return 0;
         }
 
-        private bool ParseItemClassType(string firstDataStatLine, IDictionary<BaseItemTypes, BaseItemsSource> baseItems, IDictionary<ParseRegEx, Regex> knownRegexes)
+        private bool ParseItemClassType(string firstDataStatLine, IDictionary<BaseItemTypes, BaseItemsSource> baseItems,
+            IDictionary<ParseRegEx, Regex> knownRegexes)
         {
             Regex parseRegex;
+            if (BaseType.Contains("Flask"))
+            {
+                ClassType = ItemClassType.Flask;
+                return true;
+            }
             if (!firstDataStatLine.Contains(":"))
             {
                 knownRegexes.TryGetValue(ParseRegEx.Regex1HWeaponClassLine, out parseRegex);
@@ -802,6 +951,7 @@ namespace PoePickit
 
                 if (match.Success)
                 {
+                    Enum.TryParse(match.Groups["weaponClass"].Value.Replace(" ", ""), out ClassType);
                     baseItems[BaseItemTypes.Weapon].SetWeaponsBaseProperties(BaseType, out BaseDamageLo,
                         out BaseDamageHi, out BaseCC, out BaseAPS);
                     GripType = "1h";
@@ -809,64 +959,62 @@ namespace PoePickit
                     if ((match.Groups["weaponClass"].Value == "Sekhem") ||
                         (match.Groups["weaponClass"].Value == "Fetish") ||
                         (match.Groups["weaponClass"].Value == "Sceptre"))
-                        ClassType = "Sceptre";
-                    else
-                        ClassType = match.Groups["weaponClass"].Value;
+                    {
+                        ClassType = ItemClassType.Sceptre;
+                        IsSceptre = true;
+                    }
                     return true;
                 }
 
-                
+
                 knownRegexes.TryGetValue(ParseRegEx.Regex2HWeaponClassLine, out parseRegex);
                 match = parseRegex.Match(firstDataStatLine);
 
                 if (match.Success)
                 {
+                    Enum.TryParse(match.Groups["weaponClass"].Value.Replace(" ", ""), out ClassType);
                     baseItems[BaseItemTypes.Weapon].SetWeaponsBaseProperties(BaseType, out BaseDamageLo,
                         out BaseDamageHi, out BaseCC, out BaseAPS);
                     GripType = "2h";
                     IsWeapon = true;
-                    ClassType = match.Groups["weaponClass"].Value;
                     return true;
                 }
                 Console.WriteLine(
-                    $"[Item.ParseItemClassType] Unknown WeaponType - BaseTypeNmae : {BaseType}  FirstStatLine: {firstDataStatLine}");
+                    $"[Item.ParseItemClassType] Unknown WeaponType - BaseTypeName : {BaseType}  FirstStatLine: {firstDataStatLine}");
                 return false;
             }
 
             if (firstDataStatLine.Contains("Map"))
             {
-                ClassType = "Map";
+                ClassType = ItemClassType.Map;
                 return true;
             }
             if (BaseType.Contains("Quiver"))
             {
-                IsQuiver = true;
-                ClassType = "Quiver";
+                ClassType = ItemClassType.Quiver;
                 return true;
             }
             if (BaseType.Contains("Jewel"))
             {
-                ClassType = "Jewel";
+                ClassType = ItemClassType.Jewel;
                 return true;
             }
             if (BaseType.Contains("Amulet"))
             {
-                IsAmulet = true;
-                ClassType = "Amulet";
+                ClassType = ItemClassType.Amulet;
                 return true;
             }
             if (BaseType.Contains("Talisman"))
             {
-                ClassType = "Talisman";
+                ClassType = ItemClassType.Talisman;
                 return true;
             }
 
             knownRegexes.TryGetValue(ParseRegEx.RegexRingClassLine, out parseRegex);
-            
+
             if (parseRegex.Match(BaseType).Success)
             {
-                IsRing = true;
-                ClassType = "Ring";
+                ClassType = ItemClassType.Ring;
                 return true;
             }
 
@@ -874,17 +1022,16 @@ namespace PoePickit
 
             if (parseRegex.Match(BaseType).Success)
             {
-                IsBelt = true;
-                ClassType = "Belt";
+                ClassType = ItemClassType.Belt;
                 return true;
             }
 
             knownRegexes.TryGetValue(ParseRegEx.RegexShieldClassLine, out parseRegex);
-            
+
 
             if (parseRegex.Match(BaseType).Success)
             {
-                ClassType = "Shield";
+                ClassType = ItemClassType.Shield;
                 IsArmour = true;
                 IsSpiritShield = true;
                 baseItems[BaseItemTypes.Shields].SetArmourBaseProperties(BaseType, out BaseAR, out BaseEV, out BaseES);
@@ -892,41 +1039,37 @@ namespace PoePickit
             }
 
             knownRegexes.TryGetValue(ParseRegEx.RegexBootsClassLine, out parseRegex);
-            
+
             if (parseRegex.Match(BaseType).Success)
             {
-                ClassType = "Boots";
-                IsBoots = true;
+                ClassType = ItemClassType.Boots;
                 IsArmour = true;
                 baseItems[BaseItemTypes.Boots].SetArmourBaseProperties(BaseType, out BaseAR, out BaseEV, out BaseES);
                 return true;
             }
 
             knownRegexes.TryGetValue(ParseRegEx.RegexHelmClassLine, out parseRegex);
-            
+
             if (parseRegex.Match(BaseType).Success)
             {
                 baseItems[BaseItemTypes.Helmets].SetArmourBaseProperties(BaseType, out BaseAR, out BaseEV, out BaseES);
-                ClassType = "Helm";
+                ClassType = ItemClassType.Helm;
                 IsArmour = true;
-                IsHelm = true;
                 return true;
             }
             knownRegexes.TryGetValue(ParseRegEx.RegexGlovesClassLine, out parseRegex);
-            
+
             if (parseRegex.Match(BaseType).Success)
             {
-                ClassType = "Gloves";
+                ClassType = ItemClassType.Gloves;
                 IsArmour = true;
-                IsGloves = true;
                 baseItems[BaseItemTypes.Gloves].SetArmourBaseProperties(BaseType, out BaseAR, out BaseEV, out BaseES);
                 return true;
             }
 
             if (baseItems[BaseItemTypes.BodyArmour].SetArmourBaseProperties(BaseType, out BaseAR, out BaseEV, out BaseES))
             {
-                ClassType = "BodyArmour";
-                IsBodyArmour = true;
+                ClassType = ItemClassType.BodyArmour;
                 IsArmour = true;
                 return true;
             }
@@ -936,7 +1079,7 @@ namespace PoePickit
             return false;
         }
 
-       
+
         private bool CalcCraftPhysDPS()
         {
             if (!IsWeapon) return false;
@@ -987,7 +1130,8 @@ namespace PoePickit
                 goto skipcrafts;
             }
 
-            if (((IsLocalPhysAff == AffixSolution.Negative) || (IsLocalPhysAff == AffixSolution.Uncertain)) && (Prefixes < 3))
+            if (((IsLocalPhysAff == AffixSolution.Negative) || (IsLocalPhysAff == AffixSolution.Uncertain)) &&
+                (Prefixes < 3))
             {
                 tCraftPhysDamageLo = 60;
                 tCraftPhysDamageHi = 79;
@@ -1000,7 +1144,7 @@ namespace PoePickit
             {
                 switch (ClassType)
                 {
-                    case "Bow":
+                    case ItemClassType.Bow:
                         tCraftIasLo = 7;
                         tCraftIasHi = 12;
                         break;
@@ -1033,30 +1177,28 @@ namespace PoePickit
 
             skipcrafts:
 
-            CraftPAPSLo = Math.Round(BaseAPS * (100 + tCraftIasLo) / 100, 2);
-            CraftPAPS = Math.Round(BaseAPS * (100 + tCraftIasHi) / 100, 2);
+            CraftPAPSLo = Math.Round(BaseAPS*(100 + tCraftIasLo)/100, 2);
+            CraftPAPS = Math.Round(BaseAPS*(100 + tCraftIasHi)/100, 2);
             CraftPDPSLo =
-                Math.Round((double)(BaseDamageLo / 2 + BaseDamageHi / 2 + FlatPhys + tCraftFlatPhysDamageLo) *
-                           (120 + LocalPhys + tCraftPhysDamageLo) / 100 * CraftPAPSLo, 1);
+                Math.Round((double) (BaseDamageLo/2 + BaseDamageHi/2 + FlatPhys + tCraftFlatPhysDamageLo)*
+                           (120 + LocalPhys + tCraftPhysDamageLo)/100*CraftPAPSLo, 1);
             CraftPDPS =
-                Math.Round((double)(BaseDamageLo / 2 + BaseDamageHi / 2 + FlatPhys + tCraftFlatPhysDamageHi) *
-                           (120 + LocalPhys + tCraftPhysDamageHi) / 100 * CraftPAPS, 1);
-            
-            CraftPCritLo = Math.Round(BaseCC * (100 + ImplicitCrit + tCraftCritLo) / 100, 1);
-            CraftPCrit = Math.Round(BaseCC * (100 + ImplicitCrit + tCraftCritHi) / 100, 1);
-            CraftPCritDamageLo = (AffixCritDamage + ImplicitCritDamage +  tCraftCritDamageLo);
+                Math.Round((double) (BaseDamageLo/2 + BaseDamageHi/2 + FlatPhys + tCraftFlatPhysDamageHi)*
+                           (120 + LocalPhys + tCraftPhysDamageHi)/100*CraftPAPS, 1);
+
+            CraftPCritLo = Math.Round(BaseCC*(100 + ImplicitCrit + tCraftCritLo)/100, 1);
+            CraftPCrit = Math.Round(BaseCC*(100 + ImplicitCrit + tCraftCritHi)/100, 1);
+            CraftPCritDamageLo = (AffixCritDamage + ImplicitCritDamage + tCraftCritDamageLo);
             CraftPCritDamage = (AffixCritDamage + ImplicitCritDamage + tCraftCritDamageHi);
             CraftTtPDPS = tTTcraft;
             CraftTtPDPSPrice = tTTcraftPrice;
 
             return true;
-
         }
 
 
         private bool CalcMultiPhysDPS()
         {
-            
             if (!IsWeapon) return false;
 
             MultiPAPSLo = CraftPAPSLo;
@@ -1071,7 +1213,7 @@ namespace PoePickit
             MultiTtPDPSPrice = CraftTtPDPSPrice;
 
             if (Suffixes > 2) return false;
-           
+
 
             var tMultiPhysDamageLo = 0;
             var tMultiPhysDamageHi = 0;
@@ -1087,7 +1229,6 @@ namespace PoePickit
             var tSuffixes = Suffixes;
             var tTTmulti = "";
             var tTTmultiPrice = "";
-
 
 
             if ((IAS < 10) && (AffixCritDamage < 20) && (AffixCrit < 20))
@@ -1112,7 +1253,6 @@ namespace PoePickit
                         tMultiFlatPhysDamageLo = 40/2;
                         tMultiFlatPhysDamageHi = 49/2;
                         break;
-                        
                 }
                 tTTmultiPrice += "[2chaos]";
                 tTTmulti += "[FlatPhys]";
@@ -1131,7 +1271,7 @@ namespace PoePickit
             {
                 switch (ClassType)
                 {
-                    case "Bow":
+                    case ItemClassType.Bow:
                         tMultiIasLo = 7;
                         tMultiIasHi = 12;
                         break;
@@ -1143,30 +1283,29 @@ namespace PoePickit
                 tSuffixes++;
                 tTTmulti += "[IAS]";
                 tTTmultiPrice += "[4chaos]";
-
             }
 
             if (!IsAffixCrit && (tSuffixes < 3))
             {
-                    tMultiCritLo = 22;
-                    tMultiCritHi = 27;
-                    tTTmulti += "[CritChance]";
-                    tTTmultiPrice += "[4alch]";
-                    tSuffixes++;
+                tMultiCritLo = 22;
+                tMultiCritHi = 27;
+                tTTmulti += "[CritChance]";
+                tTTmultiPrice += "[4alch]";
+                tSuffixes++;
             }
 
             if (!IsAffixCritDamage && (tSuffixes < 3))
             {
-                    tMultiCritDamageLo = 22;
-                    tMultiCritDamageHi = 27;
-                    tTTmulti += "[CritMultiplier]";
-                    tTTmultiPrice += "[4alch]";
+                tMultiCritDamageLo = 22;
+                tMultiCritDamageHi = 27;
+                tTTmulti += "[CritMultiplier]";
+                tTTmultiPrice += "[4alch]";
             }
 
             if (tTTmulti == "[MultiMod]")
                 return true;
-            MultiPAPSLo = Math.Round(BaseAPS * (100 + tMultiIasLo) / 100,2);
-            MultiPAPS = Math.Round(BaseAPS * (100 + tMultiIasHi) / 100,2);
+            MultiPAPSLo = Math.Round(BaseAPS*(100 + tMultiIasLo)/100, 2);
+            MultiPAPS = Math.Round(BaseAPS*(100 + tMultiIasHi)/100, 2);
             MultiPDPSLo =
                 Math.Round((double) (BaseDamageLo/2 + BaseDamageHi/2 + FlatPhys + tMultiFlatPhysDamageLo)*
                            (120 + LocalPhys + tMultiPhysDamageLo)/100*MultiPAPSLo, 1);
@@ -1175,9 +1314,9 @@ namespace PoePickit
                            (120 + LocalPhys + tMultiPhysDamageHi)/100*MultiPAPS, 1);
 
 
-            MultiPCritLo = Math.Round(BaseCC * (100 + ImplicitCrit + tMultiCritLo) / 100, 1);
-            MultiPCrit = Math.Round(BaseCC * (100 + ImplicitCrit + tMultiCritHi) / 100, 1);
-            MultiPCritDamageLo = (AffixCritDamage+ ImplicitCritDamage + tMultiCritDamageLo);
+            MultiPCritLo = Math.Round(BaseCC*(100 + ImplicitCrit + tMultiCritLo)/100, 1);
+            MultiPCrit = Math.Round(BaseCC*(100 + ImplicitCrit + tMultiCritHi)/100, 1);
+            MultiPCritDamageLo = (AffixCritDamage + ImplicitCritDamage + tMultiCritDamageLo);
             MultiPCritDamage = (AffixCritDamage + ImplicitCritDamage + tMultiCritDamageHi);
             MultiTtPDPS = tTTmulti;
             MultiTtPDPSPrice = tTTmultiPrice;
@@ -1202,7 +1341,7 @@ namespace PoePickit
 
 
             if ((Prefixes > 2) && (Suffixes > 2)) return false;
-            
+
             var tCraftFlatElemDamageLo = 0d;
             var tCraftFlatElemDamageHi = 0d;
             var tCraftIasLo = 0;
@@ -1219,7 +1358,6 @@ namespace PoePickit
             {
                 switch (GripType)
                 {
-                   
                     case "1h":
                         tCraftFlatElemDamageLo += 25.5d;
                         tCraftFlatElemDamageHi += 28d;
@@ -1227,7 +1365,7 @@ namespace PoePickit
                     default:
                         switch (ClassType)
                         {
-                            case "Bow":
+                            case ItemClassType.Bow:
                                 tCraftFlatElemDamageLo += 25.5d;
                                 tCraftFlatElemDamageHi += 28d;
                                 break;
@@ -1248,7 +1386,6 @@ namespace PoePickit
             {
                 switch (GripType)
                 {
-
                     case "1h":
                         tCraftFlatElemDamageLo += 22d;
                         tCraftFlatElemDamageHi += 26.5d;
@@ -1256,7 +1393,7 @@ namespace PoePickit
                     default:
                         switch (ClassType)
                         {
-                            case "Bow":
+                            case ItemClassType.Bow:
                                 tCraftFlatElemDamageLo += 22d;
                                 tCraftFlatElemDamageHi += 26.5d;
                                 break;
@@ -1277,7 +1414,6 @@ namespace PoePickit
             {
                 switch (GripType)
                 {
-
                     case "1h":
                         tCraftFlatElemDamageLo += 17.5d;
                         tCraftFlatElemDamageHi += 22d;
@@ -1285,7 +1421,7 @@ namespace PoePickit
                     default:
                         switch (ClassType)
                         {
-                            case "Bow":
+                            case ItemClassType.Bow:
                                 tCraftFlatElemDamageLo += 17.5d;
                                 tCraftFlatElemDamageHi += 22d;
                                 break;
@@ -1303,12 +1439,11 @@ namespace PoePickit
             }
 
 
-
             if (!IsIAS && (Suffixes < 3))
             {
                 switch (ClassType)
                 {
-                    case "Bow":
+                    case ItemClassType.Bow:
                         tCraftIasLo = 7;
                         tCraftIasHi = 12;
                         break;
@@ -1341,12 +1476,12 @@ namespace PoePickit
 
             skipelemcrafts:
 
-            CraftEAPSLo = Math.Round(BaseAPS * (100 + IAS + tCraftIasLo) / 100, 2);
-            CraftEAPS = Math.Round(BaseAPS * (100 + IAS + tCraftIasHi) / 100, 2);
-            CraftEDPSLo = Math.Round((FlatElem + tCraftFlatElemDamageLo) * CraftEAPSLo, 1);
-            CraftEDPS = Math.Round((FlatElem + tCraftFlatElemDamageHi) * CraftEAPS, 1);
-            CraftECritLo = Math.Round(BaseCC * (100 + ImplicitCrit + tCraftCritLo) / 100, 1);
-            CraftECrit = Math.Round(BaseCC * (100 + ImplicitCrit + tCraftCritHi) / 100, 1);
+            CraftEAPSLo = Math.Round(BaseAPS*(100 + IAS + tCraftIasLo)/100, 2);
+            CraftEAPS = Math.Round(BaseAPS*(100 + IAS + tCraftIasHi)/100, 2);
+            CraftEDPSLo = Math.Round((FlatElem + tCraftFlatElemDamageLo)*CraftEAPSLo, 1);
+            CraftEDPS = Math.Round((FlatElem + tCraftFlatElemDamageHi)*CraftEAPS, 1);
+            CraftECritLo = Math.Round(BaseCC*(100 + ImplicitCrit + tCraftCritLo)/100, 1);
+            CraftECrit = Math.Round(BaseCC*(100 + ImplicitCrit + tCraftCritHi)/100, 1);
             CraftECritDamageLo = (AffixCritDamage + tCraftCritDamageLo);
             CraftECritDamage = (AffixCritDamage + tCraftCritDamageHi);
 
@@ -1373,7 +1508,7 @@ namespace PoePickit
 
             if (Suffixes > 2) return false;
 
-            
+
             var tMultiFlatElemDamageLo = 0d;
             var tMultiFlatElemDamageHi = 0d;
             var tMultiIasLo = 0;
@@ -1388,7 +1523,7 @@ namespace PoePickit
             var tTTMultiPrice = "";
 
 
-            if (( IAS < 10) && (AffixCritDamage < 20) && (AffixCrit < 20))
+            if ((IAS < 10) && (AffixCritDamage < 20) && (AffixCrit < 20))
             {
                 tTTMulti += "[ClearSuffixes]";
                 tTTMultiPrice += "[2exa][Scouring]";
@@ -1403,7 +1538,6 @@ namespace PoePickit
             {
                 switch (GripType)
                 {
-
                     case "1h":
                         tMultiFlatElemDamageLo += 25.5d;
                         tMultiFlatElemDamageHi += 28d;
@@ -1411,7 +1545,7 @@ namespace PoePickit
                     default:
                         switch (ClassType)
                         {
-                            case "Bow":
+                            case ItemClassType.Bow:
                                 tMultiFlatElemDamageLo += 25.5d;
                                 tMultiFlatElemDamageHi += 28d;
                                 break;
@@ -1426,14 +1560,12 @@ namespace PoePickit
                 tTTMulti += "[FlatLightning]";
                 tTTMultiPrice += "[2chaos]";
                 tPrefixes++;
-
             }
 
             if (!IsFlatFire && (tPrefixes < 3))
             {
                 switch (GripType)
                 {
-
                     case "1h":
                         tMultiFlatElemDamageLo += 22d;
                         tMultiFlatElemDamageHi += 26.5d;
@@ -1441,7 +1573,7 @@ namespace PoePickit
                     default:
                         switch (ClassType)
                         {
-                            case "Bow":
+                            case ItemClassType.Bow:
                                 tMultiFlatElemDamageLo += 22d;
                                 tMultiFlatElemDamageHi += 26.5d;
                                 break;
@@ -1456,14 +1588,12 @@ namespace PoePickit
                 tTTMulti += "[FlatFire]";
                 tTTMultiPrice += "[2chaos]";
                 tPrefixes++;
-
             }
 
             if (!IsFlatCold && (tPrefixes < 3))
             {
                 switch (GripType)
                 {
-
                     case "1h":
                         tMultiFlatElemDamageLo += 17.5d;
                         tMultiFlatElemDamageHi += 22d;
@@ -1471,7 +1601,7 @@ namespace PoePickit
                     default:
                         switch (ClassType)
                         {
-                            case "Bow":
+                            case ItemClassType.Bow:
                                 tMultiFlatElemDamageLo += 17.5d;
                                 tMultiFlatElemDamageHi += 22d;
                                 break;
@@ -1485,17 +1615,14 @@ namespace PoePickit
 
                 tTTMulti += "[FlatCold]";
                 tTTMultiPrice += "[2chaos]";
-                
-                
             }
-
 
 
             if (!IsIAS && (tSuffixes < 3))
             {
                 switch (ClassType)
                 {
-                    case "Bow":
+                    case ItemClassType.Bow:
                         tMultiIasLo = 7;
                         tMultiIasHi = 12;
                         break;
@@ -1508,7 +1635,6 @@ namespace PoePickit
                 tTTMulti += "[IAS]";
                 tTTMultiPrice += "[4chaos]";
                 tSuffixes++;
-
             }
 
             if (!IsAffixCrit && (tSuffixes < 3))
@@ -1519,7 +1645,6 @@ namespace PoePickit
                 tTTMulti += "[CritChance]";
                 tTTMultiPrice += "[4alch]";
                 tSuffixes++;
-
             }
 
             if (!IsAffixCritDamage && (tSuffixes < 3))
@@ -1532,12 +1657,12 @@ namespace PoePickit
 
             if (tTTMulti == "[MultiMod]")
                 return true;
-            MultiEAPSLo = Math.Round(BaseAPS * (100 + IAS + tMultiIasLo) / 100, 2);
-            MultiEAPS = Math.Round(BaseAPS * (100 + IAS + tMultiIasHi) / 100, 2);
-            MultiEDPSLo = Math.Round((FlatElem + tMultiFlatElemDamageLo) * MultiEAPSLo, 1);
-            MultiEDPS = Math.Round((FlatElem + tMultiFlatElemDamageHi) * MultiEAPS, 1);
-            MultiECritLo = Math.Round(BaseCC * (100 + ImplicitCrit + tMultiCritLo) / 100, 1);
-            MultiECrit = Math.Round(BaseCC * (100 + ImplicitCrit + tMultiCritHi) / 100, 1);
+            MultiEAPSLo = Math.Round(BaseAPS*(100 + IAS + tMultiIasLo)/100, 2);
+            MultiEAPS = Math.Round(BaseAPS*(100 + IAS + tMultiIasHi)/100, 2);
+            MultiEDPSLo = Math.Round((FlatElem + tMultiFlatElemDamageLo)*MultiEAPSLo, 1);
+            MultiEDPS = Math.Round((FlatElem + tMultiFlatElemDamageHi)*MultiEAPS, 1);
+            MultiECritLo = Math.Round(BaseCC*(100 + ImplicitCrit + tMultiCritLo)/100, 1);
+            MultiECrit = Math.Round(BaseCC*(100 + ImplicitCrit + tMultiCritHi)/100, 1);
             MultiECritDamageLo = (AffixCritDamage + tMultiCritDamageLo);
             MultiECritDamage = (AffixCritDamage + tMultiCritDamageHi);
 
@@ -1549,7 +1674,8 @@ namespace PoePickit
 
         private bool CalcCraftSpellDamage()
         {
-            if ((ClassType != "Wand") && (ClassType != "Staff") && (ClassType != "Sceptre") && (ClassType != "Dagger") && !IsSpiritShield) return false;
+            if ((ClassType != ItemClassType.Wand) && (ClassType != ItemClassType.Staff) && (!IsSceptre) &&
+                (ClassType != ItemClassType.Dagger) && !IsSpiritShield) return false;
 
             CraftSPDLo = 0;
             CraftSPD = SPD;
@@ -1607,7 +1733,7 @@ namespace PoePickit
                 tTTcraftPrice = "[4Chaos]";
                 goto skipspellcraft;
             }
-            
+
             if (!IsFlatColdSPD && !IsFlatLightningSPD && !IsFlatFireSPD && (Prefixes < 3))
             {
                 switch (GripType)
@@ -1626,7 +1752,7 @@ namespace PoePickit
                 goto skipspellcraft;
             }
 
-            if (!IsCastSpeed && (Suffixes < 3) && (ClassType != "Dagger"))
+            if (!IsCastSpeed && (Suffixes < 3) && (ClassType != ItemClassType.Dagger))
             {
                 tCraftCastSpeedLo = 9;
                 tCraftCastSpeed = 11;
@@ -1667,11 +1793,11 @@ namespace PoePickit
             CraftSPD = SPD + tCraftSpellDamage;
             CraftLocalElemDamageLo = tCraftLocalElemDamageLo + ImplicitLocalElemDamage;
             CraftLocalElemDamage = tCraftLocalElemDamage + ImplicitLocalElemDamage;
-            CraftTotalSPDLo = SPD +  LocalElemDamage + tCraftSpellDamageLo + tCraftLocalElemDamageLo;
-            CraftTotalSPD = SPD +  LocalElemDamage + tCraftSpellDamage + tCraftLocalElemDamage;
+            CraftTotalSPDLo = SPD + LocalElemDamage + tCraftSpellDamageLo + tCraftLocalElemDamageLo;
+            CraftTotalSPD = SPD + LocalElemDamage + tCraftSpellDamage + tCraftLocalElemDamage;
             CraftSpellCritDamageLo = CritDamage + tCraftCritDamageLo;
             CraftSpellCritDamage = CritDamage + tCraftCritDamage;
-            CraftSpellCritLo = AffixSpellCrit +  tCraftSpellCritLo;
+            CraftSpellCritLo = AffixSpellCrit + tCraftSpellCritLo;
             CraftSpellCrit = AffixSpellCrit + tCraftSpellCrit;
             CraftFlatSPDLo = tCraftFlatSPDLo;
             CraftFlatSPD = tCraftFlatSPD;
@@ -1679,14 +1805,14 @@ namespace PoePickit
             CraftTtSPDPrice = tTTcraftPrice;
             CraftCastSpeedLo = tCraftCastSpeedLo + ImplicitCastSpeed;
             CraftCastSpeed = tCraftCastSpeed + ImplicitCastSpeed;
-            
-            return true;
 
+            return true;
         }
 
         private bool CalcMultiSpellDamage()
         {
-            if ((ClassType != "Wand") && (ClassType != "Staff") && (ClassType != "Sceptre") && (ClassType != "Dagger") && !IsSpiritShield) return false;
+            if ((ClassType != ItemClassType.Wand) && (ClassType != ItemClassType.Staff) && (!IsSceptre) &&
+                (ClassType != ItemClassType.Dagger) && !IsSpiritShield) return false;
 
             MultiSPDLo = CraftSPDLo;
             MultiSPD = CraftSPD;
@@ -1704,7 +1830,7 @@ namespace PoePickit
             MultiTtSPDPrice = CraftTtSPDPrice;
 
             if (Suffixes > 2) return false;
-           
+
 
             var tLocalElemDamage = (LocalFireDamage >= LocalColdDamage
                 ? (LocalFireDamage >= LocalLightDamage ? LocalFireDamage : LocalLightDamage)
@@ -1726,15 +1852,13 @@ namespace PoePickit
             var tPrefixes = Prefixes;
 
 
-            if ((!IsAffixSpellCrit || (IsAffixSpellCrit && AffixSpellCrit < 50)) && (tLocalElemDamage < 19) && !IsCastSpeed && (!IsAffixCritDamage || (AffixCritDamage < 20)))
+            if ((!IsAffixSpellCrit || (IsAffixSpellCrit && AffixSpellCrit < 50)) && (tLocalElemDamage < 19) &&
+                !IsCastSpeed && (!IsAffixCritDamage || (AffixCritDamage < 20)))
             {
                 tTTMulti += "[ClearSuffixes]";
                 tTTMultiPrice += "[2exa][Scouring]";
                 tSuffixes = 0;
             }
-
-
-
 
             tTTMultiPrice += "[2exa]";
             tTTMulti += "[MultiMod]";
@@ -1775,7 +1899,7 @@ namespace PoePickit
                 tTTMultiPrice += "[3chaos]";
             }
 
-            if (!IsCastSpeed && (tSuffixes < 3) && (ClassType != "Dagger"))
+            if (!IsCastSpeed && (tSuffixes < 3) && (ClassType != ItemClassType.Dagger))
             {
                 MultiCastSpeedLo = 9;
                 MultiCastSpeed = 11;
@@ -1828,12 +1952,11 @@ namespace PoePickit
             MultiTtSPDPrice = tTTMultiPrice;
 
             return true;
-
         }
 
         private bool CalcCraftCOC()
         {
-            if ((ClassType != "Sceptre") && (ClassType != "Dagger")) return false;
+            if (!IsSceptre && (ClassType != ItemClassType.Dagger)) return false;
 
             CraftCOCSPDLo = 0;
             CraftCOCSPD = SPD;
@@ -1877,10 +2000,6 @@ namespace PoePickit
             var tTTcraft = "";
             var tTTcraftPrice = "";
 
-
-
-
-          
 
             if (!IsAffixCrit && (Suffixes < 3))
             {
@@ -1937,7 +2056,7 @@ namespace PoePickit
                 goto skipspellcraft;
             }
 
-       
+
             if ((tLocalElemDamage < 19) && (Suffixes < 3))
             {
                 tCraftLocalElemDamageLo = 15;
@@ -1962,18 +2081,17 @@ namespace PoePickit
             CraftCOCFlatSPD = tCraftFlatSPD + FlatSPD;
             CraftCOCCritLo = Crit + tCraftCritLo;
             CraftCOCCrit = Crit + tCraftCrit;
-            CraftCOCAPSLo = Math.Round(BaseAPS * (100 + tCraftIasLo) / 100, 2); 
-            CraftCOCAPS = Math.Round(BaseAPS * (100 + tCraftIas) / 100, 2);
+            CraftCOCAPSLo = Math.Round(BaseAPS*(100 + tCraftIasLo)/100, 2);
+            CraftCOCAPS = Math.Round(BaseAPS*(100 + tCraftIas)/100, 2);
             CraftTtCOC = tTTcraft;
             CraftTtCOCPrice = tTTcraftPrice;
 
             return true;
-
         }
 
         private bool CalcMultiCOC()
         {
-            if ((ClassType != "Sceptre") && (ClassType != "Dagger")) return false;
+            if (!IsSceptre && (ClassType != ItemClassType.Dagger)) return false;
 
             MultiCOCSPDLo = CraftCOCSPDLo;
             MultiCOCSPD = CraftCOCSPD;
@@ -2032,7 +2150,7 @@ namespace PoePickit
             tTTMulti += "[MultiMod]";
             tSuffixes++;
 
-            
+
             if ((IsSpellDamageAff != AffixSolution.Positive) && (tPrefixes < 3))
             {
                 tMultiSpellDamageLo = 35;
@@ -2061,7 +2179,6 @@ namespace PoePickit
                 tSuffixes++;
             }
 
-        
 
             if (!IsAffixSpellCrit && (tSuffixes < 3))
             {
@@ -2098,7 +2215,6 @@ namespace PoePickit
                 tMultiLocalElemDamage = 19;
                 tTTMulti += "[LocalElem]";
                 tTTMultiPrice += "[10augmentation]";
-                
             }
             if (tTTMulti == "[MultiMod]")
                 return true;
@@ -2117,50 +2233,48 @@ namespace PoePickit
             MultiCOCFlatSPD = tMultiFlatSPD + FlatSPD;
             MultiCOCCritLo = Crit + tMultiCritLo;
             MultiCOCCrit = Crit + tMultiCrit;
-            MultiCOCAPSLo = Math.Round(BaseAPS * (100 + tMultiIasLo) / 100, 2);
-            MultiCOCAPS = Math.Round(BaseAPS * (100 + tMultiIas) / 100, 2);
+            MultiCOCAPSLo = Math.Round(BaseAPS*(100 + tMultiIasLo)/100, 2);
+            MultiCOCAPS = Math.Round(BaseAPS*(100 + tMultiIas)/100, 2);
             MultiTtCOC = tTTMulti;
             MultiTtCOCPrice = tTTMultiPrice;
 
             return true;
-
         }
 
-      
 
         private void CalcLife()
         {
             TotalMaxLife = MaxLife + Str/5;
         }
-        
+
 
         private void DuCalcsMich()
         {
             //APS section
-            PAPS = EAPS = APS = Math.Round(BaseAPS * (100 + IAS) / 100, 2);
-            
-            
+            PAPS = EAPS = APS = Math.Round(BaseAPS*(100 + IAS)/100, 2);
+
+
             //crit section
             PCrit = ECrit = Crit = Math.Round(BaseCC*(100 + AffixCrit + ImplicitCrit)/100, 2);
             TotalCrit = GlobalCrit + ImplicitGlobalCrit;
             PCritDamage = ECritDamage = CritDamage = AffixCritDamage + ImplicitCritDamage;
-            
+
             //phys
             FlatPhys /= 2;
             PDPS = Math.Round(
-                    (double)(BaseDamageLo / 2 + BaseDamageHi / 2 + FlatPhys) * (120 + LocalPhys) / 100 * BaseAPS * (100 + IAS) /
-                    100, 1);
-            
-            
+                (double) (BaseDamageLo/2 + BaseDamageHi/2 + FlatPhys)*(120 + LocalPhys)/100*BaseAPS*(100 + IAS)/
+                100, 1);
+
+
             //elem
             FlatLightning /= 2;
             FlatCold /= 2;
             FlatChaos /= 2;
             FlatFire /= 2;
 
-            FlatElem = Math.Round((double)(FlatLightning + FlatFire + FlatCold), 1);
-            EDPS = Math.Round(FlatElem * BaseAPS * (100 + IAS) / 100, 1);
-            
+            FlatElem = Math.Round((double) (FlatLightning + FlatFire + FlatCold), 1);
+            EDPS = Math.Round(FlatElem*BaseAPS*(100 + IAS)/100, 1);
+
             //spell
             var tLocalElemDamage = (LocalFireDamage >= LocalColdDamage
                 ? (LocalFireDamage >= LocalLightDamage ? LocalFireDamage : LocalLightDamage)
@@ -2170,11 +2284,11 @@ namespace PoePickit
             LocalElemDamage = tLocalElemDamage + ImplicitLocalElemDamage;
             TotalSPD = SPD + LocalElemDamage;
             SpellCrit = AffixSpellCrit + ImplicitGlobalCrit;
-            FlatSPD = Math.Round((double)(FlatLightningSPD + FlatFireSPD + FlatColdSPD) / 2);
+            FlatSPD = Math.Round((double) (FlatLightningSPD + FlatFireSPD + FlatColdSPD)/2);
             TotalCastSpeed = CastSpeed + ImplicitCastSpeed;
             //total
             DPS = EDPS + PDPS;
-            
+
             //crafts
             CalcCraftPhysDPS();
             CalcMultiPhysDPS();
@@ -2194,16 +2308,18 @@ namespace PoePickit
 
         private void CalcArmour()
         {
-            if (!IsBodyArmour && !IsHelm && !IsBoots && !IsGloves && !IsSpiritShield) return;
+            if (!IsArmour && (ClassType != ItemClassType.Shield))
+                return;
 
-            AR = Math.Round((double)(BaseAR + FlatAR)*(LocalArmour + 120)/100);
-            EV = Math.Round((double)(BaseEV + FlatEV) * (LocalArmour + 120) / 100);
-            ES = Math.Round((double)(BaseES + FlatES) * (LocalArmour + 120) / 100);
+            AR = Math.Round((double) (BaseAR + FlatAR)*(LocalArmour + 120)/100);
+            EV = Math.Round((double) (BaseEV + FlatEV)*(LocalArmour + 120)/100);
+            ES = Math.Round((double) (BaseES + FlatES)*(LocalArmour + 120)/100);
 
             CraftAR = AR;
             CraftEV = EV;
             CraftES = ES;
-            if (Prefixes > 2) return;
+            CraftTotalRes = TotalRes;
+            if ((Prefixes > 2) && (Suffixes > 2)) return;
 
             var tLocalArmour = 0;
             var tFlatAR = 0d;
@@ -2216,31 +2332,50 @@ namespace PoePickit
             var tTTcraft = "";
             var tTTcraftPrice = "";
 
-            if (IsLocalArmourAff != AffixSolution.Positive)
+            if ((IsLocalArmourAff != AffixSolution.Positive) && (Prefixes < 3))
             {
                 tLocalArmourLo = 55;
                 tLocalArmour = 68;
-                tTTcraft = "[LocalArmour]";
+                tTTcraft = "[+% Armour]";
                 tTTcraftPrice = "[10 trans]";
                 goto armourCalcEnd;
             }
 
-            if (!IsFlatES && (BaseES > 0))
+            if (!IsFlatES && (BaseES > 0) && (BaseAR == 0) && (BaseEV == 0) && (Prefixes < 3))
             {
                 tFlatESLo = 18;
                 tFlatES = 22;
                 tTTcraft = "[FlatES]";
                 tTTcraftPrice = "[2 chaos]";
+                goto armourCalcEnd;
             }
 
-            if (!IsFlatEV && (BaseEV > 0))
+            if (Suffixes < 3)
+            {
+                CraftTotalResLo = TotalRes + 21;
+                CraftTotalRes = TotalRes + 30;
+                tTTcraft = "[Res]";
+                tTTcraftPrice = "[2 alchemy]";
+                goto armourCalcEnd;
+            }
+
+            if (!IsFlatES && (BaseES > 0) && (Prefixes < 3))
+            {
+                tFlatESLo = 18;
+                tFlatES = 22;
+                tTTcraft = "[FlatES]";
+                tTTcraftPrice = "[2 chaos]";
+                goto armourCalcEnd;
+            }
+
+            if (!IsFlatEV && (BaseEV > 0) && (Prefixes < 3))
             {
                 tFlatEVLo = 51;
                 tFlatEV = 80;
                 tTTcraft = "[FlatEV]";
                 tTTcraftPrice = "[2 chaos]";
             }
-            if (!IsFlatAR && (BaseAR > 0))
+            if (!IsFlatAR && (BaseAR > 0) && (Prefixes < 3))
             {
                 tFlatARLo = 51;
                 tFlatAR = 80;
@@ -2248,10 +2383,11 @@ namespace PoePickit
                 tTTcraftPrice = "[2 chaos]";
             }
 
+
             armourCalcEnd:
-            CraftARLo = Math.Round((double)(BaseAR + FlatAR + tFlatARLo) * (LocalArmour + tLocalArmourLo + 120) / 100);
-            CraftEVLo = Math.Round((double)(BaseEV + FlatEV + tFlatEVLo) * (LocalArmour + tLocalArmourLo + 120) / 100);
-            CraftESLo = Math.Round((double)(BaseES + FlatES + tFlatESLo) * (LocalArmour + tLocalArmourLo + 120) / 100);
+            CraftARLo = Math.Round((double) (BaseAR + FlatAR + tFlatARLo)*(LocalArmour + tLocalArmourLo + 120)/100);
+            CraftEVLo = Math.Round((double) (BaseEV + FlatEV + tFlatEVLo)*(LocalArmour + tLocalArmourLo + 120)/100);
+            CraftESLo = Math.Round((double) (BaseES + FlatES + tFlatESLo)*(LocalArmour + tLocalArmourLo + 120)/100);
             CraftAR = Math.Round((double) (BaseAR + FlatAR + tFlatAR)*(LocalArmour + tLocalArmour + 120)/100);
             CraftEV = Math.Round((double) (BaseEV + FlatEV + tFlatEV)*(LocalArmour + tLocalArmour + 120)/100);
             CraftES = Math.Round((double) (BaseES + FlatES + tFlatES)*(LocalArmour + tLocalArmour + 120)/100);
@@ -2262,27 +2398,27 @@ namespace PoePickit
         private void CalcTotalRes()
         {
             TotalRes = LightningRes + ColdRes + FireRes + ChaosRes + AllRes*3;
-            if (IsArmour)
-                if (Suffixes < 3)
-                    CraftTotalRes = TotalRes + 30;
-                else
-                    CraftTotalRes = TotalRes;
-            if ((ClassType != "Ring") && (ClassType != "Amulet") && (ClassType != "Quiver") && (ClassType != "Belt"))
+            if ((ClassType != ItemClassType.Ring) && (ClassType != ItemClassType.Amulet) &&
+                (ClassType != ItemClassType.Quiver) && (ClassType != ItemClassType.Belt))
                 return;
             if (Suffixes < 3)
+            {
                 CraftTotalRes = TotalRes + 25;
+                CraftTotalResLo = TotalRes + 21;
+                CraftTtTotalRes = "[Res]";
+                CraftTtTotalResPrice = "[2 alchemy]";
+            }
             else
                 CraftTotalRes = TotalRes;
         }
 
 
-        private void SolveItemRarityAffixes(IDictionary<AffixBracketType,AffixBracketsSource> affixBrackets)
+        private void SolveItemRarityAffixes(IDictionary<AffixBracketType, AffixBracketsSource> affixBrackets)
         {
-
             if (!IsRarity) return;
             IsSuffixRarity = AffixSolution.Uncertain;
             IsPrefixRarity = AffixSolution.Uncertain;
-            
+
             if (Prefixes > 2)
             {
                 Suffixes++;
@@ -2376,12 +2512,7 @@ namespace PoePickit
         private void SolveArmourStunRecoveryAffixes(IDictionary<AffixBracketType, AffixBracketsSource> affixBrackets)
         {
             if (!IsArmour) return;
-            /*if ((Prefixes > 2) && (Suffixes > 2))
-            {
-                Console.WriteLine("[Item.SolveArmourStunRecovertAffixes] 2+ prefixes and 2+ suffixes.");
-                return;
-            }*/
-
+         
             if (IsLocalArmour)
             {
                 if (!IsStunRecovery)
@@ -2499,7 +2630,6 @@ namespace PoePickit
                 return;
             }
 
-          
 
             if (LocalArmour <= comboArmourMax)
             {
@@ -2638,10 +2768,8 @@ namespace PoePickit
         } //solve comboarmour
 
 
-
-        private void SolveSpellDamageManaAffixes(IDictionary<AffixBracketType,AffixBracketsSource> affixBrackets)
+        private void SolveSpellDamageManaAffixes(IDictionary<AffixBracketType, AffixBracketsSource> affixBrackets)
         {
-            
             if (!IsMaxMana)
                 if (!IsSPD)
                     return;
@@ -2650,13 +2778,15 @@ namespace PoePickit
                     IsSpellDamageAff = AffixSolution.Positive;
                     return;
                 }
+            
             if (!IsSPD)
             {
                 Affixes--;
                 IsMaxManaAff = AffixSolution.Positive;
+                Prefixes++;
                 return;
             }
-                
+
             if (!IsWeapon)
             {
                 Affixes--;
@@ -2672,8 +2802,11 @@ namespace PoePickit
             Affixes--;
 
             int comboManaMax, spMax, spMin, manaFromSpMin, manaFromSpMax, comboSpMax;
-            int spFromManaMinusMinMana_Min, spFromManaMinusMinMana_Max, manaFromSpMinusMinSp_Min, manaFromSpMinusMinSp_Max;
-            
+            int spFromManaMinusMinMana_Min,
+                spFromManaMinusMinMana_Max,
+                manaFromSpMinusMinSp_Min,
+                manaFromSpMinusMinSp_Max;
+
             switch (GripType)
             {
                 case "1h":
@@ -2682,11 +2815,14 @@ namespace PoePickit
                     spMax = affixBrackets[AffixBracketType.SpellDamage].GetAffixMinMaxFromiLevel(iLevel, "SPD",
                         AffixBracketsSource.MinOrMax.Max);
                     spMin = 10;
-                    affixBrackets[AffixBracketType.ComboSpellMana].GetAffixValueRangeFromAffixValue("SPD",SPD,"MaxMana", out manaFromSpMin, out manaFromSpMax);
+                    affixBrackets[AffixBracketType.ComboSpellMana].GetAffixValueRangeFromAffixValue("SPD", SPD,
+                        "MaxMana", out manaFromSpMin, out manaFromSpMax);
                     comboSpMax = affixBrackets[AffixBracketType.ComboSpellMana].GetAffixMinMaxFromiLevel(iLevel,
                         "SPD", AffixBracketsSource.MinOrMax.Max);
-                    affixBrackets[AffixBracketType.ComboSpellMana].GetAffixValueRangeFromAffixValue("MaxMana", MaxMana-15,"SPD",out spFromManaMinusMinMana_Min, out spFromManaMinusMinMana_Max);
-                    affixBrackets[AffixBracketType.ComboSpellMana].GetAffixValueRangeFromAffixValue("SPD", SPD - 10, "MaxMana", out manaFromSpMinusMinSp_Min, out manaFromSpMinusMinSp_Max);
+                    affixBrackets[AffixBracketType.ComboSpellMana].GetAffixValueRangeFromAffixValue("MaxMana",
+                        MaxMana - 15, "SPD", out spFromManaMinusMinMana_Min, out spFromManaMinusMinMana_Max);
+                    affixBrackets[AffixBracketType.ComboSpellMana].GetAffixValueRangeFromAffixValue("SPD", SPD - 10,
+                        "MaxMana", out manaFromSpMinusMinSp_Min, out manaFromSpMinusMinSp_Max);
                     break;
                 default:
                     comboManaMax = affixBrackets[AffixBracketType.ComboStaffSpellMana].GetAffixMinMaxFromiLevel(iLevel,
@@ -2694,18 +2830,20 @@ namespace PoePickit
                     spMax = affixBrackets[AffixBracketType.StaffSpellDamage].GetAffixMinMaxFromiLevel(iLevel, "SPD",
                         AffixBracketsSource.MinOrMax.Max);
                     spMin = 15;
-                    affixBrackets[AffixBracketType.ComboStaffSpellMana].GetAffixValueRangeFromAffixValue("SPD", SPD, "MaxMana", out manaFromSpMin, out manaFromSpMax);
+                    affixBrackets[AffixBracketType.ComboStaffSpellMana].GetAffixValueRangeFromAffixValue("SPD", SPD,
+                        "MaxMana", out manaFromSpMin, out manaFromSpMax);
                     comboSpMax = affixBrackets[AffixBracketType.ComboStaffSpellMana].GetAffixMinMaxFromiLevel(iLevel,
                         "SPD", AffixBracketsSource.MinOrMax.Max);
-                    affixBrackets[AffixBracketType.ComboStaffSpellMana].GetAffixValueRangeFromAffixValue("MaxMana", MaxMana - 15, "SPD", out spFromManaMinusMinMana_Min, out spFromManaMinusMinMana_Max);
-                    affixBrackets[AffixBracketType.ComboSpellMana].GetAffixValueRangeFromAffixValue("SPD", SPD - 15, "MaxMana", out manaFromSpMinusMinSp_Min, out manaFromSpMinusMinSp_Max);
+                    affixBrackets[AffixBracketType.ComboStaffSpellMana].GetAffixValueRangeFromAffixValue("MaxMana",
+                        MaxMana - 15, "SPD", out spFromManaMinusMinMana_Min, out spFromManaMinusMinMana_Max);
+                    affixBrackets[AffixBracketType.ComboSpellMana].GetAffixValueRangeFromAffixValue("SPD", SPD - 15,
+                        "MaxMana", out manaFromSpMinusMinSp_Min, out manaFromSpMinusMinSp_Max);
                     break;
             }
 
             var manaMax = affixBrackets[AffixBracketType.MaxMana].GetAffixMinMaxFromiLevel(iLevel, "MaxMana",
                 AffixBracketsSource.MinOrMax.Max);
 
-            
 
             if (SPD > spMax)
             {
@@ -2772,7 +2910,7 @@ namespace PoePickit
                         IsComboLocalArmourAff = AffixSolution.Negative;
                         return;
                     }
-                    
+
                     if (MaxMana > manaFromSpMinusMinSp_Max)
                     {
                         IsComboSpellDamageAff = AffixSolution.Negative;
@@ -2809,7 +2947,6 @@ namespace PoePickit
                     IsMaxManaAff = AffixSolution.Negative;
                     return;
                 }
-
 
 
                 if (Prefixes == 2)
@@ -2907,15 +3044,15 @@ namespace PoePickit
                     }
                     return;
                 }
-             
             }
-        }//solvespelldamagemanaaffixes
+        } //solvespelldamagemanaaffixes
 
 
-        private void SolveComboPhysAccAffixes(IDictionary<AffixBracketType,AffixBracketsSource> affixBrackets)
+        private void SolveComboPhysAccAffixes(IDictionary<AffixBracketType, AffixBracketsSource> affixBrackets)
         {
             if (!IsAccuracyRating && !IsLocalPhys) return;
-            if ((ClassType == "Ring") || (ClassType == "Amulet") || (ClassType == "Quiver") || (ClassType == "Gloves"))
+            if ((ClassType == ItemClassType.Ring) || (ClassType == ItemClassType.Amulet) ||
+                (ClassType == ItemClassType.Quiver) || (ClassType == ItemClassType.Gloves))
             {
                 if (IsAccuracyRating)
                 {
@@ -2948,8 +3085,8 @@ namespace PoePickit
             {
                 IsLightAccuracyRatingAff = AffixSolution.Negative;
             }
-           
-            if (ClassType == "Helm")
+
+            if (ClassType == ItemClassType.Helm)
             {
                 if (IsAccuracyRating)
                 {
@@ -2988,7 +3125,7 @@ namespace PoePickit
                         IsAccuracyRatingAff = AffixSolution.Negative;
                         return;
                     }
-                    
+
                     if ((AccuracyRating < minAcc + minLightAcc) || (AccuracyRating > maxLightAcc))
                     {
                         IsAccuracyRatingAff = AffixSolution.Positive;
@@ -3002,20 +3139,23 @@ namespace PoePickit
 
             var maxPhys = affixBrackets[AffixBracketType.LocalPhys].GetAffixMinMaxFromiLevel(iLevel, "LocalPhys",
                 AffixBracketsSource.MinOrMax.Max);
-            var maxComboPhys = affixBrackets[AffixBracketType.ComboLocalPhysAcc].GetAffixMinMaxFromiLevel(iLevel, "LocalPhys",
+            var maxComboPhys = affixBrackets[AffixBracketType.ComboLocalPhysAcc].GetAffixMinMaxFromiLevel(iLevel,
+                "LocalPhys",
                 AffixBracketsSource.MinOrMax.Max);
-            var maxAcc = affixBrackets[AffixBracketType.AccuracyRating].GetAffixMinMaxFromiLevel(iLevel, "AccuracyRating",
+            var maxAcc = affixBrackets[AffixBracketType.AccuracyRating].GetAffixMinMaxFromiLevel(iLevel,
+                "AccuracyRating",
                 AffixBracketsSource.MinOrMax.Max);
-            var maxComboAcc = affixBrackets[AffixBracketType.ComboLocalPhysAcc].GetAffixMinMaxFromiLevel(iLevel, "AccuracyRating",
+            var maxComboAcc = affixBrackets[AffixBracketType.ComboLocalPhysAcc].GetAffixMinMaxFromiLevel(iLevel,
+                "AccuracyRating",
                 AffixBracketsSource.MinOrMax.Max);
             var minComboAcc = affixBrackets[AffixBracketType.ComboLocalPhysAcc].GetAffixMinMaxFromiLevel(iLevel,
                 "AccuracyRating", AffixBracketsSource.MinOrMax.Min);
-           
+
 
             Affixes--;
             IsLocalPhysAff = AffixSolution.Uncertain;
-            IsComboLocalPhysAff =AffixSolution.Uncertain;
-            IsAccuracyRatingAff =AffixSolution.Uncertain;
+            IsComboLocalPhysAff = AffixSolution.Uncertain;
+            IsAccuracyRatingAff = AffixSolution.Uncertain;
 
             if (Prefixes == 3)
             {
@@ -3089,7 +3229,6 @@ namespace PoePickit
                         IsLocalPhysAff = AffixSolution.Positive;
                         Prefixes++;
                         return;
-
                     }
                     return;
                 }
@@ -3114,12 +3253,9 @@ namespace PoePickit
                     return;
                 }
             }
-        }//solvecombophysacc
-
-
-        
-    }//class
-}//namespace
+        } //solvecombophysacc
+    } //class
+} //namespace
 
 
 

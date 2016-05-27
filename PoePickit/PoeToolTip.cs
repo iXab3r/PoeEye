@@ -25,6 +25,8 @@ namespace PoePickit
         public string ValueText;
 
         public Color BackColor;
+        public Color TextColor;
+        public int FontSize;
 
         public static readonly PoeToolTip Empty = new PoeToolTip();
 
@@ -43,29 +45,46 @@ namespace PoePickit
 
         private void Initialize(Item item)
         {
+            if (item.ItemRarity == Item.ItemRarityType.Unique)
+            {
+                BackColor = Color.Black;
+                TextColor = Color.SaddleBrown;
+                FontSize = 11;
+                FillUniqueItemToolTip(item);
+                return;
+            }
+
             if (!item.TtTypes.Contains(ToolTipTypes.Unknown))
             {
+                
                 foreach (var type in item.TtTypes)
-                {
-                    TtFrame.Add(FillToolTip(item, type));
-                }
+                    TtFrame.Add(FillRareItemToolTip(item, type));
 
                 ArgText = itemClassType + "\n";
                 ValueText = "\n";
                 foreach (var frame in TtFrame)
-                {
                     foreach (var line in frame.TtLines)
                     {
                         ArgText = ArgText + line.Arg + "\n";
                         ValueText = ValueText + line.Value + "\n";
                     }
-                }
+            }
+            if (item.FilterSuccess)
+            {
+                BackColor = System.Drawing.Color.FromArgb(((int) (((byte) (224)))), ((int) (((byte) (213)))),
+                    ((int) (((byte) (52)))));
+                TextColor = Color.Black;
+                FontSize = 11;
             }
 
-            if (item.FilterSuccess)
-                BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(213)))), ((int)(((byte)(52)))));
             else
+            {
+                TextColor = Color.Black;
                 BackColor = System.Drawing.SystemColors.ScrollBar;
+                FontSize = 11;
+            }
+                
+
         }
 
         public void Clear()
@@ -108,7 +127,24 @@ namespace PoePickit
             ValueText = "";
         }
 
-        private ToolTipFrame FillToolTip(Item item, ToolTipTypes ttType)
+
+        private void FillUniqueItemToolTip(Item item)
+        {
+
+            ArgText = item.Name + "\n";
+            ValueText = "\n";
+            if (item.UniqueDescription != "")
+            {
+                ArgText = ArgText + "------------\n" + item.UniqueDescription + "\n";
+                ValueText = ValueText + "------------\n\n\n\n\n";
+            }
+            ArgText = ArgText + "------------\n" + item.UniqueTextLeft + "\n------------";
+            ValueText =  ValueText + "------------\n" + item.UniqueTextRight + "\n------------";
+            
+            return;
+        }
+
+        private ToolTipFrame FillRareItemToolTip(Item item, ToolTipTypes ttType)
         {
             string[] EDPSLines = {"EDPS", "EAPS", "ECrit", "ECritDamage"};
             string[] DPSLines =
@@ -123,30 +159,44 @@ namespace PoePickit
                 "COCTotalSPD", "COCSPD", "COCCrit", "COCAPS", "COCSpellCrit", "COCSpellCritDamage",
                 "COCFlatSPD", "COCElemDamage"
             };
-            string[] armourLines = {"ES", "AR", "EV"};
-            string[] commonLines = {"MaxLife", "TotalRes", "Int", "Dex", "Str", "Rarity"};
+            string[] armourLines = {"ES", "AR", "EV", "TotalRes"};
+            string[] commonLines = {"MaxLife", "Int", "Dex", "Str", "Rarity"};
             string[] bootsLines = {"MoveSpeed"};
             string[] glovesLines = {"IAS", "FlatPhys", "FlatLightning", "FlatFire", "FlatCold"};
             string[] quiverLines = {"TotalCrit", "CritDamage", "IAS", "WED"};
             string[] ringLines =
             {
-                "TotalMaxLife", "TotalRes", "Str", "Int", "Dex", "Rarity", "WED", "FlatPhys",
+                "TotalMaxLife", "Str", "Int", "Dex", "Rarity", "WED", "FlatPhys",
                 "FlatLightning", "FlatCold", "FlatFire", "CastSpeed", "CritDamage"
             };
             string[] amuletLines =
             {
-                "TotalMaxLife", "TotalRes", "Str", "Int", "Dex", "Rarity", "WED", "FlatPhys",
-                "FlatLightning", "FlatCold", "FlatFire", "CastSpeed", "CritDamage", "TotalCrit", "SpellDamage"
+                "TotalMaxLife", "Str", "Int", "Dex", "Rarity", "WED", "FlatPhys",
+                "FlatLightning", "FlatCold", "FlatFire", "CastSpeed", "CritDamage", "TotalCrit", "SPD"
             };
             string[] beltLines = {"WED", "LocalPhys", "TotalMaxLife"};
-            string[] spiritShields = {"SPD", "SpellCrit"};
+            string[] spiritShieldLines = {"SPD", "SpellCrit"};
+            string[] resLines = {"TotalRes"};
+            string[] links = {"Links"};
 
             var lines = new List<TtLine>();
             var tooltip = new ToolTipFrame();
 
 
             //AddSeparator(ref lines);
-            itemClassType = item.ClassType;
+            itemClassType = item.ClassType.ToString();
+
+            if (TtFrame.Count > 0)
+                AddEmptyLines(ref lines);
+
+            if (ttType == ToolTipTypes.LINKS)
+            {
+                AddFrameSeparator(ref lines);
+                foreach (var arg in links)
+                    FillToolTipLine(ref lines, item, arg, TtCraftTypes.NoCraft);
+                goto endOfToolTip;
+            }
+
 
             if (item.IsWeapon)
             {
@@ -155,8 +205,7 @@ namespace PoePickit
                 {
                     FillToolTipLine(ref lines, item, arg, TtCraftTypes.NoCraft);
                 }
-
-                if (ttType == ToolTipTypes.PDPS)
+                if (ttType == ToolTipTypes.Phys)
                 {
                     if (!IsNullOrEmpty(item.CraftTtPDPS))
                     {
@@ -166,6 +215,8 @@ namespace PoePickit
                         AddCraftSeparator(ref lines);
                         foreach (var arg in PDPSLines)
                         {
+                            
+
                             FillToolTipLine(ref lines, item, arg, TtCraftTypes.Craft);
                         }
 
@@ -212,7 +263,7 @@ namespace PoePickit
                     goto endOfToolTip;
                 }
 
-                if (ttType == ToolTipTypes.EDPS)
+                if (ttType == ToolTipTypes.Elem)
                 {
                     if (!IsNullOrEmpty(item.CraftTtEDPS))
                     {
@@ -240,12 +291,12 @@ namespace PoePickit
                     goto endOfToolTip;
                 }
 
-                if (ttType == ToolTipTypes.SPD)
+                if (ttType == ToolTipTypes.Spell)
                 {
                     /*AddSeparator(ref lines);
                     foreach (var arg in SPDLines)
                     {
-                        FillToolTip(ref lines, item, arg, TtCraftTypes.NoCraft);
+                        FillRareItemToolTip(ref lines, item, arg, TtCraftTypes.NoCraft);
                     }*/
 
                     if (!IsNullOrEmpty(item.CraftTtSPD))
@@ -275,6 +326,7 @@ namespace PoePickit
                 }
             }
 
+            
             if (ttType == ToolTipTypes.Common)
             {
                 AddFrameSeparator(ref lines);
@@ -282,7 +334,7 @@ namespace PoePickit
                 {
                     if (!IsNullOrEmpty(item.CraftTtArmour))
                     {
-                        AddToolTipLine(ref lines, item.CraftTtArmour , item.CraftTtArmourPrice);
+                        AddToolTipLine(ref lines, item.CraftTtArmour, item.CraftTtArmourPrice);
                         //AddToolTipLine(ref lines, item.CraftTtArmourPrice);
                         AddCraftSeparator(ref lines);
                         foreach (var arg in armourLines)
@@ -295,57 +347,50 @@ namespace PoePickit
                     {
                         FillToolTipLine(ref lines, item, arg, TtCraftTypes.NoCraft);
                     }
-                    if (item.IsBoots)
-                    {
-                        foreach (var arg in bootsLines)
-                        {
-                            FillToolTipLine(ref lines, item, arg, TtCraftTypes.NoCraft);
-                        }
-                    }
-                    else if (item.IsGloves)
-                    {
-                        foreach (var arg in glovesLines)
-                        {
-                            FillToolTipLine(ref lines, item, arg, TtCraftTypes.NoCraft);
-                        }
-                    }
-                    else if (item.IsSpiritShield)
-                    {
-                        foreach (var arg in spiritShields)
-                        {
-                            FillToolTipLine(ref lines, item, arg, TtCraftTypes.NoCraft);
-                        }
-                    }
-                }
 
-                if (item.IsBelt)
+                }
+                else
                 {
-                    foreach (var arg in beltLines)
+                    if (!IsNullOrEmpty(item.CraftTtTotalRes))
+                    {
+                        AddToolTipLine(ref lines, item.CraftTtTotalRes, item.CraftTtTotalResPrice);
+                        AddCraftSeparator(ref lines);
+                        foreach (var arg in resLines)
+                            FillToolTipLine(ref lines, item, arg, TtCraftTypes.Craft);
+                    }
+                    else
+                        foreach (var arg in resLines)
+                            FillToolTipLine(ref lines, item, arg, TtCraftTypes.NoCraft);
+                }
+                string[] typeLines = {};
+                switch (item.ClassType)
+                {
+                    case ItemClassType.Amulet:
+                        typeLines = amuletLines;
+                        break;
+                    case ItemClassType.Ring:
+                        typeLines = ringLines;
+                        break;
+                    case ItemClassType.Quiver:
+                        typeLines = quiverLines;
+                        break;
+                    case ItemClassType.Belt:
+                        typeLines = beltLines;
+                        break;
+                    case ItemClassType.Boots:
+                        typeLines = bootsLines;
+                        break;
+                    case ItemClassType.Gloves:
+                        typeLines = glovesLines;
+                        break;
+                    case ItemClassType.Shield:
+                        typeLines = spiritShieldLines;
+                        break;
+                }
+                    foreach (var arg in typeLines)
                     {
                         FillToolTipLine(ref lines, item, arg, TtCraftTypes.NoCraft);
                     }
-                }
-                else if (item.IsQuiver)
-                {
-                    foreach (var arg in quiverLines)
-                    {
-                        FillToolTipLine(ref lines, item, arg, TtCraftTypes.NoCraft);
-                    }
-                }
-                else if (item.IsRing)
-                {
-                    foreach (var arg in ringLines)
-                    {
-                        FillToolTipLine(ref lines, item, arg, TtCraftTypes.NoCraft);
-                    }
-                }
-                else if (item.IsAmulet)
-                {
-                    foreach (var arg in amuletLines)
-                    {
-                        FillToolTipLine(ref lines, item, arg, TtCraftTypes.NoCraft);
-                    }
-                }
 
                 goto endOfToolTip;
             }
@@ -379,12 +424,17 @@ namespace PoePickit
 
         private void AddSeparator(ref List<TtLine> lines)
         {
-            lines.Add(new TtLine {Arg = "------------------------------", Value = "--------------"});
+            lines.Add(new TtLine {Arg = "------------", Value = "------------" });
+        }
+
+        private void AddEmptyLines(ref List<TtLine> lines)
+        {
+            lines.Add(new TtLine { Arg = "\n\n\u2191\u2191\u2191\u2191\u2191\u2191\u2191\n\u2193\u2193\u2193\u2193\u2193\u2193\u2193\n", Value = "\n\n\u2191\u2191\u2191\u2191\n\u2193\u2193\u2193\u2193\n" });
         }
 
         private void AddFrameSeparator(ref List<TtLine> lines)
         {
-            lines.Add(new TtLine {Arg = "=======================", Value = "==========" });
+            lines.Add(new TtLine {Arg = "==========", Value = "==========" });
         }
 
         private void AddAffixesSeparator(ref List<TtLine> lines)
