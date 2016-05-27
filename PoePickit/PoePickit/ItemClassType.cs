@@ -1,0 +1,33 @@
+namespace PoePricer
+{
+    public enum ItemClassType
+    {
+        Helm,
+        BodyArmour,
+        Gloves,
+        Boots,
+        Shield,
+        Belt,
+        Ring,
+        Amulet,
+        Dagger,
+        OneHandedSword,
+        OneHandedMace,
+        OneHandedAxe,
+        Wand,
+        Claw,
+        Sceptre,
+        TwoHandedSword,
+        TwoHandedMace,
+        TwoHandedAxe,
+        Bow,
+        Staff,
+        Quiver,
+        Map,
+        Jewel,
+        Talisman,
+        Rod,
+        Flask,
+        Unknown
+    }
+}
