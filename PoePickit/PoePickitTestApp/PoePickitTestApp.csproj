@@ -110,6 +110,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DisposableReactiveObject.cs" />
+    <Compile Include="Extensions\ObjectExtensions.cs" />
     <Compile Include="IDisposableReactiveObject.cs" />
     <Compile Include="IWindowTracker.cs" />
     <Compile Include="PoeItemMonitor.cs" />

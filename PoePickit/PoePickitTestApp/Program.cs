@@ -1,15 +1,12 @@
 ﻿using System;
-using System.Drawing;
 using System.IO;
-using System.Reactive.Concurrency;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Threading;
 using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Forms;
-using System.Windows.Input;
 using AutoHotkey.Interop;
 using Gma.System.MouseKeyHook;
+using PoePickitTestApp.Extensions;
 using PoePricer;
 using ReactiveUI;
 using Application = System.Windows.Application;
@@ -27,6 +24,8 @@ namespace PoePickitTestApp
         private static WindowTracker poeWindowTracker;
 
         private static readonly ItemParse ItemParser = new ItemParse();
+
+        private static readonly CompositeDisposable Anchors = new CompositeDisposable();
 
         [STAThread]
         private static void Main()
@@ -67,6 +66,7 @@ namespace PoePickitTestApp
             var monitor = new PoeItemMonitor();
 
             var globalHook = Hook.GlobalEvents();
+            Anchors.Add(globalHook);
 
             Observable
                 .FromEventPattern<KeyEventHandler, KeyEventArgs>(
@@ -74,14 +74,16 @@ namespace PoePickitTestApp
                     h => globalHook.KeyUp -= h)
                 .Where(x => x.EventArgs.KeyData == Keys.LWin)
                 .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(_ => toolTipForm.SetTooltip(null));
+                .Subscribe(_ => toolTipForm.SetTooltip(null))
+                .AddTo(Anchors);
 
             monitor.PoeItemsSource
                 .Where(_ => poeWindowTracker.IsActive)
                 .DistinctUntilChanged(x => new { x, toolTipForm.Visibility })
                 .Select(ItemParser.CreateTooltip)
                 .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(toolTipForm.SetTooltip);
+                .Subscribe(toolTipForm.SetTooltip)
+                .AddTo(Anchors);
 
             var app = new Application();
             app.Run(toolTipForm);
