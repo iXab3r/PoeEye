@@ -3,6 +3,7 @@ using System.Drawing;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Windows;
+using System.Windows.Documents;
 using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -42,13 +43,16 @@ namespace PoePickitTestApp
                 Hide();
                 return;
             }
-
+            RefreshPosition();
             Show();
 
          
             FontSize = toolTip.FontSize;
             Background = new SolidColorBrush(toolTip.BackColor);
-            Foreground = new SolidColorBrush(toolTip.TextColor);
+            LeftLabel.Foreground = RightLabel.Foreground = new SolidColorBrush(toolTip.TextColor);
+
+            
+
 
             LeftLabel.Content = toolTip.ArgText;
             RightLabel.Content = toolTip.ValueText;
