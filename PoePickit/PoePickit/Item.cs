@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using PoePricer.Extensions;
@@ -8,7 +9,7 @@ using PoePricer.Parser;
 
 namespace PoePricer
 {
-    public class Item
+    internal class Item
     {
         public enum AffixSolution
         {
@@ -425,81 +426,78 @@ namespace PoePricer
         public string UniqueTextRight = "";
         public byte UnsolvedAffixes = 0;
 
-
         //prefixes
         public int WED = 0;
 
-
-        public bool IsArgExist(string name)
+        private FieldInfo GetFieldByName(string fieldName)
         {
-            return GetType().GetField(name) != null;
+            return GetType().GetField(fieldName);
         }
 
-        public dynamic Get(string fieldName)
+        private FieldInfo GetFieldByNameOrThrow(string fieldName)
         {
+            var result = GetFieldByName(fieldName);
+            if (result == null)
+            {
+                throw new ApplicationException($"Wrong field name: '{fieldName}'");
+            }
+            return result;
+        }
+
+        public bool IsArgExist(string fieldName)
+        {
+            return GetFieldByName(fieldName) != null;
+        }
+
+        public T? Get<T>(string fieldName) where T : struct
+        {
+            if (!IsArgExist(fieldName))
+            {
+                return default(T?);
+            }
+
             try
             {
-                return GetType().GetField(fieldName).GetValue(this);
+                var untypedValue = GetFieldByName(fieldName).GetValue(this);
+                return (T) untypedValue;
             }
             catch (Exception)
             {
                 Console.WriteLine($"[Item.Get]Wrong arg:{fieldName}");
-                return -1;
+                return default(T);
             }
         }
 
-        public void SetNumericalValue(string fieldName, string fieldValue)
+        private void SetNumericalValue(string fieldName, string fieldValue)
         {
-            try
-            {
-                GetType().GetField(fieldName);
-            }
-            catch (Exception)
-            {
-                Console.WriteLine($"[Item.SetNumericValue]Wrong fieldName: {fieldName}");
-                throw;
-            }
+            var field = GetFieldByNameOrThrow(fieldName);
 
             int intvalue;
             double doublevalue;
 
-            if (int.TryParse(fieldValue, out intvalue))
+            if (field.FieldType == typeof(double) && fieldValue.TryParseAsDouble(out doublevalue))
             {
-                try
-                {
-                    GetType().GetField(fieldName).SetValue(this, Get(fieldName) + intvalue);
-                    return;
-                }
-                catch (Exception)
-                {
-                    Console.WriteLine($"[Item.SetNumericValue]Wrong fieldValue: {fieldValue} for fieldName: {fieldName}");
-                    throw;
-                }
-            }
-            if (!double.TryParse(fieldValue, out doublevalue)) return;
-            try
+                SetFieldValue(fieldName, doublevalue);
+            } 
+            else if (field.FieldType == typeof(int) && fieldValue.TryParseAsInt(out intvalue))
             {
-                GetType().GetField(fieldName).SetValue(this, Get(fieldName) + doublevalue);
+                SetFieldValue(fieldName, intvalue);
             }
-            catch (Exception)
+            else
             {
-                Console.WriteLine($"[Item.SetNumericValue]Wrong fieldValue: {fieldValue} for fieldName: {fieldName}");
-                throw;
-            }
+                throw new ApplicationException($"Unknown field name/format, name: {fieldName}, value: {fieldValue}");  
+            }      
         }
 
-        public bool SetFlagValue(string fieldName, bool flagValue)
+        private void SetFieldValue<T>(string fieldName, T value)
         {
-            try
+            var field = GetFieldByNameOrThrow(fieldName);
+
+            if (field.FieldType != typeof(T))
             {
-                GetType().GetField(fieldName).SetValue(this, flagValue);
-                return true;
+                return;
             }
-            catch (Exception)
-            {
-                Console.WriteLine($"[Item.Set]Wrong fieldName: {fieldName}");
-                return false;
-            }
+            field.SetValue(this, value);
         }
 
         private bool ParseAffixLine(string line, AffixesSource affixes)
@@ -507,51 +505,52 @@ namespace PoePricer
             foreach (var affixLineSource in affixes.AffixesLines)
             {
                 var match = affixLineSource.AffixRegExp.Match(line);
-                if (match.Success)
+                if (!match.Success)
+                    continue;
+                for (var i = 0; i < affixLineSource.AffixLineArgs.Length; i++)
                 {
-                    for (var i = 0; i < affixLineSource.AffixLineArgs.Length; i++)
-                    {
-                        if (affixLineSource.AffixLineArgs[i] == "") continue;
+                    if (string.IsNullOrEmpty(affixLineSource.AffixLineArgs[i]))
+                        continue;
 
-                        if (affixLineSource.AffixLineArgs[i].StartsWith("Is"))
-                        {
-                            SetFlagValue(affixLineSource.AffixLineArgs[i], true);
-                        }
+                    if (affixLineSource.AffixLineArgs[i].StartsWith("Is"))
+                    {
+                        SetFieldValue(affixLineSource.AffixLineArgs[i], true);
+                    }
+                    else
+                    {
+                        if (match.Groups["valueFirst"].Success)
+                            SetNumericalValue(affixLineSource.AffixLineArgs[i], match.Groups["valueFirst"].Value);
                         else
                         {
-                            if (match.Groups["valueFirst"].Success)
-                                SetNumericalValue(affixLineSource.AffixLineArgs[i], match.Groups["valueFirst"].Value);
+                            Console.WriteLine(
+                                $"[{Name}.ParseAffixData.Affixes] Wrong argMod {affixLineSource.ArgMods[i]} for arg: {affixLineSource.AffixLineArgs[i]} \nLine :\n {line} \nRegex:\n {affixLineSource.AffixRegExp}");
+                            return false;
+                        }
+
+                        if (affixLineSource.ArgMods.Contains("2"))
+                            if (match.Groups["valueSecond"].Success)
+                                SetNumericalValue(
+                                    affixLineSource.AffixLineArgs[i],
+                                    match.Groups["valueSecond"].Value);
                             else
                             {
                                 Console.WriteLine(
                                     $"[{Name}.ParseAffixData.Affixes] Wrong argMod {affixLineSource.ArgMods[i]} for arg: {affixLineSource.AffixLineArgs[i]} \nLine :\n {line} \nRegex:\n {affixLineSource.AffixRegExp}");
                                 return false;
                             }
-
-                            if (affixLineSource.ArgMods.Contains("2"))
-                                if (match.Groups["valueSecond"].Success)
-                                    SetNumericalValue(affixLineSource.AffixLineArgs[i],
-                                        match.Groups["valueSecond"].Value);
-                                else
-                                {
-                                    Console.WriteLine(
-                                        $"[{Name}.ParseAffixData.Affixes] Wrong argMod {affixLineSource.ArgMods[i]} for arg: {affixLineSource.AffixLineArgs[i]} \nLine :\n {line} \nRegex:\n {affixLineSource.AffixRegExp}");
-                                    return false;
-                                }
-                            if (affixLineSource.ArgMods.Contains("3"))
-                                if (match.Groups["valueThird"].Success)
-                                    SetNumericalValue(affixLineSource.AffixLineArgs[i], match.Groups["valueThird"].Value);
-                                else
-                                {
-                                    Console.WriteLine(
-                                        $"[{Name}.ParseAffixData.Affixes] Wrong argMod {affixLineSource.ArgMods[i]} for arg: {affixLineSource.AffixLineArgs[i]} \nLine :\n {line} \nRegex:\n {affixLineSource.AffixRegExp}");
-                                    return false;
-                                }
-                        }
+                        if (affixLineSource.ArgMods.Contains("3"))
+                            if (match.Groups["valueThird"].Success)
+                                SetNumericalValue(affixLineSource.AffixLineArgs[i], match.Groups["valueThird"].Value);
+                            else
+                            {
+                                Console.WriteLine(
+                                    $"[{Name}.ParseAffixData.Affixes] Wrong argMod {affixLineSource.ArgMods[i]} for arg: {affixLineSource.AffixLineArgs[i]} \nLine :\n {line} \nRegex:\n {affixLineSource.AffixRegExp}");
+                                return false;
+                            }
                     }
-
-                    return true;
                 }
+
+                return true;
             }
             return false;
         }
@@ -593,7 +592,8 @@ namespace PoePricer
             if (ItemImplicitData != null)
                 foreach (var line in ItemImplicitData)
                 {
-                    if (ParseAffixLine(line, knownAffixes[AffixTypes.implicitaff])) continue;
+                    if (ParseAffixLine(line, knownAffixes[AffixTypes.implicitaff]))
+                        continue;
                     Console.WriteLine($"[Item.ParseAffixData] Unknown ImplicitAffixLine: {line}");
                 }
         }
@@ -761,9 +761,7 @@ namespace PoePricer
                     var match = parseRegex.Match(line);
 
                     //calc how good is roll
-                    var value = 0d;
-                    double.TryParse(match.Groups["value"].Value, out value);
-
+                    var value = match.Groups["value"].Value.ToDouble();
                     var percent =
                         Math.Round((value - affix.LoValue)/(affix.HighValue - affix.LoValue), 2)*100 + "%";
                     left = affix.RawLine;
@@ -775,8 +773,7 @@ namespace PoePricer
                 UniqueText = UniqueText + "\n" + left.PadRight(30) + right.PadLeft(30);
                 return true;
 
-                skipknownaffixline:
-                ;
+                skipknownaffixline: ;
             }
             return false;
         }
@@ -862,10 +859,12 @@ namespace PoePricer
 
         private int ParseLinks(string[] itemDataText, IDictionary<ParseRegEx, Regex> knownRegexes)
         {
-            if (!IsWeapon && !IsArmour) return 0;
+            if (!IsWeapon && !IsArmour)
+                return 0;
             foreach (var line in itemDataText)
             {
-                if (!line.StartsWith("Sockets:")) continue;
+                if (!line.StartsWith("Sockets:"))
+                    continue;
                 Regex parseRegex;
                 knownRegexes.TryGetValue(ParseRegEx.RegexSocket6, out parseRegex);
                 if (parseRegex.Match(line).Success)
@@ -903,7 +902,8 @@ namespace PoePricer
                 if (match.Success)
                 {
                     Enum.TryParse(match.Groups["weaponClass"].Value.Replace(" ", ""), out ClassType);
-                    baseItems[BaseItemTypes.Weapon].SetWeaponsBaseProperties(BaseType, out BaseDamageLo,
+                    baseItems[BaseItemTypes.Weapon].SetWeaponsBaseProperties(
+                        BaseType, out BaseDamageLo,
                         out BaseDamageHi, out BaseCC, out BaseAPS);
                     GripType = "1h";
                     IsWeapon = true;
@@ -924,7 +924,8 @@ namespace PoePricer
                 if (match.Success)
                 {
                     Enum.TryParse(match.Groups["weaponClass"].Value.Replace(" ", ""), out ClassType);
-                    baseItems[BaseItemTypes.Weapon].SetWeaponsBaseProperties(BaseType, out BaseDamageLo,
+                    baseItems[BaseItemTypes.Weapon].SetWeaponsBaseProperties(
+                        BaseType, out BaseDamageLo,
                         out BaseDamageHi, out BaseCC, out BaseAPS);
                     GripType = "2h";
                     IsWeapon = true;
@@ -1018,7 +1019,8 @@ namespace PoePricer
                 return true;
             }
 
-            if (baseItems[BaseItemTypes.BodyArmour].SetArmourBaseProperties(BaseType, out BaseAR, out BaseEV, out BaseES))
+            if (baseItems[BaseItemTypes.BodyArmour].SetArmourBaseProperties(
+                BaseType, out BaseAR, out BaseEV, out BaseES))
             {
                 ClassType = ItemClassType.BodyArmour;
                 IsArmour = true;
@@ -1033,7 +1035,8 @@ namespace PoePricer
 
         private bool CalcCraftPhysDPS()
         {
-            if (!IsWeapon) return false;
+            if (!IsWeapon)
+                return false;
 
             CraftPDPSLo = 0;
             CraftPDPS = PDPS;
@@ -1046,7 +1049,8 @@ namespace PoePricer
             CraftTtPDPS = "";
             CraftTtPDPSPrice = "";
 
-            if ((Prefixes > 2) && (Suffixes > 2)) return false;
+            if ((Prefixes > 2) && (Suffixes > 2))
+                return false;
 
 
             var tCraftPhysDamageLo = 0;
@@ -1131,11 +1135,13 @@ namespace PoePricer
             CraftPAPSLo = Math.Round(BaseAPS*(100 + tCraftIasLo)/100, 2);
             CraftPAPS = Math.Round(BaseAPS*(100 + tCraftIasHi)/100, 2);
             CraftPDPSLo =
-                Math.Round((double) (BaseDamageLo/2 + BaseDamageHi/2 + FlatPhys + tCraftFlatPhysDamageLo)*
-                           (120 + LocalPhys + tCraftPhysDamageLo)/100*CraftPAPSLo, 1);
+                Math.Round(
+                    (double) (BaseDamageLo/2 + BaseDamageHi/2 + FlatPhys + tCraftFlatPhysDamageLo)*
+                    (120 + LocalPhys + tCraftPhysDamageLo)/100*CraftPAPSLo, 1);
             CraftPDPS =
-                Math.Round((double) (BaseDamageLo/2 + BaseDamageHi/2 + FlatPhys + tCraftFlatPhysDamageHi)*
-                           (120 + LocalPhys + tCraftPhysDamageHi)/100*CraftPAPS, 1);
+                Math.Round(
+                    (double) (BaseDamageLo/2 + BaseDamageHi/2 + FlatPhys + tCraftFlatPhysDamageHi)*
+                    (120 + LocalPhys + tCraftPhysDamageHi)/100*CraftPAPS, 1);
 
             CraftPCritLo = Math.Round(BaseCC*(100 + ImplicitCrit + tCraftCritLo)/100, 1);
             CraftPCrit = Math.Round(BaseCC*(100 + ImplicitCrit + tCraftCritHi)/100, 1);
@@ -1150,7 +1156,8 @@ namespace PoePricer
 
         private bool CalcMultiPhysDPS()
         {
-            if (!IsWeapon) return false;
+            if (!IsWeapon)
+                return false;
 
             MultiPAPSLo = CraftPAPSLo;
             MultiPAPS = CraftPAPS;
@@ -1163,7 +1170,8 @@ namespace PoePricer
             MultiTtPDPS = CraftTtPDPS;
             MultiTtPDPSPrice = CraftTtPDPSPrice;
 
-            if (Suffixes > 2) return false;
+            if (Suffixes > 2)
+                return false;
 
 
             var tMultiPhysDamageLo = 0;
@@ -1258,11 +1266,13 @@ namespace PoePricer
             MultiPAPSLo = Math.Round(BaseAPS*(100 + tMultiIasLo)/100, 2);
             MultiPAPS = Math.Round(BaseAPS*(100 + tMultiIasHi)/100, 2);
             MultiPDPSLo =
-                Math.Round((double) (BaseDamageLo/2 + BaseDamageHi/2 + FlatPhys + tMultiFlatPhysDamageLo)*
-                           (120 + LocalPhys + tMultiPhysDamageLo)/100*MultiPAPSLo, 1);
+                Math.Round(
+                    (double) (BaseDamageLo/2 + BaseDamageHi/2 + FlatPhys + tMultiFlatPhysDamageLo)*
+                    (120 + LocalPhys + tMultiPhysDamageLo)/100*MultiPAPSLo, 1);
             MultiPDPS =
-                Math.Round((double) (BaseDamageLo/2 + BaseDamageHi/2 + FlatPhys + tMultiFlatPhysDamageHi)*
-                           (120 + LocalPhys + tMultiPhysDamageHi)/100*MultiPAPS, 1);
+                Math.Round(
+                    (double) (BaseDamageLo/2 + BaseDamageHi/2 + FlatPhys + tMultiFlatPhysDamageHi)*
+                    (120 + LocalPhys + tMultiPhysDamageHi)/100*MultiPAPS, 1);
 
 
             MultiPCritLo = Math.Round(BaseCC*(100 + ImplicitCrit + tMultiCritLo)/100, 1);
@@ -1277,7 +1287,8 @@ namespace PoePricer
 
         private bool CalcCraftElemDPS()
         {
-            if (!IsWeapon) return false;
+            if (!IsWeapon)
+                return false;
 
             CraftEDPSLo = 0;
             CraftEDPS = EDPS;
@@ -1291,7 +1302,8 @@ namespace PoePricer
             CraftTtEDPSPrice = "";
 
 
-            if ((Prefixes > 2) && (Suffixes > 2)) return false;
+            if ((Prefixes > 2) && (Suffixes > 2))
+                return false;
 
             var tCraftFlatElemDamageLo = 0d;
             var tCraftFlatElemDamageHi = 0d;
@@ -1444,7 +1456,8 @@ namespace PoePricer
 
         private bool CalcMultiElemDPS()
         {
-            if (!IsWeapon) return false;
+            if (!IsWeapon)
+                return false;
 
             MultiEDPSLo = CraftEDPSLo;
             MultiEDPS = CraftEDPS;
@@ -1457,7 +1470,8 @@ namespace PoePricer
             MultiTtEDPS = CraftTtEDPS;
             MultiTtEDPSPrice = CraftTtEDPSPrice;
 
-            if (Suffixes > 2) return false;
+            if (Suffixes > 2)
+                return false;
 
 
             var tMultiFlatElemDamageLo = 0d;
@@ -1626,7 +1640,8 @@ namespace PoePricer
         private bool CalcCraftSpellDamage()
         {
             if ((ClassType != ItemClassType.Wand) && (ClassType != ItemClassType.Staff) && !IsSceptre &&
-                (ClassType != ItemClassType.Dagger) && !IsSpiritShield) return false;
+                (ClassType != ItemClassType.Dagger) && !IsSpiritShield)
+                return false;
 
             CraftSPDLo = 0;
             CraftSPD = SPD;
@@ -1645,7 +1660,8 @@ namespace PoePricer
             CraftCastSpeed = CastSpeed;
             CraftCastSpeedLo = 0;
 
-            if ((Prefixes > 2) && (Suffixes > 2)) return false;
+            if ((Prefixes > 2) && (Suffixes > 2))
+                return false;
 
             var tLocalElemDamage = LocalFireDamage >= LocalColdDamage
                 ? (LocalFireDamage >= LocalLightDamage ? LocalFireDamage : LocalLightDamage)
@@ -1763,7 +1779,8 @@ namespace PoePricer
         private bool CalcMultiSpellDamage()
         {
             if ((ClassType != ItemClassType.Wand) && (ClassType != ItemClassType.Staff) && !IsSceptre &&
-                (ClassType != ItemClassType.Dagger) && !IsSpiritShield) return false;
+                (ClassType != ItemClassType.Dagger) && !IsSpiritShield)
+                return false;
 
             MultiSPDLo = CraftSPDLo;
             MultiSPD = CraftSPD;
@@ -1780,7 +1797,8 @@ namespace PoePricer
             MultiTtSPD = CraftTtSPD;
             MultiTtSPDPrice = CraftTtSPDPrice;
 
-            if (Suffixes > 2) return false;
+            if (Suffixes > 2)
+                return false;
 
 
             var tLocalElemDamage = LocalFireDamage >= LocalColdDamage
@@ -1907,7 +1925,8 @@ namespace PoePricer
 
         private bool CalcCraftCOC()
         {
-            if (!IsSceptre && (ClassType != ItemClassType.Dagger)) return false;
+            if (!IsSceptre && (ClassType != ItemClassType.Dagger))
+                return false;
 
             CraftCOCSPDLo = 0;
             CraftCOCSPD = SPD;
@@ -1928,7 +1947,8 @@ namespace PoePricer
             CraftTtCOC = "";
             CraftTtCOCPrice = "";
 
-            if ((Prefixes > 2) && (Suffixes > 2)) return false;
+            if ((Prefixes > 2) && (Suffixes > 2))
+                return false;
 
             var tLocalElemDamage = LocalFireDamage >= LocalColdDamage
                 ? (LocalFireDamage >= LocalLightDamage ? LocalFireDamage : LocalLightDamage)
@@ -2041,7 +2061,8 @@ namespace PoePricer
 
         private bool CalcMultiCOC()
         {
-            if (!IsSceptre && (ClassType != ItemClassType.Dagger)) return false;
+            if (!IsSceptre && (ClassType != ItemClassType.Dagger))
+                return false;
 
             MultiCOCSPDLo = CraftCOCSPDLo;
             MultiCOCSPD = CraftCOCSPD;
@@ -2062,7 +2083,8 @@ namespace PoePricer
             MultiTtCOC = CraftTtCOC;
             MultiTtCOCPrice = CraftTtCOCPrice;
 
-            if ((Prefixes > 2) && (Suffixes > 2)) return false;
+            if ((Prefixes > 2) && (Suffixes > 2))
+                return false;
 
             var tLocalElemDamage = LocalFireDamage >= LocalColdDamage
                 ? (LocalFireDamage >= LocalLightDamage ? LocalFireDamage : LocalLightDamage)
@@ -2269,7 +2291,8 @@ namespace PoePricer
             CraftEV = EV;
             CraftES = ES;
             CraftTotalRes = TotalRes;
-            if ((Prefixes > 2) && (Suffixes > 2)) return;
+            if ((Prefixes > 2) && (Suffixes > 2))
+                return;
 
             var tLocalArmour = 0;
             var tFlatAR = 0d;
@@ -2365,7 +2388,8 @@ namespace PoePricer
 
         private void SolveItemRarityAffixes(IDictionary<AffixBracketType, AffixBracketsSource> affixBrackets)
         {
-            if (!IsRarity) return;
+            if (!IsRarity)
+                return;
             IsSuffixRarity = AffixSolution.Uncertain;
             IsPrefixRarity = AffixSolution.Uncertain;
 
@@ -2410,9 +2434,11 @@ namespace PoePricer
                 return;
             }
 
-            var maxRarityPrefix = affixBrackets[AffixBracketType.ItemRarityPrefix].GetAffixMinMaxFromiLevel(iLevel,
+            var maxRarityPrefix = affixBrackets[AffixBracketType.ItemRarityPrefix].GetAffixMinMaxFromiLevel(
+                iLevel,
                 "Rarity", AffixBracketsSource.MinOrMax.Max);
-            var maxRaritySuffix = affixBrackets[AffixBracketType.ItemRaritySuffix].GetAffixMinMaxFromiLevel(iLevel,
+            var maxRaritySuffix = affixBrackets[AffixBracketType.ItemRaritySuffix].GetAffixMinMaxFromiLevel(
+                iLevel,
                 "Rarity", AffixBracketsSource.MinOrMax.Max);
 
             if (maxRarityPrefix > maxRaritySuffix)
@@ -2461,7 +2487,8 @@ namespace PoePricer
 
         private void SolveArmourStunRecoveryAffixes(IDictionary<AffixBracketType, AffixBracketsSource> affixBrackets)
         {
-            if (!IsArmour) return;
+            if (!IsArmour)
+                return;
 
             if (IsLocalArmour)
             {
@@ -2496,14 +2523,18 @@ namespace PoePricer
             IsComboLocalArmourAff = AffixSolution.Uncertain;
             IsStunRecoveryAff = AffixSolution.Uncertain;
 
-            var comboArmourMax = affixBrackets[AffixBracketType.ComboArmourStun].GetAffixMinMaxFromiLevel(iLevel,
+            var comboArmourMax = affixBrackets[AffixBracketType.ComboArmourStun].GetAffixMinMaxFromiLevel(
+                iLevel,
                 "Armour", AffixBracketsSource.MinOrMax.Max);
-            var comboStunMax = affixBrackets[AffixBracketType.ComboArmourStun].GetAffixMinMaxFromiLevel(iLevel,
+            var comboStunMax = affixBrackets[AffixBracketType.ComboArmourStun].GetAffixMinMaxFromiLevel(
+                iLevel,
                 "StunRecovery", AffixBracketsSource.MinOrMax.Max);
 
-            var armourMax = affixBrackets[AffixBracketType.Armour].GetAffixMinMaxFromiLevel(iLevel, "Armour",
+            var armourMax = affixBrackets[AffixBracketType.Armour].GetAffixMinMaxFromiLevel(
+                iLevel, "Armour",
                 AffixBracketsSource.MinOrMax.Max);
-            var stunMax = affixBrackets[AffixBracketType.StunRecovery].GetAffixMinMaxFromiLevel(iLevel, "StunRecovery",
+            var stunMax = affixBrackets[AffixBracketType.StunRecovery].GetAffixMinMaxFromiLevel(
+                iLevel, "StunRecovery",
                 AffixBracketsSource.MinOrMax.Max);
 
             if (LocalArmour > armourMax)
@@ -2584,7 +2615,8 @@ namespace PoePricer
             if (LocalArmour <= comboArmourMax)
             {
                 int stunFromArmourMin, stunFromArmourMax;
-                affixBrackets[AffixBracketType.ComboArmourStun].GetAffixValueRangeFromAffixValue("Armour", LocalArmour,
+                affixBrackets[AffixBracketType.ComboArmourStun].GetAffixValueRangeFromAffixValue(
+                    "Armour", LocalArmour,
                     "StunRecovery", out stunFromArmourMin, out stunFromArmourMax);
                 Affixes--;
 
@@ -2679,7 +2711,8 @@ namespace PoePricer
 
                     //попробовать рассчитать наличие LocalArmourAffix
                     int armourFromStunMin, armourFromStunMax;
-                    affixBrackets[AffixBracketType.ComboArmourStun].GetAffixValueRangeFromAffixValue("StunRecovery",
+                    affixBrackets[AffixBracketType.ComboArmourStun].GetAffixValueRangeFromAffixValue(
+                        "StunRecovery",
                         StunRecovery - 11, "Armour", out armourFromStunMin, out armourFromStunMax);
                     if (LocalArmour > armourFromStunMax)
                     {
@@ -2698,7 +2731,8 @@ namespace PoePricer
                     Suffixes++;
                     Affixes--;
                     int armourFromStunMin, armourFromStunMax;
-                    affixBrackets[AffixBracketType.ComboArmourStun].GetAffixValueRangeFromAffixValue("StunRecovery",
+                    affixBrackets[AffixBracketType.ComboArmourStun].GetAffixValueRangeFromAffixValue(
+                        "StunRecovery",
                         StunRecovery - 11, "Armour", out armourFromStunMin, out armourFromStunMax);
                     if (LocalArmour > armourFromStunMax)
                     {
@@ -2759,38 +2793,51 @@ namespace PoePricer
             switch (GripType)
             {
                 case "1h":
-                    comboManaMax = affixBrackets[AffixBracketType.ComboSpellMana].GetAffixMinMaxFromiLevel(iLevel,
+                    comboManaMax = affixBrackets[AffixBracketType.ComboSpellMana].GetAffixMinMaxFromiLevel(
+                        iLevel,
                         "MaxMana", AffixBracketsSource.MinOrMax.Max);
-                    spMax = affixBrackets[AffixBracketType.SpellDamage].GetAffixMinMaxFromiLevel(iLevel, "SPD",
+                    spMax = affixBrackets[AffixBracketType.SpellDamage].GetAffixMinMaxFromiLevel(
+                        iLevel, "SPD",
                         AffixBracketsSource.MinOrMax.Max);
                     spMin = 10;
-                    affixBrackets[AffixBracketType.ComboSpellMana].GetAffixValueRangeFromAffixValue("SPD", SPD,
+                    affixBrackets[AffixBracketType.ComboSpellMana].GetAffixValueRangeFromAffixValue(
+                        "SPD", SPD,
                         "MaxMana", out manaFromSpMin, out manaFromSpMax);
-                    comboSpMax = affixBrackets[AffixBracketType.ComboSpellMana].GetAffixMinMaxFromiLevel(iLevel,
+                    comboSpMax = affixBrackets[AffixBracketType.ComboSpellMana].GetAffixMinMaxFromiLevel(
+                        iLevel,
                         "SPD", AffixBracketsSource.MinOrMax.Max);
-                    affixBrackets[AffixBracketType.ComboSpellMana].GetAffixValueRangeFromAffixValue("MaxMana",
+                    affixBrackets[AffixBracketType.ComboSpellMana].GetAffixValueRangeFromAffixValue(
+                        "MaxMana",
                         MaxMana - 15, "SPD", out spFromManaMinusMinMana_Min, out spFromManaMinusMinMana_Max);
-                    affixBrackets[AffixBracketType.ComboSpellMana].GetAffixValueRangeFromAffixValue("SPD", SPD - 10,
+                    affixBrackets[AffixBracketType.ComboSpellMana].GetAffixValueRangeFromAffixValue(
+                        "SPD", SPD - 10,
                         "MaxMana", out manaFromSpMinusMinSp_Min, out manaFromSpMinusMinSp_Max);
                     break;
                 default:
-                    comboManaMax = affixBrackets[AffixBracketType.ComboStaffSpellMana].GetAffixMinMaxFromiLevel(iLevel,
+                    comboManaMax = affixBrackets[AffixBracketType.ComboStaffSpellMana].GetAffixMinMaxFromiLevel(
+                        iLevel,
                         "MaxMana", AffixBracketsSource.MinOrMax.Max);
-                    spMax = affixBrackets[AffixBracketType.StaffSpellDamage].GetAffixMinMaxFromiLevel(iLevel, "SPD",
+                    spMax = affixBrackets[AffixBracketType.StaffSpellDamage].GetAffixMinMaxFromiLevel(
+                        iLevel, "SPD",
                         AffixBracketsSource.MinOrMax.Max);
                     spMin = 15;
-                    affixBrackets[AffixBracketType.ComboStaffSpellMana].GetAffixValueRangeFromAffixValue("SPD", SPD,
+                    affixBrackets[AffixBracketType.ComboStaffSpellMana].GetAffixValueRangeFromAffixValue(
+                        "SPD", SPD,
                         "MaxMana", out manaFromSpMin, out manaFromSpMax);
-                    comboSpMax = affixBrackets[AffixBracketType.ComboStaffSpellMana].GetAffixMinMaxFromiLevel(iLevel,
+                    comboSpMax = affixBrackets[AffixBracketType.ComboStaffSpellMana].GetAffixMinMaxFromiLevel(
+                        iLevel,
                         "SPD", AffixBracketsSource.MinOrMax.Max);
-                    affixBrackets[AffixBracketType.ComboStaffSpellMana].GetAffixValueRangeFromAffixValue("MaxMana",
+                    affixBrackets[AffixBracketType.ComboStaffSpellMana].GetAffixValueRangeFromAffixValue(
+                        "MaxMana",
                         MaxMana - 15, "SPD", out spFromManaMinusMinMana_Min, out spFromManaMinusMinMana_Max);
-                    affixBrackets[AffixBracketType.ComboSpellMana].GetAffixValueRangeFromAffixValue("SPD", SPD - 15,
+                    affixBrackets[AffixBracketType.ComboSpellMana].GetAffixValueRangeFromAffixValue(
+                        "SPD", SPD - 15,
                         "MaxMana", out manaFromSpMinusMinSp_Min, out manaFromSpMinusMinSp_Max);
                     break;
             }
 
-            var manaMax = affixBrackets[AffixBracketType.MaxMana].GetAffixMinMaxFromiLevel(iLevel, "MaxMana",
+            var manaMax = affixBrackets[AffixBracketType.MaxMana].GetAffixMinMaxFromiLevel(
+                iLevel, "MaxMana",
                 AffixBracketsSource.MinOrMax.Max);
 
 
@@ -2997,7 +3044,8 @@ namespace PoePricer
 
         private void SolveComboPhysAccAffixes(IDictionary<AffixBracketType, AffixBracketsSource> affixBrackets)
         {
-            if (!IsAccuracyRating && !IsLocalPhys) return;
+            if (!IsAccuracyRating && !IsLocalPhys)
+                return;
             if ((ClassType == ItemClassType.Ring) || (ClassType == ItemClassType.Amulet) ||
                 (ClassType == ItemClassType.Quiver) || (ClassType == ItemClassType.Gloves))
             {
@@ -3050,7 +3098,8 @@ namespace PoePricer
                 return;
             }
 
-            if (!IsWeapon) return;
+            if (!IsWeapon)
+                return;
 
             if (!IsAccuracyRating)
             {
@@ -3081,18 +3130,23 @@ namespace PoePricer
                 return;
             }
 
-            var maxPhys = affixBrackets[AffixBracketType.LocalPhys].GetAffixMinMaxFromiLevel(iLevel, "LocalPhys",
+            var maxPhys = affixBrackets[AffixBracketType.LocalPhys].GetAffixMinMaxFromiLevel(
+                iLevel, "LocalPhys",
                 AffixBracketsSource.MinOrMax.Max);
-            var maxComboPhys = affixBrackets[AffixBracketType.ComboLocalPhysAcc].GetAffixMinMaxFromiLevel(iLevel,
+            var maxComboPhys = affixBrackets[AffixBracketType.ComboLocalPhysAcc].GetAffixMinMaxFromiLevel(
+                iLevel,
                 "LocalPhys",
                 AffixBracketsSource.MinOrMax.Max);
-            var maxAcc = affixBrackets[AffixBracketType.AccuracyRating].GetAffixMinMaxFromiLevel(iLevel,
+            var maxAcc = affixBrackets[AffixBracketType.AccuracyRating].GetAffixMinMaxFromiLevel(
+                iLevel,
                 "AccuracyRating",
                 AffixBracketsSource.MinOrMax.Max);
-            var maxComboAcc = affixBrackets[AffixBracketType.ComboLocalPhysAcc].GetAffixMinMaxFromiLevel(iLevel,
+            var maxComboAcc = affixBrackets[AffixBracketType.ComboLocalPhysAcc].GetAffixMinMaxFromiLevel(
+                iLevel,
                 "AccuracyRating",
                 AffixBracketsSource.MinOrMax.Max);
-            var minComboAcc = affixBrackets[AffixBracketType.ComboLocalPhysAcc].GetAffixMinMaxFromiLevel(iLevel,
+            var minComboAcc = affixBrackets[AffixBracketType.ComboLocalPhysAcc].GetAffixMinMaxFromiLevel(
+                iLevel,
                 "AccuracyRating", AffixBracketsSource.MinOrMax.Min);
 
 
@@ -3149,7 +3203,8 @@ namespace PoePricer
 
             int minAccFromComboPhys, maxAccFromComboPhys;
 
-            affixBrackets[AffixBracketType.ComboLocalPhysAcc].GetAffixValueRangeFromAffixValue("LocalPhys", LocalPhys,
+            affixBrackets[AffixBracketType.ComboLocalPhysAcc].GetAffixValueRangeFromAffixValue(
+                "LocalPhys", LocalPhys,
                 "AccuracyRating", out minAccFromComboPhys, out maxAccFromComboPhys);
 
             if (LocalPhys <= maxComboPhys)

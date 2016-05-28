@@ -7,14 +7,13 @@ using PoePricer.Extensions;
 
 namespace PoePricer.Parser
 {
-    public class AffixBracketsSource : PricerDataReader
+    internal class AffixBracketsSource : PricerDataReader
     {
         public enum MinOrMax
         {
             Min,
             Max
         }
-
 
         public AffixBracketsSource(string fileName, IDictionary<ParseRegEx, Regex> knownRegexes)
             : base(Path.Combine("AffixBrackets", fileName))
@@ -135,18 +134,18 @@ namespace PoePricer.Parser
             return 0;
         }
 
-        public void GetAffixRange(string affixSourceName, int affixSourceValue, out int MinRangeValue,
-            out int MaxRangeValue)
+        public void GetAffixRange(string affixSourceName, int affixSourceValue, out int minRangeValue,
+            out int maxRangeValue)
         {
-            MinRangeValue = 0;
-            MaxRangeValue = 0;
+            minRangeValue = 0;
+            maxRangeValue = 0;
 
             if ((affixSourceName == FirstAffix) && (affixSourceName != ""))
             {
                 foreach (var bracket in Brackets.Where(bracket => affixSourceValue <= bracket.FirstAffixValueHi))
                 {
-                    MinRangeValue = bracket.FirstAffixValueLo;
-                    MaxRangeValue = bracket.FirstAffixValueHi;
+                    minRangeValue = bracket.FirstAffixValueLo;
+                    maxRangeValue = bracket.FirstAffixValueHi;
                     return;
                 }
                 Console.WriteLine($"[{FileName}.GetValueRange()] {FirstAffix} wrong value: '{affixSourceValue}'");
@@ -156,8 +155,8 @@ namespace PoePricer.Parser
             {
                 foreach (var bracket in Brackets.Where(bracket => affixSourceValue < bracket.SecondAffixValueHi))
                 {
-                    MinRangeValue = bracket.SecondAffixValueLo;
-                    MaxRangeValue = bracket.SecondAffixValueHi;
+                    minRangeValue = bracket.SecondAffixValueLo;
+                    maxRangeValue = bracket.SecondAffixValueHi;
                     return;
                 }
                 Console.WriteLine($"[{FileName}t.GetValueRange()] {SecondAffix} wrong value: '{affixSourceValue}'");

@@ -1,6 +1,6 @@
 namespace PoePricer
 {
-    public enum ParseRegEx
+    internal enum ParseRegEx
     {
         RegExItemRarityLine,
         RegexNoteMessageLine,

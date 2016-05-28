@@ -1,6 +1,6 @@
 namespace PoePricer.Parser
 {
-    public struct FilterArg
+    internal struct FilterArg
     {
         public string Name { get; set; }
 

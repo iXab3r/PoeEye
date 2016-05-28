@@ -6,7 +6,7 @@ using PoePricer.Extensions;
 
 namespace PoePricer.Parser
 {
-    public class FilterSource : PricerDataReader
+    internal class FilterSource : PricerDataReader
     {
         public FilterSource(ItemClassType className) : base(Path.Combine("Filters"))
         {
@@ -179,12 +179,13 @@ namespace PoePricer.Parser
                     }
 
 
-                    if (!double.TryParse(matcharg.Groups["argValue"].Value, out argValue))
+                    if (!matcharg.Groups["argValue"].Value.TryParseAsDouble(out argValue))
                     {
                         Console.WriteLine(
                             $"[{filterName}.FilterSource.Read] Wrong value for Arg: {arg} line :{matcharg.Groups["argValue"].Value}");
                         skipLine = true;
                     }
+
                     endofargparse:
                     filterArg = new FilterArg
                     {
@@ -220,7 +221,6 @@ namespace PoePricer.Parser
             if (item.ClassType != FilterClass)
                 return;
 
-            var failArg = "";
             foreach (var filter in Filters)
             {
                 if (filter.Tier > tier)
@@ -230,24 +230,25 @@ namespace PoePricer.Parser
                     continue;
                 }
 
+                string failArg;
                 foreach (var arg in filter.Args)
                 {
                     switch (arg.Type)
                     {
                         case ArgTypes.Exist:
-                            if (item.Get(arg.Name) == true)
+                            if (item.Get<bool>(arg.Name) == true)
                                 continue;
                             break;
                         case ArgTypes.NotExist:
-                            if (item.Get(arg.Name) == false)
+                            if (item.Get<bool>(arg.Name) == false)
                                 continue;
                             break;
                         case ArgTypes.Craft:
-                            if (ArgCompare(item.Get(arg.Name), arg.Operator, arg.Value))
+                            if (ArgCompare(item.Get<double>(arg.Name), arg.Operator, arg.Value))
                                 continue;
                             break;
                         case ArgTypes.NonCraft:
-                            if (ArgCompare(item.Get(arg.Name), arg.Operator, arg.Value))
+                            if (ArgCompare(item.Get<double>(arg.Name), arg.Operator, arg.Value))
                                 continue;
                             break;
                     }
@@ -291,8 +292,16 @@ namespace PoePricer.Parser
             }
         }
 
+        public bool ArgCompare(double? fieldValue, ArgOperators argOperator, double argValue)
+        {
+            if (fieldValue.HasValue)
+            {
+                return ArgCompare(fieldValue.Value, argOperator, argValue);
+            }
+            return false;
+        }
 
-        public bool ArgCompare(double fieldValue, ArgOperators argOperator, dynamic argValue)
+        public bool ArgCompare(double fieldValue, ArgOperators argOperator, double argValue)
         {
             switch (argOperator)
             {

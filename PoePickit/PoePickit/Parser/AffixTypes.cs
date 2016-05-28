@@ -1,6 +1,6 @@
 namespace PoePricer.Parser
 {
-    public enum AffixTypes
+    internal enum AffixTypes
     {
         prefixes,
         suffixes,

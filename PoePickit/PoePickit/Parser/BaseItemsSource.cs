@@ -7,7 +7,7 @@ using PoePricer.Extensions;
 
 namespace PoePricer.Parser
 {
-    public class BaseItemsSource : PricerDataReader
+    internal class BaseItemsSource : PricerDataReader
     {
         public BaseItemsSource(string fileName) : base(Path.Combine("Bases", fileName))
         {
@@ -42,8 +42,8 @@ namespace PoePricer.Parser
                     BaseName = match.Groups["baseName"].Value,
                     BaseDamageLo = match.Groups["damageLo"].Success ? match.Groups["damageLo"].Value.ToInt() : 0,
                     BaseDamageHi = match.Groups["damageHi"].Success ? match.Groups["damageHi"].Value.ToInt() : 0,
-                    BaseCC = match.Groups["baseCC"].Success ? Convert.ToDouble(match.Groups["baseCC"].Value) : 0,
-                    BaseAPS = match.Groups["baseAPS"].Success ? Convert.ToDouble(match.Groups["baseAPS"].Value) : 0,
+                    BaseCC = match.Groups["baseCC"].Success ? match.Groups["baseCC"].Value.ToDouble() : 0,
+                    BaseAPS = match.Groups["baseAPS"].Success ? match.Groups["baseAPS"].Value.ToDouble() : 0,
                     BaseAR =
                         match.Groups["baseAR"].Success && match.Groups["baseAR"].Value != ""
                             ? match.Groups["baseAR"].Value.ToInt()

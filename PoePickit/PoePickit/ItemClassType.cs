@@ -1,6 +1,6 @@
 namespace PoePricer
 {
-    public enum ItemClassType
+    internal enum ItemClassType
     {
         Helm,
         BodyArmour,

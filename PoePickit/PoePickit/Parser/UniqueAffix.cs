@@ -1,6 +1,6 @@
 namespace PoePricer.Parser
 {
-    public struct UniqueAffix
+    internal struct UniqueAffix
     {
         public string[] WordsInLine;
         public string RawLine;

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace PoePricer.Parser
 {
-    public struct FilterLine
+    internal struct FilterLine
     {
         public List<FilterArg> Args;
 

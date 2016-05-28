@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 
 namespace PoePricer.Parser
 {
-    public class AffixesSource : PricerDataReader
+    internal class AffixesSource : PricerDataReader
     {
         public AffixesSource(string fileName, IDictionary<ParseRegEx, Regex> knownRegexes)
             : base(Path.Combine("Affixes", fileName))

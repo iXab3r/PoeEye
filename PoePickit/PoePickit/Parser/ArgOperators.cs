@@ -1,6 +1,6 @@
 namespace PoePricer.Parser
 {
-    public enum ArgOperators
+    internal enum ArgOperators
     {
         Empty,
         More,

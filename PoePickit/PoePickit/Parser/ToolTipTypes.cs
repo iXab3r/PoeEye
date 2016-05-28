@@ -1,6 +1,6 @@
 namespace PoePricer.Parser
 {
-    public enum ToolTipTypes
+    internal enum ToolTipTypes
     {
         Unknown,
         Common,

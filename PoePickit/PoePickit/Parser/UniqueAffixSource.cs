@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
+using PoePricer.Extensions;
 
 namespace PoePricer.Parser
 {
-    public class UniqueAffixSource : PricerDataReader
+    internal class UniqueAffixSource : PricerDataReader
     {
         public Dictionary<ItemClassType, Dictionary<string, UniqueItem>> KnownUniques;
         public UniqueItem UnknownUnique = new UniqueItem {Desc = "Данный предмет отсутсвутет в базе легендарок."};
@@ -120,14 +121,14 @@ namespace PoePricer.Parser
                         valueLoString = valueLoString.Replace("@", "");
                     }
 
-                    if (!double.TryParse(valueLoString, out valueLo))
+                    if (!valueLoString.TryParseAsDouble(out valueLo))
                     {
                         Console.WriteLine(
                             $"[{fileName}]Wrong affix range vL: {valueLoString} at uniqie file line: {line} section: {type}");
                         Console.ReadKey();
                         skipaffix = true;
                     }
-                    if (!double.TryParse(valueHiString, out valueHi))
+                    if (!valueHiString.TryParseAsDouble(out valueHi))
                     {
                         Console.WriteLine(
                             $"[{fileName}]Wrong affix range vH: {valueHiString} at uniqie file line: {line} section: {type}");
@@ -136,7 +137,7 @@ namespace PoePricer.Parser
                     }
 
                     if (valueLoStringSecond != "")
-                        if (!double.TryParse(valueLoStringSecond, out valueLoSecond))
+                        if (!valueLoStringSecond.TryParseAsDouble(out valueLoSecond))
                         {
                             Console.WriteLine(
                                 $"[{fileName}]Wrong affix range vLS: {valueLoStringSecond} at uniqie file line: {line} section: {type}");
@@ -144,7 +145,7 @@ namespace PoePricer.Parser
                             skipaffix = true;
                         }
                     if (valueHiStringSecond != "")
-                        if (!double.TryParse(valueHiStringSecond, out valueHiSecond))
+                        if (!valueHiStringSecond.TryParseAsDouble(out valueHiSecond))
                         {
                             Console.WriteLine(
                                 $"[{fileName}]Wrong affix range vHS: {valueHiStringSecond} at uniqie file line: {line} section: {type}");

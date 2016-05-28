@@ -1,6 +1,6 @@
 namespace PoePricer.Parser
 {
-    public enum ArgTypes
+    internal enum ArgTypes
     {
         NonCraft,
         Craft,

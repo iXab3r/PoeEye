@@ -1,6 +1,6 @@
 namespace PoePricer.Parser
 {
-    public enum FilterTiers
+    internal enum FilterTiers
     {
         high,
         mid,
