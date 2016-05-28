@@ -1,4 +1,0 @@
-Aff	AccuracyRating	LightRadius
-8	10-20	5
-15	21-40	10
-30	5-10%	15
