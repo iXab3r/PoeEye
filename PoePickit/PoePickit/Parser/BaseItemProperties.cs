@@ -1,6 +1,6 @@
 namespace PoePricer.Parser
 {
-    public struct BaseItemProperties
+    internal struct BaseItemProperties
     {
         public string BaseName { get; set; }
 

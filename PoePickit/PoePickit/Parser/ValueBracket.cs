@@ -1,6 +1,6 @@
 namespace PoePricer.Parser
 {
-    public struct ValueBracket
+    internal struct ValueBracket
     {
         public int ItemLevel { get; set; }
 

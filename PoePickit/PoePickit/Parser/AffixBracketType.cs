@@ -1,6 +1,6 @@
 namespace PoePricer.Parser
 {
-    public enum AffixBracketType
+    internal enum AffixBracketType
     {
         AccuracyRating,
         Armour,

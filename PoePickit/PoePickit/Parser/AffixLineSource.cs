@@ -2,7 +2,7 @@ using System.Text.RegularExpressions;
 
 namespace PoePricer.Parser
 {
-    public struct AffixLineSource
+    internal struct AffixLineSource
     {
         public Regex AffixRegExp;
         public string[] AffixLineArgs;

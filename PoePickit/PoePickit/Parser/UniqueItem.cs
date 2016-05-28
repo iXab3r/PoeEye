@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace PoePricer.Parser
 {
-    public struct UniqueItem
+    internal struct UniqueItem
     {
         public List<UniqueAffix> Affixes;
         public string WebLink;

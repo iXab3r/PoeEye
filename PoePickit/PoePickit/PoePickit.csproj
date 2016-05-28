@@ -111,7 +111,6 @@
     <Compile Include="Parser\ValueBracket.cs" />
     <Compile Include="Parser\FilterTiers.cs" />
     <Compile Include="Parser\PricerDataReader.cs" />
-    <Compile Include="IPoePricer.cs" />
     <Compile Include="Parser\ToolTipTypes.cs" />
     <Compile Include="Parser\UniqueAffix.cs" />
     <Compile Include="Parser\UniqueAffixSource.cs" />

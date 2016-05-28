@@ -1,6 +1,6 @@
 namespace PoePricer.Parser
 {
-    public enum BaseItemTypes
+    internal enum BaseItemTypes
     {
         BodyArmour,
         Boots,

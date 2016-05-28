@@ -4,7 +4,7 @@ using Guards;
 
 namespace PoePricer.Parser
 {
-    public abstract class PricerDataReader
+    internal abstract class PricerDataReader
     {
         private readonly string dataRootDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data");
 

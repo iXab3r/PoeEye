@@ -8,17 +8,17 @@ namespace PoePricer
 {
     public class ItemParse
     {
-        public readonly IDictionary<AffixBracketType, AffixBracketsSource> KnownAffixBrackets;
+        private readonly IDictionary<AffixBracketType, AffixBracketsSource> KnownAffixBrackets;
 
-        public readonly IDictionary<AffixTypes, AffixesSource> KnownAffixes;
+        private readonly IDictionary<AffixTypes, AffixesSource> KnownAffixes;
 
-        public readonly IDictionary<BaseItemTypes, BaseItemsSource> KnownBaseItems;
+        private readonly IDictionary<BaseItemTypes, BaseItemsSource> KnownBaseItems;
 
-        public readonly IDictionary<ItemClassType, FilterSource> KnownFilters;
+        private readonly IDictionary<ItemClassType, FilterSource> KnownFilters;
 
-        public readonly IDictionary<ParseRegEx, Regex> KnownRegexes;
+        private readonly IDictionary<ParseRegEx, Regex> KnownRegexes;
 
-        public UniqueAffixSource Uniques;
+        private UniqueAffixSource Uniques;
 
 
         public ItemParse()
@@ -62,7 +62,7 @@ namespace PoePricer
             FilterTier = FilterTiers.low;
         }
 
-        public FilterTiers FilterTier { get; set; }
+        private FilterTiers FilterTier { get; set; }
 
 
         private static IDictionary<ParseRegEx, Regex> SetRegExps()
