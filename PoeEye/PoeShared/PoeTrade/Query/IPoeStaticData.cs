@@ -10,6 +10,8 @@ namespace PoeShared.PoeTrade.Query
 
         IPoeItemMod[] ModsList { [NotNull] get; }
 
+        IPoeItemType[] ItemTypes { get; }
+
         string[] LeaguesList { [NotNull] get; }
     }
 }

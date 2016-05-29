@@ -1,4 +1,6 @@
-﻿namespace PoeEye.PoeTrade
+﻿using PoeShared.Communications;
+
+namespace PoeEye.PoeTrade
 {
     using System;
     using System.Reactive.Linq;
@@ -11,7 +13,6 @@
 
     using PoeShared;
     using PoeShared.Common;
-    using PoeShared.Http;
     using PoeShared.PoeTrade;
     using PoeShared.Prism;
 

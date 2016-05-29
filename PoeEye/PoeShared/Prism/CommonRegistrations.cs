@@ -1,4 +1,8 @@
-﻿namespace PoeShared.Prism
+﻿using PoeShared.Communications;
+using PoeShared.PoeTrade.Query;
+using ProxyProvider;
+
+namespace PoeShared.Prism
 {
     using System.Collections.Generic;
 
@@ -24,10 +28,14 @@
                 .RegisterSingleton<IPoeItemParser, PoeItemParser>()
                 .RegisterSingleton<IEqualityComparer<IPoeItem>, PoeItemEqualityComparer>()
                 .RegisterSingleton<IConverter<IPoeItem, IPoeQueryInfo>, PoeItemToPoeQueryConverter>()
+                .RegisterSingleton<IProxyProvider, GenericProxyProvider>(new InjectionFactory(unity => new GenericProxyProvider()))
                 .RegisterSingleton<IRandomNumberGenerator, RandomNumberGenerator>();
 
             Container
                 .RegisterType(typeof (IPoeModsProcessor), typeof (PoeModsProcessor))
+                .RegisterType<IPoeLiveHistoryProvider, PoeLiveHistoryProvider>()
+                .RegisterType<IPoeStaticData, PoeQueryInfoProvider>()
+                .RegisterType<IHttpClient, GenericHttpClient>()
                 .RegisterType(typeof (IFactory<,,>), typeof (Factory<,,>))
                 .RegisterType(typeof (IFactory<,>), typeof (Factory<,>))
                 .RegisterType(typeof (IFactory<>), typeof (Factory<>));

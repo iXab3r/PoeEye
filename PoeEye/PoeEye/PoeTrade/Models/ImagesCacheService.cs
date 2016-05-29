@@ -1,4 +1,6 @@
-﻿namespace PoeEye.PoeTrade.Models
+﻿using PoeShared.Communications;
+
+namespace PoeEye.PoeTrade.Models
 {
     using System;
     using System.Collections.Concurrent;
@@ -20,7 +22,6 @@
     using PoeEye.Prism;
 
     using PoeShared;
-    using PoeShared.Http;
     using PoeShared.Prism;
 
     internal sealed class ImagesCacheService : IImagesCacheService
@@ -67,6 +68,7 @@
             var result = httpClient
                 .GetStreamAsync(imageUri)
                 .Select(x => LoadImageFromStream(outputFilePath, x))
+                .Catch(Observable.Empty<FileInfo>())
                 .ObserveOn(uiScheduler)
                 .Publish();
 

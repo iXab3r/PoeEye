@@ -34,7 +34,7 @@ namespace PoeEye.PoeTrade.ViewModels
         private float? minGroupValue;
 
         public PoeModsEditorViewModel(
-            [NotNull] IPoeQueryInfoProvider queryInfoProvider,
+            [NotNull] IPoeStaticData queryInfoProvider,
             [NotNull] IFactory<IPoeModViewModel, ISuggestionProvider> modsViewModelsFactory,
             [NotNull] IFactory<ISuggestionProvider, string[]> suggestionProviderFactory)
         {

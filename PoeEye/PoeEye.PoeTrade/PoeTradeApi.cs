@@ -1,4 +1,6 @@
-﻿namespace PoeEye.PoeTrade
+﻿using PoeShared.Communications;
+
+namespace PoeEye.PoeTrade
 {
     using System;
     using System.Collections.Specialized;
@@ -12,7 +14,6 @@
 
     using PoeShared;
     using PoeShared.Exceptions;
-    using PoeShared.Http;
     using PoeShared.PoeTrade;
     using PoeShared.PoeTrade.Query;
     using PoeShared.Prism;

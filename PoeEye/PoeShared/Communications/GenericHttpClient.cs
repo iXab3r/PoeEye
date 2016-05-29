@@ -1,28 +1,21 @@
-﻿namespace PoeEye.PoeTrade.Communications
+﻿using System;
+using System.Collections.Specialized;
+using System.IO;
+using System.Net;
+using System.Net.Http;
+using System.Reactive.Concurrency;
+using System.Reactive.Linq;
+using System.Reactive.Threading.Tasks;
+using System.Text;
+using System.Web;
+using CsQuery.ExtensionMethods.Internal;
+using Guards;
+using JetBrains.Annotations;
+using PoeShared.Scaffolding;
+using TypeConverter;
+
+namespace PoeShared.Communications
 {
-    using System;
-    using System.Collections.Specialized;
-    using System.IO;
-    using System.Net;
-    using System.Net.Http;
-    using System.Reactive.Concurrency;
-    using System.Reactive.Linq;
-    using System.Reactive.Threading.Tasks;
-    using System.Text;
-    using System.Web;
-
-    using CsQuery.ExtensionMethods.Internal;
-
-    using Guards;
-
-    using JetBrains.Annotations;
-
-    using PoeShared;
-    using PoeShared.Http;
-    using PoeShared.Scaffolding;
-
-    using TypeConverter;
-
     internal sealed class GenericHttpClient : IHttpClient
     {
         private readonly IConverter<NameValueCollection, string> nameValueConverter;

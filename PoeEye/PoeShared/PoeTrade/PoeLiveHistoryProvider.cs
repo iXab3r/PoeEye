@@ -1,22 +1,16 @@
-﻿namespace PoeEye.PoeTrade
+﻿using System;
+using System.Reactive;
+using System.Reactive.Linq;
+using System.Reactive.Subjects;
+using Guards;
+using JetBrains.Annotations;
+using PoeShared.Common;
+using PoeShared.PoeTrade.Query;
+using PoeShared.Scaffolding;
+using ReactiveUI;
+
+namespace PoeShared.PoeTrade
 {
-    using System;
-    using System.Reactive;
-    using System.Reactive.Linq;
-    using System.Reactive.Subjects;
-
-    using Guards;
-
-    using JetBrains.Annotations;
-
-    using PoeShared;
-    using PoeShared.Common;
-    using PoeShared.PoeTrade;
-    using PoeShared.PoeTrade.Query;
-    using PoeShared.Scaffolding;
-
-    using ReactiveUI;
-
     internal sealed class PoeLiveHistoryProvider : DisposableReactiveObject, IPoeLiveHistoryProvider
     {
         private readonly ISubject<Unit> forceUpdatesSubject = new Subject<Unit>();

@@ -1,10 +1,9 @@
-namespace PoeShared.PoeTrade
+using JetBrains.Annotations;
+using PoeShared.PoeTrade.Query;
+
+namespace PoeEye.PoeTrade
 {
-    using JetBrains.Annotations;
-
-    using Query;
-
-    public interface IPoeTradeParser
+    internal interface IPoeTradeParser
     {
         [NotNull]
         IPoeQueryResult ParseQueryResponse([NotNull] string rawHtml);

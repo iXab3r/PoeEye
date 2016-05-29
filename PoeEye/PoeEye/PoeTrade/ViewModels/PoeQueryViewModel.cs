@@ -143,7 +143,7 @@
         private int? socketsW;
 
         public PoeQueryViewModel(
-            [NotNull] IPoeQueryInfoProvider queryInfoProvider,
+            [NotNull] IPoeStaticData queryInfoProvider,
             [NotNull] IPoeModGroupsEditorViewModel modGroupsEditor,
             [NotNull] IFactory<ISuggestionProvider, string[]> suggestionProviderFactory,
             [NotNull] IPoeDatabaseReader poeDatabaseReader)

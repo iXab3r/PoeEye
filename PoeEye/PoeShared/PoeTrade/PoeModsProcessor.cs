@@ -15,7 +15,7 @@ namespace PoeShared.PoeTrade
     {
         private readonly PoeModParser[] modsRegexes;
 
-        public PoeModsProcessor([NotNull] IPoeQueryInfoProvider queryInfoProvider)
+        public PoeModsProcessor([NotNull] IPoeStaticData queryInfoProvider)
         {
             Guard.ArgumentNotNull(() => queryInfoProvider);
 
@@ -27,7 +27,7 @@ namespace PoeShared.PoeTrade
             return modsRegexes;
         }
 
-        private static PoeModParser[] PrepareModsInfo(IPoeQueryInfoProvider provider)
+        private static PoeModParser[] PrepareModsInfo(IPoeStaticData provider)
         {
             var mods = provider.ModsList;
             return mods.Select(PrepareModInfo).ToArray();

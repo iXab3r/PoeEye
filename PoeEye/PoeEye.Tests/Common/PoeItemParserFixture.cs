@@ -16,7 +16,7 @@
     [TestFixture]
     public class PoeItemParserFixture
     {
-        private readonly Mock<IPoeQueryInfoProvider> queryInfoProvider = new Mock<IPoeQueryInfoProvider>();
+        private readonly Mock<IPoeStaticData> queryInfoProvider = new Mock<IPoeStaticData>();
 
         private IEnumerable<TestCaseData> KnownItems()
         {
