@@ -62,6 +62,8 @@
 
         public bool IsCorrupted { get; set; }
 
+        public bool IsUnidentified { get; set; }
+
         public PoeItemRarity Rarity { get; set; }
 
         public IPoeItemMod[] Mods

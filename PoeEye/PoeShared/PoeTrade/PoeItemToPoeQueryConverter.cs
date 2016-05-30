@@ -48,7 +48,7 @@
 
         private PoeQueryRangeModArgument Convert(IPoeItemMod mod)
         {
-            var result = new PoeQueryRangeModArgument(mod.CodeName);
+            var result = new PoeQueryRangeModArgument(mod);
 
             foreach (var poeModInfo in modsRegexes)
             {

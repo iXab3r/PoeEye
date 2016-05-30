@@ -1,10 +1,12 @@
+using PoeShared.Common;
+
 namespace PoeShared.PoeTrade.Query
 {
     using JetBrains.Annotations;
 
     public class PoeQueryRangeModArgument : PoeQueryModArgument, IPoeQueryRangeModArgument
     {
-        public PoeQueryRangeModArgument([NotNull] string name) : base(name)
+        public PoeQueryRangeModArgument(IPoeItemMod mod) : base(mod)
         {
         }
 

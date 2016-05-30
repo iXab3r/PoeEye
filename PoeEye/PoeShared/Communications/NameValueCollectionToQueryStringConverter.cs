@@ -1,13 +1,11 @@
-﻿namespace PoeEye.PoeTrade.Communications
+﻿using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.Web;
+using Guards;
+using TypeConverter;
+
+namespace PoeShared.Communications
 {
-    using System.Collections.Generic;
-    using System.Collections.Specialized;
-    using System.Web;
-
-    using Guards;
-
-    using TypeConverter;
-
     internal sealed class NameValueCollectionToQueryStringConverter : IConverter<NameValueCollection, string>
     {
         public string Convert(NameValueCollection source)

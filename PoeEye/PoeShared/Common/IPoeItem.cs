@@ -62,6 +62,8 @@
 
         bool IsCorrupted { get; }
 
+        bool IsUnidentified { get; }
+
         PoeItemRarity Rarity { get; }
 
         IPoeItemMod[] Mods { [NotNull] get; }

@@ -39,6 +39,7 @@ namespace PoeEye.PoeTrade
         private readonly IPoeTradeParser poeTradeParser;
         private readonly IProxyProvider proxyProvider;
         private readonly IConverter<IPoeQuery, NameValueCollection> queryConverter;
+        private readonly IConverter<IPoeQueryInfo, IPoeQuery> queryInfoToQueryConverter;
 
         static PoeTradeApi()
         {
@@ -53,23 +54,27 @@ namespace PoeEye.PoeTrade
             IPoeTradeParser poeTradeParser,
             IProxyProvider proxyProvider,
             IFactory<IHttpClient> httpClientFactory,
+            IConverter<IPoeQueryInfo, IPoeQuery> queryInfoToQueryConverter,
             IConverter<IPoeQuery, NameValueCollection> queryConverter)
         {
             Guard.ArgumentNotNull(() => poeTradeParser);
             Guard.ArgumentNotNull(() => proxyProvider);
             Guard.ArgumentNotNull(() => httpClientFactory);
+            Guard.ArgumentNotNull(() => queryInfoToQueryConverter);
             Guard.ArgumentNotNull(() => queryConverter);
 
             this.poeTradeParser = poeTradeParser;
             this.proxyProvider = proxyProvider;
             this.queryConverter = queryConverter;
             this.httpClientFactory = httpClientFactory;
+            this.queryInfoToQueryConverter = queryInfoToQueryConverter;
         }
 
-        public Task<IPoeQueryResult> IssueQuery(IPoeQuery query)
+        public Task<IPoeQueryResult> IssueQuery(IPoeQueryInfo queryInfo)
         {
-            Guard.ArgumentNotNull(() => query);
+            Guard.ArgumentNotNull(() => queryInfo);
 
+            var query = queryInfoToQueryConverter.Convert(queryInfo);
             var queryPostData = queryConverter.Convert(query);
             return IssueQuery(PoeTradeSearchUri, queryPostData);
         }

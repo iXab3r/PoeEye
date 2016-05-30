@@ -62,6 +62,8 @@
 
         public string ItemName { get; set; }
 
+        public string AccountName { get; set; }
+
         public PoeItemRarity? ItemRarity { get; set; }
 
         public IPoeItemType ItemType { get; set; }

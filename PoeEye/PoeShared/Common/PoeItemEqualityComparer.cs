@@ -22,10 +22,6 @@ namespace PoeShared.Common
             {
                 return false;
             }
-            if (x.GetType() != y.GetType())
-            {
-                return false;
-            }
 
             var result = string.Equals(x.ItemName, y.ItemName, StringComparison.InvariantCultureIgnoreCase) &&
                          string.Equals(x.ItemIconUri, y.ItemIconUri, StringComparison.InvariantCultureIgnoreCase) &&
@@ -33,10 +29,12 @@ namespace PoeShared.Common
                          string.Equals(x.UserForumUri, y.UserForumUri, StringComparison.InvariantCultureIgnoreCase) &&
                          string.Equals(x.UserForumName, y.UserForumName, StringComparison.InvariantCultureIgnoreCase) &&
                          string.Equals(x.Price, y.Price, StringComparison.InvariantCultureIgnoreCase) &&
+                         string.Equals(x.Hash, y.Hash, StringComparison.InvariantCultureIgnoreCase) &&
                          string.Equals(x.League, y.League, StringComparison.InvariantCultureIgnoreCase);
 
             result &= x.Mods.SequenceEqual(y.Mods, itemModEqualityComparer);
             result &= x.IsCorrupted == y.IsCorrupted;
+            result &= x.IsUnidentified == y.IsUnidentified;
             result &= x.UserIsOnline == y.UserIsOnline;
             return result;
         }

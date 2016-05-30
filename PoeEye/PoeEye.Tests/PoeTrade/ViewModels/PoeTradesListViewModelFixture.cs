@@ -33,15 +33,13 @@
         private Mock<IClock> clock;
         private Mock<IEqualityComparer<IPoeItem>> poeItemsComparer;
         private Mock<IFactory<IPoeTradeViewModel, IPoeItem>> poeTradeViewModelFactory;
-        private Mock<IFactory<IPoeLiveHistoryProvider, IPoeQuery>> poeLiveHistoryFactory;
+        private Mock<IFactory<IPoeLiveHistoryProvider, IPoeQueryInfo>> poeLiveHistoryFactory;
 
         private Mock<IPoeLiveHistoryProvider> poeLiveHistory;
         private Mock<IHistoricalTradesViewModel> historicalTradesViewModel;
         private Mock<IPoeCaptchaRegistrator> captchaService;
         private ISubject<IPoeItem[]> poeLiveHistoryItems;
         private ISubject<Exception> poeLiveHistoryUpdateExceptions;
-
-        private Mock<IConverter<IPoeQueryInfo, IPoeQuery>> poeQueryInfoToQueryConverter;
 
         [SetUp]
         public void SetUp()
@@ -61,20 +59,15 @@
                 .Setup(x => x.Equals(It.IsAny<IPoeItem>(), It.IsAny<IPoeItem>()))
                 .Returns(false);
 
-            poeQueryInfoToQueryConverter = new Mock<IConverter<IPoeQueryInfo, IPoeQuery>>();
-            poeQueryInfoToQueryConverter
-                .Setup(x => x.Convert(It.IsAny<IPoeQueryInfo>()))
-                .Returns(Mock.Of<IPoeQuery>());
-
             poeLiveHistoryItems = new Subject<IPoeItem[]>();
             poeLiveHistoryUpdateExceptions = new Subject<Exception>();
             poeLiveHistory = new Mock<IPoeLiveHistoryProvider>();
             poeLiveHistory.SetupGet(x => x.ItemsPacks).Returns(poeLiveHistoryItems);
             poeLiveHistory.SetupGet(x => x.UpdateExceptions).Returns(poeLiveHistoryUpdateExceptions);
 
-            poeLiveHistoryFactory = new Mock<IFactory<IPoeLiveHistoryProvider, IPoeQuery>>();
+            poeLiveHistoryFactory = new Mock<IFactory<IPoeLiveHistoryProvider, IPoeQueryInfo>>();
             poeLiveHistoryFactory
-                .Setup(x => x.Create(It.IsAny<IPoeQuery>()))
+                .Setup(x => x.Create(It.IsAny<IPoeQueryInfo>()))
                 .Returns(poeLiveHistory.Object);
 
             historicalTradesViewModel = new Mock<IHistoricalTradesViewModel>();
@@ -150,27 +143,6 @@
 
             //Then
             trade.TradeState.ShouldBe(PoeTradeState.Removed);
-        }
-
-        [Test]
-        public void ShouldCreateLiveHistoryProviderOnActiveQueryChange()
-        {
-            //Given
-            var instance = CreateInstance();
-
-            var queryInfo = Mock.Of<IPoeQueryInfo>();
-            var convertedQuery = Mock.Of<IPoeQuery>();
-
-            poeQueryInfoToQueryConverter
-                .Setup(x => x.Convert(It.IsAny<IPoeQueryInfo>()))
-                .Returns(convertedQuery);
-
-            //When
-            instance.ActiveQuery = queryInfo;
-
-            //Then
-            poeLiveHistoryFactory.Verify(x => x.Create(convertedQuery), Times.Once);
-            poeQueryInfoToQueryConverter.Verify(x => x.Convert(queryInfo), Times.Once);
         }
 
         [Test]
@@ -317,7 +289,6 @@
                 captchaService.Object,
                 historicalTradesViewModel.Object,
                 poeItemsComparer.Object,
-                poeQueryInfoToQueryConverter.Object,
                 clock.Object,
                 Scheduler.Immediate);
         }

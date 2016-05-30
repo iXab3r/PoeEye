@@ -191,6 +191,7 @@
     <Compile Include="Common\PoeQueryModsGroup.cs" />
     <Compile Include="Communications\GenericHttpClient.cs" />
     <Compile Include="Communications\IHttpClient.cs" />
+    <Compile Include="Communications\NameValueCollectionToQueryStringConverter.cs" />
     <Compile Include="Exceptions\CaptchaException.cs" />
     <Compile Include="IClock.cs" />
     <Compile Include="IRandomNumberGenerator.cs" />
@@ -242,6 +243,7 @@
     <Compile Include="Scaffolding\DisposableReactiveObject.cs" />
     <Compile Include="Scaffolding\EnumerableExtensions.cs" />
     <Compile Include="Scaffolding\IDisposableReactiveObject.cs" />
+    <Compile Include="Scaffolding\LambdaComparer.cs" />
     <Compile Include="Scaffolding\ObjectExtensions.cs" />
     <Compile Include="Scaffolding\ObservableExtensions.cs" />
     <Compile Include="Scaffolding\ResourceReader.cs" />

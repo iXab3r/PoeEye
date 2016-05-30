@@ -1,18 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using Nest;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using PoeEye.ExileToolsApi.Extensions;
+using PoeShared.Common;
 
 namespace PoeEye.ExileToolsApi.Entities
 {
     [ElasticsearchType(Name = "item")]
-    public class ExTzItem
+    internal class ExTzItem
     {
         [JsonProperty("info")]
         public ExTzItemInfo Info { get; set; }
 
         [JsonProperty("shop")]
         public ExTzShopInfo Shop { get; set; }
+
+        [JsonProperty("uuid")]
+        public string ItemId { get; set; }
 
         [JsonProperty("attributes")]
         public ExTzItemAttributes Attributes { get; set; }
@@ -22,9 +29,26 @@ namespace PoeEye.ExileToolsApi.Entities
 
         [JsonProperty("mods")]
         public Dictionary<string, ExTzItemMods> Mods { get; set; }
+
+        [JsonProperty("sockets")]
+        public ExTzItemSockets Sockets { get; set; }
+
+        [JsonProperty("requirements")]
+        public ExTzItemRequirements Requirements { get; set; }
     }
 
-    public class ExTzItemMods
+    [JsonConverter(typeof(StringEnumConverter))]
+    internal enum VerificationStatus
+    {
+        [EnumMember(Value = "YES")]
+        Yes,
+        [EnumMember(Value = "GONE")]
+        Gone,
+        [EnumMember(Value = "OLD")]
+        Old
+    }
+
+    internal class ExTzItemMods
     {
         [JsonProperty("implicit")]
         public Dictionary<string, object> Implicit { get; set; }
@@ -33,13 +57,55 @@ namespace PoeEye.ExileToolsApi.Entities
         public Dictionary<string, object> Explicit { get; set; }
     }
 
-    public class ExTzWeaponInfo
+    internal class ExTzItemRequirements
+    {
+        [JsonProperty("Str")]
+        public double Strength { get; set; }
+
+        [JsonProperty("Dex")]
+        public double Dexterity { get; set; }
+
+        [JsonProperty("Int")]
+        public double Intelligence { get; set; }
+
+        [JsonProperty("Level")]
+        public double Level { get; set; }
+    }
+
+    internal class ExTzArmourInfo
+    {
+        [JsonProperty("Armour")]
+        public double Armour { get; set; }
+
+        [JsonProperty("Energy Shield")]
+        public double EnergyShield { get; set; }
+
+        [JsonProperty("Evasion")]
+        public double Evasion { get; set; }
+
+        [JsonProperty("Chance to Block")]
+        public double BlockChance { get; set; }
+    }
+
+    internal class ExTzGemInfo
+    {
+        [JsonProperty("Level")]
+        public double Level { get; set; }
+    }
+
+    internal class ExTzWeaponInfo
     {
         [JsonProperty("Physical DPS")]
         public double PhysicalDps { get; set; }
 
+        [JsonProperty("Elemental DPS")]
+        public double ElementalDps { get; set; }
+
         [JsonProperty("Total DPS")]
         public double TotalDps { get; set; }
+
+        [JsonProperty("Elemental Damage")]
+        public ExTzPropertyRange ElementalDamage { get; set; }
 
         [JsonProperty("Physical Damage")]
         public ExTzPropertyRange PhysicalDamage { get; set; }
@@ -54,13 +120,22 @@ namespace PoeEye.ExileToolsApi.Entities
         public double AttacksPerSecond { get; set; }
     }
 
-    public class ExTzProperties
+    internal class ExTzProperties
     {
         [JsonProperty("Weapon")]
         public ExTzWeaponInfo Weapon { get; set; }
+
+        [JsonProperty("Armour")]
+        public ExTzArmourInfo Armour { get; set; }
+
+        [JsonProperty("Gem")]
+        public ExTzGemInfo Gem { get; set; }
+
+        [JsonProperty("Quality")]
+        public double Quality { get; set; }
     }
 
-    public class ExTzPropertyRange
+    internal struct ExTzPropertyRange
     {
         [JsonProperty("min")]
         public double Min { get; set; }
@@ -70,10 +145,14 @@ namespace PoeEye.ExileToolsApi.Entities
 
         [JsonProperty("max")]
         public double Max { get; set; }
+
+        public override string ToString()
+        {
+            return $"{Min} - {Max}";
+        }
     }
 
-
-    public class ExTzItemInfo
+    internal class ExTzItemInfo
     {
         [JsonProperty("fullName")]
         public string FullName { get; set; }
@@ -91,33 +170,39 @@ namespace PoeEye.ExileToolsApi.Entities
         public string Icon { get; set; }
     }
 
-    public class ExTzShopInfo
+    internal class ExTzShopInfo
     {
         [JsonProperty("added")]
         public long AddedTimestampSerialized { get; set; }
 
+        [JsonProperty("verified")]
+        public VerificationStatus Status { get; set; }
+
+        [JsonIgnore]
         public DateTime AddedTimestamp
         {
-            get { return DateTime.FromBinary(AddedTimestampSerialized); }
-            set { AddedTimestampSerialized = value.ToBinary(); }
+            get { return AddedTimestampSerialized.ToUnixTimeStamp(); }
+            set { AddedTimestampSerialized = value.ToUnixTimeStampInMilliseconds(); }
         }
 
         [JsonProperty("updated")]
         public long UpdatedTimestampSerialized { get; set; }
 
+        [JsonIgnore]
         public DateTime UpdatedTimestamp
         {
-            get { return DateTime.FromBinary(UpdatedTimestampSerialized); }
-            set { UpdatedTimestampSerialized = value.ToBinary(); }
+            get { return UpdatedTimestampSerialized.ToUnixTimeStamp(); }
+            set { UpdatedTimestampSerialized = value.ToUnixTimeStampInMilliseconds(); }
         }
 
         [JsonProperty("modified")]
         public long ModifiedTimestampSerialized { get; set; }
 
+        [JsonIgnore]
         public DateTime ModifiedTimestamp
         {
-            get { return DateTime.FromBinary(ModifiedTimestampSerialized); }
-            set { ModifiedTimestampSerialized = value.ToBinary(); }
+            get { return ModifiedTimestampSerialized.ToUnixTimeStamp(); }
+            set { ModifiedTimestampSerialized = value.ToUnixTimeStampInMilliseconds(); }
         }
 
         [JsonProperty("chaosEquiv")]
@@ -126,26 +211,38 @@ namespace PoeEye.ExileToolsApi.Entities
         [JsonProperty("hasPrice")]
         public bool HasPrice { get; set; }
 
-        [JsonProperty("verified")]
-        public string Verified { get; set; }
+        [JsonProperty("sellerAccount")]
+        public string SellerAccount { get; set; }
+
+        [JsonProperty("note")]
+        public string Note { get; set; }
+
+        [JsonProperty("currency")]
+        public string CurrencyRequested { get; set; }
+
+        [JsonProperty("amount")]
+        public double AmountRequested { get; set; }
+
+        [JsonProperty("lastCharacterName")]
+        public string LastCharacterName { get; set; }
 
         [JsonProperty("price")]
         public ExTzItemPrice Price { get; set; }
     }
 
-    public class ExTzItemPrice
+    internal class ExTzItemPrice
     {
         [JsonProperty("mods")]
         public Dictionary<string, ExTzItemMods> Mods { get; set; }
     }
 
-    public class ExTzItemSockets
+    internal class ExTzItemSockets
     {
-        [JsonProperty("allSockets")]
-        public string AllSockets { get; set; }
+        [JsonProperty("allSocketsGGG")]
+        public string Raw { get; set; }
     }
 
-    public class ExTzItemAttributes
+    internal class ExTzItemAttributes
     {
         [JsonProperty("league")]
         public string League { get; set; }
@@ -173,5 +270,11 @@ namespace PoeEye.ExileToolsApi.Entities
 
         [JsonProperty("identified")]
         public bool IsIdentified { get; set; }
+    }
+
+    internal enum KnownItemType
+    {
+        Unknown,
+        Gem
     }
 }

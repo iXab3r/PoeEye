@@ -30,22 +30,35 @@
                 return new SearchResult[0];
             }
 
-            var words = needle.Split(new[] {"(", ")", "#", " ", ",", "."}, StringSplitOptions.RemoveEmptyEntries);
-            var regexText = string.Join(".*?", words);
-
-            var regexOptions = RegexOptions.Compiled;
-            if (!caseSensitive)
+            try
             {
-                regexOptions |= RegexOptions.IgnoreCase;
-            }
-            var regex = new Regex(regexText, regexOptions);
+                needle = PreprocessRegex(needle);
+                var words = needle.Split(new[] { "(", ")", "#", " ", ",", "." }, StringSplitOptions.RemoveEmptyEntries);
+                var regexText = string.Join(".*?", words);
 
-            return haystack
-                .Select(x => Search(x, regex))
-                .Where(x => x.Score > 0)
-                .OrderBy(x => x.Score)
-                .ThenBy(x => x.Result.Length)
-                .ToArray();
+                var regexOptions = RegexOptions.Compiled;
+                if (!caseSensitive)
+                {
+                    regexOptions |= RegexOptions.IgnoreCase;
+                }
+                var regex = new Regex(regexText, regexOptions);
+
+                return haystack
+                    .Select(x => Search(x, regex))
+                    .Where(x => x.Score > 0)
+                    .OrderBy(x => x.Score)
+                    .ThenBy(x => x.Result.Length)
+                    .ToArray();
+            }
+            catch (Exception ex)
+            {
+                return new[]
+                {
+                    new SearchResult($"Internal exception: {ex.Message}", 0), 
+                };
+            }
+
+            
         }
 
         private SearchResult Search(string candidate, Regex regex)
@@ -58,6 +71,13 @@
             var match = regex.Match(candidate);
 
             return new SearchResult(candidate, match.Success ? match.Length : 0);
+        }
+
+        private string PreprocessRegex(string regex)
+        {
+            regex = regex.Replace(".*", ".*?");
+            regex = regex.Replace("*", ".*?");
+            return regex;
         }
     }
 }

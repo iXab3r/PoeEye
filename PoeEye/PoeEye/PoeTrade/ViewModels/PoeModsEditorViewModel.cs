@@ -33,6 +33,8 @@ namespace PoeEye.PoeTrade.ViewModels
 
         private float? minGroupValue;
 
+        private readonly IDictionary<string, IPoeItemMod> modsByName;
+
         public PoeModsEditorViewModel(
             [NotNull] IPoeStaticData queryInfoProvider,
             [NotNull] IFactory<IPoeModViewModel, ISuggestionProvider> modsViewModelsFactory,
@@ -44,12 +46,11 @@ namespace PoeEye.PoeTrade.ViewModels
 
             this.modsViewModelsFactory = modsViewModelsFactory;
 
-            KnownMods = queryInfoProvider
+            modsByName = queryInfoProvider
                 .ModsList
-                .Select(x => x.Name)
-                .ToArray();
+                .ToDictionary(x => x.Name, x => x);
 
-            modsSuggestionProvider = suggestionProviderFactory.Create(KnownMods);
+            modsSuggestionProvider = suggestionProviderFactory.Create(modsByName.Keys.ToArray());
 
             addModCommand
                 .Subscribe(_ => AddMod())
@@ -67,8 +68,6 @@ namespace PoeEye.PoeTrade.ViewModels
         public ICommand AddModCommand => addModCommand;
 
         public ICommand RemoveModCommand => removeModCommand;
-
-        public string[] KnownMods { get; }
 
         public PoeQueryModsGroupType GroupType
         {
@@ -137,13 +136,19 @@ namespace PoeEye.PoeTrade.ViewModels
                     continue;
                 }
 
-                var mod = new PoeQueryRangeModArgument(modModel.SelectedMod)
+                IPoeItemMod knownMod;
+                if (!modsByName.TryGetValue(modModel.SelectedMod, out knownMod))
+                {
+                    knownMod = new PoeItemMod() { CodeName = modModel.SelectedMod, Name = modModel.SelectedMod };
+                }
+
+                var modArg = new PoeQueryRangeModArgument(knownMod)
                 {
                     Min = modModel.Min,
                     Max = modModel.Max
                 };
 
-                result.Add(mod);
+                result.Add(modArg);
             }
             return result.ToArray();
         }

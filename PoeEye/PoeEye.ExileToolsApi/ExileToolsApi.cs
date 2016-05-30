@@ -2,46 +2,56 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Guards;
+using JetBrains.Annotations;
 using Nest;
 using PoeEye.ExileToolsApi.Converters;
 using PoeEye.ExileToolsApi.Entities;
+using PoeShared;
 using PoeShared.Common;
 using PoeShared.PoeTrade;
 using PoeShared.PoeTrade.Query;
 using PoeShared.Scaffolding;
+using TypeConverter;
 
 namespace PoeEye.ExileToolsApi
 {
     public class ExileToolsApi : IPoeApi
     {
+        private readonly IConverter<IPoeQueryInfo, ISearchRequest> queryConverter;
         private readonly ElasticClient client;
 
-        public ExileToolsApi()
+        public ExileToolsApi([NotNull] IConverter<IPoeQueryInfo, ISearchRequest> queryConverter)
         {
-            const string apiKey = "b0fdb9af1a40437647ae3c45a6ebcae7";
-            const string address = "http://api.exiletools.com/index";
+            Guard.ArgumentNotNull(() => queryConverter);
 
+            const string address = "http://api.exiletools.com/index";
+            const string apiKey = "b0fdb9af1a40437647ae3c45a6ebcae7";
+
+            this.queryConverter = queryConverter;
             var settings = new ConnectionSettings(new Uri(address))
                 .BasicAuthentication("apikey", apiKey)
                 .DisableDirectStreaming();
             client = new ElasticClient(settings);
         }
 
-        public Task<IPoeQueryResult> IssueQuery(IPoeQuery query)
+        public Task<IPoeQueryResult> IssueQuery(IPoeQueryInfo query)
         {
             return Observable
-                .Return(IssueQueryInternal(query))
+                .Start(() => IssueQueryInternal(query), Scheduler.Default)
                 .ToTask();
         }
 
         public Task<IPoeStaticData> RequestStaticData()
         {
             return Observable
-                 .Return(RequestStaticDataInternal())
+                 .Start(RequestStaticDataInternal, Scheduler.Default)
                  .ToTask();
         }
 
@@ -65,9 +75,10 @@ namespace PoeEye.ExileToolsApi
                     {
                         LoadMods(@"http://api.exiletools.com/endpoints/mapping?field=mods.*.explicit", PoeModType.Explicit, false),
                         LoadMods(@"http://api.exiletools.com/endpoints/mapping?field=mods.*.implicit", PoeModType.Implicit, false),
+                        LoadMods(@"http://api.exiletools.com/endpoints/mapping?field=mods.*.crafted", PoeModType.Explicit, true),
                     }
                     .SelectMany(x => x)
-                    .Distinct(PoeItemMod.CodeNameComparer)
+                    .Distinct(PoeItemMod.NameComparer)
                     .Cast<IPoeItemMod>()
                     .ToArray(),
                 LeaguesList = leaguesList,
@@ -131,49 +142,61 @@ namespace PoeEye.ExileToolsApi
         {
             var page = new WebClient().DownloadString(uri);
 
-            var regex = new Regex(@"(?:implicit|explicit|crafted)\.(.+?)\.", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            var regex = new Regex(@"^.*(?'prefix'implicit|explicit|crafted)\.(?'name'[^.\n\r]+)(?'kind'\.avg)?.*$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
             foreach (var match in page
                 .Split(new[] { "\n" }, StringSplitOptions.RemoveEmptyEntries)
-                .Select(x => x + ".")
                 .Select(x => regex.Match(x))
                 .Where(x => x.Success))
             {
+                var modName = match.Groups["name"].Value;
+
+                var modCodeName = match.Value;
+                if (isCrafted)
+                {
+                    modCodeName = $"modsTotal.{modName}";
+
+                } else if (modType == PoeModType.Explicit)
+                {
+                    modCodeName = $"modsTotal.{modName}";
+                }
+                else if (modType == PoeModType.Implicit)
+                {
+                    modCodeName = $"modsTotal.{modName}";
+                }
+
+                if (isCrafted)
+                {
+                    modName = $"(Crafted) {modName}";
+                }
+                else if (modType == PoeModType.Explicit)
+                {
+                    modName = $"(Explicit) {modName}";
+                }
+                else if (modType == PoeModType.Implicit)
+                {
+                    modName = $"(Implicit) {modName}";
+                }
+
                 yield return new PoeItemMod
                 {
-                    Name = match.Groups[1].Value,
-                    CodeName = match.Groups[1].Value,
+                    Name = modName,
+                    CodeName = modCodeName,
                     ModType = modType,
                     IsCrafted = isCrafted
                 };
             }
         }
 
-        private IPoeQueryResult IssueQueryInternal(IPoeQuery query)
+        private IPoeQueryResult IssueQueryInternal(IPoeQueryInfo queryInfo)
         {
-            var eQuery = new SearchRequest()
-            {
-                Query = new BoolQuery()
-                {
-                    Must = new QueryContainer[]
-                    {
-                        new TermRangeQuery()
-                {
-                    Field = "propertiesPseudo.Weapon.estimatedQ20.Physical DPS",
-                    GreaterThan = "300",
-                },
+            var query = queryConverter.Convert(queryInfo);
 
-                    },
-                },
-                Size = 1,
-                From = 0,
+            var queryResult = client.Search<ExTzItem>(query);
 
-            };
-
-            var health = client.Search<ExTzItem>(eQuery);
-            Console.WriteLine(health.Hits.Select(x => x.Source).DumpToText());
+            Log.Instance.Debug($"[ExileToolsApi] Response data:\n{queryResult.DebugInformation}");
 
             var converter = new ToPoeItemConverter();
-            var convertedItems = health.Hits.Select(x => x.Source).Select(converter.Convert).ToArray();
+            var convertedItems = queryResult.Hits.Select(x => x.Source).Select(converter.Convert).ToArray();
             return new PoeQueryResult()
             {
                 ItemsList = convertedItems,

@@ -11,7 +11,7 @@
 
     internal sealed class PoeTradeApi : IPoeApi
     {
-        public Task<IPoeQueryResult> IssueQuery(IPoeQuery query)
+        public Task<IPoeQueryResult> IssueQuery(IPoeQueryInfo query)
         {
             Guard.ArgumentNotNull(() => query);
 
@@ -37,7 +37,7 @@
             };
         }
 
-        private IPoeQueryResult ProcessQuery(IPoeQuery query)
+        private IPoeQueryResult ProcessQuery(IPoeQueryInfo query)
         {
             return new PoeQueryResult
             {

@@ -9,7 +9,7 @@
     public interface IPoeApi
     {
         [NotNull]
-        Task<IPoeQueryResult> IssueQuery([NotNull] IPoeQuery query);
+        Task<IPoeQueryResult> IssueQuery([NotNull] IPoeQueryInfo query);
 
         [NotNull]
         Task<IPoeStaticData> RequestStaticData();

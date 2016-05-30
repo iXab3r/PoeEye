@@ -1,6 +1,7 @@
 ﻿using System.Collections.Specialized;
 using System.Threading.Tasks;
 using Microsoft.Practices.Unity;
+using Nest;
 using PoeShared.Common;
 using PoeShared.PoeTrade;
 using PoeShared.PoeTrade.Query;
@@ -15,7 +16,7 @@ namespace PoeEye.ExileToolsApi.Prism
         {
             Container
                 .RegisterSingleton<IPoeItemVerifier, MockedPoeItemVerifier>()
-                .RegisterSingleton<IConverter<IPoeQueryInfo, IPoeQuery>, PoeQueryInfoToPoeQueryConverter>();
+                .RegisterSingleton<IConverter<IPoeQueryInfo, ISearchRequest>, PoeQueryInfoToSearchRequestConverter>();
             
 
             Container

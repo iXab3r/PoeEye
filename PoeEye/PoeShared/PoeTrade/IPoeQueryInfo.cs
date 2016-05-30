@@ -58,6 +58,8 @@
 
         string ItemName { get; }
 
+        string AccountName { get; }
+
         PoeItemRarity? ItemRarity { get; }
 
         IPoeItemType ItemType { get; }

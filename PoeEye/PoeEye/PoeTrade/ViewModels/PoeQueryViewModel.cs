@@ -76,6 +76,8 @@
 
         private string itemName;
 
+        private string accountName;
+
         private PoeItemRarity? itemRarity;
 
         private IPoeItemType itemType;
@@ -472,6 +474,12 @@
         {
             get { return league; }
             set { this.RaiseAndSetIfChanged(ref league, value); }
+        }
+
+        public string AccountName
+        {
+            get { return accountName; }
+            set { this.RaiseAndSetIfChanged(ref accountName, value); }
         }
 
         public bool OnlineOnly

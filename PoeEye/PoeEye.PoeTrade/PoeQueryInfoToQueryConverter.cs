@@ -1,4 +1,6 @@
-﻿namespace PoeEye.PoeTrade
+﻿using PoeShared.Common;
+
+namespace PoeEye.PoeTrade
 {
     using System;
     using System.Collections.Generic;
@@ -86,7 +88,7 @@
             foreach (var group in groups.Where(x => x.Mods != null && x.Mods.Any()))
             {
                 var mods = group.Mods;
-                args.AddRange(mods.Select(mod => CreateModArgument(mod.Name, mod.Min, mod.Max)));
+                args.AddRange(mods.Select(mod => CreateModArgument(mod.Mod, mod.Min, mod.Max)));
 
                 args.AddRange(
                     new[]
@@ -102,9 +104,9 @@
             return result;
         }
 
-        private IPoeQueryArgument CreateModArgument(string modName, float? min, float? max)
+        private IPoeQueryArgument CreateModArgument(IPoeItemMod mod, float? min, float? max)
         {
-            var arg = new PoeQueryRangeModArgument(modName)
+            var arg = new PoeQueryRangeModArgument(mod)
             {
                 Min = min,
                 Max = max

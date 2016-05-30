@@ -1,10 +1,14 @@
+using System.Collections;
+using PoeShared.Scaffolding;
+
 namespace PoeShared.Common
 {
     using System.Collections.Generic;
 
     public sealed class PoeItemMod : IPoeItemMod
     {
-        public static IEqualityComparer<PoeItemMod> CodeNameComparer { get; } = new CodeNameEqualityComparer();
+        public static IEqualityComparer<PoeItemMod> CodeNameComparer { get; } = new LambdaComparer<PoeItemMod>((x, y) => string.Equals(x.CodeName, y.CodeName));
+        public static IEqualityComparer<PoeItemMod> NameComparer { get; } = new LambdaComparer<PoeItemMod>((x, y) => string.Equals(x.Name, y.Name));
 
         public bool IsCrafted { get; set; }
 
@@ -17,35 +21,6 @@ namespace PoeShared.Common
         public override string ToString()
         {
             return $"ModType: {ModType}, CodeName: {CodeName}, IsCrafted: {IsCrafted}";
-        }
-
-        private sealed class CodeNameEqualityComparer : IEqualityComparer<PoeItemMod>
-        {
-            public bool Equals(PoeItemMod x, PoeItemMod y)
-            {
-                if (ReferenceEquals(x, y))
-                {
-                    return true;
-                }
-                if (ReferenceEquals(x, null))
-                {
-                    return false;
-                }
-                if (ReferenceEquals(y, null))
-                {
-                    return false;
-                }
-                if (x.GetType() != y.GetType())
-                {
-                    return false;
-                }
-                return string.Equals(x.CodeName, y.CodeName);
-            }
-
-            public int GetHashCode(PoeItemMod obj)
-            {
-                return obj.CodeName?.GetHashCode() ?? 0;
-            }
         }
     }
 }

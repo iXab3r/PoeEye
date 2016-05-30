@@ -156,7 +156,6 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Communications\NameValueCollectionToQueryStringConverter.cs" />
     <Compile Include="IPoeTradeDateTimeExtractor.cs" />
     <Compile Include="IPoeTradeParser.cs" />
     <Compile Include="PoeItemVerifier.cs" />

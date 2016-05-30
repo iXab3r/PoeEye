@@ -21,7 +21,7 @@ namespace PoeShared.PoeTrade
         private TimeSpan recheckPeriod;
 
         public PoeLiveHistoryProvider(
-            [NotNull] IPoeQuery query,
+            [NotNull] IPoeQueryInfo query,
             [NotNull] IPoeApi poeApi)
         {
             Guard.ArgumentNotNull(() => query);

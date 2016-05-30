@@ -1,12 +1,11 @@
-﻿namespace PoeEye.Tests.Communications
+﻿using PoeShared.Communications;
+
+namespace PoeEye.Tests.Communications
 {
     using System.Collections.Generic;
     using System.Collections.Specialized;
 
     using NUnit.Framework;
-
-    using PoeEye.PoeTrade.Communications;
-
     using Shouldly;
 
     [TestFixture]

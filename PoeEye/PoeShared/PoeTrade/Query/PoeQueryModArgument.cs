@@ -1,13 +1,18 @@
+using Guards;
+using PoeShared.Common;
+
 namespace PoeShared.PoeTrade.Query
 {
-    using JetBrains.Annotations;
-
     public class PoeQueryModArgument : PoeQueryArgumentBase, IPoeQueryModArgument
     {
-        public PoeQueryModArgument([NotNull] string name) : base(name)
+        public PoeQueryModArgument(IPoeItemMod mod) : base(mod.Name)
         {
+            Guard.ArgumentNotNull(() => mod);
+            Mod = mod;
         }
 
         public bool Excluded { get; set; }
+
+        public IPoeItemMod Mod { get; set; }
     }
 }

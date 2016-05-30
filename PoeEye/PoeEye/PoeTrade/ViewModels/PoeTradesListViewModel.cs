@@ -54,12 +54,11 @@
         private TimeSpan recheckPeriod;
 
         public PoeTradesListViewModel(
-            [NotNull] IFactory<IPoeLiveHistoryProvider, IPoeQuery> poeLiveHistoryFactory,
+            [NotNull] IFactory<IPoeLiveHistoryProvider, IPoeQueryInfo> poeLiveHistoryFactory,
             [NotNull] IFactory<IPoeTradeViewModel, IPoeItem> poeTradeViewModelFactory,
             [NotNull] IPoeCaptchaRegistrator captchaRegistrator,
             [NotNull] IHistoricalTradesViewModel historicalTrades,
             [NotNull] IEqualityComparer<IPoeItem> poeItemsComparer,
-            [NotNull] IConverter<IPoeQueryInfo, IPoeQuery> poeQueryInfoToQueryConverter,
             [NotNull] IClock clock,
             [NotNull] [Dependency(WellKnownSchedulers.Ui)] IScheduler uiScheduler)
         {
@@ -67,7 +66,6 @@
             Guard.ArgumentNotNull(() => poeTradeViewModelFactory);
             Guard.ArgumentNotNull(() => captchaRegistrator);
             Guard.ArgumentNotNull(() => historicalTrades);
-            Guard.ArgumentNotNull(() => poeQueryInfoToQueryConverter);
             Guard.ArgumentNotNull(() => poeItemsComparer);
             Guard.ArgumentNotNull(() => clock);
             Guard.ArgumentNotNull(() => uiScheduler);
@@ -96,7 +94,6 @@
                 .Select(x => x.curr)
                 .Where(x => x != null)
                 .Do(_ => lastUpdateTimestamp = clock.Now)
-                .Select(poeQueryInfoToQueryConverter.Convert)
                 .Select(poeLiveHistoryFactory.Create)
                 .Do(OnNextHistoryProviderCreated)
                 .Select(x => x.ItemsPacks)
