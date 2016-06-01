@@ -1,15 +1,41 @@
-﻿namespace PoeShared.Common
+﻿using System;
+
+namespace PoeShared.Common
 {
-    public class PoePrice
+    public struct PoePrice : IComparable
     {
+        public static readonly PoePrice Empty = new PoePrice("?", 0f);
+
         public PoePrice(string currencyType, float value)
         {
             CurrencyType = currencyType;
             Value = value;
+
+            Price = $"{value} {currencyType}";
         }
 
         public string CurrencyType { get; private set; }
 
         public float Value { get; private set; }
+
+        public string Price { get; }
+
+        public bool IsEmpty => string.IsNullOrWhiteSpace(CurrencyType);
+
+        public override string ToString()
+        {
+            return Price;
+        }
+
+        public int CompareTo(object obj)
+        {
+            if (!(obj is PoePrice))
+            {
+                return 1;
+            }
+
+            var other = (PoePrice) obj;
+            return Value.CompareTo(other.Value);
+        }
     }
 }

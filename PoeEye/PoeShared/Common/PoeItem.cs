@@ -58,6 +58,8 @@
 
         public string Note { get; set; }
 
+        public string SuggestedPrivateMessage { get; set; }
+
         public DateTime? FirstSeen { get; set; }
 
         public bool IsCorrupted { get; set; }

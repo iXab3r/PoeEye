@@ -178,6 +178,7 @@
     <Compile Include="Common\IPoeItemParser.cs" />
     <Compile Include="Common\IPoeItemType.cs" />
     <Compile Include="Common\IPoeLinksInfo.cs" />
+    <Compile Include="Common\KnownCurrencyNameList.cs" />
     <Compile Include="Common\PoeCurrency.cs" />
     <Compile Include="Common\PoeItem.cs" />
     <Compile Include="Common\PoeItemEqualityComparer.cs" />

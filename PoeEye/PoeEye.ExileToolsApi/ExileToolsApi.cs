@@ -57,7 +57,7 @@ namespace PoeEye.ExileToolsApi
 
         private IPoeStaticData RequestStaticDataInternal()
         {
-            var response = client.Search<EmptyResponse>(s => s.Aggregations(a => a.Terms("leagues", st => st.Field("attributes.league"))));
+            var response = client.Search<EmptyResponse>(s => s.Aggregations(a => a.Terms("leagues", st => st.Field("attributes.league"))).Size(0));
             var leaguesList = response
                 .Aggregations
                 .Select(x => x.Value as BucketAggregate)
@@ -69,15 +69,10 @@ namespace PoeEye.ExileToolsApi
                 .Distinct()
                 .ToArray();
 
+
             var result = new PoeStaticData()
             {
-                ModsList = new []
-                    {
-                        LoadMods(@"http://api.exiletools.com/endpoints/mapping?field=mods.*.explicit", PoeModType.Explicit, false),
-                        LoadMods(@"http://api.exiletools.com/endpoints/mapping?field=mods.*.implicit", PoeModType.Implicit, false),
-                        LoadMods(@"http://api.exiletools.com/endpoints/mapping?field=mods.*.crafted", PoeModType.Explicit, true),
-                    }
-                    .SelectMany(x => x)
+                ModsList = LoadMods()
                     .Distinct(PoeItemMod.NameComparer)
                     .Cast<IPoeItemMod>()
                     .ToArray(),
@@ -138,48 +133,32 @@ namespace PoeEye.ExileToolsApi
             return result;
         }
 
-        private IEnumerable<PoeItemMod> LoadMods(string uri, PoeModType modType, bool isCrafted)
+        private IEnumerable<PoeItemMod> LoadMods()
         {
-            var page = new WebClient().DownloadString(uri);
+            var page = new WebClient().DownloadString(@"http://api.exiletools.com/endpoints/mapping?field=mods*");
 
-            var regex = new Regex(@"^.*(?'prefix'implicit|explicit|crafted)\.(?'name'[^.\n\r]+)(?'kind'\.avg)?.*$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-            foreach (var match in page
+            var result = new List<PoeItemMod>();
+            result.AddRange(LoadMods(page, "explicit", PoeModType.Explicit, false));
+            result.AddRange(LoadMods(page, "implicit", PoeModType.Implicit, false));
+            result.AddRange(LoadMods(page, "crafted", PoeModType.Unknown, true));
+            result.AddRange(LoadMods(page, "modsTotal", PoeModType.Unknown, false));
+            result.AddRange(LoadMods(page, "modsPseudo", PoeModType.Unknown, false));
+            return result;
+        }
+
+        private IEnumerable<PoeItemMod> LoadMods(string data, string expectedPrefix, PoeModType modType, bool isCrafted)
+        {
+            var regex = new Regex($@"^.*(?'prefix'{expectedPrefix})\.(?'name'[^.\n\r]+)(?'kind'\.avg)?.*$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            foreach (var match in data
                 .Split(new[] { "\n" }, StringSplitOptions.RemoveEmptyEntries)
                 .Select(x => regex.Match(x))
                 .Where(x => x.Success))
             {
-                var modName = match.Groups["name"].Value;
-
                 var modCodeName = match.Value;
-                if (isCrafted)
-                {
-                    modCodeName = $"modsTotal.{modName}";
-
-                } else if (modType == PoeModType.Explicit)
-                {
-                    modCodeName = $"modsTotal.{modName}";
-                }
-                else if (modType == PoeModType.Implicit)
-                {
-                    modCodeName = $"modsTotal.{modName}";
-                }
-
-                if (isCrafted)
-                {
-                    modName = $"(Crafted) {modName}";
-                }
-                else if (modType == PoeModType.Explicit)
-                {
-                    modName = $"(Explicit) {modName}";
-                }
-                else if (modType == PoeModType.Implicit)
-                {
-                    modName = $"(Implicit) {modName}";
-                }
 
                 yield return new PoeItemMod
                 {
-                    Name = modName,
+                    Name = modCodeName,
                     CodeName = modCodeName,
                     ModType = modType,
                     IsCrafted = isCrafted

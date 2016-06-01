@@ -1,3 +1,5 @@
+using PoeShared.Common;
+
 namespace PoeEye.PoeTrade.ViewModels
 {
     using System;
@@ -38,7 +40,7 @@ namespace PoeEye.PoeTrade.ViewModels
 
         public PoeTradeState TradeState => Trade.TradeState;
 
-        public float? PriceInChaosOrbs => Trade.PriceInChaosOrbs;
+        public float? PriceInChaosOrbs => Trade.PriceInChaosOrbs?.Value;
 
         public DateTime Timestamp => Trade.Trade.Timestamp;
 

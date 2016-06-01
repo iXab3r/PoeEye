@@ -1,9 +1,9 @@
-﻿namespace PoeEye.PoeTrade.Models
-{
-    using JetBrains.Annotations;
+﻿using PoeShared.Common;
 
+namespace PoeEye.PoeTrade.Models
+{
     internal interface IPoePriceCalculcator
     {
-        float? GetEquivalentInChaosOrbs([CanBeNull] string rawPrice);
+        PoePrice GetEquivalentInChaosOrbs(PoePrice price);
     }
 }

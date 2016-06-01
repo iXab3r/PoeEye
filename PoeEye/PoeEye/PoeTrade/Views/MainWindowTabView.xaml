@@ -12,7 +12,7 @@
                               IsLiveSortingRequested="True">
           <CollectionViewSource.SortDescriptions>
             <componentModel:SortDescription PropertyName="TradeState" Direction="Ascending" />
-            <componentModel:SortDescription PropertyName="PriceInChaosOrbs" Direction="Ascending" />
+            <componentModel:SortDescription PropertyName="RawPriceInChaosOrbs" Direction="Ascending" />
           </CollectionViewSource.SortDescriptions>
 
         </CollectionViewSource>

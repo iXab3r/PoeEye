@@ -376,7 +376,6 @@
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />
@@ -387,14 +386,23 @@
               <TextBlock Grid.Column="0"
                          Text="Buyout:" />
 
-              <ContentPresenter Grid.Column="1" Content="{Binding Trade.Price}"
-                                ContentTemplate="{StaticResource CurrencyViewKey}" />
 
-              <TextBlock Grid.Column="2"
-                         Text="{Binding Path=PriceInChaosOrbs, Mode=OneWay, StringFormat=' (~ {0} chaos)'}"
-                         Visibility="{Binding PriceInChaosOrbs, Converter={StaticResource NullToCollapsedConverter}}" />
+              <StackPanel Grid.Column="1"
+                          Orientation="Horizontal" >
 
-              <StackPanel Grid.Column="3"
+                <ContentPresenter Content="{Binding Trade.Price}"
+                                  ContentTemplate="{StaticResource CurrencyViewKey}" />
+                
+                <TextBlock Margin="5" Text="~"
+                           Visibility="{Binding PriceInChaosOrbs, Converter={StaticResource NullToCollapsedConverter}}"/>
+                
+                <ContentPresenter Content="{Binding PriceInChaosOrbs}" 
+                                  Visibility="{Binding PriceInChaosOrbs, Converter={StaticResource NullToCollapsedConverter}}" />
+              </StackPanel>
+              
+              
+
+              <StackPanel Grid.Column="2"
                           Margin="10,2">
 
                 <Button Width="80"
@@ -425,12 +433,12 @@
                 </Button>
               </StackPanel>
 
-              <Button Grid.Column="5"
+              <Button Grid.Column="4"
                       Margin="10,2"
                         Visibility="{Binding IsEnabled, RelativeSource={RelativeSource Self}, Converter={StaticResource BoolFalseToCollapsedConverter}}"
                       Content="Go to forum thread" Command="{Binding OpenForumUriCommand}" />
 
-              <Ellipse Grid.Column="6"
+              <Ellipse Grid.Column="5"
                        Width="14" Height="14"
                        Margin="10,2,5,0"
                        StrokeThickness="1"
@@ -448,10 +456,10 @@
                 </Ellipse.Style>
               </Ellipse>
 
-              <TextBlock Grid.Column="7"
+              <TextBlock Grid.Column="6"
                          Text="{Binding Path=Trade.UserIgn, Mode=OneWay, StringFormat='IGN: {0}'}" />
 
-              <Button Grid.Column="8"
+              <Button Grid.Column="7"
                       Command="{Binding CopyPmMessageToClipboardCommand}"
                       Width="30" Height="30" Style="{StaticResource MetroCircleButtonStyle}"
                       FontFamily="{DynamicResource FontAwesome}"

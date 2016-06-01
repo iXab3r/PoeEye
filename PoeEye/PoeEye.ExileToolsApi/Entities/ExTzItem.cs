@@ -226,6 +226,9 @@ namespace PoeEye.ExileToolsApi.Entities
         [JsonProperty("lastCharacterName")]
         public string LastCharacterName { get; set; }
 
+        [JsonProperty("defaultMessage")]
+        public string DefaultMessage { get; set; }
+
         [JsonProperty("price")]
         public ExTzItemPrice Price { get; set; }
     }

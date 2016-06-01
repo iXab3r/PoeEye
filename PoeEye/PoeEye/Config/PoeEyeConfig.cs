@@ -1,3 +1,5 @@
+using PoeShared.Common;
+
 namespace PoeEye.Config
 {
     using System;
@@ -13,21 +15,22 @@ namespace PoeEye.Config
     {
         private static readonly IDictionary<string, float> DefaultCurrenciesPriceInChaos = new Dictionary<string, float>
         {
-            {"blessed", 2},
-            {"chisel", 1},
-            {"chaos", 1},
-            {"chromatic", 0.5f},
-            {"divine", 7},
-            {"exalted", 50},
-            {"gcp", 2},
-            {"jewellers", 0.14f},
-            {"alchemy", 0.5f},
-            {"alteration", 0.05f},
-            {"chance", 0},
-            {"fusing", 0.5f},
-            {"regret", 2},
-            {"scouring", 1},
-            {"regal", 1}
+            {KnownCurrencyNameList.BlessedOrb, 2},
+            {KnownCurrencyNameList.CartographersChisel, 1},
+            {KnownCurrencyNameList.ChaosOrb, 1},
+            {KnownCurrencyNameList.ChromaticOrb, 0.5f},
+            {KnownCurrencyNameList.DivineOrb, 7},
+            {KnownCurrencyNameList.ExaltedOrb, 50},
+            {KnownCurrencyNameList.GemcuttersPrism, 2},
+            {KnownCurrencyNameList.JewellersOrb, 0.14f},
+            {KnownCurrencyNameList.OrbOfAlchemy, 0.5f},
+            {KnownCurrencyNameList.OrbOfAlteration, 0.05f},
+            {KnownCurrencyNameList.OrbOfChance, 0.125f},
+            {KnownCurrencyNameList.OrbOfFusing, 0.5f},
+            {KnownCurrencyNameList.OrbOfRegret, 2},
+            {KnownCurrencyNameList.OrbOfScouring, 1},
+            {KnownCurrencyNameList.RegalOrb, 1},
+            {KnownCurrencyNameList.VaalOrb, 2}
         };
 
         private IDictionary<string, float> currenciesPriceInChaos = DefaultCurrenciesPriceInChaos;

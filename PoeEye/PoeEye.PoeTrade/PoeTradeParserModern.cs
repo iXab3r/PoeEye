@@ -12,7 +12,6 @@ namespace PoeEye.PoeTrade
     using JetBrains.Annotations;
 
     using PoeShared.Common;
-    using PoeShared.PoeTrade;
     using PoeShared.PoeTrade.Query;
 
     internal sealed class PoeTradeParserModern : IPoeTradeParser
@@ -52,21 +51,21 @@ namespace PoeEye.PoeTrade
                 LeaguesList = ExtractLeaguesList(parser),
                 CurrenciesList = new IPoeCurrency[]
                 {
-                    new PoeCurrency {Name = "Blessed Orb", CodeName = "blessed"},
-                    new PoeCurrency {Name = "Cartographer's Chisel", CodeName = "chisel"},
-                    new PoeCurrency {Name = "Chaos Orb", CodeName = "chaos"},
-                    new PoeCurrency {Name = "Chromatic Orb", CodeName = "chromatic"},
-                    new PoeCurrency {Name = "Divine Orb", CodeName = "divine"},
-                    new PoeCurrency {Name = "Exalted Orb", CodeName = "exalted"},
-                    new PoeCurrency {Name = "Gemcutter's Prism", CodeName = "gcp"},
-                    new PoeCurrency {Name = "Jeweller's Orb", CodeName = "jewellers"},
-                    new PoeCurrency {Name = "Orb of Alchemy", CodeName = "alchemy"},
-                    new PoeCurrency {Name = "Orb of Alteration", CodeName = "alteration"},
-                    new PoeCurrency {Name = "Orb of Chance", CodeName = "chance"},
-                    new PoeCurrency {Name = "Orb of Fusing", CodeName = "fusing"},
-                    new PoeCurrency {Name = "Orb of Regret", CodeName = "regret"},
-                    new PoeCurrency {Name = "Orb of Scouring", CodeName = "scouring"},
-                    new PoeCurrency {Name = "Regal Orb", CodeName = "regal"}
+                    new PoeCurrency {Name = "Blessed Orb", CodeName = KnownCurrencyNameList.BlessedOrb},
+                    new PoeCurrency {Name = "Cartographer's Chisel", CodeName = KnownCurrencyNameList.CartographersChisel},
+                    new PoeCurrency {Name = "Chaos Orb", CodeName = KnownCurrencyNameList.ChaosOrb},
+                    new PoeCurrency {Name = "Chromatic Orb", CodeName = KnownCurrencyNameList.ChromaticOrb},
+                    new PoeCurrency {Name = "Divine Orb", CodeName = KnownCurrencyNameList.DivineOrb},
+                    new PoeCurrency {Name = "Exalted Orb", CodeName = KnownCurrencyNameList.ExaltedOrb},
+                    new PoeCurrency {Name = "Gemcutter's Prism", CodeName = KnownCurrencyNameList.GemcuttersPrism},
+                    new PoeCurrency {Name = "Jeweller's Orb", CodeName = KnownCurrencyNameList.JewellersOrb},
+                    new PoeCurrency {Name = "Orb of Alchemy", CodeName = KnownCurrencyNameList.OrbOfAlchemy},
+                    new PoeCurrency {Name = "Orb of Alteration", CodeName = KnownCurrencyNameList.OrbOfAlteration},
+                    new PoeCurrency {Name = "Orb of Chance", CodeName = KnownCurrencyNameList.OrbOfChance},
+                    new PoeCurrency {Name = "Orb of Fusing", CodeName = KnownCurrencyNameList.OrbOfFusing},
+                    new PoeCurrency {Name = "Orb of Regret", CodeName = KnownCurrencyNameList.OrbOfRegret},
+                    new PoeCurrency {Name = "Orb of Scouring", CodeName = KnownCurrencyNameList.OrbOfScouring},
+                    new PoeCurrency {Name = "Regal Orb", CodeName = KnownCurrencyNameList.RegalOrb}
                 },
                 ItemTypes = new IPoeItemType[]
                 {

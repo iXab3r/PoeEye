@@ -1,4 +1,6 @@
-﻿namespace PoeEye.PoeTrade.ViewModels
+﻿using PoeEye.Converters;
+
+namespace PoeEye.PoeTrade.ViewModels
 {
     using System;
     using System.Diagnostics;
@@ -84,7 +86,12 @@
                 Anchors.Add(LinksViewModel);
             }
 
-            PriceInChaosOrbs = poePriceCalculcator.GetEquivalentInChaosOrbs(poeItem.Price);
+            var price = PriceToCurrencyConverter.Instance.Convert(poeItem.Price);
+            var priceInChaos = poePriceCalculcator.GetEquivalentInChaosOrbs(price);
+            PriceInChaosOrbs = price.CurrencyType == KnownCurrencyNameList.ChaosOrb 
+                ? default(PoePrice?) 
+                : priceInChaos;
+            RawPriceInChaosOrbs = priceInChaos.Value;
 
             Observable.Timer(DateTimeOffset.Now, RefreshTimeout).ToUnit()
                       .ObserveOn(uiScheduler)
@@ -116,7 +123,9 @@
 
         public PoeLinksInfoViewModel LinksViewModel { get; }
 
-        public float? PriceInChaosOrbs { get; }
+        public PoePrice? PriceInChaosOrbs { get; }
+
+        public float RawPriceInChaosOrbs { get; }
 
         public IPoeItemMod[] ImplicitMods => Trade.Mods.Where(x => x.ModType == PoeModType.Implicit).ToArray();
 
@@ -153,13 +162,16 @@
                 .Submit();
 
             string message = null;
-            if (string.IsNullOrWhiteSpace(Trade.Price))
+
+            if (!string.IsNullOrWhiteSpace(Trade.SuggestedPrivateMessage))
             {
-                message = $"@{Trade.UserIgn} Hi, I would like to buy your {Trade.ItemName} listed in {Trade.League}, offer is ";
+                message = Trade.SuggestedPrivateMessage;
             }
             else
             {
-                message = $"@{Trade.UserIgn} Hi, I would like to buy your {Trade.ItemName} listed for {Trade.Price} in {Trade.League}";
+                message = string.IsNullOrWhiteSpace(Trade.Price)
+                    ? $"@{Trade.UserIgn} Hi, I would like to buy your {Trade.ItemName} listed in {Trade.League}, offer is "
+                    : $"@{Trade.UserIgn} Hi, I would like to buy your {Trade.ItemName} listed for {Trade.Price} in {Trade.League}";
             }
 
             Clipboard.SetText(message);

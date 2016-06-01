@@ -20,7 +20,7 @@
 
         PoeLinksInfoViewModel LinksViewModel { [NotNull] get; }
 
-        float? PriceInChaosOrbs { get; }
+        PoePrice? PriceInChaosOrbs { get; }
 
         TimeSpan TimeElapsedSinceLastIndexation { get; }
 

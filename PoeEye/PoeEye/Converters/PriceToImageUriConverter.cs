@@ -1,4 +1,6 @@
-﻿namespace PoeEye.Converters
+﻿using PoeShared.Common;
+
+namespace PoeEye.Converters
 {
     using System;
     using System.Collections.Generic;
@@ -12,22 +14,22 @@
 
         private static readonly IDictionary<string, string> KnownImages = new Dictionary<string, string>
         {
-            {"blessed", "Blessed_Orb"},
-            {"chisel", "Cartographer's_Chisel"},
-            {"chaos", "Chaos_Orb"},
-            {"chromatic", "Chromatic_Orb"},
-            {"divine", "Divine_Orb"},
-            {"exalted", "Exalted_Orb"},
-            {"gcp", "Gemcutter's_Prism"},
-            {"jewellers", "Jeweller's_Orb"},
-            {"alchemy", "Orb_of_Alchemy"},
-            {"alteration", "Orb_of_Alteration"},
-            {"chance", "Orb_of_Chance"},
-            {"fusing", "Orb_of_Fusing"},
-            {"regret", "Orb_of_Regret"},
-            {"scouring", "Orb_of_Scouring"},
-            {"regal", "Regal_Orb"},
-            {"vaal", "Vaal_Orb"}
+            {KnownCurrencyNameList.BlessedOrb, "Blessed_Orb"},
+            {KnownCurrencyNameList.CartographersChisel, "Cartographer's_Chisel"},
+            {KnownCurrencyNameList.ChaosOrb, "Chaos_Orb"},
+            {KnownCurrencyNameList.ChromaticOrb, "Chromatic_Orb"},
+            {KnownCurrencyNameList.DivineOrb, "Divine_Orb"},
+            {KnownCurrencyNameList.ExaltedOrb, "Exalted_Orb"},
+            {KnownCurrencyNameList.GemcuttersPrism, "Gemcutter's_Prism"},
+            {KnownCurrencyNameList.JewellersOrb, "Jeweller's_Orb"},
+            {KnownCurrencyNameList.OrbOfAlchemy, "Orb_of_Alchemy"},
+            {KnownCurrencyNameList.OrbOfAlteration, "Orb_of_Alteration"},
+            {KnownCurrencyNameList.OrbOfChance, "Orb_of_Chance"},
+            {KnownCurrencyNameList.OrbOfFusing, "Orb_of_Fusing"},
+            {KnownCurrencyNameList.OrbOfRegret, "Orb_of_Regret"},
+            {KnownCurrencyNameList.OrbOfScouring, "Orb_of_Scouring"},
+            {KnownCurrencyNameList.RegalOrb, "Regal_Orb"}, 
+            {KnownCurrencyNameList.VaalOrb, "Vaal_Orb"}
         };
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
@@ -39,7 +41,7 @@
 
             var rawPrice = (string) value;
             var price = PriceToCurrencyConverter.Instance.Convert(rawPrice);
-            if (price == null)
+            if (price.IsEmpty)
             {
                 return null;
             }

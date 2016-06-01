@@ -8,6 +8,7 @@ using PoeEye.ExileToolsApi.Entities;
 using PoeEye.ExileToolsApi.Extensions;
 using PoeShared.Common;
 using TypeConverter;
+using static System.String;
 
 namespace PoeEye.ExileToolsApi.Converters
 {
@@ -47,7 +48,6 @@ namespace PoeEye.ExileToolsApi.Converters
                 Shield = GetOrDefaultAsString(value.Properties?.Armour?.EnergyShield),
                 BlockChance = GetOrDefaultAsString(value.Properties?.Armour?.BlockChance),
                 Links = value.Sockets == null ? null : new PoeLinksInfo(value.Sockets.Raw),
-                Price = value.Shop?.Note,
             };
 
             if (GetOrDefaultEnum(value.Attributes?.ItemType, KnownItemType.Unknown) == KnownItemType.Gem)
@@ -55,8 +55,19 @@ namespace PoeEye.ExileToolsApi.Converters
                 result.Level = GetOrDefaultAsString(value.Properties?.Gem?.Level);
             }
 
+            if (GetOrDefault(value.Shop?.HasPrice) && !IsNullOrWhiteSpace(value.Shop?.CurrencyRequested))
+            {
+                result.Price = $"{value.Shop?.AmountRequested} {value.Shop?.CurrencyRequested}";
+            }
+            else
+            {
+                result.Price = $"{value.Shop.Note}";
+            }
 
-            result.Requirements = string.Join(" ",
+            result.SuggestedPrivateMessage = value.Shop?.DefaultMessage;
+
+
+            result.Requirements = Join(" ",
                 GetWithNameOrDefault(value.Requirements?.Level, "Lvl"),
                 GetWithNameOrDefault(value.Requirements?.Strength, "Str"),
                 GetWithNameOrDefault(value.Requirements?.Dexterity, "Dex"),
@@ -134,12 +145,12 @@ namespace PoeEye.ExileToolsApi.Converters
 
         private string GetWithNameOrDefault<T>(T? container, Func<T, string> converter) where T : struct
         {
-            return container == null || default(T).Equals(container.Value) ? string.Empty : converter(container.Value);
+            return container == null || default(T).Equals(container.Value) ? Empty : converter(container.Value);
         }
 
         private string GetOrDefaultAsString<T>(T? container) where T : struct
         {
-            return container == null || default(T).Equals(container.Value) ? string.Empty : container.Value.ToString();
+            return container == null || default(T).Equals(container.Value) ? Empty : container.Value.ToString();
         }
 
         private T GetOrDefaultEnum<T>(string container, T defaultValue = default(T)) where T : struct

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -8,7 +7,7 @@ using Nest;
 using PoeEye.ExileToolsApi.Entities;
 using PoeShared;
 using PoeShared.PoeTrade;
-using PoeShared.Scaffolding;
+using PoeShared.PoeTrade.Query;
 using TypeConverter;
 
 namespace PoeEye.ExileToolsApi.Prism
@@ -62,24 +61,30 @@ namespace PoeEye.ExileToolsApi.Prism
             var modsQueries = new List<BoolQuery>();
             foreach (var modsGroup in source.ModGroups)
             {
-                var groupQueryList = new List<IEnumerable<QueryBase>>();
-                foreach (var modArgument in modsGroup.Mods)
-                {
-                    if (modArgument.Min == null && modArgument.Max == null)
-                    {
-                        groupQueryList.Add(CreateExistsQuery(modArgument.Mod.CodeName+"*"));
-                    }
-                    else
-                    {
-                        groupQueryList.Add(CreateTermRangeQuery(modArgument.Mod.CodeName + ".avg", modArgument.Min, modArgument.Max));
-                    }
-
-                }
-                var groupQuery = groupQueryList.SelectMany(x => x).Select(x => new QueryContainer(x)).ToArray();
                 var boolQuery = new BoolQuery()
                 {
-                    Must = groupQuery,
                 };
+                switch (modsGroup.GroupType)
+                {
+                    case PoeQueryModsGroupType.And:
+                        boolQuery.Must = PrepareModsQuery(modsGroup.Mods);
+                        break;
+                    case PoeQueryModsGroupType.Not:
+                        boolQuery.MustNot = PrepareModsQuery(modsGroup.Mods);
+                        break;
+                    case PoeQueryModsGroupType.Count:
+                        boolQuery.Should = PrepareModsQuery(modsGroup.Mods);
+                        if (modsGroup.Min != null)
+                        {
+                            boolQuery.MinimumShouldMatch = new MinimumShouldMatch((int)modsGroup.Min.Value);
+                        }
+                        break;
+                    case PoeQueryModsGroupType.Sum:
+                        break;
+                    case PoeQueryModsGroupType.If:
+                        break;
+                }
+
                 modsQueries.Add(boolQuery);
             }
 
@@ -92,12 +97,27 @@ namespace PoeEye.ExileToolsApi.Prism
             return result;
         }
 
+        private QueryContainer[] PrepareModsQuery(IEnumerable<IPoeQueryRangeModArgument> mods)
+        {
+            var groupQueryList = new List<IEnumerable<QueryBase>>();
+            foreach (var modArgument in mods)
+            {
+                if (modArgument.Min == null && modArgument.Max == null)
+                {
+                    groupQueryList.Add(CreateExistsQuery(modArgument.Mod.CodeName + "*"));
+                }
+                else
+                {
+                    groupQueryList.Add(CreateTermRangeQuery(modArgument.Mod.CodeName, modArgument.Min, modArgument.Max));
+                }
+            }
+            var groupQuery = groupQueryList.SelectMany(x => x).Select(x => new QueryContainer(x)).ToArray();
+            return groupQuery;
+        }
+
         private QueryContainer[] CombineQueries(params IEnumerable<QueryBase>[] queries)
         {
-            return queries
-                .SelectMany(x => x)
-                .Select(x => new QueryContainer(x))
-                .ToArray();
+            return queries.SelectMany(x => x).Select(x => new QueryContainer(x)).ToArray();
         }
 
         private string DumpQuery(SearchRequest request)
@@ -120,8 +140,30 @@ namespace PoeEye.ExileToolsApi.Prism
             foreach (var queryBase in CreateTermRangeQuery(fieldName, min, max))
             {
                 yield return queryBase;
-
             }
+        }
+
+        private IEnumerable<QueryBase> CreateQuery(string fieldName, float? min, float? max)
+        {
+            if (min == null && max == null)
+            {
+                yield break;
+            }
+
+            var queries = new List<string>();
+            if (min != null)
+            {
+                queries.Add($"{fieldName}:>={min.Value}");
+            }
+            if (max != null)
+            {
+                queries.Add($"{fieldName}:<={max.Value}");
+            }
+            var result = new QueryStringQuery()
+            {
+                Query = string.Join(" ", queries),
+            };
+            yield return result;
         }
 
         private IEnumerable<QueryBase> CreateTermRangeQuery(string fieldName, float? min, float? max)

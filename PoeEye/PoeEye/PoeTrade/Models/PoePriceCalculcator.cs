@@ -1,4 +1,7 @@
-﻿namespace PoeEye.PoeTrade.Models
+﻿using CsQuery.ExtensionMethods;
+using PoeShared.Common;
+
+namespace PoeEye.PoeTrade.Models
 {
     using System;
     using System.Collections.Generic;
@@ -35,28 +38,22 @@
                 .AddTo(Anchors);
         }
 
-        public float? GetEquivalentInChaosOrbs(string rawPrice)
+        public PoePrice GetEquivalentInChaosOrbs(PoePrice price)
         {
-            if (rawPrice == null)
+            if (price.IsEmpty)
             {
-                return null;
-            }
-
-            var price = PriceToCurrencyConverter.Instance.Convert(rawPrice);
-            if (price == null)
-            {
-                return null;
+                return PoePrice.Empty;
             }
 
             float currencyMultilplier;
             if (!currencyByType.TryGetValue(price.CurrencyType, out currencyMultilplier))
             {
                 Log.Instance.Debug(
-                    $"[PriceCalculcator] Could not convert currency type '{price.CurrencyType}' to multiplier, rawPrice: {rawPrice}\r\nMultipliers:{currencyByType.DumpToText()}");
-                return null;
+                    $"[PriceCalculcator] Could not convert currency type '{price.CurrencyType}' to multiplier, price: {price}\r\nMultipliers:{currencyByType.DumpToText()}");
+                return PoePrice.Empty;
             }
 
-            return price.Value * currencyMultilplier;
+            return new PoePrice(KnownCurrencyNameList.ChaosOrb, price.Value * currencyMultilplier);
         }
 
         private IDictionary<string, float> ExtractDifference(IDictionary<string, float> existingDictionary, IDictionary<string, float> candidate)
@@ -72,6 +69,7 @@
             {
                 currencyByType[kvp.Key] = kvp.Value;
             }
+
             Log.Instance.Debug($"[PriceCalculcator] Currencies list:\r\n{currencyByType.DumpToText()}");
         }
     }
