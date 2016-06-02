@@ -26,7 +26,10 @@ namespace PoeEye.PoeTrade.Models
                 .ToArray();
             Log.Instance.Debug($"[PoeApiProvider..ctor] API list:\r\n\t{apiList.DumpToText()}");
 
-            ModulesList = new ReactiveList<IPoeApiWrapper>(apiList);
+            ModulesList = new ReactiveList<IPoeApiWrapper>(apiList)
+            {
+                ChangeTrackingEnabled = true,
+            };
         }
 
         public IReactiveList<IPoeApiWrapper> ModulesList { get; }

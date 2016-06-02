@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Reactive.Linq;
 using Guards;
 using JetBrains.Annotations;
 using PoeEye.PoeTrade.Models;

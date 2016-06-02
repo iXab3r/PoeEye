@@ -51,6 +51,9 @@ namespace PoeEye.ExileToolsApi.Prism
                 Must = CombineQueries(mustQueries)
             };
 
+            result.Query &= PrepareSockets(source);
+            result.Query &= PrepareLinkedSocketsQuery(source);
+
             result.Query &= new BoolQuery
             {
                 Should = CombineQueries(
@@ -92,9 +95,61 @@ namespace PoeEye.ExileToolsApi.Prism
             {
                 result.Query &= modsQuery;
             }
+
+
             Log.Instance.Info($"[ExileToolsApi.Query] Elastic search query:\n{DumpQuery(result)}");
 
             return result;
+        }
+
+        private QueryBase PrepareSockets(IPoeQueryInfo source)
+        {
+            var mustQueries = new[]
+           {
+                CreateRangeBasedRequest("sockets.socketCount", source.SocketsMin, source.SocketsMax),
+                CreateRangeBasedRequest("sockets.largestLinkGroup", source.LinkMin, source.LinkMax),
+                CreateRangeBasedRequest("sockets.totalWhite", source.SocketsW),
+                CreateRangeBasedRequest("sockets.totalBlue", source.SocketsB),
+                CreateRangeBasedRequest("sockets.totalGreen", source.SocketsG),
+                CreateRangeBasedRequest("sockets.totalRed", source.SocketsR),
+            };
+
+            return new BoolQuery()
+            {
+                Must = CombineQueries(mustQueries),
+            };
+        }
+
+        private QueryBase PrepareLinkedSocketsQuery(IPoeQueryInfo source)
+        {
+            var sockets = string.Join(
+               string.Empty,
+               string.Join(string.Empty, Enumerable.Repeat("B", source.LinkedB ?? 0)),
+               string.Join(string.Empty, Enumerable.Repeat("G", source.LinkedG ?? 0)),
+               string.Join(string.Empty, Enumerable.Repeat("R", source.LinkedR ?? 0)),
+               string.Join(string.Empty, Enumerable.Repeat("W", source.LinkedW ?? 0)));
+
+            if (string.IsNullOrWhiteSpace(sockets))
+            {
+                return new BoolQuery();
+            }
+
+            var linkedSocketsQueryString = $"*{sockets}*";
+            var shouldQueries = new[]
+            {
+                CreateWildcardQuery("sockets.sortedLinkGroup.0", linkedSocketsQueryString),
+                CreateWildcardQuery("sockets.sortedLinkGroup.1", linkedSocketsQueryString),
+                CreateWildcardQuery("sockets.sortedLinkGroup.2", linkedSocketsQueryString),
+                CreateWildcardQuery("sockets.sortedLinkGroup.3", linkedSocketsQueryString),
+                CreateWildcardQuery("sockets.sortedLinkGroup.4", linkedSocketsQueryString),
+                CreateWildcardQuery("sockets.sortedLinkGroup.5", linkedSocketsQueryString),
+            };
+
+            return new BoolQuery()
+            {
+                Should = CombineQueries(shouldQueries),
+                MinimumShouldMatch = 1
+            };
         }
 
         private QueryContainer[] PrepareModsQuery(IEnumerable<IPoeQueryRangeModArgument> mods)
@@ -130,7 +185,7 @@ namespace PoeEye.ExileToolsApi.Prism
             return Encoding.ASCII.GetString(ms.ToArray());
         }
 
-        private IEnumerable<QueryBase> CreateRangeBasedRequest(string fieldName, float? min, float? max)
+        private IEnumerable<QueryBase> CreateRangeBasedRequest(string fieldName, float? min, float? max = null)
         {
             if (min == null && max == null)
             {
