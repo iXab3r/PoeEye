@@ -6,6 +6,7 @@ using System.Text;
 using Nest;
 using PoeEye.ExileToolsApi.Entities;
 using PoeShared;
+using PoeShared.Common;
 using PoeShared.PoeTrade;
 using PoeShared.PoeTrade.Query;
 using TypeConverter;
@@ -44,6 +45,7 @@ namespace PoeEye.ExileToolsApi.Prism
                 CreateTermQuery("shop.hasPrice", source.BuyoutOnly ? true : default(bool?)),
                 CreateTermQuery("shop.sellerAccount", source.AccountName),
                 CreateTermQuery("shop.verified", source.OnlineOnly ? VerificationStatus.Yes : default(VerificationStatus?)),
+                CreateQuery(source.ItemType),
             };
 
             result.Query &= new BoolQuery
@@ -51,8 +53,8 @@ namespace PoeEye.ExileToolsApi.Prism
                 Must = CombineQueries(mustQueries)
             };
 
-            result.Query &= PrepareSockets(source);
-            result.Query &= PrepareLinkedSocketsQuery(source);
+            result.Query &= PrepareSocketsColorQuery(source);
+            result.Query &= PrepareSocketsLinksQuery(source);
 
             result.Query &= new BoolQuery
             {
@@ -102,7 +104,7 @@ namespace PoeEye.ExileToolsApi.Prism
             return result;
         }
 
-        private QueryBase PrepareSockets(IPoeQueryInfo source)
+        private QueryBase PrepareSocketsColorQuery(IPoeQueryInfo source)
         {
             var mustQueries = new[]
            {
@@ -120,7 +122,7 @@ namespace PoeEye.ExileToolsApi.Prism
             };
         }
 
-        private QueryBase PrepareLinkedSocketsQuery(IPoeQueryInfo source)
+        private QueryBase PrepareSocketsLinksQuery(IPoeQueryInfo source)
         {
             var sockets = string.Join(
                string.Empty,
@@ -218,6 +220,23 @@ namespace PoeEye.ExileToolsApi.Prism
             {
                 Query = string.Join(" ", queries),
             };
+            yield return result;
+        }
+
+        private IEnumerable<QueryBase> CreateQuery(IPoeItemType itemType)
+        {
+            if (itemType == null || (string.IsNullOrWhiteSpace(itemType.ItemType) && string.IsNullOrWhiteSpace(itemType.EquipType)))
+            {
+                yield break;
+            }
+
+            var result = new BoolQuery()
+            {
+                Must = CombineQueries(
+                        CreateTermQuery("attributes.itemType", itemType.ItemType),
+                        CreateTermQuery("attributes.equipType", itemType.EquipType))
+            };
+
             yield return result;
         }
 

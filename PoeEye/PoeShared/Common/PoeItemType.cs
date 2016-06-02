@@ -4,6 +4,10 @@
     {
         public string CodeName { get; set; }
 
+        public string ItemType { get; set; }
+
+        public string EquipType { get; set; }
+
         public string Name { get; set; }
 
         public override string ToString()

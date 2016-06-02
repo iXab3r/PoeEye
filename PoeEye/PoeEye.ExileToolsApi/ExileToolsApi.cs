@@ -57,6 +57,18 @@ namespace PoeEye.ExileToolsApi
 
         private IPoeStaticData RequestStaticDataInternal()
         {
+            var result = new PoeStaticData()
+            {
+                ModsList = LoadMods(),
+                LeaguesList = LoadLeagues(),
+                CurrenciesList = LoadCurrencies(),
+                ItemTypes = LoadItemTypes(),
+            };
+            return result;
+        }
+
+        private string[] LoadLeagues()
+        {
             var response = client.Search<EmptyResponse>(s => s.Aggregations(a => a.Terms("leagues", st => st.Field("attributes.league"))).Size(0));
             var leaguesList = response
                 .Aggregations
@@ -69,71 +81,99 @@ namespace PoeEye.ExileToolsApi
                 .Distinct()
                 .ToArray();
 
-
-            var result = new PoeStaticData()
-            {
-                ModsList = LoadMods()
-                    .Distinct(PoeItemMod.NameComparer)
-                    .Cast<IPoeItemMod>()
-                    .ToArray(),
-                LeaguesList = leaguesList,
-                CurrenciesList = new IPoeCurrency[]
-                {
-                    new PoeCurrency {Name = "Blessed Orb", CodeName = "blessed"},
-                    new PoeCurrency {Name = "Cartographer's Chisel", CodeName = "chisel"},
-                    new PoeCurrency {Name = "Chaos Orb", CodeName = "chaos"},
-                    new PoeCurrency {Name = "Chromatic Orb", CodeName = "chromatic"},
-                    new PoeCurrency {Name = "Divine Orb", CodeName = "divine"},
-                    new PoeCurrency {Name = "Exalted Orb", CodeName = "exalted"},
-                    new PoeCurrency {Name = "Gemcutter's Prism", CodeName = "gcp"},
-                    new PoeCurrency {Name = "Jeweller's Orb", CodeName = "jewellers"},
-                    new PoeCurrency {Name = "Orb of Alchemy", CodeName = "alchemy"},
-                    new PoeCurrency {Name = "Orb of Alteration", CodeName = "alteration"},
-                    new PoeCurrency {Name = "Orb of Chance", CodeName = "chance"},
-                    new PoeCurrency {Name = "Orb of Fusing", CodeName = "fusing"},
-                    new PoeCurrency {Name = "Orb of Regret", CodeName = "regret"},
-                    new PoeCurrency {Name = "Orb of Scouring", CodeName = "scouring"},
-                    new PoeCurrency {Name = "Regal Orb", CodeName = "regal"}
-                },
-                ItemTypes = new IPoeItemType[]
-                {
-                    new PoeItemType {Name = "Generic One-Handed Weapon", CodeName = "1h"},
-                    new PoeItemType {Name = "Generic Two-Handed Weapon", CodeName = "2h"},
-                    new PoeItemType {Name = "Bow", CodeName = "Bow"},
-                    new PoeItemType {Name = "Claw", CodeName = "Claw"},
-                    new PoeItemType {Name = "Dagger", CodeName = "Dagger"},
-                    new PoeItemType {Name = "One Hand Axe", CodeName = "One Hand Axe"},
-                    new PoeItemType {Name = "One Hand Mace", CodeName = "One Hand Mace"},
-                    new PoeItemType {Name = "One Hand Sword", CodeName = "One Hand Sword"},
-                    new PoeItemType {Name = "Sceptre", CodeName = "Sceptre"},
-                    new PoeItemType {Name = "Staff", CodeName = "Staff"},
-                    new PoeItemType {Name = "Two Hand Axe", CodeName = "Two Hand Axe"},
-                    new PoeItemType {Name = "Two Hand Mace", CodeName = "Two Hand Mace"},
-                    new PoeItemType {Name = "Two Hand Sword", CodeName = "Two Hand Sword"},
-                    new PoeItemType {Name = "Wand", CodeName = "Wand"},
-                    new PoeItemType {Name = "Body Armour", CodeName = "Body Armour"},
-                    new PoeItemType {Name = "Boots", CodeName = "Boots"},
-                    new PoeItemType {Name = "Gloves", CodeName = "Gloves"},
-                    new PoeItemType {Name = "Helmet", CodeName = "Helmet"},
-                    new PoeItemType {Name = "Shield", CodeName = "Shield"},
-                    new PoeItemType {Name = "Amulet", CodeName = "Amulet"},
-                    new PoeItemType {Name = "Belt", CodeName = "Belt"},
-                    new PoeItemType {Name = "Currency", CodeName = "Currency"},
-                    new PoeItemType {Name = "Divination Card", CodeName = "Divination Card"},
-                    new PoeItemType {Name = "Fishing Rods", CodeName = "Fishing Rods"},
-                    new PoeItemType {Name = "Flask", CodeName = "Flask"},
-                    new PoeItemType {Name = "Gem", CodeName = "Gem"},
-                    new PoeItemType {Name = "Jewel", CodeName = "Jewel"},
-                    new PoeItemType {Name = "Map", CodeName = "Map"},
-                    new PoeItemType {Name = "Quiver", CodeName = "Quiver"},
-                    new PoeItemType {Name = "Ring", CodeName = "Ring"},
-                    new PoeItemType {Name = "Vaal Fragments", CodeName = "Vaal Fragments"}
-                }
-            };
-            return result;
+            return leaguesList;
         }
 
-        private IEnumerable<PoeItemMod> LoadMods()
+        private IPoeCurrency[] LoadCurrencies()
+        {
+            return new IPoeCurrency[]
+            {
+                new PoeCurrency {Name = "Blessed Orb", CodeName = KnownCurrencyNameList.BlessedOrb},
+                new PoeCurrency {Name = "Cartographer's Chisel", CodeName = KnownCurrencyNameList.CartographersChisel},
+                new PoeCurrency {Name = "Chaos Orb", CodeName = KnownCurrencyNameList.ChaosOrb},
+                new PoeCurrency {Name = "Chromatic Orb", CodeName = KnownCurrencyNameList.ChromaticOrb},
+                new PoeCurrency {Name = "Divine Orb", CodeName = KnownCurrencyNameList.DivineOrb},
+                new PoeCurrency {Name = "Exalted Orb", CodeName = KnownCurrencyNameList.ExaltedOrb},
+                new PoeCurrency {Name = "Gemcutter's Prism", CodeName = KnownCurrencyNameList.GemcuttersPrism},
+                new PoeCurrency {Name = "Jeweller's Orb", CodeName = KnownCurrencyNameList.JewellersOrb},
+                new PoeCurrency {Name = "Orb of Alchemy", CodeName = KnownCurrencyNameList.OrbOfAlchemy},
+                new PoeCurrency {Name = "Orb of Alteration", CodeName = KnownCurrencyNameList.OrbOfAlteration},
+                new PoeCurrency {Name = "Orb of Chance", CodeName = KnownCurrencyNameList.OrbOfChance},
+                new PoeCurrency {Name = "Orb of Fusing", CodeName = KnownCurrencyNameList.OrbOfFusing},
+                new PoeCurrency {Name = "Orb of Regret", CodeName = KnownCurrencyNameList.OrbOfRegret},
+                new PoeCurrency {Name = "Orb of Scouring", CodeName = KnownCurrencyNameList.OrbOfScouring},
+                new PoeCurrency {Name = "Regal Orb", CodeName = KnownCurrencyNameList.RegalOrb},
+                new PoeCurrency {Name = "Vaal Orb", CodeName = KnownCurrencyNameList.VaalOrb}
+            };
+        }
+
+        private IPoeItemType[] LoadItemTypes()
+        {
+            var response = client
+                .Search<EmptyResponse>(s =>
+                    s.Aggregations(b => b.Terms("equipType", stb => stb.Field("attributes.equipType").Size(byte.MaxValue)
+                     .Aggregations(c => c.Terms("itemType", stc => stc.Field("attributes.itemType"))).Size(byte.MaxValue)))
+                     .Size(0));
+
+            var eqBuckets =
+                from row in response.Aggregations
+                where row.Value is BucketAggregate
+                from eqBucket in ((BucketAggregate)row.Value).Items.OfType<KeyedBucket>()
+                from eqRow in eqBucket.Aggregations
+                where eqRow.Value is BucketAggregate
+                from itBucket in ((BucketAggregate)eqRow.Value).Items.OfType<KeyedBucket>()
+                select new { EquipType = eqBucket.Key, ItemType = itBucket.Key };
+
+
+            var result = new List<IPoeItemType>
+            {
+                new PoeItemType() {Name = "Generic One-Handed Weapon", EquipType = "One Handed Melee Weapon"},
+                new PoeItemType() {Name = "Generic Two-Handed Weapon", EquipType = "Two Handed Melee Weapon"}
+            };
+
+            result.AddRange(eqBuckets.Select(x => ToPoeItemType(x.EquipType, x.ItemType)).OrderBy(x => x.EquipType));
+
+            return result.ToArray();
+        }
+
+        private IPoeItemType ToPoeItemType(string equipType, string itemType)
+        {
+            if (string.IsNullOrWhiteSpace(equipType) && string.IsNullOrWhiteSpace(itemType))
+            {
+                return new PoeItemType { Name = "Empty" };
+            }
+            if (equipType == itemType)
+            {
+                return new PoeItemType
+                {
+                    EquipType = equipType,
+                    ItemType = itemType,
+                    Name = itemType
+                };
+            }
+
+            if (equipType == "One Handed Melee Weapon")
+            {
+                equipType = "One Hand";
+            }
+            else if (equipType == "Two Handed Melee Weapon")
+            {
+                equipType = "Two Hand";
+            }
+            else if (equipType == "One Handed Projectile Weapon")
+            {
+                equipType = "One Hand";
+            }
+
+            return new PoeItemType
+            {
+                EquipType = equipType,
+                ItemType = itemType,
+                Name = string.Join(" - ", equipType, itemType),
+            };
+        }
+
+        private IPoeItemMod[] LoadMods()
         {
             var page = new WebClient().DownloadString(@"http://api.exiletools.com/endpoints/mapping?field=mods*");
 
@@ -143,7 +183,10 @@ namespace PoeEye.ExileToolsApi
             result.AddRange(LoadMods(page, "crafted", PoeModType.Unknown, true));
             result.AddRange(LoadMods(page, "modsTotal", PoeModType.Unknown, false));
             result.AddRange(LoadMods(page, "modsPseudo", PoeModType.Unknown, false));
-            return result;
+            return result
+                    .Distinct(PoeItemMod.NameComparer)
+                    .Cast<IPoeItemMod>()
+                    .ToArray();
         }
 
         private IEnumerable<PoeItemMod> LoadMods(string data, string expectedPrefix, PoeModType modType, bool isCrafted)

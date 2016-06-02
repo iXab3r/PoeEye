@@ -14,4 +14,12 @@
     <ContentControl Content="{Binding Price}" ContentTemplate="{StaticResource CurrencyViewKey}"/>
   </DataTemplate>
 
+  <DataTemplate DataType="{x:Type common:PoeCurrency}" x:Key="CurrencyByCodeNameViewKey">
+    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="5,0">
+      <Image Width="20" Height="20"
+             Source="{Binding CodeName, Converter={StaticResource PriceToImageUriConverter}}" />
+      <TextBlock Text="{Binding Name}"  />
+    </StackPanel>
+  </DataTemplate>
+
 </ResourceDictionary>
