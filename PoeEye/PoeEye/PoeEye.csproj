@@ -326,11 +326,13 @@
     <Compile Include="PoeTrade\Models\FuzzySuggestionProvider.cs" />
     <Compile Include="PoeTrade\Models\IAudioNotificationsManager.cs" />
     <Compile Include="PoeTrade\Models\IImagesCacheService.cs" />
+    <Compile Include="PoeTrade\Models\IPoeApiProvider.cs" />
     <Compile Include="PoeTrade\Models\IPoePriceCalculcator.cs" />
     <Compile Include="PoeTrade\Models\ImagesCacheService.cs" />
     <Compile Include="PoeTrade\Models\IPoeCaptchaRegistrator.cs" />
     <Compile Include="PoeTrade\Models\IWhispersNotificationManager.cs" />
     <Compile Include="PoeTrade\Models\IWindowTracker.cs" />
+    <Compile Include="PoeTrade\Models\PoeApiProvider.cs" />
     <Compile Include="PoeTrade\Models\PoeItemPricePoint.cs" />
     <Compile Include="PoeTrade\Models\PoePriceCalculcator.cs" />
     <Compile Include="PoeTrade\Models\PoeCaptchaRegistrator.cs" />
@@ -342,14 +344,17 @@
     <Compile Include="PoeTrade\ViewModels\IHistoricalTradesViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\IMainWindowTabViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\IMainWindowViewModel.cs" />
+    <Compile Include="PoeTrade\ViewModels\IPoeApiSelectorViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\IPoeChatViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\IPoeModGroupsEditorViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\IPoeModsEditorViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\IPoeModViewModel.cs" />
+    <Compile Include="PoeTrade\ViewModels\IPoeQueryViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\IPoeTradeCaptchaViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\IPoeTradesListViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\IPoeTradeViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\IRecheckPeriodViewModel.cs" />
+    <Compile Include="PoeTrade\ViewModels\PoeApiSelectorViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\PoeChatViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\PoeClipboardParserViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\PoeEyeSettingsViewModel.cs" />
@@ -443,6 +448,10 @@
   </ItemGroup>
   <ItemGroup>
     <Page Include="PoeTrade\Views\ApplicationUpdaterView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="PoeTrade\Views\PoeApiSelectorView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

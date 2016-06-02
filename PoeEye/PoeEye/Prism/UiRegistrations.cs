@@ -32,6 +32,7 @@
                 .RegisterSingleton<IWhispersNotificationManager, WhispersNotificationManager>()
                 .RegisterSingleton<IPoeEyeConfigProvider, PoeEyeConfigProviderFromFile>()
                 .RegisterSingleton<IPoeCaptchaRegistrator, PoeCaptchaRegistrator>()
+                .RegisterSingleton<IPoeApiProvider, PoeApiProvider>()
                 .RegisterSingleton<IDialogCoordinator, DialogCoordinator>();
 
             Container
@@ -44,6 +45,9 @@
                 .RegisterType<IMainWindowTabViewModel, MainWindowTabViewModel>()
                 .RegisterType<IPoeModViewModel, PoeModViewModel>()
                 .RegisterType<IPoeChatViewModel, PoeChatViewModel>()
+                .RegisterType<IPoeTradesListViewModel, PoeTradesListViewModel>()
+                .RegisterType<IPoeQueryViewModel, PoeQueryViewModel>()
+                .RegisterType<IPoeApiSelectorViewModel, PoeApiSelectorViewModel>()
                 .RegisterType<IPoeModsEditorViewModel, PoeModsEditorViewModel>()
                 .RegisterType<IPoeModGroupsEditorViewModel, PoeModGroupsEditorViewModel>()
                 .RegisterType<IPoeTradeCaptchaViewModel, PoeTradeCaptchaViewModel>()

@@ -134,7 +134,8 @@
                 .Subscribe(configUpdateSubject)
                 .AddTo(Anchors);
 
-            settings.ObservableForProperty(x => x.IsOpen)
+            settings
+                .ObservableForProperty(x => x.IsOpen)
                 .Select(x => x.Value)
                 .DistinctUntilChanged()
                 .Where(x => x == false)
@@ -212,6 +213,12 @@
         private IMainWindowTabViewModel CreateAndAddTab()
         {
             var newTab = tabFactory.Create();
+
+            newTab
+                .WhenAnyValue(x => x.SelectedApi)
+                .ToUnit()
+                .Subscribe(configUpdateSubject)
+                .AddTo(newTab.Anchors);
 
             newTab
                 .Query

@@ -1,4 +1,8 @@
-﻿namespace PoeEye.PoeTrade.ViewModels
+﻿using System.Reactive.Disposables;
+using PoeShared.PoeTrade.Query;
+using PoeShared.Prism;
+
+namespace PoeEye.PoeTrade.ViewModels
 {
     using System;
     using System.Linq;
@@ -28,7 +32,10 @@
 
     internal sealed class MainWindowTabViewModel : DisposableReactiveObject, IMainWindowTabViewModel
     {
+        private readonly IFactory<IPoeTradesListViewModel, IPoeApiWrapper> tradesListFactory;
+        private readonly IFactory<IPoeQueryViewModel, IPoeStaticData> queryFactory;
         private static int GlobalTabIdx;
+
 
         private readonly ReactiveCommand<object> markAllAsReadCommand;
         private readonly ReactiveCommand<object> refreshCommand;
@@ -36,26 +43,36 @@
 
         private readonly string tabHeader;
 
+        private IPoeQueryViewModel query;
         private bool audioNotificationEnabled;
         private string tabName;
 
+        private readonly SerialDisposable tradesListAnchors = new SerialDisposable();
+        private IPoeTradesListViewModel tradesList;
+
         public MainWindowTabViewModel(
-            [NotNull] PoeTradesListViewModel tradesList,
+            [NotNull] IFactory<IPoeTradesListViewModel, IPoeApiWrapper> tradesListFactory,
             [NotNull] IAudioNotificationsManager audioNotificationsManager,
             [NotNull] IRecheckPeriodViewModel recheckPeriod,
+            [NotNull] IPoeApiSelectorViewModel apiSelector,
             [NotNull] [Dependency(WellKnownWindows.Main)] IWindowTracker mainWindowTracker,
-            [NotNull] PoeQueryViewModel query)
+            [NotNull] IFactory<IPoeQueryViewModel, IPoeStaticData> queryFactory)
         {
-            Guard.ArgumentNotNull(() => tradesList);
+            this.tradesListFactory = tradesListFactory;
+            Guard.ArgumentNotNull(() => tradesListFactory);
+            Guard.ArgumentNotNull(() => apiSelector);
             Guard.ArgumentNotNull(() => mainWindowTracker);
             Guard.ArgumentNotNull(() => audioNotificationsManager);
-            Guard.ArgumentNotNull(() => query);
+            Guard.ArgumentNotNull(() => queryFactory);
 
             tabHeader = $"Tab #{GlobalTabIdx++}";
 
-            TradesList = tradesList;
-            tradesList.AddTo(Anchors);
+            this.queryFactory = queryFactory;
+            ApiSelector = apiSelector;
+            apiSelector.AddTo(Anchors);
 
+            tradesListAnchors.AddTo(Anchors);
+            
             RecheckPeriod = recheckPeriod;
 
             searchCommand = ReactiveCommand.Create();
@@ -64,27 +81,18 @@
             markAllAsReadCommand = ReactiveCommand.Create();
             markAllAsReadCommand.Subscribe(MarkAllAsReadExecute);
 
-            refreshCommand = ReactiveCommand.Create(TradesList.WhenAnyValue(x => x.IsBusy).Select(x => !x));
+            refreshCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.IsBusy).Select(x => !x));
             refreshCommand.Subscribe(RefreshCommandExecuted);
 
-            tradesList
-                .WhenAnyValue(x => x.IsBusy)
-                .Subscribe(() => this.RaisePropertyChanged(nameof(IsBusy)))
+            apiSelector
+                .WhenAnyValue(x => x.SelectedModule)
+                .Subscribe(ReinitializeApi)
                 .AddTo(Anchors);
 
-            Query = query;
-
-            TradesList.Items.ItemChanged.ToUnit()
-                      .Merge(TradesList.Items.Changed.ToUnit())
-                      .Subscribe(
-                          () =>
-                          {
-                              this.RaisePropertyChanged(nameof(NewItemsCount));
-                              this.RaisePropertyChanged(nameof(RemovedItemsCount));
-                              this.RaisePropertyChanged(nameof(NormalItemsCount));
-                              this.RaisePropertyChanged(nameof(HasNewTrades));
-                          })
-                      .AddTo(Anchors);
+            apiSelector
+                .WhenAnyValue(x => x.SelectedModule)
+                .Subscribe(() => this.RaisePropertyChanged(nameof(SelectedApi)))
+                .AddTo(Anchors);
 
             this.WhenAnyValue(x => x.NewItemsCount)
                 .DistinctUntilChanged()
@@ -102,9 +110,14 @@
 
             RecheckPeriod
                 .WhenAny(x => x.Period, x => x.IsAutoRecheckEnabled, (x, y) => Unit.Default)
+                .Where(x => TradesList != null)
                 .Subscribe(x => TradesList.RecheckPeriod = RecheckPeriod.IsAutoRecheckEnabled ? RecheckPeriod.Period : TimeSpan.Zero)
                 .AddTo(Anchors);
         }
+
+        public IPoeApiSelectorViewModel ApiSelector { get; }
+
+        public IPoeApiWrapper SelectedApi => ApiSelector.SelectedModule;
 
         public ICommand SearchCommand => searchCommand;
 
@@ -137,7 +150,10 @@
             get { return TradesList.Items.Count(x => x.TradeState == PoeTradeState.Normal); }
         }
 
-        public IPoeTradesListViewModel TradesList { get; }
+        public IPoeTradesListViewModel TradesList {
+            get { return tradesList; }
+            private set { this.RaiseAndSetIfChanged(ref tradesList, value); }
+        }
 
         public IRecheckPeriodViewModel RecheckPeriod { get; }
 
@@ -147,10 +163,19 @@
             set { this.RaiseAndSetIfChanged(ref audioNotificationEnabled, value); }
         }
 
-        public PoeQueryViewModel Query { get; }
+        public IPoeQueryViewModel Query
+        {
+            get { return query; }
+            private set { this.RaiseAndSetIfChanged(ref query, value); }
+        }
 
         public void Load(PoeEyeTabConfig config)
         {
+            if (!string.IsNullOrWhiteSpace(config.ApiModuleName))
+            {
+                ApiSelector.SetByModuleName(config.ApiModuleName);
+            }
+
             if (config.RecheckTimeout != default(TimeSpan))
             {
                 RecheckPeriod.Period = config.RecheckTimeout;
@@ -180,8 +205,47 @@
                 IsAutoRecheckEnabled = RecheckPeriod.IsAutoRecheckEnabled,
                 QueryInfo = Query.PoeQueryBuilder(),
                 AudioNotificationEnabled = AudioNotificationEnabled,
-                SoldOrRemovedItems = TradesList.HistoricalTrades.ItemsViewModels.Select(x => x.Trade).ToArray()
+                SoldOrRemovedItems = TradesList.HistoricalTrades.ItemsViewModels.Select(x => x.Trade).ToArray(),
+                ApiModuleName = ApiSelector.SelectedModule.Name,
             };
+        }
+
+        private void ReinitializeApi(IPoeApiWrapper api)
+        {
+            var anchors = new CompositeDisposable();
+            tradesListAnchors.Disposable = anchors;
+
+            if (api == null)
+            {
+                TradesList = null;
+                Query = null;
+            }
+            else
+            {
+                TradesList = tradesListFactory.Create(api);
+                tradesList.AddTo(anchors);
+
+                Query = queryFactory.Create(api.StaticData);
+
+                tradesList
+                   .WhenAnyValue(x => x.IsBusy)
+                   .Subscribe(() => this.RaisePropertyChanged(nameof(IsBusy)))
+                   .AddTo(anchors);
+
+
+                tradesList.Items.ItemChanged.ToUnit()
+                          .Merge(tradesList.Items.Changed.ToUnit())
+                          .Subscribe(
+                              () =>
+                              {
+                                  this.RaisePropertyChanged(nameof(NewItemsCount));
+                                  this.RaisePropertyChanged(nameof(RemovedItemsCount));
+                                  this.RaisePropertyChanged(nameof(NormalItemsCount));
+                                  this.RaisePropertyChanged(nameof(HasNewTrades));
+                              })
+                          .AddTo(anchors);
+            }
+            RebuildTabName();
         }
 
         private void RebuildTabName()

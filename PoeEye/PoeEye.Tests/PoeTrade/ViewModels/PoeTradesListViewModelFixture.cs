@@ -31,9 +31,10 @@
     internal sealed class PoeTradesListViewModelFixture
     {
         private Mock<IClock> clock;
+        private Mock<IPoeApiWrapper> poeApiWrapper;
         private Mock<IEqualityComparer<IPoeItem>> poeItemsComparer;
         private Mock<IFactory<IPoeTradeViewModel, IPoeItem>> poeTradeViewModelFactory;
-        private Mock<IFactory<IPoeLiveHistoryProvider, IPoeQueryInfo>> poeLiveHistoryFactory;
+        private Mock<IFactory<IPoeLiveHistoryProvider, IPoeApiWrapper, IPoeQueryInfo>> poeLiveHistoryFactory;
 
         private Mock<IPoeLiveHistoryProvider> poeLiveHistory;
         private Mock<IHistoricalTradesViewModel> historicalTradesViewModel;
@@ -48,6 +49,8 @@
             clock
                 .SetupGet(x => x.Now)
                 .Returns(new DateTime(2015, 1, 1));
+
+            poeApiWrapper = new Mock<IPoeApiWrapper>();
 
             poeTradeViewModelFactory = new Mock<IFactory<IPoeTradeViewModel, IPoeItem>>();
             poeTradeViewModelFactory
@@ -65,9 +68,9 @@
             poeLiveHistory.SetupGet(x => x.ItemsPacks).Returns(poeLiveHistoryItems);
             poeLiveHistory.SetupGet(x => x.UpdateExceptions).Returns(poeLiveHistoryUpdateExceptions);
 
-            poeLiveHistoryFactory = new Mock<IFactory<IPoeLiveHistoryProvider, IPoeQueryInfo>>();
+            poeLiveHistoryFactory = new Mock<IFactory<IPoeLiveHistoryProvider, IPoeApiWrapper, IPoeQueryInfo>>();
             poeLiveHistoryFactory
-                .Setup(x => x.Create(It.IsAny<IPoeQueryInfo>()))
+                .Setup(x => x.Create(It.IsAny<IPoeApiWrapper>(), It.IsAny<IPoeQueryInfo>()))
                 .Returns(poeLiveHistory.Object);
 
             historicalTradesViewModel = new Mock<IHistoricalTradesViewModel>();
@@ -284,6 +287,7 @@
         private PoeTradesListViewModel CreateInstance()
         {
             return new PoeTradesListViewModel(
+                poeApiWrapper.Object,
                 poeLiveHistoryFactory.Object,
                 poeTradeViewModelFactory.Object,
                 captchaService.Object,

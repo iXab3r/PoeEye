@@ -36,17 +36,17 @@ namespace PoeEye.PoeTrade.ViewModels
         private readonly IDictionary<string, IPoeItemMod> modsByName;
 
         public PoeModsEditorViewModel(
-            [NotNull] IPoeStaticData queryInfoProvider,
+            [NotNull] IPoeStaticData staticData,
             [NotNull] IFactory<IPoeModViewModel, ISuggestionProvider> modsViewModelsFactory,
             [NotNull] IFactory<ISuggestionProvider, string[]> suggestionProviderFactory)
         {
             Guard.ArgumentNotNull(() => modsViewModelsFactory);
-            Guard.ArgumentNotNull(() => queryInfoProvider);
+            Guard.ArgumentNotNull(() => staticData);
             Guard.ArgumentNotNull(() => suggestionProviderFactory);
 
             this.modsViewModelsFactory = modsViewModelsFactory;
 
-            modsByName = queryInfoProvider
+            modsByName = staticData
                 .ModsList
                 .ToDictionary(x => x.Name, x => x);
 

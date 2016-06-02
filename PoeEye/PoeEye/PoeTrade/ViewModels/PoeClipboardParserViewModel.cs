@@ -1,4 +1,6 @@
-﻿namespace PoeEye.PoeTrade.ViewModels
+﻿using Prism.Unity;
+
+namespace PoeEye.PoeTrade.ViewModels
 {
     using System;
     using System.Reactive.Concurrency;
@@ -49,25 +51,29 @@
         private IPoeQueryInfo itemQueryInfo;
 
         public PoeClipboardParserViewModel(
-            [NotNull] IPoeItemParser itemParser,
+            [NotNull] IUnityContainer container,
             [NotNull] IFactory<IPoeTradeViewModel, IPoeItem> poeTradeViewModelFactory,
-            [NotNull] IConverter<IPoeItem, IPoeQueryInfo> itemToQueryConverter,
             [NotNull] IPoeEyeConfigProvider configProvider,
             [NotNull] [Dependency(WellKnownWindows.PathOfExile)] IWindowTracker poeWindowTracker,
             [NotNull] [Dependency(WellKnownSchedulers.Ui)] IScheduler uiScheduler,
             [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler)
         {
-            Guard.ArgumentNotNull(() => itemParser);
+            Guard.ArgumentNotNull(() => container);
             Guard.ArgumentNotNull(() => poeTradeViewModelFactory);
-            Guard.ArgumentNotNull(() => poeWindowTracker);
             Guard.ArgumentNotNull(() => configProvider);
-            Guard.ArgumentNotNull(() => itemToQueryConverter);
+            Guard.ArgumentNotNull(() => poeWindowTracker);
             Guard.ArgumentNotNull(() => uiScheduler);
             Guard.ArgumentNotNull(() => bgScheduler);
 
-            this.itemParser = itemParser;
+            itemParser = container.TryResolve<IPoeItemParser>();
+            if (itemParser == null)
+            {
+                Log.Instance.Debug("[PoeClipboardParserViewModel..ctor] Item parser was not loaded");
+                return;
+            }
+
+            this.itemToQueryConverter = container.Resolve<IConverter<IPoeItem, IPoeQueryInfo>>();
             this.poeTradeViewModelFactory = poeTradeViewModelFactory;
-            this.itemToQueryConverter = itemToQueryConverter;
 
             this.WhenAnyValue(x => x.IsBusyInternal).Throttle(IsBusyThrottlingPeriod).Merge(this.WhenAnyValue(x => x.IsOpen))
                 .Subscribe(() => this.RaisePropertyChanged(nameof(IsBusy)))

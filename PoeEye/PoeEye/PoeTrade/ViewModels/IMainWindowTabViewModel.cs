@@ -1,4 +1,6 @@
-﻿namespace PoeEye.PoeTrade.ViewModels
+﻿using PoeShared.PoeTrade;
+
+namespace PoeEye.PoeTrade.ViewModels
 {
     using System.Windows.Input;
 
@@ -20,7 +22,9 @@
 
         ICommand MarkAllAsReadCommand { [NotNull] get; }
 
-        PoeQueryViewModel Query { get; }
+        IPoeApiWrapper SelectedApi { get; }
+
+        IPoeQueryViewModel Query { get; }
 
         void Load(PoeEyeTabConfig config);
 

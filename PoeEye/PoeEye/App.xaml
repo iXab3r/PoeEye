@@ -33,6 +33,7 @@
         <ResourceDictionary Source="PoeTrade/Views/PoeTradeCaptchaView.xaml" />
         <ResourceDictionary Source="PoeTrade/Views/ApplicationUpdaterView.xaml" />
         <ResourceDictionary Source="PoeTrade/Views/PoeChatView.xaml" />
+        <ResourceDictionary Source="PoeTrade/Views/PoeApiSelectorView.xaml" />
 
         <ResourceDictionary Source="PoeTrade/Views/HistoricalTradesView.xaml" />
         <ResourceDictionary Source="PoeTrade/Views/PoeSummaryTabView.xaml" />

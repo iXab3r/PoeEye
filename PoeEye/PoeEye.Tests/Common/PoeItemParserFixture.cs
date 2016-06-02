@@ -1,4 +1,6 @@
-﻿namespace PoeEye.Tests.Common
+﻿using PoeEye.ItemParser;
+
+namespace PoeEye.Tests.Common
 {
     using System.Collections.Generic;
     using System.Linq;
@@ -473,11 +475,6 @@
                          }));
         }
 
-        private PoeItemParser CreateInstance()
-        {
-            return new PoeItemParser(new PoeModsProcessor(queryInfoProvider.Object));
-        }
-
         [Test]
         [TestCaseSource(nameof(KnownItems))]
         public void ShouldParseExplicitMods(string data, IPoeItem expectedItem)
@@ -601,6 +598,11 @@
 
             //Then
             result.ShouldBe(null);
+        }
+
+        private PoeItemParser CreateInstance()
+        {
+            return new PoeItemParser(new PoeModsProcessor(queryInfoProvider.Object));
         }
     }
 }

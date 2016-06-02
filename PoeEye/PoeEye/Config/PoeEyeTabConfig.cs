@@ -17,6 +17,8 @@
 
         public bool AudioNotificationEnabled { get; set; }
 
+        public string ApiModuleName { get; set; }
+
         public override string ToString()
         {
             return $"[Timeout: {RecheckTimeout}] Query: {QueryInfo}";

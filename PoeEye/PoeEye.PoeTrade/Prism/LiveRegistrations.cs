@@ -17,8 +17,7 @@ namespace PoeEye.PoeTrade.Prism
         protected override void Initialize()
         { 
             Container
-                .RegisterSingleton<IPoeApi, PoeTradeApi>()
-                .RegisterSingleton<IPoeItemVerifier, PoeItemVerifier>()
+                .RegisterSingleton<IPoeApi, PoeTradeApi>(typeof(PoeTradeApi).FullName)
                 .RegisterSingleton<IConverter<IPoeQueryInfo, IPoeQuery>, PoeQueryInfoToQueryConverter>()
                 .RegisterSingleton<IConverter<IPoeQuery, NameValueCollection>, PoeQueryConverter>()
                 .RegisterSingleton<IPoeTradeDateTimeExtractor, PoeTradeDateTimeExtractor>();

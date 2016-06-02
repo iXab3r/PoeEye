@@ -401,38 +401,6 @@
               </StackPanel>
               
               
-
-              <StackPanel Grid.Column="2"
-                          Margin="10,2">
-
-                <Button Width="80"
-                        Visibility="{Binding IsEnabled, RelativeSource={RelativeSource Self}, Converter={StaticResource BoolFalseToCollapsedConverter}}"
-                        Command="{Binding VerifyItemCommand}">
-                  <Button.Style>
-                    <Style BasedOn="{StaticResource {x:Type Button}}" TargetType="{x:Type Button}">
-                      <Setter Property="Content" Value="Verify" />
-                      <Setter Property="IsEnabled" Value="True" />
-                      <Style.Triggers>
-                        <DataTrigger Binding="{Binding VerificationState}" Value="InProgress">
-                          <Setter Property="IsEnabled" Value="False" />
-                        </DataTrigger>
-                        <DataTrigger Binding="{Binding VerificationState}" Value="Sold">
-                          <Setter Property="Content" Value="Sold" />
-                          <Setter Property="Foreground" Value="{StaticResource PoeTradeRemovedItemBrush}" />
-                        </DataTrigger>
-                        <DataTrigger Binding="{Binding VerificationState}" Value="Verified">
-                          <Setter Property="Content" Value="Verified" />
-                          <Setter Property="Foreground" Value="{StaticResource PoeTradeNewItemBrush}" />
-                        </DataTrigger>
-                        <DataTrigger Binding="{Binding VerificationState}" Value="InProgress">
-                          <Setter Property="Content" Value="Working..." />
-                        </DataTrigger>
-                      </Style.Triggers>
-                    </Style>
-                  </Button.Style>
-                </Button>
-              </StackPanel>
-
               <Button Grid.Column="4"
                       Margin="10,2"
                         Visibility="{Binding IsEnabled, RelativeSource={RelativeSource Self}, Converter={StaticResource BoolFalseToCollapsedConverter}}"

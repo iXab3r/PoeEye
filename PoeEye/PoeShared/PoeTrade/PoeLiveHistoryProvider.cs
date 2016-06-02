@@ -22,7 +22,7 @@ namespace PoeShared.PoeTrade
 
         public PoeLiveHistoryProvider(
             [NotNull] IPoeQueryInfo query,
-            [NotNull] IPoeApi poeApi)
+            [NotNull] IPoeApiWrapper poeApi)
         {
             Guard.ArgumentNotNull(() => query);
             Guard.ArgumentNotNull(() => poeApi);

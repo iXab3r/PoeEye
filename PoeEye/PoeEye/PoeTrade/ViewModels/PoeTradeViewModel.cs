@@ -25,7 +25,6 @@ namespace PoeEye.PoeTrade.ViewModels
 
     using PoeShared;
     using PoeShared.Common;
-    using PoeShared.PoeTrade;
     using PoeShared.Prism;
     using PoeShared.Scaffolding;
 
@@ -37,25 +36,19 @@ namespace PoeEye.PoeTrade.ViewModels
         private readonly IClock clock;
         private readonly ReactiveCommand<object> copyPmMessageToClipboardCommand = ReactiveCommand.Create();
 
-        private readonly IPoeItemVerifier itemVerifier;
         private readonly ReactiveCommand<object> openForumUriCommand;
-        private readonly ReactiveCommand<object> verifyItemCommand;
 
         private PoeTradeState tradeState;
-
-        private PoeItemVerificationState verificationState;
 
         public PoeTradeViewModel(
             [NotNull] IPoeItem poeItem,
             [NotNull] IPoePriceCalculcator poePriceCalculcator,
-            [NotNull] IPoeItemVerifier itemVerifier,
             [NotNull] IFactory<ImageViewModel, Uri> imageViewModelFactory,
             [NotNull] IFactory<PoeLinksInfoViewModel, IPoeLinksInfo> linksViewModelFactory,
             [NotNull] [Dependency(WellKnownSchedulers.Ui)] IScheduler uiScheduler,
             [NotNull] IClock clock)
         {
             Guard.ArgumentNotNull(() => poeItem);
-            Guard.ArgumentNotNull(() => itemVerifier);
             Guard.ArgumentNotNull(() => poePriceCalculcator);
             Guard.ArgumentNotNull(() => imageViewModelFactory);
             Guard.ArgumentNotNull(() => linksViewModelFactory);
@@ -63,15 +56,11 @@ namespace PoeEye.PoeTrade.ViewModels
             Guard.ArgumentNotNull(() => clock);
 
             this.clock = clock;
-            this.itemVerifier = itemVerifier;
             Trade = poeItem;
             copyPmMessageToClipboardCommand.Subscribe(CopyPmMessageToClipboardCommandExecute);
 
             openForumUriCommand = ReactiveCommand.Create(Observable.Return(OpenForumUriCommandCanExecute()));
             openForumUriCommand.Subscribe(OpenForumUriCommandExecute).AddTo(Anchors);
-
-            verifyItemCommand = ReactiveCommand.Create(Observable.Return(VerifyCommandCanExecute()));
-            verifyItemCommand.Subscribe(VerifyCommandExecuted).AddTo(Anchors);
 
             Uri imageUri;
             if (!string.IsNullOrWhiteSpace(poeItem.ItemIconUri) && Uri.TryCreate(poeItem.ItemIconUri, UriKind.Absolute, out imageUri))
@@ -104,14 +93,6 @@ namespace PoeEye.PoeTrade.ViewModels
         public TimeSpan TimeElapsedSinceLastIndexation => Trade.Timestamp == DateTime.MinValue ? TimeSpan.Zero : clock.Now - Trade.Timestamp;
 
         public ICommand OpenForumUriCommand => openForumUriCommand;
-
-        public ICommand VerifyItemCommand => verifyItemCommand;
-
-        public PoeItemVerificationState VerificationState
-        {
-            get { return verificationState; }
-            set { this.RaiseAndSetIfChanged(ref verificationState, value); }
-        }
 
         public PoeTradeState TradeState
         {
@@ -146,11 +127,6 @@ namespace PoeEye.PoeTrade.ViewModels
         {
             Uri tradeForumUri;
             return Uri.TryCreate(Trade.TradeForumUri, UriKind.Absolute, out tradeForumUri);
-        }
-
-        private bool VerifyCommandCanExecute()
-        {
-            return !string.IsNullOrWhiteSpace(Trade.Hash);
         }
 
         private void CopyPmMessageToClipboardCommandExecute(object arg)
@@ -192,31 +168,6 @@ namespace PoeEye.PoeTrade.ViewModels
             catch (Exception ex)
             {
                 Log.Instance.Warn($"Failed to open forum Uri '{uri}'", ex);
-            }
-        }
-
-        private async void VerifyCommandExecuted()
-        {
-            ExceptionlessClient.Default
-                .CreateFeatureUsage("TradeList")
-                .SetType("Verify")
-                .SetProperty("Item", Trade.DumpToText())
-                .Submit();
-
-            VerificationState = PoeItemVerificationState.InProgress;
-            var verificationResult = await itemVerifier.Verify(Trade);
-
-            if (verificationResult == true)
-            {
-                VerificationState = PoeItemVerificationState.Verified;
-            }
-            else if (verificationResult == false)
-            {
-                VerificationState = PoeItemVerificationState.Sold;
-            }
-            else
-            {
-                VerificationState = PoeItemVerificationState.Unknown;
             }
         }
     }

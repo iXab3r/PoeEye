@@ -1,19 +1,15 @@
-﻿namespace PoeShared.PoeTrade
+﻿using System;
+using System.Linq;
+using System.Text.RegularExpressions;
+using Guards;
+using JetBrains.Annotations;
+using PoeShared.Common;
+using PoeShared.PoeTrade;
+using PoeShared.PoeTrade.Query;
+using TypeConverter;
+
+namespace PoeEye.ItemParser
 {
-    using System;
-    using System.Linq;
-    using System.Text.RegularExpressions;
-
-    using Common;
-
-    using Guards;
-
-    using JetBrains.Annotations;
-
-    using Query;
-
-    using TypeConverter;
-
     internal sealed class PoeItemToPoeQueryConverter : IConverter<IPoeItem, IPoeQueryInfo>
     {
         private readonly PoeModParser[] modsRegexes;

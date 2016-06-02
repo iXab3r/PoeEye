@@ -15,12 +15,11 @@ namespace PoeEye.ExileToolsApi.Prism
         protected override void Initialize()
         {
             Container
-                .RegisterSingleton<IPoeItemVerifier, MockedPoeItemVerifier>()
                 .RegisterSingleton<IConverter<IPoeQueryInfo, ISearchRequest>, PoeQueryInfoToSearchRequestConverter>();
             
 
             Container
-                .RegisterSingleton<IPoeApi, ExileToolsApi>();
+                .RegisterSingleton<IPoeApi, ExileToolsApi>(typeof(ExileToolsApi).FullName);
         }
 
         private class MockedPoeItemVerifier : IPoeItemVerifier

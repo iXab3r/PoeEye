@@ -1,7 +1,7 @@
-﻿namespace PoeShared.PoeTrade
-{
-    using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
 
+namespace PoeEye.ItemParser
+{
     internal interface IPoeModsProcessor
     {
         [NotNull]

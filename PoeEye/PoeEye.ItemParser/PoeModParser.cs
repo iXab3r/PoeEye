@@ -1,11 +1,9 @@
-namespace PoeShared.PoeTrade
+using System.Text.RegularExpressions;
+using Guards;
+using PoeShared.Common;
+
+namespace PoeEye.ItemParser
 {
-    using System.Text.RegularExpressions;
-
-    using Common;
-
-    using Guards;
-
     internal struct PoeModParser
     {
         public PoeModParser(IPoeItemMod mod, Regex matchingRegex)

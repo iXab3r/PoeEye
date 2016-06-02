@@ -1,4 +1,6 @@
-﻿namespace PoeEye.PoeTrade.ViewModels
+﻿using PoeShared.Scaffolding;
+
+namespace PoeEye.PoeTrade.ViewModels
 {
     using System;
 
@@ -8,7 +10,7 @@
 
     using ReactiveUI;
 
-    internal interface IPoeTradesListViewModel
+    internal interface IPoeTradesListViewModel : IDisposableReactiveObject
     {
         IPoeQueryInfo ActiveQuery { get; set; }
 

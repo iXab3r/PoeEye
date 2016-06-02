@@ -161,6 +161,10 @@
       <Project>{9cee14a8-1436-4947-9c62-ff3ba83a330d}</Project>
       <Name>FuzzySearch</Name>
     </ProjectReference>
+    <ProjectReference Include="..\PoeEye.ItemParser\PoeEye.ItemParser.csproj">
+      <Project>{ea3109dd-675d-4837-977d-af61b203bebc}</Project>
+      <Name>PoeEye.ItemParser</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PoeEye\PoeEye.csproj">
       <Project>{9bc98190-3db1-48cd-84f7-96dc843718ae}</Project>
       <Name>PoeEye</Name>
@@ -173,6 +177,9 @@
       <Project>{12df53dd-7144-4d2d-b7a1-b4bc5bbdfb69}</Project>
       <Name>PoeShared</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -23,13 +23,10 @@
     using PoeShared.Common;
     using PoeShared.Exceptions;
     using PoeShared.PoeTrade;
-    using PoeShared.PoeTrade.Query;
     using PoeShared.Prism;
     using PoeShared.Scaffolding;
 
     using ReactiveUI;
-
-    using TypeConverter;
 
     internal sealed class PoeTradesListViewModel : DisposableReactiveObject, IPoeTradesListViewModel
     {
@@ -54,7 +51,8 @@
         private TimeSpan recheckPeriod;
 
         public PoeTradesListViewModel(
-            [NotNull] IFactory<IPoeLiveHistoryProvider, IPoeQueryInfo> poeLiveHistoryFactory,
+            [NotNull] IPoeApiWrapper poeApiWrapper,
+            [NotNull] IFactory<IPoeLiveHistoryProvider, IPoeApiWrapper, IPoeQueryInfo> poeLiveHistoryFactory,
             [NotNull] IFactory<IPoeTradeViewModel, IPoeItem> poeTradeViewModelFactory,
             [NotNull] IPoeCaptchaRegistrator captchaRegistrator,
             [NotNull] IHistoricalTradesViewModel historicalTrades,
@@ -62,6 +60,7 @@
             [NotNull] IClock clock,
             [NotNull] [Dependency(WellKnownSchedulers.Ui)] IScheduler uiScheduler)
         {
+            Guard.ArgumentNotNull(() => poeApiWrapper);
             Guard.ArgumentNotNull(() => poeLiveHistoryFactory);
             Guard.ArgumentNotNull(() => poeTradeViewModelFactory);
             Guard.ArgumentNotNull(() => captchaRegistrator);
@@ -94,7 +93,7 @@
                 .Select(x => x.curr)
                 .Where(x => x != null)
                 .Do(_ => lastUpdateTimestamp = clock.Now)
-                .Select(poeLiveHistoryFactory.Create)
+                .Select(x => poeLiveHistoryFactory.Create(poeApiWrapper, x))
                 .Do(OnNextHistoryProviderCreated)
                 .Select(x => x.ItemsPacks)
                 .Switch()

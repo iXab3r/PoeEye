@@ -30,10 +30,21 @@
                     MaxHeight="{Binding ActualHeight, RelativeSource={RelativeSource FindAncestor, AncestorType=ContentPresenter}, Mode=OneWay}">
         <Expander IsExpanded="{Binding Query.IsExpanded}" Margin="0">
           <Expander.Header>
-            <StackPanel Orientation="Horizontal">
-              <TextBlock Text="Query parameters" Margin="5,0" VerticalAlignment="Center" />
-              <Button Content="Mark All as Read" Command="{Binding MarkAllAsReadCommand}" />
-            </StackPanel>
+            <Grid>
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+              </Grid.ColumnDefinitions>
+              <TextBlock Grid.Column="0"
+                         Text="Query parameters" Margin="5,0" VerticalAlignment="Center" />
+              <Button Grid.Column="1"
+                      Content="Mark All as Read" Command="{Binding MarkAllAsReadCommand}" />
+              
+              <ContentControl Grid.Column="3" 
+                              Content="{Binding ApiSelector}" MinWidth="200" HorizontalAlignment="Right" />
+            </Grid>
           </Expander.Header>
 
           <StackPanel Orientation="Vertical">

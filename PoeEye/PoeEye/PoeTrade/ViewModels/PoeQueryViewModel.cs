@@ -19,7 +19,7 @@
 
     using WpfAutoCompleteControls.Editors;
 
-    internal sealed class PoeQueryViewModel : ReactiveObject, IPoeQueryInfo
+    internal sealed class PoeQueryViewModel : ReactiveObject, IPoeQueryViewModel
     {
         private bool alternativeArt;
         private float? apsMax;
@@ -145,23 +145,23 @@
         private int? socketsW;
 
         public PoeQueryViewModel(
-            [NotNull] IPoeStaticData queryInfoProvider,
-            [NotNull] IPoeModGroupsEditorViewModel modGroupsEditor,
+            [NotNull] IPoeStaticData staticData,
+            [NotNull] IFactory<IPoeModGroupsEditorViewModel, IPoeStaticData> modGroupsEditorFactory,
             [NotNull] IFactory<ISuggestionProvider, string[]> suggestionProviderFactory,
             [NotNull] IPoeDatabaseReader poeDatabaseReader)
         {
-            Guard.ArgumentNotNull(() => queryInfoProvider);
-            Guard.ArgumentNotNull(() => modGroupsEditor);
+            Guard.ArgumentNotNull(() => staticData);
+            Guard.ArgumentNotNull(() => modGroupsEditorFactory);
             Guard.ArgumentNotNull(() => suggestionProviderFactory);
             Guard.ArgumentNotNull(() => poeDatabaseReader);
 
-            LeaguesList = queryInfoProvider.LeaguesList.ToArray();
+            LeaguesList = staticData.LeaguesList.ToArray();
 
-            CurrenciesList = queryInfoProvider.CurrenciesList.ToArray();
+            CurrenciesList = staticData.CurrenciesList.ToArray();
 
-            ItemTypes = queryInfoProvider.ItemTypes.ToArray();
+            ItemTypes = staticData.ItemTypes.ToArray();
 
-            ModGroupsEditor = modGroupsEditor;
+            ModGroupsEditor = modGroupsEditorFactory.Create(staticData);
 
             OnlineOnly = true;
             BuyoutOnly = true;
@@ -560,7 +560,7 @@
             set { this.RaiseAndSetIfChanged(ref itemType, value); }
         }
 
-        private IPoeQueryInfo GetQueryInfo()
+        public IPoeQueryInfo GetQueryInfo()
         {
             var result = new PoeQueryInfo();
 

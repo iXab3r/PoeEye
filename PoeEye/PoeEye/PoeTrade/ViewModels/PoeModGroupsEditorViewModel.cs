@@ -18,13 +18,17 @@
     internal sealed class PoeModGroupsEditorViewModel : DisposableReactiveObject, IPoeModGroupsEditorViewModel
     {
         private readonly ReactiveCommand<object> addGrpCommand = ReactiveCommand.Create();
-        private readonly IFactory<PoeModsEditorViewModel> groupsFactory;
         private readonly ReactiveCommand<object> removeGrpCommand = ReactiveCommand.Create();
+        private readonly IPoeStaticData staticData;
+        private readonly IFactory<PoeModsEditorViewModel, IPoeStaticData> groupsFactory;
 
-        public PoeModGroupsEditorViewModel([NotNull] IFactory<PoeModsEditorViewModel> groupsFactory)
+        public PoeModGroupsEditorViewModel(
+            [NotNull] IPoeStaticData staticData,
+            [NotNull] IFactory<PoeModsEditorViewModel, IPoeStaticData> groupsFactory)
         {
             Guard.ArgumentNotNull(() => groupsFactory);
 
+            this.staticData = staticData;
             this.groupsFactory = groupsFactory;
 
             addGrpCommand
@@ -47,7 +51,7 @@
 
         public IPoeModsEditorViewModel AddGroup()
         {
-            var newGroup = groupsFactory.Create();
+            var newGroup = groupsFactory.Create(staticData);
 
             Groups.Add(newGroup);
 
