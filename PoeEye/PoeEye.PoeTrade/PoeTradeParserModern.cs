@@ -65,7 +65,8 @@ namespace PoeEye.PoeTrade
                     new PoeCurrency {Name = "Orb of Fusing", CodeName = KnownCurrencyNameList.OrbOfFusing},
                     new PoeCurrency {Name = "Orb of Regret", CodeName = KnownCurrencyNameList.OrbOfRegret},
                     new PoeCurrency {Name = "Orb of Scouring", CodeName = KnownCurrencyNameList.OrbOfScouring},
-                    new PoeCurrency {Name = "Regal Orb", CodeName = KnownCurrencyNameList.RegalOrb}
+                    new PoeCurrency {Name = "Regal Orb", CodeName = KnownCurrencyNameList.RegalOrb},
+                    new PoeCurrency {Name = "Vaal Orb", CodeName = KnownCurrencyNameList.VaalOrb}
                 },
                 ItemTypes = new IPoeItemType[]
                 {
