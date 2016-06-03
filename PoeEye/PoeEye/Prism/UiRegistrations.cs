@@ -47,6 +47,7 @@
                 .RegisterType<IPoeChatViewModel, PoeChatViewModel>()
                 .RegisterType<IPoeTradesListViewModel, PoeTradesListViewModel>()
                 .RegisterType<IPoeQueryViewModel, PoeQueryViewModel>()
+                .RegisterType<IAudioNotificationSelectorViewModel, AudioNotificationSelectorViewModel>()
                 .RegisterType<IPoeApiSelectorViewModel, PoeApiSelectorViewModel>()
                 .RegisterType<IPoeModsEditorViewModel, PoeModsEditorViewModel>()
                 .RegisterType<IPoeModGroupsEditorViewModel, PoeModGroupsEditorViewModel>()

@@ -63,9 +63,29 @@ namespace PoeEye.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
+        internal static byte[] electro {
+            get {
+                object obj = ResourceManager.GetObject("electro", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
         internal static byte[] icq {
             get {
                 object obj = ResourceManager.GetObject("icq", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] ironvoice {
+            get {
+                object obj = ResourceManager.GetObject("ironvoice", resourceCulture);
                 return ((byte[])(obj));
             }
         }
@@ -83,6 +103,16 @@ namespace PoeEye.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
+        internal static byte[] matrix {
+            get {
+                object obj = ResourceManager.GetObject("matrix", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
         internal static byte[] minions_tadaa {
             get {
                 object obj = ResourceManager.GetObject("minions_tadaa", resourceCulture);
@@ -93,9 +123,9 @@ namespace PoeEye.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
-        internal static byte[] sounds_940_pizzicato {
+        internal static byte[] pizzicato {
             get {
-                object obj = ResourceManager.GetObject("sounds_940_pizzicato", resourceCulture);
+                object obj = ResourceManager.GetObject("pizzicato", resourceCulture);
                 return ((byte[])(obj));
             }
         }

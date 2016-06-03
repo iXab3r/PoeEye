@@ -44,7 +44,7 @@
 
         <Expander Grid.Column="0" ExpandDirection="Right"  IsExpanded="True" Margin="0" >
           <Expander.Header>
-            <TextBlock FontSize="14" Text="QUERIES LIST" RenderTransformOrigin="0.5,0.5" VerticalAlignment="Top" >
+            <TextBlock FontSize="14" Text="QUERY LIST" RenderTransformOrigin="0.5,0.5" VerticalAlignment="Top" >
               <TextBlock.LayoutTransform>
                 <TransformGroup>
                   <RotateTransform Angle="-90"/>
@@ -82,7 +82,7 @@
 
 
     <Border Grid.Row="2"
-            BorderThickness="0,1,0,0" BorderBrush="{StaticResource AccentColorBrush}" Margin="5,1,10,5"
+            BorderThickness="0,1,0,0" BorderBrush="{StaticResource AccentColorBrush}" Margin="5,2,10,2"
             Visibility="{Binding SelectedTab, Converter={StaticResource NullToCollapsedConverter}}">
       <Border.Resources>
         <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource MetroTextBlock}">

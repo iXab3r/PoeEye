@@ -115,6 +115,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Converters\IPoePriceCalculcator.cs" />
+    <Compile Include="Converters\ItemConversionInfo.cs" />
+    <Compile Include="Converters\PriceToChaosCalculator.cs" />
     <Compile Include="Converters\ToPoeItemConverter.cs" />
     <Compile Include="Entities\ExTzItem.cs" />
     <Compile Include="ExileToolsApi.cs" />

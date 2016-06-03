@@ -29,12 +29,16 @@ namespace PoeEye.Converters
             {"Exalted Orb", KnownCurrencyNameList.ExaltedOrb},
             {"Gemcutter's Prism", KnownCurrencyNameList.GemcuttersPrism},
             {"Jewellers Orb", KnownCurrencyNameList.JewellersOrb},
+            {"Orb of Alchemy", KnownCurrencyNameList.OrbOfAlchemy},
             {"Orb of Fusing", KnownCurrencyNameList.OrbOfFusing},
             {"Orb of Chance", KnownCurrencyNameList.OrbOfChance},
             {"Orb of Regret", KnownCurrencyNameList.OrbOfRegret},
             {"Orb of Scouring", KnownCurrencyNameList.OrbOfScouring},
             {"Regal Orb", KnownCurrencyNameList.RegalOrb},
             {"Vaal Orb", KnownCurrencyNameList.VaalOrb},
+            {"Mirror of Kalandra", KnownCurrencyNameList.MirrorOfKalandra},
+            {"Eternal Orb", KnownCurrencyNameList.EternalOrb},
+            {"Unknown", KnownCurrencyNameList.Unknown},
         };
 
         public static IConverter<string, PoePrice> Instance => instance.Value;

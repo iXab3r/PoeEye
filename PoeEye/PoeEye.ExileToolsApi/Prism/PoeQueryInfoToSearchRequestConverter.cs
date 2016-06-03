@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Guards;
 using Nest;
+using PoeEye.ExileToolsApi.Converters;
 using PoeEye.ExileToolsApi.Entities;
 using PoeShared;
 using PoeShared.Common;
@@ -15,46 +17,34 @@ namespace PoeEye.ExileToolsApi.Prism
 {
     internal sealed class PoeQueryInfoToSearchRequestConverter : IConverter<IPoeQueryInfo, ISearchRequest>
     {
+        private readonly IPoePriceCalculcator toChaosCalculcator;
+        public PoeQueryInfoToSearchRequestConverter(IPoePriceCalculcator toChaosCalculcator)
+        {
+            Guard.ArgumentNotNull(() => toChaosCalculcator);
+
+            this.toChaosCalculcator = toChaosCalculcator;
+        }
+
+
         public ISearchRequest Convert(IPoeQueryInfo source)
         {
             var result = new SearchRequest
             {
                 Query = new FilteredQuery() { },
+                Sort = new List<ISort>()
+                {
+                    new SortField { Field = "shop.chaosEquiv", Order = SortOrder.Ascending },
+                    new SortField { Field = "shop.modified", Order = SortOrder.Ascending },
+                },
                 From = 0,
                 Size = 50,
             };
 
-            var mustQueries = new[]
-            {
-                CreateRangeBasedRequest("propertiesPseudo.Weapon.estimatedQ20.Physical DPS", source.PdpsMin, source.PdpsMax),
-                CreateRangeBasedRequest("propertiesPseudo.Weapon.estimatedQ20.Total DPS", source.DpsMin, source.DpsMax),
-                CreateRangeBasedRequest("propertiesPseudo.Armour.estimatedQ20.Armour", source.ArmourMin, source.ArmourMax),
-                CreateRangeBasedRequest("propertiesPseudo.Armour.estimatedQ20.Energy Shield", source.ShieldMin, source.ShieldMax),
-                CreateRangeBasedRequest("propertiesPseudo.Armour.estimatedQ20.Evasion Rating", source.EvasionMin, source.EvasionMax),
-                CreateRangeBasedRequest("properties.Weapon.Attacks per Second", source.ApsMin, source.ApsMax),
-                CreateRangeBasedRequest("properties.Weapon.Critical Strike Chance", source.CritMin, source.CritMax),
-                CreateRangeBasedRequest("properties.Weapon.Total Damage.avg", source.DamageMin, source.DamageMax),
-                CreateRangeBasedRequest("properties.Weapon.Elemental DPS", source.EdpsMin, source.EdpsMax),
-                CreateRangeBasedRequest("properties.Armour.Chance to Block", source.BlockMin, source.BlockMax),
-                CreateRangeBasedRequest("properties.Quality", source.QualityMin, source.QualityMax),
-                CreateRangeBasedRequest("properties.Map.Item Quantity", source.IncQuantityMin, source.IncQuantityMin),
-                CreateRangeBasedRequest("properties.Map.Item Quantity", source.IncQuantityMin, source.IncQuantityMin),
-                CreateWildcardQuery("info.fullName", source.ItemName, x => $"*{x}*"),
-                CreateTermQuery("attributes.league", source.League),
-                CreateTermQuery("attributes.rarity", source.ItemRarity != null ? source.ItemRarity.ToString() : null),
-                CreateTermQuery("shop.hasPrice", source.BuyoutOnly ? true : default(bool?)),
-                CreateTermQuery("shop.sellerAccount", source.AccountName),
-                CreateTermQuery("shop.verified", source.OnlineOnly ? VerificationStatus.Yes : default(VerificationStatus?)),
-                CreateQuery(source.ItemType),
-            };
 
-            result.Query &= new BoolQuery
-            {
-                Must = CombineQueries(mustQueries)
-            };
-
+            result.Query &= PrepareGeneralQuery(source);
             result.Query &= PrepareSocketsColorQuery(source);
             result.Query &= PrepareSocketsLinksQuery(source);
+            result.Query &= PreparePriceQuery(source);
 
             result.Query &= new BoolQuery
             {
@@ -102,6 +92,64 @@ namespace PoeEye.ExileToolsApi.Prism
             Log.Instance.Info($"[ExileToolsApi.Query] Elastic search query:\n{DumpQuery(result)}");
 
             return result;
+        }
+
+        private QueryBase PreparePriceQuery(IPoeQueryInfo source)
+        {
+            if (string.IsNullOrWhiteSpace(source.BuyoutCurrencyType))
+            {
+                return new BoolQuery();
+            }
+
+            var mustQueries = new[]
+           {
+                CreateExistsQuery("shop.hasPrice"),
+                CreateWildcardQuery("shop.currency", $"*{source.BuyoutCurrencyType}*"),
+                CreateRangeBasedRequest("shop.amount", source.BuyoutMin, source.BuyoutMax)
+            };
+
+            var minPrice = new PoePrice(source.BuyoutCurrencyType, source.BuyoutMin ?? 0);
+            var maxPrice = new PoePrice(source.BuyoutCurrencyType, source.BuyoutMin ?? 0);
+
+            var chaosEquivalentQuery = CreateRangeBasedRequest(
+                    "shop.chaosEquiv", 
+                    toChaosCalculcator.GetEquivalentInChaosOrbs(minPrice).Value,
+                    toChaosCalculcator.GetEquivalentInChaosOrbs(maxPrice).Value);
+
+            return new BoolQuery { Must = CombineQueries(mustQueries) } || new BoolQuery { Must = CombineQueries(chaosEquivalentQuery) };
+        }
+
+
+        private QueryBase PrepareGeneralQuery(IPoeQueryInfo source)
+        {
+            var mustQueries = new[]
+             {
+                CreateRangeBasedRequest("propertiesPseudo.Weapon.estimatedQ20.Physical DPS", source.PdpsMin, source.PdpsMax),
+                CreateRangeBasedRequest("propertiesPseudo.Weapon.estimatedQ20.Total DPS", source.DpsMin, source.DpsMax),
+                CreateRangeBasedRequest("propertiesPseudo.Armour.estimatedQ20.Armour", source.ArmourMin, source.ArmourMax),
+                CreateRangeBasedRequest("propertiesPseudo.Armour.estimatedQ20.Energy Shield", source.ShieldMin, source.ShieldMax),
+                CreateRangeBasedRequest("propertiesPseudo.Armour.estimatedQ20.Evasion Rating", source.EvasionMin, source.EvasionMax),
+                CreateRangeBasedRequest("properties.Weapon.Attacks per Second", source.ApsMin, source.ApsMax),
+                CreateRangeBasedRequest("properties.Weapon.Critical Strike Chance", source.CritMin, source.CritMax),
+                CreateRangeBasedRequest("properties.Weapon.Total Damage.avg", source.DamageMin, source.DamageMax),
+                CreateRangeBasedRequest("properties.Weapon.Elemental DPS", source.EdpsMin, source.EdpsMax),
+                CreateRangeBasedRequest("properties.Armour.Chance to Block", source.BlockMin, source.BlockMax),
+                CreateRangeBasedRequest("properties.Quality", source.QualityMin, source.QualityMax),
+                CreateRangeBasedRequest("properties.Map.Item Quantity", source.IncQuantityMin, source.IncQuantityMin),
+                CreateRangeBasedRequest("properties.Map.Item Quantity", source.IncQuantityMin, source.IncQuantityMin),
+                CreateWildcardQuery("info.fullName", source.ItemName, x => $"*{x}*"),
+                CreateTermQuery("attributes.league", source.League),
+                CreateTermQuery("attributes.rarity", source.ItemRarity != null ? source.ItemRarity.ToString() : null),
+                CreateTermQuery("shop.hasPrice", source.BuyoutOnly ? true : default(bool?)),
+                CreateTermQuery("shop.sellerAccount", source.AccountName),
+                CreateTermQuery("shop.verified", source.OnlineOnly ? VerificationStatus.Yes : default(VerificationStatus?)),
+                CreateQuery(source.ItemType),
+            };
+
+            return new BoolQuery
+            {
+                Must = CombineQueries(mustQueries)
+            };
         }
 
         private QueryBase PrepareSocketsColorQuery(IPoeQueryInfo source)
@@ -198,29 +246,6 @@ namespace PoeEye.ExileToolsApi.Prism
             {
                 yield return queryBase;
             }
-        }
-
-        private IEnumerable<QueryBase> CreateQuery(string fieldName, float? min, float? max)
-        {
-            if (min == null && max == null)
-            {
-                yield break;
-            }
-
-            var queries = new List<string>();
-            if (min != null)
-            {
-                queries.Add($"{fieldName}:>={min.Value}");
-            }
-            if (max != null)
-            {
-                queries.Add($"{fieldName}:<={max.Value}");
-            }
-            var result = new QueryStringQuery()
-            {
-                Query = string.Join(" ", queries),
-            };
-            yield return result;
         }
 
         private IEnumerable<QueryBase> CreateQuery(IPoeItemType itemType)

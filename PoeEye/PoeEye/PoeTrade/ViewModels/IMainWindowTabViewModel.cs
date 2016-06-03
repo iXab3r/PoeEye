@@ -12,7 +12,7 @@ namespace PoeEye.PoeTrade.ViewModels
 
     internal interface IMainWindowTabViewModel : IDisposableReactiveObject
     {
-        bool AudioNotificationEnabled { get; set; }
+        IAudioNotificationSelectorViewModel AudioNotificationSelector { get; }
 
         bool IsBusy { get; }
 

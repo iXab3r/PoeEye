@@ -136,7 +136,7 @@
                 (value.Trade.TradeState == PoeTradeState.Removed && showRemovedItems) ||
                 (value.Trade.TradeState == PoeTradeState.New && showNewItems);
 
-            tradeIsValid &= value.Owner.AudioNotificationEnabled;
+            tradeIsValid &= value.Owner.AudioNotificationSelector.SelectedValue != AudioNotificationType.Disabled;
             return tradeIsValid;
         }
 
@@ -167,7 +167,7 @@
 
         private void MarkAllAsReadExecuted()
         {
-            var tabsToProcess = collectionByTab.Keys.Where(x => x.AudioNotificationEnabled).ToArray();
+            var tabsToProcess = collectionByTab.Keys.Where(x => x.AudioNotificationSelector.SelectedValue != AudioNotificationType.Disabled).ToArray();
             tabsToProcess.ForEach(x => x.MarkAllAsReadCommand.Execute(null));
         }
 

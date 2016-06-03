@@ -17,24 +17,28 @@ using PoeShared;
 using PoeShared.Common;
 using PoeShared.PoeTrade;
 using PoeShared.PoeTrade.Query;
-using PoeShared.Scaffolding;
 using TypeConverter;
 
 namespace PoeEye.ExileToolsApi
 {
-    public class ExileToolsApi : IPoeApi
+    internal sealed class ExileToolsApi : IPoeApi
     {
         private readonly IConverter<IPoeQueryInfo, ISearchRequest> queryConverter;
+        private readonly IConverter<ItemConversionInfo, IPoeItem> poeItemConverter;
         private readonly ElasticClient client;
 
-        public ExileToolsApi([NotNull] IConverter<IPoeQueryInfo, ISearchRequest> queryConverter)
+        public ExileToolsApi(
+            [NotNull] IConverter<IPoeQueryInfo, ISearchRequest> queryConverter,
+            [NotNull] IConverter<ItemConversionInfo, IPoeItem> poeItemConverter)
         {
             Guard.ArgumentNotNull(() => queryConverter);
+            Guard.ArgumentNotNull(() => poeItemConverter);
 
             const string address = "http://api.exiletools.com/index";
             const string apiKey = "b0fdb9af1a40437647ae3c45a6ebcae7";
 
             this.queryConverter = queryConverter;
+            this.poeItemConverter = poeItemConverter;
             var settings = new ConnectionSettings(new Uri(address))
                 .BasicAuthentication("apikey", apiKey)
                 .DisableDirectStreaming();
@@ -103,7 +107,9 @@ namespace PoeEye.ExileToolsApi
                 new PoeCurrency {Name = "Orb of Regret", CodeName = KnownCurrencyNameList.OrbOfRegret},
                 new PoeCurrency {Name = "Orb of Scouring", CodeName = KnownCurrencyNameList.OrbOfScouring},
                 new PoeCurrency {Name = "Regal Orb", CodeName = KnownCurrencyNameList.RegalOrb},
-                new PoeCurrency {Name = "Vaal Orb", CodeName = KnownCurrencyNameList.VaalOrb}
+                new PoeCurrency {Name = "Vaal Orb", CodeName = KnownCurrencyNameList.VaalOrb},
+                new PoeCurrency {Name = "Mirror of Kalandra", CodeName = KnownCurrencyNameList.MirrorOfKalandra},
+                new PoeCurrency {Name = "Eternal Orb", CodeName = KnownCurrencyNameList.EternalOrb}
             };
         }
 
@@ -165,11 +171,13 @@ namespace PoeEye.ExileToolsApi
                 equipType = "One Hand";
             }
 
+            var itemName = string.Join(" - ", equipType, itemType);
             return new PoeItemType
             {
                 EquipType = equipType,
                 ItemType = itemType,
-                Name = string.Join(" - ", equipType, itemType),
+                Name = itemName,
+                CodeName = itemName,
             };
         }
 
@@ -217,12 +225,20 @@ namespace PoeEye.ExileToolsApi
 
             Log.Instance.Debug($"[ExileToolsApi] Response data:\n{queryResult.DebugInformation}");
 
-            var converter = new ToPoeItemConverter();
-            var convertedItems = queryResult.Hits.Select(x => x.Source).Select(converter.Convert).ToArray();
+            var convertedItems = queryResult
+                .Hits
+                .Select(x => new ItemConversionInfo(x.Source, ExtractModsList(queryInfo)))
+                .Select(poeItemConverter.Convert)
+                .ToArray();
             return new PoeQueryResult()
             {
                 ItemsList = convertedItems,
             };
+        }
+
+        private string[] ExtractModsList(IPoeQueryInfo queryInfo)
+        {
+            return queryInfo.ModGroups.SelectMany(x => x.Mods).Select(x => x.Name).ToArray();
         }
 
         private sealed class EmptyResponse { }

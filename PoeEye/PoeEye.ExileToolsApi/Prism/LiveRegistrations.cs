@@ -2,6 +2,8 @@
 using System.Threading.Tasks;
 using Microsoft.Practices.Unity;
 using Nest;
+using PoeEye.ExileToolsApi.Converters;
+using PoeEye.ExileToolsApi.Entities;
 using PoeShared.Common;
 using PoeShared.PoeTrade;
 using PoeShared.PoeTrade.Query;
@@ -15,6 +17,8 @@ namespace PoeEye.ExileToolsApi.Prism
         protected override void Initialize()
         {
             Container
+                .RegisterSingleton<IPoePriceCalculcator, PriceToChaosCalculator>()
+                .RegisterSingleton<IConverter<ItemConversionInfo, IPoeItem>, ToPoeItemConverter>()
                 .RegisterSingleton<IConverter<IPoeQueryInfo, ISearchRequest>, PoeQueryInfoToSearchRequestConverter>();
             
 

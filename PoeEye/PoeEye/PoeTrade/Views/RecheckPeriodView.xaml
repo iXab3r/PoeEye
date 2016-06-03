@@ -11,8 +11,8 @@
       </Grid.ColumnDefinitions>
 
       <Slider Grid.Column="0"
-              Width="150"
-              Margin="5,0"
+              Width="300"
+              Margin="5,3,5,0"
               IsEnabled="{Binding IsAutoRecheckEnabled}"
               Visibility="{Binding IsAutoRecheckEnabled, Converter={StaticResource BoolFalseToCollapsedConverter}}"
               Minimum="{Binding MinValue, Converter={StaticResource TimeSpanToSecondsConverter}, Mode=OneWay}"
@@ -23,13 +23,13 @@
                  VerticalAlignment="Center"
                  Margin="5,0"
                  Visibility="{Binding IsAutoRecheckEnabled, Converter={StaticResource BoolFalseToCollapsedConverter}}"
-                 Text="{Binding Period, StringFormat='Recheck timeout: {0:F0}', Converter={StaticResource TimeSpanToHumanReadableStringConverter}}" />
+                 Text="{Binding Period, StringFormat='Recheck period: {0:F0}', Converter={StaticResource TimeSpanToHumanReadableStringConverter}}" />
 
       <TextBlock Grid.Column="1"
                  VerticalAlignment="Center"
                  Margin="5,0"
                  Visibility="{Binding IsAutoRecheckEnabled, Converter={StaticResource BoolTrueToCollapsedConverter}}"
-                 Text="Recheck disabled" />
+                 Text="Recheck is disabled" />
 
       <controls:ToggleSwitchButton Grid.Column="2"
                                    ToolTip="Auto refresh"

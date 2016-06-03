@@ -7,5 +7,7 @@ namespace PoeShared.Common
         string Name { get; }
 
         string CodeName { get; }
+
+        bool IsCrafted { get; }
     }
 }

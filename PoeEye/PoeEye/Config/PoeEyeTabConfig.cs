@@ -1,4 +1,6 @@
-﻿namespace PoeEye.Config
+﻿using PoeEye.PoeTrade;
+
+namespace PoeEye.Config
 {
     using System;
 
@@ -15,7 +17,7 @@
 
         public IPoeItem[] SoldOrRemovedItems { get; set; }
 
-        public bool AudioNotificationEnabled { get; set; }
+        public AudioNotificationType NotificationType { get; set; }
 
         public string ApiModuleName { get; set; }
 

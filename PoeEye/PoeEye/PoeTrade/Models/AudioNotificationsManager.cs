@@ -23,9 +23,13 @@
     {
         private readonly IDictionary<AudioNotificationType, byte[]> knownNotifications = new Dictionary<AudioNotificationType, byte[]>
         {
-            {AudioNotificationType.NewItem, Resources.whistle},
-            {AudioNotificationType.Captcha, Resources.sounds_940_pizzicato},
-            {AudioNotificationType.Whisper, Resources.icq}
+            { AudioNotificationType.Whistle, Resources.whistle},
+            { AudioNotificationType.Pizzicato, Resources.pizzicato},
+            { AudioNotificationType.Matrix, Resources.matrix},
+            { AudioNotificationType.IronVoice, Resources.ironvoice},
+            { AudioNotificationType.Electro, Resources.electro},
+            { AudioNotificationType.Minions, Resources.minions_tadaa},
+            { AudioNotificationType.Whisper, Resources.icq}
         };
 
         private bool isEnabled;
@@ -40,6 +44,7 @@
 
             var playNotificationCommand = new ReactiveCommand<AudioNotificationType>(playNotificationCommandCanExecute, x => Observable.Return((AudioNotificationType)x));
             playNotificationCommand
+                .Where(x => x != AudioNotificationType.Disabled)
                 .Subscribe(PlayNotification)
                 .AddTo(Anchors);
 

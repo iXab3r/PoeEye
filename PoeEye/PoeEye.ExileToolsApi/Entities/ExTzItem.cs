@@ -30,6 +30,9 @@ namespace PoeEye.ExileToolsApi.Entities
         [JsonProperty("mods")]
         public Dictionary<string, ExTzItemMods> Mods { get; set; }
 
+        [JsonProperty("modsPseudo")]
+        public Dictionary<string, object> ModsPseudo { get; set; }
+
         [JsonProperty("sockets")]
         public ExTzItemSockets Sockets { get; set; }
 

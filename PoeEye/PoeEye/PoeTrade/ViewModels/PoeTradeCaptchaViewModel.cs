@@ -113,7 +113,7 @@
 
             if (!mainWindowTracker.IsActive)
             {
-                notificationsManager.PlayNotification(AudioNotificationType.Captcha);
+                notificationsManager.PlayNotification(AudioNotificationType.Pizzicato);
             }
 
             browser.Source = new Uri(uri, UriKind.RelativeOrAbsolute);

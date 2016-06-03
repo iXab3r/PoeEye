@@ -44,7 +44,6 @@ namespace PoeEye.PoeTrade.ViewModels
         private readonly string tabHeader;
 
         private IPoeQueryViewModel query;
-        private bool audioNotificationEnabled;
         private string tabName;
 
         private readonly SerialDisposable tradesListAnchors = new SerialDisposable();
@@ -56,6 +55,7 @@ namespace PoeEye.PoeTrade.ViewModels
             [NotNull] IRecheckPeriodViewModel recheckPeriod,
             [NotNull] IPoeApiSelectorViewModel apiSelector,
             [NotNull] [Dependency(WellKnownWindows.Main)] IWindowTracker mainWindowTracker,
+            [NotNull] IAudioNotificationSelectorViewModel audioNotificationSelector,
             [NotNull] IFactory<IPoeQueryViewModel, IPoeStaticData> queryFactory)
         {
             this.tradesListFactory = tradesListFactory;
@@ -63,6 +63,7 @@ namespace PoeEye.PoeTrade.ViewModels
             Guard.ArgumentNotNull(() => apiSelector);
             Guard.ArgumentNotNull(() => mainWindowTracker);
             Guard.ArgumentNotNull(() => audioNotificationsManager);
+            Guard.ArgumentNotNull(() => audioNotificationSelector);
             Guard.ArgumentNotNull(() => queryFactory);
 
             tabHeader = $"Tab #{GlobalTabIdx++}";
@@ -72,8 +73,11 @@ namespace PoeEye.PoeTrade.ViewModels
             apiSelector.AddTo(Anchors);
 
             tradesListAnchors.AddTo(Anchors);
-
+            
             RecheckPeriod = recheckPeriod;
+
+            AudioNotificationSelector = audioNotificationSelector;
+            audioNotificationSelector.AddTo(Anchors);
 
             searchCommand = ReactiveCommand.Create();
             searchCommand.Subscribe(SearchCommandExecute).AddTo(Anchors);
@@ -97,9 +101,9 @@ namespace PoeEye.PoeTrade.ViewModels
             this.WhenAnyValue(x => x.NewItemsCount)
                 .DistinctUntilChanged()
                 .Where(x => x > 0)
-                .Where(x => audioNotificationEnabled)
+                .Where(x => audioNotificationSelector.SelectedValue != AudioNotificationType.Disabled)
                 .Where(x => !mainWindowTracker.IsActive)
-                .Subscribe(x => audioNotificationsManager.PlayNotification(AudioNotificationType.NewItem), Log.HandleException)
+                .Subscribe(x => audioNotificationsManager.PlayNotification(AudioNotificationType.Whistle), Log.HandleException)
                 .AddTo(Anchors);
 
             Query.ObservableForProperty(x => x.PoeQueryBuilder)
@@ -150,19 +154,14 @@ namespace PoeEye.PoeTrade.ViewModels
             get { return TradesList.Items.Count(x => x.TradeState == PoeTradeState.Normal); }
         }
 
-        public IPoeTradesListViewModel TradesList
-        {
+        public IPoeTradesListViewModel TradesList {
             get { return tradesList; }
             private set { this.RaiseAndSetIfChanged(ref tradesList, value); }
         }
 
         public IRecheckPeriodViewModel RecheckPeriod { get; }
 
-        public bool AudioNotificationEnabled
-        {
-            get { return audioNotificationEnabled; }
-            set { this.RaiseAndSetIfChanged(ref audioNotificationEnabled, value); }
-        }
+        public IAudioNotificationSelectorViewModel AudioNotificationSelector { get; }
 
         public IPoeQueryViewModel Query
         {
@@ -195,7 +194,7 @@ namespace PoeEye.PoeTrade.ViewModels
                 TradesList.HistoricalTrades.AddItems(config.SoldOrRemovedItems);
             }
 
-            AudioNotificationEnabled = config.AudioNotificationEnabled;
+            AudioNotificationSelector.SelectedValue = config.NotificationType;
         }
 
         public PoeEyeTabConfig Save()
@@ -205,7 +204,7 @@ namespace PoeEye.PoeTrade.ViewModels
                 RecheckTimeout = RecheckPeriod.Period,
                 IsAutoRecheckEnabled = RecheckPeriod.IsAutoRecheckEnabled,
                 QueryInfo = Query.PoeQueryBuilder(),
-                AudioNotificationEnabled = AudioNotificationEnabled,
+                NotificationType = AudioNotificationSelector.SelectedValue,
                 SoldOrRemovedItems = TradesList.HistoricalTrades.ItemsViewModels.Select(x => x.Trade).ToArray(),
                 ApiModuleName = ApiSelector.SelectedModule.Name,
             };
@@ -258,7 +257,7 @@ namespace PoeEye.PoeTrade.ViewModels
         private void RebuildTabName()
         {
             Log.Instance.Debug($"[MainWindowTabViewModel.RebuildTabName] Rebuilding tab name, tabQueryMode: {Query}...");
-
+            
             var queryDescription = Query.Description;
             TabName = string.IsNullOrWhiteSpace(queryDescription)
                 ? tabHeader

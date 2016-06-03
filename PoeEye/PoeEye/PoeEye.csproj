@@ -340,7 +340,9 @@
     <Compile Include="PoeTrade\Models\WindowTracker.cs" />
     <Compile Include="PoeTrade\PoeItemVerificationState.cs" />
     <Compile Include="PoeTrade\ViewModels\ApplicationUpdaterViewModel.cs" />
+    <Compile Include="PoeTrade\ViewModels\AudioNotificationSelectorViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\HistoricalTradesViewModel.cs" />
+    <Compile Include="PoeTrade\ViewModels\IAudioNotificationSelectorViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\IHistoricalTradesViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\IMainWindowTabViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\IMainWindowViewModel.cs" />
@@ -377,6 +379,7 @@
     <Compile Include="Prism\PoeEyeBootstrapper.cs" />
     <Compile Include="Prism\WellKnownSchedulers.cs" />
     <Compile Include="Prism\WellKnownWindows.cs" />
+    <Compile Include="Utilities\ContextMenuServiceExtensions.cs" />
     <Compile Include="Utilities\EditableTuple.cs" />
     <Compile Include="Utilities\FilterExtension\CollectionViewSourceFilteringBehavior.cs" />
     <Compile Include="Utilities\FilterExtension\IFilter.cs" />
@@ -523,6 +526,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="PoeTrade\Views\AudioNotificationTypeSelectorView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="PoeTrade\Views\RecheckPeriodView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -617,13 +624,18 @@
     <Resource Include="Resources\Currencies\Cartographer%27s_Chisel.png" />
     <Resource Include="Resources\Currencies\Chaos_Orb.png" />
     <Resource Include="Resources\Currencies\Chromatic_Orb.png" />
-    <None Include="Resources\icq.wav" />
-    <Content Include="Resources\minions-tadaa.wav" />
-    <None Include="Resources\sounds-940-pizzicato.wav" />
-    <Content Include="Resources\whistle.wav" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Resources\Notifications\electro.wav" />
+    <Content Include="Resources\Notifications\icq.wav" />
+    <Content Include="Resources\Notifications\ironvoice.wav" />
+    <Content Include="Resources\Notifications\matrix.wav" />
+    <Content Include="Resources\Notifications\minions-tadaa.wav" />
+    <Content Include="Resources\Notifications\pizzicato.wav" />
+    <Content Include="Resources\Notifications\whistle.wav" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <UsingTask TaskName="CosturaCleanup" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll" TaskFactory="CodeTaskFactory">

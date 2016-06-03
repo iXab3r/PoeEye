@@ -18,5 +18,8 @@ namespace PoeShared.Common
         public static readonly string OrbOfScouring = "scouring";
         public static readonly string RegalOrb = "regal";
         public static readonly string VaalOrb = "vaal";
+        public static readonly string MirrorOfKalandra = "mirror";
+        public static readonly string EternalOrb = "eternal";
+        public static readonly string Unknown = "unknown";
     }
 }

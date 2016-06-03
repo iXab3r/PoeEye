@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using Guards;
 using Newtonsoft.Json.Linq;
 using PoeEye.ExileToolsApi.Entities;
 using PoeEye.ExileToolsApi.Extensions;
@@ -12,14 +13,11 @@ using static System.String;
 
 namespace PoeEye.ExileToolsApi.Converters
 {
-    internal class ToPoeItemConverter : IConverter<ExTzItem, IPoeItem>
+    internal class ToPoeItemConverter : IConverter<ItemConversionInfo, IPoeItem>
     {
-        public IPoeItem Convert(ExTzItem value)
+        public IPoeItem Convert(ItemConversionInfo conversionInfo)
         {
-            if (value == null)
-            {
-                return null;
-            }
+            var value = conversionInfo.Item;
 
             var result = new PoeItem()
             {
@@ -80,6 +78,12 @@ namespace PoeEye.ExileToolsApi.Converters
                 itemMods.AddRange(from mod in modsList.Explicit ?? new Dictionary<string, object>() select ToPoeItemMod(mod.Key, mod.Value, PoeModType.Explicit, false));
                 itemMods.AddRange(from mod in modsList.Implicit ?? new Dictionary<string, object>() select ToPoeItemMod(mod.Key, mod.Value, PoeModType.Implicit, false));
             }
+
+            var additionalMods = from mod in value.ModsPseudo ?? new Dictionary<string, object>()
+                                 where conversionInfo.AdditionalModsToInclude.Any(x => x.IndexOf(mod.Key, StringComparison.OrdinalIgnoreCase) >= 0)
+                                 select ToPoeItemMod($"[pseudo] {mod.Key}", mod.Value, PoeModType.Unknown, true);
+            itemMods.AddRange(additionalMods);
+
             result.Mods = itemMods.ToArray();
 
             return result;

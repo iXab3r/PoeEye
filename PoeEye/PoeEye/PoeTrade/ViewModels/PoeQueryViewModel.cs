@@ -1,4 +1,6 @@
-﻿namespace PoeEye.PoeTrade.ViewModels
+﻿using System.Reactive.Linq;
+
+namespace PoeEye.PoeTrade.ViewModels
 {
     using System;
     using System.Collections.Generic;
@@ -19,7 +21,7 @@
 
     using WpfAutoCompleteControls.Editors;
 
-    internal sealed class PoeQueryViewModel : ReactiveObject, IPoeQueryViewModel
+    internal sealed class PoeQueryViewModel : DisposableReactiveObject, IPoeQueryViewModel
     {
         private bool alternativeArt;
         private float? apsMax;
@@ -166,7 +168,13 @@
             OnlineOnly = true;
             BuyoutOnly = true;
             NormalizeQuality = true;
-            League = LeaguesList.FirstOrDefault();
+
+
+            this.WhenAnyValue(x => x.League)
+                .Where(string.IsNullOrWhiteSpace)
+                .Where(x => LeaguesList.Any())
+                .Subscribe(() => League = LeaguesList.First())
+                .AddTo(Anchors);
 
             var knownNames = poeDatabaseReader.KnownEntitiesNames;
             NameSuggestionProvider = suggestionProviderFactory.Create(knownNames);

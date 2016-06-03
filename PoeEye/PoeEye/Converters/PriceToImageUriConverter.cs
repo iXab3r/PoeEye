@@ -29,7 +29,10 @@ namespace PoeEye.Converters
             {KnownCurrencyNameList.OrbOfRegret, "Orb_of_Regret"},
             {KnownCurrencyNameList.OrbOfScouring, "Orb_of_Scouring"},
             {KnownCurrencyNameList.RegalOrb, "Regal_Orb"}, 
-            {KnownCurrencyNameList.VaalOrb, "Vaal_Orb"}
+            {KnownCurrencyNameList.VaalOrb, "Vaal_Orb"},
+            {KnownCurrencyNameList.MirrorOfKalandra, "Mirror_of_Kalandra"},
+            {KnownCurrencyNameList.EternalOrb, "Eternal_Orb"},
+            {KnownCurrencyNameList.Unknown, "Alchemy_Shard"},
         };
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)

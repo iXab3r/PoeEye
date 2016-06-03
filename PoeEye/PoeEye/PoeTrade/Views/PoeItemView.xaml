@@ -197,8 +197,20 @@
             </filterExtension:CollectionViewSourceFilteringBehavior>
           </i:Interaction.Behaviors>
         </CollectionViewSource>
+
+        <CollectionViewSource Source="{Binding Mods}" x:Key="UnknownMods">
+          <i:Interaction.Behaviors>
+            <filterExtension:CollectionViewSourceFilteringBehavior>
+              <x:Array Type="{x:Type filterExtension:IFilter}">
+                <filterExtension:PropertyFilter PropertyName="ModType" Value="{x:Static common:PoeModType.Unknown}" />
+              </x:Array>
+            </filterExtension:CollectionViewSourceFilteringBehavior>
+          </i:Interaction.Behaviors>
+        </CollectionViewSource>
       </Grid.Resources>
       <Grid.RowDefinitions>
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="5" />
         <RowDefinition Height="Auto" />
         <RowDefinition Height="5" />
         <RowDefinition Height="Auto" />
@@ -210,7 +222,15 @@
               Visibility="{Binding ElementName=ImplicitModsItemsControl, Path=HasItems, Converter={StaticResource BoolFalseToCollapsedConverter}}"
               Height="5" BorderBrush="{StaticResource AccentColorBrush}" BorderThickness="0,1,0,0" />
       <ItemsControl Grid.Row="2" Grid.Column="0"
+                    x:Name="ExplicitModsItemsControl"
                     ItemsSource="{Binding Source={StaticResource ExplicitMods}}" />
+      <Line Grid.Row="3" Grid.Column="0"
+            Visibility="{Binding ElementName=UnknownModsItemsControl, Path=HasItems, Converter={StaticResource BoolFalseToCollapsedConverter}}"
+            Stroke="{StaticResource ProgressBrush}" StrokeThickness="1" />
+      <ItemsControl Grid.Row="4" Grid.Column="0"
+                    x:Name="UnknownModsItemsControl"
+                    FontStyle="Italic"
+                    ItemsSource="{Binding Source={StaticResource UnknownMods}}" />
     </Grid>
   </DataTemplate>
 
@@ -353,11 +373,6 @@
 
             <StackPanel Grid.Column="1" Orientation="Vertical">
               <ContentControl Content="{Binding Trade}" ContentTemplate="{StaticResource PoeItemModsTemplateKey}" />
-              <TextBlock Margin="0,5,0,0"  
-                         Style="{StaticResource IconTextBlock}"
-                         FontSize="16"
-                         Text="{Binding Trade.Note, StringFormat='&#xf040; {0}'}" 
-                         Visibility="{Binding Trade.Note, Converter={StaticResource NullToCollapsedConverter}}"/>
             </StackPanel>
           </Grid>
         </Border>
@@ -399,8 +414,14 @@
                 <ContentPresenter Content="{Binding PriceInChaosOrbs}" 
                                   Visibility="{Binding PriceInChaosOrbs, Converter={StaticResource NullToCollapsedConverter}}" />
               </StackPanel>
-              
-              
+
+
+              <TextBlock Grid.Column="2" Margin="0,5,0,0"  
+                         Style="{StaticResource IconTextBlock}"
+                         FontSize="16"
+                         Text="{Binding Trade.Note, StringFormat='&#xf040; {0}'}" 
+                         Visibility="{Binding Trade.Note, Converter={StaticResource NullToCollapsedConverter}}"/>
+
               <Button Grid.Column="4"
                       Margin="10,2"
                         Visibility="{Binding IsEnabled, RelativeSource={RelativeSource Self}, Converter={StaticResource BoolFalseToCollapsedConverter}}"

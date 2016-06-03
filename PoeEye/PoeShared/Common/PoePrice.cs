@@ -4,14 +4,16 @@ namespace PoeShared.Common
 {
     public struct PoePrice : IComparable
     {
-        public static readonly PoePrice Empty = new PoePrice("?", 0f);
+        public static readonly PoePrice Empty = new PoePrice(KnownCurrencyNameList.Unknown, 0f);
 
         public PoePrice(string currencyType, float value)
         {
             CurrencyType = currencyType;
             Value = value;
 
-            Price = $"{value} {currencyType}";
+            Price = currencyType != KnownCurrencyNameList.Unknown 
+                ? $"{value} {currencyType}" 
+                : $"{currencyType}";
         }
 
         public string CurrencyType { get; private set; }

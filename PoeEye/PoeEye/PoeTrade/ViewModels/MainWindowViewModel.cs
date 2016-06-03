@@ -130,7 +130,7 @@
 
             TabsList
                 .Changed.ToUnit()
-                .Merge(TabsList.ItemChanged.Where(x => x.PropertyName == nameof(IMainWindowTabViewModel.AudioNotificationEnabled)).ToUnit())
+                .Merge(TabsList.ItemChanged.Where(x => x.PropertyName == nameof(IAudioNotificationSelectorViewModel.SelectedValue)).ToUnit())
                 .Subscribe(configUpdateSubject)
                 .AddTo(Anchors);
 
@@ -221,9 +221,9 @@
                 .AddTo(newTab.Anchors);
 
             newTab
-                .Query
-                .Changed
-                .ToUnit()
+                .WhenAnyValue(x => x.Query)
+                .Select(x => x.Changed.ToUnit())
+                .Switch()
                 .Subscribe(configUpdateSubject)
                 .AddTo(newTab.Anchors);
 

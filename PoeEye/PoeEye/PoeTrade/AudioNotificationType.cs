@@ -2,8 +2,13 @@
 {
     internal enum AudioNotificationType
     {
-        NewItem,
+        Disabled,
+        Whistle,
         Whisper,
-        Captcha
+        IronVoice,
+        Electro,
+        Minions,
+        Matrix,
+        Pizzicato
     }
 }
