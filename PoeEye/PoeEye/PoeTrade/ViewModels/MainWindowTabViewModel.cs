@@ -72,7 +72,7 @@ namespace PoeEye.PoeTrade.ViewModels
             apiSelector.AddTo(Anchors);
 
             tradesListAnchors.AddTo(Anchors);
-            
+
             RecheckPeriod = recheckPeriod;
 
             searchCommand = ReactiveCommand.Create();
@@ -150,7 +150,8 @@ namespace PoeEye.PoeTrade.ViewModels
             get { return TradesList.Items.Count(x => x.TradeState == PoeTradeState.Normal); }
         }
 
-        public IPoeTradesListViewModel TradesList {
+        public IPoeTradesListViewModel TradesList
+        {
             get { return tradesList; }
             private set { this.RaiseAndSetIfChanged(ref tradesList, value); }
         }
@@ -225,7 +226,13 @@ namespace PoeEye.PoeTrade.ViewModels
                 TradesList = tradesListFactory.Create(api);
                 tradesList.AddTo(anchors);
 
-                Query = queryFactory.Create(api.StaticData);
+                var existingQuery = query;
+                var newQuery = queryFactory.Create(api.StaticData);
+                if (existingQuery != null)
+                {
+                    newQuery.SetQueryInfo(existingQuery);
+                }
+                Query = newQuery;
 
                 tradesList
                    .WhenAnyValue(x => x.IsBusy)
@@ -251,7 +258,7 @@ namespace PoeEye.PoeTrade.ViewModels
         private void RebuildTabName()
         {
             Log.Instance.Debug($"[MainWindowTabViewModel.RebuildTabName] Rebuilding tab name, tabQueryMode: {Query}...");
-            
+
             var queryDescription = Query.Description;
             TabName = string.IsNullOrWhiteSpace(queryDescription)
                 ? tabHeader
