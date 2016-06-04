@@ -1,4 +1,6 @@
-﻿namespace PoeEye.PoeTrade.ViewModels
+﻿using System.Reactive;
+
+namespace PoeEye.PoeTrade.ViewModels
 {
     using System;
     using System.Collections.Generic;
@@ -199,12 +201,11 @@
             var tabInfo = new TabInfo(tab);
             collectionByTab[tab] = tabInfo;
 
-            tab
-                .TradesList
-                .Items
-                .Changed
-                .Subscribe(args => ProcessCollectionChange(tab, args))
-                .AddTo(tabInfo.Anchors);
+            tab.WhenAnyValue(x => x.TradesList)
+               .Select(x => x?.Items?.Changed)
+               .Switch()
+               .Subscribe(args => ProcessCollectionChange(tab, args))
+               .AddTo(tabInfo.Anchors);
         }
 
         private void ProcessRemoveTab(IMainWindowTabViewModel tab)

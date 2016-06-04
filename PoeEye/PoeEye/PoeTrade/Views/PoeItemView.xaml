@@ -308,7 +308,9 @@
                                 VerticalAlignment="Center"
                                 TextBlock.FontSize="16" />
               
-              <Label Grid.Column="2"
+              <StackPanel Grid.Column="2"
+                          Orientation="Horizontal">
+                <Label 
                      Content="Corrupted"
                      Foreground="{StaticResource LabelTextBrush}"
                      BorderBrush="{StaticResource ValidationSummaryColor2}"
@@ -320,7 +322,7 @@
                      VerticalAlignment="Center"
                      Visibility="{Binding Trade.IsCorrupted, Converter={StaticResource BoolFalseToCollapsedConverter}}" />
 
-              <Label Grid.Column="3"
+                <Label 
                      Content="Unidentified"
                      Foreground="{StaticResource LabelTextBrush}"
                      BorderBrush="{StaticResource ValidationSummaryColor2}"
@@ -331,6 +333,21 @@
                      VerticalContentAlignment="Center"
                      VerticalAlignment="Center"
                      Visibility="{Binding Trade.IsUnidentified, Converter={StaticResource BoolFalseToCollapsedConverter}}" />
+
+                <Label 
+                     Content="Mirrored"
+                     Foreground="{StaticResource LabelTextBrush}"
+                     BorderBrush="{StaticResource ValidationSummaryColor2}"
+                     Background="{StaticResource ValidationSummaryColor5}"
+                     Height="25"
+                     FontWeight="Bold"
+                     Margin="10,0"
+                     VerticalContentAlignment="Center"
+                     VerticalAlignment="Center"
+                     Visibility="{Binding Trade.IsMirrored, Converter={StaticResource BoolFalseToCollapsedConverter}}" />
+              </StackPanel>
+
+            
 
               <Label Grid.Column="4" Content="{Binding Trade.Requirements, Mode=OneWay}"
                      BorderBrush="{StaticResource AccentColorBrush}"

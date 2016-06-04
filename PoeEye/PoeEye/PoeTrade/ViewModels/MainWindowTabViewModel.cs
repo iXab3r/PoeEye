@@ -73,7 +73,7 @@ namespace PoeEye.PoeTrade.ViewModels
             apiSelector.AddTo(Anchors);
 
             tradesListAnchors.AddTo(Anchors);
-            
+
             RecheckPeriod = recheckPeriod;
 
             AudioNotificationSelector = audioNotificationSelector;
@@ -90,6 +90,7 @@ namespace PoeEye.PoeTrade.ViewModels
 
             apiSelector
                 .WhenAnyValue(x => x.SelectedModule)
+                .Where(x => x != null)
                 .Subscribe(ReinitializeApi)
                 .AddTo(Anchors);
 
@@ -105,12 +106,6 @@ namespace PoeEye.PoeTrade.ViewModels
                 .Where(x => !mainWindowTracker.IsActive)
                 .Subscribe(x => audioNotificationsManager.PlayNotification(AudioNotificationType.Whistle), Log.HandleException)
                 .AddTo(Anchors);
-
-            Query.ObservableForProperty(x => x.PoeQueryBuilder)
-                 .ToUnit()
-                 .StartWith(Unit.Default)
-                 .Subscribe(RebuildTabName)
-                 .AddTo(Anchors);
 
             RecheckPeriod
                 .WhenAny(x => x.Period, x => x.IsAutoRecheckEnabled, (x, y) => Unit.Default)
@@ -154,7 +149,8 @@ namespace PoeEye.PoeTrade.ViewModels
             get { return TradesList.Items.Count(x => x.TradeState == PoeTradeState.Normal); }
         }
 
-        public IPoeTradesListViewModel TradesList {
+        public IPoeTradesListViewModel TradesList
+        {
             get { return tradesList; }
             private set { this.RaiseAndSetIfChanged(ref tradesList, value); }
         }
@@ -212,53 +208,54 @@ namespace PoeEye.PoeTrade.ViewModels
 
         private void ReinitializeApi(IPoeApiWrapper api)
         {
+            Guard.ArgumentNotNull(() => api);
             var anchors = new CompositeDisposable();
             tradesListAnchors.Disposable = anchors;
 
-            if (api == null)
+            var existingQuery = query;
+            var newQuery = queryFactory.Create(api.StaticData);
+            if (existingQuery != null)
             {
-                TradesList = null;
-                Query = null;
+                newQuery.SetQueryInfo(existingQuery);
             }
-            else
-            {
-                TradesList = tradesListFactory.Create(api);
-                tradesList.AddTo(anchors);
+            Query = newQuery;
 
-                var existingQuery = query;
-                var newQuery = queryFactory.Create(api.StaticData);
-                if (existingQuery != null)
-                {
-                    newQuery.SetQueryInfo(existingQuery);
-                }
-                Query = newQuery;
+            TradesList?.Dispose();
+            TradesList = tradesListFactory.Create(api);
+            tradesList.AddTo(anchors);
 
-                tradesList
-                   .WhenAnyValue(x => x.IsBusy)
-                   .Subscribe(() => this.RaisePropertyChanged(nameof(IsBusy)))
-                   .AddTo(anchors);
+            newQuery
+                .ObservableForProperty(x => x.PoeQueryBuilder).ToUnit()
+                .Merge(TradesList.WhenAnyValue(x => x.ActiveQuery).ToUnit())
+                .Select(x => newQuery)
+                .Subscribe(RebuildTabName)
+                .AddTo(anchors);
 
+            TradesList
+               .WhenAnyValue(x => x.IsBusy).ToUnit()
+               .StartWith(Unit.Default)
+               .Subscribe(() => this.RaisePropertyChanged(nameof(IsBusy)))
+               .AddTo(anchors);
 
-                tradesList.Items.ItemChanged.ToUnit()
-                          .Merge(tradesList.Items.Changed.ToUnit())
-                          .Subscribe(
-                              () =>
-                              {
-                                  this.RaisePropertyChanged(nameof(NewItemsCount));
-                                  this.RaisePropertyChanged(nameof(RemovedItemsCount));
-                                  this.RaisePropertyChanged(nameof(NormalItemsCount));
-                                  this.RaisePropertyChanged(nameof(HasNewTrades));
-                              })
-                          .AddTo(anchors);
-            }
-            RebuildTabName();
+            TradesList.Items.ItemChanged.ToUnit()
+                      .Merge(tradesList.Items.Changed.ToUnit())
+                      .StartWith(Unit.Default)
+                      .Subscribe(
+                          () =>
+                          {
+                              this.RaisePropertyChanged(nameof(NewItemsCount));
+                              this.RaisePropertyChanged(nameof(RemovedItemsCount));
+                              this.RaisePropertyChanged(nameof(NormalItemsCount));
+                              this.RaisePropertyChanged(nameof(HasNewTrades));
+                          })
+                      .AddTo(anchors);
         }
 
-        private void RebuildTabName()
+        private void RebuildTabName(IPoeQueryViewModel queryToProcess)
         {
-            Log.Instance.Debug($"[MainWindowTabViewModel.RebuildTabName] Rebuilding tab name, tabQueryMode: {Query}...");
-            
-            var queryDescription = Query.Description;
+            Log.Instance.Debug($"[MainWindowTabViewModel.RebuildTabName] Rebuilding tab name, tabQueryMode: {queryToProcess}...");
+
+            var queryDescription = queryToProcess.Description;
             TabName = string.IsNullOrWhiteSpace(queryDescription)
                 ? tabHeader
                 : $"{queryDescription}";
@@ -281,7 +278,6 @@ namespace PoeEye.PoeTrade.ViewModels
 
             TradesList.Items.Clear();
             TradesList.ActiveQuery = query;
-            RebuildTabName();
             Query.IsExpanded = false;
 
             if (TradesList.RecheckPeriod == TimeSpan.Zero)

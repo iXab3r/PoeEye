@@ -64,6 +64,8 @@
 
         public bool IsCorrupted { get; set; }
 
+        public bool IsMirrored { get; set; }
+
         public bool IsUnidentified { get; set; }
 
         public PoeItemRarity Rarity { get; set; }

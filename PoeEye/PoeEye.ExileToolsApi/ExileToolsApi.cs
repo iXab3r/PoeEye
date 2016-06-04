@@ -133,8 +133,11 @@ namespace PoeEye.ExileToolsApi
 
             var result = new List<IPoeItemType>
             {
-                new PoeItemType() {Name = "Generic One-Handed Weapon", EquipType = "One Handed Melee Weapon"},
-                new PoeItemType() {Name = "Generic Two-Handed Weapon", EquipType = "Two Handed Melee Weapon"}
+                new PoeItemType("Generic One-Handed Weapon")
+                {
+                    EquipType = "One Handed Melee Weapon",
+                },
+                new PoeItemType("Generic Two-Handed Weapon") {EquipType = "Two Handed Melee Weapon"}
             };
 
             result.AddRange(eqBuckets.Select(x => ToPoeItemType(x.EquipType, x.ItemType)).OrderBy(x => x.EquipType));
@@ -146,15 +149,14 @@ namespace PoeEye.ExileToolsApi
         {
             if (string.IsNullOrWhiteSpace(equipType) && string.IsNullOrWhiteSpace(itemType))
             {
-                return new PoeItemType { Name = "Empty" };
+                return new PoeItemType("Empty");
             }
             if (equipType == itemType)
             {
-                return new PoeItemType
+                return new PoeItemType(itemType)
                 {
                     EquipType = equipType,
                     ItemType = itemType,
-                    Name = itemType
                 };
             }
 
@@ -172,12 +174,10 @@ namespace PoeEye.ExileToolsApi
             }
 
             var itemName = string.Join(" - ", equipType, itemType);
-            return new PoeItemType
+            return new PoeItemType(itemName)
             {
                 EquipType = equipType,
                 ItemType = itemType,
-                Name = itemName,
-                CodeName = itemName,
             };
         }
 

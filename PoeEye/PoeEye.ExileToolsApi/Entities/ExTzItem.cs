@@ -276,6 +276,9 @@ namespace PoeEye.ExileToolsApi.Entities
 
         [JsonProperty("identified")]
         public bool IsIdentified { get; set; }
+
+        [JsonProperty("mirrored")]
+        public bool IsMirrored { get; set; }
     }
 
     internal enum KnownItemType

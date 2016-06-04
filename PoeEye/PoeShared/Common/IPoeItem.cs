@@ -66,6 +66,8 @@
 
         bool IsUnidentified { get; }
 
+        bool IsMirrored { get; }
+
         PoeItemRarity Rarity { get; }
 
         IPoeItemMod[] Mods { [NotNull] get; }

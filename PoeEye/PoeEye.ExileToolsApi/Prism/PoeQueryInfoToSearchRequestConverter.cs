@@ -109,7 +109,7 @@ namespace PoeEye.ExileToolsApi.Prism
             };
 
             var minPrice = new PoePrice(source.BuyoutCurrencyType, source.BuyoutMin ?? 0);
-            var maxPrice = new PoePrice(source.BuyoutCurrencyType, source.BuyoutMin ?? 0);
+            var maxPrice = new PoePrice(source.BuyoutCurrencyType, source.BuyoutMax ?? 0);
 
             var chaosEquivalentQuery = CreateRangeBasedRequest(
                     "shop.chaosEquiv", 

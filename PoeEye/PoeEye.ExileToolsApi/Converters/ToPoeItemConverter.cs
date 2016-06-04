@@ -31,6 +31,7 @@ namespace PoeEye.ExileToolsApi.Converters
                 Physical = GetOrDefaultAsString(value.Properties?.Weapon?.PhysicalDamage),
                 IsCorrupted = value.Attributes?.IsCorrupted != null && (bool)value.Attributes?.IsCorrupted,
                 IsUnidentified = value.Attributes?.IsIdentified != null && !(bool)value.Attributes?.IsIdentified,
+                IsMirrored = value.Attributes?.IsMirrored != null && (bool)value.Attributes?.IsMirrored,
                 ItemIconUri = value.Info?.Icon,
                 UserIgn = value.Shop?.LastCharacterName,
                 UserForumName = value.Shop?.SellerAccount,
