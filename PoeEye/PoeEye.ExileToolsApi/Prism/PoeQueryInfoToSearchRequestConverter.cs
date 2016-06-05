@@ -278,7 +278,7 @@ namespace PoeEye.ExileToolsApi.Prism
 
             if (max != null)
             {
-                result.GreaterThanOrEqualTo = max.Value;
+                result.LessThanOrEqualTo = max.Value;
             }
 
             yield return result;
