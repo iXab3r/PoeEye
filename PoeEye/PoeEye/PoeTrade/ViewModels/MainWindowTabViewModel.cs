@@ -104,7 +104,7 @@ namespace PoeEye.PoeTrade.ViewModels
                 .Where(x => x > 0)
                 .Where(x => audioNotificationSelector.SelectedValue != AudioNotificationType.Disabled)
                 .Where(x => !mainWindowTracker.IsActive)
-                .Subscribe(x => audioNotificationsManager.PlayNotification(AudioNotificationType.Whistle), Log.HandleException)
+                .Subscribe(x => audioNotificationsManager.PlayNotification(audioNotificationSelector.SelectedValue), Log.HandleException)
                 .AddTo(Anchors);
 
             RecheckPeriod

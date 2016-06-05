@@ -22,11 +22,16 @@ namespace PoeEye.ExileToolsApi.Converters
             var result = new PoeItem()
             {
                 ItemName = value.Info?.FullName,
+                DamagePerSecond = GetOrDefaultAsString(value.PropertiesPseudo?.Weapon?.Q20?.TotalDps),
+                PhysicalDamagePerSecond = GetOrDefaultAsString(value.PropertiesPseudo?.Weapon?.Q20?.PhysicalDps),
+                ElementalDamagePerSecond = GetOrDefaultAsString(value.Properties?.Weapon?.ElementalDps),
+
+                Armour = GetOrDefaultAsString(value.PropertiesPseudo?.Armour?.Q20?.Armour),
+                Evasion = GetOrDefaultAsString(value.PropertiesPseudo?.Armour?.Q20?.Evasion),
+                Shield = GetOrDefaultAsString(value.PropertiesPseudo?.Armour?.Q20?.EnergyShield),
+
                 CriticalChance = GetOrDefaultAsString(value.Properties?.Weapon?.CriticalStrikeChance),
                 AttacksPerSecond = GetOrDefaultAsString(value.Properties?.Weapon?.AttacksPerSecond),
-                DamagePerSecond = GetOrDefaultAsString(value.Properties?.Weapon?.TotalDps),
-                PhysicalDamagePerSecond = GetOrDefaultAsString(value.Properties?.Weapon?.PhysicalDps),
-                ElementalDamagePerSecond = GetOrDefaultAsString(value.Properties?.Weapon?.ElementalDps),
                 Elemental = GetOrDefaultAsString(value.Properties?.Weapon?.ElementalDamage),
                 Physical = GetOrDefaultAsString(value.Properties?.Weapon?.PhysicalDamage),
                 IsCorrupted = value.Attributes?.IsCorrupted != null && (bool)value.Attributes?.IsCorrupted,
@@ -42,9 +47,6 @@ namespace PoeEye.ExileToolsApi.Converters
                 Note = value.Shop?.Note,
                 FirstSeen = value.Shop?.AddedTimestamp,
                 Quality = GetOrDefault(value.Properties?.Quality).ToString(CultureInfo.InvariantCulture),
-                Armour = GetOrDefaultAsString(value.Properties?.Armour?.Armour),
-                Evasion = GetOrDefaultAsString(value.Properties?.Armour?.Evasion),
-                Shield = GetOrDefaultAsString(value.Properties?.Armour?.EnergyShield),
                 BlockChance = GetOrDefaultAsString(value.Properties?.Armour?.BlockChance),
                 Links = value.Sockets == null ? null : new PoeLinksInfo(value.Sockets.Raw),
             };

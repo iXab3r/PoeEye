@@ -27,6 +27,9 @@ namespace PoeEye.ExileToolsApi.Entities
         [JsonProperty("properties")]
         public ExTzProperties Properties { get; set; }
 
+        [JsonProperty("propertiesPseudo")]
+        public ExTzPropertiesPseudo PropertiesPseudo { get; set; }
+
         [JsonProperty("mods")]
         public Dictionary<string, ExTzItemMods> Mods { get; set; }
 
@@ -136,6 +139,48 @@ namespace PoeEye.ExileToolsApi.Entities
 
         [JsonProperty("Quality")]
         public double Quality { get; set; }
+    }
+
+    internal class ExTzPropertiesPseudo
+    {
+        [JsonProperty("Weapon")]
+        public ExTzPropertiesPseudoWeapon Weapon { get; set; }
+
+        [JsonProperty("Armour")]
+        public ExTzPropertiesPseudoArmour Armour { get; set; }
+    }
+
+    internal class ExTzPropertiesPseudoWeapon
+    {
+        [JsonProperty("estimatedQ20")]
+        public ExTzPropertiesPseudoWeaponQ20 Q20 { get; set; }
+    }
+
+    internal class ExTzPropertiesPseudoWeaponQ20
+    {
+        [JsonProperty("Physical DPS")]
+        public double PhysicalDps { get; set; }
+
+        [JsonProperty("Total DPS")]
+        public double TotalDps { get; set; }
+    }
+
+    internal class ExTzPropertiesPseudoArmour
+    {
+        [JsonProperty("estimatedQ20")]
+        public ExTzPropertiesPseudoArmourQ20 Q20 { get; set; }
+    }
+
+    internal class ExTzPropertiesPseudoArmourQ20
+    {
+        [JsonProperty("Armour")]
+        public double Armour { get; set; }
+
+        [JsonProperty("Energy Shield")]
+        public double EnergyShield { get; set; }
+
+        [JsonProperty("Evasion")]
+        public double Evasion { get; set; }
     }
 
     internal struct ExTzPropertyRange
