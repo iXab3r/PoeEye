@@ -389,7 +389,9 @@
                             Content="{Binding Trade}" ContentTemplate="{StaticResource PoeItemStatsTemplateKey}"  />
 
             <StackPanel Grid.Column="1" Orientation="Vertical">
-              <ContentControl Content="{Binding Trade}" ContentTemplate="{StaticResource PoeItemModsTemplateKey}" />
+              <ContentControl Content="{Binding Trade}"
+                              HorizontalAlignment="Left"
+                              ContentTemplate="{StaticResource PoeItemModsTemplateKey}" />
             </StackPanel>
           </Grid>
         </Border>

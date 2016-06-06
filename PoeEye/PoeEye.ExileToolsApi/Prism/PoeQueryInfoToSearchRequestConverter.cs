@@ -45,6 +45,7 @@ namespace PoeEye.ExileToolsApi.Prism
             result.Query &= PrepareSocketsColorQuery(source);
             result.Query &= PrepareSocketsLinksQuery(source);
             result.Query &= PreparePriceQuery(source);
+            result.Query &= PrepareFilterByAccountName(source);
 
             result.Query &= new BoolQuery
             {
@@ -112,7 +113,7 @@ namespace PoeEye.ExileToolsApi.Prism
             var maxPrice = new PoePrice(source.BuyoutCurrencyType, source.BuyoutMax ?? 0);
 
             var chaosEquivalentQuery = CreateRangeBasedRequest(
-                    "shop.chaosEquiv", 
+                    "shop.chaosEquiv",
                     toChaosCalculcator.GetEquivalentInChaosOrbs(minPrice).Value,
                     toChaosCalculcator.GetEquivalentInChaosOrbs(maxPrice).Value);
 
@@ -137,18 +138,45 @@ namespace PoeEye.ExileToolsApi.Prism
                 CreateRangeBasedRequest("properties.Quality", source.QualityMin, source.QualityMax),
                 CreateRangeBasedRequest("properties.Map.Item Quantity", source.IncQuantityMin, source.IncQuantityMin),
                 CreateRangeBasedRequest("properties.Map.Item Quantity", source.IncQuantityMin, source.IncQuantityMin),
-                CreateWildcardQuery("info.fullName", source.ItemName, x => $"*{x}*"),
                 CreateTermQuery("attributes.league", source.League),
                 CreateTermQuery("attributes.rarity", source.ItemRarity != null ? source.ItemRarity.ToString() : null),
                 CreateTermQuery("shop.hasPrice", source.BuyoutOnly ? true : default(bool?)),
-                CreateTermQuery("shop.sellerAccount", source.AccountName),
                 CreateTermQuery("shop.verified", source.OnlineOnly ? VerificationStatus.Yes : default(VerificationStatus?)),
                 CreateQuery(source.ItemType),
             };
 
+            var shouldQueries = new IEnumerable<QueryBase>[0];
+            if (!string.IsNullOrWhiteSpace(source.ItemName))
+            {
+                shouldQueries = new[]
+                {
+                    CreateWildcardQuery("info.fullName", source.ItemName, x => $"*{x}*"),
+                    CreateWildcardQuery("info.tokenized.descrText", source.ItemName, x => $"*{x}*"),
+                    CreateWildcardQuery("info.tokenized.flavourText", source.ItemName, x => $"*{x}*"),
+                    CreateWildcardQuery("info.tokenized.prophecyText", source.ItemName, x => $"*{x}*"),
+                };
+            }
+
             return new BoolQuery
             {
-                Must = CombineQueries(mustQueries)
+                Must = CombineQueries(mustQueries),
+                Should = CombineQueries(shouldQueries),
+                MinimumShouldMatch = shouldQueries.Any() ? 1 : 0,
+            };
+        }
+
+        private QueryBase PrepareFilterByAccountName(IPoeQueryInfo source)
+        {
+            var shouldQueries = new[]
+                {
+                   CreateTermQuery("shop.sellerAccount", source.AccountName),
+                   CreateTermQuery("shop.lastCharacterName", source.AccountName),
+                };
+
+            return new BoolQuery
+            {
+                Should = CombineQueries(shouldQueries),
+                MinimumShouldMatch = shouldQueries.Any() ? 1 : 0,
             };
         }
 

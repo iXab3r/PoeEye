@@ -74,18 +74,35 @@ namespace PoeEye.ExileToolsApi.Converters
                 GetWithNameOrDefault(value.Requirements?.Dexterity, "Dex"),
                 GetWithNameOrDefault(value.Requirements?.Intelligence, "Int"));
 
-
             var itemMods = new List<IPoeItemMod>();
+
+            var enchants = from mod in value.EnchantMods ?? new Dictionary<string, object>()
+                           select ToPoeItemMod($"[enchant] {mod.Key}", mod.Value, PoeModType.Unknown, true);
+            itemMods.AddRange(enchants);
+
             foreach (var modsList in (value.Mods ?? new Dictionary<string, ExTzItemMods>()).Select(x => x.Value))
             {
                 itemMods.AddRange(from mod in modsList.Explicit ?? new Dictionary<string, object>() select ToPoeItemMod(mod.Key, mod.Value, PoeModType.Explicit, false));
                 itemMods.AddRange(from mod in modsList.Implicit ?? new Dictionary<string, object>() select ToPoeItemMod(mod.Key, mod.Value, PoeModType.Implicit, false));
+                itemMods.AddRange(from mod in modsList.Crafted ?? new Dictionary<string, object>() select ToPoeItemMod($"[craft] {mod.Key}", mod.Value, PoeModType.Unknown, true));
             }
 
             var additionalMods = from mod in value.ModsPseudo ?? new Dictionary<string, object>()
                                  where conversionInfo.AdditionalModsToInclude.Any(x => x.IndexOf(mod.Key, StringComparison.OrdinalIgnoreCase) >= 0)
                                  select ToPoeItemMod($"[pseudo] {mod.Key}", mod.Value, PoeModType.Unknown, true);
             itemMods.AddRange(additionalMods);
+
+            if (!string.IsNullOrWhiteSpace(value.Info?.ProphecyText))
+            {
+                var prophecyMod = new PoeItemMod()
+                {
+                    Name = value.Info.ProphecyText,
+                    CodeName = "Prophecy",
+                    IsCrafted = true,
+                    ModType = PoeModType.Unknown,
+                };
+                itemMods.Add(prophecyMod);
+            }
 
             result.Mods = itemMods.ToArray();
 

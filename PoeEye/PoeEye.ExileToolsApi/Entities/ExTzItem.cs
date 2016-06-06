@@ -36,6 +36,9 @@ namespace PoeEye.ExileToolsApi.Entities
         [JsonProperty("modsPseudo")]
         public Dictionary<string, object> ModsPseudo { get; set; }
 
+        [JsonProperty("enchantMods")]
+        public Dictionary<string, object> EnchantMods { get; set; }
+
         [JsonProperty("sockets")]
         public ExTzItemSockets Sockets { get; set; }
 
@@ -61,6 +64,9 @@ namespace PoeEye.ExileToolsApi.Entities
 
         [JsonProperty("explicit")]
         public Dictionary<string, object> Explicit { get; set; }
+
+        [JsonProperty("crafted")]
+        public Dictionary<string, object> Crafted { get; set; }
     }
 
     internal class ExTzItemRequirements
@@ -216,6 +222,21 @@ namespace PoeEye.ExileToolsApi.Entities
 
         [JsonProperty("icon")]
         public string Icon { get; set; }
+
+        [JsonProperty("prophecyText")]
+        public string ProphecyText { get; set; }
+
+        [JsonProperty("tokenized")]
+        public ExTzItemTokenizedInfo Tokenized { get; set; }
+    }
+
+    internal class ExTzItemTokenizedInfo
+    {
+        [JsonProperty("descrText")]
+        public string Description { get; set; }
+
+        [JsonProperty("prophecyText")]
+        public string ProphecyText { get; set; }
     }
 
     internal class ExTzShopInfo
