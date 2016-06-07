@@ -172,8 +172,7 @@ namespace PoeEye.PoeTrade.ViewModels
 
             this.WhenAnyValue(x => x.League)
                 .Where(string.IsNullOrWhiteSpace)
-                .Where(x => LeaguesList.Any())
-                .Subscribe(() => League = LeaguesList.First())
+                .Subscribe(() => League = LeaguesList.FirstOrDefault())
                 .AddTo(Anchors);
 
             var knownNames = poeDatabaseReader.KnownEntitiesNames;
@@ -613,11 +612,7 @@ namespace PoeEye.PoeTrade.ViewModels
                 }
             }
 
-            if (league == null)
-            {
-                League = LeaguesList.First();
-            }
-
+            this.RaisePropertyChanged(nameof(League));
             this.RaisePropertyChanged(nameof(PoeQueryBuilder));
         }
         
