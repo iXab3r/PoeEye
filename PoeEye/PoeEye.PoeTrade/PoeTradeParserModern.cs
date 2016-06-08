@@ -210,7 +210,8 @@ namespace PoeEye.PoeTrade
                 FirstSeen = dateTimeExtractor.ExtractTimestamp(parser["td[class=item-cell] span[class~=found-time-ago]"]?.Text()),
                 Mods = implicitMods.Concat(explicitMods).Where(IsValid).ToArray(),
                 Links = ExtractLinksInfo(row),
-                Rarity = ExtractItemRarity(row)
+                Rarity = ExtractItemRarity(row),
+                Raw = parser.ToString(),
             };
             TrimProperties(result);
             return result;

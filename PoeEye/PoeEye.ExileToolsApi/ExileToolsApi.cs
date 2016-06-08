@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Guards;
 using JetBrains.Annotations;
 using Nest;
+using Newtonsoft.Json.Linq;
 using PoeEye.ExileToolsApi.Converters;
 using PoeEye.ExileToolsApi.Entities;
 using PoeShared;
@@ -221,7 +222,7 @@ namespace PoeEye.ExileToolsApi
         {
             var query = queryConverter.Convert(queryInfo);
 
-            var queryResult = client.Search<ExTzItem>(query);
+            var queryResult = client.Search<JRaw>(query);
 
             Log.Instance.Debug($"[ExileToolsApi] Response data:\n{queryResult.DebugInformation}");
 
@@ -229,6 +230,7 @@ namespace PoeEye.ExileToolsApi
                 .Hits
                 .Select(x => new ItemConversionInfo(x.Source, ExtractModsList(queryInfo)))
                 .Select(poeItemConverter.Convert)
+                .Where(x => x != null)
                 .ToArray();
             return new PoeQueryResult()
             {

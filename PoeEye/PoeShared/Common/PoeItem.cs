@@ -70,6 +70,8 @@
 
         public PoeItemRarity Rarity { get; set; }
 
+        public string Raw { get; set; }
+
         public IPoeItemMod[] Mods
         {
             get { return mods; }

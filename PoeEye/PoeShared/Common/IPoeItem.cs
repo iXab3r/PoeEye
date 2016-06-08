@@ -58,6 +58,8 @@
 
         string Note { get; }
 
+        string Raw { get; }
+
         string SuggestedPrivateMessage { get; }
 
         DateTime? FirstSeen { get; }

@@ -4,9 +4,11 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using Guards;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using PoeEye.ExileToolsApi.Entities;
 using PoeEye.ExileToolsApi.Extensions;
+using PoeShared;
 using PoeShared.Common;
 using TypeConverter;
 using static System.String;
@@ -17,86 +19,97 @@ namespace PoeEye.ExileToolsApi.Converters
     {
         public IPoeItem Convert(ItemConversionInfo conversionInfo)
         {
-            var value = conversionInfo.Item;
+            var rawJson = conversionInfo.Item.ToString(Formatting.Indented); 
 
-            var result = new PoeItem()
+            ExTzItem source;
+            try
             {
-                ItemName = value.Info?.FullName,
-                DamagePerSecond = GetOrDefaultAsString(value.PropertiesPseudo?.Weapon?.Q20?.TotalDps),
-                PhysicalDamagePerSecond = GetOrDefaultAsString(value.PropertiesPseudo?.Weapon?.Q20?.PhysicalDps),
-                ElementalDamagePerSecond = GetOrDefaultAsString(value.Properties?.Weapon?.ElementalDps),
-
-                Armour = GetOrDefaultAsString(value.PropertiesPseudo?.Armour?.Q20?.Armour),
-                Evasion = GetOrDefaultAsString(value.PropertiesPseudo?.Armour?.Q20?.Evasion),
-                Shield = GetOrDefaultAsString(value.PropertiesPseudo?.Armour?.Q20?.EnergyShield),
-
-                CriticalChance = GetOrDefaultAsString(value.Properties?.Weapon?.CriticalStrikeChance),
-                AttacksPerSecond = GetOrDefaultAsString(value.Properties?.Weapon?.AttacksPerSecond),
-                Elemental = GetOrDefaultAsString(value.Properties?.Weapon?.ElementalDamage),
-                Physical = GetOrDefaultAsString(value.Properties?.Weapon?.PhysicalDamage),
-                IsCorrupted = value.Attributes?.IsCorrupted != null && (bool)value.Attributes?.IsCorrupted,
-                IsUnidentified = value.Attributes?.IsIdentified != null && !(bool)value.Attributes?.IsIdentified,
-                IsMirrored = value.Attributes?.IsMirrored != null && (bool)value.Attributes?.IsMirrored,
-                ItemIconUri = value.Info?.Icon,
-                UserIgn = value.Shop?.LastCharacterName,
-                UserForumName = value.Shop?.SellerAccount,
-                Hash = value.ItemId,
-                UserIsOnline = value.Shop?.Status != null && value.Shop?.Status == VerificationStatus.Yes,
-                Rarity = GetOrDefaultEnum(value.Attributes?.Rarity, PoeItemRarity.Normal),
-                League = value.Attributes?.League,
-                Note = value.Shop?.Note,
-                FirstSeen = value.Shop?.AddedTimestamp,
-                Quality = GetOrDefault(value.Properties?.Quality).ToString(CultureInfo.InvariantCulture),
-                BlockChance = GetOrDefaultAsString(value.Properties?.Armour?.BlockChance),
-                Links = value.Sockets == null ? null : new PoeLinksInfo(value.Sockets.Raw),
+                source = JsonConvert.DeserializeObject<ExTzItem>(rawJson);
+            }
+            catch (Exception ex)
+            {
+                Log.Instance.Error($"Error occurred during deserialization process, value:\r\n{rawJson}", ex);
+                return new PoeItem();
+            }
+            
+            var result = new PoeItem
+            {
+                Raw = rawJson.FormatJson(),
+                ItemName = source.Info?.FullName,
+                DamagePerSecond = GetOrDefaultAsString(source.ItemPropertiesPseudo?.Weapon?.Q20?.TotalDps),
+                PhysicalDamagePerSecond = GetOrDefaultAsString(source.ItemPropertiesPseudo?.Weapon?.Q20?.PhysicalDps),
+                ElementalDamagePerSecond = GetOrDefaultAsString(source.ItemProperties?.Weapon?.ElementalDps),
+                Armour = GetOrDefaultAsString(source.ItemPropertiesPseudo?.Armour?.Q20?.Armour),
+                Evasion = GetOrDefaultAsString(source.ItemPropertiesPseudo?.Armour?.Q20?.Evasion),
+                Shield = GetOrDefaultAsString(source.ItemPropertiesPseudo?.Armour?.Q20?.EnergyShield),
+                CriticalChance = GetOrDefaultAsString(source.ItemProperties?.Weapon?.CriticalStrikeChance),
+                AttacksPerSecond = GetOrDefaultAsString(source.ItemProperties?.Weapon?.AttacksPerSecond),
+                Elemental = GetOrDefaultAsString(source.ItemProperties?.Weapon?.ElementalDamage),
+                Physical = GetOrDefaultAsString(source.ItemProperties?.Weapon?.PhysicalDamage),
+                IsCorrupted = source.Attributes?.IsCorrupted != null && (bool) source.Attributes?.IsCorrupted,
+                IsUnidentified = source.Attributes?.IsIdentified != null && !(bool) source.Attributes?.IsIdentified,
+                IsMirrored = source.Attributes?.IsMirrored != null && (bool) source.Attributes?.IsMirrored,
+                ItemIconUri = source.Info?.Icon,
+                UserIgn = source.Shop?.LastCharacterName,
+                UserForumName = source.Shop?.SellerAccount,
+                Hash = source.ItemId,
+                UserIsOnline = source.Shop?.Status != null && source.Shop?.Status == VerificationStatus.Yes,
+                Rarity = GetOrDefaultEnum(source.Attributes?.Rarity, PoeItemRarity.Normal),
+                League = source.Attributes?.League,
+                Note = source.Shop?.Note,
+                FirstSeen = source.Shop?.AddedTimestamp,
+                Quality = GetOrDefault(source.ItemProperties?.Quality).ToString(CultureInfo.InvariantCulture),
+                BlockChance = GetOrDefaultAsString(source.ItemProperties?.Armour?.BlockChance),
+                Links = source.Sockets == null ? null : new PoeLinksInfo(source.Sockets.Raw),
             };
 
-            if (GetOrDefaultEnum(value.Attributes?.ItemType, KnownItemType.Unknown) == KnownItemType.Gem)
+
+            if (GetOrDefaultEnum(source.Attributes?.ItemType, KnownItemType.Unknown) == KnownItemType.Gem)
             {
-                result.Level = GetOrDefaultAsString(value.Properties?.Gem?.Level);
+                result.Level = GetOrDefaultAsString(source.ItemProperties?.Gem?.Level);
             }
 
-            if (GetOrDefault(value.Shop?.HasPrice) && !IsNullOrWhiteSpace(value.Shop?.CurrencyRequested))
+            if (GetOrDefault(source.Shop?.HasPrice) && !IsNullOrWhiteSpace(source.Shop?.CurrencyRequested))
             {
-                result.Price = $"{value.Shop?.AmountRequested} {value.Shop?.CurrencyRequested}";
+                result.Price = $"{source.Shop?.AmountRequested} {source.Shop?.CurrencyRequested}";
             }
             else
             {
-                result.Price = $"{value.Shop.Note}";
+                result.Price = $"{source.Shop.Note}";
             }
 
-            result.SuggestedPrivateMessage = value.Shop?.DefaultMessage;
+            result.SuggestedPrivateMessage = source.Shop?.DefaultMessage;
 
 
             result.Requirements = Join(" ",
-                GetWithNameOrDefault(value.Requirements?.Level, "Lvl"),
-                GetWithNameOrDefault(value.Requirements?.Strength, "Str"),
-                GetWithNameOrDefault(value.Requirements?.Dexterity, "Dex"),
-                GetWithNameOrDefault(value.Requirements?.Intelligence, "Int"));
+                GetWithNameOrDefault(source.Requirements?.Level, "Lvl"),
+                GetWithNameOrDefault(source.Requirements?.Strength, "Str"),
+                GetWithNameOrDefault(source.Requirements?.Dexterity, "Dex"),
+                GetWithNameOrDefault(source.Requirements?.Intelligence, "Int"));
 
             var itemMods = new List<IPoeItemMod>();
 
-            var enchants = from mod in value.EnchantMods ?? new Dictionary<string, object>()
+            var enchants = from mod in source.EnchantMods ?? new Dictionary<string, object>()
                            select ToPoeItemMod($"[enchant] {mod.Key}", mod.Value, PoeModType.Unknown, true);
             itemMods.AddRange(enchants);
 
-            foreach (var modsList in (value.Mods ?? new Dictionary<string, ExTzItemMods>()).Select(x => x.Value))
+            foreach (var modsList in (source.Mods ?? new Dictionary<string, ExTzItemMods>()).Select(x => x.Value))
             {
                 itemMods.AddRange(from mod in modsList.Explicit ?? new Dictionary<string, object>() select ToPoeItemMod(mod.Key, mod.Value, PoeModType.Explicit, false));
                 itemMods.AddRange(from mod in modsList.Implicit ?? new Dictionary<string, object>() select ToPoeItemMod(mod.Key, mod.Value, PoeModType.Implicit, false));
                 itemMods.AddRange(from mod in modsList.Crafted ?? new Dictionary<string, object>() select ToPoeItemMod($"[craft] {mod.Key}", mod.Value, PoeModType.Unknown, true));
             }
 
-            var additionalMods = from mod in value.ModsPseudo ?? new Dictionary<string, object>()
+            var additionalMods = from mod in source.ModsPseudo ?? new Dictionary<string, object>()
                                  where conversionInfo.AdditionalModsToInclude.Any(x => x.IndexOf(mod.Key, StringComparison.OrdinalIgnoreCase) >= 0)
                                  select ToPoeItemMod($"[pseudo] {mod.Key}", mod.Value, PoeModType.Unknown, true);
             itemMods.AddRange(additionalMods);
 
-            if (!string.IsNullOrWhiteSpace(value.Info?.ProphecyText))
+            if (!string.IsNullOrWhiteSpace(source.Info?.ProphecyText))
             {
                 var prophecyMod = new PoeItemMod()
                 {
-                    Name = value.Info.ProphecyText,
+                    Name = source.Info.ProphecyText,
                     CodeName = "Prophecy",
                     IsCrafted = true,
                     ModType = PoeModType.Unknown,

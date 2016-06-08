@@ -241,6 +241,7 @@
           <RowDefinition Height="40" />
           <RowDefinition Height="*" />
           <RowDefinition Height="30" />
+          <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
           <ColumnDefinition Width="100" />
@@ -250,7 +251,7 @@
         <ContentControl Grid.Row="1" Grid.Column="0"
                         Margin="0,0,10,0"
                         MaxHeight="130"
-                        Content="{Binding ImageViewModel}" />
+                        Content="{Binding ImageViewModel}"/>
 
         <ContentControl Grid.Row="1" Grid.Column="0" Content="{Binding LinksViewModel}" Margin="0,0,10,0" />
 
@@ -306,8 +307,16 @@
                                 Content="{Binding Trade}"
                                 ContentTemplate="{StaticResource PoeItemNameTemplateKey}"
                                 VerticalAlignment="Center"
-                                TextBlock.FontSize="16" />
-              
+                                TextBlock.FontSize="16">
+                <i:Interaction.Triggers>
+                  <i:EventTrigger EventName="MouseDoubleClick">
+                    <utilities:SetPropertyAction PropertyName="IsExpanded"
+                                           TargetObject="{Binding ElementName=ExpanderRaw}"
+                                           PropertyValue="{Binding ElementName=ExpanderRaw, Path=IsExpanded, Converter={StaticResource BoolInversionConverter}}" />
+                  </i:EventTrigger>
+                </i:Interaction.Triggers>
+              </ContentPresenter>
+
               <StackPanel Grid.Column="2"
                           Orientation="Horizontal">
                 <Label 
@@ -476,6 +485,17 @@
             </Grid>
           </Border>
         </ContentControl>
+
+        <Border Grid.Row="3" Grid.Column="1" 
+                Visibility="{Binding Trade.Raw, Converter={StaticResource NullToCollapsedConverter}, Mode=OneWay}">
+            <Expander Header="Raw item info" 
+                      Name="ExpanderRaw"
+                      Visibility="{Binding RelativeSource={RelativeSource Self}, Path=IsExpanded, Converter={StaticResource BoolFalseToCollapsedConverter}}">
+              <TextBox Text="{Binding Trade.Raw}" IsEnabled="True" IsReadOnly="True" MaxHeight="400" 
+                       VerticalScrollBarVisibility="Visible"
+                       HorizontalScrollBarVisibility="Visible"/>
+            </Expander>
+        </Border>
 
       </Grid>
     </ContentControl>

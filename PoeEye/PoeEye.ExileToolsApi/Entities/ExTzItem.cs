@@ -4,6 +4,7 @@ using System.Runtime.Serialization;
 using Nest;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Linq;
 using PoeEye.ExileToolsApi.Extensions;
 using PoeShared.Common;
 
@@ -25,10 +26,10 @@ namespace PoeEye.ExileToolsApi.Entities
         public ExTzItemAttributes Attributes { get; set; }
 
         [JsonProperty("properties")]
-        public ExTzProperties Properties { get; set; }
+        public ExTzItemProperties ItemProperties { get; set; }
 
         [JsonProperty("propertiesPseudo")]
-        public ExTzPropertiesPseudo PropertiesPseudo { get; set; }
+        public ExTzItemPropertiesPseudo ItemPropertiesPseudo { get; set; }
 
         [JsonProperty("mods")]
         public Dictionary<string, ExTzItemMods> Mods { get; set; }
@@ -132,7 +133,7 @@ namespace PoeEye.ExileToolsApi.Entities
         public double AttacksPerSecond { get; set; }
     }
 
-    internal class ExTzProperties
+    internal class ExTzItemProperties
     {
         [JsonProperty("Weapon")]
         public ExTzWeaponInfo Weapon { get; set; }
@@ -147,7 +148,7 @@ namespace PoeEye.ExileToolsApi.Entities
         public double Quality { get; set; }
     }
 
-    internal class ExTzPropertiesPseudo
+    internal class ExTzItemPropertiesPseudo
     {
         [JsonProperty("Weapon")]
         public ExTzPropertiesPseudoWeapon Weapon { get; set; }
