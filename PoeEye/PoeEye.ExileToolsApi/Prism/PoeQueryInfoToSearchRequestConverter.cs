@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using Guards;
 using Nest;
 using PoeEye.ExileToolsApi.Converters;
@@ -17,6 +18,8 @@ namespace PoeEye.ExileToolsApi.Prism
 {
     internal sealed class PoeQueryInfoToSearchRequestConverter : IConverter<IPoeQueryInfo, ISearchRequest>
     {
+        private static readonly Regex RegexPrefix = new Regex(@"(regexp|rp|re|reg|r):(?<exp>.*)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
         private readonly IPoePriceCalculcator toChaosCalculcator;
         public PoeQueryInfoToSearchRequestConverter(IPoePriceCalculcator toChaosCalculcator)
         {
@@ -46,6 +49,7 @@ namespace PoeEye.ExileToolsApi.Prism
             result.Query &= PrepareSocketsLinksQuery(source);
             result.Query &= PreparePriceQuery(source);
             result.Query &= PrepareFilterByAccountName(source);
+            result.Query &= PrepareFilterByName(source);
 
             result.Query &= new BoolQuery
             {
@@ -145,22 +149,47 @@ namespace PoeEye.ExileToolsApi.Prism
                 CreateQuery(source.ItemType),
             };
 
-            var shouldQueries = new IEnumerable<QueryBase>[0];
-            if (!string.IsNullOrWhiteSpace(source.ItemName))
+            return new BoolQuery
             {
-                shouldQueries = new[]
+                Must = CombineQueries(mustQueries),
+            };
+        }
+
+        private QueryBase PrepareFilterByName(IPoeQueryInfo source)
+        {
+            if (string.IsNullOrWhiteSpace(source.ItemName))
+            {
+                return new BoolQuery();
+            }
+
+            var shouldQueries = new List<IEnumerable<QueryBase>>();
+
+            var regexModeMatch = RegexPrefix.Match(source.ItemName);
+            if (regexModeMatch.Success)
+            {
+                var regex = regexModeMatch.Groups["exp"].Value.Trim();
+                shouldQueries.AddRange(new[]
+                {
+                    CreateRegexQuery("info.fullName", regex, x => $".*{x}.*"),
+                    CreateRegexQuery("info.tokenized.descrText", regex, x => $".*{x}.*"),
+                    CreateRegexQuery("info.tokenized.flavourText", regex, x => $".*{x}.*"),
+                    CreateRegexQuery("info.tokenized.prophecyText", regex, x => $".*{x}.*")
+                });
+            }
+            else
+            {
+                shouldQueries.AddRange(new[]
                 {
                     CreateWildcardQuery("info.fullName", source.ItemName, x => $"*{x}*"),
                     CreateWildcardQuery("info.tokenized.descrText", source.ItemName, x => $"*{x}*"),
                     CreateWildcardQuery("info.tokenized.flavourText", source.ItemName, x => $"*{x}*"),
-                    CreateWildcardQuery("info.tokenized.prophecyText", source.ItemName, x => $"*{x}*"),
-                };
+                    CreateWildcardQuery("info.tokenized.prophecyText", source.ItemName, x => $"*{x}*")
+                });
             }
 
             return new BoolQuery
             {
-                Must = CombineQueries(mustQueries),
-                Should = CombineQueries(shouldQueries),
+                Should = CombineQueries(shouldQueries.ToArray()),
                 MinimumShouldMatch = shouldQueries.Any() ? 1 : 0,
             };
         }
@@ -363,11 +392,16 @@ namespace PoeEye.ExileToolsApi.Prism
             yield return result;
         }
 
-        private IEnumerable<QueryBase> CreateRegexQuery(string fieldName, string value)
+        private IEnumerable<QueryBase> CreateRegexQuery(string fieldName, string value, Func<String, String> preprocessFunc = null)
         {
             if (string.IsNullOrWhiteSpace((string)value))
             {
                 yield break;
+            }
+
+            if (preprocessFunc != null)
+            {
+                value = preprocessFunc(value);
             }
 
             var result = new RegexpQuery
