@@ -303,7 +303,7 @@
                 </i:Interaction.Triggers>
               </Button>
 
-              <ContentPresenter Grid.Column="1"
+              <ContentControl Grid.Column="1"
                                 Content="{Binding Trade}"
                                 ContentTemplate="{StaticResource PoeItemNameTemplateKey}"
                                 VerticalAlignment="Center"
@@ -315,7 +315,7 @@
                                            PropertyValue="{Binding ElementName=ExpanderRaw, Path=IsExpanded, Converter={StaticResource BoolInversionConverter}}" />
                   </i:EventTrigger>
                 </i:Interaction.Triggers>
-              </ContentPresenter>
+              </ContentControl>
 
               <StackPanel Grid.Column="2"
                           Orientation="Horizontal">
@@ -487,11 +487,13 @@
         </ContentControl>
 
         <Border Grid.Row="3" Grid.Column="1" 
-                Visibility="{Binding Trade.Raw, Converter={StaticResource NullToCollapsedConverter}, Mode=OneWay}">
+                Visibility="{Binding Trade.Raw, Converter={StaticResource NullToCollapsedConverter}, Mode=OneWay}"
+                MaxWidth ="600" MaxHeight="400" >
             <Expander Header="Raw item info" 
                       Name="ExpanderRaw"
                       Visibility="{Binding RelativeSource={RelativeSource Self}, Path=IsExpanded, Converter={StaticResource BoolFalseToCollapsedConverter}}">
-              <TextBox Text="{Binding Trade.Raw}" IsEnabled="True" IsReadOnly="True" MaxHeight="400" 
+              <TextBox Text="{Binding Trade.Raw}" IsEnabled="True" IsReadOnly="True" 
+                       TextWrapping="Wrap"
                        VerticalScrollBarVisibility="Visible"
                        HorizontalScrollBarVisibility="Visible"/>
             </Expander>

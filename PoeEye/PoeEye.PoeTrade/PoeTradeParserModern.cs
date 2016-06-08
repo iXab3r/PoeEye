@@ -211,7 +211,7 @@ namespace PoeEye.PoeTrade
                 Mods = implicitMods.Concat(explicitMods).Where(IsValid).ToArray(),
                 Links = ExtractLinksInfo(row),
                 Rarity = ExtractItemRarity(row),
-                Raw = parser.ToString(),
+                Raw = row.Render(),
             };
             TrimProperties(result);
             return result;
