@@ -152,7 +152,7 @@ namespace PoeEye.PoeTrade.ViewModels
                 .SetProperty("Item", Trade.DumpToText())
                 .Submit();
 
-            var message = "test" ?? PreparePrivateMessage(Trade);
+            var message = PreparePrivateMessage(Trade);
             try
             {
                 notificationsManager.PlayNotification(AudioNotificationType.Keyboard);
