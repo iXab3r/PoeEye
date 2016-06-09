@@ -53,6 +53,7 @@ namespace PoeEye.PoeTrade.ViewModels
             Observable.Merge(
                     chatService.WhenAnyValue(x => x.IsAvailable).ToUnit(),
                     this.WhenAnyValue(x => x.MessageToSend).ToUnit())
+                .ObserveOn(uiScheduler)
                 .Subscribe(sendMessageCommand.RaiseCanExecuteChanged)
                 .AddTo(Anchors);
 
