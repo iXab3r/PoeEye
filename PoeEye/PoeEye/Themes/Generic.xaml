@@ -14,6 +14,13 @@
     <Setter Property="VerticalContentAlignment" Value="Center" />
   </Style>
 
+  <Style TargetType="{x:Type Button}" x:Key="IconButton" BasedOn="{StaticResource {x:Type Button}}">
+    <Setter Property="FontFamily" Value="{StaticResource FontAwesome}" />
+    <Setter Property="FontSize" Value="16" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+  </Style>
+
   <Style TargetType="{x:Type ToggleButton}" x:Key="ToggleCircleButton" BasedOn="{StaticResource MetroCircleToggleButtonStyle}">
     <Setter Property="FontFamily" Value="{StaticResource FontAwesome}" />
     <Setter Property="FontSize" Value="16" />
