@@ -12,13 +12,13 @@
     using PoeShared;
     using PoeShared.Scaffolding;
 
-    internal sealed class PoeTracker : DisposableReactiveObject
+    internal sealed class PoeTracker : DisposableReactiveObject, IPoeTracker
     {
         private static readonly string PathOfExileProcessName = "PathOfExile";
 
         private static readonly TimeSpan RecheckTimeout = TimeSpan.FromSeconds(10);
 
-        private readonly ISubject<PoeProcessInfo[]> processeSubject = new Subject<PoeProcessInfo[]>();
+        private readonly ISubject<PoeProcessInfo[]> processeSubject = new BehaviorSubject<PoeProcessInfo[]>(new PoeProcessInfo[0]);
 
         public PoeTracker()
         {
@@ -55,7 +55,6 @@
             Log.Instance.Debug($"[PoeTracker] Processes list have changed(count: {processes.Length}): \r\n\t{string.Join("\r\n\t", processes)}");
         }
 
-        [CanBeNull]
         private PoeProcessInfo ToProcessInfo(Process process)
         {
             try
@@ -63,7 +62,8 @@
                 var result = new PoeProcessInfo
                 {
                     ProcessId = process.Id,
-                    Executable = new FileInfo(process.MainModule.FileName)
+                    Executable = new FileInfo(process.MainModule.FileName),
+                    MainWindow = process.MainWindowHandle,
                 };
 
                 return result;

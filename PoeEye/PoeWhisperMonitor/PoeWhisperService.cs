@@ -1,4 +1,7 @@
-﻿namespace PoeWhisperMonitor
+﻿using Guards;
+using JetBrains.Annotations;
+
+namespace PoeWhisperMonitor
 {
     using System;
     using System.Collections.Generic;
@@ -18,9 +21,9 @@
         private readonly ISubject<PoeMessage> messagesSubject = new Subject<PoeMessage>();
         private readonly IDictionary<string, IDisposable> sourcesByPath = new Dictionary<string, IDisposable>();
 
-        public PoeWhisperService()
+        public PoeWhisperService([NotNull] IPoeTracker tracker)
         {
-            var tracker = new PoeTracker();
+            Guard.ArgumentNotNull(() => tracker);
             var converter = new PoeProcessToLogFilePathConverter();
 
             tracker.AddTo(Anchors);

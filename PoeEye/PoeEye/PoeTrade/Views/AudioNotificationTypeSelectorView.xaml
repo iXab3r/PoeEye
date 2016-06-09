@@ -15,10 +15,14 @@
         <ToggleButton.Style>
           <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource ToggleCircleButton}" >
             <Setter Property="Content" Value="{x:Static net:FontAwesome.volume_off}" />
+            <Setter Property="Background" Value="{StaticResource ControlBackgroundBrush}" />
             <Style.Triggers>
               <Trigger Property="IsChecked" Value="True">
                 <Setter Property="Content" Value="{x:Static net:FontAwesome.volume_up}" />
               </Trigger>
+              <DataTrigger Binding="{Binding SelectedValue}" Value="{x:Static poeTrade:AudioNotificationType.Silence}">
+                <Setter Property="Background" Value="{StaticResource ControlsDisabledBrush}" />
+              </DataTrigger>
             </Style.Triggers>
           </Style>
         </ToggleButton.Style>

@@ -379,6 +379,12 @@
     <Compile Include="Prism\PoeEyeBootstrapper.cs" />
     <Compile Include="Prism\WellKnownSchedulers.cs" />
     <Compile Include="Prism\WellKnownWindows.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Resources\Notifications\SoundLibrary.cs" />
     <Compile Include="Utilities\ContextMenuServiceExtensions.cs" />
     <Compile Include="Utilities\EditableTuple.cs" />
     <Compile Include="Utilities\FilterExtension\CollectionViewSourceFilteringBehavior.cs" />
@@ -394,11 +400,6 @@
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Settings.settings</DependentUpon>
@@ -406,8 +407,8 @@
     </Compile>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
@@ -629,13 +630,17 @@
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Resources\Notifications\electro.wav" />
-    <Content Include="Resources\Notifications\icq.wav" />
-    <Content Include="Resources\Notifications\ironvoice.wav" />
-    <Content Include="Resources\Notifications\matrix.wav" />
-    <Content Include="Resources\Notifications\minions-tadaa.wav" />
-    <Content Include="Resources\Notifications\pizzicato.wav" />
-    <Content Include="Resources\Notifications\whistle.wav" />
+    <EmbeddedResource Include="Resources\Notifications\bell.wav" />
+    <EmbeddedResource Include="Resources\Notifications\dingdong.wav" />
+    <EmbeddedResource Include="Resources\Notifications\keyboard.wav" />
+    <EmbeddedResource Include="Resources\Notifications\minions.wav" />
+    <EmbeddedResource Include="Resources\Notifications\ping.wav" />
+    <EmbeddedResource Include="Resources\Notifications\pizzicato.wav" />
+    <EmbeddedResource Include="Resources\Notifications\whistle.wav" />
+    <EmbeddedResource Include="Resources\Notifications\wob.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Notifications\whisper.wav" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <UsingTask TaskName="CosturaCleanup" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll" TaskFactory="CodeTaskFactory">

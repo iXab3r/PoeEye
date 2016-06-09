@@ -5,10 +5,13 @@
         Disabled,
         Whistle,
         Whisper,
-        IronVoice,
-        Electro,
+        Bell,
+        Ping,
+        Wob,
+        DingDong,
         Minions,
-        Matrix,
-        Pizzicato
+        Pizzicato,
+        Silence,
+        Keyboard
     }
 }

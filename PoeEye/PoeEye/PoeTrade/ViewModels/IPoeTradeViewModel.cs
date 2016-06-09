@@ -10,7 +10,7 @@
 
     internal interface IPoeTradeViewModel : IDisposableReactiveObject
     {
-        ICommand CopyPmMessageToClipboardCommand { [NotNull] get; }
+        ICommand CopyPrivateMessageToClipboardCommand { [NotNull] get; }
 
         IPoeItemMod[] ExplicitMods { [NotNull] get; }
 

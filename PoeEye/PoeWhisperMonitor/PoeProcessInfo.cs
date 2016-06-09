@@ -1,3 +1,5 @@
+using System;
+
 namespace PoeWhisperMonitor
 {
     using System.Collections.Generic;
@@ -8,6 +10,8 @@ namespace PoeWhisperMonitor
         public int ProcessId { get; set; }
 
         public FileInfo Executable { get; set; }
+
+        public IntPtr MainWindow { get; set; }
 
         private sealed class ExecutableEqualityComparer : IEqualityComparer<PoeProcessInfo>
         {
@@ -26,7 +30,7 @@ namespace PoeWhisperMonitor
 
         public override string ToString()
         {
-            return $"[PoE] '{Executable?.FullName}' (PID 0x{ProcessId:X8})";
+            return $"[PoE] '{Executable?.FullName}' (PID 0x{ProcessId:X8}, HWND 0x{MainWindow.ToInt64():X8})";
         }
     }
 }

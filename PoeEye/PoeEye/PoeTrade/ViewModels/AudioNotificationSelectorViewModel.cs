@@ -35,10 +35,17 @@ namespace PoeEye.PoeTrade.ViewModels
             playNotificationCommand.Subscribe(PlayNotificationCommandExecuted).AddTo(Anchors);
             PlayNotificationCommand = playNotificationCommand;
 
-            Enum.GetValues(typeof(AudioNotificationType))
-                .Cast<AudioNotificationType>()
-                .Select(x => new NotificationTypeWrapper(this, x, x.ToString()))
-                .ForEach(Items.Add);
+            Items.AddRange(new[]
+            {
+                AudioNotificationType.Disabled,
+                AudioNotificationType.Silence,
+                AudioNotificationType.Whistle,
+                AudioNotificationType.Bell,
+                AudioNotificationType.DingDong,
+                AudioNotificationType.Ping,
+                AudioNotificationType.Minions,
+                AudioNotificationType.Wob,
+            }.Select(x => new NotificationTypeWrapper(this, x, x.ToString())));
 
             this.WhenAnyValue(x => x.AudioEnabled)
                 .DistinctUntilChanged()

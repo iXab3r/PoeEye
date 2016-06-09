@@ -477,11 +477,17 @@
                          Text="{Binding Path=Trade.UserIgn, Mode=OneWay, StringFormat='IGN: {0}'}" />
 
               <Button Grid.Column="7"
-                      Command="{Binding CopyPmMessageToClipboardCommand}"
+                      Command="{Binding CopyPrivateMessageToClipboardCommand}"
                       Width="30" Height="30" Style="{StaticResource MetroCircleButtonStyle}"
                       FontFamily="{DynamicResource FontAwesome}"
                       Content="{x:Static net:FontAwesome.clipboard}"
-                      ToolTip="Copy PM to clipboard" />
+                      ToolTip="Copy PM to clipboard">
+                <Button.InputBindings>
+                  <MouseBinding MouseAction="RightClick" 
+                                Command="{Binding SendPrivateMessageCommand}"
+                                CommandParameter="{Binding}"/>
+                </Button.InputBindings>
+              </Button>
             </Grid>
           </Border>
         </ContentControl>

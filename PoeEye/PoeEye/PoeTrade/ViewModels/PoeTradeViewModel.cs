@@ -1,4 +1,6 @@
-﻿using PoeEye.Converters;
+﻿using System.Threading;
+using PoeEye.Converters;
+using PoeWhisperMonitor.Chat;
 
 namespace PoeEye.PoeTrade.ViewModels
 {
@@ -33,8 +35,11 @@ namespace PoeEye.PoeTrade.ViewModels
     internal sealed class PoeTradeViewModel : DisposableReactiveObject, IPoeTradeViewModel
     {
         private static readonly TimeSpan RefreshTimeout = TimeSpan.FromMinutes(1);
+        private readonly IPoeChatService chatService;
+        private readonly IAudioNotificationsManager notificationsManager;
         private readonly IClock clock;
-        private readonly ReactiveCommand<object> copyPmMessageToClipboardCommand = ReactiveCommand.Create();
+        private readonly ReactiveCommand<object> copyPrivateMessageToClipboardCommand = ReactiveCommand.Create();
+        private readonly ReactiveCommand<object> sendPrivateMessageCommand = ReactiveCommand.Create();
 
         private readonly ReactiveCommand<object> openForumUriCommand;
 
@@ -43,6 +48,8 @@ namespace PoeEye.PoeTrade.ViewModels
         public PoeTradeViewModel(
             [NotNull] IPoeItem poeItem,
             [NotNull] IPoePriceCalculcator poePriceCalculcator,
+            [NotNull] IPoeChatService chatService,
+            [NotNull] IAudioNotificationsManager notificationsManager,
             [NotNull] IFactory<ImageViewModel, Uri> imageViewModelFactory,
             [NotNull] IFactory<PoeLinksInfoViewModel, IPoeLinksInfo> linksViewModelFactory,
             [NotNull] [Dependency(WellKnownSchedulers.Ui)] IScheduler uiScheduler,
@@ -50,17 +57,23 @@ namespace PoeEye.PoeTrade.ViewModels
         {
             Guard.ArgumentNotNull(() => poeItem);
             Guard.ArgumentNotNull(() => poePriceCalculcator);
+            Guard.ArgumentNotNull(() => chatService);
+            Guard.ArgumentNotNull(() => notificationsManager);
             Guard.ArgumentNotNull(() => imageViewModelFactory);
             Guard.ArgumentNotNull(() => linksViewModelFactory);
             Guard.ArgumentNotNull(() => uiScheduler);
             Guard.ArgumentNotNull(() => clock);
 
+            this.chatService = chatService;
+            this.notificationsManager = notificationsManager;
             this.clock = clock;
             Trade = poeItem;
-            copyPmMessageToClipboardCommand.Subscribe(CopyPmMessageToClipboardCommandExecute);
+
+            copyPrivateMessageToClipboardCommand.Subscribe(CopyPrivateMessageToClipboardCommandExecuted).AddTo(Anchors);
+            sendPrivateMessageCommand.Subscribe(SendPrivateMessageCommandExecuted).AddTo(Anchors);
 
             openForumUriCommand = ReactiveCommand.Create(Observable.Return(OpenForumUriCommandCanExecute()));
-            openForumUriCommand.Subscribe(OpenForumUriCommandExecute).AddTo(Anchors);
+            openForumUriCommand.Subscribe(OpenForumUriCommandExecuted).AddTo(Anchors);
 
             Uri imageUri;
             if (!string.IsNullOrWhiteSpace(poeItem.ItemIconUri) && Uri.TryCreate(poeItem.ItemIconUri, UriKind.Absolute, out imageUri))
@@ -114,9 +127,11 @@ namespace PoeEye.PoeTrade.ViewModels
 
         public IPoeItem Trade { get; }
 
-        public ICommand CopyPmMessageToClipboardCommand => copyPmMessageToClipboardCommand;
+        public ICommand CopyPrivateMessageToClipboardCommand => copyPrivateMessageToClipboardCommand;
 
-        private void OpenForumUriCommandExecute(object arg)
+        public ICommand SendPrivateMessageCommand => sendPrivateMessageCommand;
+
+        private void OpenForumUriCommandExecuted(object arg)
         {
             Guard.ArgumentIsTrue(() => OpenForumUriCommandCanExecute());
 
@@ -129,7 +144,27 @@ namespace PoeEye.PoeTrade.ViewModels
             return Uri.TryCreate(Trade.TradeForumUri, UriKind.Absolute, out tradeForumUri);
         }
 
-        private void CopyPmMessageToClipboardCommandExecute(object arg)
+        private void SendPrivateMessageCommandExecuted(object arg)
+        {
+            ExceptionlessClient.Default
+                .CreateFeatureUsage("TradeList")
+                .SetType("SendPrivateMesage")
+                .SetProperty("Item", Trade.DumpToText())
+                .Submit();
+
+            var message = "test" ?? PreparePrivateMessage(Trade);
+            try
+            {
+                notificationsManager.PlayNotification(AudioNotificationType.Keyboard);
+                var result = chatService.SendMessage(message);
+            }
+            catch (Exception ex)
+            {
+                Log.Instance.Warn($"Failed to send private message '{message}'", ex);
+            }
+        }
+
+        private void CopyPrivateMessageToClipboardCommandExecuted(object arg)
         {
             ExceptionlessClient.Default
                 .CreateFeatureUsage("TradeList")
@@ -137,20 +172,15 @@ namespace PoeEye.PoeTrade.ViewModels
                 .SetProperty("Item", Trade.DumpToText())
                 .Submit();
 
-            string message = null;
-
-            if (!string.IsNullOrWhiteSpace(Trade.SuggestedPrivateMessage))
+            var message = PreparePrivateMessage(Trade);
+            try
             {
-                message = Trade.SuggestedPrivateMessage;
+                Clipboard.SetText(message);
             }
-            else
+            catch (Exception ex)
             {
-                message = string.IsNullOrWhiteSpace(Trade.Price)
-                    ? $"@{Trade.UserIgn} Hi, I would like to buy your {Trade.ItemName} listed in {Trade.League}, offer is "
-                    : $"@{Trade.UserIgn} Hi, I would like to buy your {Trade.ItemName} listed for {Trade.Price} in {Trade.League}";
+                Log.Instance.Warn($"Failed to send private message '{message}'", ex);
             }
-
-            Clipboard.SetText(message);
         }
 
         private void OpenUri(string uri)
@@ -169,6 +199,22 @@ namespace PoeEye.PoeTrade.ViewModels
             {
                 Log.Instance.Warn($"Failed to open forum Uri '{uri}'", ex);
             }
+        }
+
+        private static string PreparePrivateMessage(IPoeItem trade)
+        {
+            string message;
+            if (!string.IsNullOrWhiteSpace(trade.SuggestedPrivateMessage))
+            {
+                message = trade.SuggestedPrivateMessage;
+            }
+            else
+            {
+                message = string.IsNullOrWhiteSpace(trade.Price)
+                    ? $"@{trade.UserIgn} Hi, I would like to buy your {trade.ItemName} listed in {trade.League}, offer is "
+                    : $"@{trade.UserIgn} Hi, I would like to buy your {trade.ItemName} listed for {trade.Price} in {trade.League}";
+            }
+            return message;
         }
     }
 }

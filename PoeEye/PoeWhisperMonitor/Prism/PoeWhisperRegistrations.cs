@@ -1,4 +1,7 @@
-﻿namespace PoeWhisperMonitor.Prism
+﻿using PoeShared.Scaffolding;
+using PoeWhisperMonitor.Chat;
+
+namespace PoeWhisperMonitor.Prism
 {
     using Microsoft.Practices.Unity;
 
@@ -7,7 +10,9 @@
         protected override void Initialize()
         {
             Container
-                .RegisterType<IPoeWhisperService, PoeWhisperService>();
+                .RegisterSingleton<IPoeTracker, PoeTracker>()
+                .RegisterSingleton<IPoeChatService, PoeChatService>()
+                .RegisterSingleton<IPoeWhisperService, PoeWhisperService>();
         }
     }
 }

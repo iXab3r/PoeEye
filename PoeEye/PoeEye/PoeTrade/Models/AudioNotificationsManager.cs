@@ -1,4 +1,10 @@
-﻿namespace PoeEye.PoeTrade.Models
+﻿using System.Globalization;
+using System.Linq;
+using System.Reflection;
+using System.Resources;
+using PoeEye.Resources.Notifications;
+
+namespace PoeEye.PoeTrade.Models
 {
     using System;
     using System.Collections.Generic;
@@ -12,8 +18,6 @@
 
     using JetBrains.Annotations;
 
-    using PoeEye.Properties;
-
     using PoeShared;
     using PoeShared.Scaffolding;
 
@@ -21,28 +25,27 @@
 
     internal sealed class AudioNotificationsManager : DisposableReactiveObject, IAudioNotificationsManager
     {
-        private readonly IDictionary<AudioNotificationType, byte[]> knownNotifications = new Dictionary<AudioNotificationType, byte[]>
+        private readonly IDictionary<AudioNotificationType, byte[]> knownNotifications = new Dictionary
+            <AudioNotificationType, byte[]>
         {
-            { AudioNotificationType.Whistle, Resources.whistle},
-            { AudioNotificationType.Pizzicato, Resources.pizzicato},
-            { AudioNotificationType.Matrix, Resources.matrix},
-            { AudioNotificationType.IronVoice, Resources.ironvoice},
-            { AudioNotificationType.Electro, Resources.electro},
-            { AudioNotificationType.Minions, Resources.minions_tadaa},
-            { AudioNotificationType.Whisper, Resources.icq}
+            {AudioNotificationType.Silence, new byte[0]},
         };
 
         private bool isEnabled;
 
-        public AudioNotificationsManager([NotNull] IPoeEyeConfigProvider poeEyeConfigProvider)
+        public AudioNotificationsManager([NotNull] IPoeEyeConfigProvider poeEyeConfigProvider) 
         {
             Guard.ArgumentNotNull(() => poeEyeConfigProvider);
+
+            Log.Instance.Debug($"[AudioNotificationsManager..ctor] Initializing sound subsystem...");
+            Initialize();
 
             var playNotificationCommandCanExecute = poeEyeConfigProvider
                 .WhenAnyValue(x => x.ActualConfig)
                 .Select(x => x.AudioNotificationsEnabled);
 
-            var playNotificationCommand = new ReactiveCommand<AudioNotificationType>(playNotificationCommandCanExecute, x => Observable.Return((AudioNotificationType)x));
+            var playNotificationCommand = new ReactiveCommand<AudioNotificationType>(
+                playNotificationCommandCanExecute, x => Observable.Return((AudioNotificationType) x));
             playNotificationCommand
                 .Where(x => x != AudioNotificationType.Disabled)
                 .Subscribe(PlayNotification)
@@ -67,16 +70,45 @@
             byte[] notificationData;
             if (!knownNotifications.TryGetValue(notificationType, out notificationData))
             {
-                Log.Instance.Warn($"[AudioNotificationsManager] Unknown notification type - {notificationType}, known notifications: {string.Join(", ", knownNotifications.Keys)}");
+                Log.Instance.Warn(
+                    $"[AudioNotificationsManager] Unknown notification type - {notificationType}, known notifications: {string.Join(", ", knownNotifications.Keys.Select(x => x.ToString()))}");
                 return;
             }
 
-            Log.Instance.Debug($"[AudioNotificationsManager] Starting playback of {notificationType} ({notificationData.Length}b)...");
+            if (!notificationData.Any())
+            {
+                Log.Instance.Debug($"[AudioNotificationsManager] No sound data loaded for notification of type {notificationData}");
+                return;
+            }
+
+            Log.Instance.Debug(
+                $"[AudioNotificationsManager] Starting playback of {notificationType} ({notificationData.Length}b)...");
             using (var stream = new MemoryStream(notificationData))
             using (var notificationSound = new SoundPlayer(stream))
             {
                 notificationSound.Play();
             }
+        }
+
+        private void Initialize()
+        {
+            Log.Instance.Debug(
+                $"[AudioNotificationsManager.Initialize] Pre-defined notification list: {knownNotifications.Select(x => $"{x.Key} : {x.Value.Length}b")}");
+
+            foreach (var notificationType in Enum.GetValues(typeof(AudioNotificationType)).Cast<AudioNotificationType>())
+            {
+                byte[] soundData;
+                var notificationName = notificationType.ToString().ToLower();
+                if (!SoundLibrary.TryToLoadSoundByName(notificationName, out soundData))
+                {
+                    Log.Instance.Warn($"[AudioNotificationsManager.Initialize] Failed to load notification {notificationType}");
+                    continue;
+                }
+                knownNotifications.Add(notificationType, soundData);
+            }
+
+            Log.Instance.Debug(
+                $"[AudioNotificationsManager.Initialize] Known notification list: {knownNotifications.Select(x => $"{x.Key} : {x.Value.Length}b")}");
         }
     }
 }
