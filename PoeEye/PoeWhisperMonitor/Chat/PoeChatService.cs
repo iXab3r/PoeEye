@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Windows;
 using Guards;
 using JetBrains.Annotations;
 using KeyboardApi;
@@ -16,7 +18,8 @@ namespace PoeWhisperMonitor.Chat
         private bool isAvailable;
         private ConcurrentQueue<PoeProcessInfo> knownProcesses = new ConcurrentQueue<PoeProcessInfo>();
 
-        public PoeChatService([NotNull] IPoeTracker tracker)
+        public PoeChatService(
+            [NotNull] IPoeTracker tracker)
         {
             Guard.ArgumentNotNull(() => tracker);
 
@@ -52,7 +55,8 @@ namespace PoeWhisperMonitor.Chat
             {
                 Log.Instance.Debug(
                     $"[PoeChatService.SendMessage] Sending chat message '{message}' to process {process}...");
-                Messaging.SendChatTextSend(process.MainWindow, message);
+
+                SendMessageInternal(process.MainWindow, message);
             }
             catch (Exception ex)
             {
@@ -68,6 +72,15 @@ namespace PoeWhisperMonitor.Chat
         {
             knownProcesses = new ConcurrentQueue<PoeProcessInfo>(processes);
             IsAvailable = processes.Any();
+        }
+
+        private void SendMessageInternal(IntPtr hWnd, string message)
+        {
+            Clipboard.SetText(message);
+
+            Messaging.SendMessage(hWnd, new VKey(Messaging.VKeys.KEY_RETURN), true);
+            Messaging.ForegroundKeyPressAll(hWnd, new VKey(Messaging.VKeys.KEY_V, Messaging.VKeys.KEY_CONTROL, Messaging.ShiftType.CTRL), false, true, false);
+            Messaging.SendMessage(hWnd, new VKey(Messaging.VKeys.KEY_RETURN), true);
         }
     }
 }

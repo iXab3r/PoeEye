@@ -17,12 +17,15 @@ namespace PoeWhisperMonitor
         {
             public bool Equals(PoeProcessInfo x, PoeProcessInfo y)
             {
-                return Equals(x.Executable?.FullName, y.Executable?.FullName);
+                return x.ProcessId == y.ProcessId && Equals(x.Executable?.FullName, y.Executable?.FullName);
             }
 
             public int GetHashCode(PoeProcessInfo obj)
             {
-                return obj.Executable?.GetHashCode() ?? 0;
+                unchecked
+                {
+                    return (obj.ProcessId*397) ^ (obj.Executable?.GetHashCode() ?? 0);
+                }
             }
         }
 
