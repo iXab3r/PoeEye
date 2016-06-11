@@ -71,6 +71,7 @@ namespace PoeEye.PoeTrade
                 CreateArgument("base", source.ItemBase),
                 CreateArgument("name", source.ItemName),
                 CreateArgument("league", source.League),
+                CreateArgument("seller", source.AccountName),
                 CreateArgument("sockets_r", source.SocketsR),
                 CreateArgument("sockets_g", source.SocketsG),
                 CreateArgument("sockets_b", source.SocketsB),

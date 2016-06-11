@@ -118,8 +118,8 @@ namespace PoeEye.ExileToolsApi.Prism
 
             var chaosEquivalentQuery = CreateRangeBasedRequest(
                     "shop.chaosEquiv",
-                    toChaosCalculcator.GetEquivalentInChaosOrbs(minPrice).Value,
-                    toChaosCalculcator.GetEquivalentInChaosOrbs(maxPrice).Value);
+                    source.BuyoutMin == null ? default(float?) : toChaosCalculcator.GetEquivalentInChaosOrbs(minPrice).Value,
+                    source.BuyoutMax == null ? default(float?) : toChaosCalculcator.GetEquivalentInChaosOrbs(maxPrice).Value);
 
             return new BoolQuery { Must = CombineQueries(mustQueries) } || new BoolQuery { Must = CombineQueries(chaosEquivalentQuery) };
         }

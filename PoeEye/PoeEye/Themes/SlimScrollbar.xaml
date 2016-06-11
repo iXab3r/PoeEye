@@ -71,7 +71,7 @@
                 </Setter.Value>
               </Setter>
               <Setter Property="Width" Value="Auto" />
-              <Setter Property="Height" Value="12" />
+              <Setter Property="Height" Value="30" />
               <Setter TargetName="Thumb" Property="Tag" Value="Horizontal" />
               <Setter TargetName="PageDown" Property="Command" Value="ScrollBar.PageLeftCommand" />
               <Setter TargetName="PageUp" Property="Command" Value="ScrollBar.PageRightCommand" />
