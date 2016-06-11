@@ -1,10 +1,10 @@
-﻿using PoeEye.PoeTrade;
+﻿using Exceptionless.Json;
+using PoeEye.PoeTrade;
 
 namespace PoeEye.Config
 {
     using System;
 
-    using PoeShared.Common;
     using PoeShared.PoeTrade;
 
     internal struct PoeEyeTabConfig
@@ -14,8 +14,6 @@ namespace PoeEye.Config
         public bool IsAutoRecheckEnabled { get; set; }
 
         public IPoeQueryInfo QueryInfo { get; set; }
-
-        public IPoeItem[] SoldOrRemovedItems { get; set; }
 
         public AudioNotificationType NotificationType { get; set; }
 

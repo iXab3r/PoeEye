@@ -1,4 +1,5 @@
 ﻿using System.Reactive;
+using PoeShared;
 
 namespace PoeEye.PoeTrade.ViewModels
 {
@@ -58,7 +59,7 @@ namespace PoeEye.PoeTrade.ViewModels
                 IsLiveFilteringRequested = true,
                 IsLiveSortingRequested = true,
                 IsLiveGroupingRequested = true,
-                Source = tradesCollection
+                Source = tradesCollection,
             };
 
             source.LiveFilteringProperties.Add(null);
@@ -169,27 +170,34 @@ namespace PoeEye.PoeTrade.ViewModels
 
         private void MarkAllAsReadExecuted()
         {
-            var tabsToProcess = collectionByTab.Keys.Where(x => x.AudioNotificationSelector.SelectedValue != AudioNotificationType.Disabled).ToArray();
+            var tabsToProcess = collectionByTab
+                .Keys
+                .Where(x => x.AudioNotificationSelector.SelectedValue != AudioNotificationType.Disabled)
+                .ToArray();
             tabsToProcess.ForEach(x => x.MarkAllAsReadCommand.Execute(null));
         }
 
         private void ProcessTabsCollectionChange(IEnumerable<IMainWindowTabViewModel> tabs, NotifyCollectionChangedEventArgs args)
         {
-            var newItems = args.NewItems?.Cast<IMainWindowTabViewModel>() ?? new IMainWindowTabViewModel[0];
-            var oldItems = args.OldItems?.Cast<IMainWindowTabViewModel>() ?? new IMainWindowTabViewModel[0];
+            var newItems = args.NewItems?.Cast<IMainWindowTabViewModel>().ToArray() ?? new IMainWindowTabViewModel[0];
+            var oldItems = args.OldItems?.Cast<IMainWindowTabViewModel>().ToArray() ?? new IMainWindowTabViewModel[0];
             switch (args.Action)
             {
                 case NotifyCollectionChangedAction.Add:
+                    Log.Instance.Debug($"[PoeSummaryTabViewModel.TabsCollectionChange.Add] New items count: {newItems.Count()}");
                     newItems.ForEach(ProcessAddTab);
                     break;
                 case NotifyCollectionChangedAction.Remove:
+                    Log.Instance.Debug($"[PoeSummaryTabViewModel.TabsCollectionChange.Remove] Removed items count: {oldItems.Count()}");
                     oldItems.ForEach(ProcessRemoveTab);
                     break;
                 case NotifyCollectionChangedAction.Replace:
+                    Log.Instance.Debug($"[PoeSummaryTabViewModel.TabsCollectionChange.Replace] New items count: {newItems.Count()}, Removed items count: {oldItems.Count()}");
                     oldItems.ForEach(ProcessRemoveTab);
                     newItems.ForEach(ProcessAddTab);
                     break;
                 case NotifyCollectionChangedAction.Reset:
+                    Log.Instance.Debug($"[PoeSummaryTabViewModel.TabsCollectionChange.Reset] Resetting... tabs count: {collectionByTab.Count}");
                     collectionByTab.Keys.ToArray().ForEach(ProcessRemoveTab);
                     tabs.ForEach(ProcessAddTab);
                     break;
@@ -227,16 +235,20 @@ namespace PoeEye.PoeTrade.ViewModels
             switch (args.Action)
             {
                 case NotifyCollectionChangedAction.Add:
+                    Log.Instance.Debug($"[PoeSummaryTabViewModel.ItemsChanged.Add] Owner: {tab.TabName}, new items count: {newItems.Count()}");
                     ProcessAddTrade(tab, newItems);
                     break;
                 case NotifyCollectionChangedAction.Remove:
+                    Log.Instance.Debug($"[PoeSummaryTabViewModel.ItemsChanged.Remove] Owner: {tab.TabName}, removed items count: {oldItems.Count()}");
                     ProcessRemoveTrade(tab, oldItems);
                     break;
                 case NotifyCollectionChangedAction.Replace:
+                    Log.Instance.Debug($"[PoeSummaryTabViewModel.ItemsChanged.Replace] Owner: {tab.TabName}, new items count: {newItems.Count()}, removed items count: {oldItems.Count()}");
                     ProcessRemoveTrade(tab, oldItems);
                     ProcessAddTrade(tab, newItems);
                     break;
                 case NotifyCollectionChangedAction.Reset:
+                    Log.Instance.Debug($"[PoeSummaryTabViewModel.ItemsChanged.Reset] Owner: {tab.TabName}, resetting... items count: {tab.TradesList.Items.Count}");
                     ProcessResetTabTrades(tab, tab.TradesList.Items.ToArray());
                     break;
             }

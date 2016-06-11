@@ -184,12 +184,6 @@ namespace PoeEye.PoeTrade.ViewModels
                 Query.IsExpanded = true;
             }
 
-            if (config.SoldOrRemovedItems != null)
-            {
-                TradesList.HistoricalTrades.Clear();
-                TradesList.HistoricalTrades.AddItems(config.SoldOrRemovedItems);
-            }
-
             AudioNotificationSelector.SelectedValue = config.NotificationType;
         }
 
@@ -201,7 +195,6 @@ namespace PoeEye.PoeTrade.ViewModels
                 IsAutoRecheckEnabled = RecheckPeriod.IsAutoRecheckEnabled,
                 QueryInfo = Query.PoeQueryBuilder(),
                 NotificationType = AudioNotificationSelector.SelectedValue,
-                SoldOrRemovedItems = TradesList.HistoricalTrades.ItemsViewModels.Select(x => x.Trade).ToArray(),
                 ApiModuleName = ApiSelector.SelectedModule.Name,
             };
         }

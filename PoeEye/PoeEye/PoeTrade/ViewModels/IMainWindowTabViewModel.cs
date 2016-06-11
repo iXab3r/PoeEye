@@ -26,6 +26,8 @@ namespace PoeEye.PoeTrade.ViewModels
 
         IPoeQueryViewModel Query { get; }
 
+        string TabName { get; }
+
         void Load(PoeEyeTabConfig config);
 
         PoeEyeTabConfig Save();
