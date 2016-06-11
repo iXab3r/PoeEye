@@ -211,7 +211,6 @@
 
             poeLiveHistoryProvider
                 .WhenAnyValue(x => x.IsBusy)
-                .DistinctUntilChanged()
                 .ObserveOn(uiScheduler)
                 .Subscribe(() => this.RaisePropertyChanged(nameof(IsBusy)))
                 .AddTo(activeProviderInfo.Anchors);

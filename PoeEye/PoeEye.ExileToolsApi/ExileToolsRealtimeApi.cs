@@ -22,13 +22,13 @@ namespace PoeEye.ExileToolsApi
         private static readonly TimeSpan CleanupPeriod = TimeSpan.FromMinutes(1);
 
         private readonly ExileToolsSource exileSource;
-        private readonly IFactory<IBlockItemSource, IPoeQueryInfo> itemSourceFactory;
+        private readonly IFactory<IRealtimeItemSource, IPoeQueryInfo> itemSourceFactory;
 
-        private readonly ConcurrentDictionary<IPoeQueryInfo, IBlockItemSource> itemSources = new ConcurrentDictionary<IPoeQueryInfo, IBlockItemSource>(PoeQueryInfo.Comparer);
+        private readonly ConcurrentDictionary<IPoeQueryInfo, IRealtimeItemSource> itemSources = new ConcurrentDictionary<IPoeQueryInfo, IRealtimeItemSource>(PoeQueryInfo.Comparer);
 
         public ExileToolsRealtimeApi(
             [NotNull] ExileToolsSource exileSource,
-            [NotNull] IFactory<IBlockItemSource, IPoeQueryInfo> itemSourceFactory)
+            [NotNull] IFactory<IRealtimeItemSource, IPoeQueryInfo> itemSourceFactory)
         {
             Guard.ArgumentNotNull(() => exileSource);
             Guard.ArgumentNotNull(() => itemSourceFactory);
@@ -38,6 +38,8 @@ namespace PoeEye.ExileToolsApi
 
             Observable.Timer(DateTimeOffset.Now, CleanupPeriod).Subscribe(CleanupSources);
         }
+
+        public string Name { get; } = "(alpha) ExileTools Realtime";
 
         public Task<IPoeQueryResult> IssueQuery(IPoeQueryInfo query)
         {
@@ -58,7 +60,7 @@ namespace PoeEye.ExileToolsApi
 
         private IPoeQueryResult IssueQueryInternal(IPoeQueryInfo query)
         {
-            IBlockItemSource source;
+            IRealtimeItemSource source;
             if (!itemSources.TryGetValue(query, out source))
             {
                 Log.Instance.Debug($"[ExileToolsRealtimeApi.IssueQuery] Client for query was not found, creating a new one: {query}");
@@ -84,7 +86,7 @@ namespace PoeEye.ExileToolsApi
 
             foreach (var kvp in sourcesToRemove)
             {
-                IBlockItemSource removedSource;
+                IRealtimeItemSource removedSource;
                 itemSources.TryRemove(kvp.Key, out removedSource);
             }
         }

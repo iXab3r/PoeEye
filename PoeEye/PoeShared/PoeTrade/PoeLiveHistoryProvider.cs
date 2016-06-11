@@ -27,7 +27,7 @@ namespace PoeShared.PoeTrade
             Guard.ArgumentNotNull(() => query);
             Guard.ArgumentNotNull(() => poeApi);
 
-            var periodObservable = this.WhenAnyValue(x => x.RecheckPeriod).Merge(forceUpdatesSubject.Where(x => recheckPeriod != TimeSpan.Zero).Select(x => recheckPeriod))
+            var periodObservable = this.WhenAnyValue(x => x.RecheckPeriod)
                                        .Do(LogRecheckPeriodChange)
                                        .Select(ToTimer)
                                        .Switch()

@@ -143,9 +143,9 @@
     <Compile Include="Prism\LiveRegistrations.cs" />
     <Compile Include="Prism\ExileToolsModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RealtimeApi\BlockItemSource.cs" />
+    <Compile Include="RealtimeApi\RealtimeItemSource.cs" />
     <Compile Include="RealtimeApi\Entities\RealtimeQuery.cs" />
-    <Compile Include="RealtimeApi\IBlockItemSource.cs" />
+    <Compile Include="RealtimeApi\IRealtimeItemSource.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\PoeShared\PoeShared.csproj">

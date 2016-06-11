@@ -4,7 +4,7 @@ using PoeShared.PoeTrade.Query;
 
 namespace PoeEye.ExileToolsApi.RealtimeApi
 {
-    public interface IBlockItemSource : IDisposable
+    public interface IRealtimeItemSource : IDisposable
     {
         [NotNull]
         IPoeQueryResult GetResult();

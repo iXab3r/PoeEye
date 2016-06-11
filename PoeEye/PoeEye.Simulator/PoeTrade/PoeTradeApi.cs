@@ -11,6 +11,8 @@
 
     internal sealed class PoeTradeApi : IPoeApi
     {
+        public string Name { get; } = "SimulatorApi";
+
         public Task<IPoeQueryResult> IssueQuery(IPoeQueryInfo query)
         {
             Guard.ArgumentNotNull(() => query);

@@ -8,6 +8,8 @@
 
     public interface IPoeApi
     {
+        string Name { [NotNull] get; }
+
         [NotNull]
         Task<IPoeQueryResult> IssueQuery([NotNull] IPoeQueryInfo query);
 

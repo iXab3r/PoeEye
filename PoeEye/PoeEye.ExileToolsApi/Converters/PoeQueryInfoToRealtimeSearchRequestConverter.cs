@@ -2,11 +2,11 @@
 using System.Linq;
 using Guards;
 using JetBrains.Annotations;
-using Nest;
 using PoeEye.ExileToolsApi.Entities;
 using PoeEye.ExileToolsApi.RealtimeApi.Entities;
 using PoeShared.Common;
 using PoeShared.PoeTrade;
+using PoeShared.PoeTrade.Query;
 using TypeConverter;
 
 namespace PoeEye.ExileToolsApi.Converters
@@ -31,6 +31,8 @@ namespace PoeEye.ExileToolsApi.Converters
                 PrepareFilterByName(source),
                 PrepareSocketsColorQuery(source),
                 PreparePriceQuery(source),
+                PrepareItemTypeQuery(source),
+                PrepareModsQuery(source.ModGroups),
                 CreateEqualToQuery("shop.sellerAccount", source.AccountName),
                 CreateRangeQuery("propertiesPseudo.Weapon.estimatedQ20.Physical DPS", source.PdpsMin, source.PdpsMax),
                 CreateRangeQuery("propertiesPseudo.Weapon.estimatedQ20.Total DPS", source.DpsMin, source.DpsMax),
@@ -54,10 +56,22 @@ namespace PoeEye.ExileToolsApi.Converters
             return result;
         }
 
-        private static RealtimeQuery PrepareFilterByName(IPoeQueryInfo source)
+        private RealtimeQuery PrepareModsQuery(IEnumerable<IPoeQueryModsGroup> modGroup)
         {
-            return CreateEqualToQuery("item.fullName", source.ItemName);
+            var queries = modGroup
+                .Where(x => x.GroupType == PoeQueryModsGroupType.And)
+                .Select(x => x.Mods)
+                .Select(PrepareModsQuery)
+                .ToArray();
+
+            return Merge(queries);
         }
+
+        private RealtimeQuery PrepareModsQuery(IEnumerable<IPoeQueryRangeModArgument> mods)
+        {
+            return Merge(mods.Select(modArgument => CreateRangeQuery(modArgument.Mod.CodeName, modArgument.Min, modArgument.Max)).ToArray());
+        }
+
 
         private RealtimeQuery PreparePriceQuery(IPoeQueryInfo source)
         {
@@ -70,11 +84,27 @@ namespace PoeEye.ExileToolsApi.Converters
             var maxPrice = new PoePrice(source.BuyoutCurrencyType, source.BuyoutMax ?? 0);
 
             var chaosEquivalentQuery = CreateRangeQuery(
-                    "shop.chaosEquiv",
-                    source.BuyoutMin == null ? default(float?) : toChaosCalculcator.GetEquivalentInChaosOrbs(minPrice).Value,
-                    source.BuyoutMax == null ? default(float?) : toChaosCalculcator.GetEquivalentInChaosOrbs(maxPrice).Value);
+                "shop.chaosEquiv",
+                source.BuyoutMin == null ? default(float?) : toChaosCalculcator.GetEquivalentInChaosOrbs(minPrice).Value,
+                source.BuyoutMax == null ? default(float?) : toChaosCalculcator.GetEquivalentInChaosOrbs(maxPrice).Value);
 
             return chaosEquivalentQuery;
+        }
+
+        private static RealtimeQuery PrepareFilterByName(IPoeQueryInfo source)
+        {
+            return CreateEqualToQuery("item.fullName", source.ItemName);
+        }
+
+        private static RealtimeQuery PrepareItemTypeQuery(IPoeQueryInfo source)
+        {
+            if (source.ItemType == null)
+            {
+                return RealtimeQuery.Empty;
+            }
+            return Merge(
+                    CreateEqualToQuery("attributes.itemType", source.ItemType.ItemType),
+                    CreateEqualToQuery("attributes.equipType", source.ItemType.EquipType));
         }
 
         private RealtimeQuery PrepareSocketsColorQuery(IPoeQueryInfo source)

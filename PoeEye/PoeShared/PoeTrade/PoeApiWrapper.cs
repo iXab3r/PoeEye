@@ -23,8 +23,6 @@ namespace PoeShared.PoeTrade
             this.api = api;
             provider = queryInfoFactory.Create(api);
 
-            Name = api.GetType().Name;
-
             provider
                 .WhenAnyValue(x => x.IsBusy)
                 .Subscribe(() => this.RaisePropertyChanged(nameof(IsBusy)))
@@ -41,7 +39,7 @@ namespace PoeShared.PoeTrade
 
         public bool IsBusy => provider.IsBusy;
 
-        public string Name { get; }
+        public string Name => api.Name ?? api.GetType().Name;
 
         public override string ToString()
         {

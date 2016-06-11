@@ -38,6 +38,8 @@ namespace PoeEye.ExileToolsApi
             this.exileSource = exileSource;
         }
 
+        public string Name { get; } = "ExileTools";
+
         public Task<IPoeQueryResult> IssueQuery(IPoeQueryInfo query)
         {
             return Observable

@@ -45,6 +45,12 @@
                 .Subscribe(() => this.RaisePropertyChanged(nameof(Period)))
                 .AddTo(Anchors);
 
+            this.WhenAnyValue(x => x.IsAutoRecheckEnabled)
+                .Where(x => x)
+                .Where(x => period == TimeSpan.Zero)
+                .Subscribe(() => Period = MiddleSplit(minValue, maxValue))
+                .AddTo(Anchors);
+
             configProvider
                 .WhenAnyValue(x => x.ActualConfig)
                 .Select(x => new { x.MinRefreshTimeout, x.MaxRefreshTimeout })
@@ -79,7 +85,7 @@
 
         private TimeSpan MiddleSplit(TimeSpan min, TimeSpan max)
         {
-            return TimeSpan.FromTicks(Math.Abs(max.Ticks - min.Ticks));
+            return TimeSpan.FromTicks(Math.Abs(max.Ticks - min.Ticks) / 2);
         }
 
         private void Reinitialize(TimeSpan minRefreshTimeout, TimeSpan maxRefreshTimeout)

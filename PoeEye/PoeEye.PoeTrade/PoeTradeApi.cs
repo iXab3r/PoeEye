@@ -70,6 +70,8 @@ namespace PoeEye.PoeTrade
             this.queryInfoToQueryConverter = queryInfoToQueryConverter;
         }
 
+        public string Name { get; } = "poe.trade";
+
         public Task<IPoeQueryResult> IssueQuery(IPoeQueryInfo queryInfo)
         {
             Guard.ArgumentNotNull(() => queryInfo);

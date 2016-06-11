@@ -21,7 +21,7 @@ using TypeConverter;
 
 namespace PoeEye.ExileToolsApi.RealtimeApi
 {
-    internal sealed class BlockItemSource : IBlockItemSource
+    internal sealed class RealtimeItemSource : IRealtimeItemSource
     {
         public static readonly TimeSpan ClientKeepAliveTimeSpan = TimeSpan.FromMinutes(1);
 
@@ -41,7 +41,7 @@ namespace PoeEye.ExileToolsApi.RealtimeApi
 
         private DateTime lastFetchTime;
 
-        public BlockItemSource(
+        public RealtimeItemSource(
             [NotNull] IPoeQueryInfo query,
             [NotNull] IConverter<ItemConversionInfo, IPoeItem> poeItemConverter,
             [NotNull] IClock clock,
@@ -73,7 +73,7 @@ namespace PoeEye.ExileToolsApi.RealtimeApi
 
             var options = new IO.Options
             {
-                Query = new Dictionary<string, string> { { "pwxid", uniqueClientId } }
+                Query = new Dictionary<string, string> { { "pwxid", uniqueClientId } },
             };
 
             client = IO.Socket(@"http://rtstashapi.exiletools.com", options);
@@ -127,6 +127,16 @@ namespace PoeEye.ExileToolsApi.RealtimeApi
         {
             Log.Instance.Warn($"[BlockItemSource.Error] Error occured, client: {client}, error: {rawError}");
             lastException = new ServerException($"Exception occurred - {rawError}");
+
+            try
+            {
+                Log.Instance.Warn($"[BlockItemSource.Error] Reconnecting... client: {client}");
+                client.Disconnect().Connect();
+            }
+            catch (Exception ex)
+            {
+                Log.Instance.Error($"Exception occurred", ex);
+            }
         }
 
         private void OnClientHeartbeat(object rawHeartbeat)

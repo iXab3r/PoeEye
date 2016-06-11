@@ -43,13 +43,13 @@ namespace PoeEye.ExileToolsApi.Converters
                 Size = 50,
             };
 
-
             result.Query &= PrepareGeneralQuery(source);
             result.Query &= PrepareSocketsColorQuery(source);
             result.Query &= PrepareSocketsLinksQuery(source);
             result.Query &= PreparePriceQuery(source);
             result.Query &= PrepareFilterByAccountName(source);
             result.Query &= PrepareFilterByName(source);
+            result.Query &= PrepareItemTypeQuery(source.ItemType);
 
             result.Query &= new BoolQuery
             {
@@ -140,12 +140,10 @@ namespace PoeEye.ExileToolsApi.Converters
                 CreateRangeBasedRequest("properties.Weapon.Elemental DPS", source.EdpsMin, source.EdpsMax),
                 CreateRangeBasedRequest("properties.Armour.Chance to Block", source.BlockMin, source.BlockMax),
                 CreateRangeBasedRequest("properties.Quality", source.QualityMin, source.QualityMax),
-                CreateRangeBasedRequest("properties.Map.Item Quantity", source.IncQuantityMin, source.IncQuantityMin),
-                CreateRangeBasedRequest("properties.Map.Item Quantity", source.IncQuantityMin, source.IncQuantityMin),
+                CreateRangeBasedRequest("properties.Map.Item Quantity", source.IncQuantityMin, source.IncQuantityMax),
                 CreateTermQuery("attributes.league", source.League),
                 CreateTermQuery("attributes.rarity", source.ItemRarity != null ? source.ItemRarity.ToString() : null),
                 CreateTermQuery("shop.verified", source.OnlineOnly ? VerificationStatus.Yes : default(VerificationStatus?)),
-                CreateQuery(source.ItemType),
             };
 
             return new BoolQuery
@@ -276,6 +274,18 @@ namespace PoeEye.ExileToolsApi.Converters
             return groupQuery;
         }
 
+        private QueryBase PrepareItemTypeQuery(IPoeItemType itemType)
+        {
+            var result = new BoolQuery()
+            {
+                Must = CombineQueries(
+                    CreateTermQuery("attributes.itemType", itemType.ItemType),
+                    CreateTermQuery("attributes.equipType", itemType.EquipType))
+            };
+
+            return result;
+        }
+
         private QueryContainer[] CombineQueries(params IEnumerable<QueryBase>[] queries)
         {
             return queries.SelectMany(x => x).Select(x => new QueryContainer(x)).ToArray();
@@ -302,23 +312,6 @@ namespace PoeEye.ExileToolsApi.Converters
             {
                 yield return queryBase;
             }
-        }
-
-        private IEnumerable<QueryBase> CreateQuery(IPoeItemType itemType)
-        {
-            if (itemType == null || (string.IsNullOrWhiteSpace(itemType.ItemType) && string.IsNullOrWhiteSpace(itemType.EquipType)))
-            {
-                yield break;
-            }
-
-            var result = new BoolQuery()
-            {
-                Must = CombineQueries(
-                        CreateTermQuery("attributes.itemType", itemType.ItemType),
-                        CreateTermQuery("attributes.equipType", itemType.EquipType))
-            };
-
-            yield return result;
         }
 
         private IEnumerable<QueryBase> CreateTermRangeQuery(string fieldName, float? min, float? max)
