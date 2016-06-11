@@ -20,10 +20,10 @@ namespace PoeEye.ExileToolsApi.Prism
                 .RegisterSingleton<IConverter<ItemConversionInfo, IPoeItem>, ToPoeItemConverter>()
                 .RegisterSingleton<IConverter<IPoeQueryInfo, RealtimeQuery>, PoeQueryInfoToRealtimeSearchRequestConverter>()
                 .RegisterSingleton<IConverter<IPoeQueryInfo, ISearchRequest>, PoeQueryInfoToSearchRequestConverter>();
-            
+
             Container
-                .RegisterSingleton<IPoeApi, ExileToolsRealtimeApi>(typeof(ExileToolsRealtimeApi).FullName)
-                .RegisterSingleton<IPoeApi, ExileToolsApi>(typeof(ExileToolsApi).FullName);
+                .RegisterSingleton<IPoeApi, ExileToolsApi>(typeof(ExileToolsApi).FullName)
+                .RegisterSingleton<IPoeApi, ExileToolsRealtimeApi>($"(alpha) {typeof(ExileToolsRealtimeApi).FullName}");
         }
     }
 }
