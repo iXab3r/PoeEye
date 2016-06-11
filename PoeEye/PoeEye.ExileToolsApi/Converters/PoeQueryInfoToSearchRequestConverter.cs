@@ -49,7 +49,7 @@ namespace PoeEye.ExileToolsApi.Converters
             result.Query &= PreparePriceQuery(source);
             result.Query &= PrepareFilterByAccountName(source);
             result.Query &= PrepareFilterByName(source);
-            result.Query &= PrepareItemTypeQuery(source.ItemType);
+            result.Query &= PrepareItemTypeQuery(source);
 
             result.Query &= new BoolQuery
             {
@@ -274,13 +274,13 @@ namespace PoeEye.ExileToolsApi.Converters
             return groupQuery;
         }
 
-        private QueryBase PrepareItemTypeQuery(IPoeItemType itemType)
+        private QueryBase PrepareItemTypeQuery(IPoeQueryInfo source)
         {
             var result = new BoolQuery()
             {
                 Must = CombineQueries(
-                    CreateTermQuery("attributes.itemType", itemType.ItemType),
-                    CreateTermQuery("attributes.equipType", itemType.EquipType))
+                    CreateTermQuery("attributes.itemType", source.ItemType?.ItemType),
+                    CreateTermQuery("attributes.equipType", source.ItemType?.EquipType))
             };
 
             return result;
