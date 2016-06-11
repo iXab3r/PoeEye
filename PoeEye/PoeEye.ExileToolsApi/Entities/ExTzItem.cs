@@ -186,7 +186,7 @@ namespace PoeEye.ExileToolsApi.Entities
         [JsonProperty("Energy Shield")]
         public double EnergyShield { get; set; }
 
-        [JsonProperty("Evasion")]
+        [JsonProperty("Evasion Rating")]
         public double Evasion { get; set; }
     }
 

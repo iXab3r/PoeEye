@@ -1,4 +1,8 @@
-﻿namespace PoeShared.PoeTrade
+﻿using System;
+using System.Collections.Generic;
+using PoeShared.Scaffolding;
+
+namespace PoeShared.PoeTrade
 {
     using Common;
 

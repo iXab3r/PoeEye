@@ -42,5 +42,10 @@ namespace PoeShared.PoeTrade
         public bool IsBusy => provider.IsBusy;
 
         public string Name { get; }
+
+        public override string ToString()
+        {
+            return $"Name: {Name}, Api: {api}";
+        }
     }
 }

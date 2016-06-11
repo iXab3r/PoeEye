@@ -1,12 +1,10 @@
-﻿using System.Collections.Specialized;
-using System.Threading.Tasks;
-using Microsoft.Practices.Unity;
+﻿using Microsoft.Practices.Unity;
 using Nest;
 using PoeEye.ExileToolsApi.Converters;
-using PoeEye.ExileToolsApi.Entities;
+using PoeEye.ExileToolsApi.RealtimeApi;
+using PoeEye.ExileToolsApi.RealtimeApi.Entities;
 using PoeShared.Common;
 using PoeShared.PoeTrade;
-using PoeShared.PoeTrade.Query;
 using PoeShared.Scaffolding;
 using TypeConverter;
 
@@ -18,20 +16,14 @@ namespace PoeEye.ExileToolsApi.Prism
         {
             Container
                 .RegisterSingleton<IPoePriceCalculcator, PriceToChaosCalculator>()
+                .RegisterSingleton<IBlockItemSource, BlockItemSource>()
                 .RegisterSingleton<IConverter<ItemConversionInfo, IPoeItem>, ToPoeItemConverter>()
+                .RegisterSingleton<IConverter<IPoeQueryInfo, RealtimeQuery>, PoeQueryInfoToRealtimeSearchRequestConverter>()
                 .RegisterSingleton<IConverter<IPoeQueryInfo, ISearchRequest>, PoeQueryInfoToSearchRequestConverter>();
             
-
             Container
+                .RegisterSingleton<IPoeApi, ExileToolsRealtimeApi>(typeof(ExileToolsRealtimeApi).FullName)
                 .RegisterSingleton<IPoeApi, ExileToolsApi>(typeof(ExileToolsApi).FullName);
-        }
-
-        private class MockedPoeItemVerifier : IPoeItemVerifier
-        {
-            public Task<bool?> Verify(IPoeItem item)
-            {
-                return new Task<bool?>(() => false);
-            }
         }
     }
 }

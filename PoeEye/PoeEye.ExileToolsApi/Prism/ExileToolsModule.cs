@@ -1,4 +1,5 @@
 using Guards;
+using JetBrains.Annotations;
 using Microsoft.Practices.Unity;
 using Prism.Modularity;
 
@@ -8,10 +9,10 @@ namespace PoeEye.ExileToolsApi.Prism
     {
         private readonly IUnityContainer container;
 
-        public ExileToolsModule(IUnityContainer container)
+        public ExileToolsModule([NotNull] IUnityContainer container)
         {
-            this.container = container;
             Guard.ArgumentNotNull(() => container);
+            this.container = container;
         }
 
         public void Initialize()

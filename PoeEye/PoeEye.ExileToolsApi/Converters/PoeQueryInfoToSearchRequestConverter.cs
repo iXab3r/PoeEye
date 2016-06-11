@@ -5,8 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using Guards;
+using JetBrains.Annotations;
 using Nest;
-using PoeEye.ExileToolsApi.Converters;
 using PoeEye.ExileToolsApi.Entities;
 using PoeShared;
 using PoeShared.Common;
@@ -14,14 +14,14 @@ using PoeShared.PoeTrade;
 using PoeShared.PoeTrade.Query;
 using TypeConverter;
 
-namespace PoeEye.ExileToolsApi.Prism
+namespace PoeEye.ExileToolsApi.Converters
 {
     internal sealed class PoeQueryInfoToSearchRequestConverter : IConverter<IPoeQueryInfo, ISearchRequest>
     {
         private static readonly Regex RegexPrefix = new Regex(@"(regexp|rp|re|reg|r):(?<exp>.*)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         private readonly IPoePriceCalculcator toChaosCalculcator;
-        public PoeQueryInfoToSearchRequestConverter(IPoePriceCalculcator toChaosCalculcator)
+        public PoeQueryInfoToSearchRequestConverter([NotNull] IPoePriceCalculcator toChaosCalculcator)
         {
             Guard.ArgumentNotNull(() => toChaosCalculcator);
 
@@ -144,7 +144,6 @@ namespace PoeEye.ExileToolsApi.Prism
                 CreateRangeBasedRequest("properties.Map.Item Quantity", source.IncQuantityMin, source.IncQuantityMin),
                 CreateTermQuery("attributes.league", source.League),
                 CreateTermQuery("attributes.rarity", source.ItemRarity != null ? source.ItemRarity.ToString() : null),
-                CreateTermQuery("shop.hasPrice", source.BuyoutOnly ? true : default(bool?)),
                 CreateTermQuery("shop.verified", source.OnlineOnly ? VerificationStatus.Yes : default(VerificationStatus?)),
                 CreateQuery(source.ItemType),
             };
@@ -371,7 +370,7 @@ namespace PoeEye.ExileToolsApi.Prism
             yield return result;
         }
 
-        private IEnumerable<QueryBase> CreateWildcardQuery(string fieldName, string value, Func<String, String> preprocessFunc = null)
+        private IEnumerable<QueryBase> CreateWildcardQuery(string fieldName, string value, Func<string, string> preprocessFunc = null)
         {
             if (string.IsNullOrWhiteSpace((string)value))
             {

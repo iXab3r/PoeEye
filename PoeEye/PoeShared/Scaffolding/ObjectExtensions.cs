@@ -11,11 +11,11 @@
 
     public static class ObjectExtensions
     {
-        public static string DumpToText<T>(this T instance)
+        public static string DumpToText<T>(this T instance, Formatting formatting = Formatting.Indented)
         {
-            return instance == null ? $"null<{typeof(T).Name}>" : JsonConvert.SerializeObject(instance, Formatting.Indented);
+            return instance == null ? $"null<{typeof(T).Name}>" : JsonConvert.SerializeObject(instance, formatting);
         }
-
+        
         public static T AddTo<T>(this T instance, ICollection<T> collection)
         {
             Guard.ArgumentNotNull(() => instance);

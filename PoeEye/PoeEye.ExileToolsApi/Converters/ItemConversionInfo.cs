@@ -6,13 +6,13 @@ namespace PoeEye.ExileToolsApi.Converters
 {
     internal sealed class ItemConversionInfo
     {
-        public JRaw Item { get; private set; }
+        public JToken Item { get; private set; }
 
         public string[] AdditionalModsToInclude { get; private set; }
 
-        public ItemConversionInfo(JRaw item) : this(item, new string[0]) { }
+        public ItemConversionInfo(JToken item) : this(item, new string[0]) { }
 
-        public ItemConversionInfo(JRaw item, string[] additionalModsToInclude)
+        public ItemConversionInfo(JToken item, string[] additionalModsToInclude)
         {
             Guard.ArgumentNotNull(() => item);
             Guard.ArgumentNotNull(() => additionalModsToInclude);
