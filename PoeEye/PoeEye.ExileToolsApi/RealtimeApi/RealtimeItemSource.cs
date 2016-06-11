@@ -16,6 +16,7 @@ using PoeShared.Common;
 using PoeShared.PoeTrade;
 using PoeShared.PoeTrade.Query;
 using PoeShared.Scaffolding;
+using Quobject.Collections.Immutable;
 using Quobject.SocketIoClientDotNet.Client;
 using TypeConverter;
 
@@ -74,6 +75,7 @@ namespace PoeEye.ExileToolsApi.RealtimeApi
             var options = new IO.Options
             {
                 Query = new Dictionary<string, string> { { "pwxid", uniqueClientId } },
+                Transports = ImmutableList.Create(new[] { Quobject.EngineIoClientDotNet.Client.Transports.WebSocket.NAME })
             };
 
             client = IO.Socket(@"http://rtstashapi.exiletools.com", options);
@@ -127,16 +129,6 @@ namespace PoeEye.ExileToolsApi.RealtimeApi
         {
             Log.Instance.Warn($"[BlockItemSource.Error] Error occured, client: {client}, error: {rawError}");
             lastException = new ServerException($"Exception occurred - {rawError}");
-
-            try
-            {
-                Log.Instance.Warn($"[BlockItemSource.Error] Reconnecting... client: {client}");
-                client.Disconnect().Connect();
-            }
-            catch (Exception ex)
-            {
-                Log.Instance.Error($"Exception occurred", ex);
-            }
         }
 
         private void OnClientHeartbeat(object rawHeartbeat)
