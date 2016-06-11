@@ -93,7 +93,7 @@ namespace PoeEye.ExileToolsApi.Converters
 
         private static RealtimeQuery PrepareFilterByName(IPoeQueryInfo source)
         {
-            return CreateEqualToQuery("item.fullName", source.ItemName);
+            return CreateEqualToQuery("info.fullName", source.ItemName);
         }
 
         private static RealtimeQuery PrepareItemTypeQuery(IPoeQueryInfo source)
