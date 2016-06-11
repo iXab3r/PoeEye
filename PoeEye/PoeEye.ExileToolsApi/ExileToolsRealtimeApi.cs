@@ -63,7 +63,6 @@ namespace PoeEye.ExileToolsApi
             {
                 Log.Instance.Debug($"[ExileToolsRealtimeApi.IssueQuery] Client for query was not found, creating a new one: {query}");
                 source = itemSources[query] = itemSourceFactory.Create(query);
-                source.Connect();
             }
 
             return source.GetResult();

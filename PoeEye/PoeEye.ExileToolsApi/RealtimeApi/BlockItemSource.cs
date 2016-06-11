@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Reactive.Disposables;
+using System.Reactive.Linq;
 using System.Runtime.Remoting;
 using System.Threading;
 using Guards;
@@ -21,16 +23,19 @@ namespace PoeEye.ExileToolsApi.RealtimeApi
 {
     internal sealed class BlockItemSource : IBlockItemSource
     {
-        public static readonly string UniqueClientId = $"PoeEye {Guid.NewGuid()}";
-        public static readonly TimeSpan ClientKeepAliveTimeSpan = TimeSpan.FromSeconds(30);
+        public static readonly TimeSpan ClientKeepAliveTimeSpan = TimeSpan.FromMinutes(1);
+
+        private readonly string uniqueClientId = $"PoeEye {Guid.NewGuid()}";
 
         private readonly JArray realtimeQuery;
         private readonly IConverter<ItemConversionInfo, IPoeItem> poeItemConverter;
         private readonly IClock clock;
 
-        private Socket client;
+        private readonly Socket client;
 
         private readonly ConcurrentBag<IPoeItem> itemsList = new ConcurrentBag<IPoeItem>();
+
+        private readonly CompositeDisposable anchors = new CompositeDisposable();
 
         private Exception lastException = null;
 
@@ -57,22 +62,18 @@ namespace PoeEye.ExileToolsApi.RealtimeApi
 
             realtimeQuery = JArray.FromObject(convertedQuery);
             Log.Instance.Debug($"[BlockItemSource..ctor] Initializing RealTime query\nQuery source: {query.DumpToText(Formatting.None)}\n\nRealTime query: {realtimeQuery.DumpToText(Formatting.None)}");
-        }
-
-        public void Connect()
-        {
-            Log.Instance.Debug($"[BlockItemSource.Connect] Initializing connection, client: {client}");
-
-            if (client != null)
-            {
-                throw new InvalidOperationException($"Client is already initialized: {client}");
-            }
 
             lastFetchTime = clock.Now;
 
+            Log.Instance.Debug($"[BlockItemSource.Connect] Initializing connection, client: {client}");
+            Observable
+                .Timer(DateTimeOffset.Now, ClientKeepAliveTimeSpan)
+                .Subscribe(Cleanup)
+                .AddTo(anchors);
+
             var options = new IO.Options
             {
-                Query = new Dictionary<string, string> { { "pwxid", UniqueClientId } }
+                Query = new Dictionary<string, string> { { "pwxid", uniqueClientId } }
             };
 
             client = IO.Socket(@"http://rtstashapi.exiletools.com", options);
@@ -131,13 +132,6 @@ namespace PoeEye.ExileToolsApi.RealtimeApi
         private void OnClientHeartbeat(object rawHeartbeat)
         {
             Log.Instance.Info($"[BlockItemSource.Heartbeat] Heartbeat received, client: {client}, message: {rawHeartbeat}");
-
-            var timeElapsedSinceLastFetch = clock.Now - lastFetchTime;
-            if (timeElapsedSinceLastFetch > ClientKeepAliveTimeSpan)
-            {
-                Log.Instance.Info($"[BlockItemSource.Heartbeat] Client was not queried for the last {timeElapsedSinceLastFetch.TotalSeconds:F0}s, terminating connection... client {client}");
-                Dispose();
-            }
         }
 
         private void OnClientItemReceived(object rawItemData)
@@ -161,6 +155,16 @@ namespace PoeEye.ExileToolsApi.RealtimeApi
             catch (Exception ex)
             {
                 Log.Instance.Error($"Exception occurred during processing item\n{rawItemData}", ex);
+            }
+        }
+
+        private void Cleanup()
+        {
+            var timeElapsedSinceLastFetch = clock.Now - lastFetchTime;
+            if (timeElapsedSinceLastFetch > ClientKeepAliveTimeSpan)
+            {
+                Log.Instance.Info($"[BlockItemSource.Heartbeat] Client hasn't been queried for the last {timeElapsedSinceLastFetch.TotalSeconds:F0}s, terminating connection... client {client}");
+                Dispose();
             }
         }
     }

@@ -6,8 +6,6 @@ namespace PoeEye.ExileToolsApi.RealtimeApi
 {
     public interface IBlockItemSource : IDisposable
     {
-        void Connect();
-
         [NotNull]
         IPoeQueryResult GetResult();
 
