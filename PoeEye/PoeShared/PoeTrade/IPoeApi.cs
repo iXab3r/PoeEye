@@ -1,4 +1,6 @@
-﻿namespace PoeShared.PoeTrade
+﻿using System;
+
+namespace PoeShared.PoeTrade
 {
     using System.Threading.Tasks;
 
@@ -8,6 +10,8 @@
 
     public interface IPoeApi
     {
+        Guid Id { get; }
+
         string Name { [NotNull] get; }
 
         [NotNull]
@@ -15,5 +19,7 @@
 
         [NotNull]
         Task<IPoeStaticData> RequestStaticData();
+
+        void DisposeQuery([NotNull] IPoeQueryInfo query);
     }
 }

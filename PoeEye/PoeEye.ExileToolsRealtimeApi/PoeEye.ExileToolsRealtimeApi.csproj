@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{02FD1625-7DD4-4B9B-9F5C-9FEFA42B41DF}</ProjectGuid>
+    <ProjectGuid>{D6F0D9BD-95FC-4A71-8EFF-A1C82B959C5D}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>PoeEye.ExileToolsApi</RootNamespace>
-    <AssemblyName>PoeEye.ExileToolsApi</AssemblyName>
+    <RootNamespace>PoeEye.ExileToolsRealtimeApi</RootNamespace>
+    <AssemblyName>PoeEye.ExileToolsRealtimeApi</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -30,10 +30,6 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup>
-    <StartupObject>
-    </StartupObject>
-  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Common.Logging, Version=3.3.0.0, Culture=neutral, PublicKeyToken=af08829b84f0328e, processorArchitecture=MSIL">
       <HintPath>..\packages\Common.Logging.3.3.0\lib\net40\Common.Logging.dll</HintPath>
@@ -41,10 +37,6 @@
     </Reference>
     <Reference Include="Common.Logging.Core, Version=3.3.0.0, Culture=neutral, PublicKeyToken=af08829b84f0328e, processorArchitecture=MSIL">
       <HintPath>..\packages\Common.Logging.Core.3.3.0\lib\net40\Common.Logging.Core.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Elasticsearch.Net, Version=2.0.0.0, Culture=neutral, PublicKeyToken=96c599bbe3e70f5d, processorArchitecture=MSIL">
-      <HintPath>..\packages\Elasticsearch.Net.2.3.2\lib\net45\Elasticsearch.Net.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="EngineIoClientDotNet, Version=0.9.22.0, Culture=neutral, processorArchitecture=MSIL">
@@ -57,10 +49,6 @@
     </Reference>
     <Reference Include="JetBrains.Annotations, Version=10.0.0.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
       <HintPath>..\packages\JetBrains.Annotations.10.0.0\lib\net20\JetBrains.Annotations.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="log4net, Version=1.2.13.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
-      <HintPath>..\packages\log4net.2.0.3\lib\net40-full\log4net.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.Practices.ServiceLocation, Version=1.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -79,16 +67,16 @@
       <HintPath>..\packages\Unity.4.0.1\lib\net45\Microsoft.Practices.Unity.RegistrationByConvention.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Nest, Version=2.0.0.0, Culture=neutral, PublicKeyToken=96c599bbe3e70f5d, processorArchitecture=MSIL">
-      <HintPath>..\packages\NEST.2.3.2\lib\net45\Nest.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.8.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Prism, Version=6.1.0.0, Culture=neutral, PublicKeyToken=91a96d2a154366d8, processorArchitecture=MSIL">
       <HintPath>..\packages\Prism.Core.6.1.0\lib\net45\Prism.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Prism.Unity.Wpf, Version=6.1.0.0, Culture=neutral, PublicKeyToken=91a96d2a154366d8, processorArchitecture=MSIL">
+      <HintPath>..\packages\Prism.Unity.6.1.1\lib\net45\Prism.Unity.Wpf.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Prism.Wpf, Version=6.1.0.0, Culture=neutral, PublicKeyToken=91a96d2a154366d8, processorArchitecture=MSIL">
@@ -113,7 +101,10 @@
       <HintPath>..\packages\Rx-Linq.2.2.5\lib\net45\System.Reactive.Linq.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Reactive.PlatformServices, Version=2.2.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Rx-PlatformServices.2.2.5\lib\net45\System.Reactive.PlatformServices.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Web" />
     <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System.Xml.Linq" />
@@ -132,21 +123,20 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Converters\IPoePriceCalculcator.cs" />
-    <Compile Include="Converters\ItemConversionInfo.cs" />
-    <Compile Include="Converters\PoeQueryInfoToSearchRequestConverter.cs" />
-    <Compile Include="Converters\PriceToChaosCalculator.cs" />
-    <Compile Include="Converters\ToPoeItemConverter.cs" />
-    <Compile Include="Entities\ExTzItem.cs" />
-    <Compile Include="ExileToolsApi.cs" />
-    <Compile Include="ExileToolsSource.cs" />
-    <Compile Include="Extensions\DateTimeExtensions.cs" />
-    <Compile Include="Extensions\JsonStringExtensions.cs" />
-    <Compile Include="Prism\LiveRegistrations.cs" />
+    <Compile Include="Converters\PoeQueryInfoToRealtimeSearchRequestConverter.cs" />
+    <Compile Include="ExileToolsRealtimeApi.cs" />
     <Compile Include="Prism\ExileToolsModule.cs" />
+    <Compile Include="Prism\LiveRegistrations.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RealtimeApi\Entities\RealtimeQuery.cs" />
+    <Compile Include="RealtimeApi\IRealtimeItemSource.cs" />
+    <Compile Include="RealtimeApi\RealtimeItemSource.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\PoeEye.ExileToolsApi\PoeEye.ExileToolsApi.csproj">
+      <Project>{02fd1625-7dd4-4b9b-9f5c-9fefa42b41df}</Project>
+      <Name>PoeEye.ExileToolsApi</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PoeShared\PoeShared.csproj">
       <Project>{12df53dd-7144-4d2d-b7a1-b4bc5bbdfb69}</Project>
       <Name>PoeShared</Name>
@@ -156,7 +146,6 @@
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

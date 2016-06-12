@@ -28,7 +28,7 @@ namespace PoeShared.Communications
             this.nameValueConverter = nameValueConverter;
         }
 
-        public CookieCollection Cookies { get; set; }
+        public CookieCollection Cookies { get; set; } = new CookieCollection();
 
         public IWebProxy Proxy { get; set; }
 

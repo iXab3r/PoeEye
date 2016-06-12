@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
@@ -18,7 +19,7 @@ using TypeConverter;
 
 namespace PoeEye.ExileToolsApi
 {
-    internal sealed class ExileToolsApi : IPoeApi
+    internal sealed class ExileToolsApi : PoeApi
     {
         private readonly IConverter<IPoeQueryInfo, ISearchRequest> queryConverter;
         private readonly IConverter<ItemConversionInfo, IPoeItem> poeItemConverter;
@@ -38,16 +39,18 @@ namespace PoeEye.ExileToolsApi
             this.exileSource = exileSource;
         }
 
-        public string Name { get; } = "ExileTools";
+        public override Guid Id { get; } = Guid.Parse("DAEBD77B-EECA-46E2-81BC-6FB387A5A3F8");
 
-        public Task<IPoeQueryResult> IssueQuery(IPoeQueryInfo query)
+        public override string Name { get; } = "ExileTools";
+
+        public override Task<IPoeQueryResult> IssueQuery(IPoeQueryInfo query)
         {
             return Observable
                 .Start(() => IssueQueryInternal(query), Scheduler.Default)
                 .ToTask();
         }
 
-        public Task<IPoeStaticData> RequestStaticData()
+        public override Task<IPoeStaticData> RequestStaticData()
         {
             return Observable
                  .Start(exileSource.LoadStaticData, Scheduler.Default)

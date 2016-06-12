@@ -17,7 +17,7 @@ namespace PoeEye.Config
 
         public AudioNotificationType NotificationType { get; set; }
 
-        public string ApiModuleName { get; set; }
+        public string ApiModuleId { get; set; }
 
         public override string ToString()
         {

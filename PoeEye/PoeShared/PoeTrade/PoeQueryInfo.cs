@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using PoeShared.Scaffolding;
 
 namespace PoeShared.PoeTrade
@@ -10,6 +11,8 @@ namespace PoeShared.PoeTrade
     public sealed class PoeQueryInfo : IPoeQueryInfo
     {
         public static IEqualityComparer<IPoeQueryInfo> Comparer = new LambdaComparer<IPoeQueryInfo>((x, y) => string.CompareOrdinal(x?.DumpToText(), y?.DumpToText()) == 0);
+
+        public static string Id { get; } = Guid.NewGuid().ToString();
 
         public string[] LeaguesList { get; set; }
 

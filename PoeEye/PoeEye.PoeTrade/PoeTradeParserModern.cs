@@ -33,7 +33,8 @@ namespace PoeEye.PoeTrade
 
             var result = new PoeQueryResult
             {
-                ItemsList = ExtractItems(parser)
+                ItemsList = ExtractItems(parser),
+                Id = ExtractQueryId(parser),
             };
 
             return result;
@@ -104,6 +105,13 @@ namespace PoeEye.PoeTrade
                 }
             };
             return result;
+        }
+
+        private string ExtractQueryId(CQ parser)
+        {
+            var liveUri = parser["div[class='alert-box'] a"]?.Attr("href");
+
+            return liveUri;
         }
 
         private IPoeItemMod[] ExtractModsList(CQ parser)

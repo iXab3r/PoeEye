@@ -167,9 +167,9 @@ namespace PoeEye.PoeTrade.ViewModels
 
         public void Load(PoeEyeTabConfig config)
         {
-            if (!string.IsNullOrWhiteSpace(config.ApiModuleName))
+            if (!string.IsNullOrWhiteSpace(config.ApiModuleId))
             {
-                ApiSelector.SetByModuleName(config.ApiModuleName);
+                ApiSelector.SetByModuleId(config.ApiModuleId);
             }
 
             if (config.RecheckTimeout != default(TimeSpan))
@@ -195,7 +195,7 @@ namespace PoeEye.PoeTrade.ViewModels
                 IsAutoRecheckEnabled = RecheckPeriod.IsAutoRecheckEnabled,
                 QueryInfo = Query.PoeQueryBuilder(),
                 NotificationType = AudioNotificationSelector.SelectedValue,
-                ApiModuleName = ApiSelector.SelectedModule.Name,
+                ApiModuleId = ApiSelector.SelectedModule.Id.ToString(),
             };
         }
 

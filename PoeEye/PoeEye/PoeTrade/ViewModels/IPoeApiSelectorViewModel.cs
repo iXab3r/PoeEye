@@ -9,6 +9,6 @@ namespace PoeEye.PoeTrade.ViewModels
     {
         IPoeApiWrapper SelectedModule { get; set; }
 
-        void SetByModuleName([NotNull] string moduleName);
+        void SetByModuleId([NotNull] string moduleName);
     }
 }

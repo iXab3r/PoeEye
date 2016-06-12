@@ -2,7 +2,7 @@
 using JetBrains.Annotations;
 using PoeShared.PoeTrade.Query;
 
-namespace PoeEye.ExileToolsApi.RealtimeApi
+namespace PoeEye.PoeTradeRealtimeApi
 {
     public interface IRealtimeItemSource : IDisposable
     {

@@ -7,17 +7,17 @@ using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using Guards;
 using JetBrains.Annotations;
-using PoeEye.ExileToolsApi.RealtimeApi;
+using PoeEye.ExileToolsApi;
+using PoeEye.ExileToolsRealtimeApi.RealtimeApi;
 using PoeShared;
 using PoeShared.PoeTrade;
 using PoeShared.PoeTrade.Query;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
-using Prism.Regions.Behaviors;
 
-namespace PoeEye.ExileToolsApi
+namespace PoeEye.ExileToolsRealtimeApi
 {
-    internal sealed class ExileToolsRealtimeApi : IPoeApi
+    internal sealed class ExileToolsRealtimeApi : PoeApi
     {
         private static readonly TimeSpan CleanupPeriod = TimeSpan.FromMinutes(1);
 
@@ -39,9 +39,11 @@ namespace PoeEye.ExileToolsApi
             Observable.Timer(DateTimeOffset.Now, CleanupPeriod).Subscribe(CleanupSources);
         }
 
-        public string Name { get; } = "(alpha) ExileTools Realtime";
+        public override Guid Id { get; } = Guid.Parse("9271D1D9-37AA-442A-AB87-34F89EA1CE0E");
 
-        public Task<IPoeQueryResult> IssueQuery(IPoeQueryInfo query)
+        public override string Name { get; } = "(alpha) ExileTools Realtime";
+
+        public override Task<IPoeQueryResult> IssueQuery(IPoeQueryInfo query)
         {
             Log.Instance.Debug($"[ExileToolsRealtimeApi.IssueQuery] Issueing query: {query}");
 
@@ -50,7 +52,7 @@ namespace PoeEye.ExileToolsApi
                 .ToTask();
         }
 
-        public Task<IPoeStaticData> RequestStaticData()
+        public override Task<IPoeStaticData> RequestStaticData()
         {
             Log.Instance.Debug($"[ExileToolsRealtimeApi.RequestStaticData] Requesting data...");
             return Observable

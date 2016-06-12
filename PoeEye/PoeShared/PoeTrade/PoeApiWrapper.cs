@@ -1,6 +1,8 @@
+using System;
 using System.Threading.Tasks;
 using Guards;
 using JetBrains.Annotations;
+using Newtonsoft.Json;
 using PoeShared.PoeTrade.Query;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
@@ -34,12 +36,26 @@ namespace PoeShared.PoeTrade
         public Task<IPoeQueryResult> IssueQuery(IPoeQueryInfo query)
         {
             Guard.ArgumentNotNull(() => query);
+
+            Log.Instance.Debug($"[PoeApiWrapper, {Name}] Issueing query... {query.DumpToText(Formatting.None)}");
+
             return api.IssueQuery(query);
+        }
+
+        public void DisposeQuery(IPoeQueryInfo query)
+        {
+            Guard.ArgumentNotNull(() => query);
+
+            Log.Instance.Debug($"[PoeApiWrapper, {Name}] Disposing query... {query.DumpToText(Formatting.None)}");
+
+            api.DisposeQuery(query);
         }
 
         public bool IsBusy => provider.IsBusy;
 
         public string Name => api.Name ?? api.GetType().Name;
+
+        public Guid Id => api.Id;
 
         public override string ToString()
         {

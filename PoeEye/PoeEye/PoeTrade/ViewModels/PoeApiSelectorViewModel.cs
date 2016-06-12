@@ -1,5 +1,5 @@
-﻿using System.Linq;
-using System.Reactive.Linq;
+﻿using System;
+using System.Linq;
 using Guards;
 using JetBrains.Annotations;
 using PoeEye.PoeTrade.Models;
@@ -19,7 +19,7 @@ namespace PoeEye.PoeTrade.ViewModels
             Guard.ArgumentNotNull(() => apiProvider);
             this.apiProvider = apiProvider;
 
-            SelectedModule = apiProvider.ModulesList.FirstOrDefault();
+            SelectedModule = apiProvider.ModulesList.First();
         }
 
         public IReactiveList<IPoeApiWrapper> ModulesList => apiProvider.ModulesList;
@@ -30,15 +30,22 @@ namespace PoeEye.PoeTrade.ViewModels
             set { this.RaiseAndSetIfChanged(ref selectedModule, value); }
         }
 
-        public void SetByModuleName(string moduleName)
+        public void SetByModuleId(string moduleInfo)
         {
-            Guard.ArgumentNotNull(() => moduleName);
+            Guard.ArgumentNotNull(() => moduleInfo);
 
-            var module = ModulesList.FirstOrDefault(x => x.Name == moduleName);
-            if (module != null)
+            SelectedModule = FindModuleById(moduleInfo);
+        }
+
+        private IPoeApiWrapper FindModuleById(string moduleInfo)
+        {
+            Guid moduleId;
+            if (Guid.TryParse(moduleInfo, out moduleId))
             {
-                SelectedModule = module;
+                return ModulesList.FirstOrDefault(x => x.Id == moduleId);
             }
+
+            return ModulesList.FirstOrDefault(x => x.Name == moduleInfo);
         }
     }
 }

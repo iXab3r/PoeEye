@@ -24,7 +24,7 @@ namespace PoeEye.PoeTrade
 
     using TypeConverter;
 
-    internal sealed class PoeTradeApi : IPoeApi
+    internal sealed class PoeTradeApi : PoeApi
     {
         private static readonly string PoeTradeSearchUri = @"http://poe.trade/search";
         private static readonly string PoeTradeUri = @"http://poe.trade";
@@ -70,9 +70,11 @@ namespace PoeEye.PoeTrade
             this.queryInfoToQueryConverter = queryInfoToQueryConverter;
         }
 
-        public string Name { get; } = "poe.trade";
+        public override Guid Id { get; } = Guid.Parse("8BC98570-F07A-4925-B8A4-EC0BAAF2222C");
 
-        public Task<IPoeQueryResult> IssueQuery(IPoeQueryInfo queryInfo)
+        public override string Name { get; } = "poe.trade";
+
+        public override Task<IPoeQueryResult> IssueQuery(IPoeQueryInfo queryInfo)
         {
             Guard.ArgumentNotNull(() => queryInfo);
 
@@ -81,7 +83,7 @@ namespace PoeEye.PoeTrade
             return IssueQuery(PoeTradeSearchUri, queryPostData);
         }
 
-        public Task<IPoeStaticData> RequestStaticData()
+        public override Task<IPoeStaticData> RequestStaticData()
         {
             var client = CreateClient();
             return client

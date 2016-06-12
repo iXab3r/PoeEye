@@ -2,6 +2,7 @@
 using System.Linq;
 using Guards;
 using JetBrains.Annotations;
+using PoeEye.ExileToolsApi.Converters;
 using PoeEye.ExileToolsApi.Entities;
 using PoeEye.ExileToolsApi.RealtimeApi.Entities;
 using PoeShared.Common;
@@ -9,7 +10,7 @@ using PoeShared.PoeTrade;
 using PoeShared.PoeTrade.Query;
 using TypeConverter;
 
-namespace PoeEye.ExileToolsApi.Converters
+namespace PoeEye.ExileToolsRealtimeApi.Converters
 {
     internal class PoeQueryInfoToRealtimeSearchRequestConverter : IConverter<IPoeQueryInfo, RealtimeQuery>
     {

@@ -576,7 +576,7 @@ namespace PoeEye.PoeTrade.ViewModels
             return result;
         }
 
-        public void SetQueryInfo([NotNull] IPoeQueryInfo source)
+        public void SetQueryInfo(IPoeQueryInfo source)
         {
             Guard.ArgumentNotNull(() => source);
 

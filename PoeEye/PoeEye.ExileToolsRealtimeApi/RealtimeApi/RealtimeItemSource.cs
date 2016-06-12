@@ -11,6 +11,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using PoeEye.ExileToolsApi.Converters;
 using PoeEye.ExileToolsApi.RealtimeApi.Entities;
+using PoeEye.ExileToolsRealtimeApi.RealtimeApi;
 using PoeShared;
 using PoeShared.Common;
 using PoeShared.PoeTrade;

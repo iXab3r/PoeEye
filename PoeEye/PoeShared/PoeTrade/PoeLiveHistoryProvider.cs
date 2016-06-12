@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reactive;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using Guards;
@@ -48,6 +49,8 @@ namespace PoeShared.PoeTrade
                 .AddTo(Anchors);
 
             periodObservable.Connect().AddTo(Anchors);
+
+            Disposable.Create(() => poeApi.DisposeQuery(query)).AddTo(Anchors);
         }
 
         public IObservable<IPoeItem[]> ItemsPacks => itemsPacksSubject;

@@ -1,4 +1,6 @@
-﻿namespace PoeEye.Simulator.PoeTrade
+﻿using System;
+
+namespace PoeEye.Simulator.PoeTrade
 {
     using System.Linq;
     using System.Threading.Tasks;
@@ -9,18 +11,20 @@
     using PoeShared.PoeTrade;
     using PoeShared.PoeTrade.Query;
 
-    internal sealed class PoeTradeApi : IPoeApi
+    internal sealed class PoeTradeApi : PoeApi
     {
-        public string Name { get; } = "SimulatorApi";
+        public override Guid Id { get; } = Guid.Parse("523815CB-99C8-4743-A7D7-0682E5678182");
 
-        public Task<IPoeQueryResult> IssueQuery(IPoeQueryInfo query)
+        public override string Name { get; } = "SimulatorApi";
+
+        public override Task<IPoeQueryResult> IssueQuery(IPoeQueryInfo query)
         {
             Guard.ArgumentNotNull(() => query);
 
             return Task.Run(() => ProcessQuery(query));
         }
 
-        public Task<IPoeStaticData> RequestStaticData()
+        public override Task<IPoeStaticData> RequestStaticData()
         {
             return Task.Run(() => PrepareStatisData());
         }
