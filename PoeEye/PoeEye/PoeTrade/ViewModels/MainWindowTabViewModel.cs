@@ -106,12 +106,6 @@ namespace PoeEye.PoeTrade.ViewModels
                 .Where(x => !mainWindowTracker.IsActive)
                 .Subscribe(x => audioNotificationsManager.PlayNotification(audioNotificationSelector.SelectedValue), Log.HandleException)
                 .AddTo(Anchors);
-
-            RecheckPeriod
-                .WhenAny(x => x.Period, x => x.IsAutoRecheckEnabled, (x, y) => Unit.Default)
-                .Where(x => TradesList != null)
-                .Subscribe(x => TradesList.RecheckPeriod = RecheckPeriod.IsAutoRecheckEnabled ? RecheckPeriod.Period : TimeSpan.Zero)
-                .AddTo(Anchors);
         }
 
         public IPoeApiSelectorViewModel ApiSelector { get; }
@@ -219,18 +213,23 @@ namespace PoeEye.PoeTrade.ViewModels
 
             newQuery
                 .ObservableForProperty(x => x.PoeQueryBuilder).ToUnit()
-                .Merge(TradesList.WhenAnyValue(x => x.ActiveQuery).ToUnit())
+                .Merge(tradesList.WhenAnyValue(x => x.ActiveQuery).ToUnit())
                 .Select(x => newQuery)
                 .Subscribe(RebuildTabName)
                 .AddTo(anchors);
 
-            TradesList
+            RecheckPeriod
+                .WhenAny(x => x.Period, x => x.IsAutoRecheckEnabled, (x, y) => Unit.Default)
+                .Subscribe(x => tradesList.RecheckPeriod = RecheckPeriod.IsAutoRecheckEnabled ? RecheckPeriod.Period : TimeSpan.Zero)
+                .AddTo(anchors);
+
+            tradesList
                .WhenAnyValue(x => x.IsBusy).ToUnit()
                .StartWith(Unit.Default)
                .Subscribe(() => this.RaisePropertyChanged(nameof(IsBusy)))
                .AddTo(anchors);
 
-            TradesList.Items.ItemChanged.ToUnit()
+            tradesList.Items.ItemChanged.ToUnit()
                       .Merge(tradesList.Items.Changed.ToUnit())
                       .StartWith(Unit.Default)
                       .Subscribe(
