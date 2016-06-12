@@ -1,7 +1,6 @@
 using Guards;
 using JetBrains.Annotations;
 using Microsoft.Practices.Unity;
-using PoeEye.ExileToolsApi.Prism;
 using Prism.Modularity;
 
 namespace PoeEye.ExileToolsRealtimeApi.Prism

@@ -1,5 +1,4 @@
-﻿using System.ComponentModel;
-using Microsoft.Practices.Unity;
+﻿using Microsoft.Practices.Unity;
 using PoeEye.ExileToolsApi.RealtimeApi;
 using PoeEye.ExileToolsApi.RealtimeApi.Entities;
 using PoeEye.ExileToolsRealtimeApi.Converters;
@@ -8,7 +7,7 @@ using PoeShared.PoeTrade;
 using PoeShared.Scaffolding;
 using TypeConverter;
 
-namespace PoeEye.ExileToolsApi.Prism
+namespace PoeEye.ExileToolsRealtimeApi.Prism
 {
     internal sealed class LiveRegistrations : UnityContainerExtension
     {
@@ -22,7 +21,7 @@ namespace PoeEye.ExileToolsApi.Prism
                 .RegisterSingleton<IConverter<IPoeQueryInfo, RealtimeQuery>, PoeQueryInfoToRealtimeSearchRequestConverter>();
 
             Container
-                .RegisterSingleton<IPoeApi, ExileToolsRealtimeApi.ExileToolsRealtimeApi>(typeof(ExileToolsRealtimeApi.ExileToolsRealtimeApi).FullName);
+                .RegisterSingleton<IPoeApi, ExileToolsRealtimeApi>(typeof(ExileToolsRealtimeApi).FullName);
         }
     }
 }
