@@ -1,28 +1,23 @@
-﻿using System.Reactive.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reactive.Linq;
+using Guards;
+using JetBrains.Annotations;
+using PoeShared.Common;
+using PoeShared.PoeDatabase;
+using PoeShared.PoeTrade;
+using PoeShared.PoeTrade.Query;
+using PoeShared.Prism;
+using PoeShared.Scaffolding;
+using ReactiveUI;
+using WpfAutoCompleteControls.Editors;
 
 namespace PoeEye.PoeTrade.ViewModels
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-
-    using Guards;
-
-    using JetBrains.Annotations;
-
-    using PoeShared.Common;
-    using PoeShared.PoeDatabase;
-    using PoeShared.PoeTrade;
-    using PoeShared.PoeTrade.Query;
-    using PoeShared.Prism;
-    using PoeShared.Scaffolding;
-
-    using ReactiveUI;
-
-    using WpfAutoCompleteControls.Editors;
-
     internal sealed class PoeQueryViewModel : DisposableReactiveObject, IPoeQueryViewModel
     {
+        private string accountName;
         private bool alternativeArt;
         private float? apsMax;
 
@@ -43,6 +38,8 @@ namespace PoeEye.PoeTrade.ViewModels
         private float? buyoutMin;
 
         private bool buyoutOnly;
+
+        private PoeItemCorruptionState? corruptionState;
 
         private float? critMax;
 
@@ -77,8 +74,6 @@ namespace PoeEye.PoeTrade.ViewModels
         private string itemBase;
 
         private string itemName;
-
-        private string accountName;
 
         private PoeItemRarity? itemRarity;
 
@@ -179,8 +174,6 @@ namespace PoeEye.PoeTrade.ViewModels
             NameSuggestionProvider = suggestionProviderFactory.Create(knownNames);
         }
 
-        public string Description => GetQueryDescription();
-
         public int? GemOrMapLevelMin
         {
             get { return gemOrMapLevelMin; }
@@ -202,6 +195,8 @@ namespace PoeEye.PoeTrade.ViewModels
         public ISuggestionProvider NameSuggestionProvider { get; }
 
         public IPoeItemType[] ItemTypes { get; }
+
+        public string Description => GetQueryDescription();
 
         public Func<IPoeQueryInfo> PoeQueryBuilder => GetQueryInfo;
 
@@ -555,6 +550,12 @@ namespace PoeEye.PoeTrade.ViewModels
             set { this.RaiseAndSetIfChanged(ref itemRarity, value); }
         }
 
+        public PoeItemCorruptionState? CorruptionState
+        {
+            get { return corruptionState; }
+            set { this.RaiseAndSetIfChanged(ref corruptionState, value); }
+        }
+
         public bool IsExpanded
         {
             get { return isExpanded; }
@@ -571,7 +572,7 @@ namespace PoeEye.PoeTrade.ViewModels
         {
             var result = new PoeQueryInfo();
 
-            ((IPoeQueryInfo)this).TransferPropertiesTo(result);
+            ((IPoeQueryInfo) this).TransferPropertiesTo(result);
 
             return result;
         }
@@ -615,7 +616,7 @@ namespace PoeEye.PoeTrade.ViewModels
             this.RaisePropertyChanged(nameof(League));
             this.RaisePropertyChanged(nameof(PoeQueryBuilder));
         }
-        
+
         private IList<string> FormatQueryDescriptionArray()
         {
             var blackList = new[]
@@ -623,15 +624,15 @@ namespace PoeEye.PoeTrade.ViewModels
                 nameof(League),
                 nameof(ItemName)
             };
-            var nullableProperties = typeof (IPoeQueryInfo)
+            var nullableProperties = typeof(IPoeQueryInfo)
                 .GetProperties()
                 .Where(x => !blackList.Contains(x.Name))
                 .Where(
-                    x => x.PropertyType == typeof (int?)
-                         || x.PropertyType == typeof (float?)
-                         || x.PropertyType == typeof (string)
-                         || x.PropertyType == typeof (IPoeItemType)
-                         || x.PropertyType == typeof (PoeItemRarity?))
+                    x => x.PropertyType == typeof(int?)
+                         || x.PropertyType == typeof(float?)
+                         || x.PropertyType == typeof(string)
+                         || x.PropertyType == typeof(IPoeItemType)
+                         || x.PropertyType == typeof(PoeItemRarity?))
                 .Where(x => x.CanRead)
                 .ToArray();
 

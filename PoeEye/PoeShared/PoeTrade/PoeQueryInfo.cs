@@ -74,6 +74,8 @@ namespace PoeShared.PoeTrade
 
         public PoeItemRarity? ItemRarity { get; set; }
 
+        public PoeItemCorruptionState? CorruptionState { get; set; }
+
         public IPoeItemType ItemType { get; set; }
 
         public string League { get; set; }

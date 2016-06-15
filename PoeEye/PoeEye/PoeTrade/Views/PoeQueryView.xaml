@@ -333,7 +333,7 @@
                    Text="Account name" Style="{StaticResource TextBlockHeader}" />
         <StackPanel Grid.Row="0" Grid.Column="5">
           <TextBox Style="{StaticResource TextBoxKey}" 
-                             Width="100" 
+                             Width="165"
                              Text="{Binding AccountName}"
                              controls:TextBoxHelper.Watermark="any" />
         </StackPanel>
@@ -354,6 +354,26 @@
                     Width="165"
                     IsEditable="True"
                     ItemsSource="{Binding Source={StaticResource PoeItemRarityFromEnum}}"
+                    controls:TextBoxHelper.ClearTextButton="True"
+                    controls:TextBoxHelper.Watermark="any" />
+        </StackPanel>
+
+        <TextBlock Grid.Row="2" Grid.Column="4"
+                   Text="Corrupted" Style="{StaticResource TextBlockHeader}" />
+        <StackPanel Grid.Row="2" Grid.Column="5">
+          <StackPanel.Resources>
+            <ObjectDataProvider x:Key="PoeItemCorruptionStateFromEnum" MethodName="GetValues"
+                                ObjectType="{x:Type System:Enum}">
+              <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="common:PoeItemCorruptionState" />
+              </ObjectDataProvider.MethodParameters>
+            </ObjectDataProvider>
+          </StackPanel.Resources>
+          <ComboBox Style="{StaticResource QueryComboBox}"
+                    SelectedValue="{Binding CorruptionState}"
+                    Width="165"
+                    IsEditable="True"
+                    ItemsSource="{Binding Source={StaticResource PoeItemCorruptionStateFromEnum}}"
                     controls:TextBoxHelper.ClearTextButton="True"
                     controls:TextBoxHelper.Watermark="any" />
         </StackPanel>
@@ -389,37 +409,32 @@
 
       <Grid Row="14">
         <Grid.ColumnDefinitions>
-          <ColumnDefinition Width="100" />
-          <ColumnDefinition Width="80" />
-          <ColumnDefinition Width="100" />
-          <ColumnDefinition Width="80" />
-          <ColumnDefinition Width="100" />
-          <ColumnDefinition Width="80" />
-          <ColumnDefinition Width="120" />
-          <ColumnDefinition Width="80" />
+          <ColumnDefinition Width="30" />
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <TextBlock Grid.Column="0"
-                   Text="Buyout" Style="{StaticResource TextBlockHeader}" />
-        <StackPanel Grid.Column="1">
+        
+        <StackPanel Grid.Column="1" Margin="10, 0">
+          <TextBlock Text="Buyout only" Style="{StaticResource TextBlockHeader}" />
           <controls:ToggleSwitch IsChecked="{Binding BuyoutOnly}" OffLabel="" OnLabel="" />
         </StackPanel>
 
-        <TextBlock Grid.Column="2"
-                   Text="Online" Style="{StaticResource TextBlockHeader}" />
-        <StackPanel Grid.Column="3">
+        <StackPanel Grid.Column="2"  Margin="10, 0">
+          <TextBlock Text="Online" Style="{StaticResource TextBlockHeader}" />
           <controls:ToggleSwitch IsChecked="{Binding OnlineOnly}" OffLabel="" OnLabel="" />
         </StackPanel>
 
-        <TextBlock Grid.Column="4"
-                   Text="Alt. art" Style="{StaticResource TextBlockHeader}" />
-        <StackPanel Grid.Column="5">
+        <StackPanel Grid.Column="3"  Margin="10, 0">
+          <TextBlock Text="Alt. art" Style="{StaticResource TextBlockHeader}" />
           <controls:ToggleSwitch IsChecked="{Binding AlternativeArt}" OffLabel="" OnLabel="" />
         </StackPanel>
 
-        <TextBlock Grid.Column="6"
-                   Text="Normalize quality" Style="{StaticResource TextBlockHeader}" />
-        <StackPanel Grid.Column="7">
+        <StackPanel Grid.Column="4"  Margin="10, 0">
+          <TextBlock Text="Normalize quality" Style="{StaticResource TextBlockHeader}" />
           <controls:ToggleSwitch IsChecked="{Binding NormalizeQuality}" OffLabel="" OnLabel="" />
         </StackPanel>
       </Grid>

@@ -81,7 +81,8 @@ namespace PoeEye.PoeTrade
                 CreateArgument("linked_b", source.LinkedB),
                 CreateArgument("linked_w", source.LinkedW),
                 CreateArgument("type", source.ItemType?.CodeName),
-                CreateArgument("rarity", source.ItemRarity?.ToString().ToLowerInvariant() ?? string.Empty)
+                CreateArgument("rarity", ConvertToRaw(source.ItemRarity)),
+                CreateArgument("corrupted", ConvertToRaw(source.CorruptionState)),
             };
 
             var groups = source.ModGroups ?? new IPoeQueryModsGroup[0];
@@ -105,12 +106,35 @@ namespace PoeEye.PoeTrade
             return result;
         }
 
+        private static string ConvertToRaw(PoeItemRarity? source)
+        {
+            switch (source)
+            {
+                case null:
+                    return string.Empty;
+                default:
+                    return source.Value.ToString().ToLowerInvariant();
+            }
+        }
+
+        private static string ConvertToRaw(PoeItemCorruptionState? source)
+        {
+            switch (source)
+            {
+                case PoeItemCorruptionState.Corrupted:
+                    return "1";
+                case PoeItemCorruptionState.NotCorrupted:
+                    return "2";
+                default:
+                    return string.Empty;
+            }
+        }
+
         private IPoeQueryArgument CreateModArgument(IPoeItemMod mod, float? min, float? max)
         {
             var arg = new PoeQueryRangeModArgument(mod)
             {
-                Min = min,
-                Max = max
+                Min = min, Max = max
             };
             return arg;
         }
@@ -122,7 +146,7 @@ namespace PoeEye.PoeTrade
                 return new PoeQueryStringArgument(name, string.Empty);
             }
 
-            if (typeof (T).IsEnum)
+            if (typeof(T).IsEnum)
             {
                 return new PoeQueryStringArgument(name, value.ToString());
             }
@@ -132,32 +156,28 @@ namespace PoeEye.PoeTrade
                 return new PoeQueryStringArgument(name, string.Empty);
             }
 
-            if (typeof (T) == typeof (int?) || typeof (T) == typeof (int))
+            if (typeof(T) == typeof(int?) || typeof(T) == typeof(int))
             {
-                return new PoeQueryIntArgument(
-                    name,
-                    value is int ? ConvertToType<int>(value) : (int) ConvertToType<int?>(value));
+                return new PoeQueryIntArgument(name, value is int ? ConvertToType<int>(value) : (int) ConvertToType<int?>(value));
             }
-            if (typeof (T) == typeof (float?))
+            if (typeof(T) == typeof(float?))
             {
-                return new PoeQueryFloatArgument(
-                    name,
-                    value is float ? ConvertToType<float>(value) : (float) ConvertToType<float?>(value));
+                return new PoeQueryFloatArgument(name, value is float ? ConvertToType<float>(value) : (float) ConvertToType<float?>(value));
             }
-            if (typeof (T) == typeof (string))
+            if (typeof(T) == typeof(string))
             {
                 return new PoeQueryStringArgument(name, ConvertToType<string>(value) ?? string.Empty);
             }
-            if (typeof (T) == typeof (bool))
+            if (typeof(T) == typeof(bool))
             {
                 return new PoeQueryStringArgument(name, ConvertToType<bool>(value) ? "x" : string.Empty);
             }
-            throw new NotSupportedException($"Type {typeof (T)} is not supported, parameter name: {name}");
+            throw new NotSupportedException($"Type {typeof(T)} is not supported, parameter name: {name}");
         }
 
         private T ConvertToType<T>(object value)
         {
-            return (T) System.Convert.ChangeType(value, typeof (T));
+            return (T) System.Convert.ChangeType(value, typeof(T));
         }
     }
 }

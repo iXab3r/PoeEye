@@ -181,6 +181,7 @@
     <Compile Include="Common\KnownCurrencyNameList.cs" />
     <Compile Include="Common\PoeCurrency.cs" />
     <Compile Include="Common\PoeItem.cs" />
+    <Compile Include="Common\PoeItemCorruptionState.cs" />
     <Compile Include="Common\PoeItemEqualityComparer.cs" />
     <Compile Include="Common\PoeItemRarity.cs" />
     <Compile Include="Common\PoeItemMod.cs" />
