@@ -124,7 +124,7 @@ namespace PoeEye.PoeTrade
                 case PoeItemCorruptionState.Corrupted:
                     return "1";
                 case PoeItemCorruptionState.NotCorrupted:
-                    return "2";
+                    return "0";
                 default:
                     return string.Empty;
             }

@@ -56,13 +56,10 @@
           <ListBox 
                  ItemsSource="{Binding TabsList}"
                  SelectedItem="{Binding SelectedTab}"
-                 SelectionMode="Single"
-                 Focusable="False"
-                 HorizontalContentAlignment="Stretch"
-                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                 Style="{StaticResource ListBoxAsTabsList}"
                  ItemTemplate="{StaticResource MainWindowTabItemViewTemplate}">
             <ListBox.Resources>
-              <Style TargetType="ListBoxItem" BasedOn="{StaticResource ListBoxAsTabControl}" />
+              <Style TargetType="ListBoxItem" BasedOn="{StaticResource ListBoxItemForTabsList}" />
             </ListBox.Resources>
           </ListBox>
         </Expander>
