@@ -295,6 +295,8 @@ namespace PoeEye.PoeTrade.ViewModels
                 return;
             }
 
+            Log.Instance.Debug($"[MainWindowTabViewModel.MarkAllAsReadExecute] Marking {tradesToAmend.Length} of {tradesList.Items.Count} item(s) as Read");
+
             using (TradesList.Items.SuppressChangeNotifications())
             {
                 foreach (var trade in tradesToAmend)

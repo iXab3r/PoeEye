@@ -199,6 +199,7 @@
 
         private void RemoveItem(IPoeTradeViewModel tradeViewModel)
         {
+            tradeViewModel.Dispose();
             Items.Remove(tradeViewModel);
         }
 

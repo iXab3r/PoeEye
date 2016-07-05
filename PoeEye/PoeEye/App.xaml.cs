@@ -1,4 +1,6 @@
-﻿namespace PoeEye
+﻿using PoeShared.Scaffolding;
+
+namespace PoeEye
 {
     using System;
     using System.Reflection;
@@ -20,13 +22,24 @@
     {
         private static readonly string AppVersion = $"v{Assembly.GetExecutingAssembly().GetName().Version}";
 
+        public static readonly AppArguments Arguments = new AppArguments();
+
         public App()
         {
+            var arguments = Environment.GetCommandLineArgs();
+            if (!CommandLine.Parser.Default.ParseArguments(arguments, Arguments))
+            {
+                throw new ApplicationException($"Failed to parse command line args: {string.Join(" ", arguments)}");
+            }
+
             InitializeLogging();
+            Log.Instance.Debug($"[App..ctor] Arguments: {arguments.DumpToText()}");
+            Log.Instance.Debug($"[App..ctor] Parsed args: {Arguments.DumpToText()}");
 
             InitializeExceptionless();
 
             RxApp.SupportsRangeNotifications = true;
+
         }
 
         private static void InitializeExceptionless()
@@ -50,16 +63,22 @@
 
         private void InitializeLogging()
         {
-            // used for log4net configuration
-#if DEBUG
-            GlobalContext.Properties["configuration"] = "Debug";
+            if (Arguments.IsDebugMode)
+            {
+                GlobalContext.Properties["configuration"] = "Debug";
 
-            var repository = (log4net.Repository.Hierarchy.Hierarchy)LogManager.GetRepository();
-            repository.Root.Level = Level.Trace;
-            repository.RaiseConfigurationChanged(EventArgs.Empty);
-#else
-            GlobalContext.Properties["configuration"] = "Release";
-#endif
+                var repository = (log4net.Repository.Hierarchy.Hierarchy)LogManager.GetRepository();
+                repository.Root.Level = Level.Trace;
+                repository.RaiseConfigurationChanged(EventArgs.Empty);
+
+                Log.Instance.Info("Debug mode initialized");
+            }
+            else
+            {
+                GlobalContext.Properties["configuration"] = "Release";
+                Log.Instance.Info("Release mode initialized");
+            }
+
             AppDomain.CurrentDomain.UnhandledException += CurrentDomainOnUnhandledException;
 
             Log.Instance.Info("Application logging started");

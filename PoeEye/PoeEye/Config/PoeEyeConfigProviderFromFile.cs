@@ -21,11 +21,7 @@ namespace PoeEye.Config
 
     internal sealed class PoeEyeConfigProviderFromFile : DisposableReactiveObject, IPoeEyeConfigProvider
     {
-#if DEBUG
-        private static readonly string ConfigFilePath = Environment.ExpandEnvironmentVariables($@"%APPDATA%\PoeEye\configDebugMode.cfg");
-#else
-        private static readonly string ConfigFilePath = Environment.ExpandEnvironmentVariables($@"%APPDATA%\PoeEye\config.cfg");
-#endif
+        private readonly string configFilePath;
 
         private readonly JsonSerializerSettings jsonSerializerSettings;
 
@@ -33,6 +29,18 @@ namespace PoeEye.Config
 
         public PoeEyeConfigProviderFromFile()
         {
+            if (App.Arguments.IsDebugMode)
+            {
+                Log.Instance.Debug("[PoeEyeConfigProviderFromFile..ctor] Debug mode detected");
+                configFilePath = Environment.ExpandEnvironmentVariables($@"%APPDATA%\PoeEye\configDebugMode.cfg");
+            }
+            else
+            {
+                Log.Instance.Debug("[PoeEyeConfigProviderFromFile..ctor] Release mode detected");
+                configFilePath = Environment.ExpandEnvironmentVariables($@"%APPDATA%\PoeEye\config.cfg");
+            }
+            Log.Instance.Debug($"[PoeEyeConfigProviderFromFile..ctor] Config file path: {configFilePath}");
+
             jsonSerializerSettings = new JsonSerializerSettings
             {
                 Formatting = Formatting.Indented
@@ -72,14 +80,14 @@ namespace PoeEye.Config
 
                 Log.Instance.Debug($"[PoeEyeConfigProviderFromFile.Save] Successfully serialized config, got {serializedData.Length} chars");
 
-                Log.Instance.Debug($"[PoeEyeConfigProviderFromFile.Save] Saving config to file '{ConfigFilePath}'...");
+                Log.Instance.Debug($"[PoeEyeConfigProviderFromFile.Save] Saving config to file '{configFilePath}'...");
 
-                var directoryPath = Path.GetDirectoryName(ConfigFilePath);
+                var directoryPath = Path.GetDirectoryName(configFilePath);
                 if (directoryPath != null && !Directory.Exists(directoryPath))
                 {
                     Directory.CreateDirectory(directoryPath);
                 }
-                File.WriteAllText(ConfigFilePath, serializedData, Encoding.Unicode);
+                File.WriteAllText(configFilePath, serializedData, Encoding.Unicode);
 
                 Reload();
             }
@@ -93,18 +101,18 @@ namespace PoeEye.Config
 
         private IPoeEyeConfig LoadInternal()
         {
-            Log.Instance.Debug($"[PoeEyeConfigProviderFromFile.Load] Loading config from file '{ConfigFilePath}'...");
+            Log.Instance.Debug($"[PoeEyeConfigProviderFromFile.Load] Loading config from file '{configFilePath}'...");
 
-            if (!File.Exists(ConfigFilePath))
+            if (!File.Exists(configFilePath))
             {
-                Log.Instance.Debug($"[PoeEyeConfigProviderFromFile.Load] File not found, fileName: '{ConfigFilePath}'");
+                Log.Instance.Debug($"[PoeEyeConfigProviderFromFile.Load] File not found, fileName: '{configFilePath}'");
                 return new PoeEyeConfig();
             }
 
             PoeEyeConfig result;
             try
             {
-                var fileData = File.ReadAllText(ConfigFilePath);
+                var fileData = File.ReadAllText(configFilePath);
                 Log.Instance.Debug($"[PoeEyeConfigProviderFromFile.Load] Successfully read {fileData.Length} chars, deserializing...");
 
                 result = JsonConvert.DeserializeObject<PoeEyeConfig>(fileData, jsonSerializerSettings);

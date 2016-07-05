@@ -174,6 +174,8 @@ namespace PoeEye.PoeTrade.ViewModels
                 .Keys
                 .Where(x => x.AudioNotificationSelector.SelectedValue != AudioNotificationType.Disabled)
                 .ToArray();
+
+            Log.Instance.Debug($"[PoeSummaryTabViewModel.MarkAllAsReadExecuted] Sending command to {tabsToProcess.Length} tab(s)");
             tabsToProcess.ForEach(x => x.MarkAllAsReadCommand.Execute(null));
         }
 

@@ -83,10 +83,11 @@ namespace PoeEye.PoeTrade.Models
         {
             Log.Instance.Debug($"[ItemsCache.ResolveImageByUri] Starting to download image to cache...\r\n\tFilePath: '{outputFilePath}'");
 
-#if DEBUG
-            Log.Instance.Debug($"[ItemsCache.ResolveImageByUri] Atrificial delay: {ArtificialDelay}");
-            Thread.Sleep(ArtificialDelay);
-#endif
+            if (App.Arguments.IsDebugMode)
+            {
+                Log.Instance.Debug($"[ItemsCache.ResolveImageByUri] Atrificial delay: {ArtificialDelay}");
+                Thread.Sleep(ArtificialDelay);
+            }
 
             var outputDirectory = Path.GetDirectoryName(outputFilePath);
             if (outputDirectory != null && !Directory.Exists(outputDirectory))

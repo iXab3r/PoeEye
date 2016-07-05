@@ -67,7 +67,7 @@
                 .Subscribe(_ => CheckForUpdatesCommandExecuted(), Log.HandleUiException)
                 .AddTo(Anchors);
 
-            SquirrelAwareApp.HandleEvents(  
+            SquirrelAwareApp.HandleEvents(
                 OnInitialInstall,
                 OnAppUpdate,
                 onAppUninstall: OnAppUninstall,
@@ -127,11 +127,15 @@
 
             try
             {
-                var appName = typeof (ApplicationUpdaterViewModel).Assembly.GetName().Name;
+                var appName = typeof(ApplicationUpdaterViewModel).Assembly.GetName().Name;
                 var rootDirectory = default(string);
-#if DEBUG
-                rootDirectory = AppDomain.CurrentDomain.BaseDirectory;
-#endif
+
+                if (App.Arguments.IsDebugMode)
+                {
+                    rootDirectory = AppDomain.CurrentDomain.BaseDirectory;
+                }
+                Log.Instance.Debug($"[ApplicationUpdaterViewModel] AppName: {appName}, root directory: {rootDirectory}");
+
                 using (var mgr = new UpdateManager(PoeEyeUri, appName, rootDirectory))
                 {
                     Log.Instance.Debug($"[ApplicationUpdaterViewModel] Checking for updates...");
@@ -147,13 +151,17 @@
                     Log.Instance.Debug($"[ApplicationUpdaterViewModel] Downloading releases...");
                     mgr.DownloadReleases(updateInfo.ReleasesToApply, UpdateProgress).Wait();
 
-#if DEBUG
-                    Log.Instance.Debug($"[ApplicationUpdaterViewModel] Debug mode detected, skipping update");
-                    var newVersionFolder = AppDomain.CurrentDomain.BaseDirectory;
-#else
-                    Log.Instance.Debug($"[ApplicationUpdaterViewModel] Applying releases...");
-                    var newVersionFolder = mgr.ApplyReleases(updateInfo).Result;
-#endif
+                    string newVersionFolder;
+                    if (App.Arguments.IsDebugMode)
+                    {
+                        Log.Instance.Debug("[ApplicationUpdaterViewModel] Debug mode detected, skipping update");
+                        newVersionFolder = AppDomain.CurrentDomain.BaseDirectory;
+                    }
+                    else
+                    {
+                        Log.Instance.Debug("[ApplicationUpdaterViewModel] Applying releases...");
+                        newVersionFolder = mgr.ApplyReleases(updateInfo).Result;
+                    }
 
                     var lastAppliedRelease = updateInfo.ReleasesToApply.Last();
 
@@ -205,7 +213,7 @@
         {
             Log.Instance.Debug($"[ApplicationUpdaterViewModel.OnFirstRun] App started for the first time");
         }
-        
+
         private void RestartCommandExecuted()
         {
             var applicationName = Process.GetCurrentProcess().ProcessName + ".exe";
