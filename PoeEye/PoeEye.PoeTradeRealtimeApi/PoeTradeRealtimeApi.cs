@@ -38,7 +38,7 @@ namespace PoeEye.PoeTradeRealtimeApi
 
         public override Guid Id { get; } = Guid.Parse("16E6A0E6-E5A4-4260-A698-764DD8B2E843");
 
-        public override string Name { get; } = "(alpha) poe.trade Realtime";
+        public override string Name { get; } = "poe.trade Realtime";
 
         public override Task<IPoeQueryResult> IssueQuery(IPoeQueryInfo query)
         {

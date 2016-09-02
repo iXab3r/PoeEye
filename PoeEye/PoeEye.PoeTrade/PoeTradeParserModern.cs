@@ -109,7 +109,7 @@ namespace PoeEye.PoeTrade
 
         private string ExtractQueryId(CQ parser)
         {
-            var liveUri = parser["div[class='alert-box'] a"]?.Attr("href");
+            var liveUri = parser["div[class='live-search-box alert-box'] a"]?.Attr("href");
 
             return liveUri;
         }
