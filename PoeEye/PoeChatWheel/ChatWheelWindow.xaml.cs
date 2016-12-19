@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Text;
@@ -43,19 +44,20 @@ namespace PoeChatWheel
             chatWheel
                 .WhenAnyValue(x => x.IsOpen)
                 .Where(x => x)
+                .ObserveOn(this)
                 .Subscribe(x => this.CenterToMouse())
                 .AddTo(Anchors);
 
             chatWheel.Items.Changed
                 .Where(x => RadialMenu != null)
-                .ObserveOn(RxApp.MainThreadScheduler)
+                .ObserveOn(this)
                 .Select(x => chatWheel.Items.ToList())
                 .Subscribe(SetMenuItems)
                 .AddTo(Anchors);
 
             chatWheel.WhenAnyValue(x => x.CentralItem)
                 .Where(x => RadialMenu != null)
-                .ObserveOn(RxApp.MainThreadScheduler)
+                .ObserveOn(this)
                 .Subscribe(x => RadialMenu.CentralItem = x)
                 .AddTo(Anchors);
 

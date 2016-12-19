@@ -1,7 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -20,10 +21,10 @@ using RadialMenu.Controls;
 using ReactiveUI;
 using Stateless;
 using Application = System.Windows.Application;
+using Orientation = System.Windows.Controls.Orientation;
 using WinFormsKeyEventArgs = System.Windows.Forms.KeyEventArgs;
 using WpfKeyEventArgs = System.Windows.Input.KeyEventArgs;
 using WinFormsKeyEventHandler = System.Windows.Forms.KeyEventHandler;
-using Orientation = System.Windows.Controls.Orientation;
 
 namespace PoeChatWheel.ViewModels
 {
@@ -55,10 +56,12 @@ namespace PoeChatWheel.ViewModels
 
         private readonly StateMachine<State, Trigger> queryStateMachine = new StateMachine<State, Trigger>(State.Hidden);
 
-        private readonly Queue<Color> userColors =
-            new Queue<Color>(PleasantColors.Select(x => (Color) ColorConverter.ConvertFromString(x)));
+        private readonly ConcurrentQueue<Color> userColors =
+            new ConcurrentQueue<Color>(PleasantColors.Select(x => (Color) ColorConverter.ConvertFromString(x)));
 
         private RadialMenuCentralItem centralItem;
+
+        private KeyGesture hotkey;
         private bool isOpen;
 
         public PoeChatWheelViewModel(
@@ -77,61 +80,68 @@ namespace PoeChatWheel.ViewModels
 
             queryStateMachine
                 .Configure(State.Hidden)
-                .Permit(Trigger.ActionSelected, State.ActionSelection)
                 .Permit(Trigger.Show, State.NameSelection)
-                .OnEntry(() => IsOpen = false);
+                .OnEntry(
+                    () =>
+                    {
+                        IsOpen = false;
+                    });
 
             queryStateMachine
                 .Configure(State.NameSelection)
                 .Permit(Trigger.NameSelected, State.ActionSelection)
                 .Permit(Trigger.ActionSelected, State.Done)
                 .Permit(Trigger.Hide, State.Hidden)
-                .Ignore(Trigger.Show)
                 .OnEntry(RebuildCharactersList)
-                .OnEntry(() => IsOpen = true);
+                .OnEntry(
+                    () =>
+                    {
+                        IsOpen = true;
+                    });
 
             queryStateMachine
                 .Configure(State.ActionSelection)
                 .Permit(Trigger.ActionSelected, State.Done)
                 .Permit(Trigger.Hide, State.Hidden)
-                .Ignore(Trigger.Show)
                 .OnEntryFrom(nameSelectedTransitionTrigger, RebuildMenuForCharacter);
 
             queryStateMachine
                 .Configure(State.Done)
                 .Permit(Trigger.Hide, State.Hidden)
-                .Ignore(Trigger.Show)
                 .Ignore(Trigger.ActionSelected)
                 .OnEntryFrom(actionSelectedTransitionTrigger, SendMessage)
-                .OnEntry(() => IsOpen = false);
+                .OnEntry(
+                    () =>
+                    {
+                        IsOpen = false;
+                    });
 
             Observable.FromEventPattern<WinFormsKeyEventHandler, WinFormsKeyEventArgs>(
                 h => globalEvents.KeyDown += h,
                 h => globalEvents.KeyDown -= h)
-                .Where(x => IsOpen == false)
+                .Where(x => queryStateMachine.State == State.Hidden)
                 .Where(x => poeWindowTracker.IsActive)
                 .Where(x => MatchesHotkey(x.EventArgs, hotkey))
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(() => queryStateMachine.Fire(Trigger.Show))
+                .Subscribe(
+                    () =>
+                    {
+                        queryStateMachine.Fire(Trigger.Show);
+                    })
                 .AddTo(Anchors);
 
             Observable.FromEventPattern<WinFormsKeyEventHandler, WinFormsKeyEventArgs>(
                 h => globalEvents.KeyUp += h,
                 h => globalEvents.KeyUp -= h)
-                .Where(x => IsOpen || queryStateMachine.State == State.Done)
+                .Where(x => queryStateMachine.State != State.Hidden)
                 .Where(x => MatchesHotkey(x.EventArgs, hotkey))
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(() => queryStateMachine.Fire(Trigger.Hide))
+                .Subscribe(
+                    () =>
+                    {
+                        queryStateMachine.Fire(Trigger.Hide);
+                    })
                 .AddTo(Anchors);
 
-            whisperService.Messages
-                .Where(x => x.MessageType == PoeMessageType.WhisperTo)
-                .Subscribe(x => PlayerCharacterName = x.Name)
-                .AddTo(Anchors);
-
-            Observable.Concat(
-                whisperService.Messages.Where(x => x.MessageType == PoeMessageType.WhisperFrom))
-                .ObserveOn(RxApp.MainThreadScheduler)
+            whisperService.Messages.Where(x => x.MessageType == PoeMessageType.WhisperFrom)
                 .Subscribe(ProcessMessage)
                 .AddTo(Anchors);
         }
@@ -147,16 +157,6 @@ namespace PoeChatWheel.ViewModels
             get { return isOpen; }
             set { this.RaiseAndSetIfChanged(ref isOpen, value); }
         }
-
-        private string playerCharacterName;
-
-        public string PlayerCharacterName
-        {
-            get { return playerCharacterName; }
-            set { this.RaiseAndSetIfChanged(ref playerCharacterName, value); }
-        }
-
-        private KeyGesture hotkey;
 
         public KeyGesture Hotkey
         {
@@ -175,7 +175,7 @@ namespace PoeChatWheel.ViewModels
             {
                 return false;
             }
-            var winKey = (Keys)KeyInterop.VirtualKeyFromKey(hotkey.Key);
+            var winKey = (Keys) KeyInterop.VirtualKeyFromKey(hotkey.Key);
             var keyMatches = args.KeyCode == winKey;
             var wpfModifiers = ModifierKeys.None;
             if (args.Alt && winKey != Keys.Alt)
@@ -186,7 +186,8 @@ namespace PoeChatWheel.ViewModels
             {
                 wpfModifiers |= ModifierKeys.Control;
             }
-            if (args.Shift && winKey != Keys.Shift && winKey != Keys.ShiftKey && winKey != Keys.RShiftKey && winKey != Keys.LShiftKey)
+            if (args.Shift && winKey != Keys.Shift && winKey != Keys.ShiftKey && winKey != Keys.RShiftKey &&
+                winKey != Keys.LShiftKey)
             {
                 wpfModifiers |= ModifierKeys.Shift;
             }
@@ -234,7 +235,11 @@ namespace PoeChatWheel.ViewModels
             menuItem.Tag = message;
             menuItem.Content = CreateMenuItemContent(
                 $"{characterName}\n\xF017 {timeElapsed.TotalSeconds:F0}s ago", FontAwesome.Net.FontAwesome.user);
-            menuItem.Click += delegate { queryStateMachine.Fire(nameSelectedTransitionTrigger, message.Name); };
+            menuItem.Click += delegate
+            {
+                Log.Instance.Debug($"[PoeChatWheel.SelectCharacter] Name '{message.Name}'");
+                queryStateMachine.Fire(nameSelectedTransitionTrigger, message.Name);
+            };
 
             menuItem.ToolTip = PrepareMessageHistory(message.Name);
             return menuItem;
@@ -252,6 +257,7 @@ namespace PoeChatWheel.ViewModels
 
         private void ProcessMessage(PoeMessage message)
         {
+            CleanupHistory();
             if (messagesHistory.Select(x => x.Name).Contains(message.Name))
             {
                 return;
@@ -262,9 +268,13 @@ namespace PoeChatWheel.ViewModels
 
         private Color PickNextUserColor()
         {
-            var color = userColors.Dequeue();
-            userColors.Enqueue(color);
-            return color;
+            Color color;
+            if (userColors.TryDequeue(out color))
+            {
+                userColors.Enqueue(color);
+                return color;
+            }
+            return Colors.White;
         }
 
         private void RebuildMenuForCharacter(string characterName)
@@ -313,7 +323,11 @@ namespace PoeChatWheel.ViewModels
             {
                 return item;
             }
-            item.Click += delegate { queryStateMachine.Fire(actionSelectedTransitionTrigger, (string) item.Tag); };
+            item.Click += delegate
+            {
+                Log.Instance.Debug($"[PoeChatWheel.SelectAction] Action '{item.Tag}'");
+                queryStateMachine.Fire(actionSelectedTransitionTrigger, (string) item.Tag);
+            };
             return item;
         }
 
@@ -324,7 +338,7 @@ namespace PoeChatWheel.ViewModels
                 Text = itemText,
                 TextAlignment = TextAlignment.Center,
                 FontFamily = Application.Current.FindResource("FontAwesome") as FontFamily,
-                Width = 80,
+                Width = 80
             };
         }
 

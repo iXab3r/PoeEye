@@ -31,6 +31,7 @@
             x:Name="MenuControl"
             FontSize="14"
             IsOpen="{Binding DataContext.IsOpen}"
+            IsEnabled="{Binding DataContext.IsOpen}"
             TextBlock.TextAlignment="Center">
             
             <controls:RadialMenu.Resources>

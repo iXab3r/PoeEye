@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Reactive.Concurrency;
 using System.Reactive.Linq;
+using System.Threading;
 using System.Windows.Input;
 using PoeChatWheel;
 using PoeChatWheel.ViewModels;
 using PoeEye.Config;
+using Prism.Unity;
 using ReactiveUI;
 using ConfigurationModuleCatalog = Prism.Modularity.ConfigurationModuleCatalog;
 using IModuleCatalog = Prism.Modularity.IModuleCatalog;
@@ -50,12 +53,17 @@ namespace PoeEye.Prism
             var viewModel = Container.Resolve<IMainWindowViewModel>();
             window.DataContext = viewModel;
 
-            InitializeChatWheel();
+            Scheduler.Default.Schedule(InitializeChatWheel);
         }
 
-        private void InitializeChatWheel()
+        private void CreateChatWheel()
         {
-            var chatWheel = Container.Resolve<IPoeChatWheelViewModel>();
+            var chatWheel = Container.TryResolve<IPoeChatWheelViewModel>();
+            if (chatWheel == null)
+            {
+                Log.Instance.Debug("[CreateChatWheel] Chat wheel was not loaded");
+                return;
+            }
 
             var settings = Container.Resolve<IPoeEyeConfigProvider>();
             settings.WhenAnyValue(x => x.ActualConfig)
@@ -63,14 +71,15 @@ namespace PoeEye.Prism
                 .Subscribe(hotkey => chatWheel.Hotkey = hotkey);
 
             var window = new ChatWheelWindow(chatWheel);
-            window.Show();
+            window.ShowDialog();
+        }
 
-            var mainWindow = (Window)Shell;
-            mainWindow.Closed += delegate
-            {
-                chatWheel.Dispose();
-                window.Close();
-            };
+        private void InitializeChatWheel()
+        {
+            var newWindowThread = new Thread(CreateChatWheel);
+            newWindowThread.SetApartmentState(ApartmentState.STA);
+            newWindowThread.IsBackground = true;
+            newWindowThread.Start();
         }
 
         private void RegisterExtensions()

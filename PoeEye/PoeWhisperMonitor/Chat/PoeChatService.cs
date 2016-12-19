@@ -99,21 +99,11 @@ namespace PoeWhisperMonitor.Chat
                 }
             }
 
-            using (Block())
-            {
-                keyboardSimulator.KeyPress(VirtualKeyCode.RETURN);
-                keyboardSimulator.ModifiedKeyStroke(VirtualKeyCode.CONTROL, VirtualKeyCode.VK_V);
-                keyboardSimulator.KeyPress(VirtualKeyCode.RETURN);
-            }
-        }
+            keyboardSimulator.KeyPress(VirtualKeyCode.RETURN);
+            keyboardSimulator.ModifiedKeyStroke(VirtualKeyCode.CONTROL, VirtualKeyCode.VK_V);
+            keyboardSimulator.KeyPress(VirtualKeyCode.RETURN);
 
-        public IDisposable Block()
-        {
-            BlockInput(true);
-            return Disposable.Create(() => BlockInput(false));
+            SetForegroundWindow(hWnd);
         }
-
-        [DllImport("user32.dll")]
-        static extern bool BlockInput(bool blockInput);
     }
 }
