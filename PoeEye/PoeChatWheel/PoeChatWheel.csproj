@@ -144,6 +144,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Utilities\WindowExtensions.cs" />
+    <Compile Include="Utilities\WindowsServices.cs" />
     <Compile Include="ViewModels\PoeChatWheelViewModel.cs" />
     <Compile Include="ViewModels\IPoeChatWheelViewModel.cs" />
     <Page Include="ChatWheelWindow.xaml">

@@ -86,6 +86,7 @@ namespace PoeChatWheel.ViewModels
                 .Permit(Trigger.NameSelected, State.ActionSelection)
                 .Permit(Trigger.ActionSelected, State.Done)
                 .Permit(Trigger.Hide, State.Hidden)
+                .Ignore(Trigger.Show)
                 .OnEntry(RebuildCharactersList)
                 .OnEntry(() => IsOpen = true);
 
@@ -93,6 +94,7 @@ namespace PoeChatWheel.ViewModels
                 .Configure(State.ActionSelection)
                 .Permit(Trigger.ActionSelected, State.Done)
                 .Permit(Trigger.Hide, State.Hidden)
+                .Ignore(Trigger.Show)
                 .OnEntryFrom(nameSelectedTransitionTrigger, RebuildMenuForCharacter);
 
             queryStateMachine
@@ -176,15 +178,15 @@ namespace PoeChatWheel.ViewModels
             var winKey = (Keys)KeyInterop.VirtualKeyFromKey(hotkey.Key);
             var keyMatches = args.KeyCode == winKey;
             var wpfModifiers = ModifierKeys.None;
-            if (args.Alt)
+            if (args.Alt && winKey != Keys.Alt)
             {
                 wpfModifiers |= ModifierKeys.Alt;
             }
-            if (args.Control)
+            if (args.Control && winKey != Keys.LControlKey && winKey != Keys.RControlKey)
             {
                 wpfModifiers |= ModifierKeys.Control;
             }
-            if (args.Shift)
+            if (args.Shift && winKey != Keys.Shift && winKey != Keys.ShiftKey && winKey != Keys.RShiftKey && winKey != Keys.LShiftKey)
             {
                 wpfModifiers |= ModifierKeys.Shift;
             }
