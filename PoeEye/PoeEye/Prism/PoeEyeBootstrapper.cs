@@ -64,6 +64,13 @@ namespace PoeEye.Prism
 
             var window = new ChatWheelWindow(chatWheel);
             window.Show();
+
+            var mainWindow = (Window)Shell;
+            mainWindow.Closed += delegate
+            {
+                chatWheel.Dispose();
+                window.Close();
+            };
         }
 
         private void RegisterExtensions()
