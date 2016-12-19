@@ -38,7 +38,7 @@
             whisperService.Messages
                     .Where(x => poeEyeConfigProvider.ActualConfig.WhisperNotificationsEnabled)
                     .Where(x => !poeWindowTracker.IsActive)
-                    .Where(x => x.MessageType == PoeMessageType.Whisper)
+                    .Where(x => x.MessageType == PoeMessageType.WhisperFrom)
                     .Subscribe(ProcessWhisper)
                     .AddTo(Anchors);
         }

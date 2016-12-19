@@ -3,7 +3,11 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices;
+using System.Threading;
 using System.Windows;
+using WindowsInput;
+using WindowsInput.Native;
 using Guards;
 using JetBrains.Annotations;
 using KeyboardApi;
@@ -17,6 +21,17 @@ namespace PoeWhisperMonitor.Chat
     {
         private bool isAvailable;
         private ConcurrentQueue<PoeProcessInfo> knownProcesses = new ConcurrentQueue<PoeProcessInfo>();
+        private IKeyboardSimulator keyboardSimulator = new InputSimulator().Keyboard;
+
+        /// <summary>
+        ///     The GetForegroundWindow function returns a handle to the foreground window.
+        /// </summary>
+        [DllImport("user32.dll")]
+        private static extern IntPtr GetForegroundWindow();
+
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool SetForegroundWindow(IntPtr hWnd);
 
         public PoeChatService(
             [NotNull] IPoeTracker tracker)
@@ -78,9 +93,17 @@ namespace PoeWhisperMonitor.Chat
         {
             Clipboard.SetText(message);
 
-            Messaging.SendMessage(hWnd, new VKey(Messaging.VKeys.KEY_RETURN), true);
-            Messaging.ForegroundKeyPressAll(hWnd, new VKey(Messaging.VKeys.KEY_V, Messaging.VKeys.KEY_CONTROL, Messaging.ShiftType.CTRL), false, true, false);
-            Messaging.SendMessage(hWnd, new VKey(Messaging.VKeys.KEY_RETURN), true);
+            if (GetForegroundWindow() != hWnd)
+            {
+                if (!SetForegroundWindow(hWnd))
+                {
+                    return;
+                }
+            }
+
+            keyboardSimulator.KeyPress(VirtualKeyCode.RETURN);
+            keyboardSimulator.ModifiedKeyStroke(VirtualKeyCode.CONTROL, VirtualKeyCode.VK_V);
+            keyboardSimulator.KeyPress(VirtualKeyCode.RETURN);
         }
     }
 }

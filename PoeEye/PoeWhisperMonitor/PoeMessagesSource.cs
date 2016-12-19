@@ -28,7 +28,7 @@
         private readonly Regex logRecordRegex = new Regex(@"^(?'timestamp'\d\d\d\d\/\d\d\/\d\d \d\d:\d\d:\d\d) (?'content'.*)$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         private readonly Regex messageParseRegex = new Regex(
-            @"^(?'timestamp'\d\d\d\d\/\d\d\/\d\d \d\d:\d\d:\d\d).*?\[.*\] (?'prefix'[$@&])?(?'name'.*): (?'message'.*)$",
+            @"^(?'timestamp'\d\d\d\d\/\d\d\/\d\d \d\d:\d\d:\d\d).*(?'prefix'[$&]|@From|@To)\s?(?:\<(?'guild'.*?)\> )?(?'name'.*):\s*(?'message'.*)$",
             RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         private readonly ISubject<PoeMessage> messageSubject = new Subject<PoeMessage>();
@@ -77,7 +77,7 @@
 
             linesBuffer.Clear();
 
-            Log.Instance.Debug($"[PoeMessagesSource] New message: {message}");
+            Log.Instance.Debug($"[PoeMessagesSource] New message: {message.DumpToText()}");
             return message;
         }
 
@@ -125,8 +125,10 @@
         {
             switch (prefix)
             {
-                case "@":
-                    return PoeMessageType.Whisper;
+                case "@From":
+                    return PoeMessageType.WhisperFrom;
+                case "@To":
+                    return PoeMessageType.WhisperTo;
                 case "$":
                     return PoeMessageType.Trade;
                 case "&":

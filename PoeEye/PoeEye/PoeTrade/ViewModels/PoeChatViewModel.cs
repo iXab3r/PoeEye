@@ -42,9 +42,9 @@ namespace PoeEye.PoeTrade.ViewModels
 
             this.notificationsManager = notificationsManager;
             this.chatService = chatService;
-            whisperService.Messages
+            whisperService.Messages     
                 .ObserveOn(uiScheduler)
-                .Where(x => x.MessageType == PoeMessageType.Whisper)
+                .Where(x => x.MessageType == PoeMessageType.WhisperFrom || x.MessageType == PoeMessageType.WhisperTo)
                 .Subscribe(Messages.Add)
                 .AddTo(Anchors);
 

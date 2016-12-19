@@ -7,6 +7,7 @@
         Local,
         Trade,
         Guild,
-        Whisper
+        WhisperFrom,
+        WhisperTo
     }
 }
