@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Linq;
+using System.Reactive.Disposables;
 using System.Runtime.InteropServices;
 using System.Windows;
 using WindowsInput;
@@ -98,9 +99,21 @@ namespace PoeWhisperMonitor.Chat
                 }
             }
 
-            keyboardSimulator.KeyPress(VirtualKeyCode.RETURN);
-            keyboardSimulator.ModifiedKeyStroke(VirtualKeyCode.CONTROL, VirtualKeyCode.VK_V);
-            keyboardSimulator.KeyPress(VirtualKeyCode.RETURN);
+            using (Block())
+            {
+                keyboardSimulator.KeyPress(VirtualKeyCode.RETURN);
+                keyboardSimulator.ModifiedKeyStroke(VirtualKeyCode.CONTROL, VirtualKeyCode.VK_V);
+                keyboardSimulator.KeyPress(VirtualKeyCode.RETURN);
+            }
         }
+
+        public IDisposable Block()
+        {
+            BlockInput(true);
+            return Disposable.Create(() => BlockInput(false));
+        }
+
+        [DllImport("user32.dll")]
+        static extern bool BlockInput(bool blockInput);
     }
 }

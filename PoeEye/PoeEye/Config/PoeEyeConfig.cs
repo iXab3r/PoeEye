@@ -66,6 +66,8 @@ namespace PoeEye.Config
 
         public bool WhisperNotificationsEnabled { get; set; } = false;
 
+        public string ChatWheelHotkey { get; set; } = "";
+
         public TimeSpan MinRefreshTimeout { get; set; } = TimeSpan.FromSeconds(30);
 
         public TimeSpan MaxRefreshTimeout { get; set; } = TimeSpan.FromMinutes(30);

@@ -1,6 +1,7 @@
-﻿namespace PoeEye.Prism
+﻿using PoeShared.Prism;
+
+namespace PoeEye.Prism
 {
-    using System;
     using System.Diagnostics;
     using System.Reactive.Concurrency;
 
@@ -55,17 +56,8 @@
                 .RegisterType<IRecheckPeriodViewModel, RecheckPeriodViewModel>()
                 .RegisterType<ISuggestionProvider, FuzzySuggestionProvider>();
 
-            RegisterTracker(WellKnownWindows.Main, () => Process.GetCurrentProcess().MainWindowTitle);
-            RegisterTracker(WellKnownWindows.PathOfExile, () => Settings.Default.PathOfExileWindowName);
-        }
-
-        private IUnityContainer RegisterTracker(string dependencyName, Func<string> windowNameFunc)
-        {
-            return Container
-                 .RegisterType<IWindowTracker, WindowTracker>(
-                     dependencyName,
-                     new ContainerControlledLifetimeManager(),
-                     new InjectionFactory(unity => unity.Resolve<WindowTracker>(new DependencyOverride<Func<string>>(windowNameFunc))));
+            Container.RegisterWindowTracker(WellKnownWindows.Main, () => Process.GetCurrentProcess().MainWindowTitle);
+            Container.RegisterWindowTracker(WellKnownWindows.PathOfExile, () => Settings.Default.PathOfExileWindowName);
         }
     }
 }

@@ -1,20 +1,14 @@
-﻿namespace PoeEye.PoeTrade.Models
+﻿using System;
+using System.Reactive.Linq;
+using System.Runtime.InteropServices;
+using System.Text;
+using System.Text.RegularExpressions;
+using Guards;
+using JetBrains.Annotations;
+using ReactiveUI;
+
+namespace PoeShared.Scaffolding
 {
-    using System;
-    using System.Reactive.Linq;
-    using System.Runtime.InteropServices;
-    using System.Text;
-    using System.Text.RegularExpressions;
-
-    using Guards;
-
-    using JetBrains.Annotations;
-
-    using PoeShared;
-    using PoeShared.Scaffolding;
-
-    using ReactiveUI;
-
     internal sealed class WindowTracker : DisposableReactiveObject, IWindowTracker
     {
         private static readonly TimeSpan recheckPeriod = TimeSpan.FromSeconds(1);
@@ -24,8 +18,8 @@
 
         public WindowTracker([NotNull] Func<string> titleMatcherRegexFunc)
         {
-            this.titleMatcherRegexFunc = titleMatcherRegexFunc;
             Guard.ArgumentNotNull(() => titleMatcherRegexFunc);
+            this.titleMatcherRegexFunc = titleMatcherRegexFunc;
 
             Observable
                 .Timer(DateTimeOffset.Now, recheckPeriod)

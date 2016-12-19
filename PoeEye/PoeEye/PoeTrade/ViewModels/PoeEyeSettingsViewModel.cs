@@ -1,14 +1,17 @@
-﻿namespace PoeEye.PoeTrade.ViewModels
+﻿using System;
+using System.Linq;
+using System.Windows.Input;
+using PoeEye.Utilities;
+using PoeShared.Scaffolding;
+using ReactiveUI;
+
+namespace PoeEye.PoeTrade.ViewModels
 {
-    using PoeShared.Scaffolding;
-
-    using ReactiveUI;
-
-    using Utilities;
-
     internal sealed class PoeEyeSettingsViewModel : DisposableReactiveObject
     {
         private bool audioNotificationsEnabled = true;
+
+        private string chatWheelHotkey;
 
         private bool clipboardMonitoringEnabled;
 
@@ -16,6 +19,20 @@
 
         private bool isOpen;
         private bool whisperNotificationsEnabled;
+
+        public PoeEyeSettingsViewModel()
+        {
+            var keyGestureConverter = new KeyGestureConverter();
+            HotkeysList =
+                Enum.GetValues(typeof(Key))
+                    .OfType<Key>()
+                    .Select(TryToCreateKeyGesture)
+                    .Where(x => x != null)
+                    .Select(x => x.Key == Key.None ? "None" : keyGestureConverter.ConvertToInvariantString(x))
+                    .Distinct()
+                    .ToArray();
+            ChatWheelHotkey = HotkeysList.First();
+        }
 
         public bool IsOpen
         {
@@ -45,6 +62,26 @@
         {
             get { return clipboardMonitoringEnabled; }
             set { this.RaiseAndSetIfChanged(ref clipboardMonitoringEnabled, value); }
+        }
+
+        public string ChatWheelHotkey
+        {
+            get { return chatWheelHotkey; }
+            set { this.RaiseAndSetIfChanged(ref chatWheelHotkey, value); }
+        }
+
+        public string[] HotkeysList { get; set; }
+
+        private KeyGesture TryToCreateKeyGesture(Key key)
+        {
+            try
+            {
+                return new KeyGesture(key);
+            }
+            catch (Exception)
+            {
+                return null;
+            }
         }
     }
 }

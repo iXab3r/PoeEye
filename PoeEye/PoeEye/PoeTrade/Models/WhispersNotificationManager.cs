@@ -1,4 +1,7 @@
-﻿namespace PoeEye.PoeTrade.Models
+﻿using PoeShared;
+using PoeShared.Prism;
+
+namespace PoeEye.PoeTrade.Models
 {
     using System;
     using System.Reactive.Linq;

@@ -336,13 +336,11 @@
     <Compile Include="PoeTrade\Models\ImagesCacheService.cs" />
     <Compile Include="PoeTrade\Models\IPoeCaptchaRegistrator.cs" />
     <Compile Include="PoeTrade\Models\IWhispersNotificationManager.cs" />
-    <Compile Include="PoeTrade\Models\IWindowTracker.cs" />
     <Compile Include="PoeTrade\Models\PoeApiProvider.cs" />
     <Compile Include="PoeTrade\Models\PoeItemPricePoint.cs" />
     <Compile Include="PoeTrade\Models\PoePriceCalculcator.cs" />
     <Compile Include="PoeTrade\Models\PoeCaptchaRegistrator.cs" />
     <Compile Include="PoeTrade\Models\WhispersNotificationManager.cs" />
-    <Compile Include="PoeTrade\Models\WindowTracker.cs" />
     <Compile Include="PoeTrade\PoeItemVerificationState.cs" />
     <Compile Include="PoeTrade\ViewModels\ApplicationUpdaterViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\AudioNotificationSelectorViewModel.cs" />
@@ -381,7 +379,6 @@
     </Compile>
     <Compile Include="Prism\PoeEyeBootstrapper.cs" />
     <Compile Include="Prism\WellKnownSchedulers.cs" />
-    <Compile Include="Prism\WellKnownWindows.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -429,6 +426,10 @@
     <ProjectReference Include="..\FuzzySearch\FuzzySearch.csproj">
       <Project>{9cee14a8-1436-4947-9c62-ff3ba83a330d}</Project>
       <Name>FuzzySearch</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PoeChatWheel\PoeChatWheel.csproj">
+      <Project>{dad6d513-5c7c-433b-8a56-1d92476b4cff}</Project>
+      <Name>PoeChatWheel</Name>
     </ProjectReference>
     <ProjectReference Include="..\PoeEye.ExileToolsApi\PoeEye.ExileToolsApi.csproj">
       <Project>{02fd1625-7dd4-4b9b-9f5c-9fefa42b41df}</Project>

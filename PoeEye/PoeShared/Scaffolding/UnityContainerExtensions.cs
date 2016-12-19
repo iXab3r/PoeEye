@@ -1,3 +1,5 @@
+using System;
+
 namespace PoeShared.Scaffolding
 {
     using Guards;
@@ -19,6 +21,15 @@ namespace PoeShared.Scaffolding
             Guard.ArgumentNotNull(() => members);
             
             return instance.RegisterType<TFrom, TTo>(name, new ContainerControlledLifetimeManager(), members);
+        }
+
+        public static IUnityContainer RegisterWindowTracker(this IUnityContainer instance, string dependencyName, Func<string> windowNameFunc)
+        {
+            return instance
+                 .RegisterType<IWindowTracker, WindowTracker>(
+                     dependencyName,
+                     new ContainerControlledLifetimeManager(),
+                     new InjectionFactory(unity => unity.Resolve<WindowTracker>(new DependencyOverride<Func<string>>(windowNameFunc))));
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace PoeEye.PoeTrade.ViewModels
+﻿using PoeChatWheel.ViewModels;
+
+namespace PoeEye.PoeTrade.ViewModels
 {
     using System;
     using System.Linq;
@@ -242,6 +244,7 @@
                 ClipboardMonitoringEnabled = Settings.ClipboardMonitoringEnabled,
                 WhisperNotificationsEnabled = Settings.WhisperNotificationsEnabled,
                 CurrenciesPriceInChaos = Settings.CurrenciesPriceInChaosOrbs.ToDictionary(x => x.Item1, x => x.Item2),
+                ChatWheelHotkey = Settings.ChatWheelHotkey,
             };
 
             poeEyeConfigProvider.Save(config);
@@ -269,6 +272,7 @@
                 .CurrenciesPriceInChaos
                 .Select(x => new EditableTuple<string, float> {Item1 = x.Key, Item2 = x.Value})
                 .ToArray();
+            Settings.ChatWheelHotkey = config.ChatWheelHotkey;
 
             Log.Instance.Debug($"[MainWindowViewModel.LoadConfig] Sucessfully loaded config\r\nTabs count: {TabsList.Count}");
         }

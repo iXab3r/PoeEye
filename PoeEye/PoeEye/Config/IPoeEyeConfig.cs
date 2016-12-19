@@ -17,6 +17,8 @@
 
         bool WhisperNotificationsEnabled { get; set; }
 
+        string ChatWheelHotkey { get; set; }
+
         TimeSpan MinRefreshTimeout { get; set; }
 
         TimeSpan MaxRefreshTimeout { get; set; }

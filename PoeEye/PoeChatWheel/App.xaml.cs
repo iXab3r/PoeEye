@@ -1,0 +1,42 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Configuration;
+using System.Data;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Input;
+using Microsoft.Practices.Unity;
+using PoeChatWheel.Prism;
+using PoeChatWheel.Properties;
+using PoeChatWheel.ViewModels;
+using PoeShared.Prism;
+using PoeShared.Scaffolding;
+using PoeWhisperMonitor.Prism;
+
+namespace PoeChatWheel
+{
+    /// <summary>
+    /// Interaction logic for App.xaml
+    /// </summary>
+    public partial class App : Application
+    {
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            base.OnStartup(e);
+
+            var container = new UnityContainer();
+
+            new PoeChatWheelModule(container).Initialize();
+            new PoeWhisperMonitorModule(container).Initialize();
+            container.AddExtension(new CommonRegistrations());
+            container.RegisterWindowTracker(WellKnownWindows.PathOfExile, () => "Path of Exile");
+
+            var viewModel = container.Resolve<IPoeChatWheelViewModel>();
+            viewModel.Hotkey = new KeyGesture(Key.LeftCtrl);
+            var window = container.Resolve<ChatWheelWindow>(new DependencyOverride(typeof(IPoeChatWheelViewModel), viewModel));
+            window.Show();
+        }
+    }
+}

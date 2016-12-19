@@ -1,4 +1,11 @@
-﻿using ConfigurationModuleCatalog = Prism.Modularity.ConfigurationModuleCatalog;
+﻿using System;
+using System.Reactive.Linq;
+using System.Windows.Input;
+using PoeChatWheel;
+using PoeChatWheel.ViewModels;
+using PoeEye.Config;
+using ReactiveUI;
+using ConfigurationModuleCatalog = Prism.Modularity.ConfigurationModuleCatalog;
 using IModuleCatalog = Prism.Modularity.IModuleCatalog;
 using UnityBootstrapper = Prism.Unity.UnityBootstrapper;
 
@@ -41,8 +48,22 @@ namespace PoeEye.Prism
 
             var window = (Window)Shell;
             var viewModel = Container.Resolve<IMainWindowViewModel>();
-
             window.DataContext = viewModel;
+
+            InitializeChatWheel();
+        }
+
+        private void InitializeChatWheel()
+        {
+            var chatWheel = Container.Resolve<IPoeChatWheelViewModel>();
+
+            var settings = Container.Resolve<IPoeEyeConfigProvider>();
+            settings.WhenAnyValue(x => x.ActualConfig)
+                .Select(hotkey => new KeyGestureConverter().ConvertFromInvariantString(hotkey.ChatWheelHotkey) as KeyGesture)
+                .Subscribe(hotkey => chatWheel.Hotkey = hotkey);
+
+            var window = new ChatWheelWindow(chatWheel);
+            window.Show();
         }
 
         private void RegisterExtensions()

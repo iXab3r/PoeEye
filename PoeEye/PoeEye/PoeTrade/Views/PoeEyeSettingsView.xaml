@@ -12,6 +12,7 @@
         <RowDefinition Height="Auto" />
         <RowDefinition Height="Auto" />
         <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
         <RowDefinition Height="*" />
       </Grid.RowDefinitions>
 
@@ -35,8 +36,16 @@
         <controls:ToggleSwitchButton ToolTip="In-game whisper notifications" Height="26"
                                          IsChecked="{Binding WhisperNotificationsEnabled}" />
       </StackPanel>
+        
+        <StackPanel Grid.Row="3"
+                      Orientation="Horizontal" Height="30" Margin="0,2">
+        <Label Style="{StaticResource IconLabel}" Content="Chat wheel:" />
+                <ComboBox IsEditable="False" 
+                          Width="120"
+                          ToolTip="Chat wheel hotkey" ItemsSource="{Binding HotkeysList}" SelectedValue="{Binding ChatWheelHotkey}" />
+      </StackPanel>
 
-      <StackPanel Grid.Row="3"
+      <StackPanel Grid.Row="4"
                       Orientation="Vertical">
         <Label Content="Currencies rate (in Chaos orbs)" Margin="0,5,0,2" Style="{StaticResource IconLabel}" />
         <ItemsControl ItemsSource="{Binding CurrenciesPriceInChaosOrbs}" BorderThickness="0,1"

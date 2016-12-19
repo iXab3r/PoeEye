@@ -1,4 +1,5 @@
 ﻿using System.Collections.Specialized;
+using System.Diagnostics;
 using PoeShared.Communications;
 using PoeShared.PoeTrade.Query;
 using ProxyProvider;

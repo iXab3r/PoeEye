@@ -27,6 +27,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PoeEye.PoeTradeRealtimeApi"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PoeEye.ExileToolsRealtimeApi", "PoeEye.ExileToolsRealtimeApi\PoeEye.ExileToolsRealtimeApi.csproj", "{D6F0D9BD-95FC-4A71-8EFF-A1C82B959C5D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PoeChatWheel", "PoeChatWheel\PoeChatWheel.csproj", "{DAD6D513-5C7C-433B-8A56-1D92476B4CFF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -81,6 +83,10 @@ Global
 		{D6F0D9BD-95FC-4A71-8EFF-A1C82B959C5D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D6F0D9BD-95FC-4A71-8EFF-A1C82B959C5D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D6F0D9BD-95FC-4A71-8EFF-A1C82B959C5D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DAD6D513-5C7C-433B-8A56-1D92476B4CFF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DAD6D513-5C7C-433B-8A56-1D92476B4CFF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DAD6D513-5C7C-433B-8A56-1D92476B4CFF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DAD6D513-5C7C-433B-8A56-1D92476B4CFF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

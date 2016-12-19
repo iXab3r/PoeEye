@@ -1,0 +1,79 @@
+﻿<Window
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:metroControls="http://metro.mahapps.com/winfx/xaml/controls"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+        xmlns:system="clr-namespace:System;assembly=mscorlib"
+        xmlns:controls="clr-namespace:RadialMenu.Controls;assembly=RadialMenu"
+        xmlns:viewModels="clr-namespace:PoeChatWheel.ViewModels"
+        xmlns:scaffolding="clr-namespace:PoeShared.Scaffolding;assembly=PoeShared"
+        x:Class="PoeChatWheel.ChatWheelWindow"
+        AllowsTransparency="True" Topmost="True" WindowStyle="None"
+        Width="300"
+        Height="300"
+        ShowInTaskbar="False"
+        Background="Transparent">
+
+    <Window.Resources>
+       
+    </Window.Resources>
+
+    <Canvas 
+        Background="Transparent" 
+        DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}">
+
+        <controls:RadialMenu 
+            x:Name="MenuControl"
+            FontSize="14"
+            IsOpen="{Binding DataContext.IsOpen}"
+            TextBlock.TextAlignment="Center">
+            
+            <controls:RadialMenu.Resources>
+                <Style TargetType="{x:Type controls:RadialMenuItem}" BasedOn="{StaticResource {x:Type controls:RadialMenuItem}}">
+                    <Setter Property="Background" Value="#0C0B0B"/>
+                    <Setter Property="Padding" Value="2"/>
+                    <Setter Property="InnerRadius" Value="40"/>
+                    <Setter Property="OuterRadius" Value="150"/>
+                    <Setter Property="ContentRadius" Value="85"/>
+
+                    <Setter Property="EdgeBackground" Value="#312B2B"/>
+                    <Setter Property="EdgePadding" Value="7"/>
+                    <Setter Property="EdgeInnerRadius" Value="130"/>
+                    <Setter Property="EdgeOuterRadius" Value="145"/>
+
+                    <Setter Property="ArrowBackground" Value="#C1B385"/>
+                    <Setter Property="ArrowRadius" Value="138"/>
+                    <Setter Property="Foreground" Value="#C1B385"/>
+                </Style>
+
+                <Style TargetType="{x:Type controls:RadialMenuCentralItem}" BasedOn="{StaticResource {x:Type controls:RadialMenuCentralItem}}">
+                    <Setter Property="Background" Value="#0C0B0B"/>
+                    <Setter Property="Foreground" Value="#C1B385"/>
+                    <Setter Property="Width" Value="70"/>
+                </Style>
+
+            </controls:RadialMenu.Resources>
+
+            <scaffolding:DataPiping.DataPipes>
+                <scaffolding:DataPipeCollection>
+                    <scaffolding:DataPipe Source="{Binding ElementName=MenuControl}" Target="{Binding RadialMenu, Mode=OneWayToSource}" />
+                </scaffolding:DataPipeCollection>
+            </scaffolding:DataPiping.DataPipes>
+
+            <controls:RadialMenuItem Command="{Binding Test1}">
+                <TextBlock FontSize="14" TextAlignment="Center">
+                            Édition
+                </TextBlock>
+            </controls:RadialMenuItem>
+
+            <controls:RadialMenuItem Command="{Binding Test2}">
+                <TextBlock FontSize="14" TextAlignment="Center">
+                            Édition
+                </TextBlock>
+            </controls:RadialMenuItem>
+
+        </controls:RadialMenu>
+    </Canvas>
+</Window>
