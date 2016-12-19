@@ -1,16 +1,12 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Threading;
 using System.Windows;
 using WindowsInput;
 using WindowsInput.Native;
 using Guards;
 using JetBrains.Annotations;
-using KeyboardApi;
 using PoeShared;
 using PoeShared.Scaffolding;
 using ReactiveUI;
@@ -19,9 +15,10 @@ namespace PoeWhisperMonitor.Chat
 {
     internal sealed class PoeChatService : DisposableReactiveObject, IPoeChatService
     {
+        private readonly IKeyboardSimulator keyboardSimulator = new InputSimulator().Keyboard;
+
         private bool isAvailable;
         private ConcurrentQueue<PoeProcessInfo> knownProcesses = new ConcurrentQueue<PoeProcessInfo>();
-        private IKeyboardSimulator keyboardSimulator = new InputSimulator().Keyboard;
 
         /// <summary>
         ///     The GetForegroundWindow function returns a handle to the foreground window.
