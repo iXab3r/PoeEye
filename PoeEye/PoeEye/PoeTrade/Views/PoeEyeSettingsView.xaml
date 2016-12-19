@@ -2,7 +2,6 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:sd="clr-namespace:System.Drawing;assembly=System.Drawing"
                     xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
-                    xmlns:wpfAwesomium="clr-namespace:WpfAwesomium;assembly=WpfAwesomium"
                     xmlns:scaffolding="clr-namespace:PoeShared.Scaffolding;assembly=PoeShared"
                     xmlns:viewModels="clr-namespace:PoeEye.PoeTrade.ViewModels">
   <DataTemplate DataType="{x:Type viewModels:PoeEyeSettingsViewModel}">

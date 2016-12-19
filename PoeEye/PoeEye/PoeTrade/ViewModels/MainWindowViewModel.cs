@@ -56,7 +56,6 @@
             [NotNull] PoeClipboardParserViewModel clipboardParserViewModel,
             [NotNull] ProxyProviderViewModel proxyProviderViewModel,
             [NotNull] PoeEyeSettingsViewModel settings,
-            [NotNull] IPoeTradeCaptchaViewModel captchaViewModel,
             [NotNull] IPoeChatViewModel chatViewModel,
             [NotNull] IWhispersNotificationManager whispersNotificationManager,
             [NotNull] IDialogCoordinator dialogCoordinator,
@@ -72,7 +71,6 @@
             Guard.ArgumentNotNull(() => audioNotificationsManager);
             Guard.ArgumentNotNull(() => settings);
             Guard.ArgumentNotNull(() => whispersNotificationManager);
-            Guard.ArgumentNotNull(() => captchaViewModel);
             Guard.ArgumentNotNull(() => dialogCoordinator);
             Guard.ArgumentNotNull(() => uiScheduler);
             Guard.ArgumentNotNull(() => bgScheduler);
@@ -84,9 +82,6 @@
 
             this.tabFactory = tabFactory;
             this.poeEyeConfigProvider = poeEyeConfigProvider;
-
-            PoeTradeCaptchaViewModel = captchaViewModel;
-            captchaViewModel.AddTo(Anchors);
 
             Chat = chatViewModel;
             chatViewModel.AddTo(Anchors);
@@ -164,8 +159,6 @@
         public PoeClipboardParserViewModel ClipboardParserViewModel { get; }
 
         public ProxyProviderViewModel ProxyProviderViewModel { get; }
-
-        public IPoeTradeCaptchaViewModel PoeTradeCaptchaViewModel { get; }
 
         public IPoeChatViewModel Chat { get; }
 

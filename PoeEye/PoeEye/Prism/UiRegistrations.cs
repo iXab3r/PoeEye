@@ -51,7 +51,6 @@
                 .RegisterType<IPoeApiSelectorViewModel, PoeApiSelectorViewModel>()
                 .RegisterType<IPoeModsEditorViewModel, PoeModsEditorViewModel>()
                 .RegisterType<IPoeModGroupsEditorViewModel, PoeModGroupsEditorViewModel>()
-                .RegisterType<IPoeTradeCaptchaViewModel, PoeTradeCaptchaViewModel>()
                 .RegisterType<IHistoricalTradesViewModel, HistoricalTradesViewModel>()
                 .RegisterType<IRecheckPeriodViewModel, RecheckPeriodViewModel>()
                 .RegisterType<ISuggestionProvider, FuzzySuggestionProvider>();

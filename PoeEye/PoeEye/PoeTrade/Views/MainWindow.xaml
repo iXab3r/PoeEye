@@ -261,18 +261,6 @@
         </Grid>
       </controls:Flyout>
 
-      <controls:Flyout Header="&#xF188; You must resolve CAPTCHA to proceed" x:Name="CaptchaFlyout"
-                       FontFamily="{StaticResource FontAwesome}"
-                       Position="Right"
-                       Margin="0, 20"
-                       AnimateOpacity="True"
-                       Width="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=controls:MetroWindow}, Path=ActualWidth, Mode=OneWay}"
-                       BorderBrush="{StaticResource AccentColorBrush}"
-                       IsOpen="{Binding PoeTradeCaptchaViewModel.IsOpen}">
-
-        <ContentPresenter Content="{Binding PoeTradeCaptchaViewModel}" />
-      </controls:Flyout>
-
       <controls:Flyout Header="&#xF093; Update status" x:Name="ApplicationUpdatedFlyout"
                        FontFamily="{StaticResource FontAwesome}"
                        Position="Bottom"

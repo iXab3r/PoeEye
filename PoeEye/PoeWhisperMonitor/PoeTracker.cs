@@ -1,4 +1,6 @@
-﻿namespace PoeWhisperMonitor
+﻿using System.Management;
+
+namespace PoeWhisperMonitor
 {
     using System;
     using System.Diagnostics;
@@ -14,7 +16,7 @@
 
     internal sealed class PoeTracker : DisposableReactiveObject, IPoeTracker
     {
-        private static readonly string PathOfExileProcessName = "PathOfExile";
+        private static readonly string[] PathOfExileProcessNames = { "PathOfExile", "PathOfExile_x64" };
 
         private static readonly TimeSpan RecheckTimeout = TimeSpan.FromSeconds(10);
 
@@ -40,7 +42,9 @@
         {
             try
             {
-                var result = Process.GetProcessesByName(PathOfExileProcessName).OrderBy(x => x.Id).ToArray();
+                var result = PathOfExileProcessNames
+                    .SelectMany(Process.GetProcessesByName)
+                    .OrderBy(x => x.Id).ToArray();
                 return result;
             }
             catch (Exception ex)

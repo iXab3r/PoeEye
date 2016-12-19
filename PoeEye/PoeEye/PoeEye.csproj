@@ -34,7 +34,7 @@
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>x86</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -42,7 +42,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>true</Prefer32Bit>
+    <Prefer32Bit>false</Prefer32Bit>
     <UseVSHostingProcess>false</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -357,7 +357,6 @@
     <Compile Include="PoeTrade\ViewModels\IPoeModsEditorViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\IPoeModViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\IPoeQueryViewModel.cs" />
-    <Compile Include="PoeTrade\ViewModels\IPoeTradeCaptchaViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\IPoeTradesListViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\IPoeTradeViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\IRecheckPeriodViewModel.cs" />
@@ -375,7 +374,6 @@
     <Compile Include="PoeTrade\ViewModels\PoeModViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\PoeQueryViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\PoeSummaryTabViewModel.cs" />
-    <Compile Include="PoeTrade\ViewModels\PoeTradeCaptchaViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\ProxyProviderViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\RecheckPeriodViewModel.cs" />
     <Compile Include="PoeTrade\Views\MainWindow.xaml.cs">
@@ -456,10 +454,6 @@
       <Project>{75b4a3db-45c0-4639-b5a3-4d180ad4b9fb}</Project>
       <Name>PoeWhisperMonitor</Name>
     </ProjectReference>
-    <ProjectReference Include="..\WpfAwesomium\WpfAwesomium.csproj">
-      <Project>{61497f0d-f122-4a25-81c0-53c27c699f0c}</Project>
-      <Name>WpfAwesomium</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Page Include="PoeTrade\Views\ApplicationUpdaterView.xaml">
@@ -527,10 +521,6 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="PoeTrade\Views\PoeEyeSettingsView.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="PoeTrade\Views\PoeTradeCaptchaView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

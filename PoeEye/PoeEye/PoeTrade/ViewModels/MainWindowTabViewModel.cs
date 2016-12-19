@@ -266,7 +266,7 @@ namespace PoeEye.PoeTrade.ViewModels
                 return;
             }
             var query = queryBuilder();
-            Log.Instance.Debug($"[MainWindowTabViewModel.SearchCommandExecute] Search command executed, running query\r\n{query.DumpToText()}");
+            Log.Instance.Trace($"[MainWindowTabViewModel.SearchCommandExecute] Search command executed, running query\r\n{query.DumpToText()}");
 
             TradesList.Items.Clear();
             TradesList.ActiveQuery = query;
