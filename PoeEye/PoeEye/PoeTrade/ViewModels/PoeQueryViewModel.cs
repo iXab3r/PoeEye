@@ -164,9 +164,8 @@ namespace PoeEye.PoeTrade.ViewModels
             BuyoutOnly = true;
             NormalizeQuality = true;
 
-
             this.WhenAnyValue(x => x.League)
-                .Where(string.IsNullOrWhiteSpace)
+                .Where(x => string.IsNullOrWhiteSpace(x) || !LeaguesList.Contains(x, StringComparer.Ordinal))
                 .Subscribe(() => League = LeaguesList.FirstOrDefault())
                 .AddTo(Anchors);
 

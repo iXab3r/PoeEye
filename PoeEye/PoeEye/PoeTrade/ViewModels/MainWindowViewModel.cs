@@ -261,7 +261,7 @@
             var config = poeEyeConfigProvider.ActualConfig;
             poeEyeConfigProvider.Save(config);
 
-            Log.Instance.Debug($"[MainWindowViewModel.LoadConfig] Received configuration DTO:\r\n{config.DumpToText()}");
+            Log.Instance.Trace($"[MainWindowViewModel.LoadConfig] Received configuration DTO:\r\n{config.DumpToText()}");
 
             foreach (var tabConfig in config.TabConfigs)
             {

@@ -58,6 +58,7 @@
                 Style="{StaticResource AutoRecheckButtonStyle}"
                 Width="40" Height="40"
                 HorizontalAlignment="Right"
+                VerticalAlignment="Top"
                 Command="{Binding SearchCommand}"
                 ToolTip="Init query"
                 Focusable="False"
@@ -69,6 +70,7 @@
                 Margin="5,0"
                 Width="40" Height="40"
                 HorizontalAlignment="Right"
+                VerticalAlignment="Top"
                 Command="{Binding RefreshCommand}"
                 Focusable="False"
                 ToolTip="Force refresh"
@@ -138,11 +140,12 @@
 
       <StackPanel Grid.Column="3"
                   Orientation="Horizontal">
-        <ContentControl Content="{Binding AudioNotificationSelector}"/>
+        <ContentControl Content="{Binding AudioNotificationSelector}" VerticalAlignment="Top"/>
         
         <Button Width="24" Height="24"
                 Style="{StaticResource CircleButton}"
                 HorizontalAlignment="Right"
+                VerticalAlignment="Top"
                 Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type ListBox}}, Path=DataContext.CloseTabCommand}"
                 CommandParameter="{Binding}"
                 FontSize="10"

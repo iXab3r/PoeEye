@@ -119,19 +119,22 @@
 
         <Button
           Command="{Binding CreateNewTabCommand}"
-          Content="Create new tab"
+          Content="&#xF00E; New query" 
+          FontFamily="{StaticResource FontAwesome}"
           FontWeight="Bold" />
         
         <Separator />
 
         <Button
-          Content="Summary"
+          Content="&#xF029; Show summary"
+          FontFamily="{StaticResource FontAwesome}"
+          Margin="5,0"
           FontWeight="Bold">
           <Button.Style>
-            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
+            <Style TargetType="{x:Type ButtonBase}" BasedOn="{StaticResource ChromelessButtonStyle}">
               <Style.Triggers>
                 <DataTrigger Binding="{Binding SelectedTab}" Value="{x:Null}">
-                  <Setter Property="Foreground" Value="{StaticResource ValidationSummaryColor4}"/>
+                  <Setter Property="Foreground" Value="{StaticResource ControlBackgroundBrush}"/>
                 </DataTrigger>
               </Style.Triggers>
             </Style>

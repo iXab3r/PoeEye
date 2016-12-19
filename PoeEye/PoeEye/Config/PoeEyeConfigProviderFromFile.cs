@@ -21,6 +21,9 @@ namespace PoeEye.Config
 
     internal sealed class PoeEyeConfigProviderFromFile : DisposableReactiveObject, IPoeEyeConfigProvider
     {
+        private static readonly string DebugConfigFileName = @"PoeEye\configDebugMode.cfg";
+        private static readonly string ReleaseConfigFileName = @"PoeEye\config.cfg";
+
         private readonly string configFilePath;
 
         private readonly JsonSerializerSettings jsonSerializerSettings;
@@ -32,13 +35,14 @@ namespace PoeEye.Config
             if (App.Arguments.IsDebugMode)
             {
                 Log.Instance.Debug("[PoeEyeConfigProviderFromFile..ctor] Debug mode detected");
-                configFilePath = Environment.ExpandEnvironmentVariables($@"%APPDATA%\PoeEye\configDebugMode.cfg");
+                configFilePath = Environment.ExpandEnvironmentVariables($@"%APPDATA%\{DebugConfigFileName}");
             }
             else
             {
                 Log.Instance.Debug("[PoeEyeConfigProviderFromFile..ctor] Release mode detected");
-                configFilePath = Environment.ExpandEnvironmentVariables($@"%APPDATA%\PoeEye\config.cfg");
+                configFilePath = Environment.ExpandEnvironmentVariables($@"%APPDATA%\{ReleaseConfigFileName}");
             }
+
             Log.Instance.Debug($"[PoeEyeConfigProviderFromFile..ctor] Config file path: {configFilePath}");
 
             jsonSerializerSettings = new JsonSerializerSettings
