@@ -21,6 +21,8 @@ using RadialMenu.Controls;
 using ReactiveUI;
 using Stateless;
 using Application = System.Windows.Application;
+using MouseEventArgs = System.Windows.Input.MouseEventArgs;
+using MouseEventHandler = System.Windows.Input.MouseEventHandler;
 using Orientation = System.Windows.Controls.Orientation;
 using WinFormsKeyEventArgs = System.Windows.Forms.KeyEventArgs;
 using WpfKeyEventArgs = System.Windows.Input.KeyEventArgs;
@@ -247,9 +249,9 @@ namespace PoeChatWheel.ViewModels
             menuItem.Content = CreateMenuItemContent(
                 $"{characterName}\n\xF017 {timeElapsed.TotalSeconds:F0}s ago", FontAwesome.Net.FontAwesome.user);
 
-            Observable.FromEventPattern<RoutedEventHandler, RoutedEventArgs>(
-                h => menuItem.Click += h,
-                h => menuItem.Click -= h)
+            Observable.FromEventPattern<MouseEventHandler, MouseEventArgs>(
+                h => menuItem.MouseEnter += h,
+                h => menuItem.MouseEnter -= h)
                 .Where(x => IsOpen)
                 .Subscribe(
                     () =>
