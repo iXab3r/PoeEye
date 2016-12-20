@@ -648,6 +648,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\Notifications\whisper.wav" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\PathOfExile_102.cur" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <UsingTask TaskName="CosturaCleanup" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll" TaskFactory="CodeTaskFactory">
     <ParameterGroup>

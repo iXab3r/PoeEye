@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Threading;
@@ -35,6 +36,8 @@ namespace PoeEye.Prism
         {
             RegisterExtensions();
 
+            Mouse.OverrideCursor = new Cursor(new MemoryStream(Properties.Resources.PathOfExile_102));
+
             var window = (Window)Shell;
             Application.Current.MainWindow = window;
             window.Show();
@@ -53,7 +56,7 @@ namespace PoeEye.Prism
             var viewModel = Container.Resolve<IMainWindowViewModel>();
             window.DataContext = viewModel;
 
-            Scheduler.Default.Schedule(InitializeChatWheel);
+            CreateChatWheel();
         }
 
         private void CreateChatWheel()
@@ -71,15 +74,10 @@ namespace PoeEye.Prism
                 .Subscribe(hotkey => chatWheel.Hotkey = hotkey);
 
             var window = new ChatWheelWindow(chatWheel);
-            window.ShowDialog();
-        }
+            window.Show();
 
-        private void InitializeChatWheel()
-        {
-            var newWindowThread = new Thread(CreateChatWheel);
-            newWindowThread.SetApartmentState(ApartmentState.STA);
-            newWindowThread.IsBackground = true;
-            newWindowThread.Start();
+            var mainWindow = (Window)Shell;
+            mainWindow.Closed += delegate { window.Close(); };
         }
 
         private void RegisterExtensions()

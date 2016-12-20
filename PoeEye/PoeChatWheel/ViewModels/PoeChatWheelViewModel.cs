@@ -2,7 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Reactive.Concurrency;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -44,22 +44,21 @@ namespace PoeChatWheel.ViewModels
             "#FF4136"
         };
 
-        private static readonly TimeSpan HistoryPeriod = TimeSpan.FromMinutes(2);
-
-        private readonly StateMachine<State, Trigger>.TriggerWithParameters<string> actionSelectedTransitionTrigger;
-
         private readonly IPoeChatService chatService;
         private readonly IClock clock;
 
         private readonly Collection<PoeMessage> messagesHistory = new Collection<PoeMessage>();
-        private readonly StateMachine<State, Trigger>.TriggerWithParameters<string> nameSelectedTransitionTrigger;
 
+        private readonly StateMachine<State, Trigger>.TriggerWithParameters<string> actionSelectedTransitionTrigger;
+        private readonly StateMachine<State, Trigger>.TriggerWithParameters<string> nameSelectedTransitionTrigger;
         private readonly StateMachine<State, Trigger> queryStateMachine = new StateMachine<State, Trigger>(State.Hidden);
 
         private readonly ConcurrentQueue<Color> userColors =
             new ConcurrentQueue<Color>(PleasantColors.Select(x => (Color) ColorConverter.ConvertFromString(x)));
 
         private RadialMenuCentralItem centralItem;
+
+        private TimeSpan historyPeriod = TimeSpan.FromMinutes(2);
 
         private KeyGesture hotkey;
         private bool isOpen;
@@ -70,13 +69,20 @@ namespace PoeChatWheel.ViewModels
             [NotNull] [Dependency(WellKnownWindows.PathOfExile)] IWindowTracker poeWindowTracker,
             [NotNull] IClock clock)
         {
+            Log.Instance.Debug($"[PoeChatWheel..ctor] Initializing chat wheel...");
             this.chatService = chatService;
             this.clock = clock;
+
             var globalEvents = Hook.GlobalEvents();
             globalEvents.AddTo(Anchors);
 
             nameSelectedTransitionTrigger = queryStateMachine.SetTriggerParameters<string>(Trigger.NameSelected);
             actionSelectedTransitionTrigger = queryStateMachine.SetTriggerParameters<string>(Trigger.ActionSelected);
+
+            queryStateMachine.OnTransitioned(
+                x =>
+                    Log.Instance.Debug(
+                        $"[PoeChatWheel.Transition] Trigger: {x.Trigger} {x.Source} -> {x.Destination} (isReentry: {x.IsReentry})"));
 
             queryStateMachine
                 .Configure(State.Hidden)
@@ -84,6 +90,7 @@ namespace PoeChatWheel.ViewModels
                 .OnEntry(
                     () =>
                     {
+                        Log.Instance.Debug($"[PoeChatWheel.OnHidden] IsOpen: {IsOpen} => False");
                         IsOpen = false;
                     });
 
@@ -96,6 +103,7 @@ namespace PoeChatWheel.ViewModels
                 .OnEntry(
                     () =>
                     {
+                        Log.Instance.Debug($"[PoeChatWheel.OnNameSelection] IsOpen: {IsOpen} => True");
                         IsOpen = true;
                     });
 
@@ -113,6 +121,7 @@ namespace PoeChatWheel.ViewModels
                 .OnEntry(
                     () =>
                     {
+                        Log.Instance.Debug($"[PoeChatWheel.OnDone] IsOpen: {IsOpen} => False");
                         IsOpen = false;
                     });
 
@@ -123,10 +132,7 @@ namespace PoeChatWheel.ViewModels
                 .Where(x => poeWindowTracker.IsActive)
                 .Where(x => MatchesHotkey(x.EventArgs, hotkey))
                 .Subscribe(
-                    () =>
-                    {
-                        queryStateMachine.Fire(Trigger.Show);
-                    })
+                    () => { queryStateMachine.Fire(Trigger.Show); })
                 .AddTo(Anchors);
 
             Observable.FromEventPattern<WinFormsKeyEventHandler, WinFormsKeyEventArgs>(
@@ -135,15 +141,18 @@ namespace PoeChatWheel.ViewModels
                 .Where(x => queryStateMachine.State != State.Hidden)
                 .Where(x => MatchesHotkey(x.EventArgs, hotkey))
                 .Subscribe(
-                    () =>
-                    {
-                        queryStateMachine.Fire(Trigger.Hide);
-                    })
+                    () => { queryStateMachine.Fire(Trigger.Hide); })
                 .AddTo(Anchors);
 
             whisperService.Messages.Where(x => x.MessageType == PoeMessageType.WhisperFrom)
                 .Subscribe(ProcessMessage)
                 .AddTo(Anchors);
+        }
+
+        public TimeSpan HistoryPeriod
+        {
+            get { return historyPeriod; }
+            set { this.RaiseAndSetIfChanged(ref historyPeriod, value); }
         }
 
         public RadialMenuCentralItem CentralItem
@@ -164,18 +173,15 @@ namespace PoeChatWheel.ViewModels
             set { this.RaiseAndSetIfChanged(ref hotkey, value); }
         }
 
-        public IReactiveList<RadialMenuItem> Items { get; } = new ReactiveList<RadialMenuItem>
-        {
-            ChangeTrackingEnabled = true
-        };
+        public IReactiveList<RadialMenuItem> Items { get; } = new ReactiveList<RadialMenuItem>();
 
-        private bool MatchesHotkey(WinFormsKeyEventArgs args, KeyGesture hotkey)
+        private bool MatchesHotkey(WinFormsKeyEventArgs args, KeyGesture candidate)
         {
-            if (args == null || hotkey == null)
+            if (args == null || candidate == null)
             {
                 return false;
             }
-            var winKey = (Keys) KeyInterop.VirtualKeyFromKey(hotkey.Key);
+            var winKey = (Keys) KeyInterop.VirtualKeyFromKey(candidate.Key);
             var keyMatches = args.KeyCode == winKey;
             var wpfModifiers = ModifierKeys.None;
             if (args.Alt && winKey != Keys.Alt)
@@ -191,12 +197,14 @@ namespace PoeChatWheel.ViewModels
             {
                 wpfModifiers |= ModifierKeys.Shift;
             }
-            return keyMatches && wpfModifiers == hotkey.Modifiers;
+            return keyMatches && wpfModifiers == candidate.Modifiers;
         }
 
         private void RebuildCharactersList()
         {
+            Log.Instance.Debug($"[PoeChatWheel.RebuildCharactersList] Rebuilding characters list");
             CleanupHistory();
+
             var menuItems = messagesHistory.Select(ToMenuItem).ToList();
             menuItems.Add(
                 ToActionMenuItem(
@@ -212,8 +220,11 @@ namespace PoeChatWheel.ViewModels
                         Content = CreateMenuItemContent("Reset XP", FontAwesome.Net.FontAwesome.gears),
                         Tag = $"/reset_xp"
                     }));
-            Items.Clear();
-            Items.AddRange(menuItems);
+            using (Items.SuppressChangeNotifications())
+            {
+                Items.Clear();
+                Items.AddRange(menuItems);
+            }
             CentralItem = null;
         }
 
@@ -235,11 +246,17 @@ namespace PoeChatWheel.ViewModels
             menuItem.Tag = message;
             menuItem.Content = CreateMenuItemContent(
                 $"{characterName}\n\xF017 {timeElapsed.TotalSeconds:F0}s ago", FontAwesome.Net.FontAwesome.user);
-            menuItem.Click += delegate
-            {
-                Log.Instance.Debug($"[PoeChatWheel.SelectCharacter] Name '{message.Name}'");
-                queryStateMachine.Fire(nameSelectedTransitionTrigger, message.Name);
-            };
+
+            Observable.FromEventPattern<RoutedEventHandler, RoutedEventArgs>(
+                h => menuItem.Click += h,
+                h => menuItem.Click -= h)
+                .Where(x => IsOpen)
+                .Subscribe(
+                    () =>
+                    {
+                        Log.Instance.Debug($"[PoeChatWheel.SelectCharacter] Name '{message.Name}'");
+                        queryStateMachine.Fire(nameSelectedTransitionTrigger, message.Name);
+                    });
 
             menuItem.ToolTip = PrepareMessageHistory(message.Name);
             return menuItem;
@@ -279,6 +296,8 @@ namespace PoeChatWheel.ViewModels
 
         private void RebuildMenuForCharacter(string characterName)
         {
+            Log.Instance.Debug($"[PoeChatWheel.RebuildMenuForCharacter] Rebuilding items for character {characterName}");
+
             var menuItems = new[]
             {
                 new RadialMenuItem
@@ -307,13 +326,18 @@ namespace PoeChatWheel.ViewModels
             {
                 ToActionMenuItem(radialMenuItem);
             }
-            Items.Clear();
-            Items.AddRange(menuItems);
+            using (Items.SuppressChangeNotifications())
+            {
+                Items.Clear();
+                Items.AddRange(menuItems);
+            }
 
-            var central = new RadialMenuCentralItem();
-            central.Tag = characterName;
-            central.Content = CreateMenuItemContent(characterName, FontAwesome.Net.FontAwesome.user);
-            central.ToolTip = PrepareMessageHistory(characterName);
+            var central = new RadialMenuCentralItem
+            {
+                Tag = characterName,
+                Content = CreateMenuItemContent(characterName, FontAwesome.Net.FontAwesome.user),
+                ToolTip = PrepareMessageHistory(characterName)
+            };
             CentralItem = central;
         }
 
@@ -323,11 +347,19 @@ namespace PoeChatWheel.ViewModels
             {
                 return item;
             }
-            item.Click += delegate
-            {
-                Log.Instance.Debug($"[PoeChatWheel.SelectAction] Action '{item.Tag}'");
-                queryStateMachine.Fire(actionSelectedTransitionTrigger, (string) item.Tag);
-            };
+
+            Observable.FromEventPattern<MouseButtonEventHandler, MouseButtonEventArgs>(
+                h => item.PreviewMouseDown += h,
+                h => item.PreviewMouseDown -= h)
+                .Where(x => IsOpen)
+                .Where(x => x.EventArgs.ClickCount == 1 && x.EventArgs.LeftButton == MouseButtonState.Pressed)
+                .Subscribe(
+                    x =>
+                    {
+                        Log.Instance.Debug($"[PoeChatWheel.SelectAction] Action '{item.Tag}'");
+                        x.EventArgs.Handled = true;
+                        queryStateMachine.Fire(actionSelectedTransitionTrigger, (string)item.Tag);
+                    });
             return item;
         }
 
@@ -344,7 +376,7 @@ namespace PoeChatWheel.ViewModels
 
         private UIElement CreateMenuItemContent(string itemText, string itemIcon)
         {
-            var panel = new WrapPanel {Orientation = Orientation.Vertical};
+            var panel = new WrapPanel { Orientation = Orientation.Vertical };
             var text = CreateMenuItemContent(itemText);
             var icon = new TextBlock
             {
@@ -361,6 +393,8 @@ namespace PoeChatWheel.ViewModels
 
         private void SendMessage(string message)
         {
+            Log.Instance.Debug($"[PoeChatWheel.SendMessage] Sending message '{message}'");
+
             chatService.SendMessage(message);
         }
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
@@ -21,9 +22,11 @@ using System.Windows.Shapes;
 using Guards;
 using PoeChatWheel.Utilities;
 using PoeChatWheel.ViewModels;
+using PoeShared;
 using PoeShared.Scaffolding;
 using RadialMenu.Controls;
 using ReactiveUI;
+using Cursor = System.Windows.Input.Cursor;
 
 namespace PoeChatWheel
 {
@@ -41,11 +44,18 @@ namespace PoeChatWheel
             InitializeComponent();
             this.DataContext = chatWheel;
 
+            Log.Instance.Debug($"[PoeChatWheelWindow..ctor] Initializing chat wheel window...");
+
             chatWheel
                 .WhenAnyValue(x => x.IsOpen)
                 .Where(x => x)
                 .ObserveOn(this)
-                .Subscribe(x => this.CenterToMouse())
+                .Subscribe(
+                    x =>
+                    {
+                        Log.Instance.Debug($"[PoeChatWheelWindow.CenterToMouse] Centering menu to mouse");
+                        this.CenterToMouse();
+                    })
                 .AddTo(Anchors);
 
             chatWheel.Items.Changed
@@ -58,10 +68,8 @@ namespace PoeChatWheel
             chatWheel.WhenAnyValue(x => x.CentralItem)
                 .Where(x => RadialMenu != null)
                 .ObserveOn(this)
-                .Subscribe(x => RadialMenu.CentralItem = x)
+                .Subscribe(SetCentralMenuItem)
                 .AddTo(Anchors);
-
-            this.IsVisibleChanged += OnIsVisibleChanged;
         }
 
         public RadialMenu.Controls.RadialMenu RadialMenu { get; set; }
@@ -73,20 +81,17 @@ namespace PoeChatWheel
             WindowsServices.SetWindowExTransparent(hwnd);
         }
 
-        private void OnIsVisibleChanged(object sender, DependencyPropertyChangedEventArgs dependencyPropertyChangedEventArgs)
+        private void SetCentralMenuItem(RadialMenuCentralItem centralItem)
         {
-            if (!this.IsVisible)
-            {
-                return;
-            }
-
-            this.CenterToMouse();
+            Log.Instance.Debug($"[PoeChatWheelWindow.SetCentralItem] Setting central item to {centralItem}");
+            RadialMenu.CentralItem = centralItem;
         }
 
         private void SetMenuItems(List<RadialMenuItem> items)
         {
+            Log.Instance.Debug($"[PoeChatWheelWindow.SetMenuItems] Setting menu items (count: {items.Count})");
+
             RadialMenu.Items = items;
-            RadialMenu.InvalidateArrange();
         }
     }
 }
