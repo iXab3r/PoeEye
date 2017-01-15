@@ -1,4 +1,6 @@
-﻿using Prism.Unity;
+﻿using PoeShared.Modularity;
+using Prism.Unity;
+using PoeEyeMainConfig = PoeEye.Config.PoeEyeMainConfig;
 
 namespace PoeEye.PoeTrade.ViewModels
 {
@@ -33,6 +35,7 @@ namespace PoeEye.PoeTrade.ViewModels
     using ReactiveUI;
 
     using TypeConverter;
+    using IPoeEyeMainConfigProvider = IConfigProvider<PoeEyeMainConfig>;
 
     internal sealed class PoeClipboardParserViewModel : DisposableReactiveObject
     {
@@ -53,7 +56,7 @@ namespace PoeEye.PoeTrade.ViewModels
         public PoeClipboardParserViewModel(
             [NotNull] IUnityContainer container,
             [NotNull] IFactory<IPoeTradeViewModel, IPoeItem> poeTradeViewModelFactory,
-            [NotNull] IPoeEyeConfigProvider configProvider,
+            [NotNull] IPoeEyeMainConfigProvider configProvider,
             [NotNull] [Dependency(WellKnownWindows.PathOfExile)] IWindowTracker poeWindowTracker,
             [NotNull] [Dependency(WellKnownSchedulers.Ui)] IScheduler uiScheduler,
             [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler)

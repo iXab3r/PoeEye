@@ -4,9 +4,16 @@ using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Windows.Input;
+using Newtonsoft.Json;
 using PoeChatWheel;
 using PoeChatWheel.ViewModels;
 using PoeEye.Config;
+using PoeEye.Converters;
+using PoeShared.Common;
+using PoeShared.Modularity;
+using PoeShared.PoeTrade;
+using PoeShared.PoeTrade.Query;
+using PoeShared.Scaffolding;
 using Prism.Unity;
 using ReactiveUI;
 using ConfigurationModuleCatalog = Prism.Modularity.ConfigurationModuleCatalog;
@@ -35,6 +42,7 @@ namespace PoeEye.Prism
         protected override void InitializeShell()
         {
             RegisterExtensions();
+            InitializeConfigConverters();
 
             Mouse.OverrideCursor = new Cursor(new MemoryStream(Properties.Resources.PathOfExile_102));
 
@@ -55,8 +63,23 @@ namespace PoeEye.Prism
             var window = (Window)Shell;
             var viewModel = Container.Resolve<IMainWindowViewModel>();
             window.DataContext = viewModel;
-
             CreateChatWheel();
+        }
+
+        private void InitializeConfigConverters()
+        {
+            var configProvider = Container.TryResolve<IConfigProvider>();
+            var converters = new JsonConverter[]
+            {
+                new ConcreteListTypeConverter<IPoeQueryInfo, PoeQueryInfo>(),
+                new ConcreteListTypeConverter<IPoeItemType, PoeItemType>(),
+                new ConcreteListTypeConverter<IPoeItem, PoeItem>(),
+                new ConcreteListTypeConverter<IPoeItemMod, PoeItemMod>(),
+                new ConcreteListTypeConverter<IPoeLinksInfo, PoeLinksInfo>(),
+                new ConcreteListTypeConverter<IPoeQueryModsGroup, PoeQueryModsGroup>(),
+                new ConcreteListTypeConverter<IPoeQueryRangeModArgument, PoeQueryRangeModArgument>()
+            };
+            converters.ForEach(configProvider.RegisterConverter);
         }
 
         private void CreateChatWheel()
@@ -67,12 +90,7 @@ namespace PoeEye.Prism
                 Log.Instance.Debug("[CreateChatWheel] Chat wheel was not loaded");
                 return;
             }
-
-            var settings = Container.Resolve<IPoeEyeConfigProvider>();
-            settings.WhenAnyValue(x => x.ActualConfig)
-                .Select(hotkey => new KeyGestureConverter().ConvertFromInvariantString(hotkey.ChatWheelHotkey) as KeyGesture)
-                .Subscribe(hotkey => chatWheel.Hotkey = hotkey);
-
+            
             var window = new ChatWheelWindow(chatWheel);
             window.Show();
 

@@ -198,6 +198,12 @@
     <Compile Include="IClock.cs" />
     <Compile Include="IRandomNumberGenerator.cs" />
     <Compile Include="Log.cs" />
+    <Compile Include="Modularity\IConfigProvider.cs" />
+    <Compile Include="Modularity\IPoeEyeConfig.cs" />
+    <Compile Include="Modularity\IPoeEyeModule.cs" />
+    <Compile Include="Modularity\IPoeEyeModulesRegistrator.cs" />
+    <Compile Include="Modularity\ISettingsViewModel.cs" />
+    <Compile Include="Modularity\PoeEyeModulesRegistrator.cs" />
     <Compile Include="PoeDatabase\IPoeDatabaseReader.cs" />
     <Compile Include="PoeDatabase\StaticPoeDatabaseReader.cs" />
     <Compile Include="PoeTrade\IPoeApi.cs" />

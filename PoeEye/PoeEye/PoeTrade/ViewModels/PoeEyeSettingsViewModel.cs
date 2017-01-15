@@ -1,38 +1,71 @@
 ﻿using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Input;
-using PoeEye.Utilities;
+using System.Reactive;
+using System.Reactive.Linq;
+using System.Reflection;
+using Guards;
+using JetBrains.Annotations;
+using Microsoft.Practices.Unity;
+using PoeEye.Config;
+using PoeShared.Modularity;
 using PoeShared.Scaffolding;
+using Prism.Modularity;
 using ReactiveUI;
 
 namespace PoeEye.PoeTrade.ViewModels
 {
     internal sealed class PoeEyeSettingsViewModel : DisposableReactiveObject
     {
-        private bool audioNotificationsEnabled = true;
+        private static readonly MethodInfo ReloadConfigMethod = typeof(PoeEyeSettingsViewModel)
+                .GetMethod(nameof(ReloadTypedConfig), BindingFlags.Instance | BindingFlags.NonPublic);
 
-        private string chatWheelHotkey;
+        private static readonly MethodInfo SaveConfigMethod = typeof(PoeEyeSettingsViewModel)
+                .GetMethod(nameof(SaveTypedConfig), BindingFlags.Instance | BindingFlags.NonPublic);
 
-        private bool clipboardMonitoringEnabled;
-
-        private EditableTuple<string, float>[] currenciesPriceInChaosOrbs = new EditableTuple<string, float>[0];
+        private readonly IUnityContainer container;
+        private readonly ConcurrentDictionary<Type, MethodInfo> reloadConfigByType = new ConcurrentDictionary<Type, MethodInfo>();
+        private readonly ConcurrentDictionary<Type, MethodInfo> saveConfigByType = new ConcurrentDictionary<Type, MethodInfo>();
 
         private bool isOpen;
-        private bool whisperNotificationsEnabled;
 
-        public PoeEyeSettingsViewModel()
+        public PoeEyeSettingsViewModel(
+            [NotNull] IPoeEyeModulesEnumerator modulesEnumerator,
+            [NotNull] IUnityContainer container)
         {
-            var keyGestureConverter = new KeyGestureConverter();
-            HotkeysList =
-                Enum.GetValues(typeof(Key))
-                    .OfType<Key>()
-                    .Select(TryToCreateKeyGesture)
-                    .Where(x => x != null)
-                    .Select(x => x.Key == Key.None ? "None" : keyGestureConverter.ConvertToInvariantString(x))
-                    .Distinct()
-                    .ToArray();
-            ChatWheelHotkey = HotkeysList.First();
+            Guard.ArgumentNotNull(() => modulesEnumerator);
+            Guard.ArgumentNotNull(() => container);
+            this.container = container;
+
+            var settingsOpenedTrigger = this.WhenAnyValue(x => x.IsOpen)
+                .Where(x => x)
+                .Take(1)
+                .ToUnit();
+
+            modulesEnumerator
+                .Settings
+                .Changed
+                .ToUnit()
+                .SkipUntil(settingsOpenedTrigger)
+                .StartWith(Unit.Default)
+                .Select(x => modulesEnumerator.Settings.ToList())
+                .Subscribe(ReloadModulesList)
+                .AddTo(Anchors);
+
+            this.WhenAnyValue(x => x.IsOpen)
+                .Where(x => x)
+                .Subscribe(ReloadConfigs)
+                .AddTo(Anchors);
+
+            this.WhenAnyValue(x => x.IsOpen)
+                .Where(x => !x)
+                .SkipUntil(settingsOpenedTrigger)
+                .Subscribe(SaveConfigs)
+                .AddTo(Anchors);
         }
+
+        public IReactiveList<ISettingsViewModel> ModulesSettings { get; } = new ReactiveList<ISettingsViewModel>();
 
         public bool IsOpen
         {
@@ -40,48 +73,65 @@ namespace PoeEye.PoeTrade.ViewModels
             set { this.RaiseAndSetIfChanged(ref isOpen, value); }
         }
 
-        public EditableTuple<string, float>[] CurrenciesPriceInChaosOrbs
+        private void ReloadModulesList(IEnumerable<ISettingsViewModel> viewModels)
         {
-            get { return currenciesPriceInChaosOrbs; }
-            set { this.RaiseAndSetIfChanged(ref currenciesPriceInChaosOrbs, value); }
+            ModulesSettings.Clear();
+            ModulesSettings.AddRange(viewModels);
+            ReloadConfigs();
         }
 
-        public bool AudioNotificationsEnabled
+        private void ReloadConfigs()
         {
-            get { return audioNotificationsEnabled; }
-            set { this.RaiseAndSetIfChanged(ref audioNotificationsEnabled, value); }
+            ModulesSettings.ForEach(ReloadConfig);
         }
 
-        public bool WhisperNotificationsEnabled
+        private void SaveConfigs()
         {
-            get { return whisperNotificationsEnabled; }
-            set { this.RaiseAndSetIfChanged(ref whisperNotificationsEnabled, value); }
+            ModulesSettings.ForEach(SaveConfig);
         }
 
-        public bool ClipboardMonitoringEnabled
+        private Type GetConfigType(ISettingsViewModel viewModel)
         {
-            get { return clipboardMonitoringEnabled; }
-            set { this.RaiseAndSetIfChanged(ref clipboardMonitoringEnabled, value); }
-        }
-
-        public string ChatWheelHotkey
-        {
-            get { return chatWheelHotkey; }
-            set { this.RaiseAndSetIfChanged(ref chatWheelHotkey, value); }
-        }
-
-        public string[] HotkeysList { get; set; }
-
-        private KeyGesture TryToCreateKeyGesture(Key key)
-        {
-            try
+            var expectedInterface = typeof(ISettingsViewModel<>);
+            var genericArgs = viewModel.GetType()
+                .GetInterfaces()
+                .Where(x => x.IsGenericType)
+                .FirstOrDefault(x => expectedInterface.IsAssignableFrom(x.GetGenericTypeDefinition()));
+            if (genericArgs == null)
             {
-                return new KeyGesture(key);
+                throw new ModuleTypeLoadingException($"Failed to load settings of type {viewModel.GetType()} - interface {expectedInterface} was not found");
             }
-            catch (Exception)
-            {
-                return null;
-            }
+            var configType = genericArgs.GetGenericArguments().First();
+            return configType;
+        }
+
+        private void ReloadConfig(ISettingsViewModel viewModel)
+        {
+            var configType = GetConfigType(viewModel);
+            var invocationMethod = reloadConfigByType.GetOrAdd(configType, x => ReloadConfigMethod.MakeGenericMethod(x));
+            invocationMethod.Invoke(this, new object[] { viewModel });
+        }
+
+        private void SaveConfig(ISettingsViewModel viewModel)
+        {
+            var configType = GetConfigType(viewModel);
+            var invocationMethod = saveConfigByType.GetOrAdd(configType, x => SaveConfigMethod.MakeGenericMethod(x));
+            invocationMethod.Invoke(this, new object[] { viewModel });
+        }
+
+        private void ReloadTypedConfig<TConfig>(ISettingsViewModel<TConfig> viewModel)
+            where TConfig : class, IPoeEyeConfig, new()
+        {
+            var configProvider = container.Resolve<IConfigProvider<TConfig>>();
+            viewModel.Load(configProvider.ActualConfig);
+        }
+
+        private void SaveTypedConfig<TConfig>(ISettingsViewModel<TConfig> viewModel)
+            where TConfig : class, IPoeEyeConfig, new()
+        {
+            var configProvider = container.Resolve<IConfigProvider<TConfig>>();
+            var config = viewModel.Save();
+            configProvider.Save(config);
         }
     }
 }

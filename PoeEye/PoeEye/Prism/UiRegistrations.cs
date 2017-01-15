@@ -1,4 +1,6 @@
-﻿using PoeShared.Prism;
+﻿using PoeShared.Modularity;
+using PoeShared.Prism;
+using PoeEyeMainConfig = PoeEye.Config.PoeEyeMainConfig;
 
 namespace PoeEye.Prism
 {
@@ -21,6 +23,7 @@ namespace PoeEye.Prism
     using ReactiveUI;
 
     using WpfAutoCompleteControls.Editors;
+    using IPoeEyeMainConfigProvider = IConfigProvider<PoeEyeMainConfig>;
 
     internal sealed class UiRegistrations : UnityContainerExtension
     {
@@ -31,7 +34,9 @@ namespace PoeEye.Prism
                 .RegisterSingleton<IPoePriceCalculcator, PoePriceCalculcator>()
                 .RegisterSingleton<IAudioNotificationsManager, AudioNotificationsManager>()
                 .RegisterSingleton<IWhispersNotificationManager, WhispersNotificationManager>()
-                .RegisterSingleton<IPoeEyeConfigProvider, PoeEyeConfigProviderFromFile>()
+                .RegisterSingleton(typeof(IPoeEyeMainConfigProvider), typeof(GenericConfigProvider<PoeEyeMainConfig>))
+                .RegisterSingleton(typeof(IConfigProvider<>), typeof(GenericConfigProvider<>))
+                .RegisterSingleton<IConfigProvider, PoeEyeConfigProviderFromFile>()
                 .RegisterSingleton<IPoeCaptchaRegistrator, PoeCaptchaRegistrator>()
                 .RegisterSingleton<IPoeApiProvider, PoeApiProvider>()
                 .RegisterSingleton<IDialogCoordinator, DialogCoordinator>();

@@ -201,7 +201,7 @@ namespace PoeEye.PoeTrade.ViewModels
                 case NotifyCollectionChangedAction.Reset:
                     Log.Instance.Debug($"[PoeSummaryTabViewModel.TabsCollectionChange.Reset] Resetting... tabs count: {collectionByTab.Count}");
                     collectionByTab.Keys.ToArray().ForEach(ProcessRemoveTab);
-                    tabs.ForEach(ProcessAddTab);
+                    tabs.ToArray().ForEach(ProcessAddTab);
                     break;
             }
         }

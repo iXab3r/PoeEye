@@ -1,34 +1,34 @@
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reactive;
+using System.Reactive.Linq;
+using System.Reactive.Subjects;
+using System.Text;
+using Guards;
+using JetBrains.Annotations;
+using Newtonsoft.Json;
+using PoeShared;
+using PoeShared.Modularity;
+using PoeShared.Scaffolding;
+using ReactiveUI;
+
 namespace PoeEye.Config
 {
-    using System;
-    using System.IO;
-    using System.Linq;
-    using System.Text;
-
-    using Converters;
-
-    using Guards;
-
-    using Newtonsoft.Json;
-
-    using PoeShared;
-    using PoeShared.Common;
-    using PoeShared.PoeTrade;
-    using PoeShared.PoeTrade.Query;
-    using PoeShared.Scaffolding;
-
-    using ReactiveUI;
-
-    internal sealed class PoeEyeConfigProviderFromFile : DisposableReactiveObject, IPoeEyeConfigProvider
+    internal sealed class PoeEyeConfigProviderFromFile : IConfigProvider
     {
         private static readonly string DebugConfigFileName = @"PoeEye\configDebugMode.cfg";
         private static readonly string ReleaseConfigFileName = @"PoeEye\config.cfg";
 
         private readonly string configFilePath;
 
-        private readonly JsonSerializerSettings jsonSerializerSettings;
+        private JsonSerializerSettings jsonSerializerSettings;
+        private readonly IReactiveList<JsonConverter> converters = new ReactiveList<JsonConverter>();
+        private readonly ConcurrentDictionary<Type, IPoeEyeConfig> loadedConfigs = new ConcurrentDictionary<Type, IPoeEyeConfig>();
 
-        private Lazy<IPoeEyeConfig> poeEyeConfigLoader;
+        private readonly ISubject<Unit> configHasChanged = new Subject<Unit>();
 
         public PoeEyeConfigProviderFromFile()
         {
@@ -43,37 +43,45 @@ namespace PoeEye.Config
                 configFilePath = Environment.ExpandEnvironmentVariables($@"%APPDATA%\{ReleaseConfigFileName}");
             }
 
-            Log.Instance.Debug($"[PoeEyeConfigProviderFromFile..ctor] Config file path: {configFilePath}");
-
-            jsonSerializerSettings = new JsonSerializerSettings
-            {
-                Formatting = Formatting.Indented
-            };
-
-            var converters = new JsonConverter[]
-            {
-                new ConcreteListTypeConverter<IPoeQueryInfo, PoeQueryInfo>(),
-                new ConcreteListTypeConverter<IPoeItemType, PoeItemType>(),
-                new ConcreteListTypeConverter<IPoeItem, PoeItem>(),
-                new ConcreteListTypeConverter<IPoeItemMod, PoeItemMod>(),
-                new ConcreteListTypeConverter<IPoeLinksInfo, PoeLinksInfo>(),
-                new ConcreteListTypeConverter<IPoeQueryModsGroup, PoeQueryModsGroup>(),
-                new ConcreteListTypeConverter<IPoeQueryRangeModArgument, PoeQueryRangeModArgument>()
-            };
-            converters.ToList().ForEach(jsonSerializerSettings.Converters.Add);
-
-            Reload();
+            converters.Changed
+                .ToUnit()
+                .StartWith(Unit.Default)
+                .Subscribe(ReinitializeSerializerSettings);
         }
 
-        public IPoeEyeConfig ActualConfig => poeEyeConfigLoader.Value;
+        public IObservable<Unit> ConfigHasChanged => configHasChanged;
 
         public void Reload()
         {
-            poeEyeConfigLoader = new Lazy<IPoeEyeConfig>(LoadInternal);
-            this.RaisePropertyChanged(nameof(ActualConfig));
+            var config = LoadInternal();
+            loadedConfigs.Clear();
+
+            config.Items
+                .Where(x => x.ConfigType != null)
+                .ToList()
+                .ForEach(x => loadedConfigs[x.ConfigType] = x.Content);
+
+            configHasChanged.OnNext(Unit.Default);
         }
 
-        public void Save(IPoeEyeConfig config)
+        public void Save()
+        {
+            var config = new PoeEyeCombinedConfig();
+            loadedConfigs.Values.Select(x => new PoeEyeConfigMetadata(x)).ToList().ForEach(x => config.Add(x));
+
+            SaveInternal(config);
+        }
+
+        public TConfig GetActualConfig<TConfig>() where TConfig : IPoeEyeConfig, new()
+        {
+            if (loadedConfigs.IsEmpty)
+            {
+                Reload();
+            }
+            return (TConfig)loadedConfigs.GetOrAdd(typeof(TConfig), (key) => (TConfig)Activator.CreateInstance(typeof(TConfig)));
+        }
+
+        private void SaveInternal(PoeEyeCombinedConfig config)
         {
             Guard.ArgumentNotNull(() => config);
 
@@ -103,32 +111,90 @@ namespace PoeEye.Config
             }
         }
 
-        private IPoeEyeConfig LoadInternal()
+        private PoeEyeCombinedConfig LoadInternal()
         {
             Log.Instance.Debug($"[PoeEyeConfigProviderFromFile.Load] Loading config from file '{configFilePath}'...");
+            loadedConfigs.Clear();
 
             if (!File.Exists(configFilePath))
             {
                 Log.Instance.Debug($"[PoeEyeConfigProviderFromFile.Load] File not found, fileName: '{configFilePath}'");
-                return new PoeEyeConfig();
+                return new PoeEyeCombinedConfig();
             }
 
-            PoeEyeConfig result;
+            PoeEyeCombinedConfig result;
             try
             {
                 var fileData = File.ReadAllText(configFilePath);
                 Log.Instance.Debug($"[PoeEyeConfigProviderFromFile.Load] Successfully read {fileData.Length} chars, deserializing...");
 
-                result = JsonConvert.DeserializeObject<PoeEyeConfig>(fileData, jsonSerializerSettings);
+                result = JsonConvert.DeserializeObject<PoeEyeCombinedConfig>(fileData, jsonSerializerSettings);
                 Log.Instance.Debug($"[PoeEyeConfigProviderFromFile.Load] Successfully deserialized config data");
             }
             catch (Exception ex)
             {
                 Log.Instance.Warn($"[PoeEyeConfigProviderFromFile.Load] Could not deserialize config data, default config will be used", ex);
-                result = new PoeEyeConfig();
+                result = new PoeEyeCombinedConfig();
             }
 
             return result;
+        }
+
+        public void RegisterConverter(JsonConverter converter)
+        {
+            Guard.ArgumentNotNull(() => converter);
+
+            converters.Add(converter);
+        }
+
+        private void ReinitializeSerializerSettings()
+        {
+            jsonSerializerSettings = new JsonSerializerSettings
+            {
+                Formatting = Formatting.Indented,
+                TypeNameHandling = TypeNameHandling.All,
+                TypeNameAssemblyFormat = System.Runtime.Serialization.Formatters.FormatterAssemblyStyle.Simple
+            };
+
+            converters.ToList().ForEach(jsonSerializerSettings.Converters.Add);
+        }
+
+        private sealed class PoeEyeCombinedConfig
+        {
+            private readonly ICollection<PoeEyeConfigMetadata> items = new List<PoeEyeConfigMetadata>();
+
+            public int Version { get; set; } = 1;
+
+            public IEnumerable<PoeEyeConfigMetadata> Items
+            {
+                [NotNull]
+                get { return items; }
+            }
+
+            public PoeEyeCombinedConfig Add([NotNull] PoeEyeConfigMetadata item)
+            {
+                Guard.ArgumentNotNull(() => item);
+
+                items.Add(item);
+                return this;
+            }
+        }
+
+        private sealed class PoeEyeConfigMetadata
+        {
+            public string ConfigTypeName => Content.GetType().FullName;
+
+            [JsonIgnore]
+            public Type ConfigType => Type.GetType(ConfigTypeName, false);
+
+            public IPoeEyeConfig Content { get; }
+
+            public string SerializedContent { get; private set; }
+
+            public PoeEyeConfigMetadata(IPoeEyeConfig content)
+            {
+                Content = content;
+            }
         }
     }
 }

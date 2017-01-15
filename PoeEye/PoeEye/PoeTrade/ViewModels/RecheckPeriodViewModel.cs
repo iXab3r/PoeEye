@@ -1,4 +1,7 @@
-﻿namespace PoeEye.PoeTrade.ViewModels
+﻿using PoeShared.Modularity;
+using PoeEyeMainConfig = PoeEye.Config.PoeEyeMainConfig;
+
+namespace PoeEye.PoeTrade.ViewModels
 {
     using System;
     using System.Reactive.Linq;
@@ -12,6 +15,7 @@
     using PoeShared.Scaffolding;
 
     using ReactiveUI;
+    using IPoeEyeMainConfigProvider = IConfigProvider<PoeEyeMainConfig>;
 
     internal sealed class RecheckPeriodViewModel : DisposableReactiveObject, IRecheckPeriodViewModel
     {
@@ -26,7 +30,7 @@
 
         private TimeSpan period;
 
-        public RecheckPeriodViewModel([NotNull] IPoeEyeConfigProvider configProvider)
+        public RecheckPeriodViewModel([NotNull] IPoeEyeMainConfigProvider configProvider)
         {
             Guard.ArgumentNotNull(() => configProvider);
 

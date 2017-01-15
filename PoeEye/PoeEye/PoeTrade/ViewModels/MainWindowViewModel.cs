@@ -1,4 +1,6 @@
 ﻿using PoeChatWheel.ViewModels;
+using PoeShared.Modularity;
+using PoeEyeMainConfig = PoeEye.Config.PoeEyeMainConfig;
 
 namespace PoeEye.PoeTrade.ViewModels
 {
@@ -33,6 +35,7 @@ namespace PoeEye.PoeTrade.ViewModels
     using ReactiveUI;
 
     using Utilities;
+    using IPoeEyeMainConfigProvider = IConfigProvider<PoeEyeMainConfig>;
 
     internal sealed class MainWindowViewModel : DisposableReactiveObject, IMainWindowViewModel
     {
@@ -43,7 +46,7 @@ namespace PoeEye.PoeTrade.ViewModels
         private readonly ReactiveCommand<object> createNewTabCommand = ReactiveCommand.Create();
 
         private readonly ISubject<Unit> configUpdateSubject = new Subject<Unit>();
-        private readonly IPoeEyeConfigProvider poeEyeConfigProvider;
+        private readonly IPoeEyeMainConfigProvider poeEyeConfigProvider;
 
         private readonly IFactory<IMainWindowTabViewModel> tabFactory;
 
@@ -53,7 +56,7 @@ namespace PoeEye.PoeTrade.ViewModels
             [NotNull] IFactory<IMainWindowTabViewModel> tabFactory,
             [NotNull] IFactory<PoeSummaryTabViewModel, IReactiveList<IMainWindowTabViewModel>> summaryTabFactory,
             [NotNull] ApplicationUpdaterViewModel applicationUpdaterViewModel,
-            [NotNull] IPoeEyeConfigProvider poeEyeConfigProvider,
+            [NotNull] IPoeEyeMainConfigProvider poeEyeConfigProvider,
             [NotNull] IAudioNotificationsManager audioNotificationsManager,
             [NotNull] PoeClipboardParserViewModel clipboardParserViewModel,
             [NotNull] ProxyProviderViewModel proxyProviderViewModel,
@@ -128,15 +131,6 @@ namespace PoeEye.PoeTrade.ViewModels
             TabsList
                 .Changed.ToUnit()
                 .Merge(TabsList.ItemChanged.Where(x => x.PropertyName == nameof(IAudioNotificationSelectorViewModel.SelectedValue)).ToUnit())
-                .Subscribe(configUpdateSubject)
-                .AddTo(Anchors);
-
-            settings
-                .ObservableForProperty(x => x.IsOpen)
-                .Select(x => x.Value)
-                .DistinctUntilChanged()
-                .Where(x => x == false)
-                .ToUnit()
                 .Subscribe(configUpdateSubject)
                 .AddTo(Anchors);
 
@@ -237,15 +231,8 @@ namespace PoeEye.PoeTrade.ViewModels
         {
             Log.Instance.Debug($"[MainWindowViewModel.SaveConfig] Saving config (provider: {poeEyeConfigProvider})...\r\nTabs count: {TabsList.Count}");
 
-            var config = new PoeEyeConfig(poeEyeConfigProvider.ActualConfig)
-            {
-                TabConfigs = TabsList.Select(tab => tab.Save()).ToArray(),
-                AudioNotificationsEnabled = Settings.AudioNotificationsEnabled,
-                ClipboardMonitoringEnabled = Settings.ClipboardMonitoringEnabled,
-                WhisperNotificationsEnabled = Settings.WhisperNotificationsEnabled,
-                CurrenciesPriceInChaos = Settings.CurrenciesPriceInChaosOrbs.ToDictionary(x => x.Item1, x => x.Item2),
-                ChatWheelHotkey = Settings.ChatWheelHotkey,
-            };
+            var config = poeEyeConfigProvider.ActualConfig;
+            config.TabConfigs = TabsList.Select(tab => tab.Save()).ToArray();
 
             poeEyeConfigProvider.Save(config);
         }
@@ -255,7 +242,6 @@ namespace PoeEye.PoeTrade.ViewModels
             Log.Instance.Debug($"[MainWindowViewModel.LoadConfig] Loading config (provider: {poeEyeConfigProvider})...");
 
             var config = poeEyeConfigProvider.ActualConfig;
-            poeEyeConfigProvider.Save(config);
 
             Log.Instance.Trace($"[MainWindowViewModel.LoadConfig] Received configuration DTO:\r\n{config.DumpToText()}");
 
@@ -264,16 +250,7 @@ namespace PoeEye.PoeTrade.ViewModels
                 var tab = CreateAndAddTab();
                 tab.Load(tabConfig);
             }
-
-            Settings.ClipboardMonitoringEnabled = config.ClipboardMonitoringEnabled;
-            Settings.AudioNotificationsEnabled = config.AudioNotificationsEnabled;
-            Settings.WhisperNotificationsEnabled = config.WhisperNotificationsEnabled;
-            Settings.CurrenciesPriceInChaosOrbs = config
-                .CurrenciesPriceInChaos
-                .Select(x => new EditableTuple<string, float> {Item1 = x.Key, Item2 = x.Value})
-                .ToArray();
-            Settings.ChatWheelHotkey = config.ChatWheelHotkey;
-
+            
             Log.Instance.Debug($"[MainWindowViewModel.LoadConfig] Sucessfully loaded config\r\nTabs count: {TabsList.Count}");
         }
     }

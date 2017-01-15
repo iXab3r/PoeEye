@@ -12,7 +12,9 @@ using System.Windows.Media;
 using Gma.System.MouseKeyHook;
 using JetBrains.Annotations;
 using Microsoft.Practices.Unity;
+using PoeChatWheel.Modularity;
 using PoeShared;
+using PoeShared.Modularity;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
 using PoeWhisperMonitor;
@@ -68,6 +70,7 @@ namespace PoeChatWheel.ViewModels
         public PoeChatWheelViewModel(
             [NotNull] IPoeWhisperService whisperService,
             [NotNull] IPoeChatService chatService,
+            [NotNull] IConfigProvider<PoeChatWheelConfig> configProvider,
             [NotNull] [Dependency(WellKnownWindows.PathOfExile)] IWindowTracker poeWindowTracker,
             [NotNull] IClock clock)
         {
@@ -149,6 +152,12 @@ namespace PoeChatWheel.ViewModels
             whisperService.Messages.Where(x => x.MessageType == PoeMessageType.WhisperFrom)
                 .Subscribe(ProcessMessage)
                 .AddTo(Anchors);
+
+            configProvider.WhenAnyValue(x => x.ActualConfig)
+                          .Select(x => x.ChatWheelHotkey)
+                          .Select(hotkey => new KeyGestureConverter().ConvertFromInvariantString(hotkey) as KeyGesture)
+                          .Subscribe(x => this.hotkey = x)
+                          .AddTo(Anchors);
         }
 
         public TimeSpan HistoryPeriod
@@ -167,12 +176,6 @@ namespace PoeChatWheel.ViewModels
         {
             get { return isOpen; }
             set { this.RaiseAndSetIfChanged(ref isOpen, value); }
-        }
-
-        public KeyGesture Hotkey
-        {
-            get { return hotkey; }
-            set { this.RaiseAndSetIfChanged(ref hotkey, value); }
         }
 
         public IReactiveList<RadialMenuItem> Items { get; } = new ReactiveList<RadialMenuItem>();

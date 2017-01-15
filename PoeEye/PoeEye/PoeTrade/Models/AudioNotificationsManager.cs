@@ -3,6 +3,8 @@ using System.Linq;
 using System.Reflection;
 using System.Resources;
 using PoeEye.Resources.Notifications;
+using PoeShared.Modularity;
+using PoeEyeMainConfig = PoeEye.Config.PoeEyeMainConfig;
 
 namespace PoeEye.PoeTrade.Models
 {
@@ -23,6 +25,8 @@ namespace PoeEye.PoeTrade.Models
 
     using ReactiveUI;
 
+    using IPoeEyeMainConfigProvider = IConfigProvider<PoeEyeMainConfig>;
+
     internal sealed class AudioNotificationsManager : DisposableReactiveObject, IAudioNotificationsManager
     {
         private readonly IDictionary<AudioNotificationType, byte[]> knownNotifications = new Dictionary
@@ -33,7 +37,7 @@ namespace PoeEye.PoeTrade.Models
 
         private bool isEnabled;
 
-        public AudioNotificationsManager([NotNull] IPoeEyeConfigProvider poeEyeConfigProvider) 
+        public AudioNotificationsManager([NotNull] IPoeEyeMainConfigProvider poeEyeConfigProvider) 
         {
             Guard.ArgumentNotNull(() => poeEyeConfigProvider);
 

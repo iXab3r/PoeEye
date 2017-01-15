@@ -1,6 +1,7 @@
 ﻿using System.Collections.Specialized;
 using System.Diagnostics;
 using PoeShared.Communications;
+using PoeShared.Modularity;
 using PoeShared.PoeTrade.Query;
 using ProxyProvider;
 
@@ -26,6 +27,8 @@ namespace PoeShared.Prism
         {
             Container
                 .RegisterSingleton<IClock, Clock>()
+                .RegisterSingleton<IPoeEyeModulesRegistrator, PoeEyeModulesRegistrator>()
+                .RegisterSingleton<IPoeEyeModulesEnumerator, PoeEyeModulesRegistrator>()
                 .RegisterSingleton<IPoeDatabaseReader, StaticPoeDatabaseReader>()
                 .RegisterSingleton<IEqualityComparer<IPoeItem>, PoeItemEqualityComparer>()
                 .RegisterSingleton<IConverter<NameValueCollection, string>, NameValueCollectionToQueryStringConverter>()

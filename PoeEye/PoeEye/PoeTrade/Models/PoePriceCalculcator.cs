@@ -1,5 +1,7 @@
 ﻿using CsQuery.ExtensionMethods;
 using PoeShared.Common;
+using PoeShared.Modularity;
+using PoeEyeMainConfig = PoeEye.Config.PoeEyeMainConfig;
 
 namespace PoeEye.PoeTrade.Models
 {
@@ -20,12 +22,13 @@ namespace PoeEye.PoeTrade.Models
     using PoeShared.Scaffolding;
 
     using ReactiveUI;
+    using IPoeEyeMainConfigProvider = IConfigProvider<PoeEyeMainConfig>;
 
     internal sealed class PoePriceCalculcator : DisposableReactiveObject, IPoePriceCalculcator
     {
         private readonly IDictionary<string, float> currencyByType = new Dictionary<string, float>();
 
-        public PoePriceCalculcator([NotNull] IPoeEyeConfigProvider configProvider)
+        public PoePriceCalculcator([NotNull] IPoeEyeMainConfigProvider configProvider)
         {
             Guard.ArgumentNotNull(() => configProvider);
 

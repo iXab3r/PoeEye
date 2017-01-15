@@ -1,0 +1,60 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:viewModels1="clr-namespace:PoeEye.PoeTrade.ViewModels"
+                    xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls">
+  <DataTemplate DataType="{x:Type viewModels1:PoeMainSettingsViewModel}">
+    <Grid Margin="5,0">
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+      </Grid.RowDefinitions>
+
+      <StackPanel Grid.Row="0" Grid.Column="0"
+                  Orientation="Horizontal" Height="24">
+        <Label Style="{StaticResource IconLabel}" Content="Clipboard monitoring:" />
+        <controls:ToggleSwitchButton ToolTip="Enable clipboard monitoring" Height="26"
+                                         IsChecked="{Binding ClipboardMonitoringEnabled}" />
+      </StackPanel>
+
+      <StackPanel Grid.Row="1" Grid.Column="0"
+                  Orientation="Horizontal" Height="24">
+        <Label Style="{StaticResource IconLabel}" Content="Audio:" />
+        <controls:ToggleSwitchButton ToolTip="Audio notification for new items" Height="26"
+                                         IsChecked="{Binding AudioNotificationsEnabled}" />
+      </StackPanel>
+
+      <StackPanel Grid.Row="2" Grid.Column="0"
+                  Orientation="Horizontal" Height="24">
+        <Label Style="{StaticResource IconLabel}" Content="Whispers:" />
+        <controls:ToggleSwitchButton ToolTip="In-game whisper notifications" Height="26"
+                                         IsChecked="{Binding WhisperNotificationsEnabled}" />
+      </StackPanel>
+
+      <StackPanel Grid.Row="3" Grid.Column="0"
+                  Orientation="Vertical">
+        <Label Content="Currencies rate (in Chaos orbs)" Margin="0,5,0,2" Style="{StaticResource IconLabel}" />
+        <ItemsControl ItemsSource="{Binding CurrenciesPriceInChaosOrbs}" BorderThickness="0,1,0,0"
+                      BorderBrush="{StaticResource AccentColorBrush}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate>
+              <StackPanel Orientation="Horizontal" Margin="0,2">
+                <Label Width="100"
+                           HorizontalContentAlignment="Right" HorizontalAlignment="Stretch"
+                           Content="{Binding Item1, Mode=OneWay}" />
+                <controls:NumericUpDown Width="100"
+                                            Style="{StaticResource QueryNumericUpDownMax}"
+                                            Value="{Binding Item2, Converter={StaticResource NullableConverter}}"
+                                            StringFormat="{}{0:F2}" />
+              </StackPanel>
+
+            </DataTemplate>
+
+          </ItemsControl.ItemTemplate>
+
+        </ItemsControl>
+      </StackPanel>
+    </Grid>
+  </DataTemplate>
+</ResourceDictionary>

@@ -1,5 +1,7 @@
 ﻿using PoeShared;
+using PoeShared.Modularity;
 using PoeShared.Prism;
+using PoeEyeMainConfig = PoeEye.Config.PoeEyeMainConfig;
 
 namespace PoeEye.PoeTrade.Models
 {
@@ -20,6 +22,7 @@ namespace PoeEye.PoeTrade.Models
 
     using PoeWhisperMonitor;
     using PoeWhisperMonitor.Chat;
+    using IPoeEyeMainConfigProvider = IConfigProvider<PoeEyeMainConfig>;
 
     internal sealed class WhispersNotificationManager : DisposableReactiveObject, IWhispersNotificationManager
     {
@@ -27,7 +30,7 @@ namespace PoeEye.PoeTrade.Models
 
         public WhispersNotificationManager(
             [NotNull] IPoeWhisperService whisperService,
-            [NotNull] IPoeEyeConfigProvider poeEyeConfigProvider,
+            [NotNull] IPoeEyeMainConfigProvider poeEyeConfigProvider,
             [NotNull] [Dependency(WellKnownWindows.PathOfExile)] IWindowTracker poeWindowTracker,
             [NotNull] IAudioNotificationsManager audioNotificationsManager)
         {

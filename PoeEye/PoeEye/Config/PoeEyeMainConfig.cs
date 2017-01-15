@@ -1,4 +1,5 @@
 using PoeShared.Common;
+using PoeShared.Modularity;
 
 namespace PoeEye.Config
 {
@@ -11,7 +12,7 @@ namespace PoeEye.Config
 
     using PoeShared.Scaffolding;
 
-    internal sealed class PoeEyeConfig : IPoeEyeConfig
+    internal sealed class PoeEyeMainConfig : IPoeEyeConfig
     {
         private static readonly IDictionary<string, float> DefaultCurrenciesPriceInChaos = new Dictionary<string, float>
         {
@@ -37,11 +38,11 @@ namespace PoeEye.Config
 
         private PoeEyeTabConfig[] tabConfigs = new PoeEyeTabConfig[0];
 
-        public PoeEyeConfig()
+        public PoeEyeMainConfig()
         {
         }
 
-        public PoeEyeConfig([NotNull] IPoeEyeConfig source)
+        public PoeEyeMainConfig([NotNull] PoeEyeMainConfig source)
         {
             Guard.ArgumentNotNull(() => source);
 
@@ -65,8 +66,6 @@ namespace PoeEye.Config
         public bool AudioNotificationsEnabled { get; set; } = true;
 
         public bool WhisperNotificationsEnabled { get; set; } = false;
-
-        public string ChatWheelHotkey { get; set; } = "";
 
         public TimeSpan MinRefreshTimeout { get; set; } = TimeSpan.FromSeconds(30);
 

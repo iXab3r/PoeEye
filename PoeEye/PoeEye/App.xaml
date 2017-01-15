@@ -20,6 +20,7 @@
         <ResourceDictionary Source="Themes/Generic.xaml" />
         <ResourceDictionary Source="Themes/SlimScrollbar.xaml" />
 
+        <ResourceDictionary Source="PoeTrade/Views/PoeMainSettingsViewModel.xaml" />
         <ResourceDictionary Source="PoeTrade/Views/PoeEyeSettingsView.xaml" />
         <ResourceDictionary Source="PoeTrade/Views/ProxyProviderView.xaml" />
         <ResourceDictionary Source="PoeTrade/Views/RecheckPeriodView.xaml" />
