@@ -15,15 +15,7 @@ namespace PoeChatWheel.ViewModels
 
         public PoeChatWheelSettingsViewModel()
         {
-            var keyGestureConverter = new KeyGestureConverter();
-            HotkeysList =
-                Enum.GetValues(typeof(Key))
-                    .OfType<Key>()
-                    .Select(TryToCreateKeyGesture)
-                    .Where(x => x != null)
-                    .Select(x => x.Key == Key.None ? "None" : keyGestureConverter.ConvertToInvariantString(x))
-                    .Distinct()
-                    .ToArray();
+            HotkeysList = KeyGestureExtensions.GetHotkeyList();
             Hotkey = HotkeysList.First();
         }
 
@@ -50,18 +42,6 @@ namespace PoeChatWheel.ViewModels
             {
                 ChatWheelHotkey = Hotkey
             };
-        }
-
-        private KeyGesture TryToCreateKeyGesture(Key key)
-        {
-            try
-            {
-                return new KeyGesture(key);
-            }
-            catch (Exception)
-            {
-                return null;
-            }
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace PoeEye.PoeTrade.ViewModels
+﻿using PoeShared.Prism;
+
+namespace PoeEye.PoeTrade.ViewModels
 {
     using System;
     using System.ComponentModel;

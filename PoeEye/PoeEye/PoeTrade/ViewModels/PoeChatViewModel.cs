@@ -8,6 +8,7 @@ using JetBrains.Annotations;
 using Microsoft.Practices.Unity;
 using PoeEye.PoeTrade.Models;
 using PoeEye.Prism;
+using PoeShared.Prism;
 using PoeShared.Scaffolding;
 using PoeWhisperMonitor;
 using PoeWhisperMonitor.Chat;

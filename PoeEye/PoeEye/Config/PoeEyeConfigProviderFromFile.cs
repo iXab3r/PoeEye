@@ -26,7 +26,7 @@ namespace PoeEye.Config
 
         private JsonSerializerSettings jsonSerializerSettings;
         private readonly IReactiveList<JsonConverter> converters = new ReactiveList<JsonConverter>();
-        private readonly ConcurrentDictionary<Type, IPoeEyeConfig> loadedConfigs = new ConcurrentDictionary<Type, IPoeEyeConfig>();
+        private readonly ConcurrentDictionary<string, IPoeEyeConfig> loadedConfigs = new ConcurrentDictionary<string, IPoeEyeConfig>();
 
         private readonly ISubject<Unit> configHasChanged = new Subject<Unit>();
 
@@ -57,9 +57,8 @@ namespace PoeEye.Config
             loadedConfigs.Clear();
 
             config.Items
-                .Where(x => x.ConfigType != null)
                 .ToList()
-                .ForEach(x => loadedConfigs[x.ConfigType] = x.Content);
+                .ForEach(x => loadedConfigs[x.ConfigTypeName] = x.Content);
 
             configHasChanged.OnNext(Unit.Default);
         }
@@ -78,7 +77,7 @@ namespace PoeEye.Config
             {
                 Reload();
             }
-            return (TConfig)loadedConfigs.GetOrAdd(typeof(TConfig), (key) => (TConfig)Activator.CreateInstance(typeof(TConfig)));
+            return (TConfig)loadedConfigs.GetOrAdd(typeof(TConfig).FullName, (key) => (TConfig)Activator.CreateInstance(typeof(TConfig)));
         }
 
         private void SaveInternal(PoeEyeCombinedConfig config)
@@ -184,12 +183,7 @@ namespace PoeEye.Config
         {
             public string ConfigTypeName => Content.GetType().FullName;
 
-            [JsonIgnore]
-            public Type ConfigType => Type.GetType(ConfigTypeName, false);
-
             public IPoeEyeConfig Content { get; }
-
-            public string SerializedContent { get; private set; }
 
             public PoeEyeConfigMetadata(IPoeEyeConfig content)
             {

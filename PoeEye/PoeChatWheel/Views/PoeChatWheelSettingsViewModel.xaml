@@ -1,15 +1,15 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:viewModels="clr-namespace:PoeChatWheel.ViewModels">
-  <DataTemplate DataType="{x:Type viewModels:PoeChatWheelSettingsViewModel}">
-    <Grid>
-      <StackPanel 
+    <DataTemplate DataType="{x:Type viewModels:PoeChatWheelSettingsViewModel}">
+        <Grid>
+            <StackPanel 
                       Orientation="Horizontal" Height="30" Margin="0,2">
-        <Label Content="Hotkey:" />
-        <ComboBox IsEditable="False" 
+                <Label Content="Hotkey:" VerticalAlignment="Center" />
+                <ComboBox IsEditable="False" 
                           Width="120"
-                          ToolTip="Chat wheel hotkey" ItemsSource="{Binding HotkeysList}" SelectedValue="{Binding ChatWheelHotkey}" />
-      </StackPanel>
-    </Grid>
-  </DataTemplate>
+                          ToolTip="Chat wheel hotkey" ItemsSource="{Binding HotkeysList}" SelectedValue="{Binding Hotkey}" />
+            </StackPanel>
+        </Grid>
+    </DataTemplate>
 </ResourceDictionary>

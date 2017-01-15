@@ -1,0 +1,81 @@
+﻿<utilities:TransparentWindow 
+        x:Class="PoeBud.Views.OverlayWindowView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:viewModels="clr-namespace:PoeBud.ViewModels"
+        xmlns:utilities="clr-namespace:PoeBud.Utilities"
+        mc:Ignorable="d"
+        Background="{x:Null}"
+        ShowInTaskbar="False"
+        d:DataContext="{d:DesignInstance viewModels:OverlayWindowViewModel}" 
+        ResizeMode="NoResize"
+        Topmost="True" >
+
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../Themes/Generic.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <Grid  Visibility="{Binding WindowsManager.ActiveWindow, Converter={StaticResource NullToCollapsedConverter}}" >
+        <Canvas>
+            <Rectangle Canvas.Top="{Binding WindowsManager.ActiveWindow.StashBounds.Top}" 
+                       Canvas.Left="{Binding WindowsManager.ActiveWindow.StashBounds.Left}" 
+                       Width="{Binding WindowsManager.ActiveWindow.StashBounds.Width}" 
+                       Height="{Binding WindowsManager.ActiveWindow.StashBounds.Height}" 
+                       Stroke="GreenYellow" StrokeThickness="3" Visibility="Collapsed"/>
+
+            <Grid Canvas.Top="960" Canvas.Left="624" TextBlock.FontSize="20" TextBlock.Foreground="White" Opacity="0.75"
+                  Visibility="{Binding IsEnabled, Converter={StaticResource VisibleToTrueConverter}}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <Grid Grid.Row="0" Grid.Column="0" Margin="50, 5, 0, 5">
+                    <ContentPresenter Content="{Binding SolutionExecutor}" />
+                </Grid>
+
+                <Grid Grid.Row="1" Grid.Column="0" Margin="50, 5, 0, 5">
+                    <TextBlock  
+                           MaxWidth="600"
+                           Visibility="{Binding LastUpdateException, Converter={StaticResource NullToCollapsedConverter}}"
+                           Foreground="Orange"
+                           Text="{Binding LastUpdateException, StringFormat='&#xF071; {0}', Converter={StaticResource ExceptionToMessageConverter}}" 
+                           Style="{StaticResource IconTextblock}" TextTrimming="WordEllipsis" />
+                </Grid>
+
+                <Grid Grid.Row="2" Grid.Column="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Column="0"
+                           Margin="10,0"
+                           TextAlignment="Center"
+                           Text="{Binding TimeTillNextUpdate, StringFormat='&#xF017; {0}', Converter={StaticResource TimeSpanToHumanReadableStringConverter}}" Style="{StaticResource IconTextblock}"/>
+
+                    <TextBlock Grid.Column="2"
+                            TextAlignment="Left"
+                            Text="{Binding Stash.Solutions.Length, StringFormat='Sets: {0}'}" Style="{StaticResource IconTextblock}" Margin="10,0"/>
+                </Grid>
+
+                <ContentPresenter Grid.Row="3" Grid.Column="0" 
+                                  Content="{Binding Stash}"/>
+            </Grid>
+
+            <Border Canvas.Top="1065" Canvas.Left="546" Width="820" Background="#0C0C0C" Height="8" Opacity="0.95" 
+                    Visibility="{Binding HideXpBar, Converter={StaticResource VisibleToTrueConverter}}" />
+        </Canvas>
+    </Grid>
+
+</utilities:TransparentWindow>
+
