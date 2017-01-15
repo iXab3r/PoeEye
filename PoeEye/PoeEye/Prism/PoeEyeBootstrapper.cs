@@ -63,7 +63,6 @@ namespace PoeEye.Prism
             var window = (Window)Shell;
             var viewModel = Container.Resolve<IMainWindowViewModel>();
             window.DataContext = viewModel;
-            CreateChatWheel();
         }
 
         private void InitializeConfigConverters()
@@ -80,22 +79,6 @@ namespace PoeEye.Prism
                 new ConcreteListTypeConverter<IPoeQueryRangeModArgument, PoeQueryRangeModArgument>()
             };
             converters.ForEach(configProvider.RegisterConverter);
-        }
-
-        private void CreateChatWheel()
-        {
-            var chatWheel = Container.TryResolve<IPoeChatWheelViewModel>();
-            if (chatWheel == null)
-            {
-                Log.Instance.Debug("[CreateChatWheel] Chat wheel was not loaded");
-                return;
-            }
-            
-            var window = new ChatWheelWindow(chatWheel);
-            window.Show();
-
-            var mainWindow = (Window)Shell;
-            mainWindow.Closed += delegate { window.Close(); };
         }
 
         private void RegisterExtensions()

@@ -7,7 +7,7 @@
     <converters:NullToVisibilityConverter x:Key="NullToCollapsedConverter" NullValue="Collapsed" NotNullValue="Visible"/>
     <converters:NullToBoolConverter x:Key="NullToFalseConverter" NullValue="False" />
     <converters:TimeSpanToHumanReadableStringConverter x:Key="TimeSpanToHumanReadableStringConverter" />
-
+    
     <converters:ExceptionToMessageConverter x:Key="ExceptionToMessageConverter"/>
 
     <converters:BooleanToObjectConverter x:Key="BooleanToSemitransparentConverter">

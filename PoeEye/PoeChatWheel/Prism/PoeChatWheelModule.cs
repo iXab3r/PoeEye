@@ -1,10 +1,10 @@
-﻿using Guards;
+﻿using System.Windows;
+using Guards;
 using JetBrains.Annotations;
 using Microsoft.Practices.Unity;
 using PoeChatWheel.Modularity;
 using PoeChatWheel.ViewModels;
 using PoeShared.Modularity;
-using IModule = Prism.Modularity.IModule;
 
 namespace PoeChatWheel.Prism
 {
@@ -25,6 +25,14 @@ namespace PoeChatWheel.Prism
 
             var registrator = container.Resolve<IPoeEyeModulesRegistrator>();
             registrator.RegisterSettingsEditor<PoeChatWheelConfig, PoeChatWheelSettingsViewModel>();
+
+            var chatWheel = container.Resolve<IPoeChatWheelViewModel>();
+
+            var window = new ChatWheelWindow(chatWheel);
+            window.Show();
+
+            var mainWindow = Application.Current.MainWindow;
+            mainWindow.Closed += delegate { window.Close(); };
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Windows.Data;
+﻿using System.Windows;
+using System.Windows.Data;
 using Guards;
 using JetBrains.Annotations;
 using Microsoft.Practices.Unity;
@@ -30,6 +31,9 @@ namespace PoeBud.Prism
             var viewModel = container.Resolve<OverlayWindowViewModel>();
             var overlay = new OverlayWindowView { DataContext = viewModel };
             overlay.Show();
+
+            var mainWindow = Application.Current.MainWindow;
+            mainWindow.Closed += delegate { overlay.Close(); };
         }
     }
 }
