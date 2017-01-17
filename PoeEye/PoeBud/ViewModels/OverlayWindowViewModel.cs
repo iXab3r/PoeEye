@@ -58,7 +58,7 @@ namespace PoeBud.ViewModels
         private StashViewModel stash;
 
         public OverlayWindowViewModel(
-            [NotNull] IPoeWindowsManager windowsManager,
+            [NotNull] IPoeWindowManager windowManager,
             [NotNull] ISolutionExecutorViewModel solutionExecutor,
             [NotNull] IConfigProvider<PoeBudConfig> poeBudConfigProvider,
             [NotNull] IClock clock,
@@ -67,7 +67,7 @@ namespace PoeBud.ViewModels
             [NotNull] IFactory<StashViewModel, StashUpdate, IPoeBudConfig> stashUpdateFactory,
             [NotNull] [Dependency(WellKnownSchedulers.Ui)] IScheduler uiScheduler)
         {
-            Guard.ArgumentNotNull(() => windowsManager);
+            Guard.ArgumentNotNull(() => windowManager);
             Guard.ArgumentNotNull(() => solutionExecutor);
             Guard.ArgumentNotNull(() => userInteractionsManager);
             Guard.ArgumentNotNull(() => poeBudConfigProvider);
@@ -83,7 +83,7 @@ namespace PoeBud.ViewModels
             this.uiScheduler = uiScheduler;
 
             SolutionExecutor = solutionExecutor;
-            WindowsManager = windowsManager;
+            WindowManager = windowManager;
 
             poeBudConfigProvider
                 .WhenAnyValue(x => x.ActualConfig)
@@ -95,7 +95,7 @@ namespace PoeBud.ViewModels
                 .AddTo(Anchors);
         }
 
-        public IPoeWindowsManager WindowsManager { get; }
+        public IPoeWindowManager WindowManager { get; }
 
         public Exception LastUpdateException => lastUpdateException?.Value;
 
@@ -170,7 +170,7 @@ namespace PoeBud.ViewModels
                         h => globalEvents.KeyDown -= h)
                     .Where(x => IsEnabled)
                     .Where(x => !SolutionExecutor.IsBusy)
-                    .Where(x => WindowsManager.ActiveWindow != null)
+                    .Where(x => WindowManager.ActiveWindow != null)
                     .Where(x => hotkey.MatchesHotkey(x.EventArgs))
                     .Subscribe(ExecuteSolutionCommandExecuted)
                     .AddTo(stashDisposable);
@@ -257,7 +257,7 @@ namespace PoeBud.ViewModels
                 return false;
             }
 
-            var window = WindowsManager.ActiveWindow;
+            var window = WindowManager.ActiveWindow;
             if (window == null)
             {
                 return false;

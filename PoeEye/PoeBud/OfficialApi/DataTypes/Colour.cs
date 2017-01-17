@@ -1,6 +1,6 @@
 namespace PoeBud.OfficialApi.DataTypes
 {
-    public struct Colour
+    internal struct Colour
     {
         public int r { get; set; }
         public int g { get; set; }

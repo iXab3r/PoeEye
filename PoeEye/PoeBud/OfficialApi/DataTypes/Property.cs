@@ -3,7 +3,7 @@ using RestSharp.Deserializers;
 
 namespace PoeBud.OfficialApi.DataTypes
 {
-    public class Property
+    internal class Property
     {
         [DeserializeAs(Name = "name")]
         public string Name { get; set; }

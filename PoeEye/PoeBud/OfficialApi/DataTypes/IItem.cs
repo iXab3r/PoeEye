@@ -2,7 +2,7 @@
 
 namespace PoeBud.OfficialApi.DataTypes
 {
-    public interface IItem
+    internal interface IItem
     {
         List<AdditionalProperty> additionalProperties { get; }
 

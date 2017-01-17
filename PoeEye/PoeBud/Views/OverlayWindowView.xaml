@@ -21,12 +21,12 @@
         </ResourceDictionary>
     </Window.Resources>
 
-    <Grid  Visibility="{Binding WindowsManager.ActiveWindow, Converter={StaticResource NullToCollapsedConverter}}" >
+    <Grid  Visibility="{Binding WindowManager.ActiveWindow, Converter={StaticResource NullToCollapsedConverter}}" >
         <Canvas>
-            <Rectangle Canvas.Top="{Binding WindowsManager.ActiveWindow.StashBounds.Top}" 
-                       Canvas.Left="{Binding WindowsManager.ActiveWindow.StashBounds.Left}" 
-                       Width="{Binding WindowsManager.ActiveWindow.StashBounds.Width}" 
-                       Height="{Binding WindowsManager.ActiveWindow.StashBounds.Height}" 
+            <Rectangle Canvas.Top="{Binding WindowManager.ActiveWindow.StashBounds.Top}" 
+                       Canvas.Left="{Binding WindowManager.ActiveWindow.StashBounds.Left}" 
+                       Width="{Binding WindowManager.ActiveWindow.StashBounds.Width}" 
+                       Height="{Binding WindowManager.ActiveWindow.StashBounds.Height}" 
                        Stroke="GreenYellow" StrokeThickness="3" Visibility="Collapsed"/>
 
             <Grid Canvas.Top="960" Canvas.Left="624" TextBlock.FontSize="20" TextBlock.Foreground="White" Opacity="0.75"

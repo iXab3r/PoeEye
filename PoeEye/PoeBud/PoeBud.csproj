@@ -231,15 +231,17 @@
     <Compile Include="Converters\VisibilityToBoolean.cs" />
     <Compile Include="Models\IPoeTradeItem.cs" />
     <Compile Include="Models\IPoeTradeSolution.cs" />
-    <Compile Include="Models\IPoeWindowsManager.cs" />
+    <Compile Include="Models\IPoeWindowManager.cs" />
+    <Compile Include="Models\ISolutionExecutorModel.cs" />
     <Compile Include="Models\IUserInteractionsManager.cs" />
     <Compile Include="Models\IPoeWindow.cs" />
     <Compile Include="Models\IUserInputBlocker.cs" />
     <Compile Include="Models\PoeStashUpdater.cs" />
+    <Compile Include="Models\SolutionExecutorModel.cs" />
     <Compile Include="Models\StashUpdate.cs" />
     <Compile Include="Models\UserInteractionsManager.cs" />
     <Compile Include="Models\PoeWIndow.cs" />
-    <Compile Include="Models\PoeWindowsManager.cs" />
+    <Compile Include="Models\PoeWindowManager.cs" />
     <Compile Include="Models\UserInputBlocker.cs" />
     <Compile Include="OfficialApi\DataTypes\AdditionalProperty.cs" />
     <Compile Include="OfficialApi\DataTypes\Character.cs" />
@@ -271,15 +273,11 @@
     <Compile Include="Utilities\TransparentWindow.cs" />
     <Compile Include="Utilities\WindowsServices.cs" />
     <Compile Include="ViewModels\ISolutionExecutorViewModel.cs" />
-    <Compile Include="ViewModels\MainWindowViewModel.cs" />
     <Compile Include="ViewModels\OverlayWindowViewModel.cs" />
     <Compile Include="ViewModels\PoeBudSettingsViewModel.cs" />
     <Compile Include="ViewModels\SolutionExecutorViewModel.cs" />
     <Compile Include="ViewModels\StashViewModel.cs" />
     <Compile Include="ViewModels\TabSelectionViewModel.cs" />
-    <Compile Include="Views\MainWindowView.xaml.cs">
-      <DependentUpon>MainWindowView.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Views\OverlayWindowView.xaml.cs">
       <DependentUpon>OverlayWindowView.xaml</DependentUpon>
     </Compile>
@@ -305,10 +303,6 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Themes\Generic.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\MainWindowView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

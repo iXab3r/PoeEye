@@ -41,14 +41,18 @@ namespace PoeEye.Prism
 
         protected override void InitializeShell()
         {
+            base.InitializeShell();
+
             RegisterExtensions();
             InitializeConfigConverters();
 
             Mouse.OverrideCursor = new Cursor(new MemoryStream(Properties.Resources.PathOfExile_102));
 
+            var splashWindow = new SplashScreen("Resources\\Splash.png");
+            splashWindow.Show(true, true);
+
             var window = (Window)Shell;
             Application.Current.MainWindow = window;
-            window.Show();
         }
 
         protected override IModuleCatalog CreateModuleCatalog()
@@ -61,8 +65,10 @@ namespace PoeEye.Prism
             base.Run(runWithDefaultConfiguration);
 
             var window = (Window)Shell;
+
             var viewModel = Container.Resolve<IMainWindowViewModel>();
             window.DataContext = viewModel;
+            window.Show();
         }
 
         private void InitializeConfigConverters()

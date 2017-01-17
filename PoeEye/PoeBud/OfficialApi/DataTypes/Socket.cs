@@ -2,7 +2,7 @@ using RestSharp.Deserializers;
 
 namespace PoeBud.OfficialApi.DataTypes
 {
-    public class Socket
+    internal class Socket
     {
         [DeserializeAs(Name = "attr")]
         public string Attribute { get; set; }

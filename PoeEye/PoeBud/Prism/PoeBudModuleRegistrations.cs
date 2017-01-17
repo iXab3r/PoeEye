@@ -26,7 +26,7 @@ namespace PoeBud.Prism
             Container
                 .RegisterSingleton<IPoeBudConfigProvider<IPoeBudConfig>, PoeBudConfigProviderFromFile>()
                 .RegisterType<IInputSimulator>(new ContainerControlledLifetimeManager(), new InjectionFactory(x => new InputSimulator()))
-                .RegisterSingleton<IPoeWindowsManager, PoeWindowsManager>()
+                .RegisterSingleton<IPoeWindowManager, PoeWindowManager>()
                 .RegisterSingleton<IGearTypeAnalyzer, GearTypeAnalyzer>();
 
             Container
@@ -34,6 +34,7 @@ namespace PoeBud.Prism
                 .RegisterType<IUserInputBlocker, UserInputBlocker>()
                 .RegisterType<ISolutionExecutorViewModel, SolutionExecutorViewModel>()
                 .RegisterType<IPoeWindow, PoeWindow>()
+                .RegisterType<ISolutionExecutorModel, SolutionExecutorModel>()
                 .RegisterType<IPoeClient, PoeClient>()
                 .RegisterType<IUserInteractionsManager, UserInteractionsManager>();
         }

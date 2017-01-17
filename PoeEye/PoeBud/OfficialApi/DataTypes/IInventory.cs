@@ -2,7 +2,7 @@
 
 namespace PoeBud.OfficialApi.DataTypes
 {
-    public interface IInventory
+    internal interface IInventory
     {
         IEnumerable<IItem> Items { get; }
     }

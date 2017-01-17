@@ -2,7 +2,7 @@ using RestSharp.Deserializers;
 
 namespace PoeBud.OfficialApi.DataTypes
 {
-    public class Tab : ITab
+    internal class Tab : ITab
     {
         [DeserializeAs(Name = "n")]
         public string Name { get; set; }

@@ -3,7 +3,7 @@ using PoeBud.OfficialApi.DataTypes;
 
 namespace PoeBud.OfficialApi
 {
-    public interface IPoeClient
+    internal interface IPoeClient
     {
         string AccountName { [NotNull] get; }
 

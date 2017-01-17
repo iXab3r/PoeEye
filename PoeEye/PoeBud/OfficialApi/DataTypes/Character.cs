@@ -2,7 +2,7 @@
 
 namespace PoeBud.OfficialApi.DataTypes
 {
-    public class Character : ICharacter
+    internal class Character : ICharacter
     {
         [DeserializeAs(Name = "name")]
         public string Name { get; set; }

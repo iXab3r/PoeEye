@@ -2,7 +2,7 @@
 
 namespace PoeBud.OfficialApi.DataTypes
 {
-    public interface ITab
+    internal interface ITab
     {
         Colour colour { get; set; }
 

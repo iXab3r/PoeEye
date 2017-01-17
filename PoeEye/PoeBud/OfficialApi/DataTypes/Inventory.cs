@@ -3,7 +3,7 @@ using RestSharp.Deserializers;
 
 namespace PoeBud.OfficialApi.DataTypes
 {
-    public class Inventory : IInventory
+    internal class Inventory : IInventory
     {
         [DeserializeAs(Name = "items")]
         public List<Item> Items { get; set; }

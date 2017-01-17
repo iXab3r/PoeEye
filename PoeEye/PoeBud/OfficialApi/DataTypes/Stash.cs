@@ -3,7 +3,7 @@ using RestSharp.Deserializers;
 
 namespace PoeBud.OfficialApi.DataTypes
 {
-    public class Stash : IStash
+    internal class Stash : IStash
     {
         [DeserializeAs(Name = "numTabs")]
         public int NumTabs { get; set; }

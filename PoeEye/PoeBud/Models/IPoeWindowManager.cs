@@ -1,6 +1,6 @@
 ﻿namespace PoeBud.Models
 {
-    internal interface IPoeWindowsManager
+    internal interface IPoeWindowManager
     {
         IPoeWindow ActiveWindow { get; set; }
     }

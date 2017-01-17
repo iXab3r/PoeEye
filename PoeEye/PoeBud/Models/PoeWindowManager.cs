@@ -19,11 +19,11 @@ namespace PoeBud.Models
 
     using ReactiveUI;
 
-    internal sealed class PoeWindowsManager : DisposableReactiveObject, IPoeWindowsManager
+    internal sealed class PoeWindowManager : DisposableReactiveObject, IPoeWindowManager
     {
         private readonly IFactory<IPoeWindow, IntPtr> windowsFactory;
 
-        public PoeWindowsManager(
+        public PoeWindowManager(
             [NotNull] IFactory<IPoeWindow, IntPtr> windowsFactory,
             [NotNull] IPoeBudConfigProvider<IPoeBudConfig> configProvider)
         {
@@ -35,7 +35,7 @@ namespace PoeBud.Models
             NativeMethods.WindowSizeOrLocationChanged += WindowSizeOrLocationChanged;
 
             var recheckPeriod = configProvider.Load().ForegroundWindowRecheckPeriod;
-            Log.Instance.Debug($"[PoeWindowsManager] RecheckPeriod: {recheckPeriod}");
+            Log.Instance.Debug($"[PoeWindowManager] RecheckPeriod: {recheckPeriod}");
 
             Observable
                 .Timer(DateTimeOffset.Now, recheckPeriod)
@@ -57,7 +57,7 @@ namespace PoeBud.Models
         private void WindowActivated(IntPtr activeWindowHandle)
         {
             var activeWindowTitle = NativeMethods.GetWindowTitle(activeWindowHandle);
-            Log.Instance.Debug($"[PoeWindowsManager] Active window: '{activeWindowTitle}'");
+            Log.Instance.Debug($"[PoeWindowManager] Active window: '{activeWindowTitle}'");
             if (string.IsNullOrWhiteSpace(activeWindowTitle) || !PoeWindowMatcher.IsMatch(activeWindowTitle))
             {
                 ActiveWindow = null;

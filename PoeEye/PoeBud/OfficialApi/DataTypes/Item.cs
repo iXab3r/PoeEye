@@ -3,7 +3,7 @@ using RestSharp.Deserializers;
 
 namespace PoeBud.OfficialApi.DataTypes
 {
-    public class Item : IItem
+    internal class Item : IItem
     {
         [DeserializeAs(Name = "verified")]
         public bool Verified { get; set; }

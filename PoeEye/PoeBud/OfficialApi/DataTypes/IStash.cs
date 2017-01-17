@@ -2,7 +2,7 @@
 
 namespace PoeBud.OfficialApi.DataTypes
 {
-    public interface IStash
+    internal interface IStash
     {
         int NumTabs { get; }
 

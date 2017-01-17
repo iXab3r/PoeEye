@@ -39,7 +39,6 @@ namespace PoeEye
             InitializeExceptionless();
 
             RxApp.SupportsRangeNotifications = true;
-
         }
 
         private static void InitializeExceptionless()
