@@ -2,7 +2,7 @@
 using System.Windows;
 using System.Windows.Interop;
 
-namespace PoeBud.Utilities
+namespace PoeShared.Native
 {
     public class TransparentWindow : Window
     {
@@ -15,7 +15,7 @@ namespace PoeBud.Utilities
             this.AllowsTransparency = true;
             this.Topmost = true;
             this.ResizeMode = ResizeMode.NoResize;
-            this.IsTabStop = true;
+            this.IsTabStop = false;
             this.Focusable = true; 
             Visibility = Visibility.Collapsed;
         }

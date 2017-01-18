@@ -62,7 +62,7 @@ namespace PoeEye.Prism
                 .RegisterType<ISuggestionProvider, FuzzySuggestionProvider>();
 
             Container.RegisterWindowTracker(WellKnownWindows.Main, () => Process.GetCurrentProcess().MainWindowTitle);
-            Container.RegisterWindowTracker(WellKnownWindows.PathOfExile, () => Settings.Default.PathOfExileWindowName);
+            Container.RegisterWindowTracker(WellKnownWindows.PathOfExile, () => $"^{Settings.Default.PathOfExileWindowName}$");
         }
     }
 }

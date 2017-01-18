@@ -270,8 +270,6 @@
     <Compile Include="Prism\PoeBudModule.cs" />
     <Compile Include="Prism\PoeBudModuleRegistrations.cs" />
     <Compile Include="Utilities\ItemExtensions.cs" />
-    <Compile Include="Utilities\TransparentWindow.cs" />
-    <Compile Include="Utilities\WindowsServices.cs" />
     <Compile Include="ViewModels\ISolutionExecutorViewModel.cs" />
     <Compile Include="ViewModels\OverlayWindowViewModel.cs" />
     <Compile Include="ViewModels\PoeBudSettingsViewModel.cs" />

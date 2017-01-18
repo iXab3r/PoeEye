@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace PoeBud.Utilities
+namespace PoeShared.Native
 {
     internal static class WindowsServices
     {
