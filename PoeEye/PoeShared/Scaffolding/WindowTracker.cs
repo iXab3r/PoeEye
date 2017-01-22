@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
@@ -22,9 +20,13 @@ namespace PoeShared.Scaffolding
         private readonly Func<string> titleMatcherRegexFunc;
         private readonly WinEventHookWrapper winHook = new WinEventHookWrapper();
 
-        private IntPtr windowHandle;
+        private IntPtr activeWindowHandle;
+
+        private string activeWindowTitle;
 
         private bool isActive;
+
+        private IntPtr windowHandle;
 
         public WindowTracker([NotNull] Func<string> titleMatcherRegexFunc)
         {
@@ -39,9 +41,7 @@ namespace PoeShared.Scaffolding
                 .Sample(MinRecheckPeriod)
                 .ToUnit();
 
-            Observable.Merge(
-                    timerObservable,
-                    hookObservable)
+            timerObservable.Merge(hookObservable)
                 .Select(_ => NativeMethods.GetForegroundWindow())
                 .DistinctUntilChanged()
                 .Subscribe(WindowActivated)
@@ -54,13 +54,11 @@ namespace PoeShared.Scaffolding
             private set { this.RaiseAndSetIfChanged(ref isActive, value); }
         }
 
-        public IntPtr WindowHandle
+        public IntPtr MatchingWindowHandle
         {
             get { return windowHandle; }
             private set { this.RaiseAndSetIfChanged(ref windowHandle, value); }
         }
-
-        private string activeWindowTitle;
 
         public string ActiveWindowTitle
         {
@@ -68,20 +66,28 @@ namespace PoeShared.Scaffolding
             set { this.RaiseAndSetIfChanged(ref activeWindowTitle, value); }
         }
 
+        public IntPtr ActiveWindowHandle
+        {
+            get { return activeWindowHandle; }
+            set { this.RaiseAndSetIfChanged(ref activeWindowHandle, value); }
+        }
+
         private void WindowActivated(IntPtr activeWindowHandle)
         {
+            this.activeWindowHandle = activeWindowHandle;
             var targetTitle = titleMatcherRegexFunc();
             activeWindowTitle = NativeMethods.GetWindowTitle(activeWindowHandle);
 
             isActive = !string.IsNullOrWhiteSpace(activeWindowTitle) &&
-                   !string.IsNullOrWhiteSpace(targetTitle) &&
-                   Regex.IsMatch(activeWindowTitle, targetTitle, RegexOptions.IgnoreCase);
+                       !string.IsNullOrWhiteSpace(targetTitle) &&
+                       Regex.IsMatch(activeWindowTitle, targetTitle, RegexOptions.IgnoreCase);
 
             windowHandle = IsActive ? activeWindowHandle : IntPtr.Zero;
 
             this.RaisePropertyChanged(nameof(IsActive));
-            this.RaisePropertyChanged(nameof(WindowHandle));
+            this.RaisePropertyChanged(nameof(MatchingWindowHandle));
             this.RaisePropertyChanged(nameof(ActiveWindowTitle));
+            this.RaisePropertyChanged(nameof(ActiveWindowHandle));
 
             Log.Instance.DebugFormat(
                 "[WindowTracker] Target window is {0}ACTIVE (hwnd 0x{3:8X}  expected title is '{1}', got '{2}')",
@@ -93,6 +99,10 @@ namespace PoeShared.Scaffolding
 
         private static class NativeMethods
         {
+            public delegate void WinEventDelegate(
+                IntPtr hWinEventHook, uint eventType, IntPtr hwnd, int idObject, int idChild, uint dwEventThread,
+                uint dwmsEventTime);
+
             public const uint WINEVENT_OUTOFCONTEXT = 0;
             public const uint EVENT_OBJECT_LOCATIONCHANGE = 0x800B;
 
@@ -108,10 +118,6 @@ namespace PoeShared.Scaffolding
 
             [DllImport("user32.dll")]
             public static extern bool UnhookWinEvent(IntPtr hHook);
-
-            public delegate void WinEventDelegate(
-                IntPtr hWinEventHook, uint eventType, IntPtr hwnd, int idObject, int idChild, uint dwEventThread,
-                uint dwmsEventTime);
 
             public static string GetWindowTitle(IntPtr hwnd)
             {
@@ -132,7 +138,7 @@ namespace PoeShared.Scaffolding
             public WinEventHookWrapper()
             {
                 resizeEventDelegate = WinResizeEventProc;
-                Task.Run(() => this.Run());
+                Task.Run(() => Run());
             }
 
             public IObservable<IntPtr> WhenWindowLocationChanged => whenWindowLocationChanged;
@@ -152,13 +158,13 @@ namespace PoeShared.Scaffolding
             private IDisposable RegisterHook()
             {
                 var hook = NativeMethods.SetWinEventHook(
-                   NativeMethods.EVENT_OBJECT_LOCATIONCHANGE,
-                   NativeMethods.EVENT_OBJECT_LOCATIONCHANGE,
-                   IntPtr.Zero,
-                   resizeEventDelegate,
-                   0,
-                   0,
-                   NativeMethods.WINEVENT_OUTOFCONTEXT);
+                    NativeMethods.EVENT_OBJECT_LOCATIONCHANGE,
+                    NativeMethods.EVENT_OBJECT_LOCATIONCHANGE,
+                    IntPtr.Zero,
+                    resizeEventDelegate,
+                    0,
+                    0,
+                    NativeMethods.WINEVENT_OUTOFCONTEXT);
 
                 return Disposable.Create(() => NativeMethods.UnhookWinEvent(hook));
             }

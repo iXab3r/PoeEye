@@ -4,9 +4,9 @@
                     xmlns:blue="http://www.nuget.org/Blue.MVVM"
                     xmlns:sharedViewModels="clr-namespace:PoeShared.UI.ViewModels">
 
-    <blue:BoolToVisibilityConverter x:Key="TrueToVisibleConverter" 
-                                    TrueValue="Visible" 
-                                    FalseValue="Collapsed" />
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Converters.xaml" />
+    </ResourceDictionary.MergedDictionaries>
 
     <DataTemplate DataType="{x:Type sharedViewModels:ImageViewModel}">
         <Grid>

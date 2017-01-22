@@ -14,8 +14,6 @@ namespace PoeOracle.Prism
                 .RegisterSingleton<IExternalUriOpener, ExternalUriOpener>()
                 .RegisterSingleton<ISkillGemInfoProvider, SkillGemInfoProvider>();
             
-            //FIXME Change to late-bound resolution
-
             Container
                 .RegisterType<ISuggestionsDataSource>(
                     new InjectionFactory(unity => unity.Resolve<ComplexSuggestionsDataSource>(

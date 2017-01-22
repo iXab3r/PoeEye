@@ -1,12 +1,11 @@
-﻿using System.Windows;
-using System.Windows.Data;
-using Guards;
+﻿using Guards;
 using JetBrains.Annotations;
 using Microsoft.Practices.Unity;
 using PoeBud.Config;
 using PoeBud.ViewModels;
-using PoeBud.Views;
 using PoeShared.Modularity;
+using PoeShared.Native;
+using PoeShared.Prism;
 
 namespace PoeBud.Prism
 {
@@ -28,12 +27,9 @@ namespace PoeBud.Prism
             var registrator = container.Resolve<IPoeEyeModulesRegistrator>();
             registrator.RegisterSettingsEditor<PoeBudConfig, PoeBudSettingsViewModel>();
 
-            var viewModel = container.Resolve<OverlayWindowViewModel>();
-            var overlay = new OverlayWindowView { DataContext = viewModel };
-            overlay.Show();
-
-            var mainWindow = Application.Current.MainWindow;
-            mainWindow.Closed += delegate { overlay.Close(); };
+            var overlayController = container.Resolve<IOverlayWindowController>(WellKnownOverlays.PathOfExileTransparentOverlay);
+            var overlayModel = container.Resolve<PoeBudViewModel>(new DependencyOverride(typeof(IOverlayWindowController), overlayController));
+            overlayController.RegisterChild(overlayModel);
         }
     }
 }

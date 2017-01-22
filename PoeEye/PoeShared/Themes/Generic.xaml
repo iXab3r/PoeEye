@@ -10,6 +10,7 @@
         <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseDark.xaml" />
         <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Themes/ProgressRing.xaml" />
 
+        <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Converters.xaml" />
         <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Colors.xaml" />
         <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/SlimScrollbar.xaml" />
         <ResourceDictionary Source="pack://application:,,,/PoeShared;component/UI/Views/ImageView.xaml" />

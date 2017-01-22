@@ -2,14 +2,8 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:converters="clr-namespace:PoeBud.Converters"
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
-    <converters:VisibilityToBoolean x:Key="VisibleToTrueConverter" TrueValue="Visible" FalseValue="Collapsed"/>
-    <converters:VisibilityToBoolean x:Key="VisibleToFalseConverter" TrueValue="Collapsed" FalseValue="Visible"/>
-    <converters:NullToVisibilityConverter x:Key="NullToCollapsedConverter" NullValue="Collapsed" NotNullValue="Visible"/>
     <converters:NullToBoolConverter x:Key="NullToFalseConverter" NullValue="False" />
-    <converters:TimeSpanToHumanReadableStringConverter x:Key="TimeSpanToHumanReadableStringConverter" />
     
-    <converters:ExceptionToMessageConverter x:Key="ExceptionToMessageConverter"/>
-
     <converters:BooleanToObjectConverter x:Key="BooleanToSemitransparentConverter">
         <converters:BooleanToObjectConverter.FalseValue>
             <system:Double>

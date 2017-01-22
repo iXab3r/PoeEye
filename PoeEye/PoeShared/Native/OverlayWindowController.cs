@@ -46,8 +46,8 @@ namespace PoeShared.Native
             {
                 DataContext = overlay,
             };
-            var overlayWindowHandle = new WindowInteropHelper(overlayWindow).Handle;
             overlayWindow.Show();
+            var overlayWindowHandle = new WindowInteropHelper(overlayWindow).Handle;
 
             var mainWindow = Application.Current?.MainWindow;
             if (mainWindow != null)
@@ -60,7 +60,7 @@ namespace PoeShared.Native
 
             windowTracker
                 .WhenAnyValue(x => x.IsActive)
-                .Select(x => x || windowTracker.WindowHandle == overlayWindowHandle)
+                .Select(x => x || windowTracker.ActiveWindowHandle == overlayWindowHandle)
                 .Where(isActive => overlay.IsVisible != isActive)
                 .ObserveOn(uiScheduler)
                 .Subscribe(
@@ -72,8 +72,8 @@ namespace PoeShared.Native
                 .AddTo(Anchors);
 
             windowTracker
-                .WhenAnyValue(x => x.WindowHandle)
-                .Where(x => x != IntPtr.Zero)
+                .WhenAnyValue(x => x.MatchingWindowHandle)
+                .Where(x => x != IntPtr.Zero && x != overlayWindowHandle)
                 .Subscribe(lastActiveWindowHandle)
                 .AddTo(Anchors);
 

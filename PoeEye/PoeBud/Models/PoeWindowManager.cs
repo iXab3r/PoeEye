@@ -40,7 +40,7 @@ namespace PoeBud.Models
             Log.Instance.Debug($"[PoeWindowManager] RecheckPeriod: {recheckPeriod}");
 
             poeWindowTracker
-                .WhenAnyValue(x => x.WindowHandle)
+                .WhenAnyValue(x => x.MatchingWindowHandle)
                 .DistinctUntilChanged()
                 .Subscribe(WindowActivated)
                 .AddTo(Anchors);

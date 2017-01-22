@@ -223,11 +223,8 @@
     <Compile Include="Config\PoeBudConfigProviderFromFile.cs" />
     <Compile Include="Config\SafeDataConverter.cs" />
     <Compile Include="Converters\BooleanToObjectConverter.cs" />
-    <Compile Include="Converters\ExceptionToMessageConverter.cs" />
     <Compile Include="Converters\IsGreaterThanValueToBooleanConverter.cs" />
     <Compile Include="Converters\NullToBoolConverter.cs" />
-    <Compile Include="Converters\NullToVisibilityConverter.cs" />
-    <Compile Include="Converters\TimeSpanToHumanReadableStringConverter.cs" />
     <Compile Include="Converters\VisibilityToBoolean.cs" />
     <Compile Include="Models\IPoeTradeItem.cs" />
     <Compile Include="Models\IPoeTradeSolution.cs" />
@@ -271,14 +268,11 @@
     <Compile Include="Prism\PoeBudModuleRegistrations.cs" />
     <Compile Include="Utilities\ItemExtensions.cs" />
     <Compile Include="ViewModels\ISolutionExecutorViewModel.cs" />
-    <Compile Include="ViewModels\OverlayWindowViewModel.cs" />
     <Compile Include="ViewModels\PoeBudSettingsViewModel.cs" />
+    <Compile Include="ViewModels\PoeBudViewModel.cs" />
     <Compile Include="ViewModels\SolutionExecutorViewModel.cs" />
     <Compile Include="ViewModels\StashViewModel.cs" />
     <Compile Include="ViewModels\TabSelectionViewModel.cs" />
-    <Compile Include="Views\OverlayWindowView.xaml.cs">
-      <DependentUpon>OverlayWindowView.xaml</DependentUpon>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -304,11 +298,11 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\OverlayWindowView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Views\PoeBudSettingsViewModel.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\PoeBudView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

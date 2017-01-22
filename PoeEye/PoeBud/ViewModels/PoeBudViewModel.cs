@@ -5,6 +5,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 using WindowsInput.Native;
 using Gma.System.MouseKeyHook;
@@ -17,51 +18,41 @@ using PoeBud.OfficialApi.DataTypes;
 using PoeBud.Utilities;
 using PoeShared;
 using PoeShared.Modularity;
+using PoeShared.Native;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
 using ReactiveUI;
-using KeyEventArgs = System.Windows.Forms.KeyEventArgs;
-using KeyEventHandler = System.Windows.Forms.KeyEventHandler;
+using WinFormsKeyEventArgs = System.Windows.Forms.KeyEventArgs;
+using WinFormsKeyEventHandler = System.Windows.Forms.KeyEventHandler;
 
 namespace PoeBud.ViewModels
 {
-    using WinFormsKeyEventArgs = KeyEventArgs;
-    using WinFormsKeyEventHandler = KeyEventHandler;
-
-    internal sealed class OverlayWindowViewModel : DisposableReactiveObject
+    internal sealed class PoeBudViewModel : DisposableReactiveObject, IOverlayViewModel
     {
         private static readonly TimeSpan UpdateTimeout = TimeSpan.FromSeconds(1);
         private readonly IClock clock;
-
+        private readonly IKeyboardMouseEvents keyboardMouseEvents;
+        private readonly ISubject<Exception> exceptionsToPropagate = new Subject<Exception>();
+        private readonly ObservableAsPropertyHelper<Exception> lastUpdateException;
         private readonly IFactory<PoeStashUpdater, IPoeBudConfig> stashAnalyzerFactory;
-
         private readonly IFactory<StashViewModel, StashUpdate, IPoeBudConfig> stashUpdateFactory;
-        [NotNull] private readonly IScheduler uiScheduler;
         private readonly SerialDisposable stashUpdaterDisposable = new SerialDisposable();
-        private readonly IUserInteractionsManager userInteractionsManager;
+        private readonly IScheduler uiScheduler;
 
         private PoeBudConfig actualConfig;
-
-        private readonly ISubject<Exception> exceptionsToPropagate = new Subject<Exception>();
-
         private bool hideXpBar;
         private KeyGesture hotkey;
-
         private bool isEnabled;
-
         private StashUpdate lastServerStashUpdate;
-
-        private readonly ObservableAsPropertyHelper<Exception> lastUpdateException;
-
+        private StashViewModel stash;
         private PoeStashUpdater stashUpdater;
 
-        private StashViewModel stash;
-
-        public OverlayWindowViewModel(
+        public PoeBudViewModel(
             [NotNull] IPoeWindowManager windowManager,
             [NotNull] ISolutionExecutorViewModel solutionExecutor,
             [NotNull] IConfigProvider<PoeBudConfig> poeBudConfigProvider,
             [NotNull] IClock clock,
+            [NotNull] IKeyboardMouseEvents keyboardMouseEvents,
             [NotNull] IUserInteractionsManager userInteractionsManager,
             [NotNull] IFactory<PoeStashUpdater, IPoeBudConfig> stashAnalyzerFactory,
             [NotNull] IFactory<StashViewModel, StashUpdate, IPoeBudConfig> stashUpdateFactory,
@@ -71,13 +62,14 @@ namespace PoeBud.ViewModels
             Guard.ArgumentNotNull(() => solutionExecutor);
             Guard.ArgumentNotNull(() => userInteractionsManager);
             Guard.ArgumentNotNull(() => poeBudConfigProvider);
+            Guard.ArgumentNotNull(() => keyboardMouseEvents);
             Guard.ArgumentNotNull(() => clock);
             Guard.ArgumentNotNull(() => stashAnalyzerFactory);
             Guard.ArgumentNotNull(() => stashUpdateFactory);
             Guard.ArgumentNotNull(() => uiScheduler);
 
             this.clock = clock;
-            this.userInteractionsManager = userInteractionsManager;
+            this.keyboardMouseEvents = keyboardMouseEvents;
             this.stashAnalyzerFactory = stashAnalyzerFactory;
             this.stashUpdateFactory = stashUpdateFactory;
             this.uiScheduler = uiScheduler;
@@ -89,7 +81,7 @@ namespace PoeBud.ViewModels
                 .WhenAnyValue(x => x.ActualConfig)
                 .Subscribe(ApplyConfig)
                 .AddTo(Anchors);
-            
+
             exceptionsToPropagate
                 .ToProperty(this, x => x.LastUpdateException, out lastUpdateException, null, uiScheduler)
                 .AddTo(Anchors);
@@ -131,6 +123,10 @@ namespace PoeBud.ViewModels
                     ? TimeSpan.Zero
                     : stashUpdater.LastUpdateTimestamp + (actualConfig?.StashUpdatePeriod ?? TimeSpan.Zero) - clock.Now;
 
+        public Point Location { get; } = new Point();
+
+        public Size Size { get; } = new Size(double.NaN, double.NaN);
+
         private void ApplyConfig(PoeBudConfig config)
         {
             actualConfig = config;
@@ -143,7 +139,7 @@ namespace PoeBud.ViewModels
         private void RefreshStashUpdater(PoeBudConfig config)
         {
             var stashDisposable = new CompositeDisposable();
-                
+
             try
             {
                 stashUpdaterDisposable.Disposable = null;
@@ -162,16 +158,14 @@ namespace PoeBud.ViewModels
                     return;
                 }
 
-                var globalEvents = Hook.GlobalEvents();
-                globalEvents.AddTo(stashDisposable);
-
                 Observable.FromEventPattern<WinFormsKeyEventHandler, WinFormsKeyEventArgs>(
-                        h => globalEvents.KeyDown += h,
-                        h => globalEvents.KeyDown -= h)
+                        h => keyboardMouseEvents.KeyDown += h,
+                        h => keyboardMouseEvents.KeyDown -= h)
                     .Where(x => IsEnabled)
                     .Where(x => !SolutionExecutor.IsBusy)
                     .Where(x => WindowManager.ActiveWindow != null)
                     .Where(x => hotkey.MatchesHotkey(x.EventArgs))
+                    .Do(x => x.EventArgs.Handled = true)
                     .Subscribe(ExecuteSolutionCommandExecuted)
                     .AddTo(stashDisposable);
 
@@ -191,7 +185,9 @@ namespace PoeBud.ViewModels
                     .Subscribe(update => HandleStashUpdate(update, config))
                     .AddTo(stashDisposable);
 
-                updater.UpdateExceptions.Subscribe(exceptionsToPropagate).AddTo(stashDisposable);
+                updater.UpdateExceptions
+                    .Subscribe(exceptionsToPropagate)
+                    .AddTo(stashDisposable);
 
                 updater.RecheckPeriod = config.StashUpdatePeriod;
 
@@ -200,6 +196,7 @@ namespace PoeBud.ViewModels
             catch (Exception ex)
             {
                 Log.Instance.Error(ex);
+                exceptionsToPropagate.OnNext(ex);
             }
             finally
             {
@@ -231,18 +228,11 @@ namespace PoeBud.ViewModels
                     return;
                 }
 
-                if (await TryToExecuteSolution(actualConfig) == false)
-                {
-                    return;
-                }
-
-                Log.Instance.Debug("[MainViewModel] Failed to execute solution, propagating hotkey to an active app...");
-                var virtualKey = (VirtualKeyCode) KeyInterop.VirtualKeyFromKey(Key.NumPad0);
-                userInteractionsManager.SendKey(virtualKey);
+                await TryToExecuteSolution(actualConfig);
             }
             catch (Exception ex)
             {
-                Log.HandleUiException(ex);
+                Log.HandleException(ex);
                 exceptionsToPropagate.OnNext(ex);
             }
         }

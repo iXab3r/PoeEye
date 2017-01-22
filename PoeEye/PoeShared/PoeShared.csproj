@@ -288,6 +288,10 @@
     <Compile Include="Scaffolding\StringExtensions.cs" />
     <Compile Include="Scaffolding\UnityContainerExtensions.cs" />
     <Compile Include="Scaffolding\WindowTracker.cs" />
+    <Compile Include="Scaffolding\WPF\Converters\ConverterHelpers.cs" />
+    <Compile Include="Scaffolding\WPF\Converters\ExceptionToMessageConverter.cs" />
+    <Compile Include="Scaffolding\WPF\Converters\NullToVisibilityConverter.cs" />
+    <Compile Include="Scaffolding\WPF\Converters\TimeSpanToHumanReadableStringConverter.cs" />
     <Compile Include="Scaffolding\WPF\FocusHelper.cs" />
     <Compile Include="UI\Models\IImagesCacheService.cs" />
     <Compile Include="UI\Models\ImagesCacheService.cs" />
@@ -304,6 +308,10 @@
   </ItemGroup>
   <ItemGroup>
     <Page Include="Native\OverlayWindowView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\Converters.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

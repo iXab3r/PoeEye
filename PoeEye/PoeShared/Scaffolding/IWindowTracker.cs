@@ -6,8 +6,10 @@ namespace PoeShared.Scaffolding
     {
         bool IsActive { get; }
 
-        IntPtr WindowHandle { get; }
+        IntPtr MatchingWindowHandle { get; }
 
         string ActiveWindowTitle { get; }
+
+        IntPtr ActiveWindowHandle { get; }
     }
 }
