@@ -51,7 +51,7 @@ namespace PoeBud.ViewModels
 
         public PoeBudSettingsViewModel(
             [NotNull] IFactory<IPoeClient, NetworkCredential, bool> poeClientFactory,
-            [NotNull] [Dependency(WellKnownSchedulers.Ui)] IScheduler uiScheduler,
+            [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler,
             [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler)
         {
             Guard.ArgumentNotNull(() => uiScheduler);

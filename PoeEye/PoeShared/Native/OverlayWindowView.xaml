@@ -1,5 +1,5 @@
 ﻿<native:TransparentWindow 
-        x:Class="PoeBud.Views.OverlayWindowView"
+        x:Class="PoeShared.Native.OverlayWindowView"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -17,12 +17,40 @@
         <blue:BoolToVisibilityConverter x:Key="TrueToVisibleConverter" 
                                     TrueValue="Visible" 
                                     FalseValue="Collapsed" />
-        
     </Window.Resources>
 
-    <Grid  Visibility="{Binding IsVisible, Converter={StaticResource TrueToVisibleConverter}}" >
-        
-    </Grid>
+    <Canvas Visibility="{Binding IsVisible, Converter={StaticResource TrueToVisibleConverter}}" >
+        <ItemsControl ItemsSource="{Binding Items}" >
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <Canvas/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+
+            <ItemsControl.ItemContainerStyle>
+                <Style TargetType="ContentPresenter">
+                    <Setter Property="Canvas.Left" Value="{Binding Location.X}"/>
+                    <Setter Property="Canvas.Top" Value="{Binding Location.Y}"/>
+                    <Setter Property="Canvas.Width" Value="{Binding Size.Width}"/>
+                    <Setter Property="Canvas.Height" Value="{Binding Size.Height}"/>
+                </Style>
+            </ItemsControl.ItemContainerStyle>
+
+            <ItemsControl.ItemTemplate>
+                <DataTemplate DataType="{x:Type native:IOverlayViewModel}">
+                    <Grid >
+                        <Rectangle Stroke="GreenYellow" 
+                                   StrokeThickness="3" 
+                                   Visibility="{Binding 
+                                        RelativeSource={RelativeSource AncestorType={x:Type Window}}, 
+                                        Path=DataContext.ShowWireframes,
+                                        Converter={StaticResource TrueToVisibleConverter}}"/>
+                        <ContentPresenter Content="{Binding}"/>
+                    </Grid>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </Canvas>
 
 </native:TransparentWindow>
 

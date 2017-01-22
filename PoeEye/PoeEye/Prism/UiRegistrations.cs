@@ -1,5 +1,7 @@
 ﻿using PoeShared.Modularity;
+using PoeShared.Native;
 using PoeShared.Prism;
+using PoeShared.UI.Models;
 using PoeEyeMainConfig = PoeEye.Config.PoeEyeMainConfig;
 
 namespace PoeEye.Prism
@@ -30,7 +32,6 @@ namespace PoeEye.Prism
         protected override void Initialize()
         {
             Container
-                .RegisterSingleton<IImagesCacheService, ImagesCacheService>()
                 .RegisterSingleton<IPoePriceCalculcator, PoePriceCalculcator>()
                 .RegisterSingleton<IAudioNotificationsManager, AudioNotificationsManager>()
                 .RegisterSingleton<IWhispersNotificationManager, WhispersNotificationManager>()
@@ -40,10 +41,6 @@ namespace PoeEye.Prism
                 .RegisterSingleton<IPoeCaptchaRegistrator, PoeCaptchaRegistrator>()
                 .RegisterSingleton<IPoeApiProvider, PoeApiProvider>()
                 .RegisterSingleton<IDialogCoordinator, DialogCoordinator>();
-
-            Container
-                .RegisterType<IScheduler>(WellKnownSchedulers.Ui, new InjectionFactory(x => RxApp.MainThreadScheduler))
-                .RegisterType<IScheduler>(WellKnownSchedulers.Background, new InjectionFactory(x => RxApp.TaskpoolScheduler));
 
             Container
                 .RegisterType<IMainWindowViewModel, MainWindowViewModel>()
@@ -60,9 +57,6 @@ namespace PoeEye.Prism
                 .RegisterType<IHistoricalTradesViewModel, HistoricalTradesViewModel>()
                 .RegisterType<IRecheckPeriodViewModel, RecheckPeriodViewModel>()
                 .RegisterType<ISuggestionProvider, FuzzySuggestionProvider>();
-
-            Container.RegisterWindowTracker(WellKnownWindows.Main, () => Process.GetCurrentProcess().MainWindowTitle);
-            Container.RegisterWindowTracker(WellKnownWindows.PathOfExile, () => $"^{Settings.Default.PathOfExileWindowName}$");
         }
     }
 }

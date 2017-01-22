@@ -1,3 +1,5 @@
+using Guards;
+
 namespace PoeShared.Scaffolding
 {
     using System;
@@ -15,20 +17,27 @@ namespace PoeShared.Scaffolding
             return snapshottedEnumerable.ElementAt(Rng.Next(0, snapshottedEnumerable.Count()));
         }
 
-        public static void ForEach<T>(this IEnumerable<T> enumerable, Action<T> action)
+        public static IEnumerable<T> ForEach<T>(this IEnumerable<T> enumerable, Action<T> action)
         {
+            Guard.ArgumentNotNull(() => enumerable);
+
             foreach (var value in enumerable)
             {
                 action(value);
             }
+            return enumerable;
         }
 
-        public static void ForEach<T>(this T[] enumerable, Action<T> action)
+        public static IEnumerable<T> ForEach<T>(this T[] enumerable, Action<T> action)
         {
+            Guard.ArgumentNotNull(() => enumerable);
+
             foreach (var value in enumerable)
             {
                 action(value);
             }
+
+            return enumerable;
         }
     }
 }

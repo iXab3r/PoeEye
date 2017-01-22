@@ -54,7 +54,7 @@ namespace PoeEye.PoeTrade.ViewModels
             [NotNull] IAudioNotificationsManager audioNotificationsManager,
             [NotNull] IRecheckPeriodViewModel recheckPeriod,
             [NotNull] IPoeApiSelectorViewModel apiSelector,
-            [NotNull] [Dependency(WellKnownWindows.Main)] IWindowTracker mainWindowTracker,
+            [NotNull] [Dependency(WellKnownWindows.MainWindow)] IWindowTracker mainWindowTracker,
             [NotNull] IAudioNotificationSelectorViewModel audioNotificationSelector,
             [NotNull] IFactory<IPoeQueryViewModel, IPoeStaticData> queryFactory)
         {

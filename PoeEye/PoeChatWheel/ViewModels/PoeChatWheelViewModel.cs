@@ -71,7 +71,7 @@ namespace PoeChatWheel.ViewModels
             [NotNull] IPoeWhisperService whisperService,
             [NotNull] IPoeChatService chatService,
             [NotNull] IConfigProvider<PoeChatWheelConfig> configProvider,
-            [NotNull] [Dependency(WellKnownWindows.PathOfExile)] IWindowTracker poeWindowTracker,
+            [NotNull] [Dependency(WellKnownWindows.PathOfExileWindow)] IWindowTracker poeWindowTracker,
             [NotNull] IClock clock)
         {
             Log.Instance.Debug($"[PoeChatWheel..ctor] Initializing chat wheel...");

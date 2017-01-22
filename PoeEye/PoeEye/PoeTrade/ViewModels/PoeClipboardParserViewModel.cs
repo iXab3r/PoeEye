@@ -57,8 +57,8 @@ namespace PoeEye.PoeTrade.ViewModels
             [NotNull] IUnityContainer container,
             [NotNull] IFactory<IPoeTradeViewModel, IPoeItem> poeTradeViewModelFactory,
             [NotNull] IPoeEyeMainConfigProvider configProvider,
-            [NotNull] [Dependency(WellKnownWindows.PathOfExile)] IWindowTracker poeWindowTracker,
-            [NotNull] [Dependency(WellKnownSchedulers.Ui)] IScheduler uiScheduler,
+            [NotNull] [Dependency(WellKnownWindows.PathOfExileWindow)] IWindowTracker poeWindowTracker,
+            [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler,
             [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler)
         {
             Guard.ArgumentNotNull(() => container);

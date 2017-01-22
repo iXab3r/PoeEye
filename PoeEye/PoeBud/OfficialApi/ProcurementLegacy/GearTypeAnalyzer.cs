@@ -26,10 +26,11 @@ namespace PoeBud.OfficialApi.ProcurementLegacy
                 "Data.xml",
             };
 
+            var assembly = Assembly.GetExecutingAssembly();
             foreach (string resource in resources)
             {
                 var resourcePath = $"{nameof(OfficialApi)}.{nameof(ProcurementLegacy)}.{resource}";
-                var resourceData = ReadResourceAsString(resourcePath);
+                var resourceData = assembly.ReadResourceAsString(resourcePath);
 
                 if (string.IsNullOrWhiteSpace(resourceData))
                 {
@@ -104,27 +105,6 @@ namespace PoeBud.OfficialApi.ProcurementLegacy
 
             return query.FirstOrDefault();
         }
-
-        private string ReadResourceAsString(string path)
-        {
-            var assembly = Assembly.GetExecutingAssembly();
-
-            var assemblyName = assembly.GetName().Name;
-            var resourcePath = $"{assemblyName}.{path}";
-            using (var stream = assembly.GetManifestResourceStream(resourcePath))
-            {
-                if (stream == null)
-                {
-                    var assemblyResources = assembly.GetManifestResourceNames();
-                    throw new MissingManifestResourceException($"Could not find resource '{resourcePath}'. Assembly '{assemblyName}' resources list:\n\t{assemblyResources.DumpToText()}");
-                }
-                using (var streamReader = new StreamReader(stream))
-                {
-                    return streamReader.ReadToEnd();
-                }
-            }
-        }
-
 
         internal abstract class GearTypeRunner
         {

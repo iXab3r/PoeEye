@@ -65,7 +65,7 @@ namespace PoeBud.ViewModels
             [NotNull] IUserInteractionsManager userInteractionsManager,
             [NotNull] IFactory<PoeStashUpdater, IPoeBudConfig> stashAnalyzerFactory,
             [NotNull] IFactory<StashViewModel, StashUpdate, IPoeBudConfig> stashUpdateFactory,
-            [NotNull] [Dependency(WellKnownSchedulers.Ui)] IScheduler uiScheduler)
+            [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {
             Guard.ArgumentNotNull(() => windowManager);
             Guard.ArgumentNotNull(() => solutionExecutor);

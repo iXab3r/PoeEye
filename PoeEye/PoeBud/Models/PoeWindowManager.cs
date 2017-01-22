@@ -26,7 +26,7 @@ namespace PoeBud.Models
 
         public PoeWindowManager(
             [NotNull] IFactory<IPoeWindow, IntPtr> windowsFactory,
-            [NotNull] [Dependency(WellKnownWindows.PathOfExile)] IWindowTracker poeWindowTracker,
+            [NotNull] [Dependency(WellKnownWindows.PathOfExileWindow)] IWindowTracker poeWindowTracker,
             [NotNull] IPoeBudConfigProvider<IPoeBudConfig> configProvider)
         {
             Guard.ArgumentNotNull(() => windowsFactory);

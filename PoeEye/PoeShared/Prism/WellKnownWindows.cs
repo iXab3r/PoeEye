@@ -2,7 +2,8 @@
 {
     public static class WellKnownWindows
     {
-        public const string Main = "Main";
-        public const string PathOfExile = "PathOfExile";
+        public const string AllWindows = "AllWindows";
+        public const string MainWindow = "Main";
+        public const string PathOfExileWindow = "PathOfExile";
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace PoeEye.PoeTrade.ViewModels
+﻿using PoeShared.UI.ViewModels;
+
+namespace PoeEye.PoeTrade.ViewModels
 {
     using System;
     using System.Windows.Input;
@@ -14,7 +16,7 @@
 
         IPoeItemMod[] ExplicitMods { [NotNull] get; }
 
-        ImageViewModel ImageViewModel { [NotNull] get; }
+        IImageViewModel ImageViewModel { [NotNull] get; }
 
         IPoeItemMod[] ImplicitMods { [NotNull] get; }
 

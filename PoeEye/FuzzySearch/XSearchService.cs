@@ -7,20 +7,29 @@
 
     using JetBrains.Annotations;
 
-    public class XSearchService : IFuzzySearchService
+    public class XSearchService<T> : IFuzzySearchService
     {
         private readonly bool caseSensitive;
-        private readonly string[] haystack;
+        private readonly T[] haystack;
+        private readonly Func<T, string> mapper;
 
-        public XSearchService([NotNull] string[] haystack, bool caseSensitive = false)
+        public XSearchService(
+            [NotNull] T[] haystack,
+            [NotNull] Func<T, string> mapper, 
+            bool caseSensitive = false)
         {
-            this.caseSensitive = caseSensitive;
             if (haystack == null)
             {
                 throw new ArgumentNullException(nameof(haystack));
             }
+            if (mapper == null)
+            {
+                throw new ArgumentNullException(nameof(mapper));
+            }
 
+            this.caseSensitive = caseSensitive;
             this.haystack = haystack;
+            this.mapper = mapper;
         }
 
         public IEnumerable<SearchResult> Search(string needle)
@@ -61,16 +70,17 @@
             
         }
 
-        private SearchResult Search(string candidate, Regex regex)
+        private SearchResult Search(T candidate, Regex regex)
         {
-            if (string.IsNullOrWhiteSpace(candidate))
+            var candidateText = mapper(candidate);
+            if (string.IsNullOrWhiteSpace(candidateText))
             {
                 return new SearchResult(string.Empty, 0.0);
             }
 
-            var match = regex.Match(candidate);
+            var match = regex.Match(candidateText);
 
-            return new SearchResult(candidate, match.Success ? match.Length : 0);
+            return new SearchResult(candidateText, match.Success ? match.Length : 0, candidate);
         }
 
         private string PreprocessRegex(string regex)

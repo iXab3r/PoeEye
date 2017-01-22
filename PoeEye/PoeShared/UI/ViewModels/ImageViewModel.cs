@@ -1,26 +1,18 @@
-﻿namespace PoeEye.PoeTrade.ViewModels
+﻿using System;
+using System.IO;
+using System.Reactive.Linq;
+using System.Windows.Controls;
+using System.Windows.Media.Imaging;
+using Guards;
+using JetBrains.Annotations;
+using PoeShared.Scaffolding;
+using PoeShared.UI.Models;
+using ReactiveUI;
+
+namespace PoeShared.UI.ViewModels
 {
-    using System;
-    using System.IO;
-    using System.Reactive.Linq;
-    using System.Windows.Controls;
-    using System.Windows.Media.Imaging;
-
-    using Guards;
-
-    using JetBrains.Annotations;
-
-    using Models;
-
-    using PoeShared;
-    using PoeShared.Scaffolding;
-
-    using ReactiveUI;
-
-    internal sealed class ImageViewModel : DisposableReactiveObject
+    internal sealed class ImageViewModel : DisposableReactiveObject, IImageViewModel
     {
-        private Image image = new Image();
-
         private bool isLoading;
 
         public ImageViewModel(
@@ -37,15 +29,18 @@
             IsLoading = true;
             cacheService
                 .ResolveImageByUri(imageUri)
+                .Take(1)
                 .Finally(() => IsLoading = false)
                 .Subscribe(filePath => LoadImage(filePath, imageUri), Log.HandleException)
                 .AddTo(Anchors);
         }
 
-        public Image Image
+        private BitmapImage imageSource;
+
+        public BitmapImage ImageSource
         {
-            get { return image; }
-            set { this.RaiseAndSetIfChanged(ref image, value); }
+            get { return imageSource; }
+            set { this.RaiseAndSetIfChanged(ref imageSource, value); }
         }
 
         public bool IsLoading
@@ -60,7 +55,7 @@
             try
             {
                 var bitmap = LoadBitmapImage(cachedImageFilePath.FullName);
-                image.Source = bitmap;
+                ImageSource = bitmap;
             }
             catch (Exception ex)
             {

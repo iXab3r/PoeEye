@@ -1,5 +1,6 @@
 ﻿using System.Threading;
 using PoeEye.Converters;
+using PoeShared.UI.ViewModels;
 using PoeWhisperMonitor.Chat;
 
 namespace PoeEye.PoeTrade.ViewModels
@@ -50,9 +51,9 @@ namespace PoeEye.PoeTrade.ViewModels
             [NotNull] IPoePriceCalculcator poePriceCalculcator,
             [NotNull] IPoeChatService chatService,
             [NotNull] IAudioNotificationsManager notificationsManager,
-            [NotNull] IFactory<ImageViewModel, Uri> imageViewModelFactory,
+            [NotNull] IFactory<IImageViewModel, Uri> imageViewModelFactory,
             [NotNull] IFactory<PoeLinksInfoViewModel, IPoeLinksInfo> linksViewModelFactory,
-            [NotNull] [Dependency(WellKnownSchedulers.Ui)] IScheduler uiScheduler,
+            [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler,
             [NotNull] IClock clock)
         {
             Guard.ArgumentNotNull(() => poeItem);
@@ -113,7 +114,7 @@ namespace PoeEye.PoeTrade.ViewModels
             set { this.RaiseAndSetIfChanged(ref tradeState, value); }
         }
 
-        public ImageViewModel ImageViewModel { get; }
+        public IImageViewModel ImageViewModel { get; }
 
         public PoeLinksInfoViewModel LinksViewModel { get; }
 

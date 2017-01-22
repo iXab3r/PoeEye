@@ -58,7 +58,7 @@
             [NotNull] IHistoricalTradesViewModel historicalTrades,
             [NotNull] IEqualityComparer<IPoeItem> poeItemsComparer,
             [NotNull] IClock clock,
-            [NotNull] [Dependency(WellKnownSchedulers.Ui)] IScheduler uiScheduler)
+            [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {
             Guard.ArgumentNotNull(() => poeApiWrapper);
             Guard.ArgumentNotNull(() => poeLiveHistoryFactory);

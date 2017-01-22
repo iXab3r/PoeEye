@@ -25,7 +25,6 @@ namespace PoeShared.Scaffolding
         private IntPtr windowHandle;
 
         private bool isActive;
-        private Lazy<string> activeWindowTitleGetter;
 
         public WindowTracker([NotNull] Func<string> titleMatcherRegexFunc)
         {
@@ -58,21 +57,26 @@ namespace PoeShared.Scaffolding
         public IntPtr WindowHandle
         {
             get { return windowHandle; }
-            set { this.RaiseAndSetIfChanged(ref windowHandle, value); }
+            private set { this.RaiseAndSetIfChanged(ref windowHandle, value); }
         }
 
-        public string ActiveWindowTitle => activeWindowTitleGetter?.Value;
+        private string activeWindowTitle;
+
+        public string ActiveWindowTitle
+        {
+            get { return activeWindowTitle; }
+            set { this.RaiseAndSetIfChanged(ref activeWindowTitle, value); }
+        }
 
         private void WindowActivated(IntPtr activeWindowHandle)
         {
-            var activeWindowTitle = NativeMethods.GetWindowTitle(activeWindowHandle);
             var targetTitle = titleMatcherRegexFunc();
-
-            activeWindowTitleGetter = new Lazy<string>(() => NativeMethods.GetWindowTitle(activeWindowHandle));
+            activeWindowTitle = NativeMethods.GetWindowTitle(activeWindowHandle);
 
             isActive = !string.IsNullOrWhiteSpace(activeWindowTitle) &&
-                       !string.IsNullOrWhiteSpace(targetTitle) &&
-                       Regex.IsMatch(activeWindowTitle, targetTitle, RegexOptions.IgnoreCase);
+                   !string.IsNullOrWhiteSpace(targetTitle) &&
+                   Regex.IsMatch(activeWindowTitle, targetTitle, RegexOptions.IgnoreCase);
+
             windowHandle = IsActive ? activeWindowHandle : IntPtr.Zero;
 
             this.RaisePropertyChanged(nameof(IsActive));

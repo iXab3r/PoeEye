@@ -328,10 +328,8 @@
     <Compile Include="PoeTrade\Models\AudioNotificationsManager.cs" />
     <Compile Include="PoeTrade\Models\FuzzySuggestionProvider.cs" />
     <Compile Include="PoeTrade\Models\IAudioNotificationsManager.cs" />
-    <Compile Include="PoeTrade\Models\IImagesCacheService.cs" />
     <Compile Include="PoeTrade\Models\IPoeApiProvider.cs" />
     <Compile Include="PoeTrade\Models\IPoePriceCalculcator.cs" />
-    <Compile Include="PoeTrade\Models\ImagesCacheService.cs" />
     <Compile Include="PoeTrade\Models\IPoeCaptchaRegistrator.cs" />
     <Compile Include="PoeTrade\Models\IWhispersNotificationManager.cs" />
     <Compile Include="PoeTrade\Models\PoeApiProvider.cs" />
@@ -362,7 +360,6 @@
     <Compile Include="PoeTrade\ViewModels\PoeEyeSettingsViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\PoeFilteredTradeViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\PoeLinksInfoViewModel.cs" />
-    <Compile Include="PoeTrade\ViewModels\ImageViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\MainWindowTabViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\MainWindowViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\PoeMainSettingsViewModel.cs" />
@@ -399,21 +396,12 @@
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-    </Compile>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <SubType>Designer</SubType>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <None Include="packages.config" />
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
@@ -450,6 +438,10 @@
       <Project>{c6188345-f8dc-4cdc-8c01-add0a03bbf1c}</Project>
       <Name>PoeEye.PoeTrade</Name>
     </ProjectReference>
+    <ProjectReference Include="..\PoeOracle\PoeOracle.csproj">
+      <Project>{b2322e86-fee4-4b64-91e1-909046f8ebd0}</Project>
+      <Name>PoeOracle</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PoeShared\PoeShared.csproj">
       <Project>{12DF53DD-7144-4D2D-B7A1-B4BC5BBDFB69}</Project>
       <Name>PoeShared</Name>
@@ -473,10 +465,6 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="PoeTrade\Views\HistoricalTradesView.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="PoeTrade\Views\ImageView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

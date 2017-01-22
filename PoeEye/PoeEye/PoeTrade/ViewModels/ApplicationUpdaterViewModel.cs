@@ -52,7 +52,7 @@ namespace PoeEye.PoeTrade.ViewModels
 
         public ApplicationUpdaterViewModel(
             [NotNull] IDialogCoordinator dialogCoordinator,
-            [NotNull] [Dependency(WellKnownSchedulers.Ui)] IScheduler uiScheduler,
+            [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler,
             [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler)
         {
             Guard.ArgumentNotNull(() => dialogCoordinator);

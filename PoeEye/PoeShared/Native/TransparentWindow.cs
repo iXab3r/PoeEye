@@ -8,6 +8,7 @@ namespace PoeShared.Native
     {
         public TransparentWindow()
         {
+            //FIXME Hide from Alt+Tab
             this.WindowState = WindowState.Maximized;
             this.ShowActivated = true;
             this.WindowStyle = WindowStyle.None;
@@ -23,8 +24,18 @@ namespace PoeShared.Native
         protected override void OnSourceInitialized(EventArgs e)
         {
             base.OnSourceInitialized(e);
+        }
+
+        protected void MakeTransparent()
+        {
             var hwnd = new WindowInteropHelper(this).Handle;
             WindowsServices.SetWindowExTransparent(hwnd);
+        }
+
+        protected void MakeLayered()
+        {
+            var hwnd = new WindowInteropHelper(this).Handle;
+            WindowsServices.SetWindowExLayered(hwnd);
         }
     }
 }

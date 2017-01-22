@@ -24,7 +24,6 @@
         <ResourceDictionary Source="PoeTrade/Views/PoeEyeSettingsView.xaml" />
         <ResourceDictionary Source="PoeTrade/Views/ProxyProviderView.xaml" />
         <ResourceDictionary Source="PoeTrade/Views/RecheckPeriodView.xaml" />
-        <ResourceDictionary Source="PoeTrade/Views/ImageView.xaml" />
         <ResourceDictionary Source="PoeTrade/Views/CurrencyView.xaml" />
         <ResourceDictionary Source="PoeTrade/Views/PoeLinksInfoView.xaml" />
         <ResourceDictionary Source="PoeTrade/Views/PoeItemView.xaml" />

@@ -46,7 +46,7 @@ namespace PoeBud.Models
                 [NotNull] IClock clock,
                 [NotNull] IFactory<IPoeClient, NetworkCredential, bool> poeClientFactory,
                 [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler,
-                [NotNull] [Dependency(WellKnownSchedulers.Ui)] IScheduler uiScheduler)
+                [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {
             Guard.ArgumentNotNull(() => config);
             Guard.ArgumentNotNull(() => clock);

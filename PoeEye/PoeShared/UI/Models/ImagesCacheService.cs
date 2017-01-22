@@ -1,29 +1,21 @@
-﻿using PoeShared.Communications;
+﻿using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reactive.Concurrency;
+using System.Reactive.Linq;
+using System.Security.Cryptography;
+using System.Text;
+using System.Threading;
+using Guards;
+using JetBrains.Annotations;
+using Microsoft.Practices.Unity;
+using PoeShared.Communications;
+using PoeShared.Prism;
 
-namespace PoeEye.PoeTrade.Models
+namespace PoeShared.UI.Models
 {
-    using System;
-    using System.Collections.Concurrent;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
-    using System.Reactive.Concurrency;
-    using System.Reactive.Linq;
-    using System.Security.Cryptography;
-    using System.Text;
-    using System.Threading;
-
-    using Guards;
-
-    using JetBrains.Annotations;
-
-    using Microsoft.Practices.Unity;
-
-    using PoeEye.Prism;
-
-    using PoeShared;
-    using PoeShared.Prism;
-
     internal sealed class ImagesCacheService : IImagesCacheService
     {
         private static readonly TimeSpan ArtificialDelay = TimeSpan.FromSeconds(5);
@@ -36,7 +28,7 @@ namespace PoeEye.PoeTrade.Models
 
         public ImagesCacheService(
             [NotNull] IFactory<IHttpClient> httpClientFactory,
-            [NotNull] [Dependency(WellKnownSchedulers.Ui)] IScheduler uiScheduler)
+            [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {
             Guard.ArgumentNotNull(() => httpClientFactory);
             Guard.ArgumentNotNull(() => uiScheduler);
@@ -82,12 +74,6 @@ namespace PoeEye.PoeTrade.Models
         private FileInfo LoadImageFromStream(string outputFilePath, Stream dataStream)
         {
             Log.Instance.Debug($"[ItemsCache.ResolveImageByUri] Starting to download image to cache...\r\n\tFilePath: '{outputFilePath}'");
-
-            if (App.Arguments.IsDebugMode)
-            {
-                Log.Instance.Debug($"[ItemsCache.ResolveImageByUri] Atrificial delay: {ArtificialDelay}");
-                Thread.Sleep(ArtificialDelay);
-            }
 
             var outputDirectory = Path.GetDirectoryName(outputFilePath);
             if (outputDirectory != null && !Directory.Exists(outputDirectory))

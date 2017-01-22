@@ -65,7 +65,7 @@ namespace PoeEye.PoeTrade.ViewModels
             [NotNull] IWhispersNotificationManager whispersNotificationManager,
             [NotNull] IDialogCoordinator dialogCoordinator,
             [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler,
-            [NotNull] [Dependency(WellKnownSchedulers.Ui)] IScheduler uiScheduler)
+            [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {
             Guard.ArgumentNotNull(() => tabFactory);
             Guard.ArgumentNotNull(() => summaryTabFactory);

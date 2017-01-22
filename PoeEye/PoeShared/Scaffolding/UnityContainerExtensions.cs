@@ -1,4 +1,5 @@
 using System;
+using PoeShared.Native;
 
 namespace PoeShared.Scaffolding
 {
@@ -31,10 +32,27 @@ namespace PoeShared.Scaffolding
         public static IUnityContainer RegisterWindowTracker(this IUnityContainer instance, string dependencyName, Func<string> windowNameFunc)
         {
             return instance
-                 .RegisterType<IWindowTracker, WindowTracker>(
+                 .RegisterType<IWindowTracker>(
                      dependencyName,
                      new ContainerControlledLifetimeManager(),
                      new InjectionFactory(unity => unity.Resolve<WindowTracker>(new DependencyOverride<Func<string>>(windowNameFunc))));
+        }
+
+        public static IUnityContainer RegisterOverlayController(
+            this IUnityContainer instance, 
+            string dependencyName, 
+            string windowTrackerDependencyName,
+            OverlayMode overlayMode)
+        {
+            instance
+                  .RegisterType<IOverlayWindowController>(
+                      dependencyName,
+                      new ContainerControlledLifetimeManager(),
+                      new InjectionFactory(unity => unity.Resolve<OverlayWindowController>(
+                            new DependencyOverride<IWindowTracker>(unity.Resolve<IWindowTracker>(windowTrackerDependencyName)),
+                            new DependencyOverride<OverlayMode>(overlayMode))));
+
+            return instance;
         }
     }
 }

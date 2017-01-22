@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 
 namespace PoeBud.Views
 {
@@ -10,6 +11,12 @@ namespace PoeBud.Views
         public OverlayWindowView()
         {
             InitializeComponent();
+        }
+
+        protected override void OnSourceInitialized(EventArgs e)
+        {
+            base.OnSourceInitialized(e);
+            this.MakeTransparent();
         }
     }
 }
