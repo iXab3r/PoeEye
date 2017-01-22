@@ -49,6 +49,11 @@
                                VerticalAlignment="Center"
                                Foreground="{StaticResource PoeItemIntStatBrush}"
                                Text="{Binding Name}" />
+
+                    <TextBlock FontSize="13" Style="{StaticResource OracleTextBlockStyleKey}"
+                               Margin="5,0"
+                               VerticalAlignment="Top"
+                               Text="{Binding RequiredLevel, StringFormat='min. lvl {0}'}" />
                 </StackPanel>
 
                 <TextBlock FontSize="14" Style="{StaticResource OracleTextBlockStyleKey}"

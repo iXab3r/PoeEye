@@ -50,6 +50,8 @@ namespace PoeOracle.ViewModels
 
         public string QualityBonus => gemModel.QualityBonus;
 
+        public int RequiredLevel => gemModel.RequiredLevel;
+
         public IImageViewModel Icon { get; }
 
         public ICommand GotoGamepediaCommand => gotoGamepediaCommand;

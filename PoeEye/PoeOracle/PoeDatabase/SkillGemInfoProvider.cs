@@ -41,7 +41,8 @@ namespace PoeOracle.PoeDatabase
                 SoldBy = skillGemInfo.SoldBy,
                 Description = extendedInfo?.Description,
                 QualityBonus = extendedInfo?.QualityBonus,
-                IconUri = skillGemInfo.IconUri.ToUriOrDefault()
+                IconUri = skillGemInfo.IconUri.ToUriOrDefault(),
+                RequiredLevel = extendedInfo?.RequiredLevel ?? 0
             };
             return result;
         }

@@ -16,6 +16,8 @@ namespace PoeOracle.Models
 
         public string QualityBonus { get; set; }
 
+        public int RequiredLevel { get; set; }
+
         public Uri IconUri { get; set; }
     }
 }
