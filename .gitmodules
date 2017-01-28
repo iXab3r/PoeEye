@@ -1,0 +1,3 @@
+[submodule "Submodules/RadialMenu"]
+	path = Submodules/RadialMenu
+	url = https://github.com/iXab3r/RadialMenu.git

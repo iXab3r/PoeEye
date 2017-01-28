@@ -104,10 +104,6 @@
       <HintPath>..\packages\Prism.Wpf.6.1.0\lib\net45\Prism.Wpf.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="RadialMenu, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\RadialMenu.WPF.1.3.0\lib\net45\RadialMenu.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="ReactiveUI, Version=6.5.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\reactiveui-core.6.5.0\lib\Net45\ReactiveUI.dll</HintPath>
       <Private>True</Private>
@@ -162,22 +158,19 @@
     <Compile Include="Modularity\PoeChatWheelConfig.cs" />
     <Compile Include="Utilities\WindowExtensions.cs" />
     <Compile Include="Utilities\WindowsServices.cs" />
+    <Compile Include="ViewModels\MenuItemViewModel.cs" />
     <Compile Include="ViewModels\PoeChatWheelSettingsViewModel.cs" />
     <Compile Include="ViewModels\PoeChatWheelViewModel.cs" />
     <Compile Include="ViewModels\IPoeChatWheelViewModel.cs" />
-    <Page Include="ChatWheelWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Compile Include="ChatWheelWindow.xaml.cs">
-      <DependentUpon>ChatWheelWindow.xaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
-    <Page Include="Converters\Converters.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
     <Page Include="Themes\Generic.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\MenuItemView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\PoeChatWheelView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -197,6 +190,10 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Submodules\RadialMenu\RadialMenu\RadialMenu.csproj">
+      <Project>{9d959b4c-a428-4ea7-9197-be04b37bf256}</Project>
+      <Name>RadialMenu</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PoeShared\PoeShared.csproj">
       <Project>{12df53dd-7144-4d2d-b7a1-b4bc5bbdfb69}</Project>
       <Name>PoeShared</Name>
