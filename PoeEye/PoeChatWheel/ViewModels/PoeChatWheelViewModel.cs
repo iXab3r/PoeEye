@@ -372,8 +372,8 @@ namespace PoeChatWheel.ViewModels
 
         private RadialMenuItem ToActionMenuItem(RadialMenuItem item)
         {
-            var menuItemModel = item.Content as MenuItemViewModel;
-            if (menuItemModel == null)
+            var commandText = item.Tag as string;
+            if (commandText == null)
             {
                 return item;
             }
@@ -386,9 +386,9 @@ namespace PoeChatWheel.ViewModels
                 .Subscribe(
                     x =>
                     {
-                        Log.Instance.Debug($"[PoeChatWheel.SelectAction] Action '{menuItemModel.CommandText}'");
+                        Log.Instance.Debug($"[PoeChatWheel.SelectAction] Action '{commandText}'");
                         x.EventArgs.Handled = true;
-                        queryStateMachine.Fire(actionSelectedTransitionTrigger, menuItemModel.CommandText);
+                        queryStateMachine.Fire(actionSelectedTransitionTrigger, commandText);
                     });
             return item;
         }
