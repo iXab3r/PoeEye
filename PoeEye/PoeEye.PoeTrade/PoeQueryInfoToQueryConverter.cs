@@ -64,7 +64,7 @@ namespace PoeEye.PoeTrade
                 CreateArgument("buyout_min", source.BuyoutMin),
                 CreateArgument("buyout_max", source.BuyoutMax),
                 CreateArgument("buyout_currency", source.BuyoutCurrencyType),
-                CreateArgument("buyout", source.BuyoutOnly),
+                CreateArgument("has_buyout", ConvertToRaw(source.BuyoutMode)),
                 CreateArgument("online", source.OnlineOnly),
                 CreateArgument("altart", source.AlternativeArt),
                 CreateArgument("capquality", source.NormalizeQuality),
@@ -104,6 +104,19 @@ namespace PoeEye.PoeTrade
 
             result.Arguments = args.ToArray();
             return result;
+        }
+
+        private static string ConvertToRaw(PoeBuyoutMode? source)
+        {
+            switch (source)
+            {
+                case PoeBuyoutMode.BuyoutOnly:
+                    return "1";
+                case PoeBuyoutMode.OfferOnly:
+                    return "0";
+                default:
+                    return null;
+            }
         }
 
         private static string ConvertToRaw(PoeItemRarity? source)

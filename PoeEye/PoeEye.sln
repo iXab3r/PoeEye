@@ -17,15 +17,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FuzzySearch", "FuzzySearch\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PoeWhisperMonitor", "PoeWhisperMonitor\PoeWhisperMonitor.csproj", "{75B4A3DB-45C0-4639-B5A3-4D180AD4B9FB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PoeEye.ExileToolsApi", "PoeEye.ExileToolsApi\PoeEye.ExileToolsApi.csproj", "{02FD1625-7DD4-4B9B-9F5C-9FEFA42B41DF}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PoeEye.ItemParser", "PoeEye.ItemParser\PoeEye.ItemParser.csproj", "{EA3109DD-675D-4837-977D-AF61B203BEBC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PoeEye.Console", "PoeEye.Console\PoeEye.Console.csproj", "{5745039E-24A7-40FC-9B61-F6C2EE6F3406}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PoeEye.PoeTradeRealtimeApi", "PoeEye.PoeTradeRealtimeApi\PoeEye.PoeTradeRealtimeApi.csproj", "{0E9B96E1-A5DC-4F5A-8F43-40BE640D50F4}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PoeEye.ExileToolsRealtimeApi", "PoeEye.ExileToolsRealtimeApi\PoeEye.ExileToolsRealtimeApi.csproj", "{D6F0D9BD-95FC-4A71-8EFF-A1C82B959C5D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PoeChatWheel", "PoeChatWheel\PoeChatWheel.csproj", "{DAD6D513-5C7C-433B-8A56-1D92476B4CFF}"
 EndProject
@@ -69,10 +65,6 @@ Global
 		{75B4A3DB-45C0-4639-B5A3-4D180AD4B9FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{75B4A3DB-45C0-4639-B5A3-4D180AD4B9FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{75B4A3DB-45C0-4639-B5A3-4D180AD4B9FB}.Release|Any CPU.Build.0 = Release|Any CPU
-		{02FD1625-7DD4-4B9B-9F5C-9FEFA42B41DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{02FD1625-7DD4-4B9B-9F5C-9FEFA42B41DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{02FD1625-7DD4-4B9B-9F5C-9FEFA42B41DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{02FD1625-7DD4-4B9B-9F5C-9FEFA42B41DF}.Release|Any CPU.Build.0 = Release|Any CPU
 		{EA3109DD-675D-4837-977D-AF61B203BEBC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{EA3109DD-675D-4837-977D-AF61B203BEBC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EA3109DD-675D-4837-977D-AF61B203BEBC}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -85,10 +77,6 @@ Global
 		{0E9B96E1-A5DC-4F5A-8F43-40BE640D50F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0E9B96E1-A5DC-4F5A-8F43-40BE640D50F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0E9B96E1-A5DC-4F5A-8F43-40BE640D50F4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D6F0D9BD-95FC-4A71-8EFF-A1C82B959C5D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D6F0D9BD-95FC-4A71-8EFF-A1C82B959C5D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D6F0D9BD-95FC-4A71-8EFF-A1C82B959C5D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D6F0D9BD-95FC-4A71-8EFF-A1C82B959C5D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{DAD6D513-5C7C-433B-8A56-1D92476B4CFF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{DAD6D513-5C7C-433B-8A56-1D92476B4CFF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DAD6D513-5C7C-433B-8A56-1D92476B4CFF}.Release|Any CPU.ActiveCfg = Release|Any CPU

@@ -46,7 +46,7 @@ namespace PoeEye.Console
                     League = "Prophecy",
                     AccountName = "Xab3r",
                     OnlineOnly = true,
-                    BuyoutOnly = true,
+                    BuyoutMode = true,
                     NormalizeQuality = true,
                 };
                 var source = container.Resolve<IRealtimeItemSource>(new DependencyOverride<IPoeQueryInfo>(query));

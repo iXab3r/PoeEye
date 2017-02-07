@@ -422,10 +422,6 @@
       <Project>{dad6d513-5c7c-433b-8a56-1d92476b4cff}</Project>
       <Name>PoeChatWheel</Name>
     </ProjectReference>
-    <ProjectReference Include="..\PoeEye.ExileToolsApi\PoeEye.ExileToolsApi.csproj">
-      <Project>{02fd1625-7dd4-4b9b-9f5c-9fefa42b41df}</Project>
-      <Name>PoeEye.ExileToolsApi</Name>
-    </ProjectReference>
     <ProjectReference Include="..\PoeEye.PoeTradeRealtimeApi\PoeEye.PoeTradeRealtimeApi.csproj">
       <Project>{0e9b96e1-a5dc-4f5a-8f43-40be640d50f4}</Project>
       <Name>PoeEye.PoeTradeRealtimeApi</Name>

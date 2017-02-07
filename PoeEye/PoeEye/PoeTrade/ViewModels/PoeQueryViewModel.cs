@@ -37,7 +37,7 @@ namespace PoeEye.PoeTrade.ViewModels
 
         private float? buyoutMin;
 
-        private bool buyoutOnly;
+        private PoeBuyoutMode buyoutMode;
 
         private PoeItemCorruptionState? corruptionState;
 
@@ -161,7 +161,7 @@ namespace PoeEye.PoeTrade.ViewModels
             ModGroupsEditor = modGroupsEditorFactory.Create(staticData);
 
             OnlineOnly = true;
-            BuyoutOnly = true;
+            BuyoutMode = PoeBuyoutMode.BuyoutOnly;
             NormalizeQuality = true;
 
             this.WhenAnyValue(x => x.League)
@@ -489,10 +489,10 @@ namespace PoeEye.PoeTrade.ViewModels
             set { this.RaiseAndSetIfChanged(ref onlineOnly, value); }
         }
 
-        public bool BuyoutOnly
+        public PoeBuyoutMode BuyoutMode
         {
-            get { return buyoutOnly; }
-            set { this.RaiseAndSetIfChanged(ref buyoutOnly, value); }
+            get { return buyoutMode; }
+            set { this.RaiseAndSetIfChanged(ref buyoutMode, value); }
         }
 
         public bool NormalizeQuality

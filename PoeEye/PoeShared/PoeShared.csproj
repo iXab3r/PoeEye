@@ -195,6 +195,7 @@
     <Compile Include="Common\IPoeItemType.cs" />
     <Compile Include="Common\IPoeLinksInfo.cs" />
     <Compile Include="Common\KnownCurrencyNameList.cs" />
+    <Compile Include="Common\PoeBuyoutMode.cs" />
     <Compile Include="Common\PoeCurrency.cs" />
     <Compile Include="Common\PoeItem.cs" />
     <Compile Include="Common\PoeItemCorruptionState.cs" />
@@ -292,6 +293,7 @@
     <Compile Include="Scaffolding\WPF\Converters\ExceptionToMessageConverter.cs" />
     <Compile Include="Scaffolding\WPF\Converters\NullToVisibilityConverter.cs" />
     <Compile Include="Scaffolding\WPF\Converters\TimeSpanToHumanReadableStringConverter.cs" />
+    <Compile Include="Scaffolding\WPF\EnumHelper.cs" />
     <Compile Include="Scaffolding\WPF\FocusHelper.cs" />
     <Compile Include="UI\Models\IImagesCacheService.cs" />
     <Compile Include="UI\Models\ImagesCacheService.cs" />
