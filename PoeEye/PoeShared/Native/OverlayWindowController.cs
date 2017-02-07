@@ -101,6 +101,10 @@ namespace PoeShared.Native
 
         public bool IsVisible => overlay.IsVisible;
 
+        public Size Size => overlayWindow.RenderSize;
+
+        public Point Location => new Point(overlayWindow.Left, overlayWindow.Top);
+
         public void ActivateLastActiveWindow()
         {
             var windowHandle = lastActiveWindowHandle.Value;

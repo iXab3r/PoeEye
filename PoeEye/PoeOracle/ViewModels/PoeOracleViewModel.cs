@@ -1,17 +1,14 @@
 ﻿using System;
-using System.Diagnostics;
-using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
-using System.Reactive.Subjects;
 using System.Windows;
+using System.Windows.Forms;
 using System.Windows.Input;
 using Gma.System.MouseKeyHook;
 using Guards;
 using JetBrains.Annotations;
 using Microsoft.Practices.Unity;
 using PoeOracle.Models;
-using PoeShared;
 using PoeShared.Native;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
@@ -26,16 +23,19 @@ namespace PoeOracle.ViewModels
     {
         private static readonly TimeSpan DefaultQueryThrottle = TimeSpan.FromMilliseconds(200);
 
-        [NotNull]
-        private readonly IOverlayWindowController controller;
+        [NotNull] private readonly IOverlayWindowController controller;
+
         private readonly ISuggestionsDataSource dataSource;
-        [NotNull]
-        private readonly IExternalUriOpener uriOpener;
         private readonly DelegateCommand gotoGamepediaCommand;
+
+        [NotNull] private readonly IExternalUriOpener uriOpener;
+
         private bool isFocused;
 
         private bool isVisible;
         private Point location;
+
+        private double oracleActualWidth;
 
         private string query;
 
@@ -90,6 +90,11 @@ namespace PoeOracle.ViewModels
                 .Where(isFocused => isFocused == false)
                 .Subscribe(() => Hide(false))
                 .AddTo(Anchors);
+
+            this.WhenAnyValue(x => x.OracleActualWidth)
+                .Where(x => IsVisible)
+                .Subscribe(SnapToOverlayCenter)
+                .AddTo(Anchors);
         }
 
         public bool IsFocused
@@ -112,6 +117,16 @@ namespace PoeOracle.ViewModels
 
         public bool IsBusy => dataSource.IsBusy;
 
+        public IReactiveList<IOracleSuggestionViewModel> ItemsToShow => dataSource.Items;
+
+        public ICommand GotoGamepediaCommand => gotoGamepediaCommand;
+
+        public double OracleActualWidth
+        {
+            get { return oracleActualWidth; }
+            set { this.RaiseAndSetIfChanged(ref oracleActualWidth, value); }
+        }
+
         public Point Location
         {
             get { return location; }
@@ -123,10 +138,6 @@ namespace PoeOracle.ViewModels
             get { return size; }
             set { this.RaiseAndSetIfChanged(ref size, value); }
         }
-
-        public IReactiveList<IOracleSuggestionViewModel> ItemsToShow => dataSource.Items;
-
-        public ICommand GotoGamepediaCommand => gotoGamepediaCommand;
 
         private void ProcessKeyDown(KeyEventArgs keyEventArgs)
         {
@@ -155,13 +166,32 @@ namespace PoeOracle.ViewModels
 
         private void Show()
         {
-            var mousePosition = System.Windows.Forms.Control.MousePosition;
-            Location = new Point(mousePosition.X, mousePosition.Y);
-
             IsVisible = true;
             IsFocused = true;
 
             controller.Activate();
+        }
+
+        private void SnapToMouse()
+        {
+            var mousePosition = Control.MousePosition;
+            Location = new Point(mousePosition.X, mousePosition.Y);
+        }
+
+        private void SnapToOverlayCenter()
+        {
+            var overlayLocation = controller.Location;
+            var overlaySize = controller.Size;
+            var oracleSize = new Size(OracleActualWidth, 0);
+
+            var top = overlayLocation.Y + overlaySize.Height / 2;
+            var left = overlayLocation.X + overlaySize.Width / 2;
+            if (!double.IsNaN(oracleSize.Width) && !double.IsInfinity(oracleSize.Width) && !oracleSize.IsEmpty)
+            {
+                left -= oracleSize.Width / 2;
+            }
+
+            Location = new Point(left, top);
         }
 
         private void Hide(bool restoreLastActiveWindow)

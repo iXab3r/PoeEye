@@ -28,6 +28,7 @@
 
     <DataTemplate DataType="{x:Type viewModels:PoeOracleViewModel}">
         <Grid Visibility="{Binding IsVisible, Converter={StaticResource TrueToVisibleConverter}}"
+              x:Name="OracleOverlay"
               TextBlock.Foreground="{StaticResource PoeFontBrush}">
 
             <Grid.ColumnDefinitions>
@@ -171,6 +172,9 @@
                     <scaffolding:DataPipe
                         Source="{Binding ElementName=OracleQueryTextBox, Path=IsKeyboardFocused}"
                         Target="{Binding IsFocused, Mode=OneWayToSource}" />
+                    <scaffolding:DataPipe
+                        Source="{Binding ElementName=OracleOverlay, Path=ActualWidth}"
+                        Target="{Binding OracleActualWidth, Mode=OneWayToSource}" />
                 </scaffolding:DataPipeCollection>
             </scaffolding:DataPiping.DataPipes>
         </Grid>
