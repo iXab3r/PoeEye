@@ -19,8 +19,9 @@ namespace PoeEye.Config
 {
     internal sealed class PoeEyeConfigProviderFromFile : IConfigProvider
     {
-        private static readonly string DebugConfigFileName = @"PoeEye\configDebugMode.cfg";
-        private static readonly string ReleaseConfigFileName = @"PoeEye\config.cfg";
+        private static readonly string ConfigFileDirectory = Environment.ExpandEnvironmentVariables(@"%LOCALAPPDATA%\PoeEye");
+        private static readonly string DebugConfigFileName = @"configDebugMode.cfg";
+        private static readonly string ReleaseConfigFileName = @"config.cfg";
 
         private readonly string configFilePath;
 
@@ -35,12 +36,12 @@ namespace PoeEye.Config
             if (App.Arguments.IsDebugMode)
             {
                 Log.Instance.Debug("[PoeEyeConfigProviderFromFile..ctor] Debug mode detected");
-                configFilePath = Environment.ExpandEnvironmentVariables($@"%APPDATA%\{DebugConfigFileName}");
+                configFilePath = Path.Combine(ConfigFileDirectory, DebugConfigFileName);
             }
             else
             {
                 Log.Instance.Debug("[PoeEyeConfigProviderFromFile..ctor] Release mode detected");
-                configFilePath = Environment.ExpandEnvironmentVariables($@"%APPDATA%\{ReleaseConfigFileName}");
+                configFilePath = Path.Combine(ConfigFileDirectory, ReleaseConfigFileName);
             }
 
             converters.Changed

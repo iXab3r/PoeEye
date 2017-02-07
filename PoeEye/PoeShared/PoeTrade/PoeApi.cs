@@ -1,7 +1,9 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Threading.Tasks;
 using Guards;
 using PoeShared.PoeTrade.Query;
+using PoeShared.Scaffolding;
 
 namespace PoeShared.PoeTrade
 {

@@ -26,8 +26,6 @@ namespace PoeBud.Models
 
     using ReactiveUI;
 
-    using Utilities;
-
     internal sealed class PoeStashUpdater : DisposableReactiveObject
     {
         private readonly IPoeBudConfig config;

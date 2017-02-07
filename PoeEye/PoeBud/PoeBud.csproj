@@ -218,9 +218,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Config\IPoeBudConfig.cs" />
-    <Compile Include="Config\IPoeBudConfigProvider.cs" />
     <Compile Include="Config\PoeBudConfig.cs" />
-    <Compile Include="Config\PoeBudConfigProviderFromFile.cs" />
     <Compile Include="Config\SafeDataConverter.cs" />
     <Compile Include="Converters\BooleanToObjectConverter.cs" />
     <Compile Include="Converters\IsGreaterThanValueToBooleanConverter.cs" />
@@ -266,7 +264,7 @@
     <Compile Include="OfficialApi\ProcurementLegacy\IGearTypeAnalyzer.cs" />
     <Compile Include="Prism\PoeBudModule.cs" />
     <Compile Include="Prism\PoeBudModuleRegistrations.cs" />
-    <Compile Include="Utilities\ItemExtensions.cs" />
+    <Compile Include="Scaffolding\ItemExtensions.cs" />
     <Compile Include="ViewModels\ISolutionExecutorViewModel.cs" />
     <Compile Include="ViewModels\PoeBudSettingsViewModel.cs" />
     <Compile Include="ViewModels\PoeBudViewModel.cs" />

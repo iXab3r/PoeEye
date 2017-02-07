@@ -38,7 +38,7 @@ namespace PoeShared.PoeTrade
 
         public float? BuyoutMin { get; set; }
 
-        public PoeBuyoutMode BuyoutMode { get; set; }
+        public PoeBuyoutMode? BuyoutMode { get; set; }
 
         public float? CritMax { get; set; }
 

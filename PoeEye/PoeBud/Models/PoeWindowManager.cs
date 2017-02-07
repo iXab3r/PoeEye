@@ -1,6 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using Microsoft.Practices.Unity;
 using PoeShared;
+using PoeShared.Modularity;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
 
@@ -26,18 +27,12 @@ namespace PoeBud.Models
 
         public PoeWindowManager(
             [NotNull] IFactory<IPoeWindow, IntPtr> windowsFactory,
-            [NotNull] [Dependency(WellKnownWindows.PathOfExileWindow)] IWindowTracker poeWindowTracker,
-            [NotNull] IPoeBudConfigProvider<IPoeBudConfig> configProvider)
+            [NotNull] [Dependency(WellKnownWindows.PathOfExileWindow)] IWindowTracker poeWindowTracker)
         {
             Guard.ArgumentNotNull(() => windowsFactory);
-            Guard.ArgumentNotNull(() => configProvider);
             
             this.windowsFactory = windowsFactory;
             this.poeWindowTracker = poeWindowTracker;
-
-            //FIXME Apply recheck period
-            var recheckPeriod = configProvider.Load().ForegroundWindowRecheckPeriod;
-            Log.Instance.Debug($"[PoeWindowManager] RecheckPeriod: {recheckPeriod}");
 
             poeWindowTracker
                 .WhenAnyValue(x => x.MatchingWindowHandle)

@@ -70,5 +70,7 @@ namespace PoeEye.Config
         public TimeSpan MinRefreshTimeout { get; set; } = TimeSpan.FromSeconds(30);
 
         public TimeSpan MaxRefreshTimeout { get; set; } = TimeSpan.FromMinutes(30);
+
+        public TimeSpan ProxyRecheckTimeout { get; set; } = TimeSpan.FromMinutes(1);
     }
 }

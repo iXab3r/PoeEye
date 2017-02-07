@@ -30,7 +30,6 @@ namespace PoeShared.PoeTrade
 
         float? BuyoutMin { get; }
 
-        PoeBuyoutMode BuyoutMode { get; }
 
         float? CritMax { get; }
 
@@ -69,6 +68,8 @@ namespace PoeShared.PoeTrade
         PoeItemCorruptionState? CorruptionState { get; }
 
         IPoeItemType ItemType { get; }
+
+        PoeBuyoutMode? BuyoutMode { get; }
 
         string League { get; }
 

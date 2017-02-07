@@ -2,6 +2,7 @@ using System;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
 using Gma.System.MouseKeyHook;
@@ -19,28 +20,25 @@ namespace PoeShared.Native
 {
     internal sealed class OverlayWindowController : DisposableReactiveObject, IOverlayWindowController
     {
-        private readonly IUnityContainer container;
         private readonly OverlayWindowViewModel overlay;
         private readonly OverlayWindowView overlayWindow;
         private readonly IWindowTracker windowTracker;
         private readonly BehaviorSubject<IntPtr> lastActiveWindowHandle = new BehaviorSubject<IntPtr>(IntPtr.Zero);
 
         public OverlayWindowController(
-            [NotNull] IUnityContainer container,
             [NotNull] IWindowTracker windowTracker,
             [NotNull] IKeyboardMouseEvents keyboardMouseEvents,
+            [NotNull] OverlayWindowViewModel overlay,
             [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler,
             OverlayMode overlayMode = OverlayMode.Transparent)
         {
-            Guard.ArgumentNotNull(() => container);
             Guard.ArgumentNotNull(() => windowTracker);
+            Guard.ArgumentNotNull(() => overlay);
             Guard.ArgumentNotNull(() => keyboardMouseEvents);
             Guard.ArgumentNotNull(() => uiScheduler);
 
-            this.container = container;
+            this.overlay = overlay;
             this.windowTracker = windowTracker;
-
-            overlay = container.Resolve<OverlayWindowViewModel>();
 
             overlayWindow = new OverlayWindowView(overlayMode)
             {
@@ -49,13 +47,13 @@ namespace PoeShared.Native
             overlayWindow.Show();
             var overlayWindowHandle = new WindowInteropHelper(overlayWindow).Handle;
 
-            var mainWindow = Application.Current?.MainWindow;
-            if (mainWindow != null)
+            var application = Application.Current;
+            if (application != null)
             {
                 Observable
-                    .FromEventPattern(h => mainWindow.Closed += h, h => mainWindow.Closed -= h)
-                    .Subscribe(overlayWindow.Close)
-                    .AddTo(Anchors);
+                        .FromEventPattern<ExitEventHandler, ExitEventArgs>(h => application.Exit += h, h => application.Exit -= h)
+                        .Subscribe(overlayWindow.Close)
+                        .AddTo(Anchors);
             }
 
             windowTracker
@@ -82,6 +80,7 @@ namespace PoeShared.Native
                     h => keyboardMouseEvents.KeyDown += h,
                     h => keyboardMouseEvents.KeyDown -= h)
                 .Select(x => x.EventArgs)
+                .Where(x => overlay.IsVisible)
                 .Where(x => new KeyGesture(Key.F9, ModifierKeys.Control | ModifierKeys.Shift).MatchesHotkey(x))
                 .Do(x => x.Handled = true)
                 .Subscribe(() => overlay.ShowWireframes = !overlay.ShowWireframes)

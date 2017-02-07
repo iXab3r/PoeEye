@@ -1,4 +1,6 @@
 ﻿using PoeShared;
+using PoeShared.Modularity;
+using ReactiveUI;
 
 namespace PoeBud.Models
 {
@@ -25,7 +27,7 @@ namespace PoeBud.Models
 
         public UserInteractionsManager(
                 [NotNull] IInputSimulator inputSimulator,
-                [NotNull] IPoeBudConfigProvider<IPoeBudConfig> configProvider,
+                [NotNull] IConfigProvider<PoeBudConfig> configProvider,
                 [NotNull] IUserInputBlocker userInputBlocker)
         {
             Guard.ArgumentNotNull(() => inputSimulator);
@@ -35,7 +37,9 @@ namespace PoeBud.Models
             this.inputSimulator = inputSimulator;
             this.userInputBlocker = userInputBlocker;
 
-            configProvider.ConfigUpdated.Subscribe(_ => ReloadConfig(configProvider.Load()));
+            configProvider
+                .WhenAnyValue(x => x.ActualConfig)
+                .Subscribe(ReloadConfig);
         }
 
         public void SendControlLeftClick()

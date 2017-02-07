@@ -24,7 +24,6 @@ namespace PoeBud.Prism
         protected override void Initialize()
         {
             Container
-                .RegisterSingleton<IPoeBudConfigProvider<IPoeBudConfig>, PoeBudConfigProviderFromFile>()
                 .RegisterType<IInputSimulator>(new ContainerControlledLifetimeManager(), new InjectionFactory(x => new InputSimulator()))
                 .RegisterSingleton<IPoeWindowManager, PoeWindowManager>()
                 .RegisterSingleton<IGearTypeAnalyzer, GearTypeAnalyzer>();

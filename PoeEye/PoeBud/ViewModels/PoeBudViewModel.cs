@@ -15,7 +15,7 @@ using Microsoft.Practices.Unity;
 using PoeBud.Config;
 using PoeBud.Models;
 using PoeBud.OfficialApi.DataTypes;
-using PoeBud.Utilities;
+using PoeBud.Scaffolding;
 using PoeShared;
 using PoeShared.Modularity;
 using PoeShared.Native;

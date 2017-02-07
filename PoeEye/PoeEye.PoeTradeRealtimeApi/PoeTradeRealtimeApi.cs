@@ -17,7 +17,7 @@ using PoeShared.Scaffolding;
 
 namespace PoeEye.PoeTradeRealtimeApi
 {
-    internal sealed class PoeTradeRealtimeApi : PoeApi
+    internal sealed class PoeTradeRealtimeApi : IPoeApi
     {
         private readonly PoeTradeApi poeTradeApi;
         private readonly IFactory<IRealtimeItemSource, IPoeQueryInfo> itemSourceFactory;
@@ -36,11 +36,11 @@ namespace PoeEye.PoeTradeRealtimeApi
             this.itemSourceFactory = itemSourceFactory;
         }
 
-        public override Guid Id { get; } = Guid.Parse("16E6A0E6-E5A4-4260-A698-764DD8B2E843");
+        public Guid Id { get; } = Guid.Parse("16E6A0E6-E5A4-4260-A698-764DD8B2E843");
 
-        public override string Name { get; } = "poe.trade Realtime";
+        public string Name { get; } = "poe.trade Realtime";
 
-        public override Task<IPoeQueryResult> IssueQuery(IPoeQueryInfo query)
+        public Task<IPoeQueryResult> IssueQuery(IPoeQueryInfo query)
         {
             Log.Instance.Debug($"[PoeTradeRealtimeApi.IssueQuery] Issueing query: {query}");
 
@@ -49,7 +49,7 @@ namespace PoeEye.PoeTradeRealtimeApi
                 .ToTask();
         }
 
-        public override Task<IPoeStaticData> RequestStaticData()
+        public Task<IPoeStaticData> RequestStaticData()
         {
             Log.Instance.Debug($"[PoeTradeRealtimeApi.RequestStaticData] Requesting data...");
             return poeTradeApi.RequestStaticData();
@@ -67,7 +67,7 @@ namespace PoeEye.PoeTradeRealtimeApi
             return source.GetResult();
         }
 
-        public override void DisposeQuery(IPoeQueryInfo query)
+        public void DisposeQuery(IPoeQueryInfo query)
         {
             CleanupSources(query);
         }

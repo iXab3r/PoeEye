@@ -1,4 +1,7 @@
-﻿namespace PoeEye.PoeTrade.ViewModels
+﻿using PoeEye.Config;
+using PoeShared.Modularity;
+
+namespace PoeEye.PoeTrade.ViewModels
 {
     using System;
     using System.Reactive.Linq;
@@ -15,8 +18,6 @@
 
     internal sealed class ProxyProviderViewModel : DisposableReactiveObject
     {
-        private readonly TimeSpan ProxiesRecheckPeriod = TimeSpan.FromSeconds(10);
-
         private readonly IProxyProvider proxyProvider;
 
         private int activeProxiesCount;
@@ -25,14 +26,20 @@
 
         private int totalProxiesCount;
 
-        public ProxyProviderViewModel([NotNull] IProxyProvider proxyProvider)
+        public ProxyProviderViewModel(
+            [NotNull] IProxyProvider proxyProvider,
+            [NotNull] IConfigProvider<PoeEyeMainConfig> configProvider)
         {
             Guard.ArgumentNotNull(() => proxyProvider);
+            Guard.ArgumentNotNull(() => configProvider);
 
             this.proxyProvider = proxyProvider;
 
-            Observable
-                .Timer(DateTimeOffset.Now, ProxiesRecheckPeriod)
+            configProvider
+                .WhenAnyValue(x => x.ActualConfig)
+                .Select(x => x.ProxyRecheckTimeout)
+                .Select(x => Observable.Timer(DateTimeOffset.Now, x))
+                .Switch()
                 .Subscribe(Refresh)
                 .AddTo(Anchors);
         }

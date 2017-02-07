@@ -37,7 +37,7 @@ namespace PoeEye.PoeTrade.ViewModels
 
         private float? buyoutMin;
 
-        private PoeBuyoutMode buyoutMode;
+        private PoeBuyoutMode? buyoutMode;
 
         private PoeItemCorruptionState? corruptionState;
 
@@ -489,7 +489,7 @@ namespace PoeEye.PoeTrade.ViewModels
             set { this.RaiseAndSetIfChanged(ref onlineOnly, value); }
         }
 
-        public PoeBuyoutMode BuyoutMode
+        public PoeBuyoutMode? BuyoutMode
         {
             get { return buyoutMode; }
             set { this.RaiseAndSetIfChanged(ref buyoutMode, value); }

@@ -21,7 +21,7 @@ namespace PoeShared.UI.Models
         private static readonly TimeSpan ArtificialDelay = TimeSpan.FromSeconds(5);
         private readonly IScheduler uiScheduler;
 
-        private static readonly string CachePath = Environment.ExpandEnvironmentVariables($@"%APPDATA%\PoeEye\Cache\");
+        private static readonly string CachePath = Environment.ExpandEnvironmentVariables($@"%LOCALAPPDATA%\PoeEye\Cache\");
         private readonly IFactory<IHttpClient> httpClientFactory;
 
         private readonly IDictionary<string, IObservable<FileInfo>> imagesBeingLoaded = new ConcurrentDictionary<string, IObservable<FileInfo>>();

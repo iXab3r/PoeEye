@@ -1,10 +1,8 @@
-﻿using PoeBud.OfficialApi.DataTypes;
+﻿using System.Linq;
+using PoeBud.OfficialApi.DataTypes;
 
-namespace PoeBud.Utilities
+namespace PoeBud.Scaffolding
 {
-    using System;
-    using System.Linq;
-
     internal static class ItemExtensions
     {
         public static bool IsWeapon(this GearType gearType)

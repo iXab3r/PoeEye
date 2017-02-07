@@ -1,4 +1,5 @@
 ﻿using PoeBud.OfficialApi.DataTypes;
+using PoeBud.Scaffolding;
 using PoeShared;
 using PoeShared.Scaffolding;
 
@@ -15,8 +16,6 @@ namespace PoeBud.ViewModels
     using JetBrains.Annotations;
 
     using Models;
-
-    using Utilities;
 
     internal sealed class StashViewModel
     {
