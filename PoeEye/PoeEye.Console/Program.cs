@@ -5,8 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Practices.ObjectBuilder2;
 using Microsoft.Practices.Unity;
-using PoeEye.ExileToolsApi.Prism;
-using PoeEye.ExileToolsRealtimeApi.Prism;
 using PoeEye.PoeTrade.Prism;
 using PoeEye.PoeTradeRealtimeApi;
 using PoeEye.PoeTradeRealtimeApi.Prism;
@@ -31,8 +29,6 @@ namespace PoeEye.Console
 
                 var modules = new IModule[]
                 {
-                    new ExileToolsModule(container),
-                    new ExileToolsRealtimeModule(container), 
                     new PoeTradeModule(container), 
                     new PoeTradeRealtimeModule(container), 
                 };
@@ -46,7 +42,6 @@ namespace PoeEye.Console
                     League = "Prophecy",
                     AccountName = "Xab3r",
                     OnlineOnly = true,
-                    BuyoutMode = true,
                     NormalizeQuality = true,
                 };
                 var source = container.Resolve<IRealtimeItemSource>(new DependencyOverride<IPoeQueryInfo>(query));

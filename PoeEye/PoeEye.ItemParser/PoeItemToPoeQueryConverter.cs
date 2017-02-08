@@ -30,7 +30,6 @@ namespace PoeEye.ItemParser
             var query = new PoeQueryInfo
             {
                 ItemName = value.ItemName,
-                BuyoutMode = true,
                 OnlineOnly = true,
                 NormalizeQuality = true,
                 IsExpanded = true
