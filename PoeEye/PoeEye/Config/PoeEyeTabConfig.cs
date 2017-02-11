@@ -1,5 +1,6 @@
 ﻿using Exceptionless.Json;
 using PoeEye.PoeTrade;
+using PoeEye.PoeTrade.Common;
 
 namespace PoeEye.Config
 {

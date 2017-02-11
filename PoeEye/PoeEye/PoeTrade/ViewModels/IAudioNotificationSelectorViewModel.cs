@@ -1,4 +1,5 @@
 ﻿using JetBrains.Annotations;
+using PoeEye.PoeTrade.Common;
 using PoeShared.Scaffolding;
 using ReactiveUI;
 

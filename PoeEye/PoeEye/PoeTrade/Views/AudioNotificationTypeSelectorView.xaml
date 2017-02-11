@@ -3,7 +3,8 @@
                     xmlns:viewModels="clr-namespace:PoeEye.PoeTrade.ViewModels"
                     xmlns:net="clr-namespace:FontAwesome.Net;assembly=FontAwesome.Net"
                     xmlns:poeTrade="clr-namespace:PoeEye.PoeTrade"
-                    xmlns:utilities="clr-namespace:PoeEye.Utilities">
+                    xmlns:utilities="clr-namespace:PoeEye.Utilities"
+                    xmlns:common="clr-namespace:PoeEye.PoeTrade.Common">
 
 
   <DataTemplate DataType="{x:Type viewModels:AudioNotificationSelectorViewModel}">
@@ -20,7 +21,7 @@
               <Trigger Property="IsChecked" Value="True">
                 <Setter Property="Content" Value="{x:Static net:FontAwesome.volume_up}" />
               </Trigger>
-              <DataTrigger Binding="{Binding SelectedValue}" Value="{x:Static poeTrade:AudioNotificationType.Silence}">
+              <DataTrigger Binding="{Binding SelectedValue}" Value="{x:Static common:AudioNotificationType.Silence}">
                 <Setter Property="Background" Value="{StaticResource ControlsDisabledBrush}" />
               </DataTrigger>
             </Style.Triggers>

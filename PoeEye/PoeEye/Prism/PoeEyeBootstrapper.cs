@@ -9,6 +9,7 @@ using PoeChatWheel;
 using PoeChatWheel.ViewModels;
 using PoeEye.Config;
 using PoeEye.Converters;
+using PoeEye.PoeTrade.Shell.ViewModels;
 using PoeShared.Common;
 using PoeShared.Modularity;
 using PoeShared.PoeTrade;
@@ -29,14 +30,11 @@ namespace PoeEye.Prism
     using PoeShared;
     using PoeShared.Prism;
 
-    using PoeTrade.ViewModels;
-    using PoeTrade.Views;
-
     internal sealed class PoeEyeBootstrapper : UnityBootstrapper
     {
         protected override DependencyObject CreateShell()
         {
-            return Container.Resolve<MainWindow>();
+            return Container.Resolve<PoeTrade.Shell.Views.MainWindow>();
         }
 
         protected override void InitializeShell()

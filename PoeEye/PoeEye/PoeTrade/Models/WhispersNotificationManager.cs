@@ -1,4 +1,5 @@
-﻿using PoeShared;
+﻿using PoeEye.PoeTrade.Common;
+using PoeShared;
 using PoeShared.Modularity;
 using PoeShared.Prism;
 using PoeEyeMainConfig = PoeEye.Config.PoeEyeMainConfig;

@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Reflection;
 using System.Resources;
+using PoeEye.PoeTrade.Common;
 using PoeEye.Resources.Notifications;
 using PoeShared.Modularity;
 using PoeEyeMainConfig = PoeEye.Config.PoeEyeMainConfig;

@@ -1,4 +1,6 @@
-﻿namespace PoeEye.PoeTrade.ViewModels
+﻿using PoeEye.PoeTrade.Common;
+
+namespace PoeEye.PoeTrade.ViewModels
 {
     using System;
     using System.Collections.Generic;

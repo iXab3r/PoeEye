@@ -1,4 +1,4 @@
-namespace PoeEye.PoeTrade
+namespace PoeEye.PoeTrade.Common
 {
     internal enum PoeItemVerificationState
     {

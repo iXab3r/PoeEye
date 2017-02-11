@@ -1,40 +1,28 @@
-﻿using PoeChatWheel.ViewModels;
+﻿using System;
+using System.Linq;
+using System.Reactive;
+using System.Reactive.Concurrency;
+using System.Reactive.Linq;
+using System.Reactive.Subjects;
+using System.Reflection;
+using System.Windows.Input;
+using Guards;
+using JetBrains.Annotations;
+using Microsoft.Practices.Unity;
+using PoeEye.MetroModels;
+using PoeEye.PoeTrade.Models;
+using PoeEye.PoeTrade.Updater;
+using PoeEye.PoeTrade.ViewModels;
+using PoeShared;
 using PoeShared.Modularity;
+using PoeShared.PoeTrade;
+using PoeShared.Prism;
+using PoeShared.Scaffolding;
+using ReactiveUI;
 using PoeEyeMainConfig = PoeEye.Config.PoeEyeMainConfig;
 
-namespace PoeEye.PoeTrade.ViewModels
+namespace PoeEye.PoeTrade.Shell.ViewModels
 {
-    using System;
-    using System.Linq;
-    using System.Reactive;
-    using System.Reactive.Concurrency;
-    using System.Reactive.Linq;
-    using System.Reactive.Subjects;
-    using System.Reflection;
-    using System.Windows.Input;
-
-    using Config;
-
-    using Guards;
-
-    using JetBrains.Annotations;
-
-    using MetroModels;
-
-    using Microsoft.Practices.Unity;
-
-    using Models;
-
-    using PoeEye.Prism;
-
-    using PoeShared;
-    using PoeShared.PoeTrade;
-    using PoeShared.Prism;
-    using PoeShared.Scaffolding;
-
-    using ReactiveUI;
-
-    using Utilities;
     using IPoeEyeMainConfigProvider = IConfigProvider<PoeEyeMainConfig>;
 
     internal sealed class MainWindowViewModel : DisposableReactiveObject, IMainWindowViewModel
@@ -174,6 +162,8 @@ namespace PoeEye.PoeTrade.ViewModels
             get { return selectedTab; }
             set { this.RaiseAndSetIfChanged(ref selectedTab, value); }
         }
+
+        public IReactiveList<IPoeFlyoutViewModel> Flyouts { get; } = new ReactiveList<IPoeFlyoutViewModel>();
 
         public override void Dispose()
         {
