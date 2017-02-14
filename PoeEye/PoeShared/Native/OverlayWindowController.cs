@@ -1,4 +1,5 @@
 using System;
+using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
@@ -50,8 +51,23 @@ namespace PoeShared.Native
             var application = Application.Current;
             if (application != null)
             {
-                Observable
-                        .FromEventPattern<ExitEventHandler, ExitEventArgs>(h => application.Exit += h, h => application.Exit -= h)
+                var applicationExit = Observable.FromEventPattern<ExitEventHandler, ExitEventArgs>(
+                        h => application.Exit += h,
+                        h => application.Exit -= h)
+                    .ToUnit();
+
+                var mainWindow = application.MainWindow;
+                var mainWindowClosed = mainWindow == null
+                    ? Observable.Never<Unit>()
+                    : Observable.FromEventPattern<EventHandler, EventArgs>(
+                        h => mainWindow.Closed += h,
+                        h => mainWindow.Closed -= h)
+                    .ToUnit();
+
+                Observable.Merge(
+                            mainWindowClosed,
+                            applicationExit
+                        )
                         .Subscribe(overlayWindow.Close)
                         .AddTo(Anchors);
             }

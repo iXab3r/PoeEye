@@ -59,7 +59,9 @@ namespace PoeEye.Config
 
             config.Items
                 .ToList()
-                .ForEach(x => loadedConfigs[x.ConfigTypeName] = x.Content);
+                .Select(x => x.Content)
+                .Select(ValidateConfigVersion)
+                .ForEach(x => loadedConfigs[x.GetType().FullName] = x);
 
             configHasChanged.OnNext(Unit.Default);
         }
@@ -70,6 +72,26 @@ namespace PoeEye.Config
             loadedConfigs.Values.Select(x => new PoeEyeConfigMetadata(x)).ToList().ForEach(x => config.Add(x));
 
             SaveInternal(config);
+        }
+
+        private IPoeEyeConfig ValidateConfigVersion(IPoeEyeConfig loadedConfig)
+        {
+            var versionedLoadedConfig = loadedConfig as IPoeEyeConfigVersioned;
+            if (versionedLoadedConfig == null)
+            {
+                return loadedConfig;
+            }
+
+            var configTemplate = (IPoeEyeConfigVersioned)loadedConfigs.GetOrAdd(
+                loadedConfig.GetType().FullName, 
+                (key) => (IPoeEyeConfigVersioned)Activator.CreateInstance(loadedConfig.GetType()));
+            if (configTemplate.Version != versionedLoadedConfig.Version)
+            {
+                Log.Instance.Debug($"[PoeEyeConfigProviderFromFile.ValidateConfigVersion] Config version mismatch (expected: {configTemplate.Version}, got: {versionedLoadedConfig.Version})");
+                Log.Instance.Debug($"[PoeEyeConfigProviderFromFile.ValidateConfigVersion] \nLoaded config:\n{loadedConfig.DumpToText()}\n\nTemplate config:\n{configTemplate.DumpToText()}");
+                return configTemplate;
+            }
+            return loadedConfig;
         }
 
         public TConfig GetActualConfig<TConfig>() where TConfig : IPoeEyeConfig, new()
