@@ -1,3 +1,4 @@
+using PoeEye.PoeTrade.Common;
 using PoeShared.Common;
 
 namespace PoeEye.PoeTrade.ViewModels

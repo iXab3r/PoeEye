@@ -1,8 +1,8 @@
-﻿namespace PoeEye.PoeTrade.Views
-{
-    using System;
-    using System.Windows;
+﻿using System;
+using System.Windows;
 
+namespace PoeEye.PoeTrade.Shell.Views
+{
     /// <summary>
     ///     Interaction logic for MainWindow.xaml
     /// </summary>

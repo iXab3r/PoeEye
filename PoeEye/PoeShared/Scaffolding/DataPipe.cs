@@ -1,15 +1,22 @@
+using System.Windows;
+
 namespace PoeShared.Scaffolding
 {
-    using System.Windows;
-
     public class DataPipe : Freezable
     {
-        protected override Freezable CreateInstanceCore()
-        {
-            return new DataPipe();
-        }
+        public static readonly DependencyProperty SourceProperty =
+            DependencyProperty.Register(
+                "Source",
+                typeof(object),
+                typeof(DataPipe),
+                new FrameworkPropertyMetadata(null, OnSourceChanged));
 
-        #region Source (DependencyProperty)
+        public static readonly DependencyProperty TargetProperty =
+            DependencyProperty.Register(
+                "Target",
+                typeof(object),
+                typeof(DataPipe),
+                new FrameworkPropertyMetadata(null));
 
         public object Source
         {
@@ -17,12 +24,16 @@ namespace PoeShared.Scaffolding
             set { SetValue(SourceProperty, value); }
         }
 
-        public static readonly DependencyProperty SourceProperty =
-            DependencyProperty.Register(
-                "Source",
-                typeof (object),
-                typeof (DataPipe),
-                new FrameworkPropertyMetadata(null, OnSourceChanged));
+        public object Target
+        {
+            get { return GetValue(TargetProperty); }
+            set { SetValue(TargetProperty, value); }
+        }
+
+        protected override Freezable CreateInstanceCore()
+        {
+            return new DataPipe();
+        }
 
         private static void OnSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -33,24 +44,5 @@ namespace PoeShared.Scaffolding
         {
             Target = e.NewValue;
         }
-
-        #endregion
-
-        #region Target (DependencyProperty)
-
-        public object Target
-        {
-            get { return GetValue(TargetProperty); }
-            set { SetValue(TargetProperty, value); }
-        }
-
-        public static readonly DependencyProperty TargetProperty =
-            DependencyProperty.Register(
-                "Target",
-                typeof (object),
-                typeof (DataPipe),
-                new FrameworkPropertyMetadata(null));
-
-        #endregion
     }
 }

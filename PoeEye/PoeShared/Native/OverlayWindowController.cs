@@ -1,4 +1,5 @@
 using System;
+using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
@@ -50,8 +51,23 @@ namespace PoeShared.Native
             var application = Application.Current;
             if (application != null)
             {
-                Observable
-                        .FromEventPattern<ExitEventHandler, ExitEventArgs>(h => application.Exit += h, h => application.Exit -= h)
+                var applicationExit = Observable.FromEventPattern<ExitEventHandler, ExitEventArgs>(
+                        h => application.Exit += h,
+                        h => application.Exit -= h)
+                    .ToUnit();
+
+                var mainWindow = application.MainWindow;
+                var mainWindowClosed = mainWindow == null
+                    ? Observable.Never<Unit>()
+                    : Observable.FromEventPattern<EventHandler, EventArgs>(
+                        h => mainWindow.Closed += h,
+                        h => mainWindow.Closed -= h)
+                    .ToUnit();
+
+                Observable.Merge(
+                            mainWindowClosed,
+                            applicationExit
+                        )
                         .Subscribe(overlayWindow.Close)
                         .AddTo(Anchors);
             }
@@ -81,7 +97,7 @@ namespace PoeShared.Native
                     h => keyboardMouseEvents.KeyDown -= h)
                 .Select(x => x.EventArgs)
                 .Where(x => overlay.IsVisible)
-                .Where(x => new KeyGesture(Key.F9, ModifierKeys.Control | ModifierKeys.Shift).MatchesHotkey(x))
+                .Where(x => new KeyGesture(Key.F9, ModifierKeys.Control | ModifierKeys.Shift | ModifierKeys.Alt).MatchesHotkey(x))
                 .Do(x => x.Handled = true)
                 .Subscribe(() => overlay.ShowWireframes = !overlay.ShowWireframes)
                 .AddTo(Anchors);

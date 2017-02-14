@@ -6,6 +6,7 @@ using System.Windows.Input;
 using Guards;
 using JetBrains.Annotations;
 using Microsoft.Practices.Unity;
+using PoeEye.PoeTrade.Common;
 using PoeEye.PoeTrade.Models;
 using PoeEye.Prism;
 using PoeShared.Prism;

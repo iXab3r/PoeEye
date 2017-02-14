@@ -40,10 +40,22 @@ namespace PoeShared.Scaffolding
             return Enum.GetValues(typeof(Key))
                 .OfType<Key>()
                 .Select(TryToCreateKeyGesture)
-                .Where(x => x != null)
-                .Select(x => x.Key == Key.None ? "None" : keyGestureConverter.ConvertToInvariantString(x))
                 .Distinct()
+                .Select(x => x.Key == Key.None ? "None" : keyGestureConverter.ConvertToInvariantString(x))
+                .OrderBy(x => x)
                 .ToArray();
+        }
+
+        public static KeyGesture SafeCreateGesture(string hotkeyString)
+        {
+            try
+            {
+                return new KeyGestureConverter().ConvertFromInvariantString(hotkeyString) as KeyGesture;
+            }
+            catch (Exception)
+            {
+                return new KeyGesture(Key.None);
+            }
         }
 
         private static KeyGesture TryToCreateKeyGesture(Key key)
@@ -54,7 +66,7 @@ namespace PoeShared.Scaffolding
             }
             catch (Exception)
             {
-                return null;
+                return new KeyGesture(Key.None);
             }
         }
     }

@@ -1,4 +1,5 @@
-﻿using PoeShared.Modularity;
+﻿using PoeEye.PoeTrade.Shell.ViewModels;
+using PoeShared.Modularity;
 using PoeShared.Native;
 using PoeShared.Prism;
 using PoeShared.UI.Models;

@@ -9,16 +9,17 @@ A Regal Death
 A Valuable Combination
 A Whispered Prayer
 Abandoned Wealth
+Abberath's Hooves Goathide Boots
 Abberath's Horn Goat's Horn
 Abnormal Effulgence
 Abyssal Cry
 Abyssus Ezomyte Burgonet
 Acton's Nightmare Overgrown Shrine Map
-Added Chaos Damage
-Added Cold Damage
-Added Fire Damage
-Added Lightning Damage
-Additional Accuracy
+Added Chaos Damage Support
+Added Cold Damage Support
+Added Fire Damage Support
+Added Lightning Damage Support
+Additional Accuracy Support
 Advancing Fortress Gut Ripper
 Aegis Aurora Champion Kite Shield
 Against the Tide
@@ -53,6 +54,7 @@ Animate Guardian
 Animate Weapon
 Apep's Rage Opal Wand
 Apparitions Viridian Jewel
+Arakaali's Fang Fiend Dagger
 Araku Tiki Coral Amulet
 Arc
 Arctic Armour
@@ -95,23 +97,25 @@ Beyond Sight I
 Beyond Sight II
 Beyond Sight III
 Beyond Sight IV
-Beyond Sight V
 Bino's Kitchen Knife Slaughter Knife
 Birth of the Three
 Bitterdream Shadow Sceptre
 Black Sun Crest Lacquered Helmet
+Blackgleam Cured Quiver
 Blackgleam Fire Arrow Quiver
 Blackheart Iron Ring
+Blade Flurry
 Blade Vortex
 Bladefall
-Blasphemy
+Blasphemy Support
 Blast Rain
+Blight
 Blightwell Clutching Talisman
-Blind
+Blind Support
 Blind Venture
 Blink Arrow
-Block Chance Reduction
-Blood Magic
+Block Chance Reduction Support
+Blood Magic Support
 Blood Rage
 Blood Sacrifice Crimson Jewel
 Blood in the Eyes
@@ -120,7 +124,7 @@ Blood of the Betrayed
 Blood of the Karui Sanctified Life Flask
 Bloodboil Coral Ring
 Bloodgrip Coral Amulet
-Bloodlust
+Bloodlust Support
 Bloodplay Stiletto
 Bloodseeker Hellion's Paw
 Bone Offering
@@ -128,6 +132,7 @@ Bones of Ullr Silk Slippers
 Boundless Realms
 Bountiful Traps
 Bowyer's Dream
+Brain Rattler Meatgrinder
 Bramblejack Plate Vest
 Brawn Crimson Jewel
 Breath of the Council Carnal Sceptre
@@ -144,26 +149,26 @@ Brothers in Arms
 Brute Force Solution Cobalt Jewel
 Brutus' Lead Sprinkler Ritual Sceptre
 Burning Arrow
-"Caer Blaidd
- Wolfpack's Den Underground Sea Map"
+Caer Blaidd Wolfpack's Den Underground River Map
 Call of the Brotherhood Two-Stone Ring
+Call to the First Ones
 Callinellus Malleus Auric Mace
 Cameria's Maul Gavel
-Cannibalistic Habits Viridian Jewel
 Carcass Jack Varnished Coat
 Careful Planning Viridian Jewel
 Carnage Heart Onyx Amulet
 Cartographer's Delight
-Cast On Critical Strike
-Cast on Death
-Cast on Melee Kill
-Cast when Damage Taken
-Cast when Stunned
+Cast On Critical Strike Support
+Cast on Death Support
+Cast on Melee Kill Support
+Cast when Damage Taken Support
+Cast when Stunned Support
+Cast while Channelling Support
 Caustic Arrow
-Chain
+Chain Support
 Chalice of Horrors War Buckler
-Chance to Flee
-Chance to Ignite
+Chance to Flee Support
+Chance to Ignite Support
 Chaotic Disposition
 Cheap Construction Viridian Jewel
 Chernobog's Pillar Ebony Tower Shield
@@ -173,6 +178,7 @@ Chin Sol Assassin Bow
 Chitus' Apex Necromancer Circlet
 Chitus' Needle Elegant Foil
 Chober Chaber Great Mallet
+Choir of the Storm Lapis Amulet
 Clarity
 Clayshaper Rock Breaker
 Cleanser of Sins
@@ -181,47 +187,43 @@ Cleave
 Cloak of Defiance Lacquered Garb
 Cloak of Flame Scholar's Robe
 Cloak of Tawm'r Isley Savant's Robe
-Cluster Traps
+Cluster Traps Support
 Coated Shrapnel Crimson Jewel
-Coated Weapons Viridian Jewel
-Cold Penetration
+Cold Penetration Support
 Cold Snap
 Cold Steel Viridian Jewel
-Cold to Fire
+Cold to Fire Support
 Combustibles Crimson Jewel
-Concentrated Effect
+Concentrated Effect Support
 Conductivity
 Conqueror's Efficiency Crimson Jewel
 Conqueror's Longevity Viridian Jewel
 Conqueror's Potency Cobalt Jewel
 Contagion
-Controlled Destruction
-Controlled Energy Cobalt Jewel
+Controlled Destruction Support
 Conversion Trap
 Convocation
 Corrupted Energy Cobalt Jewel
 Coruscating Elixir Ruby Flask
+Cospri's Malice Jewelled Foil
 Cospri's Will Assassin's Garb
 Coveted Possession
 Cragfall Serrated Arrow Quiver
 Craghead Serrated Arrow Quiver
-Crash Test
 Crest of Perandus Pine Buckler
 Crown of Eyes Hubris Circlet
 Crown of Thorns Vine Circlet
 Crown of the Pale King Regicide Mask
 Crushing Squall
-Culling Strike
-Curse On Hit
+Culling Strike Support
+Curse On Hit Support
 Custodians of Silence
 Cybil's Paw Thresher Claw
 Cyclone
-Dancing Dervish Reaver Sword
 Daresso's Courage Baroque Round Shield
 Daresso's Defiance Full Dragonscale
 Daresso's Passion Estoc
 Daresso's Salute Citrine Amulet
-Dark Thoughts Cobalt Jewel
 Darkray Vectors Dragonscale Boots
 Darkscorn Assassin Bow
 Day of Sacrifice I
@@ -245,26 +247,25 @@ Death's Oath Astral Plate
 Death's Opus Death Bow
 Decoy Totem
 Deerstalker Deerskin Boots
-Defiled in the Scepter
+Defiled in the Sceptre
 Deidbell Gilded Sallet
 Deidbellow Gilded Sallet
-Delay Test
-Delay and Crash Test
 Demigod's Beacon Golden Flame
 Demigod's Bounty Golden Obi
 Demigod's Dominance Golden Mantle
 Demigod's Eye Golden Hoop
-Demigod's Presence Gold Amulet
 Demigod's Stride Golden Caligae
 Demigod's Touch Golden Bracers
 Demigod's Triumph Golden Wreath
 Desecrate
+Deshret's Vise Steel Gauntlets
 Destined to Crumble
 Determination
 Detonate Dead
 Detonate Mines
 Devoto's Devotion Nightmare Bascinet
 Devouring Totem
+Dialla's Subjugation
 Discharge
 Discipline
 Divinarius Imperial Skean
@@ -288,15 +289,17 @@ Dream Fragments Sapphire Ring
 Dreamfeather Eternal Sword
 Drillneck Penetrating Arrow Quiver
 Dual Strike
+Duskdawn Maelström Staff
 Dusktoe Ironscale Boots
+Dusktoe Leatherscale Boots
 Dyadian Dawn Heavy Belt
 Dyadus Infernal Axe
 Dying Anguish
 Dying Breath Coiled Staff
 Dying Cry
+Dying Sun Ruby Flask
 Earth Drinker
 Earthquake
-Eber's Key
 Echoes of Lost Love
 Echoes of Mutation
 Echoes of Witchcraft
@@ -304,9 +307,9 @@ Eclipse Solaris Crystal Wand
 Edge of Madness Etched Greatsword
 Efficient Training Crimson Jewel
 Eldritch Knowledge Cobalt Jewel
-Elemental Focus
+Elemental Focus Support
 Elemental Hit
-Elemental Proliferation
+Elemental Proliferation Support
 Elemental Weakness
 Emberwake Ruby Ring
 Emperor of Purity
@@ -316,26 +319,29 @@ Emperor's Mastery Prismatic Jewel
 Emperor's Might Crimson Jewel
 Emperor's Wit Cobalt Jewel
 Empire's Grasp Goliath Gauntlets
-Empower
+Empower Support
 Ending the Torment
-Endurance Charge on Melee Stun
+Endurance Charge on Melee Stun Support
 Enduring Cry
 Energised Armour Crimson Jewel
 Energy From Within Cobalt Jewel
 Enfeeble
-Enhance
-Enlighten
-Enter the Maelstr\u00f6m
+Enhance Support
+Enlighten Support
 Ephemeral Edge Dusk Blade
 Erased from Memory
 Erasmus' Gift
+Esh's Mirror Thorium Spirit Shield
+Esh's Visage Vaal Spirit Shield
 Essence Drain
 Essence Worm Unset Ring
 Essentia Sanguis Eye Gouger
 Ethereal Knives
+Ewar's Mirage Antique Rapier
 Explosive Arrow
 Extractor Mentis Agate Amulet
 Eye of Chayula Onyx Amulet
+Eye of Innocence Citrine Amulet
 Eyes of the Greatwolf Greatwolf Talisman
 Ezomyte Hold Iron Hat
 Ezomyte Peak Iron Hat
@@ -343,9 +349,9 @@ Facebreaker Strapped Mitts
 Fairgraves' Tricorne Tricorne
 Fallow At Last
 Faminebind Rustic Sash
-Faster Attacks
-Faster Casting
-Faster Projectiles
+Faster Attacks Support
+Faster Casting Support
+Faster Projectiles Support
 Fated Connections
 Fear's Wide Reach
 Feastbind Rustic Sash
@@ -355,12 +361,12 @@ Fertile Mind Cobalt Jewel
 Fevered Mind Cobalt Jewel
 Fidelitas' Spike Jagged Foil
 Fire Nova Mine
-Fire Penetration
+Fire Penetration Support
 Fire Trap
 Fire and Brimstone
 Fire and Ice
 Fire from the Sky
-Fire, Wood and Stone
+Fire Wood and Stone
 Fireball
 Fireborn Crimson Jewel
 Firestorm
@@ -377,9 +383,9 @@ Flicker Strike
 Fluid Motion Viridian Jewel
 Forbidden Taste Quartz Flask
 Forceful Exorcism
-Fork
+Fork Support
 Fortified Legion Cobalt Jewel
-Fortify
+Fortify Support
 Foxshade Wild Leather
 Fragile Bloom Crimson Jewel
 Fragility Crimson Jewel
@@ -396,7 +402,7 @@ Frostbolt
 Frostbreath Ornate Mace
 Gang's Momentum Legion Boots
 Gemcutter's Promise
-Generosity
+Generosity Support
 Geofri's Baptism Brass Maul
 Geofri's Crest Great Crown
 Geofri's Sanctuary Elegant Ringmail
@@ -419,13 +425,17 @@ Grand Spectrum Crimson Jewel
 Grand Spectrum Viridian Jewel
 Grave Knowledge
 Great Old One's Ward Corrugated Buckler
-Greater Multiple Projectiles
+Greater Multiple Projectiles Support
 Greed's Embrace Golden Plate
 Grip of the Council Arcanist Gloves
 Ground Slam
 Growing Agony Viridian Jewel
 Hair Trigger Viridian Jewel
 Hall of Grandmasters Promenade Map
+Hallowed Ground Graveyard Map
+Hallowed Ground Unset Ring
+Hand of Thought and Motion Blinder
+Hand of Wisdom and Action Imperial Claw
 Haste
 Hatred
 Headhunter Leather Belt
@@ -437,6 +447,7 @@ Heatshiver Leather Hood
 Heavy Blows
 Heavy Strike
 Hegemony's Era Judgement Staff
+Hellbringer Conjurer Gloves
 Her Mask
 Herald of Ash
 Herald of Ice
@@ -466,10 +477,10 @@ Hunter's Lesson
 Hunter's Resolve
 Hunter's Reward
 Hyaon's Fury Legion Sword
-Hypothermia
+Hypothermia Support
 Hyrri's Bite Sharktooth Arrow Quiver
 Hyrri's Ire Zodiac Leather
-Ice Bite
+Ice Bite Support
 Ice Crash
 Ice Nova
 Ice Shot
@@ -483,30 +494,29 @@ Immortal Flesh Leather Belt
 In the Grasp of Corruption
 Incandescent Heart Saintly Chainmail
 Incinerate
-Increased Area of Effect
-Increased Burning Damage
-Increased Critical Damage
-Increased Critical Strikes
-Increased Duration
+Increased Area of Effect Support
+Increased Burning Damage Support
+Increased Critical Damage Support
+Increased Critical Strikes Support
+Increased Duration Support
 Inertia Crimson Jewel
 Infernal Blow
+Infernal Mantle Occultist's Vestment
 Infernal Mantle Widowsilk Robe
 Infractem Decimation Bow
-Innervate
+Innervate Support
 Innsbury Edge Elder Sword
 Inspired Learning Crimson Jewel
 Intuitive Leap Viridian Jewel
-Inya's Key
 Iron Commander Death Bow
-Iron Grip
-Iron Will
-Item Quantity
-Item Rarity
+Iron Grip Support
+Iron Will Support
+Item Quantity Support
+Item Rarity Support
 Izaro's Dilemma Imperial Claw
 Izaro's Turmoil Crimson Jewel
 Jack in the Box
-"Jack
- the Axe Vaal Hatchet"
+Jack the Axe Vaal Hatchet
 Jaws of Agony Supreme Spiked Shield
 Jorrhast's Blacksteel Steelhead
 Kalandra's Craft
@@ -525,7 +535,10 @@ Kinetic Blast
 Kingmaker Despot Axe
 Kingsguard Conquest Chainmail
 Kintsugi Exquisite Leather
-Knockback
+Kitava's Feast Void Axe
+Kitava's Thirst Zealot Helmet
+Knockback Support
+Kondo's Pride Ezomyte Blade
 Kongming's Stratagem Ivory Spirit Shield
 Kongor's Undying Rage Terror Maul
 Lacerate
@@ -539,21 +552,24 @@ Lavianga's Wisdom War Hammer
 Le Heup of All Iron Ring
 Leap Slam
 Leer Cast Festival Mask
-Less Duration
-Lesser Multiple Projectiles
-Life Gain on Hit
-Life Leech
+Less Duration Support
+Lesser Multiple Projectiles Support
+Life Gain on Hit Support
+Life Leech Support
 Lifesprig Driftwood Wand
+Light and Truth
+Light of Lunaris Jingling Spirit Shield
 Lightbane Raiment Ornate Ringmail
 Lightning Arrow
 Lightning Coil Desert Brigandine
 Lightning Falls
-Lightning Penetration
+Lightning Penetration Support
 Lightning Strike
 Lightning Tendrils
 Lightning Trap
 Lightning Warp
 Limbsplit Woodsplitter
+Lingering Remnants
 Lion's Roar Granite Flask
 Lioneye's Fall Viridian Jewel
 Lioneye's Glare Imperial Bow
@@ -564,23 +580,24 @@ Living Fires
 Lochtonial Caress Iron Gauntlets
 Lori's Lantern Prismatic Ring
 Lost Worlds
-Lost in the Pages
 Loyalty
 Lucky Connections
+Lucky Deck
+Lycosidae Rawhide Tower Shield
 Lysah's Respite
-Maelstr\u00f6m of Chaos Mountain Ledge Map
+Maelström of Chaos Atoll Map
 Magma Orb
 Malachai's Artifice Unset Ring
 Malachai's Loop Harmonic Spirit Shield
 Malachai's Simula Iron Mask
+Malachai's Vision Praetor Crown
 Malicious Intent Cobalt Jewel
 Maligaro's Lens Compound Spiked Shield
 Maligaro's Restraint Chain Belt
 Maligaro's Virtuosity Deerskin Gloves
 Maloney's Nightfall Blunt Arrow Quiver
-Mana Leech
+Mana Leech Support
 Mantra of Flames Crimson Jewel
-Mantra of Force Crimson Jewel
 Mao Kun Reef Map
 Mark of the Doubting Knight Platinum Kris
 Marohi Erqi Karui Maul
@@ -588,26 +605,27 @@ Martial Artistry Crimson Jewel
 Martyr's Crown Vine Circlet
 Marylene's Fallacy Lapis Amulet
 Matua Tupuna Tarnished Spirit Shield
+Mawr Blaidd
 Meginord's Girdle Heavy Belt
 Meginord's Vise Steel Gauntlets
-Melee Damage on Full Life
-Melee Physical Damage
-Melee Splash
+Melee Damage on Full Life Support
+Melee Physical Damage Support
+Melee Splash Support
 Merciless Armament
 Midnight Bargain Engraved Wand
 Might in All Forms Crimson Jewel
 Mightflay Flaying Knife
 Mind of the Council Harlequin Mask
 Mindspiral Aventail Helmet
-Minefield
+Minefield Support
 Ming's Heart Amethyst Ring
-Minion Damage
-Minion Life
-Minion Speed
-Minion and Totem Elemental Resistance
+Minion Damage Support
+Minion Life Support
+Minion Speed Support
+Minion and Totem Elemental Resistance Support
 Mirror Arrow
-Miser of Misery Viridian Jewel
-Mj\u00f6lner Gavel
+Mitts
+Mjölner Gavel
 Mokou's Embrace Ruby Ring
 Molten Shell
 Molten Strike
@@ -615,15 +633,11 @@ Mon'tregul's Grasp Void Sceptre
 Monstrous Treasure
 Moonbender's Wing Tomahawk
 Moonsorrow Imbued Wand
-Mortal Grief
-Mortal Hope
-Mortal Ignorance
-Mortal Rage
 Mortem Morsu Fright Claw
 Mouth of Horrors
-Multiple Traps
-Multistrike
-Mutated Growth Crimson Jewel
+Multiple Traps Support
+Multistrike Support
+Mutated Growth Cobalt Jewel
 Mutewind Pennant Enameled Buckler
 Mutewind Seal Unset Ring
 Mutewind Whispersteps Serpentscale Boots
@@ -632,6 +646,7 @@ Natural Hierarchy Rotfeather Talisman
 Nature's Resilience
 Nemesis of Greed
 Ngamahu Tiki Coral Amulet
+Ngamahu's Flame Abyssal Axe
 Ngamahu's Sign Ruby Ring
 Night's Hold Black Maw Talisman
 Nomic's Storm Strapped Boots
@@ -642,8 +657,9 @@ Nuro's Harp Harbinger Bow
 Nycta's Lantern Crystal Sceptre
 Oba's Cursed Trove Torture Chamber Map
 Obliteration Demon's Horn
-Offering to the Goddess
-Olmec's Sanctum Catacomb Map
+Obscurantis Lion Pelt
+Olmec's Sanctum Catacombs Map
+Olmec's Sanctum Maze Map
 Ondar's Clasp Wrapped Mitts
 Orb of Storms
 Ornament of the East Gut Ripper
@@ -653,10 +669,11 @@ Pacifism Viridian Jewel
 Path of Betrayal
 Perandus Blazon Cloth Belt
 Perandus Signet Paua Ring
+Perseverance Vanguard Belt
 Phase Run
-Physical Projectile Attack Damage
-Physical to Lightning
-Pierce
+Physical Projectile Attack Damage Support
+Physical to Lightning Support
+Pierce Support
 Pillar of the Caged God Long Staff
 Piscator's Vigil Tornado Wand
 Pitch Darkness Viridian Jewel
@@ -666,21 +683,25 @@ Pleasure and Pain
 Pledge of Hands Judgement Staff
 Poacher's Aim Viridian Jewel
 Poacher's Mark
-Point Blank
-Poison
+Point Blank Support
+Poison Support
 Pools of Wealth
 Poorjoy's Asylum Temple Map
 Portal
 Possessed Foe
-Power Charge On Critical
+Power Charge On Critical Support
 Power Magnified
 Power Siphon
 Powerlessness Cobalt Jewel
+Praxis Paua Ring
+Presence of Chayula Onyx Amulet
 Pride Before the Fall
+Primordial Eminence Viridian Jewel
+Primordial Harmony Cobalt Jewel
+Primordial Might Crimson Jewel
 Prism Guardian Archon Kite Shield
 Prismatic Eclipse Twilight Blade
 Prismweave Rustic Sash
-Projected Force Viridian Jewel
 Projectile Weakness
 Prosperity
 Pugilist Viridian Jewel
@@ -696,6 +717,7 @@ Queen of the Forest Destiny Leather
 Queen's Decree Ornate Sword
 Queen's Escape Ornate Sword
 Quill Rain Short Bow
+Rain Tempter
 Rain of Arrows
 Rain of Chaos
 Rain of Splinters Crimson Jewel
@@ -703,13 +725,14 @@ Rainbowstride Conjurer Boots
 Raise Spectre
 Raise Zombie
 Rallying Cry
-Ranged Attack Totem
-Rapid Decay
+Ranged Attack Totem Support
+Rapid Decay Support
 Rapid Expansion Crimson Jewel
 Rashkaldor's Patience Jade Amulet
 Rat's Nest Ursine Pelt
 Rathpith Globe Titanium Spirit Shield
 Rats
+Razor of the Seventh Sun Midnight Blade
 Reach of the Council Spine Bow
 Realm Ender Iron Staff
 Realmshaper Iron Staff
@@ -724,12 +747,12 @@ Redbeak Rusted Sword
 Redblade Band Unset Ring
 Redblade Banner Painted Tower Shield
 Redblade Tramplers Ancient Greaves
-Reduced Mana
+Reduced Mana Support
 Reefbane Fishing Rod
 Reforged Bonds
 Rejuvenation Totem
 Relentless Fury Decorative Axe
-Remote Mine
+Remote Mine Support
 Repentance Crusader Gloves
 Resistant to Change
 Reverberation Rod Spiraled Wand
@@ -751,28 +774,25 @@ Rotgut Quicksilver Flask
 Roth's Legacy
 Roth's Reach Recurve Bow
 Rumi's Concoction Granite Flask
-SHOULD NOT APPEAR
-Sacrifice at Dawn
-Sacrifice at Dusk
-Sacrifice at Midnight
-Sacrifice at Noon
 Sacrificial Harvest Viridian Jewel
 Sadima's Touch Wool Gloves
 Saemus' Gift Spike-Point Arrow Quiver
 Saffell's Frame Branded Kite Shield
-Sanctum of Stone
 Scaeva Gladius
 Scholar of the Seas
 Scold's Bridle Mind Cage
+Scorching Ray
 Searing Bond
 Self-Flagellation Viridian Jewel
-Selfless Leadership Cobalt Jewel
 Sentari's Answer Brass Spirit Shield
 Seven-League Step Rawhide Boots
 Severed Limbs
+Severed in Sleep Cutlass
 Shackles of the Wretched Chain Gloves
+Shade of Solaris Sage Wand
 Shadows and Dust Clasped Mitts
 Shaper's Seed Agate Amulet
+Shaper's Touch Crusader Gloves
 Shard of Fate
 Shattered Chains Crimson Jewel
 Shavronne's Gambit Scholar Boots
@@ -790,17 +810,22 @@ Siege Ballista
 Silverbough Crude Bow
 Silverbranch Crude Bow
 Sin Trek Stealth Boots
+Sin's Rebirth Stibnite Flask
 Singularity Platinum Sceptre
 Sire of Shards Serpentine Staff
+Skin of the Lords Simple Robe
+Skin of the Loyal Simple Robe
 Skirmish Two-Point Arrow Quiver
 Skullhead Secutor Helm
 Skyforth Sorcerer Boots
 Slitherpinch Bronzescale Gauntlets
-Slower Projectiles
+Slivertongue Harbinger Bow
+Slower Projectiles Support
 Smoke Mine
 Smothering Tendrils
 Snakebite Assassin's Mitts
-Soil, Worms and Blood
+Snakepit Sapphire Ring
+Soil Worms and Blood
 Solaris Lorica Copper Plate
 Song of the Sirens Fishing Rod
 Soul Mantle Spidersilk Robe
@@ -809,10 +834,9 @@ Soul Taker Siege Axe
 Soulthirst Cloth Belt
 Southbound Soldier Gloves
 Spark
-Specialised Viridian Jewel
 Spectral Throw
-Spell Echo
-Spell Totem
+Spell Echo Support
+Spell Totem Support
 Spine of the First Claimant Iron Sceptre
 Spire of Stone Crimson Jewel
 Spirit Guards Viridian Jewel
@@ -821,12 +845,12 @@ Spirited Response Cobalt Jewel
 Split Arrow
 Springleaf Plank Kite Shield
 Star of Wraeclast Ruby Amulet
+Starforge Infernal Sword
 Starkonja's Head Silken Hood
 Static Electricity Viridian Jewel
 Static Strike
 Steel Spirit Viridian Jewel
 Steppan Eard Sorcerer Boots
-Stimulated Growth Cobalt Jewel
 Stone of Lazhwar Lapis Amulet
 Storm Call
 Storm Cloud Long Bow
@@ -834,8 +858,7 @@ Storm Prison Carved Wand
 Storm on the Horizon
 Storm on the Shore
 Strong as a Bull
-Stun
-Sturdy Growth Crimson Jewel
+Stun Support
 Summon Chaos Golem
 Summon Flame Golem
 Summon Ice Golem
@@ -847,14 +870,13 @@ Sunblast Cloth Belt
 Sundance Clasped Boots
 Sunder
 Surgebinders Dragonscale Gauntlets
-Surplus Cobalt Jewel
 Survival Instincts Viridian Jewel
 Survival Secrets Cobalt Jewel
 Survival Skills Crimson Jewel
 Sweep
 Tabula Rasa Simple Robe
 Talisman of the Victor Jet Amulet
-Taryn's Shiver Maelstr\u00f6m Staff
+Taryn's Shiver Maelström Staff
 Tasalio's Sign Sapphire Ring
 Taste of Hate Sapphire Flask
 Tear of Purity Lapis Amulet
@@ -871,6 +893,8 @@ The Alchemist
 The Ambitious Bandit I
 The Ambitious Bandit II
 The Ambitious Bandit III
+The Anima Stone Prismatic Jewel
+The Anticipation Ezomyte Tower Shield
 The Anvil Amber Amulet
 The Apex Predator
 The Arena Champion
@@ -883,23 +907,23 @@ The Beast Fur Shawl Vaal Regalia
 The Beautiful Guide
 The Beginning and the End
 The Betrayal
-The Black Stone I
-The Black Stone II
-The Black Stone III
-The Black Stone IV
 The Blacksmith
-The Blessing
 The Blood Dance Sharkskin Boots
 The Blood Reaper Headsman Axe
 The Blood Thorn Gnarled Branch
 The Bloody Flowers Redux
+The Blue Dream Cobalt Jewel
+The Blue Nightmare Cobalt Jewel
 The Body
 The Bowstring's Music
+The Brass Dome Gladiator Plate
+The Brine Crown Prophet Crown
 The Bringer of Rain Nightmare Bascinet
 The Brittle Emperor
 The Broken Crown Prophet Crown
 The Brothers of Necromancy
 The Brutal Enforcer
+The Calling
 The Carrion Crow
 The Cartographer
 The Cataclysm
@@ -908,6 +932,7 @@ The Cauteriser Woodsplitter
 The Celestial Justicar
 The Chains that Bind
 The Child of Lunaris
+The Coming Storm
 The Conduit
 The Consuming Dark Fiend Dagger
 The Corrupt
@@ -915,12 +940,12 @@ The Covenant Spidersilk Robe
 The Coward's Trial Crypt Map
 The Cursed Choir
 The Cursed King
+The Dancing Dervish Reaver Sword
 The Dapper Prodigy
 The Dark Mage
 The Dark Seer Shadow Sceptre
 The Deep One's Hide Studded Round Shield
 The Demoness
-The Devastator
 The Doctor
 The Doppelganger
 The Dragon
@@ -931,6 +956,7 @@ The Drunken Aristocrat
 The Eagle's Cry
 The Emperor's Trove
 The Encroaching Darkness
+The Endurance
 The Enlightened
 The Ethereal
 The Explorer
@@ -947,9 +973,15 @@ The Flora's Gift
 The Flow of Energy
 The Forgotten Garrison
 The Forgotten Soldiers
+The Formless Flame Siege Helmet
+The Formless Inferno Royal Burgonet
+The Formless Sea
+The Forsaken
+The Fortune Teller's Collection
 The Four Feral Exiles
 The Fox
 The Gambler
+The Garish Power
 The Gemcutter
 The Gentleman
 The Gladiator
@@ -957,8 +989,11 @@ The God of Misfortune
 The Goddess Bound Whalebone Rapier
 The Goddess Scorned Elegant Sword
 The Goddess Unleashed Eternal Sword
+The Green Dream Viridian Jewel
+The Green Nightmare Viridian Jewel
 The Gryphon Jade Hatchet
 The Gull Raven Mask
+The Halcyon Jade Amulet
 The Hardened Armour
 The Harvest Jasper Chopper
 The Harvester
@@ -970,6 +1005,7 @@ The Hungering Swarm
 The Ignomon Gold Amulet
 The Immortal
 The Incantation
+The Infinite Pursuit Goliath Greaves
 The Inoculated
 The Invader
 The Inventor
@@ -997,39 +1033,52 @@ The Misunderstood Queen
 The Mysterious Gift
 The Nest
 The Oak Plank Kite Shield
+The Oath
 The Offering
 The One With All
 The Overflowing Chalice Sulphur Flask
 The Pack Leader
 The Pact
-The Pair
+The Pandemonius Jade Amulet
 The Pariah Unset Ring
+The Penitent
 The Perandus Manor Chateau Map
 The Peregrine Visored Sallet
+The Perfect Form Zodiac Leather
 The Petrified
-The Pirate's Den
 The Plaguemaw I
 The Plaguemaw II
 The Plaguemaw III
 The Plaguemaw IV
 The Plaguemaw V
 The Poet
+The Polymath
+The Porcupine
 The Princess Sabre
 The Prison Guard
 The Prison Key
+The Putrid Cloister Museum Map
 The Queen
 The Queen's Vaults
 The Rabid Rhoa
 The Rat Cage Sharkskin Tunic
+The Red Dream Crimson Jewel
+The Red Nightmare Crimson Jewel
+The Red Trail Titan Greaves
 The Restless Ward Carnal Armour
 The Retch Rustic Sash
 The Risk
 The Road to Power
+The Saint's Treasure
 The Scarred Meadow
+The Scavenger
 The Scholar
+The Scourge Terror Claw
 The Scout
 The Screaming Eagle Jade Hatchet
 The Searing Touch Lathi
+The Searing Touch Long Staff
+The Sephirot
 The Servant's Heart
 The Sharpened Blade
 The Sigil
@@ -1038,11 +1087,14 @@ The Silverwood
 The Singular Spirit
 The Sinner's Stone
 The Siren
+The Snowblind Grace Coronal Leather
 The Snuffed Flame
 The Sorrow of the Divine Sulphur Flask
+The Soul
 The Soulless Beast
+The Spark and the Flame
 The Spoiled Prince
-The Spread of Corruption
+The Standoff
 The Stockkeeper
 The Stormcaller
 The Stormheart Royal Staff
@@ -1050,6 +1102,7 @@ The Summoner
 The Sun
 The Supreme Truth Crystal Sceptre
 The Surgeon
+The Surrender Ezomyte Tower Shield
 The Surveyor
 The Survivalist
 The Sword King's Passion
@@ -1064,6 +1117,7 @@ The Traitor
 The Trembling Earth
 The Trial
 The Twins
+The Tyrant
 The Unbreathing Queen I
 The Unbreathing Queen II
 The Unbreathing Queen III
@@ -1072,14 +1126,19 @@ The Unbreathing Queen V
 The Undead Brutes
 The Undead Storm
 The Union
+The Valkyrie
+The Valley of Steel Boxes
 The Vanguard
 The Vast
 The Vertex Vaal Mask
 The Vigil Crimson Jewel
 The Vinktar Square Courtyard Map
+The Visionary
+The Void
 The Walking Mountain
 The Ward's Ward
 The Warden
+The Warden's Brand Iron Ring
 The Warlord
 The Warmongers I
 The Warmongers II
@@ -1091,8 +1150,12 @@ The Wealthy Exile
 The Web
 The Whispering Ice Vile Staff
 The Wind
+The Wolf
 The Wolf's Shadow
+The Wolven King's Bite
+The Wolverine
 The Wrath
+The Wretched
 The Writhing Jar Hallowed Hybrid Flask
 Thief's Torment Prismatic Ring
 Thirst for Horrors War Buckler
@@ -1100,25 +1163,28 @@ Thousand Ribbons Simple Robe
 Thousand Teeth Temu Vaal Buckler
 Three Faces in the Dark
 Three-step Assault Shagreen Boots
-Through the Mirage
 Thunderfist Murder Mitts
 Thunderous Skies
 Time-Lost Relic
 Timeclasp Moonstone Ring
+Tipua Kaikohuru Whalebone Rapier
 Titucius' Span Reinforced Tower Shield
+Titucus Span Reinforced Tower Shield
 Tornado Shot
 Touch of Anguish Imperial Claw
-Touched by Death
 Touched by the Wind
 Tranquillity
-Trap
-Trap Cooldown
-Trap and Mine Damage
+Trap Cooldown Support
+Trap Support
+Trap and Mine Damage Support
 Trash to Treasure
 Treasure Hunter
 Tremor Rod Military Staff
 Trolltimber Spire Cedar Tower Shield
 Trypanon Great Mallet
+Tukohama's Fortress Ebony Tower Shield
+Tulborn Spiraled Wand
+Tulfall Tornado Wand
 Turn the Other Cheek
 Twice Enchanted
 Twyzel Sage Wand
@@ -1129,11 +1195,16 @@ Unbearable Whispers III
 Unbearable Whispers IV
 Unbearable Whispers V
 Undead Uprising
+Unending Hunger Cobalt Jewel
 Ungil's Gauche Boot Knife
 Ungil's Harmony Turquoise Amulet
+United in Dream Cutlass
 Unnatural Energy
 Unstable Payload Cobalt Jewel
+Uul-Netol's Embrace Vaal Axe
+Uul-Netol's Kiss Labrys
 Vaal Arc
+Vaal Breach
 Vaal Burning Arrow
 Vaal Caress Bronzescale Gauntlets
 Vaal Clarity
@@ -1166,7 +1237,7 @@ Vaal Storm Call
 Vaal Summon Skeletons
 Vaal Winds
 Valako's Sign Topaz Ring
-Vampire's Might Crimson Jewel
+Valyrium Moonstone Ring
 Varunastra Vaal Blade
 Vaults of Atziri Vaal Pyramid Map
 Veil of the Night Great Helmet
@@ -1186,16 +1257,18 @@ Vis Mortis Necromancer Silks
 Visions of the Drowned
 Vital Transformation
 Vitality
+Voice of the Storm Lapis Amulet
 Void Battery Prophecy Wand
-Void Manipulation
+Void Manipulation Support
 Voidbringer Conjurer Gloves
 Voideye Unset Ring
 Voidheart Iron Ring
 Voidhome Dread Maul
+Voidwalker Murder Boots
 Volatile Power
-Volkuur's Key
 Voll's Devotion Agate Amulet
 Voll's Protector Holy Chainmail
+Voll's Vision Praetor Crown
 Volley Fire Viridian Jewel
 Voltaxic Rift Spine Bow
 Vortex
@@ -1208,7 +1281,7 @@ Warlord's Mark
 Warlord's Reach Crimson Jewel
 Warped Timepiece Turquoise Amulet
 Wealth and Power
-Weapon Elemental Damage
+Weapon Elemental Damage Support
 Weeping Death
 Weight of Sin Viridian Jewel
 Weight of the Empire Crimson Jewel
@@ -1227,15 +1300,17 @@ Wings of Entropy Sundering Axe
 Winter's Bounty Cobalt Jewel
 Winter's Mournful Melodies
 Winterheart Gold Amulet
-Wisdom of the Path Not Taken Cobalt Jewel
+Witchfire Brew Stibnite Flask
 Wither
 Wondertrap Velvet Slippers
 Wrath
 Wurm's Molt Leather Belt
 Wyrmsign Wyrmscale Gauntlets
 Xirgil's Crank Coiled Staff
+Xoph's Blood Amber Amulet
+Xoph's Heart Amber Amulet
+Xoph's Inception Bone Bow
+Xoph's Nurture Citadel Bow
 Ylfeban's Trickery Hubris Circlet
-Yriel's Key
 Zahndethus' Cassock Sage's Robe
 Zerphi's Last Breath Grand Mana Flask
-Zerphi's Youth Crimson Jewel

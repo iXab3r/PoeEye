@@ -1,4 +1,5 @@
 ﻿using System.Reactive.Disposables;
+using PoeEye.PoeTrade.Common;
 using PoeShared.PoeTrade.Query;
 using PoeShared.Prism;
 

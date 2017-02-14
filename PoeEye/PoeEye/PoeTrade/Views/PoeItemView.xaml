@@ -7,7 +7,8 @@
                     xmlns:viewModels="clr-namespace:PoeEye.PoeTrade.ViewModels"
                     xmlns:poeTrade="clr-namespace:PoeEye.PoeTrade"
                     xmlns:utilities="clr-namespace:PoeEye.Utilities"
-                    xmlns:wpf="clr-namespace:PoeShared.Scaffolding.WPF;assembly=PoeShared">
+                    xmlns:wpf="clr-namespace:PoeShared.Scaffolding.WPF;assembly=PoeShared"
+                    xmlns:poeTrade1="clr-namespace:PoeEye.PoeTrade.Common">
 
     <DataTemplate x:Key="PoeItemStatsTemplateKey" DataType="{x:Type common:IPoeItem}">
         <!-- Stats -->
@@ -276,18 +277,18 @@
                                 <Button.Style>
                                     <Style TargetType="Button">
                                         <Style.Triggers>
-                                            <DataTrigger Binding="{Binding TradeState}" Value="{x:Static poeTrade:PoeTradeState.New}">
+                                            <DataTrigger Binding="{Binding TradeState}" Value="{x:Static poeTrade1:PoeTradeState.New}">
                                                 <Setter Property="Background" Value="{StaticResource PoeTradeNewItemBrush}" />
                                                 <Setter Property="BorderThickness" Value="1" />
                                             </DataTrigger>
-                                            <DataTrigger Binding="{Binding TradeState}" Value="{x:Static poeTrade:PoeTradeState.Removed}">
+                                            <DataTrigger Binding="{Binding TradeState}" Value="{x:Static poeTrade1:PoeTradeState.Removed}">
                                                 <Setter Property="Background" Value="{StaticResource PoeTradeRemovedItemBrush}" />
                                                 <Setter Property="BorderThickness" Value="1" />
                                             </DataTrigger>
-                                            <DataTrigger Binding="{Binding TradeState}" Value="{x:Static poeTrade:PoeTradeState.Normal}">
+                                            <DataTrigger Binding="{Binding TradeState}" Value="{x:Static poeTrade1:PoeTradeState.Normal}">
                                                 <Setter Property="Visibility" Value="Collapsed" />
                                             </DataTrigger>
-                                            <DataTrigger Binding="{Binding TradeState}" Value="{x:Static poeTrade:PoeTradeState.Unknown}">
+                                            <DataTrigger Binding="{Binding TradeState}" Value="{x:Static poeTrade1:PoeTradeState.Unknown}">
                                                 <Setter Property="Visibility" Value="Collapsed" />
                                             </DataTrigger>
                                         </Style.Triggers>
@@ -297,7 +298,7 @@
                                     <i:EventTrigger EventName="Click">
                                         <utilities:SetPropertyAction PropertyName="TradeState" TargetObject="{Binding}">
                                             <utilities:SetPropertyAction.PropertyValue>
-                                                <poeTrade:PoeTradeState>Normal</poeTrade:PoeTradeState>
+                                                <poeTrade1:PoeTradeState>Normal</poeTrade1:PoeTradeState>
                                             </utilities:SetPropertyAction.PropertyValue>
                                         </utilities:SetPropertyAction>
                                     </i:EventTrigger>

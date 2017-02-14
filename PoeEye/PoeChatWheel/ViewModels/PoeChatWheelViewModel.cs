@@ -156,7 +156,7 @@ namespace PoeChatWheel.ViewModels
 
             configProvider.WhenAnyValue(x => x.ActualConfig)
                 .Select(x => x.ChatWheelHotkey)
-                .Select(hotkey => new KeyGestureConverter().ConvertFromInvariantString(hotkey) as KeyGesture)
+                .Select(KeyGestureExtensions.SafeCreateGesture)
                 .Subscribe(x => this.hotkey = x)
                 .AddTo(Anchors);
 

@@ -5,6 +5,7 @@ using System.Windows.Input;
 using CsQuery.ExtensionMethods;
 using Guards;
 using JetBrains.Annotations;
+using PoeEye.PoeTrade.Common;
 using PoeEye.PoeTrade.Models;
 using PoeShared.Scaffolding;
 using ReactiveUI;

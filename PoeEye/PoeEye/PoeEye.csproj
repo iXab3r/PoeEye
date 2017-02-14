@@ -323,7 +323,7 @@
     <Compile Include="MetroModels\DialogParticipation.cs" />
     <Compile Include="MetroModels\DialogCoordinator.cs" />
     <Compile Include="MetroModels\IDialogCoordinator.cs" />
-    <Compile Include="PoeTrade\AudioNotificationType.cs" />
+    <Compile Include="PoeTrade\Common\AudioNotificationType.cs" />
     <Compile Include="PoeTrade\Common\SortDescriptionData.cs" />
     <Compile Include="PoeTrade\Models\AudioNotificationsManager.cs" />
     <Compile Include="PoeTrade\Models\FuzzySuggestionProvider.cs" />
@@ -337,14 +337,16 @@
     <Compile Include="PoeTrade\Models\PoePriceCalculcator.cs" />
     <Compile Include="PoeTrade\Models\PoeCaptchaRegistrator.cs" />
     <Compile Include="PoeTrade\Models\WhispersNotificationManager.cs" />
-    <Compile Include="PoeTrade\PoeItemVerificationState.cs" />
-    <Compile Include="PoeTrade\ViewModels\ApplicationUpdaterViewModel.cs" />
+    <Compile Include="PoeTrade\Common\PoeItemVerificationState.cs" />
+    <Compile Include="PoeTrade\Shell\ViewModels\IPoeFlyoutViewModel.cs" />
+    <Compile Include="PoeTrade\Updater\ApplicationUpdaterModel.cs" />
+    <Compile Include="PoeTrade\Updater\ApplicationUpdaterViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\AudioNotificationSelectorViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\HistoricalTradesViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\IAudioNotificationSelectorViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\IHistoricalTradesViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\IMainWindowTabViewModel.cs" />
-    <Compile Include="PoeTrade\ViewModels\IMainWindowViewModel.cs" />
+    <Compile Include="PoeTrade\Shell\ViewModels\IMainWindowViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\IPoeApiSelectorViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\IPoeChatViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\IPoeModGroupsEditorViewModel.cs" />
@@ -361,7 +363,7 @@
     <Compile Include="PoeTrade\ViewModels\PoeFilteredTradeViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\PoeLinksInfoViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\MainWindowTabViewModel.cs" />
-    <Compile Include="PoeTrade\ViewModels\MainWindowViewModel.cs" />
+    <Compile Include="PoeTrade\Shell\ViewModels\MainWindowViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\PoeMainSettingsViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\PoeModsEditorViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\PoeModGroupsEditorViewModel.cs" />
@@ -370,7 +372,7 @@
     <Compile Include="PoeTrade\ViewModels\PoeSummaryTabViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\ProxyProviderViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\RecheckPeriodViewModel.cs" />
-    <Compile Include="PoeTrade\Views\MainWindow.xaml.cs">
+    <Compile Include="PoeTrade\Shell\Views\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Prism\MainModule.cs" />
@@ -389,7 +391,7 @@
     <Compile Include="Utilities\SetPropertyAction.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="PoeTrade\PoeTradeState.cs" />
+    <Compile Include="PoeTrade\Common\PoeTradeState.cs" />
     <Compile Include="PoeTrade\ViewModels\PoeTradeViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\PoeTradesListViewModel.cs" />
     <Compile Include="Prism\UiRegistrations.cs" />
@@ -448,7 +450,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Page Include="PoeTrade\Views\ApplicationUpdaterView.xaml">
+    <Page Include="PoeTrade\Updater\ApplicationUpdaterView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -464,7 +466,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="PoeTrade\Views\MainWindow.xaml">
+    <Page Include="PoeTrade\Shell\Views\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -624,9 +626,6 @@
     <Resource Include="Resources\Currencies\Chromatic_Orb.png" />
   </ItemGroup>
   <ItemGroup>
-    <WCFMetadata Include="Service References\" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Resources\Notifications\bell.wav" />
     <EmbeddedResource Include="Resources\Notifications\dingdong.wav" />
     <EmbeddedResource Include="Resources\Notifications\keyboard.wav" />
@@ -644,6 +643,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\Splash.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="PoeTrade\Shell\Models\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <UsingTask TaskName="CosturaCleanup" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll" TaskFactory="CodeTaskFactory">

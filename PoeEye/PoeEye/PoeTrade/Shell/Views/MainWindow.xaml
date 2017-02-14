@@ -1,4 +1,4 @@
-﻿<controls:MetroWindow x:Class="PoeEye.PoeTrade.Views.MainWindow"
+﻿<controls:MetroWindow x:Class="PoeEye.PoeTrade.Shell.Views.MainWindow"
                       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -10,13 +10,16 @@
                       xmlns:utilities="clr-namespace:PoeEye.Utilities"
                       xmlns:viewModels="clr-namespace:PoeEye.PoeTrade.ViewModels"
                       xmlns:wpf="clr-namespace:PoeShared.Scaffolding.WPF;assembly=PoeShared"
+                      xmlns:shellViewModels="clr-namespace:PoeEye.PoeTrade.Shell.ViewModels"
+                      xmlns:filterExtension="clr-namespace:PoeEye.Utilities.FilterExtension"
+                      xmlns:scaffolding="clr-namespace:PoeShared.Scaffolding;assembly=PoeShared"
                       mc:Ignorable="d"
                       Title="{Binding MainWindowTitle}"
                       MinWidth="1200"
                       MinHeight="800"
                       Width="1400"
                       Height="800"
-                      d:DataContext="{d:DesignInstance viewModels:MainWindowViewModel}"
+                      d:DataContext="{d:DesignInstance shellViewModels:MainWindowViewModel}"
                       BorderThickness="1" BorderBrush="{StaticResource AccentColorBrush}"
                       metroModels:DialogParticipation.Register="{Binding}">
 
@@ -43,22 +46,23 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
-                <Expander Grid.Column="0" ExpandDirection="Right"  IsExpanded="True" Margin="0" >
+                <Expander Grid.Column="0" ExpandDirection="Right" IsExpanded="True" Margin="0">
 
                     <Expander.Header>
-                        <TextBlock FontSize="14" Text="QUERY LIST" RenderTransformOrigin="0.5,0.5" VerticalAlignment="Top" >
+                        <TextBlock FontSize="14" Text="QUERY LIST" RenderTransformOrigin="0.5,0.5"
+                                   VerticalAlignment="Top">
                             <TextBlock.LayoutTransform>
                                 <TransformGroup>
-                                    <RotateTransform Angle="-90"/>
+                                    <RotateTransform Angle="-90" />
                                 </TransformGroup>
                             </TextBlock.LayoutTransform>
                         </TextBlock>
                     </Expander.Header>
-                    <ListBox 
-                 ItemsSource="{Binding TabsList}"
-                 SelectedItem="{Binding SelectedTab}"
-                 Style="{StaticResource ListBoxAsTabsList}"
-                 ItemTemplate="{StaticResource MainWindowTabItemViewTemplate}">
+                    <ListBox
+                        ItemsSource="{Binding TabsList}"
+                        SelectedItem="{Binding SelectedTab}"
+                        Style="{StaticResource ListBoxAsTabsList}"
+                        ItemTemplate="{StaticResource MainWindowTabItemViewTemplate}">
                         <ListBox.Resources>
                             <Style TargetType="ListBoxItem" BasedOn="{StaticResource ListBoxItemForTabsList}" />
                         </ListBox.Resources>
@@ -68,21 +72,21 @@
                 <Image Grid.Column="1" Source="pack://application:,,,/Resources/mainIcon.png" Opacity="0.2" />
 
                 <ContentControl Grid.Column="1"
-                        Margin="10,0,0,0"
-                        Visibility="{Binding SelectedTab, Converter={StaticResource NullToHiddenConverter}}"
-                        Content="{Binding SelectedTab}" />
+                                Margin="10,0,0,0"
+                                Visibility="{Binding SelectedTab, Converter={StaticResource NullToHiddenConverter}}"
+                                Content="{Binding SelectedTab}" />
 
                 <ContentControl Grid.Column="1"
-                        Margin="10,0,0,0"
-                        Visibility="{Binding SelectedTab, Converter={StaticResource NotNullToHiddenConverter}}"
-                        Content="{Binding SummaryTab}" />
+                                Margin="10,0,0,0"
+                                Visibility="{Binding SelectedTab, Converter={StaticResource NotNullToHiddenConverter}}"
+                                Content="{Binding SummaryTab}" />
             </Grid>
         </Border>
 
 
         <Border Grid.Row="2"
-            BorderThickness="0,1,0,0" BorderBrush="{StaticResource AccentColorBrush}" Margin="5,2,10,2"
-            Visibility="{Binding SelectedTab, Converter={StaticResource NullToCollapsedConverter}}">
+                BorderThickness="0,1,0,0" BorderBrush="{StaticResource AccentColorBrush}" Margin="5,2,10,2"
+                Visibility="{Binding SelectedTab, Converter={StaticResource NullToCollapsedConverter}}">
             <Border.Resources>
                 <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource MetroTextBlock}">
                     <Setter Property="FontSize" Value="16" />
@@ -96,15 +100,16 @@
                 </Grid.ColumnDefinitions>
 
                 <StackPanel Grid.Column="0" Orientation="Horizontal"
-                    Visibility="{Binding SelectedTab.IsBusy, Converter={StaticResource BoolFalseToCollapsedConverter}}">
-                    <controls:ProgressRing Height="20" Width="20" IsActive="true" Foreground="{StaticResource TextBrush}" />
+                            Visibility="{Binding SelectedTab.IsBusy, Converter={StaticResource BoolFalseToCollapsedConverter}}">
+                    <controls:ProgressRing Height="20" Width="20" IsActive="true"
+                                           Foreground="{StaticResource TextBrush}" />
                     <TextBlock Text="Updating..." />
                 </StackPanel>
 
                 <TextBlock Grid.Column="1"
-                   Margin="10,0,0,0"
-                   Visibility="{Binding SelectedTab.TradesList.ActiveQuery, Converter={StaticResource NullToCollapsedConverter}}"
-                   Text="{Binding SelectedTab.TradesList.TimeSinceLastUpdate.TotalSeconds, Mode=OneWay, StringFormat='Elapsed since last update: {0:F0}s'}" />
+                           Margin="10,0,0,0"
+                           Visibility="{Binding SelectedTab.TradesList.ActiveQuery, Converter={StaticResource NullToCollapsedConverter}}"
+                           Text="{Binding SelectedTab.TradesList.TimeSinceLastUpdate.TotalSeconds, Mode=OneWay, StringFormat='Elapsed since last update: {0:F0}s'}" />
 
                 <ContentPresenter Grid.Column="2" Content="{Binding SelectedTab.RecheckPeriod}" />
 
@@ -119,30 +124,31 @@
             <StackPanel Orientation="Horizontal">
 
                 <Button
-          Command="{Binding CreateNewTabCommand}"
-          Content="&#xF00E; New query" 
-          FontFamily="{StaticResource FontAwesome}"
-          FontWeight="Bold" />
+                    Command="{Binding CreateNewTabCommand}"
+                    Content="&#xF00E; New query"
+                    FontFamily="{StaticResource FontAwesome}"
+                    FontWeight="Bold" />
 
                 <Separator />
 
                 <Button
-          Content="&#xF029; Show summary"
-          FontFamily="{StaticResource FontAwesome}"
-          Margin="5,0"
-          FontWeight="Bold">
+                    Content="&#xF029; Show summary"
+                    FontFamily="{StaticResource FontAwesome}"
+                    Margin="5,0"
+                    FontWeight="Bold">
                     <Button.Style>
                         <Style TargetType="{x:Type ButtonBase}" BasedOn="{StaticResource ChromelessButtonStyle}">
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding SelectedTab}" Value="{x:Null}">
-                                    <Setter Property="Foreground" Value="{StaticResource ControlBackgroundBrush}"/>
+                                    <Setter Property="Foreground" Value="{StaticResource ControlBackgroundBrush}" />
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
                     </Button.Style>
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="Click">
-                            <utilities:SetPropertyAction PropertyName="SelectedTab" TargetObject="{Binding}" PropertyValue="{x:Null}" />
+                            <utilities:SetPropertyAction PropertyName="SelectedTab" TargetObject="{Binding}"
+                                                         PropertyValue="{x:Null}" />
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
                 </Button>
@@ -160,20 +166,20 @@
                 <ContentPresenter Content="{Binding ProxyProviderViewModel}" />
 
                 <controls:ProgressRing Height="20" Width="20" IsActive="true"
-                               Foreground="{StaticResource TextBrush}"
-                               Visibility="{Binding ApplicationUpdater.IsBusy, Converter={StaticResource BoolFalseToCollapsedConverter}}" />
+                                       Foreground="{StaticResource TextBrush}"
+                                       Visibility="{Binding ApplicationUpdater.IsBusy, Converter={StaticResource BoolFalseToCollapsedConverter}}" />
                 <Button Command="{Binding ApplicationUpdater.CheckForUpdatesCommand}"
-                CommandParameter="{Binding}"
-                IsEnabled="{Binding ApplicationUpdater.IsBusy, Converter={StaticResource BoolTrueToCollapsedConverter}}"
-                Content="Check for updates" />
+                        CommandParameter="{Binding}"
+                        IsEnabled="{Binding ApplicationUpdater.IsBusy, Converter={StaticResource BoolTrueToCollapsedConverter}}"
+                        Content="Check for updates" />
 
                 <StackPanel Orientation="Horizontal" Height="24" Margin="5,0">
                     <Button Content="&#xF1D7; Chat" FontFamily="{StaticResource FontAwesome}">
                         <i:Interaction.Triggers>
                             <i:EventTrigger EventName="Click">
                                 <utilities:SetPropertyAction PropertyName="IsOpen"
-                                             TargetObject="{Binding ElementName=ChatFlyout}"
-                                             PropertyValue="{Binding ElementName=ChatFlyout, Path=IsOpen, Converter={StaticResource BoolInversionConverter}}" />
+                                                             TargetObject="{Binding ElementName=ChatFlyout}"
+                                                             PropertyValue="{Binding ElementName=ChatFlyout, Path=IsOpen, Converter={StaticResource BoolInversionConverter}}" />
                             </i:EventTrigger>
                         </i:Interaction.Triggers>
                     </Button>
@@ -182,8 +188,8 @@
                         <i:Interaction.Triggers>
                             <i:EventTrigger EventName="Click">
                                 <utilities:SetPropertyAction PropertyName="IsOpen"
-                                             TargetObject="{Binding ElementName=SettingsFlyout}"
-                                             PropertyValue="{Binding ElementName=SettingsFlyout, Path=IsOpen, Converter={StaticResource BoolInversionConverter}}" />
+                                                             TargetObject="{Binding ElementName=SettingsFlyout}"
+                                                             PropertyValue="{Binding ElementName=SettingsFlyout, Path=IsOpen, Converter={StaticResource BoolInversionConverter}}" />
                             </i:EventTrigger>
                         </i:Interaction.Triggers>
                     </Button>
@@ -195,35 +201,35 @@
     <controls:MetroWindow.Flyouts>
         <controls:FlyoutsControl>
             <controls:Flyout Header="&#xF0EA; Clipboard" x:Name="ClipboardFlyout"
-                       FontFamily="{StaticResource FontAwesome}"
-                       Position="Bottom"
-                       BorderThickness="0,1,0,0"
-                       BorderBrush="{StaticResource AccentColorBrush}"
-                       IsOpen="{Binding  ClipboardParserViewModel.IsOpen, Mode=TwoWay}">
+                             FontFamily="{StaticResource FontAwesome}"
+                             Position="Bottom"
+                             BorderThickness="0,1,0,0"
+                             BorderBrush="{StaticResource AccentColorBrush}"
+                             IsOpen="{Binding  ClipboardParserViewModel.IsOpen, Mode=TwoWay}">
 
                 <Grid>
                     <controls:MetroProgressBar IsIndeterminate="True"
-                                     Foreground="{StaticResource TextBrush}"
-                                     Visibility="{Binding ClipboardParserViewModel.IsBusy, Converter={StaticResource BoolFalseToCollapsedConverter}}" />
+                                               Foreground="{StaticResource TextBrush}"
+                                               Visibility="{Binding ClipboardParserViewModel.IsBusy, Converter={StaticResource BoolFalseToCollapsedConverter}}" />
 
                     <Grid MaxWidth="1000"
-                Visibility="{Binding ClipboardParserViewModel.IsBusy, Converter={StaticResource BoolTrueToCollapsedConverter}}">
+                          Visibility="{Binding ClipboardParserViewModel.IsBusy, Converter={StaticResource BoolTrueToCollapsedConverter}}">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
 
                         <ContentControl Grid.Column="0"
-                            Content="{Binding ClipboardParserViewModel.ItemFromClipboard}" />
+                                        Content="{Binding ClipboardParserViewModel.ItemFromClipboard}" />
 
                         <Button Grid.Column="1" Content="Import"
-                    Command="{Binding CreateNewTabCommand}"
-                    CommandParameter="{Binding ClipboardParserViewModel.ItemQueryInfo}"
-                    Margin="15">
+                                Command="{Binding CreateNewTabCommand}"
+                                CommandParameter="{Binding ClipboardParserViewModel.ItemQueryInfo}"
+                                Margin="15">
                             <i:Interaction.Triggers>
                                 <i:EventTrigger EventName="Click">
                                     <utilities:SetPropertyAction PropertyName="IsOpen"
-                                               TargetObject="{Binding ElementName=ClipboardFlyout}">
+                                                                 TargetObject="{Binding ElementName=ClipboardFlyout}">
                                         <utilities:SetPropertyAction.PropertyValue>
                                             <system:Boolean>False</system:Boolean>
                                         </utilities:SetPropertyAction.PropertyValue>
@@ -238,21 +244,21 @@
             </controls:Flyout>
 
             <controls:Flyout Header="&#xF085; Settings" x:Name="SettingsFlyout"
-                       FontFamily="{StaticResource FontAwesome}"
-                       Position="Right"
-                       Width="300"
-                       Margin="0, 20"
-                       IsOpen="{Binding Settings.IsOpen}"
-                       BorderBrush="{StaticResource AccentColorBrush}">
+                             FontFamily="{StaticResource FontAwesome}"
+                             Position="Right"
+                             Width="300"
+                             Margin="0, 20"
+                             IsOpen="{Binding Settings.IsOpen}"
+                             BorderBrush="{StaticResource AccentColorBrush}">
                 <ContentPresenter Content="{Binding Settings}" />
             </controls:Flyout>
 
             <controls:Flyout Header="&#xF1D7; Chat" x:Name="ChatFlyout"
-                       FontFamily="{StaticResource FontAwesome}"
-                       Position="Right"
-                       Width="500"
-                       Margin="0, 20"
-                       BorderBrush="{StaticResource AccentColorBrush}">
+                             FontFamily="{StaticResource FontAwesome}"
+                             Position="Right"
+                             Width="500"
+                             Margin="0, 20"
+                             BorderBrush="{StaticResource AccentColorBrush}">
                 <Grid Margin="5,0">
                     <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Visible">
                         <ScrollViewer.Content>
@@ -263,13 +269,13 @@
             </controls:Flyout>
 
             <controls:Flyout Header="&#xF093; Update status" x:Name="ApplicationUpdatedFlyout"
-                       FontFamily="{StaticResource FontAwesome}"
-                       Position="Bottom"
-                       AnimateOpacity="True"
-                       Margin="0, 20"
-                       BorderThickness="0,0,0,1"
-                       BorderBrush="{StaticResource AccentColorBrush}"
-                       IsOpen="{Binding ApplicationUpdater.IsOpen}">
+                             FontFamily="{StaticResource FontAwesome}"
+                             Position="Bottom"
+                             AnimateOpacity="True"
+                             Margin="0, 20"
+                             BorderThickness="0,0,0,1"
+                             BorderBrush="{StaticResource AccentColorBrush}"
+                             IsOpen="{Binding ApplicationUpdater.IsOpen}">
 
                 <ContentPresenter Content="{Binding ApplicationUpdater}" />
             </controls:Flyout>

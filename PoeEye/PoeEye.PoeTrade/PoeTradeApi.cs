@@ -77,13 +77,13 @@ namespace PoeEye.PoeTrade
 
         public string Name { get; } = "poe.trade";
 
-        public Task<IPoeQueryResult> IssueQuery(IPoeQueryInfo queryInfo)
+        public async Task<IPoeQueryResult> IssueQuery(IPoeQueryInfo queryInfo)
         {
             Guard.ArgumentNotNull(() => queryInfo);
 
             var query = queryInfoToQueryConverter.Convert(queryInfo);
             var queryPostData = queryConverter.Convert(query);
-            return IssueQuery(PoeTradeSearchUri, queryPostData);
+            return await IssueQuery(PoeTradeSearchUri, queryPostData);
         }
 
         public Task<IPoeStaticData> RequestStaticData()
@@ -96,7 +96,7 @@ namespace PoeEye.PoeTrade
                 .ToTask();
         }
 
-        private Task<IPoeQueryResult> IssueQuery(string uri, NameValueCollection queryParameters)
+        private async Task<IPoeQueryResult> IssueQuery(string uri, NameValueCollection queryParameters)
         {
             IProxyToken proxyToken = null;
             try
@@ -104,14 +104,13 @@ namespace PoeEye.PoeTrade
                 var client = CreateClient(out proxyToken);
 
                 Log.Instance.Debug($"[PoeTradeApi] Awaiting for semaphore slot (max: {config.MaxSimultaneousRequestsCount}, atm: {requestsSemaphore.CurrentCount})");
-                requestsSemaphore.Wait();
+                await requestsSemaphore.WaitAsync();
 
-                return client
+                return await client
                     .Post(uri, queryParameters)
                     .Select(ThrowIfNotParseable)
                     .Select(poeTradeParser.ParseQueryResponse)
-                    .Finally(ReleaseSemaphore)
-                    .ToTask();
+                    .Finally(ReleaseSemaphore);
             }
             catch (WebException ex)
             {
