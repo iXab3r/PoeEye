@@ -132,7 +132,7 @@ namespace PoeBud.ViewModels
             actualConfig = config;
             HideXpBar = config.HideXpBar;
             IsEnabled = actualConfig.IsEnabled;
-            hotkey = new KeyGestureConverter().ConvertFromInvariantString(config.GetSetHotkey) as KeyGesture;
+            hotkey = KeyGestureExtensions.SafeCreateGesture(config.GetSetHotkey);
             RefreshStashUpdater(actualConfig);
         }
 

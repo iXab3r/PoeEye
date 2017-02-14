@@ -97,7 +97,7 @@ namespace PoeShared.Native
                     h => keyboardMouseEvents.KeyDown -= h)
                 .Select(x => x.EventArgs)
                 .Where(x => overlay.IsVisible)
-                .Where(x => new KeyGesture(Key.F9, ModifierKeys.Control | ModifierKeys.Shift).MatchesHotkey(x))
+                .Where(x => new KeyGesture(Key.F9, ModifierKeys.Control | ModifierKeys.Shift | ModifierKeys.Alt).MatchesHotkey(x))
                 .Do(x => x.Handled = true)
                 .Subscribe(() => overlay.ShowWireframes = !overlay.ShowWireframes)
                 .AddTo(Anchors);
