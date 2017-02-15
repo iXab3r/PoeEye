@@ -22,7 +22,7 @@ namespace PoeEye.PoeTrade.Updater
 {
     internal sealed class ApplicationUpdaterModel : DisposableReactiveObject
     {
-        private static readonly string PoeEyeUri = @"http://poeeye.azurewebsites.net/PoeEye/";
+        private static readonly string PoeEyeUri = @"http://coderush.net/files/PoeEye/";
         private static readonly string ApplicationName = Process.GetCurrentProcess().ProcessName + ".exe";
 
         private bool isBusy;
