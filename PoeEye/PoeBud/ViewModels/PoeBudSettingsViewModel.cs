@@ -179,6 +179,10 @@ namespace PoeBud.ViewModels
             HideXpBar = config.HideXpBar;
             IsEnabled = config.IsEnabled;
             SelectedUiOverlay = OverlaysList.FirstOrDefault(x => x.Name == config.UiOverlayName);
+            if (SelectedUiOverlay.Name == null)
+            {
+                SelectedUiOverlay = UiOverlayInfo.Empty;
+            }
         }
 
         public PoeBudConfig Save()

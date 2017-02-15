@@ -27,7 +27,7 @@ namespace PoeBud.Prism
             var registrator = container.Resolve<IPoeEyeModulesRegistrator>();
             registrator.RegisterSettingsEditor<PoeBudConfig, PoeBudSettingsViewModel>();
 
-            var overlayController = container.Resolve<IOverlayWindowController>(WellKnownOverlays.PathOfExileLayeredOverlay);
+            var overlayController = container.Resolve<IOverlayWindowController>(WellKnownOverlays.PathOfExileTransparentOverlay);
             var overlayModel = container.Resolve<PoeBudViewModel>(new DependencyOverride(typeof(IOverlayWindowController), overlayController));
             overlayController.RegisterChild(overlayModel);
         }

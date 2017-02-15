@@ -37,7 +37,7 @@ namespace PoeBud.Models
     {
         public static readonly UiOverlayInfo Empty = new UiOverlayInfo() { Name = "None"};
 
-        public string Name { get; set; }
+        public string Name { get; set; } 
 
         public string AbsolutePath { get; set; }
     }
