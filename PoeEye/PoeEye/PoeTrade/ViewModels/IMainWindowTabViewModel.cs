@@ -22,6 +22,8 @@ namespace PoeEye.PoeTrade.ViewModels
 
         ICommand MarkAllAsReadCommand { [NotNull] get; }
 
+        ICommand RefreshCommand { [NotNull] get; }
+
         IPoeApiWrapper SelectedApi { get; }
 
         IPoeQueryViewModel Query { get; }

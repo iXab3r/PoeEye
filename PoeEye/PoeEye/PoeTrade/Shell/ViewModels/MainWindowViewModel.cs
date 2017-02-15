@@ -5,6 +5,7 @@ using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Reflection;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using Guards;
 using JetBrains.Annotations;
@@ -18,6 +19,7 @@ using PoeShared.Modularity;
 using PoeShared.PoeTrade;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
+using PoeShared.UI;
 using ReactiveUI;
 using PoeEyeMainConfig = PoeEye.Config.PoeEyeMainConfig;
 
@@ -32,6 +34,7 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
 
         private readonly ReactiveCommand<object> closeTabCommand = ReactiveCommand.Create();
         private readonly ReactiveCommand<object> createNewTabCommand = ReactiveCommand.Create();
+        private readonly ReactiveCommand<Unit> refreshAllTabsCommand;
 
         private readonly ISubject<Unit> configUpdateSubject = new Subject<Unit>();
         private readonly IPoeEyeMainConfigProvider poeEyeConfigProvider;
@@ -104,6 +107,12 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
                 .Subscribe(RemoveTabCommandExecuted)
                 .AddTo(Anchors);
 
+            refreshAllTabsCommand = ReactiveCommand
+                .CreateAsyncTask(_ => RefreshAllTabsCommandExecuted(), uiScheduler);
+            refreshAllTabsCommand
+                .Subscribe()
+                .AddTo(Anchors);
+
             TabsList
                 .ItemsAdded
                 .Subscribe(x => SelectedTab = x)
@@ -137,6 +146,8 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
         public ICommand CreateNewTabCommand => createNewTabCommand;
 
         public ICommand CloseTabCommand => closeTabCommand;
+
+        public ICommand RefreshAllTabsCommand => refreshAllTabsCommand;
 
         public ApplicationUpdaterViewModel ApplicationUpdater { get; }
 
@@ -187,6 +198,15 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
             {
                 tab.Query.SetQueryInfo(query);
             }
+        }
+
+        private Task RefreshAllTabsCommandExecuted()
+        {
+            foreach (var tab in TabsList.ToArray())
+            {
+                tab.RefreshCommand.Execute(tab.Query?.PoeQueryBuilder);
+            }
+            return Task.Delay(UiConstants.ArtificialLongDelay);
         }
 
         private IMainWindowTabViewModel CreateAndAddTab()

@@ -2,7 +2,8 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:viewModels="clr-namespace:PoeBud.ViewModels"
                     xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
-                    xmlns:dataTypes="clr-namespace:PoeBud.OfficialApi.DataTypes">
+                    xmlns:dataTypes="clr-namespace:PoeBud.OfficialApi.DataTypes"
+                    xmlns:models="clr-namespace:PoeBud.Models">
     <DataTemplate DataType="{x:Type viewModels:PoeBudSettingsViewModel}">
 
         <DataTemplate.Resources>
@@ -18,6 +19,7 @@
 
         <Grid Margin="10,5">
             <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
@@ -49,19 +51,43 @@
                 <Label Content="Hide XP bar:" VerticalAlignment="Center" />
                 <controls:ToggleSwitchButton Height="26"
                                              IsChecked="{Binding HideXpBar}" />
+            </StackPanel> 
+            
+            <StackPanel Grid.Row="3"
+                        Orientation="Horizontal" Height="30" Margin="0,2">
+                <Label Content="Overlay:" VerticalAlignment="Center" />
+                <ComboBox 
+                    SelectedItem="{Binding SelectedUiOverlay}" 
+                    ItemsSource="{Binding OverlaysList}"
+                    ToolTip="Path of Exile UI Overlay" 
+                    DisplayMemberPath="Name"
+                    Width="120"
+                    IsEditable="False">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate DataType="{x:Type models:UiOverlayInfo}">
+                            <Grid>
+                                <Image Source="{Binding AbsolutePath}" 
+                                       Width="192" Height="108"
+                                       Visibility="{Binding AbsolutePath, Converter={StaticResource NullToCollapsedConverter}}" />
+                                <Label VerticalAlignment="Top" HorizontalAlignment="Left" 
+                                       Content="{Binding Name}"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
             </StackPanel>
 
-            <TextBox Grid.Row="3"
+            <TextBox Grid.Row="4"
                      Margin="0, 5"
                      controls:TextBoxHelper.Watermark="e-mail"
                      Text="{Binding Username}" />
 
-            <PasswordBox Grid.Row="4"
+            <PasswordBox Grid.Row="5"
                          Margin="0, 5"
                          controls:TextBoxHelper.Watermark="password"
                          x:Name="LoginPasswordBox" />
 
-            <Grid Grid.Row="5">
+            <Grid Grid.Row="6">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
@@ -92,7 +118,7 @@
                 </Button>
             </Grid>
 
-            <GroupBox Grid.Row="6"
+            <GroupBox Grid.Row="7"
                       IsEnabled="{Binding IsBusy, Converter={StaticResource BoolInvertConverter}}"
                       Margin="0, 10"
                       Header="Characters and stashes selection">

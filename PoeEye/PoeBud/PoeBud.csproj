@@ -228,12 +228,14 @@
     <Compile Include="Models\IPoeTradeSolution.cs" />
     <Compile Include="Models\IPoeWindowManager.cs" />
     <Compile Include="Models\ISolutionExecutorModel.cs" />
+    <Compile Include="Models\IUiOverlaysProvider.cs" />
     <Compile Include="Models\IUserInteractionsManager.cs" />
     <Compile Include="Models\IPoeWindow.cs" />
     <Compile Include="Models\IUserInputBlocker.cs" />
     <Compile Include="Models\PoeStashUpdater.cs" />
     <Compile Include="Models\SolutionExecutorModel.cs" />
     <Compile Include="Models\StashUpdate.cs" />
+    <Compile Include="Models\UiOverlaysProvider.cs" />
     <Compile Include="Models\UserInteractionsManager.cs" />
     <Compile Include="Models\PoeWIndow.cs" />
     <Compile Include="Models\PoeWindowManager.cs" />
@@ -329,9 +331,24 @@
     <Resource Include="Resources\Ring.png" />
     <Resource Include="Resources\Weapon.png" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="Resources\Overlays\Fall Of Oriath.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="OfficialApi\ProcurementLegacy\Data.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Overlays\Green.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\Overlays\Skulls.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\Overlays\Stradios on DeviantArt.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

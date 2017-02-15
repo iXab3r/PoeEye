@@ -72,6 +72,8 @@
 
                 <Border Canvas.Top="1065" Canvas.Left="546" Width="820" Background="#0C0C0C" Height="8" Opacity="0.95" 
                     Visibility="{Binding HideXpBar, Converter={StaticResource TrueToVisibleConverter}}" />
+                
+                <Image Source="{Binding UiOverlayPath}" />
             </Canvas>
         </Grid>
     </DataTemplate>

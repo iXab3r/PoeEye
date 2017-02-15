@@ -17,6 +17,8 @@ namespace PoeBud.Config
 
         string CharacterName { get; }
 
+        string UiOverlayName { get; }
+
         int ExpectedSetsCount { get; }
 
         TimeSpan StashUpdatePeriod { get; }

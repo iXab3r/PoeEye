@@ -16,6 +16,7 @@ using Microsoft.Practices.Unity;
 using PoeShared;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
+using PoeShared.UI;
 using Prism.Mvvm;
 using ReactiveUI;
 using Squirrel;
@@ -24,8 +25,6 @@ namespace PoeEye.PoeTrade.Updater
 {
     internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject
     {
-        private static readonly TimeSpan ArtificialDelay = TimeSpan.FromSeconds(5);
-
         private readonly ApplicationUpdaterModel updaterModel;
         private readonly ReactiveCommand<Unit> checkForUpdatesCommand;
         private readonly ReactiveCommand<object> restartCommand;
@@ -91,7 +90,7 @@ namespace PoeEye.PoeTrade.Updater
             Error = string.Empty;
 
             // delaying update so the user could see the progressring
-            await Task.Delay(ArtificialDelay);
+            await Task.Delay(UiConstants.ArtificialLongDelay);
 
             try
             {

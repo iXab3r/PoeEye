@@ -1,13 +1,14 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using WindowsInput.Native;
 using Gma.System.MouseKeyHook;
 using Guards;
 using JetBrains.Annotations;
@@ -31,8 +32,9 @@ namespace PoeBud.ViewModels
     {
         private static readonly TimeSpan UpdateTimeout = TimeSpan.FromSeconds(1);
         private readonly IClock clock;
-        private readonly IKeyboardMouseEvents keyboardMouseEvents;
         private readonly ISubject<Exception> exceptionsToPropagate = new Subject<Exception>();
+        private readonly IKeyboardMouseEvents keyboardMouseEvents;
+        [NotNull] private readonly IUiOverlaysProvider overlaysProvider;
         private readonly ObservableAsPropertyHelper<Exception> lastUpdateException;
         private readonly IFactory<PoeStashUpdater, IPoeBudConfig> stashAnalyzerFactory;
         private readonly IFactory<StashViewModel, StashUpdate, IPoeBudConfig> stashUpdateFactory;
@@ -47,6 +49,8 @@ namespace PoeBud.ViewModels
         private StashViewModel stash;
         private PoeStashUpdater stashUpdater;
 
+        private string uiOverlayPath;
+
         public PoeBudViewModel(
             [NotNull] IPoeWindowManager windowManager,
             [NotNull] ISolutionExecutorViewModel solutionExecutor,
@@ -54,12 +58,14 @@ namespace PoeBud.ViewModels
             [NotNull] IClock clock,
             [NotNull] IKeyboardMouseEvents keyboardMouseEvents,
             [NotNull] IUserInteractionsManager userInteractionsManager,
+            [NotNull] IUiOverlaysProvider overlaysProvider,
             [NotNull] IFactory<PoeStashUpdater, IPoeBudConfig> stashAnalyzerFactory,
             [NotNull] IFactory<StashViewModel, StashUpdate, IPoeBudConfig> stashUpdateFactory,
             [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {
             Guard.ArgumentNotNull(() => windowManager);
             Guard.ArgumentNotNull(() => solutionExecutor);
+            Guard.ArgumentNotNull(() => overlaysProvider);
             Guard.ArgumentNotNull(() => userInteractionsManager);
             Guard.ArgumentNotNull(() => poeBudConfigProvider);
             Guard.ArgumentNotNull(() => keyboardMouseEvents);
@@ -70,6 +76,7 @@ namespace PoeBud.ViewModels
 
             this.clock = clock;
             this.keyboardMouseEvents = keyboardMouseEvents;
+            this.overlaysProvider = overlaysProvider;
             this.stashAnalyzerFactory = stashAnalyzerFactory;
             this.stashUpdateFactory = stashUpdateFactory;
             this.uiScheduler = uiScheduler;
@@ -97,6 +104,12 @@ namespace PoeBud.ViewModels
         {
             get { return stashUpdater; }
             set { this.RaiseAndSetIfChanged(ref stashUpdater, value); }
+        }
+
+        public string UiOverlayPath
+        {
+            get { return uiOverlayPath; }
+            set { this.RaiseAndSetIfChanged(ref uiOverlayPath, value); }
         }
 
         public bool HideXpBar
@@ -132,6 +145,7 @@ namespace PoeBud.ViewModels
             actualConfig = config;
             HideXpBar = config.HideXpBar;
             IsEnabled = actualConfig.IsEnabled;
+            UiOverlayPath = overlaysProvider.OverlaysList.FirstOrDefault(x => x.Name == config.UiOverlayName).AbsolutePath;
             hotkey = KeyGestureExtensions.SafeCreateGesture(config.GetSetHotkey);
             RefreshStashUpdater(actualConfig);
         }

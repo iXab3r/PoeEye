@@ -302,6 +302,7 @@
     <Compile Include="Scaffolding\WPF\FocusHelper.cs" />
     <Compile Include="UI\Models\IImagesCacheService.cs" />
     <Compile Include="UI\Models\ImagesCacheService.cs" />
+    <Compile Include="UI\UiConstants.cs" />
     <Compile Include="UI\ViewModels\IImageViewModel.cs" />
     <Compile Include="UI\ViewModels\ImageViewModel.cs" />
   </ItemGroup>

@@ -26,6 +26,7 @@ namespace PoeBud.Prism
             Container
                 .RegisterType<IInputSimulator>(new ContainerControlledLifetimeManager(), new InjectionFactory(x => new InputSimulator()))
                 .RegisterSingleton<IPoeWindowManager, PoeWindowManager>()
+                .RegisterSingleton<IUiOverlaysProvider, UiOverlaysProvider>()
                 .RegisterSingleton<IGearTypeAnalyzer, GearTypeAnalyzer>();
 
             Container

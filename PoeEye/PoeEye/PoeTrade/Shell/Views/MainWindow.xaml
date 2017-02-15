@@ -13,6 +13,7 @@
                       xmlns:shellViewModels="clr-namespace:PoeEye.PoeTrade.Shell.ViewModels"
                       xmlns:filterExtension="clr-namespace:PoeEye.Utilities.FilterExtension"
                       xmlns:scaffolding="clr-namespace:PoeShared.Scaffolding;assembly=PoeShared"
+                      xmlns:net="clr-namespace:FontAwesome.Net;assembly=FontAwesome.Net"
                       mc:Ignorable="d"
                       Title="{Binding MainWindowTitle}"
                       MinWidth="1200"
@@ -49,14 +50,39 @@
                 <Expander Grid.Column="0" ExpandDirection="Right" IsExpanded="True" Margin="0">
 
                     <Expander.Header>
-                        <TextBlock FontSize="14" Text="QUERY LIST" RenderTransformOrigin="0.5,0.5"
-                                   VerticalAlignment="Top">
-                            <TextBlock.LayoutTransform>
-                                <TransformGroup>
-                                    <RotateTransform Angle="-90" />
-                                </TransformGroup>
-                            </TextBlock.LayoutTransform>
-                        </TextBlock>
+                        <StackPanel Orientation="Vertical">
+                            <TextBlock FontSize="14" 
+                                       Text="QUERY LIST" 
+                                       RenderTransformOrigin="0.5,0.5"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Top">
+                                <TextBlock.LayoutTransform>
+                                    <TransformGroup>
+                                        <RotateTransform Angle="-90" />
+                                    </TransformGroup>
+                                </TextBlock.LayoutTransform>
+                            </TextBlock>
+                            <Button 
+                                    Width="24" Height="24"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Top"
+                                    Command="{Binding RefreshAllTabsCommand}"
+                                    Focusable="False"
+                                    ToolTip="Force refresh all tabs"
+                                    Padding="5"
+                                    Content="{x:Static net:FontAwesome.refresh}">
+                                <Button.Style>
+                                    <Style TargetType="{x:Type Button}" BasedOn="{StaticResource CircleButton}">
+                                        <Setter Property="BorderThickness" Value="2"/>
+                                        <Style.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Background" Value="{StaticResource FlatButtonPressedBackgroundBrush}"/>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                            </Button>
+                        </StackPanel>
                     </Expander.Header>
                     <ListBox
                         ItemsSource="{Binding TabsList}"

@@ -55,28 +55,25 @@
 
         <Button Grid.Column="2"
                 Margin="5,0"
-                Style="{StaticResource AutoRecheckButtonStyle}"
                 Width="40" Height="40"
                 HorizontalAlignment="Right"
                 VerticalAlignment="Top"
-                Command="{Binding SearchCommand}"
-                ToolTip="Init query"
                 Focusable="False"
-                CommandParameter="{Binding Query.PoeQueryBuilder}"
-                Content="{x:Static net:FontAwesome.search}"
-                Visibility="{Binding TradesList.ActiveQuery, Converter={StaticResource NotNullToCollapsedConverter}}" />
-
-        <Button Grid.Column="2"
-                Margin="5,0"
-                Width="40" Height="40"
-                HorizontalAlignment="Right"
-                VerticalAlignment="Top"
                 Command="{Binding RefreshCommand}"
-                Focusable="False"
-                ToolTip="Force refresh"
-                Content="{x:Static net:FontAwesome.refresh}"
-                Visibility="{Binding TradesList.ActiveQuery, Converter={StaticResource NullToCollapsedConverter}}"
-                Style="{StaticResource AutoRecheckButtonStyle}" />
+                CommandParameter="{Binding Query.PoeQueryBuilder}">
+            <Button.Style>
+                        <Style TargetType="{x:Type Button}" BasedOn="{StaticResource AutoRecheckButtonStyle}">
+                            <Setter Property="Content" Value="{x:Static net:FontAwesome.refresh}"/>
+                            <Setter Property="ToolTip" Value="Rerun current query"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding TradesList.ActiveQuery}" Value="{x:Null}">
+                                    <Setter Property="Content" Value="{x:Static net:FontAwesome.search}"/>
+                                    <Setter Property="ToolTip" Value="Run new query with current parameters"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+            </Button.Style>
+        </Button>
       </Grid>
 
       <TextBlock Grid.Column="1"

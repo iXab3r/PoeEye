@@ -40,7 +40,6 @@ namespace PoeEye.PoeTrade.ViewModels
 
         private readonly ReactiveCommand<object> markAllAsReadCommand;
         private readonly ReactiveCommand<object> refreshCommand;
-        private readonly ReactiveCommand<object> searchCommand;
 
         private readonly string tabHeader;
 
@@ -80,9 +79,6 @@ namespace PoeEye.PoeTrade.ViewModels
             AudioNotificationSelector = audioNotificationSelector;
             audioNotificationSelector.AddTo(Anchors);
 
-            searchCommand = ReactiveCommand.Create();
-            searchCommand.Subscribe(SearchCommandExecute).AddTo(Anchors);
-
             markAllAsReadCommand = ReactiveCommand.Create();
             markAllAsReadCommand.Subscribe(MarkAllAsReadExecute);
 
@@ -112,8 +108,6 @@ namespace PoeEye.PoeTrade.ViewModels
         public IPoeApiSelectorViewModel ApiSelector { get; }
 
         public IPoeApiWrapper SelectedApi => ApiSelector.SelectedModule;
-
-        public ICommand SearchCommand => searchCommand;
 
         public ICommand RefreshCommand => refreshCommand;
 
@@ -256,16 +250,21 @@ namespace PoeEye.PoeTrade.ViewModels
 
         private void RefreshCommandExecuted(object arg)
         {
-            TradesList.Refresh();
+            if (TradesList.ActiveQuery == null && arg is Func<IPoeQueryInfo>)
+            {
+                RunNewSearch(arg as Func<IPoeQueryInfo>);
+            }
+            else
+            {
+                Log.Instance.Trace($"[MainWindowTabViewModel.RefreshCommandExecuted] Refresh command executed, running query\r\n{query.DumpToText()}");
+                TradesList.Refresh();
+            }
         }
 
-        private void SearchCommandExecute(object arg)
+        private void RunNewSearch(Func<IPoeQueryInfo> queryBuilder)
         {
-            var queryBuilder = arg as Func<IPoeQueryInfo>;
-            if (queryBuilder == null)
-            {
-                return;
-            }
+            Guard.ArgumentNotNull(() => queryBuilder);
+
             var query = queryBuilder();
             Log.Instance.Trace($"[MainWindowTabViewModel.SearchCommandExecute] Search command executed, running query\r\n{query.DumpToText()}");
 

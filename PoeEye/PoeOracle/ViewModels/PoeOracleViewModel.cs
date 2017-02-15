@@ -23,12 +23,12 @@ namespace PoeOracle.ViewModels
     {
         private static readonly TimeSpan DefaultQueryThrottle = TimeSpan.FromMilliseconds(200);
 
-        [NotNull] private readonly IOverlayWindowController controller;
+        private readonly IOverlayWindowController controller;
 
         private readonly ISuggestionsDataSource dataSource;
         private readonly DelegateCommand gotoGamepediaCommand;
 
-        [NotNull] private readonly IExternalUriOpener uriOpener;
+        private readonly IExternalUriOpener uriOpener;
 
         private bool isFocused;
 

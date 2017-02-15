@@ -11,6 +11,7 @@ using JetBrains.Annotations;
 using Microsoft.Practices.Unity;
 using NuGet;
 using PoeBud.Config;
+using PoeBud.Models;
 using PoeBud.OfficialApi;
 using PoeBud.OfficialApi.DataTypes;
 using PoeShared;
@@ -25,6 +26,7 @@ namespace PoeBud.ViewModels
     {
         private readonly SerialDisposable characterSelectionDisposable = new SerialDisposable();
         private readonly ReactiveCommand<object> loginCommand;
+        [NotNull] private readonly IUiOverlaysProvider overlaysProvider;
         private readonly IFactory<IPoeClient, NetworkCredential, bool> poeClientFactory;
 
         private readonly PoeBudConfig resultingConfig = new PoeBudConfig();
@@ -45,20 +47,25 @@ namespace PoeBud.ViewModels
 
         private IReactiveList<TabSelectionViewModel> selectedCharacterStash;
 
+        private UiOverlayInfo selectedUiOverlay;
+
         private string sessionId;
 
         private string username;
 
         public PoeBudSettingsViewModel(
             [NotNull] IFactory<IPoeClient, NetworkCredential, bool> poeClientFactory,
+            [NotNull] IUiOverlaysProvider overlaysProvider,
             [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler,
             [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler)
         {
+            Guard.ArgumentNotNull(() => overlaysProvider);
             Guard.ArgumentNotNull(() => uiScheduler);
             Guard.ArgumentNotNull(() => bgScheduler);
             Guard.ArgumentNotNull(() => poeClientFactory);
 
             this.poeClientFactory = poeClientFactory;
+            this.overlaysProvider = overlaysProvider;
 
             loginCommand = ReactiveCommand.Create();
             loginCommand
@@ -121,6 +128,14 @@ namespace PoeBud.ViewModels
             set { this.RaiseAndSetIfChanged(ref selectedCharacterStash, value); }
         }
 
+        public UiOverlayInfo SelectedUiOverlay
+        {
+            get { return selectedUiOverlay; }
+            set { this.RaiseAndSetIfChanged(ref selectedUiOverlay, value); }
+        }
+
+        public IReactiveList<UiOverlayInfo> OverlaysList => overlaysProvider.OverlaysList;
+
         public string Username
         {
             get { return username; }
@@ -157,12 +172,13 @@ namespace PoeBud.ViewModels
             config.TransferPropertiesTo(resultingConfig);
 
             Username = config.LoginEmail;
-            SelectedCharacter = null;
+            SelectedCharacter = null;   
             CharactersList = null;
             SelectedCharacterStash = null;
             Hotkey = config.GetSetHotkey;
             HideXpBar = config.HideXpBar;
             IsEnabled = config.IsEnabled;
+            SelectedUiOverlay = OverlaysList.FirstOrDefault(x => x.Name == config.UiOverlayName);
         }
 
         public PoeBudConfig Save()
@@ -179,6 +195,7 @@ namespace PoeBud.ViewModels
             {
                 resultingConfig.CharacterName = SelectedCharacter.Name;
             }
+            resultingConfig.UiOverlayName = selectedUiOverlay.Name;
 
             resultingConfig.GetSetHotkey = hotkey;
             resultingConfig.HideXpBar = hideXpBar;

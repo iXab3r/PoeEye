@@ -40,8 +40,8 @@ namespace PoeShared.Scaffolding
             return Enum.GetValues(typeof(Key))
                 .OfType<Key>()
                 .Select(TryToCreateKeyGesture)
-                .Distinct()
                 .Select(x => x.Key == Key.None ? "None" : keyGestureConverter.ConvertToInvariantString(x))
+                .Distinct()
                 .OrderBy(x => x)
                 .ToArray();
         }

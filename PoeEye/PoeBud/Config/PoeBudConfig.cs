@@ -21,6 +21,8 @@ namespace PoeBud.Config
 
         public string CharacterName { get; set; }
 
+        public string UiOverlayName { get; set; }
+
         public int ExpectedSetsCount { get; set; }
 
         public TimeSpan StashUpdatePeriod { get; set; } = TimeSpan.FromSeconds(300);
