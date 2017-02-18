@@ -56,7 +56,11 @@ namespace PoeEye.PoeTrade.Updater
             set { this.RaiseAndSetIfChanged(ref mostRecentVersion, value); }
         }
 
-        public async Task CheckForUpdates()
+        /// <summary>
+        ///  Checks whether update exist and if so, downloads it
+        /// </summary>
+        /// <returns>True if application was updated</returns>
+        public async Task<bool> CheckForUpdates()
         {
             Log.Instance.Debug($"[ApplicationUpdaterModel] Update check requested");
 
@@ -78,7 +82,7 @@ namespace PoeEye.PoeTrade.Updater
                 Log.Instance.Debug($"[ApplicationUpdaterModel] UpdateInfo:\r\n{updateInfo?.DumpToText()}");
                 if (updateInfo == null || updateInfo.ReleasesToApply.Count == 0)
                 {
-                    return;
+                    return false;
                 }
 
                 Log.Instance.Debug($"[ApplicationUpdaterModel] Downloading releases...");
@@ -108,6 +112,7 @@ namespace PoeEye.PoeTrade.Updater
 
                 MostRecentVersionAppFolder = new DirectoryInfo(newVersionFolder);
                 MostRecentVersion = lastAppliedRelease.Version;
+                return true;
             }
         }
 

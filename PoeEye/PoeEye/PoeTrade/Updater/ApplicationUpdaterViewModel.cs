@@ -55,6 +55,12 @@ namespace PoeEye.PoeTrade.Updater
                 .Subscribe(ex => Error = $"Update error: {ex.Message}")
                 .AddTo(Anchors);
 
+            updaterModel
+                .WhenAnyValue(x => x.MostRecentVersion)
+                .ObserveOn(uiScheduler)
+                .Subscribe(() => this.RaisePropertyChanged(nameof(MostRecentVersion)))
+                .AddTo(Anchors);
+
             restartCommand = ReactiveCommand.Create();
             restartCommand.Subscribe(updaterModel.RestartApplication).AddTo(Anchors);
         }
@@ -94,8 +100,7 @@ namespace PoeEye.PoeTrade.Updater
 
             try
             {
-                await updaterModel.CheckForUpdates();
-                IsOpen = true;
+                IsOpen = await updaterModel.CheckForUpdates();
             }
             catch (Exception ex)
             {
