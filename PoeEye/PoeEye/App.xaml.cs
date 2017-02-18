@@ -1,44 +1,46 @@
-﻿using PoeShared.Scaffolding;
+﻿using System;
+using System.Globalization;
+using System.Reflection;
+using System.Windows;
+using CommandLine;
+using Exceptionless;
+using Exceptionless.Models;
+using log4net.Core;
+using PoeEye.Prism;
+using PoeShared;
+using PoeShared.Scaffolding;
+using ReactiveUI;
 
 namespace PoeEye
 {
-    using System;
-    using System.Reflection;
-    using System.Windows;
-
-    using Exceptionless;
-    using Exceptionless.Models;
-
-    using log4net;
-    using log4net.Core;
-
-    using PoeShared;
-
-    using Prism;
-
-    using ReactiveUI;
-
     public partial class App
     {
         private static readonly string AppVersion = $"v{Assembly.GetExecutingAssembly().GetName().Version}";
 
-        public static readonly AppArguments Arguments = new AppArguments();
-
         public App()
         {
-            var arguments = Environment.GetCommandLineArgs();
-            if (!CommandLine.Parser.Default.ParseArguments(arguments, Arguments))
+            try
             {
-                throw new ApplicationException($"Failed to parse command line args: {string.Join(" ", arguments)}");
+                var arguments = Environment.GetCommandLineArgs();
+                if (!AppArguments.Parse(arguments))
+                {
+                    Log.InitializeLogging("Startup");
+                    throw new ApplicationException($"Failed to parse command line args: {string.Join(" ", arguments)}");
+                }
+
+                InitializeLogging();
+                Log.Instance.Debug($"[App..ctor] Arguments: {arguments.DumpToText()}");
+                Log.Instance.Debug($"[App..ctor] Parsed args: {AppArguments.Instance.DumpToText()}");
+
+                InitializeExceptionless();
+
+                RxApp.SupportsRangeNotifications = true;
             }
-
-            InitializeLogging();
-            Log.Instance.Debug($"[App..ctor] Arguments: {arguments.DumpToText()}");
-            Log.Instance.Debug($"[App..ctor] Parsed args: {Arguments.DumpToText()}");
-
-            InitializeExceptionless();
-
-            RxApp.SupportsRangeNotifications = true;
+            catch (Exception e)
+            {
+                Log.HandleException(e);
+                throw;
+            }
         }
 
         private static void InitializeExceptionless()
@@ -50,37 +52,31 @@ namespace PoeEye
             ExceptionlessClient.Default.Configuration.DefaultTags.Add(AppVersion);
             ExceptionlessClient.Default.Configuration.IncludePrivateInformation = true;
             ExceptionlessClient.Default.Configuration.SetVersion(AppVersion);
-            ExceptionlessClient.Default.Configuration.SetUserIdentity($"{Environment.UserName}@{Environment.MachineName}");
+            ExceptionlessClient.Default.Configuration.SetUserIdentity(
+                $"{Environment.UserName}@{Environment.MachineName}");
 
-            ExceptionlessClient.Default.SubmitEvent(new Event { Message = AppVersion, Type = "Version" });
+            ExceptionlessClient.Default.SubmitEvent(new Event {Message = AppVersion, Type = "Version"});
         }
 
-        private void CurrentDomainOnUnhandledException(object sender, UnhandledExceptionEventArgs unhandledExceptionEventArgs)
+        private void CurrentDomainOnUnhandledException(object sender,
+            UnhandledExceptionEventArgs unhandledExceptionEventArgs)
         {
-            Log.Instance.Error($"Unhandled application exception", unhandledExceptionEventArgs.ExceptionObject as Exception);
+            Log.Instance.Error(
+                $"Unhandled application exception", unhandledExceptionEventArgs.ExceptionObject as Exception);
         }
 
         private void InitializeLogging()
         {
-            if (Arguments.IsDebugMode)
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomainOnUnhandledException;
+            if (AppArguments.Instance.IsDebugMode)
             {
-                GlobalContext.Properties["configuration"] = "Debug";
-
-                var repository = (log4net.Repository.Hierarchy.Hierarchy)LogManager.GetRepository();
-                repository.Root.Level = Level.Trace;
-                repository.RaiseConfigurationChanged(EventArgs.Empty);
-
-                Log.Instance.Info("Debug mode initialized");
+                Log.InitializeLogging("Debug");
+                Log.SwitchLoggingLevel(Level.Trace);
             }
             else
             {
-                GlobalContext.Properties["configuration"] = "Release";
-                Log.Instance.Info("Release mode initialized");
+                Log.InitializeLogging("Release");
             }
-
-            AppDomain.CurrentDomain.UnhandledException += CurrentDomainOnUnhandledException;
-
-            Log.Instance.Info("Application logging started");
         }
 
         protected override void OnStartup(StartupEventArgs e, bool? isFirstInstance)

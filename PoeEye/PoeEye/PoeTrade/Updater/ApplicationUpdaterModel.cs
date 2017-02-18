@@ -67,7 +67,7 @@ namespace PoeEye.PoeTrade.Updater
             var appName = Assembly.GetExecutingAssembly().GetName().Name;
             var rootDirectory = default(string);
 
-            if (App.Arguments.IsDebugMode)
+            if (AppArguments.Instance.IsDebugMode)
             {
                 rootDirectory = AppDomain.CurrentDomain.BaseDirectory;
             }
@@ -89,7 +89,7 @@ namespace PoeEye.PoeTrade.Updater
                 await mgr.DownloadReleases(updateInfo.ReleasesToApply, UpdateProgress);
 
                 string newVersionFolder;
-                if (App.Arguments.IsDebugMode)
+                if (AppArguments.Instance.IsDebugMode)
                 {
                     Log.Instance.Debug("[ApplicationUpdaterModel] Debug mode detected, skipping update");
                     newVersionFolder = AppDomain.CurrentDomain.BaseDirectory;

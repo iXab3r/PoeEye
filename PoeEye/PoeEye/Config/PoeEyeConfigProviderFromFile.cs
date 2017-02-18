@@ -33,7 +33,7 @@ namespace PoeEye.Config
 
         public PoeEyeConfigProviderFromFile()
         {
-            if (App.Arguments.IsDebugMode)
+            if (AppArguments.Instance.IsDebugMode)
             {
                 Log.Instance.Debug("[PoeEyeConfigProviderFromFile..ctor] Debug mode detected");
                 configFilePath = Path.Combine(ConfigFileDirectory, DebugConfigFileName);
