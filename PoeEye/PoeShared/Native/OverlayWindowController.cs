@@ -47,6 +47,7 @@ namespace PoeShared.Native
             };
             overlayWindow.Show();
             var overlayWindowHandle = new WindowInteropHelper(overlayWindow).Handle;
+            Log.Instance.Debug($"[OverlayWindowController..ctor] Overlay window({overlayMode} + {windowTracker}) handle: 0x{overlayWindowHandle.ToInt64():x8}");
 
             var application = Application.Current;
             if (application != null)
@@ -68,21 +69,23 @@ namespace PoeShared.Native
                             mainWindowClosed,
                             applicationExit
                         )
-                        .Subscribe(overlayWindow.Close)
+                        .Subscribe(overlayWindow.Close, Log.HandleUiException)
                         .AddTo(Anchors);
             }
 
-            windowTracker
-                .WhenAnyValue(x => x.IsActive)
-                .Select(x => x || windowTracker.ActiveWindowHandle == overlayWindowHandle)
-                .Where(isActive => overlay.IsVisible != isActive)
+            overlay
+                .WhenAnyValue(x => x.IsVisible)
+                .Subscribe(x => this.RaisePropertyChanged(nameof(IsVisible)))
+                .AddTo(Anchors);
+
+            Observable.CombineLatest(
+                    windowTracker.WhenAnyValue(x => x.IsActive),
+                    windowTracker.WhenAnyValue(x => x.ActiveWindowHandle).Select(x => x == overlayWindowHandle),
+                    (x, y) => new { WindowIsActive = x, OverlayIsActive = y }
+                )
+                .Select(x => x.WindowIsActive || x.OverlayIsActive)
                 .ObserveOn(uiScheduler)
-                .Subscribe(
-                    isActive =>
-                    {
-                        overlay.IsVisible = isActive;
-                        this.RaisePropertyChanged(nameof(IsVisible));
-                    })
+                .Subscribe(isActive => overlay.IsVisible = isActive, Log.HandleUiException)
                 .AddTo(Anchors);
 
             windowTracker
