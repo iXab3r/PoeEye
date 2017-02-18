@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
@@ -41,16 +42,28 @@ namespace PoeEye.Prism
         {
             base.InitializeShell();
 
+            Log.Instance.Info($"[Bootstrapper] Initializing shell...");
+            var sw = Stopwatch.StartNew();
+
             RegisterExtensions();
             InitializeConfigConverters();
 
             Mouse.OverrideCursor = new Cursor(new MemoryStream(Properties.Resources.PathOfExile_102));
-
             var splashWindow = new SplashScreen("Resources\\Splash.png");
             splashWindow.Show(true, true);
 
             var window = (Window)Shell;
             Application.Current.MainWindow = window;
+
+            Observable
+                .FromEventPattern<RoutedEventHandler, RoutedEventArgs>(h => window.Loaded += h, h => window.Loaded -= h)
+                .Take(1)
+                .Subscribe(
+                    () =>
+                    {
+                        sw.Stop();
+                        Log.Instance.Info($"[Bootstrapper] Shell initialization has taken {sw.ElapsedMilliseconds}ms");
+                    });
         }
 
         protected override IModuleCatalog CreateModuleCatalog()
