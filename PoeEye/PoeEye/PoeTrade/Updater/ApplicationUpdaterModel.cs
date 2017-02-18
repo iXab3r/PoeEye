@@ -97,7 +97,7 @@ namespace PoeEye.PoeTrade.Updater
                 else
                 {
                     Log.Instance.Debug("[ApplicationUpdaterModel] Applying releases...");
-                    newVersionFolder = mgr.ApplyReleases(updateInfo).Result;
+                    newVersionFolder = await mgr.ApplyReleases(updateInfo);
                 }
 
                 var lastAppliedRelease = updateInfo.ReleasesToApply.Last();
