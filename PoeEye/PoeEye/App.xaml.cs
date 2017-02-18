@@ -68,6 +68,7 @@ namespace PoeEye
         private void InitializeLogging()
         {
             AppDomain.CurrentDomain.UnhandledException += CurrentDomainOnUnhandledException;
+            RxApp.DefaultExceptionHandler = Log.ErrorsSubject;
             if (AppArguments.Instance.IsDebugMode)
             {
                 Log.InitializeLogging("Debug");

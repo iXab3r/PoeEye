@@ -1,23 +1,35 @@
-﻿using log4net;
+﻿using System;
+using System.Reactive.Subjects;
+using Exceptionless;
+using Guards;
+using JetBrains.Annotations;
+using log4net;
 using log4net.Core;
+using log4net.Repository.Hierarchy;
+using PoeShared.Scaffolding;
 using ILog = Common.Logging.ILog;
 using LogManager = Common.Logging.LogManager;
 
 namespace PoeShared
 {
-    using System;
-
-    using Exceptionless;
-
-    using Guards;
-
-    using JetBrains.Annotations;
-
-    public static class Log
+    public class Log : DisposableReactiveObject
     {
-        private static readonly Lazy<ILog> instance = new Lazy<ILog>(() => LogManager.GetLogger(typeof (Log)));
+        private static readonly Lazy<Log> InstanceProvider = new Lazy<Log>();
 
-        public static ILog Instance => instance.Value;
+        private readonly Lazy<ILog> loggerInstanceProvider = new Lazy<ILog>(() => LogManager.GetLogger(typeof(Log)));
+
+        public Log()
+        {
+            Errors.Subscribe(HandleUiException).AddTo(Anchors);
+        }
+
+        public static ILog Instance => InstanceProvider.Value.Logger;
+
+        public static ISubject<Exception> ErrorsSubject => InstanceProvider.Value.Errors;
+
+        public ISubject<Exception> Errors { get; } = new Subject<Exception>();
+
+        public ILog Logger => loggerInstanceProvider.Value;
 
         public static void HandleException([NotNull] Exception exception)
         {
@@ -40,17 +52,17 @@ namespace PoeShared
             Guard.ArgumentNotNull(() => configurationMode);
 
             GlobalContext.Properties["configuration"] = configurationMode;
-            Log.Instance.Info($"Logging in '{configurationMode}' mode initialized");
+            Instance.Info($"Logging in '{configurationMode}' mode initialized");
         }
 
         public static void SwitchLoggingLevel(Level loggingLevel)
         {
             Guard.ArgumentNotNull(() => loggingLevel);
 
-            var repository = (log4net.Repository.Hierarchy.Hierarchy)log4net.LogManager.GetRepository();
+            var repository = (Hierarchy) log4net.LogManager.GetRepository();
             repository.Root.Level = Level.Trace;
             repository.RaiseConfigurationChanged(EventArgs.Empty);
-            Log.Instance.Info($"Logging level switched to '{loggingLevel}'");
+            Instance.Info($"Logging level switched to '{loggingLevel}'");
         }
     }
 }

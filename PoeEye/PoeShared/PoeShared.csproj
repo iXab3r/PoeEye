@@ -289,6 +289,7 @@
     <Compile Include="Scaffolding\LambdaComparer.cs" />
     <Compile Include="Scaffolding\ObjectExtensions.cs" />
     <Compile Include="Scaffolding\ObservableExtensions.cs" />
+    <Compile Include="Scaffolding\ReactiveCommandExtensions.cs" />
     <Compile Include="Scaffolding\ResourceReader.cs" />
     <Compile Include="Scaffolding\StringExtensions.cs" />
     <Compile Include="Scaffolding\UnityContainerExtensions.cs" />

@@ -14,6 +14,8 @@
                       xmlns:filterExtension="clr-namespace:PoeEye.Utilities.FilterExtension"
                       xmlns:scaffolding="clr-namespace:PoeShared.Scaffolding;assembly=PoeShared"
                       xmlns:net="clr-namespace:FontAwesome.Net;assembly=FontAwesome.Net"
+                      xmlns:poeEye="clr-namespace:PoeEye"
+                      xmlns:updater="clr-namespace:PoeEye.PoeTrade.Updater"
                       mc:Ignorable="d"
                       Title="{Binding MainWindowTitle}"
                       MinWidth="1200"
@@ -51,8 +53,8 @@
 
                     <Expander.Header>
                         <StackPanel Orientation="Vertical">
-                            <TextBlock FontSize="14" 
-                                       Text="QUERY LIST" 
+                            <TextBlock FontSize="14"
+                                       Text="QUERY LIST"
                                        RenderTransformOrigin="0.5,0.5"
                                        HorizontalAlignment="Center"
                                        VerticalAlignment="Top">
@@ -62,21 +64,22 @@
                                     </TransformGroup>
                                 </TextBlock.LayoutTransform>
                             </TextBlock>
-                            <Button 
-                                    Width="24" Height="24"
-                                    HorizontalAlignment="Center"
-                                    VerticalAlignment="Top"
-                                    Command="{Binding RefreshAllTabsCommand}"
-                                    Focusable="False"
-                                    ToolTip="Force refresh all tabs"
-                                    Padding="5"
-                                    Content="{x:Static net:FontAwesome.refresh}">
+                            <Button
+                                Width="24" Height="24"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Top"
+                                Command="{Binding RefreshAllTabsCommand}"
+                                Focusable="False"
+                                ToolTip="Force refresh all tabs"
+                                Padding="5"
+                                Content="{x:Static net:FontAwesome.refresh}">
                                 <Button.Style>
                                     <Style TargetType="{x:Type Button}" BasedOn="{StaticResource CircleButton}">
-                                        <Setter Property="BorderThickness" Value="2"/>
+                                        <Setter Property="BorderThickness" Value="2" />
                                         <Style.Triggers>
                                             <Trigger Property="IsMouseOver" Value="True">
-                                                <Setter Property="Background" Value="{StaticResource FlatButtonPressedBackgroundBrush}"/>
+                                                <Setter Property="Background"
+                                                        Value="{StaticResource FlatButtonPressedBackgroundBrush}" />
                                             </Trigger>
                                         </Style.Triggers>
                                     </Style>
@@ -146,81 +149,87 @@
     </Grid>
 
     <controls:MetroWindow.LeftWindowCommands>
-        <controls:WindowCommands>
-            <StackPanel Orientation="Horizontal">
+        <controls:WindowCommands ShowSeparators="True">
+            <Button
+                Command="{Binding CreateNewTabCommand}"
+                Content="&#xF00E; New query"
+                FontFamily="{StaticResource FontAwesome}"
+                FontWeight="Bold" />
 
-                <Button
-                    Command="{Binding CreateNewTabCommand}"
-                    Content="&#xF00E; New query"
-                    FontFamily="{StaticResource FontAwesome}"
-                    FontWeight="Bold" />
+            <Button
+                Content="&#xF029; Show summary"
+                FontFamily="{StaticResource FontAwesome}"
+                Margin="5,0"
+                FontWeight="Bold">
+                <Button.Style>
+                    <Style TargetType="{x:Type ButtonBase}" BasedOn="{StaticResource ChromelessButtonStyle}">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding SelectedTab}" Value="{x:Null}">
+                                <Setter Property="Foreground" Value="{StaticResource ControlBackgroundBrush}" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="Click">
+                        <utilities:SetPropertyAction PropertyName="SelectedTab" TargetObject="{Binding}"
+                                                     PropertyValue="{x:Null}" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </Button>
 
-                <Separator />
-
-                <Button
-                    Content="&#xF029; Show summary"
-                    FontFamily="{StaticResource FontAwesome}"
-                    Margin="5,0"
-                    FontWeight="Bold">
-                    <Button.Style>
-                        <Style TargetType="{x:Type ButtonBase}" BasedOn="{StaticResource ChromelessButtonStyle}">
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding SelectedTab}" Value="{x:Null}">
-                                    <Setter Property="Foreground" Value="{StaticResource ControlBackgroundBrush}" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Button.Style>
-                    <i:Interaction.Triggers>
-                        <i:EventTrigger EventName="Click">
-                            <utilities:SetPropertyAction PropertyName="SelectedTab" TargetObject="{Binding}"
-                                                         PropertyValue="{x:Null}" />
-                        </i:EventTrigger>
-                    </i:Interaction.Triggers>
-                </Button>
-
-            </StackPanel>
-
+            <Button
+                Content="{x:Static net:FontAwesome.folder_open}"
+                FontFamily="{StaticResource FontAwesome}"
+                Margin="5,0"
+                FontWeight="Bold"
+                ToolTip="Open PoeEye folder"
+                Command="{Binding OpenAppDataDirectoryCommand}" />
         </controls:WindowCommands>
 
     </controls:MetroWindow.LeftWindowCommands>
 
     <controls:MetroWindow.RightWindowCommands>
-        <controls:WindowCommands>
-            <StackPanel Orientation="Horizontal">
+        <controls:WindowCommands ShowSeparators="True">
+            <ContentPresenter Content="{Binding ProxyProviderViewModel}" />
 
-                <ContentPresenter Content="{Binding ProxyProviderViewModel}" />
+            <ContentPresenter Content="{Binding ApplicationUpdater}">
+                <ContentPresenter.ContentTemplate>
+                    <DataTemplate DataType="{x:Type updater:ApplicationUpdaterViewModel}">
+                        <StackPanel Orientation="Horizontal">
+                            <controls:ProgressRing Height="20" Width="20" IsActive="true"
+                                                   Foreground="{StaticResource TextBrush}"
+                                                   Visibility="{Binding IsBusy, Converter={StaticResource BoolFalseToHiddenConverter}}" />
 
-                <controls:ProgressRing Height="20" Width="20" IsActive="true"
-                                       Foreground="{StaticResource TextBrush}"
-                                       Visibility="{Binding ApplicationUpdater.IsBusy, Converter={StaticResource BoolFalseToCollapsedConverter}}" />
-                <Button Command="{Binding ApplicationUpdater.CheckForUpdatesCommand}"
-                        CommandParameter="{Binding}"
-                        IsEnabled="{Binding ApplicationUpdater.IsBusy, Converter={StaticResource BoolTrueToCollapsedConverter}}"
-                        Content="Check for updates" />
+                            <Button Content="Check for updates"
+                                    FontFamily="{StaticResource FontAwesome}"
+                                    Command="{Binding CheckForUpdatesCommand}"
+                                    CommandParameter="{Binding}"/>
+                        </StackPanel>
+                    </DataTemplate>
 
-                <StackPanel Orientation="Horizontal" Height="24" Margin="5,0">
-                    <Button Content="&#xF1D7; Chat" FontFamily="{StaticResource FontAwesome}">
-                        <i:Interaction.Triggers>
-                            <i:EventTrigger EventName="Click">
-                                <utilities:SetPropertyAction PropertyName="IsOpen"
-                                                             TargetObject="{Binding ElementName=ChatFlyout}"
-                                                             PropertyValue="{Binding ElementName=ChatFlyout, Path=IsOpen, Converter={StaticResource BoolInversionConverter}}" />
-                            </i:EventTrigger>
-                        </i:Interaction.Triggers>
-                    </Button>
+                </ContentPresenter.ContentTemplate>
+            </ContentPresenter>
 
-                    <Button Content="&#xF085; Settings" FontFamily="{StaticResource FontAwesome}">
-                        <i:Interaction.Triggers>
-                            <i:EventTrigger EventName="Click">
-                                <utilities:SetPropertyAction PropertyName="IsOpen"
-                                                             TargetObject="{Binding ElementName=SettingsFlyout}"
-                                                             PropertyValue="{Binding ElementName=SettingsFlyout, Path=IsOpen, Converter={StaticResource BoolInversionConverter}}" />
-                            </i:EventTrigger>
-                        </i:Interaction.Triggers>
-                    </Button>
-                </StackPanel>
-            </StackPanel>
+            <Button Content="&#xF1D7; Chat" FontFamily="{StaticResource FontAwesome}">
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="Click">
+                        <utilities:SetPropertyAction PropertyName="IsOpen"
+                                                     TargetObject="{Binding ElementName=ChatFlyout}"
+                                                     PropertyValue="{Binding ElementName=ChatFlyout, Path=IsOpen, Converter={StaticResource BoolInversionConverter}}" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </Button>
+
+            <Button Content="&#xF085; Settings" FontFamily="{StaticResource FontAwesome}">
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="Click">
+                        <utilities:SetPropertyAction PropertyName="IsOpen"
+                                                     TargetObject="{Binding ElementName=SettingsFlyout}"
+                                                     PropertyValue="{Binding ElementName=SettingsFlyout, Path=IsOpen, Converter={StaticResource BoolInversionConverter}}" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </Button>
         </controls:WindowCommands>
     </controls:MetroWindow.RightWindowCommands>
 

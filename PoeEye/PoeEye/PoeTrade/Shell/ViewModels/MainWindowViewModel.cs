@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Concurrency;
@@ -29,6 +31,8 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
 
     internal sealed class MainWindowViewModel : DisposableReactiveObject, IMainWindowViewModel
     {
+        private static readonly string ExplorerExecutablePath = Environment.ExpandEnvironmentVariables(@"%WINDIR%\explorer.exe");
+
         private static readonly TimeSpan CheckForUpdatesTimeout = TimeSpan.FromHours(1);
         private static readonly TimeSpan ConfigSaveSampingTimeout = TimeSpan.FromSeconds(10);
 
@@ -97,6 +101,9 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
             SummaryTab = summaryTabFactory.Create(TabsList);
             SummaryTab.AddTo(Anchors);
 
+            OpenAppDataDirectoryCommand = ReactiveCommand
+                .CreateAsyncTask(x => OpenAppDataDirectory());
+
             createNewTabCommand
                 .Subscribe(arg => CreateNewTabCommandExecuted(arg as IPoeQueryInfo))
                 .AddTo(Anchors);
@@ -109,6 +116,7 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
 
             refreshAllTabsCommand = ReactiveCommand
                 .CreateAsyncTask(_ => RefreshAllTabsCommandExecuted(), uiScheduler);
+
             refreshAllTabsCommand
                 .Subscribe()
                 .AddTo(Anchors);
@@ -135,7 +143,6 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
                 .Sample(ConfigSaveSampingTimeout)
                 .Subscribe(SaveConfig, Log.HandleException)
                 .AddTo(Anchors);
-
             Observable
                 .Timer(DateTimeOffset.MinValue, CheckForUpdatesTimeout, bgScheduler)
                 .ObserveOn(uiScheduler)
@@ -148,6 +155,8 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
         public ICommand CloseTabCommand => closeTabCommand;
 
         public ICommand RefreshAllTabsCommand => refreshAllTabsCommand;
+
+        public ICommand OpenAppDataDirectoryCommand { get; }
 
         public ApplicationUpdaterViewModel ApplicationUpdater { get; }
 
@@ -188,6 +197,11 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
             base.Dispose();
 
             Log.Instance.Debug($"[MainWindowViewModel.Dispose] Viewmodel disposed");
+        }
+
+        private async Task OpenAppDataDirectory()
+        {
+            await Task.Run(() => Process.Start(ExplorerExecutablePath, AppArguments.AppDataDirectory));
         }
 
         private void CreateNewTabCommandExecuted([CanBeNull] IPoeQueryInfo query)

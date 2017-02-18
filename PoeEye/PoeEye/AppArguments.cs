@@ -1,17 +1,27 @@
 ﻿using System;
 using System.Globalization;
 using CommandLine;
+using PoeShared.Scaffolding;
+using ReactiveUI;
 
 namespace PoeEye
 {
-    public class AppArguments
+    public class AppArguments : DisposableReactiveObject
     {
         private static readonly Lazy<AppArguments> InstanceProducer = new Lazy<AppArguments>();
 
         public static AppArguments Instance => InstanceProducer.Value;
 
-        [Option('d', "debugMode", DefaultValue = false)]
-        public bool IsDebugMode { get; set; }
+        public static readonly string AppDataDirectory = Environment.ExpandEnvironmentVariables(@"%LOCALAPPDATA%\PoeEye");
+
+        private bool isDebugMode;
+
+        [Option('d', "debugMode", DefaultValue = false)] 
+        public bool IsDebugMode
+        {
+            get { return isDebugMode; }
+            set { this.RaiseAndSetIfChanged(ref isDebugMode, value); }
+        }
 
         public static bool Parse(string[] args)
         {

@@ -14,12 +14,14 @@
         <Ellipse.Style>
           <Style TargetType="{x:Type Ellipse}">
             <Setter Property="Fill" Value="Orange" />
+            <Setter Property="ToolTip" Value="Direct connection" />
             <Style.Triggers>
               <DataTrigger Binding="{Binding IsProxified}">
                 <DataTrigger.Value>
                   <system:Boolean>True</system:Boolean>
                 </DataTrigger.Value>
                 <Setter Property="Fill" Value="Green" />
+                <Setter Property="ToolTip" Value="Connection is routed through proxy" />
               </DataTrigger>
             </Style.Triggers>
           </Style>
@@ -28,10 +30,13 @@
 
       <TextBlock Grid.Column="1"
                  Margin="5,0"
-                 VerticalAlignment="Center">
+                 VerticalAlignment="Center"
+                 FontFamily="{StaticResource FontAwesome}">
         <TextBlock.Inlines>
-          <Run Text="{Binding ActiveProxiesCount}" Foreground="DarkSeaGreen" /> /
-          <Run Text="{Binding TotalProxiesCount}" />
+          <Run Text="{Binding ActiveProxiesCount}" Foreground="DarkSeaGreen"
+               ToolTip="Number of active proxies" />
+          /
+          <Run Text="{Binding TotalProxiesCount}" ToolTip="Number of known proxies" />
         </TextBlock.Inlines>
       </TextBlock>
     </Grid>
