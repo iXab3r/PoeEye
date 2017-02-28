@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Concurrency;
 using System.Threading.Tasks;
@@ -36,16 +37,41 @@ namespace PoeShared.PoeDatabase
                     .AsParallel()
                     .Select(x => x.KnownEntitiesNames)
                     .SelectMany(x => x)
+                    .Where(x => !string.IsNullOrWhiteSpace(x))
                     .Distinct(StringComparer.OrdinalIgnoreCase)
+                    .OrderBy(x => x, StringComparer.OrdinalIgnoreCase)
                     .ToArray();
 
-                supplierCompletionSource.SetResult(allEntities);
+                Log.Instance.Debug($"[ComplexPoeDatabaseReader] Got {allEntities.Length} entities");
+
+                var cleanedEntities = CleanupEntities(allEntities);
+                Log.Instance.Debug($"[ComplexPoeDatabaseReader] Post-cleanup: {allEntities.Length} entities");
+                supplierCompletionSource.SetResult(cleanedEntities);
             }
             catch (Exception ex)
             {
                 Log.HandleException(ex);
                 supplierCompletionSource.TrySetResult(new string[0]);
             }
+        }
+
+        private string[] CleanupEntities(string[] source)
+        {
+            var result = new List<string>();
+
+            var lastEntity = default(string);
+            foreach (var entity in source)
+            {
+                if (!string.IsNullOrWhiteSpace(lastEntity) && entity.StartsWith(lastEntity))
+                {
+                    continue;
+                }
+
+                lastEntity = entity;
+                result.Add(lastEntity);
+            }
+
+            return result.ToArray();
         }
     }
 }

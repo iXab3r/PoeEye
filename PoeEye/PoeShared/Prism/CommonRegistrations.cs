@@ -85,7 +85,7 @@ namespace PoeShared.Prism
                             new DependencyOverride<IPoeDatabaseReader[]>(
                                 new IPoeDatabaseReader[]
                                 {
-                                    // unity.Resolve<StaticPoeDatabaseReader>(), //TODO Remove static database entirely
+                                    unity.Resolve<StaticPoeDatabaseReader>(),
                                     unity.Resolve<PoeNinjaDatabaseReader>(),
                                 }
                             )
