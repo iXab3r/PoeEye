@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reactive.Concurrency;
 using System.Reflection;
 using CsQuery;
 using Guards;
@@ -47,7 +48,7 @@ namespace PoeOracle.PoeDatabase
             return result;
         }
 
-        private IEnumerable<SkillGemExtendedInfo> LoadExtendedInfo()
+        private static IEnumerable<SkillGemExtendedInfo> LoadExtendedInfo()
         {
             var jsonGemsData =
                 Assembly.GetExecutingAssembly().ReadResourceAsString($"{nameof(PoeDatabase)}.SkillGems.json");
@@ -69,7 +70,7 @@ namespace PoeOracle.PoeDatabase
             }
         }
 
-        private IEnumerable<SkillGemInfo> LoadGemsInfoFromPoeFyi()
+        private static IEnumerable<SkillGemInfo> LoadGemsInfoFromPoeFyi()
         {
             var rawGemsData =
                 Assembly.GetExecutingAssembly().ReadResourceAsString($"{nameof(PoeDatabase)}.PoeFyiDump.html");

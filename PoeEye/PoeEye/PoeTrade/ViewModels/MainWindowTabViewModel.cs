@@ -27,6 +27,7 @@ namespace PoeEye.PoeTrade.ViewModels
         private readonly ReactiveCommand<object> markAllAsReadCommand;
         private readonly IFactory<IPoeQueryViewModel, IPoeStaticData> queryFactory;
         private readonly ReactiveCommand<object> refreshCommand;
+        private readonly ReactiveCommand<object> newSearchCommand;
 
         private readonly string tabHeader;
 
@@ -73,6 +74,9 @@ namespace PoeEye.PoeTrade.ViewModels
             refreshCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.IsBusy).Select(x => !x));
             refreshCommand.Subscribe(RefreshCommandExecuted);
 
+            newSearchCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.IsBusy).Select(x => !x));
+            newSearchCommand.Subscribe(NewSearchCommandExecuted);
+
             apiSelector
                 .WhenAnyValue(x => x.SelectedModule)
                 .Where(x => x != null)
@@ -117,6 +121,8 @@ namespace PoeEye.PoeTrade.ViewModels
         public IPoeApiWrapper SelectedApi => ApiSelector.SelectedModule;
 
         public ICommand RefreshCommand => refreshCommand;
+
+        public ICommand NewSearchCommand => newSearchCommand;
 
         public ICommand MarkAllAsReadCommand => markAllAsReadCommand;
 
@@ -242,28 +248,32 @@ namespace PoeEye.PoeTrade.ViewModels
                 : $"{queryDescription}";
         }
 
+        private void NewSearchCommandExecuted(object arg)
+        {
+            TradesList.ActiveQuery = null;
+            RefreshCommandExecuted(arg);
+        }
+
         private void RefreshCommandExecuted(object arg)
         {
-            if (TradesList.ActiveQuery == null && arg is Func<IPoeQueryInfo>)
+            var queryBuilder = arg as Func<IPoeQueryInfo>;
+            if (TradesList.ActiveQuery == null && queryBuilder != null)
             {
-                RunNewSearch(arg as Func<IPoeQueryInfo>);
+                var query = queryBuilder();
+                Log.Instance.Debug(
+                    $"[MainWindowTabViewModel.RefreshCommandExecuted] Search command executed, running query\r\n{query.DumpToText()}");
+                RunNewSearch(query);
             }
             else
             {
-                Log.Instance.Trace(
+                Log.Instance.Debug(
                     $"[MainWindowTabViewModel.RefreshCommandExecuted] Refresh command executed, running query\r\n{query.DumpToText()}");
                 TradesList.Refresh();
             }
         }
 
-        private void RunNewSearch(Func<IPoeQueryInfo> queryBuilder)
+        private void RunNewSearch(IPoeQueryInfo query)
         {
-            Guard.ArgumentNotNull(() => queryBuilder);
-
-            var query = queryBuilder();
-            Log.Instance.Trace(
-                $"[MainWindowTabViewModel.SearchCommandExecute] Search command executed, running query\r\n{query.DumpToText()}");
-
             TradesList.Items.Clear();
             TradesList.ActiveQuery = query;
             Query.IsExpanded = false;

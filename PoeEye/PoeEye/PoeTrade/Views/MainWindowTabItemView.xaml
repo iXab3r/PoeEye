@@ -64,7 +64,7 @@
             <Button.Style>
                         <Style TargetType="{x:Type Button}" BasedOn="{StaticResource AutoRecheckButtonStyle}">
                             <Setter Property="Content" Value="{x:Static net:FontAwesome.refresh}"/>
-                            <Setter Property="ToolTip" Value="Rerun current query"/>
+                            <Setter Property="ToolTip" Value="Refresh current query"/>
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding TradesList.ActiveQuery}" Value="{x:Null}">
                                     <Setter Property="Content" Value="{x:Static net:FontAwesome.search}"/>
@@ -73,6 +73,11 @@
                             </Style.Triggers>
                         </Style>
             </Button.Style>
+            <i:Interaction.Triggers>
+              <i:EventTrigger EventName="MouseRightButtonUp">
+                <i:InvokeCommandAction Command="{Binding NewSearchCommand}" CommandParameter="{Binding Query.PoeQueryBuilder}"/>
+              </i:EventTrigger>
+            </i:Interaction.Triggers>
         </Button>
       </Grid>
 

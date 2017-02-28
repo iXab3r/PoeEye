@@ -50,7 +50,7 @@
           <StackPanel Orientation="Vertical">
             <controls:MetroContentControl Content="{Binding Query}" />
             <DockPanel>
-              <Button HorizontalAlignment="Right" Width="150" Command="{Binding SearchCommand}"
+              <Button HorizontalAlignment="Right" Width="150" Command="{Binding NewSearchCommand}"
                       CommandParameter="{Binding Query.PoeQueryBuilder}"
                       Content="Search" />
             </DockPanel>
