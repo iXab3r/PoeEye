@@ -5,6 +5,7 @@ using Gma.System.MouseKeyHook;
 using PoeShared.Communications;
 using PoeShared.Modularity;
 using PoeShared.Native;
+using PoeShared.PoeDatabase.PoeNinja;
 using PoeShared.PoeTrade.Query;
 using PoeShared.UI.Models;
 using PoeShared.UI.ViewModels;
@@ -36,7 +37,6 @@ namespace PoeShared.Prism
                 .RegisterInstance(typeof(IKeyboardMouseEvents), Hook.GlobalEvents(), new ContainerControlledLifetimeManager())
                 .RegisterSingleton<IPoeEyeModulesRegistrator, PoeEyeModulesRegistrator>()
                 .RegisterSingleton<IPoeEyeModulesEnumerator, PoeEyeModulesRegistrator>()
-                .RegisterSingleton<IPoeDatabaseReader, StaticPoeDatabaseReader>()
                 .RegisterSingleton<IEqualityComparer<IPoeItem>, PoeItemEqualityComparer>()
                 .RegisterSingleton<IConverter<NameValueCollection, string>, NameValueCollectionToQueryStringConverter>()
                 .RegisterSingleton<IProxyProvider, GenericProxyProvider>(new InjectionFactory(unity => new GenericProxyProvider()))
@@ -76,6 +76,20 @@ namespace PoeShared.Prism
                WellKnownOverlays.AllWindowsLayeredOverlay,
                WellKnownWindows.AllWindows,
                OverlayMode.Layered);
+
+            Container
+                .RegisterType<IPoeDatabaseReader>(
+                    new ContainerControlledLifetimeManager(),
+                    new InjectionFactory(
+                        unity => unity.Resolve<ComplexPoeDatabaseReader>(
+                            new DependencyOverride<IPoeDatabaseReader[]>(
+                                new IPoeDatabaseReader[]
+                                {
+                                    // unity.Resolve<StaticPoeDatabaseReader>(), //TODO Remove static database entirely
+                                    unity.Resolve<PoeNinjaDatabaseReader>(),
+                                }
+                            )
+                        )));
         }
     }
 }

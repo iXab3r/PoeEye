@@ -235,7 +235,9 @@
     <Compile Include="Native\OverlayWindowViewModel.cs" />
     <Compile Include="Native\TransparentWindow.cs" />
     <Compile Include="Native\WindowsServices.cs" />
+    <Compile Include="PoeDatabase\ComplexPoeDatabaseReader.cs" />
     <Compile Include="PoeDatabase\IPoeDatabaseReader.cs" />
+    <Compile Include="PoeDatabase\PoeNinja\PoeNinjaDatabaseReader.cs" />
     <Compile Include="PoeDatabase\StaticPoeDatabaseReader.cs" />
     <Compile Include="PoeTrade\IPoeApi.cs" />
     <Compile Include="PoeTrade\IPoeApiWrapper.cs" />

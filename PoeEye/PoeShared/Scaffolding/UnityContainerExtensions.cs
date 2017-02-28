@@ -28,7 +28,7 @@ namespace PoeShared.Scaffolding
             
             return instance.RegisterType<TFrom, TTo>(name, new ContainerControlledLifetimeManager(), members);
         }
-
+        
         public static IUnityContainer RegisterWindowTracker(this IUnityContainer instance, string dependencyName, Func<string> windowNameFunc)
         {
             return instance
