@@ -28,5 +28,10 @@ namespace PoeShared.Native
                     break;
             }
         }
+
+        public override string ToString()
+        {
+            return $"Overlay({overlayMode})";
+        }
     }
 }

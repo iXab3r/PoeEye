@@ -84,8 +84,9 @@ namespace PoeShared.Native
                     (x, y) => new { WindowIsActive = x, OverlayIsActive = y }
                 )
                 .Select(x => x.WindowIsActive || x.OverlayIsActive)
+                .DistinctUntilChanged()
                 .ObserveOn(uiScheduler)
-                .Subscribe(isActive => overlay.IsVisible = isActive, Log.HandleUiException)
+                .Subscribe(SetVisibility, Log.HandleUiException)
                 .AddTo(Anchors);
 
             windowTracker
@@ -132,6 +133,12 @@ namespace PoeShared.Native
                 return;
             }
             WindowsServices.SetForegroundWindow(windowHandle);
+        }
+
+        private void SetVisibility(bool isVisible)
+        {
+            Log.Instance.Debug($"[OverlayWindowController] Overlay '{overlayWindow}'.IsVisible = {overlay.IsVisible} => {isVisible} (tracker {windowTracker})");
+            overlay.IsVisible = isVisible;
         }
     }
 }
