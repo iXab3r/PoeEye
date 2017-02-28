@@ -23,7 +23,7 @@ namespace PoeEye.PoeTrade.Models
         {
             Guard.ArgumentNotNull(() => haystack);
 
-            searchService = new XSearchService<string>(haystack, x => x);
+            searchService = new RunglishSearchService(new XSearchService<string>(haystack, x => x));
         }
 
         public IEnumerable GetSuggestions(string filter)

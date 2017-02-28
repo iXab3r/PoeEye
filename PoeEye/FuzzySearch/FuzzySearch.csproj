@@ -53,6 +53,7 @@
     <Compile Include="LcsSearchService.cs" />
     <Compile Include="LevensteinDistanceSearchService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RunglishSearchService.cs" />
     <Compile Include="SearchResult.cs" />
     <Compile Include="XSearchService.cs" />
   </ItemGroup>
