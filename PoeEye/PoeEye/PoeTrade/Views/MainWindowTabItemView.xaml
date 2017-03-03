@@ -3,7 +3,9 @@
                     xmlns:net="clr-namespace:FontAwesome.Net;assembly=FontAwesome.Net"
                     xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
                     xmlns:viewModels="clr-namespace:PoeEye.PoeTrade.ViewModels"
-                    xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls">
+                    xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
+                    xmlns:sharedControls="clr-namespace:PoeShared.Scaffolding.WPF.Controls;assembly=PoeShared"
+                    xmlns:wpf="clr-namespace:PoeShared.Scaffolding.WPF;assembly=PoeShared">
   <DataTemplate DataType="{x:Type viewModels:MainWindowTabViewModel}" x:Key="MainWindowTabItemViewTemplate">
     <DataTemplate.Resources>
       <Style TargetType="{x:Type Button}" BasedOn="{StaticResource CircleButton}" x:Key="AutoRecheckButtonStyle">
@@ -16,13 +18,23 @@
 
     </DataTemplate.Resources>
 
-    <Grid Margin="0,3,0,3">
+    <Grid Margin="0,3,0,3" Background="Transparent" IsHitTestVisible="True" ToolTipService.HorizontalOffset="10" ToolTipService.VerticalOffset="10">
       <Grid.ColumnDefinitions>
         <ColumnDefinition Width="Auto" />
         <ColumnDefinition Width="*" />
         <ColumnDefinition Width="Auto" />
         <ColumnDefinition Width="Auto" />
       </Grid.ColumnDefinitions>
+
+      <Grid.ToolTip>
+        <sharedControls:MouseButtonsTooltip LeftButton="Show items list" RightButton="Mark All items as Read" />
+      </Grid.ToolTip>
+
+      <i:Interaction.Triggers>
+        <i:EventTrigger EventName="MouseRightButtonUp">
+          <i:InvokeCommandAction Command="{Binding MarkAllAsReadCommand}"/>
+        </i:EventTrigger>
+      </i:Interaction.Triggers>
 
       <DockPanel Grid.Column="0"
                  VerticalAlignment="Bottom"
@@ -59,25 +71,28 @@
                 HorizontalAlignment="Right"
                 VerticalAlignment="Top"
                 Focusable="False"
+                ToolTipService.HorizontalOffset="10" ToolTipService.VerticalOffset="10"
                 Command="{Binding RefreshCommand}"
                 CommandParameter="{Binding Query.PoeQueryBuilder}">
-            <Button.Style>
-                        <Style TargetType="{x:Type Button}" BasedOn="{StaticResource AutoRecheckButtonStyle}">
-                            <Setter Property="Content" Value="{x:Static net:FontAwesome.refresh}"/>
-                            <Setter Property="ToolTip" Value="Refresh current query"/>
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding TradesList.ActiveQuery}" Value="{x:Null}">
-                                    <Setter Property="Content" Value="{x:Static net:FontAwesome.search}"/>
-                                    <Setter Property="ToolTip" Value="Run new query with current parameters"/>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-            </Button.Style>
-            <i:Interaction.Triggers>
-              <i:EventTrigger EventName="MouseRightButtonUp">
-                <i:InvokeCommandAction Command="{Binding NewSearchCommand}" CommandParameter="{Binding Query.PoeQueryBuilder}"/>
-              </i:EventTrigger>
-            </i:Interaction.Triggers>
+          <Button.Style>
+            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource AutoRecheckButtonStyle}">
+              <Setter Property="Content" Value="{x:Static net:FontAwesome.refresh}"/>
+              <Style.Triggers>
+                <DataTrigger Binding="{Binding TradesList.ActiveQuery}" Value="{x:Null}">
+                  <Setter Property="Content" Value="{x:Static net:FontAwesome.search}"/>
+                </DataTrigger>
+              </Style.Triggers>
+            </Style>
+          </Button.Style>
+          <i:Interaction.Triggers>
+            <i:EventTrigger EventName="MouseRightButtonUp">
+              <i:InvokeCommandAction Command="{Binding NewSearchCommand}" CommandParameter="{Binding Query.PoeQueryBuilder}"/>
+            </i:EventTrigger>
+          </i:Interaction.Triggers>
+
+          <Button.ToolTip>
+            <sharedControls:MouseButtonsTooltip LeftButton="Refresh" RightButton="Restart query (erases historical data)"  />
+          </Button.ToolTip>
         </Button>
       </Grid>
 
@@ -87,7 +102,7 @@
 
       <Border Grid.Column="2"
               Margin="10,0,10,0">
-        <Border Height="30" VerticalAlignment="Center" ToolTip="Right-click to Mark all items as read" >
+        <Border Height="30" VerticalAlignment="Center"  >
           <Border.Style>
             <Style TargetType="Border">
               <Setter Property="RenderTransformOrigin" Value="0.5, 0.5"/>
@@ -114,12 +129,6 @@
             </Style>
           </Border.Style>
 
-          <i:Interaction.Triggers>
-            <i:EventTrigger EventName="MouseRightButtonUp">
-               <i:InvokeCommandAction Command="{Binding MarkAllAsReadCommand}"/>
-            </i:EventTrigger>
-          </i:Interaction.Triggers>
-
           <TextBlock 
             FontSize="16"
             VerticalAlignment="Center"
@@ -143,7 +152,7 @@
       <StackPanel Grid.Column="3"
                   Orientation="Horizontal">
         <ContentControl Content="{Binding AudioNotificationSelector}" VerticalAlignment="Top"/>
-        
+
         <Button Width="24" Height="24"
                 Style="{StaticResource CircleButton}"
                 HorizontalAlignment="Right"

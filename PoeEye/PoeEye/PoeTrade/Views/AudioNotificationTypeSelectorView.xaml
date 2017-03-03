@@ -4,14 +4,17 @@
                     xmlns:net="clr-namespace:FontAwesome.Net;assembly=FontAwesome.Net"
                     xmlns:poeTrade="clr-namespace:PoeEye.PoeTrade"
                     xmlns:utilities="clr-namespace:PoeEye.Utilities"
-                    xmlns:common="clr-namespace:PoeEye.PoeTrade.Common">
+                    xmlns:common="clr-namespace:PoeEye.PoeTrade.Common"
+                    xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+                    xmlns:wpf="clr-namespace:PoeShared.Scaffolding.WPF;assembly=PoeShared"
+                    xmlns:controls="clr-namespace:PoeShared.Scaffolding.WPF.Controls;assembly=PoeShared">
 
 
   <DataTemplate DataType="{x:Type viewModels:AudioNotificationSelectorViewModel}">
     <Grid>
       <ToggleButton IsChecked="{Binding AudioEnabled}"
                     Width="40" Height="40"
-                    ToolTip="{Binding SelectedValue, Mode=OneWay, StringFormat='Audio notifications for this tab: {0}'}"
+                    ToolTipService.HorizontalOffset="10" ToolTipService.VerticalOffset="10"
                     Focusable="False">
         <ToggleButton.Style>
           <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource ToggleCircleButton}" >
@@ -55,6 +58,13 @@
           </ContextMenu>
         </ToggleButton.ContextMenu>
 
+
+        <ToggleButton.ToolTip>
+          <controls:MouseButtonsTooltip 
+            MouseToolTip="{Binding SelectedValue, Mode=OneWay, StringFormat='Audio notifications for this tab: {0}'}"
+            LeftButton="Enable/Disable Audio notification" 
+            RightButton="Select Audio notification"  />
+        </ToggleButton.ToolTip>
       </ToggleButton>
     </Grid>
   </DataTemplate>

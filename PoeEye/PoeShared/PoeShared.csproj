@@ -151,6 +151,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Reactive.Core, Version=2.2.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Rx-Core.2.2.5\lib\net45\System.Reactive.Core.dll</HintPath>
       <Private>True</Private>
@@ -296,6 +297,9 @@
     <Compile Include="Scaffolding\StringExtensions.cs" />
     <Compile Include="Scaffolding\UnityContainerExtensions.cs" />
     <Compile Include="Scaffolding\WindowTracker.cs" />
+    <Compile Include="UI\Controls\MouseButtonsTooltip.xaml.cs">
+      <DependentUpon>MouseButtonsTooltip.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Scaffolding\WPF\Converters\ConverterHelpers.cs" />
     <Compile Include="Scaffolding\WPF\Converters\ExceptionToMessageConverter.cs" />
     <Compile Include="Scaffolding\WPF\Converters\NullToVisibilityConverter.cs" />
@@ -315,12 +319,18 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="FodyWeavers.xml" />
+    <Resource Include="Resources\mouse-device-left-click-control.png" />
+    <Resource Include="Resources\mouse-device-right-click-control.png" />
     <EmbeddedResource Include="PoeDatabase\PoeTradeUniques.lst" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="Native\OverlayWindowView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\Controls\MouseButtonsTooltip.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Themes\Converters.xaml">
       <Generator>MSBuild:Compile</Generator>

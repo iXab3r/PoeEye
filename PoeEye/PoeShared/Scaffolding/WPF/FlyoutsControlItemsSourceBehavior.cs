@@ -19,14 +19,14 @@ namespace PoeShared.Scaffolding.WPF
     {
         public static readonly DependencyProperty ItemsSourceProperty =
             DependencyProperty.Register(
-                "ItemsSource", 
-                typeof(object), 
-                typeof(FlyoutsControlItemsSourceBehavior), 
+                "ItemsSource",
+                typeof(object),
+                typeof(FlyoutsControlItemsSourceBehavior),
                 new UIPropertyMetadata(new List<object>(), OnItemsSourcePropertyChangedCallback));
-        
+
         public object ItemsSource
         {
-            get { return (object)GetValue(ItemsSourceProperty); }
+            get { return (object) GetValue(ItemsSourceProperty); }
             set { SetValue(ItemsSourceProperty, value); }
         }
 
@@ -39,7 +39,7 @@ namespace PoeShared.Scaffolding.WPF
         }
 
         private static void OnItemsSourcePropertyChangedCallback(
-            DependencyObject dependencyObject, 
+            DependencyObject dependencyObject,
             DependencyPropertyChangedEventArgs dependencyPropertyChangedEventArgs)
         {
             var behavior = dependencyObject as FlyoutsControlItemsSourceBehavior;
@@ -53,7 +53,7 @@ namespace PoeShared.Scaffolding.WPF
             itemsSourceSubscription.Disposable = itemsSourceAnchors;
 
             var npcSource = itemsSource as INotifyCollectionChanged;
-            if (npcSource == null )
+            if (npcSource == null)
             {
                 return;
             }
@@ -63,7 +63,8 @@ namespace PoeShared.Scaffolding.WPF
                 (h => npcSource.CollectionChanged += h, h => npcSource.CollectionChanged -= h)
                 .Subscribe(x => ProcessCollectionChange(itemsSource, x.EventArgs))
                 .AddTo(itemsSourceAnchors);
-            ProcessCollectionChange(itemsSource, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+            ProcessCollectionChange(
+                itemsSource, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
         }
 
         private void ProcessCollectionChange(IEnumerable itemsSource, NotifyCollectionChangedEventArgs args)

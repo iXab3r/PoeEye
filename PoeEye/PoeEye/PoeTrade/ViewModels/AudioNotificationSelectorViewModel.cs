@@ -80,9 +80,9 @@ namespace PoeEye.PoeTrade.ViewModels
 
         public IReactiveList<object> Items { get; }
 
-        internal ICommand SelectNotificationCommand { get; }
+        public ICommand SelectNotificationCommand { get; }
 
-        internal ICommand PlayNotificationCommand { get; }
+        public ICommand PlayNotificationCommand { get; }
 
         private void SelectNotificationCommandExecuted(object arg)
         {
