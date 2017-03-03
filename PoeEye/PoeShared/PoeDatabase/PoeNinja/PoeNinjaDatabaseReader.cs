@@ -45,6 +45,7 @@ namespace PoeShared.PoeDatabase.PoeNinja
                     ExtractFrom(api.GetUniqueWeaponAsync(StandardLeagueName)),
                     ExtractFrom(api.GetUniqueArmourAsync(StandardLeagueName)),
                     ExtractFrom(api.GetUniqueAccessoryAsync(StandardLeagueName)),
+                    ExtractFrom(api.GetCurrencyAsync(StandardLeagueName)),
                 };
 
                 var knownEntities = new ConcurrentBag<string>();
@@ -80,6 +81,12 @@ namespace PoeShared.PoeDatabase.PoeNinja
             return result.Lines?.Select(x => x.Name).ToArray() ?? new string[0];
         }
 
+        private static async Task<string[]> ExtractFrom(Task<CurrencyResponse> task)
+        {
+            var result = await task;
+            return result.Lines?.Select(x => x.CurrencyTypeName).ToArray() ?? new string[0];
+        }
+
         internal interface IPoeNinjaApi
         {
             [Get("GetMapOverview")]
@@ -109,16 +116,29 @@ namespace PoeShared.PoeDatabase.PoeNinja
             [Get("GetUniqueAccessoryOverview")]
             Task<GenericResponse> GetUniqueAccessoryAsync([Query] string league);
 
+            [Get("GetCurrencyOverview")]
+            Task<CurrencyResponse> GetCurrencyAsync([Query] string league);
+
         }
 
-        internal struct GenericResponse
+        internal struct GenericResponse 
         {
             public List<GenericItem> Lines { get; set; }
+        }
+
+        internal struct CurrencyResponse
+        {
+            public List<CurrencyItem> Lines { get; set; }
         }
 
         internal struct GenericItem
         {
             public string Name { get; set; }
         }
+
+        internal struct CurrencyItem
+        {
+            public string CurrencyTypeName { get; set; }
+        }                                                   
     }
 }
