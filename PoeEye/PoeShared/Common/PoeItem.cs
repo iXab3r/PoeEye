@@ -1,4 +1,6 @@
-﻿namespace PoeShared.Common
+﻿using System.Windows;
+
+namespace PoeShared.Common
 {
     using System;
 
@@ -48,7 +50,7 @@
 
         public string CriticalChance { get; set; }
 
-        public string Level { get; set; }
+        public string ItemLevel { get; set; }
 
         public string Requirements { get; set; }
 
@@ -69,6 +71,10 @@
         public bool IsUnidentified { get; set; }
 
         public PoeItemRarity Rarity { get; set; }
+
+        public string TabName { get; set; }
+
+        public Point? PositionInsideTab { get; set; }
 
         public string Raw { get; set; }
 

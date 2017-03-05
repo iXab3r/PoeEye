@@ -84,6 +84,10 @@ namespace PoeShared.PoeTrade
 
         public int? LevelMin { get; set; }
 
+        public int? ItemLevelMax { get; set; }
+
+        public int? ItemLevelMin { get; set; }
+
         public int? LinkedB { get; set; }
 
         public int? LinkedG { get; set; }

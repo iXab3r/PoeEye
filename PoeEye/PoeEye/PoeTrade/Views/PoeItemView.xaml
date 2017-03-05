@@ -49,9 +49,9 @@
       </Grid.Resources>
       <StackPanel Orientation="Vertical">
 
-        <StackPanel HorizontalAlignment="Center" Visibility="{Binding Level, Converter={StaticResource NullToCollapsedConverter}}">
+        <StackPanel HorizontalAlignment="Center" Visibility="{Binding ItemLevel, Converter={StaticResource NullToCollapsedConverter}}">
           <Label Content="Level: " Style="{StaticResource ItemStatHeader}"/>
-          <TextBlock Text="{Binding Level}" Style="{StaticResource ItemStatMedium}" />
+          <TextBlock Text="{Binding ItemLevel}" Style="{StaticResource ItemStatMedium}" />
         </StackPanel>
 
         <StackPanel Visibility="{Binding Armour, Converter={StaticResource NullToCollapsedConverter}}">

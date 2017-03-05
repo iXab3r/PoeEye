@@ -59,6 +59,8 @@ namespace PoeEye.PoeTrade
                 CreateArgument("q_max", source.QualityMax),
                 CreateArgument("level_min", source.LevelMin),
                 CreateArgument("level_max", source.LevelMax),
+                CreateArgument("ilvl_min", source.ItemLevelMin),
+                CreateArgument("ilvl_max", source.ItemLevelMax),
                 CreateArgument("mapq_min", source.IncQuantityMin),
                 CreateArgument("mapq_max", source.IncQuantityMax),
                 CreateArgument("buyout_min", source.BuyoutMin),

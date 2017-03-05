@@ -1,3 +1,6 @@
+using System.Windows;
+using PoeShared.Scaffolding;
+
 namespace PoeEye.PoeTrade
 {
     using System;
@@ -212,17 +215,46 @@ namespace PoeEye.PoeTrade
                 Shield = parser["td[class=table-stats] td[data-name=quality_shield]"]?.Text(),
                 BlockChance = parser["td[class=table-stats] td[data-name=block]"]?.Text(),
                 CriticalChance = parser["td[class=table-stats] td[data-name=crit]"]?.Text(),
-                Level = parser["td[class=table-stats] td[data-name=level]"]?.Text(),
+                ItemLevel = parser["td[class=table-stats] td[data-name=level]"]?.Text(),
                 Requirements = parser["td[class=item-cell] ul[class=requirements proplist]"]?.Text(),
                 IsCorrupted = parser["td[class=item-cell] span[class~=corrupted]"].Any(),
                 FirstSeen = dateTimeExtractor.ExtractTimestamp(parser["td[class=item-cell] span[class~=found-time-ago]"]?.Text()),
                 Mods = implicitMods.Concat(explicitMods).Where(IsValid).ToArray(),
                 Links = ExtractLinksInfo(row),
                 Rarity = ExtractItemRarity(row),
+                PositionInsideTab = ExtractPositionInsideTab(parser),
+                TabName = parser.Attr("data-tab"),
                 Raw = row.Render(),
             };
+            result.SuggestedPrivateMessage = PrepareTradeMessage(result);
             TrimProperties(result);
             return result;
+        }
+
+        private static string PrepareTradeMessage(PoeItem item)
+        {
+            var location = "";
+            if (!string.IsNullOrWhiteSpace(item.TabName) && item.PositionInsideTab != null)
+            {
+                location = $" (stash tab \"{item.TabName}\"; position: left {item.PositionInsideTab.Value.X}, top {item.PositionInsideTab.Value.Y})";
+            }
+
+            var message = string.IsNullOrWhiteSpace(item.Price)
+                   ? $"@{item.UserIgn} Hi, I would like to buy your {item.ItemName} listed in {item.League}{location}, offer is "
+                   : $"@{item.UserIgn} Hi, I would like to buy your {item.ItemName} listed for {item.Price} in {item.League}{location}";
+
+            return message;
+        }
+
+        private static Point? ExtractPositionInsideTab(CQ parser)
+        {
+            var x = parser.Attr("data-x").ToIntOrDefault() ?? -1;
+            var y = parser.Attr("data-y").ToIntOrDefault() ?? -1;
+            if (x < 0 || y < 0)
+            {
+                return null;
+            }
+            return new Point(x, x);
         }
 
         private static float? ParseFloat(string rawValue)

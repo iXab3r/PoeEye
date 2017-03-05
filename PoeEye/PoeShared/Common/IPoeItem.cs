@@ -1,4 +1,6 @@
-﻿namespace PoeShared.Common
+﻿using System.Windows;
+
+namespace PoeShared.Common
 {
     using System;
 
@@ -48,7 +50,7 @@
 
         string CriticalChance { get; }
 
-        string Level { get; }
+        string ItemLevel { get; }
 
         string Requirements { get; }
 
@@ -59,6 +61,10 @@
         string Note { get; }
 
         string Raw { get; }
+
+        string TabName { get; }
+
+        Point? PositionInsideTab { get; }
 
         string SuggestedPrivateMessage { get; }
 

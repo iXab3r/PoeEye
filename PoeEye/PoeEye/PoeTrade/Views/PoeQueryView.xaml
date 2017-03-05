@@ -331,12 +331,12 @@
 
 
                 <TextBlock Grid.Row="0" Grid.Column="4"
-                   Text="Account name" Style="{StaticResource TextBlockHeader}" />
+                   Text="Item Level" Style="{StaticResource TextBlockHeader}" />
                 <StackPanel Grid.Row="0" Grid.Column="5">
-                    <TextBox Style="{StaticResource TextBoxKey}" 
-                             Width="165"
-                             Text="{Binding AccountName}"
-                             controls:TextBoxHelper.Watermark="any" />
+                    <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}"
+                                  Value="{Binding ItemLevelMin, Converter={StaticResource NullableConverter}}" />
+                    <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}"
+                                  Value="{Binding ItemLevelMax, Converter={StaticResource NullableConverter}}" />
                 </StackPanel>
 
                 <TextBlock Grid.Row="2" Grid.Column="2"
@@ -428,9 +428,10 @@
                 </StackPanel>
             </Grid>
 
-            <Grid Row="14">
+            <Grid Row="14" Height="28" Margin="0, 5">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="30" />
+                    <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
@@ -452,6 +453,15 @@
                 <StackPanel Grid.Column="4"  Margin="10, 0">
                     <TextBlock Text="Normalize quality" Style="{StaticResource TextBlockHeader}" />
                     <controls:ToggleSwitch IsChecked="{Binding NormalizeQuality}" OffLabel="" OnLabel="" />
+                </StackPanel>
+               
+                <StackPanel Grid.Column="5"  Margin="10, 0">
+                    <TextBlock Text="Account name" Style="{StaticResource TextBlockHeader}" />
+                    <TextBox  Margin="5, 0"
+                          Style="{StaticResource TextBoxKey}" 
+                          Width="235"
+                          Text="{Binding AccountName}"
+                          controls:TextBoxHelper.Watermark="any" />
                 </StackPanel>
             </Grid>
 

@@ -85,6 +85,10 @@ namespace PoeEye.PoeTrade.ViewModels
 
         private int? levelMin;
 
+        private int? itemLevelMax;
+
+        private int? itemLevelMin;
+
         private int? linkedB;
 
         private int? linkedG;
@@ -440,6 +444,19 @@ namespace PoeEye.PoeTrade.ViewModels
             get { return levelMax; }
             set { this.RaiseAndSetIfChanged(ref levelMax, value); }
         }
+
+        public int? ItemLevelMin
+        {
+            get { return itemLevelMin; }
+            set { this.RaiseAndSetIfChanged(ref itemLevelMin, value); }
+        }
+
+        public int? ItemLevelMax
+        {
+            get { return itemLevelMax; }
+            set { this.RaiseAndSetIfChanged(ref itemLevelMax, value); }
+        }
+
 
         public int? IncQuantityMin
         {

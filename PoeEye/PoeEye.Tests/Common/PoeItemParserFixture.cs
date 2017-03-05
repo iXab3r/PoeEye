@@ -288,7 +288,7 @@ namespace PoeEye.Tests.Common
                     x => x.Rarity == PoeItemRarity.Rare &&
                          x.ItemName == "Corruption Clasp" &&
                          x.Requirements == "Level: 28" &&
-                         x.Level == "44" &&
+                         x.ItemLevel == "44" &&
                          x.Mods == new[]
                          {
                              new PoeItemMod
@@ -389,7 +389,7 @@ namespace PoeEye.Tests.Common
                 Mock.Of<IPoeItem>(
                     x => x.Rarity == PoeItemRarity.Rare &&
                          x.ItemName == "Two-Stone Ring" &&
-                         x.Level == "74" &&
+                         x.ItemLevel == "74" &&
                          x.Mods == new[]
                          {
                              new PoeItemMod
@@ -431,7 +431,7 @@ namespace PoeEye.Tests.Common
                 Mock.Of<IPoeItem>(
                     x => x.Rarity == PoeItemRarity.Unique &&
                          x.ItemName == "Lioneye's Remorse" &&
-                         x.Level == "70" &&
+                         x.ItemLevel == "70" &&
                          x.Requirements == "Level: 70 Str: 159 Int: 68" &&
                          x.Links == new PoeLinksInfo("R-R-R") &&
                          x.Mods == new[]

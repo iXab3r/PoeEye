@@ -146,7 +146,7 @@ namespace PoeEye.ItemParser
             {
                 return false;
             }
-            item.Level = itemLevelMatch.Groups[1].Value;
+            item.ItemLevel = itemLevelMatch.Groups[1].Value;
             return true;
         }
 

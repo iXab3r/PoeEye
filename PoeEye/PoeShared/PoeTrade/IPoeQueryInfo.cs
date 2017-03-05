@@ -30,7 +30,6 @@ namespace PoeShared.PoeTrade
 
         float? BuyoutMin { get; }
 
-
         float? CritMax { get; }
 
         float? CritMin { get; }
@@ -76,6 +75,10 @@ namespace PoeShared.PoeTrade
         int? LevelMax { get; }
 
         int? LevelMin { get; }
+
+        int? ItemLevelMax { get; }
+
+        int? ItemLevelMin { get; }
 
         int? LinkedB { get; }
 
