@@ -34,7 +34,8 @@ namespace PoeBud.ViewModels
         private readonly IClock clock;
         private readonly ISubject<Exception> exceptionsToPropagate = new Subject<Exception>();
         private readonly IKeyboardMouseEvents keyboardMouseEvents;
-        [NotNull] private readonly IUiOverlaysProvider overlaysProvider;
+        [NotNull]
+        private readonly IUiOverlaysProvider overlaysProvider;
         private readonly ObservableAsPropertyHelper<Exception> lastUpdateException;
         private readonly IFactory<PoeStashUpdater, IPoeBudConfig> stashAnalyzerFactory;
         private readonly IFactory<StashViewModel, StashUpdate, IPoeBudConfig> stashUpdateFactory;
@@ -130,6 +131,8 @@ namespace PoeBud.ViewModels
             set { this.RaiseAndSetIfChanged(ref stash, value); }
         }
 
+        public string CharacterName => actualConfig?.CharacterName;
+
         public TimeSpan TimeTillNextUpdate
             =>
                 stashUpdater == null || stashUpdater.LastUpdateTimestamp == DateTime.MinValue
@@ -148,6 +151,7 @@ namespace PoeBud.ViewModels
             UiOverlayPath = overlaysProvider.OverlaysList.FirstOrDefault(x => x.Name == config.UiOverlayName).AbsolutePath;
             hotkey = KeyGestureExtensions.SafeCreateGesture(config.GetSetHotkey);
             RefreshStashUpdater(actualConfig);
+            this.RaisePropertyChanged(nameof(CharacterName));
         }
 
         private void RefreshStashUpdater(PoeBudConfig config)
@@ -156,6 +160,7 @@ namespace PoeBud.ViewModels
 
             try
             {
+                Log.Instance.Info($"[MainViewModel] Reinitializing PoeBud...");
                 stashUpdaterDisposable.Disposable = null;
                 StashUpdater = null;
                 Stash = null;
@@ -163,25 +168,37 @@ namespace PoeBud.ViewModels
 
                 if (string.IsNullOrEmpty(config.LoginEmail) || string.IsNullOrEmpty(config.SessionId))
                 {
-                    throw new UnauthorizedAccessException(
-                        $"Credentials are not set, userName: {config.LoginEmail}, sessionId: {config.SessionId}");
+                    Log.Instance.Warn($"[MainViewModel] Credentials are not set, userName: {config.LoginEmail}, sessionId: {config.SessionId}");
+                    return;
                 }
 
                 if (!config.IsEnabled)
                 {
+                    Log.Instance.Debug($"[MainViewModel] PoeBud is disabled, terminating...");
                     return;
                 }
 
-                Observable.FromEventPattern<WinFormsKeyEventHandler, WinFormsKeyEventArgs>(
+                var keyPressedObservable = Observable.FromEventPattern<WinFormsKeyEventHandler, WinFormsKeyEventArgs>(
                         h => keyboardMouseEvents.KeyDown += h,
                         h => keyboardMouseEvents.KeyDown -= h)
                     .Where(x => IsEnabled)
                     .Where(x => !SolutionExecutor.IsBusy)
                     .Where(x => WindowManager.ActiveWindow != null)
+                    .Publish();
+                keyPressedObservable.Connect().AddTo(stashDisposable);
+
+                keyPressedObservable
                     .Where(x => hotkey.MatchesHotkey(x.EventArgs))
                     .Do(x => x.EventArgs.Handled = true)
                     .Subscribe(ExecuteSolutionCommandExecuted)
                     .AddTo(stashDisposable);
+
+                var refreshHotkey = new KeyGesture(hotkey.Key, ModifierKeys.Control | ModifierKeys.Shift);
+                keyPressedObservable
+                   .Where(x => refreshHotkey.MatchesHotkey(x.EventArgs))
+                   .Do(x => x.EventArgs.Handled = true)
+                   .Subscribe(ForceRefreshStashCommandExecuted)
+                   .AddTo(stashDisposable);
 
                 var updater = stashAnalyzerFactory.Create(config);
                 stashDisposable.Add(updater);
@@ -229,6 +246,25 @@ namespace PoeBud.ViewModels
 
             lastServerStashUpdate = stashUpdate;
             Stash = stashUpdateFactory.Create(stashUpdate, config);
+        }
+
+        private void ForceRefreshStashCommandExecuted()
+        {
+            try
+            {
+                Log.Instance.Debug($"[MainViewModel] Force refresh requested");
+                var updater = StashUpdater;
+                if (updater == null)
+                {
+                    return;
+                }
+                updater.ForceRefresh();
+            }
+            catch (Exception ex)
+            {
+                Log.HandleException(ex);
+                exceptionsToPropagate.OnNext(ex);
+            }
         }
 
         private async void ExecuteSolutionCommandExecuted()

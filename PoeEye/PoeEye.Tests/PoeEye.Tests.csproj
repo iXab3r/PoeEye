@@ -134,6 +134,7 @@
     <Compile Include="Communications\NameValueCollectionToQueryStringConverterFixture.cs" />
     <Compile Include="Common\PoeItemParserFixture.cs" />
     <Compile Include="Helpers\MockExtensions.cs" />
+    <Compile Include="PoeBud\OfficialApi\GearTypeAnalyzerFixture.cs" />
     <Compile Include="PoeTrade\PoeTradeDateTimeExtractorFixture.cs" />
     <Compile Include="PoeTrade\PoeTradeParserModernFixture.cs" />
     <Compile Include="PoeTrade\TestData\TestDataProvider.cs" />
@@ -160,6 +161,10 @@
     <ProjectReference Include="..\FuzzySearch\FuzzySearch.csproj">
       <Project>{9cee14a8-1436-4947-9c62-ff3ba83a330d}</Project>
       <Name>FuzzySearch</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PoeBud\PoeBud.csproj">
+      <Project>{da6c88ea-168e-4116-b0d1-0f732d5b4773}</Project>
+      <Name>PoeBud</Name>
     </ProjectReference>
     <ProjectReference Include="..\PoeEye.ItemParser\PoeEye.ItemParser.csproj">
       <Project>{ea3109dd-675d-4837-977d-af61b203bebc}</Project>

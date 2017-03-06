@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Security.Authentication;
+using System.Text.RegularExpressions;
 using CsQuery;
 using Guards;
 using JetBrains.Annotations;
 using PoeBud.OfficialApi.DataTypes;
 using PoeBud.OfficialApi.ProcurementLegacy;
+using PoeShared.Scaffolding;
 using RestSharp;
 
 namespace PoeBud.OfficialApi
@@ -192,16 +194,19 @@ namespace PoeBud.OfficialApi
             {
                 throw new ApplicationException($"Could not retrieve stash #{index} in league {league} (code: {response.StatusCode}, content-length: {response.ContentLength})");
             }
+            PostProcessStash(response.Data);
 
             foreach (var item in response.Data.Items.Where(x => x.TypeLine != null))
             {
                 item.ItemType = gearTypeAnalyzer.Resolve(item.TypeLine);
             }
 
-            if (response.Data.Tabs != null)
-            {
-                response.Data.Tabs = response.Data.Tabs.Where(x => !x.hidden).ToList();
-            }
+            response.Data.Tabs = response.Data
+                .Tabs
+                .EmptyIfNull()
+                .Where(x => !x.hidden)
+                .ToList();
+
             return response.Data;
         }
 
@@ -251,8 +256,28 @@ namespace PoeBud.OfficialApi
             {
                 throw new ApplicationException($"Could not retrieve inventory of character {characterName} @ {AccountName} (code: {response.StatusCode}, content-length: {response.ContentLength})");
             }
+            PostProcessInventory(response.Data);
 
             return response.Data;
+        }
+
+        private void PostProcessInventory(Inventory inventory)
+        {
+            inventory?.Items?.ForEach(CleanupItemName);
+        }
+
+        private void PostProcessStash(Stash stash)
+        {
+            stash?.Items?.ForEach(CleanupItemName);
+        }
+
+        private void CleanupItemName(Item item)
+        {
+            if (string.IsNullOrWhiteSpace(item.Name))
+            {
+                return;
+            }
+            item.Name = Regex.Replace(item.Name, @"\<.*\>", string.Empty);
         }
 
 

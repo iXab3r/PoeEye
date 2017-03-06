@@ -1,6 +1,7 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:viewModels="clr-namespace:PoeBud.ViewModels">
+                    xmlns:viewModels="clr-namespace:PoeBud.ViewModels"
+                    xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls">
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Generic.xaml" />
@@ -9,31 +10,32 @@
     <FontFamily x:Key="FontAwesome">pack://application:,,,/FontAwesome.Net;component/Fonts/#FontAwesome</FontFamily>
 
     <Style TargetType="{x:Type Label}" x:Key="IconLabel" BasedOn="{StaticResource {x:Type Label}}">
-        <Setter Property="FontFamily" Value="{StaticResource FontAwesome}"/>
+        <Setter Property="FontFamily" Value="{StaticResource FontAwesome}" />
     </Style>
 
     <Style TargetType="{x:Type TextBlock}" x:Key="IconTextblock" BasedOn="{StaticResource {x:Type TextBlock}}">
-        <Setter Property="FontFamily" Value="{StaticResource FontAwesome}"/>
+        <Setter Property="FontFamily" Value="{StaticResource FontAwesome}" />
     </Style>
 
     <DataTemplate DataType="{x:Type viewModels:PoeBudViewModel}">
-        <Grid >
+        <Grid>
 
             <Canvas>
-                <Rectangle Canvas.Top="{Binding WindowManager.ActiveWindow.StashBounds.Top}" 
-                       Canvas.Left="{Binding WindowManager.ActiveWindow.StashBounds.Left}" 
-                       Width="{Binding WindowManager.ActiveWindow.StashBounds.Width}" 
-                       Height="{Binding WindowManager.ActiveWindow.StashBounds.Height}" 
-                       Stroke="Red" StrokeThickness="3" Visibility="Collapsed"/>
+                <Rectangle Canvas.Top="{Binding WindowManager.ActiveWindow.StashBounds.Top}"
+                           Canvas.Left="{Binding WindowManager.ActiveWindow.StashBounds.Left}"
+                           Width="{Binding WindowManager.ActiveWindow.StashBounds.Width}"
+                           Height="{Binding WindowManager.ActiveWindow.StashBounds.Height}"
+                           Stroke="Red" StrokeThickness="3" Visibility="Collapsed" />
 
-                <Grid 
-                    Canvas.Top="960" Canvas.Left="624" TextBlock.FontSize="20" TextBlock.Foreground="White" Opacity="0.75"
+                <Grid
+                    Canvas.Top="960" Canvas.Left="624" TextBlock.FontSize="20" TextBlock.Foreground="White"
+                    Opacity="0.75"
                     Visibility="{Binding IsEnabled, Converter={StaticResource TrueToVisibleConverter}}">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="30"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="30" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
 
                     <Grid Grid.Row="0" Grid.Column="0" Margin="50, 5, 0, 5">
@@ -41,38 +43,57 @@
                     </Grid>
 
                     <Grid Grid.Row="1" Grid.Column="0" Margin="50, 5, 0, 5">
-                        <TextBlock  
-                           MaxWidth="600"
-                           Visibility="{Binding LastUpdateException, Converter={StaticResource NullToCollapsedConverter}}"
-                           Foreground="Orange"
-                           Text="{Binding LastUpdateException, StringFormat='&#xF071; {0}', Converter={StaticResource ExceptionToMessageConverter}}" 
-                           Style="{StaticResource IconTextblock}" TextTrimming="WordEllipsis" />
+                        <TextBlock
+                            MaxWidth="600"
+                            Visibility="{Binding LastUpdateException, Converter={StaticResource NullToCollapsedConverter}}"
+                            Foreground="Orange"
+                            Text="{Binding LastUpdateException, StringFormat='&#xF071; {0}', Converter={StaticResource ExceptionToMessageConverter}}"
+                            Style="{StaticResource IconTextblock}" TextTrimming="WordEllipsis" />
                     </Grid>
 
                     <Grid Grid.Row="2" Grid.Column="0">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
 
+                        <StackPanel Grid.Column="0"
+                                    Margin="10, 0"
+                                    Orientation="Horizontal"
+                                    Visibility="{Binding StashUpdater.IsBusy, Converter={StaticResource TrueToVisibleConverter}}">
+
+                            <controls:ProgressRing
+                                Height="18" Width="18"
+                                IsActive="{Binding StashUpdater.IsBusy}" />
+                            <TextBlock
+                                TextAlignment="Left"
+                                Text="{Binding TimeTillNextUpdate, Converter={StaticResource TimeSpanToHumanReadableStringConverter}}"
+                                VerticalAlignment="Center"
+                                Style="{StaticResource IconTextblock}" 
+                                Margin="5,0" />
+                        </StackPanel>
+
                         <TextBlock Grid.Column="0"
-                           Margin="10,0"
-                           TextAlignment="Center"
-                           Text="{Binding TimeTillNextUpdate, StringFormat='&#xF017; {0}', Converter={StaticResource TimeSpanToHumanReadableStringConverter}}" Style="{StaticResource IconTextblock}"/>
+                                   Margin="10,0"
+                                   TextAlignment="Center"
+                                   Visibility="{Binding StashUpdater.IsBusy, Converter={StaticResource TrueToCollapsedConverter}}"
+                                   Text="{Binding TimeTillNextUpdate, StringFormat='&#xF017; {0}', Converter={StaticResource TimeSpanToHumanReadableStringConverter}}"
+                                   Style="{StaticResource IconTextblock}" />
 
                         <TextBlock Grid.Column="2"
-                            TextAlignment="Left"
-                            Text="{Binding Stash.Solutions.Length, StringFormat='Sets: {0}'}" Style="{StaticResource IconTextblock}" Margin="10,0"/>
+                                   TextAlignment="Left"
+                                   Text="{Binding Stash.Solutions.Length, StringFormat='Sets: {0}'}"
+                                   Style="{StaticResource IconTextblock}" Margin="10,0" />
                     </Grid>
 
-                    <ContentPresenter Grid.Row="3" Grid.Column="0" 
-                                  Content="{Binding Stash}"/>
+                    <ContentPresenter Grid.Row="3" Grid.Column="0"
+                                      Content="{Binding Stash}" />
                 </Grid>
 
-                <Border Canvas.Top="1065" Canvas.Left="546" Width="820" Background="#0C0C0C" Height="8" Opacity="0.95" 
-                    Visibility="{Binding HideXpBar, Converter={StaticResource TrueToVisibleConverter}}" />
-                
+                <Border Canvas.Top="1065" Canvas.Left="546" Width="820" Background="#0C0C0C" Height="8" Opacity="0.95"
+                        Visibility="{Binding HideXpBar, Converter={StaticResource TrueToVisibleConverter}}" />
+
                 <Image Source="{Binding UiOverlayPath}" />
             </Canvas>
         </Grid>

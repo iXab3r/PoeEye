@@ -100,10 +100,12 @@ namespace PoeBud.OfficialApi.ProcurementLegacy
             Guard.ArgumentNotNull(() => itemType);
 
             var query = from runner in runners
-                        where runner.IsCompatibleType(itemType)
+                        let compatibleType = new { TypeName = runner.FindCompatibleType(itemType), GearType = runner.Type }
+                        where !string.IsNullOrWhiteSpace(compatibleType.TypeName)
+                        orderby compatibleType.TypeName.Length
                         select runner.Type;
 
-            return query.FirstOrDefault();
+            return query.LastOrDefault();
         }
 
         internal abstract class GearTypeRunner
@@ -115,7 +117,7 @@ namespace PoeBud.OfficialApi.ProcurementLegacy
 
             public GearType Type { get; set; }
 
-            public abstract bool IsCompatibleType(string item);
+            public abstract string FindCompatibleType(string item);
 
             public abstract string GetBaseType(string item);
         }
@@ -136,16 +138,26 @@ namespace PoeBud.OfficialApi.ProcurementLegacy
                 incompatibleTypes = new List<string>();
             }
 
-            public override bool IsCompatibleType(string itemType)
+            public override string FindCompatibleType(string itemName)
             {
                 // First, check the general types, to see if there is an easy match.
-                if (generalTypes.Any(itemType.Contains))
+                foreach (var typeName in generalTypes)
                 {
-                    return true;
+                    if (itemName.Contains(typeName))
+                    {
+                        return typeName;
+                    }
                 }
 
                 // Second, check all known types.
-                return compatibleTypes.Any(itemType.Contains);
+                foreach (var typeName in compatibleTypes)
+                {
+                    if (itemName.Contains(typeName))
+                    {
+                        return typeName;
+                    }
+                }
+                return null;
             }
 
             public override string GetBaseType(string itemType)
@@ -167,14 +179,14 @@ namespace PoeBud.OfficialApi.ProcurementLegacy
                 incompatibleTypes = new List<string> { "Ringmail" };
             }
 
-            public override bool IsCompatibleType(string itemType)
+            public override string FindCompatibleType(string itemName)
             {
-                if (itemType.Contains("Ring") && !incompatibleTypes.Any(itemType.Contains))
+                if (itemName.Contains("Ring") && !incompatibleTypes.Any(itemName.Contains))
                 {
-                    return true;
+                    return itemName;
                 }
 
-                return false;
+                return null;
             }
         }
 

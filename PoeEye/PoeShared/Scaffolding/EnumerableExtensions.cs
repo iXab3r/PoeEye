@@ -17,6 +17,11 @@ namespace PoeShared.Scaffolding
             return snapshottedEnumerable.ElementAt(Rng.Next(0, snapshottedEnumerable.Count()));
         }
 
+        public static IEnumerable<T> EmptyIfNull<T>(this IEnumerable<T> enumerable)
+        {
+            return enumerable ?? Enumerable.Empty<T>();
+        }
+
         public static IEnumerable<T> ForEach<T>(this IEnumerable<T> enumerable, Action<T> action)
         {
             Guard.ArgumentNotNull(() => enumerable);

@@ -1,4 +1,5 @@
-﻿using PoeBud.OfficialApi;
+﻿using System.Threading;
+using PoeBud.OfficialApi;
 using PoeBud.OfficialApi.DataTypes;
 using PoeShared;
 using PoeShared.Prism;
@@ -34,6 +35,7 @@ namespace PoeBud.Models
 
         private readonly ISubject<Exception> updateExceptionsSubject = new ReplaySubject<Exception>(1);
         private readonly ISubject<StashUpdate> updatesSubject = new ReplaySubject<StashUpdate>(1);
+        private readonly ISubject<Unit> refreshSubject = new Subject<Unit>();
         private readonly IPoeClient poeClient;
         private TimeSpan recheckPeriod;
         private DateTime lastUpdateTimestamp;
@@ -72,7 +74,7 @@ namespace PoeBud.Models
                 .Switch()
                 .Publish();
 
-            var queryObservable = periodObservable
+            var queryObservable = refreshSubject
                 .Where(x => !IsBusy)
                 .Do(StartUpdate)
                 .Select(x => Observable.Start(Refresh, bgScheduler))
@@ -85,7 +87,8 @@ namespace PoeBud.Models
                 .Subscribe()
                 .AddTo(Anchors);
 
-            periodObservable.Connect().AddTo(Anchors);
+            periodObservable.Subscribe(refreshSubject).AddTo(Anchors);
+            periodObservable.Connect();
         }
 
         public TimeSpan RecheckPeriod
@@ -110,6 +113,12 @@ namespace PoeBud.Models
 
         public IObservable<Exception> UpdateExceptions => updateExceptionsSubject;
 
+        public void ForceRefresh()
+        {
+            Log.Instance.Debug($"[PoeStashUpdater.ForceRefresh] Force update requested");
+            refreshSubject.OnNext(Unit.Default);
+        }
+
         private StashUpdate Refresh()
         {
             Log.Instance.Debug($"[PoeStashUpdater.Refresh] Updating stash(period:{recheckPeriod.TotalSeconds:F0}s)...");
@@ -118,6 +127,7 @@ namespace PoeBud.Models
                 Log.Instance.Debug("[PoeStashUpdater.Refresh] Authenticating...");
                 poeClient.Authenticate();
             }
+            Thread.Sleep(5000);
 
             Log.Instance.Debug($"[PoeStashUpdater.Refresh] Requesting characters list...");
             var charactersList = poeClient.GetCharacters();
