@@ -9,5 +9,7 @@ namespace PoeWhisperMonitor.Chat
         bool IsAvailable { get; }
 
         PoeMessageSendStatus SendMessage([NotNull] string message);
+
+        PoeMessageSendStatus SendMessage([NotNull] string message, bool terminateByPressingEnter);
     }
 }

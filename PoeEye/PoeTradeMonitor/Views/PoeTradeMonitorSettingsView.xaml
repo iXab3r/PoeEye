@@ -1,0 +1,80 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:wpf="clr-namespace:PoeShared.Scaffolding.WPF;assembly=PoeShared"
+                    xmlns:blue="http://www.nuget.org/Blue.MVVM"
+                    xmlns:scaffolding="clr-namespace:PoeShared.Scaffolding;assembly=PoeShared"
+                    xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib"
+                    xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
+                    xmlns:net="clr-namespace:FontAwesome.Net;assembly=FontAwesome.Net"
+                    xmlns:viewModels="clr-namespace:PoeEye.TradeMonitor.ViewModels"
+                    xmlns:modularity="clr-namespace:PoeEye.TradeMonitor.Modularity"
+                    xmlns:converters="clr-namespace:PoeShared.Scaffolding.WPF.Converters;assembly=PoeShared">
+
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Generic.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/PoeTradeMonitor;component/Themes/Styles.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+
+    <DataTemplate DataType="{x:Type viewModels:PoeTradeMonitorSettingsViewModel}">
+        <DataTemplate.Resources>
+            <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource TradeMonitorTextBlockStyleKey}">
+                <Setter Property="FontSize" Value="12" />
+            </Style>
+        </DataTemplate.Resources>
+
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="30" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <StackPanel Grid.Row="0" Grid.Column="0"
+                        Orientation="Horizontal">
+
+
+            </StackPanel>
+
+            <StackPanel Grid.Column="0" Grid.Row="1"
+                        Orientation="Vertical">
+                <Grid>
+                    <TextBlock Text="Response buttons" />
+                    <Button Content="&#xf055; Add new"
+                            Height="24" Width="110"
+                            HorizontalAlignment="Right"
+                            Style="{StaticResource TradeMonitorButtonStyleKey}"
+                            Command="{Binding AddMessageCommand}" Margin="5,0,0,0" />
+                </Grid>
+                <ItemsControl ItemsSource="{Binding PredefinedMessages}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="{x:Type modularity:MacroMessage}">
+                            <Grid Margin="0, 5, 0, 0">
+                                <Grid.ColumnDefinitions>
+
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBox Grid.Column="0" Margin="5,0" MinWidth="70"
+                                         Text="{Binding Label, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+
+                                <TextBox Grid.Column="1" Margin="5,0"
+                                         Text="{Binding Text, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+
+                                <Button Grid.Column="2" Margin="5,0"
+                                        Width="24"
+                                        Height="24"
+                                        Content="{x:Static net:FontAwesome.close}"
+                                        CommandParameter="{Binding}"
+                                        Style="{StaticResource TradeMonitorButtonStyleKey}"
+                                        Command="{Binding DataContext.RemoveMessageCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ItemsControl}}}" />
+                            </Grid>
+                        </DataTemplate>
+
+                    </ItemsControl.ItemTemplate>
+
+                </ItemsControl>
+            </StackPanel>
+        </Grid>
+    </DataTemplate>
+</ResourceDictionary>

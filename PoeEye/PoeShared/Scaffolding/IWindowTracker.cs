@@ -11,5 +11,7 @@ namespace PoeShared.Scaffolding
         string ActiveWindowTitle { get; }
 
         IntPtr ActiveWindowHandle { get; }
+
+        string TargetWindowName { get; }
     }
 }

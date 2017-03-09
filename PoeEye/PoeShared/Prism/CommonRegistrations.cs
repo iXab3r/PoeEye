@@ -34,7 +34,6 @@ namespace PoeShared.Prism
         {
             Container
                 .RegisterSingleton<IClock, Clock>()
-                .RegisterInstance(typeof(IKeyboardMouseEvents), Hook.GlobalEvents(), new ContainerControlledLifetimeManager())
                 .RegisterSingleton<IPoeEyeModulesRegistrator, PoeEyeModulesRegistrator>()
                 .RegisterSingleton<IPoeEyeModulesEnumerator, PoeEyeModulesRegistrator>()
                 .RegisterSingleton<IEqualityComparer<IPoeItem>, PoeItemEqualityComparer>()
@@ -48,6 +47,7 @@ namespace PoeShared.Prism
                 .RegisterType<IScheduler>(WellKnownSchedulers.UI, new InjectionFactory(x => RxApp.MainThreadScheduler))
                 .RegisterType<IScheduler>(WellKnownSchedulers.Background, new InjectionFactory(x => RxApp.TaskpoolScheduler))
                 .RegisterType<IPoeLiveHistoryProvider, PoeLiveHistoryProvider>()
+                .RegisterType(typeof(IKeyboardMouseEvents), new InjectionFactory((x) => Hook.GlobalEvents()))
                 .RegisterType<IHttpClient, GenericHttpClient>()
                 .RegisterType<IPoeApiWrapper, PoeApiWrapper>()
                 .RegisterType<IOverlayWindowController, OverlayWindowController>()

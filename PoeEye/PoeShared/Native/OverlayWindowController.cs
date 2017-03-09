@@ -1,4 +1,6 @@
 using System;
+using System.Diagnostics;
+using System.Linq;
 using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
@@ -21,10 +23,14 @@ namespace PoeShared.Native
 {
     internal sealed class OverlayWindowController : DisposableReactiveObject, IOverlayWindowController
     {
+        private static readonly int CurrentProcessId = Process.GetCurrentProcess().Id;
+        private readonly BehaviorSubject<IntPtr> lastActiveWindowHandle = new BehaviorSubject<IntPtr>(IntPtr.Zero);
+
         private readonly OverlayWindowViewModel overlay;
         private readonly OverlayWindowView overlayWindow;
+
+        private readonly string[] possibleOverlayNames;
         private readonly IWindowTracker windowTracker;
-        private readonly BehaviorSubject<IntPtr> lastActiveWindowHandle = new BehaviorSubject<IntPtr>(IntPtr.Zero);
 
         public OverlayWindowController(
             [NotNull] IWindowTracker windowTracker,
@@ -41,13 +47,21 @@ namespace PoeShared.Native
             this.overlay = overlay;
             this.windowTracker = windowTracker;
 
+            possibleOverlayNames = Enum.GetValues(typeof(OverlayMode))
+                .OfType<OverlayMode>()
+                .Select(mode => $"[PoeEye.{mode}] {windowTracker.TargetWindowName}")
+                .ToArray();
+
             overlayWindow = new OverlayWindowView(overlayMode)
             {
                 DataContext = overlay,
+                Title = $"[PoeEye.{overlayMode}] {windowTracker.TargetWindowName}"
             };
             overlayWindow.Show();
+
             var overlayWindowHandle = new WindowInteropHelper(overlayWindow).Handle;
-            Log.Instance.Debug($"[OverlayWindowController..ctor] Overlay window({overlayMode} + {windowTracker}) handle: 0x{overlayWindowHandle.ToInt64():x8}");
+            Log.Instance.Debug(
+                $"[OverlayWindowController..ctor] Overlay window({overlayMode} + {windowTracker}) handle: 0x{overlayWindowHandle.ToInt64():x8}");
 
             var application = Application.Current;
             if (application != null)
@@ -61,16 +75,13 @@ namespace PoeShared.Native
                 var mainWindowClosed = mainWindow == null
                     ? Observable.Never<Unit>()
                     : Observable.FromEventPattern<EventHandler, EventArgs>(
-                        h => mainWindow.Closed += h,
-                        h => mainWindow.Closed -= h)
-                    .ToUnit();
+                            h => mainWindow.Closed += h,
+                            h => mainWindow.Closed -= h)
+                        .ToUnit();
 
-                Observable.Merge(
-                            mainWindowClosed,
-                            applicationExit
-                        )
-                        .Subscribe(overlayWindow.Close, Log.HandleUiException)
-                        .AddTo(Anchors);
+                mainWindowClosed.Merge(applicationExit)
+                    .Subscribe(overlayWindow.Close, Log.HandleUiException)
+                    .AddTo(Anchors);
             }
 
             overlay
@@ -78,10 +89,10 @@ namespace PoeShared.Native
                 .Subscribe(x => this.RaisePropertyChanged(nameof(IsVisible)))
                 .AddTo(Anchors);
 
-            Observable.CombineLatest(
-                    windowTracker.WhenAnyValue(x => x.IsActive),
-                    windowTracker.WhenAnyValue(x => x.ActiveWindowHandle).Select(x => x == overlayWindowHandle),
-                    (x, y) => new { WindowIsActive = x, OverlayIsActive = y }
+            windowTracker.WhenAnyValue(x => x.IsActive)
+                .CombineLatest(
+                    windowTracker.WhenAnyValue(x => x.ActiveWindowTitle).Select(IsPairedOverlay),
+                    (x, overlayIsActive) => new {WindowIsActive = x, OverlayIsActive = overlayIsActive}
                 )
                 .Select(x => x.WindowIsActive || x.OverlayIsActive)
                 .DistinctUntilChanged()
@@ -101,7 +112,10 @@ namespace PoeShared.Native
                     h => keyboardMouseEvents.KeyDown -= h)
                 .Select(x => x.EventArgs)
                 .Where(x => overlay.IsVisible)
-                .Where(x => new KeyGesture(Key.F9, ModifierKeys.Control | ModifierKeys.Shift | ModifierKeys.Alt).MatchesHotkey(x))
+                .Where(
+                    x =>
+                        new KeyGesture(Key.F9, ModifierKeys.Control | ModifierKeys.Shift | ModifierKeys.Alt)
+                            .MatchesHotkey(x))
                 .Do(x => x.Handled = true)
                 .Subscribe(() => overlay.ShowWireframes = !overlay.ShowWireframes)
                 .AddTo(Anchors);
@@ -135,10 +149,34 @@ namespace PoeShared.Native
             WindowsServices.SetForegroundWindow(windowHandle);
         }
 
+        public Size MinSize => new Size(overlayWindow.MinWidth, overlayWindow.MinHeight);
+
+        public Size MaxSize => new Size(overlayWindow.MaxWidth, overlayWindow.MaxHeight);
+
+        public bool IsLocked { get; } = true;
+
+        public object Header { get; } = null;
+
+        private bool IsPairedOverlay(string activeWindowTitle)
+        {
+            return possibleOverlayNames.Contains(activeWindowTitle, StringComparer.OrdinalIgnoreCase);
+        }
+
         private void SetVisibility(bool isVisible)
         {
-            Log.Instance.Debug($"[OverlayWindowController] Overlay '{overlayWindow}'.IsVisible = {overlay.IsVisible} => {isVisible} (tracker {windowTracker})");
+            Log.Instance.Debug(
+                $"[OverlayWindowController] Overlay '{overlayWindow}'.IsVisible = {overlay.IsVisible} => {isVisible} (tracker {windowTracker})");
             overlay.IsVisible = isVisible;
+
+            if (overlay.IsVisible)
+            {
+                var overlayWindowHandle = new WindowInteropHelper(overlayWindow).Handle;
+                WindowsServices.SetForegroundWindow(overlayWindowHandle);
+            }
         }
+
+        public double Width => overlayWindow.ActualWidth;
+
+        public double Height => overlayWindow.ActualHeight;
     }
 }

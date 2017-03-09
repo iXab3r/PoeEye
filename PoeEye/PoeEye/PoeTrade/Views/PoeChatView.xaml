@@ -39,7 +39,7 @@
                     <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource SelectableTextBlockLikeStyle}">
                         <Setter Property="Visibility" Value="Collapsed"/>
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding MessageType}" Value="{x:Static chat:PoeMessageType.WhisperTo}">
+                            <DataTrigger Binding="{Binding MessageType}" Value="{x:Static chat:PoeMessageType.WhisperOutgoing}">
                                 <Setter Property="Visibility" Value="Visible"/>
                             </DataTrigger>
                         </Style.Triggers>

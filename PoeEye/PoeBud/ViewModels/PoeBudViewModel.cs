@@ -28,7 +28,7 @@ using WinFormsKeyEventHandler = System.Windows.Forms.KeyEventHandler;
 
 namespace PoeBud.ViewModels
 {
-    internal sealed class PoeBudViewModel : DisposableReactiveObject, IOverlayViewModel
+    internal sealed class PoeBudViewModel : OverlayViewModelBase
     {
         private static readonly TimeSpan UpdateTimeout = TimeSpan.FromSeconds(1);
         private readonly IClock clock;
@@ -138,11 +138,7 @@ namespace PoeBud.ViewModels
                 stashUpdater == null || stashUpdater.LastUpdateTimestamp == DateTime.MinValue
                     ? TimeSpan.Zero
                     : stashUpdater.LastUpdateTimestamp + (actualConfig?.StashUpdatePeriod ?? TimeSpan.Zero) - clock.Now;
-
-        public Point Location { get; } = new Point();
-
-        public Size Size { get; } = new Size(double.NaN, double.NaN);
-
+        
         private void ApplyConfig(PoeBudConfig config)
         {
             actualConfig = config;

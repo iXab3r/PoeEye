@@ -1,0 +1,240 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:wpf="clr-namespace:PoeShared.Scaffolding.WPF;assembly=PoeShared"
+                    xmlns:blue="http://www.nuget.org/Blue.MVVM"
+                    xmlns:scaffolding="clr-namespace:PoeShared.Scaffolding;assembly=PoeShared"
+                    xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib"
+                    xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
+                    xmlns:viewModels="clr-namespace:PoeEye.TradeMonitor.ViewModels"
+                    xmlns:utilities="clr-namespace:PoeEye.Utilities"
+                    xmlns:net="clr-namespace:FontAwesome.Net;assembly=FontAwesome.Net"
+                    xmlns:modularity="clr-namespace:PoeEye.TradeMonitor.Modularity"
+                    xmlns:scaffolding1="clr-namespace:PoeEye.TradeMonitor.Scaffolding">
+
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Generic.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/PoeTradeMonitor;component/Themes/Styles.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+
+    <blue:BoolToVisibilityConverter x:Key="TrueToVisibleConverter"
+                                    TrueValue="Visible"
+                                    FalseValue="Collapsed" />
+
+    <blue:BoolToVisibilityConverter x:Key="TrueToCollapsedConverter"
+                                    TrueValue="Collapsed"
+                                    FalseValue="Visible" />
+
+    <blue:BoolToVisibilityConverter x:Key="TrueToVisibleFalseToHiddenConverter"
+                                    TrueValue="Visible"
+                                    FalseValue="Hidden" />
+
+    <blue:BoolToVisibilityConverter x:Key="TrueToHiddenFalseToVisibleConverter"
+                                    TrueValue="Hidden"
+                                    FalseValue="Visible" />
+
+    <DataTemplate DataType="{x:Type viewModels:PoeTradeMonitorViewModel}">
+        <Grid>
+            <Border
+                x:Name="TradeMonitorBackground"
+                Background="{StaticResource TradeMonitorBackgroundBrushKey}"
+                BorderBrush="{StaticResource TradeMonitorBorderBrushKey}"
+                Opacity="{Binding Opacity}"
+                Visibility="{Binding IsLocked, Converter={StaticResource TrueToHiddenFalseToVisibleConverter}}"
+                BorderThickness="1" />
+
+            <Grid TextBlock.Foreground="{StaticResource PoeFontBrush}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="36" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <Border Grid.Row="0"
+                        Background="{StaticResource TradeMonitorTitleBackgroundBrushKey}" BorderBrush="{StaticResource TradeMonitorBorderBrushKey}"
+                        BorderThickness="1"
+                        Visibility="{Binding IsLocked, Converter={StaticResource TrueToHiddenFalseToVisibleConverter}}"
+                        Margin="3">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Style="{StaticResource TradeMonitorTextBlockStyleKey}"
+                                   Text="{x:Static net:FontAwesome.lock}"
+                                   Margin="3,0"
+                                   FontSize="16"
+                                   Visibility="{Binding IsLocked, Converter={StaticResource TrueToVisibleFalseToHiddenConverter}}" />
+                        <Button Command="{Binding LockWindowCommand}" Width="30" Height="30">
+                            <Button.Style>
+                                <Style TargetType="{x:Type Button}"
+                                       BasedOn="{StaticResource TradeMonitorCircleButtonStyleKey}">
+                                    <Setter Property="Content" Value="{x:Static net:FontAwesome.unlock}" />
+                                    <Setter Property="Foreground" Value="Red" />
+                                    <Setter Property="Padding" Value="0,2,0,0" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsLocked}" Value="True" />
+
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Content" Value="{x:Static net:FontAwesome.lock}" />
+                                            <Setter Property="Foreground" Value="GreenYellow" />
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+
+                            <Button.Triggers>
+                                <EventTrigger RoutedEvent="Mouse.MouseEnter">
+                                    <EventTrigger.EnterActions>
+                                        <BeginStoryboard>
+                                            <Storyboard>
+                                                <DoubleAnimation
+                                                    Storyboard.TargetName="TradeMonitorBackground"
+                                                    Storyboard.TargetProperty="Opacity"
+                                                    From="1"
+                                                    To="0.1"
+                                                    Duration="0:0:1" />
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </EventTrigger.EnterActions>
+                                </EventTrigger>
+                                <EventTrigger RoutedEvent="Mouse.MouseLeave">
+                                    <EventTrigger.EnterActions>
+                                        <BeginStoryboard>
+                                            <Storyboard>
+                                                <DoubleAnimation
+                                                    Storyboard.TargetName="TradeMonitorBackground"
+                                                    Storyboard.TargetProperty="Opacity"
+                                                    To="1"
+                                                    Duration="0:0:1" />
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </EventTrigger.EnterActions>
+                                </EventTrigger>
+                            </Button.Triggers>
+                        </Button>
+
+                        <TextBlock Style="{StaticResource TradeMonitorTextBlockStyleKey}"
+                                   Text=""
+                                   Margin="3,0"
+                                   Foreground="Red"
+                                   FontSize="16"
+                                   Visibility="{Binding IsLocked, Converter={StaticResource TrueToHiddenFalseToVisibleConverter}}" />
+
+                        <TextBlock Style="{StaticResource TradeMonitorTextBlockStyleKey}"
+                                   Text="Trade Monitor"
+                                   Foreground="#EEC64C"
+                                   HorizontalAlignment="Center"
+                                   FontWeight="Bold" />
+
+                        <Button Content="Create fake trade"
+                                Margin="10,0"
+                                Height="25"
+                                HorizontalAlignment="Right" Width="140" Command="{Binding CreateFakeTradeCommand}" />
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Row="1"
+                        Background="{StaticResource TradeMonitorTitleBackgroundBrushKey}" 
+                        BorderBrush="{StaticResource TradeMonitorBorderBrushKey}"
+                        BorderThickness="1"
+                        Visibility="{Binding IsLocked, Converter={StaticResource TrueToHiddenFalseToVisibleConverter}}"
+                        Margin="3">
+
+                    <StackPanel Orientation="Vertical">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" MinWidth="100"
+                                       Style="{StaticResource TradeMonitorTextBlockStyleKey}"
+                                       TextAlignment="Right"
+                                       Text="Unfold by default: " />
+
+                            <Slider Grid.Column="1"
+                                    Value="{Binding NumberOfNegotiationsToExpandByDefault}"
+                                    Minimum="0"
+                                    TickFrequency="1"
+                                    IsSnapToTickEnabled="True"
+                                    Margin="10,0"
+                                    Maximum="{x:Static modularity:PoeTradeMonitorConfig.MaxNumberOfNegotiationsToExpand}" />
+
+                            <TextBlock Grid.Column="2"
+                                       Text="{Binding NumberOfNegotiationsToExpandByDefault}"
+                                       TextAlignment="Left"
+                                       Style="{StaticResource TradeMonitorTextBlockStyleKey}"
+                                       Margin="5,0" />
+                        </Grid>
+
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Grow upwards: "
+                                           Style="{StaticResource TradeMonitorTextBlockStyleKey}"
+                                           TextAlignment="Right"
+                                           MinWidth="100" />
+                            <controls:ToggleSwitchButton
+                                    IsChecked="{Binding GrowUpwards}"
+                                    Height="24"
+                                    Margin="10,0" />
+                        </StackPanel>
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" MinWidth="100"
+                                       Style="{StaticResource TradeMonitorTextBlockStyleKey}"
+                                       TextAlignment="Right"
+                                       Text="Opacity: " />
+
+                            <Slider Grid.Column="1"
+                                    Value="{Binding Opacity}"
+                                    Minimum="0"
+                                    TickFrequency="0.1"
+                                    IsSnapToTickEnabled="True"
+                                    Margin="10,0"
+                                    Maximum="1" />
+
+                            <TextBlock Grid.Column="2"
+                                       Text="{Binding Opacity}"
+                                       TextAlignment="Left"
+                                       Style="{StaticResource TradeMonitorTextBlockStyleKey}"
+                                       Margin="5,0" />
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <ScrollViewer Grid.Row="2"
+                              scaffolding1:ScrollViewerExtensions.AlwaysScrollToEnd="True"
+                              HorizontalScrollBarVisibility="Hidden"
+                              Opacity="{Binding Opacity}"
+                              VerticalScrollBarVisibility="Auto">
+                    <ItemsControl ItemsSource="{Binding Negotiations}">
+                        <ItemsControl.Style>
+                            <Style TargetType="{x:Type ItemsControl}">
+                                <Setter Property="ItemsPanel">
+                                    <Setter.Value>
+                                        <ItemsPanelTemplate>
+                                            <StackPanel VerticalAlignment="Top" />
+                                        </ItemsPanelTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding GrowUpwards}" Value="True">
+                                        <Setter Property="ItemsPanel">
+                                            <Setter.Value>
+                                                <ItemsPanelTemplate>
+                                                    <StackPanel VerticalAlignment="Bottom" />
+                                                </ItemsPanelTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ItemsControl.Style>
+                    </ItemsControl>
+
+                </ScrollViewer>
+            </Grid>
+        </Grid>
+    </DataTemplate>
+</ResourceDictionary>

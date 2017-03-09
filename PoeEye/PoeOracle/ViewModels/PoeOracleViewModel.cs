@@ -19,7 +19,7 @@ using KeyEventHandler = System.Windows.Forms.KeyEventHandler;
 
 namespace PoeOracle.ViewModels
 {
-    internal sealed class PoeOracleViewModel : DisposableReactiveObject, IOverlayViewModel
+    internal sealed class PoeOracleViewModel : OverlayViewModelBase
     {
         private static readonly TimeSpan DefaultQueryThrottle = TimeSpan.FromMilliseconds(200);
 
@@ -33,13 +33,10 @@ namespace PoeOracle.ViewModels
         private bool isFocused;
 
         private bool isVisible;
-        private Point location;
 
         private double oracleActualWidth;
 
         private string query;
-
-        private Size size = new Size(double.NaN, double.NaN);
 
         public PoeOracleViewModel(
             [NotNull] IKeyboardMouseEvents keyboardMouseEvents,
@@ -127,18 +124,6 @@ namespace PoeOracle.ViewModels
             set { this.RaiseAndSetIfChanged(ref oracleActualWidth, value); }
         }
 
-        public Point Location
-        {
-            get { return location; }
-            set { this.RaiseAndSetIfChanged(ref location, value); }
-        }
-
-        public Size Size
-        {
-            get { return size; }
-            set { this.RaiseAndSetIfChanged(ref size, value); }
-        }
-
         private void ProcessKeyDown(KeyEventArgs keyEventArgs)
         {
             if (new KeyGesture(Key.Escape).MatchesHotkey(keyEventArgs) && IsVisible)
@@ -181,7 +166,7 @@ namespace PoeOracle.ViewModels
         private void SnapToOverlayCenter()
         {
             var overlayLocation = controller.Location;
-            var overlaySize = controller.Size;
+            var overlaySize = new Size(Width, Height);
             var oracleSize = new Size(OracleActualWidth, 0);
 
             var top = overlayLocation.Y + overlaySize.Height / 2;

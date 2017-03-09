@@ -1,58 +1,169 @@
-﻿<native:TransparentWindow 
-        x:Class="PoeShared.Native.OverlayWindowView"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:native="clr-namespace:PoeShared.Native"
-        xmlns:blue="http://www.nuget.org/Blue.MVVM"
-        mc:Ignorable="d"
-        Background="{x:Null}"
-        ShowInTaskbar="False"
-        d:DataContext="{d:DesignInstance native:OverlayWindowViewModel}" 
-        ResizeMode="NoResize"
-        Topmost="True" >
+﻿<native:TransparentWindow
+    x:Class="PoeShared.Native.OverlayWindowView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:native="clr-namespace:PoeShared.Native"
+    xmlns:blue="http://www.nuget.org/Blue.MVVM"
+    xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+    xmlns:sys="clr-namespace:System;assembly=System"
+    xmlns:converters="http://schemas.kent.boogaart.com/converters"
+    xmlns:system="clr-namespace:System;assembly=mscorlib"
+    xmlns:scaffolding="clr-namespace:PoeShared.Scaffolding"
+    xmlns:sharedConverter="clr-namespace:PoeShared.Converters"
+    mc:Ignorable="d"
+    Background="{x:Null}"
+    ShowInTaskbar="False"
+    d:DataContext="{d:DesignInstance native:OverlayWindowViewModel}"
+    ResizeMode="NoResize"
+    Topmost="True">
 
     <Window.Resources>
-        <blue:BoolToVisibilityConverter x:Key="TrueToVisibleConverter" 
-                                    TrueValue="Visible" 
-                                    FalseValue="Collapsed" />
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Generic.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <sharedConverter:TwoNumbersToSizeConverter x:Key="ActualWidthAndHeightToSizeConverter" />
+            
+            <converters:MapConverter x:Key="BoolToWindowStyleConverterKey"
+                                     FallbackBehavior="ReturnFallbackValue"
+                                     FallbackValue="{x:Static WindowStyle.ToolWindow}">
+                <converters:Mapping To="{x:Static WindowStyle.None}">
+                    <converters:Mapping.From>
+                        <system:Boolean>True</system:Boolean>
+                    </converters:Mapping.From>
+                </converters:Mapping>
+            </converters:MapConverter>
+
+            <converters:MapConverter x:Key="IsLockedToBackgroundConverterKey"
+                                     FallbackBehavior="ReturnFallbackValue">
+                <converters:MapConverter.FallbackValue>
+                    <SolidColorBrush Color="CornflowerBlue" />
+                </converters:MapConverter.FallbackValue>
+                <converters:Mapping>
+                    <converters:Mapping.To>
+                        <SolidColorBrush Color="Transparent" />
+                    </converters:Mapping.To>
+                    <converters:Mapping.From>
+                        <system:Boolean>True</system:Boolean>
+                    </converters:Mapping.From>
+                </converters:Mapping>
+            </converters:MapConverter>
+
+        </ResourceDictionary>
     </Window.Resources>
 
-    <Canvas Visibility="{Binding IsVisible, Converter={StaticResource TrueToVisibleConverter}}" >
-        <ItemsControl ItemsSource="{Binding Items}" >
+    <Grid>
+        <ItemsControl ItemsSource="{Binding Items}">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <Canvas/>
+                    <Grid />
                 </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
 
-            <ItemsControl.ItemContainerStyle>
-                <Style TargetType="ContentPresenter">
-                    <Setter Property="Canvas.Left" Value="{Binding Location.X}"/>
-                    <Setter Property="Canvas.Top" Value="{Binding Location.Y}"/>
-                    <Setter Property="Canvas.Width" Value="{Binding Size.Width}"/>
-                    <Setter Property="Canvas.Height" Value="{Binding Size.Height}"/>
-                </Style>
-            </ItemsControl.ItemContainerStyle>
-
             <ItemsControl.ItemTemplate>
                 <DataTemplate DataType="{x:Type native:IOverlayViewModel}">
-                    <Grid >
-                        <Rectangle Stroke="GreenYellow" 
-                                   StrokeThickness="3" 
-                                   Visibility="{Binding 
-                                        RelativeSource={RelativeSource AncestorType={x:Type Window}}, 
-                                        Path=DataContext.ShowWireframes,
-                                        Converter={StaticResource TrueToVisibleConverter}}"/>
-                        <ContentPresenter Content="{Binding}"/>
-                    </Grid>
+                    <xctk:WindowContainer>
+                        <xctk:ChildWindow
+                            x:Name="OverlayChildWindow"
+                            WindowState="Open"
+                            WindowStartupLocation="Manual"
+                            WindowStyle="{Binding IsLocked, Converter={StaticResource BoolToWindowStyleConverterKey}}"
+                            CloseButtonVisibility="Collapsed"
+                            WindowBorderThickness="0"
+                            BorderThickness="0"
+                            WindowThickness="0"
+                            WindowBackground="{Binding IsLocked, Converter={StaticResource IsLockedToBackgroundConverterKey}}"
+                            Background="Transparent"
+                            BorderBrush="Transparent"
+                            WindowBorderBrush="Transparent"
+                            Left="{Binding Location.X}"
+                            Top="{Binding Location.Y}"
+                            Width="{Binding Width}"
+                            Height="{Binding Height}"
+                            MinWidth="{Binding MinSize.Width}"
+                            MinHeight="{Binding MinSize.Height}"
+                            MaxWidth="{Binding MaxSize.Width}"
+                            MaxHeight="{Binding MaxSize.Height}"
+                            Visibility="{Binding 
+                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}, 
+                                            Path=DataContext.IsVisible,
+                                            Converter={StaticResource TrueToVisibleConverter}}"
+                            Focusable="False"
+                            IsTabStop="False">
+                            <xctk:ChildWindow.CloseButtonStyle>
+                                <Style TargetType="{x:Type Button}">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="{x:Type Button}" />
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </xctk:ChildWindow.CloseButtonStyle>
+
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+
+                                <Border Grid.RowSpan="2"
+                                        Visibility="{Binding 
+                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}, 
+                                            Path=DataContext.ShowWireframes,
+                                            Converter={StaticResource TrueToVisibleConverter}}"
+                                        BorderThickness="3"
+                                        BorderBrush="GreenYellow"
+                                        Background="#00aa0066">
+                                    <StackPanel Orientation="Vertical">
+                                        <TextBlock Foreground="Yellow"
+                                                   Text="{Binding}"
+                                                   FontSize="14" />
+
+                                        <TextBlock
+                                            Foreground="Red"
+                                            Margin="5,0"
+                                            Text="{Binding Location}"
+                                            FontSize="14"
+                                            FontWeight="Bold" />
+                                    </StackPanel>
+                                </Border>
+
+                                <Grid Grid.Row="0"
+                                      Visibility="{Binding Header, Converter={StaticResource NullToCollapsedConverter}}">
+                                    <ContentPresenter Content="{Binding Header}" />
+                                </Grid>
+
+                                <ContentPresenter Grid.Row="1" Content="{Binding}" />
+
+                                <Thumb Grid.Row="0" Grid.RowSpan="2"
+                                       HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                                       Width="20" Height="20"
+                                       DragDelta="ThumbResize_OnDragDelta"
+                                       Visibility="{Binding IsLocked, Converter={StaticResource TrueToCollapsedConverter}}"
+                                       Tag="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type xctk:ChildWindow}}}" />
+                            </Grid>
+
+                            <!--
+                            <scaffolding:DataPiping.DataPipes>
+                                <scaffolding:DataPipeCollection>
+                                    <scaffolding:DataPipe 
+                                        Source="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type xctk:ChildWindow}}, Path=ActualWidth}"
+                                        Target="{Binding Path=Width, Mode=OneWayToSource}"/>
+                                    <scaffolding:DataPipe 
+                                        Source="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type xctk:ChildWindow}}, Path=ActualHeight}"
+                                        Target="{Binding Path=Height, Mode=OneWayToSource}"/>
+                                </scaffolding:DataPipeCollection>
+                            </scaffolding:DataPiping.DataPipes>
+                            -->
+                        </xctk:ChildWindow>
+                    </xctk:WindowContainer>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
-    </Canvas>
+
+    </Grid>
 
 </native:TransparentWindow>
-
-
-

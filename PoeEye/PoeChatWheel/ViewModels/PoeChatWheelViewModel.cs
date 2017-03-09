@@ -33,7 +33,7 @@ using WinFormsKeyEventHandler = System.Windows.Forms.KeyEventHandler;
 
 namespace PoeChatWheel.ViewModels
 {
-    internal sealed class PoeChatWheelViewModel : DisposableReactiveObject, IPoeChatWheelViewModel
+    internal sealed class PoeChatWheelViewModel : OverlayViewModelBase, IPoeChatWheelViewModel
     {
         private static readonly string[] PleasantColors =
         {
@@ -150,7 +150,7 @@ namespace PoeChatWheel.ViewModels
                 .AddTo(Anchors);
 
             whisperService.Messages
-                .Where(x => x.MessageType == PoeMessageType.WhisperFrom)
+                .Where(x => x.MessageType == PoeMessageType.WhisperIncoming)
                 .Subscribe(ProcessMessage)
                 .AddTo(Anchors);
 
@@ -164,6 +164,9 @@ namespace PoeChatWheel.ViewModels
                 .Select(x => Items.ToList())
                 .Subscribe(SetMenuItems)
                 .AddTo(Anchors);
+
+            Width = 300;
+            Height = 300;
         }
 
         public TimeSpan HistoryPeriod
@@ -191,20 +194,12 @@ namespace PoeChatWheel.ViewModels
         }
 
         public IReactiveList<RadialMenuItem> Items { get; } = new ReactiveList<RadialMenuItem>();
-
-        public Point Location
-        {
-            get { return location; }
-            set { this.RaiseAndSetIfChanged(ref location, value); }
-        }
-
-        public Size Size { get; } = new Size(300, 300);
-
+        
         private void Show()
         {
             Log.Instance.Debug($"[PoeChatWheel.OnNameSelection] IsOpen: {IsOpen} => True");
             var mousePosition = Control.MousePosition;
-            Location = new Point(mousePosition.X - Size.Width / 2, mousePosition.Y - Size.Height / 2);
+            Location = new Point(mousePosition.X - Width / 2, mousePosition.Y - Height / 2);
 
             IsOpen = true;
         }

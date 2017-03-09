@@ -8,7 +8,7 @@ namespace PoeEye.Converters
     using System.IO;
     using System.Windows.Data;
 
-    internal sealed class PriceToImageUriConverter : IValueConverter
+    public sealed class PriceToImageUriConverter : IValueConverter
     {
         private const string ImagesPathPrefix = "pack://application:,,,/Resources/Currencies";
 

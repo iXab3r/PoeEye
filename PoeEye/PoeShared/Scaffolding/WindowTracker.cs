@@ -72,6 +72,8 @@ namespace PoeShared.Scaffolding
             set { this.RaiseAndSetIfChanged(ref activeWindowHandle, value); }
         }
 
+        public string TargetWindowName => titleMatcherRegexFunc();
+
         public override string ToString()
         {
             return $"WndTrckr({titleMatcherRegexFunc()})";

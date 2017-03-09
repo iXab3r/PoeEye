@@ -45,7 +45,7 @@ namespace PoeEye.PoeTrade.Models
             whisperService.Messages
                     .Where(x => poeEyeConfigProvider.ActualConfig.WhisperNotificationsEnabled)
                     .Where(x => !poeWindowTracker.IsActive)
-                    .Where(x => x.MessageType == PoeMessageType.WhisperFrom)
+                    .Where(x => x.MessageType == PoeMessageType.WhisperIncoming)
                     .Subscribe(ProcessWhisper)
                     .AddTo(Anchors);
         }

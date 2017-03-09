@@ -135,6 +135,7 @@
     <Compile Include="Common\PoeItemParserFixture.cs" />
     <Compile Include="Helpers\MockExtensions.cs" />
     <Compile Include="PoeBud\OfficialApi\GearTypeAnalyzerFixture.cs" />
+    <Compile Include="PoeTradeMonitor\Models\PoeMessageParserPoeTradeFixture.cs" />
     <Compile Include="PoeTrade\PoeTradeDateTimeExtractorFixture.cs" />
     <Compile Include="PoeTrade\PoeTradeParserModernFixture.cs" />
     <Compile Include="PoeTrade\TestData\TestDataProvider.cs" />
@@ -181,6 +182,14 @@
     <ProjectReference Include="..\PoeShared\PoeShared.csproj">
       <Project>{12df53dd-7144-4d2d-b7a1-b4bc5bbdfb69}</Project>
       <Name>PoeShared</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PoeTradeMonitor\PoeTradeMonitor.csproj">
+      <Project>{9baed733-7c2b-4aaa-8e60-4b73b612c78e}</Project>
+      <Name>PoeTradeMonitor</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PoeWhisperMonitor\PoeWhisperMonitor.csproj">
+      <Project>{75b4a3db-45c0-4639-b5a3-4d180ad4b9fb}</Project>
+      <Name>PoeWhisperMonitor</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

@@ -4,7 +4,7 @@ using System.Windows.Data;
 
 namespace PoeShared.Scaffolding.WPF.Converters
 {
-    internal sealed class TimeSpanToHumanReadableStringConverter : IValueConverter
+    public sealed class TimeSpanToHumanReadableStringConverter : IValueConverter
     {
         //FIXME Remove duplicate converters
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)

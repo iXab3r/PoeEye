@@ -12,7 +12,9 @@
 
         <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Converters.xaml" />
         <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Colors.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/WindowControlStyle.xaml" />
         <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/SlimScrollbar.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/PoeShared;component/UI/Views/ImageView.xaml" />
         <ResourceDictionary Source="pack://application:,,,/PoeShared;component/UI/Views/ImageView.xaml" />
     </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>

@@ -7,6 +7,16 @@ namespace PoeShared.Native
     {
         Point Location { get; }
 
-        Size Size { get; }
+        double Width { get; }
+
+        double Height { get; }
+
+        Size MinSize { get; }
+
+        Size MaxSize { get; }
+
+        bool IsLocked { get; }
+
+        object Header { get; }
     }
 }

@@ -46,7 +46,7 @@ namespace PoeEye.PoeTrade.ViewModels
             this.chatService = chatService;
             whisperService.Messages     
                 .ObserveOn(uiScheduler)
-                .Where(x => x.MessageType == PoeMessageType.WhisperFrom || x.MessageType == PoeMessageType.WhisperTo)
+                .Where(x => x.MessageType == PoeMessageType.WhisperIncoming || x.MessageType == PoeMessageType.WhisperOutgoing)
                 .Subscribe(Messages.Add)
                 .AddTo(Anchors);
 

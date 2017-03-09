@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Windows;
 using WindowsInput;
 using WindowsInput.Native;
@@ -51,6 +52,11 @@ namespace PoeWhisperMonitor.Chat
 
         public PoeMessageSendStatus SendMessage(string message)
         {
+            return SendMessage(message, true);
+        }
+
+        public PoeMessageSendStatus SendMessage(string message, bool terminateByPressingEnter)
+        {
             Guard.ArgumentNotNull(() => message);
 
             PoeProcessInfo process;
@@ -69,7 +75,7 @@ namespace PoeWhisperMonitor.Chat
                 Log.Instance.Debug(
                     $"[PoeChatService.SendMessage] Sending chat message '{message}' to process {process}...");
 
-                SendMessageInternal(process.MainWindow, message);
+                SendMessageInternal(process.MainWindow, message, terminateByPressingEnter);
             }
             catch (Exception ex)
             {
@@ -87,23 +93,39 @@ namespace PoeWhisperMonitor.Chat
             IsAvailable = processes.Any();
         }
 
-        private void SendMessageInternal(IntPtr hWnd, string message)
+        private void SendMessageInternal(IntPtr hWnd, string message, bool terminateByPressingEnter)
         {
-            Clipboard.SetText(message);
-
-            if (GetForegroundWindow() != hWnd)
+            var existingMessage = Clipboard.GetText();
+            try
             {
-                if (!SetForegroundWindow(hWnd))
+                Clipboard.SetText(message);
+
+                if (GetForegroundWindow() != hWnd)
                 {
-                    return;
+                    if (!SetForegroundWindow(hWnd))
+                    {
+                        return;
+                    }
+                }
+
+                keyboardSimulator.KeyPress(VirtualKeyCode.RETURN);
+                keyboardSimulator.ModifiedKeyStroke(VirtualKeyCode.CONTROL, VirtualKeyCode.VK_V);
+
+                if (terminateByPressingEnter)
+                {
+                    keyboardSimulator.KeyPress(VirtualKeyCode.RETURN);
+                }
+
+                SetForegroundWindow(hWnd);
+            }
+            finally
+            {
+                Thread.Sleep(100);
+                if (!string.IsNullOrWhiteSpace(existingMessage))
+                {
+                    Clipboard.SetText(existingMessage);
                 }
             }
-
-            keyboardSimulator.KeyPress(VirtualKeyCode.RETURN);
-            keyboardSimulator.ModifiedKeyStroke(VirtualKeyCode.CONTROL, VirtualKeyCode.VK_V);
-            keyboardSimulator.KeyPress(VirtualKeyCode.RETURN);
-
-            SetForegroundWindow(hWnd);
         }
     }
 }
