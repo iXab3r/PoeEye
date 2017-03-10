@@ -131,13 +131,16 @@ namespace PoeShared.Native
         public void Activate()
         {
             overlayWindow.Activate();
+            if (overlay.IsVisible)
+            {
+                var overlayWindowHandle = new WindowInteropHelper(overlayWindow).Handle;
+                WindowsServices.SetForegroundWindow(overlayWindowHandle);
+            }
         }
 
         public bool IsVisible => overlay.IsVisible;
 
         public Size Size => overlayWindow.RenderSize;
-
-        public Point Location => new Point(overlayWindow.Left, overlayWindow.Top);
 
         public void ActivateLastActiveWindow()
         {
@@ -167,16 +170,12 @@ namespace PoeShared.Native
             Log.Instance.Debug(
                 $"[OverlayWindowController] Overlay '{overlayWindow}'.IsVisible = {overlay.IsVisible} => {isVisible} (tracker {windowTracker})");
             overlay.IsVisible = isVisible;
-
-            if (overlay.IsVisible)
-            {
-                var overlayWindowHandle = new WindowInteropHelper(overlayWindow).Handle;
-                WindowsServices.SetForegroundWindow(overlayWindowHandle);
-            }
         }
 
         public double Width => overlayWindow.ActualWidth;
 
         public double Height => overlayWindow.ActualHeight;
+        public double Left => overlayWindow.Left;
+        public double Top => overlayWindow.Top;
     }
 }

@@ -165,8 +165,8 @@ namespace PoeChatWheel.ViewModels
                 .Subscribe(SetMenuItems)
                 .AddTo(Anchors);
 
-            Width = 300;
-            Height = 300;
+            Width = 320;
+            Height = 320;
         }
 
         public TimeSpan HistoryPeriod
@@ -199,8 +199,8 @@ namespace PoeChatWheel.ViewModels
         {
             Log.Instance.Debug($"[PoeChatWheel.OnNameSelection] IsOpen: {IsOpen} => True");
             var mousePosition = Control.MousePosition;
-            Location = new Point(mousePosition.X - Width / 2, mousePosition.Y - Height / 2);
-
+            Left = mousePosition.X - Width / 2;
+            Top = mousePosition.Y - Height / 2;
             IsOpen = true;
         }
 

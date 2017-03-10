@@ -157,26 +157,22 @@ namespace PoeOracle.ViewModels
             controller.Activate();
         }
 
-        private void SnapToMouse()
-        {
-            var mousePosition = Control.MousePosition;
-            Location = new Point(mousePosition.X, mousePosition.Y);
-        }
-
         private void SnapToOverlayCenter()
         {
-            var overlayLocation = controller.Location;
-            var overlaySize = new Size(Width, Height);
+            MinSize = new Size(700, 50);
+            Width = double.NaN;
+            Height = double.NaN;
             var oracleSize = new Size(OracleActualWidth, 0);
 
-            var top = overlayLocation.Y + overlaySize.Height / 2;
-            var left = overlayLocation.X + overlaySize.Width / 2;
+            var top = controller.Top + controller.Height / 2;
+            var left = controller.Left + controller.Width / 2;
             if (!double.IsNaN(oracleSize.Width) && !double.IsInfinity(oracleSize.Width) && !oracleSize.IsEmpty)
             {
                 left -= oracleSize.Width / 2;
             }
 
-            Location = new Point(left, top);
+            Left = left;
+            Top = top;
         }
 
         private void Hide(bool restoreLastActiveWindow)

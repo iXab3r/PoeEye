@@ -10,16 +10,25 @@ namespace PoeShared.Native
 
         private double height;
         private bool isLocked = true;
-        private Point location;
+
+        private double left;
         private Size maxSize = new Size(double.NaN, double.NaN);
         private Size minSize = new Size(0, 0);
 
+        private double top;
+
         private double width;
 
-        public Point Location
+        public double Left
         {
-            get { return location; }
-            set { this.RaiseAndSetIfChanged(ref location, value); }
+            get { return left; }
+            set { this.RaiseAndSetIfChanged(ref left, value); }
+        }
+
+        public double Top
+        {
+            get { return top; }
+            set { this.RaiseAndSetIfChanged(ref top, value); }
         }
 
         public double Width

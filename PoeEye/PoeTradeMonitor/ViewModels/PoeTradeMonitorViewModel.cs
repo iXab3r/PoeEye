@@ -88,7 +88,18 @@ namespace PoeEye.TradeMonitor.ViewModels
                         new KeyGesture(Key.F8, ModifierKeys.Control | ModifierKeys.Shift | ModifierKeys.Alt)
                             .MatchesHotkey(x))
                 .Do(x => x.Handled = true)
-                .Subscribe(() => IsLocked = false)
+                .Subscribe(
+                    () =>
+                    {
+                        if (!IsLocked)
+                        {
+                            LockWindowCommandExecuted();
+                        }
+                        else
+                        {
+                            UnlockWindowCommandExecuted();
+                        }
+                    })
                 .AddTo(Anchors);
         }
 
@@ -179,7 +190,8 @@ namespace PoeEye.TradeMonitor.ViewModels
                 IsLocked = false;
                 config.OverlayLocation = new Point(Width / 2, Height / 2);
             }
-            Location = config.OverlayLocation;
+            Left = config.OverlayLocation.X;
+            Top = config.OverlayLocation.Y;
 
             if (config.OverlayOpacity <= 0.01)
             {
@@ -192,13 +204,18 @@ namespace PoeEye.TradeMonitor.ViewModels
         private void LockWindowCommandExecuted()
         {
             var config = configProvider.ActualConfig;
-            config.OverlayLocation = Location;
+            config.OverlayLocation = new Point(Left, Top);
             config.GrowUpwards = GrowUpwards;
             config.NumberOfNegotiationsToExpandByDefault = NumberOfNegotiationsToExpandByDefault;
             config.OverlaySize = new Size(Width, Height);
             config.OverlayOpacity = Opacity;
             configProvider.Save(config);
             IsLocked = true;
+        }
+
+        private void UnlockWindowCommandExecuted()
+        {
+            IsLocked = false;
         }
 
         private class NegotiationClassController : INegotiationCloseController
