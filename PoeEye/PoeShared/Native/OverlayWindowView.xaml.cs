@@ -51,12 +51,12 @@ namespace PoeShared.Native
                 var newWidth = window.ActualWidth + e.HorizontalChange;
                 newWidth = Math.Min(newWidth, window.MaxWidth);
                 newWidth = Math.Max(newWidth, window.MinWidth);
-                window.SetValue(WidthProperty, newWidth);
+                window.Width = newWidth;
 
                 var newHeight = window.ActualHeight + e.VerticalChange;
                 newHeight = Math.Min(newHeight, window.MaxHeight);
                 newHeight = Math.Max(newHeight, window.MinHeight);
-                window.SetValue(HeightProperty, newHeight);
+                window.Height = newHeight;
             }
             catch (Exception exception)
             {

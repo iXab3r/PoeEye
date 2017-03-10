@@ -81,8 +81,8 @@
                             WindowBorderBrush="Transparent"
                             Left="{Binding Location.X}"
                             Top="{Binding Location.Y}"
-                            Width="{Binding Width}"
-                            Height="{Binding Height}"
+                            Width="{Binding Width, Mode=TwoWay}"
+                            Height="{Binding Height, Mode=TwoWay}"
                             MinWidth="{Binding MinSize.Width}"
                             MinHeight="{Binding MinSize.Height}"
                             MaxWidth="{Binding MaxSize.Width}"
@@ -143,21 +143,9 @@
                                        Width="20" Height="20"
                                        DragDelta="ThumbResize_OnDragDelta"
                                        Visibility="{Binding IsLocked, Converter={StaticResource TrueToCollapsedConverter}}"
-                                       Tag="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type xctk:ChildWindow}}}" />
+                                       Style="{StaticResource OverlayThumbStyleKey}"
+                                       Tag="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type xctk:ChildWindow}}}"/>
                             </Grid>
-
-                            <!--
-                            <scaffolding:DataPiping.DataPipes>
-                                <scaffolding:DataPipeCollection>
-                                    <scaffolding:DataPipe 
-                                        Source="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type xctk:ChildWindow}}, Path=ActualWidth}"
-                                        Target="{Binding Path=Width, Mode=OneWayToSource}"/>
-                                    <scaffolding:DataPipe 
-                                        Source="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type xctk:ChildWindow}}, Path=ActualHeight}"
-                                        Target="{Binding Path=Height, Mode=OneWayToSource}"/>
-                                </scaffolding:DataPipeCollection>
-                            </scaffolding:DataPiping.DataPipes>
-                            -->
                         </xctk:ChildWindow>
                     </xctk:WindowContainer>
                 </DataTemplate>

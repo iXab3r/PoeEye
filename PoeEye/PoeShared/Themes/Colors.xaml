@@ -15,6 +15,16 @@
     <Color x:Key="PoeItemStrStatColor">#FFE16043</Color>
     <Color x:Key="PoeItemIntStatColor">#FF4479A9</Color>
 
+    <Color x:Key="OverlayBorderColorKey">#1A6A73</Color>
+    <Color x:Key="OverlayTitleBackgroundColorKey">#343E3D</Color>
+    <Color x:Key="OverlayBackgroundColorKey">#292C2A</Color>
+    <Color x:Key="OverlayForegroundColorKey">White</Color>
+
+    <SolidColorBrush x:Key="OverlayBorderBrushKey" Color="{StaticResource OverlayBorderColorKey}"/>
+    <SolidColorBrush x:Key="OverlayTitleBackgroundBrushKey" Color="{StaticResource OverlayTitleBackgroundColorKey}"/>
+    <SolidColorBrush x:Key="OverlayBackgroundBrushKey" Color="{StaticResource OverlayBackgroundColorKey}"/>
+    <SolidColorBrush x:Key="OverlayForegroundBrushKey" Color="{StaticResource OverlayForegroundColorKey}"/>
+
     <SolidColorBrush x:Key="PoeFontBrush" Color="{StaticResource PoeFontColor}" />
     <SolidColorBrush x:Key="PoeBgBrush" Color="{StaticResource PoeBgColor}" />
     <SolidColorBrush x:Key="PoeSemiTransparentBgBrush" Color="{StaticResource PoeSemiTransparentBgColor}" />
