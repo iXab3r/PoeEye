@@ -32,9 +32,10 @@ namespace PoeEye.TradeMonitor.Modularity
             PredefinedMessages = new List<MacroMessage>()
             {
                 new MacroMessage { Label = "1m", Text = "one minute" },
-                new MacroMessage { Label = "thx", Text = "thanks /Kick /Close" },
-                new MacroMessage { Label = "no thx", Text = "no thanks /Close" },
-                new MacroMessage { Label = "sold", Text = "sold /Close" },
+                new MacroMessage { Label = "thx", Text = "thanks /kick /close" },
+                new MacroMessage { Label = "no thx", Text = "no thanks /close" },
+                new MacroMessage { Label = "sold", Text = "sold /close" },
+                new MacroMessage { Label = "hideout", Text = "/hideout" },
             }
         };
     }

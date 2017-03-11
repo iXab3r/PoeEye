@@ -86,7 +86,7 @@ namespace PoeEye.TradeMonitor.Models
 
         public bool IsBusy => activeUpdater?.IsBusy ?? false;
 
-        public DateTime LastUpdateTimestamp => activeUpdater.LastUpdateTimestamp;
+        public DateTime LastUpdateTimestamp => activeUpdater?.LastUpdateTimestamp ?? DateTime.MinValue;
 
         private void ApplyConfig(IPoeBudConfig poeBudConfig, PoeTradeMonitorConfig tradeMonitorConfig)
         {

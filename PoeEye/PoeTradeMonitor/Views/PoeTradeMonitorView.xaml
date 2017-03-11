@@ -36,7 +36,7 @@
 
     <DataTemplate DataType="{x:Type viewModels:PoeTradeMonitorViewModel}">
         <DataTemplate.Resources>
-            <Style TargetType="{x:Type ScrollBar}" BasedOn="{StaticResource SlimScrollBarStyleKey}"/>
+            <Style TargetType="{x:Type ScrollBar}" BasedOn="{StaticResource SlimScrollBarStyleKey}" />
         </DataTemplate.Resources>
         <Grid>
             <Border
@@ -55,7 +55,8 @@
                 </Grid.RowDefinitions>
 
                 <Border Grid.Row="0"
-                        Background="{StaticResource TradeMonitorTitleBackgroundBrushKey}" BorderBrush="{StaticResource TradeMonitorBorderBrushKey}"
+                        Background="{StaticResource TradeMonitorTitleBackgroundBrushKey}"
+                        BorderBrush="{StaticResource TradeMonitorBorderBrushKey}"
                         BorderThickness="1"
                         Visibility="{Binding IsLocked, Converter={StaticResource TrueToHiddenFalseToVisibleConverter}}"
                         Margin="3">
@@ -135,7 +136,7 @@
                 </Border>
 
                 <Border Grid.Row="1"
-                        Background="{StaticResource TradeMonitorTitleBackgroundBrushKey}" 
+                        Background="{StaticResource TradeMonitorTitleBackgroundBrushKey}"
                         BorderBrush="{StaticResource TradeMonitorBorderBrushKey}"
                         BorderThickness="1"
                         Visibility="{Binding IsLocked, Converter={StaticResource TrueToHiddenFalseToVisibleConverter}}"
@@ -170,13 +171,13 @@
 
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="Grow upwards: "
-                                           Style="{StaticResource TradeMonitorTextBlockStyleKey}"
-                                           TextAlignment="Right"
-                                           MinWidth="100" />
+                                       Style="{StaticResource TradeMonitorTextBlockStyleKey}"
+                                       TextAlignment="Right"
+                                       MinWidth="100" />
                             <controls:ToggleSwitchButton
-                                    IsChecked="{Binding GrowUpwards}"
-                                    Height="24"
-                                    Margin="10,0" />
+                                IsChecked="{Binding GrowUpwards}"
+                                Height="24"
+                                Margin="10,0" />
                         </StackPanel>
 
                         <Grid>
@@ -207,37 +208,59 @@
                     </StackPanel>
                 </Border>
 
-                <ScrollViewer Grid.Row="2"
-                              scaffolding1:ScrollViewerExtensions.AlwaysScrollToEnd="True"
-                              HorizontalScrollBarVisibility="Hidden"
+                <ItemsControl Grid.Row="2" ItemsSource="{Binding Negotiations}"
                               Opacity="{Binding Opacity}"
-                              VerticalScrollBarVisibility="Auto">
-                    <ItemsControl ItemsSource="{Binding Negotiations}">
-                        <ItemsControl.Style>
-                            <Style TargetType="{x:Type ItemsControl}">
-                                <Setter Property="ItemsPanel">
-                                    <Setter.Value>
-                                        <ItemsPanelTemplate>
-                                            <StackPanel VerticalAlignment="Top" />
-                                        </ItemsPanelTemplate>
-                                    </Setter.Value>
-                                </Setter>
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding GrowUpwards}" Value="True">
-                                        <Setter Property="ItemsPanel">
-                                            <Setter.Value>
-                                                <ItemsPanelTemplate>
-                                                    <StackPanel VerticalAlignment="Bottom" />
-                                                </ItemsPanelTemplate>
-                                            </Setter.Value>
-                                        </Setter>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </ItemsControl.Style>
-                    </ItemsControl>
-
-                </ScrollViewer>
+                              ScrollViewer.HorizontalScrollBarVisibility="Hidden"
+                              ScrollViewer.VerticalScrollBarVisibility="Auto">
+                    <ItemsControl.Style>
+                        <Style TargetType="{x:Type ItemsControl}">
+                            <Setter Property="VirtualizingStackPanel.IsVirtualizing" Value="False" />
+                            <Setter Property="VirtualizingPanel.ScrollUnit" Value="Item" />
+                            <Setter Property="ScrollViewer.CanContentScroll" Value="True" />
+                            <Setter Property="Focusable" Value="False" />
+                            <Setter Property="IsTabStop" Value="False" />
+                            <Setter Property="Background" Value="Transparent"/>
+                            <Setter Property="ItemsPanel">
+                                <Setter.Value>
+                                    <ItemsPanelTemplate>
+                                        <VirtualizingStackPanel HorizontalAlignment="Stretch" 
+                                                                Background="Transparent"
+                                                                VerticalAlignment="Top" />
+                                    </ItemsPanelTemplate>
+                                </Setter.Value>
+                            </Setter>
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ItemsControl">
+                                        <Border
+                                            BorderThickness="{TemplateBinding Border.BorderThickness}"
+                                            Padding="{TemplateBinding Control.Padding}"
+                                            BorderBrush="{TemplateBinding Border.BorderBrush}"
+                                            Background="{TemplateBinding Panel.Background}"
+                                            SnapsToDevicePixels="True">
+                                            <ScrollViewer Padding="{TemplateBinding Control.Padding}" Focusable="False">
+                                                <ItemsPresenter SnapsToDevicePixels="{TemplateBinding UIElement.SnapsToDevicePixels}" />
+                                            </ScrollViewer>
+                                        </Border>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding GrowUpwards}" Value="True">
+                                    <Setter Property="ItemsPanel">
+                                        <Setter.Value>
+                                            <ItemsPanelTemplate>
+                                                <VirtualizingStackPanel HorizontalAlignment="Stretch"
+                                                                        Background="Transparent"
+                                                                        VerticalAlignment="Bottom" />
+                                            </ItemsPanelTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ItemsControl.Style>
+                </ItemsControl>
             </Grid>
         </Grid>
     </DataTemplate>

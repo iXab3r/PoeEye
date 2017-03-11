@@ -38,6 +38,16 @@ namespace PoeEye.TradeMonitor.Models
                     Label = "Close negotiation",
                     Description = "Closes ongoing negotiation window"
                 });
+
+            MacroCommands.Add(
+                new ChatCommand(
+                    "hideout",
+                    chatService,
+                    context => $"/kick {context.Negotiation.CharacterName}")
+                {
+                    Label = "hideout",
+                    Description = "Teleport to player's hideout"
+                });
         }
 
         public IReactiveList<MacroCommand> MacroCommands { get; } = new ReactiveList<MacroCommand>();

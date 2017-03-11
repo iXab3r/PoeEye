@@ -217,8 +217,8 @@
                                 <Button Content="{Binding Label}" 
                                         Margin="5,0"
                                         Style="{StaticResource MetroFlatButton}"
-                                        Height="24"
-                                        FontSize="12"
+                                        Height="26"
+                                        FontSize="13"
                                         CommandParameter="{Binding}"
                                         Command="{Binding DataContext.SendPredefinedMessageCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ItemsControl}}}"/>
                             </DataTemplate>
