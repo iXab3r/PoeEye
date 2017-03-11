@@ -55,8 +55,8 @@ namespace PoeEye.TradeMonitor.ViewModels
             Guard.ArgumentNotNull(() => bgScheduler);
             Guard.ArgumentNotNull(() => uiScheduler);
 
-            MinSize = new Size(300, 300);
-            MaxSize = new Size(600, double.NaN);
+            MinSize = new Size(500, 300);
+            MaxSize = new Size(700, double.NaN);
 
             this.controller = controller;
             this.notificationFactory = notificationFactory;
