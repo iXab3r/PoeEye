@@ -14,7 +14,10 @@
                 </ResourceDictionary.MergedDictionaries>
 
                 <Style TargetType="{x:Type ScrollBar}" BasedOn="{StaticResource SlimScrollBarStyleKey}" />
+                <Style TargetType="{x:Type Label}" BasedOn="{StaticResource IconLabel}"/>
+                <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource IconTextBlock}"/>
             </ResourceDictionary>
+
         </DataTemplate.Resources>
 
         <Grid Margin="10,5">
@@ -32,14 +35,14 @@
 
             <StackPanel Grid.Row="0"
                         Orientation="Horizontal" Height="30" Margin="0,2">
-                <Label Content="Enable overlay:" VerticalAlignment="Center" />
+                <Label Content="Enable overlay:" MinWidth="100"/>
                 <controls:ToggleSwitchButton Height="26"
                                              IsChecked="{Binding IsEnabled}" />
             </StackPanel>
 
             <StackPanel Grid.Row="1"
                         Orientation="Horizontal" Height="30" Margin="0,2">
-                <Label Content="Get Set hotkey:" VerticalAlignment="Center" />
+                <Label Content="Get Set hotkey:" MinWidth="100" />
                 <ComboBox IsEditable="False"
                           Width="120"
                           ToolTip="Chat wheel hotkey" ItemsSource="{Binding HotkeysList}"
@@ -48,14 +51,14 @@
 
             <StackPanel Grid.Row="2"
                         Orientation="Horizontal" Height="30" Margin="0,2">
-                <Label Content="Hide XP bar:" VerticalAlignment="Center" />
+                <Label Content="Hide XP bar:" MinWidth="100" />
                 <controls:ToggleSwitchButton Height="26"
                                              IsChecked="{Binding HideXpBar}" />
             </StackPanel> 
             
             <StackPanel Grid.Row="3"
                         Orientation="Horizontal" Height="30" Margin="0,2">
-                <Label Content="Overlay:" VerticalAlignment="Center" />
+                <Label Content="Overlay:" MinWidth="100" />
                 <ComboBox 
                     SelectedItem="{Binding SelectedUiOverlay}" 
                     ItemsSource="{Binding OverlaysList}"
@@ -94,11 +97,10 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Column="1"
-                           Style="{StaticResource IconTextblock}"
+                           Style="{StaticResource IconTextBlock}"
                            Foreground="Orange"
                            Margin="5"
                            FontSize="13"
-                           VerticalAlignment="Center"
                            Visibility="{Binding LoginException, Converter={StaticResource NullToCollapsedConverter}}"
                            ToolTip="{Binding LoginException, Converter={StaticResource ExceptionToMessageConverter}}"
                            Text="&#xF071;" />

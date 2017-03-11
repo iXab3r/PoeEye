@@ -6,10 +6,15 @@
     </ResourceDictionary.MergedDictionaries>
     
     <DataTemplate DataType="{x:Type viewModels:PoeChatWheelSettingsViewModel}">
-        <Grid>
+        <DataTemplate.Resources>
+            <Style TargetType="{x:Type Label}" BasedOn="{StaticResource IconLabel}"/>
+            <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource IconTextBlock}"/>
+        </DataTemplate.Resources>
+
+        <Grid Margin="10,5">
             <StackPanel 
                       Orientation="Horizontal" Height="30" Margin="0,2">
-                <Label Content="Hotkey:" VerticalAlignment="Center" />
+                <Label Content="Hotkey:" MinWidth="100"/>
                 <ComboBox IsEditable="False" 
                           Width="120"
                           ToolTip="Chat wheel hotkey" ItemsSource="{Binding HotkeysList}" SelectedValue="{Binding Hotkey}" />

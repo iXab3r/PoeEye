@@ -107,16 +107,16 @@
             </StackPanel.Resources>
             
             <TextBlock 
-                   Style="{StaticResource IconTextBlock}" 
+                   Style="{StaticResource EyeIconTextBlock}" 
                    Text="&#xf1d8; Send" Margin="5,0"/>
 
-            <TextBlock Style="{StaticResource IconTextBlock}" 
+            <TextBlock Style="{StaticResource EyeIconTextBlock}" 
                        Text="&#xf06a;" 
                        ToolTip="{Binding SendStatusErrorMessage}"
                        Background="{StaticResource ControlsValidationBrush}"
                        Visibility="{Binding SendStatusErrorMessage, Converter={StaticResource NullToCollapsedConverter}}"
                        Margin="5,0"/>
-            <TextBlock Style="{StaticResource IconTextBlock}" 
+            <TextBlock Style="{StaticResource EyeIconTextBlock}" 
                        Text="&#xf064;"
                        Background="{StaticResource HighlightBrush}"
                        ToolTip="{Binding SendStatus}"

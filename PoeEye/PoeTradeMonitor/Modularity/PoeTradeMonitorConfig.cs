@@ -2,6 +2,7 @@
 using System.Windows;
 using System.Windows.Documents;
 using PoeEye.TradeMonitor.Models;
+using PoeShared.Audio;
 using PoeShared.Modularity;
 
 namespace PoeEye.TradeMonitor.Modularity
@@ -21,6 +22,8 @@ namespace PoeEye.TradeMonitor.Modularity
         public Size OverlaySize { get; set; }
 
         public List<MacroMessage> PredefinedMessages { get; set; } = new List<MacroMessage>();
+
+        public AudioNotificationType NotificationType { get; set; } = AudioNotificationType.Disabled;
 
         public static PoeTradeMonitorConfig Default = new PoeTradeMonitorConfig()
         {

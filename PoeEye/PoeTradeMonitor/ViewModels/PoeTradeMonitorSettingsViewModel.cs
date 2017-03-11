@@ -4,8 +4,10 @@ using Guards;
 using JetBrains.Annotations;
 using PoeEye.TradeMonitor.Models;
 using PoeEye.TradeMonitor.Modularity;
+using PoeShared.Audio;
 using PoeShared.Modularity;
 using PoeShared.Scaffolding;
+using PoeShared.UI.ViewModels;
 using Prism.Commands;
 using ReactiveUI;
 
@@ -19,11 +21,15 @@ namespace PoeEye.TradeMonitor.ViewModels
 
         private PoeTradeMonitorConfig loadedConfig;
 
-        public PoeTradeMonitorSettingsViewModel([NotNull] IPoeMacroCommandsProvider commandsProvider)
+        public PoeTradeMonitorSettingsViewModel(
+            [NotNull] IPoeMacroCommandsProvider commandsProvider,
+            [NotNull] IAudioNotificationSelectorViewModel audioNotificationSelector)
         {
             Guard.ArgumentNotNull(() => commandsProvider);
+            Guard.ArgumentNotNull(() => audioNotificationSelector);
 
             this.commandsProvider = commandsProvider;
+            AudioNotificationSelector = audioNotificationSelector;
             removeMessageCommand = new DelegateCommand<MacroMessageViewModel>(RemoveMessageCommandExecuted);
             addMessageCommand = new DelegateCommand(AddMessageCommandExecuted);
         }
@@ -33,6 +39,8 @@ namespace PoeEye.TradeMonitor.ViewModels
         public ICommand RemoveMessageCommand => removeMessageCommand;
 
         public ICommand AddMessageCommand => addMessageCommand;
+
+        public IAudioNotificationSelectorViewModel AudioNotificationSelector { get; }
 
         public string ModuleName { get; } = "Trade Monitor";
 

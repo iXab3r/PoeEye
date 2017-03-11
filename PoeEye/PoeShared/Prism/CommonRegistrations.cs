@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Reactive.Concurrency;
 using Gma.System.MouseKeyHook;
+using PoeShared.Audio;
 using PoeShared.Communications;
 using PoeShared.Modularity;
 using PoeShared.Native;
@@ -41,6 +42,7 @@ namespace PoeShared.Prism
                 .RegisterSingleton<IProxyProvider, GenericProxyProvider>(new InjectionFactory(unity => new GenericProxyProvider()))
                 .RegisterSingleton<IRandomNumberGenerator, RandomNumberGenerator>()
                 .RegisterSingleton<IImagesCacheService, ImagesCacheService>()
+                .RegisterSingleton<IAudioNotificationsManager, AudioNotificationsManager>()
                 .RegisterSingleton<IOverlayWindowController, OverlayWindowController>(WellKnownWindows.PathOfExileWindow);
 
             Container
@@ -51,6 +53,7 @@ namespace PoeShared.Prism
                 .RegisterType<IHttpClient, GenericHttpClient>()
                 .RegisterType<IPoeApiWrapper, PoeApiWrapper>()
                 .RegisterType<IOverlayWindowController, OverlayWindowController>()
+                .RegisterType<IAudioNotificationSelectorViewModel, AudioNotificationSelectorViewModel>()
                 .RegisterType(typeof (IFactory<,,>), typeof (Factory<,,>))
                 .RegisterType(typeof (IFactory<,>), typeof (Factory<,>))
                 .RegisterType(typeof (IFactory<>), typeof (Factory<>));

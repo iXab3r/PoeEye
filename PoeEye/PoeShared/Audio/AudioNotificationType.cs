@@ -1,6 +1,6 @@
-﻿namespace PoeEye.PoeTrade.Common
+﻿namespace PoeShared.Audio
 {
-    internal enum AudioNotificationType
+    public enum AudioNotificationType
     {
         Disabled,
         Whistle,

@@ -1,8 +1,7 @@
 ﻿using System.Reflection;
-using PoeShared;
 using PoeShared.Scaffolding;
 
-namespace PoeEye.Resources.Notifications
+namespace PoeShared.Audio
 {
     internal static class SoundLibrary
     {

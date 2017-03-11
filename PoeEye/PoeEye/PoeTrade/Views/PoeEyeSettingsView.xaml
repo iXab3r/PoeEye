@@ -17,7 +17,7 @@
                 IsTabStop="False"
                 Margin="10, 5, 5 ,5">
                 <Expander.Header>
-                    <Label Content="{Binding ModuleName}" Style="{StaticResource IconLabel}" VerticalAlignment="Center"/>
+                    <Label Content="{Binding ModuleName}" Style="{StaticResource EyeIconLabel}" VerticalAlignment="Center"/>
                 </Expander.Header>
                 <Border >
                 <ContentPresenter Content="{Binding}" />

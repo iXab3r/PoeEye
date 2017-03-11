@@ -2,17 +2,15 @@
 using System.Linq;
 using System.Reactive.Linq;
 using System.Windows.Input;
-using CsQuery.ExtensionMethods;
 using Guards;
 using JetBrains.Annotations;
-using PoeEye.PoeTrade.Common;
-using PoeEye.PoeTrade.Models;
+using PoeShared.Audio;
 using PoeShared.Scaffolding;
 using ReactiveUI;
 
-namespace PoeEye.PoeTrade.ViewModels
+namespace PoeShared.UI.ViewModels
 {
-    internal class AudioNotificationSelectorViewModel : DisposableReactiveObject, IDisposableReactiveObject,
+    internal sealed class AudioNotificationSelectorViewModel : DisposableReactiveObject, IDisposableReactiveObject,
         IAudioNotificationSelectorViewModel
     {
         private readonly IAudioNotificationsManager notificationsManager;

@@ -5,17 +5,10 @@
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Generic.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Styles.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
     <FontFamily x:Key="FontAwesome">pack://application:,,,/FontAwesome.Net;component/Fonts/#FontAwesome</FontFamily>
-
-    <Style TargetType="{x:Type Label}" x:Key="IconLabel" BasedOn="{StaticResource {x:Type Label}}">
-        <Setter Property="FontFamily" Value="{StaticResource FontAwesome}" />
-    </Style>
-
-    <Style TargetType="{x:Type TextBlock}" x:Key="IconTextblock" BasedOn="{StaticResource {x:Type TextBlock}}">
-        <Setter Property="FontFamily" Value="{StaticResource FontAwesome}" />
-    </Style>
 
     <DataTemplate DataType="{x:Type viewModels:PoeBudViewModel}">
         <Grid>
@@ -48,7 +41,7 @@
                             Visibility="{Binding LastUpdateException, Converter={StaticResource NullToCollapsedConverter}}"
                             Foreground="Orange"
                             Text="{Binding LastUpdateException, StringFormat='&#xF071; {0}', Converter={StaticResource ExceptionToMessageConverter}}"
-                            Style="{StaticResource IconTextblock}" TextTrimming="WordEllipsis" />
+                            Style="{StaticResource IconTextBlock}" TextTrimming="WordEllipsis" />
                     </Grid>
 
                     <Grid Grid.Row="2" Grid.Column="0">
@@ -67,10 +60,8 @@
                                 Height="18" Width="18"
                                 IsActive="{Binding StashUpdater.IsBusy}" />
                             <TextBlock
-                                TextAlignment="Left"
                                 Text="{Binding TimeTillNextUpdate, Converter={StaticResource TimeSpanToHumanReadableStringConverter}}"
-                                VerticalAlignment="Center"
-                                Style="{StaticResource IconTextblock}" 
+                                Style="{StaticResource IconTextBlock}" 
                                 Margin="5,0" />
                         </StackPanel>
 
@@ -79,12 +70,11 @@
                                    TextAlignment="Center"
                                    Visibility="{Binding StashUpdater.IsBusy, Converter={StaticResource TrueToCollapsedConverter}}"
                                    Text="{Binding TimeTillNextUpdate, StringFormat='&#xF017; {0}', Converter={StaticResource TimeSpanToHumanReadableStringConverter}}"
-                                   Style="{StaticResource IconTextblock}" />
+                                   Style="{StaticResource IconTextBlock}" />
 
                         <TextBlock Grid.Column="2"
-                                   TextAlignment="Left"
                                    Text="{Binding Stash.Solutions.Length, StringFormat='Sets: {0}'}"
-                                   Style="{StaticResource IconTextblock}" Margin="10,0" />
+                                   Style="{StaticResource IconTextBlock}" Margin="10,0" />
                     </Grid>
 
                     <ContentPresenter Grid.Row="3" Grid.Column="0"

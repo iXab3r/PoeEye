@@ -1,33 +1,17 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Resources;
-using PoeEye.PoeTrade.Common;
-using PoeEye.Resources.Notifications;
+using System.Media;
+using System.Reactive.Linq;
+using Guards;
+using JetBrains.Annotations;
 using PoeShared.Modularity;
-using PoeEyeMainConfig = PoeEye.Config.PoeEyeMainConfig;
+using PoeShared.Scaffolding;
+using ReactiveUI;
 
-namespace PoeEye.PoeTrade.Models
+namespace PoeShared.Audio
 {
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Media;
-    using System.Reactive.Linq;
-
-    using Config;
-
-    using Guards;
-
-    using JetBrains.Annotations;
-
-    using PoeShared;
-    using PoeShared.Scaffolding;
-
-    using ReactiveUI;
-
-    using IPoeEyeMainConfigProvider = IConfigProvider<PoeEyeMainConfig>;
-
     internal sealed class AudioNotificationsManager : DisposableReactiveObject, IAudioNotificationsManager
     {
         private readonly IDictionary<AudioNotificationType, byte[]> knownNotifications = new Dictionary
@@ -38,7 +22,7 @@ namespace PoeEye.PoeTrade.Models
 
         private bool isEnabled;
 
-        public AudioNotificationsManager([NotNull] IPoeEyeMainConfigProvider poeEyeConfigProvider) 
+        public AudioNotificationsManager([NotNull] IConfigProvider<PoeEyeSharedConfig> poeEyeConfigProvider) 
         {
             Guard.ArgumentNotNull(() => poeEyeConfigProvider);
 
@@ -56,8 +40,7 @@ namespace PoeEye.PoeTrade.Models
                 .Subscribe(PlayNotification)
                 .AddTo(Anchors);
 
-            playNotificationCommandCanExecute
-                .DistinctUntilChanged()
+            Observable.DistinctUntilChanged<bool>(playNotificationCommandCanExecute)
                 .Subscribe(newValue => isEnabled = newValue)
                 .AddTo(Anchors);
         }

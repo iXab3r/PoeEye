@@ -7,33 +7,33 @@
     <Setter Property="IsTabStop" Value="False" />
   </Style>
 
-  <Style TargetType="{x:Type Button}" x:Key="CircleButton" BasedOn="{StaticResource MetroCircleButtonStyle}">
+  <Style TargetType="{x:Type Button}" x:Key="EyeCircleButton" BasedOn="{StaticResource MetroCircleButtonStyle}">
     <Setter Property="FontFamily" Value="{StaticResource FontAwesome}" />
     <Setter Property="FontSize" Value="16" />
     <Setter Property="HorizontalContentAlignment" Value="Center" />
     <Setter Property="VerticalContentAlignment" Value="Center" />
   </Style>
 
-  <Style TargetType="{x:Type Button}" x:Key="IconButton" BasedOn="{StaticResource {x:Type Button}}">
+  <Style TargetType="{x:Type Button}" x:Key="EyeIconButton" BasedOn="{StaticResource {x:Type Button}}">
     <Setter Property="FontFamily" Value="{StaticResource FontAwesome}" />
     <Setter Property="FontSize" Value="16" />
     <Setter Property="HorizontalContentAlignment" Value="Center" />
     <Setter Property="VerticalContentAlignment" Value="Center" />
   </Style>
 
-  <Style TargetType="{x:Type ToggleButton}" x:Key="ToggleCircleButton" BasedOn="{StaticResource MetroCircleToggleButtonStyle}">
+  <Style TargetType="{x:Type ToggleButton}" x:Key="EyeToggleCircleButton" BasedOn="{StaticResource MetroCircleToggleButtonStyle}">
     <Setter Property="FontFamily" Value="{StaticResource FontAwesome}" />
     <Setter Property="FontSize" Value="16" />
     <Setter Property="HorizontalContentAlignment" Value="Center" />
     <Setter Property="VerticalContentAlignment" Value="Center" />
   </Style>
 
-  <Style TargetType="{x:Type Label}" x:Key="IconLabel" BasedOn="{StaticResource {x:Type Label}}">
+  <Style TargetType="{x:Type Label}" x:Key="EyeIconLabel" BasedOn="{StaticResource {x:Type Label}}">
     <Setter Property="FontFamily" Value="{StaticResource FontAwesome}" />
     <Setter Property="FontSize" Value="16" />
   </Style>
 
-  <Style TargetType="{x:Type TextBlock}" x:Key="IconTextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+  <Style TargetType="{x:Type TextBlock}" x:Key="EyeIconTextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
     <Setter Property="FontFamily" Value="{StaticResource FontAwesome}" />
   </Style>
 </ResourceDictionary>

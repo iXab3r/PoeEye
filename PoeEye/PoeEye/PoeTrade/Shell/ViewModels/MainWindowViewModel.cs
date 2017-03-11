@@ -17,11 +17,13 @@ using PoeEye.PoeTrade.Models;
 using PoeEye.PoeTrade.Updater;
 using PoeEye.PoeTrade.ViewModels;
 using PoeShared;
+using PoeShared.Audio;
 using PoeShared.Modularity;
 using PoeShared.PoeTrade;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
 using PoeShared.UI;
+using PoeShared.UI.ViewModels;
 using ReactiveUI;
 using PoeEyeMainConfig = PoeEye.Config.PoeEyeMainConfig;
 

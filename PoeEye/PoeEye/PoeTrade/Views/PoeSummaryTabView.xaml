@@ -52,7 +52,7 @@
         </Grid>
       </Border>
       
-      <Label Style="{StaticResource IconLabel}" FontSize="30" Content="No suitable items found yet" VerticalAlignment="Center" HorizontalAlignment="Center"
+      <Label Style="{StaticResource EyeIconLabel}" FontSize="30" Content="No suitable items found yet" VerticalAlignment="Center" HorizontalAlignment="Center"
              Grid.Row="1" 
              Visibility="{Binding TradesView.IsEmpty, Converter={StaticResource BoolFalseToCollapsedConverter}}"/>
 

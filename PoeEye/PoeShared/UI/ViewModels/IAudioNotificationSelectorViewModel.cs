@@ -1,11 +1,11 @@
 ﻿using JetBrains.Annotations;
-using PoeEye.PoeTrade.Common;
+using PoeShared.Audio;
 using PoeShared.Scaffolding;
 using ReactiveUI;
 
-namespace PoeEye.PoeTrade.ViewModels
+namespace PoeShared.UI.ViewModels
 {
-    internal interface IAudioNotificationSelectorViewModel : IDisposableReactiveObject
+    public interface IAudioNotificationSelectorViewModel : IDisposableReactiveObject
     {
         AudioNotificationType SelectedValue { get; set; }
 

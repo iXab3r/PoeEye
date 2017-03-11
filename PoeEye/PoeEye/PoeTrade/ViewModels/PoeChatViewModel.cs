@@ -9,6 +9,7 @@ using Microsoft.Practices.Unity;
 using PoeEye.PoeTrade.Common;
 using PoeEye.PoeTrade.Models;
 using PoeEye.Prism;
+using PoeShared.Audio;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
 using PoeWhisperMonitor;

@@ -1,5 +1,6 @@
 ﻿using System.Reactive;
 using PoeShared;
+using PoeShared.Audio;
 
 namespace PoeEye.PoeTrade.ViewModels
 {

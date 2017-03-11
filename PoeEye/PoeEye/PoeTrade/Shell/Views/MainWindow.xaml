@@ -74,7 +74,7 @@
                                 Padding="5"
                                 Content="{x:Static net:FontAwesome.refresh}">
                                 <Button.Style>
-                                    <Style TargetType="{x:Type Button}" BasedOn="{StaticResource CircleButton}">
+                                    <Style TargetType="{x:Type Button}" BasedOn="{StaticResource EyeCircleButton}">
                                         <Setter Property="BorderThickness" Value="2" />
                                         <Style.Triggers>
                                             <Trigger Property="IsMouseOver" Value="True">

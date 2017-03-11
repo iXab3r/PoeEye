@@ -62,9 +62,7 @@ namespace PoeEye.Config
         }
 
         public bool ClipboardMonitoringEnabled { get; set; } = true;
-
-        public bool AudioNotificationsEnabled { get; set; } = true;
-
+        
         public bool WhisperNotificationsEnabled { get; set; } = false;
 
         public TimeSpan MinRefreshTimeout { get; set; } = TimeSpan.FromSeconds(30);

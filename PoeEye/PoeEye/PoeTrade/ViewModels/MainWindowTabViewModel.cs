@@ -12,10 +12,12 @@ using PoeEye.Config;
 using PoeEye.PoeTrade.Common;
 using PoeEye.PoeTrade.Models;
 using PoeShared;
+using PoeShared.Audio;
 using PoeShared.PoeTrade;
 using PoeShared.PoeTrade.Query;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
+using PoeShared.UI.ViewModels;
 using ReactiveUI;
 
 namespace PoeEye.PoeTrade.ViewModels
