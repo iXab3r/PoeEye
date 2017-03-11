@@ -1,13 +1,13 @@
 using System.Collections.Generic;
 using RestSharp.Deserializers;
 
-namespace PoeBud.OfficialApi.DataTypes
+namespace PoeShared.StashApi.DataTypes
 {
     internal class Inventory : IInventory
     {
         [DeserializeAs(Name = "items")]
-        public List<Item> Items { get; set; }
+        public List<StashItem> Items { get; set; }
 
-        IEnumerable<IItem> IInventory.Items => Items;
+        IEnumerable<IStashItem> IInventory.Items => Items;
     }
 }

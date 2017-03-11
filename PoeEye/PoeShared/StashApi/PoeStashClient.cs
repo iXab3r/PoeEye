@@ -7,14 +7,14 @@ using System.Text.RegularExpressions;
 using CsQuery;
 using Guards;
 using JetBrains.Annotations;
-using PoeBud.OfficialApi.DataTypes;
-using PoeBud.OfficialApi.ProcurementLegacy;
 using PoeShared.Scaffolding;
+using PoeShared.StashApi.DataTypes;
+using PoeShared.StashApi.ProcurementLegacy;
 using RestSharp;
 
-namespace PoeBud.OfficialApi
+namespace PoeShared.StashApi
 {
-    internal sealed class PoeClient : IPoeClient
+    internal sealed class PoeStashClient : IPoeStashClient
     {
         private const string CharacterApiPortal = @"https://www.pathofexile.com";
         private const string LeaguesApiPortal = @"http://api.pathofexile.com";
@@ -33,7 +33,7 @@ namespace PoeBud.OfficialApi
 
         public string Email => credentials.UserName;
 
-        public PoeClient(
+        public PoeStashClient(
             [NotNull] NetworkCredential credentials,
             [NotNull] IGearTypeAnalyzer gearTypeAnalyzer,
             bool useSessionId = false)
@@ -271,7 +271,7 @@ namespace PoeBud.OfficialApi
             stash?.Items?.ForEach(CleanupItemName);
         }
 
-        private void CleanupItemName(Item item)
+        private void CleanupItemName(StashItem item)
         {
             if (string.IsNullOrWhiteSpace(item.Name))
             {

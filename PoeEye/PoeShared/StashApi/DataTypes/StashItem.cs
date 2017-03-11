@@ -1,9 +1,10 @@
 using System.Collections.Generic;
+using PoeShared.Common;
 using RestSharp.Deserializers;
 
-namespace PoeBud.OfficialApi.DataTypes
+namespace PoeShared.StashApi.DataTypes
 {
-    internal class Item : IItem
+    public sealed class StashItem : IStashItem
     {
         [DeserializeAs(Name = "verified")]
         public bool Verified { get; set; }
@@ -33,7 +34,7 @@ namespace PoeBud.OfficialApi.DataTypes
         public bool Identified { get; set; }
 
         [DeserializeAs(Name = "properties")]
-        public List<Property> Properties { get; set; }
+        public List<StashItemProperty> Properties { get; set; }
 
         [DeserializeAs(Name = "explicitMods")]
         public List<string> ExplicitMods { get; set; }
@@ -42,7 +43,9 @@ namespace PoeBud.OfficialApi.DataTypes
         public string DescrText { get; set; }
 
         [DeserializeAs(Name = "frameType")]
-        public PoeItemRarity Rarity { get; set; }
+        public PoeItemRarityWrapper RarityWrapper { get; set; }
+
+        public PoeItemRarity Rarity => (PoeItemRarity) ((int) RarityWrapper + 1);
 
         [DeserializeAs(Name = "x")]
         public int X { get; set; }
@@ -54,13 +57,13 @@ namespace PoeBud.OfficialApi.DataTypes
         public string InventoryId { get; set; }
 
         [DeserializeAs(Name = "socketedItems")]
-        public List<Item> SocketedItems { get; set; }
+        public List<StashItem> SocketedItems { get; set; }
 
         [DeserializeAs(Name = "sockets")]
-        public List<Socket> Sockets { get; set; }
+        public List<StashItemSocket> Sockets { get; set; }
 
         [DeserializeAs(Name = "additionalProperties")]
-        public List<AdditionalProperty> additionalProperties { get; set; }
+        public List<StashItemAdditionalProperty> additionalProperties { get; set; }
 
         [DeserializeAs(Name = "secDescrText")]
         public string SecDescrText { get; set; }
@@ -72,10 +75,10 @@ namespace PoeBud.OfficialApi.DataTypes
         public List<string> FlavourText { get; set; }
 
         [DeserializeAs(Name = "requirements")]
-        public List<Requirement> Requirements { get; set; }
+        public List<StashItemRequirement> Requirements { get; set; }
 
         [DeserializeAs(Name = "nextLevelRequirements")]
-        public List<Requirement> nextLevelRequirements { get; set; }
+        public List<StashItemRequirement> nextLevelRequirements { get; set; }
 
         [DeserializeAs(Name = "socket")]
         public int Socket { get; set; }

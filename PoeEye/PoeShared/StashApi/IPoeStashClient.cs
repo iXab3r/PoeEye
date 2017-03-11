@@ -1,9 +1,9 @@
 ﻿using JetBrains.Annotations;
-using PoeBud.OfficialApi.DataTypes;
+using PoeShared.StashApi.DataTypes;
 
-namespace PoeBud.OfficialApi
+namespace PoeShared.StashApi
 {
-    internal interface IPoeClient
+    public interface IPoeStashClient
     {
         string AccountName { [NotNull] get; }
 

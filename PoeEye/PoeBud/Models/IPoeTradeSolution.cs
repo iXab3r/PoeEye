@@ -1,4 +1,4 @@
-﻿using PoeBud.OfficialApi.DataTypes;
+﻿using PoeShared.StashApi.DataTypes;
 
 namespace PoeBud.Models
 {
@@ -8,6 +8,6 @@ namespace PoeBud.Models
     {
         IPoeTradeItem[] Items { [NotNull] get; }
 
-        ITab[] Tabs { [NotNull] get; }
+        IStashTab[] Tabs { [NotNull] get; }
     }
 }

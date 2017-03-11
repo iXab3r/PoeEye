@@ -12,12 +12,12 @@ using Microsoft.Practices.Unity;
 using NuGet;
 using PoeBud.Config;
 using PoeBud.Models;
-using PoeBud.OfficialApi;
-using PoeBud.OfficialApi.DataTypes;
 using PoeShared;
 using PoeShared.Modularity;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
+using PoeShared.StashApi;
+using PoeShared.StashApi.DataTypes;
 using ReactiveUI;
 
 namespace PoeBud.ViewModels
@@ -27,7 +27,7 @@ namespace PoeBud.ViewModels
         private readonly SerialDisposable characterSelectionDisposable = new SerialDisposable();
         private readonly ReactiveCommand<object> loginCommand;
         [NotNull] private readonly IUiOverlaysProvider overlaysProvider;
-        private readonly IFactory<IPoeClient, NetworkCredential, bool> poeClientFactory;
+        private readonly IFactory<IPoeStashClient, NetworkCredential, bool> poeClientFactory;
 
         private readonly PoeBudConfig resultingConfig = new PoeBudConfig();
 
@@ -54,7 +54,7 @@ namespace PoeBud.ViewModels
         private string username;
 
         public PoeBudSettingsViewModel(
-            [NotNull] IFactory<IPoeClient, NetworkCredential, bool> poeClientFactory,
+            [NotNull] IFactory<IPoeStashClient, NetworkCredential, bool> poeClientFactory,
             [NotNull] IUiOverlaysProvider overlaysProvider,
             [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler,
             [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler)
@@ -295,7 +295,7 @@ namespace PoeBud.ViewModels
             }
         }
 
-        private IStash TryGetStash(IPoeClient client, string league)
+        private IStash TryGetStash(IPoeStashClient client, string league)
         {
             try
             {

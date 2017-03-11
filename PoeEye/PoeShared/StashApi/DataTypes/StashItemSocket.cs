@@ -1,8 +1,8 @@
 using RestSharp.Deserializers;
 
-namespace PoeBud.OfficialApi.DataTypes
+namespace PoeShared.StashApi.DataTypes
 {
-    internal class Socket
+    public sealed class StashItemSocket
     {
         [DeserializeAs(Name = "attr")]
         public string Attribute { get; set; }

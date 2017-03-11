@@ -161,6 +161,10 @@
       <HintPath>..\packages\RestEase.1.0.5\lib\net45\RestEase.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="RestSharp, Version=105.2.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\RestSharp.105.2.3\lib\net45\RestSharp.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Splat, Version=1.6.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Splat.1.6.2\lib\Net45\Splat.dll</HintPath>
       <Private>True</Private>
@@ -232,6 +236,30 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="StashApi\DataTypes\PoeItemRarityWrapper.cs" />
+    <Compile Include="StashApi\DataTypes\StashItemAdditionalProperty.cs" />
+    <Compile Include="StashApi\DataTypes\Character.cs" />
+    <Compile Include="StashApi\DataTypes\Colour.cs" />
+    <Compile Include="StashApi\DataTypes\GearType.cs" />
+    <Compile Include="StashApi\DataTypes\ICharacter.cs" />
+    <Compile Include="StashApi\DataTypes\IInventory.cs" />
+    <Compile Include="StashApi\DataTypes\IStashItem.cs" />
+    <Compile Include="StashApi\DataTypes\ILeague.cs" />
+    <Compile Include="StashApi\DataTypes\Inventory.cs" />
+    <Compile Include="StashApi\DataTypes\IStash.cs" />
+    <Compile Include="StashApi\DataTypes\IStashTab.cs" />
+    <Compile Include="StashApi\DataTypes\StashItem.cs" />
+    <Compile Include="StashApi\DataTypes\League.cs" />
+    <Compile Include="StashApi\DataTypes\StashItemProperty.cs" />
+    <Compile Include="StashApi\DataTypes\StashItemRequirement.cs" />
+    <Compile Include="StashApi\DataTypes\StashItemSocket.cs" />
+    <Compile Include="StashApi\DataTypes\Stash.cs" />
+    <Compile Include="StashApi\DataTypes\StashTabType.cs" />
+    <Compile Include="StashApi\DataTypes\Tab.cs" />
+    <Compile Include="StashApi\IPoeStashClient.cs" />
+    <Compile Include="StashApi\PoeStashClient.cs" />
+    <Compile Include="StashApi\ProcurementLegacy\GearTypeAnalyzer.cs" />
+    <Compile Include="StashApi\ProcurementLegacy\IGearTypeAnalyzer.cs" />
     <Compile Include="UI\ViewModels\AudioNotificationSelectorViewModel.cs" />
     <Compile Include="Audio\AudioNotificationsManager.cs" />
     <Compile Include="Audio\AudioNotificationType.cs" />
@@ -370,6 +398,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="FodyWeavers.xml" />
+    <EmbeddedResource Include="StashApi\ProcurementLegacy\Data.xml" />
     <EmbeddedResource Include="Resources\Notifications\wob.wav" />
     <EmbeddedResource Include="Resources\Notifications\whistle.wav" />
     <EmbeddedResource Include="Resources\Notifications\whisper.wav" />
@@ -433,6 +462,7 @@
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Fody.1.29.2\build\dotnet\Fody.targets" Condition="Exists('..\packages\Fody.1.29.2\build\dotnet\Fody.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

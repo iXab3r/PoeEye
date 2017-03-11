@@ -1,5 +1,4 @@
 ﻿using NUnit.Framework;
-using PoeBud.OfficialApi.DataTypes;
 using PoeEye.TradeMonitor.Models;
 using PoeShared.Converters;
 using PoeWhisperMonitor.Chat;

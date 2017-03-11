@@ -1,8 +1,8 @@
 using RestSharp.Deserializers;
 
-namespace PoeBud.OfficialApi.DataTypes
+namespace PoeShared.StashApi.DataTypes
 {
-    internal class Tab : ITab
+    internal class Tab : IStashTab
     {
         [DeserializeAs(Name = "n")]
         public string Name { get; set; }

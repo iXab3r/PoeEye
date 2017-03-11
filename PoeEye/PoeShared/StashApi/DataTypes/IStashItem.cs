@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
+using PoeShared.Common;
 
-namespace PoeBud.OfficialApi.DataTypes
+namespace PoeShared.StashApi.DataTypes
 {
-    internal interface IItem
+    public interface IStashItem
     {
-        List<AdditionalProperty> additionalProperties { get; }
+        List<StashItemAdditionalProperty> additionalProperties { get; }
 
         string Color { get; }
 
@@ -36,17 +37,17 @@ namespace PoeBud.OfficialApi.DataTypes
 
         string Name { get; }
 
-        List<Requirement> nextLevelRequirements { get; }
+        List<StashItemRequirement> nextLevelRequirements { get; }
 
-        List<Property> Properties { get; }
+        List<StashItemProperty> Properties { get; }
 
-        List<Requirement> Requirements { get; }
+        List<StashItemRequirement> Requirements { get; }
 
         string SecDescrText { get; }
 
-        List<Item> SocketedItems { get; }
+        List<StashItem> SocketedItems { get; }
 
-        List<Socket> Sockets { get; }
+        List<StashItemSocket> Sockets { get; }
 
         bool Support { get; }
 

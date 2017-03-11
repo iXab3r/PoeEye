@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace PoeBud.OfficialApi.DataTypes
+namespace PoeShared.StashApi.DataTypes
 {
     public interface ILeague
     {

@@ -1,7 +1,7 @@
 ﻿using System;
 using RestSharp.Deserializers;
 
-namespace PoeBud.OfficialApi.DataTypes
+namespace PoeShared.StashApi.DataTypes
 {
     public sealed class League : ILeague
     {

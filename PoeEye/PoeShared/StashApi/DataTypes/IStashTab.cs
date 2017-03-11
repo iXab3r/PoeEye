@@ -1,8 +1,6 @@
-﻿using System;
-
-namespace PoeBud.OfficialApi.DataTypes
+﻿namespace PoeShared.StashApi.DataTypes
 {
-    internal interface ITab
+    public interface IStashTab
     {
         Colour colour { get; set; }
 

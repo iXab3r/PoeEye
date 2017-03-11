@@ -1,9 +1,9 @@
 ﻿using System.Threading;
-using PoeBud.OfficialApi;
-using PoeBud.OfficialApi.DataTypes;
 using PoeShared;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
+using PoeShared.StashApi;
+using PoeShared.StashApi.DataTypes;
 
 namespace PoeBud.Models
 {
@@ -36,7 +36,7 @@ namespace PoeBud.Models
         private readonly ISubject<Exception> updateExceptionsSubject = new ReplaySubject<Exception>(1);
         private readonly ISubject<StashUpdate> updatesSubject = new ReplaySubject<StashUpdate>(1);
         private readonly ISubject<Unit> refreshSubject = new Subject<Unit>();
-        private readonly IPoeClient poeClient;
+        private readonly IPoeStashClient poeClient;
         private TimeSpan recheckPeriod;
         private DateTime lastUpdateTimestamp;
         private bool isBusy;
@@ -44,7 +44,7 @@ namespace PoeBud.Models
         public PoeStashUpdater(
                 [NotNull] IPoeBudConfig config,
                 [NotNull] IClock clock,
-                [NotNull] IFactory<IPoeClient, NetworkCredential, bool> poeClientFactory,
+                [NotNull] IFactory<IPoeStashClient, NetworkCredential, bool> poeClientFactory,
                 [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler,
                 [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {
@@ -141,7 +141,7 @@ namespace PoeBud.Models
 
             Log.Instance.Debug($"[PoeStashUpdater.Refresh] Requesting stash #0...");
             var zeroStash = poeClient.GetStash(0, character.League);
-            var tabs = zeroStash.Tabs?.ToArray() ?? new ITab[0];
+            var tabs = zeroStash.Tabs?.ToArray() ?? new IStashTab[0];
             Log.Instance.Debug($"[PoeStashUpdater.Refresh] Tabs({tabs.Length}): {tabs.Select(x => x.Name).DumpToText()}");
 
             var stashesToRequest = config.StashesToProcess

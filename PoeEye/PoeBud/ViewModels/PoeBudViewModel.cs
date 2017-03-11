@@ -15,13 +15,13 @@ using JetBrains.Annotations;
 using Microsoft.Practices.Unity;
 using PoeBud.Config;
 using PoeBud.Models;
-using PoeBud.OfficialApi.DataTypes;
 using PoeBud.Scaffolding;
 using PoeShared;
 using PoeShared.Modularity;
 using PoeShared.Native;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
+using PoeShared.StashApi.DataTypes;
 using ReactiveUI;
 using WinFormsKeyEventArgs = System.Windows.Forms.KeyEventArgs;
 using WinFormsKeyEventHandler = System.Windows.Forms.KeyEventHandler;
@@ -93,6 +93,9 @@ namespace PoeBud.ViewModels
             exceptionsToPropagate
                 .ToProperty(this, x => x.LastUpdateException, out lastUpdateException, null, uiScheduler)
                 .AddTo(Anchors);
+
+            Width = double.NaN;
+            Height = double.NaN;
         }
 
         public IPoeWindowManager WindowManager { get; }
@@ -326,7 +329,7 @@ namespace PoeBud.ViewModels
             Stash = stashUpdateFactory.Create(dirtyStashUpdate, config);
         }
 
-        private bool IsMatch(IPoeTradeItem tradeItem, IItem item)
+        private bool IsMatch(IPoeTradeItem tradeItem, IStashItem item)
         {
             return tradeItem.TabIndex == item.GetTabIndex() && tradeItem.X == item.X && tradeItem.Y == item.Y;
         }

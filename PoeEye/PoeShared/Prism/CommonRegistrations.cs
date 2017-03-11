@@ -8,6 +8,8 @@ using PoeShared.Modularity;
 using PoeShared.Native;
 using PoeShared.PoeDatabase.PoeNinja;
 using PoeShared.PoeTrade.Query;
+using PoeShared.StashApi;
+using PoeShared.StashApi.ProcurementLegacy;
 using PoeShared.UI.Models;
 using PoeShared.UI.ViewModels;
 using ProxyProvider;
@@ -42,6 +44,7 @@ namespace PoeShared.Prism
                 .RegisterSingleton<IProxyProvider, GenericProxyProvider>(new InjectionFactory(unity => new GenericProxyProvider()))
                 .RegisterSingleton<IRandomNumberGenerator, RandomNumberGenerator>()
                 .RegisterSingleton<IImagesCacheService, ImagesCacheService>()
+                .RegisterSingleton<IGearTypeAnalyzer, GearTypeAnalyzer>()
                 .RegisterSingleton<IAudioNotificationsManager, AudioNotificationsManager>()
                 .RegisterSingleton<IOverlayWindowController, OverlayWindowController>(WellKnownWindows.PathOfExileWindow);
 
@@ -52,6 +55,7 @@ namespace PoeShared.Prism
                 .RegisterType(typeof(IKeyboardMouseEvents), new InjectionFactory((x) => Hook.GlobalEvents()))
                 .RegisterType<IHttpClient, GenericHttpClient>()
                 .RegisterType<IPoeApiWrapper, PoeApiWrapper>()
+                .RegisterType<IPoeStashClient, PoeStashClient>()
                 .RegisterType<IOverlayWindowController, OverlayWindowController>()
                 .RegisterType<IAudioNotificationSelectorViewModel, AudioNotificationSelectorViewModel>()
                 .RegisterType(typeof (IFactory<,,>), typeof (Factory<,,>))

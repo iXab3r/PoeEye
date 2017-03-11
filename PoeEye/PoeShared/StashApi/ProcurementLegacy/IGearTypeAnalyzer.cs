@@ -1,7 +1,7 @@
 ﻿using JetBrains.Annotations;
-using PoeBud.OfficialApi.DataTypes;
+using PoeShared.StashApi.DataTypes;
 
-namespace PoeBud.OfficialApi.ProcurementLegacy
+namespace PoeShared.StashApi.ProcurementLegacy
 {
     internal interface IGearTypeAnalyzer
     {

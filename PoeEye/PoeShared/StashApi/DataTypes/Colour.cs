@@ -1,6 +1,6 @@
-namespace PoeBud.OfficialApi.DataTypes
+namespace PoeShared.StashApi.DataTypes
 {
-    internal struct Colour
+    public struct Colour
     {
         public int r { get; set; }
         public int g { get; set; }

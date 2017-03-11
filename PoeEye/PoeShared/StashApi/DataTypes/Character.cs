@@ -1,6 +1,6 @@
 ﻿using RestSharp.Deserializers;
 
-namespace PoeBud.OfficialApi.DataTypes
+namespace PoeShared.StashApi.DataTypes
 {
     internal class Character : ICharacter
     {

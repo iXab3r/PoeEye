@@ -8,7 +8,6 @@ using Guards;
 using JetBrains.Annotations;
 using Microsoft.Practices.Unity;
 using PoeBud.Models;
-using PoeBud.OfficialApi.DataTypes;
 using PoeShared;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;

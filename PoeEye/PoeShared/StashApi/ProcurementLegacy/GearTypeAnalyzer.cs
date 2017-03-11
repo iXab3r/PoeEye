@@ -1,16 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Resources;
-using System.Windows;
 using System.Xml;
 using Guards;
-using PoeBud.OfficialApi.DataTypes;
 using PoeShared.Scaffolding;
+using PoeShared.StashApi.DataTypes;
 
-namespace PoeBud.OfficialApi.ProcurementLegacy
+namespace PoeShared.StashApi.ProcurementLegacy
 {
     internal class GearTypeAnalyzer : IGearTypeAnalyzer
     {
@@ -29,7 +26,7 @@ namespace PoeBud.OfficialApi.ProcurementLegacy
             var assembly = Assembly.GetExecutingAssembly();
             foreach (string resource in resources)
             {
-                var resourcePath = $"{nameof(OfficialApi)}.{nameof(ProcurementLegacy)}.{resource}";
+                var resourcePath = $"{nameof(StashApi)}.{nameof(ProcurementLegacy)}.{resource}";
                 var resourceData = assembly.ReadResourceAsString(resourcePath);
 
                 if (string.IsNullOrWhiteSpace(resourceData))

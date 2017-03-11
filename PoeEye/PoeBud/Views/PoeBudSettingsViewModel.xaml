@@ -2,8 +2,8 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:viewModels="clr-namespace:PoeBud.ViewModels"
                     xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
-                    xmlns:dataTypes="clr-namespace:PoeBud.OfficialApi.DataTypes"
-                    xmlns:models="clr-namespace:PoeBud.Models">
+                    xmlns:models="clr-namespace:PoeBud.Models"
+                    xmlns:dataTypes="clr-namespace:PoeShared.StashApi.DataTypes;assembly=PoeShared">
     <DataTemplate DataType="{x:Type viewModels:PoeBudSettingsViewModel}">
 
         <DataTemplate.Resources>

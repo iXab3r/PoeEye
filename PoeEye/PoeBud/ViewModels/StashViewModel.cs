@@ -1,7 +1,7 @@
-﻿using PoeBud.OfficialApi.DataTypes;
-using PoeBud.Scaffolding;
+﻿using PoeBud.Scaffolding;
 using PoeShared;
 using PoeShared.Scaffolding;
+using PoeShared.StashApi.DataTypes;
 
 namespace PoeBud.ViewModels
 {
@@ -152,7 +152,7 @@ namespace PoeBud.ViewModels
                 amulets,
                 rings,
             }
-                .Select(x => new ConcurrentQueue<IItem>(x))
+                .Select(x => new ConcurrentQueue<IStashItem>(x))
                 .ToArray();
 
             const float targetScoreForEachCategory = 1;
@@ -166,7 +166,7 @@ namespace PoeBud.ViewModels
                 {
                     var categoryScore = 0f;
 
-                    IItem nextItem;
+                    IStashItem nextItem;
                     while (categoryScore < targetScoreForEachCategory && items.TryDequeue(out nextItem))
                     {
                         categoryScore += nextItem.GetTradeScore();
@@ -193,7 +193,7 @@ namespace PoeBud.ViewModels
 
         private class PoeTradeItem : IPoeTradeItem
         {
-            public PoeTradeItem(IItem item)
+            public PoeTradeItem(IStashItem item)
             {
                 Name = item.ToString();
                 X = item.X;
@@ -215,7 +215,7 @@ namespace PoeBud.ViewModels
 
         private class PoeTradeSolution : IPoeTradeSolution
         {
-            public PoeTradeSolution(IPoeTradeItem[] items, ITab[] tabs)
+            public PoeTradeSolution(IPoeTradeItem[] items, IStashTab[] tabs)
             {
                 Items = items;
                 Tabs = tabs;
@@ -223,7 +223,7 @@ namespace PoeBud.ViewModels
 
             public IPoeTradeItem[] Items { get; }
 
-            public ITab[] Tabs { get; }
+            public IStashTab[] Tabs { get; }
         }
     }
 }

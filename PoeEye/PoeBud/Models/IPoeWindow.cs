@@ -1,4 +1,4 @@
-﻿using PoeBud.OfficialApi.DataTypes;
+﻿using PoeShared.StashApi.DataTypes;
 
 namespace PoeBud.Models
 {
@@ -17,7 +17,7 @@ namespace PoeBud.Models
 
         void SelectStashTabByName(int tabIndex, [NotNull] string[] knownTabs);
 
-        void SelectStashTabByIdx(ITab tabToSelect, ITab[] tabs);
+        void SelectStashTabByIdx(IStashTab tabToSelect, IStashTab[] tabs);
 
         void TransferItemFromStash(int itemX, int itemY, StashTabType tabType);
 

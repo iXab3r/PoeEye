@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using RestSharp.Deserializers;
 
-namespace PoeBud.OfficialApi.DataTypes
+namespace PoeShared.StashApi.DataTypes
 {
-    internal class Requirement
+    public sealed class StashItemRequirement
     {
         [DeserializeAs(Name = "name")]
         public string Name { get; set; }

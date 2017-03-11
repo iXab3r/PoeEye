@@ -163,10 +163,6 @@
       <HintPath>..\packages\reactiveui-core.6.5.0\lib\Net45\ReactiveUI.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="RestSharp, Version=105.2.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\RestSharp.105.2.3\lib\net45\RestSharp.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="Splat, Version=1.6.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Splat.1.6.2\lib\Net45\Splat.dll</HintPath>
       <Private>True</Private>
@@ -240,30 +236,6 @@
     <Compile Include="Models\PoeWIndow.cs" />
     <Compile Include="Models\PoeWindowManager.cs" />
     <Compile Include="Models\UserInputBlocker.cs" />
-    <Compile Include="OfficialApi\DataTypes\AdditionalProperty.cs" />
-    <Compile Include="OfficialApi\DataTypes\Character.cs" />
-    <Compile Include="OfficialApi\DataTypes\Colour.cs" />
-    <Compile Include="OfficialApi\DataTypes\GearType.cs" />
-    <Compile Include="OfficialApi\DataTypes\ICharacter.cs" />
-    <Compile Include="OfficialApi\DataTypes\IInventory.cs" />
-    <Compile Include="OfficialApi\DataTypes\IItem.cs" />
-    <Compile Include="OfficialApi\DataTypes\ILeague.cs" />
-    <Compile Include="OfficialApi\DataTypes\Inventory.cs" />
-    <Compile Include="OfficialApi\DataTypes\IStash.cs" />
-    <Compile Include="OfficialApi\DataTypes\ITab.cs" />
-    <Compile Include="OfficialApi\DataTypes\Item.cs" />
-    <Compile Include="OfficialApi\DataTypes\League.cs" />
-    <Compile Include="OfficialApi\DataTypes\PoeItemRarity.cs" />
-    <Compile Include="OfficialApi\DataTypes\Property.cs" />
-    <Compile Include="OfficialApi\DataTypes\Requirement.cs" />
-    <Compile Include="OfficialApi\DataTypes\Socket.cs" />
-    <Compile Include="OfficialApi\DataTypes\Stash.cs" />
-    <Compile Include="OfficialApi\DataTypes\StashTabType.cs" />
-    <Compile Include="OfficialApi\DataTypes\Tab.cs" />
-    <Compile Include="OfficialApi\IPoeClient.cs" />
-    <Compile Include="OfficialApi\PoeClient.cs" />
-    <Compile Include="OfficialApi\ProcurementLegacy\GearTypeAnalyzer.cs" />
-    <Compile Include="OfficialApi\ProcurementLegacy\IGearTypeAnalyzer.cs" />
     <Compile Include="Prism\PoeBudModule.cs" />
     <Compile Include="Prism\PoeBudModuleRegistrations.cs" />
     <Compile Include="Scaffolding\ItemExtensions.cs" />
@@ -335,9 +307,6 @@
     <None Include="Resources\Overlays\FallOfOriath.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="OfficialApi\ProcurementLegacy\Data.xml" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Overlays\Green.png">
