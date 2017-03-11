@@ -235,7 +235,7 @@ namespace PoeEye.TradeMonitor.ViewModels
 
         private void TradeCommandExecuted()
         {
-            chatService.SendMessage($"/trade {Negotiation.CharacterName}");
+            chatService.SendMessage($"/tradewith {Negotiation.CharacterName}");
         }
 
         private void OpenChatCommandExecuted()
