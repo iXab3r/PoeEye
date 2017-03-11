@@ -7,7 +7,7 @@
                     xmlns:modularity="clr-namespace:PoeShared.Modularity;assembly=PoeShared">
   <DataTemplate DataType="{x:Type viewModels:PoeEyeSettingsViewModel}">
     <ScrollViewer>
-      <ItemsControl ItemsSource="{Binding ModulesSettings}">
+      <ItemsControl ItemsSource="{Binding ModulesSettings}" Focusable="False">
         <ItemsControl.ItemTemplate>
           <DataTemplate DataType="{x:Type modularity:ISettingsViewModel}">
             <Expander

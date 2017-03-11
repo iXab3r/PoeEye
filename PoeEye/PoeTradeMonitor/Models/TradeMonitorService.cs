@@ -6,10 +6,12 @@ using System.Reactive.Subjects;
 using System.Windows.Input;
 using Guards;
 using JetBrains.Annotations;
+using PoeEye.TradeMonitor.ViewModels;
 using PoeShared;
 using PoeShared.Scaffolding;
 using PoeWhisperMonitor;
 using PoeWhisperMonitor.Chat;
+using ReactiveUI;
 using DisposableReactiveObject = PoeShared.Scaffolding.DisposableReactiveObject;
 
 namespace PoeEye.TradeMonitor.Models
@@ -65,7 +67,5 @@ namespace PoeEye.TradeMonitor.Models
             }
             return result;
         }
-
-
     }
 }

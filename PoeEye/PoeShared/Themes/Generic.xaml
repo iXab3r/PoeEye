@@ -15,6 +15,7 @@
         <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/WindowControlStyle.xaml" />
         <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/SlimScrollbar.xaml" />
         <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Thumb.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/AvalonEdit.xaml" />
         <ResourceDictionary Source="pack://application:,,,/PoeShared;component/UI/Views/ImageView.xaml" />
         <ResourceDictionary Source="pack://application:,,,/PoeShared;component/UI/Views/ImageView.xaml" />
     </ResourceDictionary.MergedDictionaries>

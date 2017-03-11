@@ -1,4 +1,4 @@
-﻿using PoeEye.TradeMonitor.Modularity;
+﻿using PoeEye.TradeMonitor.Models;
 using PoeShared.Scaffolding;
 using ReactiveUI;
 
@@ -6,6 +6,10 @@ namespace PoeEye.TradeMonitor.ViewModels
 {
     internal sealed class MacroMessageViewModel : DisposableReactiveObject
     {
+        private string label;
+
+        private string text;
+
         public MacroMessageViewModel(MacroMessage message)
         {
             FromMessage(message);
@@ -13,15 +17,11 @@ namespace PoeEye.TradeMonitor.ViewModels
 
         public MacroMessageViewModel() {}
 
-        private string text;
-
         public string Text
         {
             get { return text; }
             set { this.RaiseAndSetIfChanged(ref text, value); }
         }
-
-        private string label;
 
         public string Label
         {
@@ -37,10 +37,10 @@ namespace PoeEye.TradeMonitor.ViewModels
 
         public MacroMessage ToMessage()
         {
-            return new MacroMessage()
+            return new MacroMessage
             {
                 Text = Text,
-                Label = Label,
+                Label = Label
             };
         }
     }

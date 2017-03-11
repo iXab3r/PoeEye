@@ -13,6 +13,9 @@ namespace PoeEye.TradeMonitor.Prism
                 .RegisterType<INegotiationViewModel, NegotiationViewModel>();
 
             Container
+                .RegisterSingleton<IPoeMacroCommandsProvider, PoeMacroCommandsService>();
+
+            Container
                  .RegisterType<ITradeMonitorService>(
                      new InjectionFactory(unity => unity.Resolve<TradeMonitorService>(
                              new DependencyOverride<IPoeMessageParser[]>(

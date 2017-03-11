@@ -9,7 +9,8 @@
                     xmlns:net="clr-namespace:FontAwesome.Net;assembly=FontAwesome.Net"
                     xmlns:viewModels="clr-namespace:PoeEye.TradeMonitor.ViewModels"
                     xmlns:modularity="clr-namespace:PoeEye.TradeMonitor.Modularity"
-                    xmlns:converters="clr-namespace:PoeShared.Scaffolding.WPF.Converters;assembly=PoeShared">
+                    xmlns:converters="clr-namespace:PoeShared.Scaffolding.WPF.Converters;assembly=PoeShared"
+                    xmlns:models="clr-namespace:PoeEye.TradeMonitor.Models">
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Generic.xaml" />
@@ -138,7 +139,7 @@
                             </ItemsPanelTemplate>
                         </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
-                            <DataTemplate DataType="{x:Type modularity:MacroMessage}">
+                            <DataTemplate DataType="{x:Type models:MacroMessage}">
                                 <Button Content="{Binding Label}" 
                                         Margin="5,0"
                                         Style="{StaticResource MetroFlatButton}"

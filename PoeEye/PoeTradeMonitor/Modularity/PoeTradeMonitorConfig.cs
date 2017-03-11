@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Documents;
+using PoeEye.TradeMonitor.Models;
 using PoeShared.Modularity;
 
 namespace PoeEye.TradeMonitor.Modularity
@@ -19,16 +20,16 @@ namespace PoeEye.TradeMonitor.Modularity
 
         public Size OverlaySize { get; set; }
 
-        public List<MacroMessage> PredefinedMessages { get; set; }
+        public List<MacroMessage> PredefinedMessages { get; set; } = new List<MacroMessage>();
 
         public static PoeTradeMonitorConfig Default = new PoeTradeMonitorConfig()
         {
             PredefinedMessages = new List<MacroMessage>()
             {
                 new MacroMessage { Label = "1m", Text = "one minute" },
-                new MacroMessage { Label = "thx", Text = "thanks" },
-                new MacroMessage { Label = "no thx", Text = "no thanks" },
-                new MacroMessage { Label = "sold", Text = "sold" },
+                new MacroMessage { Label = "thx", Text = "thanks /Kick /Close" },
+                new MacroMessage { Label = "no thx", Text = "no thanks /Close" },
+                new MacroMessage { Label = "sold", Text = "sold /Close" },
             }
         };
     }

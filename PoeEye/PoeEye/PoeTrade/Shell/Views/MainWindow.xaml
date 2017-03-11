@@ -281,7 +281,7 @@
             <controls:Flyout Header="&#xF085; Settings" x:Name="SettingsFlyout"
                              FontFamily="{StaticResource FontAwesome}"
                              Position="Right"
-                             Width="300"
+                             Width="600"
                              Margin="0, 20"
                              IsOpen="{Binding Settings.IsOpen}"
                              BorderBrush="{StaticResource AccentColorBrush}">

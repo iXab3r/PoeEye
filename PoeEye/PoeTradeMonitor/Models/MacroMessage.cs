@@ -1,4 +1,4 @@
-﻿namespace PoeEye.TradeMonitor.Modularity
+﻿namespace PoeEye.TradeMonitor.Models
 {
     public struct MacroMessage
     {

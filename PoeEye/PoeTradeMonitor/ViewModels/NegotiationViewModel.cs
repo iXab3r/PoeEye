@@ -22,7 +22,7 @@ using ReactiveUI;
 
 namespace PoeEye.TradeMonitor.ViewModels
 {
-    public class NegotiationViewModel : DisposableReactiveObject, INegotiationViewModel
+    internal class NegotiationViewModel : DisposableReactiveObject, INegotiationViewModel, IMacroCommandContext
     {
         public static readonly TimeSpan DefaultUpdatePeriod = TimeSpan.FromSeconds(1);
 
@@ -37,8 +37,6 @@ namespace PoeEye.TradeMonitor.ViewModels
         private readonly DelegateCommand<MacroMessage?> sendPredefinedMessageCommand;
         private bool isExpanded;
         private INegotiationCloseController closeController;
-
-        private readonly IDictionary<string, Action<MacroMessage>> knownActions = new Dictionary<string, Action<MacroMessage>>();
 
         public NegotiationViewModel(
             TradeModel model,
@@ -84,9 +82,6 @@ namespace PoeEye.TradeMonitor.ViewModels
                 .ObserveOn(uiScheduler)
                 .Subscribe(() => this.RaisePropertyChanged(nameof(TimeElapsed)))
                 .AddTo(Anchors);
-
-            knownActions.Add("/kick", message => chatService.SendMessage($"/kick {model.CharacterName}"));
-            knownActions.Add("/close", message => closeController?.Close());
         }
 
         public bool IsExpanded
@@ -114,6 +109,8 @@ namespace PoeEye.TradeMonitor.ViewModels
         public PoePrice Price => model.Price;
 
         public IReactiveList<MacroMessage> PredefinedMessages { get; } = new ReactiveList<MacroMessage>();
+
+        public IReactiveList<MacroCommand> Commands { get; } = new ReactiveList<MacroCommand>();
 
         public void SetCloseController(INegotiationCloseController closeController)
         {
@@ -158,18 +155,14 @@ namespace PoeEye.TradeMonitor.ViewModels
 
         private void SendPredefinedMessage(MacroMessage message)
         {
-            var messageText = message.Text;
-            foreach (var knownAction in knownActions)
-            {
-                messageText = messageText.Replace(knownAction.Key, string.Empty);
-            }
+            var messageToSend = message.Text;
+            Commands.ForEach(x => messageToSend = x.CleanupText(messageToSend));
 
-            chatService.SendMessage($"@{model.CharacterName} {messageText}");
+            chatService.SendMessage($"@{model.CharacterName} {messageToSend}");
 
-            foreach (var knownAction in knownActions.Where(x => message.Text.IndexOf(x.Key, StringComparison.OrdinalIgnoreCase) >= 0))
-            {
-                knownAction.Value(message);
-            }
+            Commands
+                .Where(x => x.TryToMatch(message.Text).Success)
+                .ForEach(x => x.Execute(this));
         }
 
         private void ApplyConfig(PoeTradeMonitorConfig config)
@@ -177,5 +170,9 @@ namespace PoeEye.TradeMonitor.ViewModels
             PredefinedMessages.Clear();
             config.PredefinedMessages.ForEach(PredefinedMessages.Add);
         }
+
+        public INegotiationCloseController CloseController => closeController;
+
+        public TradeModel Negotiation => model;
     }
 }

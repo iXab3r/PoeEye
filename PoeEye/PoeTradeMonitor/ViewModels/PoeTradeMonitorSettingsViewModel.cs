@@ -1,6 +1,8 @@
 ﻿using System.Linq;
 using System.Windows.Input;
 using Guards;
+using JetBrains.Annotations;
+using PoeEye.TradeMonitor.Models;
 using PoeEye.TradeMonitor.Modularity;
 using PoeShared.Modularity;
 using PoeShared.Scaffolding;
@@ -11,13 +13,17 @@ namespace PoeEye.TradeMonitor.ViewModels
 {
     internal sealed class PoeTradeMonitorSettingsViewModel : DisposableReactiveObject, ISettingsViewModel<PoeTradeMonitorConfig>
     {
+        private readonly IPoeMacroCommandsProvider commandsProvider;
         private readonly DelegateCommand<MacroMessageViewModel> removeMessageCommand;
         private readonly DelegateCommand addMessageCommand;
 
         private PoeTradeMonitorConfig loadedConfig;
 
-        public PoeTradeMonitorSettingsViewModel()
+        public PoeTradeMonitorSettingsViewModel([NotNull] IPoeMacroCommandsProvider commandsProvider)
         {
+            Guard.ArgumentNotNull(() => commandsProvider);
+
+            this.commandsProvider = commandsProvider;
             removeMessageCommand = new DelegateCommand<MacroMessageViewModel>(RemoveMessageCommandExecuted);
             addMessageCommand = new DelegateCommand(AddMessageCommandExecuted);
         }
@@ -29,6 +35,8 @@ namespace PoeEye.TradeMonitor.ViewModels
         public ICommand AddMessageCommand => addMessageCommand;
 
         public string ModuleName { get; } = "Trade Monitor";
+
+        public IReactiveList<MacroCommand> MacroCommands => commandsProvider.MacroCommands;
 
         public void Load(PoeTradeMonitorConfig config)
         {

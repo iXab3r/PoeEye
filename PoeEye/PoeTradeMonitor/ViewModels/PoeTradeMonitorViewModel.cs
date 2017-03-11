@@ -164,7 +164,7 @@ namespace PoeEye.TradeMonitor.ViewModels
         {
             var fake = new TradeModel
             {
-                CharacterName = "NotBurningArrow",
+                CharacterName = "Xaber",
                 ItemName = "test item name",
                 Price = new PoePrice("chaos", 5.5f),
                 Timestamp = DateTime.Now
