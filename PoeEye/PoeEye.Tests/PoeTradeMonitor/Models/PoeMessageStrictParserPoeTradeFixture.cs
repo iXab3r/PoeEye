@@ -73,6 +73,31 @@ namespace PoeEye.Tests.PoeTradeMonitor.Models
                         TabName = "Трейд",
                         Offer = "offer 3c"
                     });
+            yield return new TestCaseData(
+                   "Hi, I would like to buy your Enduring Onslaught Leaguestone of Slaying listed for 3 alchemy in Legacy (stash tab \"Трейд\"; position: left 12, top 2) 3c ?",
+                   true,
+                   new TradeModel()
+                   {
+                       CharacterName = "Name",
+                       ItemPosition = new ItemPosition(12, 2),
+                       Price = new PoePrice("alchemy", 3),
+                       PositionName = "Enduring Onslaught Leaguestone of Slaying",
+                       League = "Legacy",
+                       TabName = "Трейд",
+                       Offer = "3c ?"
+                   });
+            yield return new TestCaseData(
+                  "Hi, I would like to buy your Enduring Onslaught Leaguestone of Slaying in Legacy (stash tab \"Трейд\"; position: left 12, top 2) 3c ?",
+                  true,
+                  new TradeModel()
+                  {
+                      CharacterName = "Name",
+                      ItemPosition = new ItemPosition(12, 2),
+                      PositionName = "Enduring Onslaught Leaguestone of Slaying",
+                       League = "Legacy",
+                      TabName = "Трейд",
+                      Offer = "3c ?"
+                  });
         }
 
         private PoeMessageStrictParserPoeTrade CreateInstance()

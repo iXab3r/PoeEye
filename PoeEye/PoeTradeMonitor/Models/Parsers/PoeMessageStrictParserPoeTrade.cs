@@ -9,7 +9,7 @@ namespace PoeEye.TradeMonitor.Models.Parsers
     internal class PoeMessageStrictParserPoeTrade : PoeMessageParserRegex
     {
         private static readonly Regex MessageParser = new Regex(
-            @"buy your (?'item'.+?) listed for (?'price'.+?) in (?'league'.*?) \(stash tab ""(?'tabName'.+?)""; position: left (?'itemX'\d+), top (?'itemY'\d+)\)[\,\.\ ]?(?'offer'.*)",
+            @"buy your (?'item'.+?)( listed for (?'price'.+?))? in (?'league'.*?) \(stash tab ""(?'tabName'.+?)""; position: left (?'itemX'\d+), top (?'itemY'\d+)\)[ ,\. ]*(?'offer'.*)",
             RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         public PoeMessageStrictParserPoeTrade([NotNull] PriceToCurrencyConverter priceConverter) : base(priceConverter)
