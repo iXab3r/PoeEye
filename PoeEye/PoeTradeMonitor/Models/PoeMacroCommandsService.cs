@@ -43,7 +43,7 @@ namespace PoeEye.TradeMonitor.Models
                 new ChatCommand(
                     "hideout",
                     chatService,
-                    context => $"/kick {context.Negotiation.CharacterName}")
+                    context => $"/hideout {context.Negotiation.CharacterName}")
                 {
                     Label = "hideout",
                     Description = "Teleport to player's hideout"
