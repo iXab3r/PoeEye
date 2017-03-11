@@ -1,5 +1,6 @@
 ﻿using Microsoft.Practices.Unity;
 using PoeEye.TradeMonitor.Models;
+using PoeEye.TradeMonitor.Models.Parsers;
 using PoeEye.TradeMonitor.ViewModels;
 using PoeShared.Scaffolding;
 
@@ -13,6 +14,7 @@ namespace PoeEye.TradeMonitor.Prism
                 .RegisterType<INegotiationViewModel, NegotiationViewModel>();
 
             Container
+                .RegisterSingleton<IPoeStashService, PoeStashService>()
                 .RegisterSingleton<IPoeMacroCommandsProvider, PoeMacroCommandsService>();
 
             Container
@@ -21,7 +23,9 @@ namespace PoeEye.TradeMonitor.Prism
                              new DependencyOverride<IPoeMessageParser[]>(
                                      new IPoeMessageParser[]
                                      {
-                                        unity.Resolve<PoeMessageParserPoeTrade>(),
+                                        unity.Resolve<PoeMessageStrictParserPoeTrade>(),
+                                        unity.Resolve<PoeMessageWeakParserPoeTrade>(),
+                                        unity.Resolve<PoeMessageCurrencyParserPoeTrade>(),
                                      }
                                  )
                          ))

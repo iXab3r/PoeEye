@@ -15,6 +15,7 @@
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Generic.xaml" />
         <ResourceDictionary Source="pack://application:,,,/PoeTradeMonitor;component/Themes/Styles.xaml" />
+
     </ResourceDictionary.MergedDictionaries>
 
     <blue:BoolToVisibilityConverter x:Key="TrueToVisibleConverter"
@@ -34,6 +35,9 @@
                                     FalseValue="Visible" />
 
     <DataTemplate DataType="{x:Type viewModels:PoeTradeMonitorViewModel}">
+        <DataTemplate.Resources>
+            <Style TargetType="{x:Type ScrollBar}" BasedOn="{StaticResource SlimScrollBarStyleKey}"/>
+        </DataTemplate.Resources>
         <Grid>
             <Border
                 x:Name="TradeMonitorBackground"

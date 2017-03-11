@@ -4,7 +4,8 @@
                     xmlns:viewModels="clr-namespace:PoeEye.TradeMonitor.ViewModels"
                     xmlns:models="clr-namespace:PoeEye.TradeMonitor.Models"
                     xmlns:tradeMonitorControls="clr-namespace:PoeEye.TradeMonitor.Controls"
-                    xmlns:codeCompletion="clr-namespace:ICSharpCode.AvalonEdit.CodeCompletion;assembly=ICSharpCode.AvalonEdit">
+                    xmlns:codeCompletion="clr-namespace:ICSharpCode.AvalonEdit.CodeCompletion;assembly=ICSharpCode.AvalonEdit"
+                    xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls">
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Generic.xaml" />
@@ -24,6 +25,7 @@
         <Grid Margin="10,5">
             <Grid.RowDefinitions>
                 <RowDefinition Height="36" />
+                <RowDefinition Height="36" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
@@ -31,11 +33,22 @@
                         Orientation="Horizontal">
                 <Label Style="{StaticResource IconLabel}"
                        MinWidth="100"
+                       Content="Is Enabled:" />
+                <controls:ToggleSwitchButton
+                                    IsChecked="{Binding IsEnabled}"
+                                    Height="24"
+                                    Margin="10,0" />
+            </StackPanel>
+
+            <StackPanel Grid.Row="1" Grid.Column="0"
+                        Orientation="Horizontal">
+                <Label Style="{StaticResource IconLabel}"
+                       MinWidth="100"
                        Content="Whispers:" />
                 <ContentPresenter Content="{Binding AudioNotificationSelector}" />
             </StackPanel>
 
-            <StackPanel Grid.Column="0" Grid.Row="1"
+            <StackPanel Grid.Column="0" Grid.Row="2"
                         Orientation="Vertical">
                 <Grid>
                     <TextBlock Text="Response buttons" Style="{StaticResource IconTextBlock}" />

@@ -6,6 +6,9 @@ namespace PoeShared.StashApi.DataTypes
 {
     public sealed class StashItem : IStashItem
     {
+        [DeserializeAs(Name = "id")]
+        public string Id { get; set; }
+
         [DeserializeAs(Name = "verified")]
         public bool Verified { get; set; }
 
@@ -18,11 +21,17 @@ namespace PoeShared.StashApi.DataTypes
         [DeserializeAs(Name = "icon")]
         public string Icon { get; set; }
 
+        [DeserializeAs(Name = "note")]
+        public string Note { get; set; }
+
         [DeserializeAs(Name = "support")]
         public bool Support { get; set; }
 
         [DeserializeAs(Name = "league")]
         public string League { get; set; }
+
+        [DeserializeAs(Name = "ilvl")]
+        public int ItemLevel { get; set; }
 
         [DeserializeAs(Name = "name")]
         public string Name { get; set; }

@@ -30,6 +30,7 @@ namespace PoeBud.Prism
             Container
                 .RegisterType<HotkeyManagerBase>(new InjectionFactory(x => HotkeyManager.Current))
                 .RegisterType<IUserInputBlocker, UserInputBlocker>()
+                .RegisterType<IPoeStashUpdater, PoeStashUpdater>()
                 .RegisterType<ISolutionExecutorViewModel, SolutionExecutorViewModel>()
                 .RegisterType<IPoeWindow, PoeWindow>()
                 .RegisterType<ISolutionExecutorModel, SolutionExecutorModel>()

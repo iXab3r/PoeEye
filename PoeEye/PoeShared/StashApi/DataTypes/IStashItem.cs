@@ -7,7 +7,13 @@ namespace PoeShared.StashApi.DataTypes
     {
         List<StashItemAdditionalProperty> additionalProperties { get; }
 
+        string Id { get; set; }
+
+        string Note { get; set; }
+
         string Color { get; }
+
+        int ItemLevel { get; }
 
         bool Corrupted { get; }
 

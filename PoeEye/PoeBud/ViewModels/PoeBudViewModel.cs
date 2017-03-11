@@ -34,10 +34,9 @@ namespace PoeBud.ViewModels
         private readonly IClock clock;
         private readonly ISubject<Exception> exceptionsToPropagate = new Subject<Exception>();
         private readonly IKeyboardMouseEvents keyboardMouseEvents;
-        [NotNull]
         private readonly IUiOverlaysProvider overlaysProvider;
         private readonly ObservableAsPropertyHelper<Exception> lastUpdateException;
-        private readonly IFactory<PoeStashUpdater, IPoeBudConfig> stashAnalyzerFactory;
+        private readonly IFactory<IPoeStashUpdater, IStashUpdaterParameters> stashAnalyzerFactory;
         private readonly IFactory<StashViewModel, StashUpdate, IPoeBudConfig> stashUpdateFactory;
         private readonly SerialDisposable stashUpdaterDisposable = new SerialDisposable();
         private readonly IScheduler uiScheduler;
@@ -48,7 +47,7 @@ namespace PoeBud.ViewModels
         private bool isEnabled;
         private StashUpdate lastServerStashUpdate;
         private StashViewModel stash;
-        private PoeStashUpdater stashUpdater;
+        private IPoeStashUpdater stashUpdater;
 
         private string uiOverlayPath;
 
@@ -60,7 +59,7 @@ namespace PoeBud.ViewModels
             [NotNull] IKeyboardMouseEvents keyboardMouseEvents,
             [NotNull] IUserInteractionsManager userInteractionsManager,
             [NotNull] IUiOverlaysProvider overlaysProvider,
-            [NotNull] IFactory<PoeStashUpdater, IPoeBudConfig> stashAnalyzerFactory,
+            [NotNull] IFactory<IPoeStashUpdater, IStashUpdaterParameters> stashAnalyzerFactory,
             [NotNull] IFactory<StashViewModel, StashUpdate, IPoeBudConfig> stashUpdateFactory,
             [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {
@@ -104,7 +103,7 @@ namespace PoeBud.ViewModels
 
         public ISolutionExecutorViewModel SolutionExecutor { get; }
 
-        public PoeStashUpdater StashUpdater
+        public IPoeStashUpdater StashUpdater
         {
             get { return stashUpdater; }
             set { this.RaiseAndSetIfChanged(ref stashUpdater, value); }

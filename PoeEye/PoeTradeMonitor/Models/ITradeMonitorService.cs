@@ -4,7 +4,7 @@ using PoeShared.Scaffolding;
 
 namespace PoeEye.TradeMonitor.Models
 {
-    public interface ITradeMonitorService : IDisposableReactiveObject
+    internal interface ITradeMonitorService : IDisposableReactiveObject
     {
         IObservable<TradeModel> Trades { [NotNull] get; }
     }

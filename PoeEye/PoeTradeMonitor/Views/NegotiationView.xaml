@@ -10,7 +10,8 @@
                     xmlns:viewModels="clr-namespace:PoeEye.TradeMonitor.ViewModels"
                     xmlns:modularity="clr-namespace:PoeEye.TradeMonitor.Modularity"
                     xmlns:converters="clr-namespace:PoeShared.Scaffolding.WPF.Converters;assembly=PoeShared"
-                    xmlns:models="clr-namespace:PoeEye.TradeMonitor.Models">
+                    xmlns:models="clr-namespace:PoeEye.TradeMonitor.Models"
+                    xmlns:common="clr-namespace:PoeShared.Common;assembly=PoeShared">
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Generic.xaml" />
@@ -37,7 +38,6 @@
                 <Setter Property="Height" Value="28"/>
                 <Setter Property="Padding" Value="0,3,0,0"/>
                 <Setter Property="FontSize" Value="20"/>
-                <Setter Property="VerticalAlignment" Value="Center"/>
             </Style>
         </DataTemplate.Resources>
 
@@ -51,6 +51,7 @@
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="Auto"/>
@@ -60,38 +61,69 @@
                                    Foreground="#EEC64C"
                                    Text="{Binding CharacterName}"/>
 
-                        <TextBlock Grid.Column="2" 
+                        <StackPanel Orientation="Horizontal" Grid.Column="1" Grid.Row="0">
+                            <TextBlock 
+                                   VerticalAlignment="Center"
+                                   Margin="5,0">
+                                <TextBlock.Style>
+                                    <Style TargetType="{x:Type TextBlock}"
+                                           BasedOn="{StaticResource IconTextBlock}">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding NegotiationType}" Value="{x:Static models:TradeType.Sell}">
+                                                <Setter Property="Text" Value="{x:Static net:FontAwesome.arrow_right}"/>
+                                                <Setter Property="Foreground" Value="#AEAB94"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding NegotiationType}" Value="{x:Static models:TradeType.Buy}">
+                                                <Setter Property="Text" Value="{x:Static net:FontAwesome.arrow_left}"/>
+                                                <Setter Property="Foreground" Value="GreenYellow"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                        
+                                    </Style>
+                                    
+                                </TextBlock.Style>
+                            </TextBlock>
+
+                            <ContentPresenter 
+                                          TextBlock.Foreground="{StaticResource PoeItemRarityUniqueBrush}" 
+                                          TextBlock.FontSize="16"  
+                                          TextBlock.FontWeight="SemiBold"
+                                          Content="{Binding Price}"/>
+                        </StackPanel>
+
+                        <TextBlock Grid.Column="3" 
                                    Foreground="#EEC64C"
                                    FontSize="13"
                                    Text="{Binding TimeElapsed, Converter={StaticResource TimeSpanToHumanReadableStringConverter}}"/>
-                        
-                        <StackPanel Grid.Column="3" 
+
+                        <StackPanel Grid.Column="4" 
                                     Orientation="Horizontal">
                             <Button Content="{x:Static net:FontAwesome.plus_circle}"
                                     Margin="2,0"
                                     Foreground="#00BA46"
                                     Command="{Binding InviteToPartyCommand}" />
-                            
+
                             <Button Content="{x:Static net:FontAwesome.minus_circle}" 
                                     Margin="2,0"
                                     Foreground="#B64A2C"
                                     Command="{Binding KickFromPartyCommand}" />
-                            
+
                             <Button Content="{x:Static net:FontAwesome.shopping_cart}" 
                                     Margin="2,0"
                                     Foreground="#FCD24E"
                                     Padding="0,2,2,0"
                                     FontSize="16"
                                     Command="{Binding TradeCommand}" />
-                            
+
                             <Button Content="{x:Static net:FontAwesome.comments_o}" 
                                     Margin="2,0"
                                     Foreground="#F3F4F4"
                                     FontSize="16"
                                     Padding="0,1,0,0"
                                     Command="{Binding OpenChatCommand}" />
-                            
+
                             <Button Content="{x:Static net:FontAwesome.close}" 
+                                    Foreground="#F3F4F4"
                                     Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}, Path=DataContext.CloseNegotiationCommand}"
                                     CommandParameter="{Binding}"
                                     FontSize="14"
@@ -103,41 +135,66 @@
             </Expander.Header>
 
             <Border Background="{StaticResource TradeMonitorBackgroundBrushKey}">
+
                 <Grid Margin="5">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    
+
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
-                    <TextBlock Grid.Column="0" Grid.Row="0"
-                           Foreground="{StaticResource PoeItemRarityUniqueBrush}"
-                           VerticalAlignment="Center"
-                           Text="{Binding ItemName}"/>
+                    <Viewbox Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="4" >
+                        <StackPanel Orientation="Horizontal" 
+                                Background="Transparent"
+                                HorizontalAlignment="Center"
+                                ToolTipService.HasDropShadow="False"
+                                ToolTipService.InitialShowDelay="0"
+                                ToolTipService.ShowDuration="{x:Static system:Int32.MaxValue}"
+                                ToolTipService.ShowOnDisabled="True">
+                            <StackPanel.ToolTip>
+                                <Border Background="{StaticResource TradeMonitorBackgroundBrushKey}"
+                                    BorderBrush="{StaticResource TradeMonitorBorderBrushKey}"
+                                    BorderThickness="1">
+                                    <ContentPresenter Content="{Binding Item}"
+                                                  TextBlock.Foreground="{StaticResource TextBrush}"/>
+                                </Border>
 
-                    <TextBlock Grid.Column="1" Grid.Row="0"
-                           Foreground="#AEAB94"
-                           VerticalAlignment="Center"
-                           Margin="5,0"
-                           Text="{x:Static net:FontAwesome.arrow_right}"/>
+                            </StackPanel.ToolTip>
 
-                    <ContentPresenter Grid.Column="2" Grid.Row="0"
-                                      Content="{Binding Price}"/>
+                            <ContentPresenter 
+                                      Content="{Binding ItemIcon}" 
+                                      Visibility="{Binding ItemIcon, Converter={StaticResource NullToCollapsedConverter}}"
+                                      Height="40"
+                                      Width="40"
+                                      Margin="5,0">
+                            </ContentPresenter>
 
-                    <ItemsControl Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="3"
+                            <ContentPresenter VerticalAlignment="Center" 
+                                              TextBlock.Foreground="{StaticResource PoeItemRarityUniqueBrush}"
+                                              TextBlock.FontSize="16"
+                                              TextBlock.FontWeight="SemiBold"
+                                              Content="{Binding ItemName}">
+                            </ContentPresenter>
+                        </StackPanel>
+                    </Viewbox>
+
+                    <ItemsControl Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="4"
                                   Margin="10"
-                                  HorizontalAlignment="Center"
+                                  HorizontalAlignment="Left"
                                   ItemsSource="{Binding PredefinedMessages}">
+
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
                                 <StackPanel Orientation="Horizontal"/>
                             </ItemsPanelTemplate>
                         </ItemsControl.ItemsPanel>
+
                         <ItemsControl.ItemTemplate>
                             <DataTemplate DataType="{x:Type models:MacroMessage}">
                                 <Button Content="{Binding Label}" 
@@ -147,11 +204,24 @@
                                         Command="{Binding DataContext.SendPredefinedMessageCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ItemsControl}}}"/>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
-                        
                     </ItemsControl>
+
+                    <StackPanel Orientation="Horizontal" Grid.Column="3" Grid.Row="1">
+                        <TextBlock 
+                                   Foreground="#EEC64C"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Right"
+                                   Margin="5,0">
+                            <TextBlock.Inlines>
+                                <Run Text="{Binding TabName, Mode=OneWay}" /> (
+                                <Run Text="{Binding ItemPosition, Mode=OneWay}" /> )
+                            </TextBlock.Inlines>
+                        </TextBlock>
+                    </StackPanel>
+
                 </Grid>
             </Border>
-            
+
         </Expander>
     </DataTemplate>
 </ResourceDictionary>

@@ -13,7 +13,7 @@
     <Color x:Key="TradeMonitorTitleBackgroundColorKey">#343E3D</Color>
     <Color x:Key="TradeMonitorBackgroundColorKey">#292C2A</Color>
 
-    <SolidColorBrush x:Key="TradeMonitorBorderBrushKey" Color="{StaticResource TradeMonitorBorderColorKey}"/>
+    <SolidColorBrush x:Key="TradeMonitorBorderBrushKey" Color="{StaticResource AccentColor}"/>
     <SolidColorBrush x:Key="TradeMonitorTitleBackgroundBrushKey" Color="{StaticResource TradeMonitorTitleBackgroundColorKey}"/>
     <SolidColorBrush x:Key="TradeMonitorBackgroundBrushKey" Color="{StaticResource TradeMonitorBackgroundColorKey}"/>
 

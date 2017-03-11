@@ -45,12 +45,21 @@ namespace PoeEye.TradeMonitor.ViewModels
         public string ModuleName { get; } = "Trade Monitor";
 
         public IReactiveList<MacroCommand> MacroCommands => commandsProvider.MacroCommands;
+        private bool isEnabled;
+
+        public bool IsEnabled
+        {
+            get { return isEnabled; }
+            set { this.RaiseAndSetIfChanged(ref isEnabled, value); }
+        }
 
         public void Load(PoeTradeMonitorConfig config)
         {
             Guard.ArgumentNotNull(() => config);
 
             loadedConfig = config;
+            IsEnabled = config.IsEnabled;
+            AudioNotificationSelector.SelectedValue = config.NotificationType;
 
             PredefinedMessages.Clear();
             config.PredefinedMessages.Select(x => new MacroMessageViewModel(x)).ForEach(PredefinedMessages.Add);
@@ -66,6 +75,8 @@ namespace PoeEye.TradeMonitor.ViewModels
                 .Where(IsValid)
                 .Select(x => x.ToMessage())
                 .ToList();
+            loadedConfig.IsEnabled = IsEnabled;
+            loadedConfig.NotificationType = AudioNotificationSelector.SelectedValue;
             return loadedConfig;
         }
 

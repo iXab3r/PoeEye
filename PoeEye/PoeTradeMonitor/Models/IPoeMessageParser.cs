@@ -2,7 +2,7 @@
 
 namespace PoeEye.TradeMonitor.Models
 {
-    public interface IPoeMessageParser
+    internal interface IPoeMessageParser
     {
         bool TryParse(PoeMessage message, out TradeModel result);
     }

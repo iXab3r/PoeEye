@@ -236,6 +236,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Converters\PoeStashItemToPoeItem.cs" />
+    <Compile Include="PoeTrade\IPoeItemViewModelFactory.cs" />
     <Compile Include="StashApi\DataTypes\PoeItemRarityWrapper.cs" />
     <Compile Include="StashApi\DataTypes\StashItemAdditionalProperty.cs" />
     <Compile Include="StashApi\DataTypes\Character.cs" />
@@ -357,7 +359,7 @@
     <Compile Include="Prism\WellKnownWindows.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RandomNumberGenerator.cs" />
-    <Compile Include="Audio\SoundLibrary.cs" />
+    <Compile Include="Resources\Notifications\SoundLibrary.cs" />
     <Compile Include="Scaffolding\AssemblyExtensions.cs" />
     <Compile Include="Scaffolding\DataPipe.cs" />
     <Compile Include="Scaffolding\DataPipeCollection.cs" />
@@ -398,6 +400,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="FodyWeavers.xml" />
+    <EmbeddedResource Include="Resources\Notifications\mercury.wav" />
     <EmbeddedResource Include="StashApi\ProcurementLegacy\Data.xml" />
     <EmbeddedResource Include="Resources\Notifications\wob.wav" />
     <EmbeddedResource Include="Resources\Notifications\whistle.wav" />

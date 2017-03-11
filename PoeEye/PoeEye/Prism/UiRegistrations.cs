@@ -2,6 +2,7 @@
 using PoeShared.Audio;
 using PoeShared.Modularity;
 using PoeShared.Native;
+using PoeShared.PoeTrade;
 using PoeShared.Prism;
 using PoeShared.UI.Models;
 using PoeEyeMainConfig = PoeEye.Config.PoeEyeMainConfig;
@@ -41,6 +42,7 @@ namespace PoeEye.Prism
                 .RegisterSingleton<IConfigProvider, PoeEyeConfigProviderFromFile>()
                 .RegisterSingleton<IPoeCaptchaRegistrator, PoeCaptchaRegistrator>()
                 .RegisterSingleton<IPoeApiProvider, PoeApiProvider>()
+                .RegisterSingleton<IPoeItemViewModelFactory, PoeItemViewModelFactory>()
                 .RegisterSingleton<IDialogCoordinator, DialogCoordinator>();
 
             Container

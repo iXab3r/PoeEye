@@ -5,6 +5,7 @@
         Disabled,
         Whistle,
         Whisper,
+        Mercury,
         Bell,
         Ping,
         Wob,

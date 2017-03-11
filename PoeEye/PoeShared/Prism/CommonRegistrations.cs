@@ -4,11 +4,13 @@ using System.Reactive.Concurrency;
 using Gma.System.MouseKeyHook;
 using PoeShared.Audio;
 using PoeShared.Communications;
+using PoeShared.Converters;
 using PoeShared.Modularity;
 using PoeShared.Native;
 using PoeShared.PoeDatabase.PoeNinja;
 using PoeShared.PoeTrade.Query;
 using PoeShared.StashApi;
+using PoeShared.StashApi.DataTypes;
 using PoeShared.StashApi.ProcurementLegacy;
 using PoeShared.UI.Models;
 using PoeShared.UI.ViewModels;
@@ -45,6 +47,7 @@ namespace PoeShared.Prism
                 .RegisterSingleton<IRandomNumberGenerator, RandomNumberGenerator>()
                 .RegisterSingleton<IImagesCacheService, ImagesCacheService>()
                 .RegisterSingleton<IGearTypeAnalyzer, GearTypeAnalyzer>()
+                .RegisterSingleton<IConverter<IStashItem, IPoeItem>, PoeStashItemToPoeItem>()
                 .RegisterSingleton<IAudioNotificationsManager, AudioNotificationsManager>()
                 .RegisterSingleton<IOverlayWindowController, OverlayWindowController>(WellKnownWindows.PathOfExileWindow);
 

@@ -9,6 +9,8 @@ namespace PoeEye.TradeMonitor.Modularity
 {
     public class PoeTradeMonitorConfig : IPoeEyeConfig
     {
+        public bool IsEnabled { get; set; } = true;
+
         public static double MaxNumberOfNegotiationsToExpand = 10;
 
         public int NumberOfNegotiationsToExpandByDefault { get; set; } = 1;
@@ -23,7 +25,7 @@ namespace PoeEye.TradeMonitor.Modularity
 
         public List<MacroMessage> PredefinedMessages { get; set; } = new List<MacroMessage>();
 
-        public AudioNotificationType NotificationType { get; set; } = AudioNotificationType.Disabled;
+        public AudioNotificationType NotificationType { get; set; } = AudioNotificationType.Mercury;
 
         public static PoeTradeMonitorConfig Default = new PoeTradeMonitorConfig()
         {

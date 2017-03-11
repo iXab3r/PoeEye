@@ -1,4 +1,5 @@
-﻿using PoeShared.Modularity;
+﻿using PoeBud.Models;
+using PoeShared.Modularity;
 
 namespace PoeBud.Config
 {
@@ -7,15 +8,9 @@ namespace PoeBud.Config
 
     using JetBrains.Annotations;
 
-    internal interface IPoeBudConfig : IPoeEyeConfig
+    public interface IPoeBudConfig : IPoeEyeConfig, IStashUpdaterParameters
     {
         bool HideXpBar { get; }
-
-        string LoginEmail { get; }
-
-        string SessionId { get; }
-
-        string CharacterName { get; }
 
         string UiOverlayName { get; }
 
@@ -26,7 +21,5 @@ namespace PoeBud.Config
         TimeSpan ForegroundWindowRecheckPeriod { get; }
 
         TimeSpan UserActionDelay { get; }
-
-        ISet<int> StashesToProcess {[NotNull] get; }
     }
 }

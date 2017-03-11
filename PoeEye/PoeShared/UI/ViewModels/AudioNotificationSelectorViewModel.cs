@@ -40,6 +40,7 @@ namespace PoeShared.UI.ViewModels
                 AudioNotificationType.Silence,
                 AudioNotificationType.Whistle,
                 AudioNotificationType.Bell,
+                AudioNotificationType.Mercury,
                 AudioNotificationType.DingDong,
                 AudioNotificationType.Ping,
                 AudioNotificationType.Minions,

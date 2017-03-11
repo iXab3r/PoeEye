@@ -4,7 +4,7 @@ using PoeShared.StashApi.DataTypes;
 
 namespace PoeBud.Scaffolding
 {
-    internal static class ItemExtensions
+    public static class ItemExtensions
     {
         public static bool IsWeapon(this GearType gearType)
         {
@@ -82,6 +82,11 @@ namespace PoeBud.Scaffolding
                 return null;
             }
             return result - 1; // PoE Stash Idx (left-most tab) = Stash1 
+        }
+
+        public static string GetInventoryId(this IStashTab tab)
+        {
+            return $"Stash{tab.Idx + 1}";
         }
 
         public static IStashItem[] GetTradeableItems(this IStashItem[] items)

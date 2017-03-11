@@ -7,6 +7,7 @@ using System.Reactive.Linq;
 using Guards;
 using JetBrains.Annotations;
 using PoeShared.Modularity;
+using PoeShared.Resources.Notifications;
 using PoeShared.Scaffolding;
 using ReactiveUI;
 

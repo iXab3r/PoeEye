@@ -38,6 +38,7 @@ namespace PoeEye.TradeMonitor.ViewModels
 
         public PoeTradeMonitorViewModel(
             [NotNull] IKeyboardMouseEvents keyboardMouseEvents,
+            [NotNull] IPoeStashService stashService,
             [NotNull] IOverlayWindowController controller,
             [NotNull] IFactory<INegotiationViewModel, TradeModel> notificationFactory,
             [NotNull] ITradeMonitorService tradeMonitorService,
@@ -46,6 +47,7 @@ namespace PoeEye.TradeMonitor.ViewModels
             [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {
             Guard.ArgumentNotNull(() => keyboardMouseEvents);
+            Guard.ArgumentNotNull(() => stashService);
             Guard.ArgumentNotNull(() => controller);
             Guard.ArgumentNotNull(() => configProvider);
             Guard.ArgumentNotNull(() => notificationFactory);
@@ -165,7 +167,7 @@ namespace PoeEye.TradeMonitor.ViewModels
             var fake = new TradeModel
             {
                 CharacterName = "Xaber",
-                ItemName = "test item name",
+                PositionName = "test item name",
                 Price = new PoePrice("chaos", 5.5f),
                 Timestamp = DateTime.Now
             };

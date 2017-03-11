@@ -6,8 +6,11 @@ using System.Reactive.Subjects;
 using System.Windows.Input;
 using Guards;
 using JetBrains.Annotations;
+using PoeEye.TradeMonitor.Modularity;
 using PoeEye.TradeMonitor.ViewModels;
 using PoeShared;
+using PoeShared.Audio;
+using PoeShared.Modularity;
 using PoeShared.Scaffolding;
 using PoeWhisperMonitor;
 using PoeWhisperMonitor.Chat;
@@ -16,18 +19,29 @@ using DisposableReactiveObject = PoeShared.Scaffolding.DisposableReactiveObject;
 
 namespace PoeEye.TradeMonitor.Models
 {
-    public class TradeMonitorService : DisposableReactiveObject, ITradeMonitorService
+    internal sealed class TradeMonitorService : DisposableReactiveObject, ITradeMonitorService
     {
+        [NotNull] private readonly IAudioNotificationsManager audioManager;
         private readonly IPoeMessageParser[] parsers;
         private readonly ISubject<TradeModel> trades = new Subject<TradeModel>();
 
         public TradeMonitorService(
+            [NotNull] IConfigProvider<PoeTradeMonitorConfig> configProvider,
             [NotNull] IPoeWhisperService whisperService,
+            [NotNull] IAudioNotificationsManager audioManager,
             [NotNull] IPoeMessageParser[] parsers)
         {
+            Guard.ArgumentNotNull(() => configProvider);
             Guard.ArgumentNotNull(() => whisperService);
+            Guard.ArgumentNotNull(() => audioManager);
             Guard.ArgumentNotNull(() => parsers);
+            this.audioManager = audioManager;
             this.parsers = parsers;
+
+            trades
+                .Where(x => x.TradeType == TradeType.Buy)
+                .Subscribe(() => audioManager.PlayNotification(configProvider.ActualConfig.NotificationType))
+                .AddTo(Anchors);
 
             whisperService
                 .Messages
