@@ -2,11 +2,16 @@
 using System.Diagnostics;
 using System.Reactive.Concurrency;
 using Gma.System.MouseKeyHook;
+using PoeShared.Audio;
 using PoeShared.Communications;
+using PoeShared.Converters;
 using PoeShared.Modularity;
 using PoeShared.Native;
 using PoeShared.PoeDatabase.PoeNinja;
 using PoeShared.PoeTrade.Query;
+using PoeShared.StashApi;
+using PoeShared.StashApi.DataTypes;
+using PoeShared.StashApi.ProcurementLegacy;
 using PoeShared.UI.Models;
 using PoeShared.UI.ViewModels;
 using ProxyProvider;
@@ -34,7 +39,6 @@ namespace PoeShared.Prism
         {
             Container
                 .RegisterSingleton<IClock, Clock>()
-                .RegisterInstance(typeof(IKeyboardMouseEvents), Hook.GlobalEvents(), new ContainerControlledLifetimeManager())
                 .RegisterSingleton<IPoeEyeModulesRegistrator, PoeEyeModulesRegistrator>()
                 .RegisterSingleton<IPoeEyeModulesEnumerator, PoeEyeModulesRegistrator>()
                 .RegisterSingleton<IEqualityComparer<IPoeItem>, PoeItemEqualityComparer>()
@@ -42,15 +46,21 @@ namespace PoeShared.Prism
                 .RegisterSingleton<IProxyProvider, GenericProxyProvider>(new InjectionFactory(unity => new GenericProxyProvider()))
                 .RegisterSingleton<IRandomNumberGenerator, RandomNumberGenerator>()
                 .RegisterSingleton<IImagesCacheService, ImagesCacheService>()
+                .RegisterSingleton<IGearTypeAnalyzer, GearTypeAnalyzer>()
+                .RegisterSingleton<IConverter<IStashItem, IPoeItem>, PoeStashItemToPoeItem>()
+                .RegisterSingleton<IAudioNotificationsManager, AudioNotificationsManager>()
                 .RegisterSingleton<IOverlayWindowController, OverlayWindowController>(WellKnownWindows.PathOfExileWindow);
 
             Container
                 .RegisterType<IScheduler>(WellKnownSchedulers.UI, new InjectionFactory(x => RxApp.MainThreadScheduler))
                 .RegisterType<IScheduler>(WellKnownSchedulers.Background, new InjectionFactory(x => RxApp.TaskpoolScheduler))
                 .RegisterType<IPoeLiveHistoryProvider, PoeLiveHistoryProvider>()
+                .RegisterType(typeof(IKeyboardMouseEvents), new InjectionFactory((x) => Hook.GlobalEvents()))
                 .RegisterType<IHttpClient, GenericHttpClient>()
                 .RegisterType<IPoeApiWrapper, PoeApiWrapper>()
+                .RegisterType<IPoeStashClient, PoeStashClient>()
                 .RegisterType<IOverlayWindowController, OverlayWindowController>()
+                .RegisterType<IAudioNotificationSelectorViewModel, AudioNotificationSelectorViewModel>()
                 .RegisterType(typeof (IFactory<,,>), typeof (Factory<,,>))
                 .RegisterType(typeof (IFactory<,>), typeof (Factory<,>))
                 .RegisterType(typeof (IFactory<>), typeof (Factory<>));

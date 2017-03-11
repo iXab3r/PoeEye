@@ -1,5 +1,5 @@
 ﻿using WindowsInput.Native;
-using PoeBud.OfficialApi.DataTypes;
+using PoeShared.StashApi.DataTypes;
 
 namespace PoeBud.Models
 {
@@ -149,7 +149,7 @@ namespace PoeBud.Models
             return new Size(formattedText.Width, formattedText.Height);
         }
 
-        public void SelectStashTabByIdx(ITab tabToSelect, ITab[] tabs)
+        public void SelectStashTabByIdx(IStashTab tabToSelect, IStashTab[] tabs)
         {
             for (var i = 0; i < tabs.Length; i++)
             {

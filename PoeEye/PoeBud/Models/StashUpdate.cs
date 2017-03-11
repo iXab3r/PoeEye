@@ -1,17 +1,23 @@
-using PoeBud.OfficialApi.DataTypes;
+using Guards;
+using PoeShared.StashApi.DataTypes;
 
 namespace PoeBud.Models
 {
-    internal sealed class StashUpdate 
+    public sealed class StashUpdate 
     {
-        public StashUpdate(IItem[] items, ITab[] tabs)
+        public static StashUpdate Empty = new StashUpdate(new IStashItem[0], new IStashTab[0]);
+
+        public StashUpdate(IStashItem[] items, IStashTab[] tabs)
         {
+            Guard.ArgumentNotNull(() => items);
+            Guard.ArgumentNotNull(() => tabs);
+
             Items = items;
             Tabs = tabs;
         }
 
-        public IItem[] Items { get; } 
+        public IStashItem[] Items { get; } 
 
-        public ITab[] Tabs { get; } 
+        public IStashTab[] Tabs { get; } 
     }
 }

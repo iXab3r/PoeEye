@@ -15,7 +15,7 @@
     <!-- Stats -->
     <Grid Margin="10,5">
       <Grid.Resources>
-        <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource IconTextBlock}" x:Key="ItemStatValue">
+        <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource EyeIconTextBlock}" x:Key="ItemStatValue">
           <Setter Property="HorizontalAlignment" Value="Center" />
           <Setter Property="VerticalAlignment" Value="Center" />
           <Setter Property="FontWeight" Value="Bold" />
@@ -32,7 +32,7 @@
           <Setter Property="FontSize" Value="14" />
         </Style>
 
-        <Style TargetType="{x:Type Label}" BasedOn="{StaticResource IconLabel}" x:Key="ItemStatHeader">
+        <Style TargetType="{x:Type Label}" BasedOn="{StaticResource EyeIconLabel}" x:Key="ItemStatHeader">
           <Setter Property="HorizontalContentAlignment" Value="Right" />
           <Setter Property="VerticalContentAlignment" Value="Center" />
           <Setter Property="Padding" Value="0" />
@@ -448,7 +448,7 @@
 
 
               <TextBlock Grid.Column="2" Margin="0,5,0,0"  
-                         Style="{StaticResource IconTextBlock}"
+                         Style="{StaticResource EyeIconTextBlock}"
                          FontSize="16"
                          Text="{Binding Trade.Note, StringFormat='&#xf040; {0}'}" 
                          Visibility="{Binding Trade.Note, Converter={StaticResource NullToCollapsedConverter}}"/>

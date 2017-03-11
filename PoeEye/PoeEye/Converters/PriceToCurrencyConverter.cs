@@ -13,7 +13,7 @@ namespace PoeEye.Converters
 
     using TypeConverter;
 
-    internal sealed class PriceToCurrencyConverter : IConverter<string, PoePrice>
+    public sealed class PriceToCurrencyConverter : IConverter<string, PoePrice>
     {
         private static readonly Lazy<IConverter<string, PoePrice>> instance = new Lazy<IConverter<string, PoePrice>>(() => new PriceToCurrencyConverter());
         private static readonly Regex CurrencyParser = new Regex(@"^[~]?(?:b\/o |price )?(?'value'[\d\.\,]+) ?(?'type'[\w ]+)$", RegexOptions.Compiled | RegexOptions.IgnoreCase);

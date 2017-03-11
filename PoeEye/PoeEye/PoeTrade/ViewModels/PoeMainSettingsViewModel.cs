@@ -10,8 +10,6 @@ namespace PoeEye.PoeTrade.ViewModels
 {
     internal sealed class PoeMainSettingsViewModel : DisposableReactiveObject, ISettingsViewModel<PoeEyeMainConfig>
     {
-        private bool audioNotificationsEnabled = true;
-
         private bool clipboardMonitoringEnabled;
 
         private EditableTuple<string, float>[] currenciesPriceInChaosOrbs = new EditableTuple<string, float>[0];
@@ -34,12 +32,6 @@ namespace PoeEye.PoeTrade.ViewModels
             set { this.RaiseAndSetIfChanged(ref currenciesPriceInChaosOrbs, value); }
         }
 
-        public bool AudioNotificationsEnabled
-        {
-            get { return audioNotificationsEnabled; }
-            set { this.RaiseAndSetIfChanged(ref audioNotificationsEnabled, value); }
-        }
-
         public bool WhisperNotificationsEnabled
         {
             get { return whisperNotificationsEnabled; }
@@ -58,7 +50,6 @@ namespace PoeEye.PoeTrade.ViewModels
         {
             tabConfigs = config.TabConfigs;
             ClipboardMonitoringEnabled = config.ClipboardMonitoringEnabled;
-            AudioNotificationsEnabled = config.AudioNotificationsEnabled;
             WhisperNotificationsEnabled = config.WhisperNotificationsEnabled;
             CurrenciesPriceInChaosOrbs = config
                  .CurrenciesPriceInChaos
@@ -71,7 +62,6 @@ namespace PoeEye.PoeTrade.ViewModels
             var config = new PoeEyeMainConfig()
             {
                 TabConfigs = tabConfigs,
-                AudioNotificationsEnabled = AudioNotificationsEnabled,
                 ClipboardMonitoringEnabled = ClipboardMonitoringEnabled,
                 WhisperNotificationsEnabled = WhisperNotificationsEnabled,
                 CurrenciesPriceInChaos = CurrenciesPriceInChaosOrbs.ToDictionary(x => x.Item1, x => x.Item2),

@@ -1,9 +1,10 @@
 ﻿using System.Linq;
-using PoeBud.OfficialApi.DataTypes;
+using PoeShared.Common;
+using PoeShared.StashApi.DataTypes;
 
 namespace PoeBud.Scaffolding
 {
-    internal static class ItemExtensions
+    public static class ItemExtensions
     {
         public static bool IsWeapon(this GearType gearType)
         {
@@ -26,12 +27,12 @@ namespace PoeBud.Scaffolding
             }
         }
 
-        public static bool IsWeapon(this IItem item)
+        public static bool IsWeapon(this IStashItem item)
         {
             return item.ItemType.IsWeapon();
         }
 
-        public static float GetTradeScore(this IItem item)
+        public static float GetTradeScore(this IStashItem item)
         {
             if (item.IsWeapon())
             {
@@ -66,7 +67,7 @@ namespace PoeBud.Scaffolding
             }
         }
 
-        public static int? GetTabIndex(this IItem item)
+        public static int? GetTabIndex(this IStashItem item)
         {
             if (string.IsNullOrWhiteSpace(item.InventoryId))
             {
@@ -83,7 +84,12 @@ namespace PoeBud.Scaffolding
             return result - 1; // PoE Stash Idx (left-most tab) = Stash1 
         }
 
-        public static IItem[] GetTradeableItems(this IItem[] items)
+        public static string GetInventoryId(this IStashTab tab)
+        {
+            return $"Stash{tab.Idx + 1}";
+        }
+
+        public static IStashItem[] GetTradeableItems(this IStashItem[] items)
         {
             return items
                 .Where(x => x.Rarity == PoeItemRarity.Rare)

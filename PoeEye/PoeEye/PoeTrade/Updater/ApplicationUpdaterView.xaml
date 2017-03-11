@@ -17,7 +17,7 @@
                              Visibility="{Binding IsBusy, Converter={StaticResource BoolFalseToCollapsedConverter}}"
                              IsActive="{Binding IsBusy}" />
 
-      <Label Grid.Column="0" Style="{StaticResource IconLabel}"
+      <Label Grid.Column="0" Style="{StaticResource EyeIconLabel}"
                Visibility="{Binding Error, Converter={StaticResource NullToCollapsedConverter}}"
                Foreground="{StaticResource ValidationSummaryColor3}"
                VerticalAlignment="Stretch"
@@ -28,11 +28,11 @@
                Content="{x:Static net:FontAwesome.warning}" />
 
       <Grid Grid.Column="1"  Visibility="{Binding IsBusy, Converter={StaticResource BoolTrueToCollapsedConverter}}">
-        <Label Style="{StaticResource IconLabel}"
+        <Label Style="{StaticResource EyeIconLabel}"
                Visibility="{Binding Error, Converter={StaticResource NullToCollapsedConverter}}"
                Content="{Binding Error}" />
 
-        <Label Style="{StaticResource IconLabel}"
+        <Label Style="{StaticResource EyeIconLabel}"
                Visibility="{Binding Error, Converter={StaticResource NotNullToCollapsedConverter}}"
                Content="{Binding MostRecentVersion}"
                ContentStringFormat="Application was successfully updated to v{0}, new version will take place after restart" />

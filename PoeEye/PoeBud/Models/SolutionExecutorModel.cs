@@ -5,9 +5,9 @@ using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using Guards;
 using JetBrains.Annotations;
-using PoeBud.OfficialApi.DataTypes;
 using PoeShared;
 using PoeShared.Scaffolding;
+using PoeShared.StashApi.DataTypes;
 
 namespace PoeBud.Models
 {
@@ -46,7 +46,7 @@ namespace PoeBud.Models
             Log.Instance.Debug(
                 $"[SolutionExecutor.ExecuteSolution] Executing solution: {solutionToExecute.DumpToText()} ...");
             var visibleTabs = solutionToExecute.Tabs.Where(x => !x.hidden).ToArray();
-            ITab activeTab = null;
+            IStashTab activeTab = null;
             foreach (var item in solutionToExecute.Items.OrderBy(x => x.TabIndex))
             {
                 if (activeTab?.Idx != item.TabIndex)

@@ -19,7 +19,7 @@ using KeyEventHandler = System.Windows.Forms.KeyEventHandler;
 
 namespace PoeOracle.ViewModels
 {
-    internal sealed class PoeOracleViewModel : DisposableReactiveObject, IOverlayViewModel
+    internal sealed class PoeOracleViewModel : OverlayViewModelBase
     {
         private static readonly TimeSpan DefaultQueryThrottle = TimeSpan.FromMilliseconds(200);
 
@@ -33,13 +33,10 @@ namespace PoeOracle.ViewModels
         private bool isFocused;
 
         private bool isVisible;
-        private Point location;
 
         private double oracleActualWidth;
 
         private string query;
-
-        private Size size = new Size(double.NaN, double.NaN);
 
         public PoeOracleViewModel(
             [NotNull] IKeyboardMouseEvents keyboardMouseEvents,
@@ -127,18 +124,6 @@ namespace PoeOracle.ViewModels
             set { this.RaiseAndSetIfChanged(ref oracleActualWidth, value); }
         }
 
-        public Point Location
-        {
-            get { return location; }
-            set { this.RaiseAndSetIfChanged(ref location, value); }
-        }
-
-        public Size Size
-        {
-            get { return size; }
-            set { this.RaiseAndSetIfChanged(ref size, value); }
-        }
-
         private void ProcessKeyDown(KeyEventArgs keyEventArgs)
         {
             if (new KeyGesture(Key.Escape).MatchesHotkey(keyEventArgs) && IsVisible)
@@ -172,26 +157,22 @@ namespace PoeOracle.ViewModels
             controller.Activate();
         }
 
-        private void SnapToMouse()
-        {
-            var mousePosition = Control.MousePosition;
-            Location = new Point(mousePosition.X, mousePosition.Y);
-        }
-
         private void SnapToOverlayCenter()
         {
-            var overlayLocation = controller.Location;
-            var overlaySize = controller.Size;
+            MinSize = new Size(700, 50);
+            Width = double.NaN;
+            Height = double.NaN;
             var oracleSize = new Size(OracleActualWidth, 0);
 
-            var top = overlayLocation.Y + overlaySize.Height / 2;
-            var left = overlayLocation.X + overlaySize.Width / 2;
+            var top = controller.Top + controller.Height / 2;
+            var left = controller.Left + controller.Width / 2;
             if (!double.IsNaN(oracleSize.Width) && !double.IsInfinity(oracleSize.Width) && !oracleSize.IsEmpty)
             {
                 left -= oracleSize.Width / 2;
             }
 
-            Location = new Point(left, top);
+            Left = left;
+            Top = top;
         }
 
         private void Hide(bool restoreLastActiveWindow)

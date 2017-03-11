@@ -1,5 +1,6 @@
 ﻿using PoeEye.PoeTrade.Common;
 using PoeShared;
+using PoeShared.Audio;
 using PoeShared.Modularity;
 using PoeShared.Prism;
 using PoeEyeMainConfig = PoeEye.Config.PoeEyeMainConfig;
@@ -45,7 +46,7 @@ namespace PoeEye.PoeTrade.Models
             whisperService.Messages
                     .Where(x => poeEyeConfigProvider.ActualConfig.WhisperNotificationsEnabled)
                     .Where(x => !poeWindowTracker.IsActive)
-                    .Where(x => x.MessageType == PoeMessageType.WhisperFrom)
+                    .Where(x => x.MessageType == PoeMessageType.WhisperIncoming)
                     .Subscribe(ProcessWhisper)
                     .AddTo(Anchors);
         }

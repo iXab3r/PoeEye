@@ -1,6 +1,8 @@
 ﻿using PoeEye.PoeTrade.Shell.ViewModels;
+using PoeShared.Audio;
 using PoeShared.Modularity;
 using PoeShared.Native;
+using PoeShared.PoeTrade;
 using PoeShared.Prism;
 using PoeShared.UI.Models;
 using PoeEyeMainConfig = PoeEye.Config.PoeEyeMainConfig;
@@ -34,13 +36,13 @@ namespace PoeEye.Prism
         {
             Container
                 .RegisterSingleton<IPoePriceCalculcator, PoePriceCalculcator>()
-                .RegisterSingleton<IAudioNotificationsManager, AudioNotificationsManager>()
                 .RegisterSingleton<IWhispersNotificationManager, WhispersNotificationManager>()
                 .RegisterSingleton(typeof(IPoeEyeMainConfigProvider), typeof(GenericConfigProvider<PoeEyeMainConfig>))
                 .RegisterSingleton(typeof(IConfigProvider<>), typeof(GenericConfigProvider<>))
                 .RegisterSingleton<IConfigProvider, PoeEyeConfigProviderFromFile>()
                 .RegisterSingleton<IPoeCaptchaRegistrator, PoeCaptchaRegistrator>()
                 .RegisterSingleton<IPoeApiProvider, PoeApiProvider>()
+                .RegisterSingleton<IPoeItemViewModelFactory, PoeItemViewModelFactory>()
                 .RegisterSingleton<IDialogCoordinator, DialogCoordinator>();
 
             Container
@@ -51,7 +53,6 @@ namespace PoeEye.Prism
                 .RegisterType<IPoeChatViewModel, PoeChatViewModel>()
                 .RegisterType<IPoeTradesListViewModel, PoeTradesListViewModel>()
                 .RegisterType<IPoeQueryViewModel, PoeQueryViewModel>()
-                .RegisterType<IAudioNotificationSelectorViewModel, AudioNotificationSelectorViewModel>()
                 .RegisterType<IPoeApiSelectorViewModel, PoeApiSelectorViewModel>()
                 .RegisterType<IPoeModsEditorViewModel, PoeModsEditorViewModel>()
                 .RegisterType<IPoeModGroupsEditorViewModel, PoeModGroupsEditorViewModel>()

@@ -1,6 +1,4 @@
-﻿using PoeBud.OfficialApi;
-using PoeBud.OfficialApi.ProcurementLegacy;
-using PoeShared.Scaffolding;
+﻿using PoeShared.Scaffolding;
 
 namespace PoeBud.Prism
 {
@@ -24,18 +22,18 @@ namespace PoeBud.Prism
         protected override void Initialize()
         {
             Container
-                .RegisterType<IInputSimulator>(new ContainerControlledLifetimeManager(), new InjectionFactory(x => new InputSimulator()))
+                .RegisterType<IInputSimulator>(
+                    new ContainerControlledLifetimeManager(), new InjectionFactory(x => new InputSimulator()))
                 .RegisterSingleton<IPoeWindowManager, PoeWindowManager>()
-                .RegisterSingleton<IUiOverlaysProvider, UiOverlaysProvider>()
-                .RegisterSingleton<IGearTypeAnalyzer, GearTypeAnalyzer>();
+                .RegisterSingleton<IUiOverlaysProvider, UiOverlaysProvider>();
 
             Container
                 .RegisterType<HotkeyManagerBase>(new InjectionFactory(x => HotkeyManager.Current))
                 .RegisterType<IUserInputBlocker, UserInputBlocker>()
+                .RegisterType<IPoeStashUpdater, PoeStashUpdater>()
                 .RegisterType<ISolutionExecutorViewModel, SolutionExecutorViewModel>()
                 .RegisterType<IPoeWindow, PoeWindow>()
                 .RegisterType<ISolutionExecutorModel, SolutionExecutorModel>()
-                .RegisterType<IPoeClient, PoeClient>()
                 .RegisterType<IUserInteractionsManager, UserInteractionsManager>();
         }
     }

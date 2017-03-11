@@ -1,4 +1,5 @@
 ﻿using PoeShared.PoeTrade;
+using PoeShared.UI.ViewModels;
 
 namespace PoeEye.PoeTrade.ViewModels
 {

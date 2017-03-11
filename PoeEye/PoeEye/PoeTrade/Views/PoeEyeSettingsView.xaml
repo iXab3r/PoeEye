@@ -7,7 +7,7 @@
                     xmlns:modularity="clr-namespace:PoeShared.Modularity;assembly=PoeShared">
   <DataTemplate DataType="{x:Type viewModels:PoeEyeSettingsViewModel}">
     <ScrollViewer>
-      <ItemsControl ItemsSource="{Binding ModulesSettings}">
+      <ItemsControl ItemsSource="{Binding ModulesSettings}" Focusable="False">
         <ItemsControl.ItemTemplate>
           <DataTemplate DataType="{x:Type modularity:ISettingsViewModel}">
             <Expander
@@ -17,7 +17,7 @@
                 IsTabStop="False"
                 Margin="10, 5, 5 ,5">
                 <Expander.Header>
-                    <Label Content="{Binding ModuleName}" Style="{StaticResource IconLabel}" VerticalAlignment="Center"/>
+                    <Label Content="{Binding ModuleName}" Style="{StaticResource EyeIconLabel}" VerticalAlignment="Center"/>
                 </Expander.Header>
                 <Border >
                 <ContentPresenter Content="{Binding}" />

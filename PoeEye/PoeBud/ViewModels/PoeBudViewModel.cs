@@ -15,29 +15,28 @@ using JetBrains.Annotations;
 using Microsoft.Practices.Unity;
 using PoeBud.Config;
 using PoeBud.Models;
-using PoeBud.OfficialApi.DataTypes;
 using PoeBud.Scaffolding;
 using PoeShared;
 using PoeShared.Modularity;
 using PoeShared.Native;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
+using PoeShared.StashApi.DataTypes;
 using ReactiveUI;
 using WinFormsKeyEventArgs = System.Windows.Forms.KeyEventArgs;
 using WinFormsKeyEventHandler = System.Windows.Forms.KeyEventHandler;
 
 namespace PoeBud.ViewModels
 {
-    internal sealed class PoeBudViewModel : DisposableReactiveObject, IOverlayViewModel
+    internal sealed class PoeBudViewModel : OverlayViewModelBase
     {
         private static readonly TimeSpan UpdateTimeout = TimeSpan.FromSeconds(1);
         private readonly IClock clock;
         private readonly ISubject<Exception> exceptionsToPropagate = new Subject<Exception>();
         private readonly IKeyboardMouseEvents keyboardMouseEvents;
-        [NotNull]
         private readonly IUiOverlaysProvider overlaysProvider;
         private readonly ObservableAsPropertyHelper<Exception> lastUpdateException;
-        private readonly IFactory<PoeStashUpdater, IPoeBudConfig> stashAnalyzerFactory;
+        private readonly IFactory<IPoeStashUpdater, IStashUpdaterParameters> stashAnalyzerFactory;
         private readonly IFactory<StashViewModel, StashUpdate, IPoeBudConfig> stashUpdateFactory;
         private readonly SerialDisposable stashUpdaterDisposable = new SerialDisposable();
         private readonly IScheduler uiScheduler;
@@ -48,7 +47,7 @@ namespace PoeBud.ViewModels
         private bool isEnabled;
         private StashUpdate lastServerStashUpdate;
         private StashViewModel stash;
-        private PoeStashUpdater stashUpdater;
+        private IPoeStashUpdater stashUpdater;
 
         private string uiOverlayPath;
 
@@ -60,7 +59,7 @@ namespace PoeBud.ViewModels
             [NotNull] IKeyboardMouseEvents keyboardMouseEvents,
             [NotNull] IUserInteractionsManager userInteractionsManager,
             [NotNull] IUiOverlaysProvider overlaysProvider,
-            [NotNull] IFactory<PoeStashUpdater, IPoeBudConfig> stashAnalyzerFactory,
+            [NotNull] IFactory<IPoeStashUpdater, IStashUpdaterParameters> stashAnalyzerFactory,
             [NotNull] IFactory<StashViewModel, StashUpdate, IPoeBudConfig> stashUpdateFactory,
             [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {
@@ -93,6 +92,9 @@ namespace PoeBud.ViewModels
             exceptionsToPropagate
                 .ToProperty(this, x => x.LastUpdateException, out lastUpdateException, null, uiScheduler)
                 .AddTo(Anchors);
+
+            Width = double.NaN;
+            Height = double.NaN;
         }
 
         public IPoeWindowManager WindowManager { get; }
@@ -101,7 +103,7 @@ namespace PoeBud.ViewModels
 
         public ISolutionExecutorViewModel SolutionExecutor { get; }
 
-        public PoeStashUpdater StashUpdater
+        public IPoeStashUpdater StashUpdater
         {
             get { return stashUpdater; }
             set { this.RaiseAndSetIfChanged(ref stashUpdater, value); }
@@ -138,11 +140,7 @@ namespace PoeBud.ViewModels
                 stashUpdater == null || stashUpdater.LastUpdateTimestamp == DateTime.MinValue
                     ? TimeSpan.Zero
                     : stashUpdater.LastUpdateTimestamp + (actualConfig?.StashUpdatePeriod ?? TimeSpan.Zero) - clock.Now;
-
-        public Point Location { get; } = new Point();
-
-        public Size Size { get; } = new Size(double.NaN, double.NaN);
-
+        
         private void ApplyConfig(PoeBudConfig config)
         {
             actualConfig = config;
@@ -330,7 +328,7 @@ namespace PoeBud.ViewModels
             Stash = stashUpdateFactory.Create(dirtyStashUpdate, config);
         }
 
-        private bool IsMatch(IPoeTradeItem tradeItem, IItem item)
+        private bool IsMatch(IPoeTradeItem tradeItem, IStashItem item)
         {
             return tradeItem.TabIndex == item.GetTabIndex() && tradeItem.X == item.X && tradeItem.Y == item.Y;
         }

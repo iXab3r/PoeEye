@@ -7,7 +7,7 @@
         Local,
         Trade,
         Guild,
-        WhisperFrom,
-        WhisperTo
+        WhisperIncoming,
+        WhisperOutgoing
     }
 }

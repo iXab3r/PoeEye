@@ -22,7 +22,7 @@ namespace PoeShared.Common
 
         public string Price { get; }
 
-        public bool IsEmpty => string.IsNullOrWhiteSpace(CurrencyType);
+        public bool IsEmpty => Empty.Equals(this);
 
         public override string ToString()
         {

@@ -8,7 +8,7 @@
                     xmlns:wpf="clr-namespace:PoeShared.Scaffolding.WPF;assembly=PoeShared">
   <DataTemplate DataType="{x:Type viewModels:MainWindowTabViewModel}" x:Key="MainWindowTabItemViewTemplate">
     <DataTemplate.Resources>
-      <Style TargetType="{x:Type Button}" BasedOn="{StaticResource CircleButton}" x:Key="AutoRecheckButtonStyle">
+      <Style TargetType="{x:Type Button}" BasedOn="{StaticResource EyeCircleButton}" x:Key="AutoRecheckButtonStyle">
         <Style.Triggers>
           <DataTrigger Binding="{Binding RecheckPeriod.IsAutoRecheckEnabled}" Value="True">
             <Setter Property="Foreground" Value="Green" />
@@ -154,7 +154,7 @@
         <ContentControl Content="{Binding AudioNotificationSelector}" VerticalAlignment="Top"/>
 
         <Button Width="24" Height="24"
-                Style="{StaticResource CircleButton}"
+                Style="{StaticResource EyeCircleButton}"
                 HorizontalAlignment="Right"
                 VerticalAlignment="Top"
                 Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type ListBox}}, Path=DataContext.CloseTabCommand}"

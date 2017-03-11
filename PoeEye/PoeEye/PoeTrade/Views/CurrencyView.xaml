@@ -2,24 +2,24 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:common="clr-namespace:PoeShared.Common;assembly=PoeShared">
 
-  <DataTemplate x:Key="CurrencyViewKey">
-    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="5,0">
-      <Image Width="20" Height="20"
-             Source="{Binding Converter={StaticResource PriceToImageUriConverter}}" />
-      <TextBlock Text="{Binding}" FontSize="13" />
-    </StackPanel>
-  </DataTemplate>
+    <DataTemplate x:Key="CurrencyViewKey">
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="5,0">
+            <Image Width="20" Height="20"
+                   Source="{Binding Converter={StaticResource PriceToImageUriConverter}}" />
+            <TextBlock Text="{Binding}" FontSize="13" Margin="1,0,0,0" />
+        </StackPanel>
+    </DataTemplate>
 
-  <DataTemplate DataType="{x:Type common:PoePrice}">
-    <ContentControl Content="{Binding Price}" ContentTemplate="{StaticResource CurrencyViewKey}"/>
-  </DataTemplate>
+    <DataTemplate DataType="{x:Type common:PoePrice}">
+        <ContentControl Content="{Binding Price}" ContentTemplate="{StaticResource CurrencyViewKey}" />
+    </DataTemplate>
 
-  <DataTemplate DataType="{x:Type common:PoeCurrency}" x:Key="CurrencyByCodeNameViewKey">
-    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="5,0">
-      <Image Width="20" Height="20"
-             Source="{Binding CodeName, Converter={StaticResource PriceToImageUriConverter}}" />
-      <TextBlock Text="{Binding Name}"  />
-    </StackPanel>
-  </DataTemplate>
+    <DataTemplate DataType="{x:Type common:PoeCurrency}" x:Key="CurrencyByCodeNameViewKey">
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="5,0">
+            <Image Width="20" Height="20"
+                   Source="{Binding CodeName, Converter={StaticResource PriceToImageUriConverter}}" />
+            <TextBlock Text="{Binding Name}" Margin="1,0,0,0" />
+        </StackPanel>
+    </DataTemplate>
 
 </ResourceDictionary>

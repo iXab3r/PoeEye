@@ -7,7 +7,7 @@ namespace PoeBud.Config
 
     using Newtonsoft.Json;
 
-    internal sealed class PoeBudConfig : IPoeBudConfig
+    public sealed class PoeBudConfig : IPoeBudConfig
     {
         public bool HideXpBar { get; set; } = false;
 
@@ -31,7 +31,7 @@ namespace PoeBud.Config
 
         public TimeSpan UserActionDelay { get; } = TimeSpan.FromMilliseconds(100);
 
-        public ISet<int> StashesToProcess { get; set; } = new HashSet<int>();
+        public ICollection<int> StashesToProcess { get; set; } = new HashSet<int>();
 
         public string GetSetHotkey { get; set; } = "None";
     }

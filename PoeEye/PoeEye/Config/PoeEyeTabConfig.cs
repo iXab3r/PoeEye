@@ -1,6 +1,7 @@
 ﻿using Exceptionless.Json;
 using PoeEye.PoeTrade;
 using PoeEye.PoeTrade.Common;
+using PoeShared.Audio;
 
 namespace PoeEye.Config
 {

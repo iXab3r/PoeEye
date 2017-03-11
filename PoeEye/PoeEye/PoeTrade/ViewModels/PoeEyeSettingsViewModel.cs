@@ -9,6 +9,7 @@ using Guards;
 using JetBrains.Annotations;
 using Microsoft.Practices.Unity;
 using PoeEye.Config;
+using PoeShared;
 using PoeShared.Modularity;
 using PoeShared.Scaffolding;
 using Prism.Modularity;
@@ -108,6 +109,7 @@ namespace PoeEye.PoeTrade.ViewModels
         private void ReloadConfig(ISettingsViewModel viewModel)
         {
             var configType = GetConfigType(viewModel);
+            Log.Instance.Debug($"[PoeSettingsViewModel.ReloadConfig] Loading viewModel {viewModel} (configType {configType}");
             var invocationMethod = reloadConfigByType.GetOrAdd(configType, x => ReloadConfigMethod.MakeGenericMethod(x));
             invocationMethod.Invoke(this, new object[] { viewModel });
         }
@@ -115,6 +117,7 @@ namespace PoeEye.PoeTrade.ViewModels
         private void SaveConfig(ISettingsViewModel viewModel)
         {
             var configType = GetConfigType(viewModel);
+            Log.Instance.Debug($"[PoeSettingsViewModel.SaveConfig] Saving viewModel {viewModel} (configType {configType}");
             var invocationMethod = saveConfigByType.GetOrAdd(configType, x => SaveConfigMethod.MakeGenericMethod(x));
             invocationMethod.Invoke(this, new object[] { viewModel });
         }

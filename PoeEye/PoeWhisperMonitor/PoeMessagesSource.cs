@@ -23,12 +23,11 @@
         private readonly ICollection<string> linesBuffer = new List<string>();
 
         private readonly StreamTracker linesStream;
-        private readonly FileInfo logFile;
 
         private readonly Regex logRecordRegex = new Regex(@"^(?'timestamp'\d\d\d\d\/\d\d\/\d\d \d\d:\d\d:\d\d) (?'content'.*)$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         private readonly Regex messageParseRegex = new Regex(
-            @"^(?'timestamp'\d\d\d\d\/\d\d\/\d\d \d\d:\d\d:\d\d).*(?'prefix'[$&]|@From|@To)\s?(?:\<(?'guild'.*?)\> )?(?'name'.*):\s*(?'message'.*)$",
+            @"^(?'timestamp'\d\d\d\d\/\d\d\/\d\d \d\d:\d\d:\d\d).*(?'prefix'[$&]|@From|@To)\s?(?:\<(?'guild'.*?)\> )?(?'name'.*?):\s*(?'message'.*)$",
             RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         private readonly ISubject<PoeMessage> messageSubject = new Subject<PoeMessage>();
@@ -36,8 +35,6 @@
         public PoeMessagesSource([NotNull] FileInfo logFile)
         {
             Guard.ArgumentNotNull(() => logFile);
-
-            this.logFile = logFile;
 
             Log.Instance.Debug($"[PoeMessagesSource] Tracking log file '{logFile.FullName}'...");
             var safeStream = new SafeFileStream(logFile.FullName);
@@ -126,9 +123,9 @@
             switch (prefix)
             {
                 case "@From":
-                    return PoeMessageType.WhisperFrom;
+                    return PoeMessageType.WhisperIncoming;
                 case "@To":
-                    return PoeMessageType.WhisperTo;
+                    return PoeMessageType.WhisperOutgoing;
                 case "$":
                     return PoeMessageType.Trade;
                 case "&":

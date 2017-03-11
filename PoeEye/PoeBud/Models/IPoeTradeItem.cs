@@ -1,4 +1,4 @@
-﻿using PoeBud.OfficialApi.DataTypes;
+﻿using PoeShared.StashApi.DataTypes;
 
 namespace PoeBud.Models
 {

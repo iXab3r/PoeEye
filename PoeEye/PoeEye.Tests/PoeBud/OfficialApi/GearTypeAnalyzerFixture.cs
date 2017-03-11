@@ -1,6 +1,6 @@
 ﻿using NUnit.Framework;
-using PoeBud.OfficialApi.DataTypes;
-using PoeBud.OfficialApi.ProcurementLegacy;
+using PoeShared.StashApi.DataTypes;
+using PoeShared.StashApi.ProcurementLegacy;
 using Shouldly;
 
 namespace PoeEye.Tests.PoeBud.OfficialApi
