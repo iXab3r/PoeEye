@@ -9,10 +9,10 @@ namespace PoeShared.StashApi.DataTypes
         public int NumTabs { get; set; }
 
         [DeserializeAs(Name = "items")]
-        public List<StashItem> Items { get; set; }
+        public List<StashItem> Items { get; set; } = new List<StashItem>();
 
         [DeserializeAs(Name = "tabs")]
-        public List<Tab> Tabs { get; set; }
+        public List<Tab> Tabs { get; set; } = new List<Tab>();
 
         IEnumerable<IStashItem> IStash.Items => Items;
 

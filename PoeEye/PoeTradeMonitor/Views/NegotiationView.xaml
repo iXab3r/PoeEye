@@ -39,6 +39,12 @@
                 <Setter Property="Padding" Value="0,3,0,0"/>
                 <Setter Property="FontSize" Value="20"/>
             </Style>
+            <Style TargetType="{x:Type ToolTip}">
+                <Setter Property="HasDropShadow" Value="False" />
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="Margin" Value="1"/>
+            </Style>
         </DataTemplate.Resources>
 
         <Expander Background="{StaticResource TradeMonitorTitleBackgroundBrushKey}" 
@@ -59,6 +65,8 @@
 
                         <TextBlock Grid.Column="0" 
                                    Foreground="#EEC64C"
+                                   MaxWidth="120"
+                                   TextTrimming="CharacterEllipsis"
                                    Text="{Binding CharacterName}"/>
 
                         <StackPanel Orientation="Horizontal" Grid.Column="1" Grid.Row="0">
@@ -166,6 +174,15 @@
                                 </Border>
 
                             </StackPanel.ToolTip>
+
+                            <controls:ProgressRing
+                                      IsActive="{Binding IsBusy, Mode=OneWay}"
+                                      Visibility="{Binding IsBusy, Converter={StaticResource TrueToVisibleConverter}, Mode=OneWay}"
+                                      Height="26"
+                                      Width="26"
+                                      Margin="5,0"
+                                ToolTip="Fetching stash data through Path Of Exile Stash API...">
+                            </controls:ProgressRing>
 
                             <ContentPresenter 
                                       Content="{Binding ItemIcon}" 

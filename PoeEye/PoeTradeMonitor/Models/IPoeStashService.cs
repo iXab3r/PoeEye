@@ -14,5 +14,7 @@ namespace PoeEye.TradeMonitor.Models
         IStashItem TryToFindItem([CanBeNull] string tabName, int itemX, int itemY);
 
         DateTime LastUpdateTimestamp { get; }
+
+        bool IsBusy { get; }
     }
 }

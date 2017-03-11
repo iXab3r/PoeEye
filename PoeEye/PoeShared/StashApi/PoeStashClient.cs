@@ -196,7 +196,7 @@ namespace PoeShared.StashApi
             }
             PostProcessStash(response.Data);
 
-            foreach (var item in response.Data.Items.Where(x => x.TypeLine != null))
+            foreach (var item in response.Data?.Items.EmptyIfNull().Where(x => x.TypeLine != null))
             {
                 item.ItemType = gearTypeAnalyzer.Resolve(item.TypeLine);
             }
