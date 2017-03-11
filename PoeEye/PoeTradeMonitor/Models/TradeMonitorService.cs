@@ -39,7 +39,7 @@ namespace PoeEye.TradeMonitor.Models
             this.parsers = parsers;
 
             trades
-                .Where(x => x.TradeType == TradeType.Buy)
+                .Where(x => x.TradeType == TradeType.Sell)
                 .Subscribe(() => audioManager.PlayNotification(configProvider.ActualConfig.NotificationType))
                 .AddTo(Anchors);
 
