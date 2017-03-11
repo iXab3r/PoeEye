@@ -144,7 +144,7 @@ namespace PoeEye.Config
                 return new PoeEyeCombinedConfig();
             }
 
-            PoeEyeCombinedConfig result;
+            PoeEyeCombinedConfig result = null;
             try
             {
                 var fileData = File.ReadAllText(configFilePath);
@@ -152,14 +152,17 @@ namespace PoeEye.Config
 
                 result = JsonConvert.DeserializeObject<PoeEyeCombinedConfig>(fileData, jsonSerializerSettings);
                 Log.Instance.Debug($"[PoeEyeConfigProviderFromFile.Load] Successfully deserialized config data");
+
+                if (result == null)
+                {
+                    Log.Instance.Warn($"[PoeEyeConfigProviderFromFile.Load] Failed to deserialize config\nData:\n{fileData}");
+                }
             }
             catch (Exception ex)
             {
                 Log.Instance.Warn($"[PoeEyeConfigProviderFromFile.Load] Could not deserialize config data, default config will be used", ex);
-                result = new PoeEyeCombinedConfig();
             }
-
-            return result;
+            return result ?? new PoeEyeCombinedConfig();
         }
 
         public void RegisterConverter(JsonConverter converter)
