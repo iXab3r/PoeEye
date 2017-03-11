@@ -1,15 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
-using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
-using System.Reactive.Subjects;
 using System.Windows.Input;
 using Guards;
 using JetBrains.Annotations;
 using Microsoft.Practices.Unity;
-using PoeBud.Models;
 using PoeEye.TradeMonitor.Models;
 using PoeEye.TradeMonitor.Modularity;
 using PoeShared;
@@ -31,23 +28,27 @@ namespace PoeEye.TradeMonitor.ViewModels
     internal class NegotiationViewModel : DisposableReactiveObject, INegotiationViewModel, IMacroCommandContext
     {
         public static readonly TimeSpan DefaultUpdatePeriod = TimeSpan.FromSeconds(1);
-
-        private readonly TradeModel model;
         private readonly IPoeChatService chatService;
-        private readonly IPoeStashService stashService;
-        [NotNull] private readonly IPoeMacroCommandsProvider macroCommandsProvider;
         private readonly IClock clock;
-        [NotNull] private readonly IPoeItemViewModelFactory poeTradeViewModelFactory;
-        [NotNull] private readonly IConverter<IStashItem, IPoeItem> poeStashItemToItemConverter;
         [NotNull] private readonly IFactory<IImageViewModel, Uri> imageFactory;
 
         private readonly DelegateCommand inviteToPartyCommand;
         private readonly DelegateCommand kickFromPartyCommand;
+        [NotNull] private readonly IPoeMacroCommandsProvider macroCommandsProvider;
+
         private readonly DelegateCommand openChatCommand;
-        private readonly DelegateCommand tradeCommand;
+        [NotNull] private readonly IConverter<IStashItem, IPoeItem> poeStashItemToItemConverter;
+        [NotNull] private readonly IPoeItemViewModelFactory poeTradeViewModelFactory;
         private readonly DelegateCommand<MacroMessage?> sendPredefinedMessageCommand;
+        private readonly IPoeStashService stashService;
+        private readonly DelegateCommand tradeCommand;
         private bool isExpanded;
-        private INegotiationCloseController closeController;
+
+        private object item;
+
+        private IImageViewModel itemIcon;
+
+        private PoeItemRarity itemRarity;
 
         public NegotiationViewModel(
             TradeModel model,
@@ -70,7 +71,7 @@ namespace PoeEye.TradeMonitor.ViewModels
             Guard.ArgumentNotNull(() => stashService);
             Guard.ArgumentNotNull(() => configProvider);
 
-            this.model = model;
+            Negotiation = model;
             this.chatService = chatService;
             this.stashService = stashService;
             this.macroCommandsProvider = macroCommandsProvider;
@@ -83,7 +84,8 @@ namespace PoeEye.TradeMonitor.ViewModels
             kickFromPartyCommand = new DelegateCommand(KickFromPartyCommandExecuted, GetChatServiceAvailability);
             openChatCommand = new DelegateCommand(OpenChatCommandExecuted, GetChatServiceAvailability);
             tradeCommand = new DelegateCommand(TradeCommandExecuted, GetChatServiceAvailability);
-            sendPredefinedMessageCommand = new DelegateCommand<MacroMessage?>(SendPredefinedMessageCommandExecuted, _ => GetChatServiceAvailability());
+            sendPredefinedMessageCommand = new DelegateCommand<MacroMessage?>(
+                SendPredefinedMessageCommandExecuted, _ => GetChatServiceAvailability());
 
             chatService
                 .WhenAnyValue(x => x.IsAvailable)
@@ -115,14 +117,14 @@ namespace PoeEye.TradeMonitor.ViewModels
                 .Subscribe(HandleStashUpdate)
                 .AddTo(Anchors);
 
-            var price = PriceToCurrencyConverter.Instance.Convert(model.PositionName);
-            ItemName = price.IsEmpty ? (object)model.PositionName : price;
-        }
+            stashService
+                .WhenAnyValue(x => x.IsBusy)
+                .ObserveOn(uiScheduler)
+                .Subscribe(() => this.RaisePropertyChanged(nameof(IsBusy)))
+                .AddTo(Anchors);
 
-        public bool IsExpanded
-        {
-            get { return isExpanded; }
-            set { this.RaiseAndSetIfChanged(ref isExpanded, value); }
+            var price = PriceToCurrencyConverter.Instance.Convert(model.PositionName);
+            ItemName = price.IsEmpty ? (object) model.PositionName : price;
         }
 
         public ICommand InviteToPartyCommand => inviteToPartyCommand;
@@ -135,23 +137,19 @@ namespace PoeEye.TradeMonitor.ViewModels
 
         public ICommand SendPredefinedMessageCommand => sendPredefinedMessageCommand;
 
-        public TradeType NegotiationType => model.TradeType;
-
-        public string CharacterName => model.CharacterName;
+        public TradeType NegotiationType => Negotiation.TradeType;
 
         public IReactiveList<MacroCommand> MacroCommands => macroCommandsProvider.MacroCommands;
 
-        public TimeSpan TimeElapsed => clock.Now - model.Timestamp;
+        public TimeSpan TimeElapsed => clock.Now - Negotiation.Timestamp;
 
-        private IImageViewModel itemIcon;
+        public bool IsBusy => stashService.IsBusy;
 
         public IImageViewModel ItemIcon
         {
             get { return itemIcon; }
             set { this.RaiseAndSetIfChanged(ref itemIcon, value); }
         }
-
-        private object item;
 
         public object Item
         {
@@ -161,32 +159,43 @@ namespace PoeEye.TradeMonitor.ViewModels
 
         public object ItemName { get; }
 
-        private PoeItemRarity itemRarity;
-
         public PoeItemRarity ItemRarity
         {
             get { return itemRarity; }
             set { this.RaiseAndSetIfChanged(ref itemRarity, value); }
         }
 
-        public PoePrice Price => model.Price;
+        public ItemPosition ItemPosition => Negotiation.ItemPosition;
 
-        public ItemPosition ItemPosition => model.ItemPosition;
-
-        public string TabName => model.TabName;
+        public string TabName => Negotiation.TabName;
 
         public IReactiveList<MacroMessage> PredefinedMessages { get; } = new ReactiveList<MacroMessage>();
+
+        public INegotiationCloseController CloseController { get; private set; }
+
+        public TradeModel Negotiation { get; }
+
+        public bool IsExpanded
+        {
+            get { return isExpanded; }
+            set { this.RaiseAndSetIfChanged(ref isExpanded, value); }
+        }
+
+        public string CharacterName => Negotiation.CharacterName;
+
+        public PoePrice Price => Negotiation.Price;
 
         public void SetCloseController(INegotiationCloseController closeController)
         {
             Guard.ArgumentNotNull(() => closeController);
 
-            this.closeController = closeController;
+            CloseController = closeController;
         }
 
         private void HandleStashUpdate()
         {
-            var item = stashService.TryToFindItem(model.TabName, model.ItemPosition.X, model.ItemPosition.Y);
+            var item = stashService.TryToFindItem(
+                Negotiation.TabName, Negotiation.ItemPosition.X, Negotiation.ItemPosition.Y);
 
             var itemIconUri = item?.Icon.ToUriOrDefault();
             ItemIcon = itemIconUri == null
@@ -195,7 +204,13 @@ namespace PoeEye.TradeMonitor.ViewModels
 
             ItemRarity = item?.Rarity ?? PoeItemRarity.Unknown;
 
-            Item = BuildItemViewModel(item);
+            var lastUpdateTimeStampInfo = stashService.LastUpdateTimestamp == DateTime.MinValue
+                ? "Never"
+                : stashService.LastUpdateTimestamp.ToString(CultureInfo.InvariantCulture);
+
+            Item = item != null 
+                ? BuildItemViewModel(item)
+                : $"Item was not found in Stash (last update timestamp: {lastUpdateTimeStampInfo})";
         }
 
         private object BuildItemViewModel(IStashItem stashItem)
@@ -219,22 +234,22 @@ namespace PoeEye.TradeMonitor.ViewModels
 
         private void TradeCommandExecuted()
         {
-            chatService.SendMessage($"/trade {model.CharacterName}");
+            chatService.SendMessage($"/trade {Negotiation.CharacterName}");
         }
 
         private void OpenChatCommandExecuted()
         {
-            chatService.SendMessage($"@{model.CharacterName} ", false);
+            chatService.SendMessage($"@{Negotiation.CharacterName} ", false);
         }
 
         private void InviteToPartyCommandExecuted()
         {
-            chatService.SendMessage($"/invite {model.CharacterName}");
+            chatService.SendMessage($"/invite {Negotiation.CharacterName}");
         }
 
         private void KickFromPartyCommandExecuted()
         {
-            chatService.SendMessage($"/kick {model.CharacterName}");
+            chatService.SendMessage($"/kick {Negotiation.CharacterName}");
         }
 
         private void SendPredefinedMessageCommandExecuted(MacroMessage? message)
@@ -251,7 +266,7 @@ namespace PoeEye.TradeMonitor.ViewModels
             var messageToSend = message.Text;
             MacroCommands.ForEach(x => messageToSend = x.CleanupText(messageToSend));
 
-            chatService.SendMessage($"@{model.CharacterName} {messageToSend}");
+            chatService.SendMessage($"@{Negotiation.CharacterName} {messageToSend}");
 
             MacroCommands
                 .Where(x => x.TryToMatch(message.Text).Success)
@@ -263,9 +278,5 @@ namespace PoeEye.TradeMonitor.ViewModels
             PredefinedMessages.Clear();
             config.PredefinedMessages.ForEach(PredefinedMessages.Add);
         }
-
-        public INegotiationCloseController CloseController => closeController;
-
-        public TradeModel Negotiation => model;
     }
 }

@@ -84,6 +84,8 @@ namespace PoeEye.TradeMonitor.Models
 
         public IObservable<Unit> Updates => stashUpdates.ToUnit();
 
+        public bool IsBusy => activeUpdater?.IsBusy ?? false;
+
         public DateTime LastUpdateTimestamp => activeUpdater.LastUpdateTimestamp;
 
         private void ApplyConfig(IPoeBudConfig poeBudConfig, PoeTradeMonitorConfig tradeMonitorConfig)
@@ -132,8 +134,17 @@ namespace PoeEye.TradeMonitor.Models
                     .Subscribe(() => this.RaisePropertyChanged(nameof(LastUpdateTimestamp)))
                     .AddTo(stashDisposable);
 
+                updater
+                    .WhenAnyValue(x => x.IsBusy)
+                    .ObserveOn(uiScheduler)
+                    .Subscribe(() => this.RaisePropertyChanged(nameof(IsBusy)))
+                    .AddTo(stashDisposable);
+
                 updater.RecheckPeriod = config.StashUpdatePeriod;
                 activeUpdater = updater;
+
+                this.RaisePropertyChanged(nameof(IsBusy));
+                this.RaisePropertyChanged(nameof(LastUpdateTimestamp));
             }
             catch (Exception ex)
             {
