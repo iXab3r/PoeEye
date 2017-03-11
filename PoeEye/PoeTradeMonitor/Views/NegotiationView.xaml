@@ -136,7 +136,7 @@
 
             <Border Background="{StaticResource TradeMonitorBackgroundBrushKey}">
 
-                <Grid Margin="5">
+                <Grid Margin="1">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
@@ -185,7 +185,7 @@
                     </Viewbox>
 
                     <ItemsControl Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="4"
-                                  Margin="10"
+                                  Margin="2"
                                   HorizontalAlignment="Left"
                                   ItemsSource="{Binding PredefinedMessages}">
 
@@ -200,6 +200,8 @@
                                 <Button Content="{Binding Label}" 
                                         Margin="5,0"
                                         Style="{StaticResource MetroFlatButton}"
+                                        Height="24"
+                                        FontSize="12"
                                         CommandParameter="{Binding}"
                                         Command="{Binding DataContext.SendPredefinedMessageCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ItemsControl}}}"/>
                             </DataTemplate>

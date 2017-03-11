@@ -35,6 +35,7 @@ namespace PoeEye.TradeMonitor.ViewModels
         private readonly TradeModel model;
         private readonly IPoeChatService chatService;
         private readonly IPoeStashService stashService;
+        [NotNull] private readonly IPoeMacroCommandsProvider macroCommandsProvider;
         private readonly IClock clock;
         [NotNull] private readonly IPoeItemViewModelFactory poeTradeViewModelFactory;
         [NotNull] private readonly IConverter<IStashItem, IPoeItem> poeStashItemToItemConverter;
@@ -52,6 +53,7 @@ namespace PoeEye.TradeMonitor.ViewModels
             TradeModel model,
             [NotNull] IPoeChatService chatService,
             [NotNull] IPoeStashService stashService,
+            [NotNull] IPoeMacroCommandsProvider macroCommandsProvider,
             [NotNull] IClock clock,
             [NotNull] IConfigProvider<PoeTradeMonitorConfig> configProvider,
             [NotNull] IPoeItemViewModelFactory poeTradeViewModelFactory,
@@ -60,6 +62,7 @@ namespace PoeEye.TradeMonitor.ViewModels
             [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {
             Guard.ArgumentNotNull(() => imageFactory);
+            Guard.ArgumentNotNull(() => macroCommandsProvider);
             Guard.ArgumentNotNull(() => clock);
             Guard.ArgumentNotNull(() => chatService);
             Guard.ArgumentNotNull(() => poeStashItemToItemConverter);
@@ -70,6 +73,7 @@ namespace PoeEye.TradeMonitor.ViewModels
             this.model = model;
             this.chatService = chatService;
             this.stashService = stashService;
+            this.macroCommandsProvider = macroCommandsProvider;
             this.clock = clock;
             this.poeTradeViewModelFactory = poeTradeViewModelFactory;
             this.poeStashItemToItemConverter = poeStashItemToItemConverter;
@@ -135,6 +139,8 @@ namespace PoeEye.TradeMonitor.ViewModels
 
         public string CharacterName => model.CharacterName;
 
+        public IReactiveList<MacroCommand> MacroCommands => macroCommandsProvider.MacroCommands;
+
         public TimeSpan TimeElapsed => clock.Now - model.Timestamp;
 
         private IImageViewModel itemIcon;
@@ -170,8 +176,6 @@ namespace PoeEye.TradeMonitor.ViewModels
         public string TabName => model.TabName;
 
         public IReactiveList<MacroMessage> PredefinedMessages { get; } = new ReactiveList<MacroMessage>();
-
-        public IReactiveList<MacroCommand> Commands { get; } = new ReactiveList<MacroCommand>();
 
         public void SetCloseController(INegotiationCloseController closeController)
         {
@@ -245,11 +249,11 @@ namespace PoeEye.TradeMonitor.ViewModels
         private void SendPredefinedMessage(MacroMessage message)
         {
             var messageToSend = message.Text;
-            Commands.ForEach(x => messageToSend = x.CleanupText(messageToSend));
+            MacroCommands.ForEach(x => messageToSend = x.CleanupText(messageToSend));
 
             chatService.SendMessage($"@{model.CharacterName} {messageToSend}");
 
-            Commands
+            MacroCommands
                 .Where(x => x.TryToMatch(message.Text).Success)
                 .ForEach(x => x.Execute(this));
         }
