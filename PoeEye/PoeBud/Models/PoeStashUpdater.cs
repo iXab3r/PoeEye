@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Reactive;
@@ -160,9 +161,21 @@ namespace PoeBud.Models
             }
 
             Log.Instance.Debug($"[PoeStashUpdater.Refresh] Requesting stashes [{stashesToRequest.DumpToText()}]...");
-            var allStashes = stashesToRequest
-                .Select(tabIdx => poeClient.GetStash(tabIdx, character.League))
-                .ToArray();
+
+            var allStashes = new List<IStash>();
+            foreach (var tabIdx in stashesToRequest)
+            {
+                try
+                {
+                    var stash = poeClient.GetStash(tabIdx, character.League);
+                    allStashes.Add(stash);
+                }
+                catch (Exception e)
+                {
+                    Log.HandleException(e);
+                    throw new ApplicationException($"Failed to request tab '{tabIdx}', league {character.League}", e);
+                }
+            }
 
             var allItems = allStashes.SelectMany(x => x.Items).ToArray();
             Log.Instance.Debug($"[PoeStashUpdater.Refresh] Got {allItems.Length} item(s)...");
@@ -186,6 +199,7 @@ namespace PoeBud.Models
         {
             Guard.ArgumentNotNull(() => ex);
 
+            Log.HandleException(ex);
             LastUpdateTimestamp = clock.Now;
             IsBusy = false;
             updateExceptionsSubject.OnNext(ex);
