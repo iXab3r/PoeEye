@@ -55,11 +55,11 @@ namespace PoeShared.Native
             overlayWindow = new OverlayWindowView(overlayMode)
             {
                 DataContext = overlay,
-                Title = $"[PoeEye.{overlayMode}] {windowTracker.TargetWindowName}"
+                Title = $"[PoeEye.{overlayMode}] {windowTracker.TargetWindowName}",
+                Visibility = Visibility.Visible
             };
-            overlayWindow.Show();
-
             var overlayWindowHandle = new WindowInteropHelper(overlayWindow).Handle;
+
             Log.Instance.Debug(
                 $"[OverlayWindowController..ctor] Overlay window({overlayMode} + {windowTracker}) handle: 0x{overlayWindowHandle.ToInt64():x8}");
 
@@ -89,11 +89,13 @@ namespace PoeShared.Native
                 .Subscribe(x => this.RaisePropertyChanged(nameof(IsVisible)))
                 .AddTo(Anchors);
 
+            overlay
+                .WhenAnyValue(x => x.IsVisible)
+                .Subscribe(HandleVisibilityChange)
+                .AddTo(Anchors);
+
             windowTracker.WhenAnyValue(x => x.IsActive)
-                .CombineLatest(
-                    windowTracker.WhenAnyValue(x => x.ActiveWindowTitle).Select(IsPairedOverlay),
-                    (x, overlayIsActive) => new {WindowIsActive = x, OverlayIsActive = overlayIsActive}
-                )
+                .Select(x => new { WindowIsActive = x, OverlayIsActive = IsPairedOverlay(windowTracker.ActiveWindowTitle) })
                 .Select(x => x.WindowIsActive || x.OverlayIsActive)
                 .DistinctUntilChanged()
                 .ObserveOn(uiScheduler)
@@ -159,6 +161,24 @@ namespace PoeShared.Native
         public bool IsLocked { get; } = true;
 
         public object Header { get; } = null;
+
+        private void HandleVisibilityChange(bool isVisible)
+        {
+            var overlayWindowHandle = new WindowInteropHelper(overlayWindow).Handle;
+            if (isVisible)
+            {
+                WindowsServices.ShowInactiveTopmost(
+                    overlayWindowHandle,
+                    (int)overlayWindow.Left,
+                    (int)overlayWindow.Top,
+                    (int)overlayWindow.Width,
+                    (int)overlayWindow.Height);
+            }
+            else
+            {
+                WindowsServices.HideWindow(overlayWindowHandle);
+            }
+        }
 
         private bool IsPairedOverlay(string activeWindowTitle)
         {

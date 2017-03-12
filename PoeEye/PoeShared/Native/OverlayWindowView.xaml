@@ -16,8 +16,7 @@
     Background="{x:Null}"
     ShowInTaskbar="False"
     d:DataContext="{d:DesignInstance native:OverlayWindowViewModel}"
-    ResizeMode="NoResize"
-    Topmost="True">
+    ResizeMode="NoResize">
 
     <Window.Resources>
         <ResourceDictionary>
