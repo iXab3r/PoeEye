@@ -16,7 +16,13 @@ namespace PoeWhisperMonitor
 
     internal sealed class PoeTracker : DisposableReactiveObject, IPoeTracker
     {
-        private static readonly string[] PathOfExileProcessNames = { "PathOfExile", "PathOfExile_x64" };
+        private static readonly string[] PathOfExileProcessNames =
+        {
+            "PathOfExile",
+            "PathOfExile_x64",
+            "PathOfExileSteam",
+            "PathOfExile_x64Steam",
+        };
 
         private static readonly TimeSpan RecheckTimeout = TimeSpan.FromSeconds(10);
 
