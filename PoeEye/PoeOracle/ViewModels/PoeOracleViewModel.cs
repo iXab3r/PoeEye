@@ -64,7 +64,6 @@ namespace PoeOracle.ViewModels
             gotoGamepediaCommand = new DelegateCommand(GotoGamepediaCommandExecuted, CanExecuteGotoGamepediaCommand);
             this.WhenAnyValue(x => x.Query).Subscribe(gotoGamepediaCommand.RaiseCanExecuteChanged).AddTo(Anchors);
 
-            keyboardMouseEvents.AddTo(Anchors);
             keyboardMouseEvents
                 .WhenKeyDown
                 .Where(x => controller.IsVisible)

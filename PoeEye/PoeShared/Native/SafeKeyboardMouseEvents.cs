@@ -22,7 +22,6 @@ namespace PoeShared.Native
 {
     internal sealed class KeyboardEventsSource : DisposableReactiveObject, IKeyboardEventsSource
     {
-        [NotNull]
         private readonly IKeyboardMouseEvents keyboardMouseEvents;
 
         private readonly ISubject<KeyPressEventArgs> whenKeyPress = new Subject<KeyPressEventArgs>();

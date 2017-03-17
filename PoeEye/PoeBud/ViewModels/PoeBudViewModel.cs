@@ -84,8 +84,6 @@ namespace PoeBud.ViewModels
             SolutionExecutor = solutionExecutor;
             WindowManager = windowManager;
 
-            keyboardMouseEvents.AddTo(Anchors);
-
             poeBudConfigProvider
                 .WhenAnyValue(x => x.ActualConfig)
                 .Subscribe(ApplyConfig)

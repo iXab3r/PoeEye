@@ -6,7 +6,7 @@ using PoeShared.Scaffolding;
 
 namespace PoeShared.Native
 {
-    public interface IKeyboardEventsSource : IDisposableReactiveObject
+    public interface IKeyboardEventsSource
     {
         IObservable<KeyPressEventArgs> WhenKeyPress { [NotNull] get; }
 

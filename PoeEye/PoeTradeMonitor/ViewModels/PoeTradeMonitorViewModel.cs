@@ -74,7 +74,6 @@ namespace PoeEye.TradeMonitor.ViewModels
             Height = double.NaN;
             SizeToContent = SizeToContent.Height;
 
-            keyboardMouseEvents.AddTo(Anchors);
             this.keyboardMouseEvents = keyboardMouseEvents;
             this.controller = controller;
             this.notificationFactory = notificationFactory;
