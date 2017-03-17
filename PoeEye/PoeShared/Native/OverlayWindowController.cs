@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Concurrency;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Windows;
@@ -97,6 +98,7 @@ namespace PoeShared.Native
                 .Where(x => IsVisible)
                 .Where(x => new KeyGesture(Key.F9, ModifierKeys.Control | ModifierKeys.Shift | ModifierKeys.Alt).MatchesHotkey(x))
                 .Do(x => x.Handled = true)
+                .ObserveOn(uiScheduler)
                 .Subscribe(() => ShowWireframes = !ShowWireframes)
                 .AddTo(Anchors);
         }
@@ -119,14 +121,20 @@ namespace PoeShared.Native
 
         public IReactiveList<OverlayWindowView> Overlays { get; } = new ReactiveList<OverlayWindowView>();
 
-        public void RegisterChild(IOverlayViewModel viewModel)
+        public IDisposable RegisterChild(IOverlayViewModel viewModel)
         {
             Guard.ArgumentNotNull(() => viewModel);
+
+            var childAnchors = new CompositeDisposable();
+
+            viewModel.AddTo(childAnchors);
 
             var overlayWindowViewModel = new OverlayWindowViewModel()
             {
                 Content = viewModel,
             };
+            overlayWindowViewModel.AddTo(childAnchors);
+
             var overlayWindow = new OverlayWindowView(overlayMode)
             {
                 DataContext = overlayWindowViewModel,
@@ -135,12 +143,8 @@ namespace PoeShared.Native
                 Topmost = true,
             };
 
-            var observer = viewModel.WhenLoaded as IObserver<Unit>;
-            if (observer != null)
-            {
-                //FIXME Inheritance problem
-                overlayWindow.WhenLoaded.Subscribe(observer).AddTo(Anchors);
-            }
+            var activationController = new ActivationController(overlayWindow);
+            viewModel.SetActivationController(activationController);
 
             var overlayWindowHandle = new WindowInteropHelper(overlayWindow).Handle;
 
@@ -150,13 +154,25 @@ namespace PoeShared.Native
             this.WhenAnyValue(x => x.IsVisible)
                 .Select(_ => overlayWindow)
                 .Subscribe(x => HandleVisibilityChange(x, viewModel))
-                .AddTo(Anchors);
+                .AddTo(childAnchors);
 
             this.WhenAnyValue(x => x.ShowWireframes)
                .Subscribe(x => overlayWindowViewModel.ShowWireframes = x)
-               .AddTo(Anchors);
+               .AddTo(childAnchors);
+
+            //FIXME Inheritance problem
+            var observer = viewModel.WhenLoaded as IObserver<Unit>;
+            if (observer != null)
+            {
+                overlayWindow.WhenLoaded.Subscribe(observer).AddTo(childAnchors);
+            }
+
+            Disposable.Create(() => Overlays.Remove(overlayWindow)).AddTo(childAnchors);
+            Disposable.Create(overlayWindow.Close).AddTo(childAnchors);
+
+            return childAnchors;
         }
-        
+
         public void ActivateLastActiveWindow()
         {
             var windowHandle = lastActiveWindowHandle.Value;
@@ -204,6 +220,21 @@ namespace PoeShared.Native
         {
             Log.Instance.Debug($"[OverlayWindowController] Overlay IsVisible = {IsVisible} => {isVisible} (tracker {windowTracker})");
             IsVisible = isVisible;
+        }
+
+        private class ActivationController : IActivationController
+        {
+            private readonly OverlayWindowView overlayWindow;
+            public ActivationController(OverlayWindowView overlayWindow)
+            {
+                this.overlayWindow = overlayWindow;
+            }
+
+            public void Activate()
+            {
+                var overlayWindowHandle = new WindowInteropHelper(overlayWindow).Handle;
+                WindowsServices.SetForegroundWindow(overlayWindowHandle);
+            }
         }
     }
 }

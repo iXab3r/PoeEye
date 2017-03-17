@@ -27,5 +27,9 @@ namespace PoeShared.Native
         bool IsLocked { get; set; }
 
         IObservable<Unit> WhenLoaded { [NotNull] get; }
+
+        SizeToContent SizeToContent { get; }
+
+        IOverlayViewModel SetActivationController([NotNull] IActivationController controller);
     }
 }

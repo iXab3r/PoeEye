@@ -95,8 +95,10 @@ namespace PoeBud.ViewModels
                 .ToProperty(this, x => x.LastUpdateException, out lastUpdateException, null, uiScheduler)
                 .AddTo(Anchors);
 
-            Width = double.NaN;
-            Height = double.NaN;
+            Width = SystemParameters.PrimaryScreenWidth;
+            Height = SystemParameters.PrimaryScreenHeight;
+            Left = 0;
+            Top = 0;
         }
 
         public IPoeWindowManager WindowManager { get; }
@@ -189,13 +191,15 @@ namespace PoeBud.ViewModels
                 keyPressedObservable
                     .Where(x => hotkey.MatchesHotkey(x))
                     .Do(x => x.Handled = true)
+                    .ObserveOn(uiScheduler)
                     .Subscribe(ExecuteSolutionCommandExecuted)
                     .AddTo(stashDisposable);
 
-                var refreshHotkey = new KeyGesture(hotkey.Key, ModifierKeys.Control | ModifierKeys.Shift);
+                var forceRefreshHotkey = new KeyGesture(hotkey.Key, ModifierKeys.Control | ModifierKeys.Shift);
                 keyPressedObservable
-                   .Where(x => refreshHotkey.MatchesHotkey(x))
+                   .Where(x => forceRefreshHotkey.MatchesHotkey(x))
                    .Do(x => x.Handled = true)
+                   .ObserveOn(uiScheduler)
                    .Subscribe(ForceRefreshStashCommandExecuted)
                    .AddTo(stashDisposable);
 

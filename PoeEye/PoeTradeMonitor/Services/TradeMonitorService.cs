@@ -3,21 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using System.Windows.Input;
 using Guards;
 using JetBrains.Annotations;
+using PoeEye.TradeMonitor.Models;
 using PoeEye.TradeMonitor.Modularity;
-using PoeEye.TradeMonitor.ViewModels;
 using PoeShared;
 using PoeShared.Audio;
 using PoeShared.Modularity;
 using PoeShared.Scaffolding;
 using PoeWhisperMonitor;
 using PoeWhisperMonitor.Chat;
-using ReactiveUI;
 using DisposableReactiveObject = PoeShared.Scaffolding.DisposableReactiveObject;
 
-namespace PoeEye.TradeMonitor.Models
+namespace PoeEye.TradeMonitor.Services
 {
     internal sealed class TradeMonitorService : DisposableReactiveObject, ITradeMonitorService
     {

@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 using PoeShared.Scaffolding;
 using PoeShared.StashApi.DataTypes;
 
-namespace PoeEye.TradeMonitor.Models
+namespace PoeEye.TradeMonitor.Services
 {
     internal interface IPoeStashService : IDisposableReactiveObject
     {

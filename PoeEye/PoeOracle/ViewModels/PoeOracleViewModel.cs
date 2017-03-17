@@ -35,9 +35,8 @@ namespace PoeOracle.ViewModels
 
         private bool isVisible;
 
-        private double oracleActualWidth;
-
         private string query;
+        private IActivationController activationController;
 
         public PoeOracleViewModel(
             [NotNull] IKeyboardEventsSource keyboardMouseEvents,
@@ -54,6 +53,9 @@ namespace PoeOracle.ViewModels
             Guard.ArgumentNotNull(() => bgScheduler);
             Guard.ArgumentNotNull(() => uiScheduler);
 
+            SizeToContent = SizeToContent.WidthAndHeight;
+            MinSize = new Size(700, 50);
+
             this.controller = controller;
             this.dataSource = dataSource;
             this.uriOpener = uriOpener;
@@ -66,6 +68,7 @@ namespace PoeOracle.ViewModels
             keyboardMouseEvents
                 .WhenKeyDown
                 .Where(x => controller.IsVisible)
+                .ObserveOn(uiScheduler)
                 .Subscribe(ProcessKeyDown, Log.HandleException)
                 .AddTo(Anchors);
 
@@ -87,8 +90,7 @@ namespace PoeOracle.ViewModels
                 .Subscribe(() => Hide(false))
                 .AddTo(Anchors);
 
-            this.WhenAnyValue(x => x.OracleActualWidth)
-                .Where(x => IsVisible)
+            this.WhenAnyValue(x => x.IsVisible)
                 .Subscribe(SnapToOverlayCenter)
                 .AddTo(Anchors);
         }
@@ -117,10 +119,11 @@ namespace PoeOracle.ViewModels
 
         public ICommand GotoGamepediaCommand => gotoGamepediaCommand;
 
-        public double OracleActualWidth
+        public override IOverlayViewModel SetActivationController(IActivationController controller)
         {
-            get { return oracleActualWidth; }
-            set { this.RaiseAndSetIfChanged(ref oracleActualWidth, value); }
+            Guard.ArgumentNotNull(() => controller);
+            activationController = controller;
+            return base.SetActivationController(controller);
         }
 
         private void ProcessKeyDown(KeyEventArgs keyEventArgs)
@@ -152,21 +155,14 @@ namespace PoeOracle.ViewModels
         {
             IsVisible = true;
             IsFocused = true;
+
+            activationController?.Activate();
         }
 
         private void SnapToOverlayCenter()
         {
-            MinSize = new Size(700, 50);
-            Width = double.NaN;
-            Height = double.NaN;
-            var oracleSize = new Size(OracleActualWidth, 0);
-
-            var top = Top + ActualHeight / 2;
-            var left = Left + ActualWidth / 2;
-            if (!double.IsNaN(oracleSize.Width) && !double.IsInfinity(oracleSize.Width) && !oracleSize.IsEmpty)
-            {
-                left -= oracleSize.Width / 2;
-            }
+            var top = SystemParameters.PrimaryScreenHeight / 2 - ActualHeight / 2;
+            var left = SystemParameters.PrimaryScreenWidth / 2 - ActualWidth / 2;
 
             Left = left;
             Top = top;

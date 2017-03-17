@@ -2,7 +2,7 @@
 using System.Reactive;
 using System.Reactive.Subjects;
 using System.Windows;
-using JetBrains.Annotations;
+using Guards;
 using PoeShared.Scaffolding;
 using ReactiveUI;
 
@@ -21,9 +21,13 @@ namespace PoeShared.Native
         private Size maxSize = new Size(double.NaN, double.NaN);
         private Size minSize = new Size(0, 0);
 
+        private SizeToContent sizeToContent = SizeToContent.Manual;
+
         private double top;
 
         private double width;
+
+        public ISubject<Unit> WhenLoaded { get; } = new ReplaySubject<Unit>(1);
 
         public double ActualHeight
         {
@@ -79,8 +83,19 @@ namespace PoeShared.Native
             set { this.RaiseAndSetIfChanged(ref isLocked, value); }
         }
 
-        public ISubject<Unit> WhenLoaded { get; } = new ReplaySubject<Unit>(1);
+        IObservable<Unit> IOverlayViewModel.WhenLoaded => WhenLoaded;
 
-        IObservable<Unit> IOverlayViewModel.WhenLoaded => this.WhenLoaded;
+        public SizeToContent SizeToContent
+        {
+            get { return sizeToContent; }
+            set { this.RaiseAndSetIfChanged(ref sizeToContent, value); }
+        }
+
+        public virtual IOverlayViewModel SetActivationController(IActivationController controller)
+        {
+            Guard.ArgumentNotNull(() => controller);
+
+            return this;
+        }
     }
 }

@@ -238,6 +238,7 @@
   <ItemGroup>
     <Compile Include="Converters\BoolInversionConverter.cs" />
     <Compile Include="Converters\PoeStashItemToPoeItem.cs" />
+    <Compile Include="Native\IActivationController.cs" />
     <Compile Include="Native\IKeyboardEventsSource.cs" />
     <Compile Include="Native\SafeKeyboardMouseEvents.cs" />
     <Compile Include="PoeTrade\IPoeItemViewModelFactory.cs" />

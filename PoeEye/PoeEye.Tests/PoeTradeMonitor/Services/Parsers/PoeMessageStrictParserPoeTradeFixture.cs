@@ -1,13 +1,13 @@
 ﻿using System.Collections.Generic;
 using NUnit.Framework;
 using PoeEye.TradeMonitor.Models;
-using PoeEye.TradeMonitor.Models.Parsers;
 using PoeShared.Common;
 using PoeShared.Converters;
 using PoeWhisperMonitor.Chat;
+using PoeEye.TradeMonitor.Services.Parsers;
 using Shouldly;
 
-namespace PoeEye.Tests.PoeTradeMonitor.Models
+namespace PoeEye.Tests.PoeTradeMonitor.Services.Parsers
 {
     [TestFixture]
     internal class PoeMessageStrictParserPoeTradeFixture

@@ -32,8 +32,8 @@ namespace PoeEye.Config
         {
             return
                 this.WhenAnyValue(x => x.ActualConfig)
-                    .Select(config => config.WhenAnyValue(fieldToMonitor))
-                    .Switch();
+                    .Select(config => fieldToMonitor.Compile().Invoke(config))
+                    .DistinctUntilChanged();
         }
 
         public void Reload()

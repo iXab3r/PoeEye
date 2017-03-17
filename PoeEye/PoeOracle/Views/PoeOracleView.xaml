@@ -172,9 +172,6 @@
                     <scaffolding:DataPipe
                         Source="{Binding ElementName=OracleQueryTextBox, Path=IsKeyboardFocused}"
                         Target="{Binding IsFocused, Mode=OneWayToSource}" />
-                    <scaffolding:DataPipe
-                        Source="{Binding ElementName=OracleOverlay, Path=ActualWidth}"
-                        Target="{Binding OracleActualWidth, Mode=OneWayToSource}" />
                 </scaffolding:DataPipeCollection>
             </scaffolding:DataPiping.DataPipes>
         </Grid>

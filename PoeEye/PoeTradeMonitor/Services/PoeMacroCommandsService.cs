@@ -1,12 +1,13 @@
 ﻿using System;
 using Guards;
 using JetBrains.Annotations;
+using PoeEye.TradeMonitor.Models;
 using PoeShared;
 using PoeShared.Scaffolding;
 using PoeWhisperMonitor.Chat;
 using ReactiveUI;
 
-namespace PoeEye.TradeMonitor.Models
+namespace PoeEye.TradeMonitor.Services
 {
     internal sealed class PoeMacroCommandsService : DisposableReactiveObject, IPoeMacroCommandsProvider
     {

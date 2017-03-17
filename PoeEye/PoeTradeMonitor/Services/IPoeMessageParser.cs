@@ -1,6 +1,7 @@
-﻿using PoeWhisperMonitor.Chat;
+﻿using PoeEye.TradeMonitor.Models;
+using PoeWhisperMonitor.Chat;
 
-namespace PoeEye.TradeMonitor.Models
+namespace PoeEye.TradeMonitor.Services
 {
     internal interface IPoeMessageParser
     {

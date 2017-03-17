@@ -59,7 +59,7 @@ namespace PoeShared.Native
 
             try
             {
-                if (!double.IsNaN(window.Width) && SizeToContent != SizeToContent.Width)
+                if (SizeToContent != SizeToContent.Width)
                 {
                     var newWidth = window.Width + e.HorizontalChange;
                     newWidth = Math.Min(newWidth, window.MaxWidth);
@@ -67,7 +67,7 @@ namespace PoeShared.Native
                     window.Width = newWidth;
                 }
 
-                if (!double.IsNaN(window.Height) && SizeToContent != SizeToContent.Height)
+                if (SizeToContent != SizeToContent.Height)
                 {
                     var newHeight = window.Height + e.VerticalChange;
                     newHeight = Math.Min(newHeight, window.MaxHeight);

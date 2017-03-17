@@ -9,6 +9,7 @@ using JetBrains.Annotations;
 using Microsoft.Practices.Unity;
 using PoeEye.TradeMonitor.Models;
 using PoeEye.TradeMonitor.Modularity;
+using PoeEye.TradeMonitor.Services;
 using PoeShared;
 using PoeShared.Common;
 using PoeShared.Converters;

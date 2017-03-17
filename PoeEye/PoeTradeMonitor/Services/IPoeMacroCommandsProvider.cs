@@ -1,7 +1,8 @@
 ﻿using JetBrains.Annotations;
+using PoeEye.TradeMonitor.Models;
 using ReactiveUI;
 
-namespace PoeEye.TradeMonitor.Models
+namespace PoeEye.TradeMonitor.Services
 {
     internal interface IPoeMacroCommandsProvider
     {

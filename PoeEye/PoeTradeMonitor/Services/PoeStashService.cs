@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
@@ -18,11 +17,10 @@ using PoeShared;
 using PoeShared.Modularity;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
-using PoeShared.StashApi;
 using PoeShared.StashApi.DataTypes;
 using ReactiveUI;
 
-namespace PoeEye.TradeMonitor.Models
+namespace PoeEye.TradeMonitor.Services
 {
     internal sealed class PoeStashService : DisposableReactiveObject, IPoeStashService
     {

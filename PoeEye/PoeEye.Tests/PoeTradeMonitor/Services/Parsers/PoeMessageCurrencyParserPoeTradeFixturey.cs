@@ -1,16 +1,16 @@
 ﻿using System.Collections.Generic;
 using NUnit.Framework;
 using PoeEye.TradeMonitor.Models;
-using PoeEye.TradeMonitor.Models.Parsers;
 using PoeShared.Common;
 using PoeShared.Converters;
 using PoeWhisperMonitor.Chat;
+using PoeEye.TradeMonitor.Services.Parsers;
 using Shouldly;
 
-namespace PoeEye.Tests.PoeTradeMonitor.Models
+namespace PoeEye.Tests.PoeTradeMonitor.Services.Parsers
 {
     [TestFixture]
-    internal class PoeMessageWeakParserPoeTradeFixture
+    internal class PoeMessageCurrencyParserPoeTradeFixture
     {
         [Test]
         [TestCaseSource(nameof(ShouldParseCases))]
@@ -48,21 +48,21 @@ namespace PoeEye.Tests.PoeTradeMonitor.Models
         private IEnumerable<TestCaseData> ShouldParseCases()
         {
             yield return new TestCaseData(
-                    "Hi, I would like to buy your Enduring Onslaught Leaguestone of Slaying listed for 3 alchemy in Legacy",
+                    "Hi, I'd like to buy your 3 exalted for my 169.5 chaos in Legacy.",
                     true,
                     new TradeModel()
                     {
                         CharacterName = "Name",
-                        Price = new PoePrice("alchemy", 3),
-                        PositionName = "Enduring Onslaught Leaguestone of Slaying",
+                        Price = new PoePrice("chaos", 169.5f),
+                        PositionName = "3 exalted",
                         League = "Legacy",
                     }
                 );
         }
 
-        private PoeMessageWeakParserPoeTrade CreateInstance()
+        private PoeMessageCurrencyParserPoeTrade CreateInstance()
         {
-            return new PoeMessageWeakParserPoeTrade(new PriceToCurrencyConverter());   
+            return new PoeMessageCurrencyParserPoeTrade(new PriceToCurrencyConverter());   
         }
     }
 }

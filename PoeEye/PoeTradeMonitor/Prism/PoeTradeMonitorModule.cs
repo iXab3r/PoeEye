@@ -2,16 +2,19 @@
 using JetBrains.Annotations;
 using Microsoft.Practices.Unity;
 using PoeEye.TradeMonitor.Modularity;
+using PoeEye.TradeMonitor.Services;
 using PoeEye.TradeMonitor.ViewModels;
 using PoeShared.Modularity;
 using PoeShared.Native;
 using PoeShared.Prism;
+using PoeShared.Scaffolding;
 
 namespace PoeEye.TradeMonitor.Prism
 {
     public sealed class PoeTradeMonitorModule : IPoeEyeModule
     {
         private readonly IUnityContainer container;
+        private TradeMonitorBootstrapper bootstrapper;
 
         public PoeTradeMonitorModule([NotNull] IUnityContainer container)
         {
@@ -27,9 +30,7 @@ namespace PoeEye.TradeMonitor.Prism
             var registrator = container.Resolve<IPoeEyeModulesRegistrator>();
             registrator.RegisterSettingsEditor<PoeTradeMonitorConfig, PoeTradeMonitorSettingsViewModel>();
 
-            var overlayController = container.Resolve<IOverlayWindowController>(WellKnownOverlays.PathOfExileLayeredOverlay);
-            var overlayModel = container.Resolve<PoeTradeMonitorViewModel>(new DependencyOverride(typeof(IOverlayWindowController), overlayController));
-            overlayController.RegisterChild(overlayModel);
+            bootstrapper = container.Resolve<TradeMonitorBootstrapper>();
         }
     }
 }

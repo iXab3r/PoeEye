@@ -135,9 +135,9 @@
     <Compile Include="Common\PoeItemParserFixture.cs" />
     <Compile Include="Helpers\MockExtensions.cs" />
     <Compile Include="PoeBud\OfficialApi\GearTypeAnalyzerFixture.cs" />
-    <Compile Include="PoeTradeMonitor\Models\PoeMessageCurrencyParserPoeTradeFixturey.cs" />
-    <Compile Include="PoeTradeMonitor\Models\PoeMessageWeakParserPoeTradeFixture.cs" />
-    <Compile Include="PoeTradeMonitor\Models\PoeMessageStrictParserPoeTradeFixture.cs" />
+    <Compile Include="PoeTradeMonitor\Services\Parsers\PoeMessageCurrencyParserPoeTradeFixturey.cs" />
+    <Compile Include="PoeTradeMonitor\Services\Parsers\PoeMessageWeakParserPoeTradeFixture.cs" />
+    <Compile Include="PoeTradeMonitor\Services\Parsers\PoeMessageStrictParserPoeTradeFixture.cs" />
     <Compile Include="PoeTrade\PoeTradeDateTimeExtractorFixture.cs" />
     <Compile Include="PoeTrade\PoeTradeParserModernFixture.cs" />
     <Compile Include="PoeTrade\TestData\TestDataProvider.cs" />

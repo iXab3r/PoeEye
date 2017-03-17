@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using Guards;
 using JetBrains.Annotations;
+using PoeEye.TradeMonitor.Models;
 using PoeShared.Converters;
 using PoeShared.Scaffolding;
 using PoeWhisperMonitor.Chat;
 
-namespace PoeEye.TradeMonitor.Models.Parsers
+namespace PoeEye.TradeMonitor.Services.Parsers
 {
     internal abstract class PoeMessageParserRegex : IPoeMessageParser
     {

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Reactive.Concurrency;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Windows;
 using System.Windows.Input;
@@ -11,6 +12,7 @@ using JetBrains.Annotations;
 using Microsoft.Practices.Unity;
 using PoeEye.TradeMonitor.Models;
 using PoeEye.TradeMonitor.Modularity;
+using PoeEye.TradeMonitor.Services;
 using PoeShared;
 using PoeShared.Common;
 using PoeShared.Modularity;
@@ -27,9 +29,15 @@ namespace PoeEye.TradeMonitor.ViewModels
         private readonly DelegateCommand<INegotiationViewModel> closeNegotiationCommand;
         private readonly IConfigProvider<PoeTradeMonitorConfig> configProvider;
         private readonly FakeItemFactory fakeItemFactory;
+        private readonly IScheduler uiScheduler;
 
         private readonly ISourceList<INegotiationViewModel> negotiationsList = new SourceList<INegotiationViewModel>();
+        private readonly IKeyboardEventsSource keyboardMouseEvents;
+        private readonly IOverlayWindowController controller;
         private readonly IFactory<INegotiationViewModel, TradeModel> notificationFactory;
+        private readonly IFactory<ITradeMonitorService> tradeMonitorServiceFactory;
+
+        private readonly SerialDisposable lifeCycleAnchors = new SerialDisposable();
 
         private bool growUpwards;
 
@@ -46,7 +54,7 @@ namespace PoeEye.TradeMonitor.ViewModels
             [NotNull] IPoeStashService stashService,
             [NotNull] IOverlayWindowController controller,
             [NotNull] IFactory<INegotiationViewModel, TradeModel> notificationFactory,
-            [NotNull] ITradeMonitorService tradeMonitorService,
+            [NotNull] IFactory<ITradeMonitorService> tradeMonitorServiceFactory,
             [NotNull] IConfigProvider<PoeTradeMonitorConfig> configProvider,
             [NotNull] FakeItemFactory fakeItemFactory,
             [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler,
@@ -57,18 +65,23 @@ namespace PoeEye.TradeMonitor.ViewModels
             Guard.ArgumentNotNull(() => controller);
             Guard.ArgumentNotNull(() => configProvider);
             Guard.ArgumentNotNull(() => notificationFactory);
-            Guard.ArgumentNotNull(() => tradeMonitorService);
+            Guard.ArgumentNotNull(() => tradeMonitorServiceFactory);
             Guard.ArgumentNotNull(() => bgScheduler);
             Guard.ArgumentNotNull(() => uiScheduler);
 
             MinSize = new Size(500, 200);
             MaxSize = new Size(700, double.NaN);
             Height = double.NaN;
+            SizeToContent = SizeToContent.Height;
 
             keyboardMouseEvents.AddTo(Anchors);
+            this.keyboardMouseEvents = keyboardMouseEvents;
+            this.controller = controller;
             this.notificationFactory = notificationFactory;
+            this.tradeMonitorServiceFactory = tradeMonitorServiceFactory;
             this.configProvider = configProvider;
             this.fakeItemFactory = fakeItemFactory;
+            this.uiScheduler = uiScheduler;
 
             CreateFakeTradeCommand = new DelegateCommand(CreateFakeCommandExecuted);
             closeNegotiationCommand = new DelegateCommand<INegotiationViewModel>(CloseNegotiationCommandExecuted);
@@ -103,15 +116,13 @@ namespace PoeEye.TradeMonitor.ViewModels
                         .Subscribe(delta => Top -= delta)
                         .AddTo(Anchors);
 
+                    var tradeMonitorService = tradeMonitorServiceFactory.Create();
+                    tradeMonitorService.AddTo(Anchors);
+
                     tradeMonitorService
                         .Trades
                         .ObserveOn(uiScheduler)
                         .Subscribe(ProcessTrade)
-                        .AddTo(Anchors);
-
-                    configProvider
-                        .WhenAnyValue(x => x.ActualConfig)
-                        .Subscribe(ApplyConfig)
                         .AddTo(Anchors);
 
                     keyboardMouseEvents
@@ -120,6 +131,11 @@ namespace PoeEye.TradeMonitor.ViewModels
                         .Where(x => new KeyGesture(Key.F8, ModifierKeys.Control | ModifierKeys.Shift | ModifierKeys.Alt).MatchesHotkey(x))
                         .Do(x => x.Handled = true)
                         .Subscribe(ToggleLock, Log.HandleException)
+                        .AddTo(Anchors);
+
+                    configProvider
+                        .WhenAnyValue(x => x.ActualConfig)
+                        .Subscribe(ApplyConfig)
                         .AddTo(Anchors);
 
                     Observable.Merge(
@@ -170,7 +186,7 @@ namespace PoeEye.TradeMonitor.ViewModels
             get { return opacity; }
             set { this.RaiseAndSetIfChanged(ref opacity, value); }
         }
-        
+
         private void ToggleLock()
         {
             if (!IsLocked)
@@ -223,6 +239,7 @@ namespace PoeEye.TradeMonitor.ViewModels
         private void ApplyConfig(PoeTradeMonitorConfig config)
         {
             Log.Instance.Debug($"[PoeTradeMonitorViewModel.ApplyConfig] Config has changed");
+
             GrowUpwards = config.GrowUpwards;
             NumberOfNegotiationsToExpandByDefault = config.NumberOfNegotiationsToExpandByDefault;
             PreGroupNotificationsCount = config.PreGroupNotificationsCount;

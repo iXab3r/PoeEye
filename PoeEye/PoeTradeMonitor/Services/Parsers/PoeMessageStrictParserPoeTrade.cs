@@ -1,10 +1,8 @@
 ﻿using System.Text.RegularExpressions;
-using Guards;
 using JetBrains.Annotations;
 using PoeShared.Converters;
-using PoeWhisperMonitor.Chat;
 
-namespace PoeEye.TradeMonitor.Models.Parsers
+namespace PoeEye.TradeMonitor.Services.Parsers
 {
     internal class PoeMessageStrictParserPoeTrade : PoeMessageParserRegex
     {

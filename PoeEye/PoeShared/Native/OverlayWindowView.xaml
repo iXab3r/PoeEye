@@ -62,24 +62,19 @@
             <Setter Property="MinWidth" Value="{Binding Content.MinSize.Width, Mode=TwoWay}"/>
             <Setter Property="MinHeight" Value="{Binding Content.MinSize.Height, Mode=TwoWay}"/>
             <Setter Property="ResizeMode" Value="NoResize"/>
-            <Setter Property="SizeToContent" Value="Manual"/>
+            <Setter Property="SizeToContent" Value="{Binding Content.SizeToContent, Mode=TwoWay}"/>
 
             <Style.Triggers>
                 <DataTrigger Binding="{Binding Content.IsLocked}" Value="False">
                     <Setter Property="BorderBrush" Value="{StaticResource ControlBorderBrush}"/>
                 </DataTrigger>
-                
-                <DataTrigger Binding="{Binding Content.MaxSize.Height}" Value="{x:Static system:Double.NaN}">
-                    <Setter Property="SizeToContent" Value="Height"/>
-                </DataTrigger>
-
             </Style.Triggers>
         </Style>
     </native:TransparentWindow.Style>
     
     <Grid >
         <Grid >
-            <ContentPresenter Grid.Row="0" Content="{Binding Content}" />
+            <ContentControl Grid.Row="0" Content="{Binding Content}" />
 
             <Border 
                 Visibility="{Binding ShowWireframes, Converter={StaticResource TrueToVisibleConverter}}"

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Practices.Unity;
 using PoeEye.TradeMonitor.Models;
-using PoeEye.TradeMonitor.Models.Parsers;
+using PoeEye.TradeMonitor.Services;
+using PoeEye.TradeMonitor.Services.Parsers;
 using PoeEye.TradeMonitor.ViewModels;
 using PoeShared.Scaffolding;
 

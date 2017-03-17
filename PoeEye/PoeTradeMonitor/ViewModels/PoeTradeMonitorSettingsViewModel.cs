@@ -4,6 +4,7 @@ using Guards;
 using JetBrains.Annotations;
 using PoeEye.TradeMonitor.Models;
 using PoeEye.TradeMonitor.Modularity;
+using PoeEye.TradeMonitor.Services;
 using PoeShared.Audio;
 using PoeShared.Modularity;
 using PoeShared.Scaffolding;
