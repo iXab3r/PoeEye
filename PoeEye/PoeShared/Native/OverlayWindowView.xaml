@@ -5,18 +5,18 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:native="clr-namespace:PoeShared.Native"
-    xmlns:blue="http://www.nuget.org/Blue.MVVM"
     xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
-    xmlns:sys="clr-namespace:System;assembly=System"
     xmlns:converters="http://schemas.kent.boogaart.com/converters"
     xmlns:system="clr-namespace:System;assembly=mscorlib"
-    xmlns:scaffolding="clr-namespace:PoeShared.Scaffolding"
     xmlns:sharedConverter="clr-namespace:PoeShared.Converters"
+    xmlns:wpf="clr-namespace:PoeShared.Scaffolding.WPF"
     mc:Ignorable="d"
-    Background="{x:Null}"
     ShowInTaskbar="False"
     d:DataContext="{d:DesignInstance native:OverlayWindowViewModel}"
-    ResizeMode="NoResize">
+    WindowStartupLocation="Manual"
+    Focusable="False"
+    IsTabStop="False"
+    SizeChanged="OverlayChildWindow_OnSizeChanged">
 
     <Window.Resources>
         <ResourceDictionary>
@@ -26,15 +26,6 @@
 
             <sharedConverter:TwoNumbersToSizeConverter x:Key="ActualWidthAndHeightToSizeConverter" />
 
-            <converters:MapConverter x:Key="BoolToWindowStyleConverterKey"
-                                     FallbackBehavior="ReturnFallbackValue"
-                                     FallbackValue="{x:Static WindowStyle.ToolWindow}">
-                <converters:Mapping To="{x:Static WindowStyle.None}">
-                    <converters:Mapping.From>
-                        <system:Boolean>True</system:Boolean>
-                    </converters:Mapping.From>
-                </converters:Mapping>
-            </converters:MapConverter>
 
             <converters:MapConverter x:Key="IsLockedToBackgroundConverterKey"
                                      FallbackBehavior="ReturnFallbackValue">
@@ -54,150 +45,136 @@
         </ResourceDictionary>
     </Window.Resources>
 
-    <Grid>
-        <ItemsControl ItemsSource="{Binding Items}">
-            <ItemsControl.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <Grid />
-                </ItemsPanelTemplate>
-            </ItemsControl.ItemsPanel>
+    <native:TransparentWindow.Style>
+        <Style TargetType="{x:Type native:TransparentWindow}">
+            <Setter Property="Background" Value="{x:Null}"/>
+            <Setter Property="BorderBrush" Value="{x:Null}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="AllowsTransparency" Value="True"/>
+            <Setter Property="WindowStyle" Value="None"/>
+            <Setter Property="DataContext" Value="{Binding}"/>
+            <Setter Property="Left" Value="{Binding Content.Left, Mode=TwoWay}"/>
+            <Setter Property="Top" Value="{Binding Content.Top, Mode=TwoWay}"/>
+            <Setter Property="Width" Value="{Binding Content.Width, Mode=TwoWay}"/>
+            <Setter Property="Height" Value="{Binding Content.Height, Mode=TwoWay}"/>
+            <Setter Property="MaxWidth" Value="{Binding Content.MaxSize.Width, Mode=TwoWay}"/>
+            <Setter Property="MaxHeight" Value="{Binding Content.MaxSize.Height, Mode=TwoWay}"/>
+            <Setter Property="MinWidth" Value="{Binding Content.MinSize.Width, Mode=TwoWay}"/>
+            <Setter Property="MinHeight" Value="{Binding Content.MinSize.Height, Mode=TwoWay}"/>
+            <Setter Property="ResizeMode" Value="NoResize"/>
+            <Setter Property="SizeToContent" Value="Manual"/>
 
-            <ItemsControl.ItemTemplate>
-                <DataTemplate DataType="{x:Type native:IOverlayViewModel}">
-                    <xctk:WindowContainer>
-                        <xctk:ChildWindow
-                            x:Name="OverlayChildWindow"
-                            WindowState="Open"
-                            WindowStartupLocation="Manual"
-                            WindowStyle="{Binding IsLocked, Converter={StaticResource BoolToWindowStyleConverterKey}}"
-                            CloseButtonVisibility="Collapsed"
-                            WindowBorderThickness="0"
-                            BorderThickness="0"
-                            WindowThickness="0"
-                            WindowBackground="{Binding IsLocked, Converter={StaticResource IsLockedToBackgroundConverterKey}}"
-                            Background="Transparent"
-                            BorderBrush="Transparent"
-                            WindowBorderBrush="Transparent"
-                            Left="{Binding Left, Mode=TwoWay}"
-                            Top="{Binding Top, Mode=TwoWay}"
-                            Width="{Binding Width, Mode=TwoWay}"
-                            Height="{Binding Height, Mode=TwoWay}"
-                            MinWidth="{Binding MinSize.Width}"
-                            MinHeight="{Binding MinSize.Height}"
-                            MaxWidth="{Binding MaxSize.Width}"
-                            MaxHeight="{Binding MaxSize.Height}"
-                            Visibility="{Binding 
-                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}, 
-                                            Path=DataContext.IsVisible,
-                                            Converter={StaticResource TrueToVisibleConverter}}"
-                            Focusable="False"
-                            IsTabStop="False">
-                            <xctk:ChildWindow.CloseButtonStyle>
-                                <Style TargetType="{x:Type Button}">
-                                    <Setter Property="Template">
-                                        <Setter.Value>
-                                            <ControlTemplate TargetType="{x:Type Button}" />
-                                        </Setter.Value>
-                                    </Setter>
-                                </Style>
-                            </xctk:ChildWindow.CloseButtonStyle>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Content.IsLocked}" Value="False">
+                    <Setter Property="BorderBrush" Value="{StaticResource ControlBorderBrush}"/>
+                </DataTrigger>
+                
+                <DataTrigger Binding="{Binding Content.MaxSize.Height}" Value="{x:Static system:Double.NaN}">
+                    <Setter Property="SizeToContent" Value="Height"/>
+                </DataTrigger>
 
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto" />
-                                    <RowDefinition Height="*" />
-                                </Grid.RowDefinitions>
+            </Style.Triggers>
+        </Style>
+    </native:TransparentWindow.Style>
+    
+    <Grid >
+        <Grid >
+            <ContentPresenter Grid.Row="0" Content="{Binding Content}" />
 
-                                <Grid Grid.Row="0"
-                                      Visibility="{Binding Header, Converter={StaticResource NullToCollapsedConverter}}">
-                                    <ContentPresenter Content="{Binding Header}" />
-                                </Grid>
+            <Border 
+                Visibility="{Binding ShowWireframes, Converter={StaticResource TrueToVisibleConverter}}"
+                BorderThickness="3"
+                IsHitTestVisible="False"
+                BorderBrush="GreenYellow"
+                Background="#aa000000">
+                <StackPanel Orientation="Vertical">
+                    <StackPanel.Resources>
+                        <Style TargetType="{x:Type TextBlock}"
+                           BasedOn="{StaticResource {x:Type TextBlock}}">
+                            <Setter Property="Foreground" Value="Red" />
+                            <Setter Property="FontSize" Value="14" />
+                            <Setter Property="FontWeight" Value="Bold" />
+                        </Style>
+                    </StackPanel.Resources>
+                    <TextBlock Foreground="Yellow"
+                           Text="{Binding}"
+                           FontSize="14" />
 
-                                <ContentPresenter Grid.Row="1" Content="{Binding}" />
+                    <TextBlock
+                    Margin="5,0"
+                    Text="{Binding Visibility, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type xctk:ChildWindow}}, StringFormat='Visibility: {0}'}" />
 
-                                <Border Grid.Row="0" Grid.RowSpan="2"
-                                        Visibility="{Binding 
-                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}, 
-                                            Path=DataContext.ShowWireframes,
-                                            Converter={StaticResource TrueToVisibleConverter}}"
-                                        BorderThickness="3"
-                                        IsHitTestVisible="False"
-                                        BorderBrush="GreenYellow"
-                                        Background="#aa000000">
-                                    <StackPanel Orientation="Vertical">
-                                        <StackPanel.Resources>
-                                            <Style TargetType="{x:Type TextBlock}"
-                                                   BasedOn="{StaticResource {x:Type TextBlock}}">
-                                                <Setter Property="Foreground" Value="Red" />
-                                                <Setter Property="FontSize" Value="14" />
-                                                <Setter Property="FontWeight" Value="Bold" />
-                                            </Style>
-                                        </StackPanel.Resources>
-                                        <TextBlock Foreground="Yellow"
-                                                   Text="{Binding}"
-                                                   FontSize="14" />
+                    <TextBlock
+                    Margin="5,0"
+                    Text="{Binding Content.IsLocked, StringFormat='IsLocked: {0}'}" />
 
-                                        <TextBlock
-                                            Margin="5,0"
-                                            Text="{Binding IsLocked, StringFormat='IsLocked: {0}'}" />
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock
+                        Margin="5,0"
+                        Text="{Binding Content.Left, StringFormat='X: {0:F0}'}" />
 
-                                        <StackPanel Orientation="Horizontal">
-                                            <TextBlock
-                                                Margin="5,0"
-                                                Text="{Binding Left, StringFormat='X: {0}'}" />
+                        <TextBlock
+                        Margin="5,0"
+                        Text="{Binding Content.Top, StringFormat='Y: {0:F0}'}" />
+                    </StackPanel>
 
-                                            <TextBlock
-                                                Margin="5,0"
-                                                Text="{Binding Top, StringFormat='Y: {0}'}" />
-                                        </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock
+                        Margin="5,0"
+                        Text="{Binding Content.Width, StringFormat='Width: {0:F0}'}" />
 
-                                        <StackPanel Orientation="Horizontal">
-                                            <TextBlock
-                                                Margin="5,0"
-                                                Text="{Binding Width, StringFormat='Width: {0}'}" />
+                        <TextBlock
+                        Margin="5,0"
+                        Text="{Binding Content.Height, StringFormat='Height: {0:F0}'}" />
+                    </StackPanel>
 
-                                            <TextBlock
-                                                Margin="5,0"
-                                                Text="{Binding Height, StringFormat='Height: {0}'}" />
-                                        </StackPanel>
 
-                                        <StackPanel Orientation="Horizontal">
-                                            <TextBlock
-                                                Margin="5,0"
-                                                Text="{Binding MinSize.Width, StringFormat='MinWidth: {0}'}" />
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock
+                        Margin="5,0"
+                        Text="{Binding Content.ActualWidth, StringFormat='ActualWidth: {0:F0}'}" />
 
-                                            <TextBlock
-                                                Margin="5,0"
-                                                Text="{Binding MinSize.Height, StringFormat='MinHeight: {0}'}" />
-                                        </StackPanel>
+                        <TextBlock
+                        Margin="5,0"
+                        Text="{Binding Content.ActualHeight, StringFormat='ActualHeight: {0:F0}'}" />
+                    </StackPanel>
 
-                                        <StackPanel Orientation="Horizontal">
-                                            <TextBlock
-                                                Margin="5,0"
-                                                Text="{Binding MaxSize.Width, StringFormat='MaxWidth: {0}'}" />
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock
+                        Margin="5,0"
+                        Text="{Binding Content.MinSize.Width, StringFormat='MinWidth: {0:F0}'}" />
 
-                                            <TextBlock
-                                                Margin="5,0"
-                                                Text="{Binding MaxSize.Height, StringFormat='MaxHeight: {0}'}" />
-                                        </StackPanel>
+                        <TextBlock
+                        Margin="5,0"
+                        Text="{Binding Content.MinSize.Height, StringFormat='MinHeight: {0:F0}'}" />
+                    </StackPanel>
 
-                                    </StackPanel>
-                                </Border>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock
+                        Margin="5,0"
+                        Text="{Binding Content.MaxSize.Width, StringFormat='MaxWidth: {0:F0}'}" />
 
-                                <Thumb Grid.Row="0" Grid.RowSpan="2"
-                                       HorizontalAlignment="Right" VerticalAlignment="Bottom"
-                                       Width="20" Height="20"
-                                       DragDelta="ThumbResize_OnDragDelta"
-                                       Visibility="{Binding IsLocked, Converter={StaticResource TrueToCollapsedConverter}}"
-                                       Style="{StaticResource OverlayThumbStyleKey}"
-                                       Tag="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type xctk:ChildWindow}}}" />
-                            </Grid>
-                        </xctk:ChildWindow>
-                    </xctk:WindowContainer>
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ItemsControl>
+                        <TextBlock
+                        Margin="5,0"
+                        Text="{Binding Content.MaxSize.Height, StringFormat='MaxHeight: {0:F0}'}" />
+                    </StackPanel>
 
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock
+                        Margin="5,0"
+                        Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=SizeToContent, StringFormat='SizeToContent: {0}'}" />
+                    </StackPanel>
+
+                </StackPanel>
+            </Border>
+        </Grid>
+        
+        <Thumb HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="20" Height="20" Cursor="SizeNWSE"
+                   DragDelta="ThumbResize_OnDragDelta"
+                   Style="{StaticResource OverlayThumbStyleKey}"
+                   Visibility="{Binding Content.IsLocked, Converter={StaticResource TrueToCollapsedConverter}}"
+                   Tag="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" >
+        </Thumb>
     </Grid>
 
 </native:TransparentWindow>

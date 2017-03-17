@@ -15,8 +15,8 @@ namespace PoeShared.Scaffolding
 {
     internal sealed class WindowTracker : DisposableReactiveObject, IWindowTracker
     {
-        private static readonly TimeSpan MinRecheckPeriod = TimeSpan.FromMilliseconds(100);
-        private static readonly TimeSpan RecheckPeriod = TimeSpan.FromMilliseconds(1000);
+        private static readonly TimeSpan MinRecheckPeriod = TimeSpan.FromMilliseconds(50);
+        private static readonly TimeSpan RecheckPeriod = TimeSpan.FromMilliseconds(250);
         private readonly Func<string> titleMatcherRegexFunc;
         private readonly WinEventHookWrapper winHook = new WinEventHookWrapper();
 
@@ -33,6 +33,7 @@ namespace PoeShared.Scaffolding
             Guard.ArgumentNotNull(() => titleMatcherRegexFunc);
             this.titleMatcherRegexFunc = titleMatcherRegexFunc;
 
+            winHook.AddTo(Anchors);
             var timerObservable = Observable
                 .Timer(DateTimeOffset.Now, RecheckPeriod)
                 .ToUnit();
@@ -41,7 +42,7 @@ namespace PoeShared.Scaffolding
                 .Sample(MinRecheckPeriod)
                 .ToUnit();
 
-            timerObservable.Merge(hookObservable)
+            Observable.Merge(timerObservable, hookObservable)
                 .Select(_ => NativeMethods.GetForegroundWindow())
                 .DistinctUntilChanged()
                 .Subscribe(WindowActivated)
@@ -91,17 +92,17 @@ namespace PoeShared.Scaffolding
 
             windowHandle = IsActive ? activeWindowHandle : IntPtr.Zero;
 
+            Log.Instance.DebugFormat(
+                "[WindowTracker] Target window is {0}ACTIVE (hwnd 0x{3:X8}  expected title is '{1}', got '{2}')",
+                isActive ? string.Empty : "NOT ",
+                targetTitle,
+                activeWindowTitle,
+                activeWindowHandle.ToInt64());
+
             this.RaisePropertyChanged(nameof(IsActive));
             this.RaisePropertyChanged(nameof(MatchingWindowHandle));
             this.RaisePropertyChanged(nameof(ActiveWindowTitle));
             this.RaisePropertyChanged(nameof(ActiveWindowHandle));
-
-            Log.Instance.DebugFormat(
-                "[WindowTracker] Target window is {0}ACTIVE (hwnd 0x{3:8X}  expected title is '{1}', got '{2}')",
-                isActive ? string.Empty : "NOT ",
-                targetTitle,
-                activeWindowTitle,
-                windowHandle.ToInt64());
         }
 
         private static class NativeMethods

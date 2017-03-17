@@ -3,9 +3,9 @@ using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Windows;
-using System.Windows.Forms;
 using System.Windows.Input;
-using Gma.System.MouseKeyHook;
+using DynamicData;
+using DynamicData.Binding;
 using Guards;
 using JetBrains.Annotations;
 using Microsoft.Practices.Unity;
@@ -19,10 +19,6 @@ using PoeShared.Prism;
 using PoeShared.Scaffolding;
 using Prism.Commands;
 using ReactiveUI;
-using KeyEventArgs = System.Windows.Forms.KeyEventArgs;
-using KeyEventHandler = System.Windows.Forms.KeyEventHandler;
-using MouseEventArgs = System.Windows.Forms.MouseEventArgs;
-using MouseEventHandler = System.Windows.Forms.MouseEventHandler;
 
 namespace PoeEye.TradeMonitor.ViewModels
 {
@@ -30,19 +26,29 @@ namespace PoeEye.TradeMonitor.ViewModels
     {
         private readonly DelegateCommand<INegotiationViewModel> closeNegotiationCommand;
         private readonly IConfigProvider<PoeTradeMonitorConfig> configProvider;
-        private readonly IOverlayWindowController controller;
+        private readonly FakeItemFactory fakeItemFactory;
 
+        private readonly ISourceList<INegotiationViewModel> negotiationsList = new SourceList<INegotiationViewModel>();
         private readonly IFactory<INegotiationViewModel, TradeModel> notificationFactory;
 
         private bool growUpwards;
 
+        private bool isExpanded;
+
+        private int numberOfNegotiationsToExpandByDefault;
+
+        private float opacity;
+
+        private int preGroupNotificationsCount;
+
         public PoeTradeMonitorViewModel(
-            [NotNull] IKeyboardMouseEvents keyboardMouseEvents,
+            [NotNull] IKeyboardEventsSource keyboardMouseEvents,
             [NotNull] IPoeStashService stashService,
             [NotNull] IOverlayWindowController controller,
             [NotNull] IFactory<INegotiationViewModel, TradeModel> notificationFactory,
             [NotNull] ITradeMonitorService tradeMonitorService,
             [NotNull] IConfigProvider<PoeTradeMonitorConfig> configProvider,
+            [NotNull] FakeItemFactory fakeItemFactory,
             [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler,
             [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {
@@ -55,57 +61,77 @@ namespace PoeEye.TradeMonitor.ViewModels
             Guard.ArgumentNotNull(() => bgScheduler);
             Guard.ArgumentNotNull(() => uiScheduler);
 
-            MinSize = new Size(500, 300);
+            MinSize = new Size(500, 200);
             MaxSize = new Size(700, double.NaN);
+            Height = double.NaN;
 
-            this.controller = controller;
+            keyboardMouseEvents.AddTo(Anchors);
             this.notificationFactory = notificationFactory;
             this.configProvider = configProvider;
+            this.fakeItemFactory = fakeItemFactory;
 
-            tradeMonitorService
-                .Trades
-                .ObserveOn(uiScheduler)
-                .Subscribe(ProcessTrade)
-                .AddTo(Anchors);
             CreateFakeTradeCommand = new DelegateCommand(CreateFakeCommandExecuted);
             closeNegotiationCommand = new DelegateCommand<INegotiationViewModel>(CloseNegotiationCommandExecuted);
             LockWindowCommand = new DelegateCommand(LockWindowCommandExecuted);
-            configProvider
-                .WhenAnyValue(x => x.ActualConfig)
-                .Subscribe(ApplyConfig)
-                .AddTo(Anchors);
 
-            this.WhenAnyValue(x => x.NumberOfNegotiationsToExpandByDefault)
-                .Subscribe(x => configProvider.ActualConfig.NumberOfNegotiationsToExpandByDefault = NumberOfNegotiationsToExpandByDefault)
-                .AddTo(Anchors);
+            //FIXME Spaghetti code
+            this.WhenLoaded.Subscribe(
+                () =>
+                {
+                    var pageSizeObservable =
+                        Observable.Merge(
+                                this.WhenAnyValue(x => x.PreGroupNotificationsCount).ToUnit(),
+                                this.WhenAnyValue(x => x.IsExpanded).ToUnit())
+                            .Select(x => IsExpanded ? int.MaxValue : PreGroupNotificationsCount)
+                            .Select(x => new VirtualRequest(0, x));
 
-            Observable
-                .FromEventPattern<KeyEventHandler, KeyEventArgs>(
-                    h => keyboardMouseEvents.KeyDown += h,
-                    h => keyboardMouseEvents.KeyDown -= h)
-                .Select(x => x.EventArgs)
-                .Where(x => controller.IsVisible)
-                .Where(
-                    x =>
-                        new KeyGesture(Key.F8, ModifierKeys.Control | ModifierKeys.Shift | ModifierKeys.Alt)
-                            .MatchesHotkey(x))
-                .Do(x => x.Handled = true)
-                .Subscribe(
-                    () =>
-                    {
-                        if (!IsLocked)
-                        {
-                            LockWindowCommandExecuted();
-                        }
-                        else
-                        {
-                            UnlockWindowCommandExecuted();
-                        }
-                    })
-                .AddTo(Anchors);
+                    this.WhenAnyValue(x => x.GrowUpwards)
+                        .Select(x => negotiationsList.Connect())
+                        .Do(_ => Negotiations.Clear())
+                        .Select(x => x.Virtualise(pageSizeObservable))
+                        .Select(x => GrowUpwards ? x.Reverse() : x)
+                        .Select(x => x.ObserveOn(uiScheduler).Bind(Negotiations))
+                        .Switch()
+                        .Subscribe()
+                        .AddTo(Anchors);
+
+                    this.WhenAnyValue(x => x.ActualHeight)
+                        .Where(x => x > 0)
+                        .WithPrevious((prev, curr) => curr - prev)
+                        .Skip(1)
+                        .Where(x => GrowUpwards)
+                        .Subscribe(delta => Top -= delta)
+                        .AddTo(Anchors);
+
+                    tradeMonitorService
+                        .Trades
+                        .ObserveOn(uiScheduler)
+                        .Subscribe(ProcessTrade)
+                        .AddTo(Anchors);
+
+                    configProvider
+                        .WhenAnyValue(x => x.ActualConfig)
+                        .Subscribe(ApplyConfig)
+                        .AddTo(Anchors);
+
+                    keyboardMouseEvents
+                        .WhenKeyDown
+                        .Where(x => controller.IsVisible)
+                        .Where(x => new KeyGesture(Key.F8, ModifierKeys.Control | ModifierKeys.Shift | ModifierKeys.Alt).MatchesHotkey(x))
+                        .Do(x => x.Handled = true)
+                        .Subscribe(ToggleLock, Log.HandleException)
+                        .AddTo(Anchors);
+
+                    Observable.Merge(
+                            this.WhenAnyValue(x => x.PreGroupNotificationsCount).ToUnit(),
+                            negotiationsList.CountChanged.ToUnit()
+                        )
+                        .Subscribe(() => this.RaisePropertyChanged(nameof(NegotiationsOverflow)))
+                        .AddTo(Anchors);
+                }).AddTo(Anchors);
         }
 
-        public IReactiveList<INegotiationViewModel> Negotiations { get; } = new ReactiveList<INegotiationViewModel>();
+        public IObservableCollection<INegotiationViewModel> Negotiations { get; } = new ObservableCollectionExtended<INegotiationViewModel>();
 
         public ICommand CloseNegotiationCommand => closeNegotiationCommand;
 
@@ -119,34 +145,59 @@ namespace PoeEye.TradeMonitor.ViewModels
             set { this.RaiseAndSetIfChanged(ref growUpwards, value); }
         }
 
-        private int numberOfNegotiationsToExpandByDefault;
-
         public int NumberOfNegotiationsToExpandByDefault
         {
             get { return numberOfNegotiationsToExpandByDefault; }
             set { this.RaiseAndSetIfChanged(ref numberOfNegotiationsToExpandByDefault, value); }
         }
 
-        private float opacity;
+        public int PreGroupNotificationsCount
+        {
+            get { return preGroupNotificationsCount; }
+            set { this.RaiseAndSetIfChanged(ref preGroupNotificationsCount, value); }
+        }
+
+        public bool IsExpanded
+        {
+            get { return isExpanded; }
+            set { this.RaiseAndSetIfChanged(ref isExpanded, value); }
+        }
+
+        public int NegotiationsOverflow => negotiationsList.Count - NumberOfNegotiationsToExpandByDefault;
 
         public float Opacity
         {
             get { return opacity; }
             set { this.RaiseAndSetIfChanged(ref opacity, value); }
         }
+        
+        private void ToggleLock()
+        {
+            if (!IsLocked)
+            {
+                Log.Instance.Debug($"[PoeTradeMonitorViewModel.ToggleLock] Locking window");
+                LockWindowCommandExecuted();
+            }
+            else
+            {
+                Log.Instance.Debug($"[PoeTradeMonitorViewModel.ToggleLock] Unlocking window");
+                UnlockWindowCommandExecuted();
+            }
+        }
 
         private void ProcessTrade(TradeModel model)
         {
+            Log.Instance.Debug($"[PoeTradeMonitorViewModel.ProcessTrade] New trade: {model}");
             var newNegotiaton = notificationFactory.Create(model);
-            var closeController = new NegotiationClassController(Negotiations, newNegotiaton);
+            var closeController = new NegotiationClassController(this, newNegotiaton);
+            Log.Instance.Debug($"[PoeTradeMonitorViewModel.ProcessTrade] Negotiation model: {newNegotiaton}");
 
             newNegotiaton.SetCloseController(closeController);
 
-            Negotiations.Add(newNegotiaton);
+            negotiationsList.Add(newNegotiaton);
 
-            var expandedItemsCount = Negotiations.Count(x => x.IsExpanded);
-            if (expandedItemsCount < configProvider.ActualConfig.NumberOfNegotiationsToExpandByDefault &&
-                Negotiations.Count > 0)
+            var expandedItemsCount = negotiationsList.Items.Count(x => x.IsExpanded);
+            if (expandedItemsCount < NumberOfNegotiationsToExpandByDefault)
             {
                 newNegotiaton.IsExpanded = true;
             }
@@ -154,30 +205,27 @@ namespace PoeEye.TradeMonitor.ViewModels
 
         private void CloseNegotiationCommandExecuted(INegotiationViewModel negotiation)
         {
+            Log.Instance.Debug($"[PoeTradeMonitorViewModel.CloseNegotiation] Closing negotiation {negotiation}");
             if (negotiation == null)
             {
                 return;
             }
-            Negotiations.Remove(negotiation);
+            negotiationsList.Remove(negotiation);
             negotiation.Dispose();
         }
 
         private void CreateFakeCommandExecuted()
         {
-            var fake = new TradeModel
-            {
-                CharacterName = "Xaber",
-                PositionName = "test item name",
-                Price = new PoePrice("chaos", 5.5f),
-                Timestamp = DateTime.Now
-            };
+            var fake = fakeItemFactory.Create();
             ProcessTrade(fake);
         }
 
         private void ApplyConfig(PoeTradeMonitorConfig config)
         {
+            Log.Instance.Debug($"[PoeTradeMonitorViewModel.ApplyConfig] Config has changed");
             GrowUpwards = config.GrowUpwards;
             NumberOfNegotiationsToExpandByDefault = config.NumberOfNegotiationsToExpandByDefault;
+            PreGroupNotificationsCount = config.PreGroupNotificationsCount;
 
             if (config.OverlaySize.Height <= 0 || config.OverlaySize.Width <= 0)
             {
@@ -185,7 +233,6 @@ namespace PoeEye.TradeMonitor.ViewModels
                 config.OverlaySize = MinSize;
             }
             Width = config.OverlaySize.Width;
-            Height = config.OverlaySize.Height;
 
             if (config.OverlayLocation.X <= 1 && config.OverlayLocation.Y <= 1)
             {
@@ -193,7 +240,16 @@ namespace PoeEye.TradeMonitor.ViewModels
                 config.OverlayLocation = new Point(Width / 2, Height / 2);
             }
             Left = config.OverlayLocation.X;
-            Top = config.OverlayLocation.Y;
+
+            if (growUpwards)
+            {
+                var deltaHeight = ActualHeight - config.OverlaySize.Height;
+                Top = config.OverlayLocation.Y - deltaHeight;
+            }
+            else
+            {
+                Top = config.OverlayLocation.Y;
+            }
 
             if (config.OverlayOpacity <= 0.01)
             {
@@ -211,6 +267,7 @@ namespace PoeEye.TradeMonitor.ViewModels
             config.NumberOfNegotiationsToExpandByDefault = NumberOfNegotiationsToExpandByDefault;
             config.OverlaySize = new Size(Width, Height);
             config.OverlayOpacity = Opacity;
+            config.PreGroupNotificationsCount = PreGroupNotificationsCount;
             configProvider.Save(config);
             IsLocked = true;
         }
@@ -223,9 +280,9 @@ namespace PoeEye.TradeMonitor.ViewModels
         private class NegotiationClassController : INegotiationCloseController
         {
             private readonly INegotiationViewModel negotiation;
-            private readonly IReactiveList<INegotiationViewModel> owner;
+            private readonly PoeTradeMonitorViewModel owner;
 
-            public NegotiationClassController(IReactiveList<INegotiationViewModel> owner,
+            public NegotiationClassController(PoeTradeMonitorViewModel owner,
                 INegotiationViewModel negotiation)
             {
                 this.owner = owner;
@@ -234,7 +291,7 @@ namespace PoeEye.TradeMonitor.ViewModels
 
             public void Close()
             {
-                owner.Remove(negotiation);
+                owner.CloseNegotiationCommandExecuted(negotiation);
             }
         }
     }

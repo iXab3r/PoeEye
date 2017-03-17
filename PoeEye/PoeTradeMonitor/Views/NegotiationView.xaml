@@ -64,7 +64,7 @@
                         </Grid.ColumnDefinitions>
 
                         <TextBlock Grid.Column="0" 
-                                   Foreground="#EEC64C"
+                                   Foreground="{StaticResource TradeMonitorTextBrushKey}"
                                    MaxWidth="120"
                                    TextTrimming="CharacterEllipsis"
                                    Text="{Binding CharacterName}"/>
@@ -100,7 +100,7 @@
                         </StackPanel>
 
                         <TextBlock Grid.Column="3" 
-                                   Foreground="#EEC64C"
+                                   Foreground="{StaticResource TradeMonitorTextBrushKey}"
                                    FontSize="13"
                                    Text="{Binding TimeElapsed, Converter={StaticResource TimeSpanToHumanReadableStringConverter}}"/>
 
@@ -162,7 +162,7 @@
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
-                    <Viewbox Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="4" >
+                    <Viewbox Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="4" Height="40">
                         <StackPanel Orientation="Horizontal" 
                                 Background="Transparent"
                                 HorizontalAlignment="Center"
@@ -197,12 +197,22 @@
                                       Margin="5,0">
                             </ContentPresenter>
 
-                            <ContentPresenter VerticalAlignment="Center" 
+                            <StackPanel Orientation="Vertical">
+                                <ContentPresenter VerticalAlignment="Center" 
                                               TextBlock.Foreground="{StaticResource PoeItemRarityUniqueBrush}"
                                               TextBlock.FontSize="16"
                                               TextBlock.FontWeight="SemiBold"
                                               Content="{Binding ItemName}">
-                            </ContentPresenter>
+                                </ContentPresenter>
+
+                                <TextBlock 
+                                   Foreground="{StaticResource TradeMonitorTextBrushKey}"
+                                   FontSize="13"
+                                   Margin="0,1"
+                                   Text="{Binding Offer}"
+                                   HorizontalAlignment="Center"
+                                   Visibility="{Binding Offer, Converter={StaticResource NullToCollapsedConverter}}"/>
+                            </StackPanel>
                         </StackPanel>
                     </Viewbox>
 
@@ -233,7 +243,7 @@
 
                     <StackPanel Orientation="Horizontal" Grid.Column="3" Grid.Row="1">
                         <TextBlock 
-                                   Foreground="#EEC64C"
+                                   Foreground="{StaticResource TradeMonitorTextBrushKey}"
                                    VerticalAlignment="Center"
                                    HorizontalAlignment="Right"
                                    Margin="5,0">

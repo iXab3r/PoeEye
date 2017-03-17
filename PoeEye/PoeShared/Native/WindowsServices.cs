@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Windows.Interop;
 
 namespace PoeShared.Native
 {
@@ -11,9 +13,13 @@ namespace PoeShared.Native
         private const int GWL_EXSTYLE = -20;
         private const int SW_SHOWNOACTIVATE = 4;
         private const int SW_HIDE = 0;
-        private const int SW_SHOWNORMAL = 01
+        private const int SW_SHOWNORMAL = 0;
         private const int HWND_TOPMOST = -1;
         private const uint SWP_NOACTIVATE = 0x0010;
+        private const int SWP_NOMOVE = 0x0002;
+        private const int SWP_NOSIZE = 0x0001;
+        private const int GWL_STYLE = -16;
+        private const int WS_SYSMENU = 0x80000;
 
         [DllImport("user32.dll", EntryPoint = "SetWindowPos")]
         private static extern bool SetWindowPos(
@@ -32,6 +38,9 @@ namespace PoeShared.Native
         private static extern int GetWindowLong(IntPtr hwnd, int index);
 
         [DllImport("user32.dll")]
+        private static extern bool AllowSetForegroundWindow(uint processId);
+
+        [DllImport("user32.dll")]
         private static extern int SetWindowLong(IntPtr hwnd, int index, int newStyle);
 
         [DllImport("user32.dll")]
@@ -40,6 +49,29 @@ namespace PoeShared.Native
 
         [DllImport("User32.dll")]
         public static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
+
+        static WindowsServices()
+        {
+            try
+            {
+                var processId = Process.GetCurrentProcess().Id;
+                Log.Instance.Warn($"[WindowsServices] Calling AllowSetForegroundWindow(pid: {processId})");
+                var result = AllowSetForegroundWindow((uint)processId);
+                if (!result)
+                {
+                    Log.Instance.Warn($"[WindowsServices] AllowSetForegroundWindow has failed !");
+                }
+            }
+            catch (Exception e)
+            {
+                Log.HandleException(e);
+            }
+        }
+
+        public static void HideSystemMenu(IntPtr hwnd)
+        {
+            SetWindowLong(hwnd, GWL_STYLE, GetWindowLong(hwnd, GWL_STYLE) & ~WS_SYSMENU);
+        }
 
         public static void ShowInactiveTopmost(IntPtr handle, int left, int top, int width, int height)
         {

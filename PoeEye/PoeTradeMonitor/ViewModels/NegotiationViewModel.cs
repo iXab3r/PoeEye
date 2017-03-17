@@ -140,6 +140,8 @@ namespace PoeEye.TradeMonitor.ViewModels
 
         public TradeType NegotiationType => Negotiation.TradeType;
 
+        public string Offer => Negotiation.Offer;
+
         public IReactiveList<MacroCommand> MacroCommands => macroCommandsProvider.MacroCommands;
 
         public TimeSpan TimeElapsed => clock.Now - Negotiation.Timestamp;

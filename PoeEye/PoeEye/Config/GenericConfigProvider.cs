@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq.Expressions;
 using System.Reactive;
 using System.Reactive.Linq;
 using Guards;
@@ -26,6 +27,14 @@ namespace PoeEye.Config
         }
 
         public TConfig ActualConfig => configLoader.Value;
+
+        public IObservable<T> ListenTo<T>(Expression<Func<TConfig, T>> fieldToMonitor)
+        {
+            return
+                this.WhenAnyValue(x => x.ActualConfig)
+                    .Select(config => config.WhenAnyValue(fieldToMonitor))
+                    .Switch();
+        }
 
         public void Reload()
         {

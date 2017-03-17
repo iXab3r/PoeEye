@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Linq.Expressions;
 using System.Reactive;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
@@ -14,6 +15,9 @@ namespace PoeShared.Modularity
         void Reload();
 
         void Save([NotNull] TConfig config);
+
+        [NotNull] 
+        IObservable<T> ListenTo<T>([NotNull] Expression<Func<TConfig, T>> fieldToMonitor);
     }
 
     public interface IConfigProvider

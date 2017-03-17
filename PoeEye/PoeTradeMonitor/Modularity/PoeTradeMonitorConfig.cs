@@ -15,6 +15,8 @@ namespace PoeEye.TradeMonitor.Modularity
 
         public int NumberOfNegotiationsToExpandByDefault { get; set; } = 1;
 
+        public int PreGroupNotificationsCount { get; set; } = 3;
+
         public bool GrowUpwards { get; set; }
 
         public float OverlayOpacity { get; set; }

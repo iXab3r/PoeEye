@@ -14,7 +14,7 @@ namespace PoeShared.Converters
         private static readonly Lazy<IConverter<string, PoePrice>> instance = new Lazy<IConverter<string, PoePrice>>(() => new PriceToCurrencyConverter());
         private static readonly Regex CurrencyParser = new Regex(@"^[~]?(?:b\/o |price )?(?'value'[\d\.\,]+) ?(?'type'[\w ]+)$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
-        private static readonly IDictionary<string, string> DefaultCurrencyByAlias = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        public static readonly IDictionary<string, string> DefaultCurrencyByAlias = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
             {"Orb of Alteration", KnownCurrencyNameList.OrbOfAlteration},
             {"Blessed Orb", KnownCurrencyNameList.BlessedOrb},

@@ -14,7 +14,6 @@
   <converters:ObjectToLowercaseConverter x:Key="ObjectToLowercaseConverter" />
   <converters:NullToBoolConverter x:Key="NullToTrueConverter" NullValue="True" />
   <converters:NullToBoolConverter x:Key="NullToFalseConverter" NullValue="False" />
-  <converters:BoolInversionConverter x:Key="BoolInversionConverter" />
   <converters:TimeSpanToSecondsConverter x:Key="TimeSpanToSecondsConverter" />
 
   <converters:PriceToImageUriConverter x:Key="PriceToImageUriConverter" />

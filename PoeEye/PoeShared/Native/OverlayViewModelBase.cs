@@ -1,4 +1,8 @@
-﻿using System.Windows;
+﻿using System;
+using System.Reactive;
+using System.Reactive.Subjects;
+using System.Windows;
+using JetBrains.Annotations;
 using PoeShared.Scaffolding;
 using ReactiveUI;
 
@@ -6,7 +10,9 @@ namespace PoeShared.Native
 {
     public abstract class OverlayViewModelBase : DisposableReactiveObject, IOverlayViewModel
     {
-        private object header;
+        private double actualHeight;
+
+        private double actualWidth;
 
         private double height;
         private bool isLocked = true;
@@ -18,6 +24,18 @@ namespace PoeShared.Native
         private double top;
 
         private double width;
+
+        public double ActualHeight
+        {
+            get { return actualHeight; }
+            set { this.RaiseAndSetIfChanged(ref actualHeight, value); }
+        }
+
+        public double ActualWidth
+        {
+            get { return actualWidth; }
+            set { this.RaiseAndSetIfChanged(ref actualWidth, value); }
+        }
 
         public double Left
         {
@@ -61,10 +79,8 @@ namespace PoeShared.Native
             set { this.RaiseAndSetIfChanged(ref isLocked, value); }
         }
 
-        public object Header
-        {
-            get { return header; }
-            set { this.RaiseAndSetIfChanged(ref header, value); }
-        }
+        public ISubject<Unit> WhenLoaded { get; } = new ReplaySubject<Unit>(1);
+
+        IObservable<Unit> IOverlayViewModel.WhenLoaded => this.WhenLoaded;
     }
 }

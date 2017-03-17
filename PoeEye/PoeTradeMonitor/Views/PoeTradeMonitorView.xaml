@@ -34,13 +34,33 @@
                                     TrueValue="Hidden"
                                     FalseValue="Visible" />
 
+    <blue:Int32ToVisibilityConverter x:Key="Int32GreatherThanZeroToVisibleConverterKey" 
+                                     TrueValue="Visible" FalseValue="Hidden">
+        <blue:Int32ToVisibilityConverter.ComparisonStrategy>
+            <blue:Int32ComparisonStrategy Mode="GreaterThan" Comparand="0"/>
+        </blue:Int32ToVisibilityConverter.ComparisonStrategy>
+    </blue:Int32ToVisibilityConverter>
+
     <DataTemplate DataType="{x:Type viewModels:PoeTradeMonitorViewModel}">
         <DataTemplate.Resources>
             <Style TargetType="{x:Type ScrollBar}" BasedOn="{StaticResource SlimScrollBarStyleKey}" />
         </DataTemplate.Resources>
-        <Grid>
+        <Grid x:Name="TradeMonitorOverlay">
+            <Grid.Style>
+                <Style TargetType="{x:Type Grid}">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding GrowUpwards}" Value="True">
+                            <Setter Property="LayoutTransform">
+                                <Setter.Value>
+                                    <ScaleTransform ScaleY="1"></ScaleTransform>
+                                </Setter.Value>
+                            </Setter>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Grid.Style>
+
             <Border
-                x:Name="TradeMonitorBackground"
                 Background="{StaticResource TradeMonitorBackgroundBrushKey}"
                 BorderBrush="{StaticResource TradeMonitorBorderBrushKey}"
                 Opacity="{Binding Opacity}"
@@ -51,21 +71,19 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="36" />
                     <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
+                <!-- Header -->
                 <Border Grid.Row="0"
+                        wpf:EnableDragHelper.EnableDrag="True"
                         Background="{StaticResource TradeMonitorTitleBackgroundBrushKey}"
                         BorderBrush="{StaticResource TradeMonitorBorderBrushKey}"
                         BorderThickness="1"
+                        LayoutTransform="{Binding ElementName=TradeMonitorOverlay, Path=LayoutTransform}"
                         Visibility="{Binding IsLocked, Converter={StaticResource TrueToHiddenFalseToVisibleConverter}}"
                         Margin="3">
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Style="{StaticResource TradeMonitorTextBlockStyleKey}"
-                                   Text="{x:Static net:FontAwesome.lock}"
-                                   Margin="3,0"
-                                   FontSize="16"
-                                   Visibility="{Binding IsLocked, Converter={StaticResource TrueToVisibleFalseToHiddenConverter}}" />
                         <Button Command="{Binding LockWindowCommand}" Width="30" Height="30">
                             <Button.Style>
                                 <Style TargetType="{x:Type Button}"
@@ -114,14 +132,6 @@
                                 </EventTrigger>
                             </Button.Triggers>
                         </Button>
-
-                        <TextBlock Style="{StaticResource TradeMonitorTextBlockStyleKey}"
-                                   Text=""
-                                   Margin="3,0"
-                                   Foreground="Red"
-                                   FontSize="16"
-                                   Visibility="{Binding IsLocked, Converter={StaticResource TrueToHiddenFalseToVisibleConverter}}" />
-
                         <TextBlock Style="{StaticResource TradeMonitorTextBlockStyleKey}"
                                    Text="Trade Monitor"
                                    Foreground="#EEC64C"
@@ -130,17 +140,22 @@
 
                         <Button Content="Create fake trade"
                                 Margin="10,0"
-                                Height="25"
-                                HorizontalAlignment="Right" Width="140" Command="{Binding CreateFakeTradeCommand}" />
+                                Height="22"
+                                Style="{StaticResource TradeMonitorButtonStyleKey}"
+                                HorizontalAlignment="Right" 
+                                Width="180" 
+                                Command="{Binding CreateFakeTradeCommand}" />
                     </StackPanel>
                 </Border>
 
+                <!-- Configuration -->
                 <Border Grid.Row="1"
                         Background="{StaticResource TradeMonitorTitleBackgroundBrushKey}"
                         BorderBrush="{StaticResource TradeMonitorBorderBrushKey}"
                         BorderThickness="1"
                         Visibility="{Binding IsLocked, Converter={StaticResource TrueToHiddenFalseToVisibleConverter}}"
-                        Margin="3">
+                        Margin="3"
+                        LayoutTransform="{Binding ElementName=TradeMonitorOverlay, Path=LayoutTransform}">
 
                     <StackPanel Orientation="Vertical">
                         <Grid>
@@ -164,6 +179,32 @@
 
                             <TextBlock Grid.Column="2"
                                        Text="{Binding NumberOfNegotiationsToExpandByDefault}"
+                                       TextAlignment="Left"
+                                       Style="{StaticResource TradeMonitorTextBlockStyleKey}"
+                                       Margin="5,0" />
+                        </Grid>
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" MinWidth="100"
+                                       Style="{StaticResource TradeMonitorTextBlockStyleKey}"
+                                       TextAlignment="Right"
+                                       Text="Pre-group: " />
+
+                            <Slider Grid.Column="1"
+                                    Value="{Binding PreGroupNotificationsCount}"
+                                    Minimum="1"
+                                    TickFrequency="1"
+                                    IsSnapToTickEnabled="True"
+                                    Margin="10,0"
+                                    Maximum="{x:Static modularity:PoeTradeMonitorConfig.MaxNumberOfNegotiationsToExpand}" />
+
+                            <TextBlock Grid.Column="2"
+                                       Text="{Binding PreGroupNotificationsCount}"
                                        TextAlignment="Left"
                                        Style="{StaticResource TradeMonitorTextBlockStyleKey}"
                                        Margin="5,0" />
@@ -208,59 +249,146 @@
                     </StackPanel>
                 </Border>
 
-                <ItemsControl Grid.Row="2" ItemsSource="{Binding Negotiations}"
-                              Opacity="{Binding Opacity}"
-                              ScrollViewer.HorizontalScrollBarVisibility="Hidden"
-                              ScrollViewer.VerticalScrollBarVisibility="Auto">
-                    <ItemsControl.Style>
-                        <Style TargetType="{x:Type ItemsControl}">
-                            <Setter Property="VirtualizingStackPanel.IsVirtualizing" Value="False" />
-                            <Setter Property="VirtualizingPanel.ScrollUnit" Value="Item" />
-                            <Setter Property="ScrollViewer.CanContentScroll" Value="True" />
-                            <Setter Property="Focusable" Value="False" />
-                            <Setter Property="IsTabStop" Value="False" />
-                            <Setter Property="Background" Value="Transparent"/>
-                            <Setter Property="ItemsPanel">
-                                <Setter.Value>
-                                    <ItemsPanelTemplate>
-                                        <VirtualizingStackPanel HorizontalAlignment="Stretch" 
-                                                                Background="Transparent"
-                                                                VerticalAlignment="Top" />
-                                    </ItemsPanelTemplate>
-                                </Setter.Value>
-                            </Setter>
-                            <Setter Property="Template">
-                                <Setter.Value>
-                                    <ControlTemplate TargetType="ItemsControl">
-                                        <Border
-                                            BorderThickness="{TemplateBinding Border.BorderThickness}"
-                                            Padding="{TemplateBinding Control.Padding}"
-                                            BorderBrush="{TemplateBinding Border.BorderBrush}"
-                                            Background="{TemplateBinding Panel.Background}"
-                                            SnapsToDevicePixels="True">
-                                            <ScrollViewer Padding="{TemplateBinding Control.Padding}" Focusable="False">
+                <!-- Body -->
+                <Grid Grid.Row="2" 
+                      Opacity="{Binding Opacity}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="24" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Border Grid.Column="0" 
+                            BorderThickness="1" 
+                            BorderBrush="{StaticResource TradeMonitorBorderBrushKey}"
+                            Background="{StaticResource TradeMonitorTitleBackgroundBrushKey}"
+                            LayoutTransform="{Binding ElementName=TradeMonitorOverlay, Path=LayoutTransform}"
+                            Visibility="{Binding NegotiationsOverflow, Converter={StaticResource Int32GreatherThanZeroToVisibleConverterKey}}"
+                            Margin="5,5,0,5">
+                        <Grid>
+                            <TextBlock Style="{StaticResource TradeMonitorTextBlockStyleKey}"
+                                       Text="{Binding Negotiations.Count}"
+                                       VerticalAlignment="Top"
+                                       HorizontalAlignment="Center"
+                                       Margin="1"
+                                       FontWeight="Bold"
+                                       Foreground="{StaticResource TradeMonitorTextBrushKey}"
+                                       Visibility="{Binding IsExpanded, Converter={StaticResource TrueToVisibleConverter}}"/>
+                            <TextBlock Style="{StaticResource TradeMonitorTextBlockStyleKey}"
+                                       Text="{Binding NegotiationsOverflow, StringFormat='+{0}'}"
+                                       VerticalAlignment="Top"
+                                       HorizontalAlignment="Center"
+                                       Margin="1"
+                                       FontWeight="Bold"
+                                       Foreground="{StaticResource TradeMonitorTextBrushKey}"
+                                       Visibility="{Binding IsExpanded, Converter={StaticResource TrueToCollapsedConverter}}"/>
+
+                            <ToggleButton IsChecked="{Binding IsExpanded}"
+                                      Background="Transparent">
+                                <ToggleButton.Style>
+                                    <Style TargetType="{x:Type ToggleButton}">
+                                        <Setter Property="BorderThickness" Value="0"/>
+                                        <Setter Property="Foreground" Value="{StaticResource AccentColorBrush2}"/>
+                                        <Setter Property="FontFamily" Value="{StaticResource FontAwesome}"/>
+                                        <Setter Property="FontSize" Value="24"/>
+                                        <Setter Property="Focusable" Value="False"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsExpanded}" Value="True">
+                                                <Setter Property="FontWeight" Value="Bold"/>
+                                            </DataTrigger>
+                                            <MultiDataTrigger>
+                                                <MultiDataTrigger.Conditions>
+                                                    <Condition Binding="{Binding IsExpanded}" Value="True" />
+                                                    <Condition Binding="{Binding GrowUpwards}" Value="True" />
+                                                </MultiDataTrigger.Conditions>
+                                                <Setter Property="Content" Value="{x:Static net:FontAwesome.angle_double_down}" />
+                                            </MultiDataTrigger>
+                                            <MultiDataTrigger>
+                                                <MultiDataTrigger.Conditions>
+                                                    <Condition Binding="{Binding IsExpanded}" Value="False" />
+                                                    <Condition Binding="{Binding GrowUpwards}" Value="True" />
+                                                </MultiDataTrigger.Conditions>
+                                                <Setter Property="Content" Value="{x:Static net:FontAwesome.angle_double_up}" />
+                                            </MultiDataTrigger>
+                                            <MultiDataTrigger>
+                                                <MultiDataTrigger.Conditions>
+                                                    <Condition Binding="{Binding IsExpanded}" Value="True" />
+                                                    <Condition Binding="{Binding GrowUpwards}" Value="False" />
+                                                </MultiDataTrigger.Conditions>
+                                                <Setter Property="Content" Value="{x:Static net:FontAwesome.angle_double_up}" />
+                                            </MultiDataTrigger>
+                                            <MultiDataTrigger>
+                                                <MultiDataTrigger.Conditions>
+                                                    <Condition Binding="{Binding IsExpanded}" Value="False" />
+                                                    <Condition Binding="{Binding GrowUpwards}" Value="False" />
+                                                </MultiDataTrigger.Conditions>
+                                                <Setter Property="Content" Value="{x:Static net:FontAwesome.angle_double_down}" />
+                                            </MultiDataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+
+                                </ToggleButton.Style>
+                            </ToggleButton>
+
+                        </Grid>
+
+                    </Border>
+
+
+                    <ItemsControl Grid.Column="1"
+                                  ItemsSource="{Binding Negotiations}"
+                                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                  ScrollViewer.VerticalScrollBarVisibility="Disabled">
+                        <ItemsControl.Style>
+                            <Style TargetType="{x:Type ItemsControl}">
+                                <Setter Property="Focusable" Value="False" />
+                                <Setter Property="IsTabStop" Value="False" />
+                                <Setter Property="Background" Value="Transparent" />
+                                <Setter Property="ItemsPanel">
+                                    <Setter.Value>
+                                        <ItemsPanelTemplate>
+                                            <StackPanel HorizontalAlignment="Stretch"
+                                                                    Background="Transparent"
+                                                                    LayoutTransform="{Binding ElementName=TradeMonitorOverlay, Path=LayoutTransform}"
+                                                                    VerticalAlignment="Top" />
+                                        </ItemsPanelTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="ItemsControl">
+                                            <Border
+                                                BorderThickness="{TemplateBinding Border.BorderThickness}"
+                                                Padding="{TemplateBinding Control.Padding}"
+                                                BorderBrush="{TemplateBinding Border.BorderBrush}"
+                                                Background="{TemplateBinding Panel.Background}"
+                                                SnapsToDevicePixels="True">
                                                 <ItemsPresenter SnapsToDevicePixels="{TemplateBinding UIElement.SnapsToDevicePixels}" />
-                                            </ScrollViewer>
-                                        </Border>
-                                    </ControlTemplate>
-                                </Setter.Value>
-                            </Setter>
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding GrowUpwards}" Value="True">
-                                    <Setter Property="ItemsPanel">
-                                        <Setter.Value>
-                                            <ItemsPanelTemplate>
-                                                <VirtualizingStackPanel HorizontalAlignment="Stretch"
-                                                                        Background="Transparent"
-                                                                        VerticalAlignment="Bottom" />
-                                            </ItemsPanelTemplate>
-                                        </Setter.Value>
-                                    </Setter>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </ItemsControl.Style>
-                </ItemsControl>
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding GrowUpwards}" Value="True">
+                                        <Setter Property="ItemsPanel">
+                                            <Setter.Value>
+                                                <ItemsPanelTemplate>
+                                                    <StackPanel HorizontalAlignment="Stretch"
+                                                                            Background="Transparent"
+                                                                            LayoutTransform="{Binding ElementName=TradeMonitorOverlay, Path=LayoutTransform}"
+                                                                            VerticalAlignment="Bottom" />
+                                                </ItemsPanelTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding Negotiations.Count}" Value="0">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ItemsControl.Style>
+                    </ItemsControl>
+                </Grid>
+
             </Grid>
         </Grid>
     </DataTemplate>

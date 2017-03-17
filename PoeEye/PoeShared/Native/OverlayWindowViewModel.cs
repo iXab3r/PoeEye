@@ -1,19 +1,12 @@
-﻿using PoeShared.Scaffolding;
+﻿using JetBrains.Annotations;
+using PoeShared.Scaffolding;
 using ReactiveUI;
 
 namespace PoeShared.Native
 {
     internal sealed class OverlayWindowViewModel : DisposableReactiveObject
     {
-        private bool isVisible;
-
         private bool showWireframes;
-
-        public bool IsVisible
-        {
-            get { return isVisible; }
-            set { this.RaiseAndSetIfChanged(ref isVisible, value); }
-        }
 
         public bool ShowWireframes
         {
@@ -21,6 +14,6 @@ namespace PoeShared.Native
             set { this.RaiseAndSetIfChanged(ref showWireframes, value); }
         }
 
-        public IReactiveList<IOverlayViewModel> Items { get; } = new ReactiveList<IOverlayViewModel>();
+        public IOverlayViewModel Content { [CanBeNull] get; [CanBeNull] set; }
     }
 }

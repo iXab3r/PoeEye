@@ -11,7 +11,11 @@
                     xmlns:poeTrade1="clr-namespace:PoeEye.PoeTrade.Common"
                     xmlns:controls="clr-namespace:PoeShared.Scaffolding.WPF.Controls;assembly=PoeShared">
 
-  <DataTemplate x:Key="PoeItemStatsTemplateKey" DataType="{x:Type common:IPoeItem}">
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Converters.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+
+    <DataTemplate x:Key="PoeItemStatsTemplateKey" DataType="{x:Type common:IPoeItem}">
     <!-- Stats -->
     <Grid Margin="10,5">
       <Grid.Resources>
@@ -315,7 +319,7 @@
                   <i:EventTrigger EventName="MouseDoubleClick">
                     <utilities:SetPropertyAction PropertyName="IsExpanded"
                                            TargetObject="{Binding ElementName=ExpanderRaw}"
-                                           PropertyValue="{Binding ElementName=ExpanderRaw, Path=IsExpanded, Converter={StaticResource BoolInversionConverter}}" />
+                                           PropertyValue="{Binding ElementName=ExpanderRaw, Path=IsExpanded, Converter={StaticResource NotConverter}}" />
                   </i:EventTrigger>
                 </i:Interaction.Triggers>
               </ContentControl>

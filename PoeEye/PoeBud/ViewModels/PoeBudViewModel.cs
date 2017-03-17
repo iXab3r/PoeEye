@@ -33,7 +33,7 @@ namespace PoeBud.ViewModels
         private static readonly TimeSpan UpdateTimeout = TimeSpan.FromSeconds(1);
         private readonly IClock clock;
         private readonly ISubject<Exception> exceptionsToPropagate = new Subject<Exception>();
-        private readonly IKeyboardMouseEvents keyboardMouseEvents;
+        private readonly IKeyboardEventsSource keyboardMouseEvents;
         private readonly IUiOverlaysProvider overlaysProvider;
         private readonly ObservableAsPropertyHelper<Exception> lastUpdateException;
         private readonly IFactory<IPoeStashUpdater, IStashUpdaterParameters> stashAnalyzerFactory;
@@ -56,7 +56,7 @@ namespace PoeBud.ViewModels
             [NotNull] ISolutionExecutorViewModel solutionExecutor,
             [NotNull] IConfigProvider<PoeBudConfig> poeBudConfigProvider,
             [NotNull] IClock clock,
-            [NotNull] IKeyboardMouseEvents keyboardMouseEvents,
+            [NotNull] IKeyboardEventsSource keyboardMouseEvents,
             [NotNull] IUserInteractionsManager userInteractionsManager,
             [NotNull] IUiOverlaysProvider overlaysProvider,
             [NotNull] IFactory<IPoeStashUpdater, IStashUpdaterParameters> stashAnalyzerFactory,
@@ -83,6 +83,8 @@ namespace PoeBud.ViewModels
 
             SolutionExecutor = solutionExecutor;
             WindowManager = windowManager;
+
+            keyboardMouseEvents.AddTo(Anchors);
 
             poeBudConfigProvider
                 .WhenAnyValue(x => x.ActualConfig)
@@ -176,9 +178,8 @@ namespace PoeBud.ViewModels
                     return;
                 }
 
-                var keyPressedObservable = Observable.FromEventPattern<WinFormsKeyEventHandler, WinFormsKeyEventArgs>(
-                        h => keyboardMouseEvents.KeyDown += h,
-                        h => keyboardMouseEvents.KeyDown -= h)
+                var keyPressedObservable = keyboardMouseEvents
+                    .WhenKeyDown
                     .Where(x => IsEnabled)
                     .Where(x => !SolutionExecutor.IsBusy)
                     .Where(x => WindowManager.ActiveWindow != null)
@@ -186,15 +187,15 @@ namespace PoeBud.ViewModels
                 keyPressedObservable.Connect().AddTo(stashDisposable);
 
                 keyPressedObservable
-                    .Where(x => hotkey.MatchesHotkey(x.EventArgs))
-                    .Do(x => x.EventArgs.Handled = true)
+                    .Where(x => hotkey.MatchesHotkey(x))
+                    .Do(x => x.Handled = true)
                     .Subscribe(ExecuteSolutionCommandExecuted)
                     .AddTo(stashDisposable);
 
                 var refreshHotkey = new KeyGesture(hotkey.Key, ModifierKeys.Control | ModifierKeys.Shift);
                 keyPressedObservable
-                   .Where(x => refreshHotkey.MatchesHotkey(x.EventArgs))
-                   .Do(x => x.EventArgs.Handled = true)
+                   .Where(x => refreshHotkey.MatchesHotkey(x))
+                   .Do(x => x.Handled = true)
                    .Subscribe(ForceRefreshStashCommandExecuted)
                    .AddTo(stashDisposable);
 

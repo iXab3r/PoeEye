@@ -9,6 +9,7 @@ using Guards;
 using JetBrains.Annotations;
 using Microsoft.Practices.Unity;
 using PoeOracle.Models;
+using PoeShared;
 using PoeShared.Native;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
@@ -39,7 +40,7 @@ namespace PoeOracle.ViewModels
         private string query;
 
         public PoeOracleViewModel(
-            [NotNull] IKeyboardMouseEvents keyboardMouseEvents,
+            [NotNull] IKeyboardEventsSource keyboardMouseEvents,
             [NotNull] IOverlayWindowController controller,
             [NotNull] ISuggestionsDataSource dataSource,
             [NotNull] IExternalUriOpener uriOpener,
@@ -61,13 +62,11 @@ namespace PoeOracle.ViewModels
             gotoGamepediaCommand = new DelegateCommand(GotoGamepediaCommandExecuted, CanExecuteGotoGamepediaCommand);
             this.WhenAnyValue(x => x.Query).Subscribe(gotoGamepediaCommand.RaiseCanExecuteChanged).AddTo(Anchors);
 
-            Observable
-                .FromEventPattern<KeyEventHandler, KeyEventArgs>(
-                    h => keyboardMouseEvents.KeyDown += h,
-                    h => keyboardMouseEvents.KeyDown -= h)
-                .Select(x => x.EventArgs)
+            keyboardMouseEvents.AddTo(Anchors);
+            keyboardMouseEvents
+                .WhenKeyDown
                 .Where(x => controller.IsVisible)
-                .Subscribe(ProcessKeyDown)
+                .Subscribe(ProcessKeyDown, Log.HandleException)
                 .AddTo(Anchors);
 
             this.WhenAnyValue(x => x.Query)
@@ -153,8 +152,6 @@ namespace PoeOracle.ViewModels
         {
             IsVisible = true;
             IsFocused = true;
-
-            controller.Activate();
         }
 
         private void SnapToOverlayCenter()
@@ -164,8 +161,8 @@ namespace PoeOracle.ViewModels
             Height = double.NaN;
             var oracleSize = new Size(OracleActualWidth, 0);
 
-            var top = controller.Top + controller.Height / 2;
-            var left = controller.Left + controller.Width / 2;
+            var top = Top + ActualHeight / 2;
+            var left = Left + ActualWidth / 2;
             if (!double.IsNaN(oracleSize.Width) && !double.IsInfinity(oracleSize.Width) && !oracleSize.IsEmpty)
             {
                 left -= oracleSize.Width / 2;

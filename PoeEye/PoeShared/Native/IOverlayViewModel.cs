@@ -1,24 +1,31 @@
+using System;
+using System.Reactive;
 using System.Windows;
+using JetBrains.Annotations;
 using PoeShared.Scaffolding;
 
 namespace PoeShared.Native
 {
     public interface IOverlayViewModel : IDisposableReactiveObject
     {
-        double Left { get; }
+        double Left { get; set; }
 
-        double Top { get; }
+        double Top { get; set; }
 
-        double Width { get; }
+        double Width { get; set; }
 
-        double Height { get; }
+        double Height { get; set; }
 
-        Size MinSize { get; }
+        double ActualWidth { get; set; }
 
-        Size MaxSize { get; }
+        double ActualHeight { get; set; }
 
-        bool IsLocked { get; }
+        Size MinSize { get; set; }
 
-        object Header { get; }
+        Size MaxSize { get; set; }
+
+        bool IsLocked { get; set; }
+
+        IObservable<Unit> WhenLoaded { [NotNull] get; }
     }
 }

@@ -48,6 +48,8 @@ namespace PoeShared.Prism
                 .RegisterSingleton<IImagesCacheService, ImagesCacheService>()
                 .RegisterSingleton<IGearTypeAnalyzer, GearTypeAnalyzer>()
                 .RegisterSingleton<IConverter<IStashItem, IPoeItem>, PoeStashItemToPoeItem>()
+                .RegisterSingleton<IKeyboardEventsSource, KeyboardEventsSource>()
+                .RegisterSingleton<IKeyboardMouseEvents>(new InjectionFactory((x) => Hook.GlobalEvents()))
                 .RegisterSingleton<IAudioNotificationsManager, AudioNotificationsManager>()
                 .RegisterSingleton<IOverlayWindowController, OverlayWindowController>(WellKnownWindows.PathOfExileWindow);
 
@@ -55,7 +57,6 @@ namespace PoeShared.Prism
                 .RegisterType<IScheduler>(WellKnownSchedulers.UI, new InjectionFactory(x => RxApp.MainThreadScheduler))
                 .RegisterType<IScheduler>(WellKnownSchedulers.Background, new InjectionFactory(x => RxApp.TaskpoolScheduler))
                 .RegisterType<IPoeLiveHistoryProvider, PoeLiveHistoryProvider>()
-                .RegisterType(typeof(IKeyboardMouseEvents), new InjectionFactory((x) => Hook.GlobalEvents()))
                 .RegisterType<IHttpClient, GenericHttpClient>()
                 .RegisterType<IPoeApiWrapper, PoeApiWrapper>()
                 .RegisterType<IPoeStashClient, PoeStashClient>()

@@ -26,6 +26,14 @@
                       BorderThickness="1" BorderBrush="{StaticResource AccentColorBrush}"
                       metroModels:DialogParticipation.Register="{Binding}">
 
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Converters.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
     <Window.InputBindings>
         <KeyBinding Command="{Binding ClipboardParserViewModel.ParseClipboard}" Gesture="CTRL+V" />
     </Window.InputBindings>
@@ -216,7 +224,7 @@
                     <i:EventTrigger EventName="Click">
                         <utilities:SetPropertyAction PropertyName="IsOpen"
                                                      TargetObject="{Binding ElementName=ChatFlyout}"
-                                                     PropertyValue="{Binding ElementName=ChatFlyout, Path=IsOpen, Converter={StaticResource BoolInversionConverter}}" />
+                                                     PropertyValue="{Binding ElementName=ChatFlyout, Path=IsOpen, Converter={StaticResource NotConverter}}" />
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
             </Button>
@@ -226,7 +234,7 @@
                     <i:EventTrigger EventName="Click">
                         <utilities:SetPropertyAction PropertyName="IsOpen"
                                                      TargetObject="{Binding ElementName=SettingsFlyout}"
-                                                     PropertyValue="{Binding ElementName=SettingsFlyout, Path=IsOpen, Converter={StaticResource BoolInversionConverter}}" />
+                                                     PropertyValue="{Binding ElementName=SettingsFlyout, Path=IsOpen, Converter={StaticResource NotConverter}}" />
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
             </Button>

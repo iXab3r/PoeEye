@@ -339,7 +339,6 @@
     <Compile Include="Converters\ConcreteListTypeConverter.cs" />
     <Compile Include="Config\PoeEyeMainConfig.cs" />
     <Compile Include="Config\PoeEyeTabConfig.cs" />
-    <Compile Include="Converters\BoolInversionConverter.cs" />
     <Compile Include="Converters\ConverterHelpers.cs" />
     <Compile Include="Converters\MathAdditionConverter.cs" />
     <Compile Include="Converters\NullToVisibilityMultiValueConverter.cs" />

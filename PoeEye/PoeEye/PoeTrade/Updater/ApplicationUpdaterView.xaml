@@ -3,21 +3,25 @@
                     xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
                     xmlns:net="clr-namespace:FontAwesome.Net;assembly=FontAwesome.Net"
                     xmlns:updater="clr-namespace:PoeEye.PoeTrade.Updater">
-  <DataTemplate DataType="{x:Type updater:ApplicationUpdaterViewModel}">
-    <Grid HorizontalAlignment="Right" VerticalAlignment="Center">
-      <Grid.ColumnDefinitions>
-        <ColumnDefinition Width="Auto" />
-        <ColumnDefinition Width="Auto" />
-        <ColumnDefinition Width="*" />
-        <ColumnDefinition Width="Auto" />
-      </Grid.ColumnDefinitions>
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Converters.xaml" />
+    </ResourceDictionary.MergedDictionaries>
 
-      <controls:ProgressRing Grid.Column="0"
+    <DataTemplate DataType="{x:Type updater:ApplicationUpdaterViewModel}">
+        <Grid HorizontalAlignment="Right" VerticalAlignment="Center">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <controls:ProgressRing Grid.Column="0"
                              Width="15" Height="15"
                              Visibility="{Binding IsBusy, Converter={StaticResource BoolFalseToCollapsedConverter}}"
                              IsActive="{Binding IsBusy}" />
 
-      <Label Grid.Column="0" Style="{StaticResource EyeIconLabel}"
+            <Label Grid.Column="0" Style="{StaticResource EyeIconLabel}"
                Visibility="{Binding Error, Converter={StaticResource NullToCollapsedConverter}}"
                Foreground="{StaticResource ValidationSummaryColor3}"
                VerticalAlignment="Stretch"
@@ -27,30 +31,30 @@
                FontSize="18"
                Content="{x:Static net:FontAwesome.warning}" />
 
-      <Grid Grid.Column="1"  Visibility="{Binding IsBusy, Converter={StaticResource BoolTrueToCollapsedConverter}}">
-        <Label Style="{StaticResource EyeIconLabel}"
+            <Grid Grid.Column="1"  Visibility="{Binding IsBusy, Converter={StaticResource BoolTrueToCollapsedConverter}}">
+                <Label Style="{StaticResource EyeIconLabel}"
                Visibility="{Binding Error, Converter={StaticResource NullToCollapsedConverter}}"
                Content="{Binding Error}" />
 
-        <Label Style="{StaticResource EyeIconLabel}"
+                <Label Style="{StaticResource EyeIconLabel}"
                Visibility="{Binding Error, Converter={StaticResource NotNullToCollapsedConverter}}"
                Content="{Binding MostRecentVersion}"
                ContentStringFormat="Application was successfully updated to v{0}, new version will take place after restart" />
-      </Grid>
+            </Grid>
 
-      <Label Grid.Column="1"
+            <Label Grid.Column="1"
              FontSize="16"
              FontFamily="{StaticResource FontAwesome}"
              Visibility="{Binding IsBusy, Converter={StaticResource BoolFalseToCollapsedConverter}}"
              Content="Checking for updates..." />
 
-      <Button Grid.Column="3"
+            <Button Grid.Column="3"
               HorizontalAlignment="Right"
               Content="Restart application"
               Margin="10, 0"
               Command="{Binding RestartCommand}"
-              IsEnabled="{Binding IsBusy, Converter={StaticResource BoolInversionConverter}}" />
-    </Grid>
+              IsEnabled="{Binding IsBusy, Converter={StaticResource NotConverter}}" />
+        </Grid>
 
-  </DataTemplate>
+    </DataTemplate>
 </ResourceDictionary>

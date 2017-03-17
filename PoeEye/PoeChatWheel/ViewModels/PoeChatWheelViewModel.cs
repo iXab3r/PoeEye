@@ -74,7 +74,7 @@ namespace PoeChatWheel.ViewModels
 
         public PoeChatWheelViewModel(
             [NotNull] IOverlayWindowController controller,
-            [NotNull] IKeyboardMouseEvents keyboardMouseEvents,
+            [NotNull] IKeyboardEventsSource keyboardMouseEvents,
             [NotNull] IPoeWhisperService whisperService,
             [NotNull] IPoeChatService chatService,
             [NotNull] IConfigProvider<PoeChatWheelConfig> configProvider,
@@ -127,23 +127,21 @@ namespace PoeChatWheel.ViewModels
                 .OnEntryFrom(actionSelectedTransitionTrigger, SendMessage)
                 .OnEntry(Hide);
 
-            Observable.FromEventPattern<WinFormsKeyEventHandler, WinFormsKeyEventArgs>(
-                    h => keyboardMouseEvents.KeyDown += h,
-                    h => keyboardMouseEvents.KeyDown -= h)
-                .Where(x => MatchesHotkey(x.EventArgs, hotkey))
+            keyboardMouseEvents
+                .WhenKeyDown
+                .Where(x => MatchesHotkey(x, hotkey))
                 .Where(x => controller.IsVisible)
-                .Do(x => x.EventArgs.Handled = true)
+                .Do(x => x.Handled = true)
                 .Where(x => queryStateMachine.State == State.Hidden)
                 .ObserveOn(uiScheduler)
                 .Subscribe(() => queryStateMachine.Fire(Trigger.Show))
                 .AddTo(Anchors);
 
-            Observable.FromEventPattern<WinFormsKeyEventHandler, WinFormsKeyEventArgs>(
-                    h => keyboardMouseEvents.KeyUp += h,
-                    h => keyboardMouseEvents.KeyUp -= h)
-                .Where(x => MatchesHotkey(x.EventArgs, hotkey))
+            keyboardMouseEvents
+                .WhenKeyUp
+                .Where(x => MatchesHotkey(x, hotkey))
                 .Where(x => controller.IsVisible)
-                .Do(x => x.EventArgs.Handled = true)
+                .Do(x => x.Handled = true)
                 .Where(x => queryStateMachine.State != State.Hidden)
                 .ObserveOn(uiScheduler)
                 .Subscribe(() => queryStateMachine.Fire(Trigger.Hide))

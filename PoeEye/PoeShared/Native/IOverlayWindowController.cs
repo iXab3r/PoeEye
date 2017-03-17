@@ -5,11 +5,9 @@ using PoeShared.Scaffolding;
 
 namespace PoeShared.Native
 {
-    public interface IOverlayWindowController : IOverlayViewModel
+    public interface IOverlayWindowController : IDisposableReactiveObject
     {
         void RegisterChild([NotNull] IOverlayViewModel viewModel);
-
-        void Activate();
 
         void ActivateLastActiveWindow();
 
