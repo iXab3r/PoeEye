@@ -36,7 +36,7 @@ namespace PoeEye.PoeTrade.ViewModels
             this.proxyProvider = proxyProvider;
 
             configProvider
-                .WhenAnyValue(x => x.ActualConfig)
+                .WhenChanged
                 .Select(x => x.ProxyRecheckTimeout)
                 .Select(x => Observable.Timer(DateTimeOffset.Now, x))
                 .Switch()

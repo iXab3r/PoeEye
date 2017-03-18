@@ -152,7 +152,8 @@ namespace PoeChatWheel.ViewModels
                 .Subscribe(ProcessMessage)
                 .AddTo(Anchors);
 
-            configProvider.WhenAnyValue(x => x.ActualConfig)
+            configProvider
+                .WhenChanged
                 .Select(x => x.ChatWheelHotkey)
                 .Select(KeyGestureExtensions.SafeCreateGesture)
                 .Subscribe(x => this.hotkey = x)

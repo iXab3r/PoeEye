@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reactive;
 using System.Reactive.Linq;
 using Guards;
 using JetBrains.Annotations;
+using KellermanSoftware.CompareNetObjects;
+using PoeShared;
 using PoeShared.Modularity;
 using PoeShared.Scaffolding;
 using ReactiveUI;
@@ -24,9 +27,23 @@ namespace PoeEye.Config
                 .StartWith(Unit.Default)
                 .Subscribe(ReloadInternal)
                 .AddTo(Anchors);
+
+            var changes = this
+                .WhenAnyValue(x => x.ActualConfig)
+                .WithPrevious((prev, curr) => new {prev, curr})
+                .Select(x => new {Config = x.curr, PreviousConfig = x.prev, ComparisonResult = Compare(x.curr, x.prev)})
+                .Where(x => x.PreviousConfig != null && !x.ComparisonResult.AreEqual)
+                .Do(x => LogConfigChange(x.Config, x.ComparisonResult))
+                .Select(x => x.Config)
+                .Publish();
+
+            WhenChanged = changes;
+            changes.Connect().AddTo(Anchors);
         }
 
         public TConfig ActualConfig => configLoader.Value;
+
+        public IObservable<TConfig> WhenChanged { get; }
 
         public IObservable<T> ListenTo<T>(Expression<Func<TConfig, T>> fieldToMonitor)
         {
@@ -45,10 +62,21 @@ namespace PoeEye.Config
         {
             Guard.ArgumentNotNull(() => config);
 
-            var actualConfig = configProvider.GetActualConfig<TConfig>();
-            config.TransferPropertiesTo(actualConfig);
+            configProvider.Save(config);
+        }
 
-            configProvider.Save();
+        private ComparisonResult Compare(TConfig x, TConfig y)
+        {
+            return new CompareLogic(
+                new ComparisonConfig
+                {
+                    MaxDifferences = byte.MaxValue
+                }).Compare(x, y);
+        }
+
+        private void LogConfigChange(TConfig config, ComparisonResult result)
+        {
+            Log.Instance.Debug($"[GenericConfigProvider.{typeof(TConfig).Name}] Config has changed:\nTime spent by comparer: {result.ElapsedMilliseconds}ms\n{result.DifferencesString}");
         }
 
         private void ReloadInternal()

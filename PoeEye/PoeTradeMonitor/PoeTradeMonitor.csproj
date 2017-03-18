@@ -186,7 +186,7 @@
     <Compile Include="Services\Parsers\PoeMessageStrictParserPoeTrade.cs" />
     <Compile Include="Services\PoeStashService.cs" />
     <Compile Include="Models\TradeModel.cs" />
-    <Compile Include="Services\TradeMonitorBootstrapper.cs" />
+    <Compile Include="Prism\TradeMonitorBootstrapper.cs" />
     <Compile Include="Services\TradeMonitorService.cs" />
     <Compile Include="Models\MacroMessage.cs" />
     <Compile Include="Models\TradeType.cs" />

@@ -85,7 +85,7 @@ namespace PoeBud.ViewModels
             WindowManager = windowManager;
 
             poeBudConfigProvider
-                .WhenAnyValue(x => x.ActualConfig)
+                .WhenChanged
                 .Subscribe(ApplyConfig)
                 .AddTo(Anchors);
 
@@ -149,7 +149,7 @@ namespace PoeBud.ViewModels
             HideXpBar = config.HideXpBar;
             IsEnabled = actualConfig.IsEnabled;
             UiOverlayPath = overlaysProvider.OverlaysList.FirstOrDefault(x => x.Name == config.UiOverlayName).AbsolutePath;
-            hotkey = KeyGestureExtensions.SafeCreateGesture(config.GetSetHotkey);
+            hotkey = KeyGestureExtensions.SafeCreateGesture(config.GetChaosSetHotkey);
             RefreshStashUpdater(actualConfig);
             this.RaisePropertyChanged(nameof(CharacterName));
         }

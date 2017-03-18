@@ -66,7 +66,7 @@ namespace PoeEye.PoeTrade
             this.queryInfoToQueryConverter = queryInfoToQueryConverter;
 
             configProvider
-                .WhenAnyValue(x => x.ActualConfig)
+                .WhenChanged
                 .Subscribe(x => config = x)
                 .AddTo(Anchors);
             Log.Instance.Debug($"[PoeTradeApi..ctor] {config.DumpToText()}");

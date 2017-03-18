@@ -66,12 +66,24 @@ namespace PoeEye.Config
             configHasChanged.OnNext(Unit.Default);
         }
 
-        public void Save()
+        public void Save<TConfig>(TConfig config) where TConfig : IPoeEyeConfig, new()
         {
-            var config = new PoeEyeCombinedConfig();
-            loadedConfigs.Values.Select(x => new PoeEyeConfigMetadata(x)).ToList().ForEach(x => config.Add(x));
+            var key = new PoeEyeConfigMetadata(config);
+            loadedConfigs[key.ConfigTypeName] = config;
 
-            SaveInternal(config);
+            var metaConfig = new PoeEyeCombinedConfig();
+            loadedConfigs.Values.Select(x => new PoeEyeConfigMetadata(x)).ToList().ForEach(x => metaConfig.Add(x));
+
+            SaveInternal(metaConfig);
+        }
+
+        public TConfig GetActualConfig<TConfig>() where TConfig : IPoeEyeConfig, new()
+        {
+            if (loadedConfigs.IsEmpty)
+            {
+                Reload();
+            }
+            return (TConfig)loadedConfigs.GetOrAdd(typeof(TConfig).FullName, (key) => (TConfig)Activator.CreateInstance(typeof(TConfig)));
         }
 
         private IPoeEyeConfig ValidateConfigVersion(IPoeEyeConfig loadedConfig)
@@ -92,15 +104,6 @@ namespace PoeEye.Config
                 return configTemplate;
             }
             return loadedConfig;
-        }
-
-        public TConfig GetActualConfig<TConfig>() where TConfig : IPoeEyeConfig, new()
-        {
-            if (loadedConfigs.IsEmpty)
-            {
-                Reload();
-            }
-            return (TConfig)loadedConfigs.GetOrAdd(typeof(TConfig).FullName, (key) => (TConfig)Activator.CreateInstance(typeof(TConfig)));
         }
 
         private void SaveInternal(PoeEyeCombinedConfig config)

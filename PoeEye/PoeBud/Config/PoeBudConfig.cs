@@ -33,6 +33,6 @@ namespace PoeBud.Config
 
         public ICollection<int> StashesToProcess { get; set; } = new HashSet<int>();
 
-        public string GetSetHotkey { get; set; } = "None";
+        public string GetChaosSetHotkey { get; set; } = "None";
     }
 }

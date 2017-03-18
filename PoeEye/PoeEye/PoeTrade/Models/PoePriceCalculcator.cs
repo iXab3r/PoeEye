@@ -33,7 +33,7 @@ namespace PoeEye.PoeTrade.Models
             Guard.ArgumentNotNull(() => configProvider);
 
             configProvider
-                .WhenAnyValue(x => x.ActualConfig)
+                .WhenChanged
                 .Select(x => x.CurrenciesPriceInChaos)
                 .Select(x => ExtractDifference(currencyByType, x))
                 .DistinctUntilChanged()

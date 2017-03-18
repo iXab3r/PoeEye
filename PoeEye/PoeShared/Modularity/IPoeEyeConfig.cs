@@ -1,4 +1,6 @@
 ﻿using System;
+using Newtonsoft.Json;
+using PoeShared.Scaffolding;
 
 namespace PoeShared.Modularity
 {

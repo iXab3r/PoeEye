@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Documents;
 using PoeEye.TradeMonitor.Models;
@@ -7,7 +8,7 @@ using PoeShared.Modularity;
 
 namespace PoeEye.TradeMonitor.Modularity
 {
-    public class PoeTradeMonitorConfig : IPoeEyeConfig
+    public class PoeTradeMonitorConfig : IPoeEyeConfigVersioned
     {
         public bool IsEnabled { get; set; } = true;
 
@@ -40,5 +41,7 @@ namespace PoeEye.TradeMonitor.Modularity
                 new MacroMessage { Label = "hideout", Text = "/hideout" },
             }
         };
+
+        public int Version { get; } = 2;
     }
 }

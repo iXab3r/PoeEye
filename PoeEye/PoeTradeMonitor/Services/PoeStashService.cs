@@ -49,11 +49,10 @@ namespace PoeEye.TradeMonitor.Services
             this.uiScheduler = uiScheduler;
             this.bgScheduler = bgScheduler;
 
-            tradeMonitorConfigProvider.WhenAnyValue(x => x.ActualConfig)
-                .CombineLatest(
-                    poeBudConfigProvider.WhenAnyValue(x => x.ActualConfig),
-                    (tradeMonitorConfig, poeBudConfig) =>
-                        new {PoeBudConfig = poeBudConfig, TradeMonitorConfig = tradeMonitorConfig})
+            Observable.CombineLatest(
+                    tradeMonitorConfigProvider.WhenChanged, 
+                    poeBudConfigProvider.WhenAnyValue(x => x.ActualConfig), 
+                    (tradeMonitorConfig, poeBudConfig) => new {PoeBudConfig = poeBudConfig, TradeMonitorConfig = tradeMonitorConfig})
                 .Subscribe(x => ApplyConfig(x.PoeBudConfig, x.TradeMonitorConfig))
                 .AddTo(Anchors);
         }

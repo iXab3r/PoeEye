@@ -11,9 +11,8 @@ using PoeShared.Modularity;
 using PoeShared.Native;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
-using ReactiveUI;
 
-namespace PoeEye.TradeMonitor.Services
+namespace PoeEye.TradeMonitor.Prism
 {
     internal sealed class TradeMonitorBootstrapper : DisposableReactiveObject
     {
@@ -23,9 +22,9 @@ namespace PoeEye.TradeMonitor.Services
         private readonly SerialDisposable activeAnchors = new SerialDisposable();
 
         public TradeMonitorBootstrapper(
-                IConfigProvider<PoeTradeMonitorConfig> configProvider,
-                [Dependency(WellKnownOverlays.PathOfExileLayeredOverlay)] IOverlayWindowController overlayController,
-                IFactory<PoeTradeMonitorViewModel, IOverlayWindowController> viewModelFactory,
+                [NotNull] IConfigProvider<PoeTradeMonitorConfig> configProvider,
+                [NotNull] [Dependency(WellKnownOverlays.PathOfExileLayeredOverlay)] IOverlayWindowController overlayController,
+                [NotNull] IFactory<PoeTradeMonitorViewModel, IOverlayWindowController> viewModelFactory,
                 [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {
             Guard.ArgumentNotNull(() => configProvider);

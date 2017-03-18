@@ -133,7 +133,7 @@ namespace PoeEye.TradeMonitor.ViewModels
                         .AddTo(Anchors);
 
                     configProvider
-                        .WhenAnyValue(x => x.ActualConfig)
+                        .WhenChanged
                         .Subscribe(ApplyConfig)
                         .AddTo(Anchors);
 

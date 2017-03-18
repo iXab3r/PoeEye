@@ -7,10 +7,12 @@ using Newtonsoft.Json;
 
 namespace PoeShared.Modularity
 {
-    public interface IConfigProvider<TConfig> : INotifyPropertyChanged
+    public interface IConfigProvider<TConfig>
         where TConfig : IPoeEyeConfig
     {
         TConfig ActualConfig { [NotNull] get; }
+
+        IObservable<TConfig> WhenChanged { [NotNull] get; }
 
         void Reload();
 
@@ -24,7 +26,7 @@ namespace PoeShared.Modularity
     {
         void Reload();
 
-        void Save();
+        void Save<TConfig>([NotNull] TConfig config) where TConfig : IPoeEyeConfig, new();
 
         TConfig GetActualConfig<TConfig>() where TConfig : IPoeEyeConfig, new();
 

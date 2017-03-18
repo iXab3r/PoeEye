@@ -175,7 +175,7 @@ namespace PoeBud.ViewModels
             SelectedCharacter = null;   
             CharactersList = null;
             SelectedCharacterStash = null;
-            Hotkey = config.GetSetHotkey;
+            Hotkey = config.GetChaosSetHotkey;
             HideXpBar = config.HideXpBar;
             IsEnabled = config.IsEnabled;
             SelectedUiOverlay = OverlaysList.FirstOrDefault(x => x.Name == config.UiOverlayName);
@@ -201,7 +201,7 @@ namespace PoeBud.ViewModels
             }
             resultingConfig.UiOverlayName = selectedUiOverlay.Name;
 
-            resultingConfig.GetSetHotkey = hotkey;
+            resultingConfig.GetChaosSetHotkey = hotkey;
             resultingConfig.HideXpBar = hideXpBar;
             resultingConfig.IsEnabled = isEnabled;
 

@@ -56,7 +56,7 @@ namespace PoeEye.PoeTrade.ViewModels
                 .AddTo(Anchors);
 
             configProvider
-                .WhenAnyValue(x => x.ActualConfig)
+                .WhenChanged
                 .Select(x => new { x.MinRefreshTimeout, x.MaxRefreshTimeout })
                 .DistinctUntilChanged()
                 .Subscribe(x => Reinitialize(x.MinRefreshTimeout, x.MaxRefreshTimeout))

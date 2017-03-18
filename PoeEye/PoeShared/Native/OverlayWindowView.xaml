@@ -97,10 +97,6 @@
 
                     <TextBlock
                     Margin="5,0"
-                    Text="{Binding Visibility, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type xctk:ChildWindow}}, StringFormat='Visibility: {0}'}" />
-
-                    <TextBlock
-                    Margin="5,0"
                     Text="{Binding Content.IsLocked, StringFormat='IsLocked: {0}'}" />
 
                     <StackPanel Orientation="Horizontal">

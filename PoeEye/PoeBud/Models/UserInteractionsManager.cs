@@ -38,7 +38,7 @@ namespace PoeBud.Models
             this.userInputBlocker = userInputBlocker;
 
             configProvider
-                .WhenAnyValue(x => x.ActualConfig)
+                .WhenChanged
                 .Subscribe(ReloadConfig);
         }
 
