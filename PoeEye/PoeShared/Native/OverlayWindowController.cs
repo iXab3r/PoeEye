@@ -58,6 +58,7 @@ namespace PoeShared.Native
                 var applicationExit = Observable.FromEventPattern<ExitEventHandler, ExitEventArgs>(
                         h => application.Exit += h,
                         h => application.Exit -= h)
+                    .Do(_ => Log.Instance.Debug($"[OverlayWindowController] Application exit detected"))
                     .ToUnit();
 
                 var mainWindow = application.MainWindow;
@@ -66,10 +67,13 @@ namespace PoeShared.Native
                     : Observable.FromEventPattern<EventHandler, EventArgs>(
                             h => mainWindow.Closed += h,
                             h => mainWindow.Closed -= h)
+                        .Do(_ => Log.Instance.Debug($"[OverlayWindowController] Main window has been closed"))
                         .ToUnit();
 
                 Observable.Merge(mainWindowClosed, applicationExit)
-                    .Subscribe(CloseOverlays, Log.HandleUiException)
+                    .Take(1)
+                    .Do(_ => Log.Instance.Debug($"[OverlayWindowController] Disposing all anchors..."))
+                    .Subscribe(Anchors.Dispose, Log.HandleUiException)
                     .AddTo(Anchors);
             }
 
@@ -119,8 +123,6 @@ namespace PoeShared.Native
             set { this.RaiseAndSetIfChanged(ref showWireframes, value); }
         }
 
-        public IReactiveList<OverlayWindowView> Overlays { get; } = new ReactiveList<OverlayWindowView>();
-
         public IDisposable RegisterChild(IOverlayViewModel viewModel)
         {
             Guard.ArgumentNotNull(() => viewModel);
@@ -167,8 +169,9 @@ namespace PoeShared.Native
                 overlayWindow.WhenLoaded.Subscribe(observer).AddTo(childAnchors);
             }
 
-            Disposable.Create(() => Overlays.Remove(overlayWindow)).AddTo(childAnchors);
-            Disposable.Create(overlayWindow.Close).AddTo(childAnchors);
+            Disposable.Create(() => overlayWindow.Close()).AddTo(childAnchors);
+            //Disposable.Create(() => Anchors.Remove(childAnchors)).AddTo(childAnchors);
+            childAnchors.AddTo(Anchors);
 
             return childAnchors;
         }
@@ -181,11 +184,6 @@ namespace PoeShared.Native
                 return;
             }
             WindowsServices.SetForegroundWindow(windowHandle);
-        }
-
-        private void CloseOverlays()
-        {
-            Overlays.ForEach(x => x.Close());
         }
 
         private void HandleVisibilityChange(OverlayWindowView overlayWindow, IOverlayViewModel viewModel)

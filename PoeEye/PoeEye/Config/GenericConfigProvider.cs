@@ -28,17 +28,21 @@ namespace PoeEye.Config
                 .Subscribe(ReloadInternal)
                 .AddTo(Anchors);
 
-            var changes = this
+            //FIXME Use ReplaySubject for propagating active config
+            WhenChanged = this
                 .WhenAnyValue(x => x.ActualConfig)
-                .WithPrevious((prev, curr) => new {prev, curr})
-                .Select(x => new {Config = x.curr, PreviousConfig = x.prev, ComparisonResult = Compare(x.curr, x.prev)})
-                .Where(x => x.PreviousConfig != null && !x.ComparisonResult.AreEqual)
-                .Do(x => LogConfigChange(x.Config, x.ComparisonResult))
-                .Select(x => x.Config)
-                .Publish();
-
-            WhenChanged = changes;
-            changes.Connect().AddTo(Anchors);
+                .WithPrevious((prev, curr) => new { prev, curr })
+                .Select(x => new { Config = x.curr, PreviousConfig = x.prev, ComparisonResult = Compare(x.curr, x.prev) })
+                .Where(x => !x.ComparisonResult.AreEqual)
+                .Do(
+                    x =>
+                    {
+                        if (x.PreviousConfig != null)
+                        {
+                            LogConfigChange(x.Config, x.ComparisonResult);
+                        }
+                    })
+                .Select(x => x.Config); ;
         }
 
         public TConfig ActualConfig => configLoader.Value;
