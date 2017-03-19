@@ -34,7 +34,7 @@
                                     TrueValue="Hidden"
                                     FalseValue="Visible" />
 
-    <blue:Int32ToVisibilityConverter x:Key="Int32GreatherThanZeroToVisibleConverterKey" 
+    <blue:Int32ToVisibilityConverter x:Key="Int32GreaterThanZeroToVisibleConverterKey" 
                                      TrueValue="Visible" FalseValue="Hidden">
         <blue:Int32ToVisibilityConverter.ComparisonStrategy>
             <blue:Int32ComparisonStrategy Mode="GreaterThan" Comparand="0"/>
@@ -262,7 +262,7 @@
                             BorderBrush="{StaticResource TradeMonitorBorderBrushKey}"
                             Background="{StaticResource TradeMonitorTitleBackgroundBrushKey}"
                             LayoutTransform="{Binding ElementName=TradeMonitorOverlay, Path=LayoutTransform}"
-                            Visibility="{Binding NegotiationsOverflow, Converter={StaticResource Int32GreatherThanZeroToVisibleConverterKey}}"
+                            Visibility="{Binding NegotiationsOverflow, Converter={StaticResource Int32GreaterThanZeroToVisibleConverterKey}}"
                             Margin="5,5,0,5">
                         <Grid>
                             <TextBlock Style="{StaticResource TradeMonitorTextBlockStyleKey}"

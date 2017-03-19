@@ -178,7 +178,7 @@ namespace PoeEye.TradeMonitor.ViewModels
             set { this.RaiseAndSetIfChanged(ref isExpanded, value); }
         }
 
-        public int NegotiationsOverflow => negotiationsList.Count - NumberOfNegotiationsToExpandByDefault;
+        public int NegotiationsOverflow => negotiationsList.Count - PreGroupNotificationsCount;
 
         public float Opacity
         {
