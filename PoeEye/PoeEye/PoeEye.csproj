@@ -362,7 +362,6 @@
     <Compile Include="PoeTrade\Common\SortDescriptionData.cs" />
     <Compile Include="PoeTrade\Models\FuzzySuggestionProvider.cs" />
     <Compile Include="PoeTrade\Models\IPoeApiProvider.cs" />
-    <Compile Include="PoeTrade\Models\IPoePriceCalculcator.cs" />
     <Compile Include="PoeTrade\Models\IPoeCaptchaRegistrator.cs" />
     <Compile Include="PoeTrade\Models\IWhispersNotificationManager.cs" />
     <Compile Include="PoeTrade\Models\PoeApiProvider.cs" />

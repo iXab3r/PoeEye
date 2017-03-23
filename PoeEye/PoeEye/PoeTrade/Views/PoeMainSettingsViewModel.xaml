@@ -38,7 +38,7 @@
                                        Content="{Binding Item1, Mode=OneWay}" />
                                 <controls:NumericUpDown Width="100"
                                                         Style="{StaticResource QueryNumericUpDownMax}"
-                                                        Value="{Binding Item2, Converter={StaticResource NullableConverter}}"
+                                                        Value="{Binding Item2}"
                                                         StringFormat="{}{0:F2}" />
                             </StackPanel>
 

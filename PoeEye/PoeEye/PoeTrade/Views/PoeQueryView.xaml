@@ -119,9 +119,9 @@
                    Text="Damage" Style="{StaticResource TextBlockHeader}" />
                 <StackPanel Grid.Row="0" Grid.Column="1">
                     <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}"
-                                  Value="{Binding DamageMin, Converter={StaticResource NullableConverter}}" />
+                                  Value="{Binding DamageMin}" />
                     <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}"
-                                  Value="{Binding DamageMax, Converter={StaticResource NullableConverter}}" />
+                                  Value="{Binding DamageMax}" />
                 </StackPanel>
 
 
@@ -129,45 +129,45 @@
                    Text="APS" Style="{StaticResource TextBlockHeader}" />
                 <StackPanel Grid.Row="0" Grid.Column="3">
                     <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}"
-                                  Value="{Binding ApsMin, Converter={StaticResource NullableConverter}}" />
+                                  Value="{Binding ApsMin}" />
                     <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}"
-                                  Value="{Binding ApsMax, Converter={StaticResource NullableConverter}}" />
+                                  Value="{Binding ApsMax}" />
                 </StackPanel>
 
                 <TextBlock Grid.Row="0" Grid.Column="4"
                    Text="Crit.Strike" Style="{StaticResource TextBlockHeader}" />
                 <StackPanel Grid.Row="0" Grid.Column="5">
                     <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}"
-                                  Value="{Binding CritMin, Converter={StaticResource NullableConverter}}" />
+                                  Value="{Binding CritMin}" />
                     <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}"
-                                  Value="{Binding CritMax, Converter={StaticResource NullableConverter}}" />
+                                  Value="{Binding CritMax}" />
                 </StackPanel>
 
                 <TextBlock Grid.Row="2" Grid.Column="0"
                    Text="DPS" Style="{StaticResource TextBlockHeader}" />
                 <StackPanel Grid.Row="2" Grid.Column="1">
                     <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}"
-                                  Value="{Binding DpsMin, Converter={StaticResource NullableConverter}}" />
+                                  Value="{Binding DpsMin}" />
                     <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}"
-                                  Value="{Binding DpsMax, Converter={StaticResource NullableConverter}}" />
+                                  Value="{Binding DpsMax}" />
                 </StackPanel>
 
                 <TextBlock Grid.Row="2" Grid.Column="2"
                    Text="eDPS" Style="{StaticResource TextBlockHeader}" />
                 <StackPanel Grid.Row="2" Grid.Column="3">
                     <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}"
-                                  Value="{Binding EdpsMin, Converter={StaticResource NullableConverter}}" />
+                                  Value="{Binding EdpsMin}" />
                     <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}"
-                                  Value="{Binding EdpsMax, Converter={StaticResource NullableConverter}}" />
+                                  Value="{Binding EdpsMax}" />
                 </StackPanel>
 
                 <TextBlock Grid.Row="2" Grid.Column="4"
                    Text="pDPS" Style="{StaticResource TextBlockHeader}" />
                 <StackPanel Grid.Row="2" Grid.Column="5">
                     <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}"
-                                  Value="{Binding PdpsMin, Converter={StaticResource NullableConverter}}" />
+                                  Value="{Binding PdpsMin}" />
                     <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}"
-                                  Value="{Binding PdpsMax, Converter={StaticResource NullableConverter}}" />
+                                  Value="{Binding PdpsMax}" />
                 </StackPanel>
             </Grid>
 
@@ -190,9 +190,9 @@
                    Text="Armour" Style="{StaticResource TextBlockHeader}" />
                 <StackPanel Grid.Row="0" Grid.Column="1">
                     <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}"
-                                  Value="{Binding ArmourMin, Converter={StaticResource NullableConverter}}" />
+                                  Value="{Binding ArmourMin}" />
                     <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}"
-                                  Value="{Binding ArmourMax, Converter={StaticResource NullableConverter}}" />
+                                  Value="{Binding ArmourMax}" />
                 </StackPanel>
 
 
@@ -200,27 +200,27 @@
                    Text="Evasion" Style="{StaticResource TextBlockHeader}" />
                 <StackPanel Grid.Row="0" Grid.Column="3">
                     <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}"
-                                  Value="{Binding EvasionMin, Converter={StaticResource NullableConverter}}" />
+                                  Value="{Binding EvasionMin}" />
                     <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}"
-                                  Value="{Binding EvasionMax, Converter={StaticResource NullableConverter}}" />
+                                  Value="{Binding EvasionMax}" />
                 </StackPanel>
 
                 <TextBlock Grid.Row="2" Grid.Column="0"
                    Text="Shield" Style="{StaticResource TextBlockHeader}" />
                 <StackPanel Grid.Row="2" Grid.Column="1">
                     <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}"
-                                  Value="{Binding ShieldMin, Converter={StaticResource NullableConverter}}" />
+                                  Value="{Binding ShieldMin}" />
                     <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}"
-                                  Value="{Binding ShieldMax, Converter={StaticResource NullableConverter}}" />
+                                  Value="{Binding ShieldMax}" />
                 </StackPanel>
 
                 <TextBlock Grid.Row="2" Grid.Column="2"
                    Text="Block" Style="{StaticResource TextBlockHeader}" />
                 <StackPanel Grid.Row="2" Grid.Column="3">
                     <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}"
-                                  Value="{Binding BlockMin, Converter={StaticResource NullableConverter}}" />
+                                  Value="{Binding BlockMin}" />
                     <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}"
-                                  Value="{Binding BlockMax, Converter={StaticResource NullableConverter}}" />
+                                  Value="{Binding BlockMax}" />
                 </StackPanel>
             </Grid>
 
@@ -243,45 +243,45 @@
                    Text="Sockets" Style="{StaticResource TextBlockHeader}" />
                 <StackPanel Grid.Row="0" Grid.Column="1">
                     <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}"
-                                  Value="{Binding SocketsMin, Converter={StaticResource NullableConverter}}" />
+                                  Value="{Binding SocketsMin}" />
                     <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}"
-                                  Value="{Binding SocketsMax, Converter={StaticResource NullableConverter}}" />
+                                  Value="{Binding SocketsMax}" />
                 </StackPanel>
 
 
                 <TextBlock Grid.Row="0" Grid.Column="2"
                    Text="Links" Style="{StaticResource TextBlockHeader}" />
                 <StackPanel Grid.Row="0" Grid.Column="3">
-                    <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}"
-                                  Value="{Binding LinkMin, Converter={StaticResource NullableConverter}}" />
+                    <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}" 
+                                  Value="{Binding LinkMin}" />
                     <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}"
-                                  Value="{Binding LinkMax, Converter={StaticResource NullableConverter}}" />
+                                  Value="{Binding LinkMax}" />
                 </StackPanel>
 
                 <TextBlock Grid.Row="2" Grid.Column="0"
                    Text="Colors" Style="{StaticResource TextBlockHeader}" />
                 <StackPanel Grid.Row="2" Grid.Column="1">
                     <TextBox Style="{StaticResource TextBoxKey}" Width="30" controls:TextBoxHelper.Watermark="R"
-                   Text="{Binding SocketsR, Converter={StaticResource NullableConverter}}" />
+                   Text="{Binding SocketsR}" />
                     <TextBox Style="{StaticResource TextBoxKey}" Width="30" controls:TextBoxHelper.Watermark="G"
-                   Text="{Binding SocketsG, Converter={StaticResource NullableConverter}}" />
+                   Text="{Binding SocketsG}" />
                     <TextBox Style="{StaticResource TextBoxKey}" Width="30" controls:TextBoxHelper.Watermark="B"
-                   Text="{Binding SocketsB, Converter={StaticResource NullableConverter}}" />
+                   Text="{Binding SocketsB}" />
                     <TextBox Style="{StaticResource TextBoxKey}" Width="30" controls:TextBoxHelper.Watermark="W"
-                   Text="{Binding SocketsW, Converter={StaticResource NullableConverter}}" />
+                   Text="{Binding SocketsW}" />
                 </StackPanel>
 
                 <TextBlock Grid.Row="2" Grid.Column="2"
                    Text="Linked" Style="{StaticResource TextBlockHeader}" />
                 <StackPanel Grid.Row="2" Grid.Column="3">
                     <TextBox Style="{StaticResource TextBoxKey}" Width="30" controls:TextBoxHelper.Watermark="R"
-                   Text="{Binding LinkedR, Converter={StaticResource NullableConverter}}" />
+                   Text="{Binding LinkedR}" />
                     <TextBox Style="{StaticResource TextBoxKey}" Width="30" controls:TextBoxHelper.Watermark="G"
-                   Text="{Binding LinkedG, Converter={StaticResource NullableConverter}}" />
+                   Text="{Binding LinkedG}" />
                     <TextBox Style="{StaticResource TextBoxKey}" Width="30" controls:TextBoxHelper.Watermark="B"
-                   Text="{Binding LinkedB, Converter={StaticResource NullableConverter}}" />
+                   Text="{Binding LinkedB}" />
                     <TextBox Style="{StaticResource TextBoxKey}" Width="30" controls:TextBoxHelper.Watermark="W"
-                   Text="{Binding LinkedW, Converter={StaticResource NullableConverter}}" />
+                   Text="{Binding LinkedW}" />
                 </StackPanel>
             </Grid>
 
@@ -314,9 +314,9 @@
                    Text="Quality" Style="{StaticResource TextBlockHeader}" />
                 <StackPanel Grid.Row="0" Grid.Column="1">
                     <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}"
-                                  Value="{Binding QualityMin, Converter={StaticResource NullableConverter}}" />
+                                  Value="{Binding QualityMin}" />
                     <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}"
-                                  Value="{Binding QualityMax, Converter={StaticResource NullableConverter}}" />
+                                  Value="{Binding QualityMax}" />
                 </StackPanel>
 
 
@@ -324,9 +324,9 @@
                    Text="Gem\map level" Style="{StaticResource TextBlockHeader}" />
                 <StackPanel Grid.Row="0" Grid.Column="3">
                     <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}"
-                                  Value="{Binding LevelMin, Converter={StaticResource NullableConverter}}" />
+                                  Value="{Binding LevelMin}" />
                     <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}"
-                                  Value="{Binding LevelMax, Converter={StaticResource NullableConverter}}" />
+                                  Value="{Binding LevelMax}" />
                 </StackPanel>
 
 
@@ -334,9 +334,9 @@
                    Text="Item Level" Style="{StaticResource TextBlockHeader}" />
                 <StackPanel Grid.Row="0" Grid.Column="5">
                     <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}"
-                                  Value="{Binding ItemLevelMin, Converter={StaticResource NullableConverter}}" />
+                                  Value="{Binding ItemLevelMin}" />
                     <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}"
-                                  Value="{Binding ItemLevelMax, Converter={StaticResource NullableConverter}}" />
+                                  Value="{Binding ItemLevelMax}" />
                 </StackPanel>
 
                 <TextBlock Grid.Row="2" Grid.Column="2"
@@ -383,9 +383,9 @@
                    Text="Inc. Quantity" Style="{StaticResource TextBlockHeader}" />
                 <StackPanel Grid.Row="2" Grid.Column="1">
                     <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}"
-                                  Value="{Binding IncQuantityMin, Converter={StaticResource NullableConverter}}" />
+                                  Value="{Binding IncQuantityMin}" />
                     <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}"
-                                  Value="{Binding IncQuantityMax, Converter={StaticResource NullableConverter}}" />
+                                  Value="{Binding IncQuantityMax}" />
                 </StackPanel>
 
                 <TextBlock Grid.Row="4" Grid.Column="0"
@@ -402,9 +402,9 @@
                     </StackPanel.Resources>
 
                     <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}"
-                                  Value="{Binding BuyoutMin, Converter={StaticResource NullableConverter}}" />
+                                  Value="{Binding BuyoutMin}" />
                     <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}"
-                                  Value="{Binding BuyoutMax, Converter={StaticResource NullableConverter}}" />
+                                  Value="{Binding BuyoutMax}" />
                     <ComboBox Style="{StaticResource QueryComboBox}"
                               Width="275"
                               ItemsSource="{Binding CurrenciesList}"

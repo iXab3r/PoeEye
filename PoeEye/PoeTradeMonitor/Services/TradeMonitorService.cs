@@ -7,9 +7,12 @@ using Guards;
 using JetBrains.Annotations;
 using PoeEye.TradeMonitor.Models;
 using PoeEye.TradeMonitor.Modularity;
+using PoeEye.TradeMonitor.Services.Notifications;
 using PoeShared;
 using PoeShared.Audio;
+using PoeShared.Common;
 using PoeShared.Modularity;
+using PoeShared.PoeTrade;
 using PoeShared.Scaffolding;
 using PoeWhisperMonitor;
 using PoeWhisperMonitor.Chat;
@@ -20,6 +23,7 @@ namespace PoeEye.TradeMonitor.Services
     internal sealed class TradeMonitorService : DisposableReactiveObject, ITradeMonitorService
     {
         [NotNull] private readonly IAudioNotificationsManager audioManager;
+        [NotNull] private readonly IPoeNotifier notifier;
         private readonly IPoeMessageParser[] parsers;
         private readonly ISubject<TradeModel> trades = new Subject<TradeModel>();
 
@@ -27,18 +31,31 @@ namespace PoeEye.TradeMonitor.Services
             [NotNull] IConfigProvider<PoeTradeMonitorConfig> configProvider,
             [NotNull] IPoeWhisperService whisperService,
             [NotNull] IAudioNotificationsManager audioManager,
+            [NotNull] IPoePriceCalculcator priceCalculcator,
+            [NotNull] IPoeNotifier notifier,
             [NotNull] IPoeMessageParser[] parsers)
         {
             Guard.ArgumentNotNull(() => configProvider);
             Guard.ArgumentNotNull(() => whisperService);
             Guard.ArgumentNotNull(() => audioManager);
+            Guard.ArgumentNotNull(() => priceCalculcator);
+            Guard.ArgumentNotNull(() => notifier);
             Guard.ArgumentNotNull(() => parsers);
+
             this.audioManager = audioManager;
+            this.notifier = notifier;
             this.parsers = parsers;
 
             trades
                 .Where(x => x.TradeType == TradeType.Sell)
                 .Subscribe(() => audioManager.PlayNotification(configProvider.ActualConfig.NotificationType))
+                .AddTo(Anchors);
+
+            trades
+                .Where(x => x.TradeType == TradeType.Sell)
+                .Select(x => new { Trade = x, PriceInChaos = priceCalculcator.GetEquivalentInChaosOrbs(x.Price) })
+                .Where(x => x.PriceInChaos.Value >= configProvider.ActualConfig.CriticalNotificationThresholdInChaos)
+                .Subscribe(x => HandleHighValueTrade(x.Trade, x.PriceInChaos))
                 .AddTo(Anchors);
 
             whisperService
@@ -78,6 +95,12 @@ namespace PoeEye.TradeMonitor.Services
 
             }
             return result;
+        }
+
+        private void HandleHighValueTrade(TradeModel trade, PoePrice priceInChaos)
+        {
+            var message = $"[{trade.Timestamp}] TradeMonitor: {trade.CharacterName} wants to buy {trade.PositionName} for {trade.Price} (~{priceInChaos}), league: {trade.League}, tab: {trade.TabName} position: {trade.ItemPosition}";
+            notifier.SendNotification(message, NotificationLevel.Critical);
         }
     }
 }

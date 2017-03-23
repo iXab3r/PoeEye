@@ -1,6 +1,7 @@
 ﻿using CsQuery.ExtensionMethods;
 using PoeShared.Common;
 using PoeShared.Modularity;
+using PoeShared.PoeTrade;
 using PoeEyeMainConfig = PoeEye.Config.PoeEyeMainConfig;
 
 namespace PoeEye.PoeTrade.Models

@@ -110,9 +110,9 @@
                       </Style>
                     </StackPanel.Style>
                     <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}"
-                                            Value="{Binding MinGroupValue, Converter={StaticResource NullableConverter}}" />
+                                            Value="{Binding MinGroupValue}" />
                     <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}"
-                                            Value="{Binding MaxGroupValue, Converter={StaticResource NullableConverter}}" />
+                                            Value="{Binding MaxGroupValue}" />
                   </StackPanel>
 
                   <Button Grid.Column="3"

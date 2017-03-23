@@ -244,6 +244,7 @@
     <Compile Include="Native\IKeyboardEventsSource.cs" />
     <Compile Include="Native\SafeKeyboardMouseEvents.cs" />
     <Compile Include="PoeTrade\IPoeItemViewModelFactory.cs" />
+    <Compile Include="PoeTrade\IPoePriceCalculcator.cs" />
     <Compile Include="Scaffolding\WPF\EnableDragHelper.cs" />
     <Compile Include="StashApi\DataTypes\PoeItemRarityWrapper.cs" />
     <Compile Include="StashApi\DataTypes\StashItemAdditionalProperty.cs" />

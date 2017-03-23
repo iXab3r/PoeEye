@@ -21,9 +21,9 @@
                   Orientation="Horizontal"
                   Margin="10,0,0,0">
         <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}"
-                                Value="{Binding Min, Converter={StaticResource NullableConverter}}" />
+                                Value="{Binding Min}" />
         <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}"
-                                Value="{Binding Max, Converter={StaticResource NullableConverter}}" />
+                                Value="{Binding Max}" />
       </StackPanel>
     </Grid>
   </DataTemplate>

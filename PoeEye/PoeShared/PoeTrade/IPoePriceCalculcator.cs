@@ -1,8 +1,8 @@
 ﻿using PoeShared.Common;
 
-namespace PoeEye.PoeTrade.Models
+namespace PoeShared.PoeTrade
 {
-    internal interface IPoePriceCalculcator
+    public interface IPoePriceCalculcator
     {
         PoePrice GetEquivalentInChaosOrbs(PoePrice price);
     }

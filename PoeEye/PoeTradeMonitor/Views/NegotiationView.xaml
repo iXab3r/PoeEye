@@ -107,7 +107,8 @@
                                           TextBlock.Foreground="{StaticResource PoeItemRarityUniqueBrush}" 
                                           TextBlock.FontSize="16"  
                                           TextBlock.FontWeight="SemiBold"
-                                          Content="{Binding Price}"/>
+                                          Content="{Binding Price}"
+                                          ToolTip="{Binding PriceInChaos}"/>
                         </StackPanel>
 
                         <TextBlock Grid.Column="3" 

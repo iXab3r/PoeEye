@@ -65,6 +65,7 @@ namespace PoeEye.TradeMonitor.ViewModels
             [NotNull] IPoeChatService chatService,
             [NotNull] IPoeStashService stashService,
             [NotNull] IPoeMacroCommandsProvider macroCommandsProvider,
+            [NotNull] IPoePriceCalculcator priceCalculcator,
             [NotNull] IClock clock,
             [NotNull] IConfigProvider<PoeTradeMonitorConfig> configProvider,
             [NotNull] IPoeItemViewModelFactory poeTradeViewModelFactory,
@@ -74,6 +75,7 @@ namespace PoeEye.TradeMonitor.ViewModels
         {
             Guard.ArgumentNotNull(() => imageFactory);
             Guard.ArgumentNotNull(() => macroCommandsProvider);
+            Guard.ArgumentNotNull(() => priceCalculcator);
             Guard.ArgumentNotNull(() => clock);
             Guard.ArgumentNotNull(() => chatService);
             Guard.ArgumentNotNull(() => poeStashItemToItemConverter);
@@ -90,6 +92,8 @@ namespace PoeEye.TradeMonitor.ViewModels
             this.poeStashItemToItemConverter = poeStashItemToItemConverter;
             this.imageFactory = imageFactory;
             this.uiScheduler = uiScheduler;
+
+            PriceInChaos = priceCalculcator.GetEquivalentInChaosOrbs(model.Price);
 
             inviteToPartyCommand = new DelegateCommand(InviteToPartyCommandExecuted, GetChatServiceAvailability);
             kickFromPartyCommand = new DelegateCommand(KickFromPartyCommandExecuted, GetChatServiceAvailability);
@@ -204,6 +208,8 @@ namespace PoeEye.TradeMonitor.ViewModels
         public string CharacterName => Negotiation.CharacterName;
 
         public PoePrice Price => Negotiation.Price;
+
+        public PoePrice PriceInChaos { get; }
 
         public void SetCloseController(INegotiationCloseController closeController)
         {

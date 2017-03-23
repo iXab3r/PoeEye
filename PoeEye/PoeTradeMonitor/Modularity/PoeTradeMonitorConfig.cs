@@ -30,6 +30,10 @@ namespace PoeEye.TradeMonitor.Modularity
 
         public AudioNotificationType NotificationType { get; set; } = AudioNotificationType.Mercury;
 
+        public string CriticalNotificationEmailAddress { get; set; }
+
+        public int CriticalNotificationThresholdInChaos { get; set; }
+
         public static PoeTradeMonitorConfig Default = new PoeTradeMonitorConfig()
         {
             PredefinedMessages = new List<MacroMessage>()

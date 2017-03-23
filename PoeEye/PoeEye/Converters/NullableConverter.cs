@@ -15,7 +15,7 @@
         {
             if (string.IsNullOrEmpty(value?.ToString()))
             {
-                return null;
+                return Binding.DoNothing;
             }
 
             return value;

@@ -2,6 +2,7 @@
 using PoeEye.Converters;
 using PoeEye.PoeTrade.Common;
 using PoeShared.Audio;
+using PoeShared.PoeTrade;
 using PoeShared.UI.ViewModels;
 using PoeWhisperMonitor.Chat;
 

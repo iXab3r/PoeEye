@@ -1,6 +1,7 @@
 ﻿using Microsoft.Practices.Unity;
 using PoeEye.TradeMonitor.Models;
 using PoeEye.TradeMonitor.Services;
+using PoeEye.TradeMonitor.Services.Notifications;
 using PoeEye.TradeMonitor.Services.Parsers;
 using PoeEye.TradeMonitor.ViewModels;
 using PoeShared.Scaffolding;
@@ -16,6 +17,7 @@ namespace PoeEye.TradeMonitor.Prism
 
             Container
                 .RegisterSingleton<IPoeStashService, PoeStashService>()
+                .RegisterSingleton<IPoeNotifier, PoeNotifier>()
                 .RegisterSingleton<IPoeMacroCommandsProvider, PoeMacroCommandsService>();
 
             Container
