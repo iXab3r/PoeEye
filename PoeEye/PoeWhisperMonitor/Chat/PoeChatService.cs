@@ -63,22 +63,21 @@ namespace PoeWhisperMonitor.Chat
             set { this.RaiseAndSetIfChanged(ref isBusy, value); }
         }
 
-        public async Task<PoeMessageSendStatus> SendMessage(string message)
+        public Task<PoeMessageSendStatus> SendMessage(string message)
         {
-            return await SendMessage(message, true);
+            return SendMessage(message, true);
         }
 
         public async Task<PoeMessageSendStatus> SendMessage(string message, bool terminateByPressingEnter)
         {
             Guard.ArgumentNotNull(() => message);
 
-            var process = default(PoeProcessInfo);
             try
             {
                 IsBusy = true;
 
                 Log.Instance.Debug(
-                    $"[PoeChatService.SendMessage] Sending chat message '{message}' to process {process}...");
+                    $"[PoeChatService.SendMessage] Sending chat message '{message}'...");
 
                 var consumer = new TaskCompletionSource<PoeMessageSendStatus>();
                 requests.OnNext(new MessageRequest(message, terminateByPressingEnter, consumer));
@@ -88,7 +87,7 @@ namespace PoeWhisperMonitor.Chat
             catch (Exception ex)
             {
                 Log.Instance.Error(
-                    $"[PoeChatService.SendMessage] Failed to send message '{message}' to process {process}", ex);
+                    $"[PoeChatService.SendMessage] Failed to send message '{message}'", ex);
                 return PoeMessageSendStatus.Error;
             }
             finally
@@ -110,11 +109,13 @@ namespace PoeWhisperMonitor.Chat
                 PoeProcessInfo process;
                 if (!knownProcesses.TryPeek(out process))
                 {
+                    Log.Instance.Trace($"[PoeChatService] Failed to get active process");
                     request.Consumer.TrySetResult(PoeMessageSendStatus.FailedProcessNotFound);
                     return;
                 }
 
                 var poeHwnd = process.MainWindow;
+                Log.Instance.Trace($"[PoeChatService] [{process}] MainWindow: {poeHwnd.ToInt64():x8}");
                 if (poeHwnd == IntPtr.Zero)
                 {
                     request.Consumer.TrySetResult(PoeMessageSendStatus.FailedWindowNotFound);
@@ -145,15 +146,15 @@ namespace PoeWhisperMonitor.Chat
                     keyboardSimulator.KeyPress(VirtualKeyCode.RETURN);
                 }
 
-                Log.Instance.Trace($"[PoeChatService] [{process}] Successfully sent message '{request.Message}'");
-                request.Consumer.TrySetResult(PoeMessageSendStatus.Success);
-
                 if (existingClipboardContent != null)
                 {
                     Thread.Sleep(ClipboardRestorationTimeout);
                     Log.Instance.Trace($"[PoeChatService] Restoring previous clipboard content (retry: {ClipboardSetRetryCount}, timeout: {ClipboardRestorationTimeout})");
                     Clipboard.SetDataObject(existingClipboardContent, true, ClipboardSetRetryCount, (int)ClipboardRestorationTimeout.TotalMilliseconds);
                 }
+
+                Log.Instance.Trace($"[PoeChatService] [{process}] Successfully sent message '{request.Message}'");
+                request.Consumer.TrySetResult(PoeMessageSendStatus.Success);
             }
             catch (Exception ex)
             {

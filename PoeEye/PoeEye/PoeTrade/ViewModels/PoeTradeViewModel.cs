@@ -148,7 +148,7 @@ namespace PoeEye.PoeTrade.ViewModels
             return Uri.TryCreate(Trade.TradeForumUri, UriKind.Absolute, out tradeForumUri);
         }
 
-        private void SendPrivateMessageCommandExecuted(object arg)
+        private async void SendPrivateMessageCommandExecuted(object arg)
         {
             ExceptionlessClient.Default
                 .CreateFeatureUsage("TradeList")
@@ -161,8 +161,8 @@ namespace PoeEye.PoeTrade.ViewModels
             {
                 Log.Instance.Warn($"[PoeTradeViewModel.SendPrivateMessageCommandExecuted] Sending private message '{message}'");
                 notificationsManager.PlayNotification(AudioNotificationType.Keyboard);
-                var result = chatService.SendMessage(message).Result;
-                Log.Instance.Warn($"[PoeTradeViewModel.SendPrivateMessageCommandExecuted] Send message, result: {result}");
+                var result = await chatService.SendMessage(message);
+                Log.Instance.Warn($"[PoeTradeViewModel.SendPrivateMessageCommandExecuted] Sent message, result: {result}");
             }
             catch (Exception ex)
             {

@@ -32,8 +32,6 @@ namespace PoeEye.TradeMonitor.ViewModels
     {
         public static readonly TimeSpan DefaultUpdatePeriod = TimeSpan.FromSeconds(1);
 
-        private readonly SerialDisposable chatDisposable = new SerialDisposable();
-
         private readonly IPoeChatService chatService;
         private readonly IClock clock;
         private readonly IFactory<IImageViewModel, Uri> imageFactory;
@@ -48,7 +46,6 @@ namespace PoeEye.TradeMonitor.ViewModels
         private readonly DelegateCommand<MacroMessage?> sendPredefinedMessageCommand;
         private readonly IPoeStashService stashService;
         private readonly DelegateCommand tradeCommand;
-        private readonly IScheduler uiScheduler;
 
         private bool isExpanded;
 
@@ -91,7 +88,6 @@ namespace PoeEye.TradeMonitor.ViewModels
             this.poeTradeViewModelFactory = poeTradeViewModelFactory;
             this.poeStashItemToItemConverter = poeStashItemToItemConverter;
             this.imageFactory = imageFactory;
-            this.uiScheduler = uiScheduler;
 
             PriceInChaos = priceCalculcator.GetEquivalentInChaosOrbs(model.Price);
 
@@ -299,14 +295,11 @@ namespace PoeEye.TradeMonitor.ViewModels
                 .ForEach(x => x.Execute(this));
         }
 
-        private void SendChatMessage(string messageToSend, bool terminateWithEnter = true)
+        private async void SendChatMessage(string messageToSend, bool terminateWithEnter = true)
         {
             MessageSendStatus = PoeMessageSendStatus.Unknown;
-            var result = chatService.SendMessage(messageToSend, terminateWithEnter);
-            chatDisposable.Disposable = result
-                .ToObservable()
-                .ObserveOn(uiScheduler)
-                .Subscribe(x => HandleSendStatus(messageToSend, x));
+            var result = await chatService.SendMessage(messageToSend, terminateWithEnter);
+            HandleSendStatus(messageToSend, result);
         }
 
         private void HandleSendStatus(string message, PoeMessageSendStatus status)

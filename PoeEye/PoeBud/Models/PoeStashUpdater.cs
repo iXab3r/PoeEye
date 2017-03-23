@@ -10,6 +10,7 @@ using System.Threading;
 using Guards;
 using JetBrains.Annotations;
 using Microsoft.Practices.Unity;
+using Newtonsoft.Json;
 using PoeBud.Config;
 using PoeShared;
 using PoeShared.Prism;
@@ -139,7 +140,7 @@ namespace PoeBud.Models
             var zeroStash = poeClient.GetStash(0, character.League);
             var tabs = zeroStash.Tabs?.ToArray() ?? new IStashTab[0];
             Log.Instance.Debug(
-                $"[PoeStashUpdater.Refresh] Tabs({tabs.Length}): {tabs.Select(x => x.Name).DumpToText()}");
+                $"[PoeStashUpdater.Refresh] Tabs({tabs.Length}): {tabs.Select(x => x.Name).DumpToText(Formatting.None)}");
 
             int[] stashesToRequest;
             if (config.StashesToProcess.Count == 0)
@@ -160,7 +161,7 @@ namespace PoeBud.Models
                 }
             }
 
-            Log.Instance.Debug($"[PoeStashUpdater.Refresh] Requesting stashes [{stashesToRequest.DumpToText()}]...");
+            Log.Instance.Debug($"[PoeStashUpdater.Refresh] Requesting stashes [{stashesToRequest.DumpToText(Formatting.None)}]...");
 
             var allStashes = new List<IStash>();
             foreach (var tabIdx in stashesToRequest)
