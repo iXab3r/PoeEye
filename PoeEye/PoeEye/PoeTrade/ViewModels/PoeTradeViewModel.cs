@@ -160,7 +160,7 @@ namespace PoeEye.PoeTrade.ViewModels
             {
                 Log.Instance.Warn($"[PoeTradeViewModel.SendPrivateMessageCommandExecuted] Sending private message '{message}'");
                 notificationsManager.PlayNotification(AudioNotificationType.Keyboard);
-                var result = chatService.SendMessage(message);
+                var result = chatService.SendMessage(message).Result;
                 Log.Instance.Warn($"[PoeTradeViewModel.SendPrivateMessageCommandExecuted] Send message, result: {result}");
             }
             catch (Exception ex)

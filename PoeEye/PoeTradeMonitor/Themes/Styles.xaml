@@ -37,6 +37,8 @@
         <Setter Property="HorizontalContentAlignment" Value="Center" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="Focusable" Value="False"/>
+        <Setter Property="IsTabStop" Value="False"/>
     </Style>
 
     <Style TargetType="{x:Type TextBlock}" x:Key="TradeMonitorTextBlockStyleKey">

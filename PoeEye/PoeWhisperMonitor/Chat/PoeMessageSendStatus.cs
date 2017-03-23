@@ -3,9 +3,9 @@
     public enum PoeMessageSendStatus
     {
         Unknown,
-        InProgress,
         FailedProcessNotFound,
         FailedWindowNotFound,
+        FailedToActivateWindow,
         Error,
         Success,
     }

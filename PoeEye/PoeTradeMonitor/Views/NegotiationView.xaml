@@ -11,7 +11,8 @@
                     xmlns:modularity="clr-namespace:PoeEye.TradeMonitor.Modularity"
                     xmlns:converters="clr-namespace:PoeShared.Scaffolding.WPF.Converters;assembly=PoeShared"
                     xmlns:models="clr-namespace:PoeEye.TradeMonitor.Models"
-                    xmlns:common="clr-namespace:PoeShared.Common;assembly=PoeShared">
+                    xmlns:common="clr-namespace:PoeShared.Common;assembly=PoeShared"
+                    xmlns:chat="clr-namespace:PoeWhisperMonitor.Chat;assembly=PoeWhisperMonitor">
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Generic.xaml" />
@@ -51,6 +52,8 @@
                   BorderBrush="{StaticResource TradeMonitorBorderBrushKey}" 
                   BorderThickness="1" 
                   Padding="0"
+                  Focusable="False"
+                  IsTabStop="False"
                   IsExpanded="{Binding IsExpanded}">
             <Expander.Header>
                 <Border Height="24">
@@ -253,6 +256,60 @@
                             </TextBlock.Inlines>
                         </TextBlock>
                     </StackPanel>
+
+                    <Border Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="4" Grid.RowSpan="2"
+                            VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
+                            Background="{StaticResource TradeMonitorTitleBackgroundBrushKey}"
+                            BorderThickness="1"
+                            BorderBrush="{StaticResource ValidationBrush5}">
+                        <Border.Style>
+                            <Style TargetType="{x:Type Border}">
+                                <Setter Property="Visibility" Value="Visible"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding MessageSendStatus}" Value="{x:Static chat:PoeMessageSendStatus.Unknown}">
+                                        <Setter Property="Visibility" Value="Hidden"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding MessageSendStatus}" Value="{x:Static chat:PoeMessageSendStatus.Success}">
+                                        <Setter Property="Visibility" Value="Hidden"/>
+                                    </DataTrigger>
+                                    <Trigger Property="Visibility" Value="Visible">
+                                        <Trigger.EnterActions>
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <DoubleAnimationUsingKeyFrames 
+                                                                     Storyboard.TargetProperty="Opacity"
+                                                                     Duration="00:00:08">
+                                                        <LinearDoubleKeyFrame KeyTime="0%" Value="0" />
+                                                        <LinearDoubleKeyFrame KeyTime="5%" Value="1" />
+                                                        <LinearDoubleKeyFrame KeyTime="50%" Value="1" />
+                                                        <LinearDoubleKeyFrame KeyTime="99%" Value="0" />
+                                                    </DoubleAnimationUsingKeyFrames>
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </Trigger.EnterActions>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+                        
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                            <TextBlock Style="{StaticResource TradeMonitorTextBlockStyleKey}" 
+                                       Text="&#xf06a;" 
+                                       Foreground="{StaticResource ControlsValidationBrush}"
+                                       FontSize="30"
+                                       ToolTip="{Binding MessageSendStatus}"
+                                       Margin="5,0"/>
+
+                            <TextBlock 
+                               Foreground="{StaticResource ControlsValidationBrush}"
+                               FontSize="18"
+                               FontWeight="Bold"
+                               Text="{Binding MessageSendStatus, StringFormat='Failed to send message: {0}'}">
+                            </TextBlock>
+
+                        </StackPanel>
+                        
+                    </Border>
 
                 </Grid>
             </Border>

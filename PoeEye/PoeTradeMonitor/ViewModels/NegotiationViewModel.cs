@@ -2,7 +2,9 @@
 using System.Globalization;
 using System.Linq;
 using System.Reactive.Concurrency;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Reactive.Threading.Tasks;
 using System.Windows.Input;
 using Guards;
 using JetBrains.Annotations;
@@ -29,20 +31,25 @@ namespace PoeEye.TradeMonitor.ViewModels
     internal class NegotiationViewModel : DisposableReactiveObject, INegotiationViewModel, IMacroCommandContext
     {
         public static readonly TimeSpan DefaultUpdatePeriod = TimeSpan.FromSeconds(1);
+
+        private readonly SerialDisposable chatDisposable = new SerialDisposable();
+
         private readonly IPoeChatService chatService;
         private readonly IClock clock;
-        [NotNull] private readonly IFactory<IImageViewModel, Uri> imageFactory;
+        private readonly IFactory<IImageViewModel, Uri> imageFactory;
 
         private readonly DelegateCommand inviteToPartyCommand;
         private readonly DelegateCommand kickFromPartyCommand;
-        [NotNull] private readonly IPoeMacroCommandsProvider macroCommandsProvider;
+        private readonly IPoeMacroCommandsProvider macroCommandsProvider;
 
         private readonly DelegateCommand openChatCommand;
-        [NotNull] private readonly IConverter<IStashItem, IPoeItem> poeStashItemToItemConverter;
-        [NotNull] private readonly IPoeItemViewModelFactory poeTradeViewModelFactory;
+        private readonly IConverter<IStashItem, IPoeItem> poeStashItemToItemConverter;
+        private readonly IPoeItemViewModelFactory poeTradeViewModelFactory;
         private readonly DelegateCommand<MacroMessage?> sendPredefinedMessageCommand;
         private readonly IPoeStashService stashService;
         private readonly DelegateCommand tradeCommand;
+        private readonly IScheduler uiScheduler;
+
         private bool isExpanded;
 
         private object item;
@@ -50,6 +57,8 @@ namespace PoeEye.TradeMonitor.ViewModels
         private IImageViewModel itemIcon;
 
         private PoeItemRarity itemRarity;
+
+        private PoeMessageSendStatus messageSendStatus;
 
         public NegotiationViewModel(
             TradeModel model,
@@ -80,6 +89,7 @@ namespace PoeEye.TradeMonitor.ViewModels
             this.poeTradeViewModelFactory = poeTradeViewModelFactory;
             this.poeStashItemToItemConverter = poeStashItemToItemConverter;
             this.imageFactory = imageFactory;
+            this.uiScheduler = uiScheduler;
 
             inviteToPartyCommand = new DelegateCommand(InviteToPartyCommandExecuted, GetChatServiceAvailability);
             kickFromPartyCommand = new DelegateCommand(KickFromPartyCommandExecuted, GetChatServiceAvailability);
@@ -89,7 +99,7 @@ namespace PoeEye.TradeMonitor.ViewModels
                 SendPredefinedMessageCommandExecuted, _ => GetChatServiceAvailability());
 
             chatService
-                .WhenAnyValue(x => x.IsAvailable)
+                .WhenAnyValue(x => x.IsAvailable, x => x.IsBusy)
                 .Subscribe(
                     () =>
                     {
@@ -175,6 +185,12 @@ namespace PoeEye.TradeMonitor.ViewModels
 
         public IReactiveList<MacroMessage> PredefinedMessages { get; } = new ReactiveList<MacroMessage>();
 
+        public PoeMessageSendStatus MessageSendStatus
+        {
+            get { return messageSendStatus; }
+            set { this.RaiseAndSetIfChanged(ref messageSendStatus, value); }
+        }
+
         public INegotiationCloseController CloseController { get; private set; }
 
         public TradeModel Negotiation { get; }
@@ -212,7 +228,7 @@ namespace PoeEye.TradeMonitor.ViewModels
                 ? "Never"
                 : stashService.LastUpdateTimestamp.ToString(CultureInfo.InvariantCulture);
 
-            Item = item != null 
+            Item = item != null
                 ? BuildItemViewModel(item)
                 : $"Item was not found in Stash (last update timestamp: {lastUpdateTimeStampInfo})";
         }
@@ -233,27 +249,27 @@ namespace PoeEye.TradeMonitor.ViewModels
 
         private bool GetChatServiceAvailability()
         {
-            return chatService.IsAvailable;
+            return chatService.IsAvailable && !chatService.IsBusy;
         }
 
         private void TradeCommandExecuted()
         {
-            chatService.SendMessage($"/tradewith {Negotiation.CharacterName}");
+            SendChatMessage($"/tradewith {Negotiation.CharacterName}");
         }
 
         private void OpenChatCommandExecuted()
         {
-            chatService.SendMessage($"@{Negotiation.CharacterName} ", false);
+            SendChatMessage($"@{Negotiation.CharacterName} ", false);
         }
 
         private void InviteToPartyCommandExecuted()
         {
-            chatService.SendMessage($"/invite {Negotiation.CharacterName}");
+            SendChatMessage($"/invite {Negotiation.CharacterName}");
         }
 
         private void KickFromPartyCommandExecuted()
         {
-            chatService.SendMessage($"/kick {Negotiation.CharacterName}");
+            SendChatMessage($"/kick {Negotiation.CharacterName}");
         }
 
         private void SendPredefinedMessageCommandExecuted(MacroMessage? message)
@@ -270,11 +286,27 @@ namespace PoeEye.TradeMonitor.ViewModels
             var messageToSend = message.Text;
             MacroCommands.ForEach(x => messageToSend = x.CleanupText(messageToSend));
 
-            chatService.SendMessage($"@{Negotiation.CharacterName} {messageToSend}");
+            SendChatMessage($"@{Negotiation.CharacterName} {messageToSend}");
 
             MacroCommands
                 .Where(x => x.TryToMatch(message.Text).Success)
                 .ForEach(x => x.Execute(this));
+        }
+
+        private void SendChatMessage(string messageToSend, bool terminateWithEnter = true)
+        {
+            MessageSendStatus = PoeMessageSendStatus.Unknown;
+            var result = chatService.SendMessage(messageToSend, terminateWithEnter);
+            chatDisposable.Disposable = result
+                .ToObservable()
+                .ObserveOn(uiScheduler)
+                .Subscribe(x => HandleSendStatus(messageToSend, x));
+        }
+
+        private void HandleSendStatus(string message, PoeMessageSendStatus status)
+        {
+            Log.Instance.Debug($"[NegotiationViewModel] Message status: {status}, message: '{message}'");
+            MessageSendStatus = status;
         }
 
         private void ApplyConfig(PoeTradeMonitorConfig config)

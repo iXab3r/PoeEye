@@ -1,39 +1,40 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Linq;
-using System.Reactive.Disposables;
-using System.Runtime.InteropServices;
+using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using WindowsInput;
 using WindowsInput.Native;
 using Guards;
 using JetBrains.Annotations;
 using PoeShared;
+using PoeShared.Modularity;
 using PoeShared.Scaffolding;
 using ReactiveUI;
+
+using Clipboard = System.Windows.Forms.Clipboard;
 
 namespace PoeWhisperMonitor.Chat
 {
     internal sealed class PoeChatService : DisposableReactiveObject, IPoeChatService
     {
+        private static readonly TimeSpan ClipboardRestorationTimeout = TimeSpan.FromMilliseconds(200);
+        private static readonly int ClipboardSetRetryCount = 10;
+
         private readonly IKeyboardSimulator keyboardSimulator = new InputSimulator().Keyboard;
+        private readonly ISubject<MessageRequest> requests = new Subject<MessageRequest>();
 
         private bool isAvailable;
+
+        private bool isBusy;
         private ConcurrentQueue<PoeProcessInfo> knownProcesses = new ConcurrentQueue<PoeProcessInfo>();
 
-        /// <summary>
-        ///     The GetForegroundWindow function returns a handle to the foreground window.
-        /// </summary>
-        [DllImport("user32.dll")]
-        private static extern IntPtr GetForegroundWindow();
-
-        [DllImport("user32.dll")]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool SetForegroundWindow(IntPtr hWnd);
-
         public PoeChatService(
-            [NotNull] IPoeTracker tracker)
+            [NotNull] IPoeTracker tracker,
+            [NotNull] ISchedulerProvider schedulerProvider)
         {
             Guard.ArgumentNotNull(() => tracker);
 
@@ -41,6 +42,12 @@ namespace PoeWhisperMonitor.Chat
 
             tracker.ActiveProcesses
                 .Subscribe(MakeProcessesSnapshot)
+                .AddTo(Anchors);
+
+            var kbdScheduler = schedulerProvider.GetOrCreate("KbdOutput");
+            requests
+                .ObserveOn(kbdScheduler)
+                .Subscribe(HandleMessageRequest, Log.HandleException)
                 .AddTo(Anchors);
         }
 
@@ -50,32 +57,33 @@ namespace PoeWhisperMonitor.Chat
             set { this.RaiseAndSetIfChanged(ref isAvailable, value); }
         }
 
-        public PoeMessageSendStatus SendMessage(string message)
+        public bool IsBusy
         {
-            return SendMessage(message, true);
+            get { return isBusy; }
+            set { this.RaiseAndSetIfChanged(ref isBusy, value); }
         }
 
-        public PoeMessageSendStatus SendMessage(string message, bool terminateByPressingEnter)
+        public async Task<PoeMessageSendStatus> SendMessage(string message)
+        {
+            return await SendMessage(message, true);
+        }
+
+        public async Task<PoeMessageSendStatus> SendMessage(string message, bool terminateByPressingEnter)
         {
             Guard.ArgumentNotNull(() => message);
 
-            PoeProcessInfo process;
-            if (!knownProcesses.TryPeek(out process))
-            {
-                return PoeMessageSendStatus.FailedProcessNotFound;
-            }
-
-            if (process.MainWindow == IntPtr.Zero)
-            {
-                return PoeMessageSendStatus.FailedWindowNotFound;
-            }
-
+            var process = default(PoeProcessInfo);
             try
             {
+                IsBusy = true;
+
                 Log.Instance.Debug(
                     $"[PoeChatService.SendMessage] Sending chat message '{message}' to process {process}...");
 
-                SendMessageInternal(process.MainWindow, message, terminateByPressingEnter);
+                var consumer = new TaskCompletionSource<PoeMessageSendStatus>();
+                requests.OnNext(new MessageRequest(message, terminateByPressingEnter, consumer));
+
+                return await consumer.Task;
             }
             catch (Exception ex)
             {
@@ -83,8 +91,10 @@ namespace PoeWhisperMonitor.Chat
                     $"[PoeChatService.SendMessage] Failed to send message '{message}' to process {process}", ex);
                 return PoeMessageSendStatus.Error;
             }
-
-            return PoeMessageSendStatus.Success;
+            finally
+            {
+                IsBusy = false;
+            }
         }
 
         private void MakeProcessesSnapshot(PoeProcessInfo[] processes)
@@ -93,38 +103,77 @@ namespace PoeWhisperMonitor.Chat
             IsAvailable = processes.Any();
         }
 
-        private void SendMessageInternal(IntPtr hWnd, string message, bool terminateByPressingEnter)
+        private void HandleMessageRequest(MessageRequest request)
         {
-            var existingMessage = Clipboard.GetText();
             try
             {
-                Clipboard.SetText(message);
-
-                if (GetForegroundWindow() != hWnd)
+                PoeProcessInfo process;
+                if (!knownProcesses.TryPeek(out process))
                 {
-                    if (!SetForegroundWindow(hWnd))
+                    request.Consumer.TrySetResult(PoeMessageSendStatus.FailedProcessNotFound);
+                    return;
+                }
+
+                var poeHwnd = process.MainWindow;
+                if (poeHwnd == IntPtr.Zero)
+                {
+                    request.Consumer.TrySetResult(PoeMessageSendStatus.FailedWindowNotFound);
+                    return;
+                }
+
+                Log.Instance.Trace($"[PoeChatService] [{process}] Bringing window {poeHwnd.ToInt64():x8} to front...");
+                if (NativeMethods.GetForegroundWindow() != poeHwnd)
+                {
+                    if (!NativeMethods.SetForegroundWindow(poeHwnd))
                     {
+                        request.Consumer.TrySetResult(PoeMessageSendStatus.FailedToActivateWindow);
                         return;
                     }
                 }
 
+                Log.Instance.Trace($"[PoeChatService] [{process}] Retrieving current clipboard content...");
+                var existingClipboardContent = Clipboard.GetDataObject();
+
+                Log.Instance.Trace($"[PoeChatService] [{process}] Setting new message '{request.Message}' (retry: {ClipboardSetRetryCount}, timeout: {ClipboardRestorationTimeout})...");
+                Clipboard.SetDataObject(request.Message, true, ClipboardSetRetryCount, (int)ClipboardRestorationTimeout.TotalMilliseconds);
+
                 keyboardSimulator.KeyPress(VirtualKeyCode.RETURN);
                 keyboardSimulator.ModifiedKeyStroke(VirtualKeyCode.CONTROL, VirtualKeyCode.VK_V);
 
-                if (terminateByPressingEnter)
+                if (request.TerminateByEnter)
                 {
                     keyboardSimulator.KeyPress(VirtualKeyCode.RETURN);
                 }
 
-                SetForegroundWindow(hWnd);
-            }
-            finally
-            {
-                Thread.Sleep(100);
-                if (!string.IsNullOrWhiteSpace(existingMessage))
+                Log.Instance.Trace($"[PoeChatService] [{process}] Successfully sent message '{request.Message}'");
+                request.Consumer.TrySetResult(PoeMessageSendStatus.Success);
+
+                if (existingClipboardContent != null)
                 {
-                    Clipboard.SetText(existingMessage);
+                    Thread.Sleep(ClipboardRestorationTimeout);
+                    Log.Instance.Trace($"[PoeChatService] Restoring previous clipboard content (retry: {ClipboardSetRetryCount}, timeout: {ClipboardRestorationTimeout})");
+                    Clipboard.SetDataObject(existingClipboardContent, true, ClipboardSetRetryCount, (int)ClipboardRestorationTimeout.TotalMilliseconds);
                 }
+            }
+            catch (Exception ex)
+            {
+                request.Consumer.TrySetException(ex);
+            }
+        }
+
+        private struct MessageRequest
+        {
+            public string Message { get; }
+
+            public bool TerminateByEnter { get; }
+
+            public TaskCompletionSource<PoeMessageSendStatus> Consumer { get; }
+
+            public MessageRequest(string message, bool terminateByEnter, TaskCompletionSource<PoeMessageSendStatus> consumer) : this()
+            {
+                Message = message;
+                TerminateByEnter = terminateByEnter;
+                Consumer = consumer;
             }
         }
     }

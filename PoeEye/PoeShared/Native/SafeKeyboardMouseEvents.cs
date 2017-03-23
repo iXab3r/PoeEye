@@ -13,6 +13,7 @@ using Guards;
 using JetBrains.Annotations;
 using Microsoft.Practices.Unity;
 using Newtonsoft.Json;
+using PoeShared.Modularity;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
 using KeyEventArgs = System.Windows.Forms.KeyEventArgs;
@@ -23,32 +24,21 @@ namespace PoeShared.Native
     internal sealed class KeyboardEventsSource : DisposableReactiveObject, IKeyboardEventsSource
     {
         private readonly IKeyboardMouseEvents keyboardMouseEvents;
+        private readonly IScheduler kbdScheduler;
 
         private readonly ISubject<KeyPressEventArgs> whenKeyPress = new Subject<KeyPressEventArgs>();
         private readonly ISubject<KeyEventArgs> whenKeyDown = new Subject<KeyEventArgs>();
         private readonly ISubject<KeyEventArgs> whenKeyUp = new Subject<KeyEventArgs>();
 
-        private readonly ISubject<IScheduler> keyboardScheduler = new ReplaySubject<IScheduler>(1);
-
         public KeyboardEventsSource(
             [NotNull] IKeyboardMouseEvents keyboardMouseEvents,
-            [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
+            [NotNull] ISchedulerProvider schedulerProvider)
         {
             Guard.ArgumentNotNull(() => keyboardMouseEvents);
             this.keyboardMouseEvents = keyboardMouseEvents;
 
-            var dispatcherThread = new Thread(InitializeKeyboardThread)
-            {
-                Name = "Kbd",
-                IsBackground = true
-            };
-
-            keyboardScheduler
-                .ObserveOn(uiScheduler)
-                .Subscribe(InitializeHook)
-                .AddTo(Anchors);
-
-            dispatcherThread.Start();
+            kbdScheduler = schedulerProvider.GetOrCreate("KdbInput");
+            InitializeHook();
         }
 
         public IObservable<KeyPressEventArgs> WhenKeyPress => whenKeyPress;
@@ -57,7 +47,7 @@ namespace PoeShared.Native
 
         public IObservable<KeyEventArgs> WhenKeyUp => whenKeyUp;
 
-        private void InitializeHook(IScheduler bgScheduler)
+        private void InitializeHook()
         {
             Log.Instance.Debug($"[KeyboardEventsSource] Hook: {keyboardMouseEvents}");
             Observable
@@ -65,7 +55,7 @@ namespace PoeShared.Native
                     h => keyboardMouseEvents.KeyDown += h,
                     h => keyboardMouseEvents.KeyDown -= h)
                 .Select(x => x.EventArgs)
-                .ObserveOn(bgScheduler)
+                .ObserveOn(kbdScheduler)
                 .Do(whenKeyDown)
                 .Where(x => x.Handled || x.SuppressKeyPress)
                 .Subscribe(LogEvent, Log.HandleException)
@@ -76,7 +66,7 @@ namespace PoeShared.Native
                    h => keyboardMouseEvents.KeyUp += h,
                    h => keyboardMouseEvents.KeyUp -= h)
                .Select(x => x.EventArgs)
-               .ObserveOn(bgScheduler)
+               .ObserveOn(kbdScheduler)
                .Do(whenKeyUp)
                .Where(x => x.Handled)
                .Subscribe(LogEvent, Log.HandleException)
@@ -87,7 +77,7 @@ namespace PoeShared.Native
                    h => keyboardMouseEvents.KeyPress += h,
                    h => keyboardMouseEvents.KeyPress -= h)
                .Select(x => x.EventArgs)
-               .ObserveOn(bgScheduler)
+               .ObserveOn(kbdScheduler)
                .Do(whenKeyPress)
                .Where(x => x.Handled)
                .Subscribe(LogEvent, Log.HandleException)
@@ -101,31 +91,6 @@ namespace PoeShared.Native
                 return;
             }
             Log.Instance.Debug($"[KeyboardEventsSource] {arg.DumpToText(Formatting.None)}");
-        }
-
-        private void InitializeKeyboardThread()
-        {
-            try
-            {
-                Log.Instance.Debug($"[KeyboardEventsSource.InitializeKeyboardThread] Thread started");
-                var dispatcher = Dispatcher.CurrentDispatcher;
-                Log.Instance.Debug($"[KeyboardEventsSource.InitializeKeyboardThread] Dispatcher: {dispatcher}");
-                var scheduler = new DispatcherScheduler(dispatcher);
-                Log.Instance.Debug($"[KeyboardEventsSource.InitializeKeyboardThread] Scheduler: {dispatcher}");
-                keyboardScheduler.OnNext(scheduler);
-
-                Log.Instance.Debug($"[KeyboardEventsSource.InitializeKeyboardThread] Starting dispatcher...");
-                Dispatcher.Run();
-            }
-            catch (Exception e)
-            {
-                Log.HandleException(e);
-                keyboardScheduler.OnError(e);
-            }
-            finally
-            {
-                Log.Instance.Debug($"[KeyboardEventsSource.InitializeKeyboardThread] Thread completed");
-            }
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 using PoeShared.Scaffolding;
 
@@ -8,8 +9,10 @@ namespace PoeWhisperMonitor.Chat
     {
         bool IsAvailable { get; }
 
-        PoeMessageSendStatus SendMessage([NotNull] string message);
+        bool IsBusy { get; }
 
-        PoeMessageSendStatus SendMessage([NotNull] string message, bool terminateByPressingEnter);
+        Task<PoeMessageSendStatus> SendMessage([NotNull] string message);
+
+        Task<PoeMessageSendStatus> SendMessage([NotNull] string message, bool terminateByPressingEnter);
     }
 }

@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Reactive.Concurrency;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Reactive.Threading.Tasks;
 using System.Windows.Input;
 using Guards;
 using JetBrains.Annotations;
@@ -31,6 +33,8 @@ namespace PoeEye.PoeTrade.ViewModels
         private PoeMessageSendStatus sendStatus;
 
         private string sendStatusErrorMessage;
+
+        private readonly SerialDisposable messageQueueDisposable = new SerialDisposable();
 
         public PoeChatViewModel(
             [NotNull] IPoeWhisperService whisperService,
@@ -100,7 +104,15 @@ namespace PoeEye.PoeTrade.ViewModels
 
         private void SendMessageCommandExecuted(string message)
         {
-            SendStatus = chatService.SendMessage(message);
+            messageQueueDisposable.Disposable = chatService
+                .SendMessage(message)
+                .ToObservable()
+                .Subscribe(HandleMessageSendStatus);
+        }
+
+        private void HandleMessageSendStatus(PoeMessageSendStatus status)
+        {
+            SendStatus = status;
             if (SendStatus == PoeMessageSendStatus.Success)
             {
                 notificationsManager.PlayNotification(AudioNotificationType.Keyboard);
