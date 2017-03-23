@@ -136,14 +136,6 @@
       <HintPath>..\packages\Newtonsoft.Json.8.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="NHotkey, Version=1.2.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\NHotkey.1.2.1\lib\net20\NHotkey.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="NHotkey.Wpf, Version=1.2.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\NHotkey.Wpf.1.2.1\lib\net35\NHotkey.Wpf.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="NuGet.Squirrel">
       <HintPath>..\packages\squirrel.windows.1.0.2\lib\Net45\NuGet.Squirrel.dll</HintPath>
     </Reference>
