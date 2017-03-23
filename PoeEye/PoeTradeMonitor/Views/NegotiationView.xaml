@@ -270,6 +270,7 @@
                             VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
                             Background="{StaticResource TradeMonitorTitleBackgroundBrushKey}"
                             BorderThickness="1"
+                            IsHitTestVisible="False"
                             BorderBrush="{StaticResource ValidationBrush5}">
                         <Border.Style>
                             <Style TargetType="{x:Type Border}">
