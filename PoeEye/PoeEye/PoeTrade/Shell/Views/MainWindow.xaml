@@ -289,8 +289,8 @@
             <controls:Flyout Header="&#xF085; Settings" x:Name="SettingsFlyout"
                              FontFamily="{StaticResource FontAwesome}"
                              Position="Right"
-                             Width="600"
-                             Margin="0, 20"
+                             Width="500"
+                             Margin="0, 35"
                              IsOpen="{Binding Settings.IsOpen}"
                              BorderBrush="{StaticResource AccentColorBrush}">
                 <ContentPresenter Content="{Binding Settings}" />
@@ -300,7 +300,7 @@
                              FontFamily="{StaticResource FontAwesome}"
                              Position="Right"
                              Width="500"
-                             Margin="0, 20"
+                             Margin="0, 35"
                              BorderBrush="{StaticResource AccentColorBrush}">
                 <Grid Margin="5,0">
                     <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Visible">
@@ -314,8 +314,7 @@
             <controls:Flyout Header="&#xF093; Update status" x:Name="ApplicationUpdatedFlyout"
                              FontFamily="{StaticResource FontAwesome}"
                              Position="Bottom"
-                             AnimateOpacity="True"
-                             Margin="0, 20"
+                             Height="60"
                              BorderThickness="0,0,0,1"
                              BorderBrush="{StaticResource AccentColorBrush}"
                              IsOpen="{Binding ApplicationUpdater.IsOpen}">

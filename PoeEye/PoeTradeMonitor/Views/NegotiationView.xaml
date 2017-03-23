@@ -17,6 +17,8 @@
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Generic.xaml" />
         <ResourceDictionary Source="pack://application:,,,/PoeTradeMonitor;component/Themes/Styles.xaml" />
+
+        <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.Expander.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
     <blue:BoolToVisibilityConverter x:Key="TrueToVisibleConverter"
@@ -55,6 +57,12 @@
                   Focusable="False"
                   IsTabStop="False"
                   IsExpanded="{Binding IsExpanded}">
+            <controls:ExpanderHelper.HeaderDownStyle>
+                <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource ExpanderDownHeaderStyle}">
+                    <Setter Property="Focusable" Value="False"/>
+                    <Setter Property="IsTabStop" Value="False"/>
+                </Style>
+            </controls:ExpanderHelper.HeaderDownStyle>
             <Expander.Header>
                 <Border Height="24">
                     <Grid>
