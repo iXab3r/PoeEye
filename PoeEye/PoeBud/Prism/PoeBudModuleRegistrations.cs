@@ -12,9 +12,6 @@ namespace PoeBud.Prism
 
     using Models;
 
-    using NHotkey;
-    using NHotkey.Wpf;
-
     using ViewModels;
 
     internal sealed class PoeBudModuleRegistrations : UnityContainerExtension
@@ -28,7 +25,6 @@ namespace PoeBud.Prism
                 .RegisterSingleton<IUiOverlaysProvider, UiOverlaysProvider>();
 
             Container
-                .RegisterType<HotkeyManagerBase>(new InjectionFactory(x => HotkeyManager.Current))
                 .RegisterType<IUserInputBlocker, UserInputBlocker>()
                 .RegisterType<IPoeStashUpdater, PoeStashUpdater>()
                 .RegisterType<ISolutionExecutorViewModel, SolutionExecutorViewModel>()
