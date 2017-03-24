@@ -20,6 +20,7 @@ namespace PoeShared.Native
         private const int SWP_NOSIZE = 0x0001;
         private const int GWL_STYLE = -16;
         private const int WS_SYSMENU = 0x80000;
+        private const int WS_EX_NOACTIVATE = 0x08000000;
 
         [DllImport("user32.dll", EntryPoint = "SetWindowPos")]
         private static extern bool SetWindowPos(
@@ -87,13 +88,19 @@ namespace PoeShared.Native
         public static void SetWindowExTransparent(IntPtr hwnd)
         {
             var extendedStyle = GetWindowLong(hwnd, GWL_EXSTYLE);
-            SetWindowLong(hwnd, GWL_EXSTYLE, extendedStyle | WS_EX_TRANSPARENT | WS_EX_TOOLWINDOW);
+            SetWindowLong(hwnd, GWL_EXSTYLE, extendedStyle | WS_EX_TOOLWINDOW | WS_EX_TRANSPARENT);
         }
 
         public static void SetWindowExLayered(IntPtr hwnd)
         {
             var extendedStyle = GetWindowLong(hwnd, GWL_EXSTYLE);
-            SetWindowLong(hwnd, GWL_EXSTYLE, extendedStyle | WS_EX_LAYERED | WS_EX_TOOLWINDOW);
+            SetWindowLong(hwnd, GWL_EXSTYLE, extendedStyle | WS_EX_TOOLWINDOW | WS_EX_LAYERED);
+        }
+
+        public static void SetWindowExNoActivate(IntPtr hwnd)
+        {
+            var existingStyle = GetWindowLong(hwnd, GWL_EXSTYLE);
+            SetWindowLong(hwnd, GWL_EXSTYLE, existingStyle | WS_EX_NOACTIVATE);
         }
     }
 }

@@ -2,17 +2,16 @@
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls.Primitives;
 using System.Windows.Forms;
+using System.Windows.Interop;
 using PoeShared.Scaffolding;
 using Xceed.Wpf.Toolkit;
 
 namespace PoeShared.Native
 {
-    /// <summary>
-    ///     Interaction logic for Window1.xaml
-    /// </summary>
     public partial class OverlayWindowView
     {
         private readonly OverlayMode overlayMode;
@@ -22,6 +21,13 @@ namespace PoeShared.Native
         {
             this.overlayMode = overlayMode;
             InitializeComponent();
+
+            WhenLoaded.Subscribe(OnLoaded);
+        }
+        private void OnLoaded()
+        {
+            var helper = new WindowInteropHelper(this);
+            WindowsServices.SetWindowExNoActivate(helper.Handle);
         }
 
         public IObservable<Unit> WhenLoaded => Observable
@@ -41,7 +47,13 @@ namespace PoeShared.Native
                     break;
             }
         }
-        
+
+        [DllImport("user32.dll")]
+        public static extern IntPtr SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
+
+        [DllImport("user32.dll")]
+        public static extern int GetWindowLong(IntPtr hWnd, int nIndex);
+
         public override string ToString()
         {
             return $"Overlay({overlayMode})";
