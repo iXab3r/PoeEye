@@ -1,4 +1,6 @@
-﻿namespace PoeEye.Converters
+﻿using System.Windows;
+
+namespace PoeEye.Converters
 {
     using System;
     using System.Globalization;
@@ -6,6 +8,8 @@
 
     internal sealed class NullableConverter : IValueConverter
     {
+        public static IValueConverter Instance = new NullableConverter();
+
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             return value;
@@ -13,11 +17,6 @@
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (string.IsNullOrEmpty(value?.ToString()))
-            {
-                return Binding.DoNothing;
-            }
-
             return value;
         }
     }

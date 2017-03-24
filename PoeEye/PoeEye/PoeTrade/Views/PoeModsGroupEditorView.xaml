@@ -3,7 +3,8 @@
                     xmlns:System="clr-namespace:System;assembly=mscorlib"
                     xmlns:query="clr-namespace:PoeShared.PoeTrade.Query;assembly=PoeShared"
                     xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
-                    xmlns:viewModels="clr-namespace:PoeEye.PoeTrade.ViewModels">
+                    xmlns:viewModels="clr-namespace:PoeEye.PoeTrade.ViewModels"
+                    xmlns:converters="clr-namespace:PoeEye.Converters">
   <DataTemplate DataType="{x:Type viewModels:PoeModGroupsEditorViewModel}">
 
     <DataTemplate.Resources>
@@ -110,9 +111,9 @@
                       </Style>
                     </StackPanel.Style>
                     <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}"
-                                            Value="{Binding MinGroupValue}" />
+                                            Value="{Binding MinGroupValue, Converter={x:Static converters:NullableConverter.Instance}}" />
                     <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}"
-                                            Value="{Binding MaxGroupValue}" />
+                                            Value="{Binding MaxGroupValue, Converter={x:Static converters:NullableConverter.Instance}}" />
                   </StackPanel>
 
                   <Button Grid.Column="3"

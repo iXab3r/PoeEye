@@ -4,7 +4,8 @@
                     xmlns:wpfControls="http://wpfcontrols.com/"
                     xmlns:common="clr-namespace:PoeShared.Common;assembly=PoeShared"
                     xmlns:editors="https://github.com/iXab3r/WpfAutoCompleteControls"
-                    xmlns:viewModels="clr-namespace:PoeEye.PoeTrade.ViewModels">
+                    xmlns:viewModels="clr-namespace:PoeEye.PoeTrade.ViewModels"
+                    xmlns:converters="clr-namespace:PoeEye.Converters">
   <DataTemplate DataType="{x:Type viewModels:PoeModViewModel}">
     <Grid>
       <Grid.ColumnDefinitions>
@@ -21,9 +22,9 @@
                   Orientation="Horizontal"
                   Margin="10,0,0,0">
         <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}"
-                                Value="{Binding Min}" />
+                                Value="{Binding Min, Converter={x:Static converters:NullableConverter.Instance}}" />
         <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}"
-                                Value="{Binding Max}" />
+                                Value="{Binding Max, Converter={x:Static converters:NullableConverter.Instance}}" />
       </StackPanel>
     </Grid>
   </DataTemplate>

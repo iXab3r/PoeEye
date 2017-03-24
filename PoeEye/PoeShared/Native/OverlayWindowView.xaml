@@ -23,25 +23,6 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Generic.xaml" />
             </ResourceDictionary.MergedDictionaries>
-
-            <sharedConverter:TwoNumbersToSizeConverter x:Key="ActualWidthAndHeightToSizeConverter" />
-
-
-            <converters:MapConverter x:Key="IsLockedToBackgroundConverterKey"
-                                     FallbackBehavior="ReturnFallbackValue">
-                <converters:MapConverter.FallbackValue>
-                    <SolidColorBrush Color="CornflowerBlue" />
-                </converters:MapConverter.FallbackValue>
-                <converters:Mapping>
-                    <converters:Mapping.To>
-                        <SolidColorBrush Color="Transparent" />
-                    </converters:Mapping.To>
-                    <converters:Mapping.From>
-                        <system:Boolean>True</system:Boolean>
-                    </converters:Mapping.From>
-                </converters:Mapping>
-            </converters:MapConverter>
-
         </ResourceDictionary>
     </Window.Resources>
 

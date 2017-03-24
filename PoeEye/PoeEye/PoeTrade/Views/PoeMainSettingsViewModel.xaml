@@ -1,7 +1,8 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:viewModels1="clr-namespace:PoeEye.PoeTrade.ViewModels"
-                    xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls">
+                    xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
+                    xmlns:converters="clr-namespace:PoeEye.Converters">
 
     <DataTemplate DataType="{x:Type viewModels1:PoeMainSettingsViewModel}">
         <Grid Margin="10,5">
@@ -38,7 +39,7 @@
                                        Content="{Binding Item1, Mode=OneWay}" />
                                 <controls:NumericUpDown Width="100"
                                                         Style="{StaticResource QueryNumericUpDownMax}"
-                                                        Value="{Binding Item2}"
+                                                        Value="{Binding Item2, Converter={x:Static converters:NullableConverter.Instance}}"
                                                         StringFormat="{}{0:F2}" />
                             </StackPanel>
 
