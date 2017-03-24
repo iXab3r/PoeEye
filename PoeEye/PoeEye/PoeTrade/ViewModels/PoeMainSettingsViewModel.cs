@@ -11,14 +11,11 @@ namespace PoeEye.PoeTrade.ViewModels
     internal sealed class PoeMainSettingsViewModel : DisposableReactiveObject, ISettingsViewModel<PoeEyeMainConfig>
     {
         private bool clipboardMonitoringEnabled;
-
         private EditableTuple<string, float>[] currenciesPriceInChaosOrbs = new EditableTuple<string, float>[0];
-
         private bool isOpen;
-
         private bool whisperNotificationsEnabled;
-
         private PoeEyeTabConfig[] tabConfigs;
+        private PoeEyeMainConfig loadedConfig;
 
         public bool IsOpen
         {
@@ -48,6 +45,8 @@ namespace PoeEye.PoeTrade.ViewModels
 
         public void Load(PoeEyeMainConfig config)
         {
+            loadedConfig = config;
+
             tabConfigs = config.TabConfigs;
             ClipboardMonitoringEnabled = config.ClipboardMonitoringEnabled;
             WhisperNotificationsEnabled = config.WhisperNotificationsEnabled;
@@ -59,15 +58,11 @@ namespace PoeEye.PoeTrade.ViewModels
 
         public PoeEyeMainConfig Save()
         {
-            var config = new PoeEyeMainConfig()
-            {
-                TabConfigs = tabConfigs,
-                ClipboardMonitoringEnabled = ClipboardMonitoringEnabled,
-                WhisperNotificationsEnabled = WhisperNotificationsEnabled,
-                CurrenciesPriceInChaos = CurrenciesPriceInChaosOrbs.ToDictionary(x => x.Item1, x => x.Item2),
-            };
-
-            return config;
+            loadedConfig.TabConfigs = tabConfigs;
+            loadedConfig.ClipboardMonitoringEnabled = ClipboardMonitoringEnabled;
+            loadedConfig.WhisperNotificationsEnabled = WhisperNotificationsEnabled;
+            loadedConfig.CurrenciesPriceInChaos = CurrenciesPriceInChaosOrbs.ToDictionary(x => x.Item1, x => x.Item2);
+            return loadedConfig;
         }
     }
 }
