@@ -1,4 +1,13 @@
-﻿namespace PoeShared.PoeDatabase
+﻿using System;
+using System.Collections.ObjectModel;
+using System.Reactive.Concurrency;
+using System.Threading.Tasks;
+using DynamicData;
+using JetBrains.Annotations;
+using Microsoft.Practices.Unity;
+using PoeShared.Prism;
+
+namespace PoeShared.PoeDatabase
 {
     using System.Collections.Generic;
     using System.Linq;
@@ -6,22 +15,39 @@
 
     using Scaffolding;
 
-    internal sealed class StaticPoeDatabaseReader : IPoeDatabaseReader
+    internal sealed class StaticPoeDatabaseReader : DisposableReactiveObject, IPoeDatabaseReader
     {
-        private readonly ISet<string> knownEntities = new HashSet<string>();
+        private readonly ISourceList<string> knownEntities = new SourceList<string>();
+        private readonly ReadOnlyObservableCollection<string> knownEntityNames;
 
-        public StaticPoeDatabaseReader()
+        public StaticPoeDatabaseReader(
+            [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler)
         {
+            Log.Instance.Debug("[StaticPoeDatabaseReader..ctor] Created");
+
+            knownEntities
+                .Connect()
+                .Bind(out knownEntityNames)
+                .Subscribe()
+                .AddTo(Anchors);
+
             Initialize();
         }
 
-        public string[] KnownEntitiesNames => knownEntities.ToArray();
+        public ReadOnlyObservableCollection<string> KnownEntityNames => knownEntityNames;
 
         private void Initialize()
         {
+            var entities = GetEntities();
+            knownEntities.Clear();
+            knownEntities.AddRange(entities);
+        }
+
+        private static string[] GetEntities()
+        {
             Log.Instance.Debug($"[StaticPoeDatabaseReader] Loading database...");
 
-            knownEntities.Clear();
+            var result = new HashSet<string>();
             var resources = new HashSet<string>
             {
                 "PoeTradeUniques.lst",
@@ -41,11 +67,12 @@
 
                 foreach (var item in items)
                 {
-                    knownEntities.Add(item);
+                    result.Add(item);
                 }
             }
 
-            Log.Instance.Debug($"[StaticPoeDatabaseReader] Loaded {knownEntities.Count} entries");
+            Log.Instance.Debug($"[StaticPoeDatabaseReader] Loaded {result.Count} entries");
+            return result.ToArray();
         }
     }
 }

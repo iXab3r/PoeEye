@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive.Concurrency;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
+using DynamicData;
+using DynamicData.Binding;
 using Guards;
 using JetBrains.Annotations;
 using Microsoft.Practices.Unity;
@@ -14,46 +18,37 @@ namespace PoeShared.PoeDatabase
     internal sealed class ComplexPoeDatabaseReader : DisposableReactiveObject, IPoeDatabaseReader
     {
         private readonly IPoeDatabaseReader[] readers;
-        private readonly TaskCompletionSource<string[]> supplierCompletionSource;
+        private readonly ReadOnlyObservableCollection<string> knownEntityNames;
 
-        public ComplexPoeDatabaseReader([NotNull] IPoeDatabaseReader[] readers)
+        public ComplexPoeDatabaseReader(
+            [NotNull] IPoeDatabaseReader[] readers,
+            [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {
-            this.readers = readers;
             Guard.ArgumentNotNull(() => readers);
+            Guard.ArgumentNotNull(() => uiScheduler);
+            this.readers = readers;
 
-            supplierCompletionSource = new TaskCompletionSource<string[]>();
+            var merge = new SourceList<ISourceList<string>>();
 
-            Task.Factory.StartNew(GetAllEntities).AddTo(Anchors);
+            foreach (var poeDatabaseReader in readers)
+            {
+                var changeSet = poeDatabaseReader
+                    .KnownEntityNames
+                    .ToObservableChangeSet();
+                var sourceList = new SourceList<string>(changeSet);
+
+                merge.Add(sourceList);
+            }
+
+            merge
+                .Or()
+                .ObserveOn(uiScheduler)
+                .Bind(out knownEntityNames)
+                .Subscribe()
+                .AddTo(Anchors);
         }
 
-        public string[] KnownEntitiesNames => supplierCompletionSource.Task.Result;
-
-        private void GetAllEntities()
-        {
-            Log.Instance.Debug("[ComplexPoeDatabaseReader] Traversing readers...");
-            try
-            {
-                var allEntities = readers
-                    .AsParallel()
-                    .Select(x => x.KnownEntitiesNames)
-                    .SelectMany(x => x)
-                    .Where(x => !string.IsNullOrWhiteSpace(x))
-                    .Distinct(StringComparer.OrdinalIgnoreCase)
-                    .OrderBy(x => x, StringComparer.OrdinalIgnoreCase)
-                    .ToArray();
-
-                Log.Instance.Debug($"[ComplexPoeDatabaseReader] Got {allEntities.Length} entities");
-
-                var cleanedEntities = CleanupEntities(allEntities);
-                Log.Instance.Debug($"[ComplexPoeDatabaseReader] Post-cleanup: {allEntities.Length} entities");
-                supplierCompletionSource.SetResult(cleanedEntities);
-            }
-            catch (Exception ex)
-            {
-                Log.HandleException(ex);
-                supplierCompletionSource.TrySetResult(new string[0]);
-            }
-        }
+        public ReadOnlyObservableCollection<string> KnownEntityNames => knownEntityNames;
 
         private string[] CleanupEntities(string[] source)
         {

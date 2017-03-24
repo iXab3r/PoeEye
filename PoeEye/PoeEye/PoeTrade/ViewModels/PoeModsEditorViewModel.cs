@@ -38,7 +38,7 @@ namespace PoeEye.PoeTrade.ViewModels
         public PoeModsEditorViewModel(
             [NotNull] IPoeStaticData staticData,
             [NotNull] IFactory<IPoeModViewModel, ISuggestionProvider> modsViewModelsFactory,
-            [NotNull] IFactory<ISuggestionProvider, string[]> suggestionProviderFactory)
+            [NotNull] IFactory<ISuggestionProvider, IEnumerable<string>> suggestionProviderFactory)
         {
             Guard.ArgumentNotNull(() => modsViewModelsFactory);
             Guard.ArgumentNotNull(() => staticData);

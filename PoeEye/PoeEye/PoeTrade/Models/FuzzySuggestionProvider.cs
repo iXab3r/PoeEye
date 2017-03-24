@@ -1,8 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace PoeEye.PoeTrade.Models
 {
-    using System.Collections;
     using System.Linq;
 
     using FuzzySearch;
@@ -19,14 +19,14 @@ namespace PoeEye.PoeTrade.Models
         private readonly IFuzzySearchService searchService;
 
         public FuzzySuggestionProvider(
-            [NotNull] string[] haystack)
+            [NotNull] IEnumerable<string> haystack)
         {
             Guard.ArgumentNotNull(() => haystack);
 
             searchService = new RunglishSearchService(new XSearchService<string>(haystack, x => x));
         }
 
-        public IEnumerable GetSuggestions(string filter)
+        public System.Collections.IEnumerable GetSuggestions(string filter)
         {
             var filteredStrings = searchService
                 .Search(filter)

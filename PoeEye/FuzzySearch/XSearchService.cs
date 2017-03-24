@@ -10,11 +10,11 @@
     public class XSearchService<T> : IFuzzySearchService
     {
         private readonly bool caseSensitive;
-        private readonly T[] haystack;
+        private readonly IEnumerable<T> haystack;
         private readonly Func<T, string> mapper;
 
         public XSearchService(
-            [NotNull] T[] haystack,
+            [NotNull] IEnumerable<T> haystack,
             [NotNull] Func<T, string> mapper, 
             bool caseSensitive = false)
         {

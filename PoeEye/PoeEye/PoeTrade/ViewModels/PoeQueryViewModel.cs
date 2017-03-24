@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive.Linq;
 using Guards;
@@ -148,7 +149,7 @@ namespace PoeEye.PoeTrade.ViewModels
         public PoeQueryViewModel(
             [NotNull] IPoeStaticData staticData,
             [NotNull] IFactory<IPoeModGroupsEditorViewModel, IPoeStaticData> modGroupsEditorFactory,
-            [NotNull] IFactory<ISuggestionProvider, string[]> suggestionProviderFactory,
+            [NotNull] IFactory<ISuggestionProvider, IEnumerable<string>> suggestionProviderFactory,
             [NotNull] IPoeDatabaseReader poeDatabaseReader)
         {
             Guard.ArgumentNotNull(() => staticData);
@@ -173,8 +174,7 @@ namespace PoeEye.PoeTrade.ViewModels
                 .Subscribe(() => League = LeaguesList.FirstOrDefault())
                 .AddTo(Anchors);
 
-            var knownNames = poeDatabaseReader.KnownEntitiesNames;
-            NameSuggestionProvider = suggestionProviderFactory.Create(knownNames);
+            NameSuggestionProvider = suggestionProviderFactory.Create(poeDatabaseReader.KnownEntityNames);
         }
 
         public int? GemOrMapLevelMin

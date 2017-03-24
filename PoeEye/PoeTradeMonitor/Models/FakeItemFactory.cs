@@ -43,7 +43,7 @@ namespace PoeEye.TradeMonitor.Models
                 Price = GetRandomPrice(),
                 TabName = $"Tab #{rng.Next(1,100)}",
                 Offer = rng.Next(0, 100) >= 70 ? $"offer {GetRandomPrice()}" : null,
-                PositionName = database.KnownEntitiesNames.PickRandom()
+                PositionName = database.KnownEntityNames.PickRandom()
             };
         }
 
