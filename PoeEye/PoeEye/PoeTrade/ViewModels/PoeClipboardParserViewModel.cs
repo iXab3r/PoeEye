@@ -1,6 +1,7 @@
 ﻿using PoeEye.PoeTrade.Common;
 using PoeShared.Modularity;
 using Prism.Unity;
+using ReactiveUI.Legacy;
 using PoeEyeMainConfig = PoeEye.Config.PoeEyeMainConfig;
 
 namespace PoeEye.PoeTrade.ViewModels
@@ -83,7 +84,7 @@ namespace PoeEye.PoeTrade.ViewModels
                 .Subscribe(() => this.RaisePropertyChanged(nameof(IsBusy)))
                 .AddTo(Anchors);
 
-            parseClipboard = ReactiveCommand.Create();
+            parseClipboard = ReactiveUI.Legacy.ReactiveCommand.Create();
 
             var textFromClipboard = Observable
                 .FromEventPattern<EventHandler, EventArgs>(

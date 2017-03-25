@@ -1,6 +1,16 @@
 ﻿using System.Reactive;
+using System.Reactive.Concurrency;
+using System.Reactive.Subjects;
+using DynamicData;
+using DynamicData.Alias;
+using DynamicData.Controllers;
+using DynamicData.ReactiveUI;
+using Microsoft.Practices.Unity;
+using PoeEye.Scaffolding;
 using PoeShared;
 using PoeShared.Audio;
+using PoeShared.Prism;
+using ReactiveUI.Legacy;
 
 namespace PoeEye.PoeTrade.ViewModels
 {
@@ -28,18 +38,14 @@ namespace PoeEye.PoeTrade.ViewModels
 
     using ReactiveUI;
 
-    internal sealed class PoeSummaryTabViewModel : DisposableReactiveObject
+    internal sealed class PoeSummaryTabViewModel : DisposableReactiveObject, IPoeSummaryTabViewModel
     {
-        private readonly IDictionary<IMainWindowTabViewModel, TabInfo> collectionByTab = new Dictionary<IMainWindowTabViewModel, TabInfo>();
-
-        private readonly ReactiveCommand<object> markAllAsReadCommand;
+        private readonly ReactiveCommand markAllAsReadCommand;
 
         private readonly ReactiveList<PoeFilteredTradeViewModel> tradesCollection = new ReactiveList<PoeFilteredTradeViewModel>
         {
             ChangeTrackingEnabled = true
         };
-
-        private bool isGrouping;
 
         private bool showNewItems = true;
 
@@ -47,27 +53,47 @@ namespace PoeEye.PoeTrade.ViewModels
 
         private SortDescriptionData activeSortDescriptionData;
 
+        private readonly ISubject<Unit> rebuildFilterRequest = new Subject<Unit>();
+        private readonly ISubject<Unit> sortRequest = new Subject<Unit>();
+
         public PoeSummaryTabViewModel(
-            [NotNull] IReactiveList<IMainWindowTabViewModel> tabsList)
+            [NotNull] ReactiveList<IMainWindowTabViewModel> tabsList,
+            [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {
             Guard.ArgumentNotNull(() => tabsList);
 
-            markAllAsReadCommand = ReactiveCommand.Create();
-            markAllAsReadCommand.Subscribe(MarkAllAsReadExecuted).AddTo(Anchors);
+            markAllAsReadCommand = ReactiveCommand.Create(MarkAllAsReadExecuted);
 
-            var source = new CollectionViewSource
-            {
-                IsLiveFilteringRequested = true,
-                IsLiveSortingRequested = true,
-                IsLiveGroupingRequested = true,
-                Source = tradesCollection,
-            };
+            this.WhenAnyValue(x => x.ActiveSortDescriptionData)
+                .ToUnit()
+                .Subscribe(sortRequest)
+                .AddTo(Anchors);
 
-            source.LiveFilteringProperties.Add(null);
-            source.LiveFilteringProperties.Add(string.Empty);
+            Observable.Merge(
+                    this.WhenAnyValue(x => x.ShowNewItems).ToUnit(),
+                    this.WhenAnyValue(x => x.ShowRemovedItems).ToUnit()
+                )
+                .Subscribe(rebuildFilterRequest)
+                .AddTo(Anchors);
 
-            TradesView = source.View;
-            TradesView.Filter = TradeFilterPredicate;
+            var srcListChangeSet =
+                tabsList
+                    .ToSourceList()
+                    .Connect()
+                    .Transform(tab => new TabProxy(tab, rebuildFilterRequest))
+                    .DisposeMany()
+                    .Transform(x => x.Trades)
+                    .DisposeMany();
+
+            var models = new SourceList<ISourceList<PoeFilteredTradeViewModel>>(srcListChangeSet);
+                models
+                    .Or()
+                    .Filter(rebuildFilterRequest.StartWith().Select(_ => new Func<PoeFilteredTradeViewModel, bool>(TradeFilterPredicate)))
+                    .Sort(sortRequest.StartWith().Select(x => new TradeComparer(activeSortDescriptionData)))
+                    .ObserveOn(uiScheduler)
+                    .Bind(tradesCollection)
+                    .Subscribe()
+                    .AddTo(Anchors);
 
             SortingOptions = new[]
             {
@@ -77,26 +103,9 @@ namespace PoeEye.PoeTrade.ViewModels
                 new SortDescriptionData(nameof(PoeFilteredTradeViewModel.PriceInChaosOrbs), ListSortDirection.Ascending),
             };
             ActiveSortDescriptionData = SortingOptions.FirstOrDefault();
-
-            this.WhenAnyValue(x => x.IsGrouping)
-                .Subscribe(HandleGrouping)
-                .AddTo(Anchors);
-
-            this.WhenAnyValue(x => x.ActiveSortDescriptionData)
-                .Subscribe(HandleSorting)
-                .AddTo(Anchors);
-
-            this.WhenAnyValue(x => x.ShowNewItems, x => x.ShowRemovedItems)
-                .Subscribe(TradesView.Refresh)
-                .AddTo(Anchors);
-
-            tabsList.Changed
-                    .Where(args => args != null)
-                    .Subscribe(args => ProcessTabsCollectionChange(tabsList, args))
-                    .AddTo(Anchors);
         }
 
-        public ICollectionView TradesView { get; }
+        public IReadOnlyReactiveList<PoeFilteredTradeViewModel> TradesView => tradesCollection;
 
         public ICommand MarkAllAsReadCommand => markAllAsReadCommand;
 
@@ -112,24 +121,12 @@ namespace PoeEye.PoeTrade.ViewModels
             set { this.RaiseAndSetIfChanged(ref showRemovedItems, value); }
         }
 
-        public bool IsGrouping
-        {
-            get { return isGrouping; }
-            set { this.RaiseAndSetIfChanged(ref isGrouping, value); }
-        }
-
         public SortDescriptionData[] SortingOptions { get; }
 
         public SortDescriptionData ActiveSortDescriptionData
         {
             get { return activeSortDescriptionData; }
             set { this.RaiseAndSetIfChanged(ref activeSortDescriptionData, value); }
-        }
-
-        private bool TradeFilterPredicate(object value)
-        {
-            var trade = value as PoeFilteredTradeViewModel;
-            return trade != null && TradeFilterPredicate(trade);
         }
 
         private bool TradeFilterPredicate(PoeFilteredTradeViewModel value)
@@ -144,220 +141,103 @@ namespace PoeEye.PoeTrade.ViewModels
             return tradeIsValid;
         }
 
-        private void HandleSorting()
-        {
-            TradesView.SortDescriptions.Clear();
-
-            if (activeSortDescriptionData != null)
-            {
-                TradesView.SortDescriptions.Add(activeSortDescriptionData.ToSortDescription());
-            }
-
-            TradesView.Refresh();
-        }
-
-        private void HandleGrouping()
-        {
-            TradesView.GroupDescriptions.Clear();
-
-            if (isGrouping)
-            {
-                var groupingByDescription = new PropertyGroupDescription(nameof(PoeFilteredTradeViewModel.Description));
-                TradesView.GroupDescriptions.Add(groupingByDescription);
-            }
-
-            TradesView.Refresh();
-        }
-
         private void MarkAllAsReadExecuted()
         {
-            var tabsToProcess = collectionByTab
-                .Keys
-                .Where(x => x.AudioNotificationSelector.SelectedValue != AudioNotificationType.Disabled)
+            var tabsToProcess = tradesCollection
+                .Where(x => x.Owner.AudioNotificationSelector.SelectedValue != AudioNotificationType.Disabled)
                 .ToArray();
 
             Log.Instance.Debug($"[PoeSummaryTabViewModel.MarkAllAsReadExecuted] Sending command to {tabsToProcess.Length} tab(s)");
-            tabsToProcess.ForEach(x => x.MarkAllAsReadCommand.Execute(null));
+            tabsToProcess.ForEach(x => x.Owner.MarkAllAsReadCommand.Execute(null));
         }
 
-        private void ProcessTabsCollectionChange(IEnumerable<IMainWindowTabViewModel> tabs, NotifyCollectionChangedEventArgs args)
+        private sealed class TabProxy : DisposableReactiveObject
         {
-            var newItems = args.NewItems?.Cast<IMainWindowTabViewModel>().ToArray() ?? new IMainWindowTabViewModel[0];
-            var oldItems = args.OldItems?.Cast<IMainWindowTabViewModel>().ToArray() ?? new IMainWindowTabViewModel[0];
-            switch (args.Action)
+            public TabProxy(
+                IMainWindowTabViewModel tab, ISubject<Unit> filterRequestSubject)
             {
-                case NotifyCollectionChangedAction.Add:
-                    Log.Instance.Debug($"[PoeSummaryTabViewModel.TabsCollectionChange.Add] New items count: {newItems.Count()}");
-                    newItems.ForEach(ProcessAddTab);
-                    break;
-                case NotifyCollectionChangedAction.Remove:
-                    Log.Instance.Debug($"[PoeSummaryTabViewModel.TabsCollectionChange.Remove] Removed items count: {oldItems.Count()}");
-                    oldItems.ForEach(ProcessRemoveTab);
-                    break;
-                case NotifyCollectionChangedAction.Replace:
-                    Log.Instance.Debug($"[PoeSummaryTabViewModel.TabsCollectionChange.Replace] New items count: {newItems.Count()}, Removed items count: {oldItems.Count()}");
-                    oldItems.ForEach(ProcessRemoveTab);
-                    newItems.ForEach(ProcessAddTab);
-                    break;
-                case NotifyCollectionChangedAction.Reset:
-                    Log.Instance.Debug($"[PoeSummaryTabViewModel.TabsCollectionChange.Reset] Resetting... tabs count: {collectionByTab.Count}");
-                    collectionByTab.Keys.ToArray().ForEach(ProcessRemoveTab);
-                    tabs.ToArray().ForEach(ProcessAddTab);
-                    break;
+                Guard.ArgumentNotNull(() => tab);
+                Guard.ArgumentNotNull(() => filterRequestSubject);
+
+                var listOfTradesList = new SourceList<ISourceList<PoeFilteredTradeViewModel>>();
+
+                tab.AudioNotificationSelector
+                    .WhenAnyValue(x => x.SelectedValue)
+                    .ToUnit()
+                    .Subscribe(filterRequestSubject)
+                    .AddTo(Anchors);
+
+                var activeTradeListAnchors = new SerialDisposable();
+                tab
+                    .WhenAnyValue(x => x.TradesList)
+                    .Select(x => x.Items)
+                    .Subscribe(
+                        tradesList =>
+                        {
+                            var tradesListAnchors = new CompositeDisposable().AssignTo(activeTradeListAnchors);
+
+                            tradesList.ItemChanged
+                                .ToUnit()
+                                .Subscribe(filterRequestSubject)
+                                .AddTo(tradesListAnchors);
+
+                            var tradesSet = tradesList
+                                .ToObservableChangeSet()
+                                .Transform(x => new PoeFilteredTradeViewModel(tab, x))
+                                .DisposeMany()
+                                .ToSourceList();
+
+                            listOfTradesList.Clear();
+                            listOfTradesList.Add(tradesSet);
+                        })
+                    .AddTo(Anchors);
+
+                Trades = listOfTradesList.Or().ToSourceList();
+
+                Disposable.Create(() => Log.Instance.Trace($"[PoeSummaryTabViewModel.TabProxy] Proxy for tab {tab} ({tab.TabName}) was disposed")).AddTo(Anchors);
             }
+
+            public ISourceList<PoeFilteredTradeViewModel> Trades { get; }
         }
 
-        private void ProcessAddTab(IMainWindowTabViewModel tab)
+        private sealed class TradeComparer : IComparer<PoeFilteredTradeViewModel>
         {
-            var tabInfo = new TabInfo(tab);
-            collectionByTab[tab] = tabInfo;
+            private readonly IComparer<PoeFilteredTradeViewModel> comparer;
 
-            tab.WhenAnyValue(x => x.TradesList)
-               .Select(x => x?.Items?.Changed)
-               .Switch()
-               .Subscribe(args => ProcessCollectionChange(tab, args))
-               .AddTo(tabInfo.Anchors);
-        }
+            public TradeComparer(params SortDescriptionData[] descriptionData)
+            {
+                Guard.ArgumentNotNull(() => descriptionData);
 
-        private void ProcessRemoveTab(IMainWindowTabViewModel tab)
-        {
-            TabInfo tabInfo;
-            if (!collectionByTab.TryGetValue(tab, out tabInfo))
-            {
-                return;
-            }
-            ProcessResetTabTrades(tab, new IPoeTradeViewModel[0]);
-            collectionByTab.Remove(tab);
-            tabInfo.Dispose();
-        }
+                comparer = OrderedComparer
+                    .For<PoeFilteredTradeViewModel>()
+                    .OrderBy(x => string.Empty);
 
-        private void ProcessCollectionChange(IMainWindowTabViewModel tab, NotifyCollectionChangedEventArgs args)
-        {
-            var newItems = args.NewItems?.Cast<IPoeTradeViewModel>().ToArray() ?? new IPoeTradeViewModel[0];
-            var oldItems = args.OldItems?.Cast<IPoeTradeViewModel>().ToArray() ?? new IPoeTradeViewModel[0];
-            switch (args.Action)
-            {
-                case NotifyCollectionChangedAction.Add:
-                    Log.Instance.Debug($"[PoeSummaryTabViewModel.ItemsChanged.Add] Owner: {tab.TabName}, new items count: {newItems.Count()}");
-                    ProcessAddTrade(tab, newItems);
-                    break;
-                case NotifyCollectionChangedAction.Remove:
-                    Log.Instance.Debug($"[PoeSummaryTabViewModel.ItemsChanged.Remove] Owner: {tab.TabName}, removed items count: {oldItems.Count()}");
-                    ProcessRemoveTrade(tab, oldItems);
-                    break;
-                case NotifyCollectionChangedAction.Replace:
-                    Log.Instance.Debug($"[PoeSummaryTabViewModel.ItemsChanged.Replace] Owner: {tab.TabName}, new items count: {newItems.Count()}, removed items count: {oldItems.Count()}");
-                    ProcessRemoveTrade(tab, oldItems);
-                    ProcessAddTrade(tab, newItems);
-                    break;
-                case NotifyCollectionChangedAction.Reset:
-                    Log.Instance.Debug($"[PoeSummaryTabViewModel.ItemsChanged.Reset] Owner: {tab.TabName}, resetting... items count: {tab.TradesList.Items.Count}");
-                    ProcessResetTabTrades(tab, tab.TradesList.Items.ToArray());
-                    break;
-            }
-        }
-
-        private void ProcessAddTrade(IMainWindowTabViewModel tab, IPoeTradeViewModel[] tradesToAdd)
-        {
-            if (!tradesToAdd.Any())
-            {
-                return;
-            }
-
-            TabInfo tabInfo;
-            if (!collectionByTab.TryGetValue(tab, out tabInfo))
-            {
-                return;
-            }
-            foreach (var poeTradeViewModel in tradesToAdd)
-            {
-                var view = tabInfo.AddTrade(poeTradeViewModel);
-                tradesCollection.Add(view);
-            }
-        }
-
-        private void ProcessRemoveTrade(IMainWindowTabViewModel tab, IPoeTradeViewModel[] tradesToRemove)
-        {
-            if (!tradesToRemove.Any())
-            {
-                return;
-            }
-
-            TabInfo tabInfo;
-            if (!collectionByTab.TryGetValue(tab, out tabInfo))
-            {
-                return;
-            }
-
-            foreach (var poeTradeViewModel in tradesToRemove)
-            {
-                PoeFilteredTradeViewModel view;
-                if (!tabInfo.TryRemoveTrade(poeTradeViewModel, out view))
+                foreach (var data in descriptionData.EmptyIfNull().Where(x => x != null))
                 {
-                    continue;
+                    switch (data.PropertyName)
+                    {
+                        case nameof(PoeFilteredTradeViewModel.Timestamp):
+                            comparer = OrderByField(comparer, data.Direction, x => x.Timestamp);
+                            break;
+                        case nameof(PoeFilteredTradeViewModel.PriceInChaosOrbs):
+                            comparer = OrderByField(comparer, data.Direction, x => x.PriceInChaosOrbs);
+                            break;
+                    }
                 }
-                tradesCollection.Remove(view);
-            }
-        }
-
-        private void ProcessResetTabTrades(IMainWindowTabViewModel tab, IPoeTradeViewModel[] actualTradesList)
-        {
-            TabInfo tabInfo;
-            if (!collectionByTab.TryGetValue(tab, out tabInfo))
-            {
-                return;
             }
 
-            var currentTradesList = tabInfo.Trades.ToArray();
-            var tradesToAdd = actualTradesList.Except(currentTradesList).ToArray();
-            var tradesToRemove = currentTradesList.Except(actualTradesList).ToArray();
-
-            ProcessRemoveTrade(tab, tradesToRemove);
-            ProcessAddTrade(tab, tradesToAdd);
-        }
-
-        private class TabInfo : IDisposable
-        {
-            public CompositeDisposable Anchors { get; } = new CompositeDisposable();
-
-            public IEnumerable<IPoeTradeViewModel> Trades => viewByViewModelMap.Keys;
-
-            private readonly IDictionary<IPoeTradeViewModel, PoeFilteredTradeViewModel> viewByViewModelMap = new Dictionary<IPoeTradeViewModel, PoeFilteredTradeViewModel>();
-
-            private readonly IMainWindowTabViewModel tab;
-
-            public TabInfo(IMainWindowTabViewModel tab)
+            private IComparer<T> OrderByField<T, TValue>(IComparer<T> builder, ListSortDirection direction, Func<T, TValue> selector)
             {
-                this.tab = tab;
-            }
-
-            public PoeFilteredTradeViewModel AddTrade(IPoeTradeViewModel viewModel)
-            {
-                var result = viewByViewModelMap[viewModel] = new PoeFilteredTradeViewModel(tab, viewModel);
-                Anchors.Add(result);
-                return result;
-            }
-
-            public bool TryRemoveTrade(IPoeTradeViewModel viewModel, out PoeFilteredTradeViewModel view)
-            {
-                var result = viewByViewModelMap.TryGetValue(viewModel, out view);
-                if (result)
+                if (direction == ListSortDirection.Ascending)
                 {
-                   RemoveTrade(viewModel, view);
+                    return builder.ThenBy(selector);
                 }
-                return result;
+                return builder.ThenByDescending(selector);
             }
 
-            private void RemoveTrade(IPoeTradeViewModel viewModel, PoeFilteredTradeViewModel view)
+            public int Compare(PoeFilteredTradeViewModel x, PoeFilteredTradeViewModel y)
             {
-                viewByViewModelMap.Remove(viewModel);
-                view.Dispose();
-                Anchors.Remove(view);
-            }
-
-            public void Dispose()
-            {
-                Anchors.Dispose();
+                return comparer.Compare(x, y);
             }
         }
     }

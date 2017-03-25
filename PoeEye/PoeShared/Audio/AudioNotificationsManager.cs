@@ -10,6 +10,7 @@ using PoeShared.Modularity;
 using PoeShared.Resources.Notifications;
 using PoeShared.Scaffolding;
 using ReactiveUI;
+using ReactiveUI.Legacy;
 
 namespace PoeShared.Audio
 {

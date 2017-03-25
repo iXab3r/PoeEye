@@ -25,7 +25,9 @@ using PoeShared.Scaffolding;
 using PoeShared.UI;
 using PoeShared.UI.ViewModels;
 using ReactiveUI;
+using ReactiveUI.Legacy;
 using PoeEyeMainConfig = PoeEye.Config.PoeEyeMainConfig;
+using ReactiveCommand = ReactiveUI.ReactiveCommand;
 
 namespace PoeEye.PoeTrade.Shell.ViewModels
 {
@@ -38,8 +40,8 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
         private static readonly TimeSpan CheckForUpdatesTimeout = TimeSpan.FromHours(1);
         private static readonly TimeSpan ConfigSaveSampingTimeout = TimeSpan.FromSeconds(10);
 
-        private readonly ReactiveCommand<object> closeTabCommand = ReactiveCommand.Create();
-        private readonly ReactiveCommand<object> createNewTabCommand = ReactiveCommand.Create();
+        private readonly ReactiveCommand<object> closeTabCommand = ReactiveUI.Legacy.ReactiveCommand.Create();
+        private readonly ReactiveCommand<object> createNewTabCommand = ReactiveUI.Legacy.ReactiveCommand.Create();
         private readonly ReactiveCommand<Unit> refreshAllTabsCommand;
 
         private readonly ISubject<Unit> configUpdateSubject = new Subject<Unit>();
@@ -51,7 +53,7 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
 
         public MainWindowViewModel(
             [NotNull] IFactory<IMainWindowTabViewModel> tabFactory,
-            [NotNull] IFactory<PoeSummaryTabViewModel, IReactiveList<IMainWindowTabViewModel>> summaryTabFactory,
+            [NotNull] IFactory<PoeSummaryTabViewModel, ReactiveList<IMainWindowTabViewModel>> summaryTabFactory,
             [NotNull] ApplicationUpdaterViewModel applicationUpdaterViewModel,
             [NotNull] IPoeEyeMainConfigProvider poeEyeConfigProvider,
             [NotNull] IAudioNotificationsManager audioNotificationsManager,
@@ -103,7 +105,7 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
             SummaryTab = summaryTabFactory.Create(TabsList);
             SummaryTab.AddTo(Anchors);
 
-            OpenAppDataDirectoryCommand = ReactiveCommand
+            OpenAppDataDirectoryCommand = ReactiveUI.Legacy.ReactiveCommand
                 .CreateAsyncTask(x => OpenAppDataDirectory());
 
             createNewTabCommand
@@ -116,7 +118,7 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
                 .Subscribe(RemoveTabCommandExecuted)
                 .AddTo(Anchors);
 
-            refreshAllTabsCommand = ReactiveCommand
+            refreshAllTabsCommand = ReactiveUI.Legacy.ReactiveCommand
                 .CreateAsyncTask(_ => RefreshAllTabsCommandExecuted(), uiScheduler);
 
             refreshAllTabsCommand
@@ -172,7 +174,7 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
 
         public PoeSummaryTabViewModel SummaryTab { get; }
 
-        public IReactiveList<IMainWindowTabViewModel> TabsList { get; } = new ReactiveList<IMainWindowTabViewModel>
+        public ReactiveList<IMainWindowTabViewModel> TabsList { get; } = new ReactiveList<IMainWindowTabViewModel>
         {
             ChangeTrackingEnabled = true
         };

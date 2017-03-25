@@ -90,7 +90,7 @@ namespace PoeBud.ViewModels
                 .AddTo(Anchors);
 
             exceptionsToPropagate
-                .ToProperty(this, x => x.LastUpdateException, out lastUpdateException, null, uiScheduler)
+                .ToProperty(this, x => x.LastUpdateException, out lastUpdateException, null, false, uiScheduler)
                 .AddTo(Anchors);
 
             Width = SystemParameters.PrimaryScreenWidth;

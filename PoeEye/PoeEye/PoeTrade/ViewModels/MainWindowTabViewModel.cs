@@ -19,6 +19,8 @@ using PoeShared.Prism;
 using PoeShared.Scaffolding;
 using PoeShared.UI.ViewModels;
 using ReactiveUI;
+using ReactiveUI.Legacy;
+using ReactiveCommand = ReactiveUI.ReactiveCommand;
 
 namespace PoeEye.PoeTrade.ViewModels
 {
@@ -70,13 +72,13 @@ namespace PoeEye.PoeTrade.ViewModels
             AudioNotificationSelector = audioNotificationSelector;
             audioNotificationSelector.AddTo(Anchors);
 
-            markAllAsReadCommand = ReactiveCommand.Create();
+            markAllAsReadCommand = ReactiveUI.Legacy.ReactiveCommand.Create();
             markAllAsReadCommand.Subscribe(MarkAllAsReadExecute);
 
-            refreshCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.IsBusy).Select(x => !x));
+            refreshCommand = ReactiveUI.Legacy.ReactiveCommand.Create(this.WhenAnyValue(x => x.IsBusy).Select(x => !x));
             refreshCommand.Subscribe(RefreshCommandExecuted);
 
-            newSearchCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.IsBusy).Select(x => !x));
+            newSearchCommand = ReactiveUI.Legacy.ReactiveCommand.Create(this.WhenAnyValue(x => x.IsBusy).Select(x => !x));
             newSearchCommand.Subscribe(NewSearchCommandExecuted);
 
             apiSelector

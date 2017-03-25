@@ -5,6 +5,7 @@ using PoeShared.Audio;
 using PoeShared.PoeTrade;
 using PoeShared.UI.ViewModels;
 using PoeWhisperMonitor.Chat;
+using ReactiveUI.Legacy;
 
 namespace PoeEye.PoeTrade.ViewModels
 {
@@ -42,8 +43,8 @@ namespace PoeEye.PoeTrade.ViewModels
         private readonly IPoeChatService chatService;
         private readonly IAudioNotificationsManager notificationsManager;
         private readonly IClock clock;
-        private readonly ReactiveCommand<object> copyPrivateMessageToClipboardCommand = ReactiveCommand.Create();
-        private readonly ReactiveCommand<object> sendPrivateMessageCommand = ReactiveCommand.Create();
+        private readonly ReactiveCommand<object> copyPrivateMessageToClipboardCommand = ReactiveUI.Legacy.ReactiveCommand.Create();
+        private readonly ReactiveCommand<object> sendPrivateMessageCommand = ReactiveUI.Legacy.ReactiveCommand.Create();
 
         private readonly ReactiveCommand<object> openForumUriCommand;
 
@@ -76,7 +77,7 @@ namespace PoeEye.PoeTrade.ViewModels
             copyPrivateMessageToClipboardCommand.Subscribe(CopyPrivateMessageToClipboardCommandExecuted).AddTo(Anchors);
             sendPrivateMessageCommand.Subscribe(SendPrivateMessageCommandExecuted).AddTo(Anchors);
 
-            openForumUriCommand = ReactiveCommand.Create(Observable.Return(OpenForumUriCommandCanExecute()));
+            openForumUriCommand = ReactiveUI.Legacy.ReactiveCommand.Create(Observable.Return(OpenForumUriCommandCanExecute()));
             openForumUriCommand.Subscribe(OpenForumUriCommandExecuted).AddTo(Anchors);
 
             Uri imageUri;

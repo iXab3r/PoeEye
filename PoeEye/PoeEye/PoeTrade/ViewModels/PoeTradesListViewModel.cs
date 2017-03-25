@@ -116,7 +116,7 @@ namespace PoeEye.PoeTrade.ViewModels
             set { this.RaiseAndSetIfChanged(ref recheckPeriod, value); }
         }
 
-        public IReactiveList<IPoeTradeViewModel> Items { get; } = new ReactiveList<IPoeTradeViewModel> { ChangeTrackingEnabled = true };
+        public ReactiveList<IPoeTradeViewModel> Items { get; } = new ReactiveList<IPoeTradeViewModel> { ChangeTrackingEnabled = true };
 
         public IHistoricalTradesViewModel HistoricalTrades { get; }
 
@@ -191,10 +191,7 @@ namespace PoeEye.PoeTrade.ViewModels
                     itemsToAdd.Add(itemViewModel);
                 }
 
-                using (Items.SuppressChangeNotifications())
-                {
-                    itemsToAdd.ForEach(Items.Add);
-                }
+                itemsToAdd.ForEach(Items.Add);
             }
             lastUpdateTimestamp = clock.Now;
         }

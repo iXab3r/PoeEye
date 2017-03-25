@@ -19,14 +19,16 @@ using PoeShared.Scaffolding;
 using PoeShared.StashApi;
 using PoeShared.StashApi.DataTypes;
 using ReactiveUI;
+using ReactiveUI.Legacy;
+using ReactiveCommand = ReactiveUI.ReactiveCommand;
 
 namespace PoeBud.ViewModels
 {
     internal sealed class PoeBudSettingsViewModel : DisposableReactiveObject, ISettingsViewModel<PoeBudConfig>
     {
         private readonly SerialDisposable characterSelectionDisposable = new SerialDisposable();
-        private readonly ReactiveCommand<object> loginCommand;
-        [NotNull] private readonly IUiOverlaysProvider overlaysProvider;
+        private readonly ReactiveUI.Legacy.ReactiveCommand<object> loginCommand;
+        private readonly IUiOverlaysProvider overlaysProvider;
         private readonly IFactory<IPoeStashClient, NetworkCredential, bool> poeClientFactory;
 
         private readonly PoeBudConfig resultingConfig = new PoeBudConfig();
@@ -67,7 +69,7 @@ namespace PoeBud.ViewModels
             this.poeClientFactory = poeClientFactory;
             this.overlaysProvider = overlaysProvider;
 
-            loginCommand = ReactiveCommand.Create();
+            loginCommand = ReactiveUI.Legacy.ReactiveCommand.Create();
             loginCommand
                 .Do(x => IsBusy = true)
                 .ObserveOn(bgScheduler)

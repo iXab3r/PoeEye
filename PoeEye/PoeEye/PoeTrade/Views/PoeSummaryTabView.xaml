@@ -38,33 +38,31 @@
               </CheckBox.Content>
             </CheckBox>
             <CheckBox IsChecked="{Binding ShowRemovedItems}" Margin="10,0" Focusable="False" IsTabStop="False">
-                <CheckBox.Content>
-                  <StackPanel Orientation="Horizontal">
-                    <Rectangle Width="10" Height="10" Fill="{StaticResource PoeTradeRemovedItemBrush}" Stroke="{StaticResource AccentColorBrush}"/>
-                    <TextBlock Text="Removed" Margin="3, 0"/>
-                  </StackPanel>
-                </CheckBox.Content>
+              <CheckBox.Content>
+                <StackPanel Orientation="Horizontal">
+                  <Rectangle Width="10" Height="10" Fill="{StaticResource PoeTradeRemovedItemBrush}" Stroke="{StaticResource AccentColorBrush}"/>
+                  <TextBlock Text="Removed" Margin="3, 0"/>
+                </StackPanel>
+              </CheckBox.Content>
             </CheckBox>
-
-            <controls:ToggleSwitch IsChecked="{Binding IsGrouping}" 
-                                   Content="Group by query" Margin="10,0" Focusable="False" IsTabStop="False"/>
           </StackPanel>
         </Grid>
       </Border>
-      
+
       <Label Style="{StaticResource EyeIconLabel}" FontSize="30" Content="No suitable items found yet" VerticalAlignment="Center" HorizontalAlignment="Center"
              Grid.Row="1" 
              Visibility="{Binding TradesView.IsEmpty, Converter={StaticResource BoolFalseToCollapsedConverter}}"/>
 
       <ItemsControl Grid.Row="1" 
                     Margin="0,10,0,0"
-                    Style="{StaticResource VirtualizedItemsControlStyle}" ItemsSource="{Binding TradesView}">
+                    Style="{StaticResource VirtualizedItemsControlStyle}" 
+                    ItemsSource="{Binding TradesView}">
         <ItemsControl.ItemTemplate>
           <DataTemplate DataType="{x:Type viewModels:PoeFilteredTradeViewModel}">
             <Grid HorizontalAlignment="Center">
-               <Grid.ColumnDefinitions>
-                 <ColumnDefinition Width="Auto" SharedSizeGroup="ItemWidth"/>
-               </Grid.ColumnDefinitions>
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" SharedSizeGroup="ItemWidth"/>
+              </Grid.ColumnDefinitions>
               <ContentControl Content="{Binding Trade}" />
             </Grid>
           </DataTemplate>

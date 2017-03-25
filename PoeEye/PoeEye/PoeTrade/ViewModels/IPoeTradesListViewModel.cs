@@ -24,7 +24,7 @@ namespace PoeEye.PoeTrade.ViewModels
 
         TimeSpan TimeSinceLastUpdate { get; }
 
-        IReactiveList<IPoeTradeViewModel> Items { [NotNull] get; }
+        ReactiveList<IPoeTradeViewModel> Items { [NotNull] get; }
 
         void Refresh();
     }

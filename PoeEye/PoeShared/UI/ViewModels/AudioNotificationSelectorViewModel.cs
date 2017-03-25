@@ -26,11 +26,11 @@ namespace PoeShared.UI.ViewModels
 
             Items = new ReactiveList<object>();
 
-            var selectNotificationCommand = ReactiveCommand.Create();
+            var selectNotificationCommand = ReactiveUI.Legacy.ReactiveCommand.Create();
             selectNotificationCommand.Subscribe(SelectNotificationCommandExecuted).AddTo(Anchors);
             SelectNotificationCommand = selectNotificationCommand;
 
-            var playNotificationCommand = ReactiveCommand.Create();
+            var playNotificationCommand = ReactiveUI.Legacy.ReactiveCommand.Create();
             playNotificationCommand.Subscribe(PlayNotificationCommandExecuted).AddTo(Anchors);
             PlayNotificationCommand = playNotificationCommand;
 

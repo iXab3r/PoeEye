@@ -1,4 +1,6 @@
-﻿namespace PoeEye.PoeTrade.ViewModels
+﻿using ReactiveUI.Legacy;
+
+namespace PoeEye.PoeTrade.ViewModels
 {
     using System;
     using System.Linq;
@@ -17,8 +19,8 @@
 
     internal sealed class PoeModGroupsEditorViewModel : DisposableReactiveObject, IPoeModGroupsEditorViewModel
     {
-        private readonly ReactiveCommand<object> addGrpCommand = ReactiveCommand.Create();
-        private readonly ReactiveCommand<object> removeGrpCommand = ReactiveCommand.Create();
+        private readonly ReactiveCommand<object> addGrpCommand = ReactiveUI.Legacy.ReactiveCommand.Create();
+        private readonly ReactiveCommand<object> removeGrpCommand = ReactiveUI.Legacy.ReactiveCommand.Create();
         private readonly IPoeStaticData staticData;
         private readonly IFactory<PoeModsEditorViewModel, IPoeStaticData> groupsFactory;
 

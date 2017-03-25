@@ -34,7 +34,7 @@ namespace PoeEye
 
                 InitializeExceptionless();
 
-                RxApp.SupportsRangeNotifications = true;
+                RxApp.SupportsRangeNotifications = false; //FIXME DynamicData (as of v4.11) does not support RangeNotifications
             }
             catch (Exception e)
             {

@@ -1,3 +1,5 @@
+using ReactiveUI.Legacy;
+
 namespace PoeEye.PoeTrade.ViewModels
 {
     using System;
@@ -21,11 +23,11 @@ namespace PoeEye.PoeTrade.ViewModels
 
     internal sealed class PoeModsEditorViewModel : DisposableReactiveObject, IPoeModsEditorViewModel
     {
-        private readonly ReactiveCommand<object> addModCommand = ReactiveCommand.Create();
+        private readonly ReactiveCommand<object> addModCommand = ReactiveUI.Legacy.ReactiveCommand.Create();
 
         private readonly ISuggestionProvider modsSuggestionProvider;
         private readonly IFactory<IPoeModViewModel, ISuggestionProvider> modsViewModelsFactory;
-        private readonly ReactiveCommand<object> removeModCommand = ReactiveCommand.Create();
+        private readonly ReactiveCommand<object> removeModCommand = ReactiveUI.Legacy.ReactiveCommand.Create();
 
         private PoeQueryModsGroupType groupType;
 

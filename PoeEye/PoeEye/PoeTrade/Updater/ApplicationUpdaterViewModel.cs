@@ -19,6 +19,7 @@ using PoeShared.Scaffolding;
 using PoeShared.UI;
 using Prism.Mvvm;
 using ReactiveUI;
+using ReactiveUI.Legacy;
 using Squirrel;
 
 namespace PoeEye.PoeTrade.Updater
@@ -47,7 +48,7 @@ namespace PoeEye.PoeTrade.Updater
                 .AddTo(Anchors);
 
             this.updaterModel = updaterModel;
-            checkForUpdatesCommand = ReactiveCommand
+            checkForUpdatesCommand = ReactiveUI.Legacy.ReactiveCommand
                 .CreateAsyncTask(x => CheckForUpdatesCommandExecuted(), uiScheduler);
 
             checkForUpdatesCommand
@@ -61,7 +62,7 @@ namespace PoeEye.PoeTrade.Updater
                 .Subscribe(() => this.RaisePropertyChanged(nameof(MostRecentVersion)))
                 .AddTo(Anchors);
 
-            restartCommand = ReactiveCommand.Create();
+            restartCommand = ReactiveUI.Legacy.ReactiveCommand.Create();
             restartCommand.Subscribe(updaterModel.RestartApplication).AddTo(Anchors);
         }
 
