@@ -1,4 +1,6 @@
-﻿using PoeShared.Scaffolding;
+﻿using System.Collections.ObjectModel;
+using DynamicData;
+using PoeShared.Scaffolding;
 
 namespace PoeEye.PoeTrade.ViewModels
 {
@@ -24,8 +26,10 @@ namespace PoeEye.PoeTrade.ViewModels
 
         TimeSpan TimeSinceLastUpdate { get; }
 
-        ReactiveList<IPoeTradeViewModel> Items { [NotNull] get; }
+        ReadOnlyObservableCollection<IPoeTradeViewModel> Items { [NotNull] get; }
 
         void Refresh();
+
+        void Clear();
     }
 }

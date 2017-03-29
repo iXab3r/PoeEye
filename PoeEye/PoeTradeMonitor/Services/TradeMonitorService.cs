@@ -100,6 +100,10 @@ namespace PoeEye.TradeMonitor.Services
         private void HandleHighValueTrade(TradeModel trade, PoePrice priceInChaos)
         {
             var message = $"[{trade.Timestamp}] TradeMonitor: {trade.CharacterName} wants to buy {trade.PositionName} for {trade.Price} (~{priceInChaos}), league: {trade.League}, tab: {trade.TabName} position: {trade.ItemPosition}";
+            if (!string.IsNullOrWhiteSpace(trade.Offer))
+            {
+                message += $" offer: {trade.Offer}";
+            }
             notifier.SendNotification(message, NotificationLevel.Critical);
         }
     }

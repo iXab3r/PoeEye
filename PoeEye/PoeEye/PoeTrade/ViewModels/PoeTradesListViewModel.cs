@@ -1,4 +1,7 @@
-﻿using PoeEye.PoeTrade.Common;
+﻿using System.Collections.ObjectModel;
+using DynamicData;
+using PoeEye.PoeTrade.Common;
+using DynamicData.ReactiveUI;
 
 namespace PoeEye.PoeTrade.ViewModels
 {
@@ -42,6 +45,8 @@ namespace PoeEye.PoeTrade.ViewModels
         private readonly IEqualityComparer<IPoeItem> poeItemsComparer;
         private readonly IFactory<IPoeTradeViewModel, IPoeItem> poeTradeViewModelFactory;
         private readonly IScheduler uiScheduler;
+        private readonly ISourceList<IPoeTradeViewModel> itemsSource = new SourceList<IPoeTradeViewModel>();
+        private readonly ReadOnlyObservableCollection<IPoeTradeViewModel> items;
 
         private ActiveProviderInfo activeProviderInfo;
         private IPoeQueryInfo activeQuery;
@@ -108,6 +113,23 @@ namespace PoeEye.PoeTrade.ViewModels
                 .ObserveOn(uiScheduler)
                 .Subscribe(_ => this.RaisePropertyChanged(nameof(TimeSinceLastUpdate)))
                 .AddTo(Anchors);
+
+            itemsSource
+                .Connect()
+                .Bind(out items)
+                .Subscribe()
+                .AddTo(Anchors);
+
+            itemsSource
+                .Connect()
+                .WhenPropertyChanged(x => x.TradeState)
+                .WithPrevious((prev, curr) => new { curr?.Sender, prev = prev?.Value, curr = curr?.Value })
+                .Where(x => x.Sender != null)
+                .Where(x => x.curr == PoeTradeState.Normal && x.prev == PoeTradeState.Removed)
+                .Select(x => x.Sender)
+                .ObserveOn(uiScheduler)
+                .Subscribe(itemsSource.Remove)
+                .AddTo(Anchors);
         }
 
         public TimeSpan RecheckPeriod
@@ -116,7 +138,10 @@ namespace PoeEye.PoeTrade.ViewModels
             set { this.RaiseAndSetIfChanged(ref recheckPeriod, value); }
         }
 
-        public ReactiveList<IPoeTradeViewModel> Items { get; } = new ReactiveList<IPoeTradeViewModel> { ChangeTrackingEnabled = true };
+        public ReadOnlyObservableCollection<IPoeTradeViewModel> Items
+        {
+            get { return items; }
+        }
 
         public IHistoricalTradesViewModel HistoricalTrades { get; }
 
@@ -142,6 +167,11 @@ namespace PoeEye.PoeTrade.ViewModels
             activeProvider.HistoryProvider?.Refresh();
         }
 
+        public void Clear()
+        {
+            itemsSource.Clear();
+        }
+
         private void OnNextItemsPackReceived(IPoeItem[] itemsPack)
         {
             var activeProvider = activeProviderInfo;
@@ -150,20 +180,20 @@ namespace PoeEye.PoeTrade.ViewModels
                 return;
             }
 
-            ExceptionlessClient.Default
-                               .CreateFeatureUsage("TradeList")
-                               .SetType("Refresh")
-                               .SetProperty("Description", activeQuery?.DumpToText())
-                               .Submit();
-
-            var existingItems = Items.Select(x => x.Trade).ToArray();
+            var existingItems = itemsSource.Items.Select(x => x.Trade).ToArray();
             var removedItems = existingItems.Except(itemsPack, poeItemsComparer).ToArray();
             var newItems = itemsPack.Except(existingItems, poeItemsComparer).ToArray();
+            var relistedItems = itemsSource.Items.Where(x => x.TradeState == PoeTradeState.Removed).Where(x => existingItems.Contains(x.Trade, poeItemsComparer)).ToArray();
 
             Log.Instance.Debug(
-                $"[TradesListViewModel] Next items pack received, existingItems: {existingItems.Length}, newItems: {newItems.Length}, removedItems: {removedItems.Length}");
+                $"[TradesListViewModel] Next items pack received, existingItems: {existingItems.Length}, newItems: {newItems.Length}, removedItems: {removedItems.Length}, relistedItems: {relistedItems.Length}");
 
-            foreach (var itemViewModel in Items.Where(x => removedItems.Contains(x.Trade)).Where(x => x.TradeState != PoeTradeState.Removed))
+            foreach (var itemViewModel in relistedItems)
+            {
+                itemViewModel.TradeState = PoeTradeState.New;
+            }
+
+            foreach (var itemViewModel in itemsSource.Items.Where(x => removedItems.Contains(x.Trade)).Where(x => x.TradeState != PoeTradeState.Removed))
             {
                 itemViewModel.TradeState = PoeTradeState.Removed;
                 itemViewModel.Trade.Timestamp = clock.Now;
@@ -181,25 +211,12 @@ namespace PoeEye.PoeTrade.ViewModels
                     itemViewModel.TradeState = PoeTradeState.New;
                     itemViewModel.Trade.Timestamp = clock.Now;
 
-                    itemViewModel
-                        .WhenAnyValue(x => x.TradeState)
-                        .WithPrevious((prev, curr) => new { prev, curr })
-                        .Where(x => x.curr == PoeTradeState.Normal && x.prev == PoeTradeState.Removed)
-                        .Subscribe(() => RemoveItem(itemViewModel))
-                        .AddTo(itemViewModel.Anchors);
-
                     itemsToAdd.Add(itemViewModel);
                 }
 
-                itemsToAdd.ForEach(Items.Add);
+                itemsToAdd.ForEach(itemsSource.Add);
             }
             lastUpdateTimestamp = clock.Now;
-        }
-
-        private void RemoveItem(IPoeTradeViewModel tradeViewModel)
-        {
-            tradeViewModel.Dispose();
-            Items.Remove(tradeViewModel);
         }
 
         private void OnNextHistoryProviderCreated(IPoeLiveHistoryProvider poeLiveHistoryProvider)

@@ -4,6 +4,8 @@ using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Windows.Input;
+using DynamicData;
+using DynamicData.Binding;
 using Exceptionless;
 using Guards;
 using JetBrains.Annotations;
@@ -227,8 +229,10 @@ namespace PoeEye.PoeTrade.ViewModels
                 .Subscribe(() => this.RaisePropertyChanged(nameof(IsBusy)))
                 .AddTo(anchors);
 
-            tradesList.Items.ItemChanged.ToUnit()
-                .Merge(tradesList.Items.Changed.ToUnit())
+            Observable.Merge(
+                    tradesList.Items.ToObservableChangeSet().ToUnit(),
+                    tradesList.Items.ToObservableChangeSet().WhenPropertyChanged(x => x.TradeState).ToUnit()
+                )
                 .StartWith(Unit.Default)
                 .Subscribe(
                     () =>
@@ -278,7 +282,7 @@ namespace PoeEye.PoeTrade.ViewModels
 
         private void RunNewSearch(IPoeQueryInfo query)
         {
-            TradesList.Items.Clear();
+            TradesList.Clear();
             TradesList.ActiveQuery = query;
             Query.IsExpanded = false;
 
@@ -309,12 +313,9 @@ namespace PoeEye.PoeTrade.ViewModels
             Log.Instance.Debug(
                 $"[MainWindowTabViewModel.MarkAllAsReadExecute] Marking {tradesToAmend.Length} of {tradesList.Items.Count} item(s) as Read");
 
-            using (TradesList.Items.SuppressChangeNotifications())
+            foreach (var trade in tradesToAmend)
             {
-                foreach (var trade in tradesToAmend)
-                {
-                    trade.TradeState = PoeTradeState.Normal;
-                }
+                trade.TradeState = PoeTradeState.Normal;
             }
         }
     }

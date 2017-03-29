@@ -3,6 +3,7 @@ using System.Reactive.Concurrency;
 using System.Reactive.Subjects;
 using DynamicData;
 using DynamicData.Alias;
+using DynamicData.Binding;
 using DynamicData.Controllers;
 using DynamicData.ReactiveUI;
 using Microsoft.Practices.Unity;
@@ -176,7 +177,9 @@ namespace PoeEye.PoeTrade.ViewModels
                         {
                             var tradesListAnchors = new CompositeDisposable().AssignTo(activeTradeListAnchors);
 
-                            tradesList.ItemChanged
+                            tradesList
+                                .ToObservableChangeSet()
+                                .WhenPropertyChanged(x => x.TradeState)
                                 .ToUnit()
                                 .Subscribe(filterRequestSubject)
                                 .AddTo(tradesListAnchors);
