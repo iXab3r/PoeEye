@@ -94,6 +94,9 @@ namespace PoeEye.PoeTrade.ViewModels
                 .Subscribe(() => this.RaisePropertyChanged(nameof(SelectedApi)))
                 .AddTo(Anchors);
 
+            this.BindPropertyTo(nameof(SelectedAudioNotificationType), audioNotificationSelector, x => x.SelectedValue)
+                .AddTo(Anchors);
+
             this.WhenAnyValue(x => x.NewItemsCount)
                 .DistinctUntilChanged()
                 .Where(x => x > 0)
@@ -106,6 +109,8 @@ namespace PoeEye.PoeTrade.ViewModels
         }
 
         public IPoeApiSelectorViewModel ApiSelector { get; }
+
+        public AudioNotificationType SelectedAudioNotificationType => AudioNotificationSelector.SelectedValue;
 
         public bool HasNewTrades => NewItemsCount > 0;
 

@@ -1,7 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using DynamicData;
 using PoeEye.PoeTrade.Common;
-using DynamicData.ReactiveUI;
 
 namespace PoeEye.PoeTrade.ViewModels
 {

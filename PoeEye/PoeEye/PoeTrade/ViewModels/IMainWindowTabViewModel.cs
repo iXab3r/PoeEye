@@ -1,4 +1,5 @@
-﻿using PoeShared.PoeTrade;
+﻿using PoeShared.Audio;
+using PoeShared.PoeTrade;
 using PoeShared.UI.ViewModels;
 
 namespace PoeEye.PoeTrade.ViewModels
@@ -13,8 +14,6 @@ namespace PoeEye.PoeTrade.ViewModels
 
     internal interface IMainWindowTabViewModel : IDisposableReactiveObject
     {
-        IAudioNotificationSelectorViewModel AudioNotificationSelector { get; }
-
         bool IsBusy { get; }
 
         IPoeTradesListViewModel TradesList { [NotNull] get; }
@@ -26,6 +25,8 @@ namespace PoeEye.PoeTrade.ViewModels
         ICommand RefreshCommand { [NotNull] get; }
 
         IPoeApiWrapper SelectedApi { get; }
+
+        AudioNotificationType SelectedAudioNotificationType { get; }
 
         IPoeQueryViewModel Query { get; }
 

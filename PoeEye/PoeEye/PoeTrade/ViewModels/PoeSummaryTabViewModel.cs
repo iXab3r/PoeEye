@@ -1,13 +1,12 @@
-﻿using System.Reactive;
+﻿using System.Collections.ObjectModel;
+using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Subjects;
 using DynamicData;
 using DynamicData.Alias;
 using DynamicData.Binding;
 using DynamicData.Controllers;
-using DynamicData.ReactiveUI;
 using Microsoft.Practices.Unity;
-using PoeEye.Scaffolding;
 using PoeShared;
 using PoeShared.Audio;
 using PoeShared.Prism;
@@ -43,10 +42,7 @@ namespace PoeEye.PoeTrade.ViewModels
     {
         private readonly ReactiveCommand markAllAsReadCommand;
 
-        private readonly ReactiveList<PoeFilteredTradeViewModel> tradesCollection = new ReactiveList<PoeFilteredTradeViewModel>
-        {
-            ChangeTrackingEnabled = true
-        };
+        private readonly ReadOnlyObservableCollection<PoeFilteredTradeViewModel> tradesCollection;
 
         private bool showNewItems = true;
 
@@ -58,7 +54,7 @@ namespace PoeEye.PoeTrade.ViewModels
         private readonly ISubject<Unit> sortRequest = new Subject<Unit>();
 
         public PoeSummaryTabViewModel(
-            [NotNull] ReactiveList<IMainWindowTabViewModel> tabsList,
+            [NotNull] ReadOnlyObservableCollection<IMainWindowTabViewModel> tabsList,
             [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {
             Guard.ArgumentNotNull(() => tabsList);
@@ -79,8 +75,7 @@ namespace PoeEye.PoeTrade.ViewModels
 
             var srcListChangeSet =
                 tabsList
-                    .ToSourceList()
-                    .Connect()
+                    .ToObservableChangeSet()
                     .Transform(tab => new TabProxy(tab, rebuildFilterRequest))
                     .DisposeMany()
                     .Transform(x => x.Trades)
@@ -92,7 +87,7 @@ namespace PoeEye.PoeTrade.ViewModels
                     .Filter(rebuildFilterRequest.StartWith().Select(_ => new Func<PoeFilteredTradeViewModel, bool>(TradeFilterPredicate)))
                     .Sort(sortRequest.StartWith().Select(x => new TradeComparer(activeSortDescriptionData)))
                     .ObserveOn(uiScheduler)
-                    .Bind(tradesCollection)
+                    .Bind(out tradesCollection)
                     .Subscribe()
                     .AddTo(Anchors);
 
@@ -106,7 +101,7 @@ namespace PoeEye.PoeTrade.ViewModels
             ActiveSortDescriptionData = SortingOptions.FirstOrDefault();
         }
 
-        public IReadOnlyReactiveList<PoeFilteredTradeViewModel> TradesView => tradesCollection;
+        public IEnumerable<PoeFilteredTradeViewModel> TradesView => tradesCollection;
 
         public ICommand MarkAllAsReadCommand => markAllAsReadCommand;
 
@@ -138,14 +133,14 @@ namespace PoeEye.PoeTrade.ViewModels
                 (value.Trade.TradeState == PoeTradeState.Removed && showRemovedItems) ||
                 (value.Trade.TradeState == PoeTradeState.New && showNewItems);
 
-            tradeIsValid &= value.Owner.AudioNotificationSelector.SelectedValue != AudioNotificationType.Disabled;
+            tradeIsValid &= value.Owner.SelectedAudioNotificationType != AudioNotificationType.Disabled;
             return tradeIsValid;
         }
 
         private void MarkAllAsReadExecuted()
         {
             var tabsToProcess = tradesCollection
-                .Where(x => x.Owner.AudioNotificationSelector.SelectedValue != AudioNotificationType.Disabled)
+                .Where(x => x.Owner.SelectedAudioNotificationType != AudioNotificationType.Disabled)
                 .ToArray();
 
             Log.Instance.Debug($"[PoeSummaryTabViewModel.MarkAllAsReadExecuted] Sending command to {tabsToProcess.Length} tab(s)");
@@ -162,11 +157,10 @@ namespace PoeEye.PoeTrade.ViewModels
 
                 var listOfTradesList = new SourceList<ISourceList<PoeFilteredTradeViewModel>>();
 
-                tab.AudioNotificationSelector
-                    .WhenAnyValue(x => x.SelectedValue)
-                    .ToUnit()
-                    .Subscribe(filterRequestSubject)
-                    .AddTo(Anchors);
+                tab.WhenAnyValue(x => x.SelectedAudioNotificationType)
+                   .ToUnit()
+                   .Subscribe(filterRequestSubject)
+                   .AddTo(Anchors);
 
                 var activeTradeListAnchors = new SerialDisposable();
                 tab

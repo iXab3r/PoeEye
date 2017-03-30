@@ -111,10 +111,6 @@
       <HintPath>..\packages\DynamicData.4.11.1.1203\lib\net45\DynamicData.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="DynamicData.ReactiveUI, Version=2.5.0.2009, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\DynamicData.ReactiveUI.2.5.0.2009\lib\portable45-net45+win8+wp8+wpa81\DynamicData.ReactiveUI.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="Exceptionless.Extras, Version=3.3.1590.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Exceptionless.Wpf.3.3.1590\lib\net45\Exceptionless.Extras.dll</HintPath>
       <Private>True</Private>
@@ -406,7 +402,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Scaffolding\ReactiveListExtensions.cs" />
     <Compile Include="Utilities\ContextMenuServiceExtensions.cs" />
     <Compile Include="Utilities\EditableTuple.cs" />
     <Compile Include="Utilities\FilterExtension\CollectionViewSourceFilteringBehavior.cs" />
@@ -658,6 +653,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="PoeTrade\Shell\Models\" />
+    <Folder Include="Scaffolding\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <UsingTask TaskName="CosturaCleanup" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll" TaskFactory="CodeTaskFactory">
@@ -695,13 +691,6 @@ foreach (var item in filesToCleanup)
   </UsingTask>
   <Target Name="CleanReferenceCopyLocalPaths" AfterTargets="AfterBuild;NonWinFodyTarget">
     <CosturaCleanup Config="FodyWeavers.xml" Files="@(ReferenceCopyLocalPaths->'$(OutDir)%(DestinationSubDirectory)%(Filename)%(Extension)')" />
-  </Target>
-  <Import Project="..\packages\Fody.1.29.2\build\dotnet\Fody.targets" Condition="Exists('..\packages\Fody.1.29.2\build\dotnet\Fody.targets')" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\packages\Fody.1.29.2\build\dotnet\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Fody.1.29.2\build\dotnet\Fody.targets'))" />
   </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

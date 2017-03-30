@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -9,6 +10,7 @@ using System.Reactive.Subjects;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using DynamicData;
 using Guards;
 using JetBrains.Annotations;
 using Microsoft.Practices.Unity;
@@ -49,11 +51,14 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
 
         private readonly IFactory<IMainWindowTabViewModel> tabFactory;
 
+        private readonly ReadOnlyObservableCollection<IMainWindowTabViewModel> tabsList;
+        private readonly ISourceList<IMainWindowTabViewModel> tabsListSource = new SourceList<IMainWindowTabViewModel>();
+
         private IMainWindowTabViewModel selectedTab;
 
         public MainWindowViewModel(
             [NotNull] IFactory<IMainWindowTabViewModel> tabFactory,
-            [NotNull] IFactory<PoeSummaryTabViewModel, ReactiveList<IMainWindowTabViewModel>> summaryTabFactory,
+            [NotNull] IFactory<PoeSummaryTabViewModel, ReadOnlyObservableCollection<IMainWindowTabViewModel>> summaryTabFactory,
             [NotNull] ApplicationUpdaterViewModel applicationUpdaterViewModel,
             [NotNull] IPoeEyeMainConfigProvider poeEyeConfigProvider,
             [NotNull] IAudioNotificationsManager audioNotificationsManager,
@@ -102,7 +107,15 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
             ProxyProviderViewModel = proxyProviderViewModel;
             proxyProviderViewModel.AddTo(Anchors);
 
-            SummaryTab = summaryTabFactory.Create(TabsList);
+            tabsListSource
+                .Connect()
+                .DisposeMany()
+                .ObserveOn(uiScheduler)
+                .Bind(out tabsList)
+                .Subscribe()
+                .AddTo(Anchors);
+
+            SummaryTab = summaryTabFactory.Create(tabsList);
             SummaryTab.AddTo(Anchors);
 
             OpenAppDataDirectoryCommand = ReactiveUI.Legacy.ReactiveCommand
@@ -125,9 +138,11 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
                 .Subscribe()
                 .AddTo(Anchors);
 
-            TabsList
-                .ItemsAdded
-                .Subscribe(x => SelectedTab = x)
+            tabsListSource
+                .Connect()
+                .ObserveOn(uiScheduler)
+                .OnItemAdded(x => SelectedTab = x)
+                .Subscribe()
                 .AddTo(Anchors);
 
             LoadConfig();
@@ -137,9 +152,11 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
                 CreateAndAddTab();
             }
 
-            TabsList
-                .Changed.ToUnit()
-                .Merge(TabsList.ItemChanged.Where(x => x.PropertyName == nameof(IAudioNotificationSelectorViewModel.SelectedValue)).ToUnit())
+            Observable.Merge(
+                    tabsListSource.Connect().ToObservableChangeSet().ToUnit(),
+                    tabsListSource.Connect().WhenPropertyChanged(x => x.SelectedAudioNotificationType).ToUnit()
+                )
+                .Do(_ => { })
                 .Subscribe(configUpdateSubject)
                 .AddTo(Anchors);
 
@@ -174,10 +191,7 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
 
         public PoeSummaryTabViewModel SummaryTab { get; }
 
-        public ReactiveList<IMainWindowTabViewModel> TabsList { get; } = new ReactiveList<IMainWindowTabViewModel>
-        {
-            ChangeTrackingEnabled = true
-        };
+        public ReadOnlyObservableCollection<IMainWindowTabViewModel> TabsList => tabsList;
 
         public string MainWindowTitle { get; }
 
@@ -244,14 +258,14 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
                 .Subscribe(configUpdateSubject)
                 .AddTo(newTab.Anchors);
 
-            TabsList.Add(newTab);
+            tabsListSource.Add(newTab);
             return newTab;
         }
 
         private void RemoveTabCommandExecuted(IMainWindowTabViewModel tab)
         {
             Log.Instance.Debug($"[MainWindowViewModel.RemoveTab] Removing tab {tab}...");
-            TabsList.Remove(tab);
+            tabsListSource.Remove(tab);
             tab.Dispose();
         }
 

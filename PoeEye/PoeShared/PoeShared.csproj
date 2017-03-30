@@ -251,6 +251,7 @@
     <Compile Include="PoeTrade\IPoePriceCalculcator.cs" />
     <Compile Include="Scaffolding\ChangeSetExtensions.cs" />
     <Compile Include="Scaffolding\DisposableExtensions.cs" />
+    <Compile Include="Scaffolding\ReactiveObjectExtensions.cs" />
     <Compile Include="Scaffolding\WPF\EnableDragHelper.cs" />
     <Compile Include="StashApi\DataTypes\PoeItemRarityWrapper.cs" />
     <Compile Include="StashApi\DataTypes\StashItemAdditionalProperty.cs" />

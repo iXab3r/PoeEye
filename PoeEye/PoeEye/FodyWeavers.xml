@@ -1,24 +1,3 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Weavers>
-    <Costura CreateTemporaryAssemblies='true' >
-        <ExcludeAssemblies>
-          Squirrel
-          NuGet.Squirrel
-          WpfAwesomium
-          avcodec-53
-          avformat-53
-          avutil-51
-          awesomium
-          awesomium_process
-          icudt
-          inspector
-          libEGL
-          libGLESv2
-          pdf_js
-          xinput9_1_0
-          Awesomium.Core
-          Awesomium.Windows.Controls
-          Awesomium.Windows.Forms
-        </ExcludeAssemblies>
-    </Costura>
 </Weavers>

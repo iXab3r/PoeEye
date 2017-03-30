@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows.Input;
 using JetBrains.Annotations;
@@ -8,7 +9,7 @@ namespace PoeEye.PoeTrade.ViewModels
 {
     internal interface IPoeSummaryTabViewModel
     {
-        IReadOnlyReactiveList<PoeFilteredTradeViewModel> TradesView { get; }
+        IEnumerable<PoeFilteredTradeViewModel> TradesView { get; }
 
         ICommand MarkAllAsReadCommand { [NotNull] get; }
 

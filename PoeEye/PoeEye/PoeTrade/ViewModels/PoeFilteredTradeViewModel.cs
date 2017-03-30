@@ -27,7 +27,7 @@ namespace PoeEye.PoeTrade.ViewModels
             Observable.Merge(
                     trade.WhenAnyValue(x => x.TradeState).ToUnit(),
                     trade.WhenAnyValue(x => x.PriceInChaosOrbs).ToUnit(),
-                    owner.WhenAnyValue(x => x.AudioNotificationSelector.SelectedValue).ToUnit(),
+                    owner.WhenAnyValue(x => x.SelectedAudioNotificationType).ToUnit(),
                     owner.WhenAnyValue(x => x.Query).ToUnit())
                .Subscribe(() => this.RaisePropertyChanged())
                .AddTo(Anchors);
