@@ -1,21 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
-    <metadata>
-        <id>PoeEye</id>
-        <version>1.0.0</version>
-        <title>PoeEye (Path of Exile Eye)</title>
-        <authors>Xab3r</authors>
-        <requireLicenseAcceptance>false</requireLicenseAcceptance>
-        <description>Path of Exile trade monitor (https://github.com/iXab3r/PoeEye) </description>
-    </metadata>
-    <files>
-        <file src="Bin\NuGet.Squirrel.dll" target="lib\.net45\NuGet.Squirrel.dll" />
-        <file src="Bin\Squirrel.dll" target="lib\.net45\Squirrel.dll" />
-        <file src="Bin\PoeEye.exe" target="lib\.net45\PoeEye.exe" />
-        <file src="Bin\PoeEye.exe.config" target="lib\.net45\PoeEye.exe.config" />
-        <file src="Bin\Resources\Overlays\FallOfOriath.png" target="lib\.net45\Resources\Overlays\FallOfOriath.png" />
-        <file src="Bin\Resources\Overlays\Green.png" target="lib\.net45\Resources\Overlays\Green.png" />
-        <file src="Bin\Resources\Overlays\Skulls.png" target="lib\.net45\Resources\Overlays\Skulls.png" />
-        <file src="Bin\Resources\Overlays\StradiosOnDeviantArt.png" target="lib\.net45\Resources\Overlays\StradiosOnDeviantArt.png" />
-    </files>
+  <metadata>
+    <id>PoeEye</id>
+    <version>1.0.0</version>
+    <title>PoeEye (Path of Exile Eye)</title>
+    <authors>Xab3r</authors>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Path of Exile trade monitor (https://github.com/iXab3r/PoeEye) </description>
+  </metadata>
+  <files>
+  </files>
 </package>
