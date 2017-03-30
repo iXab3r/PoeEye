@@ -2,7 +2,7 @@
 
 void Main()
 {
-	var homeDir = Util.CurrentQueryPath;
+	var homeDir = Path.GetDirectoryName(Util.CurrentQueryPath);
 	var nuspecFileName = @"PoeEye.nuspec";
 	var binariesDir = @"Bin\";
 	var nuspecFilePath = Path.Combine(homeDir, nuspecFileName);
@@ -45,7 +45,7 @@ void Main()
 	}
 	filesNode.Dump("[AFTER] nuspec files list");
 	
-	File.Move(nuspecFilePath, nuspecFilePath+".bak");
+	File.Copy(nuspecFilePath, nuspecFilePath+".bak", true);
  	nuspecDocument.Save(nuspecFilePath);
 }
 
