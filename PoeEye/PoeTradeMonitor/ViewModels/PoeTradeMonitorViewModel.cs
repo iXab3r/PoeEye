@@ -14,7 +14,6 @@ using PoeEye.TradeMonitor.Models;
 using PoeEye.TradeMonitor.Modularity;
 using PoeEye.TradeMonitor.Services;
 using PoeShared;
-using PoeShared.Common;
 using PoeShared.Modularity;
 using PoeShared.Native;
 using PoeShared.Prism;
@@ -28,18 +27,18 @@ namespace PoeEye.TradeMonitor.ViewModels
     {
         private readonly DelegateCommand<INegotiationViewModel> closeNegotiationCommand;
         private readonly IConfigProvider<PoeTradeMonitorConfig> configProvider;
-        private readonly FakeItemFactory fakeItemFactory;
-        private readonly IScheduler uiScheduler;
-
-        private readonly ISourceList<INegotiationViewModel> negotiationsList = new SourceList<INegotiationViewModel>();
-        private readonly IKeyboardEventsSource keyboardMouseEvents;
         private readonly IOverlayWindowController controller;
-        private readonly IFactory<INegotiationViewModel, TradeModel> notificationFactory;
-        private readonly IFactory<ITradeMonitorService> tradeMonitorServiceFactory;
+        private readonly FakeItemFactory fakeItemFactory;
+        private readonly IKeyboardEventsSource keyboardMouseEvents;
 
         private readonly SerialDisposable lifeCycleAnchors = new SerialDisposable();
 
-        private bool growUpwards;
+        private readonly ISourceList<INegotiationViewModel> negotiationsList = new SourceList<INegotiationViewModel>();
+        private readonly IFactory<INegotiationViewModel, TradeModel> notificationFactory;
+        private readonly IFactory<ITradeMonitorService> tradeMonitorServiceFactory;
+        private readonly IScheduler uiScheduler;
+
+        private bool expandOnHover;
 
         private bool isExpanded;
 
@@ -87,7 +86,7 @@ namespace PoeEye.TradeMonitor.ViewModels
             LockWindowCommand = new DelegateCommand(LockWindowCommandExecuted);
 
             //FIXME Spaghetti code
-            this.WhenLoaded.Subscribe(
+            WhenLoaded.Subscribe(
                 () =>
                 {
                     var pageSizeObservable =
@@ -105,14 +104,6 @@ namespace PoeEye.TradeMonitor.ViewModels
                         .Select(x => x.ObserveOn(uiScheduler).Bind(Negotiations))
                         .Switch()
                         .Subscribe()
-                        .AddTo(Anchors);
-
-                    this.WhenAnyValue(x => x.ActualHeight)
-                        .Where(x => x > 0)
-                        .WithPrevious((prev, curr) => curr - prev)
-                        .Skip(1)
-                        .Where(x => GrowUpwards)
-                        .Subscribe(delta => Top -= delta)
                         .AddTo(Anchors);
 
                     var tradeMonitorService = tradeMonitorServiceFactory.Create();
@@ -154,10 +145,10 @@ namespace PoeEye.TradeMonitor.ViewModels
 
         public ICommand LockWindowCommand { get; }
 
-        public bool GrowUpwards
+        public bool ExpandOnHover
         {
-            get { return growUpwards; }
-            set { this.RaiseAndSetIfChanged(ref growUpwards, value); }
+            get { return expandOnHover; }
+            set { this.RaiseAndSetIfChanged(ref expandOnHover, value); }
         }
 
         public int NumberOfNegotiationsToExpandByDefault
@@ -211,10 +202,13 @@ namespace PoeEye.TradeMonitor.ViewModels
 
             negotiationsList.Add(newNegotiaton);
 
-            var expandedItemsCount = negotiationsList.Items.Count(x => x.IsExpanded);
-            if (expandedItemsCount < NumberOfNegotiationsToExpandByDefault)
+            if (!ExpandOnHover)
             {
-                newNegotiaton.IsExpanded = true;
+                var expandedItemsCount = negotiationsList.Items.Count(x => x.IsExpanded);
+                if (expandedItemsCount < NumberOfNegotiationsToExpandByDefault)
+                {
+                    newNegotiaton.IsExpanded = true;
+                }
             }
         }
 
@@ -257,7 +251,7 @@ namespace PoeEye.TradeMonitor.ViewModels
             }
             Left = config.OverlayLocation.X;
 
-            if (growUpwards)
+            if (GrowUpwards)
             {
                 var deltaHeight = ActualHeight - config.OverlaySize.Height;
                 Top = config.OverlayLocation.Y - deltaHeight;
@@ -273,6 +267,7 @@ namespace PoeEye.TradeMonitor.ViewModels
                 config.OverlayOpacity = 1;
             }
             Opacity = config.OverlayOpacity;
+            ExpandOnHover = config.ExpandOnHover;
         }
 
         private void LockWindowCommandExecuted()
@@ -284,6 +279,7 @@ namespace PoeEye.TradeMonitor.ViewModels
             config.OverlaySize = new Size(Width, Height);
             config.OverlayOpacity = Opacity;
             config.PreGroupNotificationsCount = PreGroupNotificationsCount;
+            config.ExpandOnHover = ExpandOnHover;
             configProvider.Save(config);
             IsLocked = true;
         }

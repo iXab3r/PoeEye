@@ -14,6 +14,8 @@ namespace PoeShared.Native
 
         private double actualWidth;
 
+        private bool growUpwards;
+
         private double height;
         private bool isLocked = true;
 
@@ -28,6 +30,12 @@ namespace PoeShared.Native
         private double width;
 
         public ISubject<Unit> WhenLoaded { get; } = new ReplaySubject<Unit>(1);
+
+        public bool GrowUpwards
+        {
+            get { return growUpwards; }
+            set { this.RaiseAndSetIfChanged(ref growUpwards, value); }
+        }
 
         public double ActualHeight
         {

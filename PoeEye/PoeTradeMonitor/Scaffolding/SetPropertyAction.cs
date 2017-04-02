@@ -1,4 +1,6 @@
-﻿namespace PoeEye.Utilities
+﻿using System.ComponentModel;
+
+namespace PoeEye.Utilities
 {
     using System.Reflection;
     using System.Windows;
@@ -66,7 +68,15 @@
                 BindingFlags.Instance | BindingFlags.Public
                 | BindingFlags.NonPublic | BindingFlags.InvokeMethod);
 
-            propertyInfo.SetValue(target, PropertyValue);
+            var targetType = propertyInfo.PropertyType;
+            var valueToSet = PropertyValue;
+            if (PropertyValue is string && targetType != typeof(string))
+            {
+                var converter = TypeDescriptor.GetConverter(targetType);
+                valueToSet = converter?.ConvertFromInvariantString(PropertyValue as string);
+            }
+
+            propertyInfo.SetValue(target, valueToSet);
         }
     }
 }

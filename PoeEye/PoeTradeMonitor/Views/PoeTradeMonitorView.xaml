@@ -10,12 +10,12 @@
                     xmlns:utilities="clr-namespace:PoeEye.Utilities"
                     xmlns:net="clr-namespace:FontAwesome.Net;assembly=FontAwesome.Net"
                     xmlns:modularity="clr-namespace:PoeEye.TradeMonitor.Modularity"
-                    xmlns:scaffolding1="clr-namespace:PoeEye.TradeMonitor.Scaffolding">
+                    xmlns:scaffolding1="clr-namespace:PoeEye.TradeMonitor.Scaffolding"
+                    xmlns:themes="clr-namespace:PoeEye.TradeMonitor.Themes">
 
   <ResourceDictionary.MergedDictionaries>
     <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Generic.xaml" />
     <ResourceDictionary Source="pack://application:,,,/PoeTradeMonitor;component/Themes/Styles.xaml" />
-
   </ResourceDictionary.MergedDictionaries>
 
   <blue:BoolToVisibilityConverter x:Key="TrueToVisibleConverter"
@@ -44,21 +44,9 @@
   <DataTemplate DataType="{x:Type viewModels:PoeTradeMonitorViewModel}">
     <DataTemplate.Resources>
       <Style TargetType="{x:Type ScrollBar}" BasedOn="{StaticResource SlimScrollBarStyleKey}" />
+      <Style TargetType="{x:Type Slider}" BasedOn="{StaticResource TradeMonitorSliderStyleKey}" />
     </DataTemplate.Resources>
     <Grid x:Name="TradeMonitorOverlay">
-      <Grid.Style>
-        <Style TargetType="{x:Type Grid}">
-          <Style.Triggers>
-            <DataTrigger Binding="{Binding GrowUpwards}" Value="True">
-              <Setter Property="LayoutTransform">
-                <Setter.Value>
-                  <ScaleTransform ScaleY="1" />
-                </Setter.Value>
-              </Setter>
-            </DataTrigger>
-          </Style.Triggers>
-        </Style>
-      </Grid.Style>
 
       <Border
         Background="{StaticResource TradeMonitorBackgroundBrushKey}"
@@ -80,7 +68,6 @@
                 Background="{StaticResource TradeMonitorTitleBackgroundBrushKey}"
                 BorderBrush="{StaticResource TradeMonitorBorderBrushKey}"
                 BorderThickness="1"
-                LayoutTransform="{Binding ElementName=TradeMonitorOverlay, Path=LayoutTransform}"
                 Visibility="{Binding IsLocked, Converter={StaticResource TrueToHiddenFalseToVisibleConverter}}"
                 Margin="3">
           <StackPanel Orientation="Horizontal">
@@ -154,98 +141,96 @@
                 BorderBrush="{StaticResource TradeMonitorBorderBrushKey}"
                 BorderThickness="1"
                 Visibility="{Binding IsLocked, Converter={StaticResource TrueToHiddenFalseToVisibleConverter}}"
-                Margin="3"
-                LayoutTransform="{Binding ElementName=TradeMonitorOverlay, Path=LayoutTransform}">
+                Margin="3">
 
           <StackPanel Orientation="Vertical">
-            <Grid>
-              <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-              </Grid.ColumnDefinitions>
-              <TextBlock Grid.Column="0" MinWidth="100"
+            <StackPanel Orientation="Horizontal" Margin="0,3">
+              <TextBlock Text="Expand on hover: "
+                         Style="{StaticResource TradeMonitorTextBlockStyleKey}"
+                         TextAlignment="Right"
+                         MinWidth="100" />
+              <controls:ToggleSwitchButton
+                IsChecked="{Binding ExpandOnHover}"
+                Height="24"
+                Margin="10,0" />
+            </StackPanel>
+
+            <DockPanel IsEnabled="{Binding ExpandOnHover, Converter={StaticResource NotConverter}}" Margin="0,3" LastChildFill="True">
+              <TextBlock DockPanel.Dock="Left" MinWidth="100"
                          Style="{StaticResource TradeMonitorTextBlockStyleKey}"
                          TextAlignment="Right"
                          Text="Unfold by default: " />
 
-              <Slider Grid.Column="1"
+              <TextBlock DockPanel.Dock="Right" 
+                         Text="{Binding PreGroupNotificationsCount}"
+                         MinWidth="50"
+                         TextAlignment="Left"
+                         Style="{StaticResource TradeMonitorTextBlockStyleKey}"
+                         Margin="5,0" />
+
+              <Slider 
                       Value="{Binding NumberOfNegotiationsToExpandByDefault}"
                       Minimum="0"
                       TickFrequency="1"
                       IsSnapToTickEnabled="True"
                       Margin="10,0"
                       Maximum="{x:Static modularity:PoeTradeMonitorConfig.MaxNumberOfNegotiationsToExpand}" />
+            </DockPanel>
 
-              <TextBlock Grid.Column="2"
-                         Text="{Binding NumberOfNegotiationsToExpandByDefault}"
-                         TextAlignment="Left"
-                         Style="{StaticResource TradeMonitorTextBlockStyleKey}"
-                         Margin="5,0" />
-            </Grid>
-
-            <Grid>
-              <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-              </Grid.ColumnDefinitions>
-              <TextBlock Grid.Column="0" MinWidth="100"
+            <DockPanel Margin="0,3" LastChildFill="True">
+              <TextBlock DockPanel.Dock="Left"  MinWidth="100"
                          Style="{StaticResource TradeMonitorTextBlockStyleKey}"
                          TextAlignment="Right"
                          Text="Pre-group: " />
 
-              <Slider Grid.Column="1"
+              <TextBlock DockPanel.Dock="Right" 
+                         MinWidth="50"
+                         Text="{Binding PreGroupNotificationsCount}"
+                         TextAlignment="Left"
+                         Style="{StaticResource TradeMonitorTextBlockStyleKey}"
+                         Margin="5,0" />
+
+              <Slider 
                       Value="{Binding PreGroupNotificationsCount}"
                       Minimum="1"
                       TickFrequency="1"
                       IsSnapToTickEnabled="True"
                       Margin="10,0"
                       Maximum="{x:Static modularity:PoeTradeMonitorConfig.MaxNumberOfNegotiationsToExpand}" />
+            </DockPanel>
 
-              <TextBlock Grid.Column="2"
-                         Text="{Binding PreGroupNotificationsCount}"
-                         TextAlignment="Left"
-                         Style="{StaticResource TradeMonitorTextBlockStyleKey}"
-                         Margin="5,0" />
-            </Grid>
-
-            <StackPanel Orientation="Horizontal">
-              <TextBlock Text="Grow upwards: "
+            <StackPanel Margin="0,3" Orientation="Horizontal" >
+              <TextBlock Text="Grow upwards: " DockPanel.Dock="Left"
                          Style="{StaticResource TradeMonitorTextBlockStyleKey}"
                          TextAlignment="Right"
                          MinWidth="100" />
-              <controls:ToggleSwitchButton
+              <controls:ToggleSwitchButton  DockPanel.Dock="Left"
                 IsChecked="{Binding GrowUpwards}"
                 Height="24"
                 Margin="10,0" />
             </StackPanel>
 
-            <Grid>
-              <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-              </Grid.ColumnDefinitions>
-              <TextBlock Grid.Column="0" MinWidth="100"
+            <DockPanel Margin="0,3" LastChildFill="True">
+              <TextBlock DockPanel.Dock="Left" MinWidth="100"
                          Style="{StaticResource TradeMonitorTextBlockStyleKey}"
                          TextAlignment="Right"
                          Text="Opacity: " />
 
-              <Slider Grid.Column="1"
+              <TextBlock DockPanel.Dock="Right" 
+                         MinWidth="50"
+                         Text="{Binding Opacity}"
+                         TextAlignment="Left"
+                         Style="{StaticResource TradeMonitorTextBlockStyleKey}"
+                         Margin="5,0" />
+
+              <Slider 
                       Value="{Binding Opacity}"
                       Minimum="0"
                       TickFrequency="0.1"
                       IsSnapToTickEnabled="True"
                       Margin="10,0"
                       Maximum="1" />
-
-              <TextBlock Grid.Column="2"
-                         Text="{Binding Opacity}"
-                         TextAlignment="Left"
-                         Style="{StaticResource TradeMonitorTextBlockStyleKey}"
-                         Margin="5,0" />
-            </Grid>
+            </DockPanel>
           </StackPanel>
         </Border>
 
@@ -257,11 +242,17 @@
             <ColumnDefinition Width="*" />
           </Grid.ColumnDefinitions>
 
+          <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+
+            <!-- Trying to fix WPF resize flickering -->
+            <RowDefinition Height="Auto" MinHeight="20"/>
+          </Grid.RowDefinitions>
+
           <Border Grid.Column="0"
                   BorderThickness="1"
                   BorderBrush="{StaticResource TradeMonitorBorderBrushKey}"
                   Background="{StaticResource TradeMonitorTitleBackgroundBrushKey}"
-                  LayoutTransform="{Binding ElementName=TradeMonitorOverlay, Path=LayoutTransform}"
                   Visibility="{Binding NegotiationsOverflow, Converter={StaticResource Int32GreaterThanZeroToVisibleConverterKey}}"
                   Margin="3,1">
             <Grid>
@@ -335,6 +326,7 @@
 
 
           <ItemsControl Grid.Column="1"
+                        Grid.Row="0"
                         ItemsSource="{Binding Negotiations}"
                         ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                         ScrollViewer.VerticalScrollBarVisibility="Disabled">
@@ -343,12 +335,13 @@
                 <Setter Property="Focusable" Value="False" />
                 <Setter Property="IsTabStop" Value="False" />
                 <Setter Property="Background" Value="Transparent" />
+                <Setter Property="themes:TradeMonitorExpanderHelper.ExpanderDirection" Value="Down" />
+                <Setter Property="themes:TradeMonitorExpanderHelper.ExpandOnHover" Value="{Binding ExpandOnHover}" />
                 <Setter Property="ItemsPanel">
                   <Setter.Value>
                     <ItemsPanelTemplate>
                       <StackPanel HorizontalAlignment="Stretch"
                                   Background="Transparent"
-                                  LayoutTransform="{Binding ElementName=TradeMonitorOverlay, Path=LayoutTransform}"
                                   VerticalAlignment="Top" />
                     </ItemsPanelTemplate>
                   </Setter.Value>
@@ -376,12 +369,12 @@
                 </Setter>
                 <Style.Triggers>
                   <DataTrigger Binding="{Binding GrowUpwards}" Value="True">
+                    <Setter Property="themes:TradeMonitorExpanderHelper.ExpanderDirection" Value="Up" />
                     <Setter Property="ItemsPanel">
                       <Setter.Value>
                         <ItemsPanelTemplate>
                           <StackPanel HorizontalAlignment="Stretch"
                                       Background="Transparent"
-                                      LayoutTransform="{Binding ElementName=TradeMonitorOverlay, Path=LayoutTransform}"
                                       VerticalAlignment="Bottom" />
                         </ItemsPanelTemplate>
                       </Setter.Value>

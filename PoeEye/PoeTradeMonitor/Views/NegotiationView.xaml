@@ -12,318 +12,525 @@
                     xmlns:converters="clr-namespace:PoeShared.Scaffolding.WPF.Converters;assembly=PoeShared"
                     xmlns:models="clr-namespace:PoeEye.TradeMonitor.Models"
                     xmlns:common="clr-namespace:PoeShared.Common;assembly=PoeShared"
-                    xmlns:chat="clr-namespace:PoeWhisperMonitor.Chat;assembly=PoeWhisperMonitor">
+                    xmlns:chat="clr-namespace:PoeWhisperMonitor.Chat;assembly=PoeWhisperMonitor"
+                    xmlns:utilities="clr-namespace:PoeEye.Utilities"
+                    xmlns:mvvm="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
+                    xmlns:themes="clr-namespace:PoeEye.TradeMonitor.Themes">
 
-    <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Generic.xaml" />
-        <ResourceDictionary Source="pack://application:,,,/PoeTradeMonitor;component/Themes/Styles.xaml" />
+  <ResourceDictionary.MergedDictionaries>
+    <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Generic.xaml" />
+    <ResourceDictionary Source="pack://application:,,,/PoeTradeMonitor;component/Themes/Styles.xaml" />
+  </ResourceDictionary.MergedDictionaries>
 
-        <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.Expander.xaml" />
-    </ResourceDictionary.MergedDictionaries>
+  <blue:BoolToVisibilityConverter x:Key="TrueToVisibleConverter"
+                                  TrueValue="Visible"
+                                  FalseValue="Collapsed" />
 
-    <blue:BoolToVisibilityConverter x:Key="TrueToVisibleConverter"
-                                    TrueValue="Visible"
-                                    FalseValue="Collapsed" />
+  <blue:BoolToVisibilityConverter x:Key="TrueToVisibleFalseToHiddenConverter"
+                                  TrueValue="Visible"
+                                  FalseValue="Hidden" />
 
-    <blue:BoolToVisibilityConverter x:Key="TrueToVisibleFalseToHiddenConverter"
-                                    TrueValue="Visible"
-                                    FalseValue="Hidden" />
+  <converters:TimeSpanToHumanReadableStringConverter x:Key="TimeSpanToHumanReadableStringConverter" />
 
-    <converters:TimeSpanToHumanReadableStringConverter x:Key="TimeSpanToHumanReadableStringConverter"/>
+  <DataTemplate DataType="{x:Type viewModels:NegotiationViewModel}">
+    <DataTemplate.Resources>
+      <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource TradeMonitorTextBlockStyleKey}">
+        <Setter Property="FontSize" Value="16" />
+      </Style>
+      <Style TargetType="{x:Type Button}" BasedOn="{StaticResource TradeMonitorCircleButtonStyleKey}">
+        <Setter Property="Width" Value="28" />
+        <Setter Property="Height" Value="28" />
+        <Setter Property="Padding" Value="0,3,0,0" />
+        <Setter Property="FontSize" Value="20" />
+      </Style>
+      <Style TargetType="{x:Type ToolTip}">
+        <Setter Property="HasDropShadow" Value="False" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Margin" Value="1" />
+      </Style>
 
-    <DataTemplate DataType="{x:Type viewModels:NegotiationViewModel}">
-        <DataTemplate.Resources>
-            <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource TradeMonitorTextBlockStyleKey}">
-                <Setter Property="FontSize" Value="16"/>
-            </Style>
-            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource TradeMonitorCircleButtonStyleKey}">
-                <Setter Property="Width" Value="28"/>
-                <Setter Property="Height" Value="28"/>
-                <Setter Property="Padding" Value="0,3,0,0"/>
-                <Setter Property="FontSize" Value="20"/>
-            </Style>
-            <Style TargetType="{x:Type ToolTip}">
-                <Setter Property="HasDropShadow" Value="False" />
-                <Setter Property="Background" Value="Transparent"/>
-                <Setter Property="BorderThickness" Value="0"/>
-                <Setter Property="Margin" Value="1"/>
-            </Style>
-        </DataTemplate.Resources>
+      <Style TargetType="{x:Type ToggleButton}" x:Key="ExpanderUpHeaderStyleKey">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="Template">
+          <Setter.Value>
+            <ControlTemplate TargetType="{x:Type ToggleButton}">
+              <Border Background="{TemplateBinding Background}" Padding="8,2,8,2">
+                <Grid>
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                  </Grid.ColumnDefinitions>
+                  <ToggleButton Grid.Column="0"
+                                IsChecked="{Binding Path=IsChecked, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                VerticalAlignment="Center"
+                                Foreground="{TemplateBinding Foreground}"
+                                Style="{StaticResource MaterialDesignExpanderToggleButton}"
+                                RenderTransformOrigin="0.5,0.5">
+                    <ToggleButton.RenderTransform>
+                      <RotateTransform Angle="-180" />
+                    </ToggleButton.RenderTransform>
+                  </ToggleButton>
 
-        <Expander Background="{StaticResource TradeMonitorTitleBackgroundBrushKey}" 
-                  BorderBrush="{StaticResource TradeMonitorBorderBrushKey}" 
-                  BorderThickness="1" 
-                  Padding="0"
-                  Focusable="False"
-                  IsTabStop="False"
-                  IsExpanded="{Binding IsExpanded}">
-            <controls:ExpanderHelper.HeaderDownStyle>
-                <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource ExpanderDownHeaderStyle}">
-                    <Setter Property="Focusable" Value="False"/>
-                    <Setter Property="IsTabStop" Value="False"/>
-                </Style>
-            </controls:ExpanderHelper.HeaderDownStyle>
-            <Expander.Header>
-                <Border Height="24">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-
-                        <TextBlock Grid.Column="0" 
-                                   Foreground="{StaticResource TradeMonitorTextBrushKey}"
-                                   MaxWidth="120"
-                                   TextTrimming="CharacterEllipsis"
-                                   Text="{Binding CharacterName}"/>
-
-                        <StackPanel Orientation="Horizontal" Grid.Column="1" Grid.Row="0">
-                            <TextBlock 
-                                   VerticalAlignment="Center"
-                                   Margin="5,0">
-                                <TextBlock.Style>
-                                    <Style TargetType="{x:Type TextBlock}"
-                                           BasedOn="{StaticResource IconTextBlock}">
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding NegotiationType}" Value="{x:Static models:TradeType.Sell}">
-                                                <Setter Property="Text" Value="{x:Static net:FontAwesome.arrow_right}"/>
-                                                <Setter Property="Foreground" Value="#AEAB94"/>
-                                            </DataTrigger>
-                                            <DataTrigger Binding="{Binding NegotiationType}" Value="{x:Static models:TradeType.Buy}">
-                                                <Setter Property="Text" Value="{x:Static net:FontAwesome.arrow_left}"/>
-                                                <Setter Property="Foreground" Value="GreenYellow"/>
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                        
-                                    </Style>
-                                    
-                                </TextBlock.Style>
-                            </TextBlock>
-
-                            <ContentPresenter 
-                                          TextBlock.Foreground="{StaticResource PoeItemRarityUniqueBrush}" 
-                                          TextBlock.FontSize="16"  
-                                          TextBlock.FontWeight="SemiBold"
-                                          Content="{Binding Price}"
-                                          ToolTip="{Binding PriceInChaos}"/>
-                        </StackPanel>
-
-                        <TextBlock Grid.Column="3" 
-                                   Foreground="{StaticResource TradeMonitorTextBrushKey}"
-                                   FontSize="13"
-                                   Text="{Binding TimeElapsed, Converter={StaticResource TimeSpanToHumanReadableStringConverter}}"/>
-
-                        <StackPanel Grid.Column="4" 
-                                    Orientation="Horizontal">
-                            <Button Content="{x:Static net:FontAwesome.plus_circle}"
-                                    Margin="2,0"
-                                    Foreground="#00BA46"
-                                    ToolTip="Invite to party"
-                                    Command="{Binding InviteToPartyCommand}" />
-
-                            <Button Content="{x:Static net:FontAwesome.minus_circle}" 
-                                    Margin="2,0"
-                                    Foreground="#B64A2C"
-                                    ToolTip="Kick from party"
-                                    Command="{Binding KickFromPartyCommand}" />
-
-                            <Button Content="{x:Static net:FontAwesome.shopping_cart}" 
-                                    Margin="2,0"
-                                    Foreground="#FCD24E"
-                                    Padding="0,2,2,0"
-                                    FontSize="16"
-                                    ToolTip="Initiate trade (opens trade dialog)"
-                                    Command="{Binding TradeCommand}" />
-
-                            <Button Content="{x:Static net:FontAwesome.comments_o}" 
-                                    Margin="2,0"
-                                    Foreground="#F3F4F4"
-                                    FontSize="16"
-                                    Padding="0,1,0,0"
-                                    ToolTip="Initiate chat (opens chat window)"
-                                    Command="{Binding OpenChatCommand}" />
-
-                            <Button Content="{x:Static net:FontAwesome.close}" 
-                                    Foreground="#F3F4F4"
-                                    Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}, Path=DataContext.CloseNegotiationCommand}"
-                                    CommandParameter="{Binding}"
-                                    ToolTip="Close this negotiation"
-                                    FontSize="14"
-                                    Padding="0,1,0,0"
-                                    Margin="2,0" />
-                        </StackPanel>
-                    </Grid>
-                </Border>
-            </Expander.Header>
-
-            <Border Background="{StaticResource TradeMonitorBackgroundBrushKey}">
-
-                <Grid Margin="1">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
-
-                    <Viewbox Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="4" Height="40">
-                        <StackPanel Orientation="Horizontal" 
-                                Background="Transparent"
-                                HorizontalAlignment="Center"
-                                ToolTipService.HasDropShadow="False"
-                                ToolTipService.InitialShowDelay="0"
-                                ToolTipService.ShowDuration="{x:Static system:Int32.MaxValue}"
-                                ToolTipService.ShowOnDisabled="True">
-                            <StackPanel.ToolTip>
-                                <Border Background="{StaticResource TradeMonitorBackgroundBrushKey}"
-                                    BorderBrush="{StaticResource TradeMonitorBorderBrushKey}"
-                                    BorderThickness="1">
-                                    <ContentPresenter Content="{Binding Item}"
-                                                  TextBlock.Foreground="{StaticResource TextBrush}"/>
-                                </Border>
-
-                            </StackPanel.ToolTip>
-
-                            <controls:ProgressRing
-                                      IsActive="{Binding IsBusy, Mode=OneWay}"
-                                      Visibility="{Binding IsBusy, Converter={StaticResource TrueToVisibleConverter}, Mode=OneWay}"
-                                      Height="26"
-                                      Width="26"
-                                      Margin="5,0"
-                                ToolTip="Fetching stash data through Path Of Exile Stash API...">
-                            </controls:ProgressRing>
-
-                            <ContentPresenter 
-                                      Content="{Binding ItemIcon}" 
-                                      Visibility="{Binding ItemIcon, Converter={StaticResource NullToCollapsedConverter}}"
-                                      Height="40"
-                                      Width="40"
-                                      Margin="5,0">
-                            </ContentPresenter>
-
-                            <StackPanel Orientation="Vertical">
-                                <ContentPresenter VerticalAlignment="Center" 
-                                              TextBlock.Foreground="{StaticResource PoeItemRarityUniqueBrush}"
-                                              TextBlock.FontSize="16"
-                                              TextBlock.FontWeight="SemiBold"
-                                              Content="{Binding ItemName}">
-                                </ContentPresenter>
-
-                                <TextBlock 
-                                   Foreground="{StaticResource TradeMonitorTextBrushKey}"
-                                   FontSize="13"
-                                   Margin="0,1"
-                                   Text="{Binding Offer}"
-                                   HorizontalAlignment="Center"
-                                   Visibility="{Binding Offer, Converter={StaticResource NullToCollapsedConverter}}"/>
-                            </StackPanel>
-                        </StackPanel>
-                    </Viewbox>
-
-                    <ItemsControl Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="4"
-                                  Margin="2"
-                                  HorizontalAlignment="Left"
-                                  ItemsSource="{Binding PredefinedMessages}">
-
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <StackPanel Orientation="Horizontal"/>
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate DataType="{x:Type models:MacroMessage}">
-                                <Button Content="{Binding Label}" 
-                                        Margin="5,0"
-                                        Style="{StaticResource MetroFlatButton}"
-                                        Height="26"
-                                        FontSize="13"
-                                        CommandParameter="{Binding}"
-                                        ToolTip="{Binding Text}"
-                                        Command="{Binding DataContext.SendPredefinedMessageCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ItemsControl}}}"/>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-
-                    <StackPanel Orientation="Horizontal" Grid.Column="3" Grid.Row="1">
-                        <TextBlock 
-                                   Foreground="{StaticResource TradeMonitorTextBrushKey}"
-                                   VerticalAlignment="Center"
-                                   HorizontalAlignment="Right"
-                                   Margin="5,0">
-                            <TextBlock.Inlines>
-                                <Run Text="{Binding TabName, Mode=OneWay}" /> (
-                                <Run Text="{Binding ItemPosition, Mode=OneWay}" /> )
-                            </TextBlock.Inlines>
-                        </TextBlock>
-                    </StackPanel>
-
-                    <Border Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="4" Grid.RowSpan="2"
-                            VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
-                            Background="{StaticResource TradeMonitorTitleBackgroundBrushKey}"
-                            BorderThickness="1"
-                            IsHitTestVisible="False"
-                            BorderBrush="{StaticResource ValidationBrush5}">
-                        <Border.Style>
-                            <Style TargetType="{x:Type Border}">
-                                <Setter Property="Visibility" Value="Visible"/>
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding MessageSendStatus}" Value="{x:Static chat:PoeMessageSendStatus.Unknown}">
-                                        <Setter Property="Visibility" Value="Hidden"/>
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding MessageSendStatus}" Value="{x:Static chat:PoeMessageSendStatus.Success}">
-                                        <Setter Property="Visibility" Value="Hidden"/>
-                                    </DataTrigger>
-                                    <Trigger Property="Visibility" Value="Visible">
-                                        <Trigger.EnterActions>
-                                            <BeginStoryboard>
-                                                <Storyboard>
-                                                    <DoubleAnimationUsingKeyFrames 
-                                                                     Storyboard.TargetProperty="Opacity"
-                                                                     Duration="00:00:08">
-                                                        <LinearDoubleKeyFrame KeyTime="0%" Value="0" />
-                                                        <LinearDoubleKeyFrame KeyTime="5%" Value="1" />
-                                                        <LinearDoubleKeyFrame KeyTime="50%" Value="1" />
-                                                        <LinearDoubleKeyFrame KeyTime="99%" Value="0" />
-                                                    </DoubleAnimationUsingKeyFrames>
-                                                </Storyboard>
-                                            </BeginStoryboard>
-                                        </Trigger.EnterActions>
-                                    </Trigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Border.Style>
-                        
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                            <TextBlock Style="{StaticResource TradeMonitorTextBlockStyleKey}" 
-                                       Text="&#xf06a;" 
-                                       Foreground="{StaticResource ControlsValidationBrush}"
-                                       FontSize="30"
-                                       ToolTip="{Binding MessageSendStatus}"
-                                       Margin="5,0"/>
-
-                            <TextBlock 
-                               Foreground="{StaticResource ControlsValidationBrush}"
-                               FontSize="18"
-                               FontWeight="Bold"
-                               Text="{Binding MessageSendStatus, StringFormat='Failed to send message: {0}'}">
-                            </TextBlock>
-
-                        </StackPanel>
-                        
-                    </Border>
-
+                  <ContentPresenter Content="{TemplateBinding Content}"
+                                    ContentTemplate="{TemplateBinding ContentTemplate}"
+                                    ContentStringFormat="{TemplateBinding ContentStringFormat}"
+                                    ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}"
+                                    VerticalAlignment="Center"
+                                    Grid.Column="1"
+                                    Margin="0" />
                 </Grid>
-            </Border>
+              </Border>
+            </ControlTemplate>
+          </Setter.Value>
+        </Setter>
+      </Style>
 
-        </Expander>
-    </DataTemplate>
+      <Style TargetType="{x:Type ToggleButton}" x:Key="ExpanderDownHeaderStyleKey">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="Template">
+          <Setter.Value>
+            <ControlTemplate TargetType="{x:Type ToggleButton}">
+              <Border Background="{TemplateBinding Background}" Padding="8,2,8,2">
+                <Grid>
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition />
+                  </Grid.ColumnDefinitions>
+                  <ToggleButton Grid.Column="0"
+                                VerticalAlignment="Center"
+                                Foreground="{TemplateBinding Foreground}"
+                                IsChecked="{Binding Path=IsChecked, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                Style="{StaticResource MaterialDesignExpanderToggleButton}" />
+                  
+                  <ContentPresenter Content="{TemplateBinding Content}"
+                                    ContentTemplate="{TemplateBinding ContentTemplate}"
+                                    ContentStringFormat="{TemplateBinding ContentStringFormat}"
+                                    ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}"
+                                    VerticalAlignment="Center"
+                                    Grid.Column="1"
+                                    Margin="0" />
+                </Grid>
+              </Border>
+            </ControlTemplate>
+          </Setter.Value>
+        </Setter>
+      </Style>
+
+    </DataTemplate.Resources>
+
+    <Expander BorderBrush="{StaticResource TradeMonitorBorderBrushKey}"
+              BorderThickness="1"
+              Padding="0"
+              Focusable="False"
+              IsTabStop="False"
+              ExpandDirection="{Binding Path=(themes:TradeMonitorExpanderHelper.ExpanderDirection), RelativeSource={RelativeSource Self}, Mode=OneWay}">
+      <Expander.Style>
+        <Style TargetType="{x:Type Expander}" BasedOn="{StaticResource MaterialDesignExpander}">
+          <Setter Property="Background" Value="{StaticResource TradeMonitorTitleBackgroundBrushKey}"/>
+          <Setter Property="IsExpanded" Value="{Binding IsExpanded}"></Setter>
+          <Setter Property="Template">
+            <Setter.Value>
+              <ControlTemplate TargetType="{x:Type Expander}">
+                <Border BorderThickness="{TemplateBinding BorderThickness}" BorderBrush="{TemplateBinding BorderBrush}">
+                  <VisualStateManager.VisualStateGroups>
+                    <VisualStateGroup x:Name="ExpansionStates">
+                      <VisualStateGroup.Transitions>
+                        <VisualTransition GeneratedDuration="0" To="Expanded">
+                          <VisualTransition.GeneratedEasingFunction>
+                            <CubicEase EasingMode="EaseOut" />
+                          </VisualTransition.GeneratedEasingFunction>
+                          <Storyboard>
+                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="PART_Content"
+                                                           Storyboard.TargetProperty="Visibility">
+                              <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Visible}" />
+                            </ObjectAnimationUsingKeyFrames>
+                            <DoubleAnimation Storyboard.TargetProperty="Opacity" Storyboard.TargetName="PART_Content"
+                                             To="1" Duration="0:0:0.2" />
+                          </Storyboard>
+                        </VisualTransition>
+                        <VisualTransition GeneratedDuration="0" To="Collapsed">
+                          <VisualTransition.GeneratedEasingFunction>
+                            <CubicEase EasingMode="EaseOut" />
+                          </VisualTransition.GeneratedEasingFunction>
+                          <Storyboard>
+                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="PART_Content"
+                                                           Storyboard.TargetProperty="Visibility">
+                              <DiscreteObjectKeyFrame KeyTime="0:0:0.2" Value="{x:Static Visibility.Collapsed}" />
+                            </ObjectAnimationUsingKeyFrames>
+                            <DoubleAnimation Storyboard.TargetProperty="Opacity" Storyboard.TargetName="PART_Content"
+                                             To="0" Duration="0:0:0.2" />
+                          </Storyboard>
+                        </VisualTransition>
+                      </VisualStateGroup.Transitions>
+                      <VisualState x:Name="Expanded">
+                        <Storyboard>
+                          <DoubleAnimation Storyboard.TargetProperty="Opacity" Storyboard.TargetName="PART_Content"
+                                           To="1" Duration="0" />
+                          <ObjectAnimationUsingKeyFrames Storyboard.TargetName="PART_Content"
+                                                         Storyboard.TargetProperty="Visibility">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Visible}" />
+                          </ObjectAnimationUsingKeyFrames>
+                        </Storyboard>
+                      </VisualState>
+                      <VisualState x:Name="Collapsed">
+                        <Storyboard>
+                          <DoubleAnimation Storyboard.TargetProperty="Opacity" Storyboard.TargetName="PART_Content"
+                                           To="0" Duration="0" />
+                          <ObjectAnimationUsingKeyFrames Storyboard.TargetName="PART_Content"
+                                                         Storyboard.TargetProperty="Visibility">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Hidden}" />
+                          </ObjectAnimationUsingKeyFrames>
+                        </Storyboard>
+                      </VisualState>
+                    </VisualStateGroup>
+                  </VisualStateManager.VisualStateGroups>
+                  <Grid>
+                    <DockPanel Background="{TemplateBinding Background}">
+                      <ToggleButton Name="HeaderSite"
+                                    DockPanel.Dock="Top"
+                                    BorderThickness="0" Cursor="Hand"
+                                    IsChecked="{Binding Path=IsExpanded, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                    TextElement.FontSize="15"
+                                    Opacity=".87"
+                                    Foreground="{TemplateBinding Foreground}"
+                                    Content="{TemplateBinding Header}"
+                                    ContentTemplate="{TemplateBinding HeaderTemplate}"
+                                    ContentTemplateSelector="{TemplateBinding HeaderTemplateSelector}"
+                                    ContentStringFormat="{TemplateBinding HeaderStringFormat}" />
+                      <Border Name="ContentSite"
+                              DockPanel.Dock="Bottom">
+                        <StackPanel Name="ContentPanel"
+                                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                    Margin="{TemplateBinding Padding}"
+                                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}">
+                          <StackPanel.Height>
+                            <MultiBinding Converter="{StaticResource MathMlpMultipleConverter}">
+                              <Binding ElementName="PART_Content" Path="ActualHeight" />
+                              <Binding ElementName="PART_Content" Path="Opacity" />
+                            </MultiBinding>
+                          </StackPanel.Height>
+                          <StackPanel.Width>
+                            <MultiBinding Converter="{StaticResource MathMlpMultipleConverter}">
+                              <Binding ElementName="PART_Content" Path="ActualWidth" />
+                              <Binding ElementName="PART_Content" Path="Opacity" />
+                            </MultiBinding>
+                          </StackPanel.Width>
+                          <ContentPresenter Name="PART_Content" Focusable="False"
+                                            ContentTemplate="{TemplateBinding ContentTemplate}"
+                                            ContentStringFormat="{TemplateBinding ContentStringFormat}"
+                                            ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}" />
+                        </StackPanel>
+                      </Border>
+                    </DockPanel>
+                  </Grid>
+                </Border>
+                <ControlTemplate.Triggers>
+                  <Trigger Property="ExpandDirection" Value="Up">
+                    <Setter Property="DockPanel.Dock" TargetName="HeaderSite" Value="Bottom" />
+                    <Setter Property="DockPanel.Dock" TargetName="ContentSite" Value="Top" />
+                    <Setter Property="Orientation" TargetName="ContentPanel" Value="Vertical" />
+                    <Setter Property="Width" TargetName="ContentPanel" Value="Auto" />
+                    <Setter Property="Style" TargetName="HeaderSite" Value="{StaticResource ExpanderUpHeaderStyleKey}" />
+                  </Trigger>
+                  <Trigger Property="ExpandDirection" Value="Down">
+                    <Setter Property="DockPanel.Dock" TargetName="HeaderSite" Value="Top" />
+                    <Setter Property="DockPanel.Dock" TargetName="ContentSite" Value="Bottom" />
+                    <Setter Property="Orientation" TargetName="ContentPanel" Value="Vertical" />
+                    <Setter Property="Width" TargetName="ContentPanel" Value="Auto" />
+                    <Setter Property="Style" TargetName="HeaderSite"
+                            Value="{StaticResource ExpanderDownHeaderStyleKey}" />
+                  </Trigger>
+                </ControlTemplate.Triggers>
+              </ControlTemplate>
+            </Setter.Value>
+          </Setter>
+
+          <Style.Triggers>
+            <MultiTrigger>
+              <MultiTrigger.Conditions>
+                <Condition Property="IsMouseOver" Value="True"/>
+                <Condition Property="themes:TradeMonitorExpanderHelper.ExpandOnHover" Value="True"/>
+              </MultiTrigger.Conditions>
+              <MultiTrigger.Setters>
+                <Setter Property="IsExpanded" Value="True"></Setter>
+              </MultiTrigger.Setters>
+            </MultiTrigger>
+            <MultiTrigger>
+              <MultiTrigger.Conditions>
+                <Condition Property="IsMouseOver" Value="False"/>
+                <Condition Property="themes:TradeMonitorExpanderHelper.ExpandOnHover" Value="True"/>
+              </MultiTrigger.Conditions>
+              <MultiTrigger.Setters>
+                <Setter Property="IsExpanded" Value="False"></Setter>
+              </MultiTrigger.Setters>
+            </MultiTrigger>
+          </Style.Triggers>
+        </Style>
+      </Expander.Style>
+      <Expander.Header>
+        <Border Height="24">
+          <Grid>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="Auto" />
+              <ColumnDefinition Width="Auto" />
+              <ColumnDefinition Width="*" />
+              <ColumnDefinition Width="Auto" />
+              <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Column="0"
+                       Foreground="{StaticResource TradeMonitorTextBrushKey}"
+                       MaxWidth="120"
+                       TextTrimming="CharacterEllipsis"
+                       Text="{Binding CharacterName}" />
+
+            <StackPanel Orientation="Horizontal" Grid.Column="1" Grid.Row="0">
+              <TextBlock
+                VerticalAlignment="Center"
+                Margin="5,0">
+                <TextBlock.Style>
+                  <Style TargetType="{x:Type TextBlock}"
+                         BasedOn="{StaticResource IconTextBlock}">
+                    <Style.Triggers>
+                      <DataTrigger Binding="{Binding NegotiationType}" Value="{x:Static models:TradeType.Sell}">
+                        <Setter Property="Text" Value="{x:Static net:FontAwesome.arrow_right}" />
+                        <Setter Property="Foreground" Value="#AEAB94" />
+                      </DataTrigger>
+                      <DataTrigger Binding="{Binding NegotiationType}" Value="{x:Static models:TradeType.Buy}">
+                        <Setter Property="Text" Value="{x:Static net:FontAwesome.arrow_left}" />
+                        <Setter Property="Foreground" Value="GreenYellow" />
+                      </DataTrigger>
+                    </Style.Triggers>
+
+                  </Style>
+
+                </TextBlock.Style>
+              </TextBlock>
+
+              <ContentPresenter
+                TextBlock.Foreground="{StaticResource PoeItemRarityUniqueBrush}"
+                TextBlock.FontSize="16"
+                TextBlock.FontWeight="SemiBold"
+                Content="{Binding Price}"
+                ToolTip="{Binding PriceInChaos}" />
+            </StackPanel>
+
+            <TextBlock Grid.Column="3"
+                       Foreground="{StaticResource TradeMonitorTextBrushKey}"
+                       FontSize="13"
+                       Text="{Binding TimeElapsed, Converter={StaticResource TimeSpanToHumanReadableStringConverter}}" />
+
+            <StackPanel Grid.Column="4"
+                        Orientation="Horizontal">
+              <Button Content="{x:Static net:FontAwesome.plus_circle}"
+                      Margin="2,0"
+                      Foreground="#00BA46"
+                      ToolTip="Invite to party"
+                      Command="{Binding InviteToPartyCommand}" />
+
+              <Button Content="{x:Static net:FontAwesome.minus_circle}"
+                      Margin="2,0"
+                      Foreground="#B64A2C"
+                      ToolTip="Kick from party"
+                      Command="{Binding KickFromPartyCommand}" />
+
+              <Button Content="{x:Static net:FontAwesome.shopping_cart}"
+                      Margin="2,0"
+                      Foreground="#FCD24E"
+                      Padding="0,2,2,0"
+                      FontSize="16"
+                      ToolTip="Initiate trade (opens trade dialog)"
+                      Command="{Binding TradeCommand}" />
+
+              <Button Content="{x:Static net:FontAwesome.comments_o}"
+                      Margin="2,0"
+                      Foreground="#F3F4F4"
+                      FontSize="16"
+                      Padding="0,1,0,0"
+                      ToolTip="Initiate chat (opens chat window)"
+                      Command="{Binding OpenChatCommand}" />
+
+              <Button Content="{x:Static net:FontAwesome.close}"
+                      Foreground="#F3F4F4"
+                      Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}, Path=DataContext.CloseNegotiationCommand}"
+                      CommandParameter="{Binding}"
+                      ToolTip="Close this negotiation"
+                      FontSize="14"
+                      Padding="0,1,0,0"
+                      Margin="2,0" />
+            </StackPanel>
+          </Grid>
+        </Border>
+      </Expander.Header>
+
+      <Border Background="{StaticResource TradeMonitorBackgroundBrushKey}">
+
+        <Grid Margin="1">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+          </Grid.ColumnDefinitions>
+
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+          </Grid.RowDefinitions>
+
+          <Viewbox Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="4" Height="40">
+            <StackPanel Orientation="Horizontal"
+                        Background="Transparent"
+                        HorizontalAlignment="Center"
+                        ToolTipService.HasDropShadow="False"
+                        ToolTipService.InitialShowDelay="0"
+                        ToolTipService.ShowDuration="{x:Static system:Int32.MaxValue}"
+                        ToolTipService.ShowOnDisabled="True">
+              <StackPanel.ToolTip>
+                <Border Background="{StaticResource TradeMonitorBackgroundBrushKey}"
+                        BorderBrush="{StaticResource TradeMonitorBorderBrushKey}"
+                        BorderThickness="1">
+                  <ContentPresenter Content="{Binding Item}"
+                                    TextBlock.Foreground="{StaticResource TextBrush}" />
+                </Border>
+
+              </StackPanel.ToolTip>
+
+              <controls:ProgressRing
+                IsActive="{Binding IsBusy, Mode=OneWay}"
+                Visibility="{Binding IsBusy, Converter={StaticResource TrueToVisibleConverter}, Mode=OneWay}"
+                Height="26"
+                Width="26"
+                Margin="5,0"
+                ToolTip="Fetching stash data through Path Of Exile Stash API..." />
+
+              <ContentPresenter
+                Content="{Binding ItemIcon}"
+                Visibility="{Binding ItemIcon, Converter={StaticResource NullToCollapsedConverter}}"
+                Height="40"
+                Width="40"
+                Margin="5,0" />
+
+              <StackPanel Orientation="Vertical">
+                <ContentPresenter VerticalAlignment="Center"
+                                  TextBlock.Foreground="{StaticResource PoeItemRarityUniqueBrush}"
+                                  TextBlock.FontSize="16"
+                                  TextBlock.FontWeight="SemiBold"
+                                  Content="{Binding ItemName}" />
+
+                <TextBlock
+                  Foreground="{StaticResource TradeMonitorTextBrushKey}"
+                  FontSize="13"
+                  Margin="0,1"
+                  Text="{Binding Offer}"
+                  HorizontalAlignment="Center"
+                  Visibility="{Binding Offer, Converter={StaticResource NullToCollapsedConverter}}" />
+              </StackPanel>
+            </StackPanel>
+          </Viewbox>
+
+          <ItemsControl Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="4"
+                        Margin="2"
+                        HorizontalAlignment="Left"
+                        ItemsSource="{Binding PredefinedMessages}">
+
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate>
+                <StackPanel Orientation="Horizontal" />
+              </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+
+            <ItemsControl.ItemTemplate>
+              <DataTemplate DataType="{x:Type models:MacroMessage}">
+                <Button Content="{Binding Label}"
+                        Margin="5,0"
+                        Style="{StaticResource MetroFlatButton}"
+                        Height="26"
+                        FontSize="13"
+                        CommandParameter="{Binding}"
+                        ToolTip="{Binding Text}"
+                        Command="{Binding DataContext.SendPredefinedMessageCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ItemsControl}}}" />
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+
+          <StackPanel Orientation="Horizontal" Grid.Column="3" Grid.Row="1">
+            <TextBlock
+              Foreground="{StaticResource TradeMonitorTextBrushKey}"
+              VerticalAlignment="Center"
+              HorizontalAlignment="Right"
+              Margin="5,0">
+              <TextBlock.Inlines>
+                <Run Text="{Binding TabName, Mode=OneWay}" /> (
+                <Run Text="{Binding ItemPosition, Mode=OneWay}" /> )
+              </TextBlock.Inlines>
+            </TextBlock>
+          </StackPanel>
+
+          <Border Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="4" Grid.RowSpan="2"
+                  VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
+                  Background="{StaticResource TradeMonitorTitleBackgroundBrushKey}"
+                  BorderThickness="1"
+                  IsHitTestVisible="False"
+                  BorderBrush="{StaticResource ValidationBrush5}">
+            <Border.Style>
+              <Style TargetType="{x:Type Border}">
+                <Setter Property="Visibility" Value="Visible" />
+                <Style.Triggers>
+                  <DataTrigger Binding="{Binding MessageSendStatus}"
+                               Value="{x:Static chat:PoeMessageSendStatus.Unknown}">
+                    <Setter Property="Visibility" Value="Hidden" />
+                  </DataTrigger>
+                  <DataTrigger Binding="{Binding MessageSendStatus}"
+                               Value="{x:Static chat:PoeMessageSendStatus.Success}">
+                    <Setter Property="Visibility" Value="Hidden" />
+                  </DataTrigger>
+                  <Trigger Property="Visibility" Value="Visible">
+                    <Trigger.EnterActions>
+                      <BeginStoryboard>
+                        <Storyboard>
+                          <DoubleAnimationUsingKeyFrames
+                            Storyboard.TargetProperty="Opacity"
+                            Duration="00:00:04">
+                            <LinearDoubleKeyFrame KeyTime="0%" Value="0" />
+                            <LinearDoubleKeyFrame KeyTime="5%" Value="1" />
+                            <LinearDoubleKeyFrame KeyTime="50%" Value="1" />
+                            <LinearDoubleKeyFrame KeyTime="99%" Value="0" />
+                          </DoubleAnimationUsingKeyFrames>
+                        </Storyboard>
+                      </BeginStoryboard>
+                    </Trigger.EnterActions>
+                  </Trigger>
+                </Style.Triggers>
+              </Style>
+            </Border.Style>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+              <TextBlock Style="{StaticResource TradeMonitorTextBlockStyleKey}"
+                         Text="&#xf06a;"
+                         Foreground="{StaticResource ControlsValidationBrush}"
+                         FontSize="30"
+                         ToolTip="{Binding MessageSendStatus}"
+                         Margin="5,0" />
+
+              <TextBlock
+                Foreground="{StaticResource ControlsValidationBrush}"
+                FontSize="18"
+                FontWeight="Bold"
+                Text="{Binding MessageSendStatus, StringFormat='Failed to send message: {0}'}" />
+
+            </StackPanel>
+
+          </Border>
+
+        </Grid>
+      </Border>
+
+    </Expander>
+  </DataTemplate>
 </ResourceDictionary>

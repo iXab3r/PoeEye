@@ -20,6 +20,8 @@ namespace PoeEye.TradeMonitor.Modularity
 
         public bool GrowUpwards { get; set; }
 
+        public bool ExpandOnHover { get; set; }
+
         public float OverlayOpacity { get; set; }
 
         public Point OverlayLocation { get; set; }

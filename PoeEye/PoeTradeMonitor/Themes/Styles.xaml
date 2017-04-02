@@ -4,141 +4,195 @@
                     xmlns:controls="clr-namespace:PoeEye.TradeMonitor.Controls"
                     xmlns:codeCompletion="clr-namespace:ICSharpCode.AvalonEdit.CodeCompletion;assembly=ICSharpCode.AvalonEdit">
 
-    <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Colors.xaml" />
-        <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Generic.xaml" />
-    </ResourceDictionary.MergedDictionaries>
+  <ResourceDictionary.MergedDictionaries>
+    <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Colors.xaml" />
+    <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Generic.xaml" />
 
-    <Color x:Key="TradeMonitorBorderColorKey">#1A6A73</Color>
-    <Color x:Key="TradeMonitorTitleBackgroundColorKey">#343E3D</Color>
-    <Color x:Key="TradeMonitorBackgroundColorKey">#292C2A</Color>
-    <Color x:Key="TradeMonitorTextColorKey">#EEC64C</Color>
+    <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/MaterialDesignColor.DeepPurple.xaml" />
+    <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Accent/MaterialDesignColor.Lime.xaml" />
 
-    <SolidColorBrush x:Key="TradeMonitorTextBrushKey" Color="{StaticResource TradeMonitorTextColorKey}"/>
-    <SolidColorBrush x:Key="TradeMonitorBorderBrushKey" Color="{StaticResource AccentColor}"/>
-    <SolidColorBrush x:Key="TradeMonitorTitleBackgroundBrushKey" Color="{StaticResource TradeMonitorTitleBackgroundColorKey}"/>
-    <SolidColorBrush x:Key="TradeMonitorBackgroundBrushKey" Color="{StaticResource TradeMonitorBackgroundColorKey}"/>
+    <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Light.xaml" />
+    <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Expander.xaml" />
+    <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Slider.xaml" />
+    <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.ToggleButton.xaml" />
+  </ResourceDictionary.MergedDictionaries>
 
-    <FontFamily x:Key="FontAwesome">pack://application:,,,/FontAwesome.Net;component/Fonts/#FontAwesome</FontFamily>
+  <Color x:Key="TradeMonitorBorderColorKey">#1A6A73</Color>
+  <Color x:Key="TradeMonitorTitleBackgroundColorKey">#343E3D</Color>
+  <Color x:Key="TradeMonitorBackgroundColorKey">#292C2A</Color>
+  <Color x:Key="TradeMonitorTextColorKey">#EEC64C</Color>
 
-    <Style TargetType="{x:Type Button}" x:Key="TradeMonitorButtonStyleKey" BasedOn="{StaticResource {x:Type Button}}">
-        <Setter Property="FontFamily" Value="{StaticResource FontAwesome}" />
-        <Setter Property="FontSize" Value="14" />
-        <Setter Property="HorizontalContentAlignment" Value="Center" />
-        <Setter Property="VerticalContentAlignment" Value="Center" />
-        <Setter Property="VerticalAlignment" Value="Center"/>
-        <Setter Property="Focusable" Value="False"/>
-        <Setter Property="IsTabStop" Value="False"/>
-    </Style>
+  <SolidColorBrush x:Key="TradeMonitorTextBrushKey" Color="{StaticResource TradeMonitorTextColorKey}"/>
+  <SolidColorBrush x:Key="TradeMonitorBorderBrushKey" Color="{StaticResource AccentColor}"/>
+  <SolidColorBrush x:Key="TradeMonitorTitleBackgroundBrushKey" Color="{StaticResource TradeMonitorTitleBackgroundColorKey}"/>
+  <SolidColorBrush x:Key="TradeMonitorBackgroundBrushKey" Color="{StaticResource TradeMonitorBackgroundColorKey}"/>
 
-    <Style TargetType="{x:Type Button}" x:Key="TradeMonitorCircleButtonStyleKey" BasedOn="{StaticResource MetroCircleButtonStyle}">
-        <Setter Property="FontFamily" Value="{StaticResource FontAwesome}" />
-        <Setter Property="FontSize" Value="16" />
-        <Setter Property="HorizontalContentAlignment" Value="Center" />
-        <Setter Property="VerticalContentAlignment" Value="Center" />
-        <Setter Property="VerticalAlignment" Value="Center"/>
-        <Setter Property="Focusable" Value="False"/>
-        <Setter Property="IsTabStop" Value="False"/>
-    </Style>
+  <FontFamily x:Key="FontAwesome">pack://application:,,,/FontAwesome.Net;component/Fonts/#FontAwesome</FontFamily>
 
-    <Style TargetType="{x:Type TextBlock}" x:Key="TradeMonitorTextBlockStyleKey">
-        <Setter Property="Background" Value="Transparent"/>
-        <Setter Property="VerticalAlignment" Value="Center"/>
-        <Setter Property="FontFamily" Value="{StaticResource FontAwesome}"/>
-    </Style>
+  <Style TargetType="{x:Type Button}" x:Key="TradeMonitorButtonStyleKey" BasedOn="{StaticResource {x:Type Button}}">
+    <Setter Property="FontFamily" Value="{StaticResource FontAwesome}" />
+    <Setter Property="FontSize" Value="14" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="VerticalAlignment" Value="Center"/>
+    <Setter Property="Focusable" Value="False"/>
+    <Setter Property="IsTabStop" Value="False"/>
+  </Style>
 
-    <Style TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource MetroListBoxItem}" x:Key="CompletionListBoxItem">
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="{x:Type ListBoxItem}">
-                    <Border Name="Bd"
+  <Style TargetType="{x:Type Button}" x:Key="TradeMonitorCircleButtonStyleKey" BasedOn="{StaticResource MetroCircleButtonStyle}">
+    <Setter Property="FontFamily" Value="{StaticResource FontAwesome}" />
+    <Setter Property="FontSize" Value="16" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="VerticalAlignment" Value="Center"/>
+    <Setter Property="Focusable" Value="False"/>
+    <Setter Property="IsTabStop" Value="False"/>
+  </Style>
+
+  <Style TargetType="{x:Type TextBlock}" x:Key="TradeMonitorTextBlockStyleKey">
+    <Setter Property="Background" Value="Transparent"/>
+    <Setter Property="VerticalAlignment" Value="Center"/>
+    <Setter Property="FontFamily" Value="{StaticResource FontAwesome}"/>
+    <Style.Triggers>
+      <Trigger Property="IsEnabled" Value="False">
+        <Setter Property="Foreground" Value="{StaticResource ControlsDisabledBrush}"/>
+        
+        <Trigger.EnterActions>
+          <BeginStoryboard>
+            <Storyboard>
+              <DoubleAnimation To="0.4" Storyboard.TargetProperty="Opacity" Duration="0:0:0.3"/>
+            </Storyboard>
+          </BeginStoryboard>
+        </Trigger.EnterActions>
+
+        <Trigger.ExitActions>
+          <BeginStoryboard>
+            <Storyboard>
+              <DoubleAnimation To="1" Storyboard.TargetProperty="Opacity" Duration="0:0:0.3"/>
+            </Storyboard>
+          </BeginStoryboard>
+        </Trigger.ExitActions>
+      </Trigger>
+    </Style.Triggers>
+  </Style>
+
+  <Style TargetType="{x:Type Slider}" BasedOn="{StaticResource MetroSlider}" x:Key="TradeMonitorSliderStyleKey">
+    <Style.Triggers>
+      <Trigger Property="IsEnabled" Value="False">
+        <Setter Property="Foreground" Value="{StaticResource ControlsDisabledBrush}"/>
+
+        <Trigger.EnterActions>
+          <BeginStoryboard>
+            <Storyboard>
+              <DoubleAnimation To="0.4" Storyboard.TargetProperty="Opacity" Duration="0:0:0.3"/>
+            </Storyboard>
+          </BeginStoryboard>
+        </Trigger.EnterActions>
+
+        <Trigger.ExitActions>
+          <BeginStoryboard>
+            <Storyboard>
+              <DoubleAnimation To="1" Storyboard.TargetProperty="Opacity" Duration="0:0:0.3"/>
+            </Storyboard>
+          </BeginStoryboard>
+        </Trigger.ExitActions>
+      </Trigger>
+    </Style.Triggers>
+  </Style>
+
+
+  <Style TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource MetroListBoxItem}" x:Key="CompletionListBoxItem">
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="{x:Type ListBoxItem}">
+          <Border Name="Bd"
 					        Background="{TemplateBinding Background}"
 					        BorderBrush="{TemplateBinding BorderBrush}"
 					        BorderThickness="{TemplateBinding BorderThickness}"
 					        Padding="{TemplateBinding Padding}"
 					        SnapsToDevicePixels="true">
-                        <ContentPresenter
+            <ContentPresenter
 							HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
 							VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
 							SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
-                    </Border>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsSelected" Value="true">
-                            <Setter Property="Background" 
+          </Border>
+          <ControlTemplate.Triggers>
+            <Trigger Property="IsSelected" Value="true">
+              <Setter Property="Background" 
 							        Value="{StaticResource AccentColorBrush}"/>
-                            <Setter Property="Foreground"
+              <Setter Property="Foreground"
 							        Value="{StaticResource AccentSelectedColorBrush}"/>
-                        </Trigger>
-                        <Trigger Property="IsMouseOver"
+            </Trigger>
+            <Trigger Property="IsMouseOver"
                                  Value="True">
-                            <Setter Property="Background"
+              <Setter Property="Background"
                                     Value="{DynamicResource AccentColorBrush3}" />
-                        </Trigger>
-                        <MultiTrigger>
-                            <MultiTrigger.Conditions>
-                                <Condition Property="IsEnabled"
+            </Trigger>
+            <MultiTrigger>
+              <MultiTrigger.Conditions>
+                <Condition Property="IsEnabled"
                                            Value="False" />
-                                <Condition Property="IsSelected"
+                <Condition Property="IsSelected"
                                            Value="True" />
-                            </MultiTrigger.Conditions>
-                            <Setter Property="Background"
+              </MultiTrigger.Conditions>
+              <Setter Property="Background"
                                     Value="{DynamicResource GrayBrush7}" />
-                            <Setter Property="Foreground"
+              <Setter Property="Foreground"
                                     Value="{DynamicResource AccentSelectedColorBrush}" />
-                        </MultiTrigger>
-                        <MultiTrigger>
-                            <MultiTrigger.Conditions>
-                                <Condition Property="IsSelected"
+            </MultiTrigger>
+            <MultiTrigger>
+              <MultiTrigger.Conditions>
+                <Condition Property="IsSelected"
                                            Value="True" />
-                                <Condition Property="Selector.IsSelectionActive"
+                <Condition Property="Selector.IsSelectionActive"
                                            Value="True" />
-                            </MultiTrigger.Conditions>
-                            <Setter Property="Background"
+              </MultiTrigger.Conditions>
+              <Setter Property="Background"
                                     Value="{DynamicResource AccentColorBrush2}" />
-                        </MultiTrigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
+            </MultiTrigger>
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
 
-    <Style TargetType="{x:Type codeCompletion:CompletionList}" x:Key="CompletionListStyleKey">
-        <Setter Property="Background" Value="{StaticResource ControlBackgroundBrush}"/>
-        <Setter Property="BorderBrush" Value="{StaticResource ControlBorderBrush}"/>
-        <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="{x:Type codeCompletion:CompletionList}">
-                    <codeCompletion:CompletionListBox x:Name="PART_ListBox"
+  <Style TargetType="{x:Type codeCompletion:CompletionList}" x:Key="CompletionListStyleKey">
+    <Setter Property="Background" Value="{StaticResource ControlBackgroundBrush}"/>
+    <Setter Property="BorderBrush" Value="{StaticResource ControlBorderBrush}"/>
+    <Setter Property="BorderThickness" Value="1"/>
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="{x:Type codeCompletion:CompletionList}">
+          <codeCompletion:CompletionListBox x:Name="PART_ListBox"
                                                       Background="{TemplateBinding Background}"
                                                       BorderBrush="{TemplateBinding BorderBrush}"
                                                       BorderThickness="{TemplateBinding BorderThickness}"
 						ItemContainerStyle="{StaticResource CompletionListBoxItem}">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <StackPanel Orientation="Horizontal">
-                                    <Image Source="{Binding Image}" Width="16" Height="16" Margin="0,0,2,0"/>
-                                    <ContentPresenter Content="{Binding Content}"/>
-                                </StackPanel>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </codeCompletion:CompletionListBox>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <StackPanel Orientation="Horizontal">
+                  <Image Source="{Binding Image}" Width="16" Height="16" Margin="0,0,2,0"/>
+                  <ContentPresenter Content="{Binding Content}"/>
+                </StackPanel>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </codeCompletion:CompletionListBox>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
 
-    <Style TargetType="{x:Type controls:MacroEditBox}" 
+  <Style TargetType="{x:Type controls:MacroEditBox}" 
            BasedOn="{StaticResource {x:Type AvalonEdit:TextEditor}}"
            x:Key="MacroEditBoxStyleKey">
-        <Setter Property="CompletionListStyle">
-            <Setter.Value>
+    <Setter Property="CompletionListStyle">
+      <Setter.Value>
 
-                <Style TargetType="{x:Type codeCompletion:CompletionList}" BasedOn="{StaticResource CompletionListStyleKey}">
-                </Style>
+        <Style TargetType="{x:Type codeCompletion:CompletionList}" BasedOn="{StaticResource CompletionListStyleKey}">
+        </Style>
 
-            </Setter.Value>
-        </Setter>
-    </Style>
+      </Setter.Value>
+    </Setter>
+  </Style>
 
 </ResourceDictionary>

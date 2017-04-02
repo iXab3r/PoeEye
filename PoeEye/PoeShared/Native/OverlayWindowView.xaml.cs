@@ -7,6 +7,7 @@ using System.Windows;
 using System.Windows.Controls.Primitives;
 using System.Windows.Forms;
 using System.Windows.Interop;
+using System.Windows.Threading;
 using PoeShared.Scaffolding;
 using Xceed.Wpf.Toolkit;
 
@@ -23,7 +24,28 @@ namespace PoeShared.Native
             InitializeComponent();
 
             WhenLoaded.Subscribe(OnLoaded);
+            this.SizeChanged += OnSizeChanged;
         }
+
+
+        private void OnSizeChanged(object sender, SizeChangedEventArgs sizeChangedEventArgs)
+        {
+            var window = sender as Window;
+            var windowViewModel = window?.DataContext as OverlayWindowViewModel;
+            var overlayViewModel = windowViewModel?.Content as OverlayViewModelBase;
+            if (overlayViewModel == null)
+            {
+                return;
+            }
+
+            var delta = sizeChangedEventArgs.NewSize.Height - sizeChangedEventArgs.PreviousSize.Height;
+            if (!overlayViewModel.GrowUpwards)
+            {
+                return;
+            }
+            this.Dispatcher.BeginInvoke(new Action(() => this.Top -= delta), DispatcherPriority.Render);
+        }
+
         private void OnLoaded()
         {
             var helper = new WindowInteropHelper(this);

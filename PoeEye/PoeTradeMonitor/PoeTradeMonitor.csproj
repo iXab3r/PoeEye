@@ -97,6 +97,14 @@
       <HintPath>..\packages\MailKit.1.10.0\lib\net45\MailKit.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="MaterialDesignColors, Version=1.1.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MaterialDesignColors.1.1.2\lib\net45\MaterialDesignColors.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="MaterialDesignThemes.Wpf, Version=2.3.0.823, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MaterialDesignThemes.2.3.0.823\lib\net45\MaterialDesignThemes.Wpf.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.Practices.ServiceLocation, Version=1.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\CommonServiceLocator.1.3\lib\portable-net4+sl5+netcore45+wpa81+wp8\Microsoft.Practices.ServiceLocation.dll</HintPath>
       <Private>True</Private>
@@ -209,6 +217,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Scaffolding\ScrollViewerExtensions.cs" />
     <Compile Include="Scaffolding\SetPropertyAction.cs" />
+    <Compile Include="Themes\TradeMonitorExpanderHelper.cs" />
     <Compile Include="ViewModels\INegotiationViewModel.cs" />
     <Compile Include="ViewModels\MacroMessageViewModel.cs" />
     <Compile Include="ViewModels\NegotiationViewModel.cs" />

@@ -232,7 +232,7 @@ namespace PoeEye.TradeMonitor.ViewModels
 
             Item = item != null
                 ? BuildItemViewModel(item)
-                : $"Item was not found in Stash (last update timestamp: {lastUpdateTimeStampInfo})";
+                : null;
         }
 
         private object BuildItemViewModel(IStashItem stashItem)
