@@ -36,7 +36,7 @@ namespace PoeBud.Scaffolding
         {
             if (item.IsWeapon())
             {
-                if (item.W >= 2 && item.H >= 4)
+                if (item.Width >= 2 && item.Height >= 4)
                 {
                     return 1;
                 }

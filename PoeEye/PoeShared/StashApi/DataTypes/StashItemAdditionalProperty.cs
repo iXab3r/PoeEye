@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Newtonsoft.Json;
 using RestSharp.Deserializers;
 
 namespace PoeShared.StashApi.DataTypes
@@ -6,15 +7,19 @@ namespace PoeShared.StashApi.DataTypes
     public sealed class StashItemAdditionalProperty
     {
         [DeserializeAs(Name = "name")]
-        public string name { get; set; }
+        [JsonProperty("name")]
+        public string Name { get; set; }
 
         [DeserializeAs(Name = "values")]
-        public List<List<object>> values { get; set; }
+        [JsonProperty("values")]
+        public List<List<object>> Values { get; set; }
 
         [DeserializeAs(Name = "displayMode")]
-        public int displayMode { get; set; }
+        [JsonProperty("displayMode")]
+        public int DisplayMode { get; set; }
 
         [DeserializeAs(Name = "progress")]
-        public double progress { get; set; }
+        [JsonProperty("progress")]
+        public double Progress { get; set; }
     }
 }

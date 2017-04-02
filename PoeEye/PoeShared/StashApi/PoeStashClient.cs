@@ -263,23 +263,12 @@ namespace PoeShared.StashApi
 
         private void PostProcessInventory(Inventory inventory)
         {
-            inventory?.Items?.ForEach(CleanupItemName);
+            inventory?.Items?.ForEach(x => x.CleanupItemName());
         }
 
         private void PostProcessStash(Stash stash)
         {
-            stash?.Items?.ForEach(CleanupItemName);
+            stash?.Items?.ForEach(x => x.CleanupItemName());
         }
-
-        private void CleanupItemName(StashItem item)
-        {
-            if (string.IsNullOrWhiteSpace(item.Name))
-            {
-                return;
-            }
-            item.Name = Regex.Replace(item.Name, @"\<.*\>", string.Empty);
-        }
-
-
     }
 }

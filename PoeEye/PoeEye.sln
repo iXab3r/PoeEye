@@ -33,6 +33,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RadialMenu", "..\Submodules
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PoeTradeMonitor", "PoeTradeMonitor\PoeTradeMonitor.csproj", "{9BAED733-7C2B-4AAA-8E60-4B73B612C78E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PoeEye.StashRealtimeApi", "PoeEye.StashRealtimeApi\PoeEye.StashRealtimeApi.csproj", "{5CCDF7F6-C2B0-4EC4-B921-4313564BB13A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -99,6 +101,10 @@ Global
 		{9BAED733-7C2B-4AAA-8E60-4B73B612C78E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9BAED733-7C2B-4AAA-8E60-4B73B612C78E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9BAED733-7C2B-4AAA-8E60-4B73B612C78E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5CCDF7F6-C2B0-4EC4-B921-4313564BB13A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5CCDF7F6-C2B0-4EC4-B921-4313564BB13A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5CCDF7F6-C2B0-4EC4-B921-4313564BB13A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5CCDF7F6-C2B0-4EC4-B921-4313564BB13A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

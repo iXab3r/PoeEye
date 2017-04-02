@@ -3,27 +3,35 @@ using System.Linq;
 using System.Text;
 using Guards;
 using PoeShared.Common;
+using PoeShared.Prism;
 using PoeShared.Scaffolding;
 using PoeShared.StashApi.DataTypes;
 using TypeConverter;
 
 namespace PoeShared.Converters
 {
-    public class PoeStashItemToPoeItem : IConverter<IStashItem, IPoeItem>
+    public class PoeStashItemToPoeItem : IConverter<IStashItem, IPoeItem>, IConverter<IStashItem, PoeItem>
     {
         private readonly PriceToCurrencyConverter priceConverter = new PriceToCurrencyConverter();
 
-        public IPoeItem Convert(IStashItem value)
+        IPoeItem IConverter<IStashItem, IPoeItem>.Convert(IStashItem value)
+        {
+            return Convert(value);
+        }
+
+        public PoeItem Convert(IStashItem value)
         {
             Guard.ArgumentNotNull(() => value);
 
             var result = new PoeItem();
             result.TabName = value.InventoryId;
-            result.ItemName = $"{value.Name} {value.TypeLine}";
+            result.ItemName = $"{value.Name} {value.TypeLine}".Trim();
             result.ItemIconUri = value.Icon;
             result.Rarity = value.Rarity;
             result.IsCorrupted = value.Corrupted;
             result.ItemLevel = value.ItemLevel.ToString();
+            result.Hash = value.Id;
+            result.League = value.League;
             
             var itemPrice = string.IsNullOrWhiteSpace(value.Note)
                 ? PoePrice.Empty 
@@ -80,7 +88,7 @@ namespace PoeShared.Converters
                 return string.Empty;
             }
 
-            var values = requirement.Value.EmptyIfNull()
+            var values = requirement.Values.EmptyIfNull()
                 .Where(x => x != null)
                 .Where(IsValidRequirementValue)
                 .ToArray();
@@ -101,6 +109,5 @@ namespace PoeShared.Converters
             }
             return false;
         }
-
     }
 }

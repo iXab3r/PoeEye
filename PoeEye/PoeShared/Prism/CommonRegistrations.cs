@@ -48,6 +48,7 @@ namespace PoeShared.Prism
                 .RegisterSingleton<IImagesCacheService, ImagesCacheService>()
                 .RegisterSingleton<IGearTypeAnalyzer, GearTypeAnalyzer>()
                 .RegisterSingleton<IConverter<IStashItem, IPoeItem>, PoeStashItemToPoeItem>()
+                .RegisterSingleton<IConverter<IStashItem, PoeItem>, PoeStashItemToPoeItem>()
                 .RegisterSingleton<IKeyboardEventsSource>(new InjectionFactory(x => x.Resolve<KeyboardEventsSource>(new DependencyOverride(typeof(IKeyboardMouseEvents), Hook.GlobalEvents()))))
                 .RegisterSingleton<IAudioNotificationsManager, AudioNotificationsManager>()
                 .RegisterSingleton<ISchedulerProvider, SchedulerProvider>()

@@ -45,7 +45,7 @@ namespace PoeBud.ViewModels
                     new object[]
                     {
                         new {ItemType = $"Chests ({chests.Length})", Items = chests.Select(x => x.ToString())},
-                        new {ItemType = $"Weapons ({weapons.Length})", Items = weapons.Select(x => $"{x.Item.ToString()} ({x.Score}, W:{x.Item.W}, H:{x.Item.H})")},
+                        new {ItemType = $"Weapons ({weapons.Length})", Items = weapons.Select(x => $"{x.Item.ToString()} ({x.Score}, W:{x.Item.Width}, H:{x.Item.Height})")},
                         new {ItemType = $"Helmets ({helmets.Length})", Items = helmets.Select(x => x.ToString())},
                         new {ItemType = $"Rings ({rings.Length})", Items = rings.Select(x => x.ToString())},
                         new {ItemType = $"Amulets ({amulets.Length})", Items = amulets.Select(x => x.ToString())},

@@ -29,7 +29,7 @@ namespace PoeShared.StashApi.DataTypes
 
         PoeItemRarity Rarity { get; }
 
-        int H { get; }
+        int Height { get; }
 
         string Icon { get; }
 
@@ -63,7 +63,7 @@ namespace PoeShared.StashApi.DataTypes
 
         GearType ItemType { get; }
 
-        int W { get; }
+        int Width { get; }
 
         int X { get; }
 
