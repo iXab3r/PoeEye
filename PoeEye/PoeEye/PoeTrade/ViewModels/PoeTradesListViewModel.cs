@@ -66,14 +66,14 @@ namespace PoeEye.PoeTrade.ViewModels
             [NotNull] IClock clock,
             [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {
-            Guard.ArgumentNotNull(() => poeApiWrapper);
-            Guard.ArgumentNotNull(() => poeLiveHistoryFactory);
-            Guard.ArgumentNotNull(() => poeTradeViewModelFactory);
-            Guard.ArgumentNotNull(() => captchaRegistrator);
-            Guard.ArgumentNotNull(() => historicalTrades);
-            Guard.ArgumentNotNull(() => poeItemsComparer);
-            Guard.ArgumentNotNull(() => clock);
-            Guard.ArgumentNotNull(() => uiScheduler);
+            Guard.ArgumentNotNull(poeApiWrapper, nameof(poeApiWrapper));
+            Guard.ArgumentNotNull(poeLiveHistoryFactory, nameof(poeLiveHistoryFactory));
+            Guard.ArgumentNotNull(poeTradeViewModelFactory, nameof(poeTradeViewModelFactory));
+            Guard.ArgumentNotNull(captchaRegistrator, nameof(captchaRegistrator));
+            Guard.ArgumentNotNull(historicalTrades, nameof(historicalTrades));
+            Guard.ArgumentNotNull(poeItemsComparer, nameof(poeItemsComparer));
+            Guard.ArgumentNotNull(clock, nameof(clock));
+            Guard.ArgumentNotNull(uiScheduler, nameof(uiScheduler));
 
             this.poeTradeViewModelFactory = poeTradeViewModelFactory;
             this.poeItemsComparer = poeItemsComparer;
@@ -115,19 +115,9 @@ namespace PoeEye.PoeTrade.ViewModels
 
             itemsSource
                 .Connect()
+                .ObserveOn(uiScheduler)
                 .Bind(out items)
                 .Subscribe()
-                .AddTo(Anchors);
-
-            itemsSource
-                .Connect()
-                .WhenPropertyChanged(x => x.TradeState)
-                .WithPrevious((prev, curr) => new { curr?.Sender, prev = prev?.Value, curr = curr?.Value })
-                .Where(x => x.Sender != null)
-                .Where(x => x.curr == PoeTradeState.Normal && x.prev == PoeTradeState.Removed)
-                .Select(x => x.Sender)
-                .ObserveOn(uiScheduler)
-                .Subscribe(itemsSource.Remove)
                 .AddTo(Anchors);
         }
 
@@ -201,19 +191,23 @@ namespace PoeEye.PoeTrade.ViewModels
 
             if (newItems.Any())
             {
-                var itemsToAdd = new List<IPoeTradeViewModel>();
                 foreach (var item in newItems)
                 {
                     var itemViewModel = poeTradeViewModelFactory.Create(item);
                     itemViewModel.AddTo(activeProvider.Anchors);
+                    itemsSource.Add(itemViewModel);
+
+                    itemViewModel
+                        .WhenAnyValue(x => x.TradeState)
+                        .WithPrevious((prev, curr) => new { prev, curr })
+                        .Where(x => x.curr == PoeTradeState.Normal && x.prev == PoeTradeState.Removed)
+                        .Select(x => itemViewModel)
+                        .Subscribe(itemsSource.Remove)
+                        .AddTo(Anchors);
 
                     itemViewModel.TradeState = PoeTradeState.New;
                     itemViewModel.Trade.Timestamp = clock.Now;
-
-                    itemsToAdd.Add(itemViewModel);
                 }
-
-                itemsToAdd.ForEach(itemsSource.Add);
             }
             lastUpdateTimestamp = clock.Now;
         }
