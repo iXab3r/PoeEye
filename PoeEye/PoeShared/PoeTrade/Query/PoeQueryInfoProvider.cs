@@ -17,7 +17,7 @@ namespace PoeShared.PoeTrade.Query
 
         public PoeQueryInfoProvider([NotNull] IPoeApi poeApi)
         {
-            Guard.ArgumentNotNull(() => poeApi);
+            Guard.ArgumentNotNull(poeApi, nameof(poeApi));
             this.poeApi = poeApi;
 
             lazyDataLoader = new Lazy<IPoeStaticData>(RefreshData, LazyThreadSafetyMode.ExecutionAndPublication);

@@ -18,7 +18,7 @@ namespace PoeEye.StashRealtimeApi.Services
 
         public PoeStashRealtimeApi([NotNull] IPoeItemsProcessor itemsSource)
         {
-            Guard.ArgumentNotNull(() => itemsSource);
+            Guard.ArgumentNotNull(itemsSource, nameof(itemsSource));
 
             this.itemsSource = itemsSource;
             itemsSource.AddTo(Anchors);
@@ -26,7 +26,7 @@ namespace PoeEye.StashRealtimeApi.Services
 
         public Task<IPoeQueryResult> IssueQuery(IPoeQueryInfo query)
         {
-            Guard.ArgumentNotNull(() => query);
+            Guard.ArgumentNotNull(query, nameof(query));
 
             LogTo.Debug($"Issueing query: {query}");
             return Task.Run(() => itemsSource.IssueQuery(query));
@@ -39,7 +39,7 @@ namespace PoeEye.StashRealtimeApi.Services
 
         public void DisposeQuery(IPoeQueryInfo query)
         {
-            Guard.ArgumentNotNull(() => query);
+            Guard.ArgumentNotNull(query, nameof(query));
 
             itemsSource.DisposaQuery(query);
         }

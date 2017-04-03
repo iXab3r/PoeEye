@@ -31,7 +31,7 @@ namespace PoeChatWheel.ViewModels
 
         public void Load(PoeChatWheelConfig config)
         {
-            Guard.ArgumentNotNull(() => config);
+            Guard.ArgumentNotNull(config, nameof(config));
 
             Hotkey = config.ChatWheelHotkey;
         }

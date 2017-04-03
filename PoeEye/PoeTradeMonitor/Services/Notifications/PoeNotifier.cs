@@ -31,9 +31,9 @@ namespace PoeEye.TradeMonitor.Services.Notifications
             [NotNull] IClock clock,
             [NotNull] IConfigProvider<PoeTradeMonitorConfig> configProvider)
         {
-            Guard.ArgumentNotNull(() => schedulerProvider);
-            Guard.ArgumentNotNull(() => clock);
-            Guard.ArgumentNotNull(() => configProvider);
+            Guard.ArgumentNotNull(schedulerProvider, nameof(schedulerProvider));
+            Guard.ArgumentNotNull(clock, nameof(clock));
+            Guard.ArgumentNotNull(configProvider, nameof(configProvider));
             this.clock = clock;
             this.configProvider = configProvider;
 
@@ -49,7 +49,7 @@ namespace PoeEye.TradeMonitor.Services.Notifications
 
         public void SendNotification(string textMessage, NotificationLevel level)
         {
-            Guard.ArgumentNotNull(() => textMessage);
+            Guard.ArgumentNotNull(textMessage, nameof(textMessage));
 
             messagesQueue.OnNext(textMessage);
         }

@@ -16,7 +16,7 @@ namespace PoeEye.TradeMonitor.Services.Parsers
 
         public PoeMessageParserRegex([NotNull] PriceToCurrencyConverter priceConverter)
         {
-            Guard.ArgumentNotNull(() => priceConverter);
+            Guard.ArgumentNotNull(priceConverter, nameof(priceConverter));
             this.priceConverter = priceConverter;
         }
 

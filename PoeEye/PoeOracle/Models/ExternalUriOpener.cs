@@ -16,7 +16,7 @@ namespace PoeOracle.Models
 
         public void Request(string uri)
         {
-            Guard.ArgumentNotNull(() => uri);
+            Guard.ArgumentNotNull(uri, nameof(uri));
             try
             {
                 requested.OnNext(Unit.Default);

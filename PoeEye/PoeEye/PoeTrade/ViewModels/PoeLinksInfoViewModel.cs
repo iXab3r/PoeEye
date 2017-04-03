@@ -11,7 +11,7 @@
     {
         public PoeLinksInfoViewModel([NotNull] IPoeLinksInfo linksInfo)
         {
-            Guard.ArgumentNotNull(() => linksInfo);
+            Guard.ArgumentNotNull(linksInfo, nameof(linksInfo));
 
             var rawSockets = linksInfo.RawSockets ?? string.Empty;
             rawSockets = rawSockets.PadRight(11, ' ');

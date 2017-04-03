@@ -51,11 +51,11 @@ namespace PoeEye.PoeTradeRealtimeApi
             [NotNull] IPoeTradeParser parser,
             [NotNull] IPoeQueryInfo queryInfo)
         {
-            Guard.ArgumentNotNull(() => clientFactory);
-            Guard.ArgumentNotNull(() => queryInfoToQueryConverter);
-            Guard.ArgumentNotNull(() => queryToPostConverter);
-            Guard.ArgumentNotNull(() => parser);
-            Guard.ArgumentNotNull(() => queryInfo);
+            Guard.ArgumentNotNull(clientFactory, nameof(clientFactory));
+            Guard.ArgumentNotNull(queryInfoToQueryConverter, nameof(queryInfoToQueryConverter));
+            Guard.ArgumentNotNull(queryToPostConverter, nameof(queryToPostConverter));
+            Guard.ArgumentNotNull(parser, nameof(parser));
+            Guard.ArgumentNotNull(queryInfo, nameof(queryInfo));
 
             this.clientFactory = clientFactory;
             this.parser = parser;
@@ -184,8 +184,8 @@ namespace PoeEye.PoeTradeRealtimeApi
         {
             Log.Instance.Debug($"[RealtimeItemsSource.Live] Sending next live query, uri: {liveQueryUri}, id: '{nextLiveQueryId}'");
 
-            Guard.ArgumentNotNull(() => liveQueryUri);
-            Guard.ArgumentNotNull(() => nextLiveQueryId);
+            Guard.ArgumentNotNull(liveQueryUri, nameof(liveQueryUri));
+            Guard.ArgumentNotNull(nextLiveQueryId, nameof(nextLiveQueryId));
 
             var client = clientFactory
                 .Create();

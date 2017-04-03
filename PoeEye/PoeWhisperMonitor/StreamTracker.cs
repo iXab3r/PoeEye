@@ -23,7 +23,7 @@
 
         public StreamTracker([NotNull] Stream baseStream)
         {
-            Guard.ArgumentNotNull(() => baseStream);
+            Guard.ArgumentNotNull(baseStream, nameof(baseStream));
             if (!baseStream.CanSeek)
             {
                 throw new ArgumentException("Stream must support Seek operation");

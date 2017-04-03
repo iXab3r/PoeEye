@@ -24,9 +24,9 @@ namespace PoeOracle.ViewModels
             [NotNull] IFactory<IImageViewModel, Uri> imageFactory,
             [NotNull] IExternalUriOpener uriOpener)
         {
-            Guard.ArgumentNotNull(() => gemModel);
-            Guard.ArgumentNotNull(() => imageFactory);
-            Guard.ArgumentNotNull(() => uriOpener);
+            Guard.ArgumentNotNull(gemModel, nameof(gemModel));
+            Guard.ArgumentNotNull(imageFactory, nameof(imageFactory));
+            Guard.ArgumentNotNull(uriOpener, nameof(uriOpener));
 
             this.gemModel = gemModel;
             this.imageFactory = imageFactory;

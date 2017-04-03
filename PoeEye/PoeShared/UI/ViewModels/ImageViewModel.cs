@@ -19,7 +19,7 @@ namespace PoeShared.UI.ViewModels
             [NotNull] IImagesCacheService cacheService,
             [CanBeNull] Uri imageUri)
         {
-            Guard.ArgumentNotNull(() => cacheService);
+            Guard.ArgumentNotNull(cacheService, nameof(cacheService));
 
             if (imageUri == null)
             {

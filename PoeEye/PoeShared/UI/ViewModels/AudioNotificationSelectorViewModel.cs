@@ -22,7 +22,7 @@ namespace PoeShared.UI.ViewModels
         public AudioNotificationSelectorViewModel([NotNull] IAudioNotificationsManager notificationsManager)
         {
             this.notificationsManager = notificationsManager;
-            Guard.ArgumentNotNull(() => notificationsManager);
+            Guard.ArgumentNotNull(notificationsManager, nameof(notificationsManager));
 
             Items = new ReactiveList<object>();
 

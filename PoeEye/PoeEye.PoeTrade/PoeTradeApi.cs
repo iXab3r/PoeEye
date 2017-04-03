@@ -52,12 +52,12 @@ namespace PoeEye.PoeTrade
             IConverter<IPoeQuery, NameValueCollection> queryConverter,
             IConfigProvider<PoeTradeConfig> configProvider)
         {
-            Guard.ArgumentNotNull(() => poeTradeParser);
-            Guard.ArgumentNotNull(() => proxyProvider);
-            Guard.ArgumentNotNull(() => httpClientFactory);
-            Guard.ArgumentNotNull(() => queryInfoToQueryConverter);
-            Guard.ArgumentNotNull(() => queryConverter);
-            Guard.ArgumentNotNull(() => configProvider);
+            Guard.ArgumentNotNull(poeTradeParser, nameof(poeTradeParser));
+            Guard.ArgumentNotNull(proxyProvider, nameof(proxyProvider));
+            Guard.ArgumentNotNull(httpClientFactory, nameof(httpClientFactory));
+            Guard.ArgumentNotNull(queryInfoToQueryConverter, nameof(queryInfoToQueryConverter));
+            Guard.ArgumentNotNull(queryConverter, nameof(queryConverter));
+            Guard.ArgumentNotNull(configProvider, nameof(configProvider));
 
             this.poeTradeParser = poeTradeParser;
             this.proxyProvider = proxyProvider;
@@ -79,7 +79,7 @@ namespace PoeEye.PoeTrade
 
         public async Task<IPoeQueryResult> IssueQuery(IPoeQueryInfo queryInfo)
         {
-            Guard.ArgumentNotNull(() => queryInfo);
+            Guard.ArgumentNotNull(queryInfo, nameof(queryInfo));
 
             var query = queryInfoToQueryConverter.Convert(queryInfo);
             var queryPostData = queryConverter.Convert(query);
@@ -189,7 +189,7 @@ namespace PoeEye.PoeTrade
 
         public void DisposeQuery(IPoeQueryInfo query)
         {
-            Guard.ArgumentNotNull(() => query);
+            Guard.ArgumentNotNull(query, nameof(query));
         }
     }
 }

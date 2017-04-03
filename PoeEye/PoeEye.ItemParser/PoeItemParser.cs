@@ -26,7 +26,7 @@ namespace PoeEye.ItemParser
 
         public IPoeItem Parse(string serializedItem)
         {
-            Guard.ArgumentNotNull(() => serializedItem);
+            Guard.ArgumentNotNull(serializedItem, nameof(serializedItem));
 
             var blockParsers = new List<Func<string, PoeItem, bool>>
             {

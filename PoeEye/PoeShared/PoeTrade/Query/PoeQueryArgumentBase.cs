@@ -8,7 +8,7 @@
     {
         protected PoeQueryArgumentBase([NotNull] string name)
         {
-            Guard.ArgumentNotNull(() => name);
+            Guard.ArgumentNotNull(name, nameof(name));
 
             Name = name;
         }

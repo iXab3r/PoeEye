@@ -30,9 +30,9 @@ namespace PoeOracle.Models
             [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler,
             [NotNull] ISuggestionProvider[] suggestionProviders)
         {
-            Guard.ArgumentNotNull(() => uiScheduler);
-            Guard.ArgumentNotNull(() => bgScheduler);
-            Guard.ArgumentNotNull(() => suggestionProviders);
+            Guard.ArgumentNotNull(uiScheduler, nameof(uiScheduler));
+            Guard.ArgumentNotNull(bgScheduler, nameof(bgScheduler));
+            Guard.ArgumentNotNull(suggestionProviders, nameof(suggestionProviders));
 
             suggestionProviders.ForEach(Anchors.Add);
             activeQuery.AddTo(Anchors);

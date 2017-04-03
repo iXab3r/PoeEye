@@ -42,10 +42,10 @@ namespace PoeEye.PoeTrade.ViewModels
             [NotNull] IPoeChatService chatService,
             [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {
-            Guard.ArgumentNotNull(() => chatService);
-            Guard.ArgumentNotNull(() => whisperService);
-            Guard.ArgumentNotNull(() => notificationsManager);
-            Guard.ArgumentNotNull(() => uiScheduler);
+            Guard.ArgumentNotNull(chatService, nameof(chatService));
+            Guard.ArgumentNotNull(whisperService, nameof(whisperService));
+            Guard.ArgumentNotNull(notificationsManager, nameof(notificationsManager));
+            Guard.ArgumentNotNull(uiScheduler, nameof(uiScheduler));
 
             this.notificationsManager = notificationsManager;
             this.chatService = chatService;

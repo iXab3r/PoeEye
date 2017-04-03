@@ -81,13 +81,13 @@ namespace PoeChatWheel.ViewModels
             [NotNull] IClock clock,
             [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {
-            Guard.ArgumentNotNull(() => controller);
-            Guard.ArgumentNotNull(() => keyboardMouseEvents);
-            Guard.ArgumentNotNull(() => whisperService);
-            Guard.ArgumentNotNull(() => chatService);
-            Guard.ArgumentNotNull(() => configProvider);
-            Guard.ArgumentNotNull(() => uiScheduler);
-            Guard.ArgumentNotNull(() => clock);
+            Guard.ArgumentNotNull(controller, nameof(controller));
+            Guard.ArgumentNotNull(keyboardMouseEvents, nameof(keyboardMouseEvents));
+            Guard.ArgumentNotNull(whisperService, nameof(whisperService));
+            Guard.ArgumentNotNull(chatService, nameof(chatService));
+            Guard.ArgumentNotNull(configProvider, nameof(configProvider));
+            Guard.ArgumentNotNull(uiScheduler, nameof(uiScheduler));
+            Guard.ArgumentNotNull(clock, nameof(clock));
 
             Log.Instance.Debug($"[PoeChatWheel..ctor] Initializing chat wheel...");
             this.chatService = chatService;

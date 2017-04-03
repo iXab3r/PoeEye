@@ -19,7 +19,7 @@ namespace PoeShared.PoeTrade
 
         public virtual void DisposeQuery(IPoeQueryInfo query)
         {
-            Guard.ArgumentNotNull(() => query);
+            Guard.ArgumentNotNull(query, nameof(query));
         }
     }
 }

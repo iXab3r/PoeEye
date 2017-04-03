@@ -30,7 +30,7 @@ namespace PoeShared.Scaffolding
 
         public WindowTracker([NotNull] Func<string> titleMatcherRegexFunc)
         {
-            Guard.ArgumentNotNull(() => titleMatcherRegexFunc);
+            Guard.ArgumentNotNull(titleMatcherRegexFunc, nameof(titleMatcherRegexFunc));
             this.titleMatcherRegexFunc = titleMatcherRegexFunc;
 
             winHook.AddTo(Anchors);

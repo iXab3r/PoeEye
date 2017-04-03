@@ -10,7 +10,7 @@ namespace PoeShared.Communications
     {
         public string Convert(NameValueCollection source)
         {
-            Guard.ArgumentNotNull(() => source);
+            Guard.ArgumentNotNull(source, nameof(source));
 
             var idx = 0;
             var needAnotherRun = true;

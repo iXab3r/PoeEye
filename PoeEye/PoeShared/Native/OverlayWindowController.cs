@@ -39,9 +39,9 @@ namespace PoeShared.Native
             [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler,
             OverlayMode overlayMode = OverlayMode.Transparent)
         {
-            Guard.ArgumentNotNull(() => windowTracker);
-            Guard.ArgumentNotNull(() => keyboardMouseEvents);
-            Guard.ArgumentNotNull(() => uiScheduler);
+            Guard.ArgumentNotNull(windowTracker, nameof(windowTracker));
+            Guard.ArgumentNotNull(keyboardMouseEvents, nameof(keyboardMouseEvents));
+            Guard.ArgumentNotNull(uiScheduler, nameof(uiScheduler));
 
             this.windowTracker = windowTracker;
             this.overlayWindowViewModelFactory = overlayWindowViewModelFactory;
@@ -125,7 +125,7 @@ namespace PoeShared.Native
 
         public IDisposable RegisterChild(IOverlayViewModel viewModel)
         {
-            Guard.ArgumentNotNull(() => viewModel);
+            Guard.ArgumentNotNull(viewModel, nameof(viewModel));
 
             var childAnchors = new CompositeDisposable();
 

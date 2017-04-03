@@ -18,8 +18,8 @@ namespace PoeEye.PoeTrade.ViewModels
     {
         public PoeFilteredTradeViewModel([NotNull] IMainWindowTabViewModel owner, [NotNull] IPoeTradeViewModel trade)
         {
-            Guard.ArgumentNotNull(() => owner);
-            Guard.ArgumentNotNull(() => trade);
+            Guard.ArgumentNotNull(owner, nameof(owner));
+            Guard.ArgumentNotNull(trade, nameof(trade));
 
             Owner = owner;
             Trade = trade;

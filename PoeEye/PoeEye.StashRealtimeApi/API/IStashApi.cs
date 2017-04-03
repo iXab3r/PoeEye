@@ -10,9 +10,5 @@ namespace PoeEye.StashRealtimeApi.API
         [Get("public-stash-tabs")]
         [Header("Accept-Encoding", "gzip")]
         Task<Response<StashApiResponse>> PublicStashTabs([Query("id")] string nextChangeId);
-
-        [Get("public-stash-tabs")]
-        [Header("Accept-Encoding", "gzip")]
-        Task<HttpResponseMessage> PublicStashTabsRaw([Query("id")] string nextChangeId);
     }
 }

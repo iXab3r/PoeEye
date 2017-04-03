@@ -108,7 +108,7 @@ namespace PoeEye.Config
 
         private void SaveInternal(PoeEyeCombinedConfig config)
         {
-            Guard.ArgumentNotNull(() => config);
+            Guard.ArgumentNotNull(config, nameof(config));
 
             try
             {
@@ -170,7 +170,7 @@ namespace PoeEye.Config
 
         public void RegisterConverter(JsonConverter converter)
         {
-            Guard.ArgumentNotNull(() => converter);
+            Guard.ArgumentNotNull(converter, nameof(converter));
 
             converters.Add(converter);
         }
@@ -201,7 +201,7 @@ namespace PoeEye.Config
 
             public PoeEyeCombinedConfig Add([NotNull] PoeEyeConfigMetadata item)
             {
-                Guard.ArgumentNotNull(() => item);
+                Guard.ArgumentNotNull(item, nameof(item));
 
                 items.Add(item);
                 return this;

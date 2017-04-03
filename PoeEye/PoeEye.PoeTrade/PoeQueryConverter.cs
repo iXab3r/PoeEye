@@ -14,7 +14,7 @@
     {
         public NameValueCollection Convert(IPoeQuery value)
         {
-            Guard.ArgumentNotNull(() => value);
+            Guard.ArgumentNotNull(value, nameof(value));
 
             var result = new NameValueCollection();
             foreach (var poeQueryArgument in value.Arguments)

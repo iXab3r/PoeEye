@@ -23,7 +23,7 @@ namespace PoeWhisperMonitor
 
         public PoeWhisperService([NotNull] IPoeTracker tracker)
         {
-            Guard.ArgumentNotNull(() => tracker);
+            Guard.ArgumentNotNull(tracker, nameof(tracker));
             var converter = new PoeProcessToLogFilePathConverter();
 
             tracker.AddTo(Anchors);

@@ -19,7 +19,7 @@ namespace PoeEye.Simulator.PoeTrade
 
         public override Task<IPoeQueryResult> IssueQuery(IPoeQueryInfo query)
         {
-            Guard.ArgumentNotNull(() => query);
+            Guard.ArgumentNotNull(query, nameof(query));
 
             return Task.Run(() => ProcessQuery(query));
         }

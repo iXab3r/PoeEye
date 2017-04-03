@@ -11,14 +11,14 @@ namespace PoeEye.TradeMonitor.Models
 
         public GenericDelegateCommand([NotNull] string commandText, Action<IMacroCommandContext> action) : base(commandText)
         {
-            Guard.ArgumentNotNull(() => action);
+            Guard.ArgumentNotNull(action, nameof(action));
 
             this.action = action;
         }
 
         public override void Execute(IMacroCommandContext context)
         {
-            Guard.ArgumentNotNull(() => context);
+            Guard.ArgumentNotNull(context, nameof(context));
 
             try
             {

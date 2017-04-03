@@ -63,12 +63,12 @@ namespace PoeEye.PoeTrade.ViewModels
             [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler,
             [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler)
         {
-            Guard.ArgumentNotNull(() => container);
-            Guard.ArgumentNotNull(() => poeTradeViewModelFactory);
-            Guard.ArgumentNotNull(() => configProvider);
-            Guard.ArgumentNotNull(() => poeWindowTracker);
-            Guard.ArgumentNotNull(() => uiScheduler);
-            Guard.ArgumentNotNull(() => bgScheduler);
+            Guard.ArgumentNotNull(container, nameof(container));
+            Guard.ArgumentNotNull(poeTradeViewModelFactory, nameof(poeTradeViewModelFactory));
+            Guard.ArgumentNotNull(configProvider, nameof(configProvider));
+            Guard.ArgumentNotNull(poeWindowTracker, nameof(poeWindowTracker));
+            Guard.ArgumentNotNull(uiScheduler, nameof(uiScheduler));
+            Guard.ArgumentNotNull(bgScheduler, nameof(bgScheduler));
 
             itemParser = container.TryResolve<IPoeItemParser>();
             if (itemParser == null)
@@ -172,7 +172,7 @@ namespace PoeEye.PoeTrade.ViewModels
 
         private IPoeItem ParseItemData(string serializedData)
         {
-            Guard.ArgumentNotNull(() => serializedData);
+            Guard.ArgumentNotNull(serializedData, nameof(serializedData));
             var item = itemParser.Parse(serializedData);
             return item;
         }

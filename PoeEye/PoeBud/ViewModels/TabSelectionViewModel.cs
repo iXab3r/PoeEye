@@ -9,7 +9,7 @@ namespace PoeBud.ViewModels
     {
         public TabSelectionViewModel(IStashTab tab)
         {
-            Guard.ArgumentNotNull(() => tab);
+            Guard.ArgumentNotNull(tab, nameof(tab));
             
             this.Tab = tab;
         }

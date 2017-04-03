@@ -59,14 +59,14 @@ namespace PoeEye.TradeMonitor.ViewModels
             [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler,
             [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {
-            Guard.ArgumentNotNull(() => keyboardMouseEvents);
-            Guard.ArgumentNotNull(() => stashService);
-            Guard.ArgumentNotNull(() => controller);
-            Guard.ArgumentNotNull(() => configProvider);
-            Guard.ArgumentNotNull(() => notificationFactory);
-            Guard.ArgumentNotNull(() => tradeMonitorServiceFactory);
-            Guard.ArgumentNotNull(() => bgScheduler);
-            Guard.ArgumentNotNull(() => uiScheduler);
+            Guard.ArgumentNotNull(keyboardMouseEvents, nameof(keyboardMouseEvents));
+            Guard.ArgumentNotNull(stashService, nameof(stashService));
+            Guard.ArgumentNotNull(controller, nameof(controller));
+            Guard.ArgumentNotNull(configProvider, nameof(configProvider));
+            Guard.ArgumentNotNull(notificationFactory, nameof(notificationFactory));
+            Guard.ArgumentNotNull(tradeMonitorServiceFactory, nameof(tradeMonitorServiceFactory));
+            Guard.ArgumentNotNull(bgScheduler, nameof(bgScheduler));
+            Guard.ArgumentNotNull(uiScheduler, nameof(uiScheduler));
 
             MinSize = new Size(500, double.NaN);
             MaxSize = new Size(700, double.NaN);

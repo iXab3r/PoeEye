@@ -30,8 +30,8 @@ namespace PoeEye.PoeTrade.ViewModels
             [NotNull] IProxyProvider proxyProvider,
             [NotNull] IConfigProvider<PoeEyeMainConfig> configProvider)
         {
-            Guard.ArgumentNotNull(() => proxyProvider);
-            Guard.ArgumentNotNull(() => configProvider);
+            Guard.ArgumentNotNull(proxyProvider, nameof(proxyProvider));
+            Guard.ArgumentNotNull(configProvider, nameof(configProvider));
 
             this.proxyProvider = proxyProvider;
 

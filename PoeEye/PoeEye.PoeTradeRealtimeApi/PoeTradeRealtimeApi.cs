@@ -29,8 +29,8 @@ namespace PoeEye.PoeTradeRealtimeApi
             [NotNull] PoeTradeApi poeTradeApi,
             [NotNull] IFactory<IRealtimeItemSource, IPoeQueryInfo> itemSourceFactory)
         {
-            Guard.ArgumentNotNull(() => poeTradeApi);
-            Guard.ArgumentNotNull(() => itemSourceFactory);
+            Guard.ArgumentNotNull(poeTradeApi, nameof(poeTradeApi));
+            Guard.ArgumentNotNull(itemSourceFactory, nameof(itemSourceFactory));
 
             this.poeTradeApi = poeTradeApi;
             this.itemSourceFactory = itemSourceFactory;

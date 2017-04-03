@@ -10,7 +10,7 @@ namespace PoeShared.Scaffolding
     {
         public static string ReadResourceAsString(this Assembly assembly, [NotNull] string path)
         {
-            Guard.ArgumentNotNull(() => path);
+            Guard.ArgumentNotNull(path, nameof(path));
 
             var assemblyName = assembly.GetName().Name;
             var resourcePath = $"{assemblyName}.{path}";

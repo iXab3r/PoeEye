@@ -16,8 +16,8 @@ namespace PoeEye.PoeTrade.Models
             [NotNull] IUnityContainer container,
             [NotNull] IFactory<IPoeApiWrapper, IPoeApi> wrapperFactory)
         {
-            Guard.ArgumentNotNull(() => container);
-            Guard.ArgumentNotNull(() => wrapperFactory);
+            Guard.ArgumentNotNull(container, nameof(container));
+            Guard.ArgumentNotNull(wrapperFactory, nameof(wrapperFactory));
 
             Log.Instance.Debug($"[PoeApiProvider..ctor] Loading APIs list...");
             var apiList = container

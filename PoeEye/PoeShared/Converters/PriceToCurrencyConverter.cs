@@ -16,36 +16,77 @@ namespace PoeShared.Converters
 
         public static readonly IDictionary<string, string> DefaultCurrencyByAlias = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
-            {"Orb of Alteration", KnownCurrencyNameList.OrbOfAlteration},
-            {"Blessed Orb", KnownCurrencyNameList.BlessedOrb},
-            {"Cartographer's Chisel", KnownCurrencyNameList.CartographersChisel},
-            {"Cartographers Chisel", KnownCurrencyNameList.CartographersChisel},
-            {"Chaos Orb", KnownCurrencyNameList.ChaosOrb},
-            {"Chromatic Orb", KnownCurrencyNameList.ChromaticOrb},
-            {"Divine Orb", KnownCurrencyNameList.DivineOrb},
-            {"Exalted Orb", KnownCurrencyNameList.ExaltedOrb},
-            {"Gemcutter's Prism", KnownCurrencyNameList.GemcuttersPrism},
-            {"Gemcutters Prism", KnownCurrencyNameList.GemcuttersPrism},
-            {"Jewellers Orb", KnownCurrencyNameList.JewellersOrb},
-            {"Orb of Alchemy", KnownCurrencyNameList.OrbOfAlchemy},
-            {"Orb of Fusing", KnownCurrencyNameList.OrbOfFusing},
-            {"Orb of Chance", KnownCurrencyNameList.OrbOfChance},
-            {"Orb of Regret", KnownCurrencyNameList.OrbOfRegret},
-            {"Orb of Scouring", KnownCurrencyNameList.OrbOfScouring},
-            {"Regal Orb", KnownCurrencyNameList.RegalOrb},
-            {"Vaal Orb", KnownCurrencyNameList.VaalOrb},
-            {"Mirror of Kalandra", KnownCurrencyNameList.MirrorOfKalandra},
-            {"Eternal Orb", KnownCurrencyNameList.EternalOrb},
-            {"Unknown", KnownCurrencyNameList.Unknown},
+            { "Orb of Alteration", KnownCurrencyNameList.OrbOfAlteration},
+            { "Alt", KnownCurrencyNameList.OrbOfAlteration},
+
+            { "Blessed Orb", KnownCurrencyNameList.BlessedOrb},
+            { "Blessed", KnownCurrencyNameList.BlessedOrb},
+
+            { "Cartographer's Chisel", KnownCurrencyNameList.CartographersChisel},
+            { "Cartographers Chisel", KnownCurrencyNameList.CartographersChisel},
+            { "Chisel", KnownCurrencyNameList.CartographersChisel},
+              
+            { "Chaos Orb", KnownCurrencyNameList.ChaosOrb},
+            { "Chaos", KnownCurrencyNameList.ChaosOrb},
+              
+            { "Chromatic Orb", KnownCurrencyNameList.ChromaticOrb},
+            { "Chrome", KnownCurrencyNameList.ChromaticOrb},
+            { "Chrom", KnownCurrencyNameList.ChromaticOrb},
+              
+            { "Divine Orb", KnownCurrencyNameList.DivineOrb},
+            { "Divine", KnownCurrencyNameList.DivineOrb},
+              
+            { "Exalted Orb", KnownCurrencyNameList.ExaltedOrb},
+            { "Exalted", KnownCurrencyNameList.ExaltedOrb},
+            { "Ex", KnownCurrencyNameList.ExaltedOrb},
+            { "Exa", KnownCurrencyNameList.ExaltedOrb},
+              
+            { "Gemcutter's Prism", KnownCurrencyNameList.GemcuttersPrism},
+            { "Gemcutters Prism", KnownCurrencyNameList.GemcuttersPrism},
+            { "Gcp", KnownCurrencyNameList.GemcuttersPrism},
+              
+            { "Jewellers Orb", KnownCurrencyNameList.JewellersOrb},
+            { "Jew", KnownCurrencyNameList.JewellersOrb},
+              
+            { "Orb of Alchemy", KnownCurrencyNameList.OrbOfAlchemy},
+            { "Alch", KnownCurrencyNameList.OrbOfAlchemy},
+              
+            { "Orb of Fusing", KnownCurrencyNameList.OrbOfFusing},
+            { "Fuse", KnownCurrencyNameList.OrbOfFusing},
+
+            { "Orb of Chance", KnownCurrencyNameList.OrbOfChance},
+            { "Chance", KnownCurrencyNameList.OrbOfChance},
+
+            { "Orb of Regret", KnownCurrencyNameList.OrbOfRegret},
+            { "Regret", KnownCurrencyNameList.OrbOfRegret},
+
+            { "Orb of Scouring", KnownCurrencyNameList.OrbOfScouring},
+            { "Scour", KnownCurrencyNameList.OrbOfScouring},
+
+            { "Regal Orb", KnownCurrencyNameList.RegalOrb},
+            { "Regal", KnownCurrencyNameList.RegalOrb},
+
+            { "Vaal Orb", KnownCurrencyNameList.VaalOrb},
+            { "Vaal", KnownCurrencyNameList.VaalOrb},
+
+            { "Mirror of Kalandra", KnownCurrencyNameList.MirrorOfKalandra},
+            { "Mirror", KnownCurrencyNameList.MirrorOfKalandra},
+
+            { "Eternal Orb", KnownCurrencyNameList.EternalOrb},
+            { "Eternal", KnownCurrencyNameList.EternalOrb},
+
+            { "Unknown", KnownCurrencyNameList.Unknown},
         };
 
         public static IConverter<string, PoePrice> Instance => instance.Value;
 
-
-        private readonly ConcurrentDictionary<string, string> currencyByAlias = new ConcurrentDictionary<string, string>(DefaultCurrencyByAlias);
+        private readonly ConcurrentDictionary<string, string> currencyByAlias;
 
         public PriceToCurrencyConverter()
         {
+            currencyByAlias = new ConcurrentDictionary<string, string>(DefaultCurrencyByAlias, StringComparer.OrdinalIgnoreCase);
+            DefaultCurrencyByAlias.Values.ForEach(x => currencyByAlias[x] = x);
+
             Log.Instance.Debug($"[PriceToCurrencyConverter..ctor] Aliases list:\r\n{currencyByAlias.DumpToText()}");
         }
 

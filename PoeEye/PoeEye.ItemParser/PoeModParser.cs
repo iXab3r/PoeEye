@@ -8,8 +8,8 @@ namespace PoeEye.ItemParser
     {
         public PoeModParser(IPoeItemMod mod, Regex matchingRegex)
         {
-            Guard.ArgumentNotNull(() => mod);
-            Guard.ArgumentNotNull(() => matchingRegex);
+            Guard.ArgumentNotNull(mod, nameof(mod));
+            Guard.ArgumentNotNull(matchingRegex, nameof(matchingRegex));
 
             Mod = mod;
             MatchingRegex = matchingRegex;

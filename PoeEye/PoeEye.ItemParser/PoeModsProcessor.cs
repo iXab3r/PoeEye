@@ -14,7 +14,7 @@ namespace PoeEye.ItemParser
 
         public PoeModsProcessor([NotNull] IPoeStaticData queryInfoProvider)
         {
-            Guard.ArgumentNotNull(() => queryInfoProvider);
+            Guard.ArgumentNotNull(queryInfoProvider, nameof(queryInfoProvider));
 
             modsRegexes = PrepareModsInfo(queryInfoProvider);
         }

@@ -70,15 +70,15 @@ namespace PoeEye.TradeMonitor.ViewModels
             [NotNull] IFactory<IImageViewModel, Uri> imageFactory,
             [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {
-            Guard.ArgumentNotNull(() => imageFactory);
-            Guard.ArgumentNotNull(() => macroCommandsProvider);
-            Guard.ArgumentNotNull(() => priceCalculcator);
-            Guard.ArgumentNotNull(() => clock);
-            Guard.ArgumentNotNull(() => chatService);
-            Guard.ArgumentNotNull(() => poeStashItemToItemConverter);
-            Guard.ArgumentNotNull(() => poeTradeViewModelFactory);
-            Guard.ArgumentNotNull(() => stashService);
-            Guard.ArgumentNotNull(() => configProvider);
+            Guard.ArgumentNotNull(imageFactory, nameof(imageFactory));
+            Guard.ArgumentNotNull(macroCommandsProvider, nameof(macroCommandsProvider));
+            Guard.ArgumentNotNull(priceCalculcator, nameof(priceCalculcator));
+            Guard.ArgumentNotNull(clock, nameof(clock));
+            Guard.ArgumentNotNull(chatService, nameof(chatService));
+            Guard.ArgumentNotNull(poeStashItemToItemConverter, nameof(poeStashItemToItemConverter));
+            Guard.ArgumentNotNull(poeTradeViewModelFactory, nameof(poeTradeViewModelFactory));
+            Guard.ArgumentNotNull(stashService, nameof(stashService));
+            Guard.ArgumentNotNull(configProvider, nameof(configProvider));
 
             Negotiation = model;
             this.chatService = chatService;
@@ -209,7 +209,7 @@ namespace PoeEye.TradeMonitor.ViewModels
 
         public void SetCloseController(INegotiationCloseController closeController)
         {
-            Guard.ArgumentNotNull(() => closeController);
+            Guard.ArgumentNotNull(closeController, nameof(closeController));
 
             CloseController = closeController;
         }

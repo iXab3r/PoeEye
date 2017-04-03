@@ -23,14 +23,14 @@ namespace PoeEye.PoeTrade
 
         public PoeItemVerifier([NotNull] IFactory<IHttpClient> clientsFactory)
         {
-            Guard.ArgumentNotNull(() => clientsFactory);
+            Guard.ArgumentNotNull(clientsFactory, nameof(clientsFactory));
 
             this.clientsFactory = clientsFactory;
         }
 
         public Task<bool?> Verify(IPoeItem item)
         {
-            Guard.ArgumentNotNull(() => item);
+            Guard.ArgumentNotNull(item, nameof(item));
 
             if (string.IsNullOrWhiteSpace(item.Hash) || string.IsNullOrWhiteSpace(item.ThreadId))
             {

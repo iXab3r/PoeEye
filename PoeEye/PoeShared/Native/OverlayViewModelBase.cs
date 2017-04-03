@@ -101,7 +101,7 @@ namespace PoeShared.Native
 
         public virtual IOverlayViewModel SetActivationController(IActivationController controller)
         {
-            Guard.ArgumentNotNull(() => controller);
+            Guard.ArgumentNotNull(controller, nameof(controller));
 
             return this;
         }

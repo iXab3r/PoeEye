@@ -30,8 +30,8 @@ namespace PoeShared.UI.Models
             [NotNull] IFactory<IHttpClient> httpClientFactory,
             [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {
-            Guard.ArgumentNotNull(() => httpClientFactory);
-            Guard.ArgumentNotNull(() => uiScheduler);
+            Guard.ArgumentNotNull(httpClientFactory, nameof(httpClientFactory));
+            Guard.ArgumentNotNull(uiScheduler, nameof(uiScheduler));
 
             this.httpClientFactory = httpClientFactory;
             this.uiScheduler = uiScheduler;

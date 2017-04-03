@@ -23,8 +23,8 @@ namespace PoeEye.TradeMonitor.Models
             IPoeDatabaseReader database,
             IClock clock)
         {
-            Guard.ArgumentNotNull(() => database);
-            Guard.ArgumentNotNull(() => clock);
+            Guard.ArgumentNotNull(database, nameof(database));
+            Guard.ArgumentNotNull(clock, nameof(clock));
 
             this.database = database;
             this.clock = clock;

@@ -26,9 +26,9 @@ namespace PoeBud.ViewModels
             [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler,
             [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler)
         {
-            Guard.ArgumentNotNull(() => solutionExecutor);
-            Guard.ArgumentNotNull(() => uiScheduler);
-            Guard.ArgumentNotNull(() => bgScheduler);
+            Guard.ArgumentNotNull(solutionExecutor, nameof(solutionExecutor));
+            Guard.ArgumentNotNull(uiScheduler, nameof(uiScheduler));
+            Guard.ArgumentNotNull(bgScheduler, nameof(bgScheduler));
 
             this.solutionExecutor = solutionExecutor;
 

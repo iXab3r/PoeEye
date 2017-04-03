@@ -26,7 +26,7 @@ namespace PoeShared.Audio
 
         public AudioNotificationsManager([NotNull] IConfigProvider<PoeEyeSharedConfig> poeEyeConfigProvider) 
         {
-            Guard.ArgumentNotNull(() => poeEyeConfigProvider);
+            Guard.ArgumentNotNull(poeEyeConfigProvider, nameof(poeEyeConfigProvider));
 
             Log.Instance.Debug($"[AudioNotificationsManager..ctor] Initializing sound subsystem...");
             Initialize();

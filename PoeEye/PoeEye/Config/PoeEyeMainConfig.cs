@@ -44,7 +44,7 @@ namespace PoeEye.Config
 
         public PoeEyeMainConfig([NotNull] PoeEyeMainConfig source)
         {
-            Guard.ArgumentNotNull(() => source);
+            Guard.ArgumentNotNull(source, nameof(source));
 
             source.TransferPropertiesTo(this);
         }

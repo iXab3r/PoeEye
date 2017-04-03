@@ -35,8 +35,8 @@ namespace PoeEye.PoeTrade.ViewModels
             [NotNull] IPoeEyeModulesEnumerator modulesEnumerator,
             [NotNull] IUnityContainer container)
         {
-            Guard.ArgumentNotNull(() => modulesEnumerator);
-            Guard.ArgumentNotNull(() => container);
+            Guard.ArgumentNotNull(modulesEnumerator, nameof(modulesEnumerator));
+            Guard.ArgumentNotNull(container, nameof(container));
             this.container = container;
 
             var settingsOpenedTrigger = this.WhenAnyValue(x => x.IsOpen)

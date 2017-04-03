@@ -16,7 +16,7 @@ namespace PoeEye.TradeMonitor.Services
         public PoeMacroCommandsService(
             [NotNull] IPoeChatService chatService)
         {
-            Guard.ArgumentNotNull(() => chatService);
+            Guard.ArgumentNotNull(chatService, nameof(chatService));
 
             this.chatService = chatService;
 
@@ -63,7 +63,7 @@ namespace PoeEye.TradeMonitor.Services
                 [NotNull] IPoeChatService chatService,
                 [NotNull] Func<IMacroCommandContext, string> messageProvider) : base(commandText)
             {
-                Guard.ArgumentNotNull(() => chatService);
+                Guard.ArgumentNotNull(chatService, nameof(chatService));
 
                 this.messageProvider = messageProvider;
                 this.chatService = chatService;
@@ -71,7 +71,7 @@ namespace PoeEye.TradeMonitor.Services
 
             public override void Execute(IMacroCommandContext context)
             {
-                Guard.ArgumentNotNull(() => context);
+                Guard.ArgumentNotNull(context, nameof(context));
 
                 var message = messageProvider(context);
                 try

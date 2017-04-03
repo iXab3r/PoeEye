@@ -21,8 +21,8 @@ namespace PoeBud.ViewModels
     {
         public StashViewModel([NotNull] StashUpdate stashUpdate, [NotNull] IPoeBudConfig config)
         {
-            Guard.ArgumentNotNull(() => stashUpdate);
-            Guard.ArgumentNotNull(() => config);
+            Guard.ArgumentNotNull(stashUpdate, nameof(stashUpdate));
+            Guard.ArgumentNotNull(config, nameof(config));
 
             StashUpdate = stashUpdate;
 

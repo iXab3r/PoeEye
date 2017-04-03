@@ -24,8 +24,8 @@ namespace PoeShared.PoeDatabase
             [NotNull] IPoeDatabaseReader[] readers,
             [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {
-            Guard.ArgumentNotNull(() => readers);
-            Guard.ArgumentNotNull(() => uiScheduler);
+            Guard.ArgumentNotNull(readers, nameof(readers));
+            Guard.ArgumentNotNull(uiScheduler, nameof(uiScheduler));
             this.readers = readers;
 
             var merge = new SourceList<ISourceList<string>>();

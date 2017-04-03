@@ -23,14 +23,14 @@ namespace PoeEye.PoeTrade
 
         public PoeTradeParserModern([NotNull] IPoeTradeDateTimeExtractor dateTimeExtractor)
         {
-            Guard.ArgumentNotNull(() => dateTimeExtractor);
+            Guard.ArgumentNotNull(dateTimeExtractor, nameof(dateTimeExtractor));
 
             this.dateTimeExtractor = dateTimeExtractor;
         }
 
         public IPoeQueryResult ParseQueryResponse(string rawHtml)
         {
-            Guard.ArgumentNotNull(() => rawHtml);
+            Guard.ArgumentNotNull(rawHtml, nameof(rawHtml));
 
             var parser = new CQ(new StringReader(rawHtml));
 
@@ -45,7 +45,7 @@ namespace PoeEye.PoeTrade
 
         public IPoeStaticData ParseStaticData(string rawHtml)
         {
-            Guard.ArgumentNotNull(() => rawHtml);
+            Guard.ArgumentNotNull(rawHtml, nameof(rawHtml));
 
             var parser = new CQ(new StringReader(rawHtml));
 

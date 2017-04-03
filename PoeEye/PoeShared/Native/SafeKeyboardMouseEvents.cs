@@ -34,7 +34,7 @@ namespace PoeShared.Native
             [NotNull] IKeyboardMouseEvents keyboardMouseEvents,
             [NotNull] ISchedulerProvider schedulerProvider)
         {
-            Guard.ArgumentNotNull(() => keyboardMouseEvents);
+            Guard.ArgumentNotNull(keyboardMouseEvents, nameof(keyboardMouseEvents));
             this.keyboardMouseEvents = keyboardMouseEvents;
 
             kbdScheduler = schedulerProvider.GetOrCreate("KdbInput");

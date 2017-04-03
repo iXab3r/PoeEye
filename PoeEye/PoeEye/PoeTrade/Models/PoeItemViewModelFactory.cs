@@ -18,13 +18,13 @@ namespace PoeEye.PoeTrade.Models
         public PoeItemViewModelFactory(
             [NotNull] IFactory<IPoeTradeViewModel, IPoeItem> poeTradeViewModelFactory)
         {
-            Guard.ArgumentNotNull(() => poeTradeViewModelFactory);
+            Guard.ArgumentNotNull(poeTradeViewModelFactory, nameof(poeTradeViewModelFactory));
             this.poeTradeViewModelFactory = poeTradeViewModelFactory;
         }
 
         public IDisposableReactiveObject Create(IPoeItem item)
         {
-            Guard.ArgumentNotNull(() => item);
+            Guard.ArgumentNotNull(item, nameof(item));
 
             return poeTradeViewModelFactory.Create(item);
         }

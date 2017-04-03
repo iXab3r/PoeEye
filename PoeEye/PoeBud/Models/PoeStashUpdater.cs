@@ -42,11 +42,11 @@ namespace PoeBud.Models
             [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler,
             [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {
-            Guard.ArgumentNotNull(() => config);
-            Guard.ArgumentNotNull(() => clock);
-            Guard.ArgumentNotNull(() => poeClientFactory);
-            Guard.ArgumentNotNull(() => bgScheduler);
-            Guard.ArgumentNotNull(() => uiScheduler);
+            Guard.ArgumentNotNull(config, nameof(config));
+            Guard.ArgumentNotNull(clock, nameof(clock));
+            Guard.ArgumentNotNull(poeClientFactory, nameof(poeClientFactory));
+            Guard.ArgumentNotNull(bgScheduler, nameof(bgScheduler));
+            Guard.ArgumentNotNull(uiScheduler, nameof(uiScheduler));
 
             Guard.ArgumentNotNullOrEmpty(() => config.LoginEmail);
             Guard.ArgumentNotNullOrEmpty(() => config.SessionId);
@@ -198,7 +198,7 @@ namespace PoeBud.Models
 
         private void HandleUpdateError(Exception ex)
         {
-            Guard.ArgumentNotNull(() => ex);
+            Guard.ArgumentNotNull(ex, nameof(ex));
 
             Log.HandleException(ex);
             LastUpdateTimestamp = clock.Now;

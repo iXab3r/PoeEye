@@ -57,7 +57,7 @@ namespace PoeEye.PoeTrade.ViewModels
             [NotNull] ReadOnlyObservableCollection<IMainWindowTabViewModel> tabsList,
             [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {
-            Guard.ArgumentNotNull(() => tabsList);
+            Guard.ArgumentNotNull(tabsList, nameof(tabsList));
 
             markAllAsReadCommand = ReactiveCommand.Create(MarkAllAsReadExecuted);
 
@@ -152,8 +152,8 @@ namespace PoeEye.PoeTrade.ViewModels
             public TabProxy(
                 IMainWindowTabViewModel tab, ISubject<Unit> filterRequestSubject)
             {
-                Guard.ArgumentNotNull(() => tab);
-                Guard.ArgumentNotNull(() => filterRequestSubject);
+                Guard.ArgumentNotNull(tab, nameof(tab));
+                Guard.ArgumentNotNull(filterRequestSubject, nameof(filterRequestSubject));
 
                 var listOfTradesList = new SourceList<ISourceList<PoeFilteredTradeViewModel>>();
 
@@ -203,7 +203,7 @@ namespace PoeEye.PoeTrade.ViewModels
 
             public TradeComparer(params SortDescriptionData[] descriptionData)
             {
-                Guard.ArgumentNotNull(() => descriptionData);
+                Guard.ArgumentNotNull(descriptionData, nameof(descriptionData));
 
                 comparer = OrderedComparer
                     .For<PoeFilteredTradeViewModel>()

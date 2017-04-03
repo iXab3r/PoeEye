@@ -13,8 +13,8 @@ namespace PoeShared.Scaffolding
             Action<Exception> onNextError,
             Action<IDisposable> anchorProcessor)
         {
-            Guard.ArgumentNotNull(() => instance);
-            Guard.ArgumentNotNull(() => onNextError);
+            Guard.ArgumentNotNull(instance, nameof(instance));
+            Guard.ArgumentNotNull(onNextError, nameof(onNextError));
 
             var anchor = instance.ThrownExceptions.Subscribe(onNextError);
             anchorProcessor(anchor);

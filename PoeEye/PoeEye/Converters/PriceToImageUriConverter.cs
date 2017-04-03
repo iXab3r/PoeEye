@@ -1,4 +1,5 @@
 ﻿using PoeShared.Common;
+using PoeShared.Converters;
 
 namespace PoeEye.Converters
 {

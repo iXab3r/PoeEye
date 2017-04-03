@@ -61,10 +61,10 @@ namespace PoeBud.ViewModels
             [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler,
             [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler)
         {
-            Guard.ArgumentNotNull(() => overlaysProvider);
-            Guard.ArgumentNotNull(() => uiScheduler);
-            Guard.ArgumentNotNull(() => bgScheduler);
-            Guard.ArgumentNotNull(() => poeClientFactory);
+            Guard.ArgumentNotNull(overlaysProvider, nameof(overlaysProvider));
+            Guard.ArgumentNotNull(uiScheduler, nameof(uiScheduler));
+            Guard.ArgumentNotNull(bgScheduler, nameof(bgScheduler));
+            Guard.ArgumentNotNull(poeClientFactory, nameof(poeClientFactory));
 
             this.poeClientFactory = poeClientFactory;
             this.overlaysProvider = overlaysProvider;

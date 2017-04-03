@@ -54,12 +54,12 @@ namespace PoeEye.PoeTrade.ViewModels
             [NotNull] IFactory<IPoeQueryViewModel, IPoeStaticData> queryFactory)
         {
             this.tradesListFactory = tradesListFactory;
-            Guard.ArgumentNotNull(() => tradesListFactory);
-            Guard.ArgumentNotNull(() => apiSelector);
-            Guard.ArgumentNotNull(() => mainWindowTracker);
-            Guard.ArgumentNotNull(() => audioNotificationsManager);
-            Guard.ArgumentNotNull(() => audioNotificationSelector);
-            Guard.ArgumentNotNull(() => queryFactory);
+            Guard.ArgumentNotNull(tradesListFactory, nameof(tradesListFactory));
+            Guard.ArgumentNotNull(apiSelector, nameof(apiSelector));
+            Guard.ArgumentNotNull(mainWindowTracker, nameof(mainWindowTracker));
+            Guard.ArgumentNotNull(audioNotificationsManager, nameof(audioNotificationsManager));
+            Guard.ArgumentNotNull(audioNotificationSelector, nameof(audioNotificationSelector));
+            Guard.ArgumentNotNull(queryFactory, nameof(queryFactory));
 
             tabHeader = $"Tab #{GlobalTabIdx++}";
 
@@ -197,7 +197,7 @@ namespace PoeEye.PoeTrade.ViewModels
 
         private void ReinitializeApi(IPoeApiWrapper api)
         {
-            Guard.ArgumentNotNull(() => api);
+            Guard.ArgumentNotNull(api, nameof(api));
             var anchors = new CompositeDisposable();
             tradesListAnchors.Disposable = anchors;
 

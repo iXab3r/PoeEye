@@ -17,7 +17,7 @@ namespace PoeEye.PoeTrade
     {
         public IPoeQuery Convert(IPoeQueryInfo source)
         {
-            Guard.ArgumentNotNull(() => source);
+            Guard.ArgumentNotNull(source, nameof(source));
 
             var result = new PoeQuery();
 

@@ -27,9 +27,9 @@ namespace PoeEye.TradeMonitor.Prism
                 [NotNull] IFactory<PoeTradeMonitorViewModel, IOverlayWindowController> viewModelFactory,
                 [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {
-            Guard.ArgumentNotNull(() => configProvider);
-            Guard.ArgumentNotNull(() => overlayController);
-            Guard.ArgumentNotNull(() => viewModelFactory);
+            Guard.ArgumentNotNull(configProvider, nameof(configProvider));
+            Guard.ArgumentNotNull(overlayController, nameof(overlayController));
+            Guard.ArgumentNotNull(viewModelFactory, nameof(viewModelFactory));
 
             this.overlayController = overlayController;
             this.viewModelFactory = viewModelFactory;

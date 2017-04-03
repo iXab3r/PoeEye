@@ -25,8 +25,8 @@ namespace PoeShared.PoeTrade
             [NotNull] IPoeQueryInfo query,
             [NotNull] IPoeApiWrapper poeApi)
         {
-            Guard.ArgumentNotNull(() => query);
-            Guard.ArgumentNotNull(() => poeApi);
+            Guard.ArgumentNotNull(query, nameof(query));
+            Guard.ArgumentNotNull(poeApi, nameof(poeApi));
 
             var periodObservable = this.WhenAnyValue(x => x.RecheckPeriod)
                                        .Do(LogRecheckPeriodChange)
@@ -94,7 +94,7 @@ namespace PoeShared.PoeTrade
 
         private void HandleUpdate(IPoeItem[] queryResult)
         {
-            Guard.ArgumentNotNull(() => queryResult);
+            Guard.ArgumentNotNull(queryResult, nameof(queryResult));
 
             Log.Instance.Debug($"[PoeLiveHistoryProvider] Update received, itemsCount: {queryResult.Length}");
             IsBusy = false;
@@ -104,7 +104,7 @@ namespace PoeShared.PoeTrade
 
         private void HandleUpdateError(Exception ex)
         {
-            Guard.ArgumentNotNull(() => ex);
+            Guard.ArgumentNotNull(ex, nameof(ex));
 
             Log.Instance.Error($"[PoeLiveHistoryProvider] Update failed", ex);
             IsBusy = false;

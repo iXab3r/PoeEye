@@ -71,18 +71,18 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
             [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler,
             [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {
-            Guard.ArgumentNotNull(() => tabFactory);
-            Guard.ArgumentNotNull(() => summaryTabFactory);
-            Guard.ArgumentNotNull(() => applicationUpdaterViewModel);
-            Guard.ArgumentNotNull(() => proxyProviderViewModel);
-            Guard.ArgumentNotNull(() => poeEyeConfigProvider);
-            Guard.ArgumentNotNull(() => clipboardParserViewModel);
-            Guard.ArgumentNotNull(() => audioNotificationsManager);
-            Guard.ArgumentNotNull(() => settings);
-            Guard.ArgumentNotNull(() => whispersNotificationManager);
-            Guard.ArgumentNotNull(() => dialogCoordinator);
-            Guard.ArgumentNotNull(() => uiScheduler);
-            Guard.ArgumentNotNull(() => bgScheduler);
+            Guard.ArgumentNotNull(tabFactory, nameof(tabFactory));
+            Guard.ArgumentNotNull(summaryTabFactory, nameof(summaryTabFactory));
+            Guard.ArgumentNotNull(applicationUpdaterViewModel, nameof(applicationUpdaterViewModel));
+            Guard.ArgumentNotNull(proxyProviderViewModel, nameof(proxyProviderViewModel));
+            Guard.ArgumentNotNull(poeEyeConfigProvider, nameof(poeEyeConfigProvider));
+            Guard.ArgumentNotNull(clipboardParserViewModel, nameof(clipboardParserViewModel));
+            Guard.ArgumentNotNull(audioNotificationsManager, nameof(audioNotificationsManager));
+            Guard.ArgumentNotNull(settings, nameof(settings));
+            Guard.ArgumentNotNull(whispersNotificationManager, nameof(whispersNotificationManager));
+            Guard.ArgumentNotNull(dialogCoordinator, nameof(dialogCoordinator));
+            Guard.ArgumentNotNull(uiScheduler, nameof(uiScheduler));
+            Guard.ArgumentNotNull(bgScheduler, nameof(bgScheduler));
 
             var executingAssembly = Assembly.GetExecutingAssembly();
             MainWindowTitle = $"{executingAssembly.GetName().Name} v{executingAssembly.GetName().Version}";

@@ -18,8 +18,8 @@ namespace PoeShared.Common
 
         public PoeItemType(string name, string codeName)
         {
-            Guard.ArgumentNotNull(() => name);
-            Guard.ArgumentNotNull(() => codeName);
+            Guard.ArgumentNotNull(name, nameof(name));
+            Guard.ArgumentNotNull(codeName, nameof(codeName));
 
             Name = name;
             CodeName = codeName;

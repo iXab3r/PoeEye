@@ -14,7 +14,7 @@ namespace PoeWhisperMonitor.Prism
 
         public PoeWhisperMonitorModule([NotNull] IUnityContainer container)
         {
-            Guard.ArgumentNotNull(() => container);
+            Guard.ArgumentNotNull(container, nameof(container));
 
             this.container = container;
         }

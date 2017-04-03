@@ -7,7 +7,7 @@ namespace PoeShared.PoeTrade.Query
     {
         public PoeQueryModArgument(IPoeItemMod mod) : base(mod.Name)
         {
-            Guard.ArgumentNotNull(() => mod);
+            Guard.ArgumentNotNull(mod, nameof(mod));
             Mod = mod;
         }
 

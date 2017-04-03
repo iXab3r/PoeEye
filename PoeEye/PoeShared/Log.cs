@@ -33,7 +33,7 @@ namespace PoeShared
 
         public static void HandleException([NotNull] Exception exception)
         {
-            Guard.ArgumentNotNull(() => exception);
+            Guard.ArgumentNotNull(exception, nameof(exception));
 
             Instance.Error("Exception occurred", exception);
             exception.ToExceptionless().Submit();
@@ -41,7 +41,7 @@ namespace PoeShared
 
         public static void HandleUiException([NotNull] Exception exception)
         {
-            Guard.ArgumentNotNull(() => exception);
+            Guard.ArgumentNotNull(exception, nameof(exception));
 
             Instance.Error("UI Exception occurred", exception);
             exception.ToExceptionless().MarkAsCritical().Submit();
@@ -49,7 +49,7 @@ namespace PoeShared
 
         public static void InitializeLogging(string configurationMode)
         {
-            Guard.ArgumentNotNull(() => configurationMode);
+            Guard.ArgumentNotNull(configurationMode, nameof(configurationMode));
 
             GlobalContext.Properties["configuration"] = configurationMode;
             Instance.Info($"Logging in '{configurationMode}' mode initialized");
@@ -57,7 +57,7 @@ namespace PoeShared
 
         public static void SwitchLoggingLevel(Level loggingLevel)
         {
-            Guard.ArgumentNotNull(() => loggingLevel);
+            Guard.ArgumentNotNull(loggingLevel, nameof(loggingLevel));
 
             var repository = (Hierarchy) log4net.LogManager.GetRepository();
             repository.Root.Level = Level.Trace;

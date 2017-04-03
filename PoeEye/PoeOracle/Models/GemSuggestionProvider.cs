@@ -31,8 +31,8 @@ namespace PoeOracle.Models
             [NotNull] ISkillGemInfoProvider gemInfoProvider,
             [NotNull] IFactory<OracleSuggestionGemViewModel, SkillGemModel> viewModelFactory)
         {
-            Guard.ArgumentNotNull(() => gemInfoProvider);
-            Guard.ArgumentNotNull(() => viewModelFactory);
+            Guard.ArgumentNotNull(gemInfoProvider, nameof(gemInfoProvider));
+            Guard.ArgumentNotNull(viewModelFactory, nameof(viewModelFactory));
 
             this.viewModelFactory = viewModelFactory;
 

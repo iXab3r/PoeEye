@@ -11,7 +11,7 @@ namespace PoeEye.PoeTradeRealtimeApi.Prism
         public PoeTradeRealtimeModule(IUnityContainer container)
         {
             this.container = container;
-            Guard.ArgumentNotNull(() => container);
+            Guard.ArgumentNotNull(container, nameof(container));
         }
 
         public void Initialize()

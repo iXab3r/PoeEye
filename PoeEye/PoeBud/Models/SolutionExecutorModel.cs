@@ -18,7 +18,7 @@ namespace PoeBud.Models
 
         public SolutionExecutorModel([NotNull] IPoeWindowManager windowManager)
         {
-            Guard.ArgumentNotNull(() => windowManager);
+            Guard.ArgumentNotNull(windowManager, nameof(windowManager));
 
             this.windowManager = windowManager;
         }
@@ -27,13 +27,13 @@ namespace PoeBud.Models
 
         public async Task ExecuteSolution(IPoeTradeSolution solutionToExecute)
         {
-            Guard.ArgumentNotNull(() => solutionToExecute);
+            Guard.ArgumentNotNull(solutionToExecute, nameof(solutionToExecute));
             await Task.Run(() => ExecuteSolutionInternal(solutionToExecute));
         }
 
         private void ExecuteSolutionInternal(IPoeTradeSolution solutionToExecute)
         {
-            Guard.ArgumentNotNull(() => solutionToExecute);
+            Guard.ArgumentNotNull(solutionToExecute, nameof(solutionToExecute));
 
             var window = windowManager.ActiveWindow;
             if (window == null)

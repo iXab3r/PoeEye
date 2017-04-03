@@ -16,7 +16,7 @@ namespace PoeEye.PoeTrade.ViewModels
 
         public PoeApiSelectorViewModel([NotNull] IPoeApiProvider apiProvider)
         {
-            Guard.ArgumentNotNull(() => apiProvider);
+            Guard.ArgumentNotNull(apiProvider, nameof(apiProvider));
             this.apiProvider = apiProvider;
 
             SelectedModule = apiProvider.ModulesList.First();
@@ -32,7 +32,7 @@ namespace PoeEye.PoeTrade.ViewModels
 
         public void SetByModuleId(string moduleInfo)
         {
-            Guard.ArgumentNotNull(() => moduleInfo);
+            Guard.ArgumentNotNull(moduleInfo, nameof(moduleInfo));
 
             SelectedModule = FindModuleById(moduleInfo);
         }

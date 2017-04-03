@@ -46,12 +46,12 @@ namespace PoeOracle.ViewModels
             [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler,
             [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {
-            Guard.ArgumentNotNull(() => keyboardMouseEvents);
-            Guard.ArgumentNotNull(() => controller);
-            Guard.ArgumentNotNull(() => dataSource);
-            Guard.ArgumentNotNull(() => uriOpener);
-            Guard.ArgumentNotNull(() => bgScheduler);
-            Guard.ArgumentNotNull(() => uiScheduler);
+            Guard.ArgumentNotNull(keyboardMouseEvents, nameof(keyboardMouseEvents));
+            Guard.ArgumentNotNull(controller, nameof(controller));
+            Guard.ArgumentNotNull(dataSource, nameof(dataSource));
+            Guard.ArgumentNotNull(uriOpener, nameof(uriOpener));
+            Guard.ArgumentNotNull(bgScheduler, nameof(bgScheduler));
+            Guard.ArgumentNotNull(uiScheduler, nameof(uiScheduler));
 
             SizeToContent = SizeToContent.WidthAndHeight;
             MinSize = new Size(700, 50);
@@ -120,7 +120,7 @@ namespace PoeOracle.ViewModels
 
         public override IOverlayViewModel SetActivationController(IActivationController controller)
         {
-            Guard.ArgumentNotNull(() => controller);
+            Guard.ArgumentNotNull(controller, nameof(controller));
             activationController = controller;
             return base.SetActivationController(controller);
         }

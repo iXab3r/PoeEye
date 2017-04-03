@@ -28,7 +28,7 @@ namespace PoeEye.PoeTrade.ViewModels
             [NotNull] IPoeStaticData staticData,
             [NotNull] IFactory<PoeModsEditorViewModel, IPoeStaticData> groupsFactory)
         {
-            Guard.ArgumentNotNull(() => groupsFactory);
+            Guard.ArgumentNotNull(groupsFactory, nameof(groupsFactory));
 
             this.staticData = staticData;
             this.groupsFactory = groupsFactory;
@@ -67,7 +67,7 @@ namespace PoeEye.PoeTrade.ViewModels
 
         private void RemoveGroupCommandExecuted(IPoeModsEditorViewModel groupToRemove)
         {
-            Guard.ArgumentNotNull(() => groupToRemove);
+            Guard.ArgumentNotNull(groupToRemove, nameof(groupToRemove));
 
             using (Groups.SuppressChangeNotifications())
             {

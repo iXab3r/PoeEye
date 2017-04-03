@@ -94,7 +94,7 @@ namespace PoeShared.StashApi.ProcurementLegacy
 
         public GearType Resolve(string itemType)
         {
-            Guard.ArgumentNotNull(() => itemType);
+            Guard.ArgumentNotNull(itemType, nameof(itemType));
 
             var query = from runner in runners
                         let compatibleType = new { TypeName = runner.FindCompatibleType(itemType), GearType = runner.Type }

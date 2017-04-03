@@ -39,9 +39,9 @@ namespace PoeEye.PoeTrade.Updater
             [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler,
             [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler)
         {
-            Guard.ArgumentNotNull(() => updaterModel);
-            Guard.ArgumentNotNull(() => uiScheduler);
-            Guard.ArgumentNotNull(() => bgScheduler);
+            Guard.ArgumentNotNull(updaterModel, nameof(updaterModel));
+            Guard.ArgumentNotNull(uiScheduler, nameof(uiScheduler));
+            Guard.ArgumentNotNull(bgScheduler, nameof(bgScheduler));
 
             updaterModel.WhenAnyValue(x => x.MostRecentVersion)
                 .Subscribe(() => this.RaisePropertyChanged(nameof(MostRecentVersion)))

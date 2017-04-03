@@ -34,7 +34,7 @@
 
         public PoeMessagesSource([NotNull] FileInfo logFile)
         {
-            Guard.ArgumentNotNull(() => logFile);
+            Guard.ArgumentNotNull(logFile, nameof(logFile));
 
             Log.Instance.Debug($"[PoeMessagesSource] Tracking log file '{logFile.FullName}'...");
             var safeStream = new SafeFileStream(logFile.FullName);

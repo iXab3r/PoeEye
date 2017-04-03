@@ -23,8 +23,8 @@
         
         public static T AddTo<T>(this T instance, ICollection<T> collection)
         {
-            Guard.ArgumentNotNull(() => instance);
-            Guard.ArgumentNotNull(() => collection);
+            Guard.ArgumentNotNull(instance, nameof(instance));
+            Guard.ArgumentNotNull(collection, nameof(collection));
             
             collection.Add(instance);
             return instance;

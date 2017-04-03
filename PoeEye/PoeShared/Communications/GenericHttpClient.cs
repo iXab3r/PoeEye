@@ -23,7 +23,7 @@ namespace PoeShared.Communications
         public GenericHttpClient(
             [NotNull] IConverter<NameValueCollection, string> nameValueConverter)
         {
-            Guard.ArgumentNotNull(() => nameValueConverter);
+            Guard.ArgumentNotNull(nameValueConverter, nameof(nameValueConverter));
 
             this.nameValueConverter = nameValueConverter;
         }
@@ -34,7 +34,7 @@ namespace PoeShared.Communications
 
         public IObservable<Stream> GetStreamAsync(Uri requestUri)
         {
-            Guard.ArgumentNotNull(() => requestUri);
+            Guard.ArgumentNotNull(requestUri, nameof(requestUri));
 
             var httpClient = new HttpClient();
             return httpClient.GetStreamAsync(requestUri).ToObservable();
@@ -43,7 +43,7 @@ namespace PoeShared.Communications
         public IObservable<string> Post(string uri, NameValueCollection args)
         {
             Guard.ArgumentNotNullOrEmpty(() => uri);
-            Guard.ArgumentNotNull(() => args);
+            Guard.ArgumentNotNull(args, nameof(args));
 
             return Observable.Start(() => PostQueryInternal(uri, args), Scheduler.Default);
         }

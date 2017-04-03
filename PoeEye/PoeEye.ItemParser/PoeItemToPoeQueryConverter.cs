@@ -18,14 +18,14 @@ namespace PoeEye.ItemParser
 
         public PoeItemToPoeQueryConverter([NotNull] IPoeModsProcessor modsProcessor)
         {
-            Guard.ArgumentNotNull(() => modsProcessor);
+            Guard.ArgumentNotNull(modsProcessor, nameof(modsProcessor));
 
             modsRegexes = modsProcessor.GetKnownParsers();
         }
 
         public IPoeQueryInfo Convert(IPoeItem value)
         {
-            Guard.ArgumentNotNull(() => value);
+            Guard.ArgumentNotNull(value, nameof(value));
 
             var query = new PoeQueryInfo
             {

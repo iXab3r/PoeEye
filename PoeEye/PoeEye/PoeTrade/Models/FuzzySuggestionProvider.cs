@@ -21,7 +21,7 @@ namespace PoeEye.PoeTrade.Models
         public FuzzySuggestionProvider(
             [NotNull] IEnumerable<string> haystack)
         {
-            Guard.ArgumentNotNull(() => haystack);
+            Guard.ArgumentNotNull(haystack, nameof(haystack));
 
             searchService = new RunglishSearchService(new XSearchService<string>(haystack, x => x));
         }

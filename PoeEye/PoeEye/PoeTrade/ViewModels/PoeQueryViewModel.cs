@@ -152,10 +152,10 @@ namespace PoeEye.PoeTrade.ViewModels
             [NotNull] IFactory<ISuggestionProvider, IEnumerable<string>> suggestionProviderFactory,
             [NotNull] IPoeDatabaseReader poeDatabaseReader)
         {
-            Guard.ArgumentNotNull(() => staticData);
-            Guard.ArgumentNotNull(() => modGroupsEditorFactory);
-            Guard.ArgumentNotNull(() => suggestionProviderFactory);
-            Guard.ArgumentNotNull(() => poeDatabaseReader);
+            Guard.ArgumentNotNull(staticData, nameof(staticData));
+            Guard.ArgumentNotNull(modGroupsEditorFactory, nameof(modGroupsEditorFactory));
+            Guard.ArgumentNotNull(suggestionProviderFactory, nameof(suggestionProviderFactory));
+            Guard.ArgumentNotNull(poeDatabaseReader, nameof(poeDatabaseReader));
 
             LeaguesList = staticData.LeaguesList.ToArray();
 
@@ -595,7 +595,7 @@ namespace PoeEye.PoeTrade.ViewModels
 
         public void SetQueryInfo(IPoeQueryInfo source)
         {
-            Guard.ArgumentNotNull(() => source);
+            Guard.ArgumentNotNull(source, nameof(source));
 
             source.TransferPropertiesTo(this);
 

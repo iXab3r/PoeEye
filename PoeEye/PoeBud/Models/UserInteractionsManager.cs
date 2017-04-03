@@ -30,9 +30,9 @@ namespace PoeBud.Models
                 [NotNull] IConfigProvider<PoeBudConfig> configProvider,
                 [NotNull] IUserInputBlocker userInputBlocker)
         {
-            Guard.ArgumentNotNull(() => inputSimulator);
-            Guard.ArgumentNotNull(() => configProvider);
-            Guard.ArgumentNotNull(() => userInputBlocker);
+            Guard.ArgumentNotNull(inputSimulator, nameof(inputSimulator));
+            Guard.ArgumentNotNull(configProvider, nameof(configProvider));
+            Guard.ArgumentNotNull(userInputBlocker, nameof(userInputBlocker));
 
             this.inputSimulator = inputSimulator;
             this.userInputBlocker = userInputBlocker;

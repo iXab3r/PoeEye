@@ -63,16 +63,16 @@ namespace PoeBud.ViewModels
             [NotNull] IFactory<StashViewModel, StashUpdate, IPoeBudConfig> stashUpdateFactory,
             [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {
-            Guard.ArgumentNotNull(() => windowManager);
-            Guard.ArgumentNotNull(() => solutionExecutor);
-            Guard.ArgumentNotNull(() => overlaysProvider);
-            Guard.ArgumentNotNull(() => userInteractionsManager);
-            Guard.ArgumentNotNull(() => poeBudConfigProvider);
-            Guard.ArgumentNotNull(() => keyboardMouseEvents);
-            Guard.ArgumentNotNull(() => clock);
-            Guard.ArgumentNotNull(() => stashAnalyzerFactory);
-            Guard.ArgumentNotNull(() => stashUpdateFactory);
-            Guard.ArgumentNotNull(() => uiScheduler);
+            Guard.ArgumentNotNull(windowManager, nameof(windowManager));
+            Guard.ArgumentNotNull(solutionExecutor, nameof(solutionExecutor));
+            Guard.ArgumentNotNull(overlaysProvider, nameof(overlaysProvider));
+            Guard.ArgumentNotNull(userInteractionsManager, nameof(userInteractionsManager));
+            Guard.ArgumentNotNull(poeBudConfigProvider, nameof(poeBudConfigProvider));
+            Guard.ArgumentNotNull(keyboardMouseEvents, nameof(keyboardMouseEvents));
+            Guard.ArgumentNotNull(clock, nameof(clock));
+            Guard.ArgumentNotNull(stashAnalyzerFactory, nameof(stashAnalyzerFactory));
+            Guard.ArgumentNotNull(stashUpdateFactory, nameof(stashUpdateFactory));
+            Guard.ArgumentNotNull(uiScheduler, nameof(uiScheduler));
 
             this.clock = clock;
             this.keyboardMouseEvents = keyboardMouseEvents;

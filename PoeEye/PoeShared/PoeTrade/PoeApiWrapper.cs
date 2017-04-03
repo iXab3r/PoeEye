@@ -19,8 +19,8 @@ namespace PoeShared.PoeTrade
             [NotNull] IPoeApi api,
             [NotNull] IFactory<PoeQueryInfoProvider, IPoeApi> queryInfoFactory)
         {
-            Guard.ArgumentNotNull(() => api);
-            Guard.ArgumentNotNull(() => queryInfoFactory);
+            Guard.ArgumentNotNull(api, nameof(api));
+            Guard.ArgumentNotNull(queryInfoFactory, nameof(queryInfoFactory));
 
             this.api = api;
             provider = queryInfoFactory.Create(api);
@@ -35,7 +35,7 @@ namespace PoeShared.PoeTrade
 
         public Task<IPoeQueryResult> IssueQuery(IPoeQueryInfo query)
         {
-            Guard.ArgumentNotNull(() => query);
+            Guard.ArgumentNotNull(query, nameof(query));
 
             Log.Instance.Debug($"[PoeApiWrapper, {Name}] Issueing query... {query.DumpToText(Formatting.None)}");
 
@@ -44,7 +44,7 @@ namespace PoeShared.PoeTrade
 
         public void DisposeQuery(IPoeQueryInfo query)
         {
-            Guard.ArgumentNotNull(() => query);
+            Guard.ArgumentNotNull(query, nameof(query));
 
             Log.Instance.Debug($"[PoeApiWrapper, {Name}] Disposing query... {query.DumpToText(Formatting.None)}");
 

@@ -24,8 +24,8 @@ namespace PoeShared.Modularity
             [NotNull] [Microsoft.Practices.Unity.Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {
             this.uiScheduler = uiScheduler;
-            Guard.ArgumentNotNull(() => bgScheduler);
-            Guard.ArgumentNotNull(() => uiScheduler);
+            Guard.ArgumentNotNull(bgScheduler, nameof(bgScheduler));
+            Guard.ArgumentNotNull(uiScheduler, nameof(uiScheduler));
 
             schedulers[WellKnownSchedulers.Background] = bgScheduler;
             schedulers[WellKnownSchedulers.UI] = uiScheduler;
@@ -40,7 +40,7 @@ namespace PoeShared.Modularity
 
         private IScheduler Create(string name)
         {
-            Guard.ArgumentNotNull(() => name);
+            Guard.ArgumentNotNull(name, nameof(name));
 
             Log.Instance.Debug($"[SchedulerProvider.Create '{name}'] Creating new dispatcher");
             var consumer = new TaskCompletionSource<IScheduler>();

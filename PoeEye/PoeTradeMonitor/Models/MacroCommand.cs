@@ -10,7 +10,7 @@ namespace PoeEye.TradeMonitor.Models
 
         protected MacroCommand([NotNull] string commandText)
         {
-            Guard.ArgumentNotNull(() => commandText);
+            Guard.ArgumentNotNull(commandText, nameof(commandText));
 
             CommandText = commandText;
             Label = commandText;
@@ -30,21 +30,21 @@ namespace PoeEye.TradeMonitor.Models
 
         public Match TryToMatch([NotNull] string text, int startIdx)
         {
-            Guard.ArgumentNotNull(() => text);
+            Guard.ArgumentNotNull(text, nameof(text));
 
             return matcher.Match(text, startIdx);
         }
 
         public Match TryToMatch([NotNull] string text)
         {
-            Guard.ArgumentNotNull(() => text);
+            Guard.ArgumentNotNull(text, nameof(text));
 
             return TryToMatch(text, 0);
         }
 
         public string CleanupText([NotNull] string text)
         {
-            Guard.ArgumentNotNull(() => text);
+            Guard.ArgumentNotNull(text, nameof(text));
 
             var match = TryToMatch(text);
             if (!match.Success)

@@ -20,7 +20,7 @@
 
         public HistoricalTradesViewModel([NotNull] IFactory<IPoeTradeViewModel, IPoeItem> poeTradeViewModelFactory)
         {
-            Guard.ArgumentNotNull(() => poeTradeViewModelFactory);
+            Guard.ArgumentNotNull(poeTradeViewModelFactory, nameof(poeTradeViewModelFactory));
 
             this.poeTradeViewModelFactory = poeTradeViewModelFactory;
         }
@@ -35,7 +35,7 @@
 
         public void AddItems(params IPoeItem[] items)
         {
-            Guard.ArgumentNotNull(() => items);
+            Guard.ArgumentNotNull(items, nameof(items));
 
             var viewModels = items.Select(poeTradeViewModelFactory.Create).ToArray();
             ItemsViewModels.AddRange(viewModels);

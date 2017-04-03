@@ -19,10 +19,10 @@ namespace PoeShared.Scaffolding
               where TSource : INotifyPropertyChanged
               where TTarget : IReactiveObject
         {
-            Guard.ArgumentNotNull(() => instance);
-            Guard.ArgumentNotNull(() => propertyName);
-            Guard.ArgumentNotNull(() => sourcePropertyExtractor);
-            Guard.ArgumentNotNull(() => source);
+            Guard.ArgumentNotNull(instance, nameof(instance));
+            Guard.ArgumentNotNull(propertyName, nameof(propertyName));
+            Guard.ArgumentNotNull(sourcePropertyExtractor, nameof(sourcePropertyExtractor));
+            Guard.ArgumentNotNull(source, nameof(source));
 
             return source
                 .WhenAnyValue(sourcePropertyExtractor)

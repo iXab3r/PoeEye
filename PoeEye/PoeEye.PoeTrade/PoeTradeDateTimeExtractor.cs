@@ -24,7 +24,7 @@ namespace PoeEye.PoeTrade
 
         public PoeTradeDateTimeExtractor([NotNull] IClock clock)
         {
-            Guard.ArgumentNotNull(() => clock);
+            Guard.ArgumentNotNull(clock, nameof(clock));
             
             this.clock = clock;
         }

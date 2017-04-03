@@ -36,7 +36,7 @@ namespace PoeWhisperMonitor.Chat
             [NotNull] IPoeTracker tracker,
             [NotNull] ISchedulerProvider schedulerProvider)
         {
-            Guard.ArgumentNotNull(() => tracker);
+            Guard.ArgumentNotNull(tracker, nameof(tracker));
 
             tracker.AddTo(Anchors);
 
@@ -70,7 +70,7 @@ namespace PoeWhisperMonitor.Chat
 
         public async Task<PoeMessageSendStatus> SendMessage(string message, bool terminateByPressingEnter)
         {
-            Guard.ArgumentNotNull(() => message);
+            Guard.ArgumentNotNull(message, nameof(message));
 
             try
             {

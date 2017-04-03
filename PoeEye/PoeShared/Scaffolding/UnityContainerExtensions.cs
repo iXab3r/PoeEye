@@ -33,8 +33,8 @@ namespace PoeShared.Scaffolding
         public static IUnityContainer RegisterSingleton<TFrom, TTo>(this IUnityContainer instance, string name, params InjectionMember[] members)
             where TTo : TFrom
         {
-            Guard.ArgumentNotNull(() => instance);
-            Guard.ArgumentNotNull(() => members);
+            Guard.ArgumentNotNull(instance, nameof(instance));
+            Guard.ArgumentNotNull(members, nameof(members));
             
             return instance.RegisterType<TFrom, TTo>(name, new ContainerControlledLifetimeManager(), members);
         }

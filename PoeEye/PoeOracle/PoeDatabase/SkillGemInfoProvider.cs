@@ -98,7 +98,7 @@ namespace PoeOracle.PoeDatabase
 
             public SkillGemInfo(string rawHtml)
             {
-                Guard.ArgumentNotNull(() => rawHtml);
+                Guard.ArgumentNotNull(rawHtml, nameof(rawHtml));
 
                 this.rawHtml = rawHtml;
                 parser = new CQ(new StringReader(rawHtml));
@@ -154,7 +154,7 @@ namespace PoeOracle.PoeDatabase
 
             public SkillGemExtendedInfo(string rawHtml)
             {
-                Guard.ArgumentNotNull(() => rawHtml);
+                Guard.ArgumentNotNull(rawHtml, nameof(rawHtml));
 
                 this.rawHtml = rawHtml;
                 parser = new CQ(new StringReader(rawHtml));

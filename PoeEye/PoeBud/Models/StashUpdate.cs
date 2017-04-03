@@ -9,8 +9,8 @@ namespace PoeBud.Models
 
         public StashUpdate(IStashItem[] items, IStashTab[] tabs)
         {
-            Guard.ArgumentNotNull(() => items);
-            Guard.ArgumentNotNull(() => tabs);
+            Guard.ArgumentNotNull(items, nameof(items));
+            Guard.ArgumentNotNull(tabs, nameof(tabs));
 
             Items = items;
             Tabs = tabs;

@@ -42,9 +42,9 @@ namespace PoeEye.PoeTrade.ViewModels
             [NotNull] IFactory<IPoeModViewModel, ISuggestionProvider> modsViewModelsFactory,
             [NotNull] IFactory<ISuggestionProvider, IEnumerable<string>> suggestionProviderFactory)
         {
-            Guard.ArgumentNotNull(() => modsViewModelsFactory);
-            Guard.ArgumentNotNull(() => staticData);
-            Guard.ArgumentNotNull(() => suggestionProviderFactory);
+            Guard.ArgumentNotNull(modsViewModelsFactory, nameof(modsViewModelsFactory));
+            Guard.ArgumentNotNull(staticData, nameof(staticData));
+            Guard.ArgumentNotNull(suggestionProviderFactory, nameof(suggestionProviderFactory));
 
             this.modsViewModelsFactory = modsViewModelsFactory;
 
@@ -120,7 +120,7 @@ namespace PoeEye.PoeTrade.ViewModels
 
         private void RemoveModCommandExecuted(IPoeModViewModel modToRemove)
         {
-            Guard.ArgumentNotNull(() => modToRemove);
+            Guard.ArgumentNotNull(modToRemove, nameof(modToRemove));
 
             using (Mods.SuppressChangeNotifications())
             {

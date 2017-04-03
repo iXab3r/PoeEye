@@ -40,14 +40,14 @@ namespace PoeEye.MetroModels
 
         internal static bool IsRegistered(object context)
         {
-            Guard.ArgumentNotNull(() => context);
+            Guard.ArgumentNotNull(context, nameof(context));
             
             return ContextRegistrationIndex.ContainsKey(context);
         }
 
         internal static DependencyObject GetAssociation(object context)
         {
-            Guard.ArgumentNotNull(() => context);
+            Guard.ArgumentNotNull(context, nameof(context));
 
             return ContextRegistrationIndex[context];
         }

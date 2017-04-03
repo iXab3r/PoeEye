@@ -38,10 +38,10 @@ namespace PoeShared.StashApi
             [NotNull] IGearTypeAnalyzer gearTypeAnalyzer,
             bool useSessionId = false)
         {
-            Guard.ArgumentNotNull(() => credentials);
+            Guard.ArgumentNotNull(credentials, nameof(credentials));
             Guard.ArgumentNotNullOrEmpty(() => credentials.UserName);
             Guard.ArgumentNotNullOrEmpty(() => credentials.Password);
-            Guard.ArgumentNotNull(() => gearTypeAnalyzer);
+            Guard.ArgumentNotNull(gearTypeAnalyzer, nameof(gearTypeAnalyzer));
 
             this.credentials = credentials;
             this.gearTypeAnalyzer = gearTypeAnalyzer;

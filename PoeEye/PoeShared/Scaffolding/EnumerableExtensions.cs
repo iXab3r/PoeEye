@@ -24,7 +24,7 @@ namespace PoeShared.Scaffolding
 
         public static IEnumerable<T> ForEach<T>(this IEnumerable<T> enumerable, Action<T> action)
         {
-            Guard.ArgumentNotNull(() => enumerable);
+            Guard.ArgumentNotNull(enumerable, nameof(enumerable));
 
             foreach (var value in enumerable)
             {
@@ -35,7 +35,7 @@ namespace PoeShared.Scaffolding
 
         public static IEnumerable<T> ForEach<T>(this T[] enumerable, Action<T> action)
         {
-            Guard.ArgumentNotNull(() => enumerable);
+            Guard.ArgumentNotNull(enumerable, nameof(enumerable));
 
             foreach (var value in enumerable)
             {

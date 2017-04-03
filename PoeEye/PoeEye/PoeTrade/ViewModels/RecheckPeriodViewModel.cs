@@ -32,7 +32,7 @@ namespace PoeEye.PoeTrade.ViewModels
 
         public RecheckPeriodViewModel([NotNull] IPoeEyeMainConfigProvider configProvider)
         {
-            Guard.ArgumentNotNull(() => configProvider);
+            Guard.ArgumentNotNull(configProvider, nameof(configProvider));
 
             this.WhenAnyValue(x => x.Period)
                 .Where(x => x == TimeSpan.Zero)

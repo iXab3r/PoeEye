@@ -12,7 +12,15 @@ namespace PoeShared.Converters
 {
     public class PoeStashItemToPoeItem : IConverter<IStashItem, IPoeItem>, IConverter<IStashItem, PoeItem>
     {
+        private readonly IClock clock;
         private readonly PriceToCurrencyConverter priceConverter = new PriceToCurrencyConverter();
+
+        public PoeStashItemToPoeItem(IClock clock)
+        {
+            Guard.ArgumentNotNull(clock, nameof(clock));
+
+            this.clock = clock;
+        }
 
         IPoeItem IConverter<IStashItem, IPoeItem>.Convert(IStashItem value)
         {
@@ -21,7 +29,7 @@ namespace PoeShared.Converters
 
         public PoeItem Convert(IStashItem value)
         {
-            Guard.ArgumentNotNull(() => value);
+            Guard.ArgumentNotNull(value, nameof(value));
 
             var result = new PoeItem();
             result.TabName = value.InventoryId;
@@ -32,11 +40,15 @@ namespace PoeShared.Converters
             result.ItemLevel = value.ItemLevel.ToString();
             result.Hash = value.Id;
             result.League = value.League;
-            
+            result.IsCorrupted = value.Corrupted;
+            result.IsUnidentified = !value.Identified;
+            result.Note = value.Note;
+            result.Timestamp = clock.Now;
+
             var itemPrice = string.IsNullOrWhiteSpace(value.Note)
                 ? PoePrice.Empty 
                 : priceConverter.Convert(value.Note);
-            result.Price = itemPrice.IsEmpty
+            result.Price = !itemPrice.IsEmpty
                 ? itemPrice.ToString()
                 : null;
 

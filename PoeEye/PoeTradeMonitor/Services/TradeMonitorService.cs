@@ -35,12 +35,12 @@ namespace PoeEye.TradeMonitor.Services
             [NotNull] IPoeNotifier notifier,
             [NotNull] IPoeMessageParser[] parsers)
         {
-            Guard.ArgumentNotNull(() => configProvider);
-            Guard.ArgumentNotNull(() => whisperService);
-            Guard.ArgumentNotNull(() => audioManager);
-            Guard.ArgumentNotNull(() => priceCalculcator);
-            Guard.ArgumentNotNull(() => notifier);
-            Guard.ArgumentNotNull(() => parsers);
+            Guard.ArgumentNotNull(configProvider, nameof(configProvider));
+            Guard.ArgumentNotNull(whisperService, nameof(whisperService));
+            Guard.ArgumentNotNull(audioManager, nameof(audioManager));
+            Guard.ArgumentNotNull(priceCalculcator, nameof(priceCalculcator));
+            Guard.ArgumentNotNull(notifier, nameof(notifier));
+            Guard.ArgumentNotNull(parsers, nameof(parsers));
 
             this.audioManager = audioManager;
             this.notifier = notifier;

@@ -31,7 +31,7 @@ namespace PoeEye.PoeTrade.Models
 
         public PoePriceCalculcator([NotNull] IPoeEyeMainConfigProvider configProvider)
         {
-            Guard.ArgumentNotNull(() => configProvider);
+            Guard.ArgumentNotNull(configProvider, nameof(configProvider));
 
             configProvider
                 .WhenChanged

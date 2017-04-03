@@ -20,7 +20,7 @@ namespace PoeEye.Config
 
         public GenericConfigProvider([NotNull] IConfigProvider configProvider)
         {
-            Guard.ArgumentNotNull(() => configProvider);
+            Guard.ArgumentNotNull(configProvider, nameof(configProvider));
 
             this.configProvider = configProvider;
             configProvider.ConfigHasChanged
@@ -64,7 +64,7 @@ namespace PoeEye.Config
 
         public void Save(TConfig config)
         {
-            Guard.ArgumentNotNull(() => config);
+            Guard.ArgumentNotNull(config, nameof(config));
 
             configProvider.Save(config);
         }

@@ -9,7 +9,7 @@
     {
         public static string ReadResourceAsString(string path)
         {
-            Guard.ArgumentNotNull(() => path);
+            Guard.ArgumentNotNull(path, nameof(path));
 
             var assembly = Assembly.GetExecutingAssembly();
             return ReadResourceAsString(assembly, path);
@@ -17,8 +17,8 @@
 
         public static string ReadResourceAsString(Assembly assembly, string path)
         {
-            Guard.ArgumentNotNull(() => assembly);
-            Guard.ArgumentNotNull(() => path);
+            Guard.ArgumentNotNull(assembly, nameof(assembly));
+            Guard.ArgumentNotNull(path, nameof(path));
 
             var assemblyName = assembly.GetName().Name;
             var resourcePath = $"{assemblyName}.{path}";

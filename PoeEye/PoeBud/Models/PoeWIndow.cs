@@ -29,7 +29,7 @@ namespace PoeBud.Models
             [NotNull] IUserInteractionsManager userInteractionsManager,
             IntPtr nativeWindowHandle)
         {
-            Guard.ArgumentNotNull(() => userInteractionsManager);
+            Guard.ArgumentNotNull(userInteractionsManager, nameof(userInteractionsManager));
 
             if (nativeWindowHandle == IntPtr.Zero)
             {
@@ -70,7 +70,7 @@ namespace PoeBud.Models
 
         public void SelectStashTabByName(int tabIndex, string[] knownTabs)
         {
-            Guard.ArgumentNotNull(() => knownTabs);
+            Guard.ArgumentNotNull(knownTabs, nameof(knownTabs));
             Guard.ArgumentIsBetween(() => tabIndex, 0, knownTabs.Length - 1, true);
 
             var windowBounds = WindowBounds;

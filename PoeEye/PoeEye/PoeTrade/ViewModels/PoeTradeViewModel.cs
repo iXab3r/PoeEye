@@ -2,6 +2,7 @@
 using PoeEye.Converters;
 using PoeEye.PoeTrade.Common;
 using PoeShared.Audio;
+using PoeShared.Converters;
 using PoeShared.PoeTrade;
 using PoeShared.UI.ViewModels;
 using PoeWhisperMonitor.Chat;
@@ -60,14 +61,14 @@ namespace PoeEye.PoeTrade.ViewModels
             [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler,
             [NotNull] IClock clock)
         {
-            Guard.ArgumentNotNull(() => poeItem);
-            Guard.ArgumentNotNull(() => poePriceCalculcator);
-            Guard.ArgumentNotNull(() => chatService);
-            Guard.ArgumentNotNull(() => notificationsManager);
-            Guard.ArgumentNotNull(() => imageViewModelFactory);
-            Guard.ArgumentNotNull(() => linksViewModelFactory);
-            Guard.ArgumentNotNull(() => uiScheduler);
-            Guard.ArgumentNotNull(() => clock);
+            Guard.ArgumentNotNull(poeItem, nameof(poeItem));
+            Guard.ArgumentNotNull(poePriceCalculcator, nameof(poePriceCalculcator));
+            Guard.ArgumentNotNull(chatService, nameof(chatService));
+            Guard.ArgumentNotNull(notificationsManager, nameof(notificationsManager));
+            Guard.ArgumentNotNull(imageViewModelFactory, nameof(imageViewModelFactory));
+            Guard.ArgumentNotNull(linksViewModelFactory, nameof(linksViewModelFactory));
+            Guard.ArgumentNotNull(uiScheduler, nameof(uiScheduler));
+            Guard.ArgumentNotNull(clock, nameof(clock));
 
             this.chatService = chatService;
             this.notificationsManager = notificationsManager;

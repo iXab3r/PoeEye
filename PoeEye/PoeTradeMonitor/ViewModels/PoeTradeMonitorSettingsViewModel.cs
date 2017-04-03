@@ -26,8 +26,8 @@ namespace PoeEye.TradeMonitor.ViewModels
             [NotNull] IPoeMacroCommandsProvider commandsProvider,
             [NotNull] IAudioNotificationSelectorViewModel audioNotificationSelector)
         {
-            Guard.ArgumentNotNull(() => commandsProvider);
-            Guard.ArgumentNotNull(() => audioNotificationSelector);
+            Guard.ArgumentNotNull(commandsProvider, nameof(commandsProvider));
+            Guard.ArgumentNotNull(audioNotificationSelector, nameof(audioNotificationSelector));
 
             this.commandsProvider = commandsProvider;
             AudioNotificationSelector = audioNotificationSelector;
@@ -56,7 +56,7 @@ namespace PoeEye.TradeMonitor.ViewModels
 
         public void Load(PoeTradeMonitorConfig config)
         {
-            Guard.ArgumentNotNull(() => config);
+            Guard.ArgumentNotNull(config, nameof(config));
 
             loadedConfig = config;
             IsEnabled = config.IsEnabled;

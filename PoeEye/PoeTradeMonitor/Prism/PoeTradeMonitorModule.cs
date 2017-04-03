@@ -18,7 +18,7 @@ namespace PoeEye.TradeMonitor.Prism
 
         public PoeTradeMonitorModule([NotNull] IUnityContainer container)
         {
-            Guard.ArgumentNotNull(() => container);
+            Guard.ArgumentNotNull(container, nameof(container));
 
             this.container = container;
         }

@@ -8,7 +8,7 @@ namespace PoeShared.Scaffolding
     {
         public static ISourceList<T> ToSourceList<T>(this IObservable<IChangeSet<T>> source)
         {
-            Guard.ArgumentNotNull(() => source);
+            Guard.ArgumentNotNull(source, nameof(source));
 
             return new SourceList<T>(source);
         }
