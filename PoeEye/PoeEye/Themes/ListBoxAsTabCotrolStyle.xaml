@@ -61,7 +61,6 @@
                         </Trigger>
 
                         <Trigger Property="IsSelected" Value="True">
-                            <Setter Property="Panel.ZIndex" Value="1" TargetName="PART_Thumb" />
                             <Setter Property="Foreground" Value="{StaticResource AccentColorBrush}" />
                             <Setter Property="BorderBrush" Value="{StaticResource AccentColorBrush}" />
                             <Setter Property="Background" Value="{StaticResource TabBackgroundBrush}"/>
