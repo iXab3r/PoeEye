@@ -80,7 +80,7 @@
                                 <Button Grid.Column="2" Margin="5,0"
                                         Width="24"
                                         Height="24"
-                                        Content="{x:Static net:FontAwesome.close}"
+                                        Content="&#xf00d;"
                                         CommandParameter="{Binding}"
                                         Style="{StaticResource TradeMonitorButtonStyleKey}"
                                         ToolTip="{Binding Text}"

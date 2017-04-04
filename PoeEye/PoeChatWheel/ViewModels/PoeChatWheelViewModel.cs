@@ -231,13 +231,13 @@ namespace PoeChatWheel.ViewModels
             ToActionMenuItem(
                 new RadialMenuItem
                 {
-                    Content = CreateMenuItemContent("Go home", FontAwesome.Net.FontAwesome.home),
+                    Content = CreateMenuItemContent("Go home", "Home"),
                     Tag = $"/hideout"
                 }).AddTo(menuItems);
             ToActionMenuItem(
                 new RadialMenuItem
                 {
-                    Content = CreateMenuItemContent("Reset XP", FontAwesome.Net.FontAwesome.gears),
+                    Content = CreateMenuItemContent("Reset XP", "reset"),
                     Tag = $"/reset_xp"
                 }).AddTo(menuItems);
             using (Items.SuppressChangeNotifications())
@@ -265,7 +265,7 @@ namespace PoeChatWheel.ViewModels
             var characterName = message.Name?.Substring(0, Math.Min(8, message.Name?.Length ?? 0));
             menuItem.Tag = message;
             menuItem.Content = CreateMenuItemContent(
-                $"{characterName}\n\xF017 {timeElapsed.TotalSeconds:F0}s ago", FontAwesome.Net.FontAwesome.user);
+                $"{characterName}\n\xF017 {timeElapsed.TotalSeconds:F0}s ago", "User");
 
             Observable.FromEventPattern<MouseEventHandler, MouseEventArgs>(
                 h => menuItem.MouseEnter += h,
@@ -322,22 +322,22 @@ namespace PoeChatWheel.ViewModels
             {
                 new RadialMenuItem
                 {
-                    Content = CreateMenuItemContent("Invite", FontAwesome.Net.FontAwesome.group),
+                    Content = CreateMenuItemContent("Invite", "Group"),
                     Tag = $"/invite {characterName}"
                 },
                 new RadialMenuItem
                 {
-                    Content = CreateMenuItemContent("Thanks", FontAwesome.Net.FontAwesome.thumbs_up),
+                    Content = CreateMenuItemContent("Thanks", "ThumbsUp"),
                     Tag = $"@{characterName} thanks"
                 },
                 new RadialMenuItem
                 {
-                    Content = CreateMenuItemContent("No thanks", FontAwesome.Net.FontAwesome.paper_plane_o),
+                    Content = CreateMenuItemContent("No thanks", "PaperPlane"),
                     Tag = $"@{characterName} no, thanks"
                 },
                 new RadialMenuItem
                 {
-                    Content = CreateMenuItemContent("Wait", FontAwesome.Net.FontAwesome.refresh),
+                    Content = CreateMenuItemContent("Wait", "Refresh"),
                     Tag = $"@{characterName} please 1-2mins, busy atm"
                 }
             };
@@ -357,7 +357,7 @@ namespace PoeChatWheel.ViewModels
                 Content = new MenuItemViewModel
                 {
                     Text = characterName,
-                    IconText = FontAwesome.Net.FontAwesome.user
+                    IconText = "User"
                 },
                 ToolTip = PrepareMessageHistory(characterName),
             };

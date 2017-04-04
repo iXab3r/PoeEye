@@ -8,7 +8,7 @@
                     xmlns:system="clr-namespace:System;assembly=mscorlib"
                     xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
                     xmlns:models="clr-namespace:PoeOracle.Models"
-                    xmlns:net="clr-namespace:FontAwesome.Net;assembly=FontAwesome.Net">
+                    xmlns:fa="http://schemas.fontawesome.io/icons/">
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Generic.xaml" />
@@ -42,7 +42,7 @@
                             <TextBlock FontSize="14" 
                                        Margin="3"
                                        Style="{StaticResource OracleTextBlockStyleKey}"
-                                       Text="{x:Static net:FontAwesome.search}" />
+                                       Text="&#xf002;"/>
                         </Button.Content>
                     </Button>
                     <TextBlock FontSize="20" Style="{StaticResource OracleTextBlockStyleKey}"

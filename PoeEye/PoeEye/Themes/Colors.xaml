@@ -2,36 +2,39 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:blue="http://www.nuget.org/Blue.MVVM">
 
-  <Color x:Key="PoeTradeRemovedItemColor">#55FF9298</Color>
-  <Color x:Key="PoeTradeNewItemColor">#5592FF98</Color>
+    <Color x:Key="PoeTradeRemovedItemColor">#55FF9298</Color>
+    <Color x:Key="PoeTradeNewItemColor">#5592FF98</Color>
 
-  <Color x:Key="PoeItemElementalStatColor">#FF8CACBC</Color>
-  <Color x:Key="PoeItemPhysicalStatColor">#FFFFFB8C</Color>
+    <Color x:Key="PoeItemElementalStatColor">#FF8CACBC</Color>
+    <Color x:Key="PoeItemPhysicalStatColor">#FFFFFB8C</Color>
 
-  <Color x:Key="PoeItemDexStatColor">#FF29BA55</Color>
-  <Color x:Key="PoeItemStrStatColor">#FFE16043</Color>
-  <Color x:Key="PoeItemIntStatColor">#FF4479A9</Color>
+    <Color x:Key="PoeItemDexStatColor">#FF29BA55</Color>
+    <Color x:Key="PoeItemStrStatColor">#FFE16043</Color>
+    <Color x:Key="PoeItemIntStatColor">#FF4479A9</Color>
 
-  <SolidColorBrush x:Key="PoeTradeRemovedItemBrush" Color="{StaticResource PoeTradeRemovedItemColor}" />
-  <SolidColorBrush x:Key="PoeTradeNewItemBrush" Color="{StaticResource PoeTradeNewItemColor}" />
+    <SolidColorBrush x:Key="PoeTradeRemovedItemBrush" Color="{StaticResource PoeTradeRemovedItemColor}" />
+    <SolidColorBrush x:Key="PoeTradeNewItemBrush" Color="{StaticResource PoeTradeNewItemColor}" />
 
-  <SolidColorBrush x:Key="PoeItemElementalStatBrush" Color="{StaticResource PoeItemElementalStatColor}" />
-  <SolidColorBrush x:Key="PoeItemPhysicalStatBrush" Color="{StaticResource PoeItemPhysicalStatColor}" />
+    <SolidColorBrush x:Key="PoeItemElementalStatBrush" Color="{StaticResource PoeItemElementalStatColor}" />
+    <SolidColorBrush x:Key="PoeItemPhysicalStatBrush" Color="{StaticResource PoeItemPhysicalStatColor}" />
 
 
-  <SolidColorBrush x:Key="PoeItemDexStatBrush" Color="{StaticResource PoeItemDexStatColor}" />
-  <SolidColorBrush x:Key="PoeItemStrStatBrush" Color="{StaticResource PoeItemStrStatColor}" />
-  <SolidColorBrush x:Key="PoeItemIntStatBrush" Color="{StaticResource PoeItemIntStatColor}" />
+    <SolidColorBrush x:Key="PoeItemDexStatBrush" Color="{StaticResource PoeItemDexStatColor}" />
+    <SolidColorBrush x:Key="PoeItemStrStatBrush" Color="{StaticResource PoeItemStrStatColor}" />
+    <SolidColorBrush x:Key="PoeItemIntStatBrush" Color="{StaticResource PoeItemIntStatColor}" />
 
-  <SolidColorBrush x:Key="PoeItemRarityNormalBrush" Color="White" />
-  <SolidColorBrush x:Key="PoeItemRarityMagicBrush" Color="CornflowerBlue" />
-  <SolidColorBrush x:Key="PoeItemRarityRareBrush" Color="Yellow" />
-  <SolidColorBrush x:Key="PoeItemRarityUniqueBrush" Color="OrangeRed" />
+    <SolidColorBrush x:Key="PoeItemRarityNormalBrush" Color="White" />
+    <SolidColorBrush x:Key="PoeItemRarityMagicBrush" Color="CornflowerBlue" />
+    <SolidColorBrush x:Key="PoeItemRarityRareBrush" Color="Yellow" />
+    <SolidColorBrush x:Key="PoeItemRarityUniqueBrush" Color="OrangeRed" />
 
-  <Style x:Key="MetroTextBlockHeaderStyle" TargetType="TextBlock">
-    <Setter Property="FontSize" Value="16"/>
-    <Setter Property="Foreground" Value="{StaticResource LabelTextBrush}" />
-    <Setter Property="VerticalAlignment" Value="Center" />
-  </Style>
+    <SolidColorBrush Color="{StaticResource MenuShadowColor}" Opacity="0.1" x:Key="TabBackgroundBrush"/>
+
+
+    <Style x:Key="MetroTextBlockHeaderStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="16"/>
+        <Setter Property="Foreground" Value="{StaticResource LabelTextBrush}" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
 
 </ResourceDictionary>

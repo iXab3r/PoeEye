@@ -9,10 +9,10 @@
                       xmlns:metroModels="clr-namespace:PoeEye.MetroModels"
                       xmlns:utilities="clr-namespace:PoeEye.Utilities"
                       xmlns:shellViewModels="clr-namespace:PoeEye.PoeTrade.Shell.ViewModels"
-                      xmlns:net="clr-namespace:FontAwesome.Net;assembly=FontAwesome.Net"
                       xmlns:updater="clr-namespace:PoeEye.PoeTrade.Updater"
                       xmlns:dragablz="http://dragablz.net/winfx/xaml/dragablz"
                       xmlns:viewModels="clr-namespace:PoeEye.PoeTrade.ViewModels"
+                      xmlns:fa="http://schemas.fontawesome.io/icons/"
                       mc:Ignorable="d"
                       Title="{Binding MainWindowTitle}"
                       MinWidth="1200"
@@ -76,7 +76,7 @@
                                 Focusable="False"
                                 ToolTip="Force refresh all tabs"
                                 Padding="5"
-                                Content="{x:Static net:FontAwesome.refresh}">
+                                fa:Awesome.Content="Refresh">
                                 <Button.Style>
                                     <Style TargetType="{x:Type Button}" BasedOn="{StaticResource EyeCircleButton}">
                                         <Setter Property="BorderThickness" Value="2" />
@@ -199,7 +199,7 @@
             </Button>
 
             <Button
-                Content="{x:Static net:FontAwesome.folder_open}"
+                fa:Awesome.Content="FolderOpen"
                 FontFamily="{StaticResource FontAwesome}"
                 Margin="5,0"
                 FontWeight="Bold"

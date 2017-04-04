@@ -9,7 +9,8 @@
                     xmlns:utilities="clr-namespace:PoeEye.Utilities"
                     xmlns:wpf="clr-namespace:PoeShared.Scaffolding.WPF;assembly=PoeShared"
                     xmlns:poeTrade1="clr-namespace:PoeEye.PoeTrade.Common"
-                    xmlns:controls="clr-namespace:PoeShared.Scaffolding.WPF.Controls;assembly=PoeShared">
+                    xmlns:controls="clr-namespace:PoeShared.Scaffolding.WPF.Controls;assembly=PoeShared"
+                    xmlns:fa="http://schemas.fontawesome.io/icons/">
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Converters.xaml" />
@@ -487,7 +488,7 @@
                       Command="{Binding CopyPrivateMessageToClipboardCommand}"
                       Width="30" Height="30" Style="{StaticResource MetroCircleButtonStyle}"
                       FontFamily="{DynamicResource FontAwesome}"
-                      Content="{x:Static net:FontAwesome.clipboard}">
+                      fa:Awesome.Content="Clipboard">
                 <Button.InputBindings>
                   <MouseBinding MouseAction="RightClick" 
                                 Command="{Binding SendPrivateMessageCommand}"

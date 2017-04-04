@@ -27,8 +27,6 @@
   <SolidColorBrush x:Key="TradeMonitorTitleBackgroundBrushKey" Color="{StaticResource TradeMonitorTitleBackgroundColorKey}"/>
   <SolidColorBrush x:Key="TradeMonitorBackgroundBrushKey" Color="{StaticResource TradeMonitorBackgroundColorKey}"/>
 
-  <FontFamily x:Key="FontAwesome">pack://application:,,,/FontAwesome.Net;component/Fonts/#FontAwesome</FontFamily>
-
   <Style TargetType="{x:Type Button}" x:Key="TradeMonitorButtonStyleKey" BasedOn="{StaticResource {x:Type Button}}">
     <Setter Property="FontFamily" Value="{StaticResource FontAwesome}" />
     <Setter Property="FontSize" Value="14" />

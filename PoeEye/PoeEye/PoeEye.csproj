@@ -127,8 +127,8 @@
       <HintPath>..\packages\Exceptionless.Wpf.3.3.1590\lib\net45\Exceptionless.Wpf.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="FontAwesome.Net, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\FontAwesomeDotNet.1.0\lib\FontAwesome.Net.dll</HintPath>
+    <Reference Include="FontAwesome.WPF, Version=4.7.0.37774, Culture=neutral, PublicKeyToken=0758b07a11a4f466, processorArchitecture=MSIL">
+      <HintPath>..\packages\FontAwesome.WPF.4.7.0.9\lib\net40\FontAwesome.WPF.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Guards, Version=1.0.0.0, Culture=neutral, PublicKeyToken=ac6aedb73a72f46e, processorArchitecture=MSIL">

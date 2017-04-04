@@ -8,8 +8,6 @@
         <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Styles.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
-    <FontFamily x:Key="FontAwesome">pack://application:,,,/FontAwesome.Net;component/Fonts/#FontAwesome</FontFamily>
-
     <DataTemplate DataType="{x:Type viewModels:PoeBudViewModel}">
         <Grid>
 

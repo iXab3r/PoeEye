@@ -6,8 +6,6 @@
         <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Generic.xaml" />
     </ResourceDictionary.MergedDictionaries>
     
-    <FontFamily x:Key="FontAwesome">pack://application:,,,/FontAwesome.Net;component/Fonts/#FontAwesome</FontFamily>
-
     <Style TargetType="{x:Type Button}" x:Key="OracleButtonStyleKey">
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="Focusable" Value="False"/>
