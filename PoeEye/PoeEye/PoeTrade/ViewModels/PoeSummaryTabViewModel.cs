@@ -9,6 +9,7 @@ using DynamicData.Controllers;
 using Microsoft.Practices.Unity;
 using PoeShared;
 using PoeShared.Audio;
+using PoeShared.Common;
 using PoeShared.Prism;
 using ReactiveUI.Legacy;
 

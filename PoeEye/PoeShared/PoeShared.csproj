@@ -240,6 +240,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Common\PoeTradeState.cs" />
     <Compile Include="Converters\BoolInversionConverter.cs" />
     <Compile Include="Converters\PoeStashItemToPoeItem.cs" />
     <Compile Include="Modularity\ISchedulerProvider.cs" />
@@ -251,6 +252,7 @@
     <Compile Include="PoeTrade\IPoePriceCalculcator.cs" />
     <Compile Include="Scaffolding\ChangeSetExtensions.cs" />
     <Compile Include="Scaffolding\DisposableExtensions.cs" />
+    <Compile Include="Scaffolding\PoeItemExtensions.cs" />
     <Compile Include="Scaffolding\ReactiveObjectExtensions.cs" />
     <Compile Include="Scaffolding\WPF\EnableDragHelper.cs" />
     <Compile Include="StashApi\DataTypes\PoeItemRarityWrapper.cs" />

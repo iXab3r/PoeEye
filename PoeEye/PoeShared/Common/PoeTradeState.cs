@@ -1,6 +1,6 @@
-﻿namespace PoeEye.PoeTrade.Common
+namespace PoeShared.Common
 {
-    internal enum PoeTradeState
+    public enum PoeTradeState
     {
         Unknown,
         New,

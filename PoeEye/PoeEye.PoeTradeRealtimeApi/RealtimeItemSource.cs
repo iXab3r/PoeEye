@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Data;
 using System.Linq;
 using System.Net;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using Guards;
@@ -18,12 +20,13 @@ using PoeShared.PoeTrade;
 using PoeShared.PoeTrade.Query;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
+using PoeShared.StashApi.DataTypes;
 using Stateless;
 using TypeConverter;
 
 namespace PoeEye.PoeTradeRealtimeApi
 {
-    internal sealed class RealtimeItemSource : IRealtimeItemSource
+    internal sealed class RealtimeItemSource : DisposableReactiveObject, IRealtimeItemSource
     {
         private static readonly string PoeTradeSearchUri = @"http://poe.trade/search";
         private static readonly string PoeTradeUri = @"http://poe.trade";
@@ -39,7 +42,9 @@ namespace PoeEye.PoeTradeRealtimeApi
         private readonly StateMachine<State, Trigger>.TriggerWithParameters<string> toNextLiveQueryTransitionTrigger;
         private readonly StateMachine<State, Trigger>.TriggerWithParameters<Uri> toLiveQueryTransitionTrigger;
 
-        private readonly ICollection<IPoeItem> itemsList = new List<IPoeItem>();
+        private readonly ConcurrentDictionary<string, IPoeItem> itemsList = new ConcurrentDictionary<string, IPoeItem>();
+        private readonly string queryLeague;
+        private readonly SerialDisposable liveAnchors = new SerialDisposable();
 
         private Uri liveQueryUri;
         private string nextLiveQueryId;
@@ -59,6 +64,9 @@ namespace PoeEye.PoeTradeRealtimeApi
 
             this.clientFactory = clientFactory;
             this.parser = parser;
+
+            liveAnchors.AddTo(Anchors);
+            Disposable.Create(() => queryStateMachine.Fire(Trigger.Dispose)).AddTo(Anchors);
 
             queryStateMachine
                 .Configure(State.Created)
@@ -91,6 +99,7 @@ namespace PoeEye.PoeTradeRealtimeApi
             Log.Instance.Debug($"[RealtimeItemsSource..ctor] FSM:\n {queryStateMachine.ToDotGraph()}");
 
             Log.Instance.Debug($"[RealtimeItemsSource..ctor] Constructing query out of supplied data: {queryInfo.DumpToText(Formatting.None)}");
+            queryLeague = queryInfo.League;
             var query = queryInfoToQueryConverter.Convert(queryInfo);
             queryPostData = queryToPostConverter.Convert(query);
             Log.Instance.Debug($"[RealtimeItemsSource..ctor] Post data for supplied query has been constructed:\n Query: {queryInfo.DumpToText(Formatting.None)}\n Post: {queryPostData.DumpToText(Formatting.None)}");
@@ -118,7 +127,7 @@ namespace PoeEye.PoeTradeRealtimeApi
 
             return new PoeQueryResult()
             {
-                ItemsList = itemsList.ToArray(),
+                ItemsList = itemsList.Values.ToArray(),
             };
         }
 
@@ -147,6 +156,7 @@ namespace PoeEye.PoeTradeRealtimeApi
             ClearItemList();
             SetNextLiveQueryId(null);
             SetLiveQueryUri(null);
+            liveAnchors.Disposable = null;
         }
 
         private void SendInitialRequest()
@@ -158,9 +168,11 @@ namespace PoeEye.PoeTradeRealtimeApi
                 .Select(parser.ParseQueryResponse)
                 .ToTask()
                 .Result;
-            Log.Instance.Debug($"[RealtimeItemsSource.GetResult] Initial update contains {data.ItemsList.Length} item(s)");
 
-            data.ItemsList.ToList().ForEach(itemsList.Add);
+            var validItems = data.ItemsList.EmptyIfNull().Where(x => !string.IsNullOrWhiteSpace(x.Hash)).ToArray();
+            Log.Instance.Debug($"[RealtimeItemsSource.GetResult] Initial update contains {data.ItemsList.Length} item(s), of which {validItems.Length} are valid");
+
+            validItems.ForEach(x => itemsList[x.Hash] = x);
 
             ProcessInitialRequest(data);
         }
@@ -190,10 +202,10 @@ namespace PoeEye.PoeTradeRealtimeApi
             var client = clientFactory
                 .Create();
 
-            client.Cookies.Add(new Cookie("league", "Prophecy", @"/", "poe.trade"));
+            client.Cookies.Add(new Cookie("league", queryLeague, @"/", "poe.trade"));
             client.Cookies.Add(new Cookie("live_notify_sound", "0", @"/", "poe.trade"));
             client.Cookies.Add(new Cookie("live_notify_browser", "0", @"/", "poe.trade"));
-            client.Cookies.Add(new Cookie("live_frequency", "90", @"/", "poe.trade"));
+            client.Cookies.Add(new Cookie("live_frequency", "60", @"/", "poe.trade"));
 
             try
             {
@@ -217,8 +229,19 @@ namespace PoeEye.PoeTradeRealtimeApi
                 if (!string.IsNullOrWhiteSpace(itemsData))
                 {
                     var data = parser.ParseQueryResponse(itemsData);
-                    Log.Instance.Debug($"[RealtimeItemsSource.Live] Extracted {data.ItemsList.Length} from live query response(expected: {itemsCount})");
-                    data.ItemsList.ToList().ForEach(itemsList.Add);
+
+                    var validItems = data.ItemsList.EmptyIfNull().Where(x => !string.IsNullOrWhiteSpace(x.Hash)).ToArray();
+                    Log.Instance.Debug($"[RealtimeItemsSource.Live] Extracted {data.ItemsList.Length} from live query response(expected: {itemsCount}), of which {validItems.Length} are valid");
+
+                    var itemsToRemove = validItems.Where(x => x.ItemState == PoeTradeState.Removed).ToArray();
+                    var itemsToAdd = validItems.Where(x => x.ItemState != PoeTradeState.Removed).ToArray();
+
+                    Log.Instance.Debug($"[RealtimeItemsSource.Live] Items to add: {itemsToAdd.Length}, items to remove: {itemsToRemove.Length}, current list size: {itemsList.Count}");
+
+                    IPoeItem trash;
+                    itemsToRemove.ForEach(x => itemsList.TryRemove(x.Hash, out trash));
+                    itemsToAdd.ForEach(x => itemsList[x.Hash] = x);
+                    Log.Instance.Debug($"[RealtimeItemsSource.Live] Resulting list size: {itemsList.Count}");
                 }
 
                 queryStateMachine.Fire(toNextLiveQueryTransitionTrigger, nextId);
@@ -256,11 +279,6 @@ namespace PoeEye.PoeTradeRealtimeApi
             LiveQuerySucceeded,
             LiveQueryFailed,
             Dispose
-        }
-
-        public void Dispose()
-        {
-            queryStateMachine.Fire(Trigger.Dispose);
         }
     }
 }

@@ -417,7 +417,6 @@
     <Compile Include="Utilities\SetPropertyAction.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="PoeTrade\Common\PoeTradeState.cs" />
     <Compile Include="PoeTrade\ViewModels\PoeTradeViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\PoeTradesListViewModel.cs" />
     <Compile Include="Prism\UiRegistrations.cs" />

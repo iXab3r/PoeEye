@@ -9,7 +9,7 @@ namespace PoeEye.PoeTradeRealtimeApi.Prism
         protected override void Initialize()
         {
             Container
-                .RegisterType<IRealtimeItemSource, RealtimeItemSource>();
+                .RegisterType<IRealtimeItemSource, WebSocketRealtimeItemSource>();
 
             Container
                 .RegisterSingleton<IPoeApi, PoeTradeRealtimeApi>(typeof(PoeTradeRealtimeApi).FullName);

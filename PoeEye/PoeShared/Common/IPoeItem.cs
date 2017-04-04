@@ -20,8 +20,6 @@ namespace PoeShared.Common
 
         string UserIgn { get; }
 
-        bool UserIsOnline { get; }
-
         string Price { get; }
 
         string League { get; }
@@ -70,11 +68,15 @@ namespace PoeShared.Common
 
         DateTime? FirstSeen { get; }
 
+        bool UserIsOnline { get; }
+
         bool IsCorrupted { get; }
 
         bool IsUnidentified { get; }
 
         bool IsMirrored { get; }
+
+        PoeTradeState ItemState { get; }
 
         PoeItemRarity Rarity { get; }
 

@@ -19,6 +19,8 @@ namespace PoeShared.Communications
     internal sealed class GenericHttpClient : IHttpClient
     {
         private readonly IConverter<NameValueCollection, string> nameValueConverter;
+        private WebHeaderCollection customHeaders = new WebHeaderCollection();
+        private CookieCollection cookies = new CookieCollection();
 
         public GenericHttpClient(
             [NotNull] IConverter<NameValueCollection, string> nameValueConverter)
@@ -28,7 +30,21 @@ namespace PoeShared.Communications
             this.nameValueConverter = nameValueConverter;
         }
 
-        public CookieCollection Cookies { get; set; } = new CookieCollection();
+        public CookieCollection Cookies
+        {
+            get { return cookies; }
+            set { cookies = value ?? new CookieCollection(); }
+        }
+
+        public WebHeaderCollection CustomHeaders
+        {
+            get { return customHeaders; }
+            set { customHeaders = value ?? new WebHeaderCollection(); }
+        }
+
+        public string Referer { get; set; }
+
+        public string UserAgent { get; set; }
 
         public IWebProxy Proxy { get; set; }
 
@@ -60,14 +76,14 @@ namespace PoeShared.Communications
             Log.Instance.Debug($"[HttpClient] Querying uri '{uri}' (GET)");
 
             var httpClient = WebRequest.CreateHttp(uri);
+
             httpClient.CookieContainer = new CookieContainer();
-            if (Cookies != null)
-            {
-                httpClient.CookieContainer.Add(Cookies);
-            }
+            httpClient.CookieContainer.Add(Cookies);
+            httpClient.Headers.Add(CustomHeaders);
+            httpClient.Referer = Referer;
+            httpClient.UserAgent = UserAgent;
+
             httpClient.Method = WebRequestMethods.Http.Get;
-
-
             var rawResponse = IssueRequest(httpClient, string.Empty);
 
             return rawResponse;
@@ -80,11 +96,13 @@ namespace PoeShared.Communications
             Log.Instance.Trace($"[HttpClient] Splitted POST data dump: {postData.SplitClean('&').DumpToText()}");
 
             var httpClient = WebRequest.CreateHttp(uri);
+
             httpClient.CookieContainer = new CookieContainer();
-            if (Cookies != null)
-            {
-                httpClient.CookieContainer.Add(Cookies);
-            }
+            httpClient.CookieContainer.Add(Cookies);
+            httpClient.Headers.Add(CustomHeaders);
+            httpClient.Referer = Referer;
+            httpClient.UserAgent = UserAgent;
+
             httpClient.ContentType = "application/x-www-form-urlencoded";
             httpClient.Method = WebRequestMethods.Http.Post;
 
@@ -112,7 +130,7 @@ namespace PoeShared.Communications
                 }
             }
 
-            var response = (HttpWebResponse) httpClient.GetResponse();
+            var response = (HttpWebResponse)httpClient.GetResponse();
             var responseStream = response.GetResponseStream();
 
             var rawResponse = string.Empty;
@@ -136,7 +154,7 @@ namespace PoeShared.Communications
                 return;
             }
 
-            throw new HttpException((int) response.StatusCode, $"Wrong status code, expected 200 OK, got {response.StatusCode}");
+            throw new HttpException((int)response.StatusCode, $"Wrong status code, expected 200 OK, got {response.StatusCode}");
         }
     }
 }

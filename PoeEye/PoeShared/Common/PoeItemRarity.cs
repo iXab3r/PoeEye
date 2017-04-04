@@ -6,6 +6,7 @@
         Normal,
         Magic,
         Rare,
-        Unique
+        Unique,
+        Legacy,
     }
 }

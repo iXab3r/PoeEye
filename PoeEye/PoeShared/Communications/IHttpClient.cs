@@ -8,9 +8,15 @@ namespace PoeShared.Communications
 {
     public interface IHttpClient
     {
-        CookieCollection Cookies { get; set; }
+        CookieCollection Cookies { [NotNull] get; [NotNull] set; }
 
-        IWebProxy Proxy { get; set; }
+        IWebProxy Proxy { [CanBeNull] get; [CanBeNull] set; }
+
+        string Referer { [CanBeNull] get; [CanBeNull] set; }
+
+        string UserAgent { [CanBeNull] get; [CanBeNull] set; }
+
+        WebHeaderCollection CustomHeaders { [NotNull] get; [NotNull] set; }
 
         [NotNull]
         IObservable<string> Post([NotNull] string uri, [NotNull] NameValueCollection args);

@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using System.Windows;
 using PoeShared.Scaffolding;
 
@@ -200,7 +201,6 @@ namespace PoeEye.PoeTrade
                 UserIsOnline = parser["tr[class=bottom-row] span[class~=success]"].Any(),
                 Price = parser.Attr("data-buyout"),
                 League = parser.Attr("data-league"),
-                Hash = parser["span[class=click-button]"]?.Attr("data-hash"),
                 ThreadId = parser["span[class=click-button]"]?.Attr("data-thread"),
                 Note = parser["span[class=item-note]"]?.Text(),
                 Quality = parser["td[class=table-stats] td[data-name=q]"]?.Text(),
@@ -226,6 +226,18 @@ namespace PoeEye.PoeTrade
                 TabName = parser.Attr("data-tab"),
                 Raw = row.Render(),
             };
+
+            var className = parser["tbody[class^=\"item item-live\"]"]?.Attr("class") ?? string.Empty;
+            result.ItemState = className.IndexOf("item-gone", StringComparison.OrdinalIgnoreCase) >= 0
+                ? PoeTradeState.Removed
+                : PoeTradeState.New;
+
+            result.Hash = parser["span[class=click-button]"]?.Attr("data-hash");
+            if (string.IsNullOrWhiteSpace(result.Hash))
+            {
+                result.Hash = ParseItemId(className);
+            }
+
             result.SuggestedPrivateMessage = PrepareTradeMessage(result);
             TrimProperties(result);
             return result;
@@ -265,6 +277,12 @@ namespace PoeEye.PoeTrade
                 : result;
         }
 
+        private static string ParseItemId(string rawValue)
+        {
+            var match = Regex.Match(rawValue, @"item-live-(?'id'[\d,a-z]+)", RegexOptions.IgnoreCase);
+            return match.Success ? match.Groups["id"].Value : string.Empty;
+        }
+
         private static void TrimProperties<T>(T source)
         {
             var propertiesToProcess = typeof(T)
@@ -301,6 +319,8 @@ namespace PoeEye.PoeTrade
                     return PoeItemRarity.Rare;
                 case "title itemframe3":
                     return PoeItemRarity.Unique;
+                case "title itemframe4":
+                    return PoeItemRarity.Legacy;
                 default:
                     return PoeItemRarity.Unknown;
             }

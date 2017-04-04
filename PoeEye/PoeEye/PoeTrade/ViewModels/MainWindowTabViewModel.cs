@@ -15,6 +15,7 @@ using PoeEye.PoeTrade.Common;
 using PoeEye.PoeTrade.Models;
 using PoeShared;
 using PoeShared.Audio;
+using PoeShared.Common;
 using PoeShared.PoeTrade;
 using PoeShared.PoeTrade.Query;
 using PoeShared.Prism;
@@ -185,11 +186,12 @@ namespace PoeEye.PoeTrade.ViewModels
 
         public PoeEyeTabConfig Save()
         {
+            var query = Query;
             return new PoeEyeTabConfig
             {
                 RecheckTimeout = RecheckPeriod.Period,
                 IsAutoRecheckEnabled = RecheckPeriod.IsAutoRecheckEnabled,
-                QueryInfo = Query.PoeQueryBuilder(),
+                QueryInfo = query == null ? new PoeQueryInfo() : query.PoeQueryBuilder(),
                 NotificationType = AudioNotificationSelector.SelectedValue,
                 ApiModuleId = ApiSelector.SelectedModule.Id.ToString()
             };

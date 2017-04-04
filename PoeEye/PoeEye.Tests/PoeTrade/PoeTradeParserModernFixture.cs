@@ -1,4 +1,6 @@
-﻿namespace PoeEye.Tests.PoeTrade
+﻿using PoeShared.Common;
+
+namespace PoeEye.Tests.PoeTrade
 {
     using System.Linq;
 
@@ -65,6 +67,39 @@
 
             //Then
             result.ModsList.Length.ShouldBe(619);
+        }
+
+
+        [Test]
+        public void ShouldParseLiveResultNewItem()
+        {
+            //Given
+            var rawHtml = TestDataProvider.ModernLiveResultNewItem;
+            var instance = CreateInstance();
+
+            //When
+            var result = instance.ParseQueryResponse(rawHtml);
+
+            //Then
+            var item = result.ItemsList.Single();
+            item.ItemState.ShouldBe(PoeTradeState.New);
+            item.Hash.ShouldBe("dc01dfc3465383e3082a0ffc5f4f7268");
+        }
+
+        [Test]
+        public void ShouldParseLiveResultItemGone()
+        {
+            //Given
+            var rawHtml = TestDataProvider.ModernLiveResultItemGone;
+            var instance = CreateInstance();
+
+            //When
+            var result = instance.ParseQueryResponse(rawHtml);
+
+            //Then
+            var item = result.ItemsList.Single();
+            item.ItemState.ShouldBe(PoeTradeState.Removed);
+            item.Hash.ShouldBe("dc01dfc3465383e3082a0ffc5f4f7268");
         }
     }
 }

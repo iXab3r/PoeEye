@@ -87,5 +87,7 @@ namespace PoeShared.Common
         public IPoeLinksInfo Links { get; set; }
 
         public DateTime Timestamp { get; set; }
+
+        public PoeTradeState ItemState { get; set; }
     }
 }

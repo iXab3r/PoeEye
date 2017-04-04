@@ -282,18 +282,18 @@
                 <Button.Style>
                   <Style TargetType="Button">
                     <Style.Triggers>
-                      <DataTrigger Binding="{Binding TradeState}" Value="{x:Static poeTrade1:PoeTradeState.New}">
+                      <DataTrigger Binding="{Binding TradeState}" Value="{x:Static common:PoeTradeState.New}">
                         <Setter Property="Background" Value="{StaticResource PoeTradeNewItemBrush}" />
                         <Setter Property="BorderThickness" Value="1" />
                       </DataTrigger>
-                      <DataTrigger Binding="{Binding TradeState}" Value="{x:Static poeTrade1:PoeTradeState.Removed}">
+                      <DataTrigger Binding="{Binding TradeState}" Value="{x:Static common:PoeTradeState.Removed}">
                         <Setter Property="Background" Value="{StaticResource PoeTradeRemovedItemBrush}" />
                         <Setter Property="BorderThickness" Value="1" />
                       </DataTrigger>
-                      <DataTrigger Binding="{Binding TradeState}" Value="{x:Static poeTrade1:PoeTradeState.Normal}">
+                      <DataTrigger Binding="{Binding TradeState}" Value="{x:Static common:PoeTradeState.Normal}">
                         <Setter Property="Visibility" Value="Collapsed" />
                       </DataTrigger>
-                      <DataTrigger Binding="{Binding TradeState}" Value="{x:Static poeTrade1:PoeTradeState.Unknown}">
+                      <DataTrigger Binding="{Binding TradeState}" Value="{x:Static common:PoeTradeState.Unknown}">
                         <Setter Property="Visibility" Value="Collapsed" />
                       </DataTrigger>
                     </Style.Triggers>
@@ -303,7 +303,7 @@
                   <i:EventTrigger EventName="Click">
                     <utilities:SetPropertyAction PropertyName="TradeState" TargetObject="{Binding}">
                       <utilities:SetPropertyAction.PropertyValue>
-                        <poeTrade1:PoeTradeState>Normal</poeTrade1:PoeTradeState>
+                        <common:PoeTradeState>Normal</common:PoeTradeState>
                       </utilities:SetPropertyAction.PropertyValue>
                     </utilities:SetPropertyAction>
                   </i:EventTrigger>

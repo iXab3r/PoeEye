@@ -34,7 +34,7 @@ namespace PoeEye.PoeTrade.ViewModels
         {
             Guard.ArgumentNotNull(moduleInfo, nameof(moduleInfo));
 
-            SelectedModule = FindModuleById(moduleInfo);
+            SelectedModule = FindModuleById(moduleInfo) ?? ModulesList.First();
         }
 
         private IPoeApiWrapper FindModuleById(string moduleInfo)
