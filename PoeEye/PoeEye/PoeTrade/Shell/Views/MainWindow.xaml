@@ -11,6 +11,8 @@
                       xmlns:shellViewModels="clr-namespace:PoeEye.PoeTrade.Shell.ViewModels"
                       xmlns:net="clr-namespace:FontAwesome.Net;assembly=FontAwesome.Net"
                       xmlns:updater="clr-namespace:PoeEye.PoeTrade.Updater"
+                      xmlns:dragablz="http://dragablz.net/winfx/xaml/dragablz"
+                      xmlns:viewModels="clr-namespace:PoeEye.PoeTrade.ViewModels"
                       mc:Ignorable="d"
                       Title="{Binding MainWindowTitle}"
                       MinWidth="1200"
@@ -53,7 +55,6 @@
                 </Grid.ColumnDefinitions>
 
                 <Expander Grid.Column="0" ExpandDirection="Right" IsExpanded="True" Margin="0">
-
                     <Expander.Header>
                         <StackPanel Orientation="Vertical">
                             <TextBlock FontSize="14"
@@ -90,15 +91,31 @@
                             </Button>
                         </StackPanel>
                     </Expander.Header>
-                    <ListBox
-                        ItemsSource="{Binding TabsList}"
-                        SelectedItem="{Binding SelectedTab}"
-                        Style="{StaticResource ListBoxAsTabsList}"
-                        ItemTemplate="{StaticResource MainWindowTabItemViewTemplate}">
-                        <ListBox.Resources>
-                            <Style TargetType="ListBoxItem" BasedOn="{StaticResource ListBoxItemForTabsList}" />
-                        </ListBox.Resources>
-                    </ListBox>
+
+                    <dragablz:TabablzControl Margin="0" 
+                                   Focusable="False" IsTabStop="False"
+                                   ItemsSource="{Binding TabsList}"
+                                   TabStripPlacement="Left"
+                                   BorderThickness="0"
+                                   Background="{x:Null}"
+                                   SelectedItem="{Binding SelectedTab}"
+                                   VirtualizingPanel.IsVirtualizing="False"
+                                   VirtualizingPanel.IsContainerVirtualizable="False"
+                                   Style="{StaticResource DragablzVerticalTabablzControl}"
+                                   HeaderItemTemplate="{StaticResource MainWindowTabItemViewTemplate}">
+
+                        <dragablz:TabablzControl.ItemContainerStyle>
+                            <Style TargetType="{x:Type dragablz:DragablzItem}" BasedOn="{StaticResource DragablzTabItemVerticalStyle}">
+                                <Setter Property="Width" Value="350" />
+                                <Setter Property="BorderThickness" Value="0,2,0,2" />
+                                <Setter Property="BorderBrush" Value="Transparent" />
+                            </Style>
+                        </dragablz:TabablzControl.ItemContainerStyle>
+
+                        <dragablz:TabablzControl.ContentTemplate>
+                            <DataTemplate DataType="{x:Type viewModels:IMainWindowTabViewModel}"/>
+                        </dragablz:TabablzControl.ContentTemplate>
+                    </dragablz:TabablzControl>
                 </Expander>
 
                 <Image Grid.Column="1" Source="pack://application:,,,/Resources/mainIcon.png" Opacity="0.2" />

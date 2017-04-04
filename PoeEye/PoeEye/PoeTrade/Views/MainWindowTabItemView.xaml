@@ -5,7 +5,8 @@
                     xmlns:viewModels="clr-namespace:PoeEye.PoeTrade.ViewModels"
                     xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
                     xmlns:sharedControls="clr-namespace:PoeShared.Scaffolding.WPF.Controls;assembly=PoeShared"
-                    xmlns:wpf="clr-namespace:PoeShared.Scaffolding.WPF;assembly=PoeShared">
+                    xmlns:wpf="clr-namespace:PoeShared.Scaffolding.WPF;assembly=PoeShared"
+                    xmlns:dragablz="http://dragablz.net/winfx/xaml/dragablz">
   <DataTemplate DataType="{x:Type viewModels:MainWindowTabViewModel}" x:Key="MainWindowTabItemViewTemplate">
     <DataTemplate.Resources>
       <Style TargetType="{x:Type Button}" BasedOn="{StaticResource EyeCircleButton}" x:Key="AutoRecheckButtonStyle">
@@ -157,7 +158,7 @@
                 Style="{StaticResource EyeCircleButton}"
                 HorizontalAlignment="Right"
                 VerticalAlignment="Top"
-                Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type ListBox}}, Path=DataContext.CloseTabCommand}"
+                Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type dragablz:TabablzControl}}, Path=DataContext.CloseTabCommand}"
                 CommandParameter="{Binding}"
                 FontSize="10"
                 Content="{x:Static net:FontAwesome.close}" />

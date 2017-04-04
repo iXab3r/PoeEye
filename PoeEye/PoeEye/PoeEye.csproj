@@ -107,6 +107,10 @@
       <HintPath>..\packages\DeltaCompressionDotNet.1.0.0\lib\net45\DeltaCompressionDotNet.PatchApi.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Dragablz, Version=0.0.3.186, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Dragablz.0.0.3.186\lib\net45\Dragablz.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="DynamicData, Version=4.11.1.1203, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\DynamicData.4.11.1.1203\lib\net45\DynamicData.dll</HintPath>
       <Private>True</Private>
