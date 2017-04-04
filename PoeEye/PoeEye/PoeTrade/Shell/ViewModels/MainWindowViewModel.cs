@@ -147,7 +147,7 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
 
             LoadConfig();
 
-            if (!TabsList.Any())
+            if (tabsListSource.Count == 0)
             {
                 CreateAndAddTab();
             }

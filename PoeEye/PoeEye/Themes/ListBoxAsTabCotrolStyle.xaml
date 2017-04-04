@@ -1,12 +1,12 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:dragablz="http://dragablz.net/winfx/xaml/dragablz"
-                    xmlns:net="clr-namespace:FontAwesome.Net;assembly=FontAwesome.Net"
                     xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
                     xmlns:utilities="clr-namespace:PoeEye.Utilities"
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
 
-    <Style x:Key="DragablzTabItemVerticalStyle" TargetType="{x:Type dragablz:DragablzItem}">
+    <Style x:Key="DragablzTabItemVerticalStyle" TargetType="{x:Type dragablz:DragablzItem}" >
+        <Setter Property="OverridesDefaultStyle" Value="True"/>
         <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual}" />
         <Setter Property="BorderBrush" Value="{StaticResource ControlBorderBrush}" />
         <Setter Property="Margin" Value="0" />
@@ -19,6 +19,8 @@
         <Setter Property="Panel.ZIndex" Value="0" />
         <Setter Property="Focusable" Value="False" />
         <Setter Property="IsTabStop" Value="False" />
+        <Setter Property="Canvas.Left" Value="{Binding X, RelativeSource={RelativeSource Self}}" />
+        <Setter Property="Canvas.Top" Value="{Binding Y, RelativeSource={RelativeSource Self}}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type dragablz:DragablzItem}">
@@ -35,6 +37,11 @@
                                     Opacity="0" />
                         </Border>
 
+                        <Thumb x:Name="PART_Thumb" 
+                               VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
+                               Style="{StaticResource InvisibleThumbStyle}">
+                        </Thumb>
+
                         <ContentPresenter Content="{TemplateBinding ContentControl.Content}"
                                           ContentTemplate="{TemplateBinding ContentControl.ContentTemplate}"
                                           ContentStringFormat="{TemplateBinding ContentControl.ContentStringFormat}"
@@ -44,49 +51,7 @@
                                           x:Name="contentPresenter"
                                           Margin="{TemplateBinding Control.Padding}">
 
-                            <i:Interaction.Triggers>
-                                <i:EventTrigger EventName="MouseLeftButtonDown">
-                                    <utilities:SetPropertyAction PropertyName="SelectedItem"
-                                                                 PropertyValue="{Binding}"
-                                                                 TargetObject="{Binding Path=., RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type dragablz:TabablzControl}}}" />
-                                </i:EventTrigger>
-                            </i:Interaction.Triggers>
-
                         </ContentPresenter>
-
-                        <Thumb x:Name="PART_Thumb" Width="12"
-                               VerticalAlignment="Stretch" HorizontalAlignment="Left"
-                               Padding="0,0,3,0"
-                               VerticalContentAlignment="Stretch" HorizontalContentAlignment="Left">
-                            <Thumb.Style>
-                                <Style TargetType="{x:Type Thumb}">
-                                    <Setter Property="Visibility" Value="Hidden" />
-                                    <Setter Property="Template">
-                                        <Setter.Value>
-                                            <ControlTemplate TargetType="{x:Type Thumb}">
-                                                <Border Background="Transparent"
-                                                        Margin="{TemplateBinding Margin}"
-                                                        Padding="{TemplateBinding Padding}"
-                                                        VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                                        HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}">
-                                                    <TextBlock Text="&#xf0c9;" FontSize="20"
-                                                               VerticalAlignment="Center"
-                                                               Style="{StaticResource EyeIconTextBlock}" />
-                                                </Border>
-
-                                                <ControlTemplate.Triggers>
-                                                    <Trigger Property="IsMouseOver" Value="True">
-                                                        <Setter Property="Foreground"
-                                                                Value="{StaticResource AccentColorBrush}" />
-                                                    </Trigger>
-                                                </ControlTemplate.Triggers>
-                                            </ControlTemplate>
-                                        </Setter.Value>
-                                    </Setter>
-                                </Style>
-
-                            </Thumb.Style>
-                        </Thumb>
                     </Grid>
 
                     <ControlTemplate.Triggers>
@@ -96,14 +61,13 @@
                         </Trigger>
 
                         <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="Panel.ZIndex" Value="1" TargetName="PART_Thumb" />
                             <Setter Property="Foreground" Value="{StaticResource AccentColorBrush}" />
                             <Setter Property="BorderBrush" Value="{StaticResource AccentColorBrush}" />
                             <Setter Property="Background" Value="{StaticResource TabBackgroundBrush}"/>
                         </Trigger>
 
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Panel.ZIndex" Value="1" TargetName="PART_Thumb" />
-                            <Setter Property="Visibility" Value="Visible" TargetName="PART_Thumb" />
                             <Setter Property="Foreground" Value="{StaticResource HighlightBrush}" />
                         </Trigger>
 
@@ -120,6 +84,30 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+
+        <Style.Triggers>
+           <Trigger Property="IsSiblingDragging" Value="True">
+                <Trigger.EnterActions>
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="Opacity">
+                                <EasingDoubleKeyFrame KeyTime="0:0:0.25" Value="1" />
+                                <EasingDoubleKeyFrame KeyTime="0:0:0.50" Value=".3" />
+                            </DoubleAnimationUsingKeyFrames>
+                        </Storyboard>
+                    </BeginStoryboard>
+                </Trigger.EnterActions>
+                <Trigger.ExitActions>
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="Opacity">
+                                <EasingDoubleKeyFrame KeyTime="0:0:0.50" Value="1" />
+                            </DoubleAnimationUsingKeyFrames>
+                        </Storyboard>
+                    </BeginStoryboard>
+                </Trigger.ExitActions>
+            </Trigger>
+        </Style.Triggers>
     </Style>
 
     <Style TargetType="{x:Type dragablz:DragablzItemsControl}" x:Key="DragablzItemsControlStyle">

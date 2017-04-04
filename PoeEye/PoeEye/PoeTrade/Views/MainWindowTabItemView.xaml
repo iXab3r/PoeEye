@@ -20,7 +20,7 @@
 
         </DataTemplate.Resources>
 
-        <Grid Margin="0,3,0,3" Background="Transparent" IsHitTestVisible="True" ToolTipService.HorizontalOffset="10"
+        <Grid Margin="0,3,0,3" Background="{x:Null}" IsHitTestVisible="True" ToolTipService.HorizontalOffset="10"
               ToolTipService.VerticalOffset="10">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
@@ -123,6 +123,7 @@
 
             <TextBlock Grid.Column="1"
                        Text="{Binding TabName}"
+                       IsHitTestVisible="False"
                        FontSize="16" TextWrapping="Wrap" VerticalAlignment="Center" />
 
             <StackPanel Grid.Column="3"
