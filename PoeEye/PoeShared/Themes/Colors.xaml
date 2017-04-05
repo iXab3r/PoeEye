@@ -21,6 +21,13 @@
     <Color x:Key="OverlayBackgroundColorKey">#292C2A</Color>
     <Color x:Key="OverlayForegroundColorKey">White</Color>
 
+
+    <Color x:Key="PoeItemRarityNormalColor">White</Color>
+    <Color x:Key="PoeItemRarityMagicColor">#5050EB</Color>
+    <Color x:Key="PoeItemRarityRareColor">#A39E1B</Color>
+    <Color x:Key="PoeItemRarityUniqueColor">#AF6025</Color>
+    <Color x:Key="PoeItemRarityRelicColor">#82AD6A</Color>
+
     <SolidColorBrush x:Key="OverlayBorderBrushKey" Color="{StaticResource OverlayBorderColorKey}"/>
     <SolidColorBrush x:Key="OverlayTitleBackgroundBrushKey" Color="{StaticResource OverlayTitleBackgroundColorKey}"/>
     <SolidColorBrush x:Key="OverlayBackgroundBrushKey" Color="{StaticResource OverlayBackgroundColorKey}"/>
@@ -38,10 +45,11 @@
     <SolidColorBrush x:Key="PoeItemStrStatBrush" Color="{StaticResource PoeItemStrStatColor}" />
     <SolidColorBrush x:Key="PoeItemIntStatBrush" Color="{StaticResource PoeItemIntStatColor}" />
 
-    <SolidColorBrush x:Key="PoeItemRarityNormalBrush" Color="White" />
-    <SolidColorBrush x:Key="PoeItemRarityMagicBrush" Color="CornflowerBlue" />
-    <SolidColorBrush x:Key="PoeItemRarityRareBrush" Color="Yellow" />
-    <SolidColorBrush x:Key="PoeItemRarityUniqueBrush" Color="OrangeRed" />
+    <SolidColorBrush x:Key="PoeItemRarityNormalBrush" Color="{StaticResource PoeItemRarityNormalColor}" />
+    <SolidColorBrush x:Key="PoeItemRarityMagicBrush" Color="{StaticResource PoeItemRarityMagicColor}" />
+    <SolidColorBrush x:Key="PoeItemRarityRareBrush" Color="{StaticResource PoeItemRarityRareColor}" />
+    <SolidColorBrush x:Key="PoeItemRarityUniqueBrush" Color="{StaticResource PoeItemRarityUniqueColor}" />
+    <SolidColorBrush x:Key="PoeItemRarityRelicBrush" Color="{StaticResource PoeItemRarityRelicColor}" />
 
 
 </ResourceDictionary>

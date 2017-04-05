@@ -125,10 +125,18 @@ namespace PoeEye.PoeTrade
         {
             switch (source)
             {
-                case null:
-                    return string.Empty;
+                case PoeItemRarity.Normal:
+                    return "normal";
+                case PoeItemRarity.Magic:
+                    return "magic";
+                case PoeItemRarity.Rare:
+                    return "rare";
+                case PoeItemRarity.Unique:
+                    return "unique";
+                case PoeItemRarity.Relic:
+                    return "relic";
                 default:
-                    return source.Value.ToString().ToLowerInvariant();
+                    return string.Empty;
             }
         }
 

@@ -7,6 +7,6 @@
         Magic,
         Rare,
         Unique,
-        Legacy,
+        Relic,
     }
 }

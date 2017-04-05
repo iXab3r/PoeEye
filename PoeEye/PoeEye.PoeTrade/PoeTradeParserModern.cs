@@ -319,8 +319,8 @@ namespace PoeEye.PoeTrade
                     return PoeItemRarity.Rare;
                 case "title itemframe3":
                     return PoeItemRarity.Unique;
-                case "title itemframe4":
-                    return PoeItemRarity.Legacy;
+                case "title itemframe9":
+                    return PoeItemRarity.Relic;
                 default:
                     return PoeItemRarity.Unknown;
             }
