@@ -8,7 +8,6 @@ void Main()
 	var nuspecFilePath = Path.Combine(homeDir, nuspecFileName);
 
 	var extensionsToExclude = new[] {
-		".pdb",
 		".xml",
 		".nupkg"
 	};
