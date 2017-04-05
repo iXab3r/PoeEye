@@ -194,6 +194,7 @@
                                             ContentTemplateSelector="{TemplateBinding HeaderPrefixContentTemplateSelector}" />
                             <dragablz:DragablzItemsControl x:Name="PART_HeaderItemsControl"
                                                            Grid.Row="1"
+                                                           PositionMonitor="{Binding (utilities:TabablzHelper.PositionMonitor), RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type dragablz:TabablzControl}}, Mode=OneWay}"
                                                            ItemsSource="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Items}"
                                                            ItemContainerStyle="{TemplateBinding ItemContainerStyle}"
                                                            ItemsOrganiser="{TemplateBinding HeaderItemsOrganiser}"

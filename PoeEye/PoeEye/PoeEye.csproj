@@ -355,9 +355,6 @@
     <Compile Include="Converters\NullableConverter.cs" />
     <Compile Include="Converters\ExceptionToMessageConverter.cs" />
     <Compile Include="Converters\NullToVisibilityConverter.cs" />
-    <Compile Include="MetroModels\DialogParticipation.cs" />
-    <Compile Include="MetroModels\DialogCoordinator.cs" />
-    <Compile Include="MetroModels\IDialogCoordinator.cs" />
     <Compile Include="PoeTrade\Common\SortDescriptionData.cs" />
     <Compile Include="PoeTrade\Models\FuzzySuggestionProvider.cs" />
     <Compile Include="PoeTrade\Models\IPoeApiProvider.cs" />
@@ -419,6 +416,8 @@
     <Compile Include="Utilities\FilterExtension\IFilter.cs" />
     <Compile Include="Utilities\FilterExtension\PropertyFilter.cs" />
     <Compile Include="Utilities\SetPropertyAction.cs" />
+    <Compile Include="Utilities\TabablzHelper.cs" />
+    <Compile Include="Utilities\TabablzPositionMonitor.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="PoeTrade\ViewModels\PoeTradeViewModel.cs" />
@@ -432,7 +431,6 @@
       <SubType>Designer</SubType>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include="AppReadme\Compare-NET-Objects-Help.chm" />
     <None Include="packages.config" />
     <AppDesigner Include="Properties\" />
   </ItemGroup>
@@ -667,7 +665,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="PoeTrade\Shell\Models\" />
-    <Folder Include="Scaffolding\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <UsingTask TaskName="CosturaCleanup" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll" TaskFactory="CodeTaskFactory">

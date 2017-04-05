@@ -14,8 +14,6 @@ namespace PoeEye.Prism
 
     using Config;
 
-    using MetroModels;
-
     using Microsoft.Practices.Unity;
 
     using PoeShared.Scaffolding;
@@ -42,8 +40,7 @@ namespace PoeEye.Prism
                 .RegisterSingleton<IConfigProvider, PoeEyeConfigProviderFromFile>()
                 .RegisterSingleton<IPoeCaptchaRegistrator, PoeCaptchaRegistrator>()
                 .RegisterSingleton<IPoeApiProvider, PoeApiProvider>()
-                .RegisterSingleton<IPoeItemViewModelFactory, PoeItemViewModelFactory>()
-                .RegisterSingleton<IDialogCoordinator, DialogCoordinator>();
+                .RegisterSingleton<IPoeItemViewModelFactory, PoeItemViewModelFactory>();
 
             Container
                 .RegisterType<IMainWindowViewModel, MainWindowViewModel>()

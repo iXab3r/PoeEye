@@ -62,7 +62,7 @@ namespace PoeEye.PoeTrade.ViewModels
             Guard.ArgumentNotNull(audioNotificationSelector, nameof(audioNotificationSelector));
             Guard.ArgumentNotNull(queryFactory, nameof(queryFactory));
 
-            tabHeader = $"Tab #{GlobalTabIdx++}";
+            Id = tabHeader = $"Tab #{GlobalTabIdx++}";
 
             this.queryFactory = queryFactory;
             ApiSelector = apiSelector;
@@ -325,5 +325,7 @@ namespace PoeEye.PoeTrade.ViewModels
                 trade.TradeState = PoeTradeState.Normal;
             }
         }
+
+        public string Id { get; } 
     }
 }

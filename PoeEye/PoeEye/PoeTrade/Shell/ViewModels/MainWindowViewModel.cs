@@ -10,14 +10,17 @@ using System.Reactive.Subjects;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using CsQuery.ExtensionMethods;
+using Dragablz;
 using DynamicData;
 using Guards;
 using JetBrains.Annotations;
 using Microsoft.Practices.Unity;
-using PoeEye.MetroModels;
+using Newtonsoft.Json;
 using PoeEye.PoeTrade.Models;
 using PoeEye.PoeTrade.Updater;
 using PoeEye.PoeTrade.ViewModels;
+using PoeEye.Utilities;
 using PoeShared;
 using PoeShared.Audio;
 using PoeShared.Modularity;
@@ -53,6 +56,7 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
 
         private readonly ReadOnlyObservableCollection<IMainWindowTabViewModel> tabsList;
         private readonly ISourceList<IMainWindowTabViewModel> tabsListSource = new SourceList<IMainWindowTabViewModel>();
+        private readonly TabablzPositionMonitor<IMainWindowTabViewModel> positionMonitor = new TabablzPositionMonitor<IMainWindowTabViewModel>();
 
         private IMainWindowTabViewModel selectedTab;
 
@@ -67,7 +71,6 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
             [NotNull] PoeEyeSettingsViewModel settings,
             [NotNull] IPoeChatViewModel chatViewModel,
             [NotNull] IWhispersNotificationManager whispersNotificationManager,
-            [NotNull] IDialogCoordinator dialogCoordinator,
             [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler,
             [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {
@@ -80,14 +83,11 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
             Guard.ArgumentNotNull(audioNotificationsManager, nameof(audioNotificationsManager));
             Guard.ArgumentNotNull(settings, nameof(settings));
             Guard.ArgumentNotNull(whispersNotificationManager, nameof(whispersNotificationManager));
-            Guard.ArgumentNotNull(dialogCoordinator, nameof(dialogCoordinator));
             Guard.ArgumentNotNull(uiScheduler, nameof(uiScheduler));
             Guard.ArgumentNotNull(bgScheduler, nameof(bgScheduler));
 
             var executingAssembly = Assembly.GetExecutingAssembly();
             MainWindowTitle = $"{executingAssembly.GetName().Name} v{executingAssembly.GetName().Version}";
-
-            dialogCoordinator.MainWindow = this;
 
             this.tabFactory = tabFactory;
             this.poeEyeConfigProvider = poeEyeConfigProvider;
@@ -106,6 +106,14 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
 
             ProxyProviderViewModel = proxyProviderViewModel;
             proxyProviderViewModel.AddTo(Anchors);
+
+            Observable
+                .FromEventPattern<OrderChangedEventArgs>(
+                    h => positionMonitor.OrderChanged += h,
+                    h => positionMonitor.OrderChanged -= h)
+                .Select(x => x.EventArgs)
+                .Subscribe(OnTabOrderChanged)
+                .AddTo(Anchors);
 
             tabsListSource
                 .Connect()
@@ -193,6 +201,8 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
 
         public ReadOnlyObservableCollection<IMainWindowTabViewModel> TabsList => tabsList;
 
+        public PositionMonitor PositionMonitor => positionMonitor;
+
         public string MainWindowTitle { get; }
 
         public IMainWindowTabViewModel SelectedTab
@@ -206,7 +216,6 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
         public override void Dispose()
         {
             Log.Instance.Debug($"[MainWindowViewModel.Dispose] Disposing viewmodel...");
-
             SaveConfig();
             foreach (var mainWindowTabViewModel in TabsList)
             {
@@ -215,6 +224,14 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
             base.Dispose();
 
             Log.Instance.Debug($"[MainWindowViewModel.Dispose] Viewmodel disposed");
+        }
+
+        private void OnTabOrderChanged(OrderChangedEventArgs args)
+        {
+            var existingItems = tabsListSource.Items.ToList();
+            var newItems = args.NewOrder.OfType<IMainWindowTabViewModel>().ToList();
+
+            Log.Instance.Debug($"[PositionMonitor] Source ordering:\n\tSource: {string.Join(" => ", existingItems.Select(x => x.Id))}\n\tView: {string.Join(" => ", newItems.Select(x => x.Id))}");
         }
 
         private async Task OpenAppDataDirectory()
@@ -274,7 +291,7 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
             Log.Instance.Debug($"[MainWindowViewModel.SaveConfig] Saving config (provider: {poeEyeConfigProvider})...\r\nTabs count: {TabsList.Count}");
 
             var config = poeEyeConfigProvider.ActualConfig;
-            config.TabConfigs = TabsList.Select(tab => tab.Save()).ToArray();
+            config.TabConfigs = positionMonitor.Items.Select(tab => tab.Save()).ToArray();
 
             poeEyeConfigProvider.Save(config);
         }
@@ -292,7 +309,7 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
                 var tab = CreateAndAddTab();
                 tab.Load(tabConfig);
             }
-            
+
             Log.Instance.Debug($"[MainWindowViewModel.LoadConfig] Sucessfully loaded config\r\nTabs count: {TabsList.Count}");
         }
     }

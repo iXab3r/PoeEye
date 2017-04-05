@@ -6,7 +6,6 @@
                       xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
                       xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
                       xmlns:system="clr-namespace:System;assembly=mscorlib"
-                      xmlns:metroModels="clr-namespace:PoeEye.MetroModels"
                       xmlns:utilities="clr-namespace:PoeEye.Utilities"
                       xmlns:shellViewModels="clr-namespace:PoeEye.PoeTrade.Shell.ViewModels"
                       xmlns:updater="clr-namespace:PoeEye.PoeTrade.Updater"
@@ -20,8 +19,7 @@
                       Width="1400"
                       Height="800"
                       d:DataContext="{d:DesignInstance shellViewModels:MainWindowViewModel}"
-                      BorderThickness="1" BorderBrush="{StaticResource AccentColorBrush}"
-                      metroModels:DialogParticipation.Register="{Binding}">
+                      BorderThickness="1" BorderBrush="{StaticResource AccentColorBrush}">
 
     <Window.Resources>
         <ResourceDictionary>
@@ -92,20 +90,21 @@
                         </StackPanel>
                     </Expander.Header>
 
-                    <dragablz:TabablzControl Margin="0" 
-                                   Focusable="False" IsTabStop="False"
-                                   ItemsSource="{Binding TabsList}"
-                                   TabStripPlacement="Left"
-                                   BorderThickness="0"
-                                   Background="{x:Null}"
-                                   SelectedItem="{Binding SelectedTab}"
-                                   VirtualizingPanel.IsVirtualizing="False"
-                                   VirtualizingPanel.IsContainerVirtualizable="False"
-                                   Style="{StaticResource DragablzVerticalTabablzControl}"
-                                   HeaderItemTemplate="{StaticResource MainWindowTabItemViewTemplate}">
+                    <dragablz:TabablzControl Margin="0"
+                                             utilities:TabablzHelper.PositionMonitor="{Binding PositionMonitor, Mode=OneWay}"
+                                             ItemsSource="{Binding TabsList}"
+                                             TabStripPlacement="Left"
+                                             BorderThickness="0"
+                                             Background="{x:Null}"
+                                             SelectedItem="{Binding SelectedTab}"
+                                             VirtualizingPanel.IsVirtualizing="False"
+                                             VirtualizingPanel.IsContainerVirtualizable="False"
+                                             Style="{StaticResource DragablzVerticalTabablzControl}"
+                                             HeaderItemTemplate="{StaticResource MainWindowTabItemViewTemplate}">
 
                         <dragablz:TabablzControl.ItemContainerStyle>
-                            <Style TargetType="{x:Type dragablz:DragablzItem}" BasedOn="{StaticResource DragablzTabItemVerticalStyle}">
+                            <Style TargetType="{x:Type dragablz:DragablzItem}"
+                                   BasedOn="{StaticResource DragablzTabItemVerticalStyle}">
                                 <Setter Property="Width" Value="350" />
                                 <Setter Property="BorderThickness" Value="0,2,0,2" />
                                 <Setter Property="BorderBrush" Value="Transparent" />
@@ -113,7 +112,7 @@
                         </dragablz:TabablzControl.ItemContainerStyle>
 
                         <dragablz:TabablzControl.ContentTemplate>
-                            <DataTemplate DataType="{x:Type viewModels:IMainWindowTabViewModel}"/>
+                            <DataTemplate DataType="{x:Type viewModels:IMainWindowTabViewModel}" />
                         </dragablz:TabablzControl.ContentTemplate>
                     </dragablz:TabablzControl>
                 </Expander>
@@ -224,7 +223,7 @@
                             <Button Content="Check for updates"
                                     FontFamily="{StaticResource FontAwesome}"
                                     Command="{Binding CheckForUpdatesCommand}"
-                                    CommandParameter="{Binding}"/>
+                                    CommandParameter="{Binding}" />
                         </StackPanel>
                     </DataTemplate>
 

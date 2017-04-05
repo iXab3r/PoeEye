@@ -14,6 +14,8 @@ namespace PoeEye.PoeTrade.ViewModels
 
     internal interface IMainWindowTabViewModel : IDisposableReactiveObject
     {
+        string Id { get; }
+
         bool IsBusy { get; }
 
         IPoeTradesListViewModel TradesList { [NotNull] get; }
