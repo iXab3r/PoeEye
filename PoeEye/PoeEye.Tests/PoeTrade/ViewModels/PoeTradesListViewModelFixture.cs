@@ -188,8 +188,11 @@ namespace PoeEye.Tests.PoeTrade.ViewModels
         }
 
         [Test]
-        [Theory]
-        public void ShouldNotChangeTradeStateWhenSameItemArrivedAgain(PoeTradeState state)
+        [TestCase(PoeTradeState.New, PoeTradeState.New)]
+        [TestCase(PoeTradeState.Normal, PoeTradeState.Normal)]
+        [TestCase(PoeTradeState.Unknown, PoeTradeState.Unknown)]
+        [TestCase(PoeTradeState.Removed, PoeTradeState.New)]
+        public void ShouldChangeTradeStateToNewWhenSameItemArrivedAgainAndHadRemovedStateBefore(PoeTradeState initialState, PoeTradeState expectedState)
         {
             //Given
             var instance = CreateInstance();
@@ -199,17 +202,19 @@ namespace PoeEye.Tests.PoeTrade.ViewModels
                 .Setup(x => x.Equals(It.IsAny<IPoeItem>(), It.IsAny<IPoeItem>()))
                 .Returns(true);
 
-            poeLiveHistoryItems.OnNext(new[] {Mock.Of<IPoeItem>()});
+            var item = Mock.Of<IPoeItem>();
+            poeLiveHistoryItems.OnNext(new[] { item });
 
             var trade = instance.Items.Single();
             Assert.AreEqual(PoeTradeState.New, trade.TradeState);
-            trade.TradeState = state;
+
+            trade.TradeState = initialState;
 
             //When
-            poeLiveHistoryItems.OnNext(new[] {Mock.Of<IPoeItem>()});
+            poeLiveHistoryItems.OnNext(new[] { item });
 
             //Then
-            trade.TradeState.ShouldBe(state);
+            trade.TradeState.ShouldBe(expectedState);
         }
 
         [Test]
