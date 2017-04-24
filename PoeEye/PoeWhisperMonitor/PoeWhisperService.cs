@@ -1,5 +1,6 @@
 ﻿using Guards;
 using JetBrains.Annotations;
+using PoeShared.Prism;
 
 namespace PoeWhisperMonitor
 {
@@ -18,12 +19,18 @@ namespace PoeWhisperMonitor
 
     internal sealed class PoeWhisperService : DisposableReactiveObject, IPoeWhisperService
     {
+        private readonly IFactory<IPoeMessagesSource, FileInfo> messagesSourceFactory;
         private readonly ISubject<PoeMessage> messagesSubject = new Subject<PoeMessage>();
         private readonly IDictionary<string, IDisposable> sourcesByPath = new Dictionary<string, IDisposable>();
 
-        public PoeWhisperService([NotNull] IPoeTracker tracker)
+        public PoeWhisperService(
+            [NotNull] IPoeTracker tracker,
+            [NotNull] IFactory<IPoeMessagesSource, FileInfo> messagesSourceFactory)  
         {
             Guard.ArgumentNotNull(tracker, nameof(tracker));
+            Guard.ArgumentNotNull(messagesSourceFactory, nameof(messagesSourceFactory));
+
+            this.messagesSourceFactory = messagesSourceFactory;
             var converter = new PoeProcessToLogFilePathConverter();
 
             tracker.AddTo(Anchors);
@@ -59,7 +66,7 @@ namespace PoeWhisperMonitor
 
             foreach (var logFilePath in sourcesToAdd)
             {
-                var source = new PoeMessagesSource(new FileInfo(logFilePath));
+                var source = messagesSourceFactory.Create(new FileInfo(logFilePath));
 
                 var composite = new CompositeDisposable {source};
                 source.Messages.Subscribe(messagesSubject).AddTo(composite);

@@ -10,6 +10,10 @@ namespace PoeWhisperMonitor.Prism
         protected override void Initialize()
         {
             Container
+                .RegisterType<IPoeChatMessageProcessor, PoeChatMessageProcessor>()
+                .RegisterType<IPoeMessagesSource, PoeMessagesSource>();
+
+            Container
                 .RegisterSingleton<IPoeTracker, PoeTracker>()
                 .RegisterSingleton<IPoeChatService, PoeChatService>()
                 .RegisterSingleton<IPoeWhisperService, PoeWhisperService>();

@@ -6,6 +6,7 @@
         System,
         Local,
         Trade,
+        Party,
         Guild,
         WhisperIncoming,
         WhisperOutgoing

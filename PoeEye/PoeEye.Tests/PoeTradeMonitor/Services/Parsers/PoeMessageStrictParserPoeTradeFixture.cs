@@ -98,6 +98,30 @@ namespace PoeEye.Tests.PoeTradeMonitor.Services.Parsers
                       TabName = "Трейд",
                       Offer = "3c ?"
                   });
+            yield return new TestCaseData(
+                "Hi, I would like to buy your Enduring Onslaught Leaguestone of Slaying in Legacy (stash tab \"$\"; position: left 12, top 2) 3c ?",
+                true,
+                new TradeModel()
+                {
+                    CharacterName = "Name",
+                    ItemPosition = new ItemPosition(12, 2),
+                    PositionName = "Enduring Onslaught Leaguestone of Slaying",
+                    League = "Legacy",
+                    TabName = "$",
+                    Offer = "3c ?"
+                });
+            yield return new TestCaseData(
+                "Hi, I would like to buy your Golem Nails Gripped Gloves listed for 1.5 exalted in Legacy (stash tab \"$\"; position: left 0, top 0)",
+                true,
+                new TradeModel()
+                {
+                    CharacterName = "Name",
+                    ItemPosition = new ItemPosition(0, 0),
+                    PositionName = "Golem Nails Gripped Gloves",
+                    League = "Legacy",
+                    Price = new PoePrice("exalted", 1.5f),
+                    TabName = "$",
+                });
         }
 
         private PoeMessageStrictParserPoeTrade CreateInstance()

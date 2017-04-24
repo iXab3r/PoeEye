@@ -142,6 +142,7 @@
     <Compile Include="PoeTrade\PoeTradeParserModernFixture.cs" />
     <Compile Include="PoeTrade\TestData\TestDataProvider.cs" />
     <Compile Include="PoeTrade\ViewModels\PoeTradesListViewModelFixture.cs" />
+    <Compile Include="PoeWhisperMonitor\Chat\PoeChatMessageProcessorFixture.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

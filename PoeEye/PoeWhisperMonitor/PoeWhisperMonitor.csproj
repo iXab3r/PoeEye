@@ -137,11 +137,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Chat\IPoeChatMessageProcessor.cs" />
     <Compile Include="Chat\IPoeChatService.cs" />
+    <Compile Include="Chat\PoeChatMessageProcessor.cs" />
     <Compile Include="Chat\PoeChatService.cs" />
     <Compile Include="Chat\PoeMessage.cs" />
     <Compile Include="Chat\PoeMessageSendStatus.cs" />
     <Compile Include="Chat\PoeMessageType.cs" />
+    <Compile Include="IPoeMessagesSource.cs" />
     <Compile Include="IPoeTracker.cs" />
     <Compile Include="IPoeWhisperService.cs" />
     <Compile Include="NativeMethods.cs" />

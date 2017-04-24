@@ -18,28 +18,26 @@
 
     using TrackingStreamLib;
 
-    internal sealed class PoeMessagesSource : DisposableReactiveObject
+    internal sealed class PoeMessagesSource : DisposableReactiveObject, IPoeMessagesSource
     {
+        private readonly IPoeChatMessageProcessor messageProcessor;
         private readonly ICollection<string> linesBuffer = new List<string>();
-
-        private readonly StreamTracker linesStream;
-
-        private readonly Regex logRecordRegex = new Regex(@"^(?'timestamp'\d\d\d\d\/\d\d\/\d\d \d\d:\d\d:\d\d) (?'content'.*)$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-
-        private readonly Regex messageParseRegex = new Regex(
-            @"^(?'timestamp'\d\d\d\d\/\d\d\/\d\d \d\d:\d\d:\d\d).*(?'prefix'[$&]|@From|@To)\s?(?:\<(?'guild'.*?)\> )?(?'name'.*?):\s*(?'message'.*)$",
-            RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         private readonly ISubject<PoeMessage> messageSubject = new Subject<PoeMessage>();
 
-        public PoeMessagesSource([NotNull] FileInfo logFile)
+        public PoeMessagesSource(
+            [NotNull] FileInfo logFile,
+            [NotNull] IPoeChatMessageProcessor messageProcessor)
         {
             Guard.ArgumentNotNull(logFile, nameof(logFile));
+            Guard.ArgumentNotNull(messageProcessor, nameof(messageProcessor));
 
+            this.messageProcessor = messageProcessor;
             Log.Instance.Debug($"[PoeMessagesSource] Tracking log file '{logFile.FullName}'...");
             var safeStream = new SafeFileStream(logFile.FullName);
 
-            linesStream = new StreamTracker(safeStream);
+            var linesStream = new StreamTracker(safeStream);
+            linesStream.AddTo(Anchors);
 
             linesStream
                 .Lines
@@ -67,7 +65,7 @@
             var stringToParse = string.Join(string.Empty, linesBuffer);
 
             PoeMessage message;
-            if (!TryParse(stringToParse, out message))
+            if (!messageProcessor.TryParse(stringToParse, out message))
             {
                 return default(PoeMessage);
             }
@@ -76,65 +74,6 @@
 
             Log.Instance.Debug($"[PoeMessagesSource] New message: {message.DumpToText()}");
             return message;
-        }
-
-        private bool TryParse(string rawText, out PoeMessage message)
-        {
-            message = default(PoeMessage);
-
-            if (string.IsNullOrWhiteSpace(rawText))
-            {
-                return false;
-            }
-
-
-            var logRecordMatch = logRecordRegex.Match(rawText);
-            if (!logRecordMatch.Success)
-            {
-                return false;
-            }
-
-            var match = messageParseRegex.Match(rawText);
-            if (!match.Success)
-            {
-                // system message, error, etc
-                message = new PoeMessage
-                {
-                    Message = logRecordMatch.Groups["content"].Value,
-                    MessageType = PoeMessageType.System,
-                    Timestamp = DateTime.Parse(logRecordMatch.Groups["timestamp"].Value)
-                };
-                return true;
-            }
-
-            message = new PoeMessage
-            {
-                Message = match.Groups["message"].Value,
-                MessageType = ToMessageType(match.Groups["prefix"].Value),
-                Name = match.Groups["name"].Value,
-                Timestamp = DateTime.Parse(match.Groups["timestamp"].Value)
-            };
-
-            return true;
-        }
-
-        private PoeMessageType ToMessageType(string prefix)
-        {
-            switch (prefix)
-            {
-                case "@From":
-                    return PoeMessageType.WhisperIncoming;
-                case "@To":
-                    return PoeMessageType.WhisperOutgoing;
-                case "$":
-                    return PoeMessageType.Trade;
-                case "&":
-                    return PoeMessageType.Guild;
-                case "":
-                    return PoeMessageType.Local;
-                default:
-                    return PoeMessageType.Unknown;
-            }
         }
     }
 }
