@@ -21,6 +21,8 @@ namespace PoeEye.Config
 
         public string ApiModuleId { get; set; }
 
+        public string CustomTabName { get; set; }
+
         public override string ToString()
         {
             return $"[Timeout: {RecheckTimeout}] Query: {QueryInfo}";

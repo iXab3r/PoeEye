@@ -4,9 +4,8 @@ using System.Runtime.CompilerServices;
 using System.Windows;
 using ICSharpCode.AvalonEdit;
 using JetBrains.Annotations;
-using static System.String;
 
-namespace PoeEye.TradeMonitor.Controls
+namespace PoeShared.UI.Controls
 {
     /// <summary>
     ///     Class that inherits from the AvalonEdit TextEditor control to

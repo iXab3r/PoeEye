@@ -4,7 +4,7 @@ using System.Windows.Data;
 
 namespace PoeShared.Converters
 {
-    internal sealed class BoolInversionConverter : IValueConverter
+    public sealed class BoolInversionConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

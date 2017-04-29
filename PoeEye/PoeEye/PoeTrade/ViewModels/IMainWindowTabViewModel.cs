@@ -18,6 +18,8 @@ namespace PoeEye.PoeTrade.ViewModels
 
         bool IsBusy { get; }
 
+        bool IsFlipped { get; set; }
+
         IPoeTradesListViewModel TradesList { [NotNull] get; }
 
         IRecheckPeriodViewModel RecheckPeriod { [NotNull] get; }
@@ -25,6 +27,8 @@ namespace PoeEye.PoeTrade.ViewModels
         ICommand MarkAllAsReadCommand { [NotNull] get; }
 
         ICommand RefreshCommand { [NotNull] get; }
+
+        ICommand RenameCommand { [NotNull] get; }
 
         IPoeApiWrapper SelectedApi { get; }
 

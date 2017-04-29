@@ -1,4 +1,8 @@
 ﻿using PoeEye.PoeTrade.Common;
+using PoeShared;
+using PoeShared.Common;
+using PoeShared.PoeTrade;
+using PoeShared.Prism;
 
 namespace PoeEye.Tests.PoeTrade.ViewModels
 {
@@ -18,12 +22,6 @@ namespace PoeEye.Tests.PoeTrade.ViewModels
     using PoeEye.PoeTrade;
     using PoeEye.PoeTrade.Models;
     using PoeEye.PoeTrade.ViewModels;
-
-    using PoeShared;
-    using PoeShared.Common;
-    using PoeShared.PoeTrade;
-    using PoeShared.PoeTrade.Query;
-    using PoeShared.Prism;
 
     using Shouldly;
 

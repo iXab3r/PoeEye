@@ -9,6 +9,7 @@ using DynamicData.Binding;
 using Exceptionless;
 using Guards;
 using JetBrains.Annotations;
+using MaterialDesignThemes.Wpf;
 using Microsoft.Practices.Unity;
 using PoeEye.Config;
 using PoeEye.PoeTrade.Common;
@@ -21,9 +22,9 @@ using PoeShared.PoeTrade.Query;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
 using PoeShared.UI.ViewModels;
+using Prism.Commands;
 using ReactiveUI;
 using ReactiveUI.Legacy;
-using ReactiveCommand = ReactiveUI.ReactiveCommand;
 
 namespace PoeEye.PoeTrade.ViewModels
 {
@@ -35,15 +36,17 @@ namespace PoeEye.PoeTrade.ViewModels
         private readonly IFactory<IPoeQueryViewModel, IPoeStaticData> queryFactory;
         private readonly ReactiveCommand<object> refreshCommand;
         private readonly ReactiveCommand<object> newSearchCommand;
+        private readonly DelegateCommand<string> renameCommand;
 
-        private readonly string tabHeader;
+        private readonly string defaultTabName;
 
         private readonly SerialDisposable tradesListAnchors = new SerialDisposable();
         private readonly IFactory<IPoeTradesListViewModel, IPoeApiWrapper> tradesListFactory;
+        private readonly Fallback<string> tabName = new Fallback<string>();
 
         private IPoeQueryViewModel query;
-        private string tabName;
         private IPoeTradesListViewModel tradesList;
+        private bool isFlipped;
 
         public MainWindowTabViewModel(
             [NotNull] IFactory<IPoeTradesListViewModel, IPoeApiWrapper> tradesListFactory,
@@ -54,7 +57,6 @@ namespace PoeEye.PoeTrade.ViewModels
             [NotNull] IAudioNotificationSelectorViewModel audioNotificationSelector,
             [NotNull] IFactory<IPoeQueryViewModel, IPoeStaticData> queryFactory)
         {
-            this.tradesListFactory = tradesListFactory;
             Guard.ArgumentNotNull(tradesListFactory, nameof(tradesListFactory));
             Guard.ArgumentNotNull(apiSelector, nameof(apiSelector));
             Guard.ArgumentNotNull(mainWindowTracker, nameof(mainWindowTracker));
@@ -62,7 +64,12 @@ namespace PoeEye.PoeTrade.ViewModels
             Guard.ArgumentNotNull(audioNotificationSelector, nameof(audioNotificationSelector));
             Guard.ArgumentNotNull(queryFactory, nameof(queryFactory));
 
-            Id = tabHeader = $"Tab #{GlobalTabIdx++}";
+            Id = defaultTabName = $"Tab #{GlobalTabIdx++}";
+            tabName.SetDefaultValue(defaultTabName);
+
+            this.tradesListFactory = tradesListFactory;
+            this.BindPropertyTo(x => x.TabName, tabName, x => x.Value).AddTo(Anchors);
+            this.BindPropertyTo(x => x.DefaultTabName, tabName, x => x.DefaultValue).AddTo(Anchors);
 
             this.queryFactory = queryFactory;
             ApiSelector = apiSelector;
@@ -74,6 +81,8 @@ namespace PoeEye.PoeTrade.ViewModels
 
             AudioNotificationSelector = audioNotificationSelector;
             audioNotificationSelector.AddTo(Anchors);
+
+            renameCommand = new DelegateCommand<string>(RenameCommandExecuted);
 
             markAllAsReadCommand = ReactiveUI.Legacy.ReactiveCommand.Create();
             markAllAsReadCommand.Subscribe(MarkAllAsReadExecute);
@@ -90,13 +99,8 @@ namespace PoeEye.PoeTrade.ViewModels
                 .Subscribe(ReinitializeApi)
                 .AddTo(Anchors);
 
-            apiSelector
-                .WhenAnyValue(x => x.SelectedModule)
-                .Subscribe(() => this.RaisePropertyChanged(nameof(SelectedApi)))
-                .AddTo(Anchors);
-
-            this.BindPropertyTo(nameof(SelectedAudioNotificationType), audioNotificationSelector, x => x.SelectedValue)
-                .AddTo(Anchors);
+            this.BindPropertyTo(x => x.SelectedApi, apiSelector, x => x.SelectedModule).AddTo(Anchors);
+            this.BindPropertyTo(x => x.SelectedAudioNotificationType, audioNotificationSelector, x => x.SelectedValue).AddTo(Anchors);
 
             this.WhenAnyValue(x => x.NewItemsCount)
                 .DistinctUntilChanged()
@@ -138,13 +142,13 @@ namespace PoeEye.PoeTrade.ViewModels
 
         public ICommand MarkAllAsReadCommand => markAllAsReadCommand;
 
+        public ICommand RenameCommand => renameCommand;
+
         public bool IsBusy => TradesList.IsBusy;
 
-        public string TabName
-        {
-            get { return tabName; }
-            private set { this.RaiseAndSetIfChanged(ref tabName, value); }
-        }
+        public string TabName => tabName.Value;
+
+        public string DefaultTabName => tabName.DefaultValue;
 
         public IPoeTradesListViewModel TradesList
         {
@@ -155,6 +159,12 @@ namespace PoeEye.PoeTrade.ViewModels
         public IRecheckPeriodViewModel RecheckPeriod { get; }
 
         public IAudioNotificationSelectorViewModel AudioNotificationSelector { get; }
+
+        public bool IsFlipped
+        {
+            get { return isFlipped; }
+            set { this.RaiseAndSetIfChanged(ref isFlipped, value); }
+        }
 
         public IPoeQueryViewModel Query
         {
@@ -182,6 +192,7 @@ namespace PoeEye.PoeTrade.ViewModels
             }
 
             AudioNotificationSelector.SelectedValue = config.NotificationType;
+            tabName.SetValue(config.CustomTabName);
         }
 
         public PoeEyeTabConfig Save()
@@ -193,8 +204,40 @@ namespace PoeEye.PoeTrade.ViewModels
                 IsAutoRecheckEnabled = RecheckPeriod.IsAutoRecheckEnabled,
                 QueryInfo = query == null ? new PoeQueryInfo() : query.PoeQueryBuilder(),
                 NotificationType = AudioNotificationSelector.SelectedValue,
-                ApiModuleId = ApiSelector.SelectedModule.Id.ToString()
+                ApiModuleId = ApiSelector.SelectedModule.Id.ToString(),
+                CustomTabName = tabName.HasValue ? tabName.Value : null
             };
+        }
+
+        private void RenameCommandExecuted(string value)
+        {
+            if (IsFlipped)
+            {
+                if (value == null)
+                {
+                    // Cancel
+                } else if (string.IsNullOrWhiteSpace(value))
+                {
+                    RenameTabTo(default(string));
+                }
+                else
+                {
+                    RenameTabTo(value);
+                }
+            }
+            
+            IsFlipped = !IsFlipped;
+        }
+
+        private void RenameTabTo(string newTabNameOrDefault)
+        {
+            if (newTabNameOrDefault == tabName.Value)
+            {
+                return;
+            }
+            var previousValue = tabName.Value;
+            tabName.SetValue(newTabNameOrDefault);
+            Log.Instance.Debug($"Changed name of tab {defaultTabName}, {previousValue} => {tabName.Value}");
         }
 
         private void ReinitializeApi(IPoeApiWrapper api)
@@ -258,9 +301,12 @@ namespace PoeEye.PoeTrade.ViewModels
                 $"[MainWindowTabViewModel.RebuildTabName] Rebuilding tab name, tabQueryMode: {queryToProcess}...");
 
             var queryDescription = queryToProcess.Description;
-            TabName = string.IsNullOrWhiteSpace(queryDescription)
-                ? tabHeader
+
+            var defaultTabName = string.IsNullOrWhiteSpace(queryDescription)
+                ? this.defaultTabName
                 : $"{queryDescription}";
+
+            tabName.SetDefaultValue(defaultTabName);
         }
 
         private void NewSearchCommandExecuted(object arg)
@@ -326,6 +372,6 @@ namespace PoeEye.PoeTrade.ViewModels
             }
         }
 
-        public string Id { get; } 
+        public string Id { get; }
     }
 }

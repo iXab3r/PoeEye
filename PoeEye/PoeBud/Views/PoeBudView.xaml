@@ -21,7 +21,7 @@
                 <Grid
                     Canvas.Top="960" Canvas.Left="624" TextBlock.FontSize="20" TextBlock.Foreground="White"
                     Opacity="0.75"
-                    Visibility="{Binding IsEnabled, Converter={StaticResource TrueToVisibleConverter}}">
+                    Visibility="{Binding IsEnabled, Converter={StaticResource TrueToVisibleFalseToCollapsedConverter}}">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="30" />
@@ -52,7 +52,7 @@
                         <StackPanel Grid.Column="0"
                                     Margin="10, 0"
                                     Orientation="Horizontal"
-                                    Visibility="{Binding StashUpdater.IsBusy, Converter={StaticResource TrueToVisibleConverter}}">
+                                    Visibility="{Binding StashUpdater.IsBusy, Converter={StaticResource TrueToVisibleFalseToCollapsedConverter}}">
 
                             <controls:ProgressRing
                                 Height="18" Width="18"
@@ -66,7 +66,7 @@
                         <TextBlock Grid.Column="0"
                                    Margin="10,0"
                                    TextAlignment="Center"
-                                   Visibility="{Binding StashUpdater.IsBusy, Converter={StaticResource TrueToCollapsedConverter}}"
+                                   Visibility="{Binding StashUpdater.IsBusy, Converter={StaticResource TrueToCollapsedFalseToVisibleConverter}}"
                                    Text="{Binding TimeTillNextUpdate, StringFormat='&#xF017; {0}', Converter={StaticResource TimeSpanToHumanReadableStringConverter}}"
                                    Style="{StaticResource IconTextBlock}" />
 
@@ -80,7 +80,7 @@
                 </Grid>
 
                 <Border Canvas.Top="1065" Canvas.Left="546" Width="820" Background="#0C0C0C" Height="8" Opacity="0.95"
-                        Visibility="{Binding HideXpBar, Converter={StaticResource TrueToVisibleConverter}}" />
+                        Visibility="{Binding HideXpBar, Converter={StaticResource TrueToVisibleFalseToCollapsedConverter}}" />
 
                 <Image Source="{Binding UiOverlayPath}" />
             </Canvas>

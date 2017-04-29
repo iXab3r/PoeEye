@@ -2,6 +2,7 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Windows;
+using System.Windows.Markup;
 using RestEase;
 
 // General Information about an assembly is controlled through the following 
@@ -9,11 +10,11 @@ using RestEase;
 // associated with an assembly.
 
 [assembly: AssemblyTitle("PoeShared")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("PoeEye Shared classes")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("PoeShared")]
-[assembly: AssemblyCopyright("Copyright ©  2015")]
+[assembly: AssemblyCopyright("Copyright © Xab3r 2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -51,3 +52,23 @@ using RestEase;
                                               //(used if a resource is not found in the page, 
                                               // app, or any theme specific resource dictionaries)
     )]
+
+[assembly: XmlnsPrefix("http://coderush.net/poeeye/", "eye")]
+[assembly: XmlnsDefinition("http://coderush.net/poeeye/", "PoeShared")]
+
+[assembly: XmlnsDefinition("http://coderush.net/poeeye/", "PoeShared.Converters")]
+
+[assembly: XmlnsDefinition("http://coderush.net/poeeye/", "PoeShared.Resources")]
+[assembly: XmlnsDefinition("http://coderush.net/poeeye/", "PoeShared.Resources.Notifications")]
+
+[assembly: XmlnsDefinition("http://coderush.net/poeeye/", "PoeShared.UI")]
+[assembly: XmlnsDefinition("http://coderush.net/poeeye/", "PoeShared.UI.Controls")]
+[assembly: XmlnsDefinition("http://coderush.net/poeeye/", "PoeShared.UI.Models")]
+[assembly: XmlnsDefinition("http://coderush.net/poeeye/", "PoeShared.UI.ViewModels")]
+[assembly: XmlnsDefinition("http://coderush.net/poeeye/", "PoeShared.UI.Views")]
+
+[assembly: XmlnsDefinition("http://coderush.net/poeeye/", "PoeShared.Themes")]
+
+[assembly: XmlnsDefinition("http://coderush.net/poeeye/", "PoeShared.Scaffolding")]
+[assembly: XmlnsDefinition("http://coderush.net/poeeye/", "PoeShared.Scaffolding.WPF")]
+[assembly: XmlnsDefinition("http://coderush.net/poeeye/", "PoeShared.Scaffolding.Converters")]

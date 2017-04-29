@@ -1,4 +1,6 @@
-﻿namespace PoeEye.Tests.Common
+﻿using PoeShared.Common;
+
+namespace PoeEye.Tests.Common
 {
     using System.Collections.Generic;
     using System.Linq;
@@ -6,8 +8,6 @@
     using Moq;
 
     using NUnit.Framework;
-
-    using PoeShared.Common;
 
     using Shouldly;
 

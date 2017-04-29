@@ -14,6 +14,7 @@ using ICSharpCode.AvalonEdit.Editing;
 using ICSharpCode.AvalonEdit.Rendering;
 using PoeEye.TradeMonitor.Models;
 using PoeShared.Scaffolding;
+using PoeShared.UI.Controls;
 using ReactiveUI;
 
 namespace PoeEye.TradeMonitor.Controls

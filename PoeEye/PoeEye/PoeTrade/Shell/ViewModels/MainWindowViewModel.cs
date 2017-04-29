@@ -162,9 +162,9 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
 
             Observable.Merge(
                     tabsListSource.Connect().ToObservableChangeSet().ToUnit(),
-                    tabsListSource.Connect().WhenPropertyChanged(x => x.SelectedAudioNotificationType).ToUnit()
+                    tabsListSource.Connect().WhenPropertyChanged(x => x.SelectedAudioNotificationType).ToUnit(),
+                    tabsListSource.Connect().WhenPropertyChanged(x => x.TabName).ToUnit()
                 )
-                .Do(_ => { })
                 .Subscribe(configUpdateSubject)
                 .AddTo(Anchors);
 

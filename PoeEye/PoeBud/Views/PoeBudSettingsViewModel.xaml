@@ -107,7 +107,7 @@
                 <controls:ProgressRing Grid.Column="1"
                                        Margin="1"
                                        Width="14" Height="14"
-                                       Visibility="{Binding IsBusy, Converter={StaticResource TrueToVisibleConverter}}" />
+                                       Visibility="{Binding IsBusy, Converter={StaticResource TrueToVisibleFalseToCollapsedConverter}}" />
 
                 <Button Grid.Column="2"
                         Width="100"

@@ -52,6 +52,8 @@
               HorizontalAlignment="Right"
               Content="Restart application"
               Margin="10, 0"
+              Focusable="False"
+              IsTabStop="False"
               Command="{Binding RestartCommand}"
               IsEnabled="{Binding IsBusy, Converter={StaticResource NotConverter}}" />
         </Grid>

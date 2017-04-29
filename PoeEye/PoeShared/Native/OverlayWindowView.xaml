@@ -58,7 +58,7 @@
             <ContentControl Grid.Row="0" Content="{Binding Content}" />
 
             <Border 
-                Visibility="{Binding ShowWireframes, Converter={StaticResource TrueToVisibleConverter}}"
+                Visibility="{Binding ShowWireframes, Converter={StaticResource TrueToVisibleFalseToCollapsedConverter}}"
                 BorderThickness="3"
                 IsHitTestVisible="False"
                 BorderBrush="GreenYellow"
@@ -144,7 +144,7 @@
         <Thumb HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="20" Height="20" Cursor="SizeNWSE"
                    DragDelta="ThumbResize_OnDragDelta"
                    Style="{StaticResource OverlayThumbStyleKey}"
-                   Visibility="{Binding Content.IsLocked, Converter={StaticResource TrueToCollapsedConverter}}"
+                   Visibility="{Binding Content.IsLocked, Converter={StaticResource TrueToCollapsedFalseToVisibleConverter}}"
                    Tag="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" >
         </Thumb>
     </Grid>

@@ -135,6 +135,7 @@
     <Compile Include="Common\PoeItemParserFixture.cs" />
     <Compile Include="Helpers\MockExtensions.cs" />
     <Compile Include="PoeBud\OfficialApi\GearTypeAnalyzerFixture.cs" />
+    <Compile Include="PoeShared\Scaffolding\ReactiveObjectExtensionsFixture.cs" />
     <Compile Include="PoeTradeMonitor\Services\Parsers\PoeMessageCurrencyParserPoeTradeFixturey.cs" />
     <Compile Include="PoeTradeMonitor\Services\Parsers\PoeMessageWeakParserPoeTradeFixture.cs" />
     <Compile Include="PoeTradeMonitor\Services\Parsers\PoeMessageStrictParserPoeTradeFixture.cs" />
@@ -204,6 +205,7 @@
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

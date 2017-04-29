@@ -1,4 +1,6 @@
-﻿namespace PoeEye.Tests.PoeTrade
+﻿using PoeShared;
+
+namespace PoeEye.Tests.PoeTrade
 {
     using System;
     using System.Collections;
@@ -9,8 +11,6 @@
     using NUnit.Framework;
 
     using PoeEye.PoeTrade;
-
-    using PoeShared;
 
     using Shouldly;
 

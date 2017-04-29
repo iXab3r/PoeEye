@@ -271,18 +271,24 @@
                                 <Condition Property="IsMouseOver" Value="True" />
                                 <Condition Property="themes:TradeMonitorExpanderHelper.ExpandOnHover" Value="True" />
                             </MultiTrigger.Conditions>
-                            <MultiTrigger.Setters>
-                                <Setter Property="IsExpanded" Value="True" />
-                            </MultiTrigger.Setters>
-                        </MultiTrigger>
-                        <MultiTrigger>
-                            <MultiTrigger.Conditions>
-                                <Condition Property="IsMouseOver" Value="False" />
-                                <Condition Property="themes:TradeMonitorExpanderHelper.ExpandOnHover" Value="True" />
-                            </MultiTrigger.Conditions>
-                            <MultiTrigger.Setters>
-                                <Setter Property="IsExpanded" Value="False" />
-                            </MultiTrigger.Setters>
+                            <MultiTrigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <BooleanAnimationUsingKeyFrames Storyboard.TargetProperty="IsExpanded">
+                                            <DiscreteBooleanKeyFrame Value="True" KeyTime="0:0:0.3"/>
+                                        </BooleanAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </MultiTrigger.EnterActions>
+                            <MultiTrigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <BooleanAnimationUsingKeyFrames Storyboard.TargetProperty="IsExpanded">
+                                            <DiscreteBooleanKeyFrame Value="False" KeyTime="0:0:0.3"/>
+                                        </BooleanAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </MultiTrigger.ExitActions>
                         </MultiTrigger>
                     </Style.Triggers>
                 </Style>

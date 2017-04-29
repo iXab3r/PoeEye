@@ -111,6 +111,12 @@
       <HintPath>..\packages\MahApps.Metro.1.4.3\lib\net45\MahApps.Metro.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="MaterialDesignColors, Version=1.1.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MaterialDesignColors.1.1.2\lib\net45\MaterialDesignColors.dll</HintPath>
+    </Reference>
+    <Reference Include="MaterialDesignThemes.Wpf, Version=2.3.0.823, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MaterialDesignThemes.2.3.0.823\lib\net45\MaterialDesignThemes.Wpf.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Expression.Interactions, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Windows.Interactivity.WPF.2.0.20525\lib\net40\Microsoft.Expression.Interactions.dll</HintPath>
       <Private>True</Private>
@@ -252,8 +258,10 @@
     <Compile Include="PoeTrade\IPoePriceCalculcator.cs" />
     <Compile Include="Scaffolding\ChangeSetExtensions.cs" />
     <Compile Include="Scaffolding\DisposableExtensions.cs" />
+    <Compile Include="Scaffolding\Fallback.cs" />
     <Compile Include="Scaffolding\PoeItemExtensions.cs" />
     <Compile Include="Scaffolding\ReactiveObjectExtensions.cs" />
+    <Compile Include="Scaffolding\WPF\AccessKeyScoper.cs" />
     <Compile Include="Scaffolding\WPF\EnableDragHelper.cs" />
     <Compile Include="StashApi\DataTypes\PoeItemRarityWrapper.cs" />
     <Compile Include="StashApi\DataTypes\StashItemAdditionalProperty.cs" />
@@ -279,6 +287,7 @@
     <Compile Include="StashApi\PoeStashClient.cs" />
     <Compile Include="StashApi\ProcurementLegacy\GearTypeAnalyzer.cs" />
     <Compile Include="StashApi\ProcurementLegacy\IGearTypeAnalyzer.cs" />
+    <Compile Include="UI\Controls\ExtendedTextEditor.cs" />
     <Compile Include="UI\ViewModels\AudioNotificationSelectorViewModel.cs" />
     <Compile Include="Audio\AudioNotificationsManager.cs" />
     <Compile Include="Audio\AudioNotificationType.cs" />
@@ -482,7 +491,9 @@
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Scaffolding\WPF\Behaviors\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Fody.1.29.2\build\dotnet\Fody.targets" Condition="Exists('..\packages\Fody.1.29.2\build\dotnet\Fody.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

@@ -1,4 +1,6 @@
 ﻿using PoeEye.ItemParser;
+using PoeShared.Common;
+using PoeShared.PoeTrade.Query;
 
 namespace PoeEye.Tests.Common
 {
@@ -8,10 +10,6 @@ namespace PoeEye.Tests.Common
     using Moq;
 
     using NUnit.Framework;
-
-    using PoeShared.Common;
-    using PoeShared.PoeTrade;
-    using PoeShared.PoeTrade.Query;
 
     using Shouldly;
 

@@ -186,7 +186,6 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Controls\ExtendedTextEditor.cs" />
     <Compile Include="Controls\MacroEditBox.cs" />
     <Compile Include="Models\FakeItemFactory.cs" />
     <Compile Include="Models\GenericDelegateCommand.cs" />
