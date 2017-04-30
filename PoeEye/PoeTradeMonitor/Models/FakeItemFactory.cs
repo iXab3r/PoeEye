@@ -54,7 +54,7 @@ namespace PoeEye.TradeMonitor.Models
 
         private string GetRandomCurrency()
         {
-            var knownCurrencies = PriceToCurrencyConverter.DefaultCurrencyByAlias;
+            var knownCurrencies = KnownCurrencyNameList.CurrencyByAlias;
 
             return knownCurrencies.PickRandom().Value;
         }

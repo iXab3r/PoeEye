@@ -354,7 +354,6 @@
     <Compile Include="Converters\NullToBoolConverter.cs" />
     <Compile Include="Converters\ObjectToVisibilityConverter.cs" />
     <Compile Include="Converters\ObjectToLowercaseConverter.cs" />
-    <Compile Include="Converters\PriceToImageUriConverter.cs" />
     <Compile Include="Converters\TimeSpanToHumanReadableStringConverter.cs" />
     <Compile Include="Converters\TimeSpanToSecondsConverter.cs" />
     <Compile Include="Converters\NullableConverter.cs" />
@@ -633,37 +632,6 @@
     <Resource Include="Resources\mainIcon.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\Currencies\Divine_Orb.png" />
-    <Resource Include="Resources\Currencies\Eternal_Orb.png" />
-    <Resource Include="Resources\Currencies\Exalted_Orb.png" />
-    <Resource Include="Resources\Currencies\Gemcutter%27s_Prism.png" />
-    <Resource Include="Resources\Currencies\Glassblower%27s_Bauble.png" />
-    <Resource Include="Resources\Currencies\Jeweller%27s_Orb.png" />
-    <Resource Include="Resources\Currencies\Mirror_of_Kalandra.png" />
-    <Resource Include="Resources\Currencies\Orb_of_Alchemy.png" />
-    <Resource Include="Resources\Currencies\Orb_of_Alteration.png" />
-    <Resource Include="Resources\Currencies\Orb_of_Augmentation.png" />
-    <Resource Include="Resources\Currencies\Orb_of_Chance.png" />
-    <Resource Include="Resources\Currencies\Orb_of_Fusing.png" />
-    <Resource Include="Resources\Currencies\Orb_of_Regret.png" />
-    <Resource Include="Resources\Currencies\Orb_of_Scouring.png" />
-    <Resource Include="Resources\Currencies\Orb_of_Transmutation.png" />
-    <Resource Include="Resources\Currencies\Portal_Scroll.png" />
-    <Resource Include="Resources\Currencies\Regal_Orb.png" />
-    <Resource Include="Resources\Currencies\Scroll_Fragment.png" />
-    <Resource Include="Resources\Currencies\Scroll_of_Wisdom.png" />
-    <Resource Include="Resources\Currencies\Transmutation_Shard.png" />
-    <Resource Include="Resources\Currencies\Vaal_Orb.png" />
-    <Resource Include="Resources\Currencies\Alchemy_Shard.png" />
-    <Resource Include="Resources\Currencies\Alteration_Shard.png" />
-    <Resource Include="Resources\Currencies\Armourer%27s_Scrap.png" />
-    <Resource Include="Resources\Currencies\Blacksmith%27s_Whetstone.png" />
-    <Resource Include="Resources\Currencies\Blessed_Orb.png" />
-    <Resource Include="Resources\Currencies\Cartographer%27s_Chisel.png" />
-    <Resource Include="Resources\Currencies\Chaos_Orb.png" />
-    <Resource Include="Resources\Currencies\Chromatic_Orb.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Resources\PathOfExile_102.cur" />
   </ItemGroup>
   <ItemGroup>
@@ -671,9 +639,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="PoeTrade\Shell\Models\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\Currencies\Unknown.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <UsingTask TaskName="CosturaCleanup" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll" TaskFactory="CodeTaskFactory">

@@ -94,7 +94,7 @@ namespace PoeEye.PoeTrade.ViewModels
                 Anchors.Add(LinksViewModel);
             }
 
-            var price = PriceToCurrencyConverter.Instance.Convert(poeItem.Price);
+            var price = StringToPoePriceConverter.Instance.Convert(poeItem.Price);
             var priceInChaos = poePriceCalculcator.GetEquivalentInChaosOrbs(price);
             PriceInChaosOrbs = price.CurrencyType == KnownCurrencyNameList.ChaosOrb 
                 ? default(PoePrice?) 

@@ -20,6 +20,7 @@
         <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Thumb.xaml" />
         <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/AvalonEdit.xaml" />
         <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Styles.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/PoeShared;component/UI/Views/CurrencyTestView.xaml" />
         <ResourceDictionary Source="pack://application:,,,/PoeShared;component/UI/Views/ImageView.xaml" />
         <ResourceDictionary Source="pack://application:,,,/PoeShared;component/UI/Views/AudioNotificationTypeSelectorView.xaml" />
     </ResourceDictionary.MergedDictionaries>

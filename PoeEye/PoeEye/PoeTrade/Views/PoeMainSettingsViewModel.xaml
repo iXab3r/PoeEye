@@ -2,11 +2,17 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:viewModels1="clr-namespace:PoeEye.PoeTrade.ViewModels"
                     xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
-                    xmlns:converters="clr-namespace:PoeEye.Converters">
+                    xmlns:converters="clr-namespace:PoeEye.Converters"
+                    xmlns:eye="http://coderush.net/poeeye/">
 
-    <DataTemplate DataType="{x:Type viewModels1:PoeMainSettingsViewModel}">
+  <ResourceDictionary.MergedDictionaries>
+    <ResourceDictionary Source="pack://application:,,,/PoeShared;component/UI/Views/CurrencyTestView.xaml" />
+  </ResourceDictionary.MergedDictionaries>
+
+  <DataTemplate DataType="{x:Type viewModels1:PoeMainSettingsViewModel}">
         <Grid Margin="10,5">
             <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
@@ -49,6 +55,12 @@
 
                 </ItemsControl>
             </StackPanel>
+          
+            <ContentPresenter Grid.Row="3"
+                              Margin="0,10"
+                              ContentTemplate="{StaticResource CurrencyTestTemplateKey}"
+                              Content="{Binding CurrencyTest}">
+            </ContentPresenter>
         </Grid>
     </DataTemplate>
 </ResourceDictionary>

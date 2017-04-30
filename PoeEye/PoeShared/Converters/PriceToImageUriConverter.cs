@@ -3,36 +3,14 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Windows.Data;
+using Anotar.Log4Net;
 using PoeShared.Common;
 
 namespace PoeShared.Converters
 {
-    internal sealed class PriceToImageUriConverter : IValueConverter
+    public sealed class PriceToImageUriConverter : IValueConverter
     {
-        private const string ImagesPathPrefix = "pack://application:,,,/Resources/Currencies";
-
-        private static readonly IDictionary<string, string> KnownImages = new Dictionary<string, string>
-        {
-            {KnownCurrencyNameList.BlessedOrb, "Blessed_Orb"},
-            {KnownCurrencyNameList.CartographersChisel, "Cartographer's_Chisel"},
-            {KnownCurrencyNameList.ChaosOrb, "Chaos_Orb"},
-            {KnownCurrencyNameList.ChromaticOrb, "Chromatic_Orb"},
-            {KnownCurrencyNameList.DivineOrb, "Divine_Orb"},
-            {KnownCurrencyNameList.ExaltedOrb, "Exalted_Orb"},
-            {KnownCurrencyNameList.GemcuttersPrism, "Gemcutter's_Prism"},
-            {KnownCurrencyNameList.JewellersOrb, "Jeweller's_Orb"},
-            {KnownCurrencyNameList.OrbOfAlchemy, "Orb_of_Alchemy"},
-            {KnownCurrencyNameList.OrbOfAlteration, "Orb_of_Alteration"},
-            {KnownCurrencyNameList.OrbOfChance, "Orb_of_Chance"},
-            {KnownCurrencyNameList.OrbOfFusing, "Orb_of_Fusing"},
-            {KnownCurrencyNameList.OrbOfRegret, "Orb_of_Regret"},
-            {KnownCurrencyNameList.OrbOfScouring, "Orb_of_Scouring"},
-            {KnownCurrencyNameList.RegalOrb, "Regal_Orb"}, 
-            {KnownCurrencyNameList.VaalOrb, "Vaal_Orb"},
-            {KnownCurrencyNameList.MirrorOfKalandra, "Mirror_of_Kalandra"},
-            {KnownCurrencyNameList.EternalOrb, "Eternal_Orb"},
-            {KnownCurrencyNameList.Unknown, "Alchemy_Shard"},
-        };
+        private const string ImagesPathPrefix = "Resources/Currencies";
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
@@ -41,20 +19,28 @@ namespace PoeShared.Converters
                 return null;
             }
 
-            var rawPrice = (string) value;
-            var price = PriceToCurrencyConverter.Instance.Convert(rawPrice);
+            var rawPrice = (string)value;
+            var price = StringToPoePriceConverter.Instance.Convert(rawPrice);
             if (price.IsEmpty)
             {
+                LogTo.Debug($"Failed to convert string '{rawPrice}' to PoePrice");
                 return null;
             }
 
             string imageName;
-            if (!KnownImages.TryGetValue(price.CurrencyType, out imageName))
+            if (!KnownCurrencyNameList.KnownImages.TryGetValue(price.CurrencyType, out imageName))
             {
+                imageName = KnownCurrencyNameList.KnownImages[KnownCurrencyNameList.Unknown];
+            }
+
+            var imagePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, ImagesPathPrefix, imageName + ".png");
+            if (!File.Exists(imagePath))
+            {
+                LogTo.Debug($"Failed to find image for {price}, got path {imagePath}");
                 return null;
             }
 
-            return Path.Combine(ImagesPathPrefix, imageName + ".png");
+            return imagePath;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

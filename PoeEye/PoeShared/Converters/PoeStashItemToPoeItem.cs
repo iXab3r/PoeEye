@@ -13,7 +13,7 @@ namespace PoeShared.Converters
     public class PoeStashItemToPoeItem : IConverter<IStashItem, IPoeItem>, IConverter<IStashItem, PoeItem>
     {
         private readonly IClock clock;
-        private readonly PriceToCurrencyConverter priceConverter = new PriceToCurrencyConverter();
+        private readonly StringToPoePriceConverter stringToPoePriceConverter = new StringToPoePriceConverter();
 
         public PoeStashItemToPoeItem(IClock clock)
         {
@@ -47,7 +47,7 @@ namespace PoeShared.Converters
 
             var itemPrice = string.IsNullOrWhiteSpace(value.Note)
                 ? PoePrice.Empty 
-                : priceConverter.Convert(value.Note);
+                : stringToPoePriceConverter.Convert(value.Note);
             result.Price = !itemPrice.IsEmpty
                 ? itemPrice.ToString()
                 : null;

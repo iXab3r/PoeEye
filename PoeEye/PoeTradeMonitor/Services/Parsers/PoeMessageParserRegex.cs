@@ -12,12 +12,12 @@ namespace PoeEye.TradeMonitor.Services.Parsers
 {
     internal abstract class PoeMessageParserRegex : IPoeMessageParser
     {
-        private readonly PriceToCurrencyConverter priceConverter;
+        private readonly StringToPoePriceConverter stringToPoePriceConverter;
 
-        public PoeMessageParserRegex([NotNull] PriceToCurrencyConverter priceConverter)
+        public PoeMessageParserRegex([NotNull] StringToPoePriceConverter stringToPoePriceConverter)
         {
-            Guard.ArgumentNotNull(priceConverter, nameof(priceConverter));
-            this.priceConverter = priceConverter;
+            Guard.ArgumentNotNull(stringToPoePriceConverter, nameof(stringToPoePriceConverter));
+            this.stringToPoePriceConverter = stringToPoePriceConverter;
         }
 
         protected abstract Regex GetMessageParser();
@@ -35,7 +35,7 @@ namespace PoeEye.TradeMonitor.Services.Parsers
                     {
                         CharacterName = message.Name,
                         PositionName = GetGroupOrDefault(match, "item"),
-                        Price = priceConverter.Convert(GetGroupOrDefault(match, "price")),
+                        Price = stringToPoePriceConverter.Convert(GetGroupOrDefault(match, "price")),
                         League = GetGroupOrDefault(match, "league"),
                         TabName = GetGroupOrDefault(match, "tabName"),
                         ItemPosition = new ItemPosition

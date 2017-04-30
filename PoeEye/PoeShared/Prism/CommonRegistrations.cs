@@ -49,7 +49,7 @@ namespace PoeShared.Prism
                 .RegisterSingleton<IGearTypeAnalyzer, GearTypeAnalyzer>()
                 .RegisterSingleton<IConverter<IStashItem, IPoeItem>, PoeStashItemToPoeItem>()
                 .RegisterSingleton<IConverter<IStashItem, PoeItem>, PoeStashItemToPoeItem>()
-                .RegisterSingleton<IConverter<string, PoePrice>, PriceToCurrencyConverter>()
+                .RegisterSingleton<IConverter<string, PoePrice>, StringToPoePriceConverter>()
                 .RegisterSingleton<IKeyboardEventsSource>(new InjectionFactory(x => x.Resolve<KeyboardEventsSource>(new DependencyOverride(typeof(IKeyboardMouseEvents), Hook.GlobalEvents()))))
                 .RegisterSingleton<IAudioNotificationsManager, AudioNotificationsManager>()
                 .RegisterSingleton<ISchedulerProvider, SchedulerProvider>()

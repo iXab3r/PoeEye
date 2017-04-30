@@ -138,7 +138,7 @@ namespace PoeEye.TradeMonitor.ViewModels
                 .Subscribe(() => this.RaisePropertyChanged(nameof(TimeElapsed)))
                 .AddTo(Anchors);
 
-            var price = PriceToCurrencyConverter.Instance.Convert(model.PositionName);
+            var price = StringToPoePriceConverter.Instance.Convert(model.PositionName);
             ItemName = price.IsEmpty ? (object) model.PositionName : price;
 
             this.BindPropertyTo(x => x.Price, this, x => x.Negotiation).AddTo(Anchors);

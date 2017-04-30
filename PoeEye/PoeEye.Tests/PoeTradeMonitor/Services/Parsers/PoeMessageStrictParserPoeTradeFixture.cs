@@ -126,7 +126,7 @@ namespace PoeEye.Tests.PoeTradeMonitor.Services.Parsers
 
         private PoeMessageStrictParserPoeTrade CreateInstance()
         {
-            return new PoeMessageStrictParserPoeTrade(new PriceToCurrencyConverter());   
+            return new PoeMessageStrictParserPoeTrade(new StringToPoePriceConverter());   
         }
     }
 }

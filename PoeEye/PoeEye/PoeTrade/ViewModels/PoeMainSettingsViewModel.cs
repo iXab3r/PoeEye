@@ -4,6 +4,7 @@ using PoeEye.Config;
 using PoeEye.Utilities;
 using PoeShared.Modularity;
 using PoeShared.Scaffolding;
+using PoeShared.UI.ViewModels;
 using ReactiveUI;
 
 namespace PoeEye.PoeTrade.ViewModels
@@ -16,6 +17,14 @@ namespace PoeEye.PoeTrade.ViewModels
         private bool whisperNotificationsEnabled;
         private PoeEyeTabConfig[] tabConfigs;
         private PoeEyeMainConfig loadedConfig;
+
+        public PoeMainSettingsViewModel()
+        {
+            if (AppArguments.Instance.IsDebugMode)
+            {
+                CurrencyTest = new CurrencyTestViewModel();
+            }
+        }
 
         public bool IsOpen
         {
@@ -42,6 +51,8 @@ namespace PoeEye.PoeTrade.ViewModels
         }
 
         public string ModuleName { get; } = "Main";
+
+        public CurrencyTestViewModel CurrencyTest { get; }
 
         public void Load(PoeEyeMainConfig config)
         {
