@@ -4,7 +4,6 @@ using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Reactive.Threading.Tasks;
 using System.Windows.Input;
 using Guards;
 using JetBrains.Annotations;
@@ -31,10 +30,15 @@ namespace PoeEye.TradeMonitor.ViewModels
     internal class NegotiationViewModel : DisposableReactiveObject, INegotiationViewModel, IMacroCommandContext
     {
         public static readonly TimeSpan DefaultUpdatePeriod = TimeSpan.FromSeconds(1);
+        public static readonly TimeSpan FreshnessPeriod = TimeSpan.FromSeconds(10);
 
         private readonly IPoeChatService chatService;
         private readonly IClock clock;
+        private readonly DelegateCommand highlightCommand;
+        private readonly IPoeStashHighlightService highlightService;
+        private readonly SerialDisposable highlightServiceAnchor = new SerialDisposable();
         private readonly IFactory<IImageViewModel, Uri> imageFactory;
+        [NotNull] private readonly IScheduler uiScheduler;
 
         private readonly DelegateCommand inviteToPartyCommand;
         private readonly DelegateCommand kickFromPartyCommand;
@@ -43,6 +47,7 @@ namespace PoeEye.TradeMonitor.ViewModels
         private readonly DelegateCommand openChatCommand;
         private readonly IConverter<IStashItem, IPoeItem> poeStashItemToItemConverter;
         private readonly IPoeItemViewModelFactory poeTradeViewModelFactory;
+        private readonly IPoePriceCalculcator priceCalculcator;
         private readonly DelegateCommand<MacroMessage?> sendPredefinedMessageCommand;
         private readonly IPoeStashService stashService;
         private readonly DelegateCommand tradeCommand;
@@ -56,12 +61,16 @@ namespace PoeEye.TradeMonitor.ViewModels
         private PoeItemRarity itemRarity;
 
         private PoeMessageSendStatus messageSendStatus;
+        private TradeModel negotiation;
+
+        private PoeItemVerificationState verificationState;
 
         public NegotiationViewModel(
             TradeModel model,
             [NotNull] IPoeChatService chatService,
             [NotNull] IPoeStashService stashService,
             [NotNull] IPoeMacroCommandsProvider macroCommandsProvider,
+            [NotNull] IPoeStashHighlightService highlightService,
             [NotNull] IPoePriceCalculcator priceCalculcator,
             [NotNull] IClock clock,
             [NotNull] IConfigProvider<PoeTradeMonitorConfig> configProvider,
@@ -74,27 +83,33 @@ namespace PoeEye.TradeMonitor.ViewModels
             Guard.ArgumentNotNull(macroCommandsProvider, nameof(macroCommandsProvider));
             Guard.ArgumentNotNull(priceCalculcator, nameof(priceCalculcator));
             Guard.ArgumentNotNull(clock, nameof(clock));
+            Guard.ArgumentNotNull(highlightService, nameof(highlightService));
+            Guard.ArgumentNotNull(priceCalculcator, nameof(priceCalculcator));
             Guard.ArgumentNotNull(chatService, nameof(chatService));
             Guard.ArgumentNotNull(poeStashItemToItemConverter, nameof(poeStashItemToItemConverter));
             Guard.ArgumentNotNull(poeTradeViewModelFactory, nameof(poeTradeViewModelFactory));
             Guard.ArgumentNotNull(stashService, nameof(stashService));
             Guard.ArgumentNotNull(configProvider, nameof(configProvider));
+            Guard.ArgumentNotNull(uiScheduler, nameof(uiScheduler));
 
-            Negotiation = model;
             this.chatService = chatService;
             this.stashService = stashService;
             this.macroCommandsProvider = macroCommandsProvider;
+            this.highlightService = highlightService;
+            this.priceCalculcator = priceCalculcator;
             this.clock = clock;
             this.poeTradeViewModelFactory = poeTradeViewModelFactory;
             this.poeStashItemToItemConverter = poeStashItemToItemConverter;
             this.imageFactory = imageFactory;
+            this.uiScheduler = uiScheduler;
 
-            PriceInChaos = priceCalculcator.GetEquivalentInChaosOrbs(model.Price);
+            highlightServiceAnchor.AddTo(Anchors);
 
             inviteToPartyCommand = new DelegateCommand(InviteToPartyCommandExecuted, GetChatServiceAvailability);
             kickFromPartyCommand = new DelegateCommand(KickFromPartyCommandExecuted, GetChatServiceAvailability);
             openChatCommand = new DelegateCommand(OpenChatCommandExecuted, GetChatServiceAvailability);
             tradeCommand = new DelegateCommand(TradeCommandExecuted, GetChatServiceAvailability);
+            highlightCommand = new DelegateCommand(HighlightCommandExecuted, HighlightCommandCanExecute);
             sendPredefinedMessageCommand = new DelegateCommand<MacroMessage?>(
                 SendPredefinedMessageCommandExecuted, _ => GetChatServiceAvailability());
 
@@ -123,20 +138,40 @@ namespace PoeEye.TradeMonitor.ViewModels
                 .Subscribe(() => this.RaisePropertyChanged(nameof(TimeElapsed)))
                 .AddTo(Anchors);
 
-            stashService
-                .Updates
-                .ObserveOn(uiScheduler)
-                .Subscribe(HandleStashUpdate)
-                .AddTo(Anchors);
-
-            stashService
-                .WhenAnyValue(x => x.IsBusy)
-                .ObserveOn(uiScheduler)
-                .Subscribe(() => this.RaisePropertyChanged(nameof(IsBusy)))
-                .AddTo(Anchors);
-
             var price = PriceToCurrencyConverter.Instance.Convert(model.PositionName);
             ItemName = price.IsEmpty ? (object) model.PositionName : price;
+
+            this.BindPropertyTo(x => x.Price, this, x => x.Negotiation).AddTo(Anchors);
+            this.BindPropertyTo(x => x.Offer, this, x => x.Negotiation).AddTo(Anchors);
+            this.BindPropertyTo(x => x.NegotiationType, this, x => x.Negotiation).AddTo(Anchors);
+            this.BindPropertyTo(x => x.TimeElapsed, this, x => x.Negotiation).AddTo(Anchors);
+            this.BindPropertyTo(x => x.TabName, this, x => x.Negotiation).AddTo(Anchors);
+            this.BindPropertyTo(x => x.ItemPosition, this, x => x.Negotiation).AddTo(Anchors);
+
+            this.BindPropertyTo(x => x.PriceInChaos, this, x => x.Price).AddTo(Anchors);
+            this.BindPropertyTo(x => x.IsFresh, this, x => x.TimeElapsed).AddTo(Anchors);
+
+            this.BindPropertyTo(x => x.CanHighlight, this, x => x.NegotiationType).AddTo(Anchors);
+            this.BindPropertyTo(x => x.CanHighlight, this, x => x.ItemPosition).AddTo(Anchors);
+            this.BindPropertyTo(x => x.IsHighlighted, this, x => x.TimeElapsed).AddTo(Anchors);
+
+            VerificationState = PoeItemVerificationState.Unknown;
+            UpdateModel(model);
+
+            if (NegotiationType == TradeType.Sell)
+            {
+                stashService
+                    .Updates
+                    .ObserveOn(uiScheduler)
+                    .Subscribe(HandleStashUpdate)
+                    .AddTo(Anchors);
+
+                stashService
+                    .WhenAnyValue(x => x.IsBusy)
+                    .Where(x => x)
+                    .Subscribe(_ => VerificationState = PoeItemVerificationState.InProgress)
+                    .AddTo(Anchors);
+            }
         }
 
         public ICommand InviteToPartyCommand => inviteToPartyCommand;
@@ -149,6 +184,8 @@ namespace PoeEye.TradeMonitor.ViewModels
 
         public ICommand SendPredefinedMessageCommand => sendPredefinedMessageCommand;
 
+        public ICommand HighlightCommand => highlightCommand;
+
         public TradeType NegotiationType => Negotiation.TradeType;
 
         public string Offer => Negotiation.Offer;
@@ -157,29 +194,37 @@ namespace PoeEye.TradeMonitor.ViewModels
 
         public TimeSpan TimeElapsed => clock.Now - Negotiation.Timestamp;
 
-        public bool IsBusy => stashService.IsBusy;
+        public bool IsFresh => TimeElapsed < FreshnessPeriod;
+
+        public bool CanHighlight => NegotiationType == TradeType.Sell && !ItemPosition.IsEmpty;
+
+        public PoeItemVerificationState VerificationState
+        {
+            get => verificationState;
+            set => this.RaiseAndSetIfChanged(ref verificationState, value);
+        }
 
         public IImageViewModel ItemIcon
         {
-            get { return itemIcon; }
-            set { this.RaiseAndSetIfChanged(ref itemIcon, value); }
+            get => itemIcon;
+            set => this.RaiseAndSetIfChanged(ref itemIcon, value);
         }
 
         public object Item
         {
-            get { return item; }
-            set { this.RaiseAndSetIfChanged(ref item, value); }
+            get => item;
+            set => this.RaiseAndSetIfChanged(ref item, value);
         }
 
         public object ItemName { get; }
 
         public PoeItemRarity ItemRarity
         {
-            get { return itemRarity; }
-            set { this.RaiseAndSetIfChanged(ref itemRarity, value); }
+            get => itemRarity;
+            set => this.RaiseAndSetIfChanged(ref itemRarity, value);
         }
 
-        public ItemPosition ItemPosition => Negotiation.ItemPosition;
+        public ItemPosition ItemPosition => new ItemPosition(Negotiation.ItemPosition.X, Negotiation.ItemPosition.Y, 0, 0);
 
         public string TabName => Negotiation.TabName;
 
@@ -187,25 +232,60 @@ namespace PoeEye.TradeMonitor.ViewModels
 
         public PoeMessageSendStatus MessageSendStatus
         {
-            get { return messageSendStatus; }
-            set { this.RaiseAndSetIfChanged(ref messageSendStatus, value); }
-        }
-
-        public INegotiationCloseController CloseController { get; private set; }
-
-        public TradeModel Negotiation { get; }
-
-        public bool IsExpanded
-        {
-            get { return isExpanded; }
-            set { this.RaiseAndSetIfChanged(ref isExpanded, value); }
+            get => messageSendStatus;
+            set => this.RaiseAndSetIfChanged(ref messageSendStatus, value);
         }
 
         public string CharacterName => Negotiation.CharacterName;
 
         public PoePrice Price => Negotiation.Price;
 
-        public PoePrice PriceInChaos { get; }
+        public PoePrice PriceInChaos => priceCalculcator.GetEquivalentInChaosOrbs(Price);
+
+        public INegotiationCloseController CloseController { get; private set; }
+
+        public bool IsHighlighted => highlightServiceAnchor.Disposable != null;
+
+        public TradeModel Negotiation
+        {
+            get => negotiation;
+            set => this.RaiseAndSetIfChanged(ref negotiation, value);
+        }
+
+        public void UpdateModel(TradeModel model)
+        {
+            Log.Instance.Debug($"[NegotiationViewModel] Updating underlying model:\nCurrent: {Negotiation.DumpToText()}\nUpdate: {model.DumpToText()}");
+
+            Negotiation = model;
+        }
+
+        private void HandleStashUpdate()
+        {
+            var item = stashService.TryToFindItem(negotiation.TabName, negotiation.ItemPosition.X, negotiation.ItemPosition.Y);
+
+            var itemIconUri = item?.Icon.ToUriOrDefault();
+            ItemIcon = itemIconUri == null
+                ? null
+                : imageFactory.Create(itemIconUri);
+
+            VerificationState = item != null
+                ? PoeItemVerificationState.Verified
+                : stashService.IsBusy ? PoeItemVerificationState.InProgress : PoeItemVerificationState.Sold;
+
+            ItemRarity = item != null 
+                ? item.Rarity 
+                : PoeItemRarity.Unknown;
+
+            Item = item != null
+                ? BuildItemViewModel(item)
+                : null;
+        }
+
+        public bool IsExpanded
+        {
+            get => isExpanded;
+            set => this.RaiseAndSetIfChanged(ref isExpanded, value);
+        }
 
         public void SetCloseController(INegotiationCloseController closeController)
         {
@@ -214,25 +294,54 @@ namespace PoeEye.TradeMonitor.ViewModels
             CloseController = closeController;
         }
 
-        private void HandleStashUpdate()
+        private bool HighlightCommandCanExecute()
         {
-            var item = stashService.TryToFindItem(
-                Negotiation.TabName, Negotiation.ItemPosition.X, Negotiation.ItemPosition.Y);
+            return CanHighlight;
+        }
 
-            var itemIconUri = item?.Icon.ToUriOrDefault();
-            ItemIcon = itemIconUri == null
-                ? null
-                : imageFactory.Create(itemIconUri);
+        private void HighlightCommandExecuted()
+        {
+            if (!HighlightCommandCanExecute())
+            {
+                return;
+            }
 
-            ItemRarity = item?.Rarity ?? PoeItemRarity.Unknown;
+            var item = stashService.TryToFindItem(negotiation.TabName, negotiation.ItemPosition.X, negotiation.ItemPosition.Y);
+            var tab = stashService.TryToFindTab(negotiation.TabName);
 
-            var lastUpdateTimeStampInfo = stashService.LastUpdateTimestamp == DateTime.MinValue
-                ? "Never"
-                : stashService.LastUpdateTimestamp.ToString(CultureInfo.InvariantCulture);
+            var position = Negotiation.ItemPosition;
+            if (item != null)
+            {
+                var stashPosition = new ItemPosition(item.X, item.Y, item.Width, item.Height);
+                if (!stashPosition.IsEmpty)
+                {
+                    position = stashPosition;
+                }
+            }
 
-            Item = item != null
-                ? BuildItemViewModel(item)
-                : null;
+            if (position.Width == 0 || position.Height == 0)
+            {
+                position = new ItemPosition(position.X, position.Y, 1, 1);
+            }
+
+            var anchors = new CompositeDisposable();
+            highlightServiceAnchor.Disposable = anchors;
+
+            var controller = highlightService.AddHighlight(position, tab?.StashType ?? StashTabType.NormalStash);
+            controller.IsFresh = true;
+            controller.AddTo(anchors);
+
+            Observable
+                .Timer(FreshnessPeriod)
+                .ObserveOn(uiScheduler)
+                .Subscribe(() => controller.IsFresh = false)
+                .AddTo(anchors);
+
+            Observable
+                .Timer(TimeSpan.FromMilliseconds(FreshnessPeriod.TotalMilliseconds * 1.25))
+                .ObserveOn(uiScheduler)
+                .Subscribe(() => highlightServiceAnchor.Disposable = null)
+                .AddTo(anchors);
         }
 
         private object BuildItemViewModel(IStashItem stashItem)

@@ -371,7 +371,6 @@
     <Compile Include="PoeTrade\Models\PoePriceCalculcator.cs" />
     <Compile Include="PoeTrade\Models\PoeCaptchaRegistrator.cs" />
     <Compile Include="PoeTrade\Models\WhispersNotificationManager.cs" />
-    <Compile Include="PoeTrade\Common\PoeItemVerificationState.cs" />
     <Compile Include="PoeTrade\Shell\ViewModels\IPoeFlyoutViewModel.cs" />
     <Compile Include="PoeTrade\Updater\ApplicationUpdaterModel.cs" />
     <Compile Include="PoeTrade\Updater\ApplicationUpdaterViewModel.cs" />
@@ -672,6 +671,9 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="PoeTrade\Shell\Models\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Currencies\Unknown.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <UsingTask TaskName="CosturaCleanup" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll" TaskFactory="CodeTaskFactory">

@@ -1,3 +1,4 @@
+using System;
 using RestSharp.Deserializers;
 
 namespace PoeShared.StashApi.DataTypes
@@ -10,10 +11,17 @@ namespace PoeShared.StashApi.DataTypes
         [DeserializeAs(Name = "i")]
         public int Idx { get; set; }
 
-        public Colour colour { get; set; }
+        [DeserializeAs(Name = "colour")]
+        public Colour Colour { get; set; }
 
         [DeserializeAs(Name = "type")]
         public string StashTypeName { get; set; }
+
+        public StashTabType StashType
+        {
+            get { return Parse(StashTypeName); }
+            set { StashTypeName = StashType.ToString(); }
+        }
 
         public string srcL { get; set; }
 
@@ -21,6 +29,17 @@ namespace PoeShared.StashApi.DataTypes
 
         public string srcR { get; set; }
 
-        public bool hidden { get; set; }
+        [DeserializeAs(Name = "hidden")]
+        public bool Hidden { get; set; }
+
+        [DeserializeAs(Name = "id")]
+        public string Id { get; set; }
+
+        internal StashTabType Parse(string stashTypeName)
+        {
+            StashTabType result;
+            var parsed = Enum.TryParse(stashTypeName, out result);
+            return parsed ? result : StashTabType.Unknown;
+        }
     }
 }

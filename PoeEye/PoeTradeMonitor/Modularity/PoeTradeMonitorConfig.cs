@@ -8,7 +8,7 @@ using PoeShared.Modularity;
 
 namespace PoeEye.TradeMonitor.Modularity
 {
-    public class PoeTradeMonitorConfig : IPoeEyeConfigVersioned
+    public sealed class PoeTradeMonitorConfig : IPoeEyeConfigVersioned
     {
         public bool IsEnabled { get; set; } = true;
 

@@ -7,11 +7,11 @@ using PoeShared.Scaffolding;
 
 namespace PoeEye.TradeMonitor.ViewModels
 {
-    public interface INegotiationViewModel : IDisposableReactiveObject
+    internal interface INegotiationViewModel : IDisposableReactiveObject
     {
-        string CharacterName { get; }
+        TradeModel Negotiation { [NotNull] get; }
 
-        PoePrice Price { get; }
+        void UpdateModel([NotNull] TradeModel update);
 
         bool IsExpanded { get; set; }
 

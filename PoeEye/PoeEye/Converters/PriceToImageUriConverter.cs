@@ -33,7 +33,7 @@ namespace PoeEye.Converters
             {KnownCurrencyNameList.VaalOrb, "Vaal_Orb"},
             {KnownCurrencyNameList.MirrorOfKalandra, "Mirror_of_Kalandra"},
             {KnownCurrencyNameList.EternalOrb, "Eternal_Orb"},
-            {KnownCurrencyNameList.Unknown, "Alchemy_Shard"},
+            {KnownCurrencyNameList.Unknown, "Unknown"},
         };
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
@@ -53,7 +53,7 @@ namespace PoeEye.Converters
             string imageName;
             if (!KnownImages.TryGetValue(price.CurrencyType, out imageName))
             {
-                return null;
+                imageName = KnownImages[KnownCurrencyNameList.Unknown];
             }
 
             return Path.Combine(ImagesPathPrefix, imageName + ".png");

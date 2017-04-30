@@ -248,7 +248,7 @@ namespace PoeEye.PoeTrade
             var location = "";
             if (!string.IsNullOrWhiteSpace(item.TabName) && item.PositionInsideTab != null)
             {
-                location = $" (stash tab \"{item.TabName}\"; position: left {item.PositionInsideTab.Value.X}, top {item.PositionInsideTab.Value.Y})";
+                location = $" (stash tab \"{item.TabName}\"; position: left {item.PositionInsideTab.Value.X + 1}, top {item.PositionInsideTab.Value.Y + 1})";
             }
 
             var message = string.IsNullOrWhiteSpace(item.Price)
@@ -266,7 +266,7 @@ namespace PoeEye.PoeTrade
             {
                 return null;
             }
-            return new Point(x, x);
+            return new Point(x, y);
         }
 
         private static float? ParseFloat(string rawValue)

@@ -16,6 +16,8 @@ namespace PoeBud.Models
 
         IObservable<Exception> UpdateExceptions { [NotNull] get; }
 
+        void SetStrategy([NotNull] IStashUpdaterStrategy strategy);
+
         void ForceRefresh();
     }
 }

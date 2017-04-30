@@ -40,8 +40,8 @@ namespace PoeEye.TradeMonitor.Services.Parsers
                         TabName = GetGroupOrDefault(match, "tabName"),
                         ItemPosition = new ItemPosition
                         {
-                            X = int.Parse(GetGroupOrDefault(match, "itemX", "0")),
-                            Y = int.Parse(GetGroupOrDefault(match, "itemY", "0")),
+                            X = int.Parse(GetGroupOrDefault(match, "itemX", "1")) - 1,
+                            Y = int.Parse(GetGroupOrDefault(match, "itemY", "1")) - 1,
                         },
                         Timestamp = message.Timestamp,
                         Offer = GetGroupOrDefault(match, "offer"),

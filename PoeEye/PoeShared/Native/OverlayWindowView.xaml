@@ -47,7 +47,6 @@
 
             <Style.Triggers>
                 <DataTrigger Binding="{Binding Content.IsLocked}" Value="False">
-                    <Setter Property="BorderBrush" Value="{StaticResource ControlBorderBrush}"/>
                 </DataTrigger>
             </Style.Triggers>
         </Style>

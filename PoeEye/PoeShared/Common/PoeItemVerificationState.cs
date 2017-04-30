@@ -1,6 +1,6 @@
-namespace PoeEye.PoeTrade.Common
+namespace PoeShared.Common
 {
-    internal enum PoeItemVerificationState
+    public enum PoeItemVerificationState
     {
         Unknown,
         InProgress,

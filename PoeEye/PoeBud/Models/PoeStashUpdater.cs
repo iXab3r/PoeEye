@@ -7,6 +7,7 @@ using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading;
+using Anotar.Log4Net;
 using Guards;
 using JetBrains.Annotations;
 using Microsoft.Practices.Unity;
@@ -34,6 +35,7 @@ namespace PoeBud.Models
         private bool isBusy;
         private DateTime lastUpdateTimestamp;
         private TimeSpan recheckPeriod;
+        private IStashUpdaterStrategy stashUpdaterStrategy;
 
         public PoeStashUpdater(
             [NotNull] IStashUpdaterParameters config,
@@ -53,8 +55,8 @@ namespace PoeBud.Models
 
             this.config = config;
             this.clock = clock;
-            Log.Instance.DebugFormat(
-                "[PoeStashUpdater] Initializing client for {0}@{1}", config.LoginEmail, config.CharacterName);
+            LogTo.Debug(
+                "Initializing client for {0}@{1}", config.LoginEmail, config.CharacterName);
 
             var credentials = new NetworkCredential(config.LoginEmail, config.SessionId);
             poeClient = poeClientFactory.Create(credentials, true);
@@ -111,76 +113,112 @@ namespace PoeBud.Models
 
         public void ForceRefresh()
         {
-            Log.Instance.Debug($"[PoeStashUpdater.ForceRefresh] Force update requested");
+            LogTo.Debug($"Force update requested");
             refreshSubject.OnNext(Unit.Default);
+        }
+
+        public void SetStrategy(IStashUpdaterStrategy strategy)
+        {
+            Guard.ArgumentNotNull(strategy, nameof(strategy));
+
+                LogTo.Debug($"New strategy: {strategy}");
+            stashUpdaterStrategy = strategy;
+        }
+
+        private StashUpdate Refresh(IStashUpdaterStrategy strategy)
+        {
+            LogTo.Debug($"Refreshing stash, strategy: {strategy}");
+
+            var leaguesToProcess = strategy.GetDefaultLeaguesList();
+            if (leaguesToProcess.Length == 0)
+            {
+                LogTo.Debug($"Strategy did not provide default leagues list");
+                LogTo.Debug($"Requesting leagues list...");
+                var leagues = poeClient.GetLeagues();
+                LogTo.Debug($"Received leagues list: {leagues.DumpToTextRaw()}");
+                leaguesToProcess = strategy.GetLeaguesToProcess(leagues);
+                LogTo.Debug($"Leagues to process: {leaguesToProcess.DumpToTextRaw()}");
+            }
+
+            var allStashes = new List<IStash>();
+
+            foreach (var league in leaguesToProcess)
+            {
+                var stashesToRequest = new IStashTab[0];
+                try
+                {
+                    LogTo.Debug($"Requesting stash #0 in league {league.Id}...");
+                    var zeroStash = poeClient.GetStash(0, league.Id);
+
+                    var tabs = zeroStash.Tabs?.ToArray() ?? new IStashTab[0];
+
+                    if (tabs.Length == 0)
+                    {
+                        LogTo.Debug($"No stashes found in league {league.Id}");
+                        continue;
+                    }
+                    LogTo.Debug($"Tabs({tabs.Length}) in league {league.Id}: {tabs.Select(x => x.Name).DumpToTextRaw()}");
+                    stashesToRequest = strategy.GetTabsToProcess(tabs);
+                }
+                catch (Exception e)
+                {
+                    LogTo.WarnException($"Failed to request tabs in league {league.DumpToTextRaw()}", e);
+                }
+
+                if (stashesToRequest.Length == 0)
+                {
+                    LogTo.Debug($"No stashes to process in league {league.Id}");
+                    continue;
+                }
+                                                    
+                LogTo.Debug($"Requesting stashes [{stashesToRequest.DumpToTextRaw()}]...");
+                foreach (var tab in stashesToRequest)
+                {
+                    try
+                    {
+                        LogTo.Debug($"Requesting stash [{tab.DumpToTextRaw()}] in league {league.Id}...");
+                        var stash = poeClient.GetStash(tab.Idx, league.Id);
+                        allStashes.Add(stash);
+                    }
+                    catch (Exception e)
+                    {
+                        LogTo.WarnException($"Failed to request tab '{tab.Name}'(Idx: {tab.Idx}), league {league.DumpToTextRaw()}", e);
+                    }
+                }
+            }
+
+            var allItems = allStashes
+                .SelectMany(x => x.Items)
+                .Distinct(new LambdaComparer<IStashItem>((x, y) => x?.Id == y?.Id))
+                .ToArray();
+            var allTabs = allStashes
+                .SelectMany(x => x.Tabs)
+                .Distinct(new LambdaComparer<IStashTab>((x, y) => x?.Id == y?.Id))
+                .ToArray();
+
+            LogTo.Debug($"Got {allItems.Length} item(s) from {allTabs.Length} tab(s)...");
+            return new StashUpdate(allItems, allTabs.ToArray());
         }
 
         private StashUpdate Refresh()
         {
-            Log.Instance.Debug($"[PoeStashUpdater.Refresh] Updating stash(period:{recheckPeriod.TotalSeconds:F0}s)...");
+            LogTo.Debug($"Updating stash(period:{recheckPeriod.TotalSeconds:F0}s)...");
             if (!poeClient.IsAuthenticated)
             {
-                Log.Instance.Debug("[PoeStashUpdater.Refresh] Authenticating...");
+                LogTo.Debug("Authenticating...");
                 poeClient.Authenticate();
             }
             Thread.Sleep(5000);
 
-            Log.Instance.Debug($"[PoeStashUpdater.Refresh] Requesting characters list...");
-            var charactersList = poeClient.GetCharacters();
-            Log.Instance.Debug($"[PoeStashUpdater.Refresh] Characters list: {charactersList.DumpToText()}");
 
-            var character = charactersList.SingleOrDefault(x => x.Name == config.CharacterName);
-            if (character == null)
+            var strategy = stashUpdaterStrategy;
+            if (strategy == null)
             {
-                throw new ApplicationException(
-                    $"Could not find character '{config.CharacterName}' among the following:\r\n\t{string.Join<ICharacter>("\r\n\t", charactersList)}");
+                LogTo.Warn($"Strategy is not set");
+                return StashUpdate.Empty;
             }
 
-            Log.Instance.Debug($"[PoeStashUpdater.Refresh] Requesting stash #0...");
-            var zeroStash = poeClient.GetStash(0, character.League);
-            var tabs = zeroStash.Tabs?.ToArray() ?? new IStashTab[0];
-            Log.Instance.Debug(
-                $"[PoeStashUpdater.Refresh] Tabs({tabs.Length}): {tabs.Select(x => x.Name).DumpToText(Formatting.None)}");
-
-            int[] stashesToRequest;
-            if (config.StashesToProcess.Count == 0)
-            {
-                Log.Instance.Debug($"[PoeStashUpdater.Refresh] Stashes filter {nameof(config.StashesToProcess)} is not set, requesting all {tabs.Length} tabs...");
-                stashesToRequest = tabs.Select((_, tabIdx) => tabIdx).ToArray();
-            }
-            else
-            {
-                stashesToRequest = config.StashesToProcess
-                    .Where(tabIdx => tabIdx >= 0 && tabIdx < tabs.Length)
-                    .ToArray();
-
-                if (!stashesToRequest.SequenceEqual(config.StashesToProcess))
-                {
-                    Log.Instance.Warn(
-                        $"[PoeStashUpdater.Refresh] Not all tabs from config will be requested, config: {config.StashesToProcess.DumpToText()}, toRequest: {stashesToRequest.DumpToText()}");
-                }
-            }
-
-            Log.Instance.Debug($"[PoeStashUpdater.Refresh] Requesting stashes [{stashesToRequest.DumpToText(Formatting.None)}]...");
-
-            var allStashes = new List<IStash>();
-            foreach (var tabIdx in stashesToRequest)
-            {
-                try
-                {
-                    var stash = poeClient.GetStash(tabIdx, character.League);
-                    allStashes.Add(stash);
-                }
-                catch (Exception e)
-                {
-                    Log.HandleException(e);
-                    throw new ApplicationException($"Failed to request tab '{tabIdx}', league {character.League}", e);
-                }
-            }
-
-            var allItems = allStashes.SelectMany(x => x.Items).ToArray();
-            Log.Instance.Debug($"[PoeStashUpdater.Refresh] Got {allItems.Length} item(s)...");
-            return new StashUpdate(allItems, tabs);
+            return Refresh(strategy);
         }
 
         private void StartUpdate(Unit unit)

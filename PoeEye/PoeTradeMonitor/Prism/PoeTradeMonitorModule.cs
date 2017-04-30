@@ -1,4 +1,5 @@
-﻿using Guards;
+﻿using System.Reactive.Disposables;
+using Guards;
 using JetBrains.Annotations;
 using Microsoft.Practices.Unity;
 using PoeEye.TradeMonitor.Modularity;
@@ -14,7 +15,7 @@ namespace PoeEye.TradeMonitor.Prism
     public sealed class PoeTradeMonitorModule : IPoeEyeModule
     {
         private readonly IUnityContainer container;
-        private TradeMonitorBootstrapper bootstrapper;
+        private readonly CompositeDisposable anchors = new CompositeDisposable();
 
         public PoeTradeMonitorModule([NotNull] IUnityContainer container)
         {
@@ -30,7 +31,8 @@ namespace PoeEye.TradeMonitor.Prism
             var registrator = container.Resolve<IPoeEyeModulesRegistrator>();
             registrator.RegisterSettingsEditor<PoeTradeMonitorConfig, PoeTradeMonitorSettingsViewModel>();
 
-            bootstrapper = container.Resolve<TradeMonitorBootstrapper>();
+            container.Resolve<TradeMonitorBootstrapper>().AddTo(anchors);
+            container.Resolve<StashGridBootstrapper>().AddTo(anchors);
         }
     }
 }

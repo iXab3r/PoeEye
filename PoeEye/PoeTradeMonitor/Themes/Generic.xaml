@@ -9,6 +9,7 @@
     <ResourceDictionary Source="pack://application:,,,/PoeTradeMonitor;component/Views/PoeTradeMonitorView.xaml" />
     <ResourceDictionary Source="pack://application:,,,/PoeTradeMonitor;component/Views/NegotiationView.xaml" />
     <ResourceDictionary Source="pack://application:,,,/PoeTradeMonitor;component/Views/PoeTradeMonitorSettingsView.xaml" />
+    <ResourceDictionary Source="pack://application:,,,/PoeTradeMonitor;component/Views/PoeStashGridView.xaml" />
   </ResourceDictionary.MergedDictionaries>
 
 </ResourceDictionary>

@@ -2,13 +2,13 @@
 {
     public interface IStashTab
     {
-        Colour colour { get; set; }
+        Colour Colour { get; set; }
 
-        bool hidden { get; set; }
+        bool Hidden { get; set; }
 
         int Idx { get; set; }
 
-        string StashTypeName { get; set; }
+        StashTabType StashType { get; set; }
 
         string Name { get; set; }
 
@@ -17,5 +17,7 @@
         string srcL { get; set; }
 
         string srcR { get; set; }
+
+        string Id { get; set; }
     }
 }

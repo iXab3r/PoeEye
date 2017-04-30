@@ -192,7 +192,7 @@ namespace PoeShared.StashApi
 
             if (response.Data == null)
             {
-                throw new ApplicationException($"Could not retrieve stash #{index} in league {league} (code: {response.StatusCode}, content-length: {response.ContentLength})");
+                throw new ApplicationException($"Could not retrieve stash #{index} in league {league} (code: {response.StatusCode}, content-length: {response.ContentLength})\nResponse data: {response.Content.DumpToText()}");
             }
             PostProcessStash(response.Data);
 
@@ -204,7 +204,7 @@ namespace PoeShared.StashApi
             response.Data.Tabs = response.Data
                 .Tabs
                 .EmptyIfNull()
-                .Where(x => !x.hidden)
+                .Where(x => !x.Hidden)
                 .ToList();
 
             return response.Data;
@@ -216,6 +216,7 @@ namespace PoeShared.StashApi
 
             var client = new RestClient(LeaguesApiPortal);
             var request = new RestRequest("leagues") { Method = Method.GET };
+            request.AddParameter("type", "main");
 
             var response = client.Execute<List<League>>(request);
 

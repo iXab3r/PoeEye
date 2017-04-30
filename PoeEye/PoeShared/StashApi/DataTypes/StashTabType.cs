@@ -2,9 +2,11 @@
 {
     public enum StashTabType
     {
+        Unknown,
         NormalStash,
-        QuadStash,
         PremiumStash,
-        CurrencyStash
+        QuadStash,
+        DivinationCardStash,
+        EssenceStash
     }
 }

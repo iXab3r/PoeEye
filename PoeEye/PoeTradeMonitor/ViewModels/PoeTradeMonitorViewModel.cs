@@ -112,7 +112,7 @@ namespace PoeEye.TradeMonitor.ViewModels
                     tradeMonitorService
                         .Trades
                         .ObserveOn(uiScheduler)
-                        .Subscribe(ProcessTrade)
+                        .Subscribe(ProcessMessage)
                         .AddTo(Anchors);
 
                     keyboardMouseEvents
@@ -156,7 +156,7 @@ namespace PoeEye.TradeMonitor.ViewModels
             get { return numberOfNegotiationsToExpandByDefault; }
             set { this.RaiseAndSetIfChanged(ref numberOfNegotiationsToExpandByDefault, value); }
         }
-
+        
         public int PreGroupNotificationsCount
         {
             get { return preGroupNotificationsCount; }
@@ -191,12 +191,32 @@ namespace PoeEye.TradeMonitor.ViewModels
             }
         }
 
-        private void ProcessTrade(TradeModel model)
+        private void ProcessMessage(TradeModel model)
         {
-            Log.Instance.Debug($"[PoeTradeMonitorViewModel.ProcessTrade] New trade: {model}");
+            var existingModel = negotiationsList.Items
+                .FirstOrDefault(x => TradeModel.Comparer.Equals(x.Negotiation, model));
+            if (existingModel == null)
+            {
+                AddNegotiation(model);
+            }
+            else
+            {
+                UpdateNegotiation(existingModel, model);
+            }
+        }
+
+        private void UpdateNegotiation(INegotiationViewModel viewModel, TradeModel model)
+        {
+            Log.Instance.Debug($"[PoeTradeMonitorViewModel.UpdateNegotiation] Updating existing negotiation: {viewModel}");
+            viewModel.UpdateModel(model);
+        }
+
+        private void AddNegotiation(TradeModel model)
+        {
+            Log.Instance.Debug($"[PoeTradeMonitorViewModel.AddNegotiation] New trade: {model}");
             var newNegotiaton = notificationFactory.Create(model);
-            var closeController = new NegotiationClassController(this, newNegotiaton);
-            Log.Instance.Debug($"[PoeTradeMonitorViewModel.ProcessTrade] Negotiation model: {newNegotiaton}");
+            var closeController = new NegotiationCloseController(this, newNegotiaton);
+            Log.Instance.Debug($"[PoeTradeMonitorViewModel.AddNegotiation] Negotiation model: {newNegotiaton}");
 
             newNegotiaton.SetCloseController(closeController);
 
@@ -226,7 +246,7 @@ namespace PoeEye.TradeMonitor.ViewModels
         private void CreateFakeCommandExecuted()
         {
             var fake = fakeItemFactory.Create();
-            ProcessTrade(fake);
+            ProcessMessage(fake);
         }
 
         private void ApplyConfig(PoeTradeMonitorConfig config)
@@ -289,12 +309,13 @@ namespace PoeEye.TradeMonitor.ViewModels
             IsLocked = false;
         }
 
-        private class NegotiationClassController : INegotiationCloseController
+        private class NegotiationCloseController : INegotiationCloseController
         {
             private readonly INegotiationViewModel negotiation;
             private readonly PoeTradeMonitorViewModel owner;
 
-            public NegotiationClassController(PoeTradeMonitorViewModel owner,
+            public NegotiationCloseController(
+                PoeTradeMonitorViewModel owner,
                 INegotiationViewModel negotiation)
             {
                 this.owner = owner;

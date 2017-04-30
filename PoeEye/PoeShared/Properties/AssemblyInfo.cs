@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Markup;
+using Anotar.Log4Net;
 using RestEase;
 
 // General Information about an assembly is controlled through the following 
@@ -43,6 +44,7 @@ using RestEase;
 [assembly: AssemblyFileVersion("1.0.0.0")]
 [assembly: InternalsVisibleTo("PoeEye.Tests")]
 [assembly: InternalsVisibleTo(RestClient.FactoryAssemblyName)]
+[assembly: LogMinimalMessage]
 
 [assembly: ThemeInfo(
     ResourceDictionaryLocation.None, //where theme specific resource dictionaries are located

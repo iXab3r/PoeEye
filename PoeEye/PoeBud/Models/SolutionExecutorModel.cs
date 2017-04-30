@@ -45,7 +45,7 @@ namespace PoeBud.Models
 
             Log.Instance.Debug(
                 $"[SolutionExecutor.ExecuteSolution] Executing solution: {solutionToExecute.DumpToText()} ...");
-            var visibleTabs = solutionToExecute.Tabs.Where(x => !x.hidden).ToArray();
+            var visibleTabs = solutionToExecute.Tabs.Where(x => !x.Hidden).ToArray();
             IStashTab activeTab = null;
             foreach (var item in solutionToExecute.Items.OrderBy(x => x.TabIndex))
             {
@@ -60,10 +60,9 @@ namespace PoeBud.Models
 
                 logQueue.OnNext($"Transferring item {item.Name}({item.ItemType}) @ X{item.X} Y{item.Y}");
 
-                //FIXME StashTypeName parsing
                 window.TransferItemFromStash(
                     item.X, item.Y,
-                    activeTab.StashTypeName == "QuadStash" ? StashTabType.QuadStash : StashTabType.NormalStash);
+                    activeTab.StashType);
             }
 
             logQueue.OnNext("Solution was executed successfully");

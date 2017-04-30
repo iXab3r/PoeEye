@@ -16,6 +16,11 @@
             return DumpToText(instance, Formatting.Indented);   
         }
 
+        public static string DumpToTextRaw<T>(this T instance)
+        {
+            return DumpToText(instance, Formatting.None);
+        }
+
         public static string DumpToText<T>(this T instance, Formatting formatting)
         {
             return instance == null ? $"null<{typeof(T).Name}>" : JsonConvert.SerializeObject(instance, formatting);

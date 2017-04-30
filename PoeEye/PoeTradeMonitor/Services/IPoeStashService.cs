@@ -13,6 +13,9 @@ namespace PoeEye.TradeMonitor.Services
         [CanBeNull] 
         IStashItem TryToFindItem([CanBeNull] string tabName, int itemX, int itemY);
 
+        [CanBeNull] 
+        IStashTab TryToFindTab([CanBeNull] string tabName);
+
         DateTime LastUpdateTimestamp { get; }
 
         bool IsBusy { get; }
