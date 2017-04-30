@@ -5,16 +5,17 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using System.Windows.Data;
 using PoeShared.Common;
 using PoeShared.Scaffolding;
 using TypeConverter;
 
 namespace PoeShared.Converters
 {
-    public sealed class StringToPoePriceConverter : IConverter<string, PoePrice>
+    public sealed class StringToPoePriceConverter : IConverter<string, PoePrice>, IValueConverter
     {
         private static readonly Lazy<IConverter<string, PoePrice>> InstanceSupplier = new Lazy<IConverter<string, PoePrice>>(() => new StringToPoePriceConverter());
-        private static readonly Regex CurrencyParser = new Regex(@"^[~]?(?:b\/o |price )?(?'value'[\d\.\,]+) ?(?'type'[\w \-\']+)$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private static readonly Regex CurrencyParser = new Regex(@"^[~]?(?:b\/o |price )?(?'value'[\d\.\,]+)? ?(?'type'[\w \-\']+)$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         
         public static IConverter<string, PoePrice> Instance => InstanceSupplier.Value;
 
@@ -33,6 +34,13 @@ namespace PoeShared.Converters
             {
                 return PoePrice.Empty;
             }
+
+            rawPrice = rawPrice.Trim();
+            if (KnownCurrencyNameList.CurrencyByAlias.ContainsKey(rawPrice))
+            {
+                return new PoePrice(KnownCurrencyNameList.CurrencyByAlias[rawPrice], 1);
+            }
+
             var match = CurrencyParser.Match(rawPrice);
             if (!match.Success)
             {
@@ -57,6 +65,21 @@ namespace PoeShared.Converters
             }
 
             return new PoePrice(currencyType, currencyValue);
+        }
+
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            var rawPrice = value as string;
+            if (rawPrice == null)
+            {
+                return Binding.DoNothing;
+            }
+            return Convert(rawPrice);
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
         }
     }
 }

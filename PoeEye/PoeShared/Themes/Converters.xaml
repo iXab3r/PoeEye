@@ -22,6 +22,7 @@
                                   FalseValue="Visible" />
 
   <eyeConverters:BoolInversionConverter x:Key="NotConverter"  />
+  <eyeConverters:StringToPoePriceConverter x:Key="StringToPoePriceConverter"  />
 
     <kent:MapConverter x:Key="VisibilityInversionConverterVisibleToHidden" FallbackBehavior="ReturnUnsetValue">
         <kent:Mapping From="{x:Static Visibility.Visible}" To="{x:Static Visibility.Hidden}"/>

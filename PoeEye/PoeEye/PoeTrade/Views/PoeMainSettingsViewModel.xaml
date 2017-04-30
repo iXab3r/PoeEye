@@ -10,57 +10,56 @@
   </ResourceDictionary.MergedDictionaries>
 
   <DataTemplate DataType="{x:Type viewModels1:PoeMainSettingsViewModel}">
-        <Grid Margin="10,5">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
+    <Grid Margin="10,5">
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+      </Grid.RowDefinitions>
 
-            <StackPanel Grid.Row="0" Grid.Column="0"
-                        Orientation="Horizontal" Height="24">
-                <Label Style="{StaticResource EyeIconLabel}" Content="Clipboard monitoring:" MinWidth="100" />
-                <controls:ToggleSwitchButton ToolTip="Enable clipboard monitoring" Height="26"
-                                             IsChecked="{Binding ClipboardMonitoringEnabled}" />
-            </StackPanel>
-            
-            <StackPanel Grid.Row="1" Grid.Column="0"
-                        Orientation="Horizontal" Height="24">
-                <Label Style="{StaticResource EyeIconLabel}" Content="Whispers:" MinWidth="100"  />
-                <controls:ToggleSwitchButton ToolTip="In-game whisper notifications" Height="26"
-                                             IsChecked="{Binding WhisperNotificationsEnabled}" />
-            </StackPanel>
+      <StackPanel Grid.Row="0" Grid.Column="0"
+                  Orientation="Horizontal" Height="24">
+        <Label Style="{StaticResource EyeIconLabel}" Content="Clipboard monitoring:" MinWidth="100" />
+        <controls:ToggleSwitchButton ToolTip="Enable clipboard monitoring" Height="26"
+                                     IsChecked="{Binding ClipboardMonitoringEnabled}" />
+      </StackPanel>
 
-            <StackPanel Grid.Row="2" Grid.Column="0"
-                        Orientation="Vertical">
-                <Label Style="{StaticResource EyeIconLabel}" Content="Currencies rate (in Chaos orbs)" MinWidth="100" />
-                <ItemsControl ItemsSource="{Binding CurrenciesPriceInChaosOrbs}" BorderThickness="0,1,0,0"
-                              BorderBrush="{StaticResource AccentColorBrush}">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <StackPanel Orientation="Horizontal" Margin="0,2">
-                                <Label Width="100"
-                                       HorizontalContentAlignment="Right" HorizontalAlignment="Stretch"
-                                       Content="{Binding Item1, Mode=OneWay}" />
-                                <controls:NumericUpDown Width="100"
-                                                        Style="{StaticResource QueryNumericUpDownMax}"
-                                                        Value="{Binding Item2, Converter={x:Static converters:NullableConverter.Instance}}"
-                                                        StringFormat="{}{0:F2}" />
-                            </StackPanel>
+      <StackPanel Grid.Row="1" Grid.Column="0"
+                  Orientation="Horizontal" Height="24">
+        <Label Style="{StaticResource EyeIconLabel}" Content="Whispers:" MinWidth="100" />
+        <controls:ToggleSwitchButton ToolTip="In-game whisper notifications" Height="26"
+                                     IsChecked="{Binding WhisperNotificationsEnabled}" />
+      </StackPanel>
 
-                        </DataTemplate>
+      <StackPanel Grid.Row="2" Grid.Column="0"
+                  Orientation="Vertical">
+        <Label Style="{StaticResource EyeIconLabel}" Content="Currencies rate (in Chaos orbs)" MinWidth="100" />
+        <ItemsControl ItemsSource="{Binding CurrenciesPriceInChaosOrbs}" BorderThickness="0,1,0,0"
+                      BorderBrush="{StaticResource AccentColorBrush}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate>
+              <StackPanel Orientation="Horizontal" Margin="0,2">
+                <ContentPresenter
+                  Width="100"
+                  Content="{Binding Item1, Mode=OneWay, Converter={StaticResource StringToPoePriceConverter}}" />
+                <controls:NumericUpDown Width="100"
+                                        Style="{StaticResource QueryNumericUpDownMax}"
+                                        Value="{Binding Item2, Converter={x:Static converters:NullableConverter.Instance}}"
+                                        StringFormat="{}{0:F2}" />
+              </StackPanel>
 
-                    </ItemsControl.ItemTemplate>
+            </DataTemplate>
 
-                </ItemsControl>
-            </StackPanel>
-          
-            <ContentPresenter Grid.Row="3"
-                              Margin="0,10"
-                              ContentTemplate="{StaticResource CurrencyTestTemplateKey}"
-                              Content="{Binding CurrencyTest}">
-            </ContentPresenter>
-        </Grid>
-    </DataTemplate>
+          </ItemsControl.ItemTemplate>
+
+        </ItemsControl>
+      </StackPanel>
+
+      <ContentPresenter Grid.Row="3"
+                        Margin="0,10"
+                        ContentTemplate="{StaticResource CurrencyTestTemplateKey}"
+                        Content="{Binding CurrencyTest}" />
+    </Grid>
+  </DataTemplate>
 </ResourceDictionary>

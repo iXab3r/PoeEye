@@ -34,14 +34,20 @@ namespace PoeEye.Tests.PoeShared.Converters
             var result = instance.Convert(rawPrice);
 
             //Then
-            result.ShouldBe(expected);
+            result.CurrencyType.ShouldBe(expected.CurrencyType);
+            result.Value.ShouldBe(expected.Value);
+            result.Price.ShouldBe(expected.Price);
         }
 
         public IEnumerable<TestCaseData> ShouldConvertCases()
         {
             yield return new TestCaseData("Unknown", PoePrice.Empty);
             yield return new TestCaseData("Random", PoePrice.Empty);
+            yield return new TestCaseData("blessed", new PoePrice(KnownCurrencyNameList.BlessedOrb, 1));
+            yield return new TestCaseData("alt", new PoePrice(KnownCurrencyNameList.OrbOfAlteration, 1));
             yield return new TestCaseData("1 alt", new PoePrice(KnownCurrencyNameList.OrbOfAlteration, 1));
+            yield return new TestCaseData("price 1 alt", new PoePrice(KnownCurrencyNameList.OrbOfAlteration, 1));
+            yield return new TestCaseData("b/o 1 alt", new PoePrice(KnownCurrencyNameList.OrbOfAlteration, 1));
             yield return new TestCaseData("1.5 alt", new PoePrice(KnownCurrencyNameList.OrbOfAlteration, 1.5f));
             yield return new TestCaseData("5 blessing of chayula", new PoePrice(KnownCurrencyNameList.BlessingOfChayula, 5));
             yield return new TestCaseData("1 xoph's breachstone", new PoePrice(KnownCurrencyNameList.XophsBreachstone, 1));

@@ -11,14 +11,14 @@ namespace PoeShared.Common
             CurrencyType = currencyType;
             Value = value;
 
-            Price = currencyType != KnownCurrencyNameList.Unknown 
-                ? $"{value} {currencyType}" 
+            Price = currencyType != KnownCurrencyNameList.Unknown
+                ? $"{value} {currencyType}"
                 : $"{currencyType}";
         }
 
-        public string CurrencyType { get; private set; }
+        public string CurrencyType { get; }
 
-        public float Value { get; private set; }
+        public float Value { get; }
 
         public string Price { get; }
 
@@ -38,6 +38,28 @@ namespace PoeShared.Common
 
             var other = (PoePrice) obj;
             return Value.CompareTo(other.Value);
+        }
+
+        public bool Equals(PoePrice other)
+        {
+            return string.Equals(CurrencyType, other.CurrencyType) && Value.Equals(other.Value);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj))
+            {
+                return false;
+            }
+            return obj is PoePrice && Equals((PoePrice) obj);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                return ((CurrencyType != null ? CurrencyType.GetHashCode() : 0) * 397) ^ Value.GetHashCode();
+            }
         }
     }
 }
