@@ -257,7 +257,7 @@
 
               <TextBox.Style>
                 <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource CircleTextBox}">
-                  <Setter Property="Background" Value="{StaticResource PoeTradeNewItemBrush}" />
+                  <Setter Property="Background" Value="{StaticResource SemiPoeTradeNewItemBrush}" />
                   <Setter Property="Padding" Value="0" />
                   <Style.Triggers>
                     <DataTrigger
@@ -267,7 +267,7 @@
                       <Setter Property="Background">
                         <Setter.Value>
                           <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5, 1">
-                            <GradientStop Color="{StaticResource PoeTradeNewItemColor}" />
+                            <GradientStop Color="{StaticResource SemiPoeTradeNewItemColor}" />
                             <GradientStop Color="Transparent" Offset="1" />
                           </LinearGradientBrush>
                         </Setter.Value>
@@ -288,7 +288,7 @@
 
               <TextBox.Style>
                 <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource CircleTextBox}">
-                  <Setter Property="Background" Value="{StaticResource PoeTradeRemovedItemBrush}" />
+                  <Setter Property="Background" Value="{StaticResource SemiPoeTradeRemovedItemBrush}" />
                   <Setter Property="Padding" Value="0" />
                   <Style.Triggers>
                     <DataTrigger
@@ -299,7 +299,7 @@
                         <Setter.Value>
                           <LinearGradientBrush EndPoint="0.5, 1" StartPoint="0.5,0">
                             <GradientStop Color="Transparent" />
-                            <GradientStop Color="{StaticResource PoeTradeRemovedItemColor}" Offset="1" />
+                            <GradientStop Color="{StaticResource SemiPoeTradeRemovedItemColor}" Offset="1" />
                           </LinearGradientBrush>
                         </Setter.Value>
                       </Setter>

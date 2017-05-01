@@ -2,8 +2,11 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:blue="http://www.nuget.org/Blue.MVVM">
 
-  <Color x:Key="PoeTradeRemovedItemColor">#55FF9298</Color>
-  <Color x:Key="PoeTradeNewItemColor">#5592FF98</Color>
+  <Color x:Key="PoeTradeRemovedItemColor">#FFFF9298</Color>
+  <Color x:Key="PoeTradeNewItemColor">#FF92FF98</Color>
+
+  <Color x:Key="SemiPoeTradeRemovedItemColor">#55FF9298</Color>
+  <Color x:Key="SemiPoeTradeNewItemColor">#5592FF98</Color>
 
   <Color x:Key="PoeItemElementalStatColor">#FF8CACBC</Color>
   <Color x:Key="PoeItemPhysicalStatColor">#FFFFFB8C</Color>
@@ -12,6 +15,9 @@
   <Color x:Key="PoeItemDexStatColor">#FF29BA55</Color>
   <Color x:Key="PoeItemStrStatColor">#FFE16043</Color>
   <Color x:Key="PoeItemIntStatColor">#FF4479A9</Color>
+
+  <SolidColorBrush x:Key="SemiPoeTradeRemovedItemBrush" Color="{StaticResource SemiPoeTradeRemovedItemColor}" />
+  <SolidColorBrush x:Key="SemiPoeTradeNewItemBrush" Color="{StaticResource SemiPoeTradeNewItemColor}" />
 
   <SolidColorBrush x:Key="PoeTradeRemovedItemBrush" Color="{StaticResource PoeTradeRemovedItemColor}" />
   <SolidColorBrush x:Key="PoeTradeNewItemBrush" Color="{StaticResource PoeTradeNewItemColor}" />
