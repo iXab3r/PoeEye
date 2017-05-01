@@ -1,4 +1,5 @@
-﻿using JetBrains.Annotations;
+﻿using System.Windows;
+using JetBrains.Annotations;
 using PoeShared.Scaffolding;
 using ReactiveUI;
 
@@ -15,5 +16,7 @@ namespace PoeShared.Native
         }
 
         public IOverlayViewModel Content { [CanBeNull] get; [CanBeNull] set; }
+
+        public DataTemplate ContentTemplate { [CanBeNull] get; [CanBeNull] set; }
     }
 }

@@ -170,7 +170,6 @@ namespace PoeShared.Native
             }
 
             Disposable.Create(() => overlayWindow.Close()).AddTo(childAnchors);
-            //Disposable.Create(() => Anchors.Remove(childAnchors)).AddTo(childAnchors);
             childAnchors.AddTo(Anchors);
 
             return childAnchors;

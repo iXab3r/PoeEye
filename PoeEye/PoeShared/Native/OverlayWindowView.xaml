@@ -54,7 +54,9 @@
     
     <Grid >
         <Grid >
-            <ContentControl Grid.Row="0" Content="{Binding Content}" />
+            <ContentControl Grid.Row="0" 
+                            Content="{Binding Content}"
+                            ContentTemplate="{Binding ContentTemplate}"/>
 
             <Border 
                 Visibility="{Binding ShowWireframes, Converter={StaticResource TrueToVisibleFalseToCollapsedConverter}}"

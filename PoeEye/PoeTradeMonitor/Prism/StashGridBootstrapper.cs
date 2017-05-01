@@ -23,7 +23,7 @@ namespace PoeEye.TradeMonitor.Prism
 
         public StashGridBootstrapper(
                 [NotNull] IConfigProvider<PoeTradeMonitorConfig> configProvider,
-                [NotNull] [Dependency(WellKnownOverlays.PathOfExileTransparentOverlay)] IOverlayWindowController overlayController,
+                [NotNull] [Dependency(WellKnownOverlays.PathOfExileLayeredOverlay)] IOverlayWindowController overlayController,
                 [NotNull] IFactory<PoeStashGridViewModel, IOverlayWindowController> viewModelFactory,
                 [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {

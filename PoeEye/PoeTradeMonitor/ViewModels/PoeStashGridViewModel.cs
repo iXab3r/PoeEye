@@ -1,45 +1,61 @@
-﻿using System.Reactive.Concurrency;
-using System.Windows;
-using JetBrains.Annotations;
-using Microsoft.Practices.Unity;
-using PoeEye.TradeMonitor.Modularity;
-using PoeEye.TradeMonitor.Services;
-using PoeShared.Modularity;
-using PoeShared.Native;
-using PoeShared.Prism;
-using ReactiveUI;
-using System;
+﻿using System;
 using System.Collections.ObjectModel;
+using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Windows;
 using System.Windows.Input;
 using Anotar.Log4Net;
 using DynamicData;
+using Guards;
+using JetBrains.Annotations;
+using Microsoft.Practices.Unity;
 using PoeEye.TradeMonitor.Models;
+using PoeEye.TradeMonitor.Modularity;
+using PoeEye.TradeMonitor.Services;
+using PoeShared;
+using PoeShared.Modularity;
+using PoeShared.Native;
+using PoeShared.Prism;
 using PoeShared.Scaffolding;
 using PoeShared.StashApi.DataTypes;
 using Prism.Commands;
+using ReactiveUI;
 
 namespace PoeEye.TradeMonitor.ViewModels
 {
     internal sealed class PoeStashGridViewModel : OverlayViewModelBase, IPoeStashHighlightService
     {
-        [NotNull] private readonly IConfigProvider<PoeStashGridConfig> configProvider;
+        private const int MaxInventoryWidth = 24;
+        private const int MaxInventoryHeight = 24;
+
+        private readonly IConfigProvider<PoeStashGridConfig> configProvider;
         private readonly ISourceList<BasicStashGridCellViewModel> highlights = new SourceList<BasicStashGridCellViewModel>();
 
         private readonly ReadOnlyObservableCollection<BasicStashGridCellViewModel> highlightsProxy;
 
-        public PoeStashGridViewModel([NotNull] IKeyboardEventsSource keyboardMouseEvents,
-            [NotNull] IPoeStashService stashService,
+        private float opacity;
+
+        public PoeStashGridViewModel(
+            [NotNull] IKeyboardEventsSource keyboardMouseEvents,
+            [NotNull] IOverlayWindowController controller,
             [NotNull] IConfigProvider<PoeStashGridConfig> configProvider,
             [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler,
             [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {
+            Guard.ArgumentNotNull(keyboardMouseEvents, nameof(keyboardMouseEvents));
+            Guard.ArgumentNotNull(controller, nameof(controller));
+            Guard.ArgumentNotNull(configProvider, nameof(configProvider));
+            Guard.ArgumentNotNull(bgScheduler, nameof(bgScheduler));
+            Guard.ArgumentNotNull(uiScheduler, nameof(uiScheduler));
+
             this.configProvider = configProvider;
             MinSize = new Size(300, 300);
             MaxSize = new Size(1000, 1000);
-            Top = 100;
-            Left = 100;
+            Top = 90;
+            Left = 15;
+            Width = 640;
+            Height = 705;
             SizeToContent = SizeToContent.Manual;
 
             LockWindowCommand = new DelegateCommand(LockWindowCommandExecuted);
@@ -52,21 +68,28 @@ namespace PoeEye.TradeMonitor.ViewModels
                 .AddTo(Anchors);
 
             WhenLoaded.Subscribe(
-                () =>
-                {
-                    configProvider
-                        .WhenChanged
-                        .Subscribe(ApplyConfig)
-                        .AddTo(Anchors);
-                }).AddTo(Anchors);
-        }
+                    () =>
+                    {
+                        configProvider
+                            .WhenChanged
+                            .Subscribe(ApplyConfig)
+                            .AddTo(Anchors);
 
-        private float opacity;
+                        keyboardMouseEvents
+                            .WhenKeyDown
+                            .Where(x => controller.IsVisible)
+                            .Where(x => new KeyGesture(Key.F8, ModifierKeys.Control | ModifierKeys.Shift | ModifierKeys.Alt).MatchesHotkey(x))
+                            .Do(x => x.Handled = true)
+                            .Subscribe(ToggleLock, Log.HandleException)
+                            .AddTo(Anchors);
+                    })
+                .AddTo(Anchors);
+        }
 
         public float Opacity
         {
-            get { return opacity; }
-            set { this.RaiseAndSetIfChanged(ref opacity, value); }
+            get => opacity;
+            set => this.RaiseAndSetIfChanged(ref opacity, value);
         }
 
         public ReactiveList<BasicStashGridCellViewModel> GridCells { get; } = new ReactiveList<BasicStashGridCellViewModel>();
@@ -74,6 +97,28 @@ namespace PoeEye.TradeMonitor.ViewModels
         public ReadOnlyObservableCollection<BasicStashGridCellViewModel> Highlights => highlightsProxy;
 
         public ICommand LockWindowCommand { get; }
+
+        public IGridCellViewController AddHighlight(ItemPosition pos, StashTabType stashType)
+        {
+            LogTo.Debug($"Highlighting zone {pos} in tab of type {stashType}");
+            pos = TransformToAbsolute(pos, stashType);
+
+            LogTo.Debug($"Absolute position: {pos}");
+            var cell = new HighlightedStashGridCellViewModel
+            {
+                Width = pos.Width,
+                Height = pos.Height,
+                Left = pos.X,
+                Top = pos.Y
+            };
+
+            highlights.Add(cell);
+
+            var result = new GridCellController(cell);
+            Disposable.Create(() => highlights.Remove(cell)).AddTo(result.Anchors);
+
+            return result;
+        }
 
         private void ApplyConfig(PoeStashGridConfig config)
         {
@@ -112,45 +157,43 @@ namespace PoeEye.TradeMonitor.ViewModels
             IsLocked = true;
         }
 
+        private void ToggleLock()
+        {
+            if (!IsLocked)
+            {
+                LogTo.Debug($"Locking window");
+                LockWindowCommandExecuted();
+            }
+            else
+            {
+                LogTo.Debug($"Unlocking window");
+                UnlockWindowCommandExecuted();
+            }
+        }
+
+        private void UnlockWindowCommandExecuted()
+        {
+            IsLocked = false;
+        }
+
         private void PrepareGridCells()
         {
             GridCells.Clear();
 
-            for (int x = 0; x < 24; x += 1)
+            for (var x = 0; x < MaxInventoryWidth; x += 1)
             {
-                for (int y = 0; y < 24; y += 1)
+                for (var y = 0; y < MaxInventoryHeight; y += 1)
                 {
-                    GridCells.Add(new BasicStashGridCellViewModel()
-                    {
-                        Left = x,
-                        Top = y,
-                        Width = 1,
-                        Height = 1
-                    });
+                    GridCells.Add(
+                        new BasicStashGridCellViewModel
+                        {
+                            Left = x,
+                            Top = y,
+                            Width = 1,
+                            Height = 1
+                        });
                 }
             }
-        }
-
-        public IGridCellViewController AddHighlight(ItemPosition pos, StashTabType stashType)
-        {
-            LogTo.Debug($"Highlighting zone {pos} in tab of type {stashType}");
-            pos = TransformToAbsolute(pos, stashType);
-
-            LogTo.Debug($"Absolute position: {pos}");
-            var cell = new HighlightedStashGridCellViewModel
-            {
-                Width = pos.Width,
-                Height = pos.Height,
-                Left = pos.X,
-                Top = pos.Y,
-            };
-
-            highlights.Add(cell);
-
-            var result = new GridCellController(cell);
-            Disposable.Create(() => highlights.Remove(cell)).AddTo(result.Anchors);
-
-            return result;
         }
 
         private ItemPosition TransformToAbsolute(ItemPosition pos, StashTabType stashType)
@@ -162,10 +205,10 @@ namespace PoeEye.TradeMonitor.ViewModels
 
                 default:
                     return new ItemPosition(
-                            pos.X * 2,
-                            pos.Y * 2,
-                            pos.Width * 2,
-                            pos.Height * 2);
+                        pos.X * 2,
+                        pos.Y * 2,
+                        pos.Width * 2,
+                        pos.Height * 2);
             }
         }
 
@@ -184,6 +227,12 @@ namespace PoeEye.TradeMonitor.ViewModels
             {
                 get => cell.IsFresh;
                 set => cell.IsFresh = value;
+            }
+
+            public string ToolTipText
+            {
+                get => cell.ToolTipText;
+                set => cell.ToolTipText = value;
             }
         }
     }

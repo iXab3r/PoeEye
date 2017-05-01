@@ -11,8 +11,8 @@ namespace PoeEye.TradeMonitor.Models
 {
     internal sealed class FakeItemFactory
     {
-        private const int MaxInventoryWidth = 24;
-        private const int MaxInventoryHeight = 24;
+        private const int MaxInventoryWidth = 12;
+        private const int MaxInventoryHeight = 12;
 
         private readonly IPoeDatabaseReader database;
         private readonly IClock clock;

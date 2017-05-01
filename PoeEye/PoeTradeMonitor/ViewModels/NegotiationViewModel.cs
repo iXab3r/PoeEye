@@ -30,7 +30,7 @@ namespace PoeEye.TradeMonitor.ViewModels
     internal class NegotiationViewModel : DisposableReactiveObject, INegotiationViewModel, IMacroCommandContext
     {
         public static readonly TimeSpan DefaultUpdatePeriod = TimeSpan.FromSeconds(1);
-        public static readonly TimeSpan FreshnessPeriod = TimeSpan.FromSeconds(10);
+        public static readonly TimeSpan FreshnessPeriod = TimeSpan.FromSeconds(1000);
 
         private readonly IPoeChatService chatService;
         private readonly IClock clock;
@@ -38,7 +38,7 @@ namespace PoeEye.TradeMonitor.ViewModels
         private readonly IPoeStashHighlightService highlightService;
         private readonly SerialDisposable highlightServiceAnchor = new SerialDisposable();
         private readonly IFactory<IImageViewModel, Uri> imageFactory;
-        [NotNull] private readonly IScheduler uiScheduler;
+        private readonly IScheduler uiScheduler;
 
         private readonly DelegateCommand inviteToPartyCommand;
         private readonly DelegateCommand kickFromPartyCommand;
@@ -329,6 +329,8 @@ namespace PoeEye.TradeMonitor.ViewModels
 
             var controller = highlightService.AddHighlight(position, tab?.StashType ?? StashTabType.NormalStash);
             controller.IsFresh = true;
+            controller.ToolTipText = tab?.Name ?? Negotiation.TabName;
+
             controller.AddTo(anchors);
 
             Observable

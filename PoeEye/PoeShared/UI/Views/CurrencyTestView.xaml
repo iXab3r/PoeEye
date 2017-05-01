@@ -10,16 +10,16 @@
 
   <DataTemplate x:Key="CurrencyTestTemplateKey" DataType="{x:Type sharedViewModels:CurrencyTestViewModel}">
     <Grid>
-      <ListBox ItemsSource="{Binding Items}" MaxHeight="300">
-        <ListBox.ItemTemplate>
+      <ItemsControl ItemsSource="{Binding Items}">
+        <ItemsControl.ItemTemplate>
           <DataTemplate DataType="{x:Type sharedViewModels:CurrencyInfo}">
             <DockPanel LastChildFill="True">
               <ContentPresenter Content="{Binding Price}" MinWidth="240" />
               <TextBox Text="{Binding AliasesList, Mode=OneWay}" IsReadOnly="True"/>
             </DockPanel>
           </DataTemplate>
-        </ListBox.ItemTemplate>
-      </ListBox>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
     </Grid>
   </DataTemplate>
 
