@@ -640,6 +640,14 @@
   <ItemGroup>
     <Folder Include="PoeTrade\Shell\Models\" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\LinkHorizontal.png" />
+    <Resource Include="Resources\LinkVertical.png" />
+    <Resource Include="Resources\SocketBlue.png" />
+    <Resource Include="Resources\SocketGreen.png" />
+    <Resource Include="Resources\SocketRed.png" />
+    <Resource Include="Resources\SocketWhite.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <UsingTask TaskName="CosturaCleanup" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll" TaskFactory="CodeTaskFactory">
     <ParameterGroup>

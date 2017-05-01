@@ -12,6 +12,7 @@
                       xmlns:dragablz="http://dragablz.net/winfx/xaml/dragablz"
                       xmlns:viewModels="clr-namespace:PoeEye.PoeTrade.ViewModels"
                       xmlns:fa="http://schemas.fontawesome.io/icons/"
+                      xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
                       mc:Ignorable="d"
                       Title="{Binding MainWindowTitle}"
                       MinWidth="1200"
@@ -21,326 +22,312 @@
                       d:DataContext="{d:DesignInstance shellViewModels:MainWindowViewModel}"
                       BorderThickness="1" BorderBrush="{StaticResource AccentColorBrush}">
 
-    <Window.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Converters.xaml" />
-            </ResourceDictionary.MergedDictionaries>
-        </ResourceDictionary>
-    </Window.Resources>
+  <Window.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Converters.xaml" />
+      </ResourceDictionary.MergedDictionaries>
+    </ResourceDictionary>
+  </Window.Resources>
 
-    <Window.InputBindings>
-        <KeyBinding Command="{Binding ClipboardParserViewModel.ParseClipboard}" Gesture="CTRL+V" />
-    </Window.InputBindings>
+  <Window.InputBindings>
+    <KeyBinding Command="{Binding ClipboardParserViewModel.ParseClipboard}" Gesture="CTRL+V" />
+  </Window.InputBindings>
+
+  <materialDesign:DrawerHost x:Name="MainDrawerHost"
+                             IsBottomDrawerOpen="{Binding ApplicationUpdater.IsOpen}">
+
+    <materialDesign:DrawerHost.RightDrawerContent>
+      <Grid Width="500">
+        <ContentPresenter Content="{Binding Settings}" />
+      </Grid>
+    </materialDesign:DrawerHost.RightDrawerContent>
+
+    <materialDesign:DrawerHost.BottomDrawerContent>
+
+      <Grid Height="60">
+        <ContentPresenter Content="{Binding ApplicationUpdater}" />
+      </Grid>
+    </materialDesign:DrawerHost.BottomDrawerContent>
+
+    <materialDesign:DrawerHost.LeftDrawerContent>
+      <Grid Margin="5,0" Width="500">
+        <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Visible">
+          <ScrollViewer.Content>
+            <ContentPresenter Content="{Binding Chat}" Margin="10" HorizontalAlignment="Stretch" />
+          </ScrollViewer.Content>
+        </ScrollViewer>
+      </Grid>
+    </materialDesign:DrawerHost.LeftDrawerContent>
 
     <Grid>
 
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="*" />
+        <RowDefinition Height="Auto" />
+      </Grid.RowDefinitions>
 
-        <ContentControl Grid.Row="0">
-            <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" />
-        </ContentControl>
+      <ContentControl Grid.Row="0">
+        <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" />
+      </ContentControl>
 
-        <Border Grid.Row="1">
-            <Grid Margin="5,10">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
+      <Border Grid.Row="1">
+        <Grid Margin="5,10">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+          </Grid.ColumnDefinitions>
 
-                <Expander Grid.Column="0" ExpandDirection="Right" IsExpanded="True" Margin="0">
-                    <Expander.Header>
-                        <StackPanel Orientation="Vertical">
-                            <TextBlock FontSize="14"
-                                       Text="QUERY LIST"
-                                       RenderTransformOrigin="0.5,0.5"
-                                       HorizontalAlignment="Center"
-                                       VerticalAlignment="Top">
-                                <TextBlock.LayoutTransform>
-                                    <TransformGroup>
-                                        <RotateTransform Angle="-90" />
-                                    </TransformGroup>
-                                </TextBlock.LayoutTransform>
-                            </TextBlock>
-                            <Button
-                                Width="24" Height="24"
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Top"
-                                Command="{Binding RefreshAllTabsCommand}"
-                                Focusable="False"
-                                ToolTip="Force refresh all tabs"
-                                Padding="5"
-                                fa:Awesome.Content="Refresh">
-                                <Button.Style>
-                                    <Style TargetType="{x:Type Button}" BasedOn="{StaticResource EyeCircleButton}">
-                                        <Setter Property="BorderThickness" Value="2" />
-                                        <Style.Triggers>
-                                            <Trigger Property="IsMouseOver" Value="True">
-                                                <Setter Property="Background"
-                                                        Value="{StaticResource FlatButtonPressedBackgroundBrush}" />
-                                            </Trigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </Button.Style>
-                            </Button>
-                        </StackPanel>
-                    </Expander.Header>
+          <Expander Grid.Column="0" ExpandDirection="Right" IsExpanded="True" Margin="0">
+            <Expander.Header>
+              <StackPanel Orientation="Vertical">
+                <TextBlock FontSize="14"
+                           Text="QUERY LIST"
+                           RenderTransformOrigin="0.5,0.5"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Top">
+                  <TextBlock.LayoutTransform>
+                    <TransformGroup>
+                      <RotateTransform Angle="-90" />
+                    </TransformGroup>
+                  </TextBlock.LayoutTransform>
+                </TextBlock>
+                <Button
+                  Width="24" Height="24"
+                  HorizontalAlignment="Center"
+                  VerticalAlignment="Top"
+                  Command="{Binding RefreshAllTabsCommand}"
+                  Focusable="False"
+                  ToolTip="Force refresh all tabs"
+                  Padding="5"
+                  fa:Awesome.Content="Refresh">
+                  <Button.Style>
+                    <Style TargetType="{x:Type Button}" BasedOn="{StaticResource EyeCircleButton}">
+                      <Setter Property="BorderThickness" Value="2" />
+                      <Style.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                          <Setter Property="Background"
+                                  Value="{StaticResource FlatButtonPressedBackgroundBrush}" />
+                        </Trigger>
+                      </Style.Triggers>
+                    </Style>
+                  </Button.Style>
+                </Button>
+              </StackPanel>
+            </Expander.Header>
 
-                    <dragablz:TabablzControl Margin="0"
-                                             utilities:TabablzHelper.PositionMonitor="{Binding PositionMonitor, Mode=OneWay}"
-                                             ItemsSource="{Binding TabsList}"
-                                             TabStripPlacement="Left"
-                                             BorderThickness="0"
-                                             Background="{x:Null}"
-                                             SelectedItem="{Binding SelectedTab}"
-                                             VirtualizingPanel.IsVirtualizing="False"
-                                             VirtualizingPanel.IsContainerVirtualizable="False"
-                                             Style="{StaticResource DragablzVerticalTabablzControl}"
-                                             HeaderItemTemplate="{StaticResource MainWindowTabItemViewTemplate}">
-                      <utilities:TabablzHelper.ItemContextMenu>
-                        <ContextMenu>
-                          <MenuItem Header="Rename item" 
-                                    InputGestureText="F2"
-                                    Command="{Binding RenameCommand}"/>
-                      </ContextMenu>
-                      </utilities:TabablzHelper.ItemContextMenu>
-                      <dragablz:TabablzControl.ItemContainerStyle>
-                            <Style TargetType="{x:Type dragablz:DragablzItem}"
-                                   BasedOn="{StaticResource DragablzTabItemVerticalStyle}">
-                                <Setter Property="Width" Value="350" />
-                                <Setter Property="BorderThickness" Value="0,2,0,2" />
-                                <Setter Property="BorderBrush" Value="Transparent" />
-                            </Style>
-                        </dragablz:TabablzControl.ItemContainerStyle>
-                        <dragablz:TabablzControl.ContentTemplate>
-                            <DataTemplate DataType="{x:Type viewModels:IMainWindowTabViewModel}"/>
-                        </dragablz:TabablzControl.ContentTemplate>
-                        <dragablz:TabablzControl.InputBindings>
-                          <KeyBinding Key="F2" Command="{Binding SelectedTab.RenameCommand}"/>
-                        </dragablz:TabablzControl.InputBindings>
-                    </dragablz:TabablzControl>
-                </Expander>
-
-                <Image Grid.Column="1" Source="pack://application:,,,/Resources/mainIcon.png" Opacity="0.2" />
-
-                <ContentControl Grid.Column="1"
-                                Margin="10,0,0,0"
-                                Visibility="{Binding SelectedTab, Converter={StaticResource NullToHiddenConverter}}"
-                                Content="{Binding SelectedTab}" />
-
-                <ContentControl Grid.Column="1"
-                                Margin="10,0,0,0"
-                                Visibility="{Binding SelectedTab, Converter={StaticResource NotNullToHiddenConverter}}"
-                                Content="{Binding SummaryTab}" />
-            </Grid>
-        </Border>
-
-
-        <Border Grid.Row="2"
-                BorderThickness="0,1,0,0" BorderBrush="{StaticResource AccentColorBrush}" Margin="5,2,10,2"
-                Visibility="{Binding SelectedTab, Converter={StaticResource NullToCollapsedConverter}}">
-            <Border.Resources>
-                <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource MetroTextBlock}">
-                    <Setter Property="FontSize" Value="16" />
+            <dragablz:TabablzControl Margin="0"
+                                     utilities:TabablzHelper.PositionMonitor="{Binding PositionMonitor, Mode=OneWay}"
+                                     ItemsSource="{Binding TabsList}"
+                                     TabStripPlacement="Left"
+                                     BorderThickness="0"
+                                     Background="{x:Null}"
+                                     SelectedItem="{Binding SelectedTab}"
+                                     VirtualizingPanel.IsVirtualizing="False"
+                                     VirtualizingPanel.IsContainerVirtualizable="False"
+                                     Style="{StaticResource DragablzVerticalTabablzControl}"
+                                     HeaderItemTemplate="{StaticResource MainWindowTabItemViewTemplate}">
+              <utilities:TabablzHelper.ItemContextMenu>
+                <ContextMenu>
+                  <MenuItem Header="Rename item"
+                            InputGestureText="F2"
+                            Command="{Binding RenameCommand}" />
+                </ContextMenu>
+              </utilities:TabablzHelper.ItemContextMenu>
+              <dragablz:TabablzControl.ItemContainerStyle>
+                <Style TargetType="{x:Type dragablz:DragablzItem}"
+                       BasedOn="{StaticResource DragablzTabItemVerticalStyle}">
+                  <Setter Property="Width" Value="350" />
+                  <Setter Property="BorderThickness" Value="0,2,0,2" />
+                  <Setter Property="BorderBrush" Value="Transparent" />
                 </Style>
-            </Border.Resources>
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
+              </dragablz:TabablzControl.ItemContainerStyle>
+              <dragablz:TabablzControl.ContentTemplate>
+                <DataTemplate DataType="{x:Type viewModels:IMainWindowTabViewModel}" />
+              </dragablz:TabablzControl.ContentTemplate>
+              <dragablz:TabablzControl.InputBindings>
+                <KeyBinding Key="F2" Command="{Binding SelectedTab.RenameCommand}" />
+              </dragablz:TabablzControl.InputBindings>
+            </dragablz:TabablzControl>
+          </Expander>
 
-                <StackPanel Grid.Column="0" Orientation="Horizontal"
-                            Visibility="{Binding SelectedTab.IsBusy, Converter={StaticResource BoolFalseToCollapsedConverter}}">
-                    <controls:ProgressRing Height="20" Width="20" IsActive="true"
-                                           Foreground="{StaticResource TextBrush}" />
-                    <TextBlock Text="Updating..." />
-                </StackPanel>
+          <Image Grid.Column="1" Source="pack://application:,,,/Resources/mainIcon.png" Opacity="0.2" />
 
-                <TextBlock Grid.Column="1"
-                           Margin="10,0,0,0"
-                           Visibility="{Binding SelectedTab.TradesList.ActiveQuery, Converter={StaticResource NullToCollapsedConverter}}"
-                           Text="{Binding SelectedTab.TradesList.TimeSinceLastUpdate.TotalSeconds, Mode=OneWay, StringFormat='Elapsed since last update: {0:F0}s'}" />
+          <ContentControl Grid.Column="1"
+                          Margin="10,0,0,0"
+                          Visibility="{Binding SelectedTab, Converter={StaticResource NullToHiddenConverter}}"
+                          Content="{Binding SelectedTab}" />
 
-                <ContentPresenter Grid.Column="2" Content="{Binding SelectedTab.RecheckPeriod}" />
+          <ContentControl Grid.Column="1"
+                          Margin="10,0,0,0"
+                          Visibility="{Binding SelectedTab, Converter={StaticResource NotNullToHiddenConverter}}"
+                          Content="{Binding SummaryTab}" />
+        </Grid>
+      </Border>
 
-            </Grid>
-        </Border>
+
+      <Border Grid.Row="2"
+              BorderThickness="0,1,0,0" BorderBrush="{StaticResource AccentColorBrush}" Margin="5,2,10,2"
+              Visibility="{Binding SelectedTab, Converter={StaticResource NullToCollapsedConverter}}">
+        <Border.Resources>
+          <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource MetroTextBlock}">
+            <Setter Property="FontSize" Value="16" />
+          </Style>
+        </Border.Resources>
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+          </Grid.ColumnDefinitions>
+
+          <StackPanel Grid.Column="0" Orientation="Horizontal"
+                      Visibility="{Binding SelectedTab.IsBusy, Converter={StaticResource BoolFalseToCollapsedConverter}}">
+            <controls:ProgressRing Height="20" Width="20" IsActive="true"
+                                   Foreground="{StaticResource TextBrush}" />
+            <TextBlock Text="Updating..." />
+          </StackPanel>
+
+          <TextBlock Grid.Column="1"
+                     Margin="10,0,0,0"
+                     Visibility="{Binding SelectedTab.TradesList.ActiveQuery, Converter={StaticResource NullToCollapsedConverter}}"
+                     Text="{Binding SelectedTab.TradesList.TimeSinceLastUpdate.TotalSeconds, Mode=OneWay, StringFormat='Elapsed since last update: {0:F0}s'}" />
+
+          <ContentPresenter Grid.Column="2" Content="{Binding SelectedTab.RecheckPeriod}" />
+
+        </Grid>
+      </Border>
 
 
     </Grid>
 
-    <controls:MetroWindow.LeftWindowCommands>
-        <controls:WindowCommands ShowSeparators="True">
-            <Button
-                Command="{Binding CreateNewTabCommand}"
-                Content="&#xF00E; New query"
-                FontFamily="{StaticResource FontAwesome}"
-                FontWeight="Bold" />
+  </materialDesign:DrawerHost>
 
-            <Button
-                Content="&#xF029; Show summary"
-                FontFamily="{StaticResource FontAwesome}"
-                Margin="5,0"
-                FontWeight="Bold">
-                <Button.Style>
-                    <Style TargetType="{x:Type ButtonBase}" BasedOn="{StaticResource ChromelessButtonStyle}">
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding SelectedTab}" Value="{x:Null}">
-                                <Setter Property="Foreground" Value="{StaticResource ControlBackgroundBrush}" />
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </Button.Style>
-                <i:Interaction.Triggers>
-                    <i:EventTrigger EventName="Click">
-                        <utilities:SetPropertyAction PropertyName="SelectedTab" TargetObject="{Binding}"
-                                                     PropertyValue="{x:Null}" />
-                    </i:EventTrigger>
-                </i:Interaction.Triggers>
+  <controls:MetroWindow.LeftWindowCommands>
+    <controls:WindowCommands ShowSeparators="True">
+      <Button
+        Command="{Binding CreateNewTabCommand}"
+        Content="&#xF00E; New query"
+        FontFamily="{StaticResource FontAwesome}"
+        FontWeight="Bold" />
+
+      <Button
+        Content="&#xF029; Show summary"
+        FontFamily="{StaticResource FontAwesome}"
+        Margin="5,0"
+        FontWeight="Bold">
+        <Button.Style>
+          <Style TargetType="{x:Type ButtonBase}" BasedOn="{StaticResource ChromelessButtonStyle}">
+            <Style.Triggers>
+              <DataTrigger Binding="{Binding SelectedTab}" Value="{x:Null}">
+                <Setter Property="Foreground" Value="{StaticResource ControlBackgroundBrush}" />
+              </DataTrigger>
+            </Style.Triggers>
+          </Style>
+        </Button.Style>
+        <i:Interaction.Triggers>
+          <i:EventTrigger EventName="Click">
+            <utilities:SetPropertyAction PropertyName="SelectedTab" TargetObject="{Binding}"
+                                         PropertyValue="{x:Null}" />
+          </i:EventTrigger>
+        </i:Interaction.Triggers>
+      </Button>
+
+      <Button
+        fa:Awesome.Content="FolderOpen"
+        FontFamily="{StaticResource FontAwesome}"
+        Margin="5,0"
+        FontWeight="Bold"
+        ToolTip="Open PoeEye folder"
+        Command="{Binding OpenAppDataDirectoryCommand}" />
+    </controls:WindowCommands>
+
+  </controls:MetroWindow.LeftWindowCommands>
+
+  <controls:MetroWindow.RightWindowCommands>
+    <controls:WindowCommands ShowSeparators="True">
+      <ContentPresenter Content="{Binding ProxyProviderViewModel}" />
+
+      <ContentPresenter Content="{Binding ApplicationUpdater}">
+        <ContentPresenter.ContentTemplate>
+          <DataTemplate DataType="{x:Type updater:ApplicationUpdaterViewModel}">
+            <StackPanel Orientation="Horizontal">
+              <controls:ProgressRing Height="20" Width="20" IsActive="true"
+                                     Foreground="{StaticResource TextBrush}"
+                                     Visibility="{Binding IsBusy, Converter={StaticResource BoolFalseToHiddenConverter}}" />
+
+              <Button Content="Check for updates"
+                      FontFamily="{StaticResource FontAwesome}"
+                      Command="{Binding CheckForUpdatesCommand}"
+                      CommandParameter="{Binding}" />
+            </StackPanel>
+          </DataTemplate>
+
+        </ContentPresenter.ContentTemplate>
+      </ContentPresenter>
+
+      <Button Content="&#xF1D7; Chat" FontFamily="{StaticResource FontAwesome}"
+              Command="{x:Static materialDesign:DrawerHost.OpenDrawerCommand}"
+              CommandTarget="{Binding ElementName=MainDrawerHost}"
+              CommandParameter="{x:Static Dock.Left}">
+      </Button>
+
+      <Button Content="&#xF085; Settings" FontFamily="{StaticResource FontAwesome}"
+              Command="{x:Static materialDesign:DrawerHost.OpenDrawerCommand}"
+              CommandTarget="{Binding ElementName=MainDrawerHost}"
+              CommandParameter="{x:Static Dock.Right}">
+      </Button>
+    </controls:WindowCommands>
+  </controls:MetroWindow.RightWindowCommands>
+
+  <controls:MetroWindow.Flyouts>
+    <controls:FlyoutsControl>
+      <controls:Flyout Header="&#xF0EA; Clipboard" x:Name="ClipboardFlyout"
+                       FontFamily="{StaticResource FontAwesome}"
+                       Position="Bottom"
+                       BorderThickness="0,1,0,0"
+                       BorderBrush="{StaticResource AccentColorBrush}"
+                       IsOpen="{Binding  ClipboardParserViewModel.IsOpen, Mode=TwoWay}">
+
+        <Grid>
+          <controls:MetroProgressBar IsIndeterminate="True"
+                                     Foreground="{StaticResource TextBrush}"
+                                     Visibility="{Binding ClipboardParserViewModel.IsBusy, Converter={StaticResource BoolFalseToCollapsedConverter}}" />
+
+          <Grid MaxWidth="1000"
+                Visibility="{Binding ClipboardParserViewModel.IsBusy, Converter={StaticResource BoolTrueToCollapsedConverter}}">
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*" />
+              <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <ContentControl Grid.Column="0"
+                            Content="{Binding ClipboardParserViewModel.ItemFromClipboard}" />
+
+            <Button Grid.Column="1" Content="Import"
+                    Command="{Binding CreateNewTabCommand}"
+                    CommandParameter="{Binding ClipboardParserViewModel.ItemQueryInfo}"
+                    Margin="15">
+              <i:Interaction.Triggers>
+                <i:EventTrigger EventName="Click">
+                  <utilities:SetPropertyAction PropertyName="IsOpen"
+                                               TargetObject="{Binding ElementName=ClipboardFlyout}">
+                    <utilities:SetPropertyAction.PropertyValue>
+                      <system:Boolean>False</system:Boolean>
+                    </utilities:SetPropertyAction.PropertyValue>
+                  </utilities:SetPropertyAction>
+                </i:EventTrigger>
+              </i:Interaction.Triggers>
             </Button>
-
-            <Button
-                fa:Awesome.Content="FolderOpen"
-                FontFamily="{StaticResource FontAwesome}"
-                Margin="5,0"
-                FontWeight="Bold"
-                ToolTip="Open PoeEye folder"
-                Command="{Binding OpenAppDataDirectoryCommand}" />
-        </controls:WindowCommands>
-
-    </controls:MetroWindow.LeftWindowCommands>
-
-    <controls:MetroWindow.RightWindowCommands>
-        <controls:WindowCommands ShowSeparators="True">
-            <ContentPresenter Content="{Binding ProxyProviderViewModel}" />
-
-            <ContentPresenter Content="{Binding ApplicationUpdater}">
-                <ContentPresenter.ContentTemplate>
-                    <DataTemplate DataType="{x:Type updater:ApplicationUpdaterViewModel}">
-                        <StackPanel Orientation="Horizontal">
-                            <controls:ProgressRing Height="20" Width="20" IsActive="true"
-                                                   Foreground="{StaticResource TextBrush}"
-                                                   Visibility="{Binding IsBusy, Converter={StaticResource BoolFalseToHiddenConverter}}" />
-
-                            <Button Content="Check for updates"
-                                    FontFamily="{StaticResource FontAwesome}"
-                                    Command="{Binding CheckForUpdatesCommand}"
-                                    CommandParameter="{Binding}" />
-                        </StackPanel>
-                    </DataTemplate>
-
-                </ContentPresenter.ContentTemplate>
-            </ContentPresenter>
-
-            <Button Content="&#xF1D7; Chat" FontFamily="{StaticResource FontAwesome}">
-                <i:Interaction.Triggers>
-                    <i:EventTrigger EventName="Click">
-                        <utilities:SetPropertyAction PropertyName="IsOpen"
-                                                     TargetObject="{Binding ElementName=ChatFlyout}"
-                                                     PropertyValue="{Binding ElementName=ChatFlyout, Path=IsOpen, Converter={StaticResource NotConverter}}" />
-                    </i:EventTrigger>
-                </i:Interaction.Triggers>
-            </Button>
-
-            <Button Content="&#xF085; Settings" FontFamily="{StaticResource FontAwesome}">
-                <i:Interaction.Triggers>
-                    <i:EventTrigger EventName="Click">
-                        <utilities:SetPropertyAction PropertyName="IsOpen"
-                                                     TargetObject="{Binding ElementName=SettingsFlyout}"
-                                                     PropertyValue="{Binding ElementName=SettingsFlyout, Path=IsOpen, Converter={StaticResource NotConverter}}" />
-                    </i:EventTrigger>
-                </i:Interaction.Triggers>
-            </Button>
-        </controls:WindowCommands>
-    </controls:MetroWindow.RightWindowCommands>
-
-    <controls:MetroWindow.Flyouts>
-        <controls:FlyoutsControl>
-            <controls:Flyout Header="&#xF0EA; Clipboard" x:Name="ClipboardFlyout"
-                             FontFamily="{StaticResource FontAwesome}"
-                             Position="Bottom"
-                             BorderThickness="0,1,0,0"
-                             BorderBrush="{StaticResource AccentColorBrush}"
-                             IsOpen="{Binding  ClipboardParserViewModel.IsOpen, Mode=TwoWay}">
-
-                <Grid>
-                    <controls:MetroProgressBar IsIndeterminate="True"
-                                               Foreground="{StaticResource TextBrush}"
-                                               Visibility="{Binding ClipboardParserViewModel.IsBusy, Converter={StaticResource BoolFalseToCollapsedConverter}}" />
-
-                    <Grid MaxWidth="1000"
-                          Visibility="{Binding ClipboardParserViewModel.IsBusy, Converter={StaticResource BoolTrueToCollapsedConverter}}">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-
-                        <ContentControl Grid.Column="0"
-                                        Content="{Binding ClipboardParserViewModel.ItemFromClipboard}" />
-
-                        <Button Grid.Column="1" Content="Import"
-                                Command="{Binding CreateNewTabCommand}"
-                                CommandParameter="{Binding ClipboardParserViewModel.ItemQueryInfo}"
-                                Margin="15">
-                            <i:Interaction.Triggers>
-                                <i:EventTrigger EventName="Click">
-                                    <utilities:SetPropertyAction PropertyName="IsOpen"
-                                                                 TargetObject="{Binding ElementName=ClipboardFlyout}">
-                                        <utilities:SetPropertyAction.PropertyValue>
-                                            <system:Boolean>False</system:Boolean>
-                                        </utilities:SetPropertyAction.PropertyValue>
-                                    </utilities:SetPropertyAction>
-                                </i:EventTrigger>
-                            </i:Interaction.Triggers>
-                        </Button>
-                    </Grid>
-                </Grid>
+          </Grid>
+        </Grid>
 
 
-            </controls:Flyout>
+      </controls:Flyout>
+    </controls:FlyoutsControl>
+  </controls:MetroWindow.Flyouts>
 
-            <controls:Flyout Header="&#xF085; Settings" x:Name="SettingsFlyout"
-                             FontFamily="{StaticResource FontAwesome}"
-                             Position="Right"
-                             Width="500"
-                             Margin="0, 35"
-                             IsOpen="{Binding Settings.IsOpen}"
-                             BorderBrush="{StaticResource AccentColorBrush}">
-                <ContentPresenter Content="{Binding Settings}" />
-            </controls:Flyout>
 
-            <controls:Flyout Header="&#xF1D7; Chat" x:Name="ChatFlyout"
-                             FontFamily="{StaticResource FontAwesome}"
-                             Position="Right"
-                             Width="500"
-                             Margin="0, 35"
-                             BorderBrush="{StaticResource AccentColorBrush}">
-                <Grid Margin="5,0">
-                    <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Visible">
-                        <ScrollViewer.Content>
-                            <ContentPresenter Content="{Binding Chat}" Margin="10" HorizontalAlignment="Stretch" />
-                        </ScrollViewer.Content>
-                    </ScrollViewer>
-                </Grid>
-            </controls:Flyout>
-
-            <controls:Flyout Header="&#xF093; Update status" x:Name="ApplicationUpdatedFlyout"
-                             FontFamily="{StaticResource FontAwesome}"
-                             Position="Bottom"
-                             Height="60"
-                             BorderThickness="0,0,0,1"
-                             BorderBrush="{StaticResource AccentColorBrush}"
-                             IsOpen="{Binding ApplicationUpdater.IsOpen}">
-
-                <ContentPresenter Content="{Binding ApplicationUpdater}" />
-            </controls:Flyout>
-        </controls:FlyoutsControl>
-    </controls:MetroWindow.Flyouts>
 
 </controls:MetroWindow>

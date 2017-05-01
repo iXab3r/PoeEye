@@ -4,7 +4,7 @@
                     xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
                     xmlns:viewModels="clr-namespace:PoeEye.PoeTrade.ViewModels">
 
-  <DataTemplate DataType="{x:Type viewModels:PoeLinksInfoViewModel}">
+  <DataTemplate DataType="{x:Type viewModels:PoeLinksInfoViewModel}" x:Key="Old">
     <Grid>
       <Grid.Resources>
         <Style TargetType="Label" BasedOn="{StaticResource {x:Type Label}}">
@@ -142,5 +142,142 @@
 
     </Grid>
   </DataTemplate>
+
+  <DataTemplate DataType="{x:Type viewModels:PoeLinksInfoViewModel}">
+    <Grid>
+      <Grid.Resources>
+        <Style TargetType="Label" BasedOn="{StaticResource {x:Type Label}}">
+          <Setter Property="HorizontalContentAlignment" Value="Center" />
+          <Setter Property="VerticalContentAlignment" Value="Center" />
+          <Setter Property="HorizontalAlignment" Value="Stretch" />
+          <Setter Property="VerticalAlignment" Value="Stretch" />
+        </Style>
+
+        <Style TargetType="{x:Type Image}" x:Key="HorizontalLink">
+          <Setter Property="Width" Value="40"/>
+          <Setter Property="Source" Value="../../../Resources/LinkHorizontal.png"/>
+        </Style>
+
+        <Style TargetType="{x:Type Image}" x:Key="VerticalLink">
+          <Setter Property="Height" Value="40"/>
+          <Setter Property="Source" Value="../../../Resources/LinkVertical.png"/>
+        </Style>
+
+        <Style TargetType="{x:Type Image}">
+          <Setter Property="Width" Value="40"/>
+          <Setter Property="Height" Value="40"/>
+          <Setter Property="HorizontalAlignment" Value="Center" />
+          <Setter Property="VerticalAlignment" Value="Center" />
+          <Style.Triggers>
+            <Trigger Property="Tag" Value="R">
+              <Setter Property="Source" Value="../../../Resources/SocketRed.png"/>
+            </Trigger>
+            <Trigger Property="Tag" Value="G">
+              <Setter Property="Source" Value="../../../Resources/SocketGreen.png"/>
+            </Trigger>
+            <Trigger Property="Tag" Value="B">
+              <Setter Property="Source" Value="../../../Resources/SocketBlue.png"/>
+            </Trigger>
+            <Trigger Property="Tag" Value="W">
+              <Setter Property="Source" Value="../../../Resources/SocketWhite.png"/>
+            </Trigger>
+          </Style.Triggers>
+        </Style>
+      </Grid.Resources>
+
+      <Grid.Style>
+        <Style TargetType="Grid">
+          <Style.Triggers>
+            <EventTrigger RoutedEvent="Control.MouseEnter">
+              <BeginStoryboard>
+                <Storyboard>
+                  <DoubleAnimation Duration="0:0:1" To="0.2" Storyboard.TargetProperty="Opacity" />
+                </Storyboard>
+              </BeginStoryboard>
+            </EventTrigger>
+            <EventTrigger RoutedEvent="Control.MouseLeave">
+              <BeginStoryboard>
+                <Storyboard>
+                  <DoubleAnimation Duration="0:0:1" To="1" Storyboard.TargetProperty="Opacity" />
+                </Storyboard>
+              </BeginStoryboard>
+            </EventTrigger>
+          </Style.Triggers>
+        </Style>
+      </Grid.Style>
+
+      <Grid.RowDefinitions>
+        <RowDefinition Height="30*" />
+        <RowDefinition Height="30*" />
+        <RowDefinition Height="30*" />
+      </Grid.RowDefinitions>
+
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="30*" />
+        <ColumnDefinition Width="30*" />
+      </Grid.ColumnDefinitions>
+
+      <!-- Links -->
+
+      <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
+             Visibility="{Binding Link1, Converter={StaticResource BoolFalseToCollapsedConverter}}">
+        <Image Style="{StaticResource HorizontalLink}" />
+      </Label>
+
+      <Label Grid.Row="0" Grid.Column="1" Grid.RowSpan="2"
+             Visibility="{Binding Link2, Converter={StaticResource BoolFalseToCollapsedConverter}}">
+        <Image Style="{StaticResource VerticalLink}" />
+      </Label>
+
+      <Label Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+             Visibility="{Binding Link3, Converter={StaticResource BoolFalseToCollapsedConverter}}">
+        <Image Style="{StaticResource HorizontalLink}" />
+      </Label>
+
+      <Label Grid.Row="1" Grid.Column="0" Grid.RowSpan="2"
+             Visibility="{Binding Link4, Converter={StaticResource BoolFalseToCollapsedConverter}}">
+        <Image Style="{StaticResource VerticalLink}" />
+      </Label>
+
+      <Label Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
+             Visibility="{Binding Link5, Converter={StaticResource BoolFalseToCollapsedConverter}}">
+        <Image Style="{StaticResource HorizontalLink}" />
+      </Label>
+
+      <!-- Soekets -->
+
+      <Label Grid.Row="0" Grid.Column="0"
+             Visibility="{Binding Socket1, Converter={StaticResource NullToCollapsedConverter}}">
+        <Image Tag="{Binding Socket1}" />
+      </Label>
+
+      <Label Grid.Row="0" Grid.Column="1"
+             Visibility="{Binding Socket2, Converter={StaticResource NullToCollapsedConverter}}">
+        <Image Tag="{Binding Socket2}" />
+      </Label>
+
+      <Label Grid.Row="1" Grid.Column="1"
+             Visibility="{Binding Socket3, Converter={StaticResource NullToCollapsedConverter}}">
+        <Image Tag="{Binding Socket3}" />
+      </Label>
+
+      <Label Grid.Row="1" Grid.Column="0"
+             Visibility="{Binding Socket4, Converter={StaticResource NullToCollapsedConverter}}">
+        <Image Tag="{Binding Socket4}" />
+      </Label>
+
+      <Label Grid.Row="2" Grid.Column="0"
+             Visibility="{Binding Socket5, Converter={StaticResource NullToCollapsedConverter}}">
+        <Image Tag="{Binding Socket5}" />
+      </Label>
+
+      <Label Grid.Row="2" Grid.Column="1"
+             Visibility="{Binding Socket6, Converter={StaticResource NullToCollapsedConverter}}">
+        <Image Tag="{Binding Socket6}" />
+      </Label>
+
+    </Grid>
+  </DataTemplate>
+
 
 </ResourceDictionary>

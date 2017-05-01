@@ -191,6 +191,68 @@
                                        VerticalContentAlignment="Stretch"
                                        HorizontalContentAlignment="Stretch"
                                        BadgeColorZoneMode="PrimaryLight">
+                  <materialDesign:Badged.Style>
+                    <Style TargetType="{x:Type materialDesign:Badged}">
+                      <Setter Property="RenderTransformOrigin" Value="0.5,0.5"></Setter>
+                      <Setter Property="RenderTransform">
+                        <Setter.Value>
+                          <ScaleTransform ScaleX="1" ScaleY="1"/>
+                        </Setter.Value>
+                      </Setter>
+                      <Setter Property="Effect">
+                        <Setter.Value>
+                          <DropShadowEffect ShadowDepth="0" Color="{StaticResource HighlightColor}" Opacity="1" BlurRadius="8" Direction="0"/>
+                        </Setter.Value>
+                      </Setter>
+                      <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsFresh}" Value="True">
+                          <DataTrigger.EnterActions>
+                            <BeginStoryboard>
+                              <Storyboard>
+                                <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                                 Duration="0:0:1"
+                                                 From="0"
+                                                 To="1" />
+
+                                <DoubleAnimation Storyboard.TargetProperty="RenderTransform.(ScaleTransform.ScaleX)"
+                                                 Duration="0:0:0.5"
+                                                 From="1.5"
+                                                 To="0.9" />
+                                <DoubleAnimation Storyboard.TargetProperty="RenderTransform.(ScaleTransform.ScaleY)"
+                                                 Duration="0:0:0.5"
+                                                 From="1.5"
+                                                 To="0.9" />
+                                <DoubleAnimation Storyboard.TargetProperty="RenderTransform.(ScaleTransform.ScaleX)"
+                                                 Duration="0:0:0.5"
+                                                 BeginTime="0:0:0.5"
+                                                 From="0.9"
+                                                 To="1.1"
+                                                 AutoReverse="True"
+                                                 RepeatBehavior="Forever" />
+                                <DoubleAnimation Storyboard.TargetProperty="RenderTransform.(ScaleTransform.ScaleY)"
+                                                 Duration="0:0:0.5"
+                                                 BeginTime="0:0:0.5"
+                                                 From="0.9"
+                                                 To="1.1"
+                                                 AutoReverse="True"
+                                                 RepeatBehavior="Forever" />
+                              </Storyboard>
+                            </BeginStoryboard>
+                          </DataTrigger.EnterActions>
+                          <DataTrigger.ExitActions>
+                            <BeginStoryboard>
+                              <Storyboard>
+                                <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                                 Duration="0:0:1"
+                                                 To="0" />
+                              </Storyboard>
+                            </BeginStoryboard>
+                          </DataTrigger.ExitActions>
+                        </DataTrigger>
+                      </Style.Triggers>
+                    </Style>
+
+                  </materialDesign:Badged.Style>
                   <materialDesign:Badged.Badge>
                     <TextBlock MaxWidth="60" Text="{Binding ToolTipText}"/>
                   </materialDesign:Badged.Badge>
@@ -198,75 +260,12 @@
                           Margin="0" 
                           BorderThickness="3"
                           CornerRadius="2">
-                    <Border.Style>
-                      <Style TargetType="{x:Type Border}">
-                        <Setter Property="BorderBrush">
-                          <Setter.Value>
-                            <LinearGradientBrush MappingMode="RelativeToBoundingBox">
-                              <GradientStop Color="{StaticResource AccentBaseColor}" Offset="0" />
-                              <GradientStop Color="{StaticResource HighlightColor}" Offset="0" />
-                            </LinearGradientBrush>
-                          </Setter.Value>
-                        </Setter>
-                        <Setter Property="RenderTransformOrigin" Value="0.5,0.5"></Setter>
-                        <Setter Property="RenderTransform">
-                          <Setter.Value>
-                            <ScaleTransform ScaleX="1" ScaleY="1"/>
-                          </Setter.Value>
-                        </Setter>
-                        <Setter Property="Effect">
-                          <Setter.Value>
-                            <DropShadowEffect ShadowDepth="0" Color="{StaticResource HighlightColor}" Opacity="1" BlurRadius="8" Direction="0"/>
-                          </Setter.Value>
-                        </Setter>
-                        <Style.Triggers>
-                          <DataTrigger Binding="{Binding IsFresh}" Value="True">
-                            <DataTrigger.EnterActions>
-                              <BeginStoryboard>
-                                <Storyboard>
-                                  <DoubleAnimation Storyboard.TargetProperty="Opacity"
-                                                   Duration="0:0:1"
-                                                   From="0"
-                                                   To="1" />
-
-                                  <DoubleAnimation Storyboard.TargetProperty="RenderTransform.(ScaleTransform.ScaleX)"
-                                                   Duration="0:0:0.5"
-                                                   From="1.5"
-                                                   To="0.9" />
-                                  <DoubleAnimation Storyboard.TargetProperty="RenderTransform.(ScaleTransform.ScaleY)"
-                                                   Duration="0:0:0.5"
-                                                   From="1.5"
-                                                   To="0.9" />
-                                  <DoubleAnimation Storyboard.TargetProperty="RenderTransform.(ScaleTransform.ScaleX)"
-                                                   Duration="0:0:0.5"
-                                                   BeginTime="0:0:0.5"
-                                                   From="0.9"
-                                                   To="1.1"
-                                                   AutoReverse="True"
-                                                   RepeatBehavior="Forever" />
-                                  <DoubleAnimation Storyboard.TargetProperty="RenderTransform.(ScaleTransform.ScaleY)"
-                                                   Duration="0:0:0.5"
-                                                   BeginTime="0:0:0.5"
-                                                   From="0.9"
-                                                   To="1.1"
-                                                   AutoReverse="True"
-                                                   RepeatBehavior="Forever" />
-                                </Storyboard>
-                              </BeginStoryboard>
-                            </DataTrigger.EnterActions>
-                            <DataTrigger.ExitActions>
-                              <BeginStoryboard>
-                                <Storyboard>
-                                  <DoubleAnimation Storyboard.TargetProperty="Opacity"
-                                                   Duration="0:0:1"
-                                                   To="0" />
-                                </Storyboard>
-                              </BeginStoryboard>
-                            </DataTrigger.ExitActions>
-                          </DataTrigger>
-                        </Style.Triggers>
-                      </Style>
-                    </Border.Style>
+                    <Border.BorderBrush>
+                      <LinearGradientBrush MappingMode="RelativeToBoundingBox">
+                        <GradientStop Color="{StaticResource AccentBaseColor}" Offset="0" />
+                        <GradientStop Color="{StaticResource HighlightColor}" Offset="0" />
+                      </LinearGradientBrush>
+                    </Border.BorderBrush>
                   </Border>
                 </materialDesign:Badged>
               </DataTemplate>

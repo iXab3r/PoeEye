@@ -30,7 +30,7 @@ namespace PoeEye.TradeMonitor.ViewModels
     internal class NegotiationViewModel : DisposableReactiveObject, INegotiationViewModel, IMacroCommandContext
     {
         public static readonly TimeSpan DefaultUpdatePeriod = TimeSpan.FromSeconds(1);
-        public static readonly TimeSpan FreshnessPeriod = TimeSpan.FromSeconds(1000);
+        public static readonly TimeSpan FreshnessPeriod = TimeSpan.FromSeconds(8);
 
         private readonly IPoeChatService chatService;
         private readonly IClock clock;
