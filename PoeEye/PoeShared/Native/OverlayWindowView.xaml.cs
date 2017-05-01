@@ -15,12 +15,8 @@ namespace PoeShared.Native
 {
     public partial class OverlayWindowView
     {
-        private readonly OverlayMode overlayMode;
-
-
-        public OverlayWindowView(OverlayMode overlayMode = OverlayMode.Transparent)
+        public OverlayWindowView()
         {
-            this.overlayMode = overlayMode;
             InitializeComponent();
 
             WhenLoaded.Subscribe(OnLoaded);
@@ -56,20 +52,6 @@ namespace PoeShared.Native
             .FromEventPattern<RoutedEventHandler, RoutedEventArgs>(h => this.Loaded += h, h => this.Loaded -= h)
             .ToUnit();
 
-        protected override void OnSourceInitialized(EventArgs e)
-        {
-            base.OnSourceInitialized(e);
-            switch (overlayMode)
-            {
-                case OverlayMode.Layered:
-                    MakeLayered();
-                    break;
-                default:
-                    MakeTransparent();
-                    break;
-            }
-        }
-
         [DllImport("user32.dll")]
         public static extern IntPtr SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
 
@@ -78,7 +60,20 @@ namespace PoeShared.Native
 
         public override string ToString()
         {
-            return $"Overlay({overlayMode})";
+            return $"[OverlayWindow] DataContext: {DataContext}";
+        }
+
+        public void SetOverlayMode(OverlayMode mode)
+        {
+            switch (mode)
+            {
+                case OverlayMode.Layered:
+                    MakeLayered();
+                    break;
+                case OverlayMode.Transparent:
+                    MakeTransparent();
+                    break;
+            }
         }
 
         private void ThumbResize_OnDragDelta(object sender, DragDeltaEventArgs e)

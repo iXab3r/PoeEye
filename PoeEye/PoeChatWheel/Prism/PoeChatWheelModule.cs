@@ -28,7 +28,7 @@ namespace PoeChatWheel.Prism
             var registrator = container.Resolve<IPoeEyeModulesRegistrator>();
             registrator.RegisterSettingsEditor<PoeChatWheelConfig, PoeChatWheelSettingsViewModel>();
 
-            var overlayController = container.Resolve<IOverlayWindowController>(WellKnownOverlays.PathOfExileLayeredOverlay);
+            var overlayController = container.Resolve<IOverlayWindowController>(WellKnownOverlays.PathOfExileOverlay);
             var overlayModel = container.Resolve<IPoeChatWheelViewModel>(new DependencyOverride(typeof(IOverlayWindowController), overlayController));
             overlayController.RegisterChild(overlayModel);
         }

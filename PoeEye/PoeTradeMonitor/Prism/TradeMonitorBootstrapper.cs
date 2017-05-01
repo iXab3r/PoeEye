@@ -23,7 +23,7 @@ namespace PoeEye.TradeMonitor.Prism
 
         public TradeMonitorBootstrapper(
                 [NotNull] IConfigProvider<PoeTradeMonitorConfig> configProvider,
-                [NotNull] [Dependency(WellKnownOverlays.PathOfExileLayeredOverlay)] IOverlayWindowController overlayController,
+                [NotNull] [Dependency(WellKnownOverlays.PathOfExileOverlay)] IOverlayWindowController overlayController,
                 [NotNull] IFactory<PoeTradeMonitorViewModel, IOverlayWindowController> viewModelFactory,
                 [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {

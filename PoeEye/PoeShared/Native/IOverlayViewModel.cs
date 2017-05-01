@@ -26,6 +26,8 @@ namespace PoeShared.Native
 
         bool IsLocked { get; set; }
 
+        OverlayMode OverlayMode { get; set; }
+
         IObservable<Unit> WhenLoaded { [NotNull] get; }
 
         SizeToContent SizeToContent { get; }

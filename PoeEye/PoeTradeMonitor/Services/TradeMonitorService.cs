@@ -22,8 +22,8 @@ namespace PoeEye.TradeMonitor.Services
 {
     internal sealed class TradeMonitorService : DisposableReactiveObject, ITradeMonitorService
     {
-        [NotNull] private readonly IAudioNotificationsManager audioManager;
-        [NotNull] private readonly IPoeNotifier notifier;
+        private readonly IAudioNotificationsManager audioManager;
+        private readonly IPoeNotifier notifier;
         private readonly IPoeMessageParser[] parsers;
         private readonly ISubject<TradeModel> trades = new Subject<TradeModel>();
 
@@ -60,6 +60,7 @@ namespace PoeEye.TradeMonitor.Services
 
             whisperService
                 .Messages
+                .Where(x => x.MessageType == PoeMessageType.WhisperIncoming || x.MessageType == PoeMessageType.WhisperOutgoing)
                 .Select(ParseMessage)
                 .Select(ProcessMessage)
                 .Where(x => x.HasValue)

@@ -23,6 +23,8 @@ namespace PoeShared.Native
         private Size maxSize = new Size(double.NaN, double.NaN);
         private Size minSize = new Size(0, 0);
 
+        private OverlayMode overlayMode;
+
         private SizeToContent sizeToContent = SizeToContent.Manual;
 
         private double top;
@@ -33,70 +35,76 @@ namespace PoeShared.Native
 
         public bool GrowUpwards
         {
-            get { return growUpwards; }
-            set { this.RaiseAndSetIfChanged(ref growUpwards, value); }
+            get => growUpwards;
+            set => this.RaiseAndSetIfChanged(ref growUpwards, value);
         }
 
         public double ActualHeight
         {
-            get { return actualHeight; }
-            set { this.RaiseAndSetIfChanged(ref actualHeight, value); }
+            get => actualHeight;
+            set => this.RaiseAndSetIfChanged(ref actualHeight, value);
         }
 
         public double ActualWidth
         {
-            get { return actualWidth; }
-            set { this.RaiseAndSetIfChanged(ref actualWidth, value); }
+            get => actualWidth;
+            set => this.RaiseAndSetIfChanged(ref actualWidth, value);
         }
 
         public double Left
         {
-            get { return left; }
-            set { this.RaiseAndSetIfChanged(ref left, value); }
+            get => left;
+            set => this.RaiseAndSetIfChanged(ref left, value);
         }
 
         public double Top
         {
-            get { return top; }
-            set { this.RaiseAndSetIfChanged(ref top, value); }
+            get => top;
+            set => this.RaiseAndSetIfChanged(ref top, value);
         }
 
         public double Width
         {
-            get { return width; }
-            set { this.RaiseAndSetIfChanged(ref width, value); }
+            get => width;
+            set => this.RaiseAndSetIfChanged(ref width, value);
         }
 
         public double Height
         {
-            get { return height; }
-            set { this.RaiseAndSetIfChanged(ref height, value); }
+            get => height;
+            set => this.RaiseAndSetIfChanged(ref height, value);
         }
 
         public Size MinSize
         {
-            get { return minSize; }
-            set { this.RaiseAndSetIfChanged(ref minSize, value); }
+            get => minSize;
+            set => this.RaiseAndSetIfChanged(ref minSize, value);
         }
 
         public Size MaxSize
         {
-            get { return maxSize; }
-            set { this.RaiseAndSetIfChanged(ref maxSize, value); }
+            get => maxSize;
+            set => this.RaiseAndSetIfChanged(ref maxSize, value);
         }
 
         public bool IsLocked
         {
-            get { return isLocked; }
-            set { this.RaiseAndSetIfChanged(ref isLocked, value); }
+            get => isLocked;
+            set => this.RaiseAndSetIfChanged(ref isLocked, value);
+        }
+
+        public OverlayMode OverlayMode
+        {
+            get => overlayMode;
+            set => this.RaiseAndSetIfChanged(ref overlayMode, value);
         }
 
         IObservable<Unit> IOverlayViewModel.WhenLoaded => WhenLoaded;
 
         public SizeToContent SizeToContent
         {
-            get { return sizeToContent; }
-            set { this.RaiseAndSetIfChanged(ref sizeToContent, value); }
+            get => sizeToContent;
+            set => this.RaiseAndSetIfChanged(ref sizeToContent, value);
         }
 
         public virtual IOverlayViewModel SetActivationController(IActivationController controller)

@@ -55,6 +55,7 @@ namespace PoeOracle.ViewModels
 
             SizeToContent = SizeToContent.WidthAndHeight;
             MinSize = new Size(700, 50);
+            OverlayMode = OverlayMode.Layered;
 
             this.controller = controller;
             this.dataSource = dataSource;

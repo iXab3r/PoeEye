@@ -76,19 +76,12 @@ namespace PoeShared.Prism
             Container.RegisterWindowTracker(WellKnownWindows.PathOfExileWindow, () => $"^Path of Exile$");
 
             Container.RegisterOverlayController(
-                WellKnownOverlays.PathOfExileLayeredOverlay, 
-                WellKnownWindows.PathOfExileWindow, 
-                OverlayMode.Layered);
-
-            Container.RegisterOverlayController(
-                WellKnownOverlays.PathOfExileTransparentOverlay,
-                WellKnownWindows.PathOfExileWindow,
-                OverlayMode.Transparent);
+                WellKnownOverlays.PathOfExileOverlay, 
+                WellKnownWindows.PathOfExileWindow);
 
             Container.RegisterOverlayController(
                WellKnownOverlays.AllWindowsLayeredOverlay,
-               WellKnownWindows.AllWindows,
-               OverlayMode.Layered);
+               WellKnownWindows.AllWindows);
 
             Container
                 .RegisterType<IPoeDatabaseReader>(

@@ -67,7 +67,7 @@
                              FontSize="24"
                              x:Name="OracleQueryTextBox"
                              Background="Transparent"
-                             wpf:FocusHelper.IsFocused="{Binding IsFocused, Mode=OneWay}"
+                             wpf:FocusHelper.IsFocused="{Binding IsFocused, Mode=TwoWay}"
                              BorderThickness="0"
                              Foreground="{StaticResource PoeFontBrush}"
                              CaretBrush="{StaticResource PoeFontBrush}"

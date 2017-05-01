@@ -88,12 +88,14 @@ namespace PoeShared.Native
         public static void SetWindowExTransparent(IntPtr hwnd)
         {
             var extendedStyle = GetWindowLong(hwnd, GWL_EXSTYLE);
+            extendedStyle &= ~WS_EX_LAYERED;
             SetWindowLong(hwnd, GWL_EXSTYLE, extendedStyle | WS_EX_TOOLWINDOW | WS_EX_TRANSPARENT);
         }
 
         public static void SetWindowExLayered(IntPtr hwnd)
         {
             var extendedStyle = GetWindowLong(hwnd, GWL_EXSTYLE);
+            extendedStyle &= ~WS_EX_TRANSPARENT;
             SetWindowLong(hwnd, GWL_EXSTYLE, extendedStyle | WS_EX_TOOLWINDOW | WS_EX_LAYERED);
         }
 

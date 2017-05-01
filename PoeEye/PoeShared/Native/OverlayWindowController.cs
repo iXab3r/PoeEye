@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Concurrency;
@@ -9,48 +8,43 @@ using System.Reactive.Subjects;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
-using Gma.System.MouseKeyHook;
 using Guards;
 using JetBrains.Annotations;
 using Microsoft.Practices.Unity;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
 using ReactiveUI;
-using Application = System.Windows.Application;
-using KeyEventArgs = System.Windows.Forms.KeyEventArgs;
-using KeyEventHandler = System.Windows.Forms.KeyEventHandler;
 
 namespace PoeShared.Native
 {
     internal sealed class OverlayWindowController : DisposableReactiveObject, IOverlayWindowController
     {
-        private static readonly int CurrentProcessId = Process.GetCurrentProcess().Id;
         private readonly BehaviorSubject<IntPtr> lastActiveWindowHandle = new BehaviorSubject<IntPtr>(IntPtr.Zero);
 
         private readonly string[] possibleOverlayNames;
+        private readonly IScheduler uiScheduler;
         private readonly IWindowTracker windowTracker;
-        private readonly IFactory<OverlayWindowViewModel> overlayWindowViewModelFactory;
-        private readonly OverlayMode overlayMode;
+
+        private bool isVisible;
+
+        private bool showWireframes;
 
         public OverlayWindowController(
             [NotNull] IWindowTracker windowTracker,
             [NotNull] IKeyboardEventsSource keyboardMouseEvents,
-            [NotNull] IFactory<OverlayWindowViewModel> overlayWindowViewModelFactory,
-            [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler,
-            OverlayMode overlayMode = OverlayMode.Transparent)
+            [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {
             Guard.ArgumentNotNull(windowTracker, nameof(windowTracker));
             Guard.ArgumentNotNull(keyboardMouseEvents, nameof(keyboardMouseEvents));
             Guard.ArgumentNotNull(uiScheduler, nameof(uiScheduler));
 
             this.windowTracker = windowTracker;
-            this.overlayWindowViewModelFactory = overlayWindowViewModelFactory;
-            this.overlayMode = overlayMode;
+            this.uiScheduler = uiScheduler;
 
-            possibleOverlayNames = Enum.GetValues(typeof(OverlayMode))
-                .OfType<OverlayMode>()
-                .Select(mode => $"[PoeEye.{mode}] {windowTracker.TargetWindowName}")
-                .ToArray();
+            possibleOverlayNames = new[]
+            {
+                $"[PoeEye.Overlay] {windowTracker.TargetWindowName}"
+            };
 
             var application = Application.Current;
             if (application != null)
@@ -78,12 +72,13 @@ namespace PoeShared.Native
             }
 
             windowTracker.WhenAnyValue(x => x.ActiveWindowHandle)
-                .Select(x => new
-                {
-                    WindowIsActive = windowTracker.IsActive,
-                    OverlayIsActive = IsPairedOverlay(windowTracker.ActiveWindowTitle),
-                    ActiveTitle = windowTracker.ActiveWindowTitle
-                })
+                .Select(
+                    x => new
+                    {
+                        WindowIsActive = windowTracker.IsActive,
+                        OverlayIsActive = IsPairedOverlay(windowTracker.ActiveWindowTitle),
+                        ActiveTitle = windowTracker.ActiveWindowTitle
+                    })
                 .Do(x => Log.Instance.Debug($"[OverlayWindowController] Active window has changed: {x}"))
                 .Select(x => x.WindowIsActive || x.OverlayIsActive)
                 .DistinctUntilChanged()
@@ -107,20 +102,16 @@ namespace PoeShared.Native
                 .AddTo(Anchors);
         }
 
-        private bool isVisible;
+        public bool ShowWireframes
+        {
+            get => showWireframes;
+            set => this.RaiseAndSetIfChanged(ref showWireframes, value);
+        }
 
         public bool IsVisible
         {
-            get { return isVisible; }
-            set { this.RaiseAndSetIfChanged(ref isVisible, value); }
-        }
-
-        private bool showWireframes;
-
-        public bool ShowWireframes
-        {
-            get { return showWireframes; }
-            set { this.RaiseAndSetIfChanged(ref showWireframes, value); }
+            get => isVisible;
+            set => this.RaiseAndSetIfChanged(ref isVisible, value);
         }
 
         public IDisposable RegisterChild(IOverlayViewModel viewModel)
@@ -131,36 +122,41 @@ namespace PoeShared.Native
 
             viewModel.AddTo(childAnchors);
 
-            var overlayWindowViewModel = new OverlayWindowViewModel()
+            var overlayWindowViewModel = new OverlayWindowViewModel
             {
-                Content = viewModel,
+                Content = viewModel
             };
             overlayWindowViewModel.AddTo(childAnchors);
 
-            var overlayWindow = new OverlayWindowView(overlayMode)
+            var overlayWindow = new OverlayWindowView
             {
                 DataContext = overlayWindowViewModel,
-                Title = $"[PoeEye.{overlayMode}] {windowTracker.TargetWindowName}",
+                Title = $"[PoeEye.Overlay] {windowTracker.TargetWindowName}",
                 Visibility = Visibility.Visible,
-                Topmost = true,
+                Topmost = true
             };
+            var overlayWindowHandle = new WindowInteropHelper(overlayWindow).Handle;
+            Log.Instance.Debug(
+                $"[OverlayWindowController..ctor] Overlay window({windowTracker}) handle: 0x{overlayWindowHandle.ToInt64():x8}");
 
             var activationController = new ActivationController(overlayWindow);
             viewModel.SetActivationController(activationController);
 
-            var overlayWindowHandle = new WindowInteropHelper(overlayWindow).Handle;
-
-            Log.Instance.Debug(
-                $"[OverlayWindowController..ctor] Overlay window({overlayMode} + {windowTracker}) handle: 0x{overlayWindowHandle.ToInt64():x8}");
-
             this.WhenAnyValue(x => x.IsVisible)
-                .Select(_ => overlayWindow)
-                .Subscribe(x => HandleVisibilityChange(x, viewModel))
+                .ObserveOn(uiScheduler)
+                .Subscribe(() => HandleVisibilityChange(overlayWindow, viewModel))
                 .AddTo(childAnchors);
 
             this.WhenAnyValue(x => x.ShowWireframes)
-               .Subscribe(x => overlayWindowViewModel.ShowWireframes = x)
-               .AddTo(childAnchors);
+                .ObserveOn(uiScheduler)
+                .Subscribe(x => overlayWindowViewModel.ShowWireframes = x)
+                .AddTo(childAnchors);
+
+            viewModel
+                .WhenAnyValue(x => x.OverlayMode)
+                .ObserveOn(uiScheduler)
+                .Subscribe(overlayWindow.SetOverlayMode)
+                .AddTo(childAnchors);
 
             //FIXME Inheritance problem
             var observer = viewModel.WhenLoaded as IObserver<Unit>;
@@ -192,10 +188,10 @@ namespace PoeShared.Native
             {
                 WindowsServices.ShowInactiveTopmost(
                     overlayWindowHandle,
-                    (int)viewModel.Left,
-                    (int)viewModel.Top,
-                    (int)viewModel.Width,
-                    (int)viewModel.Height);
+                    (int) viewModel.Left,
+                    (int) viewModel.Top,
+                    (int) viewModel.Width,
+                    (int) viewModel.Height);
             }
             else
             {

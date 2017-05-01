@@ -24,7 +24,7 @@ namespace PoeOracle.Prism
         {
             container.AddExtension(new PoeOracleModuleRegistrations());
 
-            var overlayController = container.Resolve<IOverlayWindowController>(WellKnownOverlays.PathOfExileLayeredOverlay);
+            var overlayController = container.Resolve<IOverlayWindowController>(WellKnownOverlays.PathOfExileOverlay);
             var overlayModel = container.Resolve<PoeOracleViewModel>(new DependencyOverride(typeof(IOverlayWindowController), overlayController));
             overlayController.RegisterChild(overlayModel);
         }

@@ -58,6 +58,10 @@ namespace PoeEye.TradeMonitor.ViewModels
             Height = 705;
             SizeToContent = SizeToContent.Manual;
 
+            this.WhenAnyValue(x => x.IsLocked)
+                .Subscribe(isLocked => OverlayMode = isLocked ? OverlayMode.Transparent : OverlayMode.Layered)
+                .AddTo(Anchors);
+
             LockWindowCommand = new DelegateCommand(LockWindowCommandExecuted);
 
             highlights
