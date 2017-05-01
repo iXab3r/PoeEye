@@ -7,6 +7,7 @@
 
   <ResourceDictionary.MergedDictionaries>
     <ResourceDictionary Source="pack://application:,,,/PoeShared;component/UI/Views/CurrencyTestView.xaml" />
+    <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.togglebutton.xaml" />
   </ResourceDictionary.MergedDictionaries>
 
   <DataTemplate DataType="{x:Type viewModels1:PoeMainSettingsViewModel}">
@@ -18,18 +19,11 @@
         <RowDefinition Height="Auto" />
       </Grid.RowDefinitions>
 
-      <StackPanel Grid.Row="0" Grid.Column="0"
-                  Orientation="Horizontal" Height="24">
-        <Label Style="{StaticResource EyeIconLabel}" Content="Clipboard monitoring:" MinWidth="100" />
-        <controls:ToggleSwitchButton ToolTip="Enable clipboard monitoring" Height="26"
-                                     IsChecked="{Binding ClipboardMonitoringEnabled}" />
-      </StackPanel>
-
       <StackPanel Grid.Row="1" Grid.Column="0"
                   Orientation="Horizontal" Height="24">
         <Label Style="{StaticResource EyeIconLabel}" Content="Whispers:" MinWidth="100" />
-        <controls:ToggleSwitchButton ToolTip="In-game whisper notifications" Height="26"
-                                     IsChecked="{Binding WhisperNotificationsEnabled}" />
+        <ToggleButton ToolTip="In-game whisper notifications" Height="26"
+                      IsChecked="{Binding WhisperNotificationsEnabled}" />
       </StackPanel>
 
       <StackPanel Grid.Row="2" Grid.Column="0"

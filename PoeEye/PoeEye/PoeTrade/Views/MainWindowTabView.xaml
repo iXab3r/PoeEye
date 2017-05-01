@@ -24,7 +24,7 @@
         <RowDefinition Height="*" />
       </Grid.RowDefinitions>
 
-      <ScrollViewer VerticalScrollBarVisibility="Auto"
+      <ScrollViewer VerticalScrollBarVisibility="Visible"
                     IsTabStop="False"
                     Focusable="False"
                     MaxHeight="{Binding ActualHeight, RelativeSource={RelativeSource FindAncestor, AncestorType=ContentPresenter}, Mode=OneWay}">

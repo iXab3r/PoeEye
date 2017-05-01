@@ -1,15 +1,16 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
-                    xmlns:viewModels="clr-namespace:PoeEye.PoeTrade.ViewModels">
+                    xmlns:viewModels="clr-namespace:PoeEye.PoeTrade.ViewModels"
+                    xmlns:fa="http://schemas.fontawesome.io/icons/">
   <DataTemplate DataType="{x:Type viewModels:PoeModsEditorViewModel}">
     <Grid x:Name="PoeExplicitModsEditorViewModelGrid">
       <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="Auto" />
         <ColumnDefinition Width="*" />
-        <ColumnDefinition Width="auto" />
       </Grid.ColumnDefinitions>
 
-      <ItemsControl Grid.Column="0" Grid.Row="0"
+      <ItemsControl Grid.Column="1" Grid.Row="0"
                     ItemsSource="{Binding Mods}">
         <ItemsControl.ItemTemplate>
           <DataTemplate>
@@ -22,21 +23,26 @@
               <ContentControl Grid.Column="0"
                               Content="{Binding}" />
               <Button Grid.Column="1"
-                      Focusable="False"
-                      Content="Remove"
-                      Command="{Binding ElementName=PoeExplicitModsEditorViewModelGrid, Path=DataContext.RemoveModCommand}"
+                      fa:Awesome.Content="Close"
+                      ToolTip="Remove mod"
+                      Width="28" Height="28"
                       CommandParameter="{Binding}"
-                      Height="28" />
+                      Command="{Binding ElementName=PoeExplicitModsEditorViewModelGrid, Path=DataContext.RemoveModCommand}"
+                      Style="{StaticResource FlatButton}" />
             </Grid>
           </DataTemplate>
         </ItemsControl.ItemTemplate>
 
       </ItemsControl>
 
-      <Button Grid.Column="1" Grid.Row="0"
-              Focusable="False"
+      <Button Grid.Column="0" Grid.Row="0"
               Margin="5,0,0,5"
-              Command="{Binding AddModCommand}" Content="Add" />
+              Width="28" Height="28"
+              VerticalAlignment="Top"
+              Style="{StaticResource FlatButton}"
+              ToolTip="Add new mod"
+              fa:Awesome.Content="Plus"
+              Command="{Binding AddModCommand}"/>
     </Grid>
   </DataTemplate>
 </ResourceDictionary>

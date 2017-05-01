@@ -7,5 +7,9 @@
         float? Min { get; set; }
 
         string SelectedMod { get; set; }
+
+        bool IsEmpty { get; }
+
+        void Reset();
     }
 }

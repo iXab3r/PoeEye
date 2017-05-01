@@ -648,6 +648,9 @@
     <Resource Include="Resources\SocketRed.png" />
     <Resource Include="Resources\SocketWhite.png" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\mainIconNegative.ico" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <UsingTask TaskName="CosturaCleanup" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll" TaskFactory="CodeTaskFactory">
     <ParameterGroup>

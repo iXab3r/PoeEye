@@ -5,7 +5,6 @@
                     xmlns:codeCompletion="clr-namespace:ICSharpCode.AvalonEdit.CodeCompletion;assembly=ICSharpCode.AvalonEdit">
 
   <ResourceDictionary.MergedDictionaries>
-    <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Colors.xaml" />
     <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Generic.xaml" />
 
     <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/MaterialDesignColor.DeepPurple.xaml" />
@@ -15,6 +14,7 @@
     <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Expander.xaml" />
     <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Slider.xaml" />
     <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.ToggleButton.xaml" />
+    <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.button.xaml" />
   </ResourceDictionary.MergedDictionaries>
 
   <Color x:Key="TradeMonitorBorderColorKey">#1A6A73</Color>
@@ -27,14 +27,7 @@
   <SolidColorBrush x:Key="TradeMonitorTitleBackgroundBrushKey" Color="{StaticResource TradeMonitorTitleBackgroundColorKey}"/>
   <SolidColorBrush x:Key="TradeMonitorBackgroundBrushKey" Color="{StaticResource TradeMonitorBackgroundColorKey}"/>
 
-  <Style TargetType="{x:Type Button}" x:Key="TradeMonitorButtonStyleKey" BasedOn="{StaticResource {x:Type Button}}">
-    <Setter Property="FontFamily" Value="{StaticResource FontAwesome}" />
-    <Setter Property="FontSize" Value="14" />
-    <Setter Property="HorizontalContentAlignment" Value="Center" />
-    <Setter Property="VerticalContentAlignment" Value="Center" />
-    <Setter Property="VerticalAlignment" Value="Center"/>
-    <Setter Property="Focusable" Value="False"/>
-    <Setter Property="IsTabStop" Value="False"/>
+  <Style TargetType="{x:Type Button}" x:Key="TradeMonitorButtonStyleKey" BasedOn="{StaticResource FlatButton}">
   </Style>
 
   <Style TargetType="{x:Type Button}" x:Key="TradeMonitorCircleButtonStyleKey" BasedOn="{StaticResource MetroCircleButtonStyle}">

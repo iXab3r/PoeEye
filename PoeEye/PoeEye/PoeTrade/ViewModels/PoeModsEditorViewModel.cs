@@ -1,3 +1,4 @@
+using Prism.Commands;
 using ReactiveUI.Legacy;
 
 namespace PoeEye.PoeTrade.ViewModels
@@ -23,11 +24,11 @@ namespace PoeEye.PoeTrade.ViewModels
 
     internal sealed class PoeModsEditorViewModel : DisposableReactiveObject, IPoeModsEditorViewModel
     {
-        private readonly ReactiveCommand<object> addModCommand = ReactiveUI.Legacy.ReactiveCommand.Create();
+        private readonly DelegateCommand addModCommand;
 
         private readonly ISuggestionProvider modsSuggestionProvider;
         private readonly IFactory<IPoeModViewModel, ISuggestionProvider> modsViewModelsFactory;
-        private readonly ReactiveCommand<object> removeModCommand = ReactiveUI.Legacy.ReactiveCommand.Create();
+        private readonly DelegateCommand<IPoeModViewModel> removeModCommand;
 
         private PoeQueryModsGroupType groupType;
 
@@ -48,21 +49,19 @@ namespace PoeEye.PoeTrade.ViewModels
 
             this.modsViewModelsFactory = modsViewModelsFactory;
 
+            removeModCommand = new DelegateCommand<IPoeModViewModel>(RemoveModCommandExecuted);
+            addModCommand = new DelegateCommand(() => AddMod());
+
+            Observable.Merge(
+                    Mods.Changed.ToUnit(),
+                    Mods.ItemChanged.ToUnit())
+                .Subscribe(() => removeModCommand.RaiseCanExecuteChanged()).AddTo(Anchors);
+
             modsByName = staticData
                 .ModsList
                 .ToDictionary(x => x.Name, x => x);
 
             modsSuggestionProvider = suggestionProviderFactory.Create(modsByName.Keys.ToArray());
-
-            addModCommand
-                .Subscribe(_ => AddMod())
-                .AddTo(Anchors);
-
-            removeModCommand
-                .Select(x => x as IPoeModViewModel)
-                .Where(x => x != null)
-                .Subscribe(RemoveModCommandExecuted)
-                .AddTo(Anchors);
 
             AddMod();
         }
@@ -117,12 +116,15 @@ namespace PoeEye.PoeTrade.ViewModels
             return group;
         }
 
-
         private void RemoveModCommandExecuted(IPoeModViewModel modToRemove)
         {
             Guard.ArgumentNotNull(modToRemove, nameof(modToRemove));
 
-            using (Mods.SuppressChangeNotifications())
+            if (Mods.Count == 1)
+            {
+                modToRemove.Reset();
+            }
+            else
             {
                 Mods.Remove(modToRemove);
             }

@@ -17,6 +17,10 @@
         public PoeModViewModel(ISuggestionProvider suggestionProvider)
         {
             SuggestionProvider = suggestionProvider;
+
+            this.WhenAnyValue(x => x.SelectedMod, x => x.Min, x => x.Max)
+                .Subscribe(() => this.RaisePropertyChanged(nameof(IsEmpty)))
+                .AddTo(Anchors);
         }
 
         public ISuggestionProvider SuggestionProvider { get; }
@@ -37,6 +41,15 @@
         {
             get { return max; }
             set { this.RaiseAndSetIfChanged(ref max, value); }
+        }
+
+        public bool IsEmpty => string.IsNullOrWhiteSpace(SelectedMod) && Min == null && Max == null;
+
+        public void Reset()
+        {
+            SelectedMod = null;
+            Min = null;
+            Max = null;
         }
     }
 }

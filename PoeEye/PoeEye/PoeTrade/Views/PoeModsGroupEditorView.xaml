@@ -32,9 +32,9 @@
                   Margin="5">
         <TextBlock Text="Mod groups" Style="{StaticResource MetroTextBlockHeaderStyle}" />
 
-        <Button Focusable="False"
-                Margin="10, 0"
-                Command="{Binding AddGroupCommand}" Content="Add new group" />
+        <Button Margin="10, 0"
+                Style="{StaticResource FlatButton}"
+                Command="{Binding AddGroupCommand}" Content="&#xf055; Add new group" />
       </StackPanel>
 
       <ItemsControl Grid.Column="0" Grid.Row="1"
@@ -117,11 +117,11 @@
                   </StackPanel>
 
                   <Button Grid.Column="3"
-                          Focusable="False"
-                          Content="Remove group"
+                          Content="&#xf056; Remove group"
                           Command="{Binding ElementName=GroupsGrid, Path=DataContext.RemoveGroupCommand}"
                           CommandParameter="{Binding}"
-                          Height="28" />
+                          Height="28"
+                          Style="{StaticResource FlatButton}"/>
 
                 </Grid>
               </Grid>

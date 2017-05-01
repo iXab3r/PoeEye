@@ -31,5 +31,22 @@ namespace PoeShared.Scaffolding
                 .WhenAnyValue(sourcePropertyExtractor)
                 .Subscribe(x => instance.RaisePropertyChanged(instancePropertyName.Value));
         }
+
+        public static IDisposable LinkObjectProperties<TSource, TSourceProperty, TTargetProperty>(
+            [NotNull] this TSource instance,
+            [NotNull] Expression<Func<TSource, TTargetProperty>> instancePropertyExtractor,
+            [NotNull] Expression<Func<TSource, TSourceProperty>> sourcePropertyExtractor)
+            where TSource : IReactiveObject
+        {
+            Guard.ArgumentNotNull(instance, nameof(instance));
+            Guard.ArgumentNotNull(instancePropertyExtractor, nameof(instancePropertyExtractor));
+            Guard.ArgumentNotNull(sourcePropertyExtractor, nameof(sourcePropertyExtractor));
+
+            var instancePropertyName = new Lazy<string>(() => Reflection.ExpressionToPropertyNames(instancePropertyExtractor.Body));
+
+            return instance
+                .WhenAnyValue(sourcePropertyExtractor)
+                .Subscribe(x => instance.RaisePropertyChanged(instancePropertyName.Value));
+        }
     }
 }

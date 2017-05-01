@@ -11,8 +11,7 @@
                     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
 
   <ResourceDictionary.MergedDictionaries>
-    <ResourceDictionary
-      Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/themes/materialdesigntheme.flipper.xaml" />
+    <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/themes/materialdesigntheme.flipper.xaml" />
     <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/styles/controls.textbox.xaml" />
   </ResourceDictionary.MergedDictionaries>
 

@@ -4,195 +4,193 @@
                     xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
                     xmlns:models="clr-namespace:PoeBud.Models"
                     xmlns:dataTypes="clr-namespace:PoeShared.StashApi.DataTypes;assembly=PoeShared">
-    <DataTemplate DataType="{x:Type viewModels:PoeBudSettingsViewModel}">
+  <DataTemplate DataType="{x:Type viewModels:PoeBudSettingsViewModel}">
 
-        <DataTemplate.Resources>
-            <ResourceDictionary>
-                <ResourceDictionary.MergedDictionaries>
-                    <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Generic.xaml" />
-                    <ResourceDictionary Source="../Themes/Generic.xaml" />
-                </ResourceDictionary.MergedDictionaries>
+    <DataTemplate.Resources>
+      <ResourceDictionary>
+        <ResourceDictionary.MergedDictionaries>
+          <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Generic.xaml" />
+          <ResourceDictionary Source="../Themes/Generic.xaml" />
+        </ResourceDictionary.MergedDictionaries>
 
-                <Style TargetType="{x:Type ScrollBar}" BasedOn="{StaticResource SlimScrollBarStyleKey}" />
-                <Style TargetType="{x:Type Label}" BasedOn="{StaticResource IconLabel}"/>
-                <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource IconTextBlock}"/>
-            </ResourceDictionary>
+        <Style TargetType="{x:Type ScrollBar}" BasedOn="{StaticResource SlimScrollBarStyleKey}" />
+        <Style TargetType="{x:Type Label}" BasedOn="{StaticResource IconLabel}" />
+        <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource IconTextBlock}" />
+      </ResourceDictionary>
 
-        </DataTemplate.Resources>
+    </DataTemplate.Resources>
 
-        <Grid Margin="10,5">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
+    <Grid Margin="10,5">
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="*" />
+        <RowDefinition Height="Auto" />
+      </Grid.RowDefinitions>
 
-            <StackPanel Grid.Row="0"
-                        Orientation="Horizontal" Height="30" Margin="0,2">
-                <Label Content="Enable overlay:" MinWidth="100"/>
-                <controls:ToggleSwitchButton Height="26"
-                                             IsChecked="{Binding IsEnabled}" />
-            </StackPanel>
+      <StackPanel Grid.Row="0"
+                  Orientation="Horizontal" Height="30" Margin="0,2">
+        <Label Content="Enable overlay:" MinWidth="100" />
+        <ToggleButton Height="26" IsChecked="{Binding IsEnabled}" />
+      </StackPanel>
 
-            <StackPanel Grid.Row="1"
-                        Orientation="Horizontal" Height="30" Margin="0,2">
-                <Label Content="Get Set hotkey:" MinWidth="100" />
-                <ComboBox IsEditable="False"
-                          Width="120"
-                          ToolTip="Chat wheel hotkey" ItemsSource="{Binding HotkeysList}"
-                          SelectedValue="{Binding Hotkey}" />
-            </StackPanel>
+      <StackPanel Grid.Row="1"
+                  Orientation="Horizontal" Height="30" Margin="0,2">
+        <Label Content="Get Set hotkey:" MinWidth="100" />
+        <ComboBox IsEditable="False"
+                  Width="120"
+                  ToolTip="Chat wheel hotkey" ItemsSource="{Binding HotkeysList}"
+                  SelectedValue="{Binding Hotkey}" />
+      </StackPanel>
 
-            <StackPanel Grid.Row="2"
-                        Orientation="Horizontal" Height="30" Margin="0,2">
-                <Label Content="Hide XP bar:" MinWidth="100" />
-                <controls:ToggleSwitchButton Height="26"
-                                             IsChecked="{Binding HideXpBar}" />
-            </StackPanel> 
-            
-            <StackPanel Grid.Row="3"
-                        Orientation="Horizontal" Height="30" Margin="0,2">
-                <Label Content="Overlay:" MinWidth="100" />
-                <ComboBox 
-                    SelectedItem="{Binding SelectedUiOverlay}" 
-                    ItemsSource="{Binding OverlaysList}"
-                    ToolTip="Path of Exile UI Overlay" 
-                    DisplayMemberPath="Name"
-                    Width="120"
-                    IsEditable="False">
-                    <ComboBox.ItemTemplate>
-                        <DataTemplate DataType="{x:Type models:UiOverlayInfo}">
-                            <Grid>
-                                <Image Source="{Binding AbsolutePath}" 
-                                       Width="192" Height="108"
-                                       Visibility="{Binding AbsolutePath, Converter={StaticResource NullToCollapsedConverter}}" />
-                                <Label VerticalAlignment="Top" HorizontalAlignment="Left" 
-                                       Content="{Binding Name}"/>
-                            </Grid>
-                        </DataTemplate>
-                    </ComboBox.ItemTemplate>
-                </ComboBox>
-            </StackPanel>
+      <StackPanel Grid.Row="2"
+                  Orientation="Horizontal" Height="30" Margin="0,2">
+        <Label Content="Hide XP bar:" MinWidth="100" />
+        <ToggleButton Height="26" IsChecked="{Binding HideXpBar}" />
+      </StackPanel>
 
-            <TextBox Grid.Row="4"
-                     Margin="0, 5"
-                     controls:TextBoxHelper.Watermark="e-mail"
-                     Text="{Binding Username}" />
+      <StackPanel Grid.Row="3"
+                  Orientation="Horizontal" Height="30" Margin="0,2">
+        <Label Content="Overlay:" MinWidth="100" />
+        <ComboBox
+          SelectedItem="{Binding SelectedUiOverlay}"
+          ItemsSource="{Binding OverlaysList}"
+          ToolTip="Path of Exile UI Overlay"
+          DisplayMemberPath="Name"
+          Width="120"
+          IsEditable="False">
+          <ComboBox.ItemTemplate>
+            <DataTemplate DataType="{x:Type models:UiOverlayInfo}">
+              <Grid>
+                <Image Source="{Binding AbsolutePath}"
+                       Width="192" Height="108"
+                       Visibility="{Binding AbsolutePath, Converter={StaticResource NullToCollapsedConverter}}" />
+                <Label VerticalAlignment="Top" HorizontalAlignment="Left"
+                       Content="{Binding Name}" />
+              </Grid>
+            </DataTemplate>
+          </ComboBox.ItemTemplate>
+        </ComboBox>
+      </StackPanel>
 
-            <PasswordBox Grid.Row="5"
-                         Margin="0, 5"
-                         controls:TextBoxHelper.Watermark="password"
-                         x:Name="LoginPasswordBox" />
+      <TextBox Grid.Row="4"
+               Margin="0, 5"
+               controls:TextBoxHelper.Watermark="e-mail"
+               Text="{Binding Username}" />
 
-            <Grid Grid.Row="6">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-                <TextBlock Grid.Column="1"
-                           Style="{StaticResource IconTextBlock}"
-                           Foreground="Orange"
-                           Margin="5"
-                           FontSize="13"
-                           Visibility="{Binding LoginException, Converter={StaticResource NullToCollapsedConverter}}"
-                           ToolTip="{Binding LoginException, Converter={StaticResource ExceptionToMessageConverter}}"
-                           Text="&#xF071;" />
-                <controls:ProgressRing Grid.Column="1"
-                                       Margin="1"
-                                       Width="14" Height="14"
-                                       Visibility="{Binding IsBusy, Converter={StaticResource TrueToVisibleFalseToCollapsedConverter}}" />
+      <PasswordBox Grid.Row="5"
+                   Margin="0, 5"
+                   controls:TextBoxHelper.Watermark="password"
+                   x:Name="LoginPasswordBox" />
 
-                <Button Grid.Column="2"
-                        Width="100"
-                        IsDefault="true"
-                        IsEnabled="{Binding IsBusy, Converter={StaticResource BoolInvertConverter}}"
-                        Command="{Binding LoginCommand}" CommandParameter="{Binding ElementName=LoginPasswordBox}">
-                    <Button.Content>
-                        <TextBlock Text="Log in" />
-                    </Button.Content>
-                </Button>
-            </Grid>
+      <Grid Grid.Row="6">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="*" />
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        <TextBlock Grid.Column="1"
+                   Style="{StaticResource IconTextBlock}"
+                   Foreground="Orange"
+                   Margin="5"
+                   FontSize="13"
+                   Visibility="{Binding LoginException, Converter={StaticResource NullToCollapsedConverter}}"
+                   ToolTip="{Binding LoginException, Converter={StaticResource ExceptionToMessageConverter}}"
+                   Text="&#xF071;" />
+        <controls:ProgressRing Grid.Column="1"
+                               Margin="1"
+                               Width="14" Height="14"
+                               Visibility="{Binding IsBusy, Converter={StaticResource TrueToVisibleFalseToCollapsedConverter}}" />
 
-            <GroupBox Grid.Row="7"
-                      IsEnabled="{Binding IsBusy, Converter={StaticResource BoolInvertConverter}}"
-                      Margin="0, 10"
-                      Header="Characters and stashes selection">
-                <Grid>
-                    <Grid.Resources>
-                        <CollectionViewSource x:Key='charactersListSource'
-                                              Source="{Binding CharactersList}"
-                                              IsLiveGroupingRequested="True">
-                            <CollectionViewSource.GroupDescriptions>
-                                <PropertyGroupDescription PropertyName="League" />
-                            </CollectionViewSource.GroupDescriptions>
-                        </CollectionViewSource>
-                    </Grid.Resources>
+        <Button Grid.Column="2"
+                Width="100"
+                IsDefault="true"
+                IsEnabled="{Binding IsBusy, Converter={StaticResource BoolInvertConverter}}"
+                Command="{Binding LoginCommand}" CommandParameter="{Binding ElementName=LoginPasswordBox}">
+          <Button.Content>
+            <TextBlock Text="Log in" />
+          </Button.Content>
+        </Button>
+      </Grid>
 
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
+      <GroupBox Grid.Row="7"
+                IsEnabled="{Binding IsBusy, Converter={StaticResource BoolInvertConverter}}"
+                Margin="0, 10"
+                Header="Characters and stashes selection">
+        <Grid>
+          <Grid.Resources>
+            <CollectionViewSource x:Key='charactersListSource'
+                                  Source="{Binding CharactersList}"
+                                  IsLiveGroupingRequested="True">
+              <CollectionViewSource.GroupDescriptions>
+                <PropertyGroupDescription PropertyName="League" />
+              </CollectionViewSource.GroupDescriptions>
+            </CollectionViewSource>
+          </Grid.Resources>
 
-                    <ComboBox Grid.Row="0"
-                              IsEnabled="{Binding CharactersList, Converter={StaticResource NullToFalseConverter}}"
-                              Margin="0, 5"
-                              ItemsSource="{Binding Source={StaticResource charactersListSource}}"
-                              SelectedItem="{Binding SelectedCharacter}">
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+          </Grid.RowDefinitions>
 
-                        <ComboBox.GroupStyle>
-                            <GroupStyle>
-                                <GroupStyle.HeaderTemplate>
-                                    <DataTemplate DataType="{x:Type dataTypes:ICharacter}">
-                                        <TextBlock FontSize="14" FontWeight="Bold" Text="{Binding Name}" />
-                                    </DataTemplate>
-                                </GroupStyle.HeaderTemplate>
-                            </GroupStyle>
-                        </ComboBox.GroupStyle>
+          <ComboBox Grid.Row="0"
+                    IsEnabled="{Binding CharactersList, Converter={StaticResource NullToFalseConverter}}"
+                    Margin="0, 5"
+                    ItemsSource="{Binding Source={StaticResource charactersListSource}}"
+                    SelectedItem="{Binding SelectedCharacter}">
 
-                        <ComboBox.ItemTemplate>
-                            <DataTemplate DataType="{x:Type dataTypes:ICharacter}">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock>
-                                        <TextBlock.Inlines>
-                                            <Run Text="{Binding Level}" FontWeight="SemiBold" />
-                                            <Run Text="{Binding Name}" /> (
-                                            <Run Text="{Binding Class}" /> )
-                                        </TextBlock.Inlines>
-                                    </TextBlock>
-                                </StackPanel>
-                            </DataTemplate>
-                        </ComboBox.ItemTemplate>
-                    </ComboBox>
+            <ComboBox.GroupStyle>
+              <GroupStyle>
+                <GroupStyle.HeaderTemplate>
+                  <DataTemplate DataType="{x:Type dataTypes:ICharacter}">
+                    <TextBlock FontSize="14" FontWeight="Bold" Text="{Binding Name}" />
+                  </DataTemplate>
+                </GroupStyle.HeaderTemplate>
+              </GroupStyle>
+            </ComboBox.GroupStyle>
 
-                    <ListBox Grid.Row="1"
-                             Margin="0, 5"
-                             MaxHeight="150"
+            <ComboBox.ItemTemplate>
+              <DataTemplate DataType="{x:Type dataTypes:ICharacter}">
+                <StackPanel Orientation="Horizontal">
+                  <TextBlock>
+                    <TextBlock.Inlines>
+                      <Run Text="{Binding Level}" FontWeight="SemiBold" />
+                      <Run Text="{Binding Name}" /> (
+                      <Run Text="{Binding Class}" /> )
+                    </TextBlock.Inlines>
+                  </TextBlock>
+                </StackPanel>
+              </DataTemplate>
+            </ComboBox.ItemTemplate>
+          </ComboBox>
 
-                             ScrollViewer.HorizontalScrollBarVisibility="Hidden"
-                             ScrollViewer.VerticalScrollBarVisibility="Visible"
+          <ListBox Grid.Row="1"
+                   Margin="0, 5"
+                   MaxHeight="150"
 
-                             IsEnabled="{Binding SelectedCharacterStash, Converter={StaticResource NullToFalseConverter}}"
-                             Visibility="{Binding SelectedCharacterStash, Converter={StaticResource NullToCollapsedConverter}}"
-                             ItemsSource="{Binding SelectedCharacterStash}">
-                        <ListBox.ItemTemplate>
-                            <DataTemplate DataType="{x:Type viewModels:TabSelectionViewModel}">
-                                <StackPanel Orientation="Horizontal">
-                                    <CheckBox IsChecked="{Binding IsSelected}" />
-                                    <TextBlock Text="{Binding Name}" />
-                                </StackPanel>
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                    </ListBox>
-                </Grid>
-            </GroupBox>
+                   ScrollViewer.HorizontalScrollBarVisibility="Hidden"
+                   ScrollViewer.VerticalScrollBarVisibility="Visible"
+
+                   IsEnabled="{Binding SelectedCharacterStash, Converter={StaticResource NullToFalseConverter}}"
+                   Visibility="{Binding SelectedCharacterStash, Converter={StaticResource NullToCollapsedConverter}}"
+                   ItemsSource="{Binding SelectedCharacterStash}">
+            <ListBox.ItemTemplate>
+              <DataTemplate DataType="{x:Type viewModels:TabSelectionViewModel}">
+                <StackPanel Orientation="Horizontal">
+                  <CheckBox IsChecked="{Binding IsSelected}" />
+                  <TextBlock Text="{Binding Name}" />
+                </StackPanel>
+              </DataTemplate>
+            </ListBox.ItemTemplate>
+          </ListBox>
         </Grid>
+      </GroupBox>
+    </Grid>
 
-    </DataTemplate>
+  </DataTemplate>
 </ResourceDictionary>
