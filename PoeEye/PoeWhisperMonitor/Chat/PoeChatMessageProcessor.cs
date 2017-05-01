@@ -9,7 +9,7 @@ namespace PoeWhisperMonitor.Chat
         private readonly Regex logRecordRegex = new Regex(@"^(?'timestamp'\d\d\d\d\/\d\d\/\d\d \d\d:\d\d:\d\d)( \w+ \w+ \[.*?\] :? ?)?(?'content'.*)$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         private readonly Regex messageParseRegex = new Regex(
-            @"^(?'timestamp'\d\d\d\d\/\d\d\/\d\d \d\d:\d\d:\d\d).*?(?'prefix'[$&%]|@From|@To)\s?(?:\<(?'guild'.*?)\> )?(?'name'.*?):\s*(?'message'.*)$",
+            @"^(?'prefix'[$&%]|@From|@To)?\s?(?:\<(?'guild'.*?)\> )?(?'name'.*?):\s*(?'message'.*)$",
             RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         public bool TryParse(string rawText, out PoeMessage message)
@@ -30,15 +30,18 @@ namespace PoeWhisperMonitor.Chat
                 return false;
             }
 
-            var match = messageParseRegex.Match(rawText);
+            var content = logRecordMatch.Groups["content"].Value;
+            var timestamp = DateTime.Parse(logRecordMatch.Groups["timestamp"].Value);
+
+            var match = messageParseRegex.Match(content);
             if (!match.Success)
             {
                 // system message, error, etc
                 message = new PoeMessage
                 {
-                    Message = logRecordMatch.Groups["content"].Value,
+                    Message = content,
                     MessageType = PoeMessageType.System,
-                    Timestamp = DateTime.Parse(logRecordMatch.Groups["timestamp"].Value)
+                    Timestamp = timestamp
                 };
                 return true;
             }
@@ -48,7 +51,7 @@ namespace PoeWhisperMonitor.Chat
                 Message = match.Groups["message"].Value,
                 MessageType = ToMessageType(match.Groups["prefix"].Value),
                 Name = match.Groups["name"].Value,
-                Timestamp = DateTime.Parse(match.Groups["timestamp"].Value)
+                Timestamp = timestamp
             };
 
             return true;

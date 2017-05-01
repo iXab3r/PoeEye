@@ -61,6 +61,14 @@ namespace PoeEye.Tests.PoeWhisperMonitor.Chat
                     Name = "FnkAe"
                 });
             yield return new TestCaseData(
+                "2017/05/01 10:38:00 909686234 951 [INFO Client 62140] <(ROA)> OmgSoMainstream: Hi, I would like to buy your Lingering Remnants listed for 3 chaos in Legacy (stash tab \"T\"; position: left 12, top 2)",
+                new PoeMessage()
+                {
+                    Message = "Hi, I would like to buy your Lingering Remnants listed for 3 chaos in Legacy (stash tab \"T\"; position: left 12, top 2)",
+                    MessageType = PoeMessageType.Local,
+                    Name = "OmgSoMainstream"
+                });
+            yield return new TestCaseData(
                 "2017/04/10 00:59:37 1848815875 951 [INFO Client 32972] %Eragod: ty",
                 new PoeMessage()
                 {
@@ -79,15 +87,17 @@ namespace PoeEye.Tests.PoeWhisperMonitor.Chat
                 "2017/04/10 00:27:00 1846859296 951 [INFO Client 32972] The Shaper: Failure. Ambivalence. Death. A final abyss of unending darkness.",
                 new PoeMessage()
                 {
-                    Message = "The Shaper: Failure. Ambivalence. Death. A final abyss of unending darkness.",
-                    MessageType = PoeMessageType.System,
+                    Name = "The Shaper",
+                    Message = "Failure. Ambivalence. Death. A final abyss of unending darkness.",
+                    MessageType = PoeMessageType.Local,
                 });
             yield return new TestCaseData(
                 "2017/03/27 22:14:11 715687062 70 [INFO Client 28572] Doodad hash: 0",
                 new PoeMessage()
                 {
-                    Message = "Doodad hash: 0",
-                    MessageType = PoeMessageType.System,
+                    Name = "Doodad hash",
+                    Message = "0",
+                    MessageType = PoeMessageType.Local,
                 });
             yield return new TestCaseData(
                 "2017/03/29 21:21:44 885339781 6e7 [DEBUG Client 28572] Joined guild named roa with 21 members",
