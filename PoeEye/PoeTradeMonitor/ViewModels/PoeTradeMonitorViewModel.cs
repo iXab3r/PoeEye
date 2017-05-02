@@ -115,14 +115,6 @@ namespace PoeEye.TradeMonitor.ViewModels
                         .Subscribe(ProcessMessage)
                         .AddTo(Anchors);
 
-                    keyboardMouseEvents
-                        .WhenKeyDown
-                        .Where(x => controller.IsVisible)
-                        .Where(x => new KeyGesture(Key.F8, ModifierKeys.Control | ModifierKeys.Shift | ModifierKeys.Alt).MatchesHotkey(x))
-                        .Do(x => x.Handled = true)
-                        .Subscribe(ToggleLock, Log.HandleException)
-                        .AddTo(Anchors);
-
                     configProvider
                         .WhenChanged
                         .Subscribe(ApplyConfig)
@@ -175,20 +167,6 @@ namespace PoeEye.TradeMonitor.ViewModels
         {
             get { return opacity; }
             set { this.RaiseAndSetIfChanged(ref opacity, value); }
-        }
-
-        private void ToggleLock()
-        {
-            if (!IsLocked)
-            {
-                Log.Instance.Debug($"[PoeTradeMonitorViewModel.ToggleLock] Locking window");
-                LockWindowCommandExecuted();
-            }
-            else
-            {
-                Log.Instance.Debug($"[PoeTradeMonitorViewModel.ToggleLock] Unlocking window");
-                UnlockWindowCommandExecuted();
-            }
         }
 
         private void ProcessMessage(TradeModel model)
@@ -302,11 +280,6 @@ namespace PoeEye.TradeMonitor.ViewModels
             config.ExpandOnHover = ExpandOnHover;
             configProvider.Save(config);
             IsLocked = true;
-        }
-
-        private void UnlockWindowCommandExecuted()
-        {
-            IsLocked = false;
         }
 
         private class NegotiationCloseController : INegotiationCloseController

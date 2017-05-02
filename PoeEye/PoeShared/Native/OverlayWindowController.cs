@@ -8,6 +8,7 @@ using System.Reactive.Subjects;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
+using DynamicData;
 using Guards;
 using JetBrains.Annotations;
 using Microsoft.Practices.Unity;
@@ -24,6 +25,7 @@ namespace PoeShared.Native
         private readonly string[] possibleOverlayNames;
         private readonly IScheduler uiScheduler;
         private readonly IWindowTracker windowTracker;
+        private readonly ISourceList<OverlayWindowView> childsWindows = new SourceList<OverlayWindowView>();
 
         private bool isVisible;
 
@@ -114,6 +116,15 @@ namespace PoeShared.Native
             set => this.RaiseAndSetIfChanged(ref isVisible, value);
         }
 
+        public IOverlayViewModel[] GetChilds()
+        {
+            return childsWindows.Items
+                .Select(x => x.DataContext)
+                .OfType<OverlayWindowViewModel>()
+                .Select(x => x.Content)
+                .ToArray();
+        }
+
         public IDisposable RegisterChild(IOverlayViewModel viewModel)
         {
             Guard.ArgumentNotNull(viewModel, nameof(viewModel));
@@ -165,7 +176,10 @@ namespace PoeShared.Native
                 overlayWindow.WhenLoaded.Subscribe(observer).AddTo(childAnchors);
             }
 
+            childsWindows.Add(overlayWindow);
+
             Disposable.Create(() => overlayWindow.Close()).AddTo(childAnchors);
+            Disposable.Create(() => childsWindows.Remove(overlayWindow)).AddTo(childAnchors);
             childAnchors.AddTo(Anchors);
 
             return childAnchors;

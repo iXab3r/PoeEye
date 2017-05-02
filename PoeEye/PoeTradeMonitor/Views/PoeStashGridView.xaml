@@ -21,7 +21,7 @@
 
   <DataTemplate DataType="{x:Type viewModels:PoeStashGridViewModel}">
 
-    <Grid x:Name="TradeMonitorOverlay">
+    <Grid x:Name="StashGridOverlay">
 
       <Grid TextBlock.Foreground="{StaticResource PoeFontBrush}">
         <Grid.RowDefinitions>

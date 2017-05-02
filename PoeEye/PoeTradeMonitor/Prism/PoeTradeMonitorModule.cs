@@ -33,6 +33,7 @@ namespace PoeEye.TradeMonitor.Prism
 
             container.Resolve<TradeMonitorBootstrapper>().AddTo(anchors);
             container.Resolve<StashGridBootstrapper>().AddTo(anchors);
+            container.Resolve<ControlPanelBootstrapper>().AddTo(anchors);
         }
     }
 }

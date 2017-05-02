@@ -78,14 +78,6 @@ namespace PoeEye.TradeMonitor.ViewModels
                             .WhenChanged
                             .Subscribe(ApplyConfig)
                             .AddTo(Anchors);
-
-                        keyboardMouseEvents
-                            .WhenKeyDown
-                            .Where(x => controller.IsVisible)
-                            .Where(x => new KeyGesture(Key.F8, ModifierKeys.Control | ModifierKeys.Shift | ModifierKeys.Alt).MatchesHotkey(x))
-                            .Do(x => x.Handled = true)
-                            .Subscribe(ToggleLock, Log.HandleException)
-                            .AddTo(Anchors);
                     })
                 .AddTo(Anchors);
         }
@@ -159,25 +151,6 @@ namespace PoeEye.TradeMonitor.ViewModels
             config.OverlayOpacity = Opacity;
             configProvider.Save(config);
             IsLocked = true;
-        }
-
-        private void ToggleLock()
-        {
-            if (!IsLocked)
-            {
-                LogTo.Debug($"Locking window");
-                LockWindowCommandExecuted();
-            }
-            else
-            {
-                LogTo.Debug($"Unlocking window");
-                UnlockWindowCommandExecuted();
-            }
-        }
-
-        private void UnlockWindowCommandExecuted()
-        {
-            IsLocked = false;
         }
 
         private void PrepareGridCells()

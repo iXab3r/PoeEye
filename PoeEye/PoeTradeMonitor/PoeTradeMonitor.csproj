@@ -201,7 +201,9 @@
     <Compile Include="Models\GenericDelegateCommand.cs" />
     <Compile Include="Models\IMacroCommandContext.cs" />
     <Compile Include="Models\INegotiationCloseController.cs" />
+    <Compile Include="Modularity\PoeControlPanelConfig.cs" />
     <Compile Include="Modularity\PoeStashGridConfig.cs" />
+    <Compile Include="Prism\ControlPanelBootstrapper.cs" />
     <Compile Include="Prism\StashGridBootstrapper.cs" />
     <Compile Include="Services\IPoeMacroCommandsProvider.cs" />
     <Compile Include="Services\IPoeMessageParser.cs" />
@@ -235,6 +237,7 @@
     <Compile Include="ViewModels\INegotiationViewModel.cs" />
     <Compile Include="ViewModels\MacroMessageViewModel.cs" />
     <Compile Include="ViewModels\NegotiationViewModel.cs" />
+    <Compile Include="ViewModels\PoeControlPanelViewModel.cs" />
     <Compile Include="ViewModels\PoeStashGridViewModel.cs" />
     <Compile Include="ViewModels\PoeTradeMonitorSettingsViewModel.cs" />
     <Compile Include="ViewModels\PoeTradeMonitorViewModel.cs" />
@@ -272,6 +275,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Views\PoeControlPanelVIew.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Views\PoeTradeMonitorSettingsView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -289,11 +296,12 @@
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Resources\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <None Include="FodyWeavers.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\mainIcon.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>

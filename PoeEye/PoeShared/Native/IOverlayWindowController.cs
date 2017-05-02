@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Windows;
 using JetBrains.Annotations;
 using PoeShared.Scaffolding;
@@ -12,5 +13,8 @@ namespace PoeShared.Native
         void ActivateLastActiveWindow();
 
         bool IsVisible { get; }
+
+        [NotNull]
+        IOverlayViewModel[] GetChilds();
     }
 }
