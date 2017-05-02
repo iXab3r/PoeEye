@@ -37,7 +37,7 @@ namespace PoeEye.TradeMonitor.Models
             {
                 Timestamp = clock.Now,
                 CharacterName = "Xaber",
-                ItemPosition = new ItemPosition(rng.Next(0, MaxInventoryWidth), rng.Next(0, MaxInventoryHeight)),
+                ItemPosition = new ItemPosition(rng.Next(0, MaxInventoryWidth), rng.Next(0, MaxInventoryHeight), rng.Next(1,2), rng.Next(1,3)),
                 TradeType = rng.Next(0,100) >= 70 ? TradeType.Buy : TradeType.Sell,
                 League = "League",
                 Price = GetRandomPrice(),

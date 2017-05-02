@@ -4,7 +4,7 @@ namespace PoeEye.TradeMonitor.Models
 {
     internal struct ItemPosition
     {
-        public ItemPosition(int x, int y) : this(x, y, 1, 1)
+        public ItemPosition(int x, int y) : this(x, y, 0, 0)
         {
         }
 

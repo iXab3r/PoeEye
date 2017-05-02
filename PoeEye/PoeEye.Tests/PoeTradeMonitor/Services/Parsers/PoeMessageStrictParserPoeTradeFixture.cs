@@ -53,7 +53,7 @@ namespace PoeEye.Tests.PoeTradeMonitor.Services.Parsers
                     new TradeModel()
                     {
                         CharacterName = "Name",
-                        ItemPosition = new ItemPosition(12, 2),
+                        ItemPosition = new ItemPosition(11, 1),
                         Price = new PoePrice("alchemy", 3),
                         PositionName = "Enduring Onslaught Leaguestone of Slaying",
                         League = "Legacy",
@@ -66,7 +66,7 @@ namespace PoeEye.Tests.PoeTradeMonitor.Services.Parsers
                     new TradeModel()
                     {
                         CharacterName = "Name",
-                        ItemPosition = new ItemPosition(12, 2),
+                        ItemPosition = new ItemPosition(11, 1),
                         Price = new PoePrice("alchemy", 3),
                         PositionName = "Enduring Onslaught Leaguestone of Slaying",
                         League = "Legacy",
@@ -79,7 +79,7 @@ namespace PoeEye.Tests.PoeTradeMonitor.Services.Parsers
                    new TradeModel()
                    {
                        CharacterName = "Name",
-                       ItemPosition = new ItemPosition(12, 2),
+                       ItemPosition = new ItemPosition(11, 1),
                        Price = new PoePrice("alchemy", 3),
                        PositionName = "Enduring Onslaught Leaguestone of Slaying",
                        League = "Legacy",
@@ -92,7 +92,7 @@ namespace PoeEye.Tests.PoeTradeMonitor.Services.Parsers
                   new TradeModel()
                   {
                       CharacterName = "Name",
-                      ItemPosition = new ItemPosition(12, 2),
+                      ItemPosition = new ItemPosition(11, 1),
                       PositionName = "Enduring Onslaught Leaguestone of Slaying",
                        League = "Legacy",
                       TabName = "Трейд",
@@ -104,14 +104,14 @@ namespace PoeEye.Tests.PoeTradeMonitor.Services.Parsers
                 new TradeModel()
                 {
                     CharacterName = "Name",
-                    ItemPosition = new ItemPosition(12, 2),
+                    ItemPosition = new ItemPosition(11, 1),
                     PositionName = "Enduring Onslaught Leaguestone of Slaying",
                     League = "Legacy",
                     TabName = "$",
                     Offer = "3c ?"
                 });
             yield return new TestCaseData(
-                "Hi, I would like to buy your Golem Nails Gripped Gloves listed for 1.5 exalted in Legacy (stash tab \"$\"; position: left 0, top 0)",
+                "Hi, I would like to buy your Golem Nails Gripped Gloves listed for 1.5 exalted in Legacy (stash tab \"$\"; position: left 1, top 1)",
                 true,
                 new TradeModel()
                 {
