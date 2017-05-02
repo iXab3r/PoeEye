@@ -38,7 +38,7 @@ namespace PoeShared.Converters
             rawPrice = rawPrice.Trim();
             if (KnownCurrencyNameList.CurrencyByAlias.ContainsKey(rawPrice))
             {
-                return new PoePrice(KnownCurrencyNameList.CurrencyByAlias[rawPrice], 1);
+                return new PoePrice(KnownCurrencyNameList.CurrencyByAlias[rawPrice], 0);
             }
 
             var match = CurrencyParser.Match(rawPrice);

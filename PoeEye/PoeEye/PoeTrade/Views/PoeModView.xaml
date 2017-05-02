@@ -21,10 +21,10 @@
       <StackPanel Grid.Column="1"
                   Orientation="Horizontal"
                   Margin="10,0,0,0">
-        <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}"
-                                Value="{Binding Min, Converter={x:Static converters:NullableConverter.Instance}}" />
-        <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}"
-                                Value="{Binding Max, Converter={x:Static converters:NullableConverter.Instance}}" />
+        <TextBox Style="{StaticResource TextBoxMinKey}"
+                 Text="{Binding Min, Converter={x:Static converters:NullableConverter.Instance}}" />
+        <TextBox Style="{StaticResource TextBoxMaxKey}"
+                 Text="{Binding Max, Converter={x:Static converters:NullableConverter.Instance}}" />
       </StackPanel>
     </Grid>
   </DataTemplate>

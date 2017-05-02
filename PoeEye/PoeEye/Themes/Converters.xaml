@@ -27,13 +27,19 @@
     </blue:Int32ToVisibilityConverter.ComparisonStrategy>
   </blue:Int32ToVisibilityConverter>
 
-    <blue:Int32ToVisibilityConverter x:Key="GreaterThanZeroToVisibleConverter" TrueValue="Visible" FalseValue="Collapsed">
-        <blue:Int32ToVisibilityConverter.ComparisonStrategy>
-            <blue:Int32ComparisonStrategy Mode="GreaterThan" Comparand="0" />
-        </blue:Int32ToVisibilityConverter.ComparisonStrategy>
-    </blue:Int32ToVisibilityConverter>
+  <blue:Int32ToVisibilityConverter x:Key="GreaterThanZeroToVisibleConverter" TrueValue="Visible" FalseValue="Collapsed">
+    <blue:Int32ToVisibilityConverter.ComparisonStrategy>
+      <blue:Int32ComparisonStrategy Mode="GreaterThan" Comparand="0" />
+    </blue:Int32ToVisibilityConverter.ComparisonStrategy>
+  </blue:Int32ToVisibilityConverter>
 
-    <converters:NullToVisibilityMultiValueConverter x:Key="AllNullToCollapsedMultiValueConverter" TrueValue="Collapsed" FalseValue="Visible">
+  <blue:DoubleToVisibilityConverter x:Key="DoubleGreaterThanZeroToVisibleConverter" TrueValue="Visible" FalseValue="Collapsed">
+    <blue:DoubleToVisibilityConverter.ComparisonStrategy>
+      <blue:DoubleComparisonStrategy Mode="GreaterThan" Comparand="0" />
+    </blue:DoubleToVisibilityConverter.ComparisonStrategy>
+  </blue:DoubleToVisibilityConverter>
+
+  <converters:NullToVisibilityMultiValueConverter x:Key="AllNullToCollapsedMultiValueConverter" TrueValue="Collapsed" FalseValue="Visible">
     <converters:NullToVisibilityMultiValueConverter.Strategy>
       <blue:AndStrategy/>
     </converters:NullToVisibilityMultiValueConverter.Strategy>

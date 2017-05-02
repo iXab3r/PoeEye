@@ -36,11 +36,10 @@
               <StackPanel Orientation="Horizontal" Margin="0,2">
                 <ContentPresenter
                   Width="100"
-                  Content="{Binding Item1, Mode=OneWay, Converter={StaticResource StringToPoePriceConverter}}" />
-                <controls:NumericUpDown Width="100"
-                                        Style="{StaticResource QueryNumericUpDownMax}"
-                                        Value="{Binding Item2, Converter={x:Static converters:NullableConverter.Instance}}"
-                                        StringFormat="{}{0:F2}" />
+                  Content="{Binding Item1, Mode=OneWay}" />
+                <TextBox Width="100"
+                         Style="{StaticResource TextBoxKey}"
+                         Text="{Binding Item2, Converter={x:Static converters:NullableConverter.Instance}, StringFormat='{}{0:F2}'}" />
               </StackPanel>
 
             </DataTemplate>

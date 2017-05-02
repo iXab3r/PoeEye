@@ -20,6 +20,8 @@ namespace PoeShared.Common
 
         public float Value { get; }
 
+        public bool HasValue => Value > 0;
+
         public string Price { get; }
 
         public bool IsEmpty => Empty.Equals(this);

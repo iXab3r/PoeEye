@@ -110,10 +110,10 @@
                         </Style.Triggers>
                       </Style>
                     </StackPanel.Style>
-                    <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}"
-                                            Value="{Binding MinGroupValue, Converter={x:Static converters:NullableConverter.Instance}}" />
-                    <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}"
-                                            Value="{Binding MaxGroupValue, Converter={x:Static converters:NullableConverter.Instance}}" />
+                    <TextBox Style="{StaticResource TextBoxMinKey}"
+                             Text="{Binding MinGroupValue, Converter={x:Static converters:NullableConverter.Instance}}" />
+                    <TextBox Style="{StaticResource TextBoxMaxKey}"
+                             Text="{Binding MaxGroupValue, Converter={x:Static converters:NullableConverter.Instance}}" />
                   </StackPanel>
 
                   <Button Grid.Column="3"

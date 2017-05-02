@@ -37,14 +37,17 @@ namespace PoeEye.Tests.PoeShared.Converters
             result.CurrencyType.ShouldBe(expected.CurrencyType);
             result.Value.ShouldBe(expected.Value);
             result.Price.ShouldBe(expected.Price);
+            result.HasValue.ShouldBe(expected.HasValue);
+            result.IsEmpty.ShouldBe(expected.IsEmpty);
         }
 
         public IEnumerable<TestCaseData> ShouldConvertCases()
         {
             yield return new TestCaseData("Unknown", PoePrice.Empty);
             yield return new TestCaseData("Random", PoePrice.Empty);
-            yield return new TestCaseData("blessed", new PoePrice(KnownCurrencyNameList.BlessedOrb, 1));
-            yield return new TestCaseData("alt", new PoePrice(KnownCurrencyNameList.OrbOfAlteration, 1));
+            yield return new TestCaseData("blessed", new PoePrice(KnownCurrencyNameList.BlessedOrb, 0));
+            yield return new TestCaseData("0 alt", new PoePrice(KnownCurrencyNameList.OrbOfAlteration, 0));
+            yield return new TestCaseData("alt", new PoePrice(KnownCurrencyNameList.OrbOfAlteration, 0));
             yield return new TestCaseData("1 alt", new PoePrice(KnownCurrencyNameList.OrbOfAlteration, 1));
             yield return new TestCaseData("price 1 alt", new PoePrice(KnownCurrencyNameList.OrbOfAlteration, 1));
             yield return new TestCaseData("b/o 1 alt", new PoePrice(KnownCurrencyNameList.OrbOfAlteration, 1));

@@ -38,4 +38,27 @@
     <Setter Property="controls:TextBoxHelper.Watermark" Value="any" />
     <Setter Property="controls:ComboBoxHelper.EnableVirtualizationWithGrouping" Value="true" />
   </Style>
+
+  <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}" x:Key="TextBoxKey">
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Setter Property="Width" Value="80" />
+    <Setter Property="Margin" Value="3,0,3,0" />
+  </Style>
+
+  <Style TargetType="TextBox" BasedOn="{StaticResource TextBoxKey}" x:Key="TextBoxMinKey">
+    <Style.Triggers>
+      <Trigger Property="controls:TextBoxHelper.HasText" Value="False">
+        <Setter Property="controls:TextBoxHelper.Watermark" Value="Min" />
+      </Trigger>
+    </Style.Triggers>
+  </Style>
+
+  <Style TargetType="TextBox" BasedOn="{StaticResource TextBoxKey}" x:Key="TextBoxMaxKey">
+    <Style.Triggers>
+      <Trigger Property="controls:TextBoxHelper.HasText" Value="False">
+        <Setter Property="controls:TextBoxHelper.Watermark" Value="Max" />
+      </Trigger>
+    </Style.Triggers>
+  </Style>
 </ResourceDictionary>

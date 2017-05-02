@@ -2,20 +2,30 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:common="clr-namespace:PoeShared.Common;assembly=PoeShared">
   <DataTemplate x:Key="CurrencyViewKey" DataType="{x:Type common:PoePrice}">
-    <DockPanel VerticalAlignment="Center" Margin="5,0" LastChildFill="True">
-      <Image DockPanel.Dock="Left" 
+    <Grid VerticalAlignment="Center" Margin="5,0">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="Auto"/>
+        <ColumnDefinition Width="Auto"/>
+        <ColumnDefinition Width="*"/>
+      </Grid.ColumnDefinitions>
+      <Image Grid.Column="0"
              Width="20" Height="20" 
-             Source="{Binding Converter={StaticResource PriceToImageUriConverter}}"
+             Source="{Binding CurrencyType, Converter={StaticResource PriceToImageUriConverter}}"
              Visibility="{Binding RelativeSource={RelativeSource Self}, Path=Source, Converter={StaticResource NullToCollapsedConverter}}"/>
-      <TextBlock DockPanel.Dock="Right"
+      <TextBlock Grid.Column="1"
                  TextTrimming="CharacterEllipsis"
                  VerticalAlignment="Center"
-                 Text="{Binding}" FontSize="13" Margin="1,0,0,0" />
-    </DockPanel>
+                 Visibility="{Binding HasValue, Converter={StaticResource TrueToVisibleFalseToCollapsedConverter}}"
+                 Text="{Binding Value}" FontSize="13" Margin="1,0,0,0" />
+      <TextBlock Grid.Column="2"
+                 TextTrimming="CharacterEllipsis"
+                 VerticalAlignment="Center"
+                 Text="{Binding CurrencyType}" FontSize="13" Margin="1,0,0,0" />
+    </Grid>
   </DataTemplate>
 
   <DataTemplate DataType="{x:Type common:PoePrice}">
-    <ContentControl Content="{Binding Price}" ContentTemplate="{StaticResource CurrencyViewKey}" />
+    <ContentControl Content="{Binding}" ContentTemplate="{StaticResource CurrencyViewKey}" />
   </DataTemplate>
 
 </ResourceDictionary>

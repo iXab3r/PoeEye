@@ -19,12 +19,6 @@
           <Setter Property="VerticalAlignment" Value="Center" />
         </Style>
 
-        <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}" x:Key="TextBoxKey">
-          <Setter Property="VerticalContentAlignment" Value="Center" />
-          <Setter Property="HorizontalContentAlignment" Value="Center" />
-          <Setter Property="Width" Value="80" />
-          <Setter Property="Margin" Value="3,0,3,0" />
-        </Style>
 
         <Style TargetType="StackPanel">
           <Setter Property="Orientation" Value="Horizontal" />
@@ -119,56 +113,56 @@
         <TextBlock Grid.Row="0" Grid.Column="0"
                    Text="Damage" Style="{StaticResource TextBlockHeader}" />
         <StackPanel Grid.Row="0" Grid.Column="1">
-          <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}"
-                                  Value="{Binding DamageMin, Converter={x:Static converters:NullableConverter.Instance}}" />
-          <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}"
-                                  Value="{Binding DamageMax, Converter={x:Static converters:NullableConverter.Instance}}" />
+          <TextBox Style="{StaticResource TextBoxMinKey}"
+                                  Text="{Binding DamageMin, Converter={x:Static converters:NullableConverter.Instance}}" />
+          <TextBox Style="{StaticResource TextBoxMaxKey}"
+                   Text="{Binding DamageMax, Converter={x:Static converters:NullableConverter.Instance}}" />
         </StackPanel>
 
 
         <TextBlock Grid.Row="0" Grid.Column="2"
                    Text="APS" Style="{StaticResource TextBlockHeader}" />
         <StackPanel Grid.Row="0" Grid.Column="3">
-          <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}"
-                                  Value="{Binding ApsMin, Converter={x:Static converters:NullableConverter.Instance}}" />
-          <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}"
-                                  Value="{Binding ApsMax, Converter={x:Static converters:NullableConverter.Instance}}" />
+          <TextBox Style="{StaticResource TextBoxMinKey}"
+                   Text="{Binding ApsMin, Converter={x:Static converters:NullableConverter.Instance}}" />
+          <TextBox Style="{StaticResource TextBoxMaxKey}"
+                   Text="{Binding ApsMax, Converter={x:Static converters:NullableConverter.Instance}}" />
         </StackPanel>
 
         <TextBlock Grid.Row="0" Grid.Column="4"
                    Text="Crit.Strike" Style="{StaticResource TextBlockHeader}" />
         <StackPanel Grid.Row="0" Grid.Column="5">
-          <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}"
-                                  Value="{Binding CritMin, Converter={x:Static converters:NullableConverter.Instance}}" />
-          <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}"
-                                  Value="{Binding CritMax, Converter={x:Static converters:NullableConverter.Instance}}" />
+          <TextBox Style="{StaticResource TextBoxMinKey}"
+                   Text="{Binding CritMin, Converter={x:Static converters:NullableConverter.Instance}}" />
+          <TextBox Style="{StaticResource TextBoxMaxKey}"
+                   Text="{Binding CritMax, Converter={x:Static converters:NullableConverter.Instance}}" />
         </StackPanel>
 
         <TextBlock Grid.Row="2" Grid.Column="0"
                    Text="DPS" Style="{StaticResource TextBlockHeader}" />
         <StackPanel Grid.Row="2" Grid.Column="1">
-          <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}"
-                                  Value="{Binding DpsMin, Converter={x:Static converters:NullableConverter.Instance}}" />
-          <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}"
-                                  Value="{Binding DpsMax, Converter={x:Static converters:NullableConverter.Instance}}" />
+          <TextBox Style="{StaticResource TextBoxMinKey}"
+                   Text="{Binding DpsMin, Converter={x:Static converters:NullableConverter.Instance}}" />
+          <TextBox Style="{StaticResource TextBoxMaxKey}"
+                   Text="{Binding DpsMax, Converter={x:Static converters:NullableConverter.Instance}}" />
         </StackPanel>
 
         <TextBlock Grid.Row="2" Grid.Column="2"
                    Text="eDPS" Style="{StaticResource TextBlockHeader}" />
         <StackPanel Grid.Row="2" Grid.Column="3">
-          <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}"
-                                  Value="{Binding EdpsMin, Converter={x:Static converters:NullableConverter.Instance}}" />
-          <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}"
-                                  Value="{Binding EdpsMax, Converter={x:Static converters:NullableConverter.Instance}}" />
+          <TextBox Style="{StaticResource TextBoxMinKey}"
+                   Text="{Binding EdpsMin, Converter={x:Static converters:NullableConverter.Instance}}" />
+          <TextBox Style="{StaticResource TextBoxMaxKey}"
+                   Text="{Binding EdpsMax, Converter={x:Static converters:NullableConverter.Instance}}" />
         </StackPanel>
 
         <TextBlock Grid.Row="2" Grid.Column="4"
                    Text="pDPS" Style="{StaticResource TextBlockHeader}" />
         <StackPanel Grid.Row="2" Grid.Column="5">
-          <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}"
-                                  Value="{Binding PdpsMin, Converter={x:Static converters:NullableConverter.Instance}}" />
-          <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}"
-                                  Value="{Binding PdpsMax, Converter={x:Static converters:NullableConverter.Instance}}" />
+          <TextBox Style="{StaticResource TextBoxMinKey}"
+                   Text="{Binding PdpsMin, Converter={x:Static converters:NullableConverter.Instance}}" />
+          <TextBox Style="{StaticResource TextBoxMaxKey}"
+                   Text="{Binding PdpsMax, Converter={x:Static converters:NullableConverter.Instance}}" />
         </StackPanel>
       </Grid>
 
@@ -190,38 +184,38 @@
         <TextBlock Grid.Row="0" Grid.Column="0"
                    Text="Armour" Style="{StaticResource TextBlockHeader}" />
         <StackPanel Grid.Row="0" Grid.Column="1">
-          <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}"
-                                  Value="{Binding ArmourMin, Converter={x:Static converters:NullableConverter.Instance}}" />
-          <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}"
-                                  Value="{Binding ArmourMax, Converter={x:Static converters:NullableConverter.Instance}}" />
+          <TextBox Style="{StaticResource TextBoxMinKey}"
+                   Text="{Binding ArmourMin, Converter={x:Static converters:NullableConverter.Instance}}" />
+          <TextBox Style="{StaticResource TextBoxMaxKey}"
+                   Text="{Binding ArmourMax, Converter={x:Static converters:NullableConverter.Instance}}" />
         </StackPanel>
 
 
         <TextBlock Grid.Row="0" Grid.Column="2"
                    Text="Evasion" Style="{StaticResource TextBlockHeader}" />
         <StackPanel Grid.Row="0" Grid.Column="3">
-          <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}"
-                                  Value="{Binding EvasionMin, Converter={x:Static converters:NullableConverter.Instance}}" />
-          <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}"
-                                  Value="{Binding EvasionMax, Converter={x:Static converters:NullableConverter.Instance}}" />
+          <TextBox Style="{StaticResource TextBoxMinKey}"
+                   Text="{Binding EvasionMin, Converter={x:Static converters:NullableConverter.Instance}}" />
+          <TextBox Style="{StaticResource TextBoxMaxKey}"
+                   Text="{Binding EvasionMax, Converter={x:Static converters:NullableConverter.Instance}}" />
         </StackPanel>
 
         <TextBlock Grid.Row="2" Grid.Column="0"
                    Text="Shield" Style="{StaticResource TextBlockHeader}" />
         <StackPanel Grid.Row="2" Grid.Column="1">
-          <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}"
-                                  Value="{Binding ShieldMin, Converter={x:Static converters:NullableConverter.Instance}}" />
-          <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}"
-                                  Value="{Binding ShieldMax, Converter={x:Static converters:NullableConverter.Instance}}" />
+          <TextBox Style="{StaticResource TextBoxMinKey}"
+                   Text="{Binding ShieldMin, Converter={x:Static converters:NullableConverter.Instance}}" />
+          <TextBox Style="{StaticResource TextBoxMaxKey}"
+                   Text="{Binding ShieldMax, Converter={x:Static converters:NullableConverter.Instance}}" />
         </StackPanel>
 
         <TextBlock Grid.Row="2" Grid.Column="2"
                    Text="Block" Style="{StaticResource TextBlockHeader}" />
         <StackPanel Grid.Row="2" Grid.Column="3">
-          <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}"
-                                  Value="{Binding BlockMin, Converter={x:Static converters:NullableConverter.Instance}}" />
-          <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}"
-                                  Value="{Binding BlockMax, Converter={x:Static converters:NullableConverter.Instance}}" />
+          <TextBox Style="{StaticResource TextBoxMinKey}"
+                   Text="{Binding BlockMin, Converter={x:Static converters:NullableConverter.Instance}}" />
+          <TextBox Style="{StaticResource TextBoxMaxKey}"
+                   Text="{Binding BlockMax, Converter={x:Static converters:NullableConverter.Instance}}" />
         </StackPanel>
       </Grid>
 
@@ -243,20 +237,20 @@
         <TextBlock Grid.Row="0" Grid.Column="0"
                    Text="Sockets" Style="{StaticResource TextBlockHeader}" />
         <StackPanel Grid.Row="0" Grid.Column="1">
-          <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}"
-                                  Value="{Binding SocketsMin, Converter={x:Static converters:NullableConverter.Instance}}" />
-          <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}"
-                                  Value="{Binding SocketsMax, Converter={x:Static converters:NullableConverter.Instance}}" />
+          <TextBox Style="{StaticResource TextBoxMinKey}"
+                   Text="{Binding SocketsMin, Converter={x:Static converters:NullableConverter.Instance}}" />
+          <TextBox Style="{StaticResource TextBoxMaxKey}"
+                   Text="{Binding SocketsMax, Converter={x:Static converters:NullableConverter.Instance}}" />
         </StackPanel>
 
 
         <TextBlock Grid.Row="0" Grid.Column="2"
                    Text="Links" Style="{StaticResource TextBlockHeader}" />
         <StackPanel Grid.Row="0" Grid.Column="3">
-          <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}"
-                                  Value="{Binding LinkMin, Converter={x:Static converters:NullableConverter.Instance}}" />
-          <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}"
-                                  Value="{Binding LinkMax, Converter={x:Static converters:NullableConverter.Instance}}" />
+          <TextBox Style="{StaticResource TextBoxMinKey}"
+                   Text="{Binding LinkMin, Converter={x:Static converters:NullableConverter.Instance}}" />
+          <TextBox Style="{StaticResource TextBoxMaxKey}"
+                   Text="{Binding LinkMax, Converter={x:Static converters:NullableConverter.Instance}}" />
         </StackPanel>
 
         <TextBlock Grid.Row="2" Grid.Column="0"
@@ -322,30 +316,30 @@
         <TextBlock Grid.Row="0" Grid.Column="0"
                    Text="Quality" Style="{StaticResource TextBlockHeader}" />
         <StackPanel Grid.Row="0" Grid.Column="1">
-          <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}"
-                                  Value="{Binding QualityMin, Converter={x:Static converters:NullableConverter.Instance}}" />
-          <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}"
-                                  Value="{Binding QualityMax, Converter={x:Static converters:NullableConverter.Instance}}" />
+          <TextBox Style="{StaticResource TextBoxMinKey}"
+                   Text="{Binding QualityMin, Converter={x:Static converters:NullableConverter.Instance}}" />
+          <TextBox Style="{StaticResource TextBoxMaxKey}"
+                   Text="{Binding QualityMax, Converter={x:Static converters:NullableConverter.Instance}}" />
         </StackPanel>
 
 
         <TextBlock Grid.Row="0" Grid.Column="2"
                    Text="Gem\map level" Style="{StaticResource TextBlockHeader}" />
         <StackPanel Grid.Row="0" Grid.Column="3">
-          <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}"
-                                  Value="{Binding LevelMin, Converter={x:Static converters:NullableConverter.Instance}}" />
-          <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}"
-                                  Value="{Binding LevelMax, Converter={x:Static converters:NullableConverter.Instance}}" />
+          <TextBox Style="{StaticResource TextBoxMinKey}"
+                   Text="{Binding LevelMin, Converter={x:Static converters:NullableConverter.Instance}}" />
+          <TextBox Style="{StaticResource TextBoxMaxKey}"
+                   Text="{Binding LevelMax, Converter={x:Static converters:NullableConverter.Instance}}" />
         </StackPanel>
 
 
         <TextBlock Grid.Row="0" Grid.Column="4"
                    Text="Item Level" Style="{StaticResource TextBlockHeader}" />
         <StackPanel Grid.Row="0" Grid.Column="5">
-          <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}"
-                                  Value="{Binding ItemLevelMin, Converter={x:Static converters:NullableConverter.Instance}}" />
-          <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}"
-                                  Value="{Binding ItemLevelMax, Converter={x:Static converters:NullableConverter.Instance}}" />
+          <TextBox Style="{StaticResource TextBoxMinKey}"
+                   Text="{Binding ItemLevelMin, Converter={x:Static converters:NullableConverter.Instance}}" />
+          <TextBox Style="{StaticResource TextBoxMaxKey}"
+                   Text="{Binding ItemLevelMax, Converter={x:Static converters:NullableConverter.Instance}}" />
         </StackPanel>
 
         <TextBlock Grid.Row="2" Grid.Column="2"
@@ -391,10 +385,10 @@
         <TextBlock Grid.Row="2" Grid.Column="0"
                    Text="Inc. Quantity" Style="{StaticResource TextBlockHeader}" />
         <StackPanel Grid.Row="2" Grid.Column="1">
-          <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}"
-                                  Value="{Binding IncQuantityMin, Converter={x:Static converters:NullableConverter.Instance}}" />
-          <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}"
-                                  Value="{Binding IncQuantityMax, Converter={x:Static converters:NullableConverter.Instance}}" />
+          <TextBox Style="{StaticResource TextBoxMinKey}"
+                   Text="{Binding IncQuantityMin, Converter={x:Static converters:NullableConverter.Instance}}" />
+          <TextBox Style="{StaticResource TextBoxMaxKey}"
+                   Text="{Binding IncQuantityMax, Converter={x:Static converters:NullableConverter.Instance}}" />
         </StackPanel>
 
         <TextBlock Grid.Row="4" Grid.Column="0"
@@ -410,10 +404,10 @@
             </ObjectDataProvider>
           </StackPanel.Resources>
 
-          <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMin}"
-                                  Value="{Binding BuyoutMin, Converter={x:Static converters:NullableConverter.Instance}}" />
-          <controls:NumericUpDown Style="{StaticResource QueryNumericUpDownMax}"
-                                  Value="{Binding BuyoutMax, Converter={x:Static converters:NullableConverter.Instance}}" />
+          <TextBox Style="{StaticResource TextBoxMinKey}"
+                   Text="{Binding BuyoutMin, Converter={x:Static converters:NullableConverter.Instance}}" />
+          <TextBox Style="{StaticResource TextBoxMaxKey}"
+                   Text="{Binding BuyoutMax, Converter={x:Static converters:NullableConverter.Instance}}" />
           <ComboBox Style="{StaticResource QueryComboBox}"
                     Width="275"
                     ItemsSource="{Binding CurrenciesList}"
