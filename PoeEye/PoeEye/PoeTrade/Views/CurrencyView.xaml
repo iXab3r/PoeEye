@@ -11,7 +11,7 @@
       <Image Grid.Column="0"
              Width="20" Height="20" 
              Source="{Binding CurrencyType, Converter={StaticResource PriceToImageUriConverter}}"
-             Visibility="{Binding RelativeSource={RelativeSource Self}, Path=Source, Converter={StaticResource NullToCollapsedConverter}}"/>
+             Visibility="{Binding Source, RelativeSource={RelativeSource Self}, Converter={StaticResource NullToCollapsedConverter}}"/>
       <TextBlock Grid.Column="1"
                  TextTrimming="CharacterEllipsis"
                  VerticalAlignment="Center"

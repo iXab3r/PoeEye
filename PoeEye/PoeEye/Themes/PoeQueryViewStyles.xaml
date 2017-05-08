@@ -36,17 +36,22 @@
     <Setter Property="Margin" Value="3,0,3,0" />
     <Setter Property="StaysOpenOnEdit" Value="true" />
     <Setter Property="controls:TextBoxHelper.Watermark" Value="any" />
+    <Setter Property="controls:TextBoxHelper.ClearTextButton" Value="True" />
+    <Setter Property="controls:TextBoxHelper.ButtonFontFamily" Value="{StaticResource FontAwesome}" />
+    <Setter Property="controls:TextBoxHelper.ButtonContent" Value="&#xf00d;" />
     <Setter Property="controls:ComboBoxHelper.EnableVirtualizationWithGrouping" Value="true" />
   </Style>
 
-  <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}" x:Key="TextBoxKey">
+  <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}" 
+         x:Key="TextBoxKey">
     <Setter Property="VerticalContentAlignment" Value="Center" />
     <Setter Property="HorizontalContentAlignment" Value="Center" />
     <Setter Property="Width" Value="80" />
     <Setter Property="Margin" Value="3,0,3,0" />
   </Style>
 
-  <Style TargetType="TextBox" BasedOn="{StaticResource TextBoxKey}" x:Key="TextBoxMinKey">
+  <Style TargetType="TextBox" BasedOn="{StaticResource TextBoxKey}" 
+         x:Key="TextBoxMinKey">
     <Style.Triggers>
       <Trigger Property="controls:TextBoxHelper.HasText" Value="False">
         <Setter Property="controls:TextBoxHelper.Watermark" Value="Min" />
@@ -54,7 +59,8 @@
     </Style.Triggers>
   </Style>
 
-  <Style TargetType="TextBox" BasedOn="{StaticResource TextBoxKey}" x:Key="TextBoxMaxKey">
+  <Style TargetType="TextBox" BasedOn="{StaticResource TextBoxKey}" 
+         x:Key="TextBoxMaxKey">
     <Style.Triggers>
       <Trigger Property="controls:TextBoxHelper.HasText" Value="False">
         <Setter Property="controls:TextBoxHelper.Watermark" Value="Max" />

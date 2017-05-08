@@ -95,6 +95,9 @@
     <Reference Include="KellermanSoftware.Compare-NET-Objects, Version=3.6.0.0, Culture=neutral, PublicKeyToken=d970ace04cc85217, processorArchitecture=MSIL">
       <HintPath>..\packages\CompareNETObjects.3.06.0.0\lib\net45\KellermanSoftware.Compare-NET-Objects.dll</HintPath>
     </Reference>
+    <Reference Include="LiteDB, Version=3.1.0.0, Culture=neutral, PublicKeyToken=4ee40123013c9f27, processorArchitecture=MSIL">
+      <HintPath>..\packages\LiteDB.3.1.0\lib\net35\LiteDB.dll</HintPath>
+    </Reference>
     <Reference Include="log4net, Version=1.2.13.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
       <HintPath>..\packages\log4net.2.0.3\lib\net40-full\log4net.dll</HintPath>
       <Private>True</Private>

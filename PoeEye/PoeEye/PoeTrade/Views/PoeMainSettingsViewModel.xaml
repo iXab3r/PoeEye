@@ -7,7 +7,8 @@
 
   <ResourceDictionary.MergedDictionaries>
     <ResourceDictionary Source="pack://application:,,,/PoeShared;component/UI/Views/CurrencyTestView.xaml" />
-    <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.togglebutton.xaml" />
+    <ResourceDictionary
+      Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.togglebutton.xaml" />
   </ResourceDictionary.MergedDictionaries>
 
   <DataTemplate DataType="{x:Type viewModels1:PoeMainSettingsViewModel}">
@@ -21,14 +22,14 @@
 
       <StackPanel Grid.Row="1" Grid.Column="0"
                   Orientation="Horizontal" Height="24">
-        <Label Style="{StaticResource EyeIconLabel}" Content="Whispers:" MinWidth="100" />
+        <Label Style="{StaticResource IconLabel}" Content="Whispers:" MinWidth="100" />
         <ToggleButton ToolTip="In-game whisper notifications" Height="26"
                       IsChecked="{Binding WhisperNotificationsEnabled}" />
       </StackPanel>
 
       <StackPanel Grid.Row="2" Grid.Column="0"
                   Orientation="Vertical">
-        <Label Style="{StaticResource EyeIconLabel}" Content="Currencies rate (in Chaos orbs)" MinWidth="100" />
+        <Label Style="{StaticResource IconLabel}" Content="Currencies rate (in Chaos orbs)" MinWidth="100" />
         <ItemsControl ItemsSource="{Binding CurrenciesPriceInChaosOrbs}" BorderThickness="0,1,0,0"
                       BorderBrush="{StaticResource AccentColorBrush}">
           <ItemsControl.ItemTemplate>

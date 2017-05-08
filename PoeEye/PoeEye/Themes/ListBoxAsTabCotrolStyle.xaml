@@ -72,10 +72,6 @@
             <Trigger Property="IsEnabled" Value="False">
               <Setter Property="Foreground" Value="{StaticResource GrayBrush7}" />
               <Setter Property="Opacity" TargetName="contentPresenter" Value="0.56" />
-              <Setter Property="Background" TargetName="mainBorder"
-                      Value="{StaticResource TabItem.Disabled.Background}" />
-              <Setter Property="BorderBrush" TargetName="mainBorder"
-                      Value="{StaticResource TabItem.Disabled.Border}" />
             </Trigger>
 
           </ControlTemplate.Triggers>

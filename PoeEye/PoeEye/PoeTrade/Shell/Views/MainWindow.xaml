@@ -103,7 +103,7 @@
                   Padding="5"
                   fa:Awesome.Content="Refresh">
                   <Button.Style>
-                    <Style TargetType="{x:Type Button}" BasedOn="{StaticResource EyeCircleButton}">
+                    <Style TargetType="{x:Type Button}" BasedOn="{StaticResource CircleButton}">
                       <Setter Property="BorderThickness" Value="2" />
                       <Style.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
@@ -170,11 +170,6 @@
       <Border Grid.Row="2"
               BorderThickness="0,1,0,0" BorderBrush="{StaticResource AccentColorBrush}" Margin="5,2,10,2"
               Visibility="{Binding SelectedTab, Converter={StaticResource NullToCollapsedConverter}}">
-        <Border.Resources>
-          <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource MetroTextBlock}">
-            <Setter Property="FontSize" Value="16" />
-          </Style>
-        </Border.Resources>
         <Grid>
           <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />

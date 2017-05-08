@@ -75,9 +75,7 @@
                   DisplayMemberPath="Name"
                   Width="420"
                   IsEditable="True"
-                  ItemsSource="{Binding ItemTypes}"
-                  controls:TextBoxHelper.ClearTextButton="True"
-                  controls:TextBoxHelper.Watermark="any" />
+                  ItemsSource="{Binding ItemTypes}" />
 
         <TextBlock Grid.Row="2" Grid.Column="0"
                    Text="Name" Style="{StaticResource TextBlockHeader}" />
@@ -357,9 +355,7 @@
                     SelectedValue="{Binding ItemRarity}"
                     Width="165"
                     IsEditable="True"
-                    ItemsSource="{Binding Source={StaticResource PoeItemRarityFromEnum}}"
-                    controls:TextBoxHelper.ClearTextButton="True"
-                    controls:TextBoxHelper.Watermark="any" />
+                    ItemsSource="{Binding Source={StaticResource PoeItemRarityFromEnum}}" />
         </StackPanel>
 
         <TextBlock Grid.Row="2" Grid.Column="4"
@@ -375,11 +371,9 @@
           </StackPanel.Resources>
           <ComboBox Style="{StaticResource QueryComboBox}"
                     SelectedValue="{Binding CorruptionState}"
-                    Width="165"
+                    Width="167"
                     IsEditable="True"
-                    ItemsSource="{Binding Source={StaticResource PoeItemCorruptionStateFromEnum}}"
-                    controls:TextBoxHelper.ClearTextButton="True"
-                    controls:TextBoxHelper.Watermark="any" />
+                    ItemsSource="{Binding Source={StaticResource PoeItemCorruptionStateFromEnum}}" />
         </StackPanel>
 
         <TextBlock Grid.Row="2" Grid.Column="0"
@@ -415,7 +409,6 @@
                     DisplayMemberPath="Name"
                     SelectedValuePath="CodeName"
                     IsEditable="True"
-                    controls:TextBoxHelper.ClearTextButton="True"
                     controls:TextBoxHelper.Watermark="select currency" />
 
           <ComboBox Style="{StaticResource QueryComboBox}"
@@ -425,7 +418,6 @@
                     DisplayMemberPath="Description"
                     SelectedValuePath="Value"
                     ItemsSource="{Binding Source={StaticResource PoeItemBuyoutModeFromEnum}}"
-                    controls:TextBoxHelper.ClearTextButton="True"
                     controls:TextBoxHelper.Watermark="select buyout mode" />
         </StackPanel>
       </Grid>

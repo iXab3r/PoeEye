@@ -12,32 +12,8 @@
     <Setter Property="IsTabStop" Value="False" />
   </Style>
 
-  <Style TargetType="{x:Type Button}" x:Key="EyeCircleButton" BasedOn="{StaticResource MetroCircleButtonStyle}">
-    <Setter Property="FontFamily" Value="{StaticResource FontAwesome}" />
-    <Setter Property="FontSize" Value="16" />
-    <Setter Property="HorizontalContentAlignment" Value="Center" />
-    <Setter Property="VerticalContentAlignment" Value="Center" />
-  </Style>
-
-  <Style TargetType="{x:Type Label}" x:Key="EyeIconLabel" BasedOn="{StaticResource {x:Type Label}}">
-    <Setter Property="FontFamily" Value="{StaticResource FontAwesome}" />
-    <Setter Property="FontSize" Value="16" />
-  </Style>
-
-  <Style TargetType="{x:Type TextBlock}" x:Key="EyeIconTextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
-    <Setter Property="FontFamily" Value="{StaticResource FontAwesome}" />
-  </Style>
-
-  <Style TargetType="{x:Type Button}" x:Key="InvisibleButtonStyleKey">
-    <Setter Property="OverridesDefaultStyle" Value="True" />
-    <Setter Property="Template">
-      <Setter.Value>
-        <ControlTemplate TargetType="{x:Type Button}" />
-      </Setter.Value>
-    </Setter>
-  </Style>
-
-  <Style x:Key="MetroTextBlockHeaderStyle" TargetType="{x:Type TextBlock}">
+  <Style TargetType="{x:Type TextBlock}"
+         x:Key="MetroTextBlockHeaderStyle" >
     <Setter Property="FontSize" Value="16"/>
     <Setter Property="Height" Value="25"/>
     <Setter Property="Foreground" Value="{StaticResource LabelTextBrush}" />
@@ -77,11 +53,5 @@
         </ControlTemplate>
       </Setter.Value>
     </Setter>
-  </Style>
-
-  <Style TargetType="{x:Type ToggleButton}"
-         BasedOn="{StaticResource MaterialDesignSwitchAccentToggleButton}">
-    <Setter Property="FontFamily" Value="{StaticResource FontAwesome}" />
-    <Setter Property="FontSize" Value="16" />
   </Style>
 </ResourceDictionary>

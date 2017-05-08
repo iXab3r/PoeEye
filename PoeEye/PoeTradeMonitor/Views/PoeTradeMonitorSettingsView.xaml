@@ -12,7 +12,8 @@
   <DataTemplate DataType="{x:Type viewModels:PoeTradeMonitorSettingsViewModel}">
 
     <DataTemplate.Resources>
-      <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource TradeMonitorTextBlockStyleKey}">
+      <Style TargetType="{x:Type TextBlock}" 
+             BasedOn="{StaticResource TradeMonitorTextBlockStyleKey}">
         <Setter Property="FontSize" Value="12" />
       </Style>
       <Style TargetType="{x:Type tradeMonitorControls:MacroEditBox}"

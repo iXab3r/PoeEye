@@ -11,15 +11,15 @@
         <ItemsControl.ItemTemplate>
           <DataTemplate DataType="{x:Type modularity:ISettingsViewModel}">
             <Expander
-                BorderBrush="{StaticResource AccentColorBrush}" 
-                BorderThickness="2, 0, 0, 0" 
-                Focusable="False"
-                IsTabStop="False"
-                Margin="10, 5, 5 ,5">
-                <Expander.Header>
-                    <Label Content="{Binding ModuleName}" Style="{StaticResource EyeIconLabel}" VerticalAlignment="Center"/>
-                </Expander.Header>
-                <Border >
+              BorderBrush="{StaticResource AccentColorBrush}"
+              BorderThickness="2, 0, 0, 0"
+              Focusable="False"
+              IsTabStop="False"
+              Margin="10, 5, 5 ,5">
+              <Expander.Header>
+                <Label Content="{Binding ModuleName}" Style="{StaticResource IconLabel}" VerticalAlignment="Center" />
+              </Expander.Header>
+              <Border>
                 <ContentPresenter Content="{Binding}" />
               </Border>
             </Expander>

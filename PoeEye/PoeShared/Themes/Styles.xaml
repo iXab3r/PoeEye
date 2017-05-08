@@ -11,6 +11,7 @@
     <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.dark.xaml" />
     <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.popupbox.xaml" />
     <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/styles/controls.buttons.xaml" />
+    <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/styles/controls.textblock.xaml" />
   </ResourceDictionary.MergedDictionaries>
 
   <Style TargetType="{x:Type Button}" x:Key="InvisibleButtonStyleKey">
@@ -20,14 +21,6 @@
         <ControlTemplate TargetType="{x:Type Button}" />
       </Setter.Value>
     </Setter>
-  </Style>
-
-  <Style TargetType="{x:Type Button}" x:Key="CircleButton" 
-         BasedOn="{StaticResource MetroCircleButtonStyle}">
-    <Setter Property="FontFamily" Value="{StaticResource FontAwesome}" />
-    <Setter Property="FontSize" Value="14" />
-    <Setter Property="HorizontalContentAlignment" Value="Center" />
-    <Setter Property="VerticalContentAlignment" Value="Center" />
   </Style>
 
   <Style TargetType="{x:Type ToggleButton}" x:Key="ToggleCircleButton"
@@ -52,6 +45,7 @@
     <Setter Property="FontSize" Value="14" />
     <Setter Property="TextAlignment" Value="Left" />
     <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="Height" Value="NaN"/>
   </Style>
 
   <Style TargetType="{x:Type Button}" x:Key="FlatButton"
@@ -68,10 +62,15 @@
   
   <!-- DEFAULT STYLES -->
 
+  <Style TargetType="{x:Type TextBlock}"
+         BasedOn="{StaticResource IconTextBlock}">
+  </Style>
+
   <Style TargetType="{x:Type ToggleButton}"
          BasedOn="{StaticResource MaterialDesignSwitchAccentToggleButton}">
     <Setter Property="FontFamily" Value="{StaticResource FontAwesome}" />
     <Setter Property="FontSize" Value="16" />
+    <Setter Property="Margin" Value="0,4,0,0" />
   </Style>
 
   <Style TargetType="{x:Type Button}"
@@ -85,6 +84,28 @@
         <Setter Property="Background" Value="{DynamicResource PrimaryHueMidBrush}" />
       </Trigger>
     </Style.Triggers>
+  </Style>
+
+  <Style TargetType="{x:Type Button}" x:Key="MaterialCircleButton" 
+         BasedOn="{StaticResource MaterialDesignFloatingActionMiniDarkButton}">
+    <Setter Property="FontFamily" Value="{StaticResource FontAwesome}" />
+    <Setter Property="FontSize" Value="14" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Style.Triggers>
+      <Trigger Property="IsMouseOver" Value="True">
+        <Setter Property="Background" Value="{DynamicResource PrimaryHueMidBrush}" />
+      </Trigger>
+    </Style.Triggers>
+  </Style>
+
+  <Style TargetType="{x:Type Button}" x:Key="CircleButton" 
+         BasedOn="{StaticResource MetroCircleButtonStyle}">
+    <Setter Property="FontFamily" Value="{StaticResource FontAwesome}" />
+    <Setter Property="FontSize" Value="14" />
+    <Setter Property="Focusable" Value="False" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
   </Style>
 
 </ResourceDictionary>
