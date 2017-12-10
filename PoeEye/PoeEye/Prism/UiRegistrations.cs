@@ -1,4 +1,5 @@
 ﻿using PoeEye.PoeTrade.Shell.ViewModels;
+using PoeEye.PoeTrade.Updater;
 using PoeShared.Audio;
 using PoeShared.Modularity;
 using PoeShared.Native;
@@ -44,6 +45,7 @@ namespace PoeEye.Prism
 
             Container
                 .RegisterType<IMainWindowViewModel, MainWindowViewModel>()
+                .RegisterType<IApplicationUpdaterModel, ApplicationUpdaterModel>()
                 .RegisterType<IPoeTradeViewModel, PoeTradeViewModel>()
                 .RegisterType<IMainWindowTabViewModel, MainWindowTabViewModel>()
                 .RegisterType<IPoeModViewModel, PoeModViewModel>()

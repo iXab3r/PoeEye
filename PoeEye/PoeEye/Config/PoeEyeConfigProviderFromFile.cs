@@ -54,6 +54,8 @@ namespace PoeEye.Config
 
         public void Reload()
         {
+            Log.Instance.Debug($"[PoeEyeConfigProviderFromFile.Reload] Reloading configuration...");
+
             var config = LoadInternal();
             loadedConfigs.Clear();
 
@@ -89,6 +91,7 @@ namespace PoeEye.Config
         private IPoeEyeConfig ValidateConfigVersion(IPoeEyeConfig loadedConfig)
         {
             var versionedLoadedConfig = loadedConfig as IPoeEyeConfigVersioned;
+            Log.Instance.Debug($"[PoeEyeConfigProviderFromFile.ValidateConfigVersion] Validating config of type {loadedConfig} (version(-1 = unversioned): {versionedLoadedConfig?.Version ?? -1})...");
             if (versionedLoadedConfig == null)
             {
                 return loadedConfig;
@@ -97,10 +100,11 @@ namespace PoeEye.Config
             var configTemplate = (IPoeEyeConfigVersioned)loadedConfigs.GetOrAdd(
                 loadedConfig.GetType().FullName, 
                 (key) => (IPoeEyeConfigVersioned)Activator.CreateInstance(loadedConfig.GetType()));
+            
             if (configTemplate.Version != versionedLoadedConfig.Version)
             {
                 Log.Instance.Debug($"[PoeEyeConfigProviderFromFile.ValidateConfigVersion] Config version mismatch (expected: {configTemplate.Version}, got: {versionedLoadedConfig.Version})");
-                Log.Instance.Debug($"[PoeEyeConfigProviderFromFile.ValidateConfigVersion] \nLoaded config:\n{loadedConfig.DumpToText()}\n\nTemplate config:\n{configTemplate.DumpToText()}");
+                Log.Instance.Debug($"[PoeEyeConfigProviderFromFile.ValidateConfigVersion] Loaded config:\n{loadedConfig.DumpToText()}\n\nTemplate config:\n{configTemplate.DumpToText()}");
                 return configTemplate;
             }
             return loadedConfig;

@@ -11,6 +11,6 @@ namespace PoeEye.TradeMonitor.Modularity
 
         public float OverlayOpacity { get; set; }
 
-        public int Version { get; } = 1;
+        public int Version { get; set; } = 1;
     }
 }

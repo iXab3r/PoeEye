@@ -13,6 +13,6 @@ namespace PoeShared.Modularity
         /// <summary>
         ///   Config contract version
         /// </summary>
-        int Version { get; }
+        int Version { get; set; }
     }
 }

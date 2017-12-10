@@ -13,7 +13,10 @@ using System.Windows.Input;
 using Guards;
 using JetBrains.Annotations;
 using Microsoft.Practices.Unity;
+using PoeBud.Config;
+using PoeEye.Config;
 using PoeShared;
+using PoeShared.Modularity;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
 using PoeShared.UI;
@@ -26,7 +29,7 @@ namespace PoeEye.PoeTrade.Updater
 {
     internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject
     {
-        private readonly ApplicationUpdaterModel updaterModel;
+        private readonly IApplicationUpdaterModel updaterModel;
         private readonly ReactiveCommand<Unit> checkForUpdatesCommand;
         private readonly ReactiveCommand<object> restartCommand;
 
@@ -35,13 +38,15 @@ namespace PoeEye.PoeTrade.Updater
         private string error = string.Empty;
 
         public ApplicationUpdaterViewModel(
-            [NotNull] ApplicationUpdaterModel updaterModel,
+            [NotNull] IApplicationUpdaterModel updaterModel,
+            [NotNull] IConfigProvider<PoeEyeUpdateSettingsConfig> configProvider,
             [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler,
             [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler)
         {
             Guard.ArgumentNotNull(updaterModel, nameof(updaterModel));
             Guard.ArgumentNotNull(uiScheduler, nameof(uiScheduler));
             Guard.ArgumentNotNull(bgScheduler, nameof(bgScheduler));
+            Guard.ArgumentNotNull(configProvider, nameof(configProvider));
 
             updaterModel.WhenAnyValue(x => x.MostRecentVersion)
                 .Subscribe(() => this.RaisePropertyChanged(nameof(MostRecentVersion)))
@@ -64,6 +69,18 @@ namespace PoeEye.PoeTrade.Updater
 
             restartCommand = ReactiveUI.Legacy.ReactiveCommand.Create();
             restartCommand.Subscribe(updaterModel.RestartApplication).AddTo(Anchors);
+            
+            configProvider
+                .WhenChanged
+                .Select(x => x.AutoUpdateTimeout)
+                .DistinctUntilChanged()
+                .WithPrevious((prev, curr) => new { prev, curr })
+                .Do(timeout => Log.Instance.Debug($"[ApplicationUpdaterViewModel] AutoUpdate timout changed: {timeout.prev} => {timeout.curr}"))
+                .Select(timeout => timeout.curr <= TimeSpan.Zero ? Observable.Never<long>() : Observable.Timer(DateTimeOffset.MinValue, timeout.curr, bgScheduler))
+                .Switch()
+                .ObserveOn(uiScheduler)
+                .Subscribe(() => checkForUpdatesCommand.Execute(this), Log.HandleException)
+                .AddTo(Anchors);
         }
 
         public ICommand CheckForUpdatesCommand => checkForUpdatesCommand;

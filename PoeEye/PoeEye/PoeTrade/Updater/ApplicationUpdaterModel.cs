@@ -12,7 +12,9 @@ using System.Windows.Input;
 using Guards;
 using JetBrains.Annotations;
 using Microsoft.Practices.Unity;
+using PoeEye.Config;
 using PoeShared;
+using PoeShared.Modularity;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
 using ReactiveUI;
@@ -20,20 +22,23 @@ using Squirrel;
 
 namespace PoeEye.PoeTrade.Updater
 {
-    internal sealed class ApplicationUpdaterModel : DisposableReactiveObject
+    internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IApplicationUpdaterModel
     {
-        private static readonly string PoeEyeUri = @"http://coderush.net/files/PoeEye/";
         private static readonly string ApplicationName = Process.GetCurrentProcess().ProcessName + ".exe";
 
+        private readonly IConfigProvider<PoeEyeUpdateSettingsConfig> configProvider;
         private bool isBusy;
         private bool isOpen;
 
         private Version mostRecentVersion;
-
         private DirectoryInfo mostRecentVersionAppFolder;
 
-        public ApplicationUpdaterModel()
+        public ApplicationUpdaterModel(
+            [NotNull] IConfigProvider<PoeEyeUpdateSettingsConfig> configProvider)
         {
+            Guard.ArgumentNotNull(configProvider, nameof(configProvider));
+            this.configProvider = configProvider;
+
             SquirrelAwareApp.HandleEvents(
                 OnInitialInstall,
                 OnAppUpdate,
@@ -71,9 +76,9 @@ namespace PoeEye.PoeTrade.Updater
             {
                 rootDirectory = AppDomain.CurrentDomain.BaseDirectory;
             }
-            Log.Instance.Debug($"[ApplicationUpdaterModel] AppName: {appName}, root directory: {rootDirectory}");
-
-            using (var mgr = new UpdateManager(PoeEyeUri, appName, rootDirectory))
+            Log.Instance.Debug($"[ApplicationUpdaterModel] AppName: {appName}, root directory: {rootDirectory}, update URI: {configProvider.ActualConfig.UpdateUri}");
+            
+            using (var mgr = new UpdateManager(configProvider.ActualConfig.UpdateUri, appName, rootDirectory))
             {
                 Log.Instance.Debug($"[ApplicationUpdaterModel] Checking for updates...");
 

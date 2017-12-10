@@ -48,6 +48,6 @@ namespace PoeEye.TradeMonitor.Modularity
             }
         };
 
-        public int Version { get; } = 2;
+        public int Version { get; set; } = 2;
     }
 }

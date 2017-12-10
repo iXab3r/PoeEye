@@ -42,7 +42,6 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
     {
         private static readonly string ExplorerExecutablePath = Environment.ExpandEnvironmentVariables(@"%WINDIR%\explorer.exe");
 
-        private static readonly TimeSpan CheckForUpdatesTimeout = TimeSpan.FromHours(1);
         private static readonly TimeSpan ConfigSaveSampingTimeout = TimeSpan.FromSeconds(10);
 
         private readonly ReactiveCommand<object> closeTabCommand = ReactiveUI.Legacy.ReactiveCommand.Create();
@@ -171,11 +170,6 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
             configUpdateSubject
                 .Sample(ConfigSaveSampingTimeout)
                 .Subscribe(SaveConfig, Log.HandleException)
-                .AddTo(Anchors);
-            Observable
-                .Timer(DateTimeOffset.MinValue, CheckForUpdatesTimeout, bgScheduler)
-                .ObserveOn(uiScheduler)
-                .Subscribe(() => applicationUpdaterViewModel.CheckForUpdatesCommand.Execute(this), Log.HandleException)
                 .AddTo(Anchors);
         }
 
