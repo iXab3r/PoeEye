@@ -37,7 +37,7 @@ namespace PoeEye.Prism
         {
             return Container.Resolve<PoeTrade.Shell.Views.MainWindow>();
         }
-
+        
         protected override void InitializeShell()
         {
             base.InitializeShell();

@@ -92,7 +92,7 @@ namespace PoeShared.Scaffolding
 
             windowHandle = IsActive ? activeWindowHandle : IntPtr.Zero;
 
-            Log.Instance.DebugFormat(
+            Log.Instance.TraceFormat(
                 "[WindowTracker] Target window is {0}ACTIVE (hwnd 0x{3:X8}  expected title is '{1}', got '{2}')",
                 isActive ? string.Empty : "NOT ",
                 targetTitle,

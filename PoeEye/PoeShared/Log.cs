@@ -60,7 +60,7 @@ namespace PoeShared
             Guard.ArgumentNotNull(loggingLevel, nameof(loggingLevel));
 
             var repository = (Hierarchy) log4net.LogManager.GetRepository();
-            repository.Root.Level = Level.Trace;
+            repository.Root.Level = loggingLevel;
             repository.RaiseConfigurationChanged(EventArgs.Empty);
             Instance.Info($"Logging level switched to '{loggingLevel}'");
         }

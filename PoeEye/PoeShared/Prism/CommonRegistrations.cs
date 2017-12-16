@@ -4,6 +4,7 @@ using System.Reactive.Concurrency;
 using Gma.System.MouseKeyHook;
 using PoeShared.Audio;
 using PoeShared.Communications;
+using PoeShared.Communications.Chromium;
 using PoeShared.Converters;
 using PoeShared.Modularity;
 using PoeShared.Native;
@@ -47,6 +48,7 @@ namespace PoeShared.Prism
                 .RegisterSingleton<IRandomNumberGenerator, RandomNumberGenerator>()
                 .RegisterSingleton<IImagesCacheService, ImagesCacheService>()
                 .RegisterSingleton<IGearTypeAnalyzer, GearTypeAnalyzer>()
+                .RegisterSingleton<IChromiumBootstrapper, ChromiumBootstrapper>()
                 .RegisterSingleton<IConverter<IStashItem, IPoeItem>, PoeStashItemToPoeItem>()
                 .RegisterSingleton<IConverter<IStashItem, PoeItem>, PoeStashItemToPoeItem>()
                 .RegisterSingleton<IConverter<string, PoePrice>, StringToPoePriceConverter>()
