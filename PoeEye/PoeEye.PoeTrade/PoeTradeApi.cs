@@ -37,6 +37,7 @@ namespace PoeEye.PoeTrade
 
         private readonly IFactory<IHttpClient> httpClientFactory;
 
+        private readonly IFactory<PoeTradeHeadlessApi> headlessApiFactory;
         private readonly IPoeTradeParser poeTradeParser;
         private readonly IProxyProvider proxyProvider;
         private readonly IConverter<IPoeQuery, NameValueCollection> queryConverter;
@@ -45,6 +46,7 @@ namespace PoeEye.PoeTrade
         private PoeTradeConfig config = new PoeTradeConfig();
         
         public PoeTradeApi(
+            IFactory<PoeTradeHeadlessApi> headlessApiFactory,
             IPoeTradeParser poeTradeParser,
             IProxyProvider proxyProvider,
             IFactory<IHttpClient> httpClientFactory,
@@ -59,6 +61,7 @@ namespace PoeEye.PoeTrade
             Guard.ArgumentNotNull(queryConverter, nameof(queryConverter));
             Guard.ArgumentNotNull(configProvider, nameof(configProvider));
 
+            this.headlessApiFactory = headlessApiFactory;
             this.poeTradeParser = poeTradeParser;
             this.proxyProvider = proxyProvider;
             this.queryConverter = queryConverter;
@@ -88,12 +91,7 @@ namespace PoeEye.PoeTrade
 
         public Task<IPoeStaticData> RequestStaticData()
         {
-            var client = CreateClientWithoutProxy();
-            return client
-                .Get(PoeTradeUri)
-                .Select(ThrowIfNotParseable)
-                .Select(poeTradeParser.ParseStaticData)
-                .ToTask();
+            return headlessApiFactory.Create().RequestStaticData();
         }
 
         private async Task<IPoeQueryResult> IssueQuery(string uri, NameValueCollection queryParameters)

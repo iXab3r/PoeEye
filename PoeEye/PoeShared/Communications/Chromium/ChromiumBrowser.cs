@@ -59,17 +59,14 @@ namespace PoeShared.Communications.Chromium {
         
         public Task Get(string uri)
         {
-            return Post(uri, new NameValueCollection());
-            var frame = instance.GetMainFrame();
-            var request = frame.CreateRequest(false);
-            request.Url = uri;
-            request.Method = WebRequestMethods.Http.Get;
-            //request.InitializePostData();
+            using (var frame = instance.GetMainFrame())
+            {
+                var request = frame.CreateRequest(false);
+                request.Url = uri;
+                request.Method = WebRequestMethods.Http.Get;
 
-            //var headers = new NameValueCollection();
-            //request.Headers = headers;
-                
-            return Load(frame, request);
+                return Load(frame, request);
+            }
         }
         
         public Task Post(string uri, NameValueCollection args)
@@ -158,10 +155,6 @@ namespace PoeShared.Communications.Chromium {
                 {
                     Log.Instance.Debug(
                         $"[Chromium{Id}.Frame#{args.Frame.Identifier} LoadStart] MainFrame loaded, TransitionType: {args.TransitionType}, uri: {args.Url}");
-                    
-                    
-                    Unsubscribe();
-                    taskCompetionSource.TrySetResult(true);
                 }
             }
             
@@ -184,7 +177,7 @@ namespace PoeShared.Communications.Chromium {
             }
             
             Subscribe();
-            frame.LoadRequest(request);
+            frame.LoadUrl(request.Url);
 
             return taskCompetionSource.Task;
         }

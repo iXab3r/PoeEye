@@ -17,7 +17,6 @@ namespace PoeEye.PoeTrade.Prism
         protected override void Initialize()
         { 
             Container
-                .RegisterSingleton<IPoeApi, PoeTradeHeadlessApi>(typeof(PoeTradeHeadlessApi).FullName)
                 .RegisterSingleton<IPoeApi, PoeTradeApi>(typeof(PoeTradeApi).FullName)
                 .RegisterSingleton<IConverter<IPoeQueryInfo, IPoeQuery>, PoeQueryInfoToQueryConverter>()
                 .RegisterSingleton<IConverter<IPoeQuery, NameValueCollection>, PoeQueryConverter>()
