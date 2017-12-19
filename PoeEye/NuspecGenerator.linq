@@ -4,7 +4,7 @@ void Main()
 {
 	var homeDir = Path.GetDirectoryName(Util.CurrentQueryPath);
 	var nuspecFileName = @"PoeEye.nuspec";
-	var binariesDir = @"Bin\";
+	var binariesDir = @"bin\";
 	var nuspecFilePath = Path.Combine(homeDir, nuspecFileName);
 
 	var extensionsToExclude = new[] {
