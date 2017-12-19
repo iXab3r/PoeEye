@@ -10,6 +10,6 @@ namespace PoeEye.StashRealtimeApi.Services
         [NotNull] 
         IPoeQueryResult IssueQuery([NotNull] IPoeQueryInfo query);
 
-        bool DisposaQuery([NotNull] IPoeQueryInfo query);
+        bool DisposeQuery([NotNull] IPoeQueryInfo query);
     }
 }

@@ -12,6 +12,7 @@ using PoeEye.Config;
 using PoeEye.Converters;
 using PoeEye.PoeTrade.Shell.ViewModels;
 using PoeShared.Common;
+using PoeShared.Communications.Chromium;
 using PoeShared.Modularity;
 using PoeShared.PoeTrade;
 using PoeShared.PoeTrade.Query;
@@ -54,6 +55,9 @@ namespace PoeEye.Prism
 
             var window = (Window)Shell;
             Application.Current.MainWindow = window;
+            
+            Log.Instance.Info($"Initializing Chromium...");
+            var chromium = Container.Resolve<IChromiumBootstrapper>();
 
             Observable
                 .FromEventPattern<RoutedEventHandler, RoutedEventArgs>(h => window.Loaded += h, h => window.Loaded -= h)
@@ -103,6 +107,13 @@ namespace PoeEye.Prism
             Log.Instance.Debug("Initializing DI container...");
             Container.AddExtension(new CommonRegistrations());
             Container.AddExtension(new UiRegistrations());
+        }
+
+        public void Dispose()
+        {
+            Log.Instance.Info($"Disposing Chromium...");
+            var chromium = Container.TryResolve<IChromiumBootstrapper>();
+            chromium?.Dispose();
         }
     }
 }

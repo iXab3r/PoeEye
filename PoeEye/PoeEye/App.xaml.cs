@@ -98,9 +98,6 @@ namespace PoeEye
 
             Log.Instance.Info($"Initializing bootstrapper...");
             bootstrapper.Run();
-            
-            Log.Instance.Info($"Initializing Chromium...");
-            var chromium = bootstrapper.Container.Resolve<IChromiumBootstrapper>();
         }
 
         protected override void OnExit(ExitEventArgs e, bool isFirstInstance)
@@ -108,8 +105,7 @@ namespace PoeEye
             base.OnExit(e, isFirstInstance);
             
             Log.Instance.Debug($"Application exit detected");
-            var chromium = bootstrapper.Container.TryResolve<IChromiumBootstrapper>();
-            chromium?.Dispose();
+            bootstrapper.Dispose();
         }
 
         private void ShutdownIfNotInDebugMode()

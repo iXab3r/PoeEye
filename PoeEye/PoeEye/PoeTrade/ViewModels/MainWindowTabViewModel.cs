@@ -33,7 +33,7 @@ namespace PoeEye.PoeTrade.ViewModels
         private static int GlobalTabIdx;
 
         private readonly ReactiveCommand<object> markAllAsReadCommand;
-        private readonly IFactory<IPoeQueryViewModel, IPoeStaticData> queryFactory;
+        private readonly IFactory<IPoeQueryViewModel, IPoeStaticDataSource> queryFactory;
         private readonly ReactiveCommand<object> refreshCommand;
         private readonly ReactiveCommand<object> newSearchCommand;
         private readonly DelegateCommand<string> renameCommand;
@@ -55,7 +55,7 @@ namespace PoeEye.PoeTrade.ViewModels
             [NotNull] IPoeApiSelectorViewModel apiSelector,
             [NotNull] [Dependency(WellKnownWindows.MainWindow)] IWindowTracker mainWindowTracker,
             [NotNull] IAudioNotificationSelectorViewModel audioNotificationSelector,
-            [NotNull] IFactory<IPoeQueryViewModel, IPoeStaticData> queryFactory)
+            [NotNull] IFactory<IPoeQueryViewModel, IPoeStaticDataSource> queryFactory)
         {
             Guard.ArgumentNotNull(tradesListFactory, nameof(tradesListFactory));
             Guard.ArgumentNotNull(apiSelector, nameof(apiSelector));
@@ -247,7 +247,7 @@ namespace PoeEye.PoeTrade.ViewModels
             tradesListAnchors.Disposable = anchors;
 
             var existingQuery = query;
-            var newQuery = queryFactory.Create(api.StaticData);
+            var newQuery = queryFactory.Create(api);
             if (existingQuery != null)
             {
                 newQuery.SetQueryInfo(existingQuery);

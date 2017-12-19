@@ -1,4 +1,5 @@
 ﻿using PoeShared.Communications;
+using TypeConverter;
 
 namespace PoeEye.Tests.Communications
 {
@@ -80,7 +81,7 @@ namespace PoeEye.Tests.Communications
             var instance = CreateInstance();
 
             //When
-            var result = instance.Convert(source);
+            var result = ((IConverter<NameValueCollection, string>)instance).Convert(source);
 
             //Then
             result.ShouldBe(expected);

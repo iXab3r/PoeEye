@@ -1,4 +1,8 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.ObjectModel;
+using System.Linq;
+using DynamicData;
+using DynamicData.Binding;
 using Guards;
 using JetBrains.Annotations;
 using Microsoft.Practices.Unity;
@@ -12,6 +16,8 @@ namespace PoeEye.PoeTrade.Models
 {
     internal sealed class PoeApiProvider : DisposableReactiveObject, IPoeApiProvider
     {
+        private readonly ObservableCollectionExtended<IPoeApiWrapper> modulesList = new ObservableCollectionExtended<IPoeApiWrapper>();
+        
         public PoeApiProvider(
             [NotNull] IUnityContainer container,
             [NotNull] IFactory<IPoeApiWrapper, IPoeApi> wrapperFactory)
@@ -23,15 +29,18 @@ namespace PoeEye.PoeTrade.Models
             var apiList = container
                 .ResolveAll<IPoeApi>()
                 .Select(wrapperFactory.Create)
-                .ToArray();
+                .ToObservableCollection();
             Log.Instance.Debug($"[PoeApiProvider..ctor] API list:\r\n\t{apiList.DumpToText()}");
 
-            ModulesList = new ReactiveList<IPoeApiWrapper>(apiList)
-            {
-                ChangeTrackingEnabled = true,
-            };
+            apiList
+                .ToObservableChangeSet()
+                .Bind(modulesList)
+                .Subscribe()
+                .AddTo(Anchors);
+            
+            ModulesList = new ReadOnlyObservableCollection<IPoeApiWrapper>(modulesList);
         }
 
-        public IReactiveList<IPoeApiWrapper> ModulesList { get; }
+        public ReadOnlyObservableCollection<IPoeApiWrapper> ModulesList { get; }
     }
 }

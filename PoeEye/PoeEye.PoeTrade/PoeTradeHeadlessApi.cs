@@ -78,6 +78,8 @@ namespace PoeEye.PoeTrade
 
         public string Name { get; } = "poe.trade Headless";
 
+        public bool IsAvailable { get; } = true;
+
         public async Task<IPoeQueryResult> IssueQuery(IPoeQueryInfo queryInfo)
         {
             Guard.ArgumentNotNull(queryInfo, nameof(queryInfo));
@@ -96,6 +98,7 @@ namespace PoeEye.PoeTrade
                 .Select(x => client.GetSource().Result)
                 .Select(ThrowIfNotParseable)
                 .Select(poeTradeParser.ParseStaticData)
+                .Finally(() => client.Dispose())
                 .ToTask();
         }
 
@@ -115,7 +118,8 @@ namespace PoeEye.PoeTrade
                     .Select(x => client.GetSource().Result)
                     .Select(ThrowIfNotParseable)
                     .Select(poeTradeParser.ParseQueryResponse)
-                    .Finally(ReleaseSemaphore);
+                    .Finally(ReleaseSemaphore)
+                    .Finally(() => client.Dispose());
             }
             catch (WebException ex)
             {

@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using Guards;
 
 namespace PoeShared.Scaffolding
@@ -20,6 +21,11 @@ namespace PoeShared.Scaffolding
         public static IEnumerable<T> EmptyIfNull<T>(this IEnumerable<T> enumerable)
         {
             return enumerable ?? Enumerable.Empty<T>();
+        }
+
+        public static ObservableCollection<T> ToObservableCollection<T>(this IEnumerable<T> enumerable)
+        {
+            return new ObservableCollection<T>(enumerable);
         }
 
         public static IEnumerable<T> ForEach<T>(this IEnumerable<T> enumerable, Action<T> action)

@@ -4,6 +4,15 @@ namespace PoeShared.PoeTrade.Query
 
     public sealed class PoeStaticData : IPoeStaticData
     {
+        public static readonly PoeStaticData Empty = new PoeStaticData()
+        {
+            CurrenciesList = new IPoeCurrency[]{ new PoeCurrency() { Name = "Currency list is empty"} },
+            LeaguesList = new string[] { "League list is empty" },
+            ItemTypes = new IPoeItemType[] { new PoeItemType() { Name = "Item type list is empty"} },
+            ModsList = new IPoeItemMod[] { new PoeItemMod() { Name = "Mods list is empty"} },
+            IsEmpty = true,
+        };
+        
         private IPoeCurrency[] currenciesList = new IPoeCurrency[0];
         private string[] leaguesList = new string[0];
         private IPoeItemMod[] modsList = new IPoeItemMod[0];
@@ -32,5 +41,7 @@ namespace PoeShared.PoeTrade.Query
             get { return leaguesList; }
             set { leaguesList = value ?? new string[0]; }
         }
+
+        public bool IsEmpty { get; private set; } = false;
     }
 }

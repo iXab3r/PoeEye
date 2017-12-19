@@ -1,4 +1,5 @@
-﻿using ReactiveUI.Legacy;
+﻿using PoeShared.PoeTrade;
+using ReactiveUI.Legacy;
 
 namespace PoeEye.PoeTrade.ViewModels
 {
@@ -21,16 +22,16 @@ namespace PoeEye.PoeTrade.ViewModels
     {
         private readonly ReactiveCommand<object> addGrpCommand = ReactiveUI.Legacy.ReactiveCommand.Create();
         private readonly ReactiveCommand<object> removeGrpCommand = ReactiveUI.Legacy.ReactiveCommand.Create();
-        private readonly IPoeStaticData staticData;
-        private readonly IFactory<PoeModsEditorViewModel, IPoeStaticData> groupsFactory;
+        private readonly IPoeStaticDataSource staticDataSource;
+        private readonly IFactory<PoeModsEditorViewModel, IPoeStaticDataSource> groupsFactory;
 
         public PoeModGroupsEditorViewModel(
-            [NotNull] IPoeStaticData staticData,
-            [NotNull] IFactory<PoeModsEditorViewModel, IPoeStaticData> groupsFactory)
+            [NotNull] IPoeStaticDataSource staticDataSource,
+            [NotNull] IFactory<PoeModsEditorViewModel, IPoeStaticDataSource> groupsFactory)
         {
             Guard.ArgumentNotNull(groupsFactory, nameof(groupsFactory));
 
-            this.staticData = staticData;
+            this.staticDataSource = staticDataSource;
             this.groupsFactory = groupsFactory;
 
             addGrpCommand
@@ -53,7 +54,7 @@ namespace PoeEye.PoeTrade.ViewModels
 
         public IPoeModsEditorViewModel AddGroup()
         {
-            var newGroup = groupsFactory.Create(staticData);
+            var newGroup = groupsFactory.Create(staticDataSource);
 
             Groups.Add(newGroup);
 

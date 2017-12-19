@@ -17,6 +17,8 @@ namespace PoeEye.Simulator.PoeTrade
 
         public override string Name { get; } = "SimulatorApi";
 
+        public override bool IsAvailable { get; } = true;
+
         public override Task<IPoeQueryResult> IssueQuery(IPoeQueryInfo query)
         {
             Guard.ArgumentNotNull(query, nameof(query));

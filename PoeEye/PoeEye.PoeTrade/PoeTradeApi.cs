@@ -80,6 +80,8 @@ namespace PoeEye.PoeTrade
 
         public string Name { get; } = "poe.trade";
 
+        public bool IsAvailable { get; } = true;
+
         public async Task<IPoeQueryResult> IssueQuery(IPoeQueryInfo queryInfo)
         {
             Guard.ArgumentNotNull(queryInfo, nameof(queryInfo));

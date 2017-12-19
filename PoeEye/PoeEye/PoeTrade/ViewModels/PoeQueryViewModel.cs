@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Reactive.Linq;
+using DynamicData.Binding;
 using Guards;
 using JetBrains.Annotations;
 using PoeShared.Common;
@@ -21,157 +23,111 @@ namespace PoeEye.PoeTrade.ViewModels
         private string accountName;
         private bool alternativeArt;
         private float? apsMax;
-
         private float? apsMin;
-
         private float? armourMax;
-
         private float? armourMin;
-
         private float? blockMax;
-
         private float? blockMin;
-
         private string buyoutCurrencyType;
-
         private float? buyoutMax;
-
         private float? buyoutMin;
-
         private PoeBuyoutMode? buyoutMode;
-
         private PoeItemCorruptionState? corruptionState;
-
         private float? critMax;
-
         private float? critMin;
-
         private float? damageMax;
-
         private float? damageMin;
-
         private float? dpsMax;
-
         private float? dpsMin;
-
         private float? edpsMax;
-
         private float? edpsMin;
-
         private float? evasionMax;
-
         private float? evasionMin;
-
         private int? gemOrMapLevelMax;
-
         private int? gemOrMapLevelMin;
-
         private int? incQuantityMax;
-
         private int? incQuantityMin;
-
         private bool isExpanded = true;
-
         private string itemBase;
-
         private string itemName;
-
         private PoeItemRarity? itemRarity;
-
         private IPoeItemType itemType;
-
         private string league;
-
         private int? levelMax;
-
         private int? levelMin;
-
         private int? itemLevelMax;
-
         private int? itemLevelMin;
-
         private int? linkedB;
-
         private int? linkedG;
-
         private int? linkedR;
-
         private int? linkedW;
-
         private int? linkMax;
-
         private int? linkMin;
-
         private bool normalizeQuality;
-
         private bool onlineOnly;
-
         private float? pdpsMax;
-
         private float? pdpsMin;
-
         private int? qualityMax;
-
         private int? qualityMin;
-
         private int? rDexMax;
-
         private int? rDexMin;
-
         private int? rIntMax;
-
         private int? rIntMin;
-
         private int? rLevelMax;
-
         private int? rLevelMin;
-
         private int? rStrMax;
-
         private int? rStrMin;
-
         private float? shieldMax;
-
         private float? shieldMin;
-
         private int? socketsB;
-
         private int? socketsG;
-
         private int? socketsMax;
-
         private int? socketsMin;
-
         private int? socketsR;
-
         private int? socketsW;
+        
+        private readonly ObservableCollectionExtended<string> leaguesList = new ObservableCollectionExtended<string>();
+        private readonly ObservableCollectionExtended<IPoeCurrency> currencyList = new ObservableCollectionExtended<IPoeCurrency>();
+        private readonly ObservableCollectionExtended<IPoeItemType> itemTypeList = new ObservableCollectionExtended<IPoeItemType>();
 
         public PoeQueryViewModel(
-            [NotNull] IPoeStaticData staticData,
-            [NotNull] IFactory<IPoeModGroupsEditorViewModel, IPoeStaticData> modGroupsEditorFactory,
+            [NotNull] IPoeStaticDataSource staticDataSource,
+            [NotNull] IFactory<IPoeModGroupsEditorViewModel, IPoeStaticDataSource> modGroupsEditorFactory,
             [NotNull] IFactory<ISuggestionProvider, IEnumerable<string>> suggestionProviderFactory,
             [NotNull] IPoeDatabaseReader poeDatabaseReader)
         {
-            Guard.ArgumentNotNull(staticData, nameof(staticData));
+            Guard.ArgumentNotNull(staticDataSource, nameof(staticDataSource));
             Guard.ArgumentNotNull(modGroupsEditorFactory, nameof(modGroupsEditorFactory));
             Guard.ArgumentNotNull(suggestionProviderFactory, nameof(suggestionProviderFactory));
             Guard.ArgumentNotNull(poeDatabaseReader, nameof(poeDatabaseReader));
 
-            LeaguesList = staticData.LeaguesList.ToArray();
-
-            CurrenciesList = staticData.CurrenciesList.ToArray();
-
-            ItemTypes = staticData.ItemTypes.ToArray();
-
-            ModGroupsEditor = modGroupsEditorFactory.Create(staticData);
+            LeaguesList = new ReadOnlyObservableCollection<string>(leaguesList);
+            CurrenciesList = new ReadOnlyObservableCollection<IPoeCurrency>(currencyList);
+            ItemTypes = new ReadOnlyObservableCollection<IPoeItemType>(itemTypeList);
+            ModGroupsEditor = modGroupsEditorFactory.Create(staticDataSource);
 
             OnlineOnly = true;
             BuyoutMode = PoeBuyoutMode.BuyoutOnly;
             NormalizeQuality = true;
 
-            this.WhenAnyValue(x => x.League)
-                .Where(x => string.IsNullOrWhiteSpace(x) || !LeaguesList.Contains(x, StringComparer.Ordinal))
+            Observable.Merge(this.WhenAnyValue(x => x.League), leaguesList.ToObservableChangeSet().Select(x => League))
+                .Where(string.IsNullOrWhiteSpace)
                 .Subscribe(() => League = LeaguesList.FirstOrDefault())
+                .AddTo(Anchors);
+
+            staticDataSource
+                .WhenAnyValue(x => x.StaticData)
+                .Subscribe(
+                    staticData =>
+                    {
+                        leaguesList.Clear();
+                        currencyList.Clear();
+                        itemTypeList.Clear();
+
+                        leaguesList.AddRange(staticData.LeaguesList);
+                        currencyList.AddRange(staticData.CurrenciesList);
+                        itemTypeList.AddRange(staticData.ItemTypes);
+                    })
                 .AddTo(Anchors);
 
             NameSuggestionProvider = suggestionProviderFactory.Create(poeDatabaseReader.KnownEntityNames);
@@ -189,15 +145,17 @@ namespace PoeEye.PoeTrade.ViewModels
             set { this.RaiseAndSetIfChanged(ref gemOrMapLevelMax, value); }
         }
 
-        public string[] LeaguesList { get; }
+        public ReadOnlyObservableCollection<string> LeaguesList { get; }
 
-        public IPoeCurrency[] CurrenciesList { get; }
+        public ReadOnlyObservableCollection<IPoeCurrency> CurrenciesList { get; }
+        
+        public ReadOnlyObservableCollection<IPoeItemType> ItemTypes { get; }
+
+        public ObservableCollectionExtended<string> LL => leaguesList;
 
         public IPoeModGroupsEditorViewModel ModGroupsEditor { get; }
 
         public ISuggestionProvider NameSuggestionProvider { get; }
-
-        public IPoeItemType[] ItemTypes { get; }
 
         public string Description => GetQueryDescription();
 
@@ -626,6 +584,10 @@ namespace PoeEye.PoeTrade.ViewModels
                 if (mappedItemType != null)
                 {
                     ItemType = mappedItemType;
+                }
+                else
+                {
+                    ItemType = source.ItemType;
                 }
             }
 

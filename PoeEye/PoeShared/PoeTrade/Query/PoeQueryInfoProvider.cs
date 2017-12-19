@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using System.Threading.Tasks;
 using Guards;
 using JetBrains.Annotations;
 using PoeShared.Common;
@@ -9,27 +10,25 @@ using ReactiveUI;
 
 namespace PoeShared.PoeTrade.Query
 {
-    internal sealed class PoeQueryInfoProvider : DisposableReactiveObject, IPoeStaticData
+    internal sealed class PoeQueryInfoProvider : DisposableReactiveObject
     {
-        private readonly Lazy<IPoeStaticData> lazyDataLoader;
         private readonly IPoeApi poeApi;
         private bool isBusy;
+        private IPoeStaticData staticData = PoeStaticData.Empty;
 
         public PoeQueryInfoProvider([NotNull] IPoeApi poeApi)
         {
             Guard.ArgumentNotNull(poeApi, nameof(poeApi));
             this.poeApi = poeApi;
 
-            lazyDataLoader = new Lazy<IPoeStaticData>(RefreshData, LazyThreadSafetyMode.ExecutionAndPublication);
+            RefreshData();
         }
 
-        public IPoeItemType[] ItemTypes => lazyDataLoader.Value.ItemTypes;
-
-        public string[] LeaguesList => lazyDataLoader.Value.LeaguesList;
-
-        public IPoeCurrency[] CurrenciesList => lazyDataLoader.Value.CurrenciesList;
-
-        public IPoeItemMod[] ModsList => lazyDataLoader.Value.ModsList;
+        public IPoeStaticData StaticData
+        {
+            get { return staticData; }
+            set { this.RaiseAndSetIfChanged(ref staticData, value); }
+        } 
 
         public bool IsBusy
         {
@@ -37,19 +36,31 @@ namespace PoeShared.PoeTrade.Query
             set { this.RaiseAndSetIfChanged(ref isBusy, value); }
         }
 
-        private IPoeStaticData RefreshData()
+        private void RefreshData()
+        {
+            Log.Instance.Debug($"[PoeQueryInfoProvider-{poeApi.Name}] Refreshing static data...");
+            Task.Factory.StartNew(() => StaticData = RefreshDataInternal());
+        }
+
+        private IPoeStaticData RefreshDataInternal()
         {
             try
             {
                 IsBusy = true;
 
+                Log.Instance.Debug($"[PoeQueryInfoProvider-{poeApi.Name}] Requesting static data from API...");
+
                 var queryResult = poeApi.RequestStaticData().Result;
+                
+                Log.Instance.Debug($"[PoeQueryInfoProvider-{poeApi.Name}] Received static data from API");
                 return queryResult;
             }
             catch (Exception ex)
             {
                 Log.HandleUiException(ex);
-                return new PoeStaticData();
+                Log.Instance.Debug($"[PoeQueryInfoProvider-{poeApi.Name}] Returning empty static data");
+
+                return PoeStaticData.Empty;
             }
             finally
             {

@@ -47,14 +47,35 @@
             </Grid>
           </Expander.Header>
 
-          <StackPanel Orientation="Vertical">
-            <controls:MetroContentControl Content="{Binding Query}" />
-            <DockPanel>
-              <Button HorizontalAlignment="Right" Width="150" Command="{Binding NewSearchCommand}"
-                      CommandParameter="{Binding Query.PoeQueryBuilder}"
-                      Content="Search" />
-            </DockPanel>
-          </StackPanel>
+          <Grid>
+            <StackPanel Orientation="Vertical">
+              <StackPanel.IsEnabled>
+                <Binding Path="ApiSelector.SelectedModule.IsAvailable" TargetNullValue="False" />
+              </StackPanel.IsEnabled>
+              <controls:MetroContentControl Content="{Binding Query}" />
+              <DockPanel>
+                <Button HorizontalAlignment="Right" Width="150" Command="{Binding NewSearchCommand}"
+                        CommandParameter="{Binding Query.PoeQueryBuilder}"
+                        Content="Search" />
+              </DockPanel>
+            </StackPanel>
+            <Border Background="{StaticResource MetroDataGrid.DisabledHighlightBrush}" Opacity="0.9">
+              <Border.Visibility>
+                <Binding Path="ApiSelector.SelectedModule.IsAvailable" 
+                         Converter="{StaticResource TrueToCollapsedFalseToVisibleConverter}"
+                         TargetNullValue="{x:Static Visibility.Visible}" />
+              </Border.Visibility>
+              <TextBlock 
+                VerticalAlignment="Center"
+                HorizontalAlignment="Center"
+                TextAlignment="Center"
+                Text="Selected module is not available yet, please wait for a few seconds" 
+                Foreground="{StaticResource PoeFontBrush}"
+                FontSize="30">
+              </TextBlock>
+            </Border>
+          </Grid>
+          
         </Expander>
       </ScrollViewer>
 

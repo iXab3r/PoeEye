@@ -44,6 +44,7 @@ namespace PoeShared.Prism
                 .RegisterSingleton<IPoeEyeModulesEnumerator, PoeEyeModulesRegistrator>()
                 .RegisterSingleton<IEqualityComparer<IPoeItem>, PoeItemEqualityComparer>()
                 .RegisterSingleton<IConverter<NameValueCollection, string>, NameValueCollectionToQueryStringConverter>()
+                .RegisterSingleton<IConverter<NameValueCollection, IEnumerable<KeyValuePair<string, string>>>, NameValueCollectionToQueryStringConverter>()
                 .RegisterSingleton<IProxyProvider, GenericProxyProvider>(new InjectionFactory(unity => new GenericProxyProvider()))
                 .RegisterSingleton<IRandomNumberGenerator, RandomNumberGenerator>()
                 .RegisterSingleton<IImagesCacheService, ImagesCacheService>()
@@ -94,7 +95,6 @@ namespace PoeShared.Prism
                                 new IPoeDatabaseReader[]
                                 {
                                     unity.Resolve<StaticPoeDatabaseReader>(),
-                                    unity.Resolve<PoeNinjaDatabaseReader>(),
                                 }
                             )
                         )));

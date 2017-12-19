@@ -46,7 +46,7 @@ namespace PoeEye.PoeTrade
                 CreateArgument("sockets_min", source.SocketsMin),
                 CreateArgument("sockets_max", source.SocketsMax),
                 CreateArgument("link_min", source.LinkMin),
-                CreateArgument("link_max", source.LinkMin),
+                CreateArgument("link_max", source.LinkMax),
                 CreateArgument("rlevel_min", source.RLevelMin),
                 CreateArgument("rlevel_max", source.RLevelMax),
                 CreateArgument("rstr_min", source.RStrMin),

@@ -15,6 +15,8 @@ namespace PoeEye.StashRealtimeApi.Services
         public Guid Id { get; } = Guid.Parse("A4177288-05E6-475D-B05C-A30795FF600E");
 
         public string Name { get; } = "Stash Realtime API";
+        
+        public bool IsAvailable { get; } = true;
 
         public PoeStashRealtimeApi([NotNull] IPoeItemsProcessor itemsSource)
         {
@@ -41,7 +43,7 @@ namespace PoeEye.StashRealtimeApi.Services
         {
             Guard.ArgumentNotNull(query, nameof(query));
 
-            itemsSource.DisposaQuery(query);
+            itemsSource.DisposeQuery(query);
         }
     }
 }

@@ -7,11 +7,13 @@ using PoeShared.Scaffolding;
 
 namespace PoeShared.PoeTrade
 {
-    public abstract class PoeApi : IPoeApi
+    public abstract class PoeApi : DisposableReactiveObject, IPoeApi
     {
         public abstract Guid Id { get; }
 
         public abstract string Name { get; }
+        
+        public abstract bool IsAvailable { get; }
 
         public abstract Task<IPoeQueryResult> IssueQuery(IPoeQueryInfo query);
 

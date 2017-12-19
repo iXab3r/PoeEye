@@ -1,4 +1,5 @@
 ﻿using System;
+using PoeShared.Scaffolding;
 
 namespace PoeShared.PoeTrade
 {
@@ -8,11 +9,13 @@ namespace PoeShared.PoeTrade
 
     using Query;
 
-    public interface IPoeApi
+    public interface IPoeApi : IDisposableReactiveObject
     {
         Guid Id { get; }
 
         string Name { [NotNull] get; }
+        
+        bool IsAvailable { get; }
 
         [NotNull]
         Task<IPoeQueryResult> IssueQuery([NotNull] IPoeQueryInfo query);

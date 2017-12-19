@@ -1,4 +1,6 @@
-﻿namespace PoeShared.Scaffolding
+﻿using ReactiveUI;
+
+namespace PoeShared.Scaffolding
 {
     using System;
     using System.ComponentModel;
@@ -6,7 +8,7 @@
 
     using JetBrains.Annotations;
 
-    public interface IDisposableReactiveObject : IDisposable, INotifyPropertyChanged
+    public interface IDisposableReactiveObject : IDisposable, IReactiveObject
     {
         CompositeDisposable Anchors { [NotNull] get; }
     }

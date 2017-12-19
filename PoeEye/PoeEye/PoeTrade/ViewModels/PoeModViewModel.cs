@@ -13,17 +13,20 @@
         private float? min;
 
         private string selectedMod;
+        private ISuggestionProvider suggestionProvider;
 
-        public PoeModViewModel(ISuggestionProvider suggestionProvider)
+        public PoeModViewModel()
         {
-            SuggestionProvider = suggestionProvider;
-
             this.WhenAnyValue(x => x.SelectedMod, x => x.Min, x => x.Max)
                 .Subscribe(() => this.RaisePropertyChanged(nameof(IsEmpty)))
                 .AddTo(Anchors);
         }
 
-        public ISuggestionProvider SuggestionProvider { get; }
+        public ISuggestionProvider SuggestionProvider
+        {
+            get { return suggestionProvider; }
+            set { this.RaiseAndSetIfChanged(ref suggestionProvider, value); }
+        }
 
         public string SelectedMod
         {

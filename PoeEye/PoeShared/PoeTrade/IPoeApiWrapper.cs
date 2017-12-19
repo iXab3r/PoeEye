@@ -2,14 +2,12 @@
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using PoeShared.PoeTrade.Query;
+using PoeShared.Scaffolding;
 
 namespace PoeShared.PoeTrade
 {
-    public interface IPoeApiWrapper
+    public interface IPoeApiWrapper : IPoeStaticDataSource, IDisposableReactiveObject
     {
-        [NotNull]
-        IPoeStaticData StaticData { [NotNull] get; }
-
         [NotNull]
         Task<IPoeQueryResult> IssueQuery([NotNull] IPoeQueryInfo query);
 
@@ -17,6 +15,8 @@ namespace PoeShared.PoeTrade
 
         bool IsBusy { get; }
 
+        bool IsAvailable { get; }
+        
         string Name { [NotNull] get; }
 
         Guid Id { get; }
