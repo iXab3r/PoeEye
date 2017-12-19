@@ -2,10 +2,20 @@
 
 void Main()
 {
-	var homeDir = Path.GetDirectoryName(Util.CurrentQueryPath);
+	var scriptDir = Path.GetDirectoryName(Util.CurrentQueryPath);
+	var homeDir = Path.Combine(scriptDir, "PoeEye");
+	
 	var nuspecFileName = @"PoeEye.nuspec";
 	var binariesDir = @"bin\";
 	var nuspecFilePath = Path.Combine(homeDir, nuspecFileName);
+	var exeFilePath = Path.Combine(homeDir, binariesDir, "PoeEye.exe");
+
+	new[] { exeFilePath }.Dump("Reading version from .exe file...");
+
+	var versionInfo = FileVersionInfo.GetVersionInfo(exeFilePath);
+	var version = $"{versionInfo.FileMajorPart}.{versionInfo.FileMinorPart}.{versionInfo.FileBuildPart}";
+
+	version.Dump("Version");
 
 	var extensionsToExclude = new[] {
 		".xml",
@@ -29,6 +39,9 @@ void Main()
 	nuspecFilePath.Dump("Opening nuspec file...");
 	var nuspecDocument = XElement.Load(nuspecFilePath);
 	var ns = nuspecDocument.GetDefaultNamespace();
+	
+	var versionNode = nuspecDocument.Descendants(ns + "metadata").Single().Descendants(ns + "version").Single();
+	versionNode.Dump("[BEFORE] Nuspec version");
 
 	var filesNode = nuspecDocument.Descendants(ns + "files").Single();
 	filesNode.Dump("[BEFORE] nuspec files list");
@@ -43,7 +56,9 @@ void Main()
 		filesNode.Add(newElement);
 	}
 	filesNode.Dump("[AFTER] nuspec files list");
-	
+	versionNode.Value = version;
+	versionNode.Dump("[AFTER] Nuspec version");
+
 	File.Copy(nuspecFilePath, nuspecFilePath+".bak", true);
  	nuspecDocument.Save(nuspecFilePath);
 }
