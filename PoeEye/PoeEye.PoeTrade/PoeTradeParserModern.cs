@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Windows;
 using PoeShared.Scaffolding;
@@ -326,13 +327,40 @@ namespace PoeEye.PoeTrade
             }
         }
 
+        private IPoeLinksInfo ExtractLinksInfoLegacy(IDomObject row)
+        {
+            CQ parser = row.Render();
+
+            // sockets are in format [RGB]-[RGB]-... '-' indicates there is a link
+            // i.e. RR-B = R + R-B = 1 + 2 link
+            var rawLinksText = parser["span[class=sockets-raw]"]?.Text();
+            return string.IsNullOrWhiteSpace(rawLinksText) ? default(IPoeLinksInfo) : new PoeLinksInfo(rawLinksText);
+        }
+        
         private IPoeLinksInfo ExtractLinksInfo(IDomObject row)
         {
             CQ parser = row.Render();
 
-            var rawLinksText = parser["span[class=sockets-raw]"]?.Text();
+            var mappings = new Dictionary<string, string>()
+            {
+                {"socketD", "G"},
+                {"socketS", "R"},
+                {"socketI", "B"},
+                {"socketG", "W"},
+                {"socketLink", "-"}
+            };
+
+            string GetMappedValue(string className)
+            {
+                var mapping = mappings.FirstOrDefault(x => className.IndexOf(x.Key, StringComparison.OrdinalIgnoreCase) >= 0);
+                return mapping.Value;
+            }
+
+            var socketClasses = parser["div[class=sockets-inner] div"]?.EmptyIfNull().Select(x => x.ClassName).ToArray();
+            var rawLinksText = string.Join(string.Empty, socketClasses.Select(GetMappedValue));
             return string.IsNullOrWhiteSpace(rawLinksText) ? default(IPoeLinksInfo) : new PoeLinksInfo(rawLinksText);
         }
+        
 
         private IPoeItemMod[] ExtractExplicitMods(IDomObject row)
         {
