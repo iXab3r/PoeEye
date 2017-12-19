@@ -344,7 +344,6 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="AppArguments.cs" />
     <Compile Include="Config\GenericConfigProvider.cs" />
     <Compile Include="Config\PoeEyeConfigProviderFromFile.cs" />
     <Compile Include="Config\PoeEyeUpdateSettingsConfig.cs" />
