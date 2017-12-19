@@ -95,6 +95,7 @@ namespace PoeShared.Prism
                                 new IPoeDatabaseReader[]
                                 {
                                     unity.Resolve<StaticPoeDatabaseReader>(),
+                                    unity.Resolve<PoeNinjaDatabaseReader>(),
                                 }
                             )
                         )));

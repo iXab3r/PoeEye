@@ -3,14 +3,15 @@
 void Main()
 {
 	var homeDir = Path.GetDirectoryName(Util.CurrentQueryPath);
-	var nuspecFileName = @"PoeEye.nuspec";
-	var nuspecFilePath = Path.Combine(homeDir, nuspecFileName);
+	var binariesDir = @"bin\";
+	var exeFilePath = Path.Combine(homeDir, binariesDir, "PoeEye.exe");
 
-	new[] { nuspecFilePath }.Dump("Reading version from .nuspec file...");
-	var nuspecDocument = XElement.Load(nuspecFilePath);
-	var ns = nuspecDocument.GetDefaultNamespace();
+	new[] { exeFilePath }.Dump("Reading version from .exe file...");
+
+	var versionInfo = FileVersionInfo.GetVersionInfo(exeFilePath);
+	var version = $"{versionInfo.FileMajorPart}.{versionInfo.FileMinorPart}.{versionInfo.FileBuildPart}.{versionInfo.FilePrivatePart}";
 	
-	var version = nuspecDocument.Descendants(ns + "metadata").Single().Descendants(ns + "version").Single().Value;
+	version.Dump("Version");
 	
 	var nupkgFileName = $@"PoeEye.{version}.nupkg";
 	var nupkgFilePath = Path.Combine(homeDir, nupkgFileName);

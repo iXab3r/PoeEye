@@ -140,6 +140,8 @@
     <Compile Include="PoeBud\OfficialApi\GearTypeAnalyzerFixture.cs" />
     <Compile Include="PoeShared\Communications\Chromium\ChromiumBootstrapperFixture.cs" />
     <Compile Include="PoeShared\Converters\StringToPoePriceConverterFixture.cs" />
+    <Compile Include="PoeShared\PoeDatabase\PoeNinja\PoeNinjaDatabaseReaderFixture.cs" />
+    <Compile Include="PoeShared\PoeDatabase\StaticPoeDatabaseReaderFixture.cs" />
     <Compile Include="PoeShared\Scaffolding\ReactiveObjectExtensionsFixture.cs" />
     <Compile Include="PoeTradeMonitor\Services\Parsers\PoeMessageCurrencyParserPoeTradeFixturey.cs" />
     <Compile Include="PoeTradeMonitor\Services\Parsers\PoeMessageWeakParserPoeTradeFixture.cs" />

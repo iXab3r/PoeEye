@@ -19,7 +19,7 @@ namespace PoeShared.PoeDatabase.PoeNinja
 {
     internal sealed class PoeNinjaDatabaseReader : DisposableReactiveObject, IPoeDatabaseReader
     {
-        private static readonly string PoeNinjaDataUri = @"http://poeninja.azureedge.net/api/Data/";
+        private static readonly string PoeNinjaDataUri = @"http://poe.ninja/api/Data/";
         private static readonly string StandardLeagueName = "Standard";
 
         private static readonly TimeSpan RequestsThrottling = TimeSpan.FromMilliseconds(1000);
