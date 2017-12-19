@@ -33,8 +33,6 @@ namespace PoeEye.PoeTrade.ViewModels
 
     using JetBrains.Annotations;
 
-    using NuGet;
-
     using PoeShared.Scaffolding;
 
     using ReactiveUI;

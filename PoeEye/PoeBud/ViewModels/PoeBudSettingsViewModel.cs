@@ -9,7 +9,6 @@ using System.Windows.Input;
 using Guards;
 using JetBrains.Annotations;
 using Microsoft.Practices.Unity;
-using NuGet;
 using PoeBud.Config;
 using PoeBud.Models;
 using PoeShared;
@@ -215,7 +214,7 @@ namespace PoeBud.ViewModels
                     .ToArray();
 
                 resultingConfig.StashesToProcess.Clear();
-                resultingConfig.StashesToProcess.AddRange(selectedTabs);
+                selectedTabs.ForEach(resultingConfig.StashesToProcess.Add);
             }
 
             return resultingConfig;
