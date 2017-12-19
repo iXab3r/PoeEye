@@ -12,7 +12,7 @@ namespace PoeEye
 
         public static AppArguments Instance => InstanceProducer.Value;
 
-        public static readonly string AppDataDirectory = Environment.ExpandEnvironmentVariables(@"%LOCALAPPDATA%\PoeEye");
+        public static readonly string AppDataDirectory = Environment.ExpandEnvironmentVariables(@"%APPDATA%\PoeEye");
 
         private bool isDebugMode;
 
