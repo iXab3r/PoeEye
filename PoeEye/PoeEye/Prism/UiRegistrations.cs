@@ -57,7 +57,8 @@ namespace PoeEye.Prism
                 .RegisterType<IPoeModGroupsEditorViewModel, PoeModGroupsEditorViewModel>()
                 .RegisterType<IHistoricalTradesViewModel, HistoricalTradesViewModel>()
                 .RegisterType<IRecheckPeriodViewModel, RecheckPeriodViewModel>()
-                .RegisterType<ISuggestionProvider, FuzzySuggestionProvider>();
+                .RegisterType<ISuggestionProvider, FuzzySuggestionProvider>()
+                .RegisterType<IReactiveSuggestionProvider, ReactiveSuggestionProvider>();
         }
     }
 }

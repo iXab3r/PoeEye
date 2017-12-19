@@ -49,7 +49,7 @@
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
     <UseVSHostingProcess>false</UseVSHostingProcess>
-    <OutputPath>bin\x64\Release\</OutputPath>
+    <OutputPath>..\bin</OutputPath>
     <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
@@ -62,7 +62,7 @@
     <Prefer32Bit>false</Prefer32Bit>
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <StartArguments>-d --processStart</StartArguments>
-    <OutputPath>bin\x64\Debug\</OutputPath>
+    <OutputPath>..\bin</OutputPath>
     <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
@@ -365,12 +365,14 @@
     <Compile Include="PoeTrade\Models\FuzzySuggestionProvider.cs" />
     <Compile Include="PoeTrade\Models\IPoeApiProvider.cs" />
     <Compile Include="PoeTrade\Models\IPoeCaptchaRegistrator.cs" />
+    <Compile Include="PoeTrade\Models\IReactiveSuggestionProvider.cs" />
     <Compile Include="PoeTrade\Models\IWhispersNotificationManager.cs" />
     <Compile Include="PoeTrade\Models\PoeApiProvider.cs" />
     <Compile Include="PoeTrade\Models\PoeItemPricePoint.cs" />
     <Compile Include="PoeTrade\Models\PoeItemViewModelFactory.cs" />
     <Compile Include="PoeTrade\Models\PoePriceCalculcator.cs" />
     <Compile Include="PoeTrade\Models\PoeCaptchaRegistrator.cs" />
+    <Compile Include="PoeTrade\Models\ReactiveSuggestionProvider.cs" />
     <Compile Include="PoeTrade\Models\WhispersNotificationManager.cs" />
     <Compile Include="PoeTrade\Shell\ViewModels\IPoeFlyoutViewModel.cs" />
     <Compile Include="PoeTrade\Updater\ApplicationUpdaterModel.cs" />

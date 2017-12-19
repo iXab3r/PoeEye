@@ -7,6 +7,7 @@ using System.Reactive.Linq;
 using DynamicData.Binding;
 using Guards;
 using JetBrains.Annotations;
+using PoeEye.PoeTrade.Models;
 using PoeShared.Common;
 using PoeShared.PoeDatabase;
 using PoeShared.PoeTrade;
@@ -93,7 +94,7 @@ namespace PoeEye.PoeTrade.ViewModels
         public PoeQueryViewModel(
             [NotNull] IPoeStaticDataSource staticDataSource,
             [NotNull] IFactory<IPoeModGroupsEditorViewModel, IPoeStaticDataSource> modGroupsEditorFactory,
-            [NotNull] IFactory<ISuggestionProvider, IEnumerable<string>> suggestionProviderFactory,
+            [NotNull] IFactory<IReactiveSuggestionProvider> suggestionProviderFactory,
             [NotNull] IPoeDatabaseReader poeDatabaseReader)
         {
             Guard.ArgumentNotNull(staticDataSource, nameof(staticDataSource));
@@ -130,7 +131,8 @@ namespace PoeEye.PoeTrade.ViewModels
                     })
                 .AddTo(Anchors);
 
-            NameSuggestionProvider = suggestionProviderFactory.Create(poeDatabaseReader.KnownEntityNames);
+            NameSuggestionProvider = suggestionProviderFactory.Create();
+            NameSuggestionProvider.Items = poeDatabaseReader.KnownEntityNames;
         }
 
         public int? GemOrMapLevelMin
@@ -155,7 +157,7 @@ namespace PoeEye.PoeTrade.ViewModels
 
         public IPoeModGroupsEditorViewModel ModGroupsEditor { get; }
 
-        public ISuggestionProvider NameSuggestionProvider { get; }
+        public IReactiveSuggestionProvider NameSuggestionProvider { get; }
 
         public string Description => GetQueryDescription();
 

@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using PoeEye.PoeTrade.Models;
 using PoeShared.PoeTrade;
 using Prism.Commands;
 using ReactiveUI.Legacy;
@@ -37,13 +38,13 @@ namespace PoeEye.PoeTrade.ViewModels
 
         private float? minGroupValue;
 
-        private ISuggestionProvider suggestionProvider;
+        private readonly IReactiveSuggestionProvider suggestionProvider;
         private IDictionary<string, IPoeItemMod> knownModsByName = new Dictionary<string, IPoeItemMod>();
 
         public PoeModsEditorViewModel(
             [NotNull] IPoeStaticDataSource staticDataSource,
             [NotNull] IFactory<IPoeModViewModel> modsViewModelsFactory,
-            [NotNull] IFactory<ISuggestionProvider, IEnumerable<string>> suggestionProviderFactory)
+            [NotNull] IFactory<IReactiveSuggestionProvider> suggestionProviderFactory)
         {
             Guard.ArgumentNotNull(modsViewModelsFactory, nameof(modsViewModelsFactory));
             Guard.ArgumentNotNull(staticDataSource, nameof(staticDataSource));
@@ -53,6 +54,7 @@ namespace PoeEye.PoeTrade.ViewModels
 
             removeModCommand = new DelegateCommand<IPoeModViewModel>(RemoveModCommandExecuted);
             addModCommand = new DelegateCommand(() => AddMod());
+            suggestionProvider = suggestionProviderFactory.Create();
 
             Observable.Merge(
                     Mods.Changed.ToUnit(),
@@ -66,14 +68,9 @@ namespace PoeEye.PoeTrade.ViewModels
 
             this
                 .WhenAnyValue(x => x.KnownModsByName)
-                .Subscribe(modsByName => SuggestionProvider = suggestionProviderFactory.Create(modsByName.Keys))
+                .Subscribe(modsByName => suggestionProvider.Items = KnownModsByName.Keys)
                 .AddTo(Anchors);
             
-            this
-                .WhenAnyValue(x => x.SuggestionProvider)
-                .Subscribe(newValue => Mods.ForEach(mod => mod.SuggestionProvider = newValue))
-                .AddTo(Anchors);
-
             AddMod();
         }
 
@@ -97,12 +94,6 @@ namespace PoeEye.PoeTrade.ViewModels
         {
             get { return maxGroupValue; }
             set { this.RaiseAndSetIfChanged(ref maxGroupValue, value); }
-        }
-
-        private ISuggestionProvider SuggestionProvider
-        {
-            get { return suggestionProvider; }
-            set { this.RaiseAndSetIfChanged(ref suggestionProvider, value); }
         }
 
         private IDictionary<string, IPoeItemMod> KnownModsByName
