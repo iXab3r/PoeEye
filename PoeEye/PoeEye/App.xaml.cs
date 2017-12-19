@@ -5,10 +5,14 @@ using System.Windows;
 using CommandLine;
 using Exceptionless;
 using Exceptionless.Models;
+using Guards;
 using log4net.Core;
+using Microsoft.Practices.Unity;
 using PoeEye.Prism;
 using PoeShared;
+using PoeShared.Communications.Chromium;
 using PoeShared.Scaffolding;
+using Prism.Unity;
 using ReactiveUI;
 
 namespace PoeEye
@@ -16,6 +20,8 @@ namespace PoeEye
     public partial class App
     {
         private static readonly string AppVersion = $"v{Assembly.GetExecutingAssembly().GetName().Version}";
+
+        private readonly PoeEyeBootstrapper bootstrapper = new PoeEyeBootstrapper();
 
         public App()
         {
@@ -72,7 +78,7 @@ namespace PoeEye
             if (AppArguments.Instance.IsDebugMode)
             {
                 Log.InitializeLogging("Debug");
-                Log.SwitchLoggingLevel(Level.Trace);
+                Log.SwitchLoggingLevel(Level.Debug);
             }
             else
             {
@@ -91,8 +97,15 @@ namespace PoeEye
             }
 
             Log.Instance.Info($"Initializing bootstrapper...");
-            var bootstrapper = new PoeEyeBootstrapper();
             bootstrapper.Run();
+        }
+
+        protected override void OnExit(ExitEventArgs e, bool isFirstInstance)
+        {
+            base.OnExit(e, isFirstInstance);
+            
+            Log.Instance.Debug($"Application exit detected");
+            bootstrapper.Dispose();
         }
 
         private void ShutdownIfNotInDebugMode()

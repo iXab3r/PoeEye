@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 using System.Linq;
 using Guards;
 using JetBrains.Annotations;
@@ -22,7 +23,7 @@ namespace PoeEye.PoeTrade.ViewModels
             SelectedModule = apiProvider.ModulesList.First();
         }
 
-        public IReactiveList<IPoeApiWrapper> ModulesList => apiProvider.ModulesList;
+        public ReadOnlyObservableCollection<IPoeApiWrapper> ModulesList => apiProvider.ModulesList;
 
         public IPoeApiWrapper SelectedModule
         {

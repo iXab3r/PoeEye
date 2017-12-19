@@ -13,5 +13,7 @@ namespace PoeShared.PoeTrade.Query
         IPoeItemType[] ItemTypes { [NotNull] get; }
 
         string[] LeaguesList { [NotNull] get; }
+        
+        bool IsEmpty { get; }
     }
 }

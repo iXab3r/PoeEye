@@ -81,7 +81,7 @@ namespace PoeShared.Native
                         OverlayIsActive = IsPairedOverlay(windowTracker.ActiveWindowTitle),
                         ActiveTitle = windowTracker.ActiveWindowTitle
                     })
-                .Do(x => Log.Instance.Debug($"[OverlayWindowController] Active window has changed: {x}"))
+                .Do(x => Log.Instance.Trace($"[OverlayWindowController] Active window has changed: {x}"))
                 .Select(x => x.WindowIsActive || x.OverlayIsActive)
                 .DistinctUntilChanged()
                 .ObserveOn(uiScheduler)

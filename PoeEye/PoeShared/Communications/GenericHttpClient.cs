@@ -102,6 +102,8 @@ namespace PoeShared.Communications
             httpClient.Headers.Add(CustomHeaders);
             httpClient.Referer = Referer;
             httpClient.UserAgent = UserAgent;
+            httpClient.AllowAutoRedirect = true;
+            httpClient.AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip;
 
             httpClient.ContentType = "application/x-www-form-urlencoded";
             httpClient.Method = WebRequestMethods.Http.Post;
@@ -132,15 +134,22 @@ namespace PoeShared.Communications
 
             var response = (HttpWebResponse)httpClient.GetResponse();
             var responseStream = response.GetResponseStream();
-
             var rawResponse = string.Empty;
+
             if (responseStream != null)
             {
-                rawResponse = new StreamReader(responseStream).ReadToEnd();
+                var rawBytes = responseStream.ReadToEnd();
+                Log.Instance.Debug($"[HttpClient] Received response, status: {response.StatusCode}, binary length: {rawBytes}");
+
+                rawResponse = Encoding.ASCII.GetString(rawBytes);
+                
+                Log.Instance.Debug($"[HttpClient] Resulting response(string) length: {rawResponse.Length}");
+            }
+            else
+            {
+                Log.Instance.Warn($"[HttpClient] Received null response stream ! Status: {response.StatusCode}");
             }
 
-            Log.Instance.Debug(
-                $"[HttpClient] Received response, status: {response.StatusCode}, length: {rawResponse?.Length}");
 
             CheckResponseStatusOrThrow(response);
 

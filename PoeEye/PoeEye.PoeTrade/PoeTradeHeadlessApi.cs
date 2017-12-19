@@ -2,6 +2,7 @@
 using Microsoft.Practices.Unity.Configuration.ConfigurationHelpers;
 using PoeEye.PoeTrade.Modularity;
 using PoeShared.Communications;
+using PoeShared.Communications.Chromium;
 using PoeShared.Modularity;
 using PoeShared.Scaffolding;
 using ReactiveUI;
@@ -28,16 +29,15 @@ namespace PoeEye.PoeTrade
 
     using TypeConverter;
 
-    internal sealed class PoeTradeApi : DisposableReactiveObject, IPoeApi
+    internal sealed class PoeTradeHeadlessApi : DisposableReactiveObject, IPoeApi
     {
         private static readonly string PoeTradeSearchUri = @"http://poe.trade/search";
         private static readonly string PoeTradeUri = @"http://poe.trade";
 
         private readonly SemaphoreSlim requestsSemaphore;
 
-        private readonly IFactory<IHttpClient> httpClientFactory;
+        private readonly IChromiumBootstrapper httpClientFactory;
 
-        private readonly IFactory<PoeTradeHeadlessApi> headlessApiFactory;
         private readonly IPoeTradeParser poeTradeParser;
         private readonly IProxyProvider proxyProvider;
         private readonly IConverter<IPoeQuery, NameValueCollection> queryConverter;
@@ -45,11 +45,10 @@ namespace PoeEye.PoeTrade
 
         private PoeTradeConfig config = new PoeTradeConfig();
         
-        public PoeTradeApi(
-            IFactory<PoeTradeHeadlessApi> headlessApiFactory,
+        public PoeTradeHeadlessApi(
             IPoeTradeParser poeTradeParser,
             IProxyProvider proxyProvider,
-            IFactory<IHttpClient> httpClientFactory,
+            IChromiumBootstrapper httpClientFactory,
             IConverter<IPoeQueryInfo, IPoeQuery> queryInfoToQueryConverter,
             IConverter<IPoeQuery, NameValueCollection> queryConverter,
             IConfigProvider<PoeTradeConfig> configProvider)
@@ -61,7 +60,6 @@ namespace PoeEye.PoeTrade
             Guard.ArgumentNotNull(queryConverter, nameof(queryConverter));
             Guard.ArgumentNotNull(configProvider, nameof(configProvider));
 
-            this.headlessApiFactory = headlessApiFactory;
             this.poeTradeParser = poeTradeParser;
             this.proxyProvider = proxyProvider;
             this.queryConverter = queryConverter;
@@ -72,13 +70,13 @@ namespace PoeEye.PoeTrade
                 .WhenChanged
                 .Subscribe(x => config = x)
                 .AddTo(Anchors);
-            Log.Instance.Debug($"[PoeTradeApi..ctor] {config.DumpToText()}");
+            Log.Instance.Debug($"[PoeTradeHeadlessApi..ctor] {config.DumpToText()}");
             requestsSemaphore = new SemaphoreSlim(config.MaxSimultaneousRequestsCount);
         }
 
-        public Guid Id { get; } = Guid.Parse("8BC98570-F07A-4925-B8A4-EC0BAAF2222C");
+        public Guid Id { get; } = Guid.Parse("1F00C934-F739-4756-81E6-F2A9FA7BA44E");
 
-        public string Name { get; } = "poe.trade";
+        public string Name { get; } = "poe.trade Headless";
 
         public bool IsAvailable { get; } = true;
 
@@ -93,7 +91,15 @@ namespace PoeEye.PoeTrade
 
         public Task<IPoeStaticData> RequestStaticData()
         {
-            return headlessApiFactory.Create().RequestStaticData();
+            var client = CreateClientWithoutProxy();
+            return client
+                .Get(PoeTradeUri)
+                .ToObservable()
+                .Select(x => client.GetSource().Result)
+                .Select(ThrowIfNotParseable)
+                .Select(poeTradeParser.ParseStaticData)
+                .Finally(() => client.Dispose())
+                .ToTask();
         }
 
         private async Task<IPoeQueryResult> IssueQuery(string uri, NameValueCollection queryParameters)
@@ -103,14 +109,17 @@ namespace PoeEye.PoeTrade
             {
                 var client = CreateClient(out proxyToken);
 
-                Log.Instance.Debug($"[PoeTradeApi] Awaiting for semaphore slot (max: {config.MaxSimultaneousRequestsCount}, atm: {requestsSemaphore.CurrentCount})");
+                Log.Instance.Debug($"[PoeTradeHeadlessApi] Awaiting for semaphore slot (max: {config.MaxSimultaneousRequestsCount}, atm: {requestsSemaphore.CurrentCount})");
                 await requestsSemaphore.WaitAsync();
 
                 return await client
                     .Post(uri, queryParameters)
+                    .ToObservable()
+                    .Select(x => client.GetSource().Result)
                     .Select(ThrowIfNotParseable)
                     .Select(poeTradeParser.ParseQueryResponse)
-                    .Finally(ReleaseSemaphore);
+                    .Finally(ReleaseSemaphore)
+                    .Finally(() => client.Dispose());
             }
             catch (WebException ex)
             {
@@ -123,42 +132,29 @@ namespace PoeEye.PoeTrade
             }
         }
 
-        private IHttpClient CreateClientWithoutProxy()
+        private IPoeBrowser CreateClientWithoutProxy()
         {
             IProxyToken proxyToken;
             return CreateClient(out proxyToken);
         }
 
-        private IHttpClient CreateClient(out IProxyToken proxyToken)
+        private IPoeBrowser CreateClient(out IProxyToken proxyToken)
         {
             proxyToken = null;
-            var client = httpClientFactory.Create();
+            var client = httpClientFactory.CreateBrowser();
 
             var cookies = new CookieCollection
             {
                 new Cookie("interface", "simple", @"/", "poe.trade"),
                 new Cookie("theme", "modern", @"/", "poe.trade")
             };
-            client.Cookies = cookies;
-
-            if (config.ProxyEnabled && proxyProvider.TryGetProxy(out proxyToken))
-            {
-                Log.Instance.Debug($"[PoeTradeApi] Got proxy {proxyToken} from proxy provider {proxyProvider}");
-                client.Proxy = proxyToken.Proxy;
-            }
-            else
-            {
-                var systemProxy = WebRequest.DefaultWebProxy;
-                Log.Instance.Debug($"[PoeTradeApi] Using default system web proxy: {systemProxy}");
-                client.Proxy = systemProxy;
-            }
 
             return client;
         }
 
         private void ReleaseSemaphore()
         {
-            Log.Instance.Debug($"[PoeTradeApi] Awaiting {config.DelayBetweenRequests.TotalSeconds}s before releasing semaphore slot...");
+            Log.Instance.Debug($"[PoeTradeHeadlessApi] Awaiting {config.DelayBetweenRequests.TotalSeconds}s before releasing semaphore slot...");
             Thread.Sleep(config.DelayBetweenRequests);
             requestsSemaphore.Release();
         }

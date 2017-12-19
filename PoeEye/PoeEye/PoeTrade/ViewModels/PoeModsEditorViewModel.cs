@@ -1,3 +1,5 @@
+using System.Collections.Concurrent;
+using PoeShared.PoeTrade;
 using Prism.Commands;
 using ReactiveUI.Legacy;
 
@@ -26,8 +28,7 @@ namespace PoeEye.PoeTrade.ViewModels
     {
         private readonly DelegateCommand addModCommand;
 
-        private readonly ISuggestionProvider modsSuggestionProvider;
-        private readonly IFactory<IPoeModViewModel, ISuggestionProvider> modsViewModelsFactory;
+        private readonly IFactory<IPoeModViewModel> modsViewModelsFactory;
         private readonly DelegateCommand<IPoeModViewModel> removeModCommand;
 
         private PoeQueryModsGroupType groupType;
@@ -36,15 +37,16 @@ namespace PoeEye.PoeTrade.ViewModels
 
         private float? minGroupValue;
 
-        private readonly IDictionary<string, IPoeItemMod> modsByName;
+        private ISuggestionProvider suggestionProvider;
+        private IDictionary<string, IPoeItemMod> knownModsByName = new Dictionary<string, IPoeItemMod>();
 
         public PoeModsEditorViewModel(
-            [NotNull] IPoeStaticData staticData,
-            [NotNull] IFactory<IPoeModViewModel, ISuggestionProvider> modsViewModelsFactory,
+            [NotNull] IPoeStaticDataSource staticDataSource,
+            [NotNull] IFactory<IPoeModViewModel> modsViewModelsFactory,
             [NotNull] IFactory<ISuggestionProvider, IEnumerable<string>> suggestionProviderFactory)
         {
             Guard.ArgumentNotNull(modsViewModelsFactory, nameof(modsViewModelsFactory));
-            Guard.ArgumentNotNull(staticData, nameof(staticData));
+            Guard.ArgumentNotNull(staticDataSource, nameof(staticDataSource));
             Guard.ArgumentNotNull(suggestionProviderFactory, nameof(suggestionProviderFactory));
 
             this.modsViewModelsFactory = modsViewModelsFactory;
@@ -56,12 +58,21 @@ namespace PoeEye.PoeTrade.ViewModels
                     Mods.Changed.ToUnit(),
                     Mods.ItemChanged.ToUnit())
                 .Subscribe(() => removeModCommand.RaiseCanExecuteChanged()).AddTo(Anchors);
+            
+            staticDataSource
+                .WhenAnyValue(x => x.StaticData)
+                .Subscribe(staticData => KnownModsByName = ToItemMods(staticData))
+                .AddTo(Anchors);
 
-            modsByName = staticData
-                .ModsList
-                .ToDictionary(x => x.Name, x => x);
-
-            modsSuggestionProvider = suggestionProviderFactory.Create(modsByName.Keys.ToArray());
+            this
+                .WhenAnyValue(x => x.KnownModsByName)
+                .Subscribe(modsByName => SuggestionProvider = suggestionProviderFactory.Create(modsByName.Keys))
+                .AddTo(Anchors);
+            
+            this
+                .WhenAnyValue(x => x.SuggestionProvider)
+                .Subscribe(newValue => Mods.ForEach(mod => mod.SuggestionProvider = newValue))
+                .AddTo(Anchors);
 
             AddMod();
         }
@@ -88,11 +99,24 @@ namespace PoeEye.PoeTrade.ViewModels
             set { this.RaiseAndSetIfChanged(ref maxGroupValue, value); }
         }
 
+        private ISuggestionProvider SuggestionProvider
+        {
+            get { return suggestionProvider; }
+            set { this.RaiseAndSetIfChanged(ref suggestionProvider, value); }
+        }
+
+        private IDictionary<string, IPoeItemMod> KnownModsByName
+        {
+            get { return knownModsByName; }
+            set { this.RaiseAndSetIfChanged(ref knownModsByName, value); }
+        }
+
         public IReactiveList<IPoeModViewModel> Mods { get; } = new ReactiveList<IPoeModViewModel> {ChangeTrackingEnabled = true};
 
         public IPoeModViewModel AddMod()
         {
-            var newMod = modsViewModelsFactory.Create(modsSuggestionProvider);
+            var newMod = modsViewModelsFactory.Create();
+            newMod.SuggestionProvider = suggestionProvider;
 
             Mods.Add(newMod);
 
@@ -114,6 +138,15 @@ namespace PoeEye.PoeTrade.ViewModels
             }
 
             return group;
+        }
+
+        private IDictionary<string, IPoeItemMod> ToItemMods(IPoeStaticData staticData)
+        {
+            var modsByName = staticData
+                .ModsList
+                .ToDictionary(x => x.Name, x => x);
+
+            return modsByName;
         }
 
         private void RemoveModCommandExecuted(IPoeModViewModel modToRemove)
@@ -141,7 +174,7 @@ namespace PoeEye.PoeTrade.ViewModels
                 }
 
                 IPoeItemMod knownMod;
-                if (!modsByName.TryGetValue(modModel.SelectedMod, out knownMod))
+                if (!KnownModsByName.TryGetValue(modModel.SelectedMod, out knownMod))
                 {
                     knownMod = new PoeItemMod() { CodeName = modModel.SelectedMod, Name = modModel.SelectedMod };
                 }

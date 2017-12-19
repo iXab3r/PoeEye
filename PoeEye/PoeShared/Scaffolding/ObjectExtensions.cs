@@ -26,7 +26,7 @@
             return instance == null ? $"null<{typeof(T).Name}>" : JsonConvert.SerializeObject(instance, formatting);
         }
         
-        public static T AddTo<T>(this T instance, ICollection<T> collection)
+        public static TItem AddTo<TItem, TCollection>(this TItem instance, ICollection<TCollection> collection) where TItem : TCollection
         {
             Guard.ArgumentNotNull(instance, nameof(instance));
             Guard.ArgumentNotNull(collection, nameof(collection));

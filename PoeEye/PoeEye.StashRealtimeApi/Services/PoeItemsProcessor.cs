@@ -154,7 +154,7 @@ namespace PoeEye.StashRealtimeApi.Services
             return true;
         }
 
-        public bool DisposaQuery(IPoeQueryInfo query)
+        public bool DisposeQuery(IPoeQueryInfo query)
         {
             Guard.ArgumentNotNull(query, nameof(query));
 

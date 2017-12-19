@@ -17,7 +17,7 @@ using PoeShared.Scaffolding;
 
 namespace PoeEye.PoeTradeRealtimeApi
 {
-    internal sealed class PoeTradeRealtimeApi : IPoeApi
+    internal sealed class PoeTradeRealtimeApi : DisposableReactiveObject, IPoeApi
     {
         private readonly PoeTradeApi poeTradeApi;
         private readonly IFactory<IRealtimeItemSource, IPoeQueryInfo> itemSourceFactory;
@@ -39,6 +39,8 @@ namespace PoeEye.PoeTradeRealtimeApi
         public Guid Id { get; } = Guid.Parse("16E6A0E6-E5A4-4260-A698-764DD8B2E843");
 
         public string Name { get; } = "poe.trade Realtime";
+
+        public bool IsAvailable { get; } = true;
 
         public Task<IPoeQueryResult> IssueQuery(IPoeQueryInfo query)
         {

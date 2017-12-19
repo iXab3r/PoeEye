@@ -1,15 +1,44 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:viewModels="clr-namespace:PoeEye.PoeTrade.ViewModels">
+                    xmlns:viewModels="clr-namespace:PoeEye.PoeTrade.ViewModels"
+                    xmlns:poeTrade="clr-namespace:PoeShared.PoeTrade;assembly=PoeShared"
+                    xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
+                    xmlns:fa="http://schemas.fontawesome.io/icons/">
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Converters.xaml" />
+            <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/styles/controls.textbox.xaml" />
     </ResourceDictionary.MergedDictionaries>
     
     <DataTemplate DataType="{x:Type viewModels:PoeApiSelectorViewModel}">
     <ComboBox ItemsSource="{Binding ModulesList}" 
               SelectedItem="{Binding SelectedModule, TargetNullValue='No available API modules'}" 
               IsEnabled="{Binding ModulesList.IsEmpty, Converter={StaticResource NotConverter}}"
-              DisplayMemberPath="Name" IsEditable="False" />
-  </DataTemplate>
+              IsEditable="False">
+        <ComboBox.ItemTemplate>
+            <DataTemplate DataType="{x:Type poeTrade:IPoeApiWrapper}">
+                <DockPanel LastChildFill="True">
+                    <Label DockPanel.Dock="Left"
+                           FontFamily="{StaticResource FontAwesome}"
+                           Foreground="{StaticResource ValidationSummaryColor3}"
+                           VerticalAlignment="Stretch"
+                           HorizontalAlignment="Stretch"
+                           VerticalContentAlignment="Center"
+                           HorizontalContentAlignment="Center"
+                           Margin="3,0"
+                           FontSize="20"
+                           Visibility="{Binding IsAvailable, Converter={StaticResource TrueToCollapsedFalseToVisibleConverter}}"
+                           fa:Awesome.Content="Warning" />
+                    <controls:ProgressRing DockPanel.Dock="Right"
+                                           Height="16" Width="16" Margin="3,0"
+                                           Visibility="{Binding IsBusy, Converter={StaticResource TrueToVisibleFalseToCollapsedConverter}}"
+                                           IsActive="True"/>
+                    <TextBlock DockPanel.Dock="Left"
+                               Text="{Binding Name}"/>
+                    
+                </DockPanel>
+            </DataTemplate>
+        </ComboBox.ItemTemplate>
+    </ComboBox>
+    </DataTemplate>
 
 </ResourceDictionary>

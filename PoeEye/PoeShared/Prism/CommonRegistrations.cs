@@ -4,6 +4,7 @@ using System.Reactive.Concurrency;
 using Gma.System.MouseKeyHook;
 using PoeShared.Audio;
 using PoeShared.Communications;
+using PoeShared.Communications.Chromium;
 using PoeShared.Converters;
 using PoeShared.Modularity;
 using PoeShared.Native;
@@ -43,10 +44,12 @@ namespace PoeShared.Prism
                 .RegisterSingleton<IPoeEyeModulesEnumerator, PoeEyeModulesRegistrator>()
                 .RegisterSingleton<IEqualityComparer<IPoeItem>, PoeItemEqualityComparer>()
                 .RegisterSingleton<IConverter<NameValueCollection, string>, NameValueCollectionToQueryStringConverter>()
+                .RegisterSingleton<IConverter<NameValueCollection, IEnumerable<KeyValuePair<string, string>>>, NameValueCollectionToQueryStringConverter>()
                 .RegisterSingleton<IProxyProvider, GenericProxyProvider>(new InjectionFactory(unity => new GenericProxyProvider()))
                 .RegisterSingleton<IRandomNumberGenerator, RandomNumberGenerator>()
                 .RegisterSingleton<IImagesCacheService, ImagesCacheService>()
                 .RegisterSingleton<IGearTypeAnalyzer, GearTypeAnalyzer>()
+                .RegisterSingleton<IChromiumBootstrapper, ChromiumBootstrapper>()
                 .RegisterSingleton<IConverter<IStashItem, IPoeItem>, PoeStashItemToPoeItem>()
                 .RegisterSingleton<IConverter<IStashItem, PoeItem>, PoeStashItemToPoeItem>()
                 .RegisterSingleton<IConverter<string, PoePrice>, StringToPoePriceConverter>()
@@ -92,7 +95,6 @@ namespace PoeShared.Prism
                                 new IPoeDatabaseReader[]
                                 {
                                     unity.Resolve<StaticPoeDatabaseReader>(),
-                                    unity.Resolve<PoeNinjaDatabaseReader>(),
                                 }
                             )
                         )));
