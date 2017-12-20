@@ -40,7 +40,7 @@ void Main()
 	var targetSetupFileName = Path.Combine(targetReleasesFolderPath, $"PoeEyeSetup.{version}.exe");
 
 	new { sourceSetupFileName, targetSetupFileName }.Dump("Renaming Setup.exe");
-	File.Move(sourceSetupFileName, targetSetupFileName);
+	File.Copy(sourceSetupFileName, targetSetupFileName);
 
 	var squirrelLogFilePath = Path.Combine(Path.GetDirectoryName(squirrelPath), "SquirrelSetup.log");
 	var squirrelLog = File.Exists(squirrelLogFilePath) ? File.ReadAllText(squirrelLogFilePath) : $"Squirrel log file does not exist at path {squirrelLogFilePath}";
