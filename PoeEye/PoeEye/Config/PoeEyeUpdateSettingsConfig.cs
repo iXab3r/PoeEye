@@ -5,10 +5,10 @@ namespace PoeEye.Config
 {
     internal sealed class PoeEyeUpdateSettingsConfig : IPoeEyeConfigVersioned
     {
-        public int Version { get; set; } = 5;
+        public int Version { get; set; } = 6;
 
-        public TimeSpan AutoUpdateTimeout { get; set; } = TimeSpan.FromMinutes(0);
+        public TimeSpan AutoUpdateTimeout { get; set; } = TimeSpan.FromMinutes(30);
 
-        public string UpdateUri { get; set; } = @"http://coderush.net/files/PoeEye/";
+        public string UpdateUri { get; set; } = @"http://poeeye.dyndns.biz:9997/files/";
     }
 }
