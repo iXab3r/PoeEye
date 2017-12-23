@@ -1,4 +1,5 @@
-﻿using System.Reactive.Subjects;
+﻿using System.Collections.Concurrent;
+using System.Reactive.Subjects;
 using Microsoft.Practices.Unity.Configuration.ConfigurationHelpers;
 using PoeEye.PoeTrade.Modularity;
 using PoeShared.Communications;
@@ -42,7 +43,7 @@ namespace PoeEye.PoeTrade
         private readonly IProxyProvider proxyProvider;
         private readonly IConverter<IPoeQuery, NameValueCollection> queryConverter;
         private readonly IConverter<IPoeQueryInfo, IPoeQuery> queryInfoToQueryConverter;
-
+        
         private PoeTradeConfig config = new PoeTradeConfig();
         
         public PoeTradeApi(
@@ -140,6 +141,7 @@ namespace PoeEye.PoeTrade
                 new Cookie("theme", "modern", @"/", "poe.trade")
             };
             client.Cookies = cookies;
+            client.Timeout = config.RequestTimeout;
 
             if (config.ProxyEnabled && proxyProvider.TryGetProxy(out proxyToken))
             {

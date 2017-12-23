@@ -15,6 +15,8 @@ namespace PoeShared.Communications
         string Referer { [CanBeNull] get; [CanBeNull] set; }
 
         string UserAgent { [CanBeNull] get; [CanBeNull] set; }
+        
+        TimeSpan? Timeout { get; set; }
 
         WebHeaderCollection CustomHeaders { [NotNull] get; [NotNull] set; }
 

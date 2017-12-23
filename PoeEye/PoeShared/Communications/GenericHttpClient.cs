@@ -21,6 +21,7 @@ namespace PoeShared.Communications
         private readonly IConverter<NameValueCollection, string> nameValueConverter;
         private WebHeaderCollection customHeaders = new WebHeaderCollection();
         private CookieCollection cookies = new CookieCollection();
+        private static readonly string DefaultUserAgent = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36";
 
         public GenericHttpClient(
             [NotNull] IConverter<NameValueCollection, string> nameValueConverter)
@@ -36,6 +37,8 @@ namespace PoeShared.Communications
             set { cookies = value ?? new CookieCollection(); }
         }
 
+        public TimeSpan? Timeout { get; set; }
+
         public WebHeaderCollection CustomHeaders
         {
             get { return customHeaders; }
@@ -44,7 +47,7 @@ namespace PoeShared.Communications
 
         public string Referer { get; set; }
 
-        public string UserAgent { get; set; }
+        public string UserAgent { get; set; } = DefaultUserAgent;
 
         public IWebProxy Proxy { get; set; }
 
@@ -82,7 +85,10 @@ namespace PoeShared.Communications
             httpClient.Headers.Add(CustomHeaders);
             httpClient.Referer = Referer;
             httpClient.UserAgent = UserAgent;
-
+            if (Timeout != null)
+            {
+                httpClient.Timeout = (int)Timeout.Value.TotalMilliseconds;
+            }
             httpClient.Method = WebRequestMethods.Http.Get;
             var rawResponse = IssueRequest(httpClient, string.Empty);
 
@@ -103,6 +109,10 @@ namespace PoeShared.Communications
             httpClient.Referer = Referer;
             httpClient.UserAgent = UserAgent;
             httpClient.AllowAutoRedirect = true;
+            if (Timeout != null)
+            {
+                httpClient.Timeout = (int)Timeout.Value.TotalMilliseconds;
+            }
             httpClient.AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip;
 
             httpClient.ContentType = "application/x-www-form-urlencoded";
@@ -113,47 +123,48 @@ namespace PoeShared.Communications
             return rawResponse;
         }
 
-        private string IssueRequest(HttpWebRequest httpClient, string requestData)
+        private string IssueRequest(HttpWebRequest httpRequest, string requestData)
         {
             var proxy = Proxy;
             if (proxy != null)
             {
-                Log.Instance.Debug($"[HttpClient] Using proxy {proxy} for uri '{httpClient.RequestUri}'");
-                httpClient.Proxy = proxy;
+                Log.Instance.Debug($"[HttpClient] Using proxy {proxy} for uri '{httpRequest.RequestUri}'");
+                httpRequest.Proxy = proxy;
             }
 
-            if (httpClient.Method == WebRequestMethods.Http.Post && !string.IsNullOrEmpty(requestData))
+            if (httpRequest.Method == WebRequestMethods.Http.Post && !string.IsNullOrEmpty(requestData))
             {
                 Log.Instance.Debug($"[HttpClient] Preparing POST data...");
                 var data = Encoding.ASCII.GetBytes(requestData);
-                using (var stream = httpClient.GetRequestStream())
+                using (var stream = httpRequest.GetRequestStream())
                 {
                     stream.Write(data, 0, data.Length);
                 }
             }
-
-            var response = (HttpWebResponse)httpClient.GetResponse();
-            var responseStream = response.GetResponseStream();
-            var rawResponse = string.Empty;
-
-            if (responseStream != null)
+            
+            Log.Instance.Debug($"[HttpClient] Sending {httpRequest.Method} request with timeout of {httpRequest.Timeout}ms to {httpRequest.RequestUri}");
+            using (var response = (HttpWebResponse)httpRequest.GetResponse())
+            using (var responseStream = response.GetResponseStream())
             {
-                var rawBytes = responseStream.ReadToEnd();
-                Log.Instance.Debug($"[HttpClient] Received response, status: {response.StatusCode}, binary length: {rawBytes}");
+                var rawResponse = string.Empty;
 
-                rawResponse = Encoding.ASCII.GetString(rawBytes);
-                
-                Log.Instance.Debug($"[HttpClient] Resulting response(string) length: {rawResponse.Length}");
+                if (responseStream != null)
+                {
+                    var rawBytes = responseStream.ReadToEnd();
+                    Log.Instance.Debug($"[HttpClient] Received response, status: {response.StatusCode}, binary length: {rawBytes}");
+                    rawResponse = Encoding.ASCII.GetString(rawBytes);
+                    Log.Instance.Debug($"[HttpClient] Resulting response(string) length: {rawResponse.Length}");
+                }
+                else
+                {
+                    Log.Instance.Warn($"[HttpClient] Received null response stream ! Status: {response.StatusCode}");
+                }
+
+
+                CheckResponseStatusOrThrow(response);
+
+                return rawResponse;
             }
-            else
-            {
-                Log.Instance.Warn($"[HttpClient] Received null response stream ! Status: {response.StatusCode}");
-            }
-
-
-            CheckResponseStatusOrThrow(response);
-
-            return rawResponse;
         }
 
         private static void CheckResponseStatusOrThrow(HttpWebResponse response)
