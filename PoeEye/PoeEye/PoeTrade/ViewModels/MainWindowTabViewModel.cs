@@ -32,10 +32,10 @@ namespace PoeEye.PoeTrade.ViewModels
     {
         private static int GlobalTabIdx;
 
-        private readonly ReactiveCommand<object> markAllAsReadCommand;
+        private readonly DelegateCommand markAllAsReadCommand;
         private readonly IFactory<IPoeQueryViewModel, IPoeStaticDataSource> queryFactory;
-        private readonly ReactiveCommand<object> refreshCommand;
-        private readonly ReactiveCommand<object> newSearchCommand;
+        private readonly DelegateCommand<object> refreshCommand;
+        private readonly DelegateCommand<object> newSearchCommand;
         private readonly DelegateCommand<string> renameCommand;
         private readonly DelegateCommand resetCommand;
 
@@ -87,21 +87,19 @@ namespace PoeEye.PoeTrade.ViewModels
             resetCommand = new DelegateCommand(ResetCommandExecuted, ResetCommandCanExecute);
             this.WhenAnyValue(x => x.SelectedApi).Subscribe(() => resetCommand.RaiseCanExecuteChanged()).AddTo(Anchors);
 
-            markAllAsReadCommand = ReactiveUI.Legacy.ReactiveCommand.Create();
-            markAllAsReadCommand.Subscribe(MarkAllAsReadExecute);
+            markAllAsReadCommand = new DelegateCommand(MarkAllAsReadExecute);
 
-            var selectedApiIsAvailable = this
-                .WhenAnyValue(x => x.SelectedApi)
-                .Select(x => x == null ? Observable.Return(false) : x.WhenAnyValue(y => y.IsAvailable))
-                .Switch()
-                .Publish();
-
-            refreshCommand = ReactiveUI.Legacy.ReactiveCommand.Create(this.WhenAnyValue(x => x.IsBusy).Select(x => !x).Merge(selectedApiIsAvailable));
-            refreshCommand.Subscribe(RefreshCommandExecuted);
-
-            newSearchCommand = ReactiveUI.Legacy.ReactiveCommand.Create(selectedApiIsAvailable);
-            newSearchCommand.Subscribe(NewSearchCommandExecuted);
-
+            refreshCommand = new DelegateCommand<object>(RefreshCommandExecuted, RefreshCommandCanExecute);
+            newSearchCommand = new DelegateCommand<object>(NewSearchCommandExecuted, NewSearchCommandCanExecute);
+            this.WhenAnyValue(x => x.IsBusy, x => x.SelectedApi)
+                .Subscribe(
+                    () =>
+                    {
+                        refreshCommand.RaiseCanExecuteChanged();
+                        newSearchCommand.RaiseCanExecuteChanged();
+                    })
+                .AddTo(Anchors);
+            
             this
                 .WhenAnyValue(x => x.SelectedApi)
                 .Where(x => x != null)
@@ -120,8 +118,15 @@ namespace PoeEye.PoeTrade.ViewModels
                     x => audioNotificationsManager.PlayNotification(audioNotificationSelector.SelectedValue),
                     Log.HandleException)
                 .AddTo(Anchors);
+        }
+        private bool NewSearchCommandCanExecute(object arg)
+        {
+            return (SelectedApi?.IsAvailable ?? false);
+        }
 
-            selectedApiIsAvailable.Connect().AddTo(Anchors);
+        private bool RefreshCommandCanExecute(object arg)
+        {
+            return !IsBusy && NewSearchCommandCanExecute(arg);
         }
 
         public IPoeApiSelectorViewModel ApiSelector { get; }
@@ -157,7 +162,7 @@ namespace PoeEye.PoeTrade.ViewModels
         
         public ICommand ResetCommand => resetCommand;
 
-        public bool IsBusy => TradesList.IsBusy;
+        public bool IsBusy => TradesList?.IsBusy ?? false;
 
         public string TabName => tabName.Value;
 
@@ -386,7 +391,7 @@ namespace PoeEye.PoeTrade.ViewModels
                 .Submit();
         }
 
-        private void MarkAllAsReadExecute(object arg)
+        private void MarkAllAsReadExecute()
         {
             var tradesToAmend = TradesList.Items.Where(x => x.TradeState != PoeTradeState.Normal).ToArray();
             if (!tradesToAmend.Any())
