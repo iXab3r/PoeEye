@@ -229,19 +229,31 @@
 
           <Grid.RowDefinitions>
             <RowDefinition Height="*" />
-
             <!-- Trying to fix WPF resize flickering -->
             <RowDefinition Height="Auto" MinHeight="20" />
           </Grid.RowDefinitions>
 
-          <Border Grid.Column="0"
+          <Border Grid.Row="0" Grid.Column="0"
                   BorderThickness="1"
                   BorderBrush="{StaticResource TradeMonitorBorderBrushKey}"
                   Background="{StaticResource TradeMonitorTitleBackgroundBrushKey}"
                   Visibility="{Binding NegotiationsOverflow, Converter={StaticResource Int32GreaterThanZeroToVisibleConverterKey}}"
                   Margin="3,1">
             <Grid>
-              <TextBlock Style="{StaticResource TradeMonitorTextBlockStyleKey}"
+              <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+              </Grid.RowDefinitions>
+              
+              <Button fa:Awesome.Content="Close"
+                      Foreground="{StaticResource TextBrush}"
+                      Command="{Binding CloseAllNegotiations}"
+                      ToolTip="Close all negotiations"
+                      FontSize="9" Width="20" Height="20" Padding="0"
+                      Margin="2,2" />
+              
+              <TextBlock Grid.Row="1" 
+                         Style="{StaticResource TradeMonitorTextBlockStyleKey}"
                          Text="{Binding Negotiations.Count}"
                          VerticalAlignment="Top"
                          HorizontalAlignment="Center"
@@ -249,7 +261,8 @@
                          FontWeight="Bold"
                          Foreground="{StaticResource TradeMonitorTextBrushKey}"
                          Visibility="{Binding IsExpanded, Converter={StaticResource TrueToVisibleFalseToCollapsedConverter}}" />
-              <TextBlock Style="{StaticResource TradeMonitorTextBlockStyleKey}"
+              <TextBlock Grid.Row="1" 
+                         Style="{StaticResource TradeMonitorTextBlockStyleKey}"
                          Text="{Binding NegotiationsOverflow, StringFormat='+{0}'}"
                          VerticalAlignment="Top"
                          HorizontalAlignment="Center"
@@ -258,7 +271,8 @@
                          Foreground="{StaticResource TradeMonitorTextBrushKey}"
                          Visibility="{Binding IsExpanded, Converter={StaticResource TrueToCollapsedFalseToVisibleConverter}}" />
 
-              <ToggleButton IsChecked="{Binding IsExpanded}"
+              <ToggleButton Grid.Row="1" 
+                            IsChecked="{Binding IsExpanded}"
                             Background="Transparent">
                 <ToggleButton.Style>
                   <Style TargetType="{x:Type ToggleButton}">

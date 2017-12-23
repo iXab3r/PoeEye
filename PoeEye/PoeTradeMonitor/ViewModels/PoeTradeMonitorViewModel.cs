@@ -84,6 +84,7 @@ namespace PoeEye.TradeMonitor.ViewModels
             CreateFakeTradeCommand = new DelegateCommand(CreateFakeCommandExecuted);
             closeNegotiationCommand = new DelegateCommand<INegotiationViewModel>(CloseNegotiationCommandExecuted);
             LockWindowCommand = new DelegateCommand(LockWindowCommandExecuted);
+            CloseAllNegotiations = new DelegateCommand(CloseAllNegotiationsCommandExecuted);
 
             //FIXME Spaghetti code
             WhenLoaded.Subscribe(
@@ -128,7 +129,7 @@ namespace PoeEye.TradeMonitor.ViewModels
                         .AddTo(Anchors);
                 }).AddTo(Anchors);
         }
-
+        
         public IObservableCollection<INegotiationViewModel> Negotiations { get; } = new ObservableCollectionExtended<INegotiationViewModel>();
 
         public ICommand CloseNegotiationCommand => closeNegotiationCommand;
@@ -136,6 +137,8 @@ namespace PoeEye.TradeMonitor.ViewModels
         public ICommand CreateFakeTradeCommand { get; }
 
         public ICommand LockWindowCommand { get; }
+        
+        public ICommand CloseAllNegotiations { get; }
 
         public bool ExpandOnHover
         {
@@ -169,6 +172,16 @@ namespace PoeEye.TradeMonitor.ViewModels
             set { this.RaiseAndSetIfChanged(ref opacity, value); }
         }
 
+        private void CloseAllNegotiationsCommandExecuted()
+        {
+            Log.Instance.Debug($"[PoeTradeMonitorViewModel.CloseAllNegotiations] Closing all negotiations");
+
+            foreach (var negotiation in negotiationsList.Items)
+            {
+                CloseNegotiationCommandExecuted(negotiation);
+            }
+        }
+        
         private void ProcessMessage(TradeModel model)
         {
             var existingModel = negotiationsList.Items
