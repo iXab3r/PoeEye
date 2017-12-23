@@ -30,13 +30,13 @@ namespace PoeEye.PoeTrade.ViewModels
 
         ICommand RenameCommand { [NotNull] get; }
 
-        IPoeApiWrapper SelectedApi { get; }
+        IPoeApiWrapper SelectedApi { [CanBeNull] get; }
 
         AudioNotificationType SelectedAudioNotificationType { get; }
 
-        IPoeQueryViewModel Query { get; }
+        IPoeQueryViewModel Query { [NotNull] get; }
 
-        string TabName { get; }
+        string TabName { [NotNull] get; }
 
         void Load(PoeEyeTabConfig config);
 

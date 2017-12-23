@@ -37,6 +37,7 @@ namespace PoeEye.PoeTrade.ViewModels
         private readonly ReactiveCommand<object> refreshCommand;
         private readonly ReactiveCommand<object> newSearchCommand;
         private readonly DelegateCommand<string> renameCommand;
+        private readonly DelegateCommand resetCommand;
 
         private readonly string defaultTabName;
 
@@ -83,25 +84,33 @@ namespace PoeEye.PoeTrade.ViewModels
             audioNotificationSelector.AddTo(Anchors);
 
             renameCommand = new DelegateCommand<string>(RenameCommandExecuted);
+            resetCommand = new DelegateCommand(ResetCommandExecuted, ResetCommandCanExecute);
+            this.WhenAnyValue(x => x.SelectedApi).Subscribe(() => resetCommand.RaiseCanExecuteChanged()).AddTo(Anchors);
 
             markAllAsReadCommand = ReactiveUI.Legacy.ReactiveCommand.Create();
             markAllAsReadCommand.Subscribe(MarkAllAsReadExecute);
 
-            refreshCommand = ReactiveUI.Legacy.ReactiveCommand.Create(this.WhenAnyValue(x => x.IsBusy).Select(x => !x));
+            var selectedApiIsAvailable = this
+                .WhenAnyValue(x => x.SelectedApi)
+                .Select(x => x == null ? Observable.Return(false) : x.WhenAnyValue(y => y.IsAvailable))
+                .Switch()
+                .Publish();
+
+            refreshCommand = ReactiveUI.Legacy.ReactiveCommand.Create(this.WhenAnyValue(x => x.IsBusy).Select(x => !x).Merge(selectedApiIsAvailable));
             refreshCommand.Subscribe(RefreshCommandExecuted);
 
-            newSearchCommand = ReactiveUI.Legacy.ReactiveCommand.Create(this.WhenAnyValue(x => x.IsBusy).Select(x => !x));
+            newSearchCommand = ReactiveUI.Legacy.ReactiveCommand.Create(selectedApiIsAvailable);
             newSearchCommand.Subscribe(NewSearchCommandExecuted);
 
-            apiSelector
-                .WhenAnyValue(x => x.SelectedModule)
+            this
+                .WhenAnyValue(x => x.SelectedApi)
                 .Where(x => x != null)
                 .Subscribe(ReinitializeApi)
                 .AddTo(Anchors);
 
             this.BindPropertyTo(x => x.SelectedApi, apiSelector, x => x.SelectedModule).AddTo(Anchors);
             this.BindPropertyTo(x => x.SelectedAudioNotificationType, audioNotificationSelector, x => x.SelectedValue).AddTo(Anchors);
-
+            
             this.WhenAnyValue(x => x.NewItemsCount)
                 .DistinctUntilChanged()
                 .Where(x => x > 0)
@@ -111,6 +120,8 @@ namespace PoeEye.PoeTrade.ViewModels
                     x => audioNotificationsManager.PlayNotification(audioNotificationSelector.SelectedValue),
                     Log.HandleException)
                 .AddTo(Anchors);
+
+            selectedApiIsAvailable.Connect().AddTo(Anchors);
         }
 
         public IPoeApiSelectorViewModel ApiSelector { get; }
@@ -143,6 +154,8 @@ namespace PoeEye.PoeTrade.ViewModels
         public ICommand MarkAllAsReadCommand => markAllAsReadCommand;
 
         public ICommand RenameCommand => renameCommand;
+        
+        public ICommand ResetCommand => resetCommand;
 
         public bool IsBusy => TradesList.IsBusy;
 
@@ -192,7 +205,7 @@ namespace PoeEye.PoeTrade.ViewModels
             }
 
             AudioNotificationSelector.SelectedValue = config.NotificationType;
-            tabName.SetValue(config.CustomTabName);
+            RenameTabTo(config.CustomTabName);
         }
 
         public PoeEyeTabConfig Save()
@@ -207,6 +220,18 @@ namespace PoeEye.PoeTrade.ViewModels
                 ApiModuleId = ApiSelector.SelectedModule.Id.ToString(),
                 CustomTabName = tabName.HasValue ? tabName.Value : null
             };
+        }
+        
+        private void ResetCommandExecuted()
+        {
+            Log.Instance.Debug($"Resetting query parameters of tab {tabName.Value}");
+            Query = queryFactory.Create(SelectedApi);
+            ReinitializeApi(SelectedApi);
+        }
+        
+        private bool ResetCommandCanExecute()
+        {
+            return SelectedApi != null;
         }
 
         private void RenameCommandExecuted(string value)
@@ -245,8 +270,9 @@ namespace PoeEye.PoeTrade.ViewModels
             Guard.ArgumentNotNull(api, nameof(api));
             var anchors = new CompositeDisposable();
             tradesListAnchors.Disposable = anchors;
-
-            var existingQuery = query;
+            TradesList?.Dispose();
+            
+            var existingQuery = Query;
             var newQuery = queryFactory.Create(api);
             if (existingQuery != null)
             {
@@ -254,7 +280,6 @@ namespace PoeEye.PoeTrade.ViewModels
             }
             Query = newQuery;
 
-            TradesList?.Dispose();
             TradesList = tradesListFactory.Create(api);
             tradesList.AddTo(anchors);
 
@@ -333,9 +358,15 @@ namespace PoeEye.PoeTrade.ViewModels
             }
         }
 
-        private void RunNewSearch(IPoeQueryInfo query)
+        private void ResetTradesList()
         {
             TradesList.Clear();
+            TradesList.ActiveQuery = null;
+        }
+
+        private void RunNewSearch(IPoeQueryInfo query)
+        {
+            ResetTradesList();
             TradesList.ActiveQuery = query;
             Query.IsExpanded = false;
 

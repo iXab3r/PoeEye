@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.Reactive.Subjects;
 using DynamicData;
 using PoeEye.PoeTrade.Common;
 
@@ -42,10 +43,14 @@ namespace PoeEye.PoeTrade.ViewModels
 
         private readonly IClock clock;
         private readonly IEqualityComparer<IPoeItem> poeItemsComparer;
+        [NotNull] private readonly IPoeApiWrapper poeApiWrapper;
+        [NotNull] private readonly IFactory<IPoeLiveHistoryProvider, IPoeApiWrapper, IPoeQueryInfo> poeLiveHistoryFactory;
         private readonly IFactory<IPoeTradeViewModel, IPoeItem> poeTradeViewModelFactory;
         private readonly IScheduler uiScheduler;
         private readonly ISourceList<IPoeTradeViewModel> itemsSource = new SourceList<IPoeTradeViewModel>();
         private readonly ReadOnlyObservableCollection<IPoeTradeViewModel> items;
+        
+        private readonly ISubject<IPoeItem[]> defaultItemSource = new Subject<IPoeItem[]>();
 
         private ActiveProviderInfo activeProviderInfo;
         private IPoeQueryInfo activeQuery;
@@ -75,6 +80,8 @@ namespace PoeEye.PoeTrade.ViewModels
             Guard.ArgumentNotNull(clock, nameof(clock));
             Guard.ArgumentNotNull(uiScheduler, nameof(uiScheduler));
 
+            this.poeApiWrapper = poeApiWrapper;
+            this.poeLiveHistoryFactory = poeLiveHistoryFactory;
             this.poeTradeViewModelFactory = poeTradeViewModelFactory;
             this.poeItemsComparer = poeItemsComparer;
             this.uiScheduler = uiScheduler;
@@ -84,7 +91,7 @@ namespace PoeEye.PoeTrade.ViewModels
             HistoricalTrades = historicalTrades;
 
             Anchors.Add(activeHistoryProviderDisposable);
-
+            
             this.WhenAnyValue(x => x.ActiveQuery)
                 .DistinctUntilChanged()
                 .WithPrevious((prev, curr) => new { prev, curr })
@@ -97,11 +104,8 @@ namespace PoeEye.PoeTrade.ViewModels
                         }
                     })
                 .Select(x => x.curr)
-                .Where(x => x != null)
                 .Do(_ => lastUpdateTimestamp = clock.Now)
-                .Select(x => poeLiveHistoryFactory.Create(poeApiWrapper, x))
-                .Do(OnNextHistoryProviderCreated)
-                .Select(x => x.ItemsPacks)
+                .Select(HandleNextQuery)
                 .Switch()
                 .ObserveOn(uiScheduler)
                 .Subscribe(OnNextItemsPackReceived, Log.HandleException)
@@ -210,6 +214,21 @@ namespace PoeEye.PoeTrade.ViewModels
                 }
             }
             lastUpdateTimestamp = clock.Now;
+        }
+
+        private IObservable<IPoeItem[]> HandleNextQuery(IPoeQueryInfo queryInfo)
+        {
+            if (queryInfo == null)
+            {
+                activeHistoryProviderDisposable.Disposable = null;
+                return Observable.Never<IPoeItem[]>();
+            }
+            else
+            {
+                var historyProvider = poeLiveHistoryFactory.Create(poeApiWrapper, queryInfo);
+                OnNextHistoryProviderCreated(historyProvider);
+                return historyProvider.ItemsPacks;
+            }
         }
 
         private void OnNextHistoryProviderCreated(IPoeLiveHistoryProvider poeLiveHistoryProvider)

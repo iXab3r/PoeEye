@@ -48,13 +48,14 @@
           </Expander.Header>
 
           <Grid>
-            <StackPanel Orientation="Vertical">
-              <StackPanel.IsEnabled>
-                <Binding Path="ApiSelector.SelectedModule.IsAvailable" TargetNullValue="False" />
-              </StackPanel.IsEnabled>
+            <StackPanel Orientation="Vertical"
+                        IsEnabled="{Binding Path=ApiSelector.SelectedModule.IsAvailable, TargetNullValue=False}">
               <controls:MetroContentControl Content="{Binding Query}" />
+              
               <DockPanel>
-                <Button HorizontalAlignment="Right" Width="150" Command="{Binding NewSearchCommand}"
+                <Button DockPanel.Dock="Left" HorizontalAlignment="Left" Width="150" Command="{Binding ResetCommand}"
+                        Content="Reset" />
+                <Button DockPanel.Dock="Right" HorizontalAlignment="Right" Width="150" Command="{Binding NewSearchCommand}"
                         IsDefault="True"
                         CommandParameter="{Binding Query.PoeQueryBuilder}"
                         Content="Search" />
