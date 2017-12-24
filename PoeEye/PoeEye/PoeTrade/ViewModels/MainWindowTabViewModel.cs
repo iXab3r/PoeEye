@@ -91,7 +91,10 @@ namespace PoeEye.PoeTrade.ViewModels
 
             refreshCommand = new DelegateCommand<object>(RefreshCommandExecuted, RefreshCommandCanExecute);
             newSearchCommand = new DelegateCommand<object>(NewSearchCommandExecuted, NewSearchCommandCanExecute);
-            this.WhenAnyValue(x => x.IsBusy, x => x.SelectedApi)
+            
+            Observable.Merge(
+                this.WhenAnyValue(x => x.IsBusy, x => x.SelectedApi).ToUnit(),
+                this.WhenAnyValue(x => x.SelectedApi).Select(x => x.WhenAnyValue(y => y.IsAvailable)).Switch().ToUnit())
                 .Subscribe(
                     () =>
                     {
