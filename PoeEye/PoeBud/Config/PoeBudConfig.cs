@@ -31,7 +31,7 @@ namespace PoeBud.Config
 
         public TimeSpan UserActionDelay { get; } = TimeSpan.FromMilliseconds(100);
 
-        public ICollection<string> StashesToProcess { get; set; } = new HashSet<string>();
+        public string[] StashesToProcess { get; set; } = new string[0];
 
         public string GetChaosSetHotkey { get; set; } = "None";
 

@@ -185,7 +185,7 @@ namespace PoeEye.TradeMonitor.Services
             public string LoginEmail => config.LoginEmail;
             public string SessionId => config.SessionId;
             public string LeagueId => config.LeagueId;
-            public ICollection<string> StashesToProcess { get; } = new string[0];
+            public string[] StashesToProcess { get; } = new string[0];
         }
     }
 }

@@ -17,6 +17,7 @@ namespace PoeBud.Models
         {
             this.clock = clock;
             this.parameters = parameters;
+            LogTo.Debug($"[League {parameters.LeagueId}] Strategy is to process the following tabs: {parameters.StashesToProcess.DumpToTextRaw()}");
         }
 
         public IStashTab[] GetTabsToProcess(IEnumerable<IStashTab> tabs)
@@ -24,7 +25,7 @@ namespace PoeBud.Models
             var publicTabs = tabs
                 .EmptyIfNull()
                 .Where(x => !x.Hidden)
-                .Where(x => parameters.StashesToProcess.Count == 0 || parameters.StashesToProcess.Contains(x.Name))
+                .Where(x => parameters.StashesToProcess.Count() == 0 || parameters.StashesToProcess.Contains(x.Name))
                 .ToArray();
             LogTo.Debug($"Public tabs to process: {publicTabs.Select(x => x.Name).DumpToTextRaw()}");
             return publicTabs;

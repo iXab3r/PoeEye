@@ -11,6 +11,6 @@ namespace PoeBud.Models
         
         string LeagueId { [CanBeNull] get; }
 
-        ICollection<string> StashesToProcess { [CanBeNull] get; }
+        string[] StashesToProcess { [CanBeNull] get; }
     }   
 }
