@@ -30,6 +30,7 @@ namespace PoeEye.TradeMonitor.Services
         private readonly SerialDisposable stashUpdaterDisposable = new SerialDisposable();
         private readonly IClock clock;
         private readonly IFactory<IPoeStashUpdater, IStashUpdaterParameters> stashUpdaterFactory;
+        [NotNull] private readonly IFactory<IDefaultStashUpdaterStrategy, IStashUpdaterParameters> stashUpdaterStrategyFactory;
         private readonly BehaviorSubject<StashUpdate> stashUpdates = new BehaviorSubject<StashUpdate>(null);
 
         private IPoeStashUpdater activeUpdater;
@@ -39,18 +40,21 @@ namespace PoeEye.TradeMonitor.Services
             [NotNull] IConfigProvider<PoeBudConfig> poeBudConfigProvider,
             [NotNull] IConfigProvider<PoeTradeMonitorConfig> tradeMonitorConfigProvider,
             [NotNull] IFactory<IPoeStashUpdater, IStashUpdaterParameters> stashUpdaterFactory,
+            [NotNull] IFactory<IDefaultStashUpdaterStrategy, IStashUpdaterParameters> stashUpdaterStrategyFactory,
             [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler,
             [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler)
         {
             Guard.ArgumentNotNull(clock, nameof(clock));
             Guard.ArgumentNotNull(poeBudConfigProvider, nameof(poeBudConfigProvider));
             Guard.ArgumentNotNull(tradeMonitorConfigProvider, nameof(tradeMonitorConfigProvider));
+            Guard.ArgumentNotNull(stashUpdaterStrategyFactory, nameof(stashUpdaterStrategyFactory));
             Guard.ArgumentNotNull(stashUpdaterFactory, nameof(stashUpdaterFactory));
             Guard.ArgumentNotNull(bgScheduler, nameof(bgScheduler));
             Guard.ArgumentNotNull(uiScheduler, nameof(uiScheduler));
 
             this.clock = clock;
             this.stashUpdaterFactory = stashUpdaterFactory;
+            this.stashUpdaterStrategyFactory = stashUpdaterStrategyFactory;
 
             Observable.CombineLatest(
                     tradeMonitorConfigProvider.WhenChanged, 
@@ -141,7 +145,7 @@ namespace PoeEye.TradeMonitor.Services
                 }
 
                 var parameters = new StashUpdaterParameters(config);
-                var strategy = new UpdaterStrategy(clock);
+                var strategy = stashUpdaterStrategyFactory.Create(parameters);
 
                 var updater = stashUpdaterFactory.Create(parameters);
                 stashDisposable.Add(updater);
@@ -180,44 +184,8 @@ namespace PoeEye.TradeMonitor.Services
 
             public string LoginEmail => config.LoginEmail;
             public string SessionId => config.SessionId;
-            public string CharacterName => config.CharacterName;
-            public ICollection<int> StashesToProcess { get; } = new List<int>();
-        }
-
-        private sealed class UpdaterStrategy : IStashUpdaterStrategy
-        {
-            private readonly IClock clock;
-            private ILeague[] leaguesToProcess;
-
-            public UpdaterStrategy(IClock clock)
-            {
-                this.clock = clock;
-            }
-
-            public IStashTab[] GetTabsToProcess(IEnumerable<IStashTab> tabs)
-            {
-                Guard.ArgumentNotNull(tabs, nameof(tabs));
-
-                var publicTabs = tabs
-                    .Where(x => !x.Hidden)
-                    .ToArray();
-                LogTo.Debug($"Public tabs list: {publicTabs.DumpToText()}");
-                return publicTabs;
-            }
-
-            public ILeague[] GetLeaguesToProcess(IEnumerable<ILeague> leagues)
-            {
-                leaguesToProcess = leagues
-                    .Where(x => x.StartAt <= clock.Now && x.EndAt >= clock.Now)
-                    .ToArray();
-                LogTo.Debug($"Leagues to process: {leaguesToProcess.DumpToText()}");
-                return leaguesToProcess.ToArray();
-            }
-
-            public ILeague[] GetDefaultLeaguesList()
-            {
-                return leaguesToProcess ?? new ILeague[0];
-            }
+            public string LeagueId => config.LeagueId;
+            public ICollection<string> StashesToProcess { get; } = new string[0];
         }
     }
 }

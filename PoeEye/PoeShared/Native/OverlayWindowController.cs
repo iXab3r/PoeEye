@@ -225,7 +225,7 @@ namespace PoeShared.Native
 
         private void SetVisibility(bool isVisible)
         {
-            Log.Instance.Debug($"[OverlayWindowController] Overlay IsVisible = {IsVisible} => {isVisible} (tracker {windowTracker})");
+            Log.Instance.Trace($"[OverlayWindowController] Overlay IsVisible = {IsVisible} => {isVisible} (tracker {windowTracker})");
             IsVisible = isVisible;
         }
 

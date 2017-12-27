@@ -19,7 +19,7 @@ namespace PoeBud.Config
         [JsonConverter(typeof(SafeDataConverter))]
         public string SessionId { get; set; }
 
-        public string CharacterName { get; set; }
+        public string LeagueId { get; set; }
 
         public string UiOverlayName { get; set; }
 
@@ -31,8 +31,10 @@ namespace PoeBud.Config
 
         public TimeSpan UserActionDelay { get; } = TimeSpan.FromMilliseconds(100);
 
-        public ICollection<int> StashesToProcess { get; set; } = new HashSet<int>();
+        public ICollection<string> StashesToProcess { get; set; } = new HashSet<string>();
 
         public string GetChaosSetHotkey { get; set; } = "None";
+
+        public int Version { get; set; } = 2;
     }
 }

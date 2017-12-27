@@ -8,7 +8,7 @@ namespace PoeBud.Config
 
     using JetBrains.Annotations;
 
-    public interface IPoeBudConfig : IPoeEyeConfig, IStashUpdaterParameters
+    public interface IPoeBudConfig : IPoeEyeConfigVersioned, IStashUpdaterParameters
     {
         bool HideXpBar { get; }
 

@@ -1,4 +1,5 @@
 using Guards;
+using JetBrains.Annotations;
 using PoeShared.StashApi.DataTypes;
 
 namespace PoeBud.Models
@@ -16,8 +17,8 @@ namespace PoeBud.Models
             Tabs = tabs;
         }
 
-        public IStashItem[] Items { get; } 
+        public IStashItem[] Items { [NotNull] get; } 
 
-        public IStashTab[] Tabs { get; } 
+        public IStashTab[] Tabs { [NotNull] get; } 
     }
 }

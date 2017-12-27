@@ -107,32 +107,6 @@ namespace PoeShared.Communications.Chromium
 
             return browserFactory.Create(browserInstance).AddTo(Anchors);
         }
-
-        private static void DisplayBitmap(Task<Bitmap> task)
-        {
-            // Make a file to save it to (e.g. C:\Users\jan\Desktop\CefSharp screenshot.png)
-            var screenshotPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "CefSharp screenshot" + DateTime.Now.Ticks + ".png");
-
-            Console.WriteLine();
-            Console.WriteLine("Screenshot ready. Saving to {0}", screenshotPath);
-
-            var bitmap = task.Result;
-
-            // Save the Bitmap to the path.
-            // The image type is auto-detected via the ".png" extension.
-            bitmap.Save(screenshotPath);
-
-            // We no longer need the Bitmap.
-            // Dispose it to avoid keeping the memory alive.  Especially important in 32-bit applications.
-            bitmap.Dispose();
-
-            Console.WriteLine("Screenshot saved.  Launching your default image viewer...");
-
-            // Tell Windows to launch the saved image.
-            Process.Start(screenshotPath);
-
-            Console.WriteLine("Image viewer launched.  Press any key to exit.");
-        }
     }
 }
     

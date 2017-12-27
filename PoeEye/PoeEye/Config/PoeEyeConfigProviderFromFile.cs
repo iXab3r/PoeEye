@@ -14,6 +14,7 @@ using PoeShared;
 using PoeShared.Modularity;
 using PoeShared.Scaffolding;
 using ReactiveUI;
+using ErrorEventArgs = Newtonsoft.Json.Serialization.ErrorEventArgs;
 
 namespace PoeEye.Config
 {
@@ -135,7 +136,7 @@ namespace PoeEye.Config
             catch (Exception ex)
             {
                 Log.Instance.Warn(
-                    $"[PoeEyeConfigProviderFromFile.Save] Exception occurred, config was not save correctly",
+                    $"[PoeEyeConfigProviderFromFile.Save] Exception occurred, config was not saved correctly",
                     ex);
             }
         }
@@ -168,6 +169,7 @@ namespace PoeEye.Config
             catch (Exception ex)
             {
                 Log.Instance.Warn($"[PoeEyeConfigProviderFromFile.Load] Could not deserialize config data, default config will be used", ex);
+                CreateBackupOfConfig();
             }
             return result ?? new PoeEyeCombinedConfig();
         }
@@ -179,16 +181,47 @@ namespace PoeEye.Config
             converters.Add(converter);
         }
 
+        private void CreateBackupOfConfig()
+        {
+            try
+            {
+                if (!File.Exists(configFilePath))
+                {
+                    return;
+                }
+                
+                var backupFileName = Path.Combine(Path.GetDirectoryName(configFilePath), $"{Path.GetFileNameWithoutExtension(configFilePath)}.bak{Path.GetExtension(configFilePath)}");
+                Log.Instance.Debug($"[PoeEyeConfigProviderFromFile.Load] Creating a backup of existing config data '{configFilePath}' to '{backupFileName}'");
+                File.Copy(configFilePath, backupFileName);
+            }
+            catch (Exception ex)
+            {
+                Log.Instance.Warn($"[PoeEyeConfigProviderFromFile.CreateBackupOfConfig] Failed to create a backup", ex);
+            }
+        }
+        
         private void ReinitializeSerializerSettings()
         {
             jsonSerializerSettings = new JsonSerializerSettings
             {
                 Formatting = Formatting.Indented,
                 TypeNameHandling = TypeNameHandling.All,
-                TypeNameAssemblyFormat = System.Runtime.Serialization.Formatters.FormatterAssemblyStyle.Simple
+                TypeNameAssemblyFormat = System.Runtime.Serialization.Formatters.FormatterAssemblyStyle.Simple,
+                Error = HandleSerializerError
             };
 
             converters.ToList().ForEach(jsonSerializerSettings.Converters.Add);
+        }
+        
+        private void HandleSerializerError(object sender, ErrorEventArgs args)
+        {
+            if (sender == null || args == null)
+            {
+                return;
+            }
+            //FIXME Serializer errors should be treated appropriately, e.g. load value from default config on error
+            Log.Instance.Warn($"[PoeEyeConfigProviderFromFile.SerializerError] Suppresing serializer error ! Path: {args.ErrorContext.Path}, Member: {args.ErrorContext.Member}, Handled: {args.ErrorContext.Handled}", args.ErrorContext.Error);
+            args.ErrorContext.Handled = true;
         }
 
         private sealed class PoeEyeCombinedConfig

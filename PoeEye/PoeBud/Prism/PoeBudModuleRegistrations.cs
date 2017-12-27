@@ -25,6 +25,7 @@ namespace PoeBud.Prism
                 .RegisterSingleton<IUiOverlaysProvider, UiOverlaysProvider>();
 
             Container
+                .RegisterType<IDefaultStashUpdaterStrategy, UpdaterDefaultProcessAllStrategy>()
                 .RegisterType<IUserInputBlocker, UserInputBlocker>()
                 .RegisterType<IPoeStashUpdater, PoeStashUpdater>()
                 .RegisterType<ISolutionExecutorViewModel, SolutionExecutorViewModel>()

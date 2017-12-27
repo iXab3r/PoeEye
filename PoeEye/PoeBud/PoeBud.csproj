@@ -218,6 +218,7 @@
     <Compile Include="Converters\IsGreaterThanValueToBooleanConverter.cs" />
     <Compile Include="Converters\NullToBoolConverter.cs" />
     <Compile Include="Converters\VisibilityToBoolean.cs" />
+    <Compile Include="Models\IDefaultStashUpdaterStrategy.cs" />
     <Compile Include="Models\IPoeStashUpdater.cs" />
     <Compile Include="Models\IPoeTradeItem.cs" />
     <Compile Include="Models\IPoeTradeSolution.cs" />
@@ -233,6 +234,7 @@
     <Compile Include="Models\StashUpdate.cs" />
     <Compile Include="Models\IStashUpdaterParameters.cs" />
     <Compile Include="Models\UiOverlaysProvider.cs" />
+    <Compile Include="Models\UpdaterDefaultProcessAllStrategy.cs" />
     <Compile Include="Models\UserInteractionsManager.cs" />
     <Compile Include="Models\PoeWIndow.cs" />
     <Compile Include="Models\PoeWindowManager.cs" />

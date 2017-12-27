@@ -9,8 +9,8 @@ namespace PoeBud.Models
         
         string SessionId { [CanBeNull] get; }
         
-        string CharacterName { [CanBeNull] get; }
+        string LeagueId { [CanBeNull] get; }
 
-        ICollection<int> StashesToProcess { [CanBeNull] get; }
+        ICollection<string> StashesToProcess { [CanBeNull] get; }
     }   
 }

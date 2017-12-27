@@ -58,7 +58,7 @@ namespace PoeShared.Communications.Chromium {
         
         private void InstanceOnConsoleMessage(object sender, ConsoleMessageEventArgs args)
         {
-            Log.Instance.Debug($"[Chromium{Id} Console] Line #{args.Line}, Source: {args.Source}, Message: {args.Message}");
+            Log.Instance.Trace($"[Chromium{Id} Console] Line #{args.Line}, Source: {args.Source}, Message: {args.Message}");
         }
 
         public string Address => instance.Address;
@@ -98,7 +98,7 @@ namespace PoeShared.Communications.Chromium {
             js.AppendLine($"document.body.innerHTML = '{formBuilder}';");
             js.AppendLine($"document.getElementById(\"dynForm\").submit();");
 
-            Log.Instance.Debug($"[Chromium{Id}] Executing JS\n{js}");
+            Log.Instance.Trace($"[Chromium{Id}] Executing JS\n{js}");
             
             var executeScript = Load(() => instance.ExecuteScriptAsync(js.ToString()));
             return executeScript.ContinueWith(task => DumpSource());
@@ -107,7 +107,7 @@ namespace PoeShared.Communications.Chromium {
         private Task DumpSource()
         {
             return instance.GetSourceAsync()
-                .ContinueWith(source => Log.Instance.Debug($"[ChromiumBootstrapper] Source @ {instance.Address}: \n{source.Result}"));
+                .ContinueWith(source => Log.Instance.Trace($"[Chromium{Id}] Source @ {instance.Address}: \n{source.Result}"));
         }
         
         private Task GetInternal(string uri)
@@ -205,12 +205,12 @@ namespace PoeShared.Communications.Chromium {
             {
                 if (args.Frame.Identifier != args.Browser.MainFrame.Identifier)
                 {
-                    Log.Instance.Debug(
+                    Log.Instance.Trace(
                         $"[Chromium{Id}.Frame#{args.Frame.Identifier} LoadStart] TransitionType: {args.TransitionType}, uri: {args.Url}");
                 }
                 else
                 {
-                    Log.Instance.Debug(
+                    Log.Instance.Trace(
                         $"[Chromium{Id}.Frame#{args.Frame.Identifier} LoadStart] MainFrame loaded, TransitionType: {args.TransitionType}, uri: {args.Url}");
                 }
             }
@@ -219,12 +219,12 @@ namespace PoeShared.Communications.Chromium {
             {
                 if (args.Frame.Identifier != args.Browser.MainFrame.Identifier)
                 {
-                    Log.Instance.Debug(
+                    Log.Instance.Trace(
                         $"[Chromium{Id}.Frame#{args.Frame.Identifier} LoadEnd] StatusCode: {args.HttpStatusCode}, uri: {args.Url}");
                 }
                 else
                 {
-                    Log.Instance.Debug(
+                    Log.Instance.Trace(
                         $"[Chromium{Id}.Frame#{args.Frame.Identifier} LoadEnd] MainFrame loaded, StatusCode: {args.HttpStatusCode}, uri: {args.Url}");
                     
                     

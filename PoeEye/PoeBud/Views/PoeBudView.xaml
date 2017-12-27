@@ -42,7 +42,8 @@
                             Style="{StaticResource IconTextBlock}" TextTrimming="WordEllipsis" />
                     </Grid>
 
-                    <Grid Grid.Row="2" Grid.Column="0">
+                    <Grid Grid.Row="2" Grid.Column="0"
+                          Visibility="{Binding StashUpdater, Converter={StaticResource NullToCollapsedConverter}, TargetNullValue={x:Static Visibility.Collapsed}}">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="Auto" />

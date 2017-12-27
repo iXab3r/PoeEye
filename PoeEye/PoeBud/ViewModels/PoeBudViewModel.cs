@@ -9,6 +9,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using Anotar.Log4Net;
 using Gma.System.MouseKeyHook;
 using Guards;
 using JetBrains.Annotations;
@@ -37,6 +38,7 @@ namespace PoeBud.ViewModels
         private readonly IUiOverlaysProvider overlaysProvider;
         private readonly ObservableAsPropertyHelper<Exception> lastUpdateException;
         private readonly IFactory<IPoeStashUpdater, IStashUpdaterParameters> stashAnalyzerFactory;
+        [NotNull] private readonly IFactory<IDefaultStashUpdaterStrategy, IStashUpdaterParameters> stashUpdaterStrategyFactory;
         private readonly IFactory<StashViewModel, StashUpdate, IPoeBudConfig> stashUpdateFactory;
         private readonly SerialDisposable stashUpdaterDisposable = new SerialDisposable();
         private readonly IScheduler uiScheduler;
@@ -60,6 +62,7 @@ namespace PoeBud.ViewModels
             [NotNull] IUserInteractionsManager userInteractionsManager,
             [NotNull] IUiOverlaysProvider overlaysProvider,
             [NotNull] IFactory<IPoeStashUpdater, IStashUpdaterParameters> stashAnalyzerFactory,
+            [NotNull] IFactory<IDefaultStashUpdaterStrategy, IStashUpdaterParameters> stashUpdaterStrategyFactory,
             [NotNull] IFactory<StashViewModel, StashUpdate, IPoeBudConfig> stashUpdateFactory,
             [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {
@@ -67,6 +70,7 @@ namespace PoeBud.ViewModels
             Guard.ArgumentNotNull(solutionExecutor, nameof(solutionExecutor));
             Guard.ArgumentNotNull(overlaysProvider, nameof(overlaysProvider));
             Guard.ArgumentNotNull(userInteractionsManager, nameof(userInteractionsManager));
+            Guard.ArgumentNotNull(stashUpdaterStrategyFactory, nameof(stashUpdaterStrategyFactory));
             Guard.ArgumentNotNull(poeBudConfigProvider, nameof(poeBudConfigProvider));
             Guard.ArgumentNotNull(keyboardMouseEvents, nameof(keyboardMouseEvents));
             Guard.ArgumentNotNull(clock, nameof(clock));
@@ -74,11 +78,12 @@ namespace PoeBud.ViewModels
             Guard.ArgumentNotNull(stashUpdateFactory, nameof(stashUpdateFactory));
             Guard.ArgumentNotNull(uiScheduler, nameof(uiScheduler));
 
-            OverlayMode = OverlayMode.Transparent;
+            OverlayMode = OverlayMode.Layered;
             this.clock = clock;
             this.keyboardMouseEvents = keyboardMouseEvents;
             this.overlaysProvider = overlaysProvider;
             this.stashAnalyzerFactory = stashAnalyzerFactory;
+            this.stashUpdaterStrategyFactory = stashUpdaterStrategyFactory;
             this.stashUpdateFactory = stashUpdateFactory;
             this.uiScheduler = uiScheduler;
 
@@ -136,7 +141,7 @@ namespace PoeBud.ViewModels
             set { this.RaiseAndSetIfChanged(ref stash, value); }
         }
 
-        public string CharacterName => actualConfig?.CharacterName;
+        public string League => actualConfig?.LeagueId;
 
         public TimeSpan TimeTillNextUpdate
             =>
@@ -152,7 +157,7 @@ namespace PoeBud.ViewModels
             UiOverlayPath = overlaysProvider.OverlaysList.FirstOrDefault(x => x.Name == config.UiOverlayName).AbsolutePath;
             hotkey = KeyGestureExtensions.SafeCreateGesture(config.GetChaosSetHotkey);
             RefreshStashUpdater(actualConfig);
-            this.RaisePropertyChanged(nameof(CharacterName));
+            this.RaisePropertyChanged(nameof(League));
         }
 
         private void RefreshStashUpdater(PoeBudConfig config)
@@ -205,6 +210,9 @@ namespace PoeBud.ViewModels
                 var updater = stashAnalyzerFactory.Create(config);
                 stashDisposable.Add(updater);
 
+                var strategy = stashUpdaterStrategyFactory.Create(config);
+                updater.SetStrategy(strategy);
+
                 Observable.Timer(DateTimeOffset.Now, UpdateTimeout)
                     .ToUnit()
                     .Merge(updater.WhenAnyValue(x => x.LastUpdateTimestamp).ToUnit())
@@ -244,7 +252,7 @@ namespace PoeBud.ViewModels
                 Log.Instance.Debug($"[MainViewModel] Duplicate update arrived, skipping update");
                 return;
             }
-            Log.Instance.Debug($"[MainViewModel] Update arrived");
+            LogTo.Debug($"[MainViewModel] Stash update arrived, tabs: {stashUpdate.Tabs.Count()}, items: {stashUpdate.Items.Count()}");
 
             lastServerStashUpdate = stashUpdate;
             Stash = stashUpdateFactory.Create(stashUpdate, config);
@@ -296,12 +304,14 @@ namespace PoeBud.ViewModels
             var solutionToExecute = stashSnapshot?.Solutions.FirstOrDefault();
             if (solutionToExecute == null)
             {
+                SolutionExecutor.LogOperation("Failed to find a solution, not enough items ?");
                 return false;
             }
 
             var window = WindowManager.ActiveWindow;
             if (window == null)
             {
+                SolutionExecutor.LogOperation("Path of Exile window is not active");
                 return false;
             }
 

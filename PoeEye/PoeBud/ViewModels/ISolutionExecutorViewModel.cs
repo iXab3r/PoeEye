@@ -14,5 +14,7 @@ namespace PoeBud.ViewModels
         IReactiveList<string> PerformedOperations { [NotNull] get; }
 
         Task ExecuteSolution([NotNull] IPoeTradeSolution solutionToExecute);
+        
+        void LogOperation([NotNull] string logMessage);
     }
 }

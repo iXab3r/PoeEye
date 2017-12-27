@@ -32,8 +32,6 @@ namespace PoeBud.ViewModels
 
         private readonly PoeBudConfig resultingConfig = new PoeBudConfig();
 
-        private ICharacter[] charactersList;
-
         private bool hideXpBar;
 
         private string hotkey;
@@ -44,15 +42,12 @@ namespace PoeBud.ViewModels
 
         private Exception loginException;
 
-        private ICharacter selectedCharacter;
-
-        private IReactiveList<TabSelectionViewModel> selectedCharacterStash;
-
+        private IReactiveList<TabSelectionViewModel> stashesList;
         private UiOverlayInfo selectedUiOverlay;
-
         private string sessionId;
-
         private string username;
+        private string selectedLeague;
+        private string[] leaguesList;
 
         public PoeBudSettingsViewModel(
             [NotNull] IFactory<IPoeStashClient, NetworkCredential, bool> poeClientFactory,
@@ -79,9 +74,9 @@ namespace PoeBud.ViewModels
 
             Observable
                 .Merge(
-                    this.WhenAnyValue(x => x.CharactersList).ToUnit(),
+                    this.WhenAnyValue(x => x.LeaguesList).ToUnit(),
                     this.WhenAnyValue(x => x.Username).ToUnit(),
-                    this.WhenAnyValue(x => x.SelectedCharacter).ToUnit())
+                    this.WhenAnyValue(x => x.SelectedLeague).ToUnit())
                 .Subscribe(() => this.RaisePropertyChanged(nameof(CanSave)))
                 .AddTo(Anchors);
 
@@ -99,10 +94,10 @@ namespace PoeBud.ViewModels
 
         public string[] HotkeysList { get; set; }
 
-        public ICharacter[] CharactersList
+        public string[] LeaguesList
         {
-            get { return charactersList; }
-            set { this.RaiseAndSetIfChanged(ref charactersList, value); }
+            get { return leaguesList; }
+            private set { this.RaiseAndSetIfChanged(ref leaguesList, value); }
         }
 
         public bool HideXpBar
@@ -117,16 +112,16 @@ namespace PoeBud.ViewModels
             set { this.RaiseAndSetIfChanged(ref isEnabled, value); }
         }
 
-        public ICharacter SelectedCharacter
+        public string SelectedLeague
         {
-            get { return selectedCharacter; }
-            set { this.RaiseAndSetIfChanged(ref selectedCharacter, value); }
+            get { return selectedLeague; }
+            set { this.RaiseAndSetIfChanged(ref selectedLeague, value); }
         }
 
-        public IReactiveList<TabSelectionViewModel> SelectedCharacterStash
+        public IReactiveList<TabSelectionViewModel> StashesList
         {
-            get { return selectedCharacterStash; }
-            set { this.RaiseAndSetIfChanged(ref selectedCharacterStash, value); }
+            get { return stashesList; }
+            set { this.RaiseAndSetIfChanged(ref stashesList, value); }
         }
 
         public UiOverlayInfo SelectedUiOverlay
@@ -162,9 +157,9 @@ namespace PoeBud.ViewModels
         }
 
         public bool CanSave => !string.IsNullOrEmpty(username)
-                               && CharactersList != null
-                               && SelectedCharacter != null
-                               && SelectedCharacterStash != null && SelectedCharacterStash.Any(x => x.IsSelected);
+                               && LeaguesList != null
+                               && SelectedLeague != null
+                               && StashesList != null && StashesList.Any(x => x.IsSelected);
 
         public string ModuleName => "Poe Buddy";
 
@@ -173,9 +168,9 @@ namespace PoeBud.ViewModels
             config.TransferPropertiesTo(resultingConfig);
 
             Username = config.LoginEmail;
-            SelectedCharacter = null;   
-            CharactersList = null;
-            SelectedCharacterStash = null;
+            LeaguesList = null;   
+            SelectedLeague = null;
+            StashesList = null;
             Hotkey = config.GetChaosSetHotkey;
             HideXpBar = config.HideXpBar;
             IsEnabled = config.IsEnabled;
@@ -196,9 +191,9 @@ namespace PoeBud.ViewModels
             {
                 resultingConfig.SessionId = SessionId;
             }
-            if (SelectedCharacter != null)
+            if (SelectedLeague != null)
             {
-                resultingConfig.CharacterName = SelectedCharacter.Name;
+                resultingConfig.LeagueId = SelectedLeague;
             }
             resultingConfig.UiOverlayName = selectedUiOverlay.Name;
 
@@ -206,15 +201,14 @@ namespace PoeBud.ViewModels
             resultingConfig.HideXpBar = hideXpBar;
             resultingConfig.IsEnabled = isEnabled;
 
-            if (selectedCharacterStash != null)
+            if (stashesList != null)
             {
-                var selectedTabs = selectedCharacterStash
+                var selectedTabs = stashesList
                     .Where(x => x.IsSelected)
-                    .Select(x => x.Tab.Idx)
+                    .Select(x => x.Tab.Name)
                     .ToArray();
 
-                resultingConfig.StashesToProcess.Clear();
-                selectedTabs.ForEach(resultingConfig.StashesToProcess.Add);
+                resultingConfig.StashesToProcess = selectedTabs;
             }
 
             return resultingConfig;
@@ -249,14 +243,17 @@ namespace PoeBud.ViewModels
                 }
                 var characters = poeClient.GetCharacters();
 
-                var characterDisposable = new CompositeDisposable();
-                characterSelectionDisposable.Disposable = characterDisposable;
+                var leagueAnchors = new CompositeDisposable();
+                characterSelectionDisposable.Disposable = leagueAnchors;
 
                 var stashes = characters
-                    .Select(x => new {Character = x, Stash = TryGetStash(poeClient, x.League)})
-                    .Where(x => x.Stash != null && x.Character != null)
+                    .Select(x => x.League)
+                    .Where(league => !string.IsNullOrEmpty(league))
+                    .Distinct()
+                    .Select(league => new { League = league, Stash = TryGetStash(poeClient, league)})
+                    .Where(x => x.Stash != null && x.League != null)
                     .ToDictionary(
-                        x => x.Character,
+                        x => x.League,
                         x =>
                             new ReactiveList<TabSelectionViewModel>(
                                 x.Stash.Tabs.Select(tab => new TabSelectionViewModel(tab))));
@@ -264,30 +261,31 @@ namespace PoeBud.ViewModels
                 foreach (var kvp in stashes)
                 {
                     kvp.Value.ChangeTrackingEnabled = true;
-                    characterDisposable.Add(
+                    leagueAnchors.Add(
                         kvp.Value.ItemChanged.Subscribe(() => this.RaisePropertyChanged(nameof(CanSave)))
-                            .AddTo(characterDisposable));
+                            .AddTo(leagueAnchors));
                 }
 
-                CharactersList = stashes.Keys.ToArray();
+                var leagueList = stashes.Keys.ToArray();
+                LeaguesList = leagueList;
 
                 this
-                    .WhenAnyValue(x => x.SelectedCharacter)
+                    .WhenAnyValue(x => x.SelectedLeague)
                     .Subscribe(
-                        character => SelectedCharacterStash = character == null || !stashes.ContainsKey(character)
+                        league => StashesList = league == null || !stashes.ContainsKey(league)
                             ? null
-                            : stashes[character]).AddTo(characterDisposable)
-                    .AddTo(characterDisposable);
+                            : stashes[league]).AddTo(leagueAnchors)
+                    .AddTo(leagueAnchors);
 
-                if (selectedCharacter != null)
+                if (selectedLeague != null)
                 {
-                    var newSelectedCharacter = charactersList.FirstOrDefault(x => x.Name == selectedCharacter.Name);
-                    SelectedCharacter = newSelectedCharacter;
+                    var newSelectedLeague = leagueList.FirstOrDefault(x => x == selectedLeague);
+                    SelectedLeague = newSelectedLeague;
                 }
 
-                if (selectedCharacter == null)
+                if (selectedLeague == null)
                 {
-                    SelectedCharacter = CharactersList.FirstOrDefault();
+                    SelectedLeague = leagueList.FirstOrDefault();
                 }
             }
             catch (Exception ex)

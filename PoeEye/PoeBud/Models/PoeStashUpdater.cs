@@ -18,6 +18,7 @@ using PoeShared.Prism;
 using PoeShared.Scaffolding;
 using PoeShared.StashApi;
 using PoeShared.StashApi.DataTypes;
+using PoeShared.UI;
 using ReactiveUI;
 
 namespace PoeBud.Models
@@ -56,7 +57,7 @@ namespace PoeBud.Models
             this.config = config;
             this.clock = clock;
             LogTo.Debug(
-                "Initializing client for {0}@{1}", config.LoginEmail, config.CharacterName);
+                "Initializing client for {0}@{1}", config.LoginEmail, config.LeagueId);
 
             var credentials = new NetworkCredential(config.LoginEmail, config.SessionId);
             poeClient = poeClientFactory.Create(credentials, true);
@@ -121,7 +122,7 @@ namespace PoeBud.Models
         {
             Guard.ArgumentNotNull(strategy, nameof(strategy));
 
-                LogTo.Debug($"New strategy: {strategy}");
+            LogTo.Debug($"New strategy: {strategy}");
             stashUpdaterStrategy = strategy;
         }
 
@@ -147,7 +148,7 @@ namespace PoeBud.Models
                 var stashesToRequest = new IStashTab[0];
                 try
                 {
-                    LogTo.Debug($"Requesting stash #0 in league {league.Id}...");
+                    LogTo.Debug($"[League {league.Id}] Requesting stash #0...");
                     var zeroStash = poeClient.GetStash(0, league.Id);
 
                     var tabs = zeroStash.Tabs?.ToArray() ?? new IStashTab[0];
@@ -176,8 +177,10 @@ namespace PoeBud.Models
                 {
                     try
                     {
-                        LogTo.Debug($"Requesting stash [{tab.DumpToTextRaw()}] in league {league.Id}...");
+                        LogTo.Debug($"[League {league.Id}] Requesting stash tab [{tab.DumpToTextRaw()}]...");
                         var stash = poeClient.GetStash(tab.Idx, league.Id);
+                        LogTo.Debug($"[League {league.Id}] Result: {stash.Items.EmptyIfNull().Count()} item(s), stash tab [{tab.DumpToTextRaw()}]");
+
                         allStashes.Add(stash);
                     }
                     catch (Exception e)
@@ -208,7 +211,7 @@ namespace PoeBud.Models
                 LogTo.Debug("Authenticating...");
                 poeClient.Authenticate();
             }
-            Thread.Sleep(5000);
+            Thread.Sleep((int)UiConstants.ArtificialLongDelay.TotalMilliseconds);
 
 
             var strategy = stashUpdaterStrategy;
@@ -228,6 +231,8 @@ namespace PoeBud.Models
 
         private void HandleUpdate(StashUpdate update)
         {
+            LogTo.Debug($"Stash update received, tabs: {update.Tabs.Count()}, items: {update.Items.Count()}");
+
             IsBusy = false;
             LastUpdateTimestamp = clock.Now;
             updateExceptionsSubject.OnNext(null);

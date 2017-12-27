@@ -121,64 +121,28 @@
       <GroupBox Grid.Row="7"
                 IsEnabled="{Binding IsBusy, Converter={StaticResource BoolInvertConverter}}"
                 Margin="0, 10"
-                Header="Characters and stashes selection">
+                Header="League and stashes selection">
         <Grid>
-          <Grid.Resources>
-            <CollectionViewSource x:Key='charactersListSource'
-                                  Source="{Binding CharactersList}"
-                                  IsLiveGroupingRequested="True">
-              <CollectionViewSource.GroupDescriptions>
-                <PropertyGroupDescription PropertyName="League" />
-              </CollectionViewSource.GroupDescriptions>
-            </CollectionViewSource>
-          </Grid.Resources>
-
           <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
           </Grid.RowDefinitions>
 
           <ComboBox Grid.Row="0"
-                    IsEnabled="{Binding CharactersList, Converter={StaticResource NullToFalseConverter}}"
+                    IsEnabled="{Binding LeaguesList, Converter={StaticResource NullToFalseConverter}}"
                     Margin="0, 5"
-                    ItemsSource="{Binding Source={StaticResource charactersListSource}}"
-                    SelectedItem="{Binding SelectedCharacter}">
-
-            <ComboBox.GroupStyle>
-              <GroupStyle>
-                <GroupStyle.HeaderTemplate>
-                  <DataTemplate DataType="{x:Type dataTypes:ICharacter}">
-                    <TextBlock FontSize="14" FontWeight="Bold" Text="{Binding Name}" />
-                  </DataTemplate>
-                </GroupStyle.HeaderTemplate>
-              </GroupStyle>
-            </ComboBox.GroupStyle>
-
-            <ComboBox.ItemTemplate>
-              <DataTemplate DataType="{x:Type dataTypes:ICharacter}">
-                <StackPanel Orientation="Horizontal">
-                  <TextBlock>
-                    <TextBlock.Inlines>
-                      <Run Text="{Binding Level}" FontWeight="SemiBold" />
-                      <Run Text="{Binding Name}" /> (
-                      <Run Text="{Binding Class}" /> )
-                    </TextBlock.Inlines>
-                  </TextBlock>
-                </StackPanel>
-              </DataTemplate>
-            </ComboBox.ItemTemplate>
+                    ItemsSource="{Binding LeaguesList}"
+                    SelectedItem="{Binding SelectedLeague}">
           </ComboBox>
 
           <ListBox Grid.Row="1"
                    Margin="0, 5"
                    MaxHeight="150"
-
                    ScrollViewer.HorizontalScrollBarVisibility="Hidden"
                    ScrollViewer.VerticalScrollBarVisibility="Visible"
-
-                   IsEnabled="{Binding SelectedCharacterStash, Converter={StaticResource NullToFalseConverter}}"
-                   Visibility="{Binding SelectedCharacterStash, Converter={StaticResource NullToCollapsedConverter}}"
-                   ItemsSource="{Binding SelectedCharacterStash}">
+                   IsEnabled="{Binding StashesList, Converter={StaticResource NullToFalseConverter}}"
+                   Visibility="{Binding StashesList, Converter={StaticResource NullToCollapsedConverter}}"
+                   ItemsSource="{Binding StashesList}">
             <ListBox.ItemTemplate>
               <DataTemplate DataType="{x:Type viewModels:TabSelectionViewModel}">
                 <StackPanel Orientation="Horizontal">
