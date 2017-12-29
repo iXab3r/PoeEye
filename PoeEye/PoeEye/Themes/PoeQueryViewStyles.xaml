@@ -1,34 +1,8 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls">
-
-  <Style TargetType="controls:NumericUpDown" BasedOn="{StaticResource {x:Type controls:NumericUpDown}}"
-         x:Key="NumericUpDownBase">
-    <Setter Property="Foreground" Value="{StaticResource LabelTextBrush}" />
-    <Setter Property="VerticalContentAlignment" Value="Center" />
-    <Setter Property="Width" Value="80" />
-    <Setter Property="Minimum" Value="0" />
-    <Setter Property="Maximum" Value="9999" />
-    <Setter Property="Margin" Value="3,0,3,0" />
-    <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Disabled" />
-    <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
-  </Style>
-
-  <Style TargetType="controls:NumericUpDown" BasedOn="{StaticResource NumericUpDownBase}" x:Key="QueryNumericUpDownMin">
-    <Style.Triggers>
-      <Trigger Property="controls:TextBoxHelper.HasText" Value="False">
-        <Setter Property="controls:TextBoxHelper.Watermark" Value="Min" />
-      </Trigger>
-    </Style.Triggers>
-  </Style>
-
-  <Style TargetType="controls:NumericUpDown" BasedOn="{StaticResource NumericUpDownBase}" x:Key="QueryNumericUpDownMax">
-    <Style.Triggers>
-      <Trigger Property="controls:TextBoxHelper.HasText" Value="False">
-        <Setter Property="controls:TextBoxHelper.Watermark" Value="Max" />
-      </Trigger>
-    </Style.Triggers>
-  </Style>
+                    xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
+                    xmlns:eye="http://coderush.net/poeeye/"
+                    xmlns:editors="https://github.com/iXab3r/WpfAutoCompleteControls">
 
   <Style TargetType="ComboBox" BasedOn="{StaticResource {x:Type ComboBox}}" x:Key="QueryComboBox">
     <Setter Property="VerticalContentAlignment" Value="Center" />
@@ -40,6 +14,7 @@
     <Setter Property="controls:TextBoxHelper.ButtonFontFamily" Value="{StaticResource FontAwesome}" />
     <Setter Property="controls:TextBoxHelper.ButtonContent" Value="&#xf00d;" />
     <Setter Property="controls:ComboBoxHelper.EnableVirtualizationWithGrouping" Value="true" />
+    <Setter Property="eye:InputBindingsManager.UpdatePropertySourceWhenEnterPressed" Value="{x:Static ComboBox.SelectedValueProperty}"/>
   </Style>
 
   <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}" 
@@ -48,6 +23,12 @@
     <Setter Property="HorizontalContentAlignment" Value="Center" />
     <Setter Property="Width" Value="80" />
     <Setter Property="Margin" Value="3,0,3,0" />
+    <Setter Property="eye:InputBindingsManager.UpdatePropertySourceWhenEnterPressed" Value="{x:Static TextBox.TextProperty}"/>
+  </Style>
+  
+  <Style TargetType="{x:Type editors:AutoCompleteTextBox}" BasedOn="{StaticResource {x:Type editors:AutoCompleteTextBox}}" 
+         x:Key="AutoCompleteTextBoxStyleKey">
+    <Setter Property="eye:InputBindingsManager.UpdatePropertySourceWhenEnterPressed" Value="{x:Static editors:AutoCompleteTextBox.TextProperty}"/>
   </Style>
 
   <Style TargetType="TextBox" BasedOn="{StaticResource TextBoxKey}" 

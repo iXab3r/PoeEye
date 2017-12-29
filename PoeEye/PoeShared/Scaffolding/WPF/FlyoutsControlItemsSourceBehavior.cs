@@ -8,7 +8,6 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Interactivity;
 using log4net.Filter;
 using MahApps.Metro.Controls;

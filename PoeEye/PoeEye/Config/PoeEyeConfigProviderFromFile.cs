@@ -164,6 +164,7 @@ namespace PoeEye.Config
                 if (result == null)
                 {
                     Log.Instance.Warn($"[PoeEyeConfigProviderFromFile.Load] Failed to deserialize config\nData:\n{fileData}");
+                    throw new ApplicationException("Failed to deserialize existing config");
                 }
             }
             catch (Exception ex)

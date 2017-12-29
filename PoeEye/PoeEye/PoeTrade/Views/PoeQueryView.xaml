@@ -81,6 +81,7 @@
                    Text="Name" Style="{StaticResource TextBlockHeader}" />
 
         <editors:AutoCompleteTextBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="5"
+                                     Style="{StaticResource AutoCompleteTextBoxStyleKey}"
                                      Provider="{Binding NameSuggestionProvider}"
                                      Width="NaN"
                                      HorizontalContentAlignment="Left"
