@@ -78,7 +78,7 @@ namespace PoeBud.ViewModels
             Guard.ArgumentNotNull(stashUpdateFactory, nameof(stashUpdateFactory));
             Guard.ArgumentNotNull(uiScheduler, nameof(uiScheduler));
 
-            OverlayMode = OverlayMode.Layered;
+            OverlayMode = OverlayMode.Transparent;
             this.clock = clock;
             this.keyboardMouseEvents = keyboardMouseEvents;
             this.overlaysProvider = overlaysProvider;

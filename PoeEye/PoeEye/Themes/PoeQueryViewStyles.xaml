@@ -48,4 +48,14 @@
       </Trigger>
     </Style.Triggers>
   </Style>
+  
+  <Style TargetType="TextBox" BasedOn="{StaticResource TextBoxMinKey}" 
+         x:Key="TextBoxCompactMinKey">
+    <Setter Property="Width" Value="50"/>
+  </Style>
+
+  <Style TargetType="TextBox" BasedOn="{StaticResource TextBoxMaxKey}" 
+         x:Key="TextBoxCompactMaxKey">
+     <Setter Property="Width" Value="50"/>
+  </Style>
 </ResourceDictionary>

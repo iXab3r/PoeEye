@@ -75,7 +75,7 @@ namespace PoeShared.PoeTrade
         int? LevelMax { get; }
 
         int? LevelMin { get; }
-
+        
         int? ItemLevelMax { get; }
 
         int? ItemLevelMin { get; }

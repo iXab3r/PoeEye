@@ -27,23 +27,17 @@
 
       <Grid.RowDefinitions>
         <RowDefinition Height="Auto" />
-        <RowDefinition Height="10" />
         <RowDefinition Height="Auto" />
-        <RowDefinition Height="10" />
         <RowDefinition Height="Auto" />
-        <RowDefinition Height="10" />
         <RowDefinition Height="Auto" />
-        <RowDefinition Height="10" />
         <RowDefinition Height="Auto" />
-        <RowDefinition Height="10" />
         <RowDefinition Height="Auto" />
-        <RowDefinition Height="10" />
         <RowDefinition Height="Auto" />
-        <RowDefinition Height="10" />
+        <RowDefinition Height="Auto" />
         <RowDefinition Height="Auto" />
       </Grid.RowDefinitions>
 
-      <Grid Row="0">
+      <Grid Row="0" Margin="0,5">
         <Grid.RowDefinitions>
           <RowDefinition Height="Auto" />
           <RowDefinition Height="5" />
@@ -92,7 +86,7 @@
                                      controls:TextBoxHelper.ClearTextButton="True" />
       </Grid>
 
-      <Grid Row="2">
+      <Grid Row="1" Margin="0,5">
 
         <Grid.RowDefinitions>
           <RowDefinition Height="Auto" />
@@ -165,7 +159,7 @@
         </StackPanel>
       </Grid>
 
-      <Grid Row="4">
+      <Grid Row="3" Margin="0,5">
 
         <Grid.RowDefinitions>
           <RowDefinition Height="Auto" />
@@ -218,8 +212,7 @@
         </StackPanel>
       </Grid>
 
-      <Grid Row="6">
-
+      <Grid Row="4" Margin="0,5">
         <Grid.RowDefinitions>
           <RowDefinition Height="Auto" />
           <RowDefinition Height="5" />
@@ -287,13 +280,87 @@
         </StackPanel>
       </Grid>
 
-      <Grid Row="10">
+      <Grid Row="5" Margin="0,5">
+          <Border BorderBrush="{StaticResource AccentColorBrush2}" BorderThickness="0,1,0,0" Margin="0,5">
+              <Grid>
+                  <Grid.RowDefinitions>
+                      <RowDefinition Height="Auto" />
+                      <RowDefinition Height="*" />
+                  </Grid.RowDefinitions>
+
+                  <StackPanel Grid.Row="0" 
+                              Orientation="Horizontal"
+                              Margin="5">
+                      <TextBlock Text="Requirements" Style="{StaticResource MetroTextBlockHeaderStyle}" />
+                  </StackPanel>
+                  
+                  <Grid Grid.Row="1">
+                      <Grid.ColumnDefinitions>
+                          <ColumnDefinition Width="80" />
+                          <ColumnDefinition Width="110" />
+                          <ColumnDefinition Width="80" />
+                          <ColumnDefinition Width="110" />
+                          <ColumnDefinition Width="80" />
+                          <ColumnDefinition Width="110" />
+                          <ColumnDefinition Width="80" />
+                          <ColumnDefinition Width="110" />
+                      </Grid.ColumnDefinitions>
+                      
+                      <TextBlock Grid.Column="0"
+                          Text="Level" Style="{StaticResource TextBlockHeader}" />
+                      <StackPanel Grid.Column="1">
+                          <TextBox Style="{StaticResource TextBoxCompactMinKey}"
+                                   Text="{Binding RLevelMin, Converter={x:Static converters:NullableConverter.Instance}}" />
+                          <TextBox Style="{StaticResource TextBoxCompactMaxKey}"
+                                   Text="{Binding RLevelMax, Converter={x:Static converters:NullableConverter.Instance}}" />
+                      </StackPanel>
+                      
+                      <TextBlock Grid.Column="2"
+                                 Text="Str" Style="{StaticResource TextBlockHeader}" 
+                                 Foreground="{StaticResource PoeItemStrStatBrush}"/>
+                      <StackPanel Grid.Column="3">
+                          <TextBox Style="{StaticResource TextBoxCompactMinKey}"
+                                   Text="{Binding RStrMin, Converter={x:Static converters:NullableConverter.Instance}}" />
+                          <TextBox Style="{StaticResource TextBoxCompactMaxKey}"
+                                   Text="{Binding RStrMax, Converter={x:Static converters:NullableConverter.Instance}}" />
+                      </StackPanel>
+                      
+                      <TextBlock Grid.Column="4"
+                                 Text="Dex" Style="{StaticResource TextBlockHeader}" 
+                                 Foreground="{StaticResource PoeItemDexStatBrush}"/>
+                      <StackPanel Grid.Column="5">
+                          <TextBox Style="{StaticResource TextBoxCompactMinKey}"
+                                   Text="{Binding RDexMin, Converter={x:Static converters:NullableConverter.Instance}}" />
+                          <TextBox Style="{StaticResource TextBoxCompactMaxKey}"
+                                   Text="{Binding RDexMax, Converter={x:Static converters:NullableConverter.Instance}}" />
+                      </StackPanel>
+                      
+                      <TextBlock Grid.Column="6"
+                                 Text="Int" Style="{StaticResource TextBlockHeader}"
+                                 Foreground="{StaticResource PoeItemIntStatBrush}"/>
+                      <StackPanel Grid.Column="7">
+                          <TextBox Style="{StaticResource TextBoxCompactMinKey}"
+                                   Text="{Binding RIntMin, Converter={x:Static converters:NullableConverter.Instance}}" />
+                          <TextBox Style="{StaticResource TextBoxCompactMaxKey}"
+                                   Text="{Binding RIntMax, Converter={x:Static converters:NullableConverter.Instance}}" />
+                      </StackPanel>                  
+                  </Grid>
+                  
+                  <StackPanel Grid.Row="1">
+                     
+                      
+                  </StackPanel>
+              </Grid>
+          </Border>
+      </Grid>
+        
+      <Grid Row="6" Margin="0,5">
         <Border BorderBrush="{StaticResource AccentColorBrush2}" BorderThickness="0,2" Margin="0,5">
           <ContentControl Content="{Binding ModGroupsEditor}" />
         </Border>
       </Grid>
 
-      <Grid Row="12">
+      <Grid Row="7" Margin="0,5">
 
         <Grid.RowDefinitions>
           <RowDefinition Height="Auto" />
@@ -423,7 +490,7 @@
         </StackPanel>
       </Grid>
 
-      <Grid Row="14" Height="28" Margin="0, 5">
+      <Grid Row="8" Height="28" Margin="0, 5">
         <Grid.ColumnDefinitions>
           <ColumnDefinition Width="30" />
           <ColumnDefinition Width="Auto" />
