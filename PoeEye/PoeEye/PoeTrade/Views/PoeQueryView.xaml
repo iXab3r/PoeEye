@@ -23,6 +23,13 @@
         <Style TargetType="StackPanel">
           <Setter Property="Orientation" Value="Horizontal" />
         </Style>
+          
+        <ObjectDataProvider x:Key="TriStateProviderKey" MethodName="GetValues"
+                            ObjectType="{x:Type System:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="common:TriState" />
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
       </Grid.Resources>
 
       <Grid.RowDefinitions>
@@ -35,9 +42,10 @@
         <RowDefinition Height="Auto" />
         <RowDefinition Height="Auto" />
         <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
       </Grid.RowDefinitions>
 
-      <Grid Row="0" Margin="0,5">
+      <Grid Row="0" Margin="0,5"><!-- League/Type/Name -->
         <Grid.RowDefinitions>
           <RowDefinition Height="Auto" />
           <RowDefinition Height="5" />
@@ -86,7 +94,7 @@
                                      controls:TextBoxHelper.ClearTextButton="True" />
       </Grid>
 
-      <Grid Row="1" Margin="0,5">
+      <Grid Row="1" Margin="0,5"><!-- DPS -->
 
         <Grid.RowDefinitions>
           <RowDefinition Height="Auto" />
@@ -159,7 +167,7 @@
         </StackPanel>
       </Grid>
 
-      <Grid Row="3" Margin="0,5">
+      <Grid Row="3" Margin="0,5"><!-- Armour/Shield -->
 
         <Grid.RowDefinitions>
           <RowDefinition Height="Auto" />
@@ -212,7 +220,7 @@
         </StackPanel>
       </Grid>
 
-      <Grid Row="4" Margin="0,5">
+      <Grid Row="4" Margin="0,5"> <!-- Sockets/links -->
         <Grid.RowDefinitions>
           <RowDefinition Height="Auto" />
           <RowDefinition Height="5" />
@@ -280,7 +288,7 @@
         </StackPanel>
       </Grid>
 
-      <Grid Row="5" Margin="0,5">
+      <Grid Row="5" Margin="0,5"> <!-- Requirements -->
           <Border BorderBrush="{StaticResource AccentColorBrush2}" BorderThickness="0,1,0,0" Margin="0,5">
               <Grid>
                   <Grid.RowDefinitions>
@@ -345,23 +353,105 @@
                                    Text="{Binding RIntMax, Converter={x:Static converters:NullableConverter.Instance}}" />
                       </StackPanel>                  
                   </Grid>
-                  
-                  <StackPanel Grid.Row="1">
-                     
-                      
-                  </StackPanel>
               </Grid>
           </Border>
       </Grid>
         
-      <Grid Row="6" Margin="0,5">
+      <Grid Row="6" Margin="0,5"> <!-- Conditionals -->
+          <Border BorderBrush="{StaticResource AccentColorBrush2}" BorderThickness="0,1,0,0" Margin="0,5">
+              <Grid>
+                  <Grid.RowDefinitions>
+                      <RowDefinition Height="Auto" />
+                      <RowDefinition Height="*" />
+                  </Grid.RowDefinitions>
+
+                  <StackPanel Grid.Row="0" 
+                              Orientation="Horizontal"
+                              Margin="5">
+                      <TextBlock Text="Conditionals" Style="{StaticResource MetroTextBlockHeaderStyle}" />
+                  </StackPanel>
+                  
+                  <Grid Grid.Row="1">
+                      <Grid.RowDefinitions>
+                          <RowDefinition Height="Auto" />
+                          <RowDefinition Height="Auto" />
+                      </Grid.RowDefinitions>
+                      <Grid.ColumnDefinitions>
+                          <ColumnDefinition Width="80" />
+                          <ColumnDefinition Width="180" />
+                          <ColumnDefinition Width="80" />
+                          <ColumnDefinition Width="180" />
+                          <ColumnDefinition Width="80" />
+                          <ColumnDefinition Width="180" />
+                          <ColumnDefinition Width="80" />
+                          <ColumnDefinition Width="180" />
+                      </Grid.ColumnDefinitions>
+                      
+                      <TextBlock Grid.Row="0" Grid.Column="0" Margin="0,5"
+                                 Text="Corrupted" Style="{StaticResource TextBlockHeader}" />
+                      <StackPanel Grid.Row="0" Grid.Column="1" Margin="0,5">
+                          <ComboBox Style="{StaticResource QueryComboBox}"
+                                    SelectedValue="{Binding CorruptionState}"
+                                    Width="167"
+                                    IsEditable="True"
+                                    ItemsSource="{Binding Source={StaticResource TriStateProviderKey}}" />
+                      </StackPanel>            
+                      
+                      <TextBlock Grid.Row="0" Grid.Column="2" Margin="0,5"
+                                 Text="Crafted" Style="{StaticResource TextBlockHeader}" />
+                      <StackPanel Grid.Row="0" Grid.Column="3" Margin="0,5">
+                          <StackPanel.Resources>
+                          </StackPanel.Resources>
+                          <ComboBox Style="{StaticResource QueryComboBox}"
+                                    SelectedValue="{Binding CraftState}"
+                                    Width="167"
+                                    IsEditable="True"
+                                    ItemsSource="{Binding Source={StaticResource TriStateProviderKey}}" />
+                      </StackPanel> 
+                      
+                      <TextBlock Grid.Row="0" Grid.Column="4" Margin="0,5"
+                                 Text="Enchanted" Style="{StaticResource TextBlockHeader}" />
+                      <StackPanel Grid.Row="0" Grid.Column="5" Margin="0,5">
+                          <StackPanel.Resources>
+                          </StackPanel.Resources>
+                          <ComboBox Style="{StaticResource QueryComboBox}"
+                                    SelectedValue="{Binding EnchantState}"
+                                    Width="167"
+                                    IsEditable="True"
+                                    ItemsSource="{Binding Source={StaticResource TriStateProviderKey}}" />
+                      </StackPanel> 
+                      
+                      <TextBlock Grid.Row="1" Grid.Column="0" Margin="0,5"
+                                 Text="Shaped" Style="{StaticResource TextBlockHeader}" />
+                      <StackPanel Grid.Row="1" Grid.Column="1" Margin="0,5">
+                          <ComboBox Style="{StaticResource QueryComboBox}"
+                                    SelectedValue="{Binding AffectedByShaperState}"
+                                    Width="165"
+                                    IsEditable="True"
+                                    ItemsSource="{Binding Source={StaticResource TriStateProviderKey}}" />
+                      </StackPanel>
+
+                      <TextBlock Grid.Row="1" Grid.Column="2" Margin="0,5"
+                                 Text="Elder" Style="{StaticResource TextBlockHeader}" />
+                      <StackPanel Grid.Row="1" Grid.Column="3" Margin="0,5">
+                          <ComboBox Style="{StaticResource QueryComboBox}"
+                                    SelectedValue="{Binding AffectedByElderState}"
+                                    Width="167"
+                                    IsEditable="True"
+                                    ItemsSource="{Binding Source={StaticResource TriStateProviderKey}}" />
+                      </StackPanel>        
+                  </Grid>
+              </Grid>
+          </Border>
+      </Grid>
+        
+      <Grid Row="7" Margin="0,5"> <!-- Mod groups -->
         <Border BorderBrush="{StaticResource AccentColorBrush2}" BorderThickness="0,2" Margin="0,5">
           <ContentControl Content="{Binding ModGroupsEditor}" />
         </Border>
       </Grid>
 
-      <Grid Row="7" Margin="0,5">
-
+      <Grid Row="8" Margin="0,5"> <!-- Misc -->
         <Grid.RowDefinitions>
           <RowDefinition Height="Auto" />
           <RowDefinition Height="5" />
@@ -398,7 +488,6 @@
                    Text="{Binding LevelMax, Converter={x:Static converters:NullableConverter.Instance}}" />
         </StackPanel>
 
-
         <TextBlock Grid.Row="0" Grid.Column="4"
                    Text="Item Level" Style="{StaticResource TextBlockHeader}" />
         <StackPanel Grid.Row="0" Grid.Column="5">
@@ -408,41 +497,6 @@
                    Text="{Binding ItemLevelMax, Converter={x:Static converters:NullableConverter.Instance}}" />
         </StackPanel>
 
-        <TextBlock Grid.Row="2" Grid.Column="2"
-                   Text="Rarity" Style="{StaticResource TextBlockHeader}" />
-        <StackPanel Grid.Row="2" Grid.Column="3">
-          <StackPanel.Resources>
-            <ObjectDataProvider x:Key="PoeItemRarityFromEnum" MethodName="GetValues"
-                                ObjectType="{x:Type System:Enum}">
-              <ObjectDataProvider.MethodParameters>
-                <x:Type TypeName="common:PoeItemRarity" />
-              </ObjectDataProvider.MethodParameters>
-            </ObjectDataProvider>
-          </StackPanel.Resources>
-          <ComboBox Style="{StaticResource QueryComboBox}"
-                    SelectedValue="{Binding ItemRarity}"
-                    Width="165"
-                    IsEditable="True"
-                    ItemsSource="{Binding Source={StaticResource PoeItemRarityFromEnum}}" />
-        </StackPanel>
-
-        <TextBlock Grid.Row="2" Grid.Column="4"
-                   Text="Corrupted" Style="{StaticResource TextBlockHeader}" />
-        <StackPanel Grid.Row="2" Grid.Column="5">
-          <StackPanel.Resources>
-            <ObjectDataProvider x:Key="PoeItemCorruptionStateFromEnum" MethodName="GetValues"
-                                ObjectType="{x:Type System:Enum}">
-              <ObjectDataProvider.MethodParameters>
-                <x:Type TypeName="common:PoeItemCorruptionState" />
-              </ObjectDataProvider.MethodParameters>
-            </ObjectDataProvider>
-          </StackPanel.Resources>
-          <ComboBox Style="{StaticResource QueryComboBox}"
-                    SelectedValue="{Binding CorruptionState}"
-                    Width="167"
-                    IsEditable="True"
-                    ItemsSource="{Binding Source={StaticResource PoeItemCorruptionStateFromEnum}}" />
-        </StackPanel>
 
         <TextBlock Grid.Row="2" Grid.Column="0"
                    Text="Inc. Quantity" Style="{StaticResource TextBlockHeader}" />
@@ -451,6 +505,24 @@
                    Text="{Binding IncQuantityMin, Converter={x:Static converters:NullableConverter.Instance}}" />
           <TextBox Style="{StaticResource TextBoxMaxKey}"
                    Text="{Binding IncQuantityMax, Converter={x:Static converters:NullableConverter.Instance}}" />
+        </StackPanel>
+          
+        <TextBlock Grid.Row="2" Grid.Column="2"
+                   Text="Rarity" Style="{StaticResource TextBlockHeader}" />
+        <StackPanel Grid.Row="2" Grid.Column="3">
+            <StackPanel.Resources>
+                <ObjectDataProvider x:Key="PoeItemRarityFromEnum" MethodName="GetValues"
+                                    ObjectType="{x:Type System:Enum}">
+                    <ObjectDataProvider.MethodParameters>
+                        <x:Type TypeName="common:PoeItemRarity" />
+                    </ObjectDataProvider.MethodParameters>
+                </ObjectDataProvider>
+            </StackPanel.Resources>
+            <ComboBox Style="{StaticResource QueryComboBox}"
+                      SelectedValue="{Binding ItemRarity}"
+                      Width="165"
+                      IsEditable="True"
+                      ItemsSource="{Binding Source={StaticResource PoeItemRarityFromEnum}}" />
         </StackPanel>
 
         <TextBlock Grid.Row="4" Grid.Column="0"
@@ -490,7 +562,7 @@
         </StackPanel>
       </Grid>
 
-      <Grid Row="8" Height="28" Margin="0, 5">
+      <Grid Row="9" Height="28" Margin="0, 5"> <!-- Very rarely used conditionals -->
         <Grid.ColumnDefinitions>
           <ColumnDefinition Width="30" />
           <ColumnDefinition Width="Auto" />

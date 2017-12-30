@@ -33,7 +33,11 @@ namespace PoeEye.PoeTrade.ViewModels
         private float? buyoutMax;
         private float? buyoutMin;
         private PoeBuyoutMode? buyoutMode;
-        private PoeItemCorruptionState? corruptionState;
+        private TriState? corruptionState;
+        private TriState? craftState;
+        private TriState? affectedByElderState;
+        private TriState? affectedByShaperState;
+        private TriState? enchantState;
         private float? critMax;
         private float? critMin;
         private float? damageMax;
@@ -526,10 +530,34 @@ namespace PoeEye.PoeTrade.ViewModels
             set { this.RaiseAndSetIfChanged(ref itemRarity, value); }
         }
 
-        public PoeItemCorruptionState? CorruptionState
+        public TriState? CorruptionState
         {
             get { return corruptionState; }
             set { this.RaiseAndSetIfChanged(ref corruptionState, value); }
+        }
+
+        public TriState? CraftState
+        {
+            get { return craftState; }
+            set { this.RaiseAndSetIfChanged(ref craftState, value); }
+        }
+
+        public TriState? AffectedByElderState
+        {
+            get { return affectedByElderState; }
+            set { this.RaiseAndSetIfChanged(ref affectedByElderState, value); }
+        }
+
+        public TriState? AffectedByShaperState
+        {
+            get { return affectedByShaperState; }
+            set { this.RaiseAndSetIfChanged(ref affectedByShaperState, value); }
+        }
+
+        public TriState? EnchantState
+        {
+            get { return enchantState; }
+            set { this.RaiseAndSetIfChanged(ref enchantState, value); }
         }
 
         public bool IsExpanded

@@ -85,6 +85,10 @@ namespace PoeEye.PoeTrade
                 CreateArgument("type", source.ItemType?.CodeName),
                 CreateArgument("rarity", ConvertToRaw(source.ItemRarity)),
                 CreateArgument("corrupted", ConvertToRaw(source.CorruptionState)),
+                CreateArgument("elder", ConvertToRaw(source.AffectedByElderState)),
+                CreateArgument("shaper", ConvertToRaw(source.AffectedByShaperState)),
+                CreateArgument("enchanted", ConvertToRaw(source.EnchantState)),
+                CreateArgument("crafted", ConvertToRaw(source.CraftState)),
             };
 
             var groups = source.ModGroups ?? new IPoeQueryModsGroup[0];
@@ -140,13 +144,13 @@ namespace PoeEye.PoeTrade
             }
         }
 
-        private static string ConvertToRaw(PoeItemCorruptionState? source)
+        private static string ConvertToRaw(TriState? source)
         {
             switch (source)
             {
-                case PoeItemCorruptionState.Corrupted:
+                case TriState.Yes:
                     return "1";
-                case PoeItemCorruptionState.NotCorrupted:
+                case TriState.No:
                     return "0";
                 default:
                     return string.Empty;

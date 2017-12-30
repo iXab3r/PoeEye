@@ -74,7 +74,15 @@ namespace PoeShared.PoeTrade
 
         public PoeItemRarity? ItemRarity { get; set; }
 
-        public PoeItemCorruptionState? CorruptionState { get; set; }
+        public TriState? CorruptionState { get; set; }
+        
+        public TriState? CraftState { get; set; }
+        
+        public TriState? AffectedByShaperState { get; set;}
+        
+        public TriState? AffectedByElderState { get; set;}
+        
+        public TriState? EnchantState { get; set; }
 
         public IPoeItemType ItemType { get; set; }
 

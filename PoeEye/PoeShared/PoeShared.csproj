@@ -254,6 +254,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AppArguments.cs" />
+    <Compile Include="Common\TriState.cs" />
     <Compile Include="Common\PoeItemVerificationState.cs" />
     <Compile Include="Common\PoeTradeState.cs" />
     <Compile Include="Communications\Chromium\BrowserProcessHandler.cs" />
@@ -322,7 +323,6 @@
     <Compile Include="Common\PoeBuyoutMode.cs" />
     <Compile Include="Common\PoeCurrency.cs" />
     <Compile Include="Common\PoeItem.cs" />
-    <Compile Include="Common\PoeItemCorruptionState.cs" />
     <Compile Include="Common\PoeItemEqualityComparer.cs" />
     <Compile Include="Common\PoeItemRarity.cs" />
     <Compile Include="Common\PoeItemMod.cs" />
