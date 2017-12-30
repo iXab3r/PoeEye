@@ -82,7 +82,7 @@ namespace PoeEye.PoeTrade.Updater
             {
                 Log.Instance.Debug($"[ApplicationUpdaterModel] Checking for updates...");
 
-                var updateInfo = await mgr.CheckForUpdate();
+                var updateInfo = await mgr.CheckForUpdate(ignoreDeltaUpdates: true, progress: CheckUpdateProgress);
 
                 Log.Instance.Debug($"[ApplicationUpdaterModel] UpdateInfo:\r\n{updateInfo?.DumpToText()}");
                 if (updateInfo == null || updateInfo.ReleasesToApply.Count == 0)
@@ -123,7 +123,12 @@ namespace PoeEye.PoeTrade.Updater
 
         private void UpdateProgress(int progressPercent)
         {
-            Log.Instance.Debug($"[ApplicationUpdaterModel.UpdateProgress] Update in progress: {progressPercent}%");
+            Log.Instance.Debug($"[ApplicationUpdaterModel.UpdateProgress] Update is in progress: {progressPercent}%");
+        }
+        
+        private void CheckUpdateProgress(int progressPercent)
+        {
+            Log.Instance.Debug($"[ApplicationUpdaterModel.CheckUpdateProgress] Check update is in progress: {progressPercent}%");
         }
 
         private void OnAppUninstall(Version appVersion)
@@ -148,16 +153,14 @@ namespace PoeEye.PoeTrade.Updater
 
         public void RestartApplication()
         {
-            Log.Instance.Debug($"[ApplicationUpdaterModel] Restarting app, folder: {mostRecentVersionAppFolder}, appName: {ApplicationName}...");
-            var updatedExePath = new FileInfo(Path.Combine(mostRecentVersionAppFolder.FullName, ApplicationName));
+            var updatedExecutable = new FileInfo(Path.Combine(mostRecentVersionAppFolder.FullName, ApplicationName));
+            Log.Instance.Debug($"[ApplicationUpdaterModel] Restarting app, folder: {mostRecentVersionAppFolder}, appName: {ApplicationName}, exePath: {updatedExecutable}(exists: {updatedExecutable.Exists})...");
 
-            //FIXME Race condition, it's possible that the new application loads BEFORE this instance will be unloaded => mutex conflict
-            if (!updatedExePath.Exists)
+            if (!updatedExecutable.Exists)
             {
-                throw new FileNotFoundException("Application executable was not found", updatedExePath.FullName);
+                throw new FileNotFoundException("Application executable was not found", updatedExecutable.FullName);
             }
-            Process.Start(updatedExePath.FullName);
-            Application.Current.Shutdown(0);
+            UpdateManager.RestartApp(updatedExecutable.FullName);
         }
     }
 }
