@@ -15,6 +15,14 @@
   <ResourceDictionary.MergedDictionaries>
     <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Converters.xaml" />
   </ResourceDictionary.MergedDictionaries>
+  
+  <eye:FlagToVisibilityConverter x:Key="ItemShapedToVisibilityConverter" TrueValue="Visible" FalseValue="Collapsed" BitMask="{x:Static common:PoeItemModificatins.Shaped}"/>
+  <eye:FlagToVisibilityConverter x:Key="ItemElderToVisibilityConverter" TrueValue="Visible" FalseValue="Collapsed" BitMask="{x:Static common:PoeItemModificatins.Elder}"/>
+  <eye:FlagToVisibilityConverter x:Key="ItemMirroredToVisibilityConverter" TrueValue="Visible" FalseValue="Collapsed" BitMask="{x:Static common:PoeItemModificatins.Mirrored}"/>
+  <eye:FlagToVisibilityConverter x:Key="ItemUnidentifiedToVisibilityConverter" TrueValue="Visible" FalseValue="Collapsed" BitMask="{x:Static common:PoeItemModificatins.Unidentified}"/>
+  <eye:FlagToVisibilityConverter x:Key="ItemCraftedToVisibilityConverter" TrueValue="Visible" FalseValue="Collapsed" BitMask="{x:Static common:PoeItemModificatins.Crafted}"/>
+  <eye:FlagToVisibilityConverter x:Key="ItemCorruptedToVisibilityConverter" TrueValue="Visible" FalseValue="Collapsed" BitMask="{x:Static common:PoeItemModificatins.Corrupted}"/>
+  <eye:FlagToVisibilityConverter x:Key="ItemEnchantedToVisibilityConverter" TrueValue="Visible" FalseValue="Collapsed" BitMask="{x:Static common:PoeItemModificatins.Enchanted}"/>
 
   <DataTemplate x:Key="PoeItemStatsTemplateKey" DataType="{x:Type common:IPoeItem}">
     <!-- Stats -->
@@ -351,35 +359,72 @@
               <Label
                 Content="Corrupted"
                 Foreground="{StaticResource LabelTextBrush}"
-                BorderBrush="{StaticResource ValidationSummaryColor2}"
                 Background="{StaticResource ValidationSummaryColor5}"
                 FontWeight="Bold"
-                Margin="10,0"
+                Margin="5,0"
                 VerticalContentAlignment="Center"
                 VerticalAlignment="Center"
-                Visibility="{Binding Trade.IsCorrupted, Converter={StaticResource BoolFalseToCollapsedConverter}}" />
-
+                Visibility="{Binding Path=Trade.Modifications, Converter={StaticResource ItemCorruptedToVisibilityConverter}}"/>
+              
+              <Label
+                Content="Shaped"
+                Foreground="{StaticResource LabelTextBrush}"
+                Background="{StaticResource PoeShaperBrush}"
+                FontWeight="Bold"
+                Margin="5,0"
+                VerticalContentAlignment="Center"
+                VerticalAlignment="Center"
+                Visibility="{Binding Path=Trade.Modifications, Converter={StaticResource ItemShapedToVisibilityConverter}}"/>
+              
+              <Label
+                Content="Elder"
+                Foreground="{StaticResource LabelTextBrush}"
+                Background="{StaticResource PoeElderBrush}"
+                FontWeight="Bold"
+                Margin="5,0"
+                VerticalContentAlignment="Center"
+                VerticalAlignment="Center"
+                Visibility="{Binding Path=Trade.Modifications, Converter={StaticResource ItemElderToVisibilityConverter}}"/>
+              
+              <Label
+                Content="Crafted"
+                Foreground="{StaticResource LabelTextBrush}"
+                Background="{StaticResource PoeItemElementalStatBrush}"
+                FontWeight="Bold"
+                Margin="5,0"
+                VerticalContentAlignment="Center"
+                VerticalAlignment="Center"
+                Visibility="{Binding Path=Trade.Modifications, Converter={StaticResource ItemCraftedToVisibilityConverter}}"/>
+              
               <Label
                 Content="Unidentified"
                 Foreground="{StaticResource LabelTextBrush}"
-                BorderBrush="{StaticResource ValidationSummaryColor2}"
-                Background="{StaticResource ValidationSummaryColor5}"
+                Background="{StaticResource PoeItemRarityMagicBrush}"
                 FontWeight="Bold"
-                Margin="10,0"
+                Margin="5,0"
                 VerticalContentAlignment="Center"
                 VerticalAlignment="Center"
-                Visibility="{Binding Trade.IsUnidentified, Converter={StaticResource BoolFalseToCollapsedConverter}}" />
-
+                Visibility="{Binding Path=Trade.Modifications, Converter={StaticResource ItemUnidentifiedToVisibilityConverter}}"/>
+              
               <Label
                 Content="Mirrored"
                 Foreground="{StaticResource LabelTextBrush}"
-                BorderBrush="{StaticResource ValidationSummaryColor2}"
-                Background="{StaticResource ValidationSummaryColor5}"
+                Background="{StaticResource PoeItemRarityRareBrush}"
                 FontWeight="Bold"
-                Margin="10,0"
+                Margin="5,0"
                 VerticalContentAlignment="Center"
                 VerticalAlignment="Center"
-                Visibility="{Binding Trade.IsMirrored, Converter={StaticResource BoolFalseToCollapsedConverter}}" />
+                Visibility="{Binding Path=Trade.Modifications, Converter={StaticResource ItemMirroredToVisibilityConverter}}"/>
+              
+              <Label
+                Content="Enchanted"
+                Foreground="{StaticResource LabelTextBrush}"
+                Background="{StaticResource PoeItemRarityRelicBrush}"
+                FontWeight="Bold"
+                Margin="5,0"
+                VerticalContentAlignment="Center"
+                VerticalAlignment="Center"
+                Visibility="{Binding Path=Trade.Modifications, Converter={StaticResource ItemEnchantedToVisibilityConverter}}"/>
             </StackPanel>
 
 

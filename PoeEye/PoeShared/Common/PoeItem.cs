@@ -21,6 +21,8 @@ namespace PoeShared.Common
         public string UserIgn { get; set; }
 
         public bool UserIsOnline { get; set; }
+        
+        public PoeItemModificatins Modifications { get; set; }
 
         public string Price { get; set; }
 
@@ -63,12 +65,6 @@ namespace PoeShared.Common
         public string SuggestedPrivateMessage { get; set; }
 
         public DateTime? FirstSeen { get; set; }
-
-        public bool IsCorrupted { get; set; }
-
-        public bool IsMirrored { get; set; }
-
-        public bool IsUnidentified { get; set; }
 
         public PoeItemRarity Rarity { get; set; }
 

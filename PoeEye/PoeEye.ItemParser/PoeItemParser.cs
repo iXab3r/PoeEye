@@ -105,7 +105,7 @@ namespace PoeEye.ItemParser
             {
                 return false;
             }
-            item.IsCorrupted = true;
+            item.Modifications |= PoeItemModificatins.Corrupted;
             return true;
         }
 

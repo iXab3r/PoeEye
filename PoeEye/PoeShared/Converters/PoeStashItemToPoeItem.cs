@@ -36,12 +36,11 @@ namespace PoeShared.Converters
             result.ItemName = $"{value.Name} {value.TypeLine}".Trim();
             result.ItemIconUri = value.Icon;
             result.Rarity = value.Rarity;
-            result.IsCorrupted = value.Corrupted;
             result.ItemLevel = value.ItemLevel.ToString();
             result.Hash = value.Id;
             result.League = value.League;
-            result.IsCorrupted = value.Corrupted;
-            result.IsUnidentified = !value.Identified;
+            result.Modifications |= PoeItemModificatins.Corrupted;
+            result.Modifications |= !value.Identified ? PoeItemModificatins.Unidentified : PoeItemModificatins.None;
             result.Note = value.Note;
             result.Timestamp = clock.Now;
 

@@ -190,8 +190,6 @@ namespace PoeEye.PoeTrade
         {
             CQ parser = row.Render();
 
-            var implicitMods = ExtractImplicitMods(row);
-            var explicitMods = ExtractExplicitMods(row);
             var result = new PoeItem
             {
                 ItemIconUri = parser["div[class=icon] img"]?.Attr("src"),
@@ -218,9 +216,9 @@ namespace PoeEye.PoeTrade
                 CriticalChance = parser["td[class=table-stats] td[data-name=crit]"]?.Text(),
                 ItemLevel = parser["td[class=table-stats] td[data-name=level]"]?.Text(),
                 Requirements = parser["td[class=item-cell] ul[class=requirements proplist]"]?.Text(),
-                IsCorrupted = parser["td[class=item-cell] span[class~=corrupted]"].Any(),
                 FirstSeen = dateTimeExtractor.ExtractTimestamp(parser["td[class=item-cell] span[class~=found-time-ago]"]?.Text()),
-                Mods = implicitMods.Concat(explicitMods).Where(IsValid).ToArray(),
+                Mods = ParseMods(parser),
+                Modifications = ParseModificatins(parser),
                 Links = ExtractLinksInfo(row),
                 Rarity = ExtractItemRarity(row),
                 PositionInsideTab = ExtractPositionInsideTab(parser),
@@ -241,6 +239,30 @@ namespace PoeEye.PoeTrade
 
             result.SuggestedPrivateMessage = PrepareTradeMessage(result);
             TrimProperties(result);
+            return result;
+        }
+
+        private IPoeItemMod[] ParseMods(CQ parser)
+        {
+            var implicitMods = ExtractImplicitMods(parser);
+            var explicitMods = ExtractExplicitMods(parser);
+            return implicitMods.Concat(explicitMods).Where(IsValid).ToArray();
+        }
+
+        private PoeItemModificatins ParseModificatins(CQ parser)
+        {
+            var result = PoeItemModificatins.None;
+            
+            var explicitMods = ExtractExplicitMods(parser);
+            
+            result |= parser["td[class=item-cell] span[class~=corrupted]"].Any() ? PoeItemModificatins.Corrupted : PoeItemModificatins.None;
+            result |= explicitMods.Any(x => x.Name == "Shaped") ? PoeItemModificatins.Shaped : PoeItemModificatins.None;
+            result |= explicitMods.Any(x => x.Name == "Elder") ? PoeItemModificatins.Elder : PoeItemModificatins.None;
+            result |= explicitMods.Any(x => x.Name == "Mirrored") ? PoeItemModificatins.Mirrored : PoeItemModificatins.None;
+            result |= explicitMods.Any(x => x.Name == "Unidentified") ? PoeItemModificatins.Unidentified : PoeItemModificatins.None;
+            result |= explicitMods.Any(x => x.Name?.StartsWith("crafted") ?? false) ? PoeItemModificatins.Crafted : PoeItemModificatins.None;
+            result |= explicitMods.Any(x => x.Name?.StartsWith("enchanted") ?? false) ? PoeItemModificatins.Enchanted : PoeItemModificatins.None;
+            
             return result;
         }
 
@@ -362,15 +384,13 @@ namespace PoeEye.PoeTrade
         }
         
 
-        private IPoeItemMod[] ExtractExplicitMods(IDomObject row)
+        private IPoeItemMod[] ExtractExplicitMods(CQ parser)
         {
-            CQ parser = row.Render();
             return parser["ul[class=mods] li"].Select(x => ExtractItemMods(x, PoeModType.Explicit)).ToArray();
         }
 
-        private IPoeItemMod[] ExtractImplicitMods(IDomObject row)
+        private IPoeItemMod[] ExtractImplicitMods(CQ parser)
         {
-            CQ parser = row.Render();
             return parser["ul[class=mods withline] li"].Select(x => ExtractItemMods(x, PoeModType.Implicit)).ToArray();
         }
 

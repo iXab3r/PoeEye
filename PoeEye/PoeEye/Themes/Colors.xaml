@@ -15,6 +15,9 @@
   <Color x:Key="PoeItemDexStatColor">#FF29BA55</Color>
   <Color x:Key="PoeItemStrStatColor">#FFE16043</Color>
   <Color x:Key="PoeItemIntStatColor">#FF4479A9</Color>
+    
+  <Color x:Key="PoeShaperColor">#FF634DA9</Color>
+  <Color x:Key="PoeElderColor">#FF66828A</Color>
 
   <SolidColorBrush x:Key="SemiPoeTradeRemovedItemBrush" Color="{StaticResource SemiPoeTradeRemovedItemColor}" />
   <SolidColorBrush x:Key="SemiPoeTradeNewItemBrush" Color="{StaticResource SemiPoeTradeNewItemColor}" />
@@ -25,6 +28,8 @@
   <SolidColorBrush x:Key="PoeItemElementalStatBrush" Color="{StaticResource PoeItemElementalStatColor}" />
   <SolidColorBrush x:Key="PoeItemPhysicalStatBrush" Color="{StaticResource PoeItemPhysicalStatColor}" />
 
+  <SolidColorBrush x:Key="PoeShaperBrush" Color="{StaticResource PoeShaperColor}" />
+  <SolidColorBrush x:Key="PoeElderBrush" Color="{StaticResource PoeElderColor}" />
 
   <SolidColorBrush x:Key="PoeItemNoStatBrush" Color="{StaticResource PoeItemNoStatColor}" />
   <SolidColorBrush x:Key="PoeItemDexStatBrush" Color="{StaticResource PoeItemDexStatColor}" />

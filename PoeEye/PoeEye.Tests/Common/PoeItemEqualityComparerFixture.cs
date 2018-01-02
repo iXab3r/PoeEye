@@ -1,4 +1,5 @@
 ﻿using PoeShared.Common;
+using PoeShared.Scaffolding.WPF;
 
 namespace PoeEye.Tests.Common
 {
@@ -49,8 +50,8 @@ namespace PoeEye.Tests.Common
                 Mock.Of<IPoeItem>(x => x.UserIsOnline));
 
             yield return new TestCaseData(
-                Mock.Of<IPoeItem>(x => x.IsCorrupted),
-                Mock.Of<IPoeItem>(x => x.IsCorrupted));
+                Mock.Of<IPoeItem>(x => x.Modifications == PoeItemModificatins.Corrupted),
+                Mock.Of<IPoeItem>(x => x.Modifications == PoeItemModificatins.Corrupted));
 
             yield return new TestCaseData(
                 CreateItemWithMods("1"),
@@ -96,8 +97,8 @@ namespace PoeEye.Tests.Common
                 Mock.Of<IPoeItem>(x => x.UserIsOnline == false));
 
             yield return new TestCaseData(
-                Mock.Of<IPoeItem>(x => x.IsCorrupted),
-                Mock.Of<IPoeItem>(x => x.IsCorrupted == false));
+                Mock.Of<IPoeItem>(x => x.Modifications == PoeItemModificatins.Corrupted),
+                Mock.Of<IPoeItem>(x => x.Modifications == PoeItemModificatins.None));
 
             yield return new TestCaseData(
                 CreateItemWithMods("1"),

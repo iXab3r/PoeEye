@@ -254,6 +254,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AppArguments.cs" />
+    <Compile Include="Common\PoeItemModificatins.cs" />
     <Compile Include="Common\TriState.cs" />
     <Compile Include="Common\PoeItemVerificationState.cs" />
     <Compile Include="Common\PoeTradeState.cs" />
@@ -265,6 +266,7 @@
     <Compile Include="Communications\Chromium\LogRequestHandler.cs" />
     <Compile Include="Communications\Chromium\RenderProcessMessageHandler.cs" />
     <Compile Include="Converters\BoolInversionConverter.cs" />
+    <Compile Include="Converters\FlagToObjectConverter.cs" />
     <Compile Include="Converters\PoeStashItemToPoeItem.cs" />
     <Compile Include="Modularity\ISchedulerProvider.cs" />
     <Compile Include="Modularity\SchedulerProvider.cs" />

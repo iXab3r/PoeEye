@@ -237,7 +237,7 @@ namespace PoeEye.Tests.Common
                          x.ItemName == "Torment Veil" &&
                          x.Requirements == "Level: 49 Int: 134" &&
                          x.Links == new PoeLinksInfo("R-B-B-R-B-G") &&
-                         x.IsCorrupted));
+                         x.Modifications == PoeItemModificatins.Corrupted));
 
             yield return new TestCaseData(
                 @"Rarity: Normal
@@ -524,7 +524,7 @@ namespace PoeEye.Tests.Common
             var result = instance.Parse(data);
 
             //Then
-            result.IsCorrupted.ShouldBe(expectedItem.IsCorrupted);
+            result.Modifications.HasFlag(PoeItemModificatins.Corrupted).ShouldBe(expectedItem.Modifications.HasFlag(PoeItemModificatins.Corrupted));
         }
 
         [Test]

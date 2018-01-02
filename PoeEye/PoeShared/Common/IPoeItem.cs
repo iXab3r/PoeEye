@@ -70,11 +70,7 @@ namespace PoeShared.Common
 
         bool UserIsOnline { get; }
 
-        bool IsCorrupted { get; }
-
-        bool IsUnidentified { get; }
-
-        bool IsMirrored { get; }
+        PoeItemModificatins Modifications { get; }
 
         PoeTradeState ItemState { get; }
 
