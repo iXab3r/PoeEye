@@ -49,6 +49,9 @@
       <HintPath>..\packages\Common.Logging.Log4Net1211.3.3.0\lib\net40\Common.Logging.Log4Net1211.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="CsQuery, Version=1.3.3.249, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\CsQuery.1.3.4\lib\net40\CsQuery.dll</HintPath>
+    </Reference>
     <Reference Include="Guards, Version=1.0.0.0, Culture=neutral, PublicKeyToken=ac6aedb73a72f46e, processorArchitecture=MSIL">
       <HintPath>..\packages\Guards.1.0.10\lib\portable-net45+dnxcore50+wp80+wpa81+win81+netcore45+monoandroid10+monotouch10+xamarin.ios10\Guards.dll</HintPath>
       <Private>True</Private>
@@ -85,6 +88,7 @@
       <HintPath>..\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="PresentationCore" />
     <Reference Include="ReactiveUI, Version=7.2.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\reactiveui-core.7.2.0\lib\Net45\ReactiveUI.dll</HintPath>
       <Private>True</Private>
@@ -138,6 +142,11 @@
     <Compile Include="Common\PoeItemParserFixture.cs" />
     <Compile Include="Helpers\MockExtensions.cs" />
     <Compile Include="PoeBud\OfficialApi\GearTypeAnalyzerFixture.cs" />
+    <Compile Include="PoeEye\Converters\PoeItemModToHtmlConverterFixture.cs" />
+    <Compile Include="PoeEye\PoeTrade\PoeTradeDateTimeExtractorFixture.cs" />
+    <Compile Include="PoeEye\PoeTrade\PoeTradeParserModernFixture.cs" />
+    <Compile Include="PoeEye\PoeTrade\TestData\TestDataProvider.cs" />
+    <Compile Include="PoeEye\PoeTrade\ViewModels\PoeTradesListViewModelFixture.cs" />
     <Compile Include="PoeShared\Communications\Chromium\ChromiumBootstrapperFixture.cs" />
     <Compile Include="PoeShared\Converters\StringToPoePriceConverterFixture.cs" />
     <Compile Include="PoeShared\PoeDatabase\PoeNinja\PoeNinjaDatabaseReaderFixture.cs" />
@@ -146,10 +155,6 @@
     <Compile Include="PoeTradeMonitor\Services\Parsers\PoeMessageCurrencyParserPoeTradeFixturey.cs" />
     <Compile Include="PoeTradeMonitor\Services\Parsers\PoeMessageWeakParserPoeTradeFixture.cs" />
     <Compile Include="PoeTradeMonitor\Services\Parsers\PoeMessageStrictParserPoeTradeFixture.cs" />
-    <Compile Include="PoeTrade\PoeTradeDateTimeExtractorFixture.cs" />
-    <Compile Include="PoeTrade\PoeTradeParserModernFixture.cs" />
-    <Compile Include="PoeTrade\TestData\TestDataProvider.cs" />
-    <Compile Include="PoeTrade\ViewModels\PoeTradesListViewModelFixture.cs" />
     <Compile Include="PoeWhisperMonitor\Chat\PoeChatMessageProcessorFixture.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -159,19 +164,19 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="FodyWeavers.xml" />
-    <Content Include="PoeTrade\TestData\PoeTrade.Modern.SampleN4.Live.NewItem.xml">
+    <Content Include="PoeEye\PoeTrade\TestData\PoeTrade.Modern.Sample.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="PoeTrade\TestData\PoeTrade.Modern.SampleN4.Live.ItemGone.xml">
+    <Content Include="PoeEye\PoeTrade\TestData\PoeTrade.Modern.SampleN2.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="PoeTrade\TestData\PoeTrade.Modern.SampleN3.xml">
+    <Content Include="PoeEye\PoeTrade\TestData\PoeTrade.Modern.SampleN3.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="PoeTrade\TestData\PoeTrade.Modern.SampleN2.xml">
+    <Content Include="PoeEye\PoeTrade\TestData\PoeTrade.Modern.SampleN4.Live.ItemGone.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="PoeTrade\TestData\PoeTrade.Modern.Sample.xml">
+    <Content Include="PoeEye\PoeTrade\TestData\PoeTrade.Modern.SampleN4.Live.NewItem.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

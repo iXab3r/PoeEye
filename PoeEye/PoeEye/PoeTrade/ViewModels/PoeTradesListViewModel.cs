@@ -43,15 +43,13 @@ namespace PoeEye.PoeTrade.ViewModels
 
         private readonly IClock clock;
         private readonly IEqualityComparer<IPoeItem> poeItemsComparer;
-        [NotNull] private readonly IPoeApiWrapper poeApiWrapper;
-        [NotNull] private readonly IFactory<IPoeLiveHistoryProvider, IPoeApiWrapper, IPoeQueryInfo> poeLiveHistoryFactory;
+        private readonly IPoeApiWrapper poeApiWrapper;
+        private readonly IFactory<IPoeLiveHistoryProvider, IPoeApiWrapper, IPoeQueryInfo> poeLiveHistoryFactory;
         private readonly IFactory<IPoeTradeViewModel, IPoeItem> poeTradeViewModelFactory;
         private readonly IScheduler uiScheduler;
         private readonly ISourceList<IPoeTradeViewModel> itemsSource = new SourceList<IPoeTradeViewModel>();
         private readonly ReadOnlyObservableCollection<IPoeTradeViewModel> items;
         
-        private readonly ISubject<IPoeItem[]> defaultItemSource = new Subject<IPoeItem[]>();
-
         private ActiveProviderInfo activeProviderInfo;
         private IPoeQueryInfo activeQuery;
 

@@ -127,10 +127,6 @@ namespace PoeEye.PoeTrade.ViewModels
 
         public float RawPriceInChaosOrbs { get; }
 
-        public IPoeItemMod[] ImplicitMods => Trade.Mods.Where(x => x.ModType == PoeModType.Implicit).ToArray();
-
-        public IPoeItemMod[] ExplicitMods => Trade.Mods.Where(x => x.ModType == PoeModType.Explicit).ToArray();
-
         public IPoeItem Trade { get; }
 
         public ICommand CopyPrivateMessageToClipboardCommand => copyPrivateMessageToClipboardCommand;

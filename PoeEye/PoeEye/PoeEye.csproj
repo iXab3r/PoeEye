@@ -138,6 +138,12 @@
       <HintPath>..\packages\Guards.1.0.10\lib\portable-net45+dnxcore50+wp80+wpa81+win81+netcore45+monoandroid10+monotouch10+xamarin.ios10\Guards.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="HtmlRenderer, Version=1.5.0.5, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\HtmlRenderer.Core.1.5.0.5\lib\net45\HtmlRenderer.dll</HintPath>
+    </Reference>
+    <Reference Include="HtmlRenderer.WPF, Version=1.5.0.6, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\HtmlRenderer.WPF.1.5.0.6\lib\net45\HtmlRenderer.WPF.dll</HintPath>
+    </Reference>
     <Reference Include="ICSharpCode.AvalonEdit, Version=5.0.3.0, Culture=neutral, PublicKeyToken=9cc39be672370310, processorArchitecture=MSIL">
       <HintPath>..\packages\AvalonEdit.5.0.3\lib\Net40\ICSharpCode.AvalonEdit.dll</HintPath>
       <Private>True</Private>
@@ -356,6 +362,7 @@
     <Compile Include="Converters\NullToBoolConverter.cs" />
     <Compile Include="Converters\ObjectToVisibilityConverter.cs" />
     <Compile Include="Converters\ObjectToLowercaseConverter.cs" />
+    <Compile Include="Converters\PoeItemModToHtmlConverter.cs" />
     <Compile Include="Converters\TimeSpanToHumanReadableStringConverter.cs" />
     <Compile Include="Converters\TimeSpanToSecondsConverter.cs" />
     <Compile Include="Converters\NullableConverter.cs" />

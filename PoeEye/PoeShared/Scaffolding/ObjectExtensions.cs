@@ -38,6 +38,8 @@
         public static void TransferPropertiesTo<TSource, TTarget>(this TSource source, TTarget target)
             where TTarget : class, TSource
         {
+            Guard.ArgumentNotNull(source, nameof(source));
+
             var settableProperties = typeof(TTarget)
                 .GetProperties(BindingFlags.Instance | BindingFlags.Public)
                 .Where(x => x.CanRead && x.CanWrite)

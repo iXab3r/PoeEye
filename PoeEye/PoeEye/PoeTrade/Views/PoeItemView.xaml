@@ -10,7 +10,9 @@
                     xmlns:poeTrade1="clr-namespace:PoeEye.PoeTrade.Common"
                     xmlns:controls="clr-namespace:PoeShared.Scaffolding.WPF.Controls;assembly=PoeShared"
                     xmlns:fa="http://schemas.fontawesome.io/icons/"
-                    xmlns:eye="http://coderush.net/poeeye/">
+                    xmlns:eye="http://coderush.net/poeeye/"
+                    xmlns:wpf1="clr-namespace:TheArtOfDev.HtmlRenderer.WPF;assembly=HtmlRenderer.WPF"
+                    xmlns:converters="clr-namespace:PoeEye.Converters">
 
   <ResourceDictionary.MergedDictionaries>
     <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Converters.xaml" />
@@ -24,6 +26,22 @@
   <eye:FlagToVisibilityConverter x:Key="ItemCorruptedToVisibilityConverter" TrueValue="Visible" FalseValue="Collapsed" BitMask="{x:Static common:PoeItemModificatins.Corrupted}"/>
   <eye:FlagToVisibilityConverter x:Key="ItemEnchantedToVisibilityConverter" TrueValue="Visible" FalseValue="Collapsed" BitMask="{x:Static common:PoeItemModificatins.Enchanted}"/>
 
+  <converters:PoeItemModToHtmlConverter x:Key="DefaultPoeItemModToHtmlConverterKey" 
+                                        DefaultTextColor="{StaticResource PoeItemRarityNormalColor}"
+                                        FireRelatedTextColor="#B95F0E"
+                                        ColdRelatedTextColor="#2854B3"
+                                        LightningRelatedTextColor="#AD9D32"
+                                        ChaosRelatedTextColor="#3A277E"
+                                        PhysicalRelatedTextColor="{StaticResource PoeItemPhysicalStatColor}"
+                                        ElementalRelatedTextColor="{StaticResource PoeItemElementalStatColor}"
+                                        LifeRelatedTextColor="{StaticResource PoeItemStrStatColor}"
+                                        ManaRelatedTextColor="{StaticResource PoeItemIntStatColor}"
+                                        CraftGroupColor="{StaticResource PoeItemElementalStatColor}"
+                                        EnchantGroupColor="{StaticResource PoeItemRarityRelicColor}"
+                                        PseudoGroupColor="#5DA423"
+                                        TotalGroupColor="#5DA423"
+                                        />
+  
   <DataTemplate x:Key="PoeItemStatsTemplateKey" DataType="{x:Type common:IPoeItem}">
     <!-- Stats -->
     <Grid Margin="10,5">
@@ -238,6 +256,26 @@
             </filterExtension:CollectionViewSourceFilteringBehavior>
           </i:Interaction.Behaviors>
         </CollectionViewSource>
+        
+        
+        <DataTemplate x:Key="ModTemplateKey" DataType="{x:Type common:IPoeItemMod}">
+          <wpf1:HtmlLabel IsSelectionEnabled="False" 
+                          Foreground="{StaticResource TextBrush}"
+                          SnapsToDevicePixels="True"
+                          AutoSize="False"
+                          AutoSizeHeightOnly="False"
+                          Height="20"
+                          TextOptions.TextFormattingMode="Display"
+                          Text="{Binding Converter={StaticResource DefaultPoeItemModToHtmlConverterKey}}">
+            <wpf1:HtmlLabel.Width>
+              <Binding RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type ContentControl}}"
+                       Path="ActualWidth" 
+                       Mode="OneWay" Converter="{StaticResource MathAdditionConverter}" ConverterParameter="-10.0">
+              </Binding>
+            </wpf1:HtmlLabel.Width>
+          </wpf1:HtmlLabel>
+        </DataTemplate>
+
       </Grid.Resources>
       <Grid.RowDefinitions>
         <RowDefinition Height="Auto" />
@@ -248,20 +286,23 @@
       </Grid.RowDefinitions>
       <ItemsControl Grid.Row="0" Grid.Column="0"
                     x:Name="ImplicitModsItemsControl"
-                    ItemsSource="{Binding Source={StaticResource ImplicitMods}}" FontStyle="Italic" />
+                    ItemsSource="{Binding Source={StaticResource ImplicitMods}}" FontStyle="Italic"
+                    ItemTemplate="{StaticResource ModTemplateKey}"/>
       <Border Grid.Row="1" Grid.Column="0"
               Visibility="{Binding ElementName=ImplicitModsItemsControl, Path=HasItems, Converter={StaticResource BoolFalseToCollapsedConverter}}"
               Height="5" BorderBrush="{StaticResource AccentColorBrush}" BorderThickness="0,1,0,0" />
       <ItemsControl Grid.Row="2" Grid.Column="0"
                     x:Name="ExplicitModsItemsControl"
-                    ItemsSource="{Binding Source={StaticResource ExplicitMods}}" />
+                    ItemsSource="{Binding Source={StaticResource ExplicitMods}}"
+                    ItemTemplate="{StaticResource ModTemplateKey}"/>
       <Line Grid.Row="3" Grid.Column="0"
             Visibility="{Binding ElementName=UnknownModsItemsControl, Path=HasItems, Converter={StaticResource BoolFalseToCollapsedConverter}}"
             Stroke="{StaticResource ProgressBrush}" StrokeThickness="1" />
       <ItemsControl Grid.Row="4" Grid.Column="0"
                     x:Name="UnknownModsItemsControl"
                     FontStyle="Italic"
-                    ItemsSource="{Binding Source={StaticResource UnknownMods}}" />
+                    ItemsSource="{Binding Source={StaticResource UnknownMods}}" 
+                    ItemTemplate="{StaticResource ModTemplateKey}"/>
     </Grid>
   </DataTemplate>
 
@@ -284,7 +325,9 @@
                         MaxHeight="130"
                         Content="{Binding ImageViewModel}" />
 
-        <ContentControl Grid.Row="1" Grid.Column="0" Content="{Binding LinksViewModel}" Margin="0,0,10,0" />
+        <ContentControl Grid.Row="1" Grid.Column="0" Content="{Binding LinksViewModel}" 
+                        VerticalAlignment="Center"
+                        Margin="0,0,10,0" />
 
         <Border Grid.Row="0" Grid.Column="1">
           <Grid>
@@ -470,7 +513,7 @@
 
             <StackPanel Grid.Column="1" Orientation="Vertical">
               <ContentControl Content="{Binding Trade}"
-                              HorizontalAlignment="Left"
+                              HorizontalAlignment="Stretch"
                               ContentTemplate="{StaticResource PoeItemModsTemplateKey}" />
             </StackPanel>
           </Grid>

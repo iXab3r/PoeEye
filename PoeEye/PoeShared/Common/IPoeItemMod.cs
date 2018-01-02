@@ -9,5 +9,7 @@ namespace PoeShared.Common
         string CodeName { get; }
 
         bool IsCrafted { get; }
+        
+        string TierInfo { get; }
     }
 }

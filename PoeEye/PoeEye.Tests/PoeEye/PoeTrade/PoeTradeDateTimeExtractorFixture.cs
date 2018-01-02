@@ -1,19 +1,13 @@
-﻿using PoeShared;
+﻿using System;
+using System.Collections.Generic;
+using Moq;
+using NUnit.Framework;
+using PoeEye.PoeTrade;
+using PoeShared;
+using Shouldly;
 
-namespace PoeEye.Tests.PoeTrade
+namespace PoeEye.Tests.PoeEye.PoeTrade
 {
-    using System;
-    using System.Collections;
-    using System.Collections.Generic;
-
-    using Moq;
-
-    using NUnit.Framework;
-
-    using PoeEye.PoeTrade;
-
-    using Shouldly;
-
     [TestFixture]
     public class PoeTradeDateTimeExtractorFixture
     {

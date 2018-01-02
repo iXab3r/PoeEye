@@ -1,0 +1,207 @@
+﻿using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Windows.Data;
+using System.Windows.Media;
+using Guards;
+using PoeShared.Common;
+using PoeShared.Scaffolding;
+
+namespace PoeEye.Converters
+{
+    internal sealed class PoeItemModToHtmlConverter : IValueConverter
+    {
+        private readonly ConcurrentDictionary<string, Regex> cache = new ConcurrentDictionary<string, Regex>();
+
+        public Color DefaultTextColor { get; set; }
+        public Color FireRelatedTextColor { get; set; }
+        public Color ColdRelatedTextColor { get; set; }
+        public Color LightningRelatedTextColor { get; set; }
+        public Color ChaosRelatedTextColor { get; set; }
+        public Color PhysicalRelatedTextColor { get; set; }
+        public Color ElementalRelatedTextColor { get; set; }
+        
+        public Color LifeRelatedTextColor { get; set; } 
+        public Color ManaRelatedTextColor { get; set; } 
+        
+        public Color TotalGroupColor { get; set; }
+        public Color PseudoGroupColor { get; set; }
+        public Color EnchantGroupColor { get; set; }
+        public Color CraftGroupColor { get; set; }
+
+        private readonly ICollection<ModParserConfig> parsingSettings = new List<ModParserConfig>()
+        {
+          
+        };
+
+        public PoeItemModToHtmlConverter()
+        {
+            Preconfigure().ForEach(parsingSettings.Add);
+        }
+
+        private IEnumerable<ModParserConfig> Preconfigure()
+        {
+            yield return new ModParserConfig()
+            {
+                Expression = CreateReplacementRegex(@"(total:\s*)"),
+                Functor = (text, match) => ReplaceGroup(match, text, replacement: AddGroup("total", DefaultTextColor, TotalGroupColor))
+            };
+            yield return new ModParserConfig()
+            {
+                Expression = CreateReplacementRegex(@"(pseudo:\s*)"),
+                Functor = (text, match) => ReplaceGroup(match, text, replacement: AddGroup("pseudo", DefaultTextColor, PseudoGroupColor))
+            };
+            yield return new ModParserConfig()
+            {
+                Expression = CreateReplacementRegex(@"(enchanted\s*)"),
+                Functor = (text, match) => ReplaceGroup(match, text, replacement: AddGroup("enchanted", DefaultTextColor, EnchantGroupColor))
+            };
+            yield return new ModParserConfig()
+            {
+                Expression = CreateReplacementRegex(@"(crafted\s*)"),
+                Functor = (text, match) => ReplaceGroup(match, text, replacement: AddGroup("crafted", DefaultTextColor, CraftGroupColor))
+            };
+            yield return new ModParserConfig()
+            {
+                Expression = "(to Cold Resistance)|(Adds.*Cold Damage)",
+                Functor = (text, match) => WrapInSpan(text, ColdRelatedTextColor)
+            };
+            yield return new ModParserConfig()
+            {
+                Expression = "(to Fire Resistance)|(Adds.*Fire Damage)",
+                Functor = (text, match) => WrapInSpan(text, FireRelatedTextColor)
+            };
+            yield return new ModParserConfig()
+            {
+                Expression = "(to Lightning Resistance)|(Adds.*Lightning Damage)",
+                Functor = (text, match) => WrapInSpan(text, LightningRelatedTextColor)
+            };
+            yield return new ModParserConfig()
+            {
+                Expression = "(to Chaos Resistance)|(Adds.*Chaos Damage)",
+                Functor = (text, match) => WrapInSpan(text, ChaosRelatedTextColor)
+            };
+            yield return new ModParserConfig()
+            {
+                Expression = "(Physical Damage)",
+                Functor = (text, match) => WrapInSpan(text, PhysicalRelatedTextColor)
+            };
+            yield return new ModParserConfig()
+            {
+                Expression = "(Elemental Damage)",
+                Functor = (text, match) => WrapInSpan(text, ElementalRelatedTextColor)
+            };
+            yield return new ModParserConfig()
+            {
+                Expression = "(to maximum Life)",
+                Functor = (text, match) => WrapInSpan(text, LifeRelatedTextColor)
+            };
+            yield return new ModParserConfig()
+            {
+                Expression = "(to maximum Mana)",
+                Functor = (text, match) => WrapInSpan(text, ManaRelatedTextColor)
+            };
+            yield return new ModParserConfig()
+            {
+                Expression = "(.*)",
+                Functor = (text, match) => WrapInSpan(text, DefaultTextColor)
+            };
+        }
+
+        public string Convert(IPoeItemMod mod)
+        {
+            Guard.ArgumentNotNull(mod, nameof(mod));
+
+            var name = mod.Name ?? "(Unknown mod - no name specified)";
+            foreach (var config in parsingSettings)
+            {
+                var regex = cache.GetOrAdd(config.Expression, expr => new Regex(expr, RegexOptions.Compiled | RegexOptions.IgnoreCase));
+
+                var match = regex.Match(name);
+
+                if (!match.Success)
+                {
+                    continue;
+                }
+                
+                name = config.Functor(name, match);
+            }
+            if (string.IsNullOrEmpty(mod.TierInfo))
+            {
+                return name;
+            }
+            else
+            {
+                var tier = string.IsNullOrWhiteSpace(mod.TierInfo) ? string.Empty : WrapTierInfo(mod.TierInfo, DefaultTextColor);
+                return $"<table width='100%'><tr style='vertical-align: top;'><td style='text-align:left;'>{name}</td><td style='text-align:right;'>{tier}</td></tr></table>";
+            }
+         }
+
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (!(value is IPoeItemMod mod))
+            {
+                return Binding.DoNothing;
+            }
+
+            var modName = Convert(mod);
+            return modName;
+        }
+        
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotSupportedException();
+        }
+
+        public static string CreateReplacementRegex(string expression)
+        {
+            return $@"(?<=^|>){expression}";
+        }
+        
+        public static string WrapTierInfo(string input, Color color)
+        {
+            return $"<span style='font-style: italic; margin:10px; color: {ToRgb(color)}'>{input}</span>";
+        }
+
+        public static string WrapInSpan(string input, Color color)
+        {
+            return $"<span style='color: {ToRgb(color)}'>{input}</span>";
+        }
+
+        public static string AddGroup(string input, Color color, Color bgColor)
+        {
+            return $"<span style='font-size: 95%; color: {ToRgb(color)}; background-color:{ToRgb(bgColor)};  padding-left:5px;padding-right:5px; margin-right:5px;'>{input}</span>";
+        }
+        
+        private static string ReplaceGroup(
+            Match match, string input, string replacement)
+        {
+            var firstPart = input.Substring(0,match.Groups[1].Index);    
+            var secondPart = input.Substring(match.Groups[1].Index + match.Groups[1].Length);
+            var fullReplace = firstPart + replacement + secondPart;
+            return fullReplace;
+        }
+
+        private static string ToRgb(Color color)
+        {
+            return $"rgb({color.R}, {color.G}, {color.B})";
+        }
+        
+        private static string StripHtml(string input)
+        {
+            var tagsExpression = new Regex(@"</?.+?>");
+            return tagsExpression.Replace(input, string.Empty);
+        }
+
+        private struct ModParserConfig
+        {
+            public string Expression { get; set; }
+            
+            public Func<string, Match, string> Functor { get; set; }
+        }
+    }
+}

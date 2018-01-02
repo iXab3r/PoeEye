@@ -15,11 +15,7 @@ namespace PoeEye.PoeTrade.ViewModels
     {
         ICommand CopyPrivateMessageToClipboardCommand { [NotNull] get; }
 
-        IPoeItemMod[] ExplicitMods { [NotNull] get; }
-
         IImageViewModel ImageViewModel { [NotNull] get; }
-
-        IPoeItemMod[] ImplicitMods { [NotNull] get; }
 
         PoeLinksInfoViewModel LinksViewModel { [NotNull] get; }
 

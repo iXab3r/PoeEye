@@ -1,32 +1,22 @@
-﻿using PoeEye.PoeTrade.Common;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reactive.Concurrency;
+using System.Reactive.Disposables;
+using System.Reactive.Subjects;
+using Moq;
+using NUnit.Framework;
+using PoeEye.PoeTrade.Models;
+using PoeEye.PoeTrade.ViewModels;
+using PoeEye.Tests.Helpers;
 using PoeShared;
 using PoeShared.Common;
 using PoeShared.PoeTrade;
 using PoeShared.Prism;
+using Shouldly;
 
-namespace PoeEye.Tests.PoeTrade.ViewModels
+namespace PoeEye.Tests.PoeEye.PoeTrade.ViewModels
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Reactive.Concurrency;
-    using System.Reactive.Disposables;
-    using System.Reactive.Subjects;
-
-    using Helpers;
-
-    using Moq;
-
-    using NUnit.Framework;
-
-    using PoeEye.PoeTrade;
-    using PoeEye.PoeTrade.Models;
-    using PoeEye.PoeTrade.ViewModels;
-
-    using Shouldly;
-
-    using TypeConverter;
-
     [TestFixture]
     internal sealed class PoeTradesListViewModelFixture
     {

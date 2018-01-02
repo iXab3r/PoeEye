@@ -21,7 +21,6 @@
     <Color x:Key="OverlayBackgroundColorKey">#292C2A</Color>
     <Color x:Key="OverlayForegroundColorKey">White</Color>
 
-
     <Color x:Key="PoeItemRarityNormalColor">White</Color>
     <Color x:Key="PoeItemRarityMagicColor">#5050EB</Color>
     <Color x:Key="PoeItemRarityRareColor">#A39E1B</Color>

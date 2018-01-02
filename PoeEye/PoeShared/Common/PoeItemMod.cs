@@ -11,6 +11,8 @@ namespace PoeShared.Common
         public static IEqualityComparer<PoeItemMod> NameComparer { get; } = new LambdaComparer<PoeItemMod>((x, y) => string.Equals(x.Name, y.Name));
 
         public bool IsCrafted { get; set; }
+        
+        public string TierInfo { get; set; }
 
         public PoeModType ModType { get; set; }
 

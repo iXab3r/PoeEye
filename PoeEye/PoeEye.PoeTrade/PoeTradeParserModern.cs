@@ -386,28 +386,47 @@ namespace PoeEye.PoeTrade
 
         private IPoeItemMod[] ExtractExplicitMods(CQ parser)
         {
-            return parser["ul[class=mods] li"].Select(x => ExtractItemMods(x, PoeModType.Explicit)).ToArray();
+            return parser["ul[class=mods] li"].Select(x => ExtractItemMod(x, PoeModType.Explicit)).ToArray();
         }
 
         private IPoeItemMod[] ExtractImplicitMods(CQ parser)
         {
-            return parser["ul[class=mods withline] li"].Select(x => ExtractItemMods(x, PoeModType.Implicit)).ToArray();
+            return parser["ul[class=mods withline] li"].Select(x => ExtractItemMod(x, PoeModType.Implicit)).ToArray();
         }
 
-        private IPoeItemMod ExtractItemMods(IDomObject itemModRow, PoeModType modType = PoeModType.Unknown)
+        public IPoeItemMod ExtractItemMod(CQ parser, PoeModType modType)
         {
-            CQ parser = itemModRow.Render();
-
             var result = new PoeItemMod
             {
                 ModType = modType,
                 CodeName = parser.Attr("data-name")?.Trim('#'),
                 IsCrafted = parser.Select("u").Any(),
-                Name = parser["li"]?.Text(),
             };
+            
+            var nameElements = parser["li"]?.FirstOrDefault();
+            if (nameElements != null)
+            {
+                var tierInfoChild = nameElements.ChildNodes.FirstOrDefault(x => x.ClassName?.StartsWith("item-affix") ?? false);
+                if (tierInfoChild != null)
+                {
+                    nameElements.RemoveChild(tierInfoChild);
+                    result.TierInfo = new CQ(tierInfoChild.Render()).Text();
+                }
+                result.Name = new CQ(nameElements.Render()).Text();
+            }
+            else
+            {
+                result.Name = "Unknown";
+            }
 
             TrimProperties(result);
             return result;
+        }
+        
+        public IPoeItemMod ExtractItemMod(IDomObject itemModRow, PoeModType modType = PoeModType.Unknown)
+        {
+            CQ parser = itemModRow.Render();
+            return ExtractItemMod(parser, modType);
         }
 
         private IPoeItem[] ExtractItems(CQ parser)
