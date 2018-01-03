@@ -45,7 +45,18 @@ namespace PoeShared.Communications.Chromium
             settings.CachePath = "cefcache";
             settings.SetOffScreenRenderingBestPerformanceArgs();
             settings.WindowlessRenderingEnabled = true;
-            settings.LogSeverity = LogSeverity.Verbose;
+            if (Log.Instance.IsTraceEnabled)
+            {
+                settings.LogSeverity = LogSeverity.Verbose;
+            }
+            else if (Log.Instance.IsDebugEnabled)
+            {
+                settings.LogSeverity = LogSeverity.Error;
+            }
+            else 
+            {
+                settings.LogSeverity = LogSeverity.Disable;
+            }
             settings.IgnoreCertificateErrors = true;
             settings.CefCommandLineArgs.Add("no-proxy-server", "1");
             settings.UserAgent = "CefSharp Browser" + Cef.CefSharpVersion;

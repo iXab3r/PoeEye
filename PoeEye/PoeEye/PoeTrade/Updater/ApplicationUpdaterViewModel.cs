@@ -31,7 +31,7 @@ namespace PoeEye.PoeTrade.Updater
     {
         private readonly IApplicationUpdaterModel updaterModel;
         private readonly ReactiveCommand<Unit> checkForUpdatesCommand;
-        private readonly ReactiveCommand<object> restartCommand;
+        private readonly ReactiveCommand<Unit> restartCommand;
 
         private bool isBusy;
         private bool isOpen;
@@ -64,11 +64,16 @@ namespace PoeEye.PoeTrade.Updater
             updaterModel
                 .WhenAnyValue(x => x.MostRecentVersion)
                 .ObserveOn(uiScheduler)
-                .Subscribe(() => this.RaisePropertyChanged(nameof(MostRecentVersion)))
+                .Subscribe(() => this.RaisePropertyChanged(nameof(MostRecentVersion)), Log.HandleUiException)
                 .AddTo(Anchors);
+            
+            restartCommand = ReactiveUI.Legacy.ReactiveCommand
+                .CreateAsyncTask(x => RestartCommandExecuted(), uiScheduler);
 
-            restartCommand = ReactiveUI.Legacy.ReactiveCommand.Create();
-            restartCommand.Subscribe(updaterModel.RestartApplication).AddTo(Anchors);
+            restartCommand
+                .ThrownExceptions
+                .Subscribe(ex => Error = $"Restart error: {ex.Message}")
+                .AddTo(Anchors);
             
             configProvider
                 .WhenChanged
@@ -122,13 +127,29 @@ namespace PoeEye.PoeTrade.Updater
             }
             catch (Exception ex)
             {
-                Log.HandleException(ex);
+                Log.HandleUiException(ex);
                 IsOpen = true;
-                throw;
+                Error = ex.Message;
             }
             finally
             {
                 IsBusy = false;
+            }
+        }
+        
+        private async Task RestartCommandExecuted()
+        {
+            Log.Instance.Debug($"[ApplicationUpdaterViewModel] Restart application requested");
+            Error = string.Empty;
+
+            try
+            {
+                await updaterModel.RestartApplication();
+            }
+            catch (Exception ex)
+            {
+                Log.HandleUiException(ex);
+                Error = ex.Message;
             }
         }
     }

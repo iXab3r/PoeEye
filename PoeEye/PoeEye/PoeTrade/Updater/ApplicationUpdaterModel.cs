@@ -151,7 +151,7 @@ namespace PoeEye.PoeTrade.Updater
             Log.Instance.Debug($"[ApplicationUpdaterModel.OnFirstRun] App started for the first time");
         }
 
-        public void RestartApplication()
+        public async Task RestartApplication()
         {
             var updatedExecutable = new FileInfo(Path.Combine(mostRecentVersionAppFolder.FullName, ApplicationName));
             Log.Instance.Debug($"[ApplicationUpdaterModel] Restarting app, folder: {mostRecentVersionAppFolder}, appName: {ApplicationName}, exePath: {updatedExecutable}(exists: {updatedExecutable.Exists})...");
@@ -160,10 +160,48 @@ namespace PoeEye.PoeTrade.Updater
             {
                 throw new FileNotFoundException("Application executable was not found", updatedExecutable.FullName);
             }
-            UpdateManager.RestartApp(updatedExecutable.FullName);
+
+            var squirrelUpdater = GetSquirrelUpdateExe();
+            var squirrelArgs = $"--processStartAndWait {updatedExecutable.FullName}";
+            
+            Log.Instance.Debug($"[ApplicationUpdaterModel] Starting Squirrel updater @ '{squirrelUpdater}', args: {squirrelArgs} ...");
+            var updaterProcess = Process.Start(squirrelUpdater, squirrelArgs);
+            if (updaterProcess == null)
+            {
+                throw new FileNotFoundException($"Failed to start updater @ '{squirrelUpdater}'");
+            }
+            Log.Instance.Debug($"[ApplicationUpdaterModel] Process spawned, PID: {updaterProcess.Id}");
+            await Task.Delay(2000);
             
             Log.Instance.Debug($"[ApplicationUpdaterModel] Terminating application...");
             Application.Current.Shutdown(0);
+        }
+        
+        private static string GetSquirrelUpdateExe()
+        {
+            const string updaterExecutableName = "update.exe";
+            
+            var entryAssembly = Assembly.GetEntryAssembly();
+            if (entryAssembly != null &&
+                Path.GetFileName(entryAssembly.Location).Equals(updaterExecutableName, StringComparison.OrdinalIgnoreCase) &&
+                (entryAssembly.Location.IndexOf("app-", StringComparison.OrdinalIgnoreCase) == -1 && entryAssembly.Location.IndexOf("SquirrelTemp", StringComparison.OrdinalIgnoreCase) == -1))
+            {
+                return Path.GetFullPath(entryAssembly.Location);
+            }
+
+            var squirrelAssembly = typeof(UpdateManager).Assembly;
+            var executingAssembly = Path.GetDirectoryName(squirrelAssembly.Location);
+            if (executingAssembly == null)
+            {
+                throw new ApplicationException($"Failed to get executing of assembly {squirrelAssembly}");
+            }
+            
+            var fileInfo = new FileInfo(Path.Combine(executingAssembly, "..", updaterExecutableName));
+            if (!fileInfo.Exists)
+            {
+                throw new FileNotFoundException($"{updaterExecutableName} not found(path: {fileInfo.FullName}), not a Squirrel-installed app?", fileInfo.FullName);
+            }
+            return fileInfo.FullName;
         }
     }
 }

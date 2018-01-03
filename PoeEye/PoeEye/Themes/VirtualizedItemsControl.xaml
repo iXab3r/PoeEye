@@ -10,7 +10,7 @@
     <Setter Property="ItemsPanel">
       <Setter.Value>
         <ItemsPanelTemplate>
-          <VirtualizingStackPanel HorizontalAlignment="Center" />
+          <VirtualizingStackPanel HorizontalAlignment="Stretch" />
         </ItemsPanelTemplate>
       </Setter.Value>
     </Setter>

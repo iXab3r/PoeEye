@@ -14,7 +14,8 @@ namespace PoeEye.PoeTrade.Updater
         [NotNull]
         Task<bool> CheckForUpdates();
 
-        void RestartApplication();
+        [NotNull]
+        Task RestartApplication();
 
         [NotNull]
         Version MostRecentVersion { get; }
