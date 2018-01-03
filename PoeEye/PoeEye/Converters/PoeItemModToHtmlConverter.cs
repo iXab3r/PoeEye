@@ -102,6 +102,11 @@ namespace PoeEye.Converters
             };
             yield return new ModParserConfig()
             {
+                Expression = "(to maximum Energy Shield)|(increased Energy Shield)",
+                Functor = (text, match) => WrapInSpan(text, ManaRelatedTextColor)
+            };
+            yield return new ModParserConfig()
+            {
                 Expression = "(to maximum Mana)",
                 Functor = (text, match) => WrapInSpan(text, ManaRelatedTextColor)
             };
