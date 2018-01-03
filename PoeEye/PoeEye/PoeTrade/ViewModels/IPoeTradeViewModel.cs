@@ -15,9 +15,9 @@ namespace PoeEye.PoeTrade.ViewModels
     {
         ICommand CopyPrivateMessageToClipboardCommand { [NotNull] get; }
 
-        IImageViewModel ImageViewModel { [NotNull] get; }
+        IImageViewModel Image { [NotNull] get; }
 
-        PoeLinksInfoViewModel LinksViewModel { [NotNull] get; }
+        PoeLinksInfoViewModel Links { [NotNull] get; }
 
         PoePrice? PriceInChaosOrbs { get; }
 

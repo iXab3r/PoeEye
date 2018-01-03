@@ -161,6 +161,9 @@ namespace PoeEye.PoeTrade.Updater
                 throw new FileNotFoundException("Application executable was not found", updatedExecutable.FullName);
             }
             UpdateManager.RestartApp(updatedExecutable.FullName);
+            
+            Log.Instance.Debug($"[ApplicationUpdaterModel] Terminating application...");
+            Application.Current.Shutdown(0);
         }
     }
 }

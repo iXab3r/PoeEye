@@ -46,6 +46,7 @@ namespace PoeEye.Prism
             Container
                 .RegisterType<IMainWindowViewModel, MainWindowViewModel>()
                 .RegisterType<IApplicationUpdaterModel, ApplicationUpdaterModel>()
+                .RegisterType<IPoeItemModsViewModel, PoeItemModsViewModel>()
                 .RegisterType<IPoeTradeViewModel, PoeTradeViewModel>()
                 .RegisterType<IMainWindowTabViewModel, MainWindowTabViewModel>()
                 .RegisterType<IPoeModViewModel, PoeModViewModel>()

@@ -385,6 +385,7 @@
     <Compile Include="PoeTrade\Shell\ViewModels\IMainWindowViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\IPoeApiSelectorViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\IPoeChatViewModel.cs" />
+    <Compile Include="PoeTrade\ViewModels\IPoeItemModsViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\IPoeModGroupsEditorViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\IPoeModsEditorViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\IPoeModViewModel.cs" />
@@ -398,6 +399,7 @@
     <Compile Include="PoeTrade\ViewModels\PoeClipboardParserViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\PoeEyeSettingsViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\PoeFilteredTradeViewModel.cs" />
+    <Compile Include="PoeTrade\ViewModels\PoeItemModsViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\PoeLinksInfoViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\MainWindowTabViewModel.cs" />
     <Compile Include="PoeTrade\Shell\ViewModels\MainWindowViewModel.cs" />

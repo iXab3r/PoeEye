@@ -10,10 +10,11 @@ using System.Windows.Media;
 using Guards;
 using PoeShared.Common;
 using PoeShared.Scaffolding;
+using TypeConverter;
 
 namespace PoeEye.Converters
 {
-    internal sealed class PoeItemModToHtmlConverter : IValueConverter
+    internal sealed class PoeItemModToHtmlConverter : IValueConverter, IConverter<IPoeItemMod, string>
     {
         private readonly ConcurrentDictionary<string, Regex> cache = new ConcurrentDictionary<string, Regex>();
 

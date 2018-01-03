@@ -285,6 +285,7 @@
     <Compile Include="Scaffolding\WPF\AccessKeyScoper.cs" />
     <Compile Include="Scaffolding\WPF\EnableDragHelper.cs" />
     <Compile Include="Scaffolding\WPF\InputBindingsManager.cs" />
+    <Compile Include="Scaffolding\WPF\MappingTemplateSelector.cs" />
     <Compile Include="StashApi\DataTypes\PoeItemRarityWrapper.cs" />
     <Compile Include="StashApi\DataTypes\StashItemAdditionalProperty.cs" />
     <Compile Include="StashApi\DataTypes\Character.cs" />

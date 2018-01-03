@@ -222,10 +222,27 @@
     </TextBlock>
   </DataTemplate>
 
-  <DataTemplate x:Key="PoeItemModsTemplateKey" DataType="{x:Type common:IPoeItem}">
+  <DataTemplate x:Key="PoeItemModsHtmlTemplateKey" DataType="{x:Type viewModels:PoeItemModsViewModel}">
+    <Grid>
+      <wpf1:HtmlLabel IsSelectionEnabled="False" 
+                      Foreground="{StaticResource TextBrush}"
+                      SnapsToDevicePixels="True"
+                      AutoSize="False"
+                      AutoSizeHeightOnly="True"
+                      TextOptions.TextFormattingMode="Display"
+                      Text="{Binding Html}">
+      </wpf1:HtmlLabel>
+    </Grid>
+  </DataTemplate>
+  
+  <DataTemplate x:Key="PoeItemModsFastTemplateKey" DataType="{x:Type viewModels:PoeItemModsViewModel}">
+    <TextBlock Text="{Binding RawText}"/>
+  </DataTemplate>
+  
+  <DataTemplate x:Key="PoeItemModsTemplateKey" DataType="{x:Type viewModels:PoeItemModsViewModel}">
     <Grid>
       <Grid.Resources>
-        <CollectionViewSource Source="{Binding Mods}" x:Key="ImplicitMods">
+        <CollectionViewSource Source="{Binding Item.Mods}" x:Key="ImplicitMods">
           <i:Interaction.Behaviors>
             <filterExtension:CollectionViewSourceFilteringBehavior>
               <x:Array Type="{x:Type filterExtension:IFilter}">
@@ -235,7 +252,7 @@
             </filterExtension:CollectionViewSourceFilteringBehavior>
           </i:Interaction.Behaviors>
         </CollectionViewSource>
-        <CollectionViewSource Source="{Binding Mods}" x:Key="ExplicitMods">
+        <CollectionViewSource Source="{Binding Item.Mods}" x:Key="ExplicitMods">
           <i:Interaction.Behaviors>
             <filterExtension:CollectionViewSourceFilteringBehavior>
               <x:Array Type="{x:Type filterExtension:IFilter}">
@@ -246,7 +263,7 @@
           </i:Interaction.Behaviors>
         </CollectionViewSource>
 
-        <CollectionViewSource Source="{Binding Mods}" x:Key="UnknownMods">
+        <CollectionViewSource Source="{Binding Item.Mods}" x:Key="UnknownMods">
           <i:Interaction.Behaviors>
             <filterExtension:CollectionViewSourceFilteringBehavior>
               <x:Array Type="{x:Type filterExtension:IFilter}">
@@ -263,16 +280,9 @@
                           Foreground="{StaticResource TextBrush}"
                           SnapsToDevicePixels="True"
                           AutoSize="False"
-                          AutoSizeHeightOnly="False"
-                          Height="20"
+                          AutoSizeHeightOnly="True"
                           TextOptions.TextFormattingMode="Display"
                           Text="{Binding Converter={StaticResource DefaultPoeItemModToHtmlConverterKey}}">
-            <wpf1:HtmlLabel.Width>
-              <Binding RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type ContentControl}}"
-                       Path="ActualWidth" 
-                       Mode="OneWay" Converter="{StaticResource MathAdditionConverter}" ConverterParameter="-10.0">
-              </Binding>
-            </wpf1:HtmlLabel.Width>
           </wpf1:HtmlLabel>
         </DataTemplate>
 
@@ -305,6 +315,11 @@
                     ItemTemplate="{StaticResource ModTemplateKey}"/>
     </Grid>
   </DataTemplate>
+  
+  <wpf:MappingTemplateSelector x:Key="PoeItemModsTemplateSelector" KeyPropertyPath="UseFastRendering">
+    <wpf:TemplateMapping Key="True" Template="{StaticResource PoeItemModsFastTemplateKey}" />
+    <wpf:TemplateMapping Key="False" Template="{StaticResource PoeItemModsTemplateKey}" />
+  </wpf:MappingTemplateSelector>
 
   <DataTemplate DataType="{x:Type viewModels:PoeTradeViewModel}">
     <ContentControl Margin="10">
@@ -323,9 +338,9 @@
         <ContentControl Grid.Row="1" Grid.Column="0"
                         Margin="0,0,10,0"
                         MaxHeight="130"
-                        Content="{Binding ImageViewModel}" />
+                        Content="{Binding Image}" />
 
-        <ContentControl Grid.Row="1" Grid.Column="0" Content="{Binding LinksViewModel}" 
+        <ContentControl Grid.Row="1" Grid.Column="0" Content="{Binding Links}" 
                         VerticalAlignment="Center"
                         Margin="0,0,10,0" />
 
@@ -510,12 +525,9 @@
             <ContentControl Grid.Column="0" VerticalAlignment="Center"
                             Content="{Binding Trade}"
                             ContentTemplate="{StaticResource PoeItemStatsTemplateKey}" />
-
-            <StackPanel Grid.Column="1" Orientation="Vertical">
-              <ContentControl Content="{Binding Trade}"
-                              HorizontalAlignment="Stretch"
-                              ContentTemplate="{StaticResource PoeItemModsTemplateKey}" />
-            </StackPanel>
+            <ContentControl Grid.Column="1" Content="{Binding Mods}"
+                            HorizontalAlignment="Stretch"
+                            ContentTemplateSelector="{StaticResource PoeItemModsTemplateSelector}"/>
           </Grid>
         </Border>
 

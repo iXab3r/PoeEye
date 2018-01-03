@@ -58,6 +58,7 @@ namespace PoeEye.PoeTrade.ViewModels
             [NotNull] IAudioNotificationsManager notificationsManager,
             [NotNull] IFactory<IImageViewModel, Uri> imageViewModelFactory,
             [NotNull] IFactory<PoeLinksInfoViewModel, IPoeLinksInfo> linksViewModelFactory,
+            [NotNull] IFactory<IPoeItemModsViewModel> modsViewModelFactory,
             [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler,
             [NotNull] IClock clock)
         {
@@ -67,6 +68,7 @@ namespace PoeEye.PoeTrade.ViewModels
             Guard.ArgumentNotNull(notificationsManager, nameof(notificationsManager));
             Guard.ArgumentNotNull(imageViewModelFactory, nameof(imageViewModelFactory));
             Guard.ArgumentNotNull(linksViewModelFactory, nameof(linksViewModelFactory));
+            Guard.ArgumentNotNull(modsViewModelFactory, nameof(modsViewModelFactory));
             Guard.ArgumentNotNull(uiScheduler, nameof(uiScheduler));
             Guard.ArgumentNotNull(clock, nameof(clock));
 
@@ -74,6 +76,9 @@ namespace PoeEye.PoeTrade.ViewModels
             this.notificationsManager = notificationsManager;
             this.clock = clock;
             Trade = poeItem;
+
+            Mods = modsViewModelFactory.Create();
+            Mods.Item = Trade;
 
             copyPrivateMessageToClipboardCommand.Subscribe(CopyPrivateMessageToClipboardCommandExecuted).AddTo(Anchors);
             sendPrivateMessageCommand.Subscribe(SendPrivateMessageCommandExecuted).AddTo(Anchors);
@@ -84,14 +89,14 @@ namespace PoeEye.PoeTrade.ViewModels
             Uri imageUri;
             if (!string.IsNullOrWhiteSpace(poeItem.ItemIconUri) && Uri.TryCreate(poeItem.ItemIconUri, UriKind.Absolute, out imageUri))
             {
-                ImageViewModel = imageViewModelFactory.Create(imageUri);
-                Anchors.Add(ImageViewModel);
+                Image = imageViewModelFactory.Create(imageUri);
+                Anchors.Add(Image);
             }
 
             if (poeItem.Links != null)
             {
-                LinksViewModel = linksViewModelFactory.Create(poeItem.Links);
-                Anchors.Add(LinksViewModel);
+                Links = linksViewModelFactory.Create(poeItem.Links);
+                Anchors.Add(Links);
             }
 
             var price = StringToPoePriceConverter.Instance.Convert(poeItem.Price);
@@ -119,9 +124,11 @@ namespace PoeEye.PoeTrade.ViewModels
             set { this.RaiseAndSetIfChanged(ref tradeState, value); }
         }
 
-        public IImageViewModel ImageViewModel { get; }
+        public IImageViewModel Image { get; }
 
-        public PoeLinksInfoViewModel LinksViewModel { get; }
+        public PoeLinksInfoViewModel Links { get; }
+        
+        public IPoeItemModsViewModel Mods { get; }
 
         public PoePrice? PriceInChaosOrbs { get; }
 

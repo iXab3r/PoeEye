@@ -62,8 +62,8 @@
                                   ContentTemplate="{StaticResource CurrencyViewKey}" />
 
                 <Image Grid.Column="2"
-                       Visibility="{Binding ImageViewModel.Image, Converter={StaticResource NullToHiddenConverter}}"
-                       Source="{Binding ImageViewModel.Image.Source}" Width="15" Height="15" />
+                       Visibility="{Binding Image.Image, Converter={StaticResource NullToHiddenConverter}}"
+                       Source="{Binding Image.Image.Source}" Width="15" Height="15" />
 
                 <ContentPresenter Grid.Column="3"
                                   Margin="5,0"
