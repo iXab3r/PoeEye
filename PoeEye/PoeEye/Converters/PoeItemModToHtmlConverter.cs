@@ -34,10 +34,7 @@ namespace PoeEye.Converters
         public Color EnchantGroupColor { get; set; }
         public Color CraftGroupColor { get; set; }
 
-        private readonly ICollection<ModParserConfig> parsingSettings = new List<ModParserConfig>()
-        {
-          
-        };
+        private readonly ICollection<ModParserConfig> parsingSettings = new List<ModParserConfig>();
 
         public PoeItemModToHtmlConverter()
         {

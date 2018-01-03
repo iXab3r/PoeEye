@@ -39,8 +39,7 @@
                                         CraftGroupColor="{StaticResource PoeItemElementalStatColor}"
                                         EnchantGroupColor="{StaticResource PoeItemRarityRelicColor}"
                                         PseudoGroupColor="#5DA423"
-                                        TotalGroupColor="#5DA423"
-                                        />
+                                        TotalGroupColor="#5DA423" />
   
   <DataTemplate x:Key="PoeItemStatsTemplateKey" DataType="{x:Type common:IPoeItem}">
     <!-- Stats -->
@@ -242,47 +241,14 @@
   <DataTemplate x:Key="PoeItemModsTemplateKey" DataType="{x:Type viewModels:PoeItemModsViewModel}">
     <Grid>
       <Grid.Resources>
-        <CollectionViewSource Source="{Binding Item.Mods}" x:Key="ImplicitMods">
-          <i:Interaction.Behaviors>
-            <filterExtension:CollectionViewSourceFilteringBehavior>
-              <x:Array Type="{x:Type filterExtension:IFilter}">
-                <filterExtension:PropertyFilter PropertyName="ModType"
-                                                Value="{x:Static common:PoeModType.Implicit}" />
-              </x:Array>
-            </filterExtension:CollectionViewSourceFilteringBehavior>
-          </i:Interaction.Behaviors>
-        </CollectionViewSource>
-        <CollectionViewSource Source="{Binding Item.Mods}" x:Key="ExplicitMods">
-          <i:Interaction.Behaviors>
-            <filterExtension:CollectionViewSourceFilteringBehavior>
-              <x:Array Type="{x:Type filterExtension:IFilter}">
-                <filterExtension:PropertyFilter PropertyName="ModType"
-                                                Value="{x:Static common:PoeModType.Explicit}" />
-              </x:Array>
-            </filterExtension:CollectionViewSourceFilteringBehavior>
-          </i:Interaction.Behaviors>
-        </CollectionViewSource>
-
-        <CollectionViewSource Source="{Binding Item.Mods}" x:Key="UnknownMods">
-          <i:Interaction.Behaviors>
-            <filterExtension:CollectionViewSourceFilteringBehavior>
-              <x:Array Type="{x:Type filterExtension:IFilter}">
-                <filterExtension:PropertyFilter PropertyName="ModType"
-                                                Value="{x:Static common:PoeModType.Unknown}" />
-              </x:Array>
-            </filterExtension:CollectionViewSourceFilteringBehavior>
-          </i:Interaction.Behaviors>
-        </CollectionViewSource>
-        
-        
-        <DataTemplate x:Key="ModTemplateKey" DataType="{x:Type common:IPoeItemMod}">
+        <DataTemplate x:Key="ModTemplateKey">
           <wpf1:HtmlLabel IsSelectionEnabled="False" 
                           Foreground="{StaticResource TextBrush}"
                           SnapsToDevicePixels="True"
                           AutoSize="False"
                           AutoSizeHeightOnly="True"
                           TextOptions.TextFormattingMode="Display"
-                          Text="{Binding Converter={StaticResource DefaultPoeItemModToHtmlConverterKey}}">
+                          Text="{Binding}">
           </wpf1:HtmlLabel>
         </DataTemplate>
 
@@ -296,22 +262,21 @@
       </Grid.RowDefinitions>
       <ItemsControl Grid.Row="0" Grid.Column="0"
                     x:Name="ImplicitModsItemsControl"
-                    ItemsSource="{Binding Source={StaticResource ImplicitMods}}" FontStyle="Italic"
+                    ItemsSource="{Binding HtmlImplicitMods}" FontStyle="Italic"
                     ItemTemplate="{StaticResource ModTemplateKey}"/>
       <Border Grid.Row="1" Grid.Column="0"
               Visibility="{Binding ElementName=ImplicitModsItemsControl, Path=HasItems, Converter={StaticResource BoolFalseToCollapsedConverter}}"
               Height="5" BorderBrush="{StaticResource AccentColorBrush}" BorderThickness="0,1,0,0" />
       <ItemsControl Grid.Row="2" Grid.Column="0"
                     x:Name="ExplicitModsItemsControl"
-                    ItemsSource="{Binding Source={StaticResource ExplicitMods}}"
+                    ItemsSource="{Binding HtmlExplicitMods}"
                     ItemTemplate="{StaticResource ModTemplateKey}"/>
       <Line Grid.Row="3" Grid.Column="0"
             Visibility="{Binding ElementName=UnknownModsItemsControl, Path=HasItems, Converter={StaticResource BoolFalseToCollapsedConverter}}"
             Stroke="{StaticResource ProgressBrush}" StrokeThickness="1" />
       <ItemsControl Grid.Row="4" Grid.Column="0"
                     x:Name="UnknownModsItemsControl"
-                    FontStyle="Italic"
-                    ItemsSource="{Binding Source={StaticResource UnknownMods}}" 
+                    ItemsSource="{Binding HtmlUnknownMods}" 
                     ItemTemplate="{StaticResource ModTemplateKey}"/>
     </Grid>
   </DataTemplate>
