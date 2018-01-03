@@ -35,6 +35,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PoeTradeMonitor", "PoeTrade
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PoeEye.StashRealtimeApi", "PoeEye.StashRealtimeApi\PoeEye.StashRealtimeApi.csproj", "{5CCDF7F6-C2B0-4EC4-B921-4313564BB13A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HtmlRenderer", "..\Submodules\HTML-Renderer\Source\HtmlRenderer\HtmlRenderer.csproj", "{FE611685-391F-4E3E-B27E-D3150E51E49B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HtmlRenderer.WPF", "..\Submodules\HTML-Renderer\Source\HtmlRenderer.WPF\HtmlRenderer.WPF.csproj", "{7E4E8DB5-85AD-4388-BDCB-38C6F423B8B0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Release|x64 = Release|x64
@@ -105,6 +109,14 @@ Global
 		{9D959B4C-A428-4EA7-9197-BE04B37BF256}.Debug|x64.Build.0 = Debug|Any CPU
 		{9D959B4C-A428-4EA7-9197-BE04B37BF256}.Release|x64.ActiveCfg = Release|Any CPU
 		{9D959B4C-A428-4EA7-9197-BE04B37BF256}.Release|x64.Build.0 = Release|Any CPU
+		{FE611685-391F-4E3E-B27E-D3150E51E49B}.Release|x64.ActiveCfg = Release|Any CPU
+		{FE611685-391F-4E3E-B27E-D3150E51E49B}.Release|x64.Build.0 = Release|Any CPU
+		{FE611685-391F-4E3E-B27E-D3150E51E49B}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{FE611685-391F-4E3E-B27E-D3150E51E49B}.Debug|x64.Build.0 = Debug|Any CPU
+		{7E4E8DB5-85AD-4388-BDCB-38C6F423B8B0}.Release|x64.ActiveCfg = Release|Any CPU
+		{7E4E8DB5-85AD-4388-BDCB-38C6F423B8B0}.Release|x64.Build.0 = Release|Any CPU
+		{7E4E8DB5-85AD-4388-BDCB-38C6F423B8B0}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{7E4E8DB5-85AD-4388-BDCB-38C6F423B8B0}.Debug|x64.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -164,21 +164,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="FodyWeavers.xml" />
-    <Content Include="PoeEye\PoeTrade\TestData\PoeTrade.Modern.Sample.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="PoeEye\PoeTrade\TestData\PoeTrade.Modern.SampleN2.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="PoeEye\PoeTrade\TestData\PoeTrade.Modern.SampleN3.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="PoeEye\PoeTrade\TestData\PoeTrade.Modern.SampleN4.Live.ItemGone.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="PoeEye\PoeTrade\TestData\PoeTrade.Modern.SampleN4.Live.NewItem.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FuzzySearch\FuzzySearch.csproj">
