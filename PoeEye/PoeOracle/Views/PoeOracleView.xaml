@@ -163,9 +163,7 @@
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
                 </ScrollViewer>
-
             </Border>
-
 
             <scaffolding:DataPiping.DataPipes>
                 <scaffolding:DataPipeCollection>

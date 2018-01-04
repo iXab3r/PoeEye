@@ -47,11 +47,13 @@ namespace PoeEye.Tests.PoeEye.Converters
             //Given
             var instance = CreateInstance();
 
+            IEnumerable<Tuple<string, string>> history;
+
             //When
-            var result = instance.Convert(mod);
+            var result = instance.Convert(mod, out history);
 
             //Then
-            result.ShouldBe(expected);
+            result.ShouldBe(expected, $"History\n{history.DumpToText()}");
         }
 
         public IEnumerable<TestCaseData> ShouldConvertCases()
@@ -80,6 +82,15 @@ namespace PoeEye.Tests.PoeEye.Converters
             yield return new TestCaseData(
                 ToMod("+60% to Chaos Resistance"),
                 Wrap("+60% to Chaos Resistance", DataSrc.ChaosRelatedTextColor, DataSrc.DefaultTextColor));
+            yield return new TestCaseData(
+                ToMod("10% increased Intelligence"),
+                Wrap("10% increased Intelligence", DataSrc.IntelligenceRelatedTextColor, DataSrc.DefaultTextColor)); 
+            yield return new TestCaseData(
+                ToMod("10% decreased Strength"),
+                Wrap("10% decreased Strength", DataSrc.StrengthRelatedTextColor, DataSrc.DefaultTextColor)); 
+            yield return new TestCaseData(
+                ToMod("10% increased Dexterity"),
+                Wrap("10% increased Dexterity", DataSrc.DexterityRelatedTextColor, DataSrc.DefaultTextColor)); 
             yield return new TestCaseData(
                 ToMod("Adds 1 Physical Damage to Attacks"),
                 Wrap("Adds 1 Physical Damage to Attacks", DataSrc.PhysicalRelatedTextColor, DataSrc.DefaultTextColor)); 

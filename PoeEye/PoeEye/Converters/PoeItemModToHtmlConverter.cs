@@ -29,6 +29,10 @@ namespace PoeEye.Converters
         public Color LifeRelatedTextColor { get; set; } 
         public Color ManaRelatedTextColor { get; set; } 
         
+        public Color StrengthRelatedTextColor { get; set; } 
+        public Color IntelligenceRelatedTextColor { get; set; } 
+        public Color DexterityRelatedTextColor { get; set; } 
+        
         public Color TotalGroupColor { get; set; }
         public Color PseudoGroupColor { get; set; }
         public Color EnchantGroupColor { get; set; }
@@ -90,6 +94,21 @@ namespace PoeEye.Converters
             };
             yield return new ModParserConfig()
             {
+                Expression = "((?:increased|decreased) Intelligence)",
+                Functor = (text, match) => WrapInSpan(text, IntelligenceRelatedTextColor)
+            };
+            yield return new ModParserConfig()
+            {
+                Expression = "((?:increased|decreased) Dexterity)",
+                Functor = (text, match) => WrapInSpan(text, DexterityRelatedTextColor)
+            };
+            yield return new ModParserConfig()
+            {
+                Expression = "((?:increased|decreased) Strength)",
+                Functor = (text, match) => WrapInSpan(text, StrengthRelatedTextColor)
+            };
+            yield return new ModParserConfig()
+            {
                 Expression = "(Physical Damage)",
                 Functor = (text, match) => WrapInSpan(text, PhysicalRelatedTextColor)
             };
@@ -122,10 +141,18 @@ namespace PoeEye.Converters
 
         public string Convert(IPoeItemMod mod)
         {
+            IEnumerable<Tuple<string, string>> history;
+            return Convert(mod, out history);
+        }
+        
+        public string Convert(IPoeItemMod mod, out IEnumerable<Tuple<string, string>> history)
+        {
             Guard.ArgumentNotNull(mod, nameof(mod));
 
             var name = mod.Name ?? "(Unknown mod - no name specified)";
-            
+
+            var resultHistory = new List<Tuple<string, string>>();
+            resultHistory.Add(new Tuple<string, string>(string.Empty, name));
             foreach (var config in parsingSettings)
             {
                 var regex = cache.GetOrAdd(config.Expression, expr => new Regex(expr, RegexOptions.Compiled | RegexOptions.IgnoreCase));
@@ -138,7 +165,9 @@ namespace PoeEye.Converters
                 }
                 
                 name = config.Functor(name, match);
+                resultHistory.Add(new Tuple<string, string>(config.Expression, name));
             }
+            history = resultHistory;
             if (string.IsNullOrEmpty(mod.TierInfo))
             {
                 return name;
