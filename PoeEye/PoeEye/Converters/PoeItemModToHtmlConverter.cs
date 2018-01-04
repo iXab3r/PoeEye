@@ -94,17 +94,27 @@ namespace PoeEye.Converters
             };
             yield return new ModParserConfig()
             {
-                Expression = "((?:increased|decreased) Intelligence)",
+                Expression = "((?:increased|decreased) Cast Speed)|((?:increased|decreased) Spell Damage)",
                 Functor = (text, match) => WrapInSpan(text, IntelligenceRelatedTextColor)
             };
             yield return new ModParserConfig()
             {
-                Expression = "((?:increased|decreased) Dexterity)",
+                Expression = "((?:increased|decreased) Attack Speed)",
                 Functor = (text, match) => WrapInSpan(text, DexterityRelatedTextColor)
             };
             yield return new ModParserConfig()
             {
-                Expression = "((?:increased|decreased) Strength)",
+                Expression = "((?:increased|decreased) Intelligence)|(to Intelligence)|(to maximum Energy Shield)|(increased Energy Shield)",
+                Functor = (text, match) => WrapInSpan(text, IntelligenceRelatedTextColor)
+            };
+            yield return new ModParserConfig()
+            {
+                Expression = "((?:increased|decreased) Dexterity)|(to Dexterity)|(to Evasion)|((?:increased|decreased) Evasion Rating)",
+                Functor = (text, match) => WrapInSpan(text, DexterityRelatedTextColor)
+            };
+            yield return new ModParserConfig()
+            {
+                Expression = "((?:increased|decreased) Strength)|(to Strength)|(to Armour)|((?:increased|decreased) Global Defences)",
                 Functor = (text, match) => WrapInSpan(text, StrengthRelatedTextColor)
             };
             yield return new ModParserConfig()
@@ -114,22 +124,17 @@ namespace PoeEye.Converters
             };
             yield return new ModParserConfig()
             {
-                Expression = "(Elemental Damage)",
+                Expression = "(Elemental Damage)|(to all Elemental Resistances)|(total Elemental Resistances)",
                 Functor = (text, match) => WrapInSpan(text, ElementalRelatedTextColor)
             };
             yield return new ModParserConfig()
             {
-                Expression = "(to maximum Life)",
+                Expression = "(to maximum Life)|(Life gained.*hit)|(Life Regenerated)",
                 Functor = (text, match) => WrapInSpan(text, LifeRelatedTextColor)
             };
             yield return new ModParserConfig()
             {
-                Expression = "(to maximum Energy Shield)|(increased Energy Shield)",
-                Functor = (text, match) => WrapInSpan(text, ManaRelatedTextColor)
-            };
-            yield return new ModParserConfig()
-            {
-                Expression = "(to maximum Mana)",
+                Expression = "(to maximum Mana)|(Mana Regeneration)|(Mana Regenerated)",
                 Functor = (text, match) => WrapInSpan(text, ManaRelatedTextColor)
             };
             yield return new ModParserConfig()
@@ -168,15 +173,7 @@ namespace PoeEye.Converters
                 resultHistory.Add(new Tuple<string, string>(config.Expression, name));
             }
             history = resultHistory;
-            if (string.IsNullOrEmpty(mod.TierInfo))
-            {
-                return name;
-            }
-            else
-            {
-                var tier = string.IsNullOrWhiteSpace(mod.TierInfo) ? string.Empty : WrapTierInfo(mod.TierInfo, DefaultTextColor);
-                return $"<table width='100%'><tr style='vertical-align: top;'><td style='text-align:left;'>{name}</td><td style='text-align:right;'>{tier}</td></tr></table>";
-            }
+            return name;
          }
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)

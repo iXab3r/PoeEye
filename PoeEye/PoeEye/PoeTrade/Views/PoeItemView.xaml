@@ -240,19 +240,29 @@
   <DataTemplate x:Key="PoeItemModsFastTemplateKey" DataType="{x:Type viewModels:PoeItemModsViewModel}">
     <TextBlock Text="{Binding RawText}"/>
   </DataTemplate>
-  
   <DataTemplate x:Key="PoeItemModsTemplateKey" DataType="{x:Type viewModels:PoeItemModsViewModel}">
     <Grid>
       <Grid.Resources>
         <DataTemplate x:Key="ModTemplateKey">
-          <wpf1:HtmlLabel IsSelectionEnabled="False" 
-                          Foreground="{StaticResource TextBrush}"
-                          SnapsToDevicePixels="True"
-                          AutoSize="False"
-                          AutoSizeHeightOnly="True"
-                          TextOptions.TextFormattingMode="Display"
-                          Text="{Binding}">
-          </wpf1:HtmlLabel>
+          <DockPanel Height="20">
+            <wpf1:HtmlLabel DockPanel.Dock="Left" 
+                            IsSelectionEnabled="False" 
+                            Foreground="{StaticResource TextBrush}"
+                            SnapsToDevicePixels="True"
+                            AutoSize="True"
+                            TextOptions.TextFormattingMode="Ideal"
+                            Text="{Binding Name}">
+            </wpf1:HtmlLabel>
+            <wpf1:HtmlLabel DockPanel.Dock="Right" 
+                            IsSelectionEnabled="False" 
+                            Foreground="{StaticResource TextBrush}"
+                            SnapsToDevicePixels="True"
+                            AutoSize="True"
+                            TextOptions.TextFormattingMode="Ideal"
+                            HorizontalAlignment="Right"
+                            Text="{Binding TierInfo}">
+            </wpf1:HtmlLabel>
+          </DockPanel>
         </DataTemplate>
 
       </Grid.Resources>
@@ -291,7 +301,7 @@
 
   <DataTemplate DataType="{x:Type viewModels:PoeTradeViewModel}">
     <ContentControl Margin="10">
-      <Grid HorizontalAlignment="Center">
+      <Grid>
         <Grid.RowDefinitions>
           <RowDefinition Height="40" />
           <RowDefinition Height="*" />

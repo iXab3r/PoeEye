@@ -59,14 +59,23 @@ namespace PoeEye.Tests.PoeEye.Converters
         public IEnumerable<TestCaseData> ShouldConvertCases()
         {
             yield return new TestCaseData(
+                ToMod("+46 Life gained for each Enemy hit by Attacks"),
+                Wrap("+46 Life gained for each Enemy hit by Attacks", DataSrc.LifeRelatedTextColor, DataSrc.DefaultTextColor));
+            yield return new TestCaseData(
                 ToMod("+53 to maximum Mana"),
                 Wrap("+53 to maximum Mana", DataSrc.ManaRelatedTextColor, DataSrc.DefaultTextColor));
+            yield return new TestCaseData(
+                ToMod("10% increased Mana Regeneration Rate"),
+                Wrap("10% increased Mana Regeneration Rate", DataSrc.ManaRelatedTextColor, DataSrc.DefaultTextColor));
             yield return new TestCaseData(
                 ToMod("40% increased Righteous Fire Damage"),
                 Wrap("40% increased Righteous Fire Damage", DataSrc.DefaultTextColor));
             yield return new TestCaseData(
                 ToMod("+53 to maximum Life"),
                 Wrap("+53 to maximum Life", DataSrc.LifeRelatedTextColor, DataSrc.DefaultTextColor));
+            yield return new TestCaseData(
+                ToMod("1.2 Life Regenerated per second"),
+                Wrap("1.2 Life Regenerated per second", DataSrc.LifeRelatedTextColor, DataSrc.DefaultTextColor));
             yield return new TestCaseData(
                 ToMod("+60% to Fire Resistance"),
                 Wrap("+60% to Fire Resistance", DataSrc.FireRelatedTextColor, DataSrc.DefaultTextColor));
@@ -85,6 +94,21 @@ namespace PoeEye.Tests.PoeEye.Converters
             yield return new TestCaseData(
                 ToMod("10% increased Intelligence"),
                 Wrap("10% increased Intelligence", DataSrc.IntelligenceRelatedTextColor, DataSrc.DefaultTextColor)); 
+            yield return new TestCaseData(
+                ToMod("+4 to Intelligence"),
+                Wrap("+4 to Intelligence", DataSrc.IntelligenceRelatedTextColor, DataSrc.DefaultTextColor)); 
+            yield return new TestCaseData(
+                ToMod("-4 to Strength"),
+                Wrap("-4 to Strength", DataSrc.StrengthRelatedTextColor, DataSrc.DefaultTextColor)); 
+            yield return new TestCaseData(
+                ToMod("+4 to Evasion"),
+                Wrap("+4 to Evasion", DataSrc.DexterityRelatedTextColor, DataSrc.DefaultTextColor)); 
+            yield return new TestCaseData(
+                ToMod("+4 to Armour"),
+                Wrap("+4 to Armour", DataSrc.StrengthRelatedTextColor, DataSrc.DefaultTextColor)); 
+            yield return new TestCaseData(
+                ToMod("+4 to maximum Energy Shield"),
+                Wrap("+4 to maximum Energy Shield", DataSrc.IntelligenceRelatedTextColor, DataSrc.DefaultTextColor)); 
             yield return new TestCaseData(
                 ToMod("10% decreased Strength"),
                 Wrap("10% decreased Strength", DataSrc.StrengthRelatedTextColor, DataSrc.DefaultTextColor)); 
