@@ -69,8 +69,8 @@ namespace PoeEye.Tests.PoeEye.Converters
                 ToMod("+60% to Fire Resistance"),
                 Wrap("+60% to Fire Resistance", DataSrc.FireRelatedTextColor, DataSrc.DefaultTextColor));
             yield return new TestCaseData(
-                ToMod("Adds 61 to 106 Fire Damage"),
-                Wrap("Adds 61 to 106 Fire Damage", DataSrc.FireRelatedTextColor, DataSrc.DefaultTextColor));
+                ToMod("Adds 61 Fire Damage"),
+                Wrap("Adds 61 Fire Damage", DataSrc.FireRelatedTextColor, DataSrc.DefaultTextColor));
             yield return new TestCaseData(
                 ToMod("+60% to Cold Resistance"),
                 Wrap("+60% to Cold Resistance", DataSrc.ColdRelatedTextColor, DataSrc.DefaultTextColor));
@@ -81,8 +81,11 @@ namespace PoeEye.Tests.PoeEye.Converters
                 ToMod("+60% to Chaos Resistance"),
                 Wrap("+60% to Chaos Resistance", DataSrc.ChaosRelatedTextColor, DataSrc.DefaultTextColor));
             yield return new TestCaseData(
-                ToMod("Adds 1 to 2 Physical Damage to Attacks"),
-                Wrap("Adds 1 to 2 Physical Damage to Attacks", DataSrc.PhysicalRelatedTextColor, DataSrc.DefaultTextColor)); 
+                ToMod("Adds 1 Physical Damage to Attacks"),
+                Wrap("Adds 1 Physical Damage to Attacks", DataSrc.PhysicalRelatedTextColor, DataSrc.DefaultTextColor)); 
+            yield return new TestCaseData(
+                ToMod("Adds 1 to 2 Fire Damage"),
+                Wrap("Adds 1 to 2 (~1.5) Fire Damage", DataSrc.FireRelatedTextColor, DataSrc.DefaultTextColor));
             yield return new TestCaseData(
                 ToMod("total: +13% to Fire Resistance"),
                 Wrap(

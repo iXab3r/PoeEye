@@ -45,6 +45,11 @@ namespace PoeEye.Converters
         {
             yield return new ModParserConfig()
             {
+                Expression = @"(?'min'[\d\.\,]+)\s*(?:-|to)\s*(?'max'[\d\.\,]+)",
+                Functor = (text, match) => ReplaceGroup(match, match.Groups[0], text, replacement: AddAverage(match))
+            };
+            yield return new ModParserConfig()
+            {
                 Expression = CreateReplacementRegex(@"(total:\s*)"),
                 Functor = (text, match) => ReplaceGroup(match, text, replacement: AddGroup("total", DefaultTextColor, TotalGroupColor))
             };
@@ -120,6 +125,7 @@ namespace PoeEye.Converters
             Guard.ArgumentNotNull(mod, nameof(mod));
 
             var name = mod.Name ?? "(Unknown mod - no name specified)";
+            
             foreach (var config in parsingSettings)
             {
                 var regex = cache.GetOrAdd(config.Expression, expr => new Regex(expr, RegexOptions.Compiled | RegexOptions.IgnoreCase));
@@ -180,13 +186,28 @@ namespace PoeEye.Converters
             return $"<span style='font-size: 95%; color: {ToRgb(color)}; background-color:{ToRgb(bgColor)};  padding-left:5px;padding-right:5px; margin-right:5px;'>{input}</span>";
         }
         
+        public static string AddAverage(Match match)
+        {
+            var min = double.Parse(match.Groups["min"].Value);
+            var max = double.Parse(match.Groups["max"].Value);
+            var avg = min + (max - min) / 2;
+            return $"{match.Value} (~{avg:F1})";
+        }
+        
+        private static string ReplaceGroup(
+            Match match, Group group, string input, string replacement)
+        {
+            var firstPart = input.Substring(0,group.Index);    
+            var secondPart = input.Substring(group.Index + group.Length);
+            var fullReplace = firstPart + replacement + secondPart;
+            return fullReplace;
+        }
+
         private static string ReplaceGroup(
             Match match, string input, string replacement)
         {
-            var firstPart = input.Substring(0,match.Groups[1].Index);    
-            var secondPart = input.Substring(match.Groups[1].Index + match.Groups[1].Length);
-            var fullReplace = firstPart + replacement + secondPart;
-            return fullReplace;
+            var group = match.Groups[1];
+            return ReplaceGroup(match, group, input, replacement);
         }
 
         private static string ToRgb(Color color)
