@@ -142,6 +142,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Models\BasicStashGridCellViewModel.cs" />
     <Compile Include="Models\IGridCellViewController.cs" />
     <Compile Include="Modularity\PoeStashGridConfig.cs" />
     <Compile Include="Prism\PoePoeStashGridRegistrations.cs" />
@@ -149,7 +150,6 @@
     <Compile Include="Prism\StashGridBootstrapper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\IPoeStashHighlightService.cs" />
-    <Compile Include="ViewModels\BasicStashGridCellViewModel.cs" />
     <Compile Include="ViewModels\HighlightedStashGridCellViewModel.cs" />
     <Compile Include="ViewModels\IPoeStashGridViewModel.cs" />
     <Compile Include="ViewModels\PoeStashGridViewModel.cs" />

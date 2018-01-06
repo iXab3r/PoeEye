@@ -2,7 +2,8 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
                     xmlns:eye="http://coderush.net/poeeye/"
-                    xmlns:viewModels="clr-namespace:PoeEye.StashGrid.ViewModels">
+                    xmlns:viewModels="clr-namespace:PoeEye.StashGrid.ViewModels"
+                    xmlns:models="clr-namespace:PoeEye.StashGrid.Models">
 
   <ResourceDictionary.MergedDictionaries>
     <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Generic.xaml" />
@@ -100,7 +101,7 @@
               </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
             <ItemsControl.ItemTemplate>
-              <DataTemplate DataType="{x:Type viewModels:BasicStashGridCellViewModel}">
+              <DataTemplate DataType="{x:Type models:BasicStashGridCellViewModel}">
                 <Border BorderBrush="Blue" Margin="0" BorderThickness="1" Opacity="0.5" />
               </DataTemplate>
             </ItemsControl.ItemTemplate>

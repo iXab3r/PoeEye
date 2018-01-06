@@ -1,3 +1,4 @@
+using PoeEye.StashGrid.Models;
 using ReactiveUI;
 
 namespace PoeEye.StashGrid.ViewModels {
