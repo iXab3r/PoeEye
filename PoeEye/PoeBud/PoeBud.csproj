@@ -202,6 +202,9 @@
     <Reference Include="System.Xaml">
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
+    <Reference Include="TypeConverter, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b1d2d39c48564dfb">
+      <HintPath>..\packages\TypeConverter.1.0.22\lib\portable-net45+wp8+wpa81+win81+netcore45+monoandroid1+xamarin.ios10\TypeConverter.dll</HintPath>
+    </Reference>
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
@@ -220,7 +223,7 @@
     <Compile Include="Converters\VisibilityToBoolean.cs" />
     <Compile Include="Models\IDefaultStashUpdaterStrategy.cs" />
     <Compile Include="Models\IPoeStashUpdater.cs" />
-    <Compile Include="Models\IPoeTradeItem.cs" />
+    <Compile Include="Models\IPoeSolutionItem.cs" />
     <Compile Include="Models\IPoeTradeSolution.cs" />
     <Compile Include="Models\IPoeWindowManager.cs" />
     <Compile Include="Models\ISolutionExecutorModel.cs" />
@@ -229,7 +232,9 @@
     <Compile Include="Models\IUserInteractionsManager.cs" />
     <Compile Include="Models\IPoeWindow.cs" />
     <Compile Include="Models\IUserInputBlocker.cs" />
+    <Compile Include="Models\PoeSolutionItem.cs" />
     <Compile Include="Models\PoeStashUpdater.cs" />
+    <Compile Include="Models\PoeTradeSolution.cs" />
     <Compile Include="Models\SolutionExecutorModel.cs" />
     <Compile Include="Models\StashUpdate.cs" />
     <Compile Include="Models\IStashUpdaterParameters.cs" />
@@ -244,9 +249,11 @@
     <Compile Include="Scaffolding\ItemExtensions.cs" />
     <Compile Include="Services\HighlightingService.cs" />
     <Compile Include="Services\IHighlightingService.cs" />
+    <Compile Include="ViewModels\IPriceSummaryViewModel.cs" />
     <Compile Include="ViewModels\ISolutionExecutorViewModel.cs" />
     <Compile Include="ViewModels\PoeBudSettingsViewModel.cs" />
     <Compile Include="ViewModels\PoeBudViewModel.cs" />
+    <Compile Include="ViewModels\PriceSummaryViewModel.cs" />
     <Compile Include="ViewModels\SolutionExecutorViewModel.cs" />
     <Compile Include="ViewModels\StashViewModel.cs" />
     <Compile Include="ViewModels\TabSelectionViewModel.cs" />
@@ -300,6 +307,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\PoeStashView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\PriceSummaryView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

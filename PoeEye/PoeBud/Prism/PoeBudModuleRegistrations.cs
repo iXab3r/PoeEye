@@ -30,6 +30,7 @@ namespace PoeBud.Prism
                 .RegisterType<IUserInputBlocker, UserInputBlocker>()
                 .RegisterType<IPoeStashUpdater, PoeStashUpdater>()
                 .RegisterType<ISolutionExecutorViewModel, SolutionExecutorViewModel>()
+                .RegisterType<IPriceSummaryViewModel, PriceSummaryViewModel>()
                 .RegisterType<IHighlightingService, HighlightingService>()
                 .RegisterType<IPoeWindow, PoeWindow>()
                 .RegisterType<ISolutionExecutorModel, SolutionExecutorModel>()

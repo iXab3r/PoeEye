@@ -18,7 +18,7 @@
                            Height="{Binding WindowManager.ActiveWindow.StashBounds.Height}"
                            Stroke="Red" StrokeThickness="3" Visibility="Collapsed" />
 
-                <Grid
+                <Grid x:Name="PoeBudCanvas" 
                     Canvas.Top="960" Canvas.Left="624" TextBlock.FontSize="20" TextBlock.Foreground="White"
                     Opacity="0.75"
                     Visibility="{Binding IsEnabled, Converter={StaticResource TrueToVisibleFalseToCollapsedConverter}}">
@@ -35,6 +35,7 @@
 
                     <Grid Grid.Row="1" Grid.Column="0" Margin="50, 5, 0, 5">
                         <TextBlock
+                            x:Name="LastUpdateException" 
                             MaxWidth="600"
                             Visibility="{Binding LastUpdateException, Converter={StaticResource NullToCollapsedConverter}}"
                             Foreground="Orange"
@@ -44,36 +45,37 @@
 
                     <Grid Grid.Row="2" Grid.Column="0"
                           Visibility="{Binding StashUpdater, Converter={StaticResource NullToCollapsedConverter}, TargetNullValue={x:Static Visibility.Collapsed}}">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
-
                         <StackPanel Grid.Column="0"
                                     Margin="10, 0"
                                     Orientation="Horizontal"
                                     Visibility="{Binding StashUpdater.IsBusy, Converter={StaticResource TrueToVisibleFalseToCollapsedConverter}}">
 
                             <controls:ProgressRing
-                                Height="18" Width="18"
+                                Height="14" Width="14"
                                 IsActive="{Binding StashUpdater.IsBusy}" />
                             <TextBlock
                                 Text="{Binding TimeTillNextUpdate, Converter={StaticResource TimeSpanToHumanReadableStringConverter}}"
                                 Style="{StaticResource IconTextBlock}" 
                                 Margin="5,0" />
                         </StackPanel>
+                        
+                        <DockPanel Visibility="{Binding StashUpdater.IsBusy, Converter={StaticResource TrueToCollapsedFalseToVisibleConverter}}">
+                            <TextBlock DockPanel.Dock="Left"
+                                       Margin="5,0"
+                                       TextAlignment="Center"
+                                       Text="{Binding TimeTillNextUpdate, StringFormat='&#xF017; {0}', Converter={StaticResource TimeSpanToHumanReadableStringConverter}}"
+                                       Style="{StaticResource IconTextBlock}" />
 
-                        <TextBlock Grid.Column="0"
-                                   Margin="10,0"
-                                   TextAlignment="Center"
-                                   Visibility="{Binding StashUpdater.IsBusy, Converter={StaticResource TrueToCollapsedFalseToVisibleConverter}}"
-                                   Text="{Binding TimeTillNextUpdate, StringFormat='&#xF017; {0}', Converter={StaticResource TimeSpanToHumanReadableStringConverter}}"
-                                   Style="{StaticResource IconTextBlock}" />
+                            <TextBlock DockPanel.Dock="Left"
+                                       Text="{Binding Stash.ChaosSetSolutions.Length, StringFormat='Sets: {0}'}"
+                                       Style="{StaticResource IconTextBlock}" Margin="5,0" />
+                        
+                            <ContentControl DockPanel.Dock="Right" HorizontalAlignment="Right"
+                                              Margin="5,0"
+                                              Content="{Binding Stash.PriceSummary}"
+                                              Visibility="{Binding Stash, Converter={StaticResource NullToCollapsedConverter}}"/>
+                        </DockPanel>
 
-                        <TextBlock Grid.Column="2"
-                                   Text="{Binding Stash.Solutions.Length, StringFormat='Sets: {0}'}"
-                                   Style="{StaticResource IconTextBlock}" Margin="10,0" />
                     </Grid>
 
                     <ContentPresenter Grid.Row="3" Grid.Column="0"

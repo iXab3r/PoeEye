@@ -32,6 +32,8 @@ namespace PoeShared.Common
         public static readonly string OrbOfChance = "chance";
         public static readonly string OrbOfRegret = "regret";
         public static readonly string OrbOfScouring = "scouring";
+        public static readonly string OrbOfTransmutation = "tra";
+        public static readonly string OrbOfAugmentation = "aug";
         public static readonly string RegalOrb = "regal";
         public static readonly string VaalOrb = "vaal";
         public static readonly string MirrorOfKalandra = "mirror";
@@ -307,6 +309,8 @@ namespace PoeShared.Common
 
             {"Blessed Orb", BlessedOrb},
 
+            {"Glassblower's Bauble", GlassblowersBauble},
+            {"Blacksmith's Whetstone", BlacksmithsWhetstone},
             {"Whetstone", BlacksmithsWhetstone},
 
             {"Cartographer's Chisel", CartographersChisel},
@@ -328,6 +332,7 @@ namespace PoeShared.Common
             {"Gemcutter's Prism", GemcuttersPrism},
             {"Gemcutters Prism", GemcuttersPrism},
 
+            {"Jeweller's Orb", JewellersOrb},
             {"Jewellers Orb", JewellersOrb},
             {"Jew", JewellersOrb},
 
@@ -340,9 +345,12 @@ namespace PoeShared.Common
             {"Orb of Chance", OrbOfChance},
 
             {"Orb of Regret", OrbOfRegret},
+            {"Orb of Transmutation", OrbOfTransmutation},
+            {"Orb of Augmentation", OrbOfAugmentation},
 
             {"Orb of Scouring", OrbOfScouring},
             {"Scour", OrbOfScouring},
+            {"Silver Coin", SilverCoin},
 
             {"Regal Orb", RegalOrb},
 

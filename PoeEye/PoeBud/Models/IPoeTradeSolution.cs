@@ -6,7 +6,7 @@ namespace PoeBud.Models
 
     internal interface IPoeTradeSolution
     {
-        IPoeTradeItem[] Items { [NotNull] get; }
+        IPoeSolutionItem[] Items { [NotNull] get; }
 
         IStashTab[] Tabs { [NotNull] get; }
     }

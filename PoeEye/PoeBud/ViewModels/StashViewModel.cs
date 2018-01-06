@@ -1,6 +1,9 @@
 ﻿using PoeBud.Scaffolding;
 using PoeShared;
 using PoeShared.Common;
+using PoeShared.Converters;
+using PoeShared.PoeTrade;
+using PoeShared.Prism;
 using PoeShared.Scaffolding;
 using PoeShared.StashApi.DataTypes;
 
@@ -18,17 +21,24 @@ namespace PoeBud.ViewModels
 
     using Models;
 
-    internal sealed class StashViewModel
+    internal sealed class StashViewModel : DisposableReactiveObject
     {
-        public StashViewModel([NotNull] StashUpdate stashUpdate, [NotNull] IPoeBudConfig config)
+        public StashViewModel(
+            [NotNull] StashUpdate stashUpdate, 
+            [NotNull] IPoeBudConfig config,
+            [NotNull] IPriceSummaryViewModel summaryViewModel)
         {
             Guard.ArgumentNotNull(stashUpdate, nameof(stashUpdate));
             Guard.ArgumentNotNull(config, nameof(config));
+            Guard.ArgumentNotNull(summaryViewModel, nameof(summaryViewModel));
 
             StashUpdate = stashUpdate;
-
+            PriceSummary = summaryViewModel;
+            
             var rareItems = stashUpdate.Items.GetChaosSetItems();
 
+            Log.Instance.Debug($"[StashViewModel] Stash dump(itemsCount: {stashUpdate.Items.Count()}, tabsCount: {stashUpdate.Tabs.Count()})");
+            
             var chests = rareItems.Where(x => x.ItemType == GearType.Chest).ToArray();
             var weapons = rareItems.Where(x => x.IsWeapon()).Select(x => new { Item = x, Score = x.GetTradeScore() }).ToArray();
             var helmets = rareItems.Where(x => x.ItemType == GearType.Helmet).ToArray();
@@ -37,8 +47,6 @@ namespace PoeBud.ViewModels
             var gloves = rareItems.Where(x => x.ItemType == GearType.Gloves).ToArray();
             var boots = rareItems.Where(x => x.ItemType == GearType.Boots).ToArray();
             var belts = rareItems.Where(x => x.ItemType == GearType.Belt).ToArray();
-
-            Log.Instance.Debug($"[StashViewModel] Stash dump(itemsCount: {stashUpdate.Items.Count()}, tabsCount: {stashUpdate.Tabs.Count()})");
             Log.Instance.DebugFormat(
                 "[StashViewModel] Rare items:\r\n{0}",
                 string.Join(
@@ -54,10 +62,7 @@ namespace PoeBud.ViewModels
                         new {ItemType = $"Boots ({boots.Length})", Items = boots.Select(x => x.ToString())},
                         new {ItemType = $"Belts ({belts.Length})", Items = belts.Select(x => x.ToString())}
                     }.Select(x => x.DumpToText())));
-
-
-            Solutions = GetSolutions(stashUpdate);
-
+            
             ChestsCount = chests.Count();
             WeaponsCount = (int)weapons.Sum(x => x.Score);
             HelmetsCount = helmets.Count();
@@ -66,7 +71,6 @@ namespace PoeBud.ViewModels
             GlovesCount = gloves.Count();
             BootsCount = boots.Count();
             BeltsCount = belts.Count();
-
 
             var minItemsCount = 0;
             if (config.ExpectedSetsCount > 0)
@@ -89,6 +93,10 @@ namespace PoeBud.ViewModels
             IsInsufficientGlovesCount = GlovesCount < minItemsCount;
             IsInsufficientBootsCount = BootsCount < minItemsCount;
             IsInsufficientBeltsCount = BeltsCount < minItemsCount;
+            
+            ChaosSetSolutions = BuildChaosSetSolutions(stashUpdate);
+            CurrencySolution = BuildCurrencySolution(stashUpdate);
+            PriceSummary.Solution = CurrencySolution;
         }
 
         public StashUpdate StashUpdate { get; }
@@ -125,9 +133,29 @@ namespace PoeBud.ViewModels
 
         public bool IsInsufficientBeltsCount { get; }
 
-        public IPoeTradeSolution[] Solutions { get; }
+        public IPoeTradeSolution[] ChaosSetSolutions { get; }
+        
+        public IPoeTradeSolution CurrencySolution { get; }
+        
+        public IPriceSummaryViewModel PriceSummary { get; }
 
-        private static IPoeTradeSolution[] GetSolutions(StashUpdate stashUpdate)
+        public IPoeTradeSolution BuildCurrencySolution(StashUpdate stashUpdate)
+        {
+            var tabsByInventoryId = stashUpdate.Tabs.ToDictionary(x => x.GetInventoryId(), x => x);
+
+            var currency = stashUpdate
+                .Items
+                .Where(x => x.Category == "currency")
+                .Where(x => x.GetTabIndex() != null)
+                .Where(x => StringToPoePriceConverter.Instance.Convert($"{x.StackSize} {x.TypeLine}").HasValue)
+                .Select(x => new PoeSolutionItem(x, tabsByInventoryId[x.InventoryId]))
+                .OfType<IPoeSolutionItem>()
+                .ToArray();
+            
+            return new PoeTradeSolution(currency, stashUpdate.Tabs);
+        }
+        
+        private static IPoeTradeSolution[] BuildChaosSetSolutions(StashUpdate stashUpdate)
         {
             var result = new List<IPoeTradeSolution>();
 
@@ -159,10 +187,12 @@ namespace PoeBud.ViewModels
             const float targetScoreForEachCategory = 1;
             const float targetScoreForSolution = 8;
 
+            var tabsByInventoryId = stashUpdate.Tabs.ToDictionary(x => x.GetInventoryId(), x => x);
+
             do
             {
                 var tierScore = 0f;
-                var ongoingSolutionItems = new List<IPoeTradeItem>();
+                var ongoingSolutionItems = new List<IPoeSolutionItem>();
                 foreach (var items in itemsByCategories)
                 {
                     var categoryScore = 0f;
@@ -172,7 +202,7 @@ namespace PoeBud.ViewModels
                     {
                         categoryScore += nextItem.GetTradeScore();
 
-                        var tradeItem = new PoeTradeItem(nextItem);
+                        var tradeItem = new PoeSolutionItem(nextItem, tabsByInventoryId[nextItem.InventoryId]);
                         ongoingSolutionItems.Add(tradeItem);
                     }
 
@@ -190,38 +220,6 @@ namespace PoeBud.ViewModels
             } while (true);
 
             return result.ToArray();
-        }
-
-        private class PoeTradeItem : IPoeTradeItem
-        {
-            public PoeTradeItem(IStashItem item)
-            {
-                Name = item.ToString();
-                Position = item.Position;
-                TabIndex = item.GetTabIndex() ?? -1;
-                ItemType = item.ItemType;
-            }
-
-            public string Name { get; }
-            
-            public ItemPosition Position { get; }
-
-            public int TabIndex { get; }
-
-            public GearType ItemType { get; }
-        }
-
-        private class PoeTradeSolution : IPoeTradeSolution
-        {
-            public PoeTradeSolution(IPoeTradeItem[] items, IStashTab[] tabs)
-            {
-                Items = items;
-                Tabs = tabs;
-            }
-
-            public IPoeTradeItem[] Items { get; }
-
-            public IStashTab[] Tabs { get; }
         }
     }
 }

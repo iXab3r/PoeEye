@@ -49,6 +49,8 @@ namespace PoeEye.Tests.PoeShared.Converters
             yield return new TestCaseData("0 alt", new PoePrice(KnownCurrencyNameList.OrbOfAlteration, 0));
             yield return new TestCaseData("alt", new PoePrice(KnownCurrencyNameList.OrbOfAlteration, 0));
             yield return new TestCaseData("1 alt", new PoePrice(KnownCurrencyNameList.OrbOfAlteration, 1));
+            yield return new TestCaseData("1 chaos orb", new PoePrice(KnownCurrencyNameList.ChaosOrb, 1));
+            yield return new TestCaseData("9 Jeweller's Orb", new PoePrice(KnownCurrencyNameList.JewellersOrb, 9));
             yield return new TestCaseData("price 1 alt", new PoePrice(KnownCurrencyNameList.OrbOfAlteration, 1));
             yield return new TestCaseData("b/o 1 alt", new PoePrice(KnownCurrencyNameList.OrbOfAlteration, 1));
             yield return new TestCaseData("1.5 alt", new PoePrice(KnownCurrencyNameList.OrbOfAlteration, 1.5f));

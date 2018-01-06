@@ -6,6 +6,7 @@
     <ResourceDictionary Source="pack://application:,,,/PoeBud;component/Views/PoeStashView.xaml" />
     <ResourceDictionary Source="pack://application:,,,/PoeBud;component/Views/PoeBudSettingsViewModel.xaml" />
     <ResourceDictionary Source="pack://application:,,,/PoeBud;component/Views/SolutionExecutorView.xaml" />
+    <ResourceDictionary Source="pack://application:,,,/PoeBud;component/Views/PriceSummaryView.xaml" />
 
     <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
     <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />

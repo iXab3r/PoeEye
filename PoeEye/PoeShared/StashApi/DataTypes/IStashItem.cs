@@ -71,6 +71,10 @@ namespace PoeShared.StashApi.DataTypes
 
         int Y { get; }
         
+        int StackSize { get; }
+        
+        int MaxStackSize { get; }
+        
         ItemPosition Position { get; }
     }
 }

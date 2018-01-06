@@ -211,7 +211,10 @@ namespace PoeBud.ViewModels
                 resultingConfig.StashesToProcess = selectedTabs;
             }
 
-            return resultingConfig;
+            var result = new PoeBudConfig();
+            resultingConfig.TransferPropertiesTo(result);
+            
+            return result;
         }
 
         private void LoginCommandExecuted(object arg)

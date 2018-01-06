@@ -6,6 +6,7 @@ using Guards;
 using JetBrains.Annotations;
 using PoeBud.Models;
 using PoeEye.StashGrid.Services;
+using PoeShared;
 using PoeShared.Scaffolding;
 
 namespace PoeBud.Services {
@@ -27,22 +28,26 @@ namespace PoeBud.Services {
             activeHighlighting.AddTo(Anchors);
         }
 
-        public void Highlight(IPoeTradeSolution solution)
+        public IDisposable Highlight(IPoeTradeSolution solution)
         {
-            Guard.ArgumentNotNull(solution, nameof(solution));
-
             var anchors = new CompositeDisposable();
             activeHighlighting.Disposable = anchors;
 
+            if (solution == null)
+            {
+                return anchors;
+            }
+            
+            Log.Instance.Debug($"Highlighting {solution.Items.Length} item(s)");
+
             foreach (var item in solution.Items)
             {
-                var tab = solution.Tabs.First(x => x.Idx == item.TabIndex);
-                var controller = poeStashHighlightService.AddHighlight(item.Position, tab.StashType).AddTo(anchors);
+                var controller = poeStashHighlightService.AddHighlight(item.Position, item.Tab.StashType).AddTo(anchors);
                 controller.IsFresh = true;
-                controller.ToolTipText = tab.Name;
             }
 
             Observable.Timer(highlightPeriod).Subscribe(() => anchors.Dispose()).AddTo(anchors);
+            return anchors;
         }
     }
 }

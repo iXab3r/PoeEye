@@ -1,10 +1,11 @@
-﻿using JetBrains.Annotations;
+﻿using System;
+using JetBrains.Annotations;
 using PoeBud.Models;
 
 namespace PoeBud.Services
 {
     internal interface IHighlightingService
     {
-        void Highlight([NotNull] IPoeTradeSolution solution);
+        IDisposable Highlight([CanBeNull] IPoeTradeSolution solution);
     }
 }

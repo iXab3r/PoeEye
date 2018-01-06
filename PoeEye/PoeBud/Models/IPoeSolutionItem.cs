@@ -5,13 +5,17 @@ namespace PoeBud.Models
 {
     using JetBrains.Annotations;
 
-    internal interface IPoeTradeItem
+    internal interface IPoeSolutionItem
     {
         string Name { [NotNull] get; }
+        
+        int StackSize { [NotNull] get; }
+        
+        string TypeLine { [NotNull] get; }
 
         ItemPosition Position { get; }
 
-        int TabIndex { get; }
+        IStashTab Tab { [NotNull] get; }
 
         GearType ItemType { get; }
     }

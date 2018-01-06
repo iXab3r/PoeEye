@@ -14,7 +14,7 @@ namespace PoeShared.StashApi.DataTypes
 
         [DeserializeAs(Name = "category")]
         [JsonProperty("category")]
-        public string Category { get; }
+        public string Category { get; set; }
 
         [DeserializeAs(Name = "verified")]
         [JsonProperty("verified")]
@@ -139,7 +139,15 @@ namespace PoeShared.StashApi.DataTypes
         [DeserializeAs(Name = "craftedMods")]
         [JsonProperty("craftedMods")]
         public List<string> CraftedMods { get; set; }
-
+        
+        [DeserializeAs(Name = "stackSize")]
+        [JsonProperty("stackSize")]
+        public int StackSize { get; set; }
+        
+        [DeserializeAs(Name = "maxStackSize")]
+        [JsonProperty("maxStackSize")]
+        public int MaxStackSize { get; set; }
+        
         public GearType ItemType { get; set; }
 
         public PoeItemRarity Rarity => (PoeItemRarity)((int)RarityWrapper + 1);

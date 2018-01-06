@@ -195,6 +195,11 @@
                           <DropShadowEffect ShadowDepth="0" Color="{StaticResource HighlightColor}" Opacity="1" BlurRadius="8" Direction="0"/>
                         </Setter.Value>
                       </Setter>
+                      <Setter Property="Badge">
+                        <Setter.Value>
+                          <TextBlock MaxWidth="60" Text="{Binding ToolTipText}"/>
+                        </Setter.Value>
+                      </Setter>
                       <Style.Triggers>
                         <DataTrigger Binding="{Binding IsFresh}" Value="True">
                           <DataTrigger.EnterActions>
@@ -240,13 +245,14 @@
                             </BeginStoryboard>
                           </DataTrigger.ExitActions>
                         </DataTrigger>
+                        
+                        <DataTrigger Binding="{Binding ToolTipText}" Value="{x:Null}">
+                          <Setter Property="Badge" Value="{x:Null}"/>
+                        </DataTrigger>
                       </Style.Triggers>
                     </Style>
 
                   </materialDesign:Badged.Style>
-                  <materialDesign:Badged.Badge>
-                    <TextBlock MaxWidth="60" Text="{Binding ToolTipText}"/>
-                  </materialDesign:Badged.Badge>
                   <Border Background="{x:Null}"  
                           Margin="0" 
                           BorderThickness="3"

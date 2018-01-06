@@ -20,6 +20,11 @@
         {
             return DumpToText(instance, Formatting.None);
         }
+        
+        public static string DumpToTable<T>(this IEnumerable<T> instance, string separator = "\n\t")
+        {
+            return instance == null ? $"null<{typeof(T).Name}>" : String.Join(separator, instance.Select(x => x.DumpToTextRaw()));
+        }
 
         public static string DumpToText<T>(this T instance, Formatting formatting)
         {

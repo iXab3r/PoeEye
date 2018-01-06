@@ -20,7 +20,7 @@ namespace PoeEye.TradeMonitor.ViewModels
         private readonly DelegateCommand<MacroMessageViewModel> removeMessageCommand;
         private readonly DelegateCommand addMessageCommand;
 
-        private PoeTradeMonitorConfig loadedConfig;
+        private readonly PoeTradeMonitorConfig temporaryConfig = new PoeTradeMonitorConfig();
 
         public PoeTradeMonitorSettingsViewModel(
             [NotNull] IPoeMacroCommandsProvider commandsProvider,
@@ -57,8 +57,9 @@ namespace PoeEye.TradeMonitor.ViewModels
         public void Load(PoeTradeMonitorConfig config)
         {
             Guard.ArgumentNotNull(config, nameof(config));
+            
+            config.TransferPropertiesTo(temporaryConfig);
 
-            loadedConfig = config;
             IsEnabled = config.IsEnabled;
             AudioNotificationSelector.SelectedValue = config.NotificationType;
 
@@ -72,13 +73,17 @@ namespace PoeEye.TradeMonitor.ViewModels
 
         public PoeTradeMonitorConfig Save()
         {
-            loadedConfig.PredefinedMessages = PredefinedMessages
+            temporaryConfig.PredefinedMessages = PredefinedMessages
                 .Where(IsValid)
                 .Select(x => x.ToMessage())
                 .ToList();
-            loadedConfig.IsEnabled = IsEnabled;
-            loadedConfig.NotificationType = AudioNotificationSelector.SelectedValue;
-            return loadedConfig;
+            temporaryConfig.IsEnabled = IsEnabled;
+            temporaryConfig.NotificationType = AudioNotificationSelector.SelectedValue;
+            
+            var result = new PoeTradeMonitorConfig();
+            temporaryConfig.TransferPropertiesTo(result);
+            
+            return result;
         }
 
         private bool IsValid(MacroMessageViewModel message)

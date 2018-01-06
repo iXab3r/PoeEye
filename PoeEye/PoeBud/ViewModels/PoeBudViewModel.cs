@@ -83,7 +83,7 @@ namespace PoeBud.ViewModels
             Guard.ArgumentNotNull(stashUpdateFactory, nameof(stashUpdateFactory));
             Guard.ArgumentNotNull(uiScheduler, nameof(uiScheduler));
 
-            OverlayMode = OverlayMode.Transparent;
+            OverlayMode = OverlayMode.Layered;
             this.highlightingService = highlightingService;
             this.clock = clock;
             this.keyboardMouseEvents = keyboardMouseEvents;
@@ -216,9 +216,9 @@ namespace PoeBud.ViewModels
                 var highlightHotkey = new KeyGesture(hotkey.Key, ModifierKeys.Shift);
                 keyPressedObservable
                     .Where(x => highlightHotkey.MatchesHotkey(x))
-                    .Where(x => stash?.Solutions.Any() ?? false)
+                    .Where(x => stash?.ChaosSetSolutions.Any() ?? false)
                     .Do(x => x.Handled = true)
-                    .Select(x => stash?.Solutions.FirstOrDefault())
+                    .Select(x => stash?.ChaosSetSolutions.FirstOrDefault())
                     .ObserveOn(uiScheduler)
                     .Subscribe(HighlightSolutionCommandExecuted)
                     .AddTo(stashDisposable);
@@ -333,7 +333,7 @@ namespace PoeBud.ViewModels
         {
             var stashSnapshot = stash;
 
-            var solutionToExecute = stashSnapshot?.Solutions.FirstOrDefault();
+            var solutionToExecute = stashSnapshot?.ChaosSetSolutions.FirstOrDefault();
             if (solutionToExecute == null)
             {
                 SolutionExecutor.LogOperation("Failed to find a solution, not enough items ?");
@@ -374,9 +374,9 @@ namespace PoeBud.ViewModels
             Stash = stashUpdateFactory.Create(dirtyStashUpdate, config);
         }
 
-        private bool IsMatch(IPoeTradeItem tradeItem, IStashItem item)
+        private bool IsMatch(IPoeSolutionItem solutionItem, IStashItem item)
         {
-            return tradeItem.TabIndex == item.GetTabIndex() && tradeItem.Position.X == item.Position.X && tradeItem.Position.Y == item.Position.Y;
+            return solutionItem.Tab.GetInventoryId() == item.InventoryId && solutionItem.Position.X == item.Position.X && solutionItem.Position.Y == item.Position.Y;
         }
     }
 }
