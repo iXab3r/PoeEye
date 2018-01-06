@@ -10,6 +10,8 @@ namespace PoeEye.StashGrid.Prism
         protected override void Initialize()
         {
             Container
+                .RegisterSingleton<PoeStashGridViewModel>()
+                .RegisterSingleton<IPoeStashGridViewModel, PoeStashGridViewModel>()
                 .RegisterSingleton<IPoeStashHighlightService, PoeStashGridViewModel>();
         }
     }

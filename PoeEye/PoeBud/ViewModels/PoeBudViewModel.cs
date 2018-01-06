@@ -34,7 +34,7 @@ namespace PoeBud.ViewModels
     internal sealed class PoeBudViewModel : OverlayViewModelBase
     {
         private static readonly TimeSpan UpdateTimeout = TimeSpan.FromSeconds(1);
-        [NotNull] private readonly IHighlightingService highlightingService;
+        private readonly IHighlightingService highlightingService;
         private readonly IClock clock;
         private readonly ISubject<Exception> exceptionsToPropagate = new Subject<Exception>();
         private readonly IKeyboardEventsSource keyboardMouseEvents;

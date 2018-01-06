@@ -24,7 +24,7 @@ using ReactiveUI;
 
 namespace PoeEye.StashGrid.ViewModels
 {
-    public sealed class PoeStashGridViewModel : OverlayViewModelBase, IPoeStashHighlightService
+    internal sealed class PoeStashGridViewModel : OverlayViewModelBase, IPoeStashHighlightService, IPoeStashGridViewModel
     {
         private const int MaxInventoryWidth = 24;
         private const int MaxInventoryHeight = 24;

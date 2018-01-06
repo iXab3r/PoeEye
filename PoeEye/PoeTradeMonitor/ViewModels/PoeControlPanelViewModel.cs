@@ -107,13 +107,13 @@ namespace PoeEye.TradeMonitor.ViewModels
             //FIXME: These types should be provided via interface
             var knownTypes = new[]
             {
-                typeof(PoeStashGridViewModel),
+                typeof(IPoeStashGridViewModel),
                 typeof(PoeTradeMonitorViewModel),
                 typeof(PoeControlPanelViewModel),
             };
             foreach (var overlayViewModel in controller.GetChilds())
             {
-                if (!knownTypes.Contains(overlayViewModel.GetType()))
+                if (!knownTypes.Contains(overlayViewModel.GetType()) || knownTypes.Any(x => x.IsAssignableFrom(overlayViewModel.GetType())))
                 {
                     continue;
                 }
