@@ -254,6 +254,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AppArguments.cs" />
+    <Compile Include="Common\ItemPosition.cs" />
     <Compile Include="Common\PoeItemModificatins.cs" />
     <Compile Include="Common\TriState.cs" />
     <Compile Include="Common\PoeItemVerificationState.cs" />

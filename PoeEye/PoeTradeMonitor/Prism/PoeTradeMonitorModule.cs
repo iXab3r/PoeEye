@@ -22,17 +22,15 @@ namespace PoeEye.TradeMonitor.Prism
             Guard.ArgumentNotNull(container, nameof(container));
 
             this.container = container;
+            container.AddExtension(new PoeTradeMonitorModuleRegistrations());
         }
 
         public void Initialize()
         {
-            container.AddExtension(new PoeTradeMonitorModuleRegistrations());
-
             var registrator = container.Resolve<IPoeEyeModulesRegistrator>();
             registrator.RegisterSettingsEditor<PoeTradeMonitorConfig, PoeTradeMonitorSettingsViewModel>();
 
             container.Resolve<TradeMonitorBootstrapper>().AddTo(anchors);
-            container.Resolve<StashGridBootstrapper>().AddTo(anchors);
             container.Resolve<ControlPanelBootstrapper>().AddTo(anchors);
         }
     }

@@ -1,18 +1,14 @@
-﻿using System;
-using System.Reactive.Concurrency;
+﻿using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
-using System.Reactive.Linq;
 using Guards;
 using JetBrains.Annotations;
 using Microsoft.Practices.Unity;
-using PoeEye.TradeMonitor.Modularity;
-using PoeEye.TradeMonitor.ViewModels;
-using PoeShared.Modularity;
+using PoeEye.StashGrid.ViewModels;
 using PoeShared.Native;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
 
-namespace PoeEye.TradeMonitor.Prism
+namespace PoeEye.StashGrid.Prism
 {
     internal sealed class StashGridBootstrapper : DisposableReactiveObject
     {
@@ -22,23 +18,17 @@ namespace PoeEye.TradeMonitor.Prism
         private readonly SerialDisposable activeAnchors = new SerialDisposable();
 
         public StashGridBootstrapper(
-                [NotNull] IConfigProvider<PoeTradeMonitorConfig> configProvider,
                 [NotNull] [Dependency(WellKnownOverlays.PathOfExileOverlay)] IOverlayWindowController overlayController,
                 [NotNull] IFactory<PoeStashGridViewModel, IOverlayWindowController> viewModelFactory,
                 [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {
-            Guard.ArgumentNotNull(configProvider, nameof(configProvider));
             Guard.ArgumentNotNull(overlayController, nameof(overlayController));
             Guard.ArgumentNotNull(viewModelFactory, nameof(viewModelFactory));
 
             this.overlayController = overlayController;
             this.viewModelFactory = viewModelFactory;
 
-            configProvider
-                .ListenTo(x => x.IsEnabled)
-                .ObserveOn(uiScheduler)
-                .Subscribe(HandleAvailability)
-                .AddTo(Anchors);
+            HandleAvailability(isEnabled: true);
         }
 
         private void HandleAvailability(bool isEnabled)

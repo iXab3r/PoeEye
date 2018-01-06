@@ -5,15 +5,15 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Windows;
 using System.Windows.Input;
-using Anotar.Log4Net;
 using DynamicData;
 using Guards;
 using JetBrains.Annotations;
 using Microsoft.Practices.Unity;
-using PoeEye.TradeMonitor.Models;
-using PoeEye.TradeMonitor.Modularity;
-using PoeEye.TradeMonitor.Services;
+using PoeEye.StashGrid.Models;
+using PoeEye.StashGrid.Modularity;
+using PoeEye.StashGrid.Services;
 using PoeShared;
+using PoeShared.Common;
 using PoeShared.Modularity;
 using PoeShared.Native;
 using PoeShared.Prism;
@@ -22,9 +22,9 @@ using PoeShared.StashApi.DataTypes;
 using Prism.Commands;
 using ReactiveUI;
 
-namespace PoeEye.TradeMonitor.ViewModels
+namespace PoeEye.StashGrid.ViewModels
 {
-    internal sealed class PoeStashGridViewModel : OverlayViewModelBase, IPoeStashHighlightService
+    public sealed class PoeStashGridViewModel : OverlayViewModelBase, IPoeStashHighlightService
     {
         private const int MaxInventoryWidth = 24;
         private const int MaxInventoryHeight = 24;
@@ -96,10 +96,10 @@ namespace PoeEye.TradeMonitor.ViewModels
 
         public IGridCellViewController AddHighlight(ItemPosition pos, StashTabType stashType)
         {
-            LogTo.Debug($"Highlighting zone {pos} in tab of type {stashType}");
+            Log.Instance.Debug($"Highlighting zone {pos} in tab of type {stashType}");
             pos = TransformToAbsolute(pos, stashType);
 
-            LogTo.Debug($"Absolute position: {pos}");
+            Log.Instance.Debug($"Absolute position: {pos}");
             var cell = new HighlightedStashGridCellViewModel
             {
                 Width = pos.Width,

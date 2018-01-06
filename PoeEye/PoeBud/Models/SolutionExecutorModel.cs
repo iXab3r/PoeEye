@@ -58,10 +58,10 @@ namespace PoeBud.Models
                     activeTab = tabToSelect;
                 }
 
-                logQueue.OnNext($"Transferring item {item.Name}({item.ItemType}) @ X{item.X} Y{item.Y}");
+                logQueue.OnNext($"Transferring item {item.Name}({item.ItemType}) @ {item.Position}");
 
                 window.TransferItemFromStash(
-                    item.X, item.Y,
+                    item.Position.X, item.Position.Y,
                     activeTab.StashType);
             }
 

@@ -4,13 +4,9 @@
     <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Colors.xaml" />
     <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Generic.xaml" />
     <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Styles.xaml" />
-    <ResourceDictionary Source="pack://application:,,,/PoeTradeMonitor;component/Themes/Styles.xaml" />
-    <ResourceDictionary Source="pack://application:,,,/PoeTradeMonitor;component/Views/PoeTradeMonitorView.xaml" />
-    <ResourceDictionary Source="pack://application:,,,/PoeTradeMonitor;component/Views/NegotiationView.xaml" />
-    <ResourceDictionary Source="pack://application:,,,/PoeTradeMonitor;component/Views/PoeTradeMonitorSettingsView.xaml" />
-    <ResourceDictionary Source="pack://application:,,,/PoeTradeMonitor;component/Views/PoeControlPanelVIew.xaml" />
+    <ResourceDictionary Source="pack://application:,,,/PoeEye.StashGrid;component/Themes/Styles.xaml" />
+    <ResourceDictionary Source="pack://application:,,,/PoeEye.StashGrid;component/Views/PoeStashGridView.xaml" />
     <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.togglebutton.xaml" />
     <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.button.xaml" />
   </ResourceDictionary.MergedDictionaries>
-    
 </ResourceDictionary>

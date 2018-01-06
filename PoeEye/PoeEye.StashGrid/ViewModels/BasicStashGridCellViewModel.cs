@@ -1,9 +1,9 @@
 using PoeShared.Scaffolding;
 using ReactiveUI;
 
-namespace PoeEye.TradeMonitor.ViewModels
+namespace PoeEye.StashGrid.ViewModels
 {
-    internal class BasicStashGridCellViewModel : DisposableReactiveObject
+    public class BasicStashGridCellViewModel : DisposableReactiveObject
     {
         private int height;
         private int left;

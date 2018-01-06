@@ -16,8 +16,6 @@ namespace PoeEye.TradeMonitor.Prism
                 .RegisterType<INegotiationViewModel, NegotiationViewModel>();
 
             Container
-                .RegisterSingleton<PoeStashGridViewModel>()
-                .RegisterSingleton<IPoeStashHighlightService, PoeStashGridViewModel>()
                 .RegisterSingleton<IPoeStashService, PoeStashService>()
                 .RegisterSingleton<IPoeNotifier, PoeNotifier>()
                 .RegisterSingleton<IPoeMacroCommandsProvider, PoeMacroCommandsService>();

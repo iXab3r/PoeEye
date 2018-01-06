@@ -242,6 +242,8 @@
     <Compile Include="Prism\PoeBudModule.cs" />
     <Compile Include="Prism\PoeBudModuleRegistrations.cs" />
     <Compile Include="Scaffolding\ItemExtensions.cs" />
+    <Compile Include="Services\HighlightingService.cs" />
+    <Compile Include="Services\IHighlightingService.cs" />
     <Compile Include="ViewModels\ISolutionExecutorViewModel.cs" />
     <Compile Include="ViewModels\PoeBudSettingsViewModel.cs" />
     <Compile Include="ViewModels\PoeBudViewModel.cs" />
@@ -259,6 +261,22 @@
     <Resource Include="Resources\Fontin-Regular.otf" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\PoeEye.StashGrid\PoeEye.StashGrid.csproj">
+      <Project>{75b4a3db-45c0-4639-b5a3-4d180ad4b9fb}</Project>
+      <Name>PoeEye.StashGrid</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PoeEye.StashGrid\PoeEye.StashGrid.csproj">
+      <Project>{75b4a3db-45c0-4639-b5a3-4d180ad4b9fb}</Project>
+      <Name>PoeEye.StashGrid</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PoeEye.StashGrid\PoeEye.StashGrid.csproj">
+      <Project>{1d955442-14fc-48d5-9d45-4a67fc3a9aa8}</Project>
+      <Name>PoeEye.StashGrid</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PoeEye.StashGrid\PoeEye.StashGrid.csproj">
+      <Project>{1d955442-14fc-48d5-9d45-4a67fc3a9aa8}</Project>
+      <Name>PoeEye.StashGrid</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PoeShared\PoeShared.csproj">
       <Project>{12df53dd-7144-4d2d-b7a1-b4bc5bbdfb69}</Project>
       <Name>PoeShared</Name>

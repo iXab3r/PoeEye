@@ -1,5 +1,6 @@
 ﻿using PoeBud.Scaffolding;
 using PoeShared;
+using PoeShared.Common;
 using PoeShared.Scaffolding;
 using PoeShared.StashApi.DataTypes;
 
@@ -26,7 +27,7 @@ namespace PoeBud.ViewModels
 
             StashUpdate = stashUpdate;
 
-            var rareItems = stashUpdate.Items.GetTradeableItems();
+            var rareItems = stashUpdate.Items.GetChaosSetItems();
 
             var chests = rareItems.Where(x => x.ItemType == GearType.Chest).ToArray();
             var weapons = rareItems.Where(x => x.IsWeapon()).Select(x => new { Item = x, Score = x.GetTradeScore() }).ToArray();
@@ -130,7 +131,7 @@ namespace PoeBud.ViewModels
         {
             var result = new List<IPoeTradeSolution>();
 
-            var rareItems = stashUpdate.Items.GetTradeableItems();
+            var rareItems = stashUpdate.Items.GetChaosSetItems();
 
             var chests = rareItems.Where(x => x.ItemType == GearType.Chest);
             var weapons = rareItems.Where(x => x.IsWeapon());
@@ -196,17 +197,14 @@ namespace PoeBud.ViewModels
             public PoeTradeItem(IStashItem item)
             {
                 Name = item.ToString();
-                X = item.X;
-                Y = item.Y;
+                Position = item.Position;
                 TabIndex = item.GetTabIndex() ?? -1;
                 ItemType = item.ItemType;
             }
 
             public string Name { get; }
-
-            public int X { get; }
-
-            public int Y { get; }
+            
+            public ItemPosition Position { get; }
 
             public int TabIndex { get; }
 

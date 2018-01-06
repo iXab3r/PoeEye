@@ -1,6 +1,6 @@
 using ReactiveUI;
 
-namespace PoeEye.TradeMonitor.ViewModels {
+namespace PoeEye.StashGrid.ViewModels {
     internal class HighlightedStashGridCellViewModel : BasicStashGridCellViewModel
     {
         private bool isFresh;

@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reactive.Concurrency;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reflection;
 using System.Threading;
@@ -44,7 +45,7 @@ namespace PoeEye.PoeTrade.Updater
                 OnAppUpdate,
                 onAppUninstall: OnAppUninstall,
                 onFirstRun: OnFirstRun);
-
+            
             MostRecentVersionAppFolder = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
             MostRecentVersion = Assembly.GetExecutingAssembly().GetName().Version;
         }

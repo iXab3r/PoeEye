@@ -1,4 +1,5 @@
-﻿using PoeShared.Scaffolding;
+﻿using PoeBud.Services;
+using PoeShared.Scaffolding;
 
 namespace PoeBud.Prism
 {
@@ -29,6 +30,7 @@ namespace PoeBud.Prism
                 .RegisterType<IUserInputBlocker, UserInputBlocker>()
                 .RegisterType<IPoeStashUpdater, PoeStashUpdater>()
                 .RegisterType<ISolutionExecutorViewModel, SolutionExecutorViewModel>()
+                .RegisterType<IHighlightingService, HighlightingService>()
                 .RegisterType<IPoeWindow, PoeWindow>()
                 .RegisterType<ISolutionExecutorModel, SolutionExecutorModel>()
                 .RegisterType<IUserInteractionsManager, UserInteractionsManager>();

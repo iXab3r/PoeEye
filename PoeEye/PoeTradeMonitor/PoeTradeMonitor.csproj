@@ -204,14 +204,10 @@
     <Compile Include="Models\IMacroCommandContext.cs" />
     <Compile Include="Models\INegotiationCloseController.cs" />
     <Compile Include="Modularity\PoeControlPanelConfig.cs" />
-    <Compile Include="Modularity\PoeStashGridConfig.cs" />
     <Compile Include="Prism\ControlPanelBootstrapper.cs" />
-    <Compile Include="Prism\StashGridBootstrapper.cs" />
     <Compile Include="Services\IPoeMacroCommandsProvider.cs" />
     <Compile Include="Services\IPoeMessageParser.cs" />
-    <Compile Include="Services\IPoeStashHighlightService.cs" />
     <Compile Include="Services\IPoeStashService.cs" />
-    <Compile Include="Models\ItemPosition.cs" />
     <Compile Include="Services\ITradeMonitorService.cs" />
     <Compile Include="Models\MacroCommand.cs" />
     <Compile Include="Services\Notifications\IPoeNotifier.cs" />
@@ -234,16 +230,12 @@
     <Compile Include="Scaffolding\ScrollViewerExtensions.cs" />
     <Compile Include="Scaffolding\SetPropertyAction.cs" />
     <Compile Include="Themes\TradeMonitorExpanderHelper.cs" />
-    <Compile Include="ViewModels\HighlightedStashGridCellViewModel.cs" />
-    <Compile Include="ViewModels\IGridCellViewController.cs" />
     <Compile Include="ViewModels\INegotiationViewModel.cs" />
     <Compile Include="ViewModels\MacroMessageViewModel.cs" />
     <Compile Include="ViewModels\NegotiationViewModel.cs" />
     <Compile Include="ViewModels\PoeControlPanelViewModel.cs" />
-    <Compile Include="ViewModels\PoeStashGridViewModel.cs" />
     <Compile Include="ViewModels\PoeTradeMonitorSettingsViewModel.cs" />
     <Compile Include="ViewModels\PoeTradeMonitorViewModel.cs" />
-    <Compile Include="ViewModels\BasicStashGridCellViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -258,6 +250,30 @@
     <ProjectReference Include="..\PoeBud\PoeBud.csproj">
       <Project>{da6c88ea-168e-4116-b0d1-0f732d5b4773}</Project>
       <Name>PoeBud</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PoeEye.StashGrid\PoeEye.StashGrid.csproj">
+      <Project>{75b4a3db-45c0-4639-b5a3-4d180ad4b9fb}</Project>
+      <Name>PoeEye.StashGrid</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PoeEye.StashGrid\PoeEye.StashGrid.csproj">
+      <Project>{75b4a3db-45c0-4639-b5a3-4d180ad4b9fb}</Project>
+      <Name>PoeEye.StashGrid</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PoeEye.StashGrid\PoeEye.StashGrid.csproj">
+      <Project>{75b4a3db-45c0-4639-b5a3-4d180ad4b9fb}</Project>
+      <Name>PoeEye.StashGrid</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PoeEye.StashGrid\PoeEye.StashGrid.csproj">
+      <Project>{75b4a3db-45c0-4639-b5a3-4d180ad4b9fb}</Project>
+      <Name>PoeEye.StashGrid</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PoeEye.StashGrid\PoeEye.StashGrid.csproj">
+      <Project>{1d955442-14fc-48d5-9d45-4a67fc3a9aa8}</Project>
+      <Name>PoeEye.StashGrid</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PoeEye.StashGrid\PoeEye.StashGrid.csproj">
+      <Project>{1D955442-14FC-48D5-9D45-4A67FC3A9AA8}</Project>
+      <Name>PoeEye.StashGrid</Name>
     </ProjectReference>
     <ProjectReference Include="..\PoeShared\PoeShared.csproj">
       <Project>{12df53dd-7144-4d2d-b7a1-b4bc5bbdfb69}</Project>
@@ -286,10 +302,6 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\NegotiationView.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\PoeStashGridView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

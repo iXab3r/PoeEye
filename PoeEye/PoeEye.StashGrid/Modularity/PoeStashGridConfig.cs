@@ -1,7 +1,7 @@
 ﻿using System.Windows;
 using PoeShared.Modularity;
 
-namespace PoeEye.TradeMonitor.Modularity
+namespace PoeEye.StashGrid.Modularity
 {
     public class PoeStashGridConfig : IPoeEyeConfigVersioned
     {

@@ -1,8 +1,8 @@
 ﻿using System.Text;
 
-namespace PoeEye.TradeMonitor.Models
+namespace PoeShared.Common
 {
-    internal struct ItemPosition
+    public struct ItemPosition
     {
         public ItemPosition(int x, int y) : this(x, y, 0, 0)
         {

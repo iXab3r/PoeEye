@@ -485,6 +485,10 @@
       <Project>{c6188345-f8dc-4cdc-8c01-add0a03bbf1c}</Project>
       <Name>PoeEye.PoeTrade</Name>
     </ProjectReference>
+    <ProjectReference Include="..\PoeEye.StashGrid\PoeEye.StashGrid.csproj">
+      <Project>{1d955442-14fc-48d5-9d45-4a67fc3a9aa8}</Project>
+      <Name>PoeEye.StashGrid</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PoeEye.StashRealtimeApi\PoeEye.StashRealtimeApi.csproj">
       <Project>{5ccdf7f6-c2b0-4ec4-b921-4313564bb13a}</Project>
       <Name>PoeEye.StashRealtimeApi</Name>

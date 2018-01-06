@@ -58,6 +58,8 @@ namespace PoeShared.StashApi.DataTypes
         bool Support { get; }
 
         string TypeLine { get; }
+        
+        string Category { get; }
 
         bool Verified { get; }
 
@@ -68,5 +70,7 @@ namespace PoeShared.StashApi.DataTypes
         int X { get; }
 
         int Y { get; }
+        
+        ItemPosition Position { get; }
     }
 }

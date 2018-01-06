@@ -1,4 +1,5 @@
-﻿using PoeShared.StashApi.DataTypes;
+﻿using PoeShared.Common;
+using PoeShared.StashApi.DataTypes;
 
 namespace PoeBud.Models
 {
@@ -8,9 +9,7 @@ namespace PoeBud.Models
     {
         string Name { [NotNull] get; }
 
-        int X { get; }
-
-        int Y { get; }
+        ItemPosition Position { get; }
 
         int TabIndex { get; }
 

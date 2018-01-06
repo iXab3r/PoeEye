@@ -4,6 +4,7 @@ using System.Text.RegularExpressions;
 using Guards;
 using JetBrains.Annotations;
 using PoeEye.TradeMonitor.Models;
+using PoeShared.Common;
 using PoeShared.Converters;
 using PoeShared.Scaffolding;
 using PoeWhisperMonitor.Chat;

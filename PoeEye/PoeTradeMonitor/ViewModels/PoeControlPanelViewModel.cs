@@ -11,6 +11,7 @@ using DynamicData;
 using Guards;
 using JetBrains.Annotations;
 using Microsoft.Practices.Unity;
+using PoeEye.StashGrid.ViewModels;
 using PoeEye.TradeMonitor.Models;
 using PoeEye.TradeMonitor.Modularity;
 using PoeEye.TradeMonitor.Services;
@@ -19,7 +20,6 @@ using PoeShared.Modularity;
 using PoeShared.Native;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
-using PoeShared.StashApi.DataTypes;
 using Prism.Commands;
 using ReactiveUI;
 

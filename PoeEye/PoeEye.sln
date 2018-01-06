@@ -39,6 +39,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HtmlRenderer", "..\Submodul
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HtmlRenderer.WPF", "..\Submodules\HTML-Renderer\Source\HtmlRenderer.WPF\HtmlRenderer.WPF.csproj", "{7E4E8DB5-85AD-4388-BDCB-38C6F423B8B0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PoeEye.StashGrid", "PoeEye.StashGrid\PoeEye.StashGrid.csproj", "{75B4A3DB-45C0-4639-B5A3-4D180AD4B9FB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Release|x64 = Release|x64

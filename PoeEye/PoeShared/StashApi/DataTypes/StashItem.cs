@@ -12,6 +12,10 @@ namespace PoeShared.StashApi.DataTypes
         [JsonProperty("id")]
         public string Id { get; set; }
 
+        [DeserializeAs(Name = "category")]
+        [JsonProperty("category")]
+        public string Category { get; }
+
         [DeserializeAs(Name = "verified")]
         [JsonProperty("verified")]
         public bool Verified { get; set; }
@@ -139,6 +143,8 @@ namespace PoeShared.StashApi.DataTypes
         public GearType ItemType { get; set; }
 
         public PoeItemRarity Rarity => (PoeItemRarity)((int)RarityWrapper + 1);
+        
+        public ItemPosition Position => new ItemPosition(x: X, y: Y, width: Width, height: Height);
 
         public StashItem CleanupItemName()
         {

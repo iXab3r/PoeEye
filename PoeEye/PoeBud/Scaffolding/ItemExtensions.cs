@@ -89,10 +89,20 @@ namespace PoeBud.Scaffolding
             return $"Stash{tab.Idx + 1}";
         }
 
-        public static IStashItem[] GetTradeableItems(this IStashItem[] items)
+        public static IStashItem[] GetChaosSetItems(this IStashItem[] items)
         {
             return items
                 .Where(x => x.Rarity == PoeItemRarity.Rare)
+                .Where(x => x.SocketedItems == null || !x.SocketedItems.Any())
+                .Where(x => x.Sockets == null || x.Sockets.Count < 6)
+                .Where(x => x.GetTabIndex() != null)
+                .ToArray();
+        }
+        
+        public static IStashItem[] GetCurrencyItems(this IStashItem[] items)
+        {
+            return items
+                .Where(x => x.Category == "currency")
                 .Where(x => x.SocketedItems == null || !x.SocketedItems.Any())
                 .Where(x => x.Sockets == null || x.Sockets.Count < 6)
                 .Where(x => x.GetTabIndex() != null)

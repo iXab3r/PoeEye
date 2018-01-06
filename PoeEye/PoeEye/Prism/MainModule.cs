@@ -1,8 +1,10 @@
-﻿using Guards;
+﻿using System.Linq;
+using Guards;
 using Microsoft.Practices.Unity;
 using PoeEye.Config;
 using PoeEye.PoeTrade.ViewModels;
 using PoeShared.Modularity;
+using Prism.Modularity;
 
 namespace PoeEye.Prism
 {

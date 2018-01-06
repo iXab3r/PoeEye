@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Threading;
@@ -51,7 +52,7 @@ namespace PoeEye.Prism
 
             Mouse.OverrideCursor = new Cursor(new MemoryStream(Properties.Resources.PathOfExile_102));
             var splashWindow = new SplashScreen("Resources\\Splash.png");
-            splashWindow.Show(true, true);
+            splashWindow.Show(true, false);
 
             var window = (Window)Shell;
             Application.Current.MainWindow = window;
@@ -80,6 +81,10 @@ namespace PoeEye.Prism
             base.Run(runWithDefaultConfiguration);
 
             var window = (Window)Shell;
+            
+            var moduleCatalog = Container.Resolve<IModuleCatalog>();
+            var modules = moduleCatalog.Modules.ToArray();
+            Log.Instance.Info($"Modules list:\n{modules.Select(x => new { x.ModuleName, x.ModuleType, x.State, x.InitializationMode, x.DependsOn }).DumpToTextRaw()}");
 
             var viewModel = Container.Resolve<IMainWindowViewModel>();
             window.DataContext = viewModel;

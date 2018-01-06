@@ -17,11 +17,13 @@ using Microsoft.Practices.Unity;
 using PoeBud.Config;
 using PoeBud.Models;
 using PoeBud.Scaffolding;
+using PoeBud.Services;
 using PoeShared;
 using PoeShared.Modularity;
 using PoeShared.Native;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
+using PoeShared.StashApi;
 using PoeShared.StashApi.DataTypes;
 using ReactiveUI;
 using WinFormsKeyEventArgs = System.Windows.Forms.KeyEventArgs;
@@ -32,13 +34,14 @@ namespace PoeBud.ViewModels
     internal sealed class PoeBudViewModel : OverlayViewModelBase
     {
         private static readonly TimeSpan UpdateTimeout = TimeSpan.FromSeconds(1);
+        [NotNull] private readonly IHighlightingService highlightingService;
         private readonly IClock clock;
         private readonly ISubject<Exception> exceptionsToPropagate = new Subject<Exception>();
         private readonly IKeyboardEventsSource keyboardMouseEvents;
         private readonly IUiOverlaysProvider overlaysProvider;
         private readonly ObservableAsPropertyHelper<Exception> lastUpdateException;
         private readonly IFactory<IPoeStashUpdater, IStashUpdaterParameters> stashAnalyzerFactory;
-        [NotNull] private readonly IFactory<IDefaultStashUpdaterStrategy, IStashUpdaterParameters> stashUpdaterStrategyFactory;
+        private readonly IFactory<IDefaultStashUpdaterStrategy, IStashUpdaterParameters> stashUpdaterStrategyFactory;
         private readonly IFactory<StashViewModel, StashUpdate, IPoeBudConfig> stashUpdateFactory;
         private readonly SerialDisposable stashUpdaterDisposable = new SerialDisposable();
         private readonly IScheduler uiScheduler;
@@ -55,6 +58,7 @@ namespace PoeBud.ViewModels
 
         public PoeBudViewModel(
             [NotNull] IPoeWindowManager windowManager,
+            [NotNull] IHighlightingService highlightingService,
             [NotNull] ISolutionExecutorViewModel solutionExecutor,
             [NotNull] IConfigProvider<PoeBudConfig> poeBudConfigProvider,
             [NotNull] IClock clock,
@@ -68,6 +72,7 @@ namespace PoeBud.ViewModels
         {
             Guard.ArgumentNotNull(windowManager, nameof(windowManager));
             Guard.ArgumentNotNull(solutionExecutor, nameof(solutionExecutor));
+            Guard.ArgumentNotNull(highlightingService, nameof(highlightingService));
             Guard.ArgumentNotNull(overlaysProvider, nameof(overlaysProvider));
             Guard.ArgumentNotNull(userInteractionsManager, nameof(userInteractionsManager));
             Guard.ArgumentNotNull(stashUpdaterStrategyFactory, nameof(stashUpdaterStrategyFactory));
@@ -79,6 +84,7 @@ namespace PoeBud.ViewModels
             Guard.ArgumentNotNull(uiScheduler, nameof(uiScheduler));
 
             OverlayMode = OverlayMode.Transparent;
+            this.highlightingService = highlightingService;
             this.clock = clock;
             this.keyboardMouseEvents = keyboardMouseEvents;
             this.overlaysProvider = overlaysProvider;
@@ -206,6 +212,16 @@ namespace PoeBud.ViewModels
                    .ObserveOn(uiScheduler)
                    .Subscribe(ForceRefreshStashCommandExecuted)
                    .AddTo(stashDisposable);
+                
+                var highlightHotkey = new KeyGesture(hotkey.Key, ModifierKeys.Shift);
+                keyPressedObservable
+                    .Where(x => highlightHotkey.MatchesHotkey(x))
+                    .Where(x => stash?.Solutions.Any() ?? false)
+                    .Do(x => x.Handled = true)
+                    .Select(x => stash?.Solutions.FirstOrDefault())
+                    .ObserveOn(uiScheduler)
+                    .Subscribe(HighlightSolutionCommandExecuted)
+                    .AddTo(stashDisposable);
 
                 var updater = stashAnalyzerFactory.Create(config);
                 stashDisposable.Add(updater);
@@ -269,6 +285,22 @@ namespace PoeBud.ViewModels
                     return;
                 }
                 updater.ForceRefresh();
+            }
+            catch (Exception ex)
+            {
+                Log.HandleException(ex);
+                exceptionsToPropagate.OnNext(ex);
+            }
+        }
+
+        private void HighlightSolutionCommandExecuted(IPoeTradeSolution solution)
+        {
+            Guard.ArgumentNotNull(solution, nameof(solution));
+            try
+            {
+                Log.Instance.Debug($"[MainViewModel] Highlighting solution {solution}");
+
+                highlightingService.Highlight(solution);
             }
             catch (Exception ex)
             {
@@ -344,7 +376,7 @@ namespace PoeBud.ViewModels
 
         private bool IsMatch(IPoeTradeItem tradeItem, IStashItem item)
         {
-            return tradeItem.TabIndex == item.GetTabIndex() && tradeItem.X == item.X && tradeItem.Y == item.Y;
+            return tradeItem.TabIndex == item.GetTabIndex() && tradeItem.Position.X == item.Position.X && tradeItem.Position.Y == item.Position.Y;
         }
     }
 }

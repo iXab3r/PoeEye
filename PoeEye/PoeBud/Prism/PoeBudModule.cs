@@ -18,12 +18,11 @@ namespace PoeBud.Prism
             Guard.ArgumentNotNull(container, nameof(container));
 
             this.container = container;
+            container.AddExtension(new PoeBudModuleRegistrations());
         }
 
         public void Initialize()
         {
-            container.AddExtension(new PoeBudModuleRegistrations());
-
             var registrator = container.Resolve<IPoeEyeModulesRegistrator>();
             registrator.RegisterSettingsEditor<PoeBudConfig, PoeBudSettingsViewModel>();
 
