@@ -22,11 +22,10 @@ namespace PoeBud.ViewModels
     internal sealed class PriceSummaryViewModel : DisposableReactiveObject, IPriceSummaryViewModel
     {
         private readonly IPoePriceCalculcator poePriceCalculcator;
-        private readonly IHighlightingService highlightingService;
-        private PoePrice priceInChaosOrbs;
+        private readonly ObservableCollection<Tuple<PoePrice, PoePrice>> pricesByType = new ObservableCollection<Tuple<PoePrice, PoePrice>>();
 
+        private PoePrice priceInChaosOrbs;
         private IPoeTradeSolution solution;
-        private ObservableCollection<Tuple<PoePrice, PoePrice>> pricesByType = new ObservableCollection<Tuple<PoePrice, PoePrice>>();
 
         public PriceSummaryViewModel(
             [NotNull] IPoePriceCalculcator poePriceCalculcator,
@@ -36,7 +35,6 @@ namespace PoeBud.ViewModels
             Guard.ArgumentNotNull(highlightingService, nameof(highlightingService));
 
             this.poePriceCalculcator = poePriceCalculcator;
-            this.highlightingService = highlightingService;
 
             PricesByType = new ReadOnlyObservableCollection<Tuple<PoePrice, PoePrice>>(pricesByType);
 
@@ -46,8 +44,7 @@ namespace PoeBud.ViewModels
                 .Subscribe(() => PriceInChaosOrbs = Solution == null ? PoePrice.Empty : CalculateTotal(Solution))
                 .AddTo(Anchors);
 
-            ShowHighlighting = new DelegateCommand(() => highlightingService.Highlight(Solution));
-            HideHighlighting = new DelegateCommand(() => highlightingService.Highlight(null));
+            ShowHighlighting = new DelegateCommand(() => highlightingService.Highlight(Solution, TimeSpan.FromSeconds(10)));
         }
 
         public IPoeTradeSolution Solution
@@ -63,8 +60,6 @@ namespace PoeBud.ViewModels
         }
         
         public ReadOnlyObservableCollection<Tuple<PoePrice, PoePrice>> PricesByType { get; }
-        
-        public ICommand HideHighlighting { get; }
         
         public ICommand ShowHighlighting { get; }
         

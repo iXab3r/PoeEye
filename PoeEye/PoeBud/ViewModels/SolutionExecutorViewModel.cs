@@ -1,14 +1,18 @@
 ﻿using System;
 using System.Linq;
 using System.Reactive.Concurrency;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using Guards;
 using JetBrains.Annotations;
 using Microsoft.Practices.Unity;
+using PoeBud.Config;
 using PoeBud.Models;
+using PoeBud.Services;
 using PoeShared;
+using PoeShared.Modularity;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
 using ReactiveUI;
@@ -19,12 +23,16 @@ namespace PoeBud.ViewModels
     {
         private readonly IClock clock;
         private readonly ISolutionExecutorModel solutionExecutor;
+        private readonly IHighlightingService highlightingService;
+        private readonly IConfigProvider<PoeBudConfig> poeBudConfigProvider;
 
         private bool isBusy;
 
         public SolutionExecutorViewModel(
             [NotNull] IClock clock,
             [NotNull] ISolutionExecutorModel solutionExecutor,
+            [NotNull] IHighlightingService highlightingService,
+            [NotNull] IConfigProvider<PoeBudConfig> poeBudConfigProvider,
             [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler,
             [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler)
         {
@@ -35,6 +43,8 @@ namespace PoeBud.ViewModels
 
             this.clock = clock;
             this.solutionExecutor = solutionExecutor;
+            this.highlightingService = highlightingService;
+            this.poeBudConfigProvider = poeBudConfigProvider;
 
             solutionExecutor
                 .Messages
@@ -67,7 +77,10 @@ namespace PoeBud.ViewModels
             PerformedOperations.Clear();
 
             IsBusy = true;
-            await solutionExecutor.ExecuteSolution(solutionToExecute);
+            using (poeBudConfigProvider.ActualConfig.HighlightSolution ? highlightingService.Highlight(solutionToExecute) : Disposable.Empty)
+            {
+                await solutionExecutor.ExecuteSolution(solutionToExecute);
+            }
             IsBusy = false;
 
             Log.Instance.Debug($"[SolutionExecutor.ExecuteSolution] Log:\r\n\t{string.Join("\r\n\t", PerformedOperations)}");

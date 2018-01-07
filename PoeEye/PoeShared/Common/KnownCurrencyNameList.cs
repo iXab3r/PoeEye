@@ -151,6 +151,90 @@ namespace PoeShared.Common
         public static readonly string PerandusCoin = "coin";
 
 
+        private static readonly IDictionary<string, string> DefaultAliases = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            {"offering", OfferingToTheGoddess},
+
+            {"Splinter of Chayula", SplinterOfChayula},
+            {"splinter-chayula", SplinterOfChayula},
+            {"Splinter of Esh", SplinterOfEsh},
+            {"splinter-esh", SplinterOfEsh},
+            {"Splinter of Tul", SplinterOfTul},
+            {"splinter-tul", SplinterOfTul},
+            {"Splinter of Uul-Netol", SplinterOfUulNetol},
+            {"splinter-uul-netol", SplinterOfUulNetol},
+            {"Splinter of Xoph", SplinterOfXoph},
+            {"splinter-xoph", SplinterOfXoph},
+
+            {"phenix", FragmentOfThePhoenix},
+            {"pheon", FragmentOfThePhoenix},
+
+            {"Orb of Alteration", OrbOfAlteration},
+            {"Alt", OrbOfAlteration},
+
+            {"Blessed Orb", BlessedOrb},
+
+            {"Glassblower's Bauble", GlassblowersBauble},
+            {"Blacksmith's Whetstone", BlacksmithsWhetstone},
+            {"Whetstone", BlacksmithsWhetstone},
+
+            {"Cartographer's Chisel", CartographersChisel},
+            {"Cartographers Chisel", CartographersChisel},
+
+            {"Chaos Orb", ChaosOrb},
+            {"Chaos", ChaosOrb},
+
+            {"Chromatic Orb", ChromaticOrb},
+            {"Chrome", ChromaticOrb},
+            {"Chrom", ChromaticOrb},
+
+            {"Divine Orb", DivineOrb},
+
+            {"Exalted Orb", ExaltedOrb},
+            {"Ex", ExaltedOrb},
+            {"Exa", ExaltedOrb},
+
+            {"Gemcutter's Prism", GemcuttersPrism},
+            {"Gemcutters Prism", GemcuttersPrism},
+
+            {"Jeweller's Orb", JewellersOrb},
+            {"Jewellers Orb", JewellersOrb},
+            {"Jew", JewellersOrb},
+
+            {"Orb of Alchemy", OrbOfAlchemy},
+            {"Alch", OrbOfAlchemy},
+
+            {"Orb of Fusing", OrbOfFusing},
+            {"Fuse", OrbOfFusing},
+
+            {"Orb of Chance", OrbOfChance},
+
+            {"Orb of Regret", OrbOfRegret},
+            {"Orb of Transmutation", OrbOfTransmutation},
+            {"Orb of Augmentation", OrbOfAugmentation},
+
+            {"Orb of Scouring", OrbOfScouring},
+            {"Scour", OrbOfScouring},
+            {"Silver Coin", SilverCoin},
+
+            {"Regal Orb", RegalOrb},
+
+            {"Vaal Orb", VaalOrb},
+            {"Vaal", VaalOrb},
+
+            {"Mirror of Kalandra", MirrorOfKalandra},
+            {"Mirror", MirrorOfKalandra},
+
+            {"Eternal Orb", EternalOrb},
+            {"Eternal", EternalOrb},
+
+            {"blessing-chayula", BlessingOfChayula},
+            {"Apprentice Cartographer's Sextant", ApprenticeSextant},
+            {"Journeyman Cartographer's Sextant", JourneymanSextant},
+            {"Master Cartographer's Sextant", MasterSextant},
+            {"Orb of Annulment", OrbOfAnnulment},
+        };
+
         public static readonly IDictionary<string, string> KnownImages = new Dictionary<string, string>
         {
             {Unknown, "Unknown"},
@@ -180,7 +264,7 @@ namespace PoeShared.Common
             {SplinterOfChayula, "Splinter_of_Chayula"},
             {SplinterOfEsh, "Splinter_of_Esh"},
             {SplinterOfTul, "Splinter_of_Tul"},
-            {SplinterOfUulNetol, "Splinter_of_Uul_Netol"},
+            {SplinterOfUulNetol, "Splinter_of_Uul-Netol"},
             {SplinterOfXoph, "Splinter_of_Xoph"},
 
             {FragmentOfTheChimera, "Fragment_of_the_Chimera"},
@@ -292,85 +376,6 @@ namespace PoeShared.Common
             {ShriekingEssenceOfZeal, "Shrieking_Essence_of_Zeal_inventory_icon"},
             {RemnantOfCorruption, "Remnant_of_Corruption_inventory_icon"},
             {OrbOfAnnulment, "Orb_of_Annulment_inventory_icon"},
-        };
-
-        private static readonly IDictionary<string, string> DefaultAliases = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
-        {
-            {"offering", OfferingToTheGoddess},
-
-            {"splinter-chayula", SplinterOfChayula},
-            {"splinter-esh", SplinterOfEsh},
-            {"splinter-tul", SplinterOfTul},
-            {"splinter-uul-netol", SplinterOfUulNetol},
-            {"splinter-xoph", SplinterOfXoph},
-
-            {"phenix", FragmentOfThePhoenix},
-            {"pheon", FragmentOfThePhoenix},
-
-            {"Orb of Alteration", OrbOfAlteration},
-            {"Alt", OrbOfAlteration},
-
-            {"Blessed Orb", BlessedOrb},
-
-            {"Glassblower's Bauble", GlassblowersBauble},
-            {"Blacksmith's Whetstone", BlacksmithsWhetstone},
-            {"Whetstone", BlacksmithsWhetstone},
-
-            {"Cartographer's Chisel", CartographersChisel},
-            {"Cartographers Chisel", CartographersChisel},
-
-            {"Chaos Orb", ChaosOrb},
-            {"Chaos", ChaosOrb},
-
-            {"Chromatic Orb", ChromaticOrb},
-            {"Chrome", ChromaticOrb},
-            {"Chrom", ChromaticOrb},
-
-            {"Divine Orb", DivineOrb},
-
-            {"Exalted Orb", ExaltedOrb},
-            {"Ex", ExaltedOrb},
-            {"Exa", ExaltedOrb},
-
-            {"Gemcutter's Prism", GemcuttersPrism},
-            {"Gemcutters Prism", GemcuttersPrism},
-
-            {"Jeweller's Orb", JewellersOrb},
-            {"Jewellers Orb", JewellersOrb},
-            {"Jew", JewellersOrb},
-
-            {"Orb of Alchemy", OrbOfAlchemy},
-            {"Alch", OrbOfAlchemy},
-
-            {"Orb of Fusing", OrbOfFusing},
-            {"Fuse", OrbOfFusing},
-
-            {"Orb of Chance", OrbOfChance},
-
-            {"Orb of Regret", OrbOfRegret},
-            {"Orb of Transmutation", OrbOfTransmutation},
-            {"Orb of Augmentation", OrbOfAugmentation},
-
-            {"Orb of Scouring", OrbOfScouring},
-            {"Scour", OrbOfScouring},
-            {"Silver Coin", SilverCoin},
-
-            {"Regal Orb", RegalOrb},
-
-            {"Vaal Orb", VaalOrb},
-            {"Vaal", VaalOrb},
-
-            {"Mirror of Kalandra", MirrorOfKalandra},
-            {"Mirror", MirrorOfKalandra},
-
-            {"Eternal Orb", EternalOrb},
-            {"Eternal", EternalOrb},
-
-            {"blessing-chayula", BlessingOfChayula},
-            {"Apprentice Cartographer's Sextant", ApprenticeSextant},
-            {"Journeyman Cartographer's Sextant", JourneymanSextant},
-            {"Master Cartographer's Sextant", MasterSextant},
-            {"Orb of Annulment", OrbOfAnnulment},
         };
 
         static KnownCurrencyNameList()

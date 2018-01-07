@@ -40,7 +40,6 @@ namespace PoeBud.ViewModels
 
         private bool isEnabled;
 
-        private IReactiveList<TabSelectionViewModel> stashesList;
         private UiOverlayInfo selectedUiOverlay;
         private string sessionId;
         private string username;
@@ -173,15 +172,12 @@ namespace PoeBud.ViewModels
             resultingConfig.HideXpBar = hideXpBar;
             resultingConfig.IsEnabled = isEnabled;
 
-            if (stashesList != null)
-            {
-                var selectedTabs = stashesList
-                    .Where(x => x.IsSelected)
-                    .Select(x => x.Name)
-                    .ToArray();
+            var selectedTabs = StashesList
+                .Where(x => x.IsSelected)
+                .Select(x => x.Name)
+                .ToArray();
 
-                resultingConfig.StashesToProcess = selectedTabs;
-            }
+            resultingConfig.StashesToProcess = selectedTabs;
 
             var result = new PoeBudConfig();
             resultingConfig.CopyPropertiesTo(result);

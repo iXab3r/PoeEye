@@ -15,8 +15,6 @@ namespace PoeBud.Models
 
         void MoveMouseToStashItem(int itemX, int itemY, StashTabType tabType);
 
-        void SelectStashTabByName(int tabIndex, [NotNull] string[] knownTabs);
-
         void SelectStashTabByIdx(IStashTab tabToSelect, IStashTab[] tabs);
 
         void TransferItemFromStash(int itemX, int itemY, StashTabType tabType);

@@ -5,6 +5,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
 using DynamicData;
 using Guards;
 using JetBrains.Annotations;
@@ -198,12 +199,19 @@ namespace PoeEye.StashGrid.ViewModels
                 this.cell = cell;
 
                 this.BindPropertyTo(x => x.IsFresh, cell, x => x.IsFresh).AddTo(Anchors);
+                this.BindPropertyTo(x => x.BorderColor, cell, x => x.BorderColor).AddTo(Anchors);
             }
 
             public bool IsFresh
             {
                 get => cell.IsFresh;
                 set => cell.IsFresh = value;
+            }
+
+            public Color? BorderColor
+            {
+                get => cell.BorderColor;
+                set => cell.BorderColor = value;
             }
 
             public string ToolTipText

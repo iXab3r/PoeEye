@@ -68,32 +68,6 @@ namespace PoeBud.Models
             userInteractionsManager.MoveMouseTo(moveLocation);
         }
 
-        public void SelectStashTabByName(int tabIndex, string[] knownTabs)
-        {
-            Guard.ArgumentNotNull(knownTabs, nameof(knownTabs));
-            Guard.ArgumentIsBetween(() => tabIndex, 0, knownTabs.Length - 1, true);
-
-            var windowBounds = WindowBounds;
-
-            var tabsSpace = new Size(windowBounds.Width * 0.00677083333333333333333333333333, windowBounds.Height * 0.02592592592592592592592592592593);
-            var defaultTabWidth = windowBounds.Width * 0.025;
-
-            var tabWidths = knownTabs
-                .Select(x => EstimateTabWidth(x, defaultTabWidth, tabsSpace.Width))
-                .ToArray();
-
-            var stashesTopLeftLocation = new Point(
-                windowBounds.X + windowBounds.Width * 0.0078125,
-                windowBounds.Y + windowBounds.Height * 0.12037037037037037037037037037037);
-
-            var targetPoint = new Point(
-                stashesTopLeftLocation.X + tabWidths.Take(tabIndex).Sum(x => x) + tabsSpace.Width * (tabIndex + 1) + tabWidths[tabIndex] * 0.5,
-                stashesTopLeftLocation.Y + tabsSpace.Height * 0.5);
-
-            userInteractionsManager.MoveMouseTo(targetPoint);
-            userInteractionsManager.SendClick();
-        }
-
         public Rect WindowBounds => NativeMethods.GetWindowBounds(nativeWindowHandle);
 
         public Rect StashBounds

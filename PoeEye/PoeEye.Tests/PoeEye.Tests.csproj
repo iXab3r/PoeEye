@@ -172,6 +172,7 @@
     <Content Include="PoeBud\TestData\Stash1.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="PoeBud\TestData\Stash2.json" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FuzzySearch\FuzzySearch.csproj">

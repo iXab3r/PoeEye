@@ -200,7 +200,10 @@
                           <TextBlock MaxWidth="60" Text="{Binding ToolTipText}"/>
                         </Setter.Value>
                       </Setter>
+                      
                       <Style.Triggers>
+                       
+                        
                         <DataTrigger Binding="{Binding IsFresh}" Value="True">
                           <DataTrigger.EnterActions>
                             <BeginStoryboard>
@@ -212,11 +215,11 @@
 
                                 <DoubleAnimation Storyboard.TargetProperty="RenderTransform.(ScaleTransform.ScaleX)"
                                                  Duration="0:0:0.5"
-                                                 From="1.5"
+                                                 From="1.3"
                                                  To="0.9" />
                                 <DoubleAnimation Storyboard.TargetProperty="RenderTransform.(ScaleTransform.ScaleY)"
                                                  Duration="0:0:0.5"
-                                                 From="1.5"
+                                                 From="1.3"
                                                  To="0.9" />
                                 <DoubleAnimation Storyboard.TargetProperty="RenderTransform.(ScaleTransform.ScaleX)"
                                                  Duration="0:0:0.5"
@@ -251,18 +254,33 @@
                         </DataTrigger>
                       </Style.Triggers>
                     </Style>
-
                   </materialDesign:Badged.Style>
-                  <Border Background="{x:Null}"  
+                  <Border Background="{x:Null}" x:Name="CellBorder"
                           Margin="0" 
                           BorderThickness="3"
                           CornerRadius="2">
-                    <Border.BorderBrush>
-                      <LinearGradientBrush MappingMode="RelativeToBoundingBox">
-                        <GradientStop Color="{StaticResource AccentBaseColor}" Offset="0" />
-                        <GradientStop Color="{StaticResource HighlightColor}" Offset="0" />
-                      </LinearGradientBrush>
-                    </Border.BorderBrush>
+                    <Border.Style>
+                      <Style TargetType="{x:Type Border}">
+                        <Setter Property="BorderBrush">
+                          <Setter.Value>
+                            <SolidColorBrush Color="{Binding BorderColor}"/>
+                          </Setter.Value>
+                        </Setter>
+                        
+                        <Style.Triggers>
+                          <DataTrigger Binding="{Binding BorderColor}" Value="{x:Null}">
+                            <Setter Property="BorderBrush">
+                              <Setter.Value>
+                                <LinearGradientBrush MappingMode="RelativeToBoundingBox">
+                                  <GradientStop Color="{StaticResource AccentBaseColor}" Offset="0" />
+                                  <GradientStop Color="{StaticResource HighlightColor}" Offset="0" />
+                                </LinearGradientBrush>
+                              </Setter.Value>
+                            </Setter>
+                          </DataTrigger>
+                        </Style.Triggers>
+                      </Style>
+                    </Border.Style>
                   </Border>
                 </materialDesign:Badged>
               </DataTemplate>

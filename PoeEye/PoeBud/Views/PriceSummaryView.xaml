@@ -9,7 +9,7 @@
         <Grid 
             Background="Transparent"
             ToolTipService.ShowOnDisabled="True"
-            ToolTipService.ShowDuration="{x:Static system:Int32.MaxValue}"
+            ToolTipService.ShowDuration="{x:Static system:Int32.MaxValue}" 
             >
             <Grid.ToolTip>
                   <StackPanel Orientation="Vertical">
@@ -30,12 +30,8 @@
             <ContentControl Content="{Binding PriceInChaosOrbs}"/>
             
             <i:Interaction.Triggers>
-                <i:EventTrigger EventName="MouseEnter">
+                <i:EventTrigger EventName="MouseLeftButtonDown">
                     <i:InvokeCommandAction Command="{Binding ShowHighlighting}" />
-                </i:EventTrigger>
-                
-                <i:EventTrigger EventName="MouseLeave">
-                    <i:InvokeCommandAction Command="{Binding HideHighlighting}" />
                 </i:EventTrigger>
             </i:Interaction.Triggers>
         </Grid>

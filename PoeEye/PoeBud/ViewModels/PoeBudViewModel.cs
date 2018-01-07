@@ -23,8 +23,10 @@ using PoeShared.Modularity;
 using PoeShared.Native;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
+using PoeShared.Scaffolding.WPF;
 using PoeShared.StashApi;
 using PoeShared.StashApi.DataTypes;
+using Prism.Commands;
 using ReactiveUI;
 using WinFormsKeyEventArgs = System.Windows.Forms.KeyEventArgs;
 using WinFormsKeyEventHandler = System.Windows.Forms.KeyEventHandler;
@@ -109,6 +111,15 @@ namespace PoeBud.ViewModels
             Height = SystemParameters.PrimaryScreenHeight;
             Left = 0;
             Top = 0;
+            
+            WithdrawChaosSetCommand = new CommandWrapper(
+                ReactiveCommand.CreateFromTask(() => ExecuteSolutionOrFail(() => Stash.ChaosSetSolutions.FirstOrDefault(), () => "Failed to withdraw ChaosSet, not enough items ?")));
+            WithdrawCurrencyCommand = new CommandWrapper(
+                ReactiveCommand.CreateFromTask(() => ExecuteSolutionOrFail(() => Stash.CurrencySolution, () => "Failed to withdraw Currency")));
+            WithdrawDivinationCardsCommand = new CommandWrapper(
+                ReactiveCommand.CreateFromTask(() => ExecuteSolutionOrFail(() => Stash.DivinationCardsSolution, () => "Failed to withdraw Divination Cards")));
+            ForceRefreshCommand = new CommandWrapper(
+                ReactiveCommand.Create(ForceRefreshStashCommandExecuted));
         }
 
         public IPoeWindowManager WindowManager { get; }
@@ -116,6 +127,14 @@ namespace PoeBud.ViewModels
         public Exception LastUpdateException => lastUpdateException?.Value;
 
         public ISolutionExecutorViewModel SolutionExecutor { get; }
+        
+        public ICommand WithdrawChaosSetCommand { get; }
+        
+        public ICommand WithdrawCurrencyCommand { get; }
+        
+        public ICommand WithdrawDivinationCardsCommand { get; }
+        
+        public ICommand ForceRefreshCommand { get; }
 
         public IPoeStashUpdater StashUpdater
         {
@@ -204,7 +223,7 @@ namespace PoeBud.ViewModels
                     .Where(x => hotkey.MatchesHotkey(x))
                     .Do(x => x.Handled = true)
                     .ObserveOn(uiScheduler)
-                    .Subscribe(ExecuteSolutionCommandExecuted)
+                    .Subscribe(() => ExecuteChaosSolutionCommandExecuted().Wait())
                     .AddTo(stashDisposable);
 
                 var forceRefreshHotkey = new KeyGesture(hotkey.Key, ModifierKeys.Control | ModifierKeys.Shift);
@@ -215,16 +234,6 @@ namespace PoeBud.ViewModels
                    .Subscribe(ForceRefreshStashCommandExecuted)
                    .AddTo(stashDisposable);
                 
-                var highlightHotkey = new KeyGesture(hotkey.Key, ModifierKeys.Shift);
-                keyPressedObservable
-                    .Where(x => highlightHotkey.MatchesHotkey(x))
-                    .Where(x => stash?.ChaosSetSolutions.Any() ?? false)
-                    .Do(x => x.Handled = true)
-                    .Select(x => stash?.ChaosSetSolutions.FirstOrDefault())
-                    .ObserveOn(uiScheduler)
-                    .Subscribe(HighlightSolutionCommandExecuted)
-                    .AddTo(stashDisposable);
-
                 var updater = stashAnalyzerFactory.Create(config);
                 stashDisposable.Add(updater);
 
@@ -294,24 +303,8 @@ namespace PoeBud.ViewModels
                 exceptionsToPropagate.OnNext(ex);
             }
         }
-
-        private void HighlightSolutionCommandExecuted(IPoeTradeSolution solution)
-        {
-            Guard.ArgumentNotNull(solution, nameof(solution));
-            try
-            {
-                Log.Instance.Debug($"[PoeBudViewModel] Highlighting solution {solution}");
-
-                highlightingService.Highlight(solution);
-            }
-            catch (Exception ex)
-            {
-                Log.HandleException(ex);
-                exceptionsToPropagate.OnNext(ex);
-            }
-        }
-
-        private async void ExecuteSolutionCommandExecuted()
+        
+        private async Task ExecuteSolutionCommandExecuted(IPoeTradeSolution solutionToExecute)
         {
             try
             {
@@ -321,8 +314,8 @@ namespace PoeBud.ViewModels
                         "[MainViewModel.ExecuteSolutionCommandExecuted] Solution executor is busy, ignoring request");
                     return;
                 }
-
-                await TryToExecuteSolution(actualConfig);
+                
+                await TryToExecuteSolution(solutionToExecute, actualConfig);
             }
             catch (Exception ex)
             {
@@ -331,17 +324,51 @@ namespace PoeBud.ViewModels
             }
         }
 
-        private async Task<bool> TryToExecuteSolution(PoeBudConfig config)
+        private async Task  ExecuteChaosSolutionCommandExecuted()
         {
-            var stashSnapshot = stash;
-
-            var solutionToExecute = stashSnapshot?.ChaosSetSolutions.FirstOrDefault();
-            if (solutionToExecute == null)
+            try
             {
-                SolutionExecutor.LogOperation("Failed to find a solution, not enough items ?");
-                return false;
+                var solutionToExecute = stash?.ChaosSetSolutions.FirstOrDefault();
+                if (solutionToExecute == null)
+                {
+                    SolutionExecutor.LogOperation("Failed to find a solution, not enough items ?");
+                }
+                else
+                {
+                    await ExecuteSolutionCommandExecuted(solutionToExecute);
+                }
             }
+            catch (Exception ex)
+            {
+                Log.HandleException(ex);
+                exceptionsToPropagate.OnNext(ex);
+            }
+        }
+        
+        private async Task ExecuteSolutionOrFail(Func<IPoeTradeSolution> solutionSupplier, Func<string> failMessageSupplier)
+        {
+            try
+            {
+                var solutionToExecute = solutionSupplier();
+                if (solutionToExecute == null)
+                {
+                    SolutionExecutor.LogOperation(failMessageSupplier());
+                }
+                else
+                {
+                    await ExecuteSolutionCommandExecuted(solutionToExecute);
+                } 
+            }
+            catch (Exception ex)
+            {
+                Log.HandleException(ex);
+                exceptionsToPropagate.OnNext(ex);
+            }
+        }
+        
 
+        private async Task<bool> TryToExecuteSolution(IPoeTradeSolution solutionToExecute, PoeBudConfig config)
+        {
             var window = WindowManager.ActiveWindow;
             if (window == null)
             {
@@ -349,6 +376,7 @@ namespace PoeBud.ViewModels
                 return false;
             }
 
+            var stashSnapshot = stash;
             await SolutionExecutor.ExecuteSolution(solutionToExecute);
             PerformDirtyUpdate(stashSnapshot, solutionToExecute, config);
 

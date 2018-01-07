@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using PoeShared.Common;
 using PoeShared.Converters;
 using ReactiveUI;
@@ -31,6 +32,8 @@ namespace PoeShared.UI.ViewModels
                     : new string[0];
                 Items.Add(new CurrencyInfo(price, aliases));
             }
+            
+            Items.Sort((a, b) => string.Compare(a.Price.CurrencyType, b.Price.CurrencyType, StringComparison.OrdinalIgnoreCase));
         }
 
         public IReactiveList<CurrencyInfo> Items { get; } = new ReactiveList<CurrencyInfo>();

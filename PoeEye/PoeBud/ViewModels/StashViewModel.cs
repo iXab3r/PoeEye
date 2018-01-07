@@ -96,6 +96,7 @@ namespace PoeBud.ViewModels
             
             ChaosSetSolutions = BuildChaosSetSolutions(stashUpdate);
             CurrencySolution = BuildCurrencySolution(stashUpdate);
+            DivinationCardsSolution = BuildDivinationCardsSolution(stashUpdate);
             PriceSummary.Solution = CurrencySolution;
         }
 
@@ -137,6 +138,8 @@ namespace PoeBud.ViewModels
         
         public IPoeTradeSolution CurrencySolution { get; }
         
+        public IPoeTradeSolution DivinationCardsSolution { get; }
+        
         public IPriceSummaryViewModel PriceSummary { get; }
 
         public IPoeTradeSolution BuildCurrencySolution(StashUpdate stashUpdate)
@@ -148,6 +151,21 @@ namespace PoeBud.ViewModels
                 .Where(x => x.Category == "currency")
                 .Where(x => x.GetTabIndex() != null)
                 .Where(x => StringToPoePriceConverter.Instance.Convert($"{x.StackSize} {x.TypeLine}").HasValue)
+                .Select(x => new PoeSolutionItem(x, tabsByInventoryId[x.InventoryId]))
+                .OfType<IPoeSolutionItem>()
+                .ToArray();
+            
+            return new PoeTradeSolution(currency, stashUpdate.Tabs);
+        }
+        
+        public IPoeTradeSolution BuildDivinationCardsSolution(StashUpdate stashUpdate)
+        {
+            var tabsByInventoryId = stashUpdate.Tabs.ToDictionary(x => x.GetInventoryId(), x => x);
+
+            var currency = stashUpdate
+                .Items
+                .Where(x => x.Category == "cards")
+                .Where(x => x.GetTabIndex() != null)
                 .Select(x => new PoeSolutionItem(x, tabsByInventoryId[x.InventoryId]))
                 .OfType<IPoeSolutionItem>()
                 .ToArray();

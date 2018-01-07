@@ -13,6 +13,8 @@ namespace PoeBud.Config
 
         public bool IsEnabled { get; set; } = true;
 
+        public bool HighlightSolution { get; set; } = false;
+
         [JsonConverter(typeof(SafeDataConverter))]
         public string LoginEmail { get; set; }
 

@@ -36,6 +36,11 @@ namespace PoeEye.Config
             {KnownCurrencyNameList.JourneymanSextant, 5f},
             {KnownCurrencyNameList.MasterSextant, 8f},
             {KnownCurrencyNameList.GlassblowersBauble, 0.5f},
+            {KnownCurrencyNameList.SplinterOfEsh, 0.1f},
+            {KnownCurrencyNameList.SplinterOfTul, 0.1f},
+            {KnownCurrencyNameList.SplinterOfXoph, 0.03f},
+            {KnownCurrencyNameList.SplinterOfChayula, 2f},
+            {KnownCurrencyNameList.SplinterOfUulNetol, 0.15f},
         };
 
         private IDictionary<string, float> currenciesPriceInChaos = new Dictionary<string, float>(DefaultCurrenciesPriceInChaos);

@@ -1,0 +1,3806 @@
+﻿{
+    "numTabs": 23,
+    "items": [
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 50,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Jewels\/SearchingEye.png?scale=1&scaleIndex=1&w=1&h=1&v=1594a76f6cdc4a09e38ca58035d0ce873",
+            "league": "Hardcore Abyss",
+            "id": "6f24c3f772673e815f3927078dd3913a80dd83d0f6f60e19a165382093c8a620",
+            "abyssJewel": true,
+            "name": "<<set:MS>><<set:M>><<set:S>>Grim Stare",
+            "typeLine": "Searching Eye Jewel",
+            "identified": true,
+            "corrupted": true,
+            "properties": [{ "name": "Abyss", "values": [], "displayMode": 0 }],
+            "requirements": [{ "name": "Level", "values": [["35", 0]], "displayMode": 0 }],
+            "implicitMods": ["1% increased Life Leeched per second for each Equipped Corrupted Item"],
+            "explicitMods":
+            [
+                "Adds 1 to 3 Physical Damage to Attacks", "Adds 10 to 20 Fire Damage to Attacks",
+                "+34 to maximum Energy Shield"
+            ],
+            "descrText":
+                "Place into an Abyssal Socket on an Item or into an allocated Jewel Socket on the Passive Skill Tree. Right click to remove from the Socket.",
+            "frameType": 2,
+            "category": { "jewels": ["abyss"] },
+            "x": 6,
+            "y": 13,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 73,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Jewels\/MurderousEye.png?scale=1&scaleIndex=1&w=1&h=1&v=6679365e95eb89fd626cf59fa2b57c993",
+            "league": "Hardcore Abyss",
+            "id": "6ee82f61ca3715edf58b605a1d385e7a3400fee0a5428fee7a6790860cdf8d85",
+            "abyssJewel": true,
+            "name": "<<set:MS>><<set:M>><<set:S>>Whispering Hunger",
+            "typeLine": "Murderous Eye Jewel",
+            "identified": true,
+            "properties": [{ "name": "Abyss", "values": [], "displayMode": 0 }],
+            "requirements": [{ "name": "Level", "values": [["56", 0]], "displayMode": 0 }],
+            "explicitMods":
+            [
+                "Adds 8 to 16 Fire Damage to Attacks", "Adds 3 to 59 Lightning Damage to Dagger Attacks",
+                "5 Energy Shield Regenerated per second"
+            ],
+            "descrText":
+                "Place into an Abyssal Socket on an Item or into an allocated Jewel Socket on the Passive Skill Tree. Right click to remove from the Socket.",
+            "frameType": 2,
+            "category": { "jewels": ["abyss"] },
+            "x": 5,
+            "y": 11,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 0,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Gems\/Support\/IncreasedAOE.png?scale=1&scaleIndex=1&w=1&h=1&v=f0accbe4733628f443cd691574b3f6043",
+            "support": true,
+            "league": "Hardcore Abyss",
+            "id": "87be67916c9a94c01f0746de2086564a4758ca93ef2bf5dc82ce97981e2fcbd9",
+            "name": "",
+            "typeLine": "Increased Area of Effect Support",
+            "identified": true,
+            "properties":
+            [
+                { "name": "Support, AoE", "values": [], "displayMode": 0 },
+                { "name": "Level", "values": [["1", 0]], "displayMode": 0, "type": 5 },
+                { "name": "Mana Multiplier", "values": [["140%", 0]], "displayMode": 0 }
+            ],
+            "additionalProperties":
+            [
+                {
+                    "name": "Experience",
+                    "values": [["160047\/388734", 0]],
+                    "displayMode": 2,
+                    "progress": 0.4117134213447571
+                }
+            ],
+            "requirements":
+            [
+                { "name": "Level", "values": [["38", 0]], "displayMode": 0 },
+                { "name": "Int", "values": [["63", 0]], "displayMode": 1 }
+            ],
+            "secDescrText": "Supports any skill with an area of effect.",
+            "explicitMods": ["Supported Skills have 30% increased Area of Effect"],
+            "descrText":
+                "This is a Support Gem. It does not grant a bonus to your character, but to skills in sockets connected to it. Place into an item socket connected to a socket containing the Active Skill Gem you wish to augment. Right click to remove from a socket.",
+            "frameType": 4,
+            "category": "gems",
+            "x": 0,
+            "y": 14,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 71,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Maps\/Vaal02.png?scale=1&scaleIndex=1&w=1&h=1&v=3ead6455599ec6c303f54ba98d6f8eb23",
+            "league": "Hardcore Abyss",
+            "id": "df6ca5fbbad0d229bb180c1ff46b4c9e0c99d83df4c5d06f904e4ccb53ff6eb2",
+            "name": "",
+            "typeLine": "Sacrifice at Dawn",
+            "identified": true,
+            "descrText": "Can be used in the Templar Laboratory or a personal Map Device.",
+            "flavourText": ["Only those who aspire can dare to hope."],
+            "frameType": 0,
+            "category": "maps",
+            "x": 10,
+            "y": 17,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 74,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Jewels\/RivetedEye.png?scale=1&scaleIndex=1&w=1&h=1&v=a0904494de195adde172f2d6dd329b053",
+            "league": "Hardcore Abyss",
+            "id": "75a2936b49ce97be969e2fe2ec0b27f9e1beea135429027f29ff9ed67441de8c",
+            "abyssJewel": true,
+            "name": "<<set:MS>><<set:M>><<set:S>>Ancient Glare",
+            "typeLine": "Hypnotic Eye Jewel",
+            "identified": true,
+            "properties": [{ "name": "Abyss", "values": [], "displayMode": 0 }],
+            "requirements": [{ "name": "Level", "values": [["44", 0]], "displayMode": 0 }],
+            "explicitMods": [
+                "Adds 10 to 12 Physical Damage to Spells", "Adds 1 to 7 Lightning Damage to Spells while Dual Wielding",
+                "14% increased Damage over Time while wielding a Two Handed Weapon",
+                "Damage Penetrates 2% Elemental Resistance if you haven't Killed Recently"
+            ],
+            "descrText":
+                "Place into an Abyssal Socket on an Item or into an allocated Jewel Socket on the Passive Skill Tree. Right click to remove from the Socket.",
+            "frameType": 2,
+            "category": { "jewels": ["abyss"] },
+            "x": 18,
+            "y": 22,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 69,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Maps\/Atlas2Maps\/New\/AridLake.png?scale=1&scaleIndex=1&w=1&h=1&mn=1&mt=2&v=9f9ef8b0126d5ed98825962195cc4e863",
+            "league": "Hardcore Abyss",
+            "id": "e535682966c47081a4cf25b007d65c65809f4f1816ac86d2693bba19bcab2cf8",
+            "name": "",
+            "typeLine": "Arid Lake Map",
+            "identified": true,
+            "properties": [{ "name": "Map Tier", "values": [["2", 0]], "displayMode": 0, "type": 1 }],
+            "descrText":
+                "Travel to this Map by using it in the Templar Laboratory or a personal Map Device. Maps can only be used once.",
+            "frameType": 0,
+            "category": "maps",
+            "x": 7,
+            "y": 5,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 68,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Maps\/Atlas2Maps\/New\/Dungeon.png?scale=1&scaleIndex=1&w=1&h=1&mn=1&mt=1&v=577753cfdeaa5599711f3fce352516333",
+            "league": "Hardcore Abyss",
+            "id": "7be50a75cabc5b9bd72101d8fc186f0eeab897adcb0cc5081711b41d486f702a",
+            "name": "",
+            "typeLine": "Dungeon Map",
+            "identified": true,
+            "properties": [{ "name": "Map Tier", "values": [["1", 0]], "displayMode": 0, "type": 1 }],
+            "descrText":
+                "Travel to this Map by using it in the Templar Laboratory or a personal Map Device. Maps can only be used once.",
+            "frameType": 0,
+            "category": "maps",
+            "x": 6,
+            "y": 0,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 71,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Maps\/Atlas2Maps\/New\/Iceberg.png?scale=1&scaleIndex=1&w=1&h=1&mn=1&mt=3&v=9b76473ba37f8083301bff97e689e4b93",
+            "league": "Hardcore Abyss",
+            "id": "b99d9477b7eec47d7835b888f1b03e24be9297f42c3e684b25e0ddd21570f1db",
+            "name": "",
+            "typeLine": "Iceberg Map",
+            "identified": true,
+            "properties": [{ "name": "Map Tier", "values": [["3", 0]], "displayMode": 0, "type": 1 }],
+            "descrText":
+                "Travel to this Map by using it in the Templar Laboratory or a personal Map Device. Maps can only be used once.",
+            "frameType": 0,
+            "category": "maps",
+            "x": 18,
+            "y": 0,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 72,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Jewels\/MurderousEye.png?scale=1&scaleIndex=1&w=1&h=1&v=6679365e95eb89fd626cf59fa2b57c993",
+            "league": "Hardcore Abyss",
+            "id": "255c737645e127d12050302dcb5c27d6974aae524c6eb40e8edde785a46ec6a9",
+            "abyssJewel": true,
+            "name": "<<set:MS>><<set:M>><<set:S>>Enthralling Arbiter",
+            "typeLine": "Murderous Eye Jewel",
+            "identified": true,
+            "properties": [{ "name": "Abyss", "values": [], "displayMode": 0 }],
+            "requirements": [{ "name": "Level", "values": [["51", 0]], "displayMode": 0 }],
+            "explicitMods":
+            [
+                "+14% to Fire Resistance", "Adds 11 to 24 Cold Damage to Staff Attacks",
+                "Adds 6 to 9 Physical Damage to Staff Attacks"
+            ],
+            "descrText":
+                "Place into an Abyssal Socket on an Item or into an allocated Jewel Socket on the Passive Skill Tree. Right click to remove from the Socket.",
+            "frameType": 2,
+            "category": { "jewels": ["abyss"] },
+            "x": 5,
+            "y": 10,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 70,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Maps\/Atlas2Maps\/New\/Iceberg.png?scale=1&scaleIndex=1&w=1&h=1&mn=1&mt=3&v=9b76473ba37f8083301bff97e689e4b93",
+            "league": "Hardcore Abyss",
+            "id": "084b8a7e9de222f787d497bae38cf7f129ff334cace93e2c1562a0230ac61f83",
+            "name": "",
+            "typeLine": "Iceberg Map",
+            "identified": true,
+            "properties": [{ "name": "Map Tier", "values": [["3", 0]], "displayMode": 0, "type": 1 }],
+            "descrText":
+                "Travel to this Map by using it in the Templar Laboratory or a personal Map Device. Maps can only be used once.",
+            "frameType": 0,
+            "category": "maps",
+            "x": 17,
+            "y": 23,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 2,
+            "h": 1,
+            "ilvl": 73,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Belts\/Belt4.png?scale=1&scaleIndex=1&w=2&h=1&v=da282d3a3d76fc0d14b882450c3ed2ae3",
+            "league": "Hardcore Abyss",
+            "id": "f6fe722a3923484632a363ea297f2d5a97b5b922be73022ce3b2dcb93ee68b47",
+            "name": "<<set:MS>><<set:M>><<set:S>>Domination Clasp",
+            "typeLine": "Cloth Belt",
+            "identified": true,
+            "requirements": [{ "name": "Level", "values": [["33", 0]], "displayMode": 0 }],
+            "implicitMods": ["20% increased Stun and Block Recovery"],
+            "explicitMods": [
+                "+23 to maximum Energy Shield", "+31 to maximum Life", "1.2 Life Regenerated per second",
+                "+19% to Cold Resistance"
+            ],
+            "frameType": 2,
+            "category": { "accessories": ["belt"] },
+            "x": 2,
+            "y": 11,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 69,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Maps\/Labyrinth.png?scale=1&scaleIndex=1&w=1&h=1&v=ef005aef5d2f9135d6922f4b1b912f783",
+            "league": "Hardcore Abyss",
+            "id": "6553c12fbffc54a3f53065f12ea882c1c8288900735bcb85d04c68ef13acf142",
+            "name": "",
+            "typeLine": "Offering to the Goddess",
+            "identified": true,
+            "descrText":
+                "Travel to the Aspirants' Plaza and spend this item to open the Eternal Labyrinth. You must have completed the six different Trials of Ascendancy found in Maps in order to access this area.",
+            "flavourText": [
+                "It is time for the Goddess to give her final verdict.\r", "Your fate rests in her even hands."
+            ],
+            "frameType": 0,
+            "category": "maps",
+            "x": 4,
+            "y": 1,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 68,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Jewels\/MurderousEye.png?scale=1&scaleIndex=1&w=1&h=1&v=6679365e95eb89fd626cf59fa2b57c993",
+            "league": "Hardcore Abyss",
+            "id": "f4a912e98edadb84c0e0b876abcb0cf5543dcef671bb3360d8c34c63fb3d8cc7",
+            "abyssJewel": true,
+            "name": "<<set:MS>><<set:M>><<set:S>>Morbid Shatter",
+            "typeLine": "Murderous Eye Jewel",
+            "identified": true,
+            "properties": [{ "name": "Abyss", "values": [], "displayMode": 0 }],
+            "requirements": [{ "name": "Level", "values": [["28", 0]], "displayMode": 0 }],
+            "explicitMods": [
+                "+34 to maximum Life", "Adds 6 to 15 Cold Damage to Mace Attacks",
+                "0.8% of Life Regenerated per second while moving",
+                "4% increased Movement Speed if you haven't taken Damage Recently"
+            ],
+            "descrText":
+                "Place into an Abyssal Socket on an Item or into an allocated Jewel Socket on the Passive Skill Tree. Right click to remove from the Socket.",
+            "frameType": 2,
+            "category": { "jewels": ["abyss"] },
+            "x": 4,
+            "y": 6,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 68,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Jewels\/MurderousEye.png?scale=1&scaleIndex=1&w=1&h=1&v=6679365e95eb89fd626cf59fa2b57c993",
+            "league": "Hardcore Abyss",
+            "id": "5724b76244febfa46d1842170bd46cf0fc5218e8a30ba3718957bfe08c746479",
+            "abyssJewel": true,
+            "name": "<<set:MS>><<set:M>><<set:S>>Grim Mangler",
+            "typeLine": "Murderous Eye Jewel",
+            "identified": true,
+            "properties": [{ "name": "Abyss", "values": [], "displayMode": 0 }],
+            "requirements": [{ "name": "Level", "values": [["48", 0]], "displayMode": 0 }],
+            "explicitMods": [
+                "Adds 11 to 27 Fire Damage to Attacks", "Adds 5 to 49 Lightning Damage to Mace Attacks",
+                "Damage Penetrates 2% Elemental Resistance if you haven't Killed Recently"
+            ],
+            "descrText":
+                "Place into an Abyssal Socket on an Item or into an allocated Jewel Socket on the Passive Skill Tree. Right click to remove from the Socket.",
+            "frameType": 2,
+            "category": { "jewels": ["abyss"] },
+            "x": 4,
+            "y": 5,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 2,
+            "h": 1,
+            "ilvl": 68,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Belts\/AbyssBelt.png?scale=1&scaleIndex=1&w=2&h=1&v=cd7c25de181e6a77812020eb6e8679713",
+            "league": "Hardcore Abyss",
+            "id": "4603decae1ae953fff6c8913b32d1f1f0209e06542744f917839649cd2e02ac8",
+            "sockets": [{ "group": 0, "attr": false, "sColour": "A" }],
+            "name": "<<set:MS>><<set:M>><<set:S>>Dusk Trap",
+            "typeLine": "Stygian Vise",
+            "identified": true,
+            "requirements": [{ "name": "Level", "values": [["35", 0]], "displayMode": 0 }],
+            "implicitMods": ["Has 1 Abyssal Socket"],
+            "explicitMods": [
+                "+111 to Armour", "3.8 Life Regenerated per second", "+25% to Lightning Resistance",
+                "11% increased Stun Duration on Enemies"
+            ],
+            "frameType": 2,
+            "category": { "accessories": ["belt"] },
+            "x": 5,
+            "y": 2,
+            "inventoryId": "Stash1",
+            "socketedItems": []
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 72,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Jewels\/basicdex.png?scale=1&scaleIndex=1&w=1&h=1&v=7375b3bb90a9809870b31d1aa4aa68b93",
+            "league": "Hardcore Abyss",
+            "id": "db7620d0517b8e29158e0fda40a412e660632da2d4aa3a3e81f045f51fee60b4",
+            "name": "<<set:MS>><<set:M>><<set:S>>Fulgent Shard",
+            "typeLine": "Viridian Jewel",
+            "identified": true,
+            "explicitMods":
+                ["4% increased Attack Speed", "8% increased Attack Speed with Claws", "17% increased Evasion Rating"],
+            "descrText":
+                "Place into an allocated Jewel Socket on the Passive Skill Tree. Right click to remove from the Socket.",
+            "frameType": 2,
+            "category": "jewels",
+            "x": 0,
+            "y": 3,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 2,
+            "h": 1,
+            "ilvl": 71,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Belts\/Belt1.png?scale=1&scaleIndex=1&w=2&h=1&v=a40ff49a65beb9e722af0f85159432f13",
+            "league": "Hardcore Abyss",
+            "id": "3cb863ca95019c9c902e98b8e7571c26fc9d65ef7de2e09b3ad7b6a3e7bc05a0",
+            "name": "<<set:MS>><<set:M>><<set:S>>Eagle Cord",
+            "typeLine": "Rustic Sash",
+            "identified": true,
+            "requirements": [{ "name": "Level", "values": [["56", 0]], "displayMode": 0 }],
+            "implicitMods": ["13% increased Physical Damage"],
+            "explicitMods": [
+                "+329 to Armour", "+40 to maximum Energy Shield", "+35% to Fire Resistance",
+                "+33% to Lightning Resistance"
+            ],
+            "frameType": 2,
+            "category": { "accessories": ["belt"] },
+            "x": 3,
+            "y": 14,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 71,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Rings\/TopazRuby.png?scale=1&scaleIndex=1&w=1&h=1&v=0bd3c7197b952981eb21cb0dc278c04d3",
+            "league": "Hardcore Abyss",
+            "id": "9b981e17ccfba429344ca714b1507334d30a0306087c2fba628601c6522342e8",
+            "name": "<<set:MS>><<set:M>><<set:S>>Gale Whorl",
+            "typeLine": "Two-Stone Ring",
+            "identified": true,
+            "requirements": [{ "name": "Level", "values": [["40", 0]], "displayMode": 0 }],
+            "implicitMods": ["+14% to Fire and Lightning Resistances"],
+            "explicitMods": [
+                "+27 to Strength", "+11 to all Attributes", "5% increased Attack Speed", "+11 to maximum Energy Shield",
+                "0.28% of Physical Attack Damage Leeched as Life"
+            ],
+            "frameType": 2,
+            "category": { "accessories": ["ring"] },
+            "x": 6,
+            "y": 20,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 2,
+            "ilvl": 71,
+            "icon":
+                "https:\/\/web.poecdn.com\/gen\/image\/YTo2OntzOjExOiJ1c2VM\/ZWFndWVJZCI7TzoxODoi\/R3JpbmRiXERhdGFiYXNl\/XElkIjoxOntzOjI6Imlk\/IjtpOjA7fXM6OToiYWNj\/b3VudElkIjtPOjE4OiJH\/cmluZGJcRGF0YWJhc2Vc\/SWQiOjE6e3M6MjoiaWQi\/O2k6MDt9czoxMDoic2Nh\/bGVJbmRleCI7aToxO2k6\/MjthOjM6e3M6MToiZiI7\/czoyMzoiQXJ0LzJESXRl\/bXMvRmxhc2tzL2dvbGQi\/O3M6Mjoic3AiO2Q6MC4z\/MDQyNTk2MzQ4ODg0Mzgx\/NjtzOjU6ImxldmVsIjtp\/OjA7fWk6MTtpOjQ7aTow\/O2k6OTt9\/718e4794de\/Item.png",
+            "league": "Hardcore Abyss",
+            "id": "6820b635aa4f87e83c70050f331ea8b2e701f1448ca7d27cda1320478afa34d5",
+            "name": "",
+            "typeLine": "Sulphur Flask",
+            "identified": true,
+            "properties":
+            [
+                { "name": "Lasts %0 Seconds", "values": [["4.00", 0]], "displayMode": 3 },
+                { "name": "Consumes %0 of %1 Charges on use", "values": [["20", 0], ["60", 0]], "displayMode": 3 },
+                { "name": "Currently has %0 Charges", "values": [["0", 0]], "displayMode": 3 }
+            ],
+            "requirements": [{ "name": "Level", "values": [["35", 0]], "displayMode": 0 }],
+            "utilityMods": ["40% increased Damage"],
+            "implicitMods": ["Creates Consecrated Ground on Use"],
+            "descrText": "Right click to drink. Can only hold charges while in belt. Refills as you kill monsters.",
+            "frameType": 0,
+            "category": "flasks",
+            "x": 7,
+            "y": 20,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 2,
+            "h": 1,
+            "ilvl": 70,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Belts\/MaligarosRestraint.png?scale=1&scaleIndex=1&w=2&h=1&v=24f191dbf02b52a4ac848450194b73483",
+            "league": "Hardcore Abyss",
+            "id": "9feee6da9ae27691023af337ca38d9c2ec41fa4100380ab3259bd1dbcda5f0e1",
+            "name": "<<set:MS>><<set:M>><<set:S>>Maligaro's Restraint",
+            "typeLine": "Chain Belt",
+            "identified": true,
+            "requirements": [{ "name": "Level", "values": [["44", 0]], "displayMode": 0 }],
+            "implicitMods": ["+17 to maximum Energy Shield"],
+            "explicitMods": [
+                "Adds 1 to 33 Lightning Damage to Attacks", "100% increased Shock Duration on You",
+                "Shocks you cause are reflected back to you", "60% increased Damage while Shocked",
+                "15% increased Movement Speed while Shocked"
+            ],
+            "flavourText": [
+                "\"Our genius will pave the way forward.\r", "May all who are worthy be improved!\"\r",
+                "- Inquisitor Maligaro"
+            ],
+            "frameType": 3,
+            "category": { "accessories": ["belt"] },
+            "x": 5,
+            "y": 1,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 73,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Maps\/Atlas2Maps\/New\/Fields.png?scale=1&scaleIndex=1&w=1&h=1&mn=1&mt=6&v=b0b1c5fc45266879b18db4e2b9a093873",
+            "league": "Hardcore Abyss",
+            "id": "ac18f41424eb2f96f5d1ae631b0607f4c69f943bbb94bdab1dabb79681d165d5",
+            "name": "",
+            "typeLine": "Fields Map",
+            "identified": true,
+            "properties": [{ "name": "Map Tier", "values": [["6", 0]], "displayMode": 0, "type": 1 }],
+            "descrText":
+                "Travel to this Map by using it in the Templar Laboratory or a personal Map Device. Maps can only be used once.",
+            "frameType": 0,
+            "category": "maps",
+            "x": 15,
+            "y": 15,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 71,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Maps\/Atlas2Maps\/New\/Desert.png?scale=1&scaleIndex=1&w=1&h=1&mn=1&mt=2&v=9d3cd4f63f746af76128812cd24e55af3",
+            "league": "Hardcore Abyss",
+            "id": "05739a1a8aff3cc416260c58b39581984b43ae6d979040301041670b6de9f10c",
+            "name": "",
+            "typeLine": "Desert Map",
+            "identified": true,
+            "properties": [{ "name": "Map Tier", "values": [["2", 0]], "displayMode": 0, "type": 1 }],
+            "descrText":
+                "Travel to this Map by using it in the Templar Laboratory or a personal Map Device. Maps can only be used once.",
+            "frameType": 0,
+            "category": "maps",
+            "x": 9,
+            "y": 19,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 73,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Rings\/Ring6.png?scale=1&scaleIndex=1&w=1&h=1&v=23acb19022be4c89b3260db63dd1ca053",
+            "league": "Hardcore Abyss",
+            "id": "489d976dad596a5118e7a2e1b104060b0a56e38c5cd53e7a1ad2f5c8f54552f6",
+            "name": "<<set:MS>><<set:M>><<set:S>>Rune Coil",
+            "typeLine": "Sapphire Ring",
+            "identified": true,
+            "requirements": [{ "name": "Level", "values": [["44", 0]], "displayMode": 0 }],
+            "implicitMods": ["+27% to Cold Resistance"],
+            "explicitMods": [
+                "+36 to Dexterity", "Adds 5 to 13 Fire Damage to Attacks", "+21 to maximum Life", "+18 to maximum Mana"
+            ],
+            "frameType": 2,
+            "category": { "accessories": ["ring"] },
+            "x": 7,
+            "y": 6,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 72,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Rings\/Ring5.png?scale=1&scaleIndex=1&w=1&h=1&v=d645f9adfc012c52674c94d16b4292b23",
+            "league": "Hardcore Abyss",
+            "id": "dd017e069b7542627ff350a333e666a4866799ae261c534c38d34b9e4770404e",
+            "name": "<<set:MS>><<set:M>><<set:S>>Tempest Twirl",
+            "typeLine": "Topaz Ring",
+            "identified": true,
+            "requirements": [{ "name": "Level", "values": [["57", 0]], "displayMode": 0 }],
+            "implicitMods": ["+25% to Lightning Resistance"],
+            "explicitMods": [
+                "Adds 5 to 9 Physical Damage to Attacks", "+40 to Strength", "+145 to Evasion Rating",
+                "+45 to maximum Mana", "+21% to Fire Resistance", "+12% to Lightning Resistance"
+            ],
+            "frameType": 2,
+            "category": { "accessories": ["ring"] },
+            "x": 0,
+            "y": 15,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 72,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Jewels\/GhastlyEye.png?scale=1&scaleIndex=1&w=1&h=1&v=118803f4aa870b0d556958d6a0634cee3",
+            "league": "Hardcore Abyss",
+            "id": "7db5516769a6465d62a483e54f4b1fba5c038d322fbfe63d34db9d400b67c9cd",
+            "abyssJewel": true,
+            "name": "<<set:MS>><<set:M>><<set:S>>Enthralling Prism",
+            "typeLine": "Ghastly Eye Jewel",
+            "identified": true,
+            "properties": [{ "name": "Abyss", "values": [], "displayMode": 0 }],
+            "requirements": [{ "name": "Level", "values": [["32", 0]], "displayMode": 0 }],
+            "explicitMods": ["+83 to Evasion Rating", "+14% to Fire Resistance", "+10% to Fire and Cold Resistances"],
+            "descrText":
+                "Place into an Abyssal Socket on an Item or into an allocated Jewel Socket on the Passive Skill Tree. Right click to remove from the Socket.",
+            "frameType": 2,
+            "category": { "jewels": ["abyss"] },
+            "x": 18,
+            "y": 12,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 2,
+            "h": 1,
+            "ilvl": 68,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Belts\/AbyssBelt.png?scale=1&scaleIndex=1&w=2&h=1&v=cd7c25de181e6a77812020eb6e8679713",
+            "league": "Hardcore Abyss",
+            "id": "707bdcd178361393984693a151227b9ce1e5af33b751f6ae6258f90e32563af8",
+            "sockets": [{ "group": 0, "attr": false, "sColour": "A" }],
+            "name": "<<set:MS>><<set:M>><<set:S>>Brimstone Clasp",
+            "typeLine": "Stygian Vise",
+            "identified": true,
+            "requirements": [{ "name": "Level", "values": [["28", 0]], "displayMode": 0 }],
+            "implicitMods": ["Has 1 Abyssal Socket"],
+            "explicitMods": [
+                "+22 to maximum Energy Shield", "+13% to Cold Resistance", "+9% to Lightning Resistance",
+                "+5% to Chaos Resistance"
+            ],
+            "frameType": 2,
+            "category": { "accessories": ["belt"] },
+            "x": 0,
+            "y": 11,
+            "inventoryId": "Stash1",
+            "socketedItems": []
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 72,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Maps\/Atlas2Maps\/New\/Canyon.png?scale=1&scaleIndex=1&w=1&h=1&mn=1&mt=4&v=a25f408bbb820d874ee10222248191c93",
+            "league": "Hardcore Abyss",
+            "id": "d66ea56904aa3a99b911e3afaa51f8667e36792ec644ef9b4dbc89e47c415a8a",
+            "name": "",
+            "typeLine": "Canyon Map",
+            "identified": true,
+            "properties": [{ "name": "Map Tier", "values": [["4", 0]], "displayMode": 0, "type": 1 }],
+            "descrText":
+                "Travel to this Map by using it in the Templar Laboratory or a personal Map Device. Maps can only be used once.",
+            "frameType": 0,
+            "category": "maps",
+            "x": 8,
+            "y": 12,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 71,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Maps\/Atlas2Maps\/New\/Strand.png?scale=1&scaleIndex=1&w=1&h=1&mn=1&mt=4&v=9762a3d69debf5c039cb13c693061f0c3",
+            "league": "Hardcore Abyss",
+            "id": "642c3407a1d2532420d13c961d5e163bb86392bef8dcc92d0436eb807c2883f3",
+            "name": "",
+            "typeLine": "Strand Map",
+            "identified": true,
+            "properties": [{ "name": "Map Tier", "values": [["4", 0]], "displayMode": 0, "type": 1 }],
+            "descrText":
+                "Travel to this Map by using it in the Templar Laboratory or a personal Map Device. Maps can only be used once.",
+            "frameType": 0,
+            "category": "maps",
+            "x": 19,
+            "y": 12,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 2,
+            "h": 1,
+            "ilvl": 70,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Belts\/AbyssBelt.png?scale=1&scaleIndex=1&w=2&h=1&v=cd7c25de181e6a77812020eb6e8679713",
+            "league": "Hardcore Abyss",
+            "id": "0b1716e4781169da10d8dd20745465b8072c29a1bcb97cb7e870d91f000c4926",
+            "sockets": [{ "group": 0, "attr": false, "sColour": "A" }],
+            "name": "<<set:MS>><<set:M>><<set:S>>Rune Leash",
+            "typeLine": "Stygian Vise",
+            "identified": true,
+            "requirements": [{ "name": "Level", "values": [["48", 0]], "displayMode": 0 }],
+            "implicitMods": ["Has 1 Abyssal Socket"],
+            "explicitMods": [
+                "+24 to Strength", "+84 to maximum Life", "+37% to Fire Resistance",
+                "12% increased Stun and Block Recovery"
+            ],
+            "frameType": 2,
+            "category": { "accessories": ["belt"] },
+            "x": 6,
+            "y": 4,
+            "inventoryId": "Stash1",
+            "socketedItems": []
+        },
+        {
+            "verified": false,
+            "w": 2,
+            "h": 2,
+            "ilvl": 71,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Armours\/Gloves\/GlovesStrInt3.png?scale=1&scaleIndex=1&w=2&h=2&v=6121a1f24b6a6b016f4f62266feb49653",
+            "league": "Hardcore Abyss",
+            "id": "0974b0552038bbb68e0e38c611398a265a4b04114bd744aebf8cc0a87b391133",
+            "sockets": [{ "group": 0, "attr": "S", "sColour": "R" }, { "group": 0, "attr": "S", "sColour": "R" }],
+            "name": "<<set:MS>><<set:M>><<set:S>>Loath Touch",
+            "typeLine": "Soldier Gloves",
+            "identified": true,
+            "properties":
+            [
+                { "name": "Armour", "values": [["92", 0]], "displayMode": 0, "type": 16 },
+                { "name": "Energy Shield", "values": [["18", 0]], "displayMode": 0, "type": 18 }
+            ],
+            "requirements":
+            [
+                { "name": "Level", "values": [["51", 0]], "displayMode": 0 },
+                { "name": "Str", "values": [["40", 0]], "displayMode": 1 },
+                { "name": "Int", "values": [["40", 0]], "displayMode": 1 }
+            ],
+            "explicitMods": [
+                "+9 to Dexterity", "Adds 1 to 2 Cold Damage to Attacks",
+                "0.38% of Physical Attack Damage Leeched as Mana", "+2 Life gained for each Enemy hit by your Attacks"
+            ],
+            "frameType": 2,
+            "category": { "armour": ["gloves"] },
+            "x": 5,
+            "y": 16,
+            "inventoryId": "Stash1",
+            "socketedItems": []
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 72,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Maps\/Atlas2Maps\/New\/Graveyard.png?scale=1&scaleIndex=1&w=1&h=1&mn=1&mt=1&v=826e3828c489f10c05baaffd716379533",
+            "league": "Hardcore Abyss",
+            "id": "4b77cc9fb3cee2d119419e8380c656eee4bfbd41cdf5994b7d581ee9e77ae08b",
+            "name": "",
+            "typeLine": "Graveyard Map",
+            "identified": true,
+            "properties": [{ "name": "Map Tier", "values": [["1", 0]], "displayMode": 0, "type": 1 }],
+            "descrText":
+                "Travel to this Map by using it in the Templar Laboratory or a personal Map Device. Maps can only be used once.",
+            "frameType": 0,
+            "category": "maps",
+            "x": 11,
+            "y": 2,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 2,
+            "h": 1,
+            "ilvl": 71,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Belts\/AbyssBelt.png?scale=1&scaleIndex=1&w=2&h=1&v=cd7c25de181e6a77812020eb6e8679713",
+            "league": "Hardcore Abyss",
+            "id": "7f6e21caa4a2c56965d891e3fa0d42944c76a0522404b2efea5994863ef08d72",
+            "sockets": [{ "group": 0, "attr": false, "sColour": "A" }],
+            "name": "<<set:MS>><<set:M>><<set:S>>Plague Clasp",
+            "typeLine": "Stygian Vise",
+            "identified": true,
+            "requirements": [{ "name": "Level", "values": [["48", 0]], "displayMode": 0 }],
+            "implicitMods": ["Has 1 Abyssal Socket"],
+            "explicitMods": [
+                "+13 to Strength", "+27 to maximum Energy Shield", "+40% to Fire Resistance",
+                "10% increased Flask effect duration"
+            ],
+            "frameType": 2,
+            "category": { "accessories": ["belt"] },
+            "x": 15,
+            "y": 6,
+            "inventoryId": "Stash1",
+            "socketedItems": []
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 69,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Maps\/Atlas2Maps\/New\/Cavern.png?scale=1&scaleIndex=1&w=1&h=1&mn=1&mt=2&v=a7aba9ac2cf171c2d328c5eda37394463",
+            "league": "Hardcore Abyss",
+            "id": "775aa689f180597d049f6d32f3b4912475a584999c5916c51f8148c7a7650010",
+            "name": "",
+            "typeLine": "Flooded Mine Map",
+            "identified": true,
+            "properties": [{ "name": "Map Tier", "values": [["2", 0]], "displayMode": 0, "type": 1 }],
+            "descrText":
+                "Travel to this Map by using it in the Templar Laboratory or a personal Map Device. Maps can only be used once.",
+            "frameType": 0,
+            "category": "maps",
+            "x": 10,
+            "y": 16,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 73,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Maps\/Atlas2Maps\/New\/Alleyways.png?scale=1&scaleIndex=1&w=1&h=1&mn=1&mt=2&v=03a6e03f8da743331b2f57a9229d748b3",
+            "league": "Hardcore Abyss",
+            "id": "e563f10c380569a633d6a0f2a81a93e353179da7bcaea6e0430cfba33bc8ec47",
+            "name": "",
+            "typeLine": "Alleyways Map",
+            "identified": true,
+            "properties": [{ "name": "Map Tier", "values": [["2", 0]], "displayMode": 0, "type": 1 }],
+            "descrText":
+                "Travel to this Map by using it in the Templar Laboratory or a personal Map Device. Maps can only be used once.",
+            "frameType": 0,
+            "category": "maps",
+            "x": 19,
+            "y": 19,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 2,
+            "h": 2,
+            "ilvl": 73,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Armours\/Boots\/BootsDex4.png?scale=1&scaleIndex=1&w=2&h=2&v=62a68c142ba5a605dcf6b6603bf0ab0c3",
+            "league": "Hardcore Abyss",
+            "id": "747336683e1970861ea0a8244fd77709e150117632c4e8462ba439bd038e5d6c",
+            "sockets": [{ "group": 0, "attr": "D", "sColour": "G" }, { "group": 1, "attr": "D", "sColour": "G" }],
+            "name": "<<set:MS>><<set:M>><<set:S>>Agony Track",
+            "typeLine": "Shagreen Boots",
+            "identified": true,
+            "properties": [{ "name": "Evasion Rating", "values": [["346", 1]], "displayMode": 0, "type": 17 }],
+            "requirements":
+            [
+                { "name": "Level", "values": [["55", 0]], "displayMode": 0 },
+                { "name": "Dex", "values": [["97", 0]], "displayMode": 1 }
+            ],
+            "explicitMods": [
+                "92% increased Evasion Rating", "+20 to maximum Life", "13% increased Rarity of Items found",
+                "+21% to Fire Resistance", "+19% to Chaos Resistance", "13% increased Stun and Block Recovery"
+            ],
+            "frameType": 2,
+            "category": { "armour": ["boots"] },
+            "x": 7,
+            "y": 13,
+            "inventoryId": "Stash1",
+            "socketedItems": []
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 72,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Maps\/Atlas2Maps\/New\/Grotto.png?scale=1&scaleIndex=1&w=1&h=1&mn=1&mt=4&v=b4a021e0b97f473c7c4bf525d3112c1b3",
+            "league": "Hardcore Abyss",
+            "id": "8579ec60893100dec175ff92794820105df45d0377966491d307dda2cdeedb69",
+            "name": "",
+            "typeLine": "<<set:MS>><<set:M>><<set:S>>Capricious Grotto Map of Giants",
+            "identified": true,
+            "properties": [
+                { "name": "Map Tier", "values": [["4", 0]], "displayMode": 0, "type": 1 },
+                { "name": "Item Quantity", "values": [["+26%", 1]], "displayMode": 0, "type": 2 },
+                { "name": "Item Rarity", "values": [["+16%", 1]], "displayMode": 0, "type": 3 },
+                { "name": "Monster Pack Size", "values": [["+10%", 1]], "displayMode": 0, "type": 4 }
+            ],
+            "explicitMods": ["Area is inhabited by Goatmen", "Monsters have 45% increased Area of Effect"],
+            "descrText":
+                "Travel to this Map by using it in the Templar Laboratory or a personal Map Device. Maps can only be used once.",
+            "frameType": 1,
+            "category": "maps",
+            "x": 7,
+            "y": 9,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 69,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Jewels\/MurderousEye.png?scale=1&scaleIndex=1&w=1&h=1&v=6679365e95eb89fd626cf59fa2b57c993",
+            "league": "Hardcore Abyss",
+            "id": "df17f1eee612eb5d24e25bcee31cbef7f953ed45407f050452153b69d7aa9d35",
+            "abyssJewel": true,
+            "name": "<<set:MS>><<set:M>><<set:S>>Foul Stinger",
+            "typeLine": "Murderous Eye Jewel",
+            "identified": true,
+            "properties": [{ "name": "Abyss", "values": [], "displayMode": 0 }],
+            "requirements": [{ "name": "Level", "values": [["16", 0]], "displayMode": 0 }],
+            "explicitMods":
+            [
+                "6% chance to Avoid being Poisoned", "Adds 8 to 15 Cold Damage to Dagger Attacks",
+                "1% of Life Regenerated per second while moving"
+            ],
+            "descrText":
+                "Place into an Abyssal Socket on an Item or into an allocated Jewel Socket on the Passive Skill Tree. Right click to remove from the Socket.",
+            "frameType": 2,
+            "category": { "jewels": ["abyss"] },
+            "x": 10,
+            "y": 7,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 2,
+            "h": 1,
+            "ilvl": 69,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Belts\/AbyssBelt.png?scale=1&scaleIndex=1&w=2&h=1&v=cd7c25de181e6a77812020eb6e8679713",
+            "league": "Hardcore Abyss",
+            "id": "99967f800b9e24957a468c9e426bc28c6907e47b6671260ebd5b7f31284ef82f",
+            "sockets": [{ "group": 0, "attr": false, "sColour": "A" }],
+            "name": "<<set:MS>><<set:M>><<set:S>>Vortex Clasp",
+            "typeLine": "Stygian Vise",
+            "identified": true,
+            "requirements": [{ "name": "Level", "values": [["47", 0]], "displayMode": 0 }],
+            "implicitMods": ["Has 1 Abyssal Socket"],
+            "explicitMods": [
+                "+143 to Armour", "10.8 Life Regenerated per second", "+31% to Fire Resistance",
+                "Reflects 2 Physical Damage to Melee Attackers"
+            ],
+            "frameType": 2,
+            "category": { "accessories": ["belt"] },
+            "x": 10,
+            "y": 8,
+            "inventoryId": "Stash1",
+            "socketedItems": []
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 2,
+            "ilvl": 70,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Maps\/SinFlaskEmpty.png?scale=1&scaleIndex=1&w=1&h=2&v=8b9f566d35bc00387e43f8ec4eefad313",
+            "league": "Hardcore Abyss",
+            "id": "869719ac23a8b5b6ec20e12b17bb5ed29afd38a4885bf4cbcf76c2e2db1cd1ce",
+            "name": "",
+            "typeLine": "Divine Vessel",
+            "identified": true,
+            "implicitMods":
+            [
+                "Unique Boss deals 10% increased Damage", "Unique Boss has 10% increased Attack and Cast Speed",
+                "Unique Boss has 10% increased Life", "Unique Boss has 20% increased Area of Effect"
+            ],
+            "descrText":
+                "Can be used in the Templar Laboratory or a personal Map Device, allowing you to capture the Soul of the Map's Boss. The Vessel containing the captured Soul can be retrieved from the Map Device. You must be in the Map when the boss is defeated.",
+            "flavourText": [
+                "Power is a curious thing. \r", "It can be contained, hidden, locked away, \r",
+                "and yet it always breaks free."
+            ],
+            "frameType": 0,
+            "category": "maps",
+            "x": 9,
+            "y": 6,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 0,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Divination\/InventoryIcon.png?scale=1&scaleIndex=1&stackSize=1&w=1&h=1&v=a8ae131b97fad3c64de0e6d9f250d7433",
+            "league": "Hardcore Abyss",
+            "id": "95516dce4b430808e54db7fb21e7740cab87d712d35371fa799a35620abafd12",
+            "name": "",
+            "typeLine": "Her Mask",
+            "identified": true,
+            "properties": [{ "name": "Stack Size", "values": [["1\/4", 0]], "displayMode": 0 }],
+            "explicitMods": ["<whiteitem>{Sacrifice Fragment}"],
+            "flavourText": ["To her beauty you submit,\r", "lest your neck the great Queen slit."],
+            "frameType": 6,
+            "stackSize": 1,
+            "maxStackSize": 4,
+            "artFilename": "HerMask",
+            "category": "cards",
+            "x": 11,
+            "y": 4,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 2,
+            "h": 1,
+            "ilvl": 68,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Belts\/Belt1.png?scale=1&scaleIndex=1&w=2&h=1&v=a40ff49a65beb9e722af0f85159432f13",
+            "league": "Hardcore Abyss",
+            "id": "0c559447290bf009e0dd74700acfce0614e8c9a9fad87990c48ccd88da6e9ea9",
+            "name": "<<set:MS>><<set:M>><<set:S>>Mind Clasp",
+            "typeLine": "Rustic Sash",
+            "identified": true,
+            "requirements": [{ "name": "Level", "values": [["20", 0]], "displayMode": 0 }],
+            "implicitMods": ["19% increased Physical Damage"],
+            "explicitMods": [
+                "+10 to maximum Energy Shield", "+20% to Cold Resistance", "11% increased Stun and Block Recovery",
+                "10% increased Flask effect duration"
+            ],
+            "frameType": 2,
+            "category": { "accessories": ["belt"] },
+            "x": 9,
+            "y": 9,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 69,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Maps\/Atlas2Maps\/New\/Graveyard.png?scale=1&scaleIndex=1&w=1&h=1&mn=1&mt=1&v=826e3828c489f10c05baaffd716379533",
+            "league": "Hardcore Abyss",
+            "id": "89caea22c6d1cadae73891dbef9eb9fd2728b8d5e4d882145e2e82bd7b9b9604",
+            "name": "",
+            "typeLine": "Graveyard Map",
+            "identified": true,
+            "properties": [{ "name": "Map Tier", "values": [["1", 0]], "displayMode": 0, "type": 1 }],
+            "descrText":
+                "Travel to this Map by using it in the Templar Laboratory or a personal Map Device. Maps can only be used once.",
+            "frameType": 0,
+            "category": "maps",
+            "x": 7,
+            "y": 18,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 68,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Jewels\/basicint.png?scale=1&scaleIndex=1&w=1&h=1&v=cd579ea22c05f1c6ad2fd015d7a710bd3",
+            "league": "Hardcore Abyss",
+            "id": "2ac36d2a2b1a3e32f33668648307f58f43d00370cbd777c986ef286a6086bfea",
+            "name": "<<set:MS>><<set:M>><<set:S>>Sol Creed",
+            "typeLine": "Cobalt Jewel",
+            "identified": true,
+            "explicitMods": ["+16 to Strength", "8% increased Trap Throwing Speed", "12% increased Area Damage"],
+            "descrText":
+                "Place into an allocated Jewel Socket on the Passive Skill Tree. Right click to remove from the Socket.",
+            "frameType": 2,
+            "category": "jewels",
+            "x": 9,
+            "y": 8,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 0,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Divination\/InventoryIcon.png?scale=1&scaleIndex=1&stackSize=1&w=1&h=1&v=a8ae131b97fad3c64de0e6d9f250d7433",
+            "league": "Hardcore Abyss",
+            "id": "11695c829bbe3ea6296b1e4a83421405a0a42900a7ba8e846979689716247027",
+            "name": "",
+            "typeLine": "The Gemcutter",
+            "identified": true,
+            "properties": [{ "name": "Stack Size", "values": [["1\/3", 0]], "displayMode": 0 }],
+            "explicitMods": ["<currencyitem>{Gemcutter's Prism}"],
+            "flavourText": ["In the hands of a master craftsman, a worthless pebble can adorn the crown of a king."],
+            "frameType": 6,
+            "stackSize": 1,
+            "maxStackSize": 3,
+            "artFilename": "TheGemcutter",
+            "category": "cards",
+            "x": 2,
+            "y": 17,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 2,
+            "h": 2,
+            "ilvl": 72,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Armours\/Helmets\/HelmetDexInt10.png?scale=1&scaleIndex=1&w=2&h=2&v=9b24737a3b3c7517e2aa8367a67d0f9f3",
+            "league": "Hardcore Abyss",
+            "id": "b81152c71848268ee310b288fd4ae3c7020c30ffda3bea3cc12b3b546d781257",
+            "sockets":
+            [
+                { "group": 0, "attr": "I", "sColour": "B" }, { "group": 0, "attr": "I", "sColour": "B" },
+                { "group": 0, "attr": "I", "sColour": "B" }
+            ],
+            "name": "<<set:MS>><<set:M>><<set:S>>Carrion Salvation",
+            "typeLine": "Vaal Mask",
+            "identified": true,
+            "properties":
+            [
+                { "name": "Evasion Rating", "values": [["304", 1]], "displayMode": 0, "type": 17 },
+                { "name": "Energy Shield", "values": [["53", 1]], "displayMode": 0, "type": 18 }
+            ],
+            "requirements": [
+                { "name": "Level", "values": [["62", 0]], "displayMode": 0 },
+                { "name": "Dex", "values": [["79", 0]], "displayMode": 1 },
+                { "name": "Int", "values": [["72", 0]], "displayMode": 1 }
+            ],
+            "explicitMods": [
+                "+53 to Accuracy Rating", "47% increased Evasion and Energy Shield", "+28% to Chaos Resistance",
+                "18% increased Stun and Block Recovery"
+            ],
+            "frameType": 2,
+            "category": { "armour": ["helmet"] },
+            "x": 2,
+            "y": 9,
+            "inventoryId": "Stash1",
+            "socketedItems": []
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 71,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Jewels\/MurderousEye.png?scale=1&scaleIndex=1&w=1&h=1&v=6679365e95eb89fd626cf59fa2b57c993",
+            "league": "Hardcore Abyss",
+            "id": "f0507877b55ddbe8ebf2659977d25a20bdab357051c108a775ae0cbd246e77e1",
+            "abyssJewel": true,
+            "name": "<<set:MS>><<set:M>><<set:S>>Whispering Skewer",
+            "typeLine": "Murderous Eye Jewel",
+            "identified": true,
+            "properties": [{ "name": "Abyss", "values": [], "displayMode": 0 }],
+            "requirements": [{ "name": "Level", "values": [["54", 0]], "displayMode": 0 }],
+            "explicitMods":
+            [
+                "Adds 11 to 15 Cold Damage to Attacks", "+12% to Fire Resistance",
+                "Adds 19 to 32 Cold Damage to Claw Attacks"
+            ],
+            "descrText":
+                "Place into an Abyssal Socket on an Item or into an allocated Jewel Socket on the Passive Skill Tree. Right click to remove from the Socket.",
+            "frameType": 2,
+            "category": { "jewels": ["abyss"] },
+            "x": 9,
+            "y": 20,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 71,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Maps\/UniqueMapEye.png?scale=1&scaleIndex=1&w=1&h=1&v=6ab3c0f5b018f6553bd84000639188833",
+            "league": "Hardcore Abyss",
+            "id": "8c900cfcf93720f70f1b36f97868c13c1304700b8ccc66f54ead964407c71c67",
+            "name": "<<set:MS>><<set:M>><<set:S>>Whakawairua Tuahu",
+            "typeLine": "Strand Map",
+            "identified": true,
+            "properties":
+            [
+                { "name": "Map Tier", "values": [["4", 0]], "displayMode": 0, "type": 1 },
+                { "name": "Item Quantity", "values": [["+51%", 1]], "displayMode": 0, "type": 2 },
+                { "name": "Item Rarity", "values": [["+150%", 1]], "displayMode": 0, "type": 3 }
+            ],
+            "explicitMods":
+            [
+                "Area contains many Totems", "Curses have 50% reduced effect on Monsters",
+                "Rare Monsters each have a Nemesis Mod"
+            ],
+            "descrText":
+                "Travel to this Map by using it in the Templar Laboratory or a personal Map Device. Maps can only be used once.",
+            "flavourText": ["We all began life in darkness, we shall all end it there."],
+            "frameType": 3,
+            "category": "maps",
+            "x": 8,
+            "y": 8,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 2,
+            "ilvl": 69,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Maps\/SinFlaskEmpty.png?scale=1&scaleIndex=1&w=1&h=2&v=8b9f566d35bc00387e43f8ec4eefad313",
+            "league": "Hardcore Abyss",
+            "id": "e9c2c32ba87da28ceeaae5f4b6a3750789e7c9eec0c7e1983f66247cfbf6cbfd",
+            "name": "",
+            "typeLine": "Divine Vessel",
+            "identified": true,
+            "implicitMods":
+            [
+                "Unique Boss deals 10% increased Damage", "Unique Boss has 10% increased Attack and Cast Speed",
+                "Unique Boss has 10% increased Life", "Unique Boss has 20% increased Area of Effect"
+            ],
+            "descrText":
+                "Can be used in the Templar Laboratory or a personal Map Device, allowing you to capture the Soul of the Map's Boss. The Vessel containing the captured Soul can be retrieved from the Map Device. You must be in the Map when the boss is defeated.",
+            "flavourText": [
+                "Power is a curious thing. \r", "It can be contained, hidden, locked away, \r",
+                "and yet it always breaks free."
+            ],
+            "frameType": 0,
+            "category": "maps",
+            "x": 7,
+            "y": 16,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 70,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Maps\/Labyrinth.png?scale=1&scaleIndex=1&w=1&h=1&v=ef005aef5d2f9135d6922f4b1b912f783",
+            "league": "Hardcore Abyss",
+            "id": "583a7cf20ef0b28500bf4a914263cf2b232a4fcc1e871e1a57428b2da535522a",
+            "name": "",
+            "typeLine": "Offering to the Goddess",
+            "identified": true,
+            "descrText":
+                "Travel to the Aspirants' Plaza and spend this item to open the Eternal Labyrinth. You must have completed the six different Trials of Ascendancy found in Maps in order to access this area.",
+            "flavourText": [
+                "It is time for the Goddess to give her final verdict.\r", "Your fate rests in her even hands."
+            ],
+            "frameType": 0,
+            "category": "maps",
+            "x": 8,
+            "y": 21,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 69,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Maps\/Atlas2Maps\/New\/AridLake.png?scale=1&scaleIndex=1&w=1&h=1&mn=1&mt=2&v=9f9ef8b0126d5ed98825962195cc4e863",
+            "league": "Hardcore Abyss",
+            "id": "8cb51dc5bcdb9da47ccf28345048eec4a6eafe2e98f697e4483d83b7aa04daad",
+            "name": "",
+            "typeLine": "Superior Arid Lake Map",
+            "identified": true,
+            "properties": [
+                { "name": "Map Tier", "values": [["2", 0]], "displayMode": 0, "type": 1 },
+                { "name": "Item Quantity", "values": [["+6%", 1]], "displayMode": 0, "type": 2 },
+                { "name": "Quality", "values": [["+6%", 1]], "displayMode": 0, "type": 6 }
+            ],
+            "descrText":
+                "Travel to this Map by using it in the Templar Laboratory or a personal Map Device. Maps can only be used once.",
+            "frameType": 0,
+            "category": "maps",
+            "x": 3,
+            "y": 8,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 2,
+            "h": 1,
+            "ilvl": 73,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Belts\/Belt3.png?scale=1&scaleIndex=1&w=2&h=1&v=a559821037f54c94dae053b90bcea3633",
+            "league": "Hardcore Abyss",
+            "id": "db2fa0464f31c4f45854da1dd068610c2b6aeef9c327d5bb26778777362630ca",
+            "name": "<<set:MS>><<set:M>><<set:S>>Horror Shackle",
+            "typeLine": "Leather Belt",
+            "identified": true,
+            "requirements": [{ "name": "Level", "values": [["48", 0]], "displayMode": 0 }],
+            "implicitMods": ["+29 to maximum Life"],
+            "explicitMods": [
+                "+28 to Strength", "+319 to Armour", "+39% to Cold Resistance", "+20% to Lightning Resistance"
+            ],
+            "frameType": 2,
+            "category": { "accessories": ["belt"] },
+            "x": 15,
+            "y": 7,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 70,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Maps\/Atlas2Maps\/New\/Cells.png?scale=1&scaleIndex=1&w=1&h=1&mn=1&mt=3&v=281ca135d0ed2192cab5a225dd9753ff3",
+            "league": "Hardcore Abyss",
+            "id": "676d30d4e9a23ac27f1398b1bdeab88e9e8e2c636369bebf8a23eda8bbe6a5da",
+            "name": "",
+            "typeLine": "Cells Map",
+            "identified": true,
+            "properties": [{ "name": "Map Tier", "values": [["3", 0]], "displayMode": 0, "type": 1 }],
+            "descrText":
+                "Travel to this Map by using it in the Templar Laboratory or a personal Map Device. Maps can only be used once.",
+            "frameType": 0,
+            "category": "maps",
+            "x": 11,
+            "y": 3,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 69,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Jewels\/MurderousEye.png?scale=1&scaleIndex=1&w=1&h=1&v=6679365e95eb89fd626cf59fa2b57c993",
+            "league": "Hardcore Abyss",
+            "id": "8960e60199d569c595789bc06517bf74ef95897978e17a33b63256ba226526bf",
+            "abyssJewel": true,
+            "name": "<<set:MS>><<set:M>><<set:S>>Foul Oculus",
+            "typeLine": "Murderous Eye Jewel",
+            "identified": true,
+            "properties": [{ "name": "Abyss", "values": [], "displayMode": 0 }],
+            "requirements": [{ "name": "Level", "values": [["37", 0]], "displayMode": 0 }],
+            "explicitMods":
+            [
+                "Adds 7 to 17 Fire Damage to Attacks", "+58 to Accuracy Rating", "+73 to Evasion Rating",
+                "Adds 11 to 22 Cold Damage to Staff Attacks"
+            ],
+            "descrText":
+                "Place into an Abyssal Socket on an Item or into an allocated Jewel Socket on the Passive Skill Tree. Right click to remove from the Socket.",
+            "frameType": 2,
+            "category": { "jewels": ["abyss"] },
+            "x": 9,
+            "y": 23,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 2,
+            "h": 1,
+            "ilvl": 69,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Belts\/AbyssBelt.png?scale=1&scaleIndex=1&w=2&h=1&v=cd7c25de181e6a77812020eb6e8679713",
+            "league": "Hardcore Abyss",
+            "id": "24a8774b71f13e60225ba9661f1fec2c47b595cb951af2e621d6d2c11eec746c",
+            "sockets": [{ "group": 0, "attr": false, "sColour": "A" }],
+            "name": "<<set:MS>><<set:M>><<set:S>>Dragon Shackle",
+            "typeLine": "Stygian Vise",
+            "identified": true,
+            "requirements": [{ "name": "Level", "values": [["20", 0]], "displayMode": 0 }],
+            "implicitMods": ["Has 1 Abyssal Socket"],
+            "explicitMods": [
+                "+20% to Fire Resistance", "+23% to Cold Resistance", "17% increased Flask Life Recovery rate",
+                "19% increased Elemental Damage with Attack Skills"
+            ],
+            "frameType": 2,
+            "category": { "accessories": ["belt"] },
+            "x": 10,
+            "y": 5,
+            "inventoryId": "Stash1",
+            "socketedItems": []
+        },
+        {
+            "verified": false,
+            "w": 2,
+            "h": 1,
+            "ilvl": 74,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Belts\/Belt2.png?scale=1&scaleIndex=1&w=2&h=1&v=05d53adc2875453b6b6bb2652ee3d74d3",
+            "league": "Hardcore Abyss",
+            "id": "d7d69ae15f5c041911552bff035bc3746101cd52f0a64f0a154d8d965c1b2ada",
+            "name": "<<set:MS>><<set:M>><<set:S>>Death Leash",
+            "typeLine": "Chain Belt",
+            "identified": true,
+            "requirements": [{ "name": "Level", "values": [["40", 0]], "displayMode": 0 }],
+            "implicitMods": ["+18 to maximum Energy Shield"],
+            "explicitMods": [
+                "+33% to Cold Resistance", "+17% to Lightning Resistance", "14% increased Stun and Block Recovery",
+                "20% increased Flask Mana Recovery rate"
+            ],
+            "frameType": 2,
+            "category": { "accessories": ["belt"] },
+            "x": 15,
+            "y": 9,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 71,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Amulets\/TurquoiseAmulet.png?scale=1&scaleIndex=1&w=1&h=1&v=484a8eac4316c65308deea4efcfbb6213",
+            "league": "Hardcore Abyss",
+            "id": "9f1a0cd35efc2477a2151c4cf447119474f6134a537945eaea0b16b912668d53",
+            "name": "<<set:MS>><<set:M>><<set:S>>Woe Braid",
+            "typeLine": "Turquoise Amulet",
+            "identified": true,
+            "requirements": [{ "name": "Level", "values": [["48", 0]], "displayMode": 0 }],
+            "implicitMods": ["+21 to Dexterity and Intelligence"],
+            "explicitMods": [
+                "Adds 12 to 26 Cold Damage to Attacks", "+30% to Fire Resistance", "+38% to Lightning Resistance",
+                "+3 Life gained for each Enemy hit by your Attacks"
+            ],
+            "frameType": 2,
+            "category": { "accessories": ["amulet"] },
+            "x": 6,
+            "y": 21,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 70,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Maps\/Atlas2Maps\/New\/Cavern.png?scale=1&scaleIndex=1&w=1&h=1&mn=1&mt=2&v=a7aba9ac2cf171c2d328c5eda37394463",
+            "league": "Hardcore Abyss",
+            "id": "0c23667fbc8da8d422e79123d70daf74dc83c54b8ec968532e179131d74a7957",
+            "name": "",
+            "typeLine": "Flooded Mine Map",
+            "identified": true,
+            "properties": [{ "name": "Map Tier", "values": [["2", 0]], "displayMode": 0, "type": 1 }],
+            "descrText":
+                "Travel to this Map by using it in the Templar Laboratory or a personal Map Device. Maps can only be used once.",
+            "frameType": 0,
+            "category": "maps",
+            "x": 0,
+            "y": 8,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 70,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Maps\/Atlas2Maps\/New\/Desert.png?scale=1&scaleIndex=1&w=1&h=1&mn=1&mt=2&v=9d3cd4f63f746af76128812cd24e55af3",
+            "league": "Hardcore Abyss",
+            "id": "e0affff180714b8f88b2a919420dca1c2a2b7ab66edb8be7605eee05e0161b7b",
+            "name": "",
+            "typeLine": "Desert Map",
+            "identified": false,
+            "properties": [{ "name": "Map Tier", "values": [["2", 0]], "displayMode": 0, "type": 1 }],
+            "descrText":
+                "Travel to this Map by using it in the Templar Laboratory or a personal Map Device. Maps can only be used once.",
+            "frameType": 1,
+            "category": "maps",
+            "x": 7,
+            "y": 19,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 71,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Maps\/Atlas2Maps\/New\/Strand.png?scale=1&scaleIndex=1&w=1&h=1&mn=1&mt=4&v=9762a3d69debf5c039cb13c693061f0c3",
+            "league": "Hardcore Abyss",
+            "id": "15abb2cde4829085fe62e1eeab90c6e6ed444bf61339493dd4b7d12c52ee45a8",
+            "name": "",
+            "typeLine": "Strand Map",
+            "identified": true,
+            "properties": [{ "name": "Map Tier", "values": [["4", 0]], "displayMode": 0, "type": 1 }],
+            "descrText":
+                "Travel to this Map by using it in the Templar Laboratory or a personal Map Device. Maps can only be used once.",
+            "frameType": 0,
+            "category": "maps",
+            "x": 0,
+            "y": 2,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 71,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Rings\/AmethystRing.png?scale=1&scaleIndex=1&w=1&h=1&v=e6f04837a3bb2bab63f8f06522bff3923",
+            "league": "Hardcore Abyss",
+            "id": "f2a315a54e08e2f49da2c2eaf5d27445c73bf4468c51e146a5eeadbf005ed75c",
+            "name": "<<set:MS>><<set:M>><<set:S>>Vortex Spiral",
+            "typeLine": "Amethyst Ring",
+            "identified": true,
+            "requirements": [{ "name": "Level", "values": [["55", 0]], "displayMode": 0 }],
+            "implicitMods": ["+10% to Chaos Resistance"],
+            "explicitMods": [
+                "14% increased Lightning Damage", "+64 to maximum Mana", "45% increased Mana Regeneration Rate",
+                "+16% to all Elemental Resistances"
+            ],
+            "frameType": 2,
+            "category": { "accessories": ["ring"] },
+            "x": 9,
+            "y": 18,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 69,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Maps\/Atlas2Maps\/New\/Desert.png?scale=1&scaleIndex=1&w=1&h=1&mn=1&mt=2&v=9d3cd4f63f746af76128812cd24e55af3",
+            "league": "Hardcore Abyss",
+            "id": "9bee901da76fc355cb7c4b04c6ca5892e69d5edd1d33dcfee372d5f1a407a30f",
+            "name": "",
+            "typeLine": "Desert Map",
+            "identified": true,
+            "properties": [{ "name": "Map Tier", "values": [["2", 0]], "displayMode": 0, "type": 1 }],
+            "descrText":
+                "Travel to this Map by using it in the Templar Laboratory or a personal Map Device. Maps can only be used once.",
+            "frameType": 0,
+            "category": "maps",
+            "x": 18,
+            "y": 3,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 2,
+            "h": 1,
+            "ilvl": 72,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Belts\/AbyssBelt.png?scale=1&scaleIndex=1&w=2&h=1&v=cd7c25de181e6a77812020eb6e8679713",
+            "league": "Hardcore Abyss",
+            "id": "ee8ec5144f4023ec7126f39a722c865a5a9501024cdf5e383425322bf9ad9808",
+            "sockets": [{ "group": 0, "attr": false, "sColour": "A" }],
+            "name": "<<set:MS>><<set:M>><<set:S>>Kraken Bind",
+            "typeLine": "Stygian Vise",
+            "identified": true,
+            "requirements": [{ "name": "Level", "values": [["48", 0]], "displayMode": 0 }],
+            "implicitMods": ["Has 1 Abyssal Socket"],
+            "explicitMods": [
+                "+16 to maximum Energy Shield", "2.2 Life Regenerated per second", "+38% to Lightning Resistance",
+                "15% increased Stun Duration on Enemies"
+            ],
+            "frameType": 2,
+            "category": { "accessories": ["belt"] },
+            "x": 18,
+            "y": 15,
+            "inventoryId": "Stash1",
+            "socketedItems": []
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 72,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Maps\/Labyrinth.png?scale=1&scaleIndex=1&w=1&h=1&v=ef005aef5d2f9135d6922f4b1b912f783",
+            "league": "Hardcore Abyss",
+            "id": "db4138df03b3667c04ae2f4ad457a73b2d9e551487487b9a29613537f49d3be1",
+            "name": "",
+            "typeLine": "Offering to the Goddess",
+            "identified": true,
+            "descrText":
+                "Travel to the Aspirants' Plaza and spend this item to open the Eternal Labyrinth. You must have completed the six different Trials of Ascendancy found in Maps in order to access this area.",
+            "flavourText": [
+                "It is time for the Goddess to give her final verdict.\r", "Your fate rests in her even hands."
+            ],
+            "frameType": 0,
+            "category": "maps",
+            "x": 20,
+            "y": 14,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 2,
+            "h": 1,
+            "ilvl": 69,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Belts\/Belt2.png?scale=1&scaleIndex=1&w=2&h=1&v=05d53adc2875453b6b6bb2652ee3d74d3",
+            "league": "Hardcore Abyss",
+            "id": "b6208f3057cf03aeedcc7a3ed877bafb81422881d7a165def056fb3eb47e33c8",
+            "name": "<<set:MS>><<set:M>><<set:S>>Blood Bind",
+            "typeLine": "Chain Belt",
+            "identified": true,
+            "requirements": [{ "name": "Level", "values": [["54", 0]], "displayMode": 0 }],
+            "implicitMods": ["+19 to maximum Energy Shield"],
+            "explicitMods": [
+                "+42 to maximum Energy Shield", "+44 to maximum Life", "8.3 Life Regenerated per second",
+                "+24% to Fire Resistance", "30% increased Stun Duration on Enemies"
+            ],
+            "frameType": 2,
+            "category": { "accessories": ["belt"] },
+            "x": 15,
+            "y": 19,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 2,
+            "h": 1,
+            "ilvl": 69,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Belts\/Belt2.png?scale=1&scaleIndex=1&w=2&h=1&v=05d53adc2875453b6b6bb2652ee3d74d3",
+            "league": "Hardcore Abyss",
+            "id": "9f44b9959734165fc3a31e748ffb8fbb7dfdc29b4f563043730662121a6d203f",
+            "name": "<<set:MS>><<set:M>><<set:S>>Entropy Girdle",
+            "typeLine": "Chain Belt",
+            "identified": true,
+            "requirements": [{ "name": "Level", "values": [["17", 0]], "displayMode": 0 }],
+            "implicitMods": ["+15 to maximum Energy Shield"],
+            "explicitMods": [
+                "+19 to Strength", "+22 to Armour", "+16% to Lightning Resistance",
+                "9% increased Elemental Damage with Attack Skills"
+            ],
+            "frameType": 2,
+            "category": { "accessories": ["belt"] },
+            "x": 15,
+            "y": 23,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 2,
+            "h": 1,
+            "ilvl": 69,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Belts\/Belt1.png?scale=1&scaleIndex=1&w=2&h=1&v=a40ff49a65beb9e722af0f85159432f13",
+            "league": "Hardcore Abyss",
+            "id": "a0c6eb5c7a33a15e3eeee409fa56331412d8c4d274a3130276c120a1495e5e6f",
+            "name": "<<set:MS>><<set:M>><<set:S>>Rapture Locket",
+            "typeLine": "Rustic Sash",
+            "identified": true,
+            "requirements": [{ "name": "Level", "values": [["48", 0]], "displayMode": 0 }],
+            "implicitMods": ["14% increased Physical Damage"],
+            "explicitMods": [
+                "5% reduced Enemy Stun Threshold", "+4 to maximum Energy Shield", "+37% to Cold Resistance",
+                "18% increased Flask Charges gained"
+            ],
+            "frameType": 2,
+            "category": { "accessories": ["belt"] },
+            "x": 15,
+            "y": 16,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 74,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Maps\/Atlas2Maps\/New\/Canyon.png?scale=1&scaleIndex=1&w=1&h=1&mn=1&mt=4&v=a25f408bbb820d874ee10222248191c93",
+            "league": "Hardcore Abyss",
+            "id": "f463ecf1ded29a23c2d7bca75dd8abc17d31a07c73f6fc44dcaf75def2313c53",
+            "name": "",
+            "typeLine": "Canyon Map",
+            "identified": true,
+            "properties": [{ "name": "Map Tier", "values": [["4", 0]], "displayMode": 0, "type": 1 }],
+            "descrText":
+                "Travel to this Map by using it in the Templar Laboratory or a personal Map Device. Maps can only be used once.",
+            "frameType": 0,
+            "category": "maps",
+            "x": 18,
+            "y": 23,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 0,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Divination\/InventoryIcon.png?scale=1&scaleIndex=1&stackSize=4&w=1&h=1&v=a8ae131b97fad3c64de0e6d9f250d7433",
+            "league": "Hardcore Abyss",
+            "id": "3af149ff2c8334eb85df2412ea67a35e33e2a40e5df976ae3f783ef2b1a3daac",
+            "name": "",
+            "typeLine": "Her Mask",
+            "identified": true,
+            "properties": [{ "name": "Stack Size", "values": [["4\/4", 0]], "displayMode": 0 }],
+            "explicitMods": ["<whiteitem>{Sacrifice Fragment}"],
+            "flavourText": ["To her beauty you submit,\r", "lest your neck the great Queen slit."],
+            "frameType": 6,
+            "stackSize": 4,
+            "maxStackSize": 4,
+            "artFilename": "HerMask",
+            "category": "cards",
+            "x": 3,
+            "y": 6,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 2,
+            "h": 1,
+            "ilvl": 74,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Belts\/AbyssBelt.png?scale=1&scaleIndex=1&w=2&h=1&v=cd7c25de181e6a77812020eb6e8679713",
+            "league": "Hardcore Abyss",
+            "id": "1a5835733263c80676bdfa91e808cd2e975bafd67abe3acc4c46d3d3eecefd18",
+            "sockets": [{ "group": 0, "attr": false, "sColour": "A" }],
+            "name": "<<set:MS>><<set:M>><<set:S>>Bramble Leash",
+            "typeLine": "Stygian Vise",
+            "identified": true,
+            "requirements": [{ "name": "Level", "values": [["46", 0]], "displayMode": 0 }],
+            "implicitMods": ["Has 1 Abyssal Socket"],
+            "explicitMods": [
+                "+17 to maximum Energy Shield", "35% increased Stun Duration on Enemies",
+                "15% increased Stun and Block Recovery", "16% increased Flask Life Recovery rate"
+            ],
+            "frameType": 2,
+            "category": { "accessories": ["belt"] },
+            "x": 17,
+            "y": 9,
+            "inventoryId": "Stash1",
+            "socketedItems": []
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 72,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Rings\/Ring3.png?scale=1&scaleIndex=1&w=1&h=1&v=bc351f5121b5d5d052733fa5be0f79ca3",
+            "league": "Hardcore Abyss",
+            "id": "60be395246f0481328969d462dc39c68572f5751c37c89b448e64bc7c0315c9b",
+            "name": "<<set:MS>><<set:M>><<set:S>>Wrath Turn",
+            "typeLine": "Paua Ring",
+            "identified": true,
+            "requirements": [{ "name": "Level", "values": [["44", 0]], "displayMode": 0 }],
+            "implicitMods": ["+23 to maximum Mana"],
+            "explicitMods": [
+                "Adds 1 to 15 Lightning Damage to Attacks", "7.7 Life Regenerated per second",
+                "54% increased Mana Regeneration Rate", "+2 Life gained for each Enemy hit by your Attacks"
+            ],
+            "frameType": 2,
+            "category": { "accessories": ["ring"] },
+            "x": 13,
+            "y": 22,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 2,
+            "h": 2,
+            "ilvl": 70,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Armours\/Gloves\/GlovesStrInt3.png?scale=1&scaleIndex=1&w=2&h=2&v=6121a1f24b6a6b016f4f62266feb49653",
+            "league": "Hardcore Abyss",
+            "id": "24c2c4438ac9888d464047a1e73122c2beeebee2ffa3ac79429ba8b13f4f1f8c",
+            "sockets": [{ "group": 0, "attr": "I", "sColour": "B" }, { "group": 0, "attr": "S", "sColour": "R" }],
+            "name": "<<set:MS>><<set:M>><<set:S>>Torment Claw",
+            "typeLine": "Soldier Gloves",
+            "identified": true,
+            "properties":
+            [
+                { "name": "Armour", "values": [["102", 1]], "displayMode": 0, "type": 16 },
+                { "name": "Energy Shield", "values": [["32", 1]], "displayMode": 0, "type": 18 }
+            ],
+            "requirements":
+            [
+                { "name": "Level", "values": [["51", 0]], "displayMode": 0 },
+                { "name": "Str", "values": [["40", 0]], "displayMode": 1 },
+                { "name": "Int", "values": [["40", 0]], "displayMode": 1 }
+            ],
+            "explicitMods": [
+                "11% increased Armour and Energy Shield", "+11 to maximum Energy Shield", "+25 to maximum Life",
+                "2.4 Life Regenerated per second", "+30 to maximum Mana", "+13% to Fire Resistance",
+                "6% increased Stun and Block Recovery"
+            ],
+            "frameType": 2,
+            "category": { "armour": ["gloves"] },
+            "x": 15,
+            "y": 20,
+            "inventoryId": "Stash1",
+            "socketedItems": []
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 2,
+            "ilvl": 70,
+            "icon":
+                "https:\/\/web.poecdn.com\/gen\/image\/YTo2OntzOjExOiJ1c2VM\/ZWFndWVJZCI7TzoxODoi\/R3JpbmRiXERhdGFiYXNl\/XElkIjoxOntzOjI6Imlk\/IjtpOjA7fXM6OToiYWNj\/b3VudElkIjtPOjE4OiJH\/cmluZGJcRGF0YWJhc2Vc\/SWQiOjE6e3M6MjoiaWQi\/O2k6MDt9czoxMDoic2Nh\/bGVJbmRleCI7aToxO2k6\/MjthOjM6e3M6MToiZiI7\/czoyNDoiQXJ0LzJESXRl\/bXMvRmxhc2tzL3N0b25l\/IjtzOjI6InNwIjtkOjAu\/MzA0MjU5NjM0ODg4NDM4\/MTY7czo1OiJsZXZlbCI7\/aTowO31pOjE7aTo0O2k6\/MDtpOjk7fQ,,\/307a9472ba\/Item.png",
+            "league": "Hardcore Abyss",
+            "id": "7d377c1be1dd64e7e9899242627d06929d88822556a4bf5084dc37dc1c6592e4",
+            "name": "",
+            "typeLine": "<<set:MS>><<set:M>><<set:S>>Experimenter's Basalt Flask of Staunching",
+            "identified": true,
+            "properties":
+            [
+                { "name": "Lasts %0 Seconds", "values": [["5.90", 1]], "displayMode": 3 },
+                { "name": "Consumes %0 of %1 Charges on use", "values": [["40", 0], ["60", 0]], "displayMode": 3 },
+                { "name": "Currently has %0 Charges", "values": [["0", 0]], "displayMode": 3 }
+            ],
+            "requirements": [{ "name": "Level", "values": [["40", 0]], "displayMode": 0 }],
+            "utilityMods":
+            [
+                "15% additional Physical Damage Reduction", "20% of Melee Physical Damage taken reflected to Attacker"
+            ],
+            "explicitMods":
+                ["Immunity to Bleeding during Flask effect\nRemoves Bleeding on use", "31% increased Duration"],
+            "descrText": "Right click to drink. Can only hold charges while in belt. Refills as you kill monsters.",
+            "frameType": 1,
+            "category": "flasks",
+            "x": 3,
+            "y": 0,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 2,
+            "h": 2,
+            "ilvl": 71,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Armours\/Gloves\/GlovesStrInt3.png?scale=1&scaleIndex=1&w=2&h=2&v=6121a1f24b6a6b016f4f62266feb49653",
+            "league": "Hardcore Abyss",
+            "id": "436bf366344feba790ce1782a3da4ac4a22e69d668c96e6ee25d501f7e14a849",
+            "sockets": [{ "group": 0, "attr": "I", "sColour": "B" }],
+            "name": "<<set:MS>><<set:M>><<set:S>>Doom Fist",
+            "typeLine": "Crusader Gloves",
+            "identified": true,
+            "properties":
+            [
+                { "name": "Armour", "values": [["167", 1]], "displayMode": 0, "type": 16 },
+                { "name": "Energy Shield", "values": [["33", 1]], "displayMode": 0, "type": 18 }
+            ],
+            "requirements": [
+                { "name": "Level", "values": [["66", 0]], "displayMode": 0 },
+                { "name": "Str", "values": [["51", 0]], "displayMode": 1 },
+                { "name": "Int", "values": [["51", 0]], "displayMode": 1 }
+            ],
+            "explicitMods": [
+                "+38 to Dexterity", "+42 to Intelligence", "38% increased Armour and Energy Shield",
+                "+15% to Cold Resistance", "15% increased Stun and Block Recovery"
+            ],
+            "frameType": 2,
+            "category": { "armour": ["gloves"] },
+            "x": 14,
+            "y": 11,
+            "inventoryId": "Stash1",
+            "socketedItems": []
+        },
+        {
+            "verified": false,
+            "w": 2,
+            "h": 1,
+            "ilvl": 73,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Belts\/AbyssBelt.png?scale=1&scaleIndex=1&w=2&h=1&v=cd7c25de181e6a77812020eb6e8679713",
+            "league": "Hardcore Abyss",
+            "id": "6b9f4165ca085ae930972cca502830a48f309ba6bef86ef9a847db19cf627e98",
+            "sockets": [{ "group": 0, "attr": false, "sColour": "A" }],
+            "name": "<<set:MS>><<set:M>><<set:S>>Vortex Girdle",
+            "typeLine": "Stygian Vise",
+            "identified": true,
+            "requirements": [{ "name": "Level", "values": [["40", 0]], "displayMode": 0 }],
+            "implicitMods": ["Has 1 Abyssal Socket"],
+            "explicitMods": [
+                "+30 to maximum Energy Shield", "+37 to maximum Life", "5.8 Life Regenerated per second",
+                "+11% to Lightning Resistance", "24% increased Stun Duration on Enemies",
+                "14% increased Flask Life Recovery rate"
+            ],
+            "frameType": 2,
+            "category": { "accessories": ["belt"] },
+            "x": 5,
+            "y": 18,
+            "inventoryId": "Stash1",
+            "socketedItems": []
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 0,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Divination\/InventoryIcon.png?scale=1&scaleIndex=1&stackSize=2&w=1&h=1&v=a8ae131b97fad3c64de0e6d9f250d7433",
+            "league": "Hardcore Abyss",
+            "id": "28aed552ee9020e936aa7bf4e2329b4f92dab4ad827591c413b819bfee8077c4",
+            "name": "",
+            "typeLine": "The Gambler",
+            "identified": true,
+            "properties": [{ "name": "Stack Size", "values": [["2\/5", 0]], "displayMode": 0 }],
+            "explicitMods": ["<divination>{Divination Card}"],
+            "flavourText": ["\"I don't believe in karma. If it were real, I would never win.\""],
+            "frameType": 6,
+            "stackSize": 2,
+            "maxStackSize": 5,
+            "artFilename": "TheGambler",
+            "category": "cards",
+            "x": 7,
+            "y": 10,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 2,
+            "h": 2,
+            "ilvl": 69,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Armours\/Gloves\/GlovesStrInt3.png?scale=1&scaleIndex=1&w=2&h=2&v=6121a1f24b6a6b016f4f62266feb49653",
+            "league": "Hardcore Abyss",
+            "id": "1c7228afedf9aac2ec77eca1e859efd335dd64b9f2757e8248b20284dbf31008",
+            "sockets":
+            [
+                { "group": 0, "attr": "S", "sColour": "R" }, { "group": 0, "attr": "S", "sColour": "R" },
+                { "group": 0, "attr": "S", "sColour": "R" }
+            ],
+            "name": "<<set:MS>><<set:M>><<set:S>>Blood Touch",
+            "typeLine": "Mesh Gloves",
+            "identified": true,
+            "properties":
+            [
+                { "name": "Armour", "values": [["58", 0]], "displayMode": 0, "type": 16 },
+                { "name": "Energy Shield", "values": [["12", 0]], "displayMode": 0, "type": 18 }
+            ],
+            "requirements": [
+                { "name": "Level", "values": [["40", 0]], "displayMode": 0 },
+                { "name": "Str", "values": [["26", 0]], "displayMode": 1 },
+                { "name": "Int", "values": [["26", 0]], "displayMode": 1 }
+            ],
+            "explicitMods": [
+                "+18 to Dexterity", "+238 to Accuracy Rating", "+69 to maximum Life", "+10% to Chaos Resistance"
+            ],
+            "frameType": 2,
+            "category": { "armour": ["gloves"] },
+            "x": 12,
+            "y": 0,
+            "inventoryId": "Stash1",
+            "socketedItems": []
+        },
+        {
+            "verified": false,
+            "w": 2,
+            "h": 1,
+            "ilvl": 74,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Belts\/AbyssBelt.png?scale=1&scaleIndex=1&w=2&h=1&v=cd7c25de181e6a77812020eb6e8679713",
+            "league": "Hardcore Abyss",
+            "id": "bd8cc6e9702c3371b758dc32c9a85a25263d15e31bc5f5a532e6a10b60a1ccdf",
+            "sockets": [{ "group": 0, "attr": false, "sColour": "A" }],
+            "name": "<<set:MS>><<set:M>><<set:S>>Eagle Lash",
+            "typeLine": "Stygian Vise",
+            "identified": true,
+            "requirements": [{ "name": "Level", "values": [["59", 0]], "displayMode": 0 }],
+            "implicitMods": ["Has 1 Abyssal Socket"],
+            "explicitMods": [
+                "+13 to Strength", "+350 to Armour", "+45 to maximum Energy Shield", "6.7 Life Regenerated per second",
+                "+33% to Lightning Resistance"
+            ],
+            "frameType": 2,
+            "category": { "accessories": ["belt"] },
+            "x": 4,
+            "y": 0,
+            "inventoryId": "Stash1",
+            "socketedItems": []
+        },
+        {
+            "verified": false,
+            "w": 2,
+            "h": 1,
+            "ilvl": 74,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Belts\/AbyssBelt.png?scale=1&scaleIndex=1&w=2&h=1&v=cd7c25de181e6a77812020eb6e8679713",
+            "league": "Hardcore Abyss",
+            "id": "274708068e263f848f41e7eab9f8122985b97aaaa8e6bb4e45da47edf482b4f7",
+            "sockets": [{ "group": 0, "attr": false, "sColour": "A" }],
+            "name": "<<set:MS>><<set:M>><<set:S>>Hate Thread",
+            "typeLine": "Stygian Vise",
+            "identified": true,
+            "requirements": [{ "name": "Level", "values": [["35", 0]], "displayMode": 0 }],
+            "implicitMods": ["Has 1 Abyssal Socket"],
+            "explicitMods": [
+                "12% reduced Enemy Stun Threshold", "+26% to Lightning Resistance",
+                "11% increased Stun Duration on Enemies", "13% increased Flask Life Recovery rate"
+            ],
+            "frameType": 2,
+            "category": { "accessories": ["belt"] },
+            "x": 0,
+            "y": 22,
+            "inventoryId": "Stash1",
+            "socketedItems": []
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 3,
+            "ilvl": 73,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Weapons\/OneHandWeapons\/Daggers\/Dagger4.png?scale=1&scaleIndex=1&w=1&h=3&v=73f07b51d53c87085bc93c1eb8a23a283",
+            "league": "Hardcore Abyss",
+            "id": "05b89a2a4d9fa3b2d05c2df905c133e503f0ea03cd9c2ff6e73b0b592def8fa4",
+            "sockets": [{ "group": 0, "attr": "D", "sColour": "G" }, { "group": 0, "attr": "D", "sColour": "G" }],
+            "name": "<<set:MS>><<set:M>><<set:S>>Oblivion Stinger",
+            "typeLine": "Ambusher",
+            "identified": true,
+            "properties":
+            [
+                { "name": "Dagger", "values": [], "displayMode": 0 },
+                { "name": "Physical Damage", "values": [["19-74", 0]], "displayMode": 0, "type": 9 },
+                { "name": "Elemental Damage", "values": [["14-25", 4]], "displayMode": 0, "type": 10 },
+                { "name": "Critical Strike Chance", "values": [["7.56%", 1]], "displayMode": 0, "type": 12 },
+                { "name": "Attacks per Second", "values": [["1.50", 0]], "displayMode": 0, "type": 13 },
+                { "name": "Weapon Range", "values": [["8", 0]], "displayMode": 0, "type": 14 }
+            ],
+            "requirements":
+            [
+                { "name": "Level", "values": [["60", 0]], "displayMode": 0 },
+                { "name": "Dex", "values": [["113", 0]], "displayMode": 1 },
+                { "name": "Int", "values": [["113", 0]], "displayMode": 1 }
+            ],
+            "implicitMods": ["30% increased Global Critical Strike Chance"],
+            "explicitMods": [
+                "Adds 14 to 25 Fire Damage", "24% increased Critical Strike Chance", "+41 to maximum Mana",
+                "+3 Mana gained on Kill", "10% chance to Poison on Hit"
+            ],
+            "frameType": 2,
+            "category": { "weapons": ["dagger"] },
+            "x": 4,
+            "y": 9,
+            "inventoryId": "Stash1",
+            "socketedItems": []
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 3,
+            "ilvl": 73,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Weapons\/OneHandWeapons\/OneHandSwords\/OneHandSword3.png?scale=1&scaleIndex=1&w=1&h=3&v=0bf4b174a0c80b2fd80a12026ed04a053",
+            "league": "Hardcore Abyss",
+            "id": "3ff84a1ca9bd616343112f63aaaf7ec9326cb260b11fe5098d262358172fbb35",
+            "sockets":
+            [
+                { "group": 0, "attr": "D", "sColour": "G" }, { "group": 0, "attr": "D", "sColour": "G" },
+                { "group": 0, "attr": "S", "sColour": "R" }
+            ],
+            "name": "<<set:MS>><<set:M>><<set:S>>Sorrow Sever",
+            "typeLine": "Corsair Sword",
+            "identified": true,
+            "properties":
+            [
+                { "name": "One Handed Sword", "values": [], "displayMode": 0 },
+                { "name": "Physical Damage", "values": [["20-80", 0]], "displayMode": 0, "type": 9 },
+                { "name": "Elemental Damage", "values": [["1-6", 6]], "displayMode": 0, "type": 10 },
+                { "name": "Critical Strike Chance", "values": [["5.00%", 0]], "displayMode": 0, "type": 12 },
+                { "name": "Attacks per Second", "values": [["1.55", 0]], "displayMode": 0, "type": 13 },
+                { "name": "Weapon Range", "values": [["9", 0]], "displayMode": 0, "type": 14 }
+            ],
+            "requirements":
+            [
+                { "name": "Level", "values": [["58", 0]], "displayMode": 0 },
+                { "name": "Str", "values": [["81", 0]], "displayMode": 1 },
+                { "name": "Dex", "values": [["117", 0]], "displayMode": 1 }
+            ],
+            "implicitMods": ["40% increased Accuracy Rating"],
+            "explicitMods": [
+                "+26 to Strength", "Adds 1 to 6 Lightning Damage", "+13% to Global Critical Strike Multiplier",
+                "+16% to Cold Resistance"
+            ],
+            "frameType": 2,
+            "category": { "weapons": ["onesword"] },
+            "x": 4,
+            "y": 17,
+            "inventoryId": "Stash1",
+            "socketedItems": []
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 73,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Amulets\/Amulet6.png?scale=1&scaleIndex=1&w=1&h=1&v=bc7ee6ba515d5f34cfaf7daec1571c523",
+            "league": "Hardcore Abyss",
+            "id": "9ce2fedd8ee8cb8c1502df08ce9af30a0a3c0ec6d00cff92e6affa17d57a35e7",
+            "name": "<<set:MS>><<set:M>><<set:S>>Empyrean Choker",
+            "typeLine": "Gold Amulet",
+            "identified": true,
+            "requirements": [{ "name": "Level", "values": [["40", 0]], "displayMode": 0 }],
+            "implicitMods": ["20% increased Rarity of Items found"],
+            "explicitMods": [
+                "+8 to Intelligence", "Adds 1 to 2 Cold Damage to Attacks", "5% increased maximum Energy Shield",
+                "0.23% of Physical Attack Damage Leeched as Mana"
+            ],
+            "frameType": 2,
+            "category": { "accessories": ["amulet"] },
+            "x": 2,
+            "y": 23,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 2,
+            "h": 1,
+            "ilvl": 72,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Belts\/AbyssBelt.png?scale=1&scaleIndex=1&w=2&h=1&v=cd7c25de181e6a77812020eb6e8679713",
+            "league": "Hardcore Abyss",
+            "id": "7869d5004084aeb0297adc637b3e7b897d281c115b2f9acccdb2d08c5c2f16b8",
+            "sockets": [{ "group": 0, "attr": false, "sColour": "A" }],
+            "name": "<<set:MS>><<set:M>><<set:S>>Spirit Strap",
+            "typeLine": "Stygian Vise",
+            "identified": true,
+            "requirements": [{ "name": "Level", "values": [["48", 0]], "displayMode": 0 }],
+            "implicitMods": ["Has 1 Abyssal Socket"],
+            "explicitMods": [
+                "+26 to Strength", "+64 to maximum Life", "3.2 Life Regenerated per second",
+                "30% increased Stun Duration on Enemies", "31% increased Elemental Damage with Attack Skills"
+            ],
+            "frameType": 2,
+            "category": { "accessories": ["belt"] },
+            "x": 5,
+            "y": 23,
+            "inventoryId": "Stash1",
+            "socketedItems": []
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 63,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Amulets\/AgateAmulet.png?scale=1&scaleIndex=1&w=1&h=1&v=616cdaa894e5fcb0684cbeab3f90c4bc3",
+            "league": "Hardcore Abyss",
+            "id": "19f51bebe85d9e4a49a8f93b9a59c3db422ff6989cd29fcaca82994419cb1350",
+            "name": "<<set:MS>><<set:M>><<set:S>>Empyrean Beads",
+            "typeLine": "Agate Amulet",
+            "identified": true,
+            "requirements": [{ "name": "Level", "values": [["32", 0]], "displayMode": 0 }],
+            "implicitMods": ["+21 to Strength and Intelligence"],
+            "explicitMods": [
+                "+49 to maximum Life", "12% increased Rarity of Items found", "+8 Life gained on Kill",
+                "+4 Mana gained on Kill"
+            ],
+            "frameType": 2,
+            "category": { "accessories": ["amulet"] },
+            "x": 0,
+            "y": 4,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 0,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Gems\/CorpseWarp.png?scale=1&scaleIndex=1&w=1&h=1&v=8e65900fb6c8dc9909fbf0a132f4e6a63",
+            "support": false,
+            "league": "Hardcore Abyss",
+            "id": "ca7a1d10be0d1fae76893bf551346737a09e270997dfc335b928e8fb031e756a",
+            "name": "",
+            "typeLine": "Bodyswap",
+            "identified": true,
+            "properties":
+            [
+                { "name": "Movement, Spell, AoE, Fire", "values": [], "displayMode": 0 },
+                { "name": "Level", "values": [["1", 0]], "displayMode": 0, "type": 5 },
+                { "name": "Mana Cost", "values": [["10", 0]], "displayMode": 0 },
+                { "name": "Cast Time", "values": [["0.80 sec", 0]], "displayMode": 0 },
+                { "name": "Critical Strike Chance", "values": [["5.00%", 0]], "displayMode": 0 },
+                { "name": "Quality", "values": [["+18%", 1]], "displayMode": 0, "type": 6 }
+            ],
+            "additionalProperties":
+            [
+                {
+                    "name": "Experience",
+                    "values": [["1\/9569", 0]],
+                    "displayMode": 2,
+                    "progress": 0.00010450412810314447
+                }
+            ],
+            "requirements":
+            [
+                { "name": "Level", "values": [["10", 0]], "displayMode": 0 },
+                { "name": "Int", "values": [["18", 0]], "displayMode": 1 }
+            ],
+            "secDescrText":
+                "Your body explodes, dealing spell damage in an area around you, and a targeted corpse also explodes, dealing damage around it. Your body is recreated at the location of the corpse. The explosion of the corpse is not affected by modifiers to spell damage, and cannot be reflected. This spell cannot be repeated.",
+            "explicitMods": [
+                "This Spell deals 13 to 19, plus 3% of your maximum Life, as base Fire Damage",
+                "Explosion deals base Fire Damage equal to 4% of the corpse's maximum Life", "9% increased Cast Speed"
+            ],
+            "descrText":
+                "Place into an item socket of the right colour to gain this skill. Right click to remove from a socket.",
+            "frameType": 4,
+            "category": "gems",
+            "x": 2,
+            "y": 20,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 63,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Amulets\/Amulet6.png?scale=1&scaleIndex=1&w=1&h=1&v=bc7ee6ba515d5f34cfaf7daec1571c523",
+            "league": "Hardcore Abyss",
+            "id": "128624b36e69072061f4b098ad4693295d3eb4903c94f9fa51e02db655623029",
+            "name": "<<set:MS>><<set:M>><<set:S>>Sorrow Heart",
+            "typeLine": "Gold Amulet",
+            "identified": true,
+            "requirements": [{ "name": "Level", "values": [["47", 0]], "displayMode": 0 }],
+            "implicitMods": ["15% increased Rarity of Items found"],
+            "explicitMods": [
+                "Adds 6 to 11 Physical Damage to Attacks", "+6 to all Attributes", "4% increased maximum Energy Shield",
+                "+26 to maximum Life", "11.9 Life Regenerated per second"
+            ],
+            "frameType": 2,
+            "category": { "accessories": ["amulet"] },
+            "x": 1,
+            "y": 19,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 72,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Rings\/Ring3.png?scale=1&scaleIndex=1&w=1&h=1&v=bc351f5121b5d5d052733fa5be0f79ca3",
+            "league": "Hardcore Abyss",
+            "id": "5fe768c9b0816852f159fb140d861c25f0577f66dce3d3189ae2f5158a3f1edf",
+            "name": "<<set:MS>><<set:M>><<set:S>>Bramble Twirl",
+            "typeLine": "Paua Ring",
+            "identified": true,
+            "requirements": [{ "name": "Level", "values": [["48", 0]], "displayMode": 0 }],
+            "implicitMods": ["+22 to maximum Mana"],
+            "explicitMods": [
+                "Adds 7 to 10 Cold Damage to Attacks", "+26 to Accuracy Rating", "+19 to maximum Mana",
+                "+41% to Fire Resistance", "5% increased Light Radius"
+            ],
+            "frameType": 2,
+            "category": { "accessories": ["ring"] },
+            "x": 1,
+            "y": 18,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 63,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Rings\/AmethystRing.png?scale=1&scaleIndex=1&w=1&h=1&v=e6f04837a3bb2bab63f8f06522bff3923",
+            "league": "Hardcore Abyss",
+            "id": "a9049a4e588d418984b50b619fe27a9d73379a55df437511a5ffbf22a833591e",
+            "name": "<<set:MS>><<set:M>><<set:S>>Behemoth Eye",
+            "typeLine": "Amethyst Ring",
+            "identified": true,
+            "requirements": [{ "name": "Level", "values": [["30", 0]], "displayMode": 0 }],
+            "implicitMods": ["+10% to Chaos Resistance"],
+            "explicitMods": [
+                "+12 to Intelligence", "+53 to maximum Life", "34% increased Mana Regeneration Rate",
+                "+3% to all Elemental Resistances"
+            ],
+            "frameType": 2,
+            "category": { "accessories": ["ring"] },
+            "x": 2,
+            "y": 3,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 71,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Amulets\/AgateAmulet.png?scale=1&scaleIndex=1&w=1&h=1&v=616cdaa894e5fcb0684cbeab3f90c4bc3",
+            "league": "Hardcore Abyss",
+            "id": "1e2850f28e78e6794e90e85c3a808b77c982346226bde798b02c8928b3ee40c7",
+            "name": "<<set:MS>><<set:M>><<set:S>>Horror Pendant",
+            "typeLine": "Agate Amulet",
+            "identified": true,
+            "requirements": [{ "name": "Level", "values": [["44", 0]], "displayMode": 0 }],
+            "implicitMods": ["+22 to Strength and Intelligence"],
+            "explicitMods": [
+                "+37 to Strength", "+138 to Accuracy Rating", "12% increased Rarity of Items found",
+                "+12 Life gained on Kill"
+            ],
+            "frameType": 2,
+            "category": { "accessories": ["amulet"] },
+            "x": 1,
+            "y": 4,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 63,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Amulets\/Amulet5.png?scale=1&scaleIndex=1&w=1&h=1&v=574b38016f547495a51268177882d5cc3",
+            "league": "Hardcore Abyss",
+            "id": "b0966e457c5e7ae747d07195d40a0c3034e98cca47eab048dfefe1354b32adaa",
+            "name": "<<set:MS>><<set:M>><<set:S>>Rune Braid",
+            "typeLine": "Lapis Amulet",
+            "identified": true,
+            "requirements": [{ "name": "Level", "values": [["35", 0]], "displayMode": 0 }],
+            "implicitMods": ["+22 to Intelligence"],
+            "explicitMods": [
+                "+30 to Dexterity", "+169 to Accuracy Rating", "13% increased Rarity of Items found",
+                "+13 Life gained on Kill"
+            ],
+            "frameType": 2,
+            "category": { "accessories": ["amulet"] },
+            "x": 0,
+            "y": 23,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 69,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Amulets\/Amulet1.png?scale=1&scaleIndex=1&w=1&h=1&v=c2401398cda6eebb43b7f7da63caa3313",
+            "league": "Hardcore Abyss",
+            "id": "4cb6fb44b3d1e4c5d05396047baf7dd1b51c87bf5cde3ec390f5f3988fc085e6",
+            "name": "<<set:MS>><<set:M>><<set:S>>Dusk Heart",
+            "typeLine": "Paua Amulet",
+            "identified": true,
+            "requirements": [{ "name": "Level", "values": [["41", 0]], "displayMode": 0 }],
+            "implicitMods": ["27% increased Mana Regeneration Rate"],
+            "explicitMods": [
+                "Adds 4 to 49 Lightning Damage to Attacks", "12% increased maximum Energy Shield",
+                "2.3 Life Regenerated per second", "45% increased Mana Regeneration Rate"
+            ],
+            "frameType": 2,
+            "category": { "accessories": ["amulet"] },
+            "x": 1,
+            "y": 10,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 61,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Amulets\/Amulet6.png?scale=1&scaleIndex=1&w=1&h=1&v=bc7ee6ba515d5f34cfaf7daec1571c523",
+            "league": "Hardcore Abyss",
+            "id": "5de23fa4432741abed5b6673efc99994b67f8d8c7136fb01174758f33ae56398",
+            "name": "<<set:MS>><<set:M>><<set:S>>Vengeance Locket",
+            "typeLine": "Gold Amulet",
+            "identified": true,
+            "requirements": [{ "name": "Level", "values": [["48", 0]], "displayMode": 0 }],
+            "implicitMods": ["17% increased Rarity of Items found"],
+            "explicitMods": [
+                "Adds 4 to 7 Physical Damage to Attacks", "Adds 1 to 15 Lightning Damage to Attacks",
+                "+31 to maximum Energy Shield", "+37% to Fire Resistance"
+            ],
+            "frameType": 2,
+            "category": { "accessories": ["amulet"] },
+            "x": 1,
+            "y": 13,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 71,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Rings\/AmethystRing.png?scale=1&scaleIndex=1&w=1&h=1&v=e6f04837a3bb2bab63f8f06522bff3923",
+            "league": "Hardcore Abyss",
+            "id": "b8d4922d06c6391999e94ac1cf5b40859a6c6a5a9d0ae57dafbf8a26f873e9d0",
+            "name": "<<set:MS>><<set:M>><<set:S>>Corpse Gyre",
+            "typeLine": "Amethyst Ring",
+            "identified": true,
+            "requirements": [{ "name": "Level", "values": [["48", 0]], "displayMode": 0 }],
+            "implicitMods": ["+13% to Chaos Resistance"],
+            "explicitMods": [
+                "Adds 1 to 2 Physical Damage to Attacks", "+28 to Strength", "+5 to Evasion Rating",
+                "9.5 Life Regenerated per second", "+11 Life gained on Kill",
+                "34% increased Elemental Damage with Attack Skills"
+            ],
+            "frameType": 2,
+            "category": { "accessories": ["ring"] },
+            "x": 2,
+            "y": 16,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 74,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Rings\/Ring5.png?scale=1&scaleIndex=1&w=1&h=1&v=d645f9adfc012c52674c94d16b4292b23",
+            "league": "Hardcore Abyss",
+            "id": "521d574fbca5a81c15c54df1146bfc63fc9b48dbf40b179c2ddfb79a091b9550",
+            "name": "<<set:MS>><<set:M>><<set:S>>Death Nail",
+            "typeLine": "Topaz Ring",
+            "identified": true,
+            "requirements": [{ "name": "Level", "values": [["33", 0]], "displayMode": 0 }],
+            "implicitMods": ["+29% to Lightning Resistance"],
+            "explicitMods": [
+                "Adds 8 to 16 Cold Damage to Attacks", "+54 to Evasion Rating", "+46 to maximum Mana",
+                "+2 Life gained for each Enemy hit by your Attacks"
+            ],
+            "frameType": 2,
+            "category": { "accessories": ["ring"] },
+            "x": 12,
+            "y": 4,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 70,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Rings\/DiamondRing.png?scale=1&scaleIndex=1&w=1&h=1&v=d53fabd123b7c64d59ffe8a6baf7d7783",
+            "league": "Hardcore Abyss",
+            "id": "44350224c394056514c50a0cb5321c55e11e23b4b43de619032e1f66fcdc63be",
+            "name": "<<set:MS>><<set:M>><<set:S>>Wrath Knot",
+            "typeLine": "Diamond Ring",
+            "identified": true,
+            "requirements": [{ "name": "Level", "values": [["40", 0]], "displayMode": 0 }],
+            "implicitMods": ["23% increased Global Critical Strike Chance"],
+            "explicitMods": [
+                "Adds 7 to 15 Physical Damage to Attacks", "+28 to Strength", "+21 to maximum Energy Shield",
+                "+50 to maximum Mana", "+1 Mana gained on Kill"
+            ],
+            "frameType": 2,
+            "category": { "accessories": ["ring"] },
+            "x": 2,
+            "y": 15,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 69,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Amulets\/Amulet6.png?scale=1&scaleIndex=1&w=1&h=1&v=bc7ee6ba515d5f34cfaf7daec1571c523",
+            "league": "Hardcore Abyss",
+            "id": "2268fc8906e056b89ac3b8334a02b13aa0987df030816198ecafaaf5c92d8c7a",
+            "name": "<<set:MS>><<set:M>><<set:S>>Viper Locket",
+            "typeLine": "Gold Amulet",
+            "identified": true,
+            "requirements": [{ "name": "Level", "values": [["44", 0]], "displayMode": 0 }],
+            "implicitMods": ["14% increased Rarity of Items found"],
+            "explicitMods": [
+                "+35 to Strength", "9% increased Armour", "11% increased Evasion Rating",
+                "+5% to all Elemental Resistances", "+22% to Fire Resistance"
+            ],
+            "frameType": 2,
+            "category": { "accessories": ["amulet"] },
+            "x": 2,
+            "y": 22,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 71,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Rings\/Ring1.png?scale=1&scaleIndex=1&w=1&h=1&v=7c04d5a65caa0371eccfe06a129a74073",
+            "league": "Hardcore Abyss",
+            "id": "f754e8d0c80fd3f52cbabab0b32c11cec150cbf3620d3af40e740d31cc2b2b97",
+            "name": "<<set:MS>><<set:M>><<set:S>>Eagle Finger",
+            "typeLine": "Iron Ring",
+            "identified": true,
+            "requirements": [{ "name": "Level", "values": [["52", 0]], "displayMode": 0 }],
+            "implicitMods": ["Adds 1 to 4 Physical Damage to Attacks"],
+            "explicitMods": [
+                "+42 to Dexterity", "+35 to Intelligence", "+64 to maximum Life", "+13% to Chaos Resistance"
+            ],
+            "frameType": 2,
+            "category": { "accessories": ["ring"] },
+            "x": 2,
+            "y": 5,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 63,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Rings\/TopazRuby.png?scale=1&scaleIndex=1&w=1&h=1&v=0bd3c7197b952981eb21cb0dc278c04d3",
+            "league": "Hardcore Abyss",
+            "id": "acb401c160df1f754ceb076acc529b651259fe15c558acf5392bba45cd11b148",
+            "name": "<<set:MS>><<set:M>><<set:S>>Rune Circle",
+            "typeLine": "Two-Stone Ring",
+            "identified": true,
+            "requirements": [{ "name": "Level", "values": [["46", 0]], "displayMode": 0 }],
+            "implicitMods": ["+15% to Fire and Lightning Resistances"],
+            "explicitMods": [
+                "6% increased Cast Speed", "+109 to Evasion Rating", "+26 to maximum Life",
+                "6.7 Life Regenerated per second"
+            ],
+            "frameType": 2,
+            "category": { "accessories": ["ring"] },
+            "x": 2,
+            "y": 7,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 2,
+            "h": 1,
+            "ilvl": 75,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Belts\/Belt1.png?scale=1&scaleIndex=1&w=2&h=1&v=a40ff49a65beb9e722af0f85159432f13",
+            "league": "Hardcore Abyss",
+            "id": "0cc9c06790f9ebb8044efce2fd107dec53f700bdab995aec5cd186fa65a98789",
+            "name": "<<set:MS>><<set:M>><<set:S>>Skull Tether",
+            "typeLine": "Rustic Sash",
+            "identified": true,
+            "requirements": [{ "name": "Level", "values": [["28", 0]], "displayMode": 0 }],
+            "implicitMods": ["24% increased Physical Damage"],
+            "explicitMods": [
+                "10% reduced Enemy Stun Threshold", "+14 to maximum Energy Shield", "+64 to maximum Life",
+                "11% increased Stun and Block Recovery"
+            ],
+            "frameType": 2,
+            "category": { "accessories": ["belt"] },
+            "x": 7,
+            "y": 22,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 2,
+            "h": 1,
+            "ilvl": 73,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Belts\/AbyssBelt.png?scale=1&scaleIndex=1&w=2&h=1&v=cd7c25de181e6a77812020eb6e8679713",
+            "league": "Hardcore Abyss",
+            "id": "8d776aad081f2c946ae3d8b8c15154f6423506b42133e583f0a46b92087bc686",
+            "sockets": [{ "group": 0, "attr": false, "sColour": "A" }],
+            "name": "<<set:MS>><<set:M>><<set:S>>Blight Snare",
+            "typeLine": "Stygian Vise",
+            "identified": true,
+            "requirements": [{ "name": "Level", "values": [["48", 0]], "displayMode": 0 }],
+            "implicitMods": ["Has 1 Abyssal Socket"],
+            "explicitMods": [
+                "+15 to maximum Energy Shield", "+33 to maximum Life", "+41% to Cold Resistance",
+                "+38% to Lightning Resistance", "13% increased Stun and Block Recovery"
+            ],
+            "frameType": 2,
+            "category": { "accessories": ["belt"] },
+            "x": 11,
+            "y": 6,
+            "inventoryId": "Stash1",
+            "socketedItems": []
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 63,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Rings\/MoonstoneRing.png?scale=1&scaleIndex=1&w=1&h=1&v=4715c1b82b9843bf4b12f0aad25b3f263",
+            "league": "Hardcore Abyss",
+            "id": "ab59f6814631f4cf1c267131d2c18fda865a3405242ca912bf720c14236fdf55",
+            "name": "<<set:MS>><<set:M>><<set:S>>Death Knot",
+            "typeLine": "Moonstone Ring",
+            "identified": true,
+            "requirements": [{ "name": "Level", "values": [["39", 0]], "displayMode": 0 }],
+            "implicitMods": ["+20 to maximum Energy Shield"],
+            "explicitMods": [
+                "+22 to Dexterity", "+17 to maximum Energy Shield", "+30% to Lightning Resistance",
+                "+9 Life gained on Kill"
+            ],
+            "frameType": 2,
+            "category": { "accessories": ["ring"] },
+            "x": 1,
+            "y": 17,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 63,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Amulets\/AgateAmulet.png?scale=1&scaleIndex=1&w=1&h=1&v=616cdaa894e5fcb0684cbeab3f90c4bc3",
+            "league": "Hardcore Abyss",
+            "id": "bf502869fce5a17ec381055b4d85b7d6981b3aed6ed7dc04e04cb62891fccbc8",
+            "name": "<<set:MS>><<set:M>><<set:S>>Demon Choker",
+            "typeLine": "Agate Amulet",
+            "identified": true,
+            "requirements": [{ "name": "Level", "values": [["48", 0]], "displayMode": 0 }],
+            "implicitMods": ["+24 to Strength and Intelligence"],
+            "explicitMods": [
+                "20% increased Cold Damage", "Adds 1 to 5 Lightning Damage to Attacks", "+99 to Accuracy Rating",
+                "13% increased maximum Energy Shield", "+59 to maximum Mana", "24% increased Mana Regeneration Rate"
+            ],
+            "frameType": 2,
+            "category": { "accessories": ["amulet"] },
+            "x": 2,
+            "y": 2,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 2,
+            "h": 1,
+            "ilvl": 71,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Belts\/AbyssBelt.png?scale=1&scaleIndex=1&w=2&h=1&v=cd7c25de181e6a77812020eb6e8679713",
+            "league": "Hardcore Abyss",
+            "id": "3f8cfc7529132895b9c32f0c1f20f35821b26de4a14e2a516e5cff7a81ff3a7f",
+            "sockets": [{ "group": 0, "attr": false, "sColour": "A" }],
+            "name": "<<set:MS>><<set:M>><<set:S>>Rapture Twine",
+            "typeLine": "Stygian Vise",
+            "identified": true,
+            "requirements": [{ "name": "Level", "values": [["47", 0]], "displayMode": 0 }],
+            "implicitMods": ["Has 1 Abyssal Socket"],
+            "explicitMods": [
+                "+22 to maximum Energy Shield", "11.4 Life Regenerated per second", "+33% to Fire Resistance",
+                "+21% to Cold Resistance", "17% increased Flask Life Recovery rate"
+            ],
+            "frameType": 2,
+            "category": { "accessories": ["belt"] },
+            "x": 2,
+            "y": 12,
+            "inventoryId": "Stash1",
+            "socketedItems": []
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 72,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Amulets\/Amulet6.png?scale=1&scaleIndex=1&w=1&h=1&v=bc7ee6ba515d5f34cfaf7daec1571c523",
+            "league": "Hardcore Abyss",
+            "id": "b52536bc1b023eb66504ab97025ef98f22706ad997f4410af3ce051f83f7e24b",
+            "name": "<<set:MS>><<set:M>><<set:S>>Carrion Rosary",
+            "typeLine": "Gold Amulet",
+            "identified": true,
+            "requirements": [{ "name": "Level", "values": [["54", 0]], "displayMode": 0 }],
+            "implicitMods": ["13% increased Rarity of Items found"],
+            "explicitMods": [
+                "+15 to all Attributes", "Adds 1 to 2 Fire Damage to Attacks",
+                "+10% to Global Critical Strike Multiplier", "+42 to maximum Energy Shield", "+13 Life gained on Kill"
+            ],
+            "frameType": 2,
+            "category": { "accessories": ["amulet"] },
+            "x": 2,
+            "y": 21,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 2,
+            "h": 1,
+            "ilvl": 75,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Belts\/Belt5.png?scale=1&scaleIndex=1&w=2&h=1&v=5aa764352f06af8fd3231e6a52d710f53",
+            "league": "Hardcore Abyss",
+            "id": "9e4fc91f78d09d0d8f6c6864e1504db23a32ce180bfacdb95b2b5a20b0b619b9",
+            "name": "<<set:MS>><<set:M>><<set:S>>Invasion Locket",
+            "typeLine": "Heavy Belt",
+            "identified": true,
+            "requirements": [{ "name": "Level", "values": [["23", 0]], "displayMode": 0 }],
+            "implicitMods": ["+30 to Strength"],
+            "explicitMods": [
+                "+18 to maximum Energy Shield", "+14% to Fire Resistance", "19% increased Stun Duration on Enemies",
+                "18% reduced Flask Charges used"
+            ],
+            "frameType": 2,
+            "category": { "accessories": ["belt"] },
+            "x": 14,
+            "y": 22,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 2,
+            "h": 2,
+            "ilvl": 74,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Weapons\/OneHandWeapons\/Claws\/Claw9.png?scale=1&scaleIndex=1&w=2&h=2&v=7b6784ad48bc862464fc4c1ea952eb0c3",
+            "league": "Hardcore Abyss",
+            "id": "5e41c3606c5ba11695630df495047d3792851413b81921ec65dfa49c6ed60fe7",
+            "sockets":
+            [
+                { "group": 0, "attr": "I", "sColour": "B" }, { "group": 0, "attr": "D", "sColour": "G" },
+                { "group": 0, "attr": "D", "sColour": "G" }
+            ],
+            "name": "<<set:MS>><<set:M>><<set:S>>Corruption Bane",
+            "typeLine": "Gemini Claw",
+            "identified": true,
+            "properties":
+            [
+                { "name": "Claw", "values": [], "displayMode": 0 },
+                { "name": "Physical Damage", "values": [["31-91", 1]], "displayMode": 0, "type": 9 },
+                { "name": "Elemental Damage", "values": [["17-39", 5], ["2-95", 6]], "displayMode": 0, "type": 10 },
+                { "name": "Critical Strike Chance", "values": [["6.30%", 0]], "displayMode": 0, "type": 12 },
+                { "name": "Attacks per Second", "values": [["1.50", 0]], "displayMode": 0, "type": 13 },
+                { "name": "Weapon Range", "values": [["9", 0]], "displayMode": 0, "type": 14 }
+            ],
+            "requirements":
+            [
+                { "name": "Level", "values": [["72", 0]], "displayMode": 0 },
+                { "name": "Dex", "values": [["121", 0]], "displayMode": 1 },
+                { "name": "Int", "values": [["121", 0]], "displayMode": 1 }
+            ],
+            "implicitMods":
+                ["+38 Life gained for each Enemy hit by Attacks", "+14 Mana gained for each Enemy hit by Attacks"],
+            "explicitMods": [
+                "34% increased Physical Damage", "Adds 17 to 39 Cold Damage", "Adds 2 to 95 Lightning Damage",
+                "37% increased Mana Regeneration Rate", "+50 to Accuracy Rating"
+            ],
+            "frameType": 2,
+            "category": { "weapons": ["claw"] },
+            "x": 0,
+            "y": 20,
+            "inventoryId": "Stash1",
+            "socketedItems": []
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 71,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Rings\/Empty-Socket.png?scale=1&scaleIndex=1&w=1&h=1&v=3671f6d79d7190b43879b830e63fc0783",
+            "league": "Hardcore Abyss",
+            "id": "270dc5e6392d07110d9e580ba2880c6e39d6e35a1ce1d397d2b0c7bca2e5c95d",
+            "sockets": [{ "group": 0, "attr": "D", "sColour": "G" }],
+            "name": "<<set:MS>><<set:M>><<set:S>>Doom Whorl",
+            "typeLine": "Unset Ring",
+            "identified": true,
+            "requirements": [{ "name": "Level", "values": [["30", 0]], "displayMode": 0 }],
+            "implicitMods": ["Has 1 Socket"],
+            "explicitMods": [
+                "+22 to Strength", "Adds 11 to 18 Cold Damage to Attacks", "Adds 1 to 28 Lightning Damage to Attacks",
+                "+5 to maximum Life", "+26% to Cold Resistance"
+            ],
+            "frameType": 2,
+            "category": { "accessories": ["ring"] },
+            "x": 2,
+            "y": 6,
+            "inventoryId": "Stash1",
+            "socketedItems": []
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 63,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Amulets\/Amulet1.png?scale=1&scaleIndex=1&w=1&h=1&v=c2401398cda6eebb43b7f7da63caa3313",
+            "league": "Hardcore Abyss",
+            "id": "22d2fd4ef4356c9f3f037be24aca09eddff28373f7dab7c84efc8eddf4e27227",
+            "name": "<<set:MS>><<set:M>><<set:S>>Tempest Noose",
+            "typeLine": "Paua Amulet",
+            "identified": true,
+            "requirements": [{ "name": "Level", "values": [["48", 0]], "displayMode": 0 }],
+            "implicitMods": ["30% increased Mana Regeneration Rate"],
+            "explicitMods": [
+                "+23 to all Attributes", "+71 to maximum Life", "+39% to Cold Resistance", "+5 Mana gained on Kill"
+            ],
+            "frameType": 2,
+            "category": { "accessories": ["amulet"] },
+            "x": 1,
+            "y": 14,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 63,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Rings\/Ring4.png?scale=1&scaleIndex=1&w=1&h=1&v=6ef89e2afcf83dc3cc86b1522597ed2b3",
+            "league": "Hardcore Abyss",
+            "id": "d5bb9abf41d6e7e3d73b389de1478fb41fd63293581513dabd79bb11e088f3c5",
+            "name": "<<set:MS>><<set:M>><<set:S>>Pain Eye",
+            "typeLine": "Gold Ring",
+            "identified": true,
+            "requirements": [{ "name": "Level", "values": [["48", 0]], "displayMode": 0 }],
+            "implicitMods": ["9% increased Rarity of Items found"],
+            "explicitMods": [
+                "+18 to Strength", "Adds 8 to 15 Cold Damage to Attacks", "+68 to maximum Life", "+58 to maximum Mana",
+                "+7% to Fire Resistance"
+            ],
+            "frameType": 2,
+            "category": { "accessories": ["ring"] },
+            "x": 1,
+            "y": 23,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 3,
+            "ilvl": 72,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Weapons\/OneHandWeapons\/Wands\/Wand3.png?scale=1&scaleIndex=1&w=1&h=3&v=ac9f7eee09f5a8f580151298712f2a9e3",
+            "league": "Hardcore Abyss",
+            "id": "53dd6810d2e2d6e13dcbfb3ea9c13ad0e7d49ee4c8fd9126a89ae6476f547241",
+            "sockets": [{ "group": 0, "attr": "I", "sColour": "B" }],
+            "name": "<<set:MS>><<set:M>><<set:S>>Maelstr\u00f6m Bite",
+            "typeLine": "Imbued Wand",
+            "identified": true,
+            "properties":
+            [
+                { "name": "Wand", "values": [], "displayMode": 0 },
+                { "name": "Physical Damage", "values": [["24-44", 0]], "displayMode": 0, "type": 9 },
+                { "name": "Critical Strike Chance", "values": [["8.19%", 1]], "displayMode": 0, "type": 12 },
+                { "name": "Attacks per Second", "values": [["1.50", 0]], "displayMode": 0, "type": 13 }
+            ],
+            "requirements":
+            [
+                { "name": "Level", "values": [["59", 0]], "displayMode": 0 },
+                { "name": "Int", "values": [["188", 0]], "displayMode": 1 }
+            ],
+            "implicitMods": ["37% increased Spell Damage"],
+            "explicitMods": [
+                "4% increased Lightning Damage", "17% increased Critical Strike Chance", "+19 to maximum Mana",
+                "35% increased Projectile Speed"
+            ],
+            "frameType": 2,
+            "category": { "weapons": ["wand"] },
+            "x": 6,
+            "y": 9,
+            "inventoryId": "Stash1",
+            "socketedItems": []
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 70,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Rings\/TopazSapphire.png?scale=1&scaleIndex=1&w=1&h=1&v=b7334698bf04b28f755467f256a3276b3",
+            "league": "Hardcore Abyss",
+            "id": "2fecb06643e075e71f5536fc3432c12d9ef4c1e571d5c57fa3889523895c3dcf",
+            "name": "<<set:MS>><<set:M>><<set:S>>Empyrean Gyre",
+            "typeLine": "Two-Stone Ring",
+            "identified": true,
+            "requirements": [{ "name": "Level", "values": [["28", 0]], "displayMode": 0 }],
+            "implicitMods": ["+14% to Cold and Lightning Resistances"],
+            "explicitMods": [
+                "+9 to all Attributes", "+29 to Accuracy Rating", "+25 to maximum Life",
+                "+9% to all Elemental Resistances", "10% increased Light Radius"
+            ],
+            "frameType": 2,
+            "category": { "accessories": ["ring"] },
+            "x": 1,
+            "y": 16,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 3,
+            "ilvl": 74,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Weapons\/OneHandWeapons\/Wands\/Wand3.png?scale=1&scaleIndex=1&w=1&h=3&v=ac9f7eee09f5a8f580151298712f2a9e3",
+            "league": "Hardcore Abyss",
+            "id": "76955b23d8572a1ccd9fcbff8832adf54281e66bc8557cba7faacd8aeb633ee2",
+            "sockets": [{ "group": 0, "attr": "I", "sColour": "B" }, { "group": 1, "attr": "I", "sColour": "B" }],
+            "name": "<<set:MS>><<set:M>><<set:S>>Morbid Spell",
+            "typeLine": "Imbued Wand",
+            "identified": true,
+            "properties":
+            [
+                { "name": "Wand", "values": [], "displayMode": 0 },
+                { "name": "Physical Damage", "values": [["24-44", 0]], "displayMode": 0, "type": 9 },
+                { "name": "Elemental Damage", "values": [["21-36", 4]], "displayMode": 0, "type": 10 },
+                { "name": "Critical Strike Chance", "values": [["7.00%", 0]], "displayMode": 0, "type": 12 },
+                { "name": "Attacks per Second", "values": [["1.50", 0]], "displayMode": 0, "type": 13 }
+            ],
+            "requirements":
+            [
+                { "name": "Level", "values": [["59", 0]], "displayMode": 0 },
+                { "name": "Int", "values": [["188", 0]], "displayMode": 1 }
+            ],
+            "implicitMods": ["33% increased Spell Damage"],
+            "explicitMods": [
+                "+2 to Level of Socketed Lightning Gems", "Adds 21 to 36 Fire Damage",
+                "22% increased Stun Duration on Enemies", "20% increased Burning Damage", "+242 to Accuracy Rating"
+            ],
+            "frameType": 2,
+            "category": { "weapons": ["wand"] },
+            "x": 12,
+            "y": 7,
+            "inventoryId": "Stash1",
+            "socketedItems": []
+        },
+        {
+            "verified": false,
+            "w": 2,
+            "h": 1,
+            "ilvl": 72,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Belts\/AbyssBelt.png?scale=1&scaleIndex=1&w=2&h=1&v=cd7c25de181e6a77812020eb6e8679713",
+            "league": "Hardcore Abyss",
+            "id": "a7c0f9a68d3f7dba5dfc21aaa2a1aa4ee7076df54fe8eb344525659542ef0394",
+            "sockets": [{ "group": 0, "attr": false, "sColour": "A" }],
+            "name": "<<set:MS>><<set:M>><<set:S>>Honour Thread",
+            "typeLine": "Stygian Vise",
+            "identified": true,
+            "requirements": [{ "name": "Level", "values": [["51", 0]], "displayMode": 0 }],
+            "implicitMods": ["Has 1 Abyssal Socket"],
+            "explicitMods": [
+                "13% reduced Enemy Stun Threshold", "+2 to maximum Energy Shield", "+93 to maximum Life",
+                "+9% to Lightning Resistance", "21% increased Stun and Block Recovery",
+                "20% increased Flask Mana Recovery rate"
+            ],
+            "frameType": 2,
+            "category": { "accessories": ["belt"] },
+            "x": 5,
+            "y": 19,
+            "inventoryId": "Stash1",
+            "socketedItems": []
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 72,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Rings\/MoonstoneRing.png?scale=1&scaleIndex=1&w=1&h=1&v=4715c1b82b9843bf4b12f0aad25b3f263",
+            "league": "Hardcore Abyss",
+            "id": "25de59ea0121c0c88d0a1b06dc3a576b19ab6419fd216fa2e43469b5d1be252a",
+            "name": "<<set:MS>><<set:M>><<set:S>>Apocalypse Coil",
+            "typeLine": "Moonstone Ring",
+            "identified": true,
+            "requirements": [{ "name": "Level", "values": [["40", 0]], "displayMode": 0 }],
+            "implicitMods": ["+21 to maximum Energy Shield"],
+            "explicitMods": [
+                "+28 to Dexterity", "16% increased Lightning Damage", "+75 to maximum Life", "+52 to maximum Mana",
+                "+2 Mana gained on Kill"
+            ],
+            "frameType": 2,
+            "category": { "accessories": ["ring"] },
+            "x": 2,
+            "y": 4,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 75,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Rings\/Ring7.png?scale=1&scaleIndex=1&w=1&h=1&v=0d73ed3a0f503653328f2593bda615d33",
+            "league": "Hardcore Abyss",
+            "id": "6d4452be2777b76db3958d40db206843e0a8b378d9396f7bdf1d191c7e56e746",
+            "name": "<<set:MS>><<set:M>><<set:S>>Storm Gyre",
+            "typeLine": "Ruby Ring",
+            "identified": true,
+            "requirements": [{ "name": "Level", "values": [["38", 0]], "displayMode": 0 }],
+            "implicitMods": ["+28% to Fire Resistance"],
+            "explicitMods": [
+                "1.7 Life Regenerated per second", "+33 to maximum Mana", "+12% to all Elemental Resistances",
+                "+17% to Cold Resistance"
+            ],
+            "frameType": 2,
+            "category": { "accessories": ["ring"] },
+            "x": 8,
+            "y": 20,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 3,
+            "ilvl": 73,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Weapons\/OneHandWeapons\/OneHandSwords\/OneHandSword3.png?scale=1&scaleIndex=1&w=1&h=3&v=0bf4b174a0c80b2fd80a12026ed04a053",
+            "league": "Hardcore Abyss",
+            "id": "4342989e0d22581c19636ed7e2e4084d77f4ef4e889b7179c5ba48df75d36b86",
+            "sockets": [{ "group": 0, "attr": "D", "sColour": "G" }],
+            "name": "<<set:MS>><<set:M>><<set:S>>Glyph Skewer",
+            "typeLine": "Corsair Sword",
+            "identified": true,
+            "properties":
+            [
+                { "name": "One Handed Sword", "values": [], "displayMode": 0 },
+                { "name": "Physical Damage", "values": [["34-126", 1]], "displayMode": 0, "type": 9 },
+                { "name": "Elemental Damage", "values": [["1-4", 4]], "displayMode": 0, "type": 10 },
+                { "name": "Critical Strike Chance", "values": [["5.00%", 0]], "displayMode": 0, "type": 12 },
+                { "name": "Attacks per Second", "values": [["1.55", 0]], "displayMode": 0, "type": 13 },
+                { "name": "Weapon Range", "values": [["9", 0]], "displayMode": 0, "type": 14 }
+            ],
+            "requirements":
+            [
+                { "name": "Level", "values": [["58", 0]], "displayMode": 0 },
+                { "name": "Str", "values": [["81", 0]], "displayMode": 1 },
+                { "name": "Dex", "values": [["117", 0]], "displayMode": 1 }
+            ],
+            "implicitMods": ["40% increased Accuracy Rating"],
+            "explicitMods": [
+                "43% increased Physical Damage", "Adds 4 to 8 Physical Damage", "Adds 1 to 4 Fire Damage",
+                "+51 to Accuracy Rating", "28% increased Damage with Bleeding"
+            ],
+            "frameType": 2,
+            "category": { "weapons": ["onesword"] },
+            "x": 14,
+            "y": 19,
+            "inventoryId": "Stash1",
+            "socketedItems": []
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 72,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Rings\/BreachRing.png?scale=1&scaleIndex=1&w=1&h=1&v=b033df55e6cc9cd0403d5ecd5e91d5a03",
+            "league": "Hardcore Abyss",
+            "id": "c97dbc2b2859149dd8f96ef072f83e74e72483d1632db0699653c333328f6898",
+            "name": "<<set:MS>><<set:M>><<set:S>>Glyph Circle",
+            "typeLine": "Breach Ring",
+            "identified": true,
+            "corrupted": true,
+            "requirements": [{ "name": "Level", "values": [["24", 0]], "displayMode": 0 }],
+            "implicitMods": ["Properties are doubled while in a Breach"],
+            "explicitMods": [
+                "Adds 1 to 14 Lightning Damage to Attacks", "+93 to Accuracy Rating", "6% increased Accuracy Rating",
+                "+46 to maximum Life", "15% increased Light Radius"
+            ],
+            "frameType": 2,
+            "category": { "accessories": ["ring"] },
+            "x": 9,
+            "y": 14,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 2,
+            "h": 3,
+            "ilvl": 73,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Weapons\/OneHandWeapons\/OneHandAxes\/OneHandAxe3.png?scale=1&scaleIndex=1&w=2&h=3&v=b2537cc31a2470a434ee7c8488ed758e3",
+            "league": "Hardcore Abyss",
+            "id": "94c35714687265eba8ee293585ba48e0d86b0a04af3d53851df80de276d27a53",
+            "sockets": [{ "group": 0, "attr": "D", "sColour": "G" }],
+            "name": "<<set:MS>><<set:M>><<set:S>>Apocalypse Edge",
+            "typeLine": "Siege Axe",
+            "identified": true,
+            "properties":
+            [
+                { "name": "One Handed Axe", "values": [], "displayMode": 0 },
+                { "name": "Physical Damage", "values": [["38-70", 0]], "displayMode": 0, "type": 9 },
+                { "name": "Elemental Damage", "values": [["2-61", 6]], "displayMode": 0, "type": 10 },
+                { "name": "Critical Strike Chance", "values": [["5.00%", 0]], "displayMode": 0, "type": 12 },
+                { "name": "Attacks per Second", "values": [["1.50", 0]], "displayMode": 0, "type": 13 },
+                { "name": "Weapon Range", "values": [["9", 0]], "displayMode": 0, "type": 14 }
+            ],
+            "requirements": [
+                { "name": "Level", "values": [["59", 0]], "displayMode": 0 },
+                { "name": "Str", "values": [["119", 0]], "displayMode": 1 },
+                { "name": "Dex", "values": [["82", 0]], "displayMode": 1 }
+            ],
+            "explicitMods": [
+                "Adds 2 to 61 Lightning Damage", "+38% to Cold Resistance", "+211 to Accuracy Rating",
+                "24% increased Damage with Bleeding"
+            ],
+            "frameType": 2,
+            "category": { "weapons": ["oneaxe"] },
+            "x": 4,
+            "y": 20,
+            "inventoryId": "Stash1",
+            "socketedItems": []
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 70,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Rings\/TopazSapphire.png?scale=1&scaleIndex=1&w=1&h=1&v=b7334698bf04b28f755467f256a3276b3",
+            "league": "Hardcore Abyss",
+            "id": "63bcb4eb28750156f5a7c9ac28b2da162a51832fda5458b1451d256f0de50f8d",
+            "name": "<<set:MS>><<set:M>><<set:S>>Dusk Grip",
+            "typeLine": "Two-Stone Ring",
+            "identified": true,
+            "requirements": [{ "name": "Level", "values": [["49", 0]], "displayMode": 0 }],
+            "implicitMods": ["+15% to Cold and Lightning Resistances"],
+            "explicitMods": [
+                "+36 to Intelligence", "+97 to Evasion Rating", "+15 to maximum Energy Shield",
+                "21% increased Rarity of Items found", "+32% to Fire Resistance", "+1 Mana gained on Kill"
+            ],
+            "frameType": 2,
+            "category": { "accessories": ["ring"] },
+            "x": 2,
+            "y": 1,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 71,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Rings\/Ring4.png?scale=1&scaleIndex=1&w=1&h=1&v=6ef89e2afcf83dc3cc86b1522597ed2b3",
+            "league": "Hardcore Abyss",
+            "id": "04535469b3c6d4c837b96be10a0ea4bb00697148b3f1778bd78caf1320154973",
+            "name": "<<set:MS>><<set:M>><<set:S>>Grim Finger",
+            "typeLine": "Gold Ring",
+            "identified": true,
+            "requirements": [{ "name": "Level", "values": [["54", 0]], "displayMode": 0 }],
+            "implicitMods": ["12% increased Rarity of Items found"],
+            "explicitMods": [
+                "+10 to Dexterity", "+116 to Accuracy Rating", "+40 to maximum Energy Shield", "+19% to Cold Resistance"
+            ],
+            "frameType": 2,
+            "category": { "accessories": ["ring"] },
+            "x": 2,
+            "y": 18,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 73,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Amulets\/Amulet3.png?scale=1&scaleIndex=1&w=1&h=1&v=ab799e48c3d205973c8cd93ab478d20c3",
+            "league": "Hardcore Abyss",
+            "id": "fed8644aff93d46426dedd935baa9494c3f8c4f8aec5974bb0a18a0fd627ace4",
+            "name": "<<set:MS>><<set:M>><<set:S>>Vortex Rosary",
+            "typeLine": "Amber Amulet",
+            "identified": true,
+            "requirements": [{ "name": "Level", "values": [["40", 0]], "displayMode": 0 }],
+            "implicitMods": ["+24 to Strength"],
+            "explicitMods": [
+                "+4 to all Attributes", "9% increased maximum Energy Shield", "+26% to Fire Resistance",
+                "0.35% of Physical Attack Damage Leeched as Life"
+            ],
+            "frameType": 2,
+            "category": { "accessories": ["amulet"] },
+            "x": 4,
+            "y": 23,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 71,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Amulets\/Amulet3.png?scale=1&scaleIndex=1&w=1&h=1&v=ab799e48c3d205973c8cd93ab478d20c3",
+            "league": "Hardcore Abyss",
+            "id": "1b557ecf13d8f1a2b4057fd3e428242bebfcefd0b41d211e888dc0766d554147",
+            "name": "<<set:MS>><<set:M>><<set:S>>Brimstone Gorget",
+            "typeLine": "Amber Amulet",
+            "identified": true,
+            "requirements": [{ "name": "Level", "values": [["56", 0]], "displayMode": 0 }],
+            "implicitMods": ["+29 to Strength"],
+            "explicitMods": [
+                "6% increased Lightning Damage", "Adds 3 to 58 Lightning Damage to Attacks", "+22% to Cold Resistance",
+                "0.3% of Physical Attack Damage Leeched as Life", "0.65% of Physical Attack Damage Leeched as Mana"
+            ],
+            "frameType": 2,
+            "category": { "accessories": ["amulet"] },
+            "x": 2,
+            "y": 14,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 2,
+            "h": 1,
+            "ilvl": 72,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Belts\/Belt4.png?scale=1&scaleIndex=1&w=2&h=1&v=da282d3a3d76fc0d14b882450c3ed2ae3",
+            "league": "Hardcore Abyss",
+            "id": "a77997a37ff19c829c9ff7448845fc54fe31dd5f95758e667d82baae308cf6b4",
+            "name": "<<set:MS>><<set:M>><<set:S>>Dire Shackle",
+            "typeLine": "Cloth Belt",
+            "identified": true,
+            "requirements": [{ "name": "Level", "values": [["48", 0]], "displayMode": 0 }],
+            "implicitMods": ["17% increased Stun and Block Recovery"],
+            "explicitMods": [
+                "13% reduced Enemy Stun Threshold", "+3 to maximum Energy Shield", "+37% to Fire Resistance",
+                "+8% to Chaos Resistance"
+            ],
+            "frameType": 2,
+            "category": { "accessories": ["belt"] },
+            "x": 9,
+            "y": 15,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 2,
+            "h": 1,
+            "ilvl": 74,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Belts\/AbyssBelt.png?scale=1&scaleIndex=1&w=2&h=1&v=cd7c25de181e6a77812020eb6e8679713",
+            "league": "Hardcore Abyss",
+            "id": "26451c9040aa20eddb4cbe73b1b1a13455bd6a7512315ce00b369939447209d7",
+            "sockets": [{ "group": 0, "attr": false, "sColour": "A" }],
+            "name": "<<set:MS>><<set:M>><<set:S>>Rune Bond",
+            "typeLine": "Stygian Vise",
+            "identified": true,
+            "requirements": [{ "name": "Level", "values": [["35", 0]], "displayMode": 0 }],
+            "implicitMods": ["Has 1 Abyssal Socket"],
+            "explicitMods": [
+                "7% reduced Enemy Stun Threshold", "+111 to Armour", "+13 to maximum Energy Shield",
+                "12% increased Flask Charges gained"
+            ],
+            "frameType": 2,
+            "category": { "accessories": ["belt"] },
+            "x": 1,
+            "y": 0,
+            "inventoryId": "Stash1",
+            "socketedItems": []
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 73,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Rings\/Ring5.png?scale=1&scaleIndex=1&w=1&h=1&v=d645f9adfc012c52674c94d16b4292b23",
+            "league": "Hardcore Abyss",
+            "id": "8cecae7d4fa7da9d5174168e35fab5acbe16863a29119254434545370a28c4ed",
+            "name": "<<set:MS>><<set:M>><<set:S>>Ghoul Eye",
+            "typeLine": "Topaz Ring",
+            "identified": true,
+            "requirements": [{ "name": "Level", "values": [["20", 0]], "displayMode": 0 }],
+            "implicitMods": ["+27% to Lightning Resistance"],
+            "explicitMods": [
+                "+13 to Strength", "Adds 1 to 5 Lightning Damage to Attacks", "6% increased Rarity of Items found",
+                "+18% to Lightning Resistance"
+            ],
+            "frameType": 2,
+            "category": { "accessories": ["ring"] },
+            "x": 6,
+            "y": 12,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 74,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Rings\/BreachRing.png?scale=1&scaleIndex=1&w=1&h=1&v=b033df55e6cc9cd0403d5ecd5e91d5a03",
+            "league": "Hardcore Abyss",
+            "id": "6000c7488f1d0e10cedf4220833caf76f1bdb491b5a5383892709e734eed43df",
+            "name": "<<set:MS>><<set:M>><<set:S>>Pain Whorl",
+            "typeLine": "Breach Ring",
+            "identified": true,
+            "corrupted": true,
+            "requirements": [{ "name": "Level", "values": [["48", 0]], "displayMode": 0 }],
+            "implicitMods": ["Properties are doubled while in a Breach"],
+            "explicitMods": [
+                "+84 to Evasion Rating", "+17 to maximum Energy Shield", "+36 to maximum Mana",
+                "+11% to all Elemental Resistances", "+40% to Lightning Resistance", "+11 Life gained on Kill"
+            ],
+            "frameType": 2,
+            "category": { "accessories": ["ring"] },
+            "x": 14,
+            "y": 10,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 73,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Rings\/Ring4.png?scale=1&scaleIndex=1&w=1&h=1&v=6ef89e2afcf83dc3cc86b1522597ed2b3",
+            "league": "Hardcore Abyss",
+            "id": "7cb079dfa8b1c7e5e8649ef4849dd62ebe76f5fa734946928f671639e228a501",
+            "name": "<<set:MS>><<set:M>><<set:S>>Spirit Grasp",
+            "typeLine": "Gold Ring",
+            "identified": true,
+            "requirements": [{ "name": "Level", "values": [["48", 0]], "displayMode": 0 }],
+            "implicitMods": ["14% increased Rarity of Items found"],
+            "explicitMods": [
+                "+33 to Intelligence", "+69 to maximum Life", "+39 to maximum Mana", "+36% to Cold Resistance"
+            ],
+            "frameType": 2,
+            "category": { "accessories": ["ring"] },
+            "x": 0,
+            "y": 0,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 71,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Rings\/Ring4.png?scale=1&scaleIndex=1&w=1&h=1&v=6ef89e2afcf83dc3cc86b1522597ed2b3",
+            "league": "Hardcore Abyss",
+            "id": "1f9aac7a74c999db8b1e7b47c019c59fc056a9a002c15d1da9a087db855fc491",
+            "name": "<<set:MS>><<set:M>><<set:S>>Brood Whorl",
+            "typeLine": "Gold Ring",
+            "identified": true,
+            "requirements": [{ "name": "Level", "values": [["44", 0]], "displayMode": 0 }],
+            "implicitMods": ["6% increased Rarity of Items found"],
+            "explicitMods": [
+                "+36 to Intelligence", "Adds 11 to 23 Fire Damage to Attacks", "+185 to Accuracy Rating",
+                "+50 to maximum Mana", "+9% to Lightning Resistance"
+            ],
+            "frameType": 2,
+            "category": { "accessories": ["ring"] },
+            "x": 1,
+            "y": 15,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 2,
+            "h": 2,
+            "ilvl": 75,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Armours\/Boots\/BootsDex4.png?scale=1&scaleIndex=1&w=2&h=2&v=62a68c142ba5a605dcf6b6603bf0ab0c3",
+            "league": "Hardcore Abyss",
+            "id": "d0bdbd9c829b3d1c08e499e2435513f7038bf9c6bc36182168d62ad8fa155e6c",
+            "sockets": [{ "group": 0, "attr": "D", "sColour": "G" }],
+            "name": "<<set:MS>><<set:M>><<set:S>>Chimeric Track",
+            "typeLine": "Shagreen Boots",
+            "identified": true,
+            "properties": [{ "name": "Evasion Rating", "values": [["254", 1]], "displayMode": 0, "type": 17 }],
+            "requirements":
+            [
+                { "name": "Level", "values": [["57", 0]], "displayMode": 0 },
+                { "name": "Dex", "values": [["97", 0]], "displayMode": 1 }
+            ],
+            "explicitMods": [
+                "+3 to Evasion Rating", "39% increased Evasion Rating", "+42% to Fire Resistance",
+                "+26% to Lightning Resistance"
+            ],
+            "frameType": 2,
+            "category": { "armour": ["boots"] },
+            "x": 10,
+            "y": 19,
+            "inventoryId": "Stash1",
+            "socketedItems": []
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 3,
+            "ilvl": 74,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Weapons\/OneHandWeapons\/Wands\/Wand3.png?scale=1&scaleIndex=1&w=1&h=3&v=ac9f7eee09f5a8f580151298712f2a9e3",
+            "league": "Hardcore Abyss",
+            "id": "8f9f1c83e69be0c25dadcf9d14e419b6232167182059e2d6678b91fdc99fd398",
+            "sockets": [{ "group": 0, "attr": "I", "sColour": "B" }, { "group": 0, "attr": "I", "sColour": "B" }],
+            "name": "<<set:MS>><<set:M>><<set:S>>Skull Thirst",
+            "typeLine": "Imbued Wand",
+            "identified": true,
+            "properties":
+            [
+                { "name": "Wand", "values": [], "displayMode": 0 },
+                { "name": "Physical Damage", "values": [["24-44", 0]], "displayMode": 0, "type": 9 },
+                { "name": "Elemental Damage", "values": [["2-4", 4]], "displayMode": 0, "type": 10 },
+                { "name": "Critical Strike Chance", "values": [["7.00%", 0]], "displayMode": 0, "type": 12 },
+                { "name": "Attacks per Second", "values": [["1.50", 0]], "displayMode": 0, "type": 13 }
+            ],
+            "requirements":
+            [
+                { "name": "Level", "values": [["59", 0]], "displayMode": 0 },
+                { "name": "Int", "values": [["188", 0]], "displayMode": 1 }
+            ],
+            "implicitMods": ["36% increased Spell Damage"],
+            "explicitMods": [
+                "10% increased Spell Damage", "Adds 2 to 4 Fire Damage", "29% increased Lightning Damage",
+                "+13 to maximum Mana", "44% increased Mana Regeneration Rate", "+10 Life gained on Kill",
+                "15% increased Stun Duration on Enemies"
+            ],
+            "frameType": 2,
+            "category": { "weapons": ["wand"] },
+            "x": 13,
+            "y": 4,
+            "inventoryId": "Stash1",
+            "socketedItems": []
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 72,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Rings\/AmethystRing.png?scale=1&scaleIndex=1&w=1&h=1&v=e6f04837a3bb2bab63f8f06522bff3923",
+            "league": "Hardcore Abyss",
+            "id": "1f11c517c2bc9380592e5dbb50e7dd72943391d07a8c71a30e53d6909e5ec922",
+            "name": "<<set:MS>><<set:M>><<set:S>>Entropy Finger",
+            "typeLine": "Amethyst Ring",
+            "identified": true,
+            "requirements": [{ "name": "Level", "values": [["42", 0]], "displayMode": 0 }],
+            "implicitMods": ["+9% to Chaos Resistance"],
+            "explicitMods": [
+                "Adds 3 to 5 Physical Damage to Attacks", "+15 to Strength", "+22 to Dexterity",
+                "Adds 4 to 42 Lightning Damage to Attacks", "+20 to maximum Energy Shield",
+                "20% increased Rarity of Items found"
+            ],
+            "frameType": 2,
+            "category": { "accessories": ["ring"] },
+            "x": 2,
+            "y": 8,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 70,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Rings\/DiamondRing.png?scale=1&scaleIndex=1&w=1&h=1&v=d53fabd123b7c64d59ffe8a6baf7d7783",
+            "league": "Hardcore Abyss",
+            "id": "c364b85ab677c3f4e3137b0b892e2082692403bca20f02a54753f8b60c66c930",
+            "name": "<<set:MS>><<set:M>><<set:S>>Rune Finger",
+            "typeLine": "Diamond Ring",
+            "identified": true,
+            "requirements": [{ "name": "Level", "values": [["52", 0]], "displayMode": 0 }],
+            "implicitMods": ["28% increased Global Critical Strike Chance"],
+            "explicitMods": [
+                "+40 to Dexterity", "12% increased Lightning Damage", "+3 to maximum Life", "+47 to maximum Mana"
+            ],
+            "frameType": 2,
+            "category": { "accessories": ["ring"] },
+            "x": 2,
+            "y": 19,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 2,
+            "h": 1,
+            "ilvl": 73,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Belts\/AbyssBelt.png?scale=1&scaleIndex=1&w=2&h=1&v=cd7c25de181e6a77812020eb6e8679713",
+            "league": "Hardcore Abyss",
+            "id": "bbd63bcc96749483b273e10186dc5edccf9e98ebef80aa62d83e79d54de18f07",
+            "sockets": [{ "group": 0, "attr": false, "sColour": "A" }],
+            "name": "<<set:MS>><<set:M>><<set:S>>Vortex Clasp",
+            "typeLine": "Stygian Vise",
+            "identified": true,
+            "requirements": [{ "name": "Level", "values": [["35", 0]], "displayMode": 0 }],
+            "implicitMods": ["Has 1 Abyssal Socket"],
+            "explicitMods": [
+                "+121 to Armour", "+69 to maximum Life", "7.2 Life Regenerated per second", "+26% to Cold Resistance"
+            ],
+            "frameType": 2,
+            "category": { "accessories": ["belt"] },
+            "x": 7,
+            "y": 23,
+            "inventoryId": "Stash1",
+            "socketedItems": []
+        },
+        {
+            "verified": false,
+            "w": 2,
+            "h": 1,
+            "ilvl": 72,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Belts\/Belt4.png?scale=1&scaleIndex=1&w=2&h=1&v=da282d3a3d76fc0d14b882450c3ed2ae3",
+            "league": "Hardcore Abyss",
+            "id": "ef1f0bf908619a14beabdd0f1f930b7897e010a050b3b4d6a2b49097d6d02f9f",
+            "name": "<<set:MS>><<set:M>><<set:S>>Brimstone Locket",
+            "typeLine": "Cloth Belt",
+            "identified": true,
+            "requirements": [{ "name": "Level", "values": [["48", 0]], "displayMode": 0 }],
+            "implicitMods": ["25% increased Stun and Block Recovery"],
+            "explicitMods": [
+                "+24 to maximum Energy Shield", "+75 to maximum Life", "+39% to Cold Resistance",
+                "23% increased Stun and Block Recovery"
+            ],
+            "frameType": 2,
+            "category": { "accessories": ["belt"] },
+            "x": 2,
+            "y": 13,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 4,
+            "ilvl": 73,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Weapons\/OneHandWeapons\/Rapiers\/Rapier7.png?scale=1&scaleIndex=1&w=1&h=4&v=d4a9ff1bbae62362d78bc8d5a44844463",
+            "league": "Hardcore Abyss",
+            "id": "f3c32db66d6e3311110827529f445bd488e9bd7f7913e13eee9aab74ee5ebff1",
+            "sockets": [{ "group": 0, "attr": "D", "sColour": "G" }, { "group": 0, "attr": "S", "sColour": "R" }],
+            "name": "<<set:MS>><<set:M>><<set:S>>Doom Bane",
+            "typeLine": "Fancy Foil",
+            "identified": true,
+            "properties":
+            [
+                { "name": "One Handed Sword", "values": [], "displayMode": 0 },
+                { "name": "Physical Damage", "values": [["50-92", 1]], "displayMode": 0, "type": 9 },
+                { "name": "Elemental Damage", "values": [["1-28", 6]], "displayMode": 0, "type": 10 },
+                { "name": "Critical Strike Chance", "values": [["5.50%", 0]], "displayMode": 0, "type": 12 },
+                { "name": "Attacks per Second", "values": [["1.60", 0]], "displayMode": 0, "type": 13 },
+                { "name": "Weapon Range", "values": [["12", 0]], "displayMode": 0, "type": 14 }
+            ],
+            "requirements":
+            [
+                { "name": "Level", "values": [["52", 0]], "displayMode": 0 },
+                { "name": "Dex", "values": [["167", 0]], "displayMode": 1 }
+            ],
+            "implicitMods": ["+25% to Global Critical Strike Multiplier"],
+            "explicitMods": [
+                "80% increased Physical Damage", "+9 to Strength", "Adds 1 to 28 Lightning Damage",
+                "23% increased Damage with Poison"
+            ],
+            "frameType": 2,
+            "category": { "weapons": ["onesword"] },
+            "x": 14,
+            "y": 4,
+            "inventoryId": "Stash1",
+            "socketedItems": []
+        },
+        {
+            "verified": false,
+            "w": 2,
+            "h": 3,
+            "ilvl": 73,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Weapons\/OneHandWeapons\/OneHandAxes\/OneHandAxe3.png?scale=1&scaleIndex=1&w=2&h=3&v=b2537cc31a2470a434ee7c8488ed758e3",
+            "league": "Hardcore Abyss",
+            "id": "1db095af898747d4ff176d9f69d7cf319fdfa16c57f87756cbf5cde356ca1258",
+            "sockets":
+            [
+                { "group": 0, "attr": "D", "sColour": "G" }, { "group": 0, "attr": "S", "sColour": "R" },
+                { "group": 1, "attr": "S", "sColour": "R" }
+            ],
+            "name": "<<set:MS>><<set:M>><<set:S>>Entropy Rend",
+            "typeLine": "Siege Axe",
+            "identified": true,
+            "properties":
+            [
+                { "name": "One Handed Axe", "values": [], "displayMode": 0 },
+                { "name": "Physical Damage", "values": [["102-180", 1]], "displayMode": 0, "type": 9 },
+                { "name": "Elemental Damage", "values": [["4-138", 6]], "displayMode": 0, "type": 10 },
+                { "name": "Critical Strike Chance", "values": [["5.00%", 0]], "displayMode": 0, "type": 12 },
+                { "name": "Attacks per Second", "values": [["1.50", 0]], "displayMode": 0, "type": 13 },
+                { "name": "Weapon Range", "values": [["9", 0]], "displayMode": 0, "type": 14 }
+            ],
+            "requirements": [
+                { "name": "Level", "values": [["59", 0]], "displayMode": 0 },
+                { "name": "Str", "values": [["119", 0]], "displayMode": 1 },
+                { "name": "Dex", "values": [["82", 0]], "displayMode": 1 }
+            ],
+            "explicitMods": [
+                "67% increased Physical Damage", "Adds 23 to 38 Physical Damage", "Adds 4 to 138 Lightning Damage",
+                "+7% to Chaos Resistance"
+            ],
+            "frameType": 2,
+            "category": { "weapons": ["oneaxe"] },
+            "x": 0,
+            "y": 5,
+            "inventoryId": "Stash1",
+            "socketedItems": []
+        },
+        {
+            "verified": false,
+            "w": 2,
+            "h": 2,
+            "ilvl": 74,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Armours\/Helmets\/HelmetDex9.png?scale=1&scaleIndex=1&w=2&h=2&v=e6a9c07a19f574356cad3d7fc75066413",
+            "league": "Hardcore Abyss",
+            "id": "5840c253346ecd5673cb993a6cee6e724c6a75d0f0835b5ef4dc9343610a471e",
+            "sockets": [{ "group": 0, "attr": "D", "sColour": "G" }, { "group": 1, "attr": "D", "sColour": "G" }],
+            "name": "<<set:MS>><<set:M>><<set:S>>Mind Ward",
+            "typeLine": "Sinner Tricorne",
+            "identified": true,
+            "properties": [{ "name": "Evasion Rating", "values": [["428", 1]], "displayMode": 0, "type": 17 }],
+            "requirements":
+            [
+                { "name": "Level", "values": [["64", 0]], "displayMode": 0 },
+                { "name": "Dex", "values": [["93", 1]], "displayMode": 1 }
+            ],
+            "explicitMods": [
+                "16% increased Evasion Rating", "17% increased Rarity of Items found", "+7% to Fire Resistance",
+                "8% increased Stun and Block Recovery", "32% reduced Attribute Requirements"
+            ],
+            "frameType": 2,
+            "category": { "armour": ["helmet"] },
+            "x": 5,
+            "y": 5,
+            "inventoryId": "Stash1",
+            "socketedItems": []
+        },
+        {
+            "verified": false,
+            "w": 2,
+            "h": 2,
+            "ilvl": 73,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Armours\/Boots\/BootsDex3.png?scale=1&scaleIndex=1&w=2&h=2&v=597ff9da61bbd5547ef2b10d25b8e9093",
+            "league": "Hardcore Abyss",
+            "id": "0c5bbad42680b021d6185922c9be216f688c6497e10fe8d197a5469c0c10ec98",
+            "sockets": [{ "group": 0, "attr": "D", "sColour": "G" }],
+            "name": "<<set:MS>><<set:M>><<set:S>>Wrath Slippers",
+            "typeLine": "Stealth Boots",
+            "identified": true,
+            "properties": [{ "name": "Evasion Rating", "values": [["286", 1]], "displayMode": 0, "type": 17 }],
+            "requirements":
+            [
+                { "name": "Level", "values": [["62", 0]], "displayMode": 0 },
+                { "name": "Dex", "values": [["117", 0]], "displayMode": 1 }
+            ],
+            "explicitMods": [
+                "30% increased Evasion Rating", "+73 to maximum Life", "+29% to Cold Resistance",
+                "+22% to Lightning Resistance"
+            ],
+            "frameType": 2,
+            "category": { "armour": ["boots"] },
+            "x": 5,
+            "y": 14,
+            "inventoryId": "Stash1",
+            "socketedItems": []
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 73,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Rings\/BreachRing.png?scale=1&scaleIndex=1&w=1&h=1&v=b033df55e6cc9cd0403d5ecd5e91d5a03",
+            "league": "Hardcore Abyss",
+            "id": "cd9179015089369de0c33757f6aa51e572f832f21d26e1ce40528088a1ece1b7",
+            "name": "<<set:MS>><<set:M>><<set:S>>Dusk Twirl",
+            "typeLine": "Breach Ring",
+            "identified": true,
+            "corrupted": true,
+            "requirements": [{ "name": "Level", "values": [["47", 0]], "displayMode": 0 }],
+            "implicitMods": ["Properties are doubled while in a Breach"],
+            "explicitMods": [
+                "Adds 8 to 15 Cold Damage to Attacks", "+95 to Accuracy Rating", "+16 to maximum Energy Shield",
+                "12.4 Life Regenerated per second", "+18 to maximum Mana", "41% increased Mana Regeneration Rate"
+            ],
+            "frameType": 2,
+            "category": { "accessories": ["ring"] },
+            "x": 9,
+            "y": 13,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 1,
+            "ilvl": 74,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Rings\/Ring4.png?scale=1&scaleIndex=1&w=1&h=1&v=6ef89e2afcf83dc3cc86b1522597ed2b3",
+            "league": "Hardcore Abyss",
+            "id": "2b74b99f573ee1a40caa81b67c740909934fb77f5d5194c72f4dc90875ea91e0",
+            "name": "<<set:MS>><<set:M>><<set:S>>Honour Coil",
+            "typeLine": "Gold Ring",
+            "identified": true,
+            "requirements": [{ "name": "Level", "values": [["59", 0]], "displayMode": 0 }],
+            "implicitMods": ["14% increased Rarity of Items found"],
+            "explicitMods": [
+                "+43 to Strength", "Adds 9 to 21 Fire Damage to Attacks", "+315 to Accuracy Rating",
+                "+45 to maximum Energy Shield", "+55 to maximum Life"
+            ],
+            "frameType": 2,
+            "category": { "accessories": ["ring"] },
+            "x": 13,
+            "y": 19,
+            "inventoryId": "Stash1"
+        },
+        {
+            "verified": false,
+            "w": 1,
+            "h": 3,
+            "ilvl": 3,
+            "icon":
+                "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Weapons\/OneHandWeapons\/Wands\/Wand1.png?scale=1&scaleIndex=1&w=1&h=3&v=29d882fad76634e6d9feda1b35808e0b3",
+            "league": "Hardcore Abyss",
+            "id": "aeb9a90769f13e0bf76aab35d2124894f80dbacca21547896e24f6c4573b19c2",
+            "sockets":
+            [
+                { "group": 0, "attr": "I", "sColour": "B" }, { "group": 0, "attr": "I", "sColour": "B" },
+                { "group": 0, "attr": "I", "sColour": "B" }
+            ],
+            "name": "",
+            "typeLine": "<<set:MS>><<set:M>><<set:S>>Flame Spinner's Driftwood Wand",
+            "identified": true,
+            "properties":
+            [
+                { "name": "Wand", "values": [], "displayMode": 0 },
+                { "name": "Physical Damage", "values": [["4-8", 0]], "displayMode": 0, "type": 9 },
+                { "name": "Critical Strike Chance", "values": [["7.00%", 0]], "displayMode": 0, "type": 12 },
+                { "name": "Attacks per Second", "values": [["1.40", 0]], "displayMode": 0, "type": 13 }
+            ],
+            "requirements":
+            [
+                { "name": "Level", "values": [["21", 0]], "displayMode": 0 },
+                { "name": "Int", "values": [["48", 0]], "displayMode": 1 }
+            ],
+            "implicitMods": ["12% increased Spell Damage"],
+            "explicitMods": ["+1 to Level of Socketed Fire Gems"],
+            "frameType": 1,
+            "category": { "weapons": ["wand"] },
+            "x": 23,
+            "y": 21,
+            "inventoryId": "Stash1",
+            "socketedItems": [
+                {
+                    "verified": false,
+                    "w": 1,
+                    "h": 1,
+                    "ilvl": 0,
+                    "icon":
+                        "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Gems\/Firestorm.png?scale=1&scaleIndex=1&w=1&h=1&v=13b72cb8c30f7622b09dd6fbfb15da963",
+                    "support": false,
+                    "id": "1cf4d76a47625a7c8e77ccff7fb3bf468498cbfe25a735195b796667d9404822",
+                    "name": "",
+                    "typeLine": "Firestorm",
+                    "identified": true,
+                    "properties":
+                    [
+                        { "name": "Spell, AoE, Duration, Fire", "values": [], "displayMode": 0 },
+                        { "name": "Level", "values": [["3", 0]], "displayMode": 0, "type": 5 },
+                        { "name": "Mana Cost", "values": [["11", 0]], "displayMode": 0 },
+                        { "name": "Cast Time", "values": [["0.90 sec", 0]], "displayMode": 0 },
+                        { "name": "Critical Strike Chance", "values": [["6.00%", 0]], "displayMode": 0 },
+                        { "name": "Effectiveness of Added Damage", "values": [["30%", 0]], "displayMode": 0 }
+                    ],
+                    "additionalProperties":
+                    [
+                        {
+                            "name": "Experience",
+                            "values": [["55636\/81983", 0]],
+                            "displayMode": 2,
+                            "progress": 0.6786285042762756
+                        }
+                    ],
+                    "requirements":
+                    [
+                        { "name": "Level", "values": [["19", 0]], "displayMode": 0 },
+                        { "name": "Int", "values": [["48", 0]], "displayMode": 1 }
+                    ],
+                    "secDescrText":
+                        "Flaming bolts rain down over the targeted area. They explode when landing, dealing damage to nearby enemies.",
+                    "explicitMods":
+                    [
+                        "Deals 11 to 17 Fire Damage", "Base duration is 2.00 seconds", "One impact every 0.10 seconds"
+                    ],
+                    "descrText":
+                        "Place into an item socket of the right colour to gain this skill. Right click to remove from a socket.",
+                    "frameType": 4,
+                    "category": "gems",
+                    "socket": 0,
+                    "colour": "I"
+                },
+                {
+                    "verified": false,
+                    "w": 1,
+                    "h": 1,
+                    "ilvl": 0,
+                    "icon":
+                        "https:\/\/web.poecdn.com\/image\/Art\/2DItems\/Gems\/Support\/AddedLightningDamage.png?scale=1&scaleIndex=1&w=1&h=1&v=9228c011d886459c66e66caa1d3e6fb13",
+                    "support": true,
+                    "id": "8cc03ae869df1674f01733d3be1ed900e8bd4b5a858bdd40e9ab068ce414e38b",
+                    "name": "",
+                    "typeLine": "Added Lightning Damage Support",
+                    "identified": true,
+                    "properties":
+                    [
+                        { "name": "Lightning, Support", "values": [], "displayMode": 0 },
+                        { "name": "Level", "values": [["5", 0]], "displayMode": 0, "type": 5 },
+                        { "name": "Mana Multiplier", "values": [["130%", 0]], "displayMode": 0 }
+                    ],
+                    "additionalProperties":
+                    [
+                        {
+                            "name": "Experience",
+                            "values": [["17993\/111192", 0]],
+                            "displayMode": 2,
+                            "progress": 0.161819189786911
+                        }
+                    ],
+                    "requirements":
+                    [
+                        { "name": "Level", "values": [["21", 0]], "displayMode": 0 },
+                        { "name": "Int", "values": [["37", 0]], "displayMode": 1 }
+                    ],
+                    "secDescrText": "Supports any skill that hits enemies.",
+                    "explicitMods": ["Supported Skills have 1 to 24 added Lightning Damage"],
+                    "descrText":
+                        "This is a Support Gem. It does not grant a bonus to your character, but to skills in sockets connected to it. Place into an item socket connected to a socket containing the Active Skill Gem you wish to augment. Right click to remove from a socket.",
+                    "frameType": 4,
+                    "category": "gems",
+                    "socket": 1,
+                    "colour": "I"
+                }
+            ]
+        }
+    ],
+    "quadLayout": true
+}
