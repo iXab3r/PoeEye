@@ -5,6 +5,8 @@ namespace PoeShared.Common
     public struct PoePrice : IComparable
     {
         public static readonly PoePrice Empty = new PoePrice(KnownCurrencyNameList.Unknown, 0f);
+        
+        public static readonly PoePrice ChaosOrb = new PoePrice(KnownCurrencyNameList.ChaosOrb, 0f);
 
         public PoePrice(string currencyType, float value)
         {
@@ -25,6 +27,11 @@ namespace PoeShared.Common
         public string Price { get; }
 
         public bool IsEmpty => Empty.Equals(this);
+
+        public PoePrice SetValue(float value)
+        {
+            return new PoePrice(currencyType: CurrencyType, value: value);
+        }
 
         public override string ToString()
         {

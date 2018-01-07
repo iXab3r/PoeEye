@@ -1,4 +1,5 @@
-﻿using JetBrains.Annotations;
+﻿using System.Threading.Tasks;
+using JetBrains.Annotations;
 using PoeShared.StashApi.DataTypes;
 
 namespace PoeShared.StashApi
@@ -14,17 +15,31 @@ namespace PoeShared.StashApi
         bool IsAuthenticated { get; }
 
         void Authenticate();
-
+        
+        Task AuthenticateAsync();
+        
         [NotNull] 
         ICharacter[] GetCharacters();
 
         [NotNull] 
+        Task<ICharacter[]> GetCharactersAsync();
+
+        [NotNull] 
         IInventory GetInventory(string characterName);
+        
+        [NotNull] 
+        Task<IInventory> GetInventoryAsync(string characterName);
 
         [NotNull] 
         IStash GetStash(int index, string league);
+        
+        [NotNull] 
+        Task<IStash> GetStashAsync(int stashIdx, string league);
 
         [NotNull] 
         ILeague[] GetLeagues();
+        
+        [NotNull] 
+        Task<ILeague[]> GetLeaguesAsync();
     }
 }

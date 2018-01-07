@@ -274,6 +274,7 @@
     <Compile Include="Native\IActivationController.cs" />
     <Compile Include="Native\IKeyboardEventsSource.cs" />
     <Compile Include="Native\SafeKeyboardMouseEvents.cs" />
+    <Compile Include="PoeDatabase\IPoeEconomicsSource.cs" />
     <Compile Include="PoeTrade\IPoeItemViewModelFactory.cs" />
     <Compile Include="PoeTrade\IPoePriceCalculcator.cs" />
     <Compile Include="PoeTrade\IPoeStaticDataSource.cs" />
@@ -284,6 +285,7 @@
     <Compile Include="Scaffolding\ReactiveObjectExtensions.cs" />
     <Compile Include="Scaffolding\StreamExtensions.cs" />
     <Compile Include="Scaffolding\WPF\AccessKeyScoper.cs" />
+    <Compile Include="Scaffolding\WPF\CommandWrapper.cs" />
     <Compile Include="Scaffolding\WPF\EnableDragHelper.cs" />
     <Compile Include="Scaffolding\WPF\InputBindingsManager.cs" />
     <Compile Include="Scaffolding\WPF\MappingTemplateSelector.cs" />
@@ -1197,6 +1199,11 @@
     <None Include="Resources\Currencies\Yriels_Key.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Resources\Currencies\Orb_of_Annulment_inventory_icon.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

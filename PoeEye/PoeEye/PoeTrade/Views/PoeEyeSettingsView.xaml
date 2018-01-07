@@ -6,26 +6,37 @@
                     xmlns:viewModels="clr-namespace:PoeEye.PoeTrade.ViewModels"
                     xmlns:modularity="clr-namespace:PoeShared.Modularity;assembly=PoeShared">
   <DataTemplate DataType="{x:Type viewModels:PoeEyeSettingsViewModel}">
-    <ScrollViewer>
-      <ItemsControl ItemsSource="{Binding ModulesSettings}" Focusable="False">
-        <ItemsControl.ItemTemplate>
-          <DataTemplate DataType="{x:Type modularity:ISettingsViewModel}">
-            <Expander
-              BorderBrush="{StaticResource AccentColorBrush}"
-              BorderThickness="2, 0, 0, 0"
-              Focusable="False"
-              IsTabStop="False"
-              Margin="10, 5, 5 ,5">
-              <Expander.Header>
-                <Label Content="{Binding ModuleName}" Style="{StaticResource IconLabel}" VerticalAlignment="Center" />
-              </Expander.Header>
-              <Border>
-                <ContentPresenter Content="{Binding}" />
-              </Border>
-            </Expander>
-          </DataTemplate>
-        </ItemsControl.ItemTemplate>
-      </ItemsControl>
-    </ScrollViewer>
+    <DockPanel LastChildFill="True">
+        <Border DockPanel.Dock="Bottom" Margin="10,0" BorderBrush="{StaticResource MaterialDesignTextBoxBorder}" BorderThickness="0,2,0,0">
+            <DockPanel>
+                <Button DockPanel.Dock="Right" Margin="5,5" Width="120" Height="22" Content="Cancel" HorizontalAlignment="Right"
+                        Command="{Binding CancelCommand}"/>
+                <Button DockPanel.Dock="Left" Margin="5,5" Width="160" Height="22" Content="Save" HorizontalAlignment="Left"
+                        Command="{Binding SaveConfigCommand}"/>
+            </DockPanel>
+        </Border>
+        
+        <ScrollViewer DockPanel.Dock="Top">
+            <ItemsControl ItemsSource="{Binding ModulesSettings}" Focusable="False">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="{x:Type modularity:ISettingsViewModel}">
+                        <Expander
+                            BorderBrush="{StaticResource AccentColorBrush}"
+                            BorderThickness="0"
+                            Focusable="False"
+                            IsTabStop="False"
+                            Margin="0, 5">
+                            <Expander.Header>
+                                <Label Content="{Binding ModuleName}" Style="{StaticResource IconLabel}" VerticalAlignment="Center" />
+                            </Expander.Header>
+                            <Border>
+                                <ContentPresenter Content="{Binding}" />
+                            </Border>
+                        </Expander>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </DockPanel>
   </DataTemplate>
 </ResourceDictionary>

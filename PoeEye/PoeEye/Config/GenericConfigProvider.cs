@@ -16,7 +16,7 @@ namespace PoeEye.Config
     internal sealed class GenericConfigProvider<TConfig> : DisposableReactiveObject, IConfigProvider<TConfig> where TConfig : class, IPoeEyeConfig, new()
     {
         private readonly IConfigProvider configProvider;
-        private Lazy<TConfig> configLoader;
+        private TConfig actualConfig;
 
         public GenericConfigProvider([NotNull] IConfigProvider configProvider)
         {
@@ -29,7 +29,7 @@ namespace PoeEye.Config
                 .AddTo(Anchors);
 
             //FIXME Use ReplaySubject for propagating active config
-            WhenChanged = this
+            var changes = this
                 .WhenAnyValue(x => x.ActualConfig)
                 .WithPrevious((prev, curr) => new { prev, curr })
                 .Select(x => new { Config = x.curr, PreviousConfig = x.prev, ComparisonResult = Compare(x.curr, x.prev) })
@@ -42,18 +42,27 @@ namespace PoeEye.Config
                             LogConfigChange(x.Config, x.ComparisonResult);
                         }
                     })
-                .Select(x => x.Config); ;
+                .Select(x => x.Config)
+                .Replay(1);
+
+            WhenChanged = changes;
+            changes.Connect().AddTo(Anchors);
         }
 
-        public TConfig ActualConfig => configLoader.Value;
+        public TConfig ActualConfig
+        {
+            get { return actualConfig; }
+            private set { this.RaiseAndSetIfChanged(ref actualConfig, value); }
+        }
 
         public IObservable<TConfig> WhenChanged { get; }
 
         public IObservable<T> ListenTo<T>(Expression<Func<TConfig, T>> fieldToMonitor)
         {
+            var functor = fieldToMonitor.Compile();
             return
-                this.WhenAnyValue(x => x.ActualConfig)
-                    .Select(config => fieldToMonitor.Compile().Invoke(config))
+                this.WhenChanged
+                    .Select(config => functor(config))
                     .DistinctUntilChanged();
         }
 
@@ -85,8 +94,7 @@ namespace PoeEye.Config
 
         private void ReloadInternal()
         {
-            configLoader = new Lazy<TConfig>(() => configProvider.GetActualConfig<TConfig>());
-            this.RaisePropertyChanged(nameof(ActualConfig));
+            ActualConfig = configProvider.GetActualConfig<TConfig>();
         }
     }
 }

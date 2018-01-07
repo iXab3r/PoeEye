@@ -152,6 +152,8 @@ namespace PoeEye.PoeTrade.ViewModels
         {
             get { return TradesList.Items.Count(x => x.TradeState == PoeTradeState.Normal); }
         }
+        
+        public string Id { get; }
 
         public IPoeApiWrapper SelectedApi => ApiSelector.SelectedModule;
 
@@ -411,6 +413,9 @@ namespace PoeEye.PoeTrade.ViewModels
             }
         }
 
-        public string Id { get; }
+        public override string ToString()
+        {
+            return $"{Id} TabName: {TabName}";
+        }
     }
 }

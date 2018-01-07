@@ -58,7 +58,7 @@ namespace PoeEye.TradeMonitor.Services
 
             Observable.CombineLatest(
                     tradeMonitorConfigProvider.WhenChanged, 
-                    poeBudConfigProvider.WhenAnyValue(x => x.ActualConfig), 
+                    poeBudConfigProvider.WhenChanged, 
                     (tradeMonitorConfig, poeBudConfig) => new {PoeBudConfig = poeBudConfig, TradeMonitorConfig = tradeMonitorConfig})
                 .Subscribe(x => ApplyConfig(x.PoeBudConfig, x.TradeMonitorConfig))
                 .AddTo(Anchors);

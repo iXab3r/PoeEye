@@ -157,6 +157,8 @@ namespace PoeBud.ViewModels
         
         private void ApplyConfig(PoeBudConfig config)
         {
+            Log.Instance.Debug($"[PoeBudViewModel] Applying new config...");
+
             actualConfig = config;
             HideXpBar = config.HideXpBar;
             IsEnabled = actualConfig.IsEnabled;
@@ -172,7 +174,7 @@ namespace PoeBud.ViewModels
 
             try
             {
-                Log.Instance.Info($"[MainViewModel] Reinitializing PoeBud...");
+                Log.Instance.Info($"[PoeBudViewModel] Reinitializing PoeBud...");
                 stashUpdaterDisposable.Disposable = null;
                 StashUpdater = null;
                 Stash = null;
@@ -180,13 +182,13 @@ namespace PoeBud.ViewModels
 
                 if (string.IsNullOrEmpty(config.LoginEmail) || string.IsNullOrEmpty(config.SessionId))
                 {
-                    Log.Instance.Warn($"[MainViewModel] Credentials are not set, userName: {config.LoginEmail}, sessionId: {config.SessionId}");
+                    Log.Instance.Warn($"[PoeBudViewModel] Credentials are not set, userName: {config.LoginEmail}, sessionId: {config.SessionId}");
                     return;
                 }
 
                 if (!config.IsEnabled)
                 {
-                    Log.Instance.Debug($"[MainViewModel] PoeBud is disabled, terminating...");
+                    Log.Instance.Debug($"[PoeBudViewModel] PoeBud is disabled, terminating...");
                     return;
                 }
 
@@ -265,10 +267,10 @@ namespace PoeBud.ViewModels
         {
             if (lastServerStashUpdate != null && lastServerStashUpdate.DumpToText() == stashUpdate.DumpToText())
             {
-                Log.Instance.Debug($"[MainViewModel] Duplicate update arrived, skipping update");
+                Log.Instance.Debug($"[PoeBudViewModel] Duplicate update arrived, skipping update");
                 return;
             }
-            LogTo.Debug($"[MainViewModel] Stash update arrived, tabs: {stashUpdate.Tabs.Count()}, items: {stashUpdate.Items.Count()}");
+            LogTo.Debug($"[PoeBudViewModel] Stash update arrived, tabs: {stashUpdate.Tabs.Count()}, items: {stashUpdate.Items.Count()}");
 
             lastServerStashUpdate = stashUpdate;
             Stash = stashUpdateFactory.Create(stashUpdate, config);
@@ -278,7 +280,7 @@ namespace PoeBud.ViewModels
         {
             try
             {
-                Log.Instance.Debug($"[MainViewModel] Force refresh requested");
+                Log.Instance.Debug($"[PoeBudViewModel] Force refresh requested");
                 var updater = StashUpdater;
                 if (updater == null)
                 {
@@ -298,7 +300,7 @@ namespace PoeBud.ViewModels
             Guard.ArgumentNotNull(solution, nameof(solution));
             try
             {
-                Log.Instance.Debug($"[MainViewModel] Highlighting solution {solution}");
+                Log.Instance.Debug($"[PoeBudViewModel] Highlighting solution {solution}");
 
                 highlightingService.Highlight(solution);
             }

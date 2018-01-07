@@ -25,7 +25,7 @@ namespace PoeBud.Models
 {
     internal sealed class PoeStashUpdater : DisposableReactiveObject, IPoeStashUpdater
     {
-        [NotNull] private readonly IClock clock;
+        private readonly IClock clock;
         private readonly IStashUpdaterParameters config;
         private readonly IPoeStashClient poeClient;
         private readonly TimeSpan recheckPeriodThrottling = TimeSpan.FromMilliseconds(1000);

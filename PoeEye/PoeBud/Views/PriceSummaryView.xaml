@@ -12,16 +12,19 @@
             ToolTipService.ShowDuration="{x:Static system:Int32.MaxValue}"
             >
             <Grid.ToolTip>
-                <ItemsControl ItemsSource="{Binding PricesByType}">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <DockPanel LastChildFill="True">
-                                <ContentControl DockPanel.Dock="Left" Content="{Binding Item1}"/>
-                                <ContentControl DockPanel.Dock="Right" HorizontalAlignment="Right" Content="{Binding Item2}"/>
-                            </DockPanel>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
+                  <StackPanel Orientation="Vertical">
+                      <ItemsControl ItemsSource="{Binding PricesByType}">
+                          <ItemsControl.ItemTemplate>
+                              <DataTemplate>
+                                  <DockPanel LastChildFill="True">
+                                      <ContentControl DockPanel.Dock="Left" Content="{Binding Item1}"/>
+                                      <ContentControl DockPanel.Dock="Right" HorizontalAlignment="Right" MinWidth="120" Content="{Binding Item2}"/>
+                                  </DockPanel>
+                              </DataTemplate>
+                          </ItemsControl.ItemTemplate>
+                      </ItemsControl>
+                      <ContentPresenter Margin="0,10,0,5" Content="{Binding PriceInChaosOrbs}"/>
+                  </StackPanel>
             </Grid.ToolTip>
             
             <ContentControl Content="{Binding PriceInChaosOrbs}"/>

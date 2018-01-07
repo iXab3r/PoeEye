@@ -68,7 +68,7 @@ namespace PoeEye.Config
 
             configHasChanged.OnNext(Unit.Default);
         }
-
+        
         public void Save<TConfig>(TConfig config) where TConfig : IPoeEyeConfig, new()
         {
             var key = new PoeEyeConfigMetadata(config);
@@ -131,7 +131,7 @@ namespace PoeEye.Config
                 }
                 File.WriteAllText(configFilePath, serializedData, Encoding.Unicode);
 
-                Reload();
+                configHasChanged.OnNext(Unit.Default);
             }
             catch (Exception ex)
             {

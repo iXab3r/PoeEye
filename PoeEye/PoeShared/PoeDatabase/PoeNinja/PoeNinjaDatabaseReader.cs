@@ -6,18 +6,21 @@ using System.Linq;
 using System.Net.Http;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using DynamicData;
 using JetBrains.Annotations;
 using Microsoft.Practices.Unity;
+using PoeShared.Common;
+using PoeShared.Converters;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
 using RestEase;
 
 namespace PoeShared.PoeDatabase.PoeNinja
 {
-    internal sealed class PoeNinjaDatabaseReader : DisposableReactiveObject, IPoeDatabaseReader
+    internal sealed class PoeNinjaDatabaseReader : DisposableReactiveObject, IPoeDatabaseReader, IPoeEconomicsSource
     {
         private static readonly string PoeNinjaDataUri = @"http://poe.ninja/api/Data/";
         private static readonly string StandardLeagueName = "Standard";
@@ -34,10 +37,11 @@ namespace PoeShared.PoeDatabase.PoeNinja
 
             knownEntities
                 .Connect()
+                .ObserveOn(uiScheduler)
                 .Bind(out knownEntityNames)
                 .Subscribe()
                 .AddTo(Anchors);
-
+            
             bgScheduler
                 .Schedule(Initialize)
                 .AddTo(Anchors);
@@ -45,16 +49,38 @@ namespace PoeShared.PoeDatabase.PoeNinja
 
         public ReadOnlyObservableCollection<string> KnownEntityNames => knownEntityNames;
 
+        public IEnumerable<PoePrice> GetCurrenciesInChaosEquivalent(string leagueId)
+        {
+            return GetEconomics(leagueId);
+        }
+        
         private void Initialize()
         {
-            var entities = GetEntities();
+            var entities = GetEntities(StandardLeagueName);
             knownEntities.Clear();
             knownEntities.AddRange(entities);
         }
 
-        private string[] GetEntities()
+        private PoePrice[] GetEconomics(string leagueId)
         {
-            Log.Instance.Debug("[PoeNinjaDatabaseReader] Starting API queries...");
+            Log.Instance.Debug($"[PoeNinjaDatabaseReader.Economics] Starting Economics API queries for league {leagueId}...");
+            
+            var api = RestClient.For<IPoeNinjaApi>(PoeNinjaDataUri, HandleRequestMessage);
+            var rawResult = api.GetCurrencyAsync(leagueId).Result;
+
+            var result = rawResult.Lines
+                .EmptyIfNull()
+                .Select(x => new PoePrice(x.CurrencyTypeName, x.ChaosEquivalent))
+                .Select(x => StringToPoePriceConverter.Instance.Convert(x.Price))
+                .ToArray();
+
+            Log.Instance.Debug($"[PoeNinjaDatabaseReader.Economics] All  done, {result.Length} name(s) found\n\t{result.DumpToTable()}");
+            return result;
+        }
+
+        private string[] GetEntities(string leagueId)
+        {
+            Log.Instance.Debug($"[PoeNinjaDatabaseReader] Starting API queries...");
             try
             {
                 var api = RestClient.For<IPoeNinjaApi>(PoeNinjaDataUri, HandleRequestMessage);
@@ -62,17 +88,17 @@ namespace PoeShared.PoeDatabase.PoeNinja
                 
                 var sources = new[]
                 {
-                    ExtractFrom(api.GetMapsAsync(StandardLeagueName)),
-                    ExtractFrom(api.GetDivinationCardsAsync(StandardLeagueName)),
-                    ExtractFrom(api.GetEssenceAsync(StandardLeagueName)),
-                    ExtractFrom(api.GetUniqueMapAsync(StandardLeagueName)),
-                    ExtractFrom(api.GetUniqueJewelAsync(StandardLeagueName)),
-                    ExtractFrom(api.GetUniqueFlaskAsync(StandardLeagueName)),
-                    ExtractFrom(api.GetUniqueWeaponAsync(StandardLeagueName)),
-                    ExtractFrom(api.GetUniqueArmourAsync(StandardLeagueName)),
-                    ExtractFrom(api.GetUniqueAccessoryAsync(StandardLeagueName)),
-                    ExtractFrom(api.GetCurrencyAsync(StandardLeagueName)),
-                    ExtractFrom(api.GetFragmentOverviewAsync(StandardLeagueName)),
+                    ExtractFrom(api.GetMapsAsync(leagueId)),
+                    ExtractFrom(api.GetDivinationCardsAsync(leagueId)),
+                    ExtractFrom(api.GetEssenceAsync(leagueId)),
+                    ExtractFrom(api.GetUniqueMapAsync(leagueId)),
+                    ExtractFrom(api.GetUniqueJewelAsync(leagueId)),
+                    ExtractFrom(api.GetUniqueFlaskAsync(leagueId)),
+                    ExtractFrom(api.GetUniqueWeaponAsync(leagueId)),
+                    ExtractFrom(api.GetUniqueArmourAsync(leagueId)),
+                    ExtractFrom(api.GetUniqueAccessoryAsync(leagueId)),
+                    ExtractFrom(api.GetCurrencyAsync(leagueId)),
+                    ExtractFrom(api.GetFragmentOverviewAsync(leagueId)),
                 };
                 foreach (var source in sources)
                 {
@@ -116,6 +142,7 @@ namespace PoeShared.PoeDatabase.PoeNinja
             var result = await task;
             return result.Lines?.Select(x => x.CurrencyTypeName).ToArray() ?? new string[0];
         }
+
 
         internal interface IPoeNinjaApi
         {
@@ -172,6 +199,8 @@ namespace PoeShared.PoeDatabase.PoeNinja
         internal struct CurrencyItem
         {
             public string CurrencyTypeName { get; set; }
-        }                                                   
+            
+            public float ChaosEquivalent { get; set; }
+        }
     }
 }

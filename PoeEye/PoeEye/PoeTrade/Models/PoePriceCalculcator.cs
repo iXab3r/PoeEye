@@ -1,4 +1,5 @@
-﻿using CsQuery.ExtensionMethods;
+﻿using System.Reactive;
+using CsQuery.ExtensionMethods;
 using PoeShared.Common;
 using PoeShared.Modularity;
 using PoeShared.PoeTrade;
@@ -40,8 +41,12 @@ namespace PoeEye.PoeTrade.Models
                 .DistinctUntilChanged()
                 .Subscribe(Reinitialize)
                 .AddTo(Anchors);
+
+            WhenChanged = configProvider.WhenChanged.ToUnit();
         }
 
+        public IObservable<Unit> WhenChanged { get; }
+        
         public PoePrice GetEquivalentInChaosOrbs(PoePrice price)
         {
             if (price.IsEmpty)
@@ -53,11 +58,16 @@ namespace PoeEye.PoeTrade.Models
             if (!currencyByType.TryGetValue(price.CurrencyType, out currencyMultilplier))
             {
                 Log.Instance.Debug(
-                    $"[PriceCalculcator] Could not convert currency type '{price.CurrencyType}' to multiplier, price: {price}\r\nMultipliers:{currencyByType.DumpToText()}");
+                    $"[PriceCalculcator] Could not convert currency type '{price.CurrencyType}' to multiplier, price: {price}\r\nMultipliers:{currencyByType.DumpToTextRaw()}");
                 return PoePrice.Empty;
             }
 
             return new PoePrice(KnownCurrencyNameList.ChaosOrb, price.Value * currencyMultilplier);
+        }
+
+        public bool CanConvert(PoePrice price)
+        {
+            return currencyByType.ContainsKey(price.CurrencyType);
         }
 
         private IDictionary<string, float> ExtractDifference(IDictionary<string, float> existingDictionary, IDictionary<string, float> candidate)

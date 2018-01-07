@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Windows.Input;
 using Guards;
 using JetBrains.Annotations;
@@ -39,8 +40,10 @@ namespace PoeBud.ViewModels
 
             PricesByType = new ReadOnlyObservableCollection<Tuple<PoePrice, PoePrice>>(pricesByType);
 
-            this.WhenAnyValue(x => x.Solution)
-                .Subscribe(x => PriceInChaosOrbs = x == null ? PoePrice.Empty : CalculateTotal(x))
+            Observable.Merge(
+                    this.WhenAnyValue(x => x.Solution).ToUnit(),
+                    poePriceCalculcator.WhenChanged)
+                .Subscribe(() => PriceInChaosOrbs = Solution == null ? PoePrice.Empty : CalculateTotal(Solution))
                 .AddTo(Anchors);
 
             ShowHighlighting = new DelegateCommand(() => highlightingService.Highlight(Solution));
@@ -72,6 +75,7 @@ namespace PoeBud.ViewModels
             var currencyWithAmount = solution
                 .Items
                 .Select(x => new { Item = x, Price = StringToPoePriceConverter.Instance.Convert($"{x.StackSize} {x.TypeLine}")})
+                .Where(x => poePriceCalculcator.CanConvert(x.Price))
                 .Select(x => new { Item = x, RawPrice = x.Price, PriceInChaosOrbs = poePriceCalculcator.GetEquivalentInChaosOrbs(x.Price) })
                 .Where(x => x.PriceInChaosOrbs.HasValue)
                 .ToArray();

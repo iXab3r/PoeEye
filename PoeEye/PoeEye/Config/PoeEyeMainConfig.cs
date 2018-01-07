@@ -12,13 +12,12 @@ namespace PoeEye.Config
 
     using PoeShared.Scaffolding;
 
-    internal sealed class PoeEyeMainConfig : IPoeEyeConfig
+    internal sealed class PoeEyeMainConfig : IPoeEyeConfigVersioned
     {
         private static readonly IDictionary<string, float> DefaultCurrenciesPriceInChaos = new Dictionary<string, float>
         {
             {KnownCurrencyNameList.BlessedOrb, 2},
             {KnownCurrencyNameList.CartographersChisel, 1},
-            {KnownCurrencyNameList.ChaosOrb, 1},
             {KnownCurrencyNameList.ChromaticOrb, 0.5f},
             {KnownCurrencyNameList.DivineOrb, 7},
             {KnownCurrencyNameList.ExaltedOrb, 50},
@@ -31,34 +30,28 @@ namespace PoeEye.Config
             {KnownCurrencyNameList.OrbOfRegret, 2},
             {KnownCurrencyNameList.OrbOfScouring, 1},
             {KnownCurrencyNameList.RegalOrb, 1},
-            {KnownCurrencyNameList.VaalOrb, 2}
+            {KnownCurrencyNameList.VaalOrb, 2},
+            {KnownCurrencyNameList.OrbOfTransmutation, 0.05f},
+            {KnownCurrencyNameList.ApprenticeSextant, 2f},
+            {KnownCurrencyNameList.JourneymanSextant, 5f},
+            {KnownCurrencyNameList.MasterSextant, 8f},
+            {KnownCurrencyNameList.GlassblowersBauble, 0.5f},
         };
 
-        private IDictionary<string, float> currenciesPriceInChaos = DefaultCurrenciesPriceInChaos;
+        private IDictionary<string, float> currenciesPriceInChaos = new Dictionary<string, float>(DefaultCurrenciesPriceInChaos);
 
         private PoeEyeTabConfig[] tabConfigs = new PoeEyeTabConfig[0];
 
-        public PoeEyeMainConfig()
-        {
-        }
-
-        public PoeEyeMainConfig([NotNull] PoeEyeMainConfig source)
-        {
-            Guard.ArgumentNotNull(source, nameof(source));
-
-            source.TransferPropertiesTo(this);
-        }
-
         public PoeEyeTabConfig[] TabConfigs
         {
-            get { return tabConfigs; }
-            set { tabConfigs = value ?? new PoeEyeTabConfig[0]; }
+            get => tabConfigs;
+            set => tabConfigs = value ?? new PoeEyeTabConfig[0];
         }
 
         public IDictionary<string, float> CurrenciesPriceInChaos
         {
-            get { return currenciesPriceInChaos; }
-            set { currenciesPriceInChaos = value ?? DefaultCurrenciesPriceInChaos; }
+            get => currenciesPriceInChaos;
+            set => currenciesPriceInChaos = value ?? new Dictionary<string, float>(DefaultCurrenciesPriceInChaos);
         }
 
         public bool ClipboardMonitoringEnabled { get; set; } = true;
@@ -70,5 +63,7 @@ namespace PoeEye.Config
         public TimeSpan MaxRefreshTimeout { get; set; } = TimeSpan.FromMinutes(30);
 
         public TimeSpan ProxyRecheckTimeout { get; set; } = TimeSpan.FromMinutes(1);
+
+        public int Version { get; set; } = 1;
     }
 }

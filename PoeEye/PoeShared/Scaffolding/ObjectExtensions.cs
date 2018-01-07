@@ -44,6 +44,7 @@
             where TTarget : class, TSource
         {
             Guard.ArgumentNotNull(source, nameof(source));
+            Guard.ArgumentNotNull(target, nameof(target));
 
             var settableProperties = typeof(TTarget)
                 .GetProperties(BindingFlags.Instance | BindingFlags.Public)
@@ -68,6 +69,7 @@
                         skippedProperties.Add(property);
                         continue;
                     }
+
                     settableProperty.SetValue(target, currentValue);
                 }
                 catch (Exception ex)
@@ -81,8 +83,49 @@
             }
             if (skippedProperties.Any())
             {
-                Log.Instance.Debug($"[TransferProperties] Skipped following properties:\r\n{skippedProperties.Select(x => $"{x.PropertyType} {x.Name}").DumpToText()}");
+                Log.Instance.Debug($"[TransferProperties] Skipped following properties: {skippedProperties.Select(x => $"{x.PropertyType} {x.Name}").DumpToTextRaw()}");
             }
+        }
+
+        public static void CopyPropertiesTo<TSource, TTarget>(this TSource source, TTarget target)
+            where TTarget : class, TSource
+        {
+            var deserializeSettings = new JsonSerializerSettings
+            {
+                ObjectCreationHandling = ObjectCreationHandling.Replace,
+                TypeNameHandling = TypeNameHandling.All,
+                TypeNameAssemblyFormat = System.Runtime.Serialization.Formatters.FormatterAssemblyStyle.Full,
+            };
+            var serializedObject = JsonConvert.SerializeObject(source, deserializeSettings);
+            JsonConvert.PopulateObject(serializedObject, target, deserializeSettings);
+        }
+
+        /// <summary>
+        /// Perform a deep Copy of the object, using Json as a serialisation method. NOTE: Private members are not cloned using this method.
+        /// </summary>
+        /// <typeparam name="T">The type of object being copied.</typeparam>
+        /// <param name="source">The object instance to copy.</param>
+        /// <returns>The copied object.</returns>
+        public static T CloneJson<T>(this T source)
+        {            
+            // Don't serialize a null object, simply return the default for that object
+            if (Object.ReferenceEquals(source, null))
+            {
+                return default(T);
+            }
+
+            // initialize inner objects individually
+            // for example in default constructor some list property initialized with some values,
+            // but in 'source' these items are cleaned -
+            // without ObjectCreationHandling.Replace default constructor values will be added to result
+            var deserializeSettings = new JsonSerializerSettings
+            {
+                ObjectCreationHandling = ObjectCreationHandling.Replace,
+                TypeNameHandling = TypeNameHandling.All,
+                TypeNameAssemblyFormat = System.Runtime.Serialization.Formatters.FormatterAssemblyStyle.Full,
+            };
+            var json = JsonConvert.SerializeObject(source, deserializeSettings);
+            return JsonConvert.DeserializeObject<T>(json, deserializeSettings);
         }
     }
 }

@@ -1,5 +1,3 @@
-using PoeShared.StashApi.DataTypes;
-
 namespace PoeBud.ViewModels
 {
     using Guards;
@@ -7,14 +5,14 @@ namespace PoeBud.ViewModels
 
     internal sealed class TabSelectionViewModel : ReactiveObject
     {
-        public TabSelectionViewModel(IStashTab tab)
+        public TabSelectionViewModel(string tabName)
         {
-            Guard.ArgumentNotNull(tab, nameof(tab));
-            
-            this.Tab = tab;
+            Guard.ArgumentNotNull(tabName, nameof(tabName));
+
+            Name = tabName;
         }
 
-        public string Name => $"[{Tab.Idx}] {Tab.Name}";
+        public string Name { get; }
 
         private bool isSelected;
 
@@ -23,7 +21,5 @@ namespace PoeBud.ViewModels
             get { return isSelected; }
             set { this.RaiseAndSetIfChanged(ref isSelected, value); }
         }
-
-        public IStashTab Tab { get; }
     }
 }

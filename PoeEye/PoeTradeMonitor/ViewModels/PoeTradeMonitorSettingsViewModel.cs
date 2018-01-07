@@ -58,7 +58,7 @@ namespace PoeEye.TradeMonitor.ViewModels
         {
             Guard.ArgumentNotNull(config, nameof(config));
             
-            config.TransferPropertiesTo(temporaryConfig);
+            config.CopyPropertiesTo(temporaryConfig);
 
             IsEnabled = config.IsEnabled;
             AudioNotificationSelector.SelectedValue = config.NotificationType;
@@ -81,7 +81,7 @@ namespace PoeEye.TradeMonitor.ViewModels
             temporaryConfig.NotificationType = AudioNotificationSelector.SelectedValue;
             
             var result = new PoeTradeMonitorConfig();
-            temporaryConfig.TransferPropertiesTo(result);
+            temporaryConfig.CopyPropertiesTo(result);
             
             return result;
         }

@@ -7,9 +7,11 @@ using DynamicData.Alias;
 using DynamicData.Binding;
 using DynamicData.Controllers;
 using Microsoft.Practices.Unity;
+using PoeEye.Config;
 using PoeShared;
 using PoeShared.Audio;
 using PoeShared.Common;
+using PoeShared.Modularity;
 using PoeShared.Prism;
 using ReactiveUI.Legacy;
 

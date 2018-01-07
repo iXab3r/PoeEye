@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Reflection;
+using System.Windows.Input;
 using Guards;
 using JetBrains.Annotations;
 using Microsoft.Practices.Unity;
@@ -12,6 +13,7 @@ using PoeEye.Config;
 using PoeShared;
 using PoeShared.Modularity;
 using PoeShared.Scaffolding;
+using Prism.Commands;
 using Prism.Modularity;
 using ReactiveUI;
 
@@ -59,11 +61,14 @@ namespace PoeEye.PoeTrade.ViewModels
                 .Subscribe(ReloadConfigs)
                 .AddTo(Anchors);
 
-            this.WhenAnyValue(x => x.IsOpen)
-                .Where(x => !x)
-                .SkipUntil(settingsOpenedTrigger)
-                .Subscribe(SaveConfigs)
-                .AddTo(Anchors);
+            SaveConfigCommand = new DelegateCommand(
+                () =>
+                {
+                    SaveConfigs();
+                    IsOpen = false;
+                });
+
+            CancelCommand = new DelegateCommand(() => IsOpen = false);
         }
 
         public IReactiveList<ISettingsViewModel> ModulesSettings { get; } = new ReactiveList<ISettingsViewModel>();
@@ -74,6 +79,10 @@ namespace PoeEye.PoeTrade.ViewModels
             set { this.RaiseAndSetIfChanged(ref isOpen, value); }
         }
 
+        public ICommand SaveConfigCommand { get; }
+        
+        public ICommand CancelCommand { get; }
+        
         private void ReloadModulesList(IEnumerable<ISettingsViewModel> viewModels)
         {
             ModulesSettings.Clear();

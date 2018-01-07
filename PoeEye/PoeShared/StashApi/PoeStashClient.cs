@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Security.Authentication;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using CsQuery;
 using Guards;
 using JetBrains.Annotations;
@@ -61,6 +62,11 @@ namespace PoeShared.StashApi
 
         public void Authenticate()
         {
+            AuthenticateAsync().Wait();
+        }
+        
+        public async Task AuthenticateAsync()
+        {
             if (IsAuthenticated)
             {
                 throw new InvalidOperationException($"Already authenticated with email '{credentials.UserName}'");
@@ -72,7 +78,7 @@ namespace PoeShared.StashApi
             }
             else
             {
-                AuthenticateSimple();
+                await AuthenticateSimple();
             }
         }
 
@@ -136,7 +142,7 @@ namespace PoeShared.StashApi
             AccountName = accountName;
         }
 
-        private void AuthenticateSimple()
+        private async Task AuthenticateSimple()
         {
             var hash = RequestLoginToken();
 
@@ -146,7 +152,7 @@ namespace PoeShared.StashApi
             loginRequest.AddParameter("hash", hash);
             loginRequest.AddParameter("login", "Login");
 
-            var response = client.Execute(loginRequest);
+            var response = await client.ExecuteTaskAsync(loginRequest);
 
             //If we didn't get a redirect, your gonna have a bad time.
             if (response.StatusCode != HttpStatusCode.Redirect)
@@ -180,19 +186,27 @@ namespace PoeShared.StashApi
             Guard.ArgumentIsBetween(() => index, 0, byte.MaxValue, true);
             Guard.ArgumentNotNullOrEmpty(() => league);
 
+            return GetStashAsync(index, league).Result;
+        }
+
+        public async Task<IStash> GetStashAsync(int stashIdx, string league)
+        {
+            Guard.ArgumentIsBetween(() => stashIdx, 0, byte.MaxValue, true);
+            Guard.ArgumentNotNullOrEmpty(() => league);
+
             EnsureAuthenticated();
 
             var request = new RestRequest("character-window/get-stash-items") { Method = Method.GET };
             request.AddParameter("league", league);
-            request.AddParameter("tabIndex", index);
+            request.AddParameter("tabIndex", stashIdx);
             request.AddParameter("tabs", 1);
             request.AddParameter("accountName", AccountName);
 
-            var response = client.Execute<Stash>(request);
+            var response = await client.ExecuteTaskAsync<Stash>(request);
 
             if (response.Data == null)
             {
-                throw new ApplicationException($"Could not retrieve stash #{index} in league {league} (code: {response.StatusCode}, content-length: {response.ContentLength})\nResponse data: {response.Content.DumpToText()}");
+                throw new ApplicationException($"Could not retrieve stash #{stashIdx} in league {league} (code: {response.StatusCode}, content-length: {response.ContentLength})\nResponse data: {response.Content.DumpToText()}");
             }
             PostProcessStash(response.Data);
 
@@ -209,8 +223,13 @@ namespace PoeShared.StashApi
 
             return response.Data;
         }
-
+        
         public ILeague[] GetLeagues()
+        {
+            return GetLeaguesAsync().Result;
+        }
+
+        public async Task<ILeague[]> GetLeaguesAsync()
         {
             EnsureAuthenticated();
 
@@ -218,7 +237,7 @@ namespace PoeShared.StashApi
             var request = new RestRequest("leagues") { Method = Method.GET };
             request.AddParameter("type", "main");
 
-            var response = client.Execute<List<League>>(request);
+            var response = await client.ExecuteTaskAsync<List<League>>(request);
 
             if (response.Data == null)
             {
@@ -230,10 +249,15 @@ namespace PoeShared.StashApi
 
         public ICharacter[] GetCharacters()
         {
+            return GetCharactersAsync().Result;
+        }
+        
+        public async Task<ICharacter[]> GetCharactersAsync()
+        {
             EnsureAuthenticated();
 
             var request = new RestRequest("character-window/get-characters") { Method = Method.GET };
-            var response = client.Execute<List<Character>>(request);
+            var response = await client.ExecuteTaskAsync<List<Character>>(request);
 
             if (response.Data == null)
             {
@@ -245,6 +269,13 @@ namespace PoeShared.StashApi
 
         public IInventory GetInventory(string characterName)
         {
+            Guard.ArgumentNotNull(characterName, nameof(characterName));
+
+            return GetInventoryAsync(characterName).Result;
+        }
+        
+        public async Task<IInventory> GetInventoryAsync(string characterName)
+        {
             Guard.ArgumentNotNullOrEmpty(() => characterName);
             EnsureAuthenticated();
 
@@ -252,7 +283,7 @@ namespace PoeShared.StashApi
             request.AddParameter("character", characterName);
             request.AddParameter("accountName", AccountName);
 
-            var response = client.Execute<Inventory>(request);
+            var response = await client.ExecuteTaskAsync<Inventory>(request);
             if (response.Data == null)
             {
                 throw new ApplicationException($"Could not retrieve inventory of character {characterName} @ {AccountName} (code: {response.StatusCode}, content-length: {response.ContentLength})");

@@ -32,7 +32,7 @@ namespace PoeShared.Audio
             Initialize();
 
             var playNotificationCommandCanExecute = poeEyeConfigProvider
-                .WhenAnyValue(x => x.ActualConfig)
+                .WhenChanged
                 .Select(x => x.AudioNotificationsEnabled);
 
             var playNotificationCommand = new ReactiveCommand<AudioNotificationType>(

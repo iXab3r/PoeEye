@@ -22,7 +22,7 @@ namespace PoeEye.Utilities
                 return;
             }
 
-            Log.Instance.Debug($"[PositionMonitor] Items order has changed, old: {orderChangedEventArgs.PreviousOrder.DumpToText()}, new: {orderChangedEventArgs.NewOrder.DumpToText()}");
+            Log.Instance.Trace($"[PositionMonitor] Items order has changed, \nOld:\n\t{orderChangedEventArgs.PreviousOrder.EmptyIfNull().Select(x => x?.ToString() ?? "(null)").DumpToTable()}, \nNew:\n\t{orderChangedEventArgs.NewOrder.EmptyIfNull().Select(x => x?.ToString() ?? "(null)").DumpToTable()}");
             Items = orderChangedEventArgs.NewOrder
                 .EmptyIfNull()
                 .OfType<T>()

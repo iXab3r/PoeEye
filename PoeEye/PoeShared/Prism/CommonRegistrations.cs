@@ -65,6 +65,7 @@ namespace PoeShared.Prism
                 .RegisterType<IHttpClient, GenericHttpClient>()
                 .RegisterType<IPoeApiWrapper, PoeApiWrapper>()
                 .RegisterType<IPoeStashClient, PoeStashClient>()
+                .RegisterType<IPoeEconomicsSource, PoeNinjaDatabaseReader>()
                 .RegisterType<IOverlayWindowController, OverlayWindowController>()
                 .RegisterType<IAudioNotificationSelectorViewModel, AudioNotificationSelectorViewModel>()
                 .RegisterType(typeof (IFactory<,,>), typeof (Factory<,,>))

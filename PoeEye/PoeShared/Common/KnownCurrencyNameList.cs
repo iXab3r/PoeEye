@@ -18,6 +18,7 @@ namespace PoeShared.Common
         public static readonly string BlacksmithsWhetstone = "blacksmith";
 
         public static readonly string ChaosOrb = "chaos";
+        public static readonly string OrbOfAnnulment = "orb-of-annulment";
         public static readonly string OrbOfAlteration = "alteration";
         public static readonly string BlessedOrb = "blessed";
         public static readonly string CartographersChisel = "chisel";
@@ -208,6 +209,7 @@ namespace PoeShared.Common
             {OrbOfFusing, "Orb_of_Fusing"},
             {OrbOfRegret, "Orb_of_Regret"},
             {OrbOfScouring, "Orb_of_Scouring"},
+            {OrbOfTransmutation, "Orb_of_Transmutation"},
             {RegalOrb, "Regal_Orb"},
             {VaalOrb, "Vaal_Orb"},
             {MirrorOfKalandra, "Mirror_of_Kalandra"},
@@ -288,7 +290,8 @@ namespace PoeShared.Common
             {ShriekingEssenceOfWoe, "Shrieking_Essence_of_Woe_inventory_icon"},
             {ShriekingEssenceOfWrath, "Shrieking_Essence_of_Wrath_inventory_icon"},
             {ShriekingEssenceOfZeal, "Shrieking_Essence_of_Zeal_inventory_icon"},
-            {RemnantOfCorruption, "Remnant_of_Corruption_inventory_icon"}
+            {RemnantOfCorruption, "Remnant_of_Corruption_inventory_icon"},
+            {OrbOfAnnulment, "Orb_of_Annulment_inventory_icon"},
         };
 
         private static readonly IDictionary<string, string> DefaultAliases = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
@@ -363,7 +366,11 @@ namespace PoeShared.Common
             {"Eternal Orb", EternalOrb},
             {"Eternal", EternalOrb},
 
-            {"blessing-chayula", BlessingOfChayula}
+            {"blessing-chayula", BlessingOfChayula},
+            {"Apprentice Cartographer's Sextant", ApprenticeSextant},
+            {"Journeyman Cartographer's Sextant", JourneymanSextant},
+            {"Master Cartographer's Sextant", MasterSextant},
+            {"Orb of Annulment", OrbOfAnnulment},
         };
 
         static KnownCurrencyNameList()
