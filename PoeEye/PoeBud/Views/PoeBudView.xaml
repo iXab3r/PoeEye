@@ -8,6 +8,7 @@
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Generic.xaml" />
         <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Styles.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/PoeBud;component/Converters/Converters.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
     <DataTemplate DataType="{x:Type viewModels:PoeBudViewModel}">
@@ -98,7 +99,12 @@
                                 <StackPanel Orientation="Vertical">
                                     <Button Command="{Binding WithdrawChaosSetCommand}">
                                         <Button.ToolTip>
-                                            <TextBlock Text="{Binding Stash.ChaosSetSolutions.Length, StringFormat='Withdraw a Chaos Set ({0} sets left)'}"/>
+                                            <TextBlock>
+                                                <TextBlock.Inlines>
+                                                    <Run Text="Withdraw a Chaos Set - "/>
+                                                    <Run Text="{Binding Stash.ChaosSetSolutions, Mode=OneWay, Converter={StaticResource PoeSolutionToHumanReadableFormatConverterKey}}"/>
+                                                </TextBlock.Inlines>
+                                            </TextBlock>
                                         </Button.ToolTip>
                                         <Button.Content>
                                             <Image Source="../Resources/Chaos_Orb.png" 
@@ -109,13 +115,23 @@
                                         Command="{Binding WithdrawMiscCommand}"
                                         fa:Awesome.Content="Diamond">
                                         <Button.ToolTip>
-                                            <TextBlock Text="{Binding Stash.MiscellaneousItemsSolution.Items.Length, StringFormat='Withdraw Gems/Jewels/Flasks ({0} items)'}"/>
+                                            <TextBlock>
+                                                <TextBlock.Inlines>
+                                                    <Run Text="Withdraw Gems/Jewels/Flasks - "/>
+                                                    <Run Text="{Binding Stash.MiscellaneousItemsSolutions, Mode=OneWay, Converter={StaticResource PoeSolutionToHumanReadableFormatConverterKey}}"/>
+                                                </TextBlock.Inlines>
+                                            </TextBlock>
                                         </Button.ToolTip>
                                     </Button>
                                     <Button
                                         Command="{Binding WithdrawMapsCommand}">
                                         <Button.ToolTip>
-                                            <TextBlock Text="{Binding Stash.MapsSolution.Items.Length, StringFormat='Withdraw Maps ({0} items)'}"/>
+                                            <TextBlock>
+                                                <TextBlock.Inlines>
+                                                    <Run Text="Withdraw Maps - "/>
+                                                    <Run Text="{Binding Stash.MapsSolutions, Mode=OneWay, Converter={StaticResource PoeSolutionToHumanReadableFormatConverterKey}}"/>
+                                                </TextBlock.Inlines>
+                                            </TextBlock>
                                         </Button.ToolTip>
                                         <Button.Content>
                                             <Image Source="../Resources/MapCells.png" 
@@ -125,7 +141,12 @@
                                     <Button
                                         Command="{Binding WithdrawDivinationCardsCommand}">
                                         <Button.ToolTip>
-                                            <TextBlock Text="{Binding Stash.DivinationCardsSolution.Items.Length, StringFormat='Withdraw Divination cards ({0} items)'}"/>
+                                            <TextBlock>
+                                                <TextBlock.Inlines>
+                                                    <Run Text="Withdraw Divination cards - "/>
+                                                    <Run Text="{Binding Stash.DivinationCardsSolutions, Mode=OneWay, Converter={StaticResource PoeSolutionToHumanReadableFormatConverterKey}}"/>
+                                                </TextBlock.Inlines>
+                                            </TextBlock>
                                         </Button.ToolTip>
                                         <Button.Content>
                                             <Image Source="../Resources/DivinationCard.png" 
@@ -135,7 +156,12 @@
                                     <Button Command="{Binding WithdrawCurrencyCommand}"
                                             fa:Awesome.Content="Money">
                                         <Button.ToolTip>
-                                            <TextBlock Text="{Binding Stash.CurrencySolution.Items.Length, StringFormat='Withdraw Currency ({0} items)'}"/>
+                                            <TextBlock>
+                                                <TextBlock.Inlines>
+                                                    <Run Text="Withdraw Currency cards - "/>
+                                                    <Run Text="{Binding Stash.CurrencySolutions, Mode=OneWay, Converter={StaticResource PoeSolutionToHumanReadableFormatConverterKey}}"/>
+                                                </TextBlock.Inlines>
+                                            </TextBlock>
                                         </Button.ToolTip>
                                     </Button>
 

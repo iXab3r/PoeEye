@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Threading;
 using System.Threading.Tasks;
 using Guards;
 using JetBrains.Annotations;
@@ -33,11 +34,18 @@ namespace PoeBud.Models
 
         public async Task ExecuteSolution(IPoeTradeSolution solutionToExecute)
         {
+            var tokenSource = new CancellationTokenSource();
+            await ExecuteSolution(solutionToExecute, tokenSource.Token);
+        }
+        
+        public async Task ExecuteSolution(IPoeTradeSolution solutionToExecute, CancellationToken token)
+        {
             Guard.ArgumentNotNull(solutionToExecute, nameof(solutionToExecute));
-            await Task.Run(() => ExecuteSolutionInternal(solutionToExecute));
+            
+            await Task.Run(() => ExecuteSolutionInternal(solutionToExecute, token), token);
         }
 
-        private void ExecuteSolutionInternal(IPoeTradeSolution solutionToExecute)
+        private void ExecuteSolutionInternal(IPoeTradeSolution solutionToExecute, CancellationToken token)
         {
             Guard.ArgumentNotNull(solutionToExecute, nameof(solutionToExecute));
 
@@ -57,10 +65,12 @@ namespace PoeBud.Models
                 IStashTab activeTab = null;
                 foreach (var item in solutionToExecute.Items.OrderBy(x => x.Tab.Idx))
                 {
+                    token.ThrowIfCancellationRequested();
+
                     if (activeTab?.Idx != item.Tab.Idx)
                     {
                         logQueue.OnNext($"Switching to tab '{item.Tab.Name}'(idx: #{item.Tab.Idx}, inventoryId: {item.Tab.GetInventoryId()}) ...");
-
+                        
                         window.SelectStashTabByIdx(item.Tab, visibleTabs);
                         activeTab = item.Tab;
                     }

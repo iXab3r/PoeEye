@@ -26,6 +26,8 @@ namespace PoeBud.Config
         public string UiOverlayName { get; set; }
 
         public int ExpectedSetsCount { get; set; }
+        
+        public int MaxSlotsPerSolution { get; set; } = 48;
 
         public TimeSpan StashUpdatePeriod { get; set; } = TimeSpan.FromSeconds(300);
 

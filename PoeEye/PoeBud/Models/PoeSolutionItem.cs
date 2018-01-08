@@ -32,7 +32,7 @@ namespace PoeBud.Models {
                 ? Name
                 : TypeLine;
 
-            return $"{name}@{Tab.Name}-X{Position.X}Y{Position.Y}";
+            return $"{name}({TypeLine}) @ {Tab.Name}-X{Position.X}Y{Position.Y}";
         }
     }
 }

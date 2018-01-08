@@ -115,13 +115,13 @@ namespace PoeBud.ViewModels
             WithdrawChaosSetCommand = new CommandWrapper(
                 ReactiveCommand.CreateFromTask(() => ExecuteSolutionOrFail(() => Stash.ChaosSetSolutions.FirstOrDefault(), () => "Failed to withdraw ChaosSet, not enough items ?")));
             WithdrawCurrencyCommand = new CommandWrapper(
-                ReactiveCommand.CreateFromTask(() => ExecuteSolutionOrFail(() => Stash.CurrencySolution, () => "Failed to withdraw Currency")));
+                ReactiveCommand.CreateFromTask(() => ExecuteSolutionOrFail(() => Stash.CurrencySolutions.FirstOrDefault(), () => "Failed to withdraw Currency")));
             WithdrawDivinationCardsCommand = new CommandWrapper(
-                ReactiveCommand.CreateFromTask(() => ExecuteSolutionOrFail(() => Stash.DivinationCardsSolution, () => "Failed to withdraw Divination Cards")));
+                ReactiveCommand.CreateFromTask(() => ExecuteSolutionOrFail(() => Stash.DivinationCardsSolutions.FirstOrDefault(), () => "Failed to withdraw Divination Cards")));
             WithdrawMapsCommand = new CommandWrapper(
-                ReactiveCommand.CreateFromTask(() => ExecuteSolutionOrFail(() => Stash.MapsSolution, () => "Failed to withdraw Maps")));
+                ReactiveCommand.CreateFromTask(() => ExecuteSolutionOrFail(() => Stash.MapsSolutions.FirstOrDefault(), () => "Failed to withdraw Maps")));
             WithdrawMiscCommand = new CommandWrapper(
-                ReactiveCommand.CreateFromTask(() => ExecuteSolutionOrFail(() => Stash.MiscellaneousItemsSolution, () => "Failed to withdraw miscellaneous items")));
+                ReactiveCommand.CreateFromTask(() => ExecuteSolutionOrFail(() => Stash.MiscellaneousItemsSolutions.FirstOrDefault(), () => "Failed to withdraw miscellaneous items")));
             ForceRefreshCommand = new CommandWrapper(
                 ReactiveCommand.Create(ForceRefreshStashCommandExecuted));
         }
@@ -400,21 +400,12 @@ namespace PoeBud.ViewModels
                 Log.Instance.Warn(
                     $"[MainViewModel.Sell] Possible race condition, trying to resolve it...");
             }
-            var dirtyItems = stash
-                .StashUpdate
-                .Items
-                .Where(item => !executedSolution.Items.Any(tradeItem => IsMatch(tradeItem, item)))
-                .ToArray();
 
             Log.Instance.Debug($"[MainViewModel.Sell] Solution executed successfully, preparing DIRTY stash update...");
 
-            var dirtyStashUpdate = new StashUpdate(dirtyItems, stash.StashUpdate.Tabs);
+            var dirtyStashUpdate = stash.StashUpdate.RemoveItems(executedSolution.Items);
             Stash = stashUpdateFactory.Create(dirtyStashUpdate, config);
         }
 
-        private bool IsMatch(IPoeSolutionItem solutionItem, IStashItem item)
-        {
-            return solutionItem.Tab.GetInventoryId() == item.InventoryId && solutionItem.Position.X == item.Position.X && solutionItem.Position.Y == item.Position.Y;
-        }
     }
 }

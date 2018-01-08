@@ -15,6 +15,8 @@ namespace PoeBud.Config
         string UiOverlayName { get; }
 
         int ExpectedSetsCount { get; }
+        
+        int MaxSlotsPerSolution { get; }
 
         TimeSpan StashUpdatePeriod { get; }
 

@@ -1,9 +1,7 @@
-﻿using PoeBud.Scaffolding;
+﻿using System;
+using PoeBud.Scaffolding;
 using PoeShared;
-using PoeShared.Common;
 using PoeShared.Converters;
-using PoeShared.PoeTrade;
-using PoeShared.Prism;
 using PoeShared.Scaffolding;
 using PoeShared.StashApi.DataTypes;
 
@@ -36,8 +34,9 @@ namespace PoeBud.ViewModels
             PriceSummary = summaryViewModel;
             
             var rareItems = stashUpdate.Items.GetChaosSetItems();
+            MaxSlotsPerSolution = config.MaxSlotsPerSolution;
 
-            Log.Instance.Debug($"[StashViewModel] Stash dump(itemsCount: {stashUpdate.Items.Count()}, tabsCount: {stashUpdate.Tabs.Count()})");
+            Log.Instance.Debug($"[StashViewModel] Stash dump(itemsCount: {stashUpdate.Items.Count()}, tabsCount: {stashUpdate.Tabs.Count()}), maxSlotsPerSolution: {config.MaxSlotsPerSolution}");
             
             var chests = rareItems.Where(x => x.ItemType == GearType.Chest).ToArray();
             var weapons = rareItems.Where(x => x.IsWeapon()).Select(x => new { Item = x, Score = x.GetTradeScore() }).ToArray();
@@ -95,14 +94,17 @@ namespace PoeBud.ViewModels
             IsInsufficientBeltsCount = BeltsCount < minItemsCount;
             
             ChaosSetSolutions = BuildChaosSetSolutions(stashUpdate);
-            CurrencySolution = BuildCurrencySolution(stashUpdate);
-            DivinationCardsSolution = BuildDivinationCardsSolution(stashUpdate);
-            MapsSolution = BuildMapsSolution(stashUpdate);
-            MiscellaneousItemsSolution = BuildMiscellaneousItemsSolutionSolution(stashUpdate);
-            PriceSummary.Solution = CurrencySolution;
+            CurrencySolutions = BuildSolutions(stashUpdate, BuildCurrencySolution).ToArray();
+            DivinationCardsSolutions = BuildSolutions(stashUpdate, BuildDivinationCardsSolution).ToArray();
+            MapsSolutions = BuildSolutions(stashUpdate, BuildMapsSolution).ToArray();
+            MiscellaneousItemsSolutions = BuildSolutions(stashUpdate, BuildMiscellaneousItemsSolution).ToArray();
+            
+            PriceSummary.Solution = BuildCurrencySolution(stashUpdate);
         }
 
         public StashUpdate StashUpdate { get; }
+
+        public int MaxSlotsPerSolution { get; }
 
         public int ChestsCount { get; }
 
@@ -138,17 +140,37 @@ namespace PoeBud.ViewModels
 
         public IPoeTradeSolution[] ChaosSetSolutions { get; }
         
-        public IPoeTradeSolution CurrencySolution { get; }
+        public IPoeTradeSolution[] CurrencySolutions { get; }
         
-        public IPoeTradeSolution DivinationCardsSolution { get; }
+        public IPoeTradeSolution[] DivinationCardsSolutions { get; }
         
-        public IPoeTradeSolution MapsSolution { get; }
+        public IPoeTradeSolution[] MapsSolutions { get; }
         
-        public IPoeTradeSolution MiscellaneousItemsSolution { get; }
+        public IPoeTradeSolution[] MiscellaneousItemsSolutions { get; }
         
         public IPriceSummaryViewModel PriceSummary { get; }
+
+        private IEnumerable<IPoeTradeSolution> BuildSolutions(StashUpdate stashUpdate, Func<StashUpdate, IPoeTradeSolution> supplier)
+        {
+            do
+            {
+                var solution = supplier(stashUpdate);
+                solution = new PoeTradeSolution(solution.Items.Take(MaxSlotsPerSolution).ToArray(), solution.Tabs);
+                stashUpdate = stashUpdate.RemoveItems(solution.Items);
+
+                if (solution.Items.Any())
+                {
+                    yield return solution;
+                }
+                else
+                {
+                    break;
+                }
+            }
+            while (true);
+        }
         
-        public IPoeTradeSolution BuildMapsSolution(StashUpdate stashUpdate)
+        private static IPoeTradeSolution BuildMapsSolution(StashUpdate stashUpdate)
         {
             var tabsByInventoryId = stashUpdate.Tabs.ToDictionary(x => x.GetInventoryId(), x => x);
 
@@ -164,8 +186,8 @@ namespace PoeBud.ViewModels
             
             return new PoeTradeSolution(maps, stashUpdate.Tabs);
         }
-        
-        public IPoeTradeSolution BuildMiscellaneousItemsSolutionSolution(StashUpdate stashUpdate)
+
+        private static IPoeTradeSolution BuildMiscellaneousItemsSolution(StashUpdate stashUpdate)
         {
             var tabsByInventoryId = stashUpdate.Tabs.ToDictionary(x => x.GetInventoryId(), x => x);
 
@@ -199,7 +221,7 @@ namespace PoeBud.ViewModels
             return new PoeTradeSolution(result, stashUpdate.Tabs);
         }
 
-        public IPoeTradeSolution BuildCurrencySolution(StashUpdate stashUpdate)
+        private static IPoeTradeSolution BuildCurrencySolution(StashUpdate stashUpdate)
         {
             var tabsByInventoryId = stashUpdate.Tabs.ToDictionary(x => x.GetInventoryId(), x => x);
 
@@ -214,8 +236,8 @@ namespace PoeBud.ViewModels
             
             return new PoeTradeSolution(currency, stashUpdate.Tabs);
         }
-        
-        public IPoeTradeSolution BuildDivinationCardsSolution(StashUpdate stashUpdate)
+
+        private static IPoeTradeSolution BuildDivinationCardsSolution(StashUpdate stashUpdate)
         {
             var tabsByInventoryId = stashUpdate.Tabs.ToDictionary(x => x.GetInventoryId(), x => x);
 
@@ -229,7 +251,8 @@ namespace PoeBud.ViewModels
             
             return new PoeTradeSolution(cards, stashUpdate.Tabs);
         }
-        
+
+
         private static IPoeTradeSolution[] BuildChaosSetSolutions(StashUpdate stashUpdate)
         {
             var result = new List<IPoeTradeSolution>();

@@ -1,5 +1,7 @@
+using System.Linq;
 using Guards;
 using JetBrains.Annotations;
+using PoeBud.Scaffolding;
 using PoeShared.StashApi.DataTypes;
 
 namespace PoeBud.Models
@@ -19,6 +21,18 @@ namespace PoeBud.Models
 
         public IStashItem[] Items { [NotNull] get; } 
 
-        public IStashTab[] Tabs { [NotNull] get; } 
+        public IStashTab[] Tabs { [NotNull] get; }
+
+        internal StashUpdate RemoveItems(IPoeSolutionItem[] solutionItems)
+        {
+            var dirtyItems = Items.Where(item => !solutionItems.Any(tradeItem => IsMatch(tradeItem, item))).ToArray();
+            var result = new StashUpdate(dirtyItems, Tabs);
+            return result;
+        }
+        
+        private bool IsMatch(IPoeSolutionItem solutionItem, IStashItem item)
+        {
+            return solutionItem.Tab.GetInventoryId() == item.InventoryId && solutionItem.Position.X == item.Position.X && solutionItem.Position.Y == item.Position.Y;
+        }
     }
 }

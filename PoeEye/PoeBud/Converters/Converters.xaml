@@ -4,6 +4,8 @@
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
     <converters:NullToBoolConverter x:Key="NullToFalseConverter" NullValue="False" />
     
+    <converters:PoeSolutionToHumanReadableFormat x:Key="PoeSolutionToHumanReadableFormatConverterKey" />
+    
     <converters:BooleanToObjectConverter x:Key="BooleanToSemitransparentConverter">
         <converters:BooleanToObjectConverter.FalseValue>
             <system:Double>
