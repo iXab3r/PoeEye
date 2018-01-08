@@ -118,6 +118,10 @@ namespace PoeBud.ViewModels
                 ReactiveCommand.CreateFromTask(() => ExecuteSolutionOrFail(() => Stash.CurrencySolution, () => "Failed to withdraw Currency")));
             WithdrawDivinationCardsCommand = new CommandWrapper(
                 ReactiveCommand.CreateFromTask(() => ExecuteSolutionOrFail(() => Stash.DivinationCardsSolution, () => "Failed to withdraw Divination Cards")));
+            WithdrawMapsCommand = new CommandWrapper(
+                ReactiveCommand.CreateFromTask(() => ExecuteSolutionOrFail(() => Stash.MapsSolution, () => "Failed to withdraw Maps")));
+            WithdrawMiscCommand = new CommandWrapper(
+                ReactiveCommand.CreateFromTask(() => ExecuteSolutionOrFail(() => Stash.MiscellaneousItemsSolution, () => "Failed to withdraw miscellaneous items")));
             ForceRefreshCommand = new CommandWrapper(
                 ReactiveCommand.Create(ForceRefreshStashCommandExecuted));
         }
@@ -133,6 +137,10 @@ namespace PoeBud.ViewModels
         public ICommand WithdrawCurrencyCommand { get; }
         
         public ICommand WithdrawDivinationCardsCommand { get; }
+        
+        public ICommand WithdrawMapsCommand { get; }
+        
+        public ICommand WithdrawMiscCommand { get; }
         
         public ICommand ForceRefreshCommand { get; }
 

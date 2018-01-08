@@ -78,7 +78,7 @@
                                                      UnfurlOrientation="Vertical"
                                                      PopupMode="MouseOver"
                                                      ToolTip="Manage items"
-                                                     Margin="0"
+                                                     Margin="0,-10,0,0"
                                                      Padding="0"
                                                      Width="30"
                                                      Height="30"
@@ -96,10 +96,29 @@
                                            fa:Awesome.Content="Magic"/> 
                                 </materialDesign:PopupBox.ToggleContent>
                                 <StackPanel Orientation="Vertical">
-                                    <Button ToolTip="Withdraw a Chaos Set"
-                                            Command="{Binding WithdrawChaosSetCommand}">
+                                    <Button Command="{Binding WithdrawChaosSetCommand}">
+                                        <Button.ToolTip>
+                                            <TextBlock Text="{Binding Stash.ChaosSetSolutions.Length, StringFormat='Withdraw a Chaos Set ({0} sets left)'}"/>
+                                        </Button.ToolTip>
                                         <Button.Content>
                                             <Image Source="../Resources/Chaos_Orb.png" 
+                                                   Margin="4" />
+                                        </Button.Content>
+                                    </Button>
+                                    <Button
+                                        Command="{Binding WithdrawMiscCommand}"
+                                        fa:Awesome.Content="Diamond">
+                                        <Button.ToolTip>
+                                            <TextBlock Text="{Binding Stash.MiscellaneousItemsSolution.Items.Length, StringFormat='Withdraw Gems/Jewels/Flasks ({0} items)'}"/>
+                                        </Button.ToolTip>
+                                    </Button>
+                                    <Button
+                                        Command="{Binding WithdrawMapsCommand}">
+                                        <Button.ToolTip>
+                                            <TextBlock Text="{Binding Stash.MapsSolution.Items.Length, StringFormat='Withdraw Maps ({0} items)'}"/>
+                                        </Button.ToolTip>
+                                        <Button.Content>
+                                            <Image Source="../Resources/MapCells.png" 
                                                    Margin="4" />
                                         </Button.Content>
                                     </Button>

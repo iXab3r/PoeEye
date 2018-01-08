@@ -97,6 +97,8 @@ namespace PoeBud.ViewModels
             ChaosSetSolutions = BuildChaosSetSolutions(stashUpdate);
             CurrencySolution = BuildCurrencySolution(stashUpdate);
             DivinationCardsSolution = BuildDivinationCardsSolution(stashUpdate);
+            MapsSolution = BuildMapsSolution(stashUpdate);
+            MiscellaneousItemsSolution = BuildMiscellaneousItemsSolutionSolution(stashUpdate);
             PriceSummary.Solution = CurrencySolution;
         }
 
@@ -140,7 +142,62 @@ namespace PoeBud.ViewModels
         
         public IPoeTradeSolution DivinationCardsSolution { get; }
         
+        public IPoeTradeSolution MapsSolution { get; }
+        
+        public IPoeTradeSolution MiscellaneousItemsSolution { get; }
+        
         public IPriceSummaryViewModel PriceSummary { get; }
+        
+        public IPoeTradeSolution BuildMapsSolution(StashUpdate stashUpdate)
+        {
+            var tabsByInventoryId = stashUpdate.Tabs.ToDictionary(x => x.GetInventoryId(), x => x);
+
+            var maps = stashUpdate
+                .Items
+                .Where(x => x.GetTabIndex() != null)
+                .Where(x => x.Category == "maps")
+                .Where(x => x.TypeLine != "Divine Vessel")
+                .OrderBy(x => x.ItemLevel)
+                .Select(x => new PoeSolutionItem(x, tabsByInventoryId[x.InventoryId]))
+                .OfType<IPoeSolutionItem>()
+                .ToArray();
+            
+            return new PoeTradeSolution(maps, stashUpdate.Tabs);
+        }
+        
+        public IPoeTradeSolution BuildMiscellaneousItemsSolutionSolution(StashUpdate stashUpdate)
+        {
+            var tabsByInventoryId = stashUpdate.Tabs.ToDictionary(x => x.GetInventoryId(), x => x);
+
+            var validItems = stashUpdate.Items
+                .Where(x => x.GetTabIndex() != null)
+                .ToArray();
+
+            var itemsToInclude = new List<IStashItem>();
+
+            validItems
+                .Where(x => x.Category == "flasks")
+                .ForEach(itemsToInclude.Add);
+            
+            validItems
+                .Where(x => x.Category == "gems")
+                .ForEach(itemsToInclude.Add);
+                
+            validItems
+                .Where(x => x.TypeLine != null)
+                .Where(x => x.TypeLine.Contains("Eye Jewel") || 
+                            x.TypeLine.Contains("Viridian Jewel") ||
+                            x.TypeLine.Contains("Cobalt Jewel") ||
+                            x.TypeLine.Contains("Crimson Jewel"))
+                .ForEach(itemsToInclude.Add);
+            
+            var result = itemsToInclude
+                .Select(x => new PoeSolutionItem(x, tabsByInventoryId[x.InventoryId]))
+                .OfType<IPoeSolutionItem>()
+                .ToArray();
+            
+            return new PoeTradeSolution(result, stashUpdate.Tabs);
+        }
 
         public IPoeTradeSolution BuildCurrencySolution(StashUpdate stashUpdate)
         {
@@ -148,8 +205,8 @@ namespace PoeBud.ViewModels
 
             var currency = stashUpdate
                 .Items
-                .Where(x => x.Category == "currency")
                 .Where(x => x.GetTabIndex() != null)
+                .Where(x => x.Category == "currency")
                 .Where(x => StringToPoePriceConverter.Instance.Convert($"{x.StackSize} {x.TypeLine}").HasValue)
                 .Select(x => new PoeSolutionItem(x, tabsByInventoryId[x.InventoryId]))
                 .OfType<IPoeSolutionItem>()
@@ -162,15 +219,15 @@ namespace PoeBud.ViewModels
         {
             var tabsByInventoryId = stashUpdate.Tabs.ToDictionary(x => x.GetInventoryId(), x => x);
 
-            var currency = stashUpdate
+            var cards = stashUpdate
                 .Items
-                .Where(x => x.Category == "cards")
                 .Where(x => x.GetTabIndex() != null)
+                .Where(x => x.Category == "cards")
                 .Select(x => new PoeSolutionItem(x, tabsByInventoryId[x.InventoryId]))
                 .OfType<IPoeSolutionItem>()
                 .ToArray();
             
-            return new PoeTradeSolution(currency, stashUpdate.Tabs);
+            return new PoeTradeSolution(cards, stashUpdate.Tabs);
         }
         
         private static IPoeTradeSolution[] BuildChaosSetSolutions(StashUpdate stashUpdate)
