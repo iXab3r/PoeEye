@@ -10,7 +10,7 @@ namespace PoeBud.Models
     internal interface IPoeWindow
     {
         Rect WindowBounds { get; }
-
+        
         Rect StashBounds { get; }
 
         void MoveMouseToStashItem(int itemX, int itemY, StashTabType tabType);

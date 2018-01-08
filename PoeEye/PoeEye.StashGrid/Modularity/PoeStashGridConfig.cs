@@ -10,7 +10,9 @@ namespace PoeEye.StashGrid.Modularity
         public Size OverlaySize { get; set; }
 
         public float OverlayOpacity { get; set; }
+        
+        public Rect StashBounds { get; set; }
 
-        public int Version { get; set; } = 1;
+        public int Version { get; set; } = 2;
     }
 }

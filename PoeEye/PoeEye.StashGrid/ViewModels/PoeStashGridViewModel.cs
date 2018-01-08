@@ -150,6 +150,9 @@ namespace PoeEye.StashGrid.ViewModels
             config.OverlayLocation = new Point(Left, Top);
             config.OverlaySize = new Size(Width, Height);
             config.OverlayOpacity = Opacity;
+
+            const float offsetY = 66;
+            config.StashBounds = new Rect(Left, Top + offsetY, Width, Height - offsetY);
             configProvider.Save(config);
             IsLocked = true;
         }

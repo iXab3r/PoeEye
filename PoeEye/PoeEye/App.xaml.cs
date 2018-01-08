@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.Reflection;
+using System.Threading;
 using System.Windows;
 using CommandLine;
 using Exceptionless;
@@ -37,7 +38,8 @@ namespace PoeEye
                 InitializeLogging();
                 Log.Instance.Debug($"[App..ctor] Arguments: {arguments.DumpToText()}");
                 Log.Instance.Debug($"[App..ctor] Parsed args: {AppArguments.Instance.DumpToText()}");
-
+                Log.Instance.Debug($"[App..ctor] Culture: {Thread.CurrentThread.CurrentCulture}, UICulture: {Thread.CurrentThread.CurrentUICulture}");
+                
                 InitializeExceptionless();
 
                 RxApp.SupportsRangeNotifications = false; //FIXME DynamicData (as of v4.11) does not support RangeNotifications

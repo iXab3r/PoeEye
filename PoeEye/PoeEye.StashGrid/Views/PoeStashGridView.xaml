@@ -90,7 +90,7 @@
         <Grid Grid.Row="2"
               Opacity="{Binding Opacity}">
 
-          <ItemsControl ItemsSource="{Binding GridCells}"
+            <ItemsControl ItemsSource="{Binding GridCells}"
                         BorderBrush="Lime"
                         IsHitTestVisible="False"
                         Visibility="{Binding IsLocked, Converter={StaticResource TrueToCollapsedFalseToVisibleConverter}}"
@@ -286,7 +286,6 @@
               </DataTemplate>
             </ItemsControl.ItemTemplate>
           </ItemsControl>
-
         </Grid>
       </Grid>
     </Grid>

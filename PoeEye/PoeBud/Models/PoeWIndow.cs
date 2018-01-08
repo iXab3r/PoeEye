@@ -1,4 +1,7 @@
 ﻿using WindowsInput.Native;
+using PoeEye.StashGrid.Modularity;
+using PoeShared.Modularity;
+using PoeShared.Scaffolding;
 using PoeShared.StashApi.DataTypes;
 
 namespace PoeBud.Models
@@ -16,19 +19,22 @@ namespace PoeBud.Models
 
     using ReactiveUI;
 
-    internal sealed class PoeWindow : ReactiveObject, IPoeWindow
+    internal sealed class PoeWindow : DisposableReactiveObject, IPoeWindow
     {
         private const int StashItemsMaxX = 12;
         private const int StashItemsMaxY = 12;
         private const double PoeFontSize = 20;
 
         private readonly IUserInteractionsManager userInteractionsManager;
+        private readonly IConfigProvider<PoeStashGridConfig> stashConfigProvider;
         private readonly IntPtr nativeWindowHandle;
 
         public PoeWindow(
+            [NotNull] IConfigProvider<PoeStashGridConfig> stashConfigProvider,
             [NotNull] IUserInteractionsManager userInteractionsManager,
             IntPtr nativeWindowHandle)
         {
+            Guard.ArgumentNotNull(stashConfigProvider, nameof(stashConfigProvider));
             Guard.ArgumentNotNull(userInteractionsManager, nameof(userInteractionsManager));
 
             if (nativeWindowHandle == IntPtr.Zero)
@@ -36,8 +42,11 @@ namespace PoeBud.Models
                 throw new ArgumentException("Invalid Poe window handle");
             }
 
+            this.stashConfigProvider = stashConfigProvider;
             this.nativeWindowHandle = nativeWindowHandle;
             this.userInteractionsManager = userInteractionsManager;
+
+            stashConfigProvider.WhenChanged.Subscribe(() => this.RaisePropertyChanged(nameof(StashBounds))).AddTo(Anchors);
         }
 
         public void MoveMouseToStashItem(int itemX, int itemY, StashTabType tabType)
@@ -53,40 +62,28 @@ namespace PoeBud.Models
                 Guard.ArgumentIsBetween(() => itemY, 0, StashItemsMaxY - 1, true);
             }
 
-            var stash = StashBounds;
+            var stashBounds = StashBounds;
+            if (stashBounds.IsEmpty)
+            {
+                throw new ApplicationException("Stash bounds are not configured");
+            }
 
-            var itemSize = new Size(stash.Width / StashItemsMaxX, stash.Height / StashItemsMaxY);
+            var itemSize = new Size(stashBounds.Width / StashItemsMaxX, stashBounds.Height / StashItemsMaxY);
             if (tabType == StashTabType.QuadStash)
             {
                 itemSize = new Size(itemSize.Width / 2, itemSize.Height / 2);
             }
 
             var moveLocation = new Point(
-                    stash.Left + itemSize.Width * itemX + itemSize.Width / 2,
-                    stash.Top + itemSize.Height * itemY + itemSize.Height / 2);
+                    stashBounds.Left + itemSize.Width * itemX + itemSize.Width / 2,
+                    stashBounds.Top + itemSize.Height * itemY + itemSize.Height / 2);
 
             userInteractionsManager.MoveMouseTo(moveLocation);
         }
 
         public Rect WindowBounds => NativeMethods.GetWindowBounds(nativeWindowHandle);
 
-        public Rect StashBounds
-        {
-            get
-            {
-                var windowBounds = WindowBounds;
-
-                var result = new Rect(
-                        new Point(
-                                windowBounds.X + windowBounds.Width * 0.0078125,
-                                windowBounds.Y + windowBounds.Height * 0.14814814814814814814814814814815),
-                        new Size(
-                                windowBounds.Width * 0.33072916666666666666666666666667,
-                                windowBounds.Height * 0.58796296296296296296296296296296)
-                    );
-                return result;
-            }
-        }
+        public Rect StashBounds => stashConfigProvider.ActualConfig.StashBounds;
 
         public void TransferItemFromStash(int itemX, int itemY, StashTabType tabType)
         {
@@ -95,6 +92,21 @@ namespace PoeBud.Models
         }
 
         public IntPtr NativeWindowHandle => nativeWindowHandle;
+
+        private Rect GetDefaultFullScreenStashSize()
+        {
+            var windowBounds = WindowBounds;
+
+            var result = new Rect(
+                new Point(
+                    windowBounds.X + windowBounds.Width * 0.0078125,
+                    windowBounds.Y + windowBounds.Height * 0.14814814814814814814814814814815),
+                new Size(
+                    windowBounds.Width * 0.33072916666666666666666666666667,
+                    windowBounds.Height * 0.58796296296296296296296296296296)
+            );
+            return result;
+        }
 
         private static double EstimateTabWidth(string tabName, double defaultTabWidth, double spaceWidth)
         {
