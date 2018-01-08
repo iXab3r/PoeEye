@@ -113,7 +113,9 @@ namespace PoeEye.TradeMonitor.ViewModels
             };
             foreach (var overlayViewModel in controller.GetChilds())
             {
-                if (!knownTypes.Contains(overlayViewModel.GetType()) || knownTypes.Any(x => x.IsAssignableFrom(overlayViewModel.GetType())))
+                if (
+                    !knownTypes.Contains(overlayViewModel.GetType()) && 
+                    !knownTypes.Any(x => x.IsAssignableFrom(overlayViewModel.GetType())))
                 {
                     continue;
                 }

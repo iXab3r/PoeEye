@@ -204,11 +204,16 @@ namespace PoeBud.ViewModels
             }
 
             var poeClient = poeClientFactory.Create(new NetworkCredential(username, passwordBox.Password), false);
+            Log.Instance.Debug($"[PoeBudSettings.LoginCommand] Authenticating as {username}...");
             await poeClient.AuthenticateAsync();
             if (poeClient.IsAuthenticated)
             {
                 SessionId = poeClient.SessionId;
             }
+            
+            Log.Instance.Debug($"[PoeBudSettings.LoginCommand] SessionId: {poeClient.SessionId}");
+
+            Log.Instance.Debug($"[PoeBudSettings.LoginCommand] Requesting characters list...");
             var characters = await poeClient.GetCharactersAsync();
 
             var leagueAnchors = new CompositeDisposable();
@@ -219,13 +224,17 @@ namespace PoeBud.ViewModels
                 .Where(league => !string.IsNullOrEmpty(league))
                 .Distinct()
                 .ToArray();
+            
+            Log.Instance.Debug($"[PoeBudSettings.LoginCommand] Response received, characters list: \n\t{characters.DumpToTable()}\nLeagues list: \n\t{leagues.DumpToTable()}");
+
+            Log.Instance.Debug($"[PoeBudSettings.LoginCommand] Requesting stashes list...");
             var stashes = await TryGetStash(client: poeClient, leagues: leagues);
 
             var leagueStashViewModels = stashes
-                .Where(x => x.Stash != null && x.LeagueId != null)
+                .Where(x => x.Stash != null && !string.IsNullOrWhiteSpace(x.LeagueId))
                 .ToDictionary(
                     x => x.LeagueId,
-                    x => x.Stash.Tabs.Select(tab => new TabSelectionViewModel(tab.Name)).ToArray());
+                    x => x.Stash.Tabs.Where(tab => !string.IsNullOrWhiteSpace(tab.Name)).Select(tab => new TabSelectionViewModel(tab.Name)).ToArray());
 
             var leagueList = leagueStashViewModels.Keys.ToArray();
             LeaguesList = leagueList;
@@ -236,7 +245,10 @@ namespace PoeBud.ViewModels
                     league =>
                     {
                         StashesList.Clear();
-                        leagueStashViewModels[league].ForEach(StashesList.Add);
+                        if (league != null)
+                        {
+                            leagueStashViewModels[league].ForEach(StashesList.Add);
+                        }
                     })
                 .AddTo(leagueAnchors);
 
@@ -270,6 +282,7 @@ namespace PoeBud.ViewModels
         {
             try
             {
+                Log.Instance.Debug($"[PoeBudSettings.LoginCommand] Requesting stash for league {league}...");
                 return client.GetStashAsync(stashIdx: 0, league: league);
             }
             catch (Exception ex)

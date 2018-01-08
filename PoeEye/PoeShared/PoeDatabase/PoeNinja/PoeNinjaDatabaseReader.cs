@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Linq;
 using System.Net.Http;
 using System.Reactive.Concurrency;
@@ -12,6 +13,7 @@ using System.Threading.Tasks;
 using DynamicData;
 using JetBrains.Annotations;
 using Microsoft.Practices.Unity;
+using Newtonsoft.Json;
 using PoeShared.Common;
 using PoeShared.Converters;
 using PoeShared.Prism;
@@ -29,6 +31,11 @@ namespace PoeShared.PoeDatabase.PoeNinja
         private readonly ISourceList<string> knownEntities = new SourceList<string>();
         private readonly ReadOnlyObservableCollection<string> knownEntityNames;
 
+        private readonly JsonSerializerSettings serializerSettings = new JsonSerializerSettings()
+        {
+            Culture = CultureInfo.InvariantCulture
+        };
+        
         public PoeNinjaDatabaseReader(
             [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler,
             [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler)
@@ -64,8 +71,7 @@ namespace PoeShared.PoeDatabase.PoeNinja
         private PoePrice[] GetEconomics(string leagueId)
         {
             Log.Instance.Debug($"[PoeNinjaDatabaseReader.Economics] Starting Economics API queries for league {leagueId}...");
-            
-            var api = RestClient.For<IPoeNinjaApi>(PoeNinjaDataUri, HandleRequestMessage);
+            var api = RestClient.For<IPoeNinjaApi>(PoeNinjaDataUri, HandleRequestMessage, serializerSettings);
             var rawResult = api.GetCurrencyAsync(leagueId).Result;
 
             var result = rawResult.Lines
@@ -83,7 +89,7 @@ namespace PoeShared.PoeDatabase.PoeNinja
             Log.Instance.Debug($"[PoeNinjaDatabaseReader] Starting API queries...");
             try
             {
-                var api = RestClient.For<IPoeNinjaApi>(PoeNinjaDataUri, HandleRequestMessage);
+                var api = RestClient.For<IPoeNinjaApi>(PoeNinjaDataUri, HandleRequestMessage, serializerSettings);
                 var result = new ConcurrentBag<string>();
                 
                 var sources = new[]

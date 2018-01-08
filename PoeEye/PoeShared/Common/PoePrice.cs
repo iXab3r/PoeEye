@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 
 namespace PoeShared.Common
 {
@@ -14,7 +15,7 @@ namespace PoeShared.Common
             Value = value;
 
             Price = currencyType != KnownCurrencyNameList.Unknown
-                ? $"{value} {currencyType}"
+                ? $"{value.ToString(CultureInfo.InvariantCulture)} {currencyType}"
                 : $"{currencyType}";
         }
 

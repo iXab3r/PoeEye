@@ -19,11 +19,10 @@ namespace PoeShared.Scaffolding.WPF
             this.command = command;
 
             isBusy = command.IsExecuting.ToProperty(this, x => x.IsBusy);
-            command.ThrownExceptions.Subscribe(x => Error = x.Message).AddTo(Anchors);
+            command.ThrownExceptions.Subscribe(HandleException).AddTo(Anchors);
         }
-        
-        public bool IsBusy => isBusy.Value;
 
+        public bool IsBusy => isBusy.Value;
 
         public string Error
         {
@@ -48,6 +47,12 @@ namespace PoeShared.Scaffolding.WPF
         {
             add => InnerCommand.CanExecuteChanged += value;
             remove => InnerCommand.CanExecuteChanged -= value;
+        }
+        
+        private void HandleException(Exception exception)
+        {
+            Log.HandleUiException(exception);
+            Error = exception.Message;
         }
     }
 }
