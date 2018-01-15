@@ -83,7 +83,7 @@ namespace PoeShared.Converters
                 {
                     Name = valueCraftedMod,
                     ModType = PoeModType.Explicit,
-                    IsCrafted = true
+                    Origin = PoeModOrigin.Craft,
                 };
                 mods.Add(mod);
             }

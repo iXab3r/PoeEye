@@ -1,6 +1,7 @@
 ﻿using PoeEye.PoeTrade.Shell.ViewModels;
 using PoeEye.PoeTrade.Updater;
 using PoeShared.Audio;
+using PoeShared.Common;
 using PoeShared.Modularity;
 using PoeShared.Native;
 using PoeShared.PoeTrade;

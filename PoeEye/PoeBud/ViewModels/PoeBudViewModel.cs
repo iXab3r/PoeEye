@@ -122,6 +122,8 @@ namespace PoeBud.ViewModels
                 ReactiveCommand.CreateFromTask(() => ExecuteSolutionOrFail(() => Stash.MapsSolutions.FirstOrDefault(), () => "Failed to withdraw Maps")));
             WithdrawMiscCommand = new CommandWrapper(
                 ReactiveCommand.CreateFromTask(() => ExecuteSolutionOrFail(() => Stash.MiscellaneousItemsSolutions.FirstOrDefault(), () => "Failed to withdraw miscellaneous items")));
+            WithdrawSellablesCommand = new CommandWrapper(
+                ReactiveCommand.CreateFromTask(() => ExecuteSolutionOrFail(() => Stash.SellableSolutions.FirstOrDefault(), () => "Failed to withdraw sellables (six-socket, chrome, etc)")));
             ForceRefreshCommand = new CommandWrapper(
                 ReactiveCommand.Create(ForceRefreshStashCommandExecuted));
         }
@@ -141,6 +143,8 @@ namespace PoeBud.ViewModels
         public ICommand WithdrawMapsCommand { get; }
         
         public ICommand WithdrawMiscCommand { get; }
+        
+        public ICommand WithdrawSellablesCommand { get; }
         
         public ICommand ForceRefreshCommand { get; }
 

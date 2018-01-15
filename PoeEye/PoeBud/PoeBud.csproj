@@ -285,6 +285,10 @@
       <Project>{1d955442-14fc-48d5-9d45-4a67fc3a9aa8}</Project>
       <Name>PoeEye.StashGrid</Name>
     </ProjectReference>
+    <ProjectReference Include="..\PoeEye.StashGrid\PoeEye.StashGrid.csproj">
+      <Project>{1d955442-14fc-48d5-9d45-4a67fc3a9aa8}</Project>
+      <Name>PoeEye.StashGrid</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PoeShared\PoeShared.csproj">
       <Project>{12df53dd-7144-4d2d-b7a1-b4bc5bbdfb69}</Project>
       <Name>PoeShared</Name>
@@ -363,6 +367,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\MapCells.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Jewellers_Orb.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Fody.2.0.0\build\dotnet\Fody.targets" Condition="Exists('..\packages\Fody.2.0.0\build\dotnet\Fody.targets')" />

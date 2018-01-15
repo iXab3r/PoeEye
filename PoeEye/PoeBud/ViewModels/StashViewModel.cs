@@ -98,6 +98,7 @@ namespace PoeBud.ViewModels
             DivinationCardsSolutions = BuildSolutions(stashUpdate, BuildDivinationCardsSolution).ToArray();
             MapsSolutions = BuildSolutions(stashUpdate, BuildMapsSolution).ToArray();
             MiscellaneousItemsSolutions = BuildSolutions(stashUpdate, BuildMiscellaneousItemsSolution).ToArray();
+            SellableSolutions = BuildSolutions(stashUpdate, BuildSixLinksAndChromesSolution).ToArray();
             
             PriceSummary.Solution = BuildCurrencySolution(stashUpdate);
         }
@@ -148,6 +149,8 @@ namespace PoeBud.ViewModels
         
         public IPoeTradeSolution[] MiscellaneousItemsSolutions { get; }
         
+        public IPoeTradeSolution[] SellableSolutions { get; }
+        
         public IPriceSummaryViewModel PriceSummary { get; }
 
         private IEnumerable<IPoeTradeSolution> BuildSolutions(StashUpdate stashUpdate, Func<StashUpdate, IPoeTradeSolution> supplier)
@@ -186,6 +189,30 @@ namespace PoeBud.ViewModels
             
             return new PoeTradeSolution(maps, stashUpdate.Tabs);
         }
+        
+        private static IPoeTradeSolution BuildSixLinksAndChromesSolution(StashUpdate stashUpdate)
+        {
+            var tabsByInventoryId = stashUpdate.Tabs.ToDictionary(x => x.GetInventoryId(), x => x);
+
+            var validItems = stashUpdate.Items
+                .Where(x => x.GetTabIndex() != null)
+                .ToArray();
+
+            var itemsToInclude = new List<IStashItem>();
+
+            const int maxSixLinksToTransfer = 5;
+            validItems
+                .Where(x => x.Sockets.EmptyIfNull().Count() == 6)
+                .Take(maxSixLinksToTransfer)
+                .ForEach(itemsToInclude.Add);
+            
+            var result = itemsToInclude
+                .Select(x => new PoeSolutionItem(x, tabsByInventoryId[x.InventoryId]))
+                .OfType<IPoeSolutionItem>()
+                .ToArray();
+            
+            return new PoeTradeSolution(result, stashUpdate.Tabs);
+        }
 
         private static IPoeTradeSolution BuildMiscellaneousItemsSolution(StashUpdate stashUpdate)
         {
@@ -203,6 +230,10 @@ namespace PoeBud.ViewModels
             
             validItems
                 .Where(x => x.Category == "gems")
+                .ForEach(itemsToInclude.Add);
+            
+            validItems
+                .Where(x => x.TypeLine == "Divine Vessel")
                 .ForEach(itemsToInclude.Add);
                 
             validItems

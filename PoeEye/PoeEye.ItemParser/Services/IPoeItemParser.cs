@@ -1,7 +1,8 @@
-﻿namespace PoeShared.Common
-{
-    using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
+using PoeShared.Common;
 
+namespace PoeEye.ItemParser.Services
+{
     public interface IPoeItemParser
     {
         [CanBeNull]

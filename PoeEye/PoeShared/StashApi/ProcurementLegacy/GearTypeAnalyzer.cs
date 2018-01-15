@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using System.Xml;
 using Guards;
 using PoeShared.Scaffolding;
@@ -9,7 +11,7 @@ using PoeShared.StashApi.DataTypes;
 
 namespace PoeShared.StashApi.ProcurementLegacy
 {
-    internal class GearTypeAnalyzer : IGearTypeAnalyzer
+    internal class GearTypeAnalyzer : IGearTypeAnalyzer, IItemTypeAnalyzer
     {
         private static readonly IDictionary<GearType, IEnumerable<string>> GearBaseTypes = new Dictionary<GearType, IEnumerable<string>>();
 
@@ -63,6 +65,8 @@ namespace PoeShared.StashApi.ProcurementLegacy
                         .Where(itemName => !string.IsNullOrWhiteSpace(itemName))
                         .ToArray();
                 }
+                
+                Log.Instance.Debug($"[GearTypeAnalyzer] Loaded the following ItemTypes:\n\t{GearBaseTypes.DumpToTable()}");
             }
 
             runners = new GearTypeRunner[]
@@ -71,7 +75,6 @@ namespace PoeShared.StashApi.ProcurementLegacy
                 new RingRunner(),
                 new AmuletRunner(),
                 new BeltRunner(),
-                new FlaskRunner(),
                 new GloveRunner(),
                 new BootRunner(),
                 new AxeRunner(),
@@ -85,10 +88,11 @@ namespace PoeShared.StashApi.ProcurementLegacy
                 new StaffRunner(),
                 new SwordRunner(),
                 new WandRunner(),
+                new JewelRunner(),
+                new ChestRunner(),
+                new FlaskRunner(),
                 new MapRunner(),
                 new DivinationCardRunner(),
-                new JewelRunner(),
-                new ChestRunner() //Must always be last!
             };
         }
 
@@ -105,6 +109,35 @@ namespace PoeShared.StashApi.ProcurementLegacy
             return query.LastOrDefault();
         }
 
+        public ItemTypeInfo ResolveTypeInfo(string itemNameText)
+        {
+            var query = from runner in runners
+                let compatibleType = new { TypeName = runner.FindCompatibleType(itemNameText) }
+                where !string.IsNullOrWhiteSpace(compatibleType.TypeName)
+                select new { GearType = runner.Type, ItemType = compatibleType.TypeName };
+            var options = query.ToArray();
+            Log.Instance.Debug(options.DumpToTable());
+            
+            var itemInfo = options.FirstOrDefault();
+
+            var resultingName = itemNameText;
+            var itemType = itemInfo?.ItemType;
+
+            resultingName = resultingName.Replace("Superior", "");
+            if (itemType != null && resultingName.EndsWith(itemType))
+            {
+                resultingName = resultingName.Replace(itemType, string.Empty);
+            }
+            resultingName = resultingName.Trim();
+            
+            return new ItemTypeInfo()
+            {
+                ItemName = resultingName,
+                ItemType = itemType,
+                GearType = itemInfo?.GearType ?? GearType.Unknown
+            };
+        }
+        
         internal abstract class GearTypeRunner
         {
             protected GearTypeRunner(GearType gearType)
@@ -112,18 +145,15 @@ namespace PoeShared.StashApi.ProcurementLegacy
                 Type = gearType;
             }
 
-            public GearType Type { get; set; }
+            public GearType Type { get; }
 
             public abstract string FindCompatibleType(string item);
-
-            public abstract string GetBaseType(string item);
         }
 
         internal class GearTypeRunnerBase : GearTypeRunner
         {
             protected List<string> compatibleTypes;
             protected List<string> generalTypes;
-            protected List<string> incompatibleTypes;
 
             public GearTypeRunnerBase(GearType gearType)
                 : base(gearType)
@@ -132,39 +162,28 @@ namespace PoeShared.StashApi.ProcurementLegacy
                 compatibleTypes = GearBaseTypes.ContainsKey(gearType)
                     ? GearBaseTypes[gearType].ToList()
                     : new List<string>();
-                incompatibleTypes = new List<string>();
             }
 
             public override string FindCompatibleType(string itemName)
             {
-                // First, check the general types, to see if there is an easy match.
-                foreach (var typeName in generalTypes)
+                // check all known types.
+                foreach (var typeName in compatibleTypes)
                 {
-                    if (itemName.Contains(typeName))
+                    if (ContainsWord(itemName, typeName))
                     {
                         return typeName;
                     }
                 }
-
-                // Second, check all known types.
-                foreach (var typeName in compatibleTypes)
+                
+                // check the general types, to see if there is an easy match.
+                foreach (var typeName in generalTypes)
                 {
-                    if (itemName.Contains(typeName))
+                    if (ContainsWord(itemName, typeName))
                     {
                         return typeName;
                     }
                 }
                 return null;
-            }
-
-            public override string GetBaseType(string itemType)
-            {
-                if (incompatibleTypes != null && incompatibleTypes.Any(itemType.Contains))
-                {
-                    return null;
-                }
-
-                return compatibleTypes.FirstOrDefault(itemType.Contains);
             }
         }
 
@@ -173,17 +192,6 @@ namespace PoeShared.StashApi.ProcurementLegacy
             public RingRunner()
                 : base(GearType.Ring)
             {
-                incompatibleTypes = new List<string> { "Ringmail" };
-            }
-
-            public override string FindCompatibleType(string itemName)
-            {
-                if (itemName.Contains("Ring") && !incompatibleTypes.Any(itemName.Contains))
-                {
-                    return itemName;
-                }
-
-                return null;
             }
         }
 
@@ -237,6 +245,7 @@ namespace PoeShared.StashApi.ProcurementLegacy
             {
                 generalTypes.Add("Belt");
                 generalTypes.Add("Sash");
+                generalTypes.Add("Stygian Vise");
             }
         }
 
@@ -303,7 +312,13 @@ namespace PoeShared.StashApi.ProcurementLegacy
             public AxeRunner()
                 : base(GearType.Axe)
             {
-                generalTypes.AddRange(new List<string> { "Axe", "Chopper", "Splitter", "Labrys", "Tomahawk", "Hatchet", "Poleaxe", "Woodsplitter", "Cleaver" });
+                generalTypes.AddRange(new List<string>
+                {
+                    "Axe", 
+                    "Chopper", 
+                    "Splitter", 
+                    "Hatchet", 
+                });
             }
         }
 
@@ -312,7 +327,15 @@ namespace PoeShared.StashApi.ProcurementLegacy
             public ClawRunner()
                 : base(GearType.Claw)
             {
-                generalTypes.AddRange(new List<string> { "Fist", "Awl", "Paw", "Blinder", "Ripper", "Stabber", "Claw", "Gouger" });
+                generalTypes.AddRange(new List<string>
+                {
+                    "Fist", 
+                    "Paw", 
+                    "Ripper",
+                    "Stabber", 
+                    "Claw",
+                    "Gouger"
+                });
             }
         }
 
@@ -330,7 +353,14 @@ namespace PoeShared.StashApi.ProcurementLegacy
             public DaggerRunner()
                 : base(GearType.Dagger)
             {
-                generalTypes.AddRange(new List<string> { "Dagger", "Shank", "Knife", "Stiletto", "Skean", "Poignard", "Ambusher", "Boot Blade", "Kris" });
+                generalTypes.AddRange(new List<string>
+                {
+                    "Dagger", 
+                    "Shank", 
+                    "Knife", 
+                    "Skean",
+                    "Kris"
+                });
             }
         }
 
@@ -340,7 +370,14 @@ namespace PoeShared.StashApi.ProcurementLegacy
                 : base(GearType.Mace)
             {
                 generalTypes.AddRange(
-                    new List<string> { "Club", "Tenderizer", "Mace", "Hammer", "Maul", "Mallet", "Breaker", "Gavel", "Pernarch", "Steelhead", "Piledriver", "Bladed Mace" });
+                    new List<string>
+                    {
+                        "Club", 
+                        "Mace", 
+                        "Hammer", 
+                        "Maul", 
+                        "Mallet", 
+                    });
             }
         }
 
@@ -370,9 +407,6 @@ namespace PoeShared.StashApi.ProcurementLegacy
                 : base(GearType.Staff)
             {
                 generalTypes.Add("Staff");
-                generalTypes.Add("Gnarled Branch");
-                generalTypes.Add("Quarterstaff");
-                generalTypes.Add("Lathi");
             }
         }
 
@@ -385,24 +419,8 @@ namespace PoeShared.StashApi.ProcurementLegacy
                     new List<string>
                     {
                         "Sword",
-                        "sword",
-                        "Sabre",
-                        "Dusk Blade",
-                        "Cutlass",
-                        "Baselard",
-                        "Gladius",
-                        "Variscite Blade",
-                        "Vaal Blade",
-                        "Midnight Blade",
-                        "Corroded Blade",
-                        "Highland Blade",
-                        "Ezomyte Blade",
-                        "Rusted Spike",
                         "Rapier",
                         "Foil",
-                        "Pecoraro",
-                        "Estoc",
-                        "Twilight Blade"
                     });
             }
         }
@@ -413,7 +431,6 @@ namespace PoeShared.StashApi.ProcurementLegacy
                 : base(GearType.Shield)
             {
                 generalTypes.Add("Shield");
-                generalTypes.Add("Spiked Bundle");
                 generalTypes.Add("Buckler");
             }
         }
@@ -426,6 +443,15 @@ namespace PoeShared.StashApi.ProcurementLegacy
                 generalTypes.Add("Wand");
                 generalTypes.Add("Horn");
             }
+        }
+        
+        private static readonly ConcurrentDictionary<string, Regex> cachedRegexes = new ConcurrentDictionary<string, Regex>();
+
+        private static bool ContainsWord(string source, string word)
+        {
+            var regex = cachedRegexes.GetOrAdd(word, x => new Regex($@"(?<=^|\s){word}(?=$|\s)", RegexOptions.Compiled | RegexOptions.IgnoreCase));
+
+            return regex.IsMatch(source);
         }
     }
 }

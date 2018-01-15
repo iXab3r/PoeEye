@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Windows;
 using PoeShared.Scaffolding;
+using PoeShared.StashApi.ProcurementLegacy;
 
 namespace PoeEye.PoeTrade
 {
@@ -22,12 +23,17 @@ namespace PoeEye.PoeTrade
     internal sealed class PoeTradeParserModern : IPoeTradeParser
     {
         private readonly IPoeTradeDateTimeExtractor dateTimeExtractor;
+        private readonly IItemTypeAnalyzer itemTypeAnalyzer;
 
-        public PoeTradeParserModern([NotNull] IPoeTradeDateTimeExtractor dateTimeExtractor)
+        public PoeTradeParserModern(
+            [NotNull] IPoeTradeDateTimeExtractor dateTimeExtractor,
+            [NotNull] IItemTypeAnalyzer itemTypeAnalyzer)
         {
             Guard.ArgumentNotNull(dateTimeExtractor, nameof(dateTimeExtractor));
+            Guard.ArgumentNotNull(itemTypeAnalyzer, nameof(itemTypeAnalyzer));
 
             this.dateTimeExtractor = dateTimeExtractor;
+            this.itemTypeAnalyzer = itemTypeAnalyzer;
         }
 
         public IPoeQueryResult ParseQueryResponse(string rawHtml)
@@ -193,7 +199,6 @@ namespace PoeEye.PoeTrade
             var result = new PoeItem
             {
                 ItemIconUri = parser["div[class=icon] img"]?.Attr("src"),
-                ItemName = parser.Attr("data-name"),
                 TradeForumUri = parser["td[class=item-cell] a[class^=title]"]?.Attr("href"),
                 UserForumName = parser.Attr("data-seller"),
                 UserIgn = parser.Attr("data-ign"),
@@ -226,6 +231,8 @@ namespace PoeEye.PoeTrade
                 Raw = row.Render(),
             };
 
+            ParseItemName(parser, ref result);
+
             var className = parser["tbody[class^=\"item item-live\"]"]?.Attr("class") ?? string.Empty;
             result.ItemState = className.IndexOf("item-gone", StringComparison.OrdinalIgnoreCase) >= 0
                 ? PoeTradeState.Removed
@@ -242,11 +249,21 @@ namespace PoeEye.PoeTrade
             return result;
         }
 
+        private void ParseItemName(CQ parser, ref PoeItem item)
+        {
+            var nameText = parser.Attr("data-name");
+
+            var info = itemTypeAnalyzer.ResolveTypeInfo(nameText);
+
+            item.TypeInfo = info;
+            item.ItemName = nameText;
+        }
+        
         private IPoeItemMod[] ParseMods(CQ parser)
         {
             var implicitMods = ExtractImplicitMods(parser);
             var explicitMods = ExtractExplicitMods(parser);
-            return implicitMods.Concat(explicitMods).Where(IsValid).ToArray();
+            return implicitMods.Concat(explicitMods).Where(IsValid).OfType<IPoeItemMod>().ToArray();
         }
 
         private PoeItemModificatins ParseModificatins(CQ parser)
@@ -260,8 +277,8 @@ namespace PoeEye.PoeTrade
             result |= explicitMods.Any(x => x.Name == "Elder") ? PoeItemModificatins.Elder : PoeItemModificatins.None;
             result |= explicitMods.Any(x => x.Name == "Mirrored") ? PoeItemModificatins.Mirrored : PoeItemModificatins.None;
             result |= explicitMods.Any(x => x.Name == "Unidentified") ? PoeItemModificatins.Unidentified : PoeItemModificatins.None;
-            result |= explicitMods.Any(x => x.Name?.StartsWith("crafted") ?? false) ? PoeItemModificatins.Crafted : PoeItemModificatins.None;
-            result |= explicitMods.Any(x => x.Name?.StartsWith("enchanted") ?? false) ? PoeItemModificatins.Enchanted : PoeItemModificatins.None;
+            result |= explicitMods.Any(x => x.Origin == PoeModOrigin.Craft) ? PoeItemModificatins.Crafted : PoeItemModificatins.None;
+            result |= explicitMods.Any(x => x.Origin == PoeModOrigin.Enchant) ? PoeItemModificatins.Enchanted : PoeItemModificatins.None;
             
             return result;
         }
@@ -384,23 +401,45 @@ namespace PoeEye.PoeTrade
         }
         
 
-        private IPoeItemMod[] ExtractExplicitMods(CQ parser)
+        private PoeItemMod[] ExtractExplicitMods(CQ parser)
         {
-            return parser["ul[class=mods] li"].Select(x => ExtractItemMod(x, PoeModType.Explicit)).ToArray();
+            var mods = parser["ul[class=mods] li"].Select(x => ExtractItemMod(x, PoeModType.Explicit)).ToArray();
+            foreach (var mod in mods)
+            {
+                if (mod.Name.StartsWith("crafted", StringComparison.OrdinalIgnoreCase))
+                {
+                    mod.Origin = PoeModOrigin.Craft;
+                    mod.Name = mod.Name.Remove(0, "crafted".Length);
+                }
+                if (mod.Name.StartsWith("enchanted", StringComparison.OrdinalIgnoreCase))
+                {
+                    mod.Origin = PoeModOrigin.Enchant;
+                    mod.ModType = PoeModType.Implicit;
+                    mod.Name = mod.Name.Remove(0, "enchanted".Length);
+                }
+                if (mod.Name.StartsWith("total:", StringComparison.OrdinalIgnoreCase))
+                {
+                    mod.ModType = PoeModType.Unknown;
+                }
+                if (mod.Name.StartsWith("pseudo:", StringComparison.OrdinalIgnoreCase))
+                {
+                    mod.ModType = PoeModType.Unknown;
+                }
+            }
+            return mods;
         }
 
-        private IPoeItemMod[] ExtractImplicitMods(CQ parser)
+        private PoeItemMod[] ExtractImplicitMods(CQ parser)
         {
             return parser["ul[class=mods withline] li"].Select(x => ExtractItemMod(x, PoeModType.Implicit)).ToArray();
         }
 
-        public IPoeItemMod ExtractItemMod(CQ parser, PoeModType modType)
+        private PoeItemMod ExtractItemMod(CQ parser, PoeModType modType)
         {
             var result = new PoeItemMod
             {
                 ModType = modType,
                 CodeName = parser.Attr("data-name")?.Trim('#'),
-                IsCrafted = parser.Select("u").Any(),
             };
             
             var nameElements = parser["li"]?.FirstOrDefault();
@@ -423,7 +462,7 @@ namespace PoeEye.PoeTrade
             return result;
         }
         
-        public IPoeItemMod ExtractItemMod(IDomObject itemModRow, PoeModType modType = PoeModType.Unknown)
+        public PoeItemMod ExtractItemMod(IDomObject itemModRow, PoeModType modType = PoeModType.Unknown)
         {
             CQ parser = itemModRow.Render();
             return ExtractItemMod(parser, modType);

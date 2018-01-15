@@ -5,9 +5,8 @@ using System.Text.RegularExpressions;
 using Guards;
 using JetBrains.Annotations;
 using PoeShared.Common;
-using PoeShared.PoeTrade;
 
-namespace PoeEye.ItemParser
+namespace PoeEye.ItemParser.Services
 {
     internal sealed class PoeItemParser : IPoeItemParser
     {
@@ -72,7 +71,7 @@ namespace PoeEye.ItemParser
             TrimProperties(result);
             return result;
         }
-
+        
         private bool ParseItemRarityAndName(string block, PoeItem item)
         {
             var splittedBlock = SplitToStrings(block);

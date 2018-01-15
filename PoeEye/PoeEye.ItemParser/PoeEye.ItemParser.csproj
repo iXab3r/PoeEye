@@ -69,6 +69,12 @@
       <HintPath>..\packages\Prism.Core.6.1.0\lib\net45\Prism.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Prism.Unity.Wpf, Version=6.1.0.0, Culture=neutral, PublicKeyToken=91a96d2a154366d8">
+      <HintPath>..\packages\Prism.Unity.6.1.1\lib\net45\Prism.Unity.Wpf.dll</HintPath>
+    </Reference>
+    <Reference Include="Prism.Wpf, Version=6.1.0.0, Culture=neutral, PublicKeyToken=91a96d2a154366d8">
+      <HintPath>..\packages\Prism.Wpf.6.1.0\lib\net45\Prism.Wpf.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -83,12 +89,17 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="IPoeModsProcessor.cs" />
-    <Compile Include="PoeItemParser.cs" />
-    <Compile Include="PoeItemToPoeQueryConverter.cs" />
-    <Compile Include="PoeModParser.cs" />
-    <Compile Include="PoeModsProcessor.cs" />
+    <Compile Include="Converters\PoeItemToPoeQueryConverter.cs" />
+    <Compile Include="Prism\ItemParserModule.cs" />
+    <Compile Include="Prism\ItemParserRegistrations.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\IPoeItemParser.cs" />
+    <Compile Include="Services\IPoeItemSerializer.cs" />
+    <Compile Include="Services\IPoeModsProcessor.cs" />
+    <Compile Include="Services\PoeItemParser.cs" />
+    <Compile Include="Services\PoeItemSerializer.cs" />
+    <Compile Include="Services\PoeModParser.cs" />
+    <Compile Include="Services\PoeModsProcessor.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\PoeShared\PoeShared.csproj">

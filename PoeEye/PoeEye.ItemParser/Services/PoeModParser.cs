@@ -2,7 +2,7 @@ using System.Text.RegularExpressions;
 using Guards;
 using PoeShared.Common;
 
-namespace PoeEye.ItemParser
+namespace PoeEye.ItemParser.Services
 {
     internal struct PoeModParser
     {

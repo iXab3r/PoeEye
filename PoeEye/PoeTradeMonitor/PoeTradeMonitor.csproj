@@ -275,6 +275,10 @@
       <Project>{1D955442-14FC-48D5-9D45-4A67FC3A9AA8}</Project>
       <Name>PoeEye.StashGrid</Name>
     </ProjectReference>
+    <ProjectReference Include="..\PoeEye.StashGrid\PoeEye.StashGrid.csproj">
+      <Project>{1d955442-14fc-48d5-9d45-4a67fc3a9aa8}</Project>
+      <Name>PoeEye.StashGrid</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PoeShared\PoeShared.csproj">
       <Project>{12df53dd-7144-4d2d-b7a1-b4bc5bbdfb69}</Project>
       <Name>PoeShared</Name>

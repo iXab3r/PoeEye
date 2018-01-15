@@ -1,4 +1,6 @@
-﻿using PoeEye.PoeTrade.Common;
+﻿using PoeEye.ItemParser;
+using PoeEye.ItemParser.Services;
+using PoeEye.PoeTrade.Common;
 using PoeShared.Modularity;
 using Prism.Unity;
 using ReactiveUI.Legacy;
@@ -71,11 +73,8 @@ namespace PoeEye.PoeTrade.ViewModels
             Guard.ArgumentNotNull(bgScheduler, nameof(bgScheduler));
 
             itemParser = container.TryResolve<IPoeItemParser>();
-            if (itemParser == null)
-            {
-                Log.Instance.Debug("[PoeClipboardParserViewModel..ctor] Item parser was not loaded");
-                return;
-            }
+            Log.Instance.Warn("[PoeClipboardParserViewModel..ctor] Item parser was not loaded");
+            return;
 
             this.itemToQueryConverter = container.Resolve<IConverter<IPoeItem, IPoeQueryInfo>>();
             this.poeTradeViewModelFactory = poeTradeViewModelFactory;

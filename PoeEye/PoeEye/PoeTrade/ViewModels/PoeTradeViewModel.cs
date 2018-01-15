@@ -1,11 +1,16 @@
 ﻿using System.Threading;
 using PoeEye.Converters;
+using PoeEye.ItemParser;
+using PoeEye.ItemParser.Services;
 using PoeEye.PoeTrade.Common;
 using PoeShared.Audio;
 using PoeShared.Converters;
 using PoeShared.PoeTrade;
+using PoeShared.Scaffolding.WPF;
+using PoeShared.UI;
 using PoeShared.UI.ViewModels;
 using PoeWhisperMonitor.Chat;
+using Prism.Commands;
 using ReactiveUI.Legacy;
 
 namespace PoeEye.PoeTrade.ViewModels
@@ -59,12 +64,14 @@ namespace PoeEye.PoeTrade.ViewModels
             [NotNull] IFactory<IImageViewModel, Uri> imageViewModelFactory,
             [NotNull] IFactory<PoeLinksInfoViewModel, IPoeLinksInfo> linksViewModelFactory,
             [NotNull] IFactory<IPoeItemModsViewModel> modsViewModelFactory,
+            [NotNull] IPoeItemSerializer itemSerializer,
             [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler,
             [NotNull] IClock clock)
         {
             Guard.ArgumentNotNull(poeItem, nameof(poeItem));
             Guard.ArgumentNotNull(poePriceCalculcator, nameof(poePriceCalculcator));
             Guard.ArgumentNotNull(chatService, nameof(chatService));
+            Guard.ArgumentNotNull(itemSerializer, nameof(itemSerializer));
             Guard.ArgumentNotNull(notificationsManager, nameof(notificationsManager));
             Guard.ArgumentNotNull(imageViewModelFactory, nameof(imageViewModelFactory));
             Guard.ArgumentNotNull(linksViewModelFactory, nameof(linksViewModelFactory));
@@ -106,6 +113,19 @@ namespace PoeEye.PoeTrade.ViewModels
                 : priceInChaos;
             RawPriceInChaosOrbs = priceInChaos.Value;
 
+            CopyItemToClipboardCommand = new CommandWrapper(ReactiveCommand.CreateFromTask(
+                async () =>
+                {
+                    var item = itemSerializer.Serialize(Trade);
+                    if (item == null)
+                    {
+                        throw new FormatException($"Failed to parse item\n{Trade.DumpToTextRaw()}");
+                    }
+                    
+                    Clipboard.SetText(item);
+                    await Task.Delay(UiConstants.ArtificialVeryShortDelay);
+                }));
+
             Observable.Timer(DateTimeOffset.Now, RefreshTimeout).ToUnit()
                       .ObserveOn(uiScheduler)
                       .Subscribe(() => this.RaisePropertyChanged(nameof(TimeElapsedSinceLastIndexation)))
@@ -137,6 +157,8 @@ namespace PoeEye.PoeTrade.ViewModels
         public IPoeItem Trade { get; }
 
         public ICommand CopyPrivateMessageToClipboardCommand => copyPrivateMessageToClipboardCommand;
+        
+        public ICommand CopyItemToClipboardCommand { get; }
 
         public ICommand SendPrivateMessageCommand => sendPrivateMessageCommand;
 

@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using PoeShared.StashApi.ProcurementLegacy;
 
 namespace PoeShared.Common
 {
@@ -9,6 +10,10 @@ namespace PoeShared.Common
         private IPoeItemMod[] mods = new IPoeItemMod[0];
 
         public string ItemName { get; set; }
+        
+        public ItemTypeInfo TypeInfo { get; set; }
+
+        public string FlavourText { get; set; }
 
         public string ItemIconUri { get; set; }
 

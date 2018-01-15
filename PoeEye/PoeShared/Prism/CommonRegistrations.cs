@@ -49,6 +49,7 @@ namespace PoeShared.Prism
                 .RegisterSingleton<IRandomNumberGenerator, RandomNumberGenerator>()
                 .RegisterSingleton<IImagesCacheService, ImagesCacheService>()
                 .RegisterSingleton<IGearTypeAnalyzer, GearTypeAnalyzer>()
+                .RegisterSingleton<IItemTypeAnalyzer, GearTypeAnalyzer>()
                 .RegisterSingleton<IChromiumBootstrapper, ChromiumBootstrapper>()
                 .RegisterSingleton<IConverter<IStashItem, IPoeItem>, PoeStashItemToPoeItem>()
                 .RegisterSingleton<IConverter<IStashItem, PoeItem>, PoeStashItemToPoeItem>()

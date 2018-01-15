@@ -3,12 +3,13 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using Guards;
 using JetBrains.Annotations;
+using PoeEye.ItemParser.Services;
 using PoeShared.Common;
 using PoeShared.PoeTrade;
 using PoeShared.PoeTrade.Query;
 using TypeConverter;
 
-namespace PoeEye.ItemParser
+namespace PoeEye.ItemParser.Converters
 {
     internal sealed class PoeItemToPoeQueryConverter : IConverter<IPoeItem, IPoeQueryInfo>
     {

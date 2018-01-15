@@ -1,6 +1,6 @@
 ﻿using JetBrains.Annotations;
 
-namespace PoeEye.ItemParser
+namespace PoeEye.ItemParser.Services
 {
     internal interface IPoeModsProcessor
     {

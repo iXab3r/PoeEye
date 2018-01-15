@@ -1,5 +1,9 @@
-﻿namespace PoeShared.StashApi.DataTypes
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+
+namespace PoeShared.StashApi.DataTypes
 {
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum GearType
     {
         Unknown,

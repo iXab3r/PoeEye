@@ -5,6 +5,7 @@ using NUnit.Framework;
 using PoeEye.PoeTrade;
 using PoeEye.Tests.PoeEye.PoeTrade.TestData;
 using PoeShared.Common;
+using PoeShared.StashApi.ProcurementLegacy;
 using Shouldly;
 
 namespace PoeEye.Tests.PoeEye.PoeTrade
@@ -19,7 +20,7 @@ namespace PoeEye.Tests.PoeEye.PoeTrade
 
         private PoeTradeParserModern CreateInstance()
         {
-            return new PoeTradeParserModern(Mock.Of<IPoeTradeDateTimeExtractor>());
+            return new PoeTradeParserModern(Mock.Of<IPoeTradeDateTimeExtractor>(), Mock.Of<IItemTypeAnalyzer>());
         }
 
         [Test]

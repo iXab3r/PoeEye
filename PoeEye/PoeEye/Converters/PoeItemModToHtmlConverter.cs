@@ -155,7 +155,15 @@ namespace PoeEye.Converters
             Guard.ArgumentNotNull(mod, nameof(mod));
 
             var name = mod.Name ?? "(Unknown mod - no name specified)";
-
+            if (mod.Origin == PoeModOrigin.Craft)
+            {
+                name = $"crafted {name}";
+            }
+            if (mod.Origin == PoeModOrigin.Enchant)
+            {
+                name = $"enchanted {name}";
+            }
+            
             var resultHistory = new List<Tuple<string, string>>();
             resultHistory.Add(new Tuple<string, string>(string.Empty, name));
             foreach (var config in parsingSettings)

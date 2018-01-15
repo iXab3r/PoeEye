@@ -198,30 +198,46 @@
   </DataTemplate>
 
   <DataTemplate x:Key="PoeItemNameTemplateKey" DataType="{x:Type common:IPoeItem}">
-    <TextBlock Text="{Binding ItemName, Mode=OneWay}">
-      <TextBlock.Style>
-        <Style TargetType="TextBlock" 
-               BasedOn="{StaticResource {x:Type TextBlock}}">
-          <Style.Triggers>
-            <DataTrigger Binding="{Binding Rarity}" Value="{x:Static common:PoeItemRarity.Normal}">
-              <Setter Property="Foreground" Value="{StaticResource PoeItemRarityNormalBrush}" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding Rarity}" Value="{x:Static common:PoeItemRarity.Magic}">
-              <Setter Property="Foreground" Value="{StaticResource PoeItemRarityMagicBrush}" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding Rarity}" Value="{x:Static common:PoeItemRarity.Rare}">
-              <Setter Property="Foreground" Value="{StaticResource PoeItemRarityRareBrush}" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding Rarity}" Value="{x:Static common:PoeItemRarity.Unique}">
-              <Setter Property="Foreground" Value="{StaticResource PoeItemRarityUniqueBrush}" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding Rarity}" Value="{x:Static common:PoeItemRarity.Relic}">
-              <Setter Property="Foreground" Value="{StaticResource PoeItemRarityRelicBrush}" />
-            </DataTrigger>
-          </Style.Triggers>
-        </Style>
-      </TextBlock.Style>
-    </TextBlock>
+    <Grid Background="Transparent">
+      <TextBlock Text="{Binding ItemName, Mode=OneWay}">
+        <TextBlock.ToolTip>
+          <TextBlock>
+            <TextBlock.Inlines>
+              <Run Text="["/>
+              <Run Text="{Binding TypeInfo.GearType, Mode=OneWay}"/> 
+              <Run Text="] "/>
+              <Run Text="{Binding TypeInfo.ItemName, Mode=OneWay}"/>
+              <Run Text=" ("/>
+              <Run Text="{Binding TypeInfo.ItemType, Mode=OneWay}"/>
+              <Run Text=")"/>
+            </TextBlock.Inlines>
+          </TextBlock>
+        </TextBlock.ToolTip>
+        <TextBlock.Style>
+          <Style TargetType="TextBlock" 
+                 BasedOn="{StaticResource {x:Type TextBlock}}">
+            <Style.Triggers>
+              <DataTrigger Binding="{Binding Rarity}" Value="{x:Static common:PoeItemRarity.Normal}">
+                <Setter Property="Foreground" Value="{StaticResource PoeItemRarityNormalBrush}" />
+              </DataTrigger>
+              <DataTrigger Binding="{Binding Rarity}" Value="{x:Static common:PoeItemRarity.Magic}">
+                <Setter Property="Foreground" Value="{StaticResource PoeItemRarityMagicBrush}" />
+              </DataTrigger>
+              <DataTrigger Binding="{Binding Rarity}" Value="{x:Static common:PoeItemRarity.Rare}">
+                <Setter Property="Foreground" Value="{StaticResource PoeItemRarityRareBrush}" />
+              </DataTrigger>
+              <DataTrigger Binding="{Binding Rarity}" Value="{x:Static common:PoeItemRarity.Unique}">
+                <Setter Property="Foreground" Value="{StaticResource PoeItemRarityUniqueBrush}" />
+              </DataTrigger>
+              <DataTrigger Binding="{Binding Rarity}" Value="{x:Static common:PoeItemRarity.Relic}">
+                <Setter Property="Foreground" Value="{StaticResource PoeItemRarityRelicBrush}" />
+              </DataTrigger>
+            </Style.Triggers>
+          </Style>
+        </TextBlock.Style>
+      </TextBlock>
+    </Grid>
+    
   </DataTemplate>
 
   <DataTemplate x:Key="PoeItemModsHtmlTemplateKey" DataType="{x:Type viewModels:PoeItemModsViewModel}">
@@ -374,20 +390,33 @@
                 </i:EventTrigger>
               </i:Interaction.Triggers>
             </Button>
+            
+            <StackPanel Orientation="Horizontal" Grid.Column="1">
+              <ContentControl Content="{Binding Trade}"
+                              ContentTemplate="{StaticResource PoeItemNameTemplateKey}"
+                              VerticalAlignment="Center"
+                              TextBlock.FontSize="16">
+                <i:Interaction.Triggers>
+                  <i:EventTrigger EventName="MouseDoubleClick">
+                    <utilities:SetPropertyAction PropertyName="IsExpanded"
+                                                 TargetObject="{Binding ElementName=ExpanderRaw}"
+                                                 PropertyValue="{Binding ElementName=ExpanderRaw, Path=IsExpanded, Converter={StaticResource NotConverter}}" />
+                  </i:EventTrigger>
+                </i:Interaction.Triggers>
+              </ContentControl>
+              <Button Command="{Binding CopyItemToClipboardCommand}"
+                      Width="34" Height="34"
+                      Margin="5,0"
+                      Style="{StaticResource CircleButton}"
+                      RenderTransformOrigin="0.5, 0.5"
+                      fa:Awesome.Content="Clipboard">
+                <Button.ToolTip>
+                  <controls:MouseButtonsTooltip
+                    LeftButton="Copy item description to clipboard (could be pasted in Path of Building, for example)"/>
+                </Button.ToolTip>
+              </Button>
+            </StackPanel>
 
-            <ContentControl Grid.Column="1"
-                            Content="{Binding Trade}"
-                            ContentTemplate="{StaticResource PoeItemNameTemplateKey}"
-                            VerticalAlignment="Center"
-                            TextBlock.FontSize="16">
-              <i:Interaction.Triggers>
-                <i:EventTrigger EventName="MouseDoubleClick">
-                  <utilities:SetPropertyAction PropertyName="IsExpanded"
-                                               TargetObject="{Binding ElementName=ExpanderRaw}"
-                                               PropertyValue="{Binding ElementName=ExpanderRaw, Path=IsExpanded, Converter={StaticResource NotConverter}}" />
-                </i:EventTrigger>
-              </i:Interaction.Triggers>
-            </ContentControl>
 
             <StackPanel Grid.Column="2"
                         Height="25"
@@ -578,8 +607,12 @@
                     Width="34" Height="34"
                     Margin="5,0"
                     Style="{StaticResource CircleButton}"
-                    RenderTransformOrigin="0.5, 0.5"
-                    fa:Awesome.Content="Clipboard">
+                    RenderTransformOrigin="0.5, 0.5">
+              <Button.Content>
+                <TextBlock
+                  Style="{StaticResource IconTextBlock}"
+                  Text="&#xf1d8; Copy Or Send" Margin="5,0" />
+              </Button.Content>
               <Button.InputBindings>
                 <MouseBinding MouseAction="RightClick"
                               Command="{Binding SendPrivateMessageCommand}"

@@ -6,6 +6,14 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
 
+  <UserControl.Resources>
+      <ResourceDictionary>
+          <ResourceDictionary.MergedDictionaries>
+              <ResourceDictionary Source="../../Themes/Converters.xaml" />
+          </ResourceDictionary.MergedDictionaries>
+      </ResourceDictionary>
+  </UserControl.Resources>
+    
   <Grid FrameworkElement.VerticalAlignment="Center">
     <Grid.RowDefinitions>
       <RowDefinition Height="Auto"/>
@@ -17,7 +25,9 @@
                       Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}, Path=MouseToolTip}"/>
 
     <StackPanel Grid.Row="1" 
-                Orientation="Horizontal" Margin="1">
+                Orientation="Horizontal" Margin="1"
+                Visibility="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}},  
+                                     Path=LeftButton, Converter={StaticResource NullToCollapsedConverter}}">
       <Image Source="../../Resources/mouse-device-left-click-control.png" Width="24" Height="28"/>
       <TextBlock 
                 Margin="5,0,0,0"
@@ -26,7 +36,9 @@
     </StackPanel>
 
     <StackPanel Grid.Row="2" 
-                    Orientation="Horizontal" Margin="1">
+                Orientation="Horizontal" Margin="1"
+                Visibility="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}},  
+                                     Path=RightButton, Converter={StaticResource NullToCollapsedConverter}}">
       <Image Source="../../Resources/mouse-device-right-click-control.png" Width="24" Height="28"/>
       <TextBlock 
                 Margin="5,0,0,0"

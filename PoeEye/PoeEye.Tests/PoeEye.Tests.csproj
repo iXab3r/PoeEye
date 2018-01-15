@@ -142,8 +142,9 @@
     <Compile Include="Common\PoeItemEqualityComparerFixture.cs" />
     <Compile Include="Common\PoeItemModEqualityComparerFixture.cs" />
     <Compile Include="Communications\NameValueCollectionToQueryStringConverterFixture.cs" />
-    <Compile Include="Common\PoeItemParserFixture.cs" />
     <Compile Include="Helpers\MockExtensions.cs" />
+    <Compile Include="ItemParser\Services\PoeItemParserFixture.cs" />
+    <Compile Include="ItemParser\Services\PoeItemSerializerFixture.cs" />
     <Compile Include="PoeBud\OfficialApi\GearTypeAnalyzerFixture.cs" />
     <Compile Include="PoeBud\TestData\TestDataProvider.cs" />
     <Compile Include="PoeBud\ViewModels\StashViewModelFixture.cs" />

@@ -255,6 +255,7 @@
   <ItemGroup>
     <Compile Include="AppArguments.cs" />
     <Compile Include="Common\ItemPosition.cs" />
+    <Compile Include="Common\PoeModOrigin.cs" />
     <Compile Include="Common\PoeItemModificatins.cs" />
     <Compile Include="Common\TriState.cs" />
     <Compile Include="Common\PoeItemVerificationState.cs" />
@@ -313,6 +314,8 @@
     <Compile Include="StashApi\PoeStashClient.cs" />
     <Compile Include="StashApi\ProcurementLegacy\GearTypeAnalyzer.cs" />
     <Compile Include="StashApi\ProcurementLegacy\IGearTypeAnalyzer.cs" />
+    <Compile Include="StashApi\ProcurementLegacy\IItemTypeAnalyzer.cs" />
+    <Compile Include="StashApi\ProcurementLegacy\ItemTypeInfo.cs" />
     <Compile Include="UI\Controls\ExtendedTextEditor.cs" />
     <Compile Include="UI\ViewModels\AudioNotificationSelectorViewModel.cs" />
     <Compile Include="Audio\AudioNotificationsManager.cs" />
@@ -322,7 +325,6 @@
     <Compile Include="Common\IPoeCurrency.cs" />
     <Compile Include="Common\IPoeItem.cs" />
     <Compile Include="Common\IPoeItemMod.cs" />
-    <Compile Include="Common\IPoeItemParser.cs" />
     <Compile Include="Common\IPoeItemType.cs" />
     <Compile Include="Common\IPoeLinksInfo.cs" />
     <Compile Include="Common\KnownCurrencyNameList.cs" />
@@ -519,6 +521,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Scaffolding\WPF\Behaviors\" />
+    <Folder Include="StashApi\ProcurementLegacy\Runners" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Currencies\Alchemy_Shard.png">

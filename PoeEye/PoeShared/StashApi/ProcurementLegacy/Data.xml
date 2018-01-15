@@ -226,6 +226,7 @@
       <Item name="Colossal Life Flask"/>
       <Item name="Sacred Life Flask"/>
       <Item name="Hallowed Life Flask"/>
+      <Item name="Divine Life Flask"/>
       <Item name="Sanctified Life Flask"/>
 
       <Item name="Small Mana Flask"/>
@@ -407,6 +408,16 @@
       <Item name="Carnal Mitts"/>
       <Item name="Assassin's Mitts"/>
       <Item name="Murder Mitts"/>
+    </GearBaseType>
+    <GearBaseType name="Jewel">
+      <Item name="Murderous Eye Jewel"/>
+      <Item name="Ghastly Eye Jewel"/>
+      <Item name="Hypnotic Eye Jewel"/>
+      <Item name="Searching Eye Jewel"/>
+      <Item name="Cobalt Jewel"/>
+      <Item name="Crimson Jewel"/>
+      <Item name="Prismatic Jewel"/>
+      <Item name="Viridian Jewel"/>
     </GearBaseType>
     <GearBaseType name="Boots">
       <Item name="Iron Greaves"/>
@@ -641,7 +652,6 @@
       <Item name="Conductive Quiver"/>
       <Item name="Heavy Quiver"/>
       <Item name="Light Quiver"/>
-
       <Item name="Serrated Arrow Quiver"/>
       <Item name="Two-Point Arrow Quiver"/>
       <Item name="Sharktooth Arrow Quiver"/>
@@ -817,6 +827,7 @@
       <Item name="Thorium Spirit Shield"/>
       <Item name="Lacewood Spirit Shield"/>
       <Item name="Fossilized Spirit Shield"/>
+      <Item name="Fossilised Spirit Shield"/>
       <Item name="Vaal Spirit Shield"/>
       <Item name="Harmonic Spirit Shield"/>
       <Item name="Titanium Spirit Shield"/>

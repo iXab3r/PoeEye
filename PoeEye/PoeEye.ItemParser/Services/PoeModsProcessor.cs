@@ -3,10 +3,9 @@ using System.Text.RegularExpressions;
 using Guards;
 using JetBrains.Annotations;
 using PoeShared.Common;
-using PoeShared.PoeTrade;
 using PoeShared.PoeTrade.Query;
 
-namespace PoeEye.ItemParser
+namespace PoeEye.ItemParser.Services
 {
     internal sealed class PoeModsProcessor : IPoeModsProcessor
     {

@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using PoeShared.StashApi.ProcurementLegacy;
 
 namespace PoeShared.Common
 {
@@ -9,6 +10,10 @@ namespace PoeShared.Common
     public interface IPoeItem
     {
         string ItemName { get; }
+        
+        ItemTypeInfo TypeInfo { get; }
+        
+        string FlavourText { get; }
 
         string ItemIconUri { get; }
 

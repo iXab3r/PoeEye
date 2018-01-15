@@ -124,6 +124,21 @@
                                         </Button.ToolTip>
                                     </Button>
                                     <Button
+                                        Command="{Binding WithdrawSellablesCommand}">
+                                        <Button.ToolTip>
+                                            <TextBlock>
+                                                <TextBlock.Inlines>
+                                                    <Run Text="Withdraw Six Links - "/>
+                                                    <Run Text="{Binding Stash.SellableSolutions, Mode=OneWay, Converter={StaticResource PoeSolutionToHumanReadableFormatConverterKey}}"/>
+                                                </TextBlock.Inlines>
+                                            </TextBlock>
+                                        </Button.ToolTip>
+                                        <Button.Content>
+                                            <Image Source="../Resources/Jewellers_Orb.png" 
+                                                   Margin="4" />
+                                        </Button.Content>
+                                    </Button>
+                                    <Button
                                         Command="{Binding WithdrawMapsCommand}">
                                         <Button.ToolTip>
                                             <TextBlock>
