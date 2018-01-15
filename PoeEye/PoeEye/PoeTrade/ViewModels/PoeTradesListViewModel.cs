@@ -174,7 +174,10 @@ namespace PoeEye.PoeTrade.ViewModels
             var existingItems = itemsSource.Items.Select(x => x.Trade).ToArray();
             var removedItems = existingItems.Except(itemsPack, poeItemsComparer).ToArray();
             var newItems = itemsPack.Except(existingItems, poeItemsComparer).ToArray();
-            var relistedItems = itemsSource.Items.Where(x => x.TradeState == PoeTradeState.Removed).Where(x => itemsPack.Contains(x.Trade, poeItemsComparer)).ToArray();
+            var relistedItems = itemsSource.Items
+                .Where(x => x.TradeState == PoeTradeState.Removed)
+                .Where(x => itemsPack.Contains(x.Trade, poeItemsComparer))
+                .ToArray();
 
             Log.Instance.Debug(
                 $"[TradesListViewModel] Next items pack received, existingItems: {existingItems.Length}, newItems: {newItems.Length}, removedItems: {removedItems.Length}, relistedItems: {relistedItems.Length}");
@@ -205,7 +208,7 @@ namespace PoeEye.PoeTrade.ViewModels
                         .Where(x => x.curr == PoeTradeState.Normal && x.prev == PoeTradeState.Removed)
                         .Select(x => itemViewModel)
                         .Subscribe(itemsSource.Remove)
-                        .AddTo(Anchors);
+                        .AddTo(activeProvider.Anchors);
 
                     itemViewModel.TradeState = PoeTradeState.New;
                     itemViewModel.Trade.Timestamp = clock.Now;

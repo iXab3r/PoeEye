@@ -225,7 +225,7 @@ namespace PoeEye.Converters
             var min = double.Parse(match.Groups["min"].Value);
             var max = double.Parse(match.Groups["max"].Value);
             var avg = min + (max - min) / 2;
-            return $"{match.Value} (~{avg:F1})";
+            return $"{match.Value} (~{avg.ToString("0.0", CultureInfo.InvariantCulture)})";
         }
         
         private static string ReplaceGroup(

@@ -165,13 +165,10 @@ namespace PoeEye.Tests.PoeEye.PoeTrade.ViewModels
 
             var trade = instance.Items.Single();
 
+            //When
             poeLiveHistoryItems.OnNext(new IPoeItem[0]);
 
-            //When
-            trade.TradeState = PoeTradeState.Normal;
-
             //Then
-            CollectionAssert.AreEqual(new IPoeTradeViewModel[0], instance.Items);
             historicalTradesViewModel.Verify(x => x.AddItems(trade.Trade), Times.Once);
         }
 
@@ -272,10 +269,10 @@ namespace PoeEye.Tests.PoeEye.PoeTrade.ViewModels
             Assert.AreEqual(1, instance.Items.Count);
 
             //When
-            trade.TradeState = PoeTradeState.Normal;
+            Mock.Get(trade).SetPropertyAndNotify(x => x.TradeState, PoeTradeState.Removed);
+            Mock.Get(trade).SetPropertyAndNotify(x => x.TradeState, PoeTradeState.Normal);
 
             //Then
-            trade.TradeState.ShouldBe(PoeTradeState.Normal);
             instance.Items.Count.ShouldBe(0);
         }
 

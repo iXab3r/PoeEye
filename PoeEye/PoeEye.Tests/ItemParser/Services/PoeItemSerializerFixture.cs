@@ -348,24 +348,36 @@ namespace PoeEye.Tests.ItemParser.Services
                 Mock.Of<IPoeItem>(
                     x => x.ItemName == "Custom item name" && x.TypeInfo == new ItemTypeInfo { ItemName = "Death"}));
             yield return new TestCaseData(
-                @"Two-Stone Ring",
+                @"Two-Stone Ring
+                  --------
+                  {crafted}enchant",
                 Mock.Of<IPoeItem>(
-                    x => x.ItemName == "Two-Stone Ring"));
-            
-            yield return new TestCaseData(
-                @"Two-Stone Ring",
-                Mock.Of<IPoeItem>(
-                    x => x.ItemName == "Two-Stone Ring" &&  x.Mods == new[]
-                    {
-                        new PoeItemMod
+                    x => x.ItemName == "Two-Stone Ring" &&  
+                         x.Mods == new[]
                         {
-                            Name = @"enchanted something",
-                            CodeName = @"enchanted something",
-                            ModType = PoeModType.Implicit
-                        },
-                    }));
+                            new PoeItemMod
+                            {
+                                Name = @"enchant",
+                                ModType = PoeModType.Explicit,
+                                Origin = PoeModOrigin.Enchant
+                            },
+                        }));
+            yield return new TestCaseData(
+                @"Two-Stone Ring
+                  --------
+                  {crafted}craft",
+                Mock.Of<IPoeItem>(
+                    x => x.ItemName == "Two-Stone Ring" &&  
+                         x.Mods == new[]
+                         {
+                             new PoeItemMod
+                             {
+                                 Name = @"craft",
+                                 ModType = PoeModType.Explicit,
+                                 Origin = PoeModOrigin.Craft
+                             },
+                         }));
         }
-
 
         private string TrimLines(string source)
         {

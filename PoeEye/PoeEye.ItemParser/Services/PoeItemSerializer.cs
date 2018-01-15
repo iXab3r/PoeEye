@@ -45,7 +45,7 @@ namespace PoeEye.ItemParser.Services {
             
             var implicitMods = item.Mods
                 .Where(x => x.ModType == PoeModType.Implicit)
-                .Select(x => x.Name)
+                .Select(FormatName)
                 .JoinStrings(Environment.NewLine);
             
             if (!string.IsNullOrEmpty(implicitMods))
@@ -56,7 +56,7 @@ namespace PoeEye.ItemParser.Services {
             
             var explicitMods = item.Mods
                 .Where(x => x.ModType == PoeModType.Explicit)
-                .Select(x => x.Name)
+                .Select(FormatName)
                 .JoinStrings(Environment.NewLine);
             if (!string.IsNullOrEmpty(explicitMods))
             {
@@ -65,6 +65,11 @@ namespace PoeEye.ItemParser.Services {
             }
             
             return lines.JoinStrings(Environment.NewLine);
+        }
+
+        private string FormatName(IPoeItemMod mod)
+        {
+            return $"{(mod.Origin == PoeModOrigin.Craft || mod.Origin == PoeModOrigin.Enchant ? "{crafted}" : string.Empty)}{mod.Name}";
         }
     }
 }
