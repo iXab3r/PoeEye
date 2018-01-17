@@ -604,9 +604,8 @@
 
             <Button Grid.Column="7"
                     Command="{Binding CopyPrivateMessageToClipboardCommand}"
-                    Width="34" Height="34"
+                    Width="150" Height="22"
                     Margin="5,0"
-                    Style="{StaticResource CircleButton}"
                     RenderTransformOrigin="0.5, 0.5">
               <Button.Content>
                 <TextBlock
