@@ -41,6 +41,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HtmlRenderer.WPF", "..\Subm
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PoeEye.StashGrid", "PoeEye.StashGrid\PoeEye.StashGrid.csproj", "{75B4A3DB-45C0-4639-B5A3-4D180AD4B9FB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PoeEye.Pickit", "PoeEye.Pickit\PoeEye.Pickit.csproj", "{D68029E1-F012-457D-9539-FBAA9E1DB33B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Release|x64 = Release|x64
@@ -119,6 +121,10 @@ Global
 		{7E4E8DB5-85AD-4388-BDCB-38C6F423B8B0}.Release|x64.Build.0 = Release|Any CPU
 		{7E4E8DB5-85AD-4388-BDCB-38C6F423B8B0}.Debug|x64.ActiveCfg = Debug|Any CPU
 		{7E4E8DB5-85AD-4388-BDCB-38C6F423B8B0}.Debug|x64.Build.0 = Debug|Any CPU
+		{D68029E1-F012-457D-9539-FBAA9E1DB33B}.Release|x64.ActiveCfg = Release|x64
+		{D68029E1-F012-457D-9539-FBAA9E1DB33B}.Release|x64.Build.0 = Release|x64
+		{D68029E1-F012-457D-9539-FBAA9E1DB33B}.Debug|x64.ActiveCfg = Debug|x64
+		{D68029E1-F012-457D-9539-FBAA9E1DB33B}.Debug|x64.Build.0 = Debug|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
