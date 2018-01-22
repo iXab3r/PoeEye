@@ -18,6 +18,7 @@ using PoeShared.Modularity;
 using PoeShared.PoeTrade;
 using PoeShared.PoeTrade.Query;
 using PoeShared.Scaffolding;
+using Prism.Modularity;
 using Prism.Unity;
 using ReactiveUI;
 using ConfigurationModuleCatalog = Prism.Modularity.ConfigurationModuleCatalog;
@@ -46,14 +47,18 @@ namespace PoeEye.Prism
 
             Log.Instance.Info($"[Bootstrapper] Initializing shell...");
             var sw = Stopwatch.StartNew();
-
+            
+            var moduleCatalog = Container.Resolve<IModuleCatalog>();
+            var modules = moduleCatalog.Modules.ToArray();
+            Log.Instance.Info($"Modules list:\n{modules.Select(x => new { x.ModuleName, x.ModuleType, x.State, x.InitializationMode, x.DependsOn }).DumpToTextRaw()}");
+            
             RegisterExtensions();
             InitializeConfigConverters();
 
             Mouse.OverrideCursor = new Cursor(new MemoryStream(Properties.Resources.PathOfExile_102));
             var splashWindow = new SplashScreen("Resources\\Splash.png");
             splashWindow.Show(true, false);
-
+            
             var window = (Window)Shell;
             Application.Current.MainWindow = window;
             
@@ -82,10 +87,6 @@ namespace PoeEye.Prism
 
             var window = (Window)Shell;
             
-            var moduleCatalog = Container.Resolve<IModuleCatalog>();
-            var modules = moduleCatalog.Modules.ToArray();
-            Log.Instance.Info($"Modules list:\n{modules.Select(x => new { x.ModuleName, x.ModuleType, x.State, x.InitializationMode, x.DependsOn }).DumpToTextRaw()}");
-
             var viewModel = Container.Resolve<IMainWindowViewModel>();
             window.DataContext = viewModel;
             window.Show();

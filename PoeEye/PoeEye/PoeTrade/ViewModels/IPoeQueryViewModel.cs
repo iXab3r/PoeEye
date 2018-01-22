@@ -8,9 +8,6 @@ namespace PoeEye.PoeTrade.ViewModels
     internal interface IPoeQueryViewModel : IPoeQueryInfo, IReactiveObject, IReactiveNotifyPropertyChanged<IReactiveObject>
     {
         [NotNull]
-        IPoeQueryInfo GetQueryInfo();
-
-        [NotNull]
         Func<IPoeQueryInfo> PoeQueryBuilder { get; }
 
         string Description { get; }

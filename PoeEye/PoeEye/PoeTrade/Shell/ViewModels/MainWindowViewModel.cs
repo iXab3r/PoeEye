@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
@@ -29,6 +30,7 @@ using PoeShared.Prism;
 using PoeShared.Scaffolding;
 using PoeShared.UI;
 using PoeShared.UI.ViewModels;
+using Prism.Commands;
 using ReactiveUI;
 using ReactiveUI.Legacy;
 using PoeEyeMainConfig = PoeEye.Config.PoeEyeMainConfig;
@@ -40,11 +42,13 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
 
     internal sealed class MainWindowViewModel : DisposableReactiveObject, IMainWindowViewModel
     {
+        private static readonly int UndoStackDepth = 10;
+
         private static readonly string ExplorerExecutablePath = Environment.ExpandEnvironmentVariables(@"%WINDIR%\explorer.exe");
 
         private static readonly TimeSpan ConfigSaveSampingTimeout = TimeSpan.FromSeconds(10);
 
-        private readonly ReactiveCommand<object> closeTabCommand = ReactiveUI.Legacy.ReactiveCommand.Create();
+        private readonly DelegateCommand<IMainWindowTabViewModel> closeTabCommand;
         private readonly ReactiveCommand<object> createNewTabCommand = ReactiveUI.Legacy.ReactiveCommand.Create();
         private readonly ReactiveCommand<Unit> refreshAllTabsCommand;
 
@@ -56,6 +60,9 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
         private readonly ReadOnlyObservableCollection<IMainWindowTabViewModel> tabsList;
         private readonly ISourceList<IMainWindowTabViewModel> tabsListSource = new SourceList<IMainWindowTabViewModel>();
         private readonly TabablzPositionMonitor<IMainWindowTabViewModel> positionMonitor = new TabablzPositionMonitor<IMainWindowTabViewModel>();
+        
+        private readonly CircularBuffer<IPoeQueryInfo> recentlyClosedQueries = new CircularBuffer<IPoeQueryInfo>(UndoStackDepth);
+        private readonly DelegateCommand undoCloseTabCommand;
 
         private IMainWindowTabViewModel selectedTab;
 
@@ -128,14 +135,12 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
             OpenAppDataDirectoryCommand = ReactiveUI.Legacy.ReactiveCommand
                 .CreateAsyncTask(x => OpenAppDataDirectory());
 
+            DuplicateTabCommand = new DelegateCommand<IMainWindowTabViewModel>(DuplicateTabCommandExecuted, DuplicateTabCommandCanExecute);
+            undoCloseTabCommand = new DelegateCommand(UndoCloseTabCommandExecuted, UndoCloseTabCommandCanExecute);
+            closeTabCommand = new DelegateCommand<IMainWindowTabViewModel>(RemoveTabCommandExecuted);
+
             createNewTabCommand
                 .Subscribe(arg => CreateNewTabCommandExecuted(arg as IPoeQueryInfo))
-                .AddTo(Anchors);
-
-            closeTabCommand
-                .Where(x => x is IMainWindowTabViewModel)
-                .Select(x => x as IMainWindowTabViewModel)
-                .Subscribe(RemoveTabCommandExecuted)
                 .AddTo(Anchors);
 
             refreshAllTabsCommand = ReactiveUI.Legacy.ReactiveCommand
@@ -172,8 +177,41 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
                 .Subscribe(SaveConfig, Log.HandleException)
                 .AddTo(Anchors);
         }
+        
+        private bool UndoCloseTabCommandCanExecute()
+        {
+            return !recentlyClosedQueries.IsEmpty;
+        }
+
+        private void UndoCloseTabCommandExecuted()
+        {
+            if (!UndoCloseTabCommandCanExecute())
+            {
+                return;
+            }
+            var query = recentlyClosedQueries.PopBack();
+            CreateNewTabCommandExecuted(query);
+            undoCloseTabCommand.RaiseCanExecuteChanged();
+        }
+
+        private bool DuplicateTabCommandCanExecute(IMainWindowTabViewModel tab)
+        {
+            return tab != null;
+        }
+
+        private void DuplicateTabCommandExecuted(IMainWindowTabViewModel tab)
+        {
+            Guard.ArgumentIsTrue(() => DuplicateTabCommandCanExecute(tab));
+            
+            var queryInfo = tab.Query.PoeQueryBuilder();
+            CreateNewTabCommandExecuted(queryInfo);
+        }
 
         public ICommand CreateNewTabCommand => createNewTabCommand;
+        
+        public ICommand DuplicateTabCommand { get; }
+
+        public ICommand UndoCloseTabCommand => undoCloseTabCommand;
 
         public ICommand CloseTabCommand => closeTabCommand;
 
@@ -245,7 +283,7 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
 
         private Task RefreshAllTabsCommandExecuted()
         {
-            foreach (var tab in TabsList.ToArray())
+            foreach (var tab in TabsList.Where(x => x.RecheckPeriod?.IsAutoRecheckEnabled == true).ToArray())
             {
                 tab.RefreshCommand.Execute(tab.Query?.PoeQueryBuilder);
             }
@@ -277,6 +315,14 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
         {
             Log.Instance.Debug($"[MainWindowViewModel.RemoveTab] Removing tab {tab}...");
             tabsListSource.Remove(tab);
+            
+            var query = tab.Query?.PoeQueryBuilder();
+            if (query != null)
+            {
+                recentlyClosedQueries.PushBack(query);
+                undoCloseTabCommand.RaiseCanExecuteChanged();
+            }
+
             tab.Dispose();
         }
 

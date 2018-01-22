@@ -280,6 +280,7 @@
     <Compile Include="PoeTrade\IPoePriceCalculcator.cs" />
     <Compile Include="PoeTrade\IPoeStaticDataSource.cs" />
     <Compile Include="Scaffolding\ChangeSetExtensions.cs" />
+    <Compile Include="Scaffolding\CircularBuffer.cs" />
     <Compile Include="Scaffolding\DisposableExtensions.cs" />
     <Compile Include="Scaffolding\Fallback.cs" />
     <Compile Include="Scaffolding\PoeItemExtensions.cs" />

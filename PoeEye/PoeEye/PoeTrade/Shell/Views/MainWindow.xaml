@@ -19,6 +19,7 @@
                       MinHeight="800"
                       Width="1400"
                       Height="800"
+                      x:Name="MainWindowRoot"
                       d:DataContext="{d:DesignInstance shellViewModels:MainWindowViewModel}"
                       BorderThickness="1" BorderBrush="{StaticResource AccentColorBrush}">
 
@@ -31,7 +32,11 @@
   </Window.Resources>
 
   <Window.InputBindings>
-    <KeyBinding Command="{Binding ClipboardParserViewModel.ParseClipboard}" Gesture="CTRL+V" />
+    <KeyBinding Gesture="CTRL+V" Command="{Binding ClipboardParserViewModel.ParseClipboard}" />
+    <KeyBinding Gesture="CTRL+T" Command="{Binding CreateNewTabCommand}" />
+    <KeyBinding Gesture="CTRL+D" Command="{Binding DuplicateTabCommand}" CommandParameter="{Binding SelectedTab}" />
+    <KeyBinding Gesture="CTRL+W" Command="{Binding CloseTabCommand}" CommandParameter="{Binding SelectedTab}" />
+    <KeyBinding Gesture="CTRL+Z" Command="{Binding UndoCloseTabCommand}" />
   </Window.InputBindings>
 
   <materialDesign:DrawerHost x:Name="MainDrawerHost"
@@ -130,10 +135,10 @@
                                      Style="{StaticResource DragablzVerticalTabablzControl}"
                                      HeaderItemTemplate="{StaticResource MainWindowTabItemViewTemplate}">
               <utilities:TabablzHelper.ItemContextMenu>
-                <ContextMenu>
+                <ContextMenu >
                   <MenuItem Header="Rename item"
                             InputGestureText="F2"
-                            Command="{Binding RenameCommand}" />
+                            Command="{Binding RenameCommand}" /> 
                 </ContextMenu>
               </utilities:TabablzHelper.ItemContextMenu>
               <dragablz:TabablzControl.ItemContainerStyle>

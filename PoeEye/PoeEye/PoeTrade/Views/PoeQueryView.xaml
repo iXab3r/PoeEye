@@ -6,7 +6,7 @@
                     xmlns:common="clr-namespace:PoeShared.Common;assembly=PoeShared"
                     xmlns:editors="https://github.com/iXab3r/WpfAutoCompleteControls"
                     xmlns:viewModels="clr-namespace:PoeEye.PoeTrade.ViewModels"
-                    xmlns:wpf="clr-namespace:PoeShared.Scaffolding.WPF;assembly=PoeShared"
+                    xmlns:eye="clr-namespace:PoeShared.Scaffolding.WPF;assembly=PoeShared"
                     xmlns:converters="clr-namespace:PoeEye.Converters">
   <DataTemplate DataType="{x:Type viewModels:PoeQueryViewModel}">
     <Grid>
@@ -83,6 +83,7 @@
                    Text="Name" Style="{StaticResource TextBlockHeader}" />
 
         <editors:AutoCompleteTextBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="5"
+                                     x:Name="QueryItemName"
                                      Style="{StaticResource AutoCompleteTextBoxStyleKey}"
                                      Provider="{Binding NameSuggestionProvider}"
                                      Width="NaN"
@@ -531,7 +532,7 @@
           <StackPanel.Resources>
             <ObjectDataProvider x:Key="PoeItemBuyoutModeFromEnum"
                                 MethodName="GetValuesAndDescriptions"
-                                ObjectType="wpf:EnumHelper">
+                                ObjectType="eye:EnumHelper">
               <ObjectDataProvider.MethodParameters>
                 <x:TypeExtension TypeName="common:PoeBuyoutMode" />
               </ObjectDataProvider.MethodParameters>
