@@ -32,7 +32,6 @@ namespace PoeEye.PoeTrade
     internal sealed class PoeTradeApi : DisposableReactiveObject, IPoeApi
     {
         private static readonly string PoeTradeSearchUri = @"http://poe.trade/search";
-        private static readonly string PoeTradeUri = @"http://poe.trade";
 
         private readonly SemaphoreSlim requestsSemaphore;
 

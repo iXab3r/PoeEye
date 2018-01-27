@@ -36,7 +36,7 @@ namespace PoeEye.StashRealtimeApi.Services
 
         public async Task<IPoeStaticData> RequestStaticData()
         {
-            return new PoeStaticData();
+            return await Task.Run(() => new PoeStaticData());
         }
 
         public void DisposeQuery(IPoeQueryInfo query)

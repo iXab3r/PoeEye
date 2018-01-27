@@ -68,8 +68,6 @@ namespace PoeChatWheel.ViewModels
         private KeyGesture hotkey;
         private bool isOpen;
 
-        private Point location;
-
         private RadialMenu.Controls.RadialMenu menuControl;
 
         public PoeChatWheelViewModel(

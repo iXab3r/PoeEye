@@ -127,7 +127,7 @@ namespace PoeEye.StashRealtimeApi.Services
                 }
                 LogTo.Debug("Cancellation requested");
             }
-            catch (OperationCanceledException ex)
+            catch (OperationCanceledException)
             {
                 LogTo.Warn($"Operation cancelled");
             }

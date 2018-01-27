@@ -252,34 +252,6 @@
       <Name>PoeBud</Name>
     </ProjectReference>
     <ProjectReference Include="..\PoeEye.StashGrid\PoeEye.StashGrid.csproj">
-      <Project>{75b4a3db-45c0-4639-b5a3-4d180ad4b9fb}</Project>
-      <Name>PoeEye.StashGrid</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\PoeEye.StashGrid\PoeEye.StashGrid.csproj">
-      <Project>{75b4a3db-45c0-4639-b5a3-4d180ad4b9fb}</Project>
-      <Name>PoeEye.StashGrid</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\PoeEye.StashGrid\PoeEye.StashGrid.csproj">
-      <Project>{75b4a3db-45c0-4639-b5a3-4d180ad4b9fb}</Project>
-      <Name>PoeEye.StashGrid</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\PoeEye.StashGrid\PoeEye.StashGrid.csproj">
-      <Project>{75b4a3db-45c0-4639-b5a3-4d180ad4b9fb}</Project>
-      <Name>PoeEye.StashGrid</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\PoeEye.StashGrid\PoeEye.StashGrid.csproj">
-      <Project>{1d955442-14fc-48d5-9d45-4a67fc3a9aa8}</Project>
-      <Name>PoeEye.StashGrid</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\PoeEye.StashGrid\PoeEye.StashGrid.csproj">
-      <Project>{1D955442-14FC-48D5-9D45-4A67FC3A9AA8}</Project>
-      <Name>PoeEye.StashGrid</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\PoeEye.StashGrid\PoeEye.StashGrid.csproj">
-      <Project>{1d955442-14fc-48d5-9d45-4a67fc3a9aa8}</Project>
-      <Name>PoeEye.StashGrid</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\PoeEye.StashGrid\PoeEye.StashGrid.csproj">
       <Project>{d68029e1-f012-457d-9539-fbaa9e1db33b}</Project>
       <Name>PoeEye.StashGrid</Name>
     </ProjectReference>

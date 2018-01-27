@@ -22,7 +22,7 @@ using System.Windows.Markup;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("D086C572-D7BD-4630-A89E-3810B548F59E")]
+[assembly: Guid("DC0A4ED0-09A5-4B42-B4F1-A51D04D8F714")]
 
 // Version information for an assembly consists of the following four values:
 //
