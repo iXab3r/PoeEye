@@ -110,6 +110,9 @@
       <HintPath>..\packages\DeltaCompressionDotNet.1.0.0\lib\net45\DeltaCompressionDotNet.PatchApi.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="DotNetZip, Version=1.10.1.0, Culture=neutral, PublicKeyToken=6583c7c814667745">
+      <HintPath>..\packages\DotNetZip.1.10.1\lib\net20\DotNetZip.dll</HintPath>
+    </Reference>
     <Reference Include="Dragablz, Version=0.0.3.186, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Dragablz.0.0.3.186\lib\net45\Dragablz.dll</HintPath>
       <Private>True</Private>
@@ -129,6 +132,9 @@
     <Reference Include="Exceptionless.Wpf, Version=3.3.1590.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Exceptionless.Wpf.3.3.1590\lib\net45\Exceptionless.Wpf.dll</HintPath>
       <Private>True</Private>
+    </Reference>
+    <Reference Include="ExceptionReporter.NET, Version=2.2.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\ExceptionReporter.2.3.0\lib\net40\ExceptionReporter.NET.dll</HintPath>
     </Reference>
     <Reference Include="FontAwesome.WPF, Version=4.7.0.37774, Culture=neutral, PublicKeyToken=0758b07a11a4f466, processorArchitecture=MSIL">
       <HintPath>..\packages\FontAwesome.WPF.4.7.0.9\lib\net40\FontAwesome.WPF.dll</HintPath>
@@ -248,6 +254,9 @@
     <Reference Include="RestEase, Version=1.0.5.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\RestEase.1.0.5\lib\net45\RestEase.dll</HintPath>
       <Private>True</Private>
+    </Reference>
+    <Reference Include="SimpleMapi, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\Simple-MAPI.NET.1.0.1\lib\net20\SimpleMapi.dll</HintPath>
     </Reference>
     <Reference Include="Splat, Version=1.6.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Splat.1.6.2\lib\Net45\Splat.dll</HintPath>

@@ -66,7 +66,7 @@ namespace PoeEye.TradeMonitor.Services.Notifications
 
                 Log.Instance.Debug($"[Poe.MailNotifier] Preparing message to '{emailAddress}'");
                 var message = new MimeMessage();
-                message.From.Add(new MailboxAddress("PoeEye", "mail.poeeye@gmail.com"));
+                message.From.Add(new MailboxAddress("PoeEye", AppArguments.PoeEyeMail));
                 message.To.Add(new MailboxAddress(Environment.UserName, emailAddress));
                 message.Subject = $"PoeEye notifications - {messagesToSend.Length} item(s)";
 

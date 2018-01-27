@@ -21,6 +21,7 @@ namespace PoeEye.Config
     internal sealed class PoeEyeConfigProviderFromFile : IConfigProvider
     {
         private static readonly string ConfigFileDirectory = AppArguments.AppDataDirectory;
+        
         private static readonly string DebugConfigFileName = @"configDebugMode.cfg";
         private static readonly string ReleaseConfigFileName = @"config.cfg";
 

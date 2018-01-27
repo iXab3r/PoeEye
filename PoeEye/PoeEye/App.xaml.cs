@@ -1,11 +1,17 @@
 ﻿using System;
 using System.Globalization;
+using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Threading;
 using CommandLine;
 using Exceptionless;
 using Exceptionless.Models;
+using ExceptionReporting;
+using ExceptionReporting.Core;
 using Guards;
 using log4net.Core;
 using Microsoft.Practices.Unity;
@@ -66,16 +72,77 @@ namespace PoeEye
             ExceptionlessClient.Default.SubmitEvent(new Event {Message = AppVersion, Type = "Version"});
         }
 
-        private void CurrentDomainOnUnhandledException(object sender,
-            UnhandledExceptionEventArgs unhandledExceptionEventArgs)
+        private void CurrentDomainOnUnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
-            Log.Instance.Error(
-                $"Unhandled application exception", unhandledExceptionEventArgs.ExceptionObject as Exception);
+            ReportCrash(e.ExceptionObject as Exception, "CurrentDomainUnhandledException");
+        }
+        
+        private void DispatcherOnUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
+        {
+            ReportCrash(e.Exception, "DispatcherUnhandledException");
+        }
+        
+        private void TaskSchedulerOnUnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e)
+        {
+            ReportCrash(e.Exception, "TaskSchedulerUnobservedTaskException");
+        }
+        
+        private void ReportCrash(Exception exception, string developerMessage = "")
+        {
+            Log.Instance.Error($"Unhandled application exception({developerMessage})", exception);
+
+            try
+            {
+                var reporter = new ExceptionReporter();
+
+                // otherwise, set configuration via code
+                var appName = Assembly.GetExecutingAssembly().GetName().Name;
+                reporter.Config.AppName = appName;
+                reporter.Config.TitleText = $"{appName} Error Report";
+                reporter.Config.MailMethod = ExceptionReportInfo.EmailMethod.SMTP;
+                reporter.Config.ShowSysInfoTab = true;
+                reporter.Config.ShowFlatButtons = true;
+                reporter.Config.ShowContactTab = true;
+                reporter.Config.TakeScreenshot = false;
+                
+                reporter.Config.SmtpFromAddress = $"[E] {Environment.UserName} @ {Environment.MachineName}";
+                reporter.Config.EmailReportAddress = AppArguments.PoeEyeMail;
+                reporter.Config.ContactEmail = AppArguments.PoeEyeMail;
+                reporter.Config.SmtpServer = "aspmx.l.google.com";
+                reporter.Config.SmtpPort = 25;
+                reporter.Config.SmtpUseSsl = true;
+                
+                reporter.Config.MainException = exception;
+
+                var configurationFilesToInclude = Directory
+                    .EnumerateFiles(AppArguments.AppDataDirectory, "*.cfg", SearchOption.TopDirectoryOnly);
+
+                var logFilesToInclude = new DirectoryInfo(AppArguments.AppDataDirectory)
+                    .GetFiles("*.log", SearchOption.AllDirectories)
+                    .OrderByDescending(x => x.LastWriteTime)
+                    .Take(2)
+                    .Select(x => x.FullName)
+                    .ToArray();
+
+                reporter.Config.FilesToAttach = new[]
+                {
+                    logFilesToInclude,
+                    configurationFilesToInclude,
+                }.SelectMany(x => x).ToArray();
+                reporter.Show(exception);
+            }
+            catch (Exception ex)
+            {
+                Log.Instance.Error($"Exception in ExceptionReporter :-(", ex);
+            }
         }
 
         private void InitializeLogging()
         {
             AppDomain.CurrentDomain.UnhandledException += CurrentDomainOnUnhandledException;
+            Application.Current.Dispatcher.UnhandledException += DispatcherOnUnhandledException;
+            TaskScheduler.UnobservedTaskException += TaskSchedulerOnUnobservedTaskException;
+            
             RxApp.DefaultExceptionHandler = Log.ErrorsSubject;
             if (AppArguments.Instance.IsDebugMode)
             {
