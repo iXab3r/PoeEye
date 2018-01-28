@@ -42,7 +42,7 @@ namespace PoeEye.PoeTrade.ViewModels {
                 () => TestConnectionCommandExecuted(new NetworkCredential(Username, PasswordBox?.Password)));
 
             this.WhenAnyValue(x => x.PasswordBox)
-                .Where(x => loadedConfig != null)
+                .Where(box => box != null && loadedConfig != null)
                 .ObserveOn(uiScheduler)
                 .Subscribe(x => x.Password = loadedConfig.UpdateSource.Password)
                 .AddTo(Anchors);
