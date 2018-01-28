@@ -216,7 +216,6 @@
   <ItemGroup>
     <Compile Include="Config\IPoeBudConfig.cs" />
     <Compile Include="Config\PoeBudConfig.cs" />
-    <Compile Include="Config\SafeDataConverter.cs" />
     <Compile Include="Converters\BooleanToObjectConverter.cs" />
     <Compile Include="Converters\IsGreaterThanValueToBooleanConverter.cs" />
     <Compile Include="Converters\NullToBoolConverter.cs" />

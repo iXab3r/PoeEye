@@ -4,7 +4,7 @@ namespace PoeEye.Converters
 
     using Newtonsoft.Json;
 
-    internal sealed class ConcreteListTypeConverter<TInterface, TImplementation> : JsonConverter where TImplementation : TInterface
+    internal sealed class ConcreteTypeConverter<TInterface, TImplementation> : JsonConverter where TImplementation : TInterface
     {
         public override bool CanConvert(Type objectType)
         {

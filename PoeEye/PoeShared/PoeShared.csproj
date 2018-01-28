@@ -209,6 +209,7 @@
       <HintPath>..\packages\Rx-XAML.2.2.5\lib\net45\System.Reactive.Windows.Threading.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="System.Security" />
     <Reference Include="System.Web" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -270,6 +271,7 @@
     <Compile Include="Converters\BoolInversionConverter.cs" />
     <Compile Include="Converters\FlagToObjectConverter.cs" />
     <Compile Include="Converters\PoeStashItemToPoeItem.cs" />
+    <Compile Include="Converters\SafeDataConverter.cs" />
     <Compile Include="Modularity\ISchedulerProvider.cs" />
     <Compile Include="Modularity\SchedulerProvider.cs" />
     <Compile Include="Native\IActivationController.cs" />

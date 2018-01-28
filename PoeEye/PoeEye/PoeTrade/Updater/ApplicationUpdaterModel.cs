@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
@@ -14,6 +15,7 @@ using Guards;
 using JetBrains.Annotations;
 using Microsoft.Practices.Unity;
 using PoeEye.Config;
+using PoeEye.Utilities;
 using PoeShared;
 using PoeShared.Modularity;
 using PoeShared.Prism;
@@ -77,9 +79,13 @@ namespace PoeEye.PoeTrade.Updater
             {
                 rootDirectory = AppDomain.CurrentDomain.BaseDirectory;
             }
-            Log.Instance.Debug($"[ApplicationUpdaterModel] AppName: {appName}, root directory: {rootDirectory}, update URI: {configProvider.ActualConfig.UpdateUri}");
-            
-            using (var mgr = new UpdateManager(configProvider.ActualConfig.UpdateUri, appName, rootDirectory))
+            Log.Instance.Debug($"[ApplicationUpdaterModel] AppName: {appName}, root directory: {rootDirectory}");
+
+            var updateSource = configProvider.ActualConfig.UpdateSource;
+            Log.Instance.Debug($"[ApplicationUpdaterModel] Using update source: {updateSource}");
+            var downloader = new BasicAuthFileDownloader(new NetworkCredential(configProvider.ActualConfig.UpdateSource.Username, configProvider.ActualConfig.UpdateSource.Password));
+
+            using (var mgr = new UpdateManager(updateSource.Uri, appName, rootDirectory, downloader))
             {
                 Log.Instance.Debug($"[ApplicationUpdaterModel] Checking for updates...");
 

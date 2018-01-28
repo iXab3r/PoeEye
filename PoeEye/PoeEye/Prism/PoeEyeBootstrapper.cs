@@ -97,13 +97,13 @@ namespace PoeEye.Prism
             var configProvider = Container.TryResolve<IConfigProvider>();
             var converters = new JsonConverter[]
             {
-                new ConcreteListTypeConverter<IPoeQueryInfo, PoeQueryInfo>(),
-                new ConcreteListTypeConverter<IPoeItemType, PoeItemType>(),
-                new ConcreteListTypeConverter<IPoeItem, PoeItem>(),
-                new ConcreteListTypeConverter<IPoeItemMod, PoeItemMod>(),
-                new ConcreteListTypeConverter<IPoeLinksInfo, PoeLinksInfo>(),
-                new ConcreteListTypeConverter<IPoeQueryModsGroup, PoeQueryModsGroup>(),
-                new ConcreteListTypeConverter<IPoeQueryRangeModArgument, PoeQueryRangeModArgument>()
+                new ConcreteTypeConverter<IPoeQueryInfo, PoeQueryInfo>(),
+                new ConcreteTypeConverter<IPoeItemType, PoeItemType>(),
+                new ConcreteTypeConverter<IPoeItem, PoeItem>(),
+                new ConcreteTypeConverter<IPoeItemMod, PoeItemMod>(),
+                new ConcreteTypeConverter<IPoeLinksInfo, PoeLinksInfo>(),
+                new ConcreteTypeConverter<IPoeQueryModsGroup, PoeQueryModsGroup>(),
+                new ConcreteTypeConverter<IPoeQueryRangeModArgument, PoeQueryRangeModArgument>()
             };
             converters.ForEach(configProvider.RegisterConverter);
         }

@@ -1,16 +1,12 @@
-﻿namespace PoeBud.Config
+﻿using System;
+using System.Security.Cryptography;
+using System.Text;
+using Guards;
+using Newtonsoft.Json;
+
+namespace PoeShared.Converters
 {
-    using System;
-    using System.Security;
-    using System.Security.Cryptography;
-    using System.Text;
-
-    using Guards;
-
-    using Newtonsoft.Json;
-    using Newtonsoft.Json.Linq;
-
-    internal sealed class SafeDataConverter : JsonConverter
+    public sealed class SafeDataConverter : JsonConverter
     {
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {

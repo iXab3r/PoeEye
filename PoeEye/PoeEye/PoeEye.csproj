@@ -352,7 +352,7 @@
     <Compile Include="Config\GenericConfigProvider.cs" />
     <Compile Include="Config\PoeEyeConfigProviderFromFile.cs" />
     <Compile Include="Config\PoeEyeUpdateSettingsConfig.cs" />
-    <Compile Include="Converters\ConcreteListTypeConverter.cs" />
+    <Compile Include="Converters\ConcreteTypeConverter.cs" />
     <Compile Include="Config\PoeEyeMainConfig.cs" />
     <Compile Include="Config\PoeEyeTabConfig.cs" />
     <Compile Include="Converters\ConverterHelpers.cs" />
@@ -427,6 +427,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Utilities\BasicAuthFileDownloader.cs" />
     <Compile Include="Utilities\ContextMenuServiceExtensions.cs" />
     <Compile Include="Utilities\EditableTuple.cs" />
     <Compile Include="Utilities\FilterExtension\CollectionViewSourceFilteringBehavior.cs" />

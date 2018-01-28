@@ -1,4 +1,4 @@
-using PoeShared.Modularity;
+using PoeShared.Converters;
 
 namespace PoeBud.Config
 {

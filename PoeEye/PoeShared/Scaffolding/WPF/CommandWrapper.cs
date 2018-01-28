@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reactive.Linq;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using Guards;
 using ReactiveUI;
@@ -22,6 +23,16 @@ namespace PoeShared.Scaffolding.WPF
             command.ThrownExceptions.Subscribe(HandleException).AddTo(Anchors);
         }
 
+        public static CommandWrapper Create(Func<Task> execute, IObservable<bool> canExecute)
+        {
+            return new CommandWrapper(ReactiveCommand.CreateFromTask(execute, canExecute));
+        }
+        
+        public static CommandWrapper Create(Func<Task> execute)
+        {
+            return Create(execute, Observable.Return(true).Concat(Observable.Never<bool>()));
+        }
+
         public bool IsBusy => isBusy.Value;
 
         public string Error
@@ -31,7 +42,7 @@ namespace PoeShared.Scaffolding.WPF
         }
         
         private ICommand InnerCommand => command;
-
+        
         public bool CanExecute(object parameter)
         {
             return ((ICommand)command).CanExecute(parameter);
