@@ -4,13 +4,16 @@
                     xmlns:config="clr-namespace:PoeEye.Config"
                     xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
                     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-                    xmlns:fa="http://schemas.fontawesome.io/icons/">
+                    xmlns:fa="http://schemas.fontawesome.io/icons/" 
+                    xmlns:eye="http://coderush.net/poeeye/">
 
   <ResourceDictionary.MergedDictionaries>
     <ResourceDictionary
       Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.togglebutton.xaml" />
     <ResourceDictionary
       Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.textbox.xaml" />
+    <ResourceDictionary
+      Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.passwordbox.xaml" />
     <ResourceDictionary
       Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.progressbar.xaml" />
     <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.ValidationErrorTemplate.xaml"/>
@@ -53,9 +56,16 @@
                  materialDesign:HintAssist.Hint="login" 
                  Style="{StaticResource MaterialDesignFloatingHintTextBox}" 
                  Text="{Binding Username, UpdateSourceTrigger=PropertyChanged}" />
-        <TextBox DockPanel.Dock="Top" materialDesign:HintAssist.Hint="password" 
-                 Style="{StaticResource MaterialDesignFloatingHintTextBox}" 
-                 Text="{Binding Password, UpdateSourceTrigger=PropertyChanged}"/>
+        <PasswordBox x:Name="UpdateSourcePasswordBox" DockPanel.Dock="Top" materialDesign:HintAssist.Hint="password"
+                     Style="{StaticResource MaterialDesignFloatingHintPasswordBox}">
+          <eye:DataPiping.DataPipes>
+            <eye:DataPipeCollection>
+              <eye:DataPipe Source="{Binding ElementName=UpdateSourcePasswordBox}"
+                            Target="{Binding PasswordBox, Mode=OneWayToSource}" />
+            </eye:DataPipeCollection>
+          </eye:DataPiping.DataPipes>
+          
+        </PasswordBox>
       </DockPanel>
       
       <Button Grid.Row="3" Grid.Column="0" Command="{Binding TestConnectionCommand}"

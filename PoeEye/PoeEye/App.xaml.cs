@@ -114,6 +114,10 @@ namespace PoeEye
         {
             Log.Instance.Error($"Unhandled application exception({developerMessage})", exception);
 
+            AppDomain.CurrentDomain.UnhandledException -= CurrentDomainOnUnhandledException;
+            Application.Current.Dispatcher.UnhandledException -= DispatcherOnUnhandledException;
+            TaskScheduler.UnobservedTaskException -= TaskSchedulerOnUnobservedTaskException;
+            
             try
             {
                 var reporter = new ExceptionReporter();

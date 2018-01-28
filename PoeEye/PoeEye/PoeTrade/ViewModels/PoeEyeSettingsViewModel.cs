@@ -41,17 +41,16 @@ namespace PoeEye.PoeTrade.ViewModels
             Guard.ArgumentNotNull(container, nameof(container));
             this.container = container;
 
-            var settingsOpenedTrigger = this.WhenAnyValue(x => x.IsOpen)
-                .Where(x => x)
-                .Take(1)
-                .ToUnit();
-
-            modulesEnumerator
-                .Settings
-                .Changed
-                .ToUnit()
-                .SkipUntil(settingsOpenedTrigger)
-                .StartWith(Unit.Default)
+            Observable.CombineLatest(
+                    modulesEnumerator
+                        .Settings
+                        .Changed
+                        .ToUnit()
+                        .StartWith(Unit.Default),
+                    this.WhenAnyValue(x => x.IsOpen)
+                        .Where(x => x)
+                        .Take(1),
+                    (unit, b) => Unit.Default)
                 .Select(x => modulesEnumerator.Settings.ToList())
                 .Subscribe(ReloadModulesList)
                 .AddTo(Anchors);

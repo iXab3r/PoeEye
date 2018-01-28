@@ -28,8 +28,8 @@ namespace PoeEye.PoeTrade.ViewModels {
         private PoeEyeUpdateSettingsConfig loadedConfig;
         private UpdateSourceInfo updateSource;
         private string username;
-        private string password;
         private string updateSourcePatchNotes;
+        private PasswordBox passwordBox;
 
         public PoeEyeUpdateSettingsViewModel(
             [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
@@ -39,7 +39,13 @@ namespace PoeEye.PoeTrade.ViewModels {
             KnownUpdateSources = PoeEyeUpdateSettingsConfig.WellKnownUpdateSources;
 
             TestConnectionCommand = CommandWrapper.Create(
-                () => TestConnectionCommandExecuted(new NetworkCredential(Username, Password)));
+                () => TestConnectionCommandExecuted(new NetworkCredential(Username, PasswordBox?.Password)));
+
+            this.WhenAnyValue(x => x.PasswordBox)
+                .Where(x => loadedConfig != null)
+                .ObserveOn(uiScheduler)
+                .Subscribe(x => x.Password = loadedConfig.UpdateSource.Password)
+                .AddTo(Anchors);
         }
 
         public bool AutoUpdate
@@ -60,10 +66,10 @@ namespace PoeEye.PoeTrade.ViewModels {
             set { this.RaiseAndSetIfChanged(ref username, value); }
         }
 
-        public string Password
+        public PasswordBox PasswordBox
         {
-            get { return password; }
-            set { this.RaiseAndSetIfChanged(ref password, value); }
+            get { return passwordBox; }
+            set { this.RaiseAndSetIfChanged(ref passwordBox, value); }
         }
         
         public UpdateSourceInfo[] KnownUpdateSources { get; }
@@ -85,7 +91,10 @@ namespace PoeEye.PoeTrade.ViewModels {
             AutoUpdate = config.AutoUpdateTimeout > TimeSpan.Zero;
             UpdateSource = config.UpdateSource;
             Username = config.UpdateSource.Username;
-            Password = config.UpdateSource.Password;
+            if (PasswordBox != null)
+            {
+                PasswordBox.Password = config.UpdateSource.Password;
+            }
         }
         
         public PoeEyeUpdateSettingsConfig Save()
@@ -100,7 +109,7 @@ namespace PoeEye.PoeTrade.ViewModels {
             if (updateSource.RequiresAuthentication)
             {
                 updateSource.Username = Username;
-                updateSource.Password = Password;
+                updateSource.Password = PasswordBox.Password;
             }
             result.UpdateSource = updateSource;
             
