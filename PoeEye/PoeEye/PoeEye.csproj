@@ -407,6 +407,7 @@
     <Compile Include="PoeTrade\ViewModels\PoeChatViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\PoeClipboardParserViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\PoeEyeSettingsViewModel.cs" />
+    <Compile Include="PoeTrade\ViewModels\PoeEyeUpdateSettingsViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\PoeFilteredTradeViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\PoeItemModsViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\PoeLinksInfoViewModel.cs" />
@@ -589,6 +590,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="PoeTrade\Views\PoeEyeSettingsView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="PoeTrade\Views\PoeUpdateSettingsViewModel.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

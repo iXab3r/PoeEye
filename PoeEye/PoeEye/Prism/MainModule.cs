@@ -23,6 +23,7 @@ namespace PoeEye.Prism
         {
             var registrator = container.Resolve<IPoeEyeModulesRegistrator>();
             registrator.RegisterSettingsEditor<PoeEyeMainConfig, PoeMainSettingsViewModel>();
+            registrator.RegisterSettingsEditor<PoeEyeUpdateSettingsConfig, PoeEyeUpdateSettingsViewModel>();
         }
     }
 }

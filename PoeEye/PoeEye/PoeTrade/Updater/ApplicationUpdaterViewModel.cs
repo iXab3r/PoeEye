@@ -76,9 +76,7 @@ namespace PoeEye.PoeTrade.Updater
                 .AddTo(Anchors);
             
             configProvider
-                .WhenChanged
-                .Select(x => x.AutoUpdateTimeout)
-                .DistinctUntilChanged()
+                .ListenTo(x => x.AutoUpdateTimeout)
                 .WithPrevious((prev, curr) => new { prev, curr })
                 .Do(timeout => Log.Instance.Debug($"[ApplicationUpdaterViewModel] AutoUpdate timout changed: {timeout.prev} => {timeout.curr}"))
                 .Select(timeout => timeout.curr <= TimeSpan.Zero ? Observable.Never<long>() : Observable.Timer(DateTimeOffset.MinValue, timeout.curr, bgScheduler))
