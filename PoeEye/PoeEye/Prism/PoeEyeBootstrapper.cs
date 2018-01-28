@@ -80,7 +80,7 @@ namespace PoeEye.Prism
         {
             return new ConfigurationModuleCatalog();
         }
-
+        
         public override void Run(bool runWithDefaultConfiguration)
         {
             base.Run(runWithDefaultConfiguration);

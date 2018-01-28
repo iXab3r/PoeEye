@@ -50,14 +50,37 @@ namespace PoeEye
 
                 RxApp.SupportsRangeNotifications = false; //FIXME DynamicData (as of v4.11) does not support RangeNotifications
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Log.HandleException(e);
+                Log.HandleException(ex);
                 throw;
             }
         }
 
-        private static void InitializeExceptionless()
+        private void SingleInstanceValidationRoutine()
+        {
+            var mutexId = $"PoeEye{(AppArguments.Instance.IsDebugMode ? "DEBUG" : "RELEASE")}{{88286F90-96B8-4799-9E8E-78B581267D63}}";
+            Log.Instance.Debug($"[App] Acquiring mutex {mutexId}...");
+            var mutex = new Mutex(true, mutexId);
+            if(mutex.WaitOne(TimeSpan.Zero, true))
+            {
+                Log.Instance.Debug($"[App] Mutex {mutexId} was successfully acquired");
+
+                AppDomain.CurrentDomain.DomainUnload += delegate
+                {
+                    Log.Instance.Debug($"[App.DomainUnload] Detected DomainUnload, disposing mutex {mutexId}");
+                    mutex.ReleaseMutex();
+                    Log.Instance.Debug($"[App.DomainUnload] Mutex was successfully disposed");
+                };
+            } 
+            else 
+            {
+                Log.Instance.Warn($"[App] Appliation is already running, mutex: {mutexId}");
+                ShowShutdownWarning();
+            }
+        }
+
+        private void InitializeExceptionless()
         {
             Log.Instance.Debug("Initializing exceptionless...");
             ExceptionlessClient.Default.Configuration.ApiKey = "dkjcxnVxQO9Nx6zJdYYyAW66gHt5YP5XCmHNmjYj";
@@ -155,31 +178,28 @@ namespace PoeEye
             }
         }
 
-        protected override void OnStartup(StartupEventArgs e, bool? isFirstInstance)
+        protected override void OnStartup(StartupEventArgs e)
         {
-            base.OnStartup(e, isFirstInstance);
+            base.OnStartup(e);
+            
+            Log.Instance.Debug($"Application startup detected");
 
-            if (isFirstInstance != true)
-            {
-                Log.Instance.Warn($"Application is already running !");
-                ShutdownIfNotInDebugMode();
-            }
+            SingleInstanceValidationRoutine();
 
             Log.Instance.Info($"Initializing bootstrapper...");
             bootstrapper.Run();
         }
 
-        protected override void OnExit(ExitEventArgs e, bool isFirstInstance)
+        protected override void OnExit(ExitEventArgs e)
         {
-            base.OnExit(e, isFirstInstance);
+            base.OnExit(e);
             
             Log.Instance.Debug($"Application exit detected");
             bootstrapper.Dispose();
         }
 
-        private void ShutdownIfNotInDebugMode()
+        private void ShowShutdownWarning()
         {
-#if !DEBUG
             var assemblyName = System.Reflection.Assembly.GetExecutingAssembly().GetName();
             var window = MainWindow;
             var title = $"{assemblyName.Name} v{assemblyName.Version}";
@@ -193,8 +213,7 @@ namespace PoeEye
                 MessageBox.Show(message, title, MessageBoxButton.OK, MessageBoxImage.Warning);
             }
             Log.Instance.Warn($"Shutting down...");
-            Shutdown(1);
-#endif
+            Environment.Exit(0);
         }
     }
 }
