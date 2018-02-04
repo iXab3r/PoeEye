@@ -3,19 +3,20 @@
                     xmlns:viewModels="clr-namespace:PoeBud.ViewModels"
                     xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
                     xmlns:models="clr-namespace:PoeBud.Models"
-                    xmlns:dataTypes="clr-namespace:PoeShared.StashApi.DataTypes;assembly=PoeShared">
+                    xmlns:dataTypes="clr-namespace:PoeShared.StashApi.DataTypes;assembly=PoeShared"
+                    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+                    xmlns:fa="http://schemas.fontawesome.io/icons/">
   <DataTemplate DataType="{x:Type viewModels:PoeBudSettingsViewModel}">
 
     <DataTemplate.Resources>
       <ResourceDictionary>
         <ResourceDictionary.MergedDictionaries>
           <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Generic.xaml" />
+          <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.progressbar.xaml" />
           <ResourceDictionary Source="../Themes/Generic.xaml" />
         </ResourceDictionary.MergedDictionaries>
 
         <Style TargetType="{x:Type ScrollBar}" BasedOn="{StaticResource SlimScrollBarStyleKey}" />
-        <Style TargetType="{x:Type Label}" BasedOn="{StaticResource IconLabel}" />
-        <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource IconTextBlock}" />
       </ResourceDictionary>
 
     </DataTemplate.Resources>
@@ -88,34 +89,31 @@
                    controls:TextBoxHelper.Watermark="password"
                    x:Name="LoginPasswordBox" />
 
-      <Grid Grid.Row="6">
-        <Grid.ColumnDefinitions>
-          <ColumnDefinition Width="*" />
-          <ColumnDefinition Width="Auto" />
-        </Grid.ColumnDefinitions>
-        
-        <TextBlock Grid.Column="0"
-                   Style="{StaticResource IconTextBlock}"
-                   Foreground="Orange"
-                   Margin="5,0"
-                   FontSize="13" TextTrimming="CharacterEllipsis"
-                   Visibility="{Binding LoginCommand.Error, Converter={StaticResource NullToCollapsedConverter}}"
-                   Text="{Binding LoginCommand.Error, StringFormat='&#xF071; {0}'}" />
-        <!-- &#xF071; --> 
-        <Button Grid.Column="1"
-                Width="160" Height="22"
-                IsDefault="true"
-                Command="{Binding LoginCommand}" CommandParameter="{Binding ElementName=LoginPasswordBox}">
+      <materialDesign:Badged Grid.Row="6" HorizontalAlignment="Right"
+                             BadgeBackground="{x:Null}" BadgeColorZoneMode="PrimaryDark" BadgePlacementMode="Left">
+        <materialDesign:Badged.Badge>
+          <Grid Margin="30,0,0,0">
+            <Label Visibility="{Binding LoginCommand.Error, Converter={StaticResource NullToCollapsedConverter}}"
+                   ToolTip="{Binding LoginCommand.Error}" 
+                   Foreground="{StaticResource ValidationErrorBrush}"
+                   fa:Awesome.Content="Warning" 
+                   Margin="5,0" />
+            <ProgressBar HorizontalAlignment="Right" Width="20" Height="20" Margin="5,0" 
+                         Style="{StaticResource MaterialDesignCircularProgressBar}"
+                         IsIndeterminate="True"
+                         Visibility="{Binding LoginCommand.IsBusy, Converter={StaticResource TrueToVisibleFalseToCollapsedConverter}}"/>
+          </Grid>
+        </materialDesign:Badged.Badge>
+      
+        <Button Command="{Binding LoginCommand}" CommandParameter="{Binding ElementName=LoginPasswordBox}" IsDefault="True"
+                HorizontalAlignment="Right" Width="200" Margin="0,5">
           <Button.Content>
             <DockPanel LastChildFill="True">
-              <controls:ProgressRing DockPanel.Dock="Right" HorizontalAlignment="Right" Width="14" Height="14" Margin="5,0" 
-                                     IsActive="{Binding LoginCommand.IsBusy}" 
-                                     Visibility="{Binding LoginCommand.IsBusy, Converter={StaticResource TrueToVisibleFalseToCollapsedConverter}}"/>
-              <TextBlock DockPanel.Dock="Left" Text="Fetch stashes"/>
+              <TextBlock DockPanel.Dock="Left" Text="Fetch stash list"/>
             </DockPanel>
           </Button.Content>
         </Button>
-      </Grid>
+      </materialDesign:Badged>
 
       <GroupBox Grid.Row="7"
                 IsEnabled="{Binding LoginCommand.IsBusy, Converter={StaticResource BoolInvertConverter}}"

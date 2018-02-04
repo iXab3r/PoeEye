@@ -8,14 +8,11 @@
                     xmlns:eye="http://coderush.net/poeeye/">
 
   <ResourceDictionary.MergedDictionaries>
-    <ResourceDictionary
-      Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.togglebutton.xaml" />
-    <ResourceDictionary
-      Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.textbox.xaml" />
-    <ResourceDictionary
-      Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.passwordbox.xaml" />
-    <ResourceDictionary
-      Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.progressbar.xaml" />
+    <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.togglebutton.xaml" />
+    <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.textbox.xaml" />
+    <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.passwordbox.xaml" />
+    <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.combobox.xaml" />
+    <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.progressbar.xaml" />
     <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.ValidationErrorTemplate.xaml"/>
   </ResourceDictionary.MergedDictionaries>
 
@@ -29,24 +26,18 @@
       </Grid.RowDefinitions>
 
       <DockPanel Grid.Row="0" Grid.Column="0">
-        <Label Style="{StaticResource IconLabel}" Content="AutoUpdate:" MinWidth="100" />
+        <Label Content="AutoUpdate:" MinWidth="100" />
         <ToggleButton ToolTip="Is application auto-update enabled or not" 
                       HorizontalAlignment="Left"
                       IsChecked="{Binding AutoUpdate}" />
       </DockPanel>
       
       <DockPanel Grid.Row="1" Grid.Column="0">
-        <Label Style="{StaticResource IconLabel}" Content="Update source:" MinWidth="100" />
-        <ComboBox x:Name="UpdateSourceCombobox" ItemsSource="{Binding KnownUpdateSources}"
-                  SelectedItem="{Binding UpdateSource}"
+        <Label Content="Update source:" MinWidth="100" />
+        <ComboBox x:Name="UpdateSourceCombobox" 
+                  SelectedItem="{Binding UpdateSource, UpdateSourceTrigger=PropertyChanged}"
+                  ItemsSource="{Binding KnownUpdateSources}"
                   DisplayMemberPath="Description">
-          <ComboBox.ItemTemplate>
-            <DataTemplate DataType="{x:Type config:UpdateSourceInfo}">
-              <TextBlock Background="Transparent" 
-                         Text="{Binding Description}"
-                         ToolTip="{Binding Uri}"/>
-            </DataTemplate>
-          </ComboBox.ItemTemplate>
         </ComboBox>
       </DockPanel>
       
@@ -68,30 +59,38 @@
         </PasswordBox>
       </DockPanel>
       
-      <Button Grid.Row="3" Grid.Column="0" Command="{Binding TestConnectionCommand}"
-              HorizontalAlignment="Right" Width="200" Margin="0,5">
-        <Button.Content>
-          <DockPanel LastChildFill="True">
-            <Label Style="{StaticResource IconLabel}"
-                   Visibility="{Binding TestConnectionCommand.Error, Converter={StaticResource NullToCollapsedConverter}}"
+      <materialDesign:Badged Grid.Row="3" Grid.Column="0" HorizontalAlignment="Right"
+                             BadgeBackground="{x:Null}" BadgeColorZoneMode="PrimaryDark" BadgePlacementMode="Left">
+        <materialDesign:Badged.Badge>
+          <Grid Margin="30,0,0,0">
+            <Label Visibility="{Binding TestConnectionCommand.Error, Converter={StaticResource NullToCollapsedConverter}}"
                    ToolTip="{Binding TestConnectionCommand.Error}" 
                    Foreground="{StaticResource ValidationErrorBrush}"
                    fa:Awesome.Content="Warning" 
                    Margin="5,0" />
-            <Label Style="{StaticResource IconLabel}"
-                   Visibility="{Binding UpdateSourcePatchNotes, Converter={StaticResource NullToCollapsedConverter}}"
-                   ToolTip="{Binding UpdateSourcePatchNotes}" 
+            <Label Visibility="{Binding TestConnectionCommand.Description, Converter={StaticResource NullToCollapsedConverter}}"
+                   ToolTip="{Binding TestConnectionCommand.Description}" 
                    Foreground="LightGreen"
                    fa:Awesome.Content="CheckCircle" 
                    Margin="5,0" />
-            <ProgressBar DockPanel.Dock="Right" HorizontalAlignment="Right" Width="20" Height="20" Margin="5,0" 
+            <ProgressBar HorizontalAlignment="Right" Width="20" Height="20" Margin="5,0" 
                          Style="{StaticResource MaterialDesignCircularProgressBar}"
                          IsIndeterminate="True"
                          Visibility="{Binding TestConnectionCommand.IsBusy, Converter={StaticResource TrueToVisibleFalseToCollapsedConverter}}"/>
-            <TextBlock DockPanel.Dock="Left" Text="Test Connection"/>
-          </DockPanel>
-        </Button.Content>
-      </Button>
+          </Grid>
+        </materialDesign:Badged.Badge>
+        
+        <Button Command="{Binding TestConnectionCommand}" IsDefault="True"
+                HorizontalAlignment="Right" Width="200" Margin="0,5">
+          <Button.Content>
+            <DockPanel LastChildFill="True">
+              <TextBlock DockPanel.Dock="Left" Text="Test Connection"/>
+            </DockPanel>
+          </Button.Content>
+        </Button>
+      </materialDesign:Badged>
+      
+     
     </Grid>
   </DataTemplate>
 </ResourceDictionary>

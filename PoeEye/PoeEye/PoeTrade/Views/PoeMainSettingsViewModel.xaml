@@ -9,29 +9,28 @@
 
   <ResourceDictionary.MergedDictionaries>
     <ResourceDictionary Source="pack://application:,,,/PoeShared;component/UI/Views/CurrencyTestView.xaml" />
-    <ResourceDictionary
-      Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.togglebutton.xaml" />
+    <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.togglebutton.xaml" />
+    <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.textbox.xaml" />
   </ResourceDictionary.MergedDictionaries>
 
   <DataTemplate DataType="{x:Type viewModels1:PoeMainSettingsViewModel}">
     <Grid Margin="10,5">
       <Grid.RowDefinitions>
-        <RowDefinition Height="Auto" />
-        <RowDefinition Height="Auto" />
+        <RowDefinition Height="34" />
         <RowDefinition Height="Auto" />
         <RowDefinition Height="Auto" />
       </Grid.RowDefinitions>
 
-      <StackPanel Grid.Row="1" Grid.Column="0"
-                  Orientation="Horizontal" Height="24">
-        <Label Style="{StaticResource IconLabel}" Content="Whispers:" MinWidth="100" />
-        <ToggleButton ToolTip="In-game whisper notifications" Height="26"
+      <StackPanel Grid.Row="0" Grid.Column="0"
+                  Orientation="Horizontal">
+        <Label Content="Whispers:" MinWidth="100" />
+        <ToggleButton ToolTip="In-game whisper notifications"
                       IsChecked="{Binding WhisperNotificationsEnabled}" />
       </StackPanel>
 
-      <StackPanel Grid.Row="2" Grid.Column="0"
+      <StackPanel Grid.Row="1" Grid.Column="0"
                   Orientation="Vertical">
-        <Label Style="{StaticResource IconLabel}" MinWidth="100" HorizontalContentAlignment="Stretch">
+        <Label MinWidth="100" HorizontalContentAlignment="Stretch">
           <Label.Content>
             <DockPanel LastChildFill="True">
               <TextBlock DockPanel.Dock="Left" Text="Currencies rate"/>
@@ -40,8 +39,7 @@
                       Command="{Binding GetEconomicsCommand}" Margin="0,5">
                 <Button.Content>
                   <DockPanel LastChildFill="True">
-                    <Label Style="{StaticResource IconLabel}"
-                           Visibility="{Binding GetEconomicsCommand.Error, Converter={StaticResource NullToCollapsedConverter}}"
+                    <Label Visibility="{Binding GetEconomicsCommand.Error, Converter={StaticResource NullToCollapsedConverter}}"
                            ToolTip="{Binding GetEconomicsCommand.Error}"
                            Foreground="{StaticResource ValidationSummaryColor3}"
                            VerticalAlignment="Stretch"
@@ -71,8 +69,8 @@
                 <ContentPresenter
                   Grid.Column="0"
                   Content="{Binding Item1, Mode=OneWay}" />
-                <TextBox Grid.Column="1" 
-                         Style="{StaticResource TextBoxKey}"
+                <TextBox Grid.Column="1" Margin="2,0"
+                         Width="60"
                          Text="{Binding Item2, Converter={x:Static converters:NullableConverter.Instance}, StringFormat='{}{0:F2}'}" />
                 <ContentPresenter
                   Grid.Column="2" Content="{x:Static common:PoePrice.ChaosOrb}">
@@ -86,7 +84,7 @@
         </ItemsControl>
       </StackPanel>
       
-      <Expander Grid.Row="3" Margin="0,10" 
+      <Expander Grid.Row="2" Margin="0,10" 
                 Header="Currency list (Debug-only)"
                 Visibility="{Binding CurrencyTest, Converter={StaticResource NullToCollapsedConverter}}">
         <ContentPresenter 

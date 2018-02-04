@@ -74,13 +74,7 @@ namespace PoeEye.PoeTrade.ViewModels {
         
         public UpdateSourceInfo[] KnownUpdateSources { get; }
         
-        public ICommand TestConnectionCommand { get; }
-
-        public string UpdateSourcePatchNotes
-        {
-            get { return updateSourcePatchNotes; }
-            set { this.RaiseAndSetIfChanged(ref updateSourcePatchNotes, value); }
-        }
+        public CommandWrapper TestConnectionCommand { get; }
         
         public string ModuleName { get; } = "Update settings";
         
@@ -118,7 +112,7 @@ namespace PoeEye.PoeTrade.ViewModels {
         
         private async Task TestConnectionCommandExecuted(NetworkCredential credentials)
         {
-            UpdateSourcePatchNotes = null;
+            TestConnectionCommand.Description = null;
             var fakeUpdateDirectory = Path.Combine(Path.GetTempPath(), "PoeEye");
             var downloader = new BasicAuthFileDownloader(credentials);
             using (var updateManager = new UpdateManager(UpdateSource.Uri, "PoeEye", fakeUpdateDirectory, downloader))
@@ -128,7 +122,7 @@ namespace PoeEye.PoeTrade.ViewModels {
                 var updateInfo = await updateManager.CheckForUpdate(true);
                 Log.Instance.Debug($"[TestConnection] UpdateInfo:\r\n{updateInfo?.DumpToText()}");
 
-                UpdateSourcePatchNotes = $"Successfully connected to {updateSource.Description}\n{updateInfo?.DumpToText()}";
+                TestConnectionCommand.Description = $"Successfully connected to {updateSource.Description}\n{updateInfo?.DumpToText()}";
             }
         }
     }

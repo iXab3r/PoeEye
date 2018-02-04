@@ -29,8 +29,7 @@
 
       <StackPanel Grid.Row="0" Grid.Column="0"
                   Orientation="Horizontal">
-        <Label Style="{StaticResource IconLabel}"
-               MinWidth="100"
+        <Label MinWidth="100"
                Content="Is Enabled:" />
         <ToggleButton
           IsChecked="{Binding IsEnabled}"
@@ -40,8 +39,7 @@
 
       <StackPanel Grid.Row="1" Grid.Column="0"
                   Orientation="Horizontal">
-        <Label Style="{StaticResource IconLabel}"
-               MinWidth="100"
+        <Label MinWidth="100"
                Content="Whispers:" />
         <ContentPresenter Content="{Binding AudioNotificationSelector}" />
       </StackPanel>
@@ -49,7 +47,7 @@
       <StackPanel Grid.Column="0" Grid.Row="2"
                   Orientation="Vertical">
         <Grid>
-          <TextBlock Text="Response buttons" Style="{StaticResource IconTextBlock}" />
+          <TextBlock Text="Response buttons" />
           <Button Content="&#xf055; Add new"
                   Height="24" Width="110"
                   HorizontalAlignment="Right"

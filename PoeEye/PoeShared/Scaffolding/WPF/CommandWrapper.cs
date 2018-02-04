@@ -12,7 +12,8 @@ namespace PoeShared.Scaffolding.WPF
         private readonly ReactiveCommand command;
         private readonly ObservableAsPropertyHelper<bool> isBusy;
         private string error;
-        
+        private string description;
+
         public CommandWrapper(ReactiveCommand command)
         {
             Guard.ArgumentNotNull(command, nameof(command));
@@ -39,6 +40,12 @@ namespace PoeShared.Scaffolding.WPF
         {
             get { return error; }
             private set { this.RaiseAndSetIfChanged(ref error, value); }
+        }
+
+        public string Description
+        {
+            get { return description; }
+            set { this.RaiseAndSetIfChanged(ref description, value); }
         }
         
         private ICommand InnerCommand => command;

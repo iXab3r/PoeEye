@@ -4,10 +4,8 @@
   <ResourceDictionary.MergedDictionaries>
     <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Converters.xaml" />
     <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Colors.xaml" />
-    <ResourceDictionary
-      Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.togglebutton.xaml" />
-    <ResourceDictionary
-      Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.button.xaml" />
+    <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.togglebutton.xaml" />
+    <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.button.xaml" />
     <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.dark.xaml" />
     <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.popupbox.xaml" />
     <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/styles/controls.buttons.xaml" />
@@ -107,5 +105,7 @@
     <Setter Property="HorizontalContentAlignment" Value="Center" />
     <Setter Property="VerticalContentAlignment" Value="Center" />
   </Style>
+  
+  
 
 </ResourceDictionary>
