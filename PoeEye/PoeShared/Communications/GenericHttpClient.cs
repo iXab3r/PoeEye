@@ -152,7 +152,7 @@ namespace PoeShared.Communications
                 {
                     var rawBytes = responseStream.ReadToEnd();
                     Log.Instance.Debug($"[HttpClient] Received response, status: {response.StatusCode}, binary length: {rawBytes}");
-                    rawResponse = Encoding.ASCII.GetString(rawBytes);
+                    rawResponse = Encoding.UTF8.GetString(rawBytes);
                     Log.Instance.Debug($"[HttpClient] Resulting response(string) length: {rawResponse.Length}");
                 }
                 else
