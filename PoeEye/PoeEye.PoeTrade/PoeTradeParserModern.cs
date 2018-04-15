@@ -404,28 +404,6 @@ namespace PoeEye.PoeTrade
         private PoeItemMod[] ExtractExplicitMods(CQ parser)
         {
             var mods = parser["ul[class=mods] li"].Select(x => ExtractItemMod(x, PoeModType.Explicit)).ToArray();
-            foreach (var mod in mods)
-            {
-                if (mod.Name.StartsWith("crafted", StringComparison.OrdinalIgnoreCase))
-                {
-                    mod.Origin = PoeModOrigin.Craft;
-                    mod.Name = mod.Name.Remove(0, "crafted".Length);
-                }
-                if (mod.Name.StartsWith("enchanted", StringComparison.OrdinalIgnoreCase))
-                {
-                    mod.Origin = PoeModOrigin.Enchant;
-                    mod.ModType = PoeModType.Implicit;
-                    mod.Name = mod.Name.Remove(0, "enchanted".Length);
-                }
-                if (mod.Name.StartsWith("total:", StringComparison.OrdinalIgnoreCase))
-                {
-                    mod.ModType = PoeModType.Unknown;
-                }
-                if (mod.Name.StartsWith("pseudo:", StringComparison.OrdinalIgnoreCase))
-                {
-                    mod.ModType = PoeModType.Unknown;
-                }
-            }
             return mods;
         }
 
@@ -459,6 +437,27 @@ namespace PoeEye.PoeTrade
             }
 
             TrimProperties(result);
+            
+            if (result.Name.StartsWith("crafted", StringComparison.OrdinalIgnoreCase))
+            {
+                result.Origin = PoeModOrigin.Craft;
+                result.Name = result.Name.Remove(0, "crafted".Length);
+            }
+            if (result.Name.StartsWith("enchanted", StringComparison.OrdinalIgnoreCase))
+            {
+                result.Origin = PoeModOrigin.Enchant;
+                result.ModType = PoeModType.Implicit;
+                result.Name = result.Name.Remove(0, "enchanted".Length);
+            }
+            if (result.Name.IndexOf("(total)", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                result.ModType = PoeModType.Unknown;
+            }
+            if (result.Name.IndexOf("(pseudo)", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                result.ModType = PoeModType.Unknown;
+            }
+            
             return result;
         }
         
