@@ -315,9 +315,8 @@
     <wpf:TemplateMapping Key="False" Template="{StaticResource PoeItemModsTemplateKey}" />
   </wpf:MappingTemplateSelector>
 
-  <DataTemplate x:Key="PoeTradeViewModelTemplateKey">
-    <ContentControl Margin="10">
-      <Grid>
+  <DataTemplate DataType="{x:Type viewModels:PoeTradeViewModel}">
+      <Grid Margin="10">
         <Grid.RowDefinitions>
           <RowDefinition Height="40" />
           <RowDefinition Height="*" />
@@ -641,7 +640,6 @@
         </Border>
 
       </Grid>
-    </ContentControl>
   </DataTemplate>
 
 </ResourceDictionary>
