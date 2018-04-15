@@ -103,7 +103,7 @@ namespace PoeEye.PoeTrade.ViewModels {
             if (updateSource.RequiresAuthentication)
             {
                 updateSource.Username = Username;
-                updateSource.Password = PasswordBox.Password;
+                updateSource.Password = PasswordBox?.Password;
             }
             result.UpdateSource = updateSource;
             

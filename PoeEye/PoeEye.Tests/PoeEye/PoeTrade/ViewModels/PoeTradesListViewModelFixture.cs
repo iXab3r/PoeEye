@@ -13,6 +13,7 @@ using PoeShared;
 using PoeShared.Common;
 using PoeShared.PoeTrade;
 using PoeShared.Prism;
+using PoeShared.Scaffolding;
 using Shouldly;
 
 namespace PoeEye.Tests.PoeEye.PoeTrade.ViewModels
@@ -27,7 +28,6 @@ namespace PoeEye.Tests.PoeEye.PoeTrade.ViewModels
         private Mock<IFactory<IPoeLiveHistoryProvider, IPoeApiWrapper, IPoeQueryInfo>> poeLiveHistoryFactory;
 
         private Mock<IPoeLiveHistoryProvider> poeLiveHistory;
-        private Mock<IHistoricalTradesViewModel> historicalTradesViewModel;
         private Mock<IPoeCaptchaRegistrator> captchaService;
         private ISubject<IPoeItem[]> poeLiveHistoryItems;
         private ISubject<Exception> poeLiveHistoryUpdateExceptions;
@@ -63,7 +63,6 @@ namespace PoeEye.Tests.PoeEye.PoeTrade.ViewModels
                 .Setup(x => x.Create(It.IsAny<IPoeApiWrapper>(), It.IsAny<IPoeQueryInfo>()))
                 .Returns(poeLiveHistory.Object);
 
-            historicalTradesViewModel = new Mock<IHistoricalTradesViewModel>();
             captchaService = new Mock<IPoeCaptchaRegistrator>();
             captchaService.Setup(x => x.CaptchaRequests).Returns(new Subject<string>());
         }
@@ -96,8 +95,7 @@ namespace PoeEye.Tests.PoeEye.PoeTrade.ViewModels
             poeLiveHistoryItems.OnNext(itemsPack);
 
             //Then
-            var actualItems = instance.Items.Select(x => x.Trade).ToArray();
-            CollectionAssert.AreEqual(itemsPack, actualItems);
+            itemsPack.ForEach(x => poeTradeViewModelFactory.Verify(y => y.Create(x), Times.Once));
         }
 
         [Test]
@@ -155,24 +153,6 @@ namespace PoeEye.Tests.PoeEye.PoeTrade.ViewModels
         }
 
         [Test]
-        public void ShouldMoveRemovedItemsToHistoricalTrades()
-        {
-            //Given
-            var instance = CreateInstance();
-            instance.ActiveQuery = Mock.Of<IPoeQueryInfo>();
-
-            poeLiveHistoryItems.OnNext(new[] {Mock.Of<IPoeItem>()});
-
-            var trade = instance.Items.Single();
-
-            //When
-            poeLiveHistoryItems.OnNext(new IPoeItem[0]);
-
-            //Then
-            historicalTradesViewModel.Verify(x => x.AddItems(trade.Trade), Times.Once);
-        }
-
-        [Test]
         [TestCase(PoeTradeState.New, PoeTradeState.New)]
         [TestCase(PoeTradeState.Normal, PoeTradeState.Normal)]
         [TestCase(PoeTradeState.Unknown, PoeTradeState.Unknown)]
@@ -200,38 +180,6 @@ namespace PoeEye.Tests.PoeEye.PoeTrade.ViewModels
 
             //Then
             trade.TradeState.ShouldBe(expectedState);
-        }
-
-        [Test]
-        public void ShouldNotRemoveItemFromHistoricalTradesIfArrivedAgain()
-        {
-            //Given
-            var instance = CreateInstance();
-            instance.ActiveQuery = Mock.Of<IPoeQueryInfo>();
-
-            var item = Mock.Of<IPoeItem>();
-            poeLiveHistoryItems.OnNext(new[] {item});
-
-            poeLiveHistoryItems.OnNext(new IPoeItem[0]);
-
-            var trade = instance.Items.Single();
-            trade.TradeState = PoeTradeState.Normal;
-
-            poeItemsComparer
-                .Setup(x => x.Equals(It.IsAny<IPoeItem>(), It.IsAny<IPoeItem>()))
-                .Returns(true);
-
-            historicalTradesViewModel.Reset();
-
-            //When
-            poeLiveHistoryItems.OnNext(new[] {item});
-
-            //Then
-            historicalTradesViewModel.Verify(x => x.AddItems(It.IsAny<IPoeItem[]>()), Times.Never);
-            historicalTradesViewModel.Verify(x => x.Clear(), Times.Never);
-
-            var actualItems = instance.Items.Select(x => x.Trade).ToArray();
-            CollectionAssert.AreEqual(new[] {item}, actualItems);
         }
 
         [Test]
@@ -283,7 +231,6 @@ namespace PoeEye.Tests.PoeEye.PoeTrade.ViewModels
                 poeLiveHistoryFactory.Object,
                 poeTradeViewModelFactory.Object,
                 captchaService.Object,
-                historicalTradesViewModel.Object,
                 poeItemsComparer.Object,
                 clock.Object,
                 Scheduler.Immediate);

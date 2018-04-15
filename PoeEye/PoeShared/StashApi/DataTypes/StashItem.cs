@@ -1,7 +1,9 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using PoeShared.Common;
+using PoeShared.Scaffolding;
 using RestSharp.Deserializers;
 
 namespace PoeShared.StashApi.DataTypes
@@ -12,9 +14,11 @@ namespace PoeShared.StashApi.DataTypes
         [JsonProperty("id")]
         public string Id { get; set; }
 
+        public IEnumerable<string> Categories => CategoriesRaw == null ? Enumerable.Empty<string>() : CategoriesRaw.Keys.EmptyIfNull();
+        
         [DeserializeAs(Name = "category")]
         [JsonProperty("category")]
-        public string Category { get; set; }
+        public Dictionary<string, string> CategoriesRaw { get; set; }
 
         [DeserializeAs(Name = "verified")]
         [JsonProperty("verified")]

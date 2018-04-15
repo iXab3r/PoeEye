@@ -65,7 +65,6 @@ namespace PoeEye.PoeTrade.ViewModels
             [NotNull] IFactory<IPoeLiveHistoryProvider, IPoeApiWrapper, IPoeQueryInfo> poeLiveHistoryFactory,
             [NotNull] IFactory<IPoeTradeViewModel, IPoeItem> poeTradeViewModelFactory,
             [NotNull] IPoeCaptchaRegistrator captchaRegistrator,
-            [NotNull] IHistoricalTradesViewModel historicalTrades,
             [NotNull] IEqualityComparer<IPoeItem> poeItemsComparer,
             [NotNull] IClock clock,
             [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
@@ -74,7 +73,6 @@ namespace PoeEye.PoeTrade.ViewModels
             Guard.ArgumentNotNull(poeLiveHistoryFactory, nameof(poeLiveHistoryFactory));
             Guard.ArgumentNotNull(poeTradeViewModelFactory, nameof(poeTradeViewModelFactory));
             Guard.ArgumentNotNull(captchaRegistrator, nameof(captchaRegistrator));
-            Guard.ArgumentNotNull(historicalTrades, nameof(historicalTrades));
             Guard.ArgumentNotNull(poeItemsComparer, nameof(poeItemsComparer));
             Guard.ArgumentNotNull(clock, nameof(clock));
             Guard.ArgumentNotNull(uiScheduler, nameof(uiScheduler));
@@ -87,21 +85,11 @@ namespace PoeEye.PoeTrade.ViewModels
             this.clock = clock;
             this.captchaRegistrator = captchaRegistrator;
 
-            HistoricalTrades = historicalTrades;
-
             Anchors.Add(activeHistoryProviderDisposable);
             
             this.WhenAnyValue(x => x.ActiveQuery)
                 .DistinctUntilChanged()
                 .WithPrevious((prev, curr) => new { prev, curr })
-                .Do(
-                    prevcurr =>
-                    {
-                        if (prevcurr.prev != null && prevcurr.curr != null)
-                        {
-                            HistoricalTrades.Clear();
-                        }
-                    })
                 .Select(x => x.curr)
                 .Do(_ => lastUpdateTimestamp = clock.Now)
                 .Select(HandleNextQuery)
@@ -135,8 +123,6 @@ namespace PoeEye.PoeTrade.ViewModels
         {
             get { return items; }
         }
-
-        public IHistoricalTradesViewModel HistoricalTrades { get; }
 
         public IPoeQueryInfo ActiveQuery
         {
@@ -193,7 +179,6 @@ namespace PoeEye.PoeTrade.ViewModels
             {
                 itemViewModel.TradeState = PoeTradeState.Removed;
                 itemViewModel.Trade.Timestamp = clock.Now;
-                HistoricalTrades.AddItems(itemViewModel.Trade);
             }
 
             if (newItems.Any())

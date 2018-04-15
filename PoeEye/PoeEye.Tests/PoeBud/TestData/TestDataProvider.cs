@@ -9,7 +9,8 @@ namespace PoeEye.Tests.PoeBud.TestData
 {
     internal sealed class TestDataProvider
     {
-        public static StashUpdate Stash1 => ParseUpdate(File.ReadAllText(@"PoeBud\TestData\Stash1.json"));
+        public static StashUpdate Stash1_WithTabs => ParseUpdate(File.ReadAllText(@"PoeBud\TestData\Stash1_WithTabs.json"));
+        public static StashUpdate Stash1_WithoutTabs => ParseUpdate(File.ReadAllText(@"PoeBud\TestData\Stash1_WithoutTabs.json"));
 
         public static StashUpdate ParseUpdate(string json)
         {

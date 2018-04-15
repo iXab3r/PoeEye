@@ -170,10 +170,12 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="FodyWeavers.xml" />
-    <Content Include="PoeBud\TestData\Stash1.json">
+    <Content Include="PoeBud\TestData\Stash1_WithoutTabs.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="PoeBud\TestData\Stash2.json" />
+    <Content Include="PoeBud\TestData\Stash1_WithTabs.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FuzzySearch\FuzzySearch.csproj">

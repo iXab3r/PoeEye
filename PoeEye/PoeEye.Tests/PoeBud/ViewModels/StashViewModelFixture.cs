@@ -37,7 +37,7 @@ namespace PoeEye.Tests.PoeBud.ViewModels
                 .Setup(x => x.GetEquivalentInChaosOrbs(It.IsAny<PoePrice>()))
                 .Returns((PoePrice x) => new PoePrice(KnownCurrencyNameList.ChaosOrb, x.Value));
             
-            stashUpdate = new StashUpdate(new IStashItem[0], new IStashTab[0]);
+            stashUpdate = StashUpdate.Empty;
             
             summaryViewModel = new Mock<IPriceSummaryViewModel>();
         }
@@ -47,6 +47,20 @@ namespace PoeEye.Tests.PoeBud.ViewModels
         {
             //Then
             CreateInstance();
+        }
+
+        [Test]
+        public void ShouldGetMaps()
+        {
+            //Given
+            stashUpdate = TestDataProvider.Stash1_WithTabs;
+
+            //When
+            var instance = CreateInstance();
+
+            //Then
+            instance.MapsSolutions.SelectMany(x => x.Items).ShouldContain(x => x.Name == "Sacrifice at Midnight");
+            instance.MapsSolutions.SelectMany(x => x.Items).ShouldContain(x => x.Name == "Crystal Ore Map");
         }
 
         private StashViewModel CreateInstance()

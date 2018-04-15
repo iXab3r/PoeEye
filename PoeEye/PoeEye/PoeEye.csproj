@@ -384,8 +384,6 @@
     <Compile Include="PoeTrade\Updater\ApplicationUpdaterModel.cs" />
     <Compile Include="PoeTrade\Updater\ApplicationUpdaterViewModel.cs" />
     <Compile Include="PoeTrade\Updater\IApplicationUpdaterModel.cs" />
-    <Compile Include="PoeTrade\ViewModels\HistoricalTradesViewModel.cs" />
-    <Compile Include="PoeTrade\ViewModels\IHistoricalTradesViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\IMainWindowTabViewModel.cs" />
     <Compile Include="PoeTrade\Shell\ViewModels\IMainWindowViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\IPoeApiSelectorViewModel.cs" />
@@ -531,10 +529,6 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="PoeTrade\Views\CurrencyView.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="PoeTrade\Views\HistoricalTradesView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

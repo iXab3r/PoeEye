@@ -180,7 +180,8 @@ namespace PoeBud.ViewModels
             var maps = stashUpdate
                 .Items
                 .Where(x => x.GetTabIndex() != null)
-                .Where(x => x.Category == "maps")
+                .Where(x => tabsByInventoryId.ContainsKey(x.InventoryId))
+                .Where(x => x.Categories.Contains("maps"))
                 .Where(x => x.TypeLine != "Divine Vessel")
                 .OrderBy(x => x.ItemLevel)
                 .Select(x => new PoeSolutionItem(x, tabsByInventoryId[x.InventoryId]))
@@ -225,11 +226,11 @@ namespace PoeBud.ViewModels
             var itemsToInclude = new List<IStashItem>();
 
             validItems
-                .Where(x => x.Category == "flasks")
+                .Where(x => x.Categories.Contains("flasks"))
                 .ForEach(itemsToInclude.Add);
             
             validItems
-                .Where(x => x.Category == "gems")
+                .Where(x => x.Categories.Contains("gems"))
                 .ForEach(itemsToInclude.Add);
             
             validItems
@@ -245,6 +246,7 @@ namespace PoeBud.ViewModels
                 .ForEach(itemsToInclude.Add);
             
             var result = itemsToInclude
+                .Where(x => tabsByInventoryId.ContainsKey(x.InventoryId))
                 .Select(x => new PoeSolutionItem(x, tabsByInventoryId[x.InventoryId]))
                 .OfType<IPoeSolutionItem>()
                 .ToArray();
@@ -259,7 +261,8 @@ namespace PoeBud.ViewModels
             var currency = stashUpdate
                 .Items
                 .Where(x => x.GetTabIndex() != null)
-                .Where(x => x.Category == "currency")
+                .Where(x => tabsByInventoryId.ContainsKey(x.InventoryId))
+                .Where(x => x.Categories.Contains("currency"))
                 .Where(x => StringToPoePriceConverter.Instance.Convert($"{x.StackSize} {x.TypeLine}").HasValue)
                 .Select(x => new PoeSolutionItem(x, tabsByInventoryId[x.InventoryId]))
                 .OfType<IPoeSolutionItem>()
@@ -275,7 +278,8 @@ namespace PoeBud.ViewModels
             var cards = stashUpdate
                 .Items
                 .Where(x => x.GetTabIndex() != null)
-                .Where(x => x.Category == "cards")
+                .Where(x => tabsByInventoryId.ContainsKey(x.InventoryId))
+                .Where(x => x.Categories.Contains("cards"))
                 .Select(x => new PoeSolutionItem(x, tabsByInventoryId[x.InventoryId]))
                 .OfType<IPoeSolutionItem>()
                 .ToArray();

@@ -7,7 +7,6 @@
     <Grid>
       <Grid.RowDefinitions>
         <RowDefinition Height="Auto" />
-        <RowDefinition Height="Auto" />
         <RowDefinition Height="*" />
       </Grid.RowDefinitions>
 
@@ -68,23 +67,7 @@
         </Expander>
       </ScrollViewer>
 
-      <Expander Grid.Row="1"
-                IsExpanded="{Binding TradesList.HistoricalTrades.IsExpanded}"
-                Visibility="{Binding TradesList.HistoricalTrades.ItemsViewModels.Count, Converter={StaticResource ZeroToCollapsedConverter}}">
-        <Expander.Header>
-          <TextBlock>
-            <Run Text="Trades history ( " />
-            <Run ToolTip="Historical trades"
-                 Text="{Binding TradesList.HistoricalTrades.ItemsViewModels.Count, Mode=OneWay, StringFormat=\{0\}}"
-                 FontWeight="Bold" />
-            <Run Text=" )" />
-          </TextBlock>
-        </Expander.Header>
-        <ContentControl Content="{Binding TradesList.HistoricalTrades}" Margin="0" />
-      </Expander>
-
-      <Grid Grid.Row="2">
-
+      <Grid Grid.Row="1">
         <ItemsControl Margin="0,10,0,0"
                       ItemsSource="{Binding TradesList.Items}"
                       Style="{StaticResource VirtualizedItemsControlStyle}">

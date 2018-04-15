@@ -47,7 +47,6 @@
                 <ResourceDictionary Source="PoeTrade/Views/PoeChatView.xaml" />
                 <ResourceDictionary Source="PoeTrade/Views/PoeApiSelectorView.xaml" />
 
-                <ResourceDictionary Source="PoeTrade/Views/HistoricalTradesView.xaml" />
                 <ResourceDictionary Source="PoeTrade/Views/PoeSummaryTabView.xaml" />
                 <ResourceDictionary Source="PoeTrade/Views/MainWindowTabItemView.xaml" />
                 <ResourceDictionary Source="PoeTrade/Views/MainWindowTabView.xaml" />

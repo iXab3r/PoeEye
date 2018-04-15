@@ -18,8 +18,6 @@ namespace PoeEye.PoeTrade.ViewModels
 
         TimeSpan RecheckPeriod { get; set; }
 
-        IHistoricalTradesViewModel HistoricalTrades { [NotNull] get; }
-
         bool IsBusy { get; }
 
         string Errors { get; }

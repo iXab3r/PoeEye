@@ -59,7 +59,7 @@ namespace PoeShared.StashApi.DataTypes
 
         string TypeLine { get; }
         
-        string Category { get; }
+        IEnumerable<string> Categories { get; }
 
         bool Verified { get; }
 
