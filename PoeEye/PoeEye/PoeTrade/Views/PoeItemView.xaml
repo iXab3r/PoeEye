@@ -2,12 +2,9 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:common="clr-namespace:PoeShared.Common;assembly=PoeShared"
                     xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
-                    xmlns:filterExtension="clr-namespace:PoeEye.Utilities.FilterExtension"
                     xmlns:viewModels="clr-namespace:PoeEye.PoeTrade.ViewModels"
-                    xmlns:poeTrade="clr-namespace:PoeEye.PoeTrade"
                     xmlns:utilities="clr-namespace:PoeEye.Utilities"
                     xmlns:wpf="clr-namespace:PoeShared.Scaffolding.WPF;assembly=PoeShared"
-                    xmlns:poeTrade1="clr-namespace:PoeEye.PoeTrade.Common"
                     xmlns:controls="clr-namespace:PoeShared.Scaffolding.WPF.Controls;assembly=PoeShared"
                     xmlns:fa="http://schemas.fontawesome.io/icons/"
                     xmlns:eye="http://coderush.net/poeeye/"
@@ -325,7 +322,7 @@
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
           <ColumnDefinition Width="100" />
-          <ColumnDefinition Width="*" SharedSizeGroup="Content" />
+          <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
         <ContentControl Grid.Row="1" Grid.Column="0"
