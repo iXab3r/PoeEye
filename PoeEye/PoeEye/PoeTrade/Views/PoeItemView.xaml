@@ -315,7 +315,7 @@
     <wpf:TemplateMapping Key="False" Template="{StaticResource PoeItemModsTemplateKey}" />
   </wpf:MappingTemplateSelector>
 
-  <DataTemplate DataType="{x:Type viewModels:PoeTradeViewModel}">
+  <DataTemplate x:Key="PoeTradeViewModelTemplateKey">
     <ContentControl Margin="10">
       <Grid>
         <Grid.RowDefinitions>

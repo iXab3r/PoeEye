@@ -52,4 +52,22 @@
   </converters:NullToVisibilityMultiValueConverter>
 
   <converters:MathAdditionConverter x:Key="MathAdditionConverter"/> 
+  
+  <converters:PoeItemModToHtmlConverter x:Key="DefaultPoeItemModToHtmlConverterKey"
+                                        DefaultTextColor="{StaticResource PoeItemRarityNormalColor}"
+                                        FireRelatedTextColor="#B95F0E"
+                                        ColdRelatedTextColor="#6285FF"
+                                        LightningRelatedTextColor="#AD9D32"
+                                        ChaosRelatedTextColor="#8A89D0"
+                                        PhysicalRelatedTextColor="{StaticResource PoeItemPhysicalStatColor}"
+                                        ElementalRelatedTextColor="{StaticResource PoeItemElementalStatColor}"
+                                        LifeRelatedTextColor="{StaticResource PoeItemStrStatColor}"
+                                        ManaRelatedTextColor="{StaticResource PoeItemIntStatColor}"
+                                        StrengthRelatedTextColor="{StaticResource PoeItemStrStatColor}"
+                                        DexterityRelatedTextColor="{StaticResource PoeItemDexStatColor}"
+                                        IntelligenceRelatedTextColor="{StaticResource PoeItemIntStatColor}"
+                                        CraftGroupColor="{StaticResource PoeItemElementalStatColor}"
+                                        EnchantGroupColor="{StaticResource PoeItemRarityRelicColor}"
+                                        PseudoGroupColor="#5DA423"
+                                        TotalGroupColor="#5DA423" />
 </ResourceDictionary>

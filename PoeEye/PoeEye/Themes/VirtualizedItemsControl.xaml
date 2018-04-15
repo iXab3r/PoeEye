@@ -3,6 +3,7 @@
     <Style x:Key="VirtualizedItemsControlStyle" TargetType="{x:Type ItemsControl}">
     <Setter Property="VirtualizingStackPanel.IsVirtualizing" Value="True" />
     <Setter Property="VirtualizingPanel.ScrollUnit" Value="Pixel" />
+    <Setter Property="VirtualizingPanel.VirtualizationMode" Value="Recycling" />
     <Setter Property="ScrollViewer.CanContentScroll" Value="True" />
     <Setter Property="Focusable" Value="False" />
     <Setter Property="IsTabStop" Value="False" />

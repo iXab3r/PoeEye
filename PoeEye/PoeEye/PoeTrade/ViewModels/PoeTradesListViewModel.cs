@@ -1,6 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.Reactive.Subjects;
 using DynamicData;
+using DynamicData.Binding;
 using PoeEye.PoeTrade.Common;
 
 namespace PoeEye.PoeTrade.ViewModels
@@ -117,6 +118,7 @@ namespace PoeEye.PoeTrade.ViewModels
 
             itemsSource
                 .Connect()
+                .Sort(SortExpressionComparer<IPoeTradeViewModel>.Ascending(x => x.TradeState).ThenByAscending(x => x.PriceInChaosOrbs))
                 .ObserveOn(uiScheduler)
                 .Bind(out items)
                 .Subscribe()
