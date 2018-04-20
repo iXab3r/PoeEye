@@ -132,13 +132,13 @@ namespace PoeEye.PoeTrade
             }
         }
 
-        private IPoeBrowser CreateClientWithoutProxy()
+        private IChromiumBrowser CreateClientWithoutProxy()
         {
             IProxyToken proxyToken;
             return CreateClient(out proxyToken);
         }
 
-        private IPoeBrowser CreateClient(out IProxyToken proxyToken)
+        private IChromiumBrowser CreateClient(out IProxyToken proxyToken)
         {
             proxyToken = null;
             var client = httpClientFactory.CreateBrowser();

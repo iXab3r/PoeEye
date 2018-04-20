@@ -56,9 +56,9 @@ namespace PoeEye.Tests.PoeShared.Communications.Chromium
             var html = browser.GetSource();
         }
 
-        private ChromiumBootstrapper CreateInstance()
+        private ChromiumBrowserFactory CreateInstance()
         {
-            return new ChromiumBootstrapper(browserFactory.Object);
+            return new ChromiumBrowserFactory(browserFactory.Object);
         }
     }
 }

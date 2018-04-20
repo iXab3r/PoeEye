@@ -20,7 +20,7 @@ using RestSharp.Extensions.MonoHttp;
 using TypeConverter;
 
 namespace PoeShared.Communications.Chromium {
-    internal sealed class ChromiumBrowser : DisposableReactiveObject, IPoeBrowser 
+    internal sealed class ChromiumBrowser : DisposableReactiveObject, IChromiumBrowser 
     {
         private readonly ChromiumWebBrowser instance;
         private readonly IConverter<NameValueCollection, IEnumerable<KeyValuePair<string, string>>> nameValueToListConverter;

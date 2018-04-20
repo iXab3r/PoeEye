@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 using PoeShared.Scaffolding;
 
 namespace PoeShared.Communications.Chromium {
-    public interface IPoeBrowser : IDisposableReactiveObject
+    public interface IChromiumBrowser : IDisposableReactiveObject
     {
         string Address { [CanBeNull] get; }
 

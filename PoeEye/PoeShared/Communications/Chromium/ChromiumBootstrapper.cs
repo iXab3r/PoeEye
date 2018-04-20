@@ -1,123 +1,59 @@
 ﻿using System;
-using System.Diagnostics;
-using System.Drawing;
 using System.IO;
-using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reflection;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows;
-using CefSharp;
-using CefSharp.Internals;
-using CefSharp.OffScreen;
 using Guards;
 using JetBrains.Annotations;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
-using ReactiveUI;
 
 namespace PoeShared.Communications.Chromium
 {
     internal sealed class ChromiumBootstrapper : DisposableReactiveObject, IChromiumBootstrapper
     {
-        private readonly IFactory<ChromiumBrowser, ChromiumWebBrowser> browserFactory;
-        private static readonly string AssemblyDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-
+        private readonly IChromiumBrowserFactory browserFactory;
+        
+        private readonly string architectureSpecificDirectoryPath;
+        
         public ChromiumBootstrapper(
-            [NotNull] IFactory<ChromiumBrowser, ChromiumWebBrowser> browserFactory)
+            [NotNull] IFactory<IChromiumBrowserFactory> bootstrapperFactory)
         {
-            Guard.ArgumentNotNull(browserFactory, nameof(browserFactory));
-            this.browserFactory = browserFactory;
+            Guard.ArgumentNotNull(bootstrapperFactory, nameof(bootstrapperFactory));
+            architectureSpecificDirectoryPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Environment.Is64BitProcess ? "x64" : "x86");
 
-            Log.Instance.Debug("[ChromiumBootstrapper] Initializing CEF...");
-            if (Cef.IsInitialized)
+            Log.Instance.Debug($"[ChromiumBootstrapper] Initializing assembly loader(Environment.Is64Bit: {Environment.Is64BitProcess}, OS.Is64Bit: {Environment.Is64BitOperatingSystem}), path: {architectureSpecificDirectoryPath}");
+            AppDomain.CurrentDomain.AssemblyResolve += CurrentDomainOnAssemblyResolve;
+            Disposable.Create(() =>
             {
-                throw new ApplicationException("CEF is already initialized");
-            }
+                Log.Instance.Debug("[ChromiumBootstrapper] Uninitializing assembly loader...");
+                AppDomain.CurrentDomain.AssemblyResolve -= CurrentDomainOnAssemblyResolve;
 
-            var settings = new CefSettings();
-            settings.DisableGpuAcceleration();
-
-            settings.MultiThreadedMessageLoop = true;
-            settings.ExternalMessagePump = false;
-            settings.CachePath = "cefcache";
-            settings.SetOffScreenRenderingBestPerformanceArgs();
-            settings.WindowlessRenderingEnabled = true;
-            if (Log.Instance.IsTraceEnabled)
-            {
-                settings.LogSeverity = LogSeverity.Verbose;
-            }
-            else if (Log.Instance.IsDebugEnabled)
-            {
-                settings.LogSeverity = LogSeverity.Error;
-            }
-            else 
-            {
-                settings.LogSeverity = LogSeverity.Disable;
-            }
-            settings.IgnoreCertificateErrors = true;
-            settings.CefCommandLineArgs.Add("no-proxy-server", "1");
-            settings.UserAgent = "CefSharp Browser" + Cef.CefSharpVersion;
-            settings.CefCommandLineArgs.Add("disable-extensions", "1");
-            settings.CefCommandLineArgs.Add("disable-pdf-extension", "1");
-
-            Log.Instance.Debug($"[ChromiumBootstrapper] CEF settings: {settings.DumpToTextRaw()}");
-            if (!Cef.Initialize(settings, true, new BrowserProcessHandler()))
-            {
-                throw new ApplicationException("Failed to initialize CEF");
-            }
-
-            Disposable.Create(
-                () =>
-                {
-                    Log.Instance.Debug("[ChromiumBootstrapper] Shutting down CEF...");
-                    Cef.Shutdown();
-                    Log.Instance.Debug("[ChromiumBootstrapper] CEF has been shut down");
-                }).AddTo(Anchors);
+            }).AddTo(Anchors);
+            browserFactory = bootstrapperFactory.Create().AddTo(Anchors);
         }
 
-        public IPoeBrowser CreateBrowser()
+        private Assembly CurrentDomainOnAssemblyResolve(object sender, ResolveEventArgs args)
         {
-            Log.Instance.Debug("[ChromiumBootstrapper] Create new browser instance...");
-
-            var isInitialized = new ManualResetEvent(false);
-
-            var browserSettings = new BrowserSettings()
+            if (!args.Name.StartsWith("CefSharp"))
             {
-                WindowlessFrameRate = 1,
-                ImageLoading = CefState.Disabled,
-                JavascriptCloseWindows = CefState.Disabled,
-                JavascriptAccessClipboard = CefState.Disabled,
-                JavascriptOpenWindows = CefState.Disabled,
-                Javascript = CefState.Enabled
-            };
+                return null;
+            }
 
-            var contextSettings = new RequestContextSettings();
+            var assemblyName = args.Name.Split(new[] {','}, 2)[0] + ".dll";
+            var libraryPath = Path.Combine(architectureSpecificDirectoryPath, assemblyName);
 
-            var requestContext = new RequestContext(contextSettings).AddTo(Anchors);
-
-            var browserInstance = new ChromiumWebBrowser("", browserSettings, requestContext, true);
-
-            EventHandler browserInitialized = null;
-            browserInitialized = (sender, args) =>
+            if (!File.Exists(libraryPath))
             {
-                browserInstance.BrowserInitialized -= browserInitialized;
-                isInitialized.Set();
-            };
-            browserInstance.BrowserInitialized += browserInitialized;
+                Log.Instance.Warn($"Failed to load '{libraryPath}' (Environment.Is64Bit: {Environment.Is64BitProcess}, OS.Is64Bit: {Environment.Is64BitOperatingSystem})");
+                return null;
+            }
 
-            Log.Instance.Debug("[ChromiumBootstrapper] Awaiting for initialization to be completed");
-            isInitialized.WaitOne();
-
-            browserInstance.RequestHandler = new LogRequestHandler();
-            browserInstance.RenderProcessMessageHandler = new RenderProcessMessageHandler();
-
-            Log.Instance.Debug("[ChromiumBootstrapper] New browser instance initialized");
-
-            return browserFactory.Create(browserInstance).AddTo(Anchors);
+            return Assembly.LoadFile(libraryPath);
+        }
+        
+        public IChromiumBrowser CreateBrowser()
+        {
+            return browserFactory.CreateBrowser();
         }
     }
 }
-    
