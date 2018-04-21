@@ -50,6 +50,7 @@ namespace PoeShared.Prism
                 .RegisterSingleton<IImagesCacheService, ImagesCacheService>()
                 .RegisterSingleton<IGearTypeAnalyzer, GearTypeAnalyzer>()
                 .RegisterSingleton<IItemTypeAnalyzer, GearTypeAnalyzer>()
+                .RegisterSingleton<IPoeLeagueApiClient, PoeLeagueApiClient>()
                 .RegisterSingleton<IChromiumBrowserFactory, ChromiumBrowserFactory>()
                 .RegisterSingleton<IChromiumBootstrapper, ChromiumBootstrapper>()
                 .RegisterSingleton<IConverter<IStashItem, IPoeItem>, PoeStashItemToPoeItem>()

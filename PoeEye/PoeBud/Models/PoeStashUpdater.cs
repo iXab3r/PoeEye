@@ -135,7 +135,7 @@ namespace PoeBud.Models
             {
                 LogTo.Debug($"Strategy did not provide default leagues list");
                 LogTo.Debug($"Requesting leagues list...");
-                var leagues = poeClient.GetLeagues();
+                var leagues = poeClient.GetLeaguesAsync().Result;
                 LogTo.Debug($"Received leagues list: {leagues.DumpToTextRaw()}");
                 leaguesToProcess = strategy.GetLeaguesToProcess(leagues);
                 LogTo.Debug($"Leagues to process: {leaguesToProcess.DumpToTextRaw()}");

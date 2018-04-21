@@ -78,7 +78,7 @@ namespace PoeEye.PoeTrade.ViewModels {
         
         public string ModuleName { get; } = "Update settings";
         
-        public void Load(PoeEyeUpdateSettingsConfig config)
+        public async Task Load(PoeEyeUpdateSettingsConfig config)
         {
             loadedConfig = config;
 

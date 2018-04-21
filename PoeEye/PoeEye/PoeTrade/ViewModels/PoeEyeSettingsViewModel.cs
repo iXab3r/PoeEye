@@ -56,7 +56,9 @@ namespace PoeEye.PoeTrade.ViewModels
                 .AddTo(Anchors);
 
             this.WhenAnyValue(x => x.IsOpen)
-                .Where(x => x)
+                .WithPrevious((prev, curr) => new { prev, curr })
+                .DistinctUntilChanged()
+                .Where(x => x.curr == true && x.prev == false)
                 .Subscribe(ReloadConfigs)
                 .AddTo(Anchors);
 
@@ -86,7 +88,6 @@ namespace PoeEye.PoeTrade.ViewModels
         {
             ModulesSettings.Clear();
             ModulesSettings.AddRange(viewModels);
-            ReloadConfigs();
         }
 
         private void ReloadConfigs()

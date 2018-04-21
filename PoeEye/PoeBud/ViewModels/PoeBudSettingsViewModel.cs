@@ -125,7 +125,7 @@ namespace PoeBud.ViewModels
 
         public string ModuleName => "Poe Buddy";
 
-        public void Load(PoeBudConfig config)
+        public async Task Load(PoeBudConfig config)
         {
             config.CopyPropertiesTo(resultingConfig);
 

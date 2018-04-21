@@ -69,6 +69,8 @@ namespace PoeEye.Config
 
         public TimeSpan ProxyRecheckTimeout { get; set; } = TimeSpan.FromMinutes(1);
 
-        public int Version { get; set; } = 1;
+        public int Version { get; set; } = 2;
+        
+        public string LeagueId { get; set; } 
     }
 }

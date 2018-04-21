@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using Guards;
 using JetBrains.Annotations;
@@ -54,7 +55,7 @@ namespace PoeEye.TradeMonitor.ViewModels
             set { this.RaiseAndSetIfChanged(ref isEnabled, value); }
         }
 
-        public void Load(PoeTradeMonitorConfig config)
+        public async Task Load(PoeTradeMonitorConfig config)
         {
             Guard.ArgumentNotNull(config, nameof(config));
             

@@ -4,7 +4,7 @@ using PoeShared.StashApi.DataTypes;
 
 namespace PoeShared.StashApi
 {
-    public interface IPoeStashClient
+    public interface IPoeStashClient : IPoeLeagueApiClient
     {
         string AccountName { [NotNull] get; }
 
@@ -35,11 +35,5 @@ namespace PoeShared.StashApi
         
         [NotNull] 
         Task<IStash> GetStashAsync(int stashIdx, string league);
-
-        [NotNull] 
-        ILeague[] GetLeagues();
-        
-        [NotNull] 
-        Task<ILeague[]> GetLeaguesAsync();
     }
 }

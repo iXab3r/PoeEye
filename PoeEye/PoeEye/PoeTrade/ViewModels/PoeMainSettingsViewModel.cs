@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
@@ -18,6 +19,7 @@ using PoeShared.PoeDatabase;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
 using PoeShared.Scaffolding.WPF;
+using PoeShared.StashApi;
 using PoeShared.UI.ViewModels;
 using ReactiveUI;
 
@@ -25,32 +27,38 @@ namespace PoeEye.PoeTrade.ViewModels
 {
     internal sealed class PoeMainSettingsViewModel : DisposableReactiveObject, ISettingsViewModel<PoeEyeMainConfig>
     {
+        private readonly IClock clock;
+        private readonly IPoeLeagueApiClient leagueApiClient;
         private readonly IPoeEconomicsSource economicsSource;
-        private readonly IConfigProvider<PoeBudConfig> poeBudConfigProvider;
         private readonly ReactiveList<EditableTuple<PoePrice, float>> currenciesPriceInChaosOrbs = new ReactiveList<EditableTuple<PoePrice, float>>();
         private readonly PoeEyeMainConfig temporaryConfig = new PoeEyeMainConfig();
 
         private bool whisperNotificationsEnabled;
-        
+        private string leagueId;
+        private TaskCompletionSource<string[]> leaguesSource;
+
         public PoeMainSettingsViewModel(
+            [NotNull] IClock clock,
+            [NotNull] IPoeLeagueApiClient leagueApiClient,
             [NotNull] IPoeEconomicsSource economicsSource,
-            [NotNull] IConfigProvider<PoeBudConfig> poeBudConfigProvider,
+            [NotNull] IConfigProvider<PoeEyeMainConfig> mainConfigProvider,
             [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler,
             [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler)
         {
+            Guard.ArgumentNotNull(clock, nameof(clock));
+            Guard.ArgumentNotNull(leagueApiClient, nameof(leagueApiClient));
             Guard.ArgumentNotNull(economicsSource, nameof(economicsSource));
-            Guard.ArgumentNotNull(poeBudConfigProvider, nameof(poeBudConfigProvider));
+            Guard.ArgumentNotNull(mainConfigProvider, nameof(mainConfigProvider));
             Guard.ArgumentNotNull(uiScheduler, nameof(uiScheduler));
             Guard.ArgumentNotNull(bgScheduler, nameof(bgScheduler));
 
+            this.clock = clock;
+            this.leagueApiClient = leagueApiClient;
             this.economicsSource = economicsSource;
-            this.poeBudConfigProvider = poeBudConfigProvider;
             if (AppArguments.Instance.IsDebugMode)
             {
                 CurrencyTest = new CurrencyTestViewModel();
             }
-
-            poeBudConfigProvider.WhenChanged.Subscribe(() => this.RaisePropertyChanged(nameof(LeagueId))).AddTo(Anchors);
             
             GetEconomicsCommand = new CommandWrapper(
                 ReactiveCommand.CreateFromTask(RefreshCurrencyList, this.WhenAnyValue(x => x.LeagueId).Select(leagueId => !string.IsNullOrEmpty(leagueId)), outputScheduler: uiScheduler));
@@ -70,13 +78,30 @@ namespace PoeEye.PoeTrade.ViewModels
 
         public string ModuleName { get; } = "Main";
 
-        public string LeagueId => poeBudConfigProvider.ActualConfig.LeagueId;
-
-        public void Load(PoeEyeMainConfig config)
+        public string LeagueId
+        {
+            get { return leagueId; }
+            set { this.RaiseAndSetIfChanged(ref leagueId, value); }
+        }
+        
+        public IReactiveList<string> LeagueList { get; } = new ReactiveList<string>();
+        
+        public async Task Load(PoeEyeMainConfig config)
         {
             config.CopyPropertiesTo(temporaryConfig);
 
             WhisperNotificationsEnabled = config.WhisperNotificationsEnabled;
+            if (LeagueList.IsEmpty)
+            {
+                var leagues = await leagueApiClient.GetLeaguesAsync();
+
+                leagues
+                    .Where(x => x.StartAt <= clock.Now && (x.EndAt >= clock.Now || x.EndAt == DateTime.MinValue))
+                    .Where(x => x.Id.IndexOf("SSF", StringComparison.OrdinalIgnoreCase) < 0)
+                    .Select(x => x.Id)
+                    .ForEach(LeagueList.Add);
+            }
+            LeagueId = config.LeagueId;
 
             CurrenciesPriceInChaosOrbs.Clear();
             config
@@ -95,9 +120,11 @@ namespace PoeEye.PoeTrade.ViewModels
         {
             temporaryConfig.WhisperNotificationsEnabled = WhisperNotificationsEnabled;
             temporaryConfig.CurrenciesPriceInChaos = CurrenciesPriceInChaosOrbs.ToDictionary(x => x.Item1.CurrencyType, x => x.Item2);
-            
+            temporaryConfig.LeagueId = LeagueId;
+
             var result = new PoeEyeMainConfig();
             temporaryConfig.CopyPropertiesTo(result);
+
             
             return result;
         }

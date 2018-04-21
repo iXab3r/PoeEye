@@ -16,13 +16,17 @@ namespace PoeShared.Scaffolding.WPF
 
         public CommandWrapper(ReactiveCommand command)
         {
-            Guard.ArgumentNotNull(command, nameof(command));
-
             this.command = command;
 
             isBusy = command.IsExecuting.ToProperty(this, x => x.IsBusy);
             command.ThrownExceptions.Subscribe(HandleException).AddTo(Anchors);
         }
+        
+        public static CommandWrapper Create(ReactiveCommand command)
+        {
+            return new CommandWrapper(command);
+        }
+        
 
         public static CommandWrapper Create(Func<Task> execute, IObservable<bool> canExecute)
         {
@@ -33,7 +37,17 @@ namespace PoeShared.Scaffolding.WPF
         {
             return Create(execute, Observable.Return(true).Concat(Observable.Never<bool>()));
         }
-
+        
+        public static CommandWrapper Create<TParam>(Func<TParam, Task> execute, IObservable<bool> canExecute)
+        {
+            return new CommandWrapper(ReactiveCommand.CreateFromTask(execute, canExecute));
+        }
+        
+        public static CommandWrapper Create<TParam>(Func<TParam, Task> execute)
+        {
+            return Create(execute, Observable.Return(true).Concat(Observable.Never<bool>()));
+        }
+        
         public bool IsBusy => isBusy.Value;
 
         public string Error

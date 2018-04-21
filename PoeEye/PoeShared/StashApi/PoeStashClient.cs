@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Security.Authentication;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using CsQuery;
 using Guards;
@@ -18,8 +17,8 @@ namespace PoeShared.StashApi
     internal sealed class PoeStashClient : IPoeStashClient
     {
         private const string CharacterApiPortal = @"https://www.pathofexile.com";
-        private const string LeaguesApiPortal = @"http://api.pathofexile.com";
 
+        private readonly IPoeLeagueApiClient leagueClient;
         private readonly NetworkCredential credentials;
         private readonly IGearTypeAnalyzer gearTypeAnalyzer;
         private readonly bool useSessionId;
@@ -35,15 +34,18 @@ namespace PoeShared.StashApi
         public string Email => credentials.UserName;
 
         public PoeStashClient(
+            [NotNull] IPoeLeagueApiClient leagueClient,
             [NotNull] NetworkCredential credentials,
             [NotNull] IGearTypeAnalyzer gearTypeAnalyzer,
             bool useSessionId = false)
         {
+            Guard.ArgumentNotNull(leagueClient, nameof(leagueClient));
             Guard.ArgumentNotNull(credentials, nameof(credentials));
             Guard.ArgumentNotNullOrEmpty(() => credentials.UserName);
             Guard.ArgumentNotNullOrEmpty(() => credentials.Password);
             Guard.ArgumentNotNull(gearTypeAnalyzer, nameof(gearTypeAnalyzer));
 
+            this.leagueClient = leagueClient;
             this.credentials = credentials;
             this.gearTypeAnalyzer = gearTypeAnalyzer;
             this.useSessionId = useSessionId;
@@ -162,7 +164,7 @@ namespace PoeShared.StashApi
             }
 
             var poeSessionIdCookie = response.Cookies.SingleOrDefault(x => x.Name == "POESESSID");
-            if (poeSessionIdCookie == null || string.IsNullOrEmpty(poeSessionIdCookie.Value))
+            if (string.IsNullOrEmpty(poeSessionIdCookie?.Value))
             {
                 throw new AuthenticationException($"Could not retrieve POESESSID (code: {response.StatusCode}, length: {response.ContentLength}), email: {credentials.UserName}, password.Length: {credentials.Password.Length}");
             }
@@ -223,29 +225,6 @@ namespace PoeShared.StashApi
 
             return response.Data;
         }
-        
-        public ILeague[] GetLeagues()
-        {
-            return GetLeaguesAsync().Result;
-        }
-
-        public async Task<ILeague[]> GetLeaguesAsync()
-        {
-            EnsureAuthenticated();
-
-            var client = new RestClient(LeaguesApiPortal);
-            var request = new RestRequest("leagues") { Method = Method.GET };
-            request.AddParameter("type", "main");
-
-            var response = await client.ExecuteTaskAsync<List<League>>(request);
-
-            if (response.Data == null)
-            {
-                throw new ApplicationException($"Could not leagues list (code: {response.StatusCode}, content-length: {response.ContentLength})");
-            }
-
-            return response.Data.OfType<ILeague>().Where(x => !string.IsNullOrEmpty(x.Id)).ToArray();
-        }
 
         public ICharacter[] GetCharacters()
         {
@@ -291,6 +270,11 @@ namespace PoeShared.StashApi
             PostProcessInventory(response.Data);
 
             return response.Data;
+        }
+        
+        public Task<ILeague[]> GetLeaguesAsync()
+        {
+            return leagueClient.GetLeaguesAsync();
         }
 
         private void PostProcessInventory(Inventory inventory)

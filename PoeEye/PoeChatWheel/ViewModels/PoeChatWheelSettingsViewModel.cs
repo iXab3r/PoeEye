@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using Guards;
 using PoeChatWheel.Modularity;
@@ -29,7 +30,7 @@ namespace PoeChatWheel.ViewModels
 
         public string ModuleName { get; } = "Chat wheel";
 
-        public void Load(PoeChatWheelConfig config)
+        public async Task Load(PoeChatWheelConfig config)
         {
             Guard.ArgumentNotNull(config, nameof(config));
 

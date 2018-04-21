@@ -5,12 +5,14 @@
                     xmlns:converters="clr-namespace:PoeEye.Converters"
                     xmlns:eye="http://coderush.net/poeeye/" 
                     xmlns:fa="http://schemas.fontawesome.io/icons/"
-                    xmlns:common="clr-namespace:PoeShared.Common;assembly=PoeShared">
+                    xmlns:common="clr-namespace:PoeShared.Common;assembly=PoeShared"
+                    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
 
   <ResourceDictionary.MergedDictionaries>
     <ResourceDictionary Source="pack://application:,,,/PoeShared;component/UI/Views/CurrencyTestView.xaml" />
     <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.togglebutton.xaml" />
-    <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.textbox.xaml" />
+    
+    <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.progressbar.xaml" />
   </ResourceDictionary.MergedDictionaries>
 
   <DataTemplate DataType="{x:Type viewModels1:PoeMainSettingsViewModel}">
@@ -34,25 +36,24 @@
           <Label.Content>
             <DockPanel LastChildFill="True">
               <TextBlock DockPanel.Dock="Left" Text="Currencies rate"/>
-              <TextBlock DockPanel.Dock="Left" Text="{Binding LeagueId, StringFormat='({0})'}" Visibility="{Binding LeagueId, Converter={StaticResource NullToCollapsedConverter}}"/>
-              <Button DockPanel.Dock="Right" HorizontalAlignment="Right" Width="150" Height="22"
-                      Command="{Binding GetEconomicsCommand}" Margin="0,5">
-                <Button.Content>
-                  <DockPanel LastChildFill="True">
-                    <Label Visibility="{Binding GetEconomicsCommand.Error, Converter={StaticResource NullToCollapsedConverter}}"
-                           ToolTip="{Binding GetEconomicsCommand.Error}"
-                           Foreground="{StaticResource ValidationSummaryColor3}"
-                           VerticalAlignment="Stretch"
-                           HorizontalAlignment="Stretch"
-                           HorizontalContentAlignment="Center"
-                           FontSize="18" 
-                           fa:Awesome.Content="Warning" />
-                    <controls:ProgressRing DockPanel.Dock="Right" HorizontalAlignment="Right" Width="14" Height="14" Margin="5,0" 
-                                           IsActive="{Binding GetEconomicsCommand.IsBusy}" Visibility="{Binding GetEconomicsCommand.IsBusy, Converter={StaticResource TrueToVisibleFalseToCollapsedConverter}}"/>
-                    <TextBlock DockPanel.Dock="Left" Text="Refresh prices"/>
-                  </DockPanel>
-                </Button.Content>
-              </Button>
+              
+              <ComboBox DockPanel.Dock="Left" 
+                        Width="180" Height="24" VerticalAlignment="Center"
+                        SelectedItem="{Binding LeagueId}"
+                        ItemsSource="{Binding LeagueList}"
+                        controls:TextBoxHelper.Watermark="League"
+                        Margin="5,0"
+                        IsEnabled="{Binding LeagueList.IsEmpty, Converter={StaticResource NotConverter}}"/>
+              
+              <ProgressBar DockPanel.Dock="Left"
+                           Style="{StaticResource MaterialDesignCircularProgressBar}"
+                           Value="0"
+                           Visibility="{Binding LeagueList.IsEmpty, Converter={StaticResource TrueToVisibleFalseToCollapsedConverter}}"
+                           IsIndeterminate="True"/>
+              
+              <ContentPresenter DockPanel.Dock="Right" HorizontalAlignment="Right" Width="150" Height="22"
+                                eye:CommandWrapperHelper.Text="Refresh"
+                                Content="{Binding GetEconomicsCommand}"/>
             </DockPanel>
           </Label.Content>
         </Label>

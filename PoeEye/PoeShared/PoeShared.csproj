@@ -277,6 +277,7 @@
     <Compile Include="Scaffolding\StreamExtensions.cs" />
     <Compile Include="Scaffolding\WPF\AccessKeyScoper.cs" />
     <Compile Include="Scaffolding\WPF\CommandWrapper.cs" />
+    <Compile Include="Scaffolding\WPF\CommandWrapperHelper.cs" />
     <Compile Include="Scaffolding\WPF\EnableDragHelper.cs" />
     <Compile Include="Scaffolding\WPF\InputBindingsManager.cs" />
     <Compile Include="Scaffolding\WPF\MappingTemplateSelector.cs" />
@@ -300,7 +301,9 @@
     <Compile Include="StashApi\DataTypes\Stash.cs" />
     <Compile Include="StashApi\DataTypes\StashTabType.cs" />
     <Compile Include="StashApi\DataTypes\Tab.cs" />
+    <Compile Include="StashApi\IPoeLeagueApiClient.cs" />
     <Compile Include="StashApi\IPoeStashClient.cs" />
+    <Compile Include="StashApi\PoeLeagueApiClient.cs" />
     <Compile Include="StashApi\PoeStashClient.cs" />
     <Compile Include="StashApi\ProcurementLegacy\GearTypeAnalyzer.cs" />
     <Compile Include="StashApi\ProcurementLegacy\IGearTypeAnalyzer.cs" />
