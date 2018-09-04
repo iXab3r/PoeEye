@@ -34,8 +34,10 @@ namespace PoeEye.TradeMonitor.ViewModels
         public PoeControlPanelViewModel(
             [NotNull] IOverlayWindowController controller,
             [NotNull] IConfigProvider<PoeControlPanelConfig> configProvider,
-            [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler,
-            [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
+            [NotNull] [Dependency(WellKnownSchedulers.Background)]
+            IScheduler bgScheduler,
+            [NotNull] [Dependency(WellKnownSchedulers.UI)]
+            IScheduler uiScheduler)
         {
             this.controller = controller;
             this.configProvider = configProvider;
@@ -49,6 +51,7 @@ namespace PoeEye.TradeMonitor.ViewModels
             Top = 200;
             Left = 200;
             SizeToContent = SizeToContent.WidthAndHeight;
+            IsUnlockable = true;
 
             LockWindowCommand = new DelegateCommand(LockWindowCommandExecuted);
 
@@ -82,6 +85,7 @@ namespace PoeEye.TradeMonitor.ViewModels
                 IsLocked = false;
                 config.OverlayOpacity = 1;
             }
+
             Opacity = config.OverlayOpacity;
 
             if (config.OverlayLocation.X <= 1 && config.OverlayLocation.Y <= 1)
@@ -89,6 +93,7 @@ namespace PoeEye.TradeMonitor.ViewModels
                 IsLocked = false;
                 config.OverlayLocation = new Point(Width / 2, Height / 2);
             }
+
             Left = config.OverlayLocation.X;
             Top = config.OverlayLocation.Y;
         }
@@ -106,19 +111,20 @@ namespace PoeEye.TradeMonitor.ViewModels
         {
             //FIXME: These types should be provided via interface
             var knownTypes = new[]
-            {
-                typeof(IPoeStashGridViewModel),
-                typeof(PoeTradeMonitorViewModel),
-                typeof(PoeControlPanelViewModel),
-            };
+                {
+                    typeof(IPoeStashGridViewModel),
+                }.Concat(this.controller.GetChilds().Where(x => x.IsUnlockable).Select(x => x.GetType()))
+                .Distinct();
+
             foreach (var overlayViewModel in controller.GetChilds())
             {
                 if (
-                    !knownTypes.Contains(overlayViewModel.GetType()) && 
+                    !knownTypes.Contains(overlayViewModel.GetType()) &&
                     !knownTypes.Any(x => x.IsAssignableFrom(overlayViewModel.GetType())))
                 {
                     continue;
                 }
+
                 overlayViewModel.IsLocked = false;
             }
         }

@@ -30,6 +30,8 @@ namespace PoeShared.Native
         private double top;
 
         private double width;
+        private bool isUnlockable = false;
+        private float opacity;
 
         public ISubject<Unit> WhenLoaded { get; } = new ReplaySubject<Unit>(1);
 
@@ -90,7 +92,20 @@ namespace PoeShared.Native
         public bool IsLocked
         {
             get => isLocked;
-            set => this.RaiseAndSetIfChanged(ref isLocked, value);
+            set
+            {
+                if (!value && !IsUnlockable)
+                {
+                    throw new InvalidOperationException($"Overlay {this} is cannot be unlocked");
+                }
+                this.RaiseAndSetIfChanged(ref isLocked, value);
+            }
+        }
+
+        public bool IsUnlockable
+        {
+            get => isUnlockable;
+            set => this.RaiseAndSetIfChanged(ref isUnlockable, value);
         }
 
         public OverlayMode OverlayMode
@@ -106,12 +121,51 @@ namespace PoeShared.Native
             get => sizeToContent;
             set => this.RaiseAndSetIfChanged(ref sizeToContent, value);
         }
+        
+        public float Opacity
+        {
+            get => opacity;
+            set => this.RaiseAndSetIfChanged(ref opacity, value);
+        }
 
         public virtual IOverlayViewModel SetActivationController(IActivationController controller)
         {
             Guard.ArgumentNotNull(controller, nameof(controller));
 
             return this;
+        }
+
+        protected void ApplyConfig(IOverlayConfig config)
+        {
+            if (config.OverlaySize.Height <= 0 || config.OverlaySize.Width <= 0)
+            {
+                IsLocked = false;
+                config.OverlaySize = MinSize;
+            }
+            Width = config.OverlaySize.Width;
+            Height = config.OverlaySize.Height;
+
+            if (config.OverlayLocation.X <= 1 && config.OverlayLocation.Y <= 1)
+            {
+                IsLocked = false;
+                config.OverlayLocation = new Point(Width / 2, Height / 2);
+            }
+            Left = config.OverlayLocation.X;
+            Top = config.OverlayLocation.Y;
+            
+            if (config.OverlayOpacity <= 0.01)
+            {
+                IsLocked = false;
+                config.OverlayOpacity = 1;
+            }
+            Opacity = config.OverlayOpacity;
+        }
+
+        protected void SaveConfig(IOverlayConfig config)
+        {
+            config.OverlayLocation = new Point(Left, Top);
+            config.OverlaySize = new Size(Width, Height);
+            config.OverlayOpacity = Opacity;
         }
     }
 }

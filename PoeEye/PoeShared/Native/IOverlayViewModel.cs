@@ -25,6 +25,8 @@ namespace PoeShared.Native
         Size MaxSize { get; set; }
 
         bool IsLocked { get; set; }
+        
+        bool IsUnlockable { get; set; }
 
         OverlayMode OverlayMode { get; set; }
 

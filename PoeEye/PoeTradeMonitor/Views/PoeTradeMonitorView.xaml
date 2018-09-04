@@ -37,7 +37,8 @@
         BorderBrush="{StaticResource TradeMonitorBorderBrushKey}"
         Opacity="{Binding Opacity}"
         Visibility="{Binding IsLocked, Converter={StaticResource TrueToHiddenFalseToVisibleConverter}}"
-        BorderThickness="1" />
+        BorderThickness="1">
+      </Border>
 
       <Grid TextBlock.Foreground="{StaticResource PoeFontBrush}">
         <Grid.RowDefinitions>

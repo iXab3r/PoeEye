@@ -16,6 +16,7 @@ namespace PoeEye.Config
     {
         private static readonly IDictionary<string, float> DefaultCurrenciesPriceInChaos = new Dictionary<string, float>
         {
+            {KnownCurrencyNameList.ChaosOrb, 1},
             {KnownCurrencyNameList.BlessedOrb, 2},
             {KnownCurrencyNameList.CartographersChisel, 1},
             {KnownCurrencyNameList.ChromaticOrb, 0.5f},

@@ -72,6 +72,7 @@ namespace PoeEye.TradeMonitor.ViewModels
             MaxSize = new Size(700, double.NaN);
             Height = double.NaN;
             SizeToContent = SizeToContent.Height;
+            IsUnlockable = true;
 
             this.keyboardMouseEvents = keyboardMouseEvents;
             this.controller = controller;

@@ -58,7 +58,7 @@ namespace PoeShared.StashApi
             client = new RestClient(CharacterApiPortal)
             {
                 CookieContainer = new CookieContainer(),
-                FollowRedirects = false
+                FollowRedirects = false,
             };
         }
 
@@ -109,11 +109,11 @@ namespace PoeShared.StashApi
             var response = client.Execute(request);
 
             var parser = CQ.CreateDocument(response.Content);
-            var hash = parser["input[type=hidden][name=hash][id=hash]"]?.Attr("value");
+            var hash = parser["input[type=hidden][name=hash]"]?.Attr("value");
 
             if (string.IsNullOrWhiteSpace(hash))
             {
-                throw new ApplicationException($"Could not read hash from response (length: {response.Content?.Length}");
+                throw new ApplicationException($"Could not read hash from response (length: {response.Content?.Length})");
             }
 
             return hash;
@@ -152,23 +152,17 @@ namespace PoeShared.StashApi
             loginRequest.AddParameter("login_email", credentials.UserName);
             loginRequest.AddParameter("login_password", credentials.Password);
             loginRequest.AddParameter("hash", hash);
+            loginRequest.AddParameter("remember_me", "0");
             loginRequest.AddParameter("login", "Login");
 
             var response = await client.ExecuteTaskAsync(loginRequest);
 
-            //If we didn't get a redirect, your gonna have a bad time.
-            if (response.StatusCode != HttpStatusCode.Redirect)
-            {
-                var error = ExtractErrors(response.Content);
-                throw new AuthenticationException($"Could not authenticate(code: {response.StatusCode}, length: {response.ContentLength}, error: '{error}'), email: {credentials.UserName}, password.Length: {credentials.Password.Length}");
-            }
-
             var poeSessionIdCookie = response.Cookies.SingleOrDefault(x => x.Name == "POESESSID");
             if (string.IsNullOrEmpty(poeSessionIdCookie?.Value))
             {
-                throw new AuthenticationException($"Could not retrieve POESESSID (code: {response.StatusCode}, length: {response.ContentLength}), email: {credentials.UserName}, password.Length: {credentials.Password.Length}");
+                var error = ExtractErrors(response.Content);
+                throw new AuthenticationException($"Could not retrieve POESESSID (code: {response.StatusCode}, length: {response.ContentLength}, error: '{error}'), email: {credentials.UserName}, password.Length: {credentials.Password.Length}, cookies: {response.Cookies.DumpToTextRaw()}");
             }
-
             SessionId = poeSessionIdCookie.Value;
 
             IsAuthenticated = true;

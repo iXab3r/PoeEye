@@ -1,4 +1,6 @@
+using System.Windows;
 using PoeShared.Converters;
+using PoeShared.Native;
 
 namespace PoeBud.Config
 {
@@ -7,7 +9,7 @@ namespace PoeBud.Config
 
     using Newtonsoft.Json;
 
-    public sealed class PoeBudConfig : IPoeBudConfig
+    public sealed class PoeBudConfig : IPoeBudConfig, IOverlayConfig
     {
         public bool HideXpBar { get; set; } = false;
 
@@ -38,7 +40,13 @@ namespace PoeBud.Config
         public string[] StashesToProcess { get; set; } = new string[0];
 
         public string GetChaosSetHotkey { get; set; } = "None";
+        
+        public Point OverlayLocation { get; set; }
+        
+        public Size OverlaySize { get; set; }
 
-        public int Version { get; set; } = 2;
+        public float OverlayOpacity { get; set; } = 0.75f;
+
+        public int Version { get; set; } = 3;
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.Reactive;
 using System.Reactive.Subjects;
 using DynamicData;
 using DynamicData.Binding;
@@ -38,6 +39,7 @@ namespace PoeEye.PoeTrade.ViewModels
     {
         private static readonly TimeSpan TimeSinceLastUpdateRefreshTimeout = TimeSpan.FromSeconds(1);
         private static readonly TimeSpan RecheckPeriodThrottleTimeout = TimeSpan.FromSeconds(1);
+        private static readonly TimeSpan ResortThrottleTimeout = TimeSpan.FromSeconds(0.1f);
 
         private readonly SerialDisposable activeHistoryProviderDisposable = new SerialDisposable();
         private readonly IPoeCaptchaRegistrator captchaRegistrator;
@@ -106,7 +108,15 @@ namespace PoeEye.PoeTrade.ViewModels
 
             itemsSource
                 .Connect()
-                .Sort(SortExpressionComparer<IPoeTradeViewModel>.Ascending(x => x.TradeState).ThenByAscending(x => x.PriceInChaosOrbs))
+                .Sort(
+                    SortExpressionComparer<IPoeTradeViewModel>
+                        .Ascending(x => x.TradeState)
+                        .ThenByAscending(x => x.PriceInChaosOrbs ?? PoePrice.Empty), 
+                    SortOptions.None,
+                    itemsSource.Connect()
+                        .WhenAnyPropertyChanged()
+                        .Throttle(ResortThrottleTimeout)
+                        .ToUnit())
                 .ObserveOn(uiScheduler)
                 .Bind(out items)
                 .Subscribe()
@@ -187,7 +197,6 @@ namespace PoeEye.PoeTrade.ViewModels
                 {
                     var itemViewModel = poeTradeViewModelFactory.Create(item);
                     itemViewModel.AddTo(activeProvider.Anchors);
-                    itemsSource.Add(itemViewModel);
 
                     itemViewModel
                         .WhenAnyValue(x => x.TradeState)
@@ -199,6 +208,8 @@ namespace PoeEye.PoeTrade.ViewModels
 
                     itemViewModel.TradeState = PoeTradeState.New;
                     itemViewModel.Trade.Timestamp = clock.Now;
+                    
+                    itemsSource.Add(itemViewModel);
                 }
             }
             lastUpdateTimestamp = clock.Now;

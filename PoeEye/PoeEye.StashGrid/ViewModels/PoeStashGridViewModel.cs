@@ -35,8 +35,6 @@ namespace PoeEye.StashGrid.ViewModels
 
         private readonly ReadOnlyObservableCollection<BasicStashGridCellViewModel> highlightsProxy;
 
-        private float opacity;
-
         public PoeStashGridViewModel(
             [NotNull] IKeyboardEventsSource keyboardMouseEvents,
             [NotNull] IOverlayWindowController controller,
@@ -58,6 +56,7 @@ namespace PoeEye.StashGrid.ViewModels
             Width = 640;
             Height = 705;
             SizeToContent = SizeToContent.Manual;
+            IsUnlockable = true;
 
             this.WhenAnyValue(x => x.IsLocked)
                 .Subscribe(isLocked => OverlayMode = isLocked ? OverlayMode.Transparent : OverlayMode.Layered)
@@ -81,12 +80,6 @@ namespace PoeEye.StashGrid.ViewModels
                             .AddTo(Anchors);
                     })
                 .AddTo(Anchors);
-        }
-
-        public float Opacity
-        {
-            get => opacity;
-            set => this.RaiseAndSetIfChanged(ref opacity, value);
         }
 
         public ReactiveList<BasicStashGridCellViewModel> GridCells { get; } = new ReactiveList<BasicStashGridCellViewModel>();
@@ -119,37 +112,14 @@ namespace PoeEye.StashGrid.ViewModels
 
         private void ApplyConfig(PoeStashGridConfig config)
         {
-            if (config.OverlayOpacity <= 0.01)
-            {
-                IsLocked = false;
-                config.OverlayOpacity = 1;
-            }
-            if (config.OverlaySize.Height <= 0 || config.OverlaySize.Width <= 0)
-            {
-                IsLocked = false;
-                config.OverlaySize = MinSize;
-            }
-            Width = config.OverlaySize.Width;
-            Height = config.OverlaySize.Height;
-
-            if (config.OverlayLocation.X <= 1 && config.OverlayLocation.Y <= 1)
-            {
-                IsLocked = false;
-                config.OverlayLocation = new Point(Width / 2, Height / 2);
-            }
-            Left = config.OverlayLocation.X;
-            Top = config.OverlayLocation.Y;
-
-            Opacity = config.OverlayOpacity;
+            base.ApplyConfig(config);
             PrepareGridCells();
         }
 
         private void LockWindowCommandExecuted()
         {
             var config = configProvider.ActualConfig;
-            config.OverlayLocation = new Point(Left, Top);
-            config.OverlaySize = new Size(Width, Height);
-            config.OverlayOpacity = Opacity;
+            base.SaveConfig(config);
 
             const float offsetY = 66;
             config.StashBounds = new Rect(Left, Top + offsetY, Width, Height - offsetY);

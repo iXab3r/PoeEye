@@ -1,9 +1,10 @@
 ﻿using System.Windows;
 using PoeShared.Modularity;
+using PoeShared.Native;
 
 namespace PoeEye.StashGrid.Modularity
 {
-    public class PoeStashGridConfig : IPoeEyeConfigVersioned
+    public class PoeStashGridConfig : IPoeEyeConfigVersioned, IOverlayConfig
     {
         public Point OverlayLocation { get; set; }
 

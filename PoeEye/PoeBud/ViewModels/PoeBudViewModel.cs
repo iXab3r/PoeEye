@@ -9,6 +9,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Markup;
 using Anotar.Log4Net;
 using Gma.System.MouseKeyHook;
 using Guards;
@@ -37,6 +38,7 @@ namespace PoeBud.ViewModels
     {
         private static readonly TimeSpan UpdateTimeout = TimeSpan.FromSeconds(1);
         private readonly IHighlightingService highlightingService;
+        private readonly IConfigProvider<PoeBudConfig> configProvider;
         private readonly IClock clock;
         private readonly ISubject<Exception> exceptionsToPropagate = new Subject<Exception>();
         private readonly IKeyboardEventsSource keyboardMouseEvents;
@@ -62,7 +64,7 @@ namespace PoeBud.ViewModels
             [NotNull] IPoeWindowManager windowManager,
             [NotNull] IHighlightingService highlightingService,
             [NotNull] ISolutionExecutorViewModel solutionExecutor,
-            [NotNull] IConfigProvider<PoeBudConfig> poeBudConfigProvider,
+            [NotNull] IConfigProvider<PoeBudConfig> configProvider,
             [NotNull] IClock clock,
             [NotNull] IKeyboardEventsSource keyboardMouseEvents,
             [NotNull] IUserInteractionsManager userInteractionsManager,
@@ -78,15 +80,15 @@ namespace PoeBud.ViewModels
             Guard.ArgumentNotNull(overlaysProvider, nameof(overlaysProvider));
             Guard.ArgumentNotNull(userInteractionsManager, nameof(userInteractionsManager));
             Guard.ArgumentNotNull(stashUpdaterStrategyFactory, nameof(stashUpdaterStrategyFactory));
-            Guard.ArgumentNotNull(poeBudConfigProvider, nameof(poeBudConfigProvider));
+            Guard.ArgumentNotNull(configProvider, nameof(configProvider));
             Guard.ArgumentNotNull(keyboardMouseEvents, nameof(keyboardMouseEvents));
             Guard.ArgumentNotNull(clock, nameof(clock));
             Guard.ArgumentNotNull(stashAnalyzerFactory, nameof(stashAnalyzerFactory));
             Guard.ArgumentNotNull(stashUpdateFactory, nameof(stashUpdateFactory));
             Guard.ArgumentNotNull(uiScheduler, nameof(uiScheduler));
-
-            OverlayMode = OverlayMode.Layered;
+            
             this.highlightingService = highlightingService;
+            this.configProvider = configProvider;
             this.clock = clock;
             this.keyboardMouseEvents = keyboardMouseEvents;
             this.overlaysProvider = overlaysProvider;
@@ -97,8 +99,16 @@ namespace PoeBud.ViewModels
 
             SolutionExecutor = solutionExecutor;
             WindowManager = windowManager;
+            
+            OverlayMode = OverlayMode.Layered;
+            MinSize = new Size(100, 30);
+            MaxSize = new Size(1024, 400);
+            Top = 100;
+            Left = 100;
+            SizeToContent = SizeToContent.Manual;
+            IsUnlockable = true;
 
-            poeBudConfigProvider
+            configProvider
                 .WhenChanged
                 .Subscribe(ApplyConfig)
                 .AddTo(Anchors);
@@ -106,12 +116,9 @@ namespace PoeBud.ViewModels
             exceptionsToPropagate
                 .ToProperty(this, x => x.LastUpdateException, out lastUpdateException, null, false, uiScheduler)
                 .AddTo(Anchors);
-
-            Width = SystemParameters.PrimaryScreenWidth;
-            Height = SystemParameters.PrimaryScreenHeight;
-            Left = 0;
-            Top = 0;
             
+            LockWindowCommand = new DelegateCommand(LockWindowCommandExecuted);
+
             WithdrawChaosSetCommand = new CommandWrapper(
                 ReactiveCommand.CreateFromTask(() => ExecuteSolutionOrFail(() => Stash.ChaosSetSolutions.FirstOrDefault(), () => "Failed to withdraw ChaosSet, not enough items ?")));
             WithdrawCurrencyCommand = new CommandWrapper(
@@ -147,6 +154,8 @@ namespace PoeBud.ViewModels
         public ICommand WithdrawSellablesCommand { get; }
         
         public ICommand ForceRefreshCommand { get; }
+        
+        public ICommand LockWindowCommand { get; }
 
         public IPoeStashUpdater StashUpdater
         {
@@ -186,6 +195,15 @@ namespace PoeBud.ViewModels
                     ? TimeSpan.Zero
                     : stashUpdater.LastUpdateTimestamp + (actualConfig?.StashUpdatePeriod ?? TimeSpan.Zero) - clock.Now;
         
+        private void LockWindowCommandExecuted()
+        {
+            var config = configProvider.ActualConfig;
+            base.SaveConfig(config);
+
+            configProvider.Save(config);
+            IsLocked = true;
+        }
+        
         private void ApplyConfig(PoeBudConfig config)
         {
             Log.Instance.Debug($"[PoeBudViewModel] Applying new config...");
@@ -197,6 +215,8 @@ namespace PoeBud.ViewModels
             hotkey = KeyGestureExtensions.SafeCreateGesture(config.GetChaosSetHotkey);
             RefreshStashUpdater(actualConfig);
             this.RaisePropertyChanged(nameof(League));
+            
+            base.ApplyConfig(config);
         }
 
         private void RefreshStashUpdater(PoeBudConfig config)

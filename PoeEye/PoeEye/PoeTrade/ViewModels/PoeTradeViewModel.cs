@@ -108,10 +108,7 @@ namespace PoeEye.PoeTrade.ViewModels
 
             var price = StringToPoePriceConverter.Instance.Convert(poeItem.Price);
             var priceInChaos = poePriceCalculcator.GetEquivalentInChaosOrbs(price);
-            PriceInChaosOrbs = price.CurrencyType == KnownCurrencyNameList.ChaosOrb 
-                ? default(PoePrice?) 
-                : priceInChaos;
-            RawPriceInChaosOrbs = priceInChaos.Value;
+            PriceInChaosOrbs = priceInChaos;
 
             CopyItemToClipboardCommand = new CommandWrapper(ReactiveCommand.CreateFromTask(
                 async () =>
@@ -151,8 +148,6 @@ namespace PoeEye.PoeTrade.ViewModels
         public IPoeItemModsViewModel Mods { get; }
 
         public PoePrice? PriceInChaosOrbs { get; }
-
-        public float RawPriceInChaosOrbs { get; }
 
         public IPoeItem Trade { get; }
 

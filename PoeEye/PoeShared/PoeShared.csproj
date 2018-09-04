@@ -263,6 +263,7 @@
     <Compile Include="Modularity\SchedulerProvider.cs" />
     <Compile Include="Native\IActivationController.cs" />
     <Compile Include="Native\IKeyboardEventsSource.cs" />
+    <Compile Include="Native\IOverlayConfig.cs" />
     <Compile Include="Native\SafeKeyboardMouseEvents.cs" />
     <Compile Include="PoeDatabase\IPoeEconomicsSource.cs" />
     <Compile Include="PoeTrade\IPoeItemViewModelFactory.cs" />

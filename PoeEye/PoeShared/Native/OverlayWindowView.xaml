@@ -67,6 +67,9 @@
             </Style>
           </StackPanel.Resources>
           <TextBlock Foreground="Yellow"
+                     Text="{Binding Content}"
+                     FontSize="14" />
+          <TextBlock Foreground="Yellow"
                      Text="{Binding}"
                      FontSize="14" />
           <TextBlock

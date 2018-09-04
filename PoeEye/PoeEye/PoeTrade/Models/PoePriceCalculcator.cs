@@ -84,6 +84,12 @@ namespace PoeEye.PoeTrade.Models
                 currencyByType[kvp.Key] = kvp.Value;
             }
 
+            if (!currencyByType.ContainsKey(KnownCurrencyNameList.ChaosOrb))
+            {
+                Log.Instance.Debug($"[PriceCalculcator] Chaos orb is not in a list of prices, adding it");
+                currencyByType[KnownCurrencyNameList.ChaosOrb] = 1.0f;
+            }
+
             Log.Instance.Debug($"[PriceCalculcator] Currencies list:\r\n{currencyByType.DumpToText()}");
         }
     }
