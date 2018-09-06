@@ -37,20 +37,20 @@ namespace PoeShared.Scaffolding.WPF
 
             isBusy = Observable.Return(false).ToProperty(this, x => x.IsBusy);
             raiseCanExecuteChangedRequests
-                .Subscribe(command.RaiseCanExecuteChanged)
+                .Subscribe(() => command.RaiseCanExecuteChanged())
                 .AddTo(Anchors);
         }
-        
+
         public static CommandWrapper Create<T>(DelegateCommand<T> command)
         {
             return new CommandWrapper(command);
         }
-        
+
         public static CommandWrapper Create(DelegateCommand command)
         {
             return new CommandWrapper(command);
         }
-        
+
         public static CommandWrapper Create(ReactiveCommand command)
         {
             return new CommandWrapper(command);
@@ -60,22 +60,22 @@ namespace PoeShared.Scaffolding.WPF
         {
             return new CommandWrapper(ReactiveCommand.CreateFromTask(execute, canExecute));
         }
-        
+
         public static CommandWrapper Create(Func<Task> execute)
         {
             return Create(execute, Observable.Return(true).Concat(Observable.Never<bool>()));
         }
-        
+
         public static CommandWrapper Create<TParam>(Func<TParam, Task> execute, IObservable<bool> canExecute)
         {
             return new CommandWrapper(ReactiveCommand.CreateFromTask(execute, canExecute));
         }
-        
+
         public static CommandWrapper Create<TParam>(Func<TParam, Task> execute)
         {
             return Create(execute, Observable.Return(true).Concat(Observable.Never<bool>()));
         }
-        
+
         public bool IsBusy => isBusy.Value;
 
         public string Error
@@ -89,9 +89,9 @@ namespace PoeShared.Scaffolding.WPF
             get { return description; }
             set { this.RaiseAndSetIfChanged(ref description, value); }
         }
-        
+
         private ICommand InnerCommand => command;
-        
+
         public bool CanExecute(object parameter)
         {
             return command.CanExecute(parameter);
@@ -115,7 +115,15 @@ namespace PoeShared.Scaffolding.WPF
             add => InnerCommand.CanExecuteChanged += value;
             remove => InnerCommand.CanExecuteChanged -= value;
         }
-        
+
+        public CommandWrapper RaiseCanExecuteChangedWhen(IObservable<Unit> eventSource)
+        {
+            Guard.ArgumentNotNull(() => eventSource);
+
+            eventSource.Subscribe(RaiseCanExecuteChanged).AddTo(Anchors);
+            return this;
+        }
+
         private void HandleException(Exception exception)
         {
             Log.HandleUiException(exception);

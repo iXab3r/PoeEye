@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using Guards;
@@ -11,6 +12,8 @@ namespace PoeShared.Modularity
 {
     internal class JsonConfigSerializer : IConfigSerializer
     {
+        private readonly int MaxCharsToLog = 1024;
+        
         private JsonSerializerSettings jsonSerializerSettings;
         private readonly IReactiveList<JsonConverter> converters = new ReactiveList<JsonConverter>();
         
@@ -31,21 +34,34 @@ namespace PoeShared.Modularity
 
         public string Serialize(object data)
         {
+            Guard.ArgumentNotNull(() => data);
+
             return JsonConvert.SerializeObject(data, jsonSerializerSettings);
         }
 
         public T Deserialize<T>(string serializedData)
         {
-            return JsonConvert.DeserializeObject<T>(serializedData, jsonSerializerSettings);
+            Guard.ArgumentNotNullOrEmpty(() => serializedData);
+            
+            var result = JsonConvert.DeserializeObject(serializedData, typeof(T), jsonSerializerSettings);
+            if (result == null)
+            {
+                throw new FormatException($"Operation failed, could not deserialize data to instance of type {typeof(T)}, serialized data: \n{serializedData.Substring(0, Math.Min(MaxCharsToLog, serializedData.Length))}");
+            }
+            return (T)result;
         }
 
         public string Compress(object data)
         {
+            Guard.ArgumentNotNull(() => data);
+
             throw new System.NotImplementedException();
         }
 
         public T Decompress<T>(string compressedData)
         {
+            Guard.ArgumentNotNullOrEmpty(() => compressedData);
+
             throw new System.NotImplementedException();
         }
 

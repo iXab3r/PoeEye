@@ -5,6 +5,7 @@
   <ResourceDictionary.MergedDictionaries>
     <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Converters.xaml" />
     <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Colors.xaml" />
+    <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/CommandWrapperView.xaml" />
     <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.togglebutton.xaml" />
     <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.button.xaml" />
     <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.dark.xaml" />
@@ -111,23 +112,6 @@
     <Setter Property="VerticalContentAlignment" Value="Center" />
   </Style>
   
-  <DataTemplate DataType="{x:Type s:CommandWrapper}">
-    <DockPanel>
-      <ProgressBar Style="{StaticResource MaterialDesignCircularProgressBar}"
-                   Value="0"
-                   Visibility="{Binding IsBusy, Converter={StaticResource TrueToVisibleFalseToCollapsedConverter}}"
-                   IsIndeterminate="True" />
-      <materialDesign:PackIcon DockPanel.Dock="Left" Kind="AlertCircleOutline" VerticalAlignment="Center"
-                               Foreground="Red" Background="Transparent"
-                               Visibility="{Binding Error, Converter={StaticResource NullToCollapsedConverter}}"
-                               ToolTip="{Binding Error}" />
-      <Button DockPanel.Dock="Left" Margin="5,0" Height="22"
-              Command="{Binding}"
-              CommandParameter="{Binding Path=(s:CommandWrapperHelper.CommandParameter), RelativeSource={RelativeSource Self}}"
-              Content="{Binding Path=(s:CommandWrapperHelper.Text), RelativeSource={RelativeSource Self}}" />
-    </DockPanel>
-  </DataTemplate>
-
 
   <Style TargetType="{x:Type Button}" x:Key="OverlayWindowButtonStyleKey" BasedOn="{StaticResource FlatButton}">
   </Style>

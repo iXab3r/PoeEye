@@ -139,14 +139,16 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
 
             OpenAppDataDirectoryCommand = CommandWrapper.Create(OpenAppDataDirectory);
 
-            DuplicateTabCommand =
-                CommandWrapper.Create(new DelegateCommand<IMainWindowTabViewModel>(DuplicateTabCommandExecuted, DuplicateTabCommandCanExecute));
-            UndoCloseTabCommand = CommandWrapper.Create(new DelegateCommand(UndoCloseTabCommandExecuted, UndoCloseTabCommandCanExecute));
-            CloseTabCommand = CommandWrapper.Create(new DelegateCommand<IMainWindowTabViewModel>(RemoveTabCommandExecuted, RemoveTabCommandCanExecute));
-            CopyTabToClipboardCommand =
-                CommandWrapper.Create(new DelegateCommand<IMainWindowTabViewModel>(CopyTabToClipboardExecuted, CopyTabToClipboardCommandCanExecute));
+            DuplicateTabCommand = CommandWrapper.Create(new DelegateCommand<IMainWindowTabViewModel>(DuplicateTabCommandExecuted, DuplicateTabCommandCanExecute))
+                .RaiseCanExecuteChangedWhen(this.WhenAnyValue(x => x.SelectedTab).ToUnit());
+            CopyTabToClipboardCommand = CommandWrapper.Create(new DelegateCommand<IMainWindowTabViewModel>(CopyTabToClipboardExecuted, CopyTabToClipboardCommandCanExecute))
+                .RaiseCanExecuteChangedWhen(this.WhenAnyValue(x => x.SelectedTab).ToUnit());
             PasteTabCommand = CommandWrapper.Create(new DelegateCommand(PasteTabCommandExecuted));
+            
             CreateNewTabCommand = CommandWrapper.Create(new DelegateCommand(() => CreateNewTabCommandExecuted(default(PoeEyeTabConfig))));
+            CloseTabCommand = CommandWrapper.Create(new DelegateCommand<IMainWindowTabViewModel>(RemoveTabCommandExecuted, RemoveTabCommandCanExecute));
+            UndoCloseTabCommand = CommandWrapper.Create(new DelegateCommand(UndoCloseTabCommandExecuted, UndoCloseTabCommandCanExecute));
+
             RefreshAllTabsCommand = CommandWrapper.Create(RefreshAllTabsCommandExecuted);
 
             tabsListSource
@@ -198,7 +200,8 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
         private void PasteTabCommandExecuted()
         {
             var content = clipboardManager.GetText();
-            throw new ApplicationException("test");
+            var cfg = configSerializer.Deserialize<PoeEyeTabConfig>(content);
+            CreateNewTabCommandExecuted(cfg);
         }
 
         private bool DuplicateTabCommandCanExecute(IMainWindowTabViewModel tab)
@@ -352,7 +355,7 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
 
         private bool CopyTabToClipboardCommandCanExecute(IMainWindowTabViewModel tab)
         {
-            return tab != null;
+                return tab != null;
         }
 
         private void CopyTabToClipboardExecuted(IMainWindowTabViewModel tab)
