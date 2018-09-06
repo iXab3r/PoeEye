@@ -20,6 +20,7 @@ namespace PoeEye.Config
 {
     internal sealed class PoeEyeConfigProviderFromFile : IConfigProvider
     {
+        private readonly IConfigSerializer configSerializer;
         private static readonly string ConfigFileDirectory = AppArguments.AppDataDirectory;
         
         private static readonly string DebugConfigFileName = @"configDebugMode.cfg";
@@ -27,14 +28,13 @@ namespace PoeEye.Config
 
         private readonly string configFilePath;
 
-        private JsonSerializerSettings jsonSerializerSettings;
-        private readonly IReactiveList<JsonConverter> converters = new ReactiveList<JsonConverter>();
         private readonly ConcurrentDictionary<string, IPoeEyeConfig> loadedConfigs = new ConcurrentDictionary<string, IPoeEyeConfig>();
 
         private readonly ISubject<Unit> configHasChanged = new Subject<Unit>();
 
-        public PoeEyeConfigProviderFromFile()
+        public PoeEyeConfigProviderFromFile(IConfigSerializer configSerializer)
         {
+            this.configSerializer = configSerializer;
             if (AppArguments.Instance.IsDebugMode)
             {
                 Log.Instance.Debug("[PoeEyeConfigProviderFromFile..ctor] Debug mode detected");
@@ -45,11 +45,6 @@ namespace PoeEye.Config
                 Log.Instance.Debug("[PoeEyeConfigProviderFromFile..ctor] Release mode detected");
                 configFilePath = Path.Combine(ConfigFileDirectory, ReleaseConfigFileName);
             }
-
-            converters.Changed
-                .ToUnit()
-                .StartWith(Unit.Default)
-                .Subscribe(ReinitializeSerializerSettings);
         }
 
         public IObservable<Unit> ConfigHasChanged => configHasChanged;
@@ -119,7 +114,7 @@ namespace PoeEye.Config
             try
             {
                 Log.Instance.Debug($"[PoeEyeConfigProviderFromFile.Save] Serializing config data...");
-                var serializedData = JsonConvert.SerializeObject(config, jsonSerializerSettings);
+                var serializedData = configSerializer.Serialize(config);
 
                 Log.Instance.Debug($"[PoeEyeConfigProviderFromFile.Save] Successfully serialized config, got {serializedData.Length} chars");
 
@@ -159,7 +154,7 @@ namespace PoeEye.Config
                 var fileData = File.ReadAllText(configFilePath);
                 Log.Instance.Debug($"[PoeEyeConfigProviderFromFile.Load] Successfully read {fileData.Length} chars, deserializing...");
 
-                result = JsonConvert.DeserializeObject<PoeEyeCombinedConfig>(fileData, jsonSerializerSettings);
+                result = configSerializer.Deserialize<PoeEyeCombinedConfig>(fileData);
                 Log.Instance.Debug($"[PoeEyeConfigProviderFromFile.Load] Successfully deserialized config data");
 
                 if (result == null)
@@ -174,13 +169,6 @@ namespace PoeEye.Config
                 CreateBackupOfConfig();
             }
             return result ?? new PoeEyeCombinedConfig();
-        }
-
-        public void RegisterConverter(JsonConverter converter)
-        {
-            Guard.ArgumentNotNull(converter, nameof(converter));
-
-            converters.Add(converter);
         }
 
         private void CreateBackupOfConfig()
@@ -200,30 +188,6 @@ namespace PoeEye.Config
             {
                 Log.Instance.Warn($"[PoeEyeConfigProviderFromFile.CreateBackupOfConfig] Failed to create a backup", ex);
             }
-        }
-        
-        private void ReinitializeSerializerSettings()
-        {
-            jsonSerializerSettings = new JsonSerializerSettings
-            {
-                Formatting = Formatting.Indented,
-                TypeNameHandling = TypeNameHandling.All,
-                TypeNameAssemblyFormat = System.Runtime.Serialization.Formatters.FormatterAssemblyStyle.Simple,
-                Error = HandleSerializerError
-            };
-
-            converters.ToList().ForEach(jsonSerializerSettings.Converters.Add);
-        }
-        
-        private void HandleSerializerError(object sender, ErrorEventArgs args)
-        {
-            if (sender == null || args == null)
-            {
-                return;
-            }
-            //FIXME Serializer errors should be treated appropriately, e.g. load value from default config on error
-            Log.Instance.Warn($"[PoeEyeConfigProviderFromFile.SerializerError] Suppresing serializer error ! Path: {args.ErrorContext.Path}, Member: {args.ErrorContext.Member}, Handled: {args.ErrorContext.Handled}", args.ErrorContext.Error);
-            args.ErrorContext.Handled = true;
         }
 
         private sealed class PoeEyeCombinedConfig

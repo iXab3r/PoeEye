@@ -21,8 +21,7 @@ namespace PoeWhisperMonitor.Chat
 {
     internal sealed class PoeChatService : DisposableReactiveObject, IPoeChatService
     {
-        private static readonly TimeSpan ClipboardRestorationTimeout = TimeSpan.FromMilliseconds(200);
-        private static readonly int ClipboardSetRetryCount = 10;
+        private readonly IClipboardManager clipboardManager;
 
         private readonly IKeyboardSimulator keyboardSimulator = new InputSimulator().Keyboard;
         private readonly ISubject<MessageRequest> requests = new Subject<MessageRequest>();
@@ -34,8 +33,11 @@ namespace PoeWhisperMonitor.Chat
 
         public PoeChatService(
             [NotNull] IPoeTracker tracker,
+            [NotNull] IClipboardManager clipboardManager,
             [NotNull] ISchedulerProvider schedulerProvider)
         {
+            this.clipboardManager = clipboardManager;
+            Guard.ArgumentNotNull(clipboardManager, nameof(clipboardManager));
             Guard.ArgumentNotNull(tracker, nameof(tracker));
 
             tracker.AddTo(Anchors);
@@ -133,10 +135,10 @@ namespace PoeWhisperMonitor.Chat
                 }
 
                 Log.Instance.Trace($"[PoeChatService] [{process}] Retrieving current clipboard content...");
-                var existingClipboardContent = Clipboard.GetDataObject();
+                var existingClipboardContent = clipboardManager.GetDataObject();
 
-                Log.Instance.Trace($"[PoeChatService] [{process}] Setting new message '{request.Message}' (retry: {ClipboardSetRetryCount}, timeout: {ClipboardRestorationTimeout})...");
-                Clipboard.SetDataObject(request.Message, true, ClipboardSetRetryCount, (int)ClipboardRestorationTimeout.TotalMilliseconds);
+                Log.Instance.Trace($"[PoeChatService] [{process}] Setting new message '{request.Message}'...");
+                clipboardManager.SetText(request.Message);
 
                 keyboardSimulator.KeyPress(VirtualKeyCode.RETURN);
                 keyboardSimulator.ModifiedKeyStroke(VirtualKeyCode.CONTROL, VirtualKeyCode.VK_V);
@@ -148,9 +150,9 @@ namespace PoeWhisperMonitor.Chat
 
                 if (existingClipboardContent != null)
                 {
-                    Thread.Sleep(ClipboardRestorationTimeout);
-                    Log.Instance.Trace($"[PoeChatService] Restoring previous clipboard content (retry: {ClipboardSetRetryCount}, timeout: {ClipboardRestorationTimeout})");
-                    Clipboard.SetDataObject(existingClipboardContent, true, ClipboardSetRetryCount, (int)ClipboardRestorationTimeout.TotalMilliseconds);
+                    Thread.Sleep(clipboardManager.ClipboardRestorationTimeout);
+                    Log.Instance.Trace($"[PoeChatService] Restoring previous clipboard content");
+                    clipboardManager.SetDataObject(existingClipboardContent);
                 }
 
                 Log.Instance.Trace($"[PoeChatService] [{process}] Successfully sent message '{request.Message}'");

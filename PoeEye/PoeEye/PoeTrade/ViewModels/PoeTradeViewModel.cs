@@ -48,6 +48,7 @@ namespace PoeEye.PoeTrade.ViewModels
         private static readonly TimeSpan RefreshTimeout = TimeSpan.FromMinutes(1);
         private readonly IPoeChatService chatService;
         private readonly IAudioNotificationsManager notificationsManager;
+        [NotNull] private readonly IClipboardManager clipboardManager;
         private readonly IClock clock;
         private readonly ReactiveCommand<object> copyPrivateMessageToClipboardCommand = ReactiveUI.Legacy.ReactiveCommand.Create();
         private readonly ReactiveCommand<object> sendPrivateMessageCommand = ReactiveUI.Legacy.ReactiveCommand.Create();
@@ -65,6 +66,7 @@ namespace PoeEye.PoeTrade.ViewModels
             [NotNull] IFactory<PoeLinksInfoViewModel, IPoeLinksInfo> linksViewModelFactory,
             [NotNull] IFactory<IPoeItemModsViewModel> modsViewModelFactory,
             [NotNull] IPoeItemSerializer itemSerializer,
+            [NotNull] IClipboardManager clipboardManager,
             [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler,
             [NotNull] IClock clock)
         {
@@ -76,11 +78,13 @@ namespace PoeEye.PoeTrade.ViewModels
             Guard.ArgumentNotNull(imageViewModelFactory, nameof(imageViewModelFactory));
             Guard.ArgumentNotNull(linksViewModelFactory, nameof(linksViewModelFactory));
             Guard.ArgumentNotNull(modsViewModelFactory, nameof(modsViewModelFactory));
+            Guard.ArgumentNotNull(clipboardManager, nameof(clipboardManager));
             Guard.ArgumentNotNull(uiScheduler, nameof(uiScheduler));
             Guard.ArgumentNotNull(clock, nameof(clock));
 
             this.chatService = chatService;
             this.notificationsManager = notificationsManager;
+            this.clipboardManager = clipboardManager;
             this.clock = clock;
             Trade = poeItem;
 
@@ -119,7 +123,7 @@ namespace PoeEye.PoeTrade.ViewModels
                         throw new FormatException($"Failed to parse item\n{Trade.DumpToTextRaw()}");
                     }
                     
-                    Clipboard.SetText(item);
+                    clipboardManager.SetText(item);
                     await Task.Delay(UiConstants.ArtificialVeryShortDelay);
                 }));
 
@@ -203,7 +207,7 @@ namespace PoeEye.PoeTrade.ViewModels
             var message = PreparePrivateMessage(Trade);
             try
             {
-                Clipboard.SetText(message);
+                clipboardManager.SetText(message);
             }
             catch (Exception ex)
             {

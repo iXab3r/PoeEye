@@ -31,7 +31,5 @@ namespace PoeShared.Modularity
         TConfig GetActualConfig<TConfig>() where TConfig : IPoeEyeConfig, new();
 
         IObservable<Unit> ConfigHasChanged { [NotNull] get; }
-
-        void RegisterConverter([NotNull] JsonConverter converter);
     }
 }

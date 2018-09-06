@@ -33,9 +33,10 @@
   </Window.Resources>
 
   <Window.InputBindings>
-    <KeyBinding Gesture="CTRL+V" Command="{Binding ClipboardParserViewModel.ParseClipboard}" />
     <KeyBinding Gesture="CTRL+T" Command="{Binding CreateNewTabCommand}" />
+    <KeyBinding Gesture="CTRL+V" Command="{Binding PasteTabCommand}" />
     <KeyBinding Gesture="CTRL+D" Command="{Binding DuplicateTabCommand}" CommandParameter="{Binding SelectedTab}" />
+    <KeyBinding Gesture="CTRL+C" Command="{Binding CopyTabToClipboardCommand}" CommandParameter="{Binding SelectedTab}" />
     <KeyBinding Gesture="CTRL+W" Command="{Binding CloseTabCommand}" CommandParameter="{Binding SelectedTab}" />
     <KeyBinding Gesture="CTRL+Z" Command="{Binding UndoCloseTabCommand}" />
   </Window.InputBindings>
@@ -121,6 +122,11 @@
                     </Style>
                   </Button.Style>
                 </Button>
+                
+                <ContentPresenter eye:CommandWrapperHelper.Text="&#xF00E; Paste"
+                                  Content="{Binding PasteTabCommand}">
+                  <ContentPresenter.LayoutTransform><TransformGroup><RotateTransform Angle="-90" /></TransformGroup></ContentPresenter.LayoutTransform>
+                </ContentPresenter>
               </StackPanel>
             </Expander.Header>
 

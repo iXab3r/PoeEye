@@ -1,18 +1,23 @@
 ﻿using System;
+using System.Reactive;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Guards;
+using Prism.Commands;
 using ReactiveUI;
 
 namespace PoeShared.Scaffolding.WPF
 {
     public sealed class CommandWrapper : DisposableReactiveObject, ICommand
     {
-        private readonly ReactiveCommand command;
+        private readonly ICommand command;
         private readonly ObservableAsPropertyHelper<bool> isBusy;
         private string error;
         private string description;
+
+        private readonly ISubject<Unit> raiseCanExecuteChangedRequests = new Subject<Unit>();
 
         public CommandWrapper(ReactiveCommand command)
         {
@@ -20,13 +25,36 @@ namespace PoeShared.Scaffolding.WPF
 
             isBusy = command.IsExecuting.ToProperty(this, x => x.IsBusy);
             command.ThrownExceptions.Subscribe(HandleException).AddTo(Anchors);
+
+            raiseCanExecuteChangedRequests
+                .Subscribe(() => throw new NotSupportedException($"RaiseCanExecuteChanged is not supported for commands of type {command}"))
+                .AddTo(Anchors);
+        }
+
+        private CommandWrapper(DelegateCommandBase command)
+        {
+            this.command = command;
+
+            isBusy = Observable.Return(false).ToProperty(this, x => x.IsBusy);
+            raiseCanExecuteChangedRequests
+                .Subscribe(command.RaiseCanExecuteChanged)
+                .AddTo(Anchors);
+        }
+        
+        public static CommandWrapper Create<T>(DelegateCommand<T> command)
+        {
+            return new CommandWrapper(command);
+        }
+        
+        public static CommandWrapper Create(DelegateCommand command)
+        {
+            return new CommandWrapper(command);
         }
         
         public static CommandWrapper Create(ReactiveCommand command)
         {
             return new CommandWrapper(command);
         }
-        
 
         public static CommandWrapper Create(Func<Task> execute, IObservable<bool> canExecute)
         {
@@ -66,13 +94,20 @@ namespace PoeShared.Scaffolding.WPF
         
         public bool CanExecute(object parameter)
         {
-            return ((ICommand)command).CanExecute(parameter);
+            return command.CanExecute(parameter);
         }
 
         public void Execute(object parameter)
         {
             Error = null;
-            ((ICommand)command).Execute(parameter);
+            try
+            {
+                command.Execute(parameter);
+            }
+            catch (Exception ex)
+            {
+                HandleException(ex);
+            }
         }
 
         public event EventHandler CanExecuteChanged
@@ -85,6 +120,11 @@ namespace PoeShared.Scaffolding.WPF
         {
             Log.HandleUiException(exception);
             Error = exception.Message;
+        }
+
+        public void RaiseCanExecuteChanged()
+        {
+            raiseCanExecuteChangedRequests.OnNext(Unit.Default);
         }
     }
 }

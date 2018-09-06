@@ -18,6 +18,7 @@ using Guards;
 using JetBrains.Annotations;
 using Microsoft.Practices.Unity;
 using Newtonsoft.Json;
+using PoeEye.Config;
 using PoeEye.PoeTrade.Models;
 using PoeEye.PoeTrade.Updater;
 using PoeEye.PoeTrade.ViewModels;
@@ -28,6 +29,7 @@ using PoeShared.Modularity;
 using PoeShared.PoeTrade;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
+using PoeShared.Scaffolding.WPF;
 using PoeShared.UI;
 using PoeShared.UI.ViewModels;
 using Prism.Commands;
@@ -48,21 +50,18 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
 
         private static readonly TimeSpan ConfigSaveSampingTimeout = TimeSpan.FromSeconds(10);
 
-        private readonly DelegateCommand<IMainWindowTabViewModel> closeTabCommand;
-        private readonly ReactiveCommand<object> createNewTabCommand = ReactiveUI.Legacy.ReactiveCommand.Create();
-        private readonly ReactiveCommand<Unit> refreshAllTabsCommand;
-
         private readonly ISubject<Unit> configUpdateSubject = new Subject<Unit>();
         private readonly IPoeEyeMainConfigProvider poeEyeConfigProvider;
+        private readonly IClipboardManager clipboardManager;
+        private readonly IConfigSerializer configSerializer;
 
         private readonly IFactory<IMainWindowTabViewModel> tabFactory;
 
         private readonly ReadOnlyObservableCollection<IMainWindowTabViewModel> tabsList;
         private readonly ISourceList<IMainWindowTabViewModel> tabsListSource = new SourceList<IMainWindowTabViewModel>();
         private readonly TabablzPositionMonitor<IMainWindowTabViewModel> positionMonitor = new TabablzPositionMonitor<IMainWindowTabViewModel>();
-        
-        private readonly CircularBuffer<IPoeQueryInfo> recentlyClosedQueries = new CircularBuffer<IPoeQueryInfo>(UndoStackDepth);
-        private readonly DelegateCommand undoCloseTabCommand;
+
+        private readonly CircularBuffer<PoeEyeTabConfig> recentlyClosedQueries = new CircularBuffer<PoeEyeTabConfig>(UndoStackDepth);
 
         private IMainWindowTabViewModel selectedTab;
 
@@ -77,6 +76,8 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
             [NotNull] PoeEyeSettingsViewModel settings,
             [NotNull] IPoeChatViewModel chatViewModel,
             [NotNull] IWhispersNotificationManager whispersNotificationManager,
+            [NotNull] IClipboardManager clipboardManager,
+            [NotNull] IConfigSerializer configSerializer,
             [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler,
             [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {
@@ -88,6 +89,8 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
             Guard.ArgumentNotNull(clipboardParserViewModel, nameof(clipboardParserViewModel));
             Guard.ArgumentNotNull(audioNotificationsManager, nameof(audioNotificationsManager));
             Guard.ArgumentNotNull(settings, nameof(settings));
+            Guard.ArgumentNotNull(clipboardManager, nameof(clipboardManager));
+            Guard.ArgumentNotNull(configSerializer, nameof(configSerializer));
             Guard.ArgumentNotNull(whispersNotificationManager, nameof(whispersNotificationManager));
             Guard.ArgumentNotNull(uiScheduler, nameof(uiScheduler));
             Guard.ArgumentNotNull(bgScheduler, nameof(bgScheduler));
@@ -97,6 +100,8 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
 
             this.tabFactory = tabFactory;
             this.poeEyeConfigProvider = poeEyeConfigProvider;
+            this.clipboardManager = clipboardManager;
+            this.configSerializer = configSerializer;
 
             Chat = chatViewModel;
             chatViewModel.AddTo(Anchors);
@@ -132,23 +137,17 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
             SummaryTab = summaryTabFactory.Create(tabsList);
             SummaryTab.AddTo(Anchors);
 
-            OpenAppDataDirectoryCommand = ReactiveUI.Legacy.ReactiveCommand
-                .CreateAsyncTask(x => OpenAppDataDirectory());
+            OpenAppDataDirectoryCommand = CommandWrapper.Create(OpenAppDataDirectory);
 
-            DuplicateTabCommand = new DelegateCommand<IMainWindowTabViewModel>(DuplicateTabCommandExecuted, DuplicateTabCommandCanExecute);
-            undoCloseTabCommand = new DelegateCommand(UndoCloseTabCommandExecuted, UndoCloseTabCommandCanExecute);
-            closeTabCommand = new DelegateCommand<IMainWindowTabViewModel>(RemoveTabCommandExecuted, RemoveTabCommandCanExecute);
-
-            createNewTabCommand
-                .Subscribe(arg => CreateNewTabCommandExecuted(arg as IPoeQueryInfo))
-                .AddTo(Anchors);
-
-            refreshAllTabsCommand = ReactiveUI.Legacy.ReactiveCommand
-                .CreateAsyncTask(_ => RefreshAllTabsCommandExecuted(), uiScheduler);
-
-            refreshAllTabsCommand
-                .Subscribe()
-                .AddTo(Anchors);
+            DuplicateTabCommand =
+                CommandWrapper.Create(new DelegateCommand<IMainWindowTabViewModel>(DuplicateTabCommandExecuted, DuplicateTabCommandCanExecute));
+            UndoCloseTabCommand = CommandWrapper.Create(new DelegateCommand(UndoCloseTabCommandExecuted, UndoCloseTabCommandCanExecute));
+            CloseTabCommand = CommandWrapper.Create(new DelegateCommand<IMainWindowTabViewModel>(RemoveTabCommandExecuted, RemoveTabCommandCanExecute));
+            CopyTabToClipboardCommand =
+                CommandWrapper.Create(new DelegateCommand<IMainWindowTabViewModel>(CopyTabToClipboardExecuted, CopyTabToClipboardCommandCanExecute));
+            PasteTabCommand = CommandWrapper.Create(new DelegateCommand(PasteTabCommandExecuted));
+            CreateNewTabCommand = CommandWrapper.Create(new DelegateCommand(() => CreateNewTabCommandExecuted(default(PoeEyeTabConfig))));
+            RefreshAllTabsCommand = CommandWrapper.Create(RefreshAllTabsCommandExecuted);
 
             tabsListSource
                 .Connect()
@@ -177,7 +176,8 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
                 .Subscribe(SaveConfig, Log.HandleException)
                 .AddTo(Anchors);
         }
-        
+
+
         private bool UndoCloseTabCommandCanExecute()
         {
             return !recentlyClosedQueries.IsEmpty;
@@ -189,9 +189,16 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
             {
                 return;
             }
+
             var query = recentlyClosedQueries.PopBack();
             CreateNewTabCommandExecuted(query);
-            undoCloseTabCommand.RaiseCanExecuteChanged();
+            UndoCloseTabCommand.RaiseCanExecuteChanged();
+        }
+
+        private void PasteTabCommandExecuted()
+        {
+            var content = clipboardManager.GetText();
+            throw new ApplicationException("test");
         }
 
         private bool DuplicateTabCommandCanExecute(IMainWindowTabViewModel tab)
@@ -202,22 +209,26 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
         private void DuplicateTabCommandExecuted(IMainWindowTabViewModel tab)
         {
             Guard.ArgumentIsTrue(() => DuplicateTabCommandCanExecute(tab));
-            
-            var queryInfo = tab.Query.PoeQueryBuilder();
-            CreateNewTabCommandExecuted(queryInfo);
+
+            var cfg = tab.Save();
+            CreateNewTabCommandExecuted(cfg);
         }
 
-        public ICommand CreateNewTabCommand => createNewTabCommand;
-        
-        public ICommand DuplicateTabCommand { get; }
+        public CommandWrapper CreateNewTabCommand { get; }
 
-        public ICommand UndoCloseTabCommand => undoCloseTabCommand;
+        public CommandWrapper CopyTabToClipboardCommand { get; }
 
-        public ICommand CloseTabCommand => closeTabCommand;
+        public CommandWrapper DuplicateTabCommand { get; }
 
-        public ICommand RefreshAllTabsCommand => refreshAllTabsCommand;
+        public CommandWrapper UndoCloseTabCommand { get; }
 
-        public ICommand OpenAppDataDirectoryCommand { get; }
+        public CommandWrapper PasteTabCommand { get; }
+
+        public CommandWrapper CloseTabCommand { get; }
+
+        public CommandWrapper RefreshAllTabsCommand { get; }
+
+        public CommandWrapper OpenAppDataDirectoryCommand { get; }
 
         public ApplicationUpdaterViewModel ApplicationUpdater { get; }
 
@@ -239,8 +250,8 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
 
         public IMainWindowTabViewModel SelectedTab
         {
-            get { return selectedTab; }
-            set { this.RaiseAndSetIfChanged(ref selectedTab, value); }
+            get => selectedTab;
+            set => this.RaiseAndSetIfChanged(ref selectedTab, value);
         }
 
         public IReactiveList<IPoeFlyoutViewModel> Flyouts { get; } = new ReactiveList<IPoeFlyoutViewModel>();
@@ -253,6 +264,7 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
             {
                 mainWindowTabViewModel.Dispose();
             }
+
             base.Dispose();
 
             Log.Instance.Debug($"[MainWindowViewModel.Dispose] Viewmodel disposed");
@@ -263,7 +275,8 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
             var existingItems = tabsListSource.Items.ToList();
             var newItems = args.NewOrder.OfType<IMainWindowTabViewModel>().ToList();
 
-            Log.Instance.Debug($"[PositionMonitor] Source ordering:\n\tSource: {string.Join(" => ", existingItems.Select(x => x.Id))}\n\tView: {string.Join(" => ", newItems.Select(x => x.Id))}");
+            Log.Instance.Debug(
+                $"[PositionMonitor] Source ordering:\n\tSource: {string.Join(" => ", existingItems.Select(x => x.Id))}\n\tView: {string.Join(" => ", newItems.Select(x => x.Id))}");
         }
 
         private async Task OpenAppDataDirectory()
@@ -271,23 +284,20 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
             await Task.Run(() => Process.Start(ExplorerExecutablePath, AppArguments.AppDataDirectory));
         }
 
-        private void CreateNewTabCommandExecuted([CanBeNull] IPoeQueryInfo query)
+        private void CreateNewTabCommandExecuted(PoeEyeTabConfig cfg)
         {
             var tab = CreateAndAddTab();
-
-            if (query != null)
-            {
-                tab.Query.SetQueryInfo(query);
-            }
+            tab.Load(cfg);
         }
 
-        private Task RefreshAllTabsCommandExecuted()
+        private async Task RefreshAllTabsCommandExecuted()
         {
             foreach (var tab in TabsList.Where(x => x.RecheckPeriod?.IsAutoRecheckEnabled == true).ToArray())
             {
                 tab.RefreshCommand.Execute(tab.Query?.PoeQueryBuilder);
             }
-            return Task.Delay(UiConstants.ArtificialLongDelay);
+
+            await Task.Delay(UiConstants.ArtificialLongDelay);
         }
 
         private IMainWindowTabViewModel CreateAndAddTab()
@@ -310,7 +320,7 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
             tabsListSource.Add(newTab);
             return newTab;
         }
-        
+
         private bool RemoveTabCommandCanExecute(IMainWindowTabViewModel tab)
         {
             return tab != null;
@@ -330,14 +340,30 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
                 Log.Instance.Debug($"[MainWindowViewModel.RemoveTab] Selecting neighbour tab {tabToSelect}...");
                 SelectedTab = tabToSelect;
             }
-            
+
             tabsListSource.Remove(tab);
-            
-            var query = tab.Query?.PoeQueryBuilder();
-            recentlyClosedQueries.PushBack(query);
-            undoCloseTabCommand.RaiseCanExecuteChanged();
+
+            var cfg = tab.Save();
+            recentlyClosedQueries.PushBack(cfg);
+            UndoCloseTabCommand.RaiseCanExecuteChanged();
 
             tab.Dispose();
+        }
+
+        private bool CopyTabToClipboardCommandCanExecute(IMainWindowTabViewModel tab)
+        {
+            return tab != null;
+        }
+
+        private void CopyTabToClipboardExecuted(IMainWindowTabViewModel tab)
+        {
+            Guard.ArgumentIsTrue(() => CopyTabToClipboardCommandCanExecute(tab));
+
+            Log.Instance.Debug($"[MainWindowViewModel.CopyTabToClipboard] Copying tab {tab}...");
+
+            var cfg = tab.Save();
+            var data = configSerializer.Serialize(cfg);
+            clipboardManager.SetText(data);
         }
 
         private void SaveConfig()

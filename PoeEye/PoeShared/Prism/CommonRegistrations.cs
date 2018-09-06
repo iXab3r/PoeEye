@@ -59,6 +59,8 @@ namespace PoeShared.Prism
                 .RegisterSingleton<IKeyboardEventsSource>(new InjectionFactory(x => x.Resolve<KeyboardEventsSource>(new DependencyOverride(typeof(IKeyboardMouseEvents), Hook.GlobalEvents()))))
                 .RegisterSingleton<IAudioNotificationsManager, AudioNotificationsManager>()
                 .RegisterSingleton<ISchedulerProvider, SchedulerProvider>()
+                .RegisterSingleton<IClipboardManager, ClipboardManager>()
+                .RegisterSingleton<IConfigSerializer, JsonConfigSerializer>()
                 .RegisterSingleton<IOverlayWindowController, OverlayWindowController>(WellKnownWindows.PathOfExileWindow);
 
             Container

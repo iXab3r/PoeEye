@@ -94,7 +94,7 @@ namespace PoeEye.Prism
 
         private void InitializeConfigConverters()
         {
-            var configProvider = Container.TryResolve<IConfigProvider>();
+            var configProvider = Container.TryResolve<IConfigSerializer>();
             var converters = new JsonConverter[]
             {
                 new ConcreteTypeConverter<IPoeQueryInfo, PoeQueryInfo>(),

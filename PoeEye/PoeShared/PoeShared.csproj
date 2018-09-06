@@ -260,7 +260,9 @@
     <Compile Include="Converters\ObjectToTypeConverter.cs" />
     <Compile Include="Converters\PoeStashItemToPoeItem.cs" />
     <Compile Include="Converters\SafeDataConverter.cs" />
+    <Compile Include="Modularity\IConfigSerializer.cs" />
     <Compile Include="Modularity\ISchedulerProvider.cs" />
+    <Compile Include="Modularity\JsonConfigSerializer.cs" />
     <Compile Include="Modularity\SchedulerProvider.cs" />
     <Compile Include="Native\IActivationController.cs" />
     <Compile Include="Native\IKeyboardEventsSource.cs" />
@@ -272,9 +274,11 @@
     <Compile Include="PoeTrade\IPoeStaticDataSource.cs" />
     <Compile Include="Scaffolding\ChangeSetExtensions.cs" />
     <Compile Include="Scaffolding\CircularBuffer.cs" />
+    <Compile Include="Scaffolding\ClipboardManager.cs" />
     <Compile Include="Scaffolding\DependencyObjectExtensions.cs" />
     <Compile Include="Scaffolding\DisposableExtensions.cs" />
     <Compile Include="Scaffolding\Fallback.cs" />
+    <Compile Include="Scaffolding\IClipboardManager.cs" />
     <Compile Include="Scaffolding\PoeItemExtensions.cs" />
     <Compile Include="Scaffolding\ReactiveObjectExtensions.cs" />
     <Compile Include="Scaffolding\StreamExtensions.cs" />
