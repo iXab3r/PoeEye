@@ -137,7 +137,7 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
 
             DuplicateTabCommand = new DelegateCommand<IMainWindowTabViewModel>(DuplicateTabCommandExecuted, DuplicateTabCommandCanExecute);
             undoCloseTabCommand = new DelegateCommand(UndoCloseTabCommandExecuted, UndoCloseTabCommandCanExecute);
-            closeTabCommand = new DelegateCommand<IMainWindowTabViewModel>(RemoveTabCommandExecuted);
+            closeTabCommand = new DelegateCommand<IMainWindowTabViewModel>(RemoveTabCommandExecuted, RemoveTabCommandCanExecute);
 
             createNewTabCommand
                 .Subscribe(arg => CreateNewTabCommandExecuted(arg as IPoeQueryInfo))
@@ -310,18 +310,32 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
             tabsListSource.Add(newTab);
             return newTab;
         }
+        
+        private bool RemoveTabCommandCanExecute(IMainWindowTabViewModel tab)
+        {
+            return tab != null;
+        }
 
         private void RemoveTabCommandExecuted(IMainWindowTabViewModel tab)
         {
+            Guard.ArgumentIsTrue(() => RemoveTabCommandCanExecute(tab));
+
             Log.Instance.Debug($"[MainWindowViewModel.RemoveTab] Removing tab {tab}...");
+
+            var items = positionMonitor.Items.ToArray();
+            var tabIdx = items.IndexOf(tab);
+            if (tabIdx > 0)
+            {
+                var tabToSelect = items[tabIdx - 1];
+                Log.Instance.Debug($"[MainWindowViewModel.RemoveTab] Selecting neighbour tab {tabToSelect}...");
+                SelectedTab = tabToSelect;
+            }
+            
             tabsListSource.Remove(tab);
             
             var query = tab.Query?.PoeQueryBuilder();
-            if (query != null)
-            {
-                recentlyClosedQueries.PushBack(query);
-                undoCloseTabCommand.RaiseCanExecuteChanged();
-            }
+            recentlyClosedQueries.PushBack(query);
+            undoCloseTabCommand.RaiseCanExecuteChanged();
 
             tab.Dispose();
         }
