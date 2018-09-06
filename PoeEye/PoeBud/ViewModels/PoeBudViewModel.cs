@@ -107,6 +107,7 @@ namespace PoeBud.ViewModels
             Left = 100;
             SizeToContent = SizeToContent.Manual;
             IsUnlockable = true;
+            Title = "PoeBud";
 
             configProvider
                 .WhenChanged
@@ -117,8 +118,6 @@ namespace PoeBud.ViewModels
                 .ToProperty(this, x => x.LastUpdateException, out lastUpdateException, null, false, uiScheduler)
                 .AddTo(Anchors);
             
-            LockWindowCommand = new DelegateCommand(LockWindowCommandExecuted);
-
             WithdrawChaosSetCommand = new CommandWrapper(
                 ReactiveCommand.CreateFromTask(() => ExecuteSolutionOrFail(() => Stash.ChaosSetSolutions.FirstOrDefault(), () => "Failed to withdraw ChaosSet, not enough items ?")));
             WithdrawCurrencyCommand = new CommandWrapper(
@@ -155,8 +154,6 @@ namespace PoeBud.ViewModels
         
         public ICommand ForceRefreshCommand { get; }
         
-        public ICommand LockWindowCommand { get; }
-
         public IPoeStashUpdater StashUpdater
         {
             get { return stashUpdater; }
@@ -194,14 +191,14 @@ namespace PoeBud.ViewModels
                 stashUpdater == null || stashUpdater.LastUpdateTimestamp == DateTime.MinValue
                     ? TimeSpan.Zero
                     : stashUpdater.LastUpdateTimestamp + (actualConfig?.StashUpdatePeriod ?? TimeSpan.Zero) - clock.Now;
-        
-        private void LockWindowCommandExecuted()
+
+        protected override void LockWindowCommandExecuted()
         {
+            base.LockWindowCommandExecuted();
             var config = configProvider.ActualConfig;
-            base.SaveConfig(config);
+            base.SavePropertiesToConfig(config);
 
             configProvider.Save(config);
-            IsLocked = true;
         }
         
         private void ApplyConfig(PoeBudConfig config)

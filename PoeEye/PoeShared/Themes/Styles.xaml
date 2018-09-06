@@ -127,4 +127,45 @@
     </DockPanel>
   </DataTemplate>
 
+
+  <Style TargetType="{x:Type Button}" x:Key="OverlayWindowButtonStyleKey" BasedOn="{StaticResource FlatButton}">
+  </Style>
+
+  <Style TargetType="{x:Type Button}" x:Key="OverlayWindowCircleButtonStyleKey" BasedOn="{StaticResource MetroCircleButtonStyle}">
+    <Setter Property="FontFamily" Value="{StaticResource FontAwesome}" />
+    <Setter Property="FontSize" Value="16" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="VerticalAlignment" Value="Center"/>
+    <Setter Property="Focusable" Value="False"/>
+    <Setter Property="IsTabStop" Value="False"/>
+  </Style>
+
+  <Style TargetType="{x:Type TextBlock}" x:Key="OverlayWindowTextBlockStyleKey">
+    <Setter Property="Background" Value="Transparent"/>
+    <Setter Property="VerticalAlignment" Value="Center"/>
+    <Setter Property="FontFamily" Value="{StaticResource FontAwesome}"/>
+    <Style.Triggers>
+      <Trigger Property="IsEnabled" Value="False">
+        <Setter Property="Foreground" Value="{StaticResource ControlsDisabledBrush}"/>
+        
+        <Trigger.EnterActions>
+          <BeginStoryboard>
+            <Storyboard>
+              <DoubleAnimation To="0.4" Storyboard.TargetProperty="Opacity" Duration="0:0:0.3"/>
+            </Storyboard>
+          </BeginStoryboard>
+        </Trigger.EnterActions>
+
+        <Trigger.ExitActions>
+          <BeginStoryboard>
+            <Storyboard>
+              <DoubleAnimation To="1" Storyboard.TargetProperty="Opacity" Duration="0:0:0.3"/>
+            </Storyboard>
+          </BeginStoryboard>
+        </Trigger.ExitActions>
+      </Trigger>
+    </Style.Triggers>
+  </Style>
+
 </ResourceDictionary>

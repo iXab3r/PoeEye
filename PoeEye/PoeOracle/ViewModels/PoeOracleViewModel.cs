@@ -119,11 +119,10 @@ namespace PoeOracle.ViewModels
 
         public ICommand GotoGamepediaCommand => gotoGamepediaCommand;
 
-        public override IOverlayViewModel SetActivationController(IActivationController controller)
+        public override void SetActivationController(IActivationController controller)
         {
             Guard.ArgumentNotNull(controller, nameof(controller));
             activationController = controller;
-            return base.SetActivationController(controller);
         }
 
         private void ProcessKeyDown(KeyEventArgs keyEventArgs)

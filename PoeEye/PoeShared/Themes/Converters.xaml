@@ -3,7 +3,8 @@
                     xmlns:blue="http://www.nuget.org/Blue.MVVM"
                     xmlns:converters="clr-namespace:PoeShared.Scaffolding.WPF.Converters"
                     xmlns:eyeConverters="clr-namespace:PoeShared.Converters"
-                    xmlns:kent="http://schemas.kent.boogaart.com/converters">
+                    xmlns:kent="http://schemas.kent.boogaart.com/converters"
+                    xmlns:global="clr-namespace:">
 
     <blue:BoolToVisibilityConverter x:Key="TrueToVisibleFalseToCollapsedConverter"
                                     TrueValue="Visible"
@@ -17,20 +18,23 @@
                                     TrueValue="Visible"
                                     FalseValue="Hidden" />
 
-  <blue:BoolToVisibilityConverter x:Key="TrueToHiddenFalseToVisibleConverter"
-                                  TrueValue="Hidden"
-                                  FalseValue="Visible" />
+    <blue:BoolToVisibilityConverter x:Key="TrueToHiddenFalseToVisibleConverter"
+                                    TrueValue="Hidden"
+                                    FalseValue="Visible" />
 
-  <eyeConverters:BoolInversionConverter x:Key="NotConverter"  />
-  <eyeConverters:StringToPoePriceConverter x:Key="StringToPoePriceConverter"  />
+    <eyeConverters:BoolInversionConverter x:Key="NotConverter" />
+    <eyeConverters:StringToPoePriceConverter x:Key="StringToPoePriceConverter" />
+
+    <global:ObjectToTypeConverter x:Key="ObjectToTypeConverter" />
 
     <kent:MapConverter x:Key="VisibilityInversionConverterVisibleToHidden" FallbackBehavior="ReturnUnsetValue">
-        <kent:Mapping From="{x:Static Visibility.Visible}" To="{x:Static Visibility.Hidden}"/>
-        <kent:Mapping From="{x:Static Visibility.Hidden}" To="{x:Static Visibility.Visible}"/>
+        <kent:Mapping From="{x:Static Visibility.Visible}" To="{x:Static Visibility.Hidden}" />
+        <kent:Mapping From="{x:Static Visibility.Hidden}" To="{x:Static Visibility.Visible}" />
     </kent:MapConverter>
-    
+
     <converters:NullToVisibilityConverter x:Key="NullToCollapsedConverter" NullValue="Collapsed" NotNullValue="Visible" />
-    <converters:NullToVisibilityConverter x:Key="NotNullToCollapsedConverter" NullValue="Visible" NotNullValue="Collapsed" />
+    <converters:NullToVisibilityConverter x:Key="NotNullToCollapsedConverter" NullValue="Visible"
+                                          NotNullValue="Collapsed" />
     <converters:NullToVisibilityConverter x:Key="NullToHiddenConverter" NullValue="Hidden" NotNullValue="Visible" />
     <converters:NullToVisibilityConverter x:Key="NotNullToHiddenConverter" NullValue="Visible" NotNullValue="Hidden" />
     <converters:ExceptionToMessageConverter x:Key="ExceptionToMessageConverter" />

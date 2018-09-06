@@ -257,6 +257,7 @@
     <Compile Include="Communications\Chromium\RenderProcessMessageHandler.cs" />
     <Compile Include="Converters\BoolInversionConverter.cs" />
     <Compile Include="Converters\FlagToObjectConverter.cs" />
+    <Compile Include="Converters\ObjectToTypeConverter.cs" />
     <Compile Include="Converters\PoeStashItemToPoeItem.cs" />
     <Compile Include="Converters\SafeDataConverter.cs" />
     <Compile Include="Modularity\ISchedulerProvider.cs" />

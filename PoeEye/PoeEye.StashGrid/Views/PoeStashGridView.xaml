@@ -5,286 +5,213 @@
                     xmlns:viewModels="clr-namespace:PoeEye.StashGrid.ViewModels"
                     xmlns:models="clr-namespace:PoeEye.StashGrid.Models">
 
-  <ResourceDictionary.MergedDictionaries>
-    <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Generic.xaml" />
-    <ResourceDictionary Source="pack://application:,,,/PoeEye.StashGrid;component/Themes/Styles.xaml" />
-  </ResourceDictionary.MergedDictionaries>
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Generic.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/PoeEye.StashGrid;component/Themes/Styles.xaml" />
+    </ResourceDictionary.MergedDictionaries>
 
-  <DataTemplate DataType="{x:Type viewModels:PoeStashGridViewModel}">
-
-    <Grid x:Name="StashGridOverlay">
-
-      <Grid TextBlock.Foreground="{StaticResource PoeFontBrush}">
-        <Grid.RowDefinitions>
-          <RowDefinition Height="36" />
-          <RowDefinition Height="30" />
-          <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
-
-        <!-- Header -->
-        <Border Grid.Row="0"
-                eye:EnableDragHelper.EnableDrag="True"
-                Background="{StaticResource OverlayWindowTitleBackgroundBrushKey}"
-                BorderBrush="{StaticResource OverlayWindowBorderBrushKey}"
-                BorderThickness="1"
-                Visibility="{Binding IsLocked, Converter={StaticResource TrueToHiddenFalseToVisibleConverter}}"
-                Margin="3">
-          <StackPanel Orientation="Horizontal">
-            <Button Command="{Binding LockWindowCommand}" Width="30" Height="30">
-              <Button.Style>
-                <Style TargetType="{x:Type Button}"
-                       BasedOn="{StaticResource OverlayWindowCircleButtonStyleKey}">
-                  <Setter Property="Content" Value="&#xf09c;" />
-                  <Setter Property="Foreground" Value="Red" />
-                  <Setter Property="Padding" Value="0,2,0,0" />
-                  <Style.Triggers>
-                    <DataTrigger Binding="{Binding IsLocked}" Value="True" />
-
-                    <Trigger Property="IsMouseOver" Value="True">
-                      <Setter Property="Content" Value="&#xf023;" />
-                      <Setter Property="Foreground" Value="GreenYellow" />
-                    </Trigger>
-                  </Style.Triggers>
-                </Style>
-              </Button.Style>
-
-              <Button.Triggers>
-                <EventTrigger RoutedEvent="Mouse.MouseEnter">
-                  <EventTrigger.EnterActions>
-                    <BeginStoryboard>
-                      <Storyboard>
-                        <DoubleAnimation
-                          Storyboard.TargetName="TradeMonitorBackground"
-                          Storyboard.TargetProperty="Opacity"
-                          From="1"
-                          To="0.1"
-                          Duration="0:0:1" />
-                      </Storyboard>
-                    </BeginStoryboard>
-                  </EventTrigger.EnterActions>
-                </EventTrigger>
-                <EventTrigger RoutedEvent="Mouse.MouseLeave">
-                  <EventTrigger.EnterActions>
-                    <BeginStoryboard>
-                      <Storyboard>
-                        <DoubleAnimation
-                          Storyboard.TargetName="TradeMonitorBackground"
-                          Storyboard.TargetProperty="Opacity"
-                          To="1"
-                          Duration="0:0:1" />
-                      </Storyboard>
-                    </BeginStoryboard>
-                  </EventTrigger.EnterActions>
-                </EventTrigger>
-              </Button.Triggers>
-            </Button>
-            <TextBlock Style="{StaticResource OverlayWindowTextBlockStyleKey}"
-                       Text="Stash grid"
-                       Foreground="#EEC64C"
-                       HorizontalAlignment="Center"
-                       FontWeight="Bold" />
-          </StackPanel>
-        </Border>
-        
-        <!-- Body -->
-        <Grid Grid.Row="2"
-              Opacity="{Binding Opacity}">
-
+    <DataTemplate DataType="{x:Type viewModels:PoeStashGridViewModel}">
+        <Grid x:Name="StashGridOverlay">
             <ItemsControl ItemsSource="{Binding GridCells}"
-                        BorderBrush="Lime"
-                        IsHitTestVisible="False"
-                        Visibility="{Binding IsLocked, Converter={StaticResource TrueToCollapsedFalseToVisibleConverter}}"
-                        BorderThickness="2">
-            <ItemsControl.ItemsPanel>
-              <ItemsPanelTemplate>
-                <UniformGrid Columns="24" Rows="24"  />
-              </ItemsPanelTemplate>
-            </ItemsControl.ItemsPanel>
-            <ItemsControl.ItemTemplate>
-              <DataTemplate DataType="{x:Type models:BasicStashGridCellViewModel}">
-                <Border BorderBrush="Blue" Margin="0" BorderThickness="1" Opacity="0.5" />
-              </DataTemplate>
-            </ItemsControl.ItemTemplate>
-          </ItemsControl>
+                          BorderBrush="Lime"
+                          IsHitTestVisible="False"
+                          Visibility="{Binding IsLocked, Converter={StaticResource TrueToCollapsedFalseToVisibleConverter}}"
+                          BorderThickness="2">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <UniformGrid Columns="24" Rows="24" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="{x:Type models:BasicStashGridCellViewModel}">
+                        <Border BorderBrush="Blue" Margin="0" BorderThickness="1" Opacity="0.5" />
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
 
-          <ItemsControl ItemsSource="{Binding Highlights}" IsHitTestVisible="False">
-            <ItemsControl.ItemsPanel>
-              <ItemsPanelTemplate>
-                <Grid>
-                  <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                  </Grid.ColumnDefinitions>
-                  <Grid.RowDefinitions>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                  </Grid.RowDefinitions>
-                </Grid>
-              </ItemsPanelTemplate>
-            </ItemsControl.ItemsPanel>
-            <ItemsControl.ItemContainerStyle>
-              <Style>
-                <Setter Property="Grid.Row" Value="{Binding Top}"/>
-                <Setter Property="Grid.RowSpan" Value="{Binding Height}"/>
-                <Setter Property="Grid.Column" Value="{Binding Left}"/>
-                <Setter Property="Grid.ColumnSpan" Value="{Binding Width}"/>
-              </Style>
-            </ItemsControl.ItemContainerStyle>
-            <ItemsControl.ItemTemplate>
-              <DataTemplate DataType="{x:Type viewModels:HighlightedStashGridCellViewModel}">
-                <materialDesign:Badged Margin="0"
-                                       VerticalAlignment="Stretch"
-                                       HorizontalAlignment="Stretch"
-                                       VerticalContentAlignment="Stretch"
-                                       HorizontalContentAlignment="Stretch"
-                                       BadgeColorZoneMode="PrimaryLight">
-                  <materialDesign:Badged.Style>
-                    <Style TargetType="{x:Type materialDesign:Badged}">
-                      <Setter Property="RenderTransformOrigin" Value="0.5,0.5"></Setter>
-                      <Setter Property="RenderTransform">
-                        <Setter.Value>
-                          <ScaleTransform ScaleX="1" ScaleY="1"/>
-                        </Setter.Value>
-                      </Setter>
-                      <Setter Property="Effect">
-                        <Setter.Value>
-                          <DropShadowEffect ShadowDepth="0" Color="{StaticResource HighlightColor}" Opacity="1" BlurRadius="8" Direction="0"/>
-                        </Setter.Value>
-                      </Setter>
-                      <Setter Property="Badge">
-                        <Setter.Value>
-                          <TextBlock MaxWidth="60" Text="{Binding ToolTipText}"/>
-                        </Setter.Value>
-                      </Setter>
-                      
-                      <Style.Triggers>
-                        <DataTrigger Binding="{Binding IsFresh}" Value="True">
-                          <DataTrigger.EnterActions>
-                            <BeginStoryboard>
-                              <Storyboard>
-                                <DoubleAnimation Storyboard.TargetProperty="Opacity"
-                                                 Duration="0:0:1"
-                                                 From="0"
-                                                 To="1" />
-                                <DoubleAnimation Storyboard.TargetProperty="RenderTransform.(ScaleTransform.ScaleX)"
-                                                 Duration="0:0:0.5"
-                                                 From="1.3"
-                                                 To="0.9" />
-                                <DoubleAnimation Storyboard.TargetProperty="RenderTransform.(ScaleTransform.ScaleY)"
-                                                 Duration="0:0:0.5"
-                                                 From="1.3"
-                                                 To="0.9" />
-                                <DoubleAnimation Storyboard.TargetProperty="RenderTransform.(ScaleTransform.ScaleX)"
-                                                 Duration="0:0:0.5"
-                                                 BeginTime="0:0:0.5"
-                                                 From="0.9"
-                                                 To="1.1"
-                                                 AutoReverse="True"
-                                                 RepeatBehavior="Forever" />
-                                <DoubleAnimation Storyboard.TargetProperty="RenderTransform.(ScaleTransform.ScaleY)"
-                                                 Duration="0:0:0.5"
-                                                 BeginTime="0:0:0.5"
-                                                 From="0.9"
-                                                 To="1.1"
-                                                 AutoReverse="True"
-                                                 RepeatBehavior="Forever" />
-                              </Storyboard>
-                            </BeginStoryboard>
-                          </DataTrigger.EnterActions>
-                          <DataTrigger.ExitActions>
-                            <BeginStoryboard>
-                              <Storyboard>
-                                <DoubleAnimation Storyboard.TargetProperty="Opacity"
-                                                 Duration="0:0:1"
-                                                 To="0" />
-                              </Storyboard>
-                            </BeginStoryboard>
-                          </DataTrigger.ExitActions>
-                        </DataTrigger>
-                        
-                        <DataTrigger Binding="{Binding ToolTipText}" Value="{x:Null}">
-                          <Setter Property="Badge" Value="{x:Null}"/>
-                        </DataTrigger>
-                      </Style.Triggers>
+            <ItemsControl ItemsSource="{Binding Highlights}" IsHitTestVisible="False">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                        </Grid>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemContainerStyle>
+                    <Style>
+                        <Setter Property="Grid.Row" Value="{Binding Top}" />
+                        <Setter Property="Grid.RowSpan" Value="{Binding Height}" />
+                        <Setter Property="Grid.Column" Value="{Binding Left}" />
+                        <Setter Property="Grid.ColumnSpan" Value="{Binding Width}" />
                     </Style>
-                  </materialDesign:Badged.Style>
-                  <Border Background="{x:Null}" x:Name="CellBorder"
-                          Margin="0" 
-                          BorderThickness="3"
-                          CornerRadius="2">
-                    <Border.Style>
-                      <Style TargetType="{x:Type Border}">
-                        <Setter Property="BorderBrush">
-                          <Setter.Value>
-                            <SolidColorBrush Color="{Binding BorderColor}"/>
-                          </Setter.Value>
-                        </Setter>
-                        
-                        <Style.Triggers>
-                          <DataTrigger Binding="{Binding BorderColor}" Value="{x:Null}">
-                            <Setter Property="BorderBrush">
-                              <Setter.Value>
-                                <LinearGradientBrush MappingMode="RelativeToBoundingBox">
-                                  <GradientStop Color="{StaticResource AccentBaseColor}" Offset="0" />
-                                  <GradientStop Color="{StaticResource HighlightColor}" Offset="0" />
-                                </LinearGradientBrush>
-                              </Setter.Value>
-                            </Setter>
-                          </DataTrigger>
-                        </Style.Triggers>
-                      </Style>
-                    </Border.Style>
-                  </Border>
-                </materialDesign:Badged>
-              </DataTemplate>
-            </ItemsControl.ItemTemplate>
-          </ItemsControl>
+                </ItemsControl.ItemContainerStyle>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="{x:Type viewModels:HighlightedStashGridCellViewModel}">
+                        <materialDesign:Badged Margin="0"
+                                               VerticalAlignment="Stretch"
+                                               HorizontalAlignment="Stretch"
+                                               VerticalContentAlignment="Stretch"
+                                               HorizontalContentAlignment="Stretch"
+                                               BadgeColorZoneMode="PrimaryLight">
+                            <materialDesign:Badged.Style>
+                                <Style TargetType="{x:Type materialDesign:Badged}">
+                                    <Setter Property="RenderTransformOrigin" Value="0.5,0.5" />
+                                    <Setter Property="RenderTransform">
+                                        <Setter.Value>
+                                            <ScaleTransform ScaleX="1" ScaleY="1" />
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Setter Property="Effect">
+                                        <Setter.Value>
+                                            <DropShadowEffect ShadowDepth="0" Color="{StaticResource HighlightColor}"
+                                                              Opacity="1" BlurRadius="8" Direction="0" />
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Setter Property="Badge">
+                                        <Setter.Value>
+                                            <TextBlock MaxWidth="60" Text="{Binding ToolTipText}" />
+                                        </Setter.Value>
+                                    </Setter>
+
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsFresh}" Value="True">
+                                            <DataTrigger.EnterActions>
+                                                <BeginStoryboard>
+                                                    <Storyboard>
+                                                        <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                                                         Duration="0:0:1"
+                                                                         From="0"
+                                                                         To="1" />
+                                                        <DoubleAnimation
+                                                            Storyboard.TargetProperty="RenderTransform.(ScaleTransform.ScaleX)"
+                                                            Duration="0:0:0.5"
+                                                            From="1.3"
+                                                            To="0.9" />
+                                                        <DoubleAnimation
+                                                            Storyboard.TargetProperty="RenderTransform.(ScaleTransform.ScaleY)"
+                                                            Duration="0:0:0.5"
+                                                            From="1.3"
+                                                            To="0.9" />
+                                                        <DoubleAnimation
+                                                            Storyboard.TargetProperty="RenderTransform.(ScaleTransform.ScaleX)"
+                                                            Duration="0:0:0.5"
+                                                            BeginTime="0:0:0.5"
+                                                            From="0.9"
+                                                            To="1.1"
+                                                            AutoReverse="True"
+                                                            RepeatBehavior="Forever" />
+                                                        <DoubleAnimation
+                                                            Storyboard.TargetProperty="RenderTransform.(ScaleTransform.ScaleY)"
+                                                            Duration="0:0:0.5"
+                                                            BeginTime="0:0:0.5"
+                                                            From="0.9"
+                                                            To="1.1"
+                                                            AutoReverse="True"
+                                                            RepeatBehavior="Forever" />
+                                                    </Storyboard>
+                                                </BeginStoryboard>
+                                            </DataTrigger.EnterActions>
+                                            <DataTrigger.ExitActions>
+                                                <BeginStoryboard>
+                                                    <Storyboard>
+                                                        <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                                                         Duration="0:0:1"
+                                                                         To="0" />
+                                                    </Storyboard>
+                                                </BeginStoryboard>
+                                            </DataTrigger.ExitActions>
+                                        </DataTrigger>
+
+                                        <DataTrigger Binding="{Binding ToolTipText}" Value="{x:Null}">
+                                            <Setter Property="Badge" Value="{x:Null}" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </materialDesign:Badged.Style>
+                            <Border Background="{x:Null}" x:Name="CellBorder"
+                                    Margin="0"
+                                    BorderThickness="3"
+                                    CornerRadius="2">
+                                <Border.Style>
+                                    <Style TargetType="{x:Type Border}">
+                                        <Setter Property="BorderBrush">
+                                            <Setter.Value>
+                                                <SolidColorBrush Color="{Binding BorderColor}" />
+                                            </Setter.Value>
+                                        </Setter>
+
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding BorderColor}" Value="{x:Null}">
+                                                <Setter Property="BorderBrush">
+                                                    <Setter.Value>
+                                                        <LinearGradientBrush MappingMode="RelativeToBoundingBox">
+                                                            <GradientStop Color="{StaticResource AccentBaseColor}"
+                                                                          Offset="0" />
+                                                            <GradientStop Color="{StaticResource HighlightColor}"
+                                                                          Offset="0" />
+                                                        </LinearGradientBrush>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+                            </Border>
+                        </materialDesign:Badged>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
         </Grid>
-      </Grid>
-    </Grid>
-  </DataTemplate>
+    </DataTemplate>
 </ResourceDictionary>

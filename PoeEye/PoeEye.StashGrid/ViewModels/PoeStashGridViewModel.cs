@@ -25,13 +25,16 @@ using ReactiveUI;
 
 namespace PoeEye.StashGrid.ViewModels
 {
-    internal sealed class PoeStashGridViewModel : OverlayViewModelBase, IPoeStashHighlightService, IPoeStashGridViewModel
+    internal sealed class PoeStashGridViewModel : OverlayViewModelBase, IPoeStashHighlightService,
+        IPoeStashGridViewModel
     {
         private const int MaxInventoryWidth = 24;
         private const int MaxInventoryHeight = 24;
 
         private readonly IConfigProvider<PoeStashGridConfig> configProvider;
-        private readonly ISourceList<BasicStashGridCellViewModel> highlights = new SourceList<BasicStashGridCellViewModel>();
+
+        private readonly ISourceList<BasicStashGridCellViewModel> highlights =
+            new SourceList<BasicStashGridCellViewModel>();
 
         private readonly ReadOnlyObservableCollection<BasicStashGridCellViewModel> highlightsProxy;
 
@@ -39,8 +42,10 @@ namespace PoeEye.StashGrid.ViewModels
             [NotNull] IKeyboardEventsSource keyboardMouseEvents,
             [NotNull] IOverlayWindowController controller,
             [NotNull] IConfigProvider<PoeStashGridConfig> configProvider,
-            [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler,
-            [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
+            [NotNull] [Dependency(WellKnownSchedulers.Background)]
+            IScheduler bgScheduler,
+            [NotNull] [Dependency(WellKnownSchedulers.UI)]
+            IScheduler uiScheduler)
         {
             Guard.ArgumentNotNull(keyboardMouseEvents, nameof(keyboardMouseEvents));
             Guard.ArgumentNotNull(controller, nameof(controller));
@@ -57,12 +62,11 @@ namespace PoeEye.StashGrid.ViewModels
             Height = 705;
             SizeToContent = SizeToContent.Manual;
             IsUnlockable = true;
+            Title = "Stash Grid";
 
             this.WhenAnyValue(x => x.IsLocked)
                 .Subscribe(isLocked => OverlayMode = isLocked ? OverlayMode.Transparent : OverlayMode.Layered)
                 .AddTo(Anchors);
-
-            LockWindowCommand = new DelegateCommand(LockWindowCommandExecuted);
 
             highlights
                 .Connect()
@@ -82,11 +86,10 @@ namespace PoeEye.StashGrid.ViewModels
                 .AddTo(Anchors);
         }
 
-        public ReactiveList<BasicStashGridCellViewModel> GridCells { get; } = new ReactiveList<BasicStashGridCellViewModel>();
+        public ReactiveList<BasicStashGridCellViewModel> GridCells { get; } =
+            new ReactiveList<BasicStashGridCellViewModel>();
 
         public ReadOnlyObservableCollection<BasicStashGridCellViewModel> Highlights => highlightsProxy;
-
-        public ICommand LockWindowCommand { get; }
 
         public IGridCellViewController AddHighlight(ItemPosition pos, StashTabType stashType)
         {
@@ -116,15 +119,15 @@ namespace PoeEye.StashGrid.ViewModels
             PrepareGridCells();
         }
 
-        private void LockWindowCommandExecuted()
+        protected override void LockWindowCommandExecuted()
         {
+            base.LockWindowCommandExecuted();
             var config = configProvider.ActualConfig;
-            base.SaveConfig(config);
+            base.SavePropertiesToConfig(config);
 
-            const float offsetY = 66;
+            const float offsetY = 33; // FIXME Should be calculated instead of being hardcoded
             config.StashBounds = new Rect(Left, Top + offsetY, Width, Height - offsetY);
             configProvider.Save(config);
-            IsLocked = true;
         }
 
         private void PrepareGridCells()

@@ -10,273 +10,193 @@
         <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Generic.xaml" />
         <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Styles.xaml" />
         <ResourceDictionary Source="pack://application:,,,/PoeBud;component/Converters/Converters.xaml" />
-        <ResourceDictionary Source="pack://application:,,,/PoeEye.StashGrid;component/Themes/Styles.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
     <DataTemplate DataType="{x:Type viewModels:PoeBudViewModel}">
+        <Grid x:Name="PoeBudOverlay"
+              Opacity="{Binding Opacity}"
+              TextBlock.FontSize="20" TextBlock.Foreground="White"
+              Visibility="{Binding IsEnabled, Converter={StaticResource TrueToVisibleFalseToCollapsedConverter}}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="30" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
 
-        <Grid x:Name="PoeBudOverlay">
-
-            <Grid TextBlock.Foreground="{StaticResource PoeFontBrush}">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="36" />
-                    <RowDefinition Height="30" />
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
-
-                <!-- Header -->
-                <Border Grid.Row="0"
-                        eye:EnableDragHelper.EnableDrag="True"
-                        Background="{StaticResource OverlayWindowTitleBackgroundBrushKey}"
-                        BorderBrush="{StaticResource OverlayWindowBorderBrushKey}"
-                        BorderThickness="1"
-                        Visibility="{Binding IsLocked, Converter={StaticResource TrueToHiddenFalseToVisibleConverter}}"
-                        Margin="3">
-                    <StackPanel Orientation="Horizontal">
-                        <Button Command="{Binding LockWindowCommand}" Width="30" Height="30">
-                            <Button.Style>
-                                <Style TargetType="{x:Type Button}"
-                                       BasedOn="{StaticResource OverlayWindowCircleButtonStyleKey}">
-                                    <Setter Property="Content" Value="&#xf09c;" />
-                                    <Setter Property="Foreground" Value="Red" />
-                                    <Setter Property="Padding" Value="0,2,0,0" />
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding IsLocked}" Value="True" />
-
-                                        <Trigger Property="IsMouseOver" Value="True">
-                                            <Setter Property="Content" Value="&#xf023;" />
-                                            <Setter Property="Foreground" Value="GreenYellow" />
-                                        </Trigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Button.Style>
-
-                            <Button.Triggers>
-                                <EventTrigger RoutedEvent="Mouse.MouseEnter">
-                                    <EventTrigger.EnterActions>
-                                        <BeginStoryboard>
-                                            <Storyboard>
-                                                <DoubleAnimation
-                                                    Storyboard.TargetName="TradeMonitorBackground"
-                                                    Storyboard.TargetProperty="Opacity"
-                                                    From="1"
-                                                    To="0.1"
-                                                    Duration="0:0:1" />
-                                            </Storyboard>
-                                        </BeginStoryboard>
-                                    </EventTrigger.EnterActions>
-                                </EventTrigger>
-                                <EventTrigger RoutedEvent="Mouse.MouseLeave">
-                                    <EventTrigger.EnterActions>
-                                        <BeginStoryboard>
-                                            <Storyboard>
-                                                <DoubleAnimation
-                                                    Storyboard.TargetName="TradeMonitorBackground"
-                                                    Storyboard.TargetProperty="Opacity"
-                                                    To="1"
-                                                    Duration="0:0:1" />
-                                            </Storyboard>
-                                        </BeginStoryboard>
-                                    </EventTrigger.EnterActions>
-                                </EventTrigger>
-                            </Button.Triggers>
-                        </Button>
-                        <TextBlock Style="{StaticResource OverlayWindowTextBlockStyleKey}"
-                                   Text="PoeBud"
-                                   Foreground="#EEC64C"
-                                   HorizontalAlignment="Center"
-                                   FontWeight="Bold" />
-                    </StackPanel>
-                </Border>
-
-                <!-- Body -->
-                <Grid Grid.Row="2"
-                      Opacity="{Binding Opacity}"
-                      x:Name="PoeBudCanvas"
-                      TextBlock.FontSize="20" TextBlock.Foreground="White"
-                      Visibility="{Binding IsEnabled, Converter={StaticResource TrueToVisibleFalseToCollapsedConverter}}">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="30" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="*" />
-                    </Grid.RowDefinitions>
-
-                    <Grid Grid.Row="0" Grid.Column="0" Margin="50, 5, 0, 5">
-                        <ContentPresenter Content="{Binding SolutionExecutor}" />
-                    </Grid>
-
-                    <Grid Grid.Row="1" Grid.Column="0" Margin="50, 5, 0, 5">
-                        <TextBlock
-                            x:Name="LastUpdateException"
-                            MaxWidth="600"
-                            Visibility="{Binding LastUpdateException, Converter={StaticResource NullToCollapsedConverter}}"
-                            Foreground="Orange"
-                            Text="{Binding LastUpdateException, StringFormat='&#xF071; {0}', Converter={StaticResource ExceptionToMessageConverter}}"
-                            Style="{StaticResource IconTextBlock}" TextTrimming="WordEllipsis" />
-                    </Grid>
-
-                    <Grid Grid.Row="2" Grid.Column="0"
-                          Visibility="{Binding StashUpdater, Converter={StaticResource NullToCollapsedConverter}, TargetNullValue={x:Static Visibility.Collapsed}}">
-                        <StackPanel Grid.Column="0"
-                                    Margin="10, 0"
-                                    Orientation="Horizontal"
-                                    Visibility="{Binding StashUpdater.IsBusy, Converter={StaticResource TrueToVisibleFalseToCollapsedConverter}}">
-
-                            <controls:ProgressRing
-                                Height="14" Width="14"
-                                IsActive="{Binding StashUpdater.IsBusy}" />
-                            <TextBlock
-                                Text="{Binding TimeTillNextUpdate, Converter={StaticResource TimeSpanToHumanReadableStringConverter}}"
-                                Style="{StaticResource IconTextBlock}"
-                                Margin="5,0" />
-                        </StackPanel>
-
-                        <DockPanel
-                            Visibility="{Binding StashUpdater.IsBusy, Converter={StaticResource TrueToCollapsedFalseToVisibleConverter}}">
-                            <TextBlock DockPanel.Dock="Left"
-                                       Margin="5,0"
-                                       TextAlignment="Center"
-                                       Text="{Binding TimeTillNextUpdate, StringFormat='&#xF017; {0}', Converter={StaticResource TimeSpanToHumanReadableStringConverter}}"
-                                       Style="{StaticResource IconTextBlock}" />
-
-                            <TextBlock DockPanel.Dock="Left"
-                                       Text="{Binding Stash.ChaosSetSolutions.Length, StringFormat='Sets: {0}'}"
-                                       Style="{StaticResource IconTextBlock}" Margin="5,0" />
-
-                            <materialDesign:PopupBox DockPanel.Dock="Right"
-                                                     Style="{StaticResource MaterialDesignMultiFloatingActionPopupBox}"
-                                                     PlacementMode="TopAndAlignCentres"
-                                                     UnfurlOrientation="Vertical"
-                                                     PopupMode="MouseOver"
-                                                     ToolTip="Manage items"
-                                                     Margin="0,-10,0,0"
-                                                     Padding="0"
-                                                     Width="30"
-                                                     Height="30"
-                                                     BorderThickness="2"
-                                                     IsEnabled="{Binding SolutionExecutor.IsBusy, Converter={StaticResource NotConverter}}"
-                                                     BorderBrush="{StaticResource AccentColorBrush}"
-                                                     HorizontalAlignment="Center"
-                                                     VerticalAlignment="Center">
-                                <materialDesign:PopupBox.Effect>
-                                    <DropShadowEffect BlurRadius="10" ShadowDepth="0" Direction="0" Opacity="1"
-                                                      RenderingBias="Performance"
-                                                      Color="{StaticResource AccentColor}" />
-                                </materialDesign:PopupBox.Effect>
-                                <materialDesign:PopupBox.ToggleContent>
-                                    <Label Style="{StaticResource IconLabel}"
-                                           fa:Awesome.Content="Magic" />
-                                </materialDesign:PopupBox.ToggleContent>
-                                <StackPanel Orientation="Vertical">
-                                    <Button Command="{Binding WithdrawChaosSetCommand}">
-                                        <Button.ToolTip>
-                                            <TextBlock>
-                                                <TextBlock.Inlines>
-                                                    <Run Text="Withdraw a Chaos Set - " />
-                                                    <Run
-                                                        Text="{Binding Stash.ChaosSetSolutions, Mode=OneWay, Converter={StaticResource PoeSolutionToHumanReadableFormatConverterKey}}" />
-                                                </TextBlock.Inlines>
-                                            </TextBlock>
-                                        </Button.ToolTip>
-                                        <Button.Content>
-                                            <Image Source="../Resources/Chaos_Orb.png"
-                                                   Margin="4" />
-                                        </Button.Content>
-                                    </Button>
-                                    <Button
-                                        Command="{Binding WithdrawMiscCommand}"
-                                        fa:Awesome.Content="Diamond">
-                                        <Button.ToolTip>
-                                            <TextBlock>
-                                                <TextBlock.Inlines>
-                                                    <Run Text="Withdraw Gems/Jewels/Flasks - " />
-                                                    <Run
-                                                        Text="{Binding Stash.MiscellaneousItemsSolutions, Mode=OneWay, Converter={StaticResource PoeSolutionToHumanReadableFormatConverterKey}}" />
-                                                </TextBlock.Inlines>
-                                            </TextBlock>
-                                        </Button.ToolTip>
-                                    </Button>
-                                    <Button
-                                        Command="{Binding WithdrawSellablesCommand}">
-                                        <Button.ToolTip>
-                                            <TextBlock>
-                                                <TextBlock.Inlines>
-                                                    <Run Text="Withdraw Six Links - " />
-                                                    <Run
-                                                        Text="{Binding Stash.SellableSolutions, Mode=OneWay, Converter={StaticResource PoeSolutionToHumanReadableFormatConverterKey}}" />
-                                                </TextBlock.Inlines>
-                                            </TextBlock>
-                                        </Button.ToolTip>
-                                        <Button.Content>
-                                            <Image Source="../Resources/Jewellers_Orb.png"
-                                                   Margin="4" />
-                                        </Button.Content>
-                                    </Button>
-                                    <Button
-                                        Command="{Binding WithdrawMapsCommand}">
-                                        <Button.ToolTip>
-                                            <TextBlock>
-                                                <TextBlock.Inlines>
-                                                    <Run Text="Withdraw Maps - " />
-                                                    <Run
-                                                        Text="{Binding Stash.MapsSolutions, Mode=OneWay, Converter={StaticResource PoeSolutionToHumanReadableFormatConverterKey}}" />
-                                                </TextBlock.Inlines>
-                                            </TextBlock>
-                                        </Button.ToolTip>
-                                        <Button.Content>
-                                            <Image Source="../Resources/MapCells.png"
-                                                   Margin="4" />
-                                        </Button.Content>
-                                    </Button>
-                                    <Button
-                                        Command="{Binding WithdrawDivinationCardsCommand}">
-                                        <Button.ToolTip>
-                                            <TextBlock>
-                                                <TextBlock.Inlines>
-                                                    <Run Text="Withdraw Divination cards - " />
-                                                    <Run
-                                                        Text="{Binding Stash.DivinationCardsSolutions, Mode=OneWay, Converter={StaticResource PoeSolutionToHumanReadableFormatConverterKey}}" />
-                                                </TextBlock.Inlines>
-                                            </TextBlock>
-                                        </Button.ToolTip>
-                                        <Button.Content>
-                                            <Image Source="../Resources/DivinationCard.png"
-                                                   Margin="4" />
-                                        </Button.Content>
-                                    </Button>
-                                    <Button Command="{Binding WithdrawCurrencyCommand}"
-                                            fa:Awesome.Content="Money">
-                                        <Button.ToolTip>
-                                            <TextBlock>
-                                                <TextBlock.Inlines>
-                                                    <Run Text="Withdraw Currency cards - " />
-                                                    <Run
-                                                        Text="{Binding Stash.CurrencySolutions, Mode=OneWay, Converter={StaticResource PoeSolutionToHumanReadableFormatConverterKey}}" />
-                                                </TextBlock.Inlines>
-                                            </TextBlock>
-                                        </Button.ToolTip>
-                                    </Button>
-
-                                    <Button
-                                        ToolTip="Refresh Stash. Changing location forces server to save your stash."
-                                        Command="{Binding ForceRefreshCommand}"
-                                        fa:Awesome.Content="Refresh" />
-                                </StackPanel>
-                            </materialDesign:PopupBox>
-
-                            <ContentControl DockPanel.Dock="Right" HorizontalAlignment="Right"
-                                            Margin="5,0"
-                                            Content="{Binding Stash.PriceSummary}"
-                                            Visibility="{Binding Stash, Converter={StaticResource NullToCollapsedConverter}}" />
-                        </DockPanel>
-
-                    </Grid>
-
-                    <ContentPresenter Grid.Row="3" Grid.Column="0"
-                                      Content="{Binding Stash}" />
-                </Grid>
+            <Grid Grid.Row="0" Grid.Column="0" Margin="50, 5, 0, 5">
+                <ContentPresenter Content="{Binding SolutionExecutor}" />
             </Grid>
+
+            <Grid Grid.Row="1" Grid.Column="0" Margin="50, 5, 0, 5">
+                <TextBlock
+                    x:Name="LastUpdateException"
+                    MaxWidth="600"
+                    Visibility="{Binding LastUpdateException, Converter={StaticResource NullToCollapsedConverter}}"
+                    Foreground="Orange"
+                    Text="{Binding LastUpdateException, StringFormat='&#xF071; {0}', Converter={StaticResource ExceptionToMessageConverter}}"
+                    Style="{StaticResource IconTextBlock}" TextTrimming="WordEllipsis" />
+            </Grid>
+
+            <Grid Grid.Row="2" Grid.Column="0"
+                  Visibility="{Binding StashUpdater, Converter={StaticResource NullToCollapsedConverter}, TargetNullValue={x:Static Visibility.Collapsed}}">
+                <StackPanel Grid.Column="0"
+                            Margin="10, 0"
+                            Orientation="Horizontal"
+                            Visibility="{Binding StashUpdater.IsBusy, Converter={StaticResource TrueToVisibleFalseToCollapsedConverter}}">
+
+                    <controls:ProgressRing
+                        Height="14" Width="14"
+                        IsActive="{Binding StashUpdater.IsBusy}" />
+                    <TextBlock
+                        Text="{Binding TimeTillNextUpdate, Converter={StaticResource TimeSpanToHumanReadableStringConverter}}"
+                        Style="{StaticResource IconTextBlock}"
+                        Margin="5,0" />
+                </StackPanel>
+
+                <DockPanel
+                    Visibility="{Binding StashUpdater.IsBusy, Converter={StaticResource TrueToCollapsedFalseToVisibleConverter}}">
+                    <TextBlock DockPanel.Dock="Left"
+                               Margin="5,0"
+                               TextAlignment="Center"
+                               Text="{Binding TimeTillNextUpdate, StringFormat='&#xF017; {0}', Converter={StaticResource TimeSpanToHumanReadableStringConverter}}"
+                               Style="{StaticResource IconTextBlock}" />
+
+                    <TextBlock DockPanel.Dock="Left"
+                               Text="{Binding Stash.ChaosSetSolutions.Length, StringFormat='Sets: {0}'}"
+                               Style="{StaticResource IconTextBlock}" Margin="5,0" />
+
+                    <materialDesign:PopupBox DockPanel.Dock="Right"
+                                             Style="{StaticResource MaterialDesignMultiFloatingActionPopupBox}"
+                                             PlacementMode="TopAndAlignCentres"
+                                             UnfurlOrientation="Vertical"
+                                             PopupMode="MouseOver"
+                                             ToolTip="Manage items"
+                                             Margin="0,-10,0,0"
+                                             Padding="0"
+                                             Width="30"
+                                             Height="30"
+                                             BorderThickness="2"
+                                             IsEnabled="{Binding SolutionExecutor.IsBusy, Converter={StaticResource NotConverter}}"
+                                             BorderBrush="{StaticResource AccentColorBrush}"
+                                             HorizontalAlignment="Center"
+                                             VerticalAlignment="Center">
+                        <materialDesign:PopupBox.Effect>
+                            <DropShadowEffect BlurRadius="10" ShadowDepth="0" Direction="0" Opacity="1"
+                                              RenderingBias="Performance"
+                                              Color="{StaticResource AccentColor}" />
+                        </materialDesign:PopupBox.Effect>
+                        <materialDesign:PopupBox.ToggleContent>
+                            <Label Style="{StaticResource IconLabel}"
+                                   fa:Awesome.Content="Magic" />
+                        </materialDesign:PopupBox.ToggleContent>
+                        <StackPanel Orientation="Vertical">
+                            <Button Command="{Binding WithdrawChaosSetCommand}">
+                                <Button.ToolTip>
+                                    <TextBlock>
+                                        <TextBlock.Inlines>
+                                            <Run Text="Withdraw a Chaos Set - " />
+                                            <Run
+                                                Text="{Binding Stash.ChaosSetSolutions, Mode=OneWay, Converter={StaticResource PoeSolutionToHumanReadableFormatConverterKey}}" />
+                                        </TextBlock.Inlines>
+                                    </TextBlock>
+                                </Button.ToolTip>
+                                <Button.Content>
+                                    <Image Source="../Resources/Chaos_Orb.png"
+                                           Margin="4" />
+                                </Button.Content>
+                            </Button>
+                            <Button
+                                Command="{Binding WithdrawMiscCommand}"
+                                fa:Awesome.Content="Diamond">
+                                <Button.ToolTip>
+                                    <TextBlock>
+                                        <TextBlock.Inlines>
+                                            <Run Text="Withdraw Gems/Jewels/Flasks - " />
+                                            <Run
+                                                Text="{Binding Stash.MiscellaneousItemsSolutions, Mode=OneWay, Converter={StaticResource PoeSolutionToHumanReadableFormatConverterKey}}" />
+                                        </TextBlock.Inlines>
+                                    </TextBlock>
+                                </Button.ToolTip>
+                            </Button>
+                            <Button
+                                Command="{Binding WithdrawSellablesCommand}">
+                                <Button.ToolTip>
+                                    <TextBlock>
+                                        <TextBlock.Inlines>
+                                            <Run Text="Withdraw Six Links - " />
+                                            <Run
+                                                Text="{Binding Stash.SellableSolutions, Mode=OneWay, Converter={StaticResource PoeSolutionToHumanReadableFormatConverterKey}}" />
+                                        </TextBlock.Inlines>
+                                    </TextBlock>
+                                </Button.ToolTip>
+                                <Button.Content>
+                                    <Image Source="../Resources/Jewellers_Orb.png"
+                                           Margin="4" />
+                                </Button.Content>
+                            </Button>
+                            <Button
+                                Command="{Binding WithdrawMapsCommand}">
+                                <Button.ToolTip>
+                                    <TextBlock>
+                                        <TextBlock.Inlines>
+                                            <Run Text="Withdraw Maps - " />
+                                            <Run
+                                                Text="{Binding Stash.MapsSolutions, Mode=OneWay, Converter={StaticResource PoeSolutionToHumanReadableFormatConverterKey}}" />
+                                        </TextBlock.Inlines>
+                                    </TextBlock>
+                                </Button.ToolTip>
+                                <Button.Content>
+                                    <Image Source="../Resources/MapCells.png"
+                                           Margin="4" />
+                                </Button.Content>
+                            </Button>
+                            <Button
+                                Command="{Binding WithdrawDivinationCardsCommand}">
+                                <Button.ToolTip>
+                                    <TextBlock>
+                                        <TextBlock.Inlines>
+                                            <Run Text="Withdraw Divination cards - " />
+                                            <Run
+                                                Text="{Binding Stash.DivinationCardsSolutions, Mode=OneWay, Converter={StaticResource PoeSolutionToHumanReadableFormatConverterKey}}" />
+                                        </TextBlock.Inlines>
+                                    </TextBlock>
+                                </Button.ToolTip>
+                                <Button.Content>
+                                    <Image Source="../Resources/DivinationCard.png"
+                                           Margin="4" />
+                                </Button.Content>
+                            </Button>
+                            <Button Command="{Binding WithdrawCurrencyCommand}"
+                                    fa:Awesome.Content="Money">
+                                <Button.ToolTip>
+                                    <TextBlock>
+                                        <TextBlock.Inlines>
+                                            <Run Text="Withdraw Currency cards - " />
+                                            <Run
+                                                Text="{Binding Stash.CurrencySolutions, Mode=OneWay, Converter={StaticResource PoeSolutionToHumanReadableFormatConverterKey}}" />
+                                        </TextBlock.Inlines>
+                                    </TextBlock>
+                                </Button.ToolTip>
+                            </Button>
+
+                            <Button
+                                ToolTip="Refresh Stash. Changing location forces server to save your stash."
+                                Command="{Binding ForceRefreshCommand}"
+                                fa:Awesome.Content="Refresh" />
+                        </StackPanel>
+                    </materialDesign:PopupBox>
+
+                    <ContentControl DockPanel.Dock="Right" HorizontalAlignment="Right"
+                                    Margin="5,0"
+                                    Content="{Binding Stash.PriceSummary}"
+                                    Visibility="{Binding Stash, Converter={StaticResource NullToCollapsedConverter}}" />
+                </DockPanel>
+
+            </Grid>
+
+            <ContentPresenter Grid.Row="3" Grid.Column="0"
+                              Content="{Binding Stash}" />
         </Grid>
     </DataTemplate>
 </ResourceDictionary>

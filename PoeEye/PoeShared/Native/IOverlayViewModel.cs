@@ -1,6 +1,7 @@
 using System;
 using System.Reactive;
 using System.Windows;
+using System.Windows.Input;
 using JetBrains.Annotations;
 using PoeShared.Scaffolding;
 
@@ -33,7 +34,11 @@ namespace PoeShared.Native
         IObservable<Unit> WhenLoaded { [NotNull] get; }
 
         SizeToContent SizeToContent { get; }
-
-        IOverlayViewModel SetActivationController([NotNull] IActivationController controller);
+        
+        string Title { [CanBeNull] get; }
+        
+        void SetActivationController([NotNull] IActivationController controller);
+        
+        ICommand LockWindowCommand { [NotNull] get; }
     }
 }

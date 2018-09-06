@@ -52,8 +52,7 @@ namespace PoeEye.TradeMonitor.ViewModels
             Left = 200;
             SizeToContent = SizeToContent.WidthAndHeight;
             IsUnlockable = true;
-
-            LockWindowCommand = new DelegateCommand(LockWindowCommandExecuted);
+            Title = "Control panel";
 
             UnlockAllWindowsCommand = new DelegateCommand(UnlockAllWindowsCommandExecuted);
 
@@ -73,8 +72,6 @@ namespace PoeEye.TradeMonitor.ViewModels
             get => opacity;
             set => this.RaiseAndSetIfChanged(ref opacity, value);
         }
-
-        public ICommand LockWindowCommand { get; }
 
         public ICommand UnlockAllWindowsCommand { get; }
 
@@ -98,13 +95,14 @@ namespace PoeEye.TradeMonitor.ViewModels
             Top = config.OverlayLocation.Y;
         }
 
-        private void LockWindowCommandExecuted()
+        protected override void LockWindowCommandExecuted()
         {
+            base.LockWindowCommandExecuted();
+            
             var config = configProvider.ActualConfig;
             config.OverlayLocation = new Point(Left, Top);
             config.OverlayOpacity = Opacity;
             configProvider.Save(config);
-            IsLocked = true;
         }
 
         private void UnlockAllWindowsCommandExecuted()
