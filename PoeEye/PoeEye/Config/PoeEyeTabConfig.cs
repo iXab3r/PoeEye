@@ -22,6 +22,8 @@ namespace PoeEye.Config
         public string ApiModuleId { get; set; }
 
         public string CustomTabName { get; set; }
+        
+        public string QuickFilter { get; set; }
 
         public override string ToString()
         {

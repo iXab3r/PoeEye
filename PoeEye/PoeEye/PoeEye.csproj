@@ -99,6 +99,14 @@
       <HintPath>..\packages\DynamicData.4.11.1.1203\lib\net45\DynamicData.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+      <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+      <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Exceptionless.Extras, Version=3.3.1590.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Exceptionless.Wpf.3.3.1590\lib\net45\Exceptionless.Extras.dll</HintPath>
       <Private>True</Private>
@@ -148,6 +156,10 @@
     </Reference>
     <Reference Include="Kent.Boogaart.HelperTrinity, Version=1.5.2.0, Culture=neutral, PublicKeyToken=cc96fa93a217f7a1, processorArchitecture=MSIL">
       <HintPath>..\packages\Kent.Boogaart.HelperTrinity.1.5.2\lib\net45\Kent.Boogaart.HelperTrinity.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="LinqKit, Version=1.1.15.0, Culture=neutral, PublicKeyToken=bc217f8844052a91">
+      <HintPath>..\packages\LinqKit.1.1.15\lib\net45\LinqKit.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="log4net, Version=1.2.13.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
@@ -245,6 +257,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Reactive.Core, Version=2.2.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -353,6 +366,7 @@
     <Compile Include="PoeTrade\Models\FuzzySuggestionProvider.cs" />
     <Compile Include="PoeTrade\Models\IPoeApiProvider.cs" />
     <Compile Include="PoeTrade\Models\IPoeCaptchaRegistrator.cs" />
+    <Compile Include="PoeTrade\Models\IPoeTradeQuickFilter  .cs" />
     <Compile Include="PoeTrade\Models\IReactiveSuggestionProvider.cs" />
     <Compile Include="PoeTrade\Models\IWhispersNotificationManager.cs" />
     <Compile Include="PoeTrade\Models\PoeApiProvider.cs" />
@@ -360,6 +374,7 @@
     <Compile Include="PoeTrade\Models\PoeItemViewModelFactory.cs" />
     <Compile Include="PoeTrade\Models\PoePriceCalculcator.cs" />
     <Compile Include="PoeTrade\Models\PoeCaptchaRegistrator.cs" />
+    <Compile Include="PoeTrade\Models\PoeTradeQuickFilter.cs" />
     <Compile Include="PoeTrade\Models\ReactiveSuggestionProvider.cs" />
     <Compile Include="PoeTrade\Models\WhispersNotificationManager.cs" />
     <Compile Include="PoeTrade\Shell\ViewModels\IPoeFlyoutViewModel.cs" />
@@ -370,6 +385,7 @@
     <Compile Include="PoeTrade\Shell\ViewModels\IMainWindowViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\IPoeApiSelectorViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\IPoeChatViewModel.cs" />
+    <Compile Include="PoeTrade\ViewModels\IPoeAdvancedTradesListViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\IPoeItemModsViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\IPoeModGroupsEditorViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\IPoeModsEditorViewModel.cs" />
@@ -379,12 +395,12 @@
     <Compile Include="PoeTrade\ViewModels\IPoeTradesListViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\IPoeTradeViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\IRecheckPeriodViewModel.cs" />
+    <Compile Include="PoeTrade\ViewModels\PoeAdvancedTradesListViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\PoeApiSelectorViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\PoeChatViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\PoeClipboardParserViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\PoeEyeSettingsViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\PoeEyeUpdateSettingsViewModel.cs" />
-    <Compile Include="PoeTrade\ViewModels\PoeFilteredTradeViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\PoeItemModsViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\PoeLinksInfoViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\MainWindowTabViewModel.cs" />

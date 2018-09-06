@@ -68,7 +68,7 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
 
         public MainWindowViewModel(
             [NotNull] IFactory<IMainWindowTabViewModel> tabFactory,
-            [NotNull] IFactory<PoeSummaryTabViewModel, ReadOnlyObservableCollection<IMainWindowTabViewModel>> summaryTabFactory,
+            [NotNull] IFactory<IPoeSummaryTabViewModel, ReadOnlyObservableCollection<IMainWindowTabViewModel>> summaryTabFactory,
             [NotNull] ApplicationUpdaterViewModel applicationUpdaterViewModel,
             [NotNull] IPoeEyeMainConfigProvider poeEyeConfigProvider,
             [NotNull] IAudioNotificationsManager audioNotificationsManager,
@@ -229,7 +229,7 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
 
         public PoeEyeSettingsViewModel Settings { get; }
 
-        public PoeSummaryTabViewModel SummaryTab { get; }
+        public IPoeSummaryTabViewModel SummaryTab { get; }
 
         public ReadOnlyObservableCollection<IMainWindowTabViewModel> TabsList => tabsList;
 

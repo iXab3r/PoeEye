@@ -5,10 +5,11 @@ using System.Windows.Documents;
 using PoeEye.TradeMonitor.Models;
 using PoeShared.Audio;
 using PoeShared.Modularity;
+using PoeShared.Native;
 
 namespace PoeEye.TradeMonitor.Modularity
 {
-    public sealed class PoeTradeMonitorConfig : IPoeEyeConfigVersioned
+    public sealed class PoeTradeMonitorConfig : IPoeEyeConfigVersioned, IOverlayConfig
     {
         public bool IsEnabled { get; set; } = true;
 
@@ -21,12 +22,6 @@ namespace PoeEye.TradeMonitor.Modularity
         public bool GrowUpwards { get; set; }
 
         public bool ExpandOnHover { get; set; }
-
-        public float OverlayOpacity { get; set; }
-
-        public Point OverlayLocation { get; set; }
-
-        public Size OverlaySize { get; set; }
 
         public List<MacroMessage> PredefinedMessages { get; set; } = new List<MacroMessage>();
 
@@ -49,5 +44,11 @@ namespace PoeEye.TradeMonitor.Modularity
         };
 
         public int Version { get; set; } = 2;
+        
+        public Point OverlayLocation { get; set; }
+        
+        public Size OverlaySize { get; set; }
+
+        public float OverlayOpacity { get; set; } = 1;
     }
 }

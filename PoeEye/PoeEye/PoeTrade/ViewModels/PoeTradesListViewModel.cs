@@ -1,8 +1,10 @@
 ﻿using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Reactive;
 using System.Reactive.Subjects;
 using DynamicData;
 using DynamicData.Binding;
+using LinqKit;
 using PoeEye.PoeTrade.Common;
 
 namespace PoeEye.PoeTrade.ViewModels
@@ -39,7 +41,6 @@ namespace PoeEye.PoeTrade.ViewModels
     {
         private static readonly TimeSpan TimeSinceLastUpdateRefreshTimeout = TimeSpan.FromSeconds(1);
         private static readonly TimeSpan RecheckPeriodThrottleTimeout = TimeSpan.FromSeconds(1);
-        private static readonly TimeSpan ResortThrottleTimeout = TimeSpan.FromSeconds(0.1f);
 
         private readonly SerialDisposable activeHistoryProviderDisposable = new SerialDisposable();
         private readonly IPoeCaptchaRegistrator captchaRegistrator;
@@ -51,14 +52,14 @@ namespace PoeEye.PoeTrade.ViewModels
         private readonly IFactory<IPoeTradeViewModel, IPoeItem> poeTradeViewModelFactory;
         private readonly IScheduler uiScheduler;
         private readonly ISourceList<IPoeTradeViewModel> itemsSource = new SourceList<IPoeTradeViewModel>();
-        private readonly ReadOnlyObservableCollection<IPoeTradeViewModel> items;
-        
+        private readonly IPoeTradeQuickFilter quickFilter; 
         private ActiveProviderInfo activeProviderInfo;
         private IPoeQueryInfo activeQuery;
 
         private string errors;
 
         private DateTime lastUpdateTimestamp;
+        private string quickFilterText;
 
         private TimeSpan recheckPeriod;
 
@@ -66,16 +67,20 @@ namespace PoeEye.PoeTrade.ViewModels
             [NotNull] IPoeApiWrapper poeApiWrapper,
             [NotNull] IFactory<IPoeLiveHistoryProvider, IPoeApiWrapper, IPoeQueryInfo> poeLiveHistoryFactory,
             [NotNull] IFactory<IPoeTradeViewModel, IPoeItem> poeTradeViewModelFactory,
+            [NotNull] IFactory<IPoeAdvancedTradesListViewModel> listFactory,
             [NotNull] IPoeCaptchaRegistrator captchaRegistrator,
             [NotNull] IEqualityComparer<IPoeItem> poeItemsComparer,
+            [NotNull] IFactory<IPoeTradeQuickFilter> quickFilterFactory,
             [NotNull] IClock clock,
             [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {
             Guard.ArgumentNotNull(poeApiWrapper, nameof(poeApiWrapper));
             Guard.ArgumentNotNull(poeLiveHistoryFactory, nameof(poeLiveHistoryFactory));
             Guard.ArgumentNotNull(poeTradeViewModelFactory, nameof(poeTradeViewModelFactory));
+            Guard.ArgumentNotNull(listFactory, nameof(listFactory));
             Guard.ArgumentNotNull(captchaRegistrator, nameof(captchaRegistrator));
             Guard.ArgumentNotNull(poeItemsComparer, nameof(poeItemsComparer));
+            Guard.ArgumentNotNull(quickFilterFactory, nameof(quickFilterFactory));
             Guard.ArgumentNotNull(clock, nameof(clock));
             Guard.ArgumentNotNull(uiScheduler, nameof(uiScheduler));
 
@@ -106,21 +111,21 @@ namespace PoeEye.PoeTrade.ViewModels
                 .Subscribe(_ => this.RaisePropertyChanged(nameof(TimeSinceLastUpdate)))
                 .AddTo(Anchors);
 
-            itemsSource
-                .Connect()
-                .Sort(
-                    SortExpressionComparer<IPoeTradeViewModel>
-                        .Ascending(x => x.TradeState)
-                        .ThenByAscending(x => x.PriceInChaosOrbs ?? PoePrice.Empty), 
-                    SortOptions.None,
-                    itemsSource.Connect()
-                        .WhenAnyPropertyChanged()
-                        .Throttle(ResortThrottleTimeout)
-                        .ToUnit())
-                .ObserveOn(uiScheduler)
-                .Bind(out items)
+            itemsSource.Connect()
+                .DisposeMany()
+                .Bind(out var items)
                 .Subscribe()
                 .AddTo(Anchors);
+            
+            var list = listFactory.Create().AddTo(Anchors);
+            list.SortBy(nameof(IPoeTradeViewModel.TradeState), ListSortDirection.Ascending);
+            list.ThenSortBy(nameof(IPoeTradeViewModel.PriceInChaosOrbs), ListSortDirection.Ascending);
+            list.Add(items);
+
+            quickFilter = quickFilterFactory.Create();
+            list.Filter(this.WhenAnyValue(x => x.QuickFilter).Select(x => BuildFilter()));
+            
+            Items = list.Items;
         }
 
         public TimeSpan RecheckPeriod
@@ -128,11 +133,20 @@ namespace PoeEye.PoeTrade.ViewModels
             get { return recheckPeriod; }
             set { this.RaiseAndSetIfChanged(ref recheckPeriod, value); }
         }
-
-        public ReadOnlyObservableCollection<IPoeTradeViewModel> Items
+        
+        private Predicate<IPoeTradeViewModel> BuildFilter()
         {
-            get { return items; }
+            var filter = PredicateBuilder.True<IPoeTradeViewModel>();
+
+            if (!string.IsNullOrWhiteSpace(QuickFilter))
+            {
+                filter = filter.And(x => quickFilter.Apply(quickFilterText, x));
+            }
+
+            return new Predicate<IPoeTradeViewModel>(filter.Compile());
         }
+
+        public ReadOnlyObservableCollection<IPoeTradeViewModel> Items { get; }
 
         public IPoeQueryInfo ActiveQuery
         {
@@ -144,6 +158,12 @@ namespace PoeEye.PoeTrade.ViewModels
         {
             get { return errors; }
             private set { this.RaiseAndSetIfChanged(ref errors, value); }
+        }
+        
+        public string QuickFilter
+        {
+            get { return quickFilterText; }
+            set { this.RaiseAndSetIfChanged(ref quickFilterText, value); }
         }
 
         public TimeSpan TimeSinceLastUpdate => clock.Now - lastUpdateTimestamp;

@@ -11,632 +11,639 @@
                     xmlns:wpf1="clr-namespace:TheArtOfDev.HtmlRenderer.WPF;assembly=HtmlRenderer.WPF"
                     xmlns:converters="clr-namespace:PoeEye.Converters">
 
-  <ResourceDictionary.MergedDictionaries>
-    <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Converters.xaml" />
-  </ResourceDictionary.MergedDictionaries>
-  
-  <eye:FlagToVisibilityConverter x:Key="ItemShapedToVisibilityConverter" TrueValue="Visible" FalseValue="Collapsed" BitMask="{x:Static common:PoeItemModificatins.Shaped}"/>
-  <eye:FlagToVisibilityConverter x:Key="ItemElderToVisibilityConverter" TrueValue="Visible" FalseValue="Collapsed" BitMask="{x:Static common:PoeItemModificatins.Elder}"/>
-  <eye:FlagToVisibilityConverter x:Key="ItemMirroredToVisibilityConverter" TrueValue="Visible" FalseValue="Collapsed" BitMask="{x:Static common:PoeItemModificatins.Mirrored}"/>
-  <eye:FlagToVisibilityConverter x:Key="ItemUnidentifiedToVisibilityConverter" TrueValue="Visible" FalseValue="Collapsed" BitMask="{x:Static common:PoeItemModificatins.Unidentified}"/>
-  <eye:FlagToVisibilityConverter x:Key="ItemCraftedToVisibilityConverter" TrueValue="Visible" FalseValue="Collapsed" BitMask="{x:Static common:PoeItemModificatins.Crafted}"/>
-  <eye:FlagToVisibilityConverter x:Key="ItemCorruptedToVisibilityConverter" TrueValue="Visible" FalseValue="Collapsed" BitMask="{x:Static common:PoeItemModificatins.Corrupted}"/>
-  <eye:FlagToVisibilityConverter x:Key="ItemEnchantedToVisibilityConverter" TrueValue="Visible" FalseValue="Collapsed" BitMask="{x:Static common:PoeItemModificatins.Enchanted}"/>
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Converters.xaml" />
+    </ResourceDictionary.MergedDictionaries>
 
-  <converters:PoeItemModToHtmlConverter x:Key="DefaultPoeItemModToHtmlConverterKey" 
-                                        DefaultTextColor="{StaticResource PoeItemRarityNormalColor}"
-                                        FireRelatedTextColor="#B95F0E"
-                                        ColdRelatedTextColor="#6285FF"
-                                        LightningRelatedTextColor="#AD9D32"
-                                        ChaosRelatedTextColor="#8A89D0"
-                                        PhysicalRelatedTextColor="{StaticResource PoeItemPhysicalStatColor}"
-                                        ElementalRelatedTextColor="{StaticResource PoeItemElementalStatColor}"
-                                        LifeRelatedTextColor="{StaticResource PoeItemStrStatColor}"
-                                        ManaRelatedTextColor="{StaticResource PoeItemIntStatColor}"
-                                        StrengthRelatedTextColor="{StaticResource PoeItemStrStatColor}"
-                                        DexterityRelatedTextColor="{StaticResource PoeItemDexStatColor}"
-                                        IntelligenceRelatedTextColor="{StaticResource PoeItemIntStatColor}"
-                                        CraftGroupColor="{StaticResource PoeItemElementalStatColor}"
-                                        EnchantGroupColor="{StaticResource PoeItemRarityRelicColor}"
-                                        PseudoGroupColor="#5DA423"
-                                        TotalGroupColor="#5DA423" />
-  
-  <DataTemplate x:Key="PoeItemStatsTemplateKey" DataType="{x:Type common:IPoeItem}">
-    <!-- Stats -->
-    <Grid Margin="10,5">
-      <Grid.Resources>
-        <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource IconTextBlock}"
-               x:Key="ItemStatValue">
-          <Setter Property="HorizontalAlignment" Value="Center" />
-          <Setter Property="FontWeight" Value="Bold" />
-          <Setter Property="Foreground" Value="{StaticResource TextBoxBorderBrush}" />
-          <Setter Property="FontSize" Value="12" />
-        </Style>
+    <eye:FlagToVisibilityConverter x:Key="ItemShapedToVisibilityConverter" TrueValue="Visible" FalseValue="Collapsed"
+                                   BitMask="{x:Static common:PoeItemModificatins.Shaped}" />
+    <eye:FlagToVisibilityConverter x:Key="ItemElderToVisibilityConverter" TrueValue="Visible" FalseValue="Collapsed"
+                                   BitMask="{x:Static common:PoeItemModificatins.Elder}" />
+    <eye:FlagToVisibilityConverter x:Key="ItemMirroredToVisibilityConverter" TrueValue="Visible" FalseValue="Collapsed"
+                                   BitMask="{x:Static common:PoeItemModificatins.Mirrored}" />
+    <eye:FlagToVisibilityConverter x:Key="ItemUnidentifiedToVisibilityConverter" TrueValue="Visible" FalseValue="Collapsed"
+                                   BitMask="{x:Static common:PoeItemModificatins.Unidentified}" />
+    <eye:FlagToVisibilityConverter x:Key="ItemCraftedToVisibilityConverter" TrueValue="Visible" FalseValue="Collapsed"
+                                   BitMask="{x:Static common:PoeItemModificatins.Crafted}" />
+    <eye:FlagToVisibilityConverter x:Key="ItemCorruptedToVisibilityConverter" TrueValue="Visible" FalseValue="Collapsed"
+                                   BitMask="{x:Static common:PoeItemModificatins.Corrupted}" />
+    <eye:FlagToVisibilityConverter x:Key="ItemEnchantedToVisibilityConverter" TrueValue="Visible" FalseValue="Collapsed"
+                                   BitMask="{x:Static common:PoeItemModificatins.Enchanted}" />
 
-        <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource ItemStatValue}"
-               x:Key="ItemStatValueLarge">
-          <Setter Property="Margin" Value="5,0" />
-          <Setter Property="FontSize" Value="20" />
-        </Style>
+    <converters:PoeItemModToHtmlConverter x:Key="DefaultPoeItemModToHtmlConverterKey"
+                                          DefaultTextColor="{StaticResource PoeItemRarityNormalColor}"
+                                          FireRelatedTextColor="#B95F0E"
+                                          ColdRelatedTextColor="#6285FF"
+                                          LightningRelatedTextColor="#AD9D32"
+                                          ChaosRelatedTextColor="#8A89D0"
+                                          PhysicalRelatedTextColor="{StaticResource PoeItemPhysicalStatColor}"
+                                          ElementalRelatedTextColor="{StaticResource PoeItemElementalStatColor}"
+                                          LifeRelatedTextColor="{StaticResource PoeItemStrStatColor}"
+                                          ManaRelatedTextColor="{StaticResource PoeItemIntStatColor}"
+                                          StrengthRelatedTextColor="{StaticResource PoeItemStrStatColor}"
+                                          DexterityRelatedTextColor="{StaticResource PoeItemDexStatColor}"
+                                          IntelligenceRelatedTextColor="{StaticResource PoeItemIntStatColor}"
+                                          CraftGroupColor="{StaticResource PoeItemElementalStatColor}"
+                                          EnchantGroupColor="{StaticResource PoeItemRarityRelicColor}"
+                                          PseudoGroupColor="#5DA423"
+                                          TotalGroupColor="#5DA423" />
 
-        <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource ItemStatValue}" 
-               x:Key="ItemStatMedium">
-          <Setter Property="FontSize" Value="14" />
-        </Style>
+    <DataTemplate x:Key="PoeItemStatsTemplateKey" DataType="{x:Type common:IPoeItem}">
+        <!-- Stats -->
+        <Grid Margin="10,5">
+            <Grid.Resources>
+                <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource IconTextBlock}"
+                       x:Key="ItemStatValue">
+                    <Setter Property="HorizontalAlignment" Value="Center" />
+                    <Setter Property="FontWeight" Value="Bold" />
+                    <Setter Property="Foreground" Value="{StaticResource TextBoxBorderBrush}" />
+                    <Setter Property="FontSize" Value="12" />
+                </Style>
 
-        <Style TargetType="{x:Type Label}" BasedOn="{StaticResource IconLabel}" 
-               x:Key="ItemStatHeader">
-          <Setter Property="HorizontalContentAlignment" Value="Right" />
-          <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
-          <Setter Property="FontSize" Value="12" />
-          <Setter Property="Margin" Value="0,0,5,0" />
-        </Style>
+                <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource ItemStatValue}"
+                       x:Key="ItemStatValueLarge">
+                    <Setter Property="Margin" Value="5,0" />
+                    <Setter Property="FontSize" Value="20" />
+                </Style>
 
-        <Style TargetType="{x:Type StackPanel}">
-          <Setter Property="Orientation" Value="Horizontal" />
-          <Setter Property="Margin" Value="0,2" />
-        </Style>
-      </Grid.Resources>
-      
-      <Grid.RowDefinitions>
-        <RowDefinition Height="80*" />
-        <RowDefinition Height="80*" />
-      </Grid.RowDefinitions>
-      
-      <StackPanel Orientation="Vertical">
+                <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource ItemStatValue}"
+                       x:Key="ItemStatMedium">
+                    <Setter Property="FontSize" Value="14" />
+                </Style>
 
-        <StackPanel HorizontalAlignment="Center"
-                    Visibility="{Binding ItemLevel, Converter={StaticResource NullToCollapsedConverter}}">
-          <Label Content="Level: " Style="{StaticResource ItemStatHeader}" />
-          <TextBlock Text="{Binding ItemLevel}" Style="{StaticResource ItemStatMedium}" />
-        </StackPanel>
+                <Style TargetType="{x:Type Label}" BasedOn="{StaticResource IconLabel}"
+                       x:Key="ItemStatHeader">
+                    <Setter Property="HorizontalContentAlignment" Value="Right" />
+                    <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
+                    <Setter Property="FontSize" Value="12" />
+                    <Setter Property="Margin" Value="0,0,5,0" />
+                </Style>
 
-        <StackPanel Visibility="{Binding Armour, Converter={StaticResource NullToCollapsedConverter}}">
-          <Label Content="Armour: " Style="{StaticResource ItemStatHeader}" />
-          <TextBlock Text="{Binding Armour}" Style="{StaticResource ItemStatMedium}"
-                     Foreground="{StaticResource PoeItemStrStatBrush}" />
-        </StackPanel>
+                <Style TargetType="{x:Type StackPanel}">
+                    <Setter Property="Orientation" Value="Horizontal" />
+                    <Setter Property="Margin" Value="0,2" />
+                </Style>
+            </Grid.Resources>
 
-        <StackPanel Visibility="{Binding Evasion, Converter={StaticResource NullToCollapsedConverter}}">
-          <Label Content="Evasion: " Style="{StaticResource ItemStatHeader}" />
-          <TextBlock Text="{Binding Evasion}" Style="{StaticResource ItemStatMedium}"
-                     Foreground="{StaticResource PoeItemDexStatBrush}" />
-        </StackPanel>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="80*" />
+                <RowDefinition Height="80*" />
+            </Grid.RowDefinitions>
 
-        <StackPanel Visibility="{Binding Shield, Converter={StaticResource NullToCollapsedConverter}}">
-          <Label Content="Shield: " Style="{StaticResource ItemStatHeader}" />
-          <TextBlock Text="{Binding Shield}" Style="{StaticResource ItemStatMedium}"
-                     Foreground="{StaticResource PoeItemIntStatBrush}" />
-        </StackPanel>
+            <StackPanel Orientation="Vertical">
 
-        <StackPanel HorizontalAlignment="Center"
-                    Visibility="{Binding DamagePerSecond, Converter={StaticResource NullToCollapsedConverter}}">
-          <TextBlock Text="{Binding DamagePerSecond}" Style="{StaticResource ItemStatValueLarge}" />
-          <Label Content="DPS" Style="{StaticResource ItemStatHeader}" />
-        </StackPanel>
+                <StackPanel HorizontalAlignment="Center"
+                            Visibility="{Binding ItemLevel, Converter={StaticResource NullToCollapsedConverter}}">
+                    <Label Content="Level: " Style="{StaticResource ItemStatHeader}" />
+                    <TextBlock Text="{Binding ItemLevel}" Style="{StaticResource ItemStatMedium}" />
+                </StackPanel>
 
-        <StackPanel>
-          <StackPanel.Visibility>
-            <MultiBinding Converter="{StaticResource AllNullToCollapsedMultiValueConverter}">
-              <MultiBinding.Bindings>
-                <Binding Path="PhysicalDamagePerSecond" />
-                <Binding Path="ElementalDamagePerSecond" />
-              </MultiBinding.Bindings>
-            </MultiBinding>
-          </StackPanel.Visibility>
-          <Label Content="DPS: " Style="{StaticResource ItemStatHeader}" />
-          <TextBlock Text="{Binding PhysicalDamagePerSecond, FallbackValue=0.0}" ToolTip="Physical DPS"
-                     Style="{StaticResource ItemStatMedium}"
-                     Foreground="{StaticResource PoeItemPhysicalStatBrush}" />
-          <TextBlock Text=" &#xf055; " Style="{StaticResource ItemStatValue}">
-            <TextBlock.Visibility>
-              <MultiBinding Converter="{StaticResource AnyNullToCollapsedMultiValueConverter}">
-                <MultiBinding.Bindings>
-                  <Binding Path="PhysicalDamagePerSecond" />
-                  <Binding Path="ElementalDamagePerSecond" />
-                </MultiBinding.Bindings>
-              </MultiBinding>
-            </TextBlock.Visibility>
-          </TextBlock>
-          <TextBlock Text="{Binding ElementalDamagePerSecond, FallbackValue=0.0}" ToolTip="Elemental DPS"
-                     Style="{StaticResource ItemStatMedium}"
-                     Foreground="{StaticResource PoeItemElementalStatBrush}" />
-        </StackPanel>
+                <StackPanel Visibility="{Binding Armour, Converter={StaticResource NullToCollapsedConverter}}">
+                    <Label Content="Armour: " Style="{StaticResource ItemStatHeader}" />
+                    <TextBlock Text="{Binding Armour}" Style="{StaticResource ItemStatMedium}"
+                               Foreground="{StaticResource PoeItemStrStatBrush}" />
+                </StackPanel>
 
-        <StackPanel>
-          <StackPanel.Visibility>
-            <MultiBinding Converter="{StaticResource AllNullToCollapsedMultiValueConverter}">
-              <MultiBinding.Bindings>
-                <Binding Path="Physical" />
-                <Binding Path="Elemental" />
-              </MultiBinding.Bindings>
-            </MultiBinding>
-          </StackPanel.Visibility>
-          <Label Content="Damage: " Style="{StaticResource ItemStatHeader}" />
-          <TextBlock Text="{Binding Physical, FallbackValue=0.0}" Style="{StaticResource ItemStatMedium}"
-                     ToolTip="Physical Damage" Foreground="{StaticResource PoeItemPhysicalStatBrush}" />
-          <TextBlock Text=" &#xf055; " Style="{StaticResource ItemStatValue}">
-            <TextBlock.Visibility>
-              <MultiBinding Converter="{StaticResource AnyNullToCollapsedMultiValueConverter}">
-                <MultiBinding.Bindings>
-                  <Binding Path="Physical" />
-                  <Binding Path="Elemental" />
-                </MultiBinding.Bindings>
-              </MultiBinding>
-            </TextBlock.Visibility>
-          </TextBlock>
-          <TextBlock Text="{Binding Elemental, FallbackValue=0.0}" Style="{StaticResource ItemStatMedium}"
-                     ToolTip="Elemental Damage" Foreground="{StaticResource PoeItemElementalStatBrush}" />
-        </StackPanel>
+                <StackPanel Visibility="{Binding Evasion, Converter={StaticResource NullToCollapsedConverter}}">
+                    <Label Content="Evasion: " Style="{StaticResource ItemStatHeader}" />
+                    <TextBlock Text="{Binding Evasion}" Style="{StaticResource ItemStatMedium}"
+                               Foreground="{StaticResource PoeItemDexStatBrush}" />
+                </StackPanel>
 
-        <StackPanel
-          Visibility="{Binding AttacksPerSecond, Converter={StaticResource NullToCollapsedConverter}}">
-          <Label Content="Attacks per Second: " Style="{StaticResource ItemStatHeader}" />
-          <TextBlock Text="{Binding AttacksPerSecond}" Style="{StaticResource ItemStatValue}" />
-        </StackPanel>
+                <StackPanel Visibility="{Binding Shield, Converter={StaticResource NullToCollapsedConverter}}">
+                    <Label Content="Shield: " Style="{StaticResource ItemStatHeader}" />
+                    <TextBlock Text="{Binding Shield}" Style="{StaticResource ItemStatMedium}"
+                               Foreground="{StaticResource PoeItemIntStatBrush}" />
+                </StackPanel>
 
-        <StackPanel Visibility="{Binding CriticalChance, Converter={StaticResource NullToCollapsedConverter}}">
-          <Label Content="Base Critical Chance: " Style="{StaticResource ItemStatHeader}" />
-          <TextBlock Text="{Binding CriticalChance}" Style="{StaticResource ItemStatValue}" />
-        </StackPanel>
+                <StackPanel HorizontalAlignment="Center"
+                            Visibility="{Binding DamagePerSecond, Converter={StaticResource NullToCollapsedConverter}}">
+                    <TextBlock Text="{Binding DamagePerSecond}" Style="{StaticResource ItemStatValueLarge}" />
+                    <Label Content="DPS" Style="{StaticResource ItemStatHeader}" />
+                </StackPanel>
 
-        <StackPanel Visibility="{Binding BlockChance, Converter={StaticResource NullToCollapsedConverter}}">
-          <Label Content="Block: " Style="{StaticResource ItemStatHeader}" />
-          <TextBlock Text="{Binding BlockChance}" Style="{StaticResource ItemStatValue}" />
-        </StackPanel>
+                <StackPanel>
+                    <StackPanel.Visibility>
+                        <MultiBinding Converter="{StaticResource AllNullToCollapsedMultiValueConverter}">
+                            <MultiBinding.Bindings>
+                                <Binding Path="PhysicalDamagePerSecond" />
+                                <Binding Path="ElementalDamagePerSecond" />
+                            </MultiBinding.Bindings>
+                        </MultiBinding>
+                    </StackPanel.Visibility>
+                    <Label Content="DPS: " Style="{StaticResource ItemStatHeader}" />
+                    <TextBlock Text="{Binding PhysicalDamagePerSecond, FallbackValue=0.0}" ToolTip="Physical DPS"
+                               Style="{StaticResource ItemStatMedium}"
+                               Foreground="{StaticResource PoeItemPhysicalStatBrush}" />
+                    <TextBlock Text=" &#xf055; " Style="{StaticResource ItemStatValue}">
+                        <TextBlock.Visibility>
+                            <MultiBinding Converter="{StaticResource AnyNullToCollapsedMultiValueConverter}">
+                                <MultiBinding.Bindings>
+                                    <Binding Path="PhysicalDamagePerSecond" />
+                                    <Binding Path="ElementalDamagePerSecond" />
+                                </MultiBinding.Bindings>
+                            </MultiBinding>
+                        </TextBlock.Visibility>
+                    </TextBlock>
+                    <TextBlock Text="{Binding ElementalDamagePerSecond, FallbackValue=0.0}" ToolTip="Elemental DPS"
+                               Style="{StaticResource ItemStatMedium}"
+                               Foreground="{StaticResource PoeItemElementalStatBrush}" />
+                </StackPanel>
 
-        <StackPanel Visibility="{Binding Quality, Converter={StaticResource NullToCollapsedConverter}}">
-          <Label Content="Quality: " Style="{StaticResource ItemStatHeader}" />
-          <TextBlock Text="{Binding Quality}" Style="{StaticResource ItemStatValue}" />
-        </StackPanel>
-      </StackPanel>
+                <StackPanel>
+                    <StackPanel.Visibility>
+                        <MultiBinding Converter="{StaticResource AllNullToCollapsedMultiValueConverter}">
+                            <MultiBinding.Bindings>
+                                <Binding Path="Physical" />
+                                <Binding Path="Elemental" />
+                            </MultiBinding.Bindings>
+                        </MultiBinding>
+                    </StackPanel.Visibility>
+                    <Label Content="Damage: " Style="{StaticResource ItemStatHeader}" />
+                    <TextBlock Text="{Binding Physical, FallbackValue=0.0}" Style="{StaticResource ItemStatMedium}"
+                               ToolTip="Physical Damage" Foreground="{StaticResource PoeItemPhysicalStatBrush}" />
+                    <TextBlock Text=" &#xf055; " Style="{StaticResource ItemStatValue}">
+                        <TextBlock.Visibility>
+                            <MultiBinding Converter="{StaticResource AnyNullToCollapsedMultiValueConverter}">
+                                <MultiBinding.Bindings>
+                                    <Binding Path="Physical" />
+                                    <Binding Path="Elemental" />
+                                </MultiBinding.Bindings>
+                            </MultiBinding>
+                        </TextBlock.Visibility>
+                    </TextBlock>
+                    <TextBlock Text="{Binding Elemental, FallbackValue=0.0}" Style="{StaticResource ItemStatMedium}"
+                               ToolTip="Elemental Damage" Foreground="{StaticResource PoeItemElementalStatBrush}" />
+                </StackPanel>
 
-    </Grid>
-  </DataTemplate>
+                <StackPanel
+                    Visibility="{Binding AttacksPerSecond, Converter={StaticResource NullToCollapsedConverter}}">
+                    <Label Content="Attacks per Second: " Style="{StaticResource ItemStatHeader}" />
+                    <TextBlock Text="{Binding AttacksPerSecond}" Style="{StaticResource ItemStatValue}" />
+                </StackPanel>
 
-  <DataTemplate x:Key="PoeItemNameTemplateKey" DataType="{x:Type common:IPoeItem}">
-    <Grid Background="Transparent">
-      <TextBlock Text="{Binding ItemName, Mode=OneWay}">
-        <TextBlock.ToolTip>
-          <TextBlock>
-            <TextBlock.Inlines>
-              <Run Text="["/>
-              <Run Text="{Binding TypeInfo.GearType, Mode=OneWay}"/> 
-              <Run Text="] "/>
-              <Run Text="{Binding TypeInfo.ItemName, Mode=OneWay}"/>
-              <Run Text=" ("/>
-              <Run Text="{Binding TypeInfo.ItemType, Mode=OneWay}"/>
-              <Run Text=")"/>
-            </TextBlock.Inlines>
-          </TextBlock>
-        </TextBlock.ToolTip>
-        <TextBlock.Style>
-          <Style TargetType="TextBlock" 
-                 BasedOn="{StaticResource {x:Type TextBlock}}">
-            <Style.Triggers>
-              <DataTrigger Binding="{Binding Rarity}" Value="{x:Static common:PoeItemRarity.Normal}">
-                <Setter Property="Foreground" Value="{StaticResource PoeItemRarityNormalBrush}" />
-              </DataTrigger>
-              <DataTrigger Binding="{Binding Rarity}" Value="{x:Static common:PoeItemRarity.Magic}">
-                <Setter Property="Foreground" Value="{StaticResource PoeItemRarityMagicBrush}" />
-              </DataTrigger>
-              <DataTrigger Binding="{Binding Rarity}" Value="{x:Static common:PoeItemRarity.Rare}">
-                <Setter Property="Foreground" Value="{StaticResource PoeItemRarityRareBrush}" />
-              </DataTrigger>
-              <DataTrigger Binding="{Binding Rarity}" Value="{x:Static common:PoeItemRarity.Unique}">
-                <Setter Property="Foreground" Value="{StaticResource PoeItemRarityUniqueBrush}" />
-              </DataTrigger>
-              <DataTrigger Binding="{Binding Rarity}" Value="{x:Static common:PoeItemRarity.Relic}">
-                <Setter Property="Foreground" Value="{StaticResource PoeItemRarityRelicBrush}" />
-              </DataTrigger>
-            </Style.Triggers>
-          </Style>
-        </TextBlock.Style>
-      </TextBlock>
-    </Grid>
-    
-  </DataTemplate>
+                <StackPanel Visibility="{Binding CriticalChance, Converter={StaticResource NullToCollapsedConverter}}">
+                    <Label Content="Base Critical Chance: " Style="{StaticResource ItemStatHeader}" />
+                    <TextBlock Text="{Binding CriticalChance}" Style="{StaticResource ItemStatValue}" />
+                </StackPanel>
 
-  <DataTemplate x:Key="PoeItemModsHtmlTemplateKey" DataType="{x:Type viewModels:PoeItemModsViewModel}">
-    <Grid>
-      <wpf1:HtmlLabel IsSelectionEnabled="False" 
-                      Foreground="{StaticResource TextBrush}"
-                      SnapsToDevicePixels="True"
-                      AutoSize="False"
-                      AutoSizeHeightOnly="True"
-                      TextOptions.TextFormattingMode="Display"
-                      Text="{Binding Html}">
-      </wpf1:HtmlLabel>
-    </Grid>
-  </DataTemplate>
-  
-  <DataTemplate x:Key="PoeItemModsFastTemplateKey" DataType="{x:Type viewModels:PoeItemModsViewModel}">
-    <TextBlock Text="{Binding RawText}"/>
-  </DataTemplate>
-  <DataTemplate x:Key="PoeItemModsTemplateKey" DataType="{x:Type viewModels:PoeItemModsViewModel}">
-    <Grid>
-      <Grid.Resources>
-        <DataTemplate x:Key="ModTemplateKey">
-          <DockPanel Height="20">
-            <wpf1:HtmlLabel DockPanel.Dock="Left" 
-                            IsSelectionEnabled="False" 
+                <StackPanel Visibility="{Binding BlockChance, Converter={StaticResource NullToCollapsedConverter}}">
+                    <Label Content="Block: " Style="{StaticResource ItemStatHeader}" />
+                    <TextBlock Text="{Binding BlockChance}" Style="{StaticResource ItemStatValue}" />
+                </StackPanel>
+
+                <StackPanel Visibility="{Binding Quality, Converter={StaticResource NullToCollapsedConverter}}">
+                    <Label Content="Quality: " Style="{StaticResource ItemStatHeader}" />
+                    <TextBlock Text="{Binding Quality}" Style="{StaticResource ItemStatValue}" />
+                </StackPanel>
+            </StackPanel>
+
+        </Grid>
+    </DataTemplate>
+
+    <DataTemplate x:Key="PoeItemNameTemplateKey" DataType="{x:Type common:IPoeItem}">
+        <Grid Background="Transparent">
+            <TextBlock Text="{Binding ItemName, Mode=OneWay}">
+                <TextBlock.ToolTip>
+                    <TextBlock>
+                        <TextBlock.Inlines>
+                            <Run Text="[" />
+                            <Run Text="{Binding TypeInfo.GearType, Mode=OneWay}" />
+                            <Run Text="] " />
+                            <Run Text="{Binding TypeInfo.ItemName, Mode=OneWay}" />
+                            <Run Text=" (" />
+                            <Run Text="{Binding TypeInfo.ItemType, Mode=OneWay}" />
+                            <Run Text=")" />
+                        </TextBlock.Inlines>
+                    </TextBlock>
+                </TextBlock.ToolTip>
+                <TextBlock.Style>
+                    <Style TargetType="TextBlock"
+                           BasedOn="{StaticResource {x:Type TextBlock}}">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Rarity}" Value="{x:Static common:PoeItemRarity.Normal}">
+                                <Setter Property="Foreground" Value="{StaticResource PoeItemRarityNormalBrush}" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding Rarity}" Value="{x:Static common:PoeItemRarity.Magic}">
+                                <Setter Property="Foreground" Value="{StaticResource PoeItemRarityMagicBrush}" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding Rarity}" Value="{x:Static common:PoeItemRarity.Rare}">
+                                <Setter Property="Foreground" Value="{StaticResource PoeItemRarityRareBrush}" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding Rarity}" Value="{x:Static common:PoeItemRarity.Unique}">
+                                <Setter Property="Foreground" Value="{StaticResource PoeItemRarityUniqueBrush}" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding Rarity}" Value="{x:Static common:PoeItemRarity.Relic}">
+                                <Setter Property="Foreground" Value="{StaticResource PoeItemRarityRelicBrush}" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
+        </Grid>
+
+    </DataTemplate>
+
+    <DataTemplate x:Key="PoeItemModsHtmlTemplateKey" DataType="{x:Type viewModels:PoeItemModsViewModel}">
+        <Grid>
+            <wpf1:HtmlLabel IsSelectionEnabled="False"
                             Foreground="{StaticResource TextBrush}"
                             SnapsToDevicePixels="True"
-                            AutoSize="True"
-                            TextOptions.TextFormattingMode="Ideal"
-                            Text="{Binding Name}">
-            </wpf1:HtmlLabel>
-            <wpf1:HtmlLabel DockPanel.Dock="Right" 
-                            IsSelectionEnabled="False" 
-                            Foreground="{StaticResource TextBrush}"
-                            SnapsToDevicePixels="True"
-                            AutoSize="True"
-                            TextOptions.TextFormattingMode="Ideal"
-                            HorizontalAlignment="Right"
-                            Text="{Binding TierInfo}">
-            </wpf1:HtmlLabel>
-          </DockPanel>
-        </DataTemplate>
+                            AutoSize="False"
+                            AutoSizeHeightOnly="True"
+                            TextOptions.TextFormattingMode="Display"
+                            Text="{Binding Html}" />
+        </Grid>
+    </DataTemplate>
 
-      </Grid.Resources>
-      <Grid.RowDefinitions>
-        <RowDefinition Height="Auto" />
-        <RowDefinition Height="5" />
-        <RowDefinition Height="Auto" />
-        <RowDefinition Height="5" />
-        <RowDefinition Height="Auto" />
-      </Grid.RowDefinitions>
-      <ItemsControl Grid.Row="0" Grid.Column="0"
-                    x:Name="ImplicitModsItemsControl"
-                    ItemsSource="{Binding HtmlImplicitMods}" FontStyle="Italic"
-                    ItemTemplate="{StaticResource ModTemplateKey}"/>
-      <Border Grid.Row="1" Grid.Column="0"
-              Visibility="{Binding ElementName=ImplicitModsItemsControl, Path=HasItems, Converter={StaticResource BoolFalseToCollapsedConverter}}"
-              Height="5" BorderBrush="{StaticResource AccentColorBrush}" BorderThickness="0,1,0,0" />
-      <ItemsControl Grid.Row="2" Grid.Column="0"
-                    x:Name="ExplicitModsItemsControl"
-                    ItemsSource="{Binding HtmlExplicitMods}"
-                    ItemTemplate="{StaticResource ModTemplateKey}"/>
-      <Line Grid.Row="3" Grid.Column="0"
-            Visibility="{Binding ElementName=UnknownModsItemsControl, Path=HasItems, Converter={StaticResource BoolFalseToCollapsedConverter}}"
-            Stroke="{StaticResource ProgressBrush}" StrokeThickness="1" />
-      <ItemsControl Grid.Row="4" Grid.Column="0"
-                    x:Name="UnknownModsItemsControl"
-                    ItemsSource="{Binding HtmlUnknownMods}" 
-                    ItemTemplate="{StaticResource ModTemplateKey}"/>
-    </Grid>
-  </DataTemplate>
-  
-  <wpf:MappingTemplateSelector x:Key="PoeItemModsTemplateSelector" KeyPropertyPath="UseFastRendering">
-    <wpf:TemplateMapping Key="True" Template="{StaticResource PoeItemModsFastTemplateKey}" />
-    <wpf:TemplateMapping Key="False" Template="{StaticResource PoeItemModsTemplateKey}" />
-  </wpf:MappingTemplateSelector>
+    <DataTemplate x:Key="PoeItemModsFastTemplateKey" DataType="{x:Type viewModels:PoeItemModsViewModel}">
+        <TextBlock Text="{Binding RawText}" />
+    </DataTemplate>
+    <DataTemplate x:Key="PoeItemModsTemplateKey" DataType="{x:Type viewModels:PoeItemModsViewModel}">
+        <Grid>
+            <Grid.Resources>
+                <DataTemplate x:Key="ModTemplateKey">
+                    <DockPanel Height="20">
+                        <wpf1:HtmlLabel DockPanel.Dock="Left"
+                                        IsSelectionEnabled="False"
+                                        Foreground="{StaticResource TextBrush}"
+                                        SnapsToDevicePixels="True"
+                                        AutoSize="True"
+                                        TextOptions.TextFormattingMode="Ideal"
+                                        Text="{Binding Name}" />
+                        <wpf1:HtmlLabel DockPanel.Dock="Right"
+                                        IsSelectionEnabled="False"
+                                        Foreground="{StaticResource TextBrush}"
+                                        SnapsToDevicePixels="True"
+                                        AutoSize="True"
+                                        TextOptions.TextFormattingMode="Ideal"
+                                        HorizontalAlignment="Right"
+                                        Text="{Binding TierInfo}" />
+                    </DockPanel>
+                </DataTemplate>
 
-  <DataTemplate DataType="{x:Type viewModels:PoeTradeViewModel}">
-      <Grid Margin="10">
-        <Grid.RowDefinitions>
-          <RowDefinition Height="40" />
-          <RowDefinition Height="*" />
-          <RowDefinition Height="34" />
-          <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-          <ColumnDefinition Width="100" />
-          <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
+            </Grid.Resources>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="5" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="5" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <ItemsControl Grid.Row="0" Grid.Column="0"
+                          x:Name="ImplicitModsItemsControl"
+                          ItemsSource="{Binding HtmlImplicitMods}" FontStyle="Italic"
+                          ItemTemplate="{StaticResource ModTemplateKey}" />
+            <Border Grid.Row="1" Grid.Column="0"
+                    Visibility="{Binding ElementName=ImplicitModsItemsControl, Path=HasItems, Converter={StaticResource BoolFalseToCollapsedConverter}}"
+                    Height="5" BorderBrush="{StaticResource AccentColorBrush}" BorderThickness="0,1,0,0" />
+            <ItemsControl Grid.Row="2" Grid.Column="0"
+                          x:Name="ExplicitModsItemsControl"
+                          ItemsSource="{Binding HtmlExplicitMods}"
+                          ItemTemplate="{StaticResource ModTemplateKey}" />
+            <Line Grid.Row="3" Grid.Column="0"
+                  Visibility="{Binding ElementName=UnknownModsItemsControl, Path=HasItems, Converter={StaticResource BoolFalseToCollapsedConverter}}"
+                  Stroke="{StaticResource ProgressBrush}" StrokeThickness="1" />
+            <ItemsControl Grid.Row="4" Grid.Column="0"
+                          x:Name="UnknownModsItemsControl"
+                          ItemsSource="{Binding HtmlUnknownMods}"
+                          ItemTemplate="{StaticResource ModTemplateKey}" />
+        </Grid>
+    </DataTemplate>
 
-        <ContentControl Grid.Row="1" Grid.Column="0"
-                        Margin="0,0,10,0"
-                        MaxHeight="130"
-                        Content="{Binding Image}" />
+    <wpf:MappingTemplateSelector x:Key="PoeItemModsTemplateSelector" KeyPropertyPath="UseFastRendering">
+        <wpf:TemplateMapping Key="True" Template="{StaticResource PoeItemModsFastTemplateKey}" />
+        <wpf:TemplateMapping Key="False" Template="{StaticResource PoeItemModsTemplateKey}" />
+    </wpf:MappingTemplateSelector>
 
-        <ContentControl Grid.Row="1" Grid.Column="0" Content="{Binding Links}" 
-                        VerticalAlignment="Center"
-                        Margin="0,0,10,0" />
-
-        <Border Grid.Row="0" Grid.Column="1">
-          <Grid>
+    <DataTemplate DataType="{x:Type viewModels:PoeTradeViewModel}">
+        <Grid Margin="10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="40" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="34" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-              <ColumnDefinition Width="Auto" />
-              <ColumnDefinition Width="Auto" />
-              <ColumnDefinition Width="Auto" />
-              <ColumnDefinition Width="Auto" />
-              <ColumnDefinition Width="Auto" />
-              <ColumnDefinition Width="*" />
-              <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="100" />
+                <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            <Button Grid.Column="0"
-                    Width="30" Height="30"
+            <ContentControl Grid.Row="1" Grid.Column="0"
+                            Margin="0,0,10,0"
+                            MaxHeight="130"
+                            Content="{Binding Image}" />
+
+            <ContentControl Grid.Row="1" Grid.Column="0" Content="{Binding Links}"
+                            VerticalAlignment="Center"
+                            Margin="0,0,10,0" />
+
+            <Button Grid.Row="0" Grid.Column="0"
+                    Width="40" Height="30"
                     ToolTip="Mark as Read"
+                    Foreground="Black"
                     Margin="10,0">
-              <Button.Style>
-                <Style TargetType="Button">
-                  <Style.Triggers>
-                    <DataTrigger Binding="{Binding TradeState}"
-                                 Value="{x:Static common:PoeTradeState.New}">
-                      <Setter Property="Background"
-                              Value="{StaticResource PoeTradeNewItemBrush}" />
-                      <Setter Property="BorderThickness" Value="1" />
-                    </DataTrigger>
-                    <DataTrigger Binding="{Binding TradeState}"
-                                 Value="{x:Static common:PoeTradeState.Removed}">
-                      <Setter Property="Background"
-                              Value="{StaticResource PoeTradeRemovedItemBrush}" />
-                      <Setter Property="BorderThickness" Value="1" />
-                    </DataTrigger>
-                    <DataTrigger Binding="{Binding TradeState}"
-                                 Value="{x:Static common:PoeTradeState.Normal}">
-                      <Setter Property="Visibility" Value="Collapsed" />
-                    </DataTrigger>
-                    <DataTrigger Binding="{Binding TradeState}"
-                                 Value="{x:Static common:PoeTradeState.Unknown}">
-                      <Setter Property="Visibility" Value="Collapsed" />
-                    </DataTrigger>
-                  </Style.Triggers>
-                </Style>
-              </Button.Style>
-              <i:Interaction.Triggers>
-                <i:EventTrigger EventName="Click">
-                  <utilities:SetPropertyAction PropertyName="TradeState" TargetObject="{Binding}">
-                    <utilities:SetPropertyAction.PropertyValue>
-                      <common:PoeTradeState>Normal</common:PoeTradeState>
-                    </utilities:SetPropertyAction.PropertyValue>
-                  </utilities:SetPropertyAction>
-                </i:EventTrigger>
-              </i:Interaction.Triggers>
-            </Button>
-            
-            <StackPanel Orientation="Horizontal" Grid.Column="1">
-              <ContentControl Content="{Binding Trade}"
-                              ContentTemplate="{StaticResource PoeItemNameTemplateKey}"
-                              VerticalAlignment="Center"
-                              TextBlock.FontSize="16">
+                <Button.Style>
+                    <Style TargetType="Button">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding TradeState}"
+                                         Value="{x:Static common:PoeTradeState.New}">
+                                <Setter Property="Background"
+                                        Value="{StaticResource PoeTradeNewItemBrush}" />
+                                <Setter Property="BorderThickness" Value="1" />
+                                <Setter Property="Content" Value="New" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding TradeState}"
+                                         Value="{x:Static common:PoeTradeState.Removed}">
+                                <Setter Property="Background"
+                                        Value="{StaticResource PoeTradeRemovedItemBrush}" />
+                                <Setter Property="BorderThickness" Value="1" />
+                                <Setter Property="Content" Value="Sold?" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding TradeState}"
+                                         Value="{x:Static common:PoeTradeState.Normal}">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding TradeState}"
+                                         Value="{x:Static common:PoeTradeState.Unknown}">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
                 <i:Interaction.Triggers>
-                  <i:EventTrigger EventName="MouseDoubleClick">
-                    <utilities:SetPropertyAction PropertyName="IsExpanded"
-                                                 TargetObject="{Binding ElementName=ExpanderRaw}"
-                                                 PropertyValue="{Binding ElementName=ExpanderRaw, Path=IsExpanded, Converter={StaticResource NotConverter}}" />
-                  </i:EventTrigger>
+                    <i:EventTrigger EventName="Click">
+                        <utilities:SetPropertyAction PropertyName="TradeState" TargetObject="{Binding}">
+                            <utilities:SetPropertyAction.PropertyValue>
+                                <common:PoeTradeState>Normal</common:PoeTradeState>
+                            </utilities:SetPropertyAction.PropertyValue>
+                        </utilities:SetPropertyAction>
+                    </i:EventTrigger>
                 </i:Interaction.Triggers>
-              </ContentControl>
-              <Button Command="{Binding CopyItemToClipboardCommand}"
-                      Width="34" Height="34"
-                      Margin="5,0"
-                      Style="{StaticResource CircleButton}"
-                      RenderTransformOrigin="0.5, 0.5"
-                      fa:Awesome.Content="Clipboard">
-                <Button.ToolTip>
-                  <controls:MouseButtonsTooltip
-                    LeftButton="Copy item description to clipboard (could be pasted in Path of Building, for example)"/>
-                </Button.ToolTip>
-              </Button>
-            </StackPanel>
-
-
-            <StackPanel Grid.Column="2"
-                        Height="25"
-                        Orientation="Horizontal">
-              <Label
-                Content="Corrupted"
-                Foreground="{StaticResource LabelTextBrush}"
-                Background="{StaticResource ValidationSummaryColor5}"
-                FontWeight="Bold"
-                Margin="5,0"
-                VerticalContentAlignment="Center"
-                VerticalAlignment="Center"
-                Visibility="{Binding Path=Trade.Modifications, Converter={StaticResource ItemCorruptedToVisibilityConverter}}"/>
-              
-              <Label
-                Content="Shaped"
-                Foreground="{StaticResource LabelTextBrush}"
-                Background="{StaticResource PoeShaperBrush}"
-                FontWeight="Bold"
-                Margin="5,0"
-                VerticalContentAlignment="Center"
-                VerticalAlignment="Center"
-                Visibility="{Binding Path=Trade.Modifications, Converter={StaticResource ItemShapedToVisibilityConverter}}"/>
-              
-              <Label
-                Content="Elder"
-                Foreground="{StaticResource LabelTextBrush}"
-                Background="{StaticResource PoeElderBrush}"
-                FontWeight="Bold"
-                Margin="5,0"
-                VerticalContentAlignment="Center"
-                VerticalAlignment="Center"
-                Visibility="{Binding Path=Trade.Modifications, Converter={StaticResource ItemElderToVisibilityConverter}}"/>
-              
-              <Label
-                Content="Crafted"
-                Foreground="{StaticResource LabelTextBrush}"
-                Background="{StaticResource PoeItemElementalStatBrush}"
-                FontWeight="Bold"
-                Margin="5,0"
-                VerticalContentAlignment="Center"
-                VerticalAlignment="Center"
-                Visibility="{Binding Path=Trade.Modifications, Converter={StaticResource ItemCraftedToVisibilityConverter}}"/>
-              
-              <Label
-                Content="Unidentified"
-                Foreground="{StaticResource LabelTextBrush}"
-                Background="{StaticResource PoeItemRarityMagicBrush}"
-                FontWeight="Bold"
-                Margin="5,0"
-                VerticalContentAlignment="Center"
-                VerticalAlignment="Center"
-                Visibility="{Binding Path=Trade.Modifications, Converter={StaticResource ItemUnidentifiedToVisibilityConverter}}"/>
-              
-              <Label
-                Content="Mirrored"
-                Foreground="{StaticResource LabelTextBrush}"
-                Background="{StaticResource PoeItemRarityRareBrush}"
-                FontWeight="Bold"
-                Margin="5,0"
-                VerticalContentAlignment="Center"
-                VerticalAlignment="Center"
-                Visibility="{Binding Path=Trade.Modifications, Converter={StaticResource ItemMirroredToVisibilityConverter}}"/>
-              
-              <Label
-                Content="Enchanted"
-                Foreground="{StaticResource LabelTextBrush}"
-                Background="{StaticResource PoeItemRarityRelicBrush}"
-                FontWeight="Bold"
-                Margin="5,0"
-                VerticalContentAlignment="Center"
-                VerticalAlignment="Center"
-                Visibility="{Binding Path=Trade.Modifications, Converter={StaticResource ItemEnchantedToVisibilityConverter}}"/>
-            </StackPanel>
-
-
-            <Label Grid.Column="4" Content="{Binding Trade.Requirements, Mode=OneWay}"
-                   BorderBrush="{StaticResource AccentColorBrush}"
-                   BorderThickness="2,0,2,0"
-                   VerticalContentAlignment="Center"
-                   Margin="10,5,10,5"
-                   Visibility="{Binding Trade.Requirements, Converter={StaticResource NullToCollapsedConverter}}" />
-
-            <StackPanel Grid.Column="6"
-                        Orientation="Horizontal"
-                        VerticalAlignment="Center">
-              <TextBlock
-                Text="{Binding TimeElapsedSinceFirstIndexation, Mode=OneWay, StringFormat='First seen: {0} ago', Converter={StaticResource TimeSpanToHumanReadableStringConverter}}"
-                Visibility="{Binding TimeElapsedSinceFirstIndexation, Converter={StaticResource NullToCollapsedConverter}}"
-                ToolTip="{Binding Trade.FirstSeen}"
-                Margin="2, 0" />
-
-              <Border Margin="5,0" Width="1" BorderThickness="2,0"
-                      BorderBrush="{StaticResource ControlBorderBrush}" />
-
-              <TextBlock
-                Text="{Binding TimeElapsedSinceLastIndexation, Mode=OneWay, StringFormat='Last seen: {0} ago', Converter={StaticResource TimeSpanToHumanReadableStringConverter}}"
-                ToolTip="{Binding Trade.Timestamp}"
-                Margin="2, 0" />
-            </StackPanel>
-
-          </Grid>
-
-        </Border>
-
-        <Border Grid.Row="1" Grid.Column="1"
-                BorderThickness="0,2,0,2" BorderBrush="{StaticResource ControlBorderBrush}">
-          <Grid>
-            <Grid.ColumnDefinitions>
-              <ColumnDefinition Width="Auto" />
-              <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-            <ContentControl Grid.Column="0" VerticalAlignment="Center"
-                            Content="{Binding Trade}"
-                            ContentTemplate="{StaticResource PoeItemStatsTemplateKey}" />
-            <ContentControl Grid.Column="1" Content="{Binding Mods}"
-                            HorizontalAlignment="Stretch"
-                            ContentTemplateSelector="{StaticResource PoeItemModsTemplateSelector}"/>
-          </Grid>
-        </Border>
-
-        <Border Grid.Row="2" Grid.Column="1"
-                Visibility="{Binding Trade.UserIgn, Converter={StaticResource NullToHiddenConverter}, Mode=OneWay}">
-          <Grid>
-            <Grid.ColumnDefinitions>
-              <ColumnDefinition Width="Auto" />
-              <ColumnDefinition Width="Auto" />
-              <ColumnDefinition Width="Auto" />
-              <ColumnDefinition Width="*" />
-              <ColumnDefinition Width="Auto" />
-              <ColumnDefinition Width="Auto" />
-              <ColumnDefinition Width="Auto" />
-              <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-
-            <TextBlock Grid.Column="0"
-                       Text="Buyout:" />
-
-
-            <StackPanel Grid.Column="1"
-                        Orientation="Horizontal">
-
-              <ContentPresenter Content="{Binding Trade.Price, Converter={StaticResource StringToPoePriceConverter}}"
-                                ContentTemplate="{StaticResource CurrencyViewKey}" />
-
-              <TextBlock Margin="5" Text="~"
-                         Visibility="{Binding PriceInChaosOrbs, Converter={StaticResource NullToCollapsedConverter}}" />
-
-              <ContentPresenter Content="{Binding PriceInChaosOrbs}"
-                                Visibility="{Binding PriceInChaosOrbs, Converter={StaticResource NullToCollapsedConverter}}" />
-            </StackPanel>
-
-            <TextBlock Grid.Column="2" Margin="0,5,0,0"
-                       Style="{StaticResource IconTextBlock}"
-                       FontSize="16"
-                       Text="{Binding Trade.Note, StringFormat='&#xf040; {0}'}"
-                       Visibility="{Binding Trade.Note, Converter={StaticResource NullToCollapsedConverter}}" />
-
-            <Button Grid.Column="4"
-                    Margin="10,2"
-                    Visibility="{Binding IsEnabled, RelativeSource={RelativeSource Self}, Converter={StaticResource BoolFalseToCollapsedConverter}}"
-                    Content="Go to forum thread" Command="{Binding OpenForumUriCommand}" />
-
-            <Ellipse Grid.Column="5"
-                     Width="14" Height="14"
-                     Margin="10,2,5,0"
-                     StrokeThickness="1"
-                     Stroke="{StaticResource LabelTextBrush}"
-                     VerticalAlignment="Center">
-              <Ellipse.Style>
-                <Style TargetType="Ellipse">
-                  <Setter Property="Fill" Value="{StaticResource PoeTradeNewItemBrush}" />
-                  <Style.Triggers>
-                    <DataTrigger Binding="{Binding Trade.UserIsOnline}" Value="False">
-                      <Setter Property="Fill"
-                              Value="{StaticResource PoeTradeRemovedItemBrush}" />
-                    </DataTrigger>
-                  </Style.Triggers>
-                </Style>
-              </Ellipse.Style>
-            </Ellipse>
-
-            <TextBlock Grid.Column="6"
-                       Text="{Binding Path=Trade.UserIgn, Mode=OneWay, StringFormat='IGN: {0}'}" />
-
-            <Button Grid.Column="7"
-                    Command="{Binding CopyPrivateMessageToClipboardCommand}"
-                    Width="150" Height="22"
-                    Margin="5,0"
-                    RenderTransformOrigin="0.5, 0.5">
-              <Button.Content>
-                <TextBlock
-                  Style="{StaticResource IconTextBlock}"
-                  Text="&#xf1d8; Copy Or Send" Margin="5,0" />
-              </Button.Content>
-              <Button.InputBindings>
-                <MouseBinding MouseAction="RightClick"
-                              Command="{Binding SendPrivateMessageCommand}"
-                              CommandParameter="{Binding}" />
-              </Button.InputBindings>
-
-              <Button.ToolTip>
-                <controls:MouseButtonsTooltip
-                  LeftButton="Copy PM to clipboard"
-                  RightButton="Send instant PM using Path of Exile client" />
-              </Button.ToolTip>
             </Button>
-          </Grid>
-        </Border>
 
-        <Border Grid.Row="3" Grid.Column="1"
-                Visibility="{Binding Trade.Raw, Converter={StaticResource NullToCollapsedConverter}, Mode=OneWay}"
-                MaxWidth="600" MaxHeight="400">
-          <Expander Header="Raw item info"
-                    Name="ExpanderRaw"
-                    Visibility="{Binding RelativeSource={RelativeSource Self}, Path=IsExpanded, Converter={StaticResource BoolFalseToCollapsedConverter}}">
-            <TextBox Text="{Binding Trade.Raw}" IsEnabled="True" IsReadOnly="True"
-                     TextWrapping="Wrap"
-                     VerticalScrollBarVisibility="Visible"
-                     HorizontalScrollBarVisibility="Visible" />
-          </Expander>
-        </Border>
+            <Border Grid.Row="0" Grid.Column="1">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
 
-      </Grid>
-  </DataTemplate>
+                    <StackPanel Orientation="Horizontal" Grid.Column="1">
+                        <ContentControl Content="{Binding Trade}"
+                                        ContentTemplate="{StaticResource PoeItemNameTemplateKey}"
+                                        VerticalAlignment="Center"
+                                        TextBlock.FontSize="16">
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="MouseDoubleClick">
+                                    <utilities:SetPropertyAction PropertyName="IsExpanded"
+                                                                 TargetObject="{Binding ElementName=ExpanderRaw}"
+                                                                 PropertyValue="{Binding ElementName=ExpanderRaw, Path=IsExpanded, Converter={StaticResource NotConverter}}" />
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                        </ContentControl>
+                        <Button Command="{Binding CopyItemToClipboardCommand}"
+                                Width="34" Height="34"
+                                Margin="5,0"
+                                Style="{StaticResource CircleButton}"
+                                RenderTransformOrigin="0.5, 0.5"
+                                fa:Awesome.Content="Clipboard">
+                            <Button.ToolTip>
+                                <controls:MouseButtonsTooltip
+                                    LeftButton="Copy item description to clipboard (could be pasted in Path of Building, for example)" />
+                            </Button.ToolTip>
+                        </Button>
+                    </StackPanel>
+
+
+                    <StackPanel Grid.Column="2"
+                                Height="25"
+                                Orientation="Horizontal">
+                        <Label
+                            Content="Corrupted"
+                            Foreground="{StaticResource LabelTextBrush}"
+                            Background="{StaticResource ValidationSummaryColor5}"
+                            FontWeight="Bold"
+                            Margin="5,0"
+                            VerticalContentAlignment="Center"
+                            VerticalAlignment="Center"
+                            Visibility="{Binding Path=Trade.Modifications, Converter={StaticResource ItemCorruptedToVisibilityConverter}}" />
+
+                        <Label
+                            Content="Shaped"
+                            Foreground="{StaticResource LabelTextBrush}"
+                            Background="{StaticResource PoeShaperBrush}"
+                            FontWeight="Bold"
+                            Margin="5,0"
+                            VerticalContentAlignment="Center"
+                            VerticalAlignment="Center"
+                            Visibility="{Binding Path=Trade.Modifications, Converter={StaticResource ItemShapedToVisibilityConverter}}" />
+
+                        <Label
+                            Content="Elder"
+                            Foreground="{StaticResource LabelTextBrush}"
+                            Background="{StaticResource PoeElderBrush}"
+                            FontWeight="Bold"
+                            Margin="5,0"
+                            VerticalContentAlignment="Center"
+                            VerticalAlignment="Center"
+                            Visibility="{Binding Path=Trade.Modifications, Converter={StaticResource ItemElderToVisibilityConverter}}" />
+
+                        <Label
+                            Content="Crafted"
+                            Foreground="{StaticResource LabelTextBrush}"
+                            Background="{StaticResource PoeItemElementalStatBrush}"
+                            FontWeight="Bold"
+                            Margin="5,0"
+                            VerticalContentAlignment="Center"
+                            VerticalAlignment="Center"
+                            Visibility="{Binding Path=Trade.Modifications, Converter={StaticResource ItemCraftedToVisibilityConverter}}" />
+
+                        <Label
+                            Content="Unidentified"
+                            Foreground="{StaticResource LabelTextBrush}"
+                            Background="{StaticResource PoeItemRarityMagicBrush}"
+                            FontWeight="Bold"
+                            Margin="5,0"
+                            VerticalContentAlignment="Center"
+                            VerticalAlignment="Center"
+                            Visibility="{Binding Path=Trade.Modifications, Converter={StaticResource ItemUnidentifiedToVisibilityConverter}}" />
+
+                        <Label
+                            Content="Mirrored"
+                            Foreground="{StaticResource LabelTextBrush}"
+                            Background="{StaticResource PoeItemRarityRareBrush}"
+                            FontWeight="Bold"
+                            Margin="5,0"
+                            VerticalContentAlignment="Center"
+                            VerticalAlignment="Center"
+                            Visibility="{Binding Path=Trade.Modifications, Converter={StaticResource ItemMirroredToVisibilityConverter}}" />
+
+                        <Label
+                            Content="Enchanted"
+                            Foreground="{StaticResource LabelTextBrush}"
+                            Background="{StaticResource PoeItemRarityRelicBrush}"
+                            FontWeight="Bold"
+                            Margin="5,0"
+                            VerticalContentAlignment="Center"
+                            VerticalAlignment="Center"
+                            Visibility="{Binding Path=Trade.Modifications, Converter={StaticResource ItemEnchantedToVisibilityConverter}}" />
+                    </StackPanel>
+
+
+                    <Label Grid.Column="4" Content="{Binding Trade.Requirements, Mode=OneWay}"
+                           BorderBrush="{StaticResource AccentColorBrush}"
+                           BorderThickness="2,0,2,0"
+                           VerticalContentAlignment="Center"
+                           Margin="10,5,10,5"
+                           Visibility="{Binding Trade.Requirements, Converter={StaticResource NullToCollapsedConverter}}" />
+
+                    <StackPanel Grid.Column="6"
+                                Orientation="Horizontal"
+                                VerticalAlignment="Center">
+                        <TextBlock
+                            Text="{Binding TimeElapsedSinceFirstIndexation, Mode=OneWay, StringFormat='First seen: {0} ago', Converter={StaticResource TimeSpanToHumanReadableStringConverter}}"
+                            Visibility="{Binding TimeElapsedSinceFirstIndexation, Converter={StaticResource NullToCollapsedConverter}}"
+                            ToolTip="{Binding Trade.FirstSeen}"
+                            Margin="2, 0" />
+
+                        <Border Margin="5,0" Width="1" BorderThickness="2,0"
+                                BorderBrush="{StaticResource ControlBorderBrush}" />
+
+                        <TextBlock
+                            Text="{Binding TimeElapsedSinceLastIndexation, Mode=OneWay, StringFormat='Last seen: {0} ago', Converter={StaticResource TimeSpanToHumanReadableStringConverter}}"
+                            ToolTip="{Binding Trade.Timestamp}"
+                            Margin="2, 0" />
+                    </StackPanel>
+
+                </Grid>
+
+            </Border>
+
+            <Border Grid.Row="1" Grid.Column="1"
+                    BorderThickness="0,2,0,2" BorderBrush="{StaticResource ControlBorderBrush}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <ContentControl Grid.Column="0" VerticalAlignment="Center"
+                                    Content="{Binding Trade}"
+                                    ContentTemplate="{StaticResource PoeItemStatsTemplateKey}" />
+                    <ContentControl Grid.Column="1" Content="{Binding Mods}"
+                                    HorizontalAlignment="Stretch"
+                                    ContentTemplateSelector="{StaticResource PoeItemModsTemplateSelector}" />
+                </Grid>
+            </Border>
+
+            <Border Grid.Row="2" Grid.Column="1"
+                    Visibility="{Binding Trade.UserIgn, Converter={StaticResource NullToHiddenConverter}, Mode=OneWay}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Column="0"
+                               Text="Buyout:" />
+
+
+                    <StackPanel Grid.Column="1"
+                                Orientation="Horizontal">
+
+                        <ContentPresenter Content="{Binding Trade.Price, Converter={StaticResource StringToPoePriceConverter}}"
+                                          ContentTemplate="{StaticResource CurrencyViewKey}" />
+
+                        <TextBlock Margin="5" Text="~"
+                                   Visibility="{Binding PriceInChaosOrbs, Converter={StaticResource NullToCollapsedConverter}}" />
+
+                        <ContentPresenter Content="{Binding PriceInChaosOrbs}"
+                                          Visibility="{Binding PriceInChaosOrbs, Converter={StaticResource NullToCollapsedConverter}}" />
+                    </StackPanel>
+
+                    <TextBlock Grid.Column="2" Margin="0,5,0,0"
+                               Style="{StaticResource IconTextBlock}"
+                               FontSize="16"
+                               Text="{Binding Trade.Note, StringFormat='&#xf040; {0}'}"
+                               Visibility="{Binding Trade.Note, Converter={StaticResource NullToCollapsedConverter}}" />
+
+                    <Button Grid.Column="4"
+                            Margin="10,2"
+                            Visibility="{Binding IsEnabled, RelativeSource={RelativeSource Self}, Converter={StaticResource BoolFalseToCollapsedConverter}}"
+                            Content="Go to forum thread" Command="{Binding OpenForumUriCommand}" />
+
+                    <Ellipse Grid.Column="5"
+                             Width="14" Height="14"
+                             Margin="10,2,5,0"
+                             StrokeThickness="1"
+                             Stroke="{StaticResource LabelTextBrush}"
+                             VerticalAlignment="Center">
+                        <Ellipse.Style>
+                            <Style TargetType="Ellipse">
+                                <Setter Property="Fill" Value="{StaticResource PoeTradeNewItemBrush}" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Trade.UserIsOnline}" Value="False">
+                                        <Setter Property="Fill"
+                                                Value="{StaticResource PoeTradeRemovedItemBrush}" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Ellipse.Style>
+                    </Ellipse>
+
+                    <TextBlock Grid.Column="6"
+                               Text="{Binding Path=Trade.UserIgn, Mode=OneWay, StringFormat='IGN: {0}'}" />
+
+                    <Button Grid.Column="7"
+                            Command="{Binding CopyPrivateMessageToClipboardCommand}"
+                            Width="150" Height="22"
+                            Margin="5,0"
+                            RenderTransformOrigin="0.5, 0.5">
+                        <Button.Content>
+                            <TextBlock
+                                Style="{StaticResource IconTextBlock}"
+                                Text="&#xf1d8; Copy Or Send" Margin="5,0" />
+                        </Button.Content>
+                        <Button.InputBindings>
+                            <MouseBinding MouseAction="RightClick"
+                                          Command="{Binding SendPrivateMessageCommand}"
+                                          CommandParameter="{Binding}" />
+                        </Button.InputBindings>
+
+                        <Button.ToolTip>
+                            <controls:MouseButtonsTooltip
+                                LeftButton="Copy PM to clipboard"
+                                RightButton="Send instant PM using Path of Exile client" />
+                        </Button.ToolTip>
+                    </Button>
+                </Grid>
+            </Border>
+
+            <Border Grid.Row="3" Grid.Column="1"
+                    Visibility="{Binding Trade.Raw, Converter={StaticResource NullToCollapsedConverter}, Mode=OneWay}"
+                    MaxWidth="600" MaxHeight="400">
+                <Expander Header="Raw item info"
+                          Name="ExpanderRaw"
+                          Visibility="{Binding RelativeSource={RelativeSource Self}, Path=IsExpanded, Converter={StaticResource BoolFalseToCollapsedConverter}}">
+                    <TextBox Text="{Binding Trade.Raw}" IsEnabled="True" IsReadOnly="True"
+                             TextWrapping="Wrap"
+                             VerticalScrollBarVisibility="Visible"
+                             HorizontalScrollBarVisibility="Visible" />
+                </Expander>
+            </Border>
+
+        </Grid>
+    </DataTemplate>
 
 </ResourceDictionary>

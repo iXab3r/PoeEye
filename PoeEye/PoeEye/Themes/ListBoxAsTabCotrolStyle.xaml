@@ -173,7 +173,7 @@
                     KeyboardNavigation.DirectionalNavigation="Contained"
                     KeyboardNavigation.TabIndex="2" KeyboardNavigation.TabNavigation="Local"
                     Margin="-1 0 0 0">
-              <Grid x:Name="PART_ItemsHolder" />
+              <Grid x:Name="PART_ItemsHolder" Visibility="Collapsed" /> <!-- Disabling item host -->
             </Border>
             <Grid Grid.Column="0" x:Name="HeaderContainerGrid">
               <Grid.RowDefinitions>

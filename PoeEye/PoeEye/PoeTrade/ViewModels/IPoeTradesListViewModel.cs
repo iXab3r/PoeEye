@@ -25,6 +25,8 @@ namespace PoeEye.PoeTrade.ViewModels
         TimeSpan TimeSinceLastUpdate { get; }
 
         ReadOnlyObservableCollection<IPoeTradeViewModel> Items { [NotNull] get; }
+        
+        string QuickFilter { get; set; }
 
         void Refresh();
 

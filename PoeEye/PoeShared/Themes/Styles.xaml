@@ -79,6 +79,7 @@
          BasedOn="{StaticResource MaterialDesignRaisedDarkButton}">
     <Setter Property="FontFamily" Value="{StaticResource FontAwesome}" />
     <Setter Property="FontSize" Value="14" />
+    <Setter Property="Height" Value="24" />
     <Setter Property="HorizontalContentAlignment" Value="Center" />
     <Setter Property="VerticalContentAlignment" Value="Center" />
     <Style.Triggers>

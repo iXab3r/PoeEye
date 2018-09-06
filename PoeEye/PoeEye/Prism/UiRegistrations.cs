@@ -46,10 +46,13 @@ namespace PoeEye.Prism
 
             Container
                 .RegisterType<IMainWindowViewModel, MainWindowViewModel>()
+                .RegisterType<IPoeAdvancedTradesListViewModel, PoeAdvancedTradesListViewModel>()
+                .RegisterType<IPoeSummaryTabViewModel, PoeSummaryTabViewModel>()
                 .RegisterType<IApplicationUpdaterModel, ApplicationUpdaterModel>()
                 .RegisterType<IPoeItemModsViewModel, PoeItemModsViewModel>()
                 .RegisterType<IPoeTradeViewModel, PoeTradeViewModel>()
                 .RegisterType<IMainWindowTabViewModel, MainWindowTabViewModel>()
+                .RegisterType<IPoeTradeQuickFilter, PoeTradeQuickFilter>()
                 .RegisterType<IPoeModViewModel, PoeModViewModel>()
                 .RegisterType<IPoeChatViewModel, PoeChatViewModel>()
                 .RegisterType<IPoeTradesListViewModel, PoeTradesListViewModel>()

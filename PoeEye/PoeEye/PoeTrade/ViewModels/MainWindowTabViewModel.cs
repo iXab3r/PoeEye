@@ -115,6 +115,8 @@ namespace PoeEye.PoeTrade.ViewModels
             this.WhenAnyValue(x => x.NewItemsCount)
                 .DistinctUntilChanged()
                 .Where(x => x > 0)
+                .WithPrevious((prev, curr) => new { prev, curr })
+                .Where(x => x.curr > x.prev)
                 .Where(x => audioNotificationSelector.SelectedValue != AudioNotificationType.Disabled)
                 .Where(x => !mainWindowTracker.IsActive)
                 .Subscribe(
@@ -214,6 +216,8 @@ namespace PoeEye.PoeTrade.ViewModels
                 Query.IsExpanded = true;
             }
 
+            TradesList.QuickFilter = config.QuickFilter;
+
             AudioNotificationSelector.SelectedValue = config.NotificationType;
             RenameTabTo(config.CustomTabName);
         }
@@ -228,7 +232,8 @@ namespace PoeEye.PoeTrade.ViewModels
                 QueryInfo = query == null ? new PoeQueryInfo() : query.PoeQueryBuilder(),
                 NotificationType = AudioNotificationSelector.SelectedValue,
                 ApiModuleId = ApiSelector.SelectedModule.Id.ToString(),
-                CustomTabName = tabName.HasValue ? tabName.Value : null
+                CustomTabName = tabName.HasValue ? tabName.Value : null,
+                QuickFilter = TradesList.QuickFilter
             };
         }
         
