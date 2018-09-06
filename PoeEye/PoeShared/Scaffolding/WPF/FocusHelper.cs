@@ -12,7 +12,7 @@ namespace PoeShared.Scaffolding.WPF
         public static readonly DependencyProperty IsFocusedProperty =
             DependencyProperty.RegisterAttached(
                 "IsFocused", typeof(bool), typeof(FocusHelper),
-                new UIPropertyMetadata(false, OnIsFocusedPropertyChanged));
+                new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.AffectsRender, OnIsFocusedPropertyChanged));
 
         public static bool GetIsFocused(DependencyObject obj)
         {
@@ -57,8 +57,12 @@ namespace PoeShared.Scaffolding.WPF
             {
                 return;
             }
+            
+            element.SetCurrentValue(IsFocusedProperty, false);
 
-            ApplyFocus(element);
+            if (!ApplyFocus(element))
+            {
+            }
             element.IsVisibleChanged += ElementOnIsVisibleChanged;
         }
 

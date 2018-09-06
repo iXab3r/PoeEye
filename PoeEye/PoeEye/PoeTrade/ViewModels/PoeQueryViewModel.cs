@@ -90,7 +90,7 @@ namespace PoeEye.PoeTrade.ViewModels
         private int? socketsMin;
         private int? socketsR;
         private int? socketsW;
-        private bool isQueryFocused;
+        private bool captureFocusOnFirstGet = true;
         
         private readonly ObservableCollectionExtended<string> leaguesList = new ObservableCollectionExtended<string>();
         private readonly ObservableCollectionExtended<IPoeCurrency> currencyList = new ObservableCollectionExtended<IPoeCurrency>();
@@ -139,13 +139,20 @@ namespace PoeEye.PoeTrade.ViewModels
             NameSuggestionProvider = suggestionProviderFactory.Create();
             NameSuggestionProvider.Items = poeDatabaseReader.KnownEntityNames;
 
-            IsQueryFocused = true;
         }
         
-        public bool IsQueryFocused
+        public bool CaptureFocus
         {
-            get { return isQueryFocused; }
-            set { this.RaiseAndSetIfChanged(ref isQueryFocused, value); }
+            get {
+                if (captureFocusOnFirstGet)
+                {
+                    //FIXME This hack was implemented to focus on QueryTextBox when new tab is created. Usual approach is not working due to TabControl virtualisation
+                    captureFocusOnFirstGet = false;
+                    return true;
+                }
+
+                return false;
+            }
         }
 
         public int? GemOrMapLevelMin
