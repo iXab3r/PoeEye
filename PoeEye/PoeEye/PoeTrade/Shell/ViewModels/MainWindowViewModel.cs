@@ -200,7 +200,7 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
         private void PasteTabCommandExecuted()
         {
             var content = clipboardManager.GetText();
-            var cfg = configSerializer.Deserialize<PoeEyeTabConfig>(content);
+            var cfg = configSerializer.Decompress<PoeEyeTabConfig>(content);
             CreateNewTabCommandExecuted(cfg);
         }
 
@@ -365,7 +365,7 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
             Log.Instance.Debug($"[MainWindowViewModel.CopyTabToClipboard] Copying tab {tab}...");
 
             var cfg = tab.Save();
-            var data = configSerializer.Serialize(cfg);
+            var data = configSerializer.Compress(cfg);
             clipboardManager.SetText(data);
         }
 

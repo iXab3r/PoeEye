@@ -89,39 +89,47 @@
 
                     <Expander Grid.Column="0" ExpandDirection="Right" IsExpanded="True" Background="{x:Null}" Margin="0">
                         <Expander.Header>
-                            <StackPanel Orientation="Horizontal"
-                                        VerticalAlignment="Top">
-                                <StackPanel.LayoutTransform>
+                            <DockPanel VerticalAlignment="Stretch">
+                                <DockPanel.LayoutTransform>
                                     <TransformGroup>
                                         <RotateTransform Angle="-90" />
                                     </TransformGroup>
-                                </StackPanel.LayoutTransform>
+                                </DockPanel.LayoutTransform>
 
                                 <!-- Items are upside-down -->
-
-                                <ContentControl eye:CommandWrapperHelper.Text="&#xF0E2; Undo close"
+                                
+                                <ContentControl DockPanel.Dock="Left"
+                                                eye:CommandWrapperHelper.Text="&#xF0E2; Undo close" 
                                                 ToolTip="CTRL+Z Undo close operation"
                                                 Content="{Binding UndoCloseTabCommand}" />
 
 
-                                <ContentControl eye:CommandWrapperHelper.Text="&#xF24D; Clone"
+                                <ContentControl DockPanel.Dock="Left"
+                                                eye:CommandWrapperHelper.Text="&#xF24D; Clone" 
                                                 eye:CommandWrapperHelper.CommandParameter="{Binding SelectedTab}"
                                                 ToolTip="CTRL+D Duplicate selected tab"
                                                 Content="{Binding DuplicateTabCommand}" />
 
-                                <ContentControl eye:CommandWrapperHelper.Text="&#xF0EA; Paste"
+                                <ContentControl DockPanel.Dock="Left"
+                                                eye:CommandWrapperHelper.Text="&#xF0EA; Paste" 
                                                 ToolTip="CTRL+V Paste tab"
 
                                                 Content="{Binding PasteTabCommand}" />
 
-                                <ContentControl eye:CommandWrapperHelper.Text="&#xF0C5; Copy"
+                                <ContentControl DockPanel.Dock="Left" 
+                                                eye:CommandWrapperHelper.Text="&#xF0C5; Copy" 
                                                 eye:CommandWrapperHelper.CommandParameter="{Binding SelectedTab}"
                                                 ToolTip="CTRL+C Duplicate selected tab"
                                                 Content="{Binding CopyTabToClipboardCommand}" />
 
-                                <Button
+                                <TextBlock DockPanel.Dock="Right"
+                                           FontSize="14" 
+                                           Text="QUERY LIST"
+                                           HorizontalAlignment="Right" />
+                                
+                                <Button DockPanel.Dock="Right"
                                     Width="24" Height="24"
-                                    HorizontalAlignment="Center"
+                                    HorizontalAlignment="Right"
                                     VerticalAlignment="Top"
                                     Command="{Binding RefreshAllTabsCommand}"
                                     Focusable="False"
@@ -140,11 +148,7 @@
                                         </Style>
                                     </Button.Style>
                                 </Button>
-
-                                <TextBlock FontSize="14"
-                                           Text="QUERY LIST"
-                                           HorizontalAlignment="Center" />
-                            </StackPanel>
+                            </DockPanel>
                         </Expander.Header>
 
                         <dragablz:TabablzControl Margin="0"

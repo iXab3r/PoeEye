@@ -282,6 +282,7 @@
     <Compile Include="Scaffolding\PoeItemExtensions.cs" />
     <Compile Include="Scaffolding\ReactiveObjectExtensions.cs" />
     <Compile Include="Scaffolding\StreamExtensions.cs" />
+    <Compile Include="Scaffolding\StringCompressor.cs" />
     <Compile Include="Scaffolding\WPF\AccessKeyScoper.cs" />
     <Compile Include="Scaffolding\WPF\CommandWrapper.cs" />
     <Compile Include="Scaffolding\WPF\CommandWrapperHelper.cs" />
