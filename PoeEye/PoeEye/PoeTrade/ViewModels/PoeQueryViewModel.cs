@@ -90,6 +90,7 @@ namespace PoeEye.PoeTrade.ViewModels
         private int? socketsMin;
         private int? socketsR;
         private int? socketsW;
+        private bool isQueryFocused;
         
         private readonly ObservableCollectionExtended<string> leaguesList = new ObservableCollectionExtended<string>();
         private readonly ObservableCollectionExtended<IPoeCurrency> currencyList = new ObservableCollectionExtended<IPoeCurrency>();
@@ -137,6 +138,14 @@ namespace PoeEye.PoeTrade.ViewModels
 
             NameSuggestionProvider = suggestionProviderFactory.Create();
             NameSuggestionProvider.Items = poeDatabaseReader.KnownEntityNames;
+
+            IsQueryFocused = true;
+        }
+        
+        public bool IsQueryFocused
+        {
+            get { return isQueryFocused; }
+            set { this.RaiseAndSetIfChanged(ref isQueryFocused, value); }
         }
 
         public int? GemOrMapLevelMin

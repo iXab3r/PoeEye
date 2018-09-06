@@ -25,7 +25,6 @@
           </DataTrigger>
         </Style.Triggers>
       </Style>
-
     </DataTemplate.Resources>
 
     <Grid Margin="0,3,0,3" Background="{x:Null}" IsHitTestVisible="True" ToolTipService.HorizontalOffset="10"

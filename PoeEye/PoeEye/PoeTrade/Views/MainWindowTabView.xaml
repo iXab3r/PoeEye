@@ -14,9 +14,9 @@
       <ScrollViewer VerticalScrollBarVisibility="Visible"
                     IsTabStop="False"
                     Focusable="False"
-                    Background="{x:Null}"
                     MaxHeight="{Binding ActualHeight, RelativeSource={RelativeSource FindAncestor, AncestorType=ContentPresenter}, Mode=OneWay}">
-        <Expander IsExpanded="{Binding Query.IsExpanded}" Margin="0">
+        <Expander IsExpanded="{Binding Query.IsExpanded}" Margin="0"
+                  Background="{x:Null}">
           <Expander.Header>
             <Grid Height="26">
               <Grid.ColumnDefinitions>

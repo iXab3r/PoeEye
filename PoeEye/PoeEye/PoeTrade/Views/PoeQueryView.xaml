@@ -86,6 +86,7 @@
                                      x:Name="QueryItemName"
                                      Style="{StaticResource AutoCompleteTextBoxStyleKey}"
                                      Provider="{Binding NameSuggestionProvider}"
+                                     eye:FocusHelper.IsFocused="{Binding IsQueryFocused}"
                                      Width="NaN"
                                      HorizontalContentAlignment="Left"
                                      Text="{Binding ItemName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"

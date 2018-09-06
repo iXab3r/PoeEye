@@ -13,6 +13,7 @@
                       xmlns:viewModels="clr-namespace:PoeEye.PoeTrade.ViewModels"
                       xmlns:fa="http://schemas.fontawesome.io/icons/"
                       xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+                      xmlns:eye="http://coderush.net/poeeye/"
                       mc:Ignorable="d"
                       Title="{Binding MainWindowTitle}"
                       MinWidth="1200"
@@ -149,9 +150,6 @@
                   <Setter Property="BorderBrush" Value="Transparent" />
                 </Style>
               </dragablz:TabablzControl.ItemContainerStyle>
-              <dragablz:TabablzControl.ContentTemplate>
-                <DataTemplate DataType="{x:Type viewModels:IMainWindowTabViewModel}" />
-              </dragablz:TabablzControl.ContentTemplate>
               <dragablz:TabablzControl.InputBindings>
                 <KeyBinding Key="F2" Command="{Binding SelectedTab.RenameCommand}" />
               </dragablz:TabablzControl.InputBindings>

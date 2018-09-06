@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
+using Xceed.Wpf.AvalonDock.Controls;
 
 namespace PoeShared.Scaffolding.WPF
 {
@@ -55,25 +58,37 @@ namespace PoeShared.Scaffolding.WPF
                 return;
             }
 
-            element.Loaded += ElementOnLoaded;
-            element.IsVisibleChanged += ElementOnIsVisibleChanged;
             ApplyFocus(element);
+            element.IsVisibleChanged += ElementOnIsVisibleChanged;
         }
 
-        private static void ApplyFocus(FrameworkElement element)
+        private static bool ApplyFocus(FrameworkElement element)
         {
-            if (!element.IsLoaded || !element.IsVisible)
+            element.Loaded -= ElementOnLoaded;
+
+            if (!element.Focusable)
             {
-                return;
+                var targetElement = element
+                    .FindVisualChildren<TextBox>()
+                    .FirstOrDefault(x => x.Focusable);
+                if (targetElement == null)
+                {
+                    throw new ApplicationException($"Failed to find viable focusable element, src element: {element}");
+                }
+                
+                return ApplyFocus(targetElement);
             }
-            if (element.IsFocused && element.IsKeyboardFocused)
+            
+            if (!element.IsLoaded || !element.IsVisible || !element.Focus())
             {
-                return;
+                element.Loaded += ElementOnLoaded;
+                
+                return false;
             }
 
-            element.Focus();
-            Keyboard.Focus(element);
+            return element.IsFocused;
         }
+        
         private static void ElementOnIsVisibleChanged(object sender, DependencyPropertyChangedEventArgs dependencyPropertyChangedEventArgs)
         {
             var element = sender as FrameworkElement;
@@ -99,7 +114,6 @@ namespace PoeShared.Scaffolding.WPF
             {
                 return;
             }
-            element.Loaded -= ElementOnLoaded;
             ApplyFocus(element);
         }
     }
