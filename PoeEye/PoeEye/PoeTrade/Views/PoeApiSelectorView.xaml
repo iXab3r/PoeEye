@@ -11,8 +11,12 @@
     
     <DataTemplate DataType="{x:Type viewModels:PoeApiSelectorViewModel}">
     <ComboBox ItemsSource="{Binding ModulesList}" 
+              Style="{StaticResource MaterialDesignComboBox}"
               SelectedItem="{Binding SelectedModule, TargetNullValue='No available API modules'}" 
               IsEnabled="{Binding ModulesList.IsEmpty, Converter={StaticResource NotConverter}}"
+              VerticalContentAlignment="Center"
+              VerticalAlignment="Stretch"
+              Padding="0"
               IsEditable="False">
         <ComboBox.ItemTemplate>
             <DataTemplate DataType="{x:Type poeTrade:IPoeApiWrapper}">

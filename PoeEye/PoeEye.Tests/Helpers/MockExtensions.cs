@@ -15,10 +15,8 @@
         {
             Assert.IsInstanceOf<MemberExpression>(expr.Body);
 
-            var memberExpression = (MemberExpression) expr.Body;
-            var propertyName = memberExpression.Member.Name;
             mock.SetupGet(expr).Returns(value);
-            mock.Raise(x => x.PropertyChanged += null, new PropertyChangedEventArgs(propertyName));
+            RaisePropertyChanged(mock, expr);
         }
 
         public static void RaisePropertyChanged<T, TProperty>(this Mock<T> mock, Expression<Func<T, TProperty>> expr)

@@ -2,8 +2,10 @@
 {
     using System.ComponentModel;
 
-    public sealed class SortDescriptionData
+    public struct SortDescriptionData
     {
+        public static readonly SortDescriptionData Empty = new SortDescriptionData();
+
         public SortDescriptionData(string propertyName, ListSortDirection direction)
         {
             PropertyName = propertyName;
@@ -14,14 +16,11 @@
 
         public ListSortDirection Direction { get; }
 
-        public SortDescription ToSortDescription()
-        {
-            return new SortDescription(PropertyName, Direction);
-        }
+        public bool IsEmpty => string.IsNullOrWhiteSpace(PropertyName);
 
         public override string ToString()
         {
-            return $"{PropertyName} { GetDirectionDescription() }";
+            return $"{PropertyName} {GetDirectionDescription()}";
         }
 
         private string GetDirectionDescription()
