@@ -60,7 +60,7 @@ namespace PoeEye.PoeTrade.ViewModels
                 CurrencyTest = new CurrencyTestViewModel();
             }
             
-            GetEconomicsCommand = new CommandWrapper(
+            GetEconomicsCommand = CommandWrapper.Create(
                 ReactiveCommand.CreateFromTask(RefreshCurrencyList, this.WhenAnyValue(x => x.LeagueId).Select(leagueId => !string.IsNullOrEmpty(leagueId)), outputScheduler: uiScheduler));
         }
 

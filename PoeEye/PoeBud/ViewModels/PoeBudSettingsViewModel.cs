@@ -60,7 +60,7 @@ namespace PoeBud.ViewModels
             this.poeClientFactory = poeClientFactory;
             this.overlaysProvider = overlaysProvider;
             
-            LoginCommand = new CommandWrapper(
+            LoginCommand = CommandWrapper.Create(
                 ReactiveCommand.CreateFromTask<object>(x => LoginCommandExecuted(x), null, uiScheduler));
 
             HotkeysList = KeyGestureExtensions.GetHotkeyList();

@@ -118,19 +118,19 @@ namespace PoeBud.ViewModels
                 .ToProperty(this, x => x.LastUpdateException, out lastUpdateException, null, false, uiScheduler)
                 .AddTo(Anchors);
             
-            WithdrawChaosSetCommand = new CommandWrapper(
+            WithdrawChaosSetCommand = CommandWrapper.Create(
                 ReactiveCommand.CreateFromTask(() => ExecuteSolutionOrFail(() => Stash.ChaosSetSolutions.FirstOrDefault(), () => "Failed to withdraw ChaosSet, not enough items ?")));
-            WithdrawCurrencyCommand = new CommandWrapper(
+            WithdrawCurrencyCommand = CommandWrapper.Create(
                 ReactiveCommand.CreateFromTask(() => ExecuteSolutionOrFail(() => Stash.CurrencySolutions.FirstOrDefault(), () => "Failed to withdraw Currency")));
-            WithdrawDivinationCardsCommand = new CommandWrapper(
+            WithdrawDivinationCardsCommand = CommandWrapper.Create(
                 ReactiveCommand.CreateFromTask(() => ExecuteSolutionOrFail(() => Stash.DivinationCardsSolutions.FirstOrDefault(), () => "Failed to withdraw Divination Cards")));
-            WithdrawMapsCommand = new CommandWrapper(
+            WithdrawMapsCommand = CommandWrapper.Create(
                 ReactiveCommand.CreateFromTask(() => ExecuteSolutionOrFail(() => Stash.MapsSolutions.FirstOrDefault(), () => "Failed to withdraw Maps")));
-            WithdrawMiscCommand = new CommandWrapper(
+            WithdrawMiscCommand = CommandWrapper.Create(
                 ReactiveCommand.CreateFromTask(() => ExecuteSolutionOrFail(() => Stash.MiscellaneousItemsSolutions.FirstOrDefault(), () => "Failed to withdraw miscellaneous items")));
-            WithdrawSellablesCommand = new CommandWrapper(
+            WithdrawSellablesCommand = CommandWrapper.Create(
                 ReactiveCommand.CreateFromTask(() => ExecuteSolutionOrFail(() => Stash.SellableSolutions.FirstOrDefault(), () => "Failed to withdraw sellables (six-socket, chrome, etc)")));
-            ForceRefreshCommand = new CommandWrapper(
+            ForceRefreshCommand = CommandWrapper.Create(
                 ReactiveCommand.Create(ForceRefreshStashCommandExecuted));
         }
 

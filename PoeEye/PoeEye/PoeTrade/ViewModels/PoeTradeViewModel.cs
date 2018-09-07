@@ -114,7 +114,7 @@ namespace PoeEye.PoeTrade.ViewModels
             var priceInChaos = poePriceCalculcator.GetEquivalentInChaosOrbs(price);
             PriceInChaosOrbs = priceInChaos;
 
-            CopyItemToClipboardCommand = new CommandWrapper(ReactiveCommand.CreateFromTask(
+            CopyItemToClipboardCommand = CommandWrapper.Create(ReactiveCommand.CreateFromTask(
                 async () =>
                 {
                     var item = itemSerializer.Serialize(Trade);

@@ -18,8 +18,9 @@ namespace PoeShared.Scaffolding.WPF
         private string description;
 
         private readonly ISubject<Unit> raiseCanExecuteChangedRequests = new Subject<Unit>();
+        private readonly ISubject<bool> isExecuting = new Subject<bool>();
 
-        public CommandWrapper(ReactiveCommand command)
+        private CommandWrapper(ReactiveCommand command)
         {
             this.command = command;
 
@@ -34,8 +35,15 @@ namespace PoeShared.Scaffolding.WPF
         private CommandWrapper(DelegateCommandBase command)
         {
             this.command = command;
+            
+            isBusy = Observable.FromEventPattern<EventHandler, EventArgs>(x => command.IsActiveChanged += x, x => command.IsActiveChanged -= x)
+                .Select(x => command.IsActive)
+                .ToProperty(this, x => x.IsBusy);
 
-            isBusy = Observable.Return(false).ToProperty(this, x => x.IsBusy);
+            isExecuting
+                .Subscribe(x => command.IsActive = x)
+                .AddTo(Anchors);
+            
             raiseCanExecuteChangedRequests
                 .Subscribe(() => command.RaiseCanExecuteChanged())
                 .AddTo(Anchors);
@@ -102,11 +110,16 @@ namespace PoeShared.Scaffolding.WPF
             Error = null;
             try
             {
+                isExecuting.OnNext(true);
                 command.Execute(parameter);
             }
             catch (Exception ex)
             {
                 HandleException(ex);
+            }
+            finally
+            {
+                isExecuting.OnNext(false);
             }
         }
 
