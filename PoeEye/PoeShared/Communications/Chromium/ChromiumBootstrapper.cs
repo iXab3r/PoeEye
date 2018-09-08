@@ -11,8 +11,6 @@ namespace PoeShared.Communications.Chromium
 {
     internal sealed class ChromiumBootstrapper : DisposableReactiveObject, IChromiumBootstrapper
     {
-        private readonly IChromiumBrowserFactory browserFactory;
-        
         private readonly string architectureSpecificDirectoryPath;
         
         public ChromiumBootstrapper(
@@ -25,11 +23,10 @@ namespace PoeShared.Communications.Chromium
             AppDomain.CurrentDomain.AssemblyResolve += CurrentDomainOnAssemblyResolve;
             Disposable.Create(() =>
             {
-                Log.Instance.Debug("[ChromiumBootstrapper] Uninitializing assembly loader...");
+                Log.Instance.Debug("[ChromiumBootstrapper] Uninitialized assembly loader...");
                 AppDomain.CurrentDomain.AssemblyResolve -= CurrentDomainOnAssemblyResolve;
 
             }).AddTo(Anchors);
-            browserFactory = bootstrapperFactory.Create().AddTo(Anchors);
         }
 
         private Assembly CurrentDomainOnAssemblyResolve(object sender, ResolveEventArgs args)
@@ -49,11 +46,6 @@ namespace PoeShared.Communications.Chromium
             }
 
             return Assembly.LoadFile(libraryPath);
-        }
-        
-        public IChromiumBrowser CreateBrowser()
-        {
-            return browserFactory.CreateBrowser();
         }
     }
 }

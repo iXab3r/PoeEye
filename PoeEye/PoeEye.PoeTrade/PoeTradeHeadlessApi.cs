@@ -36,7 +36,7 @@ namespace PoeEye.PoeTrade
 
         private readonly SemaphoreSlim requestsSemaphore;
 
-        private readonly IChromiumBootstrapper httpClientFactory;
+        private readonly IChromiumBrowserFactory httpClientFactory;
 
         private readonly IPoeTradeParser poeTradeParser;
         private readonly IProxyProvider proxyProvider;
@@ -48,7 +48,7 @@ namespace PoeEye.PoeTrade
         public PoeTradeHeadlessApi(
             IPoeTradeParser poeTradeParser,
             IProxyProvider proxyProvider,
-            IChromiumBootstrapper httpClientFactory,
+            IChromiumBrowserFactory httpClientFactory,
             IConverter<IPoeQueryInfo, IPoeQuery> queryInfoToQueryConverter,
             IConverter<IPoeQuery, NameValueCollection> queryConverter,
             IConfigProvider<PoeTradeConfig> configProvider)

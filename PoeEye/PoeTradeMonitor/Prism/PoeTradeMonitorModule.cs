@@ -3,11 +3,8 @@ using Guards;
 using JetBrains.Annotations;
 using Microsoft.Practices.Unity;
 using PoeEye.TradeMonitor.Modularity;
-using PoeEye.TradeMonitor.Services;
 using PoeEye.TradeMonitor.ViewModels;
 using PoeShared.Modularity;
-using PoeShared.Native;
-using PoeShared.Prism;
 using PoeShared.Scaffolding;
 
 namespace PoeEye.TradeMonitor.Prism
@@ -31,7 +28,6 @@ namespace PoeEye.TradeMonitor.Prism
             registrator.RegisterSettingsEditor<PoeTradeMonitorConfig, PoeTradeMonitorSettingsViewModel>();
 
             container.Resolve<TradeMonitorBootstrapper>().AddTo(anchors);
-            container.Resolve<ControlPanelBootstrapper>().AddTo(anchors);
         }
     }
 }

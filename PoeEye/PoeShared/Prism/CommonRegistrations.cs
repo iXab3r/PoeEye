@@ -41,6 +41,7 @@ namespace PoeShared.Prism
             Container
                 .RegisterSingleton<IClock, Clock>()
                 .RegisterSingleton<IPoeEyeModulesRegistrator, PoeEyeModulesRegistrator>()
+                .RegisterSingleton(typeof(IConfigProvider<>), typeof(GenericConfigProvider<>))
                 .RegisterSingleton<IPoeEyeModulesEnumerator, PoeEyeModulesRegistrator>()
                 .RegisterSingleton<IEqualityComparer<IPoeItem>, PoeItemEqualityComparer>()
                 .RegisterSingleton<IConverter<NameValueCollection, string>, NameValueCollectionToQueryStringConverter>()

@@ -1,35 +1,24 @@
 ﻿using System;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive.Concurrency;
-using System.Reactive.Disposables;
-using System.Reactive.Linq;
 using System.Windows;
 using System.Windows.Input;
-using Anotar.Log4Net;
-using DynamicData;
 using Guards;
 using JetBrains.Annotations;
 using Microsoft.Practices.Unity;
-using PoeEye.StashGrid.ViewModels;
-using PoeEye.TradeMonitor.Models;
-using PoeEye.TradeMonitor.Modularity;
-using PoeEye.TradeMonitor.Services;
-using PoeShared;
 using PoeShared.Modularity;
 using PoeShared.Native;
+using PoeShared.PoeControlPanel.Modularity;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
 using Prism.Commands;
-using ReactiveUI;
 
-namespace PoeEye.TradeMonitor.ViewModels
+namespace PoeShared.PoeControlPanel.ViewModels
 {
     internal sealed class PoeControlPanelViewModel : OverlayViewModelBase
     {
         private readonly IOverlayWindowController controller;
         private readonly IConfigProvider<PoeControlPanelConfig> configProvider;
-        private float opacity;
 
         public PoeControlPanelViewModel(
             [NotNull] IOverlayWindowController controller,
@@ -67,32 +56,11 @@ namespace PoeEye.TradeMonitor.ViewModels
                 .AddTo(Anchors);
         }
 
-        public float Opacity
-        {
-            get => opacity;
-            set => this.RaiseAndSetIfChanged(ref opacity, value);
-        }
-
         public ICommand UnlockAllWindowsCommand { get; }
 
         private void ApplyConfig(PoeControlPanelConfig config)
         {
-            if (config.OverlayOpacity <= 0.01)
-            {
-                IsLocked = false;
-                config.OverlayOpacity = 1;
-            }
-
-            Opacity = config.OverlayOpacity;
-
-            if (config.OverlayLocation.X <= 1 && config.OverlayLocation.Y <= 1)
-            {
-                IsLocked = false;
-                config.OverlayLocation = new Point(Width / 2, Height / 2);
-            }
-
-            Left = config.OverlayLocation.X;
-            Top = config.OverlayLocation.Y;
+            base.ApplyConfig(config);
         }
 
         protected override void LockWindowCommandExecuted()
@@ -100,29 +68,14 @@ namespace PoeEye.TradeMonitor.ViewModels
             base.LockWindowCommandExecuted();
             
             var config = configProvider.ActualConfig;
-            config.OverlayLocation = new Point(Left, Top);
-            config.OverlayOpacity = Opacity;
+            base.SavePropertiesToConfig(config);
             configProvider.Save(config);
         }
 
         private void UnlockAllWindowsCommandExecuted()
         {
-            //FIXME: These types should be provided via interface
-            var knownTypes = new[]
-                {
-                    typeof(IPoeStashGridViewModel),
-                }.Concat(this.controller.GetChilds().Where(x => x.IsUnlockable).Select(x => x.GetType()))
-                .Distinct();
-
-            foreach (var overlayViewModel in controller.GetChilds())
+            foreach (var overlayViewModel in controller.GetChilds().Where(x => x.IsUnlockable))
             {
-                if (
-                    !knownTypes.Contains(overlayViewModel.GetType()) &&
-                    !knownTypes.Any(x => x.IsAssignableFrom(overlayViewModel.GetType())))
-                {
-                    continue;
-                }
-
                 overlayViewModel.IsLocked = false;
             }
         }

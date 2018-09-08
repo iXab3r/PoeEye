@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Reactive;
 using System.Reactive.Subjects;
+using System.Runtime.InteropServices;
+using System.Security.Policy;
 using System.Windows;
 using System.Windows.Input;
 using Guards;
@@ -40,6 +42,7 @@ namespace PoeShared.Native
         protected OverlayViewModelBase()
         {
             LockWindowCommand = new DelegateCommand(LockWindowCommandExecuted, LockWindowCommandCanExecute);
+            UnlockWindowCommand = new DelegateCommand(UnlockWindowCommandExecuted, UnlockWindowCommandCanExecute);
             Title = this.GetType().ToString();
         }
 
@@ -145,9 +148,14 @@ namespace PoeShared.Native
 
         public ICommand LockWindowCommand { get; }
         
+        public ICommand UnlockWindowCommand { get; }
+        
         protected void ApplyConfig(IOverlayConfig config)
         {
-            if (config.OverlaySize.Height <= 0 || config.OverlaySize.Width <= 0)
+            if (config.OverlaySize.Height <= 0 || 
+                config.OverlaySize.Width <= 0 || 
+                double.IsNaN(config.OverlaySize.Height) ||
+                double.IsNaN(config.OverlaySize.Width))
             {
                 IsLocked = false;
                 config.OverlaySize = MinSize;
@@ -155,10 +163,14 @@ namespace PoeShared.Native
             Width = config.OverlaySize.Width;
             Height = config.OverlaySize.Height;
 
-            if (config.OverlayLocation.X <= 1 || config.OverlayLocation.Y <= 1)
+            if (config.OverlayLocation.X <= 1 || 
+                config.OverlayLocation.Y <= 1 ||
+                double.IsNaN(config.OverlayLocation.X) ||
+                double.IsNaN(config.OverlayLocation.Y))
             {
                 IsLocked = false;
-                config.OverlayLocation = new Point(Width / 2, Height / 2);
+                var size = NativeMethods.GetPrimaryScreenSize();
+                config.OverlayLocation = new Point(size.Width / 2, size.Height / 2);
             }
             Left = config.OverlayLocation.X;
             Top = config.OverlayLocation.Y;
@@ -177,6 +189,17 @@ namespace PoeShared.Native
             config.OverlaySize = new Size(Width, Height);
             config.OverlayOpacity = Opacity;
         }
+        
+        protected virtual void UnlockWindowCommandExecuted()
+        {
+            IsLocked = false;
+        }
+        
+        
+        protected virtual bool UnlockWindowCommandCanExecute()
+        {
+            return true;
+        }
 
         protected virtual void LockWindowCommandExecuted()
         {
@@ -187,6 +210,20 @@ namespace PoeShared.Native
         protected virtual bool LockWindowCommandCanExecute()
         {
             return true;
+        }
+
+        internal static class NativeMethods
+        {
+            [DllImport("user32.dll",EntryPoint="GetDC")]
+            static extern IntPtr GetDC(IntPtr ptr);
+            
+            public static Size GetPrimaryScreenSize()
+            {
+                var graphics = System.Drawing.Graphics.FromHdc(GetDC(IntPtr.Zero));
+                return new Size(
+                    System.Windows.Forms.SystemInformation.PrimaryMonitorSize.Width / graphics.DpiX,
+                    System.Windows.Forms.SystemInformation.PrimaryMonitorSize.Height / graphics.DpiY);
+            }
         }
     }
 }

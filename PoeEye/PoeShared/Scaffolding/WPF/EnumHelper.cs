@@ -17,8 +17,8 @@ namespace PoeShared.Scaffolding.WPF
                         .GetMember(value.ToString())[0]
                         .GetCustomAttributes(true)
                         .OfType<DescriptionAttribute>()
-                        .First()
-                        .Description
+                        .FirstOrDefault()?
+                        .Description ?? value.ToString()
                 };
             return valuesAndDescriptions.ToArray();
         }

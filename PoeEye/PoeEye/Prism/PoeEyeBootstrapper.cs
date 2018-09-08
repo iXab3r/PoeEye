@@ -48,22 +48,13 @@ namespace PoeEye.Prism
             Log.Instance.Info($"[Bootstrapper] Initializing shell...");
             var sw = Stopwatch.StartNew();
             
-            var moduleCatalog = Container.Resolve<IModuleCatalog>();
-            var modules = moduleCatalog.Modules.ToArray();
-            Log.Instance.Info($"Modules list:\n{modules.Select(x => new { x.ModuleName, x.ModuleType, x.State, x.InitializationMode, x.DependsOn }).DumpToTextRaw()}");
-            
-            RegisterExtensions();
-            InitializeConfigConverters();
-
             Mouse.OverrideCursor = new Cursor(new MemoryStream(Properties.Resources.PathOfExile_102));
             var splashWindow = new SplashScreen("Resources\\Splash.png");
             splashWindow.Show(true, false);
             
             var window = (Window)Shell;
+            Application.Current.ShutdownMode = ShutdownMode.OnMainWindowClose;
             Application.Current.MainWindow = window;
-            
-            Log.Instance.Info($"Initializing Chromium...");
-            var chromium = Container.Resolve<IChromiumBootstrapper>();
 
             Observable
                 .FromEventPattern<RoutedEventHandler, RoutedEventArgs>(h => window.Loaded += h, h => window.Loaded -= h)
@@ -84,35 +75,16 @@ namespace PoeEye.Prism
         public override void Run(bool runWithDefaultConfiguration)
         {
             base.Run(runWithDefaultConfiguration);
+            
+            var moduleCatalog = Container.Resolve<IModuleCatalog>();
+            var modules = moduleCatalog.Modules.ToArray();
+            Log.Instance.Info($"Modules list:\n{modules.Select(x => new { x.ModuleName, x.ModuleType, x.State, x.InitializationMode, x.DependsOn }).DumpToTextRaw()}");
 
             var window = (Window)Shell;
             
             var viewModel = Container.Resolve<IMainWindowViewModel>();
             window.DataContext = viewModel;
             window.Show();
-        }
-
-        private void InitializeConfigConverters()
-        {
-            var configProvider = Container.TryResolve<IConfigSerializer>();
-            var converters = new JsonConverter[]
-            {
-                new ConcreteTypeConverter<IPoeQueryInfo, PoeQueryInfo>(),
-                new ConcreteTypeConverter<IPoeItemType, PoeItemType>(),
-                new ConcreteTypeConverter<IPoeItem, PoeItem>(),
-                new ConcreteTypeConverter<IPoeItemMod, PoeItemMod>(),
-                new ConcreteTypeConverter<IPoeLinksInfo, PoeLinksInfo>(),
-                new ConcreteTypeConverter<IPoeQueryModsGroup, PoeQueryModsGroup>(),
-                new ConcreteTypeConverter<IPoeQueryRangeModArgument, PoeQueryRangeModArgument>()
-            };
-            converters.ForEach(configProvider.RegisterConverter);
-        }
-
-        private void RegisterExtensions()
-        {
-            Log.Instance.Debug("Initializing DI container...");
-            Container.AddExtension(new CommonRegistrations());
-            Container.AddExtension(new UiRegistrations());
         }
 
         public void Dispose()

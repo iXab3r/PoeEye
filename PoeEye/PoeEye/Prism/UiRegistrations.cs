@@ -23,10 +23,6 @@ namespace PoeEye.Prism
     using PoeTrade.Models;
     using PoeTrade.ViewModels;
 
-    using Properties;
-
-    using ReactiveUI;
-
     using WpfAutoCompleteControls.Editors;
     using IPoeEyeMainConfigProvider = IConfigProvider<PoeEyeMainConfig>;
 
@@ -38,14 +34,13 @@ namespace PoeEye.Prism
                 .RegisterSingleton<IPoePriceCalculcator, PoePriceCalculcator>()
                 .RegisterSingleton<IWhispersNotificationManager, WhispersNotificationManager>()
                 .RegisterSingleton(typeof(IPoeEyeMainConfigProvider), typeof(GenericConfigProvider<PoeEyeMainConfig>))
-                .RegisterSingleton(typeof(IConfigProvider<>), typeof(GenericConfigProvider<>))
                 .RegisterSingleton<IConfigProvider, PoeEyeConfigProviderFromFile>()
                 .RegisterSingleton<IPoeCaptchaRegistrator, PoeCaptchaRegistrator>()
                 .RegisterSingleton<IPoeApiProvider, PoeApiProvider>()
-                .RegisterSingleton<IPoeItemViewModelFactory, PoeItemViewModelFactory>();
+                .RegisterSingleton<IPoeItemViewModelFactory, PoeItemViewModelFactory>()
+                .RegisterSingleton<IMainWindowViewModel, MainWindowViewModel>();
 
             Container
-                .RegisterType<IMainWindowViewModel, MainWindowViewModel>()
                 .RegisterType<IPoeAdvancedTradesListViewModel, PoeAdvancedTradesListViewModel>()
                 .RegisterType<IPoeSummaryTabViewModel, PoeSummaryTabViewModel>()
                 .RegisterType<IApplicationUpdaterModel, ApplicationUpdaterModel>()

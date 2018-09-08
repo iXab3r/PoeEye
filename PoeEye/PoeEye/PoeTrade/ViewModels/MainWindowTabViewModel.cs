@@ -320,7 +320,6 @@ namespace PoeEye.PoeTrade.ViewModels
                 .AddTo(anchors);
 
             Observable.Merge(
-                    tradesList.Items.ToObservableChangeSet().ToUnit(),
                     tradesList.Items.ToObservableChangeSet().WhenPropertyChanged(x => x.TradeState).ToUnit()
                 )
                 .StartWith(Unit.Default)

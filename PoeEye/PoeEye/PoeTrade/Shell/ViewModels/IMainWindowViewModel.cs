@@ -1,8 +1,12 @@
 ﻿using System;
+using System.Collections.ObjectModel;
+using JetBrains.Annotations;
+using PoeEye.PoeTrade.ViewModels;
 
 namespace PoeEye.PoeTrade.Shell.ViewModels
 {
-    public interface IMainWindowViewModel : IDisposable
+    internal interface IMainWindowViewModel : IDisposable
     {
+        ReadOnlyObservableCollection<IMainWindowTabViewModel> TabsList { [NotNull] get; }
     }
 }

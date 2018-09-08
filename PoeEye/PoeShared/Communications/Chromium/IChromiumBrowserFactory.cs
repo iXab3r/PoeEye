@@ -2,7 +2,7 @@
 using JetBrains.Annotations;
 
 namespace PoeShared.Communications.Chromium {
-    internal interface IChromiumBrowserFactory : IDisposable
+    public interface IChromiumBrowserFactory : IDisposable
     {
         [NotNull] 
         IChromiumBrowser CreateBrowser();

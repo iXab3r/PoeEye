@@ -22,5 +22,7 @@
         <ResourceDictionary Source="pack://application:,,,/PoeShared;component/UI/Views/CurrencyTestView.xaml" />
         <ResourceDictionary Source="pack://application:,,,/PoeShared;component/UI/Views/ImageView.xaml" />
         <ResourceDictionary Source="pack://application:,,,/PoeShared;component/UI/Views/AudioNotificationTypeSelectorView.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/PoeShared;component/PoeControlPanel/Views/PoeControlPanelVIew.xaml" />
+
     </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>

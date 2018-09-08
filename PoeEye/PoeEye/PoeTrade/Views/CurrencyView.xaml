@@ -23,6 +23,24 @@
                  Text="{Binding CurrencyType}" FontSize="13" Margin="1,0,0,0" />
     </Grid>
   </DataTemplate>
+  
+  <DataTemplate x:Key="PoePriceCompactViewTemplateKey" DataType="{x:Type common:PoePrice}">
+    <Grid VerticalAlignment="Center" Margin="5,0">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="Auto"/>
+        <ColumnDefinition Width="Auto"/>
+      </Grid.ColumnDefinitions>
+      <Image Grid.Column="0"
+             Width="20" Height="20" 
+             Source="{Binding CurrencyType, Converter={StaticResource PriceToImageUriConverter}}"
+             Visibility="{Binding Source, RelativeSource={RelativeSource Self}, Converter={StaticResource NullToCollapsedConverter}}"/>
+      <TextBlock Grid.Column="1"
+                 TextTrimming="CharacterEllipsis"
+                 VerticalAlignment="Center"
+                 Visibility="{Binding HasValue, Converter={StaticResource TrueToVisibleFalseToCollapsedConverter}}"
+                 Text="{Binding Value}" FontSize="13" Margin="1,0,0,0" />
+    </Grid>
+  </DataTemplate>
 
   <DataTemplate DataType="{x:Type common:PoePrice}">
     <ContentControl Content="{Binding}" ContentTemplate="{StaticResource CurrencyViewKey}" />

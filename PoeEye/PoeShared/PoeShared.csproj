@@ -91,6 +91,10 @@
       <HintPath>..\packages\JsonFx.2.0.1209.2802\lib\net40\JsonFx.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="KellermanSoftware.Compare-NET-Objects, Version=3.6.0.0, Culture=neutral, PublicKeyToken=d970ace04cc85217">
+      <HintPath>..\packages\CompareNETObjects.3.06.0.0\lib\net452\KellermanSoftware.Compare-NET-Objects.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Kent.Boogaart.Converters, Version=1.3.1.0, Culture=neutral, PublicKeyToken=cc96fa93a217f7a1, processorArchitecture=MSIL">
       <HintPath>..\packages\Kent.Boogaart.Converters.1.3.1\lib\net45\Kent.Boogaart.Converters.dll</HintPath>
       <Private>True</Private>
@@ -260,18 +264,25 @@
     <Compile Include="Converters\ObjectToTypeConverter.cs" />
     <Compile Include="Converters\PoeStashItemToPoeItem.cs" />
     <Compile Include="Converters\SafeDataConverter.cs" />
+    <Compile Include="Modularity\GenericConfigProvider.cs" />
     <Compile Include="Modularity\IConfigSerializer.cs" />
     <Compile Include="Modularity\ISchedulerProvider.cs" />
     <Compile Include="Modularity\JsonConfigSerializer.cs" />
+    <Compile Include="Modularity\PoeEyeConfigProviderInMemory.cs" />
     <Compile Include="Modularity\SchedulerProvider.cs" />
     <Compile Include="Native\IActivationController.cs" />
     <Compile Include="Native\IKeyboardEventsSource.cs" />
     <Compile Include="Native\IOverlayConfig.cs" />
     <Compile Include="Native\SafeKeyboardMouseEvents.cs" />
+    <Compile Include="PoeControlPanel\Modularity\PoeControlPanelConfig.cs" />
+    <Compile Include="PoeControlPanel\Modularity\PoeControlPanelModule.cs" />
+    <Compile Include="PoeControlPanel\Prism\ControlPanelBootstrapper.cs" />
+    <Compile Include="PoeControlPanel\ViewModels\PoeControlPanelViewModel.cs" />
     <Compile Include="PoeDatabase\IPoeEconomicsSource.cs" />
     <Compile Include="PoeTrade\IPoeItemViewModelFactory.cs" />
     <Compile Include="PoeTrade\IPoePriceCalculcator.cs" />
     <Compile Include="PoeTrade\IPoeStaticDataSource.cs" />
+    <Compile Include="Prism\PoeSharedModule.cs" />
     <Compile Include="Scaffolding\ChangeSetExtensions.cs" />
     <Compile Include="Scaffolding\CircularBuffer.cs" />
     <Compile Include="Scaffolding\ClipboardManager.cs" />
@@ -289,6 +300,7 @@
     <Compile Include="Scaffolding\WPF\EnableDragHelper.cs" />
     <Compile Include="Scaffolding\WPF\InputBindingsManager.cs" />
     <Compile Include="Scaffolding\WPF\MappingTemplateSelector.cs" />
+    <Compile Include="Scaffolding\WPF\StackPanelEx.cs" />
     <Compile Include="StashApi\DataTypes\PoeItemRarityWrapper.cs" />
     <Compile Include="StashApi\DataTypes\StashItemAdditionalProperty.cs" />
     <Compile Include="StashApi\DataTypes\Character.cs" />
@@ -451,6 +463,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="AppReadme\Compare-NET-Objects-Help.chm" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -466,11 +479,16 @@
     <EmbeddedResource Include="Resources\Notifications\keyboard.wav" />
     <EmbeddedResource Include="Resources\Notifications\dingdong.wav" />
     <EmbeddedResource Include="Resources\Notifications\bell.wav" />
+    <Resource Include="Resources\mainIcon.png" />
     <Resource Include="Resources\mouse-device-left-click-control.png" />
     <Resource Include="Resources\mouse-device-right-click-control.png" />
     <EmbeddedResource Include="PoeDatabase\PoeTradeUniques.lst" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="PoeControlPanel\Views\PoeControlPanelVIew.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Themes\CommandWrapperView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -525,6 +543,7 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="PoeControlPanel\Models" />
     <Folder Include="Scaffolding\WPF\Behaviors\" />
     <Folder Include="StashApi\ProcurementLegacy\Runners\" />
   </ItemGroup>

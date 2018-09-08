@@ -15,6 +15,8 @@ namespace PoeEye.PoeTrade.ViewModels
         
         ReadOnlyObservableCollection<IPoeTradeViewModel> Items { get; }
         
+        int MaxItems { get; set; }
+        
         void ResetSorting();
         
         void Filter(IObservable<Predicate<IPoeTradeViewModel>> conditionSource);

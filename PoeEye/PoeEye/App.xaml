@@ -52,6 +52,8 @@
                 <ResourceDictionary Source="PoeTrade/Views/MainWindowTabItemView.xaml" />
                 <ResourceDictionary Source="PoeTrade/Views/MainWindowTabView.xaml" />
                 <ResourceDictionary Source="PoeTrade/Views/PoeQueryView.xaml" />
+                
+                <ResourceDictionary Source="TradeSummaryOverlay/Views/PoeTradeSummaryView.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

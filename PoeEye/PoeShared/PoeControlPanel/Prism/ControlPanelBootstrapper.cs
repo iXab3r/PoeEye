@@ -5,14 +5,14 @@ using System.Reactive.Linq;
 using Guards;
 using JetBrains.Annotations;
 using Microsoft.Practices.Unity;
-using PoeEye.TradeMonitor.Modularity;
-using PoeEye.TradeMonitor.ViewModels;
 using PoeShared.Modularity;
 using PoeShared.Native;
+using PoeShared.PoeControlPanel.Modularity;
+using PoeShared.PoeControlPanel.ViewModels;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
 
-namespace PoeEye.TradeMonitor.Prism
+namespace PoeShared.PoeControlPanel.Prism
 {
     internal sealed class ControlPanelBootstrapper : DisposableReactiveObject
     {
@@ -22,7 +22,7 @@ namespace PoeEye.TradeMonitor.Prism
         private readonly SerialDisposable activeAnchors = new SerialDisposable();
 
         public ControlPanelBootstrapper(
-                [NotNull] IConfigProvider<PoeTradeMonitorConfig> configProvider,
+                [NotNull] IConfigProvider<PoeControlPanelConfig> configProvider,
                 [NotNull] [Dependency(WellKnownOverlays.PathOfExileOverlay)] IOverlayWindowController overlayController,
                 [NotNull] IFactory<PoeControlPanelViewModel, IOverlayWindowController> viewModelFactory,
                 [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)

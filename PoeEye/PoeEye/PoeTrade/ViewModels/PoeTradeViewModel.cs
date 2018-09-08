@@ -48,7 +48,7 @@ namespace PoeEye.PoeTrade.ViewModels
         private static readonly TimeSpan RefreshTimeout = TimeSpan.FromMinutes(1);
         private readonly IPoeChatService chatService;
         private readonly IAudioNotificationsManager notificationsManager;
-        [NotNull] private readonly IClipboardManager clipboardManager;
+        private readonly IClipboardManager clipboardManager;
         private readonly IClock clock;
         private readonly ReactiveCommand<object> copyPrivateMessageToClipboardCommand = ReactiveUI.Legacy.ReactiveCommand.Create();
         private readonly ReactiveCommand<object> sendPrivateMessageCommand = ReactiveUI.Legacy.ReactiveCommand.Create();
@@ -59,7 +59,7 @@ namespace PoeEye.PoeTrade.ViewModels
 
         public PoeTradeViewModel(
             [NotNull] IPoeItem poeItem,
-            [NotNull] IPoePriceCalculcator poePriceCalculcator,
+            [NotNull] IPoePriceCalculcator poePriceCalculator,
             [NotNull] IPoeChatService chatService,
             [NotNull] IAudioNotificationsManager notificationsManager,
             [NotNull] IFactory<IImageViewModel, Uri> imageViewModelFactory,
@@ -71,7 +71,7 @@ namespace PoeEye.PoeTrade.ViewModels
             [NotNull] IClock clock)
         {
             Guard.ArgumentNotNull(poeItem, nameof(poeItem));
-            Guard.ArgumentNotNull(poePriceCalculcator, nameof(poePriceCalculcator));
+            Guard.ArgumentNotNull(poePriceCalculator, nameof(poePriceCalculator));
             Guard.ArgumentNotNull(chatService, nameof(chatService));
             Guard.ArgumentNotNull(itemSerializer, nameof(itemSerializer));
             Guard.ArgumentNotNull(notificationsManager, nameof(notificationsManager));
@@ -111,7 +111,7 @@ namespace PoeEye.PoeTrade.ViewModels
             }
 
             var price = StringToPoePriceConverter.Instance.Convert(poeItem.Price);
-            var priceInChaos = poePriceCalculcator.GetEquivalentInChaosOrbs(price);
+            var priceInChaos = poePriceCalculator.GetEquivalentInChaosOrbs(price);
             PriceInChaosOrbs = priceInChaos;
 
             CopyItemToClipboardCommand = CommandWrapper.Create(ReactiveCommand.CreateFromTask(

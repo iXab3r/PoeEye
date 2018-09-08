@@ -57,4 +57,5 @@ using System.Windows;
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
 [assembly: InternalsVisibleTo("PoeEye.Tests")]
+[assembly: InternalsVisibleTo("PoeEye.TradeSummary")]
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]

@@ -44,6 +44,7 @@ namespace PoeEye.PoeTrade.ViewModels
 
         private long filterRequestsCount = 0;
         private long sortRequestsCount = 0;
+        private int maxItems = 0;
 
         public PoeAdvancedTradesListViewModel([NotNull] [Dependency(WellKnownSchedulers.UI)]
             IScheduler uiScheduler)
@@ -64,6 +65,7 @@ namespace PoeEye.PoeTrade.ViewModels
             allItems
                 .Filter(filterConditionSource.Select(x => x ?? AlwaysTruePredicate).Sample(ResortRefilterThrottleTimeout)
                     .Do(_ => Interlocked.Increment(ref filterRequestsCount)))
+                .Virtualise(this.WhenAnyValue(x => x.MaxItems).Select(x => new VirtualRequest(0, x > 0 ? x : int.MaxValue)))
                 .Sort(comparerObservable, SortOptions.None,
                     resortRequest.Sample(ResortRefilterThrottleTimeout).Do(_ => Interlocked.Increment(ref sortRequestsCount)))
                 .ObserveOn(uiScheduler)
@@ -115,7 +117,14 @@ namespace PoeEye.PoeTrade.ViewModels
         }
 
         public ReadOnlyObservableCollection<IPoeTradeViewModel> Items => itemsCollection;
-
+        
+        
+        public int MaxItems
+        {
+            get { return maxItems; }
+            set { this.RaiseAndSetIfChanged(ref maxItems, value); }
+        }
+        
         public long FilterRequestsCount => filterRequestsCount;
 
         public long SortRequestsCount => sortRequestsCount;

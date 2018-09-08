@@ -1,19 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reactive;
 using System.Reactive.Linq;
 using Guards;
 using JetBrains.Annotations;
 using KellermanSoftware.CompareNetObjects;
-using PoeShared;
-using PoeShared.Modularity;
 using PoeShared.Scaffolding;
 using ReactiveUI;
 
-namespace PoeEye.Config
+namespace PoeShared.Modularity
 {
-    internal sealed class GenericConfigProvider<TConfig> : DisposableReactiveObject, IConfigProvider<TConfig> where TConfig : class, IPoeEyeConfig, new()
+    public sealed class GenericConfigProvider<TConfig> : DisposableReactiveObject, IConfigProvider<TConfig> where TConfig : class, IPoeEyeConfig, new()
     {
         private readonly IConfigProvider configProvider;
         private TConfig actualConfig;

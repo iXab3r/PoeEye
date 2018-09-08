@@ -6,7 +6,5 @@ namespace PoeShared.Communications.Chromium
 {
     public interface IChromiumBootstrapper : IDisposable
     {
-        [NotNull] 
-        IChromiumBrowser CreateBrowser();
     }
 }

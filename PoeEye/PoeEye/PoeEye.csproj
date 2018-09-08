@@ -344,7 +344,6 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Config\GenericConfigProvider.cs" />
     <Compile Include="Config\PoeEyeConfigProviderFromFile.cs" />
     <Compile Include="Config\PoeEyeUpdateSettingsConfig.cs" />
     <Compile Include="Converters\ConcreteTypeConverter.cs" />
@@ -423,6 +422,10 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="TradeSummaryOverlay\Modularity\PoeTradeSummaryConfig.cs" />
+    <Compile Include="TradeSummaryOverlay\Prism\PoeTradeSummaryModule.cs" />
+    <Compile Include="TradeSummaryOverlay\Prism\PoeTradeSummaryModuleRegistrations.cs" />
+    <Compile Include="TradeSummaryOverlay\ViewModels\PoeTradeSummaryViewModel.cs" />
     <Compile Include="Utilities\BasicAuthFileDownloader.cs" />
     <Compile Include="Utilities\ContextMenuServiceExtensions.cs" />
     <Compile Include="Utilities\EditableTuple.cs" />
@@ -630,6 +633,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="TradeSummaryOverlay\Themes\Styles.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="TradeSummaryOverlay\Views\PoeTradeSummaryView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Resource Include="FodyWeavers.xml">
@@ -659,9 +670,6 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\Splash.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="PoeTrade\Shell\Models\" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\LinkHorizontal.png" />
