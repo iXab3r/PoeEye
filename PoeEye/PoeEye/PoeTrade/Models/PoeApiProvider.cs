@@ -5,12 +5,11 @@ using DynamicData;
 using DynamicData.Binding;
 using Guards;
 using JetBrains.Annotations;
-using Microsoft.Practices.Unity;
 using PoeShared;
 using PoeShared.PoeTrade;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
-using ReactiveUI;
+using Unity;
 
 namespace PoeEye.PoeTrade.Models
 {

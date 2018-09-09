@@ -1,11 +1,12 @@
 ﻿using System.Reactive.Disposables;
 using Guards;
 using JetBrains.Annotations;
-using Microsoft.Practices.Unity;
+using Unity; using Unity.Resolution; using Unity.Attributes;
 using PoeEye.TradeMonitor.Modularity;
 using PoeEye.TradeMonitor.ViewModels;
 using PoeShared.Modularity;
 using PoeShared.Scaffolding;
+using Prism.Ioc;
 
 namespace PoeEye.TradeMonitor.Prism
 {
@@ -19,10 +20,14 @@ namespace PoeEye.TradeMonitor.Prism
             Guard.ArgumentNotNull(container, nameof(container));
 
             this.container = container;
+        }
+
+        public void RegisterTypes(IContainerRegistry containerRegistry)
+        {
             container.AddExtension(new PoeTradeMonitorModuleRegistrations());
         }
 
-        public void Initialize()
+        public void OnInitialized(IContainerProvider containerProvider)
         {
             var registrator = container.Resolve<IPoeEyeModulesRegistrator>();
             registrator.RegisterSettingsEditor<PoeTradeMonitorConfig, PoeTradeMonitorSettingsViewModel>();

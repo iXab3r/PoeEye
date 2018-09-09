@@ -1,8 +1,9 @@
 ﻿using System.Reactive.Disposables;
 using Guards;
 using JetBrains.Annotations;
-using Microsoft.Practices.Unity;
+using Unity; using Unity.Resolution; using Unity.Attributes;
 using PoeShared.Modularity;
+using Prism.Ioc;
 
 namespace PoeEye.Pickit.Prism
 {
@@ -18,9 +19,13 @@ namespace PoeEye.Pickit.Prism
             this.container = container;
         }
 
-        public void Initialize()
+        public void RegisterTypes(IContainerRegistry containerRegistry)
         {
             container.AddExtension(new PoePickitRegistrations());
+        }
+
+        public void OnInitialized(IContainerProvider containerProvider)
+        {
         }
     }
 }

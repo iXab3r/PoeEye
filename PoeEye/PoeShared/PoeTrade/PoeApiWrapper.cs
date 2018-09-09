@@ -4,12 +4,13 @@ using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Guards;
 using JetBrains.Annotations;
-using Microsoft.Practices.Unity;
+using Unity; using Unity.Resolution; using Unity.Attributes;
 using Newtonsoft.Json;
 using PoeShared.PoeTrade.Query;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
 using ReactiveUI;
+using Unity.Attributes;
 
 namespace PoeShared.PoeTrade
 {

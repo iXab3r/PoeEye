@@ -12,7 +12,7 @@ using System.Windows.Media;
 using Gma.System.MouseKeyHook;
 using Guards;
 using JetBrains.Annotations;
-using Microsoft.Practices.Unity;
+using Unity; using Unity.Resolution; using Unity.Attributes;
 using PoeChatWheel.Modularity;
 using PoeShared;
 using PoeShared.Modularity;

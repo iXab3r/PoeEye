@@ -1,9 +1,6 @@
 using System;
 using System.Collections.Concurrent;
 using System.Reactive.Concurrency;
-using System.Reactive.Linq;
-using System.Reactive.Subjects;
-using System.Reactive.Threading.Tasks;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,8 +17,8 @@ namespace PoeShared.Modularity
         private readonly ConcurrentDictionary<string, IScheduler> schedulers = new ConcurrentDictionary<string, IScheduler>();
 
         public SchedulerProvider(
-            [NotNull] [Microsoft.Practices.Unity.Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler,
-            [NotNull] [Microsoft.Practices.Unity.Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
+            [NotNull] [Unity.Attributes.Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler,
+            [NotNull] [Unity.Attributes.Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {
             this.uiScheduler = uiScheduler;
             Guard.ArgumentNotNull(bgScheduler, nameof(bgScheduler));

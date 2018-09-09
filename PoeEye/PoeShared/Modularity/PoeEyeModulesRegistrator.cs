@@ -1,9 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
+﻿using System.Collections.ObjectModel;
 using Guards;
-using Microsoft.Practices.Unity;
-using ReactiveUI;
+using Unity;
 
 namespace PoeShared.Modularity
 {
@@ -11,11 +8,14 @@ namespace PoeShared.Modularity
     {
         private readonly IUnityContainer container;
 
+        private readonly ObservableCollection<ISettingsViewModel> settings = new ObservableCollection<ISettingsViewModel>();
+
         public PoeEyeModulesRegistrator(IUnityContainer container)
         {
             Guard.ArgumentNotNull(container, nameof(container));
 
             this.container = container;
+            Settings = new ReadOnlyObservableCollection<ISettingsViewModel>(settings);
         }
 
 
@@ -24,11 +24,11 @@ namespace PoeShared.Modularity
             where TSettingsViewModel : ISettingsViewModel<TConfig>
         {
             var viewModel = (ISettingsViewModel) container.Resolve(typeof(TSettingsViewModel));
-            Settings.Add(viewModel);
+            settings.Add(viewModel);
 
             return this;
         }
 
-        public IReactiveList<ISettingsViewModel> Settings { get; } = new ReactiveList<ISettingsViewModel>();
+        public ReadOnlyObservableCollection<ISettingsViewModel> Settings { get; } 
     }
 }

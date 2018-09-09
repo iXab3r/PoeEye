@@ -1,11 +1,12 @@
 ﻿using System.Reactive.Disposables;
 using Guards;
 using JetBrains.Annotations;
-using Microsoft.Practices.Unity;
 using PoeShared.Modularity;
 using PoeShared.PoeControlPanel.Prism;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
+using Prism.Ioc;
+using Unity;
 
 namespace PoeShared.PoeControlPanel.Modularity
 {
@@ -19,10 +20,13 @@ namespace PoeShared.PoeControlPanel.Modularity
             Guard.ArgumentNotNull(container, nameof(container));
 
             this.container = container;
-            container.AddExtension(new CommonRegistrations());
         }
 
-        public void Initialize()
+        public void RegisterTypes(IContainerRegistry containerRegistry)
+        {
+        }
+
+        public void OnInitialized(IContainerProvider containerProvider)
         {
             container.Resolve<ControlPanelBootstrapper>().AddTo(anchors);
         }

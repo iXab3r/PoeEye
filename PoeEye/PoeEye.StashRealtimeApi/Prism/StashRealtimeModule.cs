@@ -1,10 +1,12 @@
 using Guards;
-using Microsoft.Practices.Unity;
+using PoeShared.Modularity;
+using Prism.Ioc;
+using Unity; using Unity.Resolution; using Unity.Attributes;
 using IModule = Prism.Modularity.IModule;
 
 namespace PoeEye.StashRealtimeApi.Prism
 {
-    public sealed class StashRealtimeModule : IModule
+    public sealed class StashRealtimeModule : IPoeEyeModule
     {
         private readonly IUnityContainer container;
 
@@ -15,9 +17,13 @@ namespace PoeEye.StashRealtimeApi.Prism
             this.container = container;
         }
 
-        public void Initialize()
+        public void RegisterTypes(IContainerRegistry containerRegistry)
         {
             container.AddExtension(new LiveRegistrations());
+        }
+
+        public void OnInitialized(IContainerProvider containerProvider)
+        {
         }
     }
 }

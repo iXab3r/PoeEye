@@ -1,10 +1,11 @@
 ﻿using Guards;
 using JetBrains.Annotations;
-using Microsoft.Practices.Unity;
+using Unity; using Unity.Resolution; using Unity.Attributes;
 using PoeEye.TradeSummaryOverlay.ViewModels;
 using PoeShared.Modularity;
 using PoeShared.Native;
 using PoeShared.Prism;
+using Prism.Ioc;
 
 namespace PoeEye.TradeSummaryOverlay.Prism
 {
@@ -19,10 +20,13 @@ namespace PoeEye.TradeSummaryOverlay.Prism
             this.container = container;
         }
 
-        public void Initialize()
+        public void RegisterTypes(IContainerRegistry containerRegistry)
         {
             container.AddExtension(new PoeTradeSummaryModuleRegistrations());
+        }
 
+        public void OnInitialized(IContainerProvider containerProvider)
+        {
             var overlayController = container.Resolve<IOverlayWindowController>(WellKnownOverlays.PathOfExileOverlay);
             var overlayModel = container.Resolve<PoeTradeSummaryViewModel>(new DependencyOverride(typeof(IOverlayWindowController), overlayController));
             overlayController.RegisterChild(overlayModel);

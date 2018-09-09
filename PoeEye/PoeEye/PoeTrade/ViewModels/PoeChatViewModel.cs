@@ -7,7 +7,7 @@ using System.Reactive.Threading.Tasks;
 using System.Windows.Input;
 using Guards;
 using JetBrains.Annotations;
-using Microsoft.Practices.Unity;
+using Unity; using Unity.Resolution; using Unity.Attributes;
 using PoeEye.PoeTrade.Common;
 using PoeEye.PoeTrade.Models;
 using PoeEye.Prism;
@@ -18,6 +18,7 @@ using PoeWhisperMonitor;
 using PoeWhisperMonitor.Chat;
 using Prism.Commands;
 using ReactiveUI;
+using Unity.Attributes;
 
 namespace PoeEye.PoeTrade.ViewModels
 {

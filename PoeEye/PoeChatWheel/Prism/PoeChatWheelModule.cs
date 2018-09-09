@@ -1,12 +1,13 @@
 ﻿using System.Windows;
 using Guards;
 using JetBrains.Annotations;
-using Microsoft.Practices.Unity;
+using Unity; using Unity.Resolution; using Unity.Attributes;
 using PoeChatWheel.Modularity;
 using PoeChatWheel.ViewModels;
 using PoeShared.Modularity;
 using PoeShared.Native;
 using PoeShared.Prism;
+using Prism.Ioc;
 
 namespace PoeChatWheel.Prism
 {
@@ -21,10 +22,13 @@ namespace PoeChatWheel.Prism
             this.container = container;
         }
 
-        public void Initialize()
+        public void RegisterTypes(IContainerRegistry containerRegistry)
         {
             container.AddExtension(new PoeChatWheelRegistrations());
+        }
 
+        public void OnInitialized(IContainerProvider containerProvider)
+        {
             var registrator = container.Resolve<IPoeEyeModulesRegistrator>();
             registrator.RegisterSettingsEditor<PoeChatWheelConfig, PoeChatWheelSettingsViewModel>();
 

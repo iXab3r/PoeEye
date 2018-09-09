@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.Practices.ObjectBuilder2;
 using Moq;
 using NUnit.Framework;
 using PoeEye.ItemParser.Services;
 using PoeShared.Common;
 using PoeShared.StashApi.ProcurementLegacy;
 using Shouldly;
+using Unity.Interception.Utilities;
 
 namespace PoeEye.Tests.ItemParser.Services
 {

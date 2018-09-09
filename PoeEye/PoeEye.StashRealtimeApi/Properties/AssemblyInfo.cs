@@ -1,7 +1,6 @@
 ﻿using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using Anotar.Log4Net;
 
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
@@ -44,4 +43,3 @@ using Anotar.Log4Net;
 [assembly: InternalsVisibleTo("PoeEye.PoeTradeRealtimeApi")]
 [assembly: InternalsVisibleTo("PoeEye.Console")]
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
-[assembly: LogMinimalMessage]

@@ -1,11 +1,13 @@
-﻿using Guards;
+﻿using System;
+using Guards;
 using JetBrains.Annotations;
-using Microsoft.Practices.Unity;
+using Unity; using Unity.Resolution; using Unity.Attributes;
 using PoeBud.Config;
 using PoeBud.ViewModels;
 using PoeShared.Modularity;
 using PoeShared.Native;
 using PoeShared.Prism;
+using Prism.Ioc;
 
 namespace PoeBud.Prism
 {
@@ -18,10 +20,14 @@ namespace PoeBud.Prism
             Guard.ArgumentNotNull(container, nameof(container));
 
             this.container = container;
+        }
+
+        public void RegisterTypes(IContainerRegistry containerRegistry)
+        {
             container.AddExtension(new PoeBudModuleRegistrations());
         }
 
-        public void Initialize()
+        public void OnInitialized(IContainerProvider containerProvider)
         {
             var registrator = container.Resolve<IPoeEyeModulesRegistrator>();
             registrator.RegisterSettingsEditor<PoeBudConfig, PoeBudSettingsViewModel>();

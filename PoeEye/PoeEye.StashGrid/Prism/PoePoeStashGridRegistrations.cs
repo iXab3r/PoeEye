@@ -1,7 +1,8 @@
-﻿using Microsoft.Practices.Unity;
+﻿using Unity; using Unity.Resolution; using Unity.Attributes;
 using PoeEye.StashGrid.Services;
 using PoeEye.StashGrid.ViewModels;
 using PoeShared.Scaffolding;
+using Unity.Extension;
 
 namespace PoeEye.StashGrid.Prism
 {
@@ -10,7 +11,6 @@ namespace PoeEye.StashGrid.Prism
         protected override void Initialize()
         {
             Container
-                .RegisterSingleton<PoeStashGridViewModel>()
                 .RegisterSingleton<IPoeStashGridViewModel, PoeStashGridViewModel>()
                 .RegisterSingleton<IPoeStashHighlightService, PoeStashGridViewModel>();
         }

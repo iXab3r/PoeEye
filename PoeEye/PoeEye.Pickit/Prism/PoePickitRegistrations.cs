@@ -1,4 +1,5 @@
-﻿using Microsoft.Practices.Unity;
+﻿using Unity; using Unity.Resolution; using Unity.Attributes;
+using Unity.Extension;
 
 namespace PoeEye.Pickit.Prism
 {

@@ -6,6 +6,7 @@ using DynamicData;
 using DynamicData.Binding;
 using LinqKit;
 using PoeEye.PoeTrade.Common;
+using Unity.Attributes;
 
 namespace PoeEye.PoeTrade.ViewModels
 {
@@ -22,7 +23,7 @@ namespace PoeEye.PoeTrade.ViewModels
 
     using JetBrains.Annotations;
 
-    using Microsoft.Practices.Unity;
+    using Unity; using Unity.Resolution; using Unity.Attributes;
 
     using Models;
 

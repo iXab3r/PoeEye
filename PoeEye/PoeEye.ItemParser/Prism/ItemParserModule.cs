@@ -1,6 +1,7 @@
 ﻿using Guards;
-using Microsoft.Practices.Unity;
+using Unity; using Unity.Resolution; using Unity.Attributes;
 using PoeShared.Modularity;
+using Prism.Ioc;
 
 namespace PoeEye.ItemParser.Prism
 {
@@ -17,7 +18,15 @@ namespace PoeEye.ItemParser.Prism
         
         public void Initialize()
         {
+        }
+
+        public void RegisterTypes(IContainerRegistry containerRegistry)
+        {
             container.AddExtension(new ItemParserRegistrations());
+        }
+
+        public void OnInitialized(IContainerProvider containerProvider)
+        {
         }
     }
 }

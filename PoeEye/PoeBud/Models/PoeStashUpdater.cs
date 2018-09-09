@@ -7,12 +7,9 @@ using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading;
-using Anotar.Log4Net;
 using Guards;
 using JetBrains.Annotations;
-using Microsoft.Practices.Unity;
-using Newtonsoft.Json;
-using PoeBud.Config;
+using Unity; using Unity.Resolution; using Unity.Attributes;
 using PoeShared;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
@@ -20,6 +17,7 @@ using PoeShared.StashApi;
 using PoeShared.StashApi.DataTypes;
 using PoeShared.UI;
 using ReactiveUI;
+using Unity.Attributes;
 
 namespace PoeBud.Models
 {
@@ -56,7 +54,7 @@ namespace PoeBud.Models
 
             this.config = config;
             this.clock = clock;
-            LogTo.Debug(
+            Log.Instance.DebugFormat(
                 "Initializing client for {0}@{1}", config.LoginEmail, config.LeagueId);
 
             var credentials = new NetworkCredential(config.LoginEmail, config.SessionId);
@@ -114,7 +112,7 @@ namespace PoeBud.Models
 
         public void ForceRefresh()
         {
-            LogTo.Debug($"Force update requested");
+            Log.Instance.Debug($"Force update requested");
             refreshSubject.OnNext(Unit.Default);
         }
 
@@ -122,23 +120,23 @@ namespace PoeBud.Models
         {
             Guard.ArgumentNotNull(strategy, nameof(strategy));
 
-            LogTo.Debug($"New strategy: {strategy}");
+            Log.Instance.Debug($"New strategy: {strategy}");
             stashUpdaterStrategy = strategy;
         }
 
         private StashUpdate Refresh(IStashUpdaterStrategy strategy)
         {
-            LogTo.Debug($"Refreshing stash, strategy: {strategy}");
+            Log.Instance.Debug($"Refreshing stash, strategy: {strategy}");
 
             var leaguesToProcess = strategy.GetDefaultLeaguesList();
             if (leaguesToProcess.Length == 0)
             {
-                LogTo.Debug($"Strategy did not provide default leagues list");
-                LogTo.Debug($"Requesting leagues list...");
+                Log.Instance.Debug($"Strategy did not provide default leagues list");
+                Log.Instance.Debug($"Requesting leagues list...");
                 var leagues = poeClient.GetLeaguesAsync().Result;
-                LogTo.Debug($"Received leagues list: {leagues.DumpToTextRaw()}");
+                Log.Instance.Debug($"Received leagues list: {leagues.DumpToTextRaw()}");
                 leaguesToProcess = strategy.GetLeaguesToProcess(leagues);
-                LogTo.Debug($"Leagues to process: {leaguesToProcess.DumpToTextRaw()}");
+                Log.Instance.Debug($"Leagues to process: {leaguesToProcess.DumpToTextRaw()}");
             }
 
             var allStashes = new List<IStash>();
@@ -148,44 +146,44 @@ namespace PoeBud.Models
                 var stashesToRequest = new IStashTab[0];
                 try
                 {
-                    LogTo.Debug($"[League {league.Id}] Requesting stash #0...");
+                    Log.Instance.Debug($"[League {league.Id}] Requesting stash #0...");
                     var zeroStash = poeClient.GetStash(0, league.Id);
 
                     var tabs = zeroStash.Tabs?.ToArray() ?? new IStashTab[0];
 
                     if (tabs.Length == 0)
                     {
-                        LogTo.Debug($"No stashes found in league {league.Id}");
+                        Log.Instance.Debug($"No stashes found in league {league.Id}");
                         continue;
                     }
-                    LogTo.Debug($"Tabs({tabs.Length}) in league {league.Id}: {tabs.Select(x => x.Name).DumpToTextRaw()}");
+                    Log.Instance.Debug($"Tabs({tabs.Length}) in league {league.Id}: {tabs.Select(x => x.Name).DumpToTextRaw()}");
                     stashesToRequest = strategy.GetTabsToProcess(tabs);
                 }
                 catch (Exception e)
                 {
-                    LogTo.WarnException($"Failed to request tabs in league {league.DumpToTextRaw()}", e);
+                    Log.Instance.Warn($"Failed to request tabs in league {league.DumpToTextRaw()}", e);
                 }
 
                 if (stashesToRequest.Length == 0)
                 {
-                    LogTo.Debug($"No stashes to process in league {league.Id}");
+                    Log.Instance.Debug($"No stashes to process in league {league.Id}");
                     continue;
                 }
                                                     
-                LogTo.Debug($"Requesting stashes [{stashesToRequest.DumpToTextRaw()}]...");
+                Log.Instance.Debug($"Requesting stashes [{stashesToRequest.DumpToTextRaw()}]...");
                 foreach (var tab in stashesToRequest)
                 {
                     try
                     {
-                        LogTo.Debug($"[League {league.Id}] Requesting stash tab [{tab.DumpToTextRaw()}]...");
+                        Log.Instance.Debug($"[League {league.Id}] Requesting stash tab [{tab.DumpToTextRaw()}]...");
                         var stash = poeClient.GetStash(tab.Idx, league.Id);
-                        LogTo.Debug($"[League {league.Id}] Result: {stash.Items.EmptyIfNull().Count()} item(s), stash tab [{tab.DumpToTextRaw()}]");
+                        Log.Instance.Debug($"[League {league.Id}] Result: {stash.Items.EmptyIfNull().Count()} item(s), stash tab [{tab.DumpToTextRaw()}]");
 
                         allStashes.Add(stash);
                     }
                     catch (Exception e)
                     {
-                        LogTo.WarnException($"Failed to request tab '{tab.Name}'(Idx: {tab.Idx}), league {league.DumpToTextRaw()}", e);
+                        Log.Instance.Warn($"Failed to request tab '{tab.Name}'(Idx: {tab.Idx}), league {league.DumpToTextRaw()}", e);
                     }
                 }
             }
@@ -199,16 +197,16 @@ namespace PoeBud.Models
                 .Distinct(new LambdaComparer<IStashTab>((x, y) => x?.Id == y?.Id))
                 .ToArray();
 
-            LogTo.Debug($"Got {allItems.Length} item(s) from {allTabs.Length} tab(s)...");
+            Log.Instance.Debug($"Got {allItems.Length} item(s) from {allTabs.Length} tab(s)...");
             return new StashUpdate(allItems, allTabs.ToArray());
         }
 
         private StashUpdate Refresh()
         {
-            LogTo.Debug($"Updating stash(period:{recheckPeriod.TotalSeconds:F0}s)...");
+            Log.Instance.Debug($"Updating stash(period:{recheckPeriod.TotalSeconds:F0}s)...");
             if (!poeClient.IsAuthenticated)
             {
-                LogTo.Debug("Authenticating...");
+                Log.Instance.Debug("Authenticating...");
                 poeClient.Authenticate();
             }
             Thread.Sleep((int)UiConstants.ArtificialLongDelay.TotalMilliseconds);
@@ -217,7 +215,7 @@ namespace PoeBud.Models
             var strategy = stashUpdaterStrategy;
             if (strategy == null)
             {
-                LogTo.Warn($"Strategy is not set");
+               Log.Instance.Warn($"Strategy is not set");
                 return StashUpdate.Empty;
             }
 
@@ -231,7 +229,7 @@ namespace PoeBud.Models
 
         private void HandleUpdate(StashUpdate update)
         {
-            LogTo.Debug($"Stash update received, tabs: {update.Tabs.Count()}, items: {update.Items.Count()}");
+            Log.Instance.Debug($"Stash update received, tabs: {update.Tabs.Count()}, items: {update.Items.Count()}");
 
             IsBusy = false;
             LastUpdateTimestamp = clock.Now;

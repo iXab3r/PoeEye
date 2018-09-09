@@ -1,9 +1,10 @@
 ﻿using System.Collections.Concurrent;
-using Microsoft.Practices.Unity;
+using Unity; using Unity.Resolution; using Unity.Attributes;
 using PoeShared;
 using PoeShared.Modularity;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
+using Unity.Attributes;
 
 namespace PoeBud.Models
 {

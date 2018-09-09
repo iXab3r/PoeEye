@@ -15,7 +15,7 @@ using DynamicData.Binding;
 using DynamicData.Controllers;
 using Guards;
 using JetBrains.Annotations;
-using Microsoft.Practices.Unity;
+using Unity; using Unity.Resolution; using Unity.Attributes;
 using PoeEye.PoeTrade.Common;
 using PoeShared;
 using PoeShared.Common;

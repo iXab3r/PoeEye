@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
@@ -9,12 +8,9 @@ using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using System.Windows.Markup;
-using Anotar.Log4Net;
-using Gma.System.MouseKeyHook;
 using Guards;
 using JetBrains.Annotations;
-using Microsoft.Practices.Unity;
+using Unity; using Unity.Resolution; using Unity.Attributes;
 using PoeBud.Config;
 using PoeBud.Models;
 using PoeBud.Scaffolding;
@@ -42,7 +38,6 @@ namespace PoeBud.ViewModels
         private readonly IClock clock;
         private readonly ISubject<Exception> exceptionsToPropagate = new Subject<Exception>();
         private readonly IKeyboardEventsSource keyboardMouseEvents;
-        private readonly IUiOverlaysProvider overlaysProvider;
         private readonly ObservableAsPropertyHelper<Exception> lastUpdateException;
         private readonly IFactory<IPoeStashUpdater, IStashUpdaterParameters> stashAnalyzerFactory;
         private readonly IFactory<IDefaultStashUpdaterStrategy, IStashUpdaterParameters> stashUpdaterStrategyFactory;
@@ -58,8 +53,6 @@ namespace PoeBud.ViewModels
         private StashViewModel stash;
         private IPoeStashUpdater stashUpdater;
 
-        private string uiOverlayPath;
-
         public PoeBudViewModel(
             [NotNull] IPoeWindowManager windowManager,
             [NotNull] IHighlightingService highlightingService,
@@ -68,7 +61,6 @@ namespace PoeBud.ViewModels
             [NotNull] IClock clock,
             [NotNull] IKeyboardEventsSource keyboardMouseEvents,
             [NotNull] IUserInteractionsManager userInteractionsManager,
-            [NotNull] IUiOverlaysProvider overlaysProvider,
             [NotNull] IFactory<IPoeStashUpdater, IStashUpdaterParameters> stashAnalyzerFactory,
             [NotNull] IFactory<IDefaultStashUpdaterStrategy, IStashUpdaterParameters> stashUpdaterStrategyFactory,
             [NotNull] IFactory<StashViewModel, StashUpdate, IPoeBudConfig> stashUpdateFactory,
@@ -77,7 +69,6 @@ namespace PoeBud.ViewModels
             Guard.ArgumentNotNull(windowManager, nameof(windowManager));
             Guard.ArgumentNotNull(solutionExecutor, nameof(solutionExecutor));
             Guard.ArgumentNotNull(highlightingService, nameof(highlightingService));
-            Guard.ArgumentNotNull(overlaysProvider, nameof(overlaysProvider));
             Guard.ArgumentNotNull(userInteractionsManager, nameof(userInteractionsManager));
             Guard.ArgumentNotNull(stashUpdaterStrategyFactory, nameof(stashUpdaterStrategyFactory));
             Guard.ArgumentNotNull(configProvider, nameof(configProvider));
@@ -91,7 +82,6 @@ namespace PoeBud.ViewModels
             this.configProvider = configProvider;
             this.clock = clock;
             this.keyboardMouseEvents = keyboardMouseEvents;
-            this.overlaysProvider = overlaysProvider;
             this.stashAnalyzerFactory = stashAnalyzerFactory;
             this.stashUpdaterStrategyFactory = stashUpdaterStrategyFactory;
             this.stashUpdateFactory = stashUpdateFactory;
@@ -160,12 +150,6 @@ namespace PoeBud.ViewModels
             set { this.RaiseAndSetIfChanged(ref stashUpdater, value); }
         }
 
-        public string UiOverlayPath
-        {
-            get { return uiOverlayPath; }
-            set { this.RaiseAndSetIfChanged(ref uiOverlayPath, value); }
-        }
-
         public bool HideXpBar
         {
             get { return hideXpBar; }
@@ -206,9 +190,7 @@ namespace PoeBud.ViewModels
             Log.Instance.Debug($"[PoeBudViewModel] Applying new config...");
 
             actualConfig = config;
-            HideXpBar = config.HideXpBar;
             IsEnabled = actualConfig.IsEnabled;
-            UiOverlayPath = overlaysProvider.OverlaysList.FirstOrDefault(x => x.Name == config.UiOverlayName).AbsolutePath;
             hotkey = KeyGestureExtensions.SafeCreateGesture(config.GetChaosSetHotkey);
             RefreshStashUpdater(actualConfig);
             this.RaisePropertyChanged(nameof(League));
@@ -308,7 +290,7 @@ namespace PoeBud.ViewModels
                 Log.Instance.Debug($"[PoeBudViewModel] Duplicate update arrived, skipping update");
                 return;
             }
-            LogTo.Debug($"[PoeBudViewModel] Stash update arrived, tabs: {stashUpdate.Tabs.Count()}, items: {stashUpdate.Items.Count()}");
+            Log.Instance.Debug($"[PoeBudViewModel] Stash update arrived, tabs: {stashUpdate.Tabs.Count()}, items: {stashUpdate.Items.Count()}");
 
             lastServerStashUpdate = stashUpdate;
             Stash = stashUpdateFactory.Create(stashUpdate, config);

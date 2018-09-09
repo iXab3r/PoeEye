@@ -1,9 +1,10 @@
 ﻿using PoeShared.Scaffolding;
 using PoeWhisperMonitor.Chat;
+using Unity.Extension;
 
 namespace PoeWhisperMonitor.Prism
 {
-    using Microsoft.Practices.Unity;
+    using Unity; using Unity.Resolution; using Unity.Attributes;
 
     internal sealed class PoeWhisperRegistrations : UnityContainerExtension
     {

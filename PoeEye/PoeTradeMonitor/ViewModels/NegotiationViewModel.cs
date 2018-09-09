@@ -7,7 +7,7 @@ using System.Reactive.Linq;
 using System.Windows.Input;
 using Guards;
 using JetBrains.Annotations;
-using Microsoft.Practices.Unity;
+using Unity; using Unity.Resolution; using Unity.Attributes;
 using PoeEye.StashGrid.Services;
 using PoeEye.TradeMonitor.Models;
 using PoeEye.TradeMonitor.Modularity;

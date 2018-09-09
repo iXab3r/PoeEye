@@ -1,42 +1,29 @@
 using System;
 using PoeShared.Native;
+using Unity;
+using Unity.Injection;
+using Unity.Lifetime;
+using Unity.Registration;
+using Unity.Resolution;
 
 namespace PoeShared.Scaffolding
 {
     using Guards;
 
-    using Microsoft.Practices.Unity;
+    using Unity; using Unity.Resolution; using Unity.Attributes;
 
     public static class UnityContainerExtensions
     {
-        public static IUnityContainer RegisterSingleton<TFrom, TTo>(this IUnityContainer instance, params InjectionMember[] members)
-            where TTo : TFrom
+        public static IUnityContainer RegisterSingleton<TTo>(this IUnityContainer instance, params Type[] types)
         {
-            return instance.RegisterSingleton<TFrom, TTo>(null, members);
-        }
+            var factory = new InjectionFactory(container => container.Resolve<TTo>());
+            instance.RegisterSingleton(typeof(TTo));
 
-        public static IUnityContainer RegisterSingleton<TFrom>(this IUnityContainer instance, params InjectionMember[] members)
-        {
-            return instance.RegisterSingleton(typeof(TFrom), members);
-        }
-
-        public static IUnityContainer RegisterSingleton(this IUnityContainer instance, Type from, Type to, params InjectionMember[] members)
-        {
-            return instance.RegisterType(from, to, new ContainerControlledLifetimeManager(), members);
-        }
-
-        public static IUnityContainer RegisterSingleton(this IUnityContainer instance, Type from, params InjectionMember[] members)
-        {
-            return instance.RegisterType(from, new ContainerControlledLifetimeManager(), members);
-        }
-
-        public static IUnityContainer RegisterSingleton<TFrom, TTo>(this IUnityContainer instance, string name, params InjectionMember[] members)
-            where TTo : TFrom
-        {
-            Guard.ArgumentNotNull(instance, nameof(instance));
-            Guard.ArgumentNotNull(members, nameof(members));
-            
-            return instance.RegisterType<TFrom, TTo>(name, new ContainerControlledLifetimeManager(), members);
+            foreach (var type in types)
+            {
+                instance.RegisterSingleton(type, factory);
+            }
+            return instance;
         }
         
         public static IUnityContainer RegisterWindowTracker(this IUnityContainer instance, string dependencyName, Func<string> windowNameFunc)

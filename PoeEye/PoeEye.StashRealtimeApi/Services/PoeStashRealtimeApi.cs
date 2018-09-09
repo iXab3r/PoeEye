@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Anotar.Log4Net;
 using Guards;
 using JetBrains.Annotations;
+using PoeShared;
 using PoeShared.PoeTrade;
 using PoeShared.PoeTrade.Query;
 using PoeShared.Scaffolding;
@@ -30,7 +30,7 @@ namespace PoeEye.StashRealtimeApi.Services
         {
             Guard.ArgumentNotNull(query, nameof(query));
 
-            LogTo.Debug($"Issueing query: {query}");
+            Log.Instance.Debug($"Issueing query: {query}");
             return Task.Run(() => itemsSource.IssueQuery(query));
         }
 

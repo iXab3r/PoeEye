@@ -1,5 +1,9 @@
 ﻿using PoeBud.Services;
 using PoeShared.Scaffolding;
+using Unity;
+using Unity.Extension;
+using Unity.Injection;
+using Unity.Lifetime;
 
 namespace PoeBud.Prism
 {

@@ -4,7 +4,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using Guards;
 using JetBrains.Annotations;
-using Microsoft.Practices.Unity;
+using Unity; using Unity.Resolution; using Unity.Attributes;
 using PoeEye.TradeMonitor.Modularity;
 using PoeEye.TradeMonitor.ViewModels;
 using PoeShared.Modularity;

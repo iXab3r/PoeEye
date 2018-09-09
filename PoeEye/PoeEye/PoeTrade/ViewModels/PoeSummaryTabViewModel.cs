@@ -8,7 +8,7 @@ using DynamicData.Alias;
 using DynamicData.Binding;
 using DynamicData.Controllers;
 using LinqKit;
-using Microsoft.Practices.Unity;
+using Unity; using Unity.Resolution; using Unity.Attributes;
 using PoeEye.Config;
 using PoeEye.ItemParser.Services;
 using PoeEye.PoeTrade.Models;
@@ -18,6 +18,7 @@ using PoeShared.Common;
 using PoeShared.Modularity;
 using PoeShared.Prism;
 using ReactiveUI.Legacy;
+using Unity.Attributes;
 
 namespace PoeEye.PoeTrade.ViewModels
 {

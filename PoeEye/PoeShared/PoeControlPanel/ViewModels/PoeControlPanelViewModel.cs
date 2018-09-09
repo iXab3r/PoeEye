@@ -5,13 +5,13 @@ using System.Windows;
 using System.Windows.Input;
 using Guards;
 using JetBrains.Annotations;
-using Microsoft.Practices.Unity;
 using PoeShared.Modularity;
 using PoeShared.Native;
 using PoeShared.PoeControlPanel.Modularity;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
 using Prism.Commands;
+using Unity.Attributes;
 
 namespace PoeShared.PoeControlPanel.ViewModels
 {

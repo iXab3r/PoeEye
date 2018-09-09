@@ -7,6 +7,8 @@ using PoeShared.Native;
 using PoeShared.PoeTrade;
 using PoeShared.Prism;
 using PoeShared.UI.Models;
+using Unity;
+using Unity.Extension;
 using PoeEyeMainConfig = PoeEye.Config.PoeEyeMainConfig;
 
 namespace PoeEye.Prism
@@ -16,7 +18,7 @@ namespace PoeEye.Prism
 
     using Config;
 
-    using Microsoft.Practices.Unity;
+    using Unity; using Unity.Resolution; using Unity.Attributes;
 
     using PoeShared.Scaffolding;
 

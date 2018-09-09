@@ -14,7 +14,7 @@ using ExceptionReporting;
 using ExceptionReporting.Core;
 using Guards;
 using log4net.Core;
-using Microsoft.Practices.Unity;
+using Unity; using Unity.Resolution; using Unity.Attributes;
 using PoeEye.Prism;
 using PoeShared;
 using PoeShared.Communications.Chromium;

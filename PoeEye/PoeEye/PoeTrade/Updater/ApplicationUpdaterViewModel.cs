@@ -12,7 +12,7 @@ using System.Windows;
 using System.Windows.Input;
 using Guards;
 using JetBrains.Annotations;
-using Microsoft.Practices.Unity;
+using Unity; using Unity.Resolution; using Unity.Attributes;
 using PoeBud.Config;
 using PoeEye.Config;
 using PoeShared;
@@ -24,6 +24,7 @@ using Prism.Mvvm;
 using ReactiveUI;
 using ReactiveUI.Legacy;
 using Squirrel;
+using Unity.Attributes;
 
 namespace PoeEye.PoeTrade.Updater
 {

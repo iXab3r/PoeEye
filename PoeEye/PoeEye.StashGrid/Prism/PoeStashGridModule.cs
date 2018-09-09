@@ -1,9 +1,10 @@
 ﻿using System.Reactive.Disposables;
 using Guards;
 using JetBrains.Annotations;
-using Microsoft.Practices.Unity;
+using Unity; using Unity.Resolution; using Unity.Attributes;
 using PoeShared.Modularity;
 using PoeShared.Scaffolding;
+using Prism.Ioc;
 
 namespace PoeEye.StashGrid.Prism
 {
@@ -19,10 +20,13 @@ namespace PoeEye.StashGrid.Prism
             this.container = container;
         }
 
-        public void Initialize()
+        public void RegisterTypes(IContainerRegistry containerRegistry)
         {
             container.AddExtension(new PoePoeStashGridRegistrations());
-            
+        }
+
+        public void OnInitialized(IContainerProvider containerProvider)
+        {
             container.Resolve<StashGridBootstrapper>().AddTo(anchors);
         }
     }

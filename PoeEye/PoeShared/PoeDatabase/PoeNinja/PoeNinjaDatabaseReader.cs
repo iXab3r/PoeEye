@@ -12,13 +12,14 @@ using System.Threading;
 using System.Threading.Tasks;
 using DynamicData;
 using JetBrains.Annotations;
-using Microsoft.Practices.Unity;
+using Unity; using Unity.Resolution; using Unity.Attributes;
 using Newtonsoft.Json;
 using PoeShared.Common;
 using PoeShared.Converters;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
 using RestEase;
+using Unity.Attributes;
 
 namespace PoeShared.PoeDatabase.PoeNinja
 {

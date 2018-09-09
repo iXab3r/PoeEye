@@ -17,6 +17,11 @@ using PoeShared.UI.Models;
 using PoeShared.UI.ViewModels;
 using ProxyProvider;
 using ReactiveUI;
+using Unity;
+using Unity.Extension;
+using Unity.Injection;
+using Unity.Lifetime;
+using Unity.Resolution;
 
 namespace PoeShared.Prism
 {
@@ -24,7 +29,7 @@ namespace PoeShared.Prism
 
     using Common;
 
-    using Microsoft.Practices.Unity;
+    using Unity; using Unity.Resolution; using Unity.Attributes;
 
     using PoeDatabase;
 
@@ -40,22 +45,19 @@ namespace PoeShared.Prism
         {
             Container
                 .RegisterSingleton<IClock, Clock>()
-                .RegisterSingleton<IPoeEyeModulesRegistrator, PoeEyeModulesRegistrator>()
+                .RegisterSingleton<PoeEyeModulesRegistrator>(typeof(IPoeEyeModulesRegistrator), typeof(IPoeEyeModulesEnumerator))
                 .RegisterSingleton(typeof(IConfigProvider<>), typeof(GenericConfigProvider<>))
-                .RegisterSingleton<IPoeEyeModulesEnumerator, PoeEyeModulesRegistrator>()
                 .RegisterSingleton<IEqualityComparer<IPoeItem>, PoeItemEqualityComparer>()
                 .RegisterSingleton<IConverter<NameValueCollection, string>, NameValueCollectionToQueryStringConverter>()
                 .RegisterSingleton<IConverter<NameValueCollection, IEnumerable<KeyValuePair<string, string>>>, NameValueCollectionToQueryStringConverter>()
-                .RegisterSingleton<IProxyProvider, GenericProxyProvider>(new InjectionFactory(unity => new GenericProxyProvider()))
+                .RegisterSingleton<IProxyProvider>(new InjectionFactory(unity => new GenericProxyProvider()))
                 .RegisterSingleton<IRandomNumberGenerator, RandomNumberGenerator>()
                 .RegisterSingleton<IImagesCacheService, ImagesCacheService>()
-                .RegisterSingleton<IGearTypeAnalyzer, GearTypeAnalyzer>()
-                .RegisterSingleton<IItemTypeAnalyzer, GearTypeAnalyzer>()
+                .RegisterSingleton<GearTypeAnalyzer>(typeof(IGearTypeAnalyzer), typeof(IItemTypeAnalyzer))
                 .RegisterSingleton<IPoeLeagueApiClient, PoeLeagueApiClient>()
                 .RegisterSingleton<IChromiumBrowserFactory, ChromiumBrowserFactory>()
                 .RegisterSingleton<IChromiumBootstrapper, ChromiumBootstrapper>()
-                .RegisterSingleton<IConverter<IStashItem, IPoeItem>, PoeStashItemToPoeItem>()
-                .RegisterSingleton<IConverter<IStashItem, PoeItem>, PoeStashItemToPoeItem>()
+                .RegisterSingleton<PoeStashItemToPoeItem>(typeof(IConverter<IStashItem, IPoeItem>), typeof(IConverter<IStashItem, PoeItem>))
                 .RegisterSingleton<IConverter<string, PoePrice>, StringToPoePriceConverter>()
                 .RegisterSingleton<IKeyboardEventsSource>(new InjectionFactory(x => x.Resolve<KeyboardEventsSource>(new DependencyOverride(typeof(IKeyboardMouseEvents), Hook.GlobalEvents()))))
                 .RegisterSingleton<IAudioNotificationsManager, AudioNotificationsManager>()

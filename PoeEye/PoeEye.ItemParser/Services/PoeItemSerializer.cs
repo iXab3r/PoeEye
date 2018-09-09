@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Guards;
-using Microsoft.Practices.ObjectBuilder2;
 using PoeShared.Common;
+using Unity.Interception.Utilities;
 
 namespace PoeEye.ItemParser.Services {
     internal sealed class PoeItemSerializer : IPoeItemSerializer {

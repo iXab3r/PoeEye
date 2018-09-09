@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Windows.Data;
-using Anotar.Log4Net;
 using PoeShared.Common;
 
 namespace PoeShared.Converters
@@ -23,7 +21,7 @@ namespace PoeShared.Converters
             var price = StringToPoePriceConverter.Instance.Convert(rawPrice);
             if (price.IsEmpty)
             {
-                LogTo.Debug($"Failed to convert string '{rawPrice}' to PoePrice");
+                Log.Instance.Debug($"Failed to convert string '{rawPrice}' to PoePrice");
                 return null;
             }
 
@@ -36,7 +34,7 @@ namespace PoeShared.Converters
             var imagePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, ImagesPathPrefix, imageName + ".png");
             if (!File.Exists(imagePath))
             {
-                LogTo.Debug($"Failed to find image for {price}, got path {imagePath}");
+                Log.Instance.Debug($"Failed to find image for {price}, got path {imagePath}");
                 return null;
             }
 

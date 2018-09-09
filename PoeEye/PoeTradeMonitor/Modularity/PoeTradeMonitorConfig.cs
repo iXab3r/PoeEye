@@ -9,7 +9,7 @@ using PoeShared.Native;
 
 namespace PoeEye.TradeMonitor.Modularity
 {
-    public sealed class PoeTradeMonitorConfig : IPoeEyeConfigVersioned, IOverlayConfig
+    public sealed class PoeTradeMonitorConfig : IPoeEyeConfigVersioned, IOverlayConfig, ICanBeEnabled
     {
         public bool IsEnabled { get; set; } = true;
 

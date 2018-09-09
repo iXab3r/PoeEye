@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using Guards;
 using JetBrains.Annotations;
-using Microsoft.Practices.Unity;
+using Unity; using Unity.Resolution; using Unity.Attributes;
 using PoeBud.Config;
 using PoeEye.Config;
 using PoeEye.Utilities;
@@ -22,6 +22,7 @@ using PoeShared.Scaffolding.WPF;
 using PoeShared.StashApi;
 using PoeShared.UI.ViewModels;
 using ReactiveUI;
+using Unity.Attributes;
 
 namespace PoeEye.PoeTrade.ViewModels
 {

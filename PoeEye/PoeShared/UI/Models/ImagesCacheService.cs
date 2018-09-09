@@ -10,9 +10,10 @@ using System.Text;
 using System.Threading;
 using Guards;
 using JetBrains.Annotations;
-using Microsoft.Practices.Unity;
+using Unity; using Unity.Resolution; using Unity.Attributes;
 using PoeShared.Communications;
 using PoeShared.Prism;
+using Unity.Attributes;
 
 namespace PoeShared.UI.Models
 {

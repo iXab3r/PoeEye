@@ -1,12 +1,15 @@
+using PoeShared.Modularity;
+using Prism.Ioc;
+using Unity;
 using IModule = Prism.Modularity.IModule;
 
 namespace PoeEye.PoeTrade.Prism
 {
     using Guards;
 
-    using Microsoft.Practices.Unity;
+    using Unity; using Unity.Resolution; using Unity.Attributes;
 
-    public sealed class PoeTradeModule : IModule
+    public sealed class PoeTradeModule : IPoeEyeModule
     {
         private readonly IUnityContainer container;
 
@@ -16,9 +19,13 @@ namespace PoeEye.PoeTrade.Prism
             Guard.ArgumentNotNull(container, nameof(container));
         }
 
-        public void Initialize()
+        public void RegisterTypes(IContainerRegistry containerRegistry)
         {
             container.AddExtension(new LiveRegistrations());
+        }
+
+        public void OnInitialized(IContainerProvider containerProvider)
+        {
         }
     }
 }

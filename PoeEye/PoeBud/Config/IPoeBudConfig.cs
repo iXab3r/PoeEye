@@ -10,10 +10,6 @@ namespace PoeBud.Config
 
     public interface IPoeBudConfig : IPoeEyeConfigVersioned, IStashUpdaterParameters
     {
-        bool HideXpBar { get; }
-
-        string UiOverlayName { get; }
-
         int ExpectedSetsCount { get; }
         
         int MaxSlotsPerSolution { get; }

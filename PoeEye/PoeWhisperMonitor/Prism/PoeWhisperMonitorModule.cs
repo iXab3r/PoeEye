@@ -1,4 +1,6 @@
-﻿using IModule = Prism.Modularity.IModule;
+﻿using PoeShared.Modularity;
+using Prism.Ioc;
+using IModule = Prism.Modularity.IModule;
 
 namespace PoeWhisperMonitor.Prism
 {
@@ -6,9 +8,9 @@ namespace PoeWhisperMonitor.Prism
 
     using JetBrains.Annotations;
 
-    using Microsoft.Practices.Unity;
+    using Unity; using Unity.Resolution; using Unity.Attributes;
 
-    public sealed class PoeWhisperMonitorModule : IModule
+    public sealed class PoeWhisperMonitorModule : IPoeEyeModule
     {
         private readonly IUnityContainer container;
 
@@ -19,9 +21,13 @@ namespace PoeWhisperMonitor.Prism
             this.container = container;
         }
 
-        public void Initialize()
+        public void RegisterTypes(IContainerRegistry containerRegistry)
         {
             container.AddExtension(new PoeWhisperRegistrations());
+        }
+
+        public void OnInitialized(IContainerProvider containerProvider)
+        {
         }
     }
 }

@@ -9,7 +9,7 @@ using System.Windows.Media;
 using DynamicData;
 using Guards;
 using JetBrains.Annotations;
-using Microsoft.Practices.Unity;
+using Unity; using Unity.Resolution; using Unity.Attributes;
 using PoeEye.StashGrid.Models;
 using PoeEye.StashGrid.Modularity;
 using PoeEye.StashGrid.Services;

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Reactive.Linq;
 using JetBrains.Annotations;
 using Prism.Modularity;
@@ -16,6 +17,6 @@ namespace PoeShared.Modularity
 
     public interface IPoeEyeModulesEnumerator
     {
-        IReactiveList<ISettingsViewModel> Settings { [NotNull] get; }
+        ReadOnlyObservableCollection<ISettingsViewModel> Settings { [NotNull] get; }
     }
 }

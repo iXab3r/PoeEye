@@ -1,7 +1,9 @@
 ﻿using Guards;
 using JetBrains.Annotations;
-using Microsoft.Practices.Unity;
+using Unity; using Unity.Resolution; using Unity.Attributes;
 using PoeShared.Modularity;
+using Prism.Ioc;
+using Unity;
 
 namespace PoeShared.Prism
 {
@@ -14,10 +16,14 @@ namespace PoeShared.Prism
             Guard.ArgumentNotNull(container, nameof(container));
 
             this.container = container;
+        }
+
+        public void RegisterTypes(IContainerRegistry containerRegistry)
+        {
             container.AddExtension(new CommonRegistrations());
         }
 
-        public void Initialize()
+        public void OnInitialized(IContainerProvider containerProvider)
         {
         }
     }

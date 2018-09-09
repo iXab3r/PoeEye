@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Practices.ObjectBuilder2;
-using Microsoft.Practices.Unity;
+using Unity; using Unity.Resolution; using Unity.Attributes;
 using PoeEye.PoeTrade.Prism;
 using PoeEye.PoeTradeRealtimeApi;
 using PoeEye.PoeTradeRealtimeApi.Prism;
@@ -32,7 +31,11 @@ namespace PoeEye.Console
                     new PoeTradeModule(container), 
                     new PoeTradeRealtimeModule(container), 
                 };
-                modules.ForEach(x => x.Initialize());
+                foreach (var module in modules)
+                {
+                    module.OnInitialized(null);
+                    
+                }
 
                 var api = container.Resolve<IPoeApi>($"{nameof(PoeEye)}.{nameof(PoeTrade)}.{nameof(PoeTrade.PoeTradeApi)}");
                 Log.Instance.Debug($"API: {api}");

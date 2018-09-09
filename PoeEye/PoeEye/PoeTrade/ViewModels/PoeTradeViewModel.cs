@@ -12,6 +12,7 @@ using PoeShared.UI.ViewModels;
 using PoeWhisperMonitor.Chat;
 using Prism.Commands;
 using ReactiveUI.Legacy;
+using Unity.Attributes;
 
 namespace PoeEye.PoeTrade.ViewModels
 {
@@ -30,7 +31,7 @@ namespace PoeEye.PoeTrade.ViewModels
 
     using JetBrains.Annotations;
 
-    using Microsoft.Practices.Unity;
+    using Unity; using Unity.Resolution; using Unity.Attributes;
 
     using Models;
 

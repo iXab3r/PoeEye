@@ -11,7 +11,7 @@ using System.Windows.Threading;
 using Gma.System.MouseKeyHook;
 using Guards;
 using JetBrains.Annotations;
-using Microsoft.Practices.Unity;
+using Unity; using Unity.Resolution; using Unity.Attributes;
 using Newtonsoft.Json;
 using PoeShared.Modularity;
 using PoeShared.Prism;

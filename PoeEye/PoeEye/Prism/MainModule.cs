@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using System.Reactive.Disposables;
 using Guards;
-using Microsoft.Practices.Unity;
+using Unity; using Unity.Resolution; using Unity.Attributes;
 using Newtonsoft.Json;
 using PoeEye.Config;
 using PoeEye.Converters;
@@ -14,8 +14,10 @@ using PoeShared.Modularity;
 using PoeShared.PoeTrade;
 using PoeShared.PoeTrade.Query;
 using PoeShared.Scaffolding;
+using Prism.Ioc;
 using Prism.Modularity;
 using Prism.Unity;
+using Unity;
 
 namespace PoeEye.Prism
 {
@@ -31,24 +33,9 @@ namespace PoeEye.Prism
             this.container = container;
         }
 
-        public void Initialize()
-        {
-            container.AddExtension(new UiRegistrations());
-            
-            var registrator = container.Resolve<IPoeEyeModulesRegistrator>();
-            registrator.RegisterSettingsEditor<PoeEyeMainConfig, PoeMainSettingsViewModel>();
-            registrator.RegisterSettingsEditor<PoeEyeUpdateSettingsConfig, PoeEyeUpdateSettingsViewModel>();
-
-            InitializeConfigConverters();
-            
-            Log.Instance.Info($"Initializing Chromium...");
-            var chromium = container.Resolve<IChromiumBootstrapper>();
-            chromium.AddTo(anchors);
-        }
-        
         private void InitializeConfigConverters()
         {
-            var configProvider = container.TryResolve<IConfigSerializer>();
+            var configProvider = container.Resolve<IConfigSerializer>();
             var converters = new JsonConverter[]
             {
                 new ConcreteTypeConverter<IPoeQueryInfo, PoeQueryInfo>(),
@@ -60,6 +47,27 @@ namespace PoeEye.Prism
                 new ConcreteTypeConverter<IPoeQueryRangeModArgument, PoeQueryRangeModArgument>()
             };
             Array.ForEach(converters, configProvider.RegisterConverter);
+        }
+
+        public void RegisterTypes(IContainerRegistry containerRegistry)
+        {
+            container.AddExtension(new UiRegistrations());
+
+        }
+
+        public void OnInitialized(IContainerProvider containerProvider)
+        {
+            var registrator = container.Resolve<IPoeEyeModulesRegistrator>();
+            var domain = AppDomain.CurrentDomain;
+
+            registrator.RegisterSettingsEditor<PoeEyeMainConfig, PoeMainSettingsViewModel>();
+            registrator.RegisterSettingsEditor<PoeEyeUpdateSettingsConfig, PoeEyeUpdateSettingsViewModel>();
+
+            InitializeConfigConverters();
+            
+            Log.Instance.Info($"Initializing Chromium...");
+            var chromium = container.Resolve<IChromiumBootstrapper>();
+            chromium.AddTo(anchors);
         }
     }
 }

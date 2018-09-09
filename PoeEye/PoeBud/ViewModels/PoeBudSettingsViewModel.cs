@@ -10,7 +10,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using Guards;
 using JetBrains.Annotations;
-using Microsoft.Practices.Unity;
+using Unity; using Unity.Resolution; using Unity.Attributes;
 using PoeBud.Config;
 using PoeBud.Models;
 using PoeShared;
@@ -22,6 +22,7 @@ using PoeShared.StashApi;
 using PoeShared.StashApi.DataTypes;
 using ReactiveUI;
 using ReactiveUI.Legacy;
+using Unity.Attributes;
 using ReactiveCommand = ReactiveUI.ReactiveCommand;
 
 namespace PoeBud.ViewModels
@@ -83,18 +84,6 @@ namespace PoeBud.ViewModels
             private set { this.RaiseAndSetIfChanged(ref leaguesList, value); }
         }
 
-        public bool HideXpBar
-        {
-            get { return hideXpBar; }
-            set { this.RaiseAndSetIfChanged(ref hideXpBar, value); }
-        }
-
-        public bool IsEnabled
-        {
-            get { return isEnabled; }
-            set { this.RaiseAndSetIfChanged(ref isEnabled, value); }
-        }
-
         public string SelectedLeague
         {
             get { return selectedLeague; }
@@ -102,14 +91,6 @@ namespace PoeBud.ViewModels
         }
 
         public IReactiveList<TabSelectionViewModel> StashesList { get; } = new ReactiveList<TabSelectionViewModel>() { ChangeTrackingEnabled = true };
-
-        public UiOverlayInfo SelectedUiOverlay
-        {
-            get { return selectedUiOverlay; }
-            set { this.RaiseAndSetIfChanged(ref selectedUiOverlay, value); }
-        }
-
-        public IReactiveList<UiOverlayInfo> OverlaysList => overlaysProvider.OverlaysList;
 
         public string Username
         {
@@ -143,13 +124,6 @@ namespace PoeBud.ViewModels
             }
             
             Hotkey = config.GetChaosSetHotkey;
-            HideXpBar = config.HideXpBar;
-            IsEnabled = config.IsEnabled;
-            SelectedUiOverlay = OverlaysList.FirstOrDefault(x => x.Name == config.UiOverlayName);
-            if (SelectedUiOverlay.Name == null)
-            {
-                SelectedUiOverlay = UiOverlayInfo.Empty;
-            }
         }
 
         public PoeBudConfig Save()
@@ -166,10 +140,8 @@ namespace PoeBud.ViewModels
             {
                 resultingConfig.LeagueId = SelectedLeague;
             }
-            resultingConfig.UiOverlayName = selectedUiOverlay.Name;
 
             resultingConfig.GetChaosSetHotkey = hotkey;
-            resultingConfig.HideXpBar = hideXpBar;
             resultingConfig.IsEnabled = isEnabled;
 
             var selectedTabs = StashesList

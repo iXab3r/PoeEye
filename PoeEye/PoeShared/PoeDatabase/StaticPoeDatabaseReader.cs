@@ -4,8 +4,9 @@ using System.Reactive.Concurrency;
 using System.Threading.Tasks;
 using DynamicData;
 using JetBrains.Annotations;
-using Microsoft.Practices.Unity;
+using Unity; using Unity.Resolution; using Unity.Attributes;
 using PoeShared.Prism;
+using Unity.Attributes;
 
 namespace PoeShared.PoeDatabase
 {

@@ -11,8 +11,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PoeEye.Tests", "PoeEye.Test
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PoeEye", "PoeEye\PoeEye.csproj", "{9BC98190-3DB1-48CD-84F7-96DC843718AE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PoeEye.Simulator", "PoeEye.Simulator\PoeEye.Simulator.csproj", "{785DC21D-42F1-4DB9-883F-4D02CCF73FF0}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FuzzySearch", "FuzzySearch\FuzzySearch.csproj", "{9CEE14A8-1436-4947-9C62-FF3BA83A330D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PoeWhisperMonitor", "PoeWhisperMonitor\PoeWhisperMonitor.csproj", "{75B4A3DB-45C0-4639-B5A3-4D180AD4B9FB}"
@@ -26,8 +24,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PoeChatWheel", "PoeChatWheel\PoeChatWheel.csproj", "{DAD6D513-5C7C-433B-8A56-1D92476B4CFF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PoeBud", "PoeBud\PoeBud.csproj", "{DA6C88EA-168E-4116-B0D1-0F732D5B4773}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PoeOracle", "PoeOracle\PoeOracle.csproj", "{B2322E86-FEE4-4B64-91E1-909046F8EBD0}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RadialMenu", "..\Submodules\RadialMenu\RadialMenu\RadialMenu.csproj", "{9D959B4C-A428-4EA7-9197-BE04B37BF256}"
 EndProject
@@ -56,8 +52,6 @@ Global
 		{D9222C80-37C7-40F5-82CE-223F7FBBC724}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9BC98190-3DB1-48CD-84F7-96DC843718AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{9BC98190-3DB1-48CD-84F7-96DC843718AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{785DC21D-42F1-4DB9-883F-4D02CCF73FF0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{785DC21D-42F1-4DB9-883F-4D02CCF73FF0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9CEE14A8-1436-4947-9C62-FF3BA83A330D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{9CEE14A8-1436-4947-9C62-FF3BA83A330D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{75B4A3DB-45C0-4639-B5A3-4D180AD4B9FB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU

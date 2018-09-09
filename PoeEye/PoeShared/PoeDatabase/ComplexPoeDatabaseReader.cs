@@ -9,7 +9,7 @@ using DynamicData;
 using DynamicData.Binding;
 using Guards;
 using JetBrains.Annotations;
-using Microsoft.Practices.Unity;
+using Unity; using Unity.Resolution; using Unity.Attributes;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
 

@@ -13,7 +13,7 @@ using System.Windows;
 using System.Windows.Input;
 using Guards;
 using JetBrains.Annotations;
-using Microsoft.Practices.Unity;
+using Unity; using Unity.Resolution; using Unity.Attributes;
 using PoeEye.Config;
 using PoeEye.Utilities;
 using PoeShared;
@@ -30,8 +30,6 @@ namespace PoeEye.PoeTrade.Updater
         private static readonly string ApplicationName = Process.GetCurrentProcess().ProcessName + ".exe";
 
         private readonly IConfigProvider<PoeEyeUpdateSettingsConfig> configProvider;
-        private bool isBusy;
-        private bool isOpen;
 
         private Version mostRecentVersion;
         private DirectoryInfo mostRecentVersionAppFolder;

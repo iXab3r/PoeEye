@@ -4,11 +4,11 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
 using System.Reactive.Linq;
-using Anotar.Log4Net;
 using Guards;
 using JetBrains.Annotations;
 using KellermanSoftware.CompareNetObjects;
 using Newtonsoft.Json;
+using PoeShared;
 using PoeShared.Common;
 using PoeShared.Modularity;
 using PoeShared.PoeTrade;
@@ -42,7 +42,7 @@ namespace PoeEye.StashRealtimeApi.Services
 
             itemsSource.ItemPacks
                 .ObserveOn(bgScheduler)
-                .Subscribe(HandlePack, ex => LogTo.ErrorException("Exception occurred", ex))
+                .Subscribe(HandlePack, ex => Log.Instance.Error("Exception occurred", ex))
                 .AddTo(Anchors);
         }
 
@@ -63,15 +63,15 @@ namespace PoeEye.StashRealtimeApi.Services
 
         private void HandlePack(IPoeItem[] pack)
         {
-            LogTo.Debug($"Got items pack, {pack.Length} element(s), total {itemById.Count}");
+            Log.Instance.Debug($"Got items pack, {pack.Length} element(s), total {itemById.Count}");
 
             foreach (var poeItem in pack)
             {
                 itemById.AddOrUpdate(poeItem.Hash, poeItem, (key, oldItem) => HandleItemUpdate(oldItem, poeItem));
             }
 
-            LogTo.Debug("By league:\n\t{0}", pack.GroupBy(x => x.League ?? "UnknownLeague").Select(x => new { League = x.Key, Count = x.Count() }).DumpToText());
-            LogTo.Debug("By league(total):\n\t{0}", itemById.Values.GroupBy(x => x.League ?? "UnknownLeague").Select(x => new { League = x.Key, Count = x.Count() }).DumpToText());
+            Log.Instance.DebugFormat("By league:\n\t{0}", pack.GroupBy(x => x.League ?? "UnknownLeague").Select(x => new { League = x.Key, Count = x.Count() }).DumpToText());
+            Log.Instance.DebugFormat("By league(total):\n\t{0}", itemById.Values.GroupBy(x => x.League ?? "UnknownLeague").Select(x => new { League = x.Key, Count = x.Count() }).DumpToText());
 
             foreach (var queryItemSource in sourcesByQuery.Values)
             {
@@ -95,7 +95,7 @@ namespace PoeEye.StashRealtimeApi.Services
                     var rawComparisonResult = CompareObjects(rawOld, rawNew);
                     if (!rawComparisonResult.AreEqual)
                     {
-                        LogTo.Debug($"Item updated RAW, key: {oldItem.Hash}\nDiff: {rawComparisonResult.DifferencesString}");
+                        Log.Instance.Debug($"Item updated RAW, key: {oldItem.Hash}\nDiff: {rawComparisonResult.DifferencesString}");
                     }
                 }
 
@@ -106,12 +106,12 @@ namespace PoeEye.StashRealtimeApi.Services
                 }
                 if (!comparisonResult.AreEqual)
                 {
-                    LogTo.Debug($"Item updated, key: {oldItem.Hash}\nDiff: {comparisonResult.DifferencesString}");
+                    Log.Instance.Debug($"Item updated, key: {oldItem.Hash}\nDiff: {comparisonResult.DifferencesString}");
                 }
             }
             catch (Exception ex)
             {
-                LogTo.ErrorException($"Exception comparing item {oldItem.Hash}", ex);
+                Log.Instance.Error($"Exception comparing item {oldItem.Hash}", ex);
             }
 
             return newItem;
@@ -181,14 +181,14 @@ namespace PoeEye.StashRealtimeApi.Services
 
             public void AddItems(IPoeItem[] itemsPack)
             {
-                LogTo.Debug($"Got {itemsPack.Length} items");
+                Log.Instance.Debug($"Got {itemsPack.Length} items");
                 var initialCount = items.Count;
                 foreach (var poeItem in itemsPack)
                 {
                     items.Add(poeItem);
                 }
                 var newItemsCount = items.Count - initialCount;
-                LogTo.Debug($"New items count: {newItemsCount}");
+                Log.Instance.Debug($"New items count: {newItemsCount}");
             }
         }
     }

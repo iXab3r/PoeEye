@@ -16,7 +16,7 @@ using Dragablz;
 using DynamicData;
 using Guards;
 using JetBrains.Annotations;
-using Microsoft.Practices.Unity;
+using Unity; using Unity.Resolution; using Unity.Attributes;
 using Newtonsoft.Json;
 using PoeEye.Config;
 using PoeEye.PoeTrade.Models;
@@ -71,7 +71,6 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
             [NotNull] ApplicationUpdaterViewModel applicationUpdaterViewModel,
             [NotNull] IPoeEyeMainConfigProvider poeEyeConfigProvider,
             [NotNull] IAudioNotificationsManager audioNotificationsManager,
-            [NotNull] PoeClipboardParserViewModel clipboardParserViewModel,
             [NotNull] ProxyProviderViewModel proxyProviderViewModel,
             [NotNull] PoeEyeSettingsViewModel settings,
             [NotNull] IPoeChatViewModel chatViewModel,
@@ -86,7 +85,6 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
             Guard.ArgumentNotNull(applicationUpdaterViewModel, nameof(applicationUpdaterViewModel));
             Guard.ArgumentNotNull(proxyProviderViewModel, nameof(proxyProviderViewModel));
             Guard.ArgumentNotNull(poeEyeConfigProvider, nameof(poeEyeConfigProvider));
-            Guard.ArgumentNotNull(clipboardParserViewModel, nameof(clipboardParserViewModel));
             Guard.ArgumentNotNull(audioNotificationsManager, nameof(audioNotificationsManager));
             Guard.ArgumentNotNull(settings, nameof(settings));
             Guard.ArgumentNotNull(clipboardManager, nameof(clipboardManager));
@@ -111,9 +109,6 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
 
             ApplicationUpdater = applicationUpdaterViewModel;
             applicationUpdaterViewModel.AddTo(Anchors);
-
-            ClipboardParserViewModel = clipboardParserViewModel;
-            clipboardParserViewModel.AddTo(Anchors);
 
             ProxyProviderViewModel = proxyProviderViewModel;
             proxyProviderViewModel.AddTo(Anchors);
@@ -234,8 +229,6 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
         public CommandWrapper OpenAppDataDirectoryCommand { get; }
 
         public ApplicationUpdaterViewModel ApplicationUpdater { get; }
-
-        public PoeClipboardParserViewModel ClipboardParserViewModel { get; }
 
         public ProxyProviderViewModel ProxyProviderViewModel { get; }
 

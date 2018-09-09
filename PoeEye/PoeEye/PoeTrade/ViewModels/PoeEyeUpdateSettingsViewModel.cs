@@ -9,7 +9,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using DynamicData.Annotations;
 using Guards;
-using Microsoft.Practices.Unity;
+using Unity; using Unity.Resolution; using Unity.Attributes;
 using PoeEye.Config;
 using PoeEye.Utilities;
 using PoeShared;
@@ -20,6 +20,7 @@ using PoeShared.Scaffolding.WPF;
 using PoeShared.UI;
 using ReactiveUI;
 using Squirrel;
+using Unity.Attributes;
 
 namespace PoeEye.PoeTrade.ViewModels {
     internal sealed class PoeEyeUpdateSettingsViewModel : DisposableReactiveObject, ISettingsViewModel<PoeEyeUpdateSettingsConfig>

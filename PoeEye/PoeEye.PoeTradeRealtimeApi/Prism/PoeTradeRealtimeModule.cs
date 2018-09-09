@@ -1,10 +1,13 @@
 using Guards;
-using Microsoft.Practices.Unity;
+using PoeShared.Modularity;
+using Prism.Ioc;
+using Unity; using Unity.Resolution; using Unity.Attributes;
 using Prism.Modularity;
+using Unity;
 
 namespace PoeEye.PoeTradeRealtimeApi.Prism
 {
-    public sealed class PoeTradeRealtimeModule : IModule
+    public sealed class PoeTradeRealtimeModule : IPoeEyeModule
     {
         private readonly IUnityContainer container;
 
@@ -14,9 +17,13 @@ namespace PoeEye.PoeTradeRealtimeApi.Prism
             Guard.ArgumentNotNull(container, nameof(container));
         }
 
-        public void Initialize()
+        public void RegisterTypes(IContainerRegistry containerRegistry)
         {
             container.AddExtension(new LiveRegistrations());
+        }
+
+        public void OnInitialized(IContainerProvider containerProvider)
+        {
         }
     }
 }

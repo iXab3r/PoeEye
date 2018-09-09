@@ -9,7 +9,7 @@ using DynamicData.Binding;
 using Guards;
 using JetBrains.Annotations;
 using LinqKit;
-using Microsoft.Practices.Unity;
+using Unity; using Unity.Resolution; using Unity.Attributes;
 using PoeEye.PoeTrade.Shell.ViewModels;
 using PoeEye.PoeTrade.ViewModels;
 using PoeEye.TradeSummaryOverlay.Modularity;

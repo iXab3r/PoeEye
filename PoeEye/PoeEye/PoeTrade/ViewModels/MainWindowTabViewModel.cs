@@ -10,7 +10,7 @@ using Exceptionless;
 using Guards;
 using JetBrains.Annotations;
 using MaterialDesignThemes.Wpf;
-using Microsoft.Practices.Unity;
+using Unity; using Unity.Resolution; using Unity.Attributes;
 using PoeEye.Config;
 using PoeEye.PoeTrade.Common;
 using PoeEye.PoeTrade.Models;
@@ -25,6 +25,7 @@ using PoeShared.UI.ViewModels;
 using Prism.Commands;
 using ReactiveUI;
 using ReactiveUI.Legacy;
+using Unity.Attributes;
 
 namespace PoeEye.PoeTrade.ViewModels
 {

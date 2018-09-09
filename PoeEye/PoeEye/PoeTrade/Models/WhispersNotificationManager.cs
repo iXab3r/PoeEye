@@ -3,6 +3,7 @@ using PoeShared;
 using PoeShared.Audio;
 using PoeShared.Modularity;
 using PoeShared.Prism;
+using Unity.Attributes;
 using PoeEyeMainConfig = PoeEye.Config.PoeEyeMainConfig;
 
 namespace PoeEye.PoeTrade.Models
@@ -16,7 +17,7 @@ namespace PoeEye.PoeTrade.Models
 
     using JetBrains.Annotations;
 
-    using Microsoft.Practices.Unity;
+    using Unity; using Unity.Resolution; using Unity.Attributes;
 
     using PoeEye.Prism;
 

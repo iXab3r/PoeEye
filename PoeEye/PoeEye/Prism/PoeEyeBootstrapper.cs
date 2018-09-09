@@ -29,7 +29,7 @@ namespace PoeEye.Prism
 {
     using System.Windows;
 
-    using Microsoft.Practices.Unity;
+    using Unity; using Unity.Resolution; using Unity.Attributes;
 
     using PoeShared;
     using PoeShared.Prism;
@@ -90,7 +90,7 @@ namespace PoeEye.Prism
         public void Dispose()
         {
             Log.Instance.Info($"Disposing Chromium...");
-            var chromium = Container.TryResolve<IChromiumBootstrapper>();
+            var chromium = Container.Resolve<IChromiumBootstrapper>();
             chromium?.Dispose();
         }
     }

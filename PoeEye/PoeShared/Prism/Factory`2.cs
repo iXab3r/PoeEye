@@ -1,8 +1,11 @@
-﻿namespace PoeShared.Prism
+﻿using Unity;
+using Unity.Resolution;
+
+namespace PoeShared.Prism
 {
     using Guards;
 
-    using Microsoft.Practices.Unity;
+    using Unity; using Unity.Resolution; using Unity.Attributes;
 
     internal sealed class Factory<T1, T2> : IFactory<T1, T2>
     {

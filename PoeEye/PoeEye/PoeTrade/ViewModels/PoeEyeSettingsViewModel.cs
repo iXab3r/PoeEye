@@ -6,9 +6,10 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Reflection;
 using System.Windows.Input;
+using DynamicData.Binding;
 using Guards;
 using JetBrains.Annotations;
-using Microsoft.Practices.Unity;
+using Unity; using Unity.Resolution; using Unity.Attributes;
 using PoeEye.Config;
 using PoeShared;
 using PoeShared.Modularity;
@@ -16,6 +17,7 @@ using PoeShared.Scaffolding;
 using Prism.Commands;
 using Prism.Modularity;
 using ReactiveUI;
+using Unity;
 
 namespace PoeEye.PoeTrade.ViewModels
 {
@@ -44,7 +46,7 @@ namespace PoeEye.PoeTrade.ViewModels
             Observable.CombineLatest(
                     modulesEnumerator
                         .Settings
-                        .Changed
+                        .ToObservableChangeSet()
                         .ToUnit()
                         .StartWith(Unit.Default),
                     this.WhenAnyValue(x => x.IsOpen)

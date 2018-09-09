@@ -9,10 +9,8 @@ namespace PoeBud.Config
 
     using Newtonsoft.Json;
 
-    public sealed class PoeBudConfig : IPoeBudConfig, IOverlayConfig
+    public sealed class PoeBudConfig : IPoeBudConfig, IOverlayConfig, ICanBeEnabled
     {
-        public bool HideXpBar { get; set; } = false;
-
         public bool IsEnabled { get; set; } = true;
 
         public bool HighlightSolution { get; set; } = false;
@@ -24,8 +22,6 @@ namespace PoeBud.Config
         public string SessionId { get; set; }
 
         public string LeagueId { get; set; }
-
-        public string UiOverlayName { get; set; }
 
         public int ExpectedSetsCount { get; set; }
         
@@ -47,6 +43,6 @@ namespace PoeBud.Config
 
         public float OverlayOpacity { get; set; } = 0.75f;
 
-        public int Version { get; set; } = 3;
+        public int Version { get; set; } = 4;
     }
 }

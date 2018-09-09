@@ -9,7 +9,7 @@ using DynamicData;
 using DynamicData.Binding;
 using Guards;
 using JetBrains.Annotations;
-using Microsoft.Practices.Unity;
+using Unity; using Unity.Resolution; using Unity.Attributes;
 using PoeEye.TradeMonitor.Models;
 using PoeEye.TradeMonitor.Modularity;
 using PoeEye.TradeMonitor.Services;
@@ -39,8 +39,6 @@ namespace PoeEye.TradeMonitor.ViewModels
         private bool isExpanded;
 
         private int numberOfNegotiationsToExpandByDefault;
-
-        private float opacity;
 
         private int preGroupNotificationsCount;
 
@@ -117,12 +115,6 @@ namespace PoeEye.TradeMonitor.ViewModels
         }
 
         public int NegotiationsOverflow => negotiationsList.Count - PreGroupNotificationsCount;
-
-        public float Opacity
-        {
-            get { return opacity; }
-            set { this.RaiseAndSetIfChanged(ref opacity, value); }
-        }
 
         private void Initialize()
         {
