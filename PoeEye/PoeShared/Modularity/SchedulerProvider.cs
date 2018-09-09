@@ -13,12 +13,14 @@ namespace PoeShared.Modularity
 {
     internal class SchedulerProvider : ISchedulerProvider
     {
-        private readonly IScheduler uiScheduler;
         private readonly ConcurrentDictionary<string, IScheduler> schedulers = new ConcurrentDictionary<string, IScheduler>();
+        private readonly IScheduler uiScheduler;
 
         public SchedulerProvider(
-            [NotNull] [Unity.Attributes.Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler,
-            [NotNull] [Unity.Attributes.Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
+            [NotNull] [Unity.Attributes.Dependency(WellKnownSchedulers.Background)]
+            IScheduler bgScheduler,
+            [NotNull] [Unity.Attributes.Dependency(WellKnownSchedulers.UI)]
+            IScheduler uiScheduler)
         {
             this.uiScheduler = uiScheduler;
             Guard.ArgumentNotNull(bgScheduler, nameof(bgScheduler));
@@ -44,7 +46,7 @@ namespace PoeShared.Modularity
             var dispatcherThread = new Thread(InitializeDispatcherThread)
             {
                 Name = $"SC-{name}",
-                IsBackground = true,
+                IsBackground = true
             };
             dispatcherThread.SetApartmentState(ApartmentState.STA);
 

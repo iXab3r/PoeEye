@@ -16,28 +16,28 @@ namespace PoeEye.Utilities
         public static readonly DependencyProperty PropertyNameProperty
             = DependencyProperty.Register(
                 "PropertyName",
-                typeof (string),
-                typeof (SetPropertyAction));
+                typeof(string),
+                typeof(SetPropertyAction));
 
         public static readonly DependencyProperty PropertyValueProperty
             = DependencyProperty.Register(
                 "PropertyValue",
-                typeof (object),
-                typeof (SetPropertyAction));
+                typeof(object),
+                typeof(SetPropertyAction));
 
         public static readonly DependencyProperty TargetObjectProperty
             = DependencyProperty.Register(
                 "TargetObject",
-                typeof (object),
-                typeof (SetPropertyAction));
+                typeof(object),
+                typeof(SetPropertyAction));
 
         /// <summary>
         ///     The property to be executed in response to the trigger.
         /// </summary>
         public string PropertyName
         {
-            get { return (string) GetValue(PropertyNameProperty); }
-            set { SetValue(PropertyNameProperty, value); }
+            get => (string)GetValue(PropertyNameProperty);
+            set => SetValue(PropertyNameProperty, value);
         }
 
         /// <summary>
@@ -45,8 +45,8 @@ namespace PoeEye.Utilities
         /// </summary>
         public object PropertyValue
         {
-            get { return GetValue(PropertyValueProperty); }
-            set { SetValue(PropertyValueProperty, value); }
+            get => GetValue(PropertyValueProperty);
+            set => SetValue(PropertyValueProperty, value);
         }
 
 
@@ -55,8 +55,8 @@ namespace PoeEye.Utilities
         /// </summary>
         public object TargetObject
         {
-            get { return GetValue(TargetObjectProperty); }
-            set { SetValue(TargetObjectProperty, value); }
+            get => GetValue(TargetObjectProperty);
+            set => SetValue(TargetObjectProperty, value);
         }
 
         protected override void Invoke(object parameter)
@@ -65,7 +65,7 @@ namespace PoeEye.Utilities
             var propertyInfo = target.GetType().GetProperty(
                 PropertyName,
                 BindingFlags.Instance | BindingFlags.Public
-                | BindingFlags.NonPublic | BindingFlags.InvokeMethod);
+                                      | BindingFlags.NonPublic | BindingFlags.InvokeMethod);
 
             var targetType = propertyInfo.PropertyType;
             var valueToSet = PropertyValue;

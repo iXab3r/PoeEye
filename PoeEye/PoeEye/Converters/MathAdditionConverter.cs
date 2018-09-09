@@ -55,7 +55,7 @@ namespace PoeEye.Converters
                 return parameter;
             }
 
-            var stringParameter = (string) parameter;
+            var stringParameter = (string)parameter;
 
             int parsedInt;
             if (int.TryParse(stringParameter, out parsedInt))

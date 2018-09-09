@@ -11,12 +11,12 @@ namespace PoeBud.Converters
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (!(value is Boolean))
+            if (!(value is bool))
             {
                 return Binding.DoNothing;
             }
 
-            var boolValue = (Boolean)value;
+            var boolValue = (bool)value;
             return boolValue ? TrueValue : FalseValue;
         }
 

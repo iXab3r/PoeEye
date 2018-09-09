@@ -5,7 +5,7 @@ namespace PoeBud.Models
 {
     internal interface IUserInputBlocker
     {
-        [NotNull] 
+        [NotNull]
         IDisposable Block();
     }
 }

@@ -13,8 +13,8 @@ namespace PoeEye.PoeTrade.ViewModels
 
         bool IsEmpty { get; }
 
+        ISuggestionProvider SuggestionProvider { [CanBeNull] get; [CanBeNull] set; }
+
         void Reset();
-        
-        ISuggestionProvider SuggestionProvider { [CanBeNull] get; [CanBeNull] set; } 
     }
 }

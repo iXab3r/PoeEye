@@ -10,14 +10,14 @@ namespace PoeEye.TradeMonitor.Services
     {
         IObservable<Unit> Updates { [NotNull] get; }
 
-        [CanBeNull] 
-        IStashItem TryToFindItem([CanBeNull] string tabName, int itemX, int itemY);
-
-        [CanBeNull] 
-        IStashTab TryToFindTab([CanBeNull] string tabName);
-
         DateTime LastUpdateTimestamp { get; }
 
         bool IsBusy { get; }
+
+        [CanBeNull]
+        IStashItem TryToFindItem([CanBeNull] string tabName, int itemX, int itemY);
+
+        [CanBeNull]
+        IStashTab TryToFindTab([CanBeNull] string tabName);
     }
 }

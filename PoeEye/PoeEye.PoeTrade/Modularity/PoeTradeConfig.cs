@@ -10,7 +10,7 @@ namespace PoeEye.PoeTrade.Modularity
         public TimeSpan DelayBetweenRequests { get; set; } = TimeSpan.FromSeconds(0);
 
         public bool ProxyEnabled { get; set; } = false;
-        
+
         public TimeSpan RequestTimeout { get; set; } = TimeSpan.FromSeconds(10);
 
         public int Version { get; set; } = 2;

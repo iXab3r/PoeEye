@@ -14,7 +14,7 @@ namespace PoeShared.Scaffolding.WPF
     public sealed class TemplateMapping
     {
         public string Key { get; set; }
-        
+
         public DataTemplate Template { get; set; }
     }
 
@@ -27,19 +27,20 @@ namespace PoeShared.Scaffolding.WPF
         {
             DataTemplates = new ObservableCollection<TemplateMapping>();
             DataTemplates.CollectionChanged += DataTemplates_CollectionChanged;
-            
+
             templateLookup = new Dictionary<string, DataTemplate>();
         }
-        
+
         public ObservableCollection<TemplateMapping> DataTemplates { get; }
-        
+
         public string KeyPropertyPath { get; set; }
 
         private void DataTemplates_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             IList convertersToProcess = null;
 
-            switch (e.Action) {
+            switch (e.Action)
+            {
                 case NotifyCollectionChangedAction.Add:
                 case NotifyCollectionChangedAction.Replace:
                     convertersToProcess = e.NewItems;
@@ -49,6 +50,7 @@ namespace PoeShared.Scaffolding.WPF
                     {
                         templateLookup.Remove(maping.Key);
                     }
+
                     break;
                 case NotifyCollectionChangedAction.Reset:
                     templateLookup.Clear();
@@ -60,43 +62,43 @@ namespace PoeShared.Scaffolding.WPF
             {
                 return;
             }
-            
+
             foreach (TemplateMapping mapping in convertersToProcess)
             {
                 templateLookup.Add(mapping.Key, mapping.Template);
             }
         }
-        
+
         public override DataTemplate SelectTemplate(object item, DependencyObject container)
         {
             if (!(container is FrameworkElement element) || item == null)
             {
                 return null;
             }
-            
+
             var key = EvaluatePropertyPath(item, KeyPropertyPath);
             if (key == null)
             {
                 return null;
             }
-            
+
             if (item is INotifyPropertyChanged reactiveItem)
             {
                 Observable.FromEventPattern<PropertyChangedEventHandler, PropertyChangedEventArgs>(
-                    (handler => reactiveItem.PropertyChanged += handler), (handler => reactiveItem.PropertyChanged -= handler))
-                    .Where(x => x.EventArgs.PropertyName == KeyPropertyPath)
-                    .Take(1)
-                    .Subscribe(
-                        () =>
-                        {
-                            var presenter = (ContentPresenter)container;
-                            presenter.ContentTemplateSelector = null;
-                            presenter.ContentTemplateSelector = this;         
-                        });
+                              handler => reactiveItem.PropertyChanged += handler, handler => reactiveItem.PropertyChanged -= handler)
+                          .Where(x => x.EventArgs.PropertyName == KeyPropertyPath)
+                          .Take(1)
+                          .Subscribe(
+                              () =>
+                              {
+                                  var presenter = (ContentPresenter)container;
+                                  presenter.ContentTemplateSelector = null;
+                                  presenter.ContentTemplateSelector = this;
+                              });
             }
-            
-            return templateLookup.TryGetValue(key, out var templateKey) 
-                ? templateKey 
+
+            return templateLookup.TryGetValue(key, out var templateKey)
+                ? templateKey
                 : null;
         }
 

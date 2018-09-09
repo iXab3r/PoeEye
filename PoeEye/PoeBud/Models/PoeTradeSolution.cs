@@ -1,6 +1,7 @@
 using PoeShared.StashApi.DataTypes;
 
-namespace PoeBud.Models {
+namespace PoeBud.Models
+{
     internal class PoeTradeSolution : IPoeTradeSolution
     {
         public PoeTradeSolution(IPoeSolutionItem[] items, IStashTab[] tabs)

@@ -10,8 +10,8 @@ namespace PoeShared.PoeTrade.Query
 
         public IPoeItem[] ItemsList
         {
-            get { return itemsList; }
-            set { itemsList = value ?? new IPoeItem[0]; }
+            get => itemsList;
+            set => itemsList = value ?? new IPoeItem[0];
         }
     }
 }

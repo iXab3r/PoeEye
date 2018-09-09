@@ -7,7 +7,7 @@ namespace PoeEye.StashRealtimeApi.Services
 {
     internal interface IPoeItemsProcessor : IDisposable
     {
-        [NotNull] 
+        [NotNull]
         IPoeQueryResult IssueQuery([NotNull] IPoeQueryInfo query);
 
         bool DisposeQuery([NotNull] IPoeQueryInfo query);

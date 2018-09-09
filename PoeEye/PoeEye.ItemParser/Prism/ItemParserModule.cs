@@ -15,10 +15,6 @@ namespace PoeEye.ItemParser.Prism
 
             this.container = container;
         }
-        
-        public void Initialize()
-        {
-        }
 
         public void RegisterTypes(IContainerRegistry containerRegistry)
         {
@@ -26,6 +22,10 @@ namespace PoeEye.ItemParser.Prism
         }
 
         public void OnInitialized(IContainerProvider containerProvider)
+        {
+        }
+
+        public void Initialize()
         {
         }
     }

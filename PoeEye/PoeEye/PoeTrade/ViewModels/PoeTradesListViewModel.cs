@@ -31,13 +31,13 @@ namespace PoeEye.PoeTrade.ViewModels
         private readonly IPoeCaptchaRegistrator captchaRegistrator;
 
         private readonly IClock clock;
-        private readonly IEqualityComparer<IPoeItem> poeItemsComparer;
+        private readonly ISourceList<IPoeTradeViewModel> itemsSource = new SourceList<IPoeTradeViewModel>();
         private readonly IPoeApiWrapper poeApiWrapper;
+        private readonly IEqualityComparer<IPoeItem> poeItemsComparer;
         private readonly IFactory<IPoeLiveHistoryProvider, IPoeApiWrapper, IPoeQueryInfo> poeLiveHistoryFactory;
         private readonly IFactory<IPoeTradeViewModel, IPoeItem> poeTradeViewModelFactory;
+        private readonly IPoeTradeQuickFilter quickFilter;
         private readonly IScheduler uiScheduler;
-        private readonly ISourceList<IPoeTradeViewModel> itemsSource = new SourceList<IPoeTradeViewModel>();
-        private readonly IPoeTradeQuickFilter quickFilter; 
         private ActiveProviderInfo activeProviderInfo;
         private IPoeQueryInfo activeQuery;
 
@@ -57,7 +57,8 @@ namespace PoeEye.PoeTrade.ViewModels
             [NotNull] IEqualityComparer<IPoeItem> poeItemsComparer,
             [NotNull] IFactory<IPoeTradeQuickFilter> quickFilterFactory,
             [NotNull] IClock clock,
-            [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
+            [NotNull] [Dependency(WellKnownSchedulers.UI)]
+            IScheduler uiScheduler)
         {
             Guard.ArgumentNotNull(poeApiWrapper, nameof(poeApiWrapper));
             Guard.ArgumentNotNull(poeLiveHistoryFactory, nameof(poeLiveHistoryFactory));
@@ -78,10 +79,10 @@ namespace PoeEye.PoeTrade.ViewModels
             this.captchaRegistrator = captchaRegistrator;
 
             Anchors.Add(activeHistoryProviderDisposable);
-            
+
             this.WhenAnyValue(x => x.ActiveQuery)
                 .DistinctUntilChanged()
-                .WithPrevious((prev, curr) => new { prev, curr })
+                .WithPrevious((prev, curr) => new {prev, curr})
                 .Select(x => x.curr)
                 .Do(_ => lastUpdateTimestamp = clock.Now)
                 .Select(HandleNextQuery)
@@ -97,11 +98,11 @@ namespace PoeEye.PoeTrade.ViewModels
                 .AddTo(Anchors);
 
             itemsSource.Connect()
-                .DisposeMany()
-                .Bind(out var items)
-                .Subscribe()
-                .AddTo(Anchors);
-            
+                       .DisposeMany()
+                       .Bind(out var items)
+                       .Subscribe()
+                       .AddTo(Anchors);
+
             var list = listFactory.Create().AddTo(Anchors);
             list.SortBy(nameof(IPoeTradeViewModel.TradeState), ListSortDirection.Ascending);
             list.ThenSortBy(nameof(IPoeTradeViewModel.PriceInChaosOrbs), ListSortDirection.Ascending);
@@ -109,46 +110,34 @@ namespace PoeEye.PoeTrade.ViewModels
 
             quickFilter = quickFilterFactory.Create();
             list.Filter(this.WhenAnyValue(x => x.QuickFilter).Select(x => BuildFilter()));
-            
+
             Items = list.Items;
         }
 
         public TimeSpan RecheckPeriod
         {
-            get { return recheckPeriod; }
-            set { this.RaiseAndSetIfChanged(ref recheckPeriod, value); }
-        }
-        
-        private Predicate<IPoeTradeViewModel> BuildFilter()
-        {
-            var filter = PredicateBuilder.True<IPoeTradeViewModel>();
-
-            if (!string.IsNullOrWhiteSpace(QuickFilter))
-            {
-                filter = filter.And(x => quickFilter.Apply(quickFilterText, x));
-            }
-
-            return new Predicate<IPoeTradeViewModel>(filter.Compile());
+            get => recheckPeriod;
+            set => this.RaiseAndSetIfChanged(ref recheckPeriod, value);
         }
 
         public ReadOnlyObservableCollection<IPoeTradeViewModel> Items { get; }
 
         public IPoeQueryInfo ActiveQuery
         {
-            get { return activeQuery; }
-            set { this.RaiseAndSetIfChanged(ref activeQuery, value); }
+            get => activeQuery;
+            set => this.RaiseAndSetIfChanged(ref activeQuery, value);
         }
 
         public string Errors
         {
-            get { return errors; }
-            private set { this.RaiseAndSetIfChanged(ref errors, value); }
+            get => errors;
+            private set => this.RaiseAndSetIfChanged(ref errors, value);
         }
-        
+
         public string QuickFilter
         {
-            get { return quickFilterText; }
-            set { this.RaiseAndSetIfChanged(ref quickFilterText, value); }
+            get => quickFilterText;
+            set => this.RaiseAndSetIfChanged(ref quickFilterText, value);
         }
 
         public TimeSpan TimeSinceLastUpdate => clock.Now - lastUpdateTimestamp;
@@ -166,6 +155,18 @@ namespace PoeEye.PoeTrade.ViewModels
             itemsSource.Clear();
         }
 
+        private Predicate<IPoeTradeViewModel> BuildFilter()
+        {
+            var filter = PredicateBuilder.True<IPoeTradeViewModel>();
+
+            if (!string.IsNullOrWhiteSpace(QuickFilter))
+            {
+                filter = filter.And(x => quickFilter.Apply(quickFilterText, x));
+            }
+
+            return new Predicate<IPoeTradeViewModel>(filter.Compile());
+        }
+
         private void OnNextItemsPackReceived(IPoeItem[] itemsPack)
         {
             var activeProvider = activeProviderInfo;
@@ -178,9 +179,9 @@ namespace PoeEye.PoeTrade.ViewModels
             var removedItems = existingItems.Except(itemsPack, poeItemsComparer).ToArray();
             var newItems = itemsPack.Except(existingItems, poeItemsComparer).ToArray();
             var relistedItems = itemsSource.Items
-                .Where(x => x.TradeState == PoeTradeState.Removed)
-                .Where(x => itemsPack.Contains(x.Trade, poeItemsComparer))
-                .ToArray();
+                                           .Where(x => x.TradeState == PoeTradeState.Removed)
+                                           .Where(x => itemsPack.Contains(x.Trade, poeItemsComparer))
+                                           .ToArray();
 
             Log.Instance.Debug(
                 $"[TradesListViewModel] Next items pack received, existingItems: {existingItems.Length}, newItems: {newItems.Length}, removedItems: {removedItems.Length}, relistedItems: {relistedItems.Length}");
@@ -205,7 +206,7 @@ namespace PoeEye.PoeTrade.ViewModels
 
                     itemViewModel
                         .WhenAnyValue(x => x.TradeState)
-                        .WithPrevious((prev, curr) => new { prev, curr })
+                        .WithPrevious((prev, curr) => new {prev, curr})
                         .Where(x => x.curr == PoeTradeState.Normal && x.prev == PoeTradeState.Removed)
                         .Select(x => itemViewModel)
                         .Subscribe(itemsSource.Remove)
@@ -213,10 +214,11 @@ namespace PoeEye.PoeTrade.ViewModels
 
                     itemViewModel.TradeState = PoeTradeState.New;
                     itemViewModel.Trade.Timestamp = clock.Now;
-                    
+
                     itemsSource.Add(itemViewModel);
                 }
             }
+
             lastUpdateTimestamp = clock.Now;
         }
 
@@ -227,12 +229,10 @@ namespace PoeEye.PoeTrade.ViewModels
                 activeHistoryProviderDisposable.Disposable = null;
                 return Observable.Never<IPoeItem[]>();
             }
-            else
-            {
-                var historyProvider = poeLiveHistoryFactory.Create(poeApiWrapper, queryInfo);
-                OnNextHistoryProviderCreated(historyProvider);
-                return historyProvider.ItemsPacks;
-            }
+
+            var historyProvider = poeLiveHistoryFactory.Create(poeApiWrapper, queryInfo);
+            OnNextHistoryProviderCreated(historyProvider);
+            return historyProvider.ItemsPacks;
         }
 
         private void OnNextHistoryProviderCreated(IPoeLiveHistoryProvider poeLiveHistoryProvider)
@@ -297,7 +297,7 @@ namespace PoeEye.PoeTrade.ViewModels
             {
                 HistoryProvider = provider;
 
-                Anchors = new CompositeDisposable { HistoryProvider };
+                Anchors = new CompositeDisposable {HistoryProvider};
             }
 
             public void Dispose()

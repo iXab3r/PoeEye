@@ -19,13 +19,13 @@ namespace PoeShared.Scaffolding.WPF
                 typeof(FlyoutsControlItemsSourceBehavior),
                 new UIPropertyMetadata(new List<object>(), OnItemsSourcePropertyChangedCallback));
 
+        private readonly SerialDisposable itemsSourceSubscription = new SerialDisposable();
+
         public object ItemsSource
         {
-            get { return (object) GetValue(ItemsSourceProperty); }
-            set { SetValue(ItemsSourceProperty, value); }
+            get => GetValue(ItemsSourceProperty);
+            set => SetValue(ItemsSourceProperty, value);
         }
-
-        private readonly SerialDisposable itemsSourceSubscription = new SerialDisposable();
 
         protected override void OnDetaching()
         {
@@ -55,7 +55,7 @@ namespace PoeShared.Scaffolding.WPF
 
             Observable
                 .FromEventPattern<NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs>
-                (h => npcSource.CollectionChanged += h, h => npcSource.CollectionChanged -= h)
+                    (h => npcSource.CollectionChanged += h, h => npcSource.CollectionChanged -= h)
                 .Subscribe(x => ProcessCollectionChange(itemsSource, x.EventArgs))
                 .AddTo(itemsSourceAnchors);
             ProcessCollectionChange(
@@ -76,12 +76,14 @@ namespace PoeShared.Scaffolding.WPF
                     {
                         AssociatedObject.Items?.Add(argsNewItem);
                     }
+
                     break;
                 case NotifyCollectionChangedAction.Reset:
                     foreach (var argsNewItem in itemsSource)
                     {
                         AssociatedObject.Items?.Add(argsNewItem);
                     }
+
                     break;
             }
         }

@@ -1,6 +1,7 @@
 ﻿using System;
 
-namespace PoeShared.Common {
+namespace PoeShared.Common
+{
     [Flags]
     public enum PoeItemModificatins
     {

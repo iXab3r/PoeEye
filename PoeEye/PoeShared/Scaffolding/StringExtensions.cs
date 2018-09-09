@@ -12,9 +12,9 @@ namespace PoeShared.Scaffolding
         public static string[] SplitTrim(this string str, string separator)
         {
             return str
-                .Split(new[] { separator }, StringSplitOptions.RemoveEmptyEntries)
-                .Select(sub => sub.Trim('\n','\r',' '))
-                .ToArray();
+                   .Split(new[] {separator}, StringSplitOptions.RemoveEmptyEntries)
+                   .Select(sub => sub.Trim('\n', '\r', ' '))
+                   .ToArray();
         }
 
         public static int? ToIntOrDefault(this string str)
@@ -25,6 +25,7 @@ namespace PoeShared.Scaffolding
             {
                 return result;
             }
+
             return null;
         }
 
@@ -36,6 +37,7 @@ namespace PoeShared.Scaffolding
             {
                 return result;
             }
+
             return null;
         }
 
@@ -46,6 +48,7 @@ namespace PoeShared.Scaffolding
             {
                 return default(Uri);
             }
+
             return result;
         }
     }

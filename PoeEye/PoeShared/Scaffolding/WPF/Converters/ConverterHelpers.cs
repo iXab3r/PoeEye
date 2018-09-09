@@ -24,6 +24,7 @@ namespace PoeShared.Scaffolding.WPF.Converters
             {
                 isNull = value == null;
             }
+
             return isNull;
         }
 

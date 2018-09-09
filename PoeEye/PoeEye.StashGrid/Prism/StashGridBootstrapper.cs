@@ -12,15 +12,16 @@ namespace PoeEye.StashGrid.Prism
 {
     internal sealed class StashGridBootstrapper : DisposableReactiveObject
     {
+        private readonly SerialDisposable activeAnchors = new SerialDisposable();
         private readonly IOverlayWindowController overlayController;
         private readonly IFactory<PoeStashGridViewModel, IOverlayWindowController> viewModelFactory;
 
-        private readonly SerialDisposable activeAnchors = new SerialDisposable();
-
         public StashGridBootstrapper(
-                [NotNull] [Dependency(WellKnownOverlays.PathOfExileOverlay)] IOverlayWindowController overlayController,
-                [NotNull] IFactory<PoeStashGridViewModel, IOverlayWindowController> viewModelFactory,
-                [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
+            [NotNull] [Dependency(WellKnownOverlays.PathOfExileOverlay)]
+            IOverlayWindowController overlayController,
+            [NotNull] IFactory<PoeStashGridViewModel, IOverlayWindowController> viewModelFactory,
+            [NotNull] [Dependency(WellKnownSchedulers.UI)]
+            IScheduler uiScheduler)
         {
             Guard.ArgumentNotNull(overlayController, nameof(overlayController));
             Guard.ArgumentNotNull(viewModelFactory, nameof(viewModelFactory));
@@ -28,7 +29,7 @@ namespace PoeEye.StashGrid.Prism
             this.overlayController = overlayController;
             this.viewModelFactory = viewModelFactory;
 
-            HandleAvailability(isEnabled: true);
+            HandleAvailability(true);
         }
 
         private void HandleAvailability(bool isEnabled)

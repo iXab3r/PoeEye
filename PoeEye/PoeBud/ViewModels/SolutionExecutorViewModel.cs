@@ -22,10 +22,10 @@ namespace PoeBud.ViewModels
     internal sealed class SolutionExecutorViewModel : DisposableReactiveObject, ISolutionExecutorViewModel
     {
         private readonly IClock clock;
-        private readonly ISolutionExecutorModel solutionExecutor;
-        private readonly IKeyboardEventsSource keyboardMouseEvents;
         private readonly IHighlightingService highlightingService;
+        private readonly IKeyboardEventsSource keyboardMouseEvents;
         private readonly IConfigProvider<PoeBudConfig> poeBudConfigProvider;
+        private readonly ISolutionExecutorModel solutionExecutor;
         private readonly IScheduler uiScheduler;
 
         private bool isBusy;
@@ -36,8 +36,10 @@ namespace PoeBud.ViewModels
             [NotNull] IKeyboardEventsSource keyboardMouseEvents,
             [NotNull] IHighlightingService highlightingService,
             [NotNull] IConfigProvider<PoeBudConfig> poeBudConfigProvider,
-            [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler,
-            [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler)
+            [NotNull] [Dependency(WellKnownSchedulers.UI)]
+            IScheduler uiScheduler,
+            [NotNull] [Dependency(WellKnownSchedulers.Background)]
+            IScheduler bgScheduler)
         {
             Guard.ArgumentNotNull(clock, nameof(clock));
             Guard.ArgumentNotNull(solutionExecutor, nameof(solutionExecutor));
@@ -63,12 +65,12 @@ namespace PoeBud.ViewModels
 
         public bool IsBusy
         {
-            get { return isBusy; }
-            set { this.RaiseAndSetIfChanged(ref isBusy, value); }
+            get => isBusy;
+            set => this.RaiseAndSetIfChanged(ref isBusy, value);
         }
 
         public IReactiveList<string> PerformedOperations { get; } = new ReactiveList<string>();
-        
+
         public void LogOperation(string logMessage)
         {
             Guard.ArgumentNotNull(logMessage, nameof(logMessage));
@@ -87,19 +89,19 @@ namespace PoeBud.ViewModels
             var cancellationTokenSource = new CancellationTokenSource();
             var cancelSolutionHotkey = new KeyGesture(Key.Escape);
             var keyboardAnchorDisposable = keyboardMouseEvents
-                .WhenKeyDown
-                .Where(x => IsBusy)
-                .Where(x => cancelSolutionHotkey.MatchesHotkey(x))
-                .Do(x => x.Handled = true)
-                .ObserveOn(uiScheduler)
-                .Subscribe(
-                    () =>
-                    {
-                        Log.Instance.Debug($"[SolutionExecutor.ExecuteSolution] Cancellation requested");
+                                           .WhenKeyDown
+                                           .Where(x => IsBusy)
+                                           .Where(x => cancelSolutionHotkey.MatchesHotkey(x))
+                                           .Do(x => x.Handled = true)
+                                           .ObserveOn(uiScheduler)
+                                           .Subscribe(
+                                               () =>
+                                               {
+                                                   Log.Instance.Debug($"[SolutionExecutor.ExecuteSolution] Cancellation requested");
 
-                        LogMessage("Requesting solution cancellation...");
-                        cancellationTokenSource.Cancel();
-                    });
+                                                   LogMessage("Requesting solution cancellation...");
+                                                   cancellationTokenSource.Cancel();
+                                               });
 
             try
             {
@@ -123,7 +125,7 @@ namespace PoeBud.ViewModels
 
             Log.Instance.Debug($"[SolutionExecutor.ExecuteSolution] Log:\r\n\t{string.Join("\r\n\t", PerformedOperations)}");
         }
-        
+
         private void LogMessage(string logMessage)
         {
             Guard.ArgumentNotNull(logMessage, nameof(logMessage));

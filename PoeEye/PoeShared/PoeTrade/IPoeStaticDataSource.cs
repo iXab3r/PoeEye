@@ -2,7 +2,8 @@
 using PoeShared.PoeTrade.Query;
 using PoeShared.Scaffolding;
 
-namespace PoeShared.PoeTrade {
+namespace PoeShared.PoeTrade
+{
     public interface IPoeStaticDataSource : IDisposableReactiveObject
     {
         [NotNull]

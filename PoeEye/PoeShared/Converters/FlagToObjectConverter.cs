@@ -8,9 +8,9 @@ namespace PoeShared.Converters
     public class FlagToObjectConverter : IValueConverter
     {
         public object BitMask { get; set; }
-        
+
         public object TrueValue { get; set; }
-        
+
         public object FalseValue { get; set; }
 
         public object Convert(object rawValue, Type targetType, object parameter, CultureInfo culture)
@@ -19,6 +19,7 @@ namespace PoeShared.Converters
             {
                 return Binding.DoNothing;
             }
+
             if (rawValue == null)
             {
                 return Binding.DoNothing;
@@ -29,12 +30,12 @@ namespace PoeShared.Converters
 
             return IsFlagSet(value, mask) ? TrueValue : FalseValue;
         }
-        
+
         public object ConvertBack(object rawValue, Type targetType, object parameter, CultureInfo culture)
         {
             throw new NotSupportedException();
         }
-        
+
         internal static ulong ToUInt64(object value)
         {
             var typeCode = System.Convert.GetTypeCode(value);
@@ -51,12 +52,12 @@ namespace PoeShared.Converters
                 case TypeCode.Int16:
                 case TypeCode.Int32:
                 case TypeCode.Int64:
-                    return (ulong) System.Convert.ToInt64(value, CultureInfo.InvariantCulture);
+                    return (ulong)System.Convert.ToInt64(value, CultureInfo.InvariantCulture);
                 default:
                     throw new ArgumentException($"Invalid typecode: {typeCode}");
             }
         }
-        
+
         internal static bool IsFlagSet(ulong value, ulong flag)
         {
             return (value & flag) != 0;
@@ -67,14 +68,14 @@ namespace PoeShared.Converters
     {
         public new Visibility TrueValue
         {
-            get { return (Visibility)base.TrueValue; }
-            set { base.TrueValue = value; }
+            get => (Visibility)base.TrueValue;
+            set => base.TrueValue = value;
         }
-        
+
         public new Visibility FalseValue
         {
-            get { return (Visibility)base.FalseValue; }
-            set { base.FalseValue = value; }
+            get => (Visibility)base.FalseValue;
+            set => base.FalseValue = value;
         }
     }
 }

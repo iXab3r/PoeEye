@@ -12,6 +12,7 @@ namespace PoeShared.UI.ViewModels
 {
     internal sealed class ImageViewModel : DisposableReactiveObject, IImageViewModel
     {
+        private BitmapImage imageSource;
         private bool isLoading;
 
         public ImageViewModel(
@@ -34,18 +35,16 @@ namespace PoeShared.UI.ViewModels
                 .AddTo(Anchors);
         }
 
-        private BitmapImage imageSource;
-
         public BitmapImage ImageSource
         {
-            get { return imageSource; }
-            set { this.RaiseAndSetIfChanged(ref imageSource, value); }
+            get => imageSource;
+            set => this.RaiseAndSetIfChanged(ref imageSource, value);
         }
 
         public bool IsLoading
         {
-            get { return isLoading; }
-            set { this.RaiseAndSetIfChanged(ref isLoading, value); }
+            get => isLoading;
+            set => this.RaiseAndSetIfChanged(ref isLoading, value);
         }
 
         private void LoadImage(FileInfo cachedImageFilePath, Uri imageUri)

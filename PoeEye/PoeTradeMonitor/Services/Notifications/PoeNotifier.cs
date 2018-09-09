@@ -20,9 +20,9 @@ namespace PoeEye.TradeMonitor.Services.Notifications
 {
     internal sealed class PoeNotifier : DisposableReactiveObject, IPoeNotifier
     {
+        private static readonly TimeSpan BufferPeriod = TimeSpan.FromSeconds(10);
         [NotNull] private readonly IClock clock;
         private readonly IConfigProvider<PoeTradeMonitorConfig> configProvider;
-        private static readonly TimeSpan BufferPeriod = TimeSpan.FromSeconds(10);
 
         private readonly ISubject<string> messagesQueue = new Subject<string>();
 
@@ -72,7 +72,7 @@ namespace PoeEye.TradeMonitor.Services.Notifications
 
                 message.Body = new TextPart("plain")
                 {
-                    Text = $"[PoeEye]\n{messagesToSend.DumpToText()}",
+                    Text = $"[PoeEye]\n{messagesToSend.DumpToText()}"
                 };
                 Log.Instance.Debug($"[Poe.MailNotifier] Message body:\n{message.Body}");
 
@@ -100,7 +100,7 @@ namespace PoeEye.TradeMonitor.Services.Notifications
         private sealed class EmailLogger : IProtocolLogger, IEnumerable<string>
         {
             private readonly IClock clock;
-            private ConcurrentQueue<string> log = new ConcurrentQueue<string>();
+            private readonly ConcurrentQueue<string> log = new ConcurrentQueue<string>();
 
             public EmailLogger(IClock clock)
             {
@@ -108,9 +108,14 @@ namespace PoeEye.TradeMonitor.Services.Notifications
                 LogMessage("Created");
             }
 
-            private void LogMessage(string message)
+            IEnumerator IEnumerable.GetEnumerator()
             {
-                log.Enqueue($"[{clock.Now}] {message.Trim('\n', '\r', ' ', '\t')}");
+                return GetEnumerator();
+            }
+
+            public IEnumerator<string> GetEnumerator()
+            {
+                return log.GetEnumerator();
             }
 
             public void Dispose()
@@ -131,6 +136,11 @@ namespace PoeEye.TradeMonitor.Services.Notifications
             public void LogServer(byte[] buffer, int offset, int count)
             {
                 LogInteraction("Server", buffer, offset, count);
+            }
+
+            private void LogMessage(string message)
+            {
+                log.Enqueue($"[{clock.Now}] {message.Trim('\n', '\r', ' ', '\t')}");
             }
 
             private void LogInteraction(string tag, byte[] buffer, int offset, int count)
@@ -156,16 +166,6 @@ namespace PoeEye.TradeMonitor.Services.Notifications
                 {
                     LogMessage($"[{tag}] Failed to decode message: {e}\nBuffer: {buffer.DumpToText()}\nOffset: {offset}\nCount: {count}");
                 }
-            }
-
-            IEnumerator IEnumerable.GetEnumerator()
-            {
-                return GetEnumerator();
-            }
-
-            public IEnumerator<string> GetEnumerator()
-            {
-                return log.GetEnumerator();
             }
         }
     }

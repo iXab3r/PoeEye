@@ -9,7 +9,7 @@ namespace PoeShared.Common
         private IPoeItemMod[] mods = new IPoeItemMod[0];
 
         public string ItemName { get; set; }
-        
+
         public ItemTypeInfo TypeInfo { get; set; }
 
         public string FlavourText { get; set; }
@@ -25,7 +25,7 @@ namespace PoeShared.Common
         public string UserIgn { get; set; }
 
         public bool UserIsOnline { get; set; }
-        
+
         public PoeItemModificatins Modifications { get; set; }
 
         public string Price { get; set; }
@@ -80,8 +80,8 @@ namespace PoeShared.Common
 
         public IPoeItemMod[] Mods
         {
-            get { return mods; }
-            set { mods = value ?? new IPoeItemMod[0]; }
+            get => mods;
+            set => mods = value ?? new IPoeItemMod[0];
         }
 
         public IPoeLinksInfo Links { get; set; }

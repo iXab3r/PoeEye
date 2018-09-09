@@ -25,47 +25,47 @@ namespace PoeEye.PoeTrade.ViewModels
 {
     internal sealed class PoeAdvancedTradesListViewModel : DisposableReactiveObject, IPoeAdvancedTradesListViewModel
     {
-        private readonly ReadOnlyObservableCollection<IPoeTradeViewModel> itemsCollection;
         private static readonly Func<IPoeTradeViewModel, bool> AlwaysTruePredicate = model => true;
         private static readonly TimeSpan ResortRefilterThrottleTimeout = TimeSpan.FromMilliseconds(100);
+        private readonly SerialDisposable activeFilterAnchor = new SerialDisposable();
+
+        private readonly BehaviorSubject<Func<IPoeTradeViewModel, bool>> filterConditionSource = new BehaviorSubject<Func<IPoeTradeViewModel, bool>>(null);
+        private readonly ReadOnlyObservableCollection<IPoeTradeViewModel> itemsCollection;
 
         private readonly ISubject<Unit> resortRequest = new Subject<Unit>();
-        private readonly SourceList<ISourceList<IPoeTradeViewModel>> tradeLists = new SourceList<ISourceList<IPoeTradeViewModel>>();
 
         private readonly SourceCache<SortData, SortDescriptionData> sortingCache =
             new SourceCache<SortData, SortDescriptionData>(x => x.Data);
 
         private readonly SourceList<SortData> sortingRules = new SourceList<SortData>();
+        private readonly SourceList<ISourceList<IPoeTradeViewModel>> tradeLists = new SourceList<ISourceList<IPoeTradeViewModel>>();
 
-        private readonly BehaviorSubject<Func<IPoeTradeViewModel, bool>> filterConditionSource = new BehaviorSubject<Func<IPoeTradeViewModel, bool>>(null);
-        private readonly SerialDisposable activeFilterAnchor = new SerialDisposable();
-
-        private long filterRequestsCount = 0;
-        private long sortRequestsCount = 0;
-        private int maxItems = 0;
+        private long filterRequestsCount;
+        private int maxItems;
+        private long sortRequestsCount;
 
         public PoeAdvancedTradesListViewModel([NotNull] [Dependency(WellKnownSchedulers.UI)]
-            IScheduler uiScheduler)
+                                              IScheduler uiScheduler)
         {
             Guard.ArgumentNotNull(uiScheduler, nameof(uiScheduler));
 
             activeFilterAnchor.AddTo(Anchors);
 
             var comparerObservable = sortingRules
-                .Connect()
-                .ToUnit()
-                .StartWith()
-                .Select(x => new TradeComparer(sortingRules.Items.ToArray()));
+                                     .Connect()
+                                     .ToUnit()
+                                     .StartWith()
+                                     .Select(x => new TradeComparer(sortingRules.Items.ToArray()));
 
             var allItems = tradeLists
                 .Or();
 
             allItems
                 .Filter(filterConditionSource.Select(x => x ?? AlwaysTruePredicate).Sample(ResortRefilterThrottleTimeout)
-                    .Do(_ => Interlocked.Increment(ref filterRequestsCount)))
+                                             .Do(_ => Interlocked.Increment(ref filterRequestsCount)))
                 .Virtualise(this.WhenAnyValue(x => x.MaxItems).Select(x => new VirtualRequest(0, x > 0 ? x : int.MaxValue)))
                 .Sort(comparerObservable, SortOptions.None,
-                    resortRequest.Sample(ResortRefilterThrottleTimeout).Do(_ => Interlocked.Increment(ref sortRequestsCount)))
+                      resortRequest.Sample(ResortRefilterThrottleTimeout).Do(_ => Interlocked.Increment(ref sortRequestsCount)))
                 .ObserveOn(uiScheduler)
                 .Bind(out itemsCollection)
                 .Subscribe()
@@ -87,6 +87,10 @@ namespace PoeEye.PoeTrade.ViewModels
                 .Subscribe(() => filterConditionSource.OnNext(filterConditionSource.Value))
                 .AddTo(Anchors);
         }
+
+        public long FilterRequestsCount => filterRequestsCount;
+
+        public long SortRequestsCount => sortRequestsCount;
 
         public void Add(ReadOnlyObservableCollection<IPoeTradeViewModel> itemList)
         {
@@ -115,17 +119,13 @@ namespace PoeEye.PoeTrade.ViewModels
         }
 
         public ReadOnlyObservableCollection<IPoeTradeViewModel> Items => itemsCollection;
-        
-        
+
+
         public int MaxItems
         {
-            get { return maxItems; }
-            set { this.RaiseAndSetIfChanged(ref maxItems, value); }
+            get => maxItems;
+            set => this.RaiseAndSetIfChanged(ref maxItems, value);
         }
-        
-        public long FilterRequestsCount => filterRequestsCount;
-
-        public long SortRequestsCount => sortRequestsCount;
 
         public void ResetSorting()
         {
@@ -135,19 +135,6 @@ namespace PoeEye.PoeTrade.ViewModels
         public void Filter(IObservable<Predicate<IPoeTradeViewModel>> conditionSource)
         {
             conditionSource.Subscribe(condition => filterConditionSource.OnNext(new Func<IPoeTradeViewModel, bool>(condition))).AssignTo(activeFilterAnchor);
-        }
-
-        public void RegisterSort(string propertyName, Func<IPoeTradeViewModel, object> fieldExtractor)
-        {
-            var asc = new SortDescriptionData(propertyName, ListSortDirection.Ascending);
-            var desc = new SortDescriptionData(propertyName, ListSortDirection.Descending);
-            if (sortingCache.Lookup(asc).HasValue || sortingCache.Lookup(desc).HasValue)
-            {
-                throw new ApplicationException($"Cache already contains item with a key '{propertyName}', cache: ${sortingCache.Keys.DumpToTextRaw()}");
-            }
-
-            sortingCache.AddOrUpdate(new SortData(asc, fieldExtractor));
-            sortingCache.AddOrUpdate(new SortData(desc, fieldExtractor));
         }
 
         public void SortBy(string propertyName, ListSortDirection direction)
@@ -166,6 +153,19 @@ namespace PoeEye.PoeTrade.ViewModels
             }
 
             sortingRules.Add(sortData.Value);
+        }
+
+        public void RegisterSort(string propertyName, Func<IPoeTradeViewModel, object> fieldExtractor)
+        {
+            var asc = new SortDescriptionData(propertyName, ListSortDirection.Ascending);
+            var desc = new SortDescriptionData(propertyName, ListSortDirection.Descending);
+            if (sortingCache.Lookup(asc).HasValue || sortingCache.Lookup(desc).HasValue)
+            {
+                throw new ApplicationException($"Cache already contains item with a key '{propertyName}', cache: ${sortingCache.Keys.DumpToTextRaw()}");
+            }
+
+            sortingCache.AddOrUpdate(new SortData(asc, fieldExtractor));
+            sortingCache.AddOrUpdate(new SortData(desc, fieldExtractor));
         }
 
         private sealed class TabProxy : DisposableReactiveObject
@@ -194,7 +194,7 @@ namespace PoeEye.PoeTrade.ViewModels
                 Items = listOfItemLists.Or().ToSourceList();
 
                 Disposable.Create(() => Log.Instance.Trace($"[PoeAdvancedTradesListViewModel.TabProxy] Proxy for tab {tab} ({tab.TabName}) was disposed"))
-                    .AddTo(Anchors);
+                          .AddTo(Anchors);
             }
 
             public ISourceList<IPoeTradeViewModel> Items { get; }
@@ -206,8 +206,8 @@ namespace PoeEye.PoeTrade.ViewModels
                 ReadOnlyObservableCollection<IPoeTradeViewModel> source, ISubject<Unit> updateRequestSubject)
             {
                 Items = source
-                    .ToObservableChangeSet()
-                    .ToSourceList();
+                        .ToObservableChangeSet()
+                        .ToSourceList();
             }
 
             public ISourceList<IPoeTradeViewModel> Items { get; }
@@ -222,8 +222,8 @@ namespace PoeEye.PoeTrade.ViewModels
                 Guard.ArgumentNotNull(descriptionData, nameof(descriptionData));
 
                 comparer = OrderedComparer
-                    .For<IPoeTradeViewModel>()
-                    .OrderBy(x => 0);
+                           .For<IPoeTradeViewModel>()
+                           .OrderBy(x => 0);
 
                 foreach (var data in descriptionData.EmptyIfNull().Where(x => x?.Data.IsEmpty == false))
                 {
@@ -239,15 +239,15 @@ namespace PoeEye.PoeTrade.ViewModels
 
         private sealed class SortData
         {
-            public SortDescriptionData Data { get; }
-
             private readonly Func<IPoeTradeViewModel, object> fieldExtractor;
 
             public SortData(SortDescriptionData data, Func<IPoeTradeViewModel, object> fieldExtractor)
             {
-                this.Data = data;
+                Data = data;
                 this.fieldExtractor = fieldExtractor;
             }
+
+            public SortDescriptionData Data { get; }
 
             public IComparer<IPoeTradeViewModel> Apply(IComparer<IPoeTradeViewModel> builder)
             {

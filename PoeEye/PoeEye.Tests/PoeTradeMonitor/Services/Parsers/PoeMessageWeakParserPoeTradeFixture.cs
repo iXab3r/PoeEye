@@ -12,6 +12,26 @@ namespace PoeEye.Tests.PoeTradeMonitor.Services.Parsers
     [TestFixture]
     internal class PoeMessageWeakParserPoeTradeFixture
     {
+        private IEnumerable<TestCaseData> ShouldParseCases()
+        {
+            yield return new TestCaseData(
+                "Hi, I would like to buy your Enduring Onslaught Leaguestone of Slaying listed for 3 alchemy in Legacy",
+                true,
+                new TradeModel
+                {
+                    CharacterName = "Name",
+                    Price = new PoePrice("alchemy", 3),
+                    PositionName = "Enduring Onslaught Leaguestone of Slaying",
+                    League = "Legacy"
+                }
+            );
+        }
+
+        private PoeMessageWeakParserPoeTrade CreateInstance()
+        {
+            return new PoeMessageWeakParserPoeTrade(new StringToPoePriceConverter());
+        }
+
         [Test]
         [TestCaseSource(nameof(ShouldParseCases))]
         public void ShouldParse(
@@ -22,10 +42,10 @@ namespace PoeEye.Tests.PoeTradeMonitor.Services.Parsers
             //Given
             var instance = CreateInstance();
 
-            var message = new PoeMessage()
+            var message = new PoeMessage
             {
                 Message = messageText,
-                Name = "Name",
+                Name = "Name"
             };
 
             //When
@@ -43,26 +63,6 @@ namespace PoeEye.Tests.PoeTradeMonitor.Services.Parsers
                 result.League.ShouldBe(expected.League);
                 result.ItemPosition.ShouldBe(expected.ItemPosition);
             }
-        }
-
-        private IEnumerable<TestCaseData> ShouldParseCases()
-        {
-            yield return new TestCaseData(
-                    "Hi, I would like to buy your Enduring Onslaught Leaguestone of Slaying listed for 3 alchemy in Legacy",
-                    true,
-                    new TradeModel()
-                    {
-                        CharacterName = "Name",
-                        Price = new PoePrice("alchemy", 3),
-                        PositionName = "Enduring Onslaught Leaguestone of Slaying",
-                        League = "Legacy",
-                    }
-                );
-        }
-
-        private PoeMessageWeakParserPoeTrade CreateInstance()
-        {
-            return new PoeMessageWeakParserPoeTrade(new StringToPoePriceConverter());   
         }
     }
 }

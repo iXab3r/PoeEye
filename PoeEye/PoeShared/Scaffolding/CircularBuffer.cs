@@ -4,35 +4,33 @@ using System.Collections.Generic;
 
 namespace PoeShared.Scaffolding
 {
-   /// <summary>
-    /// Circular buffer.
-    /// 
-    /// When writting to a full buffer:
-    /// PushBack -> removes this[0] / Front()
-    /// PushFront -> removes this[Size-1] / Back()
-    /// 
-    /// this implementation is inspired by
-    /// http://www.boost.org/doc/libs/1_53_0/libs/circular_buffer/doc/circular_buffer.html
-    /// because I liked their interface.
+    /// <summary>
+    ///     Circular buffer.
+    ///     When writting to a full buffer:
+    ///     PushBack -> removes this[0] / Front()
+    ///     PushFront -> removes this[Size-1] / Back()
+    ///     this implementation is inspired by
+    ///     http://www.boost.org/doc/libs/1_53_0/libs/circular_buffer/doc/circular_buffer.html
+    ///     because I liked their interface.
     /// </summary>
     public class CircularBuffer<T> : IEnumerable<T>
     {
-        private T[] _buffer;
+        private readonly T[] _buffer;
 
         /// <summary>
-        /// The _start. Index of the first element in buffer.
-        /// </summary>
-        private int _start;
-
-        /// <summary>
-        /// The _end. Index after the last element in the buffer.
+        ///     The _end. Index after the last element in the buffer.
         /// </summary>
         private int _end;
 
         /// <summary>
-        /// The _size. Buffer size.
+        ///     The _size. Buffer size.
         /// </summary>
         private int _size;
+
+        /// <summary>
+        ///     The _start. Index of the first element in buffer.
+        /// </summary>
+        private int _start;
 
         public CircularBuffer(int capacity)
             : this(capacity, new T[] { })
@@ -40,16 +38,15 @@ namespace PoeShared.Scaffolding
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CircularBuffer{T}"/> class.
-        /// 
+        ///     Initializes a new instance of the <see cref="CircularBuffer{T}" /> class.
         /// </summary>
         /// <param name='capacity'>
-        /// Buffer capacity. Must be positive.
+        ///     Buffer capacity. Must be positive.
         /// </param>
         /// <param name='items'>
-        /// Items to fill buffer with. Items length must be less than capacity.
-        /// Sugestion: use Skip(x).Take(y).ToArray() to build this argument from
-        /// any enumerable.
+        ///     Items to fill buffer with. Items length must be less than capacity.
+        ///     Sugestion: use Skip(x).Take(y).ToArray() to build this argument from
+        ///     any enumerable.
         /// </param>
         public CircularBuffer(int capacity, T[] items)
         {
@@ -58,10 +55,12 @@ namespace PoeShared.Scaffolding
                 throw new ArgumentException(
                     "Circular buffer cannot have negative or zero capacity.", "capacity");
             }
+
             if (items == null)
             {
                 throw new ArgumentNullException("items");
             }
+
             if (items.Length > capacity)
             {
                 throw new ArgumentException(
@@ -78,51 +77,19 @@ namespace PoeShared.Scaffolding
         }
 
         /// <summary>
-        /// Maximum capacity of the buffer. Elements pushed into the buffer after
-        /// maximum capacity is reached (IsFull = true), will remove an element.
+        ///     Maximum capacity of the buffer. Elements pushed into the buffer after
+        ///     maximum capacity is reached (IsFull = true), will remove an element.
         /// </summary>
-        public int Capacity { get { return _buffer.Length; } }
+        public int Capacity => _buffer.Length;
 
-        public bool IsFull
-        {
-            get
-            {
-                return Size == Capacity;
-            }
-        }
+        public bool IsFull => Size == Capacity;
 
-        public bool IsEmpty
-        {
-            get
-            {
-                return Size == 0;
-            }
-        }
+        public bool IsEmpty => Size == 0;
 
         /// <summary>
-        /// Current buffer size (the number of elements that the buffer has).
+        ///     Current buffer size (the number of elements that the buffer has).
         /// </summary>
-        public int Size { get { return _size; } }
-
-        /// <summary>
-        /// Element at the front of the buffer - this[0].
-        /// </summary>
-        /// <returns>The value of the element of type T at the front of the buffer.</returns>
-        public T Front()
-        {
-            ThrowIfEmpty();
-            return _buffer[_start];
-        }
-
-        /// <summary>
-        /// Element at the back of the buffer - this[Size - 1].
-        /// </summary>
-        /// <returns>The value of the element of type T at the back of the buffer.</returns>
-        public T Back()
-        {
-            ThrowIfEmpty();
-            return _buffer[(_end != 0 ? _end : _size) - 1];
-        }
+        public int Size => _size;
 
         public T this[int index]
         {
@@ -132,11 +99,13 @@ namespace PoeShared.Scaffolding
                 {
                     throw new IndexOutOfRangeException(string.Format("Cannot access index {0}. Buffer is empty", index));
                 }
+
                 if (index >= _size)
                 {
                     throw new IndexOutOfRangeException(string.Format("Cannot access index {0}. Buffer size is {1}", index, _size));
                 }
-                int actualIndex = InternalIndex(index);
+
+                var actualIndex = InternalIndex(index);
                 return _buffer[actualIndex];
             }
             set
@@ -145,21 +114,67 @@ namespace PoeShared.Scaffolding
                 {
                     throw new IndexOutOfRangeException(string.Format("Cannot access index {0}. Buffer is empty", index));
                 }
+
                 if (index >= _size)
                 {
                     throw new IndexOutOfRangeException(string.Format("Cannot access index {0}. Buffer size is {1}", index, _size));
                 }
-                int actualIndex = InternalIndex(index);
+
+                var actualIndex = InternalIndex(index);
                 _buffer[actualIndex] = value;
             }
         }
 
+        #region IEnumerable<T> implementation
+
+        public IEnumerator<T> GetEnumerator()
+        {
+            var segments = new ArraySegment<T>[2] {ArrayOne(), ArrayTwo()};
+            foreach (var segment in segments)
+            {
+                for (var i = 0; i < segment.Count; i++)
+                {
+                    yield return segment.Array[segment.Offset + i];
+                }
+            }
+        }
+
+        #endregion
+
+        #region IEnumerable implementation
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+
+        #endregion
+
         /// <summary>
-        /// Pushes a new element to the back of the buffer. Back()/this[Size-1]
-        /// will now return this element.
-        /// 
-        /// When the buffer is full, the element at Front()/this[0] will be 
-        /// popped to allow for this new element to fit.
+        ///     Element at the front of the buffer - this[0].
+        /// </summary>
+        /// <returns>The value of the element of type T at the front of the buffer.</returns>
+        public T Front()
+        {
+            ThrowIfEmpty();
+            return _buffer[_start];
+        }
+
+        /// <summary>
+        ///     Element at the back of the buffer - this[Size - 1].
+        /// </summary>
+        /// <returns>The value of the element of type T at the back of the buffer.</returns>
+        public T Back()
+        {
+            ThrowIfEmpty();
+            return _buffer[(_end != 0 ? _end : _size) - 1];
+        }
+
+        /// <summary>
+        ///     Pushes a new element to the back of the buffer. Back()/this[Size-1]
+        ///     will now return this element.
+        ///     When the buffer is full, the element at Front()/this[0] will be
+        ///     popped to allow for this new element to fit.
         /// </summary>
         /// <param name="item">Item to push to the back of the buffer</param>
         public void PushBack(T item)
@@ -179,11 +194,10 @@ namespace PoeShared.Scaffolding
         }
 
         /// <summary>
-        /// Pushes a new element to the front of the buffer. Front()/this[0]
-        /// will now return this element.
-        /// 
-        /// When the buffer is full, the element at Back()/this[Size-1] will be 
-        /// popped to allow for this new element to fit.
+        ///     Pushes a new element to the front of the buffer. Front()/this[0]
+        ///     will now return this element.
+        ///     When the buffer is full, the element at Back()/this[Size-1] will be
+        ///     popped to allow for this new element to fit.
         /// </summary>
         /// <param name="item">Item to push to the front of the buffer</param>
         public void PushFront(T item)
@@ -203,8 +217,8 @@ namespace PoeShared.Scaffolding
         }
 
         /// <summary>
-        /// Removes the element at the back of the buffer. Decreassing the 
-        /// Buffer size by 1.
+        ///     Removes the element at the back of the buffer. Decreassing the
+        ///     Buffer size by 1.
         /// </summary>
         public T PopBack()
         {
@@ -218,8 +232,8 @@ namespace PoeShared.Scaffolding
         }
 
         /// <summary>
-        /// Removes the element at the front of the buffer. Decreassing the 
-        /// Buffer size by 1.
+        ///     Removes the element at the front of the buffer. Decreassing the
+        ///     Buffer size by 1.
         /// </summary>
         public void PopFront()
         {
@@ -230,43 +244,24 @@ namespace PoeShared.Scaffolding
         }
 
         /// <summary>
-        /// Copies the buffer contents to an array, acording to the logical
-        /// contents of the buffer (i.e. independent of the internal 
-        /// order/contents)
+        ///     Copies the buffer contents to an array, acording to the logical
+        ///     contents of the buffer (i.e. independent of the internal
+        ///     order/contents)
         /// </summary>
         /// <returns>A new array with a copy of the buffer contents.</returns>
         public T[] ToArray()
         {
-            T[] newArray = new T[Size];
-            int newArrayOffset = 0;
-            var segments = new ArraySegment<T>[2] { ArrayOne(), ArrayTwo() };
-            foreach (ArraySegment<T> segment in segments)
+            var newArray = new T[Size];
+            var newArrayOffset = 0;
+            var segments = new ArraySegment<T>[2] {ArrayOne(), ArrayTwo()};
+            foreach (var segment in segments)
             {
                 Array.Copy(segment.Array, segment.Offset, newArray, newArrayOffset, segment.Count);
                 newArrayOffset += segment.Count;
             }
+
             return newArray;
         }
-
-        #region IEnumerable<T> implementation
-        public IEnumerator<T> GetEnumerator()
-        {
-            var segments = new ArraySegment<T>[2] { ArrayOne(), ArrayTwo() };
-            foreach (ArraySegment<T> segment in segments)
-            {
-                for (int i = 0; i < segment.Count; i++)
-                {
-                    yield return segment.Array[segment.Offset + i];
-                }
-            }
-        }
-        #endregion
-        #region IEnumerable implementation
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return (IEnumerator)GetEnumerator();
-        }
-        #endregion
 
         private void ThrowIfEmpty(string message = "Cannot access an empty buffer.")
         {
@@ -277,8 +272,8 @@ namespace PoeShared.Scaffolding
         }
 
         /// <summary>
-        /// Increments the provided index variable by one, wrapping
-        /// around if necessary.
+        ///     Increments the provided index variable by one, wrapping
+        ///     around if necessary.
         /// </summary>
         /// <param name="index"></param>
         private void Increment(ref int index)
@@ -290,8 +285,8 @@ namespace PoeShared.Scaffolding
         }
 
         /// <summary>
-        /// Decrements the provided index variable by one, wrapping
-        /// around if necessary.
+        ///     Decrements the provided index variable by one, wrapping
+        ///     around if necessary.
         /// </summary>
         /// <param name="index"></param>
         private void Decrement(ref int index)
@@ -300,21 +295,22 @@ namespace PoeShared.Scaffolding
             {
                 index = Capacity;
             }
+
             index--;
         }
 
         /// <summary>
-        /// Converts the index in the argument to an index in <code>_buffer</code>
+        ///     Converts the index in the argument to an index in <code>_buffer</code>
         /// </summary>
         /// <returns>
-        /// The transformed index.
+        ///     The transformed index.
         /// </returns>
         /// <param name='index'>
-        /// External index.
+        ///     External index.
         /// </param>
         private int InternalIndex(int index)
         {
-            return _start + (index < (Capacity - _start) ? index : index - Capacity);
+            return _start + (index < Capacity - _start ? index : index - Capacity);
         }
 
         // doing ArrayOne and ArrayTwo methods returning ArraySegment<T> as seen here: 
@@ -323,6 +319,7 @@ namespace PoeShared.Scaffolding
         // should help a lot with the code.
 
         #region Array items easy access.
+
         // The array is composed by at most two non-contiguous segments, 
         // the next two methods allow easy access to those.
 
@@ -332,10 +329,8 @@ namespace PoeShared.Scaffolding
             {
                 return new ArraySegment<T>(_buffer, _start, _end - _start);
             }
-            else
-            {
-                return new ArraySegment<T>(_buffer, _start, _buffer.Length - _start);
-            }
+
+            return new ArraySegment<T>(_buffer, _start, _buffer.Length - _start);
         }
 
         private ArraySegment<T> ArrayTwo()
@@ -344,11 +339,10 @@ namespace PoeShared.Scaffolding
             {
                 return new ArraySegment<T>(_buffer, _end, 0);
             }
-            else
-            {
-                return new ArraySegment<T>(_buffer, 0, _end);
-            }
+
+            return new ArraySegment<T>(_buffer, 0, _end);
         }
+
         #endregion
     }
 }

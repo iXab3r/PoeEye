@@ -13,24 +13,25 @@ namespace PoeShared.Scaffolding.WPF.Converters
             {
                 return value;
             }
+
             var timeSpan = (TimeSpan)value;
 
             if (timeSpan.TotalHours > 24)
             {
                 return $"{timeSpan.TotalDays:F0}d {timeSpan.Hours:F0}h";
             }
-            else if (timeSpan.TotalMinutes > 120)
+
+            if (timeSpan.TotalMinutes > 120)
             {
                 return $"{timeSpan.TotalHours:F0}h";
             }
-            else if (timeSpan.TotalSeconds > 120)
+
+            if (timeSpan.TotalSeconds > 120)
             {
                 return $"{timeSpan.TotalMinutes:F0}m";
             }
-            else
-            {
-                return $"{timeSpan.TotalSeconds:F0}s";
-            }
+
+            return $"{timeSpan.TotalSeconds:F0}s";
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

@@ -9,15 +9,15 @@ namespace PoeShared.Scaffolding
     public static class StringCompressor
     {
         /// <summary>
-        /// Compresses the string.
+        ///     Compresses the string.
         /// </summary>
         /// <param name="text">The text.</param>
         /// <returns></returns>
         public static string CompressStringToGZip(string text)
         {
             Guard.ArgumentNotNull(() => text);
-            
-            byte[] buffer = Encoding.UTF8.GetBytes(text);
+
+            var buffer = Encoding.UTF8.GetBytes(text);
             var memoryStream = new MemoryStream();
             using (var gZipStream = new GZipStream(memoryStream, CompressionMode.Compress, true))
             {
@@ -36,7 +36,7 @@ namespace PoeShared.Scaffolding
         }
 
         /// <summary>
-        /// Decompresses the string.
+        ///     Decompresses the string.
         /// </summary>
         /// <param name="compressedText">The compressed text.</param>
         /// <returns></returns>
@@ -44,10 +44,10 @@ namespace PoeShared.Scaffolding
         {
             Guard.ArgumentNotNull(() => compressedText);
 
-            byte[] gZipBuffer = Convert.FromBase64String(compressedText);
+            var gZipBuffer = Convert.FromBase64String(compressedText);
             using (var memoryStream = new MemoryStream())
             {
-                int dataLength = BitConverter.ToInt32(gZipBuffer, 0);
+                var dataLength = BitConverter.ToInt32(gZipBuffer, 0);
                 memoryStream.Write(gZipBuffer, 4, gZipBuffer.Length - 4);
 
                 var buffer = new byte[dataLength];

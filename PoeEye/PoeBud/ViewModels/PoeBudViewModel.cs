@@ -28,16 +28,16 @@ namespace PoeBud.ViewModels
     internal sealed class PoeBudViewModel : OverlayViewModelBase
     {
         private static readonly TimeSpan UpdateTimeout = TimeSpan.FromSeconds(1);
-        private readonly IHighlightingService highlightingService;
-        private readonly IConfigProvider<PoeBudConfig> configProvider;
         private readonly IClock clock;
+        private readonly IConfigProvider<PoeBudConfig> configProvider;
         private readonly ISubject<Exception> exceptionsToPropagate = new Subject<Exception>();
+        private readonly IHighlightingService highlightingService;
         private readonly IKeyboardEventsSource keyboardMouseEvents;
         private readonly ObservableAsPropertyHelper<Exception> lastUpdateException;
         private readonly IFactory<IPoeStashUpdater, IStashUpdaterParameters> stashAnalyzerFactory;
-        private readonly IFactory<IDefaultStashUpdaterStrategy, IStashUpdaterParameters> stashUpdaterStrategyFactory;
         private readonly IFactory<StashViewModel, StashUpdate, IPoeBudConfig> stashUpdateFactory;
         private readonly SerialDisposable stashUpdaterDisposable = new SerialDisposable();
+        private readonly IFactory<IDefaultStashUpdaterStrategy, IStashUpdaterParameters> stashUpdaterStrategyFactory;
         private readonly IScheduler uiScheduler;
 
         private PoeBudConfig actualConfig;
@@ -59,7 +59,8 @@ namespace PoeBud.ViewModels
             [NotNull] IFactory<IPoeStashUpdater, IStashUpdaterParameters> stashAnalyzerFactory,
             [NotNull] IFactory<IDefaultStashUpdaterStrategy, IStashUpdaterParameters> stashUpdaterStrategyFactory,
             [NotNull] IFactory<StashViewModel, StashUpdate, IPoeBudConfig> stashUpdateFactory,
-            [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
+            [NotNull] [Dependency(WellKnownSchedulers.UI)]
+            IScheduler uiScheduler)
         {
             Guard.ArgumentNotNull(windowManager, nameof(windowManager));
             Guard.ArgumentNotNull(solutionExecutor, nameof(solutionExecutor));
@@ -72,7 +73,7 @@ namespace PoeBud.ViewModels
             Guard.ArgumentNotNull(stashAnalyzerFactory, nameof(stashAnalyzerFactory));
             Guard.ArgumentNotNull(stashUpdateFactory, nameof(stashUpdateFactory));
             Guard.ArgumentNotNull(uiScheduler, nameof(uiScheduler));
-            
+
             this.highlightingService = highlightingService;
             this.configProvider = configProvider;
             this.clock = clock;
@@ -84,7 +85,7 @@ namespace PoeBud.ViewModels
 
             SolutionExecutor = solutionExecutor;
             WindowManager = windowManager;
-            
+
             OverlayMode = OverlayMode.Layered;
             MinSize = new Size(100, 30);
             MaxSize = new Size(1024, 400);
@@ -102,19 +103,24 @@ namespace PoeBud.ViewModels
             exceptionsToPropagate
                 .ToProperty(this, x => x.LastUpdateException, out lastUpdateException, null, false, uiScheduler)
                 .AddTo(Anchors);
-            
+
             WithdrawChaosSetCommand = CommandWrapper.Create(
-                ReactiveCommand.CreateFromTask(() => ExecuteSolutionOrFail(() => Stash.ChaosSetSolutions.FirstOrDefault(), () => "Failed to withdraw ChaosSet, not enough items ?")));
+                ReactiveCommand.CreateFromTask(() => ExecuteSolutionOrFail(() => Stash.ChaosSetSolutions.FirstOrDefault(),
+                                                                           () => "Failed to withdraw ChaosSet, not enough items ?")));
             WithdrawCurrencyCommand = CommandWrapper.Create(
-                ReactiveCommand.CreateFromTask(() => ExecuteSolutionOrFail(() => Stash.CurrencySolutions.FirstOrDefault(), () => "Failed to withdraw Currency")));
+                ReactiveCommand.CreateFromTask(() => ExecuteSolutionOrFail(() => Stash.CurrencySolutions.FirstOrDefault(),
+                                                                           () => "Failed to withdraw Currency")));
             WithdrawDivinationCardsCommand = CommandWrapper.Create(
-                ReactiveCommand.CreateFromTask(() => ExecuteSolutionOrFail(() => Stash.DivinationCardsSolutions.FirstOrDefault(), () => "Failed to withdraw Divination Cards")));
+                ReactiveCommand.CreateFromTask(() => ExecuteSolutionOrFail(() => Stash.DivinationCardsSolutions.FirstOrDefault(),
+                                                                           () => "Failed to withdraw Divination Cards")));
             WithdrawMapsCommand = CommandWrapper.Create(
                 ReactiveCommand.CreateFromTask(() => ExecuteSolutionOrFail(() => Stash.MapsSolutions.FirstOrDefault(), () => "Failed to withdraw Maps")));
             WithdrawMiscCommand = CommandWrapper.Create(
-                ReactiveCommand.CreateFromTask(() => ExecuteSolutionOrFail(() => Stash.MiscellaneousItemsSolutions.FirstOrDefault(), () => "Failed to withdraw miscellaneous items")));
+                ReactiveCommand.CreateFromTask(() => ExecuteSolutionOrFail(() => Stash.MiscellaneousItemsSolutions.FirstOrDefault(),
+                                                                           () => "Failed to withdraw miscellaneous items")));
             WithdrawSellablesCommand = CommandWrapper.Create(
-                ReactiveCommand.CreateFromTask(() => ExecuteSolutionOrFail(() => Stash.SellableSolutions.FirstOrDefault(), () => "Failed to withdraw sellables (six-socket, chrome, etc)")));
+                ReactiveCommand.CreateFromTask(() => ExecuteSolutionOrFail(() => Stash.SellableSolutions.FirstOrDefault(),
+                                                                           () => "Failed to withdraw sellables (six-socket, chrome, etc)")));
             ForceRefreshCommand = CommandWrapper.Create(
                 ReactiveCommand.Create(ForceRefreshStashCommandExecuted));
         }
@@ -124,43 +130,43 @@ namespace PoeBud.ViewModels
         public Exception LastUpdateException => lastUpdateException?.Value;
 
         public ISolutionExecutorViewModel SolutionExecutor { get; }
-        
+
         public ICommand WithdrawChaosSetCommand { get; }
-        
+
         public ICommand WithdrawCurrencyCommand { get; }
-        
+
         public ICommand WithdrawDivinationCardsCommand { get; }
-        
+
         public ICommand WithdrawMapsCommand { get; }
-        
+
         public ICommand WithdrawMiscCommand { get; }
-        
+
         public ICommand WithdrawSellablesCommand { get; }
-        
+
         public ICommand ForceRefreshCommand { get; }
-        
+
         public IPoeStashUpdater StashUpdater
         {
-            get { return stashUpdater; }
-            set { this.RaiseAndSetIfChanged(ref stashUpdater, value); }
+            get => stashUpdater;
+            set => this.RaiseAndSetIfChanged(ref stashUpdater, value);
         }
 
         public bool HideXpBar
         {
-            get { return hideXpBar; }
-            set { this.RaiseAndSetIfChanged(ref hideXpBar, value); }
+            get => hideXpBar;
+            set => this.RaiseAndSetIfChanged(ref hideXpBar, value);
         }
 
         public bool IsEnabled
         {
-            get { return isEnabled; }
-            set { this.RaiseAndSetIfChanged(ref isEnabled, value); }
+            get => isEnabled;
+            set => this.RaiseAndSetIfChanged(ref isEnabled, value);
         }
 
         public StashViewModel Stash
         {
-            get { return stash; }
-            set { this.RaiseAndSetIfChanged(ref stash, value); }
+            get => stash;
+            set => this.RaiseAndSetIfChanged(ref stash, value);
         }
 
         public string League => actualConfig?.LeagueId;
@@ -175,11 +181,11 @@ namespace PoeBud.ViewModels
         {
             base.LockWindowCommandExecuted();
             var config = configProvider.ActualConfig;
-            base.SavePropertiesToConfig(config);
+            SavePropertiesToConfig(config);
 
             configProvider.Save(config);
         }
-        
+
         private void ApplyConfig(PoeBudConfig config)
         {
             Log.Instance.Debug($"[PoeBudViewModel] Applying new config...");
@@ -189,7 +195,7 @@ namespace PoeBud.ViewModels
             hotkey = KeyGestureExtensions.SafeCreateGesture(config.GetChaosSetHotkey);
             RefreshStashUpdater(actualConfig);
             this.RaisePropertyChanged(nameof(League));
-            
+
             base.ApplyConfig(config);
         }
 
@@ -218,11 +224,11 @@ namespace PoeBud.ViewModels
                 }
 
                 var keyPressedObservable = keyboardMouseEvents
-                    .WhenKeyDown
-                    .Where(x => IsEnabled)
-                    .Where(x => !SolutionExecutor.IsBusy)
-                    .Where(x => WindowManager.ActiveWindow != null)
-                    .Publish();
+                                           .WhenKeyDown
+                                           .Where(x => IsEnabled)
+                                           .Where(x => !SolutionExecutor.IsBusy)
+                                           .Where(x => WindowManager.ActiveWindow != null)
+                                           .Publish();
                 keyPressedObservable.Connect().AddTo(stashDisposable);
 
                 keyPressedObservable
@@ -234,12 +240,12 @@ namespace PoeBud.ViewModels
 
                 var forceRefreshHotkey = new KeyGesture(hotkey.Key, ModifierKeys.Control | ModifierKeys.Shift);
                 keyPressedObservable
-                   .Where(x => forceRefreshHotkey.MatchesHotkey(x))
-                   .Do(x => x.Handled = true)
-                   .ObserveOn(uiScheduler)
-                   .Subscribe(ForceRefreshStashCommandExecuted)
-                   .AddTo(stashDisposable);
-                
+                    .Where(x => forceRefreshHotkey.MatchesHotkey(x))
+                    .Do(x => x.Handled = true)
+                    .ObserveOn(uiScheduler)
+                    .Subscribe(ForceRefreshStashCommandExecuted)
+                    .AddTo(stashDisposable);
+
                 var updater = stashAnalyzerFactory.Create(config);
                 stashDisposable.Add(updater);
 
@@ -247,11 +253,11 @@ namespace PoeBud.ViewModels
                 updater.SetStrategy(strategy);
 
                 Observable.Timer(DateTimeOffset.Now, UpdateTimeout)
-                    .ToUnit()
-                    .Merge(updater.WhenAnyValue(x => x.LastUpdateTimestamp).ToUnit())
-                    .ObserveOn(uiScheduler)
-                    .Subscribe(() => this.RaisePropertyChanged(nameof(TimeTillNextUpdate)))
-                    .AddTo(stashDisposable);
+                          .ToUnit()
+                          .Merge(updater.WhenAnyValue(x => x.LastUpdateTimestamp).ToUnit())
+                          .ObserveOn(uiScheduler)
+                          .Subscribe(() => this.RaisePropertyChanged(nameof(TimeTillNextUpdate)))
+                          .AddTo(stashDisposable);
 
                 updater
                     .Updates
@@ -260,8 +266,8 @@ namespace PoeBud.ViewModels
                     .AddTo(stashDisposable);
 
                 updater.UpdateExceptions
-                    .Subscribe(exceptionsToPropagate)
-                    .AddTo(stashDisposable);
+                       .Subscribe(exceptionsToPropagate)
+                       .AddTo(stashDisposable);
 
                 updater.RecheckPeriod = config.StashUpdatePeriod;
 
@@ -285,6 +291,7 @@ namespace PoeBud.ViewModels
                 Log.Instance.Debug($"[PoeBudViewModel] Duplicate update arrived, skipping update");
                 return;
             }
+
             Log.Instance.Debug($"[PoeBudViewModel] Stash update arrived, tabs: {stashUpdate.Tabs.Count()}, items: {stashUpdate.Items.Count()}");
 
             lastServerStashUpdate = stashUpdate;
@@ -301,6 +308,7 @@ namespace PoeBud.ViewModels
                 {
                     return;
                 }
+
                 updater.ForceRefresh();
             }
             catch (Exception ex)
@@ -309,7 +317,7 @@ namespace PoeBud.ViewModels
                 exceptionsToPropagate.OnNext(ex);
             }
         }
-        
+
         private async Task ExecuteSolutionCommandExecuted(IPoeTradeSolution solutionToExecute)
         {
             try
@@ -320,7 +328,7 @@ namespace PoeBud.ViewModels
                         "[MainViewModel.ExecuteSolutionCommandExecuted] Solution executor is busy, ignoring request");
                     return;
                 }
-                
+
                 await TryToExecuteSolution(solutionToExecute, actualConfig);
             }
             catch (Exception ex)
@@ -330,7 +338,7 @@ namespace PoeBud.ViewModels
             }
         }
 
-        private async Task  ExecuteChaosSolutionCommandExecuted()
+        private async Task ExecuteChaosSolutionCommandExecuted()
         {
             try
             {
@@ -350,7 +358,7 @@ namespace PoeBud.ViewModels
                 exceptionsToPropagate.OnNext(ex);
             }
         }
-        
+
         private async Task ExecuteSolutionOrFail(Func<IPoeTradeSolution> solutionSupplier, Func<string> failMessageSupplier)
         {
             try
@@ -363,7 +371,7 @@ namespace PoeBud.ViewModels
                 else
                 {
                     await ExecuteSolutionCommandExecuted(solutionToExecute);
-                } 
+                }
             }
             catch (Exception ex)
             {
@@ -371,7 +379,7 @@ namespace PoeBud.ViewModels
                 exceptionsToPropagate.OnNext(ex);
             }
         }
-        
+
 
         private async Task<bool> TryToExecuteSolution(IPoeTradeSolution solutionToExecute, PoeBudConfig config)
         {
@@ -390,7 +398,7 @@ namespace PoeBud.ViewModels
         }
 
         private void PerformDirtyUpdate(StashViewModel dirtyStash, IPoeTradeSolution executedSolution,
-            PoeBudConfig config)
+                                        PoeBudConfig config)
         {
             // taking ACTUAL snapshot and performing a clean-up
             if (dirtyStash != stash)
@@ -404,6 +412,5 @@ namespace PoeBud.ViewModels
             var dirtyStashUpdate = stash.StashUpdate.RemoveItems(executedSolution.Items);
             Stash = stashUpdateFactory.Create(dirtyStashUpdate, config);
         }
-
     }
 }

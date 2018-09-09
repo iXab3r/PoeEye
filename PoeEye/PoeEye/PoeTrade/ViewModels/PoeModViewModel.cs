@@ -22,26 +22,26 @@ namespace PoeEye.PoeTrade.ViewModels
 
         public ISuggestionProvider SuggestionProvider
         {
-            get { return suggestionProvider; }
-            set { this.RaiseAndSetIfChanged(ref suggestionProvider, value); }
+            get => suggestionProvider;
+            set => this.RaiseAndSetIfChanged(ref suggestionProvider, value);
         }
 
         public string SelectedMod
         {
-            get { return selectedMod; }
-            set { this.RaiseAndSetIfChanged(ref selectedMod, value); }
+            get => selectedMod;
+            set => this.RaiseAndSetIfChanged(ref selectedMod, value);
         }
 
         public float? Min
         {
-            get { return min; }
-            set { this.RaiseAndSetIfChanged(ref min, value); }
+            get => min;
+            set => this.RaiseAndSetIfChanged(ref min, value);
         }
 
         public float? Max
         {
-            get { return max; }
-            set { this.RaiseAndSetIfChanged(ref max, value); }
+            get => max;
+            set => this.RaiseAndSetIfChanged(ref max, value);
         }
 
         public bool IsEmpty => string.IsNullOrWhiteSpace(SelectedMod) && Min == null && Max == null;

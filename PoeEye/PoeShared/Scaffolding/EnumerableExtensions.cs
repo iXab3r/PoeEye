@@ -26,7 +26,7 @@ namespace PoeShared.Scaffolding
         {
             return new ObservableCollection<T>(enumerable);
         }
-        
+
         public static ReadOnlyObservableCollection<T> ToReadOnlyObservableCollection<T>(this IEnumerable<T> enumerable)
         {
             return new ReadOnlyObservableCollection<T>(enumerable.ToObservableCollection());
@@ -40,6 +40,7 @@ namespace PoeShared.Scaffolding
             {
                 action(value);
             }
+
             return enumerable;
         }
 

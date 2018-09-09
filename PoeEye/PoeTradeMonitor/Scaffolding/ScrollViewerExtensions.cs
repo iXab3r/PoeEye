@@ -18,7 +18,7 @@ namespace PoeEye.TradeMonitor.Scaffolding
             var scroll = sender as ScrollViewer;
             if (scroll != null)
             {
-                var alwaysScrollToEnd = e.NewValue != null && (bool) e.NewValue;
+                var alwaysScrollToEnd = e.NewValue != null && (bool)e.NewValue;
                 if (alwaysScrollToEnd)
                 {
                     scroll.ScrollToEnd();
@@ -42,7 +42,8 @@ namespace PoeEye.TradeMonitor.Scaffolding
             {
                 throw new ArgumentNullException("scroll");
             }
-            return (bool) scroll.GetValue(AlwaysScrollToEndProperty);
+
+            return (bool)scroll.GetValue(AlwaysScrollToEndProperty);
         }
 
         public static void SetAlwaysScrollToEnd(ScrollViewer scroll, bool alwaysScrollToEnd)
@@ -51,6 +52,7 @@ namespace PoeEye.TradeMonitor.Scaffolding
             {
                 throw new ArgumentNullException("scroll");
             }
+
             scroll.SetValue(AlwaysScrollToEndProperty, alwaysScrollToEnd);
         }
 

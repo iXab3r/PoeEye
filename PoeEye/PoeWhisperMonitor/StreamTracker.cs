@@ -24,6 +24,7 @@ namespace PoeWhisperMonitor
             {
                 throw new ArgumentException("Stream must support Seek operation");
             }
+
             if (!baseStream.CanRead)
             {
                 throw new ArgumentException("Stream must support Read operation");

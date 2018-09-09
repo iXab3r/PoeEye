@@ -23,8 +23,8 @@ namespace PoeEye.TradeMonitor.Services
 {
     internal sealed class PoeStashService : DisposableReactiveObject, IPoeStashService
     {
-        private readonly SerialDisposable stashUpdaterDisposable = new SerialDisposable();
         private readonly IClock clock;
+        private readonly SerialDisposable stashUpdaterDisposable = new SerialDisposable();
         private readonly IFactory<IPoeStashUpdater, IStashUpdaterParameters> stashUpdaterFactory;
         [NotNull] private readonly IFactory<IDefaultStashUpdaterStrategy, IStashUpdaterParameters> stashUpdaterStrategyFactory;
         private readonly BehaviorSubject<StashUpdate> stashUpdates = new BehaviorSubject<StashUpdate>(null);
@@ -37,8 +37,10 @@ namespace PoeEye.TradeMonitor.Services
             [NotNull] IConfigProvider<PoeTradeMonitorConfig> tradeMonitorConfigProvider,
             [NotNull] IFactory<IPoeStashUpdater, IStashUpdaterParameters> stashUpdaterFactory,
             [NotNull] IFactory<IDefaultStashUpdaterStrategy, IStashUpdaterParameters> stashUpdaterStrategyFactory,
-            [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler,
-            [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler)
+            [NotNull] [Dependency(WellKnownSchedulers.UI)]
+            IScheduler uiScheduler,
+            [NotNull] [Dependency(WellKnownSchedulers.Background)]
+            IScheduler bgScheduler)
         {
             Guard.ArgumentNotNull(clock, nameof(clock));
             Guard.ArgumentNotNull(poeBudConfigProvider, nameof(poeBudConfigProvider));
@@ -52,12 +54,14 @@ namespace PoeEye.TradeMonitor.Services
             this.stashUpdaterFactory = stashUpdaterFactory;
             this.stashUpdaterStrategyFactory = stashUpdaterStrategyFactory;
 
-            Observable.CombineLatest(
-                    tradeMonitorConfigProvider.WhenChanged, 
-                    poeBudConfigProvider.WhenChanged, 
-                    (tradeMonitorConfig, poeBudConfig) => new {PoeBudConfig = poeBudConfig, TradeMonitorConfig = tradeMonitorConfig})
-                .Subscribe(x => ApplyConfig(x.PoeBudConfig, x.TradeMonitorConfig))
-                .AddTo(Anchors);
+            tradeMonitorConfigProvider.WhenChanged.CombineLatest(poeBudConfigProvider.WhenChanged,
+                                                                 (tradeMonitorConfig, poeBudConfig) => new
+                                                                 {
+                                                                     PoeBudConfig = poeBudConfig,
+                                                                     TradeMonitorConfig = tradeMonitorConfig
+                                                                 })
+                                      .Subscribe(x => ApplyConfig(x.PoeBudConfig, x.TradeMonitorConfig))
+                                      .AddTo(Anchors);
         }
 
         public IStashItem TryToFindItem(string tabName, int itemX, int itemY)
@@ -79,15 +83,15 @@ namespace PoeEye.TradeMonitor.Services
 
             var inventoryId = matchingTab.GetInventoryId();
             var itemsInTab = stash.Items
-                .Where(x => x.InventoryId == inventoryId)
-                .Select(x => new { Position = new Rectangle(x.X, x.Y, x.Width, x.Height), Item = x })
-                .ToArray();
-            var requestedRect = new Rectangle(itemX, itemY, 1 ,1);
+                                  .Where(x => x.InventoryId == inventoryId)
+                                  .Select(x => new {Position = new Rectangle(x.X, x.Y, x.Width, x.Height), Item = x})
+                                  .ToArray();
+            var requestedRect = new Rectangle(itemX, itemY, 1, 1);
             Log.Instance.Debug($"Looking up item @ {requestedRect}, total items in tab '{matchingTab.Name}': {itemsInTab.Length}");
             var itemsAtThisPosition = itemsInTab
-                .Where(x => x.Position.IntersectsWith(requestedRect))
-                .Select(x => x.Item)
-                .ToArray();
+                                      .Where(x => x.Position.IntersectsWith(requestedRect))
+                                      .Select(x => x.Item)
+                                      .ToArray();
             Log.Instance.Debug($"Got {itemsAtThisPosition.Length} item(s) @ {requestedRect}");
             return itemsAtThisPosition.FirstOrDefault();
         }
@@ -101,6 +105,7 @@ namespace PoeEye.TradeMonitor.Services
                 Log.Instance.Warn($"Stash is not ready - either not requested yet or is empty");
                 return null;
             }
+
             var matchingTab = stash.Tabs.FirstOrDefault(x => x.Name == tabName);
             return matchingTab;
         }
@@ -173,6 +178,7 @@ namespace PoeEye.TradeMonitor.Services
         private sealed class StashUpdaterParameters : IStashUpdaterParameters
         {
             private readonly IPoeBudConfig config;
+
             public StashUpdaterParameters(IPoeBudConfig config)
             {
                 this.config = config;

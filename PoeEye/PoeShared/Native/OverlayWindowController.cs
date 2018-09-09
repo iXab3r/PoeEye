@@ -20,12 +20,12 @@ namespace PoeShared.Native
 {
     internal sealed class OverlayWindowController : DisposableReactiveObject, IOverlayWindowController
     {
+        private readonly ISourceList<OverlayWindowView> childsWindows = new SourceList<OverlayWindowView>();
         private readonly BehaviorSubject<IntPtr> lastActiveWindowHandle = new BehaviorSubject<IntPtr>(IntPtr.Zero);
 
         private readonly string[] possibleOverlayNames;
         private readonly IScheduler uiScheduler;
         private readonly IWindowTracker windowTracker;
-        private readonly ISourceList<OverlayWindowView> childsWindows = new SourceList<OverlayWindowView>();
 
         private bool isVisible;
 
@@ -34,7 +34,8 @@ namespace PoeShared.Native
         public OverlayWindowController(
             [NotNull] IWindowTracker windowTracker,
             [NotNull] IKeyboardEventsSource keyboardMouseEvents,
-            [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
+            [NotNull] [Dependency(WellKnownSchedulers.UI)]
+            IScheduler uiScheduler)
         {
             Guard.ArgumentNotNull(windowTracker, nameof(windowTracker));
             Guard.ArgumentNotNull(keyboardMouseEvents, nameof(keyboardMouseEvents));
@@ -52,41 +53,41 @@ namespace PoeShared.Native
             if (application != null)
             {
                 var applicationExit = Observable.FromEventPattern<ExitEventHandler, ExitEventArgs>(
-                        h => application.Exit += h,
-                        h => application.Exit -= h)
-                    .Do(_ => Log.Instance.Debug($"[OverlayWindowController] Application exit detected"))
-                    .ToUnit();
+                                                    h => application.Exit += h,
+                                                    h => application.Exit -= h)
+                                                .Do(_ => Log.Instance.Debug($"[OverlayWindowController] Application exit detected"))
+                                                .ToUnit();
 
                 var mainWindow = application.MainWindow;
                 var mainWindowClosed = mainWindow == null
                     ? Observable.Never<Unit>()
                     : Observable.FromEventPattern<EventHandler, EventArgs>(
-                            h => mainWindow.Closed += h,
-                            h => mainWindow.Closed -= h)
-                        .Do(_ => Log.Instance.Debug($"[OverlayWindowController] Main window has been closed"))
-                        .ToUnit();
+                                    h => mainWindow.Closed += h,
+                                    h => mainWindow.Closed -= h)
+                                .Do(_ => Log.Instance.Debug($"[OverlayWindowController] Main window has been closed"))
+                                .ToUnit();
 
-                Observable.Merge(mainWindowClosed, applicationExit)
-                    .Take(1)
-                    .Do(_ => Log.Instance.Debug($"[OverlayWindowController] Disposing all anchors..."))
-                    .Subscribe(Anchors.Dispose, Log.HandleUiException)
-                    .AddTo(Anchors);
+                mainWindowClosed.Merge(applicationExit)
+                                .Take(1)
+                                .Do(_ => Log.Instance.Debug($"[OverlayWindowController] Disposing all anchors..."))
+                                .Subscribe(Anchors.Dispose, Log.HandleUiException)
+                                .AddTo(Anchors);
             }
 
             windowTracker.WhenAnyValue(x => x.ActiveWindowHandle)
-                .Select(
-                    x => new
-                    {
-                        WindowIsActive = windowTracker.IsActive,
-                        OverlayIsActive = IsPairedOverlay(windowTracker.ActiveWindowTitle),
-                        ActiveTitle = windowTracker.ActiveWindowTitle
-                    })
-                .Do(x => Log.Instance.Trace($"[OverlayWindowController] Active window has changed: {x}"))
-                .Select(x => x.WindowIsActive || x.OverlayIsActive)
-                .DistinctUntilChanged()
-                .ObserveOn(uiScheduler)
-                .Subscribe(SetVisibility, Log.HandleUiException)
-                .AddTo(Anchors);
+                         .Select(
+                             x => new
+                             {
+                                 WindowIsActive = windowTracker.IsActive,
+                                 OverlayIsActive = IsPairedOverlay(windowTracker.ActiveWindowTitle),
+                                 ActiveTitle = windowTracker.ActiveWindowTitle
+                             })
+                         .Do(x => Log.Instance.Trace($"[OverlayWindowController] Active window has changed: {x}"))
+                         .Select(x => x.WindowIsActive || x.OverlayIsActive)
+                         .DistinctUntilChanged()
+                         .ObserveOn(uiScheduler)
+                         .Subscribe(SetVisibility, Log.HandleUiException)
+                         .AddTo(Anchors);
 
             windowTracker
                 .WhenAnyValue(x => x.MatchingWindowHandle)
@@ -119,10 +120,10 @@ namespace PoeShared.Native
         public IOverlayViewModel[] GetChilds()
         {
             return childsWindows.Items
-                .Select(x => x.DataContext)
-                .OfType<OverlayWindowViewModel>()
-                .Select(x => x.Content)
-                .ToArray();
+                                .Select(x => x.DataContext)
+                                .OfType<OverlayWindowViewModel>()
+                                .Select(x => x.Content)
+                                .ToArray();
         }
 
         public IDisposable RegisterChild(IOverlayViewModel viewModel)
@@ -192,6 +193,7 @@ namespace PoeShared.Native
             {
                 return;
             }
+
             WindowsServices.SetForegroundWindow(windowHandle);
         }
 
@@ -202,10 +204,10 @@ namespace PoeShared.Native
             {
                 WindowsServices.ShowInactiveTopmost(
                     overlayWindowHandle,
-                    (int) viewModel.Left,
-                    (int) viewModel.Top,
-                    (int) viewModel.Width,
-                    (int) viewModel.Height);
+                    (int)viewModel.Left,
+                    (int)viewModel.Top,
+                    (int)viewModel.Width,
+                    (int)viewModel.Height);
             }
             else
             {
@@ -219,6 +221,7 @@ namespace PoeShared.Native
             {
                 return false;
             }
+
             return possibleOverlayNames
                 .Any(activeWindowTitle.Contains);
         }
@@ -232,6 +235,7 @@ namespace PoeShared.Native
         private class ActivationController : IActivationController
         {
             private readonly OverlayWindowView overlayWindow;
+
             public ActivationController(OverlayWindowView overlayWindow)
             {
                 this.overlayWindow = overlayWindow;

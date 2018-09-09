@@ -60,13 +60,13 @@ namespace PoeShared.PoeTrade
         PoeItemRarity? ItemRarity { get; }
 
         TriState? CorruptionState { get; }
-        
+
         TriState? CraftState { get; }
-        
+
         TriState? AffectedByShaperState { get; }
-        
+
         TriState? AffectedByElderState { get; }
-        
+
         TriState? EnchantState { get; }
 
         IPoeItemType ItemType { get; }
@@ -78,7 +78,7 @@ namespace PoeShared.PoeTrade
         int? LevelMax { get; }
 
         int? LevelMin { get; }
-        
+
         int? ItemLevelMax { get; }
 
         int? ItemLevelMin { get; }

@@ -30,13 +30,15 @@ namespace PoeEye.Utilities
                 {
                     throw new NotSupportedException($"Only Setter type is supported, got {untypedSetter}");
                 }
-                var element = string.IsNullOrEmpty(setter.TargetName) 
+
+                var element = string.IsNullOrEmpty(setter.TargetName)
                     ? AssociatedObject
                     : AssociatedObject.FindName(setter.TargetName) as DependencyObject;
                 if (element == null)
                 {
                     continue;
                 }
+
                 element.SetValue(setter.Property, setter.Value);
             }
         }

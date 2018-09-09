@@ -8,17 +8,17 @@ namespace PoeShared.PoeTrade
 {
     public interface IPoeApiWrapper : IPoeStaticDataSource, IDisposableReactiveObject
     {
+        bool IsBusy { get; }
+
+        bool IsAvailable { get; }
+
+        string Name { [NotNull] get; }
+
+        Guid Id { get; }
+
         [NotNull]
         Task<IPoeQueryResult> IssueQuery([NotNull] IPoeQueryInfo query);
 
         void DisposeQuery([NotNull] IPoeQueryInfo query);
-
-        bool IsBusy { get; }
-
-        bool IsAvailable { get; }
-        
-        string Name { [NotNull] get; }
-
-        Guid Id { get; }
     }
 }

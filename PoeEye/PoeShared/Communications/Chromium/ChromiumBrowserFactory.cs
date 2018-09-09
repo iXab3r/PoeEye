@@ -14,8 +14,8 @@ namespace PoeShared.Communications.Chromium
 {
     internal sealed class ChromiumBrowserFactory : DisposableReactiveObject, IChromiumBrowserFactory
     {
-        private readonly IFactory<ChromiumBrowser, ChromiumWebBrowser> browserFactory;
         private static readonly string AssemblyDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        private readonly IFactory<ChromiumBrowser, ChromiumWebBrowser> browserFactory;
 
         public ChromiumBrowserFactory(
             [NotNull] IFactory<ChromiumBrowser, ChromiumWebBrowser> browserFactory)
@@ -45,19 +45,20 @@ namespace PoeShared.Communications.Chromium
             {
                 settings.LogSeverity = LogSeverity.Error;
             }
-            else 
+            else
             {
                 settings.LogSeverity = LogSeverity.Disable;
             }
+
             settings.IgnoreCertificateErrors = true;
             settings.CefCommandLineArgs.Add("no-proxy-server", "1");
             settings.UserAgent = "CefSharp Browser" + Cef.CefSharpVersion;
             settings.CefCommandLineArgs.Add("disable-extensions", "1");
             settings.CefCommandLineArgs.Add("disable-pdf-extension", "1");
-            
+
             settings.BrowserSubprocessPath = Path.Combine(AssemblyDir,
-                Environment.Is64BitProcess ? "x64" : "x86",
-                "CefSharp.BrowserSubprocess.exe");
+                                                          Environment.Is64BitProcess ? "x64" : "x86",
+                                                          "CefSharp.BrowserSubprocess.exe");
 
             Log.Instance.Debug($"[ChromiumBrowserFactory] CEF settings: {settings.DumpToTextRaw()}");
             if (!Cef.Initialize(settings, true, new BrowserProcessHandler()))
@@ -80,7 +81,7 @@ namespace PoeShared.Communications.Chromium
 
             var isInitialized = new ManualResetEvent(false);
 
-            var browserSettings = new BrowserSettings()
+            var browserSettings = new BrowserSettings
             {
                 WindowlessFrameRate = 1,
                 ImageLoading = CefState.Disabled,
@@ -116,4 +117,3 @@ namespace PoeShared.Communications.Chromium
         }
     }
 }
-    

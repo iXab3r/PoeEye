@@ -3,7 +3,7 @@ using JetBrains.Annotations;
 
 namespace PoeShared.Modularity
 {
-    public interface ISettingsViewModel<TConfig> : ISettingsViewModel 
+    public interface ISettingsViewModel<TConfig> : ISettingsViewModel
         where TConfig : class, IPoeEyeConfig, new()
     {
         Task Load(TConfig config);
@@ -11,7 +11,7 @@ namespace PoeShared.Modularity
         TConfig Save();
     }
 
-    public interface ISettingsViewModel 
+    public interface ISettingsViewModel
     {
         string ModuleName { [NotNull] get; }
     }

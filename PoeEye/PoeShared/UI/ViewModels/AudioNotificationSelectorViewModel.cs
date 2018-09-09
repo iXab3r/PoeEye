@@ -7,17 +7,17 @@ using JetBrains.Annotations;
 using PoeShared.Audio;
 using PoeShared.Scaffolding;
 using ReactiveUI;
+using ReactiveCommand = ReactiveUI.Legacy.ReactiveCommand;
 
 namespace PoeShared.UI.ViewModels
 {
     internal sealed class AudioNotificationSelectorViewModel : DisposableReactiveObject, IDisposableReactiveObject,
-        IAudioNotificationSelectorViewModel
+                                                               IAudioNotificationSelectorViewModel
     {
+        private const AudioNotificationType DefaultNotification = AudioNotificationType.Whistle;
         private readonly IAudioNotificationsManager notificationsManager;
         private bool audioEnabled;
         private AudioNotificationType selectedValue;
-
-        private const AudioNotificationType DefaultNotification = AudioNotificationType.Whistle;
 
         public AudioNotificationSelectorViewModel([NotNull] IAudioNotificationsManager notificationsManager)
         {
@@ -26,11 +26,11 @@ namespace PoeShared.UI.ViewModels
 
             Items = new ReactiveList<object>();
 
-            var selectNotificationCommand = ReactiveUI.Legacy.ReactiveCommand.Create();
+            var selectNotificationCommand = ReactiveCommand.Create();
             selectNotificationCommand.Subscribe(SelectNotificationCommandExecuted).AddTo(Anchors);
             SelectNotificationCommand = selectNotificationCommand;
 
-            var playNotificationCommand = ReactiveUI.Legacy.ReactiveCommand.Create();
+            var playNotificationCommand = ReactiveCommand.Create();
             playNotificationCommand.Subscribe(PlayNotificationCommandExecuted).AddTo(Anchors);
             PlayNotificationCommand = playNotificationCommand;
 
@@ -44,7 +44,7 @@ namespace PoeShared.UI.ViewModels
                 AudioNotificationType.DingDong,
                 AudioNotificationType.Ping,
                 AudioNotificationType.Minions,
-                AudioNotificationType.Wob,
+                AudioNotificationType.Wob
             }.Select(x => new NotificationTypeWrapper(this, x, x.ToString())));
 
             this.WhenAnyValue(x => x.AudioEnabled)
@@ -55,10 +55,10 @@ namespace PoeShared.UI.ViewModels
                 .AddTo(Anchors);
 
             this.WhenAnyValue(x => x.AudioEnabled)
-              .DistinctUntilChanged()
-              .Where(x => !x)
-              .Subscribe(() => SelectedValue = AudioNotificationType.Disabled)
-              .AddTo(Anchors);
+                .DistinctUntilChanged()
+                .Where(x => !x)
+                .Subscribe(() => SelectedValue = AudioNotificationType.Disabled)
+                .AddTo(Anchors);
 
             this.WhenAnyValue(x => x.SelectedValue)
                 .Subscribe(x => AudioEnabled = x != AudioNotificationType.Disabled)
@@ -67,21 +67,21 @@ namespace PoeShared.UI.ViewModels
 
         public bool AudioEnabled
         {
-            get { return audioEnabled; }
-            set { this.RaiseAndSetIfChanged(ref audioEnabled, value); }
+            get => audioEnabled;
+            set => this.RaiseAndSetIfChanged(ref audioEnabled, value);
         }
-
-        public AudioNotificationType SelectedValue
-        {
-            get { return selectedValue; }
-            set { this.RaiseAndSetIfChanged(ref selectedValue, value); }
-        }
-
-        public IReactiveList<object> Items { get; }
 
         public ICommand SelectNotificationCommand { get; }
 
         public ICommand PlayNotificationCommand { get; }
+
+        public AudioNotificationType SelectedValue
+        {
+            get => selectedValue;
+            set => this.RaiseAndSetIfChanged(ref selectedValue, value);
+        }
+
+        public IReactiveList<object> Items { get; }
 
         private void SelectNotificationCommandExecuted(object arg)
         {

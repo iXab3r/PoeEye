@@ -36,7 +36,7 @@ namespace PoeEye.PoeTrade.Models
         }
 
         public IObservable<Unit> WhenChanged { get; }
-        
+
         public PoePrice GetEquivalentInChaosOrbs(PoePrice price)
         {
             if (price.IsEmpty)
@@ -63,8 +63,8 @@ namespace PoeEye.PoeTrade.Models
         private IDictionary<string, float> ExtractDifference(IDictionary<string, float> existingDictionary, IDictionary<string, float> candidate)
         {
             return candidate
-                .Where(x => !existingDictionary.ContainsKey(x.Key) || Math.Abs(existingDictionary[x.Key] - x.Value) > float.Epsilon)
-                .ToDictionary(x => x.Key, x => x.Value);
+                   .Where(x => !existingDictionary.ContainsKey(x.Key) || Math.Abs(existingDictionary[x.Key] - x.Value) > float.Epsilon)
+                   .ToDictionary(x => x.Key, x => x.Value);
         }
 
         private void Reinitialize(IDictionary<string, float> pricesConfig)

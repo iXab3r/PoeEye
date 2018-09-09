@@ -37,14 +37,16 @@ namespace PoeBud.ViewModels
 
             PricesByType = new ReadOnlyObservableCollection<Tuple<PoePrice, PoePrice>>(pricesByType);
 
-            Observable.Merge(
-                    this.WhenAnyValue(x => x.Solution).ToUnit(),
-                    poePriceCalculcator.WhenChanged)
+            this.WhenAnyValue(x => x.Solution).ToUnit().Merge(poePriceCalculcator.WhenChanged)
                 .Subscribe(() => PriceInChaosOrbs = Solution == null ? PoePrice.Empty : CalculateTotal(Solution))
                 .AddTo(Anchors);
 
             ShowHighlighting = new DelegateCommand(() => highlightingService.Highlight(Solution, TimeSpan.FromSeconds(10)));
         }
+
+        public ReadOnlyObservableCollection<Tuple<PoePrice, PoePrice>> PricesByType { get; }
+
+        public ICommand ShowHighlighting { get; }
 
         public IPoeTradeSolution Solution
         {
@@ -57,23 +59,19 @@ namespace PoeBud.ViewModels
             get => priceInChaosOrbs;
             set => this.RaiseAndSetIfChanged(ref priceInChaosOrbs, value);
         }
-        
-        public ReadOnlyObservableCollection<Tuple<PoePrice, PoePrice>> PricesByType { get; }
-        
-        public ICommand ShowHighlighting { get; }
-        
+
         private PoePrice CalculateTotal(IPoeTradeSolution solution)
         {
             Log.Instance.Debug($"Calculating Currency total...");
 
             var currencyWithAmount = solution
-                .Items
-                .Select(x => new { Item = x, Price = StringToPoePriceConverter.Instance.Convert($"{x.StackSize} {x.TypeLine}")})
-                .Where(x => poePriceCalculcator.CanConvert(x.Price))
-                .Select(x => new { Item = x, RawPrice = x.Price, PriceInChaosOrbs = poePriceCalculcator.GetEquivalentInChaosOrbs(x.Price) })
-                .Where(x => x.PriceInChaosOrbs.HasValue)
-                .ToArray();
-            
+                                     .Items
+                                     .Select(x => new {Item = x, Price = StringToPoePriceConverter.Instance.Convert($"{x.StackSize} {x.TypeLine}")})
+                                     .Where(x => poePriceCalculcator.CanConvert(x.Price))
+                                     .Select(x => new {Item = x, RawPrice = x.Price, PriceInChaosOrbs = poePriceCalculcator.GetEquivalentInChaosOrbs(x.Price)})
+                                     .Where(x => x.PriceInChaosOrbs.HasValue)
+                                     .ToArray();
+
             var currencyByType = currencyWithAmount
                 .GroupBy(x => x.RawPrice.CurrencyType);
 
@@ -87,15 +85,16 @@ namespace PoeBud.ViewModels
                 var chaosPrice = new PoePrice(grouping.First().PriceInChaosOrbs.CurrencyType, chaosSum);
                 prices.Add(new Tuple<PoePrice, PoePrice>(currencyPrice, chaosPrice));
             }
-            Log.Instance.Debug($"Currency found:\n\t{prices.Select(x => new { Item = x.Item1, ChaosEquiv = x.Item2 }).DumpToTable()}");
-            
+
+            Log.Instance.Debug($"Currency found:\n\t{prices.Select(x => new {Item = x.Item1, ChaosEquiv = x.Item2}).DumpToTable()}");
+
             pricesByType.Clear();
             prices.OrderByDescending(x => x.Item2.Value).ForEach(pricesByType.Add);
-            
+
             var sum = currencyWithAmount.Any()
                 ? currencyWithAmount.Select(x => x.PriceInChaosOrbs.Value).Sum()
                 : 0;
-            
+
             return new PoePrice(KnownCurrencyNameList.ChaosOrb, sum);
         }
     }

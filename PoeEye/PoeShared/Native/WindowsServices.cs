@@ -21,35 +21,6 @@ namespace PoeShared.Native
         private const int WS_SYSMENU = 0x80000;
         private const int WS_EX_NOACTIVATE = 0x08000000;
 
-        [DllImport("user32.dll", EntryPoint = "SetWindowPos")]
-        private static extern bool SetWindowPos(
-             IntPtr hWnd,             // Window handle
-             int hWndInsertAfter,  // Placement-order handle
-             int X,                // Horizontal position
-             int Y,                // Vertical position
-             int cx,               // Width
-             int cy,               // Height
-             uint uFlags);         // Window positioning flags
-
-        [DllImport("user32.dll")]
-        static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
-
-        [DllImport("user32.dll")]
-        private static extern int GetWindowLong(IntPtr hwnd, int index);
-
-        [DllImport("user32.dll")]
-        private static extern bool AllowSetForegroundWindow(uint processId);
-
-        [DllImport("user32.dll")]
-        private static extern int SetWindowLong(IntPtr hwnd, int index, int newStyle);
-
-        [DllImport("user32.dll")]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool SetForegroundWindow(IntPtr hWnd);
-
-        [DllImport("User32.dll")]
-        public static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
-
         static WindowsServices()
         {
             try
@@ -67,6 +38,35 @@ namespace PoeShared.Native
                 Log.HandleException(e);
             }
         }
+
+        [DllImport("user32.dll", EntryPoint = "SetWindowPos")]
+        private static extern bool SetWindowPos(
+            IntPtr hWnd, // Window handle
+            int hWndInsertAfter, // Placement-order handle
+            int X, // Horizontal position
+            int Y, // Vertical position
+            int cx, // Width
+            int cy, // Height
+            uint uFlags); // Window positioning flags
+
+        [DllImport("user32.dll")]
+        private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
+        [DllImport("user32.dll")]
+        private static extern int GetWindowLong(IntPtr hwnd, int index);
+
+        [DllImport("user32.dll")]
+        private static extern bool AllowSetForegroundWindow(uint processId);
+
+        [DllImport("user32.dll")]
+        private static extern int SetWindowLong(IntPtr hwnd, int index, int newStyle);
+
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool SetForegroundWindow(IntPtr hWnd);
+
+        [DllImport("User32.dll")]
+        public static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
 
         public static void HideSystemMenu(IntPtr hwnd)
         {

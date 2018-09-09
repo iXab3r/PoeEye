@@ -18,16 +18,17 @@ namespace PoeShared.UI.Models
     internal sealed class ImagesCacheService : IImagesCacheService
     {
         private static readonly TimeSpan ArtificialDelay = TimeSpan.FromSeconds(5);
-        private readonly IScheduler uiScheduler;
 
         private static readonly string CachePath = Environment.ExpandEnvironmentVariables($@"%LOCALAPPDATA%\PoeEye\Cache\");
         private readonly IFactory<IHttpClient> httpClientFactory;
 
         private readonly IDictionary<string, IObservable<FileInfo>> imagesBeingLoaded = new ConcurrentDictionary<string, IObservable<FileInfo>>();
+        private readonly IScheduler uiScheduler;
 
         public ImagesCacheService(
             [NotNull] IFactory<IHttpClient> httpClientFactory,
-            [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
+            [NotNull] [Dependency(WellKnownSchedulers.UI)]
+            IScheduler uiScheduler)
         {
             Guard.ArgumentNotNull(httpClientFactory, nameof(httpClientFactory));
             Guard.ArgumentNotNull(uiScheduler, nameof(uiScheduler));
@@ -57,11 +58,11 @@ namespace PoeShared.UI.Models
             Log.Instance.Debug($"[ItemsCache.ResolveImageByUri] Image '{imageUri}' is not loaded, downloading it...");
             var httpClient = httpClientFactory.Create();
             var result = httpClient
-                .GetStreamAsync(imageUri)
-                .Select(x => LoadImageFromStream(outputFilePath, x))
-                .Catch(Observable.Empty<FileInfo>())
-                .ObserveOn(uiScheduler)
-                .Publish();
+                         .GetStreamAsync(imageUri)
+                         .Select(x => LoadImageFromStream(outputFilePath, x))
+                         .Catch(Observable.Empty<FileInfo>())
+                         .ObserveOn(uiScheduler)
+                         .Publish();
 
             imagesBeingLoaded[outputFilePath] = result;
 
@@ -84,6 +85,7 @@ namespace PoeShared.UI.Models
             {
                 dataStream.CopyTo(outputStream);
             }
+
             imagesBeingLoaded.Remove(outputFilePath);
 
             Log.Instance.Debug($"[ItemsCache.ResolveImageByUri] Image was saved to file '{outputFilePath}'");

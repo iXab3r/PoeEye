@@ -27,29 +27,30 @@ namespace PoeEye.PoeTrade.ViewModels
     {
         private static int GlobalTabIdx;
 
+        private readonly string defaultTabName;
+
         private readonly DelegateCommand markAllAsReadCommand;
+        private readonly DelegateCommand<object> newSearchCommand;
         private readonly IFactory<IPoeQueryViewModel, IPoeStaticDataSource> queryFactory;
         private readonly DelegateCommand<object> refreshCommand;
-        private readonly DelegateCommand<object> newSearchCommand;
         private readonly DelegateCommand<string> renameCommand;
         private readonly DelegateCommand resetCommand;
-
-        private readonly string defaultTabName;
+        private readonly Fallback<string> tabName = new Fallback<string>();
 
         private readonly SerialDisposable tradesListAnchors = new SerialDisposable();
         private readonly IFactory<IPoeTradesListViewModel, IPoeApiWrapper> tradesListFactory;
-        private readonly Fallback<string> tabName = new Fallback<string>();
+        private bool isFlipped;
 
         private IPoeQueryViewModel query;
         private IPoeTradesListViewModel tradesList;
-        private bool isFlipped;
 
         public MainWindowTabViewModel(
             [NotNull] IFactory<IPoeTradesListViewModel, IPoeApiWrapper> tradesListFactory,
             [NotNull] IAudioNotificationsManager audioNotificationsManager,
             [NotNull] IRecheckPeriodViewModel recheckPeriod,
             [NotNull] IPoeApiSelectorViewModel apiSelector,
-            [NotNull] [Dependency(WellKnownWindows.MainWindow)] IWindowTracker mainWindowTracker,
+            [NotNull] [Dependency(WellKnownWindows.MainWindow)]
+            IWindowTracker mainWindowTracker,
             [NotNull] IAudioNotificationSelectorViewModel audioNotificationSelector,
             [NotNull] IFactory<IPoeQueryViewModel, IPoeStaticDataSource> queryFactory)
         {
@@ -86,10 +87,9 @@ namespace PoeEye.PoeTrade.ViewModels
 
             refreshCommand = new DelegateCommand<object>(RefreshCommandExecuted, RefreshCommandCanExecute);
             newSearchCommand = new DelegateCommand<object>(NewSearchCommandExecuted, NewSearchCommandCanExecute);
-            
-            Observable.Merge(
-                this.WhenAnyValue(x => x.IsBusy, x => x.SelectedApi).ToUnit(),
-                this.WhenAnyValue(x => x.SelectedApi).Select(x => x.WhenAnyValue(y => y.IsAvailable)).Switch().ToUnit())
+
+            this.WhenAnyValue(x => x.IsBusy, x => x.SelectedApi).ToUnit()
+                .Merge(this.WhenAnyValue(x => x.SelectedApi).Select(x => x.WhenAnyValue(y => y.IsAvailable)).Switch().ToUnit())
                 .Subscribe(
                     () =>
                     {
@@ -97,7 +97,7 @@ namespace PoeEye.PoeTrade.ViewModels
                         newSearchCommand.RaiseCanExecuteChanged();
                     })
                 .AddTo(Anchors);
-            
+
             this
                 .WhenAnyValue(x => x.SelectedApi)
                 .Where(x => x != null)
@@ -106,11 +106,11 @@ namespace PoeEye.PoeTrade.ViewModels
 
             this.BindPropertyTo(x => x.SelectedApi, apiSelector, x => x.SelectedModule).AddTo(Anchors);
             this.BindPropertyTo(x => x.SelectedAudioNotificationType, audioNotificationSelector, x => x.SelectedValue).AddTo(Anchors);
-            
+
             this.WhenAnyValue(x => x.NewItemsCount)
                 .DistinctUntilChanged()
                 .Where(x => x > 0)
-                .WithPrevious((prev, curr) => new { prev, curr })
+                .WithPrevious((prev, curr) => new {prev, curr})
                 .Where(x => x.curr > x.prev)
                 .Where(x => audioNotificationSelector.SelectedValue != AudioNotificationType.Disabled)
                 .Where(x => !mainWindowTracker.IsActive)
@@ -119,19 +119,8 @@ namespace PoeEye.PoeTrade.ViewModels
                     Log.HandleException)
                 .AddTo(Anchors);
         }
-        private bool NewSearchCommandCanExecute(object arg)
-        {
-            return (SelectedApi?.IsAvailable ?? false);
-        }
-
-        private bool RefreshCommandCanExecute(object arg)
-        {
-            return !IsBusy && NewSearchCommandCanExecute(arg);
-        }
 
         public IPoeApiSelectorViewModel ApiSelector { get; }
-
-        public AudioNotificationType SelectedAudioNotificationType => AudioNotificationSelector.SelectedValue;
 
         public bool HasNewTrades => NewItemsCount > 0;
 
@@ -149,47 +138,49 @@ namespace PoeEye.PoeTrade.ViewModels
         {
             get { return TradesList.Items.Count(x => x.TradeState == PoeTradeState.Normal); }
         }
-        
+
+        public ICommand NewSearchCommand => newSearchCommand;
+
+        public ICommand ResetCommand => resetCommand;
+
+        public string DefaultTabName => tabName.DefaultValue;
+
+        public IAudioNotificationSelectorViewModel AudioNotificationSelector { get; }
+
+        public AudioNotificationType SelectedAudioNotificationType => AudioNotificationSelector.SelectedValue;
+
         public string Id { get; }
 
         public IPoeApiWrapper SelectedApi => ApiSelector.SelectedModule;
 
         public ICommand RefreshCommand => refreshCommand;
 
-        public ICommand NewSearchCommand => newSearchCommand;
-
         public ICommand MarkAllAsReadCommand => markAllAsReadCommand;
 
         public ICommand RenameCommand => renameCommand;
-        
-        public ICommand ResetCommand => resetCommand;
 
         public bool IsBusy => TradesList?.IsBusy ?? false;
 
         public string TabName => tabName.Value;
 
-        public string DefaultTabName => tabName.DefaultValue;
-
         public IPoeTradesListViewModel TradesList
         {
-            get { return tradesList; }
-            private set { this.RaiseAndSetIfChanged(ref tradesList, value); }
+            get => tradesList;
+            private set => this.RaiseAndSetIfChanged(ref tradesList, value);
         }
 
         public IRecheckPeriodViewModel RecheckPeriod { get; }
 
-        public IAudioNotificationSelectorViewModel AudioNotificationSelector { get; }
-
         public bool IsFlipped
         {
-            get { return isFlipped; }
-            set { this.RaiseAndSetIfChanged(ref isFlipped, value); }
+            get => isFlipped;
+            set => this.RaiseAndSetIfChanged(ref isFlipped, value);
         }
 
         public IPoeQueryViewModel Query
         {
-            get { return query; }
-            private set { this.RaiseAndSetIfChanged(ref query, value); }
+            get => query;
+            private set => this.RaiseAndSetIfChanged(ref query, value);
         }
 
         public void Load(PoeEyeTabConfig config)
@@ -231,14 +222,24 @@ namespace PoeEye.PoeTrade.ViewModels
                 QuickFilter = TradesList.QuickFilter
             };
         }
-        
+
+        private bool NewSearchCommandCanExecute(object arg)
+        {
+            return SelectedApi?.IsAvailable ?? false;
+        }
+
+        private bool RefreshCommandCanExecute(object arg)
+        {
+            return !IsBusy && NewSearchCommandCanExecute(arg);
+        }
+
         private void ResetCommandExecuted()
         {
             Log.Instance.Debug($"Resetting query parameters of tab {tabName.Value}");
             Query = queryFactory.Create(SelectedApi);
             ReinitializeApi(SelectedApi);
         }
-        
+
         private bool ResetCommandCanExecute()
         {
             return SelectedApi != null;
@@ -251,7 +252,8 @@ namespace PoeEye.PoeTrade.ViewModels
                 if (value == null)
                 {
                     // Cancel
-                } else if (string.IsNullOrWhiteSpace(value))
+                }
+                else if (string.IsNullOrWhiteSpace(value))
                 {
                     RenameTabTo(default(string));
                 }
@@ -260,7 +262,7 @@ namespace PoeEye.PoeTrade.ViewModels
                     RenameTabTo(value);
                 }
             }
-            
+
             IsFlipped = !IsFlipped;
         }
 
@@ -270,6 +272,7 @@ namespace PoeEye.PoeTrade.ViewModels
             {
                 return;
             }
+
             var previousValue = tabName.Value;
             tabName.SetValue(newTabNameOrDefault);
             Log.Instance.Debug($"Changed name of tab {defaultTabName}, {previousValue} => {tabName.Value}");
@@ -281,13 +284,14 @@ namespace PoeEye.PoeTrade.ViewModels
             var anchors = new CompositeDisposable();
             tradesListAnchors.Disposable = anchors;
             TradesList?.Dispose();
-            
+
             var existingQuery = Query;
             var newQuery = queryFactory.Create(api);
             if (existingQuery != null)
             {
                 newQuery.SetQueryInfo(existingQuery);
             }
+
             Query = newQuery;
 
             TradesList = tradesListFactory.Create(api);
@@ -315,18 +319,18 @@ namespace PoeEye.PoeTrade.ViewModels
                 .AddTo(anchors);
 
             Observable.Merge(
-                    tradesList.Items.ToObservableChangeSet().WhenPropertyChanged(x => x.TradeState).ToUnit()
-                )
-                .StartWith(Unit.Default)
-                .Subscribe(
-                    () =>
-                    {
-                        this.RaisePropertyChanged(nameof(NewItemsCount));
-                        this.RaisePropertyChanged(nameof(RemovedItemsCount));
-                        this.RaisePropertyChanged(nameof(NormalItemsCount));
-                        this.RaisePropertyChanged(nameof(HasNewTrades));
-                    })
-                .AddTo(anchors);
+                          tradesList.Items.ToObservableChangeSet().WhenPropertyChanged(x => x.TradeState).ToUnit()
+                      )
+                      .StartWith(Unit.Default)
+                      .Subscribe(
+                          () =>
+                          {
+                              this.RaisePropertyChanged(nameof(NewItemsCount));
+                              this.RaisePropertyChanged(nameof(RemovedItemsCount));
+                              this.RaisePropertyChanged(nameof(NormalItemsCount));
+                              this.RaisePropertyChanged(nameof(HasNewTrades));
+                          })
+                      .AddTo(anchors);
         }
 
         private void RebuildTabName(IPoeQueryViewModel queryToProcess)
@@ -387,12 +391,12 @@ namespace PoeEye.PoeTrade.ViewModels
             }
 
             ExceptionlessClient.Default
-                .CreateFeatureUsage("TradeList")
-                .SetType("Search")
-                .SetMessage(Query.Description)
-                .SetProperty("Description", Query.Description)
-                .SetProperty("Query", query.DumpToText())
-                .Submit();
+                               .CreateFeatureUsage("TradeList")
+                               .SetType("Search")
+                               .SetMessage(Query.Description)
+                               .SetProperty("Description", Query.Description)
+                               .SetProperty("Query", query.DumpToText())
+                               .Submit();
         }
 
         private void MarkAllAsReadExecute()

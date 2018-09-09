@@ -25,18 +25,18 @@ namespace PoeEye.StashRealtimeApi.Services
     internal sealed class PoeItemsSource : DisposableReactiveObject, IPoeItemsSource
     {
         private static readonly TimeSpan AllowedPollingInterval = TimeSpan.FromMilliseconds(1100);
-
-        private readonly IFactory<IPoeItem, IStashItem, StashTab> poeItemFactory;
-        private readonly IClock clock;
         private static readonly string StashApiUri = @"http://www.pathofexile.com/api";
 
         private readonly IStashApi client;
+        private readonly IClock clock;
         private readonly ISubject<IPoeItem[]> items = new Subject<IPoeItem[]>();
 
+        private readonly IFactory<IPoeItem, IStashItem, StashTab> poeItemFactory;
+
         private readonly BlockingCollection<List<StashTab>> rawPacks = new BlockingCollection<List<StashTab>>();
+        private DateTime lastRequestTimestamp;
 
         private string nextChangeId;
-        private DateTime lastRequestTimestamp;
 
         public PoeItemsSource(
             [NotNull] IFactory<IPoeItem, IStashItem, StashTab> poeItemFactory,
@@ -55,12 +55,10 @@ namespace PoeEye.StashRealtimeApi.Services
 
             var httpClient = new HttpClient(handler)
             {
-                BaseAddress = new Uri(StashApiUri),
+                BaseAddress = new Uri(StashApiUri)
             };
 
-            client =  new RestClient(httpClient)
-            {
-            }.For<IStashApi>();
+            client = new RestClient(httpClient).For<IStashApi>();
 
             var consumerCancellationTokenSource = new CancellationTokenSource();
             var consumerThread = new Task(RawItemsConsumerThread, consumerCancellationTokenSource.Token, TaskCreationOptions.LongRunning);
@@ -101,7 +99,7 @@ namespace PoeEye.StashRealtimeApi.Services
             try
             {
                 Log.Instance.Debug("Thread started");
-                var cancellationToken = (CancellationToken) cancellationTokenUntyped;
+                var cancellationToken = (CancellationToken)cancellationTokenUntyped;
 
                 while (!cancellationToken.IsCancellationRequested)
                 {
@@ -119,10 +117,12 @@ namespace PoeEye.StashRealtimeApi.Services
                     var itemsToAdd = poeItems.Where(x => !string.IsNullOrWhiteSpace(x.Hash)).ToArray();
                     sw.Stop();
 
-                    Log.Instance.Debug($"Processed {poeItems.Length} item(s) in {sw.ElapsedMilliseconds}ms. Found {poeItems.Length - itemsToAdd.Length} bad items");
+                    Log.Instance.Debug(
+                        $"Processed {poeItems.Length} item(s) in {sw.ElapsedMilliseconds}ms. Found {poeItems.Length - itemsToAdd.Length} bad items");
 
                     items.OnNext(itemsToAdd);
                 }
+
                 Log.Instance.Debug("Cancellation requested");
             }
             catch (OperationCanceledException)
@@ -147,7 +147,8 @@ namespace PoeEye.StashRealtimeApi.Services
                 {
                     var timeElapsed = clock.Now - lastRequestTimestamp;
                     var timeToSleep = AllowedPollingInterval - timeElapsed;
-                    Log.Instance.Debug($"Update request received, time elapsed since last update: {timeElapsed.TotalMilliseconds}ms, timeToSleep: {timeToSleep.TotalMilliseconds}ms");
+                    Log.Instance.Debug(
+                        $"Update request received, time elapsed since last update: {timeElapsed.TotalMilliseconds}ms, timeToSleep: {timeToSleep.TotalMilliseconds}ms");
                     if (timeElapsed < AllowedPollingInterval)
                     {
                         Log.Instance.Debug($"Awaiting for {timeToSleep.TotalMilliseconds}ms");
@@ -197,7 +198,7 @@ namespace PoeEye.StashRealtimeApi.Services
         {
             Log.Instance.Debug($"Processing response, stashes count: {response.Stashes?.Count ?? -1}, proposed nextChangeId: {response.NextChangeId}");
 
-           
+
             if (response.Stashes == null || response.Stashes.Count == 0)
             {
                 Log.Instance.Warn($"Empty response, we should re-request with the same {nextChangeId} instead of proposed {response.NextChangeId}");
@@ -208,7 +209,6 @@ namespace PoeEye.StashRealtimeApi.Services
                 Log.Instance.Debug($"Adding pack of {response.Stashes.Count} items to a processing queue, currently there are {rawPacks.Count} elements");
                 rawPacks.Add(response.Stashes);
             }
-
         }
 
         private IEnumerable<IPoeItem> ToItems(IEnumerable<StashTab> stashes)

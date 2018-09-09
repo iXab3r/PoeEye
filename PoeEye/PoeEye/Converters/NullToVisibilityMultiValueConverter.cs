@@ -16,21 +16,25 @@ namespace PoeEye.Converters
             {
                 return Binding.DoNothing;
             }
-            var result = Convert(this.RequireStrategy(), values, parameter);
-            return result ? TrueValue : FalseValue;
-        }
 
-        private IBoolMultiValueConverterStrategy RequireStrategy()
-        {
-            IBoolMultiValueConverterStrategy strategy = this.Strategy;
-            if (strategy != null)
-                return strategy;
-            throw new InvalidOperationException("no logical strategy has been set");
+            var result = Convert(RequireStrategy(), values, parameter);
+            return result ? TrueValue : FalseValue;
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
         {
             throw new NotSupportedException();
+        }
+
+        private IBoolMultiValueConverterStrategy RequireStrategy()
+        {
+            var strategy = Strategy;
+            if (strategy != null)
+            {
+                return strategy;
+            }
+
+            throw new InvalidOperationException("no logical strategy has been set");
         }
 
         public bool Convert(IBoolMultiValueConverterStrategy strategy, object[] values, object parameter)

@@ -5,6 +5,8 @@ namespace PoeBud.ViewModels
 {
     internal sealed class TabSelectionViewModel : ReactiveObject
     {
+        private bool isSelected;
+
         public TabSelectionViewModel(string tabName)
         {
             Guard.ArgumentNotNull(tabName, nameof(tabName));
@@ -14,12 +16,10 @@ namespace PoeBud.ViewModels
 
         public string Name { get; }
 
-        private bool isSelected;
-
         public bool IsSelected
         {
-            get { return isSelected; }
-            set { this.RaiseAndSetIfChanged(ref isSelected, value); }
+            get => isSelected;
+            set => this.RaiseAndSetIfChanged(ref isSelected, value);
         }
     }
 }

@@ -43,7 +43,7 @@ namespace PoeShared.Converters
             result.Timestamp = clock.Now;
 
             var itemPrice = string.IsNullOrWhiteSpace(value.Note)
-                ? PoePrice.Empty 
+                ? PoePrice.Empty
                 : stringToPoePriceConverter.Convert(value.Note);
             result.Price = !itemPrice.IsEmpty
                 ? itemPrice.ToString()
@@ -51,40 +51,43 @@ namespace PoeShared.Converters
 
             var requirementsBuilder =
                 value.Requirements
-                    .EmptyIfNull()
-                    .Select(FormatRequirement)
-                    .ToArray();
+                     .EmptyIfNull()
+                     .Select(FormatRequirement)
+                     .ToArray();
             result.Requirements = string.Join(", ", requirementsBuilder);
 
             var mods = new List<IPoeItemMod>();
             foreach (var valueImplicitMod in value.ImplicitMods.EmptyIfNull())
             {
-                var mod = new PoeItemMod()
+                var mod = new PoeItemMod
                 {
                     Name = valueImplicitMod,
                     ModType = PoeModType.Implicit
                 };
                 mods.Add(mod);
             }
+
             foreach (var valueExplicitMod in value.ExplicitMods.EmptyIfNull())
             {
-                var mod = new PoeItemMod()
+                var mod = new PoeItemMod
                 {
                     Name = valueExplicitMod,
                     ModType = PoeModType.Explicit
                 };
                 mods.Add(mod);
             }
+
             foreach (var valueCraftedMod in value.CraftedMods.EmptyIfNull())
             {
-                var mod = new PoeItemMod()
+                var mod = new PoeItemMod
                 {
                     Name = valueCraftedMod,
                     ModType = PoeModType.Explicit,
-                    Origin = PoeModOrigin.Craft,
+                    Origin = PoeModOrigin.Craft
                 };
                 mods.Add(mod);
             }
+
             result.Mods = mods.ToArray();
 
             return result;
@@ -98,9 +101,9 @@ namespace PoeShared.Converters
             }
 
             var values = requirement.Values.EmptyIfNull()
-                .Where(x => x != null)
-                .Where(IsValidRequirementValue)
-                .ToArray();
+                                    .Where(x => x != null)
+                                    .Where(IsValidRequirementValue)
+                                    .ToArray();
 
             return $"{requirement.Name} {string.Join(" ", values)}";
         }
@@ -111,11 +114,13 @@ namespace PoeShared.Converters
             {
                 return !string.IsNullOrWhiteSpace(value as string);
             }
+
             if (value is int)
             {
                 var intValue = (int)value;
                 return intValue > 0;
             }
+
             return false;
         }
     }

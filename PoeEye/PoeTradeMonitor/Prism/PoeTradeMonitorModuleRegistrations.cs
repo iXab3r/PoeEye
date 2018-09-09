@@ -22,18 +22,18 @@ namespace PoeEye.TradeMonitor.Prism
                 .RegisterSingleton<IPoeMacroCommandsProvider, PoeMacroCommandsService>();
 
             Container
-                 .RegisterType<ITradeMonitorService>(
-                     new InjectionFactory(unity => unity.Resolve<TradeMonitorService>(
-                             new DependencyOverride<IPoeMessageParser[]>(
-                                     new IPoeMessageParser[]
-                                     {
-                                        unity.Resolve<PoeMessageStrictParserPoeTrade>(),
-                                        unity.Resolve<PoeMessageWeakParserPoeTrade>(),
-                                        unity.Resolve<PoeMessageCurrencyParserPoeTrade>(),
-                                     }
-                                 )
-                         ))
-                 );
+                .RegisterType<ITradeMonitorService>(
+                    new InjectionFactory(unity => unity.Resolve<TradeMonitorService>(
+                                             new DependencyOverride<IPoeMessageParser[]>(
+                                                 new IPoeMessageParser[]
+                                                 {
+                                                     unity.Resolve<PoeMessageStrictParserPoeTrade>(),
+                                                     unity.Resolve<PoeMessageWeakParserPoeTrade>(),
+                                                     unity.Resolve<PoeMessageCurrencyParserPoeTrade>()
+                                                 }
+                                             )
+                                         ))
+                );
         }
     }
 }

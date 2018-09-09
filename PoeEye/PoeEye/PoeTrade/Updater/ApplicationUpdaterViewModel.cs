@@ -15,24 +15,27 @@ using PoeShared.UI;
 using ReactiveUI;
 using ReactiveUI.Legacy;
 using Unity.Attributes;
+using ReactiveCommand = ReactiveUI.Legacy.ReactiveCommand;
 
 namespace PoeEye.PoeTrade.Updater
 {
     internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject
     {
-        private readonly IApplicationUpdaterModel updaterModel;
         private readonly ReactiveCommand<Unit> checkForUpdatesCommand;
         private readonly ReactiveCommand<Unit> restartCommand;
+        private readonly IApplicationUpdaterModel updaterModel;
+        private string error = string.Empty;
 
         private bool isBusy;
         private bool isOpen;
-        private string error = string.Empty;
 
         public ApplicationUpdaterViewModel(
             [NotNull] IApplicationUpdaterModel updaterModel,
             [NotNull] IConfigProvider<PoeEyeUpdateSettingsConfig> configProvider,
-            [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler,
-            [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler)
+            [NotNull] [Dependency(WellKnownSchedulers.UI)]
+            IScheduler uiScheduler,
+            [NotNull] [Dependency(WellKnownSchedulers.Background)]
+            IScheduler bgScheduler)
         {
             Guard.ArgumentNotNull(updaterModel, nameof(updaterModel));
             Guard.ArgumentNotNull(uiScheduler, nameof(uiScheduler));
@@ -40,11 +43,11 @@ namespace PoeEye.PoeTrade.Updater
             Guard.ArgumentNotNull(configProvider, nameof(configProvider));
 
             updaterModel.WhenAnyValue(x => x.MostRecentVersion)
-                .Subscribe(() => this.RaisePropertyChanged(nameof(MostRecentVersion)))
-                .AddTo(Anchors);
+                        .Subscribe(() => this.RaisePropertyChanged(nameof(MostRecentVersion)))
+                        .AddTo(Anchors);
 
             this.updaterModel = updaterModel;
-            checkForUpdatesCommand = ReactiveUI.Legacy.ReactiveCommand
+            checkForUpdatesCommand = ReactiveCommand
                 .CreateAsyncTask(x => CheckForUpdatesCommandExecuted(), uiScheduler);
 
             checkForUpdatesCommand
@@ -57,20 +60,22 @@ namespace PoeEye.PoeTrade.Updater
                 .ObserveOn(uiScheduler)
                 .Subscribe(() => this.RaisePropertyChanged(nameof(MostRecentVersion)), Log.HandleUiException)
                 .AddTo(Anchors);
-            
-            restartCommand = ReactiveUI.Legacy.ReactiveCommand
+
+            restartCommand = ReactiveCommand
                 .CreateAsyncTask(x => RestartCommandExecuted(), uiScheduler);
 
             restartCommand
                 .ThrownExceptions
                 .Subscribe(ex => Error = $"Restart error: {ex.Message}")
                 .AddTo(Anchors);
-            
+
             configProvider
                 .ListenTo(x => x.AutoUpdateTimeout)
-                .WithPrevious((prev, curr) => new { prev, curr })
+                .WithPrevious((prev, curr) => new {prev, curr})
                 .Do(timeout => Log.Instance.Debug($"[ApplicationUpdaterViewModel] AutoUpdate timout changed: {timeout.prev} => {timeout.curr}"))
-                .Select(timeout => timeout.curr <= TimeSpan.Zero ? Observable.Never<long>() : Observable.Timer(DateTimeOffset.MinValue, timeout.curr, bgScheduler))
+                .Select(timeout => timeout.curr <= TimeSpan.Zero
+                            ? Observable.Never<long>()
+                            : Observable.Timer(DateTimeOffset.MinValue, timeout.curr, bgScheduler))
                 .Switch()
                 .ObserveOn(uiScheduler)
                 .Subscribe(() => checkForUpdatesCommand.Execute(this), Log.HandleException)
@@ -83,20 +88,20 @@ namespace PoeEye.PoeTrade.Updater
 
         public string Error
         {
-            get { return error; }
-            set { this.RaiseAndSetIfChanged(ref error, value); }
+            get => error;
+            set => this.RaiseAndSetIfChanged(ref error, value);
         }
 
         public bool IsBusy
         {
-            get { return isBusy; }
-            set { this.RaiseAndSetIfChanged(ref isBusy, value); }
+            get => isBusy;
+            set => this.RaiseAndSetIfChanged(ref isBusy, value);
         }
 
         public bool IsOpen
         {
-            get { return isOpen; }
-            set { this.RaiseAndSetIfChanged(ref isOpen, value); }
+            get => isOpen;
+            set => this.RaiseAndSetIfChanged(ref isOpen, value);
         }
 
         public Version MostRecentVersion => updaterModel.MostRecentVersion;
@@ -125,7 +130,7 @@ namespace PoeEye.PoeTrade.Updater
                 IsBusy = false;
             }
         }
-        
+
         private async Task RestartCommandExecuted()
         {
             Log.Instance.Debug($"[ApplicationUpdaterViewModel] Restart application requested");

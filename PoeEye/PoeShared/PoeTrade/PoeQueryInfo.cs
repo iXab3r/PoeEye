@@ -8,7 +8,8 @@ namespace PoeShared.PoeTrade
 {
     public sealed class PoeQueryInfo : IPoeQueryInfo
     {
-        public static IEqualityComparer<IPoeQueryInfo> Comparer = new LambdaComparer<IPoeQueryInfo>((x, y) => string.CompareOrdinal(x?.DumpToText(), y?.DumpToText()) == 0);
+        public static IEqualityComparer<IPoeQueryInfo> Comparer =
+            new LambdaComparer<IPoeQueryInfo>((x, y) => string.CompareOrdinal(x?.DumpToText(), y?.DumpToText()) == 0);
 
         public static string Id { get; } = Guid.NewGuid().ToString();
 
@@ -73,13 +74,13 @@ namespace PoeShared.PoeTrade
         public PoeItemRarity? ItemRarity { get; set; }
 
         public TriState? CorruptionState { get; set; }
-        
+
         public TriState? CraftState { get; set; }
-        
-        public TriState? AffectedByShaperState { get; set;}
-        
-        public TriState? AffectedByElderState { get; set;}
-        
+
+        public TriState? AffectedByShaperState { get; set; }
+
+        public TriState? AffectedByElderState { get; set; }
+
         public TriState? EnchantState { get; set; }
 
         public IPoeItemType ItemType { get; set; }
@@ -89,7 +90,7 @@ namespace PoeShared.PoeTrade
         public int? LevelMax { get; set; }
 
         public int? LevelMin { get; set; }
-        
+
         public int? ItemLevelMax { get; set; }
 
         public int? ItemLevelMin { get; set; }

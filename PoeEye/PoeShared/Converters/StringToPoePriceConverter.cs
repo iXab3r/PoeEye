@@ -11,10 +11,11 @@ namespace PoeShared.Converters
 {
     public sealed class StringToPoePriceConverter : IConverter<string, PoePrice>, IValueConverter
     {
-        private static readonly Lazy<IConverter<string, PoePrice>> InstanceSupplier = new Lazy<IConverter<string, PoePrice>>(() => new StringToPoePriceConverter());
-        private static readonly Regex CurrencyParser = new Regex(@"^[~]?(?:b\/o |price )?(?'value'[\d\.\,]+)? ?(?'type'[\w \-\']+)$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-        
-        public static IConverter<string, PoePrice> Instance => InstanceSupplier.Value;
+        private static readonly Lazy<IConverter<string, PoePrice>> InstanceSupplier =
+            new Lazy<IConverter<string, PoePrice>>(() => new StringToPoePriceConverter());
+
+        private static readonly Regex CurrencyParser = new Regex(@"^[~]?(?:b\/o |price )?(?'value'[\d\.\,]+)? ?(?'type'[\w \-\']+)$",
+                                                                 RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         private readonly ConcurrentDictionary<string, string> currencyByAlias;
 
@@ -25,9 +26,11 @@ namespace PoeShared.Converters
             Log.Instance.Debug($"[PriceToCurrencyConverter..ctor] Aliases list:\r\n{currencyByAlias.DumpToText()}");
         }
 
+        public static IConverter<string, PoePrice> Instance => InstanceSupplier.Value;
+
         public PoePrice Convert(string rawPrice)
         {
-            if (String.IsNullOrWhiteSpace(rawPrice))
+            if (string.IsNullOrWhiteSpace(rawPrice))
             {
                 return PoePrice.Empty;
             }
@@ -71,6 +74,7 @@ namespace PoeShared.Converters
             {
                 return Binding.DoNothing;
             }
+
             return Convert(rawPrice);
         }
 

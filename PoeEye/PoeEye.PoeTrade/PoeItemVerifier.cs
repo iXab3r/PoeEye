@@ -46,11 +46,11 @@ namespace PoeEye.PoeTrade
 
             Log.Instance.Debug($"[PoeItemVerifier] Requesting verification uri '{verificationUri}'...");
             return client
-                .Get(verificationUri)
-                .Select(response => new {response, isVerified = ExtractResult(response)})
-                .Do(result => PostProcess(verificationUri, result.response, result.isVerified))
-                .Select(x => x.isVerified)
-                .ToTask();
+                   .Get(verificationUri)
+                   .Select(response => new {response, isVerified = ExtractResult(response)})
+                   .Do(result => PostProcess(verificationUri, result.response, result.isVerified))
+                   .Select(x => x.isVerified)
+                   .ToTask();
         }
 
         private void PostProcess(string verificationUri, string response, bool? isVerified)
@@ -72,10 +72,12 @@ namespace PoeEye.PoeTrade
             {
                 return true;
             }
+
             if (rawHtml.Equals("(false);", StringComparison.OrdinalIgnoreCase))
             {
                 return false;
             }
+
             return null;
         }
     }

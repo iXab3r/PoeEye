@@ -1,4 +1,5 @@
-﻿namespace PoeBud.Models {
+﻿namespace PoeBud.Models
+{
     public interface IDefaultStashUpdaterStrategy : IStashUpdaterStrategy
     {
     }

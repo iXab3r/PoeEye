@@ -5,6 +5,7 @@ using System.Reactive.Linq;
 using System.Windows;
 using System.Windows.Input;
 using PoeEye.PoeTrade.Shell.ViewModels;
+using PoeEye.PoeTrade.Shell.Views;
 using PoeShared;
 using PoeShared.Communications.Chromium;
 using PoeShared.Scaffolding;
@@ -18,20 +19,20 @@ namespace PoeEye.Prism
     {
         protected override DependencyObject CreateShell()
         {
-            return Container.Resolve<PoeTrade.Shell.Views.MainWindow>();
+            return Container.Resolve<MainWindow>();
         }
-        
+
         protected override void InitializeShell()
         {
             base.InitializeShell();
 
             Log.Instance.Info($"[Bootstrapper] Initializing shell...");
             var sw = Stopwatch.StartNew();
-            
+
             Mouse.OverrideCursor = new Cursor(new MemoryStream(Properties.Resources.PathOfExile_102));
             var splashWindow = new SplashScreen("Resources\\Splash.png");
             splashWindow.Show(true, false);
-            
+
             var window = (Window)Shell;
             Application.Current.ShutdownMode = ShutdownMode.OnMainWindowClose;
             Application.Current.MainWindow = window;
@@ -51,17 +52,18 @@ namespace PoeEye.Prism
         {
             return new ConfigurationModuleCatalog();
         }
-        
+
         public override void Run(bool runWithDefaultConfiguration)
         {
             base.Run(runWithDefaultConfiguration);
-            
+
             var moduleCatalog = Container.Resolve<IModuleCatalog>();
             var modules = moduleCatalog.Modules.ToArray();
-            Log.Instance.Info($"Modules list:\n{modules.Select(x => new { x.ModuleName, x.ModuleType, x.State, x.InitializationMode, x.DependsOn }).DumpToTextRaw()}");
+            Log.Instance.Info(
+                $"Modules list:\n{modules.Select(x => new {x.ModuleName, x.ModuleType, x.State, x.InitializationMode, x.DependsOn}).DumpToTextRaw()}");
 
             var window = (Window)Shell;
-            
+
             var viewModel = Container.Resolve<IMainWindowViewModel>();
             window.DataContext = viewModel;
             window.Show();

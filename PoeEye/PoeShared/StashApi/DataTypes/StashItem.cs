@@ -10,15 +10,23 @@ namespace PoeShared.StashApi.DataTypes
 {
     public sealed class StashItem : IStashItem
     {
+        [DeserializeAs(Name = "category")]
+        [JsonProperty("category")]
+        public Dictionary<string, string> CategoriesRaw { get; set; }
+
+        [DeserializeAs(Name = "frameType")]
+        [JsonProperty("frameType")]
+        public PoeItemRarityWrapper RarityWrapper { get; set; }
+
+        [DeserializeAs(Name = "socket")]
+        [JsonProperty("socket")]
+        public int Socket { get; set; }
+
         [DeserializeAs(Name = "id")]
         [JsonProperty("id")]
         public string Id { get; set; }
 
         public IEnumerable<string> Categories => CategoriesRaw == null ? Enumerable.Empty<string>() : CategoriesRaw.Keys.EmptyIfNull();
-        
-        [DeserializeAs(Name = "category")]
-        [JsonProperty("category")]
-        public Dictionary<string, string> CategoriesRaw { get; set; }
 
         [DeserializeAs(Name = "verified")]
         [JsonProperty("verified")]
@@ -76,10 +84,6 @@ namespace PoeShared.StashApi.DataTypes
         [JsonProperty("descrText")]
         public string DescrText { get; set; }
 
-        [DeserializeAs(Name = "frameType")]
-        [JsonProperty("frameType")]
-        public PoeItemRarityWrapper RarityWrapper { get; set; }
-
         [DeserializeAs(Name = "x")]
         [JsonProperty("x")]
         public int X { get; set; }
@@ -124,10 +128,6 @@ namespace PoeShared.StashApi.DataTypes
         [JsonProperty("nextLevelRequirements")]
         public List<StashItemRequirement> nextLevelRequirements { get; set; }
 
-        [DeserializeAs(Name = "socket")]
-        [JsonProperty("socket")]
-        public int Socket { get; set; }
-
         [DeserializeAs(Name = "colour")]
         [JsonProperty("colour")]
         public string Color { get; set; }
@@ -143,20 +143,20 @@ namespace PoeShared.StashApi.DataTypes
         [DeserializeAs(Name = "craftedMods")]
         [JsonProperty("craftedMods")]
         public List<string> CraftedMods { get; set; }
-        
+
         [DeserializeAs(Name = "stackSize")]
         [JsonProperty("stackSize")]
         public int StackSize { get; set; }
-        
+
         [DeserializeAs(Name = "maxStackSize")]
         [JsonProperty("maxStackSize")]
         public int MaxStackSize { get; set; }
-        
+
         public GearType ItemType { get; set; }
 
         public PoeItemRarity Rarity => (PoeItemRarity)((int)RarityWrapper + 1);
-        
-        public ItemPosition Position => new ItemPosition(x: X, y: Y, width: Width, height: Height);
+
+        public ItemPosition Position => new ItemPosition(X, Y, Width, Height);
 
         public StashItem CleanupItemName()
         {
@@ -164,6 +164,7 @@ namespace PoeShared.StashApi.DataTypes
             {
                 Name = Regex.Replace(Name, @"\<.*\>", string.Empty);
             }
+
             return this;
         }
 

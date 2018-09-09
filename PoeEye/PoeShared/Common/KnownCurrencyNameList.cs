@@ -232,7 +232,7 @@ namespace PoeShared.Common
             {"Apprentice Cartographer's Sextant", ApprenticeSextant},
             {"Journeyman Cartographer's Sextant", JourneymanSextant},
             {"Master Cartographer's Sextant", MasterSextant},
-            {"Orb of Annulment", OrbOfAnnulment},
+            {"Orb of Annulment", OrbOfAnnulment}
         };
 
         public static readonly IDictionary<string, string> KnownImages = new Dictionary<string, string>
@@ -375,7 +375,7 @@ namespace PoeShared.Common
             {ShriekingEssenceOfWrath, "Shrieking_Essence_of_Wrath_inventory_icon"},
             {ShriekingEssenceOfZeal, "Shrieking_Essence_of_Zeal_inventory_icon"},
             {RemnantOfCorruption, "Remnant_of_Corruption_inventory_icon"},
-            {OrbOfAnnulment, "Orb_of_Annulment_inventory_icon"},
+            {OrbOfAnnulment, "Orb_of_Annulment_inventory_icon"}
         };
 
         static KnownCurrencyNameList()
@@ -417,6 +417,7 @@ namespace PoeShared.Common
                 {
                     continue;
                 }
+
                 yield return currency;
             }
         }

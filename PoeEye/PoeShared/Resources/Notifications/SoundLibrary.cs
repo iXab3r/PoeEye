@@ -31,6 +31,7 @@ namespace PoeShared.Resources.Notifications
                 resourceData = null;
                 return false;
             }
+
             using (var stream = resourceStream)
             {
                 var buffer = new byte[stream.Length];

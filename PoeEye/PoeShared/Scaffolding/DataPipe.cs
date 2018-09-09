@@ -20,14 +20,14 @@ namespace PoeShared.Scaffolding
 
         public object Source
         {
-            get { return GetValue(SourceProperty); }
-            set { SetValue(SourceProperty, value); }
+            get => GetValue(SourceProperty);
+            set => SetValue(SourceProperty, value);
         }
 
         public object Target
         {
-            get { return GetValue(TargetProperty); }
-            set { SetValue(TargetProperty, value); }
+            get => GetValue(TargetProperty);
+            set => SetValue(TargetProperty, value);
         }
 
         protected override Freezable CreateInstanceCore()
@@ -37,7 +37,7 @@ namespace PoeShared.Scaffolding
 
         private static void OnSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            ((DataPipe) d).OnSourceChanged(e);
+            ((DataPipe)d).OnSourceChanged(e);
         }
 
         protected virtual void OnSourceChanged(DependencyPropertyChangedEventArgs e)

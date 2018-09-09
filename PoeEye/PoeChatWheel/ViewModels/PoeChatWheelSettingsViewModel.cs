@@ -20,8 +20,8 @@ namespace PoeChatWheel.ViewModels
 
         public string Hotkey
         {
-            get { return hotkey; }
-            set { this.RaiseAndSetIfChanged(ref hotkey, value); }
+            get => hotkey;
+            set => this.RaiseAndSetIfChanged(ref hotkey, value);
         }
 
         public string[] HotkeysList { get; set; }

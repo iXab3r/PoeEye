@@ -3,9 +3,9 @@ using JetBrains.Annotations;
 
 namespace PoeShared.Modularity
 {
-    public interface IPoeEyeModulesRegistrator 
+    public interface IPoeEyeModulesRegistrator
     {
-        [NotNull] 
+        [NotNull]
         IPoeEyeModulesRegistrator RegisterSettingsEditor<TConfig, TSettingsViewModel>()
             where TConfig : class, IPoeEyeConfig, new()
             where TSettingsViewModel : ISettingsViewModel<TConfig>;

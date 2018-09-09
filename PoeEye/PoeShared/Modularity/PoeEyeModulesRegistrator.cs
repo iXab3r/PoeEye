@@ -18,17 +18,17 @@ namespace PoeShared.Modularity
             Settings = new ReadOnlyObservableCollection<ISettingsViewModel>(settings);
         }
 
+        public ReadOnlyObservableCollection<ISettingsViewModel> Settings { get; }
 
-        public IPoeEyeModulesRegistrator RegisterSettingsEditor<TConfig, TSettingsViewModel>() 
-            where TConfig : class, IPoeEyeConfig, new() 
+
+        public IPoeEyeModulesRegistrator RegisterSettingsEditor<TConfig, TSettingsViewModel>()
+            where TConfig : class, IPoeEyeConfig, new()
             where TSettingsViewModel : ISettingsViewModel<TConfig>
         {
-            var viewModel = (ISettingsViewModel) container.Resolve(typeof(TSettingsViewModel));
+            var viewModel = (ISettingsViewModel)container.Resolve(typeof(TSettingsViewModel));
             settings.Add(viewModel);
 
             return this;
         }
-
-        public ReadOnlyObservableCollection<ISettingsViewModel> Settings { get; } 
     }
 }

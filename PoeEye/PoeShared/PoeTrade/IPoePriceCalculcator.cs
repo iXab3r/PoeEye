@@ -7,11 +7,11 @@ namespace PoeShared.PoeTrade
 {
     public interface IPoePriceCalculcator
     {
-        [NotNull] 
+        [NotNull]
         IObservable<Unit> WhenChanged { get; }
 
         bool CanConvert(PoePrice price);
-        
+
         PoePrice GetEquivalentInChaosOrbs(PoePrice price);
     }
 }

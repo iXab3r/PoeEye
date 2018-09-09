@@ -10,8 +10,8 @@ namespace PoeEye.StashGrid.Prism
 {
     public sealed class PoeStashGridModule : IPoeEyeModule
     {
-        private readonly IUnityContainer container;
         private readonly CompositeDisposable anchors = new CompositeDisposable();
+        private readonly IUnityContainer container;
 
         public PoeStashGridModule([NotNull] IUnityContainer container)
         {

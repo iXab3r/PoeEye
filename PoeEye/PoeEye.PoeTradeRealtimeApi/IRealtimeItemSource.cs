@@ -6,9 +6,9 @@ namespace PoeEye.PoeTradeRealtimeApi
 {
     public interface IRealtimeItemSource : IDisposable
     {
+        bool IsDisposed { get; }
+
         [NotNull]
         IPoeQueryResult GetResult();
-
-        bool IsDisposed { get; }
     }
 }

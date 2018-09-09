@@ -1,4 +1,5 @@
-namespace PoeShared.Common {
+namespace PoeShared.Common
+{
     public enum PoeModOrigin
     {
         Unknown,

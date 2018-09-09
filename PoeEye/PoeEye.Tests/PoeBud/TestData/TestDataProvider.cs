@@ -4,6 +4,7 @@ using Moq;
 using PoeBud.Models;
 using PoeShared.StashApi.DataTypes;
 using RestSharp;
+using RestSharp.Deserializers;
 
 namespace PoeEye.Tests.PoeBud.TestData
 {
@@ -14,7 +15,7 @@ namespace PoeEye.Tests.PoeBud.TestData
 
         public static StashUpdate ParseUpdate(string json)
         {
-            var deserializer = new RestSharp.Deserializers.JsonDeserializer();
+            var deserializer = new JsonDeserializer();
 
             var responseMock = Mock.Of<IRestResponse>(x => x.Content == json);
             var stash = deserializer.Deserialize<Stash>(responseMock);

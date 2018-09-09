@@ -25,22 +25,24 @@ namespace PoeEye.PoeTrade.ViewModels
     internal sealed class PoeMainSettingsViewModel : DisposableReactiveObject, ISettingsViewModel<PoeEyeMainConfig>
     {
         private readonly IClock clock;
-        private readonly IPoeLeagueApiClient leagueApiClient;
-        private readonly IPoeEconomicsSource economicsSource;
         private readonly ReactiveList<EditableTuple<PoePrice, float>> currenciesPriceInChaosOrbs = new ReactiveList<EditableTuple<PoePrice, float>>();
+        private readonly IPoeEconomicsSource economicsSource;
+        private readonly IPoeLeagueApiClient leagueApiClient;
         private readonly PoeEyeMainConfig temporaryConfig = new PoeEyeMainConfig();
-
-        private bool whisperNotificationsEnabled;
         private string leagueId;
         private TaskCompletionSource<string[]> leaguesSource;
+
+        private bool whisperNotificationsEnabled;
 
         public PoeMainSettingsViewModel(
             [NotNull] IClock clock,
             [NotNull] IPoeLeagueApiClient leagueApiClient,
             [NotNull] IPoeEconomicsSource economicsSource,
             [NotNull] IConfigProvider<PoeEyeMainConfig> mainConfigProvider,
-            [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler,
-            [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler)
+            [NotNull] [Dependency(WellKnownSchedulers.UI)]
+            IScheduler uiScheduler,
+            [NotNull] [Dependency(WellKnownSchedulers.Background)]
+            IScheduler bgScheduler)
         {
             Guard.ArgumentNotNull(clock, nameof(clock));
             Guard.ArgumentNotNull(leagueApiClient, nameof(leagueApiClient));
@@ -56,9 +58,10 @@ namespace PoeEye.PoeTrade.ViewModels
             {
                 CurrencyTest = new CurrencyTestViewModel();
             }
-            
+
             GetEconomicsCommand = CommandWrapper.Create(
-                ReactiveCommand.CreateFromTask(RefreshCurrencyList, this.WhenAnyValue(x => x.LeagueId).Select(leagueId => !string.IsNullOrEmpty(leagueId)), outputScheduler: uiScheduler));
+                ReactiveCommand.CreateFromTask(RefreshCurrencyList, this.WhenAnyValue(x => x.LeagueId).Select(leagueId => !string.IsNullOrEmpty(leagueId)),
+                                               uiScheduler));
         }
 
         public IReactiveList<EditableTuple<PoePrice, float>> CurrenciesPriceInChaosOrbs => currenciesPriceInChaosOrbs;
@@ -70,19 +73,19 @@ namespace PoeEye.PoeTrade.ViewModels
         }
 
         public CurrencyTestViewModel CurrencyTest { get; }
-        
-        public CommandWrapper GetEconomicsCommand { get; }
 
-        public string ModuleName { get; } = "Main";
+        public CommandWrapper GetEconomicsCommand { get; }
 
         public string LeagueId
         {
-            get { return leagueId; }
-            set { this.RaiseAndSetIfChanged(ref leagueId, value); }
+            get => leagueId;
+            set => this.RaiseAndSetIfChanged(ref leagueId, value);
         }
-        
+
         public IReactiveList<string> LeagueList { get; } = new ReactiveList<string>();
-        
+
+        public string ModuleName { get; } = "Main";
+
         public async Task Load(PoeEyeMainConfig config)
         {
             config.CopyPropertiesTo(temporaryConfig);
@@ -98,6 +101,7 @@ namespace PoeEye.PoeTrade.ViewModels
                     .Select(x => x.Id)
                     .ForEach(LeagueList.Add);
             }
+
             LeagueId = config.LeagueId;
 
             CurrenciesPriceInChaosOrbs.Clear();
@@ -122,7 +126,7 @@ namespace PoeEye.PoeTrade.ViewModels
             var result = new PoeEyeMainConfig();
             temporaryConfig.CopyPropertiesTo(result);
 
-            
+
             return result;
         }
 
@@ -137,6 +141,7 @@ namespace PoeEye.PoeTrade.ViewModels
                 {
                     continue;
                 }
+
                 editableValue.Item2 = economicPrice.Value;
             }
         }

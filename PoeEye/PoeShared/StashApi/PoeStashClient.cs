@@ -18,20 +18,12 @@ namespace PoeShared.StashApi
     {
         private const string CharacterApiPortal = @"https://www.pathofexile.com";
 
-        private readonly IPoeLeagueApiClient leagueClient;
+        private readonly IRestClient client;
         private readonly NetworkCredential credentials;
         private readonly IGearTypeAnalyzer gearTypeAnalyzer;
+
+        private readonly IPoeLeagueApiClient leagueClient;
         private readonly bool useSessionId;
-
-        private readonly IRestClient client;
-
-        public string SessionId { get; private set; }
-
-        public bool IsAuthenticated { get; private set; } = false;
-
-        public string AccountName { get; private set; }
-
-        public string Email => credentials.UserName;
 
         public PoeStashClient(
             [NotNull] IPoeLeagueApiClient leagueClient,
@@ -58,15 +50,23 @@ namespace PoeShared.StashApi
             client = new RestClient(CharacterApiPortal)
             {
                 CookieContainer = new CookieContainer(),
-                FollowRedirects = false,
+                FollowRedirects = false
             };
         }
+
+        public string SessionId { get; private set; }
+
+        public bool IsAuthenticated { get; private set; }
+
+        public string AccountName { get; private set; }
+
+        public string Email => credentials.UserName;
 
         public void Authenticate()
         {
             AuthenticateAsync().Wait();
         }
-        
+
         public async Task AuthenticateAsync()
         {
             if (IsAuthenticated)
@@ -82,6 +82,104 @@ namespace PoeShared.StashApi
             {
                 await AuthenticateSimple();
             }
+        }
+
+        public IStash GetStash(int index, string league)
+        {
+            Guard.ArgumentIsBetween(() => index, 0, byte.MaxValue, true);
+            Guard.ArgumentNotNullOrEmpty(() => league);
+
+            return GetStashAsync(index, league).Result;
+        }
+
+        public async Task<IStash> GetStashAsync(int stashIdx, string league)
+        {
+            Guard.ArgumentIsBetween(() => stashIdx, 0, byte.MaxValue, true);
+            Guard.ArgumentNotNullOrEmpty(() => league);
+
+            EnsureAuthenticated();
+
+            var request = new RestRequest("character-window/get-stash-items") {Method = Method.GET};
+            request.AddParameter("league", league);
+            request.AddParameter("tabIndex", stashIdx);
+            request.AddParameter("tabs", 1);
+            request.AddParameter("accountName", AccountName);
+
+            var response = await client.ExecuteTaskAsync<Stash>(request);
+
+            if (response.Data == null)
+            {
+                throw new ApplicationException(
+                    $"Could not retrieve stash #{stashIdx} in league {league} (code: {response.StatusCode}, content-length: {response.ContentLength})\nResponse data: {response.Content.DumpToText()}");
+            }
+
+            PostProcessStash(response.Data);
+
+            foreach (var item in response.Data?.Items.EmptyIfNull().Where(x => x.TypeLine != null))
+            {
+                item.ItemType = gearTypeAnalyzer.Resolve(item.TypeLine);
+            }
+
+            response.Data.Tabs = response.Data
+                                         .Tabs
+                                         .EmptyIfNull()
+                                         .Where(x => !x.Hidden)
+                                         .ToList();
+
+            return response.Data;
+        }
+
+        public ICharacter[] GetCharacters()
+        {
+            return GetCharactersAsync().Result;
+        }
+
+        public async Task<ICharacter[]> GetCharactersAsync()
+        {
+            EnsureAuthenticated();
+
+            var request = new RestRequest("character-window/get-characters") {Method = Method.GET};
+            var response = await client.ExecuteTaskAsync<List<Character>>(request);
+
+            if (response.Data == null)
+            {
+                throw new ApplicationException($"Could not retrieve characters list(code: {response.StatusCode}, content-length: {response.ContentLength})");
+            }
+
+            return response.Data.OfType<ICharacter>().ToArray();
+        }
+
+        public IInventory GetInventory(string characterName)
+        {
+            Guard.ArgumentNotNull(characterName, nameof(characterName));
+
+            return GetInventoryAsync(characterName).Result;
+        }
+
+        public async Task<IInventory> GetInventoryAsync(string characterName)
+        {
+            Guard.ArgumentNotNullOrEmpty(() => characterName);
+            EnsureAuthenticated();
+
+            var request = new RestRequest("character-window/get-items") {Method = Method.GET};
+            request.AddParameter("character", characterName);
+            request.AddParameter("accountName", AccountName);
+
+            var response = await client.ExecuteTaskAsync<Inventory>(request);
+            if (response.Data == null)
+            {
+                throw new ApplicationException(
+                    $"Could not retrieve inventory of character {characterName} @ {AccountName} (code: {response.StatusCode}, content-length: {response.ContentLength})");
+            }
+
+            PostProcessInventory(response.Data);
+
+            return response.Data;
+        }
+
+        public Task<ILeague[]> GetLeaguesAsync()
+        {
+            return leagueClient.GetLeaguesAsync();
         }
 
         private void EnsureAuthenticated()
@@ -104,7 +202,7 @@ namespace PoeShared.StashApi
 
         private string RequestLoginToken()
         {
-            var request = new RestRequest("login") { Method = Method.GET };
+            var request = new RestRequest("login") {Method = Method.GET};
 
             var response = client.Execute(request);
 
@@ -123,7 +221,7 @@ namespace PoeShared.StashApi
         {
             EnsureAuthenticated();
 
-            var request = new RestRequest("my-account") { Method = Method.GET };
+            var request = new RestRequest("my-account") {Method = Method.GET};
 
             var response = client.Execute(request);
 
@@ -138,7 +236,8 @@ namespace PoeShared.StashApi
 
             if (string.IsNullOrWhiteSpace(accountName))
             {
-                throw new ApplicationException($"Could not extract account name from response(code: {response.StatusCode}, content-length: {response.ContentLength})");
+                throw new ApplicationException(
+                    $"Could not extract account name from response(code: {response.StatusCode}, content-length: {response.ContentLength})");
             }
 
             AccountName = accountName;
@@ -148,7 +247,7 @@ namespace PoeShared.StashApi
         {
             var hash = RequestLoginToken();
 
-            var loginRequest = new RestRequest("login") { Method = Method.POST };
+            var loginRequest = new RestRequest("login") {Method = Method.POST};
             loginRequest.AddParameter("login_email", credentials.UserName);
             loginRequest.AddParameter("login_password", credentials.Password);
             loginRequest.AddParameter("hash", hash);
@@ -161,8 +260,10 @@ namespace PoeShared.StashApi
             if (string.IsNullOrEmpty(poeSessionIdCookie?.Value))
             {
                 var error = ExtractErrors(response.Content);
-                throw new AuthenticationException($"Could not retrieve POESESSID (code: {response.StatusCode}, length: {response.ContentLength}, error: '{error}'), email: {credentials.UserName}, password.Length: {credentials.Password.Length}, cookies: {response.Cookies.DumpToTextRaw()}");
+                throw new AuthenticationException(
+                    $"Could not retrieve POESESSID (code: {response.StatusCode}, length: {response.ContentLength}, error: '{error}'), email: {credentials.UserName}, password.Length: {credentials.Password.Length}, cookies: {response.Cookies.DumpToTextRaw()}");
             }
+
             SessionId = poeSessionIdCookie.Value;
 
             IsAuthenticated = true;
@@ -175,100 +276,6 @@ namespace PoeShared.StashApi
 
             IsAuthenticated = true;
             RefreshAccountName();
-        }
-
-        public IStash GetStash(int index, string league)
-        {
-            Guard.ArgumentIsBetween(() => index, 0, byte.MaxValue, true);
-            Guard.ArgumentNotNullOrEmpty(() => league);
-
-            return GetStashAsync(index, league).Result;
-        }
-
-        public async Task<IStash> GetStashAsync(int stashIdx, string league)
-        {
-            Guard.ArgumentIsBetween(() => stashIdx, 0, byte.MaxValue, true);
-            Guard.ArgumentNotNullOrEmpty(() => league);
-
-            EnsureAuthenticated();
-
-            var request = new RestRequest("character-window/get-stash-items") { Method = Method.GET };
-            request.AddParameter("league", league);
-            request.AddParameter("tabIndex", stashIdx);
-            request.AddParameter("tabs", 1);
-            request.AddParameter("accountName", AccountName);
-
-            var response = await client.ExecuteTaskAsync<Stash>(request);
-
-            if (response.Data == null)
-            {
-                throw new ApplicationException($"Could not retrieve stash #{stashIdx} in league {league} (code: {response.StatusCode}, content-length: {response.ContentLength})\nResponse data: {response.Content.DumpToText()}");
-            }
-            PostProcessStash(response.Data);
-
-            foreach (var item in response.Data?.Items.EmptyIfNull().Where(x => x.TypeLine != null))
-            {
-                item.ItemType = gearTypeAnalyzer.Resolve(item.TypeLine);
-            }
-
-            response.Data.Tabs = response.Data
-                .Tabs
-                .EmptyIfNull()
-                .Where(x => !x.Hidden)
-                .ToList();
-
-            return response.Data;
-        }
-
-        public ICharacter[] GetCharacters()
-        {
-            return GetCharactersAsync().Result;
-        }
-        
-        public async Task<ICharacter[]> GetCharactersAsync()
-        {
-            EnsureAuthenticated();
-
-            var request = new RestRequest("character-window/get-characters") { Method = Method.GET };
-            var response = await client.ExecuteTaskAsync<List<Character>>(request);
-
-            if (response.Data == null)
-            {
-                throw new ApplicationException($"Could not retrieve characters list(code: {response.StatusCode}, content-length: {response.ContentLength})");
-            }
-
-            return response.Data.OfType<ICharacter>().ToArray();
-        }
-
-        public IInventory GetInventory(string characterName)
-        {
-            Guard.ArgumentNotNull(characterName, nameof(characterName));
-
-            return GetInventoryAsync(characterName).Result;
-        }
-        
-        public async Task<IInventory> GetInventoryAsync(string characterName)
-        {
-            Guard.ArgumentNotNullOrEmpty(() => characterName);
-            EnsureAuthenticated();
-
-            var request = new RestRequest("character-window/get-items") { Method = Method.GET };
-            request.AddParameter("character", characterName);
-            request.AddParameter("accountName", AccountName);
-
-            var response = await client.ExecuteTaskAsync<Inventory>(request);
-            if (response.Data == null)
-            {
-                throw new ApplicationException($"Could not retrieve inventory of character {characterName} @ {AccountName} (code: {response.StatusCode}, content-length: {response.ContentLength})");
-            }
-            PostProcessInventory(response.Data);
-
-            return response.Data;
-        }
-        
-        public Task<ILeague[]> GetLeaguesAsync()
-        {
-            return leagueClient.GetLeaguesAsync();
         }
 
         private void PostProcessInventory(Inventory inventory)

@@ -16,17 +16,17 @@ namespace PoeEye.Config
 {
     internal sealed class PoeEyeConfigProviderFromFile : IConfigProvider
     {
-        private readonly IConfigSerializer configSerializer;
         private static readonly string ConfigFileDirectory = AppArguments.AppDataDirectory;
-        
+
         private static readonly string DebugConfigFileName = @"configDebugMode.cfg";
         private static readonly string ReleaseConfigFileName = @"config.cfg";
 
         private readonly string configFilePath;
 
-        private readonly ConcurrentDictionary<string, IPoeEyeConfig> loadedConfigs = new ConcurrentDictionary<string, IPoeEyeConfig>();
-
         private readonly ISubject<Unit> configHasChanged = new Subject<Unit>();
+        private readonly IConfigSerializer configSerializer;
+
+        private readonly ConcurrentDictionary<string, IPoeEyeConfig> loadedConfigs = new ConcurrentDictionary<string, IPoeEyeConfig>();
 
         public PoeEyeConfigProviderFromFile(IConfigSerializer configSerializer)
         {
@@ -53,14 +53,14 @@ namespace PoeEye.Config
             loadedConfigs.Clear();
 
             config.Items
-                .ToList()
-                .Select(x => x.Content)
-                .Select(ValidateConfigVersion)
-                .ForEach(x => loadedConfigs[x.GetType().FullName] = x);
+                  .ToList()
+                  .Select(x => x.Content)
+                  .Select(ValidateConfigVersion)
+                  .ForEach(x => loadedConfigs[x.GetType().FullName] = x);
 
             configHasChanged.OnNext(Unit.Default);
         }
-        
+
         public void Save<TConfig>(TConfig config) where TConfig : IPoeEyeConfig, new()
         {
             var key = new PoeEyeConfigMetadata(config);
@@ -78,28 +78,33 @@ namespace PoeEye.Config
             {
                 Reload();
             }
-            return (TConfig)loadedConfigs.GetOrAdd(typeof(TConfig).FullName, (key) => (TConfig)Activator.CreateInstance(typeof(TConfig)));
+
+            return (TConfig)loadedConfigs.GetOrAdd(typeof(TConfig).FullName, key => (TConfig)Activator.CreateInstance(typeof(TConfig)));
         }
 
         private IPoeEyeConfig ValidateConfigVersion(IPoeEyeConfig loadedConfig)
         {
             var versionedLoadedConfig = loadedConfig as IPoeEyeConfigVersioned;
-            Log.Instance.Debug($"[PoeEyeConfigProviderFromFile.ValidateConfigVersion] Validating config of type {loadedConfig} (version(-1 = unversioned): {versionedLoadedConfig?.Version ?? -1})...");
+            Log.Instance.Debug(
+                $"[PoeEyeConfigProviderFromFile.ValidateConfigVersion] Validating config of type {loadedConfig} (version(-1 = unversioned): {versionedLoadedConfig?.Version ?? -1})...");
             if (versionedLoadedConfig == null)
             {
                 return loadedConfig;
             }
 
             var configTemplate = (IPoeEyeConfigVersioned)loadedConfigs.GetOrAdd(
-                loadedConfig.GetType().FullName, 
-                (key) => (IPoeEyeConfigVersioned)Activator.CreateInstance(loadedConfig.GetType()));
-            
+                loadedConfig.GetType().FullName,
+                key => (IPoeEyeConfigVersioned)Activator.CreateInstance(loadedConfig.GetType()));
+
             if (configTemplate.Version != versionedLoadedConfig.Version)
             {
-                Log.Instance.Debug($"[PoeEyeConfigProviderFromFile.ValidateConfigVersion] Config version mismatch (expected: {configTemplate.Version}, got: {versionedLoadedConfig.Version})");
-                Log.Instance.Debug($"[PoeEyeConfigProviderFromFile.ValidateConfigVersion] Loaded config:\n{loadedConfig.DumpToText()}\n\nTemplate config:\n{configTemplate.DumpToText()}");
+                Log.Instance.Debug(
+                    $"[PoeEyeConfigProviderFromFile.ValidateConfigVersion] Config version mismatch (expected: {configTemplate.Version}, got: {versionedLoadedConfig.Version})");
+                Log.Instance.Debug(
+                    $"[PoeEyeConfigProviderFromFile.ValidateConfigVersion] Loaded config:\n{loadedConfig.DumpToText()}\n\nTemplate config:\n{configTemplate.DumpToText()}");
                 return configTemplate;
             }
+
             return loadedConfig;
         }
 
@@ -121,6 +126,7 @@ namespace PoeEye.Config
                 {
                     Directory.CreateDirectory(directoryPath);
                 }
+
                 File.WriteAllText(configFilePath, serializedData, Encoding.Unicode);
 
                 configHasChanged.OnNext(Unit.Default);
@@ -164,6 +170,7 @@ namespace PoeEye.Config
                 Log.Instance.Warn($"[PoeEyeConfigProviderFromFile.Load] Could not deserialize config data, default config will be used", ex);
                 CreateBackupOfConfig();
             }
+
             return result ?? new PoeEyeCombinedConfig();
         }
 
@@ -175,8 +182,9 @@ namespace PoeEye.Config
                 {
                     return;
                 }
-                
-                var backupFileName = Path.Combine(Path.GetDirectoryName(configFilePath), $"{Path.GetFileNameWithoutExtension(configFilePath)}.bak{Path.GetExtension(configFilePath)}");
+
+                var backupFileName = Path.Combine(Path.GetDirectoryName(configFilePath),
+                                                  $"{Path.GetFileNameWithoutExtension(configFilePath)}.bak{Path.GetExtension(configFilePath)}");
                 Log.Instance.Debug($"[PoeEyeConfigProviderFromFile.Load] Creating a backup of existing config data '{configFilePath}' to '{backupFileName}'");
                 File.Copy(configFilePath, backupFileName);
             }
@@ -194,8 +202,7 @@ namespace PoeEye.Config
 
             public IEnumerable<PoeEyeConfigMetadata> Items
             {
-                [NotNull]
-                get { return items; }
+                [NotNull] get { return items; }
             }
 
             public PoeEyeCombinedConfig Add([NotNull] PoeEyeConfigMetadata item)
@@ -209,14 +216,14 @@ namespace PoeEye.Config
 
         private sealed class PoeEyeConfigMetadata
         {
-            public string ConfigTypeName => Content.GetType().FullName;
-
-            public IPoeEyeConfig Content { get; }
-
             public PoeEyeConfigMetadata(IPoeEyeConfig content)
             {
                 Content = content;
             }
+
+            public string ConfigTypeName => Content.GetType().FullName;
+
+            public IPoeEyeConfig Content { get; }
         }
     }
 }

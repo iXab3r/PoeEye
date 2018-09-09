@@ -10,7 +10,7 @@ namespace PoeShared.Scaffolding.WPF
 
         public bool HidePartialItems
         {
-            get => (bool) GetValue(HidePartialItemsProperty);
+            get => (bool)GetValue(HidePartialItemsProperty);
             set => SetValue(HidePartialItemsProperty, value);
         }
 
@@ -25,7 +25,7 @@ namespace PoeShared.Scaffolding.WPF
             foreach (UIElement child in InternalChildren)
             {
                 var nextY = currentY + child.DesiredSize.Height;
-                if (nextY > arrangeBounds.Height) 
+                if (nextY > arrangeBounds.Height)
                 {
                     child.Arrange(new Rect());
                 }

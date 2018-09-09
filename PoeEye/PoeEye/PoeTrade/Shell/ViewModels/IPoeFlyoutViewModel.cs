@@ -20,8 +20,8 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
 
         public bool IsOpen
         {
-            get { return isOpen; }
-            set { this.RaiseAndSetIfChanged(ref isOpen, value); }
+            get => isOpen;
+            set => this.RaiseAndSetIfChanged(ref isOpen, value);
         }
 
         public string Header => "Test";

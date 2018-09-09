@@ -15,12 +15,13 @@ namespace PoeShared.PoeDatabase
 {
     internal sealed class ComplexPoeDatabaseReader : DisposableReactiveObject, IPoeDatabaseReader
     {
-        private readonly IPoeDatabaseReader[] readers;
         private readonly ReadOnlyObservableCollection<string> knownEntityNames;
+        private readonly IPoeDatabaseReader[] readers;
 
         public ComplexPoeDatabaseReader(
             [NotNull] IPoeDatabaseReader[] readers,
-            [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
+            [NotNull] [Dependency(WellKnownSchedulers.UI)]
+            IScheduler uiScheduler)
         {
             Guard.ArgumentNotNull(readers, nameof(readers));
             Guard.ArgumentNotNull(uiScheduler, nameof(uiScheduler));
@@ -31,8 +32,8 @@ namespace PoeShared.PoeDatabase
             foreach (var poeDatabaseReader in readers)
             {
                 var changeSet = poeDatabaseReader
-                    .KnownEntityNames
-                    .ToObservableChangeSet();
+                                .KnownEntityNames
+                                .ToObservableChangeSet();
                 var sourceList = new SourceList<string>(changeSet);
 
                 merge.Add(sourceList);

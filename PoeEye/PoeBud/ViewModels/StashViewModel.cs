@@ -17,7 +17,7 @@ namespace PoeBud.ViewModels
     internal sealed class StashViewModel : DisposableReactiveObject
     {
         public StashViewModel(
-            [NotNull] StashUpdate stashUpdate, 
+            [NotNull] StashUpdate stashUpdate,
             [NotNull] IPoeBudConfig config,
             [NotNull] IPriceSummaryViewModel summaryViewModel)
         {
@@ -27,14 +27,15 @@ namespace PoeBud.ViewModels
 
             StashUpdate = stashUpdate;
             PriceSummary = summaryViewModel;
-            
+
             var rareItems = stashUpdate.Items.GetChaosSetItems();
             MaxSlotsPerSolution = config.MaxSlotsPerSolution;
 
-            Log.Instance.Debug($"[StashViewModel] Stash dump(itemsCount: {stashUpdate.Items.Count()}, tabsCount: {stashUpdate.Tabs.Count()}), maxSlotsPerSolution: {config.MaxSlotsPerSolution}");
-            
+            Log.Instance.Debug(
+                $"[StashViewModel] Stash dump(itemsCount: {stashUpdate.Items.Count()}, tabsCount: {stashUpdate.Tabs.Count()}), maxSlotsPerSolution: {config.MaxSlotsPerSolution}");
+
             var chests = rareItems.Where(x => x.ItemType == GearType.Chest).ToArray();
-            var weapons = rareItems.Where(x => x.IsWeapon()).Select(x => new { Item = x, Score = x.GetTradeScore() }).ToArray();
+            var weapons = rareItems.Where(x => x.IsWeapon()).Select(x => new {Item = x, Score = x.GetTradeScore()}).ToArray();
             var helmets = rareItems.Where(x => x.ItemType == GearType.Helmet).ToArray();
             var rings = rareItems.Where(x => x.ItemType == GearType.Ring).ToArray();
             var amulets = rareItems.Where(x => x.ItemType == GearType.Amulet).ToArray();
@@ -48,7 +49,11 @@ namespace PoeBud.ViewModels
                     new object[]
                     {
                         new {ItemType = $"Chests ({chests.Length})", Items = chests.Select(x => x.ToString())},
-                        new {ItemType = $"Weapons ({weapons.Length})", Items = weapons.Select(x => $"{x.Item.ToString()} ({x.Score}, W:{x.Item.Width}, H:{x.Item.Height})")},
+                        new
+                        {
+                            ItemType = $"Weapons ({weapons.Length})",
+                            Items = weapons.Select(x => $"{x.Item.ToString()} ({x.Score}, W:{x.Item.Width}, H:{x.Item.Height})")
+                        },
                         new {ItemType = $"Helmets ({helmets.Length})", Items = helmets.Select(x => x.ToString())},
                         new {ItemType = $"Rings ({rings.Length})", Items = rings.Select(x => x.ToString())},
                         new {ItemType = $"Amulets ({amulets.Length})", Items = amulets.Select(x => x.ToString())},
@@ -56,7 +61,7 @@ namespace PoeBud.ViewModels
                         new {ItemType = $"Boots ({boots.Length})", Items = boots.Select(x => x.ToString())},
                         new {ItemType = $"Belts ({belts.Length})", Items = belts.Select(x => x.ToString())}
                     }.Select(x => x.DumpToText())));
-            
+
             ChestsCount = chests.Count();
             WeaponsCount = (int)weapons.Sum(x => x.Score);
             HelmetsCount = helmets.Count();
@@ -75,7 +80,7 @@ namespace PoeBud.ViewModels
             {
                 minItemsCount = new[]
                 {
-                    ChestsCount,WeaponsCount,HelmetsCount,RingsNormalizedCount,AmuletsCount,GlovesCount,BootsCount,BeltsCount
+                    ChestsCount, WeaponsCount, HelmetsCount, RingsNormalizedCount, AmuletsCount, GlovesCount, BootsCount, BeltsCount
                 }.Max();
             }
 
@@ -87,14 +92,14 @@ namespace PoeBud.ViewModels
             IsInsufficientGlovesCount = GlovesCount < minItemsCount;
             IsInsufficientBootsCount = BootsCount < minItemsCount;
             IsInsufficientBeltsCount = BeltsCount < minItemsCount;
-            
+
             ChaosSetSolutions = BuildChaosSetSolutions(stashUpdate);
             CurrencySolutions = BuildSolutions(stashUpdate, BuildCurrencySolution).ToArray();
             DivinationCardsSolutions = BuildSolutions(stashUpdate, BuildDivinationCardsSolution).ToArray();
             MapsSolutions = BuildSolutions(stashUpdate, BuildMapsSolution).ToArray();
             MiscellaneousItemsSolutions = BuildSolutions(stashUpdate, BuildMiscellaneousItemsSolution).ToArray();
             SellableSolutions = BuildSolutions(stashUpdate, BuildSixLinksAndChromesSolution).ToArray();
-            
+
             PriceSummary.Solution = BuildCurrencySolution(stashUpdate);
         }
 
@@ -135,17 +140,17 @@ namespace PoeBud.ViewModels
         public bool IsInsufficientBeltsCount { get; }
 
         public IPoeTradeSolution[] ChaosSetSolutions { get; }
-        
+
         public IPoeTradeSolution[] CurrencySolutions { get; }
-        
+
         public IPoeTradeSolution[] DivinationCardsSolutions { get; }
-        
+
         public IPoeTradeSolution[] MapsSolutions { get; }
-        
+
         public IPoeTradeSolution[] MiscellaneousItemsSolutions { get; }
-        
+
         public IPoeTradeSolution[] SellableSolutions { get; }
-        
+
         public IPriceSummaryViewModel PriceSummary { get; }
 
         private IEnumerable<IPoeTradeSolution> BuildSolutions(StashUpdate stashUpdate, Func<StashUpdate, IPoeTradeSolution> supplier)
@@ -164,35 +169,34 @@ namespace PoeBud.ViewModels
                 {
                     break;
                 }
-            }
-            while (true);
+            } while (true);
         }
-        
+
         private static IPoeTradeSolution BuildMapsSolution(StashUpdate stashUpdate)
         {
             var tabsByInventoryId = stashUpdate.Tabs.ToDictionary(x => x.GetInventoryId(), x => x);
 
             var maps = stashUpdate
-                .Items
-                .Where(x => x.GetTabIndex() != null)
-                .Where(x => tabsByInventoryId.ContainsKey(x.InventoryId))
-                .Where(x => x.Categories.Contains("maps"))
-                .Where(x => x.TypeLine != "Divine Vessel")
-                .OrderBy(x => x.ItemLevel)
-                .Select(x => new PoeSolutionItem(x, tabsByInventoryId[x.InventoryId]))
-                .OfType<IPoeSolutionItem>()
-                .ToArray();
-            
+                       .Items
+                       .Where(x => x.GetTabIndex() != null)
+                       .Where(x => tabsByInventoryId.ContainsKey(x.InventoryId))
+                       .Where(x => x.Categories.Contains("maps"))
+                       .Where(x => x.TypeLine != "Divine Vessel")
+                       .OrderBy(x => x.ItemLevel)
+                       .Select(x => new PoeSolutionItem(x, tabsByInventoryId[x.InventoryId]))
+                       .OfType<IPoeSolutionItem>()
+                       .ToArray();
+
             return new PoeTradeSolution(maps, stashUpdate.Tabs);
         }
-        
+
         private static IPoeTradeSolution BuildSixLinksAndChromesSolution(StashUpdate stashUpdate)
         {
             var tabsByInventoryId = stashUpdate.Tabs.ToDictionary(x => x.GetInventoryId(), x => x);
 
             var validItems = stashUpdate.Items
-                .Where(x => x.GetTabIndex() != null)
-                .ToArray();
+                                        .Where(x => x.GetTabIndex() != null)
+                                        .ToArray();
 
             var itemsToInclude = new List<IStashItem>();
 
@@ -201,12 +205,12 @@ namespace PoeBud.ViewModels
                 .Where(x => x.Sockets.EmptyIfNull().Count() == 6)
                 .Take(maxSixLinksToTransfer)
                 .ForEach(itemsToInclude.Add);
-            
+
             var result = itemsToInclude
-                .Select(x => new PoeSolutionItem(x, tabsByInventoryId[x.InventoryId]))
-                .OfType<IPoeSolutionItem>()
-                .ToArray();
-            
+                         .Select(x => new PoeSolutionItem(x, tabsByInventoryId[x.InventoryId]))
+                         .OfType<IPoeSolutionItem>()
+                         .ToArray();
+
             return new PoeTradeSolution(result, stashUpdate.Tabs);
         }
 
@@ -215,37 +219,37 @@ namespace PoeBud.ViewModels
             var tabsByInventoryId = stashUpdate.Tabs.ToDictionary(x => x.GetInventoryId(), x => x);
 
             var validItems = stashUpdate.Items
-                .Where(x => x.GetTabIndex() != null)
-                .ToArray();
+                                        .Where(x => x.GetTabIndex() != null)
+                                        .ToArray();
 
             var itemsToInclude = new List<IStashItem>();
 
             validItems
                 .Where(x => x.Categories.Contains("flasks"))
                 .ForEach(itemsToInclude.Add);
-            
+
             validItems
                 .Where(x => x.Categories.Contains("gems"))
                 .ForEach(itemsToInclude.Add);
-            
+
             validItems
                 .Where(x => x.TypeLine == "Divine Vessel")
                 .ForEach(itemsToInclude.Add);
-                
+
             validItems
                 .Where(x => x.TypeLine != null)
-                .Where(x => x.TypeLine.Contains("Eye Jewel") || 
+                .Where(x => x.TypeLine.Contains("Eye Jewel") ||
                             x.TypeLine.Contains("Viridian Jewel") ||
                             x.TypeLine.Contains("Cobalt Jewel") ||
                             x.TypeLine.Contains("Crimson Jewel"))
                 .ForEach(itemsToInclude.Add);
-            
+
             var result = itemsToInclude
-                .Where(x => tabsByInventoryId.ContainsKey(x.InventoryId))
-                .Select(x => new PoeSolutionItem(x, tabsByInventoryId[x.InventoryId]))
-                .OfType<IPoeSolutionItem>()
-                .ToArray();
-            
+                         .Where(x => tabsByInventoryId.ContainsKey(x.InventoryId))
+                         .Select(x => new PoeSolutionItem(x, tabsByInventoryId[x.InventoryId]))
+                         .OfType<IPoeSolutionItem>()
+                         .ToArray();
+
             return new PoeTradeSolution(result, stashUpdate.Tabs);
         }
 
@@ -254,15 +258,15 @@ namespace PoeBud.ViewModels
             var tabsByInventoryId = stashUpdate.Tabs.ToDictionary(x => x.GetInventoryId(), x => x);
 
             var currency = stashUpdate
-                .Items
-                .Where(x => x.GetTabIndex() != null)
-                .Where(x => tabsByInventoryId.ContainsKey(x.InventoryId))
-                .Where(x => x.Categories.Contains("currency"))
-                .Where(x => StringToPoePriceConverter.Instance.Convert($"{x.StackSize} {x.TypeLine}").HasValue)
-                .Select(x => new PoeSolutionItem(x, tabsByInventoryId[x.InventoryId]))
-                .OfType<IPoeSolutionItem>()
-                .ToArray();
-            
+                           .Items
+                           .Where(x => x.GetTabIndex() != null)
+                           .Where(x => tabsByInventoryId.ContainsKey(x.InventoryId))
+                           .Where(x => x.Categories.Contains("currency"))
+                           .Where(x => StringToPoePriceConverter.Instance.Convert($"{x.StackSize} {x.TypeLine}").HasValue)
+                           .Select(x => new PoeSolutionItem(x, tabsByInventoryId[x.InventoryId]))
+                           .OfType<IPoeSolutionItem>()
+                           .ToArray();
+
             return new PoeTradeSolution(currency, stashUpdate.Tabs);
         }
 
@@ -271,14 +275,14 @@ namespace PoeBud.ViewModels
             var tabsByInventoryId = stashUpdate.Tabs.ToDictionary(x => x.GetInventoryId(), x => x);
 
             var cards = stashUpdate
-                .Items
-                .Where(x => x.GetTabIndex() != null)
-                .Where(x => tabsByInventoryId.ContainsKey(x.InventoryId))
-                .Where(x => x.Categories.Contains("cards"))
-                .Select(x => new PoeSolutionItem(x, tabsByInventoryId[x.InventoryId]))
-                .OfType<IPoeSolutionItem>()
-                .ToArray();
-            
+                        .Items
+                        .Where(x => x.GetTabIndex() != null)
+                        .Where(x => tabsByInventoryId.ContainsKey(x.InventoryId))
+                        .Where(x => x.Categories.Contains("cards"))
+                        .Select(x => new PoeSolutionItem(x, tabsByInventoryId[x.InventoryId]))
+                        .OfType<IPoeSolutionItem>()
+                        .ToArray();
+
             return new PoeTradeSolution(cards, stashUpdate.Tabs);
         }
 
@@ -299,18 +303,18 @@ namespace PoeBud.ViewModels
             var belts = rareItems.Where(x => x.ItemType == GearType.Belt);
 
             var itemsByCategories = new[]
-            {
-                chests,
-                helmets,
-                gloves,
-                belts,
-                boots,
-                weapons.OrderByDescending(x => x.GetTradeScore()), // required to make sure that we do not mix-up .5 and 1 score items
-                amulets,
-                rings,
-            }
-                .Select(x => new ConcurrentQueue<IStashItem>(x))
-                .ToArray();
+                                    {
+                                        chests,
+                                        helmets,
+                                        gloves,
+                                        belts,
+                                        boots,
+                                        weapons.OrderByDescending(x => x.GetTradeScore()), // required to make sure that we do not mix-up .5 and 1 score items
+                                        amulets,
+                                        rings
+                                    }
+                                    .Select(x => new ConcurrentQueue<IStashItem>(x))
+                                    .ToArray();
 
             const float targetScoreForEachCategory = 1;
             const float targetScoreForSolution = 8;

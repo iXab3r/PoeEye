@@ -52,7 +52,7 @@ namespace PoeEye.TradeMonitor.Services
 
             trades
                 .Where(x => x.TradeType == TradeType.Sell)
-                .Select(x => new { Trade = x, PriceInChaos = priceCalculcator.GetEquivalentInChaosOrbs(x.Price) })
+                .Select(x => new {Trade = x, PriceInChaos = priceCalculcator.GetEquivalentInChaosOrbs(x.Price)})
                 .Where(x => x.PriceInChaos.Value >= configProvider.ActualConfig.CriticalNotificationThresholdInChaos)
                 .Subscribe(x => HandleHighValueTrade(x.Trade, x.PriceInChaos))
                 .AddTo(Anchors);
@@ -76,8 +76,9 @@ namespace PoeEye.TradeMonitor.Services
             {
                 Log.Instance.Warn($"[TradeMonitorService.ParseMessage] Multiple successfull matches:\n{successfullMatches.DumpToText()}");
             }
-            return successfullMatches.Count > 0 
-                ? successfullMatches.First().Value 
+
+            return successfullMatches.Count > 0
+                ? successfullMatches.First().Value
                 : default(TradeModel?);
         }
 
@@ -92,18 +93,20 @@ namespace PoeEye.TradeMonitor.Services
                 {
                     result[poeMessageParser] = parseResult;
                 }
-
             }
+
             return result;
         }
 
         private void HandleHighValueTrade(TradeModel trade, PoePrice priceInChaos)
         {
-            var message = $"[{trade.Timestamp}] TradeMonitor: {trade.CharacterName} wants to buy {trade.PositionName} for {trade.Price} (~{priceInChaos}), league: {trade.League}, tab: {trade.TabName} position: {trade.ItemPosition}";
+            var message =
+                $"[{trade.Timestamp}] TradeMonitor: {trade.CharacterName} wants to buy {trade.PositionName} for {trade.Price} (~{priceInChaos}), league: {trade.League}, tab: {trade.TabName} position: {trade.ItemPosition}";
             if (!string.IsNullOrWhiteSpace(trade.Offer))
             {
                 message += $" offer: {trade.Offer}";
             }
+
             notifier.SendNotification(message, NotificationLevel.Critical);
         }
     }

@@ -12,20 +12,20 @@ namespace PoeShared.Communications.Chromium
     internal sealed class ChromiumBootstrapper : DisposableReactiveObject, IChromiumBootstrapper
     {
         private readonly string architectureSpecificDirectoryPath;
-        
+
         public ChromiumBootstrapper(
             [NotNull] IFactory<IChromiumBrowserFactory> bootstrapperFactory)
         {
             Guard.ArgumentNotNull(bootstrapperFactory, nameof(bootstrapperFactory));
             architectureSpecificDirectoryPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Environment.Is64BitProcess ? "x64" : "x86");
 
-            Log.Instance.Debug($"[ChromiumBootstrapper] Initializing assembly loader(Environment.Is64Bit: {Environment.Is64BitProcess}, OS.Is64Bit: {Environment.Is64BitOperatingSystem}), path: {architectureSpecificDirectoryPath}");
+            Log.Instance.Debug(
+                $"[ChromiumBootstrapper] Initializing assembly loader(Environment.Is64Bit: {Environment.Is64BitProcess}, OS.Is64Bit: {Environment.Is64BitOperatingSystem}), path: {architectureSpecificDirectoryPath}");
             AppDomain.CurrentDomain.AssemblyResolve += CurrentDomainOnAssemblyResolve;
             Disposable.Create(() =>
             {
                 Log.Instance.Debug("[ChromiumBootstrapper] Uninitialized assembly loader...");
                 AppDomain.CurrentDomain.AssemblyResolve -= CurrentDomainOnAssemblyResolve;
-
             }).AddTo(Anchors);
         }
 
@@ -41,7 +41,8 @@ namespace PoeShared.Communications.Chromium
 
             if (!File.Exists(libraryPath))
             {
-                Log.Instance.Warn($"Failed to load '{libraryPath}' (Environment.Is64Bit: {Environment.Is64BitProcess}, OS.Is64Bit: {Environment.Is64BitOperatingSystem})");
+                Log.Instance.Warn(
+                    $"Failed to load '{libraryPath}' (Environment.Is64Bit: {Environment.Is64BitProcess}, OS.Is64Bit: {Environment.Is64BitOperatingSystem})");
                 return null;
             }
 

@@ -6,7 +6,7 @@ namespace PoeShared.PoeTrade
 {
     public interface IPoeItemViewModelFactory
     {
-        [NotNull] 
+        [NotNull]
         IDisposableReactiveObject Create([NotNull] IPoeItem item);
     }
 }

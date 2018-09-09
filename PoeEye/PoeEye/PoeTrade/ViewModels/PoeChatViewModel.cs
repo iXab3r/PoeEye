@@ -21,9 +21,11 @@ namespace PoeEye.PoeTrade.ViewModels
     internal sealed class PoeChatViewModel : DisposableReactiveObject, IPoeChatViewModel
     {
         private static readonly TimeSpan SendMessageStatusThrottleTimeSpan = TimeSpan.FromSeconds(5);
+        private readonly IPoeChatService chatService;
+
+        private readonly SerialDisposable messageQueueDisposable = new SerialDisposable();
 
         private readonly IAudioNotificationsManager notificationsManager;
-        private readonly IPoeChatService chatService;
         private readonly DelegateCommand<string> sendMessageCommand;
         private string messageToSend;
 
@@ -31,13 +33,12 @@ namespace PoeEye.PoeTrade.ViewModels
 
         private string sendStatusErrorMessage;
 
-        private readonly SerialDisposable messageQueueDisposable = new SerialDisposable();
-
         public PoeChatViewModel(
             [NotNull] IPoeWhisperService whisperService,
             [NotNull] IAudioNotificationsManager notificationsManager,
             [NotNull] IPoeChatService chatService,
-            [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
+            [NotNull] [Dependency(WellKnownSchedulers.UI)]
+            IScheduler uiScheduler)
         {
             Guard.ArgumentNotNull(chatService, nameof(chatService));
             Guard.ArgumentNotNull(whisperService, nameof(whisperService));
@@ -46,20 +47,18 @@ namespace PoeEye.PoeTrade.ViewModels
 
             this.notificationsManager = notificationsManager;
             this.chatService = chatService;
-            whisperService.Messages     
-                .ObserveOn(uiScheduler)
-                .Where(x => x.MessageType == PoeMessageType.WhisperIncoming || x.MessageType == PoeMessageType.WhisperOutgoing)
-                .Subscribe(Messages.Add)
-                .AddTo(Anchors);
+            whisperService.Messages
+                          .ObserveOn(uiScheduler)
+                          .Where(x => x.MessageType == PoeMessageType.WhisperIncoming || x.MessageType == PoeMessageType.WhisperOutgoing)
+                          .Subscribe(Messages.Add)
+                          .AddTo(Anchors);
 
             sendMessageCommand = new DelegateCommand<string>(SendMessageCommandExecuted, SendMessageCommandCanExecute);
 
-            Observable.Merge(
-                    chatService.WhenAnyValue(x => x.IsAvailable).ToUnit(),
-                    this.WhenAnyValue(x => x.MessageToSend).ToUnit())
-                .ObserveOn(uiScheduler)
-                .Subscribe(sendMessageCommand.RaiseCanExecuteChanged)
-                .AddTo(Anchors);
+            chatService.WhenAnyValue(x => x.IsAvailable).ToUnit().Merge(this.WhenAnyValue(x => x.MessageToSend).ToUnit())
+                       .ObserveOn(uiScheduler)
+                       .Subscribe(sendMessageCommand.RaiseCanExecuteChanged)
+                       .AddTo(Anchors);
 
             this.WhenAnyValue(x => x.SendStatus)
                 .Where(x => x != PoeMessageSendStatus.Unknown)
@@ -74,20 +73,20 @@ namespace PoeEye.PoeTrade.ViewModels
 
         public string MessageToSend
         {
-            get { return messageToSend; }
-            set { this.RaiseAndSetIfChanged(ref messageToSend, value); }
+            get => messageToSend;
+            set => this.RaiseAndSetIfChanged(ref messageToSend, value);
         }
 
         public PoeMessageSendStatus SendStatus
         {
-            get { return sendStatus; }
-            set { this.RaiseAndSetIfChanged(ref sendStatus, value); }
+            get => sendStatus;
+            set => this.RaiseAndSetIfChanged(ref sendStatus, value);
         }
 
         public string SendStatusErrorMessage
         {
-            get { return sendStatusErrorMessage; }
-            set { this.RaiseAndSetIfChanged(ref sendStatusErrorMessage, value); }
+            get => sendStatusErrorMessage;
+            set => this.RaiseAndSetIfChanged(ref sendStatusErrorMessage, value);
         }
 
         public ObservableCollection<PoeMessage> Messages { get; } = new ObservableCollection<PoeMessage>();
@@ -102,9 +101,9 @@ namespace PoeEye.PoeTrade.ViewModels
         private void SendMessageCommandExecuted(string message)
         {
             messageQueueDisposable.Disposable = chatService
-                .SendMessage(message)
-                .ToObservable()
-                .Subscribe(HandleMessageSendStatus);
+                                                .SendMessage(message)
+                                                .ToObservable()
+                                                .Subscribe(HandleMessageSendStatus);
         }
 
         private void HandleMessageSendStatus(PoeMessageSendStatus status)

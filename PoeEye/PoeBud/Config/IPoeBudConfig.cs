@@ -7,7 +7,7 @@ namespace PoeBud.Config
     public interface IPoeBudConfig : IPoeEyeConfigVersioned, IStashUpdaterParameters
     {
         int ExpectedSetsCount { get; }
-        
+
         int MaxSlotsPerSolution { get; }
 
         TimeSpan StashUpdatePeriod { get; }

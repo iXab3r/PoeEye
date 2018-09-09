@@ -6,8 +6,8 @@
 
         public IPoeQueryArgument[] Arguments
         {
-            get { return arguments; }
-            set { arguments = value ?? new IPoeQueryArgument[0]; }
+            get => arguments;
+            set => arguments = value ?? new IPoeQueryArgument[0];
         }
     }
 }

@@ -7,9 +7,9 @@ namespace PoeBud.Models
     internal interface IPoeSolutionItem
     {
         string Name { [NotNull] get; }
-        
+
         int StackSize { [NotNull] get; }
-        
+
         string TypeLine { [NotNull] get; }
 
         ItemPosition Position { get; }

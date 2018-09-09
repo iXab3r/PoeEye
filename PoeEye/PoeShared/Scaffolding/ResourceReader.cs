@@ -29,6 +29,7 @@ namespace PoeShared.Scaffolding
                     var resources = assembly.GetManifestResourceNames();
                     throw new FileNotFoundException($"Could not find resource '{resourcePath}' among the following:\r\n\t{string.Join("\r\n\t", resources)}");
                 }
+
                 using (var streamReader = new StreamReader(stream))
                 {
                     return streamReader.ReadToEnd();

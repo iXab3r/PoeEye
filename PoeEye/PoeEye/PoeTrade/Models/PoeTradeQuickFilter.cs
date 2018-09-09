@@ -36,7 +36,7 @@ namespace PoeEye.PoeTrade.Models
                     trade.TradeState,
                     serializer.Serialize(trade.Trade)
                 }.Where(x => x != null)
-                .Select(x => x.ToString()).ToArray();
+                 .Select(x => x.ToString()).ToArray();
 
             result |= tokens.All(token => hashstack.Any(entry => entry.IndexOf(token, StringComparison.OrdinalIgnoreCase) >= 0));
 

@@ -35,18 +35,20 @@ namespace PoeBud.ViewModels
         private string hotkey;
 
         private bool isEnabled;
+        private string[] leaguesList;
+        private string selectedLeague;
 
         private UiOverlayInfo selectedUiOverlay;
         private string sessionId;
         private string username;
-        private string selectedLeague;
-        private string[] leaguesList;
 
         public PoeBudSettingsViewModel(
             [NotNull] IFactory<IPoeStashClient, NetworkCredential, bool> poeClientFactory,
             [NotNull] IUiOverlaysProvider overlaysProvider,
-            [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler,
-            [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler)
+            [NotNull] [Dependency(WellKnownSchedulers.UI)]
+            IScheduler uiScheduler,
+            [NotNull] [Dependency(WellKnownSchedulers.Background)]
+            IScheduler bgScheduler)
         {
             Guard.ArgumentNotNull(overlaysProvider, nameof(overlaysProvider));
             Guard.ArgumentNotNull(uiScheduler, nameof(uiScheduler));
@@ -55,7 +57,7 @@ namespace PoeBud.ViewModels
 
             this.poeClientFactory = poeClientFactory;
             this.overlaysProvider = overlaysProvider;
-            
+
             LoginCommand = CommandWrapper.Create(
                 ReactiveCommand.CreateFromTask<object>(x => LoginCommandExecuted(x), null, uiScheduler));
 
@@ -67,36 +69,36 @@ namespace PoeBud.ViewModels
 
         public string Hotkey
         {
-            get { return hotkey; }
-            set { this.RaiseAndSetIfChanged(ref hotkey, value); }
+            get => hotkey;
+            set => this.RaiseAndSetIfChanged(ref hotkey, value);
         }
 
         public string[] HotkeysList { get; }
 
         public string[] LeaguesList
         {
-            get { return leaguesList; }
-            private set { this.RaiseAndSetIfChanged(ref leaguesList, value); }
+            get => leaguesList;
+            private set => this.RaiseAndSetIfChanged(ref leaguesList, value);
         }
 
         public string SelectedLeague
         {
-            get { return selectedLeague; }
-            set { this.RaiseAndSetIfChanged(ref selectedLeague, value); }
+            get => selectedLeague;
+            set => this.RaiseAndSetIfChanged(ref selectedLeague, value);
         }
 
-        public IReactiveList<TabSelectionViewModel> StashesList { get; } = new ReactiveList<TabSelectionViewModel>() { ChangeTrackingEnabled = true };
+        public IReactiveList<TabSelectionViewModel> StashesList { get; } = new ReactiveList<TabSelectionViewModel> {ChangeTrackingEnabled = true};
 
         public string Username
         {
-            get { return username; }
-            set { this.RaiseAndSetIfChanged(ref username, value); }
+            get => username;
+            set => this.RaiseAndSetIfChanged(ref username, value);
         }
 
         public string SessionId
         {
-            get { return sessionId; }
-            set { this.RaiseAndSetIfChanged(ref sessionId, value); }
+            get => sessionId;
+            set => this.RaiseAndSetIfChanged(ref sessionId, value);
         }
 
         public string ModuleName => "Poe Buddy";
@@ -106,18 +108,18 @@ namespace PoeBud.ViewModels
             config.CopyPropertiesTo(resultingConfig);
 
             Username = config.LoginEmail;
-            
-            LeaguesList = string.IsNullOrEmpty(config.LeagueId) ? null : new[] { config.LeagueId };   
+
+            LeaguesList = string.IsNullOrEmpty(config.LeagueId) ? null : new[] {config.LeagueId};
             SelectedLeague = config.LeagueId;
-            
+
             StashesList.Clear();
             if (config.StashesToProcess != null && config.StashesToProcess.Any())
             {
                 config.StashesToProcess
-                    .Select(x => new TabSelectionViewModel(x) { IsSelected = true })
-                    .ForEach(StashesList.Add);
+                      .Select(x => new TabSelectionViewModel(x) {IsSelected = true})
+                      .ForEach(StashesList.Add);
             }
-            
+
             Hotkey = config.GetChaosSetHotkey;
         }
 
@@ -127,10 +129,12 @@ namespace PoeBud.ViewModels
             {
                 resultingConfig.LoginEmail = Username;
             }
+
             if (!string.IsNullOrEmpty(SessionId))
             {
                 resultingConfig.SessionId = SessionId;
             }
+
             if (SelectedLeague != null)
             {
                 resultingConfig.LeagueId = SelectedLeague;
@@ -140,15 +144,15 @@ namespace PoeBud.ViewModels
             resultingConfig.IsEnabled = isEnabled;
 
             var selectedTabs = StashesList
-                .Where(x => x.IsSelected)
-                .Select(x => x.Name)
-                .ToArray();
+                               .Where(x => x.IsSelected)
+                               .Select(x => x.Name)
+                               .ToArray();
 
             resultingConfig.StashesToProcess = selectedTabs;
 
             var result = new PoeBudConfig();
             resultingConfig.CopyPropertiesTo(result);
-            
+
             return result;
         }
 
@@ -177,7 +181,7 @@ namespace PoeBud.ViewModels
             {
                 SessionId = poeClient.SessionId;
             }
-            
+
             Log.Instance.Debug($"[PoeBudSettings.LoginCommand] SessionId: {poeClient.SessionId}");
 
             Log.Instance.Debug($"[PoeBudSettings.LoginCommand] Requesting characters list...");
@@ -187,21 +191,23 @@ namespace PoeBud.ViewModels
             characterSelectionDisposable.Disposable = leagueAnchors;
 
             var leagues = characters
-                .Select(x => x.League)
-                .Where(league => !string.IsNullOrEmpty(league))
-                .Distinct()
-                .ToArray();
-            
-            Log.Instance.Debug($"[PoeBudSettings.LoginCommand] Response received, characters list: \n\t{characters.DumpToTable()}\nLeagues list: \n\t{leagues.DumpToTable()}");
+                          .Select(x => x.League)
+                          .Where(league => !string.IsNullOrEmpty(league))
+                          .Distinct()
+                          .ToArray();
+
+            Log.Instance.Debug(
+                $"[PoeBudSettings.LoginCommand] Response received, characters list: \n\t{characters.DumpToTable()}\nLeagues list: \n\t{leagues.DumpToTable()}");
 
             Log.Instance.Debug($"[PoeBudSettings.LoginCommand] Requesting stashes list...");
-            var stashes = await TryGetStash(client: poeClient, leagues: leagues);
+            var stashes = await TryGetStash(poeClient, leagues);
 
             var leagueStashViewModels = stashes
-                .Where(x => x.Stash != null && !string.IsNullOrWhiteSpace(x.LeagueId))
-                .ToDictionary(
-                    x => x.LeagueId,
-                    x => x.Stash.Tabs.Where(tab => !string.IsNullOrWhiteSpace(tab.Name)).Select(tab => new TabSelectionViewModel(tab.Name)).ToArray());
+                                        .Where(x => x.Stash != null && !string.IsNullOrWhiteSpace(x.LeagueId))
+                                        .ToDictionary(
+                                            x => x.LeagueId,
+                                            x => x.Stash.Tabs.Where(tab => !string.IsNullOrWhiteSpace(tab.Name))
+                                                  .Select(tab => new TabSelectionViewModel(tab.Name)).ToArray());
 
             var leagueList = leagueStashViewModels.Keys.ToArray();
             LeaguesList = leagueList;
@@ -224,6 +230,7 @@ namespace PoeBud.ViewModels
                 var newSelectedLeague = leagueList.FirstOrDefault(x => x == selectedLeague);
                 SelectedLeague = newSelectedLeague;
             }
+
             if (SelectedLeague == null)
             {
                 SelectedLeague = leagueList.FirstOrDefault();
@@ -240,8 +247,10 @@ namespace PoeBud.ViewModels
                 {
                     continue;
                 }
-                result.Add(new LeagueStashes(){ LeagueId = league, Stash = stash });
+
+                result.Add(new LeagueStashes {LeagueId = league, Stash = stash});
             }
+
             return result.ToArray();
         }
 
@@ -250,7 +259,7 @@ namespace PoeBud.ViewModels
             try
             {
                 Log.Instance.Debug($"[PoeBudSettings.LoginCommand] Requesting stash for league {league}...");
-                return client.GetStashAsync(stashIdx: 0, league: league);
+                return client.GetStashAsync(0, league);
             }
             catch (Exception ex)
             {
@@ -258,11 +267,11 @@ namespace PoeBud.ViewModels
                 return Task.FromResult(default(IStash));
             }
         }
-        
+
         private struct LeagueStashes
         {
             public string LeagueId { get; set; }
-            
+
             public IStash Stash { get; set; }
         }
     }

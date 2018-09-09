@@ -45,7 +45,7 @@ namespace PoeEye.StashRealtimeApi.Models
             poeItem.UserForumName = stashTab.AccountName;
             poeItem.UserIgn = stashTab.LastCharacterName;
             poeItem.TabName = stashTab.Stash;
-            stashTab.Items = new List<StashItem>() { (StashItem)stashItem };
+            stashTab.Items = new List<StashItem> {(StashItem)stashItem};
             poeItem.Raw = JsonConvert.SerializeObject(stashTab, Formatting.Indented);
 
             return poeItem;

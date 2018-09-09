@@ -4,9 +4,9 @@ using PoeShared.StashApi.DataTypes;
 
 namespace PoeShared.StashApi
 {
-    public interface IPoeLeagueApiClient 
+    public interface IPoeLeagueApiClient
     {
-        [NotNull] 
+        [NotNull]
         Task<ILeague[]> GetLeaguesAsync();
     }
 }

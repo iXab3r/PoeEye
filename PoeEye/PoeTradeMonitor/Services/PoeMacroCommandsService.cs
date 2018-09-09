@@ -33,7 +33,7 @@ namespace PoeEye.TradeMonitor.Services
 
             MacroCommands.Add(
                 new GenericDelegateCommand(
-                    "close", 
+                    "close",
                     context => context.CloseController?.Close())
                 {
                     Label = "Close negotiation",

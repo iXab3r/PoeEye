@@ -76,7 +76,8 @@ namespace PoeChatWheel.ViewModels
             [NotNull] IPoeChatService chatService,
             [NotNull] IConfigProvider<PoeChatWheelConfig> configProvider,
             [NotNull] IClock clock,
-            [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
+            [NotNull] [Dependency(WellKnownSchedulers.UI)]
+            IScheduler uiScheduler)
         {
             Guard.ArgumentNotNull(controller, nameof(controller));
             Guard.ArgumentNotNull(keyboardMouseEvents, nameof(keyboardMouseEvents));
@@ -145,21 +146,21 @@ namespace PoeChatWheel.ViewModels
                 .AddTo(Anchors);
 
             whisperService.Messages
-                .Where(x => x.MessageType == PoeMessageType.WhisperIncoming)
-                .Subscribe(ProcessMessage)
-                .AddTo(Anchors);
+                          .Where(x => x.MessageType == PoeMessageType.WhisperIncoming)
+                          .Subscribe(ProcessMessage)
+                          .AddTo(Anchors);
 
             configProvider
                 .WhenChanged
                 .Select(x => x.ChatWheelHotkey)
                 .Select(KeyGestureExtensions.SafeCreateGesture)
-                .Subscribe(x => this.hotkey = x)
+                .Subscribe(x => hotkey = x)
                 .AddTo(Anchors);
 
             Items.Changed
-                .Select(x => Items.ToList())
-                .Subscribe(SetMenuItems)
-                .AddTo(Anchors);
+                 .Select(x => Items.ToList())
+                 .Subscribe(SetMenuItems)
+                 .AddTo(Anchors);
 
             Width = 320;
             Height = 320;
@@ -167,30 +168,30 @@ namespace PoeChatWheel.ViewModels
 
         public TimeSpan HistoryPeriod
         {
-            get { return historyPeriod; }
-            set { this.RaiseAndSetIfChanged(ref historyPeriod, value); }
+            get => historyPeriod;
+            set => this.RaiseAndSetIfChanged(ref historyPeriod, value);
         }
 
         public RadialMenu.Controls.RadialMenu MenuControl
         {
-            get { return menuControl; }
-            set { this.RaiseAndSetIfChanged(ref menuControl, value); }
+            get => menuControl;
+            set => this.RaiseAndSetIfChanged(ref menuControl, value);
         }
 
         public RadialMenuCentralItem CentralItem
         {
-            get { return centralItem; }
-            set { this.RaiseAndSetIfChanged(ref centralItem, value); }
+            get => centralItem;
+            set => this.RaiseAndSetIfChanged(ref centralItem, value);
         }
 
         public bool IsOpen
         {
-            get { return isOpen; }
-            set { this.RaiseAndSetIfChanged(ref isOpen, value); }
+            get => isOpen;
+            set => this.RaiseAndSetIfChanged(ref isOpen, value);
         }
 
         public IReactiveList<RadialMenuItem> Items { get; } = new ReactiveList<RadialMenuItem>();
-        
+
         private void Show()
         {
             Log.Instance.Debug($"[PoeChatWheel.OnNameSelection] IsOpen: {IsOpen} => True");
@@ -212,10 +213,12 @@ namespace PoeChatWheel.ViewModels
             {
                 return false;
             }
+
             if (!candidate.MatchesHotkey(args))
             {
                 return false;
             }
+
             return true;
         }
 
@@ -242,6 +245,7 @@ namespace PoeChatWheel.ViewModels
                 Items.Clear();
                 Items.AddRange(menuItems);
             }
+
             CentralItem = null;
         }
 
@@ -265,15 +269,15 @@ namespace PoeChatWheel.ViewModels
                 $"{characterName}\n\xF017 {timeElapsed.TotalSeconds:F0}s ago", "User");
 
             Observable.FromEventPattern<MouseEventHandler, MouseEventArgs>(
-                h => menuItem.MouseEnter += h,
-                h => menuItem.MouseEnter -= h)
-                .Where(x => IsOpen)
-                .Subscribe(
-                    () =>
-                    {
-                        Log.Instance.Debug($"[PoeChatWheel.SelectCharacter] Name '{message.Name}'");
-                        queryStateMachine.Fire(nameSelectedTransitionTrigger, message.Name);
-                    });
+                          h => menuItem.MouseEnter += h,
+                          h => menuItem.MouseEnter -= h)
+                      .Where(x => IsOpen)
+                      .Subscribe(
+                          () =>
+                          {
+                              Log.Instance.Debug($"[PoeChatWheel.SelectCharacter] Name '{message.Name}'");
+                              queryStateMachine.Fire(nameSelectedTransitionTrigger, message.Name);
+                          });
 
             menuItem.ToolTip = PrepareMessageHistory(message.Name);
             return menuItem;
@@ -286,6 +290,7 @@ namespace PoeChatWheel.ViewModels
             {
                 result.Items.Add(source);
             }
+
             return result;
         }
 
@@ -308,6 +313,7 @@ namespace PoeChatWheel.ViewModels
                 userColors.Enqueue(color);
                 return color;
             }
+
             return Colors.White;
         }
 
@@ -343,6 +349,7 @@ namespace PoeChatWheel.ViewModels
             {
                 ToActionMenuItem(radialMenuItem);
             }
+
             using (Items.SuppressChangeNotifications())
             {
                 Items.Clear();
@@ -356,7 +363,7 @@ namespace PoeChatWheel.ViewModels
                     Text = characterName,
                     IconText = "User"
                 },
-                ToolTip = PrepareMessageHistory(characterName),
+                ToolTip = PrepareMessageHistory(characterName)
             };
             CentralItem = central;
         }
@@ -370,17 +377,17 @@ namespace PoeChatWheel.ViewModels
             }
 
             Observable.FromEventPattern<MouseButtonEventHandler, MouseButtonEventArgs>(
-                    h => item.PreviewMouseDown += h,
-                    h => item.PreviewMouseDown -= h)
-                .Where(x => IsOpen)
-                .Where(x => x.EventArgs.ClickCount == 1 && x.EventArgs.LeftButton == MouseButtonState.Pressed)
-                .Subscribe(
-                    x =>
-                    {
-                        Log.Instance.Debug($"[PoeChatWheel.SelectAction] Action '{commandText}'");
-                        x.EventArgs.Handled = true;
-                        queryStateMachine.Fire(actionSelectedTransitionTrigger, commandText);
-                    });
+                          h => item.PreviewMouseDown += h,
+                          h => item.PreviewMouseDown -= h)
+                      .Where(x => IsOpen)
+                      .Where(x => x.EventArgs.ClickCount == 1 && x.EventArgs.LeftButton == MouseButtonState.Pressed)
+                      .Subscribe(
+                          x =>
+                          {
+                              Log.Instance.Debug($"[PoeChatWheel.SelectAction] Action '{commandText}'");
+                              x.EventArgs.Handled = true;
+                              queryStateMachine.Fire(actionSelectedTransitionTrigger, commandText);
+                          });
             return item;
         }
 
@@ -397,7 +404,7 @@ namespace PoeChatWheel.ViewModels
 
         private UIElement CreateMenuItemContent(string itemText, string itemIcon)
         {
-            var panel = new WrapPanel { Orientation = Orientation.Vertical };
+            var panel = new WrapPanel {Orientation = Orientation.Vertical};
             var text = CreateMenuItemContent(itemText);
             var icon = new TextBlock
             {
@@ -411,6 +418,7 @@ namespace PoeChatWheel.ViewModels
             panel.Children.Add(text);
             return panel;
         }
+
         private void SendMessage(string message)
         {
             Log.Instance.Debug($"[PoeChatWheel.SendMessage] Sending message '{message}'");

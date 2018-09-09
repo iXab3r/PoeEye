@@ -9,9 +9,19 @@ namespace PoeEye.TradeMonitor.Modularity
 {
     public sealed class PoeTradeMonitorConfig : IPoeEyeConfigVersioned, IOverlayConfig, ICanBeEnabled
     {
-        public bool IsEnabled { get; set; } = true;
-
         public static double MaxNumberOfNegotiationsToExpand = 10;
+
+        public static PoeTradeMonitorConfig Default = new PoeTradeMonitorConfig
+        {
+            PredefinedMessages = new List<MacroMessage>
+            {
+                new MacroMessage {Label = "1m", Text = "one minute"},
+                new MacroMessage {Label = "thx", Text = "thanks /kick /close"},
+                new MacroMessage {Label = "no thx", Text = "no thanks /close"},
+                new MacroMessage {Label = "sold", Text = "sold /close"},
+                new MacroMessage {Label = "hideout", Text = "/hideout"}
+            }
+        };
 
         public int NumberOfNegotiationsToExpandByDefault { get; set; } = 1;
 
@@ -28,25 +38,14 @@ namespace PoeEye.TradeMonitor.Modularity
         public string CriticalNotificationEmailAddress { get; set; }
 
         public int CriticalNotificationThresholdInChaos { get; set; }
+        public bool IsEnabled { get; set; } = true;
 
-        public static PoeTradeMonitorConfig Default = new PoeTradeMonitorConfig()
-        {
-            PredefinedMessages = new List<MacroMessage>()
-            {
-                new MacroMessage { Label = "1m", Text = "one minute" },
-                new MacroMessage { Label = "thx", Text = "thanks /kick /close" },
-                new MacroMessage { Label = "no thx", Text = "no thanks /close" },
-                new MacroMessage { Label = "sold", Text = "sold /close" },
-                new MacroMessage { Label = "hideout", Text = "/hideout" },
-            }
-        };
-
-        public int Version { get; set; } = 2;
-        
         public Point OverlayLocation { get; set; }
-        
+
         public Size OverlaySize { get; set; }
 
         public float OverlayOpacity { get; set; } = 1;
+
+        public int Version { get; set; } = 2;
     }
 }

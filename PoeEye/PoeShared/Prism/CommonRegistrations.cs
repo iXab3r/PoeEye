@@ -50,7 +50,8 @@ namespace PoeShared.Prism
                 .RegisterSingleton<IChromiumBootstrapper, ChromiumBootstrapper>()
                 .RegisterSingleton<PoeStashItemToPoeItem>(typeof(IConverter<IStashItem, IPoeItem>), typeof(IConverter<IStashItem, PoeItem>))
                 .RegisterSingleton<IConverter<string, PoePrice>, StringToPoePriceConverter>()
-                .RegisterSingleton<IKeyboardEventsSource>(new InjectionFactory(x => x.Resolve<KeyboardEventsSource>(new DependencyOverride(typeof(IKeyboardMouseEvents), Hook.GlobalEvents()))))
+                .RegisterSingleton<IKeyboardEventsSource>(
+                    new InjectionFactory(x => x.Resolve<KeyboardEventsSource>(new DependencyOverride(typeof(IKeyboardMouseEvents), Hook.GlobalEvents()))))
                 .RegisterSingleton<IAudioNotificationsManager, AudioNotificationsManager>()
                 .RegisterSingleton<ISchedulerProvider, SchedulerProvider>()
                 .RegisterSingleton<IClipboardManager, ClipboardManager>()
@@ -67,9 +68,9 @@ namespace PoeShared.Prism
                 .RegisterType<IPoeEconomicsSource, PoeNinjaDatabaseReader>()
                 .RegisterType<IOverlayWindowController, OverlayWindowController>()
                 .RegisterType<IAudioNotificationSelectorViewModel, AudioNotificationSelectorViewModel>()
-                .RegisterType(typeof (IFactory<,,>), typeof (Factory<,,>))
-                .RegisterType(typeof (IFactory<,>), typeof (Factory<,>))
-                .RegisterType(typeof (IFactory<>), typeof (Factory<>));
+                .RegisterType(typeof(IFactory<,,>), typeof(Factory<,,>))
+                .RegisterType(typeof(IFactory<,>), typeof(Factory<,>))
+                .RegisterType(typeof(IFactory<>), typeof(Factory<>));
 
             Container
                 .RegisterType<IImageViewModel, ImageViewModel>();
@@ -79,12 +80,12 @@ namespace PoeShared.Prism
             Container.RegisterWindowTracker(WellKnownWindows.PathOfExileWindow, () => $"^Path of Exile$");
 
             Container.RegisterOverlayController(
-                WellKnownOverlays.PathOfExileOverlay, 
+                WellKnownOverlays.PathOfExileOverlay,
                 WellKnownWindows.PathOfExileWindow);
 
             Container.RegisterOverlayController(
-               WellKnownOverlays.AllWindowsLayeredOverlay,
-               WellKnownWindows.AllWindows);
+                WellKnownOverlays.AllWindowsLayeredOverlay,
+                WellKnownWindows.AllWindows);
 
             Container
                 .RegisterType<IPoeDatabaseReader>(
@@ -95,7 +96,7 @@ namespace PoeShared.Prism
                                 new IPoeDatabaseReader[]
                                 {
                                     unity.Resolve<StaticPoeDatabaseReader>(),
-                                    unity.Resolve<PoeNinjaDatabaseReader>(),
+                                    unity.Resolve<PoeNinjaDatabaseReader>()
                                 }
                             )
                         )));

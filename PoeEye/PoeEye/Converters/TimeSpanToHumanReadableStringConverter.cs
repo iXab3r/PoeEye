@@ -11,7 +11,7 @@ namespace PoeEye.Converters
             TimeSpan timeSpan;
             if (value is TimeSpan)
             {
-                timeSpan = (TimeSpan) value;
+                timeSpan = (TimeSpan)value;
             }
             else if (value is TimeSpan?)
             {
@@ -26,14 +26,17 @@ namespace PoeEye.Converters
             {
                 return $"{timeSpan.TotalDays:F0}d {timeSpan.Hours:F0}h";
             }
+
             if (timeSpan.TotalMinutes > 120)
             {
                 return $"{timeSpan.TotalHours:F0}h";
             }
+
             if (timeSpan.TotalSeconds > 120)
             {
                 return $"{timeSpan.TotalMinutes:F0}m";
             }
+
             return $"{timeSpan.TotalSeconds:F0}s";
         }
 

@@ -15,8 +15,8 @@ namespace PoeShared.UI.ViewModels
             {
                 var currency = kvp.Value;
 
-                var aliases = currencyByAlias.ContainsKey(currency) 
-                    ? currencyByAlias[currency] 
+                var aliases = currencyByAlias.ContainsKey(currency)
+                    ? currencyByAlias[currency]
                     : currencyByAlias[currency] = new List<string>();
 
                 aliases.Add(kvp.Key);
@@ -25,13 +25,13 @@ namespace PoeShared.UI.ViewModels
             var rng = new RandomNumberGenerator();
             foreach (var currency in KnownCurrencyNameList.EnumerateKnownCurrencies())
             {
-                var price = new PoePrice(currency, rng.Next(1,10));
+                var price = new PoePrice(currency, rng.Next(1, 10));
                 var aliases = currencyByAlias.ContainsKey(price.CurrencyType)
                     ? currencyByAlias[price.CurrencyType].ToArray()
                     : new string[0];
                 Items.Add(new CurrencyInfo(price, aliases));
             }
-            
+
             Items.Sort((a, b) => string.Compare(a.Price.CurrencyType, b.Price.CurrencyType, StringComparison.OrdinalIgnoreCase));
         }
 
@@ -43,10 +43,7 @@ namespace PoeShared.UI.ViewModels
         public PoePrice Price { get; }
         public string[] Aliases { get; }
 
-        public string AliasesList
-        {
-            get => string.Join(", ", Aliases);
-        }
+        public string AliasesList => string.Join(", ", Aliases);
 
         public CurrencyInfo(PoePrice price, string[] aliases)
         {

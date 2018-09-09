@@ -1,4 +1,5 @@
 ﻿using System;
+using PoeEye.PoeTrade;
 using PoeEye.PoeTrade.Prism;
 using PoeEye.PoeTradeRealtimeApi;
 using PoeEye.PoeTradeRealtimeApi.Prism;
@@ -12,9 +13,9 @@ using Unity.Resolution;
 
 namespace PoeEye.Console
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             try
             {
@@ -25,24 +26,23 @@ namespace PoeEye.Console
 
                 var modules = new IModule[]
                 {
-                    new PoeTradeModule(container), 
-                    new PoeTradeRealtimeModule(container), 
+                    new PoeTradeModule(container),
+                    new PoeTradeRealtimeModule(container)
                 };
                 foreach (var module in modules)
                 {
                     module.OnInitialized(null);
-                    
                 }
 
-                var api = container.Resolve<IPoeApi>($"{nameof(PoeEye)}.{nameof(PoeTrade)}.{nameof(PoeTrade.PoeTradeApi)}");
+                var api = container.Resolve<IPoeApi>($"{nameof(PoeEye)}.{nameof(PoeTrade)}.{nameof(PoeTradeApi)}");
                 Log.Instance.Debug($"API: {api}");
 
-                var query = new PoeQueryInfo()
+                var query = new PoeQueryInfo
                 {
                     League = "Prophecy",
                     AccountName = "Xab3r",
                     OnlineOnly = true,
-                    NormalizeQuality = true,
+                    NormalizeQuality = true
                 };
                 var source = container.Resolve<IRealtimeItemSource>(new DependencyOverride<IPoeQueryInfo>(query));
                 var result = source.GetResult();

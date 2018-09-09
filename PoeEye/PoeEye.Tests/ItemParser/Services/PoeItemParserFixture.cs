@@ -14,131 +14,6 @@ namespace PoeEye.Tests.ItemParser.Services
     {
         private readonly Mock<IPoeStaticData> queryInfoProvider = new Mock<IPoeStaticData>();
 
-        [Test]
-        [TestCaseSource(nameof(KnownItems))]
-        public void ShouldParseExplicitMods(string data, IPoeItem expectedItem)
-        {
-            //Given
-            var modsList = expectedItem.Mods.Where(x => x.ModType == PoeModType.Explicit).ToArray();
-            queryInfoProvider.SetupGet(x => x.ModsList).Returns(modsList);
-
-            var instance = CreateInstance();
-
-            //When
-            var result = instance.Parse(data);
-
-            //Then
-            var exprectedImplicitMods = expectedItem.Mods.Where(x => x.ModType == PoeModType.Explicit).ToArray();
-            var resultMods = result.Mods.Where(x => x.ModType == PoeModType.Explicit).ToArray();
-
-            CollectionAssert.AreEqual(exprectedImplicitMods, resultMods, new PoeItemModEqualityComparer());
-        }
-
-        [Test]
-        [TestCaseSource(nameof(KnownItems))]
-        public void ShouldParseImplicitMods(string data, IPoeItem expectedItem)
-        {
-            //Given
-            var modsList = expectedItem.Mods.Where(x => x.ModType == PoeModType.Implicit).ToArray();
-            queryInfoProvider.SetupGet(x => x.ModsList).Returns(modsList);
-
-            var instance = CreateInstance();
-
-            //When
-            var result = instance.Parse(data);
-
-            //Then
-            var exprectedImplicitMods = expectedItem.Mods.Where(x => x.ModType == PoeModType.Implicit).ToArray();
-            var resultMods = result.Mods.Where(x => x.ModType == PoeModType.Implicit).ToArray();
-
-            CollectionAssert.AreEqual(exprectedImplicitMods, resultMods, new PoeItemModEqualityComparer());
-        }
-
-        [Test]
-        [TestCaseSource(nameof(KnownItems))]
-        public void ShouldParseIsCorrupted(string data, IPoeItem expectedItem)
-        {
-            //Given
-            var instance = CreateInstance();
-
-            //When
-            var result = instance.Parse(data);
-
-            //Then
-            result.Modifications.HasFlag(PoeItemModificatins.Corrupted).ShouldBe(expectedItem.Modifications.HasFlag(PoeItemModificatins.Corrupted));
-        }
-
-        [Test]
-        [TestCaseSource(nameof(KnownItems))]
-        public void ShouldParseItemName(string data, IPoeItem expectedItem)
-        {
-            //Given
-            var instance = CreateInstance();
-
-            //When
-            var result = instance.Parse(data);
-
-            //Then
-            result.ItemName.ShouldBe(expectedItem.ItemName);
-        }
-
-        [Test]
-        [TestCaseSource(nameof(KnownItems))]
-        public void ShouldParseLinks(string data, IPoeItem expectedItem)
-        {
-            //Given
-            var instance = CreateInstance();
-
-            //When
-            var result = instance.Parse(data);
-
-            //Then
-            result.Links.ShouldBe(expectedItem.Links);
-        }
-
-        [Test]
-        [TestCaseSource(nameof(KnownItems))]
-        public void ShouldParseRarity(string data, IPoeItem expectedItem)
-        {
-            //Given
-            var instance = CreateInstance();
-
-            //When
-            var result = instance.Parse(data);
-
-            //Then
-            result.Rarity.ShouldBe(expectedItem.Rarity);
-        }
-
-        [Test]
-        [TestCaseSource(nameof(KnownItems))]
-        public void ShouldParseRequirements(string data, IPoeItem expectedItem)
-        {
-            //Given
-            var instance = CreateInstance();
-
-            //When
-            var result = instance.Parse(data);
-
-            //Then
-            result.Requirements.ShouldBe(expectedItem.Requirements);
-        }
-
-        [Test]
-        [TestCase("")]
-        [TestCase("RNGSTR")]
-        public void ShouldReturnNullNameOnUnexpectedInput(string data)
-        {
-            //Given
-            var instance = CreateInstance();
-
-            //When
-            var result = instance.Parse(data);
-
-            //Then
-            result.ShouldBe(null);
-        }
-        
         private IEnumerable<TestCaseData> KnownItems()
         {
             yield return new TestCaseData(
@@ -597,6 +472,131 @@ namespace PoeEye.Tests.ItemParser.Services
         private PoeItemParser CreateInstance()
         {
             return new PoeItemParser(new PoeModsProcessor(queryInfoProvider.Object));
+        }
+
+        [Test]
+        [TestCaseSource(nameof(KnownItems))]
+        public void ShouldParseExplicitMods(string data, IPoeItem expectedItem)
+        {
+            //Given
+            var modsList = expectedItem.Mods.Where(x => x.ModType == PoeModType.Explicit).ToArray();
+            queryInfoProvider.SetupGet(x => x.ModsList).Returns(modsList);
+
+            var instance = CreateInstance();
+
+            //When
+            var result = instance.Parse(data);
+
+            //Then
+            var exprectedImplicitMods = expectedItem.Mods.Where(x => x.ModType == PoeModType.Explicit).ToArray();
+            var resultMods = result.Mods.Where(x => x.ModType == PoeModType.Explicit).ToArray();
+
+            CollectionAssert.AreEqual(exprectedImplicitMods, resultMods, new PoeItemModEqualityComparer());
+        }
+
+        [Test]
+        [TestCaseSource(nameof(KnownItems))]
+        public void ShouldParseImplicitMods(string data, IPoeItem expectedItem)
+        {
+            //Given
+            var modsList = expectedItem.Mods.Where(x => x.ModType == PoeModType.Implicit).ToArray();
+            queryInfoProvider.SetupGet(x => x.ModsList).Returns(modsList);
+
+            var instance = CreateInstance();
+
+            //When
+            var result = instance.Parse(data);
+
+            //Then
+            var exprectedImplicitMods = expectedItem.Mods.Where(x => x.ModType == PoeModType.Implicit).ToArray();
+            var resultMods = result.Mods.Where(x => x.ModType == PoeModType.Implicit).ToArray();
+
+            CollectionAssert.AreEqual(exprectedImplicitMods, resultMods, new PoeItemModEqualityComparer());
+        }
+
+        [Test]
+        [TestCaseSource(nameof(KnownItems))]
+        public void ShouldParseIsCorrupted(string data, IPoeItem expectedItem)
+        {
+            //Given
+            var instance = CreateInstance();
+
+            //When
+            var result = instance.Parse(data);
+
+            //Then
+            result.Modifications.HasFlag(PoeItemModificatins.Corrupted).ShouldBe(expectedItem.Modifications.HasFlag(PoeItemModificatins.Corrupted));
+        }
+
+        [Test]
+        [TestCaseSource(nameof(KnownItems))]
+        public void ShouldParseItemName(string data, IPoeItem expectedItem)
+        {
+            //Given
+            var instance = CreateInstance();
+
+            //When
+            var result = instance.Parse(data);
+
+            //Then
+            result.ItemName.ShouldBe(expectedItem.ItemName);
+        }
+
+        [Test]
+        [TestCaseSource(nameof(KnownItems))]
+        public void ShouldParseLinks(string data, IPoeItem expectedItem)
+        {
+            //Given
+            var instance = CreateInstance();
+
+            //When
+            var result = instance.Parse(data);
+
+            //Then
+            result.Links.ShouldBe(expectedItem.Links);
+        }
+
+        [Test]
+        [TestCaseSource(nameof(KnownItems))]
+        public void ShouldParseRarity(string data, IPoeItem expectedItem)
+        {
+            //Given
+            var instance = CreateInstance();
+
+            //When
+            var result = instance.Parse(data);
+
+            //Then
+            result.Rarity.ShouldBe(expectedItem.Rarity);
+        }
+
+        [Test]
+        [TestCaseSource(nameof(KnownItems))]
+        public void ShouldParseRequirements(string data, IPoeItem expectedItem)
+        {
+            //Given
+            var instance = CreateInstance();
+
+            //When
+            var result = instance.Parse(data);
+
+            //Then
+            result.Requirements.ShouldBe(expectedItem.Requirements);
+        }
+
+        [Test]
+        [TestCase("")]
+        [TestCase("RNGSTR")]
+        public void ShouldReturnNullNameOnUnexpectedInput(string data)
+        {
+            //Given
+            var instance = CreateInstance();
+
+            //When
+            var result = instance.Parse(data);
+
+            //Then
+            result.ShouldBe(null);
         }
     }
 }

@@ -14,11 +14,11 @@ namespace PoeShared.Native
 {
     internal sealed class KeyboardEventsSource : DisposableReactiveObject, IKeyboardEventsSource
     {
-        private readonly IKeyboardMouseEvents keyboardMouseEvents;
         private readonly IScheduler kbdScheduler;
+        private readonly IKeyboardMouseEvents keyboardMouseEvents;
+        private readonly ISubject<KeyEventArgs> whenKeyDown = new Subject<KeyEventArgs>();
 
         private readonly ISubject<KeyPressEventArgs> whenKeyPress = new Subject<KeyPressEventArgs>();
-        private readonly ISubject<KeyEventArgs> whenKeyDown = new Subject<KeyEventArgs>();
         private readonly ISubject<KeyEventArgs> whenKeyUp = new Subject<KeyEventArgs>();
 
         public KeyboardEventsSource(
@@ -53,26 +53,26 @@ namespace PoeShared.Native
                 .AddTo(Anchors);
 
             Observable
-               .FromEventPattern<KeyEventHandler, KeyEventArgs>(
-                   h => keyboardMouseEvents.KeyUp += h,
-                   h => keyboardMouseEvents.KeyUp -= h)
-               .Select(x => x.EventArgs)
-               .ObserveOn(kbdScheduler)
-               .Do(whenKeyUp)
-               .Where(x => x.Handled)
-               .Subscribe(LogEvent, Log.HandleException)
-               .AddTo(Anchors);
+                .FromEventPattern<KeyEventHandler, KeyEventArgs>(
+                    h => keyboardMouseEvents.KeyUp += h,
+                    h => keyboardMouseEvents.KeyUp -= h)
+                .Select(x => x.EventArgs)
+                .ObserveOn(kbdScheduler)
+                .Do(whenKeyUp)
+                .Where(x => x.Handled)
+                .Subscribe(LogEvent, Log.HandleException)
+                .AddTo(Anchors);
 
             Observable
-               .FromEventPattern<KeyPressEventHandler, KeyPressEventArgs>(
-                   h => keyboardMouseEvents.KeyPress += h,
-                   h => keyboardMouseEvents.KeyPress -= h)
-               .Select(x => x.EventArgs)
-               .ObserveOn(kbdScheduler)
-               .Do(whenKeyPress)
-               .Where(x => x.Handled)
-               .Subscribe(LogEvent, Log.HandleException)
-               .AddTo(Anchors);
+                .FromEventPattern<KeyPressEventHandler, KeyPressEventArgs>(
+                    h => keyboardMouseEvents.KeyPress += h,
+                    h => keyboardMouseEvents.KeyPress -= h)
+                .Select(x => x.EventArgs)
+                .ObserveOn(kbdScheduler)
+                .Do(whenKeyPress)
+                .Where(x => x.Handled)
+                .Subscribe(LogEvent, Log.HandleException)
+                .AddTo(Anchors);
         }
 
         private void LogEvent(object arg)
@@ -81,6 +81,7 @@ namespace PoeShared.Native
             {
                 return;
             }
+
             Log.Instance.Debug($"[KeyboardEventsSource] {arg.DumpToText(Formatting.None)}");
         }
     }

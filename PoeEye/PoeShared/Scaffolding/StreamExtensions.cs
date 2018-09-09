@@ -1,14 +1,15 @@
 ﻿using System.IO;
 using Guards;
 
-namespace PoeShared.Scaffolding {
+namespace PoeShared.Scaffolding
+{
     public static class StreamExtensions
     {
         public static byte[] ReadToEnd(this Stream instance)
         {
             Guard.ArgumentNotNull(instance, nameof(instance));
 
-            byte[] buffer = new byte[2048];
+            var buffer = new byte[2048];
             using (var ms = new MemoryStream())
             {
                 int bytesRead;

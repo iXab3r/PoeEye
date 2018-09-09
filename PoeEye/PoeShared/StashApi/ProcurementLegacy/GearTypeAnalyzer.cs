@@ -15,6 +15,8 @@ namespace PoeShared.StashApi.ProcurementLegacy
     {
         private static readonly IDictionary<GearType, IEnumerable<string>> GearBaseTypes = new Dictionary<GearType, IEnumerable<string>>();
 
+        private static readonly ConcurrentDictionary<string, Regex> cachedRegexes = new ConcurrentDictionary<string, Regex>();
+
         private readonly IEnumerable<GearTypeRunner> runners;
 
         public GearTypeAnalyzer()
@@ -22,11 +24,11 @@ namespace PoeShared.StashApi.ProcurementLegacy
             GearBaseTypes.Clear();
             var resources = new HashSet<string>
             {
-                "Data.xml",
+                "Data.xml"
             };
 
             var assembly = Assembly.GetExecutingAssembly();
-            foreach (string resource in resources)
+            foreach (var resource in resources)
             {
                 var resourcePath = $"{nameof(StashApi)}.{nameof(ProcurementLegacy)}.{resource}";
                 var resourceData = assembly.ReadResourceAsString(resourcePath);
@@ -41,7 +43,10 @@ namespace PoeShared.StashApi.ProcurementLegacy
 
                 // Get entity nodes
                 var entityNodes = doc.SelectNodes("Data/GearBaseTypes/GearBaseType");
-                if (entityNodes == null) continue;
+                if (entityNodes == null)
+                {
+                    continue;
+                }
 
                 foreach (XmlNode gearBaseTypesNodes in entityNodes)
                 {
@@ -58,14 +63,14 @@ namespace PoeShared.StashApi.ProcurementLegacy
                     }
 
                     GearBaseTypes[gearType] = gearBaseTypesNodes
-                        .SelectNodes("Item")
-                        ?.OfType<XmlNode>()
-                        .Where(x => x.Attributes != null)
-                        .Select(x => x.Attributes["name"]?.InnerText)
-                        .Where(itemName => !string.IsNullOrWhiteSpace(itemName))
-                        .ToArray();
+                                              .SelectNodes("Item")
+                                              ?.OfType<XmlNode>()
+                                              .Where(x => x.Attributes != null)
+                                              .Select(x => x.Attributes["name"]?.InnerText)
+                                              .Where(itemName => !string.IsNullOrWhiteSpace(itemName))
+                                              .ToArray();
                 }
-                
+
                 Log.Instance.Debug($"[GearTypeAnalyzer] Loaded the following ItemTypes:\n\t{GearBaseTypes.DumpToTable()}");
             }
 
@@ -92,7 +97,7 @@ namespace PoeShared.StashApi.ProcurementLegacy
                 new ChestRunner(),
                 new FlaskRunner(),
                 new MapRunner(),
-                new DivinationCardRunner(),
+                new DivinationCardRunner()
             };
         }
 
@@ -101,7 +106,7 @@ namespace PoeShared.StashApi.ProcurementLegacy
             Guard.ArgumentNotNull(itemType, nameof(itemType));
 
             var query = from runner in runners
-                        let compatibleType = new { TypeName = runner.FindCompatibleType(itemType), GearType = runner.Type }
+                        let compatibleType = new {TypeName = runner.FindCompatibleType(itemType), GearType = runner.Type}
                         where !string.IsNullOrWhiteSpace(compatibleType.TypeName)
                         orderby compatibleType.TypeName.Length
                         select runner.Type;
@@ -112,12 +117,12 @@ namespace PoeShared.StashApi.ProcurementLegacy
         public ItemTypeInfo ResolveTypeInfo(string itemNameText)
         {
             var query = from runner in runners
-                let compatibleType = new { TypeName = runner.FindCompatibleType(itemNameText) }
-                where !string.IsNullOrWhiteSpace(compatibleType.TypeName)
-                select new { GearType = runner.Type, ItemType = compatibleType.TypeName };
+                        let compatibleType = new {TypeName = runner.FindCompatibleType(itemNameText)}
+                        where !string.IsNullOrWhiteSpace(compatibleType.TypeName)
+                        select new {GearType = runner.Type, ItemType = compatibleType.TypeName};
             var options = query.ToArray();
             Log.Instance.Debug(options.DumpToTable());
-            
+
             var itemInfo = options.FirstOrDefault();
 
             var resultingName = itemNameText;
@@ -128,16 +133,24 @@ namespace PoeShared.StashApi.ProcurementLegacy
             {
                 resultingName = resultingName.Replace(itemType, string.Empty);
             }
+
             resultingName = resultingName.Trim();
-            
-            return new ItemTypeInfo()
+
+            return new ItemTypeInfo
             {
                 ItemName = resultingName,
                 ItemType = itemType,
                 GearType = itemInfo?.GearType ?? GearType.Unknown
             };
         }
-        
+
+        private static bool ContainsWord(string source, string word)
+        {
+            var regex = cachedRegexes.GetOrAdd(word, x => new Regex($@"(?<=^|\s){word}(?=$|\s)", RegexOptions.Compiled | RegexOptions.IgnoreCase));
+
+            return regex.IsMatch(source);
+        }
+
         internal abstract class GearTypeRunner
         {
             protected GearTypeRunner(GearType gearType)
@@ -174,7 +187,7 @@ namespace PoeShared.StashApi.ProcurementLegacy
                         return typeName;
                     }
                 }
-                
+
                 // check the general types, to see if there is an easy match.
                 foreach (var typeName in generalTypes)
                 {
@@ -183,6 +196,7 @@ namespace PoeShared.StashApi.ProcurementLegacy
                         return typeName;
                     }
                 }
+
                 return null;
             }
         }
@@ -314,10 +328,10 @@ namespace PoeShared.StashApi.ProcurementLegacy
             {
                 generalTypes.AddRange(new List<string>
                 {
-                    "Axe", 
-                    "Chopper", 
-                    "Splitter", 
-                    "Hatchet", 
+                    "Axe",
+                    "Chopper",
+                    "Splitter",
+                    "Hatchet"
                 });
             }
         }
@@ -329,10 +343,10 @@ namespace PoeShared.StashApi.ProcurementLegacy
             {
                 generalTypes.AddRange(new List<string>
                 {
-                    "Fist", 
-                    "Paw", 
+                    "Fist",
+                    "Paw",
                     "Ripper",
-                    "Stabber", 
+                    "Stabber",
                     "Claw",
                     "Gouger"
                 });
@@ -355,9 +369,9 @@ namespace PoeShared.StashApi.ProcurementLegacy
             {
                 generalTypes.AddRange(new List<string>
                 {
-                    "Dagger", 
-                    "Shank", 
-                    "Knife", 
+                    "Dagger",
+                    "Shank",
+                    "Knife",
                     "Skean",
                     "Kris"
                 });
@@ -372,11 +386,11 @@ namespace PoeShared.StashApi.ProcurementLegacy
                 generalTypes.AddRange(
                     new List<string>
                     {
-                        "Club", 
-                        "Mace", 
-                        "Hammer", 
-                        "Maul", 
-                        "Mallet", 
+                        "Club",
+                        "Mace",
+                        "Hammer",
+                        "Maul",
+                        "Mallet"
                     });
             }
         }
@@ -420,7 +434,7 @@ namespace PoeShared.StashApi.ProcurementLegacy
                     {
                         "Sword",
                         "Rapier",
-                        "Foil",
+                        "Foil"
                     });
             }
         }
@@ -443,15 +457,6 @@ namespace PoeShared.StashApi.ProcurementLegacy
                 generalTypes.Add("Wand");
                 generalTypes.Add("Horn");
             }
-        }
-        
-        private static readonly ConcurrentDictionary<string, Regex> cachedRegexes = new ConcurrentDictionary<string, Regex>();
-
-        private static bool ContainsWord(string source, string word)
-        {
-            var regex = cachedRegexes.GetOrAdd(word, x => new Regex($@"(?<=^|\s){word}(?=$|\s)", RegexOptions.Compiled | RegexOptions.IgnoreCase));
-
-            return regex.IsMatch(source);
         }
     }
 }

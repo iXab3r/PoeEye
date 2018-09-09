@@ -9,10 +9,10 @@ namespace PoeBud.Models
     {
         IObservable<string> Messages { [NotNull] get; }
 
-        [NotNull] 
+        [NotNull]
         Task ExecuteSolution([NotNull] IPoeTradeSolution solutionToExecute);
-        
-        [NotNull] 
+
+        [NotNull]
         Task ExecuteSolution([NotNull] IPoeTradeSolution solutionToExecute, CancellationToken token);
     }
 }

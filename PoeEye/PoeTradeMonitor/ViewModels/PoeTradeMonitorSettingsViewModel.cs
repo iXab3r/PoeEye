@@ -16,11 +16,12 @@ namespace PoeEye.TradeMonitor.ViewModels
 {
     internal sealed class PoeTradeMonitorSettingsViewModel : DisposableReactiveObject, ISettingsViewModel<PoeTradeMonitorConfig>
     {
+        private readonly DelegateCommand addMessageCommand;
         private readonly IPoeMacroCommandsProvider commandsProvider;
         private readonly DelegateCommand<MacroMessageViewModel> removeMessageCommand;
-        private readonly DelegateCommand addMessageCommand;
 
         private readonly PoeTradeMonitorConfig temporaryConfig = new PoeTradeMonitorConfig();
+        private bool isEnabled;
 
         public PoeTradeMonitorSettingsViewModel(
             [NotNull] IPoeMacroCommandsProvider commandsProvider,
@@ -43,21 +44,20 @@ namespace PoeEye.TradeMonitor.ViewModels
 
         public IAudioNotificationSelectorViewModel AudioNotificationSelector { get; }
 
-        public string ModuleName { get; } = "Trade Monitor";
-
         public IReactiveList<MacroCommand> MacroCommands => commandsProvider.MacroCommands;
-        private bool isEnabled;
 
         public bool IsEnabled
         {
-            get { return isEnabled; }
-            set { this.RaiseAndSetIfChanged(ref isEnabled, value); }
+            get => isEnabled;
+            set => this.RaiseAndSetIfChanged(ref isEnabled, value);
         }
+
+        public string ModuleName { get; } = "Trade Monitor";
 
         public async Task Load(PoeTradeMonitorConfig config)
         {
             Guard.ArgumentNotNull(config, nameof(config));
-            
+
             config.CopyPropertiesTo(temporaryConfig);
 
             IsEnabled = config.IsEnabled;
@@ -74,15 +74,15 @@ namespace PoeEye.TradeMonitor.ViewModels
         public PoeTradeMonitorConfig Save()
         {
             temporaryConfig.PredefinedMessages = PredefinedMessages
-                .Where(IsValid)
-                .Select(x => x.ToMessage())
-                .ToList();
+                                                 .Where(IsValid)
+                                                 .Select(x => x.ToMessage())
+                                                 .ToList();
             temporaryConfig.IsEnabled = IsEnabled;
             temporaryConfig.NotificationType = AudioNotificationSelector.SelectedValue;
-            
+
             var result = new PoeTradeMonitorConfig();
             temporaryConfig.CopyPropertiesTo(result);
-            
+
             return result;
         }
 
@@ -103,6 +103,7 @@ namespace PoeEye.TradeMonitor.ViewModels
             {
                 return;
             }
+
             RemoveMessage(macroMessage);
         }
 

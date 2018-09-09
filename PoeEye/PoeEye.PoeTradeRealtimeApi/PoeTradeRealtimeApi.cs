@@ -18,11 +18,13 @@ namespace PoeEye.PoeTradeRealtimeApi
 {
     internal sealed class PoeTradeRealtimeApi : DisposableReactiveObject, IPoeApi
     {
-        private readonly PoeTradeApi poeTradeApi;
-        private readonly IFactory<IRealtimeItemSource, IPoeQueryInfo> itemSourceFactory;
         private readonly CompositeDisposable anchors = new CompositeDisposable();
+        private readonly IFactory<IRealtimeItemSource, IPoeQueryInfo> itemSourceFactory;
 
-        private readonly ConcurrentDictionary<IPoeQueryInfo, IRealtimeItemSource> itemSources = new ConcurrentDictionary<IPoeQueryInfo, IRealtimeItemSource>(PoeQueryInfo.Comparer);
+        private readonly ConcurrentDictionary<IPoeQueryInfo, IRealtimeItemSource> itemSources =
+            new ConcurrentDictionary<IPoeQueryInfo, IRealtimeItemSource>(PoeQueryInfo.Comparer);
+
+        private readonly PoeTradeApi poeTradeApi;
 
         public PoeTradeRealtimeApi(
             [NotNull] PoeTradeApi poeTradeApi,
@@ -46,14 +48,19 @@ namespace PoeEye.PoeTradeRealtimeApi
             Log.Instance.Debug($"[PoeTradeRealtimeApi.IssueQuery] Issueing query: {query}");
 
             return Observable
-                .Start(() => IssueQueryInternal(query), Scheduler.Default)
-                .ToTask();
+                   .Start(() => IssueQueryInternal(query), Scheduler.Default)
+                   .ToTask();
         }
 
         public Task<IPoeStaticData> RequestStaticData()
         {
             Log.Instance.Debug($"[PoeTradeRealtimeApi.RequestStaticData] Requesting data...");
             return poeTradeApi.RequestStaticData();
+        }
+
+        public void DisposeQuery(IPoeQueryInfo query)
+        {
+            CleanupSources(query);
         }
 
         private IPoeQueryResult IssueQueryInternal(IPoeQueryInfo query)
@@ -68,14 +75,10 @@ namespace PoeEye.PoeTradeRealtimeApi
             return source.GetResult();
         }
 
-        public void DisposeQuery(IPoeQueryInfo query)
-        {
-            CleanupSources(query);
-        }
-
         private void CleanupSources(params IPoeQueryInfo[] queriesToRemove)
         {
-            Log.Instance.Debug($"[PoeTradeRealtimeApi.CleanupSources] Disposing sources(total sources count: {itemSources.Count}, toDispose: {queriesToRemove.Length})");
+            Log.Instance.Debug(
+                $"[PoeTradeRealtimeApi.CleanupSources] Disposing sources(total sources count: {itemSources.Count}, toDispose: {queriesToRemove.Length})");
 
             foreach (var query in queriesToRemove)
             {

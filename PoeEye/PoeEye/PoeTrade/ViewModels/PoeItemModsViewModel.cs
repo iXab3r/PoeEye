@@ -15,19 +15,19 @@ namespace PoeEye.PoeTrade.ViewModels
 {
     internal sealed class PoeItemModsViewModel : DisposableReactiveObject, IPoeItemModsViewModel
     {
+        private readonly IConverter<IPoeItemMod, string> htmlConverter;
         private string html;
+        private ModHtml[] htmlExplicitMods;
+        private ModHtml[] htmlImplicitMods;
+        private ModHtml[] htmlUnknownMods;
         private IPoeItem item;
         private string rawText;
         private bool useFastRendering;
-        private ModHtml[] htmlImplicitMods;
-        private ModHtml[] htmlExplicitMods;
-        private ModHtml[] htmlUnknownMods;
-        private readonly IConverter<IPoeItemMod, string> htmlConverter;
 
         public PoeItemModsViewModel()
         {
             htmlConverter = (IConverter<IPoeItemMod, string>)Application.Current.FindResource("DefaultPoeItemModToHtmlConverterKey");
-            
+
             this.WhenAnyValue(x => x.Item)
                 .Select(x => x?.Mods ?? new IPoeItemMod[0])
                 .Subscribe(
@@ -48,46 +48,46 @@ namespace PoeEye.PoeTrade.ViewModels
                 .AddTo(Anchors);
         }
 
-        public IPoeItem Item
-        {
-            get { return item; }
-            set { this.RaiseAndSetIfChanged(ref item, value); }
-        }
-        
-        public string Html
-        {
-            get { return html; }
-            private set { this.RaiseAndSetIfChanged(ref html, value); }
-        }
-
-        public string RawText
-        {
-            get { return rawText; }
-            private set { this.RaiseAndSetIfChanged(ref rawText, value); }
-        }
-
         public bool UseFastRendering
         {
-            get { return useFastRendering; }
-            set { this.RaiseAndSetIfChanged(ref useFastRendering, value); }
+            get => useFastRendering;
+            set => this.RaiseAndSetIfChanged(ref useFastRendering, value);
         }
 
         public ModHtml[] HtmlImplicitMods
         {
-            get { return htmlImplicitMods; }
-            set { this.RaiseAndSetIfChanged(ref htmlImplicitMods, value); }
+            get => htmlImplicitMods;
+            set => this.RaiseAndSetIfChanged(ref htmlImplicitMods, value);
         }
 
         public ModHtml[] HtmlExplicitMods
         {
-            get { return htmlExplicitMods; }
-            set { this.RaiseAndSetIfChanged(ref htmlExplicitMods, value); }
+            get => htmlExplicitMods;
+            set => this.RaiseAndSetIfChanged(ref htmlExplicitMods, value);
         }
 
         public ModHtml[] HtmlUnknownMods
         {
-            get { return htmlUnknownMods; }
-            set { this.RaiseAndSetIfChanged(ref htmlUnknownMods, value); }
+            get => htmlUnknownMods;
+            set => this.RaiseAndSetIfChanged(ref htmlUnknownMods, value);
+        }
+
+        public IPoeItem Item
+        {
+            get => item;
+            set => this.RaiseAndSetIfChanged(ref item, value);
+        }
+
+        public string Html
+        {
+            get => html;
+            private set => this.RaiseAndSetIfChanged(ref html, value);
+        }
+
+        public string RawText
+        {
+            get => rawText;
+            private set => this.RaiseAndSetIfChanged(ref rawText, value);
         }
 
         private void RebuildHtmlModList(IPoeItemMod[] mods)
@@ -105,7 +105,7 @@ namespace PoeEye.PoeTrade.ViewModels
 
         private ModHtml ToModHtml(IPoeItemMod mod)
         {
-            return new ModHtml()
+            return new ModHtml
             {
                 Name = htmlConverter.Convert(mod),
                 TierInfo = string.IsNullOrEmpty(mod.TierInfo) ? null : PoeItemModToHtmlConverter.WrapTierInfo(mod.TierInfo, Colors.White)
@@ -127,12 +127,13 @@ namespace PoeEye.PoeTrade.ViewModels
             {
                 result.AppendLine($"-------------------------------------<br/>");
             }
+
             explicitMods.ForEach(mod => result.Append($"{htmlConverter.Convert(mod)}"));
             unknownMods.ForEach(mod => result.Append($"{htmlConverter.Convert(mod)}"));
-            
+
             Html = result.ToString();
         }
-        
+
         private void RebuildText(IPoeItemMod[] mods)
         {
             Guard.ArgumentNotNull(mods, nameof(mods));
@@ -150,16 +151,17 @@ namespace PoeEye.PoeTrade.ViewModels
             {
                 result.AppendLine($"-------------------------------------");
             }
+
             explicitMods.ForEach(x => result.AppendLine($"{x.Name.PadRight(longestName)} {x.TierInfo}"));
             unknownMods.ForEach(x => result.AppendLine($"{x.Name.PadRight(longestName)} {x.TierInfo}"));
-            
-            RawText = result.ToString().Trim('\n','\r', ' ');
+
+            RawText = result.ToString().Trim('\n', '\r', ' ');
         }
-        
+
         public struct ModHtml
         {
             public string Name { get; set; }
-            
+
             public string TierInfo { get; set; }
         }
     }

@@ -12,7 +12,7 @@ namespace PoeBud.Models
         [NotNull]
         ILeague[] GetLeaguesToProcess([NotNull] IEnumerable<ILeague> leagues);
 
-        [NotNull] 
+        [NotNull]
         ILeague[] GetDefaultLeaguesList();
     }
 }

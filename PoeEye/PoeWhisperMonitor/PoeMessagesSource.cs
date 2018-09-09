@@ -14,8 +14,8 @@ namespace PoeWhisperMonitor
 {
     internal sealed class PoeMessagesSource : DisposableReactiveObject, IPoeMessagesSource
     {
-        private readonly IPoeChatMessageProcessor messageProcessor;
         private readonly ICollection<string> linesBuffer = new List<string>();
+        private readonly IPoeChatMessageProcessor messageProcessor;
 
         private readonly ISubject<PoeMessage> messageSubject = new Subject<PoeMessage>();
 

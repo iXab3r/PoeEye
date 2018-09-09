@@ -14,8 +14,9 @@ namespace PoeBud.Converters
         {
             if (value is bool)
             {
-                return ((bool) value) ? TrueValue : FalseValue;
+                return (bool)value ? TrueValue : FalseValue;
             }
+
             return Binding.DoNothing;
         }
 
@@ -25,6 +26,7 @@ namespace PoeBud.Converters
             {
                 return (Visibility)value == TrueValue;
             }
+
             return Binding.DoNothing;
         }
     }

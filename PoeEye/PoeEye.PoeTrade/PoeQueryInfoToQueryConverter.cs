@@ -84,7 +84,7 @@ namespace PoeEye.PoeTrade
                 CreateArgument("elder", ConvertToRaw(source.AffectedByElderState)),
                 CreateArgument("shaper", ConvertToRaw(source.AffectedByShaperState)),
                 CreateArgument("enchanted", ConvertToRaw(source.EnchantState)),
-                CreateArgument("crafted", ConvertToRaw(source.CraftState)),
+                CreateArgument("crafted", ConvertToRaw(source.CraftState))
             };
 
             var groups = source.ModGroups ?? new IPoeQueryModsGroup[0];
@@ -157,7 +157,8 @@ namespace PoeEye.PoeTrade
         {
             var arg = new PoeQueryRangeModArgument(mod)
             {
-                Min = min, Max = max
+                Min = min,
+                Max = max
             };
             return arg;
         }
@@ -181,26 +182,30 @@ namespace PoeEye.PoeTrade
 
             if (typeof(T) == typeof(int?) || typeof(T) == typeof(int))
             {
-                return new PoeQueryIntArgument(name, value is int ? ConvertToType<int>(value) : (int) ConvertToType<int?>(value));
+                return new PoeQueryIntArgument(name, value is int ? ConvertToType<int>(value) : (int)ConvertToType<int?>(value));
             }
+
             if (typeof(T) == typeof(float?))
             {
-                return new PoeQueryFloatArgument(name, value is float ? ConvertToType<float>(value) : (float) ConvertToType<float?>(value));
+                return new PoeQueryFloatArgument(name, value is float ? ConvertToType<float>(value) : (float)ConvertToType<float?>(value));
             }
+
             if (typeof(T) == typeof(string))
             {
                 return new PoeQueryStringArgument(name, ConvertToType<string>(value) ?? string.Empty);
             }
+
             if (typeof(T) == typeof(bool))
             {
                 return new PoeQueryStringArgument(name, ConvertToType<bool>(value) ? "x" : string.Empty);
             }
+
             throw new NotSupportedException($"Type {typeof(T)} is not supported, parameter name: {name}");
         }
 
         private T ConvertToType<T>(object value)
         {
-            return (T) System.Convert.ChangeType(value, typeof(T));
+            return (T)System.Convert.ChangeType(value, typeof(T));
         }
     }
 }

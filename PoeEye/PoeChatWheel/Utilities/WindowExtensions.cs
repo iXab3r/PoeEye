@@ -13,15 +13,15 @@ namespace PoeChatWheel.Utilities
 
         private static void ComputeTopLeft(ref Window window)
         {
-            W32Point pt = new W32Point();
+            var pt = new W32Point();
             if (!GetCursorPos(ref pt))
             {
                 Marshal.ThrowExceptionForHR(Marshal.GetHRForLastWin32Error());
             }
 
             // 0x00000002: return nearest monitor if pt is not contained in any monitor.
-            IntPtr monHandle = MonitorFromPoint(pt, 0x00000002);
-            W32MonitorInfo monInfo = new W32MonitorInfo();
+            var monHandle = MonitorFromPoint(pt, 0x00000002);
+            var monInfo = new W32MonitorInfo();
             monInfo.Size = Marshal.SizeOf(typeof(W32MonitorInfo));
 
             if (!GetMonitorInfo(monHandle, ref monInfo))
@@ -30,17 +30,17 @@ namespace PoeChatWheel.Utilities
             }
 
             // use WorkArea struct to include the taskbar position.
-            W32Rect monitor = monInfo.WorkArea;
-            double offsetX = Math.Round(window.Width / 2);
-            double offsetY = Math.Round(window.Height / 2);
+            var monitor = monInfo.WorkArea;
+            var offsetX = Math.Round(window.Width / 2);
+            var offsetY = Math.Round(window.Height / 2);
 
-            double top = pt.Y - offsetY;
-            double left = pt.X - offsetX;
+            var top = pt.Y - offsetY;
+            var left = pt.X - offsetX;
 
-            Rect screen = new Rect(
+            var screen = new Rect(
                 new Point(monitor.Left, monitor.Top),
                 new Point(monitor.Right, monitor.Bottom));
-            Rect wnd = new Rect(
+            var wnd = new Rect(
                 new Point(left, top),
                 new Point(left + window.Width, top + window.Height));
 
@@ -51,25 +51,25 @@ namespace PoeChatWheel.Utilities
             {
                 if (wnd.Top < screen.Top)
                 {
-                    double diff = Math.Abs(screen.Top - wnd.Top);
+                    var diff = Math.Abs(screen.Top - wnd.Top);
                     window.Top = wnd.Top + diff;
                 }
 
                 if (wnd.Bottom > screen.Bottom)
                 {
-                    double diff = wnd.Bottom - screen.Bottom;
+                    var diff = wnd.Bottom - screen.Bottom;
                     window.Top = wnd.Top - diff;
                 }
 
                 if (wnd.Left < screen.Left)
                 {
-                    double diff = Math.Abs(screen.Left - wnd.Left);
+                    var diff = Math.Abs(screen.Left - wnd.Left);
                     window.Left = wnd.Left + diff;
                 }
 
                 if (wnd.Right > screen.Right)
                 {
-                    double diff = wnd.Right - screen.Right;
+                    var diff = wnd.Right - screen.Right;
                     window.Left = wnd.Left - diff;
                 }
             }

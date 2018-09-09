@@ -1,10 +1,10 @@
 using JetBrains.Annotations;
 
-namespace PoeShared.StashApi.ProcurementLegacy 
+namespace PoeShared.StashApi.ProcurementLegacy
 {
     public interface IItemTypeAnalyzer
     {
-        [CanBeNull] 
+        [CanBeNull]
         ItemTypeInfo ResolveTypeInfo([NotNull] string itemNameText);
     }
 }

@@ -40,20 +40,20 @@ namespace PoeEye.PoeTrade.ViewModels
 
         public int ActiveProxiesCount
         {
-            get { return activeProxiesCount; }
-            set { this.RaiseAndSetIfChanged(ref activeProxiesCount, value); }
+            get => activeProxiesCount;
+            set => this.RaiseAndSetIfChanged(ref activeProxiesCount, value);
         }
 
         public int TotalProxiesCount
         {
-            get { return totalProxiesCount; }
-            set { this.RaiseAndSetIfChanged(ref totalProxiesCount, value); }
+            get => totalProxiesCount;
+            set => this.RaiseAndSetIfChanged(ref totalProxiesCount, value);
         }
 
         public bool IsProxified
         {
-            get { return isProxified; }
-            set { this.RaiseAndSetIfChanged(ref isProxified, value); }
+            get => isProxified;
+            set => this.RaiseAndSetIfChanged(ref isProxified, value);
         }
 
         private void Refresh()

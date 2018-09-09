@@ -16,16 +16,17 @@ namespace PoeShared.PoeControlPanel.Prism
 {
     internal sealed class ControlPanelBootstrapper : DisposableReactiveObject
     {
+        private readonly SerialDisposable activeAnchors = new SerialDisposable();
         private readonly IOverlayWindowController overlayController;
         private readonly IFactory<PoeControlPanelViewModel, IOverlayWindowController> viewModelFactory;
 
-        private readonly SerialDisposable activeAnchors = new SerialDisposable();
-
         public ControlPanelBootstrapper(
-                [NotNull] IConfigProvider<PoeControlPanelConfig> configProvider,
-                [NotNull] [Dependency(WellKnownOverlays.PathOfExileOverlay)] IOverlayWindowController overlayController,
-                [NotNull] IFactory<PoeControlPanelViewModel, IOverlayWindowController> viewModelFactory,
-                [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
+            [NotNull] IConfigProvider<PoeControlPanelConfig> configProvider,
+            [NotNull] [Dependency(WellKnownOverlays.PathOfExileOverlay)]
+            IOverlayWindowController overlayController,
+            [NotNull] IFactory<PoeControlPanelViewModel, IOverlayWindowController> viewModelFactory,
+            [NotNull] [Dependency(WellKnownSchedulers.UI)]
+            IScheduler uiScheduler)
         {
             Guard.ArgumentNotNull(configProvider, nameof(configProvider));
             Guard.ArgumentNotNull(overlayController, nameof(overlayController));

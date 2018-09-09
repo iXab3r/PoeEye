@@ -40,10 +40,8 @@ namespace PoeEye.Converters
             {
                 return Activator.CreateInstance(type);
             }
-            else
-            {
-                return null;
-            }
+
+            return null;
         }
     }
 }

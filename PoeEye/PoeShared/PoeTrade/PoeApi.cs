@@ -11,7 +11,7 @@ namespace PoeShared.PoeTrade
         public abstract Guid Id { get; }
 
         public abstract string Name { get; }
-        
+
         public abstract bool IsAvailable { get; }
 
         public abstract Task<IPoeQueryResult> IssueQuery(IPoeQueryInfo query);

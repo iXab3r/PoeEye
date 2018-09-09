@@ -1,10 +1,11 @@
 ﻿using JetBrains.Annotations;
 using PoeShared.Common;
 
-namespace PoeEye.ItemParser.Services {
+namespace PoeEye.ItemParser.Services
+{
     public interface IPoeItemSerializer
     {
-        [CanBeNull] 
+        [CanBeNull]
         string Serialize([NotNull] IPoeItem item);
     }
 }

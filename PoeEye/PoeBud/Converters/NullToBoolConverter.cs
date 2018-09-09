@@ -35,6 +35,11 @@ namespace PoeBud.Converters
                 : !NullValue;
         }
 
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+
         private bool IsNull(string value)
         {
             return string.IsNullOrWhiteSpace(value);
@@ -50,11 +55,6 @@ namespace PoeBud.Converters
             return collection == null
                 ? true
                 : !collection.OfType<object>().Any();
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException();
         }
     }
 }

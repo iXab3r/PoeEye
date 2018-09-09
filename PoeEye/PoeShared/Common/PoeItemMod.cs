@@ -11,7 +11,7 @@ namespace PoeShared.Common
         public string TierInfo { get; set; }
 
         public PoeModType ModType { get; set; }
-        
+
         public PoeModOrigin Origin { get; set; }
 
         public string Name { get; set; }

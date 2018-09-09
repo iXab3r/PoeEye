@@ -9,7 +9,14 @@ namespace PoeEye.Tests.PoeShared.PoeDatabase.PoeNinja
     public class PoeNinjaDatabaseReaderFixture
     {
         [SetUp]
-        public void SetUp() { }
+        public void SetUp()
+        {
+        }
+
+        private PoeNinjaDatabaseReader CreateInstance()
+        {
+            return new PoeNinjaDatabaseReader(Scheduler.Immediate, Scheduler.Immediate);
+        }
 
         [Test]
         public void ShouldCreate()
@@ -29,11 +36,6 @@ namespace PoeEye.Tests.PoeShared.PoeDatabase.PoeNinja
 
             //Then
             result.Count.ShouldNotBe(0);
-        }
-
-        private PoeNinjaDatabaseReader CreateInstance()
-        {
-            return new PoeNinjaDatabaseReader(Scheduler.Immediate, Scheduler.Immediate);
         }
     }
 }

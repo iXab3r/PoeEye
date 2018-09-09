@@ -3,27 +3,28 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using CefSharp;
 
-namespace PoeShared.Communications.Chromium {
+namespace PoeShared.Communications.Chromium
+{
     internal sealed class BrowserProcessHandler : IBrowserProcessHandler
     {
         /// <summary>
-        /// The maximum number of milliseconds we're willing to wait between calls to OnScheduleMessagePumpWork().
+        ///     The maximum number of milliseconds we're willing to wait between calls to OnScheduleMessagePumpWork().
         /// </summary>
-        protected const int MaxTimerDelay = 1000 / 30;  // 30fps
+        protected const int MaxTimerDelay = 1000 / 30; // 30fps
 
         void IBrowserProcessHandler.OnContextInitialized()
         {
             //The Request Context has been initialized, you can now set preferences, like proxy server settings
             var cookieManager = Cef.GetGlobalCookieManager();
             cookieManager.SetStoragePath("cookies", true);
-            cookieManager.SetSupportedSchemes(new string[] {"custom"});
-            if(cookieManager.SetCookie("custom://cefsharp/home.html", new Cookie
+            cookieManager.SetSupportedSchemes(new[] {"custom"});
+            if (cookieManager.SetCookie("custom://cefsharp/home.html", new Cookie
             {
                 Name = "CefSharpTestCookie",
                 Value = "ILikeCookies",
                 Expires = DateTime.Now.AddDays(1)
             }))
-            { 
+            {
                 cookieManager.VisitUrlCookiesAsync("custom://cefsharp/home.html", false).ContinueWith(previous =>
                 {
                     if (previous.Status == TaskStatus.RanToCompletion)
@@ -31,7 +32,7 @@ namespace PoeShared.Communications.Chromium {
                         var cookies = previous.Result;
 
                         foreach (var cookie in cookies)
-                        { 
+                        {
                             Debug.WriteLine("CookieName:" + cookie.Name);
                         }
                     }
@@ -41,7 +42,7 @@ namespace PoeShared.Communications.Chromium {
                     }
                 });
             }
-            
+
             //Dispose of context when finished - preferable not to keep a reference if possible.
             using (var context = Cef.GetGlobalRequestContext())
             {
@@ -56,21 +57,21 @@ namespace PoeShared.Communications.Chromium {
         {
             //If the delay is greater than the Maximum then use MaxTimerDelay
             //instead - we do this to achieve a minimum number of FPS
-            if(delay > MaxTimerDelay)
+            if (delay > MaxTimerDelay)
             {
                 delay = MaxTimerDelay;
             }
+
             OnScheduleMessagePumpWork((int)delay);
+        }
+
+        public void Dispose()
+        {
         }
 
         protected void OnScheduleMessagePumpWork(int delay)
         {
             //TODO: Schedule work on the UI thread - call Cef.DoMessageLoopWork
-        }
-
-        public void Dispose()
-        {
-            
         }
     }
 }

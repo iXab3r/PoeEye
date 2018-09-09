@@ -11,9 +11,9 @@ namespace PoeEye.TradeMonitor.Models
     {
         private const int MaxInventoryWidth = 12;
         private const int MaxInventoryHeight = 12;
+        private readonly IClock clock;
 
         private readonly IPoeDatabaseReader database;
-        private readonly IClock clock;
 
         private readonly Random rng = new Random();
 
@@ -30,16 +30,15 @@ namespace PoeEye.TradeMonitor.Models
 
         public TradeModel Create()
         {
-
             return new TradeModel
             {
                 Timestamp = clock.Now,
                 CharacterName = "Xaber",
-                ItemPosition = new ItemPosition(rng.Next(0, MaxInventoryWidth), rng.Next(0, MaxInventoryHeight), rng.Next(1,2), rng.Next(1,3)),
-                TradeType = rng.Next(0,100) >= 70 ? TradeType.Buy : TradeType.Sell,
+                ItemPosition = new ItemPosition(rng.Next(0, MaxInventoryWidth), rng.Next(0, MaxInventoryHeight), rng.Next(1, 2), rng.Next(1, 3)),
+                TradeType = rng.Next(0, 100) >= 70 ? TradeType.Buy : TradeType.Sell,
                 League = "League",
                 Price = GetRandomPrice(),
-                TabName = $"Tab #{rng.Next(1,100)}",
+                TabName = $"Tab #{rng.Next(1, 100)}",
                 Offer = rng.Next(0, 100) >= 70 ? $"offer {GetRandomPrice()}" : null,
                 PositionName = database.KnownEntityNames.PickRandom()
             };

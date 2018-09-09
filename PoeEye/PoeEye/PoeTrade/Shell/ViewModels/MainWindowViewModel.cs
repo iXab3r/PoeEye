@@ -40,19 +40,19 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
         private static readonly string ExplorerExecutablePath = Environment.ExpandEnvironmentVariables(@"%WINDIR%\explorer.exe");
 
         private static readonly TimeSpan ConfigSaveSampingTimeout = TimeSpan.FromSeconds(10);
+        private readonly IClipboardManager clipboardManager;
+        private readonly IConfigSerializer configSerializer;
 
         private readonly ISubject<Unit> configUpdateSubject = new Subject<Unit>();
         private readonly IPoeEyeMainConfigProvider poeEyeConfigProvider;
-        private readonly IClipboardManager clipboardManager;
-        private readonly IConfigSerializer configSerializer;
+        private readonly TabablzPositionMonitor<IMainWindowTabViewModel> positionMonitor = new TabablzPositionMonitor<IMainWindowTabViewModel>();
+
+        private readonly CircularBuffer<PoeEyeTabConfig> recentlyClosedQueries = new CircularBuffer<PoeEyeTabConfig>(UndoStackDepth);
 
         private readonly IFactory<IMainWindowTabViewModel> tabFactory;
 
         private readonly ReadOnlyObservableCollection<IMainWindowTabViewModel> tabsList;
         private readonly ISourceList<IMainWindowTabViewModel> tabsListSource = new SourceList<IMainWindowTabViewModel>();
-        private readonly TabablzPositionMonitor<IMainWindowTabViewModel> positionMonitor = new TabablzPositionMonitor<IMainWindowTabViewModel>();
-
-        private readonly CircularBuffer<PoeEyeTabConfig> recentlyClosedQueries = new CircularBuffer<PoeEyeTabConfig>(UndoStackDepth);
 
         private IMainWindowTabViewModel selectedTab;
 
@@ -68,8 +68,10 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
             [NotNull] IWhispersNotificationManager whispersNotificationManager,
             [NotNull] IClipboardManager clipboardManager,
             [NotNull] IConfigSerializer configSerializer,
-            [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler,
-            [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
+            [NotNull] [Dependency(WellKnownSchedulers.Background)]
+            IScheduler bgScheduler,
+            [NotNull] [Dependency(WellKnownSchedulers.UI)]
+            IScheduler uiScheduler)
         {
             Guard.ArgumentNotNull(tabFactory, nameof(tabFactory));
             Guard.ArgumentNotNull(summaryTabFactory, nameof(summaryTabFactory));
@@ -125,12 +127,14 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
 
             OpenAppDataDirectoryCommand = CommandWrapper.Create(OpenAppDataDirectory);
 
-            DuplicateTabCommand = CommandWrapper.Create(new DelegateCommand<IMainWindowTabViewModel>(DuplicateTabCommandExecuted, DuplicateTabCommandCanExecute))
-                .RaiseCanExecuteChangedWhen(this.WhenAnyValue(x => x.SelectedTab).ToUnit());
-            CopyTabToClipboardCommand = CommandWrapper.Create(new DelegateCommand<IMainWindowTabViewModel>(CopyTabToClipboardExecuted, CopyTabToClipboardCommandCanExecute))
-                .RaiseCanExecuteChangedWhen(this.WhenAnyValue(x => x.SelectedTab).ToUnit());
+            DuplicateTabCommand = CommandWrapper
+                                  .Create(new DelegateCommand<IMainWindowTabViewModel>(DuplicateTabCommandExecuted, DuplicateTabCommandCanExecute))
+                                  .RaiseCanExecuteChangedWhen(this.WhenAnyValue(x => x.SelectedTab).ToUnit());
+            CopyTabToClipboardCommand = CommandWrapper
+                                        .Create(new DelegateCommand<IMainWindowTabViewModel>(CopyTabToClipboardExecuted, CopyTabToClipboardCommandCanExecute))
+                                        .RaiseCanExecuteChangedWhen(this.WhenAnyValue(x => x.SelectedTab).ToUnit());
             PasteTabCommand = CommandWrapper.Create(new DelegateCommand(PasteTabCommandExecuted));
-            
+
             CreateNewTabCommand = CommandWrapper.Create(new DelegateCommand(() => CreateNewTabCommandExecuted(default(PoeEyeTabConfig))));
             CloseTabCommand = CommandWrapper.Create(new DelegateCommand<IMainWindowTabViewModel>(RemoveTabCommandExecuted, RemoveTabCommandCanExecute));
             UndoCloseTabCommand = CommandWrapper.Create(new DelegateCommand(UndoCloseTabCommandExecuted, UndoCloseTabCommandCanExecute));
@@ -152,17 +156,71 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
             }
 
             Observable.Merge(
-                    tabsListSource.Connect().ToObservableChangeSet().ToUnit(),
-                    tabsListSource.Connect().WhenPropertyChanged(x => x.SelectedAudioNotificationType).ToUnit(),
-                    tabsListSource.Connect().WhenPropertyChanged(x => x.TabName).ToUnit()
-                )
-                .Subscribe(configUpdateSubject)
-                .AddTo(Anchors);
+                          tabsListSource.Connect().ToObservableChangeSet().ToUnit(),
+                          tabsListSource.Connect().WhenPropertyChanged(x => x.SelectedAudioNotificationType).ToUnit(),
+                          tabsListSource.Connect().WhenPropertyChanged(x => x.TabName).ToUnit()
+                      )
+                      .Subscribe(configUpdateSubject)
+                      .AddTo(Anchors);
 
             configUpdateSubject
                 .Sample(ConfigSaveSampingTimeout)
                 .Subscribe(SaveConfig, Log.HandleException)
                 .AddTo(Anchors);
+        }
+
+        public CommandWrapper CreateNewTabCommand { get; }
+
+        public CommandWrapper CopyTabToClipboardCommand { get; }
+
+        public CommandWrapper DuplicateTabCommand { get; }
+
+        public CommandWrapper UndoCloseTabCommand { get; }
+
+        public CommandWrapper PasteTabCommand { get; }
+
+        public CommandWrapper CloseTabCommand { get; }
+
+        public CommandWrapper RefreshAllTabsCommand { get; }
+
+        public CommandWrapper OpenAppDataDirectoryCommand { get; }
+
+        public ApplicationUpdaterViewModel ApplicationUpdater { get; }
+
+        public ProxyProviderViewModel ProxyProviderViewModel { get; }
+
+        public IPoeChatViewModel Chat { get; }
+
+        public PoeEyeSettingsViewModel Settings { get; }
+
+        public IPoeSummaryTabViewModel SummaryTab { get; }
+
+        public PositionMonitor PositionMonitor => positionMonitor;
+
+        public string MainWindowTitle { get; }
+
+        public IMainWindowTabViewModel SelectedTab
+        {
+            get => selectedTab;
+            set => this.RaiseAndSetIfChanged(ref selectedTab, value);
+        }
+
+        public IReactiveList<IPoeFlyoutViewModel> Flyouts { get; } = new ReactiveList<IPoeFlyoutViewModel>();
+
+        public ReadOnlyObservableCollection<IMainWindowTabViewModel> TabsList => tabsList;
+
+        public override void Dispose()
+        {
+            Log.Instance.Debug($"[MainWindowViewModel.Dispose] Disposing viewmodel...");
+            SaveConfig();
+            foreach (var mainWindowTabViewModel in TabsList)
+            {
+                mainWindowTabViewModel.Dispose();
+            }
+
+            base.Dispose();
+
+            Log.Instance.Debug($"[MainWindowViewModel.Dispose] Viewmodel disposed");
         }
 
 
@@ -201,60 +259,6 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
 
             var cfg = tab.Save();
             CreateNewTabCommandExecuted(cfg);
-        }
-
-        public CommandWrapper CreateNewTabCommand { get; }
-
-        public CommandWrapper CopyTabToClipboardCommand { get; }
-
-        public CommandWrapper DuplicateTabCommand { get; }
-
-        public CommandWrapper UndoCloseTabCommand { get; }
-
-        public CommandWrapper PasteTabCommand { get; }
-
-        public CommandWrapper CloseTabCommand { get; }
-
-        public CommandWrapper RefreshAllTabsCommand { get; }
-
-        public CommandWrapper OpenAppDataDirectoryCommand { get; }
-
-        public ApplicationUpdaterViewModel ApplicationUpdater { get; }
-
-        public ProxyProviderViewModel ProxyProviderViewModel { get; }
-
-        public IPoeChatViewModel Chat { get; }
-
-        public PoeEyeSettingsViewModel Settings { get; }
-
-        public IPoeSummaryTabViewModel SummaryTab { get; }
-
-        public ReadOnlyObservableCollection<IMainWindowTabViewModel> TabsList => tabsList;
-
-        public PositionMonitor PositionMonitor => positionMonitor;
-
-        public string MainWindowTitle { get; }
-
-        public IMainWindowTabViewModel SelectedTab
-        {
-            get => selectedTab;
-            set => this.RaiseAndSetIfChanged(ref selectedTab, value);
-        }
-
-        public IReactiveList<IPoeFlyoutViewModel> Flyouts { get; } = new ReactiveList<IPoeFlyoutViewModel>();
-
-        public override void Dispose()
-        {
-            Log.Instance.Debug($"[MainWindowViewModel.Dispose] Disposing viewmodel...");
-            SaveConfig();
-            foreach (var mainWindowTabViewModel in TabsList)
-            {
-                mainWindowTabViewModel.Dispose();
-            }
-
-            base.Dispose();
-
-            Log.Instance.Debug($"[MainWindowViewModel.Dispose] Viewmodel disposed");
         }
 
         private void OnTabOrderChanged(OrderChangedEventArgs args)
@@ -339,7 +343,7 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
 
         private bool CopyTabToClipboardCommandCanExecute(IMainWindowTabViewModel tab)
         {
-                return tab != null;
+            return tab != null;
         }
 
         private void CopyTabToClipboardExecuted(IMainWindowTabViewModel tab)

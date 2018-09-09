@@ -19,18 +19,20 @@ using ReactiveUI;
 using Squirrel;
 using Unity.Attributes;
 
-namespace PoeEye.PoeTrade.ViewModels {
+namespace PoeEye.PoeTrade.ViewModels
+{
     internal sealed class PoeEyeUpdateSettingsViewModel : DisposableReactiveObject, ISettingsViewModel<PoeEyeUpdateSettingsConfig>
     {
         private bool autoUpdate;
         private PoeEyeUpdateSettingsConfig loadedConfig;
-        private UpdateSourceInfo updateSource;
-        private string username;
-        private string updateSourcePatchNotes;
         private PasswordBox passwordBox;
+        private UpdateSourceInfo updateSource;
+        private string updateSourcePatchNotes;
+        private string username;
 
         public PoeEyeUpdateSettingsViewModel(
-            [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
+            [NotNull] [Dependency(WellKnownSchedulers.UI)]
+            IScheduler uiScheduler)
         {
             Guard.ArgumentNotNull(uiScheduler, nameof(uiScheduler));
 
@@ -48,34 +50,34 @@ namespace PoeEye.PoeTrade.ViewModels {
 
         public bool AutoUpdate
         {
-            get { return autoUpdate; }
-            set { this.RaiseAndSetIfChanged(ref autoUpdate, value); }
+            get => autoUpdate;
+            set => this.RaiseAndSetIfChanged(ref autoUpdate, value);
         }
 
         public UpdateSourceInfo UpdateSource
         {
-            get { return updateSource; }
-            set { this.RaiseAndSetIfChanged(ref updateSource, value); }
+            get => updateSource;
+            set => this.RaiseAndSetIfChanged(ref updateSource, value);
         }
 
         public string Username
         {
-            get { return username; }
-            set { this.RaiseAndSetIfChanged(ref username, value); }
+            get => username;
+            set => this.RaiseAndSetIfChanged(ref username, value);
         }
 
         public PasswordBox PasswordBox
         {
-            get { return passwordBox; }
-            set { this.RaiseAndSetIfChanged(ref passwordBox, value); }
+            get => passwordBox;
+            set => this.RaiseAndSetIfChanged(ref passwordBox, value);
         }
-        
+
         public UpdateSourceInfo[] KnownUpdateSources { get; }
-        
+
         public CommandWrapper TestConnectionCommand { get; }
-        
+
         public string ModuleName { get; } = "Update settings";
-        
+
         public async Task Load(PoeEyeUpdateSettingsConfig config)
         {
             loadedConfig = config;
@@ -88,14 +90,14 @@ namespace PoeEye.PoeTrade.ViewModels {
                 PasswordBox.Password = config.UpdateSource.Password;
             }
         }
-        
+
         public PoeEyeUpdateSettingsConfig Save()
         {
             var result = new PoeEyeUpdateSettingsConfig();
             loadedConfig.CopyPropertiesTo(result);
 
-            result.AutoUpdateTimeout = AutoUpdate 
-                ? PoeEyeUpdateSettingsConfig.DefaultAutoUpdateTimeout 
+            result.AutoUpdateTimeout = AutoUpdate
+                ? PoeEyeUpdateSettingsConfig.DefaultAutoUpdateTimeout
                 : TimeSpan.Zero;
 
             if (updateSource.RequiresAuthentication)
@@ -103,11 +105,12 @@ namespace PoeEye.PoeTrade.ViewModels {
                 updateSource.Username = Username;
                 updateSource.Password = PasswordBox?.Password;
             }
+
             result.UpdateSource = updateSource;
-            
+
             return result;
         }
-        
+
         private async Task TestConnectionCommandExecuted(NetworkCredential credentials)
         {
             TestConnectionCommand.Description = null;

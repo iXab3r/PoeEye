@@ -7,10 +7,10 @@ using Unity;
 
 namespace PoeEye.TradeMonitor
 {
-    class Program
+    internal class Program
     {
         [STAThread]
-        static void Main()
+        private static void Main()
         {
             var arguments = Environment.GetCommandLineArgs();
             if (!AppArguments.Parse(arguments))
@@ -24,11 +24,12 @@ namespace PoeEye.TradeMonitor
                 Log.Instance.Error("Oracle must be started as a separate app only in debug mode");
                 return;
             }
+
             Log.Instance.Warn("Running Oracle in debug mode");
 
-            
+
             var container = new UnityContainer();
-            
+
             var shared = new PoeControlPanelModule(container);
             shared.OnInitialized(null);
 

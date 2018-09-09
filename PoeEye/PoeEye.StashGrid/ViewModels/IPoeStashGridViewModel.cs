@@ -1,8 +1,8 @@
 ﻿using PoeShared.Native;
 
-namespace PoeEye.StashGrid.ViewModels 
+namespace PoeEye.StashGrid.ViewModels
 {
-    public interface IPoeStashGridViewModel : IOverlayViewModel 
+    public interface IPoeStashGridViewModel : IOverlayViewModel
     {
     }
 }

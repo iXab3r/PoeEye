@@ -17,8 +17,8 @@ namespace PoeShared.PoeControlPanel.ViewModels
 {
     internal sealed class PoeControlPanelViewModel : OverlayViewModelBase
     {
-        private readonly IOverlayWindowController controller;
         private readonly IConfigProvider<PoeControlPanelConfig> configProvider;
+        private readonly IOverlayWindowController controller;
 
         public PoeControlPanelViewModel(
             [NotNull] IOverlayWindowController controller,
@@ -46,14 +46,14 @@ namespace PoeShared.PoeControlPanel.ViewModels
             UnlockAllWindowsCommand = new DelegateCommand(UnlockAllWindowsCommandExecuted);
 
             WhenLoaded.Subscribe(
-                    () =>
-                    {
-                        configProvider
-                            .WhenChanged
-                            .Subscribe(ApplyConfig)
-                            .AddTo(Anchors);
-                    })
-                .AddTo(Anchors);
+                          () =>
+                          {
+                              configProvider
+                                  .WhenChanged
+                                  .Subscribe(ApplyConfig)
+                                  .AddTo(Anchors);
+                          })
+                      .AddTo(Anchors);
         }
 
         public ICommand UnlockAllWindowsCommand { get; }
@@ -66,9 +66,9 @@ namespace PoeShared.PoeControlPanel.ViewModels
         protected override void LockWindowCommandExecuted()
         {
             base.LockWindowCommandExecuted();
-            
+
             var config = configProvider.ActualConfig;
-            base.SavePropertiesToConfig(config);
+            SavePropertiesToConfig(config);
             configProvider.Save(config);
         }
 

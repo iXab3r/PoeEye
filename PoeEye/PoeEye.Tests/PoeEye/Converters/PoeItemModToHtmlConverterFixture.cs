@@ -27,29 +27,6 @@ namespace PoeEye.Tests.PoeEye.Converters
                 color = Color.FromRgb((byte)(color.R + 1), (byte)(color.G + 1), (byte)(color.B + 1));
             }
         }
-        
-        [Test]
-        public void ShouldCreate()
-        {
-            //Then
-            CreateInstance();
-        }
-
-        [Test]
-        [TestCaseSource(nameof(ShouldConvertCases))]
-        public void ShouldConvert(IPoeItemMod mod, string expected)
-        {
-            //Given
-            var instance = CreateInstance();
-
-            IEnumerable<Tuple<string, string>> history;
-
-            //When
-            var result = instance.Convert(mod, out history);
-
-            //Then
-            result.ShouldBe(expected, $"History\n{history.DumpToText()}");
-        }
 
         public IEnumerable<TestCaseData> ShouldConvertCases()
         {
@@ -88,47 +65,47 @@ namespace PoeEye.Tests.PoeEye.Converters
                 Wrap("+60% to Chaos Resistance", DataSrc.ChaosRelatedTextColor, DataSrc.DefaultTextColor));
             yield return new TestCaseData(
                 ToMod("10% increased Intelligence"),
-                Wrap("10% increased Intelligence", DataSrc.IntelligenceRelatedTextColor, DataSrc.DefaultTextColor)); 
+                Wrap("10% increased Intelligence", DataSrc.IntelligenceRelatedTextColor, DataSrc.DefaultTextColor));
             yield return new TestCaseData(
                 ToMod("+4 to Intelligence"),
-                Wrap("+4 to Intelligence", DataSrc.IntelligenceRelatedTextColor, DataSrc.DefaultTextColor)); 
+                Wrap("+4 to Intelligence", DataSrc.IntelligenceRelatedTextColor, DataSrc.DefaultTextColor));
             yield return new TestCaseData(
                 ToMod("-4 to Strength"),
-                Wrap("-4 to Strength", DataSrc.StrengthRelatedTextColor, DataSrc.DefaultTextColor)); 
+                Wrap("-4 to Strength", DataSrc.StrengthRelatedTextColor, DataSrc.DefaultTextColor));
             yield return new TestCaseData(
                 ToMod("+4 to Evasion"),
-                Wrap("+4 to Evasion", DataSrc.DexterityRelatedTextColor, DataSrc.DefaultTextColor)); 
+                Wrap("+4 to Evasion", DataSrc.DexterityRelatedTextColor, DataSrc.DefaultTextColor));
             yield return new TestCaseData(
                 ToMod("+4 to Armour"),
-                Wrap("+4 to Armour", DataSrc.StrengthRelatedTextColor, DataSrc.DefaultTextColor)); 
+                Wrap("+4 to Armour", DataSrc.StrengthRelatedTextColor, DataSrc.DefaultTextColor));
             yield return new TestCaseData(
                 ToMod("+4 to maximum Energy Shield"),
-                Wrap("+4 to maximum Energy Shield", DataSrc.IntelligenceRelatedTextColor, DataSrc.DefaultTextColor)); 
+                Wrap("+4 to maximum Energy Shield", DataSrc.IntelligenceRelatedTextColor, DataSrc.DefaultTextColor));
             yield return new TestCaseData(
                 ToMod("10% decreased Strength"),
-                Wrap("10% decreased Strength", DataSrc.StrengthRelatedTextColor, DataSrc.DefaultTextColor)); 
+                Wrap("10% decreased Strength", DataSrc.StrengthRelatedTextColor, DataSrc.DefaultTextColor));
             yield return new TestCaseData(
                 ToMod("10% increased Dexterity"),
-                Wrap("10% increased Dexterity", DataSrc.DexterityRelatedTextColor, DataSrc.DefaultTextColor)); 
+                Wrap("10% increased Dexterity", DataSrc.DexterityRelatedTextColor, DataSrc.DefaultTextColor));
             yield return new TestCaseData(
                 ToMod("Adds 1 Physical Damage to Attacks"),
-                Wrap("Adds 1 Physical Damage to Attacks", DataSrc.PhysicalRelatedTextColor, DataSrc.DefaultTextColor)); 
+                Wrap("Adds 1 Physical Damage to Attacks", DataSrc.PhysicalRelatedTextColor, DataSrc.DefaultTextColor));
             yield return new TestCaseData(
                 ToMod("Adds 1 to 2 Fire Damage"),
                 Wrap("Adds 1 to 2 (~1.5) Fire Damage", DataSrc.FireRelatedTextColor, DataSrc.DefaultTextColor));
             yield return new TestCaseData(
                 ToMod("total: +13% to Fire Resistance"),
                 Wrap(
-                    Wrap(AddGroup("total", DataSrc.DefaultTextColor, DataSrc.TotalGroupColor) + "+13% to Fire Resistance", DataSrc.FireRelatedTextColor), 
+                    Wrap(AddGroup("total", DataSrc.DefaultTextColor, DataSrc.TotalGroupColor) + "+13% to Fire Resistance", DataSrc.FireRelatedTextColor),
                     DataSrc.DefaultTextColor
-                    ));
+                ));
         }
 
         private IPoeItemMod ToMod(string name)
         {
             return Mock.Of<IPoeItemMod>(x => x.Name == name && x.CodeName == name);
         }
-        
+
         private string AddGroup(string input, Color color, Color bgColor)
         {
             return PoeItemModToHtmlConverter.AddGroup(input, color, bgColor);
@@ -144,6 +121,29 @@ namespace PoeEye.Tests.PoeEye.Converters
             var result = new PoeItemModToHtmlConverter();
             DataSrc.TransferPropertiesTo(result);
             return result;
+        }
+
+        [Test]
+        [TestCaseSource(nameof(ShouldConvertCases))]
+        public void ShouldConvert(IPoeItemMod mod, string expected)
+        {
+            //Given
+            var instance = CreateInstance();
+
+            IEnumerable<Tuple<string, string>> history;
+
+            //When
+            var result = instance.Convert(mod, out history);
+
+            //Then
+            result.ShouldBe(expected, $"History\n{history.DumpToText()}");
+        }
+
+        [Test]
+        public void ShouldCreate()
+        {
+            //Then
+            CreateInstance();
         }
     }
 }

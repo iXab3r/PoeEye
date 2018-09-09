@@ -40,30 +40,29 @@ namespace PoeBud.Scaffolding
                 {
                     return 1;
                 }
-                else if (item.ItemType == GearType.Bow)
+
+                if (item.ItemType == GearType.Bow)
                 {
                     return 1;
-                }else
-                {
-                    return 0.5f;
-                };
-            }
-            else
-            {
-                switch (item.ItemType)
-                {
-                    case GearType.Ring:
-                        return 0.5f;
-                    case GearType.Amulet:
-                    case GearType.Helmet:
-                    case GearType.Chest:
-                    case GearType.Belt:
-                    case GearType.Gloves:
-                    case GearType.Boots:
-                        return 1;
-                    default:
-                        return 0;
                 }
+
+                return 0.5f;
+                ;
+            }
+
+            switch (item.ItemType)
+            {
+                case GearType.Ring:
+                    return 0.5f;
+                case GearType.Amulet:
+                case GearType.Helmet:
+                case GearType.Chest:
+                case GearType.Belt:
+                case GearType.Gloves:
+                case GearType.Boots:
+                    return 1;
+                default:
+                    return 0;
             }
         }
 
@@ -81,6 +80,7 @@ namespace PoeBud.Scaffolding
             {
                 return null;
             }
+
             return result - 1; // PoE Stash Idx (left-most tab) = Stash1 
         }
 
@@ -92,11 +92,11 @@ namespace PoeBud.Scaffolding
         public static IStashItem[] GetChaosSetItems(this IStashItem[] items)
         {
             return items
-                .Where(x => x.Rarity == PoeItemRarity.Rare)
-                .Where(x => x.SocketedItems == null || !x.SocketedItems.Any())
-                .Where(x => x.Sockets == null || x.Sockets.Count < 6)
-                .Where(x => x.GetTabIndex() != null)
-                .ToArray();
+                   .Where(x => x.Rarity == PoeItemRarity.Rare)
+                   .Where(x => x.SocketedItems == null || !x.SocketedItems.Any())
+                   .Where(x => x.Sockets == null || x.Sockets.Count < 6)
+                   .Where(x => x.GetTabIndex() != null)
+                   .ToArray();
         }
     }
 }

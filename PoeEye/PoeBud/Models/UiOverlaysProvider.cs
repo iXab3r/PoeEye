@@ -14,7 +14,7 @@ namespace PoeBud.Models
             var assemblyDirectory = Path.GetDirectoryName(assemblyLocation);
             var overlaysDirectory = Path.Combine(assemblyDirectory, "Resources", "Overlays");
 
-            var overlaysList = Directory.Exists(overlaysDirectory) 
+            var overlaysList = Directory.Exists(overlaysDirectory)
                 ? Directory.GetFiles(overlaysDirectory, "*.png")
                 : new string[0];
 
@@ -22,11 +22,11 @@ namespace PoeBud.Models
 
             overlaysList
                 .Select(
-                x => new UiOverlayInfo
-                {
-                    Name = Path.GetFileNameWithoutExtension(x),
-                    AbsolutePath = x,
-                }).ForEach(OverlaysList.Add);
+                    x => new UiOverlayInfo
+                    {
+                        Name = Path.GetFileNameWithoutExtension(x),
+                        AbsolutePath = x
+                    }).ForEach(OverlaysList.Add);
         }
 
         public IReactiveList<UiOverlayInfo> OverlaysList { get; } = new ReactiveList<UiOverlayInfo>();
@@ -34,9 +34,9 @@ namespace PoeBud.Models
 
     public struct UiOverlayInfo
     {
-        public static readonly UiOverlayInfo Empty = new UiOverlayInfo() { Name = "None"};
+        public static readonly UiOverlayInfo Empty = new UiOverlayInfo {Name = "None"};
 
-        public string Name { get; set; } 
+        public string Name { get; set; }
 
         public string AbsolutePath { get; set; }
     }

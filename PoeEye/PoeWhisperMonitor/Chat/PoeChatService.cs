@@ -40,8 +40,8 @@ namespace PoeWhisperMonitor.Chat
             tracker.AddTo(Anchors);
 
             tracker.ActiveProcesses
-                .Subscribe(MakeProcessesSnapshot)
-                .AddTo(Anchors);
+                   .Subscribe(MakeProcessesSnapshot)
+                   .AddTo(Anchors);
 
             var kbdScheduler = schedulerProvider.GetOrCreate("KbdOutput");
             requests
@@ -52,14 +52,14 @@ namespace PoeWhisperMonitor.Chat
 
         public bool IsAvailable
         {
-            get { return isAvailable; }
-            set { this.RaiseAndSetIfChanged(ref isAvailable, value); }
+            get => isAvailable;
+            set => this.RaiseAndSetIfChanged(ref isAvailable, value);
         }
 
         public bool IsBusy
         {
-            get { return isBusy; }
-            set { this.RaiseAndSetIfChanged(ref isBusy, value); }
+            get => isBusy;
+            set => this.RaiseAndSetIfChanged(ref isBusy, value);
         }
 
         public Task<PoeMessageSendStatus> SendMessage(string message)

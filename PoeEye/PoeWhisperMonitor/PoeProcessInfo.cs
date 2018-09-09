@@ -23,7 +23,7 @@ namespace PoeWhisperMonitor
             {
                 unchecked
                 {
-                    return (obj.ProcessId*397) ^ (obj.Executable?.GetHashCode() ?? 0);
+                    return (obj.ProcessId * 397) ^ (obj.Executable?.GetHashCode() ?? 0);
                 }
             }
         }

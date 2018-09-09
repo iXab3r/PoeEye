@@ -9,14 +9,14 @@ namespace PoeBud.Converters
     {
         public static readonly DependencyProperty MinValueProperty = DependencyProperty.Register(
             "MinValue",
-            typeof (IComparable),
-            typeof (IsGreaterThanValueToBooleanConverter),
+            typeof(IComparable),
+            typeof(IsGreaterThanValueToBooleanConverter),
             new PropertyMetadata(default(IComparable)));
 
         public IComparable MinValue
         {
-            get { return (IComparable) GetValue(MinValueProperty); }
-            set { SetValue(MinValueProperty, value); }
+            get => (IComparable)GetValue(MinValueProperty);
+            set => SetValue(MinValueProperty, value);
         }
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)

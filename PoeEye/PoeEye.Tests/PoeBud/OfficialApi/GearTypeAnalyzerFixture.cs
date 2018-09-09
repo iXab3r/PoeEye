@@ -8,6 +8,11 @@ namespace PoeEye.Tests.PoeBud.OfficialApi
     [TestFixture]
     public class GearTypeAnalyzerFixture
     {
+        private GearTypeAnalyzer CreateInstance()
+        {
+            return new GearTypeAnalyzer();
+        }
+
         [Test]
         [TestCase("Mask", GearType.Helmet)]
         [TestCase("Saint's Hauberk", GearType.Chest)]
@@ -23,11 +28,10 @@ namespace PoeEye.Tests.PoeBud.OfficialApi
             //Then
             result.ShouldBe(expected);
         }
-        
+
         [Test]
-        [TestCase("Wraith Sword", GearType.Sword, "",  "Wraith Sword")]
-        [TestCase("Sai", GearType.Dagger, "","Sai")]
-        
+        [TestCase("Wraith Sword", GearType.Sword, "", "Wraith Sword")]
+        [TestCase("Sai", GearType.Dagger, "", "Sai")]
         [TestCase("Superior Dragonscale Doublet", GearType.Chest, "", "Dragonscale Doublet")]
         [TestCase("Soul Sanctuary Ringmail Coat", GearType.Chest, "Soul Sanctuary", "Ringmail Coat")]
         [TestCase("Death Coil Diamond Ring", GearType.Ring, "Death Coil", "Diamond Ring")]
@@ -44,11 +48,6 @@ namespace PoeEye.Tests.PoeBud.OfficialApi
             result.ItemType.ShouldBe(expectedItemType);
             result.GearType.ShouldBe(expectedGearType);
             result.ItemName.ShouldBe(expectedName);
-        }
-
-        private GearTypeAnalyzer CreateInstance()
-        {
-            return new GearTypeAnalyzer();   
         }
     }
 }

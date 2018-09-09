@@ -18,29 +18,30 @@ namespace PoeShared.Scaffolding
             {
                 instance.RegisterSingleton(type, factory);
             }
+
             return instance;
         }
-        
+
         public static IUnityContainer RegisterWindowTracker(this IUnityContainer instance, string dependencyName, Func<string> windowNameFunc)
         {
             return instance
-                 .RegisterType<IWindowTracker>(
-                     dependencyName,
-                     new ContainerControlledLifetimeManager(),
-                     new InjectionFactory(unity => unity.Resolve<WindowTracker>(new DependencyOverride<Func<string>>(windowNameFunc))));
+                .RegisterType<IWindowTracker>(
+                    dependencyName,
+                    new ContainerControlledLifetimeManager(),
+                    new InjectionFactory(unity => unity.Resolve<WindowTracker>(new DependencyOverride<Func<string>>(windowNameFunc))));
         }
 
         public static IUnityContainer RegisterOverlayController(
-            this IUnityContainer instance, 
-            string dependencyName, 
+            this IUnityContainer instance,
+            string dependencyName,
             string windowTrackerDependencyName)
         {
             instance
-                  .RegisterType<IOverlayWindowController>(
-                      dependencyName,
-                      new ContainerControlledLifetimeManager(),
-                      new InjectionFactory(unity => unity.Resolve<OverlayWindowController>(
-                            new DependencyOverride<IWindowTracker>(unity.Resolve<IWindowTracker>(windowTrackerDependencyName)))));
+                .RegisterType<IOverlayWindowController>(
+                    dependencyName,
+                    new ContainerControlledLifetimeManager(),
+                    new InjectionFactory(unity => unity.Resolve<OverlayWindowController>(
+                                             new DependencyOverride<IWindowTracker>(unity.Resolve<IWindowTracker>(windowTrackerDependencyName)))));
 
             return instance;
         }

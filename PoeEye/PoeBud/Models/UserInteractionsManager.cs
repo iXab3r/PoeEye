@@ -14,15 +14,14 @@ namespace PoeBud.Models
 {
     internal sealed class UserInteractionsManager : IUserInteractionsManager
     {
-        private TimeSpan actionDelay;
-
         private readonly IInputSimulator inputSimulator;
         private readonly IUserInputBlocker userInputBlocker;
+        private TimeSpan actionDelay;
 
         public UserInteractionsManager(
-                [NotNull] IInputSimulator inputSimulator,
-                [NotNull] IConfigProvider<PoeBudConfig> configProvider,
-                [NotNull] IUserInputBlocker userInputBlocker)
+            [NotNull] IInputSimulator inputSimulator,
+            [NotNull] IConfigProvider<PoeBudConfig> configProvider,
+            [NotNull] IUserInputBlocker userInputBlocker)
         {
             Guard.ArgumentNotNull(inputSimulator, nameof(inputSimulator));
             Guard.ArgumentNotNull(configProvider, nameof(configProvider));
@@ -88,7 +87,7 @@ namespace PoeBud.Models
         private static class NativeMethods
         {
             [DllImport("user32.dll", CharSet = CharSet.Unicode)]
-            static extern bool SetCursorPos(uint x, uint y);
+            private static extern bool SetCursorPos(uint x, uint y);
 
             public static void SetCursorPos(Point location)
             {

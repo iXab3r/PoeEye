@@ -35,42 +35,42 @@ namespace PoeShared.Scaffolding
 
             winHook.AddTo(Anchors);
             var timerObservable = Observable
-                .Timer(DateTimeOffset.Now, RecheckPeriod)
-                .ToUnit();
+                                  .Timer(DateTimeOffset.Now, RecheckPeriod)
+                                  .ToUnit();
             var hookObservable = winHook
-                .WhenWindowLocationChanged
-                .Sample(MinRecheckPeriod)
-                .ToUnit();
+                                 .WhenWindowLocationChanged
+                                 .Sample(MinRecheckPeriod)
+                                 .ToUnit();
 
-            Observable.Merge(timerObservable, hookObservable)
-                .Select(_ => NativeMethods.GetForegroundWindow())
-                .DistinctUntilChanged()
-                .Subscribe(WindowActivated)
-                .AddTo(Anchors);
+            timerObservable.Merge(hookObservable)
+                           .Select(_ => NativeMethods.GetForegroundWindow())
+                           .DistinctUntilChanged()
+                           .Subscribe(WindowActivated)
+                           .AddTo(Anchors);
         }
 
         public bool IsActive
         {
-            get { return isActive; }
-            private set { this.RaiseAndSetIfChanged(ref isActive, value); }
+            get => isActive;
+            private set => this.RaiseAndSetIfChanged(ref isActive, value);
         }
 
         public IntPtr MatchingWindowHandle
         {
-            get { return windowHandle; }
-            private set { this.RaiseAndSetIfChanged(ref windowHandle, value); }
+            get => windowHandle;
+            private set => this.RaiseAndSetIfChanged(ref windowHandle, value);
         }
 
         public string ActiveWindowTitle
         {
-            get { return activeWindowTitle; }
-            set { this.RaiseAndSetIfChanged(ref activeWindowTitle, value); }
+            get => activeWindowTitle;
+            set => this.RaiseAndSetIfChanged(ref activeWindowTitle, value);
         }
 
         public IntPtr ActiveWindowHandle
         {
-            get { return activeWindowHandle; }
-            set { this.RaiseAndSetIfChanged(ref activeWindowHandle, value); }
+            get => activeWindowHandle;
+            set => this.RaiseAndSetIfChanged(ref activeWindowHandle, value);
         }
 
         public string TargetWindowName => titleMatcherRegexFunc();
@@ -122,7 +122,7 @@ namespace PoeShared.Scaffolding
 
             [DllImport("user32.dll")]
             public static extern IntPtr SetWinEventHook(uint eventMin, uint eventMax, IntPtr hmodWinEventProc,
-                WinEventDelegate lpfnWinEventProc, uint idProcess, uint idThread, uint dwFlags);
+                                                        WinEventDelegate lpfnWinEventProc, uint idProcess, uint idThread, uint dwFlags);
 
             [DllImport("user32.dll")]
             public static extern bool UnhookWinEvent(IntPtr hHook);
@@ -152,7 +152,7 @@ namespace PoeShared.Scaffolding
             public IObservable<IntPtr> WhenWindowLocationChanged => whenWindowLocationChanged;
 
             private void WinResizeEventProc(IntPtr hWinEventHook, uint eventType, IntPtr hwnd, int idObject,
-                int idChild, uint dwEventThread, uint dwmsEventTime)
+                                            int idChild, uint dwEventThread, uint dwmsEventTime)
             {
                 whenWindowLocationChanged.OnNext(hwnd);
             }

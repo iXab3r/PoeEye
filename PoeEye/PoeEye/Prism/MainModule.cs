@@ -19,14 +19,34 @@ namespace PoeEye.Prism
 {
     internal sealed class MainModule : IPoeEyeModule
     {
-        private readonly IUnityContainer container;
         private readonly CompositeDisposable anchors = new CompositeDisposable();
+        private readonly IUnityContainer container;
 
         public MainModule(IUnityContainer container)
         {
             Guard.ArgumentNotNull(container, nameof(container));
 
             this.container = container;
+        }
+
+        public void RegisterTypes(IContainerRegistry containerRegistry)
+        {
+            container.AddExtension(new UiRegistrations());
+        }
+
+        public void OnInitialized(IContainerProvider containerProvider)
+        {
+            var registrator = container.Resolve<IPoeEyeModulesRegistrator>();
+            var domain = AppDomain.CurrentDomain;
+
+            registrator.RegisterSettingsEditor<PoeEyeMainConfig, PoeMainSettingsViewModel>();
+            registrator.RegisterSettingsEditor<PoeEyeUpdateSettingsConfig, PoeEyeUpdateSettingsViewModel>();
+
+            InitializeConfigConverters();
+
+            Log.Instance.Info($"Initializing Chromium...");
+            var chromium = container.Resolve<IChromiumBootstrapper>();
+            chromium.AddTo(anchors);
         }
 
         private void InitializeConfigConverters()
@@ -43,27 +63,6 @@ namespace PoeEye.Prism
                 new ConcreteTypeConverter<IPoeQueryRangeModArgument, PoeQueryRangeModArgument>()
             };
             Array.ForEach(converters, configProvider.RegisterConverter);
-        }
-
-        public void RegisterTypes(IContainerRegistry containerRegistry)
-        {
-            container.AddExtension(new UiRegistrations());
-
-        }
-
-        public void OnInitialized(IContainerProvider containerProvider)
-        {
-            var registrator = container.Resolve<IPoeEyeModulesRegistrator>();
-            var domain = AppDomain.CurrentDomain;
-
-            registrator.RegisterSettingsEditor<PoeEyeMainConfig, PoeMainSettingsViewModel>();
-            registrator.RegisterSettingsEditor<PoeEyeUpdateSettingsConfig, PoeEyeUpdateSettingsViewModel>();
-
-            InitializeConfigConverters();
-            
-            Log.Instance.Info($"Initializing Chromium...");
-            var chromium = container.Resolve<IChromiumBootstrapper>();
-            chromium.AddTo(anchors);
         }
     }
 }

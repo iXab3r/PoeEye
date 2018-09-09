@@ -10,19 +10,19 @@ namespace PoeEye
     {
         private static readonly Lazy<AppArguments> InstanceProducer = new Lazy<AppArguments>();
 
-        public static AppArguments Instance => InstanceProducer.Value;
-
         public static readonly string AppDataDirectory = Environment.ExpandEnvironmentVariables(@"%APPDATA%\PoeEye");
         public static readonly string LocalAppDataDirectory = Environment.ExpandEnvironmentVariables(@"%LOCALAPPDATA%\PoeEye");
         public static readonly string PoeEyeMail = "mail.poeeye@gmail.com";
-        
+
         private bool isDebugMode;
 
-        [Option('d', "debugMode", DefaultValue = false)] 
+        public static AppArguments Instance => InstanceProducer.Value;
+
+        [Option('d', "debugMode", DefaultValue = false)]
         public bool IsDebugMode
         {
-            get { return isDebugMode; }
-            set { this.RaiseAndSetIfChanged(ref isDebugMode, value); }
+            get => isDebugMode;
+            set => this.RaiseAndSetIfChanged(ref isDebugMode, value);
         }
 
         public static bool Parse(string[] args)
@@ -35,7 +35,7 @@ namespace PoeEye
                     settings.ParsingCulture = CultureInfo.InvariantCulture;
                     settings.MutuallyExclusive = false;
                 });
-            return parser.ParseArguments(args ?? new string[0], AppArguments.Instance);
+            return parser.ParseArguments(args ?? new string[0], Instance);
         }
     }
 }

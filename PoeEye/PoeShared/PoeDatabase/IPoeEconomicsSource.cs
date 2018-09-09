@@ -6,7 +6,7 @@ namespace PoeShared.PoeDatabase
 {
     public interface IPoeEconomicsSource
     {
-        [NotNull] 
+        [NotNull]
         IEnumerable<PoePrice> GetCurrenciesInChaosEquivalent([NotNull] string leagueId);
     }
 }

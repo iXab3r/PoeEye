@@ -10,17 +10,17 @@ namespace PoeShared.Scaffolding.WPF
         {
             var values = Enum.GetValues(enumType).Cast<object>();
             var valuesAndDescriptions = from value in values
-                select new EnumValueWithDescription
-                {
-                    Value = value,
-                    Description = value.GetType()
-                        .GetMember(value.ToString())[0]
-                        .GetCustomAttributes(true)
-                        .OfType<DescriptionAttribute>()
-                        .FirstOrDefault()?
-                        .Description ?? value.ToString()
-                };
-            return valuesAndDescriptions.ToArray<>();
+                                        select new EnumValueWithDescription
+                                        {
+                                            Value = value,
+                                            Description = value.GetType()
+                                                               .GetMember(value.ToString())[0]
+                                                               .GetCustomAttributes(true)
+                                                               .OfType<DescriptionAttribute>()
+                                                               .FirstOrDefault()?
+                                                               .Description ?? value.ToString()
+                                        };
+            return valuesAndDescriptions.ToArray();
         }
 
         public static T SetFlags<T>(this T instance, T flagToSet) where T : struct
@@ -29,7 +29,7 @@ namespace PoeShared.Scaffolding.WPF
             var value = Convert.ToUInt64(instance);
             var flag = Convert.ToUInt64(flagToSet);
 
-            return (T) Enum.ToObject(typeof(T), value | flag);
+            return (T)Enum.ToObject(typeof(T), value | flag);
         }
 
         private static void CheckIsEnum<T>(bool withFlags)
@@ -38,6 +38,7 @@ namespace PoeShared.Scaffolding.WPF
             {
                 throw new ArgumentException(string.Format("Type '{0}' is not an enum", typeof(T).FullName));
             }
+
             if (withFlags && !Attribute.IsDefined(typeof(T), typeof(FlagsAttribute)))
             {
                 throw new ArgumentException(string.Format("Type '{0}' doesn't have the 'Flags' attribute", typeof(T).FullName));
@@ -52,13 +53,13 @@ namespace PoeShared.Scaffolding.WPF
             {
                 return null;
             }
-            
+
             var field = typeof(T).GetField(name);
             if (field == null)
             {
                 return null;
             }
-            
+
             var attr = Attribute.GetCustomAttribute(field, typeof(DescriptionAttribute)) as DescriptionAttribute;
             return attr?.Description;
         }

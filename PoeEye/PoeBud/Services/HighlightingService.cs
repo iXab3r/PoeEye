@@ -10,23 +10,23 @@ using PoeEye.StashGrid.Services;
 using PoeShared.Scaffolding;
 using PoeShared.StashApi.DataTypes;
 
-namespace PoeBud.Services 
+namespace PoeBud.Services
 {
     internal sealed class HighlightingService : DisposableReactiveObject, IHighlightingService
     {
         private static readonly Color[] KnownBorderColors =
         {
-            Color.FromRgb(29, 201, 49), 
-            Color.FromRgb(255, 249, 140), 
-            Color.FromRgb(98, 133, 255), 
-            Color.FromRgb(255, 49, 57), 
-            Color.FromRgb(255, 54, 220), 
+            Color.FromRgb(29, 201, 49),
+            Color.FromRgb(255, 249, 140),
+            Color.FromRgb(98, 133, 255),
+            Color.FromRgb(255, 49, 57),
+            Color.FromRgb(255, 54, 220)
         };
-        
-        private readonly IPoeStashHighlightService poeStashHighlightService;
-        
+
         private readonly SerialDisposable activeHighlighting = new SerialDisposable();
-        
+
+        private readonly IPoeStashHighlightService poeStashHighlightService;
+
         public HighlightingService(
             [NotNull] IPoeStashHighlightService poeStashHighlightService)
         {
@@ -40,16 +40,16 @@ namespace PoeBud.Services
         public IDisposable Highlight(IPoeTradeSolution solution, TimeSpan duration)
         {
             var anchors = HighlightInternal(solution);
-            
+
             Observable.Timer(duration).Subscribe(() => anchors.Dispose()).AddTo(anchors);
             return anchors;
         }
-        
+
         public IDisposable Highlight(IPoeTradeSolution solution)
         {
             return HighlightInternal(solution);
         }
-        
+
         private CompositeDisposable HighlightInternal(IPoeTradeSolution solution)
         {
             var anchors = new CompositeDisposable();
@@ -61,11 +61,14 @@ namespace PoeBud.Services
             }
 
             var colorByTab = solution.Items
-                .Select(x => x.Tab)
-                .Distinct(new LambdaComparer<IStashTab>((a, b) => a?.Id == b?.Id))
-                .Select(delegate(IStashTab tab, int idx) { return new {Tab = tab, Colour = KnownBorderColors[idx % KnownBorderColors.Length]}; })
-                .ToDictionary(x => x.Tab.Id, x => x.Colour);
-            
+                                     .Select(x => x.Tab)
+                                     .Distinct(new LambdaComparer<IStashTab>((a, b) => a?.Id == b?.Id))
+                                     .Select(delegate(IStashTab tab, int idx)
+                                     {
+                                         return new {Tab = tab, Colour = KnownBorderColors[idx % KnownBorderColors.Length]};
+                                     })
+                                     .ToDictionary(x => x.Tab.Id, x => x.Colour);
+
             foreach (var item in solution.Items)
             {
                 var controller = poeStashHighlightService.AddHighlight(item.Position, item.Tab.StashType).AddTo(anchors);

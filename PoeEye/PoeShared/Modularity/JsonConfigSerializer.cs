@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
+using System.Runtime.Serialization.Formatters;
 using Guards;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
@@ -12,17 +13,17 @@ namespace PoeShared.Modularity
 {
     internal class JsonConfigSerializer : IConfigSerializer
     {
-        private readonly int MaxCharsToLog = 1024;
-        
-        private JsonSerializerSettings jsonSerializerSettings;
         private readonly IReactiveList<JsonConverter> converters = new ReactiveList<JsonConverter>();
-        
+        private readonly int MaxCharsToLog = 1024;
+
+        private JsonSerializerSettings jsonSerializerSettings;
+
         public JsonConfigSerializer()
         {
             converters.Changed
-                .ToUnit()
-                .StartWith(Unit.Default)
-                .Subscribe(ReinitializeSerializerSettings);
+                      .ToUnit()
+                      .StartWith(Unit.Default)
+                      .Subscribe(ReinitializeSerializerSettings);
         }
 
         public void RegisterConverter(JsonConverter converter)
@@ -42,12 +43,14 @@ namespace PoeShared.Modularity
         public T Deserialize<T>(string serializedData)
         {
             Guard.ArgumentNotNullOrEmpty(() => serializedData);
-            
+
             var result = JsonConvert.DeserializeObject(serializedData, typeof(T), jsonSerializerSettings);
             if (result == null)
             {
-                throw new FormatException($"Operation failed, could not deserialize data to instance of type {typeof(T)}, serialized data: \n{serializedData.Substring(0, Math.Min(MaxCharsToLog, serializedData.Length))}");
+                throw new FormatException(
+                    $"Operation failed, could not deserialize data to instance of type {typeof(T)}, serialized data: \n{serializedData.Substring(0, Math.Min(MaxCharsToLog, serializedData.Length))}");
             }
+
             return (T)result;
         }
 
@@ -73,21 +76,24 @@ namespace PoeShared.Modularity
             {
                 Formatting = Formatting.Indented,
                 TypeNameHandling = TypeNameHandling.All,
-                TypeNameAssemblyFormat = System.Runtime.Serialization.Formatters.FormatterAssemblyStyle.Simple,
+                TypeNameAssemblyFormat = FormatterAssemblyStyle.Simple,
                 Error = HandleSerializerError
             };
 
             converters.ToList().ForEach(jsonSerializerSettings.Converters.Add);
         }
-        
+
         private void HandleSerializerError(object sender, ErrorEventArgs args)
         {
             if (sender == null || args == null)
             {
                 return;
             }
+
             //FIXME Serializer errors should be treated appropriately, e.g. load value from default config on error
-            Log.Instance.Warn($"[PoeEyeConfigProviderFromFile.SerializerError] Suppresing serializer error ! Path: {args.ErrorContext.Path}, Member: {args.ErrorContext.Member}, Handled: {args.ErrorContext.Handled}", args.ErrorContext.Error);
+            Log.Instance.Warn(
+                $"[PoeEyeConfigProviderFromFile.SerializerError] Suppresing serializer error ! Path: {args.ErrorContext.Path}, Member: {args.ErrorContext.Member}, Handled: {args.ErrorContext.Handled}",
+                args.ErrorContext.Error);
             args.ErrorContext.Handled = true;
         }
     }

@@ -32,23 +32,28 @@ namespace PoeShared.Common
             {
                 return "Empty";
             }
+
             var result = new StringBuilder();
             if (X != 0)
             {
                 result.Append($"{nameof(X)}: {X}");
             }
+
             if (Y != 0)
             {
                 result.Append($"{nameof(Y)}: {Y}");
             }
+
             if (Width != 0)
             {
                 result.Append($"{nameof(Width)}: {Width}");
             }
+
             if (Height != 0)
             {
                 result.Append($"{nameof(Height)}: {Height}");
             }
+
             return result.ToString();
         }
     }

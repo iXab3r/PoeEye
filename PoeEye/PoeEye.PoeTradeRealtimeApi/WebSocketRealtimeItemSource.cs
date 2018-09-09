@@ -38,22 +38,25 @@ namespace PoeEye.PoeTradeRealtimeApi
         private static readonly string PoeTradeWebSocketUri = @"ws://live.poe.trade";
         private static readonly TimeSpan WebSocketPingInterval = TimeSpan.FromSeconds(60);
         private static readonly TimeSpan WebSocketGracefulCloseTimeout = TimeSpan.FromSeconds(1);
-        private static readonly string UserAgent = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36";
+
+        private static readonly string UserAgent =
+            "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36";
+
         private static readonly string InitialLiveQueryId = "-1";
+        private readonly IFactory<IHttpClient> clientFactory;
 
         private readonly IClock clock;
-        private readonly IFactory<IHttpClient> clientFactory;
-        private readonly IPoeTradeParser parser;
-        private readonly StateMachine<State, Trigger> queryStateMachine = new StateMachine<State, Trigger>(State.Created);
-        private readonly NameValueCollection queryPostData;
-
-        private readonly StateMachine<State, Trigger>.TriggerWithParameters<string> toNextLiveQueryTransitionTrigger;
-        private readonly StateMachine<State, Trigger>.TriggerWithParameters<string> toLiveQueryTransitionTrigger;
 
         private readonly LockFreeObservableCache<IPoeItem, string> itemsList = new LockFreeObservableCache<IPoeItem, string>();
+        private readonly IPoeTradeParser parser;
+        private readonly string queryLeague;
+        private readonly NameValueCollection queryPostData;
+        private readonly StateMachine<State, Trigger> queryStateMachine = new StateMachine<State, Trigger>(State.Created);
+        private readonly StateMachine<State, Trigger>.TriggerWithParameters<string> toLiveQueryTransitionTrigger;
+
+        private readonly StateMachine<State, Trigger>.TriggerWithParameters<string> toNextLiveQueryTransitionTrigger;
 
         private readonly SerialDisposable webSocketAnchors = new SerialDisposable();
-        private readonly string queryLeague;
 
         private string liveQueryName;
         private string nextLiveQueryId;
@@ -84,9 +87,9 @@ namespace PoeEye.PoeTradeRealtimeApi
             toLiveQueryTransitionTrigger = queryStateMachine.SetTriggerParameters<string>(Trigger.LiveQueryStarted);
 
             queryStateMachine
-                 .Configure(State.Created)
-                 .Permit(Trigger.Dispose, State.Disposed)
-                 .Permit(Trigger.Create, State.AwaitingForInitialRequest);
+                .Configure(State.Created)
+                .Permit(Trigger.Dispose, State.Disposed)
+                .Permit(Trigger.Create, State.AwaitingForInitialRequest);
 
             queryStateMachine
                 .Configure(State.AwaitingForInitialRequest)
@@ -115,13 +118,16 @@ namespace PoeEye.PoeTradeRealtimeApi
             queryLeague = queryInfo.League;
             var query = queryInfoToQueryConverter.Convert(queryInfo);
             queryPostData = queryToPostConverter.Convert(query);
-            Log.Instance.Debug($"Post data for supplied query has been constructed:\n Query: {queryInfo.DumpToText(Formatting.None)}\n Post: {queryPostData.DumpToText(Formatting.None)}");
+            Log.Instance.Debug(
+                $"Post data for supplied query has been constructed:\n Query: {queryInfo.DumpToText(Formatting.None)}\n Post: {queryPostData.DumpToText(Formatting.None)}");
 
             queryStateMachine.Fire(Trigger.Create);
 
-            queryStateMachine.OnTransitioned(x => Log.Instance.Debug($"[RealtimeItemsSource.State] {x.Source} => {x.Trigger} => {x.Destination} (isReentry: {x.IsReentry})"));
-            queryStateMachine.OnUnhandledTrigger((state, trigger) => Log.Instance.Debug($"[RealtimeItemsSource.UnhandledState] Failed to process trigger {trigger}, state: {state}"));
-
+            queryStateMachine.OnTransitioned(
+                x => Log.Instance.Debug($"[RealtimeItemsSource.State] {x.Source} => {x.Trigger} => {x.Destination} (isReentry: {x.IsReentry})"));
+            queryStateMachine.OnUnhandledTrigger((state, trigger) =>
+                                                     Log.Instance.Debug(
+                                                         $"[RealtimeItemsSource.UnhandledState] Failed to process trigger {trigger}, state: {state}"));
         }
 
         public IPoeQueryResult GetResult()
@@ -134,9 +140,9 @@ namespace PoeEye.PoeTradeRealtimeApi
                     break;
             }
 
-            return new PoeQueryResult()
+            return new PoeQueryResult
             {
-                ItemsList = itemsList.Items.ToArray(),
+                ItemsList = itemsList.Items.ToArray()
             };
         }
 
@@ -161,11 +167,11 @@ namespace PoeEye.PoeTradeRealtimeApi
             var client = PrepareClient();
 
             var data = client
-                .Post(PoeTradeSearchUri, queryPostData)
-                .Select(ThrowIfNotParseable)
-                .Select(parser.ParseQueryResponse)
-                .ToTask()
-                .Result;
+                       .Post(PoeTradeSearchUri, queryPostData)
+                       .Select(ThrowIfNotParseable)
+                       .Select(parser.ParseQueryResponse)
+                       .ToTask()
+                       .Result;
             var validItems = data.ItemsList.Where(x => !string.IsNullOrWhiteSpace(x.Hash)).ToArray();
             Log.Instance.Debug($"Initial update contains {data.ItemsList.Length} item(s), of which {validItems.Length} are valid");
 
@@ -243,7 +249,7 @@ namespace PoeEye.PoeTradeRealtimeApi
                 };
 
                 var webSocket = new WebSocket(
-                    liveUri.ToString(), 
+                    liveUri.ToString(),
                     "",
                     cookies,
                     headers,
@@ -251,43 +257,43 @@ namespace PoeEye.PoeTradeRealtimeApi
                     "http://poe.trade",
                     WebSocketVersion.Rfc6455)
                 {
-                    AllowUnstrustedCertificate = true,
+                    AllowUnstrustedCertificate = true
                 };
                 Disposable.Create(() => WebSocketCloseSafe(webSocket, liveQueryName)).AddTo(anchors);
                 webSocket.AddTo(anchors);
 
                 Observable.FromEventPattern<MessageReceivedEventArgs>(
-                        h => webSocket.MessageReceived += h,
-                        h => webSocket.MessageReceived -= h)
-                    .Select(x => x.EventArgs.Message)
-                    .Subscribe(message => HandleWebSocketMessage(message, liveQueryName), ex => HandleWebSocketError(ex, liveQueryName))
-                    .AddTo(anchors);
+                              h => webSocket.MessageReceived += h,
+                              h => webSocket.MessageReceived -= h)
+                          .Select(x => x.EventArgs.Message)
+                          .Subscribe(message => HandleWebSocketMessage(message, liveQueryName), ex => HandleWebSocketError(ex, liveQueryName))
+                          .AddTo(anchors);
 
                 Observable.FromEventPattern<ErrorEventArgs>(
-                       h => webSocket.Error += h,
-                       h => webSocket.Error -= h)
-                   .Select(x => x.EventArgs.Exception)
-                   .Subscribe(ex => HandleWebSocketError(ex, liveQueryName), ex => HandleWebSocketError(ex, liveQueryName))
-                   .AddTo(anchors);
+                              h => webSocket.Error += h,
+                              h => webSocket.Error -= h)
+                          .Select(x => x.EventArgs.Exception)
+                          .Subscribe(ex => HandleWebSocketError(ex, liveQueryName), ex => HandleWebSocketError(ex, liveQueryName))
+                          .AddTo(anchors);
 
                 Observable.FromEventPattern<DataReceivedEventArgs>(
-                        h => webSocket.DataReceived += h,
-                        h => webSocket.DataReceived -= h)
-                    .Select(x => x.EventArgs.Data)
-                    .Subscribe(data => HandleWebSocketData(data ?? new byte[0], liveQueryName), ex => HandleWebSocketError(ex, liveQueryName))
-                    .AddTo(anchors);
+                              h => webSocket.DataReceived += h,
+                              h => webSocket.DataReceived -= h)
+                          .Select(x => x.EventArgs.Data)
+                          .Subscribe(data => HandleWebSocketData(data ?? new byte[0], liveQueryName), ex => HandleWebSocketError(ex, liveQueryName))
+                          .AddTo(anchors);
 
                 Observable.FromEventPattern(
-                        h => webSocket.Opened += h,
-                        h => webSocket.Opened -= h)
-                    .Subscribe(_ => HandleWebSocketOpened(webSocket, liveQueryName), ex => HandleWebSocketError(ex, liveQueryName))
-                    .AddTo(anchors);
+                              h => webSocket.Opened += h,
+                              h => webSocket.Opened -= h)
+                          .Subscribe(_ => HandleWebSocketOpened(webSocket, liveQueryName), ex => HandleWebSocketError(ex, liveQueryName))
+                          .AddTo(anchors);
 
                 Observable.FromEventPattern(
-                        h => webSocket.Closed += h,
-                        h => webSocket.Closed -= h)
-                    .Subscribe(_ => HandleWebSocketClosed(webSocket, liveQueryName), ex => HandleWebSocketError(ex, liveQueryName))
-                    .AddTo(anchors);
+                              h => webSocket.Closed += h,
+                              h => webSocket.Closed -= h)
+                          .Subscribe(_ => HandleWebSocketClosed(webSocket, liveQueryName), ex => HandleWebSocketError(ex, liveQueryName))
+                          .AddTo(anchors);
 
                 Observable
                     .Timer(WebSocketPingInterval, WebSocketPingInterval)
@@ -313,7 +319,7 @@ namespace PoeEye.PoeTradeRealtimeApi
                 queryStateMachine.Fire(Trigger.LiveQueryFailed);
             }
         }
-        
+
         private void WebSocketCloseSafe(WebSocket webSocket, string liveQueryId)
         {
             try
@@ -322,9 +328,9 @@ namespace PoeEye.PoeTradeRealtimeApi
                 webSocket.Close();
 
                 var gracefulClose = Observable.FromEventPattern(
-                        h => webSocket.Closed += h,
-                        h => webSocket.Closed -= h)
-                    .Take(1);
+                                                  h => webSocket.Closed += h,
+                                                  h => webSocket.Closed -= h)
+                                              .Take(1);
 
                 var dueTime = clock.Now + WebSocketGracefulCloseTimeout;
                 gracefulClose.Timeout(dueTime).Wait();
@@ -343,7 +349,7 @@ namespace PoeEye.PoeTradeRealtimeApi
         {
             Log.Instance.Debug($"[WebSocket] [{liveQueryId}] Socket opened");
 
-            var versionMessage = new WsGenericOperation { OperationType = WsOperationType.Version, Value = 3 };
+            var versionMessage = new WsGenericOperation {OperationType = WsOperationType.Version, Value = 3};
 
             WebSocketSend(webSocket, liveQueryId, versionMessage);
             WebSocketSend(webSocket, liveQueryId, "ping");
@@ -440,15 +446,15 @@ namespace PoeEye.PoeTradeRealtimeApi
             Guard.ArgumentNotNull(nextLiveQueryId, nameof(nextLiveQueryId));
 
             var client = PrepareClient();
-            
+
             try
             {
                 var liveQueryUri = new Uri($"{PoeTradeSearchUri}/{liveQueryName}/live");
                 Log.Instance.Debug($"Issueing live query, uri: {liveQueryUri}");
                 var rawData = client
-                    .Post(liveQueryUri.AbsoluteUri, new NameValueCollection { { "id", nextLiveQueryId } })
-                    .ToTask()
-                    .Result;
+                              .Post(liveQueryUri.AbsoluteUri, new NameValueCollection {{"id", nextLiveQueryId}})
+                              .ToTask()
+                              .Result;
 
                 var result = JToken.Parse(rawData);
                 Log.Instance.Debug($"Live query response: {result.DumpToText(Formatting.None)}");
@@ -467,7 +473,8 @@ namespace PoeEye.PoeTradeRealtimeApi
                     var data = parser.ParseQueryResponse(itemsData);
 
                     var validItems = data.ItemsList.EmptyIfNull().Where(x => !string.IsNullOrWhiteSpace(x.Hash)).ToArray();
-                    Log.Instance.Debug($"Extracted {data.ItemsList.Length} from live query response(expected: {itemsCount}), of which {validItems.Length} are valid");
+                    Log.Instance.Debug(
+                        $"Extracted {data.ItemsList.Length} from live query response(expected: {itemsCount}), of which {validItems.Length} are valid");
 
                     var itemsToRemove = validItems.Where(x => x.ItemState == PoeTradeState.Removed).ToArray();
                     var itemsToAdd = validItems.Where(x => x.ItemState != PoeTradeState.Removed).ToArray();
@@ -503,7 +510,7 @@ namespace PoeEye.PoeTradeRealtimeApi
             Created,
             AwaitingForInitialRequest,
             LiveQuery,
-            Disposed,
+            Disposed
         }
 
         private enum Trigger
@@ -548,20 +555,15 @@ namespace PoeEye.PoeTradeRealtimeApi
         {
             Unknown,
 
-            [EnumMember(Value = "subscribe")]
-            Subscribe,
+            [EnumMember(Value = "subscribe")] Subscribe,
 
-            [EnumMember(Value = "del")]
-            Delete,
+            [EnumMember(Value = "del")] Delete,
 
-            [EnumMember(Value = "notify")]
-            Notify,
+            [EnumMember(Value = "notify")] Notify,
 
-            [EnumMember(Value = "version")]
-            Version,
+            [EnumMember(Value = "version")] Version,
 
-            [EnumMember(Value = "pong")]
-            Pong
+            [EnumMember(Value = "pong")] Pong
         }
     }
 }

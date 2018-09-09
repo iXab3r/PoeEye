@@ -6,7 +6,8 @@ namespace PoeWhisperMonitor.Chat
 {
     internal sealed class PoeChatMessageProcessor : IPoeChatMessageProcessor
     {
-        private readonly Regex logRecordRegex = new Regex(@"^(?'timestamp'\d\d\d\d\/\d\d\/\d\d \d\d:\d\d:\d\d)( \w+ \w+ \[.*?\] :? ?)?(?'content'.*)$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private readonly Regex logRecordRegex = new Regex(@"^(?'timestamp'\d\d\d\d\/\d\d\/\d\d \d\d:\d\d:\d\d)( \w+ \w+ \[.*?\] :? ?)?(?'content'.*)$",
+                                                          RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         private readonly Regex messageParseRegex = new Regex(
             @"^(?'prefix'[$&%]|@From|@To)?\s?(?:\<(?'guild'.*?)\> )?(?'name'.*?):\s*(?'message'.*)$",

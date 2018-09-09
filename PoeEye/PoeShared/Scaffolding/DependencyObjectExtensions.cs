@@ -14,7 +14,7 @@ namespace PoeShared.Scaffolding
             return Observable.Create<EventArgs>(observer =>
             {
                 EventHandler update = (sender, args) => observer.OnNext(args);
-                
+
                 var property = DependencyPropertyDescriptor.FromProperty(dependencyProperty, typeof(T));
                 property.AddValueChanged(component, update);
                 return Disposable.Create(() => property.RemoveValueChanged(component, update));

@@ -22,7 +22,8 @@ namespace PoeEye.PoeTrade.Models
         public WhispersNotificationManager(
             [NotNull] IPoeWhisperService whisperService,
             [NotNull] IPoeEyeMainConfigProvider poeEyeConfigProvider,
-            [NotNull] [Dependency(WellKnownWindows.PathOfExileWindow)] IWindowTracker poeWindowTracker,
+            [NotNull] [Dependency(WellKnownWindows.PathOfExileWindow)]
+            IWindowTracker poeWindowTracker,
             [NotNull] IAudioNotificationsManager audioNotificationsManager)
         {
             Guard.ArgumentNotNull(whisperService, nameof(whisperService));
@@ -33,11 +34,11 @@ namespace PoeEye.PoeTrade.Models
             this.audioNotificationsManager = audioNotificationsManager;
 
             whisperService.Messages
-                    .Where(x => poeEyeConfigProvider.ActualConfig.WhisperNotificationsEnabled)
-                    .Where(x => !poeWindowTracker.IsActive)
-                    .Where(x => x.MessageType == PoeMessageType.WhisperIncoming)
-                    .Subscribe(ProcessWhisper)
-                    .AddTo(Anchors);
+                          .Where(x => poeEyeConfigProvider.ActualConfig.WhisperNotificationsEnabled)
+                          .Where(x => !poeWindowTracker.IsActive)
+                          .Where(x => x.MessageType == PoeMessageType.WhisperIncoming)
+                          .Subscribe(ProcessWhisper)
+                          .AddTo(Anchors);
         }
 
         private void ProcessWhisper(PoeMessage message)

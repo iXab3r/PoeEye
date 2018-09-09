@@ -13,6 +13,6 @@ namespace PoeBud.Models
         }
 
         [DllImport("user32.dll")]
-        static extern bool BlockInput(bool blockInput);
+        private static extern bool BlockInput(bool blockInput);
     }
 }

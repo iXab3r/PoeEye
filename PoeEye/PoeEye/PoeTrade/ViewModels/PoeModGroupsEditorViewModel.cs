@@ -10,15 +10,16 @@ using PoeShared.Prism;
 using PoeShared.Scaffolding;
 using ReactiveUI;
 using ReactiveUI.Legacy;
+using ReactiveCommand = ReactiveUI.Legacy.ReactiveCommand;
 
 namespace PoeEye.PoeTrade.ViewModels
 {
     internal sealed class PoeModGroupsEditorViewModel : DisposableReactiveObject, IPoeModGroupsEditorViewModel
     {
-        private readonly ReactiveCommand<object> addGrpCommand = ReactiveUI.Legacy.ReactiveCommand.Create();
-        private readonly ReactiveCommand<object> removeGrpCommand = ReactiveUI.Legacy.ReactiveCommand.Create();
-        private readonly IPoeStaticDataSource staticDataSource;
+        private readonly ReactiveCommand<object> addGrpCommand = ReactiveCommand.Create();
         private readonly IFactory<PoeModsEditorViewModel, IPoeStaticDataSource> groupsFactory;
+        private readonly ReactiveCommand<object> removeGrpCommand = ReactiveCommand.Create();
+        private readonly IPoeStaticDataSource staticDataSource;
 
         public PoeModGroupsEditorViewModel(
             [NotNull] IPoeStaticDataSource staticDataSource,

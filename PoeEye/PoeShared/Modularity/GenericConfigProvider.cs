@@ -21,26 +21,26 @@ namespace PoeShared.Modularity
 
             this.configProvider = configProvider;
             configProvider.ConfigHasChanged
-                .StartWith(Unit.Default)
-                .Subscribe(ReloadInternal)
-                .AddTo(Anchors);
+                          .StartWith(Unit.Default)
+                          .Subscribe(ReloadInternal)
+                          .AddTo(Anchors);
 
             //FIXME Use ReplaySubject for propagating active config
             var changes = this
-                .WhenAnyValue(x => x.ActualConfig)
-                .WithPrevious((prev, curr) => new { prev, curr })
-                .Select(x => new { Config = x.curr, PreviousConfig = x.prev, ComparisonResult = Compare(x.curr, x.prev) })
-                .Where(x => !x.ComparisonResult.AreEqual)
-                .Do(
-                    x =>
-                    {
-                        if (x.PreviousConfig != null)
-                        {
-                            LogConfigChange(x.Config, x.ComparisonResult);
-                        }
-                    })
-                .Select(x => x.Config)
-                .Replay(1);
+                          .WhenAnyValue(x => x.ActualConfig)
+                          .WithPrevious((prev, curr) => new {prev, curr})
+                          .Select(x => new {Config = x.curr, PreviousConfig = x.prev, ComparisonResult = Compare(x.curr, x.prev)})
+                          .Where(x => !x.ComparisonResult.AreEqual)
+                          .Do(
+                              x =>
+                              {
+                                  if (x.PreviousConfig != null)
+                                  {
+                                      LogConfigChange(x.Config, x.ComparisonResult);
+                                  }
+                              })
+                          .Select(x => x.Config)
+                          .Replay(1);
 
             WhenChanged = changes;
             changes.Connect().AddTo(Anchors);
@@ -48,8 +48,8 @@ namespace PoeShared.Modularity
 
         public TConfig ActualConfig
         {
-            get { return actualConfig; }
-            private set { this.RaiseAndSetIfChanged(ref actualConfig, value); }
+            get => actualConfig;
+            private set => this.RaiseAndSetIfChanged(ref actualConfig, value);
         }
 
         public IObservable<TConfig> WhenChanged { get; }
@@ -58,7 +58,7 @@ namespace PoeShared.Modularity
         {
             var functor = fieldToMonitor.Compile();
             return
-                this.WhenChanged
+                WhenChanged
                     .Select(config => functor(config))
                     .DistinctUntilChanged();
         }
@@ -86,7 +86,8 @@ namespace PoeShared.Modularity
 
         private void LogConfigChange(TConfig config, ComparisonResult result)
         {
-            Log.Instance.Debug($"[GenericConfigProvider.{typeof(TConfig).Name}] Config has changed:\nTime spent by comparer: {result.ElapsedMilliseconds}ms\n{result.DifferencesString}");
+            Log.Instance.Debug(
+                $"[GenericConfigProvider.{typeof(TConfig).Name}] Config has changed:\nTime spent by comparer: {result.ElapsedMilliseconds}ms\n{result.DifferencesString}");
         }
 
         private void ReloadInternal()

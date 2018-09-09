@@ -15,18 +15,20 @@ namespace PoeEye.TradeMonitor.ViewModels
             FromMessage(message);
         }
 
-        public MacroMessageViewModel() {}
+        public MacroMessageViewModel()
+        {
+        }
 
         public string Text
         {
-            get { return text; }
-            set { this.RaiseAndSetIfChanged(ref text, value); }
+            get => text;
+            set => this.RaiseAndSetIfChanged(ref text, value);
         }
 
         public string Label
         {
-            get { return label; }
-            set { this.RaiseAndSetIfChanged(ref label, value); }
+            get => label;
+            set => this.RaiseAndSetIfChanged(ref label, value);
         }
 
         public void FromMessage(MacroMessage message)

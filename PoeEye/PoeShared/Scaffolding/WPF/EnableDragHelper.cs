@@ -19,7 +19,8 @@ namespace PoeShared.Scaffolding.WPF
             {
                 return;
             }
-            if ((bool) dependencyPropertyChangedEventArgs.NewValue)
+
+            if ((bool)dependencyPropertyChangedEventArgs.NewValue)
             {
                 uiElement.MouseMove += UIElementOnMouseMove;
             }
@@ -56,6 +57,7 @@ namespace PoeShared.Scaffolding.WPF
                     return;
                 }
             }
+
             var window = parent as Window;
             window.DragMove();
         }
@@ -67,7 +69,7 @@ namespace PoeShared.Scaffolding.WPF
 
         public static bool GetEnableDrag(DependencyObject element)
         {
-            return (bool) element.GetValue(EnableDragProperty);
+            return (bool)element.GetValue(EnableDragProperty);
         }
     }
 }

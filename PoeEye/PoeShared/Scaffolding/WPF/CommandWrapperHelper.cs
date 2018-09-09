@@ -13,7 +13,8 @@ namespace PoeShared.Scaffolding.WPF
             new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender | FrameworkPropertyMetadataOptions.Inherits));
 
         public static readonly DependencyProperty IsDefaultProperty = DependencyProperty.RegisterAttached(
-            "IsDefault", typeof(bool), typeof(CommandWrapperHelper), new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.AffectsRender | FrameworkPropertyMetadataOptions.Inherits));
+            "IsDefault", typeof(bool), typeof(CommandWrapperHelper),
+            new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.AffectsRender | FrameworkPropertyMetadataOptions.Inherits));
 
         public static void SetText(DependencyObject element, string value)
         {
@@ -22,7 +23,7 @@ namespace PoeShared.Scaffolding.WPF
 
         public static string GetText(DependencyObject element)
         {
-            return (string) element.GetValue(TextProperty);
+            return (string)element.GetValue(TextProperty);
         }
 
         public static void SetCommandParameter(DependencyObject element, object value)
@@ -42,7 +43,7 @@ namespace PoeShared.Scaffolding.WPF
 
         public static bool GetIsDefault(DependencyObject element)
         {
-            return (bool) element.GetValue(IsDefaultProperty);
+            return (bool)element.GetValue(IsDefaultProperty);
         }
     }
 }

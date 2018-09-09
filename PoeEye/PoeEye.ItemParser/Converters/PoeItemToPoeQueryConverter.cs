@@ -56,11 +56,11 @@ namespace PoeEye.ItemParser.Converters
                 }
 
                 var values = match
-                    .Groups
-                    .OfType<Group>()
-                    .Skip(1)
-                    .Select(x => x.Value)
-                    .ToArray();
+                             .Groups
+                             .OfType<Group>()
+                             .Skip(1)
+                             .Select(x => x.Value)
+                             .ToArray();
 
                 if (values.Length > 1)
                 {
@@ -80,8 +80,8 @@ namespace PoeEye.ItemParser.Converters
                 var minRange = parsedValue - valueRangeModifier * parsedValue;
                 var maxRange = parsedValue + valueRangeModifier * parsedValue;
 
-                result.Min = (float) Math.Round(minRange, 1);
-                result.Max = (float) Math.Round(maxRange, 1);
+                result.Min = (float)Math.Round(minRange, 1);
+                result.Max = (float)Math.Round(maxRange, 1);
             }
 
             return result;

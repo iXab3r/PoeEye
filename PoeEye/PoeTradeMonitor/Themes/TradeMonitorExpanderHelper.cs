@@ -6,7 +6,8 @@ namespace PoeEye.TradeMonitor.Themes
     internal sealed class TradeMonitorExpanderHelper
     {
         public static readonly DependencyProperty ExpanderDirectionProperty = DependencyProperty.RegisterAttached(
-            "ExpanderDirection", typeof(ExpandDirection), typeof(TradeMonitorExpanderHelper), new FrameworkPropertyMetadata(ExpandDirection.Down, FrameworkPropertyMetadataOptions.Inherits));
+            "ExpanderDirection", typeof(ExpandDirection), typeof(TradeMonitorExpanderHelper),
+            new FrameworkPropertyMetadata(ExpandDirection.Down, FrameworkPropertyMetadataOptions.Inherits));
 
         public static readonly DependencyProperty ExpandOnHoverProperty = DependencyProperty.RegisterAttached(
             "ExpandOnHover", typeof(bool), typeof(TradeMonitorExpanderHelper), new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.Inherits));
@@ -18,7 +19,7 @@ namespace PoeEye.TradeMonitor.Themes
 
         public static ExpandDirection GetExpanderDirection(DependencyObject element)
         {
-            return (ExpandDirection) element.GetValue(ExpanderDirectionProperty);
+            return (ExpandDirection)element.GetValue(ExpanderDirectionProperty);
         }
 
         public static void SetExpandOnHover(DependencyObject element, bool value)
@@ -28,7 +29,7 @@ namespace PoeEye.TradeMonitor.Themes
 
         public static bool GetExpandOnHover(DependencyObject element)
         {
-            return (bool) element.GetValue(ExpandOnHoverProperty);
+            return (bool)element.GetValue(ExpandOnHoverProperty);
         }
     }
 }

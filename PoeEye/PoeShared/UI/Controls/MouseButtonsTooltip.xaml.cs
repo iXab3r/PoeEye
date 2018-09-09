@@ -24,20 +24,20 @@ namespace PoeShared.Scaffolding.WPF.Controls
 
         public string LeftButton
         {
-            get { return (string) GetValue(LeftButtonProperty); }
-            set { SetValue(LeftButtonProperty, value); }
+            get => (string)GetValue(LeftButtonProperty);
+            set => SetValue(LeftButtonProperty, value);
         }
 
         public string RightButton
         {
-            get { return (string) GetValue(RightButtonProperty); }
-            set { SetValue(RightButtonProperty, value); }
+            get => (string)GetValue(RightButtonProperty);
+            set => SetValue(RightButtonProperty, value);
         }
 
         public object MouseToolTip
         {
-            get { return GetValue(MouseToolTipProperty); }
-            set { SetValue(MouseToolTipProperty, value); }
+            get => GetValue(MouseToolTipProperty);
+            set => SetValue(MouseToolTipProperty, value);
         }
     }
 }

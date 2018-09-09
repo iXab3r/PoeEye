@@ -1,4 +1,4 @@
-﻿ namespace PoeBud.Models
+﻿namespace PoeBud.Models
 {
     internal interface IPoeWindowManager
     {

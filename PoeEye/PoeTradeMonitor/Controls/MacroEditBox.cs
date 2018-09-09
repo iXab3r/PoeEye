@@ -71,12 +71,14 @@ namespace PoeEye.TradeMonitor.Controls
             {
                 TextArea.DefaultInputHandler.CommandBindings.Remove(binding);
             }
+
             foreach (
                 var binding in
                 TextArea.DefaultInputHandler.InputBindings.Where(x => commandsToRemove.Contains(x.Command)).ToArray())
             {
                 TextArea.DefaultInputHandler.InputBindings.Remove(binding);
             }
+
             foreach (
                 var binding in
                 TextArea.DefaultInputHandler.CaretNavigation.CommandBindings.Where(
@@ -84,6 +86,7 @@ namespace PoeEye.TradeMonitor.Controls
             {
                 TextArea.DefaultInputHandler.CaretNavigation.CommandBindings.Remove(binding);
             }
+
             foreach (
                 var binding in
                 TextArea.DefaultInputHandler.CaretNavigation.InputBindings.Where(
@@ -99,30 +102,28 @@ namespace PoeEye.TradeMonitor.Controls
 
         public IReactiveList<MacroCommand> MacroCommands
         {
-            get { return (IReactiveList<MacroCommand>) GetValue(MacroCommandsProperty); }
-            set { SetValue(MacroCommandsProperty, value); }
+            get => (IReactiveList<MacroCommand>)GetValue(MacroCommandsProperty);
+            set => SetValue(MacroCommandsProperty, value);
         }
 
         public Style CompletionListStyle
         {
-            get { return (Style) GetValue(CompletionListStyleProperty); }
-            set { SetValue(CompletionListStyleProperty, value); }
+            get => (Style)GetValue(CompletionListStyleProperty);
+            set => SetValue(CompletionListStyleProperty, value);
         }
 
         private void TextAreaOnTextEntered(object sender, TextCompositionEventArgs textCompositionEventArgs)
         {
             if (textCompositionEventArgs.Text == "/")
             {
-                completionWindow = new CompletionWindow(TextArea)
-                {
-                };
+                completionWindow = new CompletionWindow(TextArea);
                 completionWindow.CompletionList.Style = CompletionListStyle;
 
                 var data = completionWindow.CompletionList.CompletionData;
                 data.Clear();
                 MacroCommands.EmptyIfNull()
-                    .Select(x => new MacroCommandCompletionData(x))
-                    .ForEach(data.Add);
+                             .Select(x => new MacroCommandCompletionData(x))
+                             .ForEach(data.Add);
 
                 completionWindow.CompletionList.SelectedItem = data.FirstOrDefault();
 
@@ -132,13 +133,14 @@ namespace PoeEye.TradeMonitor.Controls
         }
 
         private static void PropertyChangedCallback(DependencyObject dependencyObject,
-            DependencyPropertyChangedEventArgs dependencyPropertyChangedEventArgs)
+                                                    DependencyPropertyChangedEventArgs dependencyPropertyChangedEventArgs)
         {
             var editor = dependencyObject as MacroEditBox;
             if (editor == null)
             {
                 return;
             }
+
             editor.TextArea.TextView.Redraw();
         }
 
@@ -192,10 +194,10 @@ namespace PoeEye.TradeMonitor.Controls
             {
                 var commands = commandsSupplier();
                 var match = commands
-                    .EmptyIfNull()
-                    .Select(x => x.TryToMatch(text))
-                    .Where(x => x.Success)
-                    .ToArray();
+                            .EmptyIfNull()
+                            .Select(x => x.TryToMatch(text))
+                            .Where(x => x.Success)
+                            .ToArray();
 
                 return match.Length > 0 ? match[0] : Match.Empty;
             }
@@ -217,6 +219,7 @@ namespace PoeEye.TradeMonitor.Controls
                 {
                     return null;
                 }
+
                 var border = new Border
                 {
                     BorderThickness = new Thickness(1),

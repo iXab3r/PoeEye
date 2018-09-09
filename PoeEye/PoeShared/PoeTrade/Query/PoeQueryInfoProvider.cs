@@ -23,14 +23,14 @@ namespace PoeShared.PoeTrade.Query
 
         public IPoeStaticData StaticData
         {
-            get { return staticData; }
-            set { this.RaiseAndSetIfChanged(ref staticData, value); }
-        } 
+            get => staticData;
+            set => this.RaiseAndSetIfChanged(ref staticData, value);
+        }
 
         public bool IsBusy
         {
-            get { return isBusy; }
-            set { this.RaiseAndSetIfChanged(ref isBusy, value); }
+            get => isBusy;
+            set => this.RaiseAndSetIfChanged(ref isBusy, value);
         }
 
         private void RefreshData()
@@ -48,7 +48,7 @@ namespace PoeShared.PoeTrade.Query
                 Log.Instance.Debug($"[PoeQueryInfoProvider-{poeApi.Name}] Requesting static data from API...");
 
                 var queryResult = poeApi.RequestStaticData().Result;
-                
+
                 Log.Instance.Debug($"[PoeQueryInfoProvider-{poeApi.Name}] Received static data from API");
                 return queryResult;
             }

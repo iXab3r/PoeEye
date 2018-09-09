@@ -7,7 +7,7 @@
     public interface IPoeEyeConfigVersioned : IPoeEyeConfig
     {
         /// <summary>
-        ///   Config contract version
+        ///     Config contract version
         /// </summary>
         int Version { get; set; }
     }

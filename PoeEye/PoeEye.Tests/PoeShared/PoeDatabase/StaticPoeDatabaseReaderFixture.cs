@@ -9,7 +9,14 @@ namespace PoeEye.Tests.PoeShared.PoeDatabase
     public class StaticPoeDatabaseReaderFixture
     {
         [SetUp]
-        public void SetUp() { }
+        public void SetUp()
+        {
+        }
+
+        private StaticPoeDatabaseReader CreateInstance()
+        {
+            return new StaticPoeDatabaseReader(Scheduler.Immediate);
+        }
 
         [Test]
         public void ShouldCreate()
@@ -17,7 +24,7 @@ namespace PoeEye.Tests.PoeShared.PoeDatabase
             //Then
             CreateInstance();
         }
-        
+
         [Test]
         public void ShouldRead()
         {
@@ -29,11 +36,6 @@ namespace PoeEye.Tests.PoeShared.PoeDatabase
 
             //Then
             result.Count.ShouldNotBe(0);
-        }
-
-        private StaticPoeDatabaseReader CreateInstance()
-        {
-            return new StaticPoeDatabaseReader(Scheduler.Immediate);
         }
     }
 }

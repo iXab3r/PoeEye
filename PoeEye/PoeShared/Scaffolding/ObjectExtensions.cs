@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Serialization.Formatters;
 using Guards;
 using Newtonsoft.Json;
 
@@ -11,29 +12,29 @@ namespace PoeShared.Scaffolding
     {
         public static string DumpToText<T>(this T instance)
         {
-            return DumpToText(instance, Formatting.Indented);   
+            return DumpToText(instance, Formatting.Indented);
         }
 
         public static string DumpToTextRaw<T>(this T instance)
         {
             return DumpToText(instance, Formatting.None);
         }
-        
+
         public static string DumpToTable<T>(this IEnumerable<T> instance, string separator = "\n\t")
         {
-            return instance == null ? $"null<{typeof(T).Name}>" : String.Join(separator, instance.Select(x => x.DumpToTextRaw()));
+            return instance == null ? $"null<{typeof(T).Name}>" : string.Join(separator, instance.Select(x => x.DumpToTextRaw()));
         }
 
         public static string DumpToText<T>(this T instance, Formatting formatting)
         {
             return instance == null ? $"null<{typeof(T).Name}>" : JsonConvert.SerializeObject(instance, formatting);
         }
-        
+
         public static TItem AddTo<TItem, TCollection>(this TItem instance, ICollection<TCollection> collection) where TItem : TCollection
         {
             Guard.ArgumentNotNull(instance, nameof(instance));
             Guard.ArgumentNotNull(collection, nameof(collection));
-            
+
             collection.Add(instance);
             return instance;
         }
@@ -45,14 +46,14 @@ namespace PoeShared.Scaffolding
             Guard.ArgumentNotNull(target, nameof(target));
 
             var settableProperties = typeof(TTarget)
-                .GetProperties(BindingFlags.Instance | BindingFlags.Public)
-                .Where(x => x.CanRead && x.CanWrite)
-                .ToArray();
+                                     .GetProperties(BindingFlags.Instance | BindingFlags.Public)
+                                     .Where(x => x.CanRead && x.CanWrite)
+                                     .ToArray();
 
             var propertiesToSet = typeof(TSource)
-                .GetProperties(BindingFlags.Instance | BindingFlags.Public)
-                .Where(x => x.CanRead)
-                .ToArray();
+                                  .GetProperties(BindingFlags.Instance | BindingFlags.Public)
+                                  .Where(x => x.CanRead)
+                                  .ToArray();
 
             var skippedProperties = new List<PropertyInfo>();
             foreach (var property in propertiesToSet)
@@ -79,9 +80,11 @@ namespace PoeShared.Scaffolding
                         ex);
                 }
             }
+
             if (skippedProperties.Any())
             {
-                Log.Instance.Debug($"[TransferProperties] Skipped following properties: {skippedProperties.Select(x => $"{x.PropertyType} {x.Name}").DumpToTextRaw()}");
+                Log.Instance.Debug(
+                    $"[TransferProperties] Skipped following properties: {skippedProperties.Select(x => $"{x.PropertyType} {x.Name}").DumpToTextRaw()}");
             }
         }
 
@@ -92,22 +95,22 @@ namespace PoeShared.Scaffolding
             {
                 ObjectCreationHandling = ObjectCreationHandling.Replace,
                 TypeNameHandling = TypeNameHandling.All,
-                TypeNameAssemblyFormat = System.Runtime.Serialization.Formatters.FormatterAssemblyStyle.Full,
+                TypeNameAssemblyFormat = FormatterAssemblyStyle.Full
             };
             var serializedObject = JsonConvert.SerializeObject(source, deserializeSettings);
             JsonConvert.PopulateObject(serializedObject, target, deserializeSettings);
         }
 
         /// <summary>
-        /// Perform a deep Copy of the object, using Json as a serialisation method. NOTE: Private members are not cloned using this method.
+        ///     Perform a deep Copy of the object, using Json as a serialisation method. NOTE: Private members are not cloned using this method.
         /// </summary>
         /// <typeparam name="T">The type of object being copied.</typeparam>
         /// <param name="source">The object instance to copy.</param>
         /// <returns>The copied object.</returns>
         public static T CloneJson<T>(this T source)
-        {            
+        {
             // Don't serialize a null object, simply return the default for that object
-            if (Object.ReferenceEquals(source, null))
+            if (ReferenceEquals(source, null))
             {
                 return default(T);
             }
@@ -120,7 +123,7 @@ namespace PoeShared.Scaffolding
             {
                 ObjectCreationHandling = ObjectCreationHandling.Replace,
                 TypeNameHandling = TypeNameHandling.All,
-                TypeNameAssemblyFormat = System.Runtime.Serialization.Formatters.FormatterAssemblyStyle.Full,
+                TypeNameAssemblyFormat = FormatterAssemblyStyle.Full
             };
             var json = JsonConvert.SerializeObject(source, deserializeSettings);
             return JsonConvert.DeserializeObject<T>(json, deserializeSettings);

@@ -9,8 +9,8 @@ namespace PoeEye.Pickit.Prism
 {
     public sealed class PoePickitModule : IPoeEyeModule
     {
-        private readonly IUnityContainer container;
         private readonly CompositeDisposable anchors = new CompositeDisposable();
+        private readonly IUnityContainer container;
 
         public PoePickitModule([NotNull] IUnityContainer container)
         {

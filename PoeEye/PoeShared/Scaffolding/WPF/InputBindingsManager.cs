@@ -7,9 +7,12 @@ namespace PoeShared.Scaffolding.WPF
     public static class InputBindingsManager
     {
         public static readonly DependencyProperty UpdatePropertySourceWhenEnterPressedProperty = DependencyProperty.RegisterAttached(
-            "UpdatePropertySourceWhenEnterPressed", typeof(DependencyProperty), typeof(InputBindingsManager), new PropertyMetadata(null, OnUpdatePropertySourceWhenEnterPressedPropertyChanged));
-        
-        static InputBindingsManager() { }
+            "UpdatePropertySourceWhenEnterPressed", typeof(DependencyProperty), typeof(InputBindingsManager),
+            new PropertyMetadata(null, OnUpdatePropertySourceWhenEnterPressedPropertyChanged));
+
+        static InputBindingsManager()
+        {
+        }
 
         public static void SetUpdatePropertySourceWhenEnterPressed(DependencyObject dp, DependencyProperty value)
         {
@@ -18,7 +21,7 @@ namespace PoeShared.Scaffolding.WPF
 
         public static DependencyProperty GetUpdatePropertySourceWhenEnterPressed(DependencyObject dp)
         {
-            return (DependencyProperty) dp.GetValue(UpdatePropertySourceWhenEnterPressedProperty);
+            return (DependencyProperty)dp.GetValue(UpdatePropertySourceWhenEnterPressedProperty);
         }
 
         private static void OnUpdatePropertySourceWhenEnterPressedPropertyChanged(DependencyObject dp, DependencyPropertyChangedEventArgs e)

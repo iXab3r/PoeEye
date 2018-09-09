@@ -11,8 +11,8 @@ namespace PoeShared.Native
 
         public bool ShowWireframes
         {
-            get { return showWireframes; }
-            set { this.RaiseAndSetIfChanged(ref showWireframes, value); }
+            get => showWireframes;
+            set => this.RaiseAndSetIfChanged(ref showWireframes, value);
         }
 
         public IOverlayViewModel Content { [CanBeNull] get; [CanBeNull] set; }

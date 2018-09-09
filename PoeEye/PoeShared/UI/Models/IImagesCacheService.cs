@@ -6,7 +6,7 @@ namespace PoeShared.UI.Models
 {
     public interface IImagesCacheService
     {
-        [NotNull] 
+        [NotNull]
         IObservable<FileInfo> ResolveImageByUri([NotNull] Uri imageUri);
     }
 }

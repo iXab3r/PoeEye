@@ -12,6 +12,26 @@ namespace PoeEye.Tests.PoeTradeMonitor.Services.Parsers
     [TestFixture]
     internal class PoeMessageCurrencyParserPoeTradeFixture
     {
+        private IEnumerable<TestCaseData> ShouldParseCases()
+        {
+            yield return new TestCaseData(
+                "Hi, I'd like to buy your 3 exalted for my 169.5 chaos in Legacy.",
+                true,
+                new TradeModel
+                {
+                    CharacterName = "Name",
+                    Price = new PoePrice("chaos", 169.5f),
+                    PositionName = "3 exalted",
+                    League = "Legacy"
+                }
+            );
+        }
+
+        private PoeMessageCurrencyParserPoeTrade CreateInstance()
+        {
+            return new PoeMessageCurrencyParserPoeTrade(new StringToPoePriceConverter());
+        }
+
         [Test]
         [TestCaseSource(nameof(ShouldParseCases))]
         public void ShouldParse(
@@ -22,10 +42,10 @@ namespace PoeEye.Tests.PoeTradeMonitor.Services.Parsers
             //Given
             var instance = CreateInstance();
 
-            var message = new PoeMessage()
+            var message = new PoeMessage
             {
                 Message = messageText,
-                Name = "Name",
+                Name = "Name"
             };
 
             //When
@@ -43,26 +63,6 @@ namespace PoeEye.Tests.PoeTradeMonitor.Services.Parsers
                 result.League.ShouldBe(expected.League);
                 result.ItemPosition.ShouldBe(expected.ItemPosition);
             }
-        }
-
-        private IEnumerable<TestCaseData> ShouldParseCases()
-        {
-            yield return new TestCaseData(
-                    "Hi, I'd like to buy your 3 exalted for my 169.5 chaos in Legacy.",
-                    true,
-                    new TradeModel()
-                    {
-                        CharacterName = "Name",
-                        Price = new PoePrice("chaos", 169.5f),
-                        PositionName = "3 exalted",
-                        League = "Legacy",
-                    }
-                );
-        }
-
-        private PoeMessageCurrencyParserPoeTrade CreateInstance()
-        {
-            return new PoeMessageCurrencyParserPoeTrade(new StringToPoePriceConverter());   
         }
     }
 }

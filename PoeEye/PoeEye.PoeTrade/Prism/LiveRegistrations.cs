@@ -10,7 +10,7 @@ namespace PoeEye.PoeTrade.Prism
     internal sealed class LiveRegistrations : UnityContainerExtension
     {
         protected override void Initialize()
-        { 
+        {
             Container
                 .RegisterSingleton<IPoeApi, PoeTradeApi>(typeof(PoeTradeApi).FullName)
                 .RegisterSingleton<IConverter<IPoeQueryInfo, IPoeQuery>, PoeQueryInfoToQueryConverter>()

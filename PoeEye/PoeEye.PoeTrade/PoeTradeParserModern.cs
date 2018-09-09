@@ -40,7 +40,7 @@ namespace PoeEye.PoeTrade
             var result = new PoeQueryResult
             {
                 ItemsList = ExtractItems(parser),
-                Id = ExtractQueryId(parser),
+                Id = ExtractQueryId(parser)
             };
 
             return result;
@@ -107,7 +107,7 @@ namespace PoeEye.PoeTrade
                     new PoeItemType("Map", "Map"),
                     new PoeItemType("Quiver", "Quiver"),
                     new PoeItemType("Ring", "Ring"),
-                    new PoeItemType("Vaal Fragments", "Vaal Fragments"),
+                    new PoeItemType("Vaal Fragments", "Vaal Fragments")
                 }
             };
             return result;
@@ -125,11 +125,11 @@ namespace PoeEye.PoeTrade
             var allModRows = parser["div[class='row explicit'] select option"].ToList();
 
             var allMods = allModRows
-                .Select(ParseItemModRow)
-                .Where(IsValid)
-                .Distinct(PoeItemMod.CodeNameComparer)
-                .Cast<IPoeItemMod>()
-                .ToArray();
+                          .Select(ParseItemModRow)
+                          .Where(IsValid)
+                          .Distinct(PoeItemMod.CodeNameComparer)
+                          .Cast<IPoeItemMod>()
+                          .ToArray();
 
             return allMods;
         }
@@ -138,10 +138,10 @@ namespace PoeEye.PoeTrade
         {
             var leaguesRows = parser["select[name=league] option"].ToList();
             var leaguesList = leaguesRows
-                .Select(ParseLeagueRow)
-                .Where(IsValid)
-                .Distinct()
-                .ToArray();
+                              .Select(ParseLeagueRow)
+                              .Where(IsValid)
+                              .Distinct()
+                              .ToArray();
             return leaguesList;
         }
 
@@ -223,7 +223,7 @@ namespace PoeEye.PoeTrade
                 Rarity = ExtractItemRarity(row),
                 PositionInsideTab = ExtractPositionInsideTab(parser),
                 TabName = parser.Attr("data-tab"),
-                Raw = row.Render(),
+                Raw = row.Render()
             };
 
             ParseItemName(parser, ref result);
@@ -253,7 +253,7 @@ namespace PoeEye.PoeTrade
             item.TypeInfo = info;
             item.ItemName = nameText;
         }
-        
+
         private IPoeItemMod[] ParseMods(CQ parser)
         {
             var implicitMods = ExtractImplicitMods(parser);
@@ -264,9 +264,9 @@ namespace PoeEye.PoeTrade
         private PoeItemModificatins ParseModificatins(CQ parser)
         {
             var result = PoeItemModificatins.None;
-            
+
             var explicitMods = ExtractExplicitMods(parser);
-            
+
             result |= parser["td[class=item-cell] span[class~=corrupted]"].Any() ? PoeItemModificatins.Corrupted : PoeItemModificatins.None;
             result |= explicitMods.Any(x => x.Name == "Shaped") ? PoeItemModificatins.Shaped : PoeItemModificatins.None;
             result |= explicitMods.Any(x => x.Name == "Elder") ? PoeItemModificatins.Elder : PoeItemModificatins.None;
@@ -274,7 +274,7 @@ namespace PoeEye.PoeTrade
             result |= explicitMods.Any(x => x.Name == "Unidentified") ? PoeItemModificatins.Unidentified : PoeItemModificatins.None;
             result |= explicitMods.Any(x => x.Origin == PoeModOrigin.Craft) ? PoeItemModificatins.Crafted : PoeItemModificatins.None;
             result |= explicitMods.Any(x => x.Origin == PoeModOrigin.Enchant) ? PoeItemModificatins.Enchanted : PoeItemModificatins.None;
-            
+
             return result;
         }
 
@@ -287,8 +287,8 @@ namespace PoeEye.PoeTrade
             }
 
             var message = string.IsNullOrWhiteSpace(item.Price)
-                   ? $"@{item.UserIgn} Hi, I would like to buy your {item.ItemName} listed in {item.League}{location}, offer is "
-                   : $"@{item.UserIgn} Hi, I would like to buy your {item.ItemName} listed for {item.Price} in {item.League}{location}";
+                ? $"@{item.UserIgn} Hi, I would like to buy your {item.ItemName} listed in {item.League}{location}, offer is "
+                : $"@{item.UserIgn} Hi, I would like to buy your {item.ItemName} listed for {item.Price} in {item.League}{location}";
 
             return message;
         }
@@ -301,6 +301,7 @@ namespace PoeEye.PoeTrade
             {
                 return null;
             }
+
             return new Point(x, y);
         }
 
@@ -321,10 +322,10 @@ namespace PoeEye.PoeTrade
         private static void TrimProperties<T>(T source)
         {
             var propertiesToProcess = typeof(T)
-                .GetProperties()
-                .Where(x => x.PropertyType == typeof(string))
-                .Where(x => x.CanRead && x.CanWrite)
-                .ToArray();
+                                      .GetProperties()
+                                      .Where(x => x.PropertyType == typeof(string))
+                                      .Where(x => x.CanRead && x.CanWrite)
+                                      .ToArray();
 
             foreach (var propertyInfo in propertiesToProcess)
             {
@@ -370,12 +371,12 @@ namespace PoeEye.PoeTrade
             var rawLinksText = parser["span[class=sockets-raw]"]?.Text();
             return string.IsNullOrWhiteSpace(rawLinksText) ? default(IPoeLinksInfo) : new PoeLinksInfo(rawLinksText);
         }
-        
+
         private IPoeLinksInfo ExtractLinksInfo(IDomObject row)
         {
             CQ parser = row.Render();
 
-            var mappings = new Dictionary<string, string>()
+            var mappings = new Dictionary<string, string>
             {
                 {"socketD", "G"},
                 {"socketS", "R"},
@@ -394,7 +395,7 @@ namespace PoeEye.PoeTrade
             var rawLinksText = string.Join(string.Empty, socketClasses.Select(GetMappedValue));
             return string.IsNullOrWhiteSpace(rawLinksText) ? default(IPoeLinksInfo) : new PoeLinksInfo(rawLinksText);
         }
-        
+
 
         private PoeItemMod[] ExtractExplicitMods(CQ parser)
         {
@@ -412,9 +413,9 @@ namespace PoeEye.PoeTrade
             var result = new PoeItemMod
             {
                 ModType = modType,
-                CodeName = parser.Attr("data-name")?.Trim('#'),
+                CodeName = parser.Attr("data-name")?.Trim('#')
             };
-            
+
             var nameElements = parser["li"]?.FirstOrDefault();
             if (nameElements != null)
             {
@@ -424,6 +425,7 @@ namespace PoeEye.PoeTrade
                     nameElements.RemoveChild(tierInfoChild);
                     result.TierInfo = new CQ(tierInfoChild.Render()).Text();
                 }
+
                 result.Name = new CQ(nameElements.Render()).Text();
             }
             else
@@ -432,30 +434,33 @@ namespace PoeEye.PoeTrade
             }
 
             TrimProperties(result);
-            
+
             if (result.Name.StartsWith("crafted", StringComparison.OrdinalIgnoreCase))
             {
                 result.Origin = PoeModOrigin.Craft;
                 result.Name = result.Name.Remove(0, "crafted".Length);
             }
+
             if (result.Name.StartsWith("enchanted", StringComparison.OrdinalIgnoreCase))
             {
                 result.Origin = PoeModOrigin.Enchant;
                 result.ModType = PoeModType.Implicit;
                 result.Name = result.Name.Remove(0, "enchanted".Length);
             }
+
             if (result.Name.IndexOf("(total)", StringComparison.OrdinalIgnoreCase) >= 0)
             {
                 result.ModType = PoeModType.Unknown;
             }
+
             if (result.Name.IndexOf("(pseudo)", StringComparison.OrdinalIgnoreCase) >= 0)
             {
                 result.ModType = PoeModType.Unknown;
             }
-            
+
             return result;
         }
-        
+
         public PoeItemMod ExtractItemMod(IDomObject itemModRow, PoeModType modType = PoeModType.Unknown)
         {
             CQ parser = itemModRow.Render();
@@ -467,9 +472,9 @@ namespace PoeEye.PoeTrade
             var rows = parser["tbody[id^=item-container-]"];
 
             var items = rows
-                .Select(ParseItemRow)
-                .Where(IsValid)
-                .ToArray();
+                        .Select(ParseItemRow)
+                        .Where(IsValid)
+                        .ToArray();
             return items;
         }
 
@@ -478,9 +483,9 @@ namespace PoeEye.PoeTrade
             var currenciesRows = parser["select[name=buyout_currency] option"].ToList();
 
             var currencies = currenciesRows
-                .Select(ParseCurrencyRow)
-                .Where(IsValid)
-                .ToArray();
+                             .Select(ParseCurrencyRow)
+                             .Where(IsValid)
+                             .ToArray();
             return currencies;
         }
 

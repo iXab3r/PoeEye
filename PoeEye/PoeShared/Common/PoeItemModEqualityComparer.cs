@@ -11,10 +11,12 @@ namespace PoeShared.Common
             {
                 return Equals(x as IPoeItemMod, y as IPoeItemMod) ? 0 : 1;
             }
+
             if (x is IPoeItemMod)
             {
                 return 1;
             }
+
             return -1;
         }
 
@@ -24,18 +26,22 @@ namespace PoeShared.Common
             {
                 return true;
             }
+
             if (ReferenceEquals(x, null))
             {
                 return false;
             }
+
             if (ReferenceEquals(y, null))
             {
                 return false;
             }
+
             if (x.GetType() != y.GetType())
             {
                 return false;
             }
+
             return string.Equals(x.Name, y.Name);
         }
 

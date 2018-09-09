@@ -34,7 +34,7 @@ namespace PoeEye.Config
             {KnownCurrencyNameList.SplinterOfTul, 0.1f},
             {KnownCurrencyNameList.SplinterOfXoph, 0.03f},
             {KnownCurrencyNameList.SplinterOfChayula, 2f},
-            {KnownCurrencyNameList.SplinterOfUulNetol, 0.15f},
+            {KnownCurrencyNameList.SplinterOfUulNetol, 0.15f}
         };
 
         private IDictionary<string, float> currenciesPriceInChaos = new Dictionary<string, float>(DefaultCurrenciesPriceInChaos);
@@ -54,7 +54,7 @@ namespace PoeEye.Config
         }
 
         public bool ClipboardMonitoringEnabled { get; set; } = true;
-        
+
         public bool WhisperNotificationsEnabled { get; set; } = false;
 
         public TimeSpan MinRefreshTimeout { get; set; } = TimeSpan.FromSeconds(30);
@@ -63,8 +63,8 @@ namespace PoeEye.Config
 
         public TimeSpan ProxyRecheckTimeout { get; set; } = TimeSpan.FromMinutes(1);
 
+        public string LeagueId { get; set; }
+
         public int Version { get; set; } = 2;
-        
-        public string LeagueId { get; set; } 
     }
 }

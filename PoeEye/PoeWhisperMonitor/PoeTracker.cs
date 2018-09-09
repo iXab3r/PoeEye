@@ -16,7 +16,7 @@ namespace PoeWhisperMonitor
             "PathOfExile",
             "PathOfExile_x64",
             "PathOfExileSteam",
-            "PathOfExile_x64Steam",
+            "PathOfExile_x64Steam"
         };
 
         private static readonly TimeSpan RecheckTimeout = TimeSpan.FromSeconds(10);
@@ -44,8 +44,8 @@ namespace PoeWhisperMonitor
             try
             {
                 var result = PathOfExileProcessNames
-                    .SelectMany(Process.GetProcessesByName)
-                    .OrderBy(x => x.Id).ToArray();
+                             .SelectMany(Process.GetProcessesByName)
+                             .OrderBy(x => x.Id).ToArray();
                 return result;
             }
             catch (Exception ex)
@@ -68,7 +68,7 @@ namespace PoeWhisperMonitor
                 {
                     ProcessId = process.Id,
                     Executable = new FileInfo(process.MainModule.FileName),
-                    MainWindow = process.MainWindowHandle,
+                    MainWindow = process.MainWindowHandle
                 };
 
                 return result;
@@ -78,7 +78,6 @@ namespace PoeWhisperMonitor
                 Log.HandleException(ex);
                 return default(PoeProcessInfo);
             }
-            
         }
     }
 }

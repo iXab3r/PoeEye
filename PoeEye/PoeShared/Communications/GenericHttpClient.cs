@@ -18,10 +18,12 @@ namespace PoeShared.Communications
 {
     internal sealed class GenericHttpClient : IHttpClient
     {
+        private static readonly string DefaultUserAgent =
+            "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36";
+
         private readonly IConverter<NameValueCollection, string> nameValueConverter;
-        private WebHeaderCollection customHeaders = new WebHeaderCollection();
         private CookieCollection cookies = new CookieCollection();
-        private static readonly string DefaultUserAgent = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36";
+        private WebHeaderCollection customHeaders = new WebHeaderCollection();
 
         public GenericHttpClient(
             [NotNull] IConverter<NameValueCollection, string> nameValueConverter)
@@ -33,16 +35,16 @@ namespace PoeShared.Communications
 
         public CookieCollection Cookies
         {
-            get { return cookies; }
-            set { cookies = value ?? new CookieCollection(); }
+            get => cookies;
+            set => cookies = value ?? new CookieCollection();
         }
 
         public TimeSpan? Timeout { get; set; }
 
         public WebHeaderCollection CustomHeaders
         {
-            get { return customHeaders; }
-            set { customHeaders = value ?? new WebHeaderCollection(); }
+            get => customHeaders;
+            set => customHeaders = value ?? new WebHeaderCollection();
         }
 
         public string Referer { get; set; }
@@ -89,6 +91,7 @@ namespace PoeShared.Communications
             {
                 httpClient.Timeout = (int)Timeout.Value.TotalMilliseconds;
             }
+
             httpClient.Method = WebRequestMethods.Http.Get;
             var rawResponse = IssueRequest(httpClient, string.Empty);
 
@@ -113,6 +116,7 @@ namespace PoeShared.Communications
             {
                 httpClient.Timeout = (int)Timeout.Value.TotalMilliseconds;
             }
+
             httpClient.AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip;
 
             httpClient.ContentType = "application/x-www-form-urlencoded";
@@ -141,7 +145,7 @@ namespace PoeShared.Communications
                     stream.Write(data, 0, data.Length);
                 }
             }
-            
+
             Log.Instance.Debug($"[HttpClient] Sending {httpRequest.Method} request with timeout of {httpRequest.Timeout}ms to {httpRequest.RequestUri}");
             using (var response = (HttpWebResponse)httpRequest.GetResponse())
             using (var responseStream = response.GetResponseStream())

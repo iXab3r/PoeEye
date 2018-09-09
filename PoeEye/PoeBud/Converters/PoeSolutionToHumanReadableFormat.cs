@@ -16,10 +16,12 @@ namespace PoeBud.Converters
             if (value is IPoeTradeSolution single)
             {
                 solutionsToProcess.Add(single);
-            } else if (value is IPoeTradeSolution[] array)
+            }
+            else if (value is IPoeTradeSolution[] array)
             {
                 solutionsToProcess.AddRange(array);
-            } else if (value is IEnumerable<IPoeTradeSolution> enumerable)
+            }
+            else if (value is IEnumerable<IPoeTradeSolution> enumerable)
             {
                 solutionsToProcess.AddRange(enumerable);
             }
@@ -28,18 +30,17 @@ namespace PoeBud.Converters
             {
                 return $"{solutionsToProcess[0].Items.Length} items";
             }
-            else if (solutionsToProcess.Count > 0)
+
+            if (solutionsToProcess.Count > 0)
             {
                 var total = solutionsToProcess.Select(x => x.Items.Length).Sum();
                 var itemsInSet = solutionsToProcess.Select(x => x.Items.Length).Average();
                 return $"{total} items, {solutionsToProcess.Count} sets, ~{itemsInSet:F0} items in each set";
             }
-            else
-            {
-                return "No matching items";
-            }
+
+            return "No matching items";
         }
-        
+
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             throw new NotSupportedException();

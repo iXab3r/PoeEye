@@ -19,10 +19,9 @@ namespace PoeBud.Models
         private const int StashItemsMaxX = 12;
         private const int StashItemsMaxY = 12;
         private const double PoeFontSize = 20;
+        private readonly IConfigProvider<PoeStashGridConfig> stashConfigProvider;
 
         private readonly IUserInteractionsManager userInteractionsManager;
-        private readonly IConfigProvider<PoeStashGridConfig> stashConfigProvider;
-        private readonly IntPtr nativeWindowHandle;
 
         public PoeWindow(
             [NotNull] IConfigProvider<PoeStashGridConfig> stashConfigProvider,
@@ -38,7 +37,7 @@ namespace PoeBud.Models
             }
 
             this.stashConfigProvider = stashConfigProvider;
-            this.nativeWindowHandle = nativeWindowHandle;
+            NativeWindowHandle = nativeWindowHandle;
             this.userInteractionsManager = userInteractionsManager;
 
             stashConfigProvider.WhenChanged.Subscribe(() => this.RaisePropertyChanged(nameof(StashBounds))).AddTo(Anchors);
@@ -70,13 +69,13 @@ namespace PoeBud.Models
             }
 
             var moveLocation = new Point(
-                    stashBounds.Left + itemSize.Width * itemX + itemSize.Width / 2,
-                    stashBounds.Top + itemSize.Height * itemY + itemSize.Height / 2);
+                stashBounds.Left + itemSize.Width * itemX + itemSize.Width / 2,
+                stashBounds.Top + itemSize.Height * itemY + itemSize.Height / 2);
 
             userInteractionsManager.MoveMouseTo(moveLocation);
         }
 
-        public Rect WindowBounds => NativeMethods.GetWindowBounds(nativeWindowHandle);
+        public Rect WindowBounds => NativeMethods.GetWindowBounds(NativeWindowHandle);
 
         public Rect StashBounds => stashConfigProvider.ActualConfig.StashBounds;
 
@@ -86,7 +85,28 @@ namespace PoeBud.Models
             userInteractionsManager.SendControlLeftClick();
         }
 
-        public IntPtr NativeWindowHandle => nativeWindowHandle;
+        public IntPtr NativeWindowHandle { get; }
+
+        public void SelectStashTabByIdx(IStashTab tabToSelect, IStashTab[] tabs)
+        {
+            for (var i = 0; i < tabs.Length; i++)
+            {
+                userInteractionsManager.SendKey(VirtualKeyCode.LEFT);
+                userInteractionsManager.Delay(TimeSpan.FromMilliseconds(50));
+            }
+
+            for (var i = 0; i < tabs.Length - 1; i++)
+            {
+                var currentTab = tabs[i];
+                if (currentTab.Idx == tabToSelect.Idx)
+                {
+                    break;
+                }
+
+                userInteractionsManager.SendKey(VirtualKeyCode.RIGHT);
+                userInteractionsManager.Delay(TimeSpan.FromMilliseconds(50));
+            }
+        }
 
         private Rect GetDefaultFullScreenStashSize()
         {
@@ -120,33 +140,14 @@ namespace PoeBud.Models
                 CultureInfo.CurrentUICulture,
                 FlowDirection.LeftToRight,
                 new Typeface(
-                        poeFont,
-                        new FontStyle(),
-                        new FontWeight(),
-                        new FontStretch()),
+                    poeFont,
+                    new FontStyle(),
+                    new FontWeight(),
+                    new FontStretch()),
                 fontSize,
                 Brushes.Black);
 
             return new Size(formattedText.Width, formattedText.Height);
-        }
-
-        public void SelectStashTabByIdx(IStashTab tabToSelect, IStashTab[] tabs)
-        {
-            for (var i = 0; i < tabs.Length; i++)
-            {
-                userInteractionsManager.SendKey(VirtualKeyCode.LEFT);
-                userInteractionsManager.Delay(TimeSpan.FromMilliseconds(50));
-            }
-            for (var i = 0; i < tabs.Length - 1; i++)
-            {
-                var currentTab = tabs[i];
-                if (currentTab.Idx == tabToSelect.Idx)
-                {
-                    break;
-                }
-                userInteractionsManager.SendKey(VirtualKeyCode.RIGHT);
-                userInteractionsManager.Delay(TimeSpan.FromMilliseconds(50));
-            }
         }
 
         private static class NativeMethods
@@ -155,22 +156,22 @@ namespace PoeBud.Models
             [return: MarshalAs(UnmanagedType.Bool)]
             private static extern bool GetWindowRect(IntPtr hWnd, out WinRectangle lpWinRectangle);
 
-            [StructLayout(LayoutKind.Sequential)]
-            private struct WinRectangle
-            {
-                public int Left;        // itemX position of upper-left corner
-                public int Top;         // y position of upper-left corner
-                public int Right;       // itemX position of lower-right corner
-                public int Bottom;      // y position of lower-right corner
-            }
-
             public static Rect GetWindowBounds(IntPtr hwnd)
             {
                 WinRectangle rect;
                 GetWindowRect(hwnd, out rect);
                 return new Rect(
-                        new Point(rect.Left, rect.Top),
-                        new Size(Math.Abs(rect.Right - rect.Left), Math.Abs(rect.Bottom - rect.Top)));
+                    new Point(rect.Left, rect.Top),
+                    new Size(Math.Abs(rect.Right - rect.Left), Math.Abs(rect.Bottom - rect.Top)));
+            }
+
+            [StructLayout(LayoutKind.Sequential)]
+            private struct WinRectangle
+            {
+                public readonly int Left; // itemX position of upper-left corner
+                public readonly int Top; // y position of upper-left corner
+                public readonly int Right; // itemX position of lower-right corner
+                public readonly int Bottom; // y position of lower-right corner
             }
         }
     }

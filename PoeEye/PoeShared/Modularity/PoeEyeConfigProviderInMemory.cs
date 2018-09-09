@@ -8,9 +8,8 @@ namespace PoeShared.Modularity
 {
     public sealed class PoeEyeConfigProviderInMemory : IConfigProvider
     {
-        private readonly ConcurrentDictionary<Type, IPoeEyeConfig> loadedConfigs = new ConcurrentDictionary<Type, IPoeEyeConfig>();
-
         private readonly ISubject<Unit> configHasChanged = new Subject<Unit>();
+        private readonly ConcurrentDictionary<Type, IPoeEyeConfig> loadedConfigs = new ConcurrentDictionary<Type, IPoeEyeConfig>();
 
         public PoeEyeConfigProviderInMemory()
         {
@@ -34,7 +33,7 @@ namespace PoeShared.Modularity
 
             configHasChanged.OnNext(Unit.Default);
         }
-        
+
         public void Save<TConfig>(TConfig config) where TConfig : IPoeEyeConfig, new()
         {
             loadedConfigs[typeof(TConfig)] = config;
@@ -46,7 +45,8 @@ namespace PoeShared.Modularity
             {
                 Reload();
             }
-            return (TConfig)loadedConfigs.GetOrAdd(typeof(TConfig), (key) => (TConfig)Activator.CreateInstance(typeof(TConfig)));
+
+            return (TConfig)loadedConfigs.GetOrAdd(typeof(TConfig), key => (TConfig)Activator.CreateInstance(typeof(TConfig)));
         }
     }
 }

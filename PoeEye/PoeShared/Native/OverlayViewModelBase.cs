@@ -1,13 +1,17 @@
 ﻿using System;
+using System.Drawing;
 using System.Reactive;
 using System.Reactive.Subjects;
 using System.Runtime.InteropServices;
 using System.Windows;
+using System.Windows.Forms;
 using System.Windows.Input;
 using Guards;
 using PoeShared.Scaffolding;
 using Prism.Commands;
 using ReactiveUI;
+using Point = System.Windows.Point;
+using Size = System.Windows.Size;
 
 namespace PoeShared.Native
 {
@@ -21,10 +25,12 @@ namespace PoeShared.Native
 
         private double height;
         private bool isLocked = true;
+        private bool isUnlockable;
 
         private double left;
         private Size maxSize = new Size(double.NaN, double.NaN);
         private Size minSize = new Size(0, 0);
+        private float opacity;
 
         private OverlayMode overlayMode;
 
@@ -33,23 +39,29 @@ namespace PoeShared.Native
         private double top;
 
         private double width;
-        private bool isUnlockable = false;
-        private float opacity;
-
-        public ISubject<Unit> WhenLoaded { get; } = new ReplaySubject<Unit>(1);
 
         protected OverlayViewModelBase()
         {
             LockWindowCommand = new DelegateCommand(LockWindowCommandExecuted, LockWindowCommandCanExecute);
             UnlockWindowCommand = new DelegateCommand(UnlockWindowCommandExecuted, UnlockWindowCommandCanExecute);
-            Title = this.GetType().ToString();
+            Title = GetType().ToString();
         }
+
+        public ISubject<Unit> WhenLoaded { get; } = new ReplaySubject<Unit>(1);
 
         public bool GrowUpwards
         {
             get => growUpwards;
             set => this.RaiseAndSetIfChanged(ref growUpwards, value);
         }
+
+        public float Opacity
+        {
+            get => opacity;
+            set => this.RaiseAndSetIfChanged(ref opacity, value);
+        }
+
+        public ICommand UnlockWindowCommand { get; }
 
         public double ActualHeight
         {
@@ -108,6 +120,7 @@ namespace PoeShared.Native
                 {
                     throw new InvalidOperationException($"Overlay {this} is cannot be unlocked");
                 }
+
                 this.RaiseAndSetIfChanged(ref isLocked, value);
             }
         }
@@ -134,35 +147,28 @@ namespace PoeShared.Native
 
         public string Title { get; protected set; }
 
-        public float Opacity
-        {
-            get => opacity;
-            set => this.RaiseAndSetIfChanged(ref opacity, value);
-        }
-
         public virtual void SetActivationController(IActivationController controller)
         {
             Guard.ArgumentNotNull(controller, nameof(controller));
         }
 
         public ICommand LockWindowCommand { get; }
-        
-        public ICommand UnlockWindowCommand { get; }
-        
+
         protected void ApplyConfig(IOverlayConfig config)
         {
-            if (config.OverlaySize.Height <= 0 || 
-                config.OverlaySize.Width <= 0 || 
+            if (config.OverlaySize.Height <= 0 ||
+                config.OverlaySize.Width <= 0 ||
                 double.IsNaN(config.OverlaySize.Height) ||
                 double.IsNaN(config.OverlaySize.Width))
             {
                 IsLocked = false;
                 config.OverlaySize = MinSize;
             }
+
             Width = config.OverlaySize.Width;
             Height = config.OverlaySize.Height;
 
-            if (config.OverlayLocation.X <= 1 || 
+            if (config.OverlayLocation.X <= 1 ||
                 config.OverlayLocation.Y <= 1 ||
                 double.IsNaN(config.OverlayLocation.X) ||
                 double.IsNaN(config.OverlayLocation.Y))
@@ -171,14 +177,16 @@ namespace PoeShared.Native
                 var size = NativeMethods.GetPrimaryScreenSize();
                 config.OverlayLocation = new Point(size.Width / 2, size.Height / 2);
             }
+
             Left = config.OverlayLocation.X;
             Top = config.OverlayLocation.Y;
-            
+
             if (config.OverlayOpacity <= 0.01)
             {
                 IsLocked = false;
                 config.OverlayOpacity = 1;
             }
+
             Opacity = config.OverlayOpacity;
         }
 
@@ -188,13 +196,13 @@ namespace PoeShared.Native
             config.OverlaySize = new Size(Width, Height);
             config.OverlayOpacity = Opacity;
         }
-        
+
         protected virtual void UnlockWindowCommandExecuted()
         {
             IsLocked = false;
         }
-        
-        
+
+
         protected virtual bool UnlockWindowCommandCanExecute()
         {
             return true;
@@ -204,8 +212,8 @@ namespace PoeShared.Native
         {
             IsLocked = true;
         }
-        
-        
+
+
         protected virtual bool LockWindowCommandCanExecute()
         {
             return true;
@@ -213,15 +221,15 @@ namespace PoeShared.Native
 
         internal static class NativeMethods
         {
-            [DllImport("user32.dll",EntryPoint="GetDC")]
-            static extern IntPtr GetDC(IntPtr ptr);
-            
+            [DllImport("user32.dll", EntryPoint = "GetDC")]
+            private static extern IntPtr GetDC(IntPtr ptr);
+
             public static Size GetPrimaryScreenSize()
             {
-                var graphics = System.Drawing.Graphics.FromHdc(GetDC(IntPtr.Zero));
+                var graphics = Graphics.FromHdc(GetDC(IntPtr.Zero));
                 return new Size(
-                    System.Windows.Forms.SystemInformation.PrimaryMonitorSize.Width / graphics.DpiX,
-                    System.Windows.Forms.SystemInformation.PrimaryMonitorSize.Height / graphics.DpiY);
+                    SystemInformation.PrimaryMonitorSize.Width / graphics.DpiX,
+                    SystemInformation.PrimaryMonitorSize.Height / graphics.DpiY);
             }
         }
     }

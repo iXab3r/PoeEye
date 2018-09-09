@@ -1,18 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using PoeShared.StashApi.DataTypes;
 using RestSharp;
 
-namespace PoeShared.StashApi 
+namespace PoeShared.StashApi
 {
     internal sealed class PoeLeagueApiClient : IPoeLeagueApiClient
     {
         private const string LeaguesApiPortal = @"http://api.pathofexile.com";
-        
+
         private readonly IRestClient client;
-        
+
         public PoeLeagueApiClient()
         {
             client = new RestClient(LeaguesApiPortal)
@@ -24,7 +25,7 @@ namespace PoeShared.StashApi
 
         public async Task<ILeague[]> GetLeaguesAsync()
         {
-            var request = new RestRequest("leagues") { Method = Method.GET };
+            var request = new RestRequest("leagues") {Method = Method.GET};
             request.AddParameter("type", "main");
 
             Log.Instance.Debug("Requesting leagues list using official API...");

@@ -71,7 +71,7 @@ namespace PoeEye.ItemParser.Services
             TrimProperties(result);
             return result;
         }
-        
+
         private bool ParseItemRarityAndName(string block, PoeItem item)
         {
             var splittedBlock = SplitToStrings(block);
@@ -104,6 +104,7 @@ namespace PoeEye.ItemParser.Services
             {
                 return false;
             }
+
             item.Modifications |= PoeItemModificatins.Corrupted;
             return true;
         }
@@ -115,6 +116,7 @@ namespace PoeEye.ItemParser.Services
             {
                 return false;
             }
+
             item.Links = new PoeLinksInfo(linksMatch.Groups[1].Value);
             return true;
         }
@@ -145,6 +147,7 @@ namespace PoeEye.ItemParser.Services
             {
                 return false;
             }
+
             item.ItemLevel = itemLevelMatch.Groups[1].Value;
             return true;
         }
@@ -168,6 +171,7 @@ namespace PoeEye.ItemParser.Services
                 item.Mods = item.Mods.Concat(new[] {mod}).ToArray();
                 return true;
             }
+
             return false;
         }
 
@@ -184,6 +188,7 @@ namespace PoeEye.ItemParser.Services
                 {
                     continue;
                 }
+
                 parsedMods.Add(mod);
             }
 
@@ -192,6 +197,7 @@ namespace PoeEye.ItemParser.Services
                 item.Mods = item.Mods.Concat(parsedMods).ToArray();
                 return true;
             }
+
             return false;
         }
 
@@ -214,25 +220,26 @@ namespace PoeEye.ItemParser.Services
 
                 return mod;
             }
+
             return null;
         }
 
         private static string[] SplitToBlocks(string serializedItem)
         {
             var rawBlocks = PrepareString(serializedItem)
-                .Split(new[] {BlocksSeparator}, StringSplitOptions.RemoveEmptyEntries)
-                .Where(x => !string.IsNullOrWhiteSpace(x))
-                .ToArray();
+                            .Split(new[] {BlocksSeparator}, StringSplitOptions.RemoveEmptyEntries)
+                            .Where(x => !string.IsNullOrWhiteSpace(x))
+                            .ToArray();
             return rawBlocks;
         }
 
         private static string[] SplitToStrings(string block)
         {
             return block
-                .Split(new[] {"\r", "\n"}, StringSplitOptions.RemoveEmptyEntries)
-                .Select(PrepareString)
-                .Where(x => !string.IsNullOrEmpty(x))
-                .ToArray();
+                   .Split(new[] {"\r", "\n"}, StringSplitOptions.RemoveEmptyEntries)
+                   .Select(PrepareString)
+                   .Where(x => !string.IsNullOrEmpty(x))
+                   .ToArray();
         }
 
         private static string PrepareString(string data)
@@ -242,15 +249,15 @@ namespace PoeEye.ItemParser.Services
 
         private static void TrimProperties<T>(T item)
         {
-            var propertiesToProcess = typeof (T)
-                .GetProperties()
-                .Where(x => x.PropertyType == typeof (string))
-                .Where(x => x.CanRead && x.CanWrite)
-                .ToArray();
+            var propertiesToProcess = typeof(T)
+                                      .GetProperties()
+                                      .Where(x => x.PropertyType == typeof(string))
+                                      .Where(x => x.CanRead && x.CanWrite)
+                                      .ToArray();
 
             foreach (var propertyInfo in propertiesToProcess)
             {
-                var currentValue = (string) propertyInfo.GetValue(item);
+                var currentValue = (string)propertyInfo.GetValue(item);
                 if (currentValue == null)
                 {
                     continue;

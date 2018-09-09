@@ -24,6 +24,7 @@ namespace PoeEye.Converters
             {
                 isNull = value == null;
             }
+
             return isNull;
         }
 

@@ -32,17 +32,17 @@ namespace PoeEye.PoeTradeRealtimeApi
         private static readonly string InitialLiveQueryId = "-1";
 
         private readonly IFactory<IHttpClient> clientFactory;
+
+        private readonly ConcurrentDictionary<string, IPoeItem> itemsList = new ConcurrentDictionary<string, IPoeItem>();
+        private readonly SerialDisposable liveAnchors = new SerialDisposable();
         private readonly IPoeTradeParser parser;
+        private readonly string queryLeague;
         private readonly NameValueCollection queryPostData;
 
         private readonly StateMachine<State, Trigger> queryStateMachine = new StateMachine<State, Trigger>(State.Created);
-
-        private readonly StateMachine<State, Trigger>.TriggerWithParameters<string> toNextLiveQueryTransitionTrigger;
         private readonly StateMachine<State, Trigger>.TriggerWithParameters<Uri> toLiveQueryTransitionTrigger;
 
-        private readonly ConcurrentDictionary<string, IPoeItem> itemsList = new ConcurrentDictionary<string, IPoeItem>();
-        private readonly string queryLeague;
-        private readonly SerialDisposable liveAnchors = new SerialDisposable();
+        private readonly StateMachine<State, Trigger>.TriggerWithParameters<string> toNextLiveQueryTransitionTrigger;
 
         private Uri liveQueryUri;
         private string nextLiveQueryId;
@@ -100,12 +100,16 @@ namespace PoeEye.PoeTradeRealtimeApi
             queryLeague = queryInfo.League;
             var query = queryInfoToQueryConverter.Convert(queryInfo);
             queryPostData = queryToPostConverter.Convert(query);
-            Log.Instance.Debug($"[RealtimeItemsSource..ctor] Post data for supplied query has been constructed:\n Query: {queryInfo.DumpToText(Formatting.None)}\n Post: {queryPostData.DumpToText(Formatting.None)}");
+            Log.Instance.Debug(
+                $"[RealtimeItemsSource..ctor] Post data for supplied query has been constructed:\n Query: {queryInfo.DumpToText(Formatting.None)}\n Post: {queryPostData.DumpToText(Formatting.None)}");
 
             queryStateMachine.Fire(Trigger.Create);
 
-            queryStateMachine.OnTransitioned(x => Log.Instance.Debug($"[RealtimeItemsSource.State] {x.Source} => {x.Trigger} => {x.Destination} (isReentry: {x.IsReentry})"));
-            queryStateMachine.OnUnhandledTrigger((state, trigger) => Log.Instance.Debug($"[RealtimeItemsSource.UnhandledState] Failed to process trigger {trigger}, state: {state}"));
+            queryStateMachine.OnTransitioned(
+                x => Log.Instance.Debug($"[RealtimeItemsSource.State] {x.Source} => {x.Trigger} => {x.Destination} (isReentry: {x.IsReentry})"));
+            queryStateMachine.OnUnhandledTrigger((state, trigger) =>
+                                                     Log.Instance.Debug(
+                                                         $"[RealtimeItemsSource.UnhandledState] Failed to process trigger {trigger}, state: {state}"));
         }
 
         public IPoeQueryResult GetResult()
@@ -123,9 +127,9 @@ namespace PoeEye.PoeTradeRealtimeApi
                     break;
             }
 
-            return new PoeQueryResult()
+            return new PoeQueryResult
             {
-                ItemsList = itemsList.Values.ToArray(),
+                ItemsList = itemsList.Values.ToArray()
             };
         }
 
@@ -160,15 +164,16 @@ namespace PoeEye.PoeTradeRealtimeApi
         private void SendInitialRequest()
         {
             var data = clientFactory
-                .Create()
-                .Post(PoeTradeSearchUri, queryPostData)
-                .Select(ThrowIfNotParseable)
-                .Select(parser.ParseQueryResponse)
-                .ToTask()
-                .Result;
+                       .Create()
+                       .Post(PoeTradeSearchUri, queryPostData)
+                       .Select(ThrowIfNotParseable)
+                       .Select(parser.ParseQueryResponse)
+                       .ToTask()
+                       .Result;
 
             var validItems = data.ItemsList.EmptyIfNull().Where(x => !string.IsNullOrWhiteSpace(x.Hash)).ToArray();
-            Log.Instance.Debug($"[RealtimeItemsSource.GetResult] Initial update contains {data.ItemsList.Length} item(s), of which {validItems.Length} are valid");
+            Log.Instance.Debug(
+                $"[RealtimeItemsSource.GetResult] Initial update contains {data.ItemsList.Length} item(s), of which {validItems.Length} are valid");
 
             validItems.ForEach(x => itemsList[x.Hash] = x);
 
@@ -208,9 +213,9 @@ namespace PoeEye.PoeTradeRealtimeApi
             try
             {
                 var rawData = client
-                    .Post(liveQueryUri.AbsoluteUri, new NameValueCollection() { { "id", nextLiveQueryId } })
-                    .ToTask()
-                    .Result;
+                              .Post(liveQueryUri.AbsoluteUri, new NameValueCollection {{"id", nextLiveQueryId}})
+                              .ToTask()
+                              .Result;
 
                 var result = JToken.Parse(rawData);
                 Log.Instance.Debug($"[RealtimeItemsSource.Live] Live query response: {result}");
@@ -229,12 +234,14 @@ namespace PoeEye.PoeTradeRealtimeApi
                     var data = parser.ParseQueryResponse(itemsData);
 
                     var validItems = data.ItemsList.EmptyIfNull().Where(x => !string.IsNullOrWhiteSpace(x.Hash)).ToArray();
-                    Log.Instance.Debug($"[RealtimeItemsSource.Live] Extracted {data.ItemsList.Length} from live query response(expected: {itemsCount}), of which {validItems.Length} are valid");
+                    Log.Instance.Debug(
+                        $"[RealtimeItemsSource.Live] Extracted {data.ItemsList.Length} from live query response(expected: {itemsCount}), of which {validItems.Length} are valid");
 
                     var itemsToRemove = validItems.Where(x => x.ItemState == PoeTradeState.Removed).ToArray();
                     var itemsToAdd = validItems.Where(x => x.ItemState != PoeTradeState.Removed).ToArray();
 
-                    Log.Instance.Debug($"[RealtimeItemsSource.Live] Items to add: {itemsToAdd.Length}, items to remove: {itemsToRemove.Length}, current list size: {itemsList.Count}");
+                    Log.Instance.Debug(
+                        $"[RealtimeItemsSource.Live] Items to add: {itemsToAdd.Length}, items to remove: {itemsToRemove.Length}, current list size: {itemsList.Count}");
 
                     IPoeItem trash;
                     itemsToRemove.ForEach(x => itemsList.TryRemove(x.Hash, out trash));
@@ -266,7 +273,7 @@ namespace PoeEye.PoeTradeRealtimeApi
             Created,
             AwaitingForInitialRequest,
             LiveQuery,
-            Disposed,
+            Disposed
         }
 
         private enum Trigger

@@ -16,9 +16,9 @@ namespace PoeBud.Models
 {
     internal sealed class SolutionExecutorModel : ISolutionExecutorModel
     {
+        private readonly IHighlightingService highlightingService;
         private readonly ISubject<string> logQueue = new Subject<string>();
         private readonly IPoeWindowManager windowManager;
-        private readonly IHighlightingService highlightingService;
 
         public SolutionExecutorModel(
             [NotNull] IPoeWindowManager windowManager,
@@ -37,11 +37,11 @@ namespace PoeBud.Models
             var tokenSource = new CancellationTokenSource();
             await ExecuteSolution(solutionToExecute, tokenSource.Token);
         }
-        
+
         public async Task ExecuteSolution(IPoeTradeSolution solutionToExecute, CancellationToken token)
         {
             Guard.ArgumentNotNull(solutionToExecute, nameof(solutionToExecute));
-            
+
             await Task.Run(() => ExecuteSolutionInternal(solutionToExecute, token), token);
         }
 
@@ -70,7 +70,7 @@ namespace PoeBud.Models
                     if (activeTab?.Idx != item.Tab.Idx)
                     {
                         logQueue.OnNext($"Switching to tab '{item.Tab.Name}'(idx: #{item.Tab.Idx}, inventoryId: {item.Tab.GetInventoryId()}) ...");
-                        
+
                         window.SelectStashTabByIdx(item.Tab, visibleTabs);
                         activeTab = item.Tab;
                     }

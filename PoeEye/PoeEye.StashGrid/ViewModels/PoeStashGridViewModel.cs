@@ -24,7 +24,7 @@ using Unity.Attributes;
 namespace PoeEye.StashGrid.ViewModels
 {
     internal sealed class PoeStashGridViewModel : OverlayViewModelBase, IPoeStashHighlightService,
-        IPoeStashGridViewModel
+                                                  IPoeStashGridViewModel
     {
         private const int MaxInventoryWidth = 24;
         private const int MaxInventoryHeight = 24;
@@ -74,14 +74,14 @@ namespace PoeEye.StashGrid.ViewModels
                 .AddTo(Anchors);
 
             WhenLoaded.Subscribe(
-                    () =>
-                    {
-                        configProvider
-                            .WhenChanged
-                            .Subscribe(ApplyConfig)
-                            .AddTo(Anchors);
-                    })
-                .AddTo(Anchors);
+                          () =>
+                          {
+                              configProvider
+                                  .WhenChanged
+                                  .Subscribe(ApplyConfig)
+                                  .AddTo(Anchors);
+                          })
+                      .AddTo(Anchors);
         }
 
         public ReactiveList<BasicStashGridCellViewModel> GridCells { get; } =
@@ -121,7 +121,7 @@ namespace PoeEye.StashGrid.ViewModels
         {
             base.LockWindowCommandExecuted();
             var config = configProvider.ActualConfig;
-            base.SavePropertiesToConfig(config);
+            SavePropertiesToConfig(config);
 
             const float offsetY = 33; // FIXME Should be calculated instead of being hardcoded
             config.StashBounds = new Rect(Left, Top + offsetY, Width, Height - offsetY);

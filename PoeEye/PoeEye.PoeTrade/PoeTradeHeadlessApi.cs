@@ -24,8 +24,6 @@ namespace PoeEye.PoeTrade
         private static readonly string PoeTradeSearchUri = @"http://poe.trade/search";
         private static readonly string PoeTradeUri = @"http://poe.trade";
 
-        private readonly SemaphoreSlim requestsSemaphore;
-
         private readonly IChromiumBrowserFactory httpClientFactory;
 
         private readonly IPoeTradeParser poeTradeParser;
@@ -33,8 +31,10 @@ namespace PoeEye.PoeTrade
         private readonly IConverter<IPoeQuery, NameValueCollection> queryConverter;
         private readonly IConverter<IPoeQueryInfo, IPoeQuery> queryInfoToQueryConverter;
 
+        private readonly SemaphoreSlim requestsSemaphore;
+
         private PoeTradeConfig config = new PoeTradeConfig();
-        
+
         public PoeTradeHeadlessApi(
             IPoeTradeParser poeTradeParser,
             IProxyProvider proxyProvider,
@@ -83,13 +83,18 @@ namespace PoeEye.PoeTrade
         {
             var client = CreateClientWithoutProxy();
             return client
-                .Get(PoeTradeUri)
-                .ToObservable()
-                .Select(x => client.GetSource().Result)
-                .Select(ThrowIfNotParseable)
-                .Select(poeTradeParser.ParseStaticData)
-                .Finally(() => client.Dispose())
-                .ToTask();
+                   .Get(PoeTradeUri)
+                   .ToObservable()
+                   .Select(x => client.GetSource().Result)
+                   .Select(ThrowIfNotParseable)
+                   .Select(poeTradeParser.ParseStaticData)
+                   .Finally(() => client.Dispose())
+                   .ToTask();
+        }
+
+        public void DisposeQuery(IPoeQueryInfo query)
+        {
+            Guard.ArgumentNotNull(query, nameof(query));
         }
 
         private async Task<IPoeQueryResult> IssueQuery(string uri, NameValueCollection queryParameters)
@@ -99,17 +104,18 @@ namespace PoeEye.PoeTrade
             {
                 var client = CreateClient(out proxyToken);
 
-                Log.Instance.Debug($"[PoeTradeHeadlessApi] Awaiting for semaphore slot (max: {config.MaxSimultaneousRequestsCount}, atm: {requestsSemaphore.CurrentCount})");
+                Log.Instance.Debug(
+                    $"[PoeTradeHeadlessApi] Awaiting for semaphore slot (max: {config.MaxSimultaneousRequestsCount}, atm: {requestsSemaphore.CurrentCount})");
                 await requestsSemaphore.WaitAsync();
 
                 return await client
-                    .Post(uri, queryParameters)
-                    .ToObservable()
-                    .Select(x => client.GetSource().Result)
-                    .Select(ThrowIfNotParseable)
-                    .Select(poeTradeParser.ParseQueryResponse)
-                    .Finally(ReleaseSemaphore)
-                    .Finally(() => client.Dispose());
+                             .Post(uri, queryParameters)
+                             .ToObservable()
+                             .Select(x => client.GetSource().Result)
+                             .Select(ThrowIfNotParseable)
+                             .Select(poeTradeParser.ParseQueryResponse)
+                             .Finally(ReleaseSemaphore)
+                             .Finally(() => client.Dispose());
             }
             catch (WebException ex)
             {
@@ -117,6 +123,7 @@ namespace PoeEye.PoeTrade
                 {
                     throw;
                 }
+
                 proxyToken.ReportBroken();
                 throw new WebException($"{ex.Message} (Proxy {proxyToken.Proxy})", ex);
             }
@@ -170,12 +177,8 @@ namespace PoeEye.PoeTrade
             {
                 return false;
             }
-            return queryResult.Contains("Enter captcha and press the button");
-        }
 
-        public void DisposeQuery(IPoeQueryInfo query)
-        {
-            Guard.ArgumentNotNull(query, nameof(query));
+            return queryResult.Contains("Enter captcha and press the button");
         }
     }
 }

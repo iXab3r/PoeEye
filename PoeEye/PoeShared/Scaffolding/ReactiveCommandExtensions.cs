@@ -7,7 +7,7 @@ namespace PoeShared.Scaffolding
     public static class ReactiveCommandExtensions
     {
         public static ReactiveCommand<T> SubscribeToExceptions<T>(
-            this ReactiveCommand<T> instance, 
+            this ReactiveCommand<T> instance,
             Action<Exception> onNextError,
             Action<IDisposable> anchorProcessor)
         {

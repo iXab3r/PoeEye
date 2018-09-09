@@ -11,8 +11,10 @@ namespace PoeEye.Utilities
         public TabablzPositionMonitor()
         {
             Items = Enumerable.Empty<T>();
-            this.OrderChanged += OnOrderChanged;
+            OrderChanged += OnOrderChanged;
         }
+
+        public IEnumerable<T> Items { get; private set; }
 
         private void OnOrderChanged(object sender, OrderChangedEventArgs orderChangedEventArgs)
         {
@@ -21,13 +23,12 @@ namespace PoeEye.Utilities
                 return;
             }
 
-            Log.Instance.Trace($"[PositionMonitor] Items order has changed, \nOld:\n\t{orderChangedEventArgs.PreviousOrder.EmptyIfNull().Select(x => x?.ToString() ?? "(null)").DumpToTable()}, \nNew:\n\t{orderChangedEventArgs.NewOrder.EmptyIfNull().Select(x => x?.ToString() ?? "(null)").DumpToTable()}");
+            Log.Instance.Trace(
+                $"[PositionMonitor] Items order has changed, \nOld:\n\t{orderChangedEventArgs.PreviousOrder.EmptyIfNull().Select(x => x?.ToString() ?? "(null)").DumpToTable()}, \nNew:\n\t{orderChangedEventArgs.NewOrder.EmptyIfNull().Select(x => x?.ToString() ?? "(null)").DumpToTable()}");
             Items = orderChangedEventArgs.NewOrder
-                .EmptyIfNull()
-                .OfType<T>()
-                .ToArray();
+                                         .EmptyIfNull()
+                                         .OfType<T>()
+                                         .ToArray();
         }
-
-        public IEnumerable<T> Items { get; private set; }
     }
 }

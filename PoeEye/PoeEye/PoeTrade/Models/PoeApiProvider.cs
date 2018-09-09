@@ -16,7 +16,7 @@ namespace PoeEye.PoeTrade.Models
     internal sealed class PoeApiProvider : DisposableReactiveObject, IPoeApiProvider
     {
         private readonly ObservableCollectionExtended<IPoeApiWrapper> modulesList = new ObservableCollectionExtended<IPoeApiWrapper>();
-        
+
         public PoeApiProvider(
             [NotNull] IUnityContainer container,
             [NotNull] IFactory<IPoeApiWrapper, IPoeApi> wrapperFactory)
@@ -26,9 +26,9 @@ namespace PoeEye.PoeTrade.Models
 
             Log.Instance.Debug($"[PoeApiProvider..ctor] Loading APIs list...");
             var apiList = container
-                .ResolveAll<IPoeApi>()
-                .Select(wrapperFactory.Create)
-                .ToObservableCollection();
+                          .ResolveAll<IPoeApi>()
+                          .Select(wrapperFactory.Create)
+                          .ToObservableCollection();
             Log.Instance.Debug($"[PoeApiProvider..ctor] API list:\r\n\t{apiList.DumpToText()}");
 
             apiList
@@ -36,7 +36,7 @@ namespace PoeEye.PoeTrade.Models
                 .Bind(modulesList)
                 .Subscribe()
                 .AddTo(Anchors);
-            
+
             ModulesList = new ReadOnlyObservableCollection<IPoeApiWrapper>(modulesList);
         }
 

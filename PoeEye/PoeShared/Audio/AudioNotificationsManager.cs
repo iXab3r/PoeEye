@@ -17,13 +17,13 @@ namespace PoeShared.Audio
     {
         private readonly IDictionary<AudioNotificationType, byte[]> knownNotifications = new Dictionary
             <AudioNotificationType, byte[]>
-        {
-            {AudioNotificationType.Silence, new byte[0]},
-        };
+            {
+                {AudioNotificationType.Silence, new byte[0]}
+            };
 
         private bool isEnabled;
 
-        public AudioNotificationsManager([NotNull] IConfigProvider<PoeEyeSharedConfig> poeEyeConfigProvider) 
+        public AudioNotificationsManager([NotNull] IConfigProvider<PoeEyeSharedConfig> poeEyeConfigProvider)
         {
             Guard.ArgumentNotNull(poeEyeConfigProvider, nameof(poeEyeConfigProvider));
 
@@ -31,19 +31,19 @@ namespace PoeShared.Audio
             Initialize();
 
             var playNotificationCommandCanExecute = poeEyeConfigProvider
-                .WhenChanged
-                .Select(x => x.AudioNotificationsEnabled);
+                                                    .WhenChanged
+                                                    .Select(x => x.AudioNotificationsEnabled);
 
             var playNotificationCommand = new ReactiveCommand<AudioNotificationType>(
-                playNotificationCommandCanExecute, x => Observable.Return((AudioNotificationType) x));
+                playNotificationCommandCanExecute, x => Observable.Return((AudioNotificationType)x));
             playNotificationCommand
                 .Where(x => x != AudioNotificationType.Disabled)
                 .Subscribe(PlayNotification)
                 .AddTo(Anchors);
 
-            Observable.DistinctUntilChanged<bool>(playNotificationCommandCanExecute)
-                .Subscribe(newValue => isEnabled = newValue)
-                .AddTo(Anchors);
+            playNotificationCommandCanExecute.DistinctUntilChanged()
+                                             .Subscribe(newValue => isEnabled = newValue)
+                                             .AddTo(Anchors);
         }
 
         public void PlayNotification(AudioNotificationType notificationType)
@@ -93,6 +93,7 @@ namespace PoeShared.Audio
                     Log.Instance.Warn($"[AudioNotificationsManager.Initialize] Failed to load notification {notificationType}");
                     continue;
                 }
+
                 knownNotifications.Add(notificationType, soundData);
             }
 

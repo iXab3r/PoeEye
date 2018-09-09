@@ -39,8 +39,10 @@ namespace PoeBud.Models
             [NotNull] IStashUpdaterParameters config,
             [NotNull] IClock clock,
             [NotNull] IFactory<IPoeStashClient, NetworkCredential, bool> poeClientFactory,
-            [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler,
-            [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
+            [NotNull] [Dependency(WellKnownSchedulers.Background)]
+            IScheduler bgScheduler,
+            [NotNull] [Dependency(WellKnownSchedulers.UI)]
+            IScheduler uiScheduler)
         {
             Guard.ArgumentNotNull(config, nameof(config));
             Guard.ArgumentNotNull(clock, nameof(clock));
@@ -60,22 +62,22 @@ namespace PoeBud.Models
             poeClient = poeClientFactory.Create(credentials, true);
 
             var periodObservable = this.ObservableForProperty(x => x.RecheckPeriod)
-                .Select(x => x.Value)
-                .DistinctUntilChanged()
-                .Throttle(recheckPeriodThrottling)
-                .Select(
-                    timeout => timeout == TimeSpan.Zero
-                        ? Observable.Never<Unit>()
-                        : Observable.Timer(DateTimeOffset.Now, timeout).ToUnit())
-                .Switch()
-                .Publish();
+                                       .Select(x => x.Value)
+                                       .DistinctUntilChanged()
+                                       .Throttle(recheckPeriodThrottling)
+                                       .Select(
+                                           timeout => timeout == TimeSpan.Zero
+                                               ? Observable.Never<Unit>()
+                                               : Observable.Timer(DateTimeOffset.Now, timeout).ToUnit())
+                                       .Switch()
+                                       .Publish();
 
             var queryObservable = refreshSubject
-                .Where(x => !IsBusy)
-                .Do(StartUpdate)
-                .Select(x => Observable.Start(Refresh, bgScheduler))
-                .Switch()
-                .Do(HandleUpdate, HandleUpdateError);
+                                  .Where(x => !IsBusy)
+                                  .Do(StartUpdate)
+                                  .Select(x => Observable.Start(Refresh, bgScheduler))
+                                  .Switch()
+                                  .Do(HandleUpdate, HandleUpdateError);
 
             Observable
                 .Defer(() => queryObservable)
@@ -89,20 +91,20 @@ namespace PoeBud.Models
 
         public TimeSpan RecheckPeriod
         {
-            get { return recheckPeriod; }
-            set { this.RaiseAndSetIfChanged(ref recheckPeriod, value); }
+            get => recheckPeriod;
+            set => this.RaiseAndSetIfChanged(ref recheckPeriod, value);
         }
 
         public DateTime LastUpdateTimestamp
         {
-            get { return lastUpdateTimestamp; }
-            set { this.RaiseAndSetIfChanged(ref lastUpdateTimestamp, value); }
+            get => lastUpdateTimestamp;
+            set => this.RaiseAndSetIfChanged(ref lastUpdateTimestamp, value);
         }
 
         public bool IsBusy
         {
-            get { return isBusy; }
-            set { this.RaiseAndSetIfChanged(ref isBusy, value); }
+            get => isBusy;
+            set => this.RaiseAndSetIfChanged(ref isBusy, value);
         }
 
         public IObservable<StashUpdate> Updates => updatesSubject;
@@ -155,6 +157,7 @@ namespace PoeBud.Models
                         Log.Instance.Debug($"No stashes found in league {league.Id}");
                         continue;
                     }
+
                     Log.Instance.Debug($"Tabs({tabs.Length}) in league {league.Id}: {tabs.Select(x => x.Name).DumpToTextRaw()}");
                     stashesToRequest = strategy.GetTabsToProcess(tabs);
                 }
@@ -168,7 +171,7 @@ namespace PoeBud.Models
                     Log.Instance.Debug($"No stashes to process in league {league.Id}");
                     continue;
                 }
-                                                    
+
                 Log.Instance.Debug($"Requesting stashes [{stashesToRequest.DumpToTextRaw()}]...");
                 foreach (var tab in stashesToRequest)
                 {
@@ -188,13 +191,13 @@ namespace PoeBud.Models
             }
 
             var allItems = allStashes
-                .SelectMany(x => x.Items)
-                .Distinct(new LambdaComparer<IStashItem>((x, y) => x?.Id == y?.Id))
-                .ToArray();
+                           .SelectMany(x => x.Items)
+                           .Distinct(new LambdaComparer<IStashItem>((x, y) => x?.Id == y?.Id))
+                           .ToArray();
             var allTabs = allStashes
-                .SelectMany(x => x.Tabs)
-                .Distinct(new LambdaComparer<IStashTab>((x, y) => x?.Id == y?.Id))
-                .ToArray();
+                          .SelectMany(x => x.Tabs)
+                          .Distinct(new LambdaComparer<IStashTab>((x, y) => x?.Id == y?.Id))
+                          .ToArray();
 
             Log.Instance.Debug($"Got {allItems.Length} item(s) from {allTabs.Length} tab(s)...");
             return new StashUpdate(allItems, allTabs.ToArray());
@@ -208,13 +211,14 @@ namespace PoeBud.Models
                 Log.Instance.Debug("Authenticating...");
                 poeClient.Authenticate();
             }
+
             Thread.Sleep((int)UiConstants.ArtificialLongDelay.TotalMilliseconds);
 
 
             var strategy = stashUpdaterStrategy;
             if (strategy == null)
             {
-               Log.Instance.Warn($"Strategy is not set");
+                Log.Instance.Warn($"Strategy is not set");
                 return StashUpdate.Empty;
             }
 

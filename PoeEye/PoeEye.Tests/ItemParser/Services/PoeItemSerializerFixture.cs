@@ -14,20 +14,6 @@ namespace PoeEye.Tests.ItemParser.Services
     [TestFixture]
     public class PoeItemSerializerFixture
     {
-        [Test]
-        [TestCaseSource(nameof(KnownPathOfBuildingItems))]
-        public void ShouldSerializeItems(string expectedData, IPoeItem item)
-        {
-            //Given
-            var instance = CreateInstance();
-
-            //When
-            var result = instance.Serialize(item);
-
-            //Then
-            result.ShouldBe(TrimLines(expectedData));
-        }
-
         private IEnumerable<TestCaseData> KnownPathOfBuildingItems()
         {
             yield return new TestCaseData(
@@ -43,7 +29,7 @@ namespace PoeEye.Tests.ItemParser.Services
                   63% increased Armour and Evasion",
                 Mock.Of<IPoeItem>(
                     x => x.Rarity == PoeItemRarity.Rare &&
-                         x.TypeInfo == new ItemTypeInfo()
+                         x.TypeInfo == new ItemTypeInfo
                          {
                              ItemName = "Gloom Nails",
                              ItemType = "Wyrmscale Gauntlets"
@@ -103,7 +89,7 @@ namespace PoeEye.Tests.ItemParser.Services
                   30% of Physical Damage taken as Lightning Damage",
                 Mock.Of<IPoeItem>(
                     x => x.Rarity == PoeItemRarity.Unique &&
-                         x.TypeInfo == new ItemTypeInfo()
+                         x.TypeInfo == new ItemTypeInfo
                          {
                              ItemName = "Lightning Coil",
                              ItemType = "Desert Brigandine"
@@ -172,7 +158,7 @@ namespace PoeEye.Tests.ItemParser.Services
                 -6 to Mana Cost of Skills",
                 Mock.Of<IPoeItem>(
                     x => x.Rarity == PoeItemRarity.Rare &&
-                         x.TypeInfo == new ItemTypeInfo()
+                         x.TypeInfo == new ItemTypeInfo
                          {
                              ItemName = "Corruption Clasp",
                              ItemType = "Agate Amulet"
@@ -273,7 +259,7 @@ namespace PoeEye.Tests.ItemParser.Services
                 +5% Chance to Block",
                 Mock.Of<IPoeItem>(
                     x => x.Rarity == PoeItemRarity.Unique &&
-                         x.TypeInfo == new ItemTypeInfo()
+                         x.TypeInfo == new ItemTypeInfo
                          {
                              ItemName = "Lioneye's Remorse",
                              ItemType = "Pinnacle Tower Shield"
@@ -320,54 +306,54 @@ namespace PoeEye.Tests.ItemParser.Services
                                  ModType = PoeModType.Explicit
                              }
                          }));
-            
+
             yield return new TestCaseData(
                 @"Two-Stone Ring",
                 Mock.Of<IPoeItem>(
-                    x => x.TypeInfo == new ItemTypeInfo(){ ItemName = "Two-Stone Ring"}));
+                    x => x.TypeInfo == new ItemTypeInfo {ItemName = "Two-Stone Ring"}));
             yield return new TestCaseData(
                 @"Two-Stone Ring",
                 Mock.Of<IPoeItem>(
-                    x => x.TypeInfo == new ItemTypeInfo(){ ItemType = "Two-Stone Ring"}));
+                    x => x.TypeInfo == new ItemTypeInfo {ItemType = "Two-Stone Ring"}));
             yield return new TestCaseData(
                 @"Death
                   Two-Stone Ring",
                 Mock.Of<IPoeItem>(
-                    x => x.TypeInfo == new ItemTypeInfo(){ ItemName = "Death", ItemType = "Two-Stone Ring"}));
+                    x => x.TypeInfo == new ItemTypeInfo {ItemName = "Death", ItemType = "Two-Stone Ring"}));
             yield return new TestCaseData(
                 @"Death
                   Two-Stone Ring",
                 Mock.Of<IPoeItem>(
-                    x => x.ItemName == "Custom item name" && x.TypeInfo == new ItemTypeInfo { ItemName = "Death", ItemType = "Two-Stone Ring"}));
+                    x => x.ItemName == "Custom item name" && x.TypeInfo == new ItemTypeInfo {ItemName = "Death", ItemType = "Two-Stone Ring"}));
             yield return new TestCaseData(
                 @"Custom item name",
                 Mock.Of<IPoeItem>(
-                    x => x.ItemName == "Custom item name" && x.TypeInfo == new ItemTypeInfo { ItemType = "Two-Stone Ring"}));
+                    x => x.ItemName == "Custom item name" && x.TypeInfo == new ItemTypeInfo {ItemType = "Two-Stone Ring"}));
             yield return new TestCaseData(
                 @"Custom item name",
                 Mock.Of<IPoeItem>(
-                    x => x.ItemName == "Custom item name" && x.TypeInfo == new ItemTypeInfo { ItemName = "Death"}));
+                    x => x.ItemName == "Custom item name" && x.TypeInfo == new ItemTypeInfo {ItemName = "Death"}));
             yield return new TestCaseData(
                 @"Two-Stone Ring
                   --------
                   {crafted}enchant",
                 Mock.Of<IPoeItem>(
-                    x => x.ItemName == "Two-Stone Ring" &&  
+                    x => x.ItemName == "Two-Stone Ring" &&
                          x.Mods == new[]
-                        {
-                            new PoeItemMod
-                            {
-                                Name = @"enchant",
-                                ModType = PoeModType.Explicit,
-                                Origin = PoeModOrigin.Enchant
-                            },
-                        }));
+                         {
+                             new PoeItemMod
+                             {
+                                 Name = @"enchant",
+                                 ModType = PoeModType.Explicit,
+                                 Origin = PoeModOrigin.Enchant
+                             }
+                         }));
             yield return new TestCaseData(
                 @"Two-Stone Ring
                   --------
                   {crafted}craft",
                 Mock.Of<IPoeItem>(
-                    x => x.ItemName == "Two-Stone Ring" &&  
+                    x => x.ItemName == "Two-Stone Ring" &&
                          x.Mods == new[]
                          {
                              new PoeItemMod
@@ -375,21 +361,35 @@ namespace PoeEye.Tests.ItemParser.Services
                                  Name = @"craft",
                                  ModType = PoeModType.Explicit,
                                  Origin = PoeModOrigin.Craft
-                             },
+                             }
                          }));
         }
 
         private string TrimLines(string source)
         {
             return source
-                .Split(new[] {"\r", "\n"}, StringSplitOptions.RemoveEmptyEntries)
-                .Select(x => x.Trim())
-                .JoinStrings(Environment.NewLine);
+                   .Split(new[] {"\r", "\n"}, StringSplitOptions.RemoveEmptyEntries)
+                   .Select(x => x.Trim())
+                   .JoinStrings(Environment.NewLine);
         }
-        
+
         private PoeItemSerializer CreateInstance()
         {
             return new PoeItemSerializer();
+        }
+
+        [Test]
+        [TestCaseSource(nameof(KnownPathOfBuildingItems))]
+        public void ShouldSerializeItems(string expectedData, IPoeItem item)
+        {
+            //Given
+            var instance = CreateInstance();
+
+            //When
+            var result = instance.Serialize(item);
+
+            //Then
+            result.ShouldBe(TrimLines(expectedData));
         }
     }
 }

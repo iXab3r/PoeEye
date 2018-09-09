@@ -58,14 +58,14 @@ namespace PoeShared.PoeTrade
 
         public bool IsBusy
         {
-            get { return isBusy; }
-            set { this.RaiseAndSetIfChanged(ref isBusy, value); }
+            get => isBusy;
+            set => this.RaiseAndSetIfChanged(ref isBusy, value);
         }
 
         public TimeSpan RecheckPeriod
         {
-            get { return recheckPeriod; }
-            set { this.RaiseAndSetIfChanged(ref recheckPeriod, value); }
+            get => recheckPeriod;
+            set => this.RaiseAndSetIfChanged(ref recheckPeriod, value);
         }
 
         public void Refresh()

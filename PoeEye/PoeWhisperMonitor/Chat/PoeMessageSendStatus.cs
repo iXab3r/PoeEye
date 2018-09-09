@@ -7,6 +7,6 @@
         FailedWindowNotFound,
         FailedToActivateWindow,
         Error,
-        Success,
+        Success
     }
 }

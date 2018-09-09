@@ -5,8 +5,8 @@ namespace PoeShared.Scaffolding
 {
     public sealed class LambdaComparer<T> : IEqualityComparer<T>
     {
-        readonly Func<T, T, bool> comparer;
-        readonly Func<T, int> hash;
+        private readonly Func<T, T, bool> comparer;
+        private readonly Func<T, int> hash;
 
         public LambdaComparer(Func<T, T, bool> comparer)
             : this(comparer, t => 0)
@@ -25,10 +25,12 @@ namespace PoeShared.Scaffolding
             {
                 return true;
             }
+
             if (ReferenceEquals(x, null))
             {
                 return false;
             }
+
             if (ReferenceEquals(y, null))
             {
                 return false;

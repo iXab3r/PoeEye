@@ -18,15 +18,15 @@ namespace PoeShared.UI.Controls
 
         public string TextContent
         {
-            get { return Text; }
-            set { Text = value; }
+            get => Text;
+            set => Text = value;
         }
 
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
 
         private static void OnMyContentChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            var control = (ExtendedTextEditor) sender;
+            var control = (ExtendedTextEditor)sender;
             var newValue = e.NewValue as string;
             if (!string.Equals(newValue, control.TextContent, StringComparison.Ordinal))
             {

@@ -10,19 +10,24 @@ namespace PoeEye.Tests.PoeShared.Communications.Chromium
     [Ignore("Chromium is currently not testably w/o hacks")]
     public class ChromiumBootstrapperFixture
     {
-        private Mock<IFactory<ChromiumBrowser, ChromiumWebBrowser>> browserFactory;
-        
         [SetUp]
         public void SetUp()
         {
             browserFactory = new Mock<IFactory<ChromiumBrowser, ChromiumWebBrowser>>();
         }
-        
+
+        private Mock<IFactory<ChromiumBrowser, ChromiumWebBrowser>> browserFactory;
+
         [TestFixtureSetUp]
         public void SetUpFixture()
         {
         }
-        
+
+        private ChromiumBrowserFactory CreateInstance()
+        {
+            return new ChromiumBrowserFactory(browserFactory.Object);
+        }
+
 
         [Test]
         public void ShouldCreate()
@@ -43,11 +48,6 @@ namespace PoeEye.Tests.PoeShared.Communications.Chromium
 
             //Then
             var html = browser.GetSource();
-        }
-
-        private ChromiumBrowserFactory CreateInstance()
-        {
-            return new ChromiumBrowserFactory(browserFactory.Object);
         }
     }
 }

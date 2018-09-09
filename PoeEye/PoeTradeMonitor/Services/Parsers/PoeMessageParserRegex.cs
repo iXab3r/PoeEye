@@ -21,8 +21,6 @@ namespace PoeEye.TradeMonitor.Services.Parsers
             this.stringToPoePriceConverter = stringToPoePriceConverter;
         }
 
-        protected abstract Regex GetMessageParser();
-
         public bool TryParse(PoeMessage message, out TradeModel result)
         {
             result = default(TradeModel);
@@ -42,12 +40,12 @@ namespace PoeEye.TradeMonitor.Services.Parsers
                         ItemPosition = new ItemPosition
                         {
                             X = int.Parse(GetGroupOrDefault(match, "itemX", "1")) - 1,
-                            Y = int.Parse(GetGroupOrDefault(match, "itemY", "1")) - 1,
+                            Y = int.Parse(GetGroupOrDefault(match, "itemY", "1")) - 1
                         },
                         Timestamp = message.Timestamp,
                         Offer = GetGroupOrDefault(match, "offer"),
-                        TradeType = message.MessageType == PoeMessageType.WhisperIncoming 
-                            ? TradeType.Sell 
+                        TradeType = message.MessageType == PoeMessageType.WhisperIncoming
+                            ? TradeType.Sell
                             : TradeType.Buy
                     };
                 }
@@ -55,17 +53,19 @@ namespace PoeEye.TradeMonitor.Services.Parsers
                 {
                     throw new FormatException($"Failed to parse string '{message}', match\n{CollectMatchInfo(match)}", e);
                 }
-                
+
                 return true;
             }
 
             return false;
         }
 
+        protected abstract Regex GetMessageParser();
+
         private string GetGroupOrDefault(Match match, string groupName, string defaultValue = null)
         {
-            return match.Success && match.Groups[groupName].Success 
-                ? match.Groups[groupName].Value 
+            return match.Success && match.Groups[groupName].Success
+                ? match.Groups[groupName].Value
                 : defaultValue;
         }
 
@@ -79,8 +79,8 @@ namespace PoeEye.TradeMonitor.Services.Parsers
 
             return new
             {
-                Success = match.Success,
-                Value = match.Value,
+                match.Success,
+                match.Value,
                 Groups = groups
             }.DumpToText();
         }

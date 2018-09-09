@@ -11,8 +11,8 @@ namespace PoeShared.PoeControlPanel.Modularity
 {
     public sealed class PoeControlPanelModule : IPoeEyeModule
     {
-        private readonly IUnityContainer container;
         private readonly CompositeDisposable anchors = new CompositeDisposable();
+        private readonly IUnityContainer container;
 
         public PoeControlPanelModule([NotNull] IUnityContainer container)
         {

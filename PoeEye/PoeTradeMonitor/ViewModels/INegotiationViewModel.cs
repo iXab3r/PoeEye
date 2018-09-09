@@ -8,9 +8,9 @@ namespace PoeEye.TradeMonitor.ViewModels
     {
         TradeModel Negotiation { [NotNull] get; }
 
-        void UpdateModel([NotNull] TradeModel update);
-
         bool IsExpanded { get; set; }
+
+        void UpdateModel([NotNull] TradeModel update);
 
         void SetCloseController([NotNull] INegotiationCloseController closeController);
     }

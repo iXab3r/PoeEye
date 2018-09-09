@@ -15,25 +15,25 @@ namespace PoeShared.StashApi
         bool IsAuthenticated { get; }
 
         void Authenticate();
-        
+
         Task AuthenticateAsync();
-        
-        [NotNull] 
+
+        [NotNull]
         ICharacter[] GetCharacters();
 
-        [NotNull] 
+        [NotNull]
         Task<ICharacter[]> GetCharactersAsync();
 
-        [NotNull] 
+        [NotNull]
         IInventory GetInventory(string characterName);
-        
-        [NotNull] 
+
+        [NotNull]
         Task<IInventory> GetInventoryAsync(string characterName);
 
-        [NotNull] 
+        [NotNull]
         IStash GetStash(int index, string league);
-        
-        [NotNull] 
+
+        [NotNull]
         Task<IStash> GetStashAsync(int stashIdx, string league);
     }
 }

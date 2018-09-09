@@ -51,7 +51,7 @@ namespace PoeEye.PoeTrade.ViewModels
 
             configProvider
                 .WhenChanged
-                .Select(x => new { x.MinRefreshTimeout, x.MaxRefreshTimeout })
+                .Select(x => new {x.MinRefreshTimeout, x.MaxRefreshTimeout})
                 .DistinctUntilChanged()
                 .Subscribe(x => Reinitialize(x.MinRefreshTimeout, x.MaxRefreshTimeout))
                 .AddTo(Anchors);
@@ -59,26 +59,26 @@ namespace PoeEye.PoeTrade.ViewModels
 
         public TimeSpan MinValue
         {
-            get { return minValue; }
-            set { this.RaiseAndSetIfChanged(ref minValue, value); }
+            get => minValue;
+            set => this.RaiseAndSetIfChanged(ref minValue, value);
         }
 
         public TimeSpan MaxValue
         {
-            get { return maxValue; }
-            set { this.RaiseAndSetIfChanged(ref maxValue, value); }
+            get => maxValue;
+            set => this.RaiseAndSetIfChanged(ref maxValue, value);
         }
 
         public TimeSpan Period
         {
-            get { return period; }
-            set { this.RaiseAndSetIfChanged(ref period, value); }
+            get => period;
+            set => this.RaiseAndSetIfChanged(ref period, value);
         }
 
         public bool IsAutoRecheckEnabled
         {
-            get { return isAutoRecheckEnabled; }
-            set { this.RaiseAndSetIfChanged(ref isAutoRecheckEnabled, value); }
+            get => isAutoRecheckEnabled;
+            set => this.RaiseAndSetIfChanged(ref isAutoRecheckEnabled, value);
         }
 
         private TimeSpan MiddleSplit(TimeSpan min, TimeSpan max)

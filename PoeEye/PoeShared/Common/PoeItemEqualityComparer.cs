@@ -14,10 +14,12 @@ namespace PoeShared.Common
             {
                 return true;
             }
+
             if (ReferenceEquals(x, null))
             {
                 return false;
             }
+
             if (ReferenceEquals(y, null))
             {
                 return false;

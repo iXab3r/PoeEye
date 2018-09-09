@@ -22,7 +22,7 @@ namespace PoeEye.Tests.Helpers
         {
             Assert.IsInstanceOf<MemberExpression>(expr.Body);
 
-            var memberExpression = (MemberExpression) expr.Body;
+            var memberExpression = (MemberExpression)expr.Body;
             var propertyName = memberExpression.Member.Name;
             mock.Raise(x => x.PropertyChanged += null, new PropertyChangedEventArgs(propertyName));
         }

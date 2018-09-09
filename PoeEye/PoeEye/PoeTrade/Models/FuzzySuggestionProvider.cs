@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using FuzzySearch;
 using Guards;
@@ -20,13 +21,13 @@ namespace PoeEye.PoeTrade.Models
             searchService = new RunglishSearchService(new XSearchService<string>(haystack, x => x));
         }
 
-        public System.Collections.IEnumerable GetSuggestions(string filter)
+        public IEnumerable GetSuggestions(string filter)
         {
             var filteredStrings = searchService
-                .Search(filter)
-                .Select(x => x.Result)
-                .Take(MaxResults)
-                .ToArray();
+                                  .Search(filter)
+                                  .Select(x => x.Result)
+                                  .Take(MaxResults)
+                                  .ToArray();
             return filteredStrings;
         }
     }

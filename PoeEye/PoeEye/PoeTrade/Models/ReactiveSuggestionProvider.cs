@@ -6,17 +6,18 @@ using PoeShared.Scaffolding;
 using ReactiveUI;
 using WpfAutoCompleteControls.Editors;
 
-namespace PoeEye.PoeTrade.Models {
+namespace PoeEye.PoeTrade.Models
+{
     internal sealed class ReactiveSuggestionProvider : DisposableReactiveObject, IReactiveSuggestionProvider
     {
         private IEnumerable<string> items;
 
         private ISuggestionProvider suggestionProvider;
-        
+
         public ReactiveSuggestionProvider()
         {
             this.WhenAnyValue(x => x.Items)
-                .Select(x => EnumerableExtensions.EmptyIfNull<string>(x))
+                .Select(x => x.EmptyIfNull())
                 .Subscribe(x => suggestionProvider = new FuzzySuggestionProvider(x))
                 .AddTo(Anchors);
         }
@@ -28,8 +29,8 @@ namespace PoeEye.PoeTrade.Models {
 
         public IEnumerable<string> Items
         {
-            get { return items; }
-            set { this.RaiseAndSetIfChanged(ref items, value); }
+            get => items;
+            set => this.RaiseAndSetIfChanged(ref items, value);
         }
     }
 }

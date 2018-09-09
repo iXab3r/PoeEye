@@ -19,7 +19,12 @@ namespace PoeEye.PoeTrade.ViewModels
 {
     internal sealed class PoeQueryViewModel : DisposableReactiveObject, IPoeQueryViewModel
     {
+        private readonly ObservableCollectionExtended<IPoeCurrency> currencyList = new ObservableCollectionExtended<IPoeCurrency>();
+        private readonly ObservableCollectionExtended<IPoeItemType> itemTypeList = new ObservableCollectionExtended<IPoeItemType>();
+
         private string accountName;
+        private TriState? affectedByElderState;
+        private TriState? affectedByShaperState;
         private bool alternativeArt;
         private float? apsMax;
         private float? apsMin;
@@ -31,11 +36,9 @@ namespace PoeEye.PoeTrade.ViewModels
         private float? buyoutMax;
         private float? buyoutMin;
         private PoeBuyoutMode? buyoutMode;
+        private bool captureFocusOnFirstGet = true;
         private TriState? corruptionState;
         private TriState? craftState;
-        private TriState? affectedByElderState;
-        private TriState? affectedByShaperState;
-        private TriState? enchantState;
         private float? critMax;
         private float? critMin;
         private float? damageMax;
@@ -44,6 +47,7 @@ namespace PoeEye.PoeTrade.ViewModels
         private float? dpsMin;
         private float? edpsMax;
         private float? edpsMin;
+        private TriState? enchantState;
         private float? evasionMax;
         private float? evasionMin;
         private int? gemOrMapLevelMax;
@@ -52,14 +56,14 @@ namespace PoeEye.PoeTrade.ViewModels
         private int? incQuantityMin;
         private bool isExpanded = true;
         private string itemBase;
+        private int? itemLevelMax;
+        private int? itemLevelMin;
         private string itemName;
         private PoeItemRarity? itemRarity;
         private IPoeItemType itemType;
         private string league;
         private int? levelMax;
         private int? levelMin;
-        private int? itemLevelMax;
-        private int? itemLevelMin;
         private int? linkedB;
         private int? linkedG;
         private int? linkedR;
@@ -88,11 +92,6 @@ namespace PoeEye.PoeTrade.ViewModels
         private int? socketsMin;
         private int? socketsR;
         private int? socketsW;
-        private bool captureFocusOnFirstGet = true;
-        
-        private readonly ObservableCollectionExtended<string> leaguesList = new ObservableCollectionExtended<string>();
-        private readonly ObservableCollectionExtended<IPoeCurrency> currencyList = new ObservableCollectionExtended<IPoeCurrency>();
-        private readonly ObservableCollectionExtended<IPoeItemType> itemTypeList = new ObservableCollectionExtended<IPoeItemType>();
 
         public PoeQueryViewModel(
             [NotNull] IPoeStaticDataSource staticDataSource,
@@ -105,7 +104,7 @@ namespace PoeEye.PoeTrade.ViewModels
             Guard.ArgumentNotNull(suggestionProviderFactory, nameof(suggestionProviderFactory));
             Guard.ArgumentNotNull(poeDatabaseReader, nameof(poeDatabaseReader));
 
-            LeaguesList = new ReadOnlyObservableCollection<string>(leaguesList);
+            LeaguesList = new ReadOnlyObservableCollection<string>(LL);
             CurrenciesList = new ReadOnlyObservableCollection<IPoeCurrency>(currencyList);
             ItemTypes = new ReadOnlyObservableCollection<IPoeItemType>(itemTypeList);
             ModGroupsEditor = modGroupsEditorFactory.Create(staticDataSource);
@@ -114,7 +113,7 @@ namespace PoeEye.PoeTrade.ViewModels
             BuyoutMode = PoeBuyoutMode.BuyoutOnly;
             NormalizeQuality = true;
 
-            Observable.Merge(this.WhenAnyValue(x => x.League), leaguesList.ToObservableChangeSet().Select(x => League))
+            this.WhenAnyValue(x => x.League).Merge(LL.ToObservableChangeSet().Select(x => League))
                 .Where(string.IsNullOrWhiteSpace)
                 .Subscribe(() => League = LeaguesList.FirstOrDefault())
                 .AddTo(Anchors);
@@ -124,11 +123,11 @@ namespace PoeEye.PoeTrade.ViewModels
                 .Subscribe(
                     staticData =>
                     {
-                        leaguesList.Clear();
+                        LL.Clear();
                         currencyList.Clear();
                         itemTypeList.Clear();
 
-                        leaguesList.AddRange(staticData.LeaguesList);
+                        LL.AddRange(staticData.LeaguesList);
                         currencyList.AddRange(staticData.CurrenciesList);
                         itemTypeList.AddRange(staticData.ItemTypes);
                     })
@@ -136,12 +135,12 @@ namespace PoeEye.PoeTrade.ViewModels
 
             NameSuggestionProvider = suggestionProviderFactory.Create();
             NameSuggestionProvider.Items = poeDatabaseReader.KnownEntityNames;
-
         }
-        
+
         public bool CaptureFocus
         {
-            get {
+            get
+            {
                 if (captureFocusOnFirstGet)
                 {
                     //FIXME This hack was implemented to focus on QueryTextBox when new tab is created. Usual approach is not working due to TabControl virtualisation
@@ -155,23 +154,23 @@ namespace PoeEye.PoeTrade.ViewModels
 
         public int? GemOrMapLevelMin
         {
-            get { return gemOrMapLevelMin; }
-            set { this.RaiseAndSetIfChanged(ref gemOrMapLevelMin, value); }
+            get => gemOrMapLevelMin;
+            set => this.RaiseAndSetIfChanged(ref gemOrMapLevelMin, value);
         }
 
         public int? GemOrMapLevelMax
         {
-            get { return gemOrMapLevelMax; }
-            set { this.RaiseAndSetIfChanged(ref gemOrMapLevelMax, value); }
+            get => gemOrMapLevelMax;
+            set => this.RaiseAndSetIfChanged(ref gemOrMapLevelMax, value);
         }
 
         public ReadOnlyObservableCollection<string> LeaguesList { get; }
 
         public ReadOnlyObservableCollection<IPoeCurrency> CurrenciesList { get; }
-        
+
         public ReadOnlyObservableCollection<IPoeItemType> ItemTypes { get; }
 
-        public ObservableCollectionExtended<string> LL => leaguesList;
+        public ObservableCollectionExtended<string> LL { get; } = new ObservableCollectionExtended<string>();
 
         public IPoeModGroupsEditorViewModel ModGroupsEditor { get; }
 
@@ -183,416 +182,407 @@ namespace PoeEye.PoeTrade.ViewModels
 
         public float? DamageMin
         {
-            get { return damageMin; }
-            set { this.RaiseAndSetIfChanged(ref damageMin, value); }
+            get => damageMin;
+            set => this.RaiseAndSetIfChanged(ref damageMin, value);
         }
 
         public float? DamageMax
         {
-            get { return damageMax; }
-            set { this.RaiseAndSetIfChanged(ref damageMax, value); }
+            get => damageMax;
+            set => this.RaiseAndSetIfChanged(ref damageMax, value);
         }
 
         public float? ApsMin
         {
-            get { return apsMin; }
-            set { this.RaiseAndSetIfChanged(ref apsMin, value); }
+            get => apsMin;
+            set => this.RaiseAndSetIfChanged(ref apsMin, value);
         }
 
         public float? ApsMax
         {
-            get { return apsMax; }
-            set { this.RaiseAndSetIfChanged(ref apsMax, value); }
+            get => apsMax;
+            set => this.RaiseAndSetIfChanged(ref apsMax, value);
         }
 
         public float? CritMin
         {
-            get { return critMin; }
-            set { this.RaiseAndSetIfChanged(ref critMin, value); }
+            get => critMin;
+            set => this.RaiseAndSetIfChanged(ref critMin, value);
         }
 
         public float? CritMax
         {
-            get { return critMax; }
-            set { this.RaiseAndSetIfChanged(ref critMax, value); }
+            get => critMax;
+            set => this.RaiseAndSetIfChanged(ref critMax, value);
         }
 
         public float? DpsMin
         {
-            get { return dpsMin; }
-            set { this.RaiseAndSetIfChanged(ref dpsMin, value); }
+            get => dpsMin;
+            set => this.RaiseAndSetIfChanged(ref dpsMin, value);
         }
 
         public float? DpsMax
         {
-            get { return dpsMax; }
-            set { this.RaiseAndSetIfChanged(ref dpsMax, value); }
+            get => dpsMax;
+            set => this.RaiseAndSetIfChanged(ref dpsMax, value);
         }
 
         public float? EdpsMin
         {
-            get { return edpsMin; }
-            set { this.RaiseAndSetIfChanged(ref edpsMin, value); }
+            get => edpsMin;
+            set => this.RaiseAndSetIfChanged(ref edpsMin, value);
         }
 
         public float? EdpsMax
         {
-            get { return edpsMax; }
-            set { this.RaiseAndSetIfChanged(ref edpsMax, value); }
+            get => edpsMax;
+            set => this.RaiseAndSetIfChanged(ref edpsMax, value);
         }
 
         public float? PdpsMin
         {
-            get { return pdpsMin; }
-            set { this.RaiseAndSetIfChanged(ref pdpsMin, value); }
+            get => pdpsMin;
+            set => this.RaiseAndSetIfChanged(ref pdpsMin, value);
         }
 
         public float? PdpsMax
         {
-            get { return pdpsMax; }
-            set { this.RaiseAndSetIfChanged(ref pdpsMax, value); }
+            get => pdpsMax;
+            set => this.RaiseAndSetIfChanged(ref pdpsMax, value);
         }
 
         public float? ArmourMin
         {
-            get { return armourMin; }
-            set { this.RaiseAndSetIfChanged(ref armourMin, value); }
+            get => armourMin;
+            set => this.RaiseAndSetIfChanged(ref armourMin, value);
         }
 
         public float? ArmourMax
         {
-            get { return armourMax; }
-            set { this.RaiseAndSetIfChanged(ref armourMax, value); }
+            get => armourMax;
+            set => this.RaiseAndSetIfChanged(ref armourMax, value);
         }
 
         public float? EvasionMin
         {
-            get { return evasionMin; }
-            set { this.RaiseAndSetIfChanged(ref evasionMin, value); }
+            get => evasionMin;
+            set => this.RaiseAndSetIfChanged(ref evasionMin, value);
         }
 
         public float? EvasionMax
         {
-            get { return evasionMax; }
-            set { this.RaiseAndSetIfChanged(ref evasionMax, value); }
+            get => evasionMax;
+            set => this.RaiseAndSetIfChanged(ref evasionMax, value);
         }
 
         public float? ShieldMin
         {
-            get { return shieldMin; }
-            set { this.RaiseAndSetIfChanged(ref shieldMin, value); }
+            get => shieldMin;
+            set => this.RaiseAndSetIfChanged(ref shieldMin, value);
         }
 
         public float? ShieldMax
         {
-            get { return shieldMax; }
-            set { this.RaiseAndSetIfChanged(ref shieldMax, value); }
+            get => shieldMax;
+            set => this.RaiseAndSetIfChanged(ref shieldMax, value);
         }
 
         public float? BlockMin
         {
-            get { return blockMin; }
-            set { this.RaiseAndSetIfChanged(ref blockMin, value); }
+            get => blockMin;
+            set => this.RaiseAndSetIfChanged(ref blockMin, value);
         }
 
         public float? BlockMax
         {
-            get { return blockMax; }
-            set { this.RaiseAndSetIfChanged(ref blockMax, value); }
+            get => blockMax;
+            set => this.RaiseAndSetIfChanged(ref blockMax, value);
         }
 
         public int? SocketsMin
         {
-            get { return socketsMin; }
-            set { this.RaiseAndSetIfChanged(ref socketsMin, value); }
+            get => socketsMin;
+            set => this.RaiseAndSetIfChanged(ref socketsMin, value);
         }
 
         public int? SocketsMax
         {
-            get { return socketsMax; }
-            set { this.RaiseAndSetIfChanged(ref socketsMax, value); }
+            get => socketsMax;
+            set => this.RaiseAndSetIfChanged(ref socketsMax, value);
         }
 
         public int? LinkMin
         {
-            get { return linkMin; }
-            set { this.RaiseAndSetIfChanged(ref linkMin, value); }
+            get => linkMin;
+            set => this.RaiseAndSetIfChanged(ref linkMin, value);
         }
 
         public int? LinkMax
         {
-            get { return linkMax; }
-            set { this.RaiseAndSetIfChanged(ref linkMax, value); }
+            get => linkMax;
+            set => this.RaiseAndSetIfChanged(ref linkMax, value);
         }
 
         public int? SocketsR
         {
-            get { return socketsR; }
-            set { this.RaiseAndSetIfChanged(ref socketsR, value); }
+            get => socketsR;
+            set => this.RaiseAndSetIfChanged(ref socketsR, value);
         }
 
         public int? SocketsG
         {
-            get { return socketsG; }
-            set { this.RaiseAndSetIfChanged(ref socketsG, value); }
+            get => socketsG;
+            set => this.RaiseAndSetIfChanged(ref socketsG, value);
         }
 
         public int? SocketsW
         {
-            get { return socketsW; }
-            set { this.RaiseAndSetIfChanged(ref socketsW, value); }
+            get => socketsW;
+            set => this.RaiseAndSetIfChanged(ref socketsW, value);
         }
 
         public IPoeQueryModsGroup[] ModGroups => ModGroupsEditor.ToGroups();
 
         public int? SocketsB
         {
-            get { return socketsB; }
-            set { this.RaiseAndSetIfChanged(ref socketsB, value); }
+            get => socketsB;
+            set => this.RaiseAndSetIfChanged(ref socketsB, value);
         }
 
         public int? RLevelMin
         {
-            get { return rLevelMin; }
-            set { this.RaiseAndSetIfChanged(ref rLevelMin, value); }
+            get => rLevelMin;
+            set => this.RaiseAndSetIfChanged(ref rLevelMin, value);
         }
 
         public int? RLevelMax
         {
-            get { return rLevelMax; }
-            set { this.RaiseAndSetIfChanged(ref rLevelMax, value); }
+            get => rLevelMax;
+            set => this.RaiseAndSetIfChanged(ref rLevelMax, value);
         }
 
         public int? RStrMin
         {
-            get { return rStrMin; }
-            set { this.RaiseAndSetIfChanged(ref rStrMin, value); }
+            get => rStrMin;
+            set => this.RaiseAndSetIfChanged(ref rStrMin, value);
         }
 
         public int? RStrMax
         {
-            get { return rStrMax; }
-            set { this.RaiseAndSetIfChanged(ref rStrMax, value); }
+            get => rStrMax;
+            set => this.RaiseAndSetIfChanged(ref rStrMax, value);
         }
 
         public int? RDexMin
         {
-            get { return rDexMin; }
-            set { this.RaiseAndSetIfChanged(ref rDexMin, value); }
+            get => rDexMin;
+            set => this.RaiseAndSetIfChanged(ref rDexMin, value);
         }
 
         public int? RDexMax
         {
-            get { return rDexMax; }
-            set { this.RaiseAndSetIfChanged(ref rDexMax, value); }
+            get => rDexMax;
+            set => this.RaiseAndSetIfChanged(ref rDexMax, value);
         }
 
         public int? RIntMin
         {
-            get { return rIntMin; }
-            set { this.RaiseAndSetIfChanged(ref rIntMin, value); }
+            get => rIntMin;
+            set => this.RaiseAndSetIfChanged(ref rIntMin, value);
         }
 
         public int? RIntMax
         {
-            get { return rIntMax; }
-            set { this.RaiseAndSetIfChanged(ref rIntMax, value); }
+            get => rIntMax;
+            set => this.RaiseAndSetIfChanged(ref rIntMax, value);
         }
 
         public int? QualityMin
         {
-            get { return qualityMin; }
-            set { this.RaiseAndSetIfChanged(ref qualityMin, value); }
+            get => qualityMin;
+            set => this.RaiseAndSetIfChanged(ref qualityMin, value);
         }
 
         public int? QualityMax
         {
-            get { return qualityMax; }
-            set { this.RaiseAndSetIfChanged(ref qualityMax, value); }
+            get => qualityMax;
+            set => this.RaiseAndSetIfChanged(ref qualityMax, value);
         }
 
         public int? LevelMin
         {
-            get { return levelMin; }
-            set { this.RaiseAndSetIfChanged(ref levelMin, value); }
+            get => levelMin;
+            set => this.RaiseAndSetIfChanged(ref levelMin, value);
         }
 
         public int? LevelMax
         {
-            get { return levelMax; }
-            set { this.RaiseAndSetIfChanged(ref levelMax, value); }
+            get => levelMax;
+            set => this.RaiseAndSetIfChanged(ref levelMax, value);
         }
 
         public int? ItemLevelMin
         {
-            get { return itemLevelMin; }
-            set { this.RaiseAndSetIfChanged(ref itemLevelMin, value); }
+            get => itemLevelMin;
+            set => this.RaiseAndSetIfChanged(ref itemLevelMin, value);
         }
 
         public int? ItemLevelMax
         {
-            get { return itemLevelMax; }
-            set { this.RaiseAndSetIfChanged(ref itemLevelMax, value); }
+            get => itemLevelMax;
+            set => this.RaiseAndSetIfChanged(ref itemLevelMax, value);
         }
 
 
         public int? IncQuantityMin
         {
-            get { return incQuantityMin; }
-            set { this.RaiseAndSetIfChanged(ref incQuantityMin, value); }
+            get => incQuantityMin;
+            set => this.RaiseAndSetIfChanged(ref incQuantityMin, value);
         }
 
         public int? IncQuantityMax
         {
-            get { return incQuantityMax; }
-            set { this.RaiseAndSetIfChanged(ref incQuantityMax, value); }
+            get => incQuantityMax;
+            set => this.RaiseAndSetIfChanged(ref incQuantityMax, value);
         }
 
         public float? BuyoutMin
         {
-            get { return buyoutMin; }
-            set { this.RaiseAndSetIfChanged(ref buyoutMin, value); }
+            get => buyoutMin;
+            set => this.RaiseAndSetIfChanged(ref buyoutMin, value);
         }
 
         public float? BuyoutMax
         {
-            get { return buyoutMax; }
-            set { this.RaiseAndSetIfChanged(ref buyoutMax, value); }
+            get => buyoutMax;
+            set => this.RaiseAndSetIfChanged(ref buyoutMax, value);
         }
 
         public string BuyoutCurrencyType
         {
-            get { return buyoutCurrencyType; }
-            set { this.RaiseAndSetIfChanged(ref buyoutCurrencyType, value); }
+            get => buyoutCurrencyType;
+            set => this.RaiseAndSetIfChanged(ref buyoutCurrencyType, value);
         }
 
         public string League
         {
-            get { return league; }
-            set { this.RaiseAndSetIfChanged(ref league, value); }
+            get => league;
+            set => this.RaiseAndSetIfChanged(ref league, value);
         }
 
         public string AccountName
         {
-            get { return accountName; }
-            set { this.RaiseAndSetIfChanged(ref accountName, value); }
+            get => accountName;
+            set => this.RaiseAndSetIfChanged(ref accountName, value);
         }
 
         public bool OnlineOnly
         {
-            get { return onlineOnly; }
-            set { this.RaiseAndSetIfChanged(ref onlineOnly, value); }
+            get => onlineOnly;
+            set => this.RaiseAndSetIfChanged(ref onlineOnly, value);
         }
 
         public PoeBuyoutMode? BuyoutMode
         {
-            get { return buyoutMode; }
-            set { this.RaiseAndSetIfChanged(ref buyoutMode, value); }
+            get => buyoutMode;
+            set => this.RaiseAndSetIfChanged(ref buyoutMode, value);
         }
 
         public bool NormalizeQuality
         {
-            get { return normalizeQuality; }
-            set { this.RaiseAndSetIfChanged(ref normalizeQuality, value); }
+            get => normalizeQuality;
+            set => this.RaiseAndSetIfChanged(ref normalizeQuality, value);
         }
 
         public bool AlternativeArt
         {
-            get { return alternativeArt; }
-            set { this.RaiseAndSetIfChanged(ref alternativeArt, value); }
+            get => alternativeArt;
+            set => this.RaiseAndSetIfChanged(ref alternativeArt, value);
         }
 
         public string ItemName
         {
-            get { return itemName; }
-            set { this.RaiseAndSetIfChanged(ref itemName, value); }
+            get => itemName;
+            set => this.RaiseAndSetIfChanged(ref itemName, value);
         }
 
         public string ItemBase
         {
-            get { return itemBase; }
-            set { this.RaiseAndSetIfChanged(ref itemBase, value); }
+            get => itemBase;
+            set => this.RaiseAndSetIfChanged(ref itemBase, value);
         }
 
         public int? LinkedR
         {
-            get { return linkedR; }
-            set { this.RaiseAndSetIfChanged(ref linkedR, value); }
+            get => linkedR;
+            set => this.RaiseAndSetIfChanged(ref linkedR, value);
         }
 
         public int? LinkedB
         {
-            get { return linkedB; }
-            set { this.RaiseAndSetIfChanged(ref linkedB, value); }
+            get => linkedB;
+            set => this.RaiseAndSetIfChanged(ref linkedB, value);
         }
 
         public int? LinkedG
         {
-            get { return linkedG; }
-            set { this.RaiseAndSetIfChanged(ref linkedG, value); }
+            get => linkedG;
+            set => this.RaiseAndSetIfChanged(ref linkedG, value);
         }
 
         public int? LinkedW
         {
-            get { return linkedW; }
-            set { this.RaiseAndSetIfChanged(ref linkedW, value); }
+            get => linkedW;
+            set => this.RaiseAndSetIfChanged(ref linkedW, value);
         }
 
         public PoeItemRarity? ItemRarity
         {
-            get { return itemRarity; }
-            set { this.RaiseAndSetIfChanged(ref itemRarity, value); }
+            get => itemRarity;
+            set => this.RaiseAndSetIfChanged(ref itemRarity, value);
         }
 
         public TriState? CorruptionState
         {
-            get { return corruptionState; }
-            set { this.RaiseAndSetIfChanged(ref corruptionState, value); }
+            get => corruptionState;
+            set => this.RaiseAndSetIfChanged(ref corruptionState, value);
         }
 
         public TriState? CraftState
         {
-            get { return craftState; }
-            set { this.RaiseAndSetIfChanged(ref craftState, value); }
+            get => craftState;
+            set => this.RaiseAndSetIfChanged(ref craftState, value);
         }
 
         public TriState? AffectedByElderState
         {
-            get { return affectedByElderState; }
-            set { this.RaiseAndSetIfChanged(ref affectedByElderState, value); }
+            get => affectedByElderState;
+            set => this.RaiseAndSetIfChanged(ref affectedByElderState, value);
         }
 
         public TriState? AffectedByShaperState
         {
-            get { return affectedByShaperState; }
-            set { this.RaiseAndSetIfChanged(ref affectedByShaperState, value); }
+            get => affectedByShaperState;
+            set => this.RaiseAndSetIfChanged(ref affectedByShaperState, value);
         }
 
         public TriState? EnchantState
         {
-            get { return enchantState; }
-            set { this.RaiseAndSetIfChanged(ref enchantState, value); }
+            get => enchantState;
+            set => this.RaiseAndSetIfChanged(ref enchantState, value);
         }
 
         public bool IsExpanded
         {
-            get { return isExpanded; }
-            set { this.RaiseAndSetIfChanged(ref isExpanded, value); }
+            get => isExpanded;
+            set => this.RaiseAndSetIfChanged(ref isExpanded, value);
         }
 
         public IPoeItemType ItemType
         {
-            get { return itemType; }
-            set { this.RaiseAndSetIfChanged(ref itemType, value); }
-        }
-
-        public IPoeQueryInfo GetQueryInfo()
-        {
-            var result = new PoeQueryInfo();
-
-            ((IPoeQueryInfo) this).TransferPropertiesTo(result);
-
-            return result;
+            get => itemType;
+            set => this.RaiseAndSetIfChanged(ref itemType, value);
         }
 
         public void SetQueryInfo(IPoeQueryInfo source)
@@ -639,6 +629,15 @@ namespace PoeEye.PoeTrade.ViewModels
             this.RaisePropertyChanged(nameof(PoeQueryBuilder));
         }
 
+        public IPoeQueryInfo GetQueryInfo()
+        {
+            var result = new PoeQueryInfo();
+
+            ((IPoeQueryInfo)this).TransferPropertiesTo(result);
+
+            return result;
+        }
+
         private IList<string> FormatQueryDescriptionArray()
         {
             var blackList = new[]
@@ -647,16 +646,16 @@ namespace PoeEye.PoeTrade.ViewModels
                 nameof(ItemName)
             };
             var nullableProperties = typeof(IPoeQueryInfo)
-                .GetProperties()
-                .Where(x => !blackList.Contains(x.Name))
-                .Where(
-                    x => x.PropertyType == typeof(int?)
-                         || x.PropertyType == typeof(float?)
-                         || x.PropertyType == typeof(string)
-                         || x.PropertyType == typeof(IPoeItemType)
-                         || x.PropertyType == typeof(PoeItemRarity?))
-                .Where(x => x.CanRead)
-                .ToArray();
+                                     .GetProperties()
+                                     .Where(x => !blackList.Contains(x.Name))
+                                     .Where(
+                                         x => x.PropertyType == typeof(int?)
+                                              || x.PropertyType == typeof(float?)
+                                              || x.PropertyType == typeof(string)
+                                              || x.PropertyType == typeof(IPoeItemType)
+                                              || x.PropertyType == typeof(PoeItemRarity?))
+                                     .Where(x => x.CanRead)
+                                     .ToArray();
 
             var result = new List<string>();
             foreach (var nullableProperty in nullableProperties)
@@ -666,6 +665,7 @@ namespace PoeEye.PoeTrade.ViewModels
                 {
                     continue;
                 }
+
                 if (value is string && string.IsNullOrWhiteSpace(value as string))
                 {
                     continue;
@@ -674,6 +674,7 @@ namespace PoeEye.PoeTrade.ViewModels
                 var formattedValue = $"{nullableProperty.Name}: {value}";
                 result.Add(formattedValue);
             }
+
             return result;
         }
 

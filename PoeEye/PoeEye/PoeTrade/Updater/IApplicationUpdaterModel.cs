@@ -7,6 +7,9 @@ namespace PoeEye.PoeTrade.Updater
 {
     internal interface IApplicationUpdaterModel : IDisposableReactiveObject
     {
+        [NotNull]
+        Version MostRecentVersion { get; }
+
         /// <summary>
         ///     Checks whether update exist and if so, downloads it
         /// </summary>
@@ -16,8 +19,5 @@ namespace PoeEye.PoeTrade.Updater
 
         [NotNull]
         Task RestartApplication();
-
-        [NotNull]
-        Version MostRecentVersion { get; }
     }
 }

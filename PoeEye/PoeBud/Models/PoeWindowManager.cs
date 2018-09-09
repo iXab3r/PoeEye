@@ -13,17 +13,19 @@ namespace PoeBud.Models
 {
     internal sealed class PoeWindowManager : DisposableReactiveObject, IPoeWindowManager
     {
-        private readonly IFactory<IPoeWindow, IntPtr> windowsFactory;
-        private readonly IWindowTracker poeWindowTracker;
-
         private readonly ConcurrentDictionary<IntPtr, IPoeWindow> poeWindowByHandle = new ConcurrentDictionary<IntPtr, IPoeWindow>();
+        private readonly IWindowTracker poeWindowTracker;
+        private readonly IFactory<IPoeWindow, IntPtr> windowsFactory;
+
+        private IPoeWindow activeWindow;
 
         public PoeWindowManager(
             [NotNull] IFactory<IPoeWindow, IntPtr> windowsFactory,
-            [NotNull] [Dependency(WellKnownWindows.PathOfExileWindow)] IWindowTracker poeWindowTracker)
+            [NotNull] [Dependency(WellKnownWindows.PathOfExileWindow)]
+            IWindowTracker poeWindowTracker)
         {
             Guard.ArgumentNotNull(windowsFactory, nameof(windowsFactory));
-            
+
             this.windowsFactory = windowsFactory;
             this.poeWindowTracker = poeWindowTracker;
 
@@ -34,20 +36,18 @@ namespace PoeBud.Models
                 .AddTo(Anchors);
         }
 
+        public IPoeWindow ActiveWindow
+        {
+            get => activeWindow;
+            set => this.RaiseAndSetIfChanged(ref activeWindow, value);
+        }
+
         private void WindowActivated(IntPtr activeWindowHandle)
         {
             Log.Instance.Debug($"[PoeWindowManager] Active window: '{poeWindowTracker.ActiveWindowTitle}'");
-            ActiveWindow = activeWindowHandle == IntPtr.Zero 
-                ? null 
-                : poeWindowByHandle.GetOrAdd(activeWindowHandle, (x) => windowsFactory.Create(x));
-        }
-
-        private IPoeWindow activeWindow;
-
-        public IPoeWindow ActiveWindow
-        {
-            get { return activeWindow; }
-            set { this.RaiseAndSetIfChanged(ref activeWindow, value); }
+            ActiveWindow = activeWindowHandle == IntPtr.Zero
+                ? null
+                : poeWindowByHandle.GetOrAdd(activeWindowHandle, x => windowsFactory.Create(x));
         }
     }
 }

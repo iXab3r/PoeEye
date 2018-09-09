@@ -8,7 +8,7 @@ namespace PoeShared.Native
         Point OverlayLocation { get; set; }
 
         Size OverlaySize { get; set; }
-        
+
         float OverlayOpacity { get; set; }
     }
 }

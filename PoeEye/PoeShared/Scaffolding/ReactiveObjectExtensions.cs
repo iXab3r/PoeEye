@@ -14,8 +14,8 @@ namespace PoeShared.Scaffolding
             [NotNull] Expression<Func<TTarget, TTargetProperty>> instancePropertyExtractor,
             [NotNull] TSource source,
             [NotNull] Expression<Func<TSource, TSourceProperty>> sourcePropertyExtractor)
-              where TSource : INotifyPropertyChanged
-              where TTarget : IReactiveObject
+            where TSource : INotifyPropertyChanged
+            where TTarget : IReactiveObject
         {
             Guard.ArgumentNotNull(instance, nameof(instance));
             Guard.ArgumentNotNull(instancePropertyExtractor, nameof(instancePropertyExtractor));
@@ -25,8 +25,8 @@ namespace PoeShared.Scaffolding
             var instancePropertyName = new Lazy<string>(() => Reflection.ExpressionToPropertyNames(instancePropertyExtractor.Body));
 
             return source
-                .WhenAnyValue(sourcePropertyExtractor)
-                .Subscribe(x => instance.RaisePropertyChanged(instancePropertyName.Value));
+                   .WhenAnyValue(sourcePropertyExtractor)
+                   .Subscribe(x => instance.RaisePropertyChanged(instancePropertyName.Value));
         }
 
         public static IDisposable LinkObjectProperties<TSource, TSourceProperty, TTargetProperty>(
@@ -42,8 +42,8 @@ namespace PoeShared.Scaffolding
             var instancePropertyName = new Lazy<string>(() => Reflection.ExpressionToPropertyNames(instancePropertyExtractor.Body));
 
             return instance
-                .WhenAnyValue(sourcePropertyExtractor)
-                .Subscribe(x => instance.RaisePropertyChanged(instancePropertyName.Value));
+                   .WhenAnyValue(sourcePropertyExtractor)
+                   .Subscribe(x => instance.RaisePropertyChanged(instancePropertyName.Value));
         }
     }
 }

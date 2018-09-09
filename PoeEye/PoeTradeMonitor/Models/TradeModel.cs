@@ -5,7 +5,7 @@ using PoeShared.Common;
 
 namespace PoeEye.TradeMonitor.Models
 {
-    internal struct TradeModel 
+    internal struct TradeModel
     {
         private static readonly Lazy<IEqualityComparer<TradeModel>> ComparerSupplier = new Lazy<IEqualityComparer<TradeModel>>(() => new TradeModelComparer());
 
@@ -45,7 +45,7 @@ namespace PoeEye.TradeMonitor.Models
                             nameof(PositionName),
                             nameof(TabName),
                             nameof(TradeType),
-                            nameof(Price),
+                            nameof(Price)
                         }
                     }
                 };

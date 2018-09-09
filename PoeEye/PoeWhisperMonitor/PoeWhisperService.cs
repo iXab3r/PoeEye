@@ -22,7 +22,7 @@ namespace PoeWhisperMonitor
 
         public PoeWhisperService(
             [NotNull] IPoeTracker tracker,
-            [NotNull] IFactory<IPoeMessagesSource, FileInfo> messagesSourceFactory)  
+            [NotNull] IFactory<IPoeMessagesSource, FileInfo> messagesSourceFactory)
         {
             Guard.ArgumentNotNull(tracker, nameof(tracker));
             Guard.ArgumentNotNull(messagesSourceFactory, nameof(messagesSourceFactory));

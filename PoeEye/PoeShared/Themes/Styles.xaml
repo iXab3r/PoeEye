@@ -42,8 +42,7 @@
     <Setter Property="Padding" Value="0" />
   </Style>
 
-  <Style TargetType="{x:Type TextBlock}" x:Key="IconTextBlock" 
-         BasedOn="{StaticResource {x:Type TextBlock}}">
+  <Style TargetType="{x:Type TextBlock}" x:Key="IconTextBlock" >
     <Setter Property="FontFamily" Value="{StaticResource FontAwesome}" />
     <Setter Property="FontSize" Value="14" />
     <Setter Property="TextAlignment" Value="Left" />
@@ -132,7 +131,7 @@
     <Setter Property="FontFamily" Value="{StaticResource FontAwesome}"/>
     <Style.Triggers>
       <Trigger Property="IsEnabled" Value="False">
-        <Setter Property="Foreground" Value="{StaticResource ControlsDisabledBrush}"/>
+        <Setter Property="Opacity" Value="0.23"/>
         
         <Trigger.EnterActions>
           <BeginStoryboard>

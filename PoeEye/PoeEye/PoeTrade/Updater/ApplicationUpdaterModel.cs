@@ -38,25 +38,25 @@ namespace PoeEye.PoeTrade.Updater
                 OnAppUpdate,
                 onAppUninstall: OnAppUninstall,
                 onFirstRun: OnFirstRun);
-            
+
             MostRecentVersionAppFolder = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
             MostRecentVersion = Assembly.GetExecutingAssembly().GetName().Version;
         }
 
         public DirectoryInfo MostRecentVersionAppFolder
         {
-            get { return mostRecentVersionAppFolder; }
-            set { this.RaiseAndSetIfChanged(ref mostRecentVersionAppFolder, value); }
+            get => mostRecentVersionAppFolder;
+            set => this.RaiseAndSetIfChanged(ref mostRecentVersionAppFolder, value);
         }
 
         public Version MostRecentVersion
         {
-            get { return mostRecentVersion; }
-            set { this.RaiseAndSetIfChanged(ref mostRecentVersion, value); }
+            get => mostRecentVersion;
+            set => this.RaiseAndSetIfChanged(ref mostRecentVersion, value);
         }
 
         /// <summary>
-        ///  Checks whether update exist and if so, downloads it
+        ///     Checks whether update exist and if so, downloads it
         /// </summary>
         /// <returns>True if application was updated</returns>
         public async Task<bool> CheckForUpdates()
@@ -70,17 +70,20 @@ namespace PoeEye.PoeTrade.Updater
             {
                 rootDirectory = AppDomain.CurrentDomain.BaseDirectory;
             }
+
             Log.Instance.Debug($"[ApplicationUpdaterModel] AppName: {appName}, root directory: {rootDirectory}");
 
             var updateSource = configProvider.ActualConfig.UpdateSource;
             Log.Instance.Debug($"[ApplicationUpdaterModel] Using update source: {updateSource}");
-            var downloader = new BasicAuthFileDownloader(new NetworkCredential(configProvider.ActualConfig.UpdateSource.Username, configProvider.ActualConfig.UpdateSource.Password));
+            var downloader =
+                new BasicAuthFileDownloader(new NetworkCredential(configProvider.ActualConfig.UpdateSource.Username,
+                                                                  configProvider.ActualConfig.UpdateSource.Password));
 
             using (var mgr = new UpdateManager(updateSource.Uri, appName, rootDirectory, downloader))
             {
                 Log.Instance.Debug($"[ApplicationUpdaterModel] Checking for updates...");
 
-                var updateInfo = await mgr.CheckForUpdate(ignoreDeltaUpdates: true, progress: CheckUpdateProgress);
+                var updateInfo = await mgr.CheckForUpdate(true, CheckUpdateProgress);
 
                 Log.Instance.Debug($"[ApplicationUpdaterModel] UpdateInfo:\r\n{updateInfo?.DumpToText()}");
                 if (updateInfo == null || updateInfo.ReleasesToApply.Count == 0)
@@ -119,11 +122,39 @@ namespace PoeEye.PoeTrade.Updater
             }
         }
 
+        public async Task RestartApplication()
+        {
+            var updatedExecutable = new FileInfo(Path.Combine(mostRecentVersionAppFolder.FullName, ApplicationName));
+            Log.Instance.Debug(
+                $"[ApplicationUpdaterModel] Restarting app, folder: {mostRecentVersionAppFolder}, appName: {ApplicationName}, exePath: {updatedExecutable}(exists: {updatedExecutable.Exists})...");
+
+            if (!updatedExecutable.Exists)
+            {
+                throw new FileNotFoundException("Application executable was not found", updatedExecutable.FullName);
+            }
+
+            var squirrelUpdater = GetSquirrelUpdateExe();
+            var squirrelArgs = $"--processStartAndWait {updatedExecutable.FullName}";
+
+            Log.Instance.Debug($"[ApplicationUpdaterModel] Starting Squirrel updater @ '{squirrelUpdater}', args: {squirrelArgs} ...");
+            var updaterProcess = Process.Start(squirrelUpdater, squirrelArgs);
+            if (updaterProcess == null)
+            {
+                throw new FileNotFoundException($"Failed to start updater @ '{squirrelUpdater}'");
+            }
+
+            Log.Instance.Debug($"[ApplicationUpdaterModel] Process spawned, PID: {updaterProcess.Id}");
+            await Task.Delay(2000);
+
+            Log.Instance.Debug($"[ApplicationUpdaterModel] Terminating application...");
+            Application.Current.Shutdown(0);
+        }
+
         private void UpdateProgress(int progressPercent)
         {
             Log.Instance.Debug($"[ApplicationUpdaterModel.UpdateProgress] Update is in progress: {progressPercent}%");
         }
-        
+
         private void CheckUpdateProgress(int progressPercent)
         {
             Log.Instance.Debug($"[ApplicationUpdaterModel.CheckUpdateProgress] Check update is in progress: {progressPercent}%");
@@ -149,40 +180,15 @@ namespace PoeEye.PoeTrade.Updater
             Log.Instance.Debug($"[ApplicationUpdaterModel.OnFirstRun] App started for the first time");
         }
 
-        public async Task RestartApplication()
-        {
-            var updatedExecutable = new FileInfo(Path.Combine(mostRecentVersionAppFolder.FullName, ApplicationName));
-            Log.Instance.Debug($"[ApplicationUpdaterModel] Restarting app, folder: {mostRecentVersionAppFolder}, appName: {ApplicationName}, exePath: {updatedExecutable}(exists: {updatedExecutable.Exists})...");
-
-            if (!updatedExecutable.Exists)
-            {
-                throw new FileNotFoundException("Application executable was not found", updatedExecutable.FullName);
-            }
-
-            var squirrelUpdater = GetSquirrelUpdateExe();
-            var squirrelArgs = $"--processStartAndWait {updatedExecutable.FullName}";
-            
-            Log.Instance.Debug($"[ApplicationUpdaterModel] Starting Squirrel updater @ '{squirrelUpdater}', args: {squirrelArgs} ...");
-            var updaterProcess = Process.Start(squirrelUpdater, squirrelArgs);
-            if (updaterProcess == null)
-            {
-                throw new FileNotFoundException($"Failed to start updater @ '{squirrelUpdater}'");
-            }
-            Log.Instance.Debug($"[ApplicationUpdaterModel] Process spawned, PID: {updaterProcess.Id}");
-            await Task.Delay(2000);
-            
-            Log.Instance.Debug($"[ApplicationUpdaterModel] Terminating application...");
-            Application.Current.Shutdown(0);
-        }
-        
         private static string GetSquirrelUpdateExe()
         {
             const string updaterExecutableName = "update.exe";
-            
+
             var entryAssembly = Assembly.GetEntryAssembly();
             if (entryAssembly != null &&
                 Path.GetFileName(entryAssembly.Location).Equals(updaterExecutableName, StringComparison.OrdinalIgnoreCase) &&
-                (entryAssembly.Location.IndexOf("app-", StringComparison.OrdinalIgnoreCase) == -1 && entryAssembly.Location.IndexOf("SquirrelTemp", StringComparison.OrdinalIgnoreCase) == -1))
+                entryAssembly.Location.IndexOf("app-", StringComparison.OrdinalIgnoreCase) == -1 &&
+                entryAssembly.Location.IndexOf("SquirrelTemp", StringComparison.OrdinalIgnoreCase) == -1)
             {
                 return Path.GetFullPath(entryAssembly.Location);
             }
@@ -193,12 +199,14 @@ namespace PoeEye.PoeTrade.Updater
             {
                 throw new ApplicationException($"Failed to get executing of assembly {squirrelAssembly}");
             }
-            
+
             var fileInfo = new FileInfo(Path.Combine(executingAssembly, "..", updaterExecutableName));
             if (!fileInfo.Exists)
             {
-                throw new FileNotFoundException($"{updaterExecutableName} not found(path: {fileInfo.FullName}), not a Squirrel-installed app?", fileInfo.FullName);
+                throw new FileNotFoundException($"{updaterExecutableName} not found(path: {fileInfo.FullName}), not a Squirrel-installed app?",
+                                                fileInfo.FullName);
             }
+
             return fileInfo.FullName;
         }
     }

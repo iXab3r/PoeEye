@@ -30,14 +30,16 @@ namespace PoeShared.PoeDatabase.PoeNinja
         private readonly ISourceList<string> knownEntities = new SourceList<string>();
         private readonly ReadOnlyObservableCollection<string> knownEntityNames;
 
-        private readonly JsonSerializerSettings serializerSettings = new JsonSerializerSettings()
+        private readonly JsonSerializerSettings serializerSettings = new JsonSerializerSettings
         {
             Culture = CultureInfo.InvariantCulture
         };
-        
+
         public PoeNinjaDatabaseReader(
-            [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler,
-            [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler)
+            [NotNull] [Dependency(WellKnownSchedulers.UI)]
+            IScheduler uiScheduler,
+            [NotNull] [Dependency(WellKnownSchedulers.Background)]
+            IScheduler bgScheduler)
         {
             Log.Instance.Debug("[PoeNinjaDatabaseReader..ctor] Created");
 
@@ -47,7 +49,7 @@ namespace PoeShared.PoeDatabase.PoeNinja
                 .Bind(out knownEntityNames)
                 .Subscribe()
                 .AddTo(Anchors);
-            
+
             bgScheduler
                 .Schedule(Initialize)
                 .AddTo(Anchors);
@@ -59,7 +61,7 @@ namespace PoeShared.PoeDatabase.PoeNinja
         {
             return GetEconomics(leagueId);
         }
-        
+
         private void Initialize()
         {
             var entities = GetEntities(StandardLeagueName);
@@ -74,10 +76,10 @@ namespace PoeShared.PoeDatabase.PoeNinja
             var rawResult = api.GetCurrencyAsync(leagueId).Result;
 
             var result = rawResult.Lines
-                .EmptyIfNull()
-                .Select(x => new PoePrice(x.CurrencyTypeName, x.ChaosEquivalent))
-                .Select(x => StringToPoePriceConverter.Instance.Convert(x.Price))
-                .ToArray();
+                                  .EmptyIfNull()
+                                  .Select(x => new PoePrice(x.CurrencyTypeName, x.ChaosEquivalent))
+                                  .Select(x => StringToPoePriceConverter.Instance.Convert(x.Price))
+                                  .ToArray();
 
             Log.Instance.Debug($"[PoeNinjaDatabaseReader.Economics] All  done, {result.Length} name(s) found\n\t{result.DumpToTable()}");
             return result;
@@ -90,7 +92,7 @@ namespace PoeShared.PoeDatabase.PoeNinja
             {
                 var api = RestClient.For<IPoeNinjaApi>(PoeNinjaDataUri, HandleRequestMessage, serializerSettings);
                 var result = new ConcurrentBag<string>();
-                
+
                 var sources = new[]
                 {
                     ExtractFrom(api.GetMapsAsync(leagueId)),
@@ -103,7 +105,7 @@ namespace PoeShared.PoeDatabase.PoeNinja
                     ExtractFrom(api.GetUniqueArmourAsync(leagueId)),
                     ExtractFrom(api.GetUniqueAccessoryAsync(leagueId)),
                     ExtractFrom(api.GetCurrencyAsync(leagueId)),
-                    ExtractFrom(api.GetFragmentOverviewAsync(leagueId)),
+                    ExtractFrom(api.GetFragmentOverviewAsync(leagueId))
                 };
                 foreach (var source in sources)
                 {
@@ -111,8 +113,8 @@ namespace PoeShared.PoeDatabase.PoeNinja
                     {
                         var sourceResult = source.Result;
                         sourceResult.EmptyIfNull()
-                            .Where(x => !string.IsNullOrWhiteSpace(x))
-                            .ForEach(result.Add);
+                                    .Where(x => !string.IsNullOrWhiteSpace(x))
+                                    .ForEach(result.Add);
                     }
                     catch (Exception e)
                     {
@@ -130,6 +132,7 @@ namespace PoeShared.PoeDatabase.PoeNinja
                 return new string[0];
             }
         }
+
         private async Task HandleRequestMessage(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             Log.Instance.Debug($"[PoeNinjaDatabaseReader.Api] Requesting {request?.RequestUri}' (throttling: {RequestsThrottling})...");
@@ -183,10 +186,9 @@ namespace PoeShared.PoeDatabase.PoeNinja
 
             [Get("GetCurrencyOverview")]
             Task<CurrencyResponse> GetCurrencyAsync([Query] string league);
-
         }
 
-        internal struct GenericResponse 
+        internal struct GenericResponse
         {
             public List<GenericItem> Lines { get; set; }
         }
@@ -204,7 +206,7 @@ namespace PoeShared.PoeDatabase.PoeNinja
         internal struct CurrencyItem
         {
             public string CurrencyTypeName { get; set; }
-            
+
             public float ChaosEquivalent { get; set; }
         }
     }

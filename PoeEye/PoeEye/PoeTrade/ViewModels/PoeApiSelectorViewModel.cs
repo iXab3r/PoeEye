@@ -27,8 +27,8 @@ namespace PoeEye.PoeTrade.ViewModels
 
         public IPoeApiWrapper SelectedModule
         {
-            get { return selectedModule; }
-            set { this.RaiseAndSetIfChanged(ref selectedModule, value); }
+            get => selectedModule;
+            set => this.RaiseAndSetIfChanged(ref selectedModule, value);
         }
 
         public void SetByModuleId(string moduleInfo)

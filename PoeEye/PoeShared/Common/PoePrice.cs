@@ -6,7 +6,7 @@ namespace PoeShared.Common
     public struct PoePrice : IComparable
     {
         public static readonly PoePrice Empty = new PoePrice(KnownCurrencyNameList.Unknown, 0f);
-        
+
         public static readonly PoePrice ChaosOrb = new PoePrice(KnownCurrencyNameList.ChaosOrb, 0f);
 
         public PoePrice(string currencyType, float value)
@@ -31,7 +31,7 @@ namespace PoeShared.Common
 
         public PoePrice SetValue(float value)
         {
-            return new PoePrice(currencyType: CurrencyType, value: value);
+            return new PoePrice(CurrencyType, value);
         }
 
         public override string ToString()
@@ -46,7 +46,7 @@ namespace PoeShared.Common
                 return 1;
             }
 
-            var other = (PoePrice) obj;
+            var other = (PoePrice)obj;
             return Value.CompareTo(other.Value);
         }
 
@@ -61,7 +61,8 @@ namespace PoeShared.Common
             {
                 return false;
             }
-            return obj is PoePrice && Equals((PoePrice) obj);
+
+            return obj is PoePrice && Equals((PoePrice)obj);
         }
 
         public override int GetHashCode()

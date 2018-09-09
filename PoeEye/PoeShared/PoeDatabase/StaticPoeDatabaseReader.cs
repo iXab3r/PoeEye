@@ -18,7 +18,8 @@ namespace PoeShared.PoeDatabase
         private readonly ReadOnlyObservableCollection<string> knownEntityNames;
 
         public StaticPoeDatabaseReader(
-            [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler)
+            [NotNull] [Dependency(WellKnownSchedulers.Background)]
+            IScheduler bgScheduler)
         {
             Log.Instance.Debug("[StaticPoeDatabaseReader..ctor] Created");
 
@@ -47,7 +48,7 @@ namespace PoeShared.PoeDatabase
             var result = new HashSet<string>();
             var resources = new HashSet<string>
             {
-                "PoeTradeUniques.lst",
+                "PoeTradeUniques.lst"
             };
 
             foreach (var resource in resources)

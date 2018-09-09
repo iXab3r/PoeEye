@@ -10,7 +10,6 @@ namespace PoeEye.ItemParser.Prism
 {
     internal sealed class ItemParserRegistrations : UnityContainerExtension
     {
-       
         protected override void Initialize()
         {
             Container

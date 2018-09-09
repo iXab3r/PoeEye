@@ -12,20 +12,20 @@ namespace PoeChatWheel.ViewModels
 
         public string Text
         {
-            get { return text; }
-            set { this.RaiseAndSetIfChanged(ref text, value); }
+            get => text;
+            set => this.RaiseAndSetIfChanged(ref text, value);
         }
 
         public string IconText
         {
-            get { return iconText; }
-            set { this.RaiseAndSetIfChanged(ref iconText, value); }
+            get => iconText;
+            set => this.RaiseAndSetIfChanged(ref iconText, value);
         }
 
         public string CommandText
         {
-            get { return commandText; }
-            set { this.RaiseAndSetIfChanged(ref commandText, value); }
+            get => commandText;
+            set => this.RaiseAndSetIfChanged(ref commandText, value);
         }
     }
 }

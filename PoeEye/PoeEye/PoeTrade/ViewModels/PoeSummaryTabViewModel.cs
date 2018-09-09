@@ -29,18 +29,18 @@ namespace PoeEye.PoeTrade.ViewModels
         private static readonly TimeSpan ResortRefilterThrottleTimeout = TimeSpan.FromMilliseconds(250);
 
         private readonly ReactiveCommand markAllAsReadCommand;
-
-        private bool showNewItems = true;
-
-        private bool showRemovedItems;
-        private string quickFilterText;
-
-        private SortDescriptionData activeSortDescriptionData;
+        private readonly IPoeTradeQuickFilter quickFilterBuilder;
 
         private readonly ISubject<Unit> rebuildFilterRequest = new Subject<Unit>();
         private readonly ISubject<Unit> sortRequest = new Subject<Unit>();
         private readonly ReadOnlyObservableCollection<IMainWindowTabViewModel> tabCollection;
-        private readonly IPoeTradeQuickFilter quickFilterBuilder;
+
+        private SortDescriptionData activeSortDescriptionData;
+        private string quickFilterText;
+
+        private bool showNewItems = true;
+
+        private bool showRemovedItems;
 
         public PoeSummaryTabViewModel(
             [NotNull] ReadOnlyObservableCollection<IMainWindowTabViewModel> tabsList,
@@ -68,7 +68,7 @@ namespace PoeEye.PoeTrade.ViewModels
                 new SortDescriptionData(nameof(IPoeItem.Timestamp), ListSortDirection.Descending),
                 new SortDescriptionData(nameof(IPoeItem.Timestamp), ListSortDirection.Ascending),
                 new SortDescriptionData(nameof(IPoeTradeViewModel.PriceInChaosOrbs), ListSortDirection.Descending),
-                new SortDescriptionData(nameof(IPoeTradeViewModel.PriceInChaosOrbs), ListSortDirection.Ascending),
+                new SortDescriptionData(nameof(IPoeTradeViewModel.PriceInChaosOrbs), ListSortDirection.Ascending)
             };
             ActiveSortDescriptionData = SortingOptions.FirstOrDefault();
 
@@ -93,13 +93,19 @@ namespace PoeEye.PoeTrade.ViewModels
             list.Filter(rebuildFilterRequest.Select(x => BuildFilter()));
 
             Observable.Merge(
-                    this.WhenAnyValue(x => x.ShowNewItems).ToUnit(),
-                    this.WhenAnyValue(x => x.ShowRemovedItems).ToUnit(),
-                    this.WhenAnyValue(x => x.QuickFilter).ToUnit()
-                )
-                .Throttle(ResortRefilterThrottleTimeout)
-                .Subscribe(rebuildFilterRequest)
-                .AddTo(Anchors);
+                          this.WhenAnyValue(x => x.ShowNewItems).ToUnit(),
+                          this.WhenAnyValue(x => x.ShowRemovedItems).ToUnit(),
+                          this.WhenAnyValue(x => x.QuickFilter).ToUnit()
+                      )
+                      .Throttle(ResortRefilterThrottleTimeout)
+                      .Subscribe(rebuildFilterRequest)
+                      .AddTo(Anchors);
+        }
+
+        public string QuickFilter
+        {
+            get => quickFilterText;
+            set => this.RaiseAndSetIfChanged(ref quickFilterText, value);
         }
 
         public ReadOnlyObservableCollection<IPoeTradeViewModel> TradesView { get; }
@@ -108,28 +114,22 @@ namespace PoeEye.PoeTrade.ViewModels
 
         public bool ShowNewItems
         {
-            get { return showNewItems; }
-            set { this.RaiseAndSetIfChanged(ref showNewItems, value); }
+            get => showNewItems;
+            set => this.RaiseAndSetIfChanged(ref showNewItems, value);
         }
 
         public bool ShowRemovedItems
         {
-            get { return showRemovedItems; }
-            set { this.RaiseAndSetIfChanged(ref showRemovedItems, value); }
-        }
-
-        public string QuickFilter
-        {
-            get { return quickFilterText; }
-            set { this.RaiseAndSetIfChanged(ref quickFilterText, value); }
+            get => showRemovedItems;
+            set => this.RaiseAndSetIfChanged(ref showRemovedItems, value);
         }
 
         public SortDescriptionData[] SortingOptions { get; }
 
         public SortDescriptionData ActiveSortDescriptionData
         {
-            get { return activeSortDescriptionData; }
-            set { this.RaiseAndSetIfChanged(ref activeSortDescriptionData, value); }
+            get => activeSortDescriptionData;
+            set => this.RaiseAndSetIfChanged(ref activeSortDescriptionData, value);
         }
 
         private Predicate<IPoeTradeViewModel> BuildFilter()
@@ -137,8 +137,8 @@ namespace PoeEye.PoeTrade.ViewModels
             var filter = PredicateBuilder.True<IPoeTradeViewModel>();
 
             filter = filter.And(PredicateBuilder.False<IPoeTradeViewModel>()
-                .Or(x => ShowNewItems && x.TradeState == PoeTradeState.New)
-                .Or(x => ShowRemovedItems && x.TradeState == PoeTradeState.Removed));
+                                                .Or(x => ShowNewItems && x.TradeState == PoeTradeState.New)
+                                                .Or(x => ShowRemovedItems && x.TradeState == PoeTradeState.Removed));
 
             if (!string.IsNullOrWhiteSpace(QuickFilter))
             {

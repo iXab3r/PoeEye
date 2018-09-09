@@ -1,7 +1,8 @@
 using PoeShared.Common;
 using PoeShared.StashApi.DataTypes;
 
-namespace PoeBud.Models {
+namespace PoeBud.Models
+{
     internal class PoeSolutionItem : IPoeSolutionItem
     {
         public PoeSolutionItem(IStashItem item, IStashTab tab)
@@ -15,13 +16,13 @@ namespace PoeBud.Models {
         }
 
         public string Name { get; }
-            
+
         public int StackSize { get; }
 
         public string TypeLine { get; }
-            
+
         public ItemPosition Position { get; }
-            
+
         public IStashTab Tab { get; }
 
         public GearType ItemType { get; }

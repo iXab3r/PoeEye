@@ -3,14 +3,15 @@ using System.Threading.Tasks;
 using JetBrains.Annotations;
 using PoeShared.Scaffolding;
 
-namespace PoeShared.Communications.Chromium {
+namespace PoeShared.Communications.Chromium
+{
     public interface IChromiumBrowser : IDisposableReactiveObject
     {
         string Address { [CanBeNull] get; }
 
         Task Get([NotNull] string uri);
 
-        [NotNull] 
+        [NotNull]
         Task<string> GetSource();
 
         [NotNull]

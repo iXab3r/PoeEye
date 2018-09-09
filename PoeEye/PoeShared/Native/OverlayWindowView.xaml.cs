@@ -17,8 +17,12 @@ namespace PoeShared.Native
             InitializeComponent();
 
             WhenLoaded.Subscribe(OnLoaded);
-            this.SizeChanged += OnSizeChanged;
+            SizeChanged += OnSizeChanged;
         }
+
+        public IObservable<Unit> WhenLoaded => Observable
+                                               .FromEventPattern<RoutedEventHandler, RoutedEventArgs>(h => Loaded += h, h => Loaded -= h)
+                                               .ToUnit();
 
 
         private void OnSizeChanged(object sender, SizeChangedEventArgs sizeChangedEventArgs)
@@ -36,7 +40,8 @@ namespace PoeShared.Native
             {
                 return;
             }
-            this.Dispatcher.BeginInvoke(new Action(() => this.Top -= delta), DispatcherPriority.Render);
+
+            Dispatcher.BeginInvoke(new Action(() => Top -= delta), DispatcherPriority.Render);
         }
 
         private void OnLoaded()
@@ -44,10 +49,6 @@ namespace PoeShared.Native
             var helper = new WindowInteropHelper(this);
             WindowsServices.SetWindowExNoActivate(helper.Handle);
         }
-
-        public IObservable<Unit> WhenLoaded => Observable
-            .FromEventPattern<RoutedEventHandler, RoutedEventArgs>(h => this.Loaded += h, h => this.Loaded -= h)
-            .ToUnit();
 
         [DllImport("user32.dll")]
         public static extern IntPtr SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
@@ -116,12 +117,14 @@ namespace PoeShared.Native
             {
                 return;
             }
+
             try
             {
                 if (sizeInfo.HeightChanged)
                 {
                     overlayViewModel.ActualHeight = sizeInfo.NewSize.Height;
                 }
+
                 if (sizeInfo.WidthChanged)
                 {
                     overlayViewModel.ActualWidth = sizeInfo.NewSize.Width;

@@ -12,17 +12,16 @@ namespace PoeShared.Scaffolding.WPF
 {
     public sealed class CommandWrapper : DisposableReactiveObject, ICommand
     {
-        private readonly ICommand command;
         private readonly ObservableAsPropertyHelper<bool> isBusy;
-        private string error;
-        private string description;
+        private readonly ISubject<bool> isExecuting = new Subject<bool>();
 
         private readonly ISubject<Unit> raiseCanExecuteChangedRequests = new Subject<Unit>();
-        private readonly ISubject<bool> isExecuting = new Subject<bool>();
+        private string description;
+        private string error;
 
         private CommandWrapper(ReactiveCommand command)
         {
-            this.command = command;
+            InnerCommand = command;
 
             isBusy = command.IsExecuting.ToProperty(this, x => x.IsBusy);
             command.ThrownExceptions.Subscribe(HandleException).AddTo(Anchors);
@@ -34,19 +33,64 @@ namespace PoeShared.Scaffolding.WPF
 
         private CommandWrapper(DelegateCommandBase command)
         {
-            this.command = command;
-            
+            InnerCommand = command;
+
             isBusy = Observable.FromEventPattern<EventHandler, EventArgs>(x => command.IsActiveChanged += x, x => command.IsActiveChanged -= x)
-                .Select(x => command.IsActive)
-                .ToProperty(this, x => x.IsBusy);
+                               .Select(x => command.IsActive)
+                               .ToProperty(this, x => x.IsBusy);
 
             isExecuting
                 .Subscribe(x => command.IsActive = x)
                 .AddTo(Anchors);
-            
+
             raiseCanExecuteChangedRequests
                 .Subscribe(() => command.RaiseCanExecuteChanged())
                 .AddTo(Anchors);
+        }
+
+        public bool IsBusy => isBusy.Value;
+
+        public string Error
+        {
+            get => error;
+            private set => this.RaiseAndSetIfChanged(ref error, value);
+        }
+
+        public string Description
+        {
+            get => description;
+            set => this.RaiseAndSetIfChanged(ref description, value);
+        }
+
+        private ICommand InnerCommand { get; }
+
+        public bool CanExecute(object parameter)
+        {
+            return InnerCommand.CanExecute(parameter);
+        }
+
+        public void Execute(object parameter)
+        {
+            Error = null;
+            try
+            {
+                isExecuting.OnNext(true);
+                InnerCommand.Execute(parameter);
+            }
+            catch (Exception ex)
+            {
+                HandleException(ex);
+            }
+            finally
+            {
+                isExecuting.OnNext(false);
+            }
+        }
+
+        public event EventHandler CanExecuteChanged
+        {
+            add => InnerCommand.CanExecuteChanged += value;
+            remove => InnerCommand.CanExecuteChanged -= value;
         }
 
         public static CommandWrapper Create<T>(DelegateCommand<T> command)
@@ -82,51 +126,6 @@ namespace PoeShared.Scaffolding.WPF
         public static CommandWrapper Create<TParam>(Func<TParam, Task> execute)
         {
             return Create(execute, Observable.Return(true).Concat(Observable.Never<bool>()));
-        }
-
-        public bool IsBusy => isBusy.Value;
-
-        public string Error
-        {
-            get { return error; }
-            private set { this.RaiseAndSetIfChanged(ref error, value); }
-        }
-
-        public string Description
-        {
-            get { return description; }
-            set { this.RaiseAndSetIfChanged(ref description, value); }
-        }
-
-        private ICommand InnerCommand => command;
-
-        public bool CanExecute(object parameter)
-        {
-            return command.CanExecute(parameter);
-        }
-
-        public void Execute(object parameter)
-        {
-            Error = null;
-            try
-            {
-                isExecuting.OnNext(true);
-                command.Execute(parameter);
-            }
-            catch (Exception ex)
-            {
-                HandleException(ex);
-            }
-            finally
-            {
-                isExecuting.OnNext(false);
-            }
-        }
-
-        public event EventHandler CanExecuteChanged
-        {
-            add => InnerCommand.CanExecuteChanged += value;
-            remove => InnerCommand.CanExecuteChanged -= value;
         }
 
         public CommandWrapper RaiseCanExecuteChangedWhen(IObservable<Unit> eventSource)

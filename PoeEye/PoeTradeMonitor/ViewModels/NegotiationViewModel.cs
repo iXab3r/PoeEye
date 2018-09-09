@@ -38,7 +38,6 @@ namespace PoeEye.TradeMonitor.ViewModels
         private readonly IPoeStashHighlightService highlightService;
         private readonly SerialDisposable highlightServiceAnchor = new SerialDisposable();
         private readonly IFactory<IImageViewModel, Uri> imageFactory;
-        private readonly IScheduler uiScheduler;
 
         private readonly DelegateCommand inviteToPartyCommand;
         private readonly DelegateCommand kickFromPartyCommand;
@@ -51,6 +50,7 @@ namespace PoeEye.TradeMonitor.ViewModels
         private readonly DelegateCommand<MacroMessage?> sendPredefinedMessageCommand;
         private readonly IPoeStashService stashService;
         private readonly DelegateCommand tradeCommand;
+        private readonly IScheduler uiScheduler;
 
         private bool isExpanded;
 
@@ -77,7 +77,8 @@ namespace PoeEye.TradeMonitor.ViewModels
             [NotNull] IPoeItemViewModelFactory poeTradeViewModelFactory,
             [NotNull] IConverter<IStashItem, IPoeItem> poeStashItemToItemConverter,
             [NotNull] IFactory<IImageViewModel, Uri> imageFactory,
-            [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
+            [NotNull] [Dependency(WellKnownSchedulers.UI)]
+            IScheduler uiScheduler)
         {
             Guard.ArgumentNotNull(imageFactory, nameof(imageFactory));
             Guard.ArgumentNotNull(macroCommandsProvider, nameof(macroCommandsProvider));
@@ -139,7 +140,7 @@ namespace PoeEye.TradeMonitor.ViewModels
                 .AddTo(Anchors);
 
             var price = StringToPoePriceConverter.Instance.Convert(model.PositionName);
-            ItemName = price.IsEmpty ? (object) model.PositionName : price;
+            ItemName = price.IsEmpty ? (object)model.PositionName : price;
 
             this.BindPropertyTo(x => x.Price, this, x => x.Negotiation).AddTo(Anchors);
             this.BindPropertyTo(x => x.Offer, this, x => x.Negotiation).AddTo(Anchors);
@@ -242,9 +243,9 @@ namespace PoeEye.TradeMonitor.ViewModels
 
         public PoePrice PriceInChaos => priceCalculcator.GetEquivalentInChaosOrbs(Price);
 
-        public INegotiationCloseController CloseController { get; private set; }
-
         public bool IsHighlighted => highlightServiceAnchor.Disposable != null;
+
+        public INegotiationCloseController CloseController { get; private set; }
 
         public TradeModel Negotiation
         {
@@ -259,28 +260,6 @@ namespace PoeEye.TradeMonitor.ViewModels
             Negotiation = model;
         }
 
-        private void HandleStashUpdate()
-        {
-            var item = stashService.TryToFindItem(negotiation.TabName, negotiation.ItemPosition.X, negotiation.ItemPosition.Y);
-
-            var itemIconUri = item?.Icon.ToUriOrDefault();
-            ItemIcon = itemIconUri == null
-                ? null
-                : imageFactory.Create(itemIconUri);
-
-            VerificationState = item != null
-                ? PoeItemVerificationState.Verified
-                : stashService.IsBusy ? PoeItemVerificationState.InProgress : PoeItemVerificationState.Sold;
-
-            ItemRarity = item != null 
-                ? item.Rarity 
-                : PoeItemRarity.Unknown;
-
-            Item = item != null
-                ? BuildItemViewModel(item)
-                : null;
-        }
-
         public bool IsExpanded
         {
             get => isExpanded;
@@ -292,6 +271,30 @@ namespace PoeEye.TradeMonitor.ViewModels
             Guard.ArgumentNotNull(closeController, nameof(closeController));
 
             CloseController = closeController;
+        }
+
+        private void HandleStashUpdate()
+        {
+            var item = stashService.TryToFindItem(negotiation.TabName, negotiation.ItemPosition.X, negotiation.ItemPosition.Y);
+
+            var itemIconUri = item?.Icon.ToUriOrDefault();
+            ItemIcon = itemIconUri == null
+                ? null
+                : imageFactory.Create(itemIconUri);
+
+            VerificationState = item != null
+                ? PoeItemVerificationState.Verified
+                : stashService.IsBusy
+                    ? PoeItemVerificationState.InProgress
+                    : PoeItemVerificationState.Sold;
+
+            ItemRarity = item != null
+                ? item.Rarity
+                : PoeItemRarity.Unknown;
+
+            Item = item != null
+                ? BuildItemViewModel(item)
+                : null;
         }
 
         private bool HighlightCommandCanExecute()
@@ -352,11 +355,13 @@ namespace PoeEye.TradeMonitor.ViewModels
             {
                 return null;
             }
+
             var poeItem = poeStashItemToItemConverter.Convert(stashItem);
             if (poeItem is PoeItem)
             {
                 (poeItem as PoeItem).Timestamp = stashService.LastUpdateTimestamp;
             }
+
             return poeTradeViewModelFactory.Create(poeItem);
         }
 
@@ -391,6 +396,7 @@ namespace PoeEye.TradeMonitor.ViewModels
             {
                 return;
             }
+
             SendPredefinedMessage(message.Value);
         }
 

@@ -23,14 +23,14 @@ namespace PoeEye.PoeTrade.ViewModels
         private readonly IFactory<IPoeModViewModel> modsViewModelsFactory;
         private readonly DelegateCommand<IPoeModViewModel> removeModCommand;
 
+        private readonly IReactiveSuggestionProvider suggestionProvider;
+
         private PoeQueryModsGroupType groupType;
+        private IDictionary<string, IPoeItemMod> knownModsByName = new Dictionary<string, IPoeItemMod>();
 
         private float? maxGroupValue;
 
         private float? minGroupValue;
-
-        private readonly IReactiveSuggestionProvider suggestionProvider;
-        private IDictionary<string, IPoeItemMod> knownModsByName = new Dictionary<string, IPoeItemMod>();
 
         public PoeModsEditorViewModel(
             [NotNull] IPoeStaticDataSource staticDataSource,
@@ -47,11 +47,9 @@ namespace PoeEye.PoeTrade.ViewModels
             addModCommand = new DelegateCommand(() => AddMod());
             suggestionProvider = suggestionProviderFactory.Create();
 
-            Observable.Merge(
-                    Mods.Changed.ToUnit(),
-                    Mods.ItemChanged.ToUnit())
+            Mods.Changed.ToUnit().Merge(Mods.ItemChanged.ToUnit())
                 .Subscribe(() => removeModCommand.RaiseCanExecuteChanged()).AddTo(Anchors);
-            
+
             staticDataSource
                 .WhenAnyValue(x => x.StaticData)
                 .Subscribe(staticData => KnownModsByName = ToItemMods(staticData))
@@ -61,7 +59,7 @@ namespace PoeEye.PoeTrade.ViewModels
                 .WhenAnyValue(x => x.KnownModsByName)
                 .Subscribe(modsByName => suggestionProvider.Items = KnownModsByName.Keys)
                 .AddTo(Anchors);
-            
+
             AddMod();
         }
 
@@ -69,28 +67,28 @@ namespace PoeEye.PoeTrade.ViewModels
 
         public ICommand RemoveModCommand => removeModCommand;
 
+        private IDictionary<string, IPoeItemMod> KnownModsByName
+        {
+            get => knownModsByName;
+            set => this.RaiseAndSetIfChanged(ref knownModsByName, value);
+        }
+
         public PoeQueryModsGroupType GroupType
         {
-            get { return groupType; }
-            set { this.RaiseAndSetIfChanged(ref groupType, value); }
+            get => groupType;
+            set => this.RaiseAndSetIfChanged(ref groupType, value);
         }
 
         public float? MinGroupValue
         {
-            get { return minGroupValue; }
-            set { this.RaiseAndSetIfChanged(ref minGroupValue, value); }
+            get => minGroupValue;
+            set => this.RaiseAndSetIfChanged(ref minGroupValue, value);
         }
 
         public float? MaxGroupValue
         {
-            get { return maxGroupValue; }
-            set { this.RaiseAndSetIfChanged(ref maxGroupValue, value); }
-        }
-
-        private IDictionary<string, IPoeItemMod> KnownModsByName
-        {
-            get { return knownModsByName; }
-            set { this.RaiseAndSetIfChanged(ref knownModsByName, value); }
+            get => maxGroupValue;
+            set => this.RaiseAndSetIfChanged(ref maxGroupValue, value);
         }
 
         public IReactiveList<IPoeModViewModel> Mods { get; } = new ReactiveList<IPoeModViewModel> {ChangeTrackingEnabled = true};
@@ -125,8 +123,8 @@ namespace PoeEye.PoeTrade.ViewModels
         private IDictionary<string, IPoeItemMod> ToItemMods(IPoeStaticData staticData)
         {
             var modsByName = staticData
-                .ModsList
-                .ToDictionary(x => x.Name, x => x);
+                             .ModsList
+                             .ToDictionary(x => x.Name, x => x);
 
             return modsByName;
         }
@@ -158,7 +156,7 @@ namespace PoeEye.PoeTrade.ViewModels
                 IPoeItemMod knownMod;
                 if (!KnownModsByName.TryGetValue(modModel.SelectedMod, out knownMod))
                 {
-                    knownMod = new PoeItemMod() { CodeName = modModel.SelectedMod, Name = modModel.SelectedMod };
+                    knownMod = new PoeItemMod {CodeName = modModel.SelectedMod, Name = modModel.SelectedMod};
                 }
 
                 var modArg = new PoeQueryRangeModArgument(knownMod)
@@ -169,6 +167,7 @@ namespace PoeEye.PoeTrade.ViewModels
 
                 result.Add(modArg);
             }
+
             return result.ToArray();
         }
     }

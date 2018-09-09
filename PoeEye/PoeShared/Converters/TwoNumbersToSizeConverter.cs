@@ -21,20 +21,23 @@ namespace PoeShared.Converters
 
                 return new Size(width, height);
             }
-            else if (values[0] is double && values[1] is double)
+
+            if (values[0] is double && values[1] is double)
             {
                 var width = (double)values[0];
                 var height = (double)values[1];
 
                 return new Size(width, height);
             }
-            else if (values[0] is int && values[1] is int)
+
+            if (values[0] is int && values[1] is int)
             {
                 var width = (int)values[0];
                 var height = (int)values[1];
 
                 return new Size(width, height);
             }
+
             return Binding.DoNothing;
         }
 

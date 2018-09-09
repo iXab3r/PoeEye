@@ -49,8 +49,10 @@ namespace PoeEye.TradeMonitor.ViewModels
             [NotNull] IFactory<ITradeMonitorService> tradeMonitorServiceFactory,
             [NotNull] IConfigProvider<PoeTradeMonitorConfig> configProvider,
             [NotNull] FakeItemFactory fakeItemFactory,
-            [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler,
-            [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
+            [NotNull] [Dependency(WellKnownSchedulers.Background)]
+            IScheduler bgScheduler,
+            [NotNull] [Dependency(WellKnownSchedulers.UI)]
+            IScheduler uiScheduler)
         {
             Guard.ArgumentNotNull(keyboardMouseEvents, nameof(keyboardMouseEvents));
             Guard.ArgumentNotNull(stashService, nameof(stashService));
@@ -91,26 +93,26 @@ namespace PoeEye.TradeMonitor.ViewModels
 
         public bool ExpandOnHover
         {
-            get { return expandOnHover; }
-            set { this.RaiseAndSetIfChanged(ref expandOnHover, value); }
+            get => expandOnHover;
+            set => this.RaiseAndSetIfChanged(ref expandOnHover, value);
         }
 
         public int NumberOfNegotiationsToExpandByDefault
         {
-            get { return numberOfNegotiationsToExpandByDefault; }
-            set { this.RaiseAndSetIfChanged(ref numberOfNegotiationsToExpandByDefault, value); }
+            get => numberOfNegotiationsToExpandByDefault;
+            set => this.RaiseAndSetIfChanged(ref numberOfNegotiationsToExpandByDefault, value);
         }
 
         public int PreGroupNotificationsCount
         {
-            get { return preGroupNotificationsCount; }
-            set { this.RaiseAndSetIfChanged(ref preGroupNotificationsCount, value); }
+            get => preGroupNotificationsCount;
+            set => this.RaiseAndSetIfChanged(ref preGroupNotificationsCount, value);
         }
 
         public bool IsExpanded
         {
-            get { return isExpanded; }
-            set { this.RaiseAndSetIfChanged(ref isExpanded, value); }
+            get => isExpanded;
+            set => this.RaiseAndSetIfChanged(ref isExpanded, value);
         }
 
         public int NegotiationsOverflow => negotiationsList.Count - PreGroupNotificationsCount;
@@ -118,9 +120,7 @@ namespace PoeEye.TradeMonitor.ViewModels
         private void Initialize()
         {
             var pageSizeObservable =
-                Observable.Merge(
-                        this.WhenAnyValue(x => x.PreGroupNotificationsCount).ToUnit(),
-                        this.WhenAnyValue(x => x.IsExpanded).ToUnit())
+                this.WhenAnyValue(x => x.PreGroupNotificationsCount).ToUnit().Merge(this.WhenAnyValue(x => x.IsExpanded).ToUnit())
                     .Select(x => IsExpanded ? int.MaxValue : PreGroupNotificationsCount)
                     .Select(x => new VirtualRequest(0, x));
 
@@ -148,9 +148,7 @@ namespace PoeEye.TradeMonitor.ViewModels
                 .Subscribe(ApplyConfig)
                 .AddTo(Anchors);
 
-            Observable.Merge(
-                    this.WhenAnyValue(x => x.PreGroupNotificationsCount).ToUnit(),
-                    negotiationsList.CountChanged.ToUnit()
+            this.WhenAnyValue(x => x.PreGroupNotificationsCount).ToUnit().Merge(negotiationsList.CountChanged.ToUnit()
                 )
                 .Subscribe(() => this.RaisePropertyChanged(nameof(NegotiationsOverflow)))
                 .AddTo(Anchors);
@@ -169,7 +167,7 @@ namespace PoeEye.TradeMonitor.ViewModels
         private void ProcessMessage(TradeModel model)
         {
             var existingModel = negotiationsList.Items
-                .FirstOrDefault(x => TradeModel.Comparer.Equals(x.Negotiation, model));
+                                                .FirstOrDefault(x => TradeModel.Comparer.Equals(x.Negotiation, model));
             if (existingModel == null)
             {
                 AddNegotiation(model);
@@ -233,7 +231,7 @@ namespace PoeEye.TradeMonitor.ViewModels
             GrowUpwards = config.GrowUpwards;
             NumberOfNegotiationsToExpandByDefault = config.NumberOfNegotiationsToExpandByDefault;
             PreGroupNotificationsCount = config.PreGroupNotificationsCount;
-            
+
             base.ApplyConfig(config);
 
             if (config.OverlaySize.Height <= 0 || config.OverlaySize.Width <= 0)
@@ -241,6 +239,7 @@ namespace PoeEye.TradeMonitor.ViewModels
                 IsLocked = false;
                 config.OverlaySize = MinSize;
             }
+
             Width = config.OverlaySize.Width;
 
             if (config.OverlayLocation.X <= 1 && config.OverlayLocation.Y <= 1)
@@ -267,9 +266,9 @@ namespace PoeEye.TradeMonitor.ViewModels
         protected override void LockWindowCommandExecuted()
         {
             base.LockWindowCommandExecuted();
-            
+
             var config = configProvider.ActualConfig;
-            base.SavePropertiesToConfig(config);
+            SavePropertiesToConfig(config);
 
             config.GrowUpwards = GrowUpwards;
             config.NumberOfNegotiationsToExpandByDefault = NumberOfNegotiationsToExpandByDefault;

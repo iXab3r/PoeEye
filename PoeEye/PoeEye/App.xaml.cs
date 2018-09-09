@@ -39,7 +39,7 @@ namespace PoeEye
                 Log.Instance.Debug($"[App..ctor] Arguments: {arguments.DumpToText()}");
                 Log.Instance.Debug($"[App..ctor] Parsed args: {AppArguments.Instance.DumpToText()}");
                 Log.Instance.Debug($"[App..ctor] Culture: {Thread.CurrentThread.CurrentCulture}, UICulture: {Thread.CurrentThread.CurrentUICulture}");
-                
+
                 InitializeExceptionless();
 
                 RxApp.SupportsRangeNotifications = false; //FIXME DynamicData (as of v4.11) does not support RangeNotifications
@@ -56,7 +56,7 @@ namespace PoeEye
             var mutexId = $"PoeEye{(AppArguments.Instance.IsDebugMode ? "DEBUG" : "RELEASE")}{{88286F90-96B8-4799-9E8E-78B581267D63}}";
             Log.Instance.Debug($"[App] Acquiring mutex {mutexId}...");
             var mutex = new Mutex(true, mutexId);
-            if(mutex.WaitOne(TimeSpan.Zero, true))
+            if (mutex.WaitOne(TimeSpan.Zero, true))
             {
                 Log.Instance.Debug($"[App] Mutex {mutexId} was successfully acquired");
 
@@ -66,8 +66,8 @@ namespace PoeEye
                     mutex.ReleaseMutex();
                     Log.Instance.Debug($"[App.DomainUnload] Mutex was successfully disposed");
                 };
-            } 
-            else 
+            }
+            else
             {
                 Log.Instance.Warn($"[App] Appliation is already running, mutex: {mutexId}");
                 ShowShutdownWarning();
@@ -93,25 +93,25 @@ namespace PoeEye
         {
             ReportCrash(e.ExceptionObject as Exception, "CurrentDomainUnhandledException");
         }
-        
+
         private void DispatcherOnUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
         {
             ReportCrash(e.Exception, "DispatcherUnhandledException");
         }
-        
+
         private void TaskSchedulerOnUnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e)
         {
             ReportCrash(e.Exception, "TaskSchedulerUnobservedTaskException");
         }
-        
+
         private void ReportCrash(Exception exception, string developerMessage = "")
         {
             Log.Instance.Error($"Unhandled application exception({developerMessage})", exception);
 
             AppDomain.CurrentDomain.UnhandledException -= CurrentDomainOnUnhandledException;
-            Application.Current.Dispatcher.UnhandledException -= DispatcherOnUnhandledException;
+            Current.Dispatcher.UnhandledException -= DispatcherOnUnhandledException;
             TaskScheduler.UnobservedTaskException -= TaskSchedulerOnUnobservedTaskException;
-            
+
             try
             {
                 var reporter = new ExceptionReporter();
@@ -125,30 +125,30 @@ namespace PoeEye
                 reporter.Config.ShowFlatButtons = true;
                 reporter.Config.ShowContactTab = true;
                 reporter.Config.TakeScreenshot = false;
-                
+
                 reporter.Config.SmtpFromAddress = $"[E] {Environment.UserName} @ {Environment.MachineName}";
                 reporter.Config.EmailReportAddress = AppArguments.PoeEyeMail;
                 reporter.Config.ContactEmail = AppArguments.PoeEyeMail;
                 reporter.Config.SmtpServer = "aspmx.l.google.com";
                 reporter.Config.SmtpPort = 25;
                 reporter.Config.SmtpUseSsl = true;
-                
+
                 reporter.Config.MainException = exception;
 
                 var configurationFilesToInclude = Directory
                     .EnumerateFiles(AppArguments.AppDataDirectory, "*.cfg", SearchOption.TopDirectoryOnly);
 
                 var logFilesToInclude = new DirectoryInfo(AppArguments.AppDataDirectory)
-                    .GetFiles("*.log", SearchOption.AllDirectories)
-                    .OrderByDescending(x => x.LastWriteTime)
-                    .Take(2)
-                    .Select(x => x.FullName)
-                    .ToArray();
+                                        .GetFiles("*.log", SearchOption.AllDirectories)
+                                        .OrderByDescending(x => x.LastWriteTime)
+                                        .Take(2)
+                                        .Select(x => x.FullName)
+                                        .ToArray();
 
                 reporter.Config.FilesToAttach = new[]
                 {
                     logFilesToInclude,
-                    configurationFilesToInclude,
+                    configurationFilesToInclude
                 }.SelectMany(x => x).ToArray();
                 reporter.Show(exception);
             }
@@ -161,9 +161,9 @@ namespace PoeEye
         private void InitializeLogging()
         {
             AppDomain.CurrentDomain.UnhandledException += CurrentDomainOnUnhandledException;
-            Application.Current.Dispatcher.UnhandledException += DispatcherOnUnhandledException;
+            Current.Dispatcher.UnhandledException += DispatcherOnUnhandledException;
             TaskScheduler.UnobservedTaskException += TaskSchedulerOnUnobservedTaskException;
-            
+
             RxApp.DefaultExceptionHandler = Log.ErrorsSubject;
             if (AppArguments.Instance.IsDebugMode)
             {
@@ -179,7 +179,7 @@ namespace PoeEye
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
-            
+
             Log.Instance.Debug($"Application startup detected");
 
             SingleInstanceValidationRoutine();
@@ -191,14 +191,14 @@ namespace PoeEye
         protected override void OnExit(ExitEventArgs e)
         {
             base.OnExit(e);
-            
+
             Log.Instance.Debug($"Application exit detected");
             bootstrapper.Dispose();
         }
 
         private void ShowShutdownWarning()
         {
-            var assemblyName = System.Reflection.Assembly.GetExecutingAssembly().GetName();
+            var assemblyName = Assembly.GetExecutingAssembly().GetName();
             var window = MainWindow;
             var title = $"{assemblyName.Name} v{assemblyName.Version}";
             var message = "Application is already running !";
@@ -210,6 +210,7 @@ namespace PoeEye
             {
                 MessageBox.Show(message, title, MessageBoxButton.OK, MessageBoxImage.Warning);
             }
+
             Log.Instance.Warn($"Shutting down...");
             Environment.Exit(0);
         }

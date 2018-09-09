@@ -4,17 +4,13 @@ namespace PoeShared.Common
 {
     public sealed class PoeItemType : IPoeItemType
     {
-        public string CodeName { get; set; }
+        public PoeItemType() : this(string.Empty, string.Empty)
+        {
+        }
 
-        public string ItemType { get; set; }
-
-        public string EquipType { get; set; }
-
-        public string Name { get; set; }
-
-        public PoeItemType() : this(string.Empty, string.Empty) {}
-
-        public PoeItemType(string name) : this(name, name) {}
+        public PoeItemType(string name) : this(name, name)
+        {
+        }
 
         public PoeItemType(string name, string codeName)
         {
@@ -24,6 +20,14 @@ namespace PoeShared.Common
             Name = name;
             CodeName = codeName;
         }
+
+        public string CodeName { get; set; }
+
+        public string ItemType { get; set; }
+
+        public string EquipType { get; set; }
+
+        public string Name { get; set; }
 
         public override string ToString()
         {

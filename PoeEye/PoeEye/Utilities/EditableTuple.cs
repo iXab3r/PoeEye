@@ -10,14 +10,14 @@ namespace PoeEye.Utilities
 
         public T1 Item1
         {
-            get { return item1; }
-            set { this.RaiseAndSetIfChanged(ref item1, value); }
+            get => item1;
+            set => this.RaiseAndSetIfChanged(ref item1, value);
         }
 
         public T2 Item2
         {
-            get { return item2; }
-            set { this.RaiseAndSetIfChanged(ref item2, value); }
+            get => item2;
+            set => this.RaiseAndSetIfChanged(ref item2, value);
         }
     }
 }

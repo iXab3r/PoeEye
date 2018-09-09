@@ -15,7 +15,7 @@ namespace PoeEye.Converters
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            var result = object.Equals(value, CompareTo)
+            var result = Equals(value, CompareTo)
                 ? TrueValue
                 : FalseValue;
             return result ?? Binding.DoNothing;

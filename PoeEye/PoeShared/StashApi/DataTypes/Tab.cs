@@ -5,6 +5,9 @@ namespace PoeShared.StashApi.DataTypes
 {
     internal class Tab : IStashTab
     {
+        [DeserializeAs(Name = "type")]
+        public string StashTypeName { get; set; }
+
         [DeserializeAs(Name = "n")]
         public string Name { get; set; }
 
@@ -14,13 +17,10 @@ namespace PoeShared.StashApi.DataTypes
         [DeserializeAs(Name = "colour")]
         public Colour Colour { get; set; }
 
-        [DeserializeAs(Name = "type")]
-        public string StashTypeName { get; set; }
-
         public StashTabType StashType
         {
-            get { return Parse(StashTypeName); }
-            set { StashTypeName = StashType.ToString(); }
+            get => Parse(StashTypeName);
+            set => StashTypeName = StashType.ToString();
         }
 
         public string srcL { get; set; }

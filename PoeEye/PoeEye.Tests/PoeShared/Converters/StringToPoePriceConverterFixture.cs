@@ -10,31 +10,6 @@ namespace PoeEye.Tests.PoeShared.Converters
     [TestFixture]
     public class StringToPoePriceConverterFixture
     {
-        [Test]
-        public void ShouldCreate()
-        {
-            //Then
-            CreateInstance();
-        }
-
-        [Test]
-        [TestCaseSource(nameof(ShouldConvertCases))]
-        public void ShouldConvert(string rawPrice, PoePrice expected)
-        {
-            //Given
-            var instance = CreateInstance();
-
-            //When
-            var result = instance.Convert(rawPrice);
-
-            //Then
-            result.CurrencyType.ShouldBe(expected.CurrencyType);
-            result.Value.ShouldBe(expected.Value);
-            result.Price.ShouldBe(expected.Price);
-            result.HasValue.ShouldBe(expected.HasValue);
-            result.IsEmpty.ShouldBe(expected.IsEmpty);
-        }
-
         public IEnumerable<TestCaseData> ShouldConvertCases()
         {
             yield return new TestCaseData("Unknown", PoePrice.Empty);
@@ -63,6 +38,31 @@ namespace PoeEye.Tests.PoeShared.Converters
         private StringToPoePriceConverter CreateInstance()
         {
             return new StringToPoePriceConverter();
+        }
+
+        [Test]
+        [TestCaseSource(nameof(ShouldConvertCases))]
+        public void ShouldConvert(string rawPrice, PoePrice expected)
+        {
+            //Given
+            var instance = CreateInstance();
+
+            //When
+            var result = instance.Convert(rawPrice);
+
+            //Then
+            result.CurrencyType.ShouldBe(expected.CurrencyType);
+            result.Value.ShouldBe(expected.Value);
+            result.Price.ShouldBe(expected.Price);
+            result.HasValue.ShouldBe(expected.HasValue);
+            result.IsEmpty.ShouldBe(expected.IsEmpty);
+        }
+
+        [Test]
+        public void ShouldCreate()
+        {
+            //Then
+            CreateInstance();
         }
     }
 }
