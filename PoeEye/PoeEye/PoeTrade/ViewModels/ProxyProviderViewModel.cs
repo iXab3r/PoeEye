@@ -1,21 +1,15 @@
-﻿using PoeEye.Config;
+﻿using System;
+using System.Reactive.Linq;
+using Guards;
+using JetBrains.Annotations;
+using PoeEye.Config;
 using PoeShared.Modularity;
+using PoeShared.Scaffolding;
+using ProxyProvider;
+using ReactiveUI;
 
 namespace PoeEye.PoeTrade.ViewModels
 {
-    using System;
-    using System.Reactive.Linq;
-
-    using Guards;
-
-    using JetBrains.Annotations;
-
-    using PoeShared.Scaffolding;
-
-    using ProxyProvider;
-
-    using ReactiveUI;
-
     internal sealed class ProxyProviderViewModel : DisposableReactiveObject
     {
         private readonly IProxyProvider proxyProvider;

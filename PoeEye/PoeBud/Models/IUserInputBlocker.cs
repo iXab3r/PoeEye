@@ -1,9 +1,8 @@
 ﻿using System;
+using JetBrains.Annotations;
 
 namespace PoeBud.Models
 {
-    using JetBrains.Annotations;
-
     internal interface IUserInputBlocker
     {
         [NotNull] 

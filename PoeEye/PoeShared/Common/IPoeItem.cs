@@ -1,12 +1,10 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
+using JetBrains.Annotations;
 using PoeShared.StashApi.ProcurementLegacy;
 
 namespace PoeShared.Common
 {
-    using System;
-
-    using JetBrains.Annotations;
-
     public interface IPoeItem
     {
         string ItemName { get; }

@@ -1,9 +1,8 @@
+using JetBrains.Annotations;
+using PoeShared.Common;
+
 namespace PoeShared.PoeTrade.Query
 {
-    using Common;
-
-    using JetBrains.Annotations;
-
     public interface IPoeStaticData
     {
         IPoeCurrency[] CurrenciesList { [NotNull] get; }

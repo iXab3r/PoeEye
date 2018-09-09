@@ -1,8 +1,8 @@
+using Guards;
+using ReactiveUI;
+
 namespace PoeBud.ViewModels
 {
-    using Guards;
-    using ReactiveUI;
-
     internal sealed class TabSelectionViewModel : ReactiveObject
     {
         public TabSelectionViewModel(string tabName)

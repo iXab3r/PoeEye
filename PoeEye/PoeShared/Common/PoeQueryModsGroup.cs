@@ -1,7 +1,7 @@
-﻿namespace PoeShared.Common
-{
-    using PoeTrade.Query;
+﻿using PoeShared.PoeTrade.Query;
 
+namespace PoeShared.Common
+{
     public sealed class PoeQueryModsGroup : IPoeQueryModsGroup
     {
         public float? Min { get; set; }

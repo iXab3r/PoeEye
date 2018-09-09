@@ -1,20 +1,16 @@
-﻿namespace PoeWhisperMonitor
+﻿using System;
+using System.IO;
+using System.Linq;
+using System.Reactive.Linq;
+using System.Reactive.Subjects;
+using System.Text;
+using Guards;
+using JetBrains.Annotations;
+using PoeShared.Scaffolding;
+using TrackingStreamLib;
+
+namespace PoeWhisperMonitor
 {
-    using System;
-    using System.IO;
-    using System.Linq;
-    using System.Reactive.Linq;
-    using System.Reactive.Subjects;
-    using System.Text;
-
-    using Guards;
-
-    using JetBrains.Annotations;
-
-    using PoeShared.Scaffolding;
-
-    using TrackingStreamLib;
-
     internal sealed class StreamTracker : DisposableReactiveObject
     {
         private static readonly int BufferSize = 2048;

@@ -1,5 +1,4 @@
-﻿using System.Windows.Controls;
-using System.Windows.Media.Imaging;
+﻿using System.Windows.Media.Imaging;
 using JetBrains.Annotations;
 using PoeShared.Scaffolding;
 

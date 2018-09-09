@@ -1,25 +1,20 @@
+using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
+using System.Web;
 using System.Windows;
+using CsQuery;
+using Guards;
+using JetBrains.Annotations;
+using PoeShared.Common;
+using PoeShared.PoeTrade.Query;
 using PoeShared.Scaffolding;
 using PoeShared.StashApi.ProcurementLegacy;
 
 namespace PoeEye.PoeTrade
 {
-    using System;
-    using System.IO;
-    using System.Linq;
-    using System.Web;
-
-    using CsQuery;
-
-    using Guards;
-
-    using JetBrains.Annotations;
-
-    using PoeShared.Common;
-    using PoeShared.PoeTrade.Query;
-
     internal sealed class PoeTradeParserModern : IPoeTradeParser
     {
         private readonly IPoeTradeDateTimeExtractor dateTimeExtractor;

@@ -1,11 +1,9 @@
-﻿using PoeShared.Common;
+﻿using System.Threading.Tasks;
+using JetBrains.Annotations;
+using PoeShared.Common;
 
 namespace PoeShared.PoeTrade
 {
-    using System.Threading.Tasks;
-
-    using JetBrains.Annotations;
-
     public interface IPoeItemVerifier
     {
         [NotNull]

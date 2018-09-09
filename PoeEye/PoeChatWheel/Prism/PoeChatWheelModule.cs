@@ -1,13 +1,13 @@
-﻿using System.Windows;
-using Guards;
+﻿using Guards;
 using JetBrains.Annotations;
-using Unity; using Unity.Resolution; using Unity.Attributes;
 using PoeChatWheel.Modularity;
 using PoeChatWheel.ViewModels;
 using PoeShared.Modularity;
 using PoeShared.Native;
 using PoeShared.Prism;
 using Prism.Ioc;
+using Unity;
+using Unity.Resolution;
 
 namespace PoeChatWheel.Prism
 {

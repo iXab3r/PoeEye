@@ -1,11 +1,11 @@
+using System;
+using System.Collections;
+using System.Globalization;
+using System.Linq;
+using System.Windows.Data;
+
 namespace PoeBud.Converters
 {
-    using System;
-    using System.Collections;
-    using System.Globalization;
-    using System.Linq;
-    using System.Windows.Data;
-
     internal sealed class NullToBoolConverter : IValueConverter
     {
         public bool NullValue { get; set; } = true;

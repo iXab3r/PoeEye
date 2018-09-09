@@ -6,7 +6,6 @@ using System.Reactive.Subjects;
 using Guards;
 using JetBrains.Annotations;
 using PoeShared.Common;
-using PoeShared.PoeTrade.Query;
 using PoeShared.Scaffolding;
 using ReactiveUI;
 

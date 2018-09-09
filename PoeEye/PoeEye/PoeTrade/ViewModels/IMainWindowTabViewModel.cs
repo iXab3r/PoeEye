@@ -1,17 +1,12 @@
-﻿using PoeShared.Audio;
+﻿using System.Windows.Input;
+using JetBrains.Annotations;
+using PoeEye.Config;
+using PoeShared.Audio;
 using PoeShared.PoeTrade;
-using PoeShared.UI.ViewModels;
+using PoeShared.Scaffolding;
 
 namespace PoeEye.PoeTrade.ViewModels
 {
-    using System.Windows.Input;
-
-    using Config;
-
-    using JetBrains.Annotations;
-
-    using PoeShared.Scaffolding;
-
     internal interface IMainWindowTabViewModel : IDisposableReactiveObject
     {
         string Id { get; }

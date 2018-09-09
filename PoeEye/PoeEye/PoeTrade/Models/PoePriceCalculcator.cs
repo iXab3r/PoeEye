@@ -1,29 +1,19 @@
-﻿using System.Reactive;
-using CsQuery.ExtensionMethods;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reactive;
+using System.Reactive.Linq;
+using Guards;
+using JetBrains.Annotations;
+using PoeEye.Config;
+using PoeShared;
 using PoeShared.Common;
 using PoeShared.Modularity;
 using PoeShared.PoeTrade;
-using PoeEyeMainConfig = PoeEye.Config.PoeEyeMainConfig;
+using PoeShared.Scaffolding;
 
 namespace PoeEye.PoeTrade.Models
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Reactive.Linq;
-
-    using Config;
-
-    using Converters;
-
-    using Guards;
-
-    using JetBrains.Annotations;
-
-    using PoeShared;
-    using PoeShared.Scaffolding;
-
-    using ReactiveUI;
     using IPoeEyeMainConfigProvider = IConfigProvider<PoeEyeMainConfig>;
 
     internal sealed class PoePriceCalculcator : DisposableReactiveObject, IPoePriceCalculcator

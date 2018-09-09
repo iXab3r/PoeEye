@@ -1,10 +1,8 @@
-using System.Collections;
+using System.Collections.Generic;
 using PoeShared.Scaffolding;
 
 namespace PoeShared.Common
 {
-    using System.Collections.Generic;
-
     public sealed class PoeItemMod : IPoeItemMod
     {
         public static IEqualityComparer<PoeItemMod> CodeNameComparer { get; } = new LambdaComparer<PoeItemMod>((x, y) => string.Equals(x.CodeName, y.CodeName));

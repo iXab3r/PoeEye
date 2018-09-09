@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -12,16 +11,15 @@ using System.Reactive.Subjects;
 using System.Threading;
 using DynamicData;
 using DynamicData.Binding;
-using DynamicData.Controllers;
 using Guards;
 using JetBrains.Annotations;
-using Unity; using Unity.Resolution; using Unity.Attributes;
 using PoeEye.PoeTrade.Common;
 using PoeShared;
 using PoeShared.Common;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
 using ReactiveUI;
+using Unity.Attributes;
 
 namespace PoeEye.PoeTrade.ViewModels
 {

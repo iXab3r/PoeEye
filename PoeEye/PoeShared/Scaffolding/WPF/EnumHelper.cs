@@ -20,7 +20,7 @@ namespace PoeShared.Scaffolding.WPF
                         .FirstOrDefault()?
                         .Description ?? value.ToString()
                 };
-            return valuesAndDescriptions.ToArray();
+            return valuesAndDescriptions.ToArray<>();
         }
 
         public static T SetFlags<T>(this T instance, T flagToSet) where T : struct

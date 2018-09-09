@@ -1,8 +1,7 @@
 using Guards;
 using PoeShared.Modularity;
 using Prism.Ioc;
-using Unity; using Unity.Resolution; using Unity.Attributes;
-using IModule = Prism.Modularity.IModule;
+using Unity;
 
 namespace PoeEye.StashRealtimeApi.Prism
 {

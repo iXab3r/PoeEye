@@ -1,18 +1,14 @@
-﻿using PoeShared.Common;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Guards;
+using PoeShared.Common;
+using PoeShared.PoeTrade;
+using PoeShared.PoeTrade.Query;
+using TypeConverter;
 
 namespace PoeEye.PoeTrade
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-
-    using Guards;
-
-    using PoeShared.PoeTrade;
-    using PoeShared.PoeTrade.Query;
-
-    using TypeConverter;
-
     internal sealed class PoeQueryInfoToQueryConverter : IConverter<IPoeQueryInfo, IPoeQuery>
     {
         public IPoeQuery Convert(IPoeQueryInfo source)

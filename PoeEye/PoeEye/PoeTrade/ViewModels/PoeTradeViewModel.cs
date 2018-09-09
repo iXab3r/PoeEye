@@ -1,49 +1,31 @@
-﻿using System.Threading;
-using PoeEye.Converters;
-using PoeEye.ItemParser;
+﻿using System;
+using System.Diagnostics;
+using System.Reactive.Concurrency;
+using System.Reactive.Linq;
+using System.Threading.Tasks;
+using System.Windows.Input;
+using Exceptionless;
+using Guards;
+using JetBrains.Annotations;
 using PoeEye.ItemParser.Services;
-using PoeEye.PoeTrade.Common;
+using PoeShared;
 using PoeShared.Audio;
+using PoeShared.Common;
 using PoeShared.Converters;
 using PoeShared.PoeTrade;
+using PoeShared.Prism;
+using PoeShared.Scaffolding;
 using PoeShared.Scaffolding.WPF;
 using PoeShared.UI;
 using PoeShared.UI.ViewModels;
 using PoeWhisperMonitor.Chat;
-using Prism.Commands;
+using ReactiveUI;
 using ReactiveUI.Legacy;
 using Unity.Attributes;
+using ReactiveCommand = ReactiveUI.ReactiveCommand;
 
 namespace PoeEye.PoeTrade.ViewModels
 {
-    using System;
-    using System.Diagnostics;
-    using System.Linq;
-    using System.Reactive.Concurrency;
-    using System.Reactive.Linq;
-    using System.Threading.Tasks;
-    using System.Windows;
-    using System.Windows.Input;
-
-    using Exceptionless;
-
-    using Guards;
-
-    using JetBrains.Annotations;
-
-    using Unity; using Unity.Resolution; using Unity.Attributes;
-
-    using Models;
-
-    using PoeEye.Prism;
-
-    using PoeShared;
-    using PoeShared.Common;
-    using PoeShared.Prism;
-    using PoeShared.Scaffolding;
-
-    using ReactiveUI;
-
     internal sealed class PoeTradeViewModel : DisposableReactiveObject, IPoeTradeViewModel
     {
         private static readonly TimeSpan RefreshTimeout = TimeSpan.FromMinutes(1);

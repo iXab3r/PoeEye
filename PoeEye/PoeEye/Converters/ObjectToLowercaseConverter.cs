@@ -1,9 +1,9 @@
-﻿namespace PoeEye.Converters
-{
-    using System;
-    using System.Globalization;
-    using System.Windows.Data;
+﻿using System;
+using System.Globalization;
+using System.Windows.Data;
 
+namespace PoeEye.Converters
+{
     internal sealed class ObjectToLowercaseConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)

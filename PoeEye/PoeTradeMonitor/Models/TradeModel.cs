@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using KellermanSoftware.CompareNetObjects;
-using KellermanSoftware.CompareNetObjects.TypeComparers;
 using PoeShared.Common;
-using PoeShared.Scaffolding;
-using ReactiveUI;
 
 namespace PoeEye.TradeMonitor.Models
 {

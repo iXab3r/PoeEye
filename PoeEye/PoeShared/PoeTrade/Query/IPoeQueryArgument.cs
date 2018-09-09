@@ -1,7 +1,7 @@
-﻿namespace PoeShared.PoeTrade.Query
-{
-    using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
 
+namespace PoeShared.PoeTrade.Query
+{
     public interface IPoeQueryArgument
     {
         string Name { [NotNull] get; }

@@ -1,23 +1,16 @@
-﻿using PoeBud.Config;
+﻿using System.Linq;
+using Moq;
+using NUnit.Framework;
+using PoeBud.Config;
 using PoeBud.Models;
 using PoeBud.ViewModels;
 using PoeEye.Tests.PoeBud.TestData;
-using PoeShared;
 using PoeShared.Common;
 using PoeShared.PoeTrade;
-using PoeShared.Scaffolding;
-using PoeShared.StashApi.DataTypes;
+using Shouldly;
 
 namespace PoeEye.Tests.PoeBud.ViewModels
 {
-    using System.Linq;
-
-    using Moq;
-
-    using NUnit.Framework;
-
-    using Shouldly;
-
     [TestFixture]
     public class StashViewModelFixture
     {

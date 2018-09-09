@@ -1,13 +1,9 @@
-﻿using PoeBud.Models;
+﻿using System;
+using PoeBud.Models;
 using PoeShared.Modularity;
 
 namespace PoeBud.Config
 {
-    using System;
-    using System.Collections.Generic;
-
-    using JetBrains.Annotations;
-
     public interface IPoeBudConfig : IPoeEyeConfigVersioned, IStashUpdaterParameters
     {
         int ExpectedSetsCount { get; }

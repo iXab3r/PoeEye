@@ -1,23 +1,14 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Windows.Input;
-using System.Windows.Threading;
 using Gma.System.MouseKeyHook;
 using Guards;
 using JetBrains.Annotations;
-using Unity; using Unity.Resolution; using Unity.Attributes;
 using Newtonsoft.Json;
 using PoeShared.Modularity;
-using PoeShared.Prism;
 using PoeShared.Scaffolding;
-using KeyEventArgs = System.Windows.Forms.KeyEventArgs;
-using KeyEventHandler = System.Windows.Forms.KeyEventHandler;
 
 namespace PoeShared.Native
 {

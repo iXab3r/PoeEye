@@ -1,11 +1,12 @@
 ﻿using Guards;
 using JetBrains.Annotations;
-using Unity; using Unity.Resolution; using Unity.Attributes;
 using PoeEye.TradeSummaryOverlay.ViewModels;
 using PoeShared.Modularity;
 using PoeShared.Native;
 using PoeShared.Prism;
 using Prism.Ioc;
+using Unity;
+using Unity.Resolution;
 
 namespace PoeEye.TradeSummaryOverlay.Prism
 {

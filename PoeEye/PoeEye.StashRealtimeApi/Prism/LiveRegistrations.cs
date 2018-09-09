@@ -1,12 +1,11 @@
-﻿using Unity; using Unity.Resolution; using Unity.Attributes;
-using PoeEye.StashRealtimeApi.API;
+﻿using PoeEye.StashRealtimeApi.API;
 using PoeEye.StashRealtimeApi.Models;
 using PoeEye.StashRealtimeApi.Services;
 using PoeShared.Common;
 using PoeShared.PoeTrade;
 using PoeShared.Prism;
-using PoeShared.Scaffolding;
 using PoeShared.StashApi.DataTypes;
+using Unity;
 using Unity.Extension;
 
 namespace PoeEye.StashRealtimeApi.Prism

@@ -1,11 +1,10 @@
 ﻿using System.ComponentModel;
+using System.Reflection;
+using System.Windows;
+using System.Windows.Interactivity;
 
 namespace PoeEye.Utilities
 {
-    using System.Reflection;
-    using System.Windows;
-    using System.Windows.Interactivity;
-
     /// <summary>
     ///     Sets the designated property to the supplied value. TargetObject
     ///     optionally designates the object on which to set the property. If

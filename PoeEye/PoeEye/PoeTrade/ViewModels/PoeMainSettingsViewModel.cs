@@ -1,14 +1,10 @@
 ﻿using System;
 using System.Linq;
-using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
-using System.Windows.Input;
 using Guards;
 using JetBrains.Annotations;
-using Unity; using Unity.Resolution; using Unity.Attributes;
-using PoeBud.Config;
 using PoeEye.Config;
 using PoeEye.Utilities;
 using PoeShared;

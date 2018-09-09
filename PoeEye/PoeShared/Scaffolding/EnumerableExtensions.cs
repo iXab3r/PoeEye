@@ -1,12 +1,11 @@
+using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using Guards;
 
 namespace PoeShared.Scaffolding
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-
     public static class EnumerableExtensions
     {
         private static readonly Random Rng = new Random();

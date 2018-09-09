@@ -3,13 +3,10 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
-using System.Reactive;
 using System.Reactive.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Markup;
-using DynamicData.Binding;
-using ReactiveUI;
 
 namespace PoeShared.Scaffolding.WPF
 {

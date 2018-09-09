@@ -1,14 +1,11 @@
+using System;
 using System.Windows;
+using Newtonsoft.Json;
 using PoeShared.Converters;
 using PoeShared.Native;
 
 namespace PoeBud.Config
 {
-    using System;
-    using System.Collections.Generic;
-
-    using Newtonsoft.Json;
-
     public sealed class PoeBudConfig : IPoeBudConfig, IOverlayConfig, ICanBeEnabled
     {
         public bool IsEnabled { get; set; } = true;

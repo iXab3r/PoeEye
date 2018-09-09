@@ -1,14 +1,12 @@
-﻿namespace PoeShared.Scaffolding
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using Guards;
+using Newtonsoft.Json;
+
+namespace PoeShared.Scaffolding
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Reflection;
-
-    using Guards;
-
-    using Newtonsoft.Json;
-
     public static class ObjectExtensions
     {
         public static string DumpToText<T>(this T instance)

@@ -1,12 +1,9 @@
-﻿using PoeShared.StashApi.DataTypes;
+﻿using System;
+using System.Windows;
+using PoeShared.StashApi.DataTypes;
 
 namespace PoeBud.Models
 {
-    using System;
-    using System.Windows;
-
-    using JetBrains.Annotations;
-
     internal interface IPoeWindow
     {
         Rect WindowBounds { get; }

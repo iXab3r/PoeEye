@@ -1,13 +1,11 @@
-﻿namespace PoeEye.Tests.Helpers
+﻿using System;
+using System.ComponentModel;
+using System.Linq.Expressions;
+using Moq;
+using NUnit.Framework;
+
+namespace PoeEye.Tests.Helpers
 {
-    using System;
-    using System.ComponentModel;
-    using System.Linq.Expressions;
-
-    using Moq;
-
-    using NUnit.Framework;
-
     internal static class MockExtensions
     {
         public static void SetPropertyAndNotify<T, TProperty>(this Mock<T> mock, Expression<Func<T, TProperty>> expr, TProperty value)

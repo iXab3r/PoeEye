@@ -1,22 +1,19 @@
-﻿using Guards;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reactive.Disposables;
+using System.Reactive.Linq;
+using System.Reactive.Subjects;
+using Guards;
 using JetBrains.Annotations;
+using PoeShared;
 using PoeShared.Prism;
+using PoeShared.Scaffolding;
+using PoeWhisperMonitor.Chat;
 
 namespace PoeWhisperMonitor
 {
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
-    using System.Reactive.Disposables;
-    using System.Reactive.Linq;
-    using System.Reactive.Subjects;
-
-    using Chat;
-
-    using PoeShared;
-    using PoeShared.Scaffolding;
-
     internal sealed class PoeWhisperService : DisposableReactiveObject, IPoeWhisperService
     {
         private readonly IFactory<IPoeMessagesSource, FileInfo> messagesSourceFactory;

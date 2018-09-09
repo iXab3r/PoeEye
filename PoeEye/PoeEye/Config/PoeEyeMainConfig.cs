@@ -1,17 +1,10 @@
+using System;
+using System.Collections.Generic;
 using PoeShared.Common;
 using PoeShared.Modularity;
 
 namespace PoeEye.Config
 {
-    using System;
-    using System.Collections.Generic;
-
-    using Guards;
-
-    using JetBrains.Annotations;
-
-    using PoeShared.Scaffolding;
-
     internal sealed class PoeEyeMainConfig : IPoeEyeConfigVersioned
     {
         private static readonly IDictionary<string, float> DefaultCurrenciesPriceInChaos = new Dictionary<string, float>

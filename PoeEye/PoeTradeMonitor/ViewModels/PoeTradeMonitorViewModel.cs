@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Reactive.Concurrency;
-using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Windows;
 using System.Windows.Input;
@@ -9,7 +8,6 @@ using DynamicData;
 using DynamicData.Binding;
 using Guards;
 using JetBrains.Annotations;
-using Unity; using Unity.Resolution; using Unity.Attributes;
 using PoeEye.TradeMonitor.Models;
 using PoeEye.TradeMonitor.Modularity;
 using PoeEye.TradeMonitor.Services;
@@ -20,6 +18,7 @@ using PoeShared.Prism;
 using PoeShared.Scaffolding;
 using Prism.Commands;
 using ReactiveUI;
+using Unity.Attributes;
 
 namespace PoeEye.TradeMonitor.ViewModels
 {

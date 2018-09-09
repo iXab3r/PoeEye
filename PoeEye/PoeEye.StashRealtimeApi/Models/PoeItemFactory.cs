@@ -4,7 +4,6 @@ using JetBrains.Annotations;
 using Newtonsoft.Json;
 using PoeEye.StashRealtimeApi.API;
 using PoeShared.Common;
-using PoeShared.Converters;
 using PoeShared.Prism;
 using PoeShared.StashApi.DataTypes;
 using TypeConverter;

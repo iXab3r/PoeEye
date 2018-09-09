@@ -1,9 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Reactive.Linq;
+﻿using System.Collections.ObjectModel;
 using JetBrains.Annotations;
-using Prism.Modularity;
-using ReactiveUI;
 
 namespace PoeShared.Modularity
 {

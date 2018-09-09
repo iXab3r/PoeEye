@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -7,19 +6,14 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
-using CommandLine;
 using Exceptionless;
 using Exceptionless.Models;
 using ExceptionReporting;
 using ExceptionReporting.Core;
-using Guards;
 using log4net.Core;
-using Unity; using Unity.Resolution; using Unity.Attributes;
 using PoeEye.Prism;
 using PoeShared;
-using PoeShared.Communications.Chromium;
 using PoeShared.Scaffolding;
-using Prism.Unity;
 using ReactiveUI;
 
 namespace PoeEye

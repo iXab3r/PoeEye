@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Data;
 using System.Linq;
@@ -20,7 +19,6 @@ using PoeShared.PoeTrade;
 using PoeShared.PoeTrade.Query;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
-using PoeShared.StashApi.DataTypes;
 using Stateless;
 using TypeConverter;
 

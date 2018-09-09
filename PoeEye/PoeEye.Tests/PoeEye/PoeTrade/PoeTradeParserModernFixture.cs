@@ -1,9 +1,7 @@
-﻿using System.Linq;
-using CsQuery;
+﻿using CsQuery;
 using Moq;
 using NUnit.Framework;
 using PoeEye.PoeTrade;
-using PoeEye.Tests.PoeEye.PoeTrade.TestData;
 using PoeShared.Common;
 using PoeShared.StashApi.ProcurementLegacy;
 using Shouldly;

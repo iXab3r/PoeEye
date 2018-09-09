@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Data;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reactive.Disposables;
@@ -12,8 +10,6 @@ using System.Reactive.Threading.Tasks;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading;
-using System.Threading.Tasks;
 using DynamicData;
 using DynamicData.Cache.Internal;
 using Guards;
@@ -30,9 +26,9 @@ using PoeShared.PoeTrade.Query;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
 using Stateless;
+using SuperSocket.ClientEngine;
 using TypeConverter;
 using WebSocket4Net;
-using ErrorEventArgs = SuperSocket.ClientEngine.ErrorEventArgs;
 
 namespace PoeEye.PoeTradeRealtimeApi
 {

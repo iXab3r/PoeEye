@@ -1,8 +1,6 @@
 ﻿using System;
-using System.ComponentModel;
 using System.Reactive.Disposables;
 using Guards;
-using Unity; using Unity.Resolution; using Unity.Attributes;
 using Newtonsoft.Json;
 using PoeEye.Config;
 using PoeEye.Converters;
@@ -15,8 +13,6 @@ using PoeShared.PoeTrade;
 using PoeShared.PoeTrade.Query;
 using PoeShared.Scaffolding;
 using Prism.Ioc;
-using Prism.Modularity;
-using Prism.Unity;
 using Unity;
 
 namespace PoeEye.Prism

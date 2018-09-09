@@ -1,11 +1,10 @@
-﻿namespace PoeBud.Converters
-{
-    using System;
-    using System.Collections;
-    using System.Globalization;
-    using System.Windows;
-    using System.Windows.Data;
+﻿using System;
+using System.Globalization;
+using System.Windows;
+using System.Windows.Data;
 
+namespace PoeBud.Converters
+{
     internal sealed class IsGreaterThanValueToBooleanConverter : DependencyObject, IValueConverter
     {
         public static readonly DependencyProperty MinValueProperty = DependencyProperty.Register(

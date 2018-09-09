@@ -1,9 +1,8 @@
-﻿namespace FuzzySearch
+﻿using System.Collections.Generic;
+using JetBrains.Annotations;
+
+namespace FuzzySearch
 {
-    using System.Collections.Generic;
-
-    using JetBrains.Annotations;
-
     public interface IFuzzySearchService
     {
         [NotNull]

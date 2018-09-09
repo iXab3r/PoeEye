@@ -4,17 +4,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reactive;
-using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Text;
 using Guards;
 using JetBrains.Annotations;
-using Newtonsoft.Json;
 using PoeShared;
 using PoeShared.Modularity;
 using PoeShared.Scaffolding;
-using ReactiveUI;
-using ErrorEventArgs = Newtonsoft.Json.Serialization.ErrorEventArgs;
 
 namespace PoeEye.Config
 {

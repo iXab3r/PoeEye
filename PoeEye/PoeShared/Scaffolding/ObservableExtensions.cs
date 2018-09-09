@@ -1,11 +1,10 @@
-﻿namespace PoeShared.Scaffolding
+﻿using System;
+using System.Reactive;
+using System.Reactive.Linq;
+using JetBrains.Annotations;
+
+namespace PoeShared.Scaffolding
 {
-    using System;
-    using System.Reactive;
-    using System.Reactive.Linq;
-
-    using JetBrains.Annotations;
-
     public static class ObservableExtensions
     {
         public static IDisposable Subscribe<T>(this IObservable<T> observable, [NotNull] Action onNext)

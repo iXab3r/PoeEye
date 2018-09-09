@@ -1,21 +1,17 @@
-﻿using PoeShared.Communications;
+﻿using System;
+using System.Reactive.Linq;
+using System.Reactive.Threading.Tasks;
+using System.Threading.Tasks;
+using Guards;
+using JetBrains.Annotations;
+using PoeShared;
+using PoeShared.Common;
+using PoeShared.Communications;
+using PoeShared.PoeTrade;
+using PoeShared.Prism;
 
 namespace PoeEye.PoeTrade
 {
-    using System;
-    using System.Reactive.Linq;
-    using System.Reactive.Threading.Tasks;
-    using System.Threading.Tasks;
-
-    using Guards;
-
-    using JetBrains.Annotations;
-
-    using PoeShared;
-    using PoeShared.Common;
-    using PoeShared.PoeTrade;
-    using PoeShared.Prism;
-
     internal sealed class PoeItemVerifier : IPoeItemVerifier
     {
         private static readonly string VerificationUri = "http://verify.xyz.is/";

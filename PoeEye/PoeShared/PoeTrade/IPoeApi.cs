@@ -1,14 +1,11 @@
 ﻿using System;
+using System.Threading.Tasks;
+using JetBrains.Annotations;
+using PoeShared.PoeTrade.Query;
 using PoeShared.Scaffolding;
 
 namespace PoeShared.PoeTrade
 {
-    using System.Threading.Tasks;
-
-    using JetBrains.Annotations;
-
-    using Query;
-
     public interface IPoeApi : IDisposableReactiveObject
     {
         Guid Id { get; }

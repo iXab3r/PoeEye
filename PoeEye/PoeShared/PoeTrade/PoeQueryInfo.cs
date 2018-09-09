@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using PoeShared.Common;
+using PoeShared.PoeTrade.Query;
 using PoeShared.Scaffolding;
 
 namespace PoeShared.PoeTrade
 {
-    using Common;
-
-    using Query;
-
     public sealed class PoeQueryInfo : IPoeQueryInfo
     {
         public static IEqualityComparer<IPoeQueryInfo> Comparer = new LambdaComparer<IPoeQueryInfo>((x, y) => string.CompareOrdinal(x?.DumpToText(), y?.DumpToText()) == 0);

@@ -4,13 +4,10 @@ using System.Linq;
 using System.Net;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
-using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows.Controls;
-using System.Windows.Input;
 using Guards;
 using JetBrains.Annotations;
-using Unity; using Unity.Resolution; using Unity.Attributes;
 using PoeBud.Config;
 using PoeBud.Models;
 using PoeShared;
@@ -21,9 +18,7 @@ using PoeShared.Scaffolding.WPF;
 using PoeShared.StashApi;
 using PoeShared.StashApi.DataTypes;
 using ReactiveUI;
-using ReactiveUI.Legacy;
 using Unity.Attributes;
-using ReactiveCommand = ReactiveUI.ReactiveCommand;
 
 namespace PoeBud.ViewModels
 {

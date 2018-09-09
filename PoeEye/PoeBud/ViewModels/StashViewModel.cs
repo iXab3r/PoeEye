@@ -1,4 +1,11 @@
 ﻿using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
+using Guards;
+using JetBrains.Annotations;
+using PoeBud.Config;
+using PoeBud.Models;
 using PoeBud.Scaffolding;
 using PoeShared;
 using PoeShared.Converters;
@@ -7,18 +14,6 @@ using PoeShared.StashApi.DataTypes;
 
 namespace PoeBud.ViewModels
 {
-    using System.Collections.Concurrent;
-    using System.Collections.Generic;
-    using System.Linq;
-
-    using Config;
-
-    using Guards;
-
-    using JetBrains.Annotations;
-
-    using Models;
-
     internal sealed class StashViewModel : DisposableReactiveObject
     {
         public StashViewModel(

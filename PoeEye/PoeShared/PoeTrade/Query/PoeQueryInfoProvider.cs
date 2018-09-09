@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Runtime.CompilerServices;
-using System.Threading;
 using System.Threading.Tasks;
 using Guards;
 using JetBrains.Annotations;
-using PoeShared.Common;
 using PoeShared.Scaffolding;
 using ReactiveUI;
 

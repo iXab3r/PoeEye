@@ -1,7 +1,5 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
-using System.Windows.Input;
 using Guards;
 using PoeChatWheel.Modularity;
 using PoeShared.Modularity;

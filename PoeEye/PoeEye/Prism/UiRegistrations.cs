@@ -1,31 +1,16 @@
-﻿using PoeEye.PoeTrade.Shell.ViewModels;
+﻿using PoeEye.Config;
+using PoeEye.PoeTrade.Models;
+using PoeEye.PoeTrade.Shell.ViewModels;
 using PoeEye.PoeTrade.Updater;
-using PoeShared.Audio;
-using PoeShared.Common;
+using PoeEye.PoeTrade.ViewModels;
 using PoeShared.Modularity;
-using PoeShared.Native;
 using PoeShared.PoeTrade;
-using PoeShared.Prism;
-using PoeShared.UI.Models;
 using Unity;
 using Unity.Extension;
-using PoeEyeMainConfig = PoeEye.Config.PoeEyeMainConfig;
+using WpfAutoCompleteControls.Editors;
 
 namespace PoeEye.Prism
 {
-    using System.Diagnostics;
-    using System.Reactive.Concurrency;
-
-    using Config;
-
-    using Unity; using Unity.Resolution; using Unity.Attributes;
-
-    using PoeShared.Scaffolding;
-
-    using PoeTrade.Models;
-    using PoeTrade.ViewModels;
-
-    using WpfAutoCompleteControls.Editors;
     using IPoeEyeMainConfigProvider = IConfigProvider<PoeEyeMainConfig>;
 
     internal sealed class UiRegistrations : UnityContainerExtension

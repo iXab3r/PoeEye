@@ -1,8 +1,6 @@
 using Guards;
 using PoeShared.Modularity;
 using Prism.Ioc;
-using Unity; using Unity.Resolution; using Unity.Attributes;
-using Prism.Modularity;
 using Unity;
 
 namespace PoeEye.PoeTradeRealtimeApi.Prism

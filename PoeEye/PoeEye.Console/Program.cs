@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Unity; using Unity.Resolution; using Unity.Attributes;
 using PoeEye.PoeTrade.Prism;
 using PoeEye.PoeTradeRealtimeApi;
 using PoeEye.PoeTradeRealtimeApi.Prism;
@@ -12,6 +7,8 @@ using PoeShared.PoeTrade;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
 using Prism.Modularity;
+using Unity;
+using Unity.Resolution;
 
 namespace PoeEye.Console
 {

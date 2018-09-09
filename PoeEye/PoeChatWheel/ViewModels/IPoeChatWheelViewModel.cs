@@ -1,6 +1,5 @@
 ﻿using JetBrains.Annotations;
 using PoeShared.Native;
-using PoeShared.Scaffolding;
 using RadialMenu.Controls;
 using ReactiveUI;
 

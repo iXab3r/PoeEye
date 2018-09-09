@@ -1,16 +1,12 @@
-﻿using PoeEye.PoeTrade.Common;
+﻿using System;
+using System.Windows.Input;
+using JetBrains.Annotations;
+using PoeShared.Common;
+using PoeShared.Scaffolding;
 using PoeShared.UI.ViewModels;
 
 namespace PoeEye.PoeTrade.ViewModels
 {
-    using System;
-    using System.Windows.Input;
-
-    using JetBrains.Annotations;
-
-    using PoeShared.Common;
-    using PoeShared.Scaffolding;
-
     internal interface IPoeTradeViewModel : IDisposableReactiveObject
     {
         ICommand CopyPrivateMessageToClipboardCommand { [NotNull] get; }

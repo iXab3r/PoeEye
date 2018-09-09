@@ -1,9 +1,8 @@
-﻿using Unity;
+﻿using Guards;
+using Unity;
 
 namespace PoeShared.Prism
 {
-    using Guards;
-
     internal sealed class Factory<T> : IFactory<T>
     {
         private readonly IUnityContainer container;

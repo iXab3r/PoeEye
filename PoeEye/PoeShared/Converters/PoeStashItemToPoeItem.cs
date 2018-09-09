@@ -1,9 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Guards;
 using PoeShared.Common;
-using PoeShared.Prism;
 using PoeShared.Scaffolding;
 using PoeShared.StashApi.DataTypes;
 using TypeConverter;

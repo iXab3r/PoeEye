@@ -3,15 +3,10 @@ using PoeShared.Native;
 using Unity;
 using Unity.Injection;
 using Unity.Lifetime;
-using Unity.Registration;
 using Unity.Resolution;
 
 namespace PoeShared.Scaffolding
 {
-    using Guards;
-
-    using Unity; using Unity.Resolution; using Unity.Attributes;
-
     public static class UnityContainerExtensions
     {
         public static IUnityContainer RegisterSingleton<TTo>(this IUnityContainer instance, params Type[] types)

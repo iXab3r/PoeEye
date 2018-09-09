@@ -1,14 +1,10 @@
+using Guards;
 using PoeShared.Modularity;
 using Prism.Ioc;
 using Unity;
-using IModule = Prism.Modularity.IModule;
 
 namespace PoeEye.PoeTrade.Prism
 {
-    using Guards;
-
-    using Unity; using Unity.Resolution; using Unity.Attributes;
-
     public sealed class PoeTradeModule : IPoeEyeModule
     {
         private readonly IUnityContainer container;

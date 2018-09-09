@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Windows.Data;
-using Microsoft.SqlServer.Server;
 using PoeBud.Models;
 
 namespace PoeBud.Converters

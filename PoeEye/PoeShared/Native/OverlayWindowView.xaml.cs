@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Reactive;
 using System.Reactive.Linq;
-using System.Reactive.Subjects;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls.Primitives;
-using System.Windows.Forms;
 using System.Windows.Interop;
 using System.Windows.Threading;
 using PoeShared.Scaffolding;
-using Xceed.Wpf.Toolkit;
 
 namespace PoeShared.Native
 {

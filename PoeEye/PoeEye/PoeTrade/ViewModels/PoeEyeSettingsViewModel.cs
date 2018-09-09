@@ -9,8 +9,6 @@ using System.Windows.Input;
 using DynamicData.Binding;
 using Guards;
 using JetBrains.Annotations;
-using Unity; using Unity.Resolution; using Unity.Attributes;
-using PoeEye.Config;
 using PoeShared;
 using PoeShared.Modularity;
 using PoeShared.Scaffolding;

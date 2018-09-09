@@ -1,10 +1,9 @@
-﻿using PoeShared.Common;
+﻿using JetBrains.Annotations;
+using PoeShared.Common;
 using PoeShared.StashApi.DataTypes;
 
 namespace PoeBud.Models
 {
-    using JetBrains.Annotations;
-
     internal interface IPoeSolutionItem
     {
         string Name { [NotNull] get; }

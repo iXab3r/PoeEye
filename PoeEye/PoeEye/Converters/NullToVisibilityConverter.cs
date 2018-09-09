@@ -1,10 +1,10 @@
-﻿namespace PoeEye.Converters
-{
-    using System;
-    using System.Globalization;
-    using System.Windows;
-    using System.Windows.Data;
+﻿using System;
+using System.Globalization;
+using System.Windows;
+using System.Windows.Data;
 
+namespace PoeEye.Converters
+{
     internal sealed class NullToVisibilityConverter : IValueConverter
     {
         public Visibility NullValue { get; set; } = Visibility.Collapsed;

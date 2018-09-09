@@ -1,18 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using NUnit.Framework;
 using PoeShared.Common;
 using PoeShared.Converters;
+using Shouldly;
 
 namespace PoeEye.Tests.PoeShared.Converters
 {
-    using System.Linq;
-
-    using Moq;
-
-    using NUnit.Framework;
-
-    using Shouldly;
-
     [TestFixture]
     public class StringToPoePriceConverterFixture
     {

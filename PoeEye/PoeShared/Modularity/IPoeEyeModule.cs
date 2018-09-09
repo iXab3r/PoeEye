@@ -1,5 +1,4 @@
-﻿using JetBrains.Annotations;
-using Prism.Modularity;
+﻿using Prism.Modularity;
 
 namespace PoeShared.Modularity
 {

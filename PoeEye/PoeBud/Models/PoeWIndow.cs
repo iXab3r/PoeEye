@@ -1,24 +1,19 @@
-﻿using WindowsInput.Native;
+﻿using System;
+using System.Globalization;
+using System.Runtime.InteropServices;
+using System.Windows;
+using System.Windows.Media;
+using WindowsInput.Native;
+using Guards;
+using JetBrains.Annotations;
 using PoeEye.StashGrid.Modularity;
 using PoeShared.Modularity;
 using PoeShared.Scaffolding;
 using PoeShared.StashApi.DataTypes;
+using ReactiveUI;
 
 namespace PoeBud.Models
 {
-    using System;
-    using System.Globalization;
-    using System.Linq;
-    using System.Runtime.InteropServices;
-    using System.Windows;
-    using System.Windows.Media;
-
-    using Guards;
-
-    using JetBrains.Annotations;
-
-    using ReactiveUI;
-
     internal sealed class PoeWindow : DisposableReactiveObject, IPoeWindow
     {
         private const int StashItemsMaxX = 12;

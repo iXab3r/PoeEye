@@ -1,10 +1,9 @@
-﻿using Unity; using Unity.Resolution; using Unity.Attributes;
-using PoeEye.ItemParser.Converters;
+﻿using PoeEye.ItemParser.Converters;
 using PoeEye.ItemParser.Services;
 using PoeShared.Common;
 using PoeShared.PoeTrade;
-using PoeShared.Scaffolding;
 using TypeConverter;
+using Unity;
 using Unity.Extension;
 
 namespace PoeEye.ItemParser.Prism

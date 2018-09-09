@@ -1,7 +1,7 @@
-﻿namespace PoeShared.Prism
-{
-    using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
 
+namespace PoeShared.Prism
+{
     public interface IFactory<out TOut>
     {
         [NotNull]

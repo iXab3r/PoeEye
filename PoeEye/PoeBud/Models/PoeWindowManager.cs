@@ -1,24 +1,16 @@
-﻿using System.Collections.Concurrent;
-using Unity; using Unity.Resolution; using Unity.Attributes;
+﻿using System;
+using System.Collections.Concurrent;
+using System.Reactive.Linq;
+using Guards;
+using JetBrains.Annotations;
 using PoeShared;
-using PoeShared.Modularity;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
+using ReactiveUI;
 using Unity.Attributes;
 
 namespace PoeBud.Models
 {
-    using System;
-    using System.Reactive.Linq;
-
-    using Config;
-
-    using Guards;
-
-    using JetBrains.Annotations;
-
-    using ReactiveUI;
-
     internal sealed class PoeWindowManager : DisposableReactiveObject, IPoeWindowManager
     {
         private readonly IFactory<IPoeWindow, IntPtr> windowsFactory;

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Reactive.Linq;
 using DynamicData.Binding;
@@ -15,7 +14,6 @@ using PoeShared.PoeTrade.Query;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
 using ReactiveUI;
-using WpfAutoCompleteControls.Editors;
 
 namespace PoeEye.PoeTrade.ViewModels
 {

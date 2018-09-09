@@ -1,10 +1,10 @@
-﻿namespace PoeEye.Converters
-{
-    using System;
-    using System.Globalization;
-    using System.Windows;
-    using System.Windows.Data;
+﻿using System;
+using System.Globalization;
+using System.Windows;
+using System.Windows.Data;
 
+namespace PoeEye.Converters
+{
     internal sealed class ObjectToVisibilityConverter : IValueConverter
     {
         public Visibility? TrueValue { get; set; }

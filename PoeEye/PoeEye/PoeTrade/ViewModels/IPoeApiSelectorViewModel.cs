@@ -1,7 +1,6 @@
 ﻿using JetBrains.Annotations;
 using PoeShared.PoeTrade;
 using PoeShared.Scaffolding;
-using ReactiveUI;
 
 namespace PoeEye.PoeTrade.ViewModels
 {

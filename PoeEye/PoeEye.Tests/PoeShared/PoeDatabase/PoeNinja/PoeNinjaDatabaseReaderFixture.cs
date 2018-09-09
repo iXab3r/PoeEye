@@ -1,16 +1,10 @@
 ﻿using System.Reactive.Concurrency;
+using NUnit.Framework;
 using PoeShared.PoeDatabase.PoeNinja;
+using Shouldly;
 
 namespace PoeEye.Tests.PoeShared.PoeDatabase.PoeNinja
 {
-    using System.Linq;
-
-    using Moq;
-
-    using NUnit.Framework;
-
-    using Shouldly;
-
     [TestFixture]
     public class PoeNinjaDatabaseReaderFixture
     {

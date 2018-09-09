@@ -1,21 +1,17 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Reactive.Concurrency;
-using System.Threading.Tasks;
+using System.Reflection;
 using DynamicData;
 using JetBrains.Annotations;
-using Unity; using Unity.Resolution; using Unity.Attributes;
 using PoeShared.Prism;
+using PoeShared.Scaffolding;
 using Unity.Attributes;
 
 namespace PoeShared.PoeDatabase
 {
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Reflection;
-
-    using Scaffolding;
-
     internal sealed class StaticPoeDatabaseReader : DisposableReactiveObject, IPoeDatabaseReader
     {
         private readonly ISourceList<string> knownEntities = new SourceList<string>();

@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Windows;
-using System.Windows.Documents;
 using PoeEye.TradeMonitor.Models;
 using PoeShared.Audio;
 using PoeShared.Modularity;

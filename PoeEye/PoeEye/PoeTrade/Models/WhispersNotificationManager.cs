@@ -1,30 +1,18 @@
-﻿using PoeEye.PoeTrade.Common;
-using PoeShared;
+﻿using System;
+using System.Reactive.Linq;
+using Guards;
+using JetBrains.Annotations;
+using PoeEye.Config;
 using PoeShared.Audio;
 using PoeShared.Modularity;
 using PoeShared.Prism;
+using PoeShared.Scaffolding;
+using PoeWhisperMonitor;
+using PoeWhisperMonitor.Chat;
 using Unity.Attributes;
-using PoeEyeMainConfig = PoeEye.Config.PoeEyeMainConfig;
 
 namespace PoeEye.PoeTrade.Models
 {
-    using System;
-    using System.Reactive.Linq;
-
-    using Config;
-
-    using Guards;
-
-    using JetBrains.Annotations;
-
-    using Unity; using Unity.Resolution; using Unity.Attributes;
-
-    using PoeEye.Prism;
-
-    using PoeShared.Scaffolding;
-
-    using PoeWhisperMonitor;
-    using PoeWhisperMonitor.Chat;
     using IPoeEyeMainConfigProvider = IConfigProvider<PoeEyeMainConfig>;
 
     internal sealed class WhispersNotificationManager : DisposableReactiveObject, IWhispersNotificationManager

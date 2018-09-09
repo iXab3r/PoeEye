@@ -11,10 +11,10 @@ using System.Windows.Interop;
 using DynamicData;
 using Guards;
 using JetBrains.Annotations;
-using Unity; using Unity.Resolution; using Unity.Attributes;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
 using ReactiveUI;
+using Unity.Attributes;
 
 namespace PoeShared.Native
 {

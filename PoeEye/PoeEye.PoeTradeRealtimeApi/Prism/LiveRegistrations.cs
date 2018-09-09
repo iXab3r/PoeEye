@@ -1,6 +1,5 @@
-﻿using Unity; using Unity.Resolution; using Unity.Attributes;
-using PoeShared.PoeTrade;
-using PoeShared.Scaffolding;
+﻿using PoeShared.PoeTrade;
+using Unity;
 using Unity.Extension;
 
 namespace PoeEye.PoeTradeRealtimeApi.Prism

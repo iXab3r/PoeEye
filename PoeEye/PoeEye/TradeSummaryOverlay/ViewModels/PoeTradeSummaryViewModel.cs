@@ -9,7 +9,6 @@ using DynamicData.Binding;
 using Guards;
 using JetBrains.Annotations;
 using LinqKit;
-using Unity; using Unity.Resolution; using Unity.Attributes;
 using PoeEye.PoeTrade.Shell.ViewModels;
 using PoeEye.PoeTrade.ViewModels;
 using PoeEye.TradeSummaryOverlay.Modularity;
@@ -20,6 +19,7 @@ using PoeShared.Native;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
 using ReactiveUI;
+using Unity.Attributes;
 
 namespace PoeEye.TradeSummaryOverlay.ViewModels
 {

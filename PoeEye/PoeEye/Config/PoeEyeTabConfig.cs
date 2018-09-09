@@ -1,14 +1,9 @@
-﻿using Exceptionless.Json;
-using PoeEye.PoeTrade;
-using PoeEye.PoeTrade.Common;
+﻿using System;
 using PoeShared.Audio;
+using PoeShared.PoeTrade;
 
 namespace PoeEye.Config
 {
-    using System;
-
-    using PoeShared.PoeTrade;
-
     internal struct PoeEyeTabConfig
     {
         public TimeSpan RecheckTimeout { get; set; }

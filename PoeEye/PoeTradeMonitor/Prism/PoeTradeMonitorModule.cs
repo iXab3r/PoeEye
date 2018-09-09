@@ -1,12 +1,12 @@
 ﻿using System.Reactive.Disposables;
 using Guards;
 using JetBrains.Annotations;
-using Unity; using Unity.Resolution; using Unity.Attributes;
 using PoeEye.TradeMonitor.Modularity;
 using PoeEye.TradeMonitor.ViewModels;
 using PoeShared.Modularity;
 using PoeShared.Scaffolding;
 using Prism.Ioc;
+using Unity;
 
 namespace PoeEye.TradeMonitor.Prism
 {

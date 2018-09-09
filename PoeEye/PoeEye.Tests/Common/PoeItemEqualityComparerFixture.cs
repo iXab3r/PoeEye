@@ -1,17 +1,12 @@
-﻿using PoeShared.Common;
-using PoeShared.Scaffolding.WPF;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Moq;
+using NUnit.Framework;
+using PoeShared.Common;
+using Shouldly;
 
 namespace PoeEye.Tests.Common
 {
-    using System.Collections.Generic;
-    using System.Linq;
-
-    using Moq;
-
-    using NUnit.Framework;
-
-    using Shouldly;
-
     [TestFixture]
     public class PoeItemEqualityComparerFixture
     {

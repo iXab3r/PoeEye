@@ -1,12 +1,9 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Linq.Expressions;
-using System.Reactive.Linq;
-using Common.Logging.Configuration;
 using Guards;
 using JetBrains.Annotations;
 using ReactiveUI;
-using ReactiveUI.Legacy;
 
 namespace PoeShared.Scaffolding
 {

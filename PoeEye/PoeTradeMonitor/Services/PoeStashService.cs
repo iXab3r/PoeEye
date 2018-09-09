@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Reactive;
@@ -9,7 +8,6 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using Guards;
 using JetBrains.Annotations;
-using Unity; using Unity.Resolution; using Unity.Attributes;
 using PoeBud.Config;
 using PoeBud.Models;
 using PoeBud.Scaffolding;
@@ -19,7 +17,7 @@ using PoeShared.Modularity;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
 using PoeShared.StashApi.DataTypes;
-using ReactiveUI;
+using Unity.Attributes;
 
 namespace PoeEye.TradeMonitor.Services
 {

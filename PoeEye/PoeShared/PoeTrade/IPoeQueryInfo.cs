@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using PoeShared.Scaffolding;
+﻿using PoeShared.Common;
+using PoeShared.PoeTrade.Query;
 
 namespace PoeShared.PoeTrade
 {
-    using Common;
-
-    using Query;
-
     public interface IPoeQueryInfo
     {
         bool AlternativeArt { get; }

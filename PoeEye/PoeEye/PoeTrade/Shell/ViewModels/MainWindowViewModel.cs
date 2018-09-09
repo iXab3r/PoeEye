@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Concurrency;
@@ -10,14 +8,11 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Reflection;
 using System.Threading.Tasks;
-using System.Windows.Input;
 using CsQuery.ExtensionMethods;
 using Dragablz;
 using DynamicData;
 using Guards;
 using JetBrains.Annotations;
-using Unity; using Unity.Resolution; using Unity.Attributes;
-using Newtonsoft.Json;
 using PoeEye.Config;
 using PoeEye.PoeTrade.Models;
 using PoeEye.PoeTrade.Updater;
@@ -26,17 +21,13 @@ using PoeEye.Utilities;
 using PoeShared;
 using PoeShared.Audio;
 using PoeShared.Modularity;
-using PoeShared.PoeTrade;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
 using PoeShared.Scaffolding.WPF;
 using PoeShared.UI;
-using PoeShared.UI.ViewModels;
 using Prism.Commands;
 using ReactiveUI;
-using ReactiveUI.Legacy;
-using PoeEyeMainConfig = PoeEye.Config.PoeEyeMainConfig;
-using ReactiveCommand = ReactiveUI.ReactiveCommand;
+using Unity.Attributes;
 
 namespace PoeEye.PoeTrade.Shell.ViewModels
 {

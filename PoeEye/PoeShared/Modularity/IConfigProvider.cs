@@ -1,9 +1,7 @@
 ﻿using System;
-using System.ComponentModel;
 using System.Linq.Expressions;
 using System.Reactive;
 using JetBrains.Annotations;
-using Newtonsoft.Json;
 
 namespace PoeShared.Modularity
 {

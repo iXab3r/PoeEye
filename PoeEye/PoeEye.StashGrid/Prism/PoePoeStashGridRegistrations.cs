@@ -1,7 +1,6 @@
-﻿using Unity; using Unity.Resolution; using Unity.Attributes;
-using PoeEye.StashGrid.Services;
+﻿using PoeEye.StashGrid.Services;
 using PoeEye.StashGrid.ViewModels;
-using PoeShared.Scaffolding;
+using Unity;
 using Unity.Extension;
 
 namespace PoeEye.StashGrid.Prism

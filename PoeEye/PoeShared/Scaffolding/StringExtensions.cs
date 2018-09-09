@@ -1,8 +1,8 @@
-﻿namespace PoeShared.Scaffolding
-{
-    using System;
-    using System.Linq;
+﻿using System;
+using System.Linq;
 
+namespace PoeShared.Scaffolding
+{
     public static class StringExtensions
     {
         /// <summary>

@@ -1,7 +1,7 @@
-﻿namespace PoeWhisperMonitor
-{
-    using System.IO;
+﻿using System.IO;
 
+namespace PoeWhisperMonitor
+{
     internal sealed class PoeProcessToLogFilePathConverter
     {
         public FileInfo Convert(PoeProcessInfo poeProcess)

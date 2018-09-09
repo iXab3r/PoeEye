@@ -1,13 +1,13 @@
-﻿using System;
-using Guards;
+﻿using Guards;
 using JetBrains.Annotations;
-using Unity; using Unity.Resolution; using Unity.Attributes;
 using PoeBud.Config;
 using PoeBud.ViewModels;
 using PoeShared.Modularity;
 using PoeShared.Native;
 using PoeShared.Prism;
 using Prism.Ioc;
+using Unity;
+using Unity.Resolution;
 
 namespace PoeBud.Prism
 {

@@ -1,7 +1,7 @@
-﻿namespace PoeWhisperMonitor.Chat
-{
-    using System;
+﻿using System;
 
+namespace PoeWhisperMonitor.Chat
+{
     public struct PoeMessage
     {
         public PoeMessageType MessageType { get; set; }

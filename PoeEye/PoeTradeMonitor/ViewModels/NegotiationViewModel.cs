@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Globalization;
 using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
@@ -7,7 +6,6 @@ using System.Reactive.Linq;
 using System.Windows.Input;
 using Guards;
 using JetBrains.Annotations;
-using Unity; using Unity.Resolution; using Unity.Attributes;
 using PoeEye.StashGrid.Services;
 using PoeEye.TradeMonitor.Models;
 using PoeEye.TradeMonitor.Modularity;
@@ -19,13 +17,13 @@ using PoeShared.Modularity;
 using PoeShared.PoeTrade;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
-using PoeShared.StashApi;
 using PoeShared.StashApi.DataTypes;
 using PoeShared.UI.ViewModels;
 using PoeWhisperMonitor.Chat;
 using Prism.Commands;
 using ReactiveUI;
 using TypeConverter;
+using Unity.Attributes;
 
 namespace PoeEye.TradeMonitor.ViewModels
 {

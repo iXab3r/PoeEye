@@ -1,12 +1,11 @@
-﻿namespace FuzzySearch
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
+using JetBrains.Annotations;
+
+namespace FuzzySearch
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text.RegularExpressions;
-
-    using JetBrains.Annotations;
-
     public class XSearchService<T> : IFuzzySearchService
     {
         private readonly bool caseSensitive;

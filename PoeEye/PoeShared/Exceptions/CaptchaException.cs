@@ -1,7 +1,7 @@
-﻿namespace PoeShared.Exceptions
-{
-    using System;
+﻿using System;
 
+namespace PoeShared.Exceptions
+{
     public sealed class CaptchaException : ApplicationException
     {
         public CaptchaException(string message) : base(message)

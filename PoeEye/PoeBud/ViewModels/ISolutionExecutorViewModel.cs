@@ -1,12 +1,10 @@
-﻿using PoeBud.Models;
+﻿using System.Threading.Tasks;
+using JetBrains.Annotations;
+using PoeBud.Models;
 using ReactiveUI;
 
 namespace PoeBud.ViewModels
 {
-    using System.Threading.Tasks;
-
-    using JetBrains.Annotations;
-
     internal interface ISolutionExecutorViewModel
     {
         bool IsBusy { get; set; }

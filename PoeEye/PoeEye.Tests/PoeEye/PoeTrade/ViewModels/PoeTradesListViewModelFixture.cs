@@ -7,7 +7,6 @@ using System.Reactive.Disposables;
 using System.Reactive.Subjects;
 using Moq;
 using NUnit.Framework;
-using NUnit.Framework.Constraints;
 using PoeEye.PoeTrade.Models;
 using PoeEye.PoeTrade.ViewModels;
 using PoeEye.Tests.Helpers;

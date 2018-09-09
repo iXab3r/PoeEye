@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Windows.Forms;
 using System.Windows.Input;
-using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using WinFormsKeyEventArgs = System.Windows.Forms.KeyEventArgs;
 
 namespace PoeShared.Scaffolding

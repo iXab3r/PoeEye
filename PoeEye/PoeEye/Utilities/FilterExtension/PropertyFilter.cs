@@ -1,9 +1,9 @@
+using System;
+using System.Text.RegularExpressions;
+using System.Windows;
+
 namespace PoeEye.Utilities.FilterExtension
 {
-    using System;
-    using System.Text.RegularExpressions;
-    using System.Windows;
-
     internal sealed class PropertyFilter : DependencyObject, IFilter
     {
         public static readonly DependencyProperty PropertyNameProperty =

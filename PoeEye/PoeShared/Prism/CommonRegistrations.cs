@@ -1,15 +1,19 @@
-﻿using System.Collections.Specialized;
+﻿using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Reactive.Concurrency;
 using Gma.System.MouseKeyHook;
 using PoeShared.Audio;
+using PoeShared.Common;
 using PoeShared.Communications;
 using PoeShared.Communications.Chromium;
 using PoeShared.Converters;
 using PoeShared.Modularity;
 using PoeShared.Native;
+using PoeShared.PoeDatabase;
 using PoeShared.PoeDatabase.PoeNinja;
-using PoeShared.PoeTrade.Query;
+using PoeShared.PoeTrade;
+using PoeShared.Scaffolding;
 using PoeShared.StashApi;
 using PoeShared.StashApi.DataTypes;
 using PoeShared.StashApi.ProcurementLegacy;
@@ -17,6 +21,7 @@ using PoeShared.UI.Models;
 using PoeShared.UI.ViewModels;
 using ProxyProvider;
 using ReactiveUI;
+using TypeConverter;
 using Unity;
 using Unity.Extension;
 using Unity.Injection;
@@ -25,20 +30,6 @@ using Unity.Resolution;
 
 namespace PoeShared.Prism
 {
-    using System.Collections.Generic;
-
-    using Common;
-
-    using Unity; using Unity.Resolution; using Unity.Attributes;
-
-    using PoeDatabase;
-
-    using PoeTrade;
-
-    using Scaffolding;
-
-    using TypeConverter;
-
     public sealed class CommonRegistrations : UnityContainerExtension
     {
         protected override void Initialize()

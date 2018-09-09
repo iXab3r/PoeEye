@@ -1,11 +1,9 @@
 ﻿using System;
+using System.Windows;
+using WindowsInput.Native;
 
 namespace PoeBud.Models
 {
-    using System.Windows;
-
-    using WindowsInput.Native;
-
     internal interface IUserInteractionsManager
     {
         void MoveMouseTo(Point location);

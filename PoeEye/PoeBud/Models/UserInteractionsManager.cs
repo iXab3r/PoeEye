@@ -1,23 +1,17 @@
-﻿using PoeShared;
+﻿using System;
+using System.Runtime.InteropServices;
+using System.Threading;
+using System.Windows;
+using WindowsInput;
+using WindowsInput.Native;
+using Guards;
+using JetBrains.Annotations;
+using PoeBud.Config;
+using PoeShared;
 using PoeShared.Modularity;
-using ReactiveUI;
 
 namespace PoeBud.Models
 {
-    using System;
-    using System.Runtime.InteropServices;
-    using System.Threading;
-    using System.Windows;
-
-    using WindowsInput;
-    using WindowsInput.Native;
-
-    using Config;
-
-    using Guards;
-
-    using JetBrains.Annotations;
-
     internal sealed class UserInteractionsManager : IUserInteractionsManager
     {
         private TimeSpan actionDelay;

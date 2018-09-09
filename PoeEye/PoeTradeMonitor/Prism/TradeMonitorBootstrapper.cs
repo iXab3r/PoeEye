@@ -4,13 +4,13 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using Guards;
 using JetBrains.Annotations;
-using Unity; using Unity.Resolution; using Unity.Attributes;
 using PoeEye.TradeMonitor.Modularity;
 using PoeEye.TradeMonitor.ViewModels;
 using PoeShared.Modularity;
 using PoeShared.Native;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
+using Unity.Attributes;
 
 namespace PoeEye.TradeMonitor.Prism
 {

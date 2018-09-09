@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.IO;
-using System.Linq;
 using System.Net;
 using System.Reactive.Disposables;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using CefSharp;
 using CefSharp.Internals;
@@ -15,8 +12,6 @@ using CsQuery.ExtensionMethods.Internal;
 using Guards;
 using JetBrains.Annotations;
 using PoeShared.Scaffolding;
-using RestSharp;
-using RestSharp.Extensions.MonoHttp;
 using TypeConverter;
 
 namespace PoeShared.Communications.Chromium {

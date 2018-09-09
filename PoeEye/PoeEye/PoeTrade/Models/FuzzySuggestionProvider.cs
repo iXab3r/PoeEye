@@ -1,17 +1,12 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using FuzzySearch;
+using Guards;
+using JetBrains.Annotations;
+using WpfAutoCompleteControls.Editors;
 
 namespace PoeEye.PoeTrade.Models
 {
-    using System.Linq;
-
-    using FuzzySearch;
-
-    using Guards;
-
-    using JetBrains.Annotations;
-
-    using WpfAutoCompleteControls.Editors;
-
     internal sealed class FuzzySuggestionProvider : ISuggestionProvider
     {
         private const int MaxResults = 20;

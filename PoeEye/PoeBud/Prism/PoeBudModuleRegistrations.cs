@@ -1,5 +1,7 @@
-﻿using PoeBud.Services;
-using PoeShared.Scaffolding;
+﻿using WindowsInput;
+using PoeBud.Models;
+using PoeBud.Services;
+using PoeBud.ViewModels;
 using Unity;
 using Unity.Extension;
 using Unity.Injection;
@@ -7,18 +9,6 @@ using Unity.Lifetime;
 
 namespace PoeBud.Prism
 {
-    using System.Reactive.Concurrency;
-
-    using WindowsInput;
-
-    using Config;
-
-    using Microsoft.Practices.Unity;
-
-    using Models;
-
-    using ViewModels;
-
     internal sealed class PoeBudModuleRegistrations : UnityContainerExtension
     {
         protected override void Initialize()

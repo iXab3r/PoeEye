@@ -1,13 +1,10 @@
-﻿using ReactiveUI;
+﻿using System;
+using System.Reactive.Disposables;
+using JetBrains.Annotations;
+using ReactiveUI;
 
 namespace PoeShared.Scaffolding
 {
-    using System;
-    using System.ComponentModel;
-    using System.Reactive.Disposables;
-
-    using JetBrains.Annotations;
-
     public interface IDisposableReactiveObject : IDisposable, IReactiveObject
     {
         CompositeDisposable Anchors { [NotNull] get; }

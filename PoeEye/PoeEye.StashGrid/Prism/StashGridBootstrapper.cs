@@ -2,11 +2,11 @@
 using System.Reactive.Disposables;
 using Guards;
 using JetBrains.Annotations;
-using Unity; using Unity.Resolution; using Unity.Attributes;
 using PoeEye.StashGrid.ViewModels;
 using PoeShared.Native;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
+using Unity.Attributes;
 
 namespace PoeEye.StashGrid.Prism
 {

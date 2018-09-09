@@ -1,8 +1,8 @@
+using System.Collections;
+using System.Collections.Generic;
+
 namespace PoeShared.Common
 {
-    using System.Collections;
-    using System.Collections.Generic;
-
     internal sealed class PoeItemModEqualityComparer : IEqualityComparer<IPoeItemMod>, IComparer
     {
         public int Compare(object x, object y)

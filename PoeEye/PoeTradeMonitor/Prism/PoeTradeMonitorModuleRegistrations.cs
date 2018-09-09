@@ -1,12 +1,11 @@
-﻿using Unity; using Unity.Resolution; using Unity.Attributes;
-using PoeEye.TradeMonitor.Models;
-using PoeEye.TradeMonitor.Services;
+﻿using PoeEye.TradeMonitor.Services;
 using PoeEye.TradeMonitor.Services.Notifications;
 using PoeEye.TradeMonitor.Services.Parsers;
 using PoeEye.TradeMonitor.ViewModels;
-using PoeShared.Scaffolding;
+using Unity;
 using Unity.Extension;
 using Unity.Injection;
+using Unity.Resolution;
 
 namespace PoeEye.TradeMonitor.Prism
 {

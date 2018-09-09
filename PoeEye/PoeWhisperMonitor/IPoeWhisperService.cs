@@ -1,11 +1,9 @@
-﻿namespace PoeWhisperMonitor
+﻿using System;
+using JetBrains.Annotations;
+using PoeWhisperMonitor.Chat;
+
+namespace PoeWhisperMonitor
 {
-    using System;
-
-    using Chat;
-
-    using JetBrains.Annotations;
-
     public interface IPoeWhisperService
     {
         IObservable<PoeMessage> Messages { [NotNull] get; }

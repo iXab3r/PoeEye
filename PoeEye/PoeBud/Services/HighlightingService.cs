@@ -7,7 +7,6 @@ using Guards;
 using JetBrains.Annotations;
 using PoeBud.Models;
 using PoeEye.StashGrid.Services;
-using PoeShared;
 using PoeShared.Scaffolding;
 using PoeShared.StashApi.DataTypes;
 

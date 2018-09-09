@@ -4,13 +4,13 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using Guards;
 using JetBrains.Annotations;
-using Unity; using Unity.Resolution; using Unity.Attributes;
 using PoeShared.Modularity;
 using PoeShared.Native;
 using PoeShared.PoeControlPanel.Modularity;
 using PoeShared.PoeControlPanel.ViewModels;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
+using Unity.Attributes;
 
 namespace PoeShared.PoeControlPanel.Prism
 {

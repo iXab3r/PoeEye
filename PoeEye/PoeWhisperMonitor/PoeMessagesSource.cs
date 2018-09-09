@@ -1,23 +1,17 @@
-﻿namespace PoeWhisperMonitor
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Reactive.Linq;
+using System.Reactive.Subjects;
+using Guards;
+using JetBrains.Annotations;
+using PoeShared;
+using PoeShared.Scaffolding;
+using PoeWhisperMonitor.Chat;
+using TrackingStreamLib;
+
+namespace PoeWhisperMonitor
 {
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Reactive.Linq;
-    using System.Reactive.Subjects;
-    using System.Text.RegularExpressions;
-
-    using Chat;
-
-    using Guards;
-
-    using JetBrains.Annotations;
-
-    using PoeShared;
-    using PoeShared.Scaffolding;
-
-    using TrackingStreamLib;
-
     internal sealed class PoeMessagesSource : DisposableReactiveObject, IPoeMessagesSource
     {
         private readonly IPoeChatMessageProcessor messageProcessor;

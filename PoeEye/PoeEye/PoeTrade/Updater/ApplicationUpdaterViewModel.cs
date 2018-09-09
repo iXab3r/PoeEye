@@ -1,29 +1,19 @@
 ﻿using System;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
 using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
-using System.Reflection;
-using System.Threading;
 using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Input;
 using Guards;
 using JetBrains.Annotations;
-using Unity; using Unity.Resolution; using Unity.Attributes;
-using PoeBud.Config;
 using PoeEye.Config;
 using PoeShared;
 using PoeShared.Modularity;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
 using PoeShared.UI;
-using Prism.Mvvm;
 using ReactiveUI;
 using ReactiveUI.Legacy;
-using Squirrel;
 using Unity.Attributes;
 
 namespace PoeEye.PoeTrade.Updater

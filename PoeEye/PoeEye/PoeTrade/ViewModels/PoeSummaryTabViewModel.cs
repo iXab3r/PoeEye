@@ -1,43 +1,29 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Linq;
 using System.Reactive;
 using System.Reactive.Concurrency;
+using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using System.Windows.Navigation;
+using System.Windows.Input;
 using DynamicData;
-using DynamicData.Alias;
 using DynamicData.Binding;
-using DynamicData.Controllers;
+using Guards;
+using JetBrains.Annotations;
 using LinqKit;
-using Unity; using Unity.Resolution; using Unity.Attributes;
-using PoeEye.Config;
-using PoeEye.ItemParser.Services;
+using PoeEye.PoeTrade.Common;
 using PoeEye.PoeTrade.Models;
 using PoeShared;
 using PoeShared.Audio;
 using PoeShared.Common;
-using PoeShared.Modularity;
 using PoeShared.Prism;
-using ReactiveUI.Legacy;
+using PoeShared.Scaffolding;
+using ReactiveUI;
 using Unity.Attributes;
 
 namespace PoeEye.PoeTrade.ViewModels
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Collections.Specialized;
-    using System.ComponentModel;
-    using System.Linq;
-    using System.Reactive.Disposables;
-    using System.Reactive.Linq;
-    using System.Windows.Data;
-    using System.Windows.Input;
-    using Common;
-    using CsQuery.ExtensionMethods;
-    using Guards;
-    using JetBrains.Annotations;
-    using PoeShared.Scaffolding;
-    using ReactiveUI;
-
     internal sealed class PoeSummaryTabViewModel : DisposableReactiveObject, IPoeSummaryTabViewModel
     {
         private static readonly TimeSpan ResortRefilterThrottleTimeout = TimeSpan.FromMilliseconds(250);

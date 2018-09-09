@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Reactive.Linq;
-using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 using Guards;
 using JetBrains.Annotations;

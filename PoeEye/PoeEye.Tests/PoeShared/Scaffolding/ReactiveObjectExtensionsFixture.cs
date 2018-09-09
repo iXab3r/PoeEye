@@ -1,19 +1,12 @@
 ﻿using System.ComponentModel;
+using Moq;
+using NUnit.Framework;
 using PoeEye.Tests.Helpers;
 using PoeShared.Scaffolding;
 using ReactiveUI;
-using System;
 
 namespace PoeEye.Tests.PoeShared.Scaffolding
 {
-    using System.Linq;
-
-    using Moq;
-
-    using NUnit.Framework;
-
-    using Shouldly;
-
     [TestFixture]
     public class ReactiveObjectExtensionsFixture
     {

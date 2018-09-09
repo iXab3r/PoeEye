@@ -1,22 +1,14 @@
 ﻿using System;
-using System.Diagnostics;
-using System.Drawing;
 using System.IO;
-using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reflection;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
-using System.Windows;
 using CefSharp;
-using CefSharp.Internals;
 using CefSharp.OffScreen;
 using Guards;
 using JetBrains.Annotations;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
-using ReactiveUI;
 
 namespace PoeShared.Communications.Chromium
 {

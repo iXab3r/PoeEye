@@ -9,7 +9,6 @@ using System.Reactive.Subjects;
 using System.Threading;
 using Guards;
 using JetBrains.Annotations;
-using Unity; using Unity.Resolution; using Unity.Attributes;
 using PoeShared;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;

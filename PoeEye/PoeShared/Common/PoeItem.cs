@@ -1,10 +1,9 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using PoeShared.StashApi.ProcurementLegacy;
 
 namespace PoeShared.Common
 {
-    using System;
-
     public sealed class PoeItem : IPoeItem
     {
         private IPoeItemMod[] mods = new IPoeItemMod[0];

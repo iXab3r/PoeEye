@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Windows;
-using Unity; using Unity.Resolution; using Unity.Attributes;
 using PoeEye.TradeMonitor.Prism;
 using PoeShared;
 using PoeShared.PoeControlPanel.Modularity;
-using PoeShared.Prism;
+using Unity;
 
 namespace PoeEye.TradeMonitor
 {

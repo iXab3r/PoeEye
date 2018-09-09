@@ -16,7 +16,6 @@ using PoeShared.PoeTrade;
 using PoeShared.Scaffolding;
 using PoeWhisperMonitor;
 using PoeWhisperMonitor.Chat;
-using DisposableReactiveObject = PoeShared.Scaffolding.DisposableReactiveObject;
 
 namespace PoeEye.TradeMonitor.Services
 {

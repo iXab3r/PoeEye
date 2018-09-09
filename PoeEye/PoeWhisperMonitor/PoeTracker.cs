@@ -1,19 +1,14 @@
-﻿using System.Management;
+﻿using System;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Reactive.Linq;
+using System.Reactive.Subjects;
+using PoeShared;
+using PoeShared.Scaffolding;
 
 namespace PoeWhisperMonitor
 {
-    using System;
-    using System.Diagnostics;
-    using System.IO;
-    using System.Linq;
-    using System.Reactive.Linq;
-    using System.Reactive.Subjects;
-
-    using JetBrains.Annotations;
-
-    using PoeShared;
-    using PoeShared.Scaffolding;
-
     internal sealed class PoeTracker : DisposableReactiveObject, IPoeTracker
     {
         private static readonly string[] PathOfExileProcessNames =

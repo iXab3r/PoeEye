@@ -1,10 +1,10 @@
-﻿namespace PoeBud.Converters
-{
-    using System;
-    using System.Globalization;
-    using System.Windows;
-    using System.Windows.Data;
+﻿using System;
+using System.Globalization;
+using System.Windows;
+using System.Windows.Data;
 
+namespace PoeBud.Converters
+{
     internal sealed class VisibilityToBoolean : IValueConverter
     {
         public Visibility TrueValue { get; set; } = Visibility.Visible;

@@ -1,11 +1,8 @@
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Windows.Input;
 using JetBrains.Annotations;
 using PoeEye.PoeTrade.Common;
 using PoeShared.Scaffolding;
-using ReactiveUI;
 
 namespace PoeEye.PoeTrade.ViewModels
 {

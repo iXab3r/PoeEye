@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using JetBrains.Annotations;
 
 namespace PoeShared.PoeDatabase
 {
-    using JetBrains.Annotations;
-
     public interface IPoeDatabaseReader : IDisposable
     {
         ReadOnlyObservableCollection<string> KnownEntityNames { [NotNull] get; }

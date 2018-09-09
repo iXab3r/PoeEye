@@ -1,8 +1,8 @@
-﻿namespace PoeEye.Converters
-{
-    using System.Collections;
-    using System.Linq;
+﻿using System.Collections;
+using System.Linq;
 
+namespace PoeEye.Converters
+{
     internal static class ConverterHelpers
     {
         public static bool IsNullOrEmpty(object value)

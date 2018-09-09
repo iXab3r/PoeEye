@@ -1,11 +1,9 @@
-﻿namespace PoeEye.PoeTrade.ViewModels
+﻿using PoeShared.Scaffolding;
+using ReactiveUI;
+using WpfAutoCompleteControls.Editors;
+
+namespace PoeEye.PoeTrade.ViewModels
 {
-    using PoeShared.Scaffolding;
-
-    using ReactiveUI;
-
-    using WpfAutoCompleteControls.Editors;
-
     internal sealed class PoeModViewModel : DisposableReactiveObject, IPoeModViewModel
     {
         private float? max;

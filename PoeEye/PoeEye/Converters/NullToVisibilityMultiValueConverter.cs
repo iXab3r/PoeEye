@@ -1,13 +1,11 @@
+using System;
+using System.Globalization;
+using System.Linq;
+using System.Windows.Data;
+using Blue.MVVM.Converter;
+
 namespace PoeEye.Converters
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Globalization;
-    using System.Linq;
-    using System.Windows.Data;
-
-    using Blue.MVVM.Converter;
-
     internal sealed class NullToVisibilityMultiValueConverter : VisibilityConverterBase, IMultiValueConverter
     {
         public IBoolMultiValueConverterStrategy Strategy { get; set; }

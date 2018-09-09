@@ -1,9 +1,9 @@
-﻿namespace PoeBud.Models
-{
-    using System;
-    using System.Reactive.Disposables;
-    using System.Runtime.InteropServices;
+﻿using System;
+using System.Reactive.Disposables;
+using System.Runtime.InteropServices;
 
+namespace PoeBud.Models
+{
     internal sealed class UserInputBlocker : IUserInputBlocker
     {
         public IDisposable Block()

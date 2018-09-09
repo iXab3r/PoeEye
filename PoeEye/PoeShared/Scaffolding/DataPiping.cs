@@ -1,7 +1,7 @@
-﻿namespace PoeShared.Scaffolding
-{
-    using System.Windows;
+﻿using System.Windows;
 
+namespace PoeShared.Scaffolding
+{
     public class DataPiping
     {
         #region DataPipes (Attached DependencyProperty)

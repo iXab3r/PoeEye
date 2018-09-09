@@ -1,7 +1,5 @@
 ﻿using System;
-using Common.Logging.Configuration;
 using Guards;
-using ReactiveUI;
 using ReactiveUI.Legacy;
 
 namespace PoeShared.Scaffolding

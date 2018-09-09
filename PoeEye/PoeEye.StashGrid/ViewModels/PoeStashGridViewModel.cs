@@ -4,12 +4,10 @@ using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Windows;
-using System.Windows.Input;
 using System.Windows.Media;
 using DynamicData;
 using Guards;
 using JetBrains.Annotations;
-using Unity; using Unity.Resolution; using Unity.Attributes;
 using PoeEye.StashGrid.Models;
 using PoeEye.StashGrid.Modularity;
 using PoeEye.StashGrid.Services;
@@ -20,8 +18,8 @@ using PoeShared.Native;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
 using PoeShared.StashApi.DataTypes;
-using Prism.Commands;
 using ReactiveUI;
+using Unity.Attributes;
 
 namespace PoeEye.StashGrid.ViewModels
 {

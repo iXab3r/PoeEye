@@ -1,7 +1,7 @@
-﻿namespace PoeEye.Utilities
-{
-    using ReactiveUI;
+﻿using ReactiveUI;
 
+namespace PoeEye.Utilities
+{
     internal sealed class EditableTuple<T1, T2> : ReactiveObject
     {
         private T1 item1;

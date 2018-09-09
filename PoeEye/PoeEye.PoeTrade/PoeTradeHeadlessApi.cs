@@ -1,34 +1,24 @@
-﻿using System.Reactive.Subjects;
-using Microsoft.Practices.Unity.Configuration.ConfigurationHelpers;
+﻿using System;
+using System.Collections.Specialized;
+using System.Net;
+using System.Reactive.Linq;
+using System.Reactive.Threading.Tasks;
+using System.Threading;
+using System.Threading.Tasks;
+using Guards;
 using PoeEye.PoeTrade.Modularity;
-using PoeShared.Communications;
+using PoeShared;
 using PoeShared.Communications.Chromium;
+using PoeShared.Exceptions;
 using PoeShared.Modularity;
+using PoeShared.PoeTrade;
+using PoeShared.PoeTrade.Query;
 using PoeShared.Scaffolding;
-using ReactiveUI;
+using ProxyProvider;
+using TypeConverter;
 
 namespace PoeEye.PoeTrade
 {
-    using System;
-    using System.Collections.Specialized;
-    using System.Net;
-    using System.Reactive.Linq;
-    using System.Reactive.Threading.Tasks;
-    using System.Threading;
-    using System.Threading.Tasks;
-
-    using Guards;
-
-    using PoeShared;
-    using PoeShared.Exceptions;
-    using PoeShared.PoeTrade;
-    using PoeShared.PoeTrade.Query;
-    using PoeShared.Prism;
-
-    using ProxyProvider;
-
-    using TypeConverter;
-
     internal sealed class PoeTradeHeadlessApi : DisposableReactiveObject, IPoeApi
     {
         private static readonly string PoeTradeSearchUri = @"http://poe.trade/search";

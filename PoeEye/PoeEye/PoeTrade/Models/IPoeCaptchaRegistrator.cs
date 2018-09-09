@@ -1,9 +1,8 @@
-﻿namespace PoeEye.PoeTrade.Models
+﻿using System.Reactive.Subjects;
+using JetBrains.Annotations;
+
+namespace PoeEye.PoeTrade.Models
 {
-    using System.Reactive.Subjects;
-
-    using JetBrains.Annotations;
-
     internal interface IPoeCaptchaRegistrator
     {
         ISubject<string> CaptchaRequests { [NotNull] get; }

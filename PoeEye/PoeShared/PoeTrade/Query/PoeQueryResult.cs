@@ -1,7 +1,7 @@
+using PoeShared.Common;
+
 namespace PoeShared.PoeTrade.Query
 {
-    using Common;
-
     public sealed class PoeQueryResult : IPoeQueryResult
     {
         private IPoeItem[] itemsList = new IPoeItem[0];

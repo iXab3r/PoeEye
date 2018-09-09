@@ -1,7 +1,7 @@
-﻿namespace PoeShared
-{
-    using System;
+﻿using System;
 
+namespace PoeShared
+{
     internal sealed class RandomNumberGenerator : IRandomNumberGenerator
     {
         private readonly Random rng = new Random();

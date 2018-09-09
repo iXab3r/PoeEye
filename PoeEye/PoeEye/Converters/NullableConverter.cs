@@ -1,11 +1,9 @@
-﻿using System.Windows;
+﻿using System;
+using System.Globalization;
+using System.Windows.Data;
 
 namespace PoeEye.Converters
 {
-    using System;
-    using System.Globalization;
-    using System.Windows.Data;
-
     internal sealed class NullableConverter : IValueConverter
     {
         public static IValueConverter Instance = new NullableConverter();

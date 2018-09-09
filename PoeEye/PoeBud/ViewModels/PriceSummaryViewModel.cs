@@ -7,7 +7,6 @@ using System.Windows.Input;
 using Guards;
 using JetBrains.Annotations;
 using PoeBud.Models;
-using PoeBud.Scaffolding;
 using PoeBud.Services;
 using PoeShared;
 using PoeShared.Common;

@@ -1,10 +1,9 @@
 using System;
+using System.Collections.Generic;
+using System.IO;
 
 namespace PoeWhisperMonitor
 {
-    using System.Collections.Generic;
-    using System.IO;
-
     internal struct PoeProcessInfo
     {
         public int ProcessId { get; set; }

@@ -1,7 +1,7 @@
 ﻿using Guards;
-using Unity; using Unity.Resolution; using Unity.Attributes;
 using PoeShared.Modularity;
 using Prism.Ioc;
+using Unity;
 
 namespace PoeEye.ItemParser.Prism
 {

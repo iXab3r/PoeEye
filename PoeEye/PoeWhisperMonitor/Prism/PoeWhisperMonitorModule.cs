@@ -1,15 +1,11 @@
-﻿using PoeShared.Modularity;
+﻿using Guards;
+using JetBrains.Annotations;
+using PoeShared.Modularity;
 using Prism.Ioc;
-using IModule = Prism.Modularity.IModule;
+using Unity;
 
 namespace PoeWhisperMonitor.Prism
 {
-    using Guards;
-
-    using JetBrains.Annotations;
-
-    using Unity; using Unity.Resolution; using Unity.Attributes;
-
     public sealed class PoeWhisperMonitorModule : IPoeEyeModule
     {
         private readonly IUnityContainer container;

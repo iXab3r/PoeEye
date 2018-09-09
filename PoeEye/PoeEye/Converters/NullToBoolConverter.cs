@@ -1,9 +1,9 @@
+using System;
+using System.Globalization;
+using System.Windows.Data;
+
 namespace PoeEye.Converters
 {
-    using System;
-    using System.Globalization;
-    using System.Windows.Data;
-
     internal sealed class NullToBoolConverter : IValueConverter
     {
         public bool NullValue { get; set; } = true;

@@ -1,20 +1,14 @@
-﻿using PoeShared.Modularity;
-using PoeEyeMainConfig = PoeEye.Config.PoeEyeMainConfig;
+﻿using System;
+using System.Reactive.Linq;
+using Guards;
+using JetBrains.Annotations;
+using PoeEye.Config;
+using PoeShared.Modularity;
+using PoeShared.Scaffolding;
+using ReactiveUI;
 
 namespace PoeEye.PoeTrade.ViewModels
 {
-    using System;
-    using System.Reactive.Linq;
-
-    using Config;
-
-    using Guards;
-
-    using JetBrains.Annotations;
-
-    using PoeShared.Scaffolding;
-
-    using ReactiveUI;
     using IPoeEyeMainConfigProvider = IConfigProvider<PoeEyeMainConfig>;
 
     internal sealed class RecheckPeriodViewModel : DisposableReactiveObject, IRecheckPeriodViewModel

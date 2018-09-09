@@ -1,39 +1,19 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Reactive.Concurrency;
 using System.Reactive.Linq;
-using System.Threading;
+using System.Windows;
 using System.Windows.Input;
-using Newtonsoft.Json;
-using PoeChatWheel;
-using PoeChatWheel.ViewModels;
-using PoeEye.Config;
-using PoeEye.Converters;
 using PoeEye.PoeTrade.Shell.ViewModels;
-using PoeShared.Common;
+using PoeShared;
 using PoeShared.Communications.Chromium;
-using PoeShared.Modularity;
-using PoeShared.PoeTrade;
-using PoeShared.PoeTrade.Query;
 using PoeShared.Scaffolding;
 using Prism.Modularity;
 using Prism.Unity;
-using ReactiveUI;
-using ConfigurationModuleCatalog = Prism.Modularity.ConfigurationModuleCatalog;
-using IModuleCatalog = Prism.Modularity.IModuleCatalog;
-using UnityBootstrapper = Prism.Unity.UnityBootstrapper;
+using Unity;
 
 namespace PoeEye.Prism
 {
-    using System.Windows;
-
-    using Unity; using Unity.Resolution; using Unity.Attributes;
-
-    using PoeShared;
-    using PoeShared.Prism;
-
     internal sealed class PoeEyeBootstrapper : UnityBootstrapper
     {
         protected override DependencyObject CreateShell()

@@ -1,10 +1,9 @@
-﻿namespace PoeShared.Scaffolding
+﻿using System.IO;
+using System.Reflection;
+using Guards;
+
+namespace PoeShared.Scaffolding
 {
-    using System.IO;
-    using System.Reflection;
-
-    using Guards;
-
     public static class ResourceReader
     {
         public static string ReadResourceAsString(string path)

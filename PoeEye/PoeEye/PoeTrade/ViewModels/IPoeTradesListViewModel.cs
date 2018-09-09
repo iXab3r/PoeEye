@@ -1,17 +1,11 @@
-﻿using System.Collections.ObjectModel;
-using DynamicData;
+﻿using System;
+using System.Collections.ObjectModel;
+using JetBrains.Annotations;
+using PoeShared.PoeTrade;
 using PoeShared.Scaffolding;
 
 namespace PoeEye.PoeTrade.ViewModels
 {
-    using System;
-
-    using JetBrains.Annotations;
-
-    using PoeShared.PoeTrade;
-
-    using ReactiveUI;
-
     internal interface IPoeTradesListViewModel : IDisposableReactiveObject
     {
         IPoeQueryInfo ActiveQuery { get; set; }

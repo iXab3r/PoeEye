@@ -1,11 +1,9 @@
-﻿namespace PoeShared.PoeTrade
+﻿using System;
+using JetBrains.Annotations;
+using PoeShared.Common;
+
+namespace PoeShared.PoeTrade
 {
-    using System;
-
-    using Common;
-
-    using JetBrains.Annotations;
-
     public interface IPoeLiveHistoryProvider : IDisposable
     {
         IObservable<IPoeItem[]> ItemsPacks { [NotNull] get; }

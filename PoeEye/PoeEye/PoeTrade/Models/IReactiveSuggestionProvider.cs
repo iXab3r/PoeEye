@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using JetBrains.Annotations;
-using PoeShared.Prism;
 using ReactiveUI;
 using WpfAutoCompleteControls.Editors;
 

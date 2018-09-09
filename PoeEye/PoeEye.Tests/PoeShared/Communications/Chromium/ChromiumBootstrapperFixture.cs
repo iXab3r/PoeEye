@@ -1,22 +1,11 @@
-﻿using System;
-using System.IO;
-using System.Reflection;
-using System.Threading;
-using CefSharp.OffScreen;
-using PoeShared;
+﻿using CefSharp.OffScreen;
+using Moq;
+using NUnit.Framework;
 using PoeShared.Communications.Chromium;
 using PoeShared.Prism;
 
 namespace PoeEye.Tests.PoeShared.Communications.Chromium
 {
-    using System.Linq;
-
-    using Moq;
-
-    using NUnit.Framework;
-
-    using Shouldly;
-
     [TestFixture]
     [Ignore("Chromium is currently not testably w/o hacks")]
     public class ChromiumBootstrapperFixture

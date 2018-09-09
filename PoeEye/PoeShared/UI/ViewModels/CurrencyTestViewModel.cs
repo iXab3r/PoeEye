@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using PoeShared.Common;
-using PoeShared.Converters;
 using ReactiveUI;
 
 namespace PoeShared.UI.ViewModels

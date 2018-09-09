@@ -1,7 +1,7 @@
-﻿namespace PoeEye.PoeTrade.Models
-{
-    using System;
+﻿using System;
 
+namespace PoeEye.PoeTrade.Models
+{
     internal struct PoeItemPricePoint
     {
         public DateTime Timestamp { get; set; }

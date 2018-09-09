@@ -1,9 +1,8 @@
-﻿namespace PoeShared.PoeTrade.Query
+﻿using Guards;
+using JetBrains.Annotations;
+
+namespace PoeShared.PoeTrade.Query
 {
-    using Guards;
-
-    using JetBrains.Annotations;
-
     public abstract class PoeQueryArgumentBase : IPoeQueryArgument
     {
         protected PoeQueryArgumentBase([NotNull] string name)

@@ -1,7 +1,7 @@
-﻿namespace PoeEye.PoeTrade.Common
-{
-    using System.ComponentModel;
+﻿using System.ComponentModel;
 
+namespace PoeEye.PoeTrade.Common
+{
     public struct SortDescriptionData
     {
         public static readonly SortDescriptionData Empty = new SortDescriptionData();

@@ -1,8 +1,4 @@
-﻿using System;
-using Newtonsoft.Json;
-using PoeShared.Scaffolding;
-
-namespace PoeShared.Modularity
+﻿namespace PoeShared.Modularity
 {
     public interface IPoeEyeConfig
     {

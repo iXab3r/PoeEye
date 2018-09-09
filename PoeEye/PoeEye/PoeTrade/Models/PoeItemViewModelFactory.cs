@@ -1,8 +1,5 @@
-﻿using System.Reactive.Concurrency;
-using System.Reactive.Subjects;
-using Guards;
+﻿using Guards;
 using JetBrains.Annotations;
-using Unity; using Unity.Resolution; using Unity.Attributes;
 using PoeEye.PoeTrade.ViewModels;
 using PoeShared.Common;
 using PoeShared.PoeTrade;

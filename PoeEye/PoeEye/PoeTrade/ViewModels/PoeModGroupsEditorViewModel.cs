@@ -1,23 +1,18 @@
-﻿using PoeShared.PoeTrade;
+﻿using System;
+using System.Linq;
+using System.Reactive.Linq;
+using System.Windows.Input;
+using Guards;
+using JetBrains.Annotations;
+using PoeShared.PoeTrade;
+using PoeShared.PoeTrade.Query;
+using PoeShared.Prism;
+using PoeShared.Scaffolding;
+using ReactiveUI;
 using ReactiveUI.Legacy;
 
 namespace PoeEye.PoeTrade.ViewModels
 {
-    using System;
-    using System.Linq;
-    using System.Reactive.Linq;
-    using System.Windows.Input;
-
-    using Guards;
-
-    using JetBrains.Annotations;
-
-    using PoeShared.PoeTrade.Query;
-    using PoeShared.Prism;
-    using PoeShared.Scaffolding;
-
-    using ReactiveUI;
-
     internal sealed class PoeModGroupsEditorViewModel : DisposableReactiveObject, IPoeModGroupsEditorViewModel
     {
         private readonly ReactiveCommand<object> addGrpCommand = ReactiveUI.Legacy.ReactiveCommand.Create();

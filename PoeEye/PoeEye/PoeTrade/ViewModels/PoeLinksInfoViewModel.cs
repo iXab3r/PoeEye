@@ -1,12 +1,10 @@
-﻿namespace PoeEye.PoeTrade.ViewModels
+﻿using Guards;
+using JetBrains.Annotations;
+using PoeShared.Common;
+using PoeShared.Scaffolding;
+
+namespace PoeEye.PoeTrade.ViewModels
 {
-    using Guards;
-
-    using JetBrains.Annotations;
-
-    using PoeShared.Common;
-    using PoeShared.Scaffolding;
-
     internal sealed class PoeLinksInfoViewModel : DisposableReactiveObject
     {
         public PoeLinksInfoViewModel([NotNull] IPoeLinksInfo linksInfo)

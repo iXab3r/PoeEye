@@ -1,14 +1,12 @@
-﻿using PoeShared.Communications;
+﻿using System.Collections.Generic;
+using System.Collections.Specialized;
+using NUnit.Framework;
+using PoeShared.Communications;
+using Shouldly;
 using TypeConverter;
 
 namespace PoeEye.Tests.Communications
 {
-    using System.Collections.Generic;
-    using System.Collections.Specialized;
-
-    using NUnit.Framework;
-    using Shouldly;
-
     [TestFixture]
     public class NameValueCollectionToQueryStringConverterFixture
     {

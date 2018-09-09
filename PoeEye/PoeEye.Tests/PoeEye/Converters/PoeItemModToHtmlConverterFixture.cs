@@ -1,21 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Media;
-using log4net.Appender;
+using Moq;
+using NUnit.Framework;
 using PoeEye.Converters;
 using PoeShared.Common;
 using PoeShared.Scaffolding;
+using Shouldly;
 
 namespace PoeEye.Tests.PoeEye.Converters
 {
-    using System.Linq;
-
-    using Moq;
-
-    using NUnit.Framework;
-
-    using Shouldly;
-
     [TestFixture]
     public class PoeItemModToHtmlConverterFixture
     {

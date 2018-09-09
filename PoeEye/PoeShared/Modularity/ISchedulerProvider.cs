@@ -1,5 +1,4 @@
 ﻿using System.Reactive.Concurrency;
-using System.Threading.Tasks;
 using JetBrains.Annotations;
 
 namespace PoeShared.Modularity

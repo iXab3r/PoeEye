@@ -1,18 +1,12 @@
-﻿using PoeShared.Communications;
+﻿using System.Collections.Specialized;
+using PoeShared.PoeTrade;
+using PoeShared.PoeTrade.Query;
+using TypeConverter;
+using Unity;
 using Unity.Extension;
 
 namespace PoeEye.PoeTrade.Prism
 {
-    using System.Collections.Specialized;
-    using Unity; using Unity.Resolution; using Unity.Attributes;
-    using PoeShared.PoeTrade;
-    using PoeShared.PoeTrade.Query;
-    using PoeShared.Scaffolding;
-
-    using ProxyProvider;
-
-    using TypeConverter;
-
     internal sealed class LiveRegistrations : UnityContainerExtension
     {
         protected override void Initialize()

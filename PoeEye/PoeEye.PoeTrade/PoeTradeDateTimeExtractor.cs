@@ -1,15 +1,12 @@
+using System;
+using System.Linq;
+using System.Text.RegularExpressions;
+using Guards;
+using JetBrains.Annotations;
+using PoeShared;
+
 namespace PoeEye.PoeTrade
 {
-    using System;
-    using System.Linq;
-    using System.Text.RegularExpressions;
-
-    using Guards;
-
-    using JetBrains.Annotations;
-
-    using PoeShared;
-
     internal sealed class PoeTradeDateTimeExtractor : IPoeTradeDateTimeExtractor
     {
         private readonly IClock clock;

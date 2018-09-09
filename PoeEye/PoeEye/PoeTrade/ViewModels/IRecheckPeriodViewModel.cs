@@ -1,7 +1,7 @@
-﻿namespace PoeEye.PoeTrade.ViewModels
-{
-    using System;
+﻿using System;
 
+namespace PoeEye.PoeTrade.ViewModels
+{
     internal interface IRecheckPeriodViewModel
     {
         bool IsAutoRecheckEnabled { get; set; }

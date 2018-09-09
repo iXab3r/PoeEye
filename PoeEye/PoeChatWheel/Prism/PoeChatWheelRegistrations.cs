@@ -1,8 +1,5 @@
-﻿using Unity; using Unity.Resolution; using Unity.Attributes;
-using PoeChatWheel.ViewModels;
-using PoeShared.Scaffolding;
-using PoeWhisperMonitor;
-using PoeWhisperMonitor.Chat;
+﻿using PoeChatWheel.ViewModels;
+using Unity;
 using Unity.Extension;
 
 namespace PoeChatWheel.Prism

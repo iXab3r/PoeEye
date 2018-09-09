@@ -1,30 +1,21 @@
-using System.Collections.Concurrent;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reactive.Linq;
+using System.Windows.Input;
+using Guards;
+using JetBrains.Annotations;
 using PoeEye.PoeTrade.Models;
+using PoeShared.Common;
 using PoeShared.PoeTrade;
+using PoeShared.PoeTrade.Query;
+using PoeShared.Prism;
+using PoeShared.Scaffolding;
 using Prism.Commands;
-using ReactiveUI.Legacy;
+using ReactiveUI;
 
 namespace PoeEye.PoeTrade.ViewModels
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Reactive.Linq;
-    using System.Windows.Input;
-
-    using Guards;
-
-    using JetBrains.Annotations;
-
-    using PoeShared.Common;
-    using PoeShared.PoeTrade.Query;
-    using PoeShared.Prism;
-    using PoeShared.Scaffolding;
-
-    using ReactiveUI;
-
-    using WpfAutoCompleteControls.Editors;
-
     internal sealed class PoeModsEditorViewModel : DisposableReactiveObject, IPoeModsEditorViewModel
     {
         private readonly DelegateCommand addModCommand;

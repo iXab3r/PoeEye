@@ -1,9 +1,9 @@
-﻿namespace PoeBud.Converters
-{
-    using System;
-    using System.Globalization;
-    using System.Windows.Data;
+﻿using System;
+using System.Globalization;
+using System.Windows.Data;
 
+namespace PoeBud.Converters
+{
     internal sealed class BooleanToObjectConverter : IValueConverter
     {
         public object TrueValue { get; set; }

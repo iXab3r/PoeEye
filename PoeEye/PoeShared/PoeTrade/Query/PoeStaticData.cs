@@ -1,7 +1,7 @@
+using PoeShared.Common;
+
 namespace PoeShared.PoeTrade.Query
 {
-    using Common;
-
     public sealed class PoeStaticData : IPoeStaticData
     {
         public static readonly PoeStaticData Empty = new PoeStaticData()

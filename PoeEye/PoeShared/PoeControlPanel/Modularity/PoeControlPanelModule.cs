@@ -3,7 +3,6 @@ using Guards;
 using JetBrains.Annotations;
 using PoeShared.Modularity;
 using PoeShared.PoeControlPanel.Prism;
-using PoeShared.Prism;
 using PoeShared.Scaffolding;
 using Prism.Ioc;
 using Unity;

@@ -1,7 +1,7 @@
-﻿namespace PoeEye.PoeTrade.Models
-{
-    using System.Reactive.Subjects;
+﻿using System.Reactive.Subjects;
 
+namespace PoeEye.PoeTrade.Models
+{
     internal sealed class PoeCaptchaRegistrator : IPoeCaptchaRegistrator
     {
         public ISubject<string> CaptchaRequests { get; } = new Subject<string>();

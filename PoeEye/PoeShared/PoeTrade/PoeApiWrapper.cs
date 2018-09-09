@@ -4,7 +4,6 @@ using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Guards;
 using JetBrains.Annotations;
-using Unity; using Unity.Resolution; using Unity.Attributes;
 using Newtonsoft.Json;
 using PoeShared.PoeTrade.Query;
 using PoeShared.Prism;

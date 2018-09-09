@@ -5,7 +5,6 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows;
 using WindowsInput;
 using WindowsInput.Native;
 using Guards;
@@ -14,8 +13,6 @@ using PoeShared;
 using PoeShared.Modularity;
 using PoeShared.Scaffolding;
 using ReactiveUI;
-
-using Clipboard = System.Windows.Forms.Clipboard;
 
 namespace PoeWhisperMonitor.Chat
 {

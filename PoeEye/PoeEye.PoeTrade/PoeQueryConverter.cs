@@ -1,15 +1,12 @@
-﻿namespace PoeEye.PoeTrade
+﻿using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.Globalization;
+using Guards;
+using PoeShared.PoeTrade.Query;
+using TypeConverter;
+
+namespace PoeEye.PoeTrade
 {
-    using System.Collections.Generic;
-    using System.Collections.Specialized;
-    using System.Globalization;
-
-    using Guards;
-
-    using PoeShared.PoeTrade.Query;
-
-    using TypeConverter;
-
     internal sealed class PoeQueryConverter : IConverter<IPoeQuery, NameValueCollection>
     {
         public NameValueCollection Convert(IPoeQuery value)
