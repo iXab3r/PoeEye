@@ -21,11 +21,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PoeEye.Console", "PoeEye.Co
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PoeEye.PoeTradeRealtimeApi", "PoeEye.PoeTradeRealtimeApi\PoeEye.PoeTradeRealtimeApi.csproj", "{0E9B96E1-A5DC-4F5A-8F43-40BE640D50F4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PoeChatWheel", "PoeChatWheel\PoeChatWheel.csproj", "{DAD6D513-5C7C-433B-8A56-1D92476B4CFF}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PoeBud", "PoeBud\PoeBud.csproj", "{DA6C88EA-168E-4116-B0D1-0F732D5B4773}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RadialMenu", "..\Submodules\RadialMenu\RadialMenu\RadialMenu.csproj", "{9D959B4C-A428-4EA7-9197-BE04B37BF256}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PoeTradeMonitor", "PoeTradeMonitor\PoeTradeMonitor.csproj", "{9BAED733-7C2B-4AAA-8E60-4B73B612C78E}"
 EndProject
@@ -62,12 +58,8 @@ Global
 		{5745039E-24A7-40FC-9B61-F6C2EE6F3406}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0E9B96E1-A5DC-4F5A-8F43-40BE640D50F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0E9B96E1-A5DC-4F5A-8F43-40BE640D50F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DAD6D513-5C7C-433B-8A56-1D92476B4CFF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DAD6D513-5C7C-433B-8A56-1D92476B4CFF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DA6C88EA-168E-4116-B0D1-0F732D5B4773}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{DA6C88EA-168E-4116-B0D1-0F732D5B4773}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9D959B4C-A428-4EA7-9197-BE04B37BF256}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9D959B4C-A428-4EA7-9197-BE04B37BF256}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9BAED733-7C2B-4AAA-8E60-4B73B612C78E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{9BAED733-7C2B-4AAA-8E60-4B73B612C78E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5CCDF7F6-C2B0-4EC4-B921-4313564BB13A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU

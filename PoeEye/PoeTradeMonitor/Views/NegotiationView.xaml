@@ -2,7 +2,6 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:blue="http://www.nuget.org/Blue.MVVM"
                     xmlns:system="clr-namespace:System;assembly=mscorlib"
-                    xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
                     xmlns:viewModels="clr-namespace:PoeEye.TradeMonitor.ViewModels"
                     xmlns:converters="clr-namespace:PoeShared.Scaffolding.WPF.Converters;assembly=PoeShared"
                     xmlns:models="clr-namespace:PoeEye.TradeMonitor.Models"

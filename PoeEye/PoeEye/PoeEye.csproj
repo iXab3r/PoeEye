@@ -270,11 +270,11 @@
       <HintPath>..\packages\Rx-XAML.2.2.5\lib\net45\System.Reactive.Windows.Threading.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="System.Windows.Forms">
-      <HintPath>..\..\..\..\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Windows.Forms.dll</HintPath>
+    <Reference Include="System.Windows.Interactivity, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
+      <HintPath>..\packages\System.Windows.Interactivity.WPF.2.0.20525\lib\net40\System.Windows.Interactivity.dll</HintPath>
     </Reference>
     <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
-      <HintPath>..\PoeEye.PoeTrade\bin\Debug\System.Windows.Interactivity.dll</HintPath>
+      <HintPath>..\packages\MahApps.Metro.1.4.3\lib\net45\System.Windows.Interactivity.dll</HintPath>
     </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
@@ -491,10 +491,6 @@
       <Project>{da6c88ea-168e-4116-b0d1-0f732d5b4773}</Project>
       <Name>PoeBud</Name>
     </ProjectReference>
-    <ProjectReference Include="..\PoeChatWheel\PoeChatWheel.csproj">
-      <Project>{dad6d513-5c7c-433b-8a56-1d92476b4cff}</Project>
-      <Name>PoeChatWheel</Name>
-    </ProjectReference>
     <ProjectReference Include="..\PoeEye.ItemParser\PoeEye.ItemParser.csproj">
       <Project>{ea3109dd-675d-4837-977d-af61b203bebc}</Project>
       <Name>PoeEye.ItemParser</Name>
@@ -502,10 +498,6 @@
     <ProjectReference Include="..\PoeEye.PoeTradeRealtimeApi\PoeEye.PoeTradeRealtimeApi.csproj">
       <Project>{0e9b96e1-a5dc-4f5a-8f43-40be640d50f4}</Project>
       <Name>PoeEye.PoeTradeRealtimeApi</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\PoeEye.Simulator\PoeEye.Simulator.csproj">
-      <Project>{785dc21d-42f1-4db9-883f-4d02ccf73ff0}</Project>
-      <Name>PoeEye.Simulator</Name>
     </ProjectReference>
     <ProjectReference Include="..\PoeEye.PoeTrade\PoeEye.PoeTrade.csproj">
       <Project>{c6188345-f8dc-4cdc-8c01-add0a03bbf1c}</Project>
@@ -518,10 +510,6 @@
     <ProjectReference Include="..\PoeEye.StashRealtimeApi\PoeEye.StashRealtimeApi.csproj">
       <Project>{5ccdf7f6-c2b0-4ec4-b921-4313564bb13a}</Project>
       <Name>PoeEye.StashRealtimeApi</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\PoeOracle\PoeOracle.csproj">
-      <Project>{b2322e86-fee4-4b64-91e1-909046f8ebd0}</Project>
-      <Name>PoeOracle</Name>
     </ProjectReference>
     <ProjectReference Include="..\PoeShared\PoeShared.csproj">
       <Project>{12DF53DD-7144-4D2D-B7A1-B4BC5BBDFB69}</Project>
