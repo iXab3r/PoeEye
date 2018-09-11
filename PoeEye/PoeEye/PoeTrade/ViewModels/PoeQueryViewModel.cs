@@ -20,7 +20,7 @@ namespace PoeEye.PoeTrade.ViewModels
     internal sealed class PoeQueryViewModel : DisposableReactiveObject, IPoeQueryViewModel
     {
         private readonly ObservableCollectionExtended<IPoeCurrency> currencyList = new ObservableCollectionExtended<IPoeCurrency>();
-        private readonly ObservableCollectionExtended<IPoeItemType> itemTypeList = new ObservableCollectionExtended<IPoeItemType>();
+        private readonly ObservableCollectionExtended<string> leagueList = new ObservableCollectionExtended<string>();
 
         private string accountName;
         private TriState? affectedByElderState;
@@ -36,7 +36,6 @@ namespace PoeEye.PoeTrade.ViewModels
         private float? buyoutMax;
         private float? buyoutMin;
         private PoeBuyoutMode? buyoutMode;
-        private bool captureFocusOnFirstGet = true;
         private TriState? corruptionState;
         private TriState? craftState;
         private float? critMax;
@@ -50,8 +49,6 @@ namespace PoeEye.PoeTrade.ViewModels
         private TriState? enchantState;
         private float? evasionMax;
         private float? evasionMin;
-        private int? gemOrMapLevelMax;
-        private int? gemOrMapLevelMin;
         private int? incQuantityMax;
         private int? incQuantityMin;
         private bool isExpanded = true;
@@ -60,7 +57,6 @@ namespace PoeEye.PoeTrade.ViewModels
         private int? itemLevelMin;
         private string itemName;
         private PoeItemRarity? itemRarity;
-        private IPoeItemType itemType;
         private string league;
         private int? levelMax;
         private int? levelMin;
@@ -93,43 +89,45 @@ namespace PoeEye.PoeTrade.ViewModels
         private int? socketsR;
         private int? socketsW;
 
+        private bool captureFocusOnFirstGet = true;
+
         public PoeQueryViewModel(
             [NotNull] IPoeStaticDataSource staticDataSource,
             [NotNull] IFactory<IPoeModGroupsEditorViewModel, IPoeStaticDataSource> modGroupsEditorFactory,
+            [NotNull] IFactory<IPoeItemTypeSelectorViewModel, IPoeStaticDataSource> itemTypeSelectorFactory,
             [NotNull] IFactory<IReactiveSuggestionProvider> suggestionProviderFactory,
             [NotNull] IPoeDatabaseReader poeDatabaseReader)
         {
             Guard.ArgumentNotNull(staticDataSource, nameof(staticDataSource));
             Guard.ArgumentNotNull(modGroupsEditorFactory, nameof(modGroupsEditorFactory));
+            Guard.ArgumentNotNull(itemTypeSelectorFactory, nameof(itemTypeSelectorFactory));
             Guard.ArgumentNotNull(suggestionProviderFactory, nameof(suggestionProviderFactory));
             Guard.ArgumentNotNull(poeDatabaseReader, nameof(poeDatabaseReader));
 
-            LeaguesList = new ReadOnlyObservableCollection<string>(LL);
+            LeaguesList = new ReadOnlyObservableCollection<string>(leagueList);
             CurrenciesList = new ReadOnlyObservableCollection<IPoeCurrency>(currencyList);
-            ItemTypes = new ReadOnlyObservableCollection<IPoeItemType>(itemTypeList);
+            ItemTypeSelector = itemTypeSelectorFactory.Create(staticDataSource);
             ModGroupsEditor = modGroupsEditorFactory.Create(staticDataSource);
 
             OnlineOnly = true;
             BuyoutMode = PoeBuyoutMode.BuyoutOnly;
             NormalizeQuality = true;
 
-            this.WhenAnyValue(x => x.League).Merge(LL.ToObservableChangeSet().Select(x => League))
-                .Where(string.IsNullOrWhiteSpace)
-                .Subscribe(() => League = LeaguesList.FirstOrDefault())
-                .AddTo(Anchors);
-
             staticDataSource
                 .WhenAnyValue(x => x.StaticData)
                 .Subscribe(
                     staticData =>
                     {
-                        LL.Clear();
+                        leagueList.Clear();
                         currencyList.Clear();
-                        itemTypeList.Clear();
 
-                        LL.AddRange(staticData.LeaguesList);
+                        leagueList.AddRange(staticData.LeaguesList);
                         currencyList.AddRange(staticData.CurrenciesList);
-                        itemTypeList.AddRange(staticData.ItemTypes);
+
+                        if (string.IsNullOrWhiteSpace(League))
+                        {
+                            League = LeaguesList.FirstOrDefault();
+                        }
                     })
                 .AddTo(Anchors);
 
@@ -141,36 +139,23 @@ namespace PoeEye.PoeTrade.ViewModels
         {
             get
             {
-                if (captureFocusOnFirstGet)
+                if (!captureFocusOnFirstGet)
                 {
-                    //FIXME This hack was implemented to focus on QueryTextBox when new tab is created. Usual approach is not working due to TabControl virtualisation
-                    captureFocusOnFirstGet = false;
-                    return true;
+                    return false;
                 }
 
-                return false;
+                //FIXME This hack was implemented to focus on QueryTextBox when new tab is created. Usual approach is not working due to TabControl virtualisation
+                captureFocusOnFirstGet = false;
+                return true;
+
             }
-        }
-
-        public int? GemOrMapLevelMin
-        {
-            get => gemOrMapLevelMin;
-            set => this.RaiseAndSetIfChanged(ref gemOrMapLevelMin, value);
-        }
-
-        public int? GemOrMapLevelMax
-        {
-            get => gemOrMapLevelMax;
-            set => this.RaiseAndSetIfChanged(ref gemOrMapLevelMax, value);
         }
 
         public ReadOnlyObservableCollection<string> LeaguesList { get; }
 
         public ReadOnlyObservableCollection<IPoeCurrency> CurrenciesList { get; }
 
-        public ReadOnlyObservableCollection<IPoeItemType> ItemTypes { get; }
-
-        public ObservableCollectionExtended<string> LL { get; } = new ObservableCollectionExtended<string>();
+        public IPoeItemTypeSelectorViewModel ItemTypeSelector { get; }
 
         public IPoeModGroupsEditorViewModel ModGroupsEditor { get; }
 
@@ -343,7 +328,7 @@ namespace PoeEye.PoeTrade.ViewModels
         }
 
         public IPoeQueryModsGroup[] ModGroups => ModGroupsEditor.ToGroups();
-
+        
         public int? SocketsB
         {
             get => socketsB;
@@ -579,11 +564,7 @@ namespace PoeEye.PoeTrade.ViewModels
             set => this.RaiseAndSetIfChanged(ref isExpanded, value);
         }
 
-        public IPoeItemType ItemType
-        {
-            get => itemType;
-            set => this.RaiseAndSetIfChanged(ref itemType, value);
-        }
+        public IPoeItemType ItemType => ItemTypeSelector.ToItemType();
 
         public void SetQueryInfo(IPoeQueryInfo source)
         {
@@ -614,22 +595,13 @@ namespace PoeEye.PoeTrade.ViewModels
 
             if (source.ItemType != null)
             {
-                var mappedItemType = ItemTypes.FirstOrDefault(x => x.CodeName == source.ItemType.CodeName);
-                if (mappedItemType != null)
-                {
-                    ItemType = mappedItemType;
-                }
-                else
-                {
-                    ItemType = source.ItemType;
-                }
+                ItemTypeSelector.SelectedValue = source.ItemType.Name;
             }
 
-            this.RaisePropertyChanged(nameof(League));
             this.RaisePropertyChanged(nameof(PoeQueryBuilder));
         }
 
-        public IPoeQueryInfo GetQueryInfo()
+        private IPoeQueryInfo GetQueryInfo()
         {
             var result = new PoeQueryInfo();
 
@@ -666,7 +638,7 @@ namespace PoeEye.PoeTrade.ViewModels
                     continue;
                 }
 
-                if (value is string && string.IsNullOrWhiteSpace(value as string))
+                if (value is string s && string.IsNullOrWhiteSpace(s))
                 {
                     continue;
                 }
@@ -678,7 +650,7 @@ namespace PoeEye.PoeTrade.ViewModels
             return result;
         }
 
-        public string GetQueryDescription()
+        private string GetQueryDescription()
         {
             var descriptions = FormatQueryDescriptionArray();
             if (!string.IsNullOrEmpty(itemName))

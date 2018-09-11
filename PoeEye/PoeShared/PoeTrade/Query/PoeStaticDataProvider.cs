@@ -7,13 +7,15 @@ using ReactiveUI;
 
 namespace PoeShared.PoeTrade.Query
 {
-    internal sealed class PoeQueryInfoProvider : DisposableReactiveObject
+    internal sealed class PoeStaticDataProvider : DisposableReactiveObject, IPoeStaticDataProvider
     {
         private readonly IPoeApi poeApi;
+
+        private string error;
         private bool isBusy;
         private IPoeStaticData staticData = PoeStaticData.Empty;
 
-        public PoeQueryInfoProvider([NotNull] IPoeApi poeApi)
+        public PoeStaticDataProvider([NotNull] IPoeApi poeApi)
         {
             Guard.ArgumentNotNull(poeApi, nameof(poeApi));
             this.poeApi = poeApi;
@@ -33,6 +35,12 @@ namespace PoeShared.PoeTrade.Query
             set => this.RaiseAndSetIfChanged(ref isBusy, value);
         }
 
+        public string Error
+        {
+            get => error;
+            set => this.RaiseAndSetIfChanged(ref error, value);
+        }
+
         private void RefreshData()
         {
             Log.Instance.Debug($"[PoeQueryInfoProvider-{poeApi.Name}] Refreshing static data...");
@@ -44,6 +52,7 @@ namespace PoeShared.PoeTrade.Query
             try
             {
                 IsBusy = true;
+                Error = null;
 
                 Log.Instance.Debug($"[PoeQueryInfoProvider-{poeApi.Name}] Requesting static data from API...");
 
@@ -56,7 +65,7 @@ namespace PoeShared.PoeTrade.Query
             {
                 Log.HandleUiException(ex);
                 Log.Instance.Debug($"[PoeQueryInfoProvider-{poeApi.Name}] Returning empty static data");
-
+                Error = ex.Message;
                 return PoeStaticData.Empty;
             }
             finally

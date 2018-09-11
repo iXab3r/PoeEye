@@ -12,7 +12,7 @@ namespace PoeShared.StashApi.DataTypes
     {
         [DeserializeAs(Name = "category")]
         [JsonProperty("category")]
-        public Dictionary<string, string> CategoriesRaw { get; set; }
+        public Dictionary<string, string[]> CategoriesRaw { get; set; }
 
         [DeserializeAs(Name = "frameType")]
         [JsonProperty("frameType")]
@@ -79,6 +79,10 @@ namespace PoeShared.StashApi.DataTypes
         [DeserializeAs(Name = "explicitMods")]
         [JsonProperty("explicitMods")]
         public List<string> ExplicitMods { get; set; }
+        
+        [DeserializeAs(Name = "extended")]
+        [JsonProperty("extended")]
+        public StashItemExtendedInfo Extended { get; set; }
 
         [DeserializeAs(Name = "descrText")]
         [JsonProperty("descrText")]
@@ -122,11 +126,11 @@ namespace PoeShared.StashApi.DataTypes
 
         [DeserializeAs(Name = "requirements")]
         [JsonProperty("requirements")]
-        public List<StashItemRequirement> Requirements { get; set; }
+        public List<StashItemProperty> Requirements { get; set; }
 
         [DeserializeAs(Name = "nextLevelRequirements")]
         [JsonProperty("nextLevelRequirements")]
-        public List<StashItemRequirement> nextLevelRequirements { get; set; }
+        public List<StashItemProperty> nextLevelRequirements { get; set; }
 
         [DeserializeAs(Name = "colour")]
         [JsonProperty("colour")]

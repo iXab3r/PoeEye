@@ -26,7 +26,7 @@ namespace PoeEye.PoeTrade.ViewModels
     internal sealed class PoeAdvancedTradesListViewModel : DisposableReactiveObject, IPoeAdvancedTradesListViewModel
     {
         private static readonly Func<IPoeTradeViewModel, bool> AlwaysTruePredicate = model => true;
-        private static readonly TimeSpan ResortRefilterThrottleTimeout = TimeSpan.FromMilliseconds(100);
+        private static readonly TimeSpan ResortRefilterThrottleTimeout = TimeSpan.FromMilliseconds(250);
         private readonly SerialDisposable activeFilterAnchor = new SerialDisposable();
 
         private readonly BehaviorSubject<Func<IPoeTradeViewModel, bool>> filterConditionSource = new BehaviorSubject<Func<IPoeTradeViewModel, bool>>(null);
@@ -61,11 +61,11 @@ namespace PoeEye.PoeTrade.ViewModels
                 .Or();
 
             allItems
-                .Filter(filterConditionSource.Select(x => x ?? AlwaysTruePredicate).Sample(ResortRefilterThrottleTimeout)
+                .Filter(filterConditionSource.Select(x => x ?? AlwaysTruePredicate).Throttle(ResortRefilterThrottleTimeout)
                                              .Do(_ => Interlocked.Increment(ref filterRequestsCount)))
                 .Virtualise(this.WhenAnyValue(x => x.MaxItems).Select(x => new VirtualRequest(0, x > 0 ? x : int.MaxValue)))
                 .Sort(comparerObservable, SortOptions.None,
-                      resortRequest.Sample(ResortRefilterThrottleTimeout).Do(_ => Interlocked.Increment(ref sortRequestsCount)))
+                      resortRequest.Throttle(ResortRefilterThrottleTimeout).Do(_ => Interlocked.Increment(ref sortRequestsCount)))
                 .ObserveOn(uiScheduler)
                 .Bind(out itemsCollection)
                 .Subscribe()

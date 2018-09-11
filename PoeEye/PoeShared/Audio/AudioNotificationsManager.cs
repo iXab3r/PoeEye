@@ -20,6 +20,7 @@ namespace PoeShared.Audio
             {
                 {AudioNotificationType.Silence, new byte[0]}
             };
+        private readonly TimeSpan throttlingPeriod = TimeSpan.FromMilliseconds(5000);
 
         private bool isEnabled;
 
@@ -38,6 +39,7 @@ namespace PoeShared.Audio
                 playNotificationCommandCanExecute, x => Observable.Return((AudioNotificationType)x));
             playNotificationCommand
                 .Where(x => x != AudioNotificationType.Disabled)
+                .Sample(throttlingPeriod)
                 .Subscribe(PlayNotification)
                 .AddTo(Anchors);
 

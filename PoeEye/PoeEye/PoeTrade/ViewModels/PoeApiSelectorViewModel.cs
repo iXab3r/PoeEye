@@ -1,26 +1,40 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reactive;
+using System.Reactive.Concurrency;
+using System.Reactive.Linq;
 using Guards;
 using JetBrains.Annotations;
 using PoeEye.PoeTrade.Models;
 using PoeShared.PoeTrade;
+using PoeShared.PoeTrade.Query;
+using PoeShared.Prism;
 using PoeShared.Scaffolding;
 using ReactiveUI;
+using Unity.Attributes;
 
 namespace PoeEye.PoeTrade.ViewModels
 {
-    public sealed class PoeApiSelectorViewModel : DisposableReactiveObject, IPoeApiSelectorViewModel
+    public sealed class PoeApiSelectorViewModel : DisposableReactiveObject, IPoeApiSelectorViewModel, IPoeStaticDataSource
     {
         private readonly IPoeApiProvider apiProvider;
         private IPoeApiWrapper selectedModule;
 
-        public PoeApiSelectorViewModel([NotNull] IPoeApiProvider apiProvider)
+        public PoeApiSelectorViewModel(
+            [NotNull] IPoeApiProvider apiProvider,
+            [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {
             Guard.ArgumentNotNull(apiProvider, nameof(apiProvider));
+            Guard.ArgumentNotNull(uiScheduler, nameof(uiScheduler));
             this.apiProvider = apiProvider;
-
-            SelectedModule = apiProvider.ModulesList.First();
+            
+            this.WhenAnyValue(x => x.SelectedModule)
+                .Select(x => x == null ? Observable.Return(Unit.Default).Concat(Observable.Never<Unit>()) : x.WhenAnyValue(y => y.StaticData).ToUnit())
+                .Switch()
+                .ObserveOn(uiScheduler)
+                .Subscribe(() => this.RaisePropertyChanged(nameof(StaticData)))
+                .AddTo(Anchors);
         }
 
         public ReadOnlyObservableCollection<IPoeApiWrapper> ModulesList => apiProvider.ModulesList;
@@ -31,11 +45,9 @@ namespace PoeEye.PoeTrade.ViewModels
             set => this.RaiseAndSetIfChanged(ref selectedModule, value);
         }
 
-        public void SetByModuleId(string moduleInfo)
+        public IPoeApiWrapper SetByModuleId(string moduleIdOrName)
         {
-            Guard.ArgumentNotNull(moduleInfo, nameof(moduleInfo));
-
-            SelectedModule = FindModuleById(moduleInfo) ?? ModulesList.First();
+            return SelectedModule = FindModuleById(moduleIdOrName);
         }
 
         private IPoeApiWrapper FindModuleById(string moduleInfo)
@@ -48,5 +60,7 @@ namespace PoeEye.PoeTrade.ViewModels
 
             return ModulesList.FirstOrDefault(x => x.Name == moduleInfo);
         }
+
+        public IPoeStaticData StaticData => SelectedModule == null ? PoeStaticData.Empty : SelectedModule.StaticData;
     }
 }

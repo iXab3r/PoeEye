@@ -4,14 +4,17 @@
                     xmlns:query="clr-namespace:PoeShared.PoeTrade.Query;assembly=PoeShared"
                     xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
                     xmlns:viewModels="clr-namespace:PoeEye.PoeTrade.ViewModels"
-                    xmlns:converters="clr-namespace:PoeEye.Converters">
+                    xmlns:converters="clr-namespace:PoeEye.Converters"
+                    xmlns:eye="http://coderush.net/poeeye/">
   <DataTemplate DataType="{x:Type viewModels:PoeModGroupsEditorViewModel}">
 
     <DataTemplate.Resources>
-      <ObjectDataProvider x:Key="groupTypeEnum" MethodName="GetValues"
-                          ObjectType="{x:Type System:Enum}">
+      
+      <ObjectDataProvider x:Key="groupTypeEnum"
+                          MethodName="GetValuesAndDescriptions"
+                          ObjectType="eye:EnumHelper">
         <ObjectDataProvider.MethodParameters>
-          <x:Type TypeName="query:PoeQueryModsGroupType" />
+          <x:TypeExtension TypeName="query:PoeQueryModsGroupType" />
         </ObjectDataProvider.MethodParameters>
       </ObjectDataProvider>
     </DataTemplate.Resources>
@@ -66,7 +69,10 @@
                   </Grid.ColumnDefinitions>
 
                   <ComboBox Grid.Column="0"
-                            SelectedItem="{Binding GroupType}"
+                            Width="150"
+                            DisplayMemberPath="Description"
+                            SelectedValuePath="Value"
+                            SelectedValue="{Binding GroupType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                             MinWidth="100"
                             ItemsSource="{Binding Source={StaticResource groupTypeEnum}}" />
 

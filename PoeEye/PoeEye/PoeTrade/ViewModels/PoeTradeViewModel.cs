@@ -128,7 +128,7 @@ namespace PoeEye.PoeTrade.ViewModels
 
         public ICommand SendPrivateMessageCommand => sendPrivateMessageCommand;
 
-        public TimeSpan TimeElapsedSinceLastIndexation => Trade.Timestamp == DateTime.MinValue ? TimeSpan.Zero : clock.Now - Trade.Timestamp;
+        public TimeSpan? TimeElapsedSinceLastIndexation => Trade.Timestamp == null ? TimeSpan.Zero : clock.Now - Trade.Timestamp;
 
         public PoeTradeState TradeState
         {

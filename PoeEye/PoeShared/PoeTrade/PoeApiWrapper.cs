@@ -16,13 +16,12 @@ namespace PoeShared.PoeTrade
     internal class PoeApiWrapper : DisposableReactiveObject, IPoeApiWrapper
     {
         private readonly IPoeApi api;
-        private readonly PoeQueryInfoProvider provider;
+        private readonly IPoeStaticDataProvider provider;
 
         public PoeApiWrapper(
             [NotNull] IPoeApi api,
-            [NotNull] [Dependency(WellKnownSchedulers.UI)]
-            IScheduler uiScheduler,
-            [NotNull] IFactory<PoeQueryInfoProvider, IPoeApi> queryInfoFactory)
+            [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler,
+            [NotNull] IFactory<IPoeStaticDataProvider, IPoeApi> queryInfoFactory)
         {
             Guard.ArgumentNotNull(api, nameof(api));
             Guard.ArgumentNotNull(queryInfoFactory, nameof(queryInfoFactory));
@@ -35,6 +34,11 @@ namespace PoeShared.PoeTrade
                     .Subscribe(() => this.RaisePropertyChanged(nameof(IsBusy)))
                     .AddTo(Anchors);
 
+            provider.WhenAnyValue(x => x.Error)
+                    .ObserveOn(uiScheduler)
+                    .Subscribe(() => this.RaisePropertyChanged(nameof(Error)))
+                    .AddTo(Anchors);
+            
             provider.WhenAnyValue(x => x.StaticData)
                     .ObserveOn(uiScheduler)
                     .Subscribe(() => this.RaisePropertyChanged(nameof(StaticData)))
@@ -69,6 +73,8 @@ namespace PoeShared.PoeTrade
         }
 
         public bool IsBusy => provider.IsBusy;
+
+        public string Error => provider.Error;
 
         public string Name => api.Name ?? api.GetType().Name;
 

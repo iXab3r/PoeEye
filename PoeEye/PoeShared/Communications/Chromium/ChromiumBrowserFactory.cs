@@ -14,7 +14,6 @@ namespace PoeShared.Communications.Chromium
 {
     internal sealed class ChromiumBrowserFactory : DisposableReactiveObject, IChromiumBrowserFactory
     {
-        private static readonly string AssemblyDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         private readonly IFactory<ChromiumBrowser, ChromiumWebBrowser> browserFactory;
 
         public ChromiumBrowserFactory(
@@ -22,57 +21,6 @@ namespace PoeShared.Communications.Chromium
         {
             Guard.ArgumentNotNull(browserFactory, nameof(browserFactory));
             this.browserFactory = browserFactory;
-
-            Log.Instance.Debug("[ChromiumBrowserFactory] Initializing CEF...");
-            if (Cef.IsInitialized)
-            {
-                throw new ApplicationException("CEF is already initialized");
-            }
-
-            var settings = new CefSettings();
-            settings.DisableGpuAcceleration();
-
-            settings.MultiThreadedMessageLoop = true;
-            settings.ExternalMessagePump = false;
-            settings.CachePath = "cefcache";
-            settings.SetOffScreenRenderingBestPerformanceArgs();
-            settings.WindowlessRenderingEnabled = true;
-            if (Log.Instance.IsTraceEnabled)
-            {
-                settings.LogSeverity = LogSeverity.Verbose;
-            }
-            else if (Log.Instance.IsDebugEnabled)
-            {
-                settings.LogSeverity = LogSeverity.Error;
-            }
-            else
-            {
-                settings.LogSeverity = LogSeverity.Disable;
-            }
-
-            settings.IgnoreCertificateErrors = true;
-            settings.CefCommandLineArgs.Add("no-proxy-server", "1");
-            settings.UserAgent = "CefSharp Browser" + Cef.CefSharpVersion;
-            settings.CefCommandLineArgs.Add("disable-extensions", "1");
-            settings.CefCommandLineArgs.Add("disable-pdf-extension", "1");
-
-            settings.BrowserSubprocessPath = Path.Combine(AssemblyDir,
-                                                          Environment.Is64BitProcess ? "x64" : "x86",
-                                                          "CefSharp.BrowserSubprocess.exe");
-
-            Log.Instance.Debug($"[ChromiumBrowserFactory] CEF settings: {settings.DumpToTextRaw()}");
-            if (!Cef.Initialize(settings, true, new BrowserProcessHandler()))
-            {
-                throw new ApplicationException("Failed to initialize CEF");
-            }
-
-            Disposable.Create(
-                () =>
-                {
-                    Log.Instance.Debug("[ChromiumBrowserFactory] Shutting down CEF...");
-                    Cef.Shutdown();
-                    Log.Instance.Debug("[ChromiumBrowserFactory] CEF has been shut down");
-                }).AddTo(Anchors);
         }
 
         public IChromiumBrowser CreateBrowser()

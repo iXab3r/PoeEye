@@ -23,13 +23,6 @@
         <Style TargetType="StackPanel">
           <Setter Property="Orientation" Value="Horizontal" />
         </Style>
-          
-        <ObjectDataProvider x:Key="TriStateProviderKey" MethodName="GetValues"
-                            ObjectType="{x:Type System:Enum}">
-            <ObjectDataProvider.MethodParameters>
-                <x:Type TypeName="common:TriState" />
-            </ObjectDataProvider.MethodParameters>
-        </ObjectDataProvider>
       </Grid.Resources>
 
       <Grid.RowDefinitions>
@@ -71,13 +64,9 @@
 
         <TextBlock Grid.Row="0" Grid.Column="2"
                    Text="Type" Style="{StaticResource TextBlockHeader}" />
-        <ComboBox Grid.Row="0" Grid.Column="3" Grid.ColumnSpan="3"
-                  Style="{StaticResource QueryComboBox}"
-                  SelectedItem="{Binding ItemType}"
-                  DisplayMemberPath="Name"
-                  Width="420"
-                  IsEditable="True"
-                  ItemsSource="{Binding ItemTypes}" />
+        <ContentPresenter Grid.Row="0" Grid.Column="3" Grid.ColumnSpan="3"
+                          Content="{Binding ItemTypeSelector}"
+                          Width="420"/>
 
         <TextBlock Grid.Row="2" Grid.Column="0"
                    Text="Name" Style="{StaticResource TextBlockHeader}" />
@@ -393,9 +382,11 @@
                                  Text="Corrupted" Style="{StaticResource TextBlockHeader}" />
                       <StackPanel Grid.Row="0" Grid.Column="1" Margin="0,5">
                           <ComboBox Style="{StaticResource QueryComboBox}"
-                                    SelectedValue="{Binding CorruptionState}"
                                     Width="167"
                                     IsEditable="True"
+                                    SelectedValue="{Binding CorruptionState}"
+                                    DisplayMemberPath="Description"
+                                    SelectedValuePath="Value"
                                     ItemsSource="{Binding Source={StaticResource TriStateProviderKey}}" />
                       </StackPanel>            
                       
@@ -405,9 +396,11 @@
                           <StackPanel.Resources>
                           </StackPanel.Resources>
                           <ComboBox Style="{StaticResource QueryComboBox}"
-                                    SelectedValue="{Binding CraftState}"
                                     Width="167"
                                     IsEditable="True"
+                                    SelectedValue="{Binding CraftState}"
+                                    DisplayMemberPath="Description"
+                                    SelectedValuePath="Value"
                                     ItemsSource="{Binding Source={StaticResource TriStateProviderKey}}" />
                       </StackPanel> 
                       
@@ -417,9 +410,11 @@
                           <StackPanel.Resources>
                           </StackPanel.Resources>
                           <ComboBox Style="{StaticResource QueryComboBox}"
-                                    SelectedValue="{Binding EnchantState}"
                                     Width="167"
                                     IsEditable="True"
+                                    SelectedValue="{Binding EnchantState}"
+                                    DisplayMemberPath="Description"
+                                    SelectedValuePath="Value"
                                     ItemsSource="{Binding Source={StaticResource TriStateProviderKey}}" />
                       </StackPanel> 
                       
@@ -427,9 +422,11 @@
                                  Text="Shaped" Style="{StaticResource TextBlockHeader}" />
                       <StackPanel Grid.Row="1" Grid.Column="1" Margin="0,5">
                           <ComboBox Style="{StaticResource QueryComboBox}"
-                                    SelectedValue="{Binding AffectedByShaperState}"
                                     Width="165"
                                     IsEditable="True"
+                                    SelectedValue="{Binding AffectedByShaperState}"
+                                    DisplayMemberPath="Description"
+                                    SelectedValuePath="Value"
                                     ItemsSource="{Binding Source={StaticResource TriStateProviderKey}}" />
                       </StackPanel>
 
@@ -437,9 +434,11 @@
                                  Text="Elder" Style="{StaticResource TextBlockHeader}" />
                       <StackPanel Grid.Row="1" Grid.Column="3" Margin="0,5">
                           <ComboBox Style="{StaticResource QueryComboBox}"
-                                    SelectedValue="{Binding AffectedByElderState}"
                                     Width="167"
                                     IsEditable="True"
+                                    SelectedValue="{Binding AffectedByElderState}"
+                                    DisplayMemberPath="Description"
+                                    SelectedValuePath="Value"
                                     ItemsSource="{Binding Source={StaticResource TriStateProviderKey}}" />
                       </StackPanel>        
                   </Grid>
@@ -521,9 +520,11 @@
                 </ObjectDataProvider>
             </StackPanel.Resources>
             <ComboBox Style="{StaticResource QueryComboBox}"
-                      SelectedValue="{Binding ItemRarity}"
                       Width="165"
                       IsEditable="True"
+                      SelectedValue="{Binding ItemRarity}"
+                      DisplayMemberPath="Description"
+                      SelectedValuePath="Value"
                       ItemsSource="{Binding Source={StaticResource PoeItemRarityFromEnum}}" />
         </StackPanel>
 
@@ -554,9 +555,9 @@
                     controls:TextBoxHelper.Watermark="select currency" />
 
           <ComboBox Style="{StaticResource QueryComboBox}"
-                    SelectedValue="{Binding BuyoutMode}"
                     Width="275"
                     IsEditable="True"
+                    SelectedValue="{Binding BuyoutMode}"
                     DisplayMemberPath="Description"
                     SelectedValuePath="Value"
                     ItemsSource="{Binding Source={StaticResource PoeItemBuyoutModeFromEnum}}"

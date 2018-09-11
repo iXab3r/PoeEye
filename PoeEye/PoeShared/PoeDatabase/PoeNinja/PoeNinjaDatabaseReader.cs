@@ -189,9 +189,9 @@ namespace PoeShared.PoeDatabase.PoeNinja
         }
 
         internal struct GenericResponse
-        {
-            public List<GenericItem> Lines { get; set; }
-        }
+                 {
+                     public List<GenericItem> Lines { get; set; }
+                 }
 
         internal struct CurrencyResponse
         {

@@ -26,6 +26,7 @@ using PoeShared.Scaffolding;
 using PoeShared.Scaffolding.WPF;
 using PoeShared.UI;
 using Prism.Commands;
+using Prism.Regions;
 using ReactiveUI;
 using Unity.Attributes;
 
@@ -156,7 +157,7 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
             }
 
             Observable.Merge(
-                          tabsListSource.Connect().ToObservableChangeSet().ToUnit(),
+                          tabsListSource.Connect().ToUnit(),
                           tabsListSource.Connect().WhenPropertyChanged(x => x.SelectedAudioNotificationType).ToUnit(),
                           tabsListSource.Connect().WhenPropertyChanged(x => x.TabName).ToUnit()
                       )
@@ -268,6 +269,7 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
 
             Log.Instance.Debug(
                 $"[PositionMonitor] Source ordering:\n\tSource: {string.Join(" => ", existingItems.Select(x => x.Id))}\n\tView: {string.Join(" => ", newItems.Select(x => x.Id))}");
+            configUpdateSubject.OnNext(Unit.Default);
         }
 
         private async Task OpenAppDataDirectory()
@@ -303,7 +305,7 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
 
             newTab
                 .WhenAnyValue(x => x.Query)
-                .Select(x => x.Changed.ToUnit())
+                .Select(x => x != null ? x.Changed.ToUnit() : Observable.Return(Unit.Default).Concat(Observable.Never<Unit>()))
                 .Switch()
                 .Subscribe(configUpdateSubject)
                 .AddTo(newTab.Anchors);
@@ -362,7 +364,14 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
             Log.Instance.Debug($"[MainWindowViewModel.SaveConfig] Saving config (provider: {poeEyeConfigProvider})...\r\nTabs count: {TabsList.Count}");
 
             var config = poeEyeConfigProvider.ActualConfig;
-            config.TabConfigs = positionMonitor.Items.Select(tab => tab.Save()).ToArray();
+            
+            var positionedItems = positionMonitor.Items.ToArray();
+            config.TabConfigs =  tabsListSource.Items
+                                               .Select(x => new { Idx = positionedItems.IndexOf(x), Tab = x })
+                                               .OrderBy(x => x.Idx)
+                                               .Select(x => x.Tab)
+                                               .Select(tab => tab.Save())
+                                               .ToArray();
 
             poeEyeConfigProvider.Save(config);
         }

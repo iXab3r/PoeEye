@@ -35,6 +35,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PoeEye.StashGrid", "PoeEye.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PoeEye.Pickit", "PoeEye.Pickit\PoeEye.Pickit.csproj", "{DC0A4ED0-09A5-4B42-B4F1-A51D04D8F714}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PoeEye.PathOfExileTrade", "PoeEye.PathOfExileTrade\PoeEye.PathOfExileTrade.csproj", "{AA60411B-1EAD-4925-ACF0-2380AECE35C6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -72,6 +74,8 @@ Global
 		{D68029E1-F012-457D-9539-FBAA9E1DB33B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DC0A4ED0-09A5-4B42-B4F1-A51D04D8F714}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{DC0A4ED0-09A5-4B42-B4F1-A51D04D8F714}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AA60411B-1EAD-4925-ACF0-2380AECE35C6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AA60411B-1EAD-4925-ACF0-2380AECE35C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

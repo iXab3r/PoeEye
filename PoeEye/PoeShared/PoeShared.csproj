@@ -258,6 +258,7 @@
   <ItemGroup>
     <Compile Include="AppArguments.cs" />
     <Compile Include="Common\ItemPosition.cs" />
+    <Compile Include="Common\PoeItemBuilder.cs" />
     <Compile Include="Common\PoeModOrigin.cs" />
     <Compile Include="Common\PoeItemModificatins.cs" />
     <Compile Include="Common\TriState.cs" />
@@ -296,6 +297,7 @@
     <Compile Include="PoeTrade\IPoeItemViewModelFactory.cs" />
     <Compile Include="PoeTrade\IPoePriceCalculcator.cs" />
     <Compile Include="PoeTrade\IPoeStaticDataSource.cs" />
+    <Compile Include="PoeTrade\Query\IPoeStaticDataProvider.cs" />
     <Compile Include="Prism\PoeSharedModule.cs" />
     <Compile Include="Scaffolding\ChangeSetExtensions.cs" />
     <Compile Include="Scaffolding\CircularBuffer.cs" />
@@ -306,6 +308,7 @@
     <Compile Include="Scaffolding\IClipboardManager.cs" />
     <Compile Include="Scaffolding\PoeItemExtensions.cs" />
     <Compile Include="Scaffolding\ReactiveObjectExtensions.cs" />
+    <Compile Include="Scaffolding\RestEaseResponseExtensions.cs" />
     <Compile Include="Scaffolding\StreamExtensions.cs" />
     <Compile Include="Scaffolding\StringCompressor.cs" />
     <Compile Include="Scaffolding\WPF\AccessKeyScoper.cs" />
@@ -329,8 +332,8 @@
     <Compile Include="StashApi\DataTypes\IStashTab.cs" />
     <Compile Include="StashApi\DataTypes\StashItem.cs" />
     <Compile Include="StashApi\DataTypes\League.cs" />
+    <Compile Include="StashApi\DataTypes\StashItemExtendedInfo.cs" />
     <Compile Include="StashApi\DataTypes\StashItemProperty.cs" />
-    <Compile Include="StashApi\DataTypes\StashItemRequirement.cs" />
     <Compile Include="StashApi\DataTypes\StashItemSocket.cs" />
     <Compile Include="StashApi\DataTypes\Stash.cs" />
     <Compile Include="StashApi\DataTypes\StashTabType.cs" />
@@ -421,7 +424,7 @@
     <Compile Include="PoeTrade\Query\IPoeQueryArgument.cs" />
     <Compile Include="PoeTrade\Query\PoeQueryArgumentBase.cs" />
     <Compile Include="PoeTrade\Query\PoeQueryFloatArgument.cs" />
-    <Compile Include="PoeTrade\Query\PoeQueryInfoProvider.cs" />
+    <Compile Include="PoeTrade\Query\PoeStaticDataProvider.cs" />
     <Compile Include="PoeTrade\Query\PoeQueryIntArgument.cs" />
     <Compile Include="PoeTrade\Query\PoeQueryModArgument.cs" />
     <Compile Include="PoeTrade\Query\PoeQueryModsGroupType.cs" />

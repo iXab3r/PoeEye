@@ -13,6 +13,7 @@ using PoeShared.Native;
 using PoeShared.PoeDatabase;
 using PoeShared.PoeDatabase.PoeNinja;
 using PoeShared.PoeTrade;
+using PoeShared.PoeTrade.Query;
 using PoeShared.Scaffolding;
 using PoeShared.StashApi;
 using PoeShared.StashApi.DataTypes;
@@ -65,6 +66,7 @@ namespace PoeShared.Prism
                 .RegisterType<IHttpClient, GenericHttpClient>()
                 .RegisterType<IPoeApiWrapper, PoeApiWrapper>()
                 .RegisterType<IPoeStashClient, PoeStashClient>()
+                .RegisterType<IPoeStaticDataProvider, PoeStaticDataProvider>()
                 .RegisterType<IPoeEconomicsSource, PoeNinjaDatabaseReader>()
                 .RegisterType<IOverlayWindowController, OverlayWindowController>()
                 .RegisterType<IAudioNotificationSelectorViewModel, AudioNotificationSelectorViewModel>()

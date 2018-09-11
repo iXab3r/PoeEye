@@ -23,13 +23,14 @@
                 <DockPanel LastChildFill="True">
                     <Label DockPanel.Dock="Left"
                            FontFamily="{StaticResource FontAwesome}"
-                           Foreground="{StaticResource ValidationSummaryColor3}"
+                           Foreground="{StaticResource ValidationErrorBrush}"
                            VerticalAlignment="Stretch"
                            HorizontalAlignment="Stretch"
                            VerticalContentAlignment="Center"
                            HorizontalContentAlignment="Center"
                            Margin="3,0"
                            FontSize="20"
+                           ToolTip="{Binding Error}"
                            Visibility="{Binding IsAvailable, Converter={StaticResource TrueToCollapsedFalseToVisibleConverter}}"
                            fa:Awesome.Content="Warning" />
                     <controls:ProgressRing DockPanel.Dock="Right"

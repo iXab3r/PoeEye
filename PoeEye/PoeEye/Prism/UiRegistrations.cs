@@ -30,6 +30,7 @@ namespace PoeEye.Prism
             Container
                 .RegisterType<IPoeAdvancedTradesListViewModel, PoeAdvancedTradesListViewModel>()
                 .RegisterType<IPoeSummaryTabViewModel, PoeSummaryTabViewModel>()
+                .RegisterType<IPoeItemTypeSelectorViewModel, PoeItemTypeSelectorViewModel>()
                 .RegisterType<IApplicationUpdaterModel, ApplicationUpdaterModel>()
                 .RegisterType<IPoeItemModsViewModel, PoeItemModsViewModel>()
                 .RegisterType<IPoeTradeViewModel, PoeTradeViewModel>()

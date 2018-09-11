@@ -18,8 +18,6 @@ namespace PoeEye.Config
 
         public string CustomTabName { get; set; }
 
-        public string QuickFilter { get; set; }
-
         public override string ToString()
         {
             return $"[Timeout: {RecheckTimeout}] Query: {QueryInfo}";

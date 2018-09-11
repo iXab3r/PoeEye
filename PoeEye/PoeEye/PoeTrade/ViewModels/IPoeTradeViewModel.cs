@@ -17,7 +17,7 @@ namespace PoeEye.PoeTrade.ViewModels
 
         PoePrice? PriceInChaosOrbs { get; }
 
-        TimeSpan TimeElapsedSinceLastIndexation { get; }
+        TimeSpan? TimeElapsedSinceLastIndexation { get; }
 
         IPoeItem Trade { [NotNull] get; }
 

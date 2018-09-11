@@ -10,7 +10,7 @@ namespace PoeShared.Scaffolding.WPF
         {
             var values = Enum.GetValues(enumType).Cast<object>();
             var valuesAndDescriptions = from value in values
-                                        select new EnumValueWithDescription
+                                        select new
                                         {
                                             Value = value,
                                             Description = value.GetType()
@@ -18,9 +18,23 @@ namespace PoeShared.Scaffolding.WPF
                                                                .GetCustomAttributes(true)
                                                                .OfType<DescriptionAttribute>()
                                                                .FirstOrDefault()?
-                                                               .Description ?? value.ToString()
+                                                               .Description ?? value.ToString(),
+                                            Browsable = value.GetType()
+                                                             .GetMember(value.ToString())[0]
+                                                             .GetCustomAttributes(true)
+                                                             .OfType<BrowsableAttribute>()
+                                                             .FirstOrDefault()?
+                                                             .Browsable ?? true
                                         };
-            return valuesAndDescriptions.ToArray();
+
+            return valuesAndDescriptions
+                   .Where(x => x.Browsable)
+                   .Select(x => new EnumValueWithDescription
+                   {
+                       Value = x.Value,
+                       Description = x.Description
+                   })
+                   .ToArray();
         }
 
         public static T SetFlags<T>(this T instance, T flagToSet) where T : struct

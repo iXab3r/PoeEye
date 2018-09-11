@@ -70,12 +70,11 @@
                        x:Key="ItemStatMedium">
                     <Setter Property="FontSize" Value="14" />
                 </Style>
-
-                <Style TargetType="{x:Type Label}" BasedOn="{StaticResource IconLabel}"
+                
+                <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource ItemStatValue}"
                        x:Key="ItemStatHeader">
-                    <Setter Property="HorizontalContentAlignment" Value="Right" />
+                    <Setter Property="HorizontalAlignment" Value="Left" />
                     <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
-                    <Setter Property="FontSize" Value="12" />
                     <Setter Property="Margin" Value="0,0,5,0" />
                 </Style>
 
@@ -94,24 +93,24 @@
 
                 <StackPanel HorizontalAlignment="Center"
                             Visibility="{Binding ItemLevel, Converter={StaticResource NullToCollapsedConverter}}">
-                    <Label Content="Level: " Style="{StaticResource ItemStatHeader}" />
+                    <TextBlock Text="Level: " Style="{StaticResource ItemStatHeader}" />
                     <TextBlock Text="{Binding ItemLevel}" Style="{StaticResource ItemStatMedium}" />
                 </StackPanel>
 
                 <StackPanel Visibility="{Binding Armour, Converter={StaticResource NullToCollapsedConverter}}">
-                    <Label Content="Armour: " Style="{StaticResource ItemStatHeader}" />
+                    <TextBlock Text="Armour: " Style="{StaticResource ItemStatHeader}" />
                     <TextBlock Text="{Binding Armour}" Style="{StaticResource ItemStatMedium}"
                                Foreground="{StaticResource PoeItemStrStatBrush}" />
                 </StackPanel>
 
                 <StackPanel Visibility="{Binding Evasion, Converter={StaticResource NullToCollapsedConverter}}">
-                    <Label Content="Evasion: " Style="{StaticResource ItemStatHeader}" />
+                    <TextBlock Text="Evasion: " Style="{StaticResource ItemStatHeader}" />
                     <TextBlock Text="{Binding Evasion}" Style="{StaticResource ItemStatMedium}"
                                Foreground="{StaticResource PoeItemDexStatBrush}" />
                 </StackPanel>
 
                 <StackPanel Visibility="{Binding Shield, Converter={StaticResource NullToCollapsedConverter}}">
-                    <Label Content="Shield: " Style="{StaticResource ItemStatHeader}" />
+                    <TextBlock Text="Shield: " Style="{StaticResource ItemStatHeader}" />
                     <TextBlock Text="{Binding Shield}" Style="{StaticResource ItemStatMedium}"
                                Foreground="{StaticResource PoeItemIntStatBrush}" />
                 </StackPanel>
@@ -119,7 +118,7 @@
                 <StackPanel HorizontalAlignment="Center"
                             Visibility="{Binding DamagePerSecond, Converter={StaticResource NullToCollapsedConverter}}">
                     <TextBlock Text="{Binding DamagePerSecond}" Style="{StaticResource ItemStatValueLarge}" />
-                    <Label Content="DPS" Style="{StaticResource ItemStatHeader}" />
+                    <TextBlock Text="DPS" Style="{StaticResource ItemStatHeader}" />
                 </StackPanel>
 
                 <StackPanel>
@@ -131,7 +130,7 @@
                             </MultiBinding.Bindings>
                         </MultiBinding>
                     </StackPanel.Visibility>
-                    <Label Content="DPS: " Style="{StaticResource ItemStatHeader}" />
+                    <TextBlock Text="DPS: " Style="{StaticResource ItemStatHeader}" />
                     <TextBlock Text="{Binding PhysicalDamagePerSecond, FallbackValue=0.0}" ToolTip="Physical DPS"
                                Style="{StaticResource ItemStatMedium}"
                                Foreground="{StaticResource PoeItemPhysicalStatBrush}" />
@@ -159,7 +158,7 @@
                             </MultiBinding.Bindings>
                         </MultiBinding>
                     </StackPanel.Visibility>
-                    <Label Content="Damage: " Style="{StaticResource ItemStatHeader}" />
+                    <TextBlock Text="Damage: " Style="{StaticResource ItemStatHeader}" />
                     <TextBlock Text="{Binding Physical, FallbackValue=0.0}" Style="{StaticResource ItemStatMedium}"
                                ToolTip="Physical Damage" Foreground="{StaticResource PoeItemPhysicalStatBrush}" />
                     <TextBlock Text=" &#xf055; " Style="{StaticResource ItemStatValue}">
@@ -178,22 +177,22 @@
 
                 <StackPanel
                     Visibility="{Binding AttacksPerSecond, Converter={StaticResource NullToCollapsedConverter}}">
-                    <Label Content="Attacks per Second: " Style="{StaticResource ItemStatHeader}" />
+                    <TextBlock Text="Attacks per Second: " Style="{StaticResource ItemStatHeader}" />
                     <TextBlock Text="{Binding AttacksPerSecond}" Style="{StaticResource ItemStatValue}" />
                 </StackPanel>
 
                 <StackPanel Visibility="{Binding CriticalChance, Converter={StaticResource NullToCollapsedConverter}}">
-                    <Label Content="Base Critical Chance: " Style="{StaticResource ItemStatHeader}" />
+                    <TextBlock Text="Base Critical Chance: " Style="{StaticResource ItemStatHeader}" />
                     <TextBlock Text="{Binding CriticalChance}" Style="{StaticResource ItemStatValue}" />
                 </StackPanel>
 
                 <StackPanel Visibility="{Binding BlockChance, Converter={StaticResource NullToCollapsedConverter}}">
-                    <Label Content="Block: " Style="{StaticResource ItemStatHeader}" />
+                    <TextBlock Text="Block: " Style="{StaticResource ItemStatHeader}" />
                     <TextBlock Text="{Binding BlockChance}" Style="{StaticResource ItemStatValue}" />
                 </StackPanel>
 
                 <StackPanel Visibility="{Binding Quality, Converter={StaticResource NullToCollapsedConverter}}">
-                    <Label Content="Quality: " Style="{StaticResource ItemStatHeader}" />
+                    <TextBlock Text="Quality: " Style="{StaticResource ItemStatHeader}" />
                     <TextBlock Text="{Binding Quality}" Style="{StaticResource ItemStatValue}" />
                 </StackPanel>
             </StackPanel>

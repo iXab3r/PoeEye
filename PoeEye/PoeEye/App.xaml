@@ -47,6 +47,7 @@
                 <ResourceDictionary Source="PoeTrade/Updater/ApplicationUpdaterView.xaml" />
                 <ResourceDictionary Source="PoeTrade/Views/PoeChatView.xaml" />
                 <ResourceDictionary Source="PoeTrade/Views/PoeApiSelectorView.xaml" />
+                <ResourceDictionary Source="PoeTrade/Views/PoeItemTypeSelectorViewModel.xaml" />
 
                 <ResourceDictionary Source="PoeTrade/Views/PoeSummaryTabView.xaml" />
                 <ResourceDictionary Source="PoeTrade/Views/MainWindowTabItemView.xaml" />

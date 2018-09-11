@@ -13,6 +13,8 @@ namespace PoeShared.PoeTrade
         bool IsAvailable { get; }
 
         string Name { [NotNull] get; }
+        
+        string Error { [CanBeNull] get; }
 
         Guid Id { get; }
 

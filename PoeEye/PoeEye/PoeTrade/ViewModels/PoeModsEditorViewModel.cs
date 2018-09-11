@@ -6,6 +6,7 @@ using System.Windows.Input;
 using Guards;
 using JetBrains.Annotations;
 using PoeEye.PoeTrade.Models;
+using PoeShared;
 using PoeShared.Common;
 using PoeShared.PoeTrade;
 using PoeShared.PoeTrade.Query;
@@ -25,7 +26,7 @@ namespace PoeEye.PoeTrade.ViewModels
 
         private readonly IReactiveSuggestionProvider suggestionProvider;
 
-        private PoeQueryModsGroupType groupType;
+        private PoeQueryModsGroupType groupType = PoeQueryModsGroupType.And;
         private IDictionary<string, IPoeItemMod> knownModsByName = new Dictionary<string, IPoeItemMod>();
 
         private float? maxGroupValue;
@@ -122,11 +123,18 @@ namespace PoeEye.PoeTrade.ViewModels
 
         private IDictionary<string, IPoeItemMod> ToItemMods(IPoeStaticData staticData)
         {
-            var modsByName = staticData
-                             .ModsList
-                             .ToDictionary(x => x.Name, x => x);
+            var result = new Dictionary<string, IPoeItemMod>();
+            foreach (var itemMod in staticData.ModsList)
+            {
+                if (result.ContainsKey(itemMod.Name))
+                {
+                    Log.Instance.Warn($"[PoeModsEditorViewModel] Duplicate mod detected: {itemMod.DumpToTextRaw()} and {result[itemMod.Name].DumpToTextRaw()} share the same key");
+                    continue;
+                }
 
-            return modsByName;
+                result[itemMod.Name] = itemMod;
+            }
+            return result;
         }
 
         private void RemoveModCommandExecuted(IPoeModViewModel modToRemove)

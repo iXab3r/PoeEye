@@ -403,6 +403,7 @@
     <Compile Include="PoeTrade\ViewModels\IPoeChatViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\IPoeAdvancedTradesListViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\IPoeItemModsViewModel.cs" />
+    <Compile Include="PoeTrade\ViewModels\IPoeItemTypeSelectorViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\IPoeModGroupsEditorViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\IPoeModsEditorViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\IPoeModViewModel.cs" />
@@ -417,6 +418,7 @@
     <Compile Include="PoeTrade\ViewModels\PoeEyeSettingsViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\PoeEyeUpdateSettingsViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\PoeItemModsViewModel.cs" />
+    <Compile Include="PoeTrade\ViewModels\PoeItemTypeSelectorViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\PoeLinksInfoViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\MainWindowTabViewModel.cs" />
     <Compile Include="PoeTrade\Shell\ViewModels\MainWindowViewModel.cs" />
@@ -495,6 +497,10 @@
       <Project>{ea3109dd-675d-4837-977d-af61b203bebc}</Project>
       <Name>PoeEye.ItemParser</Name>
     </ProjectReference>
+    <ProjectReference Include="..\PoeEye.PathOfExileTrade\PoeEye.PathOfExileTrade.csproj">
+      <Project>{aa60411b-1ead-4925-acf0-2380aece35c6}</Project>
+      <Name>PoeEye.PathOfExileTrade</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PoeEye.PoeTradeRealtimeApi\PoeEye.PoeTradeRealtimeApi.csproj">
       <Project>{0e9b96e1-a5dc-4f5a-8f43-40be640d50f4}</Project>
       <Name>PoeEye.PoeTradeRealtimeApi</Name>
@@ -550,6 +556,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="PoeTrade\Views\PoeChatView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="PoeTrade\Views\PoeItemTypeSelectorViewModel.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

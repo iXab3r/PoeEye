@@ -1,5 +1,7 @@
-﻿using Guards;
+﻿using System;
+using Guards;
 using JetBrains.Annotations;
+using PoeShared;
 using PoeShared.Common;
 using PoeShared.Scaffolding;
 
@@ -7,57 +9,58 @@ namespace PoeEye.PoeTrade.ViewModels
 {
     internal sealed class PoeLinksInfoViewModel : DisposableReactiveObject
     {
+        private readonly string[] colors = new string[6];
+        private readonly bool[] links = new bool[6];
+        
         public PoeLinksInfoViewModel([NotNull] IPoeLinksInfo linksInfo)
         {
             Guard.ArgumentNotNull(linksInfo, nameof(linksInfo));
 
             var rawSockets = linksInfo.RawSockets ?? string.Empty;
-            rawSockets = rawSockets.PadRight(11, ' ');
 
-            var parsedSockets = rawSockets.Replace(" ", string.Empty);
-            parsedSockets = parsedSockets.Replace("-", string.Empty);
-
-            var sockets = new string[6];
-            for (var i = 0; i < parsedSockets.Length; i++)
+            try
             {
-                sockets[i] = parsedSockets.Substring(i, 1);
+                var socketIdx = 0;
+                var linkIdx = 0;
+                foreach (var symbol in rawSockets)
+                {
+                    if (symbol == '-')
+                    {
+                        links[linkIdx - 1] = true;
+                        continue;
+                    }
+
+                    colors[socketIdx] = symbol.ToString();
+                    socketIdx++;
+                    linkIdx++;
+                }
             }
-
-            Socket1 = sockets[0];
-            Socket2 = sockets[1];
-            Socket3 = sockets[2];
-            Socket4 = sockets[3];
-            Socket5 = sockets[4];
-            Socket6 = sockets[5];
-
-            Link1 = rawSockets[1] == '-';
-            Link2 = rawSockets[3] == '-';
-            Link3 = rawSockets[5] == '-';
-            Link4 = rawSockets[7] == '-';
-            Link5 = rawSockets[9] == '-';
+            catch (Exception e)
+            {
+                Log.Instance.Error($"Failed to parse sockets {rawSockets}", e);
+            }
         }
 
+        public string Socket1 => colors[0];
 
-        public string Socket1 { get; }
+        public string Socket2 => colors[1];
 
-        public string Socket2 { get; }
+        public string Socket3 => colors[2];
 
-        public string Socket3 { get; }
+        public string Socket4 => colors[3];
 
-        public string Socket4 { get; }
+        public string Socket5 => colors[4];
 
-        public string Socket5 { get; }
+        public string Socket6 => colors[5];
 
-        public string Socket6 { get; }
+        public bool Link1  => links[0];
 
-        public bool Link1 { get; }
+        public bool Link2 => links[1];
 
-        public bool Link2 { get; }
+        public bool Link3 => links[2];
 
-        public bool Link3 { get; }
+        public bool Link4 => links[3];
 
-        public bool Link4 { get; }
-
-        public bool Link5 { get; }
+        public bool Link5 => links[4];
     }
 }

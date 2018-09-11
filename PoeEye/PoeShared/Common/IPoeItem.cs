@@ -83,6 +83,6 @@ namespace PoeShared.Common
 
         IPoeLinksInfo Links { get; }
 
-        DateTime Timestamp { get; set; }
+        DateTime? Timestamp { get; set; }
     }
 }

@@ -2,7 +2,8 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:blue="http://www.nuget.org/Blue.MVVM"
                     xmlns:converters="clr-namespace:PoeEye.Converters"
-                    xmlns:eye="http://coderush.net/poeeye/">
+                    xmlns:eye="http://coderush.net/poeeye/"
+                    xmlns:query="clr-namespace:PoeShared.Common;assembly=PoeShared">
 
   <converters:NullToVisibilityConverter x:Key="NullToCollapsedConverter" NullValue="Collapsed" NotNullValue="Visible" />
   <converters:NullToVisibilityConverter x:Key="NotNullToCollapsedConverter" NullValue="Visible"
@@ -17,6 +18,14 @@
   <converters:TimeSpanToSecondsConverter x:Key="TimeSpanToSecondsConverter" />
 
   <eye:PriceToImageUriConverter x:Key="PriceToImageUriConverter" />
+  
+  <ObjectDataProvider x:Key="TriStateProviderKey"
+                      MethodName="GetValuesAndDescriptions"
+                      ObjectType="eye:EnumHelper">
+    <ObjectDataProvider.MethodParameters>
+      <x:TypeExtension TypeName="query:TriState" />
+    </ObjectDataProvider.MethodParameters>
+  </ObjectDataProvider>
 
   <blue:BoolToVisibilityConverter x:Key="BoolTrueToCollapsedConverter" TrueValue="Collapsed" FalseValue="Visible" />
   <blue:BoolToVisibilityConverter x:Key="BoolFalseToHiddenConverter" TrueValue="Visible" FalseValue="Hidden" />

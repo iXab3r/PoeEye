@@ -43,11 +43,11 @@ namespace PoeShared.StashApi.DataTypes
 
         string Name { get; }
 
-        List<StashItemRequirement> nextLevelRequirements { get; }
+        List<StashItemProperty> nextLevelRequirements { get; }
 
         List<StashItemProperty> Properties { get; }
 
-        List<StashItemRequirement> Requirements { get; }
+        List<StashItemProperty> Requirements { get; }
 
         string SecDescrText { get; }
 
@@ -76,5 +76,7 @@ namespace PoeShared.StashApi.DataTypes
         int MaxStackSize { get; }
 
         ItemPosition Position { get; }
+
+        StashItemExtendedInfo Extended { get; }
     }
 }

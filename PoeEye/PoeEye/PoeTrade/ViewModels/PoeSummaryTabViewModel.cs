@@ -97,7 +97,6 @@ namespace PoeEye.PoeTrade.ViewModels
                           this.WhenAnyValue(x => x.ShowRemovedItems).ToUnit(),
                           this.WhenAnyValue(x => x.QuickFilter).ToUnit()
                       )
-                      .Throttle(ResortRefilterThrottleTimeout)
                       .Subscribe(rebuildFilterRequest)
                       .AddTo(Anchors);
         }

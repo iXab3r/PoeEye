@@ -32,7 +32,7 @@ namespace PoeEye.PoeTrade
             {
                 return Task.Run(() => default(bool?));
             }
-
+            
             return Task.Run(() => VerifyInternal(item.Hash, item.ThreadId));
         }
 
