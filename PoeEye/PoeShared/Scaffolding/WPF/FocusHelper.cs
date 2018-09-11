@@ -70,13 +70,6 @@ namespace PoeShared.Scaffolding.WPF
         private static bool ApplyFocus(FrameworkElement element)
         {
             element.Loaded -= ElementOnLoaded;
-            
-            if (!element.IsLoaded || !element.IsVisible)
-            {
-                element.Loaded += ElementOnLoaded;
-
-                return false;
-            }
 
             if (!element.Focusable)
             {
@@ -91,7 +84,14 @@ namespace PoeShared.Scaffolding.WPF
                 return ApplyFocus(targetElement);
             }
 
-            return element.Focus();
+            if (!element.IsLoaded || !element.IsVisible || !element.Focus())
+            {
+                element.Loaded += ElementOnLoaded;
+
+                return false;
+            }
+
+            return element.IsFocused;
         }
 
         private static void ElementOnIsVisibleChanged(object sender, DependencyPropertyChangedEventArgs dependencyPropertyChangedEventArgs)
