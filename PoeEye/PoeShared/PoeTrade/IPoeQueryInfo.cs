@@ -49,8 +49,6 @@ namespace PoeShared.PoeTrade
 
         int? IncQuantityMin { get; }
 
-        bool IsExpanded { get; }
-
         string ItemBase { get; }
 
         string ItemName { get; }

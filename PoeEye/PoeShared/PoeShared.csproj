@@ -407,7 +407,7 @@
     <Compile Include="PoeTrade\IPoeItemVerifier.cs" />
     <Compile Include="PoeTrade\IPoeLiveHistoryProvider.cs" />
     <Compile Include="PoeTrade\IPoeQueryInfo.cs" />
-    <Compile Include="PoeTrade\PoeApi.cs" />
+    <Compile Include="PoeTrade\PoeApiBase.cs" />
     <Compile Include="PoeTrade\PoeApiWrapper.cs" />
     <Compile Include="PoeTrade\PoeLiveHistoryProvider.cs" />
     <Compile Include="PoeTrade\PoeQueryInfo.cs" />

@@ -257,7 +257,6 @@ namespace PoeEye.PoeTradeRealtimeApi
                     "http://poe.trade",
                     WebSocketVersion.Rfc6455)
                 {
-                    AllowUnstrustedCertificate = true
                 };
                 Disposable.Create(() => WebSocketCloseSafe(webSocket, liveQueryName)).AddTo(anchors);
                 webSocket.AddTo(anchors);

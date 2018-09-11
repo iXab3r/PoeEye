@@ -20,6 +20,9 @@
       <Style TargetType="{x:Type Button}" BasedOn="{StaticResource CircleButton}"
              x:Key="AutoRecheckButtonStyle">
         <Style.Triggers>
+          <DataTrigger Binding="{Binding RecheckPeriod.IsLive}" Value="True">
+            <Setter Property="Foreground" Value="Yellow" />
+            </DataTrigger>
           <DataTrigger Binding="{Binding RecheckPeriod.IsAutoRecheckEnabled}" Value="True">
             <Setter Property="Foreground" Value="Green" />
           </DataTrigger>

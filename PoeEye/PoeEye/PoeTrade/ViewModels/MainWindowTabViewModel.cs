@@ -191,7 +191,6 @@ namespace PoeEye.PoeTrade.ViewModels
             if (config.RecheckTimeout != default(TimeSpan))
             {
                 RecheckPeriod.Period = config.RecheckTimeout;
-                RecheckPeriod.IsAutoRecheckEnabled = config.IsAutoRecheckEnabled;
             }
 
             if (config.QueryInfo != null)
@@ -209,7 +208,6 @@ namespace PoeEye.PoeTrade.ViewModels
             return new PoeEyeTabConfig
             {
                 RecheckTimeout = RecheckPeriod.Period,
-                IsAutoRecheckEnabled = RecheckPeriod.IsAutoRecheckEnabled,
                 QueryInfo = Query.PoeQueryBuilder(),
                 NotificationType = AudioNotificationSelector.SelectedValue,
                 ApiModuleId = ApiSelector.SelectedModule?.Id.ToString(),
@@ -282,11 +280,8 @@ namespace PoeEye.PoeTrade.ViewModels
             tradesList.AddTo(anchors);
 
             RecheckPeriod
-                .WhenAny(x => x.Period, x => x.IsAutoRecheckEnabled, (x, y) => Unit.Default)
-                .Subscribe(
-                    x =>
-                        tradesList.RecheckPeriod =
-                            RecheckPeriod.IsAutoRecheckEnabled ? RecheckPeriod.Period : TimeSpan.Zero)
+                .WhenAnyValue(x => x.Period)
+                .Subscribe(x => tradesList.RecheckPeriod = x)
                 .AddTo(anchors);
 
             tradesList

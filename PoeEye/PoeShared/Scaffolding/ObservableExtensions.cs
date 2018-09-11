@@ -31,5 +31,17 @@ namespace PoeShared.Scaffolding
                              (previous, current) => Tuple.Create(previous.Item2, current))
                          .Select(t => resultSelector(t.Item1, t.Item2));
         }
+        
+        public static IObservable<T> RetryWithDelay<T>(this IObservable<T> source, TimeSpan timeSpan)
+        {
+            if (source == null)
+                throw new ArgumentNullException("source");
+            if (timeSpan < TimeSpan.Zero)
+                throw new ArgumentOutOfRangeException("timeSpan");
+            if (timeSpan == TimeSpan.Zero)
+                return source.Retry();
+ 
+            return source.Catch(Observable.Timer(timeSpan).SelectMany(_ => source).Retry());
+        }
     }
 }

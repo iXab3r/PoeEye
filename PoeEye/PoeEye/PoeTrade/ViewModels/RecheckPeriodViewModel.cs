@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Reactive.Linq;
+using System.Windows.Input;
 using Guards;
 using JetBrains.Annotations;
 using PoeEye.Config;
 using PoeShared.Modularity;
 using PoeShared.Scaffolding;
+using Prism.Commands;
 using ReactiveUI;
 
 namespace PoeEye.PoeTrade.ViewModels
@@ -16,10 +18,7 @@ namespace PoeEye.PoeTrade.ViewModels
         private static readonly TimeSpan DefaultMaxValue = TimeSpan.FromMinutes(30);
         private static readonly TimeSpan DefaultMinValue = TimeSpan.FromSeconds(30);
 
-        private bool isAutoRecheckEnabled;
-
         private TimeSpan maxValue = DefaultMaxValue;
-
         private TimeSpan minValue = DefaultMinValue;
 
         private TimeSpan period;
@@ -28,33 +27,38 @@ namespace PoeEye.PoeTrade.ViewModels
         {
             Guard.ArgumentNotNull(configProvider, nameof(configProvider));
 
-            this.WhenAnyValue(x => x.Period)
-                .Where(x => x == TimeSpan.Zero)
-                .Subscribe(() => IsAutoRecheckEnabled = false)
-                .AddTo(Anchors);
-
-            this.WhenAnyValue(x => x.Period)
-                .Where(x => x != TimeSpan.Zero)
-                .Where(x => x > maxValue || x < minValue)
-                .Subscribe(() => Period = MiddleSplit(minValue, maxValue))
-                .AddTo(Anchors);
-
-            this.WhenAnyValue(x => x.IsAutoRecheckEnabled)
-                .Subscribe(() => this.RaisePropertyChanged(nameof(Period)))
-                .AddTo(Anchors);
-
-            this.WhenAnyValue(x => x.IsAutoRecheckEnabled)
-                .Where(x => x)
-                .Where(x => period == TimeSpan.Zero)
-                .Subscribe(() => Period = MiddleSplit(minValue, maxValue))
-                .AddTo(Anchors);
-
             configProvider
                 .WhenChanged
                 .Select(x => new {x.MinRefreshTimeout, x.MaxRefreshTimeout})
                 .DistinctUntilChanged()
                 .Subscribe(x => Reinitialize(x.MinRefreshTimeout, x.MaxRefreshTimeout))
                 .AddTo(Anchors);
+            
+            SetPeriodCommand = new DelegateCommand<object>(SetPeriodCommandExecuted);
+
+            this.WhenAnyValue(x => x.Period)
+                .Subscribe(() =>
+                {
+                    this.RaisePropertyChanged(nameof(IsLive));
+                    this.RaisePropertyChanged(nameof(IsAutoRecheckEnabled));
+                })
+                .AddTo(Anchors);
+        }
+
+        private void SetPeriodCommandExecuted(object obj)
+        {
+            if (obj == null)
+            {
+                Period = TimeSpan.MinValue;
+            } 
+            else if (obj is double periodInSeconds)
+            {
+                Period = TimeSpan.FromSeconds(periodInSeconds);
+            }
+            else if (obj is TimeSpan period)
+            {
+                Period = period;
+            }
         }
 
         public TimeSpan MinValue
@@ -75,11 +79,11 @@ namespace PoeEye.PoeTrade.ViewModels
             set => this.RaiseAndSetIfChanged(ref period, value);
         }
 
-        public bool IsAutoRecheckEnabled
-        {
-            get => isAutoRecheckEnabled;
-            set => this.RaiseAndSetIfChanged(ref isAutoRecheckEnabled, value);
-        }
+        public ICommand SetPeriodCommand { get; }
+
+        public bool IsLive => Period == TimeSpan.Zero;
+
+        public bool IsAutoRecheckEnabled => Period > TimeSpan.Zero;
 
         private TimeSpan MiddleSplit(TimeSpan min, TimeSpan max)
         {
@@ -91,7 +95,15 @@ namespace PoeEye.PoeTrade.ViewModels
             MinValue = minRefreshTimeout == TimeSpan.Zero ? DefaultMinValue : minRefreshTimeout;
             MaxValue = maxRefreshTimeout == TimeSpan.Zero ? DefaultMaxValue : maxRefreshTimeout;
 
-            this.RaisePropertyChanged(nameof(Period));
+            if (Period <= TimeSpan.Zero)
+            {
+                return;
+            }
+
+            if (Period < MinValue || Period > MaxValue)
+            {
+                Period = MiddleSplit(MinValue, MaxValue);
+            }
         }
     }
 }

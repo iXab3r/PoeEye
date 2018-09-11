@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Guards;
 using JetBrains.Annotations;
@@ -26,6 +27,13 @@ namespace PoeEye.StashRealtimeApi.Services
         public string Name { get; } = "Stash Realtime API";
 
         public bool IsAvailable { get; } = true;
+
+        public IObservable<IPoeQueryResult> SubscribeToLiveUpdates(IPoeQueryInfo query)
+        {
+            Guard.ArgumentNotNull(query, nameof(query));
+
+            return Observable.Never<IPoeQueryResult>();
+        }
 
         public Task<IPoeQueryResult> IssueQuery(IPoeQueryInfo query)
         {

@@ -8,5 +8,7 @@ namespace PoeShared.PoeTrade.Query
         string Id { [CanBeNull] get; }
 
         IPoeItem[] ItemsList { [NotNull] get; }
+        
+        IPoeQueryInfo Query { [CanBeNull] get; }
     }
 }

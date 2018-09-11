@@ -70,6 +70,13 @@ namespace PoeEye.PoeTrade
 
         public bool IsAvailable { get; } = true;
 
+        public IObservable<IPoeQueryResult> SubscribeToLiveUpdates(IPoeQueryInfo query)
+        {
+            Guard.ArgumentNotNull(query, nameof(query));
+
+            return Observable.Never<IPoeQueryResult>();
+        }
+
         public async Task<IPoeQueryResult> IssueQuery(IPoeQueryInfo queryInfo)
         {
             Guard.ArgumentNotNull(queryInfo, nameof(queryInfo));

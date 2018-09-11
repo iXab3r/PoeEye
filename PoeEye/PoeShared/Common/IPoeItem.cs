@@ -75,7 +75,7 @@ namespace PoeShared.Common
 
         PoeItemModificatins Modifications { get; }
 
-        PoeTradeState ItemState { get; }
+        PoeTradeState ItemState { get; set; }
 
         PoeItemRarity Rarity { get; }
 

@@ -54,6 +54,14 @@ namespace PoeShared.PoeTrade
 
         public bool IsAvailable => api.IsAvailable && !StaticData.IsEmpty;
 
+        public IObservable<IPoeQueryResult> SubscribeToLiveUpdates(IPoeQueryInfo query)
+        {
+            Guard.ArgumentNotNull(query, nameof(query));
+            Log.Instance.Debug($"[PoeApiWrapper, {Name}] Subscribing to live query... {query.DumpToText(Formatting.None)}");
+
+            return api.SubscribeToLiveUpdates(query);
+        }
+
         public Task<IPoeQueryResult> IssueQuery(IPoeQueryInfo query)
         {
             Guard.ArgumentNotNull(query, nameof(query));

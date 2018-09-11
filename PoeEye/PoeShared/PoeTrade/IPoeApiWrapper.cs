@@ -18,6 +18,9 @@ namespace PoeShared.PoeTrade
 
         Guid Id { get; }
 
+        [NotNull] 
+        IObservable<IPoeQueryResult> SubscribeToLiveUpdates([NotNull] IPoeQueryInfo query);
+        
         [NotNull]
         Task<IPoeQueryResult> IssueQuery([NotNull] IPoeQueryInfo query);
 

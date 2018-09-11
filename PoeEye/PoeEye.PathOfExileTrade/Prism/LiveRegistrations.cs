@@ -14,6 +14,9 @@ namespace PoeEye.PathOfExileTrade.Prism
         protected override void Initialize()
         {
             Container
+                .RegisterType<IPathOfExileTradeLiveApi, PathOfExileTradeLiveApi>();
+            
+            Container
                 .RegisterSingleton<IConverter<IPoeQueryInfo, JsonSearchRequest.Query>, PoeQueryInfoToSearchRequestConverter>()
                 .RegisterSingleton<IPoeApi, PathOfExileTradeApi>(typeof(PathOfExileTradeApi).FullName);
         }

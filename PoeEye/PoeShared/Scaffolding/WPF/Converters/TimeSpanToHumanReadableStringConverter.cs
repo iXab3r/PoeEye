@@ -9,6 +9,12 @@ namespace PoeShared.Scaffolding.WPF.Converters
         //FIXME Remove duplicate converters
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
+            if (value is double)
+            {
+                var ts = TimeSpan.FromSeconds((double)value);
+                return Convert(ts, typeof(string), null, CultureInfo.InvariantCulture);
+            }
+            
             if (!(value is TimeSpan))
             {
                 return value;

@@ -8,8 +8,6 @@ namespace PoeEye.Config
     {
         public TimeSpan RecheckTimeout { get; set; }
 
-        public bool IsAutoRecheckEnabled { get; set; }
-
         public IPoeQueryInfo QueryInfo { get; set; }
 
         public AudioNotificationType NotificationType { get; set; }

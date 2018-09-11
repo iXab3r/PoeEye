@@ -285,7 +285,7 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
 
         private async Task RefreshAllTabsCommandExecuted()
         {
-            foreach (var tab in TabsList.Where(x => x.RecheckPeriod?.IsAutoRecheckEnabled == true).ToArray())
+            foreach (var tab in TabsList.Where(x => x.RecheckPeriod?.Period >= TimeSpan.Zero).ToArray())
             {
                 tab.RefreshCommand.Execute(tab.Query?.PoeQueryBuilder);
             }

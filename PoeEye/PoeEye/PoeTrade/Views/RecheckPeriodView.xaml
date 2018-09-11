@@ -1,41 +1,114 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
-                    xmlns:viewModels="clr-namespace:PoeEye.PoeTrade.ViewModels">
-  <DataTemplate DataType="{x:Type viewModels:RecheckPeriodViewModel}">
-    <Grid>
-      <Grid.ColumnDefinitions>
-        <ColumnDefinition Width="Auto" />
-        <ColumnDefinition Width="Auto" />
-        <ColumnDefinition Width="Auto" />
-      </Grid.ColumnDefinitions>
+                    xmlns:viewModels="clr-namespace:PoeEye.PoeTrade.ViewModels"
+                    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Converters.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Styles.xaml" />
+    </ResourceDictionary.MergedDictionaries>
 
-      <Slider Grid.Column="0"
-              Width="300"
-              Margin="5,3,5,0"
-              IsEnabled="{Binding IsAutoRecheckEnabled}"
-              Visibility="{Binding IsAutoRecheckEnabled, Converter={StaticResource BoolFalseToCollapsedConverter}}"
-              Minimum="{Binding MinValue, Converter={StaticResource TimeSpanToSecondsConverter}, Mode=OneWay}"
-              Maximum="{Binding MaxValue, Converter={StaticResource TimeSpanToSecondsConverter}, Mode=OneWay}"
-              Value="{Binding Period, Converter={StaticResource TimeSpanToSecondsConverter}}" />
+    <DataTemplate DataType="{x:Type viewModels:RecheckPeriodViewModel}">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
 
-      <TextBlock Grid.Column="1"
-                 VerticalAlignment="Center"
-                 Margin="5,0"
-                 Visibility="{Binding IsAutoRecheckEnabled, Converter={StaticResource BoolFalseToCollapsedConverter}}"
-                 Text="{Binding Period, StringFormat='Recheck period: {0:F0}', Converter={StaticResource TimeSpanToHumanReadableStringConverter}}" />
+            <ContentControl Grid.Column="0">
+                <ContentControl.Style>
+                    <Style TargetType="{x:Type ContentControl}">
+                        <Setter Property="Content">
+                            <Setter.Value>
+                                <DockPanel LastChildFill="True">
+                                    <materialDesign:PackIcon
+                                        VerticalAlignment="Center"
+                                        Kind="Alarm" />
+                                    <TextBlock VerticalAlignment="Center"
+                                               Margin="5,0"
+                                               Text="{Binding Period, StringFormat='Recheck every {0:F0}', Converter={StaticResource TimeSpanToHumanReadableStringConverter}}" />
+                                </DockPanel>
+                            </Setter.Value>
+                        </Setter>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Period}" Value="{x:Static system:TimeSpan.Zero}">
+                                <Setter Property="Content">
+                                    <Setter.Value>
+                                        <DockPanel LastChildFill="True">
+                                            <materialDesign:PackIcon
+                                                VerticalAlignment="Center"
+                                                Kind="Autorenew" />
+                                            <TextBlock VerticalAlignment="Center"
+                                                       Margin="5,0"
+                                                       Text="Live mode enabled" />
+                                        </DockPanel>
+                                    </Setter.Value>
+                                </Setter>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding Period}" Value="{x:Static system:TimeSpan.MinValue}">
+                                <Setter Property="Content">
+                                    <Setter.Value>
+                                        <DockPanel LastChildFill="True">
+                                            <materialDesign:PackIcon
+                                                VerticalAlignment="Center"
+                                                Kind="AlarmOff" />
+                                            <TextBlock VerticalAlignment="Center"
+                                                       Margin="5,0"
+                                                       Text="Rechecks disabled" />
+                                        </DockPanel>
+                                    </Setter.Value>
+                                </Setter>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ContentControl.Style>
+            </ContentControl>
 
-      <TextBlock Grid.Column="1"
-                 VerticalAlignment="Center"
-                 Margin="5,0"
-                 Visibility="{Binding IsAutoRecheckEnabled, Converter={StaticResource BoolTrueToCollapsedConverter}}"
-                 Text="Recheck is disabled" />
-
-      <controls:ToggleSwitchButton Grid.Column="2"
-                                   ToolTip="Auto refresh"
-                                   Height="26"
-                                   Margin="5,0"
-                                   IsChecked="{Binding IsAutoRecheckEnabled}" />
-    </Grid>
-  </DataTemplate>
+            <materialDesign:PopupBox Grid.Column="1"
+                                     Margin="2,0"
+                                     PopupMode="Click"
+                                     StaysOpen="False">
+                <StackPanel Orientation="Vertical">
+                    <Button Command="{Binding SetPeriodCommand}" CommandParameter="{x:Static system:TimeSpan.Zero}">
+                        <Button.Content>
+                            <DockPanel LastChildFill="True">
+                                <materialDesign:PackIcon
+                                    Kind="Autorenew" />
+                                <TextBlock VerticalAlignment="Center"
+                                           Margin="5,0"
+                                           Text="Enable Live updates" />
+                            </DockPanel>
+                        </Button.Content>
+                    </Button>
+                    <Button Command="{Binding SetPeriodCommand}">
+                        <Button.Content>
+                            <DockPanel LastChildFill="True">
+                                <materialDesign:PackIcon
+                                    Kind="AlarmOff" />
+                                <TextBlock VerticalAlignment="Center"
+                                           Margin="5,0"
+                                           Text="Disable updates" />
+                            </DockPanel>
+                        </Button.Content>
+                    </Button>
+                    <Button HorizontalContentAlignment="Stretch" >
+                        <Button.Content>
+                            <DockPanel LastChildFill="True">
+                                <materialDesign:PackIcon DockPanel.Dock="Left"
+                                                         Kind="Alarm" />
+                                <Slider DockPanel.Dock="Right" x:Name="PeriodToSet"
+                                        Minimum="{Binding MinValue, Converter={StaticResource TimeSpanToSecondsConverter}, Mode=OneWay}"
+                                        Maximum="{Binding MaxValue, Converter={StaticResource TimeSpanToSecondsConverter}, Mode=OneWay}"
+                                        Style="{StaticResource MaterialDesignSlider}"
+                                        Value="{Binding Period, Converter={StaticResource TimeSpanToSecondsConverter}}"
+                                        Margin="5,0" Height="20"
+                                        HorizontalAlignment="Stretch" />
+                            </DockPanel>
+                        </Button.Content>
+                    </Button>
+                </StackPanel>
+            </materialDesign:PopupBox>
+        </Grid>
+    </DataTemplate>
 </ResourceDictionary>

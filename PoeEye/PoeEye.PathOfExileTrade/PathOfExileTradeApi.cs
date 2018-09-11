@@ -3,6 +3,8 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Reactive.Linq;
+using System.Reactive.Threading.Tasks;
 using System.Threading;
 using System.Threading.Tasks;
 using Guards;
@@ -28,27 +30,33 @@ namespace PoeEye.PathOfExileTrade
     {
         private static readonly string TradeSearchUri = @"https://www.pathofexile.com/api/trade";
         private readonly IFactory<PoeItemBuilder> itemBuilder;
+        [NotNull] private readonly IFactory<IPathOfExileTradeLiveApi, IPoeQueryResult> liveSourceFactory;
         private readonly IConverter<IPoeQueryInfo, JsonSearchRequest.Query> queryConverter;
         private readonly IClock clock;
 
         private readonly SemaphoreSlim requestsSemaphore;
 
         private PathOfExileTradeConfig config = new PathOfExileTradeConfig();
+        private readonly IPathOfExileTradePortalApi client;
 
         public PathOfExileTradeApi(
             [NotNull] IFactory<PoeItemBuilder> itemBuilder,
+            [NotNull] IFactory<IPathOfExileTradeLiveApi, IPoeQueryResult> liveSourceFactory,
             [NotNull] IConverter<IPoeQueryInfo, JsonSearchRequest.Query> queryConverter,
             [NotNull] IConfigProvider<PathOfExileTradeConfig> configProvider,
             [NotNull] IClock clock)
         {
             Guard.ArgumentNotNull(configProvider, nameof(configProvider));
             Guard.ArgumentNotNull(queryConverter, nameof(queryConverter));
+            Guard.ArgumentNotNull(liveSourceFactory, nameof(liveSourceFactory));
             Guard.ArgumentNotNull(itemBuilder, nameof(itemBuilder));
             Guard.ArgumentNotNull(clock, nameof(clock));
             
             this.itemBuilder = itemBuilder;
+            this.liveSourceFactory = liveSourceFactory;
             this.queryConverter = queryConverter;
             this.clock = clock;
+            this.client = CreateClient();
 
             configProvider
                 .WhenChanged
@@ -64,11 +72,23 @@ namespace PoeEye.PathOfExileTrade
 
         public bool IsAvailable { get; } = true;
 
+        public IObservable<IPoeQueryResult> SubscribeToLiveUpdates(IPoeQueryInfo query)
+        {
+            Guard.ArgumentNotNull(query, nameof(query));
+
+            return IssueQuery(query)
+                   .ToObservable()
+                   .Select(x =>
+                   {
+                       var liveSource = liveSourceFactory.Create(x);
+                       return liveSource.Updates;
+                   })
+                   .Switch();
+        }
+
         public async Task<IPoeQueryResult> IssueQuery(IPoeQueryInfo queryInfo)
         {
             Guard.ArgumentNotNull(queryInfo, nameof(queryInfo));
-
-            var client = CreateClient();
 
             try
             {
@@ -107,6 +127,7 @@ namespace PoeEye.PathOfExileTrade
                 return new PoeQueryResult
                 {
                     Id = resultIds.Id,
+                    Query = queryInfo,
                     ItemsList = listings.EmptyIfNull().Where(x => !x.Gone ?? true).Select(x =>
                     {
                         var result = itemBuilder.Create()
@@ -131,8 +152,6 @@ namespace PoeEye.PathOfExileTrade
 
         public async Task<IPoeStaticData> RequestStaticData()
         {
-            var client = CreateClient();
-
             var result = new PoeStaticData();
             var apiLeagueList = await client.GetLeagueList();
             result.LeaguesList = apiLeagueList.GetContentEx().Result.EmptyIfNull().Select(x => x.Id).ToArray();
@@ -240,16 +259,6 @@ namespace PoeEye.PathOfExileTrade
             Log.Instance.Debug($"[PoeTradeApi] Awaiting {config.DelayBetweenRequests.TotalSeconds}s before releasing semaphore slot...");
             Thread.Sleep(config.DelayBetweenRequests);
             requestsSemaphore.Release();
-        }
-
-        private string ThrowIfNotParseable(string queryResult)
-        {
-            if (string.IsNullOrWhiteSpace(queryResult))
-            {
-                throw new ApplicationException("Malformed query result - empty string");
-            }
-
-            return queryResult;
         }
     }
 }

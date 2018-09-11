@@ -8,6 +8,8 @@ namespace PoeShared.PoeTrade
 {
     public sealed class PoeQueryInfo : IPoeQueryInfo
     {
+        public static IPoeQueryInfo Empty = new PoeQueryInfo();
+        
         public static IEqualityComparer<IPoeQueryInfo> Comparer =
             new LambdaComparer<IPoeQueryInfo>((x, y) => string.CompareOrdinal(x?.DumpToText(), y?.DumpToText()) == 0);
 

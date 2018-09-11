@@ -43,6 +43,13 @@ namespace PoeEye.PoeTradeRealtimeApi
 
         public bool IsAvailable { get; } = true;
 
+        public IObservable<IPoeQueryResult> SubscribeToLiveUpdates(IPoeQueryInfo query)
+        {
+            Guard.ArgumentNotNull(query, nameof(query));
+
+            return Observable.Never<IPoeQueryResult>();
+        }
+
         public Task<IPoeQueryResult> IssueQuery(IPoeQueryInfo query)
         {
             Log.Instance.Debug($"[PoeTradeRealtimeApi.IssueQuery] Issueing query: {query}");
