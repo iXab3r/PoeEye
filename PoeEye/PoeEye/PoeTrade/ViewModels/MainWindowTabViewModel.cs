@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Reactive;
+using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Windows.Input;
@@ -26,6 +27,7 @@ namespace PoeEye.PoeTrade.ViewModels
     internal sealed class MainWindowTabViewModel : DisposableReactiveObject, IMainWindowTabViewModel
     {
         private static int GlobalTabIdx;
+        private static readonly TimeSpan ThrottlingPeriod = TimeSpan.FromSeconds(0.5);
 
         private readonly string defaultTabName;
 
@@ -38,6 +40,8 @@ namespace PoeEye.PoeTrade.ViewModels
 
         private readonly SerialDisposable tradesListAnchors = new SerialDisposable();
         private readonly IFactory<IPoeTradesListViewModel, IPoeApiWrapper> tradesListFactory;
+        [NotNull] private readonly IScheduler bgScheduler;
+        [NotNull] private readonly IScheduler uiScheduler;
         private bool isFlipped;
 
         private IPoeTradesListViewModel tradesList;
@@ -49,7 +53,9 @@ namespace PoeEye.PoeTrade.ViewModels
             [NotNull] IPoeApiSelectorViewModel apiSelector,
             [NotNull] [Dependency(WellKnownWindows.MainWindow)] IWindowTracker mainWindowTracker,
             [NotNull] IAudioNotificationSelectorViewModel audioNotificationSelector,
-            [NotNull] IFactory<IPoeQueryViewModel, IPoeStaticDataSource> queryFactory)
+            [NotNull] IFactory<IPoeQueryViewModel, IPoeStaticDataSource> queryFactory,
+            [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler,
+            [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {
             Guard.ArgumentNotNull(tradesListFactory, nameof(tradesListFactory));
             Guard.ArgumentNotNull(apiSelector, nameof(apiSelector));
@@ -57,11 +63,15 @@ namespace PoeEye.PoeTrade.ViewModels
             Guard.ArgumentNotNull(audioNotificationsManager, nameof(audioNotificationsManager));
             Guard.ArgumentNotNull(audioNotificationSelector, nameof(audioNotificationSelector));
             Guard.ArgumentNotNull(queryFactory, nameof(queryFactory));
+            Guard.ArgumentNotNull(uiScheduler, nameof(IScheduler));
+            Guard.ArgumentNotNull(bgScheduler, nameof(bgScheduler));
 
             Id = defaultTabName = $"Tab #{GlobalTabIdx++}";
             tabName.SetDefaultValue(defaultTabName);
 
             this.tradesListFactory = tradesListFactory;
+            this.bgScheduler = bgScheduler;
+            this.uiScheduler = uiScheduler;
             this.BindPropertyTo(x => x.TabName, tabName, x => x.Value).AddTo(Anchors);
             this.BindPropertyTo(x => x.DefaultTabName, tabName, x => x.DefaultValue).AddTo(Anchors);
 
@@ -302,6 +312,8 @@ namespace PoeEye.PoeTrade.ViewModels
                           tradesList.Items.ToObservableChangeSet().WhenPropertyChanged(x => x.TradeState).ToUnit()
                       )
                       .StartWith(Unit.Default)
+                      .Sample(ThrottlingPeriod, bgScheduler)
+                      .ObserveOn(uiScheduler)
                       .Subscribe(
                           () =>
                           {

@@ -18,6 +18,7 @@ using PoeShared;
 using PoeShared.Common;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
+using PoeShared.Scaffolding.WPF;
 using ReactiveUI;
 using Unity.Attributes;
 
@@ -30,7 +31,9 @@ namespace PoeEye.PoeTrade.ViewModels
         private readonly SerialDisposable activeFilterAnchor = new SerialDisposable();
 
         private readonly BehaviorSubject<Func<IPoeTradeViewModel, bool>> filterConditionSource = new BehaviorSubject<Func<IPoeTradeViewModel, bool>>(null);
+
         private readonly ReadOnlyObservableCollection<IPoeTradeViewModel> itemsCollection;
+        private readonly ReadOnlyObservableCollection<IPoeTradeViewModel> rawItemsCollection;
 
         private readonly ISubject<Unit> resortRequest = new Subject<Unit>();
 
@@ -44,8 +47,7 @@ namespace PoeEye.PoeTrade.ViewModels
         private int maxItems;
         private long sortRequestsCount;
 
-        public PoeAdvancedTradesListViewModel([NotNull] [Dependency(WellKnownSchedulers.UI)]
-                                              IScheduler uiScheduler)
+        public PoeAdvancedTradesListViewModel([NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {
             Guard.ArgumentNotNull(uiScheduler, nameof(uiScheduler));
 
@@ -57,15 +59,28 @@ namespace PoeEye.PoeTrade.ViewModels
                                      .StartWith()
                                      .Select(x => new TradeComparer(sortingRules.Items.ToArray()));
 
+            PageParameter = new PageParameterDataViewModel(1, 25);
+            var pager = PageParameter.WhenAny(vm => vm.PageSize, vm => vm.CurrentPage, (size, page) => new PageRequest(size.Value, page.Value))
+                                     .StartWith(new PageRequest(1, 25))
+                                     .DistinctUntilChanged()
+                                     .Sample(ResortRefilterThrottleTimeout);
+
             var allItems = tradeLists
                 .Or();
 
             allItems
+                .ObserveOn(uiScheduler)
+                .Bind(out rawItemsCollection)
+                .Subscribe()
+                .AddTo(Anchors);
+
+            rawItemsCollection
+                .ToObservableChangeSet()
                 .Filter(filterConditionSource.Select(x => x ?? AlwaysTruePredicate).Throttle(ResortRefilterThrottleTimeout)
                                              .Do(_ => Interlocked.Increment(ref filterRequestsCount)))
-                .Virtualise(this.WhenAnyValue(x => x.MaxItems).Select(x => new VirtualRequest(0, x > 0 ? x : int.MaxValue)))
                 .Sort(comparerObservable, SortOptions.None,
                       resortRequest.Throttle(ResortRefilterThrottleTimeout).Do(_ => Interlocked.Increment(ref sortRequestsCount)))
+                .Page(pager)    
                 .ObserveOn(uiScheduler)
                 .Bind(out itemsCollection)
                 .Subscribe()
@@ -120,6 +135,8 @@ namespace PoeEye.PoeTrade.ViewModels
 
         public ReadOnlyObservableCollection<IPoeTradeViewModel> Items => itemsCollection;
 
+        public ReadOnlyObservableCollection<IPoeTradeViewModel> RawItems => rawItemsCollection;
+        public IPageParameterDataViewModel PageParameter { get; }
 
         public int MaxItems
         {

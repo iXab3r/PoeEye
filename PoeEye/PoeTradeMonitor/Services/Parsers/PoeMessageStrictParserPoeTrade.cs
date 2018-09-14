@@ -1,6 +1,8 @@
 ﻿using System.Text.RegularExpressions;
 using JetBrains.Annotations;
+using PoeShared.Common;
 using PoeShared.Converters;
+using TypeConverter;
 
 namespace PoeEye.TradeMonitor.Services.Parsers
 {
@@ -10,7 +12,7 @@ namespace PoeEye.TradeMonitor.Services.Parsers
             @"buy your (?'item'.+?)( listed for (?'price'.+?))? in (?'league'.*?) \(stash tab ""(?'tabName'.+?)""; position: left (?'itemX'\d+), top (?'itemY'\d+)\)[ ,\. ]*(?'offer'.*)",
             RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
-        public PoeMessageStrictParserPoeTrade([NotNull] StringToPoePriceConverter stringToPoePriceConverter) : base(stringToPoePriceConverter)
+        public PoeMessageStrictParserPoeTrade([NotNull] IConverter<string, PoePrice> stringToPoePriceConverter) : base(stringToPoePriceConverter)
         {
         }
 
@@ -26,7 +28,7 @@ namespace PoeEye.TradeMonitor.Services.Parsers
             @"buy your (?'item'.+?) listed for (?'price'.+?) in (?'league'.*?)$",
             RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
-        public PoeMessageWeakParserPoeTrade([NotNull] StringToPoePriceConverter stringToPoePriceConverter) : base(stringToPoePriceConverter)
+        public PoeMessageWeakParserPoeTrade([NotNull] IConverter<string, PoePrice> stringToPoePriceConverter) : base(stringToPoePriceConverter)
         {
         }
 
@@ -42,7 +44,7 @@ namespace PoeEye.TradeMonitor.Services.Parsers
             @"buy your (?'item'.+?) for my (?'price'.+?) in (?'league'.*?)?\.",
             RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
-        public PoeMessageCurrencyParserPoeTrade([NotNull] StringToPoePriceConverter stringToPoePriceConverter) : base(stringToPoePriceConverter)
+        public PoeMessageCurrencyParserPoeTrade([NotNull] IConverter<string, PoePrice> stringToPoePriceConverter) : base(stringToPoePriceConverter)
         {
         }
 

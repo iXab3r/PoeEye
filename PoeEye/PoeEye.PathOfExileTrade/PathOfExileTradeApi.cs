@@ -20,28 +20,28 @@ using PoeShared.PoeTrade;
 using PoeShared.PoeTrade.Query;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
-using PoeShared.StashApi.DataTypes;
 using RestEase;
 using TypeConverter;
 
 namespace PoeEye.PathOfExileTrade
 {
-    internal sealed class PathOfExileTradeApi : DisposableReactiveObject, IPoeApi
+    internal sealed class PathOfExileTradeApi : DisposableReactiveObject, IPoeApi, IPoeItemSource
     {
         private static readonly string TradeSearchUri = @"https://www.pathofexile.com/api/trade";
-        private readonly IFactory<PoeItemBuilder> itemBuilder;
-        [NotNull] private readonly IFactory<IPathOfExileTradeLiveApi, IPoeQueryResult> liveSourceFactory;
-        private readonly IConverter<IPoeQueryInfo, JsonSearchRequest.Query> queryConverter;
+        private readonly IPathOfExileTradePortalApi client;
         private readonly IClock clock;
+        private readonly IFactory<PoeItemBuilder> itemBuilder;
+        private readonly IFactory<IPathOfExileTradeLiveAdapter, IPoeQueryResult, IPoeItemSource> liveSourceFactory;
+        private readonly IConverter<IPoeQueryInfo, JsonSearchRequest.Query> queryConverter;
 
         private readonly SemaphoreSlim requestsSemaphore;
 
         private PathOfExileTradeConfig config = new PathOfExileTradeConfig();
-        private readonly IPathOfExileTradePortalApi client;
 
         public PathOfExileTradeApi(
             [NotNull] IFactory<PoeItemBuilder> itemBuilder,
-            [NotNull] IFactory<IPathOfExileTradeLiveApi, IPoeQueryResult> liveSourceFactory,
+            [NotNull] IFactory<IPathOfExileTradeLiveAdapter, IPoeQueryResult, IPoeItemSource> liveSourceFactory,
+            [NotNull] IFactory<IPathOfExileTradePortalApiLimiter, IPathOfExileTradePortalApi> apiFactory,
             [NotNull] IConverter<IPoeQueryInfo, JsonSearchRequest.Query> queryConverter,
             [NotNull] IConfigProvider<PathOfExileTradeConfig> configProvider,
             [NotNull] IClock clock)
@@ -49,14 +49,15 @@ namespace PoeEye.PathOfExileTrade
             Guard.ArgumentNotNull(configProvider, nameof(configProvider));
             Guard.ArgumentNotNull(queryConverter, nameof(queryConverter));
             Guard.ArgumentNotNull(liveSourceFactory, nameof(liveSourceFactory));
+            Guard.ArgumentNotNull(apiFactory, nameof(apiFactory));
             Guard.ArgumentNotNull(itemBuilder, nameof(itemBuilder));
             Guard.ArgumentNotNull(clock, nameof(clock));
-            
+
             this.itemBuilder = itemBuilder;
             this.liveSourceFactory = liveSourceFactory;
             this.queryConverter = queryConverter;
             this.clock = clock;
-            this.client = CreateClient();
+            client = apiFactory.Create(CreateRestClient());
 
             configProvider
                 .WhenChanged
@@ -78,10 +79,10 @@ namespace PoeEye.PathOfExileTrade
 
             return IssueQuery(query)
                    .ToObservable()
-                   .Select(x =>
+                   .Select(queryResult =>
                    {
-                       var liveSource = liveSourceFactory.Create(x);
-                       return liveSource.Updates;
+                       Log.Instance.Debug($"[PathOfExileTradeApi] Initializing live subscription for query {queryResult.Id}");
+                       return Observable.Using(() => liveSourceFactory.Create(queryResult, this), api => api.Updates);
                    })
                    .Switch();
         }
@@ -92,9 +93,7 @@ namespace PoeEye.PathOfExileTrade
 
             try
             {
-                Log.Instance.Debug(
-                    $"[PathOfExileTradeApi] Awaiting for semaphore slot (max: {config.MaxSimultaneousRequestsCount}, atm: {requestsSemaphore.CurrentCount})");
-                await requestsSemaphore.WaitAsync();
+                Log.Instance.Debug($"[PathOfExileTradeApi.Api] Sending query");
 
                 var query = new JsonSearchRequest.Request
                 {
@@ -105,44 +104,12 @@ namespace PoeEye.PathOfExileTrade
                     }
                 };
 
-                var resultIds = (await client.Search(queryInfo.League, query)).GetContentEx();
+                var response = await client.Search(queryInfo.League, query);
+                var resultIds = response.GetContentEx();
 
-                Log.Instance.Trace($"[PathOfExileTradeApi.Api] Got {resultIds.Total} entries as a result");
-
-                const int maxItemsInRequest = 10;
-                const int maxItemsToProcess = 30;
-                var listings = new ConcurrentBag<JsonFetchRequest.ResultListing>();
-                if (resultIds.Result.Length > 0)
-                {
-                    foreach (var partition in Partitioner
-                                              .Create(0, Math.Min(maxItemsToProcess, resultIds.Result.Length), maxItemsInRequest)
-                                              .GetDynamicPartitions())
-                    {
-                        var itemIds = new ArraySegment<string>(resultIds.Result, partition.Item1, partition.Item2 - partition.Item1);
-                        var batchResult = (await client.FetchItems(string.Join(",", itemIds), resultIds.Id)).GetContentEx();
-                        batchResult.Listings.ForEach(listings.Add);
-                    }
-                }
-
-                return new PoeQueryResult
-                {
-                    Id = resultIds.Id,
-                    Query = queryInfo,
-                    ItemsList = listings.EmptyIfNull().Where(x => !x.Gone ?? true).Select(x =>
-                    {
-                        var result = itemBuilder.Create()
-                                                .WithStashItem(x.Item)
-                                                .WithIndexationTimestamp(x.Listing?.Indexed)
-                                                .WithTimestamp(clock.Now)
-                                                .WithPrivateMessage(x.Listing?.Whisper)
-                                                .WithRawPrice(x.Listing?.Price?.ToString())
-                                                .WithUserIgn(x.Listing?.Account?.LastCharacterName)
-                                                .WithUserForumName(x.Listing?.Account?.Name)
-                                                .WithOnline(x.Listing?.Account?.Online != null)
-                                                .Build();
-                        return result;
-                    }).ToArray()
-                };
+                Log.Instance.Trace($"[PathOfExileTradeApi.Api] [{resultIds.Id}]  Got {resultIds.Total} entries as a result");
+                const int maxItemsToProcess = 50;
+                return await FetchItems(new PoeQueryResult {Query = queryInfo, Id = resultIds.Id}, resultIds.Result.Take(maxItemsToProcess).ToArray());
             }
             finally
             {
@@ -152,6 +119,8 @@ namespace PoeEye.PathOfExileTrade
 
         public async Task<IPoeStaticData> RequestStaticData()
         {
+            Log.Instance.Debug($"[PathOfExileTradeApi.Api] Requesting static data...");
+
             var result = new PoeStaticData();
             var apiLeagueList = await client.GetLeagueList();
             result.LeaguesList = apiLeagueList.GetContentEx().Result.EmptyIfNull().Select(x => x.Id).ToArray();
@@ -176,7 +145,7 @@ namespace PoeEye.PathOfExileTrade
                 Name = x.Text,
                 CodeName = x.Id,
                 IconUri = x.Image
-            }).ToArray();
+            }).OfType<IPoeCurrency>().ToArray();
 
             result.ItemTypes = new IPoeItemType[]
             {
@@ -223,6 +192,7 @@ namespace PoeEye.PathOfExileTrade
                 new PoeItemType("Resonator", "currency.resonator"),
                 new PoeItemType("Fossil", "currency.fossil")
             };
+            Log.Instance.Debug($"[PathOfExileTradeApi.Api] Successfully retrieved static data");
 
             return result;
         }
@@ -232,7 +202,59 @@ namespace PoeEye.PathOfExileTrade
             Guard.ArgumentNotNull(query, nameof(query));
         }
 
-        private IPathOfExileTradePortalApi CreateClient()
+        public async Task<IPoeQueryResult> FetchItems(IPoeQueryResult initial, IReadOnlyList<string> itemIds)
+        {
+            Guard.ArgumentNotNull(initial, nameof(initial));
+            Guard.ArgumentNotNull(itemIds, nameof(itemIds));
+            Guard.ArgumentNotNull(initial.Id, nameof(initial.Id));
+
+            const int maxItemsInRequest = 5;
+            var listings = new ConcurrentBag<JsonFetchRequest.ResultListing>();
+
+            if (itemIds.Any())
+            {
+                Log.Instance.Debug($"[PathOfExileTradeApi.Api] [{initial.Id}] Fetching items in packs of {maxItemsInRequest}");
+
+                await Partitioner
+                    .Create(0, itemIds.Count, maxItemsInRequest)
+                    .GetDynamicPartitions()
+                    .ForEachAsync(async partition =>
+                      {
+                        var segment = itemIds.Subrange(partition.Item1, partition.Item2 - partition.Item1).ToArray();
+                        var ids = string.Join(",", segment);
+                        Log.Instance.Debug($"[PathOfExileTradeApi.Api] [{initial.Id}] Fetching pack {partition}: {ids}");
+                        var fetchResponse = (await client.FetchItems(ids, initial.Id)).GetContentEx();
+                        Log.Instance.Debug($"[PathOfExileTradeApi.Api] [{initial.Id}] Got response ({fetchResponse.Listings?.Length} item(s), requested: {segment.Count()}) {fetchResponse.DumpToTextRaw()}");
+
+                        fetchResponse.Listings.ForEach(listings.Add);
+                    });
+            }
+            Log.Instance.Debug($"[PathOfExileTradeApi.Api] [{initial.Id}] Successfully received {itemIds.Count} items");
+
+            var queryResult = new PoeQueryResult
+            {
+                Id = initial.Id,
+                Query = initial.Query,
+                ItemsList = listings.EmptyIfNull().Where(x => !x.Gone ?? true).Select(x =>
+                {
+                    var result = itemBuilder.Create()
+                                            .WithStashItem(x.Item)
+                                            .WithIndexationTimestamp(x.Listing?.Indexed)
+                                            .WithTimestamp(clock.Now)
+                                            .WithPrivateMessage(x.Listing?.Whisper)
+                                            .WithRawPrice(x.Listing?.Price?.ToString())
+                                            .WithUserIgn(x.Listing?.Account?.LastCharacterName)
+                                            .WithUserForumName(x.Listing?.Account?.Name)
+                                            .WithOnline(x.Listing?.Account?.Online != null)
+                                            .WithItemState(PoeTradeState.Unknown)
+                                            .Build();
+                    return result;
+                }).ToArray()
+            };
+            return queryResult;
+        }
+
+        private static IPathOfExileTradePortalApi CreateRestClient()
         {
             var settings = new JsonSerializerSettings
             {
@@ -241,17 +263,15 @@ namespace PoeEye.PathOfExileTrade
 
             var client = new RestClient(TradeSearchUri, HandleRequestMessage)
             {
-                JsonSerializerSettings = settings
+                JsonSerializerSettings = settings,
             }.For<IPathOfExileTradePortalApi>();
             return client;
         }
 
-        private async Task HandleRequestMessage(HttpRequestMessage request, CancellationToken cancellationToken)
+        private static async Task HandleRequestMessage(HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            var body = request != null && request.Content != null ? await request?.Content.ReadAsStringAsync() : "undefined";
+            var body = request?.Content != null ? await request?.Content.ReadAsStringAsync() : "undefined";
             Log.Instance.Debug($"[PathOfExileTradeApi.Api] Requesting {request?.RequestUri}', content: {request?.Content.DumpToTextRaw()}, body:\n{body}");
-
-            await Task.Delay(0, cancellationToken);
         }
 
         private void ReleaseSemaphore()

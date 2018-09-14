@@ -31,7 +31,7 @@ namespace PoeEye.PathOfExileTrade.TradeApi
         [AllowAnyStatusCode]
         Task<Response<JsonFetchRequest.Response>> FetchItems([Path] string csvItemIdList, string queryId);
     }
-    
+
     internal struct JsonGetLeagueListResponse
     {
         [JsonProperty("result")]

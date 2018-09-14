@@ -39,10 +39,8 @@ namespace PoeBud.Models
             [NotNull] IStashUpdaterParameters config,
             [NotNull] IClock clock,
             [NotNull] IFactory<IPoeStashClient, NetworkCredential, bool> poeClientFactory,
-            [NotNull] [Dependency(WellKnownSchedulers.Background)]
-            IScheduler bgScheduler,
-            [NotNull] [Dependency(WellKnownSchedulers.UI)]
-            IScheduler uiScheduler)
+            [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler,
+            [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {
             Guard.ArgumentNotNull(config, nameof(config));
             Guard.ArgumentNotNull(clock, nameof(clock));

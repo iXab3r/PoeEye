@@ -20,6 +20,8 @@ namespace PoeEye.PoeTrade.ViewModels
 
         ReadOnlyObservableCollection<IPoeTradeViewModel> Items { [NotNull] get; }
 
+        ReadOnlyObservableCollection<IPoeTradeViewModel> ItemsView { [NotNull] get; }
+
         string QuickFilter { get; set; }
 
         void Refresh();

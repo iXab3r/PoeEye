@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using Guards;
+using JetBrains.Annotations;
 using PoeShared.Common;
 using PoeShared.Scaffolding;
 using PoeShared.StashApi.DataTypes;
@@ -11,16 +12,20 @@ using TypeConverter;
 
 namespace PoeShared.Converters
 {
-    public class PoeStashItemToPoeItem : IConverter<IStashItem, IPoeItem>, IConverter<IStashItem, PoeItem>
+    public sealed class PoeStashItemToPoeItemConverter : IConverter<IStashItem, IPoeItem>, IConverter<IStashItem, PoeItem>
     {
         private readonly IClock clock;
-        private readonly StringToPoePriceConverter stringToPoePriceConverter = new StringToPoePriceConverter();
+        private readonly IConverter<string, PoePrice> priceConverter;
 
-        public PoeStashItemToPoeItem(IClock clock)
+        public PoeStashItemToPoeItemConverter(
+            [NotNull] IClock clock,
+            [NotNull] IConverter<string, PoePrice> priceConverter)
         {
             Guard.ArgumentNotNull(clock, nameof(clock));
+            Guard.ArgumentNotNull(priceConverter, nameof(priceConverter));
 
             this.clock = clock;
+            this.priceConverter = priceConverter;
         }
 
         IPoeItem IConverter<IStashItem, IPoeItem>.Convert(IStashItem value)
@@ -51,7 +56,7 @@ namespace PoeShared.Converters
 
             var itemPrice = string.IsNullOrWhiteSpace(value.Note)
                 ? PoePrice.Empty
-                : stringToPoePriceConverter.Convert(value.Note);
+                : priceConverter.Convert(value.Note);
             result.Price = !itemPrice.IsEmpty
                 ? itemPrice.ToString()
                 : null;

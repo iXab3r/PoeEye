@@ -5,7 +5,7 @@ using PoeShared.StashApi.ProcurementLegacy;
 
 namespace PoeShared.Common
 {
-    public interface IPoeItem
+    public interface IPoeItem : IEquatable<IPoeItem>
     {
         string ItemName { get; }
 

@@ -6,6 +6,8 @@ namespace PoeShared.Common
 {
     internal sealed class PoeItemEqualityComparer : IEqualityComparer<IPoeItem>
     {
+        public static readonly IEqualityComparer<IPoeItem> Instance = new PoeItemEqualityComparer();
+        
         private readonly PoeItemModEqualityComparer itemModEqualityComparer = new PoeItemModEqualityComparer();
 
         public bool Equals(IPoeItem x, IPoeItem y)
@@ -25,13 +27,13 @@ namespace PoeShared.Common
                 return false;
             }
 
-            var result = string.Equals(x.ItemName, y.ItemName, StringComparison.InvariantCultureIgnoreCase) &&
+            var result = string.Equals(x.Hash, y.Hash, StringComparison.InvariantCultureIgnoreCase) && 
+                         string.Equals(x.ItemName, y.ItemName, StringComparison.InvariantCultureIgnoreCase) &&
                          string.Equals(x.ItemIconUri, y.ItemIconUri, StringComparison.InvariantCultureIgnoreCase) &&
                          string.Equals(x.TradeForumUri, y.TradeForumUri, StringComparison.InvariantCultureIgnoreCase) &&
                          string.Equals(x.UserForumUri, y.UserForumUri, StringComparison.InvariantCultureIgnoreCase) &&
                          string.Equals(x.UserForumName, y.UserForumName, StringComparison.InvariantCultureIgnoreCase) &&
                          string.Equals(x.Price, y.Price, StringComparison.InvariantCultureIgnoreCase) &&
-                         string.Equals(x.Hash, y.Hash, StringComparison.InvariantCultureIgnoreCase) &&
                          string.Equals(x.League, y.League, StringComparison.InvariantCultureIgnoreCase);
 
             result &= x.Mods.SequenceEqual(y.Mods, itemModEqualityComparer);

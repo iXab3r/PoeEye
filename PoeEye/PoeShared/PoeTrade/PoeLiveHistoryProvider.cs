@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive;
+using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
@@ -9,8 +10,10 @@ using System.Reactive.Threading.Tasks;
 using Guards;
 using JetBrains.Annotations;
 using PoeShared.Common;
+using PoeShared.Prism;
 using PoeShared.Scaffolding;
 using ReactiveUI;
+using Unity.Attributes;
 
 namespace PoeShared.PoeTrade
 {
@@ -27,13 +30,17 @@ namespace PoeShared.PoeTrade
 
         public PoeLiveHistoryProvider(
             [NotNull] IPoeQueryInfo query,
-            [NotNull] IPoeApiWrapper poeApi)
+            [NotNull] IPoeApiWrapper poeApi,
+            [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler,
+            [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler)
         {
             Guard.ArgumentNotNull(query, nameof(query));
             Guard.ArgumentNotNull(poeApi, nameof(poeApi));
+            Guard.ArgumentNotNull(uiScheduler, nameof(uiScheduler));
+            Guard.ArgumentNotNull(bgScheduler, nameof(bgScheduler));
 
             var periodObservable = this.WhenAnyValue(x => x.RecheckPeriod)
-                                       .Do(LogRecheckPeriodChange)
+                                       .Do(_ => LogRecheckPeriodChange())
                                        .Select(_ => ToTimer())
                                        .Switch()
                                        .Publish();
@@ -41,12 +48,18 @@ namespace PoeShared.PoeTrade
             var queryObservable = Observable.Merge(periodObservable, forceUpdatesSubject)
                                             .Where(x => !IsBusy)
                                             .Do(StartUpdate)
+                                            .ObserveOn(bgScheduler)
                                             .Select(x =>
                                             {
                                                 return IsLiveMode
                                                     ? new PoeLiveUpdatesAdapter(poeApi, new PoeItemEqualityComparer()).SubscribeToLiveUpdates(query) 
-                                                    : poeApi.IssueQuery(query).ToObservable().Select(y => y.ItemsList.EmptyIfNull().ToArray());
+                                                    : poeApi.IssueQuery(query)
+                                                            .ToObservable()
+                                                            .Select(y => y.ItemsList.EmptyIfNull().ToArray())
+                                                            .WithPrevious((prev, curr) => new { prev = prev ?? new IPoeItem[0], curr })
+                                                            .Select(pack => ProcessPacks(pack.prev, pack.curr));
                                             })
+                                            .ObserveOn(uiScheduler)
                                             .Switch()
                                             .Do(HandleUpdate, HandleUpdateError);
 
@@ -104,16 +117,46 @@ namespace PoeShared.PoeTrade
 
         private void StartUpdate(Unit unit)
         {
-            Log.Instance.Debug($"[PoeLiveHistoryProvider] Updating (period: {recheckPeriod})...");
+            Log.Instance.Debug($"[PoeLiveHistoryProvider] Starting update...");
             if (!IsLiveMode)
             {
                 IsBusy = true;
             }
         }
         
-        private void LogRecheckPeriodChange(TimeSpan newRecheckPeriod)
+        private void LogRecheckPeriodChange()
         {
-            Log.Instance.Debug($"[PoeLiveHistoryProvider] Update period changed: {newRecheckPeriod}");
+            string periodInfo;
+            if (IsLiveMode)
+            {
+                periodInfo = "Live mode";
+            } 
+            else if (IsAutoRecheckEnabled)
+            {
+                periodInfo = $"every {RecheckPeriod}";
+            }
+            else
+            {
+                periodInfo = $"recheck disabled";
+            }
+            Log.Instance.Debug($"[PoeLiveHistoryProvider] Update period changed: {periodInfo}");
+        }
+
+        private IPoeItem[] ProcessPacks(IPoeItem[] existing, IPoeItem[] updated)
+        {
+            var removedItems = existing.Except(updated);
+            var newItems = updated.Except(existing);
+
+            var result = new List<IPoeItem>();
+            foreach (var poeItem in updated)
+            {
+                if (poeItem.ItemState != PoeTradeState.Unknown)
+                {
+                    result.Add(poeItem);
+                    continue;
+                }
+            }
+            return removedItems.Concat(newItems).ToArray();
         }
 
         private void HandleUpdate(IPoeItem[] queryResult)
@@ -138,7 +181,7 @@ namespace PoeShared.PoeTrade
         private sealed class PoeLiveUpdatesAdapter : DisposableReactiveObject
         {
             private readonly IPoeApiWrapper api;
-            [NotNull] private readonly IEqualityComparer<IPoeItem> itemComparer;
+            private readonly IEqualityComparer<IPoeItem> itemComparer;
 
 
             public PoeLiveUpdatesAdapter(
@@ -159,27 +202,8 @@ namespace PoeShared.PoeTrade
                 var items = new HashSet<IPoeItem>(itemComparer);
 
                 return api
-                       .SubscribeToLiveUpdates(query)
-                       .Select(x => x.ItemsList)
-                       .Select(itemsPack =>
-                       {
-                           foreach (var poeItem in itemsPack)
-                           {
-                               switch (poeItem.ItemState)
-                               {
-                                   case PoeTradeState.New:
-                                       items.Add(poeItem);
-                                       break;
-                                   case PoeTradeState.Removed:
-                                       items.Remove(poeItem);
-                                       break;
-                                   default:
-                                       Log.Instance.Warn($"Invalid realtime item state {poeItem.ItemState} - {poeItem.DumpToTextRaw()}");
-                                       break;
-                               }
-                           }
-                           return items.ToArray();
-                       });
+                       .GetLiveUpdates(query)
+                       .Select(x => x.ItemsList);
 
             }
         }

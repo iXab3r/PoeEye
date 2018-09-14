@@ -81,6 +81,12 @@ namespace PoeShared.Common
             return this;
         }
         
+        public PoeItemBuilder WithItemState(PoeTradeState state)
+        {
+            additionalDetails.ItemState = state;
+            return this;
+        }
+        
         public PoeItemBuilder WithTimestamp(DateTime? source)
         {
             additionalDetails.Timestamp = source;
@@ -124,6 +130,11 @@ namespace PoeShared.Common
             if (!poeItem.UserIsOnline)
             {
                 poeItem.UserIsOnline = additionalDetails.UserIsOnline;
+            }
+
+            if (poeItem.ItemState == PoeTradeState.Unknown)
+            {
+                poeItem.ItemState = additionalDetails.ItemState;
             }
 
             if (!string.IsNullOrWhiteSpace(poeItem.Note))

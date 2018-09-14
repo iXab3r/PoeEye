@@ -8,14 +8,15 @@ using PoeShared.Common;
 using PoeShared.Converters;
 using PoeShared.Scaffolding;
 using PoeWhisperMonitor.Chat;
+using TypeConverter;
 
 namespace PoeEye.TradeMonitor.Services.Parsers
 {
     internal abstract class PoeMessageParserRegex : IPoeMessageParser
     {
-        private readonly StringToPoePriceConverter stringToPoePriceConverter;
+        private readonly IConverter<string, PoePrice> stringToPoePriceConverter;
 
-        public PoeMessageParserRegex([NotNull] StringToPoePriceConverter stringToPoePriceConverter)
+        public PoeMessageParserRegex([NotNull] IConverter<string, PoePrice> stringToPoePriceConverter)
         {
             Guard.ArgumentNotNull(stringToPoePriceConverter, nameof(stringToPoePriceConverter));
             this.stringToPoePriceConverter = stringToPoePriceConverter;

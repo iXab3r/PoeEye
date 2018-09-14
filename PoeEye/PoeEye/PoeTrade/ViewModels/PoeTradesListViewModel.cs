@@ -27,11 +27,12 @@ namespace PoeEye.PoeTrade.ViewModels
         private static readonly TimeSpan TimeSinceLastUpdateRefreshTimeout = TimeSpan.FromSeconds(1);
         private static readonly TimeSpan RecheckPeriodThrottleTimeout = TimeSpan.FromSeconds(1);
 
+        private readonly SourceCache<IPoeTradeViewModel, IPoeItem> itemsSource = new SourceCache<IPoeTradeViewModel, IPoeItem>(x => x.Trade);
+
         private readonly SerialDisposable activeHistoryProviderDisposable = new SerialDisposable();
         private readonly IPoeCaptchaRegistrator captchaRegistrator;
 
         private readonly IClock clock;
-        private readonly ISourceList<IPoeTradeViewModel> itemsSource = new SourceList<IPoeTradeViewModel>();
         private readonly IPoeApiWrapper poeApiWrapper;
         private readonly IEqualityComparer<IPoeItem> poeItemsComparer;
         private readonly IFactory<IPoeLiveHistoryProvider, IPoeApiWrapper, IPoeQueryInfo> poeLiveHistoryFactory;
@@ -57,8 +58,7 @@ namespace PoeEye.PoeTrade.ViewModels
             [NotNull] IEqualityComparer<IPoeItem> poeItemsComparer,
             [NotNull] IFactory<IPoeTradeQuickFilter> quickFilterFactory,
             [NotNull] IClock clock,
-            [NotNull] [Dependency(WellKnownSchedulers.UI)]
-            IScheduler uiScheduler)
+            [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {
             Guard.ArgumentNotNull(poeApiWrapper, nameof(poeApiWrapper));
             Guard.ArgumentNotNull(poeLiveHistoryFactory, nameof(poeLiveHistoryFactory));
@@ -87,7 +87,6 @@ namespace PoeEye.PoeTrade.ViewModels
                 .Do(_ => lastUpdateTimestamp = clock.Now)
                 .Select(HandleNextQuery)
                 .Switch()
-                .ObserveOn(uiScheduler)
                 .Subscribe(OnNextItemsPackReceived, Log.HandleException)
                 .AddTo(Anchors);
 
@@ -106,12 +105,14 @@ namespace PoeEye.PoeTrade.ViewModels
             var list = listFactory.Create().AddTo(Anchors);
             list.SortBy(nameof(IPoeTradeViewModel.TradeState), ListSortDirection.Ascending);
             list.ThenSortBy(nameof(IPoeTradeViewModel.PriceInChaosOrbs), ListSortDirection.Ascending);
+            list.MaxItems = 5;
             list.Add(items);
 
             quickFilter = quickFilterFactory.Create();
             list.Filter(this.WhenAnyValue(x => x.QuickFilter).Select(x => BuildFilter()));
 
-            Items = list.Items;
+            Items = list.RawItems;
+            ItemsView = list.Items;
         }
 
         public TimeSpan RecheckPeriod
@@ -120,6 +121,8 @@ namespace PoeEye.PoeTrade.ViewModels
             set => this.RaiseAndSetIfChanged(ref recheckPeriod, value);
         }
 
+        public ReadOnlyObservableCollection<IPoeTradeViewModel> ItemsView { get; }
+        
         public ReadOnlyObservableCollection<IPoeTradeViewModel> Items { get; }
 
         public IPoeQueryInfo ActiveQuery
@@ -175,31 +178,25 @@ namespace PoeEye.PoeTrade.ViewModels
                 return;
             }
 
-            var existingItems = itemsSource.Items.Select(x => x.Trade).ToArray();
-            var removedItems = existingItems.Except(itemsPack, poeItemsComparer).ToArray();
-            var newItems = itemsPack.Except(existingItems, poeItemsComparer).ToArray();
+            var removedItems = itemsPack.Where(x => x.ItemState == PoeTradeState.Removed).ToArray();
+            var newItems = itemsPack.Where(x => x.ItemState == PoeTradeState.New).ToArray();
+            
             var relistedItems = itemsSource.Items
                                            .Where(x => x.TradeState == PoeTradeState.Removed)
                                            .Where(x => itemsPack.Contains(x.Trade, poeItemsComparer))
                                            .ToArray();
 
             Log.Instance.Debug(
-                $"[TradesListViewModel] Next items pack received, existingItems: {existingItems.Length}, newItems: {newItems.Length}, removedItems: {removedItems.Length}, relistedItems: {relistedItems.Length}");
+                $"[TradesListViewModel] Next items pack received, existingItems: {itemsSource.Count}, newItems: {newItems.Length}, removedItems: {removedItems.Length}, re-listedItems: {relistedItems.Length}");
 
-            foreach (var itemViewModel in relistedItems)
+            foreach (var item in removedItems)
             {
-                itemViewModel.TradeState = PoeTradeState.New;
+                Update(item, trade => trade.TradeState = PoeTradeState.Removed);
             }
 
-            foreach (var itemViewModel in itemsSource.Items.Where(x => removedItems.Contains(x.Trade)).Where(x => x.TradeState != PoeTradeState.Removed))
+            foreach (var item in newItems)
             {
-                itemViewModel.TradeState = PoeTradeState.Removed;
-                itemViewModel.Trade.Timestamp = clock.Now;
-            }
-
-            if (newItems.Any())
-            {
-                foreach (var item in newItems)
+                if (!itemsSource.Lookup(item).HasValue)
                 {
                     var itemViewModel = poeTradeViewModelFactory.Create(item);
                     itemViewModel.AddTo(activeProvider.Anchors);
@@ -212,14 +209,28 @@ namespace PoeEye.PoeTrade.ViewModels
                         .Subscribe(itemsSource.Remove)
                         .AddTo(activeProvider.Anchors);
 
-                    itemViewModel.TradeState = PoeTradeState.New;
-                    itemViewModel.Trade.Timestamp = clock.Now;
-
-                    itemsSource.Add(itemViewModel);
+                    itemsSource.AddOrUpdate(itemViewModel);
                 }
+                
+                Update(item, trade =>
+                {
+                    trade.TradeState = PoeTradeState.New;
+                    trade.Trade.Timestamp = clock.Now;
+                });
             }
 
             lastUpdateTimestamp = clock.Now;
+        }
+
+        private void Update(IPoeItem item, Action<IPoeTradeViewModel> action)
+        {
+            var existing = itemsSource.Lookup(item);
+            if (!existing.HasValue)
+            {
+                return;
+            }
+
+            uiScheduler.Schedule(() => { action(existing.Value); });
         }
 
         private IObservable<IPoeItem[]> HandleNextQuery(IPoeQueryInfo queryInfo)

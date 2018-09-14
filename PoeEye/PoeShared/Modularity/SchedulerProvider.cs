@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Reactive.Concurrency;
+using System.Reactive.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -8,10 +9,11 @@ using System.Windows.Threading;
 using Guards;
 using JetBrains.Annotations;
 using PoeShared.Prism;
+using PoeShared.Scaffolding;
 
 namespace PoeShared.Modularity
 {
-    internal class SchedulerProvider : ISchedulerProvider
+    internal class SchedulerProvider : DisposableReactiveObject, ISchedulerProvider
     {
         private readonly ConcurrentDictionary<string, IScheduler> schedulers = new ConcurrentDictionary<string, IScheduler>();
         private readonly IScheduler uiScheduler;
@@ -77,6 +79,36 @@ namespace PoeShared.Modularity
                 var dispatcher = Dispatcher.CurrentDispatcher;
                 Log.Instance.Debug($"[SchedulerProvider.InitializeDispatcherThread] Dispatcher: {dispatcher}");
                 var scheduler = new DispatcherScheduler(dispatcher);
+                Observable
+                    .FromEventPattern<DispatcherHookEventHandler, DispatcherHookEventArgs>(
+                        h => scheduler.Dispatcher.Hooks.OperationStarted += h,
+                        h => scheduler.Dispatcher.Hooks.OperationStarted -= h)
+                    .Subscribe(eventArgs => LogEvent("OperationStarted", eventArgs.EventArgs))
+                    .AddTo(Anchors);
+                Observable
+                    .FromEventPattern<DispatcherHookEventHandler, DispatcherHookEventArgs>(
+                        h => scheduler.Dispatcher.Hooks.OperationPriorityChanged += h,
+                        h => scheduler.Dispatcher.Hooks.OperationPriorityChanged -= h)
+                    .Subscribe(eventArgs => LogEvent("OperationPriorityChanged", eventArgs.EventArgs))
+                    .AddTo(Anchors);
+                Observable
+                    .FromEventPattern<DispatcherHookEventHandler, DispatcherHookEventArgs>(
+                        h => scheduler.Dispatcher.Hooks.OperationAborted += h,
+                        h => scheduler.Dispatcher.Hooks.OperationAborted -= h)
+                    .Subscribe(eventArgs => LogEvent("OperationAborted", eventArgs.EventArgs))
+                    .AddTo(Anchors);
+                Observable
+                    .FromEventPattern<DispatcherHookEventHandler, DispatcherHookEventArgs>(
+                        h => scheduler.Dispatcher.Hooks.OperationPriorityChanged += h,
+                        h => scheduler.Dispatcher.Hooks.OperationPriorityChanged -= h)
+                    .Subscribe(eventArgs => LogEvent("OperationPriorityChanged", eventArgs.EventArgs))
+                    .AddTo(Anchors);
+                Observable
+                    .FromEventPattern<DispatcherHookEventHandler, DispatcherHookEventArgs>(
+                        h => scheduler.Dispatcher.Hooks.OperationPosted += h,
+                        h => scheduler.Dispatcher.Hooks.OperationPosted -= h)
+                    .Subscribe(eventArgs => LogEvent("OperationPosted", eventArgs.EventArgs))
+                    .AddTo(Anchors);
                 Log.Instance.Debug($"[SchedulerProvider.InitializeDispatcherThread] Scheduler: {dispatcher}");
                 consumer.TrySetResult(scheduler);
 
@@ -91,6 +123,14 @@ namespace PoeShared.Modularity
             finally
             {
                 Log.Instance.Debug($"[KeyboardEventsSource.InitializeKeyboardThread] Thread completed");
+            }
+        }
+
+        private void LogEvent(string eventName, DispatcherHookEventArgs eventArgs)
+        {
+            if (Log.Instance.IsTraceEnabled)
+            {
+                Log.Instance.Trace($"[{eventName}] Priority: {eventArgs.Operation.Priority} Status: {eventArgs.Operation.Status}, Operation: {eventArgs.Operation.Task}");
             }
         }
     }

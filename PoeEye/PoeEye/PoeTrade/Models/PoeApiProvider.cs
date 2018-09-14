@@ -29,7 +29,7 @@ namespace PoeEye.PoeTrade.Models
                           .ResolveAll<IPoeApi>()
                           .Select(wrapperFactory.Create)
                           .ToObservableCollection();
-            Log.Instance.Debug($"[PoeApiProvider..ctor] API list:\r\n\t{apiList.DumpToText()}");
+            Log.Instance.Debug($"[PoeApiProvider..ctor] API list:\r\n\t{apiList.Select(x => $"{x.Name} ({x.Id})").DumpToText()}");
 
             apiList
                 .ToObservableChangeSet()

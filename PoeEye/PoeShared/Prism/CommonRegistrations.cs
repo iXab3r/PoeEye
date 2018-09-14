@@ -15,6 +15,7 @@ using PoeShared.PoeDatabase.PoeNinja;
 using PoeShared.PoeTrade;
 using PoeShared.PoeTrade.Query;
 using PoeShared.Scaffolding;
+using PoeShared.Scaffolding.WPF;
 using PoeShared.StashApi;
 using PoeShared.StashApi.DataTypes;
 using PoeShared.StashApi.ProcurementLegacy;
@@ -49,8 +50,8 @@ namespace PoeShared.Prism
                 .RegisterSingleton<IPoeLeagueApiClient, PoeLeagueApiClient>()
                 .RegisterSingleton<IChromiumBrowserFactory, ChromiumBrowserFactory>()
                 .RegisterSingleton<IChromiumBootstrapper, ChromiumBootstrapper>()
-                .RegisterSingleton<PoeStashItemToPoeItem>(typeof(IConverter<IStashItem, IPoeItem>), typeof(IConverter<IStashItem, PoeItem>))
-                .RegisterSingleton<IConverter<string, PoePrice>, StringToPoePriceConverter>()
+                .RegisterSingleton<PoeStashItemToPoeItemConverter>(typeof(IConverter<IStashItem, IPoeItem>), typeof(IConverter<IStashItem, PoeItem>))
+                .RegisterSingleton<IConverter<string, PoePrice>>(new InjectionFactory(x => StringToPoePriceConverter.Instance))
                 .RegisterSingleton<IKeyboardEventsSource>(
                     new InjectionFactory(x => x.Resolve<KeyboardEventsSource>(new DependencyOverride(typeof(IKeyboardMouseEvents), Hook.GlobalEvents()))))
                 .RegisterSingleton<IAudioNotificationsManager, AudioNotificationsManager>()
@@ -65,6 +66,7 @@ namespace PoeShared.Prism
                 .RegisterType<IPoeLiveHistoryProvider, PoeLiveHistoryProvider>()
                 .RegisterType<IHttpClient, GenericHttpClient>()
                 .RegisterType<IPoeApiWrapper, PoeApiWrapper>()
+                .RegisterType<IPageParameterDataViewModel, PageParameterDataViewModel>()
                 .RegisterType<IPoeStashClient, PoeStashClient>()
                 .RegisterType<IPoeStaticDataProvider, PoeStaticDataProvider>()
                 .RegisterType<IPoeEconomicsSource, PoeNinjaDatabaseReader>()
