@@ -6,8 +6,8 @@ using Guards;
 using JetBrains.Annotations;
 using PoeShared.Audio;
 using PoeShared.Scaffolding;
+using Prism.Commands;
 using ReactiveUI;
-using ReactiveCommand = ReactiveUI.Legacy.ReactiveCommand;
 
 namespace PoeShared.UI.ViewModels
 {
@@ -26,13 +26,8 @@ namespace PoeShared.UI.ViewModels
 
             Items = new ReactiveList<object>();
 
-            var selectNotificationCommand = ReactiveCommand.Create();
-            selectNotificationCommand.Subscribe(SelectNotificationCommandExecuted).AddTo(Anchors);
-            SelectNotificationCommand = selectNotificationCommand;
-
-            var playNotificationCommand = ReactiveCommand.Create();
-            playNotificationCommand.Subscribe(PlayNotificationCommandExecuted).AddTo(Anchors);
-            PlayNotificationCommand = playNotificationCommand;
+            SelectNotificationCommand = new DelegateCommand<object>(SelectNotificationCommandExecuted);
+            PlayNotificationCommand = new DelegateCommand<object>(PlayNotificationCommandExecuted);
 
             Items.AddRange(new[]
             {

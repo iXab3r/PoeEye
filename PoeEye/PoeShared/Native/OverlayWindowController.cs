@@ -34,8 +34,7 @@ namespace PoeShared.Native
         public OverlayWindowController(
             [NotNull] IWindowTracker windowTracker,
             [NotNull] IKeyboardEventsSource keyboardMouseEvents,
-            [NotNull] [Dependency(WellKnownSchedulers.UI)]
-            IScheduler uiScheduler)
+            [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {
             Guard.ArgumentNotNull(windowTracker, nameof(windowTracker));
             Guard.ArgumentNotNull(keyboardMouseEvents, nameof(keyboardMouseEvents));

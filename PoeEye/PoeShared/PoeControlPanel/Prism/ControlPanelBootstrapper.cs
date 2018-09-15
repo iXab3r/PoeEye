@@ -22,11 +22,9 @@ namespace PoeShared.PoeControlPanel.Prism
 
         public ControlPanelBootstrapper(
             [NotNull] IConfigProvider<PoeControlPanelConfig> configProvider,
-            [NotNull] [Dependency(WellKnownOverlays.PathOfExileOverlay)]
-            IOverlayWindowController overlayController,
+            [NotNull] [Dependency(WellKnownOverlays.PathOfExileOverlay)] IOverlayWindowController overlayController,
             [NotNull] IFactory<PoeControlPanelViewModel, IOverlayWindowController> viewModelFactory,
-            [NotNull] [Dependency(WellKnownSchedulers.UI)]
-            IScheduler uiScheduler)
+            [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {
             Guard.ArgumentNotNull(configProvider, nameof(configProvider));
             Guard.ArgumentNotNull(overlayController, nameof(overlayController));

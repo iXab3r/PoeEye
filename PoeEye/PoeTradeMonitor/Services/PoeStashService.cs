@@ -37,10 +37,8 @@ namespace PoeEye.TradeMonitor.Services
             [NotNull] IConfigProvider<PoeTradeMonitorConfig> tradeMonitorConfigProvider,
             [NotNull] IFactory<IPoeStashUpdater, IStashUpdaterParameters> stashUpdaterFactory,
             [NotNull] IFactory<IDefaultStashUpdaterStrategy, IStashUpdaterParameters> stashUpdaterStrategyFactory,
-            [NotNull] [Dependency(WellKnownSchedulers.UI)]
-            IScheduler uiScheduler,
-            [NotNull] [Dependency(WellKnownSchedulers.Background)]
-            IScheduler bgScheduler)
+            [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler,
+            [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler)
         {
             Guard.ArgumentNotNull(clock, nameof(clock));
             Guard.ArgumentNotNull(poeBudConfigProvider, nameof(poeBudConfigProvider));

@@ -36,10 +36,8 @@ namespace PoeBud.ViewModels
             [NotNull] IKeyboardEventsSource keyboardMouseEvents,
             [NotNull] IHighlightingService highlightingService,
             [NotNull] IConfigProvider<PoeBudConfig> poeBudConfigProvider,
-            [NotNull] [Dependency(WellKnownSchedulers.UI)]
-            IScheduler uiScheduler,
-            [NotNull] [Dependency(WellKnownSchedulers.Background)]
-            IScheduler bgScheduler)
+            [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler,
+            [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler)
         {
             Guard.ArgumentNotNull(clock, nameof(clock));
             Guard.ArgumentNotNull(solutionExecutor, nameof(solutionExecutor));

@@ -26,10 +26,16 @@ namespace PoeShared.Scaffolding
             this IObservable<TSource> source,
             Func<TSource, TSource, TResult> resultSelector)
         {
-            return source.Scan(
-                             Tuple.Create(default(TSource), default(TSource)),
-                             (previous, current) => Tuple.Create(previous.Item2, current))
+            return WithPrevious(source)
                          .Select(t => resultSelector(t.Item1, t.Item2));
+        }
+        
+        public static IObservable<Tuple<TSource,TSource>> WithPrevious<TSource>(
+            this IObservable<TSource> source)
+        {
+            return source.Scan(
+                Tuple.Create(default(TSource), default(TSource)),
+                (previous, current) => Tuple.Create(previous.Item2, current));
         }
         
         public static IObservable<T> RetryWithDelay<T>(this IObservable<T> source, TimeSpan timeSpan)

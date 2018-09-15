@@ -46,8 +46,7 @@ namespace PoeEye.PoeTrade.ViewModels
             [NotNull] ReadOnlyObservableCollection<IMainWindowTabViewModel> tabsList,
             [NotNull] IFactory<IPoeAdvancedTradesListViewModel> listFactory,
             [NotNull] IFactory<IPoeTradeQuickFilter> quickFilterFactory,
-            [NotNull] [Dependency(WellKnownSchedulers.UI)]
-            IScheduler uiScheduler)
+            [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {
             Guard.ArgumentNotNull(tabsList, nameof(tabsList));
             Guard.ArgumentNotNull(listFactory, nameof(listFactory));

@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using System.Windows.Data;
 using System.Windows.Media;
 using Guards;
+using PoeShared;
 using PoeShared.Common;
 using PoeShared.Scaffolding;
 using TypeConverter;
@@ -223,10 +224,21 @@ namespace PoeEye.Converters
 
         public static string AddAverage(Match match)
         {
-            var min = double.Parse(match.Groups["min"].Value);
-            var max = double.Parse(match.Groups["max"].Value);
-            var avg = min + (max - min) / 2;
-            return $"{match.Value} (~{avg.ToString("0.0", CultureInfo.InvariantCulture)})";
+            var minRaw = match.Groups["min"].Value;
+            var maxRaw = match.Groups["max"].Value;
+            try
+            {
+                var min = double.Parse(minRaw);
+                var max = double.Parse(maxRaw);
+                var avg = min + (max - min) / 2;
+                return $"{match.Value} (~{avg.ToString("0.0", CultureInfo.InvariantCulture)})";
+            }
+            catch (Exception e)
+            {
+                Log.Instance.Warn($"Failed to parse input {match.Value}, min: '{match.Groups["min"]}', max: '{match.Groups["max"]}'");
+                return string.Empty;
+            }
+            
         }
 
         private static string ReplaceGroup(

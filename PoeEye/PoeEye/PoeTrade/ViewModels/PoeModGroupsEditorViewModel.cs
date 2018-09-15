@@ -8,17 +8,14 @@ using PoeShared.PoeTrade;
 using PoeShared.PoeTrade.Query;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
+using Prism.Commands;
 using ReactiveUI;
-using ReactiveUI.Legacy;
-using ReactiveCommand = ReactiveUI.Legacy.ReactiveCommand;
 
 namespace PoeEye.PoeTrade.ViewModels
 {
     internal sealed class PoeModGroupsEditorViewModel : DisposableReactiveObject, IPoeModGroupsEditorViewModel
     {
-        private readonly ReactiveCommand<object> addGrpCommand = ReactiveCommand.Create();
         private readonly IFactory<PoeModsEditorViewModel, IPoeStaticDataSource> groupsFactory;
-        private readonly ReactiveCommand<object> removeGrpCommand = ReactiveCommand.Create();
         private readonly IPoeStaticDataSource staticDataSource;
 
         public PoeModGroupsEditorViewModel(
@@ -30,21 +27,16 @@ namespace PoeEye.PoeTrade.ViewModels
             this.staticDataSource = staticDataSource;
             this.groupsFactory = groupsFactory;
 
-            addGrpCommand
-                .Subscribe(_ => AddGroup())
-                .AddTo(Anchors);
+            AddGroupCommand = new DelegateCommand(() => AddGroup());
 
-            removeGrpCommand
-                .OfType<PoeModsEditorViewModel>()
-                .Subscribe(RemoveGroupCommandExecuted)
-                .AddTo(Anchors);
+            RemoveGroupCommand = new DelegateCommand<IPoeModsEditorViewModel>(RemoveGroupCommandExecuted);
 
             AddGroup();
         }
 
-        public ICommand AddGroupCommand => addGrpCommand;
+        public ICommand AddGroupCommand { get; }
 
-        public ICommand RemoveGroupCommand => removeGrpCommand;
+        public ICommand RemoveGroupCommand { get; }
 
         public IReactiveList<IPoeModsEditorViewModel> Groups { get; } = new ReactiveList<IPoeModsEditorViewModel> {ChangeTrackingEnabled = true};
 

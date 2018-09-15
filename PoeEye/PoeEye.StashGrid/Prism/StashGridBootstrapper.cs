@@ -20,8 +20,7 @@ namespace PoeEye.StashGrid.Prism
             [NotNull] [Dependency(WellKnownOverlays.PathOfExileOverlay)]
             IOverlayWindowController overlayController,
             [NotNull] IFactory<PoeStashGridViewModel, IOverlayWindowController> viewModelFactory,
-            [NotNull] [Dependency(WellKnownSchedulers.UI)]
-            IScheduler uiScheduler)
+            [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {
             Guard.ArgumentNotNull(overlayController, nameof(overlayController));
             Guard.ArgumentNotNull(viewModelFactory, nameof(viewModelFactory));

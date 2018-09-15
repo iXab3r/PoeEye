@@ -31,8 +31,7 @@ namespace PoeEye.PoeTrade.ViewModels
         private string username;
 
         public PoeEyeUpdateSettingsViewModel(
-            [NotNull] [Dependency(WellKnownSchedulers.UI)]
-            IScheduler uiScheduler)
+            [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {
             Guard.ArgumentNotNull(uiScheduler, nameof(uiScheduler));
 

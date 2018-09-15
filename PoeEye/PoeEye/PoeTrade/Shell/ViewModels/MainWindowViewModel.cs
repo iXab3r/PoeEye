@@ -68,10 +68,8 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
             [NotNull] IWhispersNotificationManager whispersNotificationManager,
             [NotNull] IClipboardManager clipboardManager,
             [NotNull] IConfigSerializer configSerializer,
-            [NotNull] [Dependency(WellKnownSchedulers.Background)]
-            IScheduler bgScheduler,
-            [NotNull] [Dependency(WellKnownSchedulers.UI)]
-            IScheduler uiScheduler)
+            [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler,
+            [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {
             Guard.ArgumentNotNull(tabFactory, nameof(tabFactory));
             Guard.ArgumentNotNull(summaryTabFactory, nameof(summaryTabFactory));

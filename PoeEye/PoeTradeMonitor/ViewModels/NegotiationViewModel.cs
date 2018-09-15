@@ -77,8 +77,7 @@ namespace PoeEye.TradeMonitor.ViewModels
             [NotNull] IPoeItemViewModelFactory poeTradeViewModelFactory,
             [NotNull] IConverter<IStashItem, IPoeItem> poeStashItemToItemConverter,
             [NotNull] IFactory<IImageViewModel, Uri> imageFactory,
-            [NotNull] [Dependency(WellKnownSchedulers.UI)]
-            IScheduler uiScheduler)
+            [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {
             Guard.ArgumentNotNull(imageFactory, nameof(imageFactory));
             Guard.ArgumentNotNull(macroCommandsProvider, nameof(macroCommandsProvider));

@@ -49,10 +49,8 @@ namespace PoeEye.TradeMonitor.ViewModels
             [NotNull] IFactory<ITradeMonitorService> tradeMonitorServiceFactory,
             [NotNull] IConfigProvider<PoeTradeMonitorConfig> configProvider,
             [NotNull] FakeItemFactory fakeItemFactory,
-            [NotNull] [Dependency(WellKnownSchedulers.Background)]
-            IScheduler bgScheduler,
-            [NotNull] [Dependency(WellKnownSchedulers.UI)]
-            IScheduler uiScheduler)
+            [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler,
+            [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {
             Guard.ArgumentNotNull(keyboardMouseEvents, nameof(keyboardMouseEvents));
             Guard.ArgumentNotNull(stashService, nameof(stashService));

@@ -78,14 +78,14 @@ namespace PoeEye.PoeTrade.ViewModels
                 .ToObservableChangeSet()
                 .Filter(filterConditionSource.Select(x => x ?? AlwaysTruePredicate).Throttle(ResortRefilterThrottleTimeout)
                                              .Do(_ => Interlocked.Increment(ref filterRequestsCount)))
-                .Sort(comparerObservable, SortOptions.None,
-                      resortRequest.Throttle(ResortRefilterThrottleTimeout).Do(_ => Interlocked.Increment(ref sortRequestsCount)))
-                .Page(pager)    
+                .Sort(comparerObservable, SortOptions.None, resortRequest.Throttle(ResortRefilterThrottleTimeout)
+                                                                         .Do(_ => Interlocked.Increment(ref sortRequestsCount)))
                 .ObserveOn(uiScheduler)
+                .Virtualise(Observable.Return(new VirtualRequest(0, 20)))
                 .Bind(out itemsCollection)
                 .Subscribe()
                 .AddTo(Anchors);
-
+            
             // Filtering / Sorting    
             RegisterSort(nameof(IPoeTradeViewModel.TradeState), x => x?.TradeState);
             RegisterSort(nameof(IPoeTradeViewModel.PriceInChaosOrbs), x => x?.PriceInChaosOrbs);

@@ -19,10 +19,9 @@ using PoeShared.Scaffolding.WPF;
 using PoeShared.UI;
 using PoeShared.UI.ViewModels;
 using PoeWhisperMonitor.Chat;
+using Prism.Commands;
 using ReactiveUI;
-using ReactiveUI.Legacy;
 using Unity.Attributes;
-using ReactiveCommand = ReactiveUI.Legacy.ReactiveCommand;
 
 namespace PoeEye.PoeTrade.ViewModels
 {
@@ -32,11 +31,7 @@ namespace PoeEye.PoeTrade.ViewModels
         private readonly IPoeChatService chatService;
         private readonly IClipboardManager clipboardManager;
         private readonly IClock clock;
-        private readonly ReactiveCommand<object> copyPrivateMessageToClipboardCommand = ReactiveCommand.Create();
         private readonly IAudioNotificationsManager notificationsManager;
-
-        private readonly ReactiveCommand<object> openForumUriCommand;
-        private readonly ReactiveCommand<object> sendPrivateMessageCommand = ReactiveCommand.Create();
 
         private PoeTradeState tradeState;
 
@@ -50,8 +45,7 @@ namespace PoeEye.PoeTrade.ViewModels
             [NotNull] IFactory<IPoeItemModsViewModel> modsViewModelFactory,
             [NotNull] IPoeItemSerializer itemSerializer,
             [NotNull] IClipboardManager clipboardManager,
-            [NotNull] [Dependency(WellKnownSchedulers.UI)]
-            IScheduler uiScheduler,
+            [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler,
             [NotNull] IClock clock)
         {
             Guard.ArgumentNotNull(poeItem, nameof(poeItem));
@@ -75,11 +69,10 @@ namespace PoeEye.PoeTrade.ViewModels
             Mods = modsViewModelFactory.Create();
             Mods.Item = Trade;
 
-            copyPrivateMessageToClipboardCommand.Subscribe(CopyPrivateMessageToClipboardCommandExecuted).AddTo(Anchors);
-            sendPrivateMessageCommand.Subscribe(SendPrivateMessageCommandExecuted).AddTo(Anchors);
+            CopyItemToClipboardCommand = new DelegateCommand(CopyPrivateMessageToClipboardCommandExecuted);
+            SendPrivateMessageCommand = new DelegateCommand(SendPrivateMessageCommandExecuted);
 
-            openForumUriCommand = ReactiveCommand.Create(Observable.Return(OpenForumUriCommandCanExecute()));
-            openForumUriCommand.Subscribe(OpenForumUriCommandExecuted).AddTo(Anchors);
+            OpenForumUriCommand = new DelegateCommand(OpenForumUriCommandExecuted, OpenForumUriCommandCanExecute); 
 
             Uri imageUri;
             if (!string.IsNullOrWhiteSpace(poeItem.ItemIconUri) && Uri.TryCreate(poeItem.ItemIconUri, UriKind.Absolute, out imageUri))
@@ -120,13 +113,13 @@ namespace PoeEye.PoeTrade.ViewModels
 
         public TimeSpan? TimeElapsedSinceFirstIndexation => Trade.FirstSeen == null ? default(TimeSpan?) : clock.Now - Trade.FirstSeen.Value;
 
-        public ICommand OpenForumUriCommand => openForumUriCommand;
+        public ICommand OpenForumUriCommand { get; }
 
         public IPoeItemModsViewModel Mods { get; }
 
         public ICommand CopyItemToClipboardCommand { get; }
 
-        public ICommand SendPrivateMessageCommand => sendPrivateMessageCommand;
+        public ICommand SendPrivateMessageCommand { get; }
 
         public TimeSpan? TimeElapsedSinceLastIndexation => Trade.Timestamp == null ? TimeSpan.Zero : clock.Now - Trade.Timestamp;
 
@@ -144,9 +137,9 @@ namespace PoeEye.PoeTrade.ViewModels
 
         public IPoeItem Trade { get; }
 
-        public ICommand CopyPrivateMessageToClipboardCommand => copyPrivateMessageToClipboardCommand;
+        public ICommand CopyPrivateMessageToClipboardCommand { get; }
 
-        private void OpenForumUriCommandExecuted(object arg)
+        private void OpenForumUriCommandExecuted()
         {
             Guard.ArgumentIsTrue(() => OpenForumUriCommandCanExecute());
 
@@ -159,7 +152,7 @@ namespace PoeEye.PoeTrade.ViewModels
             return Uri.TryCreate(Trade.TradeForumUri, UriKind.Absolute, out tradeForumUri);
         }
 
-        private async void SendPrivateMessageCommandExecuted(object arg)
+        private async void SendPrivateMessageCommandExecuted()
         {
             ExceptionlessClient.Default
                                .CreateFeatureUsage("TradeList")
@@ -181,7 +174,7 @@ namespace PoeEye.PoeTrade.ViewModels
             }
         }
 
-        private void CopyPrivateMessageToClipboardCommandExecuted(object arg)
+        private void CopyPrivateMessageToClipboardCommandExecuted()
         {
             ExceptionlessClient.Default
                                .CreateFeatureUsage("TradeList")

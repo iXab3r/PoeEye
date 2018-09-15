@@ -7,3 +7,6 @@
 [submodule "Submodules/PoePickit"]
 	path = Submodules/PoePickit
 	url = https://github.com/iXab3r/PoePickit.git
+[submodule "Submodules/WpfAutoCompleteControls"]
+	path = Submodules/WpfAutoCompleteControls
+	url = https://github.com/iXab3r/WpfAutoCompleteControls.git

@@ -19,10 +19,8 @@ namespace PoeShared.Modularity
         private readonly IScheduler uiScheduler;
 
         public SchedulerProvider(
-            [NotNull] [Unity.Attributes.Dependency(WellKnownSchedulers.Background)]
-            IScheduler bgScheduler,
-            [NotNull] [Unity.Attributes.Dependency(WellKnownSchedulers.UI)]
-            IScheduler uiScheduler)
+            [NotNull] [Unity.Attributes.Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler,
+            [NotNull] [Unity.Attributes.Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {
             this.uiScheduler = uiScheduler;
             Guard.ArgumentNotNull(bgScheduler, nameof(bgScheduler));

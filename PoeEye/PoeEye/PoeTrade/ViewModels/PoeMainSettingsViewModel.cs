@@ -39,10 +39,8 @@ namespace PoeEye.PoeTrade.ViewModels
             [NotNull] IPoeLeagueApiClient leagueApiClient,
             [NotNull] IPoeEconomicsSource economicsSource,
             [NotNull] IConfigProvider<PoeEyeMainConfig> mainConfigProvider,
-            [NotNull] [Dependency(WellKnownSchedulers.UI)]
-            IScheduler uiScheduler,
-            [NotNull] [Dependency(WellKnownSchedulers.Background)]
-            IScheduler bgScheduler)
+            [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler,
+            [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler)
         {
             Guard.ArgumentNotNull(clock, nameof(clock));
             Guard.ArgumentNotNull(leagueApiClient, nameof(leagueApiClient));

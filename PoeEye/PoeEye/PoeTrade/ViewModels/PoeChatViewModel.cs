@@ -37,8 +37,7 @@ namespace PoeEye.PoeTrade.ViewModels
             [NotNull] IPoeWhisperService whisperService,
             [NotNull] IAudioNotificationsManager notificationsManager,
             [NotNull] IPoeChatService chatService,
-            [NotNull] [Dependency(WellKnownSchedulers.UI)]
-            IScheduler uiScheduler)
+            [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {
             Guard.ArgumentNotNull(chatService, nameof(chatService));
             Guard.ArgumentNotNull(whisperService, nameof(whisperService));

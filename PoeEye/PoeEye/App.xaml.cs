@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Reactive.Concurrency;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
@@ -43,6 +44,10 @@ namespace PoeEye
                 InitializeExceptionless();
 
                 RxApp.SupportsRangeNotifications = false; //FIXME DynamicData (as of v4.11) does not support RangeNotifications
+                Log.Instance.Debug($"[App..ctor] UI Scheduler: {RxApp.MainThreadScheduler}");
+                RxApp.MainThreadScheduler = DispatcherScheduler.Current;
+                RxApp.TaskpoolScheduler = TaskPoolScheduler.Default;
+                Log.Instance.Debug($"[App..ctor] New UI Scheduler: {RxApp.MainThreadScheduler}");
             }
             catch (Exception ex)
             {

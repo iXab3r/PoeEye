@@ -40,10 +40,8 @@ namespace PoeEye.StashGrid.ViewModels
             [NotNull] IKeyboardEventsSource keyboardMouseEvents,
             [NotNull] IOverlayWindowController controller,
             [NotNull] IConfigProvider<PoeStashGridConfig> configProvider,
-            [NotNull] [Dependency(WellKnownSchedulers.Background)]
-            IScheduler bgScheduler,
-            [NotNull] [Dependency(WellKnownSchedulers.UI)]
-            IScheduler uiScheduler)
+            [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler,
+            [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {
             Guard.ArgumentNotNull(keyboardMouseEvents, nameof(keyboardMouseEvents));
             Guard.ArgumentNotNull(controller, nameof(controller));

@@ -45,10 +45,8 @@ namespace PoeBud.ViewModels
         public PoeBudSettingsViewModel(
             [NotNull] IFactory<IPoeStashClient, NetworkCredential, bool> poeClientFactory,
             [NotNull] IUiOverlaysProvider overlaysProvider,
-            [NotNull] [Dependency(WellKnownSchedulers.UI)]
-            IScheduler uiScheduler,
-            [NotNull] [Dependency(WellKnownSchedulers.Background)]
-            IScheduler bgScheduler)
+            [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler,
+            [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler)
         {
             Guard.ArgumentNotNull(overlaysProvider, nameof(overlaysProvider));
             Guard.ArgumentNotNull(uiScheduler, nameof(uiScheduler));

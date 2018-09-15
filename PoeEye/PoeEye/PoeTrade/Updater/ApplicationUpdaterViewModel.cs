@@ -11,18 +11,17 @@ using PoeShared;
 using PoeShared.Modularity;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
+using PoeShared.Scaffolding.WPF;
 using PoeShared.UI;
 using ReactiveUI;
-using ReactiveUI.Legacy;
 using Unity.Attributes;
-using ReactiveCommand = ReactiveUI.Legacy.ReactiveCommand;
 
 namespace PoeEye.PoeTrade.Updater
 {
     internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject
     {
-        private readonly ReactiveCommand<Unit> checkForUpdatesCommand;
-        private readonly ReactiveCommand<Unit> restartCommand;
+        private readonly CommandWrapper checkForUpdatesCommand;
+        private readonly CommandWrapper restartCommand;
         private readonly IApplicationUpdaterModel updaterModel;
         private string error = string.Empty;
 
@@ -32,10 +31,8 @@ namespace PoeEye.PoeTrade.Updater
         public ApplicationUpdaterViewModel(
             [NotNull] IApplicationUpdaterModel updaterModel,
             [NotNull] IConfigProvider<PoeEyeUpdateSettingsConfig> configProvider,
-            [NotNull] [Dependency(WellKnownSchedulers.UI)]
-            IScheduler uiScheduler,
-            [NotNull] [Dependency(WellKnownSchedulers.Background)]
-            IScheduler bgScheduler)
+            [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler,
+            [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler)
         {
             Guard.ArgumentNotNull(updaterModel, nameof(updaterModel));
             Guard.ArgumentNotNull(uiScheduler, nameof(uiScheduler));
@@ -47,8 +44,8 @@ namespace PoeEye.PoeTrade.Updater
                         .AddTo(Anchors);
 
             this.updaterModel = updaterModel;
-            checkForUpdatesCommand = ReactiveCommand
-                .CreateAsyncTask(x => CheckForUpdatesCommandExecuted(), uiScheduler);
+            checkForUpdatesCommand = CommandWrapper
+                .Create(CheckForUpdatesCommandExecuted);
 
             checkForUpdatesCommand
                 .ThrownExceptions
@@ -61,8 +58,9 @@ namespace PoeEye.PoeTrade.Updater
                 .Subscribe(() => this.RaisePropertyChanged(nameof(MostRecentVersion)), Log.HandleUiException)
                 .AddTo(Anchors);
 
-            restartCommand = ReactiveCommand
-                .CreateAsyncTask(x => RestartCommandExecuted(), uiScheduler);
+            //FIXME UI THREAD ?
+            restartCommand = CommandWrapper
+                .Create(RestartCommandExecuted);
 
             restartCommand
                 .ThrownExceptions
