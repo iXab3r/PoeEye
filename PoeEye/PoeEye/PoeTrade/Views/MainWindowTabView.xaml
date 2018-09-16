@@ -82,36 +82,9 @@
                       ItemsSource="{Binding TradesList.ItemsView}"
                       Style="{StaticResource VirtualizedItemsControlStyle}">
         </ItemsControl>
-        <Border HorizontalAlignment="Right" VerticalAlignment="Bottom"
-                Visibility="{Binding TradesList.PageParameters.PageCount, Converter={StaticResource GreaterThanOneToVisibleConverter}}"
-                BorderBrush="{StaticResource AccentColorBrush}"
-                CornerRadius="4"
-                Background="{StaticResource MaterialDesignBackground}"
-                BorderThickness="1">
-            <DockPanel >
-              <TextBlock FontWeight="Bold" Text="{Binding TradesList.PageParameters.CurrentPage}"/>
-              <TextBlock FontWeight="Bold" Text=" / "/>
-              <TextBlock FontWeight="Bold" Text="{Binding TradesList.PageParameters.PageCount}"/>
-              <Button
-                Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}"
-                Command="{Binding TradesList.PageParameters.PreviousPageCommand}" Width="20" Height="20" Margin="1,0"
-                ToolTip="Previous page">
-                <materialDesign:PackIcon
-                  Kind="ArrowLeft"
-                  Height="16"
-                  Width="16" />
-              </Button>
-              <Button
-                Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}"
-                Command="{Binding TradesList.PageParameters.NextPageCommand}" Width="20" Height="20" Margin="1,0"
-                ToolTip="Next page">
-                <materialDesign:PackIcon
-                  Kind="ArrowRight"
-                  Height="16"
-                  Width="16" />
-              </Button>
-            </DockPanel>
-        </Border>
+        <ContentControl Content="{Binding TradesList.PageParameters}"
+                        HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                        ></ContentControl>
       </Grid>
     </Grid>
   </DataTemplate>

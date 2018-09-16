@@ -256,8 +256,6 @@
     <Compile Include="Scaffolding\WPF\InputBindingsManager.cs" />
     <Compile Include="Scaffolding\WPF\IPageParameterDataViewModel.cs" />
     <Compile Include="Scaffolding\WPF\MappingTemplateSelector.cs" />
-    <Compile Include="Scaffolding\WPF\PageParameterDataViewModel.cs" />
-    <Compile Include="Scaffolding\WPF\PageResponse.cs" />
     <Compile Include="Scaffolding\WPF\StackPanelEx.cs" />
     <Compile Include="StashApi\DataTypes\PoeItemRarityWrapper.cs" />
     <Compile Include="StashApi\DataTypes\StashItemAdditionalProperty.cs" />
@@ -288,6 +286,7 @@
     <Compile Include="StashApi\ProcurementLegacy\IItemTypeAnalyzer.cs" />
     <Compile Include="StashApi\ProcurementLegacy\ItemTypeInfo.cs" />
     <Compile Include="UI\Controls\ExtendedTextEditor.cs" />
+    <Compile Include="UI\Models\PageResponse.cs" />
     <Compile Include="UI\ViewModels\AudioNotificationSelectorViewModel.cs" />
     <Compile Include="Audio\AudioNotificationsManager.cs" />
     <Compile Include="Audio\AudioNotificationType.cs" />
@@ -416,6 +415,7 @@
     <Compile Include="UI\ViewModels\IAudioNotificationSelectorViewModel.cs" />
     <Compile Include="UI\ViewModels\IImageViewModel.cs" />
     <Compile Include="UI\ViewModels\ImageViewModel.cs" />
+    <Compile Include="UI\ViewModels\PageParameterDataViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -497,6 +497,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="UI\Views\ImageView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\Views\PageParametersView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

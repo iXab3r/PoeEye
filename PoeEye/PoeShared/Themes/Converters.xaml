@@ -26,6 +26,24 @@
     <eyeConverters:StringToPoePriceConverter x:Key="StringToPoePriceConverter" />
 
     <global:ObjectToTypeConverter x:Key="ObjectToTypeConverter" />
+    
+    <blue:Int32ToVisibilityConverter x:Key="GreaterThanZeroToVisibleConverter" TrueValue="Visible" FalseValue="Collapsed">
+        <blue:Int32ToVisibilityConverter.ComparisonStrategy>
+            <blue:Int32ComparisonStrategy Mode="GreaterThan" Comparand="0" />
+        </blue:Int32ToVisibilityConverter.ComparisonStrategy>
+    </blue:Int32ToVisibilityConverter>
+  
+    <blue:Int32ToVisibilityConverter x:Key="GreaterThanOneToVisibleConverter" TrueValue="Visible" FalseValue="Collapsed">
+        <blue:Int32ToVisibilityConverter.ComparisonStrategy>
+            <blue:Int32ComparisonStrategy Mode="GreaterThan" Comparand="1" />
+        </blue:Int32ToVisibilityConverter.ComparisonStrategy>
+    </blue:Int32ToVisibilityConverter>
+
+    <blue:DoubleToVisibilityConverter x:Key="DoubleGreaterThanZeroToVisibleConverter" TrueValue="Visible" FalseValue="Collapsed">
+        <blue:DoubleToVisibilityConverter.ComparisonStrategy>
+            <blue:DoubleComparisonStrategy Mode="GreaterThan" Comparand="0" />
+        </blue:DoubleToVisibilityConverter.ComparisonStrategy>
+    </blue:DoubleToVisibilityConverter>
 
     <kent:MapConverter x:Key="VisibilityInversionConverterVisibleToHidden" FallbackBehavior="ReturnUnsetValue">
         <kent:Mapping From="{x:Static Visibility.Visible}" To="{x:Static Visibility.Hidden}" />

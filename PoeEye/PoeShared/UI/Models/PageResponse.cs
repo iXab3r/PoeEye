@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using DynamicData.Operators;
 
-namespace PoeShared.Scaffolding.WPF
+namespace PoeShared.UI.Models
 {
     public sealed class PageResponse : IEquatable<IPageResponse>, IPageResponse
     {

@@ -12,13 +12,16 @@ using DynamicData.Binding;
 using Guards;
 using JetBrains.Annotations;
 using LinqKit;
+using PoeEye.Config;
 using PoeEye.PoeTrade.Common;
 using PoeEye.PoeTrade.Models;
 using PoeShared;
 using PoeShared.Audio;
 using PoeShared.Common;
+using PoeShared.Modularity;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
+using PoeShared.Scaffolding.WPF;
 using ReactiveUI;
 using Unity.Attributes;
 
@@ -46,11 +49,13 @@ namespace PoeEye.PoeTrade.ViewModels
             [NotNull] ReadOnlyObservableCollection<IMainWindowTabViewModel> tabsList,
             [NotNull] IFactory<IPoeAdvancedTradesListViewModel> listFactory,
             [NotNull] IFactory<IPoeTradeQuickFilter> quickFilterFactory,
+            [NotNull] IConfigProvider<PoeEyeMainConfig> configProvider,
             [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {
             Guard.ArgumentNotNull(tabsList, nameof(tabsList));
             Guard.ArgumentNotNull(listFactory, nameof(listFactory));
             Guard.ArgumentNotNull(quickFilterFactory, nameof(quickFilterFactory));
+            Guard.ArgumentNotNull(configProvider, nameof(configProvider));
             Guard.ArgumentNotNull(uiScheduler, nameof(uiScheduler));
 
             markAllAsReadCommand = ReactiveCommand.Create(MarkAllAsReadExecuted);
@@ -82,8 +87,10 @@ namespace PoeEye.PoeTrade.ViewModels
                 .Bind(out tabCollection)
                 .Subscribe()
                 .AddTo(Anchors);
+            configProvider.WhenChanged.Subscribe(x => list.PageParameter.PageSize = x.ItemPageSize).AddTo(Anchors);
             list.Add(tabCollection);
             TradesView = list.Items;
+            PageParameter = list.PageParameter;
 
             this.WhenAnyValue(x => x.ActiveSortDescriptionData)
                 .Subscribe(x => list.SortBy(x.PropertyName, x.Direction))
@@ -107,6 +114,8 @@ namespace PoeEye.PoeTrade.ViewModels
         }
 
         public ReadOnlyObservableCollection<IPoeTradeViewModel> TradesView { get; }
+        
+        public IPageParameterDataViewModel PageParameter{ get; }
 
         public ICommand MarkAllAsReadCommand => markAllAsReadCommand;
 

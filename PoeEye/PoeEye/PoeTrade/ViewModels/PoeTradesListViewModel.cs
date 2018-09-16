@@ -10,10 +10,12 @@ using DynamicData;
 using Guards;
 using JetBrains.Annotations;
 using LinqKit;
+using PoeEye.Config;
 using PoeEye.PoeTrade.Models;
 using PoeShared;
 using PoeShared.Common;
 using PoeShared.Exceptions;
+using PoeShared.Modularity;
 using PoeShared.PoeTrade;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
@@ -58,6 +60,7 @@ namespace PoeEye.PoeTrade.ViewModels
             [NotNull] IPoeCaptchaRegistrator captchaRegistrator,
             [NotNull] IEqualityComparer<IPoeItem> poeItemsComparer,
             [NotNull] IFactory<IPoeTradeQuickFilter> quickFilterFactory,
+            [NotNull] IConfigProvider<PoeEyeMainConfig> configProvider,
             [NotNull] IClock clock,
             [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {
@@ -65,6 +68,7 @@ namespace PoeEye.PoeTrade.ViewModels
             Guard.ArgumentNotNull(poeLiveHistoryFactory, nameof(poeLiveHistoryFactory));
             Guard.ArgumentNotNull(poeTradeViewModelFactory, nameof(poeTradeViewModelFactory));
             Guard.ArgumentNotNull(listFactory, nameof(listFactory));
+            Guard.ArgumentNotNull(configProvider, nameof(configProvider));
             Guard.ArgumentNotNull(captchaRegistrator, nameof(captchaRegistrator));
             Guard.ArgumentNotNull(poeItemsComparer, nameof(poeItemsComparer));
             Guard.ArgumentNotNull(quickFilterFactory, nameof(quickFilterFactory));
@@ -106,7 +110,7 @@ namespace PoeEye.PoeTrade.ViewModels
             var list = listFactory.Create().AddTo(Anchors);
             list.SortBy(nameof(IPoeTradeViewModel.TradeState), ListSortDirection.Ascending);
             list.ThenSortBy(nameof(IPoeTradeViewModel.PriceInChaosOrbs), ListSortDirection.Ascending);
-            list.PageParameter.PageSize = 20;
+            configProvider.WhenChanged.Subscribe(x => list.PageParameter.PageSize = x.ItemPageSize).AddTo(Anchors);
             list.Add(items);
 
             quickFilter = quickFilterFactory.Create();

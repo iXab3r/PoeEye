@@ -7,11 +7,13 @@ using System.Reactive.Disposables;
 using System.Reactive.Subjects;
 using Moq;
 using NUnit.Framework;
+using PoeEye.Config;
 using PoeEye.PoeTrade.Models;
 using PoeEye.PoeTrade.ViewModels;
 using PoeEye.Tests.Helpers;
 using PoeShared;
 using PoeShared.Common;
+using PoeShared.Modularity;
 using PoeShared.PoeTrade;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
@@ -70,6 +72,10 @@ namespace PoeEye.Tests.PoeEye.PoeTrade.ViewModels
 
             captchaService = new Mock<IPoeCaptchaRegistrator>();
             captchaService.Setup(x => x.CaptchaRequests).Returns(new Subject<string>());
+            
+            configSink = new Subject<PoeEyeMainConfig>();
+            configProvider = new Mock<IConfigProvider<PoeEyeMainConfig>>();
+            configProvider.SetupGet(x => x.WhenChanged).Returns(configSink);
         }
 
         private Mock<IClock> clock;
@@ -80,11 +86,13 @@ namespace PoeEye.Tests.PoeEye.PoeTrade.ViewModels
         private Mock<IFactory<IPoeAdvancedTradesListViewModel>> listFactory;
         private Mock<IFactory<IPoeTradeQuickFilter>> quickFilterFactory;
         private Mock<IPoeAdvancedTradesListViewModel> advancedList;
+        private Mock<IConfigProvider<PoeEyeMainConfig>> configProvider;
 
         private Mock<IPoeLiveHistoryProvider> poeLiveHistory;
         private Mock<IPoeCaptchaRegistrator> captchaService;
         private ISubject<IPoeItem[]> poeLiveHistoryItems;
         private ISubject<Exception> poeLiveHistoryUpdateExceptions;
+        private ISubject<PoeEyeMainConfig> configSink;
 
         private IPoeTradeViewModel CreateTradeVm(IPoeItem item)
         {
@@ -107,6 +115,7 @@ namespace PoeEye.Tests.PoeEye.PoeTrade.ViewModels
                 captchaService.Object,
                 poeItemsComparer.Object,
                 quickFilterFactory.Object,
+                configProvider.Object,
                 clock.Object,
                 Scheduler.Immediate);
         }

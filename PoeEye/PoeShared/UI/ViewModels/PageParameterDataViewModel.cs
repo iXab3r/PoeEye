@@ -1,10 +1,12 @@
 ﻿using System.Windows.Input;
 using DynamicData.Operators;
 using Guards;
+using PoeShared.Scaffolding;
+using PoeShared.Scaffolding.WPF;
 using Prism.Commands;
 using ReactiveUI;
 
-namespace PoeShared.Scaffolding.WPF
+namespace PoeShared.UI.ViewModels
 {
     public sealed class PageParameterDataViewModel : DisposableReactiveObject, IPageParameterDataViewModel
     {
@@ -15,10 +17,10 @@ namespace PoeShared.Scaffolding.WPF
         private int pageSize;
         private int totalCount;
 
-        public PageParameterDataViewModel(int currentPage, int pageSize)
+        public PageParameterDataViewModel()
         {
-            this.currentPage = currentPage;
-            this.pageSize = pageSize;
+            this.currentPage = 1;
+            this.pageSize = int.MaxValue;
 
             nextPageCommand = new DelegateCommand(() => CurrentPage = CurrentPage + 1, () => CurrentPage < PageCount);
             previousPageCommand = new DelegateCommand(() => CurrentPage = CurrentPage - 1, () => CurrentPage > 1);

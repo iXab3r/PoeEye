@@ -19,6 +19,8 @@ using PoeShared.Common;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
 using PoeShared.Scaffolding.WPF;
+using PoeShared.UI.Models;
+using PoeShared.UI.ViewModels;
 using ReactiveUI;
 using Unity.Attributes;
 
@@ -47,9 +49,12 @@ namespace PoeEye.PoeTrade.ViewModels
         private long filterRequestsCount;
         private long sortRequestsCount;
 
-        public PoeAdvancedTradesListViewModel([NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
+        public PoeAdvancedTradesListViewModel(
+            [NotNull] IPageParameterDataViewModel pageParameter,
+            [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {
             Guard.ArgumentNotNull(uiScheduler, nameof(uiScheduler));
+            Guard.ArgumentNotNull(pageParameter, nameof(pageParameter));
 
             activeFilterAnchor.AddTo(Anchors);
 
@@ -59,7 +64,7 @@ namespace PoeEye.PoeTrade.ViewModels
                                      .StartWith()
                                      .Select(x => new TradeComparer(sortingRules.Items.ToArray()));
 
-            PageParameter = new PageParameterDataViewModel(1, int.MaxValue);
+            PageParameter = pageParameter;
 
             var allItems = tradeLists
                 .Or();

@@ -65,6 +65,8 @@ namespace PoeEye.Config
 
         public string LeagueId { get; set; }
 
+        public int ItemPageSize { get; set; } = 20;
+
         public int Version { get; set; } = 2;
     }
 }
