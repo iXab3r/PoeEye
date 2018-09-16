@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using JetBrains.Annotations;
 using PoeShared.PoeTrade;
 using PoeShared.Scaffolding;
+using PoeShared.Scaffolding.WPF;
 
 namespace PoeEye.PoeTrade.ViewModels
 {
@@ -21,6 +22,8 @@ namespace PoeEye.PoeTrade.ViewModels
         ReadOnlyObservableCollection<IPoeTradeViewModel> Items { [NotNull] get; }
 
         ReadOnlyObservableCollection<IPoeTradeViewModel> ItemsView { [NotNull] get; }
+        
+        IPageParameterDataViewModel PageParameters { [NotNull] get; }
 
         string QuickFilter { get; set; }
 

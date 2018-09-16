@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive;
@@ -28,6 +29,8 @@ namespace PoeShared.PoeTrade
         private bool isBusy;
         private TimeSpan recheckPeriod;
 
+        private readonly HashSet<IPoeItem> existingItems = new HashSet<IPoeItem>();
+
         public PoeLiveHistoryProvider(
             [NotNull] IPoeQueryInfo query,
             [NotNull] IPoeApiWrapper poeApi,
@@ -55,12 +58,11 @@ namespace PoeShared.PoeTrade
                                                     ? new PoeLiveUpdatesAdapter(poeApi, new PoeItemEqualityComparer()).SubscribeToLiveUpdates(query) 
                                                     : poeApi.IssueQuery(query)
                                                             .ToObservable()
-                                                            .Select(y => y.ItemsList.EmptyIfNull().ToArray())
-                                                            .WithPrevious((prev, curr) => new { prev = prev ?? new IPoeItem[0], curr })
-                                                            .Select(pack => ProcessPacks(pack.prev, pack.curr));
+                                                            .Select(y => y.ItemsList.EmptyIfNull().ToArray());
                                             })
                                             .ObserveOn(uiScheduler)
                                             .Switch()
+                                            .Select(ProcessPacks)
                                             .Do(HandleUpdate, HandleUpdateError);
 
             Observable
@@ -142,21 +144,36 @@ namespace PoeShared.PoeTrade
             Log.Instance.Debug($"[PoeLiveHistoryProvider] Update period changed: {periodInfo}");
         }
 
-        private IPoeItem[] ProcessPacks(IPoeItem[] existing, IPoeItem[] updated)
+        private IPoeItem[] ProcessPacks(IPoeItem[] updated)
         {
-            var removedItems = existing.Except(updated);
-            var newItems = updated.Except(existing);
+            var result = new List<IPoeItem>(updated.Length);
+            result.AddRange(updated.Where(x => x.ItemState != PoeTradeState.Unknown));
 
-            var result = new List<IPoeItem>();
-            foreach (var poeItem in updated)
+            var updatedUnknown = updated.Where(x => x.ItemState == PoeTradeState.Unknown).ToArray();
+            if (updatedUnknown.Any())
             {
-                if (poeItem.ItemState != PoeTradeState.Unknown)
+                var removedItems = existingItems.Except(updatedUnknown, PoeItemEqualityComparer.Instance).ForEach(x => x.ItemState = PoeTradeState.Removed);
+                var newItems = updatedUnknown .Except(existingItems, PoeItemEqualityComparer.Instance).ForEach(x => x.ItemState = PoeTradeState.New);
+                result.AddRange(removedItems);
+                result.AddRange(newItems);
+            }
+            
+            foreach (var item in result)
+            {
+                switch (item.ItemState)
                 {
-                    result.Add(poeItem);
-                    continue;
+                    case PoeTradeState.New:
+                        existingItems.Add(item);
+                        break;
+                    case PoeTradeState.Removed:
+                        existingItems.Remove(item);
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException($"Invalid item state: {item.ItemState}, expected to be New/Removed at this stage, items: {result.DumpToTextRaw()}");
                 }
             }
-            return removedItems.Concat(newItems).ToArray();
+            
+            return result.ToArray();
         }
 
         private void HandleUpdate(IPoeItem[] queryResult)
@@ -198,8 +215,6 @@ namespace PoeShared.PoeTrade
             public IObservable<IPoeItem[]> SubscribeToLiveUpdates([NotNull] IPoeQueryInfo query)
             {
                 Guard.ArgumentNotNull(query, nameof(query));
-
-                var items = new HashSet<IPoeItem>(itemComparer);
 
                 return api
                        .GetLiveUpdates(query)

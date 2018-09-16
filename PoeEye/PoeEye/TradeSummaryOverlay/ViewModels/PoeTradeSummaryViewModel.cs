@@ -77,7 +77,7 @@ namespace PoeEye.TradeSummaryOverlay.ViewModels
                 .AddTo(Anchors);
 
             var list = listFactory.Create();
-            list.MaxItems = 10;
+            list.PageParameter.PageSize = 10;
             list.SortBy(nameof(IPoeItem.Timestamp), ListSortDirection.Descending);
             list.Filter(Observable.Return(BuildFilter()));
 

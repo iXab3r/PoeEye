@@ -257,6 +257,7 @@
     <Compile Include="Scaffolding\WPF\IPageParameterDataViewModel.cs" />
     <Compile Include="Scaffolding\WPF\MappingTemplateSelector.cs" />
     <Compile Include="Scaffolding\WPF\PageParameterDataViewModel.cs" />
+    <Compile Include="Scaffolding\WPF\PageResponse.cs" />
     <Compile Include="Scaffolding\WPF\StackPanelEx.cs" />
     <Compile Include="StashApi\DataTypes\PoeItemRarityWrapper.cs" />
     <Compile Include="StashApi\DataTypes\StashItemAdditionalProperty.cs" />

@@ -28,6 +28,7 @@ namespace PoeEye.PoeTrade.ViewModels
     {
         private static readonly Func<IPoeTradeViewModel, bool> AlwaysTruePredicate = model => true;
         private static readonly TimeSpan ResortRefilterThrottleTimeout = TimeSpan.FromMilliseconds(250);
+        private static readonly TimeSpan DataChangesThrottleTimeout = TimeSpan.FromMilliseconds(1000);
         private readonly SerialDisposable activeFilterAnchor = new SerialDisposable();
 
         private readonly BehaviorSubject<Func<IPoeTradeViewModel, bool>> filterConditionSource = new BehaviorSubject<Func<IPoeTradeViewModel, bool>>(null);
@@ -44,7 +45,6 @@ namespace PoeEye.PoeTrade.ViewModels
         private readonly SourceList<ISourceList<IPoeTradeViewModel>> tradeLists = new SourceList<ISourceList<IPoeTradeViewModel>>();
 
         private long filterRequestsCount;
-        private int maxItems;
         private long sortRequestsCount;
 
         public PoeAdvancedTradesListViewModel([NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
@@ -59,11 +59,7 @@ namespace PoeEye.PoeTrade.ViewModels
                                      .StartWith()
                                      .Select(x => new TradeComparer(sortingRules.Items.ToArray()));
 
-            PageParameter = new PageParameterDataViewModel(1, 25);
-            var pager = PageParameter.WhenAny(vm => vm.PageSize, vm => vm.CurrentPage, (size, page) => new PageRequest(size.Value, page.Value))
-                                     .StartWith(new PageRequest(1, 25))
-                                     .DistinctUntilChanged()
-                                     .Sample(ResortRefilterThrottleTimeout);
+            PageParameter = new PageParameterDataViewModel(1, int.MaxValue);
 
             var allItems = tradeLists
                 .Or();
@@ -74,18 +70,47 @@ namespace PoeEye.PoeTrade.ViewModels
                 .Subscribe()
                 .AddTo(Anchors);
 
+            var pager = Observable.Merge(
+                                      PageParameter.WhenAnyValue(x => x.CurrentPage).ToUnit(),
+                                      PageParameter.WhenAnyValue(x => x.PageSize).ToUnit())
+                                  .Select(x => new PageRequest(PageParameter.CurrentPage, PageParameter.PageSize))
+                                  .Sample(ResortRefilterThrottleTimeout)
+                                  .ObserveOn(uiScheduler);
+
             rawItemsCollection
-                .ToObservableChangeSet()
+                .ToObservableChangeSet(x => x.Trade)
                 .Filter(filterConditionSource.Select(x => x ?? AlwaysTruePredicate).Throttle(ResortRefilterThrottleTimeout)
                                              .Do(_ => Interlocked.Increment(ref filterRequestsCount)))
-                .Sort(comparerObservable, SortOptions.None, resortRequest.Throttle(ResortRefilterThrottleTimeout)
-                                                                         .Do(_ => Interlocked.Increment(ref sortRequestsCount)))
+                .Sort(comparerObservable, resortRequest.Throttle(ResortRefilterThrottleTimeout)
+                                                       .Do(_ => Interlocked.Increment(ref sortRequestsCount)))
+                .Page(pager)
                 .ObserveOn(uiScheduler)
-                .Virtualise(Observable.Return(new VirtualRequest(0, 20)))
+                .Do(changes =>
+                {
+                    if (changes is IPagedChangeSet<IPoeTradeViewModel, IPoeItem> pageCacheChanges)
+                    {
+                        var response = new PageResponse(
+                            pageSize: pageCacheChanges.Response.PageSize,
+                            totalSize: pageCacheChanges.Response.TotalSize,
+                            page: pageCacheChanges.Response.Page,
+                            pages: pageCacheChanges.Response.Pages);
+                        PageParameter.Update(response);
+                    } 
+                    else if (changes is IPageChangeSet<IPoeTradeViewModel> pageChanges)
+                    {
+                        //FIXME There is a bug in DynamicData - PageResponse for Lists is built incorrectly
+                        var response = new PageResponse(
+                            pageSize: pageChanges.Response.PageSize,
+                            totalSize: pageChanges.Response.Page,
+                            page: pageChanges.Response.TotalSize,
+                            pages: pageChanges.Response.Pages);
+                        PageParameter.Update(response);
+                    }
+                })
                 .Bind(out itemsCollection)
                 .Subscribe()
                 .AddTo(Anchors);
-            
+
             // Filtering / Sorting    
             RegisterSort(nameof(IPoeTradeViewModel.TradeState), x => x?.TradeState);
             RegisterSort(nameof(IPoeTradeViewModel.PriceInChaosOrbs), x => x?.PriceInChaosOrbs);
@@ -137,12 +162,6 @@ namespace PoeEye.PoeTrade.ViewModels
 
         public ReadOnlyObservableCollection<IPoeTradeViewModel> RawItems => rawItemsCollection;
         public IPageParameterDataViewModel PageParameter { get; }
-
-        public int MaxItems
-        {
-            get => maxItems;
-            set => this.RaiseAndSetIfChanged(ref maxItems, value);
-        }
 
         public void ResetSorting()
         {

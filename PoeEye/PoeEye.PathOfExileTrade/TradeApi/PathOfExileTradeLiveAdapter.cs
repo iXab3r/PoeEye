@@ -62,7 +62,6 @@ namespace PoeEye.PathOfExileTrade.TradeApi
             liveUri = new Uri(new Uri(WebSocketUri), $"{initialData.Query.League}/{queryId}");
             Log.Instance.Debug($"QueryId URI: {liveUri}");
 
-            initialData.ItemsList.ForEach(x => x.ItemState = PoeTradeState.New);
             resultSink.OnNext(initialData);
 
             webSocketAnchors.AddTo(Anchors);
@@ -221,6 +220,15 @@ namespace PoeEye.PathOfExileTrade.TradeApi
             Log.Instance.Debug(
                 $"[WebSocket] [{queryId}] Got data(isBinary: {eventArgs.IsBinary}, isText: {eventArgs.IsText}, isPing: {eventArgs.IsPing}): {eventArgs.RawData.Length}");
 
+            if (eventArgs.IsPing)
+            {
+                resultSink.OnNext(new PoeQueryResult
+                {
+                    Id = queryId,
+                    Query = initialData.Query,
+                });
+            }
+            
             if (!eventArgs.IsText)
             {
                 return;

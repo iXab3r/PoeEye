@@ -55,9 +55,8 @@ namespace PoeShared.Scaffolding.WPF
         public void Update(IPageResponse response)
         {
             Guard.ArgumentNotNull(response, nameof(response));
-            
-            CurrentPage = response.Page;
-            PageSize = response.PageSize;
+
+            currentPage = response.Page;
             PageCount = response.Pages;
             TotalCount = response.TotalSize;
             nextPageCommand.RaiseCanExecuteChanged();

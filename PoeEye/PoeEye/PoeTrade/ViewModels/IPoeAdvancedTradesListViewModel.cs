@@ -21,7 +21,6 @@ namespace PoeEye.PoeTrade.ViewModels
         
         IPageParameterDataViewModel PageParameter { [NotNull] get; }
 
-        int MaxItems { get; set; }
         void Add([NotNull] ReadOnlyObservableCollection<IPoeTradeViewModel> itemList);
 
         void Add([NotNull] ReadOnlyObservableCollection<IMainWindowTabViewModel> tabsList);

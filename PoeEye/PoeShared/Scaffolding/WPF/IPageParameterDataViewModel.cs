@@ -11,7 +11,7 @@ namespace PoeShared.Scaffolding.WPF
         int TotalCount { get; }
         int PageCount { get; }
         int CurrentPage { get; }
-        int PageSize { get; }
+        int PageSize { get; set; }
 
         void Update([NotNull] IPageResponse response);
     }

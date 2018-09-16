@@ -17,6 +17,7 @@ using PoeShared.Exceptions;
 using PoeShared.PoeTrade;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
+using PoeShared.Scaffolding.WPF;
 using ReactiveUI;
 using Unity.Attributes;
 
@@ -105,7 +106,7 @@ namespace PoeEye.PoeTrade.ViewModels
             var list = listFactory.Create().AddTo(Anchors);
             list.SortBy(nameof(IPoeTradeViewModel.TradeState), ListSortDirection.Ascending);
             list.ThenSortBy(nameof(IPoeTradeViewModel.PriceInChaosOrbs), ListSortDirection.Ascending);
-            list.MaxItems = 5;
+            list.PageParameter.PageSize = 20;
             list.Add(items);
 
             quickFilter = quickFilterFactory.Create();
@@ -113,6 +114,7 @@ namespace PoeEye.PoeTrade.ViewModels
 
             Items = list.RawItems;
             ItemsView = list.Items;
+            PageParameters = list.PageParameter;
         }
 
         public TimeSpan RecheckPeriod
@@ -122,7 +124,8 @@ namespace PoeEye.PoeTrade.ViewModels
         }
 
         public ReadOnlyObservableCollection<IPoeTradeViewModel> ItemsView { get; }
-        
+        public IPageParameterDataViewModel PageParameters { get; }
+
         public ReadOnlyObservableCollection<IPoeTradeViewModel> Items { get; }
 
         public IPoeQueryInfo ActiveQuery
@@ -180,14 +183,9 @@ namespace PoeEye.PoeTrade.ViewModels
 
             var removedItems = itemsPack.Where(x => x.ItemState == PoeTradeState.Removed).ToArray();
             var newItems = itemsPack.Where(x => x.ItemState == PoeTradeState.New).ToArray();
-            
-            var relistedItems = itemsSource.Items
-                                           .Where(x => x.TradeState == PoeTradeState.Removed)
-                                           .Where(x => itemsPack.Contains(x.Trade, poeItemsComparer))
-                                           .ToArray();
 
             Log.Instance.Debug(
-                $"[TradesListViewModel] Next items pack received, existingItems: {itemsSource.Count}, newItems: {newItems.Length}, removedItems: {removedItems.Length}, re-listedItems: {relistedItems.Length}");
+                $"[TradesListViewModel] Next items pack received, existingItems: {itemsSource.Count}, newItems: {newItems.Length}, removedItems: {removedItems.Length}");
 
             foreach (var item in removedItems)
             {
@@ -209,7 +207,11 @@ namespace PoeEye.PoeTrade.ViewModels
                         .Subscribe(itemsSource.Remove)
                         .AddTo(activeProvider.Anchors);
 
-                    itemsSource.AddOrUpdate(itemViewModel);
+                    uiScheduler.Schedule(() =>
+                    {
+                        Log.Instance.Debug($"Adding new item: {itemViewModel}");
+                        itemsSource.AddOrUpdate(itemViewModel);
+                    });
                 }
                 
                 Update(item, trade =>
@@ -224,13 +226,17 @@ namespace PoeEye.PoeTrade.ViewModels
 
         private void Update(IPoeItem item, Action<IPoeTradeViewModel> action)
         {
-            var existing = itemsSource.Lookup(item);
-            if (!existing.HasValue)
+            uiScheduler.Schedule(() =>
             {
-                return;
-            }
-
-            uiScheduler.Schedule(() => { action(existing.Value); });
+                var existing = itemsSource.Lookup(item);
+                if (!existing.HasValue)
+                {
+                    throw new ApplicationException($"Failed to find item {item.DumpToTextRaw()}, items: \n\t{itemsSource.Items.DumpToTable()}");
+                }
+                //itemsSource.Remove(existing.Value);
+                action(existing.Value);
+                //itemsSource.AddOrUpdate(existing.Value);
+            });
         }
 
         private IObservable<IPoeItem[]> HandleNextQuery(IPoeQueryInfo queryInfo)
