@@ -145,7 +145,6 @@ namespace PoeEye.PoeTrade.Updater
             try
             {
                 var newVersion = await updaterModel.CheckForUpdates();
-                IsOpen = true;
 
                 if (newVersion != null)
                 {
