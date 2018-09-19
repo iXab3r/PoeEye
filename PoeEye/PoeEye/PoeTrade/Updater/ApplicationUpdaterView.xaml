@@ -2,60 +2,45 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
                     xmlns:updater="clr-namespace:PoeEye.PoeTrade.Updater"
-                    xmlns:fa="http://schemas.fontawesome.io/icons/">
-  <ResourceDictionary.MergedDictionaries>
-    <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Converters.xaml" />
-  </ResourceDictionary.MergedDictionaries>
+                    xmlns:fa="http://schemas.fontawesome.io/icons/"
+                    xmlns:eye="http://coderush.net/poeeye/">
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Converters.xaml" />
+    </ResourceDictionary.MergedDictionaries>
 
-  <DataTemplate DataType="{x:Type updater:ApplicationUpdaterViewModel}">
-    <Grid HorizontalAlignment="Right" VerticalAlignment="Center">
-      <Grid.ColumnDefinitions>
-        <ColumnDefinition Width="Auto" />
-        <ColumnDefinition Width="Auto" />
-        <ColumnDefinition Width="*" />
-        <ColumnDefinition Width="Auto" />
-      </Grid.ColumnDefinitions>
+    <DataTemplate DataType="{x:Type updater:ApplicationUpdaterViewModel}">
+        <DockPanel HorizontalAlignment="Right" VerticalAlignment="Center">
+            <Label Style="{StaticResource IconLabel}"
+                   Visibility="{Binding Error, Converter={StaticResource NullToCollapsedConverter}}"
+                   Foreground="{StaticResource ValidationSummaryColor3}"
+                   VerticalAlignment="Stretch"
+                   HorizontalAlignment="Stretch"
+                   HorizontalContentAlignment="Center"
+                   FontSize="18"
+                   fa:Awesome.Content="Warning" />
+            
+            <Label Style="{StaticResource IconLabel}"
+                   Visibility="{Binding Error, Converter={StaticResource NullToCollapsedConverter}}"
+                   Content="{Binding Error}" />
+            
+            <Label Style="{StaticResource IconLabel}"
+                   Visibility="{Binding StatusText, Converter={StaticResource NullToCollapsedConverter}}"
+                   Content="{Binding StatusText}" />
 
-      <controls:ProgressRing Grid.Column="0"
-                             Width="15" Height="15"
-                             Visibility="{Binding IsBusy, Converter={StaticResource BoolFalseToCollapsedConverter}}"
-                             IsActive="{Binding IsBusy}" />
+            <Button HorizontalAlignment="Right"
+                    Visibility="{Binding UpdatedVersion, Converter={StaticResource NullToCollapsedConverter}}"
+                    Content="Restart application"
+                    Margin="10, 0"
+                    Focusable="False"
+                    IsTabStop="False"
+                    Command="{Binding RestartCommand}" />
 
-      <Label Grid.Column="0" Style="{StaticResource IconLabel}"
-             Visibility="{Binding Error, Converter={StaticResource NullToCollapsedConverter}}"
-             Foreground="{StaticResource ValidationSummaryColor3}"
-             VerticalAlignment="Stretch"
-             HorizontalAlignment="Stretch"
-             HorizontalContentAlignment="Center"
-             FontSize="18"
-             fa:Awesome.Content="Warning" />
-
-      <Grid Grid.Column="1" Visibility="{Binding IsBusy, Converter={StaticResource BoolTrueToCollapsedConverter}}">
-        <Label Style="{StaticResource IconLabel}"
-               Visibility="{Binding Error, Converter={StaticResource NullToCollapsedConverter}}"
-               Content="{Binding Error}" />
-
-        <Label Style="{StaticResource IconLabel}"
-               Visibility="{Binding Error, Converter={StaticResource NotNullToCollapsedConverter}}"
-               Content="{Binding MostRecentVersion}"
-               ContentStringFormat="Application was successfully updated to v{0}, new version will take place after restart" />
-      </Grid>
-
-      <Label Grid.Column="1"
-             FontSize="16"
-             FontFamily="{StaticResource FontAwesome}"
-             Visibility="{Binding IsBusy, Converter={StaticResource BoolFalseToCollapsedConverter}}"
-             Content="Checking for updates..." />
-
-      <Button Grid.Column="3"
-              HorizontalAlignment="Right"
-              Content="Restart application"
-              Margin="10, 0"
-              Focusable="False"
-              IsTabStop="False"
-              Command="{Binding RestartCommand}"
-              IsEnabled="{Binding IsBusy, Converter={StaticResource NotConverter}}" />
-    </Grid>
-
-  </DataTemplate>
+            <ContentControl HorizontalAlignment="Right"
+                            Visibility="{Binding LatestVersion, Converter={StaticResource NullToCollapsedConverter}}"
+                            Content="{Binding ApplyUpdate}"
+                            Margin="10, 0"
+                            Focusable="False"
+                            eye:CommandWrapperHelper.Text="Apply update" />
+        </DockPanel>
+    </DataTemplate>
 </ResourceDictionary>

@@ -12,6 +12,7 @@ namespace PoeEye.Config
 
         public static readonly UpdateSourceInfo[] WellKnownUpdateSources =
         {
+            new UpdateSourceInfo {Uri = @"https://github.com/iXab3r/PoeEyeReleases", Description = "[Stable] GitHub Mirror"},
             new UpdateSourceInfo {Uri = @"http://poeeye.dyndns.biz:9997/files/", Description = "[Stable] DynDns Mirror"},
             new UpdateSourceInfo {Uri = @"http://poeeye.dyndns.biz:9997/alpha/", Description = "[Alpha] DynDns Mirror", RequiresAuthentication = true}
         };
@@ -20,12 +21,11 @@ namespace PoeEye.Config
 
         public UpdateSourceInfo UpdateSource { get; set; } = WellKnownUpdateSources.First();
 
-        public int Version { get; set; } = 7;
+        public int Version { get; set; } = 9;
     }
 
     internal struct UpdateSourceInfo
     {
-        [JsonConverter(typeof(SafeDataConverter))]
         public string Uri { get; set; }
 
         public string Description { get; set; }

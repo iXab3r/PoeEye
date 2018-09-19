@@ -8,6 +8,7 @@ using System.Windows.Controls;
 using DynamicData.Annotations;
 using Guards;
 using PoeEye.Config;
+using PoeEye.PoeTrade.Updater;
 using PoeEye.Utilities;
 using PoeShared;
 using PoeShared.Modularity;
@@ -23,6 +24,7 @@ namespace PoeEye.PoeTrade.ViewModels
 {
     internal sealed class PoeEyeUpdateSettingsViewModel : DisposableReactiveObject, ISettingsViewModel<PoeEyeUpdateSettingsConfig>
     {
+        private readonly IApplicationUpdaterModel updaterModel;
         private bool autoUpdate;
         private PoeEyeUpdateSettingsConfig loadedConfig;
         private PasswordBox passwordBox;
@@ -31,9 +33,12 @@ namespace PoeEye.PoeTrade.ViewModels
         private string username;
 
         public PoeEyeUpdateSettingsViewModel(
+            [NotNull] IApplicationUpdaterModel updaterModel,
             [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {
+            Guard.ArgumentNotNull(updaterModel, nameof(updaterModel));
             Guard.ArgumentNotNull(uiScheduler, nameof(uiScheduler));
+            this.updaterModel = updaterModel;
 
             KnownUpdateSources = PoeEyeUpdateSettingsConfig.WellKnownUpdateSources;
 
@@ -113,17 +118,10 @@ namespace PoeEye.PoeTrade.ViewModels
         private async Task TestConnectionCommandExecuted(NetworkCredential credentials)
         {
             TestConnectionCommand.Description = null;
-            var fakeUpdateDirectory = Path.Combine(Path.GetTempPath(), "PoeEye");
-            var downloader = new BasicAuthFileDownloader(credentials);
-            using (var updateManager = new UpdateManager(UpdateSource.Uri, "PoeEye", fakeUpdateDirectory, downloader))
-            {
-                Log.Instance.Debug($"[TestConnection] Checking for updates...");
-                await Task.Delay(UiConstants.ArtificialShortDelay);
-                var updateInfo = await updateManager.CheckForUpdate(true);
-                Log.Instance.Debug($"[TestConnection] UpdateInfo:\r\n{updateInfo?.DumpToText()}");
+            updaterModel.UpdateSource = UpdateSource;
 
-                TestConnectionCommand.Description = $"Successfully connected to {updateSource.Description}\n{updateInfo?.DumpToText()}";
-            }
+            var updateInfo  = await updaterModel.CheckForUpdates();
+            TestConnectionCommand.Description = $"Successfully connected to {updateSource.Description}\n{updateInfo?.DumpToText()}";
         }
     }
 }

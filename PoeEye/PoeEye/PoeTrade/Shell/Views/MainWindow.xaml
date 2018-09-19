@@ -273,7 +273,7 @@
     </controls:MetroWindow.LeftWindowCommands>
 
     <controls:MetroWindow.RightWindowCommands>
-        <controls:WindowCommands ShowSeparators="True">
+        <controls:WindowCommands ShowSeparators="True" >
             <ContentPresenter Content="{Binding ProxyProviderViewModel}" />
 
             <ContentPresenter Content="{Binding ApplicationUpdater}">
@@ -282,12 +282,11 @@
                         <StackPanel Orientation="Horizontal">
                             <controls:ProgressRing Height="20" Width="20" IsActive="true"
                                                    Foreground="{StaticResource TextBrush}"
-                                                   Visibility="{Binding IsBusy, Converter={StaticResource BoolFalseToHiddenConverter}}" />
+                                                   Visibility="{Binding CheckForUpdatesCommand.IsBusy, Converter={StaticResource BoolFalseToHiddenConverter}}" />
 
                             <Button Content="Check for updates"
                                     FontFamily="{StaticResource FontAwesome}"
-                                    Command="{Binding CheckForUpdatesCommand}"
-                                    CommandParameter="{Binding}" />
+                                    Command="{Binding CheckForUpdatesCommand}" />
                         </StackPanel>
                     </DataTemplate>
 

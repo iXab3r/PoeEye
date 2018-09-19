@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Net;
+using System.Reactive.Disposables;
+using System.Reactive.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using PoeShared;
+using PoeShared.Scaffolding;
+using PoeShared.UI;
 using Squirrel;
 
 namespace PoeEye.Utilities
@@ -20,8 +24,23 @@ namespace PoeEye.Utilities
         {
             using (var wc = CreateClient())
             {
-                Log.Instance.Debug($"[WebClient.DownloadFile] Downloading file to '{targetFile}', uri: {url} ");
-                await wc.DownloadFileTaskAsync(url, targetFile);
+                var progressAnchors = new CompositeDisposable();
+                Observable.FromEventPattern<DownloadProgressChangedEventHandler, DownloadProgressChangedEventArgs>(
+                              h => wc.DownloadProgressChanged += h,
+                              h => wc.DownloadProgressChanged -= h)
+                          .Where(x => progress != null)
+                          .Sample(UiConstants.ArtificialShortDelay)
+                          .Subscribe(x => progress(x.EventArgs.ProgressPercentage))
+                          .AddTo(progressAnchors);
+                try
+                {
+                    Log.Instance.Debug($"[WebClient.DownloadFile] Downloading file to '{targetFile}', uri: {url} ");
+                    await wc.DownloadFileTaskAsync(url, targetFile);
+                }
+                finally
+                {
+                    progressAnchors.Dispose();
+                }
             }
         }
 

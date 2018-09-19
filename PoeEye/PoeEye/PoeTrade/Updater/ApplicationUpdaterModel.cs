@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -22,17 +23,13 @@ namespace PoeEye.PoeTrade.Updater
     {
         private static readonly string ApplicationName = Process.GetCurrentProcess().ProcessName + ".exe";
 
-        private readonly IConfigProvider<PoeEyeUpdateSettingsConfig> configProvider;
-
+        private UpdateInfo latestVersion;
         private Version mostRecentVersion;
         private DirectoryInfo mostRecentVersionAppFolder;
+        private UpdateSourceInfo updateSource;
 
-        public ApplicationUpdaterModel(
-            [NotNull] IConfigProvider<PoeEyeUpdateSettingsConfig> configProvider)
+        public ApplicationUpdaterModel()
         {
-            Guard.ArgumentNotNull(configProvider, nameof(configProvider));
-            this.configProvider = configProvider;
-
             SquirrelAwareApp.HandleEvents(
                 OnInitialInstall,
                 OnAppUpdate,
@@ -40,7 +37,13 @@ namespace PoeEye.PoeTrade.Updater
                 onFirstRun: OnFirstRun);
 
             MostRecentVersionAppFolder = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
-            MostRecentVersion = Assembly.GetExecutingAssembly().GetName().Version;
+            UpdatedVersion = null;
+        }
+
+        public UpdateSourceInfo UpdateSource
+        {
+            get => updateSource;
+            set => this.RaiseAndSetIfChanged(ref updateSource, value);
         }
 
         public DirectoryInfo MostRecentVersionAppFolder
@@ -49,48 +52,26 @@ namespace PoeEye.PoeTrade.Updater
             set => this.RaiseAndSetIfChanged(ref mostRecentVersionAppFolder, value);
         }
 
-        public Version MostRecentVersion
+        public Version UpdatedVersion
         {
             get => mostRecentVersion;
             set => this.RaiseAndSetIfChanged(ref mostRecentVersion, value);
         }
 
-        /// <summary>
-        ///     Checks whether update exist and if so, downloads it
-        /// </summary>
-        /// <returns>True if application was updated</returns>
-        public async Task<bool> CheckForUpdates()
+        public UpdateInfo LatestVersion
         {
-            Log.Instance.Debug($"[ApplicationUpdaterModel] Update check requested");
+            get => latestVersion;
+            set => this.RaiseAndSetIfChanged(ref latestVersion, value);
+        }
+        
+        public async Task ApplyRelease(UpdateInfo updateInfo)
+        {
+            Guard.ArgumentNotNull(updateInfo, nameof(updateInfo));
+            
+            Log.Instance.Debug($"[ApplicationUpdaterModel] Applying update {updateInfo.DumpToTextRaw()}");
 
-            var appName = Assembly.GetExecutingAssembly().GetName().Name;
-            var rootDirectory = default(string);
-
-            if (AppArguments.Instance.IsDebugMode)
+            using (var mgr = await CreateManager())
             {
-                rootDirectory = AppDomain.CurrentDomain.BaseDirectory;
-            }
-
-            Log.Instance.Debug($"[ApplicationUpdaterModel] AppName: {appName}, root directory: {rootDirectory}");
-
-            var updateSource = configProvider.ActualConfig.UpdateSource;
-            Log.Instance.Debug($"[ApplicationUpdaterModel] Using update source: {updateSource}");
-            var downloader =
-                new BasicAuthFileDownloader(new NetworkCredential(configProvider.ActualConfig.UpdateSource.Username,
-                                                                  configProvider.ActualConfig.UpdateSource.Password));
-
-            using (var mgr = new UpdateManager(updateSource.Uri, appName, rootDirectory, downloader))
-            {
-                Log.Instance.Debug($"[ApplicationUpdaterModel] Checking for updates...");
-
-                var updateInfo = await mgr.CheckForUpdate(true, CheckUpdateProgress);
-
-                Log.Instance.Debug($"[ApplicationUpdaterModel] UpdateInfo:\r\n{updateInfo?.DumpToText()}");
-                if (updateInfo == null || updateInfo.ReleasesToApply.Count == 0)
-                {
-                    return false;
-                }
-
                 Log.Instance.Debug($"[ApplicationUpdaterModel] Downloading releases...");
                 await mgr.DownloadReleases(updateInfo.ReleasesToApply, UpdateProgress);
 
@@ -117,8 +98,34 @@ namespace PoeEye.PoeTrade.Updater
                 }
 
                 MostRecentVersionAppFolder = new DirectoryInfo(newVersionFolder);
-                MostRecentVersion = lastAppliedRelease.Version;
-                return true;
+                UpdatedVersion = lastAppliedRelease.Version;
+                LatestVersion = null;
+            }
+        }
+
+        /// <summary>
+        ///     Checks whether update exist and if so, downloads it
+        /// </summary>
+        /// <returns>True if application was updated</returns>
+        public async Task<UpdateInfo> CheckForUpdates()
+        {
+            Log.Instance.Debug($"[ApplicationUpdaterModel] Update check requested");
+
+            using (var mgr = await CreateManager())
+            {
+                Log.Instance.Debug($"[ApplicationUpdaterModel] Checking for updates...");
+                LatestVersion = null;
+
+                var updateInfo = await mgr.CheckForUpdate(true, CheckUpdateProgress);
+
+                Log.Instance.Debug($"[ApplicationUpdaterModel] UpdateInfo:\r\n{updateInfo?.DumpToText()}");
+                if (updateInfo == null || updateInfo.ReleasesToApply.Count == 0)
+                {
+                    return null;
+                }
+
+                LatestVersion = updateInfo;
+                return updateInfo;
             }
         }
 
@@ -148,6 +155,41 @@ namespace PoeEye.PoeTrade.Updater
 
             Log.Instance.Debug($"[ApplicationUpdaterModel] Terminating application...");
             Application.Current.Shutdown(0);
+        }
+
+        private async Task<IUpdateManager> CreateManager()
+        {
+            var appName = Assembly.GetExecutingAssembly().GetName().Name;
+            var rootDirectory = default(string);
+
+            if (AppArguments.Instance.IsDebugMode)
+            {
+                rootDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            }
+
+            Log.Instance.Debug($"[ApplicationUpdaterModel] AppName: {appName}, root directory: {rootDirectory}");
+
+            Log.Instance.Debug($"[ApplicationUpdaterModel] Using update source: {updateSource.DumpToTextRaw()}");
+            var downloader = new BasicAuthFileDownloader(new NetworkCredential(updateSource.Username,
+                                                                               updateSource.Password));
+            if (updateSource.Uri.Contains("github"))
+            {
+                Log.Instance.Debug($"[ApplicationUpdaterModel] Using GitHub source: {updateSource.DumpToTextRaw()}");
+
+                var mgr = UpdateManager.GitHubUpdateManager(
+                    updateSource.Uri, 
+                    applicationName:appName, 
+                    rootDirectory:rootDirectory, 
+                    urlDownloader:downloader, 
+                    prerelease:false);
+                return await mgr;
+            }
+            else
+            {
+                Log.Instance.Debug($"[ApplicationUpdaterModel] Using BasicHTTP source: {updateSource.DumpToTextRaw()}");
+                var mgr = new UpdateManager(updateSource.Uri, appName, rootDirectory, downloader);
+                return mgr;
+            }
         }
 
         private void UpdateProgress(int progressPercent)

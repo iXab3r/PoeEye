@@ -25,8 +25,9 @@ namespace PoeEye.PoeTrade.Updater
         private readonly IApplicationUpdaterModel updaterModel;
         private string error = string.Empty;
 
-        private bool isBusy;
         private bool isOpen;
+
+        private string statusText;
 
         public ApplicationUpdaterViewModel(
             [NotNull] IApplicationUpdaterModel updaterModel,
@@ -39,11 +40,12 @@ namespace PoeEye.PoeTrade.Updater
             Guard.ArgumentNotNull(bgScheduler, nameof(bgScheduler));
             Guard.ArgumentNotNull(configProvider, nameof(configProvider));
 
-            updaterModel.WhenAnyValue(x => x.MostRecentVersion)
-                        .Subscribe(() => this.RaisePropertyChanged(nameof(MostRecentVersion)))
+            this.updaterModel = updaterModel;
+
+            updaterModel.WhenAnyValue(x => x.UpdatedVersion)
+                        .Subscribe(() => this.RaisePropertyChanged(nameof(UpdatedVersion)))
                         .AddTo(Anchors);
 
-            this.updaterModel = updaterModel;
             checkForUpdatesCommand = CommandWrapper
                 .Create(CheckForUpdatesCommandExecuted);
 
@@ -53,9 +55,15 @@ namespace PoeEye.PoeTrade.Updater
                 .AddTo(Anchors);
 
             updaterModel
-                .WhenAnyValue(x => x.MostRecentVersion)
+                .WhenAnyValue(x => x.UpdatedVersion)
                 .ObserveOn(uiScheduler)
-                .Subscribe(() => this.RaisePropertyChanged(nameof(MostRecentVersion)), Log.HandleUiException)
+                .Subscribe(() => this.RaisePropertyChanged(nameof(UpdatedVersion)), Log.HandleUiException)
+                .AddTo(Anchors);
+
+            updaterModel
+                .WhenAnyValue(x => x.LatestVersion)
+                .ObserveOn(uiScheduler)
+                .Subscribe(() => this.RaisePropertyChanged(nameof(LatestVersion)), Log.HandleUiException)
                 .AddTo(Anchors);
 
             //FIXME UI THREAD ?
@@ -68,21 +76,32 @@ namespace PoeEye.PoeTrade.Updater
                 .AddTo(Anchors);
 
             configProvider
+                .ListenTo(x => x.UpdateSource)
+                .Subscribe(x => updaterModel.UpdateSource = x)
+                .AddTo(Anchors);
+
+            configProvider
                 .ListenTo(x => x.AutoUpdateTimeout)
                 .WithPrevious((prev, curr) => new {prev, curr})
-                .Do(timeout => Log.Instance.Debug($"[ApplicationUpdaterViewModel] AutoUpdate timout changed: {timeout.prev} => {timeout.curr}"))
+                .Do(timeout => Log.Instance.Debug($"[ApplicationUpdaterViewModel] AutoUpdate timeout changed: {timeout.prev} => {timeout.curr}"))
                 .Select(timeout => timeout.curr <= TimeSpan.Zero
                             ? Observable.Never<long>()
                             : Observable.Timer(DateTimeOffset.MinValue, timeout.curr, bgScheduler))
                 .Switch()
                 .ObserveOn(uiScheduler)
-                .Subscribe(() => checkForUpdatesCommand.Execute(this), Log.HandleException)
+                .Subscribe(() => checkForUpdatesCommand.Execute(null), Log.HandleException)
                 .AddTo(Anchors);
+
+            ApplyUpdate = CommandWrapper.Create(
+                ApplyUpdateCommandExecuted,
+                this.updaterModel.WhenAnyValue(x => x.LatestVersion).Select(x => x != null));
         }
 
-        public ICommand CheckForUpdatesCommand => checkForUpdatesCommand;
+        public CommandWrapper CheckForUpdatesCommand => checkForUpdatesCommand;
 
         public ICommand RestartCommand => restartCommand;
+
+        public CommandWrapper ApplyUpdate { get; }
 
         public string Error
         {
@@ -90,10 +109,10 @@ namespace PoeEye.PoeTrade.Updater
             set => this.RaiseAndSetIfChanged(ref error, value);
         }
 
-        public bool IsBusy
+        public string StatusText
         {
-            get => isBusy;
-            set => this.RaiseAndSetIfChanged(ref isBusy, value);
+            get => statusText;
+            set => this.RaiseAndSetIfChanged(ref statusText, value);
         }
 
         public bool IsOpen
@@ -102,20 +121,41 @@ namespace PoeEye.PoeTrade.Updater
             set => this.RaiseAndSetIfChanged(ref isOpen, value);
         }
 
-        public Version MostRecentVersion => updaterModel.MostRecentVersion;
+        [CanBeNull]
+        public Version UpdatedVersion => updaterModel.UpdatedVersion;
+
+        [CanBeNull]
+        public Version LatestVersion => updaterModel.LatestVersion?.FutureReleaseEntry?.Version;
 
         private async Task CheckForUpdatesCommandExecuted()
         {
-            Log.Instance.Debug($"[ApplicationUpdaterViewModel] Update check requested");
-            IsBusy = true;
+            Log.Instance.Debug("[ApplicationUpdaterViewModel] Update check requested");
+            if (checkForUpdatesCommand.IsBusy || ApplyUpdate.IsBusy)
+            {
+                Log.Instance.Debug("[ApplicationUpdaterViewModel] Already in progress");
+                IsOpen = true;
+                return;
+            }
+            StatusText = "Checking for updates...";
             Error = string.Empty;
 
-            // delaying update so the user could see the progressring
+            // delaying update so the user could see the progress ring
             await Task.Delay(UiConstants.ArtificialLongDelay);
 
             try
             {
-                IsOpen = await updaterModel.CheckForUpdates();
+                var newVersion = await updaterModel.CheckForUpdates();
+                IsOpen = true;
+
+                if (newVersion != null)
+                {
+                    IsOpen = true;
+                    StatusText = $"New version available ! Application could be updated to v{LatestVersion}";
+                }
+                else
+                {
+                    StatusText = $"Latest version is already installed";
+                }
             }
             catch (Exception ex)
             {
@@ -123,23 +163,57 @@ namespace PoeEye.PoeTrade.Updater
                 IsOpen = true;
                 Error = ex.Message;
             }
-            finally
+        }
+
+        private async Task ApplyUpdateCommandExecuted()
+        {
+            Log.Instance.Debug($"[ApplicationUpdaterViewModel] Applying latest update {LatestVersion}");
+            if (checkForUpdatesCommand.IsBusy || ApplyUpdate.IsBusy)
             {
-                IsBusy = false;
+                Log.Instance.Debug("[ApplicationUpdaterViewModel] Already in progress");
+                IsOpen = true;
+                return;
+            }
+            StatusText = $"Applying update {LatestVersion}...";
+            Error = string.Empty;
+
+            if (updaterModel.LatestVersion == null)
+            {
+                throw new ApplicationException("Latest version must be specified");
+            }
+
+            await Task.Delay(UiConstants.ArtificialLongDelay);
+
+            try
+            {
+                await updaterModel.ApplyRelease(updaterModel.LatestVersion);
+                IsOpen = true;
+                StatusText = $"Application was successfully updated to v{updaterModel.UpdatedVersion}, new version will take place after restart";
+            }
+            catch (Exception ex)
+            {
+                Log.HandleUiException(ex);
+                IsOpen = true;
+                Error = ex.Message;
+                StatusText = null;
             }
         }
 
         private async Task RestartCommandExecuted()
         {
-            Log.Instance.Debug($"[ApplicationUpdaterViewModel] Restart application requested");
+            Log.Instance.Debug("[ApplicationUpdaterViewModel] Restart application requested");
             Error = string.Empty;
 
             try
             {
+                IsOpen = true;
+
                 await updaterModel.RestartApplication();
             }
             catch (Exception ex)
             {
+                IsOpen = true;
+
                 Log.HandleUiException(ex);
                 Error = ex.Message;
             }
