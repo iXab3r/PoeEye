@@ -207,6 +207,7 @@ namespace PoeEye.PoeTrade.Updater
             try
             {
                 IsOpen = true;
+                StatusText = "Restarting application...";
 
                 await updaterModel.RestartApplication();
             }
@@ -216,6 +217,7 @@ namespace PoeEye.PoeTrade.Updater
 
                 Log.HandleUiException(ex);
                 Error = ex.Message;
+                StatusText = null;
             }
         }
     }

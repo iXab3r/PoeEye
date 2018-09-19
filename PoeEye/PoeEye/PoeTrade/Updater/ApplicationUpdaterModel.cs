@@ -76,9 +76,9 @@ namespace PoeEye.PoeTrade.Updater
                 await mgr.DownloadReleases(updateInfo.ReleasesToApply, UpdateProgress);
 
                 string newVersionFolder;
-                if (AppArguments.Instance.IsDebugMode)
+                if (string.IsNullOrWhiteSpace(GetSquirrelUpdateExe()))
                 {
-                    Log.Instance.Debug("[ApplicationUpdaterModel] Debug mode detected, skipping update");
+                    Log.Instance.Warn("[ApplicationUpdaterModel] Not a Squirrel-app or debug mode detected, skipping update");
                     newVersionFolder = AppDomain.CurrentDomain.BaseDirectory;
                 }
                 else
@@ -162,7 +162,7 @@ namespace PoeEye.PoeTrade.Updater
             var appName = Assembly.GetExecutingAssembly().GetName().Name;
             var rootDirectory = default(string);
 
-            if (AppArguments.Instance.IsDebugMode)
+            if (AppArguments.Instance.IsDebugMode || string.IsNullOrWhiteSpace(GetSquirrelUpdateExe()))
             {
                 rootDirectory = AppDomain.CurrentDomain.BaseDirectory;
             }
