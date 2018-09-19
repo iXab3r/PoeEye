@@ -22,10 +22,9 @@ void Main()
 	new { scriptDir, grPath,setupFilePath, username, reponame, GithubTokenIsSet = !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("GITHUB_TOKEN")) }.Dump("GitHubRelease Arguments");
 	
 	var versionInfo = FileVersionInfo.GetVersionInfo(setupFilePath);
-	var version = $"{versionInfo.ProductMajorPart}.{versionInfo.ProductMinorPart}.{versionInfo.ProductBuildPart}";
+	var version = versionInfo.ProductVersion;
 	var versionTag = $"v{version}";
-
-	version.Dump("PoeEye version");
+	versionTag.Dump("PoeEye version");
 	
 	$"Preparing release draft {versionTag}".Dump();
 
