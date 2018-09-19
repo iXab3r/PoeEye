@@ -37,6 +37,6 @@ void Main()
 	foreach (var fileName in packages)
 	{
 		fileName.Dump("Uploading...");
-		Util.Cmd(grPath, $"upload --user {username} --repo {reponame} --tag {versionTag} --file \"{fileName}\" --replace", false);
+		Util.Cmd(grPath, $"upload --user {username} --repo {reponame} --tag {versionTag} --file \"{fileName}\" --name \"{Path.GetFileName(fileName)}\" --replace", false);
 	}
 }
