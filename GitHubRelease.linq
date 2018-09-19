@@ -31,6 +31,9 @@ void Main()
 
 	Util.Cmd(grPath, $"release --user {username} --repo {reponame} --tag {versionTag}", false);
 
+	$"Uploading releases file".Dump();
+	Util.Cmd(grPath, $"upload --user {username} --repo {reponame} --tag {versionTag} --name \"RELEASES\" --file \"{Path.Combine(releasesPath, "RELEASES")}\" --replace", false);
+
 	$"Uploading binaries".Dump();
 	Util.Cmd(grPath, $"upload --user {username} --repo {reponame} --tag {versionTag} --name \"PoeEyeSetup.{version}.exe\" --file \"{setupFilePath}\" --replace", false);
 	
