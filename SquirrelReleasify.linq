@@ -7,22 +7,29 @@ void Main()
 
 	var nuspecFileName = @"PoeEye.nuspec";
 	var nuspecFilePath = Path.Combine(homeDir, nuspecFileName);
-
-	new[] { nuspecFilePath }.Dump("Reading version from .nuspec file...");
-	var nuspecDocument = XElement.Load(nuspecFilePath);
-	var ns = nuspecDocument.GetDefaultNamespace();
-
-	var version = nuspecDocument.Descendants(ns + "metadata").Single().Descendants(ns + "version").Single().Value;
+	var version = GetSpecVersion(nuspecFilePath);
 
 	var nupkgFileName = $@"PoeEye.{version}.nupkg";
 	var nupkgFilePath = Path.Combine(scriptDir, nupkgFileName);
-	
+
 	var releasesFolderName = "Releases";
 	var squirrelPath = Path.Combine(homeDir, $@"packages\squirrel.windows.1.0.2\tools\Squirrel.exe");
+	var squirrelLogPath = Path.Combine(Path.GetDirectoryName(squirrelPath), "SquirrelSetup.log");
 
-	new { version, homeDir, nupkgFilePath, squirrelPath }.Dump("Running Releasify...");
+	if (File.Exists(squirrelLogPath))
+	{
+		File.Delete(squirrelLogPath.Dump("Removing Squirrel log..."));
+	}
 
-	Util.Cmd(squirrelPath, $"--releasify={nupkgFilePath}", false);
+	new { version, homeDir, nupkgFilePath }.Dump("Running Releasify...");
+	var squirrelArgs = new { Path = squirrelPath, Args = $"--releasify=\"{nupkgFilePath}\"", Log = squirrelLogPath }.Dump("Squirrel");
+	
+	Util.Cmd(squirrelArgs.Path, squirrelArgs.Args, false);
+
+	if (File.Exists(squirrelLogPath))
+	{
+		File.ReadAllText(squirrelLogPath).Dump("Squirrel execution log");
+	}
 
 	var sourceReleasesFolderPath = Path.Combine(Path.GetDirectoryName(squirrelPath), releasesFolderName);
 	var targetReleasesFolderPath = Path.Combine(scriptDir, releasesFolderName);
@@ -45,6 +52,18 @@ void Main()
 	var squirrelLogFilePath = Path.Combine(Path.GetDirectoryName(squirrelPath), "SquirrelSetup.log");
 	var squirrelLog = File.Exists(squirrelLogFilePath) ? File.ReadAllText(squirrelLogFilePath) : $"Squirrel log file does not exist at path {squirrelLogFilePath}";
 	squirrelLog.Dump("Squirrel execution log");
+}
+
+
+private static string GetSpecVersion(string nuspecFilePath)
+{
+	new[] { nuspecFilePath }.Dump("Reading version from .nuspec file...");
+	var nuspecDocument = XElement.Load(nuspecFilePath);
+	var ns = nuspecDocument.GetDefaultNamespace();
+
+	var version = nuspecDocument.Descendants(ns + "metadata").Single().Descendants(ns + "version").Single().Value;
+
+	return version;
 }
 
 // Define other methods and classes here
