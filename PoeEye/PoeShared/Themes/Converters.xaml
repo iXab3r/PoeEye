@@ -6,7 +6,10 @@
                     xmlns:kent="http://schemas.kent.boogaart.com/converters"
                     xmlns:global="clr-namespace:"
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
-    
+    <eyeConverters:NullToBoolConverter x:Key="IsNullOrEmptyConverter" NullValue="True" />
+    <eyeConverters:NullToBoolConverter x:Key="IsNotNullOrEmptyConverter" NullValue="False" />
+    <eyeConverters:MultiBooleanConverter x:Key="MultiBooleanOrConverter" />
+
     <system:Boolean x:Key="FalseValue">False</system:Boolean>
     <system:Boolean x:Key="TrueValue">True</system:Boolean>
 

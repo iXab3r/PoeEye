@@ -2,8 +2,6 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:converters="clr-namespace:PoeBud.Converters"
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
-    <converters:NullToBoolConverter x:Key="NullToFalseConverter" NullValue="False" />
-    
     <converters:PoeSolutionToHumanReadableFormat x:Key="PoeSolutionToHumanReadableFormatConverterKey" />
     
     <converters:BooleanToObjectConverter x:Key="BooleanToSemitransparentConverter">

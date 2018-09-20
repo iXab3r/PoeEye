@@ -68,7 +68,7 @@
           </Grid.RowDefinitions>
 
           <ComboBox Grid.Row="0"
-                    IsEnabled="{Binding LeaguesList, Converter={StaticResource NullToFalseConverter}}"
+                    IsEnabled="{Binding LeaguesList, Converter={StaticResource IsNotNullOrEmptyConverter}}"
                     Margin="0, 5"
                     ItemsSource="{Binding LeaguesList}"
                     SelectedItem="{Binding SelectedLeague}">
