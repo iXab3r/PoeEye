@@ -4,7 +4,6 @@ using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using Exceptionless;
 using Guards;
 using JetBrains.Annotations;
 using PoeEye.ItemParser.Services;
@@ -151,12 +150,6 @@ namespace PoeEye.PoeTrade.ViewModels
 
         private async Task CopyPrivateMessageCommandExecuted(bool sendMessageToChat)
         {
-            ExceptionlessClient.Default
-                               .CreateFeatureUsage("TradeList")
-                               .SetType("SendPrivateMesage")
-                               .SetProperty("Item", Trade.DumpToText())
-                               .Submit();
-
             var message = PreparePrivateMessage(Trade);
             if (sendMessageToChat)
             {
@@ -181,12 +174,6 @@ namespace PoeEye.PoeTrade.ViewModels
         {
             try
             {
-                ExceptionlessClient.Default
-                                   .CreateFeatureUsage("TradeList")
-                                   .SetType("OpenForumUri")
-                                   .SetProperty("Item", Trade.DumpToText())
-                                   .Submit();
-
                 Process.Start(uri);
             }
             catch (Exception ex)

@@ -7,8 +7,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
-using Exceptionless;
-using Exceptionless.Models;
 using ExceptionReporting;
 using ExceptionReporting.Core;
 using log4net.Core;
@@ -40,8 +38,6 @@ namespace PoeEye
                 Log.Instance.Debug($"[App..ctor] Arguments: {arguments.DumpToText()}");
                 Log.Instance.Debug($"[App..ctor] Parsed args: {AppArguments.Instance.DumpToText()}");
                 Log.Instance.Debug($"[App..ctor] Culture: {Thread.CurrentThread.CurrentCulture}, UICulture: {Thread.CurrentThread.CurrentUICulture}");
-
-                InitializeExceptionless();
 
                 RxApp.SupportsRangeNotifications = false; //FIXME DynamicData (as of v4.11) does not support RangeNotifications
                 Log.Instance.Debug($"[App..ctor] UI Scheduler: {RxApp.MainThreadScheduler}");
@@ -77,21 +73,6 @@ namespace PoeEye
                 Log.Instance.Warn($"[App] Appliation is already running, mutex: {mutexId}");
                 ShowShutdownWarning();
             }
-        }
-
-        private void InitializeExceptionless()
-        {
-            Log.Instance.Debug("Initializing exceptionless...");
-            ExceptionlessClient.Default.Configuration.ApiKey = "dkjcxnVxQO9Nx6zJdYYyAW66gHt5YP5XCmHNmjYj";
-            ExceptionlessClient.Default.Configuration.DefaultTags.Add($".NET {Environment.Version}");
-            ExceptionlessClient.Default.Configuration.DefaultTags.Add($"OS:{Environment.OSVersion}");
-            ExceptionlessClient.Default.Configuration.DefaultTags.Add(AppVersion);
-            ExceptionlessClient.Default.Configuration.IncludePrivateInformation = true;
-            ExceptionlessClient.Default.Configuration.SetVersion(AppVersion);
-            ExceptionlessClient.Default.Configuration.SetUserIdentity(
-                $"{Environment.UserName}@{Environment.MachineName}");
-
-            ExceptionlessClient.Default.SubmitEvent(new Event {Message = AppVersion, Type = "Version"});
         }
 
         private void CurrentDomainOnUnhandledException(object sender, UnhandledExceptionEventArgs e)

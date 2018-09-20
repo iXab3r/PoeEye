@@ -63,7 +63,7 @@ namespace PoeShared.PoeTrade.Query
             }
             catch (Exception ex)
             {
-                Log.HandleUiException(ex);
+                Log.HandleException(ex);
                 Log.Instance.Debug($"[PoeQueryInfoProvider-{poeApi.Name}] Returning empty static data");
                 Error = ex.Message;
                 return PoeStaticData.Empty;

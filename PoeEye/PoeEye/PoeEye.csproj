@@ -98,15 +98,6 @@
     <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
-    <Reference Include="Exceptionless.Extras, Version=3.3.1590.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Exceptionless.Wpf.3.3.1590\lib\net45\Exceptionless.Extras.dll</HintPath>
-    </Reference>
-    <Reference Include="Exceptionless.Portable, Version=3.3.1590.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Exceptionless.Portable.3.3.1590\lib\net45\Exceptionless.Portable.dll</HintPath>
-    </Reference>
-    <Reference Include="Exceptionless.Wpf, Version=3.3.1590.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Exceptionless.Wpf.3.3.1590\lib\net45\Exceptionless.Wpf.dll</HintPath>
-    </Reference>
     <Reference Include="ExceptionReporter.NET, Version=2.2.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\ExceptionReporter.2.3.0\lib\net40\ExceptionReporter.NET.dll</HintPath>
     </Reference>

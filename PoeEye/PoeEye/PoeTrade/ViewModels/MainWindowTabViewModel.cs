@@ -7,7 +7,6 @@ using System.Reactive.Linq;
 using System.Windows.Input;
 using DynamicData;
 using DynamicData.Binding;
-using Exceptionless;
 using Guards;
 using JetBrains.Annotations;
 using PoeEye.Config;
@@ -376,14 +375,6 @@ namespace PoeEye.PoeTrade.ViewModels
                 Log.Instance.Debug("[MainWindowTabViewModel.SearchCommandExecute] Auto-recheck is disabled, refreshing query manually...");
                 TradesList.Refresh();
             }
-
-            ExceptionlessClient.Default
-                               .CreateFeatureUsage("TradeList")
-                               .SetType("Search")
-                               .SetMessage(Query.Description)
-                               .SetProperty("Description", Query.Description)
-                               .SetProperty("Query", newQuery.DumpToText())
-                               .Submit();
         }
 
         private void MarkAllAsReadExecute()

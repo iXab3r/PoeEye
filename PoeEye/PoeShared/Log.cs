@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Reactive.Subjects;
-using Exceptionless;
 using Guards;
 using JetBrains.Annotations;
 using log4net;
@@ -36,7 +35,6 @@ namespace PoeShared
             Guard.ArgumentNotNull(exception, nameof(exception));
 
             Instance.Error("Exception occurred", exception);
-            exception.ToExceptionless().Submit();
         }
 
         public static void HandleUiException([NotNull] Exception exception)
@@ -44,7 +42,6 @@ namespace PoeShared
             Guard.ArgumentNotNull(exception, nameof(exception));
 
             Instance.Error("UI Exception occurred", exception);
-            exception.ToExceptionless().MarkAsCritical().Submit();
         }
 
         public static void InitializeLogging(string configurationMode)
