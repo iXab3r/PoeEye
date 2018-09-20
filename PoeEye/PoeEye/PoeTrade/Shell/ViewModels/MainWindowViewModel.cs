@@ -294,6 +294,8 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
         {
             var newTab = tabFactory.Create();
 
+            newTab.RecheckPeriod.Period = TimeSpan.MinValue; // by default, recheck is disabled
+
             newTab
                 .WhenAnyValue(x => x.SelectedApi)
                 .ToUnit()
