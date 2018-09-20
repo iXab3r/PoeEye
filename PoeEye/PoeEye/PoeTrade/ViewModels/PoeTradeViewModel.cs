@@ -69,8 +69,7 @@ namespace PoeEye.PoeTrade.ViewModels
             Mods = modsViewModelFactory.Create();
             Mods.Item = Trade;
 
-            CopyItemToClipboardCommand = new DelegateCommand(CopyPrivateMessageToClipboardCommandExecuted);
-            SendPrivateMessageCommand = new DelegateCommand(SendPrivateMessageCommandExecuted);
+            CopyPrivateMessageToClipboardCommand = CommandWrapper.Create<bool>(CopyPrivateMessageCommandExecuted);
 
             OpenForumUriCommand = new DelegateCommand(OpenForumUriCommandExecuted, OpenForumUriCommandCanExecute); 
 
@@ -119,7 +118,7 @@ namespace PoeEye.PoeTrade.ViewModels
 
         public ICommand CopyItemToClipboardCommand { get; }
 
-        public ICommand SendPrivateMessageCommand { get; }
+        public ICommand CopyPrivateMessageToClipboardCommand { get; }
 
         public TimeSpan? TimeElapsedSinceLastIndexation => Trade.Timestamp == null ? TimeSpan.Zero : clock.Now - Trade.Timestamp;
 
@@ -137,8 +136,6 @@ namespace PoeEye.PoeTrade.ViewModels
 
         public IPoeItem Trade { get; }
 
-        public ICommand CopyPrivateMessageToClipboardCommand { get; }
-
         private void OpenForumUriCommandExecuted()
         {
             Guard.ArgumentIsTrue(() => OpenForumUriCommandCanExecute());
@@ -152,7 +149,7 @@ namespace PoeEye.PoeTrade.ViewModels
             return Uri.TryCreate(Trade.TradeForumUri, UriKind.Absolute, out tradeForumUri);
         }
 
-        private async void SendPrivateMessageCommandExecuted()
+        private async Task CopyPrivateMessageCommandExecuted(bool sendMessageToChat)
         {
             ExceptionlessClient.Default
                                .CreateFeatureUsage("TradeList")
@@ -161,35 +158,22 @@ namespace PoeEye.PoeTrade.ViewModels
                                .Submit();
 
             var message = PreparePrivateMessage(Trade);
-            try
+            if (sendMessageToChat)
             {
                 Log.Instance.Warn($"[PoeTradeViewModel.SendPrivateMessageCommandExecuted] Sending private message '{message}'");
                 notificationsManager.PlayNotification(AudioNotificationType.Keyboard);
                 var result = await chatService.SendMessage(message);
+                if (result != PoeMessageSendStatus.Success)
+                {
+                    throw new ApplicationException($"Failed to send message, reason: {result}");
+                }
                 Log.Instance.Warn($"[PoeTradeViewModel.SendPrivateMessageCommandExecuted] Sent message, result: {result}");
             }
-            catch (Exception ex)
+            else
             {
-                Log.Instance.Warn($"Failed to send private message '{message}'", ex);
-            }
-        }
-
-        private void CopyPrivateMessageToClipboardCommandExecuted()
-        {
-            ExceptionlessClient.Default
-                               .CreateFeatureUsage("TradeList")
-                               .SetType("CopyToClipboard")
-                               .SetProperty("Item", Trade.DumpToText())
-                               .Submit();
-
-            var message = PreparePrivateMessage(Trade);
-            try
-            {
+                Log.Instance.Warn($"[PoeTradeViewModel.SendPrivateMessageCommandExecuted] Copying private message '{message}' to clipboard");
                 clipboardManager.SetText(message);
-            }
-            catch (Exception ex)
-            {
-                Log.Instance.Warn($"Failed to send private message '{message}'", ex);
+                Log.Instance.Warn($"[PoeTradeViewModel.SendPrivateMessageCommandExecuted] Copied message");
             }
         }
 

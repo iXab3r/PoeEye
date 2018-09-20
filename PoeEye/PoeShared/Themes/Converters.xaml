@@ -4,7 +4,11 @@
                     xmlns:converters="clr-namespace:PoeShared.Scaffolding.WPF.Converters"
                     xmlns:eyeConverters="clr-namespace:PoeShared.Converters"
                     xmlns:kent="http://schemas.kent.boogaart.com/converters"
-                    xmlns:global="clr-namespace:">
+                    xmlns:global="clr-namespace:"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+    
+    <system:Boolean x:Key="FalseValue">False</system:Boolean>
+    <system:Boolean x:Key="TrueValue">True</system:Boolean>
 
     <blue:BoolToVisibilityConverter x:Key="TrueToVisibleFalseToCollapsedConverter"
                                     TrueValue="Visible"

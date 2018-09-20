@@ -648,28 +648,25 @@
                     <TextBlock Grid.Column="6"
                                Text="{Binding Path=Trade.UserIgn, Mode=OneWay, StringFormat='IGN: {0}'}" />
 
-                    <Button Grid.Column="7"
-                            Command="{Binding CopyPrivateMessageToClipboardCommand}"
-                            Width="150" Height="22"
-                            Margin="5,0"
-                            RenderTransformOrigin="0.5, 0.5">
-                        <Button.Content>
-                            <TextBlock
-                                Style="{StaticResource IconTextBlock}"
-                                Text="&#xf1d8; Copy Or Send" Margin="5,0" />
-                        </Button.Content>
-                        <Button.InputBindings>
+                    <ContentControl Grid.Column="7"
+                                    Content="{Binding CopyPrivateMessageToClipboardCommand}"
+                                    eye:CommandWrapperHelper.Text="&#xf1d8; Copy Or Send"
+                                    Width="150" Height="22"
+                                    Margin="5,0"
+                                    eye:CommandWrapperHelper.CommandParameter="{StaticResource FalseValue}">
+                        
+                        <ContentControl.InputBindings>
                             <MouseBinding MouseAction="RightClick"
-                                          Command="{Binding SendPrivateMessageCommand}"
-                                          CommandParameter="{Binding}" />
-                        </Button.InputBindings>
-
-                        <Button.ToolTip>
+                                          Command="{Binding CopyPrivateMessageToClipboardCommand}"
+                                          CommandParameter="{StaticResource TrueValue}" />
+                        </ContentControl.InputBindings>
+                        
+                        <ContentControl.ToolTip>
                             <controls:MouseButtonsTooltip
                                 LeftButton="Copy PM to clipboard"
                                 RightButton="Send instant PM using Path of Exile client" />
-                        </Button.ToolTip>
-                    </Button>
+                        </ContentControl.ToolTip>
+                    </ContentControl>
                 </Grid>
             </Border>
 

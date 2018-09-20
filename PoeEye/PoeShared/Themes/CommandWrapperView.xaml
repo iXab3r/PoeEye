@@ -22,7 +22,6 @@
                     Command="{Binding}"
                     Focusable="False"
                     IsDefault="{Binding Path=(s:CommandWrapperHelper.IsDefault), RelativeSource={RelativeSource Self}}"
-
                     HorizontalAlignment="Stretch"
                     Content="{Binding Path=(s:CommandWrapperHelper.Text), RelativeSource={RelativeSource Self}}"
                     CommandParameter="{Binding Path=(s:CommandWrapperHelper.CommandParameter), RelativeSource={RelativeSource Self}}" />
@@ -47,7 +46,15 @@
                                 <MultiDataTrigger.Conditions>
                                     <Condition Binding="{Binding Error}" Value="{x:Null}" />
                                 </MultiDataTrigger.Conditions>
-
+                                <MultiDataTrigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Visibility">
+                                                <DiscreteObjectKeyFrame KeyTime="0:0:0" Value="{x:Static Visibility.Collapsed}" />
+                                            </ObjectAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </MultiDataTrigger.EnterActions>
                                 <MultiDataTrigger.ExitActions>
                                     <BeginStoryboard>
                                         <Storyboard>
@@ -100,6 +107,15 @@
                                         </Storyboard>
                                     </BeginStoryboard>
                                 </MultiDataTrigger.EnterActions>
+                                <MultiDataTrigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Visibility">
+                                                <DiscreteObjectKeyFrame KeyTime="0:0:0" Value="{x:Static Visibility.Collapsed}" />
+                                            </ObjectAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </MultiDataTrigger.ExitActions>
                             </MultiDataTrigger>
                         </Style.Triggers>
 
