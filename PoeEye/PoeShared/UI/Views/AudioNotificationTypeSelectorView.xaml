@@ -48,9 +48,8 @@
                                             BorderThickness="1"
                                             BorderBrush="{StaticResource AccentColorBrush}"
                                             Style="{StaticResource CircleButton}" />
-                                    <CheckBox IsEnabled="{Binding IsSelected, Mode=OneWay}" />
-                                    <TextBlock Style="{StaticResource IconTextBlock}" Text="{Binding Name}"
-                                               VerticalAlignment="Center" />
+                                    <CheckBox IsEnabled="False" IsChecked="{Binding IsSelected, Mode=OneWay}" />
+                                    <TextBlock Style="{StaticResource IconTextBlock}" Text="{Binding Name}"/>
                                 </StackPanel>
                             </DataTemplate>
                         </ContextMenu.ItemTemplate>
@@ -64,7 +63,6 @@
 
                     </ContextMenu>
                 </ToggleButton.ContextMenu>
-
 
                 <ToggleButton.ToolTip>
                     <controls:MouseButtonsTooltip
