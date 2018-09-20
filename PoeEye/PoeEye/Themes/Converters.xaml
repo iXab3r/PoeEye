@@ -5,16 +5,7 @@
                     xmlns:eye="http://coderush.net/poeeye/"
                     xmlns:query="clr-namespace:PoeShared.Common;assembly=PoeShared">
 
-  <converters:NullToVisibilityConverter x:Key="NullToCollapsedConverter" NullValue="Collapsed" NotNullValue="Visible" />
-  <converters:NullToVisibilityConverter x:Key="NotNullToCollapsedConverter" NullValue="Visible"
-                                        NotNullValue="Collapsed" />
-  <converters:NullToVisibilityConverter x:Key="NullToHiddenConverter" NullValue="Hidden" NotNullValue="Visible" />
-  <converters:NullToVisibilityConverter x:Key="NotNullToHiddenConverter" NullValue="Visible" NotNullValue="Hidden" />
-  <converters:ExceptionToMessageConverter x:Key="ExceptionToMessageConverter" />
-  <converters:TimeSpanToHumanReadableStringConverter x:Key="TimeSpanToHumanReadableStringConverter" />
   <converters:ObjectToLowercaseConverter x:Key="ObjectToLowercaseConverter" />
-  <converters:NullToBoolConverter x:Key="NullToTrueConverter" NullValue="True" />
-  <converters:NullToBoolConverter x:Key="NullToFalseConverter" NullValue="False" />
   <converters:TimeSpanToSecondsConverter x:Key="TimeSpanToSecondsConverter" />
 
   <eye:PriceToImageUriConverter x:Key="PriceToImageUriConverter" />
@@ -27,9 +18,6 @@
     </ObjectDataProvider.MethodParameters>
   </ObjectDataProvider>
 
-  <blue:BoolToVisibilityConverter x:Key="BoolTrueToCollapsedConverter" TrueValue="Collapsed" FalseValue="Visible" />
-  <blue:BoolToVisibilityConverter x:Key="BoolFalseToHiddenConverter" TrueValue="Visible" FalseValue="Hidden" />
-  <blue:BoolToVisibilityConverter x:Key="BoolFalseToCollapsedConverter" TrueValue="Visible" FalseValue="Collapsed" />
   <blue:Int32ToVisibilityConverter x:Key="ZeroToCollapsedConverter" TrueValue="Collapsed" FalseValue="Visible">
     <blue:Int32ToVisibilityConverter.ComparisonStrategy>
       <blue:Int32ComparisonStrategy Mode="Equal" Comparand="0" />

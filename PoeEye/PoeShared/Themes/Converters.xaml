@@ -28,6 +28,13 @@
     <blue:BoolToVisibilityConverter x:Key="TrueToHiddenFalseToVisibleConverter"
                                     TrueValue="Hidden"
                                     FalseValue="Visible" />
+    
+    <blue:BoolToVisibilityConverter x:Key="FalseToHiddenTrueToVisibleConverter" 
+                                    TrueValue="Visible" 
+                                    FalseValue="Hidden" />
+    <blue:BoolToVisibilityConverter x:Key="FalseToCollapsedTrueToVisibleConverter" 
+                                    TrueValue="Visible" 
+                                    FalseValue="Collapsed" />
 
     <eyeConverters:BoolInversionConverter x:Key="NotConverter" />
     <eyeConverters:StringToPoePriceConverter x:Key="StringToPoePriceConverter" />

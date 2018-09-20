@@ -52,7 +52,7 @@
 
         <Label Grid.Column="1"
                ToolTip="{Binding TradesList.Errors}"
-               Visibility="{Binding TradesList.Errors, Converter={StaticResource NullToCollapsedConverter}}"
+               Visibility="{Binding TradesList.Errors, Converter={StaticResource NullToCollapsedConverter}, TargetNullValue={x:Static Visibility.Collapsed}}"
                FontFamily="{StaticResource FontAwesome}"
                Foreground="{StaticResource ValidationSummaryColor3}"
                VerticalAlignment="Stretch"

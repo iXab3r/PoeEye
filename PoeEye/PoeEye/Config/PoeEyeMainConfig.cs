@@ -39,21 +39,11 @@ namespace PoeEye.Config
 
         private IDictionary<string, float> currenciesPriceInChaos = new Dictionary<string, float>(DefaultCurrenciesPriceInChaos);
 
-        private PoeEyeTabConfig[] tabConfigs = new PoeEyeTabConfig[0];
-
-        public PoeEyeTabConfig[] TabConfigs
-        {
-            get => tabConfigs;
-            set => tabConfigs = value ?? new PoeEyeTabConfig[0];
-        }
-
         public IDictionary<string, float> CurrenciesPriceInChaos
         {
             get => currenciesPriceInChaos;
             set => currenciesPriceInChaos = value ?? new Dictionary<string, float>(DefaultCurrenciesPriceInChaos);
         }
-
-        public bool ClipboardMonitoringEnabled { get; set; } = true;
 
         public bool WhisperNotificationsEnabled { get; set; } = false;
 
@@ -67,6 +57,6 @@ namespace PoeEye.Config
 
         public int ItemPageSize { get; set; } = 20;
 
-        public int Version { get; set; } = 2;
+        public int Version { get; set; } = 3;
     }
 }

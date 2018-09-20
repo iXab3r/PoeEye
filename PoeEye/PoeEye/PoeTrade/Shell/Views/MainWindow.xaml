@@ -209,7 +209,7 @@
                     </Grid.ColumnDefinitions>
 
                     <StackPanel Grid.Column="0" Orientation="Horizontal"
-                                Visibility="{Binding SelectedTab.IsBusy, Converter={StaticResource BoolFalseToCollapsedConverter}}">
+                                Visibility="{Binding SelectedTab.IsBusy, Converter={StaticResource FalseToCollapsedTrueToVisibleConverter}}">
                         <controls:ProgressRing Height="20" Width="20" IsActive="true"
                                                Foreground="{StaticResource TextBrush}" />
                         <TextBlock Text="Updating..." />
@@ -282,8 +282,7 @@
                         <StackPanel Orientation="Horizontal">
                             <controls:ProgressRing Height="20" Width="20" IsActive="true"
                                                    Foreground="{StaticResource TextBrush}"
-                                                   Visibility="{Binding CheckForUpdatesCommand.IsBusy, Converter={StaticResource BoolFalseToHiddenConverter}}" />
-
+                                                   Visibility="{Binding CheckForUpdatesCommand.IsBusy, Converter={StaticResource TrueToVisibleFalseToCollapsedConverter}}" />
                             <Button Content="Check for updates"
                                     FontFamily="{StaticResource FontAwesome}"
                                     Command="{Binding CheckForUpdatesCommand}" />

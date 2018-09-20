@@ -294,14 +294,14 @@
                           ItemsSource="{Binding HtmlImplicitMods}" FontStyle="Italic"
                           ItemTemplate="{StaticResource ModTemplateKey}" />
             <Border Grid.Row="1" Grid.Column="0"
-                    Visibility="{Binding ElementName=ImplicitModsItemsControl, Path=HasItems, Converter={StaticResource BoolFalseToCollapsedConverter}}"
+                    Visibility="{Binding ElementName=ImplicitModsItemsControl, Path=HasItems, Converter={StaticResource FalseToCollapsedTrueToVisibleConverter}}"
                     Height="5" BorderBrush="{StaticResource AccentColorBrush}" BorderThickness="0,1,0,0" />
             <ItemsControl Grid.Row="2" Grid.Column="0"
                           x:Name="ExplicitModsItemsControl"
                           ItemsSource="{Binding HtmlExplicitMods}"
                           ItemTemplate="{StaticResource ModTemplateKey}" />
             <Line Grid.Row="3" Grid.Column="0"
-                  Visibility="{Binding ElementName=UnknownModsItemsControl, Path=HasItems, Converter={StaticResource BoolFalseToCollapsedConverter}}"
+                  Visibility="{Binding ElementName=UnknownModsItemsControl, Path=HasItems, Converter={StaticResource FalseToCollapsedTrueToVisibleConverter}}"
                   Stroke="{StaticResource ProgressBrush}" StrokeThickness="1" />
             <ItemsControl Grid.Row="4" Grid.Column="0"
                           x:Name="UnknownModsItemsControl"
@@ -338,14 +338,14 @@
                           ItemsSource="{Binding HtmlImplicitMods}" FontStyle="Italic"
                           ItemTemplate="{StaticResource ModTemplateKey}" />
             <Border Grid.Row="1" Grid.Column="0"
-                    Visibility="{Binding ElementName=ImplicitModsItemsControl, Path=HasItems, Converter={StaticResource BoolFalseToCollapsedConverter}}"
+                    Visibility="{Binding ElementName=ImplicitModsItemsControl, Path=HasItems, Converter={StaticResource FalseToCollapsedTrueToVisibleConverter}}"
                     Height="5" BorderBrush="{StaticResource AccentColorBrush}" BorderThickness="0,1,0,0" />
             <ItemsControl Grid.Row="2" Grid.Column="0"
                           x:Name="ExplicitModsItemsControl"
                           ItemsSource="{Binding HtmlExplicitMods}"
                           ItemTemplate="{StaticResource ModTemplateKey}" />
             <Line Grid.Row="3" Grid.Column="0"
-                  Visibility="{Binding ElementName=UnknownModsItemsControl, Path=HasItems, Converter={StaticResource BoolFalseToCollapsedConverter}}"
+                  Visibility="{Binding ElementName=UnknownModsItemsControl, Path=HasItems, Converter={StaticResource FalseToCollapsedTrueToVisibleConverter}}"
                   Stroke="{StaticResource ProgressBrush}" StrokeThickness="1" />
             <ItemsControl Grid.Row="4" Grid.Column="0"
                           x:Name="UnknownModsItemsControl"
@@ -623,7 +623,7 @@
 
                     <Button Grid.Column="4"
                             Margin="10,2"
-                            Visibility="{Binding IsEnabled, RelativeSource={RelativeSource Self}, Converter={StaticResource BoolFalseToCollapsedConverter}}"
+                            Visibility="{Binding IsEnabled, RelativeSource={RelativeSource Self}, Converter={StaticResource FalseToCollapsedTrueToVisibleConverter}}"
                             Content="Go to forum thread" Command="{Binding OpenForumUriCommand}" />
 
                     <Ellipse Grid.Column="5"
@@ -675,7 +675,7 @@
                     MaxWidth="600" MaxHeight="400">
                 <Expander Header="Raw item info"
                           Name="ExpanderRaw"
-                          Visibility="{Binding RelativeSource={RelativeSource Self}, Path=IsExpanded, Converter={StaticResource BoolFalseToCollapsedConverter}}">
+                          Visibility="{Binding RelativeSource={RelativeSource Self}, Path=IsExpanded, Converter={StaticResource FalseToCollapsedTrueToVisibleConverter}}">
                     <TextBox Text="{Binding Trade.Raw}" IsEnabled="True" IsReadOnly="True"
                              TextWrapping="Wrap"
                              VerticalScrollBarVisibility="Visible"

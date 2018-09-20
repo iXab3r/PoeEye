@@ -25,26 +25,23 @@ using PoeShared.Scaffolding;
 using PoeShared.Scaffolding.WPF;
 using PoeShared.UI;
 using Prism.Commands;
-using Prism.Regions;
 using ReactiveUI;
 using Unity.Attributes;
 
 namespace PoeEye.PoeTrade.Shell.ViewModels
 {
-    using IPoeEyeMainConfigProvider = IConfigProvider<PoeEyeMainConfig>;
-
     internal sealed class MainWindowViewModel : DisposableReactiveObject, IMainWindowViewModel
     {
         private static readonly int UndoStackDepth = 10;
 
         private static readonly string ExplorerExecutablePath = Environment.ExpandEnvironmentVariables(@"%WINDIR%\explorer.exe");
 
-        private static readonly TimeSpan ConfigSaveSampingTimeout = TimeSpan.FromSeconds(10);
+        private static readonly TimeSpan ConfigSaveSamplingTimeout = TimeSpan.FromSeconds(10);
         private readonly IClipboardManager clipboardManager;
         private readonly IConfigSerializer configSerializer;
 
         private readonly ISubject<Unit> configUpdateSubject = new Subject<Unit>();
-        private readonly IPoeEyeMainConfigProvider poeEyeConfigProvider;
+        private readonly IConfigProvider<PoeEyeTabListConfig> poeEyeConfigProvider;
         private readonly TabablzPositionMonitor<IMainWindowTabViewModel> positionMonitor = new TabablzPositionMonitor<IMainWindowTabViewModel>();
 
         private readonly CircularBuffer<PoeEyeTabConfig> recentlyClosedQueries = new CircularBuffer<PoeEyeTabConfig>(UndoStackDepth);
@@ -60,7 +57,7 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
             [NotNull] IFactory<IMainWindowTabViewModel> tabFactory,
             [NotNull] IFactory<IPoeSummaryTabViewModel, ReadOnlyObservableCollection<IMainWindowTabViewModel>> summaryTabFactory,
             [NotNull] ApplicationUpdaterViewModel applicationUpdaterViewModel,
-            [NotNull] IPoeEyeMainConfigProvider poeEyeConfigProvider,
+            [NotNull] IConfigProvider<PoeEyeTabListConfig> poeEyeConfigProvider,
             [NotNull] IAudioNotificationsManager audioNotificationsManager,
             [NotNull] ProxyProviderViewModel proxyProviderViewModel,
             [NotNull] PoeEyeSettingsViewModel settings,
@@ -150,7 +147,7 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
 
             if (tabsListSource.Count == 0)
             {
-                CreateAndAddTab();
+                CreateNewTabCommand.Execute(null);
             }
 
             Observable.Merge(
@@ -162,7 +159,7 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
                       .AddTo(Anchors);
 
             configUpdateSubject
-                .Sample(ConfigSaveSampingTimeout)
+                .Sample(ConfigSaveSamplingTimeout)
                 .Subscribe(SaveConfig, Log.HandleException)
                 .AddTo(Anchors);
         }
@@ -203,13 +200,11 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
             set => this.RaiseAndSetIfChanged(ref selectedTab, value);
         }
 
-        public IReactiveList<IPoeFlyoutViewModel> Flyouts { get; } = new ReactiveList<IPoeFlyoutViewModel>();
-
         public ReadOnlyObservableCollection<IMainWindowTabViewModel> TabsList => tabsList;
 
         public override void Dispose()
         {
-            Log.Instance.Debug($"[MainWindowViewModel.Dispose] Disposing viewmodel...");
+            Log.Instance.Debug("[MainWindowViewModel.Dispose] Disposing viewmodel...");
             SaveConfig();
             foreach (var mainWindowTabViewModel in TabsList)
             {
@@ -218,7 +213,7 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
 
             base.Dispose();
 
-            Log.Instance.Debug($"[MainWindowViewModel.Dispose] Viewmodel disposed");
+            Log.Instance.Debug("[MainWindowViewModel.Dispose] Viewmodel disposed");
         }
 
 
@@ -363,14 +358,14 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
             Log.Instance.Debug($"[MainWindowViewModel.SaveConfig] Saving config (provider: {poeEyeConfigProvider})...\r\nTabs count: {TabsList.Count}");
 
             var config = poeEyeConfigProvider.ActualConfig;
-            
+
             var positionedItems = positionMonitor.Items.ToArray();
-            config.TabConfigs =  tabsListSource.Items
-                                               .Select(x => new { Idx = positionedItems.IndexOf(x), Tab = x })
-                                               .OrderBy(x => x.Idx)
-                                               .Select(x => x.Tab)
-                                               .Select(tab => tab.Save())
-                                               .ToArray();
+            config.TabConfigs = tabsListSource.Items
+                                              .Select(x => new {Idx = positionedItems.IndexOf(x), Tab = x})
+                                              .OrderBy(x => x.Idx)
+                                              .Select(x => x.Tab)
+                                              .Select(tab => tab.Save())
+                                              .ToArray();
 
             poeEyeConfigProvider.Save(config);
         }
@@ -389,7 +384,7 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
                 tab.Load(tabConfig);
             }
 
-            Log.Instance.Debug($"[MainWindowViewModel.LoadConfig] Sucessfully loaded config\r\nTabs count: {TabsList.Count}");
+            Log.Instance.Debug($"[MainWindowViewModel.LoadConfig] Successfully loaded config\r\nTabs count: {TabsList.Count}");
         }
     }
 }

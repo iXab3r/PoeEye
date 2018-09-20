@@ -84,27 +84,27 @@
       <!-- Links -->
 
       <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
-             Visibility="{Binding Link1, Converter={StaticResource BoolFalseToCollapsedConverter}}">
+             Visibility="{Binding Link1, Converter={StaticResource FalseToCollapsedTrueToVisibleConverter}}">
         <Rectangle Style="{StaticResource HorizontalLink}" />
       </Label>
 
       <Label Grid.Row="0" Grid.Column="1" Grid.RowSpan="2"
-             Visibility="{Binding Link2, Converter={StaticResource BoolFalseToCollapsedConverter}}">
+             Visibility="{Binding Link2, Converter={StaticResource FalseToCollapsedTrueToVisibleConverter}}">
         <Rectangle Style="{StaticResource VerticalLink}" />
       </Label>
 
       <Label Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
-             Visibility="{Binding Link3, Converter={StaticResource BoolFalseToCollapsedConverter}}">
+             Visibility="{Binding Link3, Converter={StaticResource FalseToCollapsedTrueToVisibleConverter}}">
         <Rectangle Style="{StaticResource HorizontalLink}" />
       </Label>
 
       <Label Grid.Row="1" Grid.Column="0" Grid.RowSpan="2"
-             Visibility="{Binding Link4, Converter={StaticResource BoolFalseToCollapsedConverter}}">
+             Visibility="{Binding Link4, Converter={StaticResource FalseToCollapsedTrueToVisibleConverter}}">
         <Rectangle Style="{StaticResource VerticalLink}" />
       </Label>
 
       <Label Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
-             Visibility="{Binding Link5, Converter={StaticResource BoolFalseToCollapsedConverter}}">
+             Visibility="{Binding Link5, Converter={StaticResource FalseToCollapsedTrueToVisibleConverter}}">
         <Rectangle Style="{StaticResource HorizontalLink}" />
       </Label>
 
@@ -220,27 +220,27 @@
       <!-- Links -->
 
       <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
-             Visibility="{Binding Link1, Converter={StaticResource BoolFalseToCollapsedConverter}}">
+             Visibility="{Binding Link1, Converter={StaticResource FalseToCollapsedTrueToVisibleConverter}}">
         <Image Style="{StaticResource HorizontalLink}" />
       </Label>
 
       <Label Grid.Row="0" Grid.Column="1" Grid.RowSpan="2"
-             Visibility="{Binding Link2, Converter={StaticResource BoolFalseToCollapsedConverter}}">
+             Visibility="{Binding Link2, Converter={StaticResource FalseToCollapsedTrueToVisibleConverter}}">
         <Image Style="{StaticResource VerticalLink}" />
       </Label>
 
       <Label Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
-             Visibility="{Binding Link3, Converter={StaticResource BoolFalseToCollapsedConverter}}">
+             Visibility="{Binding Link3, Converter={StaticResource FalseToCollapsedTrueToVisibleConverter}}">
         <Image Style="{StaticResource HorizontalLink}" />
       </Label>
 
       <Label Grid.Row="1" Grid.Column="0" Grid.RowSpan="2"
-             Visibility="{Binding Link4, Converter={StaticResource BoolFalseToCollapsedConverter}}">
+             Visibility="{Binding Link4, Converter={StaticResource FalseToCollapsedTrueToVisibleConverter}}">
         <Image Style="{StaticResource VerticalLink}" />
       </Label>
 
       <Label Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
-             Visibility="{Binding Link5, Converter={StaticResource BoolFalseToCollapsedConverter}}">
+             Visibility="{Binding Link5, Converter={StaticResource FalseToCollapsedTrueToVisibleConverter}}">
         <Image Style="{StaticResource HorizontalLink}" />
       </Label>
 
