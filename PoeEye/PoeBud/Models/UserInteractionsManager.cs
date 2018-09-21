@@ -4,6 +4,7 @@ using System.Threading;
 using System.Windows;
 using WindowsInput;
 using WindowsInput.Native;
+using Common.Logging;
 using Guards;
 using JetBrains.Annotations;
 using PoeBud.Config;
@@ -14,6 +15,8 @@ namespace PoeBud.Models
 {
     internal sealed class UserInteractionsManager : IUserInteractionsManager
     {
+        private static readonly ILog Log = LogManager.GetLogger<UserInteractionsManager>();
+
         private readonly IInputSimulator inputSimulator;
         private readonly IUserInputBlocker userInputBlocker;
         private TimeSpan actionDelay;
@@ -80,7 +83,7 @@ namespace PoeBud.Models
 
         private void ReloadConfig(IPoeBudConfig config)
         {
-            Log.Instance.Debug($"[UserInteractionsManager] New config, actionDelay: {actionDelay} => {config.UserActionDelay}");
+            Log.Debug($"[UserInteractionsManager] New config, actionDelay: {actionDelay} => {config.UserActionDelay}");
             actionDelay = config.UserActionDelay;
         }
 

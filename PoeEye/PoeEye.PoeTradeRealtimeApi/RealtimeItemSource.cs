@@ -7,6 +7,7 @@ using System.Net;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
+using Common.Logging;
 using Guards;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
@@ -26,6 +27,8 @@ namespace PoeEye.PoeTradeRealtimeApi
 {
     internal sealed class RealtimeItemSource : DisposableReactiveObject, IRealtimeItemSource
     {
+        private static readonly ILog Log = LogManager.GetLogger<RealtimeItemSource>();
+
         private static readonly string PoeTradeSearchUri = @"http://poe.trade/search";
         private static readonly string PoeTradeUri = @"http://poe.trade";
 
@@ -94,21 +97,21 @@ namespace PoeEye.PoeTradeRealtimeApi
                 .Configure(State.Disposed)
                 .OnEntry(Reset);
 
-            Log.Instance.Debug($"[RealtimeItemsSource..ctor] FSM:\n {queryStateMachine.ToDotGraph()}");
+            Log.Debug($"[RealtimeItemsSource..ctor] FSM:\n {queryStateMachine.ToDotGraph()}");
 
-            Log.Instance.Debug($"[RealtimeItemsSource..ctor] Constructing query out of supplied data: {queryInfo.DumpToText(Formatting.None)}");
+            Log.Debug($"[RealtimeItemsSource..ctor] Constructing query out of supplied data: {queryInfo.DumpToText(Formatting.None)}");
             queryLeague = queryInfo.League;
             var query = queryInfoToQueryConverter.Convert(queryInfo);
             queryPostData = queryToPostConverter.Convert(query);
-            Log.Instance.Debug(
+            Log.Debug(
                 $"[RealtimeItemsSource..ctor] Post data for supplied query has been constructed:\n Query: {queryInfo.DumpToText(Formatting.None)}\n Post: {queryPostData.DumpToText(Formatting.None)}");
 
             queryStateMachine.Fire(Trigger.Create);
 
             queryStateMachine.OnTransitioned(
-                x => Log.Instance.Debug($"[RealtimeItemsSource.State] {x.Source} => {x.Trigger} => {x.Destination} (isReentry: {x.IsReentry})"));
+                x => Log.Debug($"[RealtimeItemsSource.State] {x.Source} => {x.Trigger} => {x.Destination} (isReentry: {x.IsReentry})"));
             queryStateMachine.OnUnhandledTrigger((state, trigger) =>
-                                                     Log.Instance.Debug(
+                                                     Log.Debug(
                                                          $"[RealtimeItemsSource.UnhandledState] Failed to process trigger {trigger}, state: {state}"));
         }
 
@@ -117,12 +120,12 @@ namespace PoeEye.PoeTradeRealtimeApi
             switch (queryStateMachine.State)
             {
                 case State.LiveQuery:
-                    Log.Instance.Debug($"[RealtimeItemsSource.GetResult] Requesting next live query result...");
+                    Log.Debug($"[RealtimeItemsSource.GetResult] Requesting next live query result...");
                     SendLiveQuery();
                     break;
 
                 case State.AwaitingForInitialRequest:
-                    Log.Instance.Debug($"[RealtimeItemsSource.GetResult] Sending initial request...");
+                    Log.Debug($"[RealtimeItemsSource.GetResult] Sending initial request...");
                     SendInitialRequest();
                     break;
             }
@@ -137,19 +140,19 @@ namespace PoeEye.PoeTradeRealtimeApi
 
         private void SetNextLiveQueryId(string queryId)
         {
-            Log.Instance.Debug($"[RealtimeItemsSource.SetNextLiveQueryId] Next Live queryId: '{nextLiveQueryId}' => '{queryId}'");
+            Log.Debug($"[RealtimeItemsSource.SetNextLiveQueryId] Next Live queryId: '{nextLiveQueryId}' => '{queryId}'");
             nextLiveQueryId = queryId;
         }
 
         private void SetLiveQueryUri(Uri newQueryUri)
         {
-            Log.Instance.Debug($"[RealtimeItemsSource.SetLiveQueryUri] Next Live query URI: '{liveQueryUri}' => '{newQueryUri}'");
+            Log.Debug($"[RealtimeItemsSource.SetLiveQueryUri] Next Live query URI: '{liveQueryUri}' => '{newQueryUri}'");
             liveQueryUri = newQueryUri;
         }
 
         private void ClearItemList()
         {
-            Log.Instance.Debug($"[RealtimeItemsSource.ClearItemsList] Clearing items list...");
+            Log.Debug($"[RealtimeItemsSource.ClearItemsList] Clearing items list...");
             itemsList.Clear();
         }
 
@@ -172,7 +175,7 @@ namespace PoeEye.PoeTradeRealtimeApi
                        .Result;
 
             var validItems = data.ItemsList.EmptyIfNull().Where(x => !string.IsNullOrWhiteSpace(x.Hash)).ToArray();
-            Log.Instance.Debug(
+            Log.Debug(
                 $"[RealtimeItemsSource.GetResult] Initial update contains {data.ItemsList.Length} item(s), of which {validItems.Length} are valid");
 
             validItems.ForEach(x => itemsList[x.Hash] = x);
@@ -185,19 +188,19 @@ namespace PoeEye.PoeTradeRealtimeApi
             Uri liveUri;
             if (Uri.TryCreate(new Uri(PoeTradeUri), data.Id, out liveUri))
             {
-                Log.Instance.Debug($"[RealtimeItemsSource.GetResult] Live query URI: {liveUri}");
+                Log.Debug($"[RealtimeItemsSource.GetResult] Live query URI: {liveUri}");
                 queryStateMachine.Fire(toLiveQueryTransitionTrigger, liveUri);
             }
             else
             {
-                Log.Instance.Debug($"[RealtimeItemsSource.GetResult] Failed to extract live uri from the initial response");
+                Log.Debug($"[RealtimeItemsSource.GetResult] Failed to extract live uri from the initial response");
                 queryStateMachine.Fire(Trigger.ReceivedUnexpectedInitialResponse);
             }
         }
 
         private void SendLiveQuery()
         {
-            Log.Instance.Debug($"[RealtimeItemsSource.Live] Sending next live query, uri: {liveQueryUri}, id: '{nextLiveQueryId}'");
+            Log.Debug($"[RealtimeItemsSource.Live] Sending next live query, uri: {liveQueryUri}, id: '{nextLiveQueryId}'");
 
             Guard.ArgumentNotNull(liveQueryUri, nameof(liveQueryUri));
             Guard.ArgumentNotNull(nextLiveQueryId, nameof(nextLiveQueryId));
@@ -218,7 +221,7 @@ namespace PoeEye.PoeTradeRealtimeApi
                               .Result;
 
                 var result = JToken.Parse(rawData);
-                Log.Instance.Debug($"[RealtimeItemsSource.Live] Live query response: {result}");
+                Log.Debug($"[RealtimeItemsSource.Live] Live query response: {result}");
 
                 var nextId = result.Value<string>("newid");
                 if (string.IsNullOrWhiteSpace(nextId))
@@ -234,26 +237,26 @@ namespace PoeEye.PoeTradeRealtimeApi
                     var data = parser.ParseQueryResponse(itemsData);
 
                     var validItems = data.ItemsList.EmptyIfNull().Where(x => !string.IsNullOrWhiteSpace(x.Hash)).ToArray();
-                    Log.Instance.Debug(
+                    Log.Debug(
                         $"[RealtimeItemsSource.Live] Extracted {data.ItemsList.Length} from live query response(expected: {itemsCount}), of which {validItems.Length} are valid");
 
                     var itemsToRemove = validItems.Where(x => x.ItemState == PoeTradeState.Removed).ToArray();
                     var itemsToAdd = validItems.Where(x => x.ItemState != PoeTradeState.Removed).ToArray();
 
-                    Log.Instance.Debug(
+                    Log.Debug(
                         $"[RealtimeItemsSource.Live] Items to add: {itemsToAdd.Length}, items to remove: {itemsToRemove.Length}, current list size: {itemsList.Count}");
 
                     IPoeItem trash;
                     itemsToRemove.ForEach(x => itemsList.TryRemove(x.Hash, out trash));
                     itemsToAdd.ForEach(x => itemsList[x.Hash] = x);
-                    Log.Instance.Debug($"[RealtimeItemsSource.Live] Resulting list size: {itemsList.Count}");
+                    Log.Debug($"[RealtimeItemsSource.Live] Resulting list size: {itemsList.Count}");
                 }
 
                 queryStateMachine.Fire(toNextLiveQueryTransitionTrigger, nextId);
             }
             catch (Exception ex)
             {
-                Log.Instance.Warn($"[RealtimeItemsSource.Live] Exception occurred during live request", ex);
+                Log.Warn($"[RealtimeItemsSource.Live] Exception occurred during live request", ex);
                 queryStateMachine.Fire(Trigger.LiveQueryFailed);
             }
         }

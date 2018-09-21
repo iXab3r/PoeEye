@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Media;
 using System.Reactive.Concurrency;
+using Common.Logging;
 using Guards;
 using JetBrains.Annotations;
 using PoeShared.Modularity;
@@ -17,6 +18,8 @@ namespace PoeShared.Audio
 {
     internal sealed class AudioNotificationsManager : DisposableReactiveObject, IAudioNotificationsManager
     {
+        private static readonly ILog Log = LogManager.GetLogger<AudioNotificationsManager>();
+
         private readonly ConcurrentDictionary<AudioNotificationType, byte[]> knownNotifications = new ConcurrentDictionary<AudioNotificationType, byte[]>();
 
         public AudioNotificationsManager(
@@ -26,7 +29,7 @@ namespace PoeShared.Audio
             Guard.ArgumentNotNull(poeEyeConfigProvider, nameof(poeEyeConfigProvider));
             Guard.ArgumentNotNull(bgScheduler, nameof(bgScheduler));
 
-            Log.Instance.Debug($"[AudioNotificationsManager..ctor] Initializing sound subsystem...");
+            Log.Debug($"[AudioNotificationsManager..ctor] Initializing sound subsystem...");
             knownNotifications[AudioNotificationType.Silence] = new byte[0];
 
             bgScheduler.Schedule(Initialize).AddTo(Anchors);
@@ -34,22 +37,22 @@ namespace PoeShared.Audio
 
         public void PlayNotification(AudioNotificationType notificationType)
         {
-            Log.Instance.Debug($"[AudioNotificationsManager] Notification of type {notificationType} requested...");
+            Log.Debug($"[AudioNotificationsManager] Notification of type {notificationType} requested...");
 
             if (!knownNotifications.TryGetValue(notificationType, out var notificationData))
             {
-                Log.Instance.Warn(
+                Log.Warn(
                     $"[AudioNotificationsManager] Unknown notification type - {notificationType}, known notifications: {string.Join(", ", knownNotifications.Keys.Select(x => x.ToString()))}");
                 return;
             }
 
             if (!notificationData.Any())
             {
-                Log.Instance.Debug($"[AudioNotificationsManager] No sound data loaded for notification of type {notificationData}");
+                Log.Debug($"[AudioNotificationsManager] No sound data loaded for notification of type {notificationData}");
                 return;
             }
 
-            Log.Instance.Debug(
+            Log.Debug(
                 $"[AudioNotificationsManager] Starting playback of {notificationType} ({notificationData.Length}b)...");
             using (var stream = new MemoryStream(notificationData))
             using (var notificationSound = new SoundPlayer(stream))
@@ -60,7 +63,7 @@ namespace PoeShared.Audio
 
         private void Initialize()
         {
-            Log.Instance.Debug(
+            Log.Debug(
                 $"[AudioNotificationsManager.Initialize] Pre-defined notification list: {knownNotifications.Select(x => $"{x.Key} : {x.Value.Length}b")}");
 
             foreach (var notificationType in Enum.GetValues(typeof(AudioNotificationType)).Cast<AudioNotificationType>())
@@ -68,14 +71,14 @@ namespace PoeShared.Audio
                 var notificationName = notificationType.ToString().ToLower();
                 if (!SoundLibrary.TryToLoadSoundByName(notificationName, out var soundData))
                 {
-                    Log.Instance.Warn($"[AudioNotificationsManager.Initialize] Failed to load notification {notificationType}");
+                    Log.Warn($"[AudioNotificationsManager.Initialize] Failed to load notification {notificationType}");
                     continue;
                 }
 
                 knownNotifications[notificationType] = soundData;
             }
 
-            Log.Instance.Debug(
+            Log.Debug(
                 $"[AudioNotificationsManager.Initialize] Known notification list: {knownNotifications.Select(x => $"{x.Key} : {x.Value.Length}b")}");
         }
     }

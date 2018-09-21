@@ -7,6 +7,7 @@ using System.Reactive.Subjects;
 using System.Reactive.Threading.Tasks;
 using System.Threading;
 using System.Threading.Tasks;
+using Common.Logging;
 using CsQuery.ExtensionMethods;
 using Guards;
 using JetBrains.Annotations;
@@ -18,11 +19,14 @@ using PoeShared.PoeTrade.Query;
 using PoeShared.Scaffolding;
 using WebSocketSharp;
 using WebSocketSharp.Net;
+using LogLevel = WebSocketSharp.LogLevel;
 
 namespace PoeEye.PathOfExileTrade.TradeApi
 {
     internal sealed class PathOfExileTradeLiveAdapter : DisposableReactiveObject, IPathOfExileTradeLiveAdapter
     {
+        private static readonly ILog Log = LogManager.GetLogger<PathOfExileTradeLiveAdapter>();
+
         private static readonly int MaxItemsToReplay = 99;
         
         private static readonly TimeSpan WebSocketGracefulCloseTimeout = TimeSpan.FromSeconds(5);
@@ -60,7 +64,7 @@ namespace PoeEye.PathOfExileTrade.TradeApi
             queryId = initialData.Id;
 
             liveUri = new Uri(new Uri(WebSocketUri), $"{initialData.Query.League}/{queryId}");
-            Log.Instance.Debug($"QueryId URI: {liveUri}");
+            Log.Debug($"QueryId URI: {liveUri}");
 
             resultSink.OnNext(initialData);
 
@@ -74,9 +78,9 @@ namespace PoeEye.PathOfExileTrade.TradeApi
                 .Subscribe(OnNext)
                 .AddTo(Anchors);
 
-            Disposable.Create(() => Log.Instance.Debug($"[WebSocket] [{queryId}] Disposing Live provider for query {queryId}")).AddTo(Anchors);
+            Disposable.Create(() => Log.Debug($"[WebSocket] [{queryId}] Disposing Live provider for query {queryId}")).AddTo(Anchors);
 
-            Task.Run(() => Initialize()).ToObservable().Subscribe(_ => { Log.Instance.Debug($"[WebSocket] [{queryId}] Initialized connection"); },
+            Task.Run(() => Initialize()).ToObservable().Subscribe(_ => { Log.Debug($"[WebSocket] [{queryId}] Initialized connection"); },
                                                                   exception => resultSink.OnError(exception));
         }
 
@@ -84,15 +88,15 @@ namespace PoeEye.PathOfExileTrade.TradeApi
         {
             try
             {
-                Log.Instance.Debug($"[WebSocket] [{queryId}] Requesting ({itemIds.Count} items)");
+                Log.Debug($"[WebSocket] [{queryId}] Requesting ({itemIds.Count} items)");
                 var items = await itemSource.FetchItems(initialData, itemIds.ToList());
-                Log.Instance.Debug($"[WebSocket] [{queryId}] Successfully retrieved ({items.ItemsList.Length} items)");
+                Log.Debug($"[WebSocket] [{queryId}] Successfully retrieved ({items.ItemsList.Length} items)");
                 items.ItemsList.ForEach(x => x.ItemState = PoeTradeState.New);
                 resultSink.OnNext(items);
             }
             catch (Exception e)
             {
-                Log.Instance.Error($"[WebSocket] [{queryId}] Failed to get items pack {itemIds.DumpToTextRaw()}", e);
+                Log.Error($"[WebSocket] [{queryId}] Failed to get items pack {itemIds.DumpToTextRaw()}", e);
             }
         }
 
@@ -109,7 +113,7 @@ namespace PoeEye.PathOfExileTrade.TradeApi
                 Compression = CompressionMethod.Deflate,
                 Origin = "https://www.pathofexile.com",
                 EmitOnPing = true,
-                Log = {Level = LogLevel.Trace, Output = (data, s) => Log.Instance.Debug($"[WebSocket] [{queryId}] Inner: {s}, data: {data.DumpToTextRaw()}")}
+                Log = {Level = LogLevel.Trace, Output = (data, s) => Log.Debug($"[WebSocket] [{queryId}] Inner: {s}, data: {data.DumpToTextRaw()}")}
             };
             webSocket.SetCookie(new Cookie("POESESSID", "64e5acf7aa8fdc51af716a1f73b8db64"));
 
@@ -151,7 +155,7 @@ namespace PoeEye.PathOfExileTrade.TradeApi
             try
             {
                 var response = JsonConvert.DeserializeObject<ItemUpdate>(rawResponse);
-                Log.Instance.Debug($"[WebSocket] [{queryId}] Processing new items ({response.NewItemId?.EmptyIfNull().Count()} items)");
+                Log.Debug($"[WebSocket] [{queryId}] Processing new items ({response.NewItemId?.EmptyIfNull().Count()} items)");
                 foreach (var itemId in response.NewItemId.EmptyIfNull())
                 {
                     itemsToFetch.OnNext(itemId);
@@ -159,7 +163,7 @@ namespace PoeEye.PathOfExileTrade.TradeApi
             }
             catch (Exception e)
             {
-                Log.Instance.Error($"[WebSocket] [{queryId}] Failed to process update {rawResponse}", e);
+                Log.Error($"[WebSocket] [{queryId}] Failed to process update {rawResponse}", e);
             }
         }
 
@@ -168,7 +172,7 @@ namespace PoeEye.PathOfExileTrade.TradeApi
             var anchors = new CompositeDisposable();
             try
             {
-                Log.Instance.Debug($"[WebSocket] [{queryId}] Trying to gracefully close webSocket...");
+                Log.Debug($"[WebSocket] [{queryId}] Trying to gracefully close webSocket...");
 
                 var isClosed = new SemaphoreSlim(0);
                 Observable.FromEventPattern<CloseEventArgs>(
@@ -181,15 +185,15 @@ namespace PoeEye.PathOfExileTrade.TradeApi
                 webSocket.CloseAsync();
 
                 await isClosed.WaitAsync(WebSocketGracefulCloseTimeout);
-                Log.Instance.Debug($"[WebSocket] [{queryId}] Successfully closed webSocket, state: {webSocket.ReadyState}");
+                Log.Debug($"[WebSocket] [{queryId}] Successfully closed webSocket, state: {webSocket.ReadyState}");
             }
             catch (ObjectDisposedException)
             {
-                Log.Instance.Warn($"[WebSocket] [{queryId}] Failed to close websocket gracefully, socket is disposed");
+                Log.Warn($"[WebSocket] [{queryId}] Failed to close websocket gracefully, socket is disposed");
             }
             catch (TimeoutException)
             {
-                Log.Instance.Error($"[WebSocket] [{queryId}] Failed to close websocket, timeout occured, state: {webSocket.ReadyState}");
+                Log.Error($"[WebSocket] [{queryId}] Failed to close websocket, timeout occured, state: {webSocket.ReadyState}");
             }
             finally
             {
@@ -199,25 +203,25 @@ namespace PoeEye.PathOfExileTrade.TradeApi
 
         private void HandleWebSocketOpened(WebSocket webSocket)
         {
-            Log.Instance.Debug($"[WebSocket] [{queryId}] Socket opened");
+            Log.Debug($"[WebSocket] [{queryId}] Socket opened");
         }
 
         private void HandleWebSocketClosed(WebSocket webSocket)
         {
-            Log.Instance.Debug($"[WebSocket] [{queryId}] Socket closed, state: {webSocket.ReadyState}");
+            Log.Debug($"[WebSocket] [{queryId}] Socket closed, state: {webSocket.ReadyState}");
             resultSink.OnCompleted();
         }
 
         private void HandleWebSocketError(Exception error)
         {
-            Log.Instance.Debug($"[WebSocket] [{queryId}] Error ! {error.Message}");
+            Log.Debug($"[WebSocket] [{queryId}] Error ! {error.Message}");
             Log.HandleException(error);
             resultSink.OnError(error);
         }
 
         private void HandleWebSocketData(MessageEventArgs eventArgs)
         {
-            Log.Instance.Debug(
+            Log.Debug(
                 $"[WebSocket] [{queryId}] Got data(isBinary: {eventArgs.IsBinary}, isText: {eventArgs.IsText}, isPing: {eventArgs.IsPing}): {eventArgs.RawData.Length}");
 
             if (eventArgs.IsPing)
@@ -233,7 +237,7 @@ namespace PoeEye.PathOfExileTrade.TradeApi
             {
                 return;
             }
-            Log.Instance.Debug($"[WebSocket] [{queryId}] Raw data:\n{eventArgs.Data?.DumpToText(Formatting.None)} (binary: {eventArgs.RawData?.Length})");
+            Log.Debug($"[WebSocket] [{queryId}] Raw data:\n{eventArgs.Data?.DumpToText(Formatting.None)} (binary: {eventArgs.RawData?.Length})");
 
             if (string.IsNullOrWhiteSpace(eventArgs.Data))
             {
@@ -245,7 +249,7 @@ namespace PoeEye.PathOfExileTrade.TradeApi
 
         private void WebSocketSend(WebSocket webSocket, string message)
         {
-            Log.Instance.Debug($"[WebSocket] [{queryId}] Sending message (state: {webSocket.ReadyState}): {message}");
+            Log.Debug($"[WebSocket] [{queryId}] Sending message (state: {webSocket.ReadyState}): {message}");
             webSocket.Send(message);
         }
 

@@ -9,6 +9,7 @@ using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Common.Logging;
 using DynamicData;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
@@ -23,6 +24,8 @@ namespace PoeShared.PoeDatabase.PoeNinja
 {
     internal sealed class PoeNinjaDatabaseReader : DisposableReactiveObject, IPoeDatabaseReader, IPoeEconomicsSource
     {
+        private static readonly ILog Log = LogManager.GetLogger<PoeNinjaDatabaseReader>();
+
         private static readonly string PoeNinjaDataUri = @"http://poe.ninja/api/Data/";
         private static readonly string StandardLeagueName = "Standard";
 
@@ -41,7 +44,7 @@ namespace PoeShared.PoeDatabase.PoeNinja
             [NotNull] [Dependency(WellKnownSchedulers.Background)]
             IScheduler bgScheduler)
         {
-            Log.Instance.Debug("[PoeNinjaDatabaseReader..ctor] Created");
+            Log.Debug("[PoeNinjaDatabaseReader..ctor] Created");
 
             knownEntities
                 .Connect()
@@ -71,7 +74,7 @@ namespace PoeShared.PoeDatabase.PoeNinja
 
         private PoePrice[] GetEconomics(string leagueId)
         {
-            Log.Instance.Debug($"[PoeNinjaDatabaseReader.Economics] Starting Economics API queries for league {leagueId}...");
+            Log.Debug($"[PoeNinjaDatabaseReader.Economics] Starting Economics API queries for league {leagueId}...");
             var api = RestClient.For<IPoeNinjaApi>(PoeNinjaDataUri, HandleRequestMessage, serializerSettings);
             var rawResult = api.GetCurrencyAsync(leagueId).Result;
 
@@ -81,13 +84,13 @@ namespace PoeShared.PoeDatabase.PoeNinja
                                   .Select(x => StringToPoePriceConverter.Instance.Convert(x.Price))
                                   .ToArray();
 
-            Log.Instance.Debug($"[PoeNinjaDatabaseReader.Economics] All  done, {result.Length} name(s) found\n\t{result.DumpToTable()}");
+            Log.Debug($"[PoeNinjaDatabaseReader.Economics] All  done, {result.Length} name(s) found\n\t{result.DumpToTable()}");
             return result;
         }
 
         private string[] GetEntities(string leagueId)
         {
-            Log.Instance.Debug($"[PoeNinjaDatabaseReader] Starting API queries...");
+            Log.Debug($"[PoeNinjaDatabaseReader] Starting API queries...");
             try
             {
                 var api = RestClient.For<IPoeNinjaApi>(PoeNinjaDataUri, HandleRequestMessage, serializerSettings);
@@ -122,7 +125,7 @@ namespace PoeShared.PoeDatabase.PoeNinja
                     }
                 }
 
-                Log.Instance.Debug($"[PoeNinjaDatabaseReader] All done, {result.Count} name(s) found");
+                Log.Debug($"[PoeNinjaDatabaseReader] All done, {result.Count} name(s) found");
 
                 return result.ToArray();
             }
@@ -135,7 +138,7 @@ namespace PoeShared.PoeDatabase.PoeNinja
 
         private async Task HandleRequestMessage(HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            Log.Instance.Debug($"[PoeNinjaDatabaseReader.Api] Requesting {request?.RequestUri}' (throttling: {RequestsThrottling})...");
+            Log.Debug($"[PoeNinjaDatabaseReader.Api] Requesting {request?.RequestUri}' (throttling: {RequestsThrottling})...");
             await Task.Delay(RequestsThrottling, cancellationToken);
         }
 

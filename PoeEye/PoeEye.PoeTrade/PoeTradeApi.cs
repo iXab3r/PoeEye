@@ -4,6 +4,7 @@ using System.Net;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Common.Logging;
 using Guards;
 using PoeEye.PoeTrade.Modularity;
 using PoeShared;
@@ -21,6 +22,8 @@ namespace PoeEye.PoeTrade
 {
     internal sealed class PoeTradeApi : DisposableReactiveObject, IPoeApi
     {
+        private static readonly ILog Log = LogManager.GetLogger<PoeTradeApi>();
+
         private static readonly string PoeTradeSearchUri = @"http://poe.trade/search";
 
         private readonly IFactory<PoeTradeHeadlessApi> headlessApiFactory;
@@ -62,7 +65,7 @@ namespace PoeEye.PoeTrade
                 .WhenChanged
                 .Subscribe(x => config = x)
                 .AddTo(Anchors);
-            Log.Instance.Debug($"[PoeTradeApi..ctor] {config.DumpToText()}");
+            Log.Debug($"[PoeTradeApi..ctor] {config.DumpToText()}");
             requestsSemaphore = new SemaphoreSlim(config.MaxSimultaneousRequestsCount);
         }
 
@@ -105,7 +108,7 @@ namespace PoeEye.PoeTrade
             {
                 var client = CreateClient(out proxyToken);
 
-                Log.Instance.Debug(
+                Log.Debug(
                     $"[PoeTradeApi] Awaiting for semaphore slot (max: {config.MaxSimultaneousRequestsCount}, atm: {requestsSemaphore.CurrentCount})");
                 await requestsSemaphore.WaitAsync();
 
@@ -148,13 +151,13 @@ namespace PoeEye.PoeTrade
 
             if (config.ProxyEnabled && proxyProvider.TryGetProxy(out proxyToken))
             {
-                Log.Instance.Debug($"[PoeTradeApi] Got proxy {proxyToken} from proxy provider {proxyProvider}");
+                Log.Debug($"[PoeTradeApi] Got proxy {proxyToken} from proxy provider {proxyProvider}");
                 client.Proxy = proxyToken.Proxy;
             }
             else
             {
                 var systemProxy = WebRequest.DefaultWebProxy;
-                Log.Instance.Debug($"[PoeTradeApi] Using default system web proxy: {systemProxy}");
+                Log.Debug($"[PoeTradeApi] Using default system web proxy: {systemProxy}");
                 client.Proxy = systemProxy;
             }
 
@@ -163,7 +166,7 @@ namespace PoeEye.PoeTrade
 
         private void ReleaseSemaphore()
         {
-            Log.Instance.Debug($"[PoeTradeApi] Awaiting {config.DelayBetweenRequests.TotalSeconds}s before releasing semaphore slot...");
+            Log.Debug($"[PoeTradeApi] Awaiting {config.DelayBetweenRequests.TotalSeconds}s before releasing semaphore slot...");
             Thread.Sleep(config.DelayBetweenRequests);
             requestsSemaphore.Release();
         }

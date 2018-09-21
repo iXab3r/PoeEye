@@ -4,6 +4,7 @@ using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using Common.Logging;
 using Guards;
 using JetBrains.Annotations;
 using PoeEye.Config;
@@ -20,6 +21,8 @@ namespace PoeEye.PoeTrade.Updater
 {
     internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject
     {
+        private static readonly ILog Log = LogManager.GetLogger<ApplicationUpdaterViewModel>();
+
         private readonly CommandWrapper checkForUpdatesCommand;
         private readonly CommandWrapper restartCommand;
         private readonly IApplicationUpdaterModel updaterModel;
@@ -83,7 +86,7 @@ namespace PoeEye.PoeTrade.Updater
             configProvider
                 .ListenTo(x => x.AutoUpdateTimeout)
                 .WithPrevious((prev, curr) => new {prev, curr})
-                .Do(timeout => Log.Instance.Debug($"[ApplicationUpdaterViewModel] AutoUpdate timeout changed: {timeout.prev} => {timeout.curr}"))
+                .Do(timeout => Log.Debug($"[ApplicationUpdaterViewModel] AutoUpdate timeout changed: {timeout.prev} => {timeout.curr}"))
                 .Select(timeout => timeout.curr <= TimeSpan.Zero
                             ? Observable.Never<long>()
                             : Observable.Timer(DateTimeOffset.MinValue, timeout.curr, bgScheduler))
@@ -129,10 +132,10 @@ namespace PoeEye.PoeTrade.Updater
 
         private async Task CheckForUpdatesCommandExecuted()
         {
-            Log.Instance.Debug("[ApplicationUpdaterViewModel] Update check requested");
+            Log.Debug("[ApplicationUpdaterViewModel] Update check requested");
             if (checkForUpdatesCommand.IsBusy || ApplyUpdate.IsBusy)
             {
-                Log.Instance.Debug("[ApplicationUpdaterViewModel] Already in progress");
+                Log.Debug("[ApplicationUpdaterViewModel] Already in progress");
                 IsOpen = true;
                 return;
             }
@@ -166,10 +169,10 @@ namespace PoeEye.PoeTrade.Updater
 
         private async Task ApplyUpdateCommandExecuted()
         {
-            Log.Instance.Debug($"[ApplicationUpdaterViewModel] Applying latest update {LatestVersion}");
+            Log.Debug($"[ApplicationUpdaterViewModel] Applying latest update {LatestVersion}");
             if (checkForUpdatesCommand.IsBusy || ApplyUpdate.IsBusy)
             {
-                Log.Instance.Debug("[ApplicationUpdaterViewModel] Already in progress");
+                Log.Debug("[ApplicationUpdaterViewModel] Already in progress");
                 IsOpen = true;
                 return;
             }
@@ -200,7 +203,7 @@ namespace PoeEye.PoeTrade.Updater
 
         private async Task RestartCommandExecuted()
         {
-            Log.Instance.Debug("[ApplicationUpdaterViewModel] Restart application requested");
+            Log.Debug("[ApplicationUpdaterViewModel] Restart application requested");
             Error = string.Empty;
 
             try

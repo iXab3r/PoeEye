@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using Common.Logging;
 using DynamicData;
 using Guards;
 using JetBrains.Annotations;
@@ -27,6 +28,8 @@ namespace PoeEye.PoeTrade.ViewModels
 {
     internal sealed class PoeTradesListViewModel : DisposableReactiveObject, IPoeTradesListViewModel
     {
+        private static readonly ILog Log = LogManager.GetLogger<PoeTradesListViewModel>();
+        
         private static readonly TimeSpan TimeSinceLastUpdateRefreshTimeout = TimeSpan.FromSeconds(1);
         private static readonly TimeSpan RecheckPeriodThrottleTimeout = TimeSpan.FromSeconds(1);
 
@@ -188,7 +191,7 @@ namespace PoeEye.PoeTrade.ViewModels
             var removedItems = itemsPack.Where(x => x.ItemState == PoeTradeState.Removed).ToArray();
             var newItems = itemsPack.Where(x => x.ItemState == PoeTradeState.New).ToArray();
 
-            Log.Instance.Debug(
+            Log.Debug(
                 $"[TradesListViewModel] Next items pack received, existingItems: {itemsSource.Count}, newItems: {newItems.Length}, removedItems: {removedItems.Length}");
 
             foreach (var item in removedItems)
@@ -213,9 +216,9 @@ namespace PoeEye.PoeTrade.ViewModels
 
                     uiScheduler.Schedule(() =>
                     {
-                        if (Log.Instance.IsTraceEnabled)
+                        if (Log.IsTraceEnabled)
                         {
-                            Log.Instance.Trace($"Adding new item: {itemViewModel.Trade.DumpToTextRaw()}");
+                            Log.Trace($"Adding new item: {itemViewModel.Trade.DumpToTextRaw()}");
                         }
                         itemsSource.AddOrUpdate(itemViewModel);
                     });
@@ -261,7 +264,7 @@ namespace PoeEye.PoeTrade.ViewModels
 
         private void OnNextHistoryProviderCreated(IPoeLiveHistoryProvider poeLiveHistoryProvider)
         {
-            Log.Instance.Debug($"[TradesListViewModel] Setting up new HistoryProvider (updateTimeout: {recheckPeriod})...");
+            Log.Debug($"[TradesListViewModel] Setting up new HistoryProvider (updateTimeout: {recheckPeriod})...");
 
             activeProviderInfo = new ActiveProviderInfo(poeLiveHistoryProvider);
             activeHistoryProviderDisposable.Disposable = activeProviderInfo;
@@ -289,7 +292,7 @@ namespace PoeEye.PoeTrade.ViewModels
         {
             if (exception != null)
             {
-                Log.Instance.Debug($"[TradesListViewModel] Received an exception from history provider", exception);
+                Log.Debug($"[TradesListViewModel] Received an exception from history provider", exception);
                 var errorMsg = $"[{clock.Now}] {exception.Message}";
 
                 if (errors?.Length > 1024)

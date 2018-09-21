@@ -7,6 +7,7 @@ using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using Common.Logging;
 using Guards;
 using JetBrains.Annotations;
 using PoeShared.Communications;
@@ -17,6 +18,8 @@ namespace PoeShared.UI.Models
 {
     internal sealed class ImagesCacheService : IImagesCacheService
     {
+        private static readonly ILog Log = LogManager.GetLogger<ImagesCacheService>();
+        
         private static readonly TimeSpan ArtificialDelay = TimeSpan.FromSeconds(5);
 
         private static readonly string CachePath = Environment.ExpandEnvironmentVariables($@"%LOCALAPPDATA%\PoeEye\Cache\");
@@ -38,23 +41,23 @@ namespace PoeShared.UI.Models
 
         public IObservable<FileInfo> ResolveImageByUri(Uri imageUri)
         {
-            Log.Instance.Trace($"[ItemsCache.ResolveImageByUri] Resolving image '{imageUri}'...");
+            Log.Trace($"[ItemsCache.ResolveImageByUri] Resolving image '{imageUri}'...");
             var outputFilePath = ConstructPath(imageUri.AbsolutePath);
 
             IObservable<FileInfo> inProgress;
             if (imagesBeingLoaded.TryGetValue(outputFilePath, out inProgress))
             {
-                Log.Instance.Debug($"[ItemsCache.ResolveImageByUri] Image is currently loading, returning source");
+                Log.Debug($"[ItemsCache.ResolveImageByUri] Image is currently loading, returning source");
                 return inProgress;
             }
 
             if (File.Exists(outputFilePath))
             {
-                Log.Instance.Trace($"[ItemsCache.ResolveImageByUri] Image is already loaded, cache path '{outputFilePath}'");
+                Log.Trace($"[ItemsCache.ResolveImageByUri] Image is already loaded, cache path '{outputFilePath}'");
                 return Observable.Return(new FileInfo(outputFilePath)).ObserveOn(uiScheduler);
             }
 
-            Log.Instance.Debug($"[ItemsCache.ResolveImageByUri] Image '{imageUri}' is not loaded, downloading it...");
+            Log.Debug($"[ItemsCache.ResolveImageByUri] Image '{imageUri}' is not loaded, downloading it...");
             var httpClient = httpClientFactory.Create();
             var result = httpClient
                          .GetStreamAsync(imageUri)
@@ -72,7 +75,7 @@ namespace PoeShared.UI.Models
 
         private FileInfo LoadImageFromStream(string outputFilePath, Stream dataStream)
         {
-            Log.Instance.Debug($"[ItemsCache.ResolveImageByUri] Starting to download image to cache...\r\n\tFilePath: '{outputFilePath}'");
+            Log.Debug($"[ItemsCache.ResolveImageByUri] Starting to download image to cache...\r\n\tFilePath: '{outputFilePath}'");
 
             var outputDirectory = Path.GetDirectoryName(outputFilePath);
             if (outputDirectory != null && !Directory.Exists(outputDirectory))
@@ -87,7 +90,7 @@ namespace PoeShared.UI.Models
 
             imagesBeingLoaded.Remove(outputFilePath);
 
-            Log.Instance.Debug($"[ItemsCache.ResolveImageByUri] Image was saved to file '{outputFilePath}'");
+            Log.Debug($"[ItemsCache.ResolveImageByUri] Image was saved to file '{outputFilePath}'");
             return new FileInfo(outputFilePath);
         }
 

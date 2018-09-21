@@ -2,6 +2,7 @@
 using System.IO;
 using System.Reactive.Linq;
 using System.Windows.Media.Imaging;
+using Common.Logging;
 using Guards;
 using JetBrains.Annotations;
 using PoeShared.Scaffolding;
@@ -12,6 +13,8 @@ namespace PoeShared.UI.ViewModels
 {
     internal sealed class ImageViewModel : DisposableReactiveObject, IImageViewModel
     {
+        private static readonly ILog Log = LogManager.GetLogger<ImageViewModel>();
+        
         private BitmapImage imageSource;
         private bool isLoading;
 
@@ -49,7 +52,7 @@ namespace PoeShared.UI.ViewModels
 
         private void LoadImage(FileInfo cachedImageFilePath, Uri imageUri)
         {
-            Log.Instance.Trace($"[ImageViewModel] Loading image...\r\n\tBase URI: '{imageUri}'\r\n\tFilePath: '{cachedImageFilePath.FullName}'");
+            Log.Trace($"[ImageViewModel] Loading image...\r\n\tBase URI: '{imageUri}'\r\n\tFilePath: '{cachedImageFilePath.FullName}'");
             try
             {
                 var bitmap = LoadBitmapImage(cachedImageFilePath.FullName);

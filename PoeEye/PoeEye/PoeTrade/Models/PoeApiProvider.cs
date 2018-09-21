@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using Common.Logging;
 using DynamicData;
 using DynamicData.Binding;
 using Guards;
@@ -15,6 +16,8 @@ namespace PoeEye.PoeTrade.Models
 {
     internal sealed class PoeApiProvider : DisposableReactiveObject, IPoeApiProvider
     {
+        private static readonly ILog Log = LogManager.GetLogger<PoeApiProvider>();
+
         private readonly ObservableCollectionExtended<IPoeApiWrapper> modulesList = new ObservableCollectionExtended<IPoeApiWrapper>();
 
         public PoeApiProvider(
@@ -24,12 +27,12 @@ namespace PoeEye.PoeTrade.Models
             Guard.ArgumentNotNull(container, nameof(container));
             Guard.ArgumentNotNull(wrapperFactory, nameof(wrapperFactory));
 
-            Log.Instance.Debug($"[PoeApiProvider..ctor] Loading APIs list...");
+            Log.Debug($"[PoeApiProvider..ctor] Loading APIs list...");
             var apiList = container
                           .ResolveAll<IPoeApi>()
                           .Select(wrapperFactory.Create)
                           .ToObservableCollection();
-            Log.Instance.Debug($"[PoeApiProvider..ctor] API list:\r\n\t{apiList.Select(x => $"{x.Name} ({x.Id})").DumpToText()}");
+            Log.Debug($"[PoeApiProvider..ctor] API list:\r\n\t{apiList.Select(x => $"{x.Name} ({x.Id})").DumpToText()}");
 
             apiList
                 .ToObservableChangeSet()

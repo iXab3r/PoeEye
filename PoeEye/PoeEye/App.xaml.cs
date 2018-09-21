@@ -152,7 +152,6 @@ namespace PoeEye
             if (AppArguments.Instance.IsDebugMode)
             {
                 Log.InitializeLogging("Debug");
-                Log.SwitchLoggingLevel(Level.Debug);
             }
             else
             {

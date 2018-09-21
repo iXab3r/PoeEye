@@ -10,6 +10,7 @@ using System.Reactive.Threading.Tasks;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Text.RegularExpressions;
+using Common.Logging;
 using DynamicData;
 using DynamicData.Cache.Internal;
 using Guards;
@@ -34,13 +35,15 @@ namespace PoeEye.PoeTradeRealtimeApi
 {
     internal sealed class WebSocketRealtimeItemSource : DisposableReactiveObject, IRealtimeItemSource
     {
+        private static readonly ILog Log = LogManager.GetLogger<WebSocketRealtimeItemSource>();
+        
         private static readonly string PoeTradeSearchUri = @"http://poe.trade/search";
         private static readonly string PoeTradeWebSocketUri = @"ws://live.poe.trade";
         private static readonly TimeSpan WebSocketPingInterval = TimeSpan.FromSeconds(60);
         private static readonly TimeSpan WebSocketGracefulCloseTimeout = TimeSpan.FromSeconds(1);
 
         private static readonly string UserAgent =
-            "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36";
+            @"Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36";
 
         private static readonly string InitialLiveQueryId = "-1";
         private readonly IFactory<IHttpClient> clientFactory;
@@ -112,21 +115,21 @@ namespace PoeEye.PoeTradeRealtimeApi
                 .Configure(State.Disposed)
                 .OnEntry(Reset);
 
-            Log.Instance.Debug($"FSM:\n {queryStateMachine.ToDotGraph()}");
+            Log.Debug($"FSM:\n {queryStateMachine.ToDotGraph()}");
 
-            Log.Instance.Debug($"Constructing query out of supplied data: {queryInfo.DumpToText(Formatting.None)}");
+            Log.Debug($"Constructing query out of supplied data: {queryInfo.DumpToText(Formatting.None)}");
             queryLeague = queryInfo.League;
             var query = queryInfoToQueryConverter.Convert(queryInfo);
             queryPostData = queryToPostConverter.Convert(query);
-            Log.Instance.Debug(
+            Log.Debug(
                 $"Post data for supplied query has been constructed:\n Query: {queryInfo.DumpToText(Formatting.None)}\n Post: {queryPostData.DumpToText(Formatting.None)}");
 
             queryStateMachine.Fire(Trigger.Create);
 
             queryStateMachine.OnTransitioned(
-                x => Log.Instance.Debug($"[RealtimeItemsSource.State] {x.Source} => {x.Trigger} => {x.Destination} (isReentry: {x.IsReentry})"));
+                x => Log.Debug($"[RealtimeItemsSource.State] {x.Source} => {x.Trigger} => {x.Destination} (isReentry: {x.IsReentry})"));
             queryStateMachine.OnUnhandledTrigger((state, trigger) =>
-                                                     Log.Instance.Debug(
+                                                     Log.Debug(
                                                          $"[RealtimeItemsSource.UnhandledState] Failed to process trigger {trigger}, state: {state}"));
         }
 
@@ -135,7 +138,7 @@ namespace PoeEye.PoeTradeRealtimeApi
             switch (queryStateMachine.State)
             {
                 case State.AwaitingForInitialRequest:
-                    Log.Instance.Debug($"Sending initial request...");
+                    Log.Debug($"Sending initial request...");
                     SendInitialRequest();
                     break;
             }
@@ -150,13 +153,13 @@ namespace PoeEye.PoeTradeRealtimeApi
 
         private void ClearItemList()
         {
-            Log.Instance.Debug($"Clearing items list...");
+            Log.Debug($"Clearing items list...");
             itemsList.Clear();
         }
 
         private void Reset()
         {
-            Log.Instance.Debug($"Resetting state, items count: {itemsList.Count}");
+            Log.Debug($"Resetting state, items count: {itemsList.Count}");
 
             ClearItemList();
             webSocketAnchors.Disposable = null;
@@ -173,7 +176,7 @@ namespace PoeEye.PoeTradeRealtimeApi
                        .ToTask()
                        .Result;
             var validItems = data.ItemsList.Where(x => !string.IsNullOrWhiteSpace(x.Hash)).ToArray();
-            Log.Instance.Debug($"Initial update contains {data.ItemsList.Length} item(s), of which {validItems.Length} are valid");
+            Log.Debug($"Initial update contains {data.ItemsList.Length} item(s), of which {validItems.Length} are valid");
 
             validItems.ForEach(x => itemsList.Edit(y => y.AddOrUpdate(x, x.Hash)));
 
@@ -201,36 +204,36 @@ namespace PoeEye.PoeTradeRealtimeApi
 
         private void ProcessInitialRequest(IPoeQueryResult data)
         {
-            Log.Instance.Debug($"Processing initial response, data.Id: {data.Id}");
+            Log.Debug($"Processing initial response, data.Id: {data.Id}");
             var rawIdMatch = Regex.Match(data.Id ?? string.Empty, @"search\/(?'id'.*?)\/live", RegexOptions.IgnoreCase);
             if (rawIdMatch.Success)
             {
                 var liveQueryId = rawIdMatch.Groups["id"].Value;
-                Log.Instance.Debug($"Live query Id: {liveQueryId}");
+                Log.Debug($"Live query Id: {liveQueryId}");
                 queryStateMachine.Fire(toLiveQueryTransitionTrigger, liveQueryId);
             }
             else
             {
-                Log.Instance.Debug($"Failed to extract live uri from the initial response");
+                Log.Debug($"Failed to extract live uri from the initial response");
                 queryStateMachine.Fire(Trigger.ReceivedUnexpectedInitialResponse);
             }
         }
 
         private void SetNextLiveQueryId(string queryId)
         {
-            Log.Instance.Debug($"Next Live queryId: '{nextLiveQueryId}' => '{queryId}'");
+            Log.Debug($"Next Live queryId: '{nextLiveQueryId}' => '{queryId}'");
             nextLiveQueryId = queryId;
         }
 
         private void SetLiveQueryUri(string newLiveQueryId)
         {
-            Log.Instance.Debug($"Next Live queryName: '{liveQueryName}' => '{newLiveQueryId}'");
+            Log.Debug($"Next Live queryName: '{liveQueryName}' => '{newLiveQueryId}'");
             liveQueryName = newLiveQueryId;
         }
 
         private void SetupLiveQuery()
         {
-            Log.Instance.Debug($"Setting up webSocket, live queryName: {liveQueryName}");
+            Log.Debug($"Setting up webSocket, live queryName: {liveQueryName}");
 
             try
             {
@@ -238,7 +241,7 @@ namespace PoeEye.PoeTradeRealtimeApi
 
                 var liveUri = new Uri(new Uri(PoeTradeWebSocketUri), liveQueryName);
 
-                Log.Instance.Debug($"Live URI: {liveUri}");
+                Log.Debug($"Live URI: {liveUri}");
                 var anchors = new CompositeDisposable();
                 webSocketAnchors.Disposable = anchors;
 
@@ -299,7 +302,7 @@ namespace PoeEye.PoeTradeRealtimeApi
                     .Subscribe(() => HandleWebSocketPingRequest(webSocket, liveQueryName), ex => HandleWebSocketError(ex, liveQueryName))
                     .AddTo(anchors);
 
-                Log.Instance.Debug($"Opening webSocket...");
+                Log.Debug($"Opening webSocket...");
                 webSocket.Open();
 
                 itemsList
@@ -310,7 +313,7 @@ namespace PoeEye.PoeTradeRealtimeApi
                     .Subscribe(item => WebSocketSubscribeToItemUpdates(webSocket, liveQueryName, item.Current), ex => HandleWebSocketError(ex, liveQueryName))
                     .AddTo(anchors);
 
-                Log.Instance.Debug($"Listening for updates");
+                Log.Debug($"Listening for updates");
             }
             catch (Exception e)
             {
@@ -323,7 +326,7 @@ namespace PoeEye.PoeTradeRealtimeApi
         {
             try
             {
-                Log.Instance.Debug($"[WebSocket] [{liveQueryId}] Trying to gracefully close webSocket...");
+                Log.Debug($"[WebSocket] [{liveQueryId}] Trying to gracefully close webSocket...");
                 webSocket.Close();
 
                 var gracefulClose = Observable.FromEventPattern(
@@ -333,20 +336,20 @@ namespace PoeEye.PoeTradeRealtimeApi
 
                 var dueTime = clock.Now + WebSocketGracefulCloseTimeout;
                 gracefulClose.Timeout(dueTime).Wait();
-                Log.Instance.Debug($"[WebSocket] [{liveQueryId}] Successfully closed webSocket, state: {webSocket.State}");
+                Log.Debug($"[WebSocket] [{liveQueryId}] Successfully closed webSocket, state: {webSocket.State}");
             }
             catch (ObjectDisposedException)
             {
             }
             catch (TimeoutException)
             {
-                Log.Instance.Debug($"[WebSocket] [{liveQueryId}] Failed to close websocket, imeout occured, state: {webSocket.State}");
+                Log.Debug($"[WebSocket] [{liveQueryId}] Failed to close websocket, imeout occured, state: {webSocket.State}");
             }
         }
 
         private void HandleWebSocketOpened(WebSocket webSocket, string liveQueryId)
         {
-            Log.Instance.Debug($"[WebSocket] [{liveQueryId}] Socket opened");
+            Log.Debug($"[WebSocket] [{liveQueryId}] Socket opened");
 
             var versionMessage = new WsGenericOperation {OperationType = WsOperationType.Version, Value = 3};
 
@@ -356,7 +359,7 @@ namespace PoeEye.PoeTradeRealtimeApi
 
         private void WebSocketSubscribeToItemUpdates(WebSocket webSocket, string liveQueryId, IPoeItem item)
         {
-            Log.Instance.Debug($"[WebSocketMessage] [{liveQueryId}] Subscribing for updates of item {item.DumpToText(Formatting.None)}");
+            Log.Debug($"[WebSocketMessage] [{liveQueryId}] Subscribing for updates of item {item.DumpToText(Formatting.None)}");
             var message = new WsGenericOperation
             {
                 OperationType = WsOperationType.Subscribe,
@@ -367,31 +370,31 @@ namespace PoeEye.PoeTradeRealtimeApi
 
         private void HandleWebSocketClosed(WebSocket webSocket, string liveQueryId)
         {
-            Log.Instance.Debug($"[WebSocket] [{liveQueryId}] Socket closed, state: {webSocket.State}");
+            Log.Debug($"[WebSocket] [{liveQueryId}] Socket closed, state: {webSocket.State}");
         }
 
         private void HandleWebSocketError(Exception error, string liveQueryId)
         {
-            Log.Instance.Debug($"[WebSocketError] [{liveQueryId}]  Error ! {error.Message}");
+            Log.Debug($"[WebSocketError] [{liveQueryId}]  Error ! {error.Message}");
             Log.HandleException(error);
             queryStateMachine.Fire(Trigger.LiveQueryFailed);
         }
 
         private void HandleWebSocketData(byte[] data, string liveQueryId)
         {
-            Log.Instance.Debug($"[RealtimeItemsSource.Data] [{liveQueryId}] Got data: {data.Length}b");
+            Log.Debug($"[RealtimeItemsSource.Data] [{liveQueryId}] Got data: {data.Length}b");
             var rawData = Encoding.Unicode.GetString(data);
-            Log.Instance.Debug($"[WebSocketData] [{liveQueryId}] Raw data:\n{rawData.DumpToText(Formatting.None)}");
+            Log.Debug($"[WebSocketData] [{liveQueryId}] Raw data:\n{rawData.DumpToText(Formatting.None)}");
 
             HandleWebSocketMessage(rawData, liveQueryId);
         }
 
         private void HandleWebSocketMessage(string rawMessage, string liveQueryId)
         {
-            Log.Instance.Debug($"[WebSocketMessage] [{liveQueryId}] Got message: {rawMessage.DumpToText()}");
+            Log.Debug($"[WebSocketMessage] [{liveQueryId}] Got message: {rawMessage.DumpToText()}");
 
             var message = WsGenericOperation.Deserialize(rawMessage);
-            Log.Instance.Debug($"[WebSocketData] [{liveQueryId}] Deserialized data:\n{message.DumpToText(Formatting.None)}");
+            Log.Debug($"[WebSocketData] [{liveQueryId}] Deserialized data:\n{message.DumpToText(Formatting.None)}");
 
             switch (message.OperationType)
             {
@@ -406,14 +409,14 @@ namespace PoeEye.PoeTradeRealtimeApi
 
         private void HandleWebSocketPingRequest(WebSocket webSocket, string liveQueryId)
         {
-            Log.Instance.Debug($"[WebSocketMessage] [{liveQueryId}] Pinging (state: {webSocket.State}) ...");
+            Log.Debug($"[WebSocketMessage] [{liveQueryId}] Pinging (state: {webSocket.State}) ...");
 
             WebSocketSend(webSocket, liveQueryId, "ping");
         }
 
         private void WebSocketSend(WebSocket webSocket, string liveQueryId, string message)
         {
-            Log.Instance.Debug($"[WebSocketMessage] [{liveQueryId}] Sending message (state: {webSocket.State}): {message}");
+            Log.Debug($"[WebSocketMessage] [{liveQueryId}] Sending message (state: {webSocket.State}): {message}");
             webSocket.Send(message);
         }
 
@@ -425,21 +428,21 @@ namespace PoeEye.PoeTradeRealtimeApi
 
         private void HandleItemRemoval(string liveQueryId, string itemId)
         {
-            Log.Instance.Debug($"[WebSocket] [{liveQueryId}] Removing item '{itemId}' (itemsCount: {itemsList.Count})");
+            Log.Debug($"[WebSocket] [{liveQueryId}] Removing item '{itemId}' (itemsCount: {itemsList.Count})");
             itemsList.Edit(x => x.RemoveKey(itemId));
-            Log.Instance.Debug($"[WebSocket] [{liveQueryId}] Resulting items count: {itemsList.Count})");
+            Log.Debug($"[WebSocket] [{liveQueryId}] Resulting items count: {itemsList.Count})");
         }
 
         private void HandleLiveUpdate(string liveQueryId, string nextLiveUpdateId)
         {
-            Log.Instance.Debug($"[WebSocket] [{liveQueryId}] Got next update Id: {nextLiveUpdateId}");
+            Log.Debug($"[WebSocket] [{liveQueryId}] Got next update Id: {nextLiveUpdateId}");
             SendLiveQuery();
             SetNextLiveQueryId(nextLiveUpdateId);
         }
 
         private void SendLiveQuery()
         {
-            Log.Instance.Debug($"Sending next live query, name: {liveQueryName}, id: '{nextLiveQueryId}'");
+            Log.Debug($"Sending next live query, name: {liveQueryName}, id: '{nextLiveQueryId}'");
 
             Guard.ArgumentNotNull(liveQueryName, nameof(liveQueryName));
             Guard.ArgumentNotNull(nextLiveQueryId, nameof(nextLiveQueryId));
@@ -449,14 +452,14 @@ namespace PoeEye.PoeTradeRealtimeApi
             try
             {
                 var liveQueryUri = new Uri($"{PoeTradeSearchUri}/{liveQueryName}/live");
-                Log.Instance.Debug($"Issueing live query, uri: {liveQueryUri}");
+                Log.Debug($"Issueing live query, uri: {liveQueryUri}");
                 var rawData = client
                               .Post(liveQueryUri.AbsoluteUri, new NameValueCollection {{"id", nextLiveQueryId}})
                               .ToTask()
                               .Result;
 
                 var result = JToken.Parse(rawData);
-                Log.Instance.Debug($"Live query response: {result.DumpToText(Formatting.None)}");
+                Log.Debug($"Live query response: {result.DumpToText(Formatting.None)}");
 
                 var nextId = result.Value<string>("newid");
                 if (string.IsNullOrWhiteSpace(nextId))
@@ -472,24 +475,24 @@ namespace PoeEye.PoeTradeRealtimeApi
                     var data = parser.ParseQueryResponse(itemsData);
 
                     var validItems = data.ItemsList.EmptyIfNull().Where(x => !string.IsNullOrWhiteSpace(x.Hash)).ToArray();
-                    Log.Instance.Debug(
+                    Log.Debug(
                         $"Extracted {data.ItemsList.Length} from live query response(expected: {itemsCount}), of which {validItems.Length} are valid");
 
                     var itemsToRemove = validItems.Where(x => x.ItemState == PoeTradeState.Removed).ToArray();
                     var itemsToAdd = validItems.Where(x => x.ItemState != PoeTradeState.Removed).ToArray();
 
-                    Log.Instance.Debug($"Items to add: {itemsToAdd.Length}, items to remove: {itemsToRemove.Length}, current list size: {itemsList.Count}");
+                    Log.Debug($"Items to add: {itemsToAdd.Length}, items to remove: {itemsToRemove.Length}, current list size: {itemsList.Count}");
 
                     itemsToAdd.ForEach(x => itemsList.Edit(y => y.AddOrUpdate(x, x.Hash)));
                     itemsToRemove.ForEach(x => itemsList.Edit(y => y.RemoveKey(x.Hash)));
-                    Log.Instance.Debug($"Resulting list size: {itemsList.Count}");
+                    Log.Debug($"Resulting list size: {itemsList.Count}");
                 }
 
                 queryStateMachine.Fire(toNextLiveQueryTransitionTrigger, nextId);
             }
             catch (Exception ex)
             {
-                Log.Instance.Warn($"Exception occurred during live request", ex);
+                Log.Warn($"Exception occurred during live request", ex);
                 queryStateMachine.Fire(Trigger.LiveQueryFailed);
             }
         }

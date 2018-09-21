@@ -6,6 +6,7 @@ using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Threading.Tasks;
 using System.Windows.Controls;
+using Common.Logging;
 using Guards;
 using JetBrains.Annotations;
 using PoeBud.Config;
@@ -24,6 +25,8 @@ namespace PoeBud.ViewModels
 {
     internal sealed class PoeBudSettingsViewModel : DisposableReactiveObject, ISettingsViewModel<PoeBudConfig>
     {
+        private static readonly ILog Log = LogManager.GetLogger<PoeBudSettingsViewModel>();
+
         private readonly SerialDisposable characterSelectionDisposable = new SerialDisposable();
         private readonly IUiOverlaysProvider overlaysProvider;
         private readonly IFactory<IPoeStashClient, NetworkCredential, bool> poeClientFactory;
@@ -173,16 +176,16 @@ namespace PoeBud.ViewModels
             }
 
             var poeClient = poeClientFactory.Create(new NetworkCredential(username, passwordBox.Password), false);
-            Log.Instance.Debug($"[PoeBudSettings.LoginCommand] Authenticating as {username}...");
+            Log.Debug($"[PoeBudSettings.LoginCommand] Authenticating as {username}...");
             await poeClient.AuthenticateAsync();
             if (poeClient.IsAuthenticated)
             {
                 SessionId = poeClient.SessionId;
             }
 
-            Log.Instance.Debug($"[PoeBudSettings.LoginCommand] SessionId: {poeClient.SessionId}");
+            Log.Debug($"[PoeBudSettings.LoginCommand] SessionId: {poeClient.SessionId}");
 
-            Log.Instance.Debug($"[PoeBudSettings.LoginCommand] Requesting characters list...");
+            Log.Debug($"[PoeBudSettings.LoginCommand] Requesting characters list...");
             var characters = await poeClient.GetCharactersAsync();
 
             var leagueAnchors = new CompositeDisposable();
@@ -194,10 +197,10 @@ namespace PoeBud.ViewModels
                           .Distinct()
                           .ToArray();
 
-            Log.Instance.Debug(
+            Log.Debug(
                 $"[PoeBudSettings.LoginCommand] Response received, characters list: \n\t{characters.DumpToTable()}\nLeagues list: \n\t{leagues.DumpToTable()}");
 
-            Log.Instance.Debug($"[PoeBudSettings.LoginCommand] Requesting stashes list...");
+            Log.Debug($"[PoeBudSettings.LoginCommand] Requesting stashes list...");
             var stashes = await TryGetStash(poeClient, leagues);
 
             var leagueStashViewModels = stashes
@@ -256,12 +259,12 @@ namespace PoeBud.ViewModels
         {
             try
             {
-                Log.Instance.Debug($"[PoeBudSettings.LoginCommand] Requesting stash for league {league}...");
+                Log.Debug($"[PoeBudSettings.LoginCommand] Requesting stash for league {league}...");
                 return client.GetStashAsync(0, league);
             }
             catch (Exception ex)
             {
-                Log.Instance.Error(ex);
+                Log.Error(ex);
                 return Task.FromResult(default(IStash));
             }
         }

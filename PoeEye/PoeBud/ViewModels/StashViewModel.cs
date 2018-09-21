@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using Common.Logging;
 using Guards;
 using JetBrains.Annotations;
 using PoeBud.Config;
@@ -16,6 +17,8 @@ namespace PoeBud.ViewModels
 {
     internal sealed class StashViewModel : DisposableReactiveObject
     {
+        private static readonly ILog Log = LogManager.GetLogger<StashViewModel>();
+
         public StashViewModel(
             [NotNull] StashUpdate stashUpdate,
             [NotNull] IPoeBudConfig config,
@@ -31,7 +34,7 @@ namespace PoeBud.ViewModels
             var rareItems = stashUpdate.Items.GetChaosSetItems();
             MaxSlotsPerSolution = config.MaxSlotsPerSolution;
 
-            Log.Instance.Debug(
+            Log.Debug(
                 $"[StashViewModel] Stash dump(itemsCount: {stashUpdate.Items.Count()}, tabsCount: {stashUpdate.Tabs.Count()}), maxSlotsPerSolution: {config.MaxSlotsPerSolution}");
 
             var chests = rareItems.Where(x => x.ItemType == GearType.Chest).ToArray();
@@ -42,7 +45,7 @@ namespace PoeBud.ViewModels
             var gloves = rareItems.Where(x => x.ItemType == GearType.Gloves).ToArray();
             var boots = rareItems.Where(x => x.ItemType == GearType.Boots).ToArray();
             var belts = rareItems.Where(x => x.ItemType == GearType.Belt).ToArray();
-            Log.Instance.DebugFormat(
+            Log.DebugFormat(
                 "[StashViewModel] Rare items:\r\n{0}",
                 string.Join(
                     "\r\n",

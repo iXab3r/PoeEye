@@ -6,6 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Threading;
+using Common.Logging;
 using Guards;
 using JetBrains.Annotations;
 using PoeShared.Prism;
@@ -15,6 +16,8 @@ namespace PoeShared.Modularity
 {
     internal class SchedulerProvider : DisposableReactiveObject, ISchedulerProvider
     {
+        private static readonly ILog Log = LogManager.GetLogger<SchedulerProvider>();
+        
         private readonly ConcurrentDictionary<string, IScheduler> schedulers = new ConcurrentDictionary<string, IScheduler>();
         private readonly IScheduler uiScheduler;
 
@@ -33,7 +36,7 @@ namespace PoeShared.Modularity
         [MethodImpl(MethodImplOptions.Synchronized)]
         public IScheduler GetOrCreate(string name)
         {
-            Log.Instance.Debug($"[SchedulerProvider.GetOrCreate '{name}'] Retrieving scheduler...");
+            Log.Debug($"[SchedulerProvider.GetOrCreate '{name}'] Retrieving scheduler...");
             return schedulers.GetOrAdd(name, Create);
         }
 
@@ -41,7 +44,7 @@ namespace PoeShared.Modularity
         {
             Guard.ArgumentNotNull(name, nameof(name));
 
-            Log.Instance.Debug($"[SchedulerProvider.Create '{name}'] Creating new dispatcher");
+            Log.Debug($"[SchedulerProvider.Create '{name}'] Creating new dispatcher");
             var consumer = new TaskCompletionSource<IScheduler>();
             var dispatcherThread = new Thread(InitializeDispatcherThread)
             {
@@ -50,7 +53,7 @@ namespace PoeShared.Modularity
             };
             dispatcherThread.SetApartmentState(ApartmentState.STA);
 
-            Log.Instance.Debug($"[SchedulerProvider.Create '{name}'] Thread started");
+            Log.Debug($"[SchedulerProvider.Create '{name}'] Thread started");
 
             dispatcherThread.Start(consumer);
             return consumer.Task.Result;
@@ -65,7 +68,7 @@ namespace PoeShared.Modularity
             }
             else
             {
-                Log.Instance.Debug($"[SchedulerProvider.InitializeDispatcherThread] Wrong args: {arg}");
+                Log.Debug($"[SchedulerProvider.InitializeDispatcherThread] Wrong args: {arg}");
             }
         }
 
@@ -73,9 +76,9 @@ namespace PoeShared.Modularity
         {
             try
             {
-                Log.Instance.Debug($"[SchedulerProvider.InitializeDispatcherThread] Thread started");
+                Log.Debug($"[SchedulerProvider.InitializeDispatcherThread] Thread started");
                 var dispatcher = Dispatcher.CurrentDispatcher;
-                Log.Instance.Debug($"[SchedulerProvider.InitializeDispatcherThread] Dispatcher: {dispatcher}");
+                Log.Debug($"[SchedulerProvider.InitializeDispatcherThread] Dispatcher: {dispatcher}");
                 var scheduler = new DispatcherScheduler(dispatcher);
                 Observable
                     .FromEventPattern<DispatcherHookEventHandler, DispatcherHookEventArgs>(
@@ -107,10 +110,10 @@ namespace PoeShared.Modularity
                         h => scheduler.Dispatcher.Hooks.OperationPosted -= h)
                     .Subscribe(eventArgs => LogEvent("OperationPosted", eventArgs.EventArgs))
                     .AddTo(Anchors);
-                Log.Instance.Debug($"[SchedulerProvider.InitializeDispatcherThread] Scheduler: {dispatcher}");
+                Log.Debug($"[SchedulerProvider.InitializeDispatcherThread] Scheduler: {dispatcher}");
                 consumer.TrySetResult(scheduler);
 
-                Log.Instance.Debug($"[KeyboardEventsSource.InitializeKeyboardThread] Starting dispatcher...");
+                Log.Debug($"[KeyboardEventsSource.InitializeKeyboardThread] Starting dispatcher...");
                 Dispatcher.Run();
             }
             catch (Exception e)
@@ -120,15 +123,15 @@ namespace PoeShared.Modularity
             }
             finally
             {
-                Log.Instance.Debug($"[KeyboardEventsSource.InitializeKeyboardThread] Thread completed");
+                Log.Debug($"[KeyboardEventsSource.InitializeKeyboardThread] Thread completed");
             }
         }
 
         private void LogEvent(string eventName, DispatcherHookEventArgs eventArgs)
         {
-            if (Log.Instance.IsTraceEnabled)
+            if (Log.IsTraceEnabled)
             {
-                Log.Instance.Trace($"[{eventName}] Priority: {eventArgs.Operation.Priority} Status: {eventArgs.Operation.Status}, Operation: {eventArgs.Operation.Task}");
+                Log.Trace($"[{eventName}] Priority: {eventArgs.Operation.Priority} Status: {eventArgs.Operation.Status}, Operation: {eventArgs.Operation.Task}");
             }
         }
     }

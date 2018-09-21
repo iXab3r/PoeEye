@@ -2,6 +2,7 @@
 using System.Linq.Expressions;
 using System.Reactive;
 using System.Reactive.Linq;
+using Common.Logging;
 using Guards;
 using JetBrains.Annotations;
 using KellermanSoftware.CompareNetObjects;
@@ -12,6 +13,8 @@ namespace PoeShared.Modularity
 {
     public sealed class GenericConfigProvider<TConfig> : DisposableReactiveObject, IConfigProvider<TConfig> where TConfig : class, IPoeEyeConfig, new()
     {
+        private static readonly ILog Log = LogManager.GetLogger<GenericConfigProvider<TConfig>>();
+
         private readonly IConfigProvider configProvider;
         private TConfig actualConfig;
 
@@ -86,7 +89,7 @@ namespace PoeShared.Modularity
 
         private void LogConfigChange(TConfig config, ComparisonResult result)
         {
-            Log.Instance.Debug(
+            Log.Debug(
                 $"[GenericConfigProvider.{typeof(TConfig).Name}] Config has changed:\nTime spent by comparer: {result.ElapsedMilliseconds}ms\n{result.DifferencesString}");
         }
 

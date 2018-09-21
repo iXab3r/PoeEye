@@ -10,6 +10,7 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading;
 using System.Threading.Tasks;
+using Common.Logging;
 using Guards;
 using JetBrains.Annotations;
 using PoeEye.StashRealtimeApi.API;
@@ -24,6 +25,8 @@ namespace PoeEye.StashRealtimeApi.Services
 {
     internal sealed class PoeItemsSource : DisposableReactiveObject, IPoeItemsSource
     {
+        private static readonly ILog Log = LogManager.GetLogger<PoeItemsSource>();
+
         private static readonly TimeSpan AllowedPollingInterval = TimeSpan.FromMilliseconds(1100);
         private static readonly string StashApiUri = @"http://www.pathofexile.com/api";
 
@@ -78,7 +81,7 @@ namespace PoeEye.StashRealtimeApi.Services
 
         private string GetStartingIdFromPoeRates()
         {
-            Log.Instance.Debug($"Requesting lastChangeId from poe-rates.com ...");
+            Log.Debug($"Requesting lastChangeId from poe-rates.com ...");
             var poeRatesApi = RestClient.For<IPoeRatesApi>("http://poe-rates.com/actions/");
             var result = poeRatesApi.GetLastChangeId().Result;
 
@@ -87,7 +90,7 @@ namespace PoeEye.StashRealtimeApi.Services
 
         private string GetStartingIdFromPoeNinja()
         {
-            Log.Instance.Debug($"Requesting lastChangeId from Poe.ninja ...");
+            Log.Debug($"Requesting lastChangeId from Poe.ninja ...");
             var api = RestClient.For<IPoeNinjaApi>("http://api.poe.ninja/api/Data");
             var result = api.GetStats().Result;
 
@@ -98,7 +101,7 @@ namespace PoeEye.StashRealtimeApi.Services
         {
             try
             {
-                Log.Instance.Debug("Thread started");
+                Log.Debug("Thread started");
                 var cancellationToken = (CancellationToken)cancellationTokenUntyped;
 
                 while (!cancellationToken.IsCancellationRequested)
@@ -106,36 +109,36 @@ namespace PoeEye.StashRealtimeApi.Services
                     var nextPack = rawPacks.Take(cancellationToken);
                     if (nextPack == null || nextPack.Count == 0)
                     {
-                        Log.Instance.Warn("Something went wrong - current pack is null or empty");
+                        Log.Warn("Something went wrong - current pack is null or empty");
                         continue;
                     }
 
-                    Log.Instance.Debug($"Processed next pack of {nextPack.Count} items");
+                    Log.Debug($"Processed next pack of {nextPack.Count} items");
 
                     var sw = Stopwatch.StartNew();
                     var poeItems = ToItems(nextPack).ToArray();
                     var itemsToAdd = poeItems.Where(x => !string.IsNullOrWhiteSpace(x.Hash)).ToArray();
                     sw.Stop();
 
-                    Log.Instance.Debug(
+                    Log.Debug(
                         $"Processed {poeItems.Length} item(s) in {sw.ElapsedMilliseconds}ms. Found {poeItems.Length - itemsToAdd.Length} bad items");
 
                     items.OnNext(itemsToAdd);
                 }
 
-                Log.Instance.Debug("Cancellation requested");
+                Log.Debug("Cancellation requested");
             }
             catch (OperationCanceledException)
             {
-                Log.Instance.Warn($"Operation cancelled");
+                Log.Warn($"Operation cancelled");
             }
             catch (Exception e)
             {
-                Log.Instance.Error($"Exception occurred in consumer thread", e);
+                Log.Error($"Exception occurred in consumer thread", e);
             }
             finally
             {
-                Log.Instance.Debug("Thread completed");
+                Log.Debug("Thread completed");
             }
         }
 
@@ -147,36 +150,36 @@ namespace PoeEye.StashRealtimeApi.Services
                 {
                     var timeElapsed = clock.Now - lastRequestTimestamp;
                     var timeToSleep = AllowedPollingInterval - timeElapsed;
-                    Log.Instance.Debug(
+                    Log.Debug(
                         $"Update request received, time elapsed since last update: {timeElapsed.TotalMilliseconds}ms, timeToSleep: {timeToSleep.TotalMilliseconds}ms");
                     if (timeElapsed < AllowedPollingInterval)
                     {
-                        Log.Instance.Debug($"Awaiting for {timeToSleep.TotalMilliseconds}ms");
+                        Log.Debug($"Awaiting for {timeToSleep.TotalMilliseconds}ms");
                         Thread.Sleep(timeToSleep);
                     }
                 }
 
-                Log.Instance.Debug($"Requesting updated data...");
+                Log.Debug($"Requesting updated data...");
                 var sw = Stopwatch.StartNew();
 
                 if (string.IsNullOrWhiteSpace(nextChangeId))
                 {
                     nextChangeId = GetStartingIdFromPoeNinja();
-                    Log.Instance.Debug($"Starting changeId: {nextChangeId}");
+                    Log.Debug($"Starting changeId: {nextChangeId}");
                 }
 
                 var response = client.PublicStashTabs(nextChangeId).Result;
                 sw.Stop();
-                Log.Instance.Debug($"Got HTTP response(in {sw.ElapsedMilliseconds}ms): {response?.ResponseMessage?.StatusCode}");
+                Log.Debug($"Got HTTP response(in {sw.ElapsedMilliseconds}ms): {response?.ResponseMessage?.StatusCode}");
                 if (response == null || response.ResponseMessage == null)
                 {
-                    Log.Instance.Warn($"Got null response for change id {nextChangeId} !");
+                    Log.Warn($"Got null response for change id {nextChangeId} !");
                 }
                 else
                 {
                     if (!response.ResponseMessage.IsSuccessStatusCode)
                     {
-                        Log.Instance.Warn($"Got unsucessfull response:\n{response.ResponseMessage.DumpToText()}");
+                        Log.Warn($"Got unsucessfull response:\n{response.ResponseMessage.DumpToText()}");
                     }
                     else
                     {
@@ -186,7 +189,7 @@ namespace PoeEye.StashRealtimeApi.Services
             }
             catch (Exception e)
             {
-                Log.Instance.Error($"Failed to get next change with Id {nextChangeId}", e);
+                Log.Error($"Failed to get next change with Id {nextChangeId}", e);
             }
             finally
             {
@@ -196,17 +199,17 @@ namespace PoeEye.StashRealtimeApi.Services
 
         private void HandleResponse(StashApiResponse response)
         {
-            Log.Instance.Debug($"Processing response, stashes count: {response.Stashes?.Count ?? -1}, proposed nextChangeId: {response.NextChangeId}");
+            Log.Debug($"Processing response, stashes count: {response.Stashes?.Count ?? -1}, proposed nextChangeId: {response.NextChangeId}");
 
 
             if (response.Stashes == null || response.Stashes.Count == 0)
             {
-                Log.Instance.Warn($"Empty response, we should re-request with the same {nextChangeId} instead of proposed {response.NextChangeId}");
+                Log.Warn($"Empty response, we should re-request with the same {nextChangeId} instead of proposed {response.NextChangeId}");
             }
             else
             {
                 nextChangeId = response.NextChangeId;
-                Log.Instance.Debug($"Adding pack of {response.Stashes.Count} items to a processing queue, currently there are {rawPacks.Count} elements");
+                Log.Debug($"Adding pack of {response.Stashes.Count} items to a processing queue, currently there are {rawPacks.Count} elements");
                 rawPacks.Add(response.Stashes);
             }
         }

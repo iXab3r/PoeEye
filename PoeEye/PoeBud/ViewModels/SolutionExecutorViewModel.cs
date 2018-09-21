@@ -4,6 +4,7 @@ using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using Common.Logging;
 using Guards;
 using JetBrains.Annotations;
 using PoeBud.Config;
@@ -21,6 +22,8 @@ namespace PoeBud.ViewModels
 {
     internal sealed class SolutionExecutorViewModel : DisposableReactiveObject, ISolutionExecutorViewModel
     {
+        private static readonly ILog Log = LogManager.GetLogger<SolutionExecutorViewModel>();
+
         private readonly IClock clock;
         private readonly IHighlightingService highlightingService;
         private readonly IKeyboardEventsSource keyboardMouseEvents;
@@ -95,7 +98,7 @@ namespace PoeBud.ViewModels
                                            .Subscribe(
                                                () =>
                                                {
-                                                   Log.Instance.Debug($"[SolutionExecutor.ExecuteSolution] Cancellation requested");
+                                                   Log.Debug($"[SolutionExecutor.ExecuteSolution] Cancellation requested");
 
                                                    LogMessage("Requesting solution cancellation...");
                                                    cancellationTokenSource.Cancel();
@@ -113,7 +116,7 @@ namespace PoeBud.ViewModels
             }
             catch (OperationCanceledException)
             {
-                Log.Instance.Debug($"[SolutionExecutor.ExecuteSolution] Solution execution was cancelled");
+                Log.Debug($"[SolutionExecutor.ExecuteSolution] Solution execution was cancelled");
                 LogMessage("Solution execution was cancelled");
             }
             finally
@@ -121,7 +124,7 @@ namespace PoeBud.ViewModels
                 IsBusy = false;
             }
 
-            Log.Instance.Debug($"[SolutionExecutor.ExecuteSolution] Log:\r\n\t{string.Join("\r\n\t", PerformedOperations)}");
+            Log.Debug($"[SolutionExecutor.ExecuteSolution] Log:\r\n\t{string.Join("\r\n\t", PerformedOperations)}");
         }
 
         private void LogMessage(string logMessage)

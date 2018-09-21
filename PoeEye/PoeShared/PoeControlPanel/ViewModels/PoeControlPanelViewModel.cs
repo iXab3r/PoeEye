@@ -74,7 +74,7 @@ namespace PoeShared.PoeControlPanel.ViewModels
 
         private void UnlockAllWindowsCommandExecuted()
         {
-            foreach (var overlayViewModel in controller.GetChilds().Where(x => x.IsUnlockable))
+            foreach (var overlayViewModel in controller.GetChildren().Where(x => x.IsUnlockable))
             {
                 overlayViewModel.IsLocked = false;
             }

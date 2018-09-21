@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Common.Logging;
 using PoeShared;
 using PoeShared.Scaffolding;
 using PoeShared.StashApi.DataTypes;
@@ -8,6 +9,8 @@ namespace PoeBud.Models
 {
     internal sealed class UpdaterDefaultProcessAllStrategy : IDefaultStashUpdaterStrategy
     {
+        private static readonly ILog Log = LogManager.GetLogger<UpdaterDefaultProcessAllStrategy>();
+        
         private readonly IClock clock;
         private readonly IStashUpdaterParameters parameters;
         private ILeague[] leaguesToProcess;
@@ -16,7 +19,7 @@ namespace PoeBud.Models
         {
             this.clock = clock;
             this.parameters = parameters;
-            Log.Instance.Debug($"[League {parameters.LeagueId}] Strategy is to process the following tabs: {parameters.StashesToProcess.DumpToTextRaw()}");
+            Log.Debug($"[League {parameters.LeagueId}] Strategy is to process the following tabs: {parameters.StashesToProcess.DumpToTextRaw()}");
         }
 
         public IStashTab[] GetTabsToProcess(IEnumerable<IStashTab> tabs)
@@ -24,9 +27,9 @@ namespace PoeBud.Models
             var publicTabs = tabs
                              .EmptyIfNull()
                              .Where(x => !x.Hidden)
-                             .Where(x => parameters.StashesToProcess.Count() == 0 || parameters.StashesToProcess.Contains(x.Name))
+                             .Where(x => !parameters.StashesToProcess.Any() || parameters.StashesToProcess.Contains(x.Name))
                              .ToArray();
-            Log.Instance.Debug($"Public tabs to process: {publicTabs.Select(x => x.Name).DumpToTextRaw()}");
+            Log.Debug($"Public tabs to process: {publicTabs.Select(x => x.Name).DumpToTextRaw()}");
             return publicTabs;
         }
 
@@ -36,7 +39,7 @@ namespace PoeBud.Models
                                .Where(x => x.StartAt <= clock.Now && x.EndAt >= clock.Now)
                                .Where(x => parameters.LeagueId == x.Id)
                                .ToArray();
-            Log.Instance.Debug($"Leagues to process: {leaguesToProcess.Select(x => x.Id).DumpToTextRaw()}");
+            Log.Debug($"Leagues to process: {leaguesToProcess.Select(x => x.Id).DumpToTextRaw()}");
             return leaguesToProcess.ToArray();
         }
 

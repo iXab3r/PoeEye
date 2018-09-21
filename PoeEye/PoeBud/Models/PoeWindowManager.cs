@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Reactive.Linq;
+using Common.Logging;
 using Guards;
 using JetBrains.Annotations;
 using PoeShared;
@@ -13,6 +14,8 @@ namespace PoeBud.Models
 {
     internal sealed class PoeWindowManager : DisposableReactiveObject, IPoeWindowManager
     {
+        private static readonly ILog Log = LogManager.GetLogger<PoeWindowManager>();
+        
         private readonly ConcurrentDictionary<IntPtr, IPoeWindow> poeWindowByHandle = new ConcurrentDictionary<IntPtr, IPoeWindow>();
         private readonly IWindowTracker poeWindowTracker;
         private readonly IFactory<IPoeWindow, IntPtr> windowsFactory;
@@ -44,7 +47,7 @@ namespace PoeBud.Models
 
         private void WindowActivated(IntPtr activeWindowHandle)
         {
-            Log.Instance.Trace($"[PoeWindowManager] Active window: '{poeWindowTracker.ActiveWindowTitle}'");
+            Log.Trace($"[PoeWindowManager] Active window: '{poeWindowTracker.ActiveWindowTitle}'");
             ActiveWindow = activeWindowHandle == IntPtr.Zero
                 ? null
                 : poeWindowByHandle.GetOrAdd(activeWindowHandle, x => windowsFactory.Create(x));

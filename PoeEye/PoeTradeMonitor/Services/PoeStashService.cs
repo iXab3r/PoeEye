@@ -6,6 +6,7 @@ using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using Common.Logging;
 using Guards;
 using JetBrains.Annotations;
 using PoeBud.Config;
@@ -23,10 +24,12 @@ namespace PoeEye.TradeMonitor.Services
 {
     internal sealed class PoeStashService : DisposableReactiveObject, IPoeStashService
     {
+        private static readonly ILog Log = LogManager.GetLogger<PoeStashService>();
+
         private readonly IClock clock;
         private readonly SerialDisposable stashUpdaterDisposable = new SerialDisposable();
         private readonly IFactory<IPoeStashUpdater, IStashUpdaterParameters> stashUpdaterFactory;
-        [NotNull] private readonly IFactory<IDefaultStashUpdaterStrategy, IStashUpdaterParameters> stashUpdaterStrategyFactory;
+        private readonly IFactory<IDefaultStashUpdaterStrategy, IStashUpdaterParameters> stashUpdaterStrategyFactory;
         private readonly BehaviorSubject<StashUpdate> stashUpdates = new BehaviorSubject<StashUpdate>(null);
 
         private IPoeStashUpdater activeUpdater;
@@ -65,17 +68,17 @@ namespace PoeEye.TradeMonitor.Services
         public IStashItem TryToFindItem(string tabName, int itemX, int itemY)
         {
             var stash = stashUpdates.Value;
-            Log.Instance.Debug($"Trying to find item in tab {tabName} @ X{itemX} Y{itemY} (tabs count: {stash?.Tabs?.Length ?? 0})");
+            Log.Debug($"Trying to find item in tab {tabName} @ X{itemX} Y{itemY} (tabs count: {stash?.Tabs?.Length ?? 0})");
             if (stash == null || stash == StashUpdate.Empty)
             {
-                Log.Instance.Warn($"Stash is not ready - either not requested yet or is empty");
+                Log.Warn($"Stash is not ready - either not requested yet or is empty");
                 return null;
             }
 
             var matchingTab = TryToFindTab(tabName);
             if (matchingTab == null)
             {
-                Log.Instance.Warn($"Failed to find tab {tabName}, tabs list: {stash.Tabs?.DumpToTextRaw()}");
+                Log.Warn($"Failed to find tab {tabName}, tabs list: {stash.Tabs?.DumpToTextRaw()}");
                 return null;
             }
 
@@ -85,22 +88,22 @@ namespace PoeEye.TradeMonitor.Services
                                   .Select(x => new {Position = new Rectangle(x.X, x.Y, x.Width, x.Height), Item = x})
                                   .ToArray();
             var requestedRect = new Rectangle(itemX, itemY, 1, 1);
-            Log.Instance.Debug($"Looking up item @ {requestedRect}, total items in tab '{matchingTab.Name}': {itemsInTab.Length}");
+            Log.Debug($"Looking up item @ {requestedRect}, total items in tab '{matchingTab.Name}': {itemsInTab.Length}");
             var itemsAtThisPosition = itemsInTab
                                       .Where(x => x.Position.IntersectsWith(requestedRect))
                                       .Select(x => x.Item)
                                       .ToArray();
-            Log.Instance.Debug($"Got {itemsAtThisPosition.Length} item(s) @ {requestedRect}");
+            Log.Debug($"Got {itemsAtThisPosition.Length} item(s) @ {requestedRect}");
             return itemsAtThisPosition.FirstOrDefault();
         }
 
         public IStashTab TryToFindTab(string tabName)
         {
             var stash = stashUpdates.Value;
-            Log.Instance.Debug($"Trying to find item int tab {tabName}");
+            Log.Debug($"Trying to find item int tab {tabName}");
             if (stash == null || stash == StashUpdate.Empty)
             {
-                Log.Instance.Warn($"Stash is not ready - either not requested yet or is empty");
+                Log.Warn($"Stash is not ready - either not requested yet or is empty");
                 return null;
             }
 
@@ -125,21 +128,21 @@ namespace PoeEye.TradeMonitor.Services
 
             try
             {
-                Log.Instance.Info($"[TradeMonitor.PoeStashService] Reinitializing stash service...");
+                Log.Info($"[TradeMonitor.PoeStashService] Reinitializing stash service...");
                 stashUpdaterDisposable.Disposable = null;
                 stashUpdates.OnNext(StashUpdate.Empty);
                 activeUpdater = null;
 
                 if (string.IsNullOrEmpty(config.LoginEmail) || string.IsNullOrEmpty(config.SessionId))
                 {
-                    Log.Instance.Warn(
+                    Log.Warn(
                         $"[TradeMonitor.PoeStashService] Credentials are not set, userName: {config.LoginEmail}, sessionId: {config.SessionId}");
                     return;
                 }
 
                 if (!tradeMonitorConfig.IsEnabled)
                 {
-                    Log.Instance.Debug($"[TradeMonitor.PoeStashService] Service is disabled, terminating...");
+                    Log.Debug($"[TradeMonitor.PoeStashService] Service is disabled, terminating...");
                     return;
                 }
 
@@ -153,7 +156,7 @@ namespace PoeEye.TradeMonitor.Services
 
                 updater
                     .Updates
-                    .Do(x => Log.Instance.Debug($"[TradeMonitor.PoeStashService] Got {x.Items?.Length} item(s) and {x.Tabs?.Length} tabs"))
+                    .Do(x => Log.Debug($"[TradeMonitor.PoeStashService] Got {x.Items?.Length} item(s) and {x.Tabs?.Length} tabs"))
                     .Subscribe(stashUpdates)
                     .AddTo(stashDisposable);
 
@@ -165,7 +168,7 @@ namespace PoeEye.TradeMonitor.Services
             }
             catch (Exception ex)
             {
-                Log.Instance.Warn($"Failed to initialize stash updater using config:\n{config.DumpToText()}", ex);
+                Log.Warn($"Failed to initialize stash updater using config:\n{config.DumpToText()}", ex);
             }
             finally
             {

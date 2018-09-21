@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Windows.Input;
+using Common.Logging;
 using Guards;
 using JetBrains.Annotations;
 using PoeBud.Models;
@@ -20,6 +21,8 @@ namespace PoeBud.ViewModels
 {
     internal sealed class PriceSummaryViewModel : DisposableReactiveObject, IPriceSummaryViewModel
     {
+        private static readonly ILog Log = LogManager.GetLogger<PriceSummaryViewModel>();
+
         private readonly IPoePriceCalculcator poePriceCalculcator;
         private readonly ObservableCollection<Tuple<PoePrice, PoePrice>> pricesByType = new ObservableCollection<Tuple<PoePrice, PoePrice>>();
 
@@ -62,7 +65,7 @@ namespace PoeBud.ViewModels
 
         private PoePrice CalculateTotal(IPoeTradeSolution solution)
         {
-            Log.Instance.Debug($"Calculating Currency total...");
+            Log.Debug($"Calculating Currency total...");
 
             var currencyWithAmount = solution
                                      .Items
@@ -86,7 +89,7 @@ namespace PoeBud.ViewModels
                 prices.Add(new Tuple<PoePrice, PoePrice>(currencyPrice, chaosPrice));
             }
 
-            Log.Instance.Debug($"Currency found:\n\t{prices.Select(x => new {Item = x.Item1, ChaosEquiv = x.Item2}).DumpToTable()}");
+            Log.Debug($"Currency found:\n\t{prices.Select(x => new {Item = x.Item1, ChaosEquiv = x.Item2}).DumpToTable()}");
 
             pricesByType.Clear();
             prices.OrderByDescending(x => x.Item2.Value).ForEach(pricesByType.Add);

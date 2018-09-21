@@ -3,6 +3,7 @@ using System.IO;
 using System.Reactive.Disposables;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using Common.Logging;
 using Guards;
 using JetBrains.Annotations;
 using PoeShared.Prism;
@@ -12,6 +13,8 @@ namespace PoeShared.Communications.Chromium
 {
     internal sealed class ChromiumBootstrapper : DisposableReactiveObject, IChromiumBootstrapper
     {
+        private static readonly ILog Log = LogManager.GetLogger<ChromiumBootstrapper>();
+
         private static readonly string AssemblyDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
         private readonly string ArchitectureSpecificDirectoryPath;
@@ -22,14 +25,14 @@ namespace PoeShared.Communications.Chromium
             Guard.ArgumentNotNull(bootstrapperFactory, nameof(bootstrapperFactory));
             ArchitectureSpecificDirectoryPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Environment.Is64BitProcess ? "x64" : "x86");
 
-            Log.Instance.Debug(
+            Log.Debug(
                 $"[ChromiumBootstrapper] Initializing assembly loader(Environment.Is64Bit: {Environment.Is64BitProcess}, OS.Is64Bit: {Environment.Is64BitOperatingSystem}), path: {ArchitectureSpecificDirectoryPath}");
             
             AppDomain.CurrentDomain.AssemblyResolve += CurrentDomainOnAssemblyResolve;
 
             Disposable.Create(() =>
             {
-                Log.Instance.Debug("[ChromiumBootstrapper] Uninitialized assembly loader...");
+                Log.Debug("[ChromiumBootstrapper] Uninitialized assembly loader...");
                 AppDomain.CurrentDomain.AssemblyResolve -= CurrentDomainOnAssemblyResolve;
             }).AddTo(Anchors);
             
@@ -48,7 +51,7 @@ namespace PoeShared.Communications.Chromium
 
             if (!File.Exists(libraryPath))
             {
-                Log.Instance.Warn(
+                Log.Warn(
                     $"Failed to load '{libraryPath}' (Environment.Is64Bit: {Environment.Is64BitProcess}, OS.Is64Bit: {Environment.Is64BitOperatingSystem})");
                 return null;
             }
@@ -59,7 +62,7 @@ namespace PoeShared.Communications.Chromium
         [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
         private static IDisposable InitializeCef()
         {
-            Log.Instance.Debug("[ChromiumBrowserFactory] Initializing CEF...");
+            Log.Debug("[ChromiumBrowserFactory] Initializing CEF...");
             var anchors = new CompositeDisposable();
 
 
@@ -76,11 +79,11 @@ namespace PoeShared.Communications.Chromium
             settings.CachePath = "cefcache";
             settings.SetOffScreenRenderingBestPerformanceArgs();
             settings.WindowlessRenderingEnabled = true;
-            if (Log.Instance.IsTraceEnabled)
+            if (Log.IsTraceEnabled)
             {
                 settings.LogSeverity = CefSharp.LogSeverity.Verbose;
             }
-            else if (Log.Instance.IsDebugEnabled)
+            else if (Log.IsDebugEnabled)
             {
                 settings.LogSeverity = CefSharp.LogSeverity.Error;
             }
@@ -99,7 +102,7 @@ namespace PoeShared.Communications.Chromium
                                                           Environment.Is64BitProcess ? "x64" : "x86",
                                                           "CefSharp.BrowserSubprocess.exe");
 
-            Log.Instance.Debug($"[ChromiumBrowserFactory] CEF settings: {settings.DumpToTextRaw()}");
+            Log.Debug($"[ChromiumBrowserFactory] CEF settings: {settings.DumpToTextRaw()}");
             if (!CefSharp.Cef.Initialize(settings, true, new BrowserProcessHandler()))
             {
                 throw new ApplicationException("Failed to initialize CEF");
@@ -108,9 +111,9 @@ namespace PoeShared.Communications.Chromium
             Disposable.Create(
                 () =>
                 {
-                    Log.Instance.Debug("[ChromiumBrowserFactory] Shutting down CEF...");
+                    Log.Debug("[ChromiumBrowserFactory] Shutting down CEF...");
                     CefSharp.Cef.Shutdown();
-                    Log.Instance.Debug("[ChromiumBrowserFactory] CEF has been shut down");
+                    Log.Debug("[ChromiumBrowserFactory] CEF has been shut down");
                 }).AddTo(anchors);
 
             return anchors;

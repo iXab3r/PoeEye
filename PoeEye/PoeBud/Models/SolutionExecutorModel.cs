@@ -4,6 +4,7 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading;
 using System.Threading.Tasks;
+using Common.Logging;
 using Guards;
 using JetBrains.Annotations;
 using PoeBud.Scaffolding;
@@ -16,6 +17,8 @@ namespace PoeBud.Models
 {
     internal sealed class SolutionExecutorModel : ISolutionExecutorModel
     {
+        private static readonly ILog Log = LogManager.GetLogger<SolutionExecutorModel>();
+        
         private readonly IHighlightingService highlightingService;
         private readonly ISubject<string> logQueue = new Subject<string>();
         private readonly IPoeWindowManager windowManager;
@@ -59,7 +62,7 @@ namespace PoeBud.Models
 
             using (highlightingService.Highlight(solutionToExecute))
             {
-                Log.Instance.Debug(
+                Log.Debug(
                     $"[SolutionExecutor.ExecuteSolution] Executing solution: {solutionToExecute.DumpToText()} ...");
                 var visibleTabs = solutionToExecute.Tabs.Where(x => !x.Hidden).ToArray();
                 IStashTab activeTab = null;

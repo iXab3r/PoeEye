@@ -7,6 +7,7 @@ using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using Common.Logging;
 using Guards;
 using JetBrains.Annotations;
 using PoeBud.Config;
@@ -27,6 +28,8 @@ namespace PoeBud.ViewModels
 {
     internal sealed class PoeBudViewModel : OverlayViewModelBase
     {
+        private static readonly ILog Log = LogManager.GetLogger<PoeBudViewModel>();
+
         private static readonly TimeSpan UpdateTimeout = TimeSpan.FromSeconds(1);
         private readonly IClock clock;
         private readonly IConfigProvider<PoeBudConfig> configProvider;
@@ -187,7 +190,7 @@ namespace PoeBud.ViewModels
 
         private void ApplyConfig(PoeBudConfig config)
         {
-            Log.Instance.Debug($"[PoeBudViewModel] Applying new config...");
+            Log.Debug($"[PoeBudViewModel] Applying new config...");
 
             actualConfig = config;
             IsEnabled = actualConfig.IsEnabled;
@@ -204,7 +207,7 @@ namespace PoeBud.ViewModels
 
             try
             {
-                Log.Instance.Info($"[PoeBudViewModel] Reinitializing PoeBud...");
+                Log.Info($"[PoeBudViewModel] Reinitializing PoeBud...");
                 stashUpdaterDisposable.Disposable = null;
                 StashUpdater = null;
                 Stash = null;
@@ -212,13 +215,13 @@ namespace PoeBud.ViewModels
 
                 if (string.IsNullOrEmpty(config.LoginEmail) || string.IsNullOrEmpty(config.SessionId))
                 {
-                    Log.Instance.Warn($"[PoeBudViewModel] Credentials are not set, userName: {config.LoginEmail}, sessionId: {config.SessionId}");
+                    Log.Warn($"[PoeBudViewModel] Credentials are not set, userName: {config.LoginEmail}, sessionId: {config.SessionId}");
                     return;
                 }
 
                 if (!config.IsEnabled)
                 {
-                    Log.Instance.Debug($"[PoeBudViewModel] PoeBud is disabled, terminating...");
+                    Log.Debug($"[PoeBudViewModel] PoeBud is disabled, terminating...");
                     return;
                 }
 
@@ -274,7 +277,7 @@ namespace PoeBud.ViewModels
             }
             catch (Exception ex)
             {
-                Log.Instance.Error(ex);
+                Log.Error(ex);
                 exceptionsToPropagate.OnNext(ex);
             }
             finally
@@ -287,11 +290,11 @@ namespace PoeBud.ViewModels
         {
             if (lastServerStashUpdate != null && lastServerStashUpdate.DumpToText() == stashUpdate.DumpToText())
             {
-                Log.Instance.Debug($"[PoeBudViewModel] Duplicate update arrived, skipping update");
+                Log.Debug($"[PoeBudViewModel] Duplicate update arrived, skipping update");
                 return;
             }
 
-            Log.Instance.Debug($"[PoeBudViewModel] Stash update arrived, tabs: {stashUpdate.Tabs.Count()}, items: {stashUpdate.Items.Count()}");
+            Log.Debug($"[PoeBudViewModel] Stash update arrived, tabs: {stashUpdate.Tabs.Count()}, items: {stashUpdate.Items.Count()}");
 
             lastServerStashUpdate = stashUpdate;
             Stash = stashUpdateFactory.Create(stashUpdate, config);
@@ -301,7 +304,7 @@ namespace PoeBud.ViewModels
         {
             try
             {
-                Log.Instance.Debug($"[PoeBudViewModel] Force refresh requested");
+                Log.Debug($"[PoeBudViewModel] Force refresh requested");
                 var updater = StashUpdater;
                 if (updater == null)
                 {
@@ -323,7 +326,7 @@ namespace PoeBud.ViewModels
             {
                 if (SolutionExecutor.IsBusy)
                 {
-                    Log.Instance.Debug(
+                    Log.Debug(
                         "[MainViewModel.ExecuteSolutionCommandExecuted] Solution executor is busy, ignoring request");
                     return;
                 }
@@ -402,11 +405,11 @@ namespace PoeBud.ViewModels
             // taking ACTUAL snapshot and performing a clean-up
             if (dirtyStash != stash)
             {
-                Log.Instance.Warn(
+                Log.Warn(
                     $"[MainViewModel.Sell] Possible race condition, trying to resolve it...");
             }
 
-            Log.Instance.Debug($"[MainViewModel.Sell] Solution executed successfully, preparing DIRTY stash update...");
+            Log.Debug($"[MainViewModel.Sell] Solution executed successfully, preparing DIRTY stash update...");
 
             var dirtyStashUpdate = stash.StashUpdate.RemoveItems(executedSolution.Items);
             Stash = stashUpdateFactory.Create(dirtyStashUpdate, config);

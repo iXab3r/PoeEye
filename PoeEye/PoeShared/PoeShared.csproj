@@ -209,6 +209,7 @@
     <Compile Include="Converters\ObjectToTypeConverter.cs" />
     <Compile Include="Converters\PoeStashItemToPoeItemConverter.cs" />
     <Compile Include="Converters\SafeDataConverter.cs" />
+    <Compile Include="LogExtensions.cs" />
     <Compile Include="Modularity\GenericConfigProvider.cs" />
     <Compile Include="Modularity\IConfigSerializer.cs" />
     <Compile Include="Modularity\ISchedulerProvider.cs" />

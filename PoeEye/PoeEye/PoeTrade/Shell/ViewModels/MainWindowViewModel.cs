@@ -8,6 +8,7 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Reflection;
 using System.Threading.Tasks;
+using Common.Logging;
 using Dragablz;
 using DynamicData;
 using Guards;
@@ -32,6 +33,8 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
 {
     internal sealed class MainWindowViewModel : DisposableReactiveObject, IMainWindowViewModel
     {
+        private static readonly ILog Log = LogManager.GetLogger<MainWindowViewModel>();
+        
         private static readonly int UndoStackDepth = 10;
 
         private static readonly string ExplorerExecutablePath = Environment.ExpandEnvironmentVariables(@"%WINDIR%\explorer.exe");
@@ -204,7 +207,7 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
 
         public override void Dispose()
         {
-            Log.Instance.Debug("[MainWindowViewModel.Dispose] Disposing viewmodel...");
+            Log.Debug("[MainWindowViewModel.Dispose] Disposing viewmodel...");
             SaveConfig();
             foreach (var mainWindowTabViewModel in TabsList)
             {
@@ -213,7 +216,7 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
 
             base.Dispose();
 
-            Log.Instance.Debug("[MainWindowViewModel.Dispose] Viewmodel disposed");
+            Log.Debug("[MainWindowViewModel.Dispose] Viewmodel disposed");
         }
 
 
@@ -259,7 +262,7 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
             var existingItems = tabsListSource.Items.ToList();
             var newItems = args.NewOrder.OfType<IMainWindowTabViewModel>().ToList();
 
-            Log.Instance.Debug(
+            Log.Debug(
                 $"[PositionMonitor] Source ordering:\n\tSource: {string.Join(" => ", existingItems.Select(x => x.Id))}\n\tView: {string.Join(" => ", newItems.Select(x => x.Id))}");
             configUpdateSubject.OnNext(Unit.Default);
         }
@@ -321,14 +324,14 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
         {
             Guard.ArgumentIsTrue(() => RemoveTabCommandCanExecute(tab));
 
-            Log.Instance.Debug($"[MainWindowViewModel.RemoveTab] Removing tab {tab}...");
+            Log.Debug($"[MainWindowViewModel.RemoveTab] Removing tab {tab}...");
 
             var items = positionMonitor.Items.ToArray();
             var tabIdx = items.IndexOf(tab);
             if (tabIdx > 0)
             {
                 var tabToSelect = items[tabIdx - 1];
-                Log.Instance.Debug($"[MainWindowViewModel.RemoveTab] Selecting neighbour tab {tabToSelect}...");
+                Log.Debug($"[MainWindowViewModel.RemoveTab] Selecting neighbour tab {tabToSelect}...");
                 SelectedTab = tabToSelect;
             }
 
@@ -350,7 +353,7 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
         {
             Guard.ArgumentIsTrue(() => CopyTabToClipboardCommandCanExecute(tab));
 
-            Log.Instance.Debug($"[MainWindowViewModel.CopyTabToClipboard] Copying tab {tab}...");
+            Log.Debug($"[MainWindowViewModel.CopyTabToClipboard] Copying tab {tab}...");
 
             var cfg = tab.Save();
             var data = configSerializer.Compress(cfg);
@@ -359,7 +362,7 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
 
         private void SaveConfig()
         {
-            Log.Instance.Debug($"[MainWindowViewModel.SaveConfig] Saving config (provider: {poeEyeConfigProvider})...\r\nTabs count: {TabsList.Count}");
+            Log.Debug($"[MainWindowViewModel.SaveConfig] Saving config (provider: {poeEyeConfigProvider})...\r\nTabs count: {TabsList.Count}");
 
             var config = poeEyeConfigProvider.ActualConfig;
 
@@ -376,11 +379,11 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
 
         private void LoadConfig()
         {
-            Log.Instance.Debug($"[MainWindowViewModel.LoadConfig] Loading config (provider: {poeEyeConfigProvider})...");
+            Log.Debug($"[MainWindowViewModel.LoadConfig] Loading config (provider: {poeEyeConfigProvider})...");
 
             var config = poeEyeConfigProvider.ActualConfig;
 
-            Log.Instance.Trace($"[MainWindowViewModel.LoadConfig] Received configuration DTO:\r\n{config.DumpToText()}");
+            Log.Trace($"[MainWindowViewModel.LoadConfig] Received configuration DTO:\r\n{config.DumpToText()}");
 
             foreach (var tabConfig in config.TabConfigs)
             {
@@ -388,7 +391,7 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
                 tab.Load(tabConfig);
             }
 
-            Log.Instance.Debug($"[MainWindowViewModel.LoadConfig] Successfully loaded config\r\nTabs count: {TabsList.Count}");
+            Log.Debug($"[MainWindowViewModel.LoadConfig] Successfully loaded config\r\nTabs count: {TabsList.Count}");
         }
     }
 }

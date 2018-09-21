@@ -303,7 +303,7 @@
     <Compile Include="PoeTrade\Models\PoeApiProvider.cs" />
     <Compile Include="PoeTrade\Models\PoeItemPricePoint.cs" />
     <Compile Include="PoeTrade\Models\PoeItemViewModelFactory.cs" />
-    <Compile Include="PoeTrade\Models\PoePriceCalculcator.cs" />
+    <Compile Include="PoeTrade\Models\PoePriceCalculator.cs" />
     <Compile Include="PoeTrade\Models\PoeCaptchaRegistrator.cs" />
     <Compile Include="PoeTrade\Models\PoeTradeQuickFilter.cs" />
     <Compile Include="PoeTrade\Models\ReactiveSuggestionProvider.cs" />

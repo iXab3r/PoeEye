@@ -7,6 +7,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Common.Logging;
 using Guards;
 using JetBrains.Annotations;
 using ReactiveUI;
@@ -15,6 +16,8 @@ namespace PoeShared.Scaffolding
 {
     internal sealed class WindowTracker : DisposableReactiveObject, IWindowTracker
     {
+        private static readonly ILog Log = LogManager.GetLogger<WindowTracker>();
+        
         private static readonly TimeSpan MinRecheckPeriod = TimeSpan.FromMilliseconds(50);
         private static readonly TimeSpan RecheckPeriod = TimeSpan.FromMilliseconds(250);
         private readonly Func<string> titleMatcherRegexFunc;
@@ -92,7 +95,7 @@ namespace PoeShared.Scaffolding
 
             windowHandle = IsActive ? activeWindowHandle : IntPtr.Zero;
 
-            Log.Instance.TraceFormat(
+            Log.TraceFormat(
                 "[WindowTracker] Target window is {0}ACTIVE (hwnd 0x{3:X8}  expected title is '{1}', got '{2}')",
                 isActive ? string.Empty : "NOT ",
                 targetTitle,

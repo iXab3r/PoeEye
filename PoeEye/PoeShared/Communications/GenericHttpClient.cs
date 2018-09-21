@@ -8,6 +8,7 @@ using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Text;
 using System.Web;
+using Common.Logging;
 using CsQuery.ExtensionMethods.Internal;
 using Guards;
 using JetBrains.Annotations;
@@ -18,6 +19,8 @@ namespace PoeShared.Communications
 {
     internal sealed class GenericHttpClient : IHttpClient
     {
+        private static readonly ILog Log = LogManager.GetLogger<GenericHttpClient>();
+        
         private static readonly string DefaultUserAgent =
             "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36";
 
@@ -78,7 +81,7 @@ namespace PoeShared.Communications
 
         private string GetInternal(string uri)
         {
-            Log.Instance.Debug($"[HttpClient] Querying uri '{uri}' (GET)");
+            Log.Debug($"[HttpClient] Querying uri '{uri}' (GET)");
 
             var httpClient = WebRequest.CreateHttp(uri);
 
@@ -101,8 +104,8 @@ namespace PoeShared.Communications
         private string PostQueryInternal(string uri, NameValueCollection args)
         {
             var postData = nameValueConverter.Convert(args);
-            Log.Instance.Debug($"[HttpClient] Querying uri '{uri}', args: \r\nPOST: {postData}");
-            Log.Instance.Trace($"[HttpClient] Splitted POST data dump: {postData.SplitClean('&').DumpToText()}");
+            Log.Debug($"[HttpClient] Querying uri '{uri}', args: \r\nPOST: {postData}");
+            Log.Trace($"[HttpClient] Splitted POST data dump: {postData.SplitClean('&').DumpToText()}");
 
             var httpClient = WebRequest.CreateHttp(uri);
 
@@ -132,13 +135,13 @@ namespace PoeShared.Communications
             var proxy = Proxy;
             if (proxy != null)
             {
-                Log.Instance.Debug($"[HttpClient] Using proxy {proxy} for uri '{httpRequest.RequestUri}'");
+                Log.Debug($"[HttpClient] Using proxy {proxy} for uri '{httpRequest.RequestUri}'");
                 httpRequest.Proxy = proxy;
             }
 
             if (httpRequest.Method == WebRequestMethods.Http.Post && !string.IsNullOrEmpty(requestData))
             {
-                Log.Instance.Debug($"[HttpClient] Preparing POST data...");
+                Log.Debug($"[HttpClient] Preparing POST data...");
                 var data = Encoding.ASCII.GetBytes(requestData);
                 using (var stream = httpRequest.GetRequestStream())
                 {
@@ -146,7 +149,7 @@ namespace PoeShared.Communications
                 }
             }
 
-            Log.Instance.Debug($"[HttpClient] Sending {httpRequest.Method} request with timeout of {httpRequest.Timeout}ms to {httpRequest.RequestUri}");
+            Log.Debug($"[HttpClient] Sending {httpRequest.Method} request with timeout of {httpRequest.Timeout}ms to {httpRequest.RequestUri}");
             using (var response = (HttpWebResponse)httpRequest.GetResponse())
             using (var responseStream = response.GetResponseStream())
             {
@@ -155,13 +158,13 @@ namespace PoeShared.Communications
                 if (responseStream != null)
                 {
                     var rawBytes = responseStream.ReadToEnd();
-                    Log.Instance.Debug($"[HttpClient] Received response, status: {response.StatusCode}, binary length: {rawBytes}");
+                    Log.Debug($"[HttpClient] Received response, status: {response.StatusCode}, binary length: {rawBytes}");
                     rawResponse = Encoding.UTF8.GetString(rawBytes);
-                    Log.Instance.Debug($"[HttpClient] Resulting response(string) length: {rawResponse.Length}");
+                    Log.Debug($"[HttpClient] Resulting response(string) length: {rawResponse.Length}");
                 }
                 else
                 {
-                    Log.Instance.Warn($"[HttpClient] Received null response stream ! Status: {response.StatusCode}");
+                    Log.Warn($"[HttpClient] Received null response stream ! Status: {response.StatusCode}");
                 }
 
 

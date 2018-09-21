@@ -28,7 +28,7 @@ namespace PoeShared.Converters
                                     object parameter,
                                     CultureInfo culture)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
     }
 }

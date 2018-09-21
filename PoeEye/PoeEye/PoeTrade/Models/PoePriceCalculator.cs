@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
+using Common.Logging;
 using Guards;
 using JetBrains.Annotations;
 using PoeEye.Config;
@@ -16,11 +17,13 @@ namespace PoeEye.PoeTrade.Models
 {
     using IPoeEyeMainConfigProvider = IConfigProvider<PoeEyeMainConfig>;
 
-    internal sealed class PoePriceCalculcator : DisposableReactiveObject, IPoePriceCalculcator
+    internal sealed class PoePriceCalculator : DisposableReactiveObject, IPoePriceCalculcator
     {
+        private static readonly ILog Log = LogManager.GetLogger<PoePriceCalculator>();
+
         private readonly IDictionary<string, float> currencyByType = new Dictionary<string, float>();
 
-        public PoePriceCalculcator([NotNull] IPoeEyeMainConfigProvider configProvider)
+        public PoePriceCalculator([NotNull] IPoeEyeMainConfigProvider configProvider)
         {
             Guard.ArgumentNotNull(configProvider, nameof(configProvider));
 
@@ -44,15 +47,14 @@ namespace PoeEye.PoeTrade.Models
                 return PoePrice.Empty;
             }
 
-            float currencyMultilplier;
-            if (!currencyByType.TryGetValue(price.CurrencyType, out currencyMultilplier))
+            if (!currencyByType.TryGetValue(price.CurrencyType, out var currencyMultiplier))
             {
-                Log.Instance.Debug(
-                    $"[PriceCalculcator] Could not convert currency type '{price.CurrencyType}' to multiplier, price: {price}\r\nMultipliers:{currencyByType.DumpToTextRaw()}");
+                Log.Debug(
+                    $"[PriceCalculator] Could not convert currency type '{price.CurrencyType}' to multiplier, price: {price}\r\nMultipliers:{currencyByType.DumpToTextRaw()}");
                 return PoePrice.Empty;
             }
 
-            return new PoePrice(KnownCurrencyNameList.ChaosOrb, price.Value * currencyMultilplier);
+            return new PoePrice(KnownCurrencyNameList.ChaosOrb, price.Value * currencyMultiplier);
         }
 
         public bool CanConvert(PoePrice price)
@@ -76,11 +78,11 @@ namespace PoeEye.PoeTrade.Models
 
             if (!currencyByType.ContainsKey(KnownCurrencyNameList.ChaosOrb))
             {
-                Log.Instance.Debug($"[PriceCalculcator] Chaos orb is not in a list of prices, adding it");
+                Log.Debug($"[PriceCalculator] Chaos orb is not in a list of prices, adding it");
                 currencyByType[KnownCurrencyNameList.ChaosOrb] = 1.0f;
             }
 
-            Log.Instance.Debug($"[PriceCalculcator] Currencies list:\r\n{currencyByType.DumpToText()}");
+            Log.Debug($"[PriceCalculator] Currencies list:\r\n{currencyByType.DumpToText()}");
         }
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using Common.Logging;
 using Guards;
 using JetBrains.Annotations;
 using PoeShared;
@@ -14,6 +15,8 @@ namespace PoeWhisperMonitor
 {
     internal sealed class PoeMessagesSource : DisposableReactiveObject, IPoeMessagesSource
     {
+        private static readonly ILog Log = LogManager.GetLogger<PoeMessagesSource>();
+        
         private readonly ICollection<string> linesBuffer = new List<string>();
         private readonly IPoeChatMessageProcessor messageProcessor;
 
@@ -27,7 +30,7 @@ namespace PoeWhisperMonitor
             Guard.ArgumentNotNull(messageProcessor, nameof(messageProcessor));
 
             this.messageProcessor = messageProcessor;
-            Log.Instance.Debug($"[PoeMessagesSource] Tracking log file '{logFile.FullName}'...");
+            Log.Debug($"[PoeMessagesSource] Tracking log file '{logFile.FullName}'...");
             var safeStream = new SafeFileStream(logFile.FullName);
 
             var linesStream = new StreamTracker(safeStream);
@@ -36,13 +39,14 @@ namespace PoeWhisperMonitor
             linesStream
                 .Lines
                 .Where(x => !string.IsNullOrWhiteSpace(x))
+                .Where(x => MaxLinesBufferSize > 0)
                 .Select(ToMessage)
                 .Where(x => !default(PoeMessage).Equals(x))
                 .Subscribe(messageSubject)
                 .AddTo(Anchors);
         }
 
-        public int MaxLinesBufferSize { get; set; }
+        public int MaxLinesBufferSize { get; set; } = 1024;
 
         public IObservable<PoeMessage> Messages => messageSubject;
 
@@ -50,7 +54,7 @@ namespace PoeWhisperMonitor
         {
             if (linesBuffer.Count >= MaxLinesBufferSize)
             {
-                Log.Instance.Warn($"[PoeMessagesSource] Clearing lines buffer(maxSize: {MaxLinesBufferSize}):\r\n\t{string.Join("\r\n\t", linesBuffer)}");
+                Log.Trace($"[PoeMessagesSource] Clearing lines buffer(maxSize: {MaxLinesBufferSize}):\r\n\t{string.Join("\r\n\t", linesBuffer)}");
                 linesBuffer.Clear();
             }
 
@@ -66,7 +70,7 @@ namespace PoeWhisperMonitor
 
             linesBuffer.Clear();
 
-            Log.Instance.Debug($"[PoeMessagesSource] New message: {message.DumpToText()}");
+            Log.Debug($"[PoeMessagesSource] New message: {message.DumpToTextRaw()}");
             return message;
         }
     }

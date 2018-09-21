@@ -5,6 +5,7 @@ using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Windows.Input;
+using Common.Logging;
 using DynamicData;
 using DynamicData.Binding;
 using Guards;
@@ -27,6 +28,8 @@ namespace PoeEye.PoeTrade.ViewModels
 {
     internal sealed class MainWindowTabViewModel : DisposableReactiveObject, IMainWindowTabViewModel
     {
+        private static readonly ILog Log = LogManager.GetLogger<MainWindowTabViewModel>();
+
         private static int GlobalTabIdx;
         private static readonly TimeSpan ThrottlingPeriod = TimeSpan.FromSeconds(0.5);
 
@@ -202,7 +205,7 @@ namespace PoeEye.PoeTrade.ViewModels
             var defaultModule = ApiSelector.ModulesList.FirstOrDefault();
             if (ApiSelector.SetByModuleId(config.ApiModuleId) == null && defaultModule != null)
             {
-                Log.Instance.Warn($"Failed to find module {config.ApiModuleId}, available modules: {ApiSelector.ModulesList.DumpToTextRaw()}");
+                Log.Warn($"Failed to find module {config.ApiModuleId}, available modules: {ApiSelector.ModulesList.DumpToTextRaw()}");
                 ApiSelector.SetByModuleId(defaultModule.Id.ToString());
             }
 
@@ -245,7 +248,7 @@ namespace PoeEye.PoeTrade.ViewModels
 
         private void ResetCommandExecuted()
         {
-            Log.Instance.Debug($"Resetting query parameters of tab {tabName.Value}");
+            Log.Debug($"Resetting query parameters of tab {tabName.Value}");
             Query.SetQueryInfo(PoeQueryInfo.Empty);
         }
 
@@ -284,7 +287,7 @@ namespace PoeEye.PoeTrade.ViewModels
 
             var previousValue = tabName.Value;
             tabName.SetValue(newTabNameOrDefault);
-            Log.Instance.Debug($"Changed name of tab {defaultTabName}, {previousValue} => {tabName.Value}");
+            Log.Debug($"Changed name of tab {defaultTabName}, {previousValue} => {tabName.Value}");
         }
 
         private void ReinitializeApi(IPoeApiWrapper api)
@@ -335,7 +338,7 @@ namespace PoeEye.PoeTrade.ViewModels
 
         private void RebuildTabName(IPoeQueryViewModel queryToProcess)
         {
-            Log.Instance.Debug($"[MainWindowTabViewModel.RebuildTabName] Rebuilding tab name, tabQueryMode: {queryToProcess}...");
+            Log.Debug($"[MainWindowTabViewModel.RebuildTabName] Rebuilding tab name, tabQueryMode: {queryToProcess}...");
 
             var queryDescription = queryToProcess.Description;
 
@@ -355,13 +358,13 @@ namespace PoeEye.PoeTrade.ViewModels
             if (TradesList.ActiveQuery == null && arg is Func<IPoeQueryInfo> queryBuilder)
             {
                 var newQuery = queryBuilder();
-                Log.Instance.Debug(
+                Log.Debug(
                     $"[MainWindowTabViewModel.RefreshCommandExecuted] Search command executed, running query\r\n{newQuery.DumpToText()}");
                 RunNewSearch(newQuery);
             }
             else
             {
-                Log.Instance.Debug(
+                Log.Debug(
                     $"[MainWindowTabViewModel.RefreshCommandExecuted] Refresh command executed, running query\r\n{Query.DumpToText()}");
                 TradesList.Refresh();
             }
@@ -381,7 +384,7 @@ namespace PoeEye.PoeTrade.ViewModels
 
             if (TradesList.RecheckPeriod == TimeSpan.Zero)
             {
-                Log.Instance.Debug("[MainWindowTabViewModel.SearchCommandExecute] Auto-recheck is disabled, refreshing query manually...");
+                Log.Debug("[MainWindowTabViewModel.SearchCommandExecute] Auto-recheck is disabled, refreshing query manually...");
                 TradesList.Refresh();
             }
         }
@@ -394,7 +397,7 @@ namespace PoeEye.PoeTrade.ViewModels
                 return;
             }
 
-            Log.Instance.Debug(
+            Log.Debug(
                 $"[MainWindowTabViewModel.MarkAllAsReadExecute] Marking {tradesToAmend.Length} of {tradesList.Items.Count} item(s) as Read");
 
             foreach (var trade in tradesToAmend)
@@ -405,7 +408,7 @@ namespace PoeEye.PoeTrade.ViewModels
 
         private void SaveAsDefaultExecuted()
         {
-            Log.Instance.Debug("[MainWindowTabViewModel.SaveAsDefaultExecuted] Saving default tab configuration as default");
+            Log.Debug("[MainWindowTabViewModel.SaveAsDefaultExecuted] Saving default tab configuration as default");
             configProvider.ActualConfig.DefaultConfig = this.Save();
         }
 

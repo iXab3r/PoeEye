@@ -9,6 +9,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading;
+using Common.Logging;
 using DynamicData;
 using DynamicData.Binding;
 using Guards;
@@ -28,6 +29,8 @@ namespace PoeEye.PoeTrade.ViewModels
 {
     internal sealed class PoeAdvancedTradesListViewModel : DisposableReactiveObject, IPoeAdvancedTradesListViewModel
     {
+        private static readonly ILog Log = LogManager.GetLogger<PoeAdvancedTradesListViewModel>();
+        
         private static readonly Func<IPoeTradeViewModel, bool> AlwaysTruePredicate = model => true;
         private static readonly TimeSpan ResortRefilterThrottleTimeout = TimeSpan.FromMilliseconds(250);
         private static readonly TimeSpan DataChangesThrottleTimeout = TimeSpan.FromMilliseconds(1000);
@@ -234,7 +237,7 @@ namespace PoeEye.PoeTrade.ViewModels
 
                 Items = listOfItemLists.Or().ToSourceList();
 
-                Disposable.Create(() => Log.Instance.Trace($"[PoeAdvancedTradesListViewModel.TabProxy] Proxy for tab {tab} ({tab.TabName}) was disposed"))
+                Disposable.Create(() => Log.Trace($"[PoeAdvancedTradesListViewModel.TabProxy] Proxy for tab {tab} ({tab.TabName}) was disposed"))
                           .AddTo(Anchors);
             }
 

@@ -9,6 +9,7 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Common.Logging;
 using Guards;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
@@ -30,6 +31,8 @@ namespace PoeEye.PathOfExileTrade
 {
     internal sealed class PathOfExileTradeApi : DisposableReactiveObject, IPoeApi, IPoeItemSource
     {
+        private static readonly ILog Log = LogManager.GetLogger<PathOfExileTradeApi>();
+        
         private static readonly string TradeSearchUri = @"https://www.pathofexile.com/api/trade";
         private readonly IPathOfExileTradePortalApi client;
         private readonly IClock clock;
@@ -66,7 +69,7 @@ namespace PoeEye.PathOfExileTrade
                 .WhenChanged
                 .Subscribe(x => config = x)
                 .AddTo(Anchors);
-            Log.Instance.Debug($"[PathOfExileTradeApi..ctor] {config.DumpToText()}");
+            Log.Debug($"[PathOfExileTradeApi..ctor] {config.DumpToText()}");
             requestsSemaphore = new SemaphoreSlim(config.MaxSimultaneousRequestsCount);
         }
 
@@ -84,7 +87,7 @@ namespace PoeEye.PathOfExileTrade
                    .ToObservable()
                    .Select(queryResult =>
                    {
-                       Log.Instance.Debug($"[PathOfExileTradeApi] Initializing live subscription for query {queryResult.Id}");
+                       Log.Debug($"[PathOfExileTradeApi] Initializing live subscription for query {queryResult.Id}");
                        return Observable.Using(() => liveSourceFactory.Create(queryResult, this), api => api.Updates);
                    })
                    .Switch();
@@ -96,7 +99,7 @@ namespace PoeEye.PathOfExileTrade
 
             try
             {
-                Log.Instance.Debug($"[PathOfExileTradeApi.Api] Sending query");
+                Log.Debug($"[PathOfExileTradeApi.Api] Sending query");
 
                 var query = new JsonSearchRequest.Request
                 {
@@ -110,7 +113,7 @@ namespace PoeEye.PathOfExileTrade
                 var response = await client.Search(queryInfo.League, query);
                 var resultIds = response.GetContentEx();
 
-                Log.Instance.Trace($"[PathOfExileTradeApi.Api] [{resultIds.Id}]  Got {resultIds.Total} entries as a result");
+                Log.Trace($"[PathOfExileTradeApi.Api] [{resultIds.Id}]  Got {resultIds.Total} entries as a result");
                 const int maxItemsToProcess = 50;
                 return await FetchItems(new PoeQueryResult {Query = queryInfo, Id = resultIds.Id}, resultIds.Result.Take(maxItemsToProcess).ToArray());
             }
@@ -122,7 +125,7 @@ namespace PoeEye.PathOfExileTrade
 
         public async Task<IPoeStaticData> RequestStaticData()
         {
-            Log.Instance.Debug($"[PathOfExileTradeApi.Api] Requesting static data...");
+            Log.Debug($"[PathOfExileTradeApi.Api] Requesting static data...");
 
             var result = new PoeStaticData();
             var apiLeagueList = await client.GetLeagueList();
@@ -183,7 +186,7 @@ namespace PoeEye.PathOfExileTrade
                 new PoeItemType("Resonator", "currency.resonator"),
                 new PoeItemType("Fossil", "currency.fossil")
             };
-            Log.Instance.Debug($"[PathOfExileTradeApi.Api] Successfully retrieved static data");
+            Log.Debug($"[PathOfExileTradeApi.Api] Successfully retrieved static data");
 
             return result;
         }
@@ -204,7 +207,7 @@ namespace PoeEye.PathOfExileTrade
 
             if (itemIds.Any())
             {
-                Log.Instance.Debug($"[PathOfExileTradeApi.Api] [{initial.Id}] Fetching items in packs of {maxItemsInRequest}");
+                Log.Debug($"[PathOfExileTradeApi.Api] [{initial.Id}] Fetching items in packs of {maxItemsInRequest}");
 
                 await Partitioner
                     .Create(0, itemIds.Count, maxItemsInRequest)
@@ -213,14 +216,14 @@ namespace PoeEye.PathOfExileTrade
                       {
                         var segment = itemIds.Subrange(partition.Item1, partition.Item2 - partition.Item1).ToArray();
                         var ids = string.Join(",", segment);
-                        Log.Instance.Debug($"[PathOfExileTradeApi.Api] [{initial.Id}] Fetching pack {partition}: {ids}");
+                        Log.Debug($"[PathOfExileTradeApi.Api] [{initial.Id}] Fetching pack {partition}: {ids}");
                         var fetchResponse = (await client.FetchItems(ids, initial.Id)).GetContentEx();
-                        Log.Instance.Debug($"[PathOfExileTradeApi.Api] [{initial.Id}] Got response ({fetchResponse.Listings?.Length} item(s), requested: {segment.Count()}) {fetchResponse.DumpToTextRaw()}");
+                        Log.Debug($"[PathOfExileTradeApi.Api] [{initial.Id}] Got response ({fetchResponse.Listings?.Length} item(s), requested: {segment.Count()}) {fetchResponse.DumpToTextRaw()}");
 
                         fetchResponse.Listings.ForEach(listings.Add);
                     });
             }
-            Log.Instance.Debug($"[PathOfExileTradeApi.Api] [{initial.Id}] Successfully received {itemIds.Count} items");
+            Log.Debug($"[PathOfExileTradeApi.Api] [{initial.Id}] Successfully received {itemIds.Count} items");
 
             var queryResult = new PoeQueryResult
             {
@@ -266,7 +269,7 @@ namespace PoeEye.PathOfExileTrade
                     // mod with the same name exists
                     if (existingMod.CodeName == mod.CodeName)
                     {
-                        Log.Instance.Warn($"[PathOfExileTradeApi.Api] Duplicate mod detected, existingMod: {existingMod.DumpToText()} newMod: {mod.DumpToText()}");
+                        Log.Warn($"[PathOfExileTradeApi.Api] Duplicate mod detected, existingMod: {existingMod.DumpToText()} newMod: {mod.DumpToText()}");
                         continue;
                     }
 
@@ -306,12 +309,12 @@ namespace PoeEye.PathOfExileTrade
         private static async Task HandleRequestMessage(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             var body = request?.Content != null ? await request?.Content.ReadAsStringAsync() : "undefined";
-            Log.Instance.Debug($"[PathOfExileTradeApi.Api] Requesting {request?.RequestUri}', content: {request?.Content.DumpToTextRaw()}, body:\n{body}");
+            Log.Debug($"[PathOfExileTradeApi.Api] Requesting {request?.RequestUri}', content: {request?.Content.DumpToTextRaw()}, body:\n{body}");
         }
 
         private void ReleaseSemaphore()
         {
-            Log.Instance.Debug($"[PoeTradeApi] Awaiting {config.DelayBetweenRequests.TotalSeconds}s before releasing semaphore slot...");
+            Log.Debug($"[PoeTradeApi] Awaiting {config.DelayBetweenRequests.TotalSeconds}s before releasing semaphore slot...");
             Thread.Sleep(config.DelayBetweenRequests);
             requestsSemaphore.Release();
         }

@@ -4,6 +4,7 @@ using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Windows;
 using System.Windows.Input;
+using Common.Logging;
 using DynamicData;
 using DynamicData.Binding;
 using Guards;
@@ -24,6 +25,8 @@ namespace PoeEye.TradeMonitor.ViewModels
 {
     internal sealed class PoeTradeMonitorViewModel : OverlayViewModelBase
     {
+        private static readonly ILog Log = LogManager.GetLogger<PoeTradeMonitorViewModel>();
+
         private readonly DelegateCommand<INegotiationViewModel> closeNegotiationCommand;
         private readonly IConfigProvider<PoeTradeMonitorConfig> configProvider;
         private readonly FakeItemFactory fakeItemFactory;
@@ -154,7 +157,7 @@ namespace PoeEye.TradeMonitor.ViewModels
 
         private void CloseAllNegotiationsCommandExecuted()
         {
-            Log.Instance.Debug($"[PoeTradeMonitorViewModel.CloseAllNegotiations] Closing all negotiations");
+            Log.Debug($"[PoeTradeMonitorViewModel.CloseAllNegotiations] Closing all negotiations");
 
             foreach (var negotiation in negotiationsList.Items)
             {
@@ -178,17 +181,17 @@ namespace PoeEye.TradeMonitor.ViewModels
 
         private void UpdateNegotiation(INegotiationViewModel viewModel, TradeModel model)
         {
-            Log.Instance.Debug(
+            Log.Debug(
                 $"[PoeTradeMonitorViewModel.UpdateNegotiation] Updating existing negotiation: {viewModel}");
             viewModel.UpdateModel(model);
         }
 
         private void AddNegotiation(TradeModel model)
         {
-            Log.Instance.Debug($"[PoeTradeMonitorViewModel.AddNegotiation] New trade: {model}");
+            Log.Debug($"[PoeTradeMonitorViewModel.AddNegotiation] New trade: {model}");
             var newNegotiaton = notificationFactory.Create(model);
             var closeController = new NegotiationCloseController(this, newNegotiaton);
-            Log.Instance.Debug($"[PoeTradeMonitorViewModel.AddNegotiation] Negotiation model: {newNegotiaton}");
+            Log.Debug($"[PoeTradeMonitorViewModel.AddNegotiation] Negotiation model: {newNegotiaton}");
 
             newNegotiaton.SetCloseController(closeController);
 
@@ -206,7 +209,7 @@ namespace PoeEye.TradeMonitor.ViewModels
 
         private void CloseNegotiationCommandExecuted(INegotiationViewModel negotiation)
         {
-            Log.Instance.Debug($"[PoeTradeMonitorViewModel.CloseNegotiation] Closing negotiation {negotiation}");
+            Log.Debug($"[PoeTradeMonitorViewModel.CloseNegotiation] Closing negotiation {negotiation}");
             if (negotiation == null)
             {
                 return;
@@ -224,7 +227,7 @@ namespace PoeEye.TradeMonitor.ViewModels
 
         private void ApplyConfig(PoeTradeMonitorConfig config)
         {
-            Log.Instance.Debug($"[PoeTradeMonitorViewModel.ApplyConfig] Config has changed");
+            Log.Debug($"[PoeTradeMonitorViewModel.ApplyConfig] Config has changed");
 
             GrowUpwards = config.GrowUpwards;
             NumberOfNegotiationsToExpandByDefault = config.NumberOfNegotiationsToExpandByDefault;

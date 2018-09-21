@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Windows;
 using System.Windows.Input;
+using Common.Logging;
 using PoeEye.PoeTrade.Shell.ViewModels;
 using PoeEye.PoeTrade.Shell.Views;
 using PoeShared;
@@ -18,6 +19,8 @@ namespace PoeEye.Prism
 {
     internal sealed class PoeEyeBootstrapper : UnityBootstrapper
     {
+        private static readonly ILog Log = LogManager.GetLogger<PoeEyeBootstrapper>();
+
         protected override DependencyObject CreateShell()
         {
             return Container.Resolve<MainWindow>();
@@ -27,12 +30,12 @@ namespace PoeEye.Prism
         {
             base.InitializeShell();
 
-            Log.Instance.Info($"[Bootstrapper] Initializing shell...");
+            Log.Info($"[Bootstrapper] Initializing shell...");
             var sw = Stopwatch.StartNew();
 
             Mouse.OverrideCursor = new Cursor(new MemoryStream(Properties.Resources.PathOfExile_102));
             var splashWindow = new SplashScreen("Resources\\Splash.png");
-            splashWindow.Show(false, false);
+            splashWindow.Show(true, false);
 
             var window = (Window)Shell;
             Application.Current.ShutdownMode = ShutdownMode.OnMainWindowClose;
@@ -44,9 +47,8 @@ namespace PoeEye.Prism
                 .Subscribe(
                     () =>
                     {
-                        //splashWindow.Close(TimeSpan.FromSeconds(1));
                         sw.Stop();
-                        Log.Instance.Info($"[Bootstrapper] Shell initialization has taken {sw.ElapsedMilliseconds}ms");
+                        Log.Info($"[Bootstrapper] Shell initialization has taken {sw.ElapsedMilliseconds}ms");
                     });
         }
 
@@ -61,7 +63,7 @@ namespace PoeEye.Prism
 
             var moduleCatalog = Container.Resolve<IModuleCatalog>();
             var modules = moduleCatalog.Modules.ToArray();
-            Log.Instance.Info(
+            Log.Info(
                 $"Modules list:\n\t{modules.Select(x => new {x.ModuleName, x.ModuleType, x.State, x.InitializationMode, x.DependsOn}).DumpToTable()}");
 
             var window = (Window)Shell;
@@ -73,7 +75,7 @@ namespace PoeEye.Prism
 
         public void Dispose()
         {
-            Log.Instance.Info($"Disposing Chromium...");
+            Log.Info($"Disposing Chromium...");
             var chromium = Container.Resolve<IChromiumBootstrapper>();
             chromium?.Dispose();
         }

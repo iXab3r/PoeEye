@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using CefSharp;
 using CefSharp.Internals;
 using CefSharp.OffScreen;
+using Common.Logging;
 using CsQuery.ExtensionMethods.Internal;
 using Guards;
 using JetBrains.Annotations;
@@ -18,10 +19,12 @@ namespace PoeShared.Communications.Chromium
 {
     internal sealed class ChromiumBrowser : DisposableReactiveObject, IChromiumBrowser
     {
+        private static readonly ILog Log = LogManager.GetLogger<ChromiumBrowser>();
+        
         private readonly Lazy<string> browserId;
         private readonly ChromiumWebBrowser instance;
 
-        [NotNull] private readonly IConverter<NameValueCollection, string> nameValueConverter;
+        private readonly IConverter<NameValueCollection, string> nameValueConverter;
         private readonly IConverter<NameValueCollection, IEnumerable<KeyValuePair<string, string>>> nameValueToListConverter;
 
         public ChromiumBrowser(
@@ -40,13 +43,13 @@ namespace PoeShared.Communications.Chromium
             this.nameValueConverter = nameValueConverter;
             instance.AddTo(Anchors);
 
-            Log.Instance.Debug($"[Chromium{Id}] Initialized");
+            Log.Debug($"[Chromium{Id}] Initialized");
 
             instance.LoadError += InstanceOnLoadError;
             instance.ConsoleMessage += InstanceOnConsoleMessage;
 
             Disposable.Create(
-                () => { Log.Instance.Debug($"[Chromium{Id}] Disposed @ URI {Address}"); }).AddTo(Anchors);
+                () => { Log.Debug($"[Chromium{Id}] Disposed @ URI {Address}"); }).AddTo(Anchors);
         }
 
         public string Id => browserId.Value;
@@ -71,13 +74,13 @@ namespace PoeShared.Communications.Chromium
 
         private void InstanceOnConsoleMessage(object sender, ConsoleMessageEventArgs args)
         {
-            Log.Instance.Trace($"[Chromium{Id} Console] Line #{args.Line}, Source: {args.Source}, Message: {args.Message}");
+            Log.Trace($"[Chromium{Id} Console] Line #{args.Line}, Source: {args.Source}, Message: {args.Message}");
         }
 
         private Task GetUsingJavascript(string uri, string method, NameValueCollection elements)
         {
             var blankPage = "<html><script language='javascript'>var init = 1</script><body><h1>Hello world!</h1></body></html>";
-            Log.Instance.Debug($"[Chromium{Id}] Loading bootstrapper page");
+            Log.Debug($"[Chromium{Id}] Loading bootstrapper page");
 
             Load(() => instance.LoadHtml(blankPage)).Wait();
 
@@ -98,7 +101,7 @@ namespace PoeShared.Communications.Chromium
             js.AppendLine($"document.body.innerHTML = '{formBuilder}';");
             js.AppendLine($"document.getElementById(\"dynForm\").submit();");
 
-            Log.Instance.Trace($"[Chromium{Id}] Executing JS\n{js}");
+            Log.Trace($"[Chromium{Id}] Executing JS\n{js}");
 
             var executeScript = Load(() => instance.ExecuteScriptAsync(js.ToString()));
             return executeScript.ContinueWith(task => DumpSource());
@@ -107,7 +110,7 @@ namespace PoeShared.Communications.Chromium
         private Task DumpSource()
         {
             return instance.GetSourceAsync()
-                           .ContinueWith(source => Log.Instance.Trace($"[Chromium{Id}] Source @ {instance.Address}: \n{source.Result}"));
+                           .ContinueWith(source => Log.Trace($"[Chromium{Id}] Source @ {instance.Address}: \n{source.Result}"));
         }
 
         private Task GetInternal(string uri)
@@ -125,8 +128,8 @@ namespace PoeShared.Communications.Chromium
         public Task PostInternal(string uri, NameValueCollection args)
         {
             var postData = nameValueConverter.Convert(args);
-            Log.Instance.Debug($"[Chromium{Id}] Querying uri '{uri}', args: \r\nPOST: {postData}");
-            Log.Instance.Trace($"[Chromium{Id}] Splitted POST data dump: {postData.SplitClean('&').DumpToText()}");
+            Log.Debug($"[Chromium{Id}] Querying uri '{uri}', args: \r\nPOST: {postData}");
+            Log.Trace($"[Chromium{Id}] Splitted POST data dump: {postData.SplitClean('&').DumpToText()}");
 
             using (var frame = instance.GetMainFrame())
             {
@@ -134,7 +137,7 @@ namespace PoeShared.Communications.Chromium
                 request.Url = uri;
                 request.Method = WebRequestMethods.Http.Post;
 
-                Log.Instance.Debug($"[Chromium{Id}] Preparing POST data...");
+                Log.Debug($"[Chromium{Id}] Preparing POST data...");
                 if (args.Count > 0)
                 {
                     request.PostData.AddData(postData, Encoding.ASCII);
@@ -150,7 +153,7 @@ namespace PoeShared.Communications.Chromium
 
         private Task Load(IRequest request, Action<IRequest> loader)
         {
-            Log.Instance.Debug($"[Chromium{Id}] Loading request of type {request.Method}, URI: {request.Url}");
+            Log.Debug($"[Chromium{Id}] Loading request of type {request.Method}, URI: {request.Url}");
 
             return Load(() => loader(request));
         }
@@ -177,7 +180,7 @@ namespace PoeShared.Communications.Chromium
 
             void LoadingStateChangedHandler(object sender, LoadingStateChangedEventArgs args)
             {
-                Log.Instance.Debug(
+                Log.Debug(
                     $"[Chromium{Id}.LoadingState] Loading state changed, isLoading: {args.IsLoading}, uri: {args.Browser?.MainFrame?.Url}");
 
                 if (args.IsLoading)
@@ -185,13 +188,13 @@ namespace PoeShared.Communications.Chromium
                     return;
                 }
 
-                Log.Instance.Debug(
+                Log.Debug(
                     $"[Chromium{Id}.LoadingState] Received response, address: {instance.Address}");
             }
 
             void StatusMessageEventHandler(object sender, StatusMessageEventArgs args)
             {
-                Log.Instance.Debug(
+                Log.Debug(
                     $"[Chromium{Id}.Status] Status message: '{args.Value}', uri: {args.Browser?.MainFrame?.Url}, isLoading: {args.Browser?.IsLoading}");
             }
 
@@ -199,12 +202,12 @@ namespace PoeShared.Communications.Chromium
             {
                 if (args.Frame.Identifier != args.Browser.MainFrame.Identifier)
                 {
-                    Log.Instance.Trace(
+                    Log.Trace(
                         $"[Chromium{Id}.Frame#{args.Frame.Identifier} LoadStart] TransitionType: {args.TransitionType}, uri: {args.Url}");
                 }
                 else
                 {
-                    Log.Instance.Trace(
+                    Log.Trace(
                         $"[Chromium{Id}.Frame#{args.Frame.Identifier} LoadStart] MainFrame loaded, TransitionType: {args.TransitionType}, uri: {args.Url}");
                 }
             }
@@ -213,12 +216,12 @@ namespace PoeShared.Communications.Chromium
             {
                 if (args.Frame.Identifier != args.Browser.MainFrame.Identifier)
                 {
-                    Log.Instance.Trace(
+                    Log.Trace(
                         $"[Chromium{Id}.Frame#{args.Frame.Identifier} LoadEnd] StatusCode: {args.HttpStatusCode}, uri: {args.Url}");
                 }
                 else
                 {
-                    Log.Instance.Trace(
+                    Log.Trace(
                         $"[Chromium{Id}.Frame#{args.Frame.Identifier} LoadEnd] MainFrame loaded, StatusCode: {args.HttpStatusCode}, uri: {args.Url}");
 
 
@@ -230,14 +233,14 @@ namespace PoeShared.Communications.Chromium
             Subscribe();
             loader();
 
-            Log.Instance.Debug($"[Chromium{Id}] Returning task");
+            Log.Debug($"[Chromium{Id}] Returning task");
 
             return taskCompetionSource.Task;
         }
 
         private void InstanceOnLoadError(object sender1, LoadErrorEventArgs args)
         {
-            Log.Instance.Warn(
+            Log.Warn(
                 $"[Chromium{Id}.Frame#{args.Frame.Identifier} ] Failed uri: {args.FailedUrl}, error: {args.ErrorText}, errorCode: {args.ErrorCode}");
         }
     }

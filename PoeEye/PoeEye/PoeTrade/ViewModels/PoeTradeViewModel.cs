@@ -4,6 +4,7 @@ using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using Common.Logging;
 using Guards;
 using JetBrains.Annotations;
 using PoeEye.ItemParser.Services;
@@ -26,6 +27,8 @@ namespace PoeEye.PoeTrade.ViewModels
 {
     internal sealed class PoeTradeViewModel : DisposableReactiveObject, IPoeTradeViewModel
     {
+        private static readonly ILog Log = LogManager.GetLogger<PoeTradeViewModel>();
+
         private static readonly TimeSpan RefreshTimeout = TimeSpan.FromMinutes(1);
         private readonly IPoeChatService chatService;
         private readonly IClipboardManager clipboardManager;
@@ -153,20 +156,20 @@ namespace PoeEye.PoeTrade.ViewModels
             var message = PreparePrivateMessage(Trade);
             if (sendMessageToChat)
             {
-                Log.Instance.Warn($"[PoeTradeViewModel.SendPrivateMessageCommandExecuted] Sending private message '{message}'");
+                Log.Warn($"[PoeTradeViewModel.SendPrivateMessageCommandExecuted] Sending private message '{message}'");
                 notificationsManager.PlayNotification(AudioNotificationType.Keyboard);
                 var result = await chatService.SendMessage(message);
                 if (result != PoeMessageSendStatus.Success)
                 {
                     throw new ApplicationException($"Failed to send message, reason: {result}");
                 }
-                Log.Instance.Warn($"[PoeTradeViewModel.SendPrivateMessageCommandExecuted] Sent message, result: {result}");
+                Log.Warn($"[PoeTradeViewModel.SendPrivateMessageCommandExecuted] Sent message, result: {result}");
             }
             else
             {
-                Log.Instance.Warn($"[PoeTradeViewModel.SendPrivateMessageCommandExecuted] Copying private message '{message}' to clipboard");
+                Log.Warn($"[PoeTradeViewModel.SendPrivateMessageCommandExecuted] Copying private message '{message}' to clipboard");
                 clipboardManager.SetText(message);
-                Log.Instance.Warn($"[PoeTradeViewModel.SendPrivateMessageCommandExecuted] Copied message");
+                Log.Warn($"[PoeTradeViewModel.SendPrivateMessageCommandExecuted] Copied message");
             }
         }
 
@@ -178,7 +181,7 @@ namespace PoeEye.PoeTrade.ViewModels
             }
             catch (Exception ex)
             {
-                Log.Instance.Warn($"Failed to open forum Uri '{uri}'", ex);
+                Log.Warn($"Failed to open forum Uri '{uri}'", ex);
             }
         }
 

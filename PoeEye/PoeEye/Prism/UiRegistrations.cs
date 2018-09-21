@@ -18,7 +18,7 @@ namespace PoeEye.Prism
         protected override void Initialize()
         {
             Container
-                .RegisterSingleton<IPoePriceCalculcator, PoePriceCalculcator>()
+                .RegisterSingleton<IPoePriceCalculcator, PoePriceCalculator>()
                 .RegisterSingleton<IWhispersNotificationManager, WhispersNotificationManager>()
                 .RegisterSingleton(typeof(IPoeEyeMainConfigProvider), typeof(GenericConfigProvider<PoeEyeMainConfig>))
                 .RegisterSingleton<IConfigProvider, PoeEyeConfigProviderFromFile>()
