@@ -5,6 +5,7 @@ using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Threading;
 using System.Threading.Tasks;
+using Common.Logging;
 using Guards;
 using PoeEye.PoeTrade.Modularity;
 using PoeShared;
@@ -21,6 +22,8 @@ namespace PoeEye.PoeTrade
 {
     internal sealed class PoeTradeHeadlessApi : DisposableReactiveObject, IPoeApi
     {
+        private static readonly ILog Log = LogManager.GetLogger(typeof(PoeTradeHeadlessApi));
+
         private static readonly string PoeTradeSearchUri = @"http://poe.trade/search";
         private static readonly string PoeTradeUri = @"http://poe.trade";
 
@@ -60,7 +63,7 @@ namespace PoeEye.PoeTrade
                 .WhenChanged
                 .Subscribe(x => config = x)
                 .AddTo(Anchors);
-            Log.Instance.Debug($"[PoeTradeHeadlessApi..ctor] {config.DumpToText()}");
+            Log.Debug($"[PoeTradeHeadlessApi..ctor] {config.DumpToText()}");
             requestsSemaphore = new SemaphoreSlim(config.MaxSimultaneousRequestsCount);
         }
 
@@ -111,7 +114,7 @@ namespace PoeEye.PoeTrade
             {
                 var client = CreateClient(out proxyToken);
 
-                Log.Instance.Debug(
+                Log.Debug(
                     $"[PoeTradeHeadlessApi] Awaiting for semaphore slot (max: {config.MaxSimultaneousRequestsCount}, atm: {requestsSemaphore.CurrentCount})");
                 await requestsSemaphore.WaitAsync();
 
@@ -158,7 +161,7 @@ namespace PoeEye.PoeTrade
 
         private void ReleaseSemaphore()
         {
-            Log.Instance.Debug($"[PoeTradeHeadlessApi] Awaiting {config.DelayBetweenRequests.TotalSeconds}s before releasing semaphore slot...");
+            Log.Debug($"[PoeTradeHeadlessApi] Awaiting {config.DelayBetweenRequests.TotalSeconds}s before releasing semaphore slot...");
             Thread.Sleep(config.DelayBetweenRequests);
             requestsSemaphore.Release();
         }

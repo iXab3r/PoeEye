@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Text.RegularExpressions;
 using System.Windows.Data;
 using System.Windows.Media;
+using Common.Logging;
 using Guards;
 using PoeShared;
 using PoeShared.Common;
@@ -15,6 +16,8 @@ namespace PoeEye.Converters
 {
     internal sealed class PoeItemModToHtmlConverter : IValueConverter, IConverter<IPoeItemMod, string>
     {
+        private static readonly ILog Log = LogManager.GetLogger(typeof(PoeItemModToHtmlConverter));
+
         private readonly ConcurrentDictionary<string, Regex> cache = new ConcurrentDictionary<string, Regex>();
 
         private readonly ICollection<ModParserConfig> parsingSettings = new List<ModParserConfig>();
@@ -235,7 +238,7 @@ namespace PoeEye.Converters
             }
             catch (Exception e)
             {
-                Log.Instance.Warn($"Failed to parse input {match.Value}, min: '{match.Groups["min"]}', max: '{match.Groups["max"]}'");
+                Log.Warn($"Failed to parse input {match.Value}, min: '{match.Groups["min"]}', max: '{match.Groups["max"]}'");
                 return string.Empty;
             }
             

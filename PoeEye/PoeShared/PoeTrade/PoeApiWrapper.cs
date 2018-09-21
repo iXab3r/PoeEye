@@ -2,6 +2,7 @@ using System;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+using Common.Logging;
 using Guards;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
@@ -15,6 +16,8 @@ namespace PoeShared.PoeTrade
 {
     internal class PoeApiWrapper : DisposableReactiveObject, IPoeApiWrapper
     {
+        private static readonly ILog Log = LogManager.GetLogger<PoeApiWrapper>();
+
         private readonly IPoeApi api;
         private readonly IPoeStaticDataProvider provider;
 
@@ -57,7 +60,7 @@ namespace PoeShared.PoeTrade
         public IObservable<IPoeQueryResult> GetLiveUpdates(IPoeQueryInfo query)
         {
             Guard.ArgumentNotNull(query, nameof(query));
-            Log.Instance.Debug($"[PoeApiWrapper, {Name}] Issuing live query... {query.DumpToText(Formatting.None)}");
+            Log.Debug($"[PoeApiWrapper, {Name}] Issuing live query... {query.DumpToText(Formatting.None)}");
 
             return api
                 .SubscribeToLiveUpdates(query);
@@ -67,7 +70,7 @@ namespace PoeShared.PoeTrade
         {
             Guard.ArgumentNotNull(query, nameof(query));
 
-            Log.Instance.Debug($"[PoeApiWrapper, {Name}] Issuing query... {query.DumpToText(Formatting.None)}");
+            Log.Debug($"[PoeApiWrapper, {Name}] Issuing query... {query.DumpToText(Formatting.None)}");
 
             return api.IssueQuery(query);
         }
@@ -76,7 +79,7 @@ namespace PoeShared.PoeTrade
         {
             Guard.ArgumentNotNull(query, nameof(query));
 
-            Log.Instance.Debug($"[PoeApiWrapper, {Name}] Disposing query... {query.DumpToText(Formatting.None)}");
+            Log.Debug($"[PoeApiWrapper, {Name}] Disposing query... {query.DumpToText(Formatting.None)}");
 
             api.DisposeQuery(query);
         }

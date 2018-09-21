@@ -22,7 +22,7 @@ namespace PoeShared
             Errors.Subscribe(HandleUiException).AddTo(Anchors);
         }
 
-        public static ILog Instance => InstanceProvider.Value.Logger;
+        private static ILog Instance => InstanceProvider.Value.Logger;
 
         public static ISubject<Exception> ErrorsSubject => InstanceProvider.Value.Errors;
 

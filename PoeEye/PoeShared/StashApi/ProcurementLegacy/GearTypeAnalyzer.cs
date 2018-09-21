@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Xml;
+using Common.Logging;
 using Guards;
 using PoeShared.Scaffolding;
 using PoeShared.StashApi.DataTypes;
@@ -13,6 +14,8 @@ namespace PoeShared.StashApi.ProcurementLegacy
 {
     internal class GearTypeAnalyzer : IGearTypeAnalyzer, IItemTypeAnalyzer
     {
+        private static readonly ILog Log = LogManager.GetLogger(typeof(GearTypeAnalyzer));
+
         private static readonly IDictionary<GearType, IEnumerable<string>> GearBaseTypes = new Dictionary<GearType, IEnumerable<string>>();
 
         private static readonly ConcurrentDictionary<string, Regex> cachedRegexes = new ConcurrentDictionary<string, Regex>();
@@ -71,7 +74,7 @@ namespace PoeShared.StashApi.ProcurementLegacy
                                               .ToArray();
                 }
 
-                Log.Instance.Debug($"[GearTypeAnalyzer] Loaded the following ItemTypes:\n\t{GearBaseTypes.DumpToTable()}");
+                Log.Debug($"[GearTypeAnalyzer] Loaded the following ItemTypes:\n\t{GearBaseTypes.DumpToTable()}");
             }
 
             runners = new GearTypeRunner[]
@@ -121,7 +124,7 @@ namespace PoeShared.StashApi.ProcurementLegacy
                         where !string.IsNullOrWhiteSpace(compatibleType.TypeName)
                         select new {GearType = runner.Type, ItemType = compatibleType.TypeName};
             var options = query.ToArray();
-            Log.Instance.Debug(options.DumpToTable());
+            Log.Debug(options.DumpToTable());
 
             var itemInfo = options.FirstOrDefault();
 

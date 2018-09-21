@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Windows.Input;
+using Common.Logging;
 using Guards;
 using JetBrains.Annotations;
 using PoeEye.PoeTrade.Models;
@@ -19,6 +20,8 @@ namespace PoeEye.PoeTrade.ViewModels
 {
     internal sealed class PoeModsEditorViewModel : DisposableReactiveObject, IPoeModsEditorViewModel
     {
+        private static readonly ILog Log = LogManager.GetLogger(typeof(PoeModsEditorViewModel));
+
         private readonly DelegateCommand addModCommand;
 
         private readonly IFactory<IPoeModViewModel> modsViewModelsFactory;
@@ -138,7 +141,7 @@ namespace PoeEye.PoeTrade.ViewModels
 
             if (badMods.Any())
             {
-                Log.Instance.Warn($"[PoeModsEditorViewModel] Bad mods detected({badMods.Count})\n\n{badMods.DumpToTable()}");
+                Log.Warn($"[PoeModsEditorViewModel] Bad mods detected({badMods.Count})\n\n{badMods.DumpToTable()}");
             }
             return result;
         }

@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using Common.Logging;
 using PoeShared;
 using PoeShared.Scaffolding;
 
@@ -11,6 +12,8 @@ namespace PoeWhisperMonitor
 {
     internal sealed class PoeTracker : DisposableReactiveObject, IPoeTracker
     {
+        private static readonly ILog Log = LogManager.GetLogger(typeof(PoeTracker));
+
         private static readonly string[] PathOfExileProcessNames =
         {
             "PathOfExile",
@@ -57,7 +60,7 @@ namespace PoeWhisperMonitor
 
         private void LogProcesses(PoeProcessInfo[] processes)
         {
-            Log.Instance.Debug($"[PoeTracker] Processes list have changed(count: {processes.Length}): \r\n\t{string.Join("\r\n\t", processes)}");
+            Log.Debug($"[PoeTracker] Processes list have changed(count: {processes.Length}): \r\n\t{string.Join("\r\n\t", processes)}");
         }
 
         private PoeProcessInfo ToProcessInfo(Process process)

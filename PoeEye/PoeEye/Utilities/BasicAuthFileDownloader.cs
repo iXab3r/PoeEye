@@ -4,6 +4,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Common.Logging;
 using PoeShared;
 using PoeShared.Scaffolding;
 using PoeShared.UI;
@@ -13,6 +14,8 @@ namespace PoeEye.Utilities
 {
     internal sealed class BasicAuthFileDownloader : IFileDownloader
     {
+        private static readonly ILog Log = LogManager.GetLogger<BasicAuthFileDownloader>();
+
         private readonly NetworkCredential credentials;
 
         public BasicAuthFileDownloader(NetworkCredential credentials)
@@ -34,7 +37,7 @@ namespace PoeEye.Utilities
                           .AddTo(progressAnchors);
                 try
                 {
-                    Log.Instance.Debug($"[WebClient.DownloadFile] Downloading file to '{targetFile}', uri: {url} ");
+                    Log.Debug($"[WebClient.DownloadFile] Downloading file to '{targetFile}', uri: {url} ");
                     await wc.DownloadFileTaskAsync(url, targetFile);
                 }
                 finally
@@ -48,7 +51,7 @@ namespace PoeEye.Utilities
         {
             using (var wc = CreateClient())
             {
-                Log.Instance.Debug($"[WebClient.DownloadUrl] Downloading data, uri: {url} ");
+                Log.Debug($"[WebClient.DownloadUrl] Downloading data, uri: {url} ");
 
                 return await wc.DownloadDataTaskAsync(url);
             }

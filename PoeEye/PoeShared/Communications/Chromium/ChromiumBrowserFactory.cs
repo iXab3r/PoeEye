@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Threading;
 using CefSharp;
 using CefSharp.OffScreen;
+using Common.Logging;
 using Guards;
 using JetBrains.Annotations;
 using PoeShared.Prism;
@@ -14,6 +15,8 @@ namespace PoeShared.Communications.Chromium
 {
     internal sealed class ChromiumBrowserFactory : DisposableReactiveObject, IChromiumBrowserFactory
     {
+        private static readonly ILog Log = LogManager.GetLogger<ChromiumBrowserFactory>();
+
         private readonly IFactory<ChromiumBrowser, ChromiumWebBrowser> browserFactory;
 
         public ChromiumBrowserFactory(
@@ -25,7 +28,7 @@ namespace PoeShared.Communications.Chromium
 
         public IChromiumBrowser CreateBrowser()
         {
-            Log.Instance.Debug("[ChromiumBrowserFactory] Create new browser instance...");
+            Log.Debug("[ChromiumBrowserFactory] Create new browser instance...");
 
             var isInitialized = new ManualResetEvent(false);
 
@@ -53,13 +56,13 @@ namespace PoeShared.Communications.Chromium
             };
             browserInstance.BrowserInitialized += browserInitialized;
 
-            Log.Instance.Debug("[ChromiumBrowserFactory] Awaiting for initialization to be completed");
+            Log.Debug("[ChromiumBrowserFactory] Awaiting for initialization to be completed");
             isInitialized.WaitOne();
 
             browserInstance.RequestHandler = new LogRequestHandler();
             browserInstance.RenderProcessMessageHandler = new RenderProcessMessageHandler();
 
-            Log.Instance.Debug("[ChromiumBrowserFactory] New browser instance initialized");
+            Log.Debug("[ChromiumBrowserFactory] New browser instance initialized");
 
             return browserFactory.Create(browserInstance).AddTo(Anchors);
         }

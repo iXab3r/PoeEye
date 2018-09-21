@@ -8,6 +8,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Reactive.Threading.Tasks;
+using Common.Logging;
 using Guards;
 using JetBrains.Annotations;
 using PoeShared.Common;
@@ -20,6 +21,8 @@ namespace PoeShared.PoeTrade
 {
     internal sealed class PoeLiveHistoryProvider : DisposableReactiveObject, IPoeLiveHistoryProvider
     {
+        private static readonly ILog Log = LogManager.GetLogger<PoeLiveHistoryProvider>();
+
         private readonly TimeSpan delayAfterError = TimeSpan.FromSeconds(30);
         
         private readonly ISubject<Unit> forceUpdatesSubject = new Subject<Unit>();
@@ -119,7 +122,7 @@ namespace PoeShared.PoeTrade
 
         private void StartUpdate(Unit unit)
         {
-            Log.Instance.Debug($"[PoeLiveHistoryProvider] Starting update...");
+            Log.Debug($"[PoeLiveHistoryProvider] Starting update...");
             if (!IsLiveMode)
             {
                 IsBusy = true;
@@ -141,7 +144,7 @@ namespace PoeShared.PoeTrade
             {
                 periodInfo = $"recheck disabled";
             }
-            Log.Instance.Debug($"[PoeLiveHistoryProvider] Update period changed: {periodInfo}");
+            Log.Debug($"[PoeLiveHistoryProvider] Update period changed: {periodInfo}");
         }
 
         private IPoeItem[] ProcessPacks(IPoeItem[] updated)
@@ -180,7 +183,7 @@ namespace PoeShared.PoeTrade
         {
             Guard.ArgumentNotNull(queryResult, nameof(queryResult));
 
-            Log.Instance.Debug($"[PoeLiveHistoryProvider] Update received, itemsCount: {queryResult.Length}");
+            Log.Debug($"[PoeLiveHistoryProvider] Update received, itemsCount: {queryResult.Length}");
             IsBusy = false;
             updateExceptionsSubject.OnNext(null);
             itemsPacksSubject.OnNext(queryResult);
@@ -190,7 +193,7 @@ namespace PoeShared.PoeTrade
         {
             Guard.ArgumentNotNull(ex, nameof(ex));
 
-            Log.Instance.Error("[PoeLiveHistoryProvider] Update failed", ex);
+            Log.Error("[PoeLiveHistoryProvider] Update failed", ex);
             IsBusy = false;
             updateExceptionsSubject.OnNext(ex);
         }

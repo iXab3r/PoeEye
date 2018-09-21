@@ -5,6 +5,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Windows;
 using System.Windows.Media;
+using Common.Logging;
 using DynamicData;
 using Guards;
 using JetBrains.Annotations;
@@ -26,6 +27,8 @@ namespace PoeEye.StashGrid.ViewModels
     internal sealed class PoeStashGridViewModel : OverlayViewModelBase, IPoeStashHighlightService,
                                                   IPoeStashGridViewModel
     {
+        private static readonly ILog Log = LogManager.GetLogger(typeof(PoeStashGridViewModel));
+
         private const int MaxInventoryWidth = 24;
         private const int MaxInventoryHeight = 24;
 
@@ -89,10 +92,10 @@ namespace PoeEye.StashGrid.ViewModels
 
         public IGridCellViewController AddHighlight(ItemPosition pos, StashTabType stashType)
         {
-            Log.Instance.Debug($"Highlighting zone {pos} in tab of type {stashType}");
+            Log.Debug($"Highlighting zone {pos} in tab of type {stashType}");
             pos = TransformToAbsolute(pos, stashType);
 
-            Log.Instance.Debug($"Absolute position: {pos}");
+            Log.Debug($"Absolute position: {pos}");
             var cell = new HighlightedStashGridCellViewModel
             {
                 Width = pos.Width,

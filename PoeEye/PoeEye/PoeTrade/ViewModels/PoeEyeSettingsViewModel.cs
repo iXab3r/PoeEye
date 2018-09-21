@@ -6,6 +6,7 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Reflection;
 using System.Windows.Input;
+using Common.Logging;
 using DynamicData.Binding;
 using Guards;
 using JetBrains.Annotations;
@@ -21,6 +22,8 @@ namespace PoeEye.PoeTrade.ViewModels
 {
     internal sealed class PoeEyeSettingsViewModel : DisposableReactiveObject
     {
+        private static readonly ILog Log = LogManager.GetLogger(typeof(PoeEyeSettingsViewModel));
+
         private static readonly MethodInfo ReloadConfigMethod = typeof(PoeEyeSettingsViewModel)
             .GetMethod(nameof(ReloadTypedConfig), BindingFlags.Instance | BindingFlags.NonPublic);
 
@@ -117,7 +120,7 @@ namespace PoeEye.PoeTrade.ViewModels
         private void ReloadConfig(ISettingsViewModel viewModel)
         {
             var configType = GetConfigType(viewModel);
-            Log.Instance.Debug($"[PoeSettingsViewModel.ReloadConfig] Loading viewModel {viewModel} (configType {configType}");
+            Log.Debug($"[PoeSettingsViewModel.ReloadConfig] Loading viewModel {viewModel} (configType {configType}");
             var invocationMethod = reloadConfigByType.GetOrAdd(configType, x => ReloadConfigMethod.MakeGenericMethod(x));
             invocationMethod.Invoke(this, new object[] {viewModel});
         }
@@ -125,7 +128,7 @@ namespace PoeEye.PoeTrade.ViewModels
         private void SaveConfig(ISettingsViewModel viewModel)
         {
             var configType = GetConfigType(viewModel);
-            Log.Instance.Debug($"[PoeSettingsViewModel.SaveConfig] Saving viewModel {viewModel} (configType {configType}");
+            Log.Debug($"[PoeSettingsViewModel.SaveConfig] Saving viewModel {viewModel} (configType {configType}");
             var invocationMethod = saveConfigByType.GetOrAdd(configType, x => SaveConfigMethod.MakeGenericMethod(x));
             invocationMethod.Invoke(this, new object[] {viewModel});
         }

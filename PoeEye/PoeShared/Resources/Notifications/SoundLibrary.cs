@@ -1,13 +1,16 @@
 ﻿using System.Reflection;
+using Common.Logging;
 using PoeShared.Scaffolding;
 
 namespace PoeShared.Resources.Notifications
 {
     internal static class SoundLibrary
     {
+        private static readonly ILog Log = LogManager.GetLogger(typeof(SoundLibrary));
+
         static SoundLibrary()
         {
-            Log.Instance.Debug(
+            Log.Debug(
                 $"[SoundLibrary..staticctor] Embedded resources list:\r\n {EnumerateResources().DumpToText()}");
         }
 
@@ -22,12 +25,12 @@ namespace PoeShared.Resources.Notifications
 
             var namespaceName = typeof(SoundLibrary).Namespace;
             var resourceName = $"{namespaceName}.{name}";
-            Log.Instance.Debug($"[SoundLibrary.TryToLoadResourceByName] Loading resource '{resourceName}'");
+            Log.Debug($"[SoundLibrary.TryToLoadResourceByName] Loading resource '{resourceName}'");
 
             var resourceStream = assembly.GetManifestResourceStream(resourceName);
             if (resourceStream == null)
             {
-                Log.Instance.Debug($"[SoundLibrary.TryToLoadResourceByName] Resource was not found '{resourceName}'");
+                Log.Debug($"[SoundLibrary.TryToLoadResourceByName] Resource was not found '{resourceName}'");
                 resourceData = null;
                 return false;
             }
@@ -37,7 +40,7 @@ namespace PoeShared.Resources.Notifications
                 var buffer = new byte[stream.Length];
                 stream.Read(buffer, 0, buffer.Length);
 
-                Log.Instance.Debug($"[SoundLibrary.TryToLoadResourceByName] Loaded resource '{resourceName}' : {buffer.Length}b");
+                Log.Debug($"[SoundLibrary.TryToLoadResourceByName] Loaded resource '{resourceName}' : {buffer.Length}b");
                 resourceData = buffer;
                 return true;
             }

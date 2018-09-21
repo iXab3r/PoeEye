@@ -2,6 +2,7 @@
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
+using Common.Logging;
 using Guards;
 using JetBrains.Annotations;
 using PoeShared;
@@ -14,6 +15,8 @@ namespace PoeEye.PoeTrade
 {
     internal sealed class PoeItemVerifier : IPoeItemVerifier
     {
+        private static readonly ILog Log = LogManager.GetLogger(typeof(PoeItemVerifier));
+
         private static readonly string VerificationUri = "http://verify.xyz.is/";
         private readonly IFactory<IHttpClient> clientsFactory;
 
@@ -44,7 +47,7 @@ namespace PoeEye.PoeTrade
             var client = clientsFactory.Create();
             var verificationUri = $"{VerificationUri}/{threadId}/{hash}";
 
-            Log.Instance.Debug($"[PoeItemVerifier] Requesting verification uri '{verificationUri}'...");
+            Log.Debug($"[PoeItemVerifier] Requesting verification uri '{verificationUri}'...");
             return client
                    .Get(verificationUri)
                    .Select(response => new {response, isVerified = ExtractResult(response)})
@@ -57,7 +60,7 @@ namespace PoeEye.PoeTrade
         {
             if (isVerified == null)
             {
-                Log.Instance.Debug($"[PoeItemVerifier] Failed to process response(uri '{verificationUri}'):\r\n\tResponse: '{response}'");
+                Log.Debug($"[PoeItemVerifier] Failed to process response(uri '{verificationUri}'):\r\n\tResponse: '{response}'");
             }
         }
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reactive.Disposables;
+using Common.Logging;
 using Guards;
 using Newtonsoft.Json;
 using PoeEye.Config;
@@ -19,6 +20,8 @@ namespace PoeEye.Prism
 {
     internal sealed class MainModule : IPoeEyeModule
     {
+        private static readonly ILog Log = LogManager.GetLogger<MainModule>();
+
         private readonly CompositeDisposable anchors = new CompositeDisposable();
         private readonly IUnityContainer container;
 
@@ -44,7 +47,7 @@ namespace PoeEye.Prism
 
             InitializeConfigConverters();
 
-            Log.Instance.Info($"Initializing Chromium...");
+            Log.Info($"Initializing Chromium...");
             var chromium = container.Resolve<IChromiumBootstrapper>();
             chromium.AddTo(anchors);
         }

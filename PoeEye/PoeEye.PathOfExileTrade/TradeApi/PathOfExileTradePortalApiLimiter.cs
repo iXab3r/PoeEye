@@ -8,6 +8,7 @@ using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using Common.Logging;
 using Guards;
 using JetBrains.Annotations;
 using PoeEye.PathOfExileTrade.TradeApi.Domain;
@@ -19,6 +20,8 @@ namespace PoeEye.PathOfExileTrade.TradeApi
 {
     internal class PathOfExileTradePortalApiLimiter : IPathOfExileTradePortalApiLimiter
     {
+        private static readonly ILog Log = LogManager.GetLogger(typeof(PathOfExileTradePortalApiLimiter));
+
         private static readonly HttpStatusCode HttpTooManyRequests = (HttpStatusCode)429;
 
         private static readonly ConcurrentDictionary<string, LimiterData> LimitsByPolicyName = new ConcurrentDictionary<string, LimiterData>();
@@ -81,14 +84,14 @@ namespace PoeEye.PathOfExileTrade.TradeApi
 
             try
             {
-                Log.Instance.Debug($"[PathOfExileTradePortalApi #{before.PolicyName}] Awaiting semaphore slot");
+                Log.Debug($"[PathOfExileTradePortalApi #{before.PolicyName}] Awaiting semaphore slot");
 
                 await before.Semaphore.WaitAsync();
                 return await LimitCall(before, functor);
             }
             finally
             {
-                Log.Instance.Debug($"[PathOfExileTradePortalApi #{before.PolicyName}] Releasing semaphore slot");
+                Log.Debug($"[PathOfExileTradePortalApi #{before.PolicyName}] Releasing semaphore slot");
                 before.Semaphore.Release();
             }
 
@@ -100,7 +103,7 @@ namespace PoeEye.PathOfExileTrade.TradeApi
             
             if (!before.Limit.IsEmpty)
             {
-                Log.Instance.Debug($"[PathOfExileTradePortalApi #{before.PolicyName}] Current X-Rate limits: {before}");
+                Log.Debug($"[PathOfExileTradePortalApi #{before.PolicyName}] Current X-Rate limits: {before}");
 
                 var now = clock.Now;
                 var timeElapsed = now - before.Limit.TimeStamp;
@@ -108,45 +111,45 @@ namespace PoeEye.PathOfExileTrade.TradeApi
                 var sanctionsPeriod = before.Limit.SanctionsPeriod - timeElapsed;
                 if (sanctionsPeriod > TimeSpan.Zero)
                 {
-                    Log.Instance.Debug($"[PathOfExileTradePortalApi #{before.PolicyName}] Applying sanctions throttling of {sanctionsPeriod}");
+                    Log.Debug($"[PathOfExileTradePortalApi #{before.PolicyName}] Applying sanctions throttling of {sanctionsPeriod}");
                     await Task.Delay(sanctionsPeriod);
                 }
                 else if (timeElapsed > before.Limit.TimePeriod)
                 {
-                    Log.Instance.Debug(
+                    Log.Debug(
                         $"[PathOfExileTradePortalApi #{before.PolicyName}] Skipping throttling - too much time passed, elapsed: {timeElapsed}, rate period: {before.Limit.TimePeriod}");
                 }
                 else
                 {
-                    Log.Instance.Debug(
+                    Log.Debug(
                         $"[PathOfExileTradePortalApi #{before.PolicyName}] Checking rate limits, elapsed: {timeElapsed}, rate period: {before.Limit.TimePeriod}");
                     var currentRate = before.Limit.Current / before.Limit.TimePeriod.TotalSeconds;
                     var maxRate = before.Limit.Max / before.Limit.TimePeriod.TotalSeconds;
                     var fillRate = currentRate / maxRate;
 
-                    Log.Instance.Debug(
+                    Log.Debug(
                         $"[PathOfExileTradePortalApi #{before.PolicyName}] Current rate: {currentRate:F2}, maxRate: {maxRate:F2} ({fillRate * 100:F2}%), limits: {before}");
                     if (fillRate > targetFillRate)
                     {
                         var diff = fillRate - targetFillRate;
                         var throttlePeriod = TimeSpan.FromSeconds(before.Limit.TimePeriod.TotalSeconds * diff * 2);
-                        Log.Instance.Debug($"[PathOfExileTradePortalApi #{before.PolicyName}] Applying throttling of {throttlePeriod} (fillRate target: current: {fillRate}, target: {targetFillRate}, diff: {diff})");
+                        Log.Debug($"[PathOfExileTradePortalApi #{before.PolicyName}] Applying throttling of {throttlePeriod} (fillRate target: current: {fillRate}, target: {targetFillRate}, diff: {diff})");
                         await Task.Delay(throttlePeriod);
                     }
                 }
             }
 
-            Log.Instance.Debug($"[PathOfExileTradePortalApi #{before.PolicyName}] Executing request...");
+            Log.Debug($"[PathOfExileTradePortalApi #{before.PolicyName}] Executing request...");
 
             var sw = Stopwatch.StartNew();
             var result = await functor();
             sw.Stop();
 
-            Log.Instance.Debug(
+            Log.Debug(
                 $"[PathOfExileTradePortalApi #{before.PolicyName}] Request took {sw.ElapsedMilliseconds}ms, got HTTP {result.ResponseMessage.StatusCode} (success: {result.ResponseMessage.IsSuccessStatusCode})");
 
             var limits = new RateLimits(clock.Now, result.ResponseMessage);
-            Log.Instance.Debug($"[PathOfExileTradePortalApi #{before.PolicyName}] X-Rate limits update, current: {before} => {limits}");
+            Log.Debug($"[PathOfExileTradePortalApi #{before.PolicyName}] X-Rate limits update, current: {before} => {limits}");
             before.Limit = limits;
 
             if (result.ResponseMessage.StatusCode == HttpTooManyRequests)

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization.Formatters;
+using Common.Logging;
 using Guards;
 using Newtonsoft.Json;
 
@@ -10,6 +11,8 @@ namespace PoeShared.Scaffolding
 {
     public static class ObjectExtensions
     {
+        private static readonly ILog Log = LogManager.GetLogger(typeof(ObjectExtensions));
+
         public static string DumpToText<T>(this T instance)
         {
             return DumpToText(instance, Formatting.Indented);
@@ -83,7 +86,7 @@ namespace PoeShared.Scaffolding
 
             if (skippedProperties.Any())
             {
-                Log.Instance.Debug(
+                Log.Debug(
                     $"[TransferProperties] Skipped following properties: {skippedProperties.Select(x => $"{x.PropertyType} {x.Name}").DumpToTextRaw()}");
             }
         }

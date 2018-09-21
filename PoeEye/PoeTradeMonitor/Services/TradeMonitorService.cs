@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using Common.Logging;
 using Guards;
 using JetBrains.Annotations;
 using PoeEye.TradeMonitor.Models;
@@ -21,6 +22,8 @@ namespace PoeEye.TradeMonitor.Services
 {
     internal sealed class TradeMonitorService : DisposableReactiveObject, ITradeMonitorService
     {
+        private static readonly ILog Log = LogManager.GetLogger(typeof(TradeMonitorService));
+
         private readonly IAudioNotificationsManager audioManager;
         private readonly IPoeNotifier notifier;
         private readonly IPoeMessageParser[] parsers;
@@ -74,7 +77,7 @@ namespace PoeEye.TradeMonitor.Services
         {
             if (successfullMatches.Count > 1)
             {
-                Log.Instance.Warn($"[TradeMonitorService.ParseMessage] Multiple successfull matches:\n{successfullMatches.DumpToText()}");
+                Log.Warn($"[TradeMonitorService.ParseMessage] Multiple successfull matches:\n{successfullMatches.DumpToText()}");
             }
 
             return successfullMatches.Count > 0
@@ -84,7 +87,7 @@ namespace PoeEye.TradeMonitor.Services
 
         private IDictionary<IPoeMessageParser, TradeModel> ParseMessage(PoeMessage message)
         {
-            Log.Instance.Warn($"[TradeMonitorService.ParseMessage] Processing message {message.DumpToText()}...");
+            Log.Warn($"[TradeMonitorService.ParseMessage] Processing message {message.DumpToText()}...");
             var result = new Dictionary<IPoeMessageParser, TradeModel>();
             foreach (var poeMessageParser in parsers)
             {

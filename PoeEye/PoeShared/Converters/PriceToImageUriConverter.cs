@@ -2,12 +2,15 @@
 using System.Globalization;
 using System.IO;
 using System.Windows.Data;
+using Common.Logging;
 using PoeShared.Common;
 
 namespace PoeShared.Converters
 {
     public sealed class PriceToImageUriConverter : IValueConverter
     {
+        private static readonly ILog Log = LogManager.GetLogger<PriceToImageUriConverter>();
+
         private const string ImagesPathPrefix = "Resources/Currencies";
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
@@ -21,7 +24,7 @@ namespace PoeShared.Converters
             var price = StringToPoePriceConverter.Instance.Convert(rawPrice);
             if (price.IsEmpty)
             {
-                Log.Instance.Debug($"Failed to convert string '{rawPrice}' to PoePrice");
+                Log.Debug($"Failed to convert string '{rawPrice}' to PoePrice");
                 return null;
             }
 
@@ -34,7 +37,7 @@ namespace PoeShared.Converters
             var imagePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, ImagesPathPrefix, imageName + ".png");
             if (!File.Exists(imagePath))
             {
-                Log.Instance.Debug($"Failed to find image for {price}, got path {imagePath}");
+                Log.Debug($"Failed to find image for {price}, got path {imagePath}");
                 return null;
             }
 

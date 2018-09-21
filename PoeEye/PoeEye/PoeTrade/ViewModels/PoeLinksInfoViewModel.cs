@@ -1,4 +1,5 @@
 ﻿using System;
+using Common.Logging;
 using Guards;
 using JetBrains.Annotations;
 using PoeShared;
@@ -9,6 +10,8 @@ namespace PoeEye.PoeTrade.ViewModels
 {
     internal sealed class PoeLinksInfoViewModel : DisposableReactiveObject
     {
+        private static readonly ILog Log = LogManager.GetLogger(typeof(PoeLinksInfoViewModel));
+        
         private readonly string[] colors = new string[6];
         private readonly bool[] links = new bool[6];
         
@@ -37,7 +40,7 @@ namespace PoeEye.PoeTrade.ViewModels
             }
             catch (Exception e)
             {
-                Log.Instance.Error($"Failed to parse sockets {rawSockets}", e);
+                Log.Error($"Failed to parse sockets {rawSockets}", e);
             }
         }
 

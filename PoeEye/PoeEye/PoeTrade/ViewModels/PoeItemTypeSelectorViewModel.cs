@@ -2,6 +2,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
+using Common.Logging;
 using DynamicData;
 using Guards;
 using JetBrains.Annotations;
@@ -17,6 +18,8 @@ namespace PoeEye.PoeTrade.ViewModels
 {
     internal class PoeItemTypeSelectorViewModel : DisposableReactiveObject, IPoeItemTypeSelectorViewModel
     {
+        private static readonly ILog Log = LogManager.GetLogger(typeof(PoeItemTypeSelectorViewModel));
+
         private readonly ReadOnlyObservableCollection<string> knownTypes;
         private readonly SourceCache<IPoeItemType, string> knownTypesByName;
 
@@ -71,7 +74,7 @@ namespace PoeEye.PoeTrade.ViewModels
                 return knownType.Value;
             }
 
-            Log.Instance.Warn($"Failed to find ItemType '{SelectedValue}' in types cache, known items: {knownTypes.DumpToTextRaw()}");
+            Log.Warn($"Failed to find ItemType '{SelectedValue}' in types cache, known items: {knownTypes.DumpToTextRaw()}");
             return null;
         }
     }

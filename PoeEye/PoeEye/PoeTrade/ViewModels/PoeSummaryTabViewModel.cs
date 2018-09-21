@@ -7,6 +7,7 @@ using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Windows.Input;
+using Common.Logging;
 using DynamicData;
 using DynamicData.Binding;
 using Guards;
@@ -29,6 +30,8 @@ namespace PoeEye.PoeTrade.ViewModels
 {
     internal sealed class PoeSummaryTabViewModel : DisposableReactiveObject, IPoeSummaryTabViewModel
     {
+        private static readonly ILog Log = LogManager.GetLogger<PoeSummaryTabViewModel>();
+
         private static readonly TimeSpan ResortRefilterThrottleTimeout = TimeSpan.FromMilliseconds(250);
 
         private readonly ReactiveCommand markAllAsReadCommand;
@@ -157,7 +160,7 @@ namespace PoeEye.PoeTrade.ViewModels
 
         private void MarkAllAsReadExecuted()
         {
-            Log.Instance.Debug($"[PoeSummaryTabViewModel.MarkAllAsReadExecuted] Sending command to {tabCollection.Count} tab(s)");
+            Log.Debug($"[PoeSummaryTabViewModel.MarkAllAsReadExecuted] Sending command to {tabCollection.Count} tab(s)");
             foreach (var mainWindowTabViewModel in tabCollection)
             {
                 if (mainWindowTabViewModel.MarkAllAsReadCommand.CanExecute(null))

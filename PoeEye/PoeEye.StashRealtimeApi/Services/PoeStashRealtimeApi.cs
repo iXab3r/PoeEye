@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+using Common.Logging;
 using Guards;
 using JetBrains.Annotations;
 using PoeShared;
@@ -12,7 +13,9 @@ namespace PoeEye.StashRealtimeApi.Services
 {
     internal sealed class PoeStashRealtimeApi : DisposableReactiveObject, IPoeApi
     {
-        [NotNull] private readonly IPoeItemsProcessor itemsSource;
+        private static readonly ILog Log = LogManager.GetLogger(typeof(PoeStashRealtimeApi));
+
+        private readonly IPoeItemsProcessor itemsSource;
 
         public PoeStashRealtimeApi([NotNull] IPoeItemsProcessor itemsSource)
         {
@@ -39,7 +42,7 @@ namespace PoeEye.StashRealtimeApi.Services
         {
             Guard.ArgumentNotNull(query, nameof(query));
 
-            Log.Instance.Debug($"Issueing query: {query}");
+            Log.Debug($"Issueing query: {query}");
             return Task.Run(() => itemsSource.IssueQuery(query));
         }
 

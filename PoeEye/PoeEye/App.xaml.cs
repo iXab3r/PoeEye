@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
+using Common.Logging;
 using ExceptionReporting;
 using ExceptionReporting.Core;
 using log4net.Core;
@@ -19,6 +20,8 @@ namespace PoeEye
 {
     public partial class App
     {
+        private static readonly ILog Log = LogManager.GetLogger(typeof(App));
+
         private readonly PoeEyeBootstrapper bootstrapper = new PoeEyeBootstrapper();
 
         public App()
@@ -28,20 +31,20 @@ namespace PoeEye
                 var arguments = Environment.GetCommandLineArgs();
                 if (!AppArguments.Parse(arguments))
                 {
-                    Log.InitializeLogging("Startup");
+                    PoeShared.Log.InitializeLogging("Startup");
                     throw new ApplicationException($"Failed to parse command line args: {string.Join(" ", arguments)}");
                 }
 
                 InitializeLogging();
-                Log.Instance.Debug($"[App..ctor] Arguments: {arguments.DumpToText()}");
-                Log.Instance.Debug($"[App..ctor] Parsed args: {AppArguments.Instance.DumpToText()}");
-                Log.Instance.Debug($"[App..ctor] Culture: {Thread.CurrentThread.CurrentCulture}, UICulture: {Thread.CurrentThread.CurrentUICulture}");
+                Log.Debug($"[App..ctor] Arguments: {arguments.DumpToText()}");
+                Log.Debug($"[App..ctor] Parsed args: {AppArguments.Instance.DumpToText()}");
+                Log.Debug($"[App..ctor] Culture: {Thread.CurrentThread.CurrentCulture}, UICulture: {Thread.CurrentThread.CurrentUICulture}");
 
                 RxApp.SupportsRangeNotifications = false; //FIXME DynamicData (as of v4.11) does not support RangeNotifications
-                Log.Instance.Debug($"[App..ctor] UI Scheduler: {RxApp.MainThreadScheduler}");
+                Log.Debug($"[App..ctor] UI Scheduler: {RxApp.MainThreadScheduler}");
                 RxApp.MainThreadScheduler = DispatcherScheduler.Current;
                 RxApp.TaskpoolScheduler = TaskPoolScheduler.Default;
-                Log.Instance.Debug($"[App..ctor] New UI Scheduler: {RxApp.MainThreadScheduler}");
+                Log.Debug($"[App..ctor] New UI Scheduler: {RxApp.MainThreadScheduler}");
             }
             catch (Exception ex)
             {
@@ -53,22 +56,22 @@ namespace PoeEye
         private void SingleInstanceValidationRoutine()
         {
             var mutexId = $"PoeEye{(AppArguments.Instance.IsDebugMode ? "DEBUG" : "RELEASE")}{{88286F90-96B8-4799-9E8E-78B581267D63}}";
-            Log.Instance.Debug($"[App] Acquiring mutex {mutexId}...");
+            Log.Debug($"[App] Acquiring mutex {mutexId}...");
             var mutex = new Mutex(true, mutexId);
             if (mutex.WaitOne(TimeSpan.Zero, true))
             {
-                Log.Instance.Debug($"[App] Mutex {mutexId} was successfully acquired");
+                Log.Debug($"[App] Mutex {mutexId} was successfully acquired");
 
                 AppDomain.CurrentDomain.DomainUnload += delegate
                 {
-                    Log.Instance.Debug($"[App.DomainUnload] Detected DomainUnload, disposing mutex {mutexId}");
+                    Log.Debug($"[App.DomainUnload] Detected DomainUnload, disposing mutex {mutexId}");
                     mutex.ReleaseMutex();
-                    Log.Instance.Debug($"[App.DomainUnload] Mutex was successfully disposed");
+                    Log.Debug($"[App.DomainUnload] Mutex was successfully disposed");
                 };
             }
             else
             {
-                Log.Instance.Warn($"[App] Appliation is already running, mutex: {mutexId}");
+                Log.Warn($"[App] Appliation is already running, mutex: {mutexId}");
                 ShowShutdownWarning();
             }
         }
@@ -90,7 +93,7 @@ namespace PoeEye
 
         private void ReportCrash(Exception exception, string developerMessage = "")
         {
-            Log.Instance.Error($"Unhandled application exception({developerMessage})", exception);
+            Log.Error($"Unhandled application exception({developerMessage})", exception);
 
             AppDomain.CurrentDomain.UnhandledException -= CurrentDomainOnUnhandledException;
             Current.Dispatcher.UnhandledException -= DispatcherOnUnhandledException;
@@ -138,7 +141,7 @@ namespace PoeEye
             }
             catch (Exception ex)
             {
-                Log.Instance.Error($"Exception in ExceptionReporter :-(", ex);
+                Log.Error($"Exception in ExceptionReporter :-(", ex);
             }
         }
 
@@ -148,14 +151,14 @@ namespace PoeEye
             Current.Dispatcher.UnhandledException += DispatcherOnUnhandledException;
             TaskScheduler.UnobservedTaskException += TaskSchedulerOnUnobservedTaskException;
 
-            RxApp.DefaultExceptionHandler = Log.ErrorsSubject;
+            RxApp.DefaultExceptionHandler = PoeShared.Log.ErrorsSubject;
             if (AppArguments.Instance.IsDebugMode)
             {
-                Log.InitializeLogging("Debug");
+                PoeShared.Log.InitializeLogging("Debug");
             }
             else
             {
-                Log.InitializeLogging("Release");
+                PoeShared.Log.InitializeLogging("Release");
             }
         }
 
@@ -163,11 +166,11 @@ namespace PoeEye
         {
             base.OnStartup(e);
 
-            Log.Instance.Debug($"Application startup detected");
+            Log.Debug($"Application startup detected");
 
             SingleInstanceValidationRoutine();
 
-            Log.Instance.Info($"Initializing bootstrapper...");
+            Log.Info($"Initializing bootstrapper...");
             bootstrapper.Run();
         }
 
@@ -175,7 +178,7 @@ namespace PoeEye
         {
             base.OnExit(e);
 
-            Log.Instance.Debug($"Application exit detected");
+            Log.Debug($"Application exit detected");
             bootstrapper.Dispose();
         }
 
@@ -194,7 +197,7 @@ namespace PoeEye
                 MessageBox.Show(message, title, MessageBoxButton.OK, MessageBoxImage.Warning);
             }
 
-            Log.Instance.Warn($"Shutting down...");
+            Log.Warn($"Shutting down...");
             Environment.Exit(0);
         }
     }

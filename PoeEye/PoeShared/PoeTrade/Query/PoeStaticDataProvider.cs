@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Common.Logging;
 using Guards;
 using JetBrains.Annotations;
 using PoeShared.Scaffolding;
@@ -9,6 +10,8 @@ namespace PoeShared.PoeTrade.Query
 {
     internal sealed class PoeStaticDataProvider : DisposableReactiveObject, IPoeStaticDataProvider
     {
+        private static readonly ILog Log = LogManager.GetLogger<PoeStaticDataProvider>();
+
         private readonly IPoeApi poeApi;
 
         private string error;
@@ -43,7 +46,7 @@ namespace PoeShared.PoeTrade.Query
 
         private void RefreshData()
         {
-            Log.Instance.Debug($"[PoeQueryInfoProvider-{poeApi.Name}] Refreshing static data...");
+            Log.Debug($"[PoeQueryInfoProvider-{poeApi.Name}] Refreshing static data...");
             Task.Factory.StartNew(() => StaticData = RefreshDataInternal());
         }
 
@@ -54,17 +57,17 @@ namespace PoeShared.PoeTrade.Query
                 IsBusy = true;
                 Error = null;
 
-                Log.Instance.Debug($"[PoeQueryInfoProvider-{poeApi.Name}] Requesting static data from API...");
+                Log.Debug($"[PoeQueryInfoProvider-{poeApi.Name}] Requesting static data from API...");
 
                 var queryResult = poeApi.RequestStaticData().Result;
 
-                Log.Instance.Debug($"[PoeQueryInfoProvider-{poeApi.Name}] Received static data from API");
+                Log.Debug($"[PoeQueryInfoProvider-{poeApi.Name}] Received static data from API");
                 return queryResult;
             }
             catch (Exception ex)
             {
                 Log.HandleException(ex);
-                Log.Instance.Debug($"[PoeQueryInfoProvider-{poeApi.Name}] Returning empty static data");
+                Log.Debug($"[PoeQueryInfoProvider-{poeApi.Name}] Returning empty static data");
                 Error = ex.Message;
                 return PoeStaticData.Empty;
             }

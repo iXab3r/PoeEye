@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using Common.Logging;
 using Guards;
 using JetBrains.Annotations;
 using PoeShared;
@@ -16,6 +17,8 @@ namespace PoeWhisperMonitor
 {
     internal sealed class PoeWhisperService : DisposableReactiveObject, IPoeWhisperService
     {
+        private static readonly ILog Log = LogManager.GetLogger(typeof(PoeWhisperService));
+
         private readonly IFactory<IPoeMessagesSource, FileInfo> messagesSourceFactory;
         private readonly ISubject<PoeMessage> messagesSubject = new Subject<PoeMessage>();
         private readonly IDictionary<string, IDisposable> sourcesByPath = new Dictionary<string, IDisposable>();
@@ -50,7 +53,7 @@ namespace PoeWhisperMonitor
                 return;
             }
 
-            Log.Instance.Debug(
+            Log.Debug(
                 $"[PoeWhispers] Log files list changed:\r\n\tLogs to add: {string.Join(", ", sourcesToAdd)}\r\n\tLogs to remove: {string.Join(", ", sourcesToRemove)}");
 
             foreach (var logFilePath in sourcesToRemove)

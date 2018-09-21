@@ -1,4 +1,5 @@
 ﻿using System;
+using Common.Logging;
 using Guards;
 using JetBrains.Annotations;
 using PoeEye.TradeMonitor.Models;
@@ -11,6 +12,8 @@ namespace PoeEye.TradeMonitor.Services
 {
     internal sealed class PoeMacroCommandsService : DisposableReactiveObject, IPoeMacroCommandsProvider
     {
+        private static readonly ILog Log = LogManager.GetLogger(typeof(PoeMacroCommandsService));
+
         private readonly IPoeChatService chatService;
 
         public PoeMacroCommandsService(
@@ -76,10 +79,10 @@ namespace PoeEye.TradeMonitor.Services
                 var message = messageProvider(context);
                 try
                 {
-                    Log.Instance.Debug(
+                    Log.Debug(
                         $"[TradeMonitor.ChatCommand] Executing commandName '{CommandText}', message '{message}'...");
                     var result = chatService.SendMessage(message);
-                    Log.Instance.Debug(
+                    Log.Debug(
                         $"[TradeMonitor.ChatCommand] Executed commandName '{CommandText}', result: {result}");
                 }
                 catch (Exception e)

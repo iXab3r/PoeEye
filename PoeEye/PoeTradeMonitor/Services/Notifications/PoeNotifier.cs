@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Text;
+using Common.Logging;
 using Guards;
 using JetBrains.Annotations;
 using MailKit;
@@ -20,8 +21,10 @@ namespace PoeEye.TradeMonitor.Services.Notifications
 {
     internal sealed class PoeNotifier : DisposableReactiveObject, IPoeNotifier
     {
+        private static readonly ILog Log = LogManager.GetLogger(typeof(PoeNotifier));
+
         private static readonly TimeSpan BufferPeriod = TimeSpan.FromSeconds(10);
-        [NotNull] private readonly IClock clock;
+        private readonly IClock clock;
         private readonly IConfigProvider<PoeTradeMonitorConfig> configProvider;
 
         private readonly ISubject<string> messagesQueue = new Subject<string>();
@@ -64,7 +67,7 @@ namespace PoeEye.TradeMonitor.Services.Notifications
                     return;
                 }
 
-                Log.Instance.Debug($"[Poe.MailNotifier] Preparing message to '{emailAddress}'");
+                Log.Debug($"[Poe.MailNotifier] Preparing message to '{emailAddress}'");
                 var message = new MimeMessage();
                 message.From.Add(new MailboxAddress("PoeEye", AppArguments.PoeEyeMail));
                 message.To.Add(new MailboxAddress(Environment.UserName, emailAddress));
@@ -74,10 +77,10 @@ namespace PoeEye.TradeMonitor.Services.Notifications
                 {
                     Text = $"[PoeEye]\n{messagesToSend.DumpToText()}"
                 };
-                Log.Instance.Debug($"[Poe.MailNotifier] Message body:\n{message.Body}");
+                Log.Debug($"[Poe.MailNotifier] Message body:\n{message.Body}");
 
                 var logger = new EmailLogger(clock);
-                Log.Instance.Debug($"[Poe.MailNotifier] Sending message...");
+                Log.Debug($"[Poe.MailNotifier] Sending message...");
                 using (var client = new SmtpClient(logger))
                 {
                     client.ServerCertificateValidationCallback = (s, c, h, e) => true;
@@ -89,7 +92,7 @@ namespace PoeEye.TradeMonitor.Services.Notifications
                 }
 
                 var loggerLog = string.Join("\n\t", logger);
-                Log.Instance.Debug($"[Poe.MailNotifier] Send message log:\n\t{loggerLog}");
+                Log.Debug($"[Poe.MailNotifier] Send message log:\n\t{loggerLog}");
             }
             catch (Exception e)
             {

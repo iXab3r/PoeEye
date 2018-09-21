@@ -4,6 +4,7 @@ using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Windows.Input;
+using Common.Logging;
 using Guards;
 using JetBrains.Annotations;
 using PoeEye.StashGrid.Services;
@@ -29,6 +30,8 @@ namespace PoeEye.TradeMonitor.ViewModels
 {
     internal class NegotiationViewModel : DisposableReactiveObject, INegotiationViewModel, IMacroCommandContext
     {
+        private static readonly ILog Log = LogManager.GetLogger(typeof(NegotiationViewModel));
+
         public static readonly TimeSpan DefaultUpdatePeriod = TimeSpan.FromSeconds(1);
         public static readonly TimeSpan FreshnessPeriod = TimeSpan.FromSeconds(8);
 
@@ -254,7 +257,7 @@ namespace PoeEye.TradeMonitor.ViewModels
 
         public void UpdateModel(TradeModel model)
         {
-            Log.Instance.Debug($"[NegotiationViewModel] Updating underlying model:\nCurrent: {Negotiation.DumpToText()}\nUpdate: {model.DumpToText()}");
+            Log.Debug($"[NegotiationViewModel] Updating underlying model:\nCurrent: {Negotiation.DumpToText()}\nUpdate: {model.DumpToText()}");
 
             Negotiation = model;
         }
@@ -420,7 +423,7 @@ namespace PoeEye.TradeMonitor.ViewModels
 
         private void HandleSendStatus(string message, PoeMessageSendStatus status)
         {
-            Log.Instance.Debug($"[NegotiationViewModel] Message status: {status}, message: '{message}'");
+            Log.Debug($"[NegotiationViewModel] Message status: {status}, message: '{message}'");
             MessageSendStatus = status;
         }
 

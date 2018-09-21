@@ -3,6 +3,7 @@ using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Windows.Forms;
+using Common.Logging;
 using Gma.System.MouseKeyHook;
 using Guards;
 using JetBrains.Annotations;
@@ -14,6 +15,8 @@ namespace PoeShared.Native
 {
     internal sealed class KeyboardEventsSource : DisposableReactiveObject, IKeyboardEventsSource
     {
+        private static readonly ILog Log = LogManager.GetLogger<KeyboardEventsSource>();
+
         private readonly IScheduler kbdScheduler;
         private readonly IKeyboardMouseEvents keyboardMouseEvents;
         private readonly ISubject<KeyEventArgs> whenKeyDown = new Subject<KeyEventArgs>();
@@ -40,7 +43,7 @@ namespace PoeShared.Native
 
         private void InitializeHook()
         {
-            Log.Instance.Debug($"[KeyboardEventsSource] Hook: {keyboardMouseEvents}");
+            Log.Debug($"[KeyboardEventsSource] Hook: {keyboardMouseEvents}");
             Observable
                 .FromEventPattern<KeyEventHandler, KeyEventArgs>(
                     h => keyboardMouseEvents.KeyDown += h,
@@ -77,12 +80,12 @@ namespace PoeShared.Native
 
         private void LogEvent(object arg)
         {
-            if (!Log.Instance.IsDebugEnabled)
+            if (!Log.IsDebugEnabled)
             {
                 return;
             }
 
-            Log.Instance.Debug($"[KeyboardEventsSource] {arg.DumpToText(Formatting.None)}");
+            Log.Debug($"[KeyboardEventsSource] {arg.DumpToText(Formatting.None)}");
         }
     }
 }

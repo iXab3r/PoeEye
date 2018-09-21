@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
 using System.Reactive.Linq;
+using Common.Logging;
 using Guards;
 using JetBrains.Annotations;
 using KellermanSoftware.CompareNetObjects;
@@ -19,6 +20,8 @@ namespace PoeEye.StashRealtimeApi.Services
 {
     internal sealed class PoeItemsProcessor : DisposableReactiveObject, IPoeItemsProcessor
     {
+        private static readonly ILog Log = LogManager.GetLogger(typeof(PoeItemsProcessor));
+
         private readonly ConcurrentDictionary<string, IPoeItem> itemById = new ConcurrentDictionary<string, IPoeItem>();
         private readonly IEqualityComparer<IPoeItem> itemComparer;
         private readonly IPoeItemsSource itemsSource;
@@ -42,7 +45,7 @@ namespace PoeEye.StashRealtimeApi.Services
 
             itemsSource.ItemPacks
                        .ObserveOn(bgScheduler)
-                       .Subscribe(HandlePack, ex => Log.Instance.Error("Exception occurred", ex))
+                       .Subscribe(HandlePack, ex => Log.Error("Exception occurred", ex))
                        .AddTo(Anchors);
         }
 
@@ -71,16 +74,16 @@ namespace PoeEye.StashRealtimeApi.Services
 
         private void HandlePack(IPoeItem[] pack)
         {
-            Log.Instance.Debug($"Got items pack, {pack.Length} element(s), total {itemById.Count}");
+            Log.Debug($"Got items pack, {pack.Length} element(s), total {itemById.Count}");
 
             foreach (var poeItem in pack)
             {
                 itemById.AddOrUpdate(poeItem.Hash, poeItem, (key, oldItem) => HandleItemUpdate(oldItem, poeItem));
             }
 
-            Log.Instance.DebugFormat("By league:\n\t{0}",
+            Log.DebugFormat("By league:\n\t{0}",
                                      pack.GroupBy(x => x.League ?? "UnknownLeague").Select(x => new {League = x.Key, Count = x.Count()}).DumpToText());
-            Log.Instance.DebugFormat("By league(total):\n\t{0}",
+            Log.DebugFormat("By league(total):\n\t{0}",
                                      itemById.Values.GroupBy(x => x.League ?? "UnknownLeague").Select(x => new {League = x.Key, Count = x.Count()})
                                              .DumpToText());
 
@@ -107,7 +110,7 @@ namespace PoeEye.StashRealtimeApi.Services
                     var rawComparisonResult = CompareObjects(rawOld, rawNew);
                     if (!rawComparisonResult.AreEqual)
                     {
-                        Log.Instance.Debug($"Item updated RAW, key: {oldItem.Hash}\nDiff: {rawComparisonResult.DifferencesString}");
+                        Log.Debug($"Item updated RAW, key: {oldItem.Hash}\nDiff: {rawComparisonResult.DifferencesString}");
                     }
                 }
 
@@ -119,12 +122,12 @@ namespace PoeEye.StashRealtimeApi.Services
 
                 if (!comparisonResult.AreEqual)
                 {
-                    Log.Instance.Debug($"Item updated, key: {oldItem.Hash}\nDiff: {comparisonResult.DifferencesString}");
+                    Log.Debug($"Item updated, key: {oldItem.Hash}\nDiff: {comparisonResult.DifferencesString}");
                 }
             }
             catch (Exception ex)
             {
-                Log.Instance.Error($"Exception comparing item {oldItem.Hash}", ex);
+                Log.Error($"Exception comparing item {oldItem.Hash}", ex);
             }
 
             return newItem;
@@ -184,7 +187,7 @@ namespace PoeEye.StashRealtimeApi.Services
 
             public void AddItems(IPoeItem[] itemsPack)
             {
-                Log.Instance.Debug($"Got {itemsPack.Length} items");
+                Log.Debug($"Got {itemsPack.Length} items");
                 var initialCount = items.Count;
                 foreach (var poeItem in itemsPack)
                 {
@@ -192,7 +195,7 @@ namespace PoeEye.StashRealtimeApi.Services
                 }
 
                 var newItemsCount = items.Count - initialCount;
-                Log.Instance.Debug($"New items count: {newItemsCount}");
+                Log.Debug($"New items count: {newItemsCount}");
             }
         }
     }

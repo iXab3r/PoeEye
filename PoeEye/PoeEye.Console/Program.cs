@@ -1,4 +1,5 @@
 ﻿using System;
+using Common.Logging;
 using PoeEye.PoeTrade;
 using PoeEye.PoeTrade.Prism;
 using PoeEye.PoeTradeRealtimeApi;
@@ -15,11 +16,13 @@ namespace PoeEye.Console
 {
     internal class Program
     {
+        private static readonly ILog Log = LogManager.GetLogger(typeof(Program));
+
         private static void Main(string[] args)
         {
             try
             {
-                Log.Instance.Debug("Initializing API...");
+                Log.Debug("Initializing API...");
 
                 var container = new UnityContainer();
                 container.AddExtension(new CommonRegistrations());
@@ -35,7 +38,7 @@ namespace PoeEye.Console
                 }
 
                 var api = container.Resolve<IPoeApi>($"{nameof(PoeEye)}.{nameof(PoeTrade)}.{nameof(PoeTradeApi)}");
-                Log.Instance.Debug($"API: {api}");
+                Log.Debug($"API: {api}");
 
                 var query = new PoeQueryInfo
                 {
@@ -47,7 +50,7 @@ namespace PoeEye.Console
                 var source = container.Resolve<IRealtimeItemSource>(new DependencyOverride<IPoeQueryInfo>(query));
                 var result = source.GetResult();
 
-                Log.Instance.Info($"[Result] {result.ItemsList.Length.DumpToText()}");
+                Log.Info($"[Result] {result.ItemsList.Length.DumpToText()}");
 
                 while (true)
                 {
@@ -55,12 +58,12 @@ namespace PoeEye.Console
                     System.Console.ReadKey();
 
                     var liveResult = source.GetResult();
-                    Log.Instance.Info($"[LiveResult] {liveResult.ItemsList.Length.DumpToText()}");
+                    Log.Info($"[LiveResult] {liveResult.ItemsList.Length.DumpToText()}");
                 }
             }
             catch (Exception ex)
             {
-                Log.Instance.Error(ex);
+                Log.Error(ex);
             }
             finally
             {

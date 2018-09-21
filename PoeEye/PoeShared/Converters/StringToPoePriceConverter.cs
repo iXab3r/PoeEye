@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Globalization;
 using System.Text.RegularExpressions;
 using System.Windows.Data;
+using Common.Logging;
 using PoeShared.Common;
 using PoeShared.Scaffolding;
 using TypeConverter;
@@ -11,6 +12,8 @@ namespace PoeShared.Converters
 {
     public sealed class StringToPoePriceConverter : IConverter<string, PoePrice>, IValueConverter
     {
+        private static readonly ILog Log = LogManager.GetLogger<StringToPoePriceConverter>();
+
         private static readonly Lazy<IConverter<string, PoePrice>> InstanceSupplier =
             new Lazy<IConverter<string, PoePrice>>(() => new StringToPoePriceConverter());
 
@@ -23,7 +26,7 @@ namespace PoeShared.Converters
         {
             currencyByAlias = new ConcurrentDictionary<string, string>(KnownCurrencyNameList.CurrencyByAlias, StringComparer.OrdinalIgnoreCase);
 
-            Log.Instance.Debug($"[PriceToCurrencyConverter..ctor] Aliases list:\r\n{currencyByAlias.DumpToText()}");
+            Log.Debug($"[PriceToCurrencyConverter..ctor] Aliases list:\r\n{currencyByAlias.DumpToText()}");
         }
 
         public static IConverter<string, PoePrice> Instance => InstanceSupplier.Value;
@@ -53,7 +56,7 @@ namespace PoeShared.Converters
             float currencyValue;
             if (!float.TryParse(currencyValueString, NumberStyles.Any, CultureInfo.InvariantCulture, out currencyValue))
             {
-                Log.Instance.Debug(
+                Log.Debug(
                     $"[PriceCalculcator] Could not convert value '{currencyValueString}' to float, rawPrice: {rawPrice}");
                 return PoePrice.Empty;
             }

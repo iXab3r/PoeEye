@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using Common.Logging;
 
 namespace PoeShared.Native
 {
     internal static class WindowsServices
     {
+        private static readonly ILog Log = LogManager.GetLogger(typeof(WindowsServices));
+
         private const int WS_EX_LAYERED = 0x00080000;
         private const int WS_EX_TRANSPARENT = 0x00000020;
         private const int WS_EX_TOOLWINDOW = 0x00000080;
@@ -26,15 +29,15 @@ namespace PoeShared.Native
             try
             {
                 var processId = Process.GetCurrentProcess().Id;
-                Log.Instance.Debug($"[WindowsServices] Calling AllowSetForegroundWindow(pid: {processId})");
+                Log.Debug($"[WindowsServices] Calling AllowSetForegroundWindow(pid: {processId})");
                 var result = AllowSetForegroundWindow((uint)processId);
                 if (!result)
                 {
-                    Log.Instance.Warn($"[WindowsServices] AllowSetForegroundWindow has failed !");
+                    Log.Warn($"[WindowsServices] AllowSetForegroundWindow has failed !");
                 }
                 else
                 {
-                    Log.Instance.Debug($"[WindowsServices] Successfully executed AllowSetForegroundWindow(pid: {processId})");
+                    Log.Debug($"[WindowsServices] Successfully executed AllowSetForegroundWindow(pid: {processId})");
                 }
             }
             catch (Exception e)

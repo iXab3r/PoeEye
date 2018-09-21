@@ -1,4 +1,5 @@
 ﻿using System;
+using Common.Logging;
 using Guards;
 using JetBrains.Annotations;
 using PoeShared;
@@ -7,6 +8,8 @@ namespace PoeEye.TradeMonitor.Models
 {
     internal sealed class GenericDelegateCommand : MacroCommand
     {
+        private static readonly ILog Log = LogManager.GetLogger(typeof(GenericDelegateCommand));
+
         private readonly Action<IMacroCommandContext> action;
 
         public GenericDelegateCommand([NotNull] string commandText, Action<IMacroCommandContext> action) : base(commandText)
@@ -22,7 +25,7 @@ namespace PoeEye.TradeMonitor.Models
 
             try
             {
-                Log.Instance.Debug($"[TradeMonitor.GenericDelegateCommand] Executing commandName '{CommandText}'...");
+                Log.Debug($"[TradeMonitor.GenericDelegateCommand] Executing commandName '{CommandText}'...");
                 action(context);
             }
             catch (Exception e)
@@ -31,7 +34,7 @@ namespace PoeEye.TradeMonitor.Models
             }
             finally
             {
-                Log.Instance.Debug($"[TradeMonitor.GenericDelegateCommand] Executed commandName '{CommandText}'");
+                Log.Debug($"[TradeMonitor.GenericDelegateCommand] Executed commandName '{CommandText}'");
             }
         }
     }

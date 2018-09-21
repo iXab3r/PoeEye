@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Common.Logging;
 using PoeShared.StashApi.DataTypes;
 using RestSharp;
 
@@ -10,6 +11,8 @@ namespace PoeShared.StashApi
 {
     internal sealed class PoeLeagueApiClient : IPoeLeagueApiClient
     {
+        private static readonly ILog Log = LogManager.GetLogger(typeof(PoeLeagueApiClient));
+
         private const string LeaguesApiPortal = @"http://api.pathofexile.com";
 
         private readonly IRestClient client;
@@ -28,7 +31,7 @@ namespace PoeShared.StashApi
             var request = new RestRequest("leagues") {Method = Method.GET};
             request.AddParameter("type", "main");
 
-            Log.Instance.Debug("Requesting leagues list using official API...");
+            Log.Debug("Requesting leagues list using official API...");
             var response = await client.ExecuteTaskAsync<List<League>>(request);
 
             if (response.Data == null)

@@ -3,6 +3,7 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Runtime.Serialization.Formatters;
+using Common.Logging;
 using Guards;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
@@ -13,6 +14,8 @@ namespace PoeShared.Modularity
 {
     internal class JsonConfigSerializer : IConfigSerializer
     {
+        private static readonly ILog Log = LogManager.GetLogger<JsonConfigSerializer>();
+
         private readonly IReactiveList<JsonConverter> converters = new ReactiveList<JsonConverter>();
         private readonly int MaxCharsToLog = 1024;
 
@@ -91,7 +94,7 @@ namespace PoeShared.Modularity
             }
 
             //FIXME Serializer errors should be treated appropriately, e.g. load value from default config on error
-            Log.Instance.Warn(
+            Log.Warn(
                 $"[PoeEyeConfigProviderFromFile.SerializerError] Suppresing serializer error ! Path: {args.ErrorContext.Path}, Member: {args.ErrorContext.Member}, Handled: {args.ErrorContext.Handled}",
                 args.ErrorContext.Error);
             args.ErrorContext.Handled = true;

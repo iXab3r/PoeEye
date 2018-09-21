@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using Common.Logging;
 using Guards;
 using JetBrains.Annotations;
 using PoeShared.Common;
@@ -14,6 +15,8 @@ namespace PoeShared.Converters
 {
     public sealed class PoeStashItemToPoeItemConverter : IConverter<IStashItem, IPoeItem>, IConverter<IStashItem, PoeItem>
     {
+        private static readonly ILog Log = LogManager.GetLogger<PoeStashItemToPoeItemConverter>();
+
         private readonly IClock clock;
         private readonly IConverter<string, PoePrice> priceConverter;
 
@@ -153,7 +156,7 @@ namespace PoeShared.Converters
             {
                 if (sourceByName.TryGetValue(x.Name, out var existingItem))
                 {
-                    Log.Instance.Warn($"[PoeStashItemToPoeItem] Properties dictionary already contains key {x.Name}, existing entry: {existingItem}, new: {x}");
+                    Log.Warn($"[PoeStashItemToPoeItem] Properties dictionary already contains key {x.Name}, existing entry: {existingItem}, new: {x}");
                     return;
                 }
 
