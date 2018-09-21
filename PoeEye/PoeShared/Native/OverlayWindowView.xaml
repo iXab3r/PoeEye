@@ -12,6 +12,7 @@
     WindowStartupLocation="Manual"
     Focusable="False"
     IsTabStop="False"
+    ShowActivated="False"
     SizeChanged="OverlayChildWindow_OnSizeChanged">
 
     <Window.Resources>

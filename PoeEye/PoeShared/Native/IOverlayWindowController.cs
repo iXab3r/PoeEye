@@ -12,6 +12,6 @@ namespace PoeShared.Native
         void ActivateLastActiveWindow();
 
         [NotNull]
-        IOverlayViewModel[] GetChilds();
+        IOverlayViewModel[] GetChildren();
     }
 }

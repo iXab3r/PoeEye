@@ -26,22 +26,22 @@ namespace PoeShared
 
         public static ISubject<Exception> ErrorsSubject => InstanceProvider.Value.Errors;
 
-        public ISubject<Exception> Errors { get; } = new Subject<Exception>();
+        private ISubject<Exception> Errors { get; } = new Subject<Exception>();
 
-        public ILog Logger => loggerInstanceProvider.Value;
+        private ILog Logger => loggerInstanceProvider.Value;
 
         public static void HandleException([NotNull] Exception exception)
         {
             Guard.ArgumentNotNull(exception, nameof(exception));
 
-            Instance.Error("Exception occurred", exception);
+            Instance.HandleException(exception);
         }
 
         public static void HandleUiException([NotNull] Exception exception)
         {
             Guard.ArgumentNotNull(exception, nameof(exception));
 
-            Instance.Error("UI Exception occurred", exception);
+            Instance.HandleUiException(exception);
         }
 
         public static void InitializeLogging(string configurationMode)
