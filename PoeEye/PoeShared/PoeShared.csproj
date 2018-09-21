@@ -314,7 +314,7 @@
     <Compile Include="Exceptions\CaptchaException.cs" />
     <Compile Include="IClock.cs" />
     <Compile Include="IRandomNumberGenerator.cs" />
-    <Compile Include="Log.cs" />
+    <Compile Include="SharedLog.cs" />
     <Compile Include="Modularity\IConfigProvider.cs" />
     <Compile Include="Modularity\IPoeEyeConfig.cs" />
     <Compile Include="Modularity\IPoeEyeModule.cs" />

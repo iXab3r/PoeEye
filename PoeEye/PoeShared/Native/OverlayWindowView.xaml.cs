@@ -6,12 +6,15 @@ using System.Windows;
 using System.Windows.Controls.Primitives;
 using System.Windows.Interop;
 using System.Windows.Threading;
+using Common.Logging;
 using PoeShared.Scaffolding;
 
 namespace PoeShared.Native
 {
     public partial class OverlayWindowView
     {
+        private static readonly ILog Log = LogManager.GetLogger(typeof(OverlayWindowView));
+
         public OverlayWindowView()
         {
             InitializeComponent();

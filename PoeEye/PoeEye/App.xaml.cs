@@ -31,7 +31,7 @@ namespace PoeEye
                 var arguments = Environment.GetCommandLineArgs();
                 if (!AppArguments.Parse(arguments))
                 {
-                    PoeShared.Log.InitializeLogging("Startup");
+                    PoeShared.SharedLog.InitializeLogging("Startup");
                     throw new ApplicationException($"Failed to parse command line args: {string.Join(" ", arguments)}");
                 }
 
@@ -151,14 +151,14 @@ namespace PoeEye
             Current.Dispatcher.UnhandledException += DispatcherOnUnhandledException;
             TaskScheduler.UnobservedTaskException += TaskSchedulerOnUnobservedTaskException;
 
-            RxApp.DefaultExceptionHandler = PoeShared.Log.ErrorsSubject;
+            RxApp.DefaultExceptionHandler = SharedLog.Instance.Errors;
             if (AppArguments.Instance.IsDebugMode)
             {
-                PoeShared.Log.InitializeLogging("Debug");
+                SharedLog.InitializeLogging("Debug");
             }
             else
             {
-                PoeShared.Log.InitializeLogging("Release");
+                SharedLog.InitializeLogging("Release");
             }
         }
 

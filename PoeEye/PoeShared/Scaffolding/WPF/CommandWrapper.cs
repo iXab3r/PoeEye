@@ -4,6 +4,7 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using Common.Logging;
 using Guards;
 using Prism.Commands;
 using ReactiveUI;
@@ -12,6 +13,8 @@ namespace PoeShared.Scaffolding.WPF
 {
     public sealed class CommandWrapper : DisposableReactiveObject, ICommand
     {
+        private static readonly ILog Log = LogManager.GetLogger(typeof(CommandWrapper));
+
         private readonly ObservableAsPropertyHelper<bool> isBusy;
         private readonly ISubject<bool> isExecuting = new Subject<bool>();
 
