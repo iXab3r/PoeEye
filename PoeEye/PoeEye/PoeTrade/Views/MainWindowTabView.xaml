@@ -2,7 +2,8 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
                     xmlns:viewModels="clr-namespace:PoeEye.PoeTrade.ViewModels"
-                    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
+                    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+                    xmlns:eye="http://coderush.net/poeeye/">
   
   <DataTemplate DataType="{x:Type viewModels:MainWindowTabViewModel}" >
     <Grid>
@@ -49,8 +50,13 @@
               <controls:MetroContentControl Content="{Binding Query}" />
               
               <DockPanel>
-                <Button DockPanel.Dock="Left" HorizontalAlignment="Left" Width="150" Command="{Binding ResetCommand}"
-                        Content="Reset" />
+                <ContentControl DockPanel.Dock="Left" Width="150" Content="{Binding ResetCommand}"
+                                eye:CommandWrapperHelper.Text="Clear"
+                                ToolTip="Clear all fields"/>
+                <ContentControl DockPanel.Dock="Left" Content="{Binding SaveAsDefault}" Width="150" 
+                                Margin="10,0,0,0"
+                                eye:CommandWrapperHelper.Text="Save as Default"
+                                ToolTip="Apply this configuration to all new tabs"/>
                 <Button DockPanel.Dock="Right" HorizontalAlignment="Right" Width="150" Command="{Binding NewSearchCommand}"
                         IsDefault="True"
                         CommandParameter="{Binding Query.PoeQueryBuilder}"

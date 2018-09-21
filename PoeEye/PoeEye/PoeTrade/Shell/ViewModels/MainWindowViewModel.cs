@@ -272,6 +272,10 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
         private void CreateNewTabCommandExecuted(PoeEyeTabConfig cfg)
         {
             var tab = CreateAndAddTab();
+            if (default(PoeEyeTabConfig).Equals(cfg))
+            {
+                cfg = poeEyeConfigProvider.ActualConfig.DefaultConfig;
+            }
             tab.Load(cfg);
         }
 

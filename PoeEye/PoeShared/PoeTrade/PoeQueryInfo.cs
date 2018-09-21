@@ -8,9 +8,9 @@ namespace PoeShared.PoeTrade
 {
     public sealed class PoeQueryInfo : IPoeQueryInfo
     {
-        public static IPoeQueryInfo Empty = new PoeQueryInfo();
+        public static readonly IPoeQueryInfo Empty = new PoeQueryInfo();
         
-        public static IEqualityComparer<IPoeQueryInfo> Comparer =
+        public static readonly IEqualityComparer<IPoeQueryInfo> Comparer =
             new LambdaComparer<IPoeQueryInfo>((x, y) => string.CompareOrdinal(x?.DumpToText(), y?.DumpToText()) == 0);
 
         public static string Id { get; } = Guid.NewGuid().ToString();

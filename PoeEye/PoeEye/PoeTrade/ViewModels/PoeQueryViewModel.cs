@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using DynamicData.Binding;
 using Guards;
@@ -14,6 +15,7 @@ using PoeShared.PoeTrade.Query;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
 using ReactiveUI;
+using Unity.Attributes;
 
 namespace PoeEye.PoeTrade.ViewModels
 {
@@ -36,6 +38,8 @@ namespace PoeEye.PoeTrade.ViewModels
         private float? buyoutMax;
         private float? buyoutMin;
         private PoeBuyoutMode? buyoutMode;
+
+        private bool captureFocusOnFirstGet = true;
         private TriState? corruptionState;
         private TriState? craftState;
         private float? critMax;
@@ -89,20 +93,20 @@ namespace PoeEye.PoeTrade.ViewModels
         private int? socketsR;
         private int? socketsW;
 
-        private bool captureFocusOnFirstGet = true;
-
         public PoeQueryViewModel(
             [NotNull] IPoeStaticDataSource staticDataSource,
             [NotNull] IFactory<IPoeModGroupsEditorViewModel, IPoeStaticDataSource> modGroupsEditorFactory,
             [NotNull] IFactory<IPoeItemTypeSelectorViewModel, IPoeStaticDataSource> itemTypeSelectorFactory,
             [NotNull] IFactory<IReactiveSuggestionProvider> suggestionProviderFactory,
-            [NotNull] IPoeDatabaseReader poeDatabaseReader)
+            [NotNull] IPoeDatabaseReader poeDatabaseReader,
+            [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {
             Guard.ArgumentNotNull(staticDataSource, nameof(staticDataSource));
             Guard.ArgumentNotNull(modGroupsEditorFactory, nameof(modGroupsEditorFactory));
             Guard.ArgumentNotNull(itemTypeSelectorFactory, nameof(itemTypeSelectorFactory));
             Guard.ArgumentNotNull(suggestionProviderFactory, nameof(suggestionProviderFactory));
             Guard.ArgumentNotNull(poeDatabaseReader, nameof(poeDatabaseReader));
+            Guard.ArgumentNotNull(uiScheduler, nameof(uiScheduler));
 
             LeaguesList = new ReadOnlyObservableCollection<string>(leagueList);
             CurrenciesList = new ReadOnlyObservableCollection<IPoeCurrency>(currencyList);
@@ -123,16 +127,18 @@ namespace PoeEye.PoeTrade.ViewModels
 
                         leagueList.AddRange(staticData.LeaguesList);
                         currencyList.AddRange(staticData.CurrenciesList);
-
-                        if (string.IsNullOrWhiteSpace(League))
-                        {
-                            League = LeaguesList.FirstOrDefault();
-                        }
                     })
                 .AddTo(Anchors);
 
             NameSuggestionProvider = suggestionProviderFactory.Create();
             NameSuggestionProvider.Items = poeDatabaseReader.KnownEntityNames;
+
+            this.WhenAnyValue(x => x.League).Where(string.IsNullOrWhiteSpace).ToUnit()
+                .Merge(leagueList.ToObservableChangeSet().ToUnit())
+                .Where(x => string.IsNullOrWhiteSpace(League) && LeaguesList.Count > 0)
+                .ObserveOn(uiScheduler)
+                .Subscribe(() => League = LeaguesList.FirstOrDefault())
+                .AddTo(Anchors);
         }
 
         public bool CaptureFocus
@@ -147,7 +153,6 @@ namespace PoeEye.PoeTrade.ViewModels
                 //FIXME This hack was implemented to focus on QueryTextBox when new tab is created. Usual approach is not working due to TabControl virtualisation
                 captureFocusOnFirstGet = false;
                 return true;
-
             }
         }
 
@@ -328,7 +333,7 @@ namespace PoeEye.PoeTrade.ViewModels
         }
 
         public IPoeQueryModsGroup[] ModGroups => ModGroupsEditor.ToGroups();
-        
+
         public int? SocketsB
         {
             get => socketsB;
@@ -572,25 +577,32 @@ namespace PoeEye.PoeTrade.ViewModels
 
             source.TransferPropertiesTo(this);
 
-            if (source.ModGroups != null && source.ModGroups.Any())
+            ModGroupsEditor.Groups.Clear();
+            foreach (var group in source.ModGroups.EmptyIfNull())
             {
-                ModGroupsEditor.Groups.Clear();
-                foreach (var group in source.ModGroups.Where(x => x.Mods != null && x.Mods.Any()))
-                {
-                    var newGroup = ModGroupsEditor.AddGroup();
-                    newGroup.Mods.Clear();
-                    newGroup.GroupType = group.GroupType;
-                    newGroup.MinGroupValue = group.Min;
-                    newGroup.MaxGroupValue = group.Max;
+                var newGroup = ModGroupsEditor.AddGroup();
+                newGroup.Mods.Clear();
+                newGroup.GroupType = group.GroupType;
+                newGroup.MinGroupValue = group.Min;
+                newGroup.MaxGroupValue = group.Max;
 
-                    foreach (var mod in group.Mods.Where(x => !string.IsNullOrWhiteSpace(x.Name)))
-                    {
-                        var newMod = newGroup.AddMod();
-                        newMod.SelectedMod = mod.Name;
-                        newMod.Max = mod.Max;
-                        newMod.Min = mod.Min;
-                    }
+                foreach (var mod in group.Mods.EmptyIfNull().Where(x => !string.IsNullOrWhiteSpace(x.Name)))
+                {
+                    var newMod = newGroup.AddMod();
+                    newMod.SelectedMod = mod.Name;
+                    newMod.Max = mod.Max;
+                    newMod.Min = mod.Min;
                 }
+
+                if (newGroup.Mods.Count == 0)
+                {
+                    newGroup.AddMod();
+                }
+            }
+
+            if (ModGroupsEditor.Groups.Count == 0)
+            {
+                ModGroupsEditor.AddGroup();
             }
 
             if (source.ItemType != null)

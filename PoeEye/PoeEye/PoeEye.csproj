@@ -350,6 +350,7 @@
     </Compile>
     <Compile Include="Prism\MainModule.cs" />
     <Compile Include="Prism\PoeEyeBootstrapper.cs" />
+    <Compile Include="Prism\WellKnownApi.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

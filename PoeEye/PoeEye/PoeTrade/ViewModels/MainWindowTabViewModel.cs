@@ -13,9 +13,11 @@ using PoeEye.Config;
 using PoeShared;
 using PoeShared.Audio;
 using PoeShared.Common;
+using PoeShared.Modularity;
 using PoeShared.PoeTrade;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
+using PoeShared.Scaffolding.WPF;
 using PoeShared.UI.ViewModels;
 using Prism.Commands;
 using ReactiveUI;
@@ -34,11 +36,11 @@ namespace PoeEye.PoeTrade.ViewModels
         private readonly DelegateCommand<object> newSearchCommand;
         private readonly DelegateCommand<object> refreshCommand;
         private readonly DelegateCommand<string> renameCommand;
-        private readonly DelegateCommand resetCommand;
         private readonly Fallback<string> tabName = new Fallback<string>();
 
         private readonly SerialDisposable tradesListAnchors = new SerialDisposable();
         private readonly IFactory<IPoeTradesListViewModel, IPoeApiWrapper> tradesListFactory;
+        [NotNull] private readonly IConfigProvider<PoeEyeTabListConfig> configProvider;
         [NotNull] private readonly IScheduler bgScheduler;
         [NotNull] private readonly IScheduler uiScheduler;
         private bool isFlipped;
@@ -50,9 +52,10 @@ namespace PoeEye.PoeTrade.ViewModels
             [NotNull] IAudioNotificationsManager audioNotificationsManager,
             [NotNull] IRecheckPeriodViewModel recheckPeriod,
             [NotNull] IPoeApiSelectorViewModel apiSelector,
-            [NotNull] [Dependency(WellKnownWindows.MainWindow)] IWindowTracker mainWindowTracker,
             [NotNull] IAudioNotificationSelectorViewModel audioNotificationSelector,
             [NotNull] IFactory<IPoeQueryViewModel, IPoeStaticDataSource> queryFactory,
+            [NotNull] IConfigProvider<PoeEyeTabListConfig> configProvider,
+            [NotNull] [Dependency(WellKnownWindows.MainWindow)] IWindowTracker mainWindowTracker,
             [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler,
             [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {
@@ -61,6 +64,7 @@ namespace PoeEye.PoeTrade.ViewModels
             Guard.ArgumentNotNull(mainWindowTracker, nameof(mainWindowTracker));
             Guard.ArgumentNotNull(audioNotificationsManager, nameof(audioNotificationsManager));
             Guard.ArgumentNotNull(audioNotificationSelector, nameof(audioNotificationSelector));
+            Guard.ArgumentNotNull(configProvider, nameof(configProvider));
             Guard.ArgumentNotNull(queryFactory, nameof(queryFactory));
             Guard.ArgumentNotNull(uiScheduler, nameof(IScheduler));
             Guard.ArgumentNotNull(bgScheduler, nameof(bgScheduler));
@@ -69,6 +73,7 @@ namespace PoeEye.PoeTrade.ViewModels
             tabName.SetDefaultValue(defaultTabName);
 
             this.tradesListFactory = tradesListFactory;
+            this.configProvider = configProvider;
             this.bgScheduler = bgScheduler;
             this.uiScheduler = uiScheduler;
             this.BindPropertyTo(x => x.TabName, tabName, x => x.Value).AddTo(Anchors);
@@ -87,8 +92,8 @@ namespace PoeEye.PoeTrade.ViewModels
             Query = queryFactory.Create(ApiSelector);
 
             renameCommand = new DelegateCommand<string>(RenameCommandExecuted);
-            resetCommand = new DelegateCommand(ResetCommandExecuted, ResetCommandCanExecute);
-            this.WhenAnyValue(x => x.SelectedApi).Subscribe(() => resetCommand.RaiseCanExecuteChanged()).AddTo(Anchors);
+            ResetCommand = CommandWrapper.Create(new DelegateCommand(ResetCommandExecuted, ResetCommandCanExecute));
+            this.WhenAnyValue(x => x.SelectedApi).Subscribe(() => ResetCommand.RaiseCanExecuteChanged()).AddTo(Anchors);
 
             markAllAsReadCommand = new DelegateCommand(MarkAllAsReadExecute);
 
@@ -127,6 +132,8 @@ namespace PoeEye.PoeTrade.ViewModels
                     x => audioNotificationsManager.PlayNotification(audioNotificationSelector.SelectedValue),
                     Log.HandleException)
                 .AddTo(Anchors);
+            
+            SaveAsDefault = CommandWrapper.Create(() => SaveAsDefaultExecuted());
         }
 
         public IPoeApiSelectorViewModel ApiSelector { get; }
@@ -150,7 +157,9 @@ namespace PoeEye.PoeTrade.ViewModels
 
         public ICommand NewSearchCommand => newSearchCommand;
 
-        public ICommand ResetCommand => resetCommand;
+        public CommandWrapper ResetCommand { get; }
+        
+        public CommandWrapper SaveAsDefault { get; }
 
         public string DefaultTabName => tabName.DefaultValue;
 
@@ -237,7 +246,7 @@ namespace PoeEye.PoeTrade.ViewModels
         private void ResetCommandExecuted()
         {
             Log.Instance.Debug($"Resetting query parameters of tab {tabName.Value}");
-            ReinitializeApi(SelectedApi);
+            Query.SetQueryInfo(PoeQueryInfo.Empty);
         }
 
         private bool ResetCommandCanExecute()
@@ -392,6 +401,12 @@ namespace PoeEye.PoeTrade.ViewModels
             {
                 trade.TradeState = PoeTradeState.Normal;
             }
+        }
+
+        private void SaveAsDefaultExecuted()
+        {
+            Log.Instance.Debug("[MainWindowTabViewModel.SaveAsDefaultExecuted] Saving default tab configuration as default");
+            configProvider.ActualConfig.DefaultConfig = this.Save();
         }
 
         public override string ToString()
