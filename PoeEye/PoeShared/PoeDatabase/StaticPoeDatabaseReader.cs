@@ -17,9 +17,7 @@ namespace PoeShared.PoeDatabase
         private readonly ISourceList<string> knownEntities = new SourceList<string>();
         private readonly ReadOnlyObservableCollection<string> knownEntityNames;
 
-        public StaticPoeDatabaseReader(
-            [NotNull] [Dependency(WellKnownSchedulers.Background)]
-            IScheduler bgScheduler)
+        public StaticPoeDatabaseReader([NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler)
         {
             Log.Instance.Debug("[StaticPoeDatabaseReader..ctor] Created");
 
@@ -29,7 +27,7 @@ namespace PoeShared.PoeDatabase
                 .Subscribe()
                 .AddTo(Anchors);
 
-            Initialize();
+            bgScheduler.Schedule(Initialize);
         }
 
         public ReadOnlyObservableCollection<string> KnownEntityNames => knownEntityNames;

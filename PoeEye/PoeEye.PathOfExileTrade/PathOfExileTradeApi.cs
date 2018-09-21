@@ -5,8 +5,10 @@ using System.Linq;
 using System.Net.Http;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using Guards;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
@@ -20,6 +22,7 @@ using PoeShared.PoeTrade;
 using PoeShared.PoeTrade.Query;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
+using PoeShared.Scaffolding.WPF;
 using RestEase;
 using TypeConverter;
 
@@ -125,19 +128,7 @@ namespace PoeEye.PathOfExileTrade
             var apiLeagueList = await client.GetLeagueList();
             result.LeaguesList = apiLeagueList.GetContentEx().Result.EmptyIfNull().Select(x => x.Id).ToArray();
 
-            var statsList = (await client.GetStatsList()).GetContentEx();
-
-            result.ModsList = statsList.Categories
-                                       .SelectMany(x => x.Entries)
-                                       .Select(x => new PoeItemMod
-                                       {
-                                           Name = $"({x.StatsType}) {x.Text}",
-                                           ModType = x.StatsType.ToPoeModType(),
-                                           Origin = x.StatsType.ToPoeModOrigin(),
-                                           CodeName = x.Id
-                                       })
-                                       .OfType<IPoeItemMod>()
-                                       .ToArray();
+            result.ModsList = await ExtractMods();
 
             var staticData = (await client.GetStatic()).GetContentEx();
             result.CurrenciesList = staticData.Result.Currency.EmptyIfNull().Select(x => new PoeCurrency
@@ -252,6 +243,50 @@ namespace PoeEye.PathOfExileTrade
                 }).ToArray()
             };
             return queryResult;
+        }
+
+        private async Task<IPoeItemMod[]> ExtractMods()
+        {
+            var statsList = (await client.GetStatsList()).GetContentEx();
+
+            var modsByName = new Dictionary<string, PoeItemMod>();
+            var duplicatesById = new Dictionary<string, int>();
+            foreach (var x in  statsList.Categories
+                                        .SelectMany(x => x.Entries))
+            {
+                var mod = new PoeItemMod
+                {
+                    Name = $"({x.StatsType}) {x.Text}",
+                    ModType = x.StatsType.ToPoeModType(),
+                    Origin = x.StatsType.ToPoeModOrigin(),
+                    CodeName = x.Id
+                };
+                if (modsByName.TryGetValue(mod.Name, out var existingMod))
+                {
+                    // mod with the same name exists
+                    if (existingMod.CodeName == mod.CodeName)
+                    {
+                        Log.Instance.Warn($"[PathOfExileTradeApi.Api] Duplicate mod detected, existingMod: {existingMod.DumpToText()} newMod: {mod.DumpToText()}");
+                        continue;
+                    }
+
+                    const int startId = 2;
+                    var id = duplicatesById.AddOrUpdate(existingMod.Name, startId, (s, existingId) => existingId + 1);
+                    if (id == startId)
+                    {
+                        // update existing mod
+                        modsByName.Remove(existingMod.Name);
+                        existingMod.Name = $"[#{id - 1}] {existingMod.Name}";
+                        modsByName[existingMod.Name] = existingMod;
+                    }
+                        
+                    mod.Name = $"[#{id}] {mod.Name}";
+                }
+
+                modsByName[mod.Name] = mod;
+            }
+
+            return modsByName.Values.OfType<IPoeItemMod>().ToArray();
         }
 
         private static IPathOfExileTradePortalApi CreateRestClient()

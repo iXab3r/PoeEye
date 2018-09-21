@@ -213,7 +213,10 @@ namespace PoeEye.PoeTrade.ViewModels
 
                     uiScheduler.Schedule(() =>
                     {
-                        Log.Instance.Debug($"Adding new item: {itemViewModel}");
+                        if (Log.Instance.IsTraceEnabled)
+                        {
+                            Log.Instance.Trace($"Adding new item: {itemViewModel.Trade.DumpToTextRaw()}");
+                        }
                         itemsSource.AddOrUpdate(itemViewModel);
                     });
                 }

@@ -44,7 +44,7 @@ namespace PoeBud.Models
 
         private void WindowActivated(IntPtr activeWindowHandle)
         {
-            Log.Instance.Debug($"[PoeWindowManager] Active window: '{poeWindowTracker.ActiveWindowTitle}'");
+            Log.Instance.Trace($"[PoeWindowManager] Active window: '{poeWindowTracker.ActiveWindowTitle}'");
             ActiveWindow = activeWindowHandle == IntPtr.Zero
                 ? null
                 : poeWindowByHandle.GetOrAdd(activeWindowHandle, x => windowsFactory.Create(x));

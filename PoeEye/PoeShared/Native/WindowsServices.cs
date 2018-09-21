@@ -26,11 +26,15 @@ namespace PoeShared.Native
             try
             {
                 var processId = Process.GetCurrentProcess().Id;
-                Log.Instance.Warn($"[WindowsServices] Calling AllowSetForegroundWindow(pid: {processId})");
+                Log.Instance.Debug($"[WindowsServices] Calling AllowSetForegroundWindow(pid: {processId})");
                 var result = AllowSetForegroundWindow((uint)processId);
                 if (!result)
                 {
                     Log.Instance.Warn($"[WindowsServices] AllowSetForegroundWindow has failed !");
+                }
+                else
+                {
+                    Log.Instance.Debug($"[WindowsServices] Successfully executed AllowSetForegroundWindow(pid: {processId})");
                 }
             }
             catch (Exception e)

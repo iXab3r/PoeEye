@@ -144,7 +144,7 @@ namespace PoeEye.PoeTrade.Updater
 
             try
             {
-                var newVersion = await updaterModel.CheckForUpdates();
+                var newVersion = await Task.Run(updaterModel.CheckForUpdates);
 
                 if (newVersion != null)
                 {

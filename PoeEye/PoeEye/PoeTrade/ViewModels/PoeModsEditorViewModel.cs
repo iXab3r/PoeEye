@@ -124,15 +124,21 @@ namespace PoeEye.PoeTrade.ViewModels
         private IDictionary<string, IPoeItemMod> ToItemMods(IPoeStaticData staticData)
         {
             var result = new Dictionary<string, IPoeItemMod>();
+            var badMods = new List<string>();
             foreach (var itemMod in staticData.ModsList)
             {
                 if (result.ContainsKey(itemMod.Name))
                 {
-                    Log.Instance.Warn($"[PoeModsEditorViewModel] Duplicate mod detected: {itemMod.DumpToTextRaw()} and {result[itemMod.Name].DumpToTextRaw()} share the same key");
+                    badMods.Add($"Duplicate mod detected: {itemMod.DumpToTextRaw()} and {result[itemMod.Name].DumpToTextRaw()} share the same key");
                     continue;
                 }
 
                 result[itemMod.Name] = itemMod;
+            }
+
+            if (badMods.Any())
+            {
+                Log.Instance.Warn($"[PoeModsEditorViewModel] Bad mods detected({badMods.Count})\n\n{badMods.DumpToTable()}");
             }
             return result;
         }

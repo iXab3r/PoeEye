@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
@@ -31,7 +32,7 @@ namespace PoeEye.Prism
 
             Mouse.OverrideCursor = new Cursor(new MemoryStream(Properties.Resources.PathOfExile_102));
             var splashWindow = new SplashScreen("Resources\\Splash.png");
-            splashWindow.Show(true, false);
+            splashWindow.Show(false, false);
 
             var window = (Window)Shell;
             Application.Current.ShutdownMode = ShutdownMode.OnMainWindowClose;
@@ -43,6 +44,7 @@ namespace PoeEye.Prism
                 .Subscribe(
                     () =>
                     {
+                        //splashWindow.Close(TimeSpan.FromSeconds(1));
                         sw.Stop();
                         Log.Instance.Info($"[Bootstrapper] Shell initialization has taken {sw.ElapsedMilliseconds}ms");
                     });
@@ -60,7 +62,7 @@ namespace PoeEye.Prism
             var moduleCatalog = Container.Resolve<IModuleCatalog>();
             var modules = moduleCatalog.Modules.ToArray();
             Log.Instance.Info(
-                $"Modules list:\n{modules.Select(x => new {x.ModuleName, x.ModuleType, x.State, x.InitializationMode, x.DependsOn}).DumpToTextRaw()}");
+                $"Modules list:\n\t{modules.Select(x => new {x.ModuleName, x.ModuleType, x.State, x.InitializationMode, x.DependsOn}).DumpToTable()}");
 
             var window = (Window)Shell;
 

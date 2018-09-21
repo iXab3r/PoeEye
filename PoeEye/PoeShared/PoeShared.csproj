@@ -234,6 +234,7 @@
     <Compile Include="Scaffolding\CircularBuffer.cs" />
     <Compile Include="Scaffolding\ClipboardManager.cs" />
     <Compile Include="Scaffolding\DependencyObjectExtensions.cs" />
+    <Compile Include="Scaffolding\DictionaryExtensions.cs" />
     <Compile Include="Scaffolding\DisposableExtensions.cs" />
     <Compile Include="Scaffolding\Fallback.cs" />
     <Compile Include="Scaffolding\IClipboardManager.cs" />

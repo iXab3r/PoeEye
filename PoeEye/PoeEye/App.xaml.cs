@@ -19,8 +19,6 @@ namespace PoeEye
 {
     public partial class App
     {
-        private static readonly string AppVersion = $"v{Assembly.GetExecutingAssembly().GetName().Version}";
-
         private readonly PoeEyeBootstrapper bootstrapper = new PoeEyeBootstrapper();
 
         public App()
