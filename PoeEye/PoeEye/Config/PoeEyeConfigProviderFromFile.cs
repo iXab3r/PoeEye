@@ -17,7 +17,7 @@ namespace PoeEye.Config
 {
     internal sealed class PoeEyeConfigProviderFromFile : IConfigProvider
     {
-        private static readonly ILog Log = LogManager.GetLogger<PoeEyeConfigProviderFromFile>();
+        private static readonly ILog Log = LogManager.GetLogger(typeof(PoeEyeConfigProviderFromFile));
 
         private static readonly string ConfigFileDirectory = AppArguments.AppDataDirectory;
 

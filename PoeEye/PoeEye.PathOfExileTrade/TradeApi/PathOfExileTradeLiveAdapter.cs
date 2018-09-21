@@ -25,7 +25,7 @@ namespace PoeEye.PathOfExileTrade.TradeApi
 {
     internal sealed class PathOfExileTradeLiveAdapter : DisposableReactiveObject, IPathOfExileTradeLiveAdapter
     {
-        private static readonly ILog Log = LogManager.GetLogger<PathOfExileTradeLiveAdapter>();
+        private static readonly ILog Log = LogManager.GetLogger(typeof(PathOfExileTradeLiveAdapter));
 
         private static readonly int MaxItemsToReplay = 99;
         

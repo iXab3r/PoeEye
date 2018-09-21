@@ -28,7 +28,7 @@ namespace PoeEye.PoeTrade.ViewModels
 {
     internal sealed class MainWindowTabViewModel : DisposableReactiveObject, IMainWindowTabViewModel
     {
-        private static readonly ILog Log = LogManager.GetLogger<MainWindowTabViewModel>();
+        private static readonly ILog Log = LogManager.GetLogger(typeof(MainWindowTabViewModel));
 
         private static int GlobalTabIdx;
         private static readonly TimeSpan ThrottlingPeriod = TimeSpan.FromSeconds(0.5);

@@ -12,7 +12,7 @@ namespace PoeShared.Converters
 {
     public sealed class StringToPoePriceConverter : IConverter<string, PoePrice>, IValueConverter
     {
-        private static readonly ILog Log = LogManager.GetLogger<StringToPoePriceConverter>();
+        private static readonly ILog Log = LogManager.GetLogger(typeof(StringToPoePriceConverter));
 
         private static readonly Lazy<IConverter<string, PoePrice>> InstanceSupplier =
             new Lazy<IConverter<string, PoePrice>>(() => new StringToPoePriceConverter());

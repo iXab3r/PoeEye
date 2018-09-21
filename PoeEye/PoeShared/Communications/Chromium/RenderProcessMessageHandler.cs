@@ -6,7 +6,7 @@ namespace PoeShared.Communications.Chromium
 {
     internal sealed class RenderProcessMessageHandler : IRenderProcessMessageHandler
     {
-        private static readonly ILog Log = LogManager.GetLogger<RenderProcessMessageHandler>();
+        private static readonly ILog Log = LogManager.GetLogger(typeof(RenderProcessMessageHandler));
         
         // Wait for the underlying JavaScript Context to be created. This is only called for the main frame.
         // If the page has no JavaScript, no context will be created.

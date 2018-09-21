@@ -15,7 +15,7 @@ namespace PoeShared.Converters
 {
     public sealed class PoeStashItemToPoeItemConverter : IConverter<IStashItem, IPoeItem>, IConverter<IStashItem, PoeItem>
     {
-        private static readonly ILog Log = LogManager.GetLogger<PoeStashItemToPoeItemConverter>();
+        private static readonly ILog Log = LogManager.GetLogger(typeof(PoeStashItemToPoeItemConverter));
 
         private readonly IClock clock;
         private readonly IConverter<string, PoePrice> priceConverter;

@@ -25,7 +25,7 @@ namespace PoeEye.TradeMonitor.ViewModels
 {
     internal sealed class PoeTradeMonitorViewModel : OverlayViewModelBase
     {
-        private static readonly ILog Log = LogManager.GetLogger<PoeTradeMonitorViewModel>();
+        private static readonly ILog Log = LogManager.GetLogger(typeof(PoeTradeMonitorViewModel));
 
         private readonly DelegateCommand<INegotiationViewModel> closeNegotiationCommand;
         private readonly IConfigProvider<PoeTradeMonitorConfig> configProvider;

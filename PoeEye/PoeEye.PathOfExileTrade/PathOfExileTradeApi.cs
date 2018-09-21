@@ -31,7 +31,7 @@ namespace PoeEye.PathOfExileTrade
 {
     internal sealed class PathOfExileTradeApi : DisposableReactiveObject, IPoeApi, IPoeItemSource
     {
-        private static readonly ILog Log = LogManager.GetLogger<PathOfExileTradeApi>();
+        private static readonly ILog Log = LogManager.GetLogger(typeof(PathOfExileTradeApi));
         
         private static readonly string TradeSearchUri = @"https://www.pathofexile.com/api/trade";
         private readonly IPathOfExileTradePortalApi client;

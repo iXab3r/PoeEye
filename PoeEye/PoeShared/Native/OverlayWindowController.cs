@@ -21,7 +21,7 @@ namespace PoeShared.Native
 {
     internal sealed class OverlayWindowController : DisposableReactiveObject, IOverlayWindowController
     {
-        private static readonly ILog Log = LogManager.GetLogger<OverlayWindowController>();
+        private static readonly ILog Log = LogManager.GetLogger(typeof(OverlayWindowController));
 
         private readonly ISourceList<OverlayWindowView> windows = new SourceList<OverlayWindowView>();
         private readonly BehaviorSubject<IntPtr> lastActiveWindowHandle = new BehaviorSubject<IntPtr>(IntPtr.Zero);

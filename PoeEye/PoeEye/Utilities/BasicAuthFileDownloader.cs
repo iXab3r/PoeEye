@@ -14,7 +14,7 @@ namespace PoeEye.Utilities
 {
     internal sealed class BasicAuthFileDownloader : IFileDownloader
     {
-        private static readonly ILog Log = LogManager.GetLogger<BasicAuthFileDownloader>();
+        private static readonly ILog Log = LogManager.GetLogger(typeof(BasicAuthFileDownloader));
 
         private readonly NetworkCredential credentials;
 

@@ -14,7 +14,7 @@ namespace PoeBud.Models
 {
     internal sealed class PoeWindowManager : DisposableReactiveObject, IPoeWindowManager
     {
-        private static readonly ILog Log = LogManager.GetLogger<PoeWindowManager>();
+        private static readonly ILog Log = LogManager.GetLogger(typeof(PoeWindowManager));
         
         private readonly ConcurrentDictionary<IntPtr, IPoeWindow> poeWindowByHandle = new ConcurrentDictionary<IntPtr, IPoeWindow>();
         private readonly IWindowTracker poeWindowTracker;

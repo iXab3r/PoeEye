@@ -13,7 +13,7 @@ namespace PoeShared.Communications.Chromium
 {
     internal sealed class ChromiumBootstrapper : DisposableReactiveObject, IChromiumBootstrapper
     {
-        private static readonly ILog Log = LogManager.GetLogger<ChromiumBootstrapper>();
+        private static readonly ILog Log = LogManager.GetLogger(typeof(ChromiumBootstrapper));
 
         private static readonly string AssemblyDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 

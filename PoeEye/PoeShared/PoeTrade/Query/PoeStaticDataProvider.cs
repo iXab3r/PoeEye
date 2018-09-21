@@ -10,7 +10,7 @@ namespace PoeShared.PoeTrade.Query
 {
     internal sealed class PoeStaticDataProvider : DisposableReactiveObject, IPoeStaticDataProvider
     {
-        private static readonly ILog Log = LogManager.GetLogger<PoeStaticDataProvider>();
+        private static readonly ILog Log = LogManager.GetLogger(typeof(PoeStaticDataProvider));
 
         private readonly IPoeApi poeApi;
 

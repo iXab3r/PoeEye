@@ -24,7 +24,7 @@ namespace PoeShared.PoeDatabase.PoeNinja
 {
     internal sealed class PoeNinjaDatabaseReader : DisposableReactiveObject, IPoeDatabaseReader, IPoeEconomicsSource
     {
-        private static readonly ILog Log = LogManager.GetLogger<PoeNinjaDatabaseReader>();
+        private static readonly ILog Log = LogManager.GetLogger(typeof(PoeNinjaDatabaseReader));
 
         private static readonly string PoeNinjaDataUri = @"http://poe.ninja/api/Data/";
         private static readonly string StandardLeagueName = "Standard";

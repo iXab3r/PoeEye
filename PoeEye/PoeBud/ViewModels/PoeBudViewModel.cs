@@ -28,7 +28,7 @@ namespace PoeBud.ViewModels
 {
     internal sealed class PoeBudViewModel : OverlayViewModelBase
     {
-        private static readonly ILog Log = LogManager.GetLogger<PoeBudViewModel>();
+        private static readonly ILog Log = LogManager.GetLogger(typeof(PoeBudViewModel));
 
         private static readonly TimeSpan UpdateTimeout = TimeSpan.FromSeconds(1);
         private readonly IClock clock;

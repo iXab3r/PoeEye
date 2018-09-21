@@ -19,7 +19,7 @@ namespace PoeEye.Prism
 {
     internal sealed class PoeEyeBootstrapper : UnityBootstrapper
     {
-        private static readonly ILog Log = LogManager.GetLogger<PoeEyeBootstrapper>();
+        private static readonly ILog Log = LogManager.GetLogger(typeof(PoeEyeBootstrapper));
 
         protected override DependencyObject CreateShell()
         {

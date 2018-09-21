@@ -30,7 +30,7 @@ namespace PoeEye.PoeTrade.ViewModels
 {
     internal sealed class PoeSummaryTabViewModel : DisposableReactiveObject, IPoeSummaryTabViewModel
     {
-        private static readonly ILog Log = LogManager.GetLogger<PoeSummaryTabViewModel>();
+        private static readonly ILog Log = LogManager.GetLogger(typeof(PoeSummaryTabViewModel));
 
         private static readonly TimeSpan ResortRefilterThrottleTimeout = TimeSpan.FromMilliseconds(250);
 

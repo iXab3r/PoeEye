@@ -27,7 +27,7 @@ namespace PoeEye.PoeTradeRealtimeApi
 {
     internal sealed class RealtimeItemSource : DisposableReactiveObject, IRealtimeItemSource
     {
-        private static readonly ILog Log = LogManager.GetLogger<RealtimeItemSource>();
+        private static readonly ILog Log = LogManager.GetLogger(typeof(RealtimeItemSource));
 
         private static readonly string PoeTradeSearchUri = @"http://poe.trade/search";
         private static readonly string PoeTradeUri = @"http://poe.trade";

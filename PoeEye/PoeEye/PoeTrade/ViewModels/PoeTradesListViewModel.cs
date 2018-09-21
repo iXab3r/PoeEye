@@ -28,7 +28,7 @@ namespace PoeEye.PoeTrade.ViewModels
 {
     internal sealed class PoeTradesListViewModel : DisposableReactiveObject, IPoeTradesListViewModel
     {
-        private static readonly ILog Log = LogManager.GetLogger<PoeTradesListViewModel>();
+        private static readonly ILog Log = LogManager.GetLogger(typeof(PoeTradesListViewModel));
         
         private static readonly TimeSpan TimeSinceLastUpdateRefreshTimeout = TimeSpan.FromSeconds(1);
         private static readonly TimeSpan RecheckPeriodThrottleTimeout = TimeSpan.FromSeconds(1);

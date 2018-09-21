@@ -21,7 +21,7 @@ namespace PoeShared.PoeTrade
 {
     internal sealed class PoeLiveHistoryProvider : DisposableReactiveObject, IPoeLiveHistoryProvider
     {
-        private static readonly ILog Log = LogManager.GetLogger<PoeLiveHistoryProvider>();
+        private static readonly ILog Log = LogManager.GetLogger(typeof(PoeLiveHistoryProvider));
 
         private readonly TimeSpan delayAfterError = TimeSpan.FromSeconds(30);
         

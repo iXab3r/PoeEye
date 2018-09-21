@@ -35,7 +35,7 @@ namespace PoeEye.PoeTradeRealtimeApi
 {
     internal sealed class WebSocketRealtimeItemSource : DisposableReactiveObject, IRealtimeItemSource
     {
-        private static readonly ILog Log = LogManager.GetLogger<WebSocketRealtimeItemSource>();
+        private static readonly ILog Log = LogManager.GetLogger(typeof(WebSocketRealtimeItemSource));
         
         private static readonly string PoeTradeSearchUri = @"http://poe.trade/search";
         private static readonly string PoeTradeWebSocketUri = @"ws://live.poe.trade";

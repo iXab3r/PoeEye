@@ -33,7 +33,7 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
 {
     internal sealed class MainWindowViewModel : DisposableReactiveObject, IMainWindowViewModel
     {
-        private static readonly ILog Log = LogManager.GetLogger<MainWindowViewModel>();
+        private static readonly ILog Log = LogManager.GetLogger(typeof(MainWindowViewModel));
         
         private static readonly int UndoStackDepth = 10;
 

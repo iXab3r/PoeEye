@@ -16,7 +16,7 @@ namespace PoeShared.PoeTrade
 {
     internal class PoeApiWrapper : DisposableReactiveObject, IPoeApiWrapper
     {
-        private static readonly ILog Log = LogManager.GetLogger<PoeApiWrapper>();
+        private static readonly ILog Log = LogManager.GetLogger(typeof(PoeApiWrapper));
 
         private readonly IPoeApi api;
         private readonly IPoeStaticDataProvider provider;

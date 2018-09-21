@@ -22,7 +22,7 @@ namespace PoeBud.ViewModels
 {
     internal sealed class SolutionExecutorViewModel : DisposableReactiveObject, ISolutionExecutorViewModel
     {
-        private static readonly ILog Log = LogManager.GetLogger<SolutionExecutorViewModel>();
+        private static readonly ILog Log = LogManager.GetLogger(typeof(SolutionExecutorViewModel));
 
         private readonly IClock clock;
         private readonly IHighlightingService highlightingService;

@@ -20,7 +20,7 @@ namespace PoeEye.Prism
 {
     internal sealed class MainModule : IPoeEyeModule
     {
-        private static readonly ILog Log = LogManager.GetLogger<MainModule>();
+        private static readonly ILog Log = LogManager.GetLogger(typeof(MainModule));
 
         private readonly CompositeDisposable anchors = new CompositeDisposable();
         private readonly IUnityContainer container;

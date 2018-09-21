@@ -13,7 +13,7 @@ namespace PoeShared.Modularity
 {
     public sealed class GenericConfigProvider<TConfig> : DisposableReactiveObject, IConfigProvider<TConfig> where TConfig : class, IPoeEyeConfig, new()
     {
-        private static readonly ILog Log = LogManager.GetLogger<GenericConfigProvider<TConfig>>();
+        private static readonly ILog Log = LogManager.GetLogger(typeof(GenericConfigProvider<TConfig>));
 
         private readonly IConfigProvider configProvider;
         private TConfig actualConfig;

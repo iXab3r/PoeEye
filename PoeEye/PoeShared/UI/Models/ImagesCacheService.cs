@@ -18,7 +18,7 @@ namespace PoeShared.UI.Models
 {
     internal sealed class ImagesCacheService : IImagesCacheService
     {
-        private static readonly ILog Log = LogManager.GetLogger<ImagesCacheService>();
+        private static readonly ILog Log = LogManager.GetLogger(typeof(ImagesCacheService));
         
         private static readonly TimeSpan ArtificialDelay = TimeSpan.FromSeconds(5);
 

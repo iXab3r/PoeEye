@@ -27,7 +27,7 @@ namespace PoeEye.PoeTrade.ViewModels
 {
     internal sealed class PoeTradeViewModel : DisposableReactiveObject, IPoeTradeViewModel
     {
-        private static readonly ILog Log = LogManager.GetLogger<PoeTradeViewModel>();
+        private static readonly ILog Log = LogManager.GetLogger(typeof(PoeTradeViewModel));
 
         private static readonly TimeSpan RefreshTimeout = TimeSpan.FromMinutes(1);
         private readonly IPoeChatService chatService;

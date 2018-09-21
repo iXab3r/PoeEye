@@ -17,7 +17,7 @@ namespace PoeBud.Models
 {
     internal sealed class SolutionExecutorModel : ISolutionExecutorModel
     {
-        private static readonly ILog Log = LogManager.GetLogger<SolutionExecutorModel>();
+        private static readonly ILog Log = LogManager.GetLogger(typeof(SolutionExecutorModel));
         
         private readonly IHighlightingService highlightingService;
         private readonly ISubject<string> logQueue = new Subject<string>();

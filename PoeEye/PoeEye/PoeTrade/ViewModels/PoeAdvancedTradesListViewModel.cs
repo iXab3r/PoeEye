@@ -29,7 +29,7 @@ namespace PoeEye.PoeTrade.ViewModels
 {
     internal sealed class PoeAdvancedTradesListViewModel : DisposableReactiveObject, IPoeAdvancedTradesListViewModel
     {
-        private static readonly ILog Log = LogManager.GetLogger<PoeAdvancedTradesListViewModel>();
+        private static readonly ILog Log = LogManager.GetLogger(typeof(PoeAdvancedTradesListViewModel));
         
         private static readonly Func<IPoeTradeViewModel, bool> AlwaysTruePredicate = model => true;
         private static readonly TimeSpan ResortRefilterThrottleTimeout = TimeSpan.FromMilliseconds(250);

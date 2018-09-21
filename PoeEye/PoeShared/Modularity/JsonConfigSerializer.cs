@@ -14,7 +14,7 @@ namespace PoeShared.Modularity
 {
     internal class JsonConfigSerializer : IConfigSerializer
     {
-        private static readonly ILog Log = LogManager.GetLogger<JsonConfigSerializer>();
+        private static readonly ILog Log = LogManager.GetLogger(typeof(JsonConfigSerializer));
 
         private readonly IReactiveList<JsonConverter> converters = new ReactiveList<JsonConverter>();
         private readonly int MaxCharsToLog = 1024;

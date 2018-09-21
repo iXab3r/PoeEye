@@ -15,7 +15,7 @@ namespace PoeWhisperMonitor
 {
     internal sealed class PoeMessagesSource : DisposableReactiveObject, IPoeMessagesSource
     {
-        private static readonly ILog Log = LogManager.GetLogger<PoeMessagesSource>();
+        private static readonly ILog Log = LogManager.GetLogger(typeof(PoeMessagesSource));
         
         private readonly ICollection<string> linesBuffer = new List<string>();
         private readonly IPoeChatMessageProcessor messageProcessor;

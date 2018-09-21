@@ -16,7 +16,7 @@ namespace PoeShared.Scaffolding
 {
     internal sealed class WindowTracker : DisposableReactiveObject, IWindowTracker
     {
-        private static readonly ILog Log = LogManager.GetLogger<WindowTracker>();
+        private static readonly ILog Log = LogManager.GetLogger(typeof(WindowTracker));
         
         private static readonly TimeSpan MinRecheckPeriod = TimeSpan.FromMilliseconds(50);
         private static readonly TimeSpan RecheckPeriod = TimeSpan.FromMilliseconds(250);

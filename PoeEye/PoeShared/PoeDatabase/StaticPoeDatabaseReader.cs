@@ -15,7 +15,7 @@ namespace PoeShared.PoeDatabase
 {
     internal sealed class StaticPoeDatabaseReader : DisposableReactiveObject, IPoeDatabaseReader
     {
-        private static readonly ILog Log = LogManager.GetLogger<StaticPoeDatabaseReader>();
+        private static readonly ILog Log = LogManager.GetLogger(typeof(StaticPoeDatabaseReader));
 
         private readonly ISourceList<string> knownEntities = new SourceList<string>();
         private readonly ReadOnlyObservableCollection<string> knownEntityNames;

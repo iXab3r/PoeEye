@@ -15,7 +15,7 @@ namespace PoeShared.Communications.Chromium
 {
     internal sealed class ChromiumBrowserFactory : DisposableReactiveObject, IChromiumBrowserFactory
     {
-        private static readonly ILog Log = LogManager.GetLogger<ChromiumBrowserFactory>();
+        private static readonly ILog Log = LogManager.GetLogger(typeof(ChromiumBrowserFactory));
 
         private readonly IFactory<ChromiumBrowser, ChromiumWebBrowser> browserFactory;
 

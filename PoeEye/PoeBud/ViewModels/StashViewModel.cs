@@ -17,7 +17,7 @@ namespace PoeBud.ViewModels
 {
     internal sealed class StashViewModel : DisposableReactiveObject
     {
-        private static readonly ILog Log = LogManager.GetLogger<StashViewModel>();
+        private static readonly ILog Log = LogManager.GetLogger(typeof(StashViewModel));
 
         public StashViewModel(
             [NotNull] StashUpdate stashUpdate,

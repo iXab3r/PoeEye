@@ -22,7 +22,7 @@ namespace PoeEye.PoeTrade
 {
     internal sealed class PoeTradeApi : DisposableReactiveObject, IPoeApi
     {
-        private static readonly ILog Log = LogManager.GetLogger<PoeTradeApi>();
+        private static readonly ILog Log = LogManager.GetLogger(typeof(PoeTradeApi));
 
         private static readonly string PoeTradeSearchUri = @"http://poe.trade/search";
 

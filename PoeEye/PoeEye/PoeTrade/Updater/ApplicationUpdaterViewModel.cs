@@ -21,7 +21,7 @@ namespace PoeEye.PoeTrade.Updater
 {
     internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject
     {
-        private static readonly ILog Log = LogManager.GetLogger<ApplicationUpdaterViewModel>();
+        private static readonly ILog Log = LogManager.GetLogger(typeof(ApplicationUpdaterViewModel));
 
         private readonly CommandWrapper checkForUpdatesCommand;
         private readonly CommandWrapper restartCommand;

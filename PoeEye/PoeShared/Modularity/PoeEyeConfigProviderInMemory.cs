@@ -9,7 +9,7 @@ namespace PoeShared.Modularity
 {
     public sealed class PoeEyeConfigProviderInMemory : IConfigProvider
     {
-        private static readonly ILog Log = LogManager.GetLogger<PoeEyeConfigProviderInMemory>();
+        private static readonly ILog Log = LogManager.GetLogger(typeof(PoeEyeConfigProviderInMemory));
 
         private readonly ISubject<Unit> configHasChanged = new Subject<Unit>();
         private readonly ConcurrentDictionary<Type, IPoeEyeConfig> loadedConfigs = new ConcurrentDictionary<Type, IPoeEyeConfig>();

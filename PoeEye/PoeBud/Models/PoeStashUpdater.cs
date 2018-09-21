@@ -23,7 +23,7 @@ namespace PoeBud.Models
 {
     internal sealed class PoeStashUpdater : DisposableReactiveObject, IPoeStashUpdater
     {
-        private static readonly ILog Log = LogManager.GetLogger<PoeStashUpdater>();
+        private static readonly ILog Log = LogManager.GetLogger(typeof(PoeStashUpdater));
         
         private readonly IClock clock;
         private readonly IStashUpdaterParameters config;

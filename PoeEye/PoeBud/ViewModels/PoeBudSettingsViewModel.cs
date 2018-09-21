@@ -25,7 +25,7 @@ namespace PoeBud.ViewModels
 {
     internal sealed class PoeBudSettingsViewModel : DisposableReactiveObject, ISettingsViewModel<PoeBudConfig>
     {
-        private static readonly ILog Log = LogManager.GetLogger<PoeBudSettingsViewModel>();
+        private static readonly ILog Log = LogManager.GetLogger(typeof(PoeBudSettingsViewModel));
 
         private readonly SerialDisposable characterSelectionDisposable = new SerialDisposable();
         private readonly IUiOverlaysProvider overlaysProvider;

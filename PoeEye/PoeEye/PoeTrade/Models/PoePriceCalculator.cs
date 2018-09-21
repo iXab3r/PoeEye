@@ -19,7 +19,7 @@ namespace PoeEye.PoeTrade.Models
 
     internal sealed class PoePriceCalculator : DisposableReactiveObject, IPoePriceCalculcator
     {
-        private static readonly ILog Log = LogManager.GetLogger<PoePriceCalculator>();
+        private static readonly ILog Log = LogManager.GetLogger(typeof(PoePriceCalculator));
 
         private readonly IDictionary<string, float> currencyByType = new Dictionary<string, float>();
 

@@ -9,7 +9,7 @@ namespace PoeEye.Utilities
 {
     internal sealed class TabablzPositionMonitor<T> : VerticalPositionMonitor
     {
-        private static readonly ILog Log = LogManager.GetLogger<TabablzPositionMonitor<T>>();
+        private static readonly ILog Log = LogManager.GetLogger(typeof(TabablzPositionMonitor<T>));
         
         public TabablzPositionMonitor()
         {

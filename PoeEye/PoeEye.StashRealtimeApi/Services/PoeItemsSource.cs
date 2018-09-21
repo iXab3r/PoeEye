@@ -25,7 +25,7 @@ namespace PoeEye.StashRealtimeApi.Services
 {
     internal sealed class PoeItemsSource : DisposableReactiveObject, IPoeItemsSource
     {
-        private static readonly ILog Log = LogManager.GetLogger<PoeItemsSource>();
+        private static readonly ILog Log = LogManager.GetLogger(typeof(PoeItemsSource));
 
         private static readonly TimeSpan AllowedPollingInterval = TimeSpan.FromMilliseconds(1100);
         private static readonly string StashApiUri = @"http://www.pathofexile.com/api";

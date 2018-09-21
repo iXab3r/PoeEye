@@ -6,7 +6,7 @@ namespace PoeShared.Communications.Chromium
 {
     internal sealed class LogRequestHandler : IRequestHandler
     {
-        private static readonly ILog Log = LogManager.GetLogger<LogRequestHandler>();
+        private static readonly ILog Log = LogManager.GetLogger(typeof(LogRequestHandler));
         
         public bool OnBeforeBrowse(IWebBrowser browserControl, IBrowser browser, IFrame frame, IRequest request, bool isRedirect)
         {

@@ -19,7 +19,7 @@ namespace PoeShared.Communications.Chromium
 {
     internal sealed class ChromiumBrowser : DisposableReactiveObject, IChromiumBrowser
     {
-        private static readonly ILog Log = LogManager.GetLogger<ChromiumBrowser>();
+        private static readonly ILog Log = LogManager.GetLogger(typeof(ChromiumBrowser));
         
         private readonly Lazy<string> browserId;
         private readonly ChromiumWebBrowser instance;

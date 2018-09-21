@@ -16,7 +16,7 @@ namespace PoeEye.PoeTrade.Models
 {
     internal sealed class PoeApiProvider : DisposableReactiveObject, IPoeApiProvider
     {
-        private static readonly ILog Log = LogManager.GetLogger<PoeApiProvider>();
+        private static readonly ILog Log = LogManager.GetLogger(typeof(PoeApiProvider));
 
         private readonly ObservableCollectionExtended<IPoeApiWrapper> modulesList = new ObservableCollectionExtended<IPoeApiWrapper>();
 

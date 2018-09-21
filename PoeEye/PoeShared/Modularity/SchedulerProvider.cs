@@ -16,7 +16,7 @@ namespace PoeShared.Modularity
 {
     internal class SchedulerProvider : DisposableReactiveObject, ISchedulerProvider
     {
-        private static readonly ILog Log = LogManager.GetLogger<SchedulerProvider>();
+        private static readonly ILog Log = LogManager.GetLogger(typeof(SchedulerProvider));
         
         private readonly ConcurrentDictionary<string, IScheduler> schedulers = new ConcurrentDictionary<string, IScheduler>();
         private readonly IScheduler uiScheduler;

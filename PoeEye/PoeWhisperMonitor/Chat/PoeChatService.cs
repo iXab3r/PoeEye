@@ -19,7 +19,7 @@ namespace PoeWhisperMonitor.Chat
 {
     internal sealed class PoeChatService : DisposableReactiveObject, IPoeChatService
     {
-        private static readonly ILog Log = LogManager.GetLogger<PoeChatService>();
+        private static readonly ILog Log = LogManager.GetLogger(typeof(PoeChatService));
         
         private readonly IClipboardManager clipboardManager;
 

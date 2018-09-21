@@ -21,7 +21,7 @@ namespace PoeBud.ViewModels
 {
     internal sealed class PriceSummaryViewModel : DisposableReactiveObject, IPriceSummaryViewModel
     {
-        private static readonly ILog Log = LogManager.GetLogger<PriceSummaryViewModel>();
+        private static readonly ILog Log = LogManager.GetLogger(typeof(PriceSummaryViewModel));
 
         private readonly IPoePriceCalculcator poePriceCalculcator;
         private readonly ObservableCollection<Tuple<PoePrice, PoePrice>> pricesByType = new ObservableCollection<Tuple<PoePrice, PoePrice>>();

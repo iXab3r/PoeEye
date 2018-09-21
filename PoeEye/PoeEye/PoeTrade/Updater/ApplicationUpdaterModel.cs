@@ -22,7 +22,7 @@ namespace PoeEye.PoeTrade.Updater
 {
     internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IApplicationUpdaterModel
     {
-        private static readonly ILog Log = LogManager.GetLogger<ApplicationUpdaterModel>();
+        private static readonly ILog Log = LogManager.GetLogger(typeof(ApplicationUpdaterModel));
 
         private static readonly string ApplicationName = Process.GetCurrentProcess().ProcessName + ".exe";
 

@@ -15,7 +15,7 @@ namespace PoeBud.Models
 {
     internal sealed class UserInteractionsManager : IUserInteractionsManager
     {
-        private static readonly ILog Log = LogManager.GetLogger<UserInteractionsManager>();
+        private static readonly ILog Log = LogManager.GetLogger(typeof(UserInteractionsManager));
 
         private readonly IInputSimulator inputSimulator;
         private readonly IUserInputBlocker userInputBlocker;

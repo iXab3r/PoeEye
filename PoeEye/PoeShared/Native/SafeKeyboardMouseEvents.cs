@@ -15,7 +15,7 @@ namespace PoeShared.Native
 {
     internal sealed class KeyboardEventsSource : DisposableReactiveObject, IKeyboardEventsSource
     {
-        private static readonly ILog Log = LogManager.GetLogger<KeyboardEventsSource>();
+        private static readonly ILog Log = LogManager.GetLogger(typeof(KeyboardEventsSource));
 
         private readonly IScheduler kbdScheduler;
         private readonly IKeyboardMouseEvents keyboardMouseEvents;

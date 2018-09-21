@@ -24,7 +24,7 @@ namespace PoeEye.TradeMonitor.Services
 {
     internal sealed class PoeStashService : DisposableReactiveObject, IPoeStashService
     {
-        private static readonly ILog Log = LogManager.GetLogger<PoeStashService>();
+        private static readonly ILog Log = LogManager.GetLogger(typeof(PoeStashService));
 
         private readonly IClock clock;
         private readonly SerialDisposable stashUpdaterDisposable = new SerialDisposable();
