@@ -27,6 +27,9 @@ namespace PoeShared.Native
                                                .FromEventPattern<RoutedEventHandler, RoutedEventArgs>(h => Loaded += h, h => Loaded -= h)
                                                .ToUnit();
 
+        public IObservable<Unit> WhenRendered => Observable
+                                               .FromEventPattern<EventHandler, EventArgs>(h => ContentRendered += h, h => ContentRendered -= h)
+                                               .ToUnit();
 
         private void OnSizeChanged(object sender, SizeChangedEventArgs sizeChangedEventArgs)
         {
