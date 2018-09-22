@@ -17,8 +17,7 @@ namespace PoeEye.StashGrid.Prism
         private readonly IFactory<PoeStashGridViewModel, IOverlayWindowController> viewModelFactory;
 
         public StashGridBootstrapper(
-            [NotNull] [Dependency(WellKnownOverlays.PathOfExileOverlay)]
-            IOverlayWindowController overlayController,
+            [NotNull] [Dependency(WellKnownOverlays.PathOfExileOverlay)] IOverlayWindowController overlayController,
             [NotNull] IFactory<PoeStashGridViewModel, IOverlayWindowController> viewModelFactory,
             [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {

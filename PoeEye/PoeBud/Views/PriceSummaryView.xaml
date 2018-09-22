@@ -4,29 +4,28 @@
                     xmlns:system="clr-namespace:System;assembly=mscorlib"
                     xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity">
     <DataTemplate DataType="{x:Type viewModels:PriceSummaryViewModel}">
-        <Grid 
+        <Grid
             Background="Transparent"
             ToolTipService.ShowOnDisabled="True"
-            ToolTipService.ShowDuration="{x:Static system:Int32.MaxValue}" 
-            >
+            ToolTipService.ShowDuration="{x:Static system:Int32.MaxValue}">
             <Grid.ToolTip>
-                  <StackPanel Orientation="Vertical">
-                      <ItemsControl ItemsSource="{Binding PricesByType}">
-                          <ItemsControl.ItemTemplate>
-                              <DataTemplate>
-                                  <DockPanel LastChildFill="True">
-                                      <ContentControl DockPanel.Dock="Left" Content="{Binding Item1}"/>
-                                      <ContentControl DockPanel.Dock="Right" HorizontalAlignment="Right" MinWidth="120" Content="{Binding Item2}"/>
-                                  </DockPanel>
-                              </DataTemplate>
-                          </ItemsControl.ItemTemplate>
-                      </ItemsControl>
-                      <ContentPresenter Margin="0,10,0,5" Content="{Binding PriceInChaosOrbs}"/>
-                  </StackPanel>
+                <StackPanel Orientation="Vertical">
+                    <ItemsControl ItemsSource="{Binding PricesByType}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <DockPanel LastChildFill="True">
+                                    <ContentControl DockPanel.Dock="Left" Content="{Binding Item1}" />
+                                    <ContentControl DockPanel.Dock="Right" HorizontalAlignment="Right" MinWidth="120" Content="{Binding Item2}" />
+                                </DockPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <ContentPresenter Margin="0,10,0,5" Content="{Binding PriceInChaosOrbs}" />
+                </StackPanel>
             </Grid.ToolTip>
-            
-            <ContentControl Content="{Binding PriceInChaosOrbs}"/>
-            
+
+            <ContentControl Content="{Binding PriceInChaosOrbs}" />
+
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="MouseLeftButtonDown">
                     <i:InvokeCommandAction Command="{Binding ShowHighlighting}" />

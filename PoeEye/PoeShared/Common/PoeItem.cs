@@ -89,7 +89,7 @@ namespace PoeShared.Common
         public DateTime? Timestamp { get; set; }
 
         public PoeTradeState ItemState { get; set; }
-        
+
         public bool Equals(IPoeItem other)
         {
             return PoeItemEqualityComparer.Instance.Equals(this, other);

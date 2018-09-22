@@ -44,7 +44,7 @@ namespace PoeShared.PoeDatabase
 
         private static string[] GetEntities()
         {
-            Log.Debug($"[StaticPoeDatabaseReader] Loading database...");
+            Log.Debug("[StaticPoeDatabaseReader] Loading database...");
 
             var result = new HashSet<string>();
             var resources = new HashSet<string>

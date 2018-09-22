@@ -9,7 +9,6 @@ using Guards;
 using JetBrains.Annotations;
 using PoeBud.Scaffolding;
 using PoeBud.Services;
-using PoeShared;
 using PoeShared.Scaffolding;
 using PoeShared.StashApi.DataTypes;
 
@@ -18,7 +17,7 @@ namespace PoeBud.Models
     internal sealed class SolutionExecutorModel : ISolutionExecutorModel
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(SolutionExecutorModel));
-        
+
         private readonly IHighlightingService highlightingService;
         private readonly ISubject<string> logQueue = new Subject<string>();
         private readonly IPoeWindowManager windowManager;

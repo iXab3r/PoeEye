@@ -122,12 +122,12 @@
                                        FontWeight="Bold" />
                         </StackPanel>
                     </Border>
-                    
+
                     <Border Grid.Row="2"
                             BorderBrush="{StaticResource OverlayWindowBorderBrushKey}"
                             BorderThickness="1"
                             Visibility="{Binding Content.IsLocked, Converter={StaticResource TrueToHiddenFalseToVisibleConverter}}"
-                            Margin="3"/>
+                            Margin="3" />
 
                     <!-- Body -->
                     <ContentControl Grid.Row="2"

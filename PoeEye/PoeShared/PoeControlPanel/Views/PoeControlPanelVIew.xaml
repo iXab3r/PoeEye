@@ -28,7 +28,7 @@
                                      VerticalAlignment="Center">
                 <materialDesign:PopupBox.Effect>
                     <DropShadowEffect BlurRadius="10" ShadowDepth="0" Direction="0" Opacity="1"
-                                      RenderingBias="Performance"    
+                                      RenderingBias="Performance"
                                       Color="{StaticResource OverlayWindowBorderColorKey}" />
                 </materialDesign:PopupBox.Effect>
                 <materialDesign:PopupBox.ToggleContent>

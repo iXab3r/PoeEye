@@ -9,7 +9,7 @@ namespace PoeShared.PoeTrade
     public sealed class PoeQueryInfo : IPoeQueryInfo
     {
         public static readonly IPoeQueryInfo Empty = new PoeQueryInfo();
-        
+
         public static readonly IEqualityComparer<IPoeQueryInfo> Comparer =
             new LambdaComparer<IPoeQueryInfo>((x, y) => string.CompareOrdinal(x?.DumpToText(), y?.DumpToText()) == 0);
 
@@ -18,6 +18,8 @@ namespace PoeShared.PoeTrade
         public string[] LeaguesList { get; set; }
 
         public IPoeQueryRangeModArgument[] Mods { get; set; }
+
+        public bool IsExpanded { get; set; }
 
         public bool AlternativeArt { get; set; }
 
@@ -64,8 +66,6 @@ namespace PoeShared.PoeTrade
         public int? IncQuantityMax { get; set; }
 
         public int? IncQuantityMin { get; set; }
-
-        public bool IsExpanded { get; set; }
 
         public string ItemBase { get; set; }
 

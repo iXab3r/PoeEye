@@ -3,9 +3,9 @@
                     xmlns:common="clr-namespace:PoeShared.Common;assembly=PoeShared"
                     xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls">
 
-  <DataTemplate DataType="{x:Type common:PoeItemMod}">
-    <ContentControl>
-      <TextBlock Text="{Binding Name}" FontSize="15"/>
-    </ContentControl>
-  </DataTemplate>
+    <DataTemplate DataType="{x:Type common:PoeItemMod}">
+        <ContentControl>
+            <TextBlock Text="{Binding Name}" FontSize="15" />
+        </ContentControl>
+    </DataTemplate>
 </ResourceDictionary>

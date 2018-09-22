@@ -20,7 +20,7 @@ namespace PoeWhisperMonitor.Chat
     internal sealed class PoeChatService : DisposableReactiveObject, IPoeChatService
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(PoeChatService));
-        
+
         private readonly IClipboardManager clipboardManager;
 
         private readonly IKeyboardSimulator keyboardSimulator = new InputSimulator().Keyboard;
@@ -111,7 +111,7 @@ namespace PoeWhisperMonitor.Chat
                 PoeProcessInfo process;
                 if (!knownProcesses.TryPeek(out process))
                 {
-                    Log.Trace($"[PoeChatService] Failed to get active process");
+                    Log.Trace("[PoeChatService] Failed to get active process");
                     request.Consumer.TrySetResult(PoeMessageSendStatus.FailedProcessNotFound);
                     return;
                 }
@@ -151,7 +151,7 @@ namespace PoeWhisperMonitor.Chat
                 if (existingClipboardContent != null)
                 {
                     Thread.Sleep(clipboardManager.ClipboardRestorationTimeout);
-                    Log.Trace($"[PoeChatService] Restoring previous clipboard content");
+                    Log.Trace("[PoeChatService] Restoring previous clipboard content");
                     clipboardManager.SetDataObject(existingClipboardContent);
                 }
 

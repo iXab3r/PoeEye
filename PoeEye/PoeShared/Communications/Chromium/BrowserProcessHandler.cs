@@ -2,15 +2,18 @@
 using System.Diagnostics;
 using System.Threading.Tasks;
 using CefSharp;
+using Common.Logging;
 
 namespace PoeShared.Communications.Chromium
 {
     internal sealed class BrowserProcessHandler : IBrowserProcessHandler
     {
+        private static readonly ILog Log = LogManager.GetLogger(typeof(BrowserProcessHandler));
+
         /// <summary>
         ///     The maximum number of milliseconds we're willing to wait between calls to OnScheduleMessagePumpWork().
         /// </summary>
-        protected const int MaxTimerDelay = 1000 / 30; // 30fps
+        private const int MaxTimerDelay = 1000 / 30; // 30fps
 
         void IBrowserProcessHandler.OnContextInitialized()
         {
@@ -33,12 +36,12 @@ namespace PoeShared.Communications.Chromium
 
                         foreach (var cookie in cookies)
                         {
-                            Debug.WriteLine("CookieName:" + cookie.Name);
+                            Log.Trace($"[[Chromium] CookieName: {cookie}");
                         }
                     }
                     else
                     {
-                        Debug.WriteLine("No Cookies found");
+                        Log.Trace($"[[Chromium] No Cookies found");
                     }
                 });
             }
@@ -69,7 +72,7 @@ namespace PoeShared.Communications.Chromium
         {
         }
 
-        protected void OnScheduleMessagePumpWork(int delay)
+        private void OnScheduleMessagePumpWork(int delay)
         {
             //TODO: Schedule work on the UI thread - call Cef.DoMessageLoopWork
         }

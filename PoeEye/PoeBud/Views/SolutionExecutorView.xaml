@@ -9,7 +9,7 @@
         <DataTemplate.Resources>
             <ResourceDictionary>
                 <ResourceDictionary.MergedDictionaries>
-                    <ResourceDictionary Source="../Themes/Generic.xaml"/>
+                    <ResourceDictionary Source="../Themes/Generic.xaml" />
                 </ResourceDictionary.MergedDictionaries>
             </ResourceDictionary>
         </DataTemplate.Resources>
@@ -17,28 +17,28 @@
         <Grid TextBlock.FontSize="20">
             <Grid.Style>
                 <Style TargetType="{x:Type Grid}">
-                    <Setter Property="Opacity" Value="0"></Setter>
+                    <Setter Property="Opacity" Value="0" />
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding IsBusy}" Value="True">
                             <DataTrigger.EnterActions>
                                 <BeginStoryboard>
                                     <Storyboard>
-                                        <DoubleAnimation 
-                                             Storyboard.TargetProperty="Opacity"
-                                             From="0"
-                                             To="1"
-                                             Duration="0:0:1"/>
+                                        <DoubleAnimation
+                                            Storyboard.TargetProperty="Opacity"
+                                            From="0"
+                                            To="1"
+                                            Duration="0:0:1" />
                                     </Storyboard>
                                 </BeginStoryboard>
                             </DataTrigger.EnterActions>
                             <DataTrigger.ExitActions>
                                 <BeginStoryboard>
                                     <Storyboard>
-                                        <DoubleAnimation 
-                                             Storyboard.TargetProperty="Opacity"
-                                             From="1"
-                                             To="0"
-                                             Duration="0:0:5"/>
+                                        <DoubleAnimation
+                                            Storyboard.TargetProperty="Opacity"
+                                            From="1"
+                                            To="0"
+                                            Duration="0:0:5" />
                                     </Storyboard>
                                 </BeginStoryboard>
                             </DataTrigger.ExitActions>
@@ -46,12 +46,12 @@
                     </Style.Triggers>
                 </Style>
             </Grid.Style>
-            
+
             <Canvas>
-                <ItemsControl Canvas.Bottom="0"  Width="600" Height="200" ItemsSource="{Binding PerformedOperations}"  >
+                <ItemsControl Canvas.Bottom="0" Width="600" Height="200" ItemsSource="{Binding PerformedOperations}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
-                            <VirtualizingStackPanel VerticalAlignment="Bottom"/>
+                            <VirtualizingStackPanel VerticalAlignment="Bottom" />
                         </ItemsPanelTemplate>
                     </ItemsControl.ItemsPanel>
                 </ItemsControl>

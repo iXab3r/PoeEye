@@ -13,14 +13,14 @@ namespace PoeShared.PoeTrade
         bool IsAvailable { get; }
 
         string Name { [NotNull] get; }
-        
+
         string Error { [CanBeNull] get; }
 
         Guid Id { get; }
 
-        [NotNull] 
+        [NotNull]
         IObservable<IPoeQueryResult> GetLiveUpdates([NotNull] IPoeQueryInfo query);
-        
+
         [NotNull]
         Task<IPoeQueryResult> IssueQuery([NotNull] IPoeQueryInfo query);
 

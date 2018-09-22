@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Reactive.Linq;
+﻿using System.Linq;
 using System.Windows.Input;
 using Guards;
 using JetBrains.Annotations;

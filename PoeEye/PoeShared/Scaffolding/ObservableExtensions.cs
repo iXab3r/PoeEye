@@ -27,26 +27,34 @@ namespace PoeShared.Scaffolding
             Func<TSource, TSource, TResult> resultSelector)
         {
             return WithPrevious(source)
-                         .Select(t => resultSelector(t.Item1, t.Item2));
+                .Select(t => resultSelector(t.Item1, t.Item2));
         }
-        
-        public static IObservable<Tuple<TSource,TSource>> WithPrevious<TSource>(
+
+        public static IObservable<Tuple<TSource, TSource>> WithPrevious<TSource>(
             this IObservable<TSource> source)
         {
             return source.Scan(
                 Tuple.Create(default(TSource), default(TSource)),
                 (previous, current) => Tuple.Create(previous.Item2, current));
         }
-        
+
         public static IObservable<T> RetryWithDelay<T>(this IObservable<T> source, TimeSpan timeSpan)
         {
             if (source == null)
+            {
                 throw new ArgumentNullException("source");
+            }
+
             if (timeSpan < TimeSpan.Zero)
+            {
                 throw new ArgumentOutOfRangeException("timeSpan");
+            }
+
             if (timeSpan == TimeSpan.Zero)
+            {
                 return source.Retry();
- 
+            }
+
             return source.Catch(Observable.Timer(timeSpan).SelectMany(_ => source).Retry());
         }
     }

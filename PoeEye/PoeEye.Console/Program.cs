@@ -4,7 +4,6 @@ using PoeEye.PoeTrade;
 using PoeEye.PoeTrade.Prism;
 using PoeEye.PoeTradeRealtimeApi;
 using PoeEye.PoeTradeRealtimeApi.Prism;
-using PoeShared;
 using PoeShared.PoeTrade;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;

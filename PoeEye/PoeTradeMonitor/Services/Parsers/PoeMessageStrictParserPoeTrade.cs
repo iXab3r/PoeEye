@@ -1,7 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 using JetBrains.Annotations;
 using PoeShared.Common;
-using PoeShared.Converters;
 using TypeConverter;
 
 namespace PoeEye.TradeMonitor.Services.Parsers

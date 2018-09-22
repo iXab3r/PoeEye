@@ -6,7 +6,6 @@ using Newtonsoft.Json;
 using PoeEye.Config;
 using PoeEye.Converters;
 using PoeEye.PoeTrade.ViewModels;
-using PoeShared;
 using PoeShared.Common;
 using PoeShared.Communications.Chromium;
 using PoeShared.Modularity;
@@ -40,14 +39,13 @@ namespace PoeEye.Prism
         public void OnInitialized(IContainerProvider containerProvider)
         {
             var registrator = container.Resolve<IPoeEyeModulesRegistrator>();
-            var domain = AppDomain.CurrentDomain;
 
             registrator.RegisterSettingsEditor<PoeEyeMainConfig, PoeMainSettingsViewModel>();
             registrator.RegisterSettingsEditor<PoeEyeUpdateSettingsConfig, PoeEyeUpdateSettingsViewModel>();
 
             InitializeConfigConverters();
 
-            Log.Info($"Initializing Chromium...");
+            Log.Info("Initializing Chromium core...");
             var chromium = container.Resolve<IChromiumBootstrapper>();
             chromium.AddTo(anchors);
         }

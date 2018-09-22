@@ -23,10 +23,8 @@ namespace PoeShared.PoeControlPanel.ViewModels
         public PoeControlPanelViewModel(
             [NotNull] IOverlayWindowController controller,
             [NotNull] IConfigProvider<PoeControlPanelConfig> configProvider,
-            [NotNull] [Dependency(WellKnownSchedulers.Background)]
-            IScheduler bgScheduler,
-            [NotNull] [Dependency(WellKnownSchedulers.UI)]
-            IScheduler uiScheduler)
+            [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler,
+            [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {
             this.controller = controller;
             this.configProvider = configProvider;

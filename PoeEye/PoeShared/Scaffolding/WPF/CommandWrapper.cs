@@ -115,7 +115,7 @@ namespace PoeShared.Scaffolding.WPF
         {
             return new CommandWrapper(ReactiveCommand.CreateFromTask(execute, canExecute));
         }
-        
+
         public static CommandWrapper Create(Action execute)
         {
             return Create(new DelegateCommand(execute));

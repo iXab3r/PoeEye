@@ -14,7 +14,7 @@ namespace PoeShared.UI.ViewModels
     internal sealed class ImageViewModel : DisposableReactiveObject, IImageViewModel
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(ImageViewModel));
-        
+
         private BitmapImage imageSource;
         private bool isLoading;
 

@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using Common.Logging;
 using Guards;
 using PoeEye.PoeTrade.Modularity;
-using PoeShared;
 using PoeShared.Communications.Chromium;
 using PoeShared.Exceptions;
 using PoeShared.Modularity;

@@ -16,7 +16,6 @@ using LinqKit;
 using PoeEye.Config;
 using PoeEye.PoeTrade.Common;
 using PoeEye.PoeTrade.Models;
-using PoeShared;
 using PoeShared.Audio;
 using PoeShared.Common;
 using PoeShared.Modularity;
@@ -116,9 +115,9 @@ namespace PoeEye.PoeTrade.ViewModels
             set => this.RaiseAndSetIfChanged(ref quickFilterText, value);
         }
 
+        public IPageParameterDataViewModel PageParameter { get; }
+
         public ReadOnlyObservableCollection<IPoeTradeViewModel> TradesView { get; }
-        
-        public IPageParameterDataViewModel PageParameter{ get; }
 
         public ICommand MarkAllAsReadCommand => markAllAsReadCommand;
 

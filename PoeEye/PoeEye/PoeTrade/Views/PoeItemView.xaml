@@ -70,7 +70,7 @@
                        x:Key="ItemStatMedium">
                     <Setter Property="FontSize" Value="14" />
                 </Style>
-                
+
                 <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource ItemStatValue}"
                        x:Key="ItemStatHeader">
                     <Setter Property="HorizontalAlignment" Value="Left" />
@@ -309,7 +309,7 @@
                           ItemTemplate="{StaticResource ModTemplateKey}" />
         </Grid>
     </DataTemplate>
-    
+
     <DataTemplate x:Key="PoeItemModsWithoutTiersTemplateKey" DataType="{x:Type viewModels:PoeItemModsViewModel}">
         <Grid>
             <Grid.Resources>
@@ -358,7 +358,7 @@
         <wpf:TemplateMapping Key="True" Template="{StaticResource PoeItemModsFastTemplateKey}" />
         <wpf:TemplateMapping Key="False" Template="{StaticResource PoeItemModsTemplateKey}" />
     </wpf:MappingTemplateSelector>
-    
+
     <DataTemplate DataType="{x:Type viewModels:PoeTradeViewModel}">
         <Grid Margin="10">
             <Grid.RowDefinitions>
@@ -654,13 +654,13 @@
                                     Width="150" Height="22"
                                     Margin="5,0"
                                     eye:CommandWrapperHelper.CommandParameter="{StaticResource FalseValue}">
-                        
+
                         <ContentControl.InputBindings>
                             <MouseBinding MouseAction="RightClick"
                                           Command="{Binding CopyPrivateMessageToClipboardCommand}"
                                           CommandParameter="{StaticResource TrueValue}" />
                         </ContentControl.InputBindings>
-                        
+
                         <ContentControl.ToolTip>
                             <controls:MouseButtonsTooltip
                                 LeftButton="Copy PM to clipboard"
@@ -695,7 +695,7 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <Border Grid.Row="0" Grid.Column="0" >
+            <Border Grid.Row="0" Grid.Column="0">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
@@ -753,8 +753,7 @@
                         <ContentControl Content="{Binding Trade}" IsHitTestVisible="False"
                                         ContentTemplate="{StaticResource PoeItemNameTemplateKey}"
                                         VerticalAlignment="Center"
-                                        TextBlock.FontSize="16">
-                        </ContentControl>
+                                        TextBlock.FontSize="16" />
                     </StackPanel>
 
                     <StackPanel Grid.Column="2"
@@ -847,8 +846,8 @@
                                     Content="{Binding Image}" />
 
                     <Viewbox Grid.Column="0" IsHitTestVisible="False" Height="64" Width="64">
-                        <ContentControl Content="{Binding Links}" 
-                                        VerticalAlignment="Center"/>
+                        <ContentControl Content="{Binding Links}"
+                                        VerticalAlignment="Center" />
                     </Viewbox>
                     <ContentControl Grid.Column="1" VerticalAlignment="Center"
                                     Content="{Binding Trade}"
@@ -862,7 +861,7 @@
             <Border Grid.Row="2" Grid.Column="0"
                     Visibility="{Binding Trade.UserIgn, Converter={StaticResource NullToHiddenConverter}, Mode=OneWay}">
                 <Grid>
-                    
+
                     <Button HorizontalAlignment="Left"
                             Command="{Binding CopyPrivateMessageToClipboardCommand}"
                             Height="26"
@@ -871,7 +870,7 @@
                         <Button.Content>
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Style="{StaticResource IconTextBlock}" Text="&#xf1d8;" Margin="2,0" />
-                                
+
                                 <ContentControl Content="{Binding Trade.Price, Converter={StaticResource StringToPoePriceConverter}}"
                                                 ContentTemplate="{StaticResource PoePriceCompactViewTemplateKey}" />
 

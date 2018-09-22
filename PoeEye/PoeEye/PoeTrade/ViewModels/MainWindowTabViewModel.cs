@@ -32,6 +32,8 @@ namespace PoeEye.PoeTrade.ViewModels
 
         private static int GlobalTabIdx;
         private static readonly TimeSpan ThrottlingPeriod = TimeSpan.FromSeconds(0.5);
+        [NotNull] private readonly IScheduler bgScheduler;
+        [NotNull] private readonly IConfigProvider<PoeEyeTabListConfig> configProvider;
 
         private readonly string defaultTabName;
 
@@ -43,8 +45,6 @@ namespace PoeEye.PoeTrade.ViewModels
 
         private readonly SerialDisposable tradesListAnchors = new SerialDisposable();
         private readonly IFactory<IPoeTradesListViewModel, IPoeApiWrapper> tradesListFactory;
-        [NotNull] private readonly IConfigProvider<PoeEyeTabListConfig> configProvider;
-        [NotNull] private readonly IScheduler bgScheduler;
         [NotNull] private readonly IScheduler uiScheduler;
         private bool isFlipped;
 
@@ -135,7 +135,7 @@ namespace PoeEye.PoeTrade.ViewModels
                     x => audioNotificationsManager.PlayNotification(audioNotificationSelector.SelectedValue),
                     Log.HandleException)
                 .AddTo(Anchors);
-            
+
             SaveAsDefault = CommandWrapper.Create(() => SaveAsDefaultExecuted());
         }
 
@@ -161,7 +161,7 @@ namespace PoeEye.PoeTrade.ViewModels
         public ICommand NewSearchCommand => newSearchCommand;
 
         public CommandWrapper ResetCommand { get; }
-        
+
         public CommandWrapper SaveAsDefault { get; }
 
         public string DefaultTabName => tabName.DefaultValue;
@@ -232,7 +232,7 @@ namespace PoeEye.PoeTrade.ViewModels
                 QueryInfo = Query.PoeQueryBuilder(),
                 NotificationType = AudioNotificationSelector.SelectedValue,
                 ApiModuleId = ApiSelector.SelectedModule?.Id.ToString(),
-                CustomTabName = tabName.HasValue ? tabName.Value : null,
+                CustomTabName = tabName.HasValue ? tabName.Value : null
             };
         }
 
@@ -310,7 +310,7 @@ namespace PoeEye.PoeTrade.ViewModels
                 .StartWith(Unit.Default)
                 .Subscribe(() => this.RaisePropertyChanged(nameof(IsBusy)))
                 .AddTo(anchors);
-            
+
             Query
                 .ObservableForProperty(x => x.PoeQueryBuilder).ToUnit()
                 .Merge(tradesList.WhenAnyValue(x => x.ActiveQuery).ToUnit())
@@ -409,7 +409,7 @@ namespace PoeEye.PoeTrade.ViewModels
         private void SaveAsDefaultExecuted()
         {
             Log.Debug("[MainWindowTabViewModel.SaveAsDefaultExecuted] Saving default tab configuration as default");
-            configProvider.ActualConfig.DefaultConfig = this.Save();
+            configProvider.ActualConfig.DefaultConfig = Save();
         }
 
         public override string ToString()

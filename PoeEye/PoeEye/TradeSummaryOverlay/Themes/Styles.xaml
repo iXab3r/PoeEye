@@ -5,5 +5,5 @@
         <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Converters.xaml" />
         <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Colors.xaml" />
     </ResourceDictionary.MergedDictionaries>
-    
+
 </ResourceDictionary>

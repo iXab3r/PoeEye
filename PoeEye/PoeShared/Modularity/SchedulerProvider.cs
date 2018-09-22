@@ -17,7 +17,7 @@ namespace PoeShared.Modularity
     internal class SchedulerProvider : DisposableReactiveObject, ISchedulerProvider
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(SchedulerProvider));
-        
+
         private readonly ConcurrentDictionary<string, IScheduler> schedulers = new ConcurrentDictionary<string, IScheduler>();
         private readonly IScheduler uiScheduler;
 
@@ -76,7 +76,7 @@ namespace PoeShared.Modularity
         {
             try
             {
-                Log.Debug($"[SchedulerProvider.InitializeDispatcherThread] Thread started");
+                Log.Debug("[SchedulerProvider.InitializeDispatcherThread] Thread started");
                 var dispatcher = Dispatcher.CurrentDispatcher;
                 Log.Debug($"[SchedulerProvider.InitializeDispatcherThread] Dispatcher: {dispatcher}");
                 var scheduler = new DispatcherScheduler(dispatcher);
@@ -113,7 +113,7 @@ namespace PoeShared.Modularity
                 Log.Debug($"[SchedulerProvider.InitializeDispatcherThread] Scheduler: {dispatcher}");
                 consumer.TrySetResult(scheduler);
 
-                Log.Debug($"[KeyboardEventsSource.InitializeKeyboardThread] Starting dispatcher...");
+                Log.Debug("[KeyboardEventsSource.InitializeKeyboardThread] Starting dispatcher...");
                 Dispatcher.Run();
             }
             catch (Exception e)
@@ -123,7 +123,7 @@ namespace PoeShared.Modularity
             }
             finally
             {
-                Log.Debug($"[KeyboardEventsSource.InitializeKeyboardThread] Thread completed");
+                Log.Debug("[KeyboardEventsSource.InitializeKeyboardThread] Thread completed");
             }
         }
 
@@ -131,7 +131,8 @@ namespace PoeShared.Modularity
         {
             if (Log.IsTraceEnabled)
             {
-                Log.Trace($"[{eventName}] Priority: {eventArgs.Operation.Priority} Status: {eventArgs.Operation.Status}, Operation: {eventArgs.Operation.Task}");
+                Log.Trace(
+                    $"[{eventName}] Priority: {eventArgs.Operation.Priority} Status: {eventArgs.Operation.Status}, Operation: {eventArgs.Operation.Task}");
             }
         }
     }

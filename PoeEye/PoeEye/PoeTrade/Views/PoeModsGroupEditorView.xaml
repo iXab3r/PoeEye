@@ -6,137 +6,137 @@
                     xmlns:viewModels="clr-namespace:PoeEye.PoeTrade.ViewModels"
                     xmlns:converters="clr-namespace:PoeEye.Converters"
                     xmlns:eye="http://coderush.net/poeeye/">
-  <DataTemplate DataType="{x:Type viewModels:PoeModGroupsEditorViewModel}">
+    <DataTemplate DataType="{x:Type viewModels:PoeModGroupsEditorViewModel}">
 
-    <DataTemplate.Resources>
-      
-      <ObjectDataProvider x:Key="groupTypeEnum"
-                          MethodName="GetValuesAndDescriptions"
-                          ObjectType="eye:EnumHelper">
-        <ObjectDataProvider.MethodParameters>
-          <x:TypeExtension TypeName="query:PoeQueryModsGroupType" />
-        </ObjectDataProvider.MethodParameters>
-      </ObjectDataProvider>
-    </DataTemplate.Resources>
+        <DataTemplate.Resources>
 
-    <Grid x:Name="GroupsGrid">
-      <Grid.ColumnDefinitions>
-        <ColumnDefinition Width="*" />
-        <ColumnDefinition Width="auto" />
-      </Grid.ColumnDefinitions>
+            <ObjectDataProvider x:Key="groupTypeEnum"
+                                MethodName="GetValuesAndDescriptions"
+                                ObjectType="eye:EnumHelper">
+                <ObjectDataProvider.MethodParameters>
+                    <x:TypeExtension TypeName="query:PoeQueryModsGroupType" />
+                </ObjectDataProvider.MethodParameters>
+            </ObjectDataProvider>
+        </DataTemplate.Resources>
 
-      <Grid.RowDefinitions>
-        <RowDefinition Height="Auto" />
-        <RowDefinition Height="*" />
-      </Grid.RowDefinitions>
+        <Grid x:Name="GroupsGrid">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="auto" />
+            </Grid.ColumnDefinitions>
 
-      <StackPanel Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2"
-                  Orientation="Horizontal"
-                  Margin="5">
-        <TextBlock Text="Mod groups" Style="{StaticResource MetroTextBlockHeaderStyle}" />
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
 
-        <Button Margin="10, 0"
-                Style="{StaticResource FlatButton}"
-                Command="{Binding AddGroupCommand}" Content="&#xf055; Add new group" />
-      </StackPanel>
+            <StackPanel Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2"
+                        Orientation="Horizontal"
+                        Margin="5">
+                <TextBlock Text="Mod groups" Style="{StaticResource MetroTextBlockHeaderStyle}" />
 
-      <ItemsControl Grid.Column="0" Grid.Row="1"
-                    ItemsSource="{Binding Groups}">
-        <ItemsControl.ItemTemplate>
-          <DataTemplate DataType="{x:Type viewModels:PoeModsEditorViewModel}">
-            <Border BorderBrush="{StaticResource AccentColorBrush4}" BorderThickness="1" Margin="5">
-              <Grid Margin="5">
-                <Grid.ColumnDefinitions>
-                  <ColumnDefinition Width="*" />
-                  <ColumnDefinition Width="auto" />
-                </Grid.ColumnDefinitions>
+                <Button Margin="10, 0"
+                        Style="{StaticResource FlatButton}"
+                        Command="{Binding AddGroupCommand}" Content="&#xf055; Add new group" />
+            </StackPanel>
 
-                <Grid.RowDefinitions>
-                  <RowDefinition Height="*" />
-                  <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
+            <ItemsControl Grid.Column="0" Grid.Row="1"
+                          ItemsSource="{Binding Groups}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="{x:Type viewModels:PoeModsEditorViewModel}">
+                        <Border BorderBrush="{StaticResource AccentColorBrush4}" BorderThickness="1" Margin="5">
+                            <Grid Margin="5">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="auto" />
+                                </Grid.ColumnDefinitions>
 
-                <ContentControl Grid.Column="0"
-                                Content="{Binding}" />
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
 
-                <Grid Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2"
-                      Margin="0,5,0,0">
-                  <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="Auto" />
-                  </Grid.ColumnDefinitions>
+                                <ContentControl Grid.Column="0"
+                                                Content="{Binding}" />
 
-                  <ComboBox Grid.Column="0"
-                            Width="150"
-                            DisplayMemberPath="Description"
-                            SelectedValuePath="Value"
-                            SelectedValue="{Binding GroupType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                            MinWidth="100"
-                            ItemsSource="{Binding Source={StaticResource groupTypeEnum}}" />
+                                <Grid Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2"
+                                      Margin="0,5,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
 
-                  <Label Grid.Column="1">
-                    <Label.Style>
-                      <Style TargetType="{x:Type Label}" BasedOn="{StaticResource {x:Type Label}}">
-                        <Style.Triggers>
-                          <DataTrigger Binding="{Binding GroupType}" Value="And">
-                            <Setter Property="Content" Value="All specified mods must exist and match their values." />
-                          </DataTrigger>
-                          <DataTrigger Binding="{Binding GroupType}" Value="Not">
-                            <Setter Property="Content" Value="None of specified mods must exist." />
-                          </DataTrigger>
-                          <DataTrigger Binding="{Binding GroupType}" Value="Count">
-                            <Setter Property="Content" Value="Specify the number of mods that should be matched." />
-                          </DataTrigger>
-                          <DataTrigger Binding="{Binding GroupType}" Value="Sum">
-                            <Setter Property="Content" Value="The mods' values must add to the specified total value." />
-                          </DataTrigger>
-                          <DataTrigger Binding="{Binding GroupType}" Value="If">
-                            <Setter Property="Content"
-                                    Value="If a mod is present, its value must match the specified min/max." />
-                          </DataTrigger>
-                        </Style.Triggers>
-                      </Style>
-                    </Label.Style>
-                  </Label>
+                                    <ComboBox Grid.Column="0"
+                                              Width="150"
+                                              DisplayMemberPath="Description"
+                                              SelectedValuePath="Value"
+                                              SelectedValue="{Binding GroupType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                              MinWidth="100"
+                                              ItemsSource="{Binding Source={StaticResource groupTypeEnum}}" />
 
-                  <StackPanel Grid.Column="2"
-                              Orientation="Horizontal">
-                    <StackPanel.Style>
-                      <Style TargetType="{x:Type StackPanel}">
-                        <Setter Property="Visibility" Value="Collapsed" />
-                        <Style.Triggers>
-                          <DataTrigger Binding="{Binding GroupType}" Value="Count">
-                            <Setter Property="Visibility" Value="Visible" />
-                          </DataTrigger>
-                          <DataTrigger Binding="{Binding GroupType}" Value="Sum">
-                            <Setter Property="Visibility" Value="Visible" />
-                          </DataTrigger>
-                        </Style.Triggers>
-                      </Style>
-                    </StackPanel.Style>
-                    <TextBox Style="{StaticResource TextBoxMinKey}"
-                             Text="{Binding MinGroupValue, Converter={x:Static converters:NullableConverter.Instance}}" />
-                    <TextBox Style="{StaticResource TextBoxMaxKey}"
-                             Text="{Binding MaxGroupValue, Converter={x:Static converters:NullableConverter.Instance}}" />
-                  </StackPanel>
+                                    <Label Grid.Column="1">
+                                        <Label.Style>
+                                            <Style TargetType="{x:Type Label}" BasedOn="{StaticResource {x:Type Label}}">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding GroupType}" Value="And">
+                                                        <Setter Property="Content" Value="All specified mods must exist and match their values." />
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding GroupType}" Value="Not">
+                                                        <Setter Property="Content" Value="None of specified mods must exist." />
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding GroupType}" Value="Count">
+                                                        <Setter Property="Content" Value="Specify the number of mods that should be matched." />
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding GroupType}" Value="Sum">
+                                                        <Setter Property="Content" Value="The mods' values must add to the specified total value." />
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding GroupType}" Value="If">
+                                                        <Setter Property="Content"
+                                                                Value="If a mod is present, its value must match the specified min/max." />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Label.Style>
+                                    </Label>
 
-                  <Button Grid.Column="3"
-                          Content="&#xf056; Remove group"
-                          Command="{Binding ElementName=GroupsGrid, Path=DataContext.RemoveGroupCommand}"
-                          CommandParameter="{Binding}"
-                          Height="28"
-                          Style="{StaticResource FlatButton}"/>
+                                    <StackPanel Grid.Column="2"
+                                                Orientation="Horizontal">
+                                        <StackPanel.Style>
+                                            <Style TargetType="{x:Type StackPanel}">
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding GroupType}" Value="Count">
+                                                        <Setter Property="Visibility" Value="Visible" />
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding GroupType}" Value="Sum">
+                                                        <Setter Property="Visibility" Value="Visible" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </StackPanel.Style>
+                                        <TextBox Style="{StaticResource TextBoxMinKey}"
+                                                 Text="{Binding MinGroupValue, Converter={x:Static converters:NullableConverter.Instance}}" />
+                                        <TextBox Style="{StaticResource TextBoxMaxKey}"
+                                                 Text="{Binding MaxGroupValue, Converter={x:Static converters:NullableConverter.Instance}}" />
+                                    </StackPanel>
 
-                </Grid>
-              </Grid>
-            </Border>
-          </DataTemplate>
-        </ItemsControl.ItemTemplate>
-      </ItemsControl>
-    </Grid>
+                                    <Button Grid.Column="3"
+                                            Content="&#xf056; Remove group"
+                                            Command="{Binding ElementName=GroupsGrid, Path=DataContext.RemoveGroupCommand}"
+                                            CommandParameter="{Binding}"
+                                            Height="28"
+                                            Style="{StaticResource FlatButton}" />
+
+                                </Grid>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </Grid>
 
 
-  </DataTemplate>
+    </DataTemplate>
 </ResourceDictionary>

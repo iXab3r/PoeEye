@@ -10,7 +10,7 @@ namespace PoeBud.Models
     internal sealed class UpdaterDefaultProcessAllStrategy : IDefaultStashUpdaterStrategy
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(UpdaterDefaultProcessAllStrategy));
-        
+
         private readonly IClock clock;
         private readonly IStashUpdaterParameters parameters;
         private ILeague[] leaguesToProcess;

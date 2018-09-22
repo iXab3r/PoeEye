@@ -18,7 +18,7 @@ namespace PoeEye.TradeMonitor
             var arguments = Environment.GetCommandLineArgs();
             if (!AppArguments.Parse(arguments))
             {
-                PoeShared.SharedLog.InitializeLogging("Startup");
+                SharedLog.InitializeLogging("Startup");
                 throw new ApplicationException($"Failed to parse command line args: {string.Join(" ", arguments)}");
             }
 

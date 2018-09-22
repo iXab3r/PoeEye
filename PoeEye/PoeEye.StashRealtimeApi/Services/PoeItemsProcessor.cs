@@ -9,7 +9,6 @@ using Guards;
 using JetBrains.Annotations;
 using KellermanSoftware.CompareNetObjects;
 using Newtonsoft.Json;
-using PoeShared;
 using PoeShared.Common;
 using PoeShared.Modularity;
 using PoeShared.PoeTrade;
@@ -82,10 +81,10 @@ namespace PoeEye.StashRealtimeApi.Services
             }
 
             Log.DebugFormat("By league:\n\t{0}",
-                                     pack.GroupBy(x => x.League ?? "UnknownLeague").Select(x => new {League = x.Key, Count = x.Count()}).DumpToText());
+                            pack.GroupBy(x => x.League ?? "UnknownLeague").Select(x => new {League = x.Key, Count = x.Count()}).DumpToText());
             Log.DebugFormat("By league(total):\n\t{0}",
-                                     itemById.Values.GroupBy(x => x.League ?? "UnknownLeague").Select(x => new {League = x.Key, Count = x.Count()})
-                                             .DumpToText());
+                            itemById.Values.GroupBy(x => x.League ?? "UnknownLeague").Select(x => new {League = x.Key, Count = x.Count()})
+                                    .DumpToText());
 
             foreach (var queryItemSource in sourcesByQuery.Values)
             {

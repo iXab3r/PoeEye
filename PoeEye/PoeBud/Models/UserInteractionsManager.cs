@@ -8,7 +8,6 @@ using Common.Logging;
 using Guards;
 using JetBrains.Annotations;
 using PoeBud.Config;
-using PoeShared;
 using PoeShared.Modularity;
 
 namespace PoeBud.Models

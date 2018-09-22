@@ -80,7 +80,7 @@ namespace PoeEye.TradeMonitor.Services.Notifications
                 Log.Debug($"[Poe.MailNotifier] Message body:\n{message.Body}");
 
                 var logger = new EmailLogger(clock);
-                Log.Debug($"[Poe.MailNotifier] Sending message...");
+                Log.Debug("[Poe.MailNotifier] Sending message...");
                 using (var client = new SmtpClient(logger))
                 {
                     client.ServerCertificateValidationCallback = (s, c, h, e) => true;

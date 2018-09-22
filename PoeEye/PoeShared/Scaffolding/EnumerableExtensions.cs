@@ -19,7 +19,7 @@ namespace PoeShared.Scaffolding
 
             return snapshottedEnumerable.ElementAt(Rng.Next(0, snapshottedEnumerable.Count()));
         }
-        
+
         public static IEnumerable<T> Subrange<T>(this IReadOnlyList<T> enumerable, int startIdx, int count)
         {
             Guard.ArgumentNotNull(enumerable, nameof(enumerable));
@@ -28,7 +28,7 @@ namespace PoeShared.Scaffolding
                 yield return enumerable[idx];
             }
         }
-        
+
         public static Task ForEachAsync<T>(this IEnumerable<T> enumerable, Func<T, Task> action)
         {
             return Task.WhenAll(enumerable.Select(action));

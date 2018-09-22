@@ -10,7 +10,6 @@ using System.Windows.Threading;
 using Common.Logging;
 using ExceptionReporting;
 using ExceptionReporting.Core;
-using log4net.Core;
 using PoeEye.Prism;
 using PoeShared;
 using PoeShared.Scaffolding;
@@ -31,7 +30,7 @@ namespace PoeEye
                 var arguments = Environment.GetCommandLineArgs();
                 if (!AppArguments.Parse(arguments))
                 {
-                    PoeShared.SharedLog.InitializeLogging("Startup");
+                    SharedLog.InitializeLogging("Startup");
                     throw new ApplicationException($"Failed to parse command line args: {string.Join(" ", arguments)}");
                 }
 
@@ -66,7 +65,7 @@ namespace PoeEye
                 {
                     Log.Debug($"[App.DomainUnload] Detected DomainUnload, disposing mutex {mutexId}");
                     mutex.ReleaseMutex();
-                    Log.Debug($"[App.DomainUnload] Mutex was successfully disposed");
+                    Log.Debug("[App.DomainUnload] Mutex was successfully disposed");
                 };
             }
             else
@@ -141,7 +140,7 @@ namespace PoeEye
             }
             catch (Exception ex)
             {
-                Log.Error($"Exception in ExceptionReporter :-(", ex);
+                Log.Error("Exception in ExceptionReporter :-(", ex);
             }
         }
 
@@ -166,11 +165,11 @@ namespace PoeEye
         {
             base.OnStartup(e);
 
-            Log.Debug($"Application startup detected");
+            Log.Debug("Application startup detected");
 
             SingleInstanceValidationRoutine();
 
-            Log.Info($"Initializing bootstrapper...");
+            Log.Info("Initializing bootstrapper...");
             bootstrapper.Run();
         }
 
@@ -178,7 +177,7 @@ namespace PoeEye
         {
             base.OnExit(e);
 
-            Log.Debug($"Application exit detected");
+            Log.Debug("Application exit detected");
             bootstrapper.Dispose();
         }
 
@@ -197,7 +196,7 @@ namespace PoeEye
                 MessageBox.Show(message, title, MessageBoxButton.OK, MessageBoxImage.Warning);
             }
 
-            Log.Warn($"Shutting down...");
+            Log.Warn("Shutting down...");
             Environment.Exit(0);
         }
     }

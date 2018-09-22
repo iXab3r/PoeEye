@@ -12,7 +12,6 @@ using JetBrains.Annotations;
 using PoeEye.StashGrid.Models;
 using PoeEye.StashGrid.Modularity;
 using PoeEye.StashGrid.Services;
-using PoeShared;
 using PoeShared.Common;
 using PoeShared.Modularity;
 using PoeShared.Native;
@@ -27,10 +26,9 @@ namespace PoeEye.StashGrid.ViewModels
     internal sealed class PoeStashGridViewModel : OverlayViewModelBase, IPoeStashHighlightService,
                                                   IPoeStashGridViewModel
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(PoeStashGridViewModel));
-
         private const int MaxInventoryWidth = 24;
         private const int MaxInventoryHeight = 24;
+        private static readonly ILog Log = LogManager.GetLogger(typeof(PoeStashGridViewModel));
 
         private readonly IConfigProvider<PoeStashGridConfig> configProvider;
 

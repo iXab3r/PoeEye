@@ -11,7 +11,6 @@ using Guards;
 using JetBrains.Annotations;
 using PoeBud.Config;
 using PoeBud.Models;
-using PoeShared;
 using PoeShared.Modularity;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
@@ -28,20 +27,15 @@ namespace PoeBud.ViewModels
         private static readonly ILog Log = LogManager.GetLogger(typeof(PoeBudSettingsViewModel));
 
         private readonly SerialDisposable characterSelectionDisposable = new SerialDisposable();
-        private readonly IUiOverlaysProvider overlaysProvider;
         private readonly IFactory<IPoeStashClient, NetworkCredential, bool> poeClientFactory;
 
         private readonly PoeBudConfig resultingConfig = new PoeBudConfig();
 
-        private bool hideXpBar;
-
         private string hotkey;
 
-        private bool isEnabled;
         private string[] leaguesList;
         private string selectedLeague;
 
-        private UiOverlayInfo selectedUiOverlay;
         private string sessionId;
         private string username;
 
@@ -57,7 +51,6 @@ namespace PoeBud.ViewModels
             Guard.ArgumentNotNull(poeClientFactory, nameof(poeClientFactory));
 
             this.poeClientFactory = poeClientFactory;
-            this.overlaysProvider = overlaysProvider;
 
             LoginCommand = CommandWrapper.Create(
                 ReactiveCommand.CreateFromTask<object>(x => LoginCommandExecuted(x), null, uiScheduler));
@@ -142,7 +135,6 @@ namespace PoeBud.ViewModels
             }
 
             resultingConfig.GetChaosSetHotkey = hotkey;
-            resultingConfig.IsEnabled = isEnabled;
 
             var selectedTabs = StashesList
                                .Where(x => x.IsSelected)
@@ -185,7 +177,7 @@ namespace PoeBud.ViewModels
 
             Log.Debug($"[PoeBudSettings.LoginCommand] SessionId: {poeClient.SessionId}");
 
-            Log.Debug($"[PoeBudSettings.LoginCommand] Requesting characters list...");
+            Log.Debug("[PoeBudSettings.LoginCommand] Requesting characters list...");
             var characters = await poeClient.GetCharactersAsync();
 
             var leagueAnchors = new CompositeDisposable();
@@ -200,7 +192,7 @@ namespace PoeBud.ViewModels
             Log.Debug(
                 $"[PoeBudSettings.LoginCommand] Response received, characters list: \n\t{characters.DumpToTable()}\nLeagues list: \n\t{leagues.DumpToTable()}");
 
-            Log.Debug($"[PoeBudSettings.LoginCommand] Requesting stashes list...");
+            Log.Debug("[PoeBudSettings.LoginCommand] Requesting stashes list...");
             var stashes = await TryGetStash(poeClient, leagues);
 
             var leagueStashViewModels = stashes

@@ -18,11 +18,11 @@
                    HorizontalContentAlignment="Center"
                    FontSize="18"
                    fa:Awesome.Content="Warning" />
-            
+
             <Label Style="{StaticResource IconLabel}"
                    Visibility="{Binding Error, Converter={StaticResource NullToCollapsedConverter}}"
                    Content="{Binding Error}" />
-            
+
             <Label Style="{StaticResource IconLabel}"
                    Visibility="{Binding StatusText, Converter={StaticResource NullToCollapsedConverter}}"
                    Content="{Binding StatusText}" />

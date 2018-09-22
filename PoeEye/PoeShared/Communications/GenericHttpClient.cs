@@ -20,7 +20,7 @@ namespace PoeShared.Communications
     internal sealed class GenericHttpClient : IHttpClient
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(GenericHttpClient));
-        
+
         private static readonly string DefaultUserAgent =
             "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36";
 
@@ -141,7 +141,7 @@ namespace PoeShared.Communications
 
             if (httpRequest.Method == WebRequestMethods.Http.Post && !string.IsNullOrEmpty(requestData))
             {
-                Log.Debug($"[HttpClient] Preparing POST data...");
+                Log.Debug("[HttpClient] Preparing POST data...");
                 var data = Encoding.ASCII.GetBytes(requestData);
                 using (var stream = httpRequest.GetRequestStream())
                 {

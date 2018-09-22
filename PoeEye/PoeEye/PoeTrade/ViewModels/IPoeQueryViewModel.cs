@@ -12,7 +12,7 @@ namespace PoeEye.PoeTrade.ViewModels
 
         string Description { get; }
 
-        new bool IsExpanded { get; set; }
+         bool IsExpanded { get; set; }
 
         void SetQueryInfo([NotNull] IPoeQueryInfo source);
     }

@@ -30,7 +30,7 @@ namespace PoeShared.Modularity
 
         public void Reload()
         {
-            Log.Debug($"[PoeEyeConfigProviderInMemory.Reload] Reloading configuration...");
+            Log.Debug("[PoeEyeConfigProviderInMemory.Reload] Reloading configuration...");
 
             loadedConfigs.Clear();
 

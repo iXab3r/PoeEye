@@ -81,7 +81,7 @@ namespace PoeEye.PathOfExileTrade.TradeApi
                     Str = ToMinMaxValue(query.RStrMin, query.RStrMax)
                 }
             });
-            
+
             VisitIfNeeded(x => filters.SocketFilters = x, new JsonSearchRequest.SocketFilters
             {
                 Disabled = false,
@@ -96,13 +96,13 @@ namespace PoeEye.PathOfExileTrade.TradeApi
                         query.LinkedW
                     ),
                     Sockets = ToSocketDef(
-                       query.SocketsMin,
-                       query.SocketsMax,
-                       query.SocketsR,
-                       query.SocketsG,
-                       query.SocketsB,
-                       query.SocketsW
-                    ),
+                        query.SocketsMin,
+                        query.SocketsMax,
+                        query.SocketsR,
+                        query.SocketsG,
+                        query.SocketsB,
+                        query.SocketsW
+                    )
                 }
             });
 
@@ -155,8 +155,9 @@ namespace PoeEye.PathOfExileTrade.TradeApi
                 if (x is long?)
                 {
                     return true;
-                } 
-                else if (x is int?)
+                }
+
+                if (x is int?)
                 {
                     return true;
                 }
@@ -167,7 +168,7 @@ namespace PoeEye.PathOfExileTrade.TradeApi
 
         private JsonSearchRequest.SocketsDef ToSocketDef(long? min, long? max, long? red, long? green, long? blue, long? white)
         {
-            var result = new JsonSearchRequest.SocketsDef()
+            var result = new JsonSearchRequest.SocketsDef
             {
                 Min = min,
                 Max = max,

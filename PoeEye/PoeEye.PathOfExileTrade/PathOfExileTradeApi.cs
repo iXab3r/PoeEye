@@ -5,10 +5,8 @@ using System.Linq;
 using System.Net.Http;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Forms;
 using Common.Logging;
 using Guards;
 using JetBrains.Annotations;
@@ -23,7 +21,6 @@ using PoeShared.PoeTrade;
 using PoeShared.PoeTrade.Query;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
-using PoeShared.Scaffolding.WPF;
 using RestEase;
 using TypeConverter;
 
@@ -32,7 +29,7 @@ namespace PoeEye.PathOfExileTrade
     internal sealed class PathOfExileTradeApi : DisposableReactiveObject, IPoeApi, IPoeItemSource
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(PathOfExileTradeApi));
-        
+
         private static readonly string TradeSearchUri = @"https://www.pathofexile.com/api/trade";
         private readonly IPathOfExileTradePortalApi client;
         private readonly IClock clock;
@@ -99,7 +96,7 @@ namespace PoeEye.PathOfExileTrade
 
             try
             {
-                Log.Debug($"[PathOfExileTradeApi.Api] Sending query");
+                Log.Debug("[PathOfExileTradeApi.Api] Sending query");
 
                 var query = new JsonSearchRequest.Request
                 {
@@ -125,7 +122,7 @@ namespace PoeEye.PathOfExileTrade
 
         public async Task<IPoeStaticData> RequestStaticData()
         {
-            Log.Debug($"[PathOfExileTradeApi.Api] Requesting static data...");
+            Log.Debug("[PathOfExileTradeApi.Api] Requesting static data...");
 
             var result = new PoeStaticData();
             var apiLeagueList = await client.GetLeagueList();
@@ -186,7 +183,7 @@ namespace PoeEye.PathOfExileTrade
                 new PoeItemType("Resonator", "currency.resonator"),
                 new PoeItemType("Fossil", "currency.fossil")
             };
-            Log.Debug($"[PathOfExileTradeApi.Api] Successfully retrieved static data");
+            Log.Debug("[PathOfExileTradeApi.Api] Successfully retrieved static data");
 
             return result;
         }
@@ -210,19 +207,21 @@ namespace PoeEye.PathOfExileTrade
                 Log.Debug($"[PathOfExileTradeApi.Api] [{initial.Id}] Fetching items in packs of {maxItemsInRequest}");
 
                 await Partitioner
-                    .Create(0, itemIds.Count, maxItemsInRequest)
-                    .GetDynamicPartitions()
-                    .ForEachAsync(async partition =>
+                      .Create(0, itemIds.Count, maxItemsInRequest)
+                      .GetDynamicPartitions()
+                      .ForEachAsync(async partition =>
                       {
-                        var segment = itemIds.Subrange(partition.Item1, partition.Item2 - partition.Item1).ToArray();
-                        var ids = string.Join(",", segment);
-                        Log.Debug($"[PathOfExileTradeApi.Api] [{initial.Id}] Fetching pack {partition}: {ids}");
-                        var fetchResponse = (await client.FetchItems(ids, initial.Id)).GetContentEx();
-                        Log.Debug($"[PathOfExileTradeApi.Api] [{initial.Id}] Got response ({fetchResponse.Listings?.Length} item(s), requested: {segment.Count()}) {fetchResponse.DumpToTextRaw()}");
+                          var segment = itemIds.Subrange(partition.Item1, partition.Item2 - partition.Item1).ToArray();
+                          var ids = string.Join(",", segment);
+                          Log.Debug($"[PathOfExileTradeApi.Api] [{initial.Id}] Fetching pack {partition}: {ids}");
+                          var fetchResponse = (await client.FetchItems(ids, initial.Id)).GetContentEx();
+                          Log.Debug(
+                              $"[PathOfExileTradeApi.Api] [{initial.Id}] Got response ({fetchResponse.Listings?.Length} item(s), requested: {segment.Count()}) {fetchResponse.DumpToTextRaw()}");
 
-                        fetchResponse.Listings.ForEach(listings.Add);
-                    });
+                          fetchResponse.Listings.ForEach(listings.Add);
+                      });
             }
+
             Log.Debug($"[PathOfExileTradeApi.Api] [{initial.Id}] Successfully received {itemIds.Count} items");
 
             var queryResult = new PoeQueryResult
@@ -254,8 +253,8 @@ namespace PoeEye.PathOfExileTrade
 
             var modsByName = new Dictionary<string, PoeItemMod>();
             var duplicatesById = new Dictionary<string, int>();
-            foreach (var x in  statsList.Categories
-                                        .SelectMany(x => x.Entries))
+            foreach (var x in statsList.Categories
+                                       .SelectMany(x => x.Entries))
             {
                 var mod = new PoeItemMod
                 {
@@ -282,7 +281,7 @@ namespace PoeEye.PathOfExileTrade
                         existingMod.Name = $"[#{id - 1}] {existingMod.Name}";
                         modsByName[existingMod.Name] = existingMod;
                     }
-                        
+
                     mod.Name = $"[#{id}] {mod.Name}";
                 }
 
@@ -301,7 +300,7 @@ namespace PoeEye.PathOfExileTrade
 
             var client = new RestClient(TradeSearchUri, HandleRequestMessage)
             {
-                JsonSerializerSettings = settings,
+                JsonSerializerSettings = settings
             }.For<IPathOfExileTradePortalApi>();
             return client;
         }

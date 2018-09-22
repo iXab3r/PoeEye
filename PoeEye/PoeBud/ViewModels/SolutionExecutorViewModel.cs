@@ -98,7 +98,7 @@ namespace PoeBud.ViewModels
                                            .Subscribe(
                                                () =>
                                                {
-                                                   Log.Debug($"[SolutionExecutor.ExecuteSolution] Cancellation requested");
+                                                   Log.Debug("[SolutionExecutor.ExecuteSolution] Cancellation requested");
 
                                                    LogMessage("Requesting solution cancellation...");
                                                    cancellationTokenSource.Cancel();
@@ -116,7 +116,7 @@ namespace PoeBud.ViewModels
             }
             catch (OperationCanceledException)
             {
-                Log.Debug($"[SolutionExecutor.ExecuteSolution] Solution execution was cancelled");
+                Log.Debug("[SolutionExecutor.ExecuteSolution] Solution execution was cancelled");
                 LogMessage("Solution execution was cancelled");
             }
             finally

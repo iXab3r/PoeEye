@@ -15,8 +15,8 @@ namespace PoeEye.Config
             get => tabConfigs;
             set => tabConfigs = value ?? new PoeEyeTabConfig[0];
         }
-        
-        public PoeEyeTabConfig DefaultConfig { get; set; } = new PoeEyeTabConfig()
+
+        public PoeEyeTabConfig DefaultConfig { get; set; } = new PoeEyeTabConfig
         {
             NotificationType = AudioNotificationType.Disabled,
             ApiModuleId = WellKnownApi.PathOfExileTradeApiModuleId

@@ -9,7 +9,6 @@ using System.Text;
 using Common.Logging;
 using Guards;
 using JetBrains.Annotations;
-using PoeShared;
 using PoeShared.Modularity;
 using PoeShared.Scaffolding;
 
@@ -50,7 +49,7 @@ namespace PoeEye.Config
 
         public void Reload()
         {
-            Log.Debug($"[PoeEyeConfigProviderFromFile.Reload] Reloading configuration...");
+            Log.Debug("[PoeEyeConfigProviderFromFile.Reload] Reloading configuration...");
 
             var config = LoadInternal();
             loadedConfigs.Clear();
@@ -117,7 +116,7 @@ namespace PoeEye.Config
 
             try
             {
-                Log.Debug($"[PoeEyeConfigProviderFromFile.Save] Serializing config data...");
+                Log.Debug("[PoeEyeConfigProviderFromFile.Save] Serializing config data...");
                 var serializedData = configSerializer.Serialize(config);
 
                 Log.Debug($"[PoeEyeConfigProviderFromFile.Save] Successfully serialized config, got {serializedData.Length} chars");
@@ -136,9 +135,7 @@ namespace PoeEye.Config
             }
             catch (Exception ex)
             {
-                Log.Warn(
-                    $"[PoeEyeConfigProviderFromFile.Save] Exception occurred, config was not saved correctly",
-                    ex);
+                Log.Warn("[PoeEyeConfigProviderFromFile.Save] Exception occurred, config was not saved correctly",ex);
             }
         }
 
@@ -160,7 +157,7 @@ namespace PoeEye.Config
                 Log.Debug($"[PoeEyeConfigProviderFromFile.Load] Successfully read {fileData.Length} chars, deserializing...");
 
                 result = configSerializer.Deserialize<PoeEyeCombinedConfig>(fileData);
-                Log.Debug($"[PoeEyeConfigProviderFromFile.Load] Successfully deserialized config data");
+                Log.Debug("[PoeEyeConfigProviderFromFile.Load] Successfully deserialized config data");
 
                 if (result == null)
                 {
@@ -170,7 +167,7 @@ namespace PoeEye.Config
             }
             catch (Exception ex)
             {
-                Log.Warn($"[PoeEyeConfigProviderFromFile.Load] Could not deserialize config data, default config will be used", ex);
+                Log.Warn("[PoeEyeConfigProviderFromFile.Load] Could not deserialize config data, default config will be used", ex);
                 CreateBackupOfConfig();
             }
 
@@ -193,7 +190,7 @@ namespace PoeEye.Config
             }
             catch (Exception ex)
             {
-                Log.Warn($"[PoeEyeConfigProviderFromFile.CreateBackupOfConfig] Failed to create a backup", ex);
+                Log.Warn("[PoeEyeConfigProviderFromFile.CreateBackupOfConfig] Failed to create a backup", ex);
             }
         }
 
@@ -205,7 +202,7 @@ namespace PoeEye.Config
 
             public IEnumerable<PoeEyeConfigMetadata> Items
             {
-                [NotNull] get { return items; }
+                [NotNull] get => items;
             }
 
             public PoeEyeCombinedConfig Add([NotNull] PoeEyeConfigMetadata item)

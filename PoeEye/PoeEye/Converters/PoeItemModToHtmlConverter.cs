@@ -7,7 +7,6 @@ using System.Windows.Data;
 using System.Windows.Media;
 using Common.Logging;
 using Guards;
-using PoeShared;
 using PoeShared.Common;
 using PoeShared.Scaffolding;
 using TypeConverter;
@@ -238,10 +237,9 @@ namespace PoeEye.Converters
             }
             catch (Exception e)
             {
-                Log.Warn($"Failed to parse input {match.Value}, min: '{match.Groups["min"]}', max: '{match.Groups["max"]}'");
+                Log.Warn($"Failed to parse input {match.Value}, min: '{match.Groups["min"]}', max: '{match.Groups["max"]}'", e);
                 return string.Empty;
             }
-            
         }
 
         private static string ReplaceGroup(

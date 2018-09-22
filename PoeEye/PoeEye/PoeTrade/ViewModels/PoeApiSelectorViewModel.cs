@@ -28,7 +28,7 @@ namespace PoeEye.PoeTrade.ViewModels
             Guard.ArgumentNotNull(apiProvider, nameof(apiProvider));
             Guard.ArgumentNotNull(uiScheduler, nameof(uiScheduler));
             this.apiProvider = apiProvider;
-            
+
             this.WhenAnyValue(x => x.SelectedModule)
                 .Select(x => x == null ? Observable.Return(Unit.Default).Concat(Observable.Never<Unit>()) : x.WhenAnyValue(y => y.StaticData).ToUnit())
                 .Switch()
@@ -50,6 +50,8 @@ namespace PoeEye.PoeTrade.ViewModels
             return SelectedModule = FindModuleById(moduleIdOrName);
         }
 
+        public IPoeStaticData StaticData => SelectedModule == null ? PoeStaticData.Empty : SelectedModule.StaticData;
+
         private IPoeApiWrapper FindModuleById(string moduleInfo)
         {
             Guid moduleId;
@@ -60,7 +62,5 @@ namespace PoeEye.PoeTrade.ViewModels
 
             return ModulesList.FirstOrDefault(x => x.Name == moduleInfo);
         }
-
-        public IPoeStaticData StaticData => SelectedModule == null ? PoeStaticData.Empty : SelectedModule.StaticData;
     }
 }

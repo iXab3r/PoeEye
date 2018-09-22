@@ -10,10 +10,10 @@ namespace PoeEye.PoeTrade.Updater
     internal interface IApplicationUpdaterModel : IDisposableReactiveObject
     {
         UpdateSourceInfo UpdateSource { get; set; }
-        
+
         [CanBeNull]
         Version UpdatedVersion { get; }
-        
+
         [CanBeNull]
         UpdateInfo LatestVersion { get; }
 

@@ -14,7 +14,7 @@ namespace PoeShared.PoeTrade
 
         bool IsAvailable { get; }
 
-        [NotNull] 
+        [NotNull]
         IObservable<IPoeQueryResult> SubscribeToLiveUpdates([NotNull] IPoeQueryInfo query);
 
         [NotNull]

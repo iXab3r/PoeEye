@@ -15,13 +15,11 @@ using DynamicData.Binding;
 using Guards;
 using JetBrains.Annotations;
 using PoeEye.PoeTrade.Common;
-using PoeShared;
 using PoeShared.Common;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
 using PoeShared.Scaffolding.WPF;
 using PoeShared.UI.Models;
-using PoeShared.UI.ViewModels;
 using ReactiveUI;
 using Unity.Attributes;
 
@@ -30,7 +28,7 @@ namespace PoeEye.PoeTrade.ViewModels
     internal sealed class PoeAdvancedTradesListViewModel : DisposableReactiveObject, IPoeAdvancedTradesListViewModel
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(PoeAdvancedTradesListViewModel));
-        
+
         private static readonly Func<IPoeTradeViewModel, bool> AlwaysTruePredicate = model => true;
         private static readonly TimeSpan ResortRefilterThrottleTimeout = TimeSpan.FromMilliseconds(250);
         private static readonly TimeSpan DataChangesThrottleTimeout = TimeSpan.FromMilliseconds(1000);
@@ -98,20 +96,20 @@ namespace PoeEye.PoeTrade.ViewModels
                     if (changes is IPagedChangeSet<IPoeTradeViewModel, IPoeItem> pageCacheChanges)
                     {
                         var response = new PageResponse(
-                            pageSize: pageCacheChanges.Response.PageSize,
-                            totalSize: pageCacheChanges.Response.TotalSize,
-                            page: pageCacheChanges.Response.Page,
-                            pages: pageCacheChanges.Response.Pages);
+                            pageCacheChanges.Response.PageSize,
+                            pageCacheChanges.Response.TotalSize,
+                            pageCacheChanges.Response.Page,
+                            pageCacheChanges.Response.Pages);
                         PageParameter.Update(response);
-                    } 
+                    }
                     else if (changes is IPageChangeSet<IPoeTradeViewModel> pageChanges)
                     {
                         //FIXME There is a bug in DynamicData - PageResponse for Lists is built incorrectly
                         var response = new PageResponse(
-                            pageSize: pageChanges.Response.PageSize,
-                            totalSize: pageChanges.Response.Page,
-                            page: pageChanges.Response.TotalSize,
-                            pages: pageChanges.Response.Pages);
+                            pageChanges.Response.PageSize,
+                            pageChanges.Response.Page,
+                            pageChanges.Response.TotalSize,
+                            pageChanges.Response.Pages);
                         PageParameter.Update(response);
                     }
                 })

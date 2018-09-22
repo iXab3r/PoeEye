@@ -23,10 +23,10 @@ namespace PoeShared.StashApi.DataTypes
 
     public sealed class StashItemDisplayValue : List<string>
     {
-        public string Min => this.Count == 2 ? this[0] : null;
-        
-        public string Max => this.Count == 2 ? this[1] : null;
-        
+        public string Min => Count == 2 ? this[0] : null;
+
+        public string Max => Count == 2 ? this[1] : null;
+
         public bool IsValid => this.Any(x => !string.IsNullOrWhiteSpace(x));
 
         public string ToDisplayValue()
@@ -36,11 +36,13 @@ namespace PoeShared.StashApi.DataTypes
             {
                 result.Append(Min);
             }
+
             if (IsValidNumber(Max))
             {
                 result.Append("-");
                 result.Append(Max);
             }
+
             return result.ToString();
         }
 

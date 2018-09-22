@@ -12,7 +12,7 @@ namespace PoeShared.StashApi.DataTypes
         [JsonProperty("group")]
         [DeserializeAs(Name = "group")]
         public int Group { get; set; }
-        
+
         [JsonProperty("sColour")]
         [DeserializeAs(Name = "sColour")]
         public string Colour { get; set; }

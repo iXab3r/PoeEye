@@ -125,7 +125,7 @@ namespace PoeEye.PoeTrade.ViewModels
             implicitMods.ForEach(mod => result.Append($"{htmlConverter.Convert(mod)}"));
             if (implicitMods.Any())
             {
-                result.AppendLine($"-------------------------------------<br/>");
+                result.AppendLine("-------------------------------------<br/>");
             }
 
             explicitMods.ForEach(mod => result.Append($"{htmlConverter.Convert(mod)}"));
@@ -149,7 +149,7 @@ namespace PoeEye.PoeTrade.ViewModels
             implicitMods.ForEach(x => result.AppendLine($"{x.Name.PadRight(longestName)} {x.TierInfo}"));
             if (implicitMods.Any())
             {
-                result.AppendLine($"-------------------------------------");
+                result.AppendLine("-------------------------------------");
             }
 
             explicitMods.ForEach(x => result.AppendLine($"{x.Name.PadRight(longestName)} {x.TierInfo}"));

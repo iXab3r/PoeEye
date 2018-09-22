@@ -36,7 +36,7 @@ namespace PoeEye.PoeTradeRealtimeApi
     internal sealed class WebSocketRealtimeItemSource : DisposableReactiveObject, IRealtimeItemSource
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(WebSocketRealtimeItemSource));
-        
+
         private static readonly string PoeTradeSearchUri = @"http://poe.trade/search";
         private static readonly string PoeTradeWebSocketUri = @"ws://live.poe.trade";
         private static readonly TimeSpan WebSocketPingInterval = TimeSpan.FromSeconds(60);
@@ -138,7 +138,7 @@ namespace PoeEye.PoeTradeRealtimeApi
             switch (queryStateMachine.State)
             {
                 case State.AwaitingForInitialRequest:
-                    Log.Debug($"Sending initial request...");
+                    Log.Debug("Sending initial request...");
                     SendInitialRequest();
                     break;
             }
@@ -153,7 +153,7 @@ namespace PoeEye.PoeTradeRealtimeApi
 
         private void ClearItemList()
         {
-            Log.Debug($"Clearing items list...");
+            Log.Debug("Clearing items list...");
             itemsList.Clear();
         }
 
@@ -214,7 +214,7 @@ namespace PoeEye.PoeTradeRealtimeApi
             }
             else
             {
-                Log.Debug($"Failed to extract live uri from the initial response");
+                Log.Debug("Failed to extract live uri from the initial response");
                 queryStateMachine.Fire(Trigger.ReceivedUnexpectedInitialResponse);
             }
         }
@@ -258,9 +258,7 @@ namespace PoeEye.PoeTradeRealtimeApi
                     headers,
                     UserAgent,
                     "http://poe.trade",
-                    WebSocketVersion.Rfc6455)
-                {
-                };
+                    WebSocketVersion.Rfc6455);
                 Disposable.Create(() => WebSocketCloseSafe(webSocket, liveQueryName)).AddTo(anchors);
                 webSocket.AddTo(anchors);
 
@@ -302,7 +300,7 @@ namespace PoeEye.PoeTradeRealtimeApi
                     .Subscribe(() => HandleWebSocketPingRequest(webSocket, liveQueryName), ex => HandleWebSocketError(ex, liveQueryName))
                     .AddTo(anchors);
 
-                Log.Debug($"Opening webSocket...");
+                Log.Debug("Opening webSocket...");
                 webSocket.Open();
 
                 itemsList
@@ -313,7 +311,7 @@ namespace PoeEye.PoeTradeRealtimeApi
                     .Subscribe(item => WebSocketSubscribeToItemUpdates(webSocket, liveQueryName, item.Current), ex => HandleWebSocketError(ex, liveQueryName))
                     .AddTo(anchors);
 
-                Log.Debug($"Listening for updates");
+                Log.Debug("Listening for updates");
             }
             catch (Exception e)
             {
@@ -492,7 +490,7 @@ namespace PoeEye.PoeTradeRealtimeApi
             }
             catch (Exception ex)
             {
-                Log.Warn($"Exception occurred during live request", ex);
+                Log.Warn("Exception occurred during live request", ex);
                 queryStateMachine.Fire(Trigger.LiveQueryFailed);
             }
         }

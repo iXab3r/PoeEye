@@ -7,7 +7,7 @@ namespace PoeShared.Common
     internal sealed class PoeItemEqualityComparer : IEqualityComparer<IPoeItem>
     {
         public static readonly IEqualityComparer<IPoeItem> Instance = new PoeItemEqualityComparer();
-        
+
         private readonly PoeItemModEqualityComparer itemModEqualityComparer = new PoeItemModEqualityComparer();
 
         public bool Equals(IPoeItem x, IPoeItem y)
@@ -27,7 +27,7 @@ namespace PoeShared.Common
                 return false;
             }
 
-            var result = string.Equals(x.Hash, y.Hash, StringComparison.InvariantCultureIgnoreCase) && 
+            var result = string.Equals(x.Hash, y.Hash, StringComparison.InvariantCultureIgnoreCase) &&
                          string.Equals(x.ItemName, y.ItemName, StringComparison.InvariantCultureIgnoreCase) &&
                          string.Equals(x.ItemIconUri, y.ItemIconUri, StringComparison.InvariantCultureIgnoreCase) &&
                          string.Equals(x.TradeForumUri, y.TradeForumUri, StringComparison.InvariantCultureIgnoreCase) &&

@@ -19,10 +19,10 @@ namespace PoeShared.UI.Models
     internal sealed class ImagesCacheService : IImagesCacheService
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(ImagesCacheService));
-        
+
         private static readonly TimeSpan ArtificialDelay = TimeSpan.FromSeconds(5);
 
-        private static readonly string CachePath = Environment.ExpandEnvironmentVariables($@"%LOCALAPPDATA%\PoeEye\Cache\");
+        private static readonly string CachePath = Environment.ExpandEnvironmentVariables(@"%LOCALAPPDATA%\PoeEye\Cache\");
         private readonly IFactory<IHttpClient> httpClientFactory;
 
         private readonly IDictionary<string, IObservable<FileInfo>> imagesBeingLoaded = new ConcurrentDictionary<string, IObservable<FileInfo>>();
@@ -47,7 +47,7 @@ namespace PoeShared.UI.Models
             IObservable<FileInfo> inProgress;
             if (imagesBeingLoaded.TryGetValue(outputFilePath, out inProgress))
             {
-                Log.Debug($"[ItemsCache.ResolveImageByUri] Image is currently loading, returning source");
+                Log.Debug("[ItemsCache.ResolveImageByUri] Image is currently loading, returning source");
                 return inProgress;
             }
 

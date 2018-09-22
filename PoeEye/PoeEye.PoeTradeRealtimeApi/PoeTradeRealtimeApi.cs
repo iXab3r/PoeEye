@@ -9,7 +9,6 @@ using Common.Logging;
 using Guards;
 using JetBrains.Annotations;
 using PoeEye.PoeTrade;
-using PoeShared;
 using PoeShared.PoeTrade;
 using PoeShared.PoeTrade.Query;
 using PoeShared.Prism;
@@ -64,7 +63,7 @@ namespace PoeEye.PoeTradeRealtimeApi
 
         public Task<IPoeStaticData> RequestStaticData()
         {
-            Log.Debug($"[PoeTradeRealtimeApi.RequestStaticData] Requesting data...");
+            Log.Debug("[PoeTradeRealtimeApi.RequestStaticData] Requesting data...");
             return poeTradeApi.RequestStaticData();
         }
 

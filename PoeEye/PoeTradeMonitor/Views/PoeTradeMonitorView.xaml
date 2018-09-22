@@ -133,7 +133,7 @@
                             Command="{Binding CreateFakeTradeCommand}" />
                 </StackPanel>
             </Border>
-            
+
             <!-- Body -->
             <Grid DockPanel.Dock="Bottom"
                   Margin="3">

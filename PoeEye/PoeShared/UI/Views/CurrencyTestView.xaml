@@ -4,23 +4,23 @@
                     xmlns:blue="http://www.nuget.org/Blue.MVVM"
                     xmlns:sharedViewModels="clr-namespace:PoeShared.UI.ViewModels">
 
-  <ResourceDictionary.MergedDictionaries>
-    <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Converters.xaml" />
-  </ResourceDictionary.MergedDictionaries>
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Converters.xaml" />
+    </ResourceDictionary.MergedDictionaries>
 
-  <DataTemplate x:Key="CurrencyTestTemplateKey" DataType="{x:Type sharedViewModels:CurrencyTestViewModel}">
-    <Grid>
-      <ItemsControl ItemsSource="{Binding Items}">
-        <ItemsControl.ItemTemplate>
-          <DataTemplate DataType="{x:Type sharedViewModels:CurrencyInfo}">
-            <DockPanel LastChildFill="True">
-              <ContentPresenter Content="{Binding Price}" MinWidth="240" />
-              <TextBox Text="{Binding AliasesList, Mode=OneWay}" IsReadOnly="True"/>
-            </DockPanel>
-          </DataTemplate>
-        </ItemsControl.ItemTemplate>
-      </ItemsControl>
-    </Grid>
-  </DataTemplate>
+    <DataTemplate x:Key="CurrencyTestTemplateKey" DataType="{x:Type sharedViewModels:CurrencyTestViewModel}">
+        <Grid>
+            <ItemsControl ItemsSource="{Binding Items}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="{x:Type sharedViewModels:CurrencyInfo}">
+                        <DockPanel LastChildFill="True">
+                            <ContentPresenter Content="{Binding Price}" MinWidth="240" />
+                            <TextBox Text="{Binding AliasesList, Mode=OneWay}" IsReadOnly="True" />
+                        </DockPanel>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </Grid>
+    </DataTemplate>
 
 </ResourceDictionary>

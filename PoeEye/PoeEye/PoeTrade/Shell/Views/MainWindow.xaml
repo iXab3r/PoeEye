@@ -97,45 +97,45 @@
                                 </DockPanel.LayoutTransform>
 
                                 <!-- Items are upside-down -->
-                                
+
                                 <ContentControl DockPanel.Dock="Left"
-                                                eye:CommandWrapperHelper.Text="&#xF0E2; UNDO CLOSE" 
+                                                eye:CommandWrapperHelper.Text="&#xF0E2; UNDO CLOSE"
                                                 ToolTip="CTRL+Z Undo close operation"
                                                 Content="{Binding UndoCloseTabCommand}" />
 
 
                                 <ContentControl DockPanel.Dock="Left"
-                                                eye:CommandWrapperHelper.Text="&#xF24D; CLONE" 
+                                                eye:CommandWrapperHelper.Text="&#xF24D; CLONE"
                                                 eye:CommandWrapperHelper.CommandParameter="{Binding SelectedTab}"
                                                 ToolTip="CTRL+D Duplicate selected tab"
                                                 Content="{Binding DuplicateTabCommand}" />
 
                                 <ContentControl DockPanel.Dock="Left"
-                                                eye:CommandWrapperHelper.Text="&#xF0EA; PASTE" 
+                                                eye:CommandWrapperHelper.Text="&#xF0EA; PASTE"
                                                 ToolTip="CTRL+V Paste tab"
 
                                                 Content="{Binding PasteTabCommand}" />
 
-                                <ContentControl DockPanel.Dock="Left" 
-                                                eye:CommandWrapperHelper.Text="&#xF0C5; COPY" 
+                                <ContentControl DockPanel.Dock="Left"
+                                                eye:CommandWrapperHelper.Text="&#xF0C5; COPY"
                                                 eye:CommandWrapperHelper.CommandParameter="{Binding SelectedTab}"
                                                 ToolTip="CTRL+C Duplicate selected tab"
                                                 Content="{Binding CopyTabToClipboardCommand}" />
 
                                 <TextBlock DockPanel.Dock="Right"
-                                           FontSize="14" 
+                                           FontSize="14"
                                            Text="QUERY LIST"
                                            HorizontalAlignment="Right" />
-                                
+
                                 <Button DockPanel.Dock="Right"
-                                    Width="24" Height="24"
-                                    HorizontalAlignment="Right"
-                                    VerticalAlignment="Top"
-                                    Command="{Binding RefreshAllTabsCommand}"
-                                    Focusable="False"
-                                    ToolTip="Force refresh all tabs"
-                                    Padding="5"
-                                    fa:Awesome.Content="Refresh">
+                                        Width="24" Height="24"
+                                        HorizontalAlignment="Right"
+                                        VerticalAlignment="Top"
+                                        Command="{Binding RefreshAllTabsCommand}"
+                                        Focusable="False"
+                                        ToolTip="Force refresh all tabs"
+                                        Padding="5"
+                                        fa:Awesome.Content="Refresh">
                                     <Button.Style>
                                         <Style TargetType="{x:Type Button}" BasedOn="{StaticResource CircleButton}">
                                             <Setter Property="BorderThickness" Value="2" />
@@ -273,7 +273,7 @@
     </controls:MetroWindow.LeftWindowCommands>
 
     <controls:MetroWindow.RightWindowCommands>
-        <controls:WindowCommands ShowSeparators="True" >
+        <controls:WindowCommands ShowSeparators="True">
             <ContentPresenter Content="{Binding ProxyProviderViewModel}" />
 
             <ContentPresenter Content="{Binding ApplicationUpdater}">

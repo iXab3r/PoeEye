@@ -7,7 +7,6 @@ using Common.Logging;
 using Guards;
 using JetBrains.Annotations;
 using PoeEye.Config;
-using PoeShared;
 using PoeShared.Common;
 using PoeShared.Modularity;
 using PoeShared.PoeTrade;
@@ -78,7 +77,7 @@ namespace PoeEye.PoeTrade.Models
 
             if (!currencyByType.ContainsKey(KnownCurrencyNameList.ChaosOrb))
             {
-                Log.Debug($"[PriceCalculator] Chaos orb is not in a list of prices, adding it");
+                Log.Debug("[PriceCalculator] Chaos orb is not in a list of prices, adding it");
                 currencyByType[KnownCurrencyNameList.ChaosOrb] = 1.0f;
             }
 

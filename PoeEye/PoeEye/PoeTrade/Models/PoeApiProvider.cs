@@ -6,7 +6,6 @@ using DynamicData;
 using DynamicData.Binding;
 using Guards;
 using JetBrains.Annotations;
-using PoeShared;
 using PoeShared.PoeTrade;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
@@ -27,7 +26,7 @@ namespace PoeEye.PoeTrade.Models
             Guard.ArgumentNotNull(container, nameof(container));
             Guard.ArgumentNotNull(wrapperFactory, nameof(wrapperFactory));
 
-            Log.Debug($"[PoeApiProvider..ctor] Loading APIs list...");
+            Log.Debug("[PoeApiProvider..ctor] Loading APIs list...");
             var apiList = container
                           .ResolveAll<IPoeApi>()
                           .Select(wrapperFactory.Create)

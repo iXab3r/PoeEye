@@ -33,7 +33,7 @@ namespace PoeEye.PoeTrade.ViewModels
                 .DistinctUntilChanged()
                 .Subscribe(x => Reinitialize(x.MinRefreshTimeout, x.MaxRefreshTimeout))
                 .AddTo(Anchors);
-            
+
             SetPeriodCommand = new DelegateCommand<object>(SetPeriodCommandExecuted);
 
             this.WhenAnyValue(x => x.Period)
@@ -43,22 +43,6 @@ namespace PoeEye.PoeTrade.ViewModels
                     this.RaisePropertyChanged(nameof(IsAutoRecheckEnabled));
                 })
                 .AddTo(Anchors);
-        }
-
-        private void SetPeriodCommandExecuted(object obj)
-        {
-            if (obj == null)
-            {
-                Period = TimeSpan.MinValue;
-            } 
-            else if (obj is double periodInSeconds)
-            {
-                Period = TimeSpan.FromSeconds(periodInSeconds);
-            }
-            else if (obj is TimeSpan period)
-            {
-                Period = period;
-            }
         }
 
         public TimeSpan MinValue
@@ -73,17 +57,33 @@ namespace PoeEye.PoeTrade.ViewModels
             set => this.RaiseAndSetIfChanged(ref maxValue, value);
         }
 
+        public ICommand SetPeriodCommand { get; }
+
         public TimeSpan Period
         {
             get => period;
             set => this.RaiseAndSetIfChanged(ref period, value);
         }
 
-        public ICommand SetPeriodCommand { get; }
-
         public bool IsLive => Period == TimeSpan.Zero;
 
         public bool IsAutoRecheckEnabled => Period > TimeSpan.Zero;
+
+        private void SetPeriodCommandExecuted(object obj)
+        {
+            if (obj == null)
+            {
+                Period = TimeSpan.MinValue;
+            }
+            else if (obj is double periodInSeconds)
+            {
+                Period = TimeSpan.FromSeconds(periodInSeconds);
+            }
+            else if (obj is TimeSpan period)
+            {
+                Period = period;
+            }
+        }
 
         private TimeSpan MiddleSplit(TimeSpan min, TimeSpan max)
         {

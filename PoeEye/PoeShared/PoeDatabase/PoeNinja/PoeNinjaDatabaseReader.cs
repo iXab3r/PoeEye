@@ -39,10 +39,8 @@ namespace PoeShared.PoeDatabase.PoeNinja
         };
 
         public PoeNinjaDatabaseReader(
-            [NotNull] [Dependency(WellKnownSchedulers.UI)]
-            IScheduler uiScheduler,
-            [NotNull] [Dependency(WellKnownSchedulers.Background)]
-            IScheduler bgScheduler)
+            [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler,
+            [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler)
         {
             Log.Debug("[PoeNinjaDatabaseReader..ctor] Created");
 
@@ -90,7 +88,7 @@ namespace PoeShared.PoeDatabase.PoeNinja
 
         private string[] GetEntities(string leagueId)
         {
-            Log.Debug($"[PoeNinjaDatabaseReader] Starting API queries...");
+            Log.Debug("[PoeNinjaDatabaseReader] Starting API queries...");
             try
             {
                 var api = RestClient.For<IPoeNinjaApi>(PoeNinjaDataUri, HandleRequestMessage, serializerSettings);
@@ -192,9 +190,9 @@ namespace PoeShared.PoeDatabase.PoeNinja
         }
 
         internal struct GenericResponse
-                 {
-                     public List<GenericItem> Lines { get; set; }
-                 }
+        {
+            public List<GenericItem> Lines { get; set; }
+        }
 
         internal struct CurrencyResponse
         {

@@ -6,7 +6,6 @@ using Common.Logging;
 using DynamicData;
 using Guards;
 using JetBrains.Annotations;
-using PoeShared;
 using PoeShared.Common;
 using PoeShared.PoeTrade;
 using PoeShared.Prism;
@@ -68,6 +67,7 @@ namespace PoeEye.PoeTrade.ViewModels
             {
                 return null;
             }
+
             var knownType = knownTypesByName.Lookup(SelectedValue);
             if (knownType.HasValue)
             {

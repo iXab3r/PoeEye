@@ -5,54 +5,54 @@
                     xmlns:eye="http://coderush.net/poeeye/"
                     xmlns:query="clr-namespace:PoeShared.Common;assembly=PoeShared">
 
-  <converters:ObjectToLowercaseConverter x:Key="ObjectToLowercaseConverter" />
-  <converters:TimeSpanToSecondsConverter x:Key="TimeSpanToSecondsConverter" />
+    <converters:ObjectToLowercaseConverter x:Key="ObjectToLowercaseConverter" />
+    <converters:TimeSpanToSecondsConverter x:Key="TimeSpanToSecondsConverter" />
 
-  <eye:PriceToImageUriConverter x:Key="PriceToImageUriConverter" />
-  
-  <ObjectDataProvider x:Key="TriStateProviderKey"
-                      MethodName="GetValuesAndDescriptions"
-                      ObjectType="eye:EnumHelper">
-    <ObjectDataProvider.MethodParameters>
-      <x:TypeExtension TypeName="query:TriState" />
-    </ObjectDataProvider.MethodParameters>
-  </ObjectDataProvider>
+    <eye:PriceToImageUriConverter x:Key="PriceToImageUriConverter" />
 
-  <blue:Int32ToVisibilityConverter x:Key="ZeroToCollapsedConverter" TrueValue="Collapsed" FalseValue="Visible">
-    <blue:Int32ToVisibilityConverter.ComparisonStrategy>
-      <blue:Int32ComparisonStrategy Mode="Equal" Comparand="0" />
-    </blue:Int32ToVisibilityConverter.ComparisonStrategy>
-  </blue:Int32ToVisibilityConverter>
+    <ObjectDataProvider x:Key="TriStateProviderKey"
+                        MethodName="GetValuesAndDescriptions"
+                        ObjectType="eye:EnumHelper">
+        <ObjectDataProvider.MethodParameters>
+            <x:TypeExtension TypeName="query:TriState" />
+        </ObjectDataProvider.MethodParameters>
+    </ObjectDataProvider>
 
-  <converters:NullToVisibilityMultiValueConverter x:Key="AllNullToCollapsedMultiValueConverter" TrueValue="Collapsed" FalseValue="Visible">
-    <converters:NullToVisibilityMultiValueConverter.Strategy>
-      <blue:AndStrategy/>
-    </converters:NullToVisibilityMultiValueConverter.Strategy>
-  </converters:NullToVisibilityMultiValueConverter>
+    <blue:Int32ToVisibilityConverter x:Key="ZeroToCollapsedConverter" TrueValue="Collapsed" FalseValue="Visible">
+        <blue:Int32ToVisibilityConverter.ComparisonStrategy>
+            <blue:Int32ComparisonStrategy Mode="Equal" Comparand="0" />
+        </blue:Int32ToVisibilityConverter.ComparisonStrategy>
+    </blue:Int32ToVisibilityConverter>
 
-  <converters:NullToVisibilityMultiValueConverter x:Key="AnyNullToCollapsedMultiValueConverter" TrueValue="Collapsed" FalseValue="Visible">
-    <converters:NullToVisibilityMultiValueConverter.Strategy>
-      <blue:OrStrategy/>
-    </converters:NullToVisibilityMultiValueConverter.Strategy>
-  </converters:NullToVisibilityMultiValueConverter>
+    <converters:NullToVisibilityMultiValueConverter x:Key="AllNullToCollapsedMultiValueConverter" TrueValue="Collapsed" FalseValue="Visible">
+        <converters:NullToVisibilityMultiValueConverter.Strategy>
+            <blue:AndStrategy />
+        </converters:NullToVisibilityMultiValueConverter.Strategy>
+    </converters:NullToVisibilityMultiValueConverter>
 
-  <converters:MathAdditionConverter x:Key="MathAdditionConverter"/> 
-  
-  <converters:PoeItemModToHtmlConverter x:Key="DefaultPoeItemModToHtmlConverterKey"
-                                        DefaultTextColor="{StaticResource PoeItemRarityNormalColor}"
-                                        FireRelatedTextColor="#B95F0E"
-                                        ColdRelatedTextColor="#6285FF"
-                                        LightningRelatedTextColor="#AD9D32"
-                                        ChaosRelatedTextColor="#8A89D0"
-                                        PhysicalRelatedTextColor="{StaticResource PoeItemPhysicalStatColor}"
-                                        ElementalRelatedTextColor="{StaticResource PoeItemElementalStatColor}"
-                                        LifeRelatedTextColor="{StaticResource PoeItemStrStatColor}"
-                                        ManaRelatedTextColor="{StaticResource PoeItemIntStatColor}"
-                                        StrengthRelatedTextColor="{StaticResource PoeItemStrStatColor}"
-                                        DexterityRelatedTextColor="{StaticResource PoeItemDexStatColor}"
-                                        IntelligenceRelatedTextColor="{StaticResource PoeItemIntStatColor}"
-                                        CraftGroupColor="{StaticResource PoeItemElementalStatColor}"
-                                        EnchantGroupColor="{StaticResource PoeItemRarityRelicColor}"
-                                        PseudoGroupColor="#5DA423"
-                                        TotalGroupColor="#5DA423" />
+    <converters:NullToVisibilityMultiValueConverter x:Key="AnyNullToCollapsedMultiValueConverter" TrueValue="Collapsed" FalseValue="Visible">
+        <converters:NullToVisibilityMultiValueConverter.Strategy>
+            <blue:OrStrategy />
+        </converters:NullToVisibilityMultiValueConverter.Strategy>
+    </converters:NullToVisibilityMultiValueConverter>
+
+    <converters:MathAdditionConverter x:Key="MathAdditionConverter" />
+
+    <converters:PoeItemModToHtmlConverter x:Key="DefaultPoeItemModToHtmlConverterKey"
+                                          DefaultTextColor="{StaticResource PoeItemRarityNormalColor}"
+                                          FireRelatedTextColor="#B95F0E"
+                                          ColdRelatedTextColor="#6285FF"
+                                          LightningRelatedTextColor="#AD9D32"
+                                          ChaosRelatedTextColor="#8A89D0"
+                                          PhysicalRelatedTextColor="{StaticResource PoeItemPhysicalStatColor}"
+                                          ElementalRelatedTextColor="{StaticResource PoeItemElementalStatColor}"
+                                          LifeRelatedTextColor="{StaticResource PoeItemStrStatColor}"
+                                          ManaRelatedTextColor="{StaticResource PoeItemIntStatColor}"
+                                          StrengthRelatedTextColor="{StaticResource PoeItemStrStatColor}"
+                                          DexterityRelatedTextColor="{StaticResource PoeItemDexStatColor}"
+                                          IntelligenceRelatedTextColor="{StaticResource PoeItemIntStatColor}"
+                                          CraftGroupColor="{StaticResource PoeItemElementalStatColor}"
+                                          EnchantGroupColor="{StaticResource PoeItemRarityRelicColor}"
+                                          PseudoGroupColor="#5DA423"
+                                          TotalGroupColor="#5DA423" />
 </ResourceDictionary>

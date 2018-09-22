@@ -9,9 +9,8 @@ namespace PoeShared.Converters
 {
     public sealed class PriceToImageUriConverter : IValueConverter
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(PriceToImageUriConverter));
-
         private const string ImagesPathPrefix = "Resources/Currencies";
+        private static readonly ILog Log = LogManager.GetLogger(typeof(PriceToImageUriConverter));
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

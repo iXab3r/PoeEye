@@ -11,9 +11,9 @@
     <DataTemplate DataType="{x:Type sharedViewModels:ImageViewModel}">
         <Grid>
             <controls:ProgressRing Height="20" Width="20" IsActive="true"
-                             Visibility="{Binding IsLoading, Converter={StaticResource TrueToVisibleFalseToCollapsedConverter}}" />
+                                   Visibility="{Binding IsLoading, Converter={StaticResource TrueToVisibleFalseToCollapsedConverter}}" />
 
-            <Image Source="{Binding ImageSource}"/>
+            <Image Source="{Binding ImageSource}" />
         </Grid>
     </DataTemplate>
 

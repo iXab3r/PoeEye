@@ -5,10 +5,8 @@ using Common.Logging;
 
 namespace PoeShared.Native
 {
-    internal static class WindowsServices
+    public static class WindowsServices
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(WindowsServices));
-
         private const int WS_EX_LAYERED = 0x00080000;
         private const int WS_EX_TRANSPARENT = 0x00000020;
         private const int WS_EX_TOOLWINDOW = 0x00000080;
@@ -23,6 +21,7 @@ namespace PoeShared.Native
         private const int GWL_STYLE = -16;
         private const int WS_SYSMENU = 0x80000;
         private const int WS_EX_NOACTIVATE = 0x08000000;
+        private static readonly ILog Log = LogManager.GetLogger(typeof(WindowsServices));
 
         static WindowsServices()
         {
@@ -33,7 +32,7 @@ namespace PoeShared.Native
                 var result = AllowSetForegroundWindow((uint)processId);
                 if (!result)
                 {
-                    Log.Warn($"[WindowsServices] AllowSetForegroundWindow has failed !");
+                    Log.Warn("[WindowsServices] AllowSetForegroundWindow has failed !");
                 }
                 else
                 {
@@ -84,6 +83,11 @@ namespace PoeShared.Native
         {
             ShowWindow(handle, SW_SHOWNOACTIVATE);
             SetWindowPos(handle, HWND_TOPMOST, left, top, width, height, SWP_NOACTIVATE);
+        }
+        
+        public static void ShowWindow(IntPtr handle)
+        {
+            ShowWindow(handle, SW_SHOWNORMAL);
         }
 
         public static void HideWindow(IntPtr handle)

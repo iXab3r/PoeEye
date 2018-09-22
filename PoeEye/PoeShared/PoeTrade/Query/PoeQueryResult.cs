@@ -6,17 +6,18 @@ namespace PoeShared.PoeTrade.Query
 {
     public sealed class PoeQueryResult : IPoeQueryResult
     {
+        private readonly ReadOnlyDictionary<string, string> freeFormDataWrapper;
         private IPoeItem[] itemsList = new IPoeItem[0];
         private IPoeQueryInfo query = PoeQueryInfo.Empty;
-        private readonly IDictionary<string,string> freeFormData = new Dictionary<string, string>();
-        private readonly ReadOnlyDictionary<string, string> freeFormDataWrapper;
-
-        public string Id { get; set; }
 
         public PoeQueryResult()
         {
-            freeFormDataWrapper = new ReadOnlyDictionary<string, string>(freeFormData);
+            freeFormDataWrapper = new ReadOnlyDictionary<string, string>(FreeFormData);
         }
+
+        public IDictionary<string, string> FreeFormData { get; } = new Dictionary<string, string>();
+
+        public string Id { get; set; }
 
         public IPoeItem[] ItemsList
         {
@@ -30,8 +31,6 @@ namespace PoeShared.PoeTrade.Query
             set => query = value ?? PoeQueryInfo.Empty;
         }
 
-        public IDictionary<string, string> FreeFormData => freeFormData;
-
-        ReadOnlyDictionary<string, string> IPoeQueryResult.FreeFormData => this.freeFormDataWrapper;
+        ReadOnlyDictionary<string, string> IPoeQueryResult.FreeFormData => freeFormDataWrapper;
     }
 }

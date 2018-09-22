@@ -6,13 +6,13 @@ namespace PoeEye.PathOfExileTrade.TradeApi.Domain
 {
     public static class JsonFetchRequest
     {
-        public partial class Response
+        public class Response
         {
             [JsonProperty("result")]
             public ResultListing[] Listings { get; set; }
         }
 
-        public partial class ResultListing
+        public class ResultListing
         {
             [JsonProperty("id")]
             public string Id { get; set; }
@@ -26,8 +26,8 @@ namespace PoeEye.PathOfExileTrade.TradeApi.Domain
             [JsonProperty("gone", NullValueHandling = NullValueHandling.Ignore)]
             public bool? Gone { get; set; }
         }
-        
-        public partial class ListingDetails
+
+        public class ListingDetails
         {
             [JsonProperty("method")]
             public string Method { get; set; }
@@ -47,8 +47,8 @@ namespace PoeEye.PathOfExileTrade.TradeApi.Domain
             [JsonProperty("price")]
             public Price Price { get; set; }
         }
-    
-        public partial class JsonListingStash
+
+        public class JsonListingStash
         {
             [JsonProperty("name")]
             public string Name { get; set; }
@@ -59,14 +59,14 @@ namespace PoeEye.PathOfExileTrade.TradeApi.Domain
             [JsonProperty("y")]
             public long Y { get; set; }
         }
-    
-        public partial class AccountOnline
+
+        public class AccountOnline
         {
             [JsonProperty("league")]
             public string League { get; set; }
         }
 
-        public partial class Price
+        public class Price
         {
             [JsonProperty("type")]
             public string Type { get; set; }
@@ -82,8 +82,8 @@ namespace PoeEye.PathOfExileTrade.TradeApi.Domain
                 return $"{Type} {Amount} {Currency}";
             }
         }
-    
-        public partial class Account
+
+        public class Account
         {
             [JsonProperty("name")]
             public string Name { get; set; }
@@ -97,6 +97,5 @@ namespace PoeEye.PathOfExileTrade.TradeApi.Domain
             [JsonProperty("language")]
             public string Language { get; set; }
         }
-
     }
 }

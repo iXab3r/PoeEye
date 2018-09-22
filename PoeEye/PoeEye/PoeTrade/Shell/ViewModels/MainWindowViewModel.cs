@@ -34,7 +34,7 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
     internal sealed class MainWindowViewModel : DisposableReactiveObject, IMainWindowViewModel
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(MainWindowViewModel));
-        
+
         private static readonly int UndoStackDepth = 10;
 
         private static readonly string ExplorerExecutablePath = Environment.ExpandEnvironmentVariables(@"%WINDIR%\explorer.exe");
@@ -279,6 +279,7 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
             {
                 cfg = poeEyeConfigProvider.ActualConfig.DefaultConfig;
             }
+
             tab.Load(cfg);
         }
 

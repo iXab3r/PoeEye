@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive;
@@ -24,15 +23,15 @@ namespace PoeShared.PoeTrade
         private static readonly ILog Log = LogManager.GetLogger(typeof(PoeLiveHistoryProvider));
 
         private readonly TimeSpan delayAfterError = TimeSpan.FromSeconds(30);
-        
+
+        private readonly HashSet<IPoeItem> existingItems = new HashSet<IPoeItem>();
+
         private readonly ISubject<Unit> forceUpdatesSubject = new Subject<Unit>();
         private readonly ISubject<IPoeItem[]> itemsPacksSubject = new Subject<IPoeItem[]>();
         private readonly ISubject<Exception> updateExceptionsSubject = new Subject<Exception>();
 
         private bool isBusy;
         private TimeSpan recheckPeriod;
-
-        private readonly HashSet<IPoeItem> existingItems = new HashSet<IPoeItem>();
 
         public PoeLiveHistoryProvider(
             [NotNull] IPoeQueryInfo query,
@@ -58,7 +57,7 @@ namespace PoeShared.PoeTrade
                                             .Select(x =>
                                             {
                                                 return IsLiveMode
-                                                    ? new PoeLiveUpdatesAdapter(poeApi, new PoeItemEqualityComparer()).SubscribeToLiveUpdates(query) 
+                                                    ? new PoeLiveUpdatesAdapter(poeApi, new PoeItemEqualityComparer()).SubscribeToLiveUpdates(query)
                                                     : poeApi.IssueQuery(query)
                                                             .ToObservable()
                                                             .Select(y => y.ItemsList.EmptyIfNull().ToArray());
@@ -79,6 +78,10 @@ namespace PoeShared.PoeTrade
             Disposable.Create(() => poeApi.DisposeQuery(query)).AddTo(Anchors);
         }
 
+        public bool IsLiveMode => RecheckPeriod == TimeSpan.Zero;
+
+        public bool IsAutoRecheckEnabled => RecheckPeriod > TimeSpan.Zero;
+
         public IObservable<IPoeItem[]> ItemsPacks => itemsPacksSubject;
 
         public IObservable<Exception> UpdateExceptions => updateExceptionsSubject;
@@ -95,10 +98,6 @@ namespace PoeShared.PoeTrade
             set => this.RaiseAndSetIfChanged(ref recheckPeriod, value);
         }
 
-        public bool IsLiveMode => RecheckPeriod == TimeSpan.Zero;
-        
-        public bool IsAutoRecheckEnabled => RecheckPeriod > TimeSpan.Zero;
-
         public void Refresh()
         {
             forceUpdatesSubject.OnNext(Unit.Default); // forcing refresh
@@ -109,41 +108,41 @@ namespace PoeShared.PoeTrade
             if (IsLiveMode)
             {
                 return Observable.Never<Unit>();
-            } 
-            else if (IsAutoRecheckEnabled)
+            }
+
+            if (IsAutoRecheckEnabled)
             {
                 return Observable.Timer(DateTimeOffset.Now, RecheckPeriod).ToUnit();
             }
-            else
-            {
-                return Observable.Return(Unit.Default).Concat(Observable.Never<Unit>());
-            }
+
+            return Observable.Return(Unit.Default).Concat(Observable.Never<Unit>());
         }
 
         private void StartUpdate(Unit unit)
         {
-            Log.Debug($"[PoeLiveHistoryProvider] Starting update...");
+            Log.Debug("[PoeLiveHistoryProvider] Starting update...");
             if (!IsLiveMode)
             {
                 IsBusy = true;
             }
         }
-        
+
         private void LogRecheckPeriodChange()
         {
             string periodInfo;
             if (IsLiveMode)
             {
                 periodInfo = "Live mode";
-            } 
+            }
             else if (IsAutoRecheckEnabled)
             {
                 periodInfo = $"every {RecheckPeriod}";
             }
             else
             {
-                periodInfo = $"recheck disabled";
+                periodInfo = "recheck disabled";
             }
+
             Log.Debug($"[PoeLiveHistoryProvider] Update period changed: {periodInfo}");
         }
 
@@ -156,11 +155,11 @@ namespace PoeShared.PoeTrade
             if (updatedUnknown.Any())
             {
                 var removedItems = existingItems.Except(updatedUnknown, PoeItemEqualityComparer.Instance).ForEach(x => x.ItemState = PoeTradeState.Removed);
-                var newItems = updatedUnknown .Except(existingItems, PoeItemEqualityComparer.Instance).ForEach(x => x.ItemState = PoeTradeState.New);
+                var newItems = updatedUnknown.Except(existingItems, PoeItemEqualityComparer.Instance).ForEach(x => x.ItemState = PoeTradeState.New);
                 result.AddRange(removedItems);
                 result.AddRange(newItems);
             }
-            
+
             foreach (var item in result)
             {
                 switch (item.ItemState)
@@ -172,10 +171,11 @@ namespace PoeShared.PoeTrade
                         existingItems.Remove(item);
                         break;
                     default:
-                        throw new ArgumentOutOfRangeException($"Invalid item state: {item.ItemState}, expected to be New/Removed at this stage, items: {result.DumpToTextRaw()}");
+                        throw new ArgumentOutOfRangeException(
+                            $"Invalid item state: {item.ItemState}, expected to be New/Removed at this stage, items: {result.DumpToTextRaw()}");
                 }
             }
-            
+
             return result.ToArray();
         }
 
@@ -222,7 +222,6 @@ namespace PoeShared.PoeTrade
                 return api
                        .GetLiveUpdates(query)
                        .Select(x => x.ItemsList);
-
             }
         }
     }

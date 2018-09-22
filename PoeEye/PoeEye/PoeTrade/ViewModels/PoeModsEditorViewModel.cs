@@ -7,7 +7,6 @@ using Common.Logging;
 using Guards;
 using JetBrains.Annotations;
 using PoeEye.PoeTrade.Models;
-using PoeShared;
 using PoeShared.Common;
 using PoeShared.PoeTrade;
 using PoeShared.PoeTrade.Query;
@@ -143,6 +142,7 @@ namespace PoeEye.PoeTrade.ViewModels
             {
                 Log.Warn($"[PoeModsEditorViewModel] Bad mods detected({badMods.Count})\n\n{badMods.DumpToTable()}");
             }
+
             return result;
         }
 

@@ -9,7 +9,6 @@ using Guards;
 using JetBrains.Annotations;
 using PoeBud.Models;
 using PoeBud.Services;
-using PoeShared;
 using PoeShared.Common;
 using PoeShared.Converters;
 using PoeShared.PoeTrade;
@@ -65,7 +64,7 @@ namespace PoeBud.ViewModels
 
         private PoePrice CalculateTotal(IPoeTradeSolution solution)
         {
-            Log.Debug($"Calculating Currency total...");
+            Log.Debug("Calculating Currency total...");
 
             var currencyWithAmount = solution
                                      .Items

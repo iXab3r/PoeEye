@@ -15,10 +15,10 @@
                 CornerRadius="4"
                 Background="{StaticResource MaterialDesignBackground}"
                 BorderThickness="1">
-            <DockPanel >
-                <TextBlock FontWeight="Bold" Text="{Binding CurrentPage}"/>
-                <TextBlock FontWeight="Bold" Text=" / "/>
-                <TextBlock FontWeight="Bold" Text="{Binding PageCount}"/>
+            <DockPanel>
+                <TextBlock FontWeight="Bold" Text="{Binding CurrentPage}" />
+                <TextBlock FontWeight="Bold" Text=" / " />
+                <TextBlock FontWeight="Bold" Text="{Binding PageCount}" />
                 <Button
                     Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}"
                     Command="{Binding PreviousPageCommand}" Width="20" Height="20" Margin="1,0"

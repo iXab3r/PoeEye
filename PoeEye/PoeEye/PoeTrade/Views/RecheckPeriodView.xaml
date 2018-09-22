@@ -92,7 +92,7 @@
                             </DockPanel>
                         </Button.Content>
                     </Button>
-                    <Button HorizontalContentAlignment="Stretch" >
+                    <Button HorizontalContentAlignment="Stretch">
                         <Button.Content>
                             <DockPanel LastChildFill="True">
                                 <materialDesign:PackIcon DockPanel.Dock="Left"

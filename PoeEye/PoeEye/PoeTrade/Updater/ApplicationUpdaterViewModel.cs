@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
@@ -23,7 +22,6 @@ namespace PoeEye.PoeTrade.Updater
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(ApplicationUpdaterViewModel));
 
-        private readonly CommandWrapper checkForUpdatesCommand;
         private readonly CommandWrapper restartCommand;
         private readonly IApplicationUpdaterModel updaterModel;
         private string error = string.Empty;
@@ -49,10 +47,10 @@ namespace PoeEye.PoeTrade.Updater
                         .Subscribe(() => this.RaisePropertyChanged(nameof(UpdatedVersion)))
                         .AddTo(Anchors);
 
-            checkForUpdatesCommand = CommandWrapper
+            CheckForUpdatesCommand = CommandWrapper
                 .Create(CheckForUpdatesCommandExecuted);
 
-            checkForUpdatesCommand
+            CheckForUpdatesCommand
                 .ThrownExceptions
                 .Subscribe(ex => Error = $"Update error: {ex.Message}")
                 .AddTo(Anchors);
@@ -92,7 +90,7 @@ namespace PoeEye.PoeTrade.Updater
                             : Observable.Timer(DateTimeOffset.MinValue, timeout.curr, bgScheduler))
                 .Switch()
                 .ObserveOn(uiScheduler)
-                .Subscribe(() => checkForUpdatesCommand.Execute(null), Log.HandleException)
+                .Subscribe(() => CheckForUpdatesCommand.Execute(null), Log.HandleException)
                 .AddTo(Anchors);
 
             ApplyUpdate = CommandWrapper.Create(
@@ -100,7 +98,7 @@ namespace PoeEye.PoeTrade.Updater
                 this.updaterModel.WhenAnyValue(x => x.LatestVersion).Select(x => x != null));
         }
 
-        public CommandWrapper CheckForUpdatesCommand => checkForUpdatesCommand;
+        public CommandWrapper CheckForUpdatesCommand { get; }
 
         public ICommand RestartCommand => restartCommand;
 
@@ -133,12 +131,13 @@ namespace PoeEye.PoeTrade.Updater
         private async Task CheckForUpdatesCommandExecuted()
         {
             Log.Debug("[ApplicationUpdaterViewModel] Update check requested");
-            if (checkForUpdatesCommand.IsBusy || ApplyUpdate.IsBusy)
+            if (CheckForUpdatesCommand.IsBusy || ApplyUpdate.IsBusy)
             {
                 Log.Debug("[ApplicationUpdaterViewModel] Already in progress");
                 IsOpen = true;
                 return;
             }
+
             StatusText = "Checking for updates...";
             Error = string.Empty;
 
@@ -156,7 +155,7 @@ namespace PoeEye.PoeTrade.Updater
                 }
                 else
                 {
-                    StatusText = $"Latest version is already installed";
+                    StatusText = "Latest version is already installed";
                 }
             }
             catch (Exception ex)
@@ -170,12 +169,13 @@ namespace PoeEye.PoeTrade.Updater
         private async Task ApplyUpdateCommandExecuted()
         {
             Log.Debug($"[ApplicationUpdaterViewModel] Applying latest update {LatestVersion}");
-            if (checkForUpdatesCommand.IsBusy || ApplyUpdate.IsBusy)
+            if (CheckForUpdatesCommand.IsBusy || ApplyUpdate.IsBusy)
             {
                 Log.Debug("[ApplicationUpdaterViewModel] Already in progress");
                 IsOpen = true;
                 return;
             }
+
             StatusText = $"Applying update {LatestVersion}...";
             Error = string.Empty;
 

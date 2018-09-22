@@ -81,7 +81,7 @@ namespace PoeEye.StashRealtimeApi.Services
 
         private string GetStartingIdFromPoeRates()
         {
-            Log.Debug($"Requesting lastChangeId from poe-rates.com ...");
+            Log.Debug("Requesting lastChangeId from poe-rates.com ...");
             var poeRatesApi = RestClient.For<IPoeRatesApi>("http://poe-rates.com/actions/");
             var result = poeRatesApi.GetLastChangeId().Result;
 
@@ -90,7 +90,7 @@ namespace PoeEye.StashRealtimeApi.Services
 
         private string GetStartingIdFromPoeNinja()
         {
-            Log.Debug($"Requesting lastChangeId from Poe.ninja ...");
+            Log.Debug("Requesting lastChangeId from Poe.ninja ...");
             var api = RestClient.For<IPoeNinjaApi>("http://api.poe.ninja/api/Data");
             var result = api.GetStats().Result;
 
@@ -130,11 +130,11 @@ namespace PoeEye.StashRealtimeApi.Services
             }
             catch (OperationCanceledException)
             {
-                Log.Warn($"Operation cancelled");
+                Log.Warn("Operation cancelled");
             }
             catch (Exception e)
             {
-                Log.Error($"Exception occurred in consumer thread", e);
+                Log.Error("Exception occurred in consumer thread", e);
             }
             finally
             {
@@ -159,7 +159,7 @@ namespace PoeEye.StashRealtimeApi.Services
                     }
                 }
 
-                Log.Debug($"Requesting updated data...");
+                Log.Debug("Requesting updated data...");
                 var sw = Stopwatch.StartNew();
 
                 if (string.IsNullOrWhiteSpace(nextChangeId))

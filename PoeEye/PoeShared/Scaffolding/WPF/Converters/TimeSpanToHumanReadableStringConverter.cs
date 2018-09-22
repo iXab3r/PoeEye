@@ -14,7 +14,7 @@ namespace PoeShared.Scaffolding.WPF.Converters
                 var ts = TimeSpan.FromSeconds((double)value);
                 return Convert(ts, typeof(string), null, CultureInfo.InvariantCulture);
             }
-            
+
             if (!(value is TimeSpan))
             {
                 return value;

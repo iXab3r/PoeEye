@@ -41,7 +41,7 @@ namespace PoeShared.PoeTrade
                     .ObserveOn(uiScheduler)
                     .Subscribe(() => this.RaisePropertyChanged(nameof(Error)))
                     .AddTo(Anchors);
-            
+
             provider.WhenAnyValue(x => x.StaticData)
                     .ObserveOn(uiScheduler)
                     .Subscribe(() => this.RaisePropertyChanged(nameof(StaticData)))

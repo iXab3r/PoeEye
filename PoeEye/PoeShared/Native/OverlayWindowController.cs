@@ -22,12 +22,12 @@ namespace PoeShared.Native
     internal sealed class OverlayWindowController : DisposableReactiveObject, IOverlayWindowController
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(OverlayWindowController));
-
-        private readonly ISourceList<OverlayWindowView> windows = new SourceList<OverlayWindowView>();
         private readonly BehaviorSubject<IntPtr> lastActiveWindowHandle = new BehaviorSubject<IntPtr>(IntPtr.Zero);
 
         private readonly string[] possibleOverlayNames;
         private readonly IScheduler uiScheduler;
+
+        private readonly ISourceList<OverlayWindowView> windows = new SourceList<OverlayWindowView>();
         private readonly IWindowTracker windowTracker;
 
         private bool isVisible;
@@ -97,10 +97,10 @@ namespace PoeShared.Native
         public IOverlayViewModel[] GetChildren()
         {
             return windows.Items
-                                .Select(x => x.DataContext)
-                                .OfType<OverlayWindowViewModel>()
-                                .Select(x => x.Content)
-                                .ToArray();
+                          .Select(x => x.DataContext)
+                          .OfType<OverlayWindowViewModel>()
+                          .Select(x => x.Content)
+                          .ToArray();
         }
 
         public IDisposable RegisterChild(IOverlayViewModel viewModel)
@@ -129,7 +129,7 @@ namespace PoeShared.Native
             var overlayWindowHandle = new WindowInteropHelper(overlayWindow).Handle;
             Log.Debug(
                 $"[OverlayWindowController #{overlayName}] Created Overlay window({windowTracker}) handle: 0x{overlayWindowHandle.ToInt64():x8}");
-
+            
             var activationController = new ActivationController(overlayWindow);
             viewModel.SetActivationController(activationController);
 
@@ -160,8 +160,10 @@ namespace PoeShared.Native
 
             Disposable.Create(() => overlayWindow.Close()).AddTo(childAnchors);
             Disposable.Create(() => windows.Remove(overlayWindow)).AddTo(childAnchors);
-            
+
             childAnchors.AddTo(Anchors);
+            
+            Log.Info($"Overlay #{overlayName} initialized");
 
             return childAnchors;
         }
@@ -216,6 +218,7 @@ namespace PoeShared.Native
             {
                 return;
             }
+
             Log.Trace($"[OverlayWindowController] Overlay controller IsVisible = {IsVisible} => {isVisible} (tracker {windowTracker})");
             IsVisible = isVisible;
         }

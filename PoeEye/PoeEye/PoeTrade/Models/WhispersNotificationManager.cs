@@ -22,8 +22,7 @@ namespace PoeEye.PoeTrade.Models
         public WhispersNotificationManager(
             [NotNull] IPoeWhisperService whisperService,
             [NotNull] IPoeEyeMainConfigProvider poeEyeConfigProvider,
-            [NotNull] [Dependency(WellKnownWindows.PathOfExileWindow)]
-            IWindowTracker poeWindowTracker,
+            [NotNull] [Dependency(WellKnownWindows.PathOfExileWindow)] IWindowTracker poeWindowTracker,
             [NotNull] IAudioNotificationsManager audioNotificationsManager)
         {
             Guard.ArgumentNotNull(whisperService, nameof(whisperService));

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using Common.Logging;
 using Guards;
@@ -48,12 +47,12 @@ namespace PoeShared.Converters
             result.ItemLevel = value.ItemLevel > 0 ? value.ItemLevel.ToString() : null;
             result.Hash = value.Id;
             result.League = value.League;
-            
+
             result.Modifications |= PoeItemModificatins.None;
             result.Modifications |= value.Corrupted ? PoeItemModificatins.Corrupted : PoeItemModificatins.None;
             result.Modifications |= !value.Identified ? PoeItemModificatins.Unidentified : PoeItemModificatins.None;
             result.Modifications |= value.CraftedMods.EmptyIfNull().Any() ? PoeItemModificatins.Crafted : PoeItemModificatins.None;
-            
+
             result.Note = value.Note;
             result.Timestamp = clock.Now;
 
@@ -124,7 +123,7 @@ namespace PoeShared.Converters
             {
                 return;
             }
-            
+
             var groupsById = new ConcurrentDictionary<int, string>();
             source.ForEach(socket => groupsById.AddOrUpdate(socket.Group, socket.Colour, (i, s) => s + "-" + socket.Colour));
 
@@ -151,6 +150,7 @@ namespace PoeShared.Converters
             {
                 return;
             }
+
             var sourceByName = new Dictionary<string, StashItemProperty>(StringComparer.OrdinalIgnoreCase);
             sourceRaw.Where(x => !string.IsNullOrEmpty(x.Name)).ForEach(x =>
             {
@@ -175,12 +175,13 @@ namespace PoeShared.Converters
         private string ExtractProperty(string key, IDictionary<string, StashItemProperty> propertiesByName)
         {
             string result = null;
-            if (propertiesByName.TryGetValue(key, out var property) && 
+            if (propertiesByName.TryGetValue(key, out var property) &&
                 property.Values?.Count >= 1 &&
                 property.Values[0].IsValid)
             {
                 result = property.Values[0].Min;
             }
+
             return result;
         }
     }

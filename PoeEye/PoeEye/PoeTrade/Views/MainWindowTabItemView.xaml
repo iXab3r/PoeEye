@@ -10,290 +10,290 @@
                     xmlns:eye="http://coderush.net/poeeye/"
                     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
 
-  <ResourceDictionary.MergedDictionaries>
-    <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/themes/materialdesigntheme.flipper.xaml" />
-    <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/styles/controls.textbox.xaml" />
-  </ResourceDictionary.MergedDictionaries>
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/themes/materialdesigntheme.flipper.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/styles/controls.textbox.xaml" />
+    </ResourceDictionary.MergedDictionaries>
 
-  <DataTemplate DataType="{x:Type viewModels:MainWindowTabViewModel}" x:Key="MainWindowTabItemViewTemplate">
-    <DataTemplate.Resources>
-      <Style TargetType="{x:Type Button}" BasedOn="{StaticResource CircleButton}"
-             x:Key="AutoRecheckButtonStyle">
-        <Style.Triggers>
-          <DataTrigger Binding="{Binding RecheckPeriod.IsLive}" Value="True">
-            <Setter Property="Foreground" Value="Yellow" />
-            </DataTrigger>
-          <DataTrigger Binding="{Binding RecheckPeriod.IsAutoRecheckEnabled}" Value="True">
-            <Setter Property="Foreground" Value="Green" />
-          </DataTrigger>
-        </Style.Triggers>
-      </Style>
-    </DataTemplate.Resources>
-
-    <Grid Margin="0,3,0,3" Background="{x:Null}" IsHitTestVisible="True" ToolTipService.HorizontalOffset="10"
-          ToolTipService.VerticalOffset="10">
-      <Grid.ColumnDefinitions>
-        <ColumnDefinition Width="Auto" />
-        <ColumnDefinition Width="*" />
-        <ColumnDefinition Width="Auto" />
-        <ColumnDefinition Width="Auto" />
-      </Grid.ColumnDefinitions>
-
-      <DockPanel Grid.Column="0"
-                 VerticalAlignment="Bottom"
-                 Margin="0,5,0,0" />
-
-      <Grid Grid.Column="0">
-        <Grid.ColumnDefinitions>
-          <ColumnDefinition Width="Auto" />
-          <ColumnDefinition Width="Auto" />
-          <ColumnDefinition Width="Auto" />
-        </Grid.ColumnDefinitions>
-
-        <Label Grid.Column="1"
-               ToolTip="{Binding TradesList.Errors}"
-               Visibility="{Binding TradesList.Errors, Converter={StaticResource NullToCollapsedConverter}, TargetNullValue={x:Static Visibility.Collapsed}}"
-               FontFamily="{StaticResource FontAwesome}"
-               Foreground="{StaticResource ValidationSummaryColor3}"
-               VerticalAlignment="Stretch"
-               HorizontalAlignment="Stretch"
-               VerticalContentAlignment="Center"
-               HorizontalContentAlignment="Center"
-               FontSize="20"
-               fa:Awesome.Content="Warning" />
-
-        <Button Grid.Column="2"
-                Margin="5,0"
-                Width="40" Height="40"
-                HorizontalAlignment="Right"
-                VerticalAlignment="Top"
-                Focusable="False"
-                ToolTipService.HorizontalOffset="10" ToolTipService.VerticalOffset="10"
-                Command="{Binding RefreshCommand}"
-                RenderTransformOrigin="0.5, 0.5"
-                CommandParameter="{Binding Query.PoeQueryBuilder}">
-          <Button.Style>
-            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource AutoRecheckButtonStyle}">
-              <Setter Property="fa:Awesome.Content" Value="Refresh" />
-              <Style.Triggers>
-                <DataTrigger Binding="{Binding TradesList.ActiveQuery}" Value="{x:Null}">
-                  <Setter Property="fa:Awesome.Content" Value="Search" />
-                </DataTrigger>
-
-                <DataTrigger Binding="{Binding IsBusy}" Value="True">
-                  <DataTrigger.EnterActions>
-                    <BeginStoryboard>
-                      <Storyboard>
-                        <DoubleAnimation
-                          Storyboard.TargetProperty="(Button.RenderTransform).(RotateTransform.Angle)"
-                          To="360"
-                          Duration="0:0:1"
-                          RepeatBehavior="Forever" />
-                      </Storyboard>
-                    </BeginStoryboard>
-                  </DataTrigger.EnterActions>
-                  <DataTrigger.ExitActions>
-                    <BeginStoryboard>
-                      <Storyboard>
-                        <DoubleAnimation
-                          Storyboard.TargetProperty="(Button.RenderTransform).(RotateTransform.Angle)"
-                          To="360"
-                          Duration="0:0:0.5" />
-
-                        <DoubleAnimationUsingKeyFrames
-                          Storyboard.TargetProperty="(Button.RenderTransform).(RotateTransform.Angle)">
-                          <DiscreteDoubleKeyFrame Value="0" KeyTime="0:0:0.5" />
-                        </DoubleAnimationUsingKeyFrames>
-                      </Storyboard>
-                    </BeginStoryboard>
-                  </DataTrigger.ExitActions>
-
-                </DataTrigger>
-              </Style.Triggers>
+    <DataTemplate DataType="{x:Type viewModels:MainWindowTabViewModel}" x:Key="MainWindowTabItemViewTemplate">
+        <DataTemplate.Resources>
+            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource CircleButton}"
+                   x:Key="AutoRecheckButtonStyle">
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding RecheckPeriod.IsLive}" Value="True">
+                        <Setter Property="Foreground" Value="Yellow" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding RecheckPeriod.IsAutoRecheckEnabled}" Value="True">
+                        <Setter Property="Foreground" Value="Green" />
+                    </DataTrigger>
+                </Style.Triggers>
             </Style>
-          </Button.Style>
+        </DataTemplate.Resources>
 
-          <Button.RenderTransform>
-            <RotateTransform x:Name="noFreeze" />
-          </Button.RenderTransform>
+        <Grid Margin="0,3,0,3" Background="{x:Null}" IsHitTestVisible="True" ToolTipService.HorizontalOffset="10"
+              ToolTipService.VerticalOffset="10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
 
-          <i:Interaction.Triggers>
-            <i:EventTrigger EventName="MouseRightButtonUp">
-              <i:InvokeCommandAction Command="{Binding NewSearchCommand}"
-                                     CommandParameter="{Binding Query.PoeQueryBuilder}" />
-            </i:EventTrigger>
-          </i:Interaction.Triggers>
+            <DockPanel Grid.Column="0"
+                       VerticalAlignment="Bottom"
+                       Margin="0,5,0,0" />
 
-          <Button.ToolTip>
-            <sharedControls:MouseButtonsTooltip LeftButton="Refresh"
-                                                RightButton="Restart query (erases historical data)" />
-          </Button.ToolTip>
-        </Button>
-      </Grid>
+            <Grid Grid.Column="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
 
-      <DockPanel Grid.Column="1" Background="{x:Null}" LastChildFill="True">
-        <materialDesign:Flipper VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
-                                IsHitTestVisible="{Binding RelativeSource={RelativeSource Self}, Path=IsFlipped}"
-                                IsFlipped="{Binding IsFlipped, Mode=TwoWay}"
-                                Focusable="False"
-                                Style="{StaticResource SimpleFlipper}"
-                                x:Name="TabNameFlipper">
-          <materialDesign:Flipper.FrontContent>
-            <TextBlock
-              Text="{Binding TabName, Mode=OneWay}"
-              IsHitTestVisible="False"
-              FontSize="16" TextWrapping="Wrap" VerticalAlignment="Center" />
-          </materialDesign:Flipper.FrontContent>
-
-          <materialDesign:Flipper.BackContent>
-            <DockPanel LastChildFill="True" wpf:AccessKeyScoper.IsAccessKeyScope="True">
-              <Button
-                Command="{Binding RenameCommand}"
-                Style="{StaticResource InvisibleButtonStyleKey}"
-                DockPanel.Dock="Right"
-                IsCancel="True"
-                Content="Cancel" />
-              <Button
-                Command="{Binding RenameCommand}"
-                CommandParameter="{Binding ElementName=TabNameEditor, Path=Text}"
-                Style="{StaticResource InvisibleButtonStyleKey}"
-                DockPanel.Dock="Right"
-                IsDefault="True"
-                Content="Commit" />
-              <TextBox x:Name="TabNameEditor"
-                       eye:FocusHelper.IsFocused="True"
-                       TextWrapping="Wrap"
-                       DockPanel.Dock="Left"
+                <Label Grid.Column="1"
+                       ToolTip="{Binding TradesList.Errors}"
+                       Visibility="{Binding TradesList.Errors, Converter={StaticResource NullToCollapsedConverter}, TargetNullValue={x:Static Visibility.Collapsed}}"
+                       FontFamily="{StaticResource FontAwesome}"
+                       Foreground="{StaticResource ValidationSummaryColor3}"
+                       VerticalAlignment="Stretch"
+                       HorizontalAlignment="Stretch"
                        VerticalContentAlignment="Center"
-                       controls:TextBoxHelper.AutoWatermark="True"
-                       controls:TextBoxHelper.Watermark="{Binding DefaultTabName, Mode=OneWay}"
-                       FontSize="15">
-                <TextBox.Style>
-                  <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource MetroTextBox}">
-                    <Style.Triggers>
-                      <DataTrigger Binding="{Binding IsFlipped}" Value="True">
-                        <Setter Property="Text" Value="{Binding TabName, Mode=OneWay}" />
-                      </DataTrigger>
-                      <Trigger Property="controls:TextBoxHelper.HasText" Value="True">
-                        <Setter Property="controls:TextBoxHelper.ClearTextButton" Value="True" />
-                      </Trigger>
-                    </Style.Triggers>
-                  </Style>
-                </TextBox.Style>
-              </TextBox>
+                       HorizontalContentAlignment="Center"
+                       FontSize="20"
+                       fa:Awesome.Content="Warning" />
+
+                <Button Grid.Column="2"
+                        Margin="5,0"
+                        Width="40" Height="40"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Top"
+                        Focusable="False"
+                        ToolTipService.HorizontalOffset="10" ToolTipService.VerticalOffset="10"
+                        Command="{Binding RefreshCommand}"
+                        RenderTransformOrigin="0.5, 0.5"
+                        CommandParameter="{Binding Query.PoeQueryBuilder}">
+                    <Button.Style>
+                        <Style TargetType="{x:Type Button}" BasedOn="{StaticResource AutoRecheckButtonStyle}">
+                            <Setter Property="fa:Awesome.Content" Value="Refresh" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding TradesList.ActiveQuery}" Value="{x:Null}">
+                                    <Setter Property="fa:Awesome.Content" Value="Search" />
+                                </DataTrigger>
+
+                                <DataTrigger Binding="{Binding IsBusy}" Value="True">
+                                    <DataTrigger.EnterActions>
+                                        <BeginStoryboard>
+                                            <Storyboard>
+                                                <DoubleAnimation
+                                                    Storyboard.TargetProperty="(Button.RenderTransform).(RotateTransform.Angle)"
+                                                    To="360"
+                                                    Duration="0:0:1"
+                                                    RepeatBehavior="Forever" />
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </DataTrigger.EnterActions>
+                                    <DataTrigger.ExitActions>
+                                        <BeginStoryboard>
+                                            <Storyboard>
+                                                <DoubleAnimation
+                                                    Storyboard.TargetProperty="(Button.RenderTransform).(RotateTransform.Angle)"
+                                                    To="360"
+                                                    Duration="0:0:0.5" />
+
+                                                <DoubleAnimationUsingKeyFrames
+                                                    Storyboard.TargetProperty="(Button.RenderTransform).(RotateTransform.Angle)">
+                                                    <DiscreteDoubleKeyFrame Value="0" KeyTime="0:0:0.5" />
+                                                </DoubleAnimationUsingKeyFrames>
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </DataTrigger.ExitActions>
+
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+
+                    <Button.RenderTransform>
+                        <RotateTransform x:Name="noFreeze" />
+                    </Button.RenderTransform>
+
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="MouseRightButtonUp">
+                            <i:InvokeCommandAction Command="{Binding NewSearchCommand}"
+                                                   CommandParameter="{Binding Query.PoeQueryBuilder}" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+
+                    <Button.ToolTip>
+                        <sharedControls:MouseButtonsTooltip LeftButton="Refresh"
+                                                            RightButton="Restart query (erases historical data)" />
+                    </Button.ToolTip>
+                </Button>
+            </Grid>
+
+            <DockPanel Grid.Column="1" Background="{x:Null}" LastChildFill="True">
+                <materialDesign:Flipper VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
+                                        IsHitTestVisible="{Binding RelativeSource={RelativeSource Self}, Path=IsFlipped}"
+                                        IsFlipped="{Binding IsFlipped, Mode=TwoWay}"
+                                        Focusable="False"
+                                        Style="{StaticResource SimpleFlipper}"
+                                        x:Name="TabNameFlipper">
+                    <materialDesign:Flipper.FrontContent>
+                        <TextBlock
+                            Text="{Binding TabName, Mode=OneWay}"
+                            IsHitTestVisible="False"
+                            FontSize="16" TextWrapping="Wrap" VerticalAlignment="Center" />
+                    </materialDesign:Flipper.FrontContent>
+
+                    <materialDesign:Flipper.BackContent>
+                        <DockPanel LastChildFill="True" wpf:AccessKeyScoper.IsAccessKeyScope="True">
+                            <Button
+                                Command="{Binding RenameCommand}"
+                                Style="{StaticResource InvisibleButtonStyleKey}"
+                                DockPanel.Dock="Right"
+                                IsCancel="True"
+                                Content="Cancel" />
+                            <Button
+                                Command="{Binding RenameCommand}"
+                                CommandParameter="{Binding ElementName=TabNameEditor, Path=Text}"
+                                Style="{StaticResource InvisibleButtonStyleKey}"
+                                DockPanel.Dock="Right"
+                                IsDefault="True"
+                                Content="Commit" />
+                            <TextBox x:Name="TabNameEditor"
+                                     eye:FocusHelper.IsFocused="True"
+                                     TextWrapping="Wrap"
+                                     DockPanel.Dock="Left"
+                                     VerticalContentAlignment="Center"
+                                     controls:TextBoxHelper.AutoWatermark="True"
+                                     controls:TextBoxHelper.Watermark="{Binding DefaultTabName, Mode=OneWay}"
+                                     FontSize="15">
+                                <TextBox.Style>
+                                    <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource MetroTextBox}">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsFlipped}" Value="True">
+                                                <Setter Property="Text" Value="{Binding TabName, Mode=OneWay}" />
+                                            </DataTrigger>
+                                            <Trigger Property="controls:TextBoxHelper.HasText" Value="True">
+                                                <Setter Property="controls:TextBoxHelper.ClearTextButton" Value="True" />
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBox.Style>
+                            </TextBox>
+                        </DockPanel>
+                    </materialDesign:Flipper.BackContent>
+                </materialDesign:Flipper>
             </DockPanel>
-          </materialDesign:Flipper.BackContent>
-        </materialDesign:Flipper>
-      </DockPanel>
 
 
-      <StackPanel Grid.Column="3"
-                  Orientation="Horizontal">
-        <StackPanel.Resources>
-         
-
-        </StackPanel.Resources>
+            <StackPanel Grid.Column="3"
+                        Orientation="Horizontal">
+                <StackPanel.Resources>
 
 
-        <StackPanel Orientation="Horizontal" VerticalAlignment="Top">
-
-          <TextBox
-            BorderThickness="1"
-            Text="{Binding NormalItemsCount, Mode=OneWay}"
-            ToolTip="Total items count"
-            BorderBrush="{StaticResource TabBackgroundBrush}"
-            Visibility="{Binding NormalItemsCount, Converter={StaticResource GreaterThanZeroToVisibleConverter}}"
-            Foreground="{StaticResource TextBrush}"
-            Style="{StaticResource CircleTextBox}"
-            Padding="4,0,0,0" />
-
-          <StackPanel Orientation="Vertical" VerticalAlignment="Center">
-            <TextBox
-              BorderThickness="1"
-              Text="{Binding NewItemsCount, Mode=OneWay}"
-              ToolTip="New items"
-              BorderBrush="Transparent"
-              Visibility="{Binding NewItemsCount, Converter={StaticResource GreaterThanZeroToVisibleConverter}}"
-              Foreground="{StaticResource PoeTradeNewItemBrush}">
-
-              <TextBox.Style>
-                <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource CircleTextBox}">
-                  <Setter Property="Background" Value="{StaticResource SemiPoeTradeNewItemBrush}" />
-                  <Setter Property="Padding" Value="0" />
-                  <Style.Triggers>
-                    <DataTrigger
-                      Binding="{Binding RemovedItemsCount, Converter={StaticResource GreaterThanZeroToVisibleConverter}}"
-                      Value="Visible">
-                      <Setter Property="Padding" Value="0,4,0,0" />
-                      <Setter Property="Background">
-                        <Setter.Value>
-                          <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5, 1">
-                            <GradientStop Color="{StaticResource SemiPoeTradeNewItemColor}" />
-                            <GradientStop Color="Transparent" Offset="1" />
-                          </LinearGradientBrush>
-                        </Setter.Value>
-                      </Setter>
-                    </DataTrigger>
-                  </Style.Triggers>
-                </Style>
-              </TextBox.Style>
-            </TextBox>
-
-            <TextBox
-              BorderThickness="1"
-              Text="{Binding RemovedItemsCount, Mode=OneWay}"
-              BorderBrush="Transparent"
-              ToolTip="Sold(or removed) items"
-              Visibility="{Binding RemovedItemsCount, Converter={StaticResource GreaterThanZeroToVisibleConverter}}"
-              Foreground="{StaticResource PoeTradeRemovedItemBrush}">
-
-              <TextBox.Style>
-                <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource CircleTextBox}">
-                  <Setter Property="Background" Value="{StaticResource SemiPoeTradeRemovedItemBrush}" />
-                  <Setter Property="Padding" Value="0" />
-                  <Style.Triggers>
-                    <DataTrigger
-                      Binding="{Binding NewItemsCount, Converter={StaticResource GreaterThanZeroToVisibleConverter}}"
-                      Value="Visible">
-                      <Setter Property="Padding" Value="0,-4,0,0" />
-                      <Setter Property="Background">
-                        <Setter.Value>
-                          <LinearGradientBrush EndPoint="0.5, 1" StartPoint="0.5,0">
-                            <GradientStop Color="Transparent" />
-                            <GradientStop Color="{StaticResource SemiPoeTradeRemovedItemColor}" Offset="1" />
-                          </LinearGradientBrush>
-                        </Setter.Value>
-                      </Setter>
-                    </DataTrigger>
-                  </Style.Triggers>
-                </Style>
-              </TextBox.Style>
-            </TextBox>
-
-            <StackPanel.ToolTip>
-              <sharedControls:MouseButtonsTooltip RightButton="Mark All items as Read" />
-            </StackPanel.ToolTip>
-
-            <i:Interaction.Triggers>
-              <i:EventTrigger EventName="MouseRightButtonUp">
-                <i:InvokeCommandAction Command="{Binding MarkAllAsReadCommand}" />
-              </i:EventTrigger>
-            </i:Interaction.Triggers>
-          </StackPanel>
-
-          <ContentControl Content="{Binding AudioNotificationSelector}" VerticalAlignment="Top" />
-        </StackPanel>
+                </StackPanel.Resources>
 
 
-        <Button Width="24" Height="24"
-                Style="{StaticResource CircleButton}"
-                HorizontalAlignment="Right"
-                VerticalAlignment="Top"
-                Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type dragablz:TabablzControl}}, Path=DataContext.CloseTabCommand}"
-                CommandParameter="{Binding}"
-                FontSize="10"
-                fa:Awesome.Content="Close" />
-      </StackPanel>
-    </Grid>
-  </DataTemplate>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Top">
+
+                    <TextBox
+                        BorderThickness="1"
+                        Text="{Binding NormalItemsCount, Mode=OneWay}"
+                        ToolTip="Total items count"
+                        BorderBrush="{StaticResource TabBackgroundBrush}"
+                        Visibility="{Binding NormalItemsCount, Converter={StaticResource GreaterThanZeroToVisibleConverter}}"
+                        Foreground="{StaticResource TextBrush}"
+                        Style="{StaticResource CircleTextBox}"
+                        Padding="4,0,0,0" />
+
+                    <StackPanel Orientation="Vertical" VerticalAlignment="Center">
+                        <TextBox
+                            BorderThickness="1"
+                            Text="{Binding NewItemsCount, Mode=OneWay}"
+                            ToolTip="New items"
+                            BorderBrush="Transparent"
+                            Visibility="{Binding NewItemsCount, Converter={StaticResource GreaterThanZeroToVisibleConverter}}"
+                            Foreground="{StaticResource PoeTradeNewItemBrush}">
+
+                            <TextBox.Style>
+                                <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource CircleTextBox}">
+                                    <Setter Property="Background" Value="{StaticResource SemiPoeTradeNewItemBrush}" />
+                                    <Setter Property="Padding" Value="0" />
+                                    <Style.Triggers>
+                                        <DataTrigger
+                                            Binding="{Binding RemovedItemsCount, Converter={StaticResource GreaterThanZeroToVisibleConverter}}"
+                                            Value="Visible">
+                                            <Setter Property="Padding" Value="0,4,0,0" />
+                                            <Setter Property="Background">
+                                                <Setter.Value>
+                                                    <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5, 1">
+                                                        <GradientStop Color="{StaticResource SemiPoeTradeNewItemColor}" />
+                                                        <GradientStop Color="Transparent" Offset="1" />
+                                                    </LinearGradientBrush>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBox.Style>
+                        </TextBox>
+
+                        <TextBox
+                            BorderThickness="1"
+                            Text="{Binding RemovedItemsCount, Mode=OneWay}"
+                            BorderBrush="Transparent"
+                            ToolTip="Sold(or removed) items"
+                            Visibility="{Binding RemovedItemsCount, Converter={StaticResource GreaterThanZeroToVisibleConverter}}"
+                            Foreground="{StaticResource PoeTradeRemovedItemBrush}">
+
+                            <TextBox.Style>
+                                <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource CircleTextBox}">
+                                    <Setter Property="Background" Value="{StaticResource SemiPoeTradeRemovedItemBrush}" />
+                                    <Setter Property="Padding" Value="0" />
+                                    <Style.Triggers>
+                                        <DataTrigger
+                                            Binding="{Binding NewItemsCount, Converter={StaticResource GreaterThanZeroToVisibleConverter}}"
+                                            Value="Visible">
+                                            <Setter Property="Padding" Value="0,-4,0,0" />
+                                            <Setter Property="Background">
+                                                <Setter.Value>
+                                                    <LinearGradientBrush EndPoint="0.5, 1" StartPoint="0.5,0">
+                                                        <GradientStop Color="Transparent" />
+                                                        <GradientStop Color="{StaticResource SemiPoeTradeRemovedItemColor}" Offset="1" />
+                                                    </LinearGradientBrush>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBox.Style>
+                        </TextBox>
+
+                        <StackPanel.ToolTip>
+                            <sharedControls:MouseButtonsTooltip RightButton="Mark All items as Read" />
+                        </StackPanel.ToolTip>
+
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="MouseRightButtonUp">
+                                <i:InvokeCommandAction Command="{Binding MarkAllAsReadCommand}" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </StackPanel>
+
+                    <ContentControl Content="{Binding AudioNotificationSelector}" VerticalAlignment="Top" />
+                </StackPanel>
+
+
+                <Button Width="24" Height="24"
+                        Style="{StaticResource CircleButton}"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Top"
+                        Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type dragablz:TabablzControl}}, Path=DataContext.CloseTabCommand}"
+                        CommandParameter="{Binding}"
+                        FontSize="10"
+                        fa:Awesome.Content="Close" />
+            </StackPanel>
+        </Grid>
+    </DataTemplate>
 </ResourceDictionary>

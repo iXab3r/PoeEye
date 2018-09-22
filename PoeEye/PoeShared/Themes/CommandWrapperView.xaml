@@ -25,14 +25,14 @@
                     HorizontalAlignment="Stretch"
                     Content="{Binding Path=(s:CommandWrapperHelper.Text), RelativeSource={RelativeSource Self}}"
                     CommandParameter="{Binding Path=(s:CommandWrapperHelper.CommandParameter), RelativeSource={RelativeSource Self}}" />
-            
+
             <ProgressBar Style="{StaticResource MaterialDesignCircularProgressBar}"
                          Value="0"
                          HorizontalAlignment="Right" VerticalAlignment="Center"
                          Visibility="{Binding IsBusy, Converter={StaticResource TrueToVisibleFalseToCollapsedConverter}}"
                          IsIndeterminate="True" />
 
-            <materialDesign:PackIcon x:Name="ErrorIcon" Kind="AlertCircleOutline" 
+            <materialDesign:PackIcon x:Name="ErrorIcon" Kind="AlertCircleOutline"
                                      HorizontalAlignment="Right" VerticalAlignment="Center"
                                      Foreground="Red" Background="Transparent"
                                      ToolTip="{Binding Error}">
@@ -55,7 +55,7 @@
                                         </Storyboard>
                                     </BeginStoryboard>
                                 </MultiDataTrigger.EnterActions>
-                                
+
                                 <MultiDataTrigger.ExitActions>
                                     <BeginStoryboard>
                                         <Storyboard>
@@ -78,7 +78,7 @@
                 </materialDesign:PackIcon.Style>
             </materialDesign:PackIcon>
 
-            <materialDesign:PackIcon x:Name="SuccessIcon" Kind="CheckboxMarked" 
+            <materialDesign:PackIcon x:Name="SuccessIcon" Kind="CheckboxMarked"
                                      HorizontalAlignment="Right" VerticalAlignment="Center"
                                      Foreground="GreenYellow" Background="Transparent">
                 <materialDesign:PackIcon.Style>
@@ -93,7 +93,7 @@
                                         <Condition.Binding>
                                             <MultiBinding Converter="{StaticResource MultiBooleanOrConverter}">
                                                 <Binding Path="IsBusy" />
-                                                <Binding Path="Error" Converter="{StaticResource IsNotNullOrEmptyConverter}"/>
+                                                <Binding Path="Error" Converter="{StaticResource IsNotNullOrEmptyConverter}" />
                                             </MultiBinding>
                                         </Condition.Binding>
                                     </Condition>
@@ -107,7 +107,7 @@
                                         </Storyboard>
                                     </BeginStoryboard>
                                 </MultiDataTrigger.EnterActions>
-                                
+
                                 <MultiDataTrigger.ExitActions>
                                     <BeginStoryboard>
                                         <Storyboard>

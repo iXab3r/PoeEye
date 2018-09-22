@@ -308,7 +308,9 @@
     <Compile Include="PoeTrade\Models\PoeTradeQuickFilter.cs" />
     <Compile Include="PoeTrade\Models\ReactiveSuggestionProvider.cs" />
     <Compile Include="PoeTrade\Models\WhispersNotificationManager.cs" />
+    <Compile Include="PoeTrade\Shell\Services\SplashWindow.cs" />
     <Compile Include="PoeTrade\Shell\ViewModels\IPoeFlyoutViewModel.cs" />
+    <Compile Include="PoeTrade\Shell\ViewModels\SplashWindowViewModel.cs" />
     <Compile Include="PoeTrade\Updater\ApplicationUpdaterModel.cs" />
     <Compile Include="PoeTrade\Updater\ApplicationUpdaterViewModel.cs" />
     <Compile Include="PoeTrade\Updater\IApplicationUpdaterModel.cs" />
@@ -447,6 +449,10 @@
   </ItemGroup>
   <ItemGroup>
     <Page Include="Converter.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="PoeTrade\Shell\Views\SplashWindowView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -626,6 +632,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\Entypo-license.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\SplashRing.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <UsingTask TaskName="CosturaCleanup" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll" TaskFactory="CodeTaskFactory">

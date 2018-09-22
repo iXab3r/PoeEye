@@ -8,7 +8,6 @@ using System.Reactive.Threading.Tasks;
 using System.Threading;
 using System.Threading.Tasks;
 using Common.Logging;
-using CsQuery.ExtensionMethods;
 using Guards;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
@@ -28,16 +27,14 @@ namespace PoeEye.PathOfExileTrade.TradeApi
         private static readonly ILog Log = LogManager.GetLogger(typeof(PathOfExileTradeLiveAdapter));
 
         private static readonly int MaxItemsToReplay = 99;
-        
+
         private static readonly TimeSpan WebSocketGracefulCloseTimeout = TimeSpan.FromSeconds(5);
         private static readonly string WebSocketUri = @"wss://www.pathofexile.com/api/trade/live/Delve";
-
-        private static readonly string UserAgent =
-            "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36";
 
         private readonly IClock clock;
         private readonly IPoeQueryResult initialData;
         private readonly IPoeItemSource itemSource;
+        private readonly ISubject<string> itemsToFetch = new Subject<string>();
         private readonly Uri liveUri;
 
         private readonly string queryId;
@@ -45,8 +42,7 @@ namespace PoeEye.PathOfExileTrade.TradeApi
         private readonly ISubject<IPoeQueryResult> resultSink = new ReplaySubject<IPoeQueryResult>(MaxItemsToReplay);
 
         private readonly SerialDisposable webSocketAnchors = new SerialDisposable();
-        private readonly ISubject<string> itemsToFetch = new Subject<string>();
-        
+
         public PathOfExileTradeLiveAdapter(
             [NotNull] IClock clock,
             [NotNull] IPoeItemSource itemSource,
@@ -69,7 +65,7 @@ namespace PoeEye.PathOfExileTrade.TradeApi
             resultSink.OnNext(initialData);
 
             webSocketAnchors.AddTo(Anchors);
-            
+
             const int maxItemsPerRequest = 5;
             itemsToFetch
                 .Buffer(TimeSpan.FromSeconds(1), maxItemsPerRequest)
@@ -83,6 +79,8 @@ namespace PoeEye.PathOfExileTrade.TradeApi
             Task.Run(() => Initialize()).ToObservable().Subscribe(_ => { Log.Debug($"[WebSocket] [{queryId}] Initialized connection"); },
                                                                   exception => resultSink.OnError(exception));
         }
+
+        public IObservable<IPoeQueryResult> Updates => resultSink;
 
         private async void OnNext(IList<string> itemIds)
         {
@@ -99,8 +97,6 @@ namespace PoeEye.PathOfExileTrade.TradeApi
                 Log.Error($"[WebSocket] [{queryId}] Failed to get items pack {itemIds.DumpToTextRaw()}", e);
             }
         }
-
-        public IObservable<IPoeQueryResult> Updates => resultSink;
 
         private void Initialize()
         {
@@ -229,14 +225,15 @@ namespace PoeEye.PathOfExileTrade.TradeApi
                 resultSink.OnNext(new PoeQueryResult
                 {
                     Id = queryId,
-                    Query = initialData.Query,
+                    Query = initialData.Query
                 });
             }
-            
+
             if (!eventArgs.IsText)
             {
                 return;
             }
+
             Log.Debug($"[WebSocket] [{queryId}] Raw data:\n{eventArgs.Data?.DumpToText(Formatting.None)} (binary: {eventArgs.RawData?.Length})");
 
             if (string.IsNullOrWhiteSpace(eventArgs.Data))

@@ -73,7 +73,7 @@ namespace PoeEye.PoeTrade.ViewModels
 
             CopyPrivateMessageToClipboardCommand = CommandWrapper.Create<bool>(CopyPrivateMessageCommandExecuted);
 
-            OpenForumUriCommand = new DelegateCommand(OpenForumUriCommandExecuted, OpenForumUriCommandCanExecute); 
+            OpenForumUriCommand = new DelegateCommand(OpenForumUriCommandExecuted, OpenForumUriCommandCanExecute);
 
             Uri imageUri;
             if (!string.IsNullOrWhiteSpace(poeItem.ItemIconUri) && Uri.TryCreate(poeItem.ItemIconUri, UriKind.Absolute, out imageUri))
@@ -92,7 +92,7 @@ namespace PoeEye.PoeTrade.ViewModels
             var priceInChaos = poePriceCalculator.GetEquivalentInChaosOrbs(price);
             PriceInChaosOrbs = priceInChaos;
 
-            CopyItemToClipboardCommand = CommandWrapper.Create(ReactiveUI.ReactiveCommand.CreateFromTask(
+            CopyItemToClipboardCommand = CommandWrapper.Create(ReactiveCommand.CreateFromTask(
                                                                    async () =>
                                                                    {
                                                                        var item = itemSerializer.Serialize(Trade);
@@ -163,13 +163,14 @@ namespace PoeEye.PoeTrade.ViewModels
                 {
                     throw new ApplicationException($"Failed to send message, reason: {result}");
                 }
+
                 Log.Warn($"[PoeTradeViewModel.SendPrivateMessageCommandExecuted] Sent message, result: {result}");
             }
             else
             {
                 Log.Warn($"[PoeTradeViewModel.SendPrivateMessageCommandExecuted] Copying private message '{message}' to clipboard");
                 clipboardManager.SetText(message);
-                Log.Warn($"[PoeTradeViewModel.SendPrivateMessageCommandExecuted] Copied message");
+                Log.Warn("[PoeTradeViewModel.SendPrivateMessageCommandExecuted] Copied message");
             }
         }
 

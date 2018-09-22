@@ -5,7 +5,6 @@ using System.Reactive.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Common.Logging;
-using PoeShared;
 using PoeShared.Scaffolding;
 using PoeShared.UI;
 using Squirrel;

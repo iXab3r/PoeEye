@@ -13,7 +13,6 @@ using JetBrains.Annotations;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using PoeEye.PoeTrade;
-using PoeShared;
 using PoeShared.Common;
 using PoeShared.Communications;
 using PoeShared.PoeTrade;
@@ -120,12 +119,12 @@ namespace PoeEye.PoeTradeRealtimeApi
             switch (queryStateMachine.State)
             {
                 case State.LiveQuery:
-                    Log.Debug($"[RealtimeItemsSource.GetResult] Requesting next live query result...");
+                    Log.Debug("[RealtimeItemsSource.GetResult] Requesting next live query result...");
                     SendLiveQuery();
                     break;
 
                 case State.AwaitingForInitialRequest:
-                    Log.Debug($"[RealtimeItemsSource.GetResult] Sending initial request...");
+                    Log.Debug("[RealtimeItemsSource.GetResult] Sending initial request...");
                     SendInitialRequest();
                     break;
             }
@@ -152,7 +151,7 @@ namespace PoeEye.PoeTradeRealtimeApi
 
         private void ClearItemList()
         {
-            Log.Debug($"[RealtimeItemsSource.ClearItemsList] Clearing items list...");
+            Log.Debug("[RealtimeItemsSource.ClearItemsList] Clearing items list...");
             itemsList.Clear();
         }
 
@@ -193,7 +192,7 @@ namespace PoeEye.PoeTradeRealtimeApi
             }
             else
             {
-                Log.Debug($"[RealtimeItemsSource.GetResult] Failed to extract live uri from the initial response");
+                Log.Debug("[RealtimeItemsSource.GetResult] Failed to extract live uri from the initial response");
                 queryStateMachine.Fire(Trigger.ReceivedUnexpectedInitialResponse);
             }
         }
@@ -256,7 +255,7 @@ namespace PoeEye.PoeTradeRealtimeApi
             }
             catch (Exception ex)
             {
-                Log.Warn($"[RealtimeItemsSource.Live] Exception occurred during live request", ex);
+                Log.Warn("[RealtimeItemsSource.Live] Exception occurred during live request", ex);
                 queryStateMachine.Fire(Trigger.LiveQueryFailed);
             }
         }

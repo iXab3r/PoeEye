@@ -9,7 +9,7 @@
         <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseDark.xaml" />
         <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Themes/ProgressRing.xaml" />
     </ResourceDictionary.MergedDictionaries>
-    
+
     <!--Scrollbar Thumbs-->
     <Style x:Key="ScrollThumbsStyleKey" TargetType="{x:Type Thumb}">
         <Setter Property="Template">

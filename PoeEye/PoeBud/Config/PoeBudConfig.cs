@@ -11,6 +11,7 @@ namespace PoeBud.Config
         public bool HighlightSolution { get; set; } = false;
 
         public string GetChaosSetHotkey { get; set; } = "None";
+        
         public bool IsEnabled { get; set; } = true;
 
         public Point OverlayLocation { get; set; }

@@ -2,7 +2,6 @@
 using Common.Logging;
 using Guards;
 using JetBrains.Annotations;
-using PoeShared;
 using PoeShared.Common;
 using PoeShared.Scaffolding;
 
@@ -11,10 +10,10 @@ namespace PoeEye.PoeTrade.ViewModels
     internal sealed class PoeLinksInfoViewModel : DisposableReactiveObject
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(PoeLinksInfoViewModel));
-        
+
         private readonly string[] colors = new string[6];
         private readonly bool[] links = new bool[6];
-        
+
         public PoeLinksInfoViewModel([NotNull] IPoeLinksInfo linksInfo)
         {
             Guard.ArgumentNotNull(linksInfo, nameof(linksInfo));
@@ -56,7 +55,7 @@ namespace PoeEye.PoeTrade.ViewModels
 
         public string Socket6 => colors[5];
 
-        public bool Link1  => links[0];
+        public bool Link1 => links[0];
 
         public bool Link2 => links[1];
 

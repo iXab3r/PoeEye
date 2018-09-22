@@ -3,89 +3,86 @@
                     xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
                     xmlns:viewModels="clr-namespace:PoeEye.PoeTrade.ViewModels"
                     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
-  <DataTemplate DataType="{x:Type viewModels:PoeSummaryTabViewModel}">
+    <DataTemplate DataType="{x:Type viewModels:PoeSummaryTabViewModel}">
 
 
-    <Grid>
-      <Grid.RowDefinitions>
-        <RowDefinition Height="Auto" />
-        <RowDefinition Height="*" />
-      </Grid.RowDefinitions>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
 
-      <Border Grid.Row="0" BorderBrush="{StaticResource AccentColorBrush}" BorderThickness="0,0,0,2" Margin="0">
-        <Grid Margin="0,5" Height="26">
-          <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" />
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="Auto" />
-            <ColumnDefinition Width="Auto" />
-          </Grid.ColumnDefinitions>
-          <Button Grid.Column="0"
-                  Content="Mark All as Read" Command="{Binding MarkAllAsReadCommand}" Width="150" />
+            <Border Grid.Row="0" BorderBrush="{StaticResource AccentColorBrush}" BorderThickness="0,0,0,2" Margin="0">
+                <Grid Margin="0,5" Height="26">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Button Grid.Column="0"
+                            Content="Mark All as Read" Command="{Binding MarkAllAsReadCommand}" Width="150" />
 
-          <StackPanel Grid.Column="2" Orientation="Horizontal">
-            <TextBlock Text="↕ Sort by" Margin="2,0" VerticalAlignment="Center" />
-            <ComboBox ItemsSource="{Binding SortingOptions}" 
-                      Style="{StaticResource MaterialDesignComboBox}"
-                      Margin="10,0"
-                      SelectedItem="{Binding ActiveSortDescriptionData}"
-                      VerticalContentAlignment="Center"
-                      VerticalAlignment="Stretch"
-                      Padding="0"
-                      IsTabStop="False" Width="200" />
-          </StackPanel>
+                    <StackPanel Grid.Column="2" Orientation="Horizontal">
+                        <TextBlock Text="↕ Sort by" Margin="2,0" VerticalAlignment="Center" />
+                        <ComboBox ItemsSource="{Binding SortingOptions}"
+                                  Style="{StaticResource MaterialDesignComboBox}"
+                                  Margin="10,0"
+                                  SelectedItem="{Binding ActiveSortDescriptionData}"
+                                  VerticalContentAlignment="Center"
+                                  VerticalAlignment="Stretch"
+                                  Padding="0"
+                                  IsTabStop="False" Width="200" />
+                    </StackPanel>
 
-          <StackPanel Grid.Column="3" Orientation="Horizontal">
-            
-            <TextBox Text="{Binding QuickFilter, UpdateSourceTrigger=PropertyChanged}"
-                     Style="{StaticResource MaterialDesignTextBox}"
-                     Width="200"
-                     Margin="10,0"
-                     materialDesign:HintAssist.Hint="quick filter..." 
-                     ></TextBox>
+                    <StackPanel Grid.Column="3" Orientation="Horizontal">
 
-            <CheckBox IsChecked="{Binding ShowNewItems}" 
-                      Style="{StaticResource MaterialDesignCheckBox}"
-                      Margin="10,0" Focusable="False" IsTabStop="False">
-              <CheckBox.Content>
-                <StackPanel Orientation="Horizontal">
-                  <Rectangle Width="10" Height="10" Fill="{StaticResource PoeTradeNewItemBrush}"
-                             Stroke="{StaticResource AccentColorBrush}" />
-                  <TextBlock Text="New" Margin="3, 0" />
-                </StackPanel>
-              </CheckBox.Content>
-            </CheckBox>
-            <CheckBox IsChecked="{Binding ShowRemovedItems}" 
-                      Style="{StaticResource MaterialDesignCheckBox}"
-                      Margin="10,0" Focusable="False" IsTabStop="False">
-              <CheckBox.Content>
-                <StackPanel Orientation="Horizontal">
-                  <Rectangle Width="10" Height="10" Fill="{StaticResource PoeTradeRemovedItemBrush}"
-                             Stroke="{StaticResource AccentColorBrush}" />
-                  <TextBlock Text="Removed" Margin="3, 0" />
-                </StackPanel>
-              </CheckBox.Content>
-            </CheckBox>
-          </StackPanel>
+                        <TextBox Text="{Binding QuickFilter, UpdateSourceTrigger=PropertyChanged}"
+                                 Style="{StaticResource MaterialDesignTextBox}"
+                                 Width="200"
+                                 Margin="10,0"
+                                 materialDesign:HintAssist.Hint="quick filter..." />
+
+                        <CheckBox IsChecked="{Binding ShowNewItems}"
+                                  Style="{StaticResource MaterialDesignCheckBox}"
+                                  Margin="10,0" Focusable="False" IsTabStop="False">
+                            <CheckBox.Content>
+                                <StackPanel Orientation="Horizontal">
+                                    <Rectangle Width="10" Height="10" Fill="{StaticResource PoeTradeNewItemBrush}"
+                                               Stroke="{StaticResource AccentColorBrush}" />
+                                    <TextBlock Text="New" Margin="3, 0" />
+                                </StackPanel>
+                            </CheckBox.Content>
+                        </CheckBox>
+                        <CheckBox IsChecked="{Binding ShowRemovedItems}"
+                                  Style="{StaticResource MaterialDesignCheckBox}"
+                                  Margin="10,0" Focusable="False" IsTabStop="False">
+                            <CheckBox.Content>
+                                <StackPanel Orientation="Horizontal">
+                                    <Rectangle Width="10" Height="10" Fill="{StaticResource PoeTradeRemovedItemBrush}"
+                                               Stroke="{StaticResource AccentColorBrush}" />
+                                    <TextBlock Text="Removed" Margin="3, 0" />
+                                </StackPanel>
+                            </CheckBox.Content>
+                        </CheckBox>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <Label Style="{StaticResource IconLabel}" FontSize="30" Content="No suitable items found yet"
+                   VerticalAlignment="Center" HorizontalAlignment="Center"
+                   Grid.Row="1"
+                   Visibility="{Binding TradesView.IsEmpty, Converter={StaticResource FalseToCollapsedTrueToVisibleConverter}}" />
+
+            <ItemsControl Grid.Row="1"
+                          Margin="0,10,0,0"
+                          Style="{StaticResource VirtualizedItemsControlStyle}"
+                          ItemsSource="{Binding TradesView}" />
+
+            <ContentControl Grid.Row="1" Content="{Binding PageParameter}"
+                            HorizontalAlignment="Right" VerticalAlignment="Bottom" />
+
         </Grid>
-      </Border>
 
-      <Label Style="{StaticResource IconLabel}" FontSize="30" Content="No suitable items found yet"
-             VerticalAlignment="Center" HorizontalAlignment="Center"
-             Grid.Row="1"
-             Visibility="{Binding TradesView.IsEmpty, Converter={StaticResource FalseToCollapsedTrueToVisibleConverter}}" />
-
-      <ItemsControl Grid.Row="1"
-                    Margin="0,10,0,0"
-                    Style="{StaticResource VirtualizedItemsControlStyle}"
-                    ItemsSource="{Binding TradesView}">
-      </ItemsControl>
-      
-      <ContentControl Grid.Row="1" Content="{Binding PageParameter}"
-                      HorizontalAlignment="Right" VerticalAlignment="Bottom"
-      ></ContentControl>
-
-    </Grid>
-
-  </DataTemplate>
+    </DataTemplate>
 </ResourceDictionary>

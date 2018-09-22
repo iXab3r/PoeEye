@@ -9,7 +9,7 @@
         <ResourceDictionary Source="pack://application:,,,/PoeEye;component/PoeTrade/Views/PoeItemView.xaml" />
         <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Styles.xaml" />
     </ResourceDictionary.MergedDictionaries>
-    
+
     <ObjectDataProvider x:Key="HorizontalAlignmentEnumArrayKey"
                         MethodName="GetValuesAndDescriptions"
                         ObjectType="eye:EnumHelper">
@@ -21,12 +21,12 @@
     <DataTemplate DataType="{x:Type viewModels:PoeTradeSummaryViewModel}">
         <Grid Focusable="False">
             <Grid.RowDefinitions>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
-            <StackPanel Grid.Row="0" Margin="0,-20,0,0" Orientation="Horizontal" 
-                        HorizontalAlignment="{Binding ControlBarAlignment}" 
-                        VerticalAlignment="Top" 
+            <StackPanel Grid.Row="0" Margin="0,-20,0,0" Orientation="Horizontal"
+                        HorizontalAlignment="{Binding ControlBarAlignment}"
+                        VerticalAlignment="Top"
                         Focusable="False"
                         Opacity="0.5">
                 <Button Command="{Binding UnlockWindowCommand}" Width="30" Height="30" VerticalAlignment="Center"
@@ -41,10 +41,10 @@
                             <Setter Property="Padding" Value="0,2,0,0" />
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding IsLocked}" Value="False">
-                                    <Setter Property="Visibility" Value="Hidden"/>
+                                    <Setter Property="Visibility" Value="Hidden" />
                                 </DataTrigger>
                                 <DataTrigger Binding="{Binding IsVisible}" Value="False">
-                                    <Setter Property="Visibility" Value="Hidden"/>
+                                    <Setter Property="Visibility" Value="Hidden" />
                                 </DataTrigger>
                                 <Trigger Property="IsMouseOver" Value="True">
                                     <Setter Property="Content" Value="&#xf09c;" />
@@ -65,17 +65,16 @@
                 <ToggleButton
                     IsChecked="{Binding IsVisible}"
                     Background="Transparent"
-                    VerticalAlignment="Center" 
+                    VerticalAlignment="Center"
                     Focusable="False"
                     Style="{StaticResource MaterialDesignSwitchToggleButton}"
                     ToolTip="Toggle TradeSummary visibility">
-                    <materialDesign:PackIcon Kind="EyeOff" >
-                    </materialDesign:PackIcon>
+                    <materialDesign:PackIcon Kind="EyeOff" />
                     <materialDesign:ToggleButtonAssist.OnContent>
                         <materialDesign:PackIcon Kind="Eye" />
                     </materialDesign:ToggleButtonAssist.OnContent>
                 </ToggleButton>
-                
+
                 <TextBox
                     BorderThickness="1"
                     Text="{Binding TradesView.Count, Mode=OneWay}"
@@ -84,8 +83,7 @@
                     Visibility="{Binding TradesView.Count, Converter={StaticResource GreaterThanZeroToVisibleConverter}}"
                     Style="{StaticResource CircleTextBox}"
                     Background="{StaticResource SemiPoeTradeNewItemBrush}"
-                    Foreground="{StaticResource PoeTradeNewItemBrush}">
-                </TextBox>
+                    Foreground="{StaticResource PoeTradeNewItemBrush}" />
 
             </StackPanel>
 
@@ -93,7 +91,7 @@
                           Visibility="{Binding IsVisible, Converter={StaticResource TrueToVisibleFalseToCollapsedConverter}}"
                           ItemTemplate="{StaticResource CompactItemViewTemplateKey}">
                 <ItemsControl.LayoutTransform>
-                    <ScaleTransform ScaleX="{Binding ListScaleFactor}" ScaleY="{Binding ListScaleFactor}"></ScaleTransform>
+                    <ScaleTransform ScaleX="{Binding ListScaleFactor}" ScaleY="{Binding ListScaleFactor}" />
                 </ItemsControl.LayoutTransform>
                 <ItemsControl.Style>
                     <Style TargetType="{x:Type ItemsControl}">
@@ -110,7 +108,7 @@
                         <Setter Property="Template">
                             <Setter.Value>
                                 <ControlTemplate TargetType="ItemsControl">
-                                    <ScrollViewer Padding="{TemplateBinding Control.Padding}" Focusable="False" 
+                                    <ScrollViewer Padding="{TemplateBinding Control.Padding}" Focusable="False"
                                                   VerticalScrollBarVisibility="Hidden"
                                                   HorizontalScrollBarVisibility="Hidden">
                                         <ItemsPresenter SnapsToDevicePixels="{TemplateBinding UIElement.SnapsToDevicePixels}" />
@@ -141,9 +139,9 @@
                                   DisplayMemberPath="Description"
                                   Width="150"
                                   SelectedValuePath="Value"
-                                  SelectedValue="{Binding ControlBarAlignment, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                  SelectedValue="{Binding ControlBarAlignment, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     </DockPanel>
-                    
+
                     <DockPanel Margin="0,3" LastChildFill="True">
                         <TextBlock DockPanel.Dock="Left" MinWidth="100"
                                    TextAlignment="Right"
@@ -163,7 +161,7 @@
                             Margin="10,0"
                             Maximum="1" />
                     </DockPanel>
-                    
+
                     <DockPanel Margin="0,3" LastChildFill="True">
                         <TextBlock DockPanel.Dock="Left" MinWidth="100"
                                    TextAlignment="Right"
@@ -183,7 +181,7 @@
                             Margin="10,0"
                             Maximum="1.5" />
                     </DockPanel>
-                    
+
                 </StackPanel>
             </Border>
         </Grid>

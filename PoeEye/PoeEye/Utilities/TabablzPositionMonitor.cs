@@ -2,7 +2,6 @@
 using System.Linq;
 using Common.Logging;
 using Dragablz;
-using PoeShared;
 using PoeShared.Scaffolding;
 
 namespace PoeEye.Utilities
@@ -10,7 +9,7 @@ namespace PoeEye.Utilities
     internal sealed class TabablzPositionMonitor<T> : VerticalPositionMonitor
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(TabablzPositionMonitor<T>));
-        
+
         public TabablzPositionMonitor()
         {
             Items = Enumerable.Empty<T>();

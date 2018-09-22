@@ -20,8 +20,7 @@ namespace PoeShared.PoeDatabase
 
         public ComplexPoeDatabaseReader(
             [NotNull] IPoeDatabaseReader[] readers,
-            [NotNull] [Dependency(WellKnownSchedulers.UI)]
-            IScheduler uiScheduler)
+            [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {
             Guard.ArgumentNotNull(readers, nameof(readers));
             Guard.ArgumentNotNull(uiScheduler, nameof(uiScheduler));

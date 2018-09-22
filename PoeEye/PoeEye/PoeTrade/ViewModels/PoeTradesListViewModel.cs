@@ -29,16 +29,16 @@ namespace PoeEye.PoeTrade.ViewModels
     internal sealed class PoeTradesListViewModel : DisposableReactiveObject, IPoeTradesListViewModel
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(PoeTradesListViewModel));
-        
+
         private static readonly TimeSpan TimeSinceLastUpdateRefreshTimeout = TimeSpan.FromSeconds(1);
         private static readonly TimeSpan RecheckPeriodThrottleTimeout = TimeSpan.FromSeconds(1);
-
-        private readonly SourceCache<IPoeTradeViewModel, IPoeItem> itemsSource = new SourceCache<IPoeTradeViewModel, IPoeItem>(x => x.Trade);
 
         private readonly SerialDisposable activeHistoryProviderDisposable = new SerialDisposable();
         private readonly IPoeCaptchaRegistrator captchaRegistrator;
 
         private readonly IClock clock;
+
+        private readonly SourceCache<IPoeTradeViewModel, IPoeItem> itemsSource = new SourceCache<IPoeTradeViewModel, IPoeItem>(x => x.Trade);
         private readonly IPoeApiWrapper poeApiWrapper;
         private readonly IEqualityComparer<IPoeItem> poeItemsComparer;
         private readonly IFactory<IPoeLiveHistoryProvider, IPoeApiWrapper, IPoeQueryInfo> poeLiveHistoryFactory;
@@ -220,10 +220,11 @@ namespace PoeEye.PoeTrade.ViewModels
                         {
                             Log.Trace($"Adding new item: {itemViewModel.Trade.DumpToTextRaw()}");
                         }
+
                         itemsSource.AddOrUpdate(itemViewModel);
                     });
                 }
-                
+
                 Update(item, trade =>
                 {
                     trade.TradeState = PoeTradeState.New;
@@ -243,6 +244,7 @@ namespace PoeEye.PoeTrade.ViewModels
                 {
                     throw new ApplicationException($"Failed to find item {item.DumpToTextRaw()}, items: \n\t{itemsSource.Items.DumpToTable()}");
                 }
+
                 //itemsSource.Remove(existing.Value);
                 action(existing.Value);
                 //itemsSource.AddOrUpdate(existing.Value);
@@ -292,7 +294,7 @@ namespace PoeEye.PoeTrade.ViewModels
         {
             if (exception != null)
             {
-                Log.Debug($"[TradesListViewModel] Received an exception from history provider", exception);
+                Log.Debug("[TradesListViewModel] Received an exception from history provider", exception);
                 var errorMsg = $"[{clock.Now}] {exception.Message}";
 
                 if (errors?.Length > 1024)

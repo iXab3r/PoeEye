@@ -6,7 +6,6 @@ using System.Reactive.Subjects;
 using Common.Logging;
 using Guards;
 using JetBrains.Annotations;
-using PoeShared;
 using PoeShared.Scaffolding;
 using PoeWhisperMonitor.Chat;
 using TrackingStreamLib;
@@ -16,7 +15,7 @@ namespace PoeWhisperMonitor
     internal sealed class PoeMessagesSource : DisposableReactiveObject, IPoeMessagesSource
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(PoeMessagesSource));
-        
+
         private readonly ICollection<string> linesBuffer = new List<string>();
         private readonly IPoeChatMessageProcessor messageProcessor;
 

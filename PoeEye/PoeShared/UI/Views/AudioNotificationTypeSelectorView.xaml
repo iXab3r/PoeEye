@@ -49,7 +49,7 @@
                                             BorderBrush="{StaticResource AccentColorBrush}"
                                             Style="{StaticResource CircleButton}" />
                                     <CheckBox IsEnabled="False" IsChecked="{Binding IsSelected, Mode=OneWay}" />
-                                    <TextBlock Style="{StaticResource IconTextBlock}" Text="{Binding Name}"/>
+                                    <TextBlock Style="{StaticResource IconTextBlock}" Text="{Binding Name}" />
                                 </StackPanel>
                             </DataTemplate>
                         </ContextMenu.ItemTemplate>

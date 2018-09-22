@@ -11,9 +11,8 @@ namespace PoeShared.StashApi
 {
     internal sealed class PoeLeagueApiClient : IPoeLeagueApiClient
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(PoeLeagueApiClient));
-
         private const string LeaguesApiPortal = @"http://api.pathofexile.com";
+        private static readonly ILog Log = LogManager.GetLogger(typeof(PoeLeagueApiClient));
 
         private readonly IRestClient client;
 

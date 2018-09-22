@@ -8,7 +8,6 @@ using System.Reactive.Subjects;
 using Common.Logging;
 using Guards;
 using JetBrains.Annotations;
-using PoeShared;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
 using PoeWhisperMonitor.Chat;

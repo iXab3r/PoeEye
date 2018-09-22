@@ -4,94 +4,90 @@
                     xmlns:viewModels="clr-namespace:PoeEye.PoeTrade.ViewModels"
                     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
                     xmlns:eye="http://coderush.net/poeeye/">
-  
-  <DataTemplate DataType="{x:Type viewModels:MainWindowTabViewModel}" >
-    <Grid>
-      <Grid.RowDefinitions>
-        <RowDefinition Height="Auto" />
-        <RowDefinition Height="*" />
-      </Grid.RowDefinitions>
 
-      <ScrollViewer VerticalScrollBarVisibility="Visible"
-                    IsTabStop="False"
-                    Focusable="False"
-                    MaxHeight="{Binding ActualHeight, RelativeSource={RelativeSource FindAncestor, AncestorType=ContentPresenter}, Mode=OneWay}">
-        <Expander IsExpanded="{Binding Query.IsExpanded}" Margin="0"
-                  Background="{x:Null}">
-          <Expander.Header>
-            <Grid Height="26">
-              <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-              </Grid.ColumnDefinitions>
-              <TextBlock Grid.Column="0"
-                         Text="Query parameters" Margin="5,0" VerticalAlignment="Center" />
-              <Button Grid.Column="1"
-                      Content="Mark All as Read" Command="{Binding MarkAllAsReadCommand}" />
-              
-              <TextBox Grid.Column="2" Text="{Binding TradesList.QuickFilter, UpdateSourceTrigger=PropertyChanged}"
-                       Style="{StaticResource MaterialDesignTextBox}"
-                       Width="300"
-                       Margin="10,0"
-                       materialDesign:HintAssist.Hint="quick filter, e.g 'chaos 20 30' ..." 
-              ></TextBox>
-              
-              <ContentControl Grid.Column="4" 
-                              Content="{Binding ApiSelector}" MinWidth="200" HorizontalAlignment="Right" />
+    <DataTemplate DataType="{x:Type viewModels:MainWindowTabViewModel}">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <ScrollViewer VerticalScrollBarVisibility="Visible"
+                          IsTabStop="False"
+                          Focusable="False"
+                          MaxHeight="{Binding ActualHeight, RelativeSource={RelativeSource FindAncestor, AncestorType=ContentPresenter}, Mode=OneWay}">
+                <Expander IsExpanded="{Binding Query.IsExpanded}" Margin="0"
+                          Background="{x:Null}">
+                    <Expander.Header>
+                        <Grid Height="26">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0"
+                                       Text="Query parameters" Margin="5,0" VerticalAlignment="Center" />
+                            <Button Grid.Column="1"
+                                    Content="Mark All as Read" Command="{Binding MarkAllAsReadCommand}" />
+
+                            <TextBox Grid.Column="2" Text="{Binding TradesList.QuickFilter, UpdateSourceTrigger=PropertyChanged}"
+                                     Style="{StaticResource MaterialDesignTextBox}"
+                                     Width="300"
+                                     Margin="10,0"
+                                     materialDesign:HintAssist.Hint="quick filter, e.g 'chaos 20 30' ..." />
+
+                            <ContentControl Grid.Column="4"
+                                            Content="{Binding ApiSelector}" MinWidth="200" HorizontalAlignment="Right" />
+                        </Grid>
+                    </Expander.Header>
+
+                    <Grid>
+                        <StackPanel Orientation="Vertical"
+                                    IsEnabled="{Binding Path=ApiSelector.SelectedModule.IsAvailable, TargetNullValue=False}">
+                            <controls:MetroContentControl Content="{Binding Query}" />
+
+                            <DockPanel>
+                                <ContentControl DockPanel.Dock="Left" Width="150" Content="{Binding ResetCommand}"
+                                                eye:CommandWrapperHelper.Text="Clear"
+                                                ToolTip="Clear all fields" />
+                                <ContentControl DockPanel.Dock="Left" Content="{Binding SaveAsDefault}" Width="150"
+                                                Margin="10,0,0,0"
+                                                eye:CommandWrapperHelper.Text="Save as Default"
+                                                ToolTip="Apply this configuration to all new tabs" />
+                                <Button DockPanel.Dock="Right" HorizontalAlignment="Right" Width="150" Command="{Binding NewSearchCommand}"
+                                        IsDefault="True"
+                                        CommandParameter="{Binding Query.PoeQueryBuilder}"
+                                        Content="Search" />
+                            </DockPanel>
+                        </StackPanel>
+                        <Border Background="{StaticResource MetroDataGrid.DisabledHighlightBrush}" Opacity="0.9">
+                            <Border.Visibility>
+                                <Binding Path="ApiSelector.SelectedModule.IsAvailable"
+                                         Converter="{StaticResource TrueToCollapsedFalseToVisibleConverter}"
+                                         TargetNullValue="{x:Static Visibility.Visible}" />
+                            </Border.Visibility>
+                            <TextBlock
+                                VerticalAlignment="Center"
+                                HorizontalAlignment="Center"
+                                TextAlignment="Center"
+                                Text="Selected module is not available yet, please wait for a few seconds"
+                                Foreground="{StaticResource PoeFontBrush}"
+                                FontSize="30" />
+                        </Border>
+                    </Grid>
+
+                </Expander>
+            </ScrollViewer>
+
+            <Grid Grid.Row="1">
+                <ItemsControl Margin="0,10,0,0"
+                              ItemsSource="{Binding TradesList.ItemsView}"
+                              Style="{StaticResource VirtualizedItemsControlStyle}" />
+                <ContentControl Content="{Binding TradesList.PageParameters}"
+                                HorizontalAlignment="Right" VerticalAlignment="Bottom" />
             </Grid>
-          </Expander.Header>
-
-          <Grid>
-            <StackPanel Orientation="Vertical"
-                        IsEnabled="{Binding Path=ApiSelector.SelectedModule.IsAvailable, TargetNullValue=False}">
-              <controls:MetroContentControl Content="{Binding Query}" />
-              
-              <DockPanel>
-                <ContentControl DockPanel.Dock="Left" Width="150" Content="{Binding ResetCommand}"
-                                eye:CommandWrapperHelper.Text="Clear"
-                                ToolTip="Clear all fields"/>
-                <ContentControl DockPanel.Dock="Left" Content="{Binding SaveAsDefault}" Width="150" 
-                                Margin="10,0,0,0"
-                                eye:CommandWrapperHelper.Text="Save as Default"
-                                ToolTip="Apply this configuration to all new tabs"/>
-                <Button DockPanel.Dock="Right" HorizontalAlignment="Right" Width="150" Command="{Binding NewSearchCommand}"
-                        IsDefault="True"
-                        CommandParameter="{Binding Query.PoeQueryBuilder}"
-                        Content="Search" />
-              </DockPanel>
-            </StackPanel>
-            <Border Background="{StaticResource MetroDataGrid.DisabledHighlightBrush}" Opacity="0.9">
-              <Border.Visibility>
-                <Binding Path="ApiSelector.SelectedModule.IsAvailable" 
-                         Converter="{StaticResource TrueToCollapsedFalseToVisibleConverter}"
-                         TargetNullValue="{x:Static Visibility.Visible}" />
-              </Border.Visibility>
-              <TextBlock 
-                VerticalAlignment="Center"
-                HorizontalAlignment="Center"
-                TextAlignment="Center"
-                Text="Selected module is not available yet, please wait for a few seconds" 
-                Foreground="{StaticResource PoeFontBrush}"
-                FontSize="30">
-              </TextBlock>
-            </Border>
-          </Grid>
-          
-        </Expander>
-      </ScrollViewer>
-
-      <Grid Grid.Row="1">
-        <ItemsControl Margin="0,10,0,0"
-                      ItemsSource="{Binding TradesList.ItemsView}"
-                      Style="{StaticResource VirtualizedItemsControlStyle}">
-        </ItemsControl>
-        <ContentControl Content="{Binding TradesList.PageParameters}"
-                        HorizontalAlignment="Right" VerticalAlignment="Bottom"
-                        ></ContentControl>
-      </Grid>
-    </Grid>
-  </DataTemplate>
+        </Grid>
+    </DataTemplate>
 </ResourceDictionary>

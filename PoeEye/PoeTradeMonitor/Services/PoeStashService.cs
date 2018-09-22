@@ -71,7 +71,7 @@ namespace PoeEye.TradeMonitor.Services
             Log.Debug($"Trying to find item in tab {tabName} @ X{itemX} Y{itemY} (tabs count: {stash?.Tabs?.Length ?? 0})");
             if (stash == null || stash == StashUpdate.Empty)
             {
-                Log.Warn($"Stash is not ready - either not requested yet or is empty");
+                Log.Warn("Stash is not ready - either not requested yet or is empty");
                 return null;
             }
 
@@ -103,7 +103,7 @@ namespace PoeEye.TradeMonitor.Services
             Log.Debug($"Trying to find item int tab {tabName}");
             if (stash == null || stash == StashUpdate.Empty)
             {
-                Log.Warn($"Stash is not ready - either not requested yet or is empty");
+                Log.Warn("Stash is not ready - either not requested yet or is empty");
                 return null;
             }
 
@@ -128,21 +128,21 @@ namespace PoeEye.TradeMonitor.Services
 
             try
             {
-                Log.Info($"[TradeMonitor.PoeStashService] Reinitializing stash service...");
+                Log.Info("Reinitializing stash service...");
                 stashUpdaterDisposable.Disposable = null;
                 stashUpdates.OnNext(StashUpdate.Empty);
                 activeUpdater = null;
 
                 if (string.IsNullOrEmpty(config.LoginEmail) || string.IsNullOrEmpty(config.SessionId))
                 {
-                    Log.Warn(
-                        $"[TradeMonitor.PoeStashService] Credentials are not set, userName: {config.LoginEmail}, sessionId: {config.SessionId}");
+                    Log.Debug(
+                        $"Credentials are not set, userName: {config.LoginEmail}, sessionId: {config.SessionId}");
                     return;
                 }
 
                 if (!tradeMonitorConfig.IsEnabled)
                 {
-                    Log.Debug($"[TradeMonitor.PoeStashService] Service is disabled, terminating...");
+                    Log.Debug("Service is disabled, terminating...");
                     return;
                 }
 
@@ -156,7 +156,7 @@ namespace PoeEye.TradeMonitor.Services
 
                 updater
                     .Updates
-                    .Do(x => Log.Debug($"[TradeMonitor.PoeStashService] Got {x.Items?.Length} item(s) and {x.Tabs?.Length} tabs"))
+                    .Do(x => Log.Debug($"Got {x.Items?.Length} item(s) and {x.Tabs?.Length} tabs"))
                     .Subscribe(stashUpdates)
                     .AddTo(stashDisposable);
 

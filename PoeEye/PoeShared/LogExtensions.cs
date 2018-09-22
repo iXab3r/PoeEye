@@ -5,7 +5,7 @@ using JetBrains.Annotations;
 
 namespace PoeShared
 {
-    public static class LogExtensions 
+    public static class LogExtensions
     {
         public static void HandleException(this ILog logger, [NotNull] Exception exception)
         {

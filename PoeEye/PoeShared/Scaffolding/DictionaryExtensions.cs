@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Guards;
 
 namespace PoeShared.Scaffolding
@@ -8,9 +7,9 @@ namespace PoeShared.Scaffolding
     public static class DictionaryExtensions
     {
         public static TValue AddOrUpdate<TKey, TValue>(
-            this IDictionary<TKey, TValue> enumerable, 
-            TKey key, 
-            TValue newValue, 
+            this IDictionary<TKey, TValue> enumerable,
+            TKey key,
+            TValue newValue,
             Func<TKey, TValue, TValue> updateValueFactory)
         {
             Guard.ArgumentNotNull(enumerable, nameof(enumerable));
@@ -22,10 +21,8 @@ namespace PoeShared.Scaffolding
             {
                 return enumerable[key] = updateValueFactory(key, existing);
             }
-            else
-            {
-                return enumerable[key] = newValue;
-            }
+
+            return enumerable[key] = newValue;
         }
     }
 }

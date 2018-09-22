@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Net;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
@@ -9,15 +8,11 @@ using DynamicData.Annotations;
 using Guards;
 using PoeEye.Config;
 using PoeEye.PoeTrade.Updater;
-using PoeEye.Utilities;
-using PoeShared;
 using PoeShared.Modularity;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
 using PoeShared.Scaffolding.WPF;
-using PoeShared.UI;
 using ReactiveUI;
-using Squirrel;
 using Unity.Attributes;
 
 namespace PoeEye.PoeTrade.ViewModels
@@ -29,7 +24,6 @@ namespace PoeEye.PoeTrade.ViewModels
         private PoeEyeUpdateSettingsConfig loadedConfig;
         private PasswordBox passwordBox;
         private UpdateSourceInfo updateSource;
-        private string updateSourcePatchNotes;
         private string username;
 
         public PoeEyeUpdateSettingsViewModel(
@@ -120,7 +114,7 @@ namespace PoeEye.PoeTrade.ViewModels
             TestConnectionCommand.Description = null;
             updaterModel.UpdateSource = UpdateSource;
 
-            var updateInfo  = await updaterModel.CheckForUpdates();
+            var updateInfo = await updaterModel.CheckForUpdates();
             TestConnectionCommand.Description = $"Successfully connected to {updateSource.Description}\n{updateInfo?.DumpToText()}";
         }
     }

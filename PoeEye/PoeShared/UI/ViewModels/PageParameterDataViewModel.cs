@@ -19,8 +19,8 @@ namespace PoeShared.UI.ViewModels
 
         public PageParameterDataViewModel()
         {
-            this.currentPage = 1;
-            this.pageSize = int.MaxValue;
+            currentPage = 1;
+            pageSize = int.MaxValue;
 
             nextPageCommand = new DelegateCommand(() => CurrentPage = CurrentPage + 1, () => CurrentPage < PageCount);
             previousPageCommand = new DelegateCommand(() => CurrentPage = CurrentPage - 1, () => CurrentPage > 1);

@@ -8,7 +8,6 @@ using JetBrains.Annotations;
 using PoeBud.Config;
 using PoeBud.Models;
 using PoeBud.Scaffolding;
-using PoeShared;
 using PoeShared.Converters;
 using PoeShared.Scaffolding;
 using PoeShared.StashApi.DataTypes;

@@ -94,13 +94,12 @@ namespace PoeEye.PathOfExileTrade.TradeApi
                 Log.Debug($"[PathOfExileTradePortalApi #{before.PolicyName}] Releasing semaphore slot");
                 before.Semaphore.Release();
             }
-
         }
 
         private async Task<Response<T>> LimitCall<T>(LimiterData before, Func<Task<Response<T>>> functor)
         {
-            const double targetFillRate = 0.8; 
-            
+            const double targetFillRate = 0.8;
+
             if (!before.Limit.IsEmpty)
             {
                 Log.Debug($"[PathOfExileTradePortalApi #{before.PolicyName}] Current X-Rate limits: {before}");
@@ -133,7 +132,8 @@ namespace PoeEye.PathOfExileTrade.TradeApi
                     {
                         var diff = fillRate - targetFillRate;
                         var throttlePeriod = TimeSpan.FromSeconds(before.Limit.TimePeriod.TotalSeconds * diff * 2);
-                        Log.Debug($"[PathOfExileTradePortalApi #{before.PolicyName}] Applying throttling of {throttlePeriod} (fillRate target: current: {fillRate}, target: {targetFillRate}, diff: {diff})");
+                        Log.Debug(
+                            $"[PathOfExileTradePortalApi #{before.PolicyName}] Applying throttling of {throttlePeriod} (fillRate target: current: {fillRate}, target: {targetFillRate}, diff: {diff})");
                         await Task.Delay(throttlePeriod);
                     }
                 }
@@ -240,7 +240,7 @@ namespace PoeEye.PathOfExileTrade.TradeApi
             public string PolicyName { get; }
             public RateLimits Limit { get; set; }
 
-            public SemaphoreSlim Semaphore { get; } = new SemaphoreSlim(initialCount:1, maxCount:1);
+            public SemaphoreSlim Semaphore { get; } = new SemaphoreSlim(1, 1);
 
             public long RequestId => requestId;
 

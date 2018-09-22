@@ -81,7 +81,7 @@ namespace PoeShared.Prism
 
             Container.RegisterWindowTracker(WellKnownWindows.AllWindows, () => ".*");
             Container.RegisterWindowTracker(WellKnownWindows.MainWindow, () => Process.GetCurrentProcess().MainWindowTitle);
-            Container.RegisterWindowTracker(WellKnownWindows.PathOfExileWindow, () => $"^Path of Exile$");
+            Container.RegisterWindowTracker(WellKnownWindows.PathOfExileWindow, () => "^Path of Exile$");
 
             Container.RegisterOverlayController(
                 WellKnownOverlays.PathOfExileOverlay,

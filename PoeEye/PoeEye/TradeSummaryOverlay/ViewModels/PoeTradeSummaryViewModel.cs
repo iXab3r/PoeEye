@@ -41,10 +41,8 @@ namespace PoeEye.TradeSummaryOverlay.ViewModels
             [NotNull] IOverlayWindowController controller,
             [NotNull] IFactory<IPoeAdvancedTradesListViewModel> listFactory,
             [NotNull] IMainWindowViewModel mainWindow,
-            [NotNull] [Dependency(WellKnownSchedulers.Background)]
-            IScheduler bgScheduler,
-            [NotNull] [Dependency(WellKnownSchedulers.UI)]
-            IScheduler uiScheduler)
+            [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler,
+            [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {
             Guard.ArgumentNotNull(configProvider, nameof(configProvider));
             Guard.ArgumentNotNull(controller, nameof(controller));

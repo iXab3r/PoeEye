@@ -4,7 +4,7 @@ namespace PoeEye.PathOfExileTrade.TradeApi.Domain
 {
     public static class JsonSearchRequest
     {
-        public partial class Request
+        public class Request
         {
             [JsonProperty("query")]
             public Query Query { get; set; }
@@ -12,8 +12,8 @@ namespace PoeEye.PathOfExileTrade.TradeApi.Domain
             [JsonProperty("sort")]
             public Sort Sort { get; set; }
         }
-        
-        public partial class Response
+
+        public class Response
         {
             [JsonProperty("result")]
             public string[] Result { get; set; }
@@ -24,18 +24,18 @@ namespace PoeEye.PathOfExileTrade.TradeApi.Domain
             [JsonProperty("total")]
             public long Total { get; set; }
         }
-        
-        public partial class Query
+
+        public class Query
         {
             [JsonProperty("term")]
             public string Term { get; set; }
-            
+
             [JsonProperty("name")]
             public string Name { get; set; }
-            
+
             [JsonProperty("type")]
             public string ItemBaseType { get; set; }
-            
+
             [JsonProperty("status")]
             public OptionValue Status { get; set; }
 
@@ -46,7 +46,7 @@ namespace PoeEye.PathOfExileTrade.TradeApi.Domain
             public QueryFilters Filters { get; set; }
         }
 
-        public partial class QueryFilters
+        public class QueryFilters
         {
             [JsonProperty("socket_filters")]
             public SocketFilters SocketFilters { get; set; }
@@ -73,13 +73,13 @@ namespace PoeEye.PathOfExileTrade.TradeApi.Domain
             public TypeFilters TypeFilters { get; set; }
         }
 
-        public partial class ArmourFilters : BaseFilter
+        public class ArmourFilters : BaseFilter
         {
             [JsonProperty("filters")]
             public ArmourFilterDef Value { get; set; }
         }
 
-        public partial class ArmourFilterDef : BaseFilterDef
+        public class ArmourFilterDef : BaseFilterDef
         {
             [JsonProperty("ar")]
             public MinMaxValue Armour { get; set; }
@@ -94,7 +94,7 @@ namespace PoeEye.PathOfExileTrade.TradeApi.Domain
             public MinMaxValue EnergyShield { get; set; }
         }
 
-        public partial class MinMaxValue : BaseFilterDef
+        public class MinMaxValue : BaseFilterDef
         {
             [JsonProperty("min")]
             public long? Min { get; set; }
@@ -103,34 +103,34 @@ namespace PoeEye.PathOfExileTrade.TradeApi.Domain
             public long? Max { get; set; }
         }
 
-        public partial class MapFilters : BaseFilter
+        public class MapFilters : BaseFilter
         {
             [JsonProperty("filters")]
             public MapFilterDef Value { get; set; }
         }
 
-        public partial class MapFilterDef : BaseFilterDef
+        public class MapFilterDef : BaseFilterDef
         {
             [JsonProperty("disabled")]
             public bool Disabled { get; set; }
-            
+
             [JsonProperty("map_tier")]
             public MapTier MapTier { get; set; }
         }
 
-        public partial class MapTier : BaseFilterDef
+        public class MapTier : BaseFilterDef
         {
             [JsonProperty("min")]
             public long? Min { get; set; }
         }
 
-        public partial class MiscFilters : BaseFilter
+        public class MiscFilters : BaseFilter
         {
             [JsonProperty("filters")]
             public MiscFilterDef Value { get; set; }
         }
 
-        public partial class MiscFilterDef : BaseFilterDef
+        public class MiscFilterDef : BaseFilterDef
         {
             [JsonProperty("quality")]
             public MinMaxValue Quality { get; set; }
@@ -171,24 +171,24 @@ namespace PoeEye.PathOfExileTrade.TradeApi.Domain
             [JsonProperty("disabled")]
             public bool Disabled { get; set; }
         }
-        
+
         public class BaseFilterDef
         {
         }
 
-        public partial class OptionValue
+        public class OptionValue
         {
             [JsonProperty("option")]
             public string Option { get; set; }
         }
 
-        public partial class ReqFilters : BaseFilter
+        public class ReqFilters : BaseFilter
         {
             [JsonProperty("filters")]
             public RequirementsFilterDef Value { get; set; }
         }
 
-        public partial class RequirementsFilterDef : BaseFilterDef
+        public class RequirementsFilterDef : BaseFilterDef
         {
             [JsonProperty("lvl")]
             public MinMaxValue Lvl { get; set; }
@@ -203,13 +203,13 @@ namespace PoeEye.PathOfExileTrade.TradeApi.Domain
             public MinMaxValue Int { get; set; }
         }
 
-        public partial class SocketFilters : BaseFilter
+        public class SocketFilters : BaseFilter
         {
             [JsonProperty("filters")]
             public SocketFilterDef Value { get; set; }
         }
 
-        public partial class SocketFilterDef : BaseFilterDef
+        public class SocketFilterDef : BaseFilterDef
         {
             [JsonProperty("sockets")]
             public SocketsDef Sockets { get; set; }
@@ -218,7 +218,7 @@ namespace PoeEye.PathOfExileTrade.TradeApi.Domain
             public SocketsDef Links { get; set; }
         }
 
-        public partial class SocketsDef : BaseFilterDef
+        public class SocketsDef : BaseFilterDef
         {
             [JsonProperty("r")]
             public long? R { get; set; }
@@ -239,13 +239,13 @@ namespace PoeEye.PathOfExileTrade.TradeApi.Domain
             public long? Max { get; set; }
         }
 
-        public partial class TradeFilters : BaseFilter
+        public class TradeFilters : BaseFilter
         {
             [JsonProperty("filters")]
             public TradeFilterDef Value { get; set; }
         }
 
-        public partial class TradeFilterDef : BaseFilterDef
+        public class TradeFilterDef : BaseFilterDef
         {
             [JsonProperty("price")]
             public Price Price { get; set; }
@@ -254,13 +254,13 @@ namespace PoeEye.PathOfExileTrade.TradeApi.Domain
             public Account Account { get; set; }
         }
 
-        public partial class Account : BaseFilterDef
+        public class Account : BaseFilterDef
         {
             [JsonProperty("input")]
             public string Input { get; set; }
         }
 
-        public partial class Price : BaseFilterDef
+        public class Price : BaseFilterDef
         {
             [JsonProperty("option")]
             public string Option { get; set; }
@@ -272,13 +272,13 @@ namespace PoeEye.PathOfExileTrade.TradeApi.Domain
             public long? Max { get; set; }
         }
 
-        public partial class TypeFilters : BaseFilter
+        public class TypeFilters : BaseFilter
         {
             [JsonProperty("filters")]
             public TypeFilterDef Value { get; set; }
         }
 
-        public partial class TypeFilterDef : BaseFilterDef
+        public class TypeFilterDef : BaseFilterDef
         {
             [JsonProperty("category")]
             public OptionValue Category { get; set; }
@@ -287,13 +287,13 @@ namespace PoeEye.PathOfExileTrade.TradeApi.Domain
             public OptionValue Rarity { get; set; }
         }
 
-        public partial class WeaponFilters : BaseFilter
+        public class WeaponFilters : BaseFilter
         {
             [JsonProperty("filters")]
             public WeaponFilterDef Value { get; set; }
         }
 
-        public partial class WeaponFilterDef : BaseFilterDef
+        public class WeaponFilterDef : BaseFilterDef
         {
             [JsonProperty("damage")]
             public MinMaxValue Damage { get; set; }
@@ -314,7 +314,7 @@ namespace PoeEye.PathOfExileTrade.TradeApi.Domain
             public MinMaxValue Edps { get; set; }
         }
 
-        public partial class FilterGroup : BaseFilter
+        public class FilterGroup : BaseFilter
         {
             [JsonProperty("type")]
             public string Type { get; set; }
@@ -325,8 +325,8 @@ namespace PoeEye.PathOfExileTrade.TradeApi.Domain
             [JsonProperty("value")]
             public MinMaxValue GroupValue { get; set; }
         }
-        
-        public partial class Filter
+
+        public class Filter
         {
             [JsonProperty("id")]
             public string Id { get; set; }
@@ -338,7 +338,7 @@ namespace PoeEye.PathOfExileTrade.TradeApi.Domain
             public bool Disabled { get; set; }
         }
 
-        public partial class Sort
+        public class Sort
         {
             [JsonProperty("price")]
             public string Price { get; set; }

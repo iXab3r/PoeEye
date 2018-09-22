@@ -24,7 +24,7 @@ namespace PoeBud.Models
     internal sealed class PoeStashUpdater : DisposableReactiveObject, IPoeStashUpdater
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(PoeStashUpdater));
-        
+
         private readonly IClock clock;
         private readonly IStashUpdaterParameters config;
         private readonly IPoeStashClient poeClient;
@@ -114,7 +114,7 @@ namespace PoeBud.Models
 
         public void ForceRefresh()
         {
-            Log.Debug($"Force update requested");
+            Log.Debug("Force update requested");
             refreshSubject.OnNext(Unit.Default);
         }
 
@@ -133,8 +133,8 @@ namespace PoeBud.Models
             var leaguesToProcess = strategy.GetDefaultLeaguesList();
             if (leaguesToProcess.Length == 0)
             {
-                Log.Debug($"Strategy did not provide default leagues list");
-                Log.Debug($"Requesting leagues list...");
+                Log.Debug("Strategy did not provide default leagues list");
+                Log.Debug("Requesting leagues list...");
                 var leagues = poeClient.GetLeaguesAsync().Result;
                 Log.Debug($"Received leagues list: {leagues.DumpToTextRaw()}");
                 leaguesToProcess = strategy.GetLeaguesToProcess(leagues);
@@ -219,7 +219,7 @@ namespace PoeBud.Models
             var strategy = stashUpdaterStrategy;
             if (strategy == null)
             {
-                Log.Warn($"Strategy is not set");
+                Log.Warn("Strategy is not set");
                 return StashUpdate.Empty;
             }
 

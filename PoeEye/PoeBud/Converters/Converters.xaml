@@ -3,7 +3,7 @@
                     xmlns:converters="clr-namespace:PoeBud.Converters"
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
     <converters:PoeSolutionToHumanReadableFormat x:Key="PoeSolutionToHumanReadableFormatConverterKey" />
-    
+
     <converters:BooleanToObjectConverter x:Key="BooleanToSemitransparentConverter">
         <converters:BooleanToObjectConverter.FalseValue>
             <system:Double>
@@ -16,7 +16,7 @@
             </system:Double>
         </converters:BooleanToObjectConverter.TrueValue>
     </converters:BooleanToObjectConverter>
-    
+
     <converters:BooleanToObjectConverter x:Key="BoolInvertConverter">
         <converters:BooleanToObjectConverter.FalseValue>
             <system:Boolean>
@@ -28,7 +28,7 @@
                 False
             </system:Boolean>
         </converters:BooleanToObjectConverter.TrueValue>
-        
+
     </converters:BooleanToObjectConverter>
-    
+
 </ResourceDictionary>

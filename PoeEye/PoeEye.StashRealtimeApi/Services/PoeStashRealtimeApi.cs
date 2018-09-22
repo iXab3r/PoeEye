@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using Common.Logging;
 using Guards;
 using JetBrains.Annotations;
-using PoeShared;
 using PoeShared.PoeTrade;
 using PoeShared.PoeTrade.Query;
 using PoeShared.Scaffolding;

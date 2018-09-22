@@ -9,8 +9,8 @@ namespace PoeShared.Common
     public sealed class PoeItemBuilder
     {
         private readonly PoeItem additionalDetails = new PoeItem();
-        private readonly IConverter<IStashItem, PoeItem> itemConverter;
         [NotNull] private readonly IClock clock;
+        private readonly IConverter<IStashItem, PoeItem> itemConverter;
         private readonly IConverter<string, PoePrice> priceConverter;
 
         private IStashItem stashItem;
@@ -62,31 +62,31 @@ namespace PoeShared.Common
             additionalDetails.FirstSeen = source;
             return this;
         }
-        
+
         public PoeItemBuilder WithUserIgn(string source)
         {
             additionalDetails.UserIgn = source;
             return this;
         }
-        
+
         public PoeItemBuilder WithUserForumName(string source)
         {
             additionalDetails.UserForumName = source;
             return this;
         }
-        
+
         public PoeItemBuilder WithOnline(bool isOnline)
         {
             additionalDetails.UserIsOnline = isOnline;
             return this;
         }
-        
+
         public PoeItemBuilder WithItemState(PoeTradeState state)
         {
             additionalDetails.ItemState = state;
             return this;
         }
-        
+
         public PoeItemBuilder WithTimestamp(DateTime? source)
         {
             additionalDetails.Timestamp = source;
@@ -110,18 +110,22 @@ namespace PoeShared.Common
             {
                 poeItem.SuggestedPrivateMessage = additionalDetails.SuggestedPrivateMessage;
             }
+
             if (string.IsNullOrWhiteSpace(poeItem.UserIgn))
             {
                 poeItem.UserIgn = additionalDetails.UserIgn;
             }
+
             if (string.IsNullOrWhiteSpace(poeItem.UserForumName))
             {
                 poeItem.UserForumName = additionalDetails.UserForumName;
             }
+
             if (poeItem.FirstSeen == null)
             {
                 poeItem.FirstSeen = additionalDetails.FirstSeen;
             }
+
             if (poeItem.Timestamp == null)
             {
                 poeItem.Timestamp = additionalDetails.Timestamp ?? clock.Now;
@@ -140,13 +144,13 @@ namespace PoeShared.Common
             if (!string.IsNullOrWhiteSpace(poeItem.Note))
             {
                 var notePrice = priceConverter.Convert(poeItem.Note);
-                if (!notePrice.IsEmpty && poeItem.Price.ToString() == notePrice.ToString())
+                if (!notePrice.IsEmpty && poeItem.Price == notePrice.ToString())
                 {
                     // price is already set
                     poeItem.Note = null;
                 }
             }
-            
+
             return poeItem;
         }
     }

@@ -79,7 +79,7 @@ namespace PoeShared.StashApi.DataTypes
         [DeserializeAs(Name = "explicitMods")]
         [JsonProperty("explicitMods")]
         public List<string> ExplicitMods { get; set; }
-        
+
         [DeserializeAs(Name = "extended")]
         [JsonProperty("extended")]
         public StashItemExtendedInfo Extended { get; set; }

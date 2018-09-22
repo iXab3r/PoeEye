@@ -9,7 +9,6 @@ using JetBrains.Annotations;
 using PoeEye.TradeMonitor.Models;
 using PoeEye.TradeMonitor.Modularity;
 using PoeEye.TradeMonitor.Services.Notifications;
-using PoeShared;
 using PoeShared.Audio;
 using PoeShared.Common;
 using PoeShared.Modularity;

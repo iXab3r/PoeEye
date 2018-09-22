@@ -72,7 +72,7 @@ namespace PoeEye.Tests.PoeEye.PoeTrade.ViewModels
 
             captchaService = new Mock<IPoeCaptchaRegistrator>();
             captchaService.Setup(x => x.CaptchaRequests).Returns(new Subject<string>());
-            
+
             configSink = new Subject<PoeEyeMainConfig>();
             configProvider = new Mock<IConfigProvider<PoeEyeMainConfig>>();
             configProvider.SetupGet(x => x.WhenChanged).Returns(configSink);

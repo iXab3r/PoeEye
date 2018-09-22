@@ -10,15 +10,15 @@ namespace PoeEye.PoeTrade.ViewModels
     internal interface IPoeAdvancedTradesListViewModel : IDisposableReactiveObject
     {
         /// <summary>
-        ///   Filtered and sorted items list
+        ///     Filtered and sorted items list
         /// </summary>
         ReadOnlyObservableCollection<IPoeTradeViewModel> Items { get; }
-        
+
         /// <summary>
-        ///  Raw items list - without sorting/paging/filtering/etc
+        ///     Raw items list - without sorting/paging/filtering/etc
         /// </summary>
         ReadOnlyObservableCollection<IPoeTradeViewModel> RawItems { get; }
-        
+
         IPageParameterDataViewModel PageParameter { [NotNull] get; }
 
         void Add([NotNull] ReadOnlyObservableCollection<IPoeTradeViewModel> itemList);

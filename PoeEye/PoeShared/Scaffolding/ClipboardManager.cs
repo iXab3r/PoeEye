@@ -8,7 +8,7 @@ namespace PoeShared.Scaffolding
     internal sealed class ClipboardManager : IClipboardManager
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(ClipboardManager));
-        
+
         public TimeSpan ClipboardRestorationTimeout { get; } = TimeSpan.FromMilliseconds(200);
 
         public int ClipboardSetRetryCount { get; } = 10;

@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Common.Logging;
 using Guards;
 using JetBrains.Annotations;
-using PoeShared;
 using PoeShared.Common;
 using PoeShared.Communications;
 using PoeShared.PoeTrade;
@@ -35,7 +34,7 @@ namespace PoeEye.PoeTrade
             {
                 return Task.Run(() => default(bool?));
             }
-            
+
             return Task.Run(() => VerifyInternal(item.Hash, item.ThreadId));
         }
 

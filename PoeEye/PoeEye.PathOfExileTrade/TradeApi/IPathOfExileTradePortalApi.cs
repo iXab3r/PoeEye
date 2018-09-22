@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using PoeEye.PathOfExileTrade.TradeApi.Domain;
 using PoeShared.Common;
-using PoeShared.StashApi.DataTypes;
 using RestEase;
 
 namespace PoeEye.PathOfExileTrade.TradeApi
@@ -14,19 +12,19 @@ namespace PoeEye.PathOfExileTrade.TradeApi
         [Get("data/leagues")]
         [AllowAnyStatusCode]
         Task<Response<JsonGetLeagueListResponse>> GetLeagueList();
-        
+
         [Get("data/stats")]
         [AllowAnyStatusCode]
         Task<Response<JsonGetStatsListResponse>> GetStatsList();
-        
+
         [Get("data/static")]
         [AllowAnyStatusCode]
         Task<Response<JsonGetStaticResponse>> GetStatic();
-        
+
         [Post("search/{league}")]
         [AllowAnyStatusCode]
         Task<Response<JsonSearchRequest.Response>> Search([Path] string league, [Body] JsonSearchRequest.Request query);
-        
+
         [Get("fetch/{csvItemIdList}")]
         [AllowAnyStatusCode]
         Task<Response<JsonFetchRequest.Response>> FetchItems([Path] string csvItemIdList, string queryId);
@@ -37,23 +35,23 @@ namespace PoeEye.PathOfExileTrade.TradeApi
         [JsonProperty("result")]
         public List<JsonLeague> Result { get; set; }
     }
-    
-    internal partial class JsonLeague
+
+    internal class JsonLeague
     {
-        [JsonProperty("id")]    
+        [JsonProperty("id")]
         public string Id { get; set; }
 
         [JsonProperty("text")]
         public string Text { get; set; }
     }
-    
-    internal partial class JsonGetStatsListResponse
+
+    internal class JsonGetStatsListResponse
     {
         [JsonProperty("result")]
         public JsonStatsCategory[] Categories { get; set; }
     }
 
-    internal partial class JsonStatsCategory
+    internal class JsonStatsCategory
     {
         [JsonProperty("label")]
         public string Label { get; set; }
@@ -62,7 +60,7 @@ namespace PoeEye.PathOfExileTrade.TradeApi
         public JsonStatsEntry[] Entries { get; set; }
     }
 
-    internal partial class JsonStatsEntry
+    internal class JsonStatsEntry
     {
         [JsonProperty("id")]
         public string Id { get; set; }
@@ -73,16 +71,25 @@ namespace PoeEye.PathOfExileTrade.TradeApi
         [JsonProperty("type")]
         public StatsTypeEnum StatsType { get; set; }
     }
-    
-    internal enum StatsTypeEnum { Crafted, Delve, Enchant, Explicit, Implicit, Monster, Pseudo };
-    
-    public partial class JsonGetStaticResponse
+
+    internal enum StatsTypeEnum
+    {
+        Crafted,
+        Delve,
+        Enchant,
+        Explicit,
+        Implicit,
+        Monster,
+        Pseudo
+    }
+
+    public class JsonGetStaticResponse
     {
         [JsonProperty("result")]
         public JsonStaticEntries Result { get; set; }
     }
 
-    public partial class JsonStaticEntries
+    public class JsonStaticEntries
     {
         [JsonProperty("currency")]
         public JsonCurrency[] Currency { get; set; }
@@ -124,7 +131,7 @@ namespace PoeEye.PathOfExileTrade.TradeApi
         public object[] Misc { get; set; }
     }
 
-    public partial class JsonStaticEntry
+    public class JsonStaticEntry
     {
         [JsonProperty("id")]
         public string Id { get; set; }
@@ -133,7 +140,7 @@ namespace PoeEye.PathOfExileTrade.TradeApi
         public string Text { get; set; }
     }
 
-    public partial class JsonCurrency
+    public class JsonCurrency
     {
         [JsonProperty("id")]
         public string Id { get; set; }
@@ -144,7 +151,7 @@ namespace PoeEye.PathOfExileTrade.TradeApi
         [JsonProperty("image")]
         public string Image { get; set; }
     }
-    
+
     internal static class StatsTypeEnumExtensions
     {
         public static PoeModType ToPoeModType(this StatsTypeEnum source)
@@ -159,7 +166,7 @@ namespace PoeEye.PathOfExileTrade.TradeApi
                     return PoeModType.Unknown;
             }
         }
-        
+
         public static PoeModOrigin ToPoeModOrigin(this StatsTypeEnum source)
         {
             switch (source)

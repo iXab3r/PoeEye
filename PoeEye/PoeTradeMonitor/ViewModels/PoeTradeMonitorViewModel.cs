@@ -12,7 +12,6 @@ using JetBrains.Annotations;
 using PoeEye.TradeMonitor.Models;
 using PoeEye.TradeMonitor.Modularity;
 using PoeEye.TradeMonitor.Services;
-using PoeShared;
 using PoeShared.Modularity;
 using PoeShared.Native;
 using PoeShared.Prism;
@@ -120,6 +119,8 @@ namespace PoeEye.TradeMonitor.ViewModels
 
         private void Initialize()
         {
+            Log.Info("Initializing TradeMonitor...");
+
             var pageSizeObservable =
                 this.WhenAnyValue(x => x.PreGroupNotificationsCount).ToUnit().Merge(this.WhenAnyValue(x => x.IsExpanded).ToUnit())
                     .Select(x => IsExpanded ? int.MaxValue : PreGroupNotificationsCount)
@@ -157,7 +158,7 @@ namespace PoeEye.TradeMonitor.ViewModels
 
         private void CloseAllNegotiationsCommandExecuted()
         {
-            Log.Debug($"[PoeTradeMonitorViewModel.CloseAllNegotiations] Closing all negotiations");
+            Log.Debug("Closing all negotiations");
 
             foreach (var negotiation in negotiationsList.Items)
             {
@@ -182,16 +183,16 @@ namespace PoeEye.TradeMonitor.ViewModels
         private void UpdateNegotiation(INegotiationViewModel viewModel, TradeModel model)
         {
             Log.Debug(
-                $"[PoeTradeMonitorViewModel.UpdateNegotiation] Updating existing negotiation: {viewModel}");
+                $"Updating existing negotiation: {viewModel}");
             viewModel.UpdateModel(model);
         }
 
         private void AddNegotiation(TradeModel model)
         {
-            Log.Debug($"[PoeTradeMonitorViewModel.AddNegotiation] New trade: {model}");
+            Log.Debug($"New trade: {model}");
             var newNegotiaton = notificationFactory.Create(model);
             var closeController = new NegotiationCloseController(this, newNegotiaton);
-            Log.Debug($"[PoeTradeMonitorViewModel.AddNegotiation] Negotiation model: {newNegotiaton}");
+            Log.Debug($"Negotiation model: {newNegotiaton}");
 
             newNegotiaton.SetCloseController(closeController);
 
@@ -209,7 +210,7 @@ namespace PoeEye.TradeMonitor.ViewModels
 
         private void CloseNegotiationCommandExecuted(INegotiationViewModel negotiation)
         {
-            Log.Debug($"[PoeTradeMonitorViewModel.CloseNegotiation] Closing negotiation {negotiation}");
+            Log.Debug($"Closing negotiation {negotiation}");
             if (negotiation == null)
             {
                 return;
@@ -227,7 +228,7 @@ namespace PoeEye.TradeMonitor.ViewModels
 
         private void ApplyConfig(PoeTradeMonitorConfig config)
         {
-            Log.Debug($"[PoeTradeMonitorViewModel.ApplyConfig] Config has changed");
+            Log.Debug("Config has changed");
 
             GrowUpwards = config.GrowUpwards;
             NumberOfNegotiationsToExpandByDefault = config.NumberOfNegotiationsToExpandByDefault;

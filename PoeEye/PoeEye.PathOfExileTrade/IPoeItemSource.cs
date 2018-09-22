@@ -5,9 +5,9 @@ using PoeShared.PoeTrade.Query;
 
 namespace PoeEye.PathOfExileTrade
 {
-    internal interface IPoeItemSource 
+    internal interface IPoeItemSource
     {
-        [NotNull] 
+        [NotNull]
         Task<IPoeQueryResult> FetchItems([NotNull] IPoeQueryResult initial, [NotNull] IReadOnlyList<string> itemIds);
     }
 }

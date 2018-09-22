@@ -10,7 +10,6 @@ using Common.Logging;
 using DynamicData.Binding;
 using Guards;
 using JetBrains.Annotations;
-using PoeShared;
 using PoeShared.Modularity;
 using PoeShared.Scaffolding;
 using Prism.Commands;

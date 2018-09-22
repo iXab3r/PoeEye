@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -9,11 +8,8 @@ using System.Threading.Tasks;
 using System.Windows;
 using Common.Logging;
 using Guards;
-using JetBrains.Annotations;
 using PoeEye.Config;
 using PoeEye.Utilities;
-using PoeShared;
-using PoeShared.Modularity;
 using PoeShared.Scaffolding;
 using ReactiveUI;
 using Squirrel;
@@ -43,16 +39,16 @@ namespace PoeEye.PoeTrade.Updater
             UpdatedVersion = null;
         }
 
-        public UpdateSourceInfo UpdateSource
-        {
-            get => updateSource;
-            set => this.RaiseAndSetIfChanged(ref updateSource, value);
-        }
-
         public DirectoryInfo MostRecentVersionAppFolder
         {
             get => mostRecentVersionAppFolder;
             set => this.RaiseAndSetIfChanged(ref mostRecentVersionAppFolder, value);
+        }
+
+        public UpdateSourceInfo UpdateSource
+        {
+            get => updateSource;
+            set => this.RaiseAndSetIfChanged(ref updateSource, value);
         }
 
         public Version UpdatedVersion
@@ -66,16 +62,16 @@ namespace PoeEye.PoeTrade.Updater
             get => latestVersion;
             set => this.RaiseAndSetIfChanged(ref latestVersion, value);
         }
-        
+
         public async Task ApplyRelease(UpdateInfo updateInfo)
         {
             Guard.ArgumentNotNull(updateInfo, nameof(updateInfo));
-            
+
             Log.Debug($"[ApplicationUpdaterModel] Applying update {updateInfo.DumpToTextRaw()}");
 
             using (var mgr = await CreateManager())
             {
-                Log.Debug($"[ApplicationUpdaterModel] Downloading releases...");
+                Log.Debug("[ApplicationUpdaterModel] Downloading releases...");
                 await mgr.DownloadReleases(updateInfo.ReleasesToApply, UpdateProgress);
 
                 string newVersionFolder;
@@ -112,11 +108,11 @@ namespace PoeEye.PoeTrade.Updater
         /// <returns>True if application was updated</returns>
         public async Task<UpdateInfo> CheckForUpdates()
         {
-            Log.Debug($"[ApplicationUpdaterModel] Update check requested");
+            Log.Debug("[ApplicationUpdaterModel] Update check requested");
 
             using (var mgr = await CreateManager())
             {
-                Log.Debug($"[ApplicationUpdaterModel] Checking for updates...");
+                Log.Debug("[ApplicationUpdaterModel] Checking for updates...");
                 LatestVersion = null;
 
                 var updateInfo = await mgr.CheckForUpdate(true, CheckUpdateProgress);
@@ -156,7 +152,7 @@ namespace PoeEye.PoeTrade.Updater
             Log.Debug($"[ApplicationUpdaterModel] Process spawned, PID: {updaterProcess.Id}");
             await Task.Delay(2000);
 
-            Log.Debug($"[ApplicationUpdaterModel] Terminating application...");
+            Log.Debug("[ApplicationUpdaterModel] Terminating application...");
             Application.Current.Shutdown(0);
         }
 
@@ -180,11 +176,11 @@ namespace PoeEye.PoeTrade.Updater
                 Log.Debug($"[ApplicationUpdaterModel] Using GitHub source: {updateSource.DumpToTextRaw()}");
 
                 var mgr = UpdateManager.GitHubUpdateManager(
-                    updateSource.Uri, 
-                    applicationName:appName, 
-                    rootDirectory:rootDirectory, 
-                    urlDownloader:downloader, 
-                    prerelease:false);
+                    updateSource.Uri,
+                    appName,
+                    rootDirectory,
+                    downloader,
+                    false);
                 return await mgr;
             }
             else
@@ -222,7 +218,7 @@ namespace PoeEye.PoeTrade.Updater
 
         private void OnFirstRun()
         {
-            Log.Debug($"[ApplicationUpdaterModel.OnFirstRun] App started for the first time");
+            Log.Debug("[ApplicationUpdaterModel.OnFirstRun] App started for the first time");
         }
 
         private static string GetSquirrelUpdateExe()
