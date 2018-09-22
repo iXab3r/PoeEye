@@ -209,6 +209,7 @@ namespace PoeShared.Native
                 Log.Trace($"[#{overlayWindow.Name}] Showing overlay (tracker {windowTracker})");
                 if (overlayWindow.Visibility != Visibility.Visible)
                 {
+                    Log.Trace($"[#{overlayWindow.Name}] Overlay visibility is {overlayWindow.Visibility}, setting to Visible");
                     overlayWindow.Visibility = Visibility.Visible;
                 }
                 WindowsServices.ShowInactiveTopmost(
