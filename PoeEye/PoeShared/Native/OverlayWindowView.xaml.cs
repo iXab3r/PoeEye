@@ -21,6 +21,7 @@ namespace PoeShared.Native
 
             WhenLoaded.Subscribe(OnLoaded);
             SizeChanged += OnSizeChanged;
+            LocationChanged += OnLocationChanged;
         }
 
         public IObservable<Unit> WhenLoaded => Observable
@@ -28,8 +29,19 @@ namespace PoeShared.Native
                                                .ToUnit();
 
         public IObservable<Unit> WhenRendered => Observable
-                                               .FromEventPattern<EventHandler, EventArgs>(h => ContentRendered += h, h => ContentRendered -= h)
-                                               .ToUnit();
+                                                 .FromEventPattern<EventHandler, EventArgs>(h => ContentRendered += h, h => ContentRendered -= h)
+                                                 .ToUnit();
+
+        private void OnLocationChanged(object sender, EventArgs e)
+        {
+            var window = sender as Window;
+            var windowViewModel = window?.DataContext as OverlayWindowViewModel;
+            var overlayViewModel = windowViewModel?.Content as OverlayViewModelBase;
+            if (overlayViewModel == null)
+            {
+                return;
+            }
+        }
 
         private void OnSizeChanged(object sender, SizeChangedEventArgs sizeChangedEventArgs)
         {
@@ -64,7 +76,7 @@ namespace PoeShared.Native
 
         public override string ToString()
         {
-            return $"[OverlayWindow] DataContext: {DataContext}";
+            return $"[OverlayWindow] DataContext: {DataContext} (X:{this.Left} Y:{this.Top} Width: {this.Width} Height: {this.Height})";
         }
 
         public void SetOverlayMode(OverlayMode mode)

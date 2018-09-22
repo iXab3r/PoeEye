@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Common.Logging;
+using PoeShared.Scaffolding;
 
 namespace PoeShared.Native
 {
@@ -28,15 +29,15 @@ namespace PoeShared.Native
             try
             {
                 var processId = Process.GetCurrentProcess().Id;
-                Log.Debug($"[WindowsServices] Calling AllowSetForegroundWindow(pid: {processId})");
+                Log.Debug($"Calling AllowSetForegroundWindow(pid: {processId})");
                 var result = AllowSetForegroundWindow((uint)processId);
                 if (!result)
                 {
-                    Log.Warn("[WindowsServices] AllowSetForegroundWindow has failed !");
+                    Log.Warn("AllowSetForegroundWindow has failed !");
                 }
                 else
                 {
-                    Log.Debug($"[WindowsServices] Successfully executed AllowSetForegroundWindow(pid: {processId})");
+                    Log.Debug($"Successfully executed AllowSetForegroundWindow(pid: {processId})");
                 }
             }
             catch (Exception e)
@@ -72,31 +73,40 @@ namespace PoeShared.Native
         public static extern bool SetForegroundWindow(IntPtr hWnd);
 
         [DllImport("User32.dll")]
-        public static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
+        public static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint processId);
 
         public static void HideSystemMenu(IntPtr hwnd)
         {
+            Log.Trace($"[{hwnd.ToHexadecimal()}] Hiding SystemMenu");
+
             SetWindowLong(hwnd, GWL_STYLE, GetWindowLong(hwnd, GWL_STYLE) & ~WS_SYSMENU);
         }
 
         public static void ShowInactiveTopmost(IntPtr handle, int left, int top, int width, int height)
         {
+            Log.Trace($"[{handle.ToHexadecimal()}] Showing window X:{left} Y:{top} Width:{width} Height:{height}");
             ShowWindow(handle, SW_SHOWNOACTIVATE);
             SetWindowPos(handle, HWND_TOPMOST, left, top, width, height, SWP_NOACTIVATE);
         }
         
         public static void ShowWindow(IntPtr handle)
         {
+            Log.Trace($"[{handle.ToHexadecimal()}] Showing window");
+
             ShowWindow(handle, SW_SHOWNORMAL);
         }
 
         public static void HideWindow(IntPtr handle)
         {
+            Log.Trace($"[{handle.ToHexadecimal()}] Hiding window");
+
             ShowWindow(handle, SW_HIDE);
         }
 
         public static void SetWindowExTransparent(IntPtr hwnd)
         {
+            Log.Trace($"[{hwnd.ToHexadecimal()}] Reconfiguring window to Transparent");
+
             var extendedStyle = GetWindowLong(hwnd, GWL_EXSTYLE);
             extendedStyle &= ~WS_EX_LAYERED;
             SetWindowLong(hwnd, GWL_EXSTYLE, extendedStyle | WS_EX_TOOLWINDOW | WS_EX_TRANSPARENT);
@@ -104,6 +114,8 @@ namespace PoeShared.Native
 
         public static void SetWindowExLayered(IntPtr hwnd)
         {
+            Log.Trace($"[{hwnd.ToHexadecimal()}] Reconfiguring window to Layered");
+
             var extendedStyle = GetWindowLong(hwnd, GWL_EXSTYLE);
             extendedStyle &= ~WS_EX_TRANSPARENT;
             SetWindowLong(hwnd, GWL_EXSTYLE, extendedStyle | WS_EX_TOOLWINDOW | WS_EX_LAYERED);
@@ -111,6 +123,8 @@ namespace PoeShared.Native
 
         public static void SetWindowExNoActivate(IntPtr hwnd)
         {
+            Log.Trace($"[{hwnd.ToHexadecimal()}] Reconfiguring window to NoActivate");
+
             var existingStyle = GetWindowLong(hwnd, GWL_EXSTYLE);
             SetWindowLong(hwnd, GWL_EXSTYLE, existingStyle | WS_EX_NOACTIVATE);
         }

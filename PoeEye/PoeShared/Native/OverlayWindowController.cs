@@ -206,16 +206,18 @@ namespace PoeShared.Native
             var overlayWindowHandle = new WindowInteropHelper(overlayWindow).Handle;
             if (isVisible)
             {
-                Log.Trace($"[#{overlayWindow.Name}] Showing overlay (tracker {windowTracker})");
+                Log.Trace($"[#{overlayWindow.Name}] Showing overlay {overlayWindow}");
                 if (overlayWindow.Visibility != Visibility.Visible)
                 {
                     Log.Trace($"[#{overlayWindow.Name}] Overlay visibility is {overlayWindow.Visibility}, setting to Visible");
                     overlayWindow.Visibility = Visibility.Visible;
                 }
+
+                var location = overlayWindow.PointToScreen(new Point(0, 0));
                 WindowsServices.ShowInactiveTopmost(
                     overlayWindowHandle,
-                    (int)viewModel.Left,
-                    (int)viewModel.Top,
+                    (int)location.X,
+                    (int)location.Y,
                     (int)viewModel.Width,
                     (int)viewModel.Height);
             }

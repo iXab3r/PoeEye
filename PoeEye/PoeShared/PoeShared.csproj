@@ -239,6 +239,7 @@
     <Compile Include="Scaffolding\DisposableExtensions.cs" />
     <Compile Include="Scaffolding\Fallback.cs" />
     <Compile Include="Scaffolding\IClipboardManager.cs" />
+    <Compile Include="Scaffolding\IntPtrExtensions.cs" />
     <Compile Include="Scaffolding\PoeItemExtensions.cs" />
     <Compile Include="Scaffolding\ReactiveObjectExtensions.cs" />
     <Compile Include="Scaffolding\RestEaseResponseExtensions.cs" />

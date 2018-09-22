@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Windows;
 using System.Windows.Input;
@@ -24,6 +25,8 @@ namespace PoeEye.Prism
     internal sealed class PoeEyeBootstrapper : UnityBootstrapper
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(PoeEyeBootstrapper));
+        
+        private readonly CompositeDisposable anchors = new CompositeDisposable();
 
         protected override DependencyObject CreateShell()
         {
@@ -54,7 +57,7 @@ namespace PoeEye.Prism
                         Application.Current.MainWindow = window;
                         splashWindow.Close();
                         Log.Info($"Window+Shell initialization has taken {sw.ElapsedMilliseconds}ms");
-                    });
+                    }).AddTo(anchors);
             
             Observable
                 .FromEventPattern<RoutedEventHandler, RoutedEventArgs>(h => window.Loaded += h, h => window.Loaded -= h)
@@ -64,7 +67,7 @@ namespace PoeEye.Prism
                     {
                         Log.Debug($"Window loaded");
                         Log.Info($"Shell initialization has taken {sw.ElapsedMilliseconds}ms");
-                    });
+                    }).AddTo(anchors);
             
             Log.Info($"Loading main window...");
             Application.Current.ShutdownMode = ShutdownMode.OnMainWindowClose;
@@ -82,6 +85,20 @@ namespace PoeEye.Prism
         public override void Run(bool runWithDefaultConfiguration)
         {
             base.Run(runWithDefaultConfiguration);
+            
+            var moduleManager = Container.Resolve<IModuleManager>();
+            Observable
+                .FromEventPattern<LoadModuleCompletedEventArgs>(h =>  moduleManager.LoadModuleCompleted += h, h => moduleManager.LoadModuleCompleted -= h)
+                .Select(x => x.EventArgs)
+                .Subscribe(
+                    evt =>
+                    {
+                        if (evt.Error != null)
+                        {
+                            Log.Error($"[#{evt.ModuleInfo.ModuleName}] Error during loading occured, isHandled: {evt.IsErrorHandled}", evt.Error);
+                        }
+                        Log.Info($"[#{evt.ModuleInfo.ModuleName}] Module loaded");
+                    }).AddTo(anchors);
 
             var moduleCatalog = Container.Resolve<IModuleCatalog>();
             var modules = moduleCatalog.Modules.ToArray();
@@ -92,6 +109,7 @@ namespace PoeEye.Prism
 
             var viewModel = Container.Resolve<IMainWindowViewModel>();
             window.DataContext = viewModel;
+            viewModel.AddTo(anchors);
         }
 
         public void Dispose()
@@ -99,6 +117,8 @@ namespace PoeEye.Prism
             Log.Info("Disposing Chromium...");
             var chromium = Container.Resolve<IChromiumBootstrapper>();
             chromium?.Dispose();
+            
+            anchors.Dispose();
         }
     }
 }
