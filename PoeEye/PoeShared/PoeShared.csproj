@@ -205,6 +205,7 @@
     <Compile Include="Converters\BoolInversionConverter.cs" />
     <Compile Include="Converters\FlagToObjectConverter.cs" />
     <Compile Include="Converters\MultiBooleanConverter.cs" />
+    <Compile Include="Converters\MultiDoubleSumConverter.cs" />
     <Compile Include="Converters\NullToBoolConverter.cs" />
     <Compile Include="Converters\ObjectToTypeConverter.cs" />
     <Compile Include="Converters\PoeStashItemToPoeItemConverter.cs" />

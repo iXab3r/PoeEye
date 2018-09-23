@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reactive.Disposables;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
@@ -30,7 +31,16 @@ namespace PoeEye.PoeTrade.Shell.Services
                 {
                     Log.Debug("Splash window thread started");
 
-                    Dispatcher.CurrentDispatcher.BeginInvoke((Action)(() =>
+                    var dispatcher = Dispatcher.CurrentDispatcher;
+                    
+                    Disposable.Create(() =>
+                    {
+                        Log.Debug("Shutting down Dispatcher");
+                        dispatcher.InvokeShutdown();
+                        Log.Debug("Dispatcher has been shut down");
+                    }).AddTo(Anchors);
+
+                    dispatcher.BeginInvoke((Action)(() =>
                     {
                         splashWindow = new Window
                         {

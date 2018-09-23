@@ -18,7 +18,6 @@ namespace PoeShared.Scaffolding
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(WindowTracker));
 
-        private static readonly TimeSpan MinRecheckPeriod = TimeSpan.FromMilliseconds(50);
         private static readonly TimeSpan RecheckPeriod = TimeSpan.FromMilliseconds(250);
         private readonly Func<string> titleMatcherRegexFunc;
         private readonly WinEventHookWrapper winHook = new WinEventHookWrapper();
@@ -42,10 +41,10 @@ namespace PoeShared.Scaffolding
                                   .ToUnit();
             var hookObservable = winHook
                                  .WhenWindowLocationChanged
-                                 .Sample(MinRecheckPeriod)
                                  .ToUnit();
 
             timerObservable.Merge(hookObservable)
+                           .Sample(RecheckPeriod)
                            .Select(_ => NativeMethods.GetForegroundWindow())
                            .DistinctUntilChanged()
                            .Subscribe(WindowActivated)
@@ -149,7 +148,7 @@ namespace PoeShared.Scaffolding
             public WinEventHookWrapper()
             {
                 resizeEventDelegate = WinResizeEventProc;
-                Task.Run(() => Run());
+                Task.Factory.StartNew(Run, TaskCreationOptions.LongRunning);
             }
 
             public IObservable<IntPtr> WhenWindowLocationChanged => whenWindowLocationChanged;

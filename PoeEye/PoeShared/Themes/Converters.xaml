@@ -9,6 +9,7 @@
     <eyeConverters:NullToBoolConverter x:Key="IsNullOrEmptyConverter" NullValue="True" />
     <eyeConverters:NullToBoolConverter x:Key="IsNotNullOrEmptyConverter" NullValue="False" />
     <eyeConverters:MultiBooleanConverter x:Key="MultiBooleanOrConverter" />
+    <eyeConverters:MultiDoubleSumConverter x:Key="MultiDoubleSumConverter" />
 
     <system:Boolean x:Key="FalseValue">False</system:Boolean>
     <system:Boolean x:Key="TrueValue">True</system:Boolean>
