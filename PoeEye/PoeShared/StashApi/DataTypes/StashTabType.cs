@@ -7,6 +7,8 @@
         PremiumStash,
         QuadStash,
         DivinationCardStash,
+        MapStash,
+        CurrencyStash,
         EssenceStash
     }
 }

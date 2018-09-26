@@ -37,6 +37,9 @@
                            Opacity="0.8" />
                 </materialDesign:PopupBox.ToggleContent>
                 <StackPanel Orientation="Vertical">
+                    <Button ToolTip="Lock all"
+                            fa:Awesome.Content="Lock"
+                            Command="{Binding LockAllWindowsCommand}" />
                     <Button ToolTip="Unlock all"
                             fa:Awesome.Content="Unlock"
                             Command="{Binding UnlockAllWindowsCommand}" />

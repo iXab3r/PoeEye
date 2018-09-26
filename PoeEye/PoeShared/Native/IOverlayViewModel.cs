@@ -25,19 +25,21 @@ namespace PoeShared.Native
 
         Size MaxSize { get; set; }
 
-        bool IsLocked { get; set; }
+        bool IsLocked { get; }
 
-        bool IsUnlockable { get; set; }
+        bool IsUnlockable { get; }
 
         OverlayMode OverlayMode { get; set; }
 
         IObservable<Unit> WhenLoaded { [NotNull] get; }
 
         SizeToContent SizeToContent { get; }
-
+        
         string Title { [CanBeNull] get; }
 
         ICommand LockWindowCommand { [NotNull] get; }
+        
+        ICommand UnlockWindowCommand { [NotNull] get; }
 
         void SetActivationController([NotNull] IActivationController controller);
     }

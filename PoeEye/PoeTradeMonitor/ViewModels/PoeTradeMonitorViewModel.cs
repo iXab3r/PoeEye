@@ -234,24 +234,6 @@ namespace PoeEye.TradeMonitor.ViewModels
             NumberOfNegotiationsToExpandByDefault = config.NumberOfNegotiationsToExpandByDefault;
             PreGroupNotificationsCount = config.PreGroupNotificationsCount;
 
-            base.ApplyConfig(config);
-
-            if (config.OverlaySize.Height <= 0 || config.OverlaySize.Width <= 0)
-            {
-                IsLocked = false;
-                config.OverlaySize = MinSize;
-            }
-
-            Width = config.OverlaySize.Width;
-
-            if (config.OverlayLocation.X <= 1 && config.OverlayLocation.Y <= 1)
-            {
-                IsLocked = false;
-                config.OverlayLocation = new Point(Width / 2, Height / 2);
-            }
-
-            Left = config.OverlayLocation.X;
-
             if (GrowUpwards)
             {
                 var deltaHeight = ActualHeight - config.OverlaySize.Height;

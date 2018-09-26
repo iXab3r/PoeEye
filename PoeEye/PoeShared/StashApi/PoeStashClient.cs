@@ -7,10 +7,12 @@ using System.Threading.Tasks;
 using CsQuery;
 using Guards;
 using JetBrains.Annotations;
+using Newtonsoft.Json;
 using PoeShared.Scaffolding;
 using PoeShared.StashApi.DataTypes;
 using PoeShared.StashApi.ProcurementLegacy;
 using RestSharp;
+using RestSharp.Deserializers;
 
 namespace PoeShared.StashApi
 {
@@ -50,8 +52,12 @@ namespace PoeShared.StashApi
             client = new RestClient(CharacterApiPortal)
             {
                 CookieContainer = new CookieContainer(),
-                FollowRedirects = false
+                FollowRedirects = false,
             };
+            client.ClearHandlers();
+            client.AddHandler("application/json", new NewtonsoftJsonDeserializer());
+            client.AddHandler("text/json", new NewtonsoftJsonDeserializer());
+            client.AddHandler("*+json", new NewtonsoftJsonDeserializer());
         }
 
         public string SessionId { get; private set; }
@@ -106,7 +112,6 @@ namespace PoeShared.StashApi
             request.AddParameter("accountName", AccountName);
 
             var response = await client.ExecuteTaskAsync<Stash>(request);
-
             if (response.Data == null)
             {
                 throw new ApplicationException(
@@ -194,7 +199,7 @@ namespace PoeShared.StashApi
         {
             var query = CQ.Create(rawHtml);
 
-            var text = query["ul[class=errors]"]?.Text();
+            var text = query["div[class~=error] ul"]?.Text();
 
             return text;
         }
@@ -286,6 +291,17 @@ namespace PoeShared.StashApi
         private void PostProcessStash(Stash stash)
         {
             stash?.Items?.ForEach(x => x.CleanupItemName());
+        }
+        
+        internal class NewtonsoftJsonDeserializer : IDeserializer {
+            public T Deserialize<T>(IRestResponse response)
+            {
+                return JsonConvert.DeserializeObject<T>(response.Content);
+            }
+
+            public string RootElement { get; set; }
+            public string Namespace { get; set; }
+            public string DateFormat { get; set; }
         }
     }
 }

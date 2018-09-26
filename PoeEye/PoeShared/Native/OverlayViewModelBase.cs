@@ -8,6 +8,7 @@ using System.Windows.Forms;
 using System.Windows.Input;
 using Guards;
 using PoeShared.Scaffolding;
+using PoeShared.Scaffolding.WPF;
 using Prism.Commands;
 using ReactiveUI;
 using Point = System.Windows.Point;
@@ -39,15 +40,25 @@ namespace PoeShared.Native
         private double top;
 
         private double width;
+        private readonly CommandWrapper unlockWindowCommand;
+        private readonly CommandWrapper lockWindowCommand;
 
         protected OverlayViewModelBase()
         {
-            LockWindowCommand = new DelegateCommand(LockWindowCommandExecuted, LockWindowCommandCanExecute);
-            UnlockWindowCommand = new DelegateCommand(UnlockWindowCommandExecuted, UnlockWindowCommandCanExecute);
+            lockWindowCommand = CommandWrapper.Create(LockWindowCommandExecuted, LockWindowCommandCanExecute);
+            unlockWindowCommand = CommandWrapper.Create(UnlockWindowCommandExecuted, UnlockWindowCommandCanExecute);
+            this.WhenAnyValue(x => x.IsLocked, x => x.IsUnlockable)
+                .Subscribe(() =>
+                {
+                    lockWindowCommand.RaiseCanExecuteChanged();
+                    unlockWindowCommand.RaiseCanExecuteChanged();
+                })
+                .AddTo(Anchors);
+            
             Title = GetType().ToString();
         }
 
-        public ISubject<Unit> WhenLoaded { get; } = new ReplaySubject<Unit>(1);
+        protected ISubject<Unit> WhenLoaded { get; } = new ReplaySubject<Unit>(1);
 
         public bool GrowUpwards
         {
@@ -61,7 +72,9 @@ namespace PoeShared.Native
             set => this.RaiseAndSetIfChanged(ref opacity, value);
         }
 
-        public ICommand UnlockWindowCommand { get; }
+        public ICommand UnlockWindowCommand => unlockWindowCommand;
+
+        public ICommand LockWindowCommand => lockWindowCommand;
 
         public double ActualHeight
         {
@@ -114,11 +127,11 @@ namespace PoeShared.Native
         public bool IsLocked
         {
             get => isLocked;
-            set
+            private set
             {
                 if (!value && !IsUnlockable)
                 {
-                    throw new InvalidOperationException($"Overlay {this} is cannot be unlocked");
+                    throw new InvalidOperationException($"Overlay {this} cannot be unlocked");
                 }
 
                 this.RaiseAndSetIfChanged(ref isLocked, value);
@@ -128,7 +141,7 @@ namespace PoeShared.Native
         public bool IsUnlockable
         {
             get => isUnlockable;
-            set => this.RaiseAndSetIfChanged(ref isUnlockable, value);
+            protected set => this.RaiseAndSetIfChanged(ref isUnlockable, value);
         }
 
         public OverlayMode OverlayMode
@@ -142,7 +155,7 @@ namespace PoeShared.Native
         public SizeToContent SizeToContent
         {
             get => sizeToContent;
-            set => this.RaiseAndSetIfChanged(ref sizeToContent, value);
+            protected set => this.RaiseAndSetIfChanged(ref sizeToContent, value);
         }
 
         public string Title { get; protected set; }
@@ -152,8 +165,6 @@ namespace PoeShared.Native
             Guard.ArgumentNotNull(controller, nameof(controller));
         }
 
-        public ICommand LockWindowCommand { get; }
-
         protected void ApplyConfig(IOverlayConfig config)
         {
             if (config.OverlaySize.Height <= 0 ||
@@ -161,7 +172,7 @@ namespace PoeShared.Native
                 double.IsNaN(config.OverlaySize.Height) ||
                 double.IsNaN(config.OverlaySize.Width))
             {
-                IsLocked = false;
+                UnlockWindowCommand.Execute(null);
                 config.OverlaySize = MinSize;
             }
 
@@ -173,7 +184,7 @@ namespace PoeShared.Native
                 double.IsNaN(config.OverlayLocation.X) ||
                 double.IsNaN(config.OverlayLocation.Y))
             {
-                IsLocked = false;
+                UnlockWindowCommand.Execute(null);
                 var size = NativeMethods.GetPrimaryScreenSize();
                 config.OverlayLocation = new Point(size.Width / 2, size.Height / 2);
             }
@@ -183,7 +194,7 @@ namespace PoeShared.Native
 
             if (config.OverlayOpacity <= 0.01)
             {
-                IsLocked = false;
+                UnlockWindowCommand.Execute(null);
                 config.OverlayOpacity = 1;
             }
 
@@ -205,7 +216,7 @@ namespace PoeShared.Native
 
         protected virtual bool UnlockWindowCommandCanExecute()
         {
-            return true;
+            return IsUnlockable && IsLocked;
         }
 
         protected virtual void LockWindowCommandExecuted()
@@ -213,10 +224,9 @@ namespace PoeShared.Native
             IsLocked = true;
         }
 
-
         protected virtual bool LockWindowCommandCanExecute()
         {
-            return true;
+            return !IsLocked;
         }
 
         internal static class NativeMethods

@@ -42,6 +42,7 @@ namespace PoeShared.PoeControlPanel.ViewModels
             Title = "Control panel";
 
             UnlockAllWindowsCommand = new DelegateCommand(UnlockAllWindowsCommandExecuted);
+            LockAllWindowsCommand = new DelegateCommand(LockAllWindowsCommandExecuted);
 
             WhenLoaded.Subscribe(
                           () =>
@@ -55,6 +56,8 @@ namespace PoeShared.PoeControlPanel.ViewModels
         }
 
         public ICommand UnlockAllWindowsCommand { get; }
+        
+        public ICommand LockAllWindowsCommand { get; }
 
         private void ApplyConfig(PoeControlPanelConfig config)
         {
@@ -72,9 +75,19 @@ namespace PoeShared.PoeControlPanel.ViewModels
 
         private void UnlockAllWindowsCommandExecuted()
         {
-            foreach (var overlayViewModel in controller.GetChildren().Where(x => x.IsUnlockable))
+            foreach (var overlayViewModel in controller.GetChildren()
+                                                       .Where(x => x.UnlockWindowCommand.CanExecute(null)))
             {
-                overlayViewModel.IsLocked = false;
+                overlayViewModel.UnlockWindowCommand.Execute(null);
+            }
+        }
+        
+        private void LockAllWindowsCommandExecuted()
+        {
+            foreach (var overlayViewModel in controller.GetChildren()
+                                                       .Where(x => x.LockWindowCommand.CanExecute(null)))
+            {
+                overlayViewModel.LockWindowCommand.Execute(null);
             }
         }
     }

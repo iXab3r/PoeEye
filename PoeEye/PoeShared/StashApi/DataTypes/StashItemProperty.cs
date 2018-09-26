@@ -29,6 +29,10 @@ namespace PoeShared.StashApi.DataTypes
 
         public bool IsValid => this.Any(x => !string.IsNullOrWhiteSpace(x));
 
+        public StashItemDisplayValue()
+        {
+        }
+
         public string ToDisplayValue()
         {
             var result = new StringBuilder();

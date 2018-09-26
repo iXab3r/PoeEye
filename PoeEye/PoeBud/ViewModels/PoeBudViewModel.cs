@@ -19,6 +19,7 @@ using PoeShared.Native;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
 using PoeShared.Scaffolding.WPF;
+using PoeShared.StashApi.DataTypes;
 using ReactiveUI;
 using Unity.Attributes;
 using WinFormsKeyEventArgs = System.Windows.Forms.KeyEventArgs;
@@ -34,7 +35,6 @@ namespace PoeBud.ViewModels
         private readonly IClock clock;
         private readonly IConfigProvider<PoeBudConfig> configProvider;
         private readonly ISubject<Exception> exceptionsToPropagate = new Subject<Exception>();
-        private readonly IHighlightingService highlightingService;
         private readonly IKeyboardEventsSource keyboardMouseEvents;
         private readonly ObservableAsPropertyHelper<Exception> lastUpdateException;
         private readonly IFactory<IPoeStashUpdater, IStashUpdaterParameters> stashAnalyzerFactory;
@@ -44,7 +44,6 @@ namespace PoeBud.ViewModels
         private readonly IScheduler uiScheduler;
 
         private PoeBudConfig actualConfig;
-        private bool hideXpBar;
         private KeyGesture hotkey;
         private bool isEnabled;
         private StashUpdate lastServerStashUpdate;
@@ -76,7 +75,6 @@ namespace PoeBud.ViewModels
             Guard.ArgumentNotNull(stashUpdateFactory, nameof(stashUpdateFactory));
             Guard.ArgumentNotNull(uiScheduler, nameof(uiScheduler));
 
-            this.highlightingService = highlightingService;
             this.configProvider = configProvider;
             this.clock = clock;
             this.keyboardMouseEvents = keyboardMouseEvents;
@@ -89,7 +87,7 @@ namespace PoeBud.ViewModels
             WindowManager = windowManager;
 
             OverlayMode = OverlayMode.Layered;
-            MinSize = new Size(100, 30);
+            MinSize = new Size(100, 60);
             MaxSize = new Size(1024, 400);
             Top = 100;
             Left = 100;
@@ -147,16 +145,18 @@ namespace PoeBud.ViewModels
 
         public ICommand ForceRefreshCommand { get; }
 
+        private string statusText;
+
+        public string StatusText
+        {
+            get => statusText;
+            set => this.RaiseAndSetIfChanged(ref statusText, value);
+        }
+
         public IPoeStashUpdater StashUpdater
         {
             get => stashUpdater;
             set => this.RaiseAndSetIfChanged(ref stashUpdater, value);
-        }
-
-        public bool HideXpBar
-        {
-            get => hideXpBar;
-            set => this.RaiseAndSetIfChanged(ref hideXpBar, value);
         }
 
         public bool IsEnabled
@@ -170,8 +170,6 @@ namespace PoeBud.ViewModels
             get => stash;
             set => this.RaiseAndSetIfChanged(ref stash, value);
         }
-
-        public string League => actualConfig?.LeagueId;
 
         public TimeSpan TimeTillNextUpdate
             =>
@@ -188,6 +186,17 @@ namespace PoeBud.ViewModels
             configProvider.Save(config);
         }
 
+        protected override void UnlockWindowCommandExecuted()
+        {
+            base.UnlockWindowCommandExecuted();
+
+            if (Stash == null)
+            {
+                var fakeUpdate = StashUpdate.Empty;
+                HandleStashUpdate(fakeUpdate, actualConfig);
+            }
+        }
+
         private void ApplyConfig(PoeBudConfig config)
         {
             Log.Debug("Applying new config...");
@@ -196,7 +205,6 @@ namespace PoeBud.ViewModels
             IsEnabled = actualConfig.IsEnabled;
             hotkey = KeyGestureExtensions.SafeCreateGesture(config.GetChaosSetHotkey);
             RefreshStashUpdater(actualConfig);
-            this.RaisePropertyChanged(nameof(League));
 
             base.ApplyConfig(config);
         }
@@ -212,16 +220,19 @@ namespace PoeBud.ViewModels
                 StashUpdater = null;
                 Stash = null;
                 lastServerStashUpdate = null;
+                StatusText = null;
 
                 if (string.IsNullOrEmpty(config.LoginEmail) || string.IsNullOrEmpty(config.SessionId))
                 {
                     Log.Debug($"Credentials are not set, userName: {config.LoginEmail}, sessionId: {config.SessionId}");
+                    StatusText = "Set up your credentials in PoeBud settings section";
                     return;
                 }
 
                 if (!config.IsEnabled)
                 {
                     Log.Debug("PoeBud is disabled, terminating...");
+                    StatusText = "PoeBud is disabled";
                     return;
                 }
 

@@ -71,9 +71,25 @@ namespace PoeShared.Native
         [DllImport("user32.dll")]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool SetForegroundWindow(IntPtr hWnd);
+        
+        [DllImport("user32.dll")]
+        public static extern int GetDpiForWindow(IntPtr hWnd);
 
         [DllImport("User32.dll")]
         public static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint processId);
+        
+        public static float GetDisplayScaleFactor(IntPtr windowHandle)
+        {
+            try
+            {
+                return GetDpiForWindow(windowHandle) / 96f;
+            }
+            catch
+            {
+                // Or fallback to GDI solutions above
+                return 1;
+            }
+        }
 
         public static void HideSystemMenu(IntPtr hwnd)
         {
@@ -84,9 +100,11 @@ namespace PoeShared.Native
 
         public static void ShowInactiveTopmost(IntPtr handle, int left, int top, int width, int height)
         {
-            Log.Trace($"[{handle.ToHexadecimal()}] Showing window X:{left} Y:{top} Width:{width} Height:{height}");
+            var dpi = GetDisplayScaleFactor(handle);
+            Log.Trace($"[{handle.ToHexadecimal()}] Showing window X:{left} Y:{top} Width:{width} Height:{height}, scaleFactor: {dpi}");
             ShowWindow(handle, SW_SHOWNOACTIVATE);
-            SetWindowPos(handle, HWND_TOPMOST, left, top, width, height, SWP_NOACTIVATE);
+
+            SetWindowPos(handle, HWND_TOPMOST, left, top, (int)(width * dpi), (int)(height * dpi), SWP_NOACTIVATE);
         }
         
         public static void ShowWindow(IntPtr handle)

@@ -14,74 +14,63 @@
             </ResourceDictionary>
         </DataTemplate.Resources>
 
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition />
-                <ColumnDefinition />
-                <ColumnDefinition />
-                <ColumnDefinition />
-                <ColumnDefinition />
-                <ColumnDefinition />
-                <ColumnDefinition />
-                <ColumnDefinition />
-            </Grid.ColumnDefinitions>
-
-            <StackPanel Grid.Row="0" Grid.Column="0"
+        <DockPanel>
+            <DockPanel
                         Opacity="{Binding IsInsufficientChestsCount, Converter={StaticResource BooleanToSemitransparentConverter}}"
-                        Orientation="Horizontal" Margin="5,2">
+                        Margin="5,2">
                 <Image Source="../Resources/Chest.png" Height="30" Width="30" />
                 <TextBlock x:Name="ChestsCount" Text="{Binding ChestsCount}" Margin="5,0" />
-            </StackPanel>
+            </DockPanel>
 
-            <StackPanel Grid.Row="0" Grid.Column="1"
+            <DockPanel 
                         Opacity="{Binding IsInsufficientHelmetsCount, Converter={StaticResource BooleanToSemitransparentConverter}}"
-                        Orientation="Horizontal" Margin="5,2">
+                        Margin="5,2">
                 <Image Source="../Resources/Helmet.png" Height="30" Width="30" />
                 <TextBlock x:Name="HelmetsCount" Text="{Binding HelmetsCount}" Margin="5,0" />
-            </StackPanel>
+            </DockPanel>
 
-            <StackPanel Grid.Row="0" Grid.Column="2"
+            <DockPanel 
                         Opacity="{Binding IsInsufficientGlovesCount, Converter={StaticResource BooleanToSemitransparentConverter}}"
-                        Orientation="Horizontal" Margin="5,2">
+                        Margin="5,2">
                 <Image Source="../Resources/Gloves.png" Height="30" Width="30" />
                 <TextBlock x:Name="GlovesCount" Text="{Binding GlovesCount}" Margin="5,0" />
-            </StackPanel>
+            </DockPanel>
 
-            <StackPanel Grid.Row="0" Grid.Column="3"
+            <DockPanel 
                         Opacity="{Binding IsInsufficientBootsCount, Converter={StaticResource BooleanToSemitransparentConverter}}"
-                        Orientation="Horizontal" Margin="5,2">
+                        Margin="5,2">
                 <Image Source="../Resources/Boots.png" Height="30" Width="30" />
                 <TextBlock x:Name="BootsCount" Text="{Binding BootsCount}" Margin="5,0" />
-            </StackPanel>
+            </DockPanel>
 
 
-            <StackPanel Grid.Row="0" Grid.Column="4"
+            <DockPanel 
                         Opacity="{Binding IsInsufficientWeaponsCount, Converter={StaticResource BooleanToSemitransparentConverter}}"
-                        Orientation="Horizontal" Margin="5,2">
+                        Margin="5,2">
                 <Image Source="../Resources/Weapon.png" Height="30" Width="30" />
                 <TextBlock x:Name="WeaponsCount" Text="{Binding WeaponsCount}" Margin="5,0" />
-            </StackPanel>
+            </DockPanel>
 
-            <StackPanel Grid.Row="0" Grid.Column="5"
+            <DockPanel 
                         Opacity="{Binding IsInsufficientBeltsCount, Converter={StaticResource BooleanToSemitransparentConverter}}"
-                        Orientation="Horizontal" Margin="5,2">
+                        Margin="5,2">
                 <Image Source="../Resources/Belt.png" Height="30" Width="30" />
                 <TextBlock x:Name="BeltsCount" Text="{Binding BeltsCount}" Margin="5,0" />
-            </StackPanel>
+            </DockPanel>
 
-            <StackPanel Grid.Row="0" Grid.Column="6"
+            <DockPanel 
                         Opacity="{Binding IsInsufficientRingsNormalizedCount, Converter={StaticResource BooleanToSemitransparentConverter}}"
-                        Orientation="Horizontal" Margin="5,2">
+                        Margin="5,2">
                 <Image Source="../Resources/Ring.png" Height="30" Width="30" />
                 <TextBlock x:Name="RingsCount" Text="{Binding RingsNormalizedCount}" Margin="5,0" />
-            </StackPanel>
+            </DockPanel>
 
-            <StackPanel Grid.Row="0" Grid.Column="7"
+            <DockPanel 
                         Opacity="{Binding IsInsufficientAmuletsCount, Converter={StaticResource BooleanToSemitransparentConverter}}"
-                        Orientation="Horizontal" Margin="5,2">
+                        Margin="5,2">
                 <Image Source="../Resources/Amulet.png" Height="30" Width="30" />
                 <TextBlock x:Name="AmuletsCount" Text="{Binding AmuletsCount}" Margin="5,0" />
-            </StackPanel>
-        </Grid>
+            </DockPanel>
+        </DockPanel>
     </DataTemplate>
 </ResourceDictionary>

@@ -40,7 +40,7 @@
             <Setter Property="MinWidth" Value="{Binding Content.MinSize.Width, Mode=TwoWay}" />
             <Setter Property="MinHeight" Value="{Binding Content.MinSize.Height, Mode=TwoWay}" />
             <Setter Property="ResizeMode" Value="NoResize" />
-            <Setter Property="SizeToContent" Value="{Binding Content.SizeToContent, Mode=TwoWay}" />
+            <Setter Property="SizeToContent" Value="{Binding Content.SizeToContent, Mode=OneWay}" />
 
             <Style.Triggers>
                 <DataTrigger Binding="{Binding Content.IsLocked}" Value="False" />

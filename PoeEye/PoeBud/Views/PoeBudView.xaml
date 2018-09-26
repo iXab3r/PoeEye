@@ -14,9 +14,7 @@
 
     <DataTemplate DataType="{x:Type viewModels:PoeBudViewModel}">
         <Grid x:Name="PoeBudOverlay"
-              Opacity="{Binding Opacity}"
-              TextBlock.FontSize="20" TextBlock.Foreground="White"
-              Visibility="{Binding IsEnabled, Converter={StaticResource TrueToVisibleFalseToCollapsedConverter}}">
+              TextBlock.FontSize="20" TextBlock.Foreground="White">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="30" />
@@ -29,13 +27,23 @@
             </Grid>
 
             <Grid Grid.Row="1" Grid.Column="0" Margin="50, 5, 0, 5">
-                <TextBlock
-                    x:Name="LastUpdateException"
-                    MaxWidth="600"
-                    Visibility="{Binding LastUpdateException, Converter={StaticResource NullToCollapsedConverter}}"
-                    Foreground="Orange"
-                    Text="{Binding LastUpdateException, StringFormat='&#xF071; {0}', Converter={StaticResource ExceptionToMessageConverter}}"
-                    Style="{StaticResource IconTextBlock}" TextTrimming="WordEllipsis" />
+                <DockPanel>
+                    <TextBlock
+                        x:Name="LastUpdateException" DockPanel.Dock="Top"
+                        MaxWidth="{Binding ElementName=PoeBudOverlay, Path=ActualWidth}"
+                        Visibility="{Binding LastUpdateException, Converter={StaticResource NullToCollapsedConverter}}"
+                        Foreground="Orange"
+                        Text="{Binding LastUpdateException, StringFormat='&#xF071; {0}', Converter={StaticResource ExceptionToMessageConverter}}"
+                        Style="{StaticResource IconTextBlock}" TextTrimming="WordEllipsis" />
+                    <TextBlock
+                        x:Name="StatusText" DockPanel.Dock="Top"
+                        MaxWidth="{Binding ElementName=PoeBudOverlay, Path=ActualWidth}"
+                        Foreground="IndianRed"
+                        Text="{Binding StatusText, StringFormat='&#xF071; {0}'}"
+                        Visibility="{Binding StatusText, Converter={StaticResource NullToCollapsedConverter}}"
+                        Style="{StaticResource IconTextBlock}" TextTrimming="WordEllipsis" />
+                </DockPanel>
+               
             </Grid>
 
             <Grid Grid.Row="2" Grid.Column="0"
@@ -192,11 +200,12 @@
                                     Content="{Binding Stash.PriceSummary}"
                                     Visibility="{Binding Stash, Converter={StaticResource NullToCollapsedConverter}}" />
                 </DockPanel>
-
             </Grid>
 
-            <ContentPresenter Grid.Row="3" Grid.Column="0"
-                              Content="{Binding Stash}" />
+            <ContentControl Grid.Row="3" Grid.Column="0"
+                            VerticalAlignment="Top"
+                            Content="{Binding Stash}"
+                            Visibility="{Binding Stash, Converter={StaticResource NullToCollapsedConverter}}"/>
         </Grid>
     </DataTemplate>
 </ResourceDictionary>

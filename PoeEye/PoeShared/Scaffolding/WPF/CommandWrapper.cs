@@ -120,6 +120,11 @@ namespace PoeShared.Scaffolding.WPF
         {
             return Create(new DelegateCommand(execute));
         }
+        
+        public static CommandWrapper Create(Action execute, Func<bool> canExecute)
+        {
+            return Create(new DelegateCommand(execute, canExecute));
+        }
 
         public static CommandWrapper Create(Func<Task> execute)
         {

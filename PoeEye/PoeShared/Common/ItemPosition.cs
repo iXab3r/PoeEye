@@ -4,7 +4,7 @@ namespace PoeShared.Common
 {
     public struct ItemPosition
     {
-        public ItemPosition(int x, int y) : this(x, y, 0, 0)
+        public ItemPosition(int x, int y) : this(x: x, y: y, width: 0, height: 0)
         {
         }
 

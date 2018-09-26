@@ -50,10 +50,14 @@ namespace PoeBud.Models
                 Guard.ArgumentIsBetween(() => itemX, 0, StashItemsMaxX * 2 - 1, true);
                 Guard.ArgumentIsBetween(() => itemY, 0, StashItemsMaxY * 2 - 1, true);
             }
-            else
+            else if (tabType == StashTabType.NormalStash || tabType == StashTabType.PremiumStash)
             {
                 Guard.ArgumentIsBetween(() => itemX, 0, StashItemsMaxX - 1, true);
                 Guard.ArgumentIsBetween(() => itemY, 0, StashItemsMaxY - 1, true);
+            }
+            else
+            {
+                throw new NotSupportedException($"Stash tabs of type {tabType} are not supported yet");
             }
 
             var stashBounds = StashBounds;
