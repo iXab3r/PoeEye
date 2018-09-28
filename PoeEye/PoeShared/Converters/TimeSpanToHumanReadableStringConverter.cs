@@ -22,6 +22,16 @@ namespace PoeShared.Converters
 
             var timeSpan = (TimeSpan)value;
 
+            if (timeSpan == TimeSpan.MaxValue)
+            {
+                return "∞";
+            }
+            //TODO Distinguish min an max ? +inf -inf ?
+            if (timeSpan == TimeSpan.MinValue)
+            {
+                return "∞";
+            }
+
             if (timeSpan.TotalHours > 24)
             {
                 return $"{timeSpan.TotalDays:F0}d {timeSpan.Hours:F0}h";

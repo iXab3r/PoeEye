@@ -97,6 +97,11 @@
                             <DockPanel LastChildFill="True">
                                 <materialDesign:PackIcon DockPanel.Dock="Left"
                                                          Kind="Alarm" />
+                                <TextBlock VerticalAlignment="Center"
+                                           DockPanel.Dock="Right"
+                                           Margin="5,0"
+                                           Width="30"
+                                           Text="{Binding Period, StringFormat='{}{0:F0}', Converter={StaticResource TimeSpanToHumanReadableStringConverter}}" />
                                 <Slider DockPanel.Dock="Right" x:Name="PeriodToSet"
                                         Minimum="{Binding MinValue, Converter={StaticResource TimeSpanToSecondsConverter}, Mode=OneWay}"
                                         Maximum="{Binding MaxValue, Converter={StaticResource TimeSpanToSecondsConverter}, Mode=OneWay}"

@@ -231,7 +231,7 @@ namespace PoeEye.PoeTrade
             var className = parser["tbody[class^=\"item item-live\"]"]?.Attr("class") ?? string.Empty;
             result.ItemState = className.IndexOf("item-gone", StringComparison.OrdinalIgnoreCase) >= 0
                 ? PoeTradeState.Removed
-                : PoeTradeState.New;
+                : PoeTradeState.Unknown;
 
             result.Hash = parser["span[class=click-button]"]?.Attr("data-hash");
             if (string.IsNullOrWhiteSpace(result.Hash))
