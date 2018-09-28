@@ -1,5 +1,6 @@
 ﻿using PoeEye.StashGrid.Services;
 using PoeEye.StashGrid.ViewModels;
+using PoeShared.Scaffolding;
 using Unity;
 using Unity.Extension;
 
@@ -10,8 +11,7 @@ namespace PoeEye.StashGrid.Prism
         protected override void Initialize()
         {
             Container
-                .RegisterSingleton<IPoeStashGridViewModel, PoeStashGridViewModel>()
-                .RegisterSingleton<IPoeStashHighlightService, PoeStashGridViewModel>();
+                .RegisterSingleton<PoeStashGridViewModel>(typeof(IPoeStashGridViewModel), typeof(IPoeStashHighlightService));
         }
     }
 }

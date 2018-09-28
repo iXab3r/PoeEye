@@ -83,8 +83,7 @@ namespace PoeEye.StashGrid.ViewModels
                       .AddTo(Anchors);
         }
 
-        public ReactiveList<BasicStashGridCellViewModel> GridCells { get; } =
-            new ReactiveList<BasicStashGridCellViewModel>();
+        public ReactiveList<BasicStashGridCellViewModel> GridCells { get; } = new ReactiveList<BasicStashGridCellViewModel>();
 
         public ReadOnlyObservableCollection<BasicStashGridCellViewModel> Highlights => highlightsProxy;
 

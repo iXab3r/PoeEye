@@ -12,23 +12,6 @@
 
     <DataTemplate DataType="{x:Type viewModels:PoeStashGridViewModel}">
         <Grid x:Name="StashGridOverlay">
-            <ItemsControl ItemsSource="{Binding GridCells}"
-                          BorderBrush="Lime"
-                          IsHitTestVisible="False"
-                          Visibility="{Binding IsLocked, Converter={StaticResource TrueToCollapsedFalseToVisibleConverter}}"
-                          BorderThickness="2">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <UniformGrid Columns="24" Rows="24" />
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate DataType="{x:Type models:BasicStashGridCellViewModel}">
-                        <Border BorderBrush="Blue" Margin="0" BorderThickness="1" Opacity="0.5" />
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-
             <ItemsControl ItemsSource="{Binding Highlights}" IsHitTestVisible="False">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
@@ -212,6 +195,24 @@
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
+            
+            <ItemsControl ItemsSource="{Binding GridCells}"
+                          BorderBrush="Lime"
+                          IsHitTestVisible="False"
+                          Visibility="{Binding IsLocked, Converter={StaticResource TrueToCollapsedFalseToVisibleConverter}}"
+                          BorderThickness="2">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <UniformGrid Columns="24" Rows="24" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="{x:Type models:BasicStashGridCellViewModel}">
+                        <Border BorderBrush="Blue" Margin="0" BorderThickness="1" Opacity="0.5" />
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
         </Grid>
     </DataTemplate>
 </ResourceDictionary>
