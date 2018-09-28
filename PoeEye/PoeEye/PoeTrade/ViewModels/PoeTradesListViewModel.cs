@@ -40,20 +40,18 @@ namespace PoeEye.PoeTrade.ViewModels
 
         private readonly SourceCache<IPoeTradeViewModel, IPoeItem> itemsSource = new SourceCache<IPoeTradeViewModel, IPoeItem>(x => x.Trade);
         private readonly IPoeApiWrapper poeApiWrapper;
-        private readonly IEqualityComparer<IPoeItem> poeItemsComparer;
         private readonly IFactory<IPoeLiveHistoryProvider, IPoeApiWrapper, IPoeQueryInfo> poeLiveHistoryFactory;
         private readonly IFactory<IPoeTradeViewModel, IPoeItem> poeTradeViewModelFactory;
         private readonly IPoeTradeQuickFilter quickFilter;
         private readonly IScheduler uiScheduler;
+        
         private ActiveProviderInfo activeProviderInfo;
         private IPoeQueryInfo activeQuery;
-
         private string errors;
-
         private DateTime lastUpdateTimestamp;
         private string quickFilterText;
-
         private TimeSpan recheckPeriod;
+        private string rawQuery;
 
         public PoeTradesListViewModel(
             [NotNull] IPoeApiWrapper poeApiWrapper,
@@ -81,7 +79,6 @@ namespace PoeEye.PoeTrade.ViewModels
             this.poeApiWrapper = poeApiWrapper;
             this.poeLiveHistoryFactory = poeLiveHistoryFactory;
             this.poeTradeViewModelFactory = poeTradeViewModelFactory;
-            this.poeItemsComparer = poeItemsComparer;
             this.uiScheduler = uiScheduler;
             this.clock = clock;
             this.captchaRegistrator = captchaRegistrator;
@@ -131,10 +128,11 @@ namespace PoeEye.PoeTrade.ViewModels
         }
 
         public ReadOnlyObservableCollection<IPoeTradeViewModel> ItemsView { get; }
+        
         public IPageParameterDataViewModel PageParameters { get; }
 
         public ReadOnlyObservableCollection<IPoeTradeViewModel> Items { get; }
-
+        
         public IPoeQueryInfo ActiveQuery
         {
             get => activeQuery;
@@ -145,6 +143,12 @@ namespace PoeEye.PoeTrade.ViewModels
         {
             get => errors;
             private set => this.RaiseAndSetIfChanged(ref errors, value);
+        }
+
+        public string RawQuery
+        {
+            get => rawQuery;
+            private set => this.RaiseAndSetIfChanged(ref rawQuery, value);
         }
 
         public string QuickFilter
@@ -245,9 +249,7 @@ namespace PoeEye.PoeTrade.ViewModels
                     throw new ApplicationException($"Failed to find item {item.DumpToTextRaw()}, items: \n\t{itemsSource.Items.DumpToTable()}");
                 }
 
-                //itemsSource.Remove(existing.Value);
                 action(existing.Value);
-                //itemsSource.AddOrUpdate(existing.Value);
             });
         }
 
@@ -261,7 +263,7 @@ namespace PoeEye.PoeTrade.ViewModels
 
             var historyProvider = poeLiveHistoryFactory.Create(poeApiWrapper, queryInfo);
             OnNextHistoryProviderCreated(historyProvider);
-            return historyProvider.ItemsPacks;
+            return historyProvider.WhenAnyValue(x => x.ItemPack).Where(x => x != null);
         }
 
         private void OnNextHistoryProviderCreated(IPoeLiveHistoryProvider poeLiveHistoryProvider)
@@ -278,11 +280,17 @@ namespace PoeEye.PoeTrade.ViewModels
                 .AddTo(activeProviderInfo.Anchors);
 
             poeLiveHistoryProvider
-                .UpdateExceptions
+                .WhenAnyValue(x => x.LastException)
                 .ObserveOn(uiScheduler)
-                .Subscribe(OnErrorReceived)
+                .Subscribe(HandleProviderErrorReceived)
                 .AddTo(activeProviderInfo.Anchors);
 
+            poeLiveHistoryProvider
+                .WhenAnyValue(x => x.QueryResult)
+                .ObserveOn(uiScheduler)
+                .Subscribe(x => RawQuery = $"Eye query:\n{x?.Query?.DumpToTextRaw() ?? "Empty"}\n\nProvider query:\n{x?.ConvertedQuery ?? "Empty"}")
+                .AddTo(activeProviderInfo.Anchors);
+            
             this.WhenAnyValue(x => x.RecheckPeriod)
                 .Throttle(RecheckPeriodThrottleTimeout)
                 .ObserveOn(uiScheduler)
@@ -290,7 +298,7 @@ namespace PoeEye.PoeTrade.ViewModels
                 .AddTo(activeProviderInfo.Anchors);
         }
 
-        private void OnErrorReceived(Exception exception)
+        private void HandleProviderErrorReceived(Exception exception)
         {
             if (exception != null)
             {
@@ -304,9 +312,8 @@ namespace PoeEye.PoeTrade.ViewModels
 
                 Errors = string.IsNullOrEmpty(errors) ? $"{errorMsg}" : $"{errorMsg}\r\n{errors}";
 
-                if (exception is CaptchaException)
+                if (exception is CaptchaException captchaException)
                 {
-                    var captchaException = (CaptchaException)exception;
                     captchaRegistrator.CaptchaRequests.OnNext(captchaException.ResolutionUri);
                 }
             }

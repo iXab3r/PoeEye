@@ -3,11 +3,14 @@
                     xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
                     xmlns:viewModels="clr-namespace:PoeEye.PoeTrade.ViewModels"
                     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-                    xmlns:eye="http://coderush.net/poeeye/">
+                    xmlns:eye="http://coderush.net/poeeye/"
+                    xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+                    xmlns:utilities="clr-namespace:PoeEye.Utilities">
 
     <DataTemplate DataType="{x:Type viewModels:MainWindowTabViewModel}">
         <Grid>
             <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
@@ -36,7 +39,15 @@
                                      Style="{StaticResource MaterialDesignTextBox}"
                                      Width="300"
                                      Margin="10,0"
-                                     materialDesign:HintAssist.Hint="quick filter, e.g 'chaos 20 30' ..." />
+                                     materialDesign:HintAssist.Hint="quick filter, e.g 'chaos 20' ...">
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="MouseDoubleClick">
+                                        <utilities:SetPropertyAction PropertyName="IsExpanded"
+                                                                     TargetObject="{Binding ElementName=ExpanderRaw}"
+                                                                     PropertyValue="{Binding ElementName=ExpanderRaw, Path=IsExpanded, Converter={StaticResource NotConverter}}" />
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+                            </TextBox>
 
                             <ContentControl Grid.Column="4"
                                             Content="{Binding ApiSelector}" MinWidth="200" HorizontalAlignment="Right" />
@@ -81,7 +92,19 @@
                 </Expander>
             </ScrollViewer>
 
-            <Grid Grid.Row="1">
+            <Border Grid.Row="1">
+                <Expander Header="Raw query info"
+                          Name="ExpanderRaw"
+                          Margin="0,10,0,0"
+                          Visibility="{Binding RelativeSource={RelativeSource Self}, Path=IsExpanded, Converter={StaticResource FalseToCollapsedTrueToVisibleConverter}}">
+                    <TextBox Text="{Binding TradesList.RawQuery, Mode=OneWay}" IsEnabled="True" IsReadOnly="True"
+                             TextWrapping="Wrap"
+                             VerticalScrollBarVisibility="Visible"
+                             HorizontalScrollBarVisibility="Visible" />
+                </Expander>
+            </Border>
+            
+            <Grid Grid.Row="2">
                 <ItemsControl Margin="0,10,0,0"
                               ItemsSource="{Binding TradesList.ItemsView}"
                               Style="{StaticResource VirtualizedItemsControlStyle}" />

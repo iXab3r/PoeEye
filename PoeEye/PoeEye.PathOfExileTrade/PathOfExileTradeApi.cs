@@ -36,6 +36,11 @@ namespace PoeEye.PathOfExileTrade
         private readonly IFactory<PoeItemBuilder> itemBuilder;
         private readonly IFactory<IPathOfExileTradeLiveAdapter, IPoeQueryResult, IPoeItemSource> liveSourceFactory;
         private readonly IConverter<IPoeQueryInfo, JsonSearchRequest.Query> queryConverter;
+        
+        private static readonly JsonSerializerSettings TradeApiSerializerSettings =  new JsonSerializerSettings
+        {
+            NullValueHandling = NullValueHandling.Ignore
+        };
 
         private readonly SemaphoreSlim requestsSemaphore;
 
@@ -96,7 +101,7 @@ namespace PoeEye.PathOfExileTrade
 
             try
             {
-                Log.Debug("[PathOfExileTradeApi.Api] Sending query");
+                Log.Debug($"[PathOfExileTradeApi.Api] Sending query {queryInfo.DumpToTextRaw()}");
 
                 var query = new JsonSearchRequest.Request
                 {
@@ -107,12 +112,21 @@ namespace PoeEye.PathOfExileTrade
                     }
                 };
 
+                var rawQuery = query.DumpToText(TradeApiSerializerSettings);
+                Log.Debug($"[PathOfExileTradeApi.Api] Raw JSON query: {rawQuery}");
+
                 var response = await client.Search(queryInfo.League, query);
                 var resultIds = response.GetContentEx();
 
-                Log.Trace($"[PathOfExileTradeApi.Api] [{resultIds.Id}]  Got {resultIds.Total} entries as a result");
-                const int maxItemsToProcess = 50;
-                return await FetchItems(new PoeQueryResult {Query = queryInfo, Id = resultIds.Id}, resultIds.Result.Take(maxItemsToProcess).ToArray());
+                var itemsToFetch = config.MaxItemsToFetch;
+                Log.Trace($"[PathOfExileTradeApi.Api] [{resultIds.Id}] Got {resultIds.Total} entries as a result, fetching {itemsToFetch} items");
+                var result = new PoeQueryResult
+                {
+                    Query = queryInfo, 
+                    ConvertedQuery = rawQuery,
+                    Id = resultIds.Id
+                };
+                return await FetchItems(result, resultIds.Result.Take(itemsToFetch).ToArray());
             }
             finally
             {
@@ -224,10 +238,8 @@ namespace PoeEye.PathOfExileTrade
 
             Log.Debug($"[PathOfExileTradeApi.Api] [{initial.Id}] Successfully received {itemIds.Count} items");
 
-            var queryResult = new PoeQueryResult
+            var queryResult = new PoeQueryResult(initial)
             {
-                Id = initial.Id,
-                Query = initial.Query,
                 ItemsList = listings.EmptyIfNull().Where(x => !x.Gone ?? true).Select(x =>
                 {
                     var result = itemBuilder.Create()
@@ -242,7 +254,7 @@ namespace PoeEye.PathOfExileTrade
                                             .WithItemState(PoeTradeState.Unknown)
                                             .Build();
                     return result;
-                }).ToArray()
+                }).ToArray(),
             };
             return queryResult;
         }
@@ -293,14 +305,9 @@ namespace PoeEye.PathOfExileTrade
 
         private static IPathOfExileTradePortalApi CreateRestClient()
         {
-            var settings = new JsonSerializerSettings
-            {
-                NullValueHandling = NullValueHandling.Ignore
-            };
-
             var client = new RestClient(TradeSearchUri, HandleRequestMessage)
             {
-                JsonSerializerSettings = settings
+                JsonSerializerSettings = TradeApiSerializerSettings,
             }.For<IPathOfExileTradePortalApi>();
             return client;
         }

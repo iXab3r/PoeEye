@@ -22,6 +22,8 @@ namespace PoeShared.StashApi.DataTypes
         List<string> CraftedMods { get; }
 
         string DescrText { get; }
+        
+        List<string> EnchantMods { get; }
 
         List<string> ExplicitMods { get; }
 

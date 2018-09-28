@@ -30,6 +30,11 @@ namespace PoeShared.Scaffolding
         {
             return instance == null ? $"null<{typeof(T).Name}>" : JsonConvert.SerializeObject(instance, formatting);
         }
+        
+        public static string DumpToText<T>(this T instance, JsonSerializerSettings settings)
+        {
+            return instance == null ? $"null<{typeof(T).Name}>" : JsonConvert.SerializeObject(instance, settings);
+        }
 
         public static TItem AddTo<TItem, TCollection>(this TItem instance, ICollection<TCollection> collection) where TItem : TCollection
         {

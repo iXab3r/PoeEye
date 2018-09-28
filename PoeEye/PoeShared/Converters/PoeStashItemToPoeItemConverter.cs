@@ -73,22 +73,33 @@ namespace PoeShared.Converters
                 };
                 mods.Add(mod);
             }
-
-            foreach (var valueExplicitMod in value.ExplicitMods.EmptyIfNull())
+            
+            foreach (var rawMod in value.EnchantMods.EmptyIfNull())
             {
                 var mod = new PoeItemMod
                 {
-                    Name = valueExplicitMod,
+                    Name = rawMod,
+                    ModType = PoeModType.Implicit,
+                    Origin = PoeModOrigin.Enchant
+                };
+                mods.Add(mod);
+            }
+
+            foreach (var rawMod in value.ExplicitMods.EmptyIfNull())
+            {
+                var mod = new PoeItemMod
+                {
+                    Name = rawMod,
                     ModType = PoeModType.Explicit
                 };
                 mods.Add(mod);
             }
 
-            foreach (var valueCraftedMod in value.CraftedMods.EmptyIfNull())
+            foreach (var rawMod in value.CraftedMods.EmptyIfNull())
             {
                 var mod = new PoeItemMod
                 {
-                    Name = valueCraftedMod,
+                    Name = rawMod,
                     ModType = PoeModType.Explicit,
                     Origin = PoeModOrigin.Craft
                 };

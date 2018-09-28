@@ -11,6 +11,8 @@ namespace PoeShared.PoeTrade.Query
         IPoeItem[] ItemsList { [NotNull] get; }
 
         IPoeQueryInfo Query { [CanBeNull] get; }
+        
+        string ConvertedQuery { [CanBeNull] get; }
 
         ReadOnlyDictionary<string, string> FreeFormData { get; }
     }

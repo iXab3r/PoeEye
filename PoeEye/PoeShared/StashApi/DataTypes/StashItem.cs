@@ -76,6 +76,10 @@ namespace PoeShared.StashApi.DataTypes
         [JsonProperty("properties")]
         public List<StashItemProperty> Properties { get; set; }
 
+        [DeserializeAs(Name = "enchantMods")]
+        [JsonProperty("enchantMods")]
+        public List<string> EnchantMods { get; set; }
+        
         [DeserializeAs(Name = "explicitMods")]
         [JsonProperty("explicitMods")]
         public List<string> ExplicitMods { get; set; }

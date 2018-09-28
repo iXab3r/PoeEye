@@ -1,14 +1,17 @@
 ﻿using System;
 using JetBrains.Annotations;
 using PoeShared.Common;
+using PoeShared.PoeTrade.Query;
 
 namespace PoeShared.PoeTrade
 {
     public interface IPoeLiveHistoryProvider : IDisposable
     {
-        IObservable<IPoeItem[]> ItemsPacks { [NotNull] get; }
+        IPoeItem[] ItemPack { [CanBeNull] get; }
 
-        IObservable<Exception> UpdateExceptions { [NotNull] get; }
+        Exception LastException { [CanBeNull] get; }
+        
+        IPoeQueryResult QueryResult { [CanBeNull] get; }
 
         TimeSpan RecheckPeriod { get; set; }
 

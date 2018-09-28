@@ -142,7 +142,6 @@
     <Compile Include="PoeEye\PoeTrade\PoeTradeDateTimeExtractorFixture.cs" />
     <Compile Include="PoeEye\PoeTrade\PoeTradeParserModernFixture.cs" />
     <Compile Include="PoeEye\PoeTrade\TestData\TestDataProvider.cs" />
-    <Compile Include="PoeEye\PoeTrade\ViewModels\PoeTradesListViewModelFixture.cs" />
     <Compile Include="PoeShared\Communications\Chromium\ChromiumBootstrapperFixture.cs" />
     <Compile Include="PoeShared\Converters\StringToPoePriceConverterFixture.cs" />
     <Compile Include="PoeShared\PoeDatabase\PoeNinja\PoeNinjaDatabaseReaderFixture.cs" />

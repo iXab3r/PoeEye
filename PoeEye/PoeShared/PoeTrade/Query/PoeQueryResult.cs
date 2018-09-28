@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using PoeShared.Common;
+using PoeShared.Scaffolding;
 
 namespace PoeShared.PoeTrade.Query
 {
@@ -10,9 +12,18 @@ namespace PoeShared.PoeTrade.Query
         private IPoeItem[] itemsList = new IPoeItem[0];
         private IPoeQueryInfo query = PoeQueryInfo.Empty;
 
-        public PoeQueryResult()
+        public PoeQueryResult() 
         {
             freeFormDataWrapper = new ReadOnlyDictionary<string, string>(FreeFormData);
+        }
+        
+        public PoeQueryResult(IPoeQueryResult source) : this()
+        {
+            source.FreeFormData.ForEach(x => FreeFormData[x.Key] = x.Value);
+            Id = source.Id;
+            ItemsList = source.ItemsList.ToArray();
+            Query = source.Query;
+            ConvertedQuery = source.ConvertedQuery;
         }
 
         public IDictionary<string, string> FreeFormData { get; } = new Dictionary<string, string>();
@@ -30,6 +41,8 @@ namespace PoeShared.PoeTrade.Query
             get => query;
             set => query = value ?? PoeQueryInfo.Empty;
         }
+
+        public string ConvertedQuery { get; set; }
 
         ReadOnlyDictionary<string, string> IPoeQueryResult.FreeFormData => freeFormDataWrapper;
     }

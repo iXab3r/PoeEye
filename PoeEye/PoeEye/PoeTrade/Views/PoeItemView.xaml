@@ -676,7 +676,7 @@
                 <Expander Header="Raw item info"
                           Name="ExpanderRaw"
                           Visibility="{Binding RelativeSource={RelativeSource Self}, Path=IsExpanded, Converter={StaticResource FalseToCollapsedTrueToVisibleConverter}}">
-                    <TextBox Text="{Binding Trade.Raw}" IsEnabled="True" IsReadOnly="True"
+                    <TextBox Text="{Binding Trade.Raw, Mode=OneWay}" IsEnabled="True" IsReadOnly="True"
                              TextWrapping="Wrap"
                              VerticalScrollBarVisibility="Visible"
                              HorizontalScrollBarVisibility="Visible" />

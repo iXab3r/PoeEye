@@ -10,6 +10,8 @@ namespace PoeEye.PoeTrade.ViewModels
     internal interface IPoeTradesListViewModel : IDisposableReactiveObject
     {
         IPoeQueryInfo ActiveQuery { get; set; }
+        
+        string RawQuery { [CanBeNull] get; }
 
         TimeSpan RecheckPeriod { get; set; }
 
