@@ -10,9 +10,10 @@ using System.Windows.Forms;
 using Common.Logging;
 using Guards;
 using JetBrains.Annotations;
+using PoeShared.Scaffolding;
 using ReactiveUI;
 
-namespace PoeShared.Scaffolding
+namespace PoeShared.Native
 {
     internal sealed class WindowTracker : DisposableReactiveObject, IWindowTracker
     {

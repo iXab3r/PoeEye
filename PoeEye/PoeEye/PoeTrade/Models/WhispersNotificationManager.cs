@@ -5,6 +5,7 @@ using JetBrains.Annotations;
 using PoeEye.Config;
 using PoeShared.Audio;
 using PoeShared.Modularity;
+using PoeShared.Native;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
 using PoeWhisperMonitor;

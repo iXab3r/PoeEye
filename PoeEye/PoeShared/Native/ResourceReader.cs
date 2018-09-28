@@ -2,7 +2,7 @@
 using System.Reflection;
 using Guards;
 
-namespace PoeShared.Scaffolding
+namespace PoeShared.Native
 {
     public static class ResourceReader
     {

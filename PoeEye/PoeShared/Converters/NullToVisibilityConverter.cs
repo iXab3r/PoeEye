@@ -3,7 +3,7 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
 
-namespace PoeShared.Scaffolding.WPF.Converters
+namespace PoeShared.Converters
 {
     internal sealed class NullToVisibilityConverter : IValueConverter
     {

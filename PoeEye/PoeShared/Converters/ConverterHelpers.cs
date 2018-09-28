@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Linq;
 
-namespace PoeShared.Scaffolding.WPF.Converters
+namespace PoeShared.Converters
 {
     internal static class ConverterHelpers
     {

@@ -14,20 +14,33 @@ namespace PoeShared
 {
     public class SharedLog : DisposableReactiveObject
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(SharedLog));
+        /// <summary>
+        ///  Log Instance HAVE to be initialized only after GlobalContext is configured
+        /// </summary>
+        private static readonly Lazy<ILog> LogInstanceSupplier = new Lazy<ILog>(() =>
+        {
+            var log = LogManager.GetLogger(typeof(SharedLog));
+            log.Debug($"Logger instance initialized, context: {GlobalContext.Properties.DumpToTextRaw()}");
+            return log;
+        });
 
         private static readonly Lazy<SharedLog> InstanceSupplier = new Lazy<SharedLog>();
 
         public SharedLog()
         {
-            Errors.Subscribe(Log.HandleUiException).AddTo(Anchors);
+            Errors.Subscribe((ex) =>
+            {
+                Log.HandleException(ex);
+            }).AddTo(Anchors);
         }
 
         public ISubject<Exception> Errors { get; } = new Subject<Exception>();
 
         public static SharedLog Instance => InstanceSupplier.Value;
 
-        public static void InitializeLogging(string configurationMode)
+        public ILog Log => LogInstanceSupplier.Value;
+
+        public void InitializeLogging(string configurationMode)
         {
             Guard.ArgumentNotNull(configurationMode, nameof(configurationMode));
 
@@ -35,7 +48,7 @@ namespace PoeShared
             Log.Info($"Logging in '{configurationMode}' mode initialized");
         }
 
-        public static void SwitchLoggingLevel(Level loggingLevel)
+        public void SwitchLoggingLevel(Level loggingLevel)
         {
             Guard.ArgumentNotNull(loggingLevel, nameof(loggingLevel));
 
@@ -44,8 +57,8 @@ namespace PoeShared
             repository.RaiseConfigurationChanged(EventArgs.Empty);
             Log.Info($"Logging level switched to '{loggingLevel}'");
         }
-        
-        public static IDisposable AddAppender(IAppender appender)
+
+        public IDisposable AddAppender(IAppender appender)
         {
             Guard.ArgumentNotNull(appender, nameof(appender));
 
@@ -54,7 +67,7 @@ namespace PoeShared
             Log.Debug($"Adding appender {appender}, currently root contains {root.Appenders.Count} appenders");
             root.AddAppender(appender);
             repository.RaiseConfigurationChanged(EventArgs.Empty);
-            
+
             return Disposable.Create(() =>
             {
                 Log.Debug($"Removing appender {appender}, currently root contains {root.Appenders.Count} appenders");

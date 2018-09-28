@@ -2,8 +2,9 @@
 using System.Windows.Forms;
 using Common.Logging;
 using Guards;
+using PoeShared.Scaffolding;
 
-namespace PoeShared.Scaffolding
+namespace PoeShared.Native
 {
     internal sealed class ClipboardManager : IClipboardManager
     {

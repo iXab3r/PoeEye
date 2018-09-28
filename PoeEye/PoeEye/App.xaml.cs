@@ -19,18 +19,19 @@ namespace PoeEye
 {
     public partial class App
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(App));
+        private static ILog Log => SharedLog.Instance.Log;
 
-        private readonly PoeEyeBootstrapper bootstrapper = new PoeEyeBootstrapper();
+        private readonly PoeEyeBootstrapper bootstrapper;
 
         public App()
         {
             try
             {
                 var arguments = Environment.GetCommandLineArgs();
+
                 if (!AppArguments.Parse(arguments))
                 {
-                    SharedLog.InitializeLogging("Startup");
+                    SharedLog.Instance.InitializeLogging("Startup");
                     throw new ApplicationException($"Failed to parse command line args: {string.Join(" ", arguments)}");
                 }
 
@@ -39,6 +40,7 @@ namespace PoeEye
                 Log.Debug($"[App..ctor] Parsed args: {AppArguments.Instance.DumpToText()}");
                 Log.Debug($"[App..ctor] Culture: {Thread.CurrentThread.CurrentCulture}, UICulture: {Thread.CurrentThread.CurrentUICulture}");
 
+                bootstrapper = new PoeEyeBootstrapper();
                 RxApp.SupportsRangeNotifications = false; //FIXME DynamicData (as of v4.11) does not support RangeNotifications
                 Log.Debug($"[App..ctor] UI Scheduler: {RxApp.MainThreadScheduler}");
                 RxApp.MainThreadScheduler = DispatcherScheduler.Current;
@@ -70,7 +72,7 @@ namespace PoeEye
             }
             else
             {
-                Log.Warn($"[App] Appliation is already running, mutex: {mutexId}");
+                Log.Warn($"[App] Application is already running, mutex: {mutexId}");
                 ShowShutdownWarning();
             }
         }
@@ -153,11 +155,11 @@ namespace PoeEye
             RxApp.DefaultExceptionHandler = SharedLog.Instance.Errors;
             if (AppArguments.Instance.IsDebugMode)
             {
-                SharedLog.InitializeLogging("Debug");
+                SharedLog.Instance.InitializeLogging("Debug");
             }
             else
             {
-                SharedLog.InitializeLogging("Release");
+                SharedLog.Instance.InitializeLogging("Release");
             }
         }
 

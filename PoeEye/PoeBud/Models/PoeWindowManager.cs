@@ -4,6 +4,7 @@ using System.Reactive.Linq;
 using Common.Logging;
 using Guards;
 using JetBrains.Annotations;
+using PoeShared.Native;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
 using ReactiveUI;

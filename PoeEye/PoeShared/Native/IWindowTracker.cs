@@ -1,6 +1,7 @@
 ﻿using System;
+using JetBrains.Annotations;
 
-namespace PoeShared.Scaffolding
+namespace PoeShared.Native
 {
     public interface IWindowTracker
     {
@@ -8,7 +9,7 @@ namespace PoeShared.Scaffolding
 
         IntPtr MatchingWindowHandle { get; }
 
-        string ActiveWindowTitle { get; }
+        string ActiveWindowTitle { [CanBeNull] get; }
 
         IntPtr ActiveWindowHandle { get; }
 

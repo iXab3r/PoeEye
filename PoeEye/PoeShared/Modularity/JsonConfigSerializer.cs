@@ -62,14 +62,14 @@ namespace PoeShared.Modularity
             Guard.ArgumentNotNull(() => data);
 
             var serialized = Serialize(data);
-            return StringCompressor.CompressStringToGZip(serialized);
+            return StringExtensions.CompressStringToGZip(serialized);
         }
 
         public T Decompress<T>(string compressedData)
         {
             Guard.ArgumentNotNullOrEmpty(() => compressedData);
 
-            var serialized = StringCompressor.DecompressStringFromGZip(compressedData);
+            var serialized = StringExtensions.DecompressStringFromGZip(compressedData);
             return Deserialize<T>(serialized);
         }
 

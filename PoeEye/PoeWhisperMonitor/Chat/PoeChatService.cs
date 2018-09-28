@@ -12,6 +12,7 @@ using Guards;
 using JetBrains.Annotations;
 using PoeShared;
 using PoeShared.Modularity;
+using PoeShared.Native;
 using PoeShared.Scaffolding;
 using ReactiveUI;
 

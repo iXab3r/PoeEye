@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.Windows.Data;
 
-namespace PoeShared.Scaffolding.WPF.Converters
+namespace PoeShared.Converters
 {
     internal sealed class ExceptionToMessageConverter : IValueConverter
     {

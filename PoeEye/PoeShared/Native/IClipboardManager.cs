@@ -2,7 +2,7 @@
 using System.Windows.Forms;
 using JetBrains.Annotations;
 
-namespace PoeShared.Scaffolding
+namespace PoeShared.Native
 {
     public interface IClipboardManager
     {

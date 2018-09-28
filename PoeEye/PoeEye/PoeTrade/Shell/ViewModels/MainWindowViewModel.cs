@@ -21,6 +21,7 @@ using PoeEye.Utilities;
 using PoeShared;
 using PoeShared.Audio;
 using PoeShared.Modularity;
+using PoeShared.Native;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
 using PoeShared.Scaffolding.WPF;

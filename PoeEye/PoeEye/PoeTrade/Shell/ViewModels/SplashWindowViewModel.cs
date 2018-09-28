@@ -45,7 +45,7 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
                     })
                     .AddTo(Anchors);
 
-            SharedLog.AddAppender(appender).AddTo(Anchors);
+            SharedLog.Instance.AddAppender(appender).AddTo(Anchors);
         }
 
         public string Status

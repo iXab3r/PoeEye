@@ -7,6 +7,7 @@ using System.Reflection;
 using Common.Logging;
 using DynamicData;
 using JetBrains.Annotations;
+using PoeShared.Native;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
 using Unity.Attributes;

@@ -2,7 +2,7 @@ using System;
 using System.Globalization;
 using System.Windows.Data;
 
-namespace PoeShared.Scaffolding.WPF.Converters
+namespace PoeShared.Converters
 {
     public sealed class TimeSpanToHumanReadableStringConverter : IValueConverter
     {

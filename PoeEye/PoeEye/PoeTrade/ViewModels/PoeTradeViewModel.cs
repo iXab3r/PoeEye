@@ -12,6 +12,7 @@ using PoeShared;
 using PoeShared.Audio;
 using PoeShared.Common;
 using PoeShared.Converters;
+using PoeShared.Native;
 using PoeShared.PoeTrade;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;

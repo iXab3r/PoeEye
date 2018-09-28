@@ -3,13 +3,13 @@
                     xmlns:blue="http://www.nuget.org/Blue.MVVM"
                     xmlns:system="clr-namespace:System;assembly=mscorlib"
                     xmlns:viewModels="clr-namespace:PoeEye.TradeMonitor.ViewModels"
-                    xmlns:converters="clr-namespace:PoeShared.Scaffolding.WPF.Converters;assembly=PoeShared"
                     xmlns:models="clr-namespace:PoeEye.TradeMonitor.Models"
                     xmlns:chat="clr-namespace:PoeWhisperMonitor.Chat;assembly=PoeWhisperMonitor"
                     xmlns:themes="clr-namespace:PoeEye.TradeMonitor.Themes"
                     xmlns:fa="http://schemas.fontawesome.io/icons/"
                     xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
-                    xmlns:common="clr-namespace:PoeShared.Common;assembly=PoeShared">
+                    xmlns:common="clr-namespace:PoeShared.Common;assembly=PoeShared"
+                    xmlns:eye="http://coderush.net/poeeye/">
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Generic.xaml" />
@@ -26,7 +26,7 @@
                                     TrueValue="Visible"
                                     FalseValue="Hidden" />
 
-    <converters:TimeSpanToHumanReadableStringConverter x:Key="TimeSpanToHumanReadableStringConverter" />
+    <eye:TimeSpanToHumanReadableStringConverter x:Key="TimeSpanToHumanReadableStringConverter" />
 
     <DataTemplate DataType="{x:Type viewModels:NegotiationViewModel}">
         <DataTemplate.Resources>
