@@ -12,7 +12,5 @@ namespace PoeShared.Native
         string ActiveWindowTitle { [CanBeNull] get; }
 
         IntPtr ActiveWindowHandle { get; }
-
-        string TargetWindowName { get; }
     }
 }

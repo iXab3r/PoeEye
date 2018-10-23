@@ -30,20 +30,25 @@ namespace PoeShared.Modularity
 
             //FIXME Use ReplaySubject for propagating active config
             var changes = this
-                          .WhenAnyValue(x => x.ActualConfig)
-                          .WithPrevious((prev, curr) => new {prev, curr})
-                          .Select(x => new {Config = x.curr, PreviousConfig = x.prev, ComparisonResult = Compare(x.curr, x.prev)})
-                          .Where(x => !x.ComparisonResult.AreEqual)
-                          .Do(
-                              x =>
-                              {
-                                  if (x.PreviousConfig != null)
-                                  {
-                                      LogConfigChange(x.Config, x.ComparisonResult);
-                                  }
-                              })
-                          .Select(x => x.Config)
-                          .Replay(1);
+                .WhenAnyValue(x => x.ActualConfig)
+                .WithPrevious((prev, curr) => new {prev, curr})
+                .Select(x => new {Config = x.curr, PreviousConfig = x.prev, ComparisonResult = Compare(x.curr, x.prev)})
+                .Where(x => !x.ComparisonResult.AreEqual)
+                .Do(
+                    x =>
+                    {
+                        if (x.PreviousConfig != null)
+                        {
+                            LogConfigChange(x.Config, x.ComparisonResult);
+                        }
+                    })
+                .Select(x => x.Config)
+                .Catch<TConfig, Exception>(ex =>
+                {
+                    Log.HandleException(ex);
+                    return Observable.Never<TConfig>();
+                })
+                .Replay(1);
 
             WhenChanged = changes;
             changes.Connect().AddTo(Anchors);

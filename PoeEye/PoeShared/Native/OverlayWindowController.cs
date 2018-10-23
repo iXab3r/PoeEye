@@ -49,7 +49,7 @@ namespace PoeShared.Native
 
             possibleOverlayNames = new[]
             {
-                $"[PoeEye.Overlay] {windowTracker.TargetWindowName}"
+                $"[PoeEye.Overlay] {windowTracker}"
             };
 
             windowTracker.WhenAnyValue(x => x.ActiveWindowHandle)
@@ -122,7 +122,7 @@ namespace PoeShared.Native
             var overlayWindow = new OverlayWindowView
             {
                 DataContext = overlayWindowViewModel,
-                Title = $"[PoeEye.Overlay] {windowTracker.TargetWindowName} #{overlayName}",
+                Title = $"[PoeEye.Overlay] {windowTracker} #{overlayName}",
                 Visibility = Visibility.Visible,
                 Topmost = true,
                 Name = $"{overlayName}_OverlayView"

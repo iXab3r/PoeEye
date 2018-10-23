@@ -11,5 +11,9 @@ namespace PoeShared.Native
         IObservable<KeyEventArgs> WhenKeyDown { [NotNull] get; }
 
         IObservable<KeyEventArgs> WhenKeyUp { [NotNull] get; }
+        
+        IObservable<MouseEventArgs> WhenMouseUp { [NotNull] get; }
+        
+        IObservable<MouseEventArgs> WhenMouseDown { [NotNull] get; }
     }
 }

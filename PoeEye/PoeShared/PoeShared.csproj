@@ -227,7 +227,9 @@
     <Compile Include="Native\IClipboardManager.cs" />
     <Compile Include="Native\IKeyboardEventsSource.cs" />
     <Compile Include="Native\IOverlayConfig.cs" />
+    <Compile Include="Native\IStringMatcher.cs" />
     <Compile Include="Native\IWindowTracker.cs" />
+    <Compile Include="Native\RegexStringMatcher.cs" />
     <Compile Include="Native\ResourceReader.cs" />
     <Compile Include="Native\SafeKeyboardMouseEvents.cs" />
     <Compile Include="Native\WindowTracker.cs" />
@@ -445,6 +447,14 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Themes\CommandWrapperView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\Generic.mahapps.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\Generic.shared.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

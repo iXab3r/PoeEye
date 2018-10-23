@@ -6,6 +6,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:native="clr-namespace:PoeShared.Native"
     xmlns:wpf="clr-namespace:PoeShared.Scaffolding.WPF"
+    xmlns:converters="http://schemas.kent.boogaart.com/converters"
     mc:Ignorable="d"
     ShowInTaskbar="False"
     d:DataContext="{d:DesignInstance native:OverlayWindowViewModel}"
@@ -222,11 +223,22 @@
             </Border>
         </Grid>
 
-        <Thumb HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="20" Height="20" Cursor="SizeNWSE"
-               DragDelta="ThumbResize_OnDragDelta"
-               Style="{StaticResource OverlayThumbStyleKey}"
-               Visibility="{Binding Content.IsLocked, Converter={StaticResource TrueToCollapsedFalseToVisibleConverter}}"
-               Tag="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" />
+        <Grid>
+            <Grid.Visibility>
+                <Binding Path="Content.SizeToContent">
+                    <Binding.Converter>
+                        <converters:MapConverter FallbackBehavior="ReturnFallbackValue" FallbackValue="{x:Static Visibility.Visible}">
+                            <converters:Mapping From="{x:Static SizeToContent.WidthAndHeight}" To="{x:Static Visibility.Collapsed}"/>
+                        </converters:MapConverter>
+                    </Binding.Converter>
+                </Binding>
+            </Grid.Visibility>
+            <Thumb HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="20" Height="20" Cursor="SizeNWSE"
+                   DragDelta="ThumbResize_OnDragDelta"
+                   Style="{StaticResource OverlayThumbStyleKey}"
+                   Visibility="{Binding Content.IsLocked, Converter={StaticResource TrueToCollapsedFalseToVisibleConverter}}"
+                   Tag="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" />
+        </Grid>
     </Grid>
 
 </native:TransparentWindow>

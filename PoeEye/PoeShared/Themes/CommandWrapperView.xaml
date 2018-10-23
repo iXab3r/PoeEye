@@ -12,8 +12,6 @@
         <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.progressbar.xaml" />
         <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.textbox.xaml" />
         <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.combobox.xaml" />
-        <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/styles/controls.buttons.xaml" />
-        <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/styles/controls.textblock.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
     <DataTemplate DataType="{x:Type s:CommandWrapper}">

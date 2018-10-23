@@ -20,6 +20,8 @@ namespace PoeShared.Native
         double ActualWidth { get; set; }
 
         double ActualHeight { get; set; }
+        
+        float Opacity { get; set; }
 
         Size MinSize { get; set; }
 

@@ -2,11 +2,9 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:audio="clr-namespace:PoeShared.Audio;assembly=PoeShared"
                     xmlns:viewModels="clr-namespace:PoeShared.UI.ViewModels"
-                    xmlns:controls="clr-namespace:PoeShared.Scaffolding.WPF.Controls"
-                    xmlns:fa="http://schemas.fontawesome.io/icons/">
+                    xmlns:controls="clr-namespace:PoeShared.Scaffolding.WPF.Controls">
 
     <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
         <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
         <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Colors.xaml" />
 

@@ -3,6 +3,7 @@ using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Windows.Forms;
+using CefSharp;
 using Common.Logging;
 using Gma.System.MouseKeyHook;
 using Guards;
@@ -23,6 +24,8 @@ namespace PoeShared.Native
 
         private readonly ISubject<KeyPressEventArgs> whenKeyPress = new Subject<KeyPressEventArgs>();
         private readonly ISubject<KeyEventArgs> whenKeyUp = new Subject<KeyEventArgs>();
+        private readonly ISubject<MouseEventArgs> whenMouseDown = new Subject<MouseEventArgs>();
+        private readonly ISubject<MouseEventArgs> whenMouseUp = new Subject<MouseEventArgs>();
 
         public KeyboardEventsSource(
             [NotNull] IKeyboardMouseEvents keyboardMouseEvents,
@@ -40,6 +43,8 @@ namespace PoeShared.Native
         public IObservable<KeyEventArgs> WhenKeyDown => whenKeyDown;
 
         public IObservable<KeyEventArgs> WhenKeyUp => whenKeyUp;
+        public IObservable<MouseEventArgs> WhenMouseDown => whenMouseDown;
+        public IObservable<MouseEventArgs> WhenMouseUp => whenMouseUp;
 
         private void InitializeHook()
         {
@@ -74,6 +79,26 @@ namespace PoeShared.Native
                 .ObserveOn(kbdScheduler)
                 .Do(whenKeyPress)
                 .Where(x => x.Handled)
+                .Subscribe(LogEvent, Log.HandleException)
+                .AddTo(Anchors);
+            
+            Observable
+                .FromEventPattern<MouseEventHandler, MouseEventArgs>(
+                    h => keyboardMouseEvents.MouseDown += h,
+                    h => keyboardMouseEvents.MouseDown -= h)
+                .Select(x => x.EventArgs)
+                .ObserveOn(kbdScheduler)
+                .Do(whenMouseDown)
+                .Subscribe(LogEvent, Log.HandleException)
+                .AddTo(Anchors);
+            
+            Observable
+                .FromEventPattern<MouseEventHandler, MouseEventArgs>(
+                    h => keyboardMouseEvents.MouseUp += h,
+                    h => keyboardMouseEvents.MouseUp -= h)
+                .Select(x => x.EventArgs)
+                .ObserveOn(kbdScheduler)
+                .Do(whenMouseUp)
                 .Subscribe(LogEvent, Log.HandleException)
                 .AddTo(Anchors);
         }

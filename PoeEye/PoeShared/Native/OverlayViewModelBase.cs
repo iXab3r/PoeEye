@@ -75,7 +75,7 @@ namespace PoeShared.Native
         public ICommand UnlockWindowCommand => unlockWindowCommand;
 
         public ICommand LockWindowCommand => lockWindowCommand;
-
+        
         public double ActualHeight
         {
             get => actualHeight;
@@ -212,7 +212,6 @@ namespace PoeShared.Native
         {
             IsLocked = false;
         }
-
 
         protected virtual bool UnlockWindowCommandCanExecute()
         {
