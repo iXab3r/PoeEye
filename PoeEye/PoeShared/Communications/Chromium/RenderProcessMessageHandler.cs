@@ -1,6 +1,5 @@
 ﻿using CefSharp;
 using Common.Logging;
-using Xceed.Wpf.AvalonDock.Layout;
 
 namespace PoeShared.Communications.Chromium
 {
