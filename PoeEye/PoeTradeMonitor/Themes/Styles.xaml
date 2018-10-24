@@ -63,7 +63,7 @@
         </Style.Triggers>
     </Style>
 
-    <Style TargetType="{x:Type Slider}" BasedOn="{StaticResource MetroSlider}" x:Key="TradeMonitorSliderStyleKey">
+    <Style TargetType="{x:Type Slider}" x:Key="TradeMonitorSliderStyleKey">
         <Style.Triggers>
             <Trigger Property="IsEnabled" Value="False">
                 <Setter Property="Foreground" Value="{StaticResource ControlsDisabledBrush}" />
@@ -88,7 +88,7 @@
     </Style>
 
 
-    <Style TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource MetroListBoxItem}" x:Key="CompletionListBoxItem">
+    <Style TargetType="{x:Type ListBoxItem}" x:Key="CompletionListBoxItem">
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type ListBoxItem}">
@@ -106,9 +106,9 @@
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsSelected" Value="true">
                             <Setter Property="Background"
-                                    Value="{StaticResource AccentColorBrush}" />
+                                    Value="{StaticResource ControlBackgroundBrush}" />
                             <Setter Property="Foreground"
-                                    Value="{StaticResource AccentSelectedColorBrush}" />
+                                    Value="{StaticResource HighlightBrush}" />
                         </Trigger>
                         <Trigger Property="IsMouseOver"
                                  Value="True">
