@@ -182,7 +182,6 @@
                             Text="{Binding Content.Height, StringFormat='Height: {0:F0}'}" />
                     </StackPanel>
 
-
                     <StackPanel Orientation="Horizontal">
                         <TextBlock
                             Margin="5,0"
