@@ -12,6 +12,7 @@ namespace PoeEye
 
         public static readonly string AppDataDirectory = Environment.ExpandEnvironmentVariables(@"%APPDATA%\PoeEye");
         public static readonly string LocalAppDataDirectory = Environment.ExpandEnvironmentVariables(@"%LOCALAPPDATA%\PoeEye");
+        public static readonly string AppDomainDirectory = AppDomain.CurrentDomain.BaseDirectory;
         public static readonly string PoeEyeMail = "mail.poeeye@gmail.com";
 
         private bool isDebugMode;
