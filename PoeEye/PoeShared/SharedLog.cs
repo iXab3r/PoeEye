@@ -50,6 +50,7 @@ namespace PoeShared
             Guard.ArgumentNotNull(configurationMode, nameof(configurationMode));
 
             GlobalContext.Properties["configuration"] = configurationMode;
+            GlobalContext.Properties["CONFIGURATION"] = configurationMode;
             GlobalContext.Properties["APPNAME"] = appName;
             Log.Info($"Logging in '{configurationMode}' mode initialized");
         }
