@@ -42,9 +42,15 @@ namespace PoeShared
 
         public void InitializeLogging(string configurationMode)
         {
+            InitializeLogging(configurationMode, "PoeSharedUnknownApp");
+        }
+
+        public void InitializeLogging(string configurationMode, string appName)
+        {
             Guard.ArgumentNotNull(configurationMode, nameof(configurationMode));
 
             GlobalContext.Properties["configuration"] = configurationMode;
+            GlobalContext.Properties["APPNAME"] = appName;
             Log.Info($"Logging in '{configurationMode}' mode initialized");
         }
 

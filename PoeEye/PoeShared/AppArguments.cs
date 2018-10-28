@@ -10,14 +10,16 @@ namespace PoeEye
     {
         private static readonly Lazy<AppArguments> InstanceProducer = new Lazy<AppArguments>();
 
-        public static readonly string AppDataDirectory = Environment.ExpandEnvironmentVariables(@"%APPDATA%\PoeEye");
-        public static readonly string LocalAppDataDirectory = Environment.ExpandEnvironmentVariables(@"%LOCALAPPDATA%\PoeEye");
-        public static readonly string AppDomainDirectory = AppDomain.CurrentDomain.BaseDirectory;
-        public static readonly string PoeEyeMail = "mail.poeeye@gmail.com";
-
         private bool isDebugMode;
 
         public static AppArguments Instance => InstanceProducer.Value;
+
+        public string AppName { get; set; } = "PoeEye";
+
+        public string AppSupportMail { get; set; } = "mail.poeeye@gmail.com";
+        public string AppDomainDirectory => AppDomain.CurrentDomain.BaseDirectory;
+        public string AppDataDirectory => Environment.ExpandEnvironmentVariables($@"%APPDATA%\{AppName}");
+        public string LocalAppDataDirectory => Environment.ExpandEnvironmentVariables($@"%LOCALAPPDATA%\{AppName}");
 
         [Option('d', "debugMode", DefaultValue = false)]
         public bool IsDebugMode
