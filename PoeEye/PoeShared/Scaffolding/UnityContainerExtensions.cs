@@ -37,7 +37,28 @@ namespace PoeShared.Scaffolding
                 .RegisterType<IWindowTracker>(
                     dependencyName,
                     new ContainerControlledLifetimeManager(),
-                    new InjectionFactory(unity => unity.Resolve<WindowTracker>(new DependencyOverride<IStringMatcher>(new RegexStringMatcher().AddToWhitelist(windowNamePattern)))));
+                    new InjectionFactory(unity =>
+                    {
+                        var result = unity.Resolve<WindowTracker>(
+                            new DependencyOverride<IStringMatcher>(new RegexStringMatcher().AddToWhitelist(windowNamePattern)));
+                        result.Name = $"{dependencyName} ('{windowNamePattern}')";
+                        return result;
+                    }));
+        }
+        
+        public static IUnityContainer RegisterWindowTracker(this IUnityContainer instance, string dependencyName, IStringMatcher matcher)
+        {
+            return instance
+                .RegisterType<IWindowTracker>(
+                    dependencyName,
+                    new ContainerControlledLifetimeManager(),
+                    new InjectionFactory(unity =>
+                    {
+                        var result = unity.Resolve<WindowTracker>(
+                            new DependencyOverride<IStringMatcher>(matcher));
+                        result.Name = $"{dependencyName}";
+                        return result;
+                    }));
         }
 
         public static IUnityContainer RegisterOverlayController(

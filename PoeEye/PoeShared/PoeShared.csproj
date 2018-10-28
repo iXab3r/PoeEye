@@ -214,6 +214,7 @@
     <Compile Include="Native\RegexStringMatcher.cs" />
     <Compile Include="Native\ResourceReader.cs" />
     <Compile Include="Native\SafeKeyboardMouseEvents.cs" />
+    <Compile Include="Native\UnsafeNative.cs" />
     <Compile Include="Native\WindowTracker.cs" />
     <Compile Include="PoeControlPanel\Modularity\PoeControlPanelConfig.cs" />
     <Compile Include="PoeControlPanel\Modularity\PoeControlPanelModule.cs" />
@@ -232,6 +233,7 @@
     <Compile Include="Scaffolding\DisposableExtensions.cs" />
     <Compile Include="Scaffolding\Fallback.cs" />
     <Compile Include="Scaffolding\IntPtrExtensions.cs" />
+    <Compile Include="Scaffolding\KeyEventArgsExtensions.cs" />
     <Compile Include="Scaffolding\PoeItemExtensions.cs" />
     <Compile Include="Scaffolding\ReactiveObjectExtensions.cs" />
     <Compile Include="Scaffolding\RestEaseResponseExtensions.cs" />

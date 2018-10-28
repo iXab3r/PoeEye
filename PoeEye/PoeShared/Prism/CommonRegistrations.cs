@@ -2,6 +2,7 @@
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Reactive.Concurrency;
+using System.Text.RegularExpressions;
 using Gma.System.MouseKeyHook;
 using PoeShared.Audio;
 using PoeShared.Common;
@@ -80,7 +81,11 @@ namespace PoeShared.Prism
                 .RegisterType<IImageViewModel, ImageViewModel>();
 
             Container.RegisterWindowTracker(WellKnownWindows.AllWindows, () => ".*");
-            Container.RegisterWindowTracker(WellKnownWindows.MainWindow, () => Process.GetCurrentProcess().MainWindowTitle);
+            Container.RegisterWindowTracker(WellKnownWindows.MainWindow, () =>
+            {
+                var mainWindowTitle = Process.GetCurrentProcess().MainWindowTitle;
+                return $"^{Regex.Escape(mainWindowTitle)}$";
+            });
             Container.RegisterWindowTracker(WellKnownWindows.PathOfExileWindow, () => "^Path of Exile$");
 
             Container.RegisterOverlayController(

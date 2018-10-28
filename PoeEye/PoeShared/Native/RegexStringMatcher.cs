@@ -2,12 +2,16 @@
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Common.Logging;
 using Guards;
+using PoeShared.Scaffolding;
 
 namespace PoeShared.Native
 {
     public sealed class RegexStringMatcher : IStringMatcher
     {
+        private static readonly ILog Log = LogManager.GetLogger(typeof(RegexStringMatcher));
+
         private readonly ConcurrentDictionary<string, Regex> whitelist = new ConcurrentDictionary<string, Regex>();
         private readonly ConcurrentDictionary<string, Regex> blacklist = new ConcurrentDictionary<string, Regex>();
 
@@ -46,19 +50,60 @@ namespace PoeShared.Native
         {
             if (string.IsNullOrWhiteSpace(value))
             {
+                Log.Trace($"Provided Value is not set or empty, ignoring it");
+
                 return false;
             }
-            
+
+            if (Log.IsTraceEnabled)
+            {
+                Log.Trace($"Matching value '{value}', whitelist: {whitelist.DumpToTextRaw()}, blacklist: {blacklist.DumpToTextRaw()}, lazyWhite: '{lazyWhiteListRegex?.Invoke()}'");
+            }
             var isInBlackList = blacklist.Any() && blacklist.Values.Any(x => x.IsMatch(value));
             if (isInBlackList)
             {
+                if (Log.IsTraceEnabled)
+                {
+                    Log.Trace($"Value '{value}' was found in blacklist: {blacklist.DumpToTextRaw()}");
+                }
                 return false;
             }
                 
             var isInWhiteList = whitelist.Any() && whitelist.Values.Any(x => x.IsMatch(value));
-            isInWhiteList |= lazyWhiteListRegex != null && ConstructRegex(lazyWhiteListRegex()).IsMatch(value);
 
-            return isInWhiteList;
+            if (isInWhiteList)
+            {
+                if (Log.IsTraceEnabled)
+                {
+                    Log.Trace($"Value '{value}' was found in whitelist: {whitelist.DumpToTextRaw()}");
+                }
+                return true;
+            }
+
+            if (lazyWhiteListRegex != null)
+            {
+                var lazyRegexRaw = lazyWhiteListRegex();
+                var regex = ConstructRegex(lazyRegexRaw);
+
+                if (regex.IsMatch(value))
+                {
+                    if (Log.IsTraceEnabled)
+                    {
+                        Log.Trace($"Value '{value}' was found in lazy whitelist: '{lazyRegexRaw}'");
+                    }
+
+                    return true;
+                }
+                else
+                {
+                    if (Log.IsTraceEnabled)
+                    {
+                        Log.Trace($"Failed to match value '{value}' in lazy whitelist: '{lazyRegexRaw}'");
+                    }
+                }
+            }
+
+            return false;
         }
     }
 }

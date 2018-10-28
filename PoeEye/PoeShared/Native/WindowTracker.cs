@@ -24,13 +24,11 @@ namespace PoeShared.Native
         private readonly WinEventHookWrapper winHook = new WinEventHookWrapper();
 
         private IntPtr activeWindowHandle;
-
         private string activeWindowTitle;
-
         private bool isActive;
-
         private IntPtr windowHandle;
-        
+        private string name;
+
         public WindowTracker([NotNull] IStringMatcher titleMatcher)
         {
             Guard.ArgumentNotNull(titleMatcher, nameof(titleMatcher));
@@ -52,6 +50,12 @@ namespace PoeShared.Native
                 .AddTo(Anchors);
         }
 
+        public string Name
+        {
+            get => name;
+            set => this.RaiseAndSetIfChanged(ref name, value);
+        }
+
         public bool IsActive
         {
             get => isActive;
@@ -67,13 +71,18 @@ namespace PoeShared.Native
         public string ActiveWindowTitle
         {
             get => activeWindowTitle;
-            set => this.RaiseAndSetIfChanged(ref activeWindowTitle, value);
+            private set => this.RaiseAndSetIfChanged(ref activeWindowTitle, value);
         }
 
         public IntPtr ActiveWindowHandle
         {
             get => activeWindowHandle;
-            set => this.RaiseAndSetIfChanged(ref activeWindowHandle, value);
+            private set => this.RaiseAndSetIfChanged(ref activeWindowHandle, value);
+        }
+
+        public override string ToString()
+        {
+            return $"#Tracker{Name}";
         }
 
         private void WindowActivated(IntPtr activeWindowHandle)
@@ -85,14 +94,14 @@ namespace PoeShared.Native
 
             windowHandle = IsActive ? activeWindowHandle : IntPtr.Zero;
 
-            Log.Trace($@"[WindowTracker] Target window is {(isActive ? string.Empty : "NOT ")}ACTIVE (hwnd 0x{activeWindowHandle.ToInt64():X8}, active title '{activeWindowTitle}')");
+            Log.Trace($@"[#{Name}] Target window is {(isActive ? string.Empty : "NOT ")}ACTIVE (hwnd 0x{activeWindowHandle.ToInt64():X8}, active title '{activeWindowTitle}')");
 
             this.RaisePropertyChanged(nameof(IsActive));
             this.RaisePropertyChanged(nameof(MatchingWindowHandle));
             this.RaisePropertyChanged(nameof(ActiveWindowTitle));
             this.RaisePropertyChanged(nameof(ActiveWindowHandle));
         }
-
+        
         private static class NativeMethods
         {
             public delegate void WinEventDelegate(

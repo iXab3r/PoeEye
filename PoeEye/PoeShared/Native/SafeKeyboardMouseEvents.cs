@@ -24,8 +24,8 @@ namespace PoeShared.Native
 
         private readonly ISubject<KeyPressEventArgs> whenKeyPress = new Subject<KeyPressEventArgs>();
         private readonly ISubject<KeyEventArgs> whenKeyUp = new Subject<KeyEventArgs>();
-        private readonly ISubject<MouseEventArgs> whenMouseDown = new Subject<MouseEventArgs>();
-        private readonly ISubject<MouseEventArgs> whenMouseUp = new Subject<MouseEventArgs>();
+        private readonly ISubject<MouseEventExtArgs> whenMouseDown = new Subject<MouseEventExtArgs>();
+        private readonly ISubject<MouseEventExtArgs> whenMouseUp = new Subject<MouseEventExtArgs>();
 
         public KeyboardEventsSource(
             [NotNull] IKeyboardMouseEvents keyboardMouseEvents,
@@ -43,8 +43,8 @@ namespace PoeShared.Native
         public IObservable<KeyEventArgs> WhenKeyDown => whenKeyDown;
 
         public IObservable<KeyEventArgs> WhenKeyUp => whenKeyUp;
-        public IObservable<MouseEventArgs> WhenMouseDown => whenMouseDown;
-        public IObservable<MouseEventArgs> WhenMouseUp => whenMouseUp;
+        public IObservable<MouseEventArgs> WhenMouseDown => whenMouseDown.OfType<MouseEventArgs>();
+        public IObservable<MouseEventArgs> WhenMouseUp => whenMouseUp.OfType<MouseEventArgs>();
 
         private void InitializeHook()
         {
@@ -83,34 +83,36 @@ namespace PoeShared.Native
                 .AddTo(Anchors);
             
             Observable
-                .FromEventPattern<MouseEventHandler, MouseEventArgs>(
-                    h => keyboardMouseEvents.MouseDown += h,
-                    h => keyboardMouseEvents.MouseDown -= h)
+                .FromEventPattern<EventHandler<MouseEventExtArgs>, MouseEventExtArgs>(
+                    h => keyboardMouseEvents.MouseDownExt += h,
+                    h => keyboardMouseEvents.MouseDownExt -= h)
                 .Select(x => x.EventArgs)
                 .ObserveOn(kbdScheduler)
                 .Do(whenMouseDown)
+                .Where(x => x.Handled)
                 .Subscribe(LogEvent, Log.HandleException)
                 .AddTo(Anchors);
             
             Observable
-                .FromEventPattern<MouseEventHandler, MouseEventArgs>(
-                    h => keyboardMouseEvents.MouseUp += h,
-                    h => keyboardMouseEvents.MouseUp -= h)
+                .FromEventPattern<EventHandler<MouseEventExtArgs>, MouseEventExtArgs>(
+                    h => keyboardMouseEvents.MouseUpExt += h,
+                    h => keyboardMouseEvents.MouseUpExt -= h)
                 .Select(x => x.EventArgs)
                 .ObserveOn(kbdScheduler)
                 .Do(whenMouseUp)
+                .Where(x => x.Handled)
                 .Subscribe(LogEvent, Log.HandleException)
                 .AddTo(Anchors);
         }
 
         private void LogEvent(object arg)
         {
-            if (!Log.IsDebugEnabled)
+            if (!Log.IsTraceEnabled)
             {
                 return;
             }
 
-            Log.Debug($"[KeyboardEventsSource] {arg.DumpToText(Formatting.None)}");
+            Log.Trace($"[KeyboardEventsSource] {arg.DumpToText(Formatting.None)}");
         }
     }
 }

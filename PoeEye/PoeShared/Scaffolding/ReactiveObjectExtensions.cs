@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Linq.Expressions;
+using Common.Logging;
 using Guards;
 using JetBrains.Annotations;
 using ReactiveUI;
@@ -9,6 +10,8 @@ namespace PoeShared.Scaffolding
 {
     public static class ReactiveObjectExtensions
     {
+        private static readonly ILog Log = LogManager.GetLogger(typeof(ReactiveObjectExtensions));
+
         public static IDisposable BindPropertyTo<TSource, TTarget, TSourceProperty, TTargetProperty>(
             [NotNull] this TTarget instance,
             [NotNull] Expression<Func<TTarget, TTargetProperty>> instancePropertyExtractor,
@@ -23,10 +26,19 @@ namespace PoeShared.Scaffolding
             Guard.ArgumentNotNull(source, nameof(source));
 
             var instancePropertyName = new Lazy<string>(() => Reflection.ExpressionToPropertyNames(instancePropertyExtractor.Body));
+            var sourcePropertyName = new Lazy<string>(() => Reflection.ExpressionToPropertyNames(sourcePropertyExtractor.Body));
 
             return source
                    .WhenAnyValue(sourcePropertyExtractor)
-                   .Subscribe(x => instance.RaisePropertyChanged(instancePropertyName.Value));
+                   .Subscribe(x =>
+                {
+                    if (Log.IsTraceEnabled)
+                    {
+                        Log.Trace($"[{typeof(TSource).Name}.{sourcePropertyName.Value} => {typeof(TTarget).Name}.{instancePropertyName.Value}] Bound property '{sourcePropertyName.Value}' (source {source}) fired, raising {instancePropertyName.Value} on {instance}");
+                    }
+
+                    instance.RaisePropertyChanged(instancePropertyName.Value);
+                }, Log.HandleException);
         }
 
         public static IDisposable LinkObjectProperties<TSource, TSourceProperty, TTargetProperty>(
@@ -43,7 +55,7 @@ namespace PoeShared.Scaffolding
 
             return instance
                    .WhenAnyValue(sourcePropertyExtractor)
-                   .Subscribe(x => instance.RaisePropertyChanged(instancePropertyName.Value));
+                   .Subscribe(x => instance.RaisePropertyChanged(instancePropertyName.Value), Log.HandleException);
         }
     }
 }
