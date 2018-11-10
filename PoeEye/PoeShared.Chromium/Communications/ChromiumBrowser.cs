@@ -9,13 +9,12 @@ using CefSharp;
 using CefSharp.Internals;
 using CefSharp.OffScreen;
 using Common.Logging;
-using CsQuery.ExtensionMethods.Internal;
 using Guards;
 using JetBrains.Annotations;
 using PoeShared.Scaffolding;
 using TypeConverter;
 
-namespace PoeShared.Communications.Chromium
+namespace PoeShared.Chromium.Communications
 {
     internal sealed class ChromiumBrowser : DisposableReactiveObject, IChromiumBrowser
     {
@@ -129,7 +128,7 @@ namespace PoeShared.Communications.Chromium
         {
             var postData = nameValueConverter.Convert(args);
             Log.Debug($"[Chromium{Id}] Querying uri '{uri}', args: \r\nPOST: {postData}");
-            Log.Trace($"[Chromium{Id}] Splitted POST data dump: {postData.SplitClean('&').DumpToText()}");
+            Log.Trace($"[Chromium{Id}] Splitted POST data dump: {postData.SplitTrim('&').DumpToText()}");
 
             using (var frame = instance.GetMainFrame())
             {

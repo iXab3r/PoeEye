@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using JetBrains.Annotations;
 using PoeShared.Scaffolding;
 
-namespace PoeShared.Communications.Chromium
+namespace PoeShared.Chromium.Communications
 {
     public interface IChromiumBrowser : IDisposableReactiveObject
     {

@@ -9,7 +9,7 @@ using JetBrains.Annotations;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
 
-namespace PoeShared.Communications.Chromium
+namespace PoeShared.Chromium.Communications
 {
     internal sealed class ChromiumBootstrapper : DisposableReactiveObject, IChromiumBootstrapper
     {

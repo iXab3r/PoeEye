@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Threading.Tasks;
 using CefSharp;
 using Common.Logging;
 
-namespace PoeShared.Communications.Chromium
+namespace PoeShared.Chromium.Communications
 {
     internal sealed class BrowserProcessHandler : IBrowserProcessHandler
     {

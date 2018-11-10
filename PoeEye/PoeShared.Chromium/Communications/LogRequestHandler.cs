@@ -2,7 +2,7 @@
 using CefSharp;
 using Common.Logging;
 
-namespace PoeShared.Communications.Chromium
+namespace PoeShared.Chromium.Communications
 {
     internal sealed class LogRequestHandler : IRequestHandler
     {

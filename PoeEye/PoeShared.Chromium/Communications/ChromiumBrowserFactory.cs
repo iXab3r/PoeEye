@@ -1,7 +1,4 @@
 ﻿using System;
-using System.IO;
-using System.Reactive.Disposables;
-using System.Reflection;
 using System.Threading;
 using CefSharp;
 using CefSharp.OffScreen;
@@ -11,7 +8,7 @@ using JetBrains.Annotations;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
 
-namespace PoeShared.Communications.Chromium
+namespace PoeShared.Chromium.Communications
 {
     internal sealed class ChromiumBrowserFactory : DisposableReactiveObject, IChromiumBrowserFactory
     {

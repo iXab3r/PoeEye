@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -16,9 +17,9 @@ namespace PoeShared.Scaffolding
         public static string[] SplitTrim(this string str, string separator)
         {
             return str
-                   .Split(new[] {separator}, StringSplitOptions.RemoveEmptyEntries)
-                   .Select(sub => sub.Trim('\n', '\r', ' '))
-                   .ToArray();
+                .Split(new[] {separator}, StringSplitOptions.RemoveEmptyEntries)
+                .Select(sub => sub.Trim('\n', '\r', ' '))
+                .ToArray();
         }
 
         public static int? ToIntOrDefault(this string str)
@@ -31,6 +32,42 @@ namespace PoeShared.Scaffolding
             }
 
             return null;
+        }
+        
+        /// <summary>
+        /// Perform a string split that also trims whitespace from each result and removes duplicats
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="separator"></param>
+        /// <returns></returns>
+        public static IEnumerable<string> SplitTrim(this string text, char separator)
+        {
+            var separators = new[] { separator };
+            return text.SplitTrim(separators);
+        }
+
+        /// <summary>
+        ///     Perform a string split that also trims whitespace from each result and removes duplicats
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="separator"></param>
+        /// <returns></returns>
+        public static IEnumerable<string> SplitTrim(this string text, char[] separator)
+        {
+            var list = (text ?? string.Empty).Split(separator, StringSplitOptions.RemoveEmptyEntries);
+            if (list.Length <= 0)
+            {
+                yield break;
+            }
+
+            var uniqueList = new HashSet<string>();
+            foreach (var item in list)
+            {
+                if (uniqueList.Add(item))
+                {
+                    yield return item.Trim();
+                }
+            }
         }
 
         public static decimal? ToDecimalOrDefault(this string str)
@@ -55,7 +92,7 @@ namespace PoeShared.Scaffolding
 
             return result;
         }
-        
+
         /// <summary>
         ///     Compresses the string.
         /// </summary>

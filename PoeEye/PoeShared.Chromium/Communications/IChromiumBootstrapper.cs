@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace PoeShared.Communications.Chromium
+namespace PoeShared.Chromium.Communications
 {
     public interface IChromiumBootstrapper : IDisposable
     {

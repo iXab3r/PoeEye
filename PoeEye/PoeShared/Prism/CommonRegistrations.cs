@@ -7,7 +7,6 @@ using Gma.System.MouseKeyHook;
 using PoeShared.Audio;
 using PoeShared.Common;
 using PoeShared.Communications;
-using PoeShared.Communications.Chromium;
 using PoeShared.Converters;
 using PoeShared.Modularity;
 using PoeShared.Native;
@@ -49,8 +48,6 @@ namespace PoeShared.Prism
                 .RegisterSingleton<IImagesCacheService, ImagesCacheService>()
                 .RegisterSingleton<GearTypeAnalyzer>(typeof(IGearTypeAnalyzer), typeof(IItemTypeAnalyzer))
                 .RegisterSingleton<IPoeLeagueApiClient, PoeLeagueApiClient>()
-                .RegisterSingleton<IChromiumBrowserFactory, ChromiumBrowserFactory>()
-                .RegisterSingleton<IChromiumBootstrapper, ChromiumBootstrapper>()
                 .RegisterSingleton<PoeStashItemToPoeItemConverter>(typeof(IConverter<IStashItem, IPoeItem>), typeof(IConverter<IStashItem, PoeItem>))
                 .RegisterSingleton<IConverter<string, PoePrice>>(new InjectionFactory(x => StringToPoePriceConverter.Instance))
                 .RegisterSingleton<IKeyboardEventsSource>(
