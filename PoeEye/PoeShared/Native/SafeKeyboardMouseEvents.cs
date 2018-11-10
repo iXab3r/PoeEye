@@ -3,7 +3,6 @@ using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Windows.Forms;
-using CefSharp;
 using Common.Logging;
 using Gma.System.MouseKeyHook;
 using Guards;
