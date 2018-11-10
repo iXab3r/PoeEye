@@ -48,8 +48,9 @@
     <Reference Include="DynamicData, Version=6.5.1.2479, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\DynamicData.6.5.1.2479\lib\net46\DynamicData.dll</HintPath>
     </Reference>
-    <Reference Include="FontAwesome.WPF, Version=4.7.0.37774, Culture=neutral, PublicKeyToken=0758b07a11a4f466, processorArchitecture=MSIL">
-      <HintPath>..\packages\FontAwesome.WPF.4.7.0.9\lib\net40\FontAwesome.WPF.dll</HintPath>
+    <Reference Include="FontAwesome.WPF, Version=5.0.0.35068, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\FontAwesome.WPF.5.0.3-alpha\lib\FontAwesome.WPF.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Gma.System.MouseKeyHook, Version=5.4.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\MouseKeyHook.5.4.0\lib\net40\Gma.System.MouseKeyHook.dll</HintPath>

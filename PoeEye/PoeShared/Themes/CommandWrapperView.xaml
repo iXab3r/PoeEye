@@ -15,12 +15,13 @@
     </ResourceDictionary.MergedDictionaries>
 
     <DataTemplate DataType="{x:Type s:CommandWrapper}">
-        <Grid Margin="5,0">
+        <Grid>
             <Button Height="22"
                     Command="{Binding}"
                     Focusable="False"
                     IsDefault="{Binding Path=(s:CommandWrapperHelper.IsDefault), RelativeSource={RelativeSource Self}}"
                     HorizontalAlignment="Stretch"
+                    FontFamily="{StaticResource FontAwesome}"
                     Content="{Binding Path=(s:CommandWrapperHelper.Text), RelativeSource={RelativeSource Self}}"
                     CommandParameter="{Binding Path=(s:CommandWrapperHelper.CommandParameter), RelativeSource={RelativeSource Self}}" />
 

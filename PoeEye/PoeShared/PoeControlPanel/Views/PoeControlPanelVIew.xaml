@@ -38,10 +38,10 @@
                 </materialDesign:PopupBox.ToggleContent>
                 <StackPanel Orientation="Vertical">
                     <Button ToolTip="Lock all"
-                            fa:Awesome.Content="Lock"
+                            Content="&#xF07C;"
                             Command="{Binding LockAllWindowsCommand}" />
                     <Button ToolTip="Unlock all"
-                            fa:Awesome.Content="Unlock"
+                            Content="&#xF09C;"
                             Command="{Binding UnlockAllWindowsCommand}" />
                 </StackPanel>
             </materialDesign:PopupBox>
