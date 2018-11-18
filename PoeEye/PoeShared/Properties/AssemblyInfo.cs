@@ -61,8 +61,8 @@ using RestEase;
 
 [assembly: XmlnsDefinition("http://coderush.net/poeeye/", "PoeShared.Converters")]
 
-[assembly: XmlnsDefinition("http://coderush.net/poeeye/", "PoeShared.Resources")]
-[assembly: XmlnsDefinition("http://coderush.net/poeeye/", "PoeShared.Resources.Notifications")]
+[assembly: XmlnsDefinition("http://coderush.net/poeeye/", "PoeShared.Audio")]
+[assembly: XmlnsDefinition("http://coderush.net/poeeye/", "PoeShared.Audio.ViewModels")]
 
 [assembly: XmlnsDefinition("http://coderush.net/poeeye/", "PoeShared.UI")]
 [assembly: XmlnsDefinition("http://coderush.net/poeeye/", "PoeShared.UI.Controls")]

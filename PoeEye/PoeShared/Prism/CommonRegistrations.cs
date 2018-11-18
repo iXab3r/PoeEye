@@ -5,6 +5,8 @@ using System.Reactive.Concurrency;
 using System.Text.RegularExpressions;
 using Gma.System.MouseKeyHook;
 using PoeShared.Audio;
+using PoeShared.Audio.Services;
+using PoeShared.Audio.ViewModels;
 using PoeShared.Common;
 using PoeShared.Communications;
 using PoeShared.Converters;
@@ -14,6 +16,7 @@ using PoeShared.PoeDatabase;
 using PoeShared.PoeDatabase.PoeNinja;
 using PoeShared.PoeTrade;
 using PoeShared.PoeTrade.Query;
+using PoeShared.Resources.Notifications;
 using PoeShared.Scaffolding;
 using PoeShared.Scaffolding.WPF;
 using PoeShared.StashApi;
@@ -52,10 +55,11 @@ namespace PoeShared.Prism
                 .RegisterSingleton<IConverter<string, PoePrice>>(new InjectionFactory(x => StringToPoePriceConverter.Instance))
                 .RegisterSingleton<IKeyboardEventsSource>(
                     new InjectionFactory(x => x.Resolve<KeyboardEventsSource>(new DependencyOverride(typeof(IKeyboardMouseEvents), Hook.GlobalEvents()))))
-                .RegisterSingleton<IAudioNotificationsManager, AudioNotificationsManager>()
                 .RegisterSingleton<ISchedulerProvider, SchedulerProvider>()
                 .RegisterSingleton<IClipboardManager, ClipboardManager>()
                 .RegisterSingleton<IConfigSerializer, JsonConfigSerializer>()
+                .RegisterSingleton<IAudioPlayer, AudioPlayer>()
+                .RegisterSingleton<IAudioNotificationsManager, AudioNotificationsManager>()
                 .RegisterSingleton<IOverlayWindowController, OverlayWindowController>(WellKnownWindows.PathOfExileWindow);
 
             Container
@@ -92,6 +96,20 @@ namespace PoeShared.Prism
             Container.RegisterOverlayController(
                 WellKnownOverlays.AllWindowsLayeredOverlay,
                 WellKnownWindows.AllWindows);
+            
+            Container
+                .RegisterType<ISoundLibrarySource>(
+                    new ContainerControlledLifetimeManager(),
+                    new InjectionFactory(
+                        unity => unity.Resolve<ComplexSoundLibrary>(
+                            new DependencyOverride<ISoundLibrarySource[]>(
+                                new ISoundLibrarySource[]
+                                {
+                                    unity.Resolve<FileSoundLibrarySource>(),
+                                    unity.Resolve<EmbeddedSoundLibrarySource>()
+                                }
+                            )
+                        )));
 
             Container
                 .RegisterType<IPoeDatabaseReader>(

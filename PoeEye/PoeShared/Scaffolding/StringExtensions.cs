@@ -4,6 +4,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using Guards;
 
 namespace PoeShared.Scaffolding
@@ -80,6 +81,16 @@ namespace PoeShared.Scaffolding
             }
 
             return null;
+        }
+        
+        /// <summary>
+        /// By default, pascalize converts strings to UpperCamelCase also removing underscores
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        public static string Pascalize(this string input)
+        {
+            return input.Length > 0 ? input.Substring(0, 1).ToUpper() + input.Substring(1) : input;
         }
 
         public static Uri ToUriOrDefault(this string str)

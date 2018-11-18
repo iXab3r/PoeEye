@@ -1,8 +1,8 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:audio="clr-namespace:PoeShared.Audio;assembly=PoeShared"
-                    xmlns:viewModels="clr-namespace:PoeShared.UI.ViewModels"
-                    xmlns:controls="clr-namespace:PoeShared.Scaffolding.WPF.Controls">
+                    xmlns:controls="clr-namespace:PoeShared.Scaffolding.WPF.Controls"
+                    xmlns:services="clr-namespace:PoeShared.Audio.Services"
+                    xmlns:viewModels="clr-namespace:PoeShared.Audio.ViewModels">
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
@@ -28,7 +28,7 @@
                                 <Setter Property="Content" Value="&#xf028;" />
                             </Trigger>
                             <DataTrigger Binding="{Binding SelectedValue}"
-                                         Value="{x:Static audio:AudioNotificationType.Silence}">
+                                         Value="{x:Static services:AudioNotificationType.Silence}">
                                 <Setter Property="Background" Value="{StaticResource ControlsDisabledBrush}" />
                             </DataTrigger>
                         </Style.Triggers>
