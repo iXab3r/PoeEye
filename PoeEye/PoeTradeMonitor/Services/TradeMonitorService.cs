@@ -10,6 +10,7 @@ using PoeEye.TradeMonitor.Models;
 using PoeEye.TradeMonitor.Modularity;
 using PoeEye.TradeMonitor.Services.Notifications;
 using PoeShared.Audio;
+using PoeShared.Audio.Services;
 using PoeShared.Common;
 using PoeShared.Modularity;
 using PoeShared.PoeTrade;

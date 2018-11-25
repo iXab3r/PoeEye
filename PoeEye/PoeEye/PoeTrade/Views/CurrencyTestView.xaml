@@ -1,16 +1,16 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:sharedViewModels="clr-namespace:PoeShared.UI.ViewModels">
+                    xmlns:viewModels="clr-namespace:PoeEye.PoeTrade.ViewModels">
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Converters.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
-    <DataTemplate x:Key="CurrencyTestTemplateKey" DataType="{x:Type sharedViewModels:CurrencyTestViewModel}">
+    <DataTemplate x:Key="CurrencyTestTemplateKey" DataType="{x:Type viewModels:CurrencyTestViewModel}">
         <Grid>
             <ItemsControl ItemsSource="{Binding Items}">
                 <ItemsControl.ItemTemplate>
-                    <DataTemplate DataType="{x:Type sharedViewModels:CurrencyInfo}">
+                    <DataTemplate DataType="{x:Type viewModels:CurrencyInfo}">
                         <DockPanel LastChildFill="True">
                             <ContentPresenter Content="{Binding Price}" MinWidth="240" />
                             <TextBox Text="{Binding AliasesList, Mode=OneWay}" IsReadOnly="True" />

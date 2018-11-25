@@ -8,6 +8,7 @@ using System.Windows.Input;
 using Guards;
 using JetBrains.Annotations;
 using PoeShared.Audio;
+using PoeShared.Audio.Services;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
 using PoeWhisperMonitor;

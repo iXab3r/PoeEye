@@ -37,7 +37,6 @@
                                     FalseValue="Collapsed" />
 
     <eyeConverters:BoolInversionConverter x:Key="NotConverter" />
-    <eyeConverters:StringToPoePriceConverter x:Key="StringToPoePriceConverter" />
 
     <eyeConverters:ObjectToTypeConverter x:Key="ObjectToTypeConverter" />
 

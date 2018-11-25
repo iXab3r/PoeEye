@@ -6,6 +6,7 @@ using Guards;
 using JetBrains.Annotations;
 using PoeShared.Audio.Services;
 using PoeShared.Scaffolding;
+using PoeShared.Scaffolding.WPF;
 using Prism.Commands;
 using ReactiveUI;
 
@@ -87,6 +88,12 @@ namespace PoeShared.Audio.ViewModels
         {
             get => selectedValue;
             set => this.RaiseAndSetIfChanged(ref selectedValue, value);
+        }
+
+        public AudioNotificationType SelectedItem
+        {
+            get => SelectedValue.ParseEnumSafe<AudioNotificationType>();
+            set => SelectedValue = value.ToString();
         }
 
         public IReactiveList<object> Items { get; }

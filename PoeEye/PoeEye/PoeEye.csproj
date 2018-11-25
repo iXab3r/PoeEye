@@ -221,8 +221,9 @@
     <Reference Include="TypeConverter, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b1d2d39c48564dfb, processorArchitecture=MSIL">
       <HintPath>..\packages\TypeConverter.1.0.22\lib\portable-net45+wp8+wpa81+win81+netcore45+monoandroid1+xamarin.ios10\TypeConverter.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.Abstractions, Version=3.3.0.0, Culture=neutral, PublicKeyToken=6d32ff45e0ccc69f, processorArchitecture=MSIL">
-      <HintPath>..\packages\Unity.Abstractions.3.3.0\lib\net45\Unity.Abstractions.dll</HintPath>
+    <Reference Include="Unity.Abstractions, Version=3.3.1.0, Culture=neutral, PublicKeyToken=6d32ff45e0ccc69f">
+      <HintPath>..\packages\Unity.Abstractions.3.3.1\lib\net46\Unity.Abstractions.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Unity.Configuration, Version=5.2.5.0, Culture=neutral, PublicKeyToken=6d32ff45e0ccc69f, processorArchitecture=MSIL">
       <HintPath>..\packages\Unity.5.8.11\lib\net46\Unity.Configuration.dll</HintPath>
@@ -296,6 +297,7 @@
     <Compile Include="PoeTrade\Updater\ApplicationUpdaterModel.cs" />
     <Compile Include="PoeTrade\Updater\ApplicationUpdaterViewModel.cs" />
     <Compile Include="PoeTrade\Updater\IApplicationUpdaterModel.cs" />
+    <Compile Include="PoeTrade\ViewModels\CurrencyTestViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\IMainWindowTabViewModel.cs" />
     <Compile Include="PoeTrade\Shell\ViewModels\IMainWindowViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\IPoeApiSelectorViewModel.cs" />
@@ -416,6 +418,14 @@
       <Project>{5ccdf7f6-c2b0-4ec4-b921-4313564bb13a}</Project>
       <Name>PoeEye.StashRealtimeApi</Name>
     </ProjectReference>
+    <ProjectReference Include="..\PoeShared.Chromium\PoeShared.Chromium.csproj">
+      <Project>{6dcd5f8f-c1d8-49e6-bfd7-af50ec8107ab}</Project>
+      <Name>PoeShared.Chromium</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PoeShared.PathOfExile\PoeShared.PathOfExile.csproj">
+      <Project>{e8fb0101-f7df-46fa-8222-d4c9ca9289c1}</Project>
+      <Name>PoeShared.PathOfExile</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PoeShared\PoeShared.csproj">
       <Project>{12DF53DD-7144-4D2D-B7A1-B4BC5BBDFB69}</Project>
       <Name>PoeShared</Name>
@@ -441,6 +451,9 @@
     <Page Include="PoeTrade\Updater\ApplicationUpdaterView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="PoeTrade\Views\CurrencyTestView.xaml">
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="PoeTrade\Views\PoeApiSelectorView.xaml">
       <Generator>MSBuild:Compile</Generator>

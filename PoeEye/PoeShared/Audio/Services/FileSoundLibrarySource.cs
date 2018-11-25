@@ -21,12 +21,13 @@ namespace PoeShared.Audio.Services
         public FileSoundLibrarySource()
         {
             var extensions = GetSupportedExtensions();
-            var sources = ResourceDirectory
+            var sources = ResourceDirectory.Exists ? 
+               ResourceDirectory
                 .EnumerateFiles()
                 .Select(x => new{ FilePath = x.FullName, SourceName = Path.GetFileNameWithoutExtension(x.Name) })
                 .Where(x => extensions.Any(ext => string.Equals(ext, Path.GetExtension(x.FilePath), StringComparison.OrdinalIgnoreCase)))
                 .Select(x => x.SourceName)
-                .ToArray();
+                .ToArray() : new string[0];
             SourceName = sources;
             
             Log.Debug($"Source name list(directory: {ResourceDirectory.FullName}):\r\n {sources.DumpToText()}");

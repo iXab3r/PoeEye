@@ -1,11 +1,27 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Linq;
+using Common.Logging;
 
 namespace PoeShared.Scaffolding.WPF
 {
     public static class EnumHelper
     {
+        private static readonly ILog Log = LogManager.GetLogger(typeof(EnumHelper));
+        
+        public static TEnum ParseEnumSafe<TEnum>(this string instance, TEnum defaultValue = default(TEnum)) where TEnum : struct
+        {
+            if (Enum.TryParse(instance, out TEnum result))
+            {
+                return result;
+            }
+
+            Log.Warn($"Failed to parse enum value '{instance}'(isEmpty: {string.IsNullOrEmpty(instance)}), defaulting to {defaultValue}");
+            result = defaultValue;
+
+            return result;
+        }
+        
         public static EnumValueWithDescription[] GetValuesAndDescriptions(Type enumType)
         {
             var values = Enum.GetValues(enumType).Cast<object>();

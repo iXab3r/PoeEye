@@ -38,6 +38,7 @@ namespace PoeEye.PoeTrade.ViewModels
             [NotNull] IClock clock,
             [NotNull] IPoeLeagueApiClient leagueApiClient,
             [NotNull] IPoeEconomicsSource economicsSource,
+            [NotNull] IFactory<CurrencyTestViewModel> currencyTestViewModelFactory,
             [NotNull] IConfigProvider<PoeEyeMainConfig> mainConfigProvider,
             [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler,
             [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler)
@@ -45,6 +46,7 @@ namespace PoeEye.PoeTrade.ViewModels
             Guard.ArgumentNotNull(clock, nameof(clock));
             Guard.ArgumentNotNull(leagueApiClient, nameof(leagueApiClient));
             Guard.ArgumentNotNull(economicsSource, nameof(economicsSource));
+            Guard.ArgumentNotNull(currencyTestViewModelFactory, nameof(currencyTestViewModelFactory));
             Guard.ArgumentNotNull(mainConfigProvider, nameof(mainConfigProvider));
             Guard.ArgumentNotNull(uiScheduler, nameof(uiScheduler));
             Guard.ArgumentNotNull(bgScheduler, nameof(bgScheduler));
@@ -54,7 +56,7 @@ namespace PoeEye.PoeTrade.ViewModels
             this.economicsSource = economicsSource;
             if (AppArguments.Instance.IsDebugMode)
             {
-                CurrencyTest = new CurrencyTestViewModel();
+                CurrencyTest = currencyTestViewModelFactory.Create();
             }
 
             GetEconomicsCommand = CommandWrapper.Create(

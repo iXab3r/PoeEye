@@ -12,16 +12,9 @@ using PoeShared.Communications;
 using PoeShared.Converters;
 using PoeShared.Modularity;
 using PoeShared.Native;
-using PoeShared.PoeDatabase;
-using PoeShared.PoeDatabase.PoeNinja;
-using PoeShared.PoeTrade;
-using PoeShared.PoeTrade.Query;
 using PoeShared.Resources.Notifications;
 using PoeShared.Scaffolding;
 using PoeShared.Scaffolding.WPF;
-using PoeShared.StashApi;
-using PoeShared.StashApi.DataTypes;
-using PoeShared.StashApi.ProcurementLegacy;
 using PoeShared.UI.Models;
 using PoeShared.UI.ViewModels;
 using ProxyProvider;
@@ -43,16 +36,11 @@ namespace PoeShared.Prism
                 .RegisterSingleton<IClock, Clock>()
                 .RegisterSingleton<PoeEyeModulesRegistrator>(typeof(IPoeEyeModulesRegistrator), typeof(IPoeEyeModulesEnumerator))
                 .RegisterSingleton(typeof(IConfigProvider<>), typeof(GenericConfigProvider<>))
-                .RegisterSingleton<IEqualityComparer<IPoeItem>, PoeItemEqualityComparer>()
                 .RegisterSingleton<IConverter<NameValueCollection, string>, NameValueCollectionToQueryStringConverter>()
                 .RegisterSingleton<IConverter<NameValueCollection, IEnumerable<KeyValuePair<string, string>>>, NameValueCollectionToQueryStringConverter>()
                 .RegisterSingleton<IProxyProvider>(new InjectionFactory(unity => new GenericProxyProvider()))
                 .RegisterSingleton<IRandomNumberGenerator, RandomNumberGenerator>()
                 .RegisterSingleton<IImagesCacheService, ImagesCacheService>()
-                .RegisterSingleton<GearTypeAnalyzer>(typeof(IGearTypeAnalyzer), typeof(IItemTypeAnalyzer))
-                .RegisterSingleton<IPoeLeagueApiClient, PoeLeagueApiClient>()
-                .RegisterSingleton<PoeStashItemToPoeItemConverter>(typeof(IConverter<IStashItem, IPoeItem>), typeof(IConverter<IStashItem, PoeItem>))
-                .RegisterSingleton<IConverter<string, PoePrice>>(new InjectionFactory(x => StringToPoePriceConverter.Instance))
                 .RegisterSingleton<IKeyboardEventsSource>(
                     new InjectionFactory(x => x.Resolve<KeyboardEventsSource>(new DependencyOverride(typeof(IKeyboardMouseEvents), Hook.GlobalEvents()))))
                 .RegisterSingleton<ISchedulerProvider, SchedulerProvider>()
@@ -65,13 +53,8 @@ namespace PoeShared.Prism
             Container
                 .RegisterType<IScheduler>(WellKnownSchedulers.UI, new InjectionFactory(x => RxApp.MainThreadScheduler))
                 .RegisterType<IScheduler>(WellKnownSchedulers.Background, new InjectionFactory(x => RxApp.TaskpoolScheduler))
-                .RegisterType<IPoeLiveHistoryProvider, PoeLiveHistoryProvider>()
                 .RegisterType<IHttpClient, GenericHttpClient>()
-                .RegisterType<IPoeApiWrapper, PoeApiWrapper>()
                 .RegisterType<IPageParameterDataViewModel, PageParameterDataViewModel>()
-                .RegisterType<IPoeStashClient, PoeStashClient>()
-                .RegisterType<IPoeStaticDataProvider, PoeStaticDataProvider>()
-                .RegisterType<IPoeEconomicsSource, PoeNinjaDatabaseReader>()
                 .RegisterType<IOverlayWindowController, OverlayWindowController>()
                 .RegisterType<IAudioNotificationSelectorViewModel, AudioNotificationSelectorViewModel>()
                 .RegisterType(typeof(IFactory<,,>), typeof(Factory<,,>))
@@ -107,20 +90,6 @@ namespace PoeShared.Prism
                                 {
                                     unity.Resolve<FileSoundLibrarySource>(),
                                     unity.Resolve<EmbeddedSoundLibrarySource>()
-                                }
-                            )
-                        )));
-
-            Container
-                .RegisterType<IPoeDatabaseReader>(
-                    new ContainerControlledLifetimeManager(),
-                    new InjectionFactory(
-                        unity => unity.Resolve<ComplexPoeDatabaseReader>(
-                            new DependencyOverride<IPoeDatabaseReader[]>(
-                                new IPoeDatabaseReader[]
-                                {
-                                    unity.Resolve<StaticPoeDatabaseReader>(),
-                                    unity.Resolve<PoeNinjaDatabaseReader>()
                                 }
                             )
                         )));

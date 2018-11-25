@@ -10,6 +10,7 @@ using JetBrains.Annotations;
 using PoeEye.ItemParser.Services;
 using PoeShared;
 using PoeShared.Audio;
+using PoeShared.Audio.Services;
 using PoeShared.Common;
 using PoeShared.Converters;
 using PoeShared.Native;

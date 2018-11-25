@@ -146,8 +146,9 @@
     <Reference Include="TypeConverter, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b1d2d39c48564dfb, processorArchitecture=MSIL">
       <HintPath>..\packages\TypeConverter.1.0.22\lib\portable-net45+wp8+wpa81+win81+netcore45+monoandroid1+xamarin.ios10\TypeConverter.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.Abstractions, Version=3.3.0.0, Culture=neutral, PublicKeyToken=6d32ff45e0ccc69f, processorArchitecture=MSIL">
-      <HintPath>..\packages\Unity.Abstractions.3.3.0\lib\net45\Unity.Abstractions.dll</HintPath>
+    <Reference Include="Unity.Abstractions, Version=3.3.1.0, Culture=neutral, PublicKeyToken=6d32ff45e0ccc69f">
+      <HintPath>..\packages\Unity.Abstractions.3.3.1\lib\net46\Unity.Abstractions.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Unity.Configuration, Version=5.2.5.0, Culture=neutral, PublicKeyToken=6d32ff45e0ccc69f, processorArchitecture=MSIL">
       <HintPath>..\packages\Unity.5.8.11\lib\net46\Unity.Configuration.dll</HintPath>
@@ -182,13 +183,7 @@
     <Compile Include="Audio\Services\SoundLibrarySourceBase.cs" />
     <Compile Include="Audio\ViewModels\AudioNotificationSelectorViewModel.cs" />
     <Compile Include="Audio\ViewModels\IAudioNotificationSelectorViewModel.cs" />
-    <Compile Include="Common\ItemPosition.cs" />
-    <Compile Include="Common\PoeItemBuilder.cs" />
-    <Compile Include="Common\PoeModOrigin.cs" />
-    <Compile Include="Common\PoeItemModificatins.cs" />
     <Compile Include="Common\TriState.cs" />
-    <Compile Include="Common\PoeItemVerificationState.cs" />
-    <Compile Include="Common\PoeTradeState.cs" />
     <Compile Include="Converters\BoolInversionConverter.cs" />
     <Compile Include="Converters\ConverterHelpers.cs" />
     <Compile Include="Converters\ExceptionToMessageConverter.cs" />
@@ -198,7 +193,6 @@
     <Compile Include="Converters\NullToBoolConverter.cs" />
     <Compile Include="Converters\NullToVisibilityConverter.cs" />
     <Compile Include="Converters\ObjectToTypeConverter.cs" />
-    <Compile Include="Converters\PoeStashItemToPoeItemConverter.cs" />
     <Compile Include="Converters\SafeDataConverter.cs" />
     <Compile Include="Converters\TimeSpanToHumanReadableStringConverter.cs" />
     <Compile Include="LogExtensions.cs" />
@@ -221,15 +215,6 @@
     <Compile Include="Native\SafeKeyboardMouseEvents.cs" />
     <Compile Include="Native\UnsafeNative.cs" />
     <Compile Include="Native\WindowTracker.cs" />
-    <Compile Include="PoeControlPanel\Modularity\PoeControlPanelConfig.cs" />
-    <Compile Include="PoeControlPanel\Modularity\PoeControlPanelModule.cs" />
-    <Compile Include="PoeControlPanel\Prism\ControlPanelBootstrapper.cs" />
-    <Compile Include="PoeControlPanel\ViewModels\PoeControlPanelViewModel.cs" />
-    <Compile Include="PoeDatabase\IPoeEconomicsSource.cs" />
-    <Compile Include="PoeTrade\IPoeItemViewModelFactory.cs" />
-    <Compile Include="PoeTrade\IPoePriceCalculcator.cs" />
-    <Compile Include="PoeTrade\IPoeStaticDataSource.cs" />
-    <Compile Include="PoeTrade\Query\IPoeStaticDataProvider.cs" />
     <Compile Include="Prism\PoeSharedModule.cs" />
     <Compile Include="Resources\Notifications\EmbeddedSoundLibrarySource.cs" />
     <Compile Include="Scaffolding\ChangeSetExtensions.cs" />
@@ -240,9 +225,7 @@
     <Compile Include="Scaffolding\Fallback.cs" />
     <Compile Include="Scaffolding\IntPtrExtensions.cs" />
     <Compile Include="Scaffolding\KeyEventArgsExtensions.cs" />
-    <Compile Include="Scaffolding\PoeItemExtensions.cs" />
     <Compile Include="Scaffolding\ReactiveObjectExtensions.cs" />
-    <Compile Include="Scaffolding\RestEaseResponseExtensions.cs" />
     <Compile Include="Scaffolding\StreamExtensions.cs" />
     <Compile Include="Scaffolding\WPF\AccessKeyScoper.cs" />
     <Compile Include="Scaffolding\WPF\CommandWrapper.cs" />
@@ -252,62 +235,11 @@
     <Compile Include="Scaffolding\WPF\IPageParameterDataViewModel.cs" />
     <Compile Include="Scaffolding\WPF\MappingTemplateSelector.cs" />
     <Compile Include="Scaffolding\WPF\StackPanelEx.cs" />
-    <Compile Include="StashApi\DataTypes\PoeItemRarityWrapper.cs" />
-    <Compile Include="StashApi\DataTypes\StashItemAdditionalProperty.cs" />
-    <Compile Include="StashApi\DataTypes\Character.cs" />
-    <Compile Include="StashApi\DataTypes\Colour.cs" />
-    <Compile Include="StashApi\DataTypes\GearType.cs" />
-    <Compile Include="StashApi\DataTypes\ICharacter.cs" />
-    <Compile Include="StashApi\DataTypes\IInventory.cs" />
-    <Compile Include="StashApi\DataTypes\IStashItem.cs" />
-    <Compile Include="StashApi\DataTypes\ILeague.cs" />
-    <Compile Include="StashApi\DataTypes\Inventory.cs" />
-    <Compile Include="StashApi\DataTypes\IStash.cs" />
-    <Compile Include="StashApi\DataTypes\IStashTab.cs" />
-    <Compile Include="StashApi\DataTypes\StashItem.cs" />
-    <Compile Include="StashApi\DataTypes\League.cs" />
-    <Compile Include="StashApi\DataTypes\StashItemExtendedInfo.cs" />
-    <Compile Include="StashApi\DataTypes\StashItemProperty.cs" />
-    <Compile Include="StashApi\DataTypes\StashItemSocket.cs" />
-    <Compile Include="StashApi\DataTypes\Stash.cs" />
-    <Compile Include="StashApi\DataTypes\StashTabType.cs" />
-    <Compile Include="StashApi\DataTypes\Tab.cs" />
-    <Compile Include="StashApi\IPoeLeagueApiClient.cs" />
-    <Compile Include="StashApi\IPoeStashClient.cs" />
-    <Compile Include="StashApi\PoeLeagueApiClient.cs" />
-    <Compile Include="StashApi\PoeStashClient.cs" />
-    <Compile Include="StashApi\ProcurementLegacy\GearTypeAnalyzer.cs" />
-    <Compile Include="StashApi\ProcurementLegacy\IGearTypeAnalyzer.cs" />
-    <Compile Include="StashApi\ProcurementLegacy\IItemTypeAnalyzer.cs" />
-    <Compile Include="StashApi\ProcurementLegacy\ItemTypeInfo.cs" />
-    <Compile Include="UI\Controls\ExtendedTextEditor.cs" />
-    <Compile Include="UI\Models\PageResponse.cs" />
     <Compile Include="Clock.cs" />
-    <Compile Include="Common\IPoeCurrency.cs" />
-    <Compile Include="Common\IPoeItem.cs" />
-    <Compile Include="Common\IPoeItemMod.cs" />
-    <Compile Include="Common\IPoeItemType.cs" />
-    <Compile Include="Common\IPoeLinksInfo.cs" />
-    <Compile Include="Common\KnownCurrencyNameList.cs" />
-    <Compile Include="Common\PoeBuyoutMode.cs" />
-    <Compile Include="Common\PoeCurrency.cs" />
-    <Compile Include="Common\PoeItem.cs" />
-    <Compile Include="Common\PoeItemEqualityComparer.cs" />
-    <Compile Include="Common\PoeItemRarity.cs" />
-    <Compile Include="Common\PoeItemMod.cs" />
-    <Compile Include="Common\PoeItemModEqualityComparer.cs" />
-    <Compile Include="Common\PoeItemType.cs" />
-    <Compile Include="Common\PoeLinksInfo.cs" />
-    <Compile Include="Common\PoeModType.cs" />
-    <Compile Include="Common\PoePrice.cs" />
-    <Compile Include="Common\PoeQueryModsGroup.cs" />
     <Compile Include="Communications\GenericHttpClient.cs" />
     <Compile Include="Communications\IHttpClient.cs" />
     <Compile Include="Communications\NameValueCollectionToQueryStringConverter.cs" />
-    <Compile Include="Converters\StringToPoePriceConverter.cs" />
-    <Compile Include="Converters\PriceToImageUriConverter.cs" />
     <Compile Include="Converters\TwoNumbersToSizeConverter.cs" />
-    <Compile Include="Exceptions\CaptchaException.cs" />
     <Compile Include="IClock.cs" />
     <Compile Include="IRandomNumberGenerator.cs" />
     <Compile Include="SharedLog.cs" />
@@ -329,40 +261,6 @@
     <Compile Include="Native\OverlayWindowViewModel.cs" />
     <Compile Include="Native\TransparentWindow.cs" />
     <Compile Include="Native\WindowsServices.cs" />
-    <Compile Include="PoeDatabase\ComplexPoeDatabaseReader.cs" />
-    <Compile Include="PoeDatabase\IPoeDatabaseReader.cs" />
-    <Compile Include="PoeDatabase\PoeNinja\PoeNinjaDatabaseReader.cs" />
-    <Compile Include="PoeDatabase\StaticPoeDatabaseReader.cs" />
-    <Compile Include="PoeTrade\IPoeApi.cs" />
-    <Compile Include="PoeTrade\IPoeApiWrapper.cs" />
-    <Compile Include="PoeTrade\IPoeItemVerifier.cs" />
-    <Compile Include="PoeTrade\IPoeLiveHistoryProvider.cs" />
-    <Compile Include="PoeTrade\IPoeQueryInfo.cs" />
-    <Compile Include="PoeTrade\PoeApiBase.cs" />
-    <Compile Include="PoeTrade\PoeApiWrapper.cs" />
-    <Compile Include="PoeTrade\PoeLiveHistoryProvider.cs" />
-    <Compile Include="PoeTrade\PoeQueryInfo.cs" />
-    <Compile Include="PoeTrade\Query\IPoeQuery.cs" />
-    <Compile Include="PoeTrade\Query\IPoeQueryFloatArgument.cs" />
-    <Compile Include="PoeTrade\Query\IPoeQueryIntArgument.cs" />
-    <Compile Include="PoeTrade\Query\IPoeQueryModArgument.cs" />
-    <Compile Include="PoeTrade\Query\IPoeQueryModsGroup.cs" />
-    <Compile Include="PoeTrade\Query\IPoeQueryRangeModArgument.cs" />
-    <Compile Include="PoeTrade\Query\IPoeQueryResult.cs" />
-    <Compile Include="PoeTrade\Query\IPoeQueryStringArgument.cs" />
-    <Compile Include="PoeTrade\Query\IPoeStaticData.cs" />
-    <Compile Include="PoeTrade\Query\PoeQuery.cs" />
-    <Compile Include="PoeTrade\Query\IPoeQueryArgument.cs" />
-    <Compile Include="PoeTrade\Query\PoeQueryArgumentBase.cs" />
-    <Compile Include="PoeTrade\Query\PoeQueryFloatArgument.cs" />
-    <Compile Include="PoeTrade\Query\PoeStaticDataProvider.cs" />
-    <Compile Include="PoeTrade\Query\PoeQueryIntArgument.cs" />
-    <Compile Include="PoeTrade\Query\PoeQueryModArgument.cs" />
-    <Compile Include="PoeTrade\Query\PoeQueryModsGroupType.cs" />
-    <Compile Include="PoeTrade\Query\PoeQueryRangeModArgument.cs" />
-    <Compile Include="PoeTrade\Query\PoeQueryResult.cs" />
-    <Compile Include="PoeTrade\Query\PoeQueryStringArgument.cs" />
-    <Compile Include="PoeTrade\Query\PoeStaticData.cs" />
     <Compile Include="Prism\CommonRegistrations.cs" />
     <Compile Include="Prism\Factory`2.cs" />
     <Compile Include="Prism\Factory.cs" />
@@ -386,15 +284,16 @@
     <Compile Include="Scaffolding\ObservableExtensions.cs" />
     <Compile Include="Scaffolding\StringExtensions.cs" />
     <Compile Include="Scaffolding\UnityContainerExtensions.cs" />
+    <Compile Include="Scaffolding\WPF\EnumHelper.cs" />
+    <Compile Include="Scaffolding\WPF\FocusHelper.cs" />
+    <Compile Include="UI\Controls\ExtendedTextEditor.cs" />
     <Compile Include="UI\Controls\MouseButtonsTooltip.xaml.cs">
       <DependentUpon>MouseButtonsTooltip.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Scaffolding\WPF\EnumHelper.cs" />
-    <Compile Include="Scaffolding\WPF\FocusHelper.cs" />
     <Compile Include="UI\Models\IImagesCacheService.cs" />
     <Compile Include="UI\Models\ImagesCacheService.cs" />
+    <Compile Include="UI\Models\PageResponse.cs" />
     <Compile Include="UI\UiConstants.cs" />
-    <Compile Include="UI\ViewModels\CurrencyTestViewModel.cs" />
     <Compile Include="UI\ViewModels\IImageViewModel.cs" />
     <Compile Include="UI\ViewModels\ImageViewModel.cs" />
     <Compile Include="UI\ViewModels\PageParameterDataViewModel.cs" />
@@ -403,10 +302,8 @@
     <None Include="app.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="AppReadme\Compare-NET-Objects-Help.chm" />
     <None Include="FodyWeavers.xml" />
     <EmbeddedResource Include="Resources\Notifications\mercury.wav" />
-    <EmbeddedResource Include="StashApi\ProcurementLegacy\Data.xml" />
     <EmbeddedResource Include="Resources\Notifications\wob.wav" />
     <EmbeddedResource Include="Resources\Notifications\whistle.wav" />
     <EmbeddedResource Include="Resources\Notifications\whisper.wav" />
@@ -419,7 +316,6 @@
     <Resource Include="Resources\mainIcon.png" />
     <Resource Include="Resources\mouse-device-left-click-control.png" />
     <Resource Include="Resources\mouse-device-right-click-control.png" />
-    <EmbeddedResource Include="PoeDatabase\PoeTradeUniques.lst" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="Audio\Views\AudioNotificationTypeSelectorView.xaml">
@@ -427,10 +323,6 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Converter.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="PoeControlPanel\Views\PoeControlPanelVIew.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -462,10 +354,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="UI\Controls\MouseButtonsTooltip.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Themes\Converters.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -482,708 +370,18 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="UI\Views\CurrencyTestView.xaml">
+    <Page Include="UI\Controls\MouseButtonsTooltip.xaml">
       <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
     </Page>
     <Page Include="UI\Views\ImageView.xaml">
       <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
     </Page>
     <Page Include="UI\Views\PageParametersView.xaml">
       <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="PoeControlPanel\Models\" />
-    <Folder Include="StashApi\ProcurementLegacy\Runners\" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="packages.config" />
-    <None Include="Resources\Currencies\Alchemy_Shard.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Alteration_Shard.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Apprentice_Sextant.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Armourers_Scrap.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Blacksmiths_Whetstone.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Blessed_Orb.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Blessing_of_Chayula.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Blessing_of_Esh.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Blessing_of_Tul.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Blessing_of_Uul-Netol.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Blessing_of_Xoph.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Cartographers_Chisel.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Chaos_Orb.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Chayulas_Breachstone.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Chromatic_Orb.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Deafening_Essence_of_Anger_inventory_icon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Deafening_Essence_of_Anguish_inventory_icon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Deafening_Essence_of_Contempt_inventory_icon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Deafening_Essence_of_Doubt_inventory_icon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Deafening_Essence_of_Dread_inventory_icon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Deafening_Essence_of_Envy_inventory_icon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Deafening_Essence_of_Fear_inventory_icon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Deafening_Essence_of_Greed_inventory_icon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Deafening_Essence_of_Hatred_inventory_icon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Deafening_Essence_of_Loathing_inventory_icon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Deafening_Essence_of_Misery_inventory_icon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Deafening_Essence_of_Rage_inventory_icon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Deafening_Essence_of_Scorn_inventory_icon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Deafening_Essence_of_Sorrow_inventory_icon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Deafening_Essence_of_Spite_inventory_icon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Deafening_Essence_of_Suffering_inventory_icon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Deafening_Essence_of_Torment_inventory_icon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Deafening_Essence_of_Woe_inventory_icon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Deafening_Essence_of_Wrath_inventory_icon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Deafening_Essence_of_Zeal_inventory_icon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Divine_Orb.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Ebers_Key.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Eshs_Breachstone.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Essence_of_Delirium_inventory_icon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Essence_of_Horror_inventory_icon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Essence_of_Hysteria_inventory_icon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Essence_of_Insanity_inventory_icon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Eternal_Orb.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Exalted_Orb.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Fragment_of_the_Chimera.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Fragment_of_the_Hydra.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Fragment_of_the_Minotaur.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Fragment_of_the_Phoenix.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Fragment_Set.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Gemcutters_Prism.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Glassblowers_Bauble.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Inyas_Key.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Jewellers_Orb.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Journeyman_Sextant.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Key_Set.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Master_Sextant.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Mirror_of_Kalandra.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Mortal_Grief.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Mortal_Hope.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Mortal_Ignorance.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Mortal_Rage.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Mortal_Set.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Offering_to_the_Goddess.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Orb_of_Alchemy.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Orb_of_Alteration.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Orb_of_Augmentation.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Orb_of_Chance.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Orb_of_Fusing.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Orb_of_Regret.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Orb_of_Scouring.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Orb_of_Transmutation.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Perandus_Coin.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Portal_Scroll.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Regal_Orb.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Remnant_of_Corruption_inventory_icon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Sacrifice_at_Dawn.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Sacrifice_at_Dusk.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Sacrifice_at_Midnight.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Sacrifice_at_Noon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Sacrifice_Set.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Screaming_Essence_of_Anger_inventory_icon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Screaming_Essence_of_Anguish_inventory_icon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Screaming_Essence_of_Contempt_inventory_icon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Screaming_Essence_of_Doubt_inventory_icon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Screaming_Essence_of_Dread_inventory_icon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Screaming_Essence_of_Envy_inventory_icon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Screaming_Essence_of_Fear_inventory_icon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Screaming_Essence_of_Greed_inventory_icon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Screaming_Essence_of_Hatred_inventory_icon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Screaming_Essence_of_Loathing_inventory_icon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Screaming_Essence_of_Misery_inventory_icon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Screaming_Essence_of_Rage_inventory_icon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Screaming_Essence_of_Scorn_inventory_icon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Screaming_Essence_of_Sorrow_inventory_icon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Screaming_Essence_of_Spite_inventory_icon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Screaming_Essence_of_Suffering_inventory_icon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Screaming_Essence_of_Torment_inventory_icon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Screaming_Essence_of_Woe_inventory_icon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Screaming_Essence_of_Wrath_inventory_icon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Screaming_Essence_of_Zeal_inventory_icon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Scroll_Fragment.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Scroll_of_Wisdom.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Shrieking_Essence_of_Anger_inventory_icon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Shrieking_Essence_of_Anguish_inventory_icon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Shrieking_Essence_of_Contempt_inventory_icon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Shrieking_Essence_of_Doubt_inventory_icon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Shrieking_Essence_of_Dread_inventory_icon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Shrieking_Essence_of_Envy_inventory_icon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Shrieking_Essence_of_Fear_inventory_icon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Shrieking_Essence_of_Greed_inventory_icon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Shrieking_Essence_of_Hatred_inventory_icon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Shrieking_Essence_of_Loathing_inventory_icon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Shrieking_Essence_of_Misery_inventory_icon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Shrieking_Essence_of_Rage_inventory_icon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Shrieking_Essence_of_Scorn_inventory_icon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Shrieking_Essence_of_Sorrow_inventory_icon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Shrieking_Essence_of_Spite_inventory_icon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Shrieking_Essence_of_Suffering_inventory_icon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Shrieking_Essence_of_Torment_inventory_icon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Shrieking_Essence_of_Woe_inventory_icon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Shrieking_Essence_of_Wrath_inventory_icon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Shrieking_Essence_of_Zeal_inventory_icon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Silver_Coin.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Splinter_of_Chayula.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Splinter_of_Esh.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Splinter_of_Tul.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Splinter_of_Uul-Netol.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Splinter_of_Xoph.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Transmutation_Shard.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Tuls_Breachstone.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Unknown.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Uul-Netols_Breachstone.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Vaal_Orb.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Volkuurs_Key.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Xophs_Breachstone.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Currencies\Yriels_Key.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Resources\Currencies\Orb_of_Annulment_inventory_icon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -1,6 +1,6 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:common="clr-namespace:PoeShared.Common;assembly=PoeShared"
+                    xmlns:common="clr-namespace:PoeShared.Common;assembly=PoeShared.PathOfExile"
                     xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
                     xmlns:viewModels="clr-namespace:PoeEye.PoeTrade.ViewModels"
                     xmlns:utilities="clr-namespace:PoeEye.Utilities"
@@ -13,6 +13,7 @@
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Converters.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/PoeShared.PathOfExile;component/Themes/Converters.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
     <eye:FlagToVisibilityConverter x:Key="ItemShapedToVisibilityConverter" TrueValue="Visible" FalseValue="Collapsed"

@@ -9,10 +9,12 @@
                     xmlns:fa="http://schemas.fontawesome.io/icons/"
                     xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
                     xmlns:common="clr-namespace:PoeShared.Common;assembly=PoeShared"
-                    xmlns:eye="http://coderush.net/poeeye/">
+                    xmlns:eye="http://coderush.net/poeeye/"
+                    xmlns:commonPoe="clr-namespace:PoeShared.Common;assembly=PoeShared.PathOfExile">
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Generic.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/PoeShared.PathOfExile;component/Themes/Generic.xaml" />
         <ResourceDictionary Source="pack://application:,,,/PoeTradeMonitor;component/Themes/Styles.xaml" />
         <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.progressbar.xaml" />
         <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.button.xaml" />
@@ -371,24 +373,24 @@
 
                                                 <ControlTemplate.Triggers>
                                                     <DataTrigger Binding="{Binding VerificationState}"
-                                                                 Value="{x:Static common:PoeItemVerificationState.Unknown}">
+                                                                 Value="{x:Static commonPoe:PoeItemVerificationState.Unknown}">
                                                         <Setter TargetName="StateInProgress" Property="Visibility" Value="Collapsed" />
                                                         <Setter TargetName="StateSold" Property="Visibility" Value="Collapsed" />
                                                         <Setter TargetName="StateVerified" Property="Visibility" Value="Collapsed" />
                                                     </DataTrigger>
                                                     <DataTrigger Binding="{Binding VerificationState}"
-                                                                 Value="{x:Static common:PoeItemVerificationState.InProgress}">
+                                                                 Value="{x:Static commonPoe:PoeItemVerificationState.InProgress}">
                                                         <Setter TargetName="StateInProgress" Property="Visibility" Value="Visible" />
                                                         <Setter TargetName="StateSold" Property="Visibility" Value="Collapsed" />
                                                         <Setter TargetName="StateVerified" Property="Visibility" Value="Collapsed" />
                                                     </DataTrigger>
-                                                    <DataTrigger Binding="{Binding VerificationState}" Value="{x:Static common:PoeItemVerificationState.Sold}">
+                                                    <DataTrigger Binding="{Binding VerificationState}" Value="{x:Static commonPoe:PoeItemVerificationState.Sold}">
                                                         <Setter TargetName="StateInProgress" Property="Visibility" Value="Collapsed" />
                                                         <Setter TargetName="StateSold" Property="Visibility" Value="Visible" />
                                                         <Setter TargetName="StateVerified" Property="Visibility" Value="Collapsed" />
                                                     </DataTrigger>
                                                     <DataTrigger Binding="{Binding VerificationState}"
-                                                                 Value="{x:Static common:PoeItemVerificationState.Verified}">
+                                                                 Value="{x:Static commonPoe:PoeItemVerificationState.Verified}">
                                                         <Setter TargetName="StateInProgress" Property="Visibility" Value="Collapsed" />
                                                         <Setter TargetName="StateSold" Property="Visibility" Value="Collapsed" />
                                                         <Setter TargetName="StateVerified" Property="Visibility" Value="Visible" />

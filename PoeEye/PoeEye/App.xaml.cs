@@ -115,8 +115,8 @@ namespace PoeEye
                 reporter.Config.TakeScreenshot = false;
 
                 reporter.Config.SmtpFromAddress = $"[E] {Environment.UserName} @ {Environment.MachineName}";
-                reporter.Config.EmailReportAddress = AppArguments.PoeEyeMail;
-                reporter.Config.ContactEmail = AppArguments.PoeEyeMail;
+                reporter.Config.EmailReportAddress = AppArguments.Instance.AppSupportMail;
+                reporter.Config.ContactEmail = AppArguments.Instance.AppSupportMail;
                 reporter.Config.SmtpServer = "aspmx.l.google.com";
                 reporter.Config.SmtpPort = 25;
                 reporter.Config.SmtpUseSsl = true;
@@ -124,9 +124,9 @@ namespace PoeEye
                 reporter.Config.MainException = exception;
 
                 var configurationFilesToInclude = Directory
-                    .EnumerateFiles(AppArguments.AppDataDirectory, "*.cfg", SearchOption.TopDirectoryOnly);
+                    .EnumerateFiles(AppArguments.Instance.AppDataDirectory, "*.cfg", SearchOption.TopDirectoryOnly);
 
-                var logFilesToInclude = new DirectoryInfo(AppArguments.AppDataDirectory)
+                var logFilesToInclude = new DirectoryInfo(AppArguments.Instance.AppDataDirectory)
                                         .GetFiles("*.log", SearchOption.AllDirectories)
                                         .OrderByDescending(x => x.LastWriteTime)
                                         .Take(2)

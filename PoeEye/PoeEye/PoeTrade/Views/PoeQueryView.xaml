@@ -3,7 +3,7 @@
                     xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
                     xmlns:wpfControls="http://wpfcontrols.com/"
                     xmlns:System="clr-namespace:System;assembly=mscorlib"
-                    xmlns:common="clr-namespace:PoeShared.Common;assembly=PoeShared"
+                    xmlns:common="clr-namespace:PoeShared.Common;assembly=PoeShared.PathOfExile"
                     xmlns:editors="https://github.com/iXab3r/WpfAutoCompleteControls"
                     xmlns:viewModels="clr-namespace:PoeEye.PoeTrade.ViewModels"
                     xmlns:eye="clr-namespace:PoeShared.Scaffolding.WPF;assembly=PoeShared"

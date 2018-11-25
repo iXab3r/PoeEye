@@ -4,6 +4,7 @@ using Guards;
 using JetBrains.Annotations;
 using PoeEye.Config;
 using PoeShared.Audio;
+using PoeShared.Audio.Services;
 using PoeShared.Modularity;
 using PoeShared.Native;
 using PoeShared.Prism;

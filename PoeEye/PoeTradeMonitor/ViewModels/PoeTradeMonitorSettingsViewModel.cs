@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Guards;
@@ -6,8 +7,11 @@ using JetBrains.Annotations;
 using PoeEye.TradeMonitor.Models;
 using PoeEye.TradeMonitor.Modularity;
 using PoeEye.TradeMonitor.Services;
+using PoeShared.Audio.Services;
+using PoeShared.Audio.ViewModels;
 using PoeShared.Modularity;
 using PoeShared.Scaffolding;
+using PoeShared.Scaffolding.WPF;
 using PoeShared.UI.ViewModels;
 using Prism.Commands;
 using ReactiveUI;
@@ -61,7 +65,7 @@ namespace PoeEye.TradeMonitor.ViewModels
             config.CopyPropertiesTo(temporaryConfig);
 
             IsEnabled = config.IsEnabled;
-            AudioNotificationSelector.SelectedValue = config.NotificationType;
+            AudioNotificationSelector.SelectedValue = config.NotificationType.ToString();
 
             PredefinedMessages.Clear();
             config.PredefinedMessages.Select(x => new MacroMessageViewModel(x)).ForEach(PredefinedMessages.Add);
@@ -78,7 +82,7 @@ namespace PoeEye.TradeMonitor.ViewModels
                                                  .Select(x => x.ToMessage())
                                                  .ToList();
             temporaryConfig.IsEnabled = IsEnabled;
-            temporaryConfig.NotificationType = AudioNotificationSelector.SelectedValue;
+            temporaryConfig.NotificationType = AudioNotificationSelector.SelectedValue.ParseEnumSafe<AudioNotificationType>();
 
             var result = new PoeTradeMonitorConfig();
             temporaryConfig.CopyPropertiesTo(result);

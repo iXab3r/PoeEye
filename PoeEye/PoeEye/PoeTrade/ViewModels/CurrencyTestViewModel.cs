@@ -1,14 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using Guards;
+using PoeShared;
 using PoeShared.Common;
 using ReactiveUI;
 
-namespace PoeShared.UI.ViewModels
+namespace PoeEye.PoeTrade.ViewModels
 {
     public sealed class CurrencyTestViewModel
     {
-        public CurrencyTestViewModel()
+        public CurrencyTestViewModel(IRandomNumberGenerator rng)
         {
+            Guard.ArgumentNotNull(rng, nameof(rng));
             var currencyByAlias = new Dictionary<string, List<string>>();
 
             foreach (var kvp in KnownCurrencyNameList.CurrencyByAlias)
@@ -22,7 +25,6 @@ namespace PoeShared.UI.ViewModels
                 aliases.Add(kvp.Key);
             }
 
-            var rng = new RandomNumberGenerator();
             foreach (var currency in KnownCurrencyNameList.EnumerateKnownCurrencies())
             {
                 var price = new PoePrice(currency, rng.Next(1, 10));

@@ -5,11 +5,10 @@
                     xmlns:converters="clr-namespace:PoeEye.Converters"
                     xmlns:eye="http://coderush.net/poeeye/"
                     xmlns:fa="http://schemas.fontawesome.io/icons/"
-                    xmlns:common="clr-namespace:PoeShared.Common;assembly=PoeShared"
+                    xmlns:common="clr-namespace:PoeShared.Common;assembly=PoeShared.PathOfExile"
                     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
 
     <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="pack://application:,,,/PoeShared;component/UI/Views/CurrencyTestView.xaml" />
         <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.togglebutton.xaml" />
 
         <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.progressbar.xaml" />

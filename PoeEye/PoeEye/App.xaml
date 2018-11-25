@@ -40,6 +40,7 @@
                 <ResourceDictionary Source="PoeTrade/Views/ProxyProviderView.xaml" />
                 <ResourceDictionary Source="PoeTrade/Views/RecheckPeriodView.xaml" />
                 <ResourceDictionary Source="PoeTrade/Views/CurrencyView.xaml" />
+                <ResourceDictionary Source="PoeTrade/Views/CurrencyTestView.xaml" />
                 <ResourceDictionary Source="PoeTrade/Views/PoeLinksInfoView.xaml" />
                 <ResourceDictionary Source="PoeTrade/Views/PoeItemModView.xaml" />
                 <ResourceDictionary Source="PoeTrade/Views/PoeModView.xaml" />
