@@ -48,6 +48,7 @@ namespace PoeShared.Prism
                 .RegisterSingleton<IConfigSerializer, JsonConfigSerializer>()
                 .RegisterSingleton<IAudioPlayer, AudioPlayer>()
                 .RegisterSingleton<IAudioNotificationsManager, AudioNotificationsManager>()
+                .RegisterSingleton<IFactory<IWinEventHookWrapper, WinEventHookArguments>, WinEventHookWrapperFactory>()
                 .RegisterSingleton<IOverlayWindowController, OverlayWindowController>(WellKnownWindows.PathOfExileWindow);
 
             Container

@@ -210,11 +210,15 @@
     <Compile Include="Native\IOverlayConfig.cs" />
     <Compile Include="Native\IStringMatcher.cs" />
     <Compile Include="Native\IWindowTracker.cs" />
+    <Compile Include="Native\IWinEventHookWrapper.cs" />
     <Compile Include="Native\RegexStringMatcher.cs" />
     <Compile Include="Native\ResourceReader.cs" />
     <Compile Include="Native\SafeKeyboardMouseEvents.cs" />
     <Compile Include="Native\UnsafeNative.cs" />
     <Compile Include="Native\WindowTracker.cs" />
+    <Compile Include="Native\WinEventHookArguments.cs" />
+    <Compile Include="Native\WinEventHookWrapper.cs" />
+    <Compile Include="Native\WinEventHookWrapperFactory.cs" />
     <Compile Include="Prism\PoeSharedModule.cs" />
     <Compile Include="Resources\Notifications\EmbeddedSoundLibrarySource.cs" />
     <Compile Include="Scaffolding\ChangeSetExtensions.cs" />

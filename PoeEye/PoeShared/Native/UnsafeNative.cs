@@ -11,9 +11,40 @@ namespace PoeShared.Native
 
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         public static extern int GetKeyNameText(int lParam, [MarshalAs(UnmanagedType.LPWStr)] [Out] StringBuilder str, int size);
+        public delegate void WinEventDelegate(
+            IntPtr hWinEventHook, uint eventType, IntPtr hwnd, int idObject, int idChild, uint dwEventThread,
+            uint dwmsEventTime);
+
+            
+        [DllImport("user32.dll")]
+        public static extern IntPtr GetForegroundWindow();
+
+        [DllImport("user32.dll")]
+        private static extern int GetWindowText(IntPtr hWnd, StringBuilder text, int count);
+
+        [DllImport("user32.dll")]
+        public static extern IntPtr SetWinEventHook(uint eventMin, uint eventMax, IntPtr hmodWinEventProc,
+            WinEventDelegate lpfnWinEventProc, uint idProcess, uint idThread, uint dwFlags);
+
+        [DllImport("user32.dll")]
+        public static extern bool UnhookWinEvent(IntPtr hHook);
+
+        public static string GetWindowTitle(IntPtr hwnd)
+        {
+            const int nChars = 256;
+            var buff = new StringBuilder(nChars);
+
+            return GetWindowText(hwnd, buff, nChars) > 0
+                ? buff.ToString()
+                : null;
+        }
         
         public static class Constants
         {
+            public const uint WINEVENT_OUTOFCONTEXT = 0;
+            public const uint EVENT_OBJECT_LOCATIONCHANGE = 0x800B;
+            public const int EVENT_SYSTEM_FOREGROUND = 3;
+            
             [Flags]
             public enum RedrawWindowFlags : uint
             {
