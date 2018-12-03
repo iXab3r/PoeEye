@@ -9,7 +9,6 @@ using System.Windows.Input;
 using Guards;
 using PoeShared.Scaffolding;
 using PoeShared.Scaffolding.WPF;
-using Prism.Commands;
 using ReactiveUI;
 using Point = System.Windows.Point;
 using Size = System.Windows.Size;
@@ -18,6 +17,8 @@ namespace PoeShared.Native
 {
     public abstract class OverlayViewModelBase : DisposableReactiveObject, IOverlayViewModel
     {
+        private readonly CommandWrapper lockWindowCommand;
+        private readonly CommandWrapper unlockWindowCommand;
         private double actualHeight;
 
         private double actualWidth;
@@ -40,8 +41,6 @@ namespace PoeShared.Native
         private double top;
 
         private double width;
-        private readonly CommandWrapper unlockWindowCommand;
-        private readonly CommandWrapper lockWindowCommand;
 
         protected OverlayViewModelBase()
         {
@@ -54,7 +53,7 @@ namespace PoeShared.Native
                     unlockWindowCommand.RaiseCanExecuteChanged();
                 })
                 .AddTo(Anchors);
-            
+
             Title = GetType().ToString();
         }
 
@@ -75,7 +74,7 @@ namespace PoeShared.Native
         public ICommand UnlockWindowCommand => unlockWindowCommand;
 
         public ICommand LockWindowCommand => lockWindowCommand;
-        
+
         public double ActualHeight
         {
             get => actualHeight;

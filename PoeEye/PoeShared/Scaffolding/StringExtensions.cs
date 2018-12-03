@@ -4,7 +4,6 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 using Guards;
 
 namespace PoeShared.Scaffolding
@@ -34,16 +33,16 @@ namespace PoeShared.Scaffolding
 
             return null;
         }
-        
+
         /// <summary>
-        /// Perform a string split that also trims whitespace from each result and removes duplicats
+        ///     Perform a string split that also trims whitespace from each result and removes duplicats
         /// </summary>
         /// <param name="text"></param>
         /// <param name="separator"></param>
         /// <returns></returns>
         public static IEnumerable<string> SplitTrim(this string text, char separator)
         {
-            var separators = new[] { separator };
+            var separators = new[] {separator};
             return text.SplitTrim(separators);
         }
 
@@ -82,9 +81,9 @@ namespace PoeShared.Scaffolding
 
             return null;
         }
-        
+
         /// <summary>
-        /// By default, pascalize converts strings to UpperCamelCase also removing underscores
+        ///     By default, pascalize converts strings to UpperCamelCase also removing underscores
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>

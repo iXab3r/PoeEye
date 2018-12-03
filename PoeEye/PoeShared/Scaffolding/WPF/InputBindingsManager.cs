@@ -21,7 +21,7 @@ namespace PoeShared.Scaffolding.WPF
 
         public static DependencyProperty GetUpdatePropertySourceWhenEnterPressed(DependencyObject dp)
         {
-            return (DependencyProperty)dp.GetValue(UpdatePropertySourceWhenEnterPressedProperty);
+            return (DependencyProperty) dp.GetValue(UpdatePropertySourceWhenEnterPressedProperty);
         }
 
         private static void OnUpdatePropertySourceWhenEnterPressedPropertyChanged(DependencyObject dp, DependencyPropertyChangedEventArgs e)

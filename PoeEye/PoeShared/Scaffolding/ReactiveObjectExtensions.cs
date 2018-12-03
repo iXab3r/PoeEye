@@ -29,12 +29,13 @@ namespace PoeShared.Scaffolding
             var sourcePropertyName = new Lazy<string>(() => Reflection.ExpressionToPropertyNames(sourcePropertyExtractor.Body));
 
             return source
-                   .WhenAnyValue(sourcePropertyExtractor)
-                   .Subscribe(x =>
+                .WhenAnyValue(sourcePropertyExtractor)
+                .Subscribe(x =>
                 {
                     if (Log.IsTraceEnabled)
                     {
-                        Log.Trace($"[{typeof(TSource).Name}.{sourcePropertyName.Value} => {typeof(TTarget).Name}.{instancePropertyName.Value}] Bound property '{sourcePropertyName.Value}' (source {source}) fired, raising {instancePropertyName.Value} on {instance}");
+                        Log.Trace(
+                            $"[{typeof(TSource).Name}.{sourcePropertyName.Value} => {typeof(TTarget).Name}.{instancePropertyName.Value}] Bound property '{sourcePropertyName.Value}' (source {source}) fired, raising {instancePropertyName.Value} on {instance}");
                     }
 
                     instance.RaisePropertyChanged(instancePropertyName.Value);
@@ -54,8 +55,8 @@ namespace PoeShared.Scaffolding
             var instancePropertyName = new Lazy<string>(() => Reflection.ExpressionToPropertyNames(instancePropertyExtractor.Body));
 
             return instance
-                   .WhenAnyValue(sourcePropertyExtractor)
-                   .Subscribe(x => instance.RaisePropertyChanged(instancePropertyName.Value), Log.HandleException);
+                .WhenAnyValue(sourcePropertyExtractor)
+                .Subscribe(x => instance.RaisePropertyChanged(instancePropertyName.Value), Log.HandleException);
         }
     }
 }

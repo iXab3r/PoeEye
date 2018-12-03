@@ -50,7 +50,7 @@ namespace PoeShared.Modularity
                 Reload();
             }
 
-            return (TConfig)loadedConfigs.GetOrAdd(typeof(TConfig), key => (TConfig)Activator.CreateInstance(typeof(TConfig)));
+            return (TConfig) loadedConfigs.GetOrAdd(typeof(TConfig), key => (TConfig) Activator.CreateInstance(typeof(TConfig)));
         }
     }
 }

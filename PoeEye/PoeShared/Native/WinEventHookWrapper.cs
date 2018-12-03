@@ -1,10 +1,10 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Drawing;
 using System.Reactive.Disposables;
 using System.Reactive.Subjects;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
-using System.Windows.Forms;
 using Common.Logging;
 using PoeShared.Scaffolding;
 
@@ -13,9 +13,9 @@ namespace PoeShared.Native
     public sealed class WinEventHookWrapper : DisposableReactiveObject, IWinEventHookWrapper
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(WinEventHookWrapper));
+        private readonly UnsafeNative.WinEventDelegate eventDelegate;
 
         private readonly WinEventHookArguments hookArgs;
-        private readonly UnsafeNative.WinEventDelegate eventDelegate;
         private readonly ISubject<IntPtr> whenWindowEventTriggered = new Subject<IntPtr>();
 
         public WinEventHookWrapper(WinEventHookArguments hookArgs)
@@ -34,16 +34,18 @@ namespace PoeShared.Native
         {
             if (Log.IsTraceEnabled)
             {
-                Log.Trace($"[{hookArgs}] Event hook triggered, hWinEventHook: 0x{hWinEventHook.ToInt64():x8}, eventType: {eventType}, hwnd: 0x{hwnd.ToInt64():x8}, idObject: {idObject}, idChild: {idChild}, dwEventThread: {dwEventThread}, dwmsEventTime: {dwmsEventTime}");
+                Log.Trace(
+                    $"[{hookArgs}] Event hook triggered, hWinEventHook: 0x{hWinEventHook.ToInt64():x8}, eventType: {eventType}, hwnd: 0x{hwnd.ToInt64():x8}, idObject: {idObject}, idChild: {idChild}, dwEventThread: {dwEventThread}, dwmsEventTime: {dwmsEventTime}");
             }
+
             whenWindowEventTriggered.OnNext(hwnd);
         }
 
         private void Run()
         {
-            Log.Debug($"Starting up event sink");
+            Log.Debug("Starting up event sink");
             RegisterHook().AddTo(Anchors);
-            Log.Debug($"Initializing sink");
+            Log.Debug("Initializing sink");
 
             EventLoop.Run();
         }
@@ -60,7 +62,7 @@ namespace PoeShared.Native
                 hookArgs.ThreadId,
                 hookArgs.Flags);
             Log.Debug($"Hook handle(args: {hookArgs}): {hook.ToInt64():x8}");
-   
+
             if (hook == IntPtr.Zero)
             {
                 throw new Win32Exception(Marshal.GetLastWin32Error());
@@ -73,10 +75,15 @@ namespace PoeShared.Native
                 UnsafeNative.UnhookWinEvent(hook);
             });
         }
-        
-        
+
+
         public static class EventLoop
         {
+            private const uint PM_NOREMOVE = 0;
+            private const uint PM_REMOVE = 1;
+
+            private const uint WM_QUIT = 0x0012;
+
             public static void Run()
             {
                 MSG msg;
@@ -86,7 +93,9 @@ namespace PoeShared.Native
                     if (PeekMessage(out msg, IntPtr.Zero, 0, 0, PM_REMOVE))
                     {
                         if (msg.Message == WM_QUIT)
+                        {
                             break;
+                        }
 
                         TranslateMessage(ref msg);
                         DispatchMessage(ref msg);
@@ -98,31 +107,28 @@ namespace PoeShared.Native
                 }
             }
 
+            [DllImport("user32.dll")]
+            private static extern bool PeekMessage(out MSG lpMsg, IntPtr hwnd, uint wMsgFilterMin, uint wMsgFilterMax, uint wRemoveMsg);
+
+            [DllImport("user32.dll")]
+            private static extern bool TranslateMessage(ref MSG lpMsg);
+
+            [DllImport("user32.dll")]
+            private static extern IntPtr DispatchMessage(ref MSG lpMsg);
+
+            [DllImport("user32.dll")]
+            private static extern bool WaitMessage();
+
             [StructLayout(LayoutKind.Sequential)]
             private struct MSG
             {
-                public IntPtr Hwnd;
-                public uint Message;
-                public IntPtr WParam;
-                public IntPtr LParam;
-                public uint Time;
-                public System.Drawing.Point Point;
+                public readonly IntPtr Hwnd;
+                public readonly uint Message;
+                public readonly IntPtr WParam;
+                public readonly IntPtr LParam;
+                public readonly uint Time;
+                public readonly Point Point;
             }
-
-            const uint PM_NOREMOVE = 0;
-            const uint PM_REMOVE = 1;
-
-            const uint WM_QUIT = 0x0012;
-
-            [DllImport("user32.dll")]
-            private static extern bool PeekMessage(out MSG lpMsg, IntPtr hwnd, uint wMsgFilterMin, uint wMsgFilterMax, uint wRemoveMsg);
-            [DllImport("user32.dll")]
-            private static extern bool TranslateMessage(ref MSG lpMsg);
-            [DllImport("user32.dll")]
-            private static extern IntPtr DispatchMessage(ref MSG lpMsg);
-            
-            [DllImport("user32.dll")]
-            private static extern bool WaitMessage();
         }
     }
 }

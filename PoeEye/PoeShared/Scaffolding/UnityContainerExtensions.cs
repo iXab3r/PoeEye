@@ -28,9 +28,10 @@ namespace PoeShared.Scaffolding
                 .RegisterType<IWindowTracker>(
                     dependencyName,
                     new ContainerControlledLifetimeManager(),
-                    new InjectionFactory(unity => unity.Resolve<WindowTracker>(new DependencyOverride<IStringMatcher>(new RegexStringMatcher().WithLazyWhitelistItem(windowNameFunc)))));
+                    new InjectionFactory(unity =>
+                        unity.Resolve<WindowTracker>(new DependencyOverride<IStringMatcher>(new RegexStringMatcher().WithLazyWhitelistItem(windowNameFunc)))));
         }
-        
+
         public static IUnityContainer RegisterWindowTracker(this IUnityContainer instance, string dependencyName, string windowNamePattern)
         {
             return instance
@@ -45,7 +46,7 @@ namespace PoeShared.Scaffolding
                         return result;
                     }));
         }
-        
+
         public static IUnityContainer RegisterWindowTracker(this IUnityContainer instance, string dependencyName, IStringMatcher matcher)
         {
             return instance
@@ -71,7 +72,7 @@ namespace PoeShared.Scaffolding
                     dependencyName,
                     new ContainerControlledLifetimeManager(),
                     new InjectionFactory(unity => unity.Resolve<OverlayWindowController>(
-                                             new DependencyOverride<IWindowTracker>(unity.Resolve<IWindowTracker>(windowTrackerDependencyName)))));
+                        new DependencyOverride<IWindowTracker>(unity.Resolve<IWindowTracker>(windowTrackerDependencyName)))));
 
             return instance;
         }

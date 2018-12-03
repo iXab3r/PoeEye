@@ -227,7 +227,7 @@
                 <Binding Path="Content.SizeToContent">
                     <Binding.Converter>
                         <converters:MapConverter FallbackBehavior="ReturnFallbackValue" FallbackValue="{x:Static Visibility.Visible}">
-                            <converters:Mapping From="{x:Static SizeToContent.WidthAndHeight}" To="{x:Static Visibility.Collapsed}"/>
+                            <converters:Mapping From="{x:Static SizeToContent.WidthAndHeight}" To="{x:Static Visibility.Collapsed}" />
                         </converters:MapConverter>
                     </Binding.Converter>
                 </Binding>

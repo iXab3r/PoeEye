@@ -60,11 +60,11 @@ namespace PoeShared.UI.Models
             Log.Debug($"[ItemsCache.ResolveImageByUri] Image '{imageUri}' is not loaded, downloading it...");
             var httpClient = httpClientFactory.Create();
             var result = httpClient
-                         .GetStreamAsync(imageUri)
-                         .Select(x => LoadImageFromStream(outputFilePath, x))
-                         .Catch(Observable.Empty<FileInfo>())
-                         .ObserveOn(uiScheduler)
-                         .Publish();
+                .GetStreamAsync(imageUri)
+                .Select(x => LoadImageFromStream(outputFilePath, x))
+                .Catch(Observable.Empty<FileInfo>())
+                .ObserveOn(uiScheduler)
+                .Publish();
 
             imagesBeingLoaded[outputFilePath] = result;
 

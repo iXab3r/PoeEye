@@ -12,8 +12,8 @@ using ReactiveUI;
 
 namespace PoeShared.Audio.ViewModels
 {
-    internal sealed class AudioNotificationSelectorViewModel : DisposableReactiveObject, 
-                                                               IAudioNotificationSelectorViewModel
+    internal sealed class AudioNotificationSelectorViewModel : DisposableReactiveObject,
+        IAudioNotificationSelectorViewModel
     {
         private static readonly string DefaultNotification = AudioNotificationType.Whistle.ToString();
         private readonly IAudioNotificationsManager notificationsManager;
@@ -33,10 +33,11 @@ namespace PoeShared.Audio.ViewModels
             var preconfiguredNotifications = new[]
             {
                 AudioNotificationType.Disabled,
-                AudioNotificationType.Silence,
+                AudioNotificationType.Silence
             }.Select(x => x.ToString());
 
-            var defaultNotifications = new[] { 
+            var defaultNotifications = new[]
+            {
                 AudioNotificationType.Whistle,
                 AudioNotificationType.Bell,
                 AudioNotificationType.Mercury,
@@ -50,7 +51,7 @@ namespace PoeShared.Audio.ViewModels
                 .Select(x => x.Pascalize())
                 .Distinct()
                 .OrderBy(x => x);
-            
+
             Items.AddRange(
                 preconfiguredNotifications
                     .Concat(notifications)

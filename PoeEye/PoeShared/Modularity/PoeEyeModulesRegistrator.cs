@@ -25,7 +25,7 @@ namespace PoeShared.Modularity
             where TConfig : class, IPoeEyeConfig, new()
             where TSettingsViewModel : ISettingsViewModel<TConfig>
         {
-            var viewModel = (ISettingsViewModel)container.Resolve(typeof(TSettingsViewModel));
+            var viewModel = (ISettingsViewModel) container.Resolve(typeof(TSettingsViewModel));
             settings.Add(viewModel);
 
             return this;

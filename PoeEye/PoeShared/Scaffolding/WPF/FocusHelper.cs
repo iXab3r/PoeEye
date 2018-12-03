@@ -14,7 +14,7 @@ namespace PoeShared.Scaffolding.WPF
 
         public static bool GetIsFocused(DependencyObject obj)
         {
-            return (bool)obj.GetValue(IsFocusedProperty);
+            return (bool) obj.GetValue(IsFocusedProperty);
         }
 
         public static void SetIsFocused(DependencyObject obj, bool value)
@@ -44,7 +44,7 @@ namespace PoeShared.Scaffolding.WPF
 
             if (valueToSet.NewValue is bool)
             {
-                newValue = (bool)valueToSet.NewValue;
+                newValue = (bool) valueToSet.NewValue;
             }
 
             if (newValue == null)
@@ -73,8 +73,8 @@ namespace PoeShared.Scaffolding.WPF
             if (!element.Focusable)
             {
                 var targetElement = element
-                                    .FindVisualChildren<TextBox>()
-                                    .FirstOrDefault(x => x.Focusable);
+                    .FindVisualChildren<TextBox>()
+                    .FirstOrDefault(x => x.Focusable);
                 if (targetElement == null)
                 {
                     throw new ApplicationException($"Failed to find viable focusable element, src element: {element}");

@@ -12,24 +12,28 @@ namespace PoeShared.Scaffolding
             {
                 result |= ModifierKeys.Control;
             }
+
             if (keys.HasFlag(Keys.Shift))
             {
                 result |= ModifierKeys.Shift;
             }
+
             if (keys.HasFlag(Keys.Alt))
             {
                 result |= ModifierKeys.Alt;
             }
+
             if (keys.HasFlag(Keys.LWin) || keys.HasFlag(Keys.LWin))
             {
                 result |= ModifierKeys.Control;
             }
+
             return result;
         }
-        
+
         public static Key ToInputKey(this Keys keys)
         {
-            return KeyInterop.KeyFromVirtualKey((int)keys);
+            return KeyInterop.KeyFromVirtualKey((int) keys);
         }
     }
 }

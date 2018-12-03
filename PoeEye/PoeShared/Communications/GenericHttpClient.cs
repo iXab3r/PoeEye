@@ -92,7 +92,7 @@ namespace PoeShared.Communications
             httpClient.UserAgent = UserAgent;
             if (Timeout != null)
             {
-                httpClient.Timeout = (int)Timeout.Value.TotalMilliseconds;
+                httpClient.Timeout = (int) Timeout.Value.TotalMilliseconds;
             }
 
             httpClient.Method = WebRequestMethods.Http.Get;
@@ -117,7 +117,7 @@ namespace PoeShared.Communications
             httpClient.AllowAutoRedirect = true;
             if (Timeout != null)
             {
-                httpClient.Timeout = (int)Timeout.Value.TotalMilliseconds;
+                httpClient.Timeout = (int) Timeout.Value.TotalMilliseconds;
             }
 
             httpClient.AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip;
@@ -150,7 +150,7 @@ namespace PoeShared.Communications
             }
 
             Log.Debug($"[HttpClient] Sending {httpRequest.Method} request with timeout of {httpRequest.Timeout}ms to {httpRequest.RequestUri}");
-            using (var response = (HttpWebResponse)httpRequest.GetResponse())
+            using (var response = (HttpWebResponse) httpRequest.GetResponse())
             using (var responseStream = response.GetResponseStream())
             {
                 var rawResponse = string.Empty;
@@ -181,7 +181,7 @@ namespace PoeShared.Communications
                 return;
             }
 
-            throw new HttpException((int)response.StatusCode, $"Wrong status code, expected 200 OK, got {response.StatusCode}");
+            throw new HttpException((int) response.StatusCode, $"Wrong status code, expected 200 OK, got {response.StatusCode}");
         }
     }
 }

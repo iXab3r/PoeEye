@@ -24,13 +24,13 @@ namespace PoeShared.Scaffolding.WPF.Controls
 
         public string LeftButton
         {
-            get => (string)GetValue(LeftButtonProperty);
+            get => (string) GetValue(LeftButtonProperty);
             set => SetValue(LeftButtonProperty, value);
         }
 
         public string RightButton
         {
-            get => (string)GetValue(RightButtonProperty);
+            get => (string) GetValue(RightButtonProperty);
             set => SetValue(RightButtonProperty, value);
         }
 

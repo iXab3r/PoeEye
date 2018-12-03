@@ -14,22 +14,24 @@ namespace PoeShared.Resources.Notifications
         private static readonly ILog Log = LogManager.GetLogger(typeof(EmbeddedSoundLibrarySource));
 
         private static readonly string[] EmbeddedResourceNames = Assembly.GetExecutingAssembly().GetManifestResourceNames();
-        
+
         public EmbeddedSoundLibrarySource()
         {
             Log.Debug($"Embedded resources list:\r\n {EmbeddedResourceNames.DumpToText()}");
-           
+
             var namespaceName = typeof(EmbeddedSoundLibrarySource).Namespace;
             var extensions = GetSupportedExtensions();
             var sources = EmbeddedResourceNames
-                .Select(x => new{ InternalResourceName = x, SourceName = Path.GetFileNameWithoutExtension(x.Replace($"{namespaceName}.", string.Empty)) })
+                .Select(x => new {InternalResourceName = x, SourceName = Path.GetFileNameWithoutExtension(x.Replace($"{namespaceName}.", string.Empty))})
                 .Where(x => extensions.Any(ext => string.Equals(ext, Path.GetExtension(x.InternalResourceName), StringComparison.OrdinalIgnoreCase)))
                 .Select(x => x.SourceName)
                 .ToArray();
             SourceName = sources;
-            
+
             Log.Debug($"Source name list(namespace: {namespaceName}):\r\n {sources.DumpToText()}");
         }
+
+        public override IEnumerable<string> SourceName { get; }
 
         public override bool TryToLoadSourceByName(string name, out byte[] resourceData)
         {
@@ -56,7 +58,7 @@ namespace PoeShared.Resources.Notifications
                     break;
                 }
             }
-            
+
             Log.Debug($"Loading resource '{internalResourceName}'...");
             var resourceStream = assembly.GetManifestResourceStream(internalResourceName);
             if (resourceStream == null)
@@ -77,7 +79,5 @@ namespace PoeShared.Resources.Notifications
                 return true;
             }
         }
-
-        public override IEnumerable<string> SourceName { get; }
     }
 }

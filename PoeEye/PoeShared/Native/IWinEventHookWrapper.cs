@@ -3,7 +3,7 @@ using JetBrains.Annotations;
 
 namespace PoeShared.Native
 {
-    public interface IWinEventHookWrapper 
+    public interface IWinEventHookWrapper
     {
         [NotNull]
         IObservable<IntPtr> WhenWindowEventTriggered { get; }

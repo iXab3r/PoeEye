@@ -24,9 +24,9 @@ namespace PoeShared.Modularity
 
             this.configProvider = configProvider;
             configProvider.ConfigHasChanged
-                          .StartWith(Unit.Default)
-                          .Subscribe(ReloadInternal)
-                          .AddTo(Anchors);
+                .StartWith(Unit.Default)
+                .Subscribe(ReloadInternal)
+                .AddTo(Anchors);
 
             //FIXME Use ReplaySubject for propagating active config
             var changes = this

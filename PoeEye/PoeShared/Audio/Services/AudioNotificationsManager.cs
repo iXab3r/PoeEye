@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Media;
 using System.Reactive.Concurrency;
 using Common.Logging;
 using Guards;
 using JetBrains.Annotations;
-using NAudio.Wave;
 using PoeShared.Modularity;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
@@ -18,11 +15,11 @@ namespace PoeShared.Audio.Services
 {
     internal sealed class AudioNotificationsManager : DisposableReactiveObject, IAudioNotificationsManager
     {
-        private readonly IAudioPlayer audioPlayer;
-        private readonly ISoundLibrarySource soundLibrarySource;
         private static readonly ILog Log = LogManager.GetLogger(typeof(AudioNotificationsManager));
+        private readonly IAudioPlayer audioPlayer;
 
         private readonly ConcurrentDictionary<string, byte[]> knownNotifications = new ConcurrentDictionary<string, byte[]>();
+        private readonly ISoundLibrarySource soundLibrarySource;
 
         public AudioNotificationsManager(
             [NotNull] IAudioPlayer audioPlayer,
@@ -56,9 +53,10 @@ namespace PoeShared.Audio.Services
 
             if (!TryToLoadNotification(notificationName, out var notificationData))
             {
-                Log.Warn($"Unknown notification type - {notificationName}, known notifications: {string.Join(", ", knownNotifications.Keys.Select(x => x.ToString()))}");
+                Log.Warn(
+                    $"Unknown notification type - {notificationName}, known notifications: {string.Join(", ", knownNotifications.Keys.Select(x => x.ToString()))}");
                 return;
-            } 
+            }
 
             if (!notificationData.Any())
             {

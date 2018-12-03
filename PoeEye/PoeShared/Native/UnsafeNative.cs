@@ -6,16 +6,17 @@ namespace PoeShared.Native
 {
     public static class UnsafeNative
     {
+        public delegate void WinEventDelegate(
+            IntPtr hWinEventHook, uint eventType, IntPtr hwnd, int idObject, int idChild, uint dwEventThread,
+            uint dwmsEventTime);
+
         [DllImport("user32.dll")]
         public static extern int MapVirtualKey(uint uCode, uint uMapType);
 
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         public static extern int GetKeyNameText(int lParam, [MarshalAs(UnmanagedType.LPWStr)] [Out] StringBuilder str, int size);
-        public delegate void WinEventDelegate(
-            IntPtr hWinEventHook, uint eventType, IntPtr hwnd, int idObject, int idChild, uint dwEventThread,
-            uint dwmsEventTime);
 
-            
+
         [DllImport("user32.dll")]
         public static extern IntPtr GetForegroundWindow();
 
@@ -38,13 +39,9 @@ namespace PoeShared.Native
                 ? buff.ToString()
                 : null;
         }
-        
+
         public static class Constants
         {
-            public const uint WINEVENT_OUTOFCONTEXT = 0;
-            public const uint EVENT_OBJECT_LOCATIONCHANGE = 0x800B;
-            public const int EVENT_SYSTEM_FOREGROUND = 3;
-            
             [Flags]
             public enum RedrawWindowFlags : uint
             {
@@ -98,6 +95,10 @@ namespace PoeShared.Native
 
                 NoFrame = 0x800
             }
+
+            public const uint WINEVENT_OUTOFCONTEXT = 0;
+            public const uint EVENT_OBJECT_LOCATIONCHANGE = 0x800B;
+            public const int EVENT_SYSTEM_FOREGROUND = 3;
 
             public const int GCLP_HBRBACKGROUND = -0x0A;
 

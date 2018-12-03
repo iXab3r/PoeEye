@@ -13,7 +13,7 @@ namespace PoeShared.Modularity
         IObservable<TConfig> WhenChanged { [NotNull] get; }
 
         void Reload();
-        
+
         void Save([NotNull] TConfig config);
 
         [NotNull]

@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Reactive.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Xml.Schema;
 using Common.Logging;
 using Guards;
 using JetBrains.Annotations;
-using PoeShared.Prism;
 using PoeShared.Scaffolding;
 using ReactiveUI;
 
@@ -22,8 +18,8 @@ namespace PoeShared.Native
         private IntPtr activeWindowHandle;
         private string activeWindowTitle;
         private bool isActive;
-        private IntPtr windowHandle;
         private string name;
+        private IntPtr windowHandle;
 
         public WindowTracker(
             [NotNull] IStringMatcher titleMatcher)
@@ -87,7 +83,8 @@ namespace PoeShared.Native
 
             windowHandle = IsActive ? activeWindowHandle : IntPtr.Zero;
 
-            Log.Trace($@"[#{Name}] Target window is {(isActive ? string.Empty : "NOT ")}ACTIVE (hwnd 0x{activeWindowHandle.ToInt64():X8}, active title '{activeWindowTitle}')");
+            Log.Trace(
+                $@"[#{Name}] Target window is {(isActive ? string.Empty : "NOT ")}ACTIVE (hwnd 0x{activeWindowHandle.ToInt64():X8}, active title '{activeWindowTitle}')");
 
             this.RaisePropertyChanged(nameof(IsActive));
             this.RaisePropertyChanged(nameof(MatchingWindowHandle));

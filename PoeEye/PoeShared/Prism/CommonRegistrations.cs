@@ -4,12 +4,9 @@ using System.Diagnostics;
 using System.Reactive.Concurrency;
 using System.Text.RegularExpressions;
 using Gma.System.MouseKeyHook;
-using PoeShared.Audio;
 using PoeShared.Audio.Services;
 using PoeShared.Audio.ViewModels;
-using PoeShared.Common;
 using PoeShared.Communications;
-using PoeShared.Converters;
 using PoeShared.Modularity;
 using PoeShared.Native;
 using PoeShared.Resources.Notifications;
@@ -80,7 +77,7 @@ namespace PoeShared.Prism
             Container.RegisterOverlayController(
                 WellKnownOverlays.AllWindowsLayeredOverlay,
                 WellKnownWindows.AllWindows);
-            
+
             Container
                 .RegisterType<ISoundLibrarySource>(
                     new ContainerControlledLifetimeManager(),

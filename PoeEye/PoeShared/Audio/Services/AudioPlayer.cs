@@ -28,7 +28,7 @@ namespace PoeShared.Audio.Services
         {
             return PlayInternal(rawStream);
         }
-        
+
         private IDisposable PlayInternalMedia(Stream rawStream)
         {
             using (var waveStream = WaveFormatConversionStream.CreatePcmStream(new WaveFileReader(rawStream)))
@@ -40,7 +40,7 @@ namespace PoeShared.Audio.Services
 
             return Disposable.Empty;
         }
-        
+
         private IDisposable PlayInternal(Stream rawStream)
         {
             Log.Trace($"Queueing audio stream({rawStream.Length})...");
@@ -48,10 +48,10 @@ namespace PoeShared.Audio.Services
             {
                 try
                 {
-                    using(var waveStream = new WaveFileReader(rawStream))
+                    using (var waveStream = new WaveFileReader(rawStream))
                     using (WaveStream blockAlignedStream = new BlockAlignReductionStream(waveStream))
-                    using (WaveOut waveOut = new WaveOut(WaveCallbackInfo.FunctionCallback()))
-                    using(rawStream)
+                    using (var waveOut = new WaveOut(WaveCallbackInfo.FunctionCallback()))
+                    using (rawStream)
                     {
                         {
                             Log.Trace($"Initializing waveOut device {waveOut}");
@@ -65,7 +65,7 @@ namespace PoeShared.Audio.Services
 
                                 Log.Trace($"Starting to play audio stream({rawStream.Length}) using waveOut {waveOut}...");
                                 waveOut.Play();
-                                
+
                                 playbackAnchor.WaitOne();
                                 Log.Trace($"Successfully played audio stream({rawStream.Length})...");
                             }

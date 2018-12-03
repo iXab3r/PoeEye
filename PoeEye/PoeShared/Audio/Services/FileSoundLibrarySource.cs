@@ -2,11 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
 using Common.Logging;
-using NAudio.Utils;
-using NAudio.Wave;
 using PoeShared.Scaffolding;
 
 namespace PoeShared.Audio.Services
@@ -17,21 +13,24 @@ namespace PoeShared.Audio.Services
 
         private static readonly DirectoryInfo ResourceDirectory =
             new DirectoryInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "Notifications"));
-        
+
         public FileSoundLibrarySource()
         {
             var extensions = GetSupportedExtensions();
-            var sources = ResourceDirectory.Exists ? 
-               ResourceDirectory
-                .EnumerateFiles()
-                .Select(x => new{ FilePath = x.FullName, SourceName = Path.GetFileNameWithoutExtension(x.Name) })
-                .Where(x => extensions.Any(ext => string.Equals(ext, Path.GetExtension(x.FilePath), StringComparison.OrdinalIgnoreCase)))
-                .Select(x => x.SourceName)
-                .ToArray() : new string[0];
+            var sources = ResourceDirectory.Exists
+                ? ResourceDirectory
+                    .EnumerateFiles()
+                    .Select(x => new {FilePath = x.FullName, SourceName = Path.GetFileNameWithoutExtension(x.Name)})
+                    .Where(x => extensions.Any(ext => string.Equals(ext, Path.GetExtension(x.FilePath), StringComparison.OrdinalIgnoreCase)))
+                    .Select(x => x.SourceName)
+                    .ToArray()
+                : new string[0];
             SourceName = sources;
-            
+
             Log.Debug($"Source name list(directory: {ResourceDirectory.FullName}):\r\n {sources.DumpToText()}");
         }
+
+        public override IEnumerable<string> SourceName { get; }
 
         public override bool TryToLoadSourceByName(string name, out byte[] resourceData)
         {
@@ -61,8 +60,6 @@ namespace PoeShared.Audio.Services
                 return false;
             }
         }
-
-        public override IEnumerable<string> SourceName { get; }
 
         private string FormatSourceFileName(string fileName)
         {

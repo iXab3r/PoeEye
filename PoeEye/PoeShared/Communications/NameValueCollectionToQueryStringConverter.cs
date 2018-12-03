@@ -8,7 +8,7 @@ using TypeConverter;
 namespace PoeShared.Communications
 {
     internal sealed class NameValueCollectionToQueryStringConverter : IConverter<NameValueCollection, string>,
-                                                                      IConverter<NameValueCollection, IEnumerable<KeyValuePair<string, string>>>
+        IConverter<NameValueCollection, IEnumerable<KeyValuePair<string, string>>>
     {
         IEnumerable<KeyValuePair<string, string>> IConverter<NameValueCollection, IEnumerable<KeyValuePair<string, string>>>.Convert(NameValueCollection source)
         {

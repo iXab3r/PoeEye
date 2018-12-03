@@ -21,13 +21,13 @@ namespace PoeShared.Scaffolding
         {
             return observable.Select(_ => Unit.Default);
         }
-        
+
         public static IObservable<T> StartWithDefault<T>(this IObservable<T> observable)
         {
             return observable.StartWith(default(T));
         }
-        
-        public static IObservable<Y> Select<T,Y>(this IObservable<T> observable, Func<Y> selector)
+
+        public static IObservable<Y> Select<T, Y>(this IObservable<T> observable, Func<Y> selector)
         {
             return observable.Select(_ => selector());
         }

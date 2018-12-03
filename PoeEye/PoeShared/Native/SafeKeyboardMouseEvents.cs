@@ -80,7 +80,7 @@ namespace PoeShared.Native
                 .Where(x => x.Handled)
                 .Subscribe(LogEvent, Log.HandleException)
                 .AddTo(Anchors);
-            
+
             Observable
                 .FromEventPattern<EventHandler<MouseEventExtArgs>, MouseEventExtArgs>(
                     h => keyboardMouseEvents.MouseDownExt += h,
@@ -91,7 +91,7 @@ namespace PoeShared.Native
                 .Where(x => x.Handled)
                 .Subscribe(LogEvent, Log.HandleException)
                 .AddTo(Anchors);
-            
+
             Observable
                 .FromEventPattern<EventHandler<MouseEventExtArgs>, MouseEventExtArgs>(
                     h => keyboardMouseEvents.MouseUpExt += h,

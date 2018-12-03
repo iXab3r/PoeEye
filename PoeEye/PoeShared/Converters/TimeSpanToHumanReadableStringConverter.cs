@@ -11,7 +11,7 @@ namespace PoeShared.Converters
         {
             if (value is double)
             {
-                var ts = TimeSpan.FromSeconds((double)value);
+                var ts = TimeSpan.FromSeconds((double) value);
                 return Convert(ts, typeof(string), null, CultureInfo.InvariantCulture);
             }
 
@@ -20,12 +20,13 @@ namespace PoeShared.Converters
                 return value;
             }
 
-            var timeSpan = (TimeSpan)value;
+            var timeSpan = (TimeSpan) value;
 
             if (timeSpan == TimeSpan.MaxValue)
             {
                 return "∞";
             }
+
             //TODO Distinguish min an max ? +inf -inf ?
             if (timeSpan == TimeSpan.MinValue)
             {

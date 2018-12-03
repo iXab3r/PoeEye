@@ -10,7 +10,7 @@ namespace PoeShared.Scaffolding.WPF
 
         public bool HidePartialItems
         {
-            get => (bool)GetValue(HidePartialItemsProperty);
+            get => (bool) GetValue(HidePartialItemsProperty);
             set => SetValue(HidePartialItemsProperty, value);
         }
 
