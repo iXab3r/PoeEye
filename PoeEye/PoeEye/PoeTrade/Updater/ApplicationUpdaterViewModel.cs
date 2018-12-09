@@ -126,7 +126,7 @@ namespace PoeEye.PoeTrade.Updater
         public Version UpdatedVersion => updaterModel.UpdatedVersion;
 
         [CanBeNull]
-        public Version LatestVersion => updaterModel.LatestVersion?.FutureReleaseEntry?.Version;
+        public Version LatestVersion => updaterModel.LatestVersion?.FutureReleaseEntry?.Version?.Version;
 
         private async Task CheckForUpdatesCommandExecuted()
         {

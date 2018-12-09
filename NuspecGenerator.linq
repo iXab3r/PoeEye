@@ -2,13 +2,17 @@
 
 void Main()
 {
+	var appExeName = "MicSwitch.exe";
+	var appName = Path.GetFileNameWithoutExtension(appExeName);
 	var scriptDir = Path.GetDirectoryName(Util.CurrentQueryPath);
-	var homeDir = Path.Combine(scriptDir, "PoeEye");
-	
-	var nuspecFileName = @"PoeEye.nuspec";
+	var homeDir = Path.Combine(scriptDir, "Sources");
+
+	var nuspecFileName = $"{appName}.nuspec";
 	var binariesDir = @"bin\";
 	var nuspecFilePath = Path.Combine(homeDir, nuspecFileName);
-	var exeFilePath = Path.Combine(homeDir, binariesDir, "PoeEye.exe");
+	var exeFilePath = Path.Combine(homeDir, binariesDir, appExeName);
+
+	new { appExeName, appName, scriptDir, homeDir, nuspecFileName, binariesDir, nuspecFilePath }.Dump("Arguments");
 
 	new[] { exeFilePath }.Dump("Reading version from .exe file...");
 
@@ -43,7 +47,11 @@ void Main()
 	var versionNode = nuspecDocument.Descendants(ns + "metadata").Single().Descendants(ns + "version").Single();
 	versionNode.Dump("[BEFORE] Nuspec version");
 
-	var filesNode = nuspecDocument.Descendants(ns + "files").Single();
+	var filesNode = nuspecDocument.Descendants(ns + "files").SingleOrDefault();
+	if (filesNode == null){
+		filesNode = new XElement(ns + "files");
+		nuspecDocument.Add(filesNode);
+	}
 	filesNode.Dump("[BEFORE] nuspec files list");
 	filesNode.RemoveAll();
 	foreach (var file in files)

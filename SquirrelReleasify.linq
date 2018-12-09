@@ -2,19 +2,41 @@
 
 void Main()
 {
+	var appExeName = "MicSwitch.exe";
+	var appName = Path.GetFileNameWithoutExtension(appExeName);
 	var scriptDir = Path.GetDirectoryName(Util.CurrentQueryPath);
-	var homeDir = Path.Combine(scriptDir, "PoeEye");
+	var homeDir = Path.Combine(scriptDir, "Sources");
 
-	var nuspecFileName = @"PoeEye.nuspec";
+	var nuspecFileName = $"{appName}.nuspec";
 	var nuspecFilePath = Path.Combine(homeDir, nuspecFileName);
 	var version = GetSpecVersion(nuspecFilePath);
+	version.Dump("NuSpec version");
 
-	var nupkgFileName = $@"PoeEye.{version}.nupkg";
+	var nupkgFileName = $@"{appName}.{version}.nupkg";
 	var nupkgFilePath = Path.Combine(scriptDir, nupkgFileName);
 
 	var releasesFolderName = "Releases";
-	var squirrelPath = Path.Combine(homeDir, $@"packages\squirrel.windows.1.0.2\tools\Squirrel.exe");
+	var squirrelPath = Path.Combine(homeDir, $@"packages\squirrel.windows.1.9.0\tools\Squirrel.exe");
+	if (!File.Exists(squirrelPath))
+	{
+		throw new FileNotFoundException($@"Squirrel executable not found '{squirrelPath}' !");
+	}
 	var squirrelLogPath = Path.Combine(Path.GetDirectoryName(squirrelPath), "SquirrelSetup.log");
+
+	var sourceReleasesFolderPath = Path.Combine(Path.GetDirectoryName(squirrelPath), releasesFolderName);
+	var targetReleasesFolderPath = Path.Combine(scriptDir, releasesFolderName);
+
+	if (Directory.Exists(targetReleasesFolderPath))
+	{
+		targetReleasesFolderPath.Dump("Target directory exists, removing it");
+		Directory.Delete(targetReleasesFolderPath, true);
+	}
+
+	if (Directory.Exists(sourceReleasesFolderPath))
+	{
+		sourceReleasesFolderPath.Dump("Squirrel Source directory exists, removing it");
+		Directory.Delete(sourceReleasesFolderPath, true);
+	}
 
 	if (File.Exists(squirrelLogPath))
 	{
@@ -26,34 +48,33 @@ void Main()
 	
 	Util.Cmd(squirrelArgs.Path, squirrelArgs.Args, false);
 
-	if (File.Exists(squirrelLogPath))
-	{
-		File.ReadAllText(squirrelLogPath).Dump("Squirrel execution log");
-	}
-
-	var sourceReleasesFolderPath = Path.Combine(Path.GetDirectoryName(squirrelPath), releasesFolderName);
-	var targetReleasesFolderPath = Path.Combine(scriptDir, releasesFolderName);
-
-	if (Directory.Exists(targetReleasesFolderPath))
-	{
-		targetReleasesFolderPath.Dump("Target directory exists, removing it");
-		Directory.Delete(targetReleasesFolderPath);
-	}
+	var squirrelLogFilePath = Path.Combine(Path.GetDirectoryName(squirrelPath), "SquirrelSetup.log");
+	var squirrelLog = File.Exists(squirrelLogFilePath) ? File.ReadAllText(squirrelLogFilePath) : $"Squirrel log file does not exist at path {squirrelLogFilePath}";
+	squirrelLog.Dump("Squirrel execution log");
 
 	new { sourceReleasesFolderPath, targetReleasesFolderPath }.Dump("Moving 'Releases' folder...");
 	Directory.Move(sourceReleasesFolderPath, targetReleasesFolderPath);
 
 	var sourceSetupFileName = Path.Combine(targetReleasesFolderPath, "Setup.exe");
-	var targetSetupFileName = Path.Combine(targetReleasesFolderPath, $"PoeEyeSetup.{version}.exe");
+
+	var versionInfo = FileVersionInfo.GetVersionInfo(sourceSetupFileName);
+	new { versionInfo.ProductName, versionInfo.ProductVersion, versionInfo.FileVersion }.Dump($"{sourceSetupFileName}");
+
+	if (versionInfo.FileVersion != version)
+	{
+		throw new ApplicationException($"Setup file should have the same FileVersion {version}, got {versionInfo.FileVersion}");
+	}
+
+	if (versionInfo.ProductVersion != version)
+	{
+		throw new ApplicationException($"Setup file should have the same ProductVersion {version}, got {versionInfo.ProductVersion}");
+	}
+
+	var targetSetupFileName = Path.Combine(targetReleasesFolderPath, $"{appName}Setup.{version}.exe");
 
 	new { sourceSetupFileName, targetSetupFileName }.Dump("Renaming Setup.exe");
-	File.Copy(sourceSetupFileName, targetSetupFileName);
-
-	var squirrelLogFilePath = Path.Combine(Path.GetDirectoryName(squirrelPath), "SquirrelSetup.log");
-	var squirrelLog = File.Exists(squirrelLogFilePath) ? File.ReadAllText(squirrelLogFilePath) : $"Squirrel log file does not exist at path {squirrelLogFilePath}";
-	squirrelLog.Dump("Squirrel execution log");
+	File.Copy(sourceSetupFileName, targetSetupFileName);	
 }
-
 
 private static string GetSpecVersion(string nuspecFilePath)
 {
