@@ -40,6 +40,7 @@ namespace PoeShared.Modularity
         public void Save<TConfig>(TConfig config) where TConfig : IPoeEyeConfig, new()
         {
             loadedConfigs[typeof(TConfig)] = config;
+            configHasChanged.OnNext(Unit.Default);
         }
 
         public TConfig GetActualConfig<TConfig>() where TConfig : IPoeEyeConfig, new()
@@ -49,7 +50,7 @@ namespace PoeShared.Modularity
                 Reload();
             }
 
-            return (TConfig)loadedConfigs.GetOrAdd(typeof(TConfig), key => (TConfig)Activator.CreateInstance(typeof(TConfig)));
+            return (TConfig) loadedConfigs.GetOrAdd(typeof(TConfig), key => (TConfig) Activator.CreateInstance(typeof(TConfig)));
         }
     }
 }

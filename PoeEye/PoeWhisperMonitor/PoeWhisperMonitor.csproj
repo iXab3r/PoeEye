@@ -95,8 +95,9 @@
     <Reference Include="TrackingStreamLib, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\TrackingStreamLib.0.1\lib\net45\TrackingStreamLib.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.Abstractions, Version=3.3.0.0, Culture=neutral, PublicKeyToken=6d32ff45e0ccc69f, processorArchitecture=MSIL">
-      <HintPath>..\packages\Unity.Abstractions.3.3.0\lib\net45\Unity.Abstractions.dll</HintPath>
+    <Reference Include="Unity.Abstractions, Version=3.3.1.0, Culture=neutral, PublicKeyToken=6d32ff45e0ccc69f">
+      <HintPath>..\packages\Unity.Abstractions.3.3.1\lib\net46\Unity.Abstractions.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Unity.Configuration, Version=5.2.5.0, Culture=neutral, PublicKeyToken=6d32ff45e0ccc69f, processorArchitecture=MSIL">
       <HintPath>..\packages\Unity.5.8.11\lib\net46\Unity.Configuration.dll</HintPath>

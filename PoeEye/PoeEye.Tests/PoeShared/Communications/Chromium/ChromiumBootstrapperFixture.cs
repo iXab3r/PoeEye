@@ -1,7 +1,7 @@
 ﻿using CefSharp.OffScreen;
 using Moq;
 using NUnit.Framework;
-using PoeShared.Communications.Chromium;
+using PoeShared.Chromium.Communications;
 using PoeShared.Prism;
 
 namespace PoeEye.Tests.PoeShared.Communications.Chromium

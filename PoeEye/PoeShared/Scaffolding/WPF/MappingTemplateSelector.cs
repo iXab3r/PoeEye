@@ -85,16 +85,16 @@ namespace PoeShared.Scaffolding.WPF
             if (item is INotifyPropertyChanged reactiveItem)
             {
                 Observable.FromEventPattern<PropertyChangedEventHandler, PropertyChangedEventArgs>(
-                              handler => reactiveItem.PropertyChanged += handler, handler => reactiveItem.PropertyChanged -= handler)
-                          .Where(x => x.EventArgs.PropertyName == KeyPropertyPath)
-                          .Take(1)
-                          .Subscribe(
-                              () =>
-                              {
-                                  var presenter = (ContentPresenter)container;
-                                  presenter.ContentTemplateSelector = null;
-                                  presenter.ContentTemplateSelector = this;
-                              });
+                        handler => reactiveItem.PropertyChanged += handler, handler => reactiveItem.PropertyChanged -= handler)
+                    .Where(x => x.EventArgs.PropertyName == KeyPropertyPath)
+                    .Take(1)
+                    .Subscribe(
+                        () =>
+                        {
+                            var presenter = (ContentPresenter) container;
+                            presenter.ContentTemplateSelector = null;
+                            presenter.ContentTemplateSelector = this;
+                        });
             }
 
             return templateLookup.TryGetValue(key, out var templateKey)

@@ -2,7 +2,6 @@
 using System.Windows.Forms;
 using Common.Logging;
 using Guards;
-using PoeShared.Scaffolding;
 
 namespace PoeShared.Native
 {
@@ -30,7 +29,7 @@ namespace PoeShared.Native
         {
             Log.Debug(
                 $"[PoeChatService] Setting new clipboard object '{dataObject}' (retry: {ClipboardSetRetryCount}, timeout: {ClipboardRestorationTimeout})...");
-            Clipboard.SetDataObject(dataObject, true, ClipboardSetRetryCount, (int)ClipboardRestorationTimeout.TotalMilliseconds);
+            Clipboard.SetDataObject(dataObject, true, ClipboardSetRetryCount, (int) ClipboardRestorationTimeout.TotalMilliseconds);
         }
 
         public string GetText()

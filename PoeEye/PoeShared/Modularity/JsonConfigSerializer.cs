@@ -24,9 +24,9 @@ namespace PoeShared.Modularity
         public JsonConfigSerializer()
         {
             converters.Changed
-                      .ToUnit()
-                      .StartWith(Unit.Default)
-                      .Subscribe(ReinitializeSerializerSettings);
+                .ToUnit()
+                .StartWith(Unit.Default)
+                .Subscribe(ReinitializeSerializerSettings);
         }
 
         public void RegisterConverter(JsonConverter converter)
@@ -54,7 +54,7 @@ namespace PoeShared.Modularity
                     $"Operation failed, could not deserialize data to instance of type {typeof(T)}, serialized data: \n{serializedData.Substring(0, Math.Min(MaxCharsToLog, serializedData.Length))}");
             }
 
-            return (T)result;
+            return (T) result;
         }
 
         public string Compress(object data)

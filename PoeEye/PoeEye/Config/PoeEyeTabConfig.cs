@@ -1,5 +1,6 @@
 ﻿using System;
 using PoeShared.Audio;
+using PoeShared.Audio.Services;
 using PoeShared.PoeTrade;
 
 namespace PoeEye.Config

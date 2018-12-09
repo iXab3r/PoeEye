@@ -52,7 +52,7 @@ namespace PoeShared.Converters
                 case TypeCode.Int16:
                 case TypeCode.Int32:
                 case TypeCode.Int64:
-                    return (ulong)System.Convert.ToInt64(value, CultureInfo.InvariantCulture);
+                    return (ulong) System.Convert.ToInt64(value, CultureInfo.InvariantCulture);
                 default:
                     throw new ArgumentException($"Invalid typecode: {typeCode}");
             }
@@ -68,13 +68,13 @@ namespace PoeShared.Converters
     {
         public new Visibility TrueValue
         {
-            get => (Visibility)base.TrueValue;
+            get => (Visibility) base.TrueValue;
             set => base.TrueValue = value;
         }
 
         public new Visibility FalseValue
         {
-            get => (Visibility)base.FalseValue;
+            get => (Visibility) base.FalseValue;
             set => base.FalseValue = value;
         }
     }

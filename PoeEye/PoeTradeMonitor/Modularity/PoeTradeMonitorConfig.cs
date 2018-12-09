@@ -2,6 +2,7 @@
 using System.Windows;
 using PoeEye.TradeMonitor.Models;
 using PoeShared.Audio;
+using PoeShared.Audio.Services;
 using PoeShared.Modularity;
 using PoeShared.Native;
 

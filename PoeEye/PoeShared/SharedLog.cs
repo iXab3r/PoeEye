@@ -15,7 +15,7 @@ namespace PoeShared
     public class SharedLog : DisposableReactiveObject
     {
         /// <summary>
-        ///  Log Instance HAVE to be initialized only after GlobalContext is configured
+        ///     Log Instance HAVE to be initialized only after GlobalContext is configured
         /// </summary>
         private static readonly Lazy<ILog> LogInstanceSupplier = new Lazy<ILog>(() =>
         {
@@ -28,10 +28,7 @@ namespace PoeShared
 
         public SharedLog()
         {
-            Errors.Subscribe((ex) =>
-            {
-                Log.HandleException(ex);
-            }).AddTo(Anchors);
+            Errors.Subscribe(ex => { Log.HandleException(ex); }).AddTo(Anchors);
         }
 
         public ISubject<Exception> Errors { get; } = new Subject<Exception>();
@@ -42,9 +39,16 @@ namespace PoeShared
 
         public void InitializeLogging(string configurationMode)
         {
+            InitializeLogging(configurationMode, "PoeSharedUnknownApp");
+        }
+
+        public void InitializeLogging(string configurationMode, string appName)
+        {
             Guard.ArgumentNotNull(configurationMode, nameof(configurationMode));
 
             GlobalContext.Properties["configuration"] = configurationMode;
+            GlobalContext.Properties["CONFIGURATION"] = configurationMode;
+            GlobalContext.Properties["APPNAME"] = appName;
             Log.Info($"Logging in '{configurationMode}' mode initialized");
         }
 
@@ -52,7 +56,7 @@ namespace PoeShared
         {
             Guard.ArgumentNotNull(loggingLevel, nameof(loggingLevel));
 
-            var repository = (Hierarchy)log4net.LogManager.GetRepository();
+            var repository = (Hierarchy) log4net.LogManager.GetRepository();
             repository.Root.Level = loggingLevel;
             repository.RaiseConfigurationChanged(EventArgs.Empty);
             Log.Info($"Logging level switched to '{loggingLevel}'");
@@ -62,7 +66,7 @@ namespace PoeShared
         {
             Guard.ArgumentNotNull(appender, nameof(appender));
 
-            var repository = (Hierarchy)log4net.LogManager.GetRepository();
+            var repository = (Hierarchy) log4net.LogManager.GetRepository();
             var root = repository.Root;
             Log.Debug($"Adding appender {appender}, currently root contains {root.Appenders.Count} appenders");
             root.AddAppender(appender);

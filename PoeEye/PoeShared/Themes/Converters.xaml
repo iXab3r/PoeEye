@@ -37,7 +37,6 @@
                                     FalseValue="Collapsed" />
 
     <eyeConverters:BoolInversionConverter x:Key="NotConverter" />
-    <eyeConverters:StringToPoePriceConverter x:Key="StringToPoePriceConverter" />
 
     <eyeConverters:ObjectToTypeConverter x:Key="ObjectToTypeConverter" />
 
@@ -66,7 +65,7 @@
 
     <eyeConverters:NullToVisibilityConverter x:Key="NullToCollapsedConverter" NullValue="Collapsed" NotNullValue="Visible" />
     <eyeConverters:NullToVisibilityConverter x:Key="NotNullToCollapsedConverter" NullValue="Visible"
-                                          NotNullValue="Collapsed" />
+                                             NotNullValue="Collapsed" />
     <eyeConverters:NullToVisibilityConverter x:Key="NullToHiddenConverter" NullValue="Hidden" NotNullValue="Visible" />
     <eyeConverters:NullToVisibilityConverter x:Key="NotNullToHiddenConverter" NullValue="Visible" NotNullValue="Hidden" />
     <eyeConverters:ExceptionToMessageConverter x:Key="ExceptionToMessageConverter" />

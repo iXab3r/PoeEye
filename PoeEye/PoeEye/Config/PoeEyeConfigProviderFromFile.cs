@@ -18,7 +18,7 @@ namespace PoeEye.Config
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(PoeEyeConfigProviderFromFile));
 
-        private static readonly string ConfigFileDirectory = AppArguments.AppDataDirectory;
+        private static readonly string ConfigFileDirectory = AppArguments.Instance.AppDataDirectory;
 
         private static readonly string DebugConfigFileName = @"configDebugMode.cfg";
         private static readonly string ReleaseConfigFileName = @"config.cfg";

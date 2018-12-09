@@ -17,6 +17,7 @@ using PoeEye.Config;
 using PoeEye.PoeTrade.Common;
 using PoeEye.PoeTrade.Models;
 using PoeShared.Audio;
+using PoeShared.Audio.Services;
 using PoeShared.Common;
 using PoeShared.Modularity;
 using PoeShared.Prism;

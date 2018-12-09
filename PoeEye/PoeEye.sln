@@ -39,6 +39,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PoeEye.PathOfExileTrade", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WpfAutoCompleteControls", "..\Submodules\WpfAutoCompleteControls\WpfAutoCompleteControls\WpfAutoCompleteControls\WpfAutoCompleteControls.csproj", "{9425AF6E-5B23-45D8-90B9-EFD5B63E81DC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PoeShared.PathOfExile", "PoeShared.PathOfExile\PoeShared.PathOfExile.csproj", "{E8FB0101-F7DF-46FA-8222-D4C9CA9289C1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PoeShared.Chromium", "PoeShared.Chromium\PoeShared.Chromium.csproj", "{6DCD5F8F-C1D8-49E6-BFD7-AF50EC8107AB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -117,6 +121,14 @@ Global
 		{9425AF6E-5B23-45D8-90B9-EFD5B63E81DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9425AF6E-5B23-45D8-90B9-EFD5B63E81DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9425AF6E-5B23-45D8-90B9-EFD5B63E81DC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E8FB0101-F7DF-46FA-8222-D4C9CA9289C1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E8FB0101-F7DF-46FA-8222-D4C9CA9289C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E8FB0101-F7DF-46FA-8222-D4C9CA9289C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E8FB0101-F7DF-46FA-8222-D4C9CA9289C1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6DCD5F8F-C1D8-49E6-BFD7-AF50EC8107AB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6DCD5F8F-C1D8-49E6-BFD7-AF50EC8107AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6DCD5F8F-C1D8-49E6-BFD7-AF50EC8107AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6DCD5F8F-C1D8-49E6-BFD7-AF50EC8107AB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

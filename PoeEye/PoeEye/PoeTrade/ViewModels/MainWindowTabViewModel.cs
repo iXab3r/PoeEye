@@ -13,6 +13,8 @@ using JetBrains.Annotations;
 using PoeEye.Config;
 using PoeShared;
 using PoeShared.Audio;
+using PoeShared.Audio.Services;
+using PoeShared.Audio.ViewModels;
 using PoeShared.Common;
 using PoeShared.Modularity;
 using PoeShared.Native;
@@ -33,8 +35,8 @@ namespace PoeEye.PoeTrade.ViewModels
 
         private static int GlobalTabIdx;
         private static readonly TimeSpan ThrottlingPeriod = TimeSpan.FromSeconds(0.5);
-        [NotNull] private readonly IScheduler bgScheduler;
-        [NotNull] private readonly IConfigProvider<PoeEyeTabListConfig> configProvider;
+        private readonly IScheduler bgScheduler;
+        private readonly IConfigProvider<PoeEyeTabListConfig> configProvider;
 
         private readonly string defaultTabName;
 
@@ -46,7 +48,7 @@ namespace PoeEye.PoeTrade.ViewModels
 
         private readonly SerialDisposable tradesListAnchors = new SerialDisposable();
         private readonly IFactory<IPoeTradesListViewModel, IPoeApiWrapper> tradesListFactory;
-        [NotNull] private readonly IScheduler uiScheduler;
+        private readonly IScheduler uiScheduler;
         private bool isFlipped;
 
         private IPoeTradesListViewModel tradesList;
@@ -130,7 +132,7 @@ namespace PoeEye.PoeTrade.ViewModels
                 .Where(x => x > 0)
                 .WithPrevious((prev, curr) => new {prev, curr})
                 .Where(x => x.curr > x.prev)
-                .Where(x => audioNotificationSelector.SelectedValue != AudioNotificationType.Disabled)
+                .Where(x => audioNotificationSelector.SelectedItem != AudioNotificationType.Disabled)
                 .Where(x => !mainWindowTracker.IsActive)
                 .Subscribe(
                     x => audioNotificationsManager.PlayNotification(audioNotificationSelector.SelectedValue),
@@ -169,7 +171,7 @@ namespace PoeEye.PoeTrade.ViewModels
 
         public IAudioNotificationSelectorViewModel AudioNotificationSelector { get; }
 
-        public AudioNotificationType SelectedAudioNotificationType => AudioNotificationSelector.SelectedValue;
+        public AudioNotificationType SelectedAudioNotificationType => AudioNotificationSelector.SelectedItem;
 
         public string Id { get; }
 
@@ -221,7 +223,7 @@ namespace PoeEye.PoeTrade.ViewModels
                 Query.IsExpanded = true;
             }
 
-            AudioNotificationSelector.SelectedValue = config.NotificationType;
+            AudioNotificationSelector.SelectedItem = config.NotificationType;
             RenameTabTo(config.CustomTabName);
         }
 
@@ -231,7 +233,7 @@ namespace PoeEye.PoeTrade.ViewModels
             {
                 RecheckTimeout = RecheckPeriod.Period,
                 QueryInfo = Query.PoeQueryBuilder(),
-                NotificationType = AudioNotificationSelector.SelectedValue,
+                NotificationType = AudioNotificationSelector.SelectedItem,
                 ApiModuleId = ApiSelector.SelectedModule?.Id.ToString(),
                 CustomTabName = tabName.HasValue ? tabName.Value : null
             };

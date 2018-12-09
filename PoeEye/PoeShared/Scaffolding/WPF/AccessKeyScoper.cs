@@ -10,7 +10,7 @@ namespace PoeShared.Scaffolding.WPF
         /// </summary>
         public static readonly DependencyProperty IsAccessKeyScopeProperty =
             DependencyProperty.RegisterAttached("IsAccessKeyScope", typeof(bool), typeof(AccessKeyScoper),
-                                                new PropertyMetadata(false, HandleIsAccessKeyScopePropertyChanged));
+                new PropertyMetadata(false, HandleIsAccessKeyScopePropertyChanged));
 
         /// <summary>
         ///     Sets the IsAccessKeyScope attached property value for the specified object
@@ -29,7 +29,7 @@ namespace PoeShared.Scaffolding.WPF
         /// <returns>The value of IsAccessKeyScope attached property for the specified object</returns>
         public static bool GetIsAccessKeyScope(DependencyObject obj)
         {
-            return (bool)obj.GetValue(IsAccessKeyScopeProperty);
+            return (bool) obj.GetValue(IsAccessKeyScopeProperty);
         }
 
         private static void HandleIsAccessKeyScopePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -46,7 +46,7 @@ namespace PoeShared.Scaffolding.WPF
 
         private static void HandleScopedElementAccessKeyPressed(object sender, AccessKeyPressedEventArgs e)
         {
-            if (!Keyboard.IsKeyDown(Key.LeftAlt) && !Keyboard.IsKeyDown(Key.RightAlt) && GetIsAccessKeyScope((DependencyObject)sender))
+            if (!Keyboard.IsKeyDown(Key.LeftAlt) && !Keyboard.IsKeyDown(Key.RightAlt) && GetIsAccessKeyScope((DependencyObject) sender))
             {
                 e.Scope = sender;
                 e.Handled = true;

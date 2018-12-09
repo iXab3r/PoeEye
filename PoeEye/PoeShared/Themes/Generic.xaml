@@ -3,27 +3,6 @@
     <FontFamily x:Key="FontAwesome">pack://application:,,,/FontAwesome.WPF;component/#FontAwesome</FontFamily>
 
     <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
-        <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
-        <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Colors.xaml" />
-        <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/Blue.xaml" />
-        <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseDark.xaml" />
-        <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.Slider.xaml" />
-        <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.Buttons.xaml" />
-        <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.ListBox.xaml" />
-        <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Themes/ProgressRing.xaml" />
-
-        <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Converters.xaml" />
-        <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Colors.xaml" />
-        <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/SlimScrollbar.xaml" />
-        <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Thumb.xaml" />
-        <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/AvalonEdit.xaml" />
-        <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Styles.xaml" />
-        <ResourceDictionary Source="pack://application:,,,/PoeShared;component/UI/Views/CurrencyTestView.xaml" />
-        <ResourceDictionary Source="pack://application:,,,/PoeShared;component/UI/Views/ImageView.xaml" />
-        <ResourceDictionary Source="pack://application:,,,/PoeShared;component/UI/Views/PageParametersView.xaml" />
-        <ResourceDictionary Source="pack://application:,,,/PoeShared;component/UI/Views/AudioNotificationTypeSelectorView.xaml" />
-        <ResourceDictionary Source="pack://application:,,,/PoeShared;component/PoeControlPanel/Views/PoeControlPanelVIew.xaml" />
-
+        <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Generic.shared.xaml" />
     </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>

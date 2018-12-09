@@ -15,7 +15,7 @@ namespace PoeShared.Scaffolding
                 return false;
             }
 
-            var winKey = (Keys)KeyInterop.VirtualKeyFromKey(candidate.Key);
+            var winKey = (Keys) KeyInterop.VirtualKeyFromKey(candidate.Key);
             var keyMatches = args.KeyCode == winKey;
             var wpfModifiers = ModifierKeys.None;
             if (args.Alt && winKey != Keys.Alt)
@@ -41,12 +41,12 @@ namespace PoeShared.Scaffolding
         {
             var keyGestureConverter = new KeyGestureConverter();
             return Enum.GetValues(typeof(Key))
-                       .OfType<Key>()
-                       .Select(TryToCreateKeyGesture)
-                       .Select(x => x.Key == Key.None ? "None" : keyGestureConverter.ConvertToInvariantString(x))
-                       .Distinct()
-                       .OrderBy(x => x)
-                       .ToArray();
+                .OfType<Key>()
+                .Select(TryToCreateKeyGesture)
+                .Select(x => x.Key == Key.None ? "None" : keyGestureConverter.ConvertToInvariantString(x))
+                .Distinct()
+                .OrderBy(x => x)
+                .ToArray();
         }
 
         public static KeyGesture SafeCreateGesture(string hotkeyString)

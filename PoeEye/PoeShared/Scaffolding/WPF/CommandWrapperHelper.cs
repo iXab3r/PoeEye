@@ -23,7 +23,7 @@ namespace PoeShared.Scaffolding.WPF
 
         public static string GetText(DependencyObject element)
         {
-            return (string)element.GetValue(TextProperty);
+            return (string) element.GetValue(TextProperty);
         }
 
         public static void SetCommandParameter(DependencyObject element, object value)
@@ -43,7 +43,7 @@ namespace PoeShared.Scaffolding.WPF
 
         public static bool GetIsDefault(DependencyObject element)
         {
-            return (bool)element.GetValue(IsDefaultProperty);
+            return (bool) element.GetValue(IsDefaultProperty);
         }
     }
 }

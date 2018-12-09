@@ -37,7 +37,7 @@ namespace PoeShared.Scaffolding
 
         private static void OnSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            ((DataPipe)d).OnSourceChanged(e);
+            ((DataPipe) d).OnSourceChanged(e);
         }
 
         protected virtual void OnSourceChanged(DependencyPropertyChangedEventArgs e)

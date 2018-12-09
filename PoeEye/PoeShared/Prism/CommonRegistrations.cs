@@ -2,23 +2,16 @@
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Reactive.Concurrency;
+using System.Text.RegularExpressions;
 using Gma.System.MouseKeyHook;
-using PoeShared.Audio;
-using PoeShared.Common;
+using PoeShared.Audio.Services;
+using PoeShared.Audio.ViewModels;
 using PoeShared.Communications;
-using PoeShared.Communications.Chromium;
-using PoeShared.Converters;
 using PoeShared.Modularity;
 using PoeShared.Native;
-using PoeShared.PoeDatabase;
-using PoeShared.PoeDatabase.PoeNinja;
-using PoeShared.PoeTrade;
-using PoeShared.PoeTrade.Query;
+using PoeShared.Resources.Notifications;
 using PoeShared.Scaffolding;
 using PoeShared.Scaffolding.WPF;
-using PoeShared.StashApi;
-using PoeShared.StashApi.DataTypes;
-using PoeShared.StashApi.ProcurementLegacy;
 using PoeShared.UI.Models;
 using PoeShared.UI.ViewModels;
 using ProxyProvider;
@@ -40,36 +33,26 @@ namespace PoeShared.Prism
                 .RegisterSingleton<IClock, Clock>()
                 .RegisterSingleton<PoeEyeModulesRegistrator>(typeof(IPoeEyeModulesRegistrator), typeof(IPoeEyeModulesEnumerator))
                 .RegisterSingleton(typeof(IConfigProvider<>), typeof(GenericConfigProvider<>))
-                .RegisterSingleton<IEqualityComparer<IPoeItem>, PoeItemEqualityComparer>()
                 .RegisterSingleton<IConverter<NameValueCollection, string>, NameValueCollectionToQueryStringConverter>()
                 .RegisterSingleton<IConverter<NameValueCollection, IEnumerable<KeyValuePair<string, string>>>, NameValueCollectionToQueryStringConverter>()
                 .RegisterSingleton<IProxyProvider>(new InjectionFactory(unity => new GenericProxyProvider()))
                 .RegisterSingleton<IRandomNumberGenerator, RandomNumberGenerator>()
                 .RegisterSingleton<IImagesCacheService, ImagesCacheService>()
-                .RegisterSingleton<GearTypeAnalyzer>(typeof(IGearTypeAnalyzer), typeof(IItemTypeAnalyzer))
-                .RegisterSingleton<IPoeLeagueApiClient, PoeLeagueApiClient>()
-                .RegisterSingleton<IChromiumBrowserFactory, ChromiumBrowserFactory>()
-                .RegisterSingleton<IChromiumBootstrapper, ChromiumBootstrapper>()
-                .RegisterSingleton<PoeStashItemToPoeItemConverter>(typeof(IConverter<IStashItem, IPoeItem>), typeof(IConverter<IStashItem, PoeItem>))
-                .RegisterSingleton<IConverter<string, PoePrice>>(new InjectionFactory(x => StringToPoePriceConverter.Instance))
                 .RegisterSingleton<IKeyboardEventsSource>(
                     new InjectionFactory(x => x.Resolve<KeyboardEventsSource>(new DependencyOverride(typeof(IKeyboardMouseEvents), Hook.GlobalEvents()))))
-                .RegisterSingleton<IAudioNotificationsManager, AudioNotificationsManager>()
                 .RegisterSingleton<ISchedulerProvider, SchedulerProvider>()
                 .RegisterSingleton<IClipboardManager, ClipboardManager>()
                 .RegisterSingleton<IConfigSerializer, JsonConfigSerializer>()
+                .RegisterSingleton<IAudioPlayer, AudioPlayer>()
+                .RegisterSingleton<IAudioNotificationsManager, AudioNotificationsManager>()
+                .RegisterSingleton<IFactory<IWinEventHookWrapper, WinEventHookArguments>, WinEventHookWrapperFactory>()
                 .RegisterSingleton<IOverlayWindowController, OverlayWindowController>(WellKnownWindows.PathOfExileWindow);
 
             Container
                 .RegisterType<IScheduler>(WellKnownSchedulers.UI, new InjectionFactory(x => RxApp.MainThreadScheduler))
                 .RegisterType<IScheduler>(WellKnownSchedulers.Background, new InjectionFactory(x => RxApp.TaskpoolScheduler))
-                .RegisterType<IPoeLiveHistoryProvider, PoeLiveHistoryProvider>()
                 .RegisterType<IHttpClient, GenericHttpClient>()
-                .RegisterType<IPoeApiWrapper, PoeApiWrapper>()
                 .RegisterType<IPageParameterDataViewModel, PageParameterDataViewModel>()
-                .RegisterType<IPoeStashClient, PoeStashClient>()
-                .RegisterType<IPoeStaticDataProvider, PoeStaticDataProvider>()
-                .RegisterType<IPoeEconomicsSource, PoeNinjaDatabaseReader>()
                 .RegisterType<IOverlayWindowController, OverlayWindowController>()
                 .RegisterType<IAudioNotificationSelectorViewModel, AudioNotificationSelectorViewModel>()
                 .RegisterType(typeof(IFactory<,,>), typeof(Factory<,,>))
@@ -80,7 +63,11 @@ namespace PoeShared.Prism
                 .RegisterType<IImageViewModel, ImageViewModel>();
 
             Container.RegisterWindowTracker(WellKnownWindows.AllWindows, () => ".*");
-            Container.RegisterWindowTracker(WellKnownWindows.MainWindow, () => Process.GetCurrentProcess().MainWindowTitle);
+            Container.RegisterWindowTracker(WellKnownWindows.MainWindow, () =>
+            {
+                var mainWindowTitle = Process.GetCurrentProcess().MainWindowTitle;
+                return $"^{Regex.Escape(mainWindowTitle)}$";
+            });
             Container.RegisterWindowTracker(WellKnownWindows.PathOfExileWindow, () => "^Path of Exile$");
 
             Container.RegisterOverlayController(
@@ -92,15 +79,15 @@ namespace PoeShared.Prism
                 WellKnownWindows.AllWindows);
 
             Container
-                .RegisterType<IPoeDatabaseReader>(
+                .RegisterType<ISoundLibrarySource>(
                     new ContainerControlledLifetimeManager(),
                     new InjectionFactory(
-                        unity => unity.Resolve<ComplexPoeDatabaseReader>(
-                            new DependencyOverride<IPoeDatabaseReader[]>(
-                                new IPoeDatabaseReader[]
+                        unity => unity.Resolve<ComplexSoundLibrary>(
+                            new DependencyOverride<ISoundLibrarySource[]>(
+                                new ISoundLibrarySource[]
                                 {
-                                    unity.Resolve<StaticPoeDatabaseReader>(),
-                                    unity.Resolve<PoeNinjaDatabaseReader>()
+                                    unity.Resolve<FileSoundLibrarySource>(),
+                                    unity.Resolve<EmbeddedSoundLibrarySource>()
                                 }
                             )
                         )));

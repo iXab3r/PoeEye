@@ -10,7 +10,7 @@ namespace PoeShared.Converters
         {
             if (value is bool)
             {
-                return !(bool)value;
+                return !(bool) value;
             }
 
             return value;
@@ -20,7 +20,7 @@ namespace PoeShared.Converters
         {
             if (value is bool)
             {
-                return !(bool)value;
+                return !(bool) value;
             }
 
             return value;

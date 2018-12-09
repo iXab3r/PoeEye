@@ -20,7 +20,7 @@ namespace PoeShared.Scaffolding
 
         public static DataPipeCollection GetDataPipes(DependencyObject o)
         {
-            return (DataPipeCollection)o.GetValue(DataPipesProperty);
+            return (DataPipeCollection) o.GetValue(DataPipesProperty);
         }
 
         #endregion

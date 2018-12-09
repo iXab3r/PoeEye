@@ -1,6 +1,7 @@
 using JetBrains.Annotations;
 using PoeEye.Prism;
 using PoeShared.Audio;
+using PoeShared.Audio.Services;
 using PoeShared.Modularity;
 
 namespace PoeEye.Config

@@ -21,6 +21,8 @@ namespace PoeShared.Native
 
         double ActualHeight { get; set; }
 
+        float Opacity { get; set; }
+
         Size MinSize { get; set; }
 
         Size MaxSize { get; set; }
@@ -34,11 +36,11 @@ namespace PoeShared.Native
         IObservable<Unit> WhenLoaded { [NotNull] get; }
 
         SizeToContent SizeToContent { get; }
-        
+
         string Title { [CanBeNull] get; }
 
         ICommand LockWindowCommand { [NotNull] get; }
-        
+
         ICommand UnlockWindowCommand { [NotNull] get; }
 
         void SetActivationController([NotNull] IActivationController controller);

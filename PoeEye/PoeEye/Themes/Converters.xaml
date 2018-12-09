@@ -3,12 +3,13 @@
                     xmlns:blue="http://www.nuget.org/Blue.MVVM"
                     xmlns:converters="clr-namespace:PoeEye.Converters"
                     xmlns:eye="http://coderush.net/poeeye/"
-                    xmlns:query="clr-namespace:PoeShared.Common;assembly=PoeShared">
+                    xmlns:query="clr-namespace:PoeShared.Common;assembly=PoeShared"
+                    xmlns:common="clr-namespace:PoeShared.Converters;assembly=PoeShared.PathOfExile">
 
     <converters:ObjectToLowercaseConverter x:Key="ObjectToLowercaseConverter" />
     <converters:TimeSpanToSecondsConverter x:Key="TimeSpanToSecondsConverter" />
 
-    <eye:PriceToImageUriConverter x:Key="PriceToImageUriConverter" />
+    <common:PriceToImageUriConverter x:Key="PriceToImageUriConverter" />
 
     <ObjectDataProvider x:Key="TriStateProviderKey"
                         MethodName="GetValuesAndDescriptions"

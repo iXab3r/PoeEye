@@ -13,7 +13,7 @@ using PoeEye.PoeTrade.Shell.Services;
 using PoeEye.PoeTrade.Shell.ViewModels;
 using PoeEye.PoeTrade.Shell.Views;
 using PoeEye.Properties;
-using PoeShared.Communications.Chromium;
+using PoeShared.Chromium.Communications;
 using PoeShared.Native;
 using PoeShared.Scaffolding;
 using Prism.Modularity;

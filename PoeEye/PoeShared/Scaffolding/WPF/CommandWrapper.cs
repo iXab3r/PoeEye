@@ -39,8 +39,8 @@ namespace PoeShared.Scaffolding.WPF
             InnerCommand = command;
 
             isBusy = Observable.FromEventPattern<EventHandler, EventArgs>(x => command.IsActiveChanged += x, x => command.IsActiveChanged -= x)
-                               .Select(x => command.IsActive)
-                               .ToProperty(this, x => x.IsBusy);
+                .Select(x => command.IsActive)
+                .ToProperty(this, x => x.IsBusy);
 
             isExecuting
                 .Subscribe(x => command.IsActive = x)
@@ -120,7 +120,7 @@ namespace PoeShared.Scaffolding.WPF
         {
             return Create(new DelegateCommand(execute));
         }
-        
+
         public static CommandWrapper Create(Action execute, Func<bool> canExecute)
         {
             return Create(new DelegateCommand(execute, canExecute));

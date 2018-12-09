@@ -2,10 +2,6 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:viewModels="clr-namespace:PoeBud.ViewModels"
                     xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
-                    xmlns:models="clr-namespace:PoeBud.Models"
-                    xmlns:dataTypes="clr-namespace:PoeShared.StashApi.DataTypes;assembly=PoeShared"
-                    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-                    xmlns:fa="http://schemas.fontawesome.io/icons/"
                     xmlns:eye="http://coderush.net/poeeye/">
     <DataTemplate DataType="{x:Type viewModels:PoeBudSettingsViewModel}">
 
@@ -13,6 +9,7 @@
             <ResourceDictionary>
                 <ResourceDictionary.MergedDictionaries>
                     <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Generic.xaml" />
+                    <ResourceDictionary Source="pack://application:,,,/PoeShared.PathOfExile;component/Themes/Generic.xaml" />
                     <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.progressbar.xaml" />
                     <ResourceDictionary Source="../Themes/Generic.xaml" />
                 </ResourceDictionary.MergedDictionaries>

@@ -26,7 +26,7 @@ namespace PoeShared.UI.Controls
 
         private static void OnMyContentChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            var control = (ExtendedTextEditor)sender;
+            var control = (ExtendedTextEditor) sender;
             var newValue = e.NewValue as string;
             if (!string.Equals(newValue, control.TextContent, StringComparison.Ordinal))
             {

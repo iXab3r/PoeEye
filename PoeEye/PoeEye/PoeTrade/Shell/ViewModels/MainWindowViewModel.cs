@@ -20,6 +20,7 @@ using PoeEye.PoeTrade.ViewModels;
 using PoeEye.Utilities;
 using PoeShared;
 using PoeShared.Audio;
+using PoeShared.Audio.Services;
 using PoeShared.Modularity;
 using PoeShared.Native;
 using PoeShared.Prism;
@@ -270,7 +271,7 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
 
         private async Task OpenAppDataDirectory()
         {
-            await Task.Run(() => Process.Start(ExplorerExecutablePath, AppArguments.AppDataDirectory));
+            await Task.Run(() => Process.Start(ExplorerExecutablePath, AppArguments.Instance.AppDataDirectory));
         }
 
         private void CreateNewTabCommandExecuted(PoeEyeTabConfig cfg)

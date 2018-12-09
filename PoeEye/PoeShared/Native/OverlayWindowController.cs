@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Concurrency;
@@ -49,23 +48,23 @@ namespace PoeShared.Native
 
             possibleOverlayNames = new[]
             {
-                $"[PoeEye.Overlay] {windowTracker.TargetWindowName}"
+                $"[PoeEye.Overlay] {windowTracker}"
             };
 
             windowTracker.WhenAnyValue(x => x.ActiveWindowHandle)
-                         .Select(
-                             x => new
-                             {
-                                 WindowIsActive = windowTracker.IsActive,
-                                 OverlayIsActive = IsPairedOverlay(windowTracker.ActiveWindowTitle),
-                                 ActiveTitle = windowTracker.ActiveWindowTitle
-                             })
-                         .Do(x => Log.Trace($"Active window has changed: {x}"))
-                         .Select(x => x.WindowIsActive || x.OverlayIsActive)
-                         .DistinctUntilChanged()
-                         .ObserveOn(uiScheduler)
-                         .Subscribe(SetVisibility, Log.HandleUiException)
-                         .AddTo(Anchors);
+                .Select(
+                    x => new
+                    {
+                        WindowIsActive = windowTracker.IsActive,
+                        OverlayIsActive = IsPairedOverlay(windowTracker.ActiveWindowTitle),
+                        ActiveTitle = windowTracker.ActiveWindowTitle
+                    })
+                .Do(x => Log.Trace($"Active window has changed: {x}"))
+                .Select(x => x.WindowIsActive || x.OverlayIsActive)
+                .DistinctUntilChanged()
+                .ObserveOn(uiScheduler)
+                .Subscribe(SetVisibility, Log.HandleUiException)
+                .AddTo(Anchors);
 
             windowTracker
                 .WhenAnyValue(x => x.MatchingWindowHandle)
@@ -98,10 +97,10 @@ namespace PoeShared.Native
         public IOverlayViewModel[] GetChildren()
         {
             return windows.Items
-                          .Select(x => x.DataContext)
-                          .OfType<OverlayWindowViewModel>()
-                          .Select(x => x.Content)
-                          .ToArray();
+                .Select(x => x.DataContext)
+                .OfType<OverlayWindowViewModel>()
+                .Select(x => x.Content)
+                .ToArray();
         }
 
         public IDisposable RegisterChild(IOverlayViewModel viewModel)
@@ -122,13 +121,13 @@ namespace PoeShared.Native
             var overlayWindow = new OverlayWindowView
             {
                 DataContext = overlayWindowViewModel,
-                Title = $"[PoeEye.Overlay] {windowTracker.TargetWindowName} #{overlayName}",
+                Title = $"[PoeEye.Overlay] {windowTracker} #{overlayName}",
                 Visibility = Visibility.Visible,
                 Topmost = true,
                 Name = $"{overlayName}_OverlayView"
             };
             Log.Debug($"[#{overlayName}] Created Overlay window({windowTracker})");
-            
+
             var activationController = new ActivationController(overlayWindow);
             viewModel.SetActivationController(activationController);
 
@@ -152,21 +151,18 @@ namespace PoeShared.Native
             if (viewModel.WhenLoaded is IObserver<Unit> observer)
             {
                 overlayWindow.WhenLoaded
-                             .Do(_ =>
-                             {
-                                 Log.Debug($"[#{overlayWindow.Name}] Overlay is loaded");
-                                 overlayWindow.Visibility = Visibility.Hidden;
-                             })
-                             .Subscribe(observer)
-                             .AddTo(childAnchors);
+                    .Do(_ =>
+                    {
+                        Log.Debug($"[#{overlayWindow.Name}] Overlay is loaded");
+                        overlayWindow.Visibility = Visibility.Hidden;
+                    })
+                    .Subscribe(observer)
+                    .AddTo(childAnchors);
             }
 
             overlayWindow
                 .WhenRendered
-                .Do(_ =>
-                {
-                    Log.Debug($"[#{overlayWindow.Name}] Overlay is rendered");
-                })
+                .Do(_ => { Log.Debug($"[#{overlayWindow.Name}] Overlay is rendered"); })
                 .Subscribe()
                 .AddTo(childAnchors);
 
@@ -184,7 +180,7 @@ namespace PoeShared.Native
             }).AddTo(childAnchors);
 
             childAnchors.AddTo(Anchors);
-            
+
             Log.Info($"Overlay #{overlayName} initialized");
 
             return childAnchors;
@@ -216,10 +212,10 @@ namespace PoeShared.Native
                 var location = overlayWindow.PointToScreen(new Point(0, 0));
                 WindowsServices.ShowInactiveTopmost(
                     overlayWindowHandle,
-                    (int)location.X,
-                    (int)location.Y,
-                    (int)viewModel.Width,
-                    (int)viewModel.Height);
+                    (int) location.X,
+                    (int) location.Y,
+                    (int) viewModel.Width,
+                    (int) viewModel.Height);
             }
             else
             {

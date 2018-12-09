@@ -1,7 +1,7 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:System="clr-namespace:System;assembly=mscorlib"
-                    xmlns:query="clr-namespace:PoeShared.PoeTrade.Query;assembly=PoeShared"
+                    xmlns:query="clr-namespace:PoeShared.PoeTrade.Query;assembly=PoeShared.PathOfExile"
                     xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
                     xmlns:viewModels="clr-namespace:PoeEye.PoeTrade.ViewModels"
                     xmlns:converters="clr-namespace:PoeEye.Converters"

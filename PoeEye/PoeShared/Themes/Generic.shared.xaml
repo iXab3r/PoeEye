@@ -1,0 +1,16 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <FontFamily x:Key="FontAwesome">pack://application:,,,/FontAwesome.WPF;component/#FontAwesome</FontFamily>
+
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Converters.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Colors.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/SlimScrollbar.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Thumb.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/AvalonEdit.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Styles.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/PoeShared;component/UI/Views/ImageView.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/PoeShared;component/UI/Views/PageParametersView.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Audio/Views/AudioNotificationTypeSelectorView.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+</ResourceDictionary>

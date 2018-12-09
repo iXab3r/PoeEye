@@ -1,9 +1,10 @@
 ﻿using System;
+using System.ComponentModel;
 using JetBrains.Annotations;
 
 namespace PoeShared.Native
 {
-    public interface IWindowTracker
+    public interface IWindowTracker : INotifyPropertyChanged
     {
         bool IsActive { get; }
 
@@ -13,6 +14,6 @@ namespace PoeShared.Native
 
         IntPtr ActiveWindowHandle { get; }
 
-        string TargetWindowName { get; }
+        string Name { get; }
     }
 }

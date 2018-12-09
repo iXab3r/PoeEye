@@ -2,6 +2,7 @@
 using JetBrains.Annotations;
 using PoeEye.Config;
 using PoeShared.Audio;
+using PoeShared.Audio.Services;
 using PoeShared.PoeTrade;
 using PoeShared.Scaffolding;
 

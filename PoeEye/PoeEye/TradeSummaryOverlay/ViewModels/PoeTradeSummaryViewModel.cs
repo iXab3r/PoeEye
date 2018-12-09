@@ -13,6 +13,7 @@ using PoeEye.PoeTrade.Shell.ViewModels;
 using PoeEye.PoeTrade.ViewModels;
 using PoeEye.TradeSummaryOverlay.Modularity;
 using PoeShared.Audio;
+using PoeShared.Audio.Services;
 using PoeShared.Common;
 using PoeShared.Modularity;
 using PoeShared.Native;

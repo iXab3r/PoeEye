@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization.Formatters;
-using Common.Logging;
 using Guards;
 using Newtonsoft.Json;
 
@@ -30,7 +29,7 @@ namespace PoeShared.Scaffolding
         {
             return instance == null ? $"null<{typeof(T).Name}>" : JsonConvert.SerializeObject(instance, formatting);
         }
-        
+
         public static string DumpToText<T>(this T instance, JsonSerializerSettings settings)
         {
             return instance == null ? $"null<{typeof(T).Name}>" : JsonConvert.SerializeObject(instance, settings);
@@ -52,14 +51,14 @@ namespace PoeShared.Scaffolding
             Guard.ArgumentNotNull(target, nameof(target));
 
             var settableProperties = typeof(TTarget)
-                                     .GetProperties(BindingFlags.Instance | BindingFlags.Public)
-                                     .Where(x => x.CanRead && x.CanWrite)
-                                     .ToArray();
+                .GetProperties(BindingFlags.Instance | BindingFlags.Public)
+                .Where(x => x.CanRead && x.CanWrite)
+                .ToArray();
 
             var propertiesToSet = typeof(TSource)
-                                  .GetProperties(BindingFlags.Instance | BindingFlags.Public)
-                                  .Where(x => x.CanRead)
-                                  .ToArray();
+                .GetProperties(BindingFlags.Instance | BindingFlags.Public)
+                .Where(x => x.CanRead)
+                .ToArray();
 
             var skippedProperties = new List<PropertyInfo>();
             foreach (var property in propertiesToSet)
