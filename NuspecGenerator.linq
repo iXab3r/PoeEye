@@ -2,10 +2,10 @@
 
 void Main()
 {
-	var appExeName = "MicSwitch.exe";
+	var appExeName = "PoeEye.exe";
 	var appName = Path.GetFileNameWithoutExtension(appExeName);
 	var scriptDir = Path.GetDirectoryName(Util.CurrentQueryPath);
-	var homeDir = Path.Combine(scriptDir, "Sources");
+	var homeDir = Path.Combine(scriptDir, "PoeEye");
 
 	var nuspecFileName = $"{appName}.nuspec";
 	var binariesDir = @"bin\";

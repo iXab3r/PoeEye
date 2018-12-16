@@ -52,7 +52,7 @@
                             
                             <ContentControl Grid.Column="4" Content="{Binding SaveAsDefault}" Width="150" Margin="10,0"
                                             eye:CommandWrapperHelper.Text="Save as Default"
-                                            ToolTip="Apply this configuration to all new tabs" />
+                                            ToolTip="Apply this parameters(league, mods, etc) to all new tabs" />
 
                             <ContentControl Grid.Column="5"
                                             Content="{Binding ApiSelector}" MinWidth="200" HorizontalAlignment="Right" />
