@@ -29,7 +29,6 @@ using PoeShared.Scaffolding;
 using Stateless;
 using SuperSocket.ClientEngine;
 using TypeConverter;
-using WebSocket4Net;
 
 namespace PoeEye.PoeTradeRealtimeApi
 {
@@ -131,6 +130,7 @@ namespace PoeEye.PoeTradeRealtimeApi
             queryStateMachine.OnUnhandledTrigger((state, trigger) =>
                                                      Log.Debug(
                                                          $"[RealtimeItemsSource.UnhandledState] Failed to process trigger {trigger}, state: {state}"));
+            
         }
 
         public IPoeQueryResult GetResult()

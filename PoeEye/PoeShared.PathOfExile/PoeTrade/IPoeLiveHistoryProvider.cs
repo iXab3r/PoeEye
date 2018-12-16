@@ -16,7 +16,9 @@ namespace PoeShared.PoeTrade
         TimeSpan RecheckPeriod { get; set; }
 
         bool IsBusy { get; }
-
+        
+        DateTime LastUpdateTimestamp { get; }
+        
         void Refresh();
     }
 }

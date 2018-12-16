@@ -363,13 +363,13 @@ namespace PoeEye.PoeTrade.ViewModels
             {
                 var newQuery = queryBuilder();
                 Log.Debug(
-                    $"[MainWindowTabViewModel.RefreshCommandExecuted] Search command executed, running query\r\n{newQuery.DumpToText()}");
+                    $"[MainWindowTabViewModel.RefreshCommandExecuted] Search command executed, running query\r\n{newQuery.DumpToTextRaw()}");
                 RunNewSearch(newQuery);
             }
             else
             {
                 Log.Debug(
-                    $"[MainWindowTabViewModel.RefreshCommandExecuted] Refresh command executed, running query\r\n{Query.DumpToText()}");
+                    $"[MainWindowTabViewModel.RefreshCommandExecuted] Refresh command executed, running query\r\n{Query.DumpToTextRaw()}");
                 TradesList.Refresh();
             }
         }

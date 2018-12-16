@@ -105,7 +105,10 @@ namespace PoeShared.Communications
         {
             var postData = nameValueConverter.Convert(args);
             Log.Debug($"[HttpClient] Querying uri '{uri}', args: \r\nPOST: {postData}");
-            Log.Trace($"[HttpClient] Splitted POST data dump: {postData.SplitClean('&').DumpToText()}");
+            if (Log.IsTraceEnabled)
+            {
+                Log.Trace($"[HttpClient] POST data dump: {postData.SplitClean('&').DumpToText()}");
+            }
 
             var httpClient = WebRequest.CreateHttp(uri);
 
@@ -157,8 +160,8 @@ namespace PoeShared.Communications
 
                 if (responseStream != null)
                 {
-                    var rawBytes = responseStream.ReadToEnd();
-                    Log.Debug($"[HttpClient] Received response, status: {response.StatusCode}, binary length: {rawBytes}");
+                    var rawBytes = responseStream.ReadToEnd() ?? new byte[0];
+                    Log.Debug($"[HttpClient] Received response, status: {response.StatusCode}, binary length: {rawBytes.Length}");
                     rawResponse = Encoding.UTF8.GetString(rawBytes);
                     Log.Debug($"[HttpClient] Resulting response(string) length: {rawResponse.Length}");
                 }

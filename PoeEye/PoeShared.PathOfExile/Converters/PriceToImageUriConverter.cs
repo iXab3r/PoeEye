@@ -23,12 +23,10 @@ namespace PoeShared.Converters
             var price = StringToPoePriceConverter.Instance.Convert(rawPrice);
             if (price.IsEmpty)
             {
-                Log.Debug($"Failed to convert string '{rawPrice}' to PoePrice");
                 return null;
             }
 
-            string imageName;
-            if (!KnownCurrencyNameList.KnownImages.TryGetValue(price.CurrencyType, out imageName))
+            if (!KnownCurrencyNameList.KnownImages.TryGetValue(price.CurrencyType, out var imageName))
             {
                 imageName = KnownCurrencyNameList.KnownImages[KnownCurrencyNameList.Unknown];
             }

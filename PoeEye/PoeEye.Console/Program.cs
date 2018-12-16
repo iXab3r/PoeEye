@@ -2,11 +2,8 @@
 using Common.Logging;
 using PoeEye.PoeTrade;
 using PoeEye.PoeTrade.Prism;
-using PoeEye.PoeTradeRealtimeApi;
-using PoeEye.PoeTradeRealtimeApi.Prism;
 using PoeShared.PoeTrade;
 using PoeShared.Prism;
-using PoeShared.Scaffolding;
 using Prism.Modularity;
 using Unity;
 using Unity.Resolution;
@@ -29,7 +26,6 @@ namespace PoeEye.Console
                 var modules = new IModule[]
                 {
                     new PoeTradeModule(container),
-                    new PoeTradeRealtimeModule(container)
                 };
                 foreach (var module in modules)
                 {
@@ -46,19 +42,6 @@ namespace PoeEye.Console
                     OnlineOnly = true,
                     NormalizeQuality = true
                 };
-                var source = container.Resolve<IRealtimeItemSource>(new DependencyOverride<IPoeQueryInfo>(query));
-                var result = source.GetResult();
-
-                Log.Info($"[Result] {result.ItemsList.Length.DumpToText()}");
-
-                while (true)
-                {
-                    System.Console.WriteLine("Press any key...");
-                    System.Console.ReadKey();
-
-                    var liveResult = source.GetResult();
-                    Log.Info($"[LiveResult] {liveResult.ItemsList.Length.DumpToText()}");
-                }
             }
             catch (Exception ex)
             {

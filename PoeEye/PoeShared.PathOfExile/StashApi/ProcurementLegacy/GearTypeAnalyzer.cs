@@ -124,7 +124,6 @@ namespace PoeShared.StashApi.ProcurementLegacy
                         where !string.IsNullOrWhiteSpace(compatibleType.TypeName)
                         select new {GearType = runner.Type, ItemType = compatibleType.TypeName};
             var options = query.ToArray();
-            Log.Debug(options.DumpToTable());
 
             var itemInfo = options.FirstOrDefault();
 

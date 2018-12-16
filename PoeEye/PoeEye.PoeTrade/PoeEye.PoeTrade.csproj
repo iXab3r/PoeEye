@@ -148,6 +148,9 @@
     <Compile Include="Prism\LiveRegistrations.cs" />
     <Compile Include="Prism\PoeTradeModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TradeApi\IPoeTradeLiveAdapter.cs" />
+    <Compile Include="TradeApi\RealtimeItemSource.cs" />
+    <None Include="TradeApi\WebSocketRealtimeItemSource.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config">
@@ -169,7 +172,6 @@
       <Name>PoeShared</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

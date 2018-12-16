@@ -2,11 +2,16 @@
 using System.Collections.Specialized;
 using System.Net;
 using System.Reactive.Linq;
+using System.Reactive.Threading.Tasks;
 using System.Threading;
 using System.Threading.Tasks;
 using Common.Logging;
+using DynamicData;
+using DynamicData.Alias;
 using Guards;
+using JetBrains.Annotations;
 using PoeEye.PoeTrade.Modularity;
+using PoeEye.PoeTrade.TradeApi;
 using PoeShared.Communications;
 using PoeShared.Exceptions;
 using PoeShared.Modularity;
@@ -32,26 +37,30 @@ namespace PoeEye.PoeTrade
         private readonly IProxyProvider proxyProvider;
         private readonly IConverter<IPoeQuery, NameValueCollection> queryConverter;
         private readonly IConverter<IPoeQueryInfo, IPoeQuery> queryInfoToQueryConverter;
+        private readonly IFactory<IPoeTradeLiveAdapter, IPoeQueryResult> liveSourceFactory;
 
         private readonly SemaphoreSlim requestsSemaphore;
 
         private PoeTradeConfig config = new PoeTradeConfig();
 
         public PoeTradeApi(
-            IFactory<PoeTradeHeadlessApi> headlessApiFactory,
-            IPoeTradeParser poeTradeParser,
-            IProxyProvider proxyProvider,
-            IFactory<IHttpClient> httpClientFactory,
-            IConverter<IPoeQueryInfo, IPoeQuery> queryInfoToQueryConverter,
-            IConverter<IPoeQuery, NameValueCollection> queryConverter,
-            IConfigProvider<PoeTradeConfig> configProvider)
+            [NotNull] IFactory<PoeTradeHeadlessApi> headlessApiFactory,
+            [NotNull] IPoeTradeParser poeTradeParser,
+            [NotNull] IProxyProvider proxyProvider,
+            [NotNull] IFactory<IHttpClient> httpClientFactory,
+            [NotNull] IConverter<IPoeQueryInfo, IPoeQuery> queryInfoToQueryConverter,
+            [NotNull] IFactory<IPoeTradeLiveAdapter, IPoeQueryResult> liveSourceFactory,
+            [NotNull] IConverter<IPoeQuery, NameValueCollection> queryConverter,
+            [NotNull] IConfigProvider<PoeTradeConfig> configProvider)
         {
+            Guard.ArgumentNotNull(headlessApiFactory, nameof(headlessApiFactory));
             Guard.ArgumentNotNull(poeTradeParser, nameof(poeTradeParser));
             Guard.ArgumentNotNull(proxyProvider, nameof(proxyProvider));
             Guard.ArgumentNotNull(httpClientFactory, nameof(httpClientFactory));
             Guard.ArgumentNotNull(queryInfoToQueryConverter, nameof(queryInfoToQueryConverter));
             Guard.ArgumentNotNull(queryConverter, nameof(queryConverter));
             Guard.ArgumentNotNull(configProvider, nameof(configProvider));
+            Guard.ArgumentNotNull(liveSourceFactory, nameof(liveSourceFactory));
 
             this.headlessApiFactory = headlessApiFactory;
             this.poeTradeParser = poeTradeParser;
@@ -59,6 +68,7 @@ namespace PoeEye.PoeTrade
             this.queryConverter = queryConverter;
             this.httpClientFactory = httpClientFactory;
             this.queryInfoToQueryConverter = queryInfoToQueryConverter;
+            this.liveSourceFactory = liveSourceFactory;
 
             configProvider
                 .WhenChanged
@@ -78,7 +88,14 @@ namespace PoeEye.PoeTrade
         {
             Guard.ArgumentNotNull(query, nameof(query));
 
-            return Observable.Never<IPoeQueryResult>();
+            return IssueQuery(query)
+                   .ToObservable()
+                   .Select(queryResult =>
+                   {
+                       Log.Debug($"Initializing live subscription for query {queryResult.Id}");
+                       return Observable.Using(() => liveSourceFactory.Create(queryResult), api => api.Updates);
+                   })
+                   .Switch();
         }
 
         public async Task<IPoeQueryResult> IssueQuery(IPoeQueryInfo queryInfo)
@@ -87,7 +104,12 @@ namespace PoeEye.PoeTrade
 
             var query = queryInfoToQueryConverter.Convert(queryInfo);
             var queryPostData = queryConverter.Convert(query);
-            return await IssueQuery(PoeTradeSearchUri, queryPostData);
+            var rawData = await IssueQuery(PoeTradeSearchUri, queryPostData);
+            return new PoeQueryResult(rawData)
+            {
+                Query = queryInfo,
+                ConvertedQuery = queryPostData.DumpToTextRaw(),
+            };
         }
 
         public Task<IPoeStaticData> RequestStaticData()
@@ -108,7 +130,7 @@ namespace PoeEye.PoeTrade
                 var client = CreateClient(out proxyToken);
 
                 Log.Debug(
-                    $"[PoeTradeApi] Awaiting for semaphore slot (max: {config.MaxSimultaneousRequestsCount}, atm: {requestsSemaphore.CurrentCount})");
+                    $"Awaiting for semaphore slot (max: {config.MaxSimultaneousRequestsCount}, atm: {requestsSemaphore.CurrentCount})");
                 await requestsSemaphore.WaitAsync();
 
                 return await client
@@ -129,12 +151,6 @@ namespace PoeEye.PoeTrade
             }
         }
 
-        private IHttpClient CreateClientWithoutProxy()
-        {
-            IProxyToken proxyToken;
-            return CreateClient(out proxyToken);
-        }
-
         private IHttpClient CreateClient(out IProxyToken proxyToken)
         {
             proxyToken = null;
@@ -150,7 +166,7 @@ namespace PoeEye.PoeTrade
 
             if (config.ProxyEnabled && proxyProvider.TryGetProxy(out proxyToken))
             {
-                Log.Debug($"[PoeTradeApi] Got proxy {proxyToken} from proxy provider {proxyProvider}");
+                Log.Debug($"Got proxy {proxyToken} from proxy provider {proxyProvider}");
                 client.Proxy = proxyToken.Proxy;
             }
             else
@@ -165,7 +181,7 @@ namespace PoeEye.PoeTrade
 
         private void ReleaseSemaphore()
         {
-            Log.Debug($"[PoeTradeApi] Awaiting {config.DelayBetweenRequests.TotalSeconds}s before releasing semaphore slot...");
+            Log.Debug($"Awaiting {config.DelayBetweenRequests.TotalSeconds}s before releasing semaphore slot...");
             Thread.Sleep(config.DelayBetweenRequests);
             requestsSemaphore.Release();
         }

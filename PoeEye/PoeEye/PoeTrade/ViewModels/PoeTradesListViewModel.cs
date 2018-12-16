@@ -48,7 +48,6 @@ namespace PoeEye.PoeTrade.ViewModels
         private ActiveProviderInfo activeProviderInfo;
         private IPoeQueryInfo activeQuery;
         private string errors;
-        private DateTime lastUpdateTimestamp;
         private string quickFilterText;
         private TimeSpan recheckPeriod;
         private string rawQuery;
@@ -89,16 +88,9 @@ namespace PoeEye.PoeTrade.ViewModels
                 .DistinctUntilChanged()
                 .WithPrevious((prev, curr) => new {prev, curr})
                 .Select(x => x.curr)
-                .Do(_ => lastUpdateTimestamp = clock.Now)
                 .Select(HandleNextQuery)
                 .Switch()
                 .Subscribe(OnNextItemsPackReceived, Log.HandleException)
-                .AddTo(Anchors);
-
-            Observable
-                .Timer(DateTimeOffset.Now, TimeSinceLastUpdateRefreshTimeout)
-                .ObserveOn(uiScheduler)
-                .Subscribe(_ => this.RaisePropertyChanged(nameof(TimeSinceLastUpdate)))
                 .AddTo(Anchors);
 
             itemsSource.Connect()
@@ -132,6 +124,10 @@ namespace PoeEye.PoeTrade.ViewModels
         public IPageParameterDataViewModel PageParameters { get; }
 
         public ReadOnlyObservableCollection<IPoeTradeViewModel> Items { get; }
+
+        public TimeSpan TimeSinceLastUpdate => activeProviderInfo.HistoryProvider == null 
+            ? TimeSpan.MaxValue 
+            : clock.Now - activeProviderInfo.HistoryProvider.LastUpdateTimestamp;
         
         public IPoeQueryInfo ActiveQuery
         {
@@ -156,8 +152,6 @@ namespace PoeEye.PoeTrade.ViewModels
             get => quickFilterText;
             set => this.RaiseAndSetIfChanged(ref quickFilterText, value);
         }
-
-        public TimeSpan TimeSinceLastUpdate => clock.Now - lastUpdateTimestamp;
 
         public bool IsBusy => activeProviderInfo.HistoryProvider?.IsBusy ?? false;
 
@@ -191,12 +185,29 @@ namespace PoeEye.PoeTrade.ViewModels
             {
                 return;
             }
+            //TODO PERFORMANCE - do single-pass bucketing
+            var unknownItems = itemsPack.Where(x => x.ItemState == PoeTradeState.Unknown || x.ItemState == PoeTradeState.Normal).ToArray();
+            if (unknownItems.Any())
+            {
+                var invalidArgsException = new ApplicationException($"Received invalid(malformed) items pack - some of items have invalid state(Normal/Unknown), data: {itemsPack.DumpToTextRaw()}");
+                HandleProviderErrorReceived(invalidArgsException);
+                throw invalidArgsException;
+            }
 
+            if (!itemsPack.Any())
+            {
+                if (Log.IsTraceEnabled)
+                {
+                    Log.Trace($"Empty items pack received, query: {activeQuery?.DumpToTextRaw()}");
+                }
+                return;
+            }
+            
             var removedItems = itemsPack.Where(x => x.ItemState == PoeTradeState.Removed).ToArray();
             var newItems = itemsPack.Where(x => x.ItemState == PoeTradeState.New).ToArray();
 
             Log.Debug(
-                $"[TradesListViewModel] Next items pack received, existingItems: {itemsSource.Count}, newItems: {newItems.Length}, removedItems: {removedItems.Length}");
+                $"Next items pack received, existingItems: {itemsSource.Count}, newItems: {newItems.Length}, removedItems: {removedItems.Length}");
 
             foreach (var item in removedItems)
             {
@@ -235,8 +246,6 @@ namespace PoeEye.PoeTrade.ViewModels
                     trade.Trade.Timestamp = clock.Now;
                 });
             }
-
-            lastUpdateTimestamp = clock.Now;
         }
 
         private void Update(IPoeItem item, Action<IPoeTradeViewModel> action)
@@ -268,7 +277,7 @@ namespace PoeEye.PoeTrade.ViewModels
 
         private void OnNextHistoryProviderCreated(IPoeLiveHistoryProvider poeLiveHistoryProvider)
         {
-            Log.Debug($"[TradesListViewModel] Setting up new HistoryProvider (updateTimeout: {recheckPeriod})...");
+            Log.Debug($"Setting up new HistoryProvider (updateTimeout: {recheckPeriod})...");
 
             activeProviderInfo = new ActiveProviderInfo(poeLiveHistoryProvider);
             activeHistoryProviderDisposable.Disposable = activeProviderInfo;
@@ -291,6 +300,13 @@ namespace PoeEye.PoeTrade.ViewModels
                 .Subscribe(x => RawQuery = $"Eye query:\n{x?.Query?.DumpToTextRaw() ?? "Empty"}\n\nProvider query:\n{x?.ConvertedQuery ?? "Empty"}")
                 .AddTo(activeProviderInfo.Anchors);
             
+            poeLiveHistoryProvider
+                .WhenAnyValue(x => x.LastUpdateTimestamp)
+                .Buffer(TimeSinceLastUpdateRefreshTimeout)
+                .ObserveOn(uiScheduler)
+                .Subscribe(x => this.RaisePropertyChanged(nameof(TimeSinceLastUpdate)))
+                .AddTo(activeProviderInfo.Anchors);
+            
             this.WhenAnyValue(x => x.RecheckPeriod)
                 .Throttle(RecheckPeriodThrottleTimeout)
                 .ObserveOn(uiScheduler)
@@ -302,7 +318,7 @@ namespace PoeEye.PoeTrade.ViewModels
         {
             if (exception != null)
             {
-                Log.Debug("[TradesListViewModel] Received an exception from history provider", exception);
+                Log.Debug("Received an exception from history provider", exception);
                 var errorMsg = $"[{clock.Now}] {exception.Message}";
 
                 if (errors?.Length > 1024)

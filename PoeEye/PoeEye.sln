@@ -19,8 +19,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PoeEye.ItemParser", "PoeEye
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PoeEye.Console", "PoeEye.Console\PoeEye.Console.csproj", "{5745039E-24A7-40FC-9B61-F6C2EE6F3406}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PoeEye.PoeTradeRealtimeApi", "PoeEye.PoeTradeRealtimeApi\PoeEye.PoeTradeRealtimeApi.csproj", "{0E9B96E1-A5DC-4F5A-8F43-40BE640D50F4}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PoeBud", "PoeBud\PoeBud.csproj", "{DA6C88EA-168E-4116-B0D1-0F732D5B4773}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PoeTradeMonitor", "PoeTradeMonitor\PoeTradeMonitor.csproj", "{9BAED733-7C2B-4AAA-8E60-4B73B612C78E}"
@@ -81,10 +79,6 @@ Global
 		{5745039E-24A7-40FC-9B61-F6C2EE6F3406}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5745039E-24A7-40FC-9B61-F6C2EE6F3406}.Release|Any CPU.ActiveCfg = Debug|Any CPU
 		{5745039E-24A7-40FC-9B61-F6C2EE6F3406}.Release|Any CPU.Build.0 = Debug|Any CPU
-		{0E9B96E1-A5DC-4F5A-8F43-40BE640D50F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0E9B96E1-A5DC-4F5A-8F43-40BE640D50F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0E9B96E1-A5DC-4F5A-8F43-40BE640D50F4}.Release|Any CPU.ActiveCfg = Debug|Any CPU
-		{0E9B96E1-A5DC-4F5A-8F43-40BE640D50F4}.Release|Any CPU.Build.0 = Debug|Any CPU
 		{DA6C88EA-168E-4116-B0D1-0F732D5B4773}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{DA6C88EA-168E-4116-B0D1-0F732D5B4773}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DA6C88EA-168E-4116-B0D1-0F732D5B4773}.Release|Any CPU.ActiveCfg = Debug|Any CPU

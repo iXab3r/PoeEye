@@ -1,18 +1,21 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Data;
 using System.Linq;
 using System.Net;
+using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using System.Reactive.Threading.Tasks;
+using System.Threading.Tasks;
 using Common.Logging;
 using Guards;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using PoeEye.PoeTrade;
 using PoeShared.Common;
 using PoeShared.Communications;
 using PoeShared.PoeTrade;
@@ -21,25 +24,31 @@ using PoeShared.Prism;
 using PoeShared.Scaffolding;
 using Stateless;
 using TypeConverter;
+using Unity.Attributes;
 
-namespace PoeEye.PoeTradeRealtimeApi
+namespace PoeEye.PoeTrade.TradeApi
 {
-    internal sealed class RealtimeItemSource : DisposableReactiveObject, IRealtimeItemSource
+    internal sealed class RealtimeItemSource : DisposableReactiveObject, IPoeTradeLiveAdapter
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(RealtimeItemSource));
 
-        private static readonly string PoeTradeSearchUri = @"http://poe.trade/search";
+        private static readonly TimeSpan LiveQueryRefreshPeriod = TimeSpan.FromSeconds(5);
+
         private static readonly string PoeTradeUri = @"http://poe.trade";
 
         private static readonly string InitialLiveQueryId = "-1";
+        private static readonly int MaxItemsToReplay = 99;
+
+        private readonly ISubject<IPoeQueryResult> resultSink = new ReplaySubject<IPoeQueryResult>(MaxItemsToReplay);
 
         private readonly IFactory<IHttpClient> clientFactory;
 
-        private readonly ConcurrentDictionary<string, IPoeItem> itemsList = new ConcurrentDictionary<string, IPoeItem>();
         private readonly SerialDisposable liveAnchors = new SerialDisposable();
         private readonly IPoeTradeParser parser;
+        private readonly IPoeQueryResult initialData;
         private readonly string queryLeague;
-        private readonly NameValueCollection queryPostData;
+        private readonly string queryId;
+        private readonly IPoeQueryResult emptyResult;
 
         private readonly StateMachine<State, Trigger> queryStateMachine = new StateMachine<State, Trigger>(State.Created);
         private readonly StateMachine<State, Trigger>.TriggerWithParameters<Uri> toLiveQueryTransitionTrigger;
@@ -50,20 +59,39 @@ namespace PoeEye.PoeTradeRealtimeApi
         private string nextLiveQueryId;
 
         public RealtimeItemSource(
+            [NotNull] IPoeQueryResult initialData,
             [NotNull] IFactory<IHttpClient> clientFactory,
             [NotNull] IConverter<IPoeQueryInfo, IPoeQuery> queryInfoToQueryConverter,
             [NotNull] IConverter<IPoeQuery, NameValueCollection> queryToPostConverter,
             [NotNull] IPoeTradeParser parser,
-            [NotNull] IPoeQueryInfo queryInfo)
+            [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler)
         {
+            Guard.ArgumentNotNull(initialData, nameof(initialData));
             Guard.ArgumentNotNull(clientFactory, nameof(clientFactory));
             Guard.ArgumentNotNull(queryInfoToQueryConverter, nameof(queryInfoToQueryConverter));
             Guard.ArgumentNotNull(queryToPostConverter, nameof(queryToPostConverter));
             Guard.ArgumentNotNull(parser, nameof(parser));
-            Guard.ArgumentNotNull(queryInfo, nameof(queryInfo));
+            Guard.ArgumentNotNull(bgScheduler, nameof(bgScheduler));
 
             this.clientFactory = clientFactory;
             this.parser = parser;
+            this.initialData = initialData;
+            Log.Debug($"Constructing query out of supplied data: {initialData.DumpToTextRaw()}");
+
+            queryId = initialData.Id;
+            queryLeague = initialData.Query.League;
+
+            if (string.IsNullOrWhiteSpace(queryId))
+            {
+                throw new ArgumentException($"QueryId must be set in the supplied data, got: {initialData.DumpToTextRaw()}");
+            }
+            
+            if (string.IsNullOrWhiteSpace(queryLeague))
+            {
+                throw new ArgumentException($"League must be set in the supplied data, got: {initialData.DumpToTextRaw()}");
+            }
+
+            emptyResult = ToQueryResult(Array.Empty<IPoeItem>());
 
             liveAnchors.AddTo(Anchors);
             Disposable.Create(() => queryStateMachine.Fire(Trigger.Dispose)).AddTo(Anchors);
@@ -96,110 +124,96 @@ namespace PoeEye.PoeTradeRealtimeApi
                 .Configure(State.Disposed)
                 .OnEntry(Reset);
 
-            Log.Debug($"[RealtimeItemsSource..ctor] FSM:\n {queryStateMachine.ToDotGraph()}");
-
-            Log.Debug($"[RealtimeItemsSource..ctor] Constructing query out of supplied data: {queryInfo.DumpToText(Formatting.None)}");
-            queryLeague = queryInfo.League;
-            var query = queryInfoToQueryConverter.Convert(queryInfo);
-            queryPostData = queryToPostConverter.Convert(query);
-            Log.Debug(
-                $"[RealtimeItemsSource..ctor] Post data for supplied query has been constructed:\n Query: {queryInfo.DumpToText(Formatting.None)}\n Post: {queryPostData.DumpToText(Formatting.None)}");
+            if (Log.IsTraceEnabled)
+            {
+                Log.Trace($"[{queryId}] FSM:\n {queryStateMachine.ToDotGraph()}");
+            }
 
             queryStateMachine.Fire(Trigger.Create);
 
-            queryStateMachine.OnTransitioned(
-                x => Log.Debug($"[RealtimeItemsSource.State] {x.Source} => {x.Trigger} => {x.Destination} (isReentry: {x.IsReentry})"));
+            queryStateMachine.OnTransitioned(x =>
+            {
+                if (Log.IsTraceEnabled)
+                {
+                    Log.Trace($"[{queryId}] State {x.Source} => {x.Trigger} => {x.Destination} (isReentry: {x.IsReentry})");
+                }
+            });
             queryStateMachine.OnUnhandledTrigger((state, trigger) =>
-                                                     Log.Debug(
-                                                         $"[RealtimeItemsSource.UnhandledState] Failed to process trigger {trigger}, state: {state}"));
+            {
+                Log.Error($"[{queryId}] Failed to process trigger {trigger}, state: {state}");
+                resultSink.OnError(new ApplicationException($"Failed to process trigger {trigger}, state: {state}"));
+            });
+
+            Observable
+                .Timer(TimeSpan.Zero, LiveQueryRefreshPeriod, bgScheduler)
+                .Subscribe(RefreshData)
+                .AddTo(Anchors);
         }
 
-        public IPoeQueryResult GetResult()
+        private IPoeQueryResult ToQueryResult(IEnumerable<IPoeItem> items)
+        {
+            return new PoeQueryResult
+            {
+                Id = initialData.Id,
+                Query = initialData.Query,
+                ItemsList = items.ToArray(),
+            };
+        }
+
+        private void SetNextLiveQueryId(string nextQueryId)
+        {
+            Log.Debug($"[{queryId}] Next Live queryId: '{nextLiveQueryId}' => '{nextQueryId}'");
+            nextLiveQueryId = nextQueryId;
+        }
+        
+        private void RefreshData()
         {
             switch (queryStateMachine.State)
             {
                 case State.LiveQuery:
-                    Log.Debug("[RealtimeItemsSource.GetResult] Requesting next live query result...");
+                    Log.Debug($"[{queryId}] Requesting next live query result...");
                     SendLiveQuery();
                     break;
 
                 case State.AwaitingForInitialRequest:
-                    Log.Debug("[RealtimeItemsSource.GetResult] Sending initial request...");
-                    SendInitialRequest();
+                    Log.Debug($"[{queryId}] Processing initial data...");
+                    ProcessInitialRequest(initialData);
                     break;
             }
-
-            return new PoeQueryResult
-            {
-                ItemsList = itemsList.Values.ToArray()
-            };
-        }
-
-        public bool IsDisposed => queryStateMachine.IsInState(State.Disposed);
-
-        private void SetNextLiveQueryId(string queryId)
-        {
-            Log.Debug($"[RealtimeItemsSource.SetNextLiveQueryId] Next Live queryId: '{nextLiveQueryId}' => '{queryId}'");
-            nextLiveQueryId = queryId;
         }
 
         private void SetLiveQueryUri(Uri newQueryUri)
         {
-            Log.Debug($"[RealtimeItemsSource.SetLiveQueryUri] Next Live query URI: '{liveQueryUri}' => '{newQueryUri}'");
+            Log.Debug($"[{queryId}] Next Live query URI: '{liveQueryUri}' => '{newQueryUri}'");
             liveQueryUri = newQueryUri;
-        }
-
-        private void ClearItemList()
-        {
-            Log.Debug("[RealtimeItemsSource.ClearItemsList] Clearing items list...");
-            itemsList.Clear();
         }
 
         private void Reset()
         {
-            ClearItemList();
             SetNextLiveQueryId(null);
             SetLiveQueryUri(null);
             liveAnchors.Disposable = null;
         }
 
-        private void SendInitialRequest()
-        {
-            var data = clientFactory
-                       .Create()
-                       .Post(PoeTradeSearchUri, queryPostData)
-                       .Select(ThrowIfNotParseable)
-                       .Select(parser.ParseQueryResponse)
-                       .ToTask()
-                       .Result;
-
-            var validItems = data.ItemsList.EmptyIfNull().Where(x => !string.IsNullOrWhiteSpace(x.Hash)).ToArray();
-            Log.Debug(
-                $"[RealtimeItemsSource.GetResult] Initial update contains {data.ItemsList.Length} item(s), of which {validItems.Length} are valid");
-
-            validItems.ForEach(x => itemsList[x.Hash] = x);
-
-            ProcessInitialRequest(data);
-        }
-
         private void ProcessInitialRequest(IPoeQueryResult data)
         {
-            Uri liveUri;
-            if (Uri.TryCreate(new Uri(PoeTradeUri), data.Id, out liveUri))
+            resultSink.OnNext(ToQueryResult(data.ItemsList));
+
+            if (Uri.TryCreate(new Uri(PoeTradeUri), data.Id, out var liveUri))
             {
-                Log.Debug($"[RealtimeItemsSource.GetResult] Live query URI: {liveUri}");
+                Log.Debug($"[{queryId}] Live query URI: {liveUri}");
                 queryStateMachine.Fire(toLiveQueryTransitionTrigger, liveUri);
             }
             else
             {
-                Log.Debug("[RealtimeItemsSource.GetResult] Failed to extract live uri from the initial response");
+                Log.Debug($"[{queryId}] Failed to extract live uri from the initial response");
                 queryStateMachine.Fire(Trigger.ReceivedUnexpectedInitialResponse);
             }
         }
 
         private void SendLiveQuery()
         {
-            Log.Debug($"[RealtimeItemsSource.Live] Sending next live query, uri: {liveQueryUri}, id: '{nextLiveQueryId}'");
+            Log.Debug($"[{queryId}] Sending next live query, uri: {liveQueryUri}, id: '{nextLiveQueryId}'");
 
             Guard.ArgumentNotNull(liveQueryUri, nameof(liveQueryUri));
             Guard.ArgumentNotNull(nextLiveQueryId, nameof(nextLiveQueryId));
@@ -210,7 +224,7 @@ namespace PoeEye.PoeTradeRealtimeApi
             client.Cookies.Add(new Cookie("league", queryLeague, @"/", "poe.trade"));
             client.Cookies.Add(new Cookie("live_notify_sound", "0", @"/", "poe.trade"));
             client.Cookies.Add(new Cookie("live_notify_browser", "0", @"/", "poe.trade"));
-            client.Cookies.Add(new Cookie("live_frequency", "60", @"/", "poe.trade"));
+            client.Cookies.Add(new Cookie("live_frequency", $"{LiveQueryRefreshPeriod.TotalSeconds:F0}", @"/", "poe.trade"));
 
             try
             {
@@ -220,54 +234,44 @@ namespace PoeEye.PoeTradeRealtimeApi
                               .Result;
 
                 var result = JToken.Parse(rawData);
-                Log.Debug($"[RealtimeItemsSource.Live] Live query response: {result}");
+                Log.Debug($"[{queryId}] Live query response: {result}");
 
                 var nextId = result.Value<string>("newid");
                 if (string.IsNullOrWhiteSpace(nextId))
                 {
-                    throw new DataException($"Failed to extract nextId from the supplied data:\n{result}");
+                    throw new DataException($"[{queryId}] Failed to extract nextId from the supplied data:\n{result}");
                 }
 
                 var itemsCount = result.Value<string>("count");
                 var itemsData = result.Value<string>("data");
 
+                IPoeItem[] items = null;
                 if (!string.IsNullOrWhiteSpace(itemsData))
                 {
                     var data = parser.ParseQueryResponse(itemsData);
-
-                    var validItems = data.ItemsList.EmptyIfNull().Where(x => !string.IsNullOrWhiteSpace(x.Hash)).ToArray();
-                    Log.Debug(
-                        $"[RealtimeItemsSource.Live] Extracted {data.ItemsList.Length} from live query response(expected: {itemsCount}), of which {validItems.Length} are valid");
-
-                    var itemsToRemove = validItems.Where(x => x.ItemState == PoeTradeState.Removed).ToArray();
-                    var itemsToAdd = validItems.Where(x => x.ItemState != PoeTradeState.Removed).ToArray();
-
-                    Log.Debug(
-                        $"[RealtimeItemsSource.Live] Items to add: {itemsToAdd.Length}, items to remove: {itemsToRemove.Length}, current list size: {itemsList.Count}");
-
-                    IPoeItem trash;
-                    itemsToRemove.ForEach(x => itemsList.TryRemove(x.Hash, out trash));
-                    itemsToAdd.ForEach(x => itemsList[x.Hash] = x);
-                    Log.Debug($"[RealtimeItemsSource.Live] Resulting list size: {itemsList.Count}");
+                    
+                    if (data.ItemsList?.Length > 0)
+                    {
+                        Log.Debug($"[{queryId}] Extracted {data.ItemsList.Length} valid item from live query response(expected: {itemsCount})");
+                        data.ItemsList.ForEach(x => x.ItemState = PoeTradeState.New);
+                        items = data.ItemsList;
+                    }
                 }
+
+                var requestResult = items?.Any() == true ? ToQueryResult(items) : emptyResult;
+                if (Log.IsTraceEnabled)
+                {
+                    Log.Trace($"Reporting query result, data: {requestResult.DumpToTextRaw()}");
+                }
+                resultSink.OnNext(requestResult);
 
                 queryStateMachine.Fire(toNextLiveQueryTransitionTrigger, nextId);
             }
             catch (Exception ex)
             {
-                Log.Warn("[RealtimeItemsSource.Live] Exception occurred during live request", ex);
+                Log.Warn($"[{queryId}] Exception occurred during live request", ex);
                 queryStateMachine.Fire(Trigger.LiveQueryFailed);
             }
-        }
-
-        private string ThrowIfNotParseable(string queryResult)
-        {
-            if (string.IsNullOrWhiteSpace(queryResult))
-            {
-                throw new ApplicationException("Malformed query result - empty string");
-            }
-
-            return queryResult;
         }
 
         private enum State
@@ -287,5 +291,7 @@ namespace PoeEye.PoeTradeRealtimeApi
             LiveQueryFailed,
             Dispose
         }
+
+        public IObservable<IPoeQueryResult> Updates => resultSink;
     }
 }

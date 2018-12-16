@@ -29,7 +29,7 @@ namespace PoeWhisperMonitor
             Guard.ArgumentNotNull(messageProcessor, nameof(messageProcessor));
 
             this.messageProcessor = messageProcessor;
-            Log.Debug($"[PoeMessagesSource] Tracking log file '{logFile.FullName}'...");
+            Log.Debug($"Tracking log file '{logFile.FullName}'...");
             var safeStream = new SafeFileStream(logFile.FullName);
 
             var linesStream = new StreamTracker(safeStream);
@@ -53,7 +53,7 @@ namespace PoeWhisperMonitor
         {
             if (linesBuffer.Count >= MaxLinesBufferSize)
             {
-                Log.Trace($"[PoeMessagesSource] Clearing lines buffer(maxSize: {MaxLinesBufferSize}):\r\n\t{string.Join("\r\n\t", linesBuffer)}");
+                Log.Trace($"Clearing lines buffer(maxSize: {MaxLinesBufferSize}):\r\n\t{string.Join("\r\n\t", linesBuffer)}");
                 linesBuffer.Clear();
             }
 
@@ -69,7 +69,7 @@ namespace PoeWhisperMonitor
 
             linesBuffer.Clear();
 
-            Log.Debug($"[PoeMessagesSource] New message: {message.DumpToTextRaw()}");
+            Log.Debug($"New message: {message.DumpToTextRaw()}");
             return message;
         }
     }

@@ -21,6 +21,7 @@ namespace PoeShared.PoeTrade
 {
     internal sealed class PoeLiveHistoryProvider : DisposableReactiveObject, IPoeLiveHistoryProvider
     {
+        private readonly IClock clock;
         private static readonly ILog Log = LogManager.GetLogger(typeof(PoeLiveHistoryProvider));
 
         private readonly TimeSpan delayAfterError = TimeSpan.FromSeconds(30);
@@ -34,18 +35,21 @@ namespace PoeShared.PoeTrade
         private Exception lastException;
         private IPoeItem[] itemPack;
         private IPoeQueryResult queryResult;
+        private DateTime lastUpdateTimestamp;
 
         public PoeLiveHistoryProvider(
             [NotNull] IPoeQueryInfo query,
             [NotNull] IPoeApiWrapper poeApi,
+            [NotNull] IClock clock,
             [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler,
             [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler)
         {
             Guard.ArgumentNotNull(query, nameof(query));
             Guard.ArgumentNotNull(poeApi, nameof(poeApi));
+            Guard.ArgumentNotNull(clock, nameof(clock));
             Guard.ArgumentNotNull(uiScheduler, nameof(uiScheduler));
             Guard.ArgumentNotNull(bgScheduler, nameof(bgScheduler));
-
+            this.clock = clock;
             var periodObservable = this.WhenAnyValue(x => x.RecheckPeriod)
                                        .Do(_ => LogRecheckPeriodChange())
                                        .Select(_ => ToTimer())
@@ -56,13 +60,9 @@ namespace PoeShared.PoeTrade
                                             .Where(x => !IsBusy)
                                             .Do(StartUpdate)
                                             .ObserveOn(bgScheduler)
-                                            .Select(x =>
-                                            {
-                                                return IsLiveMode
-                                                    ? new PoeLiveUpdatesAdapter(poeApi).SubscribeToLiveUpdates(query)
-                                                    : poeApi.IssueQuery(query)
-                                                            .ToObservable();
-                                            })
+                                            .Select(x => IsLiveMode
+                                                        ? poeApi.GetLiveUpdates(query)
+                                                        : poeApi.IssueQuery(query).ToObservable())
                                             .ObserveOn(uiScheduler)
                                             .Switch()
                                             .Select(ProcessPacks)
@@ -110,9 +110,15 @@ namespace PoeShared.PoeTrade
         public IPoeQueryResult QueryResult
         {
             get => queryResult;
-            set => this.RaiseAndSetIfChanged(ref queryResult, value);
+            private set => this.RaiseAndSetIfChanged(ref queryResult, value);
         }
-
+        
+        public DateTime LastUpdateTimestamp
+        {
+            get => lastUpdateTimestamp;
+            private set => this.RaiseAndSetIfChanged(ref lastUpdateTimestamp, value);
+        }
+        
         public void Refresh()
         {
             forceUpdatesSubject.OnNext(Unit.Default); // forcing refresh
@@ -135,7 +141,7 @@ namespace PoeShared.PoeTrade
 
         private void StartUpdate(Unit unit)
         {
-            Log.Debug("[PoeLiveHistoryProvider] Starting update...");
+            Log.Debug("Starting update...");
             if (!IsLiveMode)
             {
                 IsBusy = true;
@@ -158,7 +164,7 @@ namespace PoeShared.PoeTrade
                 periodInfo = "recheck disabled";
             }
 
-            Log.Debug($"[PoeLiveHistoryProvider] Update period changed: {periodInfo}");
+            Log.Debug($"Update period changed: {periodInfo}");
         }
 
         private IPoeQueryResult ProcessPacks(IPoeQueryResult queryResult)
@@ -203,40 +209,24 @@ namespace PoeShared.PoeTrade
         {
             Guard.ArgumentNotNull(queryResult, nameof(queryResult));
 
-            Log.Debug($"[PoeLiveHistoryProvider] Update received, itemsCount: {queryResult.ItemsList.Length}");
+            ItemPack = queryResult.ItemsList;
             IsBusy = false;
             LastException = null;
-            ItemPack = queryResult.ItemsList;
             QueryResult = queryResult;
+            LastUpdateTimestamp = clock.Now;
+            if (ItemPack.Any())
+            {
+                Log.Debug($"[{queryResult.Id}] Update received, itemsCount: {queryResult.ItemsList.Length}");
+            }
         }
 
         private void HandleUpdateError(Exception ex)
         {
             Guard.ArgumentNotNull(ex, nameof(ex));
 
-            Log.Error("[PoeLiveHistoryProvider] Update failed", ex);
+            Log.Error("Update failed", ex);
             IsBusy = false;
             LastException = ex;
-        }
-
-        private sealed class PoeLiveUpdatesAdapter : DisposableReactiveObject
-        {
-            private readonly IPoeApiWrapper api;
-
-            public PoeLiveUpdatesAdapter([NotNull] IPoeApiWrapper api)
-            {
-                Guard.ArgumentNotNull(api, nameof(api));
-
-                this.api = api;
-            }
-
-            public IObservable<IPoeQueryResult> SubscribeToLiveUpdates([NotNull] IPoeQueryInfo query)
-            {
-                Guard.ArgumentNotNull(query, nameof(query));
-
-                return api
-                       .GetLiveUpdates(query);
-            }
         }
     }
 }

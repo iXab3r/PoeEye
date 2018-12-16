@@ -11,8 +11,8 @@ namespace PoeEye.PoeTrade.Prism
 
         public PoeTradeModule(IUnityContainer container)
         {
-            this.container = container;
             Guard.ArgumentNotNull(container, nameof(container));
+            this.container = container;
         }
 
         public void RegisterTypes(IContainerRegistry containerRegistry)

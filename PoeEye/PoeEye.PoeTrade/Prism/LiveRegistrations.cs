@@ -1,4 +1,5 @@
 ﻿using System.Collections.Specialized;
+using PoeEye.PoeTrade.TradeApi;
 using PoeShared.PoeTrade;
 using PoeShared.PoeTrade.Query;
 using TypeConverter;
@@ -15,10 +16,11 @@ namespace PoeEye.PoeTrade.Prism
                 .RegisterSingleton<IPoeApi, PoeTradeApi>(typeof(PoeTradeApi).FullName)
                 .RegisterSingleton<IConverter<IPoeQueryInfo, IPoeQuery>, PoeQueryInfoToQueryConverter>()
                 .RegisterSingleton<IConverter<IPoeQuery, NameValueCollection>, PoeQueryConverter>()
-                .RegisterSingleton<IPoeTradeDateTimeExtractor, PoeTradeDateTimeExtractor>();
+                .RegisterSingleton<IPoeTradeDateTimeExtractor, PoeTradeDateTimeExtractor>()
+                .RegisterSingleton<IPoeTradeParser, PoeTradeParserModern>();
 
             Container
-                .RegisterSingleton<IPoeTradeParser, PoeTradeParserModern>();
+                .RegisterType<IPoeTradeLiveAdapter, RealtimeItemSource>();
         }
     }
 }
