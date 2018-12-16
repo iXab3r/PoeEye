@@ -4,13 +4,13 @@ namespace PoeShared.Common
 {
     public enum PoeBuyoutMode
     {
-        [Description("Show all items")]
+        [Description("any")]
         Unknown,
 
-        [Description("Show items with buyout")]
+        [Description("w/ buyout")]
         BuyoutOnly,
 
-        [Description("Show items without buyout")]
+        [Description("w/o buyout")]
         OfferOnly
     }
 }

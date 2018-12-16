@@ -80,7 +80,8 @@ namespace PoeEye.PathOfExileTrade.TradeApi
         Explicit,
         Implicit,
         Monster,
-        Pseudo
+        Pseudo,
+        Veiled
     }
 
     public class JsonGetStaticResponse

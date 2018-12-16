@@ -31,8 +31,7 @@
             </Grid.RowDefinitions>
 
             <StackPanel Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2"
-                        Orientation="Horizontal"
-                        Margin="5">
+                        Orientation="Horizontal">
                 <TextBlock Text="Mod groups" Style="{StaticResource MetroTextBlockHeaderStyle}" />
 
                 <Button Margin="10, 0"
@@ -44,8 +43,8 @@
                           ItemsSource="{Binding Groups}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate DataType="{x:Type viewModels:PoeModsEditorViewModel}">
-                        <Border BorderBrush="{StaticResource AccentColorBrush4}" BorderThickness="1" Margin="5">
-                            <Grid Margin="5">
+                        <Border BorderBrush="{StaticResource AccentColorBrush4}" BorderThickness="1" Margin="0,2">
+                            <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="auto" />

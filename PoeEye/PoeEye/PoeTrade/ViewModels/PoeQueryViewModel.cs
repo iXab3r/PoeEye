@@ -21,6 +21,8 @@ namespace PoeEye.PoeTrade.ViewModels
 {
     internal sealed class PoeQueryViewModel : DisposableReactiveObject, IPoeQueryViewModel
     {
+        private static readonly TimeSpan ReconfigurationBuffer = TimeSpan.FromMilliseconds(100);
+        
         private readonly ObservableCollectionExtended<IPoeCurrency> currencyList = new ObservableCollectionExtended<IPoeCurrency>();
         private readonly ObservableCollectionExtended<string> leagueList = new ObservableCollectionExtended<string>();
 
@@ -133,10 +135,12 @@ namespace PoeEye.PoeTrade.ViewModels
             NameSuggestionProvider = suggestionProviderFactory.Create();
             NameSuggestionProvider.Items = poeDatabaseReader.KnownEntityNames;
 
-            this.WhenAnyValue(x => x.League).Where(string.IsNullOrWhiteSpace).ToUnit()
-                .Merge(leagueList.ToObservableChangeSet().ToUnit())
-                .Where(x => string.IsNullOrWhiteSpace(League) && LeaguesList.Count > 0)
+            Observable.Merge(
+                          this.WhenAnyValue(x => x.League).Where(string.IsNullOrWhiteSpace).ToUnit(), 
+                          leagueList.ToObservableChangeSet().ToUnit())
+                .Buffer(ReconfigurationBuffer)
                 .ObserveOn(uiScheduler)
+                .Where(x => string.IsNullOrWhiteSpace(League) && LeaguesList.Count > 0)
                 .Subscribe(() => League = LeaguesList.FirstOrDefault())
                 .AddTo(Anchors);
         }

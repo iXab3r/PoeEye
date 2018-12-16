@@ -229,10 +229,11 @@ namespace PoeEye.PoeTrade.ViewModels
 
         public PoeEyeTabConfig Save()
         {
+            var query = Query.PoeQueryBuilder();
             return new PoeEyeTabConfig
             {
                 RecheckTimeout = RecheckPeriod.Period,
-                QueryInfo = Query.PoeQueryBuilder(),
+                QueryInfo = query,
                 NotificationType = AudioNotificationSelector.SelectedItem,
                 ApiModuleId = ApiSelector.SelectedModule?.Id.ToString(),
                 CustomTabName = tabName.HasValue ? tabName.Value : null

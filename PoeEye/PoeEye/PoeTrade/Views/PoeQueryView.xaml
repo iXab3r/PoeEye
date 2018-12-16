@@ -8,6 +8,23 @@
                     xmlns:viewModels="clr-namespace:PoeEye.PoeTrade.ViewModels"
                     xmlns:eye="clr-namespace:PoeShared.Scaffolding.WPF;assembly=PoeShared"
                     xmlns:converters="clr-namespace:PoeEye.Converters">
+    
+    <ObjectDataProvider x:Key="PoeItemBuyoutModeFromEnum"
+                        MethodName="GetValuesAndDescriptions"
+                        ObjectType="{x:Type eye:EnumHelper}">
+        <ObjectDataProvider.MethodParameters>
+            <x:TypeExtension TypeName="common:PoeBuyoutMode" />
+        </ObjectDataProvider.MethodParameters>
+    </ObjectDataProvider>
+    
+    <ObjectDataProvider x:Key="PoeItemRarityFromEnum" 
+                        MethodName="GetValuesAndDescriptions"
+                        ObjectType="{x:Type eye:EnumHelper}">
+        <ObjectDataProvider.MethodParameters>
+            <x:Type TypeName="common:PoeItemRarity" />
+        </ObjectDataProvider.MethodParameters>
+    </ObjectDataProvider>
+    
     <DataTemplate DataType="{x:Type viewModels:PoeQueryViewModel}">
         <Grid>
             <Grid.Resources>
@@ -38,11 +55,11 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <Grid Row="0" Margin="0,5"><!-- League/Type/Name -->
+            <Grid Row="0" Margin="0,2"><!-- League/Type/Name -->
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="26" />
                     <RowDefinition Height="5" />
-                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="26" />
                 </Grid.RowDefinitions>
 
                 <Grid.ColumnDefinitions>
@@ -52,6 +69,7 @@
                     <ColumnDefinition Width="180" />
                     <ColumnDefinition Width="80" />
                     <ColumnDefinition Width="180" />
+                    <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
                 <TextBlock Grid.Row="0" Grid.Column="0"
@@ -59,19 +77,46 @@
                 <ComboBox Grid.Row="0" Grid.Column="1"
                           ItemsSource="{Binding LeaguesList}"
                           Width="NaN"
+                          Margin="3,0,10,0"
                           IsEditable="False"
                           SelectedItem="{Binding League}" />
-
+                
                 <TextBlock Grid.Row="0" Grid.Column="2"
-                           Text="Type" Style="{StaticResource TextBlockHeader}" />
-                <ContentPresenter Grid.Row="0" Grid.Column="3" Grid.ColumnSpan="3"
-                                  Content="{Binding ItemTypeSelector}"
-                                  Width="420" />
+                           Text="Price" Style="{StaticResource TextBlockHeader}" />
+                <StackPanel Grid.Row="0" Grid.Column="3" Grid.ColumnSpan="4">
+                    <TextBox Style="{StaticResource TextBoxMinKey}"
+                             Text="{Binding BuyoutMin, Converter={x:Static converters:NullableConverter.Instance}}" />
+                    <TextBox Style="{StaticResource TextBoxMaxKey}"
+                             Text="{Binding BuyoutMax, Converter={x:Static converters:NullableConverter.Instance}}" />
+                    <ComboBox Style="{StaticResource QueryComboBox}"
+                              Width="254"
+                              ItemsSource="{Binding CurrenciesList}"
+                              SelectedValue="{Binding BuyoutCurrencyType}"
+                              DisplayMemberPath="Name"
+                              SelectedValuePath="CodeName"
+                              IsEditable="True"
+                              controls:TextBoxHelper.Watermark="select currency" />
+
+                    <ComboBox Style="{StaticResource QueryComboBox}"
+                              IsEditable="True"
+                              Width="150"
+                              SelectedValue="{Binding BuyoutMode}"
+                              DisplayMemberPath="Description"
+                              SelectedValuePath="Value"
+                              ItemsSource="{Binding Source={StaticResource PoeItemBuyoutModeFromEnum}}"
+                              controls:TextBoxHelper.Watermark="select buyout" />
+                </StackPanel>
+
+                <TextBlock Grid.Row="2" Grid.Column="3"
+                           Text="Item Type" Style="{StaticResource TextBlockHeader}" />
+                <ContentPresenter Grid.Row="2" Grid.Column="4" Grid.ColumnSpan="2"
+                                  Margin="8, 0"
+                                  Content="{Binding ItemTypeSelector}"/>
 
                 <TextBlock Grid.Row="2" Grid.Column="0"
                            Text="Name" Style="{StaticResource TextBlockHeader}" />
 
-                <editors:AutoCompleteTextBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="5"
+                <editors:AutoCompleteTextBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3" 
                                              x:Name="QueryItemName"
                                              Style="{StaticResource AutoCompleteTextBoxStyleKey}"
                                              Provider="{Binding NameSuggestionProvider}"
@@ -79,13 +124,14 @@
                                              Width="NaN"
                                              HorizontalContentAlignment="Left"
                                              Text="{Binding ItemName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                                             Margin="0,0,10,0"
-                                             Height="26"
+                                             Margin="3,0,97,0"
                                              Watermark="item name, e.g. Temple map"
                                              controls:TextBoxHelper.ClearTextButton="True" />
+                
+                
             </Grid>
 
-            <Grid Row="1" Margin="0,5"><!-- DPS -->
+            <Grid Row="1" Margin="0,2"><!-- DPS -->
 
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
@@ -158,7 +204,7 @@
                 </StackPanel>
             </Grid>
 
-            <Grid Row="3" Margin="0,5"><!-- Armour/Shield -->
+            <Grid Row="3" Margin="0,2"><!-- Armour/Shield -->
 
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
@@ -211,7 +257,7 @@
                 </StackPanel>
             </Grid>
 
-            <Grid Row="4" Margin="0,5"> <!-- Sockets/links -->
+            <Grid Row="4" Margin="0,2"> <!-- Sockets/links -->
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="5" />
@@ -247,16 +293,16 @@
                 <TextBlock Grid.Row="2" Grid.Column="0"
                            Text="Colors" Style="{StaticResource TextBlockHeader}" />
                 <StackPanel Grid.Row="2" Grid.Column="1">
-                    <TextBox Style="{StaticResource TextBoxKey}" Width="30" controls:TextBoxHelper.Watermark="R"
+                    <TextBox Style="{StaticResource TextBoxKey}" Width="37" controls:TextBoxHelper.Watermark="R"
                              Foreground="{StaticResource PoeItemStrStatBrush}"
                              Text="{Binding SocketsR, Converter={x:Static converters:NullableConverter.Instance}}" />
-                    <TextBox Style="{StaticResource TextBoxKey}" Width="30" controls:TextBoxHelper.Watermark="G"
+                    <TextBox Style="{StaticResource TextBoxKey}" Width="37" controls:TextBoxHelper.Watermark="G"
                              Foreground="{StaticResource PoeItemDexStatBrush}"
                              Text="{Binding SocketsG, Converter={x:Static converters:NullableConverter.Instance}}" />
-                    <TextBox Style="{StaticResource TextBoxKey}" Width="30" controls:TextBoxHelper.Watermark="B"
+                    <TextBox Style="{StaticResource TextBoxKey}" Width="37" controls:TextBoxHelper.Watermark="B"
                              Foreground="{StaticResource PoeItemIntStatBrush}"
                              Text="{Binding SocketsB, Converter={x:Static converters:NullableConverter.Instance}}" />
-                    <TextBox Style="{StaticResource TextBoxKey}" Width="30" controls:TextBoxHelper.Watermark="W"
+                    <TextBox Style="{StaticResource TextBoxKey}" Width="37" controls:TextBoxHelper.Watermark="W"
                              Foreground="{StaticResource PoeItemNoStatBrush}"
                              Text="{Binding SocketsW, Converter={x:Static converters:NullableConverter.Instance}}" />
                 </StackPanel>
@@ -264,23 +310,23 @@
                 <TextBlock Grid.Row="2" Grid.Column="2"
                            Text="Linked" Style="{StaticResource TextBlockHeader}" />
                 <StackPanel Grid.Row="2" Grid.Column="3">
-                    <TextBox Style="{StaticResource TextBoxKey}" Width="30" controls:TextBoxHelper.Watermark="R"
+                    <TextBox Style="{StaticResource TextBoxKey}" Width="37" controls:TextBoxHelper.Watermark="R"
                              Foreground="{StaticResource PoeItemStrStatBrush}"
                              Text="{Binding LinkedR, Converter={x:Static converters:NullableConverter.Instance}}" />
-                    <TextBox Style="{StaticResource TextBoxKey}" Width="30" controls:TextBoxHelper.Watermark="G"
+                    <TextBox Style="{StaticResource TextBoxKey}" Width="37" controls:TextBoxHelper.Watermark="G"
                              Foreground="{StaticResource PoeItemDexStatBrush}"
                              Text="{Binding LinkedG, Converter={x:Static converters:NullableConverter.Instance}}" />
-                    <TextBox Style="{StaticResource TextBoxKey}" Width="30" controls:TextBoxHelper.Watermark="B"
+                    <TextBox Style="{StaticResource TextBoxKey}" Width="37" controls:TextBoxHelper.Watermark="B"
                              Foreground="{StaticResource PoeItemIntStatBrush}"
                              Text="{Binding LinkedB, Converter={x:Static converters:NullableConverter.Instance}}" />
-                    <TextBox Style="{StaticResource TextBoxKey}" Width="30" controls:TextBoxHelper.Watermark="W"
+                    <TextBox Style="{StaticResource TextBoxKey}" Width="37" controls:TextBoxHelper.Watermark="W"
                              Foreground="{StaticResource PoeItemNoStatBrush}"
                              Text="{Binding LinkedW, Converter={x:Static converters:NullableConverter.Instance}}" />
                 </StackPanel>
             </Grid>
 
-            <Grid Row="5" Margin="0,5"> <!-- Requirements -->
-                <Border BorderBrush="{StaticResource AccentColorBrush2}" BorderThickness="0,1,0,0" Margin="0,5">
+            <Grid Row="5" Margin="0,2"> <!-- Requirements -->
+                <Border BorderBrush="{StaticResource AccentColorBrush2}" BorderThickness="0,1,0,0">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
@@ -288,21 +334,20 @@
                         </Grid.RowDefinitions>
 
                         <StackPanel Grid.Row="0"
-                                    Orientation="Horizontal"
-                                    Margin="5">
+                                    Orientation="Horizontal">
                             <TextBlock Text="Requirements" Style="{StaticResource MetroTextBlockHeaderStyle}" />
                         </StackPanel>
 
                         <Grid Grid.Row="1">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="80" />
-                                <ColumnDefinition Width="110" />
+                                <ColumnDefinition Width="114" />
                                 <ColumnDefinition Width="80" />
-                                <ColumnDefinition Width="110" />
+                                <ColumnDefinition Width="114" />
                                 <ColumnDefinition Width="80" />
-                                <ColumnDefinition Width="110" />
+                                <ColumnDefinition Width="114" />
                                 <ColumnDefinition Width="80" />
-                                <ColumnDefinition Width="110" />
+                                <ColumnDefinition Width="114" />
                             </Grid.ColumnDefinitions>
 
                             <TextBlock Grid.Column="0"
@@ -348,8 +393,8 @@
                 </Border>
             </Grid>
 
-            <Grid Row="6" Margin="0,5"> <!-- Conditionals -->
-                <Border BorderBrush="{StaticResource AccentColorBrush2}" BorderThickness="0,1,0,0" Margin="0,5">
+            <Grid Row="6" Margin="0,2"> <!-- Conditionals -->
+                <Border BorderBrush="{StaticResource AccentColorBrush2}" BorderThickness="0,1,0,0">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
@@ -357,15 +402,15 @@
                         </Grid.RowDefinitions>
 
                         <StackPanel Grid.Row="0"
-                                    Orientation="Horizontal"
-                                    Margin="5">
+                                    Orientation="Horizontal">
                             <TextBlock Text="Conditionals" Style="{StaticResource MetroTextBlockHeaderStyle}" />
                         </StackPanel>
 
                         <Grid Grid.Row="1">
                             <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="26" />
+                                <RowDefinition Height="5" />
+                                <RowDefinition Height="26" />
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="80" />
@@ -378,81 +423,77 @@
                                 <ColumnDefinition Width="180" />
                             </Grid.ColumnDefinitions>
 
-                            <TextBlock Grid.Row="0" Grid.Column="0" Margin="0,5"
+                            <TextBlock Grid.Row="0" Grid.Column="0"
                                        Text="Corrupted" Style="{StaticResource TextBlockHeader}" />
-                            <StackPanel Grid.Row="0" Grid.Column="1" Margin="0,5">
-                                <ComboBox Style="{StaticResource QueryComboBox}"
-                                          Width="167"
-                                          IsEditable="True"
-                                          SelectedValue="{Binding CorruptionState}"
-                                          DisplayMemberPath="Description"
-                                          SelectedValuePath="Value"
-                                          ItemsSource="{Binding Source={StaticResource TriStateProviderKey}}" />
-                            </StackPanel>
+                            <ComboBox Grid.Row="0" Grid.Column="1"
+                                      Style="{StaticResource QueryComboBox}"
+                                      IsEditable="True"
+                                      SelectedValue="{Binding CorruptionState}"
+                                      DisplayMemberPath="Description"
+                                      SelectedValuePath="Value"
+                                      ItemsSource="{Binding Source={StaticResource TriStateProviderKey}}" />
 
-                            <TextBlock Grid.Row="0" Grid.Column="2" Margin="0,5"
+                            <TextBlock Grid.Row="0" Grid.Column="2"
                                        Text="Crafted" Style="{StaticResource TextBlockHeader}" />
-                            <StackPanel Grid.Row="0" Grid.Column="3" Margin="0,5">
-                                <StackPanel.Resources>
-                                </StackPanel.Resources>
-                                <ComboBox Style="{StaticResource QueryComboBox}"
-                                          Width="167"
-                                          IsEditable="True"
-                                          SelectedValue="{Binding CraftState}"
-                                          DisplayMemberPath="Description"
-                                          SelectedValuePath="Value"
-                                          ItemsSource="{Binding Source={StaticResource TriStateProviderKey}}" />
-                            </StackPanel>
+                            <ComboBox Grid.Row="0" Grid.Column="3"
+                                      Style="{StaticResource QueryComboBox}"
+                                      IsEditable="True"
+                                      SelectedValue="{Binding CraftState}"
+                                      DisplayMemberPath="Description"
+                                      SelectedValuePath="Value"
+                                      ItemsSource="{Binding Source={StaticResource TriStateProviderKey}}" />
 
-                            <TextBlock Grid.Row="0" Grid.Column="4" Margin="0,5"
+                            <TextBlock Grid.Row="0" Grid.Column="4"
                                        Text="Enchanted" Style="{StaticResource TextBlockHeader}" />
-                            <StackPanel Grid.Row="0" Grid.Column="5" Margin="0,5">
-                                <StackPanel.Resources>
-                                </StackPanel.Resources>
-                                <ComboBox Style="{StaticResource QueryComboBox}"
-                                          Width="167"
-                                          IsEditable="True"
-                                          SelectedValue="{Binding EnchantState}"
-                                          DisplayMemberPath="Description"
-                                          SelectedValuePath="Value"
-                                          ItemsSource="{Binding Source={StaticResource TriStateProviderKey}}" />
-                            </StackPanel>
+                            <ComboBox Grid.Row="0" Grid.Column="5" 
+                                      Style="{StaticResource QueryComboBox}"
+                                      IsEditable="True"
+                                      SelectedValue="{Binding EnchantState}"
+                                      DisplayMemberPath="Description"
+                                      SelectedValuePath="Value"
+                                      ItemsSource="{Binding Source={StaticResource TriStateProviderKey}}" />
+                            
+                            <TextBlock Grid.Row="2" Grid.Column="4"
+                                       Text="Rarity" Style="{StaticResource TextBlockHeader}" />
+                            <ComboBox Grid.Row="2" Grid.Column="5" 
+                                      Style="{StaticResource QueryComboBox}"
+                                      IsEditable="True"
+                                      SelectedValue="{Binding ItemRarity}"
+                                      DisplayMemberPath="Description"
+                                      SelectedValuePath="Value"
+                                      ItemsSource="{Binding Source={StaticResource PoeItemRarityFromEnum}}" />
 
-                            <TextBlock Grid.Row="1" Grid.Column="0" Margin="0,5"
+                            <TextBlock Grid.Row="2" Grid.Column="0"
                                        Text="Shaped" Style="{StaticResource TextBlockHeader}" />
-                            <StackPanel Grid.Row="1" Grid.Column="1" Margin="0,5">
-                                <ComboBox Style="{StaticResource QueryComboBox}"
-                                          Width="165"
-                                          IsEditable="True"
-                                          SelectedValue="{Binding AffectedByShaperState}"
-                                          DisplayMemberPath="Description"
-                                          SelectedValuePath="Value"
-                                          ItemsSource="{Binding Source={StaticResource TriStateProviderKey}}" />
-                            </StackPanel>
+                            <ComboBox Grid.Row="2" Grid.Column="1"
+                                      Style="{StaticResource QueryComboBox}"
+                                      IsEditable="True"
+                                      SelectedValue="{Binding AffectedByShaperState}"
+                                      DisplayMemberPath="Description"
+                                      SelectedValuePath="Value"
+                                      ItemsSource="{Binding Source={StaticResource TriStateProviderKey}}" />
 
-                            <TextBlock Grid.Row="1" Grid.Column="2" Margin="0,5"
+                            <TextBlock Grid.Row="2" Grid.Column="2"
                                        Text="Elder" Style="{StaticResource TextBlockHeader}" />
-                            <StackPanel Grid.Row="1" Grid.Column="3" Margin="0,5">
-                                <ComboBox Style="{StaticResource QueryComboBox}"
-                                          Width="167"
-                                          IsEditable="True"
-                                          SelectedValue="{Binding AffectedByElderState}"
-                                          DisplayMemberPath="Description"
-                                          SelectedValuePath="Value"
-                                          ItemsSource="{Binding Source={StaticResource TriStateProviderKey}}" />
-                            </StackPanel>
+                            <ComboBox Grid.Row="2" Grid.Column="3"
+                                      Style="{StaticResource QueryComboBox}"
+                                      IsEditable="True"
+                                      SelectedValue="{Binding AffectedByElderState}"
+                                      DisplayMemberPath="Description"
+                                      SelectedValuePath="Value"
+                                      ItemsSource="{Binding Source={StaticResource TriStateProviderKey}}" />
                         </Grid>
                     </Grid>
                 </Border>
             </Grid>
 
-            <Grid Row="7" Margin="0,5"> <!-- Mod groups -->
-                <Border BorderBrush="{StaticResource AccentColorBrush2}" BorderThickness="0,2" Margin="0,5">
+            <Grid Row="7" Margin="0,2"> <!-- Mod groups -->
+                <Border BorderBrush="{StaticResource AccentColorBrush2}" BorderThickness="0,2">
                     <ContentControl Content="{Binding ModGroupsEditor}" />
                 </Border>
             </Grid>
 
-            <Grid Row="8" Margin="0,5"> <!-- Misc -->
+            <Grid Row="8" Margin="0,2"> <!-- Misc -->
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="5" />
@@ -489,16 +530,6 @@
                              Text="{Binding LevelMax, Converter={x:Static converters:NullableConverter.Instance}}" />
                 </StackPanel>
 
-                <TextBlock Grid.Row="0" Grid.Column="4"
-                           Text="Item Level" Style="{StaticResource TextBlockHeader}" />
-                <StackPanel Grid.Row="0" Grid.Column="5">
-                    <TextBox Style="{StaticResource TextBoxMinKey}"
-                             Text="{Binding ItemLevelMin, Converter={x:Static converters:NullableConverter.Instance}}" />
-                    <TextBox Style="{StaticResource TextBoxMaxKey}"
-                             Text="{Binding ItemLevelMax, Converter={x:Static converters:NullableConverter.Instance}}" />
-                </StackPanel>
-
-
                 <TextBlock Grid.Row="2" Grid.Column="0"
                            Text="Inc. Quantity" Style="{StaticResource TextBlockHeader}" />
                 <StackPanel Grid.Row="2" Grid.Column="1">
@@ -507,65 +538,18 @@
                     <TextBox Style="{StaticResource TextBoxMaxKey}"
                              Text="{Binding IncQuantityMax, Converter={x:Static converters:NullableConverter.Instance}}" />
                 </StackPanel>
-
+                
                 <TextBlock Grid.Row="2" Grid.Column="2"
-                           Text="Rarity" Style="{StaticResource TextBlockHeader}" />
+                           Text="Item Level" Style="{StaticResource TextBlockHeader}" />
                 <StackPanel Grid.Row="2" Grid.Column="3">
-                    <StackPanel.Resources>
-                        <ObjectDataProvider x:Key="PoeItemRarityFromEnum" MethodName="GetValues"
-                                            ObjectType="{x:Type System:Enum}">
-                            <ObjectDataProvider.MethodParameters>
-                                <x:Type TypeName="common:PoeItemRarity" />
-                            </ObjectDataProvider.MethodParameters>
-                        </ObjectDataProvider>
-                    </StackPanel.Resources>
-                    <ComboBox Style="{StaticResource QueryComboBox}"
-                              Width="165"
-                              IsEditable="True"
-                              SelectedValue="{Binding ItemRarity}"
-                              DisplayMemberPath="Description"
-                              SelectedValuePath="Value"
-                              ItemsSource="{Binding Source={StaticResource PoeItemRarityFromEnum}}" />
-                </StackPanel>
-
-                <TextBlock Grid.Row="4" Grid.Column="0"
-                           Text="Buyout" Style="{StaticResource TextBlockHeader}" />
-                <StackPanel Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="5">
-                    <StackPanel.Resources>
-                        <ObjectDataProvider x:Key="PoeItemBuyoutModeFromEnum"
-                                            MethodName="GetValuesAndDescriptions"
-                                            ObjectType="eye:EnumHelper">
-                            <ObjectDataProvider.MethodParameters>
-                                <x:TypeExtension TypeName="common:PoeBuyoutMode" />
-                            </ObjectDataProvider.MethodParameters>
-                        </ObjectDataProvider>
-                    </StackPanel.Resources>
-
                     <TextBox Style="{StaticResource TextBoxMinKey}"
-                             Text="{Binding BuyoutMin, Converter={x:Static converters:NullableConverter.Instance}}" />
+                             Text="{Binding ItemLevelMin, Converter={x:Static converters:NullableConverter.Instance}}" />
                     <TextBox Style="{StaticResource TextBoxMaxKey}"
-                             Text="{Binding BuyoutMax, Converter={x:Static converters:NullableConverter.Instance}}" />
-                    <ComboBox Style="{StaticResource QueryComboBox}"
-                              Width="275"
-                              ItemsSource="{Binding CurrenciesList}"
-                              SelectedValue="{Binding BuyoutCurrencyType}"
-                              DisplayMemberPath="Name"
-                              SelectedValuePath="CodeName"
-                              IsEditable="True"
-                              controls:TextBoxHelper.Watermark="select currency" />
-
-                    <ComboBox Style="{StaticResource QueryComboBox}"
-                              Width="275"
-                              IsEditable="True"
-                              SelectedValue="{Binding BuyoutMode}"
-                              DisplayMemberPath="Description"
-                              SelectedValuePath="Value"
-                              ItemsSource="{Binding Source={StaticResource PoeItemBuyoutModeFromEnum}}"
-                              controls:TextBoxHelper.Watermark="select buyout mode" />
+                             Text="{Binding ItemLevelMax, Converter={x:Static converters:NullableConverter.Instance}}" />
                 </StackPanel>
             </Grid>
 
-            <Grid Row="9" Height="28" Margin="0, 5"> <!-- Very rarely used conditionals -->
+            <Grid Row="9" Height="28" > <!-- Rarely(?) used conditionals -->
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="30" />
                     <ColumnDefinition Width="Auto" />
