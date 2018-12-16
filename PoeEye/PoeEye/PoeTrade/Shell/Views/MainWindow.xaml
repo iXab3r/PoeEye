@@ -218,7 +218,7 @@
                     <TextBlock Grid.Column="1"
                                Margin="10,0,0,0"
                                Visibility="{Binding SelectedTab.TradesList.ActiveQuery, Converter={StaticResource NullToCollapsedConverter}}"
-                               Text="{Binding SelectedTab.TradesList.TimeSinceLastUpdate.TotalSeconds, Mode=OneWay, StringFormat='Elapsed since last update: {0:F0}s'}" />
+                               Text="{Binding SelectedTab.TradesList.TimeSinceLastUpdate, Mode=OneWay, StringFormat='Elapsed since last update: {0}', Converter={StaticResource TimeSpanToHumanReadableStringConverter}}" />
 
                     <ContentPresenter Grid.Column="2" Content="{Binding SelectedTab.RecheckPeriod}" />
 

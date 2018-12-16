@@ -94,7 +94,11 @@ namespace PoeEye.PoeTrade.TradeApi
             emptyResult = ToQueryResult(Array.Empty<IPoeItem>());
 
             liveAnchors.AddTo(Anchors);
-            Disposable.Create(() => queryStateMachine.Fire(Trigger.Dispose)).AddTo(Anchors);
+            Disposable.Create(() =>
+            {
+                Log.Debug($"[{queryId}] Disposing live query...");
+                queryStateMachine.Fire(Trigger.Dispose);
+            }).AddTo(Anchors);
 
             queryStateMachine
                 .Configure(State.Created)
@@ -122,6 +126,10 @@ namespace PoeEye.PoeTrade.TradeApi
 
             queryStateMachine
                 .Configure(State.Disposed)
+                .Ignore(Trigger.LiveQueryFailed)
+                .Ignore(Trigger.LiveQuerySucceeded)
+                .Ignore(Trigger.LiveQueryStarted)
+                .Ignore(Trigger.ReceivedUnexpectedInitialResponse)
                 .OnEntry(Reset);
 
             if (Log.IsTraceEnabled)

@@ -89,7 +89,7 @@ namespace PoeShared.Scaffolding
             if (skippedProperties.Any())
             {
                 SharedLog.Instance.Log.Debug(
-                    $"[TransferProperties] Skipped following properties: {skippedProperties.Select(x => $"{x.PropertyType} {x.Name}").DumpToTextRaw()}");
+                    $"Skipped following properties: {skippedProperties.Select(x => $"{x.PropertyType} {x.Name}").DumpToTextRaw()}");
             }
         }
 

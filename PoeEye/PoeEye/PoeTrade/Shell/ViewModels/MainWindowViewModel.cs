@@ -155,11 +155,7 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
                 CreateNewTabCommand.Execute(null);
             }
 
-            Observable.Merge(
-                          tabsListSource.Connect().ToUnit(),
-                          tabsListSource.Connect().WhenPropertyChanged(x => x.SelectedAudioNotificationType).ToUnit(),
-                          tabsListSource.Connect().WhenPropertyChanged(x => x.TabName).ToUnit()
-                      )
+            Observable.Merge(tabsListSource.Connect().ToUnit())
                       .Subscribe(configUpdateSubject)
                       .AddTo(Anchors);
 
@@ -209,7 +205,7 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
 
         public override void Dispose()
         {
-            Log.Debug("[MainWindowViewModel.Dispose] Disposing viewmodel...");
+            Log.Debug("Disposing viewmodel...");
             SaveConfig();
             foreach (var mainWindowTabViewModel in TabsList)
             {
@@ -218,7 +214,7 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
 
             base.Dispose();
 
-            Log.Debug("[MainWindowViewModel.Dispose] Viewmodel disposed");
+            Log.Debug("Viewmodel disposed");
         }
 
 
@@ -256,7 +252,7 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
             Guard.ArgumentIsTrue(() => DuplicateTabCommandCanExecute(tab));
 
             var cfg = tab.Save();
-            CreateNewTabCommandExecuted(cfg);
+            CreateAndAddTab(cfg);
         }
 
         private void OnTabOrderChanged(OrderChangedEventArgs args)
@@ -264,8 +260,7 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
             var existingItems = tabsListSource.Items.ToList();
             var newItems = args.NewOrder.OfType<IMainWindowTabViewModel>().ToList();
 
-            Log.Debug(
-                $"[PositionMonitor] Source ordering:\n\tSource: {string.Join(" => ", existingItems.Select(x => x.Id))}\n\tView: {string.Join(" => ", newItems.Select(x => x.Id))}");
+            Log.Debug($"Source ordering:\n\tSource: {string.Join(" => ", existingItems.Select(x => x.Id))}\n\tView: {string.Join(" => ", newItems.Select(x => x.Id))}");
             configUpdateSubject.OnNext(Unit.Default);
         }
 
@@ -276,13 +271,7 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
 
         private void CreateNewTabCommandExecuted(PoeEyeTabConfig cfg)
         {
-            var tab = CreateAndAddTab();
-            if (default(PoeEyeTabConfig).Equals(cfg))
-            {
-                cfg = poeEyeConfigProvider.ActualConfig.DefaultConfig;
-            }
-
-            tab.Load(cfg);
+            CreateAndAddTab(cfg);
         }
 
         private async Task RefreshAllTabsCommandExecuted()
@@ -295,14 +284,44 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
             await Task.Delay(UiConstants.ArtificialLongDelay);
         }
 
+        private IMainWindowTabViewModel CreateAndAddTab(PoeEyeTabConfig cfg)
+        {
+            var tab = CreateAndAddTab();
+            if (default(PoeEyeTabConfig).Equals(cfg))
+            {
+                cfg = poeEyeConfigProvider.ActualConfig.DefaultConfig;
+            }
+
+            tab.Load(cfg);
+            return tab;
+        }
+
         private IMainWindowTabViewModel CreateAndAddTab()
         {
             var newTab = tabFactory.Create();
 
-            newTab.RecheckPeriod.Period = TimeSpan.MinValue; // by default, recheck is disabled
-
+            newTab
+                .WhenAnyValue(x => x.SelectedAudioNotificationType)
+                .ToUnit()
+                .Subscribe(configUpdateSubject)
+                .AddTo(newTab.Anchors);
+            
+            newTab
+                .WhenAnyValue(x => x.TabName)
+                .ToUnit()
+                .Subscribe(configUpdateSubject)
+                .AddTo(newTab.Anchors);
+            
             newTab
                 .WhenAnyValue(x => x.SelectedApi)
+                .ToUnit()
+                .Subscribe(configUpdateSubject)
+                .AddTo(newTab.Anchors);
+            
+            newTab
+                .WhenAnyValue(x => x.RecheckPeriod)
+                .Select(x => x.WhenAnyValue(y => y.Period))
+                .Switch()
                 .ToUnit()
                 .Subscribe(configUpdateSubject)
                 .AddTo(newTab.Anchors);
@@ -327,14 +346,14 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
         {
             Guard.ArgumentIsTrue(() => RemoveTabCommandCanExecute(tab));
 
-            Log.Debug($"[MainWindowViewModel.RemoveTab] Removing tab {tab}...");
+            Log.Debug($"Removing tab {tab}...");
 
             var items = positionMonitor.Items.ToArray();
             var tabIdx = items.IndexOf(tab);
             if (tabIdx > 0)
             {
                 var tabToSelect = items[tabIdx - 1];
-                Log.Debug($"[MainWindowViewModel.RemoveTab] Selecting neighbour tab {tabToSelect}...");
+                Log.Debug($"Selecting neighbour tab {tabToSelect}...");
                 SelectedTab = tabToSelect;
             }
 
@@ -356,7 +375,7 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
         {
             Guard.ArgumentIsTrue(() => CopyTabToClipboardCommandCanExecute(tab));
 
-            Log.Debug($"[MainWindowViewModel.CopyTabToClipboard] Copying tab {tab}...");
+            Log.Debug($"Copying tab {tab}...");
 
             var cfg = tab.Save();
             var data = configSerializer.Compress(cfg);
@@ -365,7 +384,7 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
 
         private void SaveConfig()
         {
-            Log.Debug($"[MainWindowViewModel.SaveConfig] Saving config (provider: {poeEyeConfigProvider})...\r\nTabs count: {TabsList.Count}");
+            Log.Debug($"Saving config (provider: {poeEyeConfigProvider})...\r\nTabs count: {TabsList.Count}");
 
             var config = poeEyeConfigProvider.ActualConfig;
 
@@ -382,19 +401,18 @@ namespace PoeEye.PoeTrade.Shell.ViewModels
 
         private void LoadConfig()
         {
-            Log.Debug($"[MainWindowViewModel.LoadConfig] Loading config (provider: {poeEyeConfigProvider})...");
+            Log.Debug($"Loading config (provider: {poeEyeConfigProvider})...");
 
             var config = poeEyeConfigProvider.ActualConfig;
 
-            Log.Trace($"[MainWindowViewModel.LoadConfig] Received configuration DTO:\r\n{config.DumpToText()}");
+            Log.Trace($"Received configuration DTO:\r\n{config.DumpToText()}");
 
             foreach (var tabConfig in config.TabConfigs)
             {
-                var tab = CreateAndAddTab();
-                tab.Load(tabConfig);
+                var tab = CreateAndAddTab(tabConfig);
             }
 
-            Log.Debug($"[MainWindowViewModel.LoadConfig] Successfully loaded config\r\nTabs count: {TabsList.Count}");
+            Log.Debug($"Successfully loaded config\r\nTabs count: {TabsList.Count}");
         }
     }
 }

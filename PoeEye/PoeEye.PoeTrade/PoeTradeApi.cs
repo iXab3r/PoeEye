@@ -74,7 +74,7 @@ namespace PoeEye.PoeTrade
                 .WhenChanged
                 .Subscribe(x => config = x)
                 .AddTo(Anchors);
-            Log.Debug($"[PoeTradeApi..ctor] {config.DumpToText()}");
+            Log.Debug($"Using config {config.DumpToTextRaw()}");
             requestsSemaphore = new SemaphoreSlim(config.MaxSimultaneousRequestsCount);
         }
 
@@ -172,7 +172,7 @@ namespace PoeEye.PoeTrade
             else
             {
                 var systemProxy = WebRequest.DefaultWebProxy;
-                Log.Debug($"[PoeTradeApi] Using default system web proxy: {systemProxy}");
+                Log.Debug($"Using default system web proxy: {systemProxy}");
                 client.Proxy = systemProxy;
             }
 

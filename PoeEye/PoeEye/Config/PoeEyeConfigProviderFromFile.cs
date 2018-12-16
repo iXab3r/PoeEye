@@ -35,12 +35,12 @@ namespace PoeEye.Config
             this.configSerializer = configSerializer;
             if (AppArguments.Instance.IsDebugMode)
             {
-                Log.Debug("[PoeEyeConfigProviderFromFile..ctor] Debug mode detected");
+                Log.Debug("Debug mode detected");
                 configFilePath = Path.Combine(ConfigFileDirectory, DebugConfigFileName);
             }
             else
             {
-                Log.Debug("[PoeEyeConfigProviderFromFile..ctor] Release mode detected");
+                Log.Debug("Release mode detected");
                 configFilePath = Path.Combine(ConfigFileDirectory, ReleaseConfigFileName);
             }
         }
@@ -49,7 +49,7 @@ namespace PoeEye.Config
 
         public void Reload()
         {
-            Log.Debug("[PoeEyeConfigProviderFromFile.Reload] Reloading configuration...");
+            Log.Debug("Reloading configuration...");
 
             var config = LoadInternal();
             loadedConfigs.Clear();
@@ -88,7 +88,7 @@ namespace PoeEye.Config
         {
             var versionedLoadedConfig = loadedConfig as IPoeEyeConfigVersioned;
             Log.Debug(
-                $"[PoeEyeConfigProviderFromFile.ValidateConfigVersion] Validating config of type {loadedConfig} (version(-1 = unversioned): {versionedLoadedConfig?.Version ?? -1})...");
+                $"Validating config of type {loadedConfig} (version(-1 = unversioned): {versionedLoadedConfig?.Version ?? -1})...");
             if (versionedLoadedConfig == null)
             {
                 return loadedConfig;
@@ -101,9 +101,9 @@ namespace PoeEye.Config
             if (configTemplate.Version != versionedLoadedConfig.Version)
             {
                 Log.Debug(
-                    $"[PoeEyeConfigProviderFromFile.ValidateConfigVersion] Config version mismatch (expected: {configTemplate.Version}, got: {versionedLoadedConfig.Version})");
+                    $"Config version mismatch (expected: {configTemplate.Version}, got: {versionedLoadedConfig.Version})");
                 Log.Debug(
-                    $"[PoeEyeConfigProviderFromFile.ValidateConfigVersion] Loaded config:\n{loadedConfig.DumpToText()}\n\nTemplate config:\n{configTemplate.DumpToText()}");
+                    $"Loaded config:\n{loadedConfig.DumpToText()}\n\nTemplate config:\n{configTemplate.DumpToText()}");
                 return configTemplate;
             }
 
@@ -116,12 +116,12 @@ namespace PoeEye.Config
 
             try
             {
-                Log.Debug("[PoeEyeConfigProviderFromFile.Save] Serializing config data...");
+                Log.Debug("Serializing config data...");
                 var serializedData = configSerializer.Serialize(config);
 
-                Log.Debug($"[PoeEyeConfigProviderFromFile.Save] Successfully serialized config, got {serializedData.Length} chars");
+                Log.Debug($"Successfully serialized config, got {serializedData.Length} chars");
 
-                Log.Debug($"[PoeEyeConfigProviderFromFile.Save] Saving config to file '{configFilePath}'...");
+                Log.Debug($"Saving config to file '{configFilePath}'...");
 
                 var directoryPath = Path.GetDirectoryName(configFilePath);
                 if (directoryPath != null && !Directory.Exists(directoryPath))
@@ -135,18 +135,18 @@ namespace PoeEye.Config
             }
             catch (Exception ex)
             {
-                Log.Warn("[PoeEyeConfigProviderFromFile.Save] Exception occurred, config was not saved correctly",ex);
+                Log.Warn("Exception occurred, config was not saved correctly",ex);
             }
         }
 
         private PoeEyeCombinedConfig LoadInternal()
         {
-            Log.Debug($"[PoeEyeConfigProviderFromFile.Load] Loading config from file '{configFilePath}'...");
+            Log.Debug($"Loading config from file '{configFilePath}'...");
             loadedConfigs.Clear();
 
             if (!File.Exists(configFilePath))
             {
-                Log.Debug($"[PoeEyeConfigProviderFromFile.Load] File not found, fileName: '{configFilePath}'");
+                Log.Debug($"File not found, fileName: '{configFilePath}'");
                 return new PoeEyeCombinedConfig();
             }
 
@@ -154,20 +154,14 @@ namespace PoeEye.Config
             try
             {
                 var fileData = File.ReadAllText(configFilePath);
-                Log.Debug($"[PoeEyeConfigProviderFromFile.Load] Successfully read {fileData.Length} chars, deserializing...");
+                Log.Debug($"Successfully read {fileData.Length} chars, deserializing...");
 
                 result = configSerializer.Deserialize<PoeEyeCombinedConfig>(fileData);
-                Log.Debug("[PoeEyeConfigProviderFromFile.Load] Successfully deserialized config data");
-
-                if (result == null)
-                {
-                    Log.Warn($"[PoeEyeConfigProviderFromFile.Load] Failed to deserialize config\nData:\n{fileData}");
-                    throw new ApplicationException("Failed to deserialize existing config");
-                }
+                Log.Debug("Successfully deserialized config data");
             }
             catch (Exception ex)
             {
-                Log.Warn("[PoeEyeConfigProviderFromFile.Load] Could not deserialize config data, default config will be used", ex);
+                Log.Warn("Could not deserialize config data, default config will be used", ex);
                 CreateBackupOfConfig();
             }
 
@@ -185,12 +179,12 @@ namespace PoeEye.Config
 
                 var backupFileName = Path.Combine(Path.GetDirectoryName(configFilePath),
                                                   $"{Path.GetFileNameWithoutExtension(configFilePath)}.bak{Path.GetExtension(configFilePath)}");
-                Log.Debug($"[PoeEyeConfigProviderFromFile.Load] Creating a backup of existing config data '{configFilePath}' to '{backupFileName}'");
+                Log.Debug($"Creating a backup of existing config data '{configFilePath}' to '{backupFileName}'");
                 File.Copy(configFilePath, backupFileName);
             }
             catch (Exception ex)
             {
-                Log.Warn("[PoeEyeConfigProviderFromFile.CreateBackupOfConfig] Failed to create a backup", ex);
+                Log.Warn("Failed to create a backup", ex);
             }
         }
 

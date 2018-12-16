@@ -60,7 +60,7 @@ namespace PoeShared.PoeTrade
         public IObservable<IPoeQueryResult> GetLiveUpdates(IPoeQueryInfo query)
         {
             Guard.ArgumentNotNull(query, nameof(query));
-            Log.Debug($"[PoeApiWrapper, {Name}] Issuing live query... {query.DumpToText(Formatting.None)}");
+            Log.Debug($"[{Name}] Issuing live query... {query.DumpToText(Formatting.None)}");
 
             return api
                 .SubscribeToLiveUpdates(query);
@@ -70,7 +70,7 @@ namespace PoeShared.PoeTrade
         {
             Guard.ArgumentNotNull(query, nameof(query));
 
-            Log.Debug($"[PoeApiWrapper, {Name}] Issuing query... {query.DumpToText(Formatting.None)}");
+            Log.Debug($"[{Name}] Issuing query... {query.DumpToText(Formatting.None)}");
 
             return api.IssueQuery(query);
         }
@@ -79,7 +79,7 @@ namespace PoeShared.PoeTrade
         {
             Guard.ArgumentNotNull(query, nameof(query));
 
-            Log.Debug($"[PoeApiWrapper, {Name}] Disposing query... {query.DumpToText(Formatting.None)}");
+            Log.Debug($"[{Name}] Disposing query... {query.DumpToText(Formatting.None)}");
 
             api.DisposeQuery(query);
         }

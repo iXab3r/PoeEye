@@ -3,72 +3,75 @@
                     xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
                     xmlns:viewModels="clr-namespace:PoeEye.PoeTrade.ViewModels"
                     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+                    xmlns:system="clr-namespace:System;assembly=mscorlib"
+                    xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+                    xmlns:utilities="clr-namespace:PoeEye.Utilities">
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Converters.xaml" />
         <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Styles.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
     <DataTemplate DataType="{x:Type viewModels:RecheckPeriodViewModel}">
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-
-            <ContentControl Grid.Column="0">
-                <ContentControl.Style>
-                    <Style TargetType="{x:Type ContentControl}">
-                        <Setter Property="Content">
-                            <Setter.Value>
-                                <DockPanel LastChildFill="True">
-                                    <materialDesign:PackIcon
-                                        VerticalAlignment="Center"
-                                        Kind="Alarm" />
-                                    <TextBlock VerticalAlignment="Center"
-                                               Margin="5,0"
-                                               Text="{Binding Period, StringFormat='Recheck every {0:F0}', Converter={StaticResource TimeSpanToHumanReadableStringConverter}}" />
-                                </DockPanel>
-                            </Setter.Value>
-                        </Setter>
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding Period}" Value="{x:Static system:TimeSpan.Zero}">
-                                <Setter Property="Content">
-                                    <Setter.Value>
-                                        <DockPanel LastChildFill="True">
-                                            <materialDesign:PackIcon
-                                                VerticalAlignment="Center"
-                                                Kind="Autorenew" />
-                                            <TextBlock VerticalAlignment="Center"
-                                                       Margin="5,0"
-                                                       Text="Live mode enabled" />
-                                        </DockPanel>
-                                    </Setter.Value>
-                                </Setter>
-                            </DataTrigger>
-                            <DataTrigger Binding="{Binding Period}" Value="{x:Static system:TimeSpan.MinValue}">
-                                <Setter Property="Content">
-                                    <Setter.Value>
-                                        <DockPanel LastChildFill="True">
-                                            <materialDesign:PackIcon
-                                                VerticalAlignment="Center"
-                                                Kind="AlarmOff" />
-                                            <TextBlock VerticalAlignment="Center"
-                                                       Margin="5,0"
-                                                       Text="Rechecks disabled" />
-                                        </DockPanel>
-                                    </Setter.Value>
-                                </Setter>
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </ContentControl.Style>
-            </ContentControl>
-
-            <materialDesign:PopupBox Grid.Column="1"
+        <Grid Background="Transparent">
+            <materialDesign:PopupBox x:Name="RecheckPeriodPopupBox"
                                      Margin="2,0"
                                      PopupMode="Click"
                                      StaysOpen="False">
+                <materialDesign:PopupBox.ToggleContent>
+                    <DockPanel LastChildFill="True" Margin="2" Width="170">
+                        <materialDesign:PackIcon DockPanel.Dock="Right" Kind="Menu" />
+                        <ContentControl DockPanel.Dock="Left">
+                            <ContentControl.Style>
+                                <Style TargetType="{x:Type ContentControl}">
+                                    <Setter Property="Content">
+                                        <Setter.Value>
+                                            <DockPanel LastChildFill="True">
+                                                <materialDesign:PackIcon
+                                                    VerticalAlignment="Center"
+                                                    Foreground="Green"
+                                                    Kind="Alarm" />
+                                                <TextBlock VerticalAlignment="Center"
+                                                           Margin="5,0"
+                                                           Text="{Binding Period, StringFormat='Recheck every {0:F0}', Converter={StaticResource TimeSpanToHumanReadableStringConverter}}" />
+                                            </DockPanel>
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Period}" Value="{x:Static system:TimeSpan.Zero}">
+                                            <Setter Property="Content">
+                                                <Setter.Value>
+                                                    <DockPanel LastChildFill="True">
+                                                        <materialDesign:PackIcon
+                                                            VerticalAlignment="Center"
+                                                            Foreground="Yellow"
+                                                            Kind="Autorenew" />
+                                                        <TextBlock VerticalAlignment="Center"
+                                                                   Margin="5,0"
+                                                                   Text="Live mode enabled" />
+                                                    </DockPanel>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Period}" Value="{x:Static system:TimeSpan.MinValue}">
+                                            <Setter Property="Content">
+                                                <Setter.Value>
+                                                    <DockPanel LastChildFill="True">
+                                                        <materialDesign:PackIcon
+                                                            VerticalAlignment="Center"
+                                                            Kind="AlarmOff" />
+                                                        <TextBlock VerticalAlignment="Center"
+                                                                   Margin="5,0"
+                                                                   Text="Rechecks disabled" />
+                                                    </DockPanel>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ContentControl.Style>
+                        </ContentControl>
+                    </DockPanel>
+                </materialDesign:PopupBox.ToggleContent>
                 <StackPanel Orientation="Vertical">
                     <Button Command="{Binding SetPeriodCommand}" CommandParameter="{x:Static system:TimeSpan.Zero}">
                         <Button.Content>

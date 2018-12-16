@@ -212,10 +212,7 @@ namespace PoeEye.PoeTrade.ViewModels
                 ApiSelector.SetByModuleId(defaultModule.Id.ToString());
             }
 
-            if (config.RecheckTimeout != default(TimeSpan))
-            {
-                RecheckPeriod.Period = config.RecheckTimeout;
-            }
+            RecheckPeriod.Period = config.RecheckTimeout;
 
             if (config.QueryInfo != null)
             {
@@ -342,7 +339,7 @@ namespace PoeEye.PoeTrade.ViewModels
 
         private void RebuildTabName(IPoeQueryViewModel queryToProcess)
         {
-            Log.Debug($"[MainWindowTabViewModel.RebuildTabName] Rebuilding tab name, tabQueryMode: {queryToProcess}...");
+            Log.Debug($"Rebuilding tab name, tabQueryMode: {queryToProcess}...");
 
             var queryDescription = queryToProcess.Description;
 
@@ -363,13 +360,13 @@ namespace PoeEye.PoeTrade.ViewModels
             {
                 var newQuery = queryBuilder();
                 Log.Debug(
-                    $"[MainWindowTabViewModel.RefreshCommandExecuted] Search command executed, running query\r\n{newQuery.DumpToTextRaw()}");
+                    $"Search command executed, running query\r\n{newQuery.DumpToTextRaw()}");
                 RunNewSearch(newQuery);
             }
             else
             {
                 Log.Debug(
-                    $"[MainWindowTabViewModel.RefreshCommandExecuted] Refresh command executed, running query\r\n{Query.DumpToTextRaw()}");
+                    $"Refresh command executed, running query\r\n{Query.DumpToTextRaw()}");
                 TradesList.Refresh();
             }
         }
@@ -386,9 +383,9 @@ namespace PoeEye.PoeTrade.ViewModels
             TradesList.ActiveQuery = newQuery;
             Query.IsExpanded = false;
 
-            if (TradesList.RecheckPeriod == TimeSpan.Zero)
+            if (TradesList.RecheckPeriod < TimeSpan.Zero)
             {
-                Log.Debug("[MainWindowTabViewModel.SearchCommandExecute] Auto-recheck is disabled, refreshing query manually...");
+                Log.Debug("Auto-recheck is disabled, refreshing query manually...");
                 TradesList.Refresh();
             }
         }
@@ -402,7 +399,7 @@ namespace PoeEye.PoeTrade.ViewModels
             }
 
             Log.Debug(
-                $"[MainWindowTabViewModel.MarkAllAsReadExecute] Marking {tradesToAmend.Length} of {tradesList.Items.Count} item(s) as Read");
+                $"Marking {tradesToAmend.Length} of {tradesList.Items.Count} item(s) as Read");
 
             foreach (var trade in tradesToAmend)
             {
@@ -412,7 +409,7 @@ namespace PoeEye.PoeTrade.ViewModels
 
         private void SaveAsDefaultExecuted()
         {
-            Log.Debug("[MainWindowTabViewModel.SaveAsDefaultExecuted] Saving default tab configuration as default");
+            Log.Debug("Saving default tab configuration as default");
             configProvider.ActualConfig.DefaultConfig = Save();
         }
 

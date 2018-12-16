@@ -38,7 +38,7 @@ namespace PoeShared.Modularity
         [MethodImpl(MethodImplOptions.Synchronized)]
         public IScheduler GetOrCreate(string name)
         {
-            Log.Debug($"[SchedulerProvider.GetOrCreate '{name}'] Retrieving scheduler...");
+            Log.Debug($"[{name}] Retrieving scheduler...");
             return schedulers.GetOrAdd(name, Create);
         }
 
@@ -46,7 +46,7 @@ namespace PoeShared.Modularity
         {
             Guard.ArgumentNotNull(name, nameof(name));
 
-            Log.Debug($"[SchedulerProvider.Create '{name}'] Creating new dispatcher");
+            Log.Debug($"[{name}] Creating new dispatcher");
             var consumer = new TaskCompletionSource<IScheduler>();
             var dispatcherThread = new Thread(InitializeDispatcherThread)
             {
@@ -55,7 +55,7 @@ namespace PoeShared.Modularity
             };
             dispatcherThread.SetApartmentState(ApartmentState.STA);
 
-            Log.Debug($"[SchedulerProvider.Create '{name}'] Thread started");
+            Log.Debug($"[{name}] Thread started");
 
             dispatcherThread.Start(consumer);
             return consumer.Task.Result;
@@ -70,7 +70,7 @@ namespace PoeShared.Modularity
             }
             else
             {
-                Log.Debug($"[SchedulerProvider.InitializeDispatcherThread] Wrong args: {arg}");
+                Log.Debug($"Wrong args: {arg}");
             }
         }
 
@@ -78,9 +78,9 @@ namespace PoeShared.Modularity
         {
             try
             {
-                Log.Debug("[SchedulerProvider.InitializeDispatcherThread] Thread started");
+                Log.Debug("Thread started");
                 var dispatcher = Dispatcher.CurrentDispatcher;
-                Log.Debug($"[SchedulerProvider.InitializeDispatcherThread] Dispatcher: {dispatcher}");
+                Log.Debug($"Dispatcher: {dispatcher}");
                 var scheduler = new DispatcherScheduler(dispatcher);
                 Observable
                     .FromEventPattern<DispatcherHookEventHandler, DispatcherHookEventArgs>(
@@ -112,10 +112,10 @@ namespace PoeShared.Modularity
                         h => scheduler.Dispatcher.Hooks.OperationPosted -= h)
                     .Subscribe(eventArgs => LogEvent("OperationPosted", eventArgs.EventArgs))
                     .AddTo(Anchors);
-                Log.Debug($"[SchedulerProvider.InitializeDispatcherThread] Scheduler: {dispatcher}");
+                Log.Debug($"Scheduler: {dispatcher}");
                 consumer.TrySetResult(scheduler);
 
-                Log.Debug("[KeyboardEventsSource.InitializeKeyboardThread] Starting dispatcher...");
+                Log.Debug("Starting dispatcher...");
                 Dispatcher.Run();
             }
             catch (Exception e)
@@ -125,7 +125,7 @@ namespace PoeShared.Modularity
             }
             finally
             {
-                Log.Debug("[KeyboardEventsSource.InitializeKeyboardThread] Thread completed");
+                Log.Debug("Thread completed");
             }
         }
 

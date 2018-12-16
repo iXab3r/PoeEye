@@ -138,7 +138,7 @@ namespace PoeEye.PoeTrade.ViewModels
             Observable.Merge(
                           this.WhenAnyValue(x => x.League).Where(string.IsNullOrWhiteSpace).ToUnit(), 
                           leagueList.ToObservableChangeSet().ToUnit())
-                .Buffer(ReconfigurationBuffer)
+                .Sample(ReconfigurationBuffer)
                 .ObserveOn(uiScheduler)
                 .Where(x => string.IsNullOrWhiteSpace(League) && LeaguesList.Count > 0)
                 .Subscribe(() => League = LeaguesList.FirstOrDefault())

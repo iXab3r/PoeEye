@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
@@ -125,7 +126,7 @@ namespace PoeEye.PoeTrade.ViewModels
 
         public ReadOnlyObservableCollection<IPoeTradeViewModel> Items { get; }
 
-        public TimeSpan TimeSinceLastUpdate => activeProviderInfo.HistoryProvider == null 
+        public TimeSpan TimeSinceLastUpdate => activeProviderInfo.HistoryProvider == null  || activeProviderInfo.HistoryProvider.LastUpdateTimestamp == default(DateTime)
             ? TimeSpan.MaxValue 
             : clock.Now - activeProviderInfo.HistoryProvider.LastUpdateTimestamp;
         
@@ -300,16 +301,15 @@ namespace PoeEye.PoeTrade.ViewModels
                 .Subscribe(x => RawQuery = $"Eye query:\n{x?.Query?.DumpToTextRaw() ?? "Empty"}\n\nProvider query:\n{x?.ConvertedQuery ?? "Empty"}")
                 .AddTo(activeProviderInfo.Anchors);
             
-            poeLiveHistoryProvider
-                .WhenAnyValue(x => x.LastUpdateTimestamp)
-                .Buffer(TimeSinceLastUpdateRefreshTimeout)
+            Observable
+                .Timer(TimeSinceLastUpdateRefreshTimeout, TimeSinceLastUpdateRefreshTimeout)
                 .ObserveOn(uiScheduler)
                 .Subscribe(x => this.RaisePropertyChanged(nameof(TimeSinceLastUpdate)))
                 .AddTo(activeProviderInfo.Anchors);
             
-            this.WhenAnyValue(x => x.RecheckPeriod)
-                .Throttle(RecheckPeriodThrottleTimeout)
-                .ObserveOn(uiScheduler)
+                Observable.Merge(
+                              this.WhenAnyValue(x => x.RecheckPeriod).Throttle(RecheckPeriodThrottleTimeout).ToUnit(),
+                              Observable.Return(Unit.Default))
                 .Subscribe(x => poeLiveHistoryProvider.RecheckPeriod = recheckPeriod)
                 .AddTo(activeProviderInfo.Anchors);
         }

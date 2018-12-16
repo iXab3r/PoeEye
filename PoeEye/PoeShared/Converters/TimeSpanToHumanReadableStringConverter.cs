@@ -27,10 +27,9 @@ namespace PoeShared.Converters
                 return "∞";
             }
 
-            //TODO Distinguish min an max ? +inf -inf ?
             if (timeSpan == TimeSpan.MinValue)
             {
-                return "∞";
+                return "-∞";
             }
 
             if (timeSpan.TotalHours > 24)

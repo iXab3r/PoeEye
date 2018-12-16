@@ -54,6 +54,7 @@ namespace PoeShared.PoeTrade
                                        .Do(_ => LogRecheckPeriodChange())
                                        .Select(_ => ToTimer())
                                        .Switch()
+                                       .ObserveOn(uiScheduler)
                                        .Publish();
 
             var queryObservable = Observable.Merge(periodObservable, forceUpdatesSubject)
@@ -61,7 +62,7 @@ namespace PoeShared.PoeTrade
                                             .Do(StartUpdate)
                                             .ObserveOn(bgScheduler)
                                             .Select(x => IsLiveMode
-                                                        ? poeApi.GetLiveUpdates(query)
+                                                        ? poeApi.GetLiveUpdates(query).TakeWhile(_ => IsLiveMode)
                                                         : poeApi.IssueQuery(query).ToObservable())
                                             .ObserveOn(uiScheduler)
                                             .Switch()
@@ -126,17 +127,17 @@ namespace PoeShared.PoeTrade
 
         private IObservable<Unit> ToTimer()
         {
-            if (IsLiveMode)
-            {
-                return Observable.Never<Unit>();
-            }
-
             if (IsAutoRecheckEnabled)
             {
                 return Observable.Timer(DateTimeOffset.Now, RecheckPeriod).ToUnit();
             }
 
-            return Observable.Return(Unit.Default).Concat(Observable.Never<Unit>());
+            if (IsLiveMode)
+            {
+                return Observable.Return(Unit.Default);
+            }
+
+            return Observable.Never<Unit>();
         }
 
         private void StartUpdate(Unit unit)
@@ -164,7 +165,7 @@ namespace PoeShared.PoeTrade
                 periodInfo = "recheck disabled";
             }
 
-            Log.Debug($"Update period changed: {periodInfo}");
+            Log.Debug($"Update period changed({RecheckPeriod}): {periodInfo}");
         }
 
         private IPoeQueryResult ProcessPacks(IPoeQueryResult queryResult)
