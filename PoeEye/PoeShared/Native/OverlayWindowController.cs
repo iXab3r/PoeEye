@@ -131,7 +131,7 @@ namespace PoeShared.Native
             var activationController = new ActivationController(overlayWindow);
             viewModel.SetActivationController(activationController);
 
-            this.WhenAnyValue(x => x.IsVisible)
+            Observable.Merge(this.WhenAnyValue(x => x.IsVisible).ToUnit(), windowTracker.WhenAnyValue(x => x.ActiveWindowHandle).ToUnit())
                 .ObserveOn(uiScheduler)
                 .Subscribe(isVisible => HandleVisibilityChange(overlayWindow, viewModel))
                 .AddTo(childAnchors);
