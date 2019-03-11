@@ -33,7 +33,7 @@ namespace PoeShared.Native
 
         OverlayMode OverlayMode { get; set; }
 
-        IObservable<Unit> WhenLoaded { [NotNull] get; }
+        IObservable<EventPattern<RoutedEventArgs>> WhenLoaded { [NotNull] get; }
 
         SizeToContent SizeToContent { get; }
 
@@ -42,6 +42,8 @@ namespace PoeShared.Native
         ICommand LockWindowCommand { [NotNull] get; }
 
         ICommand UnlockWindowCommand { [NotNull] get; }
+
+        void ResetToDefault();
 
         void SetActivationController([NotNull] IActivationController controller);
     }

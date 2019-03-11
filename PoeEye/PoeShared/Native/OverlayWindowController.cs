@@ -148,12 +148,12 @@ namespace PoeShared.Native
                 .AddTo(childAnchors);
 
             //FIXME Inheritance problem
-            if (viewModel.WhenLoaded is IObserver<Unit> observer)
+            if (viewModel.WhenLoaded is IObserver<EventPattern<RoutedEventArgs>> observer)
             {
                 overlayWindow.WhenLoaded
-                    .Do(_ =>
+                    .Do(args =>
                     {
-                        Log.Debug($"[#{overlayWindow.Name}] Overlay is loaded");
+                        Log.Debug($"[#{overlayWindow.Name}] Overlay is loaded, window: {args.Sender}");
                         overlayWindow.Visibility = Visibility.Hidden;
                     })
                     .Subscribe(observer)

@@ -109,7 +109,7 @@ namespace PoeShared.Native
                     }
                 }
             }
-            catch (OperationCanceledException e)
+            catch (OperationCanceledException)
             {
                 Log.Debug("Input event consumer received Cancellation request");
             }

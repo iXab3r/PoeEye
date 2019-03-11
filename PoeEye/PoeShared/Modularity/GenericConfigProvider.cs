@@ -32,7 +32,15 @@ namespace PoeShared.Modularity
             var changes = this
                 .WhenAnyValue(x => x.ActualConfig)
                 .WithPrevious((prev, curr) => new {prev, curr})
+                .Do(x =>
+                {
+                    if (ReferenceEquals(x.prev, x.curr))
+                    {
+                        throw new ApplicationException($"Previous config instance is equal to the current one ! Instance: {x.DumpToTextRaw()}");
+                    }
+                })
                 .Select(x => new {Config = x.curr, PreviousConfig = x.prev, ComparisonResult = Compare(x.curr, x.prev)})
+                .Do(x => { LogActualConfigChange(x.PreviousConfig, x.Config, x.ComparisonResult); })
                 .Where(x => !x.ComparisonResult.AreEqual)
                 .Do(
                     x =>
@@ -88,6 +96,7 @@ namespace PoeShared.Modularity
             return new CompareLogic(
                 new ComparisonConfig
                 {
+                    DoublePrecision = 0.01,
                     MaxDifferences = byte.MaxValue
                 }).Compare(x, y);
         }
@@ -95,7 +104,13 @@ namespace PoeShared.Modularity
         private void LogConfigChange(TConfig config, ComparisonResult result)
         {
             Log.Debug(
-                $"[GenericConfigProvider.{typeof(TConfig).Name}] Config has changed:\nTime spent by comparer: {result.ElapsedMilliseconds}ms\n{result.DifferencesString}");
+                $"[GenericConfigProvider.{typeof(TConfig).Name}] Config has changed:{config.DumpToTextRaw()}\nTime spent by comparer: {result.ElapsedMilliseconds}ms\n{result.DifferencesString}");
+        }
+        
+        private void LogActualConfigChange(TConfig previousConfig, TConfig currentConfig, ComparisonResult result)
+        {
+            Log.Trace(
+                $"[GenericConfigProvider.{typeof(TConfig).Name}] Actual config updated(areEqual: {result.AreEqual})\nPrevious: {(previousConfig == null ? "NULL" : previousConfig.DumpToTextRaw())}\nCurrent: {(currentConfig == null ? "NULL" : currentConfig.DumpToTextRaw())}\nTime spent by comparer: {result.ElapsedMilliseconds}ms\n{result.DifferencesString}");
         }
 
         private void ReloadInternal()

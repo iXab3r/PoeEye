@@ -24,13 +24,11 @@ namespace PoeShared.Native
             LocationChanged += OnLocationChanged;
         }
 
-        public IObservable<Unit> WhenLoaded => Observable
-            .FromEventPattern<RoutedEventHandler, RoutedEventArgs>(h => Loaded += h, h => Loaded -= h)
-            .ToUnit();
+        public IObservable<EventPattern<RoutedEventArgs>> WhenLoaded => Observable
+            .FromEventPattern<RoutedEventHandler, RoutedEventArgs>(h => Loaded += h, h => Loaded -= h);
 
-        public IObservable<Unit> WhenRendered => Observable
-            .FromEventPattern<EventHandler, EventArgs>(h => ContentRendered += h, h => ContentRendered -= h)
-            .ToUnit();
+        public IObservable<EventPattern<EventArgs>> WhenRendered => Observable
+            .FromEventPattern<EventHandler, EventArgs>(h => ContentRendered += h, h => ContentRendered -= h);
 
         private void OnLocationChanged(object sender, EventArgs e)
         {

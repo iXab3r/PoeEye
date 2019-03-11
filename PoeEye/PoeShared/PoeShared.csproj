@@ -230,6 +230,7 @@
     <Compile Include="Scaffolding\IntPtrExtensions.cs" />
     <Compile Include="Scaffolding\KeyEventArgsExtensions.cs" />
     <Compile Include="Scaffolding\ReactiveObjectExtensions.cs" />
+    <Compile Include="Scaffolding\SizeExtensions.cs" />
     <Compile Include="Scaffolding\StreamExtensions.cs" />
     <Compile Include="Scaffolding\WPF\AccessKeyScoper.cs" />
     <Compile Include="Scaffolding\WPF\CommandWrapper.cs" />
