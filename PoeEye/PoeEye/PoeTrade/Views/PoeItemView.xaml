@@ -395,14 +395,12 @@
                                 <Setter Property="Background"
                                         Value="{StaticResource PoeTradeNewItemBrush}" />
                                 <Setter Property="BorderThickness" Value="1" />
-                                <Setter Property="Content" Value="New" />
                             </DataTrigger>
                             <DataTrigger Binding="{Binding TradeState}"
                                          Value="{x:Static common:PoeTradeState.Removed}">
                                 <Setter Property="Background"
                                         Value="{StaticResource PoeTradeRemovedItemBrush}" />
                                 <Setter Property="BorderThickness" Value="1" />
-                                <Setter Property="Content" Value="Sold?" />
                             </DataTrigger>
                             <DataTrigger Binding="{Binding TradeState}"
                                          Value="{x:Static common:PoeTradeState.Normal}">
@@ -721,14 +719,12 @@
                                             <Setter Property="Background"
                                                     Value="{StaticResource PoeTradeNewItemBrush}" />
                                             <Setter Property="BorderThickness" Value="1" />
-                                            <Setter Property="Content" Value="New" />
                                         </DataTrigger>
                                         <DataTrigger Binding="{Binding TradeState}"
                                                      Value="{x:Static common:PoeTradeState.Removed}">
                                             <Setter Property="Background"
                                                     Value="{StaticResource PoeTradeRemovedItemBrush}" />
                                             <Setter Property="BorderThickness" Value="1" />
-                                            <Setter Property="Content" Value="Sold?" />
                                         </DataTrigger>
                                         <DataTrigger Binding="{Binding TradeState}"
                                                      Value="{x:Static common:PoeTradeState.Normal}">

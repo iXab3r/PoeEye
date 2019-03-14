@@ -13,8 +13,8 @@
         <Border Visibility="{Binding PageCount, Converter={StaticResource GreaterThanOneToVisibleConverter}}"
                 BorderBrush="{StaticResource SecondaryAccentBrush}"
                 CornerRadius="4"
-                Background="{StaticResource MaterialDesignBackground}"
-                BorderThickness="1">
+                Background="Transparent"
+                BorderThickness="0">
             <DockPanel>
                 <TextBlock FontWeight="Bold" Text="{Binding CurrentPage}" />
                 <TextBlock FontWeight="Bold" Text=" / " />

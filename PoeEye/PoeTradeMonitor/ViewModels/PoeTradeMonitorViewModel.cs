@@ -147,6 +147,7 @@ namespace PoeEye.TradeMonitor.ViewModels
 
             configProvider
                 .WhenChanged
+                .ObserveOn(uiScheduler)
                 .Subscribe(ApplyConfig)
                 .AddTo(Anchors);
 

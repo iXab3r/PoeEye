@@ -1,13 +1,16 @@
 ﻿using System;
 using System.Linq.Expressions;
 using System.Reactive;
+using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using Common.Logging;
 using Guards;
 using JetBrains.Annotations;
 using KellermanSoftware.CompareNetObjects;
+using PoeShared.Prism;
 using PoeShared.Scaffolding;
 using ReactiveUI;
+using Unity.Attributes;
 
 namespace PoeShared.Modularity
 {
@@ -18,12 +21,16 @@ namespace PoeShared.Modularity
         private readonly IConfigProvider configProvider;
         private TConfig actualConfig;
 
-        public GenericConfigProvider([NotNull] IConfigProvider configProvider)
+        public GenericConfigProvider(
+            [NotNull] IConfigProvider configProvider,
+            [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {
             Guard.ArgumentNotNull(configProvider, nameof(configProvider));
+            Guard.ArgumentNotNull(uiScheduler, nameof(uiScheduler));
 
             this.configProvider = configProvider;
             configProvider.ConfigHasChanged
+                .ObserveOn(uiScheduler)
                 .StartWith(Unit.Default)
                 .Subscribe(ReloadInternal)
                 .AddTo(Anchors);

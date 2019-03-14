@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Globalization;
+using System.Reactive.Concurrency;
+using System.Reactive.Linq;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Media;
@@ -8,9 +10,11 @@ using Guards;
 using JetBrains.Annotations;
 using PoeEye.StashGrid.Modularity;
 using PoeShared.Modularity;
+using PoeShared.Prism;
 using PoeShared.Scaffolding;
 using PoeShared.StashApi.DataTypes;
 using ReactiveUI;
+using Unity.Attributes;
 
 namespace PoeBud.Models
 {
@@ -26,10 +30,12 @@ namespace PoeBud.Models
         public PoeWindow(
             [NotNull] IConfigProvider<PoeStashGridConfig> stashConfigProvider,
             [NotNull] IUserInteractionsManager userInteractionsManager,
+            [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler,
             IntPtr nativeWindowHandle)
         {
             Guard.ArgumentNotNull(stashConfigProvider, nameof(stashConfigProvider));
             Guard.ArgumentNotNull(userInteractionsManager, nameof(userInteractionsManager));
+            Guard.ArgumentNotNull(uiScheduler, nameof(uiScheduler));
 
             if (nativeWindowHandle == IntPtr.Zero)
             {
@@ -40,7 +46,7 @@ namespace PoeBud.Models
             NativeWindowHandle = nativeWindowHandle;
             this.userInteractionsManager = userInteractionsManager;
 
-            stashConfigProvider.WhenChanged.Subscribe(() => this.RaisePropertyChanged(nameof(StashBounds))).AddTo(Anchors);
+            stashConfigProvider.WhenChanged.ObserveOn(uiScheduler).Subscribe(() => this.RaisePropertyChanged(nameof(StashBounds))).AddTo(Anchors);
         }
 
         public void MoveMouseToStashItem(int itemX, int itemY, StashTabType tabType)

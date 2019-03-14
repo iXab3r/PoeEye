@@ -107,12 +107,6 @@
                               controls:TextBoxHelper.Watermark="select buyout" />
                 </StackPanel>
 
-                <TextBlock Grid.Row="2" Grid.Column="3"
-                           Text="Item Type" Style="{StaticResource TextBlockHeader}" />
-                <ContentPresenter Grid.Row="2" Grid.Column="4" Grid.ColumnSpan="2"
-                                  Margin="8, 0"
-                                  Content="{Binding ItemTypeSelector}"/>
-
                 <TextBlock Grid.Row="2" Grid.Column="0"
                            Text="Name" Style="{StaticResource TextBlockHeader}" />
 
@@ -128,7 +122,11 @@
                                              Watermark="item name, e.g. Temple map"
                                              controls:TextBoxHelper.ClearTextButton="True" />
                 
-                
+                <TextBlock Grid.Row="2" Grid.Column="3"
+                           Text="Item Type" Style="{StaticResource TextBlockHeader}" />
+                <ContentPresenter Grid.Row="2" Grid.Column="4" Grid.ColumnSpan="2"
+                                  Margin="8, 0"
+                                  Content="{Binding ItemTypeSelector}"/>
             </Grid>
 
             <Grid Row="1" Margin="0,2"><!-- DPS -->

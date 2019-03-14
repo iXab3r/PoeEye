@@ -10,7 +10,6 @@
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.togglebutton.xaml" />
-
         <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.progressbar.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
@@ -87,7 +86,7 @@
                       Header="Currency list (Debug-only)"
                       Visibility="{Binding CurrencyTest, Converter={StaticResource NullToCollapsedConverter}}">
                 <ContentPresenter
-                    ContentTemplate="{StaticResource CurrencyTestTemplateKey}"
+                    ContentTemplate="{DynamicResource CurrencyTestTemplateKey}"
                     Content="{Binding CurrencyTest}" />
             </Expander>
         </Grid>
