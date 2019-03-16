@@ -186,6 +186,8 @@ namespace PoeShared.Native
 
         public string Title { get; protected set; }
 
+        public string OverlayDescription => $"{(overlayWindow == null ? "NOWINDOW" : overlayWindow.Name)}";
+
         public virtual void ResetToDefault()
         {
             var activeMonitor = NativeMethods.GetMonitorInfo(OverlayWindow);
@@ -224,13 +226,13 @@ namespace PoeShared.Native
         
         protected void ApplyConfig(IOverlayConfig config)
         {
-            Log.Debug($"Applying configuration: {config.DumpToTextRaw()}");
+            Log.Debug($"[{OverlayDescription}] Applying configuration of type ({config.GetType().FullName}): {config.DumpToTextRaw()}");
             if (config.OverlaySize.Height <= 0 ||
                 config.OverlaySize.Width <= 0 ||
                 double.IsNaN(config.OverlaySize.Height) ||
                 double.IsNaN(config.OverlaySize.Width))
             {
-                Log.Warn($"Overlay size is invalid, resetting to {MinSize}, config: {config.DumpToTextRaw()}");
+                Log.Warn($"[{OverlayDescription}] Overlay size is invalid, resetting to {MinSize}, config: {config.DumpToTextRaw()}");
                 config.OverlaySize = MinSize;
                 if (UnlockWindowCommand.CanExecute(null))
                 {
@@ -248,13 +250,13 @@ namespace PoeShared.Native
                 MonitorInfo = NativeMethods.GetMonitorInfo(OverlayWindow)
             };
 
-            Log.Debug($"Current SystemInformation: {systemInformation.DumpToTextRaw()}");
+            Log.Debug($"[{OverlayDescription}] Current SystemInformation: {systemInformation.DumpToTextRaw()}");
             
             var overlayBounds = new Rect(config.OverlayLocation, config.OverlaySize);
             if (IsOutOfBounds(overlayBounds, systemInformation.MonitorBounds))
             {
                 var screenCenter = GetPositionAtTheCenter();
-                Log.Warn($"Overlay is out of screen bounds(screen: {systemInformation.MonitorBounds}, overlay: {overlayBounds}) , resetting to {screenCenter}, systemInfo: {systemInformation.DumpToTextRaw()}, config: {config.DumpToTextRaw()}");
+                Log.Warn($"[{OverlayDescription}] Overlay is out of screen bounds(screen: {systemInformation.MonitorBounds}, overlay: {overlayBounds}) , resetting to {screenCenter}, systemInfo: {systemInformation.DumpToTextRaw()}, config: {config.DumpToTextRaw()}");
                 config.OverlayLocation = screenCenter;
                 
                 if (UnlockWindowCommand.CanExecute(null))
@@ -268,6 +270,8 @@ namespace PoeShared.Native
 
             if (config.OverlayOpacity <= 0.01)
             {
+                Log.Warn($"[{OverlayDescription}] Overlay is fully invisible(screen: {systemInformation.MonitorBounds}, overlay: {overlayBounds}), systemInfo: {systemInformation.DumpToTextRaw()}, config: {config.DumpToTextRaw()}");
+
                 config.OverlayOpacity = 1;
                 if (UnlockWindowCommand.CanExecute(null))
                 {
@@ -318,8 +322,9 @@ namespace PoeShared.Native
         {
             if (!UnlockWindowCommandCanExecute())
             {
-                throw new InvalidOperationException($"Unsupported operation in this state, overlay(IsLocked: {IsLocked}, IsUnlockable: {IsUnlockable}): {this.DumpToTextRaw()}");
+                throw new InvalidOperationException($"[{OverlayDescription}] Unsupported operation in this state, overlay(IsLocked: {IsLocked}, IsUnlockable: {IsUnlockable}): {this.DumpToTextRaw()}");
             }
+            Log.Debug($"[{OverlayDescription}] Unlocking window @ position {new Point(Left, Top)}");
             IsLocked = false;
         }
 
@@ -332,8 +337,9 @@ namespace PoeShared.Native
         {
             if (!LockWindowCommandCanExecute())
             {
-                throw new InvalidOperationException($"Unsupported operation in this state, overlay(IsLocked: {IsLocked}): {this.DumpToTextRaw()}");
+                throw new InvalidOperationException($"[{OverlayDescription}] Unsupported operation in this state, overlay(IsLocked: {IsLocked}): {this.DumpToTextRaw()}");
             }
+            Log.Debug($"[{OverlayDescription}] Locking window @ position {new Point(Left, Top)}");
             IsLocked = true;
         }
 

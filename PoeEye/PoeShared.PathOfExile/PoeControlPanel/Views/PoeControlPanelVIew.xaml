@@ -36,7 +36,7 @@
                 </materialDesign:PopupBox.ToggleContent>
                 <StackPanel Orientation="Vertical">
                     <Button ToolTip="Lock all"
-                            Content="&#xF07C;"
+                            Content="&#xF023;"
                             Command="{Binding LockAllWindowsCommand}" />
                     <Button ToolTip="Unlock all"
                             Content="&#xF09C;"

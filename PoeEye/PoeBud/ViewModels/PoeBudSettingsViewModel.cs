@@ -38,6 +38,7 @@ namespace PoeBud.ViewModels
 
         private string sessionId;
         private string username;
+        private bool isEnabled;
 
         public PoeBudSettingsViewModel(
             [NotNull] IFactory<IPoeStashClient, NetworkCredential, bool> poeClientFactory,
@@ -68,6 +69,12 @@ namespace PoeBud.ViewModels
         }
 
         public string[] HotkeysList { get; }
+        
+        public bool IsEnabled
+        {
+            get => isEnabled;
+            set => this.RaiseAndSetIfChanged(ref isEnabled, value);
+        }
 
         public string[] LeaguesList
         {
@@ -102,6 +109,7 @@ namespace PoeBud.ViewModels
             config.CopyPropertiesTo(resultingConfig);
 
             Username = config.LoginEmail;
+            IsEnabled = config.IsEnabled;
 
             LeaguesList = string.IsNullOrEmpty(config.LeagueId) ? null : new[] {config.LeagueId};
             SelectedLeague = config.LeagueId;
@@ -142,6 +150,7 @@ namespace PoeBud.ViewModels
                                .ToArray();
 
             resultingConfig.StashesToProcess = selectedTabs;
+            resultingConfig.IsEnabled = IsEnabled;
 
             var result = new PoeBudConfig();
             resultingConfig.CopyPropertiesTo(result);

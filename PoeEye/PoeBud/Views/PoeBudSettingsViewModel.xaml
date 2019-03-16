@@ -25,11 +25,22 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
+            
+            <StackPanel Grid.Row="0" 
+                        Orientation="Horizontal">
+                <Label MinWidth="100"
+                       Content="Overlay Is Enabled:" />
+                <ToggleButton
+                    IsChecked="{Binding IsEnabled}"
+                    Height="24"
+                    Margin="10,0" />
+            </StackPanel>
 
-            <StackPanel Grid.Row="0"
+            <StackPanel Grid.Row="1"
                         Orientation="Horizontal" Height="30" Margin="0,2">
                 <Label Content="Get Set hotkey:" MinWidth="100" />
                 <ComboBox IsEditable="False"
@@ -38,23 +49,23 @@
                           SelectedValue="{Binding Hotkey}" />
             </StackPanel>
 
-            <TextBox Grid.Row="1"
+            <TextBox Grid.Row="3"
                      Margin="0, 5"
                      controls:TextBoxHelper.Watermark="e-mail"
                      Text="{Binding Username}" />
 
-            <PasswordBox Grid.Row="3"
+            <PasswordBox Grid.Row="4"
                          Margin="0, 5"
                          controls:TextBoxHelper.Watermark="password"
                          x:Name="LoginPasswordBox" />
 
-            <ContentControl Grid.Row="4"
+            <ContentControl Grid.Row="5"
                             eye:CommandWrapperHelper.Text="Fetch stash list"
                             eye:CommandWrapperHelper.IsDefault="True"
                             eye:CommandWrapperHelper.CommandParameter="{Binding ElementName=LoginPasswordBox}"
                             Content="{Binding LoginCommand}" />
 
-            <GroupBox Grid.Row="5"
+            <GroupBox Grid.Row="6"
                       IsEnabled="{Binding LoginCommand.IsBusy, Converter={StaticResource BoolInvertConverter}}"
                       Margin="0, 10"
                       Header="League and stashes selection">

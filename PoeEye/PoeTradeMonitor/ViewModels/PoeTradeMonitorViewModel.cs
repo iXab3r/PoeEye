@@ -229,7 +229,9 @@ namespace PoeEye.TradeMonitor.ViewModels
 
         private void ApplyConfig(PoeTradeMonitorConfig config)
         {
-            Log.Debug("Config has changed");
+            base.ApplyConfig(config);
+
+            Log.Debug($"Config has changed, new config: {config.DumpToTextRaw()}");
 
             GrowUpwards = config.GrowUpwards;
             NumberOfNegotiationsToExpandByDefault = config.NumberOfNegotiationsToExpandByDefault;

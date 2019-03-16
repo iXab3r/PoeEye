@@ -204,6 +204,7 @@
     <Compile Include="Models\PoeWIndow.cs" />
     <Compile Include="Models\PoeWindowManager.cs" />
     <Compile Include="Models\UserInputBlocker.cs" />
+    <Compile Include="Prism\PoeBudBootstrapper.cs" />
     <Compile Include="Prism\PoeBudModule.cs" />
     <Compile Include="Prism\PoeBudModuleRegistrations.cs" />
     <Compile Include="Scaffolding\ItemExtensions.cs" />

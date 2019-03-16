@@ -286,7 +286,6 @@
     <Compile Include="PoeTrade\Models\IPoeCaptchaRegistrator.cs" />
     <Compile Include="PoeTrade\Models\IPoeTradeQuickFilter  .cs" />
     <Compile Include="PoeTrade\Models\IReactiveSuggestionProvider.cs" />
-    <Compile Include="PoeTrade\Models\IWhispersNotificationManager.cs" />
     <Compile Include="PoeTrade\Models\PoeApiProvider.cs" />
     <Compile Include="PoeTrade\Models\PoeItemPricePoint.cs" />
     <Compile Include="PoeTrade\Models\PoeItemViewModelFactory.cs" />
@@ -294,7 +293,6 @@
     <Compile Include="PoeTrade\Models\PoeCaptchaRegistrator.cs" />
     <Compile Include="PoeTrade\Models\PoeTradeQuickFilter.cs" />
     <Compile Include="PoeTrade\Models\ReactiveSuggestionProvider.cs" />
-    <Compile Include="PoeTrade\Models\WhispersNotificationManager.cs" />
     <Compile Include="PoeTrade\ViewModels\CurrencyTestViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\IPoeApiSelectorViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\IPoeChatViewModel.cs" />

@@ -45,7 +45,6 @@ namespace PoeBud.ViewModels
 
         private PoeBudConfig actualConfig;
         private KeyGesture hotkey;
-        private bool isEnabled;
         private StashUpdate lastServerStashUpdate;
         private StashViewModel stash;
         private IPoeStashUpdater stashUpdater;
@@ -87,7 +86,7 @@ namespace PoeBud.ViewModels
             WindowManager = windowManager;
 
             OverlayMode = OverlayMode.Layered;
-            MinSize = new Size(100, 60);
+            MinSize = new Size(500, 130);
             MaxSize = new Size(1024, 400);
             Top = 100;
             Left = 100;
@@ -159,12 +158,6 @@ namespace PoeBud.ViewModels
             set => this.RaiseAndSetIfChanged(ref stashUpdater, value);
         }
 
-        public bool IsEnabled
-        {
-            get => isEnabled;
-            set => this.RaiseAndSetIfChanged(ref isEnabled, value);
-        }
-
         public StashViewModel Stash
         {
             get => stash;
@@ -202,7 +195,6 @@ namespace PoeBud.ViewModels
             Log.Debug("Applying new config...");
 
             actualConfig = config;
-            IsEnabled = actualConfig.IsEnabled;
             hotkey = KeyGestureExtensions.SafeCreateGesture(config.GetChaosSetHotkey);
             RefreshStashUpdater(actualConfig);
 
@@ -238,7 +230,7 @@ namespace PoeBud.ViewModels
 
                 var keyPressedObservable = keyboardMouseEvents
                                            .WhenKeyDown
-                                           .Where(x => IsEnabled)
+                                           .Where(x => config.IsEnabled)
                                            .Where(x => !SolutionExecutor.IsBusy)
                                            .Where(x => WindowManager.ActiveWindow != null)
                                            .Publish();

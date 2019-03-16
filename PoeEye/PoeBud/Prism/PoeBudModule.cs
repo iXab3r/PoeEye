@@ -1,18 +1,18 @@
-﻿using Guards;
+﻿using System.Reactive.Disposables;
+using Guards;
 using JetBrains.Annotations;
 using PoeBud.Config;
 using PoeBud.ViewModels;
 using PoeShared.Modularity;
-using PoeShared.Native;
-using PoeShared.Prism;
+using PoeShared.Scaffolding;
 using Prism.Ioc;
 using Unity;
-using Unity.Resolution;
 
 namespace PoeBud.Prism
 {
     public sealed class PoeBudModule : IPoeEyeModule
     {
+        private readonly CompositeDisposable anchors = new CompositeDisposable();
         private readonly IUnityContainer container;
 
         public PoeBudModule([NotNull] IUnityContainer container)
@@ -32,9 +32,7 @@ namespace PoeBud.Prism
             var registrator = container.Resolve<IPoeEyeModulesRegistrator>();
             registrator.RegisterSettingsEditor<PoeBudConfig, PoeBudSettingsViewModel>();
 
-            var overlayController = container.Resolve<IOverlayWindowController>(WellKnownOverlays.PathOfExileOverlay);
-            var overlayModel = container.Resolve<PoeBudViewModel>(new DependencyOverride(typeof(IOverlayWindowController), overlayController));
-            overlayController.RegisterChild(overlayModel);
+            container.Resolve<PoeBudBootstrapper>().AddTo(anchors);
         }
     }
 }

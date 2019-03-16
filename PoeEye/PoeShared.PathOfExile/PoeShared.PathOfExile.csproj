@@ -724,10 +724,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="UI\ViewModels" />
-    <Folder Include="UI\Views" />
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="Resources\Currencies\Orb_of_Annulment_inventory_icon.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

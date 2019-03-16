@@ -26,7 +26,7 @@
                 <ResourceDictionary Source="Themes/Converters.xaml" />
                 <ResourceDictionary Source="Themes/Generic.xaml" />
 
-                <ResourceDictionary Source="Themes/ListBoxAsTabCotrolStyle.xaml" />
+                <ResourceDictionary Source="Themes/ListBoxAsTabControlStyle.xaml" />
                 <ResourceDictionary Source="Themes/VirtualizedItemsControl.xaml" />
                 <ResourceDictionary Source="Themes/WpfAutoCompleteTextBoxStyle.xaml" />
                 <ResourceDictionary Source="Themes/PoeQueryViewStyles.xaml" />

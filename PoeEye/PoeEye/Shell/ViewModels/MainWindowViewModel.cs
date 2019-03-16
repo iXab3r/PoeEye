@@ -67,7 +67,6 @@ namespace PoeEye.Shell.ViewModels
             [NotNull] ProxyProviderViewModel proxyProviderViewModel,
             [NotNull] PoeEyeSettingsViewModel settings,
             [NotNull] IPoeChatViewModel chatViewModel,
-            [NotNull] IWhispersNotificationManager whispersNotificationManager,
             [NotNull] IClipboardManager clipboardManager,
             [NotNull] IConfigSerializer configSerializer,
             [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler,
@@ -82,7 +81,6 @@ namespace PoeEye.Shell.ViewModels
             Guard.ArgumentNotNull(settings, nameof(settings));
             Guard.ArgumentNotNull(clipboardManager, nameof(clipboardManager));
             Guard.ArgumentNotNull(configSerializer, nameof(configSerializer));
-            Guard.ArgumentNotNull(whispersNotificationManager, nameof(whispersNotificationManager));
             Guard.ArgumentNotNull(uiScheduler, nameof(uiScheduler));
             Guard.ArgumentNotNull(bgScheduler, nameof(bgScheduler));
 

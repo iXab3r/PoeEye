@@ -18,7 +18,6 @@ namespace PoeEye.Prism
         {
             Container
                 .RegisterSingleton<IPoePriceCalculcator, PoePriceCalculator>()
-                .RegisterSingleton<IWhispersNotificationManager, WhispersNotificationManager>()
                 .RegisterSingleton(typeof(IPoeEyeMainConfigProvider), typeof(GenericConfigProvider<PoeEyeMainConfig>))
                 .RegisterSingleton<IConfigProvider, PoeEyeConfigProviderFromFile>()
                 .RegisterSingleton<IPoeCaptchaRegistrator, PoeCaptchaRegistrator>()

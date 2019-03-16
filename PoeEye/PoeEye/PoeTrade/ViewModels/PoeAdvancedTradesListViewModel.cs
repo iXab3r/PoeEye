@@ -15,6 +15,7 @@ using DynamicData.Binding;
 using Guards;
 using JetBrains.Annotations;
 using PoeEye.Scaffolding;
+using PoeShared;
 using PoeShared.Common;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
@@ -35,14 +36,12 @@ namespace PoeEye.PoeTrade.ViewModels
         private readonly SerialDisposable activeFilterAnchor = new SerialDisposable();
 
         private readonly BehaviorSubject<Func<IPoeTradeViewModel, bool>> filterConditionSource = new BehaviorSubject<Func<IPoeTradeViewModel, bool>>(null);
+        private readonly ISubject<Unit> resortRequest = new Subject<Unit>();
 
         private readonly ReadOnlyObservableCollection<IPoeTradeViewModel> itemsCollection;
         private readonly ReadOnlyObservableCollection<IPoeTradeViewModel> rawItemsCollection;
 
-        private readonly ISubject<Unit> resortRequest = new Subject<Unit>();
-
-        private readonly SourceCache<SortData, SortDescriptionData> sortingCache =
-            new SourceCache<SortData, SortDescriptionData>(x => x.Data);
+        private readonly SourceCache<SortData, SortDescriptionData> sortingCache = new SourceCache<SortData, SortDescriptionData>(x => x.Data);
 
         private readonly SourceList<SortData> sortingRules = new SourceList<SortData>();
         private readonly SourceList<ISourceList<IPoeTradeViewModel>> tradeLists = new SourceList<ISourceList<IPoeTradeViewModel>>();
@@ -63,7 +62,8 @@ namespace PoeEye.PoeTrade.ViewModels
                                      .Connect()
                                      .ToUnit()
                                      .StartWith()
-                                     .Select(x => new TradeComparer(sortingRules.Items.ToArray()));
+                                     .Select(x => new TradeComparer(sortingRules.Items.ToArray()))
+                                     .ObserveOn(uiScheduler);
 
             PageParameter = pageParameter;
 
@@ -73,7 +73,7 @@ namespace PoeEye.PoeTrade.ViewModels
             allItems
                 .ObserveOn(uiScheduler)
                 .Bind(out rawItemsCollection)
-                .Subscribe()
+                .Subscribe(_ => { }, Log.HandleUiException)
                 .AddTo(Anchors);
 
             var pager = Observable.Merge(
@@ -83,12 +83,17 @@ namespace PoeEye.PoeTrade.ViewModels
                                   .Sample(ResortRefilterThrottleTimeout)
                                   .ObserveOn(uiScheduler);
 
+            var filterSink = filterConditionSource.Select(x => x ?? AlwaysTruePredicate)
+                                                  .Throttle(ResortRefilterThrottleTimeout)
+                                                  .Do(_ => Interlocked.Increment(ref filterRequestsCount))
+                                                  .ObserveOn(uiScheduler);
+            var sortSink = resortRequest.Throttle(ResortRefilterThrottleTimeout)
+                                        .Do(_ => Interlocked.Increment(ref sortRequestsCount))
+                                        .ObserveOn(uiScheduler);
             rawItemsCollection
                 .ToObservableChangeSet(x => x.Trade)
-                .Filter(filterConditionSource.Select(x => x ?? AlwaysTruePredicate).Throttle(ResortRefilterThrottleTimeout)
-                                             .Do(_ => Interlocked.Increment(ref filterRequestsCount)))
-                .Sort(comparerObservable, resortRequest.Throttle(ResortRefilterThrottleTimeout)
-                                                       .Do(_ => Interlocked.Increment(ref sortRequestsCount)))
+                .Filter(filterSink)
+                .Sort(comparerObservable, sortSink)
                 .Page(pager)
                 .ObserveOn(uiScheduler)
                 .Do(changes =>
@@ -114,7 +119,7 @@ namespace PoeEye.PoeTrade.ViewModels
                     }
                 })
                 .Bind(out itemsCollection)
-                .Subscribe()
+                .Subscribe(_ => { }, Log.HandleUiException)
                 .AddTo(Anchors);
 
             // Filtering / Sorting    
@@ -130,7 +135,7 @@ namespace PoeEye.PoeTrade.ViewModels
 
             allItems
                 .WhenAnyPropertyChanged()
-                .Subscribe(() => filterConditionSource.OnNext(filterConditionSource.Value))
+                .Subscribe(() => filterConditionSource.OnNext(filterConditionSource.Value), Log.HandleUiException)
                 .AddTo(Anchors);
         }
 
@@ -142,7 +147,7 @@ namespace PoeEye.PoeTrade.ViewModels
         {
             Guard.ArgumentNotNull(itemList, nameof(itemList));
 
-            var proxy = new ItemListProxy(itemList, resortRequest).AddTo(Anchors);
+            var proxy = new ItemListProxy(itemList).AddTo(Anchors);
             tradeLists.Add(proxy.Items);
         }
 
@@ -160,40 +165,61 @@ namespace PoeEye.PoeTrade.ViewModels
                     .ToSourceList();
 
             //FIXME Potential bug - maybe it would be better to check for a specific action(Add,Remove,Reset,Clear) rather than handling OnItemAdded/Removed
-            srcListChangeSet.Connect().OnItemAdded(item => tradeLists.Add(item)).Subscribe().AddTo(Anchors);
-            srcListChangeSet.Connect().OnItemRemoved(item => tradeLists.Remove(item)).Subscribe().AddTo(Anchors);
+            srcListChangeSet.Connect()
+                            .OnItemAdded(item => tradeLists.Add(item))
+                            .Subscribe(_ => { }, Log.HandleUiException)
+                            .AddTo(Anchors);
+            srcListChangeSet.Connect()
+                            .OnItemRemoved(item => tradeLists.Remove(item))
+                            .Subscribe(_ => { }, Log.HandleUiException)
+                            .AddTo(Anchors);
         }
 
         public ReadOnlyObservableCollection<IPoeTradeViewModel> Items => itemsCollection;
 
         public ReadOnlyObservableCollection<IPoeTradeViewModel> RawItems => rawItemsCollection;
+        
         public IPageParameterDataViewModel PageParameter { get; }
 
         public void ResetSorting()
         {
+            if (Log.IsTraceEnabled)
+            {
+                Log.Trace($"Resetting sorting rules");
+            }
             sortingRules.Clear();
         }
 
         public void Filter(IObservable<Predicate<IPoeTradeViewModel>> conditionSource)
         {
-            conditionSource.Subscribe(condition => filterConditionSource.OnNext(new Func<IPoeTradeViewModel, bool>(condition))).AssignTo(activeFilterAnchor);
+            conditionSource.Subscribe(condition => filterConditionSource.OnNext(new Func<IPoeTradeViewModel, bool>(condition)), Log.HandleUiException).AssignTo(activeFilterAnchor);
         }
 
         public void SortBy(string propertyName, ListSortDirection direction)
         {
-            sortingRules.Clear();
+            if (Log.IsTraceEnabled)
+            {
+                Log.Trace($"Sorting by {propertyName} {direction}");
+            }
+
+            ResetSorting();
             ThenSortBy(propertyName, direction);
         }
 
         public void ThenSortBy(string propertyName, ListSortDirection direction)
         {
+            if (Log.IsTraceEnabled)
+            {
+                Log.Trace($"Then Sorting by {propertyName} {direction}");
+            }
+
             var sort = new SortDescriptionData(propertyName, direction);
             var sortData = sortingCache.Lookup(sort);
             if (!sortData.HasValue)
             {
                 throw new ApplicationException($"Could not find item with a key '{sort}', cache: ${sortingCache.Keys.DumpToTextRaw()}");
             }
-
+            
             sortingRules.Add(sortData.Value);
         }
 
@@ -227,10 +253,10 @@ namespace PoeEye.PoeTrade.ViewModels
                     .Subscribe(
                         items =>
                         {
-                            var proxy = new ItemListProxy(items, filterRequestSubject).AssignTo(activeTradeListAnchors);
+                            var proxy = new ItemListProxy(items).AssignTo(activeTradeListAnchors);
                             listOfItemLists.Clear();
                             listOfItemLists.Add(proxy.Items);
-                        })
+                        }, Log.HandleUiException)
                     .AddTo(Anchors);
 
                 Items = listOfItemLists.Or().ToSourceList();
@@ -245,7 +271,7 @@ namespace PoeEye.PoeTrade.ViewModels
         private sealed class ItemListProxy : DisposableReactiveObject
         {
             public ItemListProxy(
-                ReadOnlyObservableCollection<IPoeTradeViewModel> source, ISubject<Unit> updateRequestSubject)
+                ReadOnlyObservableCollection<IPoeTradeViewModel> source)
             {
                 Items = source
                         .ToObservableChangeSet()
