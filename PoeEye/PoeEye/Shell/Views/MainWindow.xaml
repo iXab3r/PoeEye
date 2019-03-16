@@ -1,19 +1,17 @@
-﻿<controls:MetroWindow x:Class="PoeEye.PoeTrade.Shell.Views.MainWindow"
+﻿<controls:MetroWindow x:Class="PoeEye.Shell.Views.MainWindow"
                       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                       xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
                       xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
-                      xmlns:system="clr-namespace:System;assembly=mscorlib"
                       xmlns:utilities="clr-namespace:PoeEye.Utilities"
-                      xmlns:shellViewModels="clr-namespace:PoeEye.PoeTrade.Shell.ViewModels"
-                      xmlns:updater="clr-namespace:PoeEye.PoeTrade.Updater"
                       xmlns:dragablz="http://dragablz.net/winfx/xaml/dragablz"
-                      xmlns:viewModels="clr-namespace:PoeEye.PoeTrade.ViewModels"
                       xmlns:fa="http://schemas.fontawesome.io/icons/"
                       xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
                       xmlns:eye="http://coderush.net/poeeye/"
+                      xmlns:viewModels1="clr-namespace:PoeEye.Shell.ViewModels"
+                      xmlns:updater="clr-namespace:PoeEye.Updates"
                       mc:Ignorable="d"
                       Title="{Binding MainWindowTitle}"
                       MinWidth="1200"
@@ -21,13 +19,15 @@
                       Width="1400"
                       Height="800"
                       x:Name="MainWindowRoot"
-                      d:DataContext="{d:DesignInstance shellViewModels:MainWindowViewModel}"
+                      d:DataContext="{d:DesignInstance viewModels1:MainWindowViewModel}"
                       BorderThickness="1" BorderBrush="{StaticResource AccentColorBrush}">
 
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Converters.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/PoeEye;component/Shell/Views/MainWindowTabItemView.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/PoeEye;component/Shell/Views/MainWindowTabView.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>

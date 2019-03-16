@@ -15,11 +15,11 @@ using Guards;
 using JetBrains.Annotations;
 using PoeEye.Config;
 using PoeEye.PoeTrade.Models;
-using PoeEye.PoeTrade.Updater;
 using PoeEye.PoeTrade.ViewModels;
+using PoeEye.Settings.ViewModels;
+using PoeEye.Updates;
 using PoeEye.Utilities;
 using PoeShared;
-using PoeShared.Audio;
 using PoeShared.Audio.Services;
 using PoeShared.Modularity;
 using PoeShared.Native;
@@ -31,7 +31,7 @@ using Prism.Commands;
 using ReactiveUI;
 using Unity.Attributes;
 
-namespace PoeEye.PoeTrade.Shell.ViewModels
+namespace PoeEye.Shell.ViewModels
 {
     internal sealed class MainWindowViewModel : DisposableReactiveObject, IMainWindowViewModel
     {

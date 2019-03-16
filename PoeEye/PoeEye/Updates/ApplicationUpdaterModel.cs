@@ -14,7 +14,7 @@ using PoeShared.Scaffolding;
 using ReactiveUI;
 using Squirrel;
 
-namespace PoeEye.PoeTrade.Updater
+namespace PoeEye.Updates
 {
     internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IApplicationUpdaterModel
     {

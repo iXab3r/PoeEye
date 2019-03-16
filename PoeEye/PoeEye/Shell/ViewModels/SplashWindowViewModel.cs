@@ -9,9 +9,8 @@ using log4net.Core;
 using PoeShared;
 using PoeShared.Scaffolding;
 using ReactiveUI;
-using CommonLogging = Common.Logging;
 
-namespace PoeEye.PoeTrade.Shell.ViewModels
+namespace PoeEye.Shell.ViewModels
 {
     internal sealed class SplashWindowViewModel : DisposableReactiveObject
     {

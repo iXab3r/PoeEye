@@ -32,11 +32,12 @@
                 <ResourceDictionary Source="Themes/PoeQueryViewStyles.xaml" />
                 <ResourceDictionary Source="Themes/SlimScrollbar.xaml" />
 
-                <ResourceDictionary Source="PoeTrade/Shell/Views/SplashWindowView.xaml" />
+                <ResourceDictionary Source="Settings/Views/PoeMainSettingsViewModel.xaml" />
+                <ResourceDictionary Source="Settings/Views/PoeUpdateSettingsViewModel.xaml" />
+                <ResourceDictionary Source="Settings/Views/PoeEyeSettingsView.xaml" />
                 
-                <ResourceDictionary Source="PoeTrade/Views/PoeMainSettingsViewModel.xaml" />
-                <ResourceDictionary Source="PoeTrade/Views/PoeUpdateSettingsViewModel.xaml" />
-                <ResourceDictionary Source="PoeTrade/Views/PoeEyeSettingsView.xaml" />
+                <ResourceDictionary Source="Updates/ApplicationUpdaterView.xaml" />
+                
                 <ResourceDictionary Source="PoeTrade/Views/ProxyProviderView.xaml" />
                 <ResourceDictionary Source="PoeTrade/Views/RecheckPeriodView.xaml" />
                 <ResourceDictionary Source="PoeTrade/Views/CurrencyView.xaml" />
@@ -47,15 +48,15 @@
                 <ResourceDictionary Source="PoeTrade/Views/PoeItemView.xaml" />
                 <ResourceDictionary Source="PoeTrade/Views/PoeModsEditorView.xaml" />
                 <ResourceDictionary Source="PoeTrade/Views/PoeModsGroupEditorView.xaml" />
-                <ResourceDictionary Source="PoeTrade/Updater/ApplicationUpdaterView.xaml" />
                 <ResourceDictionary Source="PoeTrade/Views/PoeChatView.xaml" />
                 <ResourceDictionary Source="PoeTrade/Views/PoeApiSelectorView.xaml" />
                 <ResourceDictionary Source="PoeTrade/Views/PoeItemTypeSelectorViewModel.xaml" />
-
-                <ResourceDictionary Source="PoeTrade/Views/PoeSummaryTabView.xaml" />
-                <ResourceDictionary Source="PoeTrade/Views/MainWindowTabItemView.xaml" />
-                <ResourceDictionary Source="PoeTrade/Views/MainWindowTabView.xaml" />
                 <ResourceDictionary Source="PoeTrade/Views/PoeQueryView.xaml" />
+                <ResourceDictionary Source="PoeTrade/Views/PoeSummaryTabView.xaml" />
+
+                <ResourceDictionary Source="Shell/Views/MainWindowTabItemView.xaml" />
+                <ResourceDictionary Source="Shell/Views/MainWindowTabView.xaml" />
+                <ResourceDictionary Source="Shell/Views/SplashWindowView.xaml" />
 
                 <ResourceDictionary Source="TradeSummaryOverlay/Views/PoeTradeSummaryView.xaml" />
             </ResourceDictionary.MergedDictionaries>

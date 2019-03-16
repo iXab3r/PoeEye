@@ -281,7 +281,6 @@
     <Compile Include="Converters\NullableConverter.cs" />
     <Compile Include="Converters\ExceptionToMessageConverter.cs" />
     <Compile Include="Converters\NullToVisibilityConverter.cs" />
-    <Compile Include="PoeTrade\Common\SortDescriptionData.cs" />
     <Compile Include="PoeTrade\Models\FuzzySuggestionProvider.cs" />
     <Compile Include="PoeTrade\Models\IPoeApiProvider.cs" />
     <Compile Include="PoeTrade\Models\IPoeCaptchaRegistrator.cs" />
@@ -296,15 +295,7 @@
     <Compile Include="PoeTrade\Models\PoeTradeQuickFilter.cs" />
     <Compile Include="PoeTrade\Models\ReactiveSuggestionProvider.cs" />
     <Compile Include="PoeTrade\Models\WhispersNotificationManager.cs" />
-    <Compile Include="PoeTrade\Shell\Services\SplashWindow.cs" />
-    <Compile Include="PoeTrade\Shell\ViewModels\IPoeFlyoutViewModel.cs" />
-    <Compile Include="PoeTrade\Shell\ViewModels\SplashWindowViewModel.cs" />
-    <Compile Include="PoeTrade\Updater\ApplicationUpdaterModel.cs" />
-    <Compile Include="PoeTrade\Updater\ApplicationUpdaterViewModel.cs" />
-    <Compile Include="PoeTrade\Updater\IApplicationUpdaterModel.cs" />
     <Compile Include="PoeTrade\ViewModels\CurrencyTestViewModel.cs" />
-    <Compile Include="PoeTrade\ViewModels\IMainWindowTabViewModel.cs" />
-    <Compile Include="PoeTrade\Shell\ViewModels\IMainWindowViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\IPoeApiSelectorViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\IPoeChatViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\IPoeAdvancedTradesListViewModel.cs" />
@@ -321,14 +312,9 @@
     <Compile Include="PoeTrade\ViewModels\PoeAdvancedTradesListViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\PoeApiSelectorViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\PoeChatViewModel.cs" />
-    <Compile Include="PoeTrade\ViewModels\PoeEyeSettingsViewModel.cs" />
-    <Compile Include="PoeTrade\ViewModels\PoeEyeUpdateSettingsViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\PoeItemModsViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\PoeItemTypeSelectorViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\PoeLinksInfoViewModel.cs" />
-    <Compile Include="PoeTrade\ViewModels\MainWindowTabViewModel.cs" />
-    <Compile Include="PoeTrade\Shell\ViewModels\MainWindowViewModel.cs" />
-    <Compile Include="PoeTrade\ViewModels\PoeMainSettingsViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\PoeModsEditorViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\PoeModGroupsEditorViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\PoeModViewModel.cs" />
@@ -336,9 +322,6 @@
     <Compile Include="PoeTrade\ViewModels\PoeSummaryTabViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\ProxyProviderViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\RecheckPeriodViewModel.cs" />
-    <Compile Include="PoeTrade\Shell\Views\MainWindow.xaml.cs">
-      <DependentUpon>MainWindow.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Prism\MainModule.cs" />
     <Compile Include="Prism\PoeEyeBootstrapper.cs" />
     <Compile Include="Prism\WellKnownApi.cs" />
@@ -347,10 +330,27 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Scaffolding\SortDescriptionData.cs" />
+    <Compile Include="Settings\ViewModels\PoeEyeUpdateSettingsViewModel.cs" />
+    <Compile Include="Shell\Services\SplashWindowDisplayer.cs" />
+    <Compile Include="Shell\ViewModels\IMainWindowTabViewModel.cs" />
+    <Compile Include="Shell\ViewModels\IMainWindowViewModel.cs" />
+    <Compile Include="Shell\ViewModels\IPoeFlyoutViewModel.cs" />
+    <Compile Include="Shell\ViewModels\MainWindowTabViewModel.cs" />
+    <Compile Include="Shell\ViewModels\MainWindowViewModel.cs" />
+    <Compile Include="Shell\ViewModels\PoeEyeSettingsViewModel.cs" />
+    <Compile Include="Shell\ViewModels\PoeMainSettingsViewModel.cs" />
+    <Compile Include="Shell\ViewModels\SplashWindowViewModel.cs" />
+    <Compile Include="Shell\Views\MainWindow.xaml.cs">
+      <DependentUpon>MainWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="TradeSummaryOverlay\Modularity\PoeTradeSummaryConfig.cs" />
     <Compile Include="TradeSummaryOverlay\Prism\PoeTradeSummaryModule.cs" />
     <Compile Include="TradeSummaryOverlay\Prism\PoeTradeSummaryModuleRegistrations.cs" />
     <Compile Include="TradeSummaryOverlay\ViewModels\PoeTradeSummaryViewModel.cs" />
+    <Compile Include="Updates\ApplicationUpdaterModel.cs" />
+    <Compile Include="Updates\ApplicationUpdaterViewModel.cs" />
+    <Compile Include="Updates\IApplicationUpdaterModel.cs" />
     <Compile Include="Utilities\BasicAuthFileDownloader.cs" />
     <Compile Include="Utilities\ContextMenuServiceExtensions.cs" />
     <Compile Include="Utilities\EditableTuple.cs" />
@@ -449,14 +449,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="PoeTrade\Shell\Views\SplashWindowView.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="PoeTrade\Updater\ApplicationUpdaterView.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
     <Page Include="PoeTrade\Views\CurrencyTestView.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -468,27 +460,11 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="PoeTrade\Shell\Views\MainWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="PoeTrade\Views\MainWindowTabItemView.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="PoeTrade\Views\MainWindowTabView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="PoeTrade\Views\PoeChatView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
     <Page Include="PoeTrade\Views\PoeItemTypeSelectorViewModel.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="PoeTrade\Views\PoeMainSettingsViewModel.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -520,14 +496,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="PoeTrade\Views\PoeEyeSettingsView.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="PoeTrade\Views\PoeUpdateSettingsViewModel.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
     <Page Include="PoeTrade\Views\ProxyProviderView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -539,6 +507,32 @@
     <Page Include="Resources\Icons.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Settings\Views\PoeEyeSettingsView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Settings\Views\PoeMainSettingsViewModel.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Settings\Views\PoeUpdateSettingsViewModel.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Shell\Views\MainWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Shell\Views\MainWindowTabItemView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Shell\Views\MainWindowTabView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Shell\Views\SplashWindowView.xaml">
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Themes\Generic.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -556,7 +550,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Themes\ListBoxAsTabCotrolStyle.xaml">
+    <Page Include="Themes\ListBoxAsTabControlStyle.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -599,7 +593,6 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <None Include="AppReadme\Compare-NET-Objects-Help.chm" />
     <None Include="packages.config" />
     <Resource Include="Resources\Entypo.ttf" />
     <None Include="Resources\mainIcon.ico" />
@@ -635,6 +628,12 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\SplashRing.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Settings\Models" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="Updates\ApplicationUpdaterView.xaml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <UsingTask TaskName="CosturaCleanup" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll" TaskFactory="CodeTaskFactory">

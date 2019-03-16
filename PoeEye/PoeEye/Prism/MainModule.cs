@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using PoeEye.Config;
 using PoeEye.Converters;
 using PoeEye.PoeTrade.ViewModels;
+using PoeEye.Settings.ViewModels;
 using PoeShared.Chromium.Communications;
 using PoeShared.Common;
 using PoeShared.Modularity;

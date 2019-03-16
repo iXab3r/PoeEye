@@ -1,7 +1,7 @@
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 using JetBrains.Annotations;
-using PoeEye.PoeTrade.Common;
+using PoeEye.Scaffolding;
 using PoeShared.Scaffolding;
 
 namespace PoeEye.PoeTrade.ViewModels

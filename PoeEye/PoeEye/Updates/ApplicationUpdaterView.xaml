@@ -1,14 +1,13 @@
-﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
-                    xmlns:updater="clr-namespace:PoeEye.PoeTrade.Updater"
                     xmlns:fa="http://schemas.fontawesome.io/icons/"
-                    xmlns:eye="http://coderush.net/poeeye/">
+                    xmlns:eye="http://coderush.net/poeeye/"
+                    xmlns:updates="clr-namespace:PoeEye.Updates">
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Converters.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
-    <DataTemplate DataType="{x:Type updater:ApplicationUpdaterViewModel}">
+    <DataTemplate DataType="{x:Type updates:ApplicationUpdaterViewModel}">
         <DockPanel HorizontalAlignment="Right" VerticalAlignment="Center">
             <Label Style="{StaticResource IconLabel}"
                    Visibility="{Binding Error, Converter={StaticResource NullToCollapsedConverter}}"

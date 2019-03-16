@@ -5,7 +5,7 @@ using PoeEye.Config;
 using PoeShared.Scaffolding;
 using Squirrel;
 
-namespace PoeEye.PoeTrade.Updater
+namespace PoeEye.Updates
 {
     internal interface IApplicationUpdaterModel : IDisposableReactiveObject
     {

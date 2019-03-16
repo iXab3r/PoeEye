@@ -14,6 +14,7 @@ using JetBrains.Annotations;
 using Newtonsoft.Json;
 using PoeShared.Modularity;
 using PoeShared.Scaffolding;
+using ReactiveUI;
 
 namespace PoeShared.Native
 {
@@ -50,9 +51,19 @@ namespace PoeShared.Native
         public IObservable<KeyEventArgs> WhenKeyDown => whenKeyDown;
 
         public IObservable<KeyEventArgs> WhenKeyUp => whenKeyUp;
+        
         public IObservable<MouseEventArgs> WhenMouseDown => whenMouseDown.OfType<MouseEventArgs>();
+        
         public IObservable<MouseEventArgs> WhenMouseUp => whenMouseUp.OfType<MouseEventArgs>();
 
+        private bool realtimeMode;
+
+        public bool RealtimeMode
+        {
+            get => realtimeMode;
+            set => this.RaiseAndSetIfChanged(ref realtimeMode, value);
+        }
+        
         private IDisposable InitializeConsumer()
         {
             Log.Debug($"Creating new event consumer thread");
@@ -87,26 +98,7 @@ namespace PoeShared.Native
                 while (!cancellationToken.IsCancellationRequested)
                 {
                     var nextEvent = eventQueue.Take(cancellationToken);
-                    switch (nextEvent.EventType)
-                    {
-                        case InputEventType.KeyDown:
-                            whenKeyDown.OnNext((KeyEventArgs)nextEvent.EventArgs);
-                            break;
-                        case InputEventType.KeyUp:
-                            whenKeyUp.OnNext((KeyEventArgs)nextEvent.EventArgs);
-                            break;
-                        case InputEventType.KeyPress:
-                            whenKeyPress.OnNext((KeyPressEventArgs)nextEvent.EventArgs);
-                            break;
-                        case InputEventType.MouseDown:
-                            whenMouseDown.OnNext((MouseEventExtArgs)nextEvent.EventArgs);
-                            break;
-                        case InputEventType.MouseUp:
-                            whenMouseUp.OnNext((MouseEventExtArgs)nextEvent.EventArgs);
-                            break;
-                        default:
-                            throw new ArgumentOutOfRangeException(nameof(nextEvent), nextEvent.EventType, $"Invalid enum value, data: {nextEvent.DumpToTextRaw()}");
-                    }
+                    ProcessEvent(nextEvent);
                 }
             }
             catch (OperationCanceledException)
@@ -122,6 +114,30 @@ namespace PoeShared.Native
                 Log.Debug("Input event consumer completed");
             }
         }
+
+         private void ProcessEvent(InputEventData nextEvent)
+         {
+             switch (nextEvent.EventType)
+             {
+                 case InputEventType.KeyDown:
+                     whenKeyDown.OnNext((KeyEventArgs)nextEvent.EventArgs);
+                     break;
+                 case InputEventType.KeyUp:
+                     whenKeyUp.OnNext((KeyEventArgs)nextEvent.EventArgs);
+                     break;
+                 case InputEventType.KeyPress:
+                     whenKeyPress.OnNext((KeyPressEventArgs)nextEvent.EventArgs);
+                     break;
+                 case InputEventType.MouseDown:
+                     whenMouseDown.OnNext((MouseEventExtArgs)nextEvent.EventArgs);
+                     break;
+                 case InputEventType.MouseUp:
+                     whenMouseUp.OnNext((MouseEventExtArgs)nextEvent.EventArgs);
+                     break;
+                 default:
+                     throw new ArgumentOutOfRangeException(nameof(nextEvent), nextEvent.EventType, $"Invalid enum value, data: {nextEvent.DumpToTextRaw()}");
+             }
+         }
 
         private void InitializeHook()
         {
@@ -177,9 +193,17 @@ namespace PoeShared.Native
             var eventData = new InputEventData() {EventArgs = args, EventType = eventType, Timestamp = clock.Now};
             if (Log.IsTraceEnabled)
             {
-                Log.Trace($"Sending event for processing(in queue: {eventQueue.Count}): {eventData.DumpToTextRaw()}");
+                Log.Trace($"Sending event for processing(in queue: {eventQueue.Count}, realtimeMode: {realtimeMode}): {eventData.DumpToTextRaw()}");
             }
-            eventQueue.Add(eventData);
+
+            if (realtimeMode)
+            {
+                ProcessEvent(eventData);
+            }
+            else
+            {
+                eventQueue.Add(eventData);
+            }
         }
 
         private void LogEvent(object arg)

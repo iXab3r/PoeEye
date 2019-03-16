@@ -3,7 +3,7 @@ using MahApps.Metro.Controls;
 using PoeShared.Scaffolding;
 using ReactiveUI;
 
-namespace PoeEye.PoeTrade.Shell.ViewModels
+namespace PoeEye.Shell.ViewModels
 {
     public interface IPoeFlyoutViewModel : IDisposableReactiveObject
     {

@@ -1,18 +1,17 @@
 ﻿using PoeEye.Config;
 using PoeEye.PoeTrade.Models;
-using PoeEye.PoeTrade.Shell.ViewModels;
-using PoeEye.PoeTrade.Updater;
 using PoeEye.PoeTrade.ViewModels;
+using PoeEye.Shell.ViewModels;
+using PoeEye.Updates;
 using PoeShared.Modularity;
 using PoeShared.PoeTrade;
 using Unity;
 using Unity.Extension;
 using WpfAutoCompleteControls.Editors;
+using IPoeEyeMainConfigProvider = PoeShared.Modularity.IConfigProvider<PoeEye.Config.PoeEyeMainConfig>;
 
 namespace PoeEye.Prism
 {
-    using IPoeEyeMainConfigProvider = IConfigProvider<PoeEyeMainConfig>;
-
     internal sealed class UiRegistrations : UnityContainerExtension
     {
         protected override void Initialize()

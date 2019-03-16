@@ -5,7 +5,8 @@
                     xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
                     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
                     xmlns:fa="http://schemas.fontawesome.io/icons/"
-                    xmlns:eye="http://coderush.net/poeeye/">
+                    xmlns:eye="http://coderush.net/poeeye/"
+                    xmlns:viewModels="clr-namespace:PoeEye.Settings.ViewModels">
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.togglebutton.xaml" />
@@ -16,7 +17,7 @@
         <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.ValidationErrorTemplate.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
-    <DataTemplate DataType="{x:Type viewModels1:PoeEyeUpdateSettingsViewModel}">
+    <DataTemplate DataType="{x:Type viewModels:PoeEyeUpdateSettingsViewModel}">
         <Grid Margin="10,5" IsEnabled="{Binding TestConnectionCommand.IsBusy, Converter={StaticResource NotConverter}}">
             <Grid.RowDefinitions>
                 <RowDefinition MinHeight="34" />

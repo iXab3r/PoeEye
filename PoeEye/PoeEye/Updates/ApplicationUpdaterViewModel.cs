@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
@@ -16,7 +16,7 @@ using PoeShared.UI;
 using ReactiveUI;
 using Unity.Attributes;
 
-namespace PoeEye.PoeTrade.Updater
+namespace PoeEye.Updates
 {
     internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject
     {

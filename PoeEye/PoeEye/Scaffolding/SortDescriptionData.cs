@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace PoeEye.PoeTrade.Common
+namespace PoeEye.Scaffolding
 {
     public struct SortDescriptionData
     {

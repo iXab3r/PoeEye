@@ -14,7 +14,7 @@ using DynamicData;
 using DynamicData.Binding;
 using Guards;
 using JetBrains.Annotations;
-using PoeEye.PoeTrade.Common;
+using PoeEye.Scaffolding;
 using PoeShared.Common;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;

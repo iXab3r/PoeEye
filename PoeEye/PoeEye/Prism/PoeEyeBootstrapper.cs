@@ -9,10 +9,10 @@ using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
 using Common.Logging;
-using PoeEye.PoeTrade.Shell.Services;
-using PoeEye.PoeTrade.Shell.ViewModels;
-using PoeEye.PoeTrade.Shell.Views;
 using PoeEye.Properties;
+using PoeEye.Shell.Services;
+using PoeEye.Shell.ViewModels;
+using PoeEye.Shell.Views;
 using PoeShared.Chromium.Communications;
 using PoeShared.Native;
 using PoeShared.Scaffolding;
@@ -45,7 +45,7 @@ namespace PoeEye.Prism
 
             var window = (Window)Shell;
 
-            var splashWindow = new SplashWindow(window);
+            var splashWindow = new SplashWindowDisplayer(window);
             
             Observable
                 .FromEventPattern<EventHandler, EventArgs>(h => window.ContentRendered += h, h => window.ContentRendered -= h)

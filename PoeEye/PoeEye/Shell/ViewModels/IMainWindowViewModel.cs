@@ -3,7 +3,7 @@ using System.Collections.ObjectModel;
 using JetBrains.Annotations;
 using PoeEye.PoeTrade.ViewModels;
 
-namespace PoeEye.PoeTrade.Shell.ViewModels
+namespace PoeEye.Shell.ViewModels
 {
     internal interface IMainWindowViewModel : IDisposable
     {

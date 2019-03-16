@@ -2,24 +2,22 @@
 using System.Reactive.Disposables;
 using System.Threading;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using Common.Logging;
 using Guards;
-using PoeEye.PoeTrade.Shell.ViewModels;
+using PoeEye.Shell.ViewModels;
 using PoeShared.Scaffolding;
 
-namespace PoeEye.PoeTrade.Shell.Services
+namespace PoeEye.Shell.Services
 {
-    internal sealed class SplashWindow : DisposableReactiveObject
+    internal sealed class SplashWindowDisplayer : DisposableReactiveObject
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(SplashWindow));
+        private static readonly ILog Log = LogManager.GetLogger(typeof(SplashWindowDisplayer));
 
         private readonly Window mainWindow;
         private Window splashWindow;
 
-        public SplashWindow(Window mainWindow)
+        public SplashWindowDisplayer(Window mainWindow)
         {
             Guard.ArgumentNotNull(mainWindow, nameof(mainWindow));
 

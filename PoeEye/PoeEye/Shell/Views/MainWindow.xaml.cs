@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows;
 
-namespace PoeEye.PoeTrade.Shell.Views
+namespace PoeEye.Shell.Views
 {
     /// <summary>
     ///     Interaction logic for MainWindow.xaml

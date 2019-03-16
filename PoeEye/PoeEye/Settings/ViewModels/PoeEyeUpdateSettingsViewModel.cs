@@ -7,7 +7,7 @@ using System.Windows.Controls;
 using DynamicData.Annotations;
 using Guards;
 using PoeEye.Config;
-using PoeEye.PoeTrade.Updater;
+using PoeEye.Updates;
 using PoeShared.Modularity;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
@@ -15,7 +15,7 @@ using PoeShared.Scaffolding.WPF;
 using ReactiveUI;
 using Unity.Attributes;
 
-namespace PoeEye.PoeTrade.ViewModels
+namespace PoeEye.Settings.ViewModels
 {
     internal sealed class PoeEyeUpdateSettingsViewModel : DisposableReactiveObject, ISettingsViewModel<PoeEyeUpdateSettingsConfig>
     {
