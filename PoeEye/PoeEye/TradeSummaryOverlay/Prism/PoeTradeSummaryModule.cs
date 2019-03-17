@@ -1,16 +1,19 @@
 ﻿using Guards;
 using JetBrains.Annotations;
+using PoeEye.TradeSummaryOverlay.Modularity;
 using PoeEye.TradeSummaryOverlay.ViewModels;
 using PoeShared.Modularity;
 using PoeShared.Native;
 using PoeShared.Prism;
+using PoeShared.Scaffolding;
 using Prism.Ioc;
 using Unity;
 using Unity.Resolution;
 
 namespace PoeEye.TradeSummaryOverlay.Prism
 {
-    public sealed class PoeTradeSummaryModule : IPoeEyeModule
+    [UsedImplicitly]
+    public sealed class PoeTradeSummaryModule : DisposableReactiveObject, IPoeEyeModule
     {
         private readonly IUnityContainer container;
 
@@ -28,9 +31,10 @@ namespace PoeEye.TradeSummaryOverlay.Prism
 
         public void OnInitialized(IContainerProvider containerProvider)
         {
-            var overlayController = container.Resolve<IOverlayWindowController>(WellKnownOverlays.PathOfExileOverlay);
-            var overlayModel = container.Resolve<PoeTradeSummaryViewModel>(new DependencyOverride(typeof(IOverlayWindowController), overlayController));
-            overlayController.RegisterChild(overlayModel);
+            var registrator = container.Resolve<IPoeEyeModulesRegistrator>();
+            registrator.RegisterSettingsEditor<PoeTradeSummaryConfig, PoeTradeSummarySettingsViewModel>();
+            
+            container.Resolve<PoeTradeSummaryBootstrapper>().AddTo(Anchors);
         }
     }
 }

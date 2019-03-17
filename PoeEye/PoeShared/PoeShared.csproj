@@ -239,6 +239,7 @@
     <Compile Include="Scaffolding\WPF\InputBindingsManager.cs" />
     <Compile Include="Scaffolding\WPF\IPageParameterDataViewModel.cs" />
     <Compile Include="Scaffolding\WPF\MappingTemplateSelector.cs" />
+    <Compile Include="Scaffolding\WPF\ScrollViewerExtensions.cs" />
     <Compile Include="Scaffolding\WPF\StackPanelEx.cs" />
     <Compile Include="Clock.cs" />
     <Compile Include="Communications\GenericHttpClient.cs" />

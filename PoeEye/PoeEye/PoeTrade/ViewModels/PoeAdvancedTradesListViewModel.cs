@@ -48,6 +48,7 @@ namespace PoeEye.PoeTrade.ViewModels
 
         private long filterRequestsCount;
         private long sortRequestsCount;
+        private bool scrollToTop;
 
         public PoeAdvancedTradesListViewModel(
             [NotNull] IPageParameterDataViewModel pageParameter,
@@ -66,6 +67,16 @@ namespace PoeEye.PoeTrade.ViewModels
                                      .ObserveOn(uiScheduler);
 
             PageParameter = pageParameter;
+            pageParameter.WhenAnyValue(x => x.CurrentPage)
+                         .ObserveOn(uiScheduler)
+                         .Select(x => new { pageParameter.CurrentPage, pageParameter.TotalCount, pageParameter.PageCount, pageParameter.PageSize })
+                         .Where(x => x.CurrentPage > 0 && x.TotalCount > 0 && x.PageCount > 0)
+                         .Subscribe(x =>
+                         {
+                             Log.Debug($"Current page changed, list: {this}, current page: {x.CurrentPage} / {x.PageCount} (page size: {x.PageSize}, total count: {x.TotalCount})");
+                             this.RaisePropertyChanged(nameof(ScrollToTop));
+                         })
+                         .AddTo(Anchors);
 
             var allItems = tradeLists
                 .Or();
@@ -142,6 +153,8 @@ namespace PoeEye.PoeTrade.ViewModels
         public long FilterRequestsCount => filterRequestsCount;
 
         public long SortRequestsCount => sortRequestsCount;
+
+        public bool ScrollToTop => PageParameter.CurrentPage > 0 && PageParameter.PageCount > 0 && PageParameter.TotalCount > 0;
 
         public void Add(ReadOnlyObservableCollection<IPoeTradeViewModel> itemList)
         {
@@ -249,7 +262,7 @@ namespace PoeEye.PoeTrade.ViewModels
                 var activeTradeListAnchors = new SerialDisposable().AddTo(Anchors);
                 tab
                     .WhenAnyValue(x => x.TradesList)
-                    .Select(x => x.Items)
+                    .Select(x => x.ItemList.RawItems)
                     .Subscribe(
                         items =>
                         {

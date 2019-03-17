@@ -109,9 +109,7 @@ namespace PoeEye.PoeTrade.ViewModels
             quickFilter = quickFilterFactory.Create();
             list.Filter(this.WhenAnyValue(x => x.QuickFilter).Select(x => BuildFilter()));
 
-            Items = list.RawItems;
-            ItemsView = list.Items;
-            PageParameters = list.PageParameter;
+            ItemList = list;
         }
 
         public TimeSpan RecheckPeriod
@@ -120,12 +118,8 @@ namespace PoeEye.PoeTrade.ViewModels
             set => this.RaiseAndSetIfChanged(ref recheckPeriod, value);
         }
 
-        public ReadOnlyObservableCollection<IPoeTradeViewModel> ItemsView { get; }
+        public IPoeAdvancedTradesListViewModel ItemList { get; }
         
-        public IPageParameterDataViewModel PageParameters { get; }
-
-        public ReadOnlyObservableCollection<IPoeTradeViewModel> Items { get; }
-
         public TimeSpan TimeSinceLastUpdate => activeProviderInfo.HistoryProvider == null  || activeProviderInfo.HistoryProvider.LastUpdateTimestamp == default(DateTime)
             ? TimeSpan.MaxValue 
             : clock.Now - activeProviderInfo.HistoryProvider.LastUpdateTimestamp;

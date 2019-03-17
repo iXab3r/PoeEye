@@ -107,11 +107,7 @@
             </Border>
             
             <Grid Grid.Row="2">
-                <ItemsControl Margin="0,10,0,0"
-                              ItemsSource="{Binding TradesList.ItemsView}"
-                              Style="{StaticResource VirtualizedItemsControlStyle}" />
-                <ContentControl Margin="0,0,30,-10" Content="{Binding TradesList.PageParameters}"
-                                HorizontalAlignment="Right" VerticalAlignment="Bottom" />
+                <ContentControl Content="{Binding TradesList.ItemList}"></ContentControl>
             </Grid>
         </Grid>
     </DataTemplate>

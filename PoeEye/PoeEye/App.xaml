@@ -38,6 +38,7 @@
                 
                 <ResourceDictionary Source="Updates/ApplicationUpdaterView.xaml" />
                 
+                <ResourceDictionary Source="PoeTrade/Views/PoeAdvancedTradesListView.xaml" />
                 <ResourceDictionary Source="PoeTrade/Views/ProxyProviderView.xaml" />
                 <ResourceDictionary Source="PoeTrade/Views/RecheckPeriodView.xaml" />
                 <ResourceDictionary Source="PoeTrade/Views/CurrencyView.xaml" />
@@ -59,6 +60,7 @@
                 <ResourceDictionary Source="Shell/Views/SplashWindowView.xaml" />
 
                 <ResourceDictionary Source="TradeSummaryOverlay/Views/PoeTradeSummaryView.xaml" />
+                <ResourceDictionary Source="TradeSummaryOverlay/Views/PoeTradeSummarySettingsViewModel.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

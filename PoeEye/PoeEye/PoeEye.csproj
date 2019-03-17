@@ -343,8 +343,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="TradeSummaryOverlay\Modularity\PoeTradeSummaryConfig.cs" />
+    <Compile Include="TradeSummaryOverlay\Prism\PoeTradeSummaryBootstrapper.cs" />
     <Compile Include="TradeSummaryOverlay\Prism\PoeTradeSummaryModule.cs" />
     <Compile Include="TradeSummaryOverlay\Prism\PoeTradeSummaryModuleRegistrations.cs" />
+    <Compile Include="TradeSummaryOverlay\ViewModels\PoeTradeSummarySettingsViewModel.cs" />
     <Compile Include="TradeSummaryOverlay\ViewModels\PoeTradeSummaryViewModel.cs" />
     <Compile Include="Updates\ApplicationUpdaterModel.cs" />
     <Compile Include="Updates\ApplicationUpdaterViewModel.cs" />
@@ -449,6 +451,10 @@
     </Page>
     <Page Include="PoeTrade\Views\CurrencyTestView.xaml">
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="PoeTrade\Views\PoeAdvancedTradesListView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="PoeTrade\Views\PoeApiSelectorView.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -565,6 +571,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="TradeSummaryOverlay\Themes\Styles.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="TradeSummaryOverlay\Views\PoeTradeSummarySettingsViewModel.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

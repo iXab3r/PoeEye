@@ -189,7 +189,6 @@
     <Compile Include="Prism\PoeTradeMonitorModuleRegistrations.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Scaffolding\ScrollViewerExtensions.cs" />
     <Compile Include="Scaffolding\SetPropertyAction.cs" />
     <Compile Include="Themes\TradeMonitorExpanderHelper.cs" />
     <Compile Include="ViewModels\INegotiationViewModel.cs" />

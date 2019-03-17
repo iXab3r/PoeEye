@@ -61,7 +61,7 @@ namespace PoeEye.TradeSummaryOverlay.ViewModels
             Height = 300;
             SizeToContent = SizeToContent.Manual;
             IsUnlockable = true;
-            Title = "Trade Summary";
+            Title = "Realtime Trade Log";
 
             WhenLoaded
                 .Take(1)

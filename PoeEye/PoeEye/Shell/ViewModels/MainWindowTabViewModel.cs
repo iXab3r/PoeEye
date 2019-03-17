@@ -148,17 +148,17 @@ namespace PoeEye.PoeTrade.ViewModels
 
         public int NewItemsCount
         {
-            get { return TradesList?.Items.Count(x => x.TradeState == PoeTradeState.New) ?? 0; }
+            get { return TradesList?.ItemList.RawItems.Count(x => x.TradeState == PoeTradeState.New) ?? 0; }
         }
 
         public int RemovedItemsCount
         {
-            get { return TradesList?.Items.Count(x => x.TradeState == PoeTradeState.Removed) ?? 0; }
+            get { return TradesList?.ItemList.RawItems.Count(x => x.TradeState == PoeTradeState.Removed) ?? 0; }
         }
 
         public int NormalItemsCount
         {
-            get { return TradesList?.Items.Count(x => x.TradeState == PoeTradeState.Normal) ?? 0; }
+            get { return TradesList?.ItemList.RawItems.Count(x => x.TradeState == PoeTradeState.Normal) ?? 0; }
         }
 
         public ICommand NewSearchCommand => newSearchCommand;
@@ -320,8 +320,8 @@ namespace PoeEye.PoeTrade.ViewModels
                 .AddTo(anchors);
 
             Observable.Merge(
-                          tradesList.Items.ToObservableChangeSet().ToUnit(),
-                          tradesList.Items.ToObservableChangeSet().WhenPropertyChanged(x => x.TradeState).ToUnit()
+                          tradesList.ItemList.RawItems.ToObservableChangeSet().ToUnit(),
+                          tradesList.ItemList.RawItems.ToObservableChangeSet().WhenPropertyChanged(x => x.TradeState).ToUnit()
                       )
                       .StartWith(Unit.Default)
                       .Sample(ThrottlingPeriod, bgScheduler)
@@ -392,14 +392,14 @@ namespace PoeEye.PoeTrade.ViewModels
 
         private void MarkAllAsReadExecute()
         {
-            var tradesToAmend = TradesList.Items.Where(x => x.TradeState != PoeTradeState.Normal).ToArray();
+            var tradesToAmend = TradesList.ItemList.RawItems.Where(x => x.TradeState != PoeTradeState.Normal).ToArray();
             if (!tradesToAmend.Any())
             {
                 return;
             }
 
             Log.Debug(
-                $"Marking {tradesToAmend.Length} of {tradesList.Items.Count} item(s) as Read");
+                $"Marking {tradesToAmend.Length} of {tradesList.ItemList.RawItems.Count} item(s) as Read");
 
             foreach (var trade in tradesToAmend)
             {
