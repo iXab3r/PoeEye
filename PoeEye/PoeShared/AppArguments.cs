@@ -81,6 +81,8 @@ namespace PoeEye
             return new
             {
                 AppName,
+                IsAutostart,
+                AutostartFlag,
                 AppSupportMail,
                 AppDomainDirectory,
                 AppDataDirectory,
@@ -89,7 +91,7 @@ namespace PoeEye
                 StartupArgs,
                 ApplicationPath = ApplicationExecutablePath,
                 ApplicationName = ApplicationExecutableName
-            }.ToString();
+            }.DumpToTextRaw();
         }
     }
 }
