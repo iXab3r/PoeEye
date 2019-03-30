@@ -57,6 +57,11 @@ namespace PoeShared.Native
             if (lazyWhiteListRegex != null)
             {
                 var lazyRegexRaw = lazyWhiteListRegex();
+                if (string.IsNullOrEmpty(lazyRegexRaw))
+                {
+                    return false;
+                }
+                
                 var regex = ConstructRegex(lazyRegexRaw);
 
                 if (regex.IsMatch(value))

@@ -67,8 +67,14 @@ namespace PoeShared.Prism
             Container.RegisterWindowTracker(WellKnownWindows.AllWindows, () => ".*");
             Container.RegisterWindowTracker(WellKnownWindows.MainWindow, () =>
             {
+                //TODO Optimize MainWindowTitle resolution
                 var mainWindowTitle = Process.GetCurrentProcess().MainWindowTitle;
-                return $"^{Regex.Escape(mainWindowTitle)}$";
+                if (string.IsNullOrEmpty(mainWindowTitle))
+                {
+                    return string.Empty;
+                }
+                var regex = $"^{Regex.Escape(mainWindowTitle)}$";
+                return regex;
             });
             Container.RegisterWindowTracker(WellKnownWindows.PathOfExileWindow, () => "^Path of Exile$");
 
