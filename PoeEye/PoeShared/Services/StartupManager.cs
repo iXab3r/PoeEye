@@ -13,16 +13,14 @@ namespace PoeShared.Services
 {
     internal sealed class StartupManager : DisposableReactiveObject, IStartupManager
     {
-        private readonly StartupManagerArgs args;
         private static readonly ILog Log = LogManager.GetLogger(typeof(StartupManager));
+        private readonly StartupManagerArgs args;
 
         private readonly StartupHelper.StartupManager manager;
         
         public StartupManager(
-            [NotNull] AppArguments appArguments,
             [NotNull] StartupManagerArgs args)
         {
-            Guard.ArgumentNotNull(appArguments, nameof(appArguments));
             Guard.ArgumentNotNull(args, nameof(args));
             Log.Debug($"Creating startup helper using args: {args.DumpToTextRaw()}...");
 
@@ -36,10 +34,10 @@ namespace PoeShared.Services
                 args.UniqueAppName, 
                 RegistrationScope.Local,
                 false,
-                "--autostart");    
-            manager.FixWorkingDirectory();
+                args.AutostartFlag ?? "--autostart");    
             
             Log.Debug($"Manager parameters: {new { ArgsCommandLine = args.CommandLineArgs, manager.IsRegistered, manager.Name, manager.ApplicationImage, manager.RegistrationScope, manager.IsStartedUp, manager.NeedsAdministrativePrivileges, manager.Provider, manager.WorkingDirectory, CommandLineArgs = String.Join(" ", manager.CommandLineArguments), manager.StartupSpecialArgument }}");
+            Reregister();
         }
 
         public bool IsRegistered => manager.IsRegistered;
@@ -77,6 +75,21 @@ namespace PoeShared.Services
             }
             this.RaisePropertyChanged(nameof(IsRegistered));
             return result;
+        }
+
+        private void Reregister()
+        {
+            if (manager.IsRegistered)
+            {
+                Log.Debug("Reregistering application startup");
+                Unregister();
+                Register();
+            }
+            else
+            {
+                Log.Debug("Application startup is not registered");
+            }
+            
         }
     }
 }

@@ -4,8 +4,10 @@ using System.Diagnostics;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Reactive.Threading.Tasks;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using Common.Logging;
 using Gma.System.MouseKeyHook;
@@ -42,8 +44,6 @@ namespace PoeShared.Native
 
             subscription.AddTo(Anchors);
             InitializeConsumer().AddTo(Anchors);
-
-            Reinitialize();
         }
 
         public IObservable<KeyPressEventArgs> WhenKeyPress => whenKeyPress;
@@ -62,7 +62,7 @@ namespace PoeShared.Native
             set => this.RaiseAndSetIfChanged(ref realtimeMode, value);
         }
 
-        private void Reinitialize()
+        public IDisposable InitializeHooks()
         {
             Log.Info("Configuring Mouse&Keyboard hooks...");
             var sw = Stopwatch.StartNew();
@@ -77,6 +77,7 @@ namespace PoeShared.Native
 
             sw.Stop();
             Log.Info($"Mouse&Keyboard hooks configuration took {sw.ElapsedMilliseconds:F0}ms");
+            return anchors;
         }
 
         private IDisposable InitializeConsumer()

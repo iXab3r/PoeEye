@@ -7,6 +7,8 @@ namespace PoeShared.Native
     public interface IKeyboardEventsSource
     {
         bool RealtimeMode { get; set; }
+
+        IDisposable InitializeHooks();
         
         IObservable<KeyPressEventArgs> WhenKeyPress { [NotNull] get; }
 

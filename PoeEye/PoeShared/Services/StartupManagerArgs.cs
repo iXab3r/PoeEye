@@ -9,5 +9,7 @@ namespace PoeShared.Services
         public string CommandLineArgs { [CanBeNull] get; [CanBeNull] set; }
         
         public string ExecutablePath { [CanBeNull] get; [CanBeNull] set; }
+        
+        public string AutostartFlag { [CanBeNull] get; [CanBeNull] set; }
     }
 }

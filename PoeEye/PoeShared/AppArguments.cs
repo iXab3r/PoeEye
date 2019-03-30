@@ -1,21 +1,25 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using CommandLine;
 using PoeShared.Scaffolding;
 using ReactiveUI;
+using Unity.Interception.Utilities;
 
 namespace PoeEye
 {
     public class AppArguments : DisposableReactiveObject
     {
         private static readonly Lazy<AppArguments> InstanceProducer = new Lazy<AppArguments>(() => new AppArguments());
+        public static AppArguments Instance => InstanceProducer.Value;
 
         private bool isDebugMode;
+        private bool isAutostart;
 
-        public static AppArguments Instance => InstanceProducer.Value;
+        private const string AutostartFlagValue = "autostart";
 
         public string AppName { get; set; } = "PoeEye";
         public string AppSupportMail { get; set; } = "mail.poeeye@gmail.com";
@@ -26,11 +30,32 @@ namespace PoeEye
 
         private AppArguments()
         {
-            StartupArgs = Environment.GetCommandLineArgs().Skip(1).FirstOrDefault();
+            ProcessId = Process.GetCurrentProcess().Id;
+            var args = Environment.GetCommandLineArgs();
+            StartupArgs = args.Skip(1)
+                .Where(x => !string.Equals(AutostartFlagValue, x, StringComparison.OrdinalIgnoreCase))
+                .JoinStrings(" ");
+            ApplicationExecutablePath = args.First();
+            ApplicationExecutableName = Path.GetFileName(ApplicationExecutablePath);
         }
 
-        public string StartupArgs { get; }
+        public string AutostartFlag => $"--{AutostartFlagValue}";
 
+        public string StartupArgs { get; }
+        
+        public int ProcessId { get; }
+        
+        public string ApplicationExecutablePath { get; }
+        
+        public string ApplicationExecutableName { get; }
+
+        [Option(AutostartFlagValue, DefaultValue = false)]
+        public bool IsAutostart
+        {
+            get => isAutostart;
+            set => this.RaiseAndSetIfChanged(ref isAutostart, value);
+        }
+        
         [Option('d', "debugMode", DefaultValue = false)]
         public bool IsDebugMode
         {
@@ -61,7 +86,9 @@ namespace PoeEye
                 AppDataDirectory,
                 LocalAppDataDirectory,
                 IsDebugMode,
-                StartupArgs
+                StartupArgs,
+                ApplicationPath = ApplicationExecutablePath,
+                ApplicationName = ApplicationExecutableName
             }.ToString();
         }
     }
