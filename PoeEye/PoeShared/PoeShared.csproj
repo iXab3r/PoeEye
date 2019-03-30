@@ -86,6 +86,10 @@
     <Reference Include="MaterialDesignThemes.Wpf, Version=2.3.0.823, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\MaterialDesignThemes.2.3.0.823\lib\net45\MaterialDesignThemes.Wpf.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.Win32.TaskScheduler, Version=2.5.19.0, Culture=neutral, PublicKeyToken=0d013ddd5178a2ae">
+      <HintPath>..\packages\TaskScheduler.2.5.19\lib\net452\Microsoft.Win32.TaskScheduler.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="NAudio, Version=1.8.5.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\packages\NAudio.1.8.5\lib\net35\NAudio.dll</HintPath>
       <Private>True</Private>
@@ -118,6 +122,10 @@
     </Reference>
     <Reference Include="Splat, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Splat.4.0.2\lib\net461\Splat.dll</HintPath>
+    </Reference>
+    <Reference Include="StartupHelper, Version=1.0.2.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\StartupHelper.1.0.2.0\lib\net20\StartupHelper.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
@@ -248,6 +256,9 @@
     <Compile Include="Converters\TwoNumbersToSizeConverter.cs" />
     <Compile Include="IClock.cs" />
     <Compile Include="IRandomNumberGenerator.cs" />
+    <Compile Include="Services\IStartupManager.cs" />
+    <Compile Include="Services\StartupManager.cs" />
+    <Compile Include="Services\StartupManagerArgs.cs" />
     <Compile Include="SharedLog.cs" />
     <Compile Include="Modularity\IConfigProvider.cs" />
     <Compile Include="Modularity\IPoeEyeConfig.cs" />

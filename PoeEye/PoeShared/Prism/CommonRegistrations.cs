@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Reactive.Concurrency;
 using System.Text.RegularExpressions;
 using Gma.System.MouseKeyHook;
+using PoeEye;
 using PoeShared.Audio.Services;
 using PoeShared.Audio.ViewModels;
 using PoeShared.Communications;
@@ -12,6 +13,7 @@ using PoeShared.Native;
 using PoeShared.Resources.Notifications;
 using PoeShared.Scaffolding;
 using PoeShared.Scaffolding.WPF;
+using PoeShared.Services;
 using PoeShared.UI.Models;
 using PoeShared.UI.ViewModels;
 using ProxyProvider;
@@ -31,6 +33,7 @@ namespace PoeShared.Prism
         {
             Container
                 .RegisterSingleton<IClock, Clock>()
+                .RegisterSingleton<IStartupManager, StartupManager>()
                 .RegisterSingleton<PoeEyeModulesRegistrator>(typeof(IPoeEyeModulesRegistrator), typeof(IPoeEyeModulesEnumerator))
                 .RegisterSingleton(typeof(IConfigProvider<>), typeof(GenericConfigProvider<>))
                 .RegisterSingleton<IConverter<NameValueCollection, string>, NameValueCollectionToQueryStringConverter>()
