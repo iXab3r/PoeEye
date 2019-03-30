@@ -309,7 +309,9 @@
     </Compile>
     <Compile Include="UI\Models\IImagesCacheService.cs" />
     <Compile Include="UI\Models\ImagesCacheService.cs" />
+    <Compile Include="UI\Models\IViewController.cs" />
     <Compile Include="UI\Models\PageResponse.cs" />
+    <Compile Include="UI\Models\ViewController.cs" />
     <Compile Include="UI\UiConstants.cs" />
     <Compile Include="UI\ViewModels\IImageViewModel.cs" />
     <Compile Include="UI\ViewModels\ImageViewModel.cs" />
