@@ -41,8 +41,7 @@ namespace PoeShared.Prism
                 .RegisterSingleton<IProxyProvider>(new InjectionFactory(unity => new GenericProxyProvider()))
                 .RegisterSingleton<IRandomNumberGenerator, RandomNumberGenerator>()
                 .RegisterSingleton<IImagesCacheService, ImagesCacheService>()
-                .RegisterSingleton<IKeyboardEventsSource>(
-                    new InjectionFactory(x => x.Resolve<KeyboardEventsSource>(new DependencyOverride(typeof(IKeyboardMouseEvents), Hook.GlobalEvents()))))
+                .RegisterSingleton<IKeyboardEventsSource, KeyboardEventsSource>()
                 .RegisterSingleton<ISchedulerProvider, SchedulerProvider>()
                 .RegisterSingleton<IClipboardManager, ClipboardManager>()
                 .RegisterSingleton<IConfigSerializer, JsonConfigSerializer>()

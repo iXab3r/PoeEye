@@ -50,8 +50,9 @@
       <HintPath>..\packages\FontAwesome.WPF.5.0.3-alpha\lib\FontAwesome.WPF.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Gma.System.MouseKeyHook, Version=5.4.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\MouseKeyHook.5.4.0\lib\net40\Gma.System.MouseKeyHook.dll</HintPath>
+    <Reference Include="Gma.System.MouseKeyHook, Version=5.6.130.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\MouseKeyHook.5.6.0\lib\net40\Gma.System.MouseKeyHook.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Guards, Version=1.0.0.0, Culture=neutral, PublicKeyToken=ac6aedb73a72f46e, processorArchitecture=MSIL">
       <HintPath>..\packages\Guards.1.0.10\lib\portable-net45+dnxcore50+wp80+wpa81+win81+netcore45+monoandroid10+monotouch10+xamarin.ios10\Guards.dll</HintPath>
@@ -247,7 +248,6 @@
     <Compile Include="Scaffolding\WPF\InputBindingsManager.cs" />
     <Compile Include="Scaffolding\WPF\IPageParameterDataViewModel.cs" />
     <Compile Include="Scaffolding\WPF\MappingTemplateSelector.cs" />
-    <Compile Include="Scaffolding\WPF\ScrollViewerExtensions.cs" />
     <Compile Include="Scaffolding\WPF\StackPanelEx.cs" />
     <Compile Include="Clock.cs" />
     <Compile Include="Communications\GenericHttpClient.cs" />
