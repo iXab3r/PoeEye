@@ -196,6 +196,7 @@
     <Compile Include="Prism\PoeSharedModule.cs" />
     <Compile Include="Scaffolding\ChangeSetExtensions.cs" />
     <Compile Include="Scaffolding\CircularBuffer.cs" />
+    <Compile Include="Scaffolding\DateTimeUtils.cs" />
     <Compile Include="Scaffolding\DependencyObjectExtensions.cs" />
     <Compile Include="Scaffolding\DictionaryExtensions.cs" />
     <Compile Include="Scaffolding\DisposableExtensions.cs" />
