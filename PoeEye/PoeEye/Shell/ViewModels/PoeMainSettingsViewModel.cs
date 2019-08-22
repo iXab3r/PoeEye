@@ -31,8 +31,7 @@ namespace PoeEye.PoeTrade.ViewModels
         private readonly PoeEyeMainConfig temporaryConfig = new PoeEyeMainConfig();
         private string leagueId;
         private TaskCompletionSource<string[]> leaguesSource;
-
-        private bool whisperNotificationsEnabled;
+        private string autoInviteKeyword;
 
         public PoeMainSettingsViewModel(
             [NotNull] IClock clock,
@@ -66,12 +65,6 @@ namespace PoeEye.PoeTrade.ViewModels
 
         public IReactiveList<EditableTuple<PoePrice, float>> CurrenciesPriceInChaosOrbs => currenciesPriceInChaosOrbs;
 
-        public bool WhisperNotificationsEnabled
-        {
-            get => whisperNotificationsEnabled;
-            set => this.RaiseAndSetIfChanged(ref whisperNotificationsEnabled, value);
-        }
-
         public CurrencyTestViewModel CurrencyTest { get; }
 
         public CommandWrapper GetEconomicsCommand { get; }
@@ -82,6 +75,12 @@ namespace PoeEye.PoeTrade.ViewModels
             set => this.RaiseAndSetIfChanged(ref leagueId, value);
         }
 
+        public string AutoInviteKeyword
+        {
+            get => autoInviteKeyword;
+            set => this.RaiseAndSetIfChanged(ref autoInviteKeyword, value);
+        }
+
         public IReactiveList<string> LeagueList { get; } = new ReactiveList<string>();
 
         public string ModuleName { get; } = "Main";
@@ -90,7 +89,6 @@ namespace PoeEye.PoeTrade.ViewModels
         {
             config.CopyPropertiesTo(temporaryConfig);
 
-            WhisperNotificationsEnabled = config.WhisperNotificationsEnabled;
             if (LeagueList.IsEmpty)
             {
                 var leagues = await leagueApiClient.GetLeaguesAsync();
@@ -103,6 +101,7 @@ namespace PoeEye.PoeTrade.ViewModels
             }
 
             LeagueId = config.LeagueId;
+            AutoInviteKeyword = config.AutoInviteKeyword;
 
             CurrenciesPriceInChaosOrbs.Clear();
             config
@@ -119,13 +118,12 @@ namespace PoeEye.PoeTrade.ViewModels
 
         public PoeEyeMainConfig Save()
         {
-            temporaryConfig.WhisperNotificationsEnabled = WhisperNotificationsEnabled;
             temporaryConfig.CurrenciesPriceInChaos = CurrenciesPriceInChaosOrbs.ToDictionary(x => x.Item1.CurrencyType, x => x.Item2);
             temporaryConfig.LeagueId = LeagueId;
+            temporaryConfig.AutoInviteKeyword = AutoInviteKeyword;
 
             var result = new PoeEyeMainConfig();
             temporaryConfig.CopyPropertiesTo(result);
-
 
             return result;
         }

@@ -45,14 +45,14 @@ namespace PoeEye.Config
             set => currenciesPriceInChaos = value ?? new Dictionary<string, float>(DefaultCurrenciesPriceInChaos);
         }
 
-        public bool WhisperNotificationsEnabled { get; set; } = false;
-
         public TimeSpan MinRefreshTimeout { get; set; } = TimeSpan.FromSeconds(30);
 
         public TimeSpan MaxRefreshTimeout { get; set; } = TimeSpan.FromMinutes(30);
 
         public TimeSpan ProxyRecheckTimeout { get; set; } = TimeSpan.FromMinutes(1);
 
+        public string AutoInviteKeyword { get; set; } 
+        
         public string LeagueId { get; set; }
 
         public int ItemPageSize { get; set; } = 20;

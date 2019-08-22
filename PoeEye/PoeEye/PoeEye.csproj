@@ -282,6 +282,7 @@
     <Compile Include="Converters\ExceptionToMessageConverter.cs" />
     <Compile Include="Converters\NullToVisibilityConverter.cs" />
     <Compile Include="PoeTrade\Models\FuzzySuggestionProvider.cs" />
+    <Compile Include="PoeTrade\Models\IAutoInviteService.cs" />
     <Compile Include="PoeTrade\Models\IPoeApiProvider.cs" />
     <Compile Include="PoeTrade\Models\IPoeCaptchaRegistrator.cs" />
     <Compile Include="PoeTrade\Models\IPoeTradeQuickFilter  .cs" />
@@ -293,6 +294,7 @@
     <Compile Include="PoeTrade\Models\PoeCaptchaRegistrator.cs" />
     <Compile Include="PoeTrade\Models\PoeTradeQuickFilter.cs" />
     <Compile Include="PoeTrade\Models\ReactiveSuggestionProvider.cs" />
+    <Compile Include="PoeTrade\Models\AutoInviteService.cs" />
     <Compile Include="PoeTrade\ViewModels\CurrencyTestViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\IPoeApiSelectorViewModel.cs" />
     <Compile Include="PoeTrade\ViewModels\IPoeChatViewModel.cs" />

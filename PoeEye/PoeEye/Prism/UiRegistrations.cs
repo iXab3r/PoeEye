@@ -21,6 +21,7 @@ namespace PoeEye.Prism
                 .RegisterSingleton(typeof(IPoeEyeMainConfigProvider), typeof(GenericConfigProvider<PoeEyeMainConfig>))
                 .RegisterSingleton<IConfigProvider, PoeEyeConfigProviderFromFile>()
                 .RegisterSingleton<IPoeCaptchaRegistrator, PoeCaptchaRegistrator>()
+                .RegisterSingleton<IAutoInviteService, AutoInviteService>()
                 .RegisterSingleton<IPoeApiProvider, PoeApiProvider>()
                 .RegisterSingleton<IPoeItemViewModelFactory, PoeItemViewModelFactory>()
                 .RegisterSingleton<IMainWindowViewModel, MainWindowViewModel>();

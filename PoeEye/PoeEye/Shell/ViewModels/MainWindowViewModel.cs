@@ -47,6 +47,7 @@ namespace PoeEye.Shell.ViewModels
 
         private readonly ISubject<Unit> configUpdateSubject = new Subject<Unit>();
         private readonly IConfigProvider<PoeEyeTabListConfig> poeEyeConfigProvider;
+        private readonly IAutoInviteService autoInviteService;
         private readonly TabablzPositionMonitor<IMainWindowTabViewModel> positionMonitor = new TabablzPositionMonitor<IMainWindowTabViewModel>();
 
         private readonly CircularBuffer<PoeEyeTabConfig> recentlyClosedQueries = new CircularBuffer<PoeEyeTabConfig>(UndoStackDepth);
@@ -67,6 +68,7 @@ namespace PoeEye.Shell.ViewModels
             [NotNull] ProxyProviderViewModel proxyProviderViewModel,
             [NotNull] PoeEyeSettingsViewModel settings,
             [NotNull] IPoeChatViewModel chatViewModel,
+            [NotNull] IAutoInviteService autoInviteService,
             [NotNull] IClipboardManager clipboardManager,
             [NotNull] IConfigSerializer configSerializer,
             [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler,
@@ -79,6 +81,7 @@ namespace PoeEye.Shell.ViewModels
             Guard.ArgumentNotNull(poeEyeConfigProvider, nameof(poeEyeConfigProvider));
             Guard.ArgumentNotNull(audioNotificationsManager, nameof(audioNotificationsManager));
             Guard.ArgumentNotNull(settings, nameof(settings));
+            Guard.ArgumentNotNull(autoInviteService, nameof(autoInviteService));
             Guard.ArgumentNotNull(clipboardManager, nameof(clipboardManager));
             Guard.ArgumentNotNull(configSerializer, nameof(configSerializer));
             Guard.ArgumentNotNull(uiScheduler, nameof(uiScheduler));
@@ -89,6 +92,7 @@ namespace PoeEye.Shell.ViewModels
 
             this.tabFactory = tabFactory;
             this.poeEyeConfigProvider = poeEyeConfigProvider;
+            this.autoInviteService = autoInviteService;
             this.clipboardManager = clipboardManager;
             this.configSerializer = configSerializer;
 
