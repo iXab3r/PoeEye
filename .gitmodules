@@ -10,3 +10,7 @@
 [submodule "Submodules/WpfAutoCompleteControls"]
 	path = Submodules/WpfAutoCompleteControls
 	url = https://github.com/iXab3r/WpfAutoCompleteControls.git
+[submodule "Submodules/DeploymentTools"]
+	path = Submodules/DeploymentTools
+	url = https://github.com/iXab3r/DeploymentTools.git
+	branch = master
