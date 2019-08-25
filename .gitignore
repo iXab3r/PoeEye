@@ -145,7 +145,6 @@ publish/
 
 # NuGet Packages
 *.nupkg
-*.nuspec
 # The packages folder can be ignored because of Package Restore
 **/packages/*
 # except build/, which is used as an MSBuild target.
@@ -218,4 +217,5 @@ ModelManifest.xml
 *.ncrunchsolution
 .idea
 *.iml
-.nuspec
+*.nuspec
+*.nuspec.bak
