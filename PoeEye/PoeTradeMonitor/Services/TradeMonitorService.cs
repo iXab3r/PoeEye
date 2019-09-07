@@ -77,7 +77,7 @@ namespace PoeEye.TradeMonitor.Services
         {
             if (successfullMatches.Count > 1)
             {
-                Log.Warn($"[TradeMonitorService.ParseMessage] Multiple successfull matches:\n{successfullMatches.DumpToText()}");
+                Log.Debug($"[TradeMonitorService.ParseMessage] Multiple successfull matches:\n{successfullMatches.DumpToText()}");
             }
 
             return successfullMatches.Count > 0
@@ -87,7 +87,7 @@ namespace PoeEye.TradeMonitor.Services
 
         private IDictionary<IPoeMessageParser, TradeModel> ParseMessage(PoeMessage message)
         {
-            Log.Warn($"[TradeMonitorService.ParseMessage] Processing message {message.DumpToText()}...");
+            Log.Debug($"[TradeMonitorService.ParseMessage] Processing message {message.DumpToText()}...");
             var result = new Dictionary<IPoeMessageParser, TradeModel>();
             foreach (var poeMessageParser in parsers)
             {
