@@ -2,7 +2,6 @@ using System;
 using System.Collections.Concurrent;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Threading;
@@ -11,6 +10,7 @@ using JetBrains.Annotations;
 using log4net;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
+using Unity;
 
 namespace PoeShared.Modularity
 {
@@ -22,9 +22,9 @@ namespace PoeShared.Modularity
         private readonly IScheduler uiScheduler;
 
         public SchedulerProvider(
-            [NotNull] [Unity.Dependency(WellKnownSchedulers.Background)]
+            [NotNull] [Dependency(WellKnownSchedulers.Background)]
             IScheduler bgScheduler,
-            [NotNull] [Unity.Dependency(WellKnownSchedulers.UI)]
+            [NotNull] [Dependency(WellKnownSchedulers.UI)]
             IScheduler uiScheduler)
         {
             this.uiScheduler = uiScheduler;
@@ -35,7 +35,7 @@ namespace PoeShared.Modularity
             schedulers[WellKnownSchedulers.UI] = uiScheduler;
         }
 
-        [MethodImpl(MethodImplOptions.Synchronized)]
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.Synchronized)]
         public IScheduler GetOrCreate(string name)
         {
             Log.Debug($"[{name}] Retrieving scheduler...");
