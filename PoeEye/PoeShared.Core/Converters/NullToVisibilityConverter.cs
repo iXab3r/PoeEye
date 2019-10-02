@@ -5,7 +5,7 @@ using System.Windows.Data;
 
 namespace PoeShared.Converters
 {
-    internal sealed class NullToVisibilityConverter : IValueConverter
+    public sealed class NullToVisibilityConverter : IValueConverter
     {
         public Visibility NullValue { get; set; } = Visibility.Collapsed;
 

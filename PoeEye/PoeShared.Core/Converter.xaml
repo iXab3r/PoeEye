@@ -19,7 +19,7 @@
                                      FalseValue="Visible"
         >
         <blue:ObjectToVisiblityConverter.ComparisonStrategy>
-            <blue:IsNullStrategy />
+            <strategies:IsNullStrategy />
         </blue:ObjectToVisiblityConverter.ComparisonStrategy>
     </blue:ObjectToVisiblityConverter>
 
@@ -29,7 +29,7 @@
                                      FalseValue="Collapsed"
         >
         <blue:ObjectToVisiblityConverter.ComparisonStrategy>
-            <blue:IsNullStrategy />
+            <strategies:IsNullStrategy />
         </blue:ObjectToVisiblityConverter.ComparisonStrategy>
     </blue:ObjectToVisiblityConverter>
 
@@ -39,7 +39,7 @@
         TrueValue="Visible" 
         FalseValue="Collapsed">
         <blue:DoubleToVisibilityConverter.ComparisonStrategy>
-            <blue:DoubleComparisonStrategy Comparand="42" Mode="LessThanOrEqual" />
+            <strategies:DoubleComparisonStrategy Comparand="42" Mode="LessThanOrEqual" />
         </blue:DoubleToVisibilityConverter.ComparisonStrategy>
     </blue:DoubleToVisibilityConverter>
 

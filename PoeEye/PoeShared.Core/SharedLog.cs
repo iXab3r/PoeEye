@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Reactive.Disposables;
 using System.Reactive.Subjects;
@@ -73,6 +74,19 @@ namespace PoeShared
             Log.Info($"Logging level switched to '{loggingLevel}'");
         }
 
+        public IDisposable AddTraceAppender()
+        {
+            var listener = new Log4NetTraceListener(Log);
+            Log.Debug($"Adding TraceListener");
+            Trace.Listeners.Add(listener);
+            Trace.WriteLine("TraceListener initialized");
+            return Disposable.Create(() =>
+            {
+                Log.Debug($"Removing TraceListener");
+                Trace.Listeners.Remove(listener);
+            });
+        }
+        
         public IDisposable AddAppender(IAppender appender)
         {
             Guard.ArgumentNotNull(appender, nameof(appender));
@@ -89,6 +103,34 @@ namespace PoeShared
                 root.RemoveAppender(appender);
                 repository.RaiseConfigurationChanged(EventArgs.Empty);
             });
+        }
+        
+        private sealed class Log4NetTraceListener : System.Diagnostics.TraceListener
+        {
+            private readonly log4net.ILog log;
+
+            public Log4NetTraceListener(log4net.ILog log)
+            {
+                this.log = log;
+            }
+
+            public override void Write(string message)
+            {
+                if (string.IsNullOrEmpty(message))
+                {
+                    return;
+                }
+                log.Debug($"[TraceListener] {message}");
+            }
+
+            public override void WriteLine(string message)
+            {
+                if (string.IsNullOrEmpty(message))
+                {
+                    return;
+                }
+                log.Debug($"[TraceListener] {message}");
+            }
         }
     }
 }

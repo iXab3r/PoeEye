@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace PoeShared.Converters
 {
-    internal static class ConverterHelpers
+    public static class ConverterHelpers
     {
         public static bool IsNullOrEmpty(object value)
         {

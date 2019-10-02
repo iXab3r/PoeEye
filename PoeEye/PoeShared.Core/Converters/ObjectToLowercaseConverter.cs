@@ -4,22 +4,16 @@ using System.Windows.Data;
 
 namespace PoeShared.Converters
 {
-    public sealed class ExceptionToMessageConverter : IValueConverter
+    public sealed class ObjectToLowercaseConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            var exception = value as Exception;
-            if (exception == null)
-            {
-                return null;
-            }
-
-            return exception.Message;
+            return value?.ToString().ToLowerInvariant();
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            throw new NotSupportedException();
+            return Convert(value, targetType, parameter, culture);
         }
     }
 }

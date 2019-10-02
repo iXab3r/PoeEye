@@ -4,7 +4,7 @@ using System.Windows.Data;
 
 namespace PoeShared.Converters
 {
-    internal sealed class NullToBoolConverter : IValueConverter
+    public sealed class NullToBoolConverter : IValueConverter
     {
         public bool NullValue { get; set; } = true;
 

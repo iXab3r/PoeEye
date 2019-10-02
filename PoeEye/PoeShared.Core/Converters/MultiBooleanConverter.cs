@@ -4,7 +4,7 @@ using System.Windows.Data;
 
 namespace PoeShared.Converters
 {
-    internal sealed class MultiBooleanConverter : IMultiValueConverter
+    public sealed class MultiBooleanConverter : IMultiValueConverter
     {
         public object Convert(object[] values,
             Type targetType,

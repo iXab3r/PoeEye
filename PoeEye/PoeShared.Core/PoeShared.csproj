@@ -22,8 +22,9 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Blue.MVVM.Converter, Version=1.4.3.26888, Culture=neutral, PublicKeyToken=1bb1db17d606db59, processorArchitecture=MSIL">
-      <HintPath>..\packages\Blue.MVVM.Converter.1.4.3\lib\net45\Blue.MVVM.Converter.dll</HintPath>
+    <Reference Include="Blue.MVVM.Converter, Version=1.5.0.27868, Culture=neutral, PublicKeyToken=1bb1db17d606db59">
+      <HintPath>..\packages\Blue.MVVM.Converter.1.5.0\lib\net45\Blue.MVVM.Converter.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="CommandLine, Version=1.9.71.2, Culture=neutral, PublicKeyToken=de6f01bd326f8c32, processorArchitecture=MSIL">
       <HintPath>..\packages\CommandLineParser.1.9.71\lib\net45\CommandLine.dll</HintPath>
@@ -171,16 +172,24 @@
     <Compile Include="AppArguments.cs" />
     <Compile Include="Common\TriState.cs" />
     <Compile Include="Converters\BoolInversionConverter.cs" />
+    <Compile Include="Converters\ConcreteTypeConverter.cs" />
     <Compile Include="Converters\ConverterHelpers.cs" />
     <Compile Include="Converters\ExceptionToMessageConverter.cs" />
     <Compile Include="Converters\FlagToObjectConverter.cs" />
+    <Compile Include="Converters\IconToImageSourceConverter.cs" />
+    <Compile Include="Converters\MathAdditionConverter.cs" />
     <Compile Include="Converters\MultiBooleanConverter.cs" />
     <Compile Include="Converters\MultiDoubleSumConverter.cs" />
+    <Compile Include="Converters\NullableConverter.cs" />
     <Compile Include="Converters\NullToBoolConverter.cs" />
     <Compile Include="Converters\NullToVisibilityConverter.cs" />
+    <Compile Include="Converters\NullToVisibilityMultiValueConverter.cs" />
+    <Compile Include="Converters\ObjectToLowercaseConverter.cs" />
     <Compile Include="Converters\ObjectToTypeConverter.cs" />
+    <Compile Include="Converters\ObjectToVisibilityConverter.cs" />
     <Compile Include="Converters\SafeDataConverter.cs" />
     <Compile Include="Converters\TimeSpanToHumanReadableStringConverter.cs" />
+    <Compile Include="Converters\TimeSpanToSecondsConverter.cs" />
     <Compile Include="LogExtensions.cs" />
     <Compile Include="Modularity\GenericConfigProvider.cs" />
     <Compile Include="Modularity\IConfigSerializer.cs" />
@@ -271,6 +280,7 @@
     <None Include="app.config" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Converter.xaml" />
     <None Include="FodyWeavers.xml" />
     <EmbeddedResource Include="Resources\Notifications\mercury.wav" />
     <EmbeddedResource Include="Resources\Notifications\wob.wav" />
@@ -285,12 +295,6 @@
     <Resource Include="Resources\mainIcon.png" />
     <Resource Include="Resources\mouse-device-left-click-control.png" />
     <Resource Include="Resources\mouse-device-right-click-control.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Page Include="Converter.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
