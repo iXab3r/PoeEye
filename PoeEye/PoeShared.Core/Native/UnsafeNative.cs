@@ -1,11 +1,19 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Windows;
+using System.Windows.Shapes;
+using System.Xml.XPath;
+using log4net;
+using log4net.Repository.Hierarchy;
+using Rectangle = System.Drawing.Rectangle;
 
 namespace PoeShared.Native
 {
     public static class UnsafeNative
     {
+        private static readonly ILog Log = LogManager.GetLogger(typeof(UnsafeNative));
+        
         public delegate void WinEventDelegate(
             IntPtr hWinEventHook, uint eventType, IntPtr hwnd, int idObject, int idChild, uint dwEventThread,
             uint dwmsEventTime);
@@ -31,6 +39,12 @@ namespace PoeShared.Native
 
         [DllImport("user32.dll")]
         public static extern bool UnhookWinEvent(IntPtr hHook);
+        
+        [DllImport("user32.dll", CharSet = CharSet.Auto)]
+        public static extern IntPtr FindWindow(string strClassName, string strWindowName);
+
+        [DllImport("user32.dll")]
+        public static extern bool GetWindowRect(IntPtr hwnd, ref Rect rectangle);
 
         public static string GetWindowTitle(IntPtr hwnd)
         {
@@ -40,6 +54,18 @@ namespace PoeShared.Native
             return GetWindowText(hwnd, buff, nChars) > 0
                 ? buff.ToString()
                 : null;
+        }
+
+        public static System.Drawing.Rectangle GetWindowRect(IntPtr hwnd)
+        {
+            var result = new Rect();
+            if (!GetWindowRect(hwnd, ref result))
+            {
+                Log.Warn($"Failed to get size of Window by HWND {hwnd.ToInt64():x8}");
+                return Rectangle.Empty;
+            }
+
+            return new System.Drawing.Rectangle((int)result.X, (int)result.Y, (int)result.Width, (int)result.Height);
         }
 
         public static class Constants

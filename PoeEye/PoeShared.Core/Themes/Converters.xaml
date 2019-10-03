@@ -1,0 +1,69 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:blue="http://www.nuget.org/Blue.MVVM"
+                    xmlns:eyeConverters="clr-namespace:PoeShared.Converters"
+                    xmlns:kent="http://schemas.kent.boogaart.com/converters"
+                    xmlns:global="clr-namespace:"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+    <eyeConverters:NullToBoolConverter x:Key="IsNullOrEmptyConverter" NullValue="True" />
+    <eyeConverters:NullToBoolConverter x:Key="IsNotNullOrEmptyConverter" NullValue="False" />
+    <eyeConverters:MultiBooleanConverter x:Key="MultiBooleanOrConverter" />
+    <eyeConverters:MultiDoubleSumConverter x:Key="MultiDoubleSumConverter" />
+
+    <system:Boolean x:Key="FalseValue">False</system:Boolean>
+    <system:Boolean x:Key="TrueValue">True</system:Boolean>
+
+    <blue:BoolToVisibilityConverter x:Key="TrueToVisibleFalseToCollapsedConverter"
+                                    TrueValue="Visible"
+                                    FalseValue="Collapsed" />
+
+    <blue:BoolToVisibilityConverter x:Key="TrueToCollapsedFalseToVisibleConverter"
+                                    TrueValue="Collapsed"
+                                    FalseValue="Visible" />
+
+    <blue:BoolToVisibilityConverter x:Key="TrueToVisibleFalseToHiddenConverter"
+                                    TrueValue="Visible"
+                                    FalseValue="Hidden" />
+
+    <blue:BoolToVisibilityConverter x:Key="TrueToHiddenFalseToVisibleConverter"
+                                    TrueValue="Hidden"
+                                    FalseValue="Visible" />
+
+    <blue:BoolToVisibilityConverter x:Key="FalseToHiddenTrueToVisibleConverter"
+                                    TrueValue="Visible"
+                                    FalseValue="Hidden" />
+    <blue:BoolToVisibilityConverter x:Key="FalseToCollapsedTrueToVisibleConverter"
+                                    TrueValue="Visible"
+                                    FalseValue="Collapsed" />
+
+    <eyeConverters:BoolInversionConverter x:Key="NotConverter" />
+
+    <eyeConverters:ObjectToTypeConverter x:Key="ObjectToTypeConverter" />
+
+    <blue:Int32ToVisibilityConverter x:Key="GreaterThanZeroToVisibleConverter" TrueValue="Visible" FalseValue="Collapsed">
+        <blue:Int32ToVisibilityConverter.ComparisonStrategy>
+            <blue:Int32ComparisonStrategy Mode="GreaterThan" Comparand="0" />
+        </blue:Int32ToVisibilityConverter.ComparisonStrategy>
+    </blue:Int32ToVisibilityConverter>
+
+    <blue:Int32ToVisibilityConverter x:Key="GreaterThanOneToVisibleConverter" TrueValue="Visible" FalseValue="Collapsed">
+        <blue:Int32ToVisibilityConverter.ComparisonStrategy>
+            <blue:Int32ComparisonStrategy Mode="GreaterThan" Comparand="1" />
+        </blue:Int32ToVisibilityConverter.ComparisonStrategy>
+    </blue:Int32ToVisibilityConverter>
+
+    <blue:DoubleToVisibilityConverter x:Key="DoubleGreaterThanZeroToVisibleConverter" TrueValue="Visible" FalseValue="Collapsed">
+        <blue:DoubleToVisibilityConverter.ComparisonStrategy>
+            <blue:DoubleComparisonStrategy Mode="GreaterThan" Comparand="0" />
+        </blue:DoubleToVisibilityConverter.ComparisonStrategy>
+    </blue:DoubleToVisibilityConverter>
+
+    <eyeConverters:NullToVisibilityConverter x:Key="NullToCollapsedConverter" NullValue="Collapsed" NotNullValue="Visible" />
+    <eyeConverters:NullToVisibilityConverter x:Key="NotNullToCollapsedConverter" NullValue="Visible"
+                                             NotNullValue="Collapsed" />
+    <eyeConverters:NullToVisibilityConverter x:Key="NullToHiddenConverter" NullValue="Hidden" NotNullValue="Visible" />
+    <eyeConverters:NullToVisibilityConverter x:Key="NotNullToHiddenConverter" NullValue="Visible" NotNullValue="Hidden" />
+    <eyeConverters:ExceptionToMessageConverter x:Key="ExceptionToMessageConverter" />
+    <eyeConverters:TimeSpanToHumanReadableStringConverter x:Key="TimeSpanToHumanReadableStringConverter" />
+
+</ResourceDictionary>

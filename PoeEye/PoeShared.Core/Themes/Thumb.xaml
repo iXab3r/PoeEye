@@ -1,0 +1,46 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Colors.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+
+    <Style TargetType="{x:Type Thumb}" x:Key="OverlayThumbStyleKey">
+        <Setter Property="Foreground" Value="{StaticResource OverlayTitleBackgroundBrushKey}" />
+        <Setter Property="Background" Value="{StaticResource OverlayForegroundBrushKey}" />
+        <Setter Property="BorderBrush" Value="{StaticResource OverlayBorderBrushKey}" />
+        <Setter Property="Cursor" Value="{x:Static Cursors.AppStarting}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Thumb}">
+                    <Viewbox Width="{TemplateBinding Width}" Height="{TemplateBinding Height}">
+                        <Canvas Width="50" Height="50" Background="Transparent">
+                            <Path Data="M50,0 V50 H0 L50,0"
+                                  StrokeThickness="{TemplateBinding BorderThickness}"
+                                  Stroke="{TemplateBinding BorderBrush}" />
+
+                            <Path Data="M45,15 V45 H12 L45,15"
+                                  StrokeThickness="{TemplateBinding BorderThickness}"
+                                  Stroke="{TemplateBinding BorderBrush}"
+                                  Fill="{TemplateBinding Background}" />
+                            <Path Data="M50,-10 L-10,50"
+                                  StrokeThickness="{TemplateBinding BorderThickness}"
+                                  Stroke="{TemplateBinding BorderBrush}" />
+                        </Canvas>
+                    </Viewbox>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+
+        <Style.Triggers>
+            <Trigger Property="IsDragging" Value="True">
+                <Setter Property="Cursor" Value="{x:Static Cursors.SizeNWSE}" />
+                <Setter Property="Background" Value="{Binding RelativeSource={RelativeSource Self}, Path=Foreground}" />
+            </Trigger>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Cursor" Value="{x:Static Cursors.SizeNWSE}" />
+            </Trigger>
+        </Style.Triggers>
+
+    </Style>
+</ResourceDictionary>

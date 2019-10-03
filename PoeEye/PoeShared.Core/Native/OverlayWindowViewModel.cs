@@ -1,5 +1,5 @@
 ﻿using System.Windows;
-using JetBrains.Annotations;
+using DynamicData.Annotations;
 using PoeShared.Scaffolding;
 using ReactiveUI;
 

@@ -13,5 +13,10 @@ namespace PoeShared.Scaffolding
         {
             return new Size(size.Width * factor.X, size.Height * factor.Y);
         }
+        
+        public static Size Scale(this Size size, double factorX, double factorY)
+        {
+            return new Size(size.Width * factorX, size.Height * factorY);
+        }
     }
 }
