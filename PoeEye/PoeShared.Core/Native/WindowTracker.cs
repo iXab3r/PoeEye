@@ -34,6 +34,7 @@ namespace PoeShared.Native
 
             timerObservable
                 .Select(_ => UnsafeNative.GetForegroundWindow())
+                .StartWithDefault()
                 .DistinctUntilChanged()
                 .Subscribe(WindowActivated, Log.HandleUiException)
                 .AddTo(Anchors);

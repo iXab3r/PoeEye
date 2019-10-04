@@ -236,6 +236,7 @@
     <Compile Include="IClock.cs" />
     <Compile Include="IRandomNumberGenerator.cs" />
     <Compile Include="Scaffolding\StringUtils.cs" />
+    <Compile Include="Scaffolding\WPF\BindableSelectedItemBehavior.cs" />
     <Compile Include="Services\IStartupManager.cs" />
     <Compile Include="Services\StartupManager.cs" />
     <Compile Include="Services\StartupManagerArgs.cs" />
