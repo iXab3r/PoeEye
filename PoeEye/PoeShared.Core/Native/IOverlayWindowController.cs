@@ -7,6 +7,9 @@ namespace PoeShared.Native
     public interface IOverlayWindowController : IDisposableReactiveObject
     {
         bool IsVisible { get; }
+        
+        bool IsEnabled { get; set; }
+        
         IDisposable RegisterChild([NotNull] IOverlayViewModel viewModel);
 
         void ActivateLastActiveWindow();

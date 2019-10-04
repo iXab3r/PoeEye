@@ -17,6 +17,7 @@ using PoeShared.Prism;
 using PoeShared.Scaffolding;
 using ReactiveUI;
 using Unity;
+using Point = System.Windows.Point;
 
 namespace PoeShared.Native
 {
@@ -32,7 +33,7 @@ namespace PoeShared.Native
         private readonly IWindowTracker windowTracker;
 
         private bool isVisible;
-
+        private bool isEnabled;
         private bool showWireframes;
 
         public OverlayWindowController(
@@ -52,17 +53,18 @@ namespace PoeShared.Native
                 $"[PoeEye.Overlay] {windowTracker}"
             };
 
-            windowTracker.WhenAnyValue(x => x.ActiveWindowHandle)
+            Observable.Merge(windowTracker.WhenAnyValue(x => x.ActiveWindowHandle).ToUnit(), this.WhenAnyValue(x => x.IsEnabled).ToUnit())
                 .Select(
                     x => new
                     {
-                        ActiveWindowHandle = x,
+                        ActiveWindowHandle = windowTracker.ActiveWindowHandle,
+                        ActiveTitle = windowTracker.ActiveWindowTitle,
                         WindowIsActive = windowTracker.IsActive,
                         OverlayIsActive = IsPairedOverlay(windowTracker.ActiveWindowTitle),
-                        ActiveTitle = windowTracker.ActiveWindowTitle
+                        IsEnabled
                     })
                 .Do(x => Log.Debug($"Active window has changed: {x}"))
-                .Select(x => x.WindowIsActive || x.OverlayIsActive)
+                .Select(x => (x.WindowIsActive || x.OverlayIsActive) && x.IsEnabled)
                 .DistinctUntilChanged()
                 .ObserveOn(uiScheduler)
                 .Subscribe(SetVisibility, Log.HandleUiException)
@@ -96,6 +98,12 @@ namespace PoeShared.Native
             private set => this.RaiseAndSetIfChanged(ref isVisible, value);
         }
 
+        public bool IsEnabled
+        {
+            get => isEnabled;
+            set => this.RaiseAndSetIfChanged(ref isEnabled, value);
+        }
+
         public IOverlayViewModel[] GetChildren()
         {
             return windows.Items
@@ -124,7 +132,7 @@ namespace PoeShared.Native
             {
                 DataContext = overlayWindowViewModel,
                 Title = $"[PoeEye.Overlay] {windowTracker} #{overlayName} #{windows.Count + 1}",
-                Visibility = Visibility.Visible,
+                Visibility = Visibility.Collapsed,
                 Topmost = true,
                 Name = $"{overlayName}_OverlayView"
             };
@@ -210,7 +218,16 @@ namespace PoeShared.Native
                     overlayWindow.Visibility = Visibility.Visible;
                 }
 
-                var location = overlayWindow.PointToScreen(new System.Windows.Point(0, 0));
+                Point location;
+                if (overlayWindow.IsVisible)
+                {
+                    location = overlayWindow.PointToScreen(new System.Windows.Point(0, 0));
+                }
+                else
+                {
+                    location = new Point(overlayWindow.Left, overlayWindow.Top);
+                }
+                
                 WindowsServices.ShowInactiveTopmost(
                     overlayWindowHandle,
                     (int) location.X,

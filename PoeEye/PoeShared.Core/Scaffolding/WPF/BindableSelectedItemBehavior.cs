@@ -1,28 +1,37 @@
+using System.Reactive.Disposables;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Interactivity;
+using System;
 
 namespace PoeShared.Scaffolding.WPF
 {
     public class BindableSelectedItemBehavior : Behavior<TreeView>
     {
+        private readonly SerialDisposable attachmentAnchor = new SerialDisposable();
+        
         protected override void OnAttached()
         {
             base.OnAttached();
 
-            AssociatedObject.SelectedItemChanged += OnTreeViewSelectedItemChanged;
+            var anchors = new CompositeDisposable();
+            attachmentAnchor.Disposable = anchors;
+
+            AssociatedObject
+                .Observe(TreeView.SelectedItemProperty)
+                .Subscribe(x => OnTreeViewSelectedItemChanged(AssociatedObject.SelectedItem))
+                .AddTo(anchors);
         }
 
         protected override void OnDetaching()
         {
             base.OnDetaching();
-
-            if (AssociatedObject != null) AssociatedObject.SelectedItemChanged -= OnTreeViewSelectedItemChanged;
+            attachmentAnchor.Disposable = null;
         }
 
-        private void OnTreeViewSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        private void OnTreeViewSelectedItemChanged(object newValue)
         {
-            SelectedItem = e.NewValue;
+            SelectedItem = newValue;
         }
 
         #region SelectedItem Property
@@ -35,13 +44,7 @@ namespace PoeShared.Scaffolding.WPF
 
         public static readonly DependencyProperty SelectedItemProperty =
             DependencyProperty.Register("SelectedItem", typeof(object), typeof(BindableSelectedItemBehavior),
-                new UIPropertyMetadata(null, OnSelectedItemChanged));
-
-        private static void OnSelectedItemChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
-        {
-            var item = e.NewValue as TreeViewItem;
-            if (item != null) item.SetValue(TreeViewItem.IsSelectedProperty, true);
-        }
+                new UIPropertyMetadata(null));
 
         #endregion
     }

@@ -202,6 +202,7 @@
     <Compile Include="Native\IActivationController.cs" />
     <Compile Include="Native\ICanBeEnabled.cs" />
     <Compile Include="Native\IClipboardManager.cs" />
+    <Compile Include="Native\ICloseController.cs" />
     <Compile Include="Native\IKeyboardEventsSource.cs" />
     <Compile Include="Native\IOverlayConfig.cs" />
     <Compile Include="Native\IStringMatcher.cs" />
