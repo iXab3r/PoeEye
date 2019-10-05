@@ -60,6 +60,10 @@ namespace PoeShared.Native
                 })
                 .AddTo(Anchors);
 
+            this.WhenAnyValue(x => x.Left, x => x.Top, x => x.Width, x => x.Height)
+                .Subscribe(() => this.RaisePropertyChanged(nameof(Bounds)))
+                .AddTo(Anchors);
+
             Title = GetType().ToString();
             WhenLoaded.Subscribe(OnLoaded).AddTo(Anchors);
         }
@@ -113,6 +117,8 @@ namespace PoeShared.Native
             get => actualWidth;
             set => this.RaiseAndSetIfChanged(ref actualWidth, value);
         }
+
+        public Rect Bounds => new Rect { X = Left, Y = Top, Width = Width, Height = Height };
 
         public double Left
         {

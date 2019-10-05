@@ -9,6 +9,8 @@ namespace PoeShared.Native
 {
     public interface IOverlayViewModel : IDisposableReactiveObject
     {
+        Rect Bounds { get; }
+    
         double Left { get; set; }
 
         double Top { get; set; }
