@@ -3,6 +3,7 @@ using System.Drawing;
 using System.Reactive;
 using System.Reactive.Subjects;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Input;
@@ -23,6 +24,10 @@ namespace PoeShared.Native
 
         private readonly CommandWrapper lockWindowCommand;
         private readonly CommandWrapper unlockWindowCommand;
+        
+        private readonly CommandWrapper makeLayeredCommand;
+        private readonly CommandWrapper makeTransparentCommand;
+        
         private double actualHeight;
 
         private double actualWidth;
@@ -52,11 +57,21 @@ namespace PoeShared.Native
         {
             lockWindowCommand = CommandWrapper.Create(LockWindowCommandExecuted, LockWindowCommandCanExecute);
             unlockWindowCommand = CommandWrapper.Create(UnlockWindowCommandExecuted, UnlockWindowCommandCanExecute);
+            makeLayeredCommand = CommandWrapper.Create(MakeLayeredCommandExecuted, MakeLayeredCommandCanExecute);
+            makeTransparentCommand = CommandWrapper.Create(MakeTransparentCommandExecuted, MakeTransparentCommandCanExecute);
             this.WhenAnyValue(x => x.IsLocked, x => x.IsUnlockable)
                 .Subscribe(() =>
                 {
                     lockWindowCommand.RaiseCanExecuteChanged();
                     unlockWindowCommand.RaiseCanExecuteChanged();
+                })
+                .AddTo(Anchors);
+            
+            this.WhenAnyValue(x => x.OverlayMode)
+                .Subscribe(() =>
+                {
+                    makeLayeredCommand.RaiseCanExecuteChanged();
+                    makeTransparentCommand.RaiseCanExecuteChanged();
                 })
                 .AddTo(Anchors);
 
@@ -97,6 +112,10 @@ namespace PoeShared.Native
         }
 
         public ICommand UnlockWindowCommand => unlockWindowCommand;
+        
+        public ICommand MakeLayeredCommand => makeLayeredCommand;
+        
+        public ICommand MakeTransparentCommand => makeTransparentCommand;
 
         public ICommand LockWindowCommand => lockWindowCommand;
 
@@ -356,6 +375,36 @@ namespace PoeShared.Native
         protected virtual bool LockWindowCommandCanExecute()
         {
             return !IsLocked;
+        }
+        
+        protected virtual bool MakeLayeredCommandCanExecute()
+        {
+            return OverlayMode == OverlayMode.Transparent;
+        }
+
+        protected virtual void MakeLayeredCommandExecuted()
+        {
+            if (!MakeLayeredCommandCanExecute())
+            {
+                throw new InvalidOperationException($"[{OverlayDescription}] Unsupported operation in this state, overlay(OverlayMode: {OverlayMode}): {this.DumpToTextRaw()}");
+            }
+            Log.Debug($"[{OverlayDescription}] Making overlay Layered");
+            OverlayMode = OverlayMode.Layered;
+        }
+        
+        protected virtual bool MakeTransparentCommandCanExecute()
+        {
+            return OverlayMode == OverlayMode.Layered;
+        }
+
+        protected virtual void MakeTransparentCommandExecuted()
+        {
+            if (!MakeTransparentCommandCanExecute())
+            {
+                throw new InvalidOperationException($"[{OverlayDescription}] Unsupported operation in this state, overlay(OverlayMode: {OverlayMode}): {this.DumpToTextRaw()}");
+            }
+            Log.Debug($"[{OverlayDescription}] Making overlay Transparent");
+            OverlayMode = OverlayMode.Transparent;
         }
         
         internal static class NativeMethods

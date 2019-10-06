@@ -205,6 +205,7 @@
     <Compile Include="Native\ICloseController.cs" />
     <Compile Include="Native\IKeyboardEventsSource.cs" />
     <Compile Include="Native\IOverlayConfig.cs" />
+    <Compile Include="Native\IRegexStringMatcher.cs" />
     <Compile Include="Native\IStringMatcher.cs" />
     <Compile Include="Native\IWindowTracker.cs" />
     <Compile Include="Native\IWinEventHookWrapper.cs" />

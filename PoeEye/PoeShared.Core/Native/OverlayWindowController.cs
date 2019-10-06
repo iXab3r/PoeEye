@@ -31,6 +31,7 @@ namespace PoeShared.Native
 
         private readonly ISourceList<OverlayWindowView> windows = new SourceList<OverlayWindowView>();
         private readonly IWindowTracker windowTracker;
+        private readonly string uniqueControllerId = Guid.NewGuid().ToString();
 
         private bool isVisible;
         private bool isEnabled;
@@ -50,7 +51,7 @@ namespace PoeShared.Native
 
             possibleOverlayNames = new[]
             {
-                $"[PoeEye.Overlay] {windowTracker}"
+                $"[PoeEye.Overlay] {uniqueControllerId}"
             };
 
             Observable.Merge(windowTracker.WhenAnyValue(x => x.ActiveWindowHandle).ToUnit(), this.WhenAnyValue(x => x.IsEnabled).ToUnit())
@@ -64,7 +65,7 @@ namespace PoeShared.Native
                         IsEnabled
                     })
                 .Do(x => Log.Debug($"Active window has changed: {x}"))
-                .Select(x => (x.WindowIsActive || x.OverlayIsActive) && x.IsEnabled)
+                .Select(x => (x.WindowIsActive || x.OverlayIsActive) && IsEnabled)
                 .DistinctUntilChanged()
                 .ObserveOn(uiScheduler)
                 .Subscribe(SetVisibility, Log.HandleUiException)
@@ -131,7 +132,7 @@ namespace PoeShared.Native
             var overlayWindow = new OverlayWindowView
             {
                 DataContext = overlayWindowViewModel,
-                Title = $"[PoeEye.Overlay] {windowTracker} #{overlayName} #{windows.Count + 1}",
+                Title = $"[PoeEye.Overlay] {uniqueControllerId} {windowTracker} #{overlayName} #{windows.Count + 1}",
                 Visibility = Visibility.Collapsed,
                 Topmost = true,
                 Name = $"{overlayName}_OverlayView"
@@ -209,6 +210,8 @@ namespace PoeShared.Native
         private void HandleVisibilityChange(OverlayWindowView overlayWindow, IOverlayViewModel viewModel)
         {
             var overlayWindowHandle = new WindowInteropHelper(overlayWindow).Handle;
+           
+            
             if (isVisible)
             {
                 Log.Debug($"[#{overlayWindow.Name}] Showing overlay {overlayWindow}");
@@ -234,6 +237,9 @@ namespace PoeShared.Native
                     (int) location.Y,
                     (int) viewModel.Width,
                     (int) viewModel.Height);
+            } else if (overlayWindowHandle == IntPtr.Zero)
+            {
+                Log.Debug($"[#{overlayWindow.Name}] Overlay is not initialized yet");
             }
             else
             {

@@ -8,7 +8,7 @@ using PoeShared.Scaffolding;
 
 namespace PoeShared.Native
 {
-    public sealed class RegexStringMatcher : IStringMatcher
+    public sealed class RegexStringMatcher : IRegexStringMatcher
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(RegexStringMatcher));
         private readonly ConcurrentDictionary<string, Regex> blacklist = new ConcurrentDictionary<string, Regex>();
@@ -91,7 +91,7 @@ namespace PoeShared.Native
             return this;
         }
 
-        public RegexStringMatcher AddToBlacklist(string regexValue)
+        public IRegexStringMatcher AddToBlacklist(string regexValue)
         {
             Guard.ArgumentNotNull(regexValue, nameof(regexValue));
 
@@ -99,13 +99,20 @@ namespace PoeShared.Native
             return this;
         }
 
-        public RegexStringMatcher AddToWhitelist(string regexValue)
+        public IRegexStringMatcher AddToWhitelist(string regexValue)
         {
             Guard.ArgumentNotNull(regexValue, nameof(regexValue));
 
             whitelist[regexValue] = ConstructRegex(regexValue);
             return this;
         }
+
+        public IRegexStringMatcher ClearWhitelist()
+        {
+            whitelist.Clear();
+            return this;
+        }
+
 
         private Regex ConstructRegex(string regexValue)
         {

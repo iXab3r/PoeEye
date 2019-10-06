@@ -44,6 +44,10 @@ namespace PoeShared.Native
         ICommand LockWindowCommand { [NotNull] get; }
 
         ICommand UnlockWindowCommand { [NotNull] get; }
+        
+        ICommand MakeLayeredCommand { [NotNull] get; }
+
+        ICommand MakeTransparentCommand { [NotNull] get; }
 
         void ResetToDefault();
 

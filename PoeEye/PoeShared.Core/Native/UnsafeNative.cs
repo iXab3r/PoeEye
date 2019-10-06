@@ -42,6 +42,9 @@ namespace PoeShared.Native
         
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         public static extern IntPtr FindWindow(string strClassName, string strWindowName);
+        
+        [DllImport("user32.dll", SetLastError=true)]
+        static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
 
         [DllImport("user32.dll")]
         public static extern bool GetWindowRect(IntPtr hwnd, ref Rect rectangle);
@@ -54,6 +57,12 @@ namespace PoeShared.Native
             return GetWindowText(hwnd, buff, nChars) > 0
                 ? buff.ToString()
                 : null;
+        }
+
+        public static uint GetProcessIdByWindowHandle(IntPtr hwnd)
+        {
+            GetWindowThreadProcessId(hwnd, out var processId);
+            return processId;
         }
 
         public static System.Drawing.Rectangle GetWindowRect(IntPtr hwnd)
