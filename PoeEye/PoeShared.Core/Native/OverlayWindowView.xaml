@@ -35,8 +35,8 @@
             <Setter Property="Top" Value="{Binding Content.Top, Mode=TwoWay}" />
             <Setter Property="Width" Value="{Binding Content.Width, Mode=TwoWay}" />
             <Setter Property="Height" Value="{Binding Content.Height, Mode=TwoWay}" />
-            <Setter Property="MaxWidth" Value="{Binding Content.MaxSize.Width, Mode=TwoWay}" />
-            <Setter Property="MaxHeight" Value="{Binding Content.MaxSize.Height, Mode=TwoWay}" />
+            <Setter Property="MaxWidth" Value="{Binding Content.MaxSize.Width, Mode=TwoWay, FallbackValue=0}" />
+            <Setter Property="MaxHeight" Value="{Binding Content.MaxSize.Height, Mode=TwoWay, FallbackValue=0}" />
             <Setter Property="MinWidth" Value="{Binding Content.MinSize.Width, Mode=TwoWay}" />
             <Setter Property="MinHeight" Value="{Binding Content.MinSize.Height, Mode=TwoWay}" />
             <Setter Property="ResizeMode" Value="NoResize" />

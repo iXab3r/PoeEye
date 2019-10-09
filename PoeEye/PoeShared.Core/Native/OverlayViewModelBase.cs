@@ -42,7 +42,7 @@ namespace PoeShared.Native
         private bool enableHeader = true;
 
         private double left;
-        private Size maxSize = new Size(double.NaN, double.NaN);
+        private Size maxSize = new Size(Int16.MaxValue, Int16.MaxValue);
         private Size minSize = new Size(0, 0);
         private float opacity;
 
