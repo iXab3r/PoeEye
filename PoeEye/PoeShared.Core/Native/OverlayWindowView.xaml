@@ -28,7 +28,7 @@
         <Style TargetType="{x:Type native:TransparentWindow}">
             <Setter Property="Background" Value="{x:Null}" />
             <Setter Property="BorderBrush" Value="{x:Null}" />
-            <Setter Property="AllowsTransparency" Value="True" />
+            <Setter Property="AllowsTransparency" Value="False" />
             <Setter Property="WindowStyle" Value="None" />
             <Setter Property="DataContext" Value="{Binding}" />
             <Setter Property="Left" Value="{Binding Content.Left, Mode=TwoWay}" />
@@ -53,83 +53,85 @@
             <Border>
                 <Grid TextBlock.Foreground="{StaticResource PoeFontBrush}">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="36" />
-                        <RowDefinition Height="5" />
+                        <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
 
                     <!-- Header -->
-                    <Border Grid.Row="0"
+                    <Grid Grid.Row="0" Height="36" Visibility="{Binding Content.EnableHeader, Converter={StaticResource TrueToVisibleFalseToCollapsedConverter}}">
+                        <Border 
                             wpf:EnableDragHelper.EnableDrag="True"
                             Background="{StaticResource OverlayWindowTitleBackgroundBrushKey}"
                             BorderBrush="{StaticResource OverlayWindowBorderBrushKey}"
                             BorderThickness="1"
                             Visibility="{Binding Content.IsLocked, Converter={StaticResource TrueToHiddenFalseToVisibleConverter}}"
-                            Margin="3">
-                        <StackPanel Orientation="Horizontal">
-                            <Button Command="{Binding Content.LockWindowCommand}" Width="30" Height="30">
-                                <Button.Style>
-                                    <Style TargetType="{x:Type Button}"
-                                           BasedOn="{StaticResource OverlayWindowCircleButtonStyleKey}">
-                                        <Setter Property="Content" Value="&#xf09c;" />
-                                        <Setter Property="Foreground" Value="Red" />
-                                        <Setter Property="Padding" Value="0,2,0,0" />
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding Content.IsLocked}" Value="True" />
+                            Margin="3,3,3,8">
+                            <StackPanel Orientation="Horizontal">
+                                <Button Command="{Binding Content.LockWindowCommand}" Width="30" Height="30">
+                                    <Button.Style>
+                                        <Style TargetType="{x:Type Button}"
+                                               BasedOn="{StaticResource OverlayWindowCircleButtonStyleKey}">
+                                            <Setter Property="Content" Value="&#xf09c;" />
+                                            <Setter Property="Foreground" Value="Red" />
+                                            <Setter Property="Padding" Value="0,2,0,0" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Content.IsLocked}" Value="True" />
 
-                                            <Trigger Property="IsMouseOver" Value="True">
-                                                <Setter Property="Content" Value="&#xf023;" />
-                                                <Setter Property="Foreground" Value="GreenYellow" />
-                                            </Trigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </Button.Style>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter Property="Content" Value="&#xf023;" />
+                                                    <Setter Property="Foreground" Value="GreenYellow" />
+                                                </Trigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Button.Style>
 
-                                <Button.Triggers>
-                                    <EventTrigger RoutedEvent="Mouse.MouseEnter">
-                                        <EventTrigger.EnterActions>
-                                            <BeginStoryboard>
-                                                <Storyboard>
-                                                    <DoubleAnimation
-                                                        Storyboard.TargetName="TradeMonitorBackground"
-                                                        Storyboard.TargetProperty="Opacity"
-                                                        From="1"
-                                                        To="0.1"
-                                                        Duration="0:0:1" />
-                                                </Storyboard>
-                                            </BeginStoryboard>
-                                        </EventTrigger.EnterActions>
-                                    </EventTrigger>
-                                    <EventTrigger RoutedEvent="Mouse.MouseLeave">
-                                        <EventTrigger.EnterActions>
-                                            <BeginStoryboard>
-                                                <Storyboard>
-                                                    <DoubleAnimation
-                                                        Storyboard.TargetName="TradeMonitorBackground"
-                                                        Storyboard.TargetProperty="Opacity"
-                                                        To="1"
-                                                        Duration="0:0:1" />
-                                                </Storyboard>
-                                            </BeginStoryboard>
-                                        </EventTrigger.EnterActions>
-                                    </EventTrigger>
-                                </Button.Triggers>
-                            </Button>
-                            <TextBlock Style="{StaticResource OverlayWindowTextBlockStyleKey}"
-                                       Text="{Binding Content.Title}"
-                                       Foreground="#EEC64C"
-                                       HorizontalAlignment="Center"
-                                       FontWeight="Bold" />
-                        </StackPanel>
-                    </Border>
+                                    <Button.Triggers>
+                                        <EventTrigger RoutedEvent="Mouse.MouseEnter">
+                                            <EventTrigger.EnterActions>
+                                                <BeginStoryboard>
+                                                    <Storyboard>
+                                                        <DoubleAnimation
+                                                            Storyboard.TargetName="TradeMonitorBackground"
+                                                            Storyboard.TargetProperty="Opacity"
+                                                            From="1"
+                                                            To="0.1"
+                                                            Duration="0:0:1" />
+                                                    </Storyboard>
+                                                </BeginStoryboard>
+                                            </EventTrigger.EnterActions>
+                                        </EventTrigger>
+                                        <EventTrigger RoutedEvent="Mouse.MouseLeave">
+                                            <EventTrigger.EnterActions>
+                                                <BeginStoryboard>
+                                                    <Storyboard>
+                                                        <DoubleAnimation
+                                                            Storyboard.TargetName="TradeMonitorBackground"
+                                                            Storyboard.TargetProperty="Opacity"
+                                                            To="1"
+                                                            Duration="0:0:1" />
+                                                    </Storyboard>
+                                                </BeginStoryboard>
+                                            </EventTrigger.EnterActions>
+                                        </EventTrigger>
+                                    </Button.Triggers>
+                                </Button>
+                                <TextBlock Style="{StaticResource OverlayWindowTextBlockStyleKey}"
+                                           Text="{Binding Content.Title}"
+                                           Foreground="#EEC64C"
+                                           HorizontalAlignment="Center"
+                                           FontWeight="Bold" />
+                            </StackPanel>
+                        </Border>
+                    </Grid>
 
-                    <Border Grid.Row="2"
+                    <Border Grid.Row="1"
                             BorderBrush="{StaticResource OverlayWindowBorderBrushKey}"
                             BorderThickness="1"
                             Visibility="{Binding Content.IsLocked, Converter={StaticResource TrueToHiddenFalseToVisibleConverter}}" />
 
                     <!-- Body -->
-                    <ContentControl Grid.Row="2"
+                    <native:ContentControlEx Grid.Row="1"
+                                    Location="{Binding Content.ViewModelLocation, Mode=OneWayToSource}"
                                     Content="{Binding Content}"
                                     ContentTemplate="{Binding ContentTemplate}" />
                 </Grid>

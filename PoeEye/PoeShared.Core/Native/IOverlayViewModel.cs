@@ -29,14 +29,14 @@ namespace PoeShared.Native
 
         Size MaxSize { get; set; }
 
+        bool EnableHeader { get; set; }
+        
         bool IsLocked { get; }
 
         bool IsUnlockable { get; }
 
         OverlayMode OverlayMode { get; set; }
-
-        IObservable<EventPattern<RoutedEventArgs>> WhenLoaded { [NotNull] get; }
-
+        
         SizeToContent SizeToContent { get; }
 
         string Title { [CanBeNull] get; }
@@ -48,9 +48,13 @@ namespace PoeShared.Native
         ICommand MakeLayeredCommand { [NotNull] get; }
 
         ICommand MakeTransparentCommand { [NotNull] get; }
+        
+        Point ViewModelLocation { get; }
 
         void ResetToDefault();
 
         void SetActivationController([NotNull] IActivationController controller);
+
+        void SetOverlayWindow([NotNull] Window owner);
     }
 }

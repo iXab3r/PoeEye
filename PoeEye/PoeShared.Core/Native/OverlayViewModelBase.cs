@@ -2,6 +2,7 @@
 using System.Drawing;
 using System.Reactive;
 using System.Reactive.Subjects;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Windows;
@@ -37,6 +38,7 @@ namespace PoeShared.Native
         private double height;
         private bool isLocked = true;
         private bool isUnlockable;
+        private bool enableHeader = true;
 
         private double left;
         private Size maxSize = new Size(double.NaN, double.NaN);
@@ -49,9 +51,11 @@ namespace PoeShared.Native
         private string title;
 
         private double top;
+        private double? targetAspectRatio;
 
         private double width;
         private Window overlayWindow;
+        private Point viewModelLocation;
 
         protected OverlayViewModelBase()
         {
@@ -80,24 +84,11 @@ namespace PoeShared.Native
                 .AddTo(Anchors);
 
             Title = GetType().ToString();
-            WhenLoaded.Subscribe(OnLoaded).AddTo(Anchors);
+            WhenLoaded = new ReplaySubject<Unit>(1);
+            this.WhenAnyValue(x => x.OverlayWindow).ToUnit().Subscribe(WhenLoaded).AddTo(Anchors);
         }
 
-        private void OnLoaded(EventPattern<RoutedEventArgs> loadedArgs)
-        {
-            var window = loadedArgs.Sender as Window;
-            if (window == null)
-            {
-                Log.Warn("Something went wrong - expected Window as a sender of Loaded event");
-                return;
-            }
-
-            var interopHelper = new WindowInteropHelper(window);
-            Log.Debug($"[#{this}] Loaded overlay window: {OverlayWindow} (0x{interopHelper.Handle.ToInt64():x8})");
-            OverlayWindow = window;
-        }
-
-        protected ISubject<EventPattern<RoutedEventArgs>> WhenLoaded { get; } = new ReplaySubject<EventPattern<RoutedEventArgs>>(1);
+        protected ISubject<Unit> WhenLoaded { get; } 
 
         public bool GrowUpwards
         {
@@ -111,6 +102,18 @@ namespace PoeShared.Native
             set => this.RaiseAndSetIfChanged(ref opacity, value);
         }
 
+        public double? TargetAspectRatio
+        {
+            get => targetAspectRatio;
+            set => this.RaiseAndSetIfChanged(ref targetAspectRatio, value);
+        }
+
+        public Point ViewModelLocation 
+        {
+            get => viewModelLocation;
+            set => this.RaiseAndSetIfChanged(ref viewModelLocation, value);
+        }
+        
         public ICommand UnlockWindowCommand => unlockWindowCommand;
         
         public ICommand MakeLayeredCommand => makeLayeredCommand;
@@ -189,6 +192,12 @@ namespace PoeShared.Native
             }
         }
 
+        public bool EnableHeader
+        {
+            get => enableHeader;
+            set => this.RaiseAndSetIfChanged(ref enableHeader, value);
+        }
+
         public bool IsUnlockable
         {
             get => isUnlockable;
@@ -200,8 +209,6 @@ namespace PoeShared.Native
             get => overlayMode;
             set => this.RaiseAndSetIfChanged(ref overlayMode, value);
         }
-
-        IObservable<EventPattern<RoutedEventArgs>> IOverlayViewModel.WhenLoaded => WhenLoaded;
 
         public SizeToContent SizeToContent
         {
@@ -252,7 +259,20 @@ namespace PoeShared.Native
         {
             Guard.ArgumentNotNull(controller, nameof(controller));
         }
-        
+
+        public void SetOverlayWindow(Window owner)
+        {
+            Guard.ArgumentNotNull(owner, nameof(owner));
+            
+            if (this.OverlayWindow != null)
+            {
+                throw new InvalidOperationException($"Window is already assigned");
+            }
+            OverlayWindow = owner;
+            var interopHelper = new WindowInteropHelper(OverlayWindow);
+            Log.Debug($"[#{this}] Loaded overlay window: {OverlayWindow} (0x{interopHelper.Handle.ToInt64():x8})");
+        }
+
         protected void ApplyConfig(IOverlayConfig config)
         {
             Log.Debug($"[{OverlayDescription}] Applying configuration of type ({config.GetType().FullName}): {config.DumpToTextRaw()}");

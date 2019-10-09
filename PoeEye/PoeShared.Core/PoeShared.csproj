@@ -199,6 +199,7 @@
     <Compile Include="Modularity\PoeEyeConfigProviderInMemory.cs" />
     <Compile Include="Modularity\SchedulerProvider.cs" />
     <Compile Include="Native\ClipboardManager.cs" />
+    <Compile Include="Native\ContentControlEx.cs" />
     <Compile Include="Native\IActivationController.cs" />
     <Compile Include="Native\ICanBeEnabled.cs" />
     <Compile Include="Native\IClipboardManager.cs" />

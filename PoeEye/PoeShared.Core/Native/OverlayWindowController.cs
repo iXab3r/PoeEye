@@ -161,14 +161,10 @@ namespace PoeShared.Native
                 .Subscribe(overlayWindow.SetOverlayMode)
                 .AddTo(childAnchors);
 
-            //FIXME Inheritance problem
-            if (viewModel.WhenLoaded is IObserver<EventPattern<RoutedEventArgs>> observer)
-            {
-                overlayWindow.WhenLoaded
-                    .Do(args => Log.Debug($"[#{overlayWindow.Name}] Overlay is loaded, window: {args.Sender}"))
-                    .Subscribe(observer)
-                    .AddTo(childAnchors);
-            }
+            overlayWindow.WhenLoaded
+                .Do(args => Log.Debug($"[#{overlayWindow.Name}] Overlay is loaded, window: {args.Sender}"))
+                .Subscribe(() => viewModel.SetOverlayWindow(overlayWindow))
+                .AddTo(childAnchors);
 
             overlayWindow
                 .WhenRendered
