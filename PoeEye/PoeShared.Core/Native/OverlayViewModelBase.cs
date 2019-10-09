@@ -34,6 +34,7 @@ namespace PoeShared.Native
         private double actualWidth;
 
         private bool growUpwards;
+        private bool showInTaskbar;
 
         private double height;
         private bool isLocked = true;
@@ -202,6 +203,12 @@ namespace PoeShared.Native
         {
             get => isUnlockable;
             protected set => this.RaiseAndSetIfChanged(ref isUnlockable, value);
+        }
+
+        public bool ShowInTaskbar
+        {
+            get => showInTaskbar;
+            set => this.RaiseAndSetIfChanged(ref showInTaskbar, value);
         }
 
         public OverlayMode OverlayMode

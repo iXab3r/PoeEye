@@ -8,11 +8,11 @@
     xmlns:wpf="clr-namespace:PoeShared.Scaffolding.WPF"
     xmlns:converters="http://schemas.kent.boogaart.com/converters"
     mc:Ignorable="d"
-    ShowInTaskbar="False"
     d:DataContext="{d:DesignInstance native:OverlayWindowViewModel}"
     WindowStartupLocation="Manual"
     Focusable="False"
     IsTabStop="False"
+    ShowInTaskbar="{Binding Content.ShowInTaskbar, Mode=TwoWay}"
     ShowActivated="False"
     SizeChanged="OverlayChildWindow_OnSizeChanged">
 

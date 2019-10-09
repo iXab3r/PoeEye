@@ -29,6 +29,8 @@ namespace PoeShared.Native
 
         Size MaxSize { get; set; }
 
+        bool ShowInTaskbar { get; set; }
+
         bool EnableHeader { get; set; }
         
         bool IsLocked { get; }

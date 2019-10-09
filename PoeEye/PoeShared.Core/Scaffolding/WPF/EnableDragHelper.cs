@@ -1,6 +1,8 @@
+using System;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Threading;
 
 namespace PoeShared.Scaffolding.WPF
 {
@@ -59,7 +61,13 @@ namespace PoeShared.Scaffolding.WPF
             }
 
             var window = parent as Window;
-            window.DragMove();
+            Dispatcher.CurrentDispatcher.BeginInvoke(new Action(() =>
+            {
+                if (Mouse.LeftButton == MouseButtonState.Pressed)
+                {
+                    window.DragMove();
+                }
+            }));
         }
 
         public static void SetEnableDrag(DependencyObject element, bool value)
