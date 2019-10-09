@@ -15,32 +15,21 @@ namespace PoeShared.Scaffolding.WPF
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(CommandWrapper));
 
-        private readonly ObservableAsPropertyHelper<bool> isBusy;
         private readonly ISubject<bool> isExecuting = new Subject<bool>();
 
         private readonly ISubject<Unit> raiseCanExecuteChangedRequests = new Subject<Unit>();
         private string description;
         private string error;
-
-        private CommandWrapper(ReactiveCommand command)
-        {
-            InnerCommand = command;
-
-            isBusy = command.IsExecuting.ToProperty(this, x => x.IsBusy);
-            command.ThrownExceptions.Subscribe(HandleException).AddTo(Anchors);
-
-            raiseCanExecuteChangedRequests
-                .Subscribe(() => throw new NotSupportedException($"RaiseCanExecuteChanged is not supported for commands of type {command}"))
-                .AddTo(Anchors);
-        }
+        private bool isBusy;
 
         private CommandWrapper(DelegateCommandBase command)
         {
             InnerCommand = command;
 
-            isBusy = Observable.FromEventPattern<EventHandler, EventArgs>(x => command.IsActiveChanged += x, x => command.IsActiveChanged -= x)
+             Observable.FromEventPattern<EventHandler, EventArgs>(x => command.IsActiveChanged += x, x => command.IsActiveChanged -= x)
                 .Select(x => command.IsActive)
-                .ToProperty(this, x => x.IsBusy);
+                .Subscribe(x => IsBusy = x)
+                .AddTo(Anchors);
 
             isExecuting
                 .Subscribe(x => command.IsActive = x)
@@ -51,7 +40,12 @@ namespace PoeShared.Scaffolding.WPF
                 .AddTo(Anchors);
         }
 
-        public bool IsBusy => isBusy.Value;
+
+        public bool IsBusy
+        {
+            get => isBusy;
+            set => this.RaiseAndSetIfChanged(ref isBusy, value);
+        }
 
         public string Error
         {
@@ -106,16 +100,6 @@ namespace PoeShared.Scaffolding.WPF
             return new CommandWrapper(command);
         }
 
-        public static CommandWrapper Create(ReactiveCommand command)
-        {
-            return new CommandWrapper(command);
-        }
-
-        public static CommandWrapper Create(Func<Task> execute, IObservable<bool> canExecute)
-        {
-            return new CommandWrapper(ReactiveCommand.CreateFromTask(execute, canExecute));
-        }
-
         public static CommandWrapper Create(Action execute)
         {
             return Create(new DelegateCommand(execute));
@@ -124,21 +108,6 @@ namespace PoeShared.Scaffolding.WPF
         public static CommandWrapper Create(Action execute, Func<bool> canExecute)
         {
             return Create(new DelegateCommand(execute, canExecute));
-        }
-
-        public static CommandWrapper Create(Func<Task> execute)
-        {
-            return Create(execute, Observable.Return(true).Concat(Observable.Never<bool>()));
-        }
-
-        public static CommandWrapper Create<TParam>(Func<TParam, Task> execute, IObservable<bool> canExecute)
-        {
-            return new CommandWrapper(ReactiveCommand.CreateFromTask(execute, canExecute));
-        }
-
-        public static CommandWrapper Create<TParam>(Func<TParam, Task> execute)
-        {
-            return Create(execute, Observable.Return(true).Concat(Observable.Never<bool>()));
         }
 
         public CommandWrapper RaiseCanExecuteChangedWhen(IObservable<Unit> eventSource)

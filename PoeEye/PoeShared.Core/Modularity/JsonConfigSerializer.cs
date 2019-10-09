@@ -3,6 +3,7 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Runtime.Serialization.Formatters;
+using DynamicData;
 using Guards;
 using log4net;
 using Newtonsoft.Json;
@@ -16,14 +17,15 @@ namespace PoeShared.Modularity
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(JsonConfigSerializer));
 
-        private readonly IReactiveList<JsonConverter> converters = new ReactiveList<JsonConverter>();
+        private readonly SourceList<JsonConverter> converters = new SourceList<JsonConverter>();
         private readonly int MaxCharsToLog = 1024;
 
         private JsonSerializerSettings jsonSerializerSettings;
 
         public JsonConfigSerializer()
         {
-            converters.Changed
+            converters
+                .Connect()
                 .ToUnit()
                 .StartWith(Unit.Default)
                 .Subscribe(ReinitializeSerializerSettings);
@@ -83,7 +85,7 @@ namespace PoeShared.Modularity
                 Error = HandleSerializerError
             };
 
-            converters.ToList().ForEach(jsonSerializerSettings.Converters.Add);
+            converters.Items.ForEach(jsonSerializerSettings.Converters.Add);
         }
 
         private void HandleSerializerError(object sender, ErrorEventArgs args)
