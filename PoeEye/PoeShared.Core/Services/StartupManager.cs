@@ -4,7 +4,6 @@ using System.Windows.Forms;
 using Guards;
 using JetBrains.Annotations;
 using log4net;
-using PoeEye;
 using PoeShared.Scaffolding;
 using ReactiveUI;
 using StartupHelper;

@@ -3,7 +3,6 @@ using System.Collections.Concurrent;
 using System.Reactive;
 using System.Reactive.Subjects;
 using log4net;
-using PoeEye;
 
 namespace PoeShared.Modularity
 {

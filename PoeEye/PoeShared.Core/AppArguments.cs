@@ -5,9 +5,8 @@ using System.IO;
 using System.Linq;
 using CommandLine;
 using PoeShared.Scaffolding;
-using ReactiveUI;
 
-namespace PoeEye
+namespace PoeShared
 {
     public class AppArguments : DisposableReactiveObject
     {
