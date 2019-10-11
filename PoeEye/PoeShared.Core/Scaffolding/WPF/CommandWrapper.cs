@@ -22,13 +22,11 @@ namespace PoeShared.Scaffolding.WPF
         private string error;
         private bool isBusy;
         
-        private CommandWrapper(ICommand command)
+        private CommandWrapper(DelegateCommandBase command)
         {
+            Guard.ArgumentNotNull(command, nameof(command));
+            
             InnerCommand = command;
-        }
-
-        private CommandWrapper(DelegateCommandBase command) : this((ICommand)command)
-        {
              Observable.FromEventPattern<EventHandler, EventArgs>(x => command.IsActiveChanged += x, x => command.IsActiveChanged -= x)
                 .Select(x => command.IsActive)
                 .Subscribe(x => IsBusy = x)
@@ -43,6 +41,10 @@ namespace PoeShared.Scaffolding.WPF
                 .AddTo(Anchors);
         }
 
+        private CommandWrapper(ICommand command)
+        {
+             InnerCommand = command;
+        }
 
         public bool IsBusy
         {
@@ -108,7 +110,7 @@ namespace PoeShared.Scaffolding.WPF
             return Create(new DelegateCommand(execute));
         }
         
-        public static CommandWrapper FromReactiveCommand<T, TResult>(ReactiveCommand<T, TResult> command)
+        private static CommandWrapper FromReactiveCommand<T, TResult>(ReactiveCommand<T, TResult> command)
         {
             var result = new CommandWrapper(command);
             command.IsExecuting.Subscribe(x => result.IsBusy = x).AddTo(result.Anchors);
@@ -122,7 +124,7 @@ namespace PoeShared.Scaffolding.WPF
         
         public static CommandWrapper Create(Func<Task> execute, IObservable<bool> canExecute)
         {
-            return new CommandWrapper(ReactiveCommand.CreateFromTask(execute, canExecute));
+            return FromReactiveCommand(ReactiveCommand.CreateFromTask(execute, canExecute));
         }
         
         public static CommandWrapper Create(Func<Task> execute)
@@ -132,7 +134,7 @@ namespace PoeShared.Scaffolding.WPF
         
         public static CommandWrapper Create<TParam>(Func<TParam, Task> execute, IObservable<bool> canExecute)
         {
-            return new CommandWrapper(ReactiveCommand.CreateFromTask(execute, canExecute));
+            return FromReactiveCommand(ReactiveCommand.CreateFromTask(execute, canExecute));
         }
 
         public static CommandWrapper Create<TParam>(Func<TParam, Task> execute)
