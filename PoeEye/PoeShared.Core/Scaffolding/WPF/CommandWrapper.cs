@@ -21,11 +21,14 @@ namespace PoeShared.Scaffolding.WPF
         private string description;
         private string error;
         private bool isBusy;
-
-        private CommandWrapper(DelegateCommandBase command)
+        
+        private CommandWrapper(ICommand command)
         {
             InnerCommand = command;
+        }
 
+        private CommandWrapper(DelegateCommandBase command) : this((ICommand)command)
+        {
              Observable.FromEventPattern<EventHandler, EventArgs>(x => command.IsActiveChanged += x, x => command.IsActiveChanged -= x)
                 .Select(x => command.IsActive)
                 .Subscribe(x => IsBusy = x)
@@ -36,7 +39,7 @@ namespace PoeShared.Scaffolding.WPF
                 .AddTo(Anchors);
 
             raiseCanExecuteChangedRequests
-                .Subscribe(() => command.RaiseCanExecuteChanged())
+                .Subscribe(command.RaiseCanExecuteChanged)
                 .AddTo(Anchors);
         }
 
@@ -104,10 +107,47 @@ namespace PoeShared.Scaffolding.WPF
         {
             return Create(new DelegateCommand(execute));
         }
+        
+        public static CommandWrapper FromReactiveCommand<T, TResult>(ReactiveCommand<T, TResult> command)
+        {
+            var result = new CommandWrapper(command);
+            command.IsExecuting.Subscribe(x => result.IsBusy = x).AddTo(result.Anchors);
+            command.ThrownExceptions.Subscribe(x => result.HandleException(x)).AddTo(result.Anchors);
+            result.raiseCanExecuteChangedRequests
+                .Subscribe(() => throw new NotSupportedException($"RaiseCanExecuteChanged is not supported for commands of type {command}"))
+                .AddTo(result.Anchors);
 
+            return result;
+        }
+        
+        public static CommandWrapper Create(Func<Task> execute, IObservable<bool> canExecute)
+        {
+            return new CommandWrapper(ReactiveCommand.CreateFromTask(execute, canExecute));
+        }
+        
+        public static CommandWrapper Create(Func<Task> execute)
+        {
+            return Create(execute, Observable.Return(true).Concat(Observable.Never<bool>()));
+        }
+        
+        public static CommandWrapper Create<TParam>(Func<TParam, Task> execute, IObservable<bool> canExecute)
+        {
+            return new CommandWrapper(ReactiveCommand.CreateFromTask(execute, canExecute));
+        }
+
+        public static CommandWrapper Create<TParam>(Func<TParam, Task> execute)
+        {
+            return Create(execute, Observable.Return(true).Concat(Observable.Never<bool>()));
+        }
+        
         public static CommandWrapper Create(Action execute, Func<bool> canExecute)
         {
             return Create(new DelegateCommand(execute, canExecute));
+        }
+        
+        public static CommandWrapper Create<T>(Action<T> execute, Func<T, bool> canExecute)
+        {
+            return Create(new DelegateCommand<T>(execute, canExecute));
         }
 
         public CommandWrapper RaiseCanExecuteChangedWhen(IObservable<Unit> eventSource)

@@ -16,8 +16,6 @@
         <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.listbox.xaml" />
         <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.menu.xaml" />
         <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.textblock.xaml" />
-
-        <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.Buttons.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
     <Style TargetType="{x:Type Button}" x:Key="InvisibleButtonStyleKey">
@@ -29,8 +27,7 @@
         </Setter>
     </Style>
 
-    <Style TargetType="{x:Type ToggleButton}" x:Key="ToggleCircleButton"
-           BasedOn="{StaticResource MetroCircleToggleButtonStyle}">
+    <Style TargetType="{x:Type ToggleButton}" x:Key="ToggleCircleButton">
         <Setter Property="FontFamily" Value="{StaticResource FontAwesome}" />
         <Setter Property="FontSize" Value="14" />
         <Setter Property="HorizontalContentAlignment" Value="Center" />
@@ -104,8 +101,7 @@
         </Style.Triggers>
     </Style>
 
-    <Style TargetType="{x:Type Button}" x:Key="CircleButton"
-           BasedOn="{StaticResource MetroCircleButtonStyle}">
+    <Style TargetType="{x:Type Button}" x:Key="CircleButton">
         <Setter Property="FontFamily" Value="{StaticResource FontAwesome}" />
         <Setter Property="FontSize" Value="14" />
         <Setter Property="Focusable" Value="False" />
@@ -116,7 +112,7 @@
 
     <Style TargetType="{x:Type Button}" x:Key="OverlayWindowButtonStyleKey" BasedOn="{StaticResource FlatButton}" />
 
-    <Style TargetType="{x:Type Button}" x:Key="OverlayWindowCircleButtonStyleKey" BasedOn="{StaticResource MetroCircleButtonStyle}">
+    <Style TargetType="{x:Type Button}" x:Key="OverlayWindowCircleButtonStyleKey" >
         <Setter Property="FontFamily" Value="{StaticResource FontAwesome}" />
         <Setter Property="FontSize" Value="16" />
         <Setter Property="HorizontalContentAlignment" Value="Center" />

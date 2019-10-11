@@ -306,6 +306,7 @@
     <Compile Include="Scaffolding\WPF\MappingTemplateSelector.cs" />
     <Compile Include="Scaffolding\WPF\ScrollViewerExtensions.cs" />
     <Compile Include="Scaffolding\WPF\StackPanelEx.cs" />
+    <Compile Include="UI\UiConstants.cs" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="Themes\CommandWrapperView.xaml">
