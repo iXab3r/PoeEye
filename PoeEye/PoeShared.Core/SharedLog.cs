@@ -61,7 +61,14 @@ namespace PoeShared
             GlobalContext.Properties["configuration"] = configurationMode;
             GlobalContext.Properties["CONFIGURATION"] = configurationMode;
             GlobalContext.Properties["APPNAME"] = appName;
-            Log.Info($"Logging for app {GlobalContext.Properties["APPNAME"]} in '{GlobalContext.Properties["CONFIGURATION"]}' mode initialized");
+            GlobalContext.Properties["APPDATA"] = Environment.ExpandEnvironmentVariables("%APPDATA%");
+            GlobalContext.Properties["LOCALAPPDATA"] = Environment.ExpandEnvironmentVariables("%LOCALAPPDATA%");
+
+            var startupInfo =
+                $"Logging for app {GlobalContext.Properties["APPNAME"]} in '{GlobalContext.Properties["CONFIGURATION"]}' mode initialized";
+            Console.WriteLine(startupInfo);
+            Trace.WriteLine(startupInfo);
+            Log.Info(startupInfo);
         }
 
         public void SwitchLoggingLevel(Level loggingLevel)
