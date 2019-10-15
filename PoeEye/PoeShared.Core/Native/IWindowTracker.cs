@@ -13,6 +13,8 @@ namespace PoeShared.Native
         string ActiveWindowTitle { [CanBeNull] get; }
 
         IntPtr ActiveWindowHandle { get; }
+        
+        uint ActiveProcessId { get; }
 
         string Name { get; }
     }

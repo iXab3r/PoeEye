@@ -20,6 +20,7 @@ namespace PoeShared.Native
         private bool isActive;
         private string name;
         private IntPtr windowHandle;
+        private uint activeProcessId;
 
         public WindowTracker(
             [NotNull] IStringMatcher titleMatcher)
@@ -70,6 +71,12 @@ namespace PoeShared.Native
             private set => this.RaiseAndSetIfChanged(ref activeWindowHandle, value);
         }
 
+        public uint ActiveProcessId
+        {
+            get => activeProcessId;
+            private set => this.RaiseAndSetIfChanged(ref activeProcessId, value);
+        }
+
         public override string ToString()
         {
             return $"#Tracker{Name}";
@@ -83,6 +90,7 @@ namespace PoeShared.Native
             isActive = titleMatcher.IsMatch(activeWindowTitle);
 
             windowHandle = IsActive ? activeWindowHandle : IntPtr.Zero;
+            activeProcessId = UnsafeNative.GetProcessIdByWindowHandle(this.activeWindowHandle); 
 
             Log.Debug(
                 $@"[#{Name}] Target window is {(isActive ? string.Empty : "NOT ")}ACTIVE (hwnd 0x{activeWindowHandle.ToInt64():X8}, active title '{activeWindowTitle}')");
@@ -91,6 +99,7 @@ namespace PoeShared.Native
             this.RaisePropertyChanged(nameof(MatchingWindowHandle));
             this.RaisePropertyChanged(nameof(ActiveWindowTitle));
             this.RaisePropertyChanged(nameof(ActiveWindowHandle));
+            this.RaisePropertyChanged(nameof(ActiveProcessId));
         }
     }
 }
