@@ -28,7 +28,7 @@
         <Style TargetType="{x:Type native:TransparentWindow}">
             <Setter Property="Background" Value="{x:Null}" />
             <Setter Property="BorderBrush" Value="{x:Null}" />
-            <Setter Property="AllowsTransparency" Value="False" />
+            <Setter Property="AllowsTransparency" Value="True" />
             <Setter Property="WindowStyle" Value="None" />
             <Setter Property="DataContext" Value="{Binding}" />
             <Setter Property="Left" Value="{Binding Content.Left, Mode=TwoWay}" />

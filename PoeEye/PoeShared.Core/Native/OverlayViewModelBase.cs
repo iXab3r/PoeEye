@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.Reactive;
+using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -9,6 +10,7 @@ using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Interop;
+using DynamicData.Binding;
 using Guards;
 using log4net;
 using PoeShared.Scaffolding;
@@ -28,6 +30,7 @@ namespace PoeShared.Native
         
         private readonly CommandWrapper makeLayeredCommand;
         private readonly CommandWrapper makeTransparentCommand;
+        private readonly ISubject<Unit> whenLoaded = new ReplaySubject<Unit>(1);
         
         private double actualHeight;
 
@@ -60,6 +63,8 @@ namespace PoeShared.Native
 
         protected OverlayViewModelBase()
         {
+            Title = GetType().ToString();
+
             lockWindowCommand = CommandWrapper.Create(LockWindowCommandExecuted, LockWindowCommandCanExecute);
             unlockWindowCommand = CommandWrapper.Create(UnlockWindowCommandExecuted, UnlockWindowCommandCanExecute);
             makeLayeredCommand = CommandWrapper.Create(MakeLayeredCommandExecuted, MakeLayeredCommandCanExecute);
@@ -81,15 +86,18 @@ namespace PoeShared.Native
                 .AddTo(Anchors);
 
             this.WhenAnyValue(x => x.Left, x => x.Top, x => x.Width, x => x.Height)
+                .Select(() => new { Left, Top, Width, Height })
+                .DistinctUntilChanged()
                 .Subscribe(() => this.RaisePropertyChanged(nameof(Bounds)))
                 .AddTo(Anchors);
 
-            Title = GetType().ToString();
-            WhenLoaded = new ReplaySubject<Unit>(1);
-            this.WhenAnyValue(x => x.OverlayWindow).ToUnit().Subscribe(WhenLoaded).AddTo(Anchors);
+            this.WhenValueChanged(x => x.OverlayWindow, false)
+                .ToUnit()
+                .Subscribe(whenLoaded)
+                .AddTo(Anchors);
         }
 
-        protected ISubject<Unit> WhenLoaded { get; } 
+        protected IObservable<Unit> WhenLoaded => whenLoaded;
 
         public bool GrowUpwards
         {

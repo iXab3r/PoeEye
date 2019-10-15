@@ -63,6 +63,10 @@ namespace PoeShared.Native
 
         public void SetOverlayMode(OverlayMode mode)
         {
+            if (AllowsTransparency == false && mode == OverlayMode.Transparent)
+            {
+                throw new InvalidOperationException($"Transparent mode requires AllowsTransparency to be set to True");
+            }
             switch (mode)
             {
                 case OverlayMode.Layered:
