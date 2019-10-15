@@ -3,6 +3,7 @@ using System.Linq.Expressions;
 using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
+using System.Threading;
 using Guards;
 using JetBrains.Annotations;
 using KellermanSoftware.CompareNetObjects;
@@ -20,6 +21,9 @@ namespace PoeShared.Modularity
 
         private readonly IConfigProvider configProvider;
         private TConfig actualConfig;
+        
+        private int saveCommandCounter = 0;
+        private int loadCommandCounter = 0;
 
         public GenericConfigProvider(
             [NotNull] IConfigProvider configProvider,
@@ -88,12 +92,18 @@ namespace PoeShared.Modularity
 
         public void Reload()
         {
+            Interlocked.Increment(ref loadCommandCounter);
+            Log.Info($"[ConfigProvider.Reload] Current stat: { new { saveCommandCounter, loadCommandCounter } }");
+
             configProvider.Reload();
         }
 
         public void Save(TConfig config)
         {
             Guard.ArgumentNotNull(config, nameof(config));
+
+            Interlocked.Increment(ref saveCommandCounter);
+            Log.Info($"[ConfigProvider.Save] Current stat: { new { saveCommandCounter, loadCommandCounter } }");
 
             configProvider.Save(config);
         }

@@ -4,7 +4,11 @@
     {
     }
 
-    public interface IPoeEyeConfigVersioned : IPoeEyeConfig
+    public interface IPoeEyeConfigVersioned : IPoeEyeConfig, IHasVersion
+    {
+    }
+
+    public interface IHasVersion
     {
         /// <summary>
         ///     Config contract version

@@ -23,6 +23,7 @@ namespace PoeShared.Modularity
     public interface IConfigProvider
     {
         IObservable<Unit> ConfigHasChanged { [NotNull] get; }
+        
         void Reload();
 
         void Save<TConfig>([NotNull] TConfig config) where TConfig : IPoeEyeConfig, new();
