@@ -1,4 +1,5 @@
 using System;
+using System.Collections.ObjectModel;
 using System.Drawing;
 using System.Linq;
 using System.Reactive;
@@ -26,10 +27,10 @@ namespace PoeShared.Native
         private static readonly ILog Log = LogManager.GetLogger(typeof(OverlayWindowController));
         private readonly BehaviorSubject<IntPtr> lastActiveWindowHandle = new BehaviorSubject<IntPtr>(IntPtr.Zero);
 
-        private readonly string[] possibleOverlayNames;
         private readonly IScheduler uiScheduler;
 
         private readonly ISourceList<OverlayWindowView> windows = new SourceList<OverlayWindowView>();
+        private readonly ReadOnlyObservableCollection<IntPtr> childWindows;
         private readonly IWindowTracker windowTracker;
         private readonly string uniqueControllerId = Guid.NewGuid().ToString();
 
@@ -49,10 +50,13 @@ namespace PoeShared.Native
             this.windowTracker = windowTracker;
             this.uiScheduler = uiScheduler;
 
-            possibleOverlayNames = new[]
-            {
-                $"[PoeEye.Overlay] {uniqueControllerId}"
-            };
+            windows
+                .Connect()
+                .ObserveOn(uiScheduler)
+                .Transform(x => new WindowInteropHelper(x).Handle)
+                .Bind(out childWindows)
+                .Subscribe()
+                .AddTo(Anchors);
 
             Observable.Merge(windowTracker.WhenAnyValue(x => x.ActiveWindowHandle).ToUnit(), this.WhenAnyValue(x => x.IsEnabled).ToUnit())
                 .Select(
@@ -61,7 +65,7 @@ namespace PoeShared.Native
                         ActiveWindowHandle = windowTracker.ActiveWindowHandle,
                         ActiveTitle = windowTracker.ActiveWindowTitle,
                         WindowIsActive = windowTracker.IsActive,
-                        OverlayIsActive = IsPairedOverlay(windowTracker.ActiveWindowTitle),
+                        OverlayIsActive = IsPairedOverlay(windowTracker.ActiveWindowHandle),
                         IsEnabled
                     })
                 .Do(x => Log.Debug($"Active window has changed: {x}"))
@@ -73,7 +77,7 @@ namespace PoeShared.Native
 
             windowTracker
                 .WhenAnyValue(x => x.MatchingWindowHandle)
-                .Where(x => x != IntPtr.Zero && !IsPairedOverlay(windowTracker.ActiveWindowTitle))
+                .Where(x => x != IntPtr.Zero && !IsPairedOverlay(windowTracker.ActiveWindowHandle))
                 .Subscribe(lastActiveWindowHandle)
                 .AddTo(Anchors);
 
@@ -161,6 +165,12 @@ namespace PoeShared.Native
                 .Subscribe(overlayWindow.SetOverlayMode)
                 .AddTo(childAnchors);
 
+            viewModel
+                .WhenAnyValue(x => x.TargetAspectRatio)
+                .ObserveOn(uiScheduler)
+                .Subscribe(() => overlayWindow.UpdateBounds(0, 0, 0.000001f, 0))
+                .AddTo(childAnchors);
+            
             overlayWindow.WhenLoaded
                 .Do(args => Log.Debug($"[#{overlayWindow.Name}] Overlay is loaded, window: {args.Sender}"))
                 .Subscribe(() => viewModel.SetOverlayWindow(overlayWindow))
@@ -245,15 +255,10 @@ namespace PoeShared.Native
             }
         }
 
-        private bool IsPairedOverlay(string activeWindowTitle)
+        private bool IsPairedOverlay(IntPtr hwnd)
         {
-            if (string.IsNullOrWhiteSpace(activeWindowTitle))
-            {
-                return false;
-            }
+            return childWindows.Contains(hwnd);
 
-            return possibleOverlayNames
-                .Any(activeWindowTitle.Contains);
         }
 
         private void SetVisibility(bool isVisible)

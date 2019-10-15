@@ -9,6 +9,7 @@ using System.Windows.Interop;
 using System.Windows.Threading;
 using log4net;
 using PoeShared.Scaffolding;
+using ReactiveUI;
 
 namespace PoeShared.Native
 {
@@ -72,7 +73,7 @@ namespace PoeShared.Native
                     break;
             }
         }
-        
+
         private void ThumbResize_OnDragDelta(object sender, DragDeltaEventArgs e)
         {
             var thumb = sender as Thumb;
@@ -93,7 +94,7 @@ namespace PoeShared.Native
             }
         }
 
-        private void UpdateBounds(double leftChange, double topChange, double widthChange, double heightChange)
+        public void UpdateBounds(double leftChange, double topChange, double widthChange, double heightChange)
         {
             var window = this;
             var windowViewModel = window?.DataContext as OverlayWindowViewModel;
@@ -104,14 +105,11 @@ namespace PoeShared.Native
             }
             if (overlayViewModel.TargetAspectRatio != null && SizeToContent == SizeToContent.Manual)
             {
-                if (widthChange > 0 || widthChange < 0)
-                {
-                    var newWidth = window.Width + widthChange;
-                    newWidth = Math.Min(newWidth, window.MaxWidth);
-                    newWidth = Math.Max(newWidth, window.MinWidth);
-                    window.Width = newWidth;
-                    window.Height = newWidth / overlayViewModel.TargetAspectRatio.Value;
-                } 
+                var newWidth = window.Width + widthChange;
+                newWidth = Math.Min(newWidth, window.MaxWidth);
+                newWidth = Math.Max(newWidth, window.MinWidth);
+                window.Width = newWidth;
+                window.Height = newWidth / overlayViewModel.TargetAspectRatio.Value;
             }
             else
             {

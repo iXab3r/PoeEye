@@ -51,6 +51,8 @@ namespace PoeShared.Native
 
         ICommand MakeTransparentCommand { [NotNull] get; }
         
+        double? TargetAspectRatio { get; set; }
+        
         Point ViewModelLocation { get; }
 
         void ResetToDefault();
