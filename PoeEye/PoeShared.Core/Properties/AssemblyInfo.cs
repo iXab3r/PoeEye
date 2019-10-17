@@ -58,8 +58,6 @@ using RestEase;
 
 [assembly: XmlnsPrefix("http://coderush.net/poeeye/", "eye")]
 [assembly: XmlnsDefinition("http://coderush.net/poeeye/", "PoeShared")]
-
 [assembly: XmlnsDefinition("http://coderush.net/poeeye/", "PoeShared.Converters")]
-
 [assembly: XmlnsDefinition("http://coderush.net/poeeye/", "PoeShared.Scaffolding")]
 [assembly: XmlnsDefinition("http://coderush.net/poeeye/", "PoeShared.Scaffolding.WPF")]

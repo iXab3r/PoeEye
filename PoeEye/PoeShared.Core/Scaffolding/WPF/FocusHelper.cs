@@ -5,7 +5,7 @@ using System.Windows.Controls;
 
 namespace PoeShared.Scaffolding.WPF
 {
-    public class FocusHelper
+    public sealed class FocusHelper
     {
         public static readonly DependencyProperty IsFocusedProperty =
             DependencyProperty.RegisterAttached(

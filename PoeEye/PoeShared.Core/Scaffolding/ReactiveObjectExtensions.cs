@@ -20,7 +20,7 @@ namespace PoeShared.Scaffolding
             [NotNull] TSource source,
             [NotNull] Expression<Func<TSource, TSourceProperty>> sourcePropertyExtractor)
             where TSource : INotifyPropertyChanged
-            where TTarget : IReactiveObject
+            where TTarget : IDisposableReactiveObject
         {
             Guard.ArgumentNotNull(instance, nameof(instance));
             Guard.ArgumentNotNull(instancePropertyExtractor, nameof(instancePropertyExtractor));
