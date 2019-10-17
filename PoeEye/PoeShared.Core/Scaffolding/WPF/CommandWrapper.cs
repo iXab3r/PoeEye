@@ -151,6 +151,11 @@ namespace PoeShared.Scaffolding.WPF
         {
             return Create(new DelegateCommand<T>(execute, canExecute));
         }
+        
+        public static CommandWrapper Create<T>(Action<T> execute)
+        {
+            return Create(new DelegateCommand<T>(execute));
+        }
 
         public CommandWrapper RaiseCanExecuteChangedWhen(IObservable<Unit> eventSource)
         {
