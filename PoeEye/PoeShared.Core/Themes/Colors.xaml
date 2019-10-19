@@ -41,6 +41,7 @@
     <SolidColorBrush x:Key="OverlayWindowTextBrushKey" Color="{StaticResource OverlayWindowTextColorKey}" />
     <SolidColorBrush x:Key="OverlayWindowBorderBrushKey" Color="{StaticResource OverlayWindowBorderColorKey}" />
     <SolidColorBrush x:Key="OverlayWindowTitleBackgroundBrushKey" Color="{StaticResource OverlayWindowTitleBackgroundColorKey}" />
+    <SolidColorBrush x:Key="OverlayWindowTitleLightBackgroundBrushKey" Opacity="0.95" Color="{StaticResource OverlayWindowTitleBackgroundColorKey}" />
     <SolidColorBrush x:Key="OverlayWindowBackgroundBrushKey" Color="{StaticResource OverlayWindowBackgroundColorKey}" />
 
     <SolidColorBrush x:Key="PoeFontBrush" Color="{StaticResource PoeFontColor}" />
