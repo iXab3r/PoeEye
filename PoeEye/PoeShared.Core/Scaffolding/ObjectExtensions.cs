@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization.Formatters;
+using System.Windows;
+using System.Windows.Markup;
 using Guards;
 using Newtonsoft.Json;
 
@@ -34,7 +37,16 @@ namespace PoeShared.Scaffolding
         {
             return instance == null ? $"null<{typeof(T).Name}>" : JsonConvert.SerializeObject(instance, settings);
         }
+        
+        public static TItem AddTo<TItem>(this TItem instance, IAddChild parent)
+        {
+            Guard.ArgumentNotNull(instance, nameof(instance));
+            Guard.ArgumentNotNull(parent, nameof(parent));
 
+            parent.AddChild(instance);
+            return instance;
+        }
+        
         public static TItem AddTo<TItem, TCollection>(this TItem instance, ICollection<TCollection> collection) where TItem : TCollection
         {
             Guard.ArgumentNotNull(instance, nameof(instance));
