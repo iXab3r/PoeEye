@@ -189,6 +189,7 @@
     <Compile Include="Converters\BoolInversionConverter.cs" />
     <Compile Include="Converters\ConcreteTypeConverter.cs" />
     <Compile Include="Converters\ConverterHelpers.cs" />
+    <Compile Include="Converters\EqualityConverter.cs" />
     <Compile Include="Converters\ExceptionToMessageConverter.cs" />
     <Compile Include="Converters\FlagToObjectConverter.cs" />
     <Compile Include="Converters\IconToImageSourceConverter.cs" />
@@ -325,6 +326,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Themes\Generic.shared.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\Styles.default.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
