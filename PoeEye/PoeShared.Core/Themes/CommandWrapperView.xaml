@@ -12,6 +12,50 @@
 
     </ResourceDictionary.MergedDictionaries>
     
+    <Style x:Key="CommandWrapperIconButton" TargetType="{x:Type ButtonBase}" BasedOn="{StaticResource MaterialDesignFlatButton}">
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="Width" Value="48" />
+        <Setter Property="Height" Value="48" />
+        
+        <Setter Property="materialDesign:ButtonProgressAssist.IsIndicatorVisible" Value="False" />
+        <Setter Property="materialDesign:ButtonProgressAssist.Opacity" Value=".8" />
+        <Setter Property="materialDesign:ButtonProgressAssist.IndicatorForeground" Value="{DynamicResource PrimaryHueMidForegroundBrush}" />
+
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ButtonBase}">
+                    <Grid>
+                        <ContentPresenter Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" Focusable="False"
+                                          x:Name="ButtonContent"
+                                         SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" 
+                                         HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                         VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                        
+                        <ProgressBar x:Name="ProgressBar"
+                                     Style="{StaticResource MaterialDesignCircularProgressBar}"
+                                     Minimum="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(materialDesign:ButtonProgressAssist.Minimum)}"
+                                     Maximum="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(materialDesign:ButtonProgressAssist.Maximum)}"
+                                     Foreground="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(materialDesign:ButtonProgressAssist.IndicatorForeground)}"
+                                     Background="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(materialDesign:ButtonProgressAssist.IndicatorBackground)}"
+                                     Value="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(materialDesign:ButtonProgressAssist.Value)}"
+                                     IsIndeterminate="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(materialDesign:ButtonProgressAssist.IsIndeterminate)}"
+                                     Visibility="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(materialDesign:ButtonProgressAssist.IsIndicatorVisible), Converter={StaticResource BooleanToVisibilityConverter}}"
+                                     Height="{TemplateBinding Height}"
+                                     Width="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ButtonBase}}, Path=ActualWidth}"
+                                     Opacity="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(materialDesign:ButtonProgressAssist.Opacity)}"
+                                     HorizontalAlignment="Left"
+                                     VerticalAlignment="Center"/>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsEnabled" Value="false">
+                            <Setter Property="Opacity" Value="0.23" TargetName="ButtonContent"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    
     <Style TargetType="{x:Type materialDesign:PackIcon}"
            x:Key="CommandWrapperErrorIndicatorErrorStyleKey">
         
@@ -124,7 +168,7 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             <Button Grid.Column="0"
-                Style="{StaticResource MaterialDesignFloatingActionButton}"
+                Style="{StaticResource CommandWrapperIconButton}"
                 Height="24" Width="24"
                 Background="Transparent"
                 BorderBrush="{x:Null}"
@@ -132,7 +176,11 @@
                 Focusable="False"
                 IsTabStop="False"
                 IsDefault="{Binding Path=(s:CommandWrapperHelper.IsDefault), RelativeSource={RelativeSource Self}}"
-                CommandParameter="{Binding Path=(s:CommandWrapperHelper.CommandParameter), RelativeSource={RelativeSource Self}}">
+                CommandParameter="{Binding Path=(s:CommandWrapperHelper.CommandParameter), RelativeSource={RelativeSource Self}}"
+                materialDesign:ButtonProgressAssist.IndicatorForeground="LimeGreen"
+                materialDesign:ButtonProgressAssist.IsIndicatorVisible="{Binding IsBusy}"
+                materialDesign:ButtonProgressAssist.IsIndeterminate="True"
+                >
                 <Button.Content>
                     <Label Style="{StaticResource IconLabel}"
                            Foreground="{Binding ElementName=CommandWrapperGrid, Path=(TextElement.Foreground), Mode=OneWay}"
@@ -141,14 +189,8 @@
                 </Button.Content>
             </Button>
 
-            <ProgressBar Grid.Column="0"
-                Width="30" Height="30" IsHitTestVisible="False" Foreground="LimeGreen"
-                Style="{StaticResource MaterialDesignCircularProgressBar}"
-                Value="0"
-                IsIndeterminate="{Binding IsBusy}" />
             
             <materialDesign:PackIcon Grid.Column="0" x:Name="ErrorIcon" Kind="AlertCircleOutline" Style="{StaticResource CommandWrapperErrorIndicatorErrorStyleKey}"/>
-            <materialDesign:PackIcon Grid.Column="0" x:Name="SuccessIcon" Kind="CheckboxMarked" Style="{StaticResource CommandWrapperErrorIndicatorSuccessStyleKey}"/>
             
             <Label Grid.Column="1" Margin="10,0,0,0"
                    Foreground="{Binding ElementName=CommandWrapperGrid, Path=(TextElement.Foreground), Mode=OneWay}"
@@ -170,7 +212,6 @@
                         <Label Style="{StaticResource IconLabel}"
                                Foreground="{Binding ElementName=CommandWrapperGrid, Path=(TextElement.Foreground), Mode=OneWay}"
                                Content="{Binding Path=(s:CommandWrapperHelper.Icon), RelativeSource={RelativeSource Self}}"
-                               Margin="0,0,5,0"
                                Visibility="{Binding Path=Content, RelativeSource={RelativeSource Self}, Converter={StaticResource NullToCollapsedConverter}}" />
                         <Label Padding="0"
                                Foreground="{Binding ElementName=CommandWrapperGrid, Path=(TextElement.Foreground), Mode=OneWay}"
