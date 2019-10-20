@@ -4,7 +4,7 @@ using System.IO;
 using System.Reactive.Disposables;
 using System.Reactive.Subjects;
 using System.Reflection;
-using Guards;
+
 using log4net;
 using log4net.Appender;
 using log4net.Config;

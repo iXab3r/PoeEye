@@ -10,7 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Gma.System.MouseKeyHook;
-using Guards;
+
 using JetBrains.Annotations;
 using log4net;
 using PoeShared.Scaffolding;

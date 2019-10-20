@@ -9,7 +9,7 @@ using System.Reactive.Threading.Tasks;
 using System.Text;
 using System.Web;
 using CsQuery.ExtensionMethods.Internal;
-using Guards;
+
 using JetBrains.Annotations;
 using log4net;
 using PoeShared.Scaffolding;

@@ -2,7 +2,7 @@
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Guards;
+
 using log4net;
 using PoeShared.Scaffolding;
 

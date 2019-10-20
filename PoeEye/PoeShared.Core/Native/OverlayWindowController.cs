@@ -11,7 +11,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
 using DynamicData;
-using Guards;
+
 using JetBrains.Annotations;
 using log4net;
 using PoeShared.Prism;

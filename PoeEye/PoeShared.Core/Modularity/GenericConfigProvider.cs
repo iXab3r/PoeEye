@@ -4,7 +4,7 @@ using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Threading;
-using Guards;
+
 using JetBrains.Annotations;
 using KellermanSoftware.CompareNetObjects;
 using log4net;

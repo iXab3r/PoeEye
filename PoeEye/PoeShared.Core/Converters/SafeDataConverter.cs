@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Security.Cryptography;
 using System.Text;
-using Guards;
+
 using Newtonsoft.Json;
 
 namespace PoeShared.Converters

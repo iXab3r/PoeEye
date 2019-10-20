@@ -11,7 +11,7 @@ using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Interop;
 using DynamicData.Binding;
-using Guards;
+
 using log4net;
 using PoeShared.Scaffolding;
 using PoeShared.Scaffolding.WPF;

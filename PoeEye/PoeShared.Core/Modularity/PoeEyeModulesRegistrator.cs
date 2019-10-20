@@ -1,5 +1,5 @@
 ﻿using System.Collections.ObjectModel;
-using Guards;
+
 using Unity;
 
 namespace PoeShared.Modularity

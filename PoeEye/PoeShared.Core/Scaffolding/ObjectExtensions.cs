@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Runtime.Serialization.Formatters;
 using System.Windows;
 using System.Windows.Markup;
-using Guards;
+
 using Newtonsoft.Json;
 
 namespace PoeShared.Scaffolding

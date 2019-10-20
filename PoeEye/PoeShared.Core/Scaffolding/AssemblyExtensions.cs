@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Reflection;
 using System.Resources;
-using Guards;
+
 using JetBrains.Annotations;
 
 namespace PoeShared.Scaffolding

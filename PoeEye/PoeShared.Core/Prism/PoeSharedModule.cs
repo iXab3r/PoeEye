@@ -1,4 +1,4 @@
-﻿using Guards;
+﻿
 using JetBrains.Annotations;
 using PoeShared.Modularity;
 using Prism.Ioc;

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Reactive.Linq;
-using Guards;
+
 using JetBrains.Annotations;
 using log4net;
 using PoeShared.Scaffolding;

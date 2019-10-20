@@ -1,7 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.Windows.Forms;
-using Guards;
+
 using JetBrains.Annotations;
 using log4net;
 using PoeShared.Scaffolding;

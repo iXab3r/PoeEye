@@ -4,7 +4,7 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using Guards;
+
 using log4net;
 using Prism.Commands;
 using ReactiveUI;

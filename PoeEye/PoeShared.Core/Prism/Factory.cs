@@ -1,4 +1,4 @@
-﻿using Guards;
+﻿
 using Unity;
 
 namespace PoeShared.Prism
