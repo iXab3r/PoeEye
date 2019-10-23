@@ -8,7 +8,7 @@
     </ResourceDictionary.MergedDictionaries>
 
     <FontFamily x:Key="FontAwesome">pack://application:,,,/FontAwesome.WPF;component/#FontAwesome</FontFamily>
-
+    <SolidColorBrush x:Key="MaxTransparencyBrush">#01000000</SolidColorBrush>
     <Color x:Key="OverlayBorderColorKey">#1A6A73</Color>
     <Color x:Key="OverlayTitleBackgroundColorKey">#343E3D</Color>
     <Color x:Key="OverlayBackgroundColorKey">#292C2A</Color>

@@ -130,10 +130,10 @@
                             Visibility="{Binding Content.IsLocked, Converter={StaticResource TrueToHiddenFalseToVisibleConverter}}" />
 
                     <!-- Body -->
-                    <native:ContentControlEx Grid.Row="1"
-                                    Location="{Binding Content.ViewModelLocation, Mode=OneWayToSource}"
-                                    Content="{Binding Content}"
-                                    ContentTemplate="{Binding ContentTemplate}" />
+                    <native:ContentControlEx Grid.Row="1" 
+                                             Location="{Binding Content.ViewModelLocation, Mode=OneWayToSource}"
+                                             Content="{Binding Content}"
+                                             ContentTemplate="{Binding ContentTemplate}" />
                 </Grid>
             </Border>
 

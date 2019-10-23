@@ -1,8 +1,9 @@
-﻿using ReactiveUI;
+﻿using System;
+using ReactiveUI;
 
 namespace PoeShared.Scaffolding
 {
-    public sealed class Fallback<T> : ReactiveObject where T : class
+    public sealed class Fallback<T> : ReactiveObject
     {
         private T actualValue;
 
@@ -33,7 +34,7 @@ namespace PoeShared.Scaffolding
 
         private bool CheckValue()
         {
-            return default(T) != actualValue;
+            return !Equals(default(T), actualValue);
         }
 
         private void Raise()
