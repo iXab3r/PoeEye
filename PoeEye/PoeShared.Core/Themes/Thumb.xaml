@@ -7,7 +7,7 @@
 
     <Style TargetType="{x:Type Thumb}" x:Key="OverlayThumbStyleKey">
         <Setter Property="Foreground" Value="{StaticResource OverlayTitleBackgroundBrushKey}" />
-        <Setter Property="Background" Value="{StaticResource OverlayForegroundBrushKey}" />
+        <Setter Property="Background" Value="{StaticResource OverlayWindowTextBrushKey}" />
         <Setter Property="BorderBrush" Value="{StaticResource OverlayBorderBrushKey}" />
         <Setter Property="Cursor" Value="{x:Static Cursors.AppStarting}" />
         <Setter Property="Template">
@@ -35,10 +35,10 @@
         <Style.Triggers>
             <Trigger Property="IsDragging" Value="True">
                 <Setter Property="Cursor" Value="{x:Static Cursors.SizeNWSE}" />
-                <Setter Property="Background" Value="{Binding RelativeSource={RelativeSource Self}, Path=Foreground}" />
             </Trigger>
             <Trigger Property="IsMouseOver" Value="True">
                 <Setter Property="Cursor" Value="{x:Static Cursors.SizeNWSE}" />
+                <Setter Property="Background" Value="{StaticResource MouseOverAccentBrushKey}" />
             </Trigger>
         </Style.Triggers>
 
