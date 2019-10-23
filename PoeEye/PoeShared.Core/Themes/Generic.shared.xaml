@@ -8,5 +8,6 @@
         <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Styles.xaml" />
         <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Styles.default.xaml" />
         <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/CommandWrapperView.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/PoeShared;component/UI/Hotkeys/HotKeyBox.xaml" />
     </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>

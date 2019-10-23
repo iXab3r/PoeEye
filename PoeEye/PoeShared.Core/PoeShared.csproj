@@ -316,6 +316,10 @@
     <Compile Include="Scaffolding\WPF\MappingTemplateSelector.cs" />
     <Compile Include="Scaffolding\WPF\ScrollViewerExtensions.cs" />
     <Compile Include="Scaffolding\WPF\StackPanelEx.cs" />
+    <Compile Include="UI\Hotkeys\HotkeyBox.cs" />
+    <Compile Include="UI\Hotkeys\HotkeyConverter.cs" />
+    <Compile Include="UI\Hotkeys\HotkeyGesture.cs" />
+    <Compile Include="UI\Hotkeys\HotkeyMode.cs" />
     <Compile Include="UI\RemoveItemController.cs" />
     <Compile Include="UI\UiConstants.cs" />
   </ItemGroup>
@@ -382,6 +386,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="UI\Hotkeys\HotKeyBox.xaml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -44,6 +44,7 @@ namespace PoeShared.Native
 
             subscription.AddTo(Anchors);
             InitializeConsumer().AddTo(Anchors);
+            InitializeHooks().AddTo(Anchors);
         }
 
         public IObservable<KeyPressEventArgs> WhenKeyPress => whenKeyPress;
