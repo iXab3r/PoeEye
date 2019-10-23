@@ -212,6 +212,7 @@
                         <Label Style="{StaticResource IconLabel}"
                                Foreground="{Binding ElementName=CommandWrapperGrid, Path=(TextElement.Foreground), Mode=OneWay}"
                                Content="{Binding Path=(s:CommandWrapperHelper.Icon), RelativeSource={RelativeSource Self}}"
+                               Margin="0,0,5,0"
                                Visibility="{Binding Path=Content, RelativeSource={RelativeSource Self}, Converter={StaticResource NullToCollapsedConverter}}" />
                         <Label Padding="0"
                                Foreground="{Binding ElementName=CommandWrapperGrid, Path=(TextElement.Foreground), Mode=OneWay}"
