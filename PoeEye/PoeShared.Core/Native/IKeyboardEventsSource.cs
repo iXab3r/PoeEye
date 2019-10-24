@@ -8,7 +8,9 @@ namespace PoeShared.Native
     {
         bool RealtimeMode { get; set; }
 
-        IDisposable InitializeHooks();
+        IDisposable InitializeMouseHook();
+        
+        IDisposable InitializeKeyboardHook();
         
         IObservable<KeyPressEventArgs> WhenKeyPress { [NotNull] get; }
 

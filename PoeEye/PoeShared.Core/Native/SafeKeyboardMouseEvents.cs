@@ -25,7 +25,8 @@ namespace PoeShared.Native
         private readonly IClock clock;
 
         private readonly BlockingCollection<InputEventData> eventQueue = new BlockingCollection<InputEventData>();
-        private readonly SerialDisposable subscription = new SerialDisposable();
+        private readonly SerialDisposable keyboardSubscription = new SerialDisposable();
+        private readonly SerialDisposable mouseSubscription = new SerialDisposable();
         private readonly ISubject<KeyEventArgs> whenKeyDown = new Subject<KeyEventArgs>();
 
         private readonly ISubject<KeyPressEventArgs> whenKeyPress = new Subject<KeyPressEventArgs>();
@@ -42,9 +43,42 @@ namespace PoeShared.Native
 
             this.clock = clock;
 
-            subscription.AddTo(Anchors);
+            mouseSubscription.AddTo(Anchors);
             InitializeConsumer().AddTo(Anchors);
-            InitializeHooks().AddTo(Anchors);
+        }
+
+        public IDisposable InitializeMouseHook()
+        {
+            Log.Info("Configuring Mouse hook...");
+            var sw = Stopwatch.StartNew();
+
+            var anchors = new CompositeDisposable();
+            mouseSubscription.Disposable = anchors;
+
+            Disposable.Create(() => Log.Info("Disposing Mouse hook")).AddTo(anchors);
+            var hook = Hook.GlobalEvents().AddTo(anchors);
+            InitializeMouseHook(hook).AddTo(anchors);
+
+            sw.Stop();
+            Log.Info($"Mouse hook configuration took {sw.ElapsedMilliseconds:F0}ms");
+            return anchors;
+        }
+
+        public IDisposable InitializeKeyboardHook()
+        {
+            Log.Info("Configuring Keyboard hook...");
+            var sw = Stopwatch.StartNew();
+
+            var anchors = new CompositeDisposable();
+            keyboardSubscription.Disposable = anchors;
+
+            Disposable.Create(() => Log.Info("Disposing Keyboard hook")).AddTo(anchors);
+            var hook = Hook.GlobalEvents().AddTo(anchors);
+            InitializeKeyboardHook(hook).AddTo(anchors);
+
+            sw.Stop();
+            Log.Info($"Keyboard hook configuration took {sw.ElapsedMilliseconds:F0}ms");
+            return anchors;
         }
 
         public IObservable<KeyPressEventArgs> WhenKeyPress => whenKeyPress;
@@ -61,24 +95,6 @@ namespace PoeShared.Native
         {
             get => realtimeMode;
             set => this.RaiseAndSetIfChanged(ref realtimeMode, value);
-        }
-
-        public IDisposable InitializeHooks()
-        {
-            Log.Info("Configuring Mouse&Keyboard hooks...");
-            var sw = Stopwatch.StartNew();
-
-            var anchors = new CompositeDisposable();
-            subscription.Disposable = anchors;
-
-            Disposable.Create(() => Log.Info("Disposing Mouse&Keyboard hooks")).AddTo(anchors);
-            var hook = Hook.GlobalEvents().AddTo(anchors);
-            InitializeKeyboardHook(hook).AddTo(anchors);
-            InitializeMouseHook(hook).AddTo(anchors);
-
-            sw.Stop();
-            Log.Info($"Mouse&Keyboard hooks configuration took {sw.ElapsedMilliseconds:F0}ms");
-            return anchors;
         }
 
         private IDisposable InitializeConsumer()
