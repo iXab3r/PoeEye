@@ -112,8 +112,21 @@ namespace PoeShared.Native
                 var newWidth = window.Width + widthChange;
                 newWidth = Math.Min(newWidth, window.MaxWidth);
                 newWidth = Math.Max(newWidth, window.MinWidth);
-                window.Width = newWidth;
-                window.Height = newWidth / overlayViewModel.TargetAspectRatio.Value;
+                
+                var newHeight = window.Height + heightChange;
+                newHeight = Math.Min(newHeight, window.MaxHeight);
+                newHeight = Math.Max(newHeight, window.MinHeight);
+
+                if (heightChange > widthChange)
+                {
+                    window.Width = newHeight * overlayViewModel.TargetAspectRatio.Value;
+                    window.Height = newHeight;
+                }
+                else
+                {
+                    window.Width = newWidth;
+                    window.Height = newWidth / overlayViewModel.TargetAspectRatio.Value;
+                }
             }
             else
             {

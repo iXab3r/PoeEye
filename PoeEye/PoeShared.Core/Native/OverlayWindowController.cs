@@ -167,8 +167,11 @@ namespace PoeShared.Native
 
             viewModel
                 .WhenAnyValue(x => x.TargetAspectRatio)
+                .Where(x => x != null)
+                .Select(newAspectRatio => newAspectRatio.Value)
+                .WithPrevious((prev, curr) => new { prev, curr, isHorizontalChange = curr > prev })
                 .ObserveOn(uiScheduler)
-                .Subscribe(() => overlayWindow.UpdateBounds(0, 0, 0.000001f, 0))
+                .Subscribe(x => overlayWindow.UpdateBounds(0,  0, x.isHorizontalChange ? 0.000000001f : 0, x.isHorizontalChange ? 0 : 0.000000001f))
                 .AddTo(childAnchors);
             
             overlayWindow.WhenLoaded
