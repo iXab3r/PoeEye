@@ -42,6 +42,16 @@ namespace PoeShared.UI.Hotkeys
             knownSpecialKeys["`"] = Key.OemTilde;
         }
 
+        public string ConvertToString(HotkeyGesture hotkeyGesture)
+        {
+            return (string)ConvertTo(hotkeyGesture, typeof(string));
+        }
+        
+        public new HotkeyGesture ConvertFromString(string source)
+        {
+            return (HotkeyGesture) ConvertFrom(source ?? string.Empty);
+        }
+
         public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
         {
             return sourceType == typeof(string);
