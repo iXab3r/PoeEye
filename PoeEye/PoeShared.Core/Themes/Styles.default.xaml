@@ -9,12 +9,6 @@
            BasedOn="{StaticResource DefaultTextBlockStyleKey}">
     </Style>
     
-    <Style TargetType="{x:Type CheckBox}"
-           BasedOn="{StaticResource MaterialDesignCheckBox}">
-        <Setter Property="VerticalAlignment" Value="Center"/>
-        <Setter Property="VerticalContentAlignment" Value="Top"/>
-    </Style>
-    
     <Style TargetType="{x:Type controls:WindowCommandsItem}">
         <Setter Property="FontFamily" Value="{StaticResource FontAwesome}" />
     </Style>
