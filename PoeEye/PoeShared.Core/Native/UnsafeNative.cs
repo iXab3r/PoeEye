@@ -1,22 +1,20 @@
 ﻿using System;
+using System.Drawing;
 using System.Runtime.InteropServices;
+using System.Security.Principal;
 using System.Text;
 using System.Windows;
-using System.Windows.Shapes;
-using System.Xml.XPath;
 using log4net;
-using log4net.Repository.Hierarchy;
-using Rectangle = System.Drawing.Rectangle;
 
 namespace PoeShared.Native
 {
     public static class UnsafeNative
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(UnsafeNative));
-        
         public delegate void WinEventDelegate(
             IntPtr hWinEventHook, uint eventType, IntPtr hwnd, int idObject, int idChild, uint dwEventThread,
             uint dwmsEventTime);
+
+        private static readonly ILog Log = LogManager.GetLogger(typeof(UnsafeNative));
 
         [DllImport("user32.dll")]
         public static extern int MapVirtualKey(uint uCode, uint uMapType);
@@ -26,7 +24,7 @@ namespace PoeShared.Native
 
         [DllImport("user32.dll")]
         public static extern IntPtr GetForegroundWindow();
-        
+
         [DllImport("user32.dll")]
         public static extern void SetForegroundWindow(IntPtr hWnd);
 
@@ -39,15 +37,24 @@ namespace PoeShared.Native
 
         [DllImport("user32.dll")]
         public static extern bool UnhookWinEvent(IntPtr hHook);
-        
+
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         public static extern IntPtr FindWindow(string strClassName, string strWindowName);
-        
-        [DllImport("user32.dll", SetLastError=true)]
-        static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
+
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
 
         [DllImport("user32.dll")]
         public static extern bool GetWindowRect(IntPtr hwnd, ref Rect rectangle);
+
+        public static bool IsElevated()
+        {
+            using (var identity = WindowsIdentity.GetCurrent())
+            {
+                var principal = new WindowsPrincipal(identity);
+                return principal.IsInRole(WindowsBuiltInRole.Administrator);
+            }
+        }
 
         public static string GetWindowTitle(IntPtr hwnd)
         {
@@ -65,7 +72,7 @@ namespace PoeShared.Native
             return processId;
         }
 
-        public static System.Drawing.Rectangle GetWindowRect(IntPtr hwnd)
+        public static Rectangle GetWindowRect(IntPtr hwnd)
         {
             var result = new Rect();
             if (!GetWindowRect(hwnd, ref result))
@@ -74,7 +81,7 @@ namespace PoeShared.Native
                 return Rectangle.Empty;
             }
 
-            return new System.Drawing.Rectangle((int)result.X, (int)result.Y, (int)result.Width, (int)result.Height);
+            return new Rectangle((int) result.X, (int) result.Y, (int) result.Width, (int) result.Height);
         }
 
         public static class Constants
@@ -84,11 +91,15 @@ namespace PoeShared.Native
             {
                 /// <summary>
                 ///     Invalidates the rectangle or region that you specify in lprcUpdate or hrgnUpdate.
-                ///     You can set only one of these parameters to a non-NULL value. If both are NULL, RDW_INVALIDATE invalidates the entire window.
+                ///     You can set only one of these parameters to a non-NULL value. If both are NULL, RDW_INVALIDATE invalidates the
+                ///     entire window.
                 /// </summary>
                 Invalidate = 0x1,
 
-                /// <summary>Causes the OS to post a WM_PAINT message to the window regardless of whether a portion of the window is invalid.</summary>
+                /// <summary>
+                ///     Causes the OS to post a WM_PAINT message to the window regardless of whether a portion of the window is
+                ///     invalid.
+                /// </summary>
                 InternalPaint = 0x2,
 
                 /// <summary>
@@ -99,7 +110,8 @@ namespace PoeShared.Native
 
                 /// <summary>
                 ///     Validates the rectangle or region that you specify in lprcUpdate or hrgnUpdate.
-                ///     You can set only one of these parameters to a non-NULL value. If both are NULL, RDW_VALIDATE validates the entire window.
+                ///     You can set only one of these parameters to a non-NULL value. If both are NULL, RDW_VALIDATE validates the entire
+                ///     window.
                 ///     This value does not affect internal WM_PAINT messages.
                 /// </summary>
                 Validate = 0x8,
@@ -116,13 +128,15 @@ namespace PoeShared.Native
                 AllChildren = 0x80,
 
                 /// <summary>
-                ///     Causes the affected windows, which you specify by setting the RDW_ALLCHILDREN and RDW_NOCHILDREN values, to receive WM_ERASEBKGND and WM_PAINT
+                ///     Causes the affected windows, which you specify by setting the RDW_ALLCHILDREN and RDW_NOCHILDREN values, to receive
+                ///     WM_ERASEBKGND and WM_PAINT
                 ///     messages before the RedrawWindow returns, if necessary.
                 /// </summary>
                 UpdateNow = 0x100,
 
                 /// <summary>
-                ///     Causes the affected windows, which you specify by setting the RDW_ALLCHILDREN and RDW_NOCHILDREN values, to receive WM_ERASEBKGND messages before
+                ///     Causes the affected windows, which you specify by setting the RDW_ALLCHILDREN and RDW_NOCHILDREN values, to receive
+                ///     WM_ERASEBKGND messages before
                 ///     RedrawWindow returns, if necessary.
                 ///     The affected windows receive WM_PAINT messages at the ordinary time.
                 /// </summary>

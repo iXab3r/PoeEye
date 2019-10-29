@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using CommandLine;
+using PoeShared.Native;
 using PoeShared.Scaffolding;
 
 namespace PoeShared
@@ -28,6 +29,7 @@ namespace PoeShared
         private AppArguments()
         {
             ProcessId = Process.GetCurrentProcess().Id;
+            IsElevated = UnsafeNative.IsElevated();
             var args = Environment.GetCommandLineArgs();
             StartupArgs = args.Skip(1)
                 .Where(x => !string.Equals(AutostartFlagValue, x, StringComparison.OrdinalIgnoreCase))
@@ -41,6 +43,8 @@ namespace PoeShared
         public string StartupArgs { get; }
         
         public int ProcessId { get; }
+        
+        public bool IsElevated { get; }
         
         public string ApplicationExecutablePath { get; }
         
