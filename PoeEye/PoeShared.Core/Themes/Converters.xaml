@@ -66,5 +66,6 @@
     <eyeConverters:ExceptionToMessageConverter x:Key="ExceptionToMessageConverter" />
     <eyeConverters:TimeSpanToHumanReadableStringConverter x:Key="TimeSpanToHumanReadableStringConverter" />
     <eyeConverters:EqualityConverter x:Key="EqualToVisibleConverter" TrueValue="{x:Static Visibility.Visible}" FalseValue="{x:Static Visibility.Collapsed}" />
+    <eyeConverters:PropagatingMultiValueConverter x:Key="PropagatingMultiValueConverter" />
 
 </ResourceDictionary>
