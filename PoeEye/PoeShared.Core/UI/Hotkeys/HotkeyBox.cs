@@ -1,8 +1,12 @@
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Interop;
 using PoeShared.Native;
+using Control = System.Windows.Controls.Control;
+using KeyEventArgs = System.Windows.Input.KeyEventArgs;
+using TextBox = System.Windows.Controls.TextBox;
 
 namespace PoeShared.UI.Hotkeys
 {
@@ -12,17 +16,41 @@ namespace PoeShared.UI.Hotkeys
         private const string PART_TextBox = "PART_TextBox";
 
         public static readonly DependencyProperty HotKeyProperty = DependencyProperty.Register(
-            "HotKey", typeof(HotkeyGesture), typeof(HotKeyBox),
+            "HotKey",
+            typeof(HotkeyGesture),
+            typeof(HotKeyBox),
             new FrameworkPropertyMetadata(default(HotkeyGesture), OnHotKeyChanged) {BindsTwoWayByDefault = true});
 
         public static readonly DependencyProperty AreModifierKeysRequiredProperty = DependencyProperty.Register(
-            "AreModifierKeysRequired", typeof(bool), typeof(HotKeyBox), new PropertyMetadata(default(bool)));
+            "AreModifierKeysRequired",
+            typeof(bool),
+            typeof(HotKeyBox),
+            new PropertyMetadata(default(bool)));
 
         public static readonly DependencyProperty WatermarkProperty = DependencyProperty.Register(
-            "Watermark", typeof(string), typeof(HotKeyBox), new PropertyMetadata(default(string)));
+            "Watermark",
+            typeof(string),
+            typeof(HotKeyBox),
+            new PropertyMetadata(default(string)));
 
         private static readonly DependencyPropertyKey TextPropertyKey = DependencyProperty.RegisterReadOnly(
-            "Text", typeof(string), typeof(HotKeyBox), new PropertyMetadata(default(string)));
+            "Text",
+            typeof(string),
+            typeof(HotKeyBox),
+            new PropertyMetadata(default(string)));
+
+        public static readonly DependencyProperty AcceptsMouseKeysProperty = DependencyProperty.Register(
+            "AcceptsMouseKeys",
+            typeof(bool),
+            typeof(HotKeyBox),
+            new PropertyMetadata(false));
+        
+        /// <summary>Identifies the <see cref="P:System.Windows.Controls.Primitives.TextBoxBase.AcceptsReturn" /> dependency property. </summary>
+        /// <returns>The identifier for the <see cref="P:System.Windows.Controls.Primitives.TextBoxBase.AcceptsReturn" /> dependency property.</returns>
+        public static readonly DependencyProperty AcceptsReturnProperty = KeyboardNavigation.AcceptsReturnProperty.AddOwner(typeof (HotKeyBox));
+        /// <summary>Identifies the <see cref="P:System.Windows.Controls.Primitives.TextBoxBase.AcceptsTab" /> dependency property. </summary>
+        /// <returns>The identifier for the <see cref="P:System.Windows.Controls.Primitives.TextBoxBase.AcceptsTab" /> dependency property.</returns>
+        public static readonly DependencyProperty AcceptsTabProperty = DependencyProperty.Register(nameof (TextBoxBase.AcceptsTab), typeof (bool), typeof (HotKeyBox), new FrameworkPropertyMetadata(false));
 
         public static readonly DependencyProperty TextProperty = TextPropertyKey.DependencyProperty;
 
@@ -32,6 +60,24 @@ namespace PoeShared.UI.Hotkeys
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(HotKeyBox), new FrameworkPropertyMetadata(typeof(HotKeyBox)));
             EventManager.RegisterClassHandler(typeof(HotKeyBox), GotFocusEvent, new RoutedEventHandler(OnGotFocus));
+        }
+        
+        public bool AcceptsReturn
+        {
+            get => (bool) this.GetValue(AcceptsReturnProperty);
+            set => this.SetValue(AcceptsReturnProperty, value);
+        }
+        
+        public bool AcceptsTab
+        {
+            get => (bool) this.GetValue(AcceptsTabProperty);
+            set => this.SetValue(AcceptsTabProperty, value);
+        }
+
+        public bool AcceptsMouseKeys
+        {
+            get => (bool) GetValue(AcceptsMouseKeysProperty);
+            set => SetValue(AcceptsMouseKeysProperty, value);
         }
 
         public HotkeyGesture HotKey
@@ -85,9 +131,10 @@ namespace PoeShared.UI.Hotkeys
             }
 
             // MoveFocus takes a TraversalRequest as its argument.
-            var request = new TraversalRequest((Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift
-                ? FocusNavigationDirection.Previous
-                : FocusNavigationDirection.Next);
+            var request = new TraversalRequest(
+                (Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift
+                    ? FocusNavigationDirection.Previous
+                    : FocusNavigationDirection.Next);
             // Gets the element with keyboard focus.
             var elementWithFocus = Keyboard.FocusedElement as UIElement;
             // Change keyboard focus.
@@ -100,7 +147,7 @@ namespace PoeShared.UI.Hotkeys
             if (textBox != null)
             {
                 textBox.PreviewMouseDown -= TextBoxOnPreviewMouseDown;
-                textBox.PreviewKeyDown -= TextBoxOnPreviewKeyDown2;
+                textBox.PreviewKeyDown -= TextBoxOnPreviewKeyDown;
                 textBox.GotFocus -= TextBoxOnGotFocus;
                 textBox.LostFocus -= TextBoxOnLostFocus;
                 textBox.TextChanged -= TextBoxOnTextChanged;
@@ -114,7 +161,7 @@ namespace PoeShared.UI.Hotkeys
                 return;
             }
 
-            textBox.PreviewKeyDown += TextBoxOnPreviewKeyDown2;
+            textBox.PreviewKeyDown += TextBoxOnPreviewKeyDown;
             textBox.PreviewMouseDown += TextBoxOnPreviewMouseDown;
 
             textBox.GotFocus += TextBoxOnGotFocus;
@@ -125,6 +172,10 @@ namespace PoeShared.UI.Hotkeys
 
         private void TextBoxOnPreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
+            if (!AcceptsMouseKeys)
+            {
+                return;
+            }
             var currentModifierKeys = GetCurrentModifierKeys();
             if (e.XButton1 == MouseButtonState.Pressed)
             {
@@ -164,12 +215,13 @@ namespace PoeShared.UI.Hotkeys
             ComponentDispatcher.ThreadPreprocessMessage -= ComponentDispatcherOnThreadPreprocessMessage;
         }
 
-        private void TextBoxOnPreviewKeyDown2(object sender, KeyEventArgs e)
+        private void TextBoxOnPreviewKeyDown(object sender, KeyEventArgs e)
         {
-            var key = e.Key == Key.System ? e.SystemKey : e.Key;
+            var key = e.Key == Key.System
+                ? e.SystemKey
+                : e.Key;
             switch (key)
             {
-                case Key.Tab:
                 case Key.LeftShift:
                 case Key.RightShift:
                 case Key.LeftCtrl:
@@ -178,6 +230,8 @@ namespace PoeShared.UI.Hotkeys
                 case Key.RightAlt:
                 case Key.RWin:
                 case Key.LWin:
+                case Key keyTab when keyTab == Key.Tab && !AcceptsTab:
+                case Key keyReturn when keyReturn == Key.Return && !AcceptsReturn:
                     return;
             }
 

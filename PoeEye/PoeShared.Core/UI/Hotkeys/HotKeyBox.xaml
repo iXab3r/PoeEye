@@ -19,6 +19,9 @@
         <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Hidden" />
         <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Hidden" />
         <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="AcceptsReturn" Value="True"/>
+        <Setter Property="AcceptsTab" Value="True"/>
+        <Setter Property="ToolTip" Value="Press Backspace to clear Hotkey"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type hotkeys1:HotKeyBox}">
@@ -43,7 +46,10 @@
                              SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
                              Text="{TemplateBinding Text}"
                              Validation.ErrorTemplate="{TemplateBinding Validation.ErrorTemplate}"
-                             VerticalScrollBarVisibility="{TemplateBinding ScrollViewer.VerticalScrollBarVisibility}" />
+                             VerticalScrollBarVisibility="{TemplateBinding ScrollViewer.VerticalScrollBarVisibility}"
+                             AcceptsReturn="{TemplateBinding AcceptsReturn}"
+                             AcceptsTab="{TemplateBinding AcceptsTab}"
+                             ToolTip="{TemplateBinding ToolTip}"/>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
