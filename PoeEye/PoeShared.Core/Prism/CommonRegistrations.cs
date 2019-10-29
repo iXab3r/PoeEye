@@ -8,6 +8,7 @@ using PoeShared.Modularity;
 using PoeShared.Native;
 using PoeShared.Scaffolding;
 using PoeShared.Services;
+using PoeShared.UI.Hotkeys;
 using ReactiveUI;
 using TypeConverter;
 using Unity;
@@ -32,6 +33,7 @@ namespace PoeShared.Prism
                 .RegisterSingleton<ISchedulerProvider, SchedulerProvider>()
                 .RegisterSingleton<IClipboardManager, ClipboardManager>()
                 .RegisterSingleton<IConfigSerializer, JsonConfigSerializer>()
+                .RegisterSingleton<IHotkeyConverter, HotkeyConverter>()
                 .RegisterSingleton<IFactory<IWinEventHookWrapper, WinEventHookArguments>, WinEventHookWrapperFactory>();
 
             Container

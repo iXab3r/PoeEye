@@ -8,11 +8,12 @@ using log4net;
 
 namespace PoeShared.UI.Hotkeys
 {
-    public class HotkeyConverter : System.ComponentModel.TypeConverter
+    public class HotkeyConverter : System.ComponentModel.TypeConverter, IHotkeyConverter
     {
         private const char ModifiersDelimiter = '+';
         private static readonly KeyConverter KeyConverter = new KeyConverter();
         private static readonly ModifierKeysConverter ModifierKeysConverter = new ModifierKeysConverter();
+        private static readonly HotkeyGesture NoneHotkey = new HotkeyGesture(Key.None); 
 
         private readonly IDictionary<string, HotkeyGesture> mouseKeys;
         private readonly CultureInfo[] knownCultures;
@@ -44,12 +45,12 @@ namespace PoeShared.UI.Hotkeys
 
         public string ConvertToString(HotkeyGesture hotkeyGesture)
         {
-            return (string)ConvertTo(hotkeyGesture, typeof(string));
+            return hotkeyGesture == null ? NoneHotkey.ToString() : (string)ConvertTo(hotkeyGesture, typeof(string)) ?? NoneHotkey.ToString();
         }
         
         public new HotkeyGesture ConvertFromString(string source)
         {
-            return (HotkeyGesture) ConvertFrom(source ?? string.Empty);
+            return (HotkeyGesture) ConvertFrom(source ?? string.Empty) ?? NoneHotkey;
         }
 
         public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)

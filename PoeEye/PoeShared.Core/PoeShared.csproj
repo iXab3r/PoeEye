@@ -320,6 +320,7 @@
     <Compile Include="UI\Hotkeys\HotkeyConverter.cs" />
     <Compile Include="UI\Hotkeys\HotkeyGesture.cs" />
     <Compile Include="UI\Hotkeys\HotkeyMode.cs" />
+    <Compile Include="UI\Hotkeys\IHotkeyConverter.cs" />
     <Compile Include="UI\RemoveItemController.cs" />
     <Compile Include="UI\UiConstants.cs" />
   </ItemGroup>
