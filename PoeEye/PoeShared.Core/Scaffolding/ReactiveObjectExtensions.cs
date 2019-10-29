@@ -14,6 +14,19 @@ namespace PoeShared.Scaffolding
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(ReactiveObjectExtensions));
 
+        public static IDisposable RaiseWhenSourceValue<TSource, TTarget, TSourceProperty, TTargetProperty>(
+            [NotNull] this TTarget instance,
+            [NotNull] Expression<Func<TTarget, TTargetProperty>> instancePropertyExtractor,
+            [NotNull] TSource source,
+            [NotNull] Expression<Func<TSource, TSourceProperty>> sourcePropertyExtractor)
+            where TSource : INotifyPropertyChanged
+            where TTarget : IDisposableReactiveObject
+        {
+            // backward compatibility
+            return BindPropertyTo(instance, instancePropertyExtractor, source, sourcePropertyExtractor);
+        }
+
+        [Obsolete("Use RaiseWhenSourceValue instead")]
         public static IDisposable BindPropertyTo<TSource, TTarget, TSourceProperty, TTargetProperty>(
             [NotNull] this TTarget instance,
             [NotNull] Expression<Func<TTarget, TTargetProperty>> instancePropertyExtractor,
