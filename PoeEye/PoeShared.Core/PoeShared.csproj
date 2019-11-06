@@ -186,6 +186,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AppArguments.cs" />
+    <Compile Include="Audio\Services\AudioNotificationsManager.cs" />
+    <Compile Include="Audio\Services\AudioNotificationType.cs" />
+    <Compile Include="Audio\Services\AudioPlayer.cs" />
+    <Compile Include="Audio\Services\ComplexSoundLibrary.cs" />
+    <Compile Include="Audio\Services\FileSoundLibrarySource.cs" />
+    <Compile Include="Audio\Services\IAudioNotificationsManager.cs" />
+    <Compile Include="Audio\Services\IAudioPlayer.cs" />
+    <Compile Include="Audio\Services\ISoundLibrarySource.cs" />
+    <Compile Include="Audio\Services\SoundLibrarySourceBase.cs" />
+    <Compile Include="Audio\ViewModels\AudioNotificationSelectorViewModel.cs" />
+    <Compile Include="Audio\ViewModels\IAudioNotificationSelectorViewModel.cs" />
     <Compile Include="Common\TriState.cs" />
     <Compile Include="Converters\BoolInversionConverter.cs" />
     <Compile Include="Converters\ConcreteTypeConverter.cs" />
@@ -237,6 +248,7 @@
     <Compile Include="Native\WinEventHookWrapper.cs" />
     <Compile Include="Native\WinEventHookWrapperFactory.cs" />
     <Compile Include="Prism\PoeSharedModule.cs" />
+    <Compile Include="Resources\Notifications\EmbeddedSoundLibrarySource.cs" />
     <Compile Include="Scaffolding\ChangeSetExtensions.cs" />
     <Compile Include="Scaffolding\CircularBuffer.cs" />
     <Compile Include="Scaffolding\DateTimeUtils.cs" />
@@ -395,6 +407,9 @@
   </ItemGroup>
   <ItemGroup>
     <Page Include="UI\RangeSlider.xaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="Audio\Views\AudioNotificationTypeSelectorView.xaml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

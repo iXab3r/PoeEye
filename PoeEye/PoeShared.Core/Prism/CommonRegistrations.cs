@@ -3,9 +3,12 @@ using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Reactive.Concurrency;
 using System.Text.RegularExpressions;
+using PoeShared.Audio.Services;
+using PoeShared.Audio.ViewModels;
 using PoeShared.Communications;
 using PoeShared.Modularity;
 using PoeShared.Native;
+using PoeShared.Resources.Notifications;
 using PoeShared.Scaffolding;
 using PoeShared.Services;
 using PoeShared.UI.Hotkeys;
@@ -14,6 +17,8 @@ using TypeConverter;
 using Unity;
 using Unity.Extension;
 using Unity.Injection;
+using Unity.Lifetime;
+using Unity.Resolution;
 
 namespace PoeShared.Prism
 {
@@ -34,12 +39,15 @@ namespace PoeShared.Prism
                 .RegisterSingleton<IClipboardManager, ClipboardManager>()
                 .RegisterSingleton<IConfigSerializer, JsonConfigSerializer>()
                 .RegisterSingleton<IHotkeyConverter, HotkeyConverter>()
+                .RegisterSingleton<IAudioNotificationsManager, AudioNotificationsManager>()
+                .RegisterSingleton<IAudioPlayer, AudioPlayer>()
                 .RegisterSingleton<IFactory<IWinEventHookWrapper, WinEventHookArguments>, WinEventHookWrapperFactory>();
 
             Container
                 .RegisterType<IScheduler>(WellKnownSchedulers.UI, new InjectionFactory(x => RxApp.MainThreadScheduler))
                 .RegisterType<IScheduler>(WellKnownSchedulers.Background, new InjectionFactory(x => RxApp.TaskpoolScheduler))
                 .RegisterType<IHttpClient, GenericHttpClient>()
+                .RegisterType<IAudioNotificationSelectorViewModel, AudioNotificationSelectorViewModel>()
                 .RegisterType(typeof(IFactory<,,>), typeof(Factory<,,>))
                 .RegisterType(typeof(IFactory<,>), typeof(Factory<,>))
                 .RegisterType(typeof(IFactory<>), typeof(Factory<>));
@@ -57,6 +65,21 @@ namespace PoeShared.Prism
                 return regex;
             });
             Container.RegisterWindowTracker(WellKnownWindows.PathOfExileWindow, () => "^Path of Exile$");
+            
+            
+            Container
+                .RegisterType<ISoundLibrarySource>(
+                    new ContainerControlledLifetimeManager(),
+                    new InjectionFactory(
+                        unity => unity.Resolve<ComplexSoundLibrary>(
+                            new DependencyOverride<ISoundLibrarySource[]>(
+                                new ISoundLibrarySource[]
+                                {
+                                    unity.Resolve<FileSoundLibrarySource>(),
+                                    unity.Resolve<EmbeddedSoundLibrarySource>()
+                                }
+                            )
+                        )));
         }
     }
 }
