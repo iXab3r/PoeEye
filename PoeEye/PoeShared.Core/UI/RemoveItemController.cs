@@ -1,3 +1,4 @@
+using System;
 using System.Collections.ObjectModel;
 using PoeShared.Native;
 
@@ -17,6 +18,10 @@ namespace PoeShared.UI
         public void Close()
         {
             collection.Remove(item);
+            if (item is IDisposable disposable)
+            {
+                disposable.Dispose();
+            }
         }
     }
 }
