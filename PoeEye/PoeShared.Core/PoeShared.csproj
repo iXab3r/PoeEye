@@ -394,7 +394,7 @@
     <Page Include="UI\Hotkeys\HotKeyBox.xaml" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="UI\ColorRangeSlider.xaml" />
+    <Page Include="UI\RangeSlider.xaml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

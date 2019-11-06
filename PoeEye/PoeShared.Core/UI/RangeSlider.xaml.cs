@@ -4,27 +4,27 @@ using System.Windows.Controls;
 
 namespace PoeShared.UI
 {
-    public partial class ColorRangeSlider : UserControl
+    public partial class RangeSlider : UserControl
     {
         public static readonly RoutedEvent ValueChangedEvent = EventManager.RegisterRoutedEvent(
             "ValueChanged",
             RoutingStrategy.Bubble,
             typeof(RoutedPropertyChangedEventHandler<double[]>),
-            typeof(ColorRangeSlider));
+            typeof(RangeSlider));
 
         public static readonly DependencyProperty MinimumProperty =
-            DependencyProperty.Register("Minimum", typeof(double), typeof(ColorRangeSlider), new UIPropertyMetadata(0d));
+            DependencyProperty.Register("Minimum", typeof(double), typeof(RangeSlider), new UIPropertyMetadata(0d));
 
         public static readonly DependencyProperty LowerValueProperty =
-            DependencyProperty.Register("LowerValue", typeof(double), typeof(ColorRangeSlider), new UIPropertyMetadata(0d));
+            DependencyProperty.Register("LowerValue", typeof(double), typeof(RangeSlider), new UIPropertyMetadata(0d));
 
         public static readonly DependencyProperty UpperValueProperty =
-            DependencyProperty.Register("UpperValue", typeof(double), typeof(ColorRangeSlider), new UIPropertyMetadata(0d));
+            DependencyProperty.Register("UpperValue", typeof(double), typeof(RangeSlider), new UIPropertyMetadata(0d));
 
         public static readonly DependencyProperty MaximumProperty =
-            DependencyProperty.Register("Maximum", typeof(double), typeof(ColorRangeSlider), new UIPropertyMetadata(1d));
+            DependencyProperty.Register("Maximum", typeof(double), typeof(RangeSlider), new UIPropertyMetadata(1d));
 
-        public ColorRangeSlider()
+        public RangeSlider()
         {
             InitializeComponent();
 
