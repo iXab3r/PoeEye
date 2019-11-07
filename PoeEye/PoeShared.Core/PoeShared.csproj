@@ -1,342 +1,75 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <CefSharpAnyCpuSupport>true</CefSharpAnyCpuSupport>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{12DF53DD-7144-4D2D-B7A1-B4BC5BBDFB69}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>PoeShared</RootNamespace>
-    <AssemblyName>PoeShared</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
-    <TargetFrameworkProfile />
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <TargetFramework>net461</TargetFramework>
+    <AssemblyTitle>PoeShared</AssemblyTitle>
+    <Product>PoeShared</Product>
+    <Description>PoeEye Shared classes</Description>
+    <Copyright>Copyright © Xab3r 2015</Copyright>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Blue.MVVM.Converter, Version=1.5.0.27868, Culture=neutral, PublicKeyToken=1bb1db17d606db59">
-      <HintPath>..\packages\Blue.MVVM.Converter.1.5.0\lib\net45\Blue.MVVM.Converter.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="CommandLine, Version=1.9.71.2, Culture=neutral, PublicKeyToken=de6f01bd326f8c32, processorArchitecture=MSIL">
-      <HintPath>..\packages\CommandLineParser.1.9.71\lib\net45\CommandLine.dll</HintPath>
-    </Reference>
-    <Reference Include="CommonServiceLocator, Version=2.0.4.0, Culture=neutral, PublicKeyToken=489b6accfaf20ef0">
-      <HintPath>..\packages\CommonServiceLocator.2.0.4\lib\net46\CommonServiceLocator.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="CsQuery, Version=1.3.3.249, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CsQuery.1.3.4\lib\net40\CsQuery.dll</HintPath>
-    </Reference>
-    <Reference Include="DynamicData, Version=6.13.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\packages\DynamicData.6.13.13\lib\net461\DynamicData.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="FontAwesome.WPF, Version=4.7.0.37774, Culture=neutral, PublicKeyToken=0758b07a11a4f466">
-      <HintPath>..\packages\FontAwesome.WPF.4.7.0.9\lib\net40\FontAwesome.WPF.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Gma.System.MouseKeyHook, Version=5.6.130.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\packages\MouseKeyHook.5.6.0\lib\net40\Gma.System.MouseKeyHook.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Guards, Version=1.0.0.0, Culture=neutral, PublicKeyToken=ac6aedb73a72f46e, processorArchitecture=MSIL">
-      <HintPath>..\packages\Guards.1.0.10\lib\portable-net45+dnxcore50+wp80+wpa81+win81+netcore45+monoandroid10+monotouch10+xamarin.ios10\Guards.dll</HintPath>
-    </Reference>
-    <Reference Include="ICSharpCode.AvalonEdit, Version=5.0.3.0, Culture=neutral, PublicKeyToken=9cc39be672370310, processorArchitecture=MSIL">
-      <HintPath>..\packages\AvalonEdit.5.0.3\lib\Net40\ICSharpCode.AvalonEdit.dll</HintPath>
-    </Reference>
-    <Reference Include="JetBrains.Annotations, Version=2019.1.3.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325">
-      <HintPath>..\packages\JetBrains.Annotations.2019.1.3\lib\net20\JetBrains.Annotations.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="JsonFx, Version=2.0.1209.2802, Culture=neutral, PublicKeyToken=315052dd637f8a52, processorArchitecture=MSIL">
-      <HintPath>..\packages\JsonFx.2.0.1209.2802\lib\net40\JsonFx.dll</HintPath>
-    </Reference>
-    <Reference Include="KellermanSoftware.Compare-NET-Objects, Version=3.6.0.0, Culture=neutral, PublicKeyToken=d970ace04cc85217, processorArchitecture=MSIL">
-      <HintPath>..\packages\CompareNETObjects.3.06.0.0\lib\net46\KellermanSoftware.Compare-NET-Objects.dll</HintPath>
-    </Reference>
-    <Reference Include="Kent.Boogaart.Converters, Version=1.3.1.0, Culture=neutral, PublicKeyToken=cc96fa93a217f7a1">
-      <HintPath>..\packages\Kent.Boogaart.Converters.1.3.1\lib\net45\Kent.Boogaart.Converters.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Kent.Boogaart.HelperTrinity, Version=1.5.2.0, Culture=neutral, PublicKeyToken=cc96fa93a217f7a1, processorArchitecture=MSIL">
-      <HintPath>..\packages\Kent.Boogaart.HelperTrinity.1.5.2\lib\net45\Kent.Boogaart.HelperTrinity.dll</HintPath>
-    </Reference>
-    <Reference Include="log4net, Version=2.0.8.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a">
-      <HintPath>..\packages\log4net.2.0.8\lib\net45-full\log4net.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="MahApps.Metro, Version=1.4.3.0, Culture=neutral, PublicKeyToken=f4fb5a3c4d1e5b4f, processorArchitecture=MSIL">
-      <HintPath>..\packages\MahApps.Metro.1.4.3\lib\net45\MahApps.Metro.dll</HintPath>
-    </Reference>
-    <Reference Include="MaterialDesignColors, Version=1.2.0.325, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\packages\MaterialDesignColors.1.2.0\lib\net45\MaterialDesignColors.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="MaterialDesignThemes.Wpf, Version=1.0.1.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\packages\MaterialDesignThemes.3.0.0-ci683\lib\net45\MaterialDesignThemes.Wpf.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Microsoft.Win32.TaskScheduler, Version=2.5.19.0, Culture=neutral, PublicKeyToken=0d013ddd5178a2ae">
-      <HintPath>..\packages\TaskScheduler.2.5.19\lib\net452\Microsoft.Win32.TaskScheduler.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="NAudio, Version=1.8.5.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\packages\NAudio.1.8.5\lib\net35\NAudio.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.8.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
+    <PackageReference Include="AvalonEdit" Version="5.0.3" />
+    <PackageReference Include="Blue.MVVM.Converter" Version="1.5.0" />
+    <PackageReference Include="CommandLineParser" Version="1.9.71" />
+    <PackageReference Include="CommonServiceLocator" Version="2.0.4" />
+    <PackageReference Include="CompareNETObjects" Version="3.06.0.0" />
+    <PackageReference Include="CsQuery" Version="1.3.4" />
+    <PackageReference Include="DynamicData" Version="6.13.13" />
+    <PackageReference Include="FontAwesome.WPF" Version="4.7.0.9" />
+    <PackageReference Include="Guards" Version="1.0.10" />
+    <PackageReference Include="JetBrains.Annotations" Version="2019.1.3" />
+    <PackageReference Include="JsonFx" Version="2.0.1209.2802" />
+    <PackageReference Include="Kent.Boogaart.Converters" Version="1.3.1" />
+    <PackageReference Include="Kent.Boogaart.HelperTrinity" Version="1.5.2" />
+    <PackageReference Include="log4net" Version="2.0.8" />
+    <PackageReference Include="MahApps.Metro" Version="1.4.3" />
+    <PackageReference Include="MaterialDesignColors" Version="1.2.0" />
+    <PackageReference Include="MaterialDesignThemes" Version="3.0.0-ci683" />
+    <PackageReference Include="Microsoft.CSharp" Version="4.0.1" />
+    <PackageReference Include="MouseKeyHook" Version="5.6.0" />
+    <PackageReference Include="NAudio" Version="1.8.5" />
+    <PackageReference Include="Newtonsoft.Json" Version="8.0.3" />
+    <PackageReference Include="Prism.Core" Version="7.2.0.1367" />
+    <PackageReference Include="Prism.Unity" Version="7.2.0.1367" />
+    <PackageReference Include="Prism.Wpf" Version="7.2.0.1367" />
+    <PackageReference Include="ReactiveUI" Version="10.4.1" />
+    <PackageReference Include="RestEase" Version="1.0.5" />
+    <PackageReference Include="RestSharp" Version="105.2.3" />
+    <PackageReference Include="Splat" Version="9.1.1" />
+    <PackageReference Include="Splat.Drawing" Version="9.1.1" />
+    <PackageReference Include="StartupHelper" Version="1.0.2.0" />
+    <PackageReference Include="System.Drawing.Primitives" Version="4.3.0" />
+    <PackageReference Include="System.Reactive" Version="4.2.0" />
+    <PackageReference Include="System.Reflection.Emit" Version="4.3.0" />
+    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.5.2" />
+    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.3" />
+    <PackageReference Include="System.ValueTuple" Version="4.5.0" />
+    <PackageReference Include="TaskScheduler" Version="2.5.19" />
+    <PackageReference Include="TypeConverter" Version="1.0.22" />
+    <PackageReference Include="Unity" Version="5.10.3" />
+    <PackageReference Include="Unity.Abstractions" Version="4.1.3" />
+    <PackageReference Include="Unity.Container" Version="5.10.3" />
+  </ItemGroup>
+  <ItemGroup>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
-    <Reference Include="Prism, Version=7.2.0.1367, Culture=neutral, PublicKeyToken=40ee6c3a2184dc59">
-      <HintPath>..\packages\Prism.Core.7.2.0.1367\lib\net45\Prism.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Prism.Unity.Wpf, Version=7.2.0.1367, Culture=neutral, PublicKeyToken=40ee6c3a2184dc59">
-      <HintPath>..\packages\Prism.Unity.7.2.0.1367\lib\net45\Prism.Unity.Wpf.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Prism.Wpf, Version=7.2.0.1367, Culture=neutral, PublicKeyToken=40ee6c3a2184dc59">
-      <HintPath>..\packages\Prism.Wpf.7.2.0.1367\lib\net45\Prism.Wpf.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="ReactiveUI, Version=10.4.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\packages\ReactiveUI.10.4.1\lib\net461\ReactiveUI.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="RestEase, Version=1.0.5.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\RestEase.1.0.5\lib\net45\RestEase.dll</HintPath>
-    </Reference>
-    <Reference Include="RestSharp, Version=105.2.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\RestSharp.105.2.3\lib\net46\RestSharp.dll</HintPath>
-    </Reference>
-    <Reference Include="Splat, Version=9.1.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\packages\Splat.9.1.1\lib\net461\Splat.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Splat.Drawing, Version=9.1.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\packages\Splat.Drawing.9.1.1\lib\net461\Splat.Drawing.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="StartupHelper, Version=1.0.2.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\packages\StartupHelper.1.0.2.0\lib\net20\StartupHelper.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System" />
     <Reference Include="System.Configuration" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Drawing.Primitives, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Drawing.Primitives.4.3.0\lib\net45\System.Drawing.Primitives.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Reactive, Version=4.2.0.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263">
-      <HintPath>..\packages\System.Reactive.4.2.0\lib\net46\System.Reactive.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System.Runtime.Caching" />
-    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=4.0.4.1, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.4.5.2\lib\netstandard2.0\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System.Security" />
-    <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51">
-      <HintPath>..\packages\System.Threading.Tasks.Extensions.4.5.3\lib\netstandard2.0\System.Threading.Tasks.Extensions.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.ValueTuple.4.5.0\lib\net461\System.ValueTuple.dll</HintPath>
-    </Reference>
     <Reference Include="System.Web" />
     <Reference Include="System.Windows" />
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
-      <HintPath>..\packages\Prism.Wpf.7.2.0.1367\lib\net45\System.Windows.Interactivity.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System.Xaml" />
-    <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
-    <Reference Include="TypeConverter, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b1d2d39c48564dfb, processorArchitecture=MSIL">
-      <HintPath>..\packages\TypeConverter.1.0.22\lib\portable-net45+wp8+wpa81+win81+netcore45+monoandroid1+xamarin.ios10\TypeConverter.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.Abstractions, Version=4.1.3.0, Culture=neutral, PublicKeyToken=489b6accfaf20ef0">
-      <HintPath>..\packages\Unity.Abstractions.4.1.3\lib\net46\Unity.Abstractions.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Unity.Container, Version=5.10.3.0, Culture=neutral, PublicKeyToken=489b6accfaf20ef0">
-      <HintPath>..\packages\Unity.Container.5.10.3\lib\net46\Unity.Container.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AppArguments.cs" />
-    <Compile Include="Audio\Services\AudioNotificationsManager.cs" />
-    <Compile Include="Audio\Services\AudioNotificationType.cs" />
-    <Compile Include="Audio\Services\AudioPlayer.cs" />
-    <Compile Include="Audio\Services\ComplexSoundLibrary.cs" />
-    <Compile Include="Audio\Services\FileSoundLibrarySource.cs" />
-    <Compile Include="Audio\Services\IAudioNotificationsManager.cs" />
-    <Compile Include="Audio\Services\IAudioPlayer.cs" />
-    <Compile Include="Audio\Services\ISoundLibrarySource.cs" />
-    <Compile Include="Audio\Services\SoundLibrarySourceBase.cs" />
-    <Compile Include="Audio\ViewModels\AudioNotificationSelectorViewModel.cs" />
-    <Compile Include="Audio\ViewModels\IAudioNotificationSelectorViewModel.cs" />
-    <Compile Include="Common\TriState.cs" />
-    <Compile Include="Converters\BoolInversionConverter.cs" />
-    <Compile Include="Converters\ConcreteTypeConverter.cs" />
-    <Compile Include="Converters\ConverterHelpers.cs" />
-    <Compile Include="Converters\EqualityConverter.cs" />
-    <Compile Include="Converters\ExceptionToMessageConverter.cs" />
-    <Compile Include="Converters\FlagToObjectConverter.cs" />
-    <Compile Include="Converters\IconToImageSourceConverter.cs" />
-    <Compile Include="Converters\MathAdditionConverter.cs" />
-    <Compile Include="Converters\MultiBooleanConverter.cs" />
-    <Compile Include="Converters\MultiDoubleSumConverter.cs" />
-    <Compile Include="Converters\NullableConverter.cs" />
-    <Compile Include="Converters\NullToBoolConverter.cs" />
-    <Compile Include="Converters\NullToVisibilityConverter.cs" />
-    <Compile Include="Converters\NullToVisibilityMultiValueConverter.cs" />
-    <Compile Include="Converters\ObjectToLowercaseConverter.cs" />
-    <Compile Include="Converters\ObjectToTypeConverter.cs" />
-    <Compile Include="Converters\ObjectToVisibilityConverter.cs" />
-    <Compile Include="Converters\PropagatingMultiValueConverter.cs" />
-    <Compile Include="Converters\SafeDataConverter.cs" />
-    <Compile Include="Converters\TimeSpanToHumanReadableStringConverter.cs" />
-    <Compile Include="Converters\TimeSpanToSecondsConverter.cs" />
-    <Compile Include="Guard.cs" />
-    <Compile Include="LogExtensions.cs" />
-    <Compile Include="Modularity\GenericConfigProvider.cs" />
-    <Compile Include="Modularity\IConfigSerializer.cs" />
-    <Compile Include="Modularity\ISchedulerProvider.cs" />
-    <Compile Include="Modularity\JsonConfigSerializer.cs" />
-    <Compile Include="Modularity\PoeEyeConfigProviderInMemory.cs" />
-    <Compile Include="Modularity\SchedulerProvider.cs" />
-    <Compile Include="Native\ClipboardManager.cs" />
-    <Compile Include="Native\ContentControlEx.cs" />
-    <Compile Include="Native\IActivationController.cs" />
-    <Compile Include="Native\ICanBeEnabled.cs" />
-    <Compile Include="Native\IClipboardManager.cs" />
-    <Compile Include="Native\ICloseController.cs" />
-    <Compile Include="Native\IKeyboardEventsSource.cs" />
-    <Compile Include="Native\IOverlayConfig.cs" />
-    <Compile Include="Native\IRegexStringMatcher.cs" />
-    <Compile Include="Native\IStringMatcher.cs" />
-    <Compile Include="Native\IWindowTracker.cs" />
-    <Compile Include="Native\IWinEventHookWrapper.cs" />
-    <Compile Include="Native\RegexStringMatcher.cs" />
-    <Compile Include="Native\ResourceReader.cs" />
-    <Compile Include="Native\SafeKeyboardMouseEvents.cs" />
-    <Compile Include="Native\UnsafeNative.cs" />
-    <Compile Include="Native\WindowTracker.cs" />
-    <Compile Include="Native\WinEventHookArguments.cs" />
-    <Compile Include="Native\WinEventHookWrapper.cs" />
-    <Compile Include="Native\WinEventHookWrapperFactory.cs" />
-    <Compile Include="Prism\PoeSharedModule.cs" />
-    <Compile Include="Resources\Notifications\EmbeddedSoundLibrarySource.cs" />
-    <Compile Include="Scaffolding\ChangeSetExtensions.cs" />
-    <Compile Include="Scaffolding\CircularBuffer.cs" />
-    <Compile Include="Scaffolding\DateTimeUtils.cs" />
-    <Compile Include="Scaffolding\DependencyObjectExtensions.cs" />
-    <Compile Include="Scaffolding\DictionaryExtensions.cs" />
-    <Compile Include="Scaffolding\DisposableExtensions.cs" />
-    <Compile Include="Scaffolding\ExpressionExtensions.cs" />
-    <Compile Include="Scaffolding\Fallback.cs" />
-    <Compile Include="Scaffolding\IntPtrExtensions.cs" />
-    <Compile Include="Scaffolding\KeyEventArgsExtensions.cs" />
-    <Compile Include="Scaffolding\NotifyPropertyChangedExtensions.cs" />
-    <Compile Include="Scaffolding\ReactiveObjectExtensions.cs" />
-    <Compile Include="Scaffolding\SizeExtensions.cs" />
-    <Compile Include="Scaffolding\StreamExtensions.cs" />
-    <Compile Include="Clock.cs" />
-    <Compile Include="Communications\GenericHttpClient.cs" />
-    <Compile Include="Communications\IHttpClient.cs" />
-    <Compile Include="Communications\NameValueCollectionToQueryStringConverter.cs" />
-    <Compile Include="Converters\TwoNumbersToSizeConverter.cs" />
-    <Compile Include="IClock.cs" />
-    <Compile Include="IRandomNumberGenerator.cs" />
-    <Compile Include="Scaffolding\StringUtils.cs" />
-    <Compile Include="Scaffolding\WPF\BindableSelectedItemBehavior.cs" />
-    <Compile Include="Scaffolding\WPF\BindingProxy.cs" />
-    <Compile Include="Scaffolding\WPF\EnumHelper.cs" />
-    <Compile Include="Scaffolding\WPF\FocusHelper.cs" />
-    <Compile Include="Services\IStartupManager.cs" />
-    <Compile Include="Services\StartupManager.cs" />
-    <Compile Include="Services\StartupManagerArgs.cs" />
-    <Compile Include="SharedLog.cs" />
-    <Compile Include="Modularity\IConfigProvider.cs" />
-    <Compile Include="Modularity\IPoeEyeConfig.cs" />
-    <Compile Include="Modularity\IPoeEyeModule.cs" />
-    <Compile Include="Modularity\IPoeEyeModulesRegistrator.cs" />
-    <Compile Include="Modularity\ISettingsViewModel.cs" />
-    <Compile Include="Modularity\PoeEyeModulesRegistrator.cs" />
-    <Compile Include="Modularity\PoeEyeSharedConfig.cs" />
-    <Compile Include="Native\IOverlayViewModel.cs" />
-    <Compile Include="Native\IOverlayWindowController.cs" />
-    <Compile Include="Native\OverlayMode.cs" />
-    <Compile Include="Native\OverlayViewModelBase.cs" />
-    <Compile Include="Native\OverlayWindowController.cs" />
-    <Compile Include="Native\OverlayWindowView.xaml.cs">
+    <Compile Update="Native\OverlayWindowView.xaml.cs">
       <DependentUpon>OverlayWindowView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Native\OverlayWindowViewModel.cs" />
-    <Compile Include="Native\TransparentWindow.cs" />
-    <Compile Include="Native\WindowsServices.cs" />
-    <Compile Include="Prism\CommonRegistrations.cs" />
-    <Compile Include="Prism\Factory`2.cs" />
-    <Compile Include="Prism\Factory.cs" />
-    <Compile Include="Prism\Factory`3.cs" />
-    <Compile Include="Prism\IFactory.cs" />
-    <Compile Include="Prism\WellKnownOverlays.cs" />
-    <Compile Include="Prism\WellKnownSchedulers.cs" />
-    <Compile Include="Prism\WellKnownWindows.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RandomNumberGenerator.cs" />
-    <Compile Include="Scaffolding\AssemblyExtensions.cs" />
-    <Compile Include="Scaffolding\DataPipe.cs" />
-    <Compile Include="Scaffolding\DataPipeCollection.cs" />
-    <Compile Include="Scaffolding\DataPiping.cs" />
-    <Compile Include="Scaffolding\DisposableReactiveObject.cs" />
-    <Compile Include="Scaffolding\EnumerableExtensions.cs" />
-    <Compile Include="Scaffolding\IDisposableReactiveObject.cs" />
-    <Compile Include="Scaffolding\KeyGestureExtensions.cs" />
-    <Compile Include="Scaffolding\LambdaComparer.cs" />
-    <Compile Include="Scaffolding\ObjectExtensions.cs" />
-    <Compile Include="Scaffolding\ObservableExtensions.cs" />
-    <Compile Include="Scaffolding\StringExtensions.cs" />
-    <Compile Include="Scaffolding\UnityContainerExtensions.cs" />
-    <Compile Include="Scaffolding\WPF\AccessKeyScoper.cs" />
-    <Compile Include="Scaffolding\WPF\CommandWrapper.cs" />
-    <Compile Include="Scaffolding\WPF\CommandWrapperHelper.cs" />
-    <Compile Include="Scaffolding\WPF\EnableDragHelper.cs" />
-    <Compile Include="Scaffolding\WPF\InputBindingsManager.cs" />
-    <Compile Include="Scaffolding\WPF\IPageParameterDataViewModel.cs" />
-    <Compile Include="Scaffolding\WPF\MappingTemplateSelector.cs" />
-    <Compile Include="Scaffolding\WPF\ScrollViewerExtensions.cs" />
-    <Compile Include="Scaffolding\WPF\StackPanelEx.cs" />
-    <Compile Include="UI\Hotkeys\HotkeyBox.cs" />
-    <Compile Include="UI\Hotkeys\HotkeyConverter.cs" />
-    <Compile Include="UI\Hotkeys\HotkeyGesture.cs" />
-    <Compile Include="UI\Hotkeys\HotkeyMode.cs" />
-    <Compile Include="UI\Hotkeys\IHotkeyConverter.cs" />
-    <Compile Include="UI\RangeSlider.xaml.cs" />
-    <Compile Include="UI\RemoveItemController.cs" />
-    <Compile Include="UI\UiConstants.cs" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="Themes\CommandWrapperView.xaml">
@@ -381,9 +114,6 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="FodyWeavers.xml" />
     <EmbeddedResource Include="Resources\Notifications\mercury.wav" />
     <EmbeddedResource Include="Resources\Notifications\wob.wav" />
@@ -400,9 +130,6 @@
     <Resource Include="Resources\mouse-device-right-click-control.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
     <Page Include="UI\Hotkeys\HotKeyBox.xaml" />
   </ItemGroup>
   <ItemGroup>
@@ -411,12 +138,4 @@
   <ItemGroup>
     <Page Include="Audio\Views\AudioNotificationTypeSelectorView.xaml" />
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>
