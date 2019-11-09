@@ -4,7 +4,12 @@ using System.Runtime.InteropServices;
 using System.Security.Principal;
 using System.Text;
 using System.Windows;
+using System.Windows.Forms;
+using System.Windows.Interop;
 using log4net;
+using PoeShared.Scaffolding;
+using Point = System.Windows.Point;
+using Size = System.Windows.Size;
 
 namespace PoeShared.Native
 {
@@ -47,6 +52,12 @@ namespace PoeShared.Native
         [DllImport("user32.dll")]
         public static extern bool GetWindowRect(IntPtr hwnd, ref Rect rectangle);
 
+        [DllImport("user32.dll", EntryPoint = "GetDC")]
+        private static extern IntPtr GetDC(IntPtr ptr);
+        
+        [DllImport("user32.dll")]
+        public static extern IntPtr GetDesktopWindow();
+        
         public static bool IsElevated()
         {
             using (var identity = WindowsIdentity.GetCurrent())
@@ -82,6 +93,118 @@ namespace PoeShared.Native
             }
 
             return new Rectangle((int) result.X, (int) result.Y, (int) result.Width, (int) result.Height);
+        }
+        
+        public static Rect GetActiveMonitorBounds(Window window)
+        {
+            var handle = window != null
+                ? new WindowInteropHelper(window).Handle
+                : IntPtr.Zero;
+            return GetActiveMonitorBounds(handle);
+        }
+
+        public static Rect GetActiveMonitorBounds(IntPtr windowHandle)
+        {
+            var screen = Screen.FromHandle(windowHandle);
+            var graphics = Graphics.FromHdc(GetDC(windowHandle));
+            var dpi = GetDpi(graphics);
+
+            Log.Debug($"Monitor for window 0x{windowHandle.ToInt64():X8}: {GetMonitorInfo(windowHandle)}");
+            return GetMonitorBounds(screen, dpi);
+        }
+
+        public static Rect GetMonitorBounds(Screen monitor, PointF dpi)
+        {
+            var result = new Rect(
+                monitor.Bounds.X,
+                monitor.Bounds.Y,
+                monitor.Bounds.Width,
+                monitor.Bounds.Height);
+            result.Scale(1 / dpi.X, 1 / dpi.Y);
+            return result;
+        }
+
+        public static PointF GetDesktopDpi()
+        {
+            var windowHandle = GetDesktopWindow();
+            var graphics = Graphics.FromHdc(GetDC(windowHandle));
+            
+            return GetDpi(graphics);
+        }
+
+        private static PointF GetDpi(Graphics graphics)
+        {
+            return new PointF(graphics.DpiX / 96f, graphics.DpiY / 96f);
+        }
+        
+        public static bool IsOutOfBounds(Point point, Size bounds)
+        {
+            return IsOutOfBounds(point, new Rect(new Point(), bounds));
+        }
+        
+        public static bool IsOutOfBounds(Rect frame, Rect bounds)
+        {
+            var downscaledFrame = frame;
+            // downscaling frame as we do not require for FULL frame to be visible, only top-left part of it
+            downscaledFrame.Size = frame.Size.Scale(0.5);
+            
+            return double.IsNaN(frame.X) ||
+                   double.IsNaN(frame.Y) ||
+                   double.IsNaN(frame.Width) ||
+                   double.IsNaN(frame.Height) ||
+                   downscaledFrame.X <= 1 ||
+                   downscaledFrame.Y <= 1 ||
+                   !bounds.Contains(downscaledFrame);
+        }
+
+        public static bool IsOutOfBounds(Point point, Rect bounds)
+        {
+            return double.IsNaN(point.X) ||
+                   double.IsNaN(point.Y) ||
+                   point.X <= 1 ||
+                   point.Y <= 1 ||
+                   !bounds.IntersectsWith(new Rect(point.X, point.Y, 1, 1));
+        }
+        
+        public static Point GetPositionAtTheCenter(Rect monitorBounds, Size windowSize)
+        {
+            var screenCenter = new Point(
+                monitorBounds.X + monitorBounds.Width / 2, 
+                monitorBounds.Y + monitorBounds.Height / 2);
+            screenCenter.Offset(- windowSize.Width / 2, - windowSize.Height / 2);
+
+            return screenCenter;
+        }
+
+        public static Point GetPositionAtTheCenter(Window window)
+        {
+            var monitorBounds = GetActiveMonitorBounds(window);
+
+            return GetPositionAtTheCenter(monitorBounds, new Size(window.Width, window.Height));
+        }
+
+        public static string GetMonitorInfo(Window window)
+        {
+            var handle = window != null
+                ? new WindowInteropHelper(window).Handle
+                : IntPtr.Zero;
+            return GetMonitorInfo(handle);
+        }
+
+        public static string GetDesktopMonitorInfo()
+        {
+            return GetMonitorInfo(GetDesktopWindow());
+        }
+
+        public static string GetMonitorInfo(IntPtr windowHandle)
+        {
+            var screen = Screen.FromHandle(windowHandle);
+            var graphics = Graphics.FromHdc(GetDC(windowHandle));
+            var scaledBounds = GetMonitorBounds(screen, new PointF(graphics.DpiX, graphics.DpiY));
+            return new
+            {
+                screen.DeviceName, screen.Primary, graphics.PageScale, SystemBounds = screen.Bounds, ScaledBounds = scaledBounds, graphics.DpiX, graphics.DpiY
+            }.DumpToTextRaw();
         }
 
         public static class Constants

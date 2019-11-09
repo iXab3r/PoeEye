@@ -241,13 +241,13 @@ namespace PoeShared.Native
 
         public virtual void ResetToDefault()
         {
-            var activeMonitor = NativeMethods.GetMonitorInfo(OverlayWindow);
+            var activeMonitor = UnsafeNative.GetMonitorInfo(OverlayWindow);
 
             Log.Warn($"Resetting overlay bounds (screen: {activeMonitor}, currently @ {new Rect(left, top, width, height)})");
 
             Width = MinSize.Width;
             Height = MinSize.Height;
-            var center = GetPositionAtTheCenter();
+            var center = UnsafeNative.GetPositionAtTheCenter(OverlayWindow);
             Left = center.X;
             Top = center.Y;
             Log.Info($"Reconfigured overlay bounds (screen: {activeMonitor}, new @ {new Rect(left, top, width, height)})");
@@ -256,18 +256,6 @@ namespace PoeShared.Native
             {
                 UnlockWindowCommand.Execute(null);
             }
-        }
-
-        private Point GetPositionAtTheCenter()
-        {
-            var monitorBounds = NativeMethods.GetActiveMonitorBounds(OverlayWindow);
-            
-            var screenCenter = new Point(
-                monitorBounds.X + monitorBounds.Width / 2, 
-                monitorBounds.Y + monitorBounds.Height / 2);
-            screenCenter.Offset(- Width / 2, - Height / 2);
-
-            return screenCenter;
         }
 
         public virtual void SetActivationController(IActivationController controller)
@@ -310,16 +298,16 @@ namespace PoeShared.Native
             {
                 MonitorCount = SystemInformation.MonitorCount, 
                 VirtualScreen = SystemInformation.VirtualScreen,
-                MonitorBounds = NativeMethods.GetActiveMonitorBounds(OverlayWindow),
-                MonitorInfo = NativeMethods.GetMonitorInfo(OverlayWindow)
+                MonitorBounds = UnsafeNative.GetActiveMonitorBounds(OverlayWindow),
+                MonitorInfo = UnsafeNative.GetMonitorInfo(OverlayWindow)
             };
 
             Log.Debug($"[{OverlayDescription}] Current SystemInformation: {systemInformation.DumpToTextRaw()}");
             
             var overlayBounds = new Rect(config.OverlayLocation, config.OverlaySize);
-            if (IsOutOfBounds(overlayBounds, systemInformation.MonitorBounds))
+            if (UnsafeNative.IsOutOfBounds(overlayBounds, systemInformation.MonitorBounds))
             {
-                var screenCenter = GetPositionAtTheCenter();
+                var screenCenter = UnsafeNative.GetPositionAtTheCenter(OverlayWindow);
                 Log.Warn($"[{OverlayDescription}] Overlay is out of screen bounds(screen: {systemInformation.MonitorBounds}, overlay: {overlayBounds}) , resetting to {screenCenter}, systemInfo: {systemInformation.DumpToTextRaw()}, config: {config.DumpToTextRaw()}");
                 config.OverlayLocation = screenCenter;
                 
@@ -344,35 +332,6 @@ namespace PoeShared.Native
             }
 
             Opacity = config.OverlayOpacity;
-        }
-
-        private bool IsOutOfBounds(Point point, Size bounds)
-        {
-            return IsOutOfBounds(point, new Rect(new Point(), bounds));
-        }
-        
-        private bool IsOutOfBounds(Rect frame, Rect bounds)
-        {
-            var downscaledFrame = frame;
-            // downscaling frame as we do not require for FULL frame to be visible, only top-left part of it
-            downscaledFrame.Size = frame.Size.Scale(0.5);
-            
-            return double.IsNaN(frame.X) ||
-                   double.IsNaN(frame.Y) ||
-                   double.IsNaN(frame.Width) ||
-                   double.IsNaN(frame.Height) ||
-                   downscaledFrame.X <= 1 ||
-                   downscaledFrame.Y <= 1 ||
-                   !bounds.Contains(downscaledFrame);
-        }
-
-        private bool IsOutOfBounds(Point point, Rect bounds)
-        {
-            return double.IsNaN(point.X) ||
-                   double.IsNaN(point.Y) ||
-                   point.X <= 1 ||
-                   point.Y <= 1 ||
-                   !bounds.IntersectsWith(new Rect(point.X, point.Y, 1, 1));
         }
 
         protected void SavePropertiesToConfig(IOverlayConfig config)
@@ -440,55 +399,6 @@ namespace PoeShared.Native
             }
             Log.Debug($"[{OverlayDescription}] Making overlay Transparent");
             OverlayMode = OverlayMode.Transparent;
-        }
-        
-        internal static class NativeMethods
-        {
-            [DllImport("user32.dll", EntryPoint = "GetDC")]
-            private static extern IntPtr GetDC(IntPtr ptr);
-
-            public static Rect GetActiveMonitorBounds(Window window)
-            {
-                var handle = window != null ? new WindowInteropHelper(window).Handle : IntPtr.Zero;
-                return GetActiveMonitorBounds(handle);
-            }
-
-            public static Rect GetActiveMonitorBounds(IntPtr windowHandle)
-            {
-                var screen = Screen.FromHandle(windowHandle);
-                var graphics = Graphics.FromHdc(GetDC(windowHandle));
-
-                Log.Debug($"Monitor for window 0x{windowHandle.ToInt64():X8}: {GetMonitorInfo(windowHandle)}");
-                return GetMonitorBounds(screen, graphics);
-            }
-
-            public static Rect GetMonitorBounds(Screen monitor, Graphics graphics)
-            {
-                var result = new Rect(
-                    monitor.Bounds.X,
-                    monitor.Bounds.Y,
-                    monitor.Bounds.Width,
-                    monitor.Bounds.Height);
-                result.Scale(96 / graphics.DpiX, 96f / graphics.DpiY);
-                return result;
-            }
-
-            public static string GetMonitorInfo(Window window)
-            {
-                var handle = window != null ? new WindowInteropHelper(window).Handle : IntPtr.Zero;
-                return GetMonitorInfo(handle);
-            }
-
-            public static string GetMonitorInfo(IntPtr windowHandle)
-            {
-                var screen = Screen.FromHandle(windowHandle);
-                var graphics = Graphics.FromHdc(GetDC(windowHandle));
-                var scaledBounds = GetMonitorBounds(screen, graphics);
-                return new
-                {
-                    screen.DeviceName, screen.Primary, graphics.PageScale, SystemBounds = screen.Bounds, ScaledBounds = scaledBounds, graphics.DpiX, graphics.DpiY, 
-                }.DumpToTextRaw();
-            }
         }
     }
 }
