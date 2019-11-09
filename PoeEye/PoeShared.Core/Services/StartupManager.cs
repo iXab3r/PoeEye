@@ -33,7 +33,7 @@ namespace PoeShared.Services
                 args.UniqueAppName, 
                 RegistrationScope.Local,
                 false,
-                args.AutostartFlag ?? "--autostart");    
+                args.AutostartFlag ?? AppArguments.Instance.AutostartFlag);    
             
             Log.Debug($"Manager parameters: {new { ArgsCommandLine = args.CommandLineArgs, manager.IsRegistered, manager.Name, manager.ApplicationImage, manager.RegistrationScope, manager.IsStartedUp, manager.NeedsAdministrativePrivileges, manager.Provider, manager.WorkingDirectory, CommandLineArgs = String.Join(" ", manager.CommandLineArguments), manager.StartupSpecialArgument }}");
             Reregister();

@@ -53,14 +53,6 @@ namespace PoeShared.Modularity
                 .Select(x => new {Config = x.curr, PreviousConfig = x.prev, ComparisonResult = Compare(x.curr, x.prev)})
                 .Do(x => { LogActualConfigChange(x.PreviousConfig, x.Config, x.ComparisonResult); })
                 .Where(x => !x.ComparisonResult.AreEqual)
-                .Do(
-                    x =>
-                    {
-                        if (x.PreviousConfig != null)
-                        {
-                            LogConfigChange(x.Config, x.ComparisonResult);
-                        }
-                    })
                 .Select(x => x.Config)
                 .Catch<TConfig, Exception>(ex =>
                 {
@@ -93,7 +85,7 @@ namespace PoeShared.Modularity
         public void Reload()
         {
             Interlocked.Increment(ref loadCommandCounter);
-            Log.Info($"Current stat: { new { saveCommandCounter, loadCommandCounter } }");
+            Log.Debug($"ConfigProvider Save/Load stat: { new { saveCommandCounter, loadCommandCounter } }");
 
             configProvider.Reload();
         }
@@ -102,8 +94,16 @@ namespace PoeShared.Modularity
         {
             Guard.ArgumentNotNull(config, nameof(config));
 
+            var compare = Compare(ActualConfig, config);
+
+            if (compare.AreEqual)
+            {
+                Log.Debug($"Attempted to save config that is an exact duplicate of an Actual config, skipping request");
+                return;
+            }
+
             Interlocked.Increment(ref saveCommandCounter);
-            Log.Info($"Current stat: { new { saveCommandCounter, loadCommandCounter } }");
+            Log.Debug($"ConfigProvider Save/Load stat: { new { saveCommandCounter, loadCommandCounter } }");
 
             configProvider.Save(config);
         }
@@ -116,12 +116,6 @@ namespace PoeShared.Modularity
                     DoublePrecision = 0.01,
                     MaxDifferences = byte.MaxValue
                 }).Compare(x, y);
-        }
-
-        private void LogConfigChange(TConfig config, ComparisonResult result)
-        {
-            Log.Debug(
-                $"[{typeof(TConfig).Name}] Config has changed:{config.DumpToTextRaw()}\nTime spent by comparer: {result.ElapsedMilliseconds}ms\n{result.DifferencesString}");
         }
         
         private void LogActualConfigChange(TConfig previousConfig, TConfig currentConfig, ComparisonResult result)

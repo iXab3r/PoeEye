@@ -38,28 +38,31 @@ namespace PoeShared.Resources.Notifications
             var assembly = Assembly.GetExecutingAssembly();
 
             var namespaceName = typeof(EmbeddedSoundLibrarySource).Namespace;
-            var resourceNames = FormatFileName(name)
+            var resourceNameCandidates = FormatFileName(name)
                 .Select(x => $"{namespaceName}.{x}")
                 .ToArray();
-            Log.Debug($"Mapping resources '{resourceNames.DumpToTextRaw()}' to real resource name...");
+            Log.Debug($"Trying to find resource using names '{resourceNameCandidates.DumpToTextRaw()}'...");
 
-            string internalResourceName = null;
-            foreach (var realResourceName in EmbeddedResourceNames)
+            string resourceName = null;
+            foreach (var embeddedResourceName in EmbeddedResourceNames)
             {
-                foreach (var resourceName in resourceNames)
+                foreach (var resourceNameCandidate in resourceNameCandidates)
                 {
-                    if (!string.Equals(resourceName, realResourceName, StringComparison.OrdinalIgnoreCase))
+                    if (!string.Equals(resourceNameCandidate, embeddedResourceName, StringComparison.OrdinalIgnoreCase))
                     {
                         continue;
                     }
 
-                    Log.Debug($"Real resource name: '{realResourceName}', initial: {resourceName}...");
-                    internalResourceName = realResourceName;
+                    if (embeddedResourceName != resourceNameCandidate)
+                    {
+                        Log.Debug($"Embedded resource name: '{embeddedResourceName}', candidate: {resourceNameCandidate}...");
+                    }
+                    resourceName = embeddedResourceName;
                     break;
                 }
             }
 
-            if (string.IsNullOrEmpty(internalResourceName))
+            if (string.IsNullOrEmpty(resourceName))
             {
                 Log.Debug($"Failed to find internal resource name for '{name}'");
 
@@ -67,12 +70,12 @@ namespace PoeShared.Resources.Notifications
                 return false;
             }
 
-            Log.Debug($"Loading resource '{internalResourceName}'...");
-            var resourceStream = assembly.GetManifestResourceStream(internalResourceName);
+            Log.Debug($"Loading resource '{resourceName}'...");
+            var resourceStream = assembly.GetManifestResourceStream(resourceName);
             if (resourceStream == null)
             {
                 var resourcesList = assembly.GetManifestResourceNames();
-                Log.Debug($"Resource was not found '{internalResourceName}', embedded res.list: {resourcesList.DumpToTextRaw()}");
+                Log.Debug($"Resource was not found '{resourceName}', embedded res.list: {resourcesList.DumpToTextRaw()}");
                 resourceData = null;
                 return false;
             }
@@ -82,7 +85,7 @@ namespace PoeShared.Resources.Notifications
                 var buffer = new byte[stream.Length];
                 stream.Read(buffer, 0, buffer.Length);
 
-                Log.Debug($"Loaded resource '{internalResourceName}' : {buffer.Length}b");
+                Log.Debug($"Loaded resource '{resourceName}' : {buffer.Length}b");
                 resourceData = buffer;
                 return true;
             }

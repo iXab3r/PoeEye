@@ -31,6 +31,7 @@ namespace PoeShared.Native
         private readonly CommandWrapper makeLayeredCommand;
         private readonly CommandWrapper makeTransparentCommand;
         private readonly ISubject<Unit> whenLoaded = new ReplaySubject<Unit>(1);
+        private readonly ObservableAsPropertyHelper<Rect> bounds;
         
         private double actualHeight;
 
@@ -85,15 +86,14 @@ namespace PoeShared.Native
                 })
                 .AddTo(Anchors);
 
-            this.WhenAnyValue(x => x.Left, x => x.Top, x => x.Width, x => x.Height)
-                .Select(() => new { Left, Top, Width, Height })
-                .DistinctUntilChanged()
-                .Subscribe(() => this.RaisePropertyChanged(nameof(Bounds)))
-                .AddTo(Anchors);
-
             this.WhenValueChanged(x => x.OverlayWindow, false)
                 .ToUnit()
                 .Subscribe(whenLoaded)
+                .AddTo(Anchors);
+
+            bounds = this.WhenAnyValue(x => x.Left, x => x.Top, x => x.Width, x => x.Height)
+                .Select(x => new Rect {X = Left, Y = Top, Width = Width, Height = Height})
+                .ToPropertyHelper(this, x => x.Bounds)
                 .AddTo(Anchors);
         }
 
@@ -149,7 +149,7 @@ namespace PoeShared.Native
             set => this.RaiseAndSetIfChanged(ref actualWidth, value);
         }
 
-        public Rect Bounds => new Rect { X = Left, Y = Top, Width = Width, Height = Height };
+        public Rect Bounds => bounds.Value;
 
         public double Left
         {

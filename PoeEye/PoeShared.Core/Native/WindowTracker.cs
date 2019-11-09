@@ -99,19 +99,11 @@ namespace PoeShared.Native
                 Log.Debug($"[#{Name}] Target window is {(isActive ? string.Empty : "NOT ")}ACTIVE (0x{activeHwnd.ToInt64():X8}, title '{activeWindowTitle}')");
             }
 
-            RaiseIfChanged(previousState.IsActive, IsActive, nameof(IsActive));
-            RaiseIfChanged(previousState.MatchingWindowHandle, MatchingWindowHandle, nameof(MatchingWindowHandle));
-            RaiseIfChanged(previousState.ActiveWindowTitle, ActiveWindowTitle, nameof(ActiveWindowTitle));
-            RaiseIfChanged(previousState.ActiveWindowHandle, ActiveWindowHandle, nameof(ActiveWindowHandle));
-            RaiseIfChanged(previousState.ActiveProcessId, ActiveProcessId, nameof(ActiveProcessId));
-        }
-
-        private void RaiseIfChanged<TRet>(TRet previous, TRet current, string propertyName)
-        {
-            if (!EqualityComparer<TRet>.Default.Equals(previous, current))
-            {
-                RaisePropertyChanged(propertyName);
-            }
+            this.RaiseIfChanged(nameof(IsActive), previousState.IsActive, IsActive);
+            this.RaiseIfChanged(nameof(MatchingWindowHandle), previousState.MatchingWindowHandle, MatchingWindowHandle);
+            this.RaiseIfChanged(nameof(ActiveWindowTitle), previousState.ActiveWindowTitle, ActiveWindowTitle);
+            this.RaiseIfChanged(nameof(ActiveWindowHandle), previousState.ActiveWindowHandle, ActiveWindowHandle);
+            this.RaiseIfChanged(nameof(ActiveProcessId), previousState.ActiveProcessId, ActiveProcessId);
         }
     }
 }
