@@ -4,7 +4,6 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using System.Windows.Input;
-
 using log4net;
 using Prism.Commands;
 using ReactiveUI;
@@ -21,13 +20,13 @@ namespace PoeShared.Scaffolding.WPF
         private string description;
         private string error;
         private bool isBusy;
-        
+
         private CommandWrapper(DelegateCommandBase command)
         {
             Guard.ArgumentNotNull(command, nameof(command));
-            
+
             InnerCommand = command;
-             Observable.FromEventPattern<EventHandler, EventArgs>(x => command.IsActiveChanged += x, x => command.IsActiveChanged -= x)
+            Observable.FromEventPattern<EventHandler, EventArgs>(x => command.IsActiveChanged += x, x => command.IsActiveChanged -= x)
                 .Select(x => command.IsActive)
                 .Subscribe(x => IsBusy = x)
                 .AddTo(Anchors);
@@ -43,25 +42,25 @@ namespace PoeShared.Scaffolding.WPF
 
         private CommandWrapper(ICommand command)
         {
-             InnerCommand = command;
+            InnerCommand = command;
         }
 
         public bool IsBusy
         {
             get => isBusy;
-            set => this.RaiseAndSetIfChanged(ref isBusy, value);
+            set => RaiseAndSetIfChanged(ref isBusy, value);
         }
 
         public string Error
         {
             get => error;
-            private set => this.RaiseAndSetIfChanged(ref error, value);
+            private set => RaiseAndSetIfChanged(ref error, value);
         }
 
         public string Description
         {
             get => description;
-            set => this.RaiseAndSetIfChanged(ref description, value);
+            set => RaiseAndSetIfChanged(ref description, value);
         }
 
         private ICommand InnerCommand { get; }
@@ -109,7 +108,7 @@ namespace PoeShared.Scaffolding.WPF
         {
             return Create(new DelegateCommand(execute));
         }
-        
+
         private static CommandWrapper FromReactiveCommand<T, TResult>(ReactiveCommand<T, TResult> command)
         {
             var result = new CommandWrapper(command);
@@ -121,17 +120,17 @@ namespace PoeShared.Scaffolding.WPF
 
             return result;
         }
-        
+
         public static CommandWrapper Create(Func<Task> execute, IObservable<bool> canExecute)
         {
             return FromReactiveCommand(ReactiveCommand.CreateFromTask(execute, canExecute));
         }
-        
+
         public static CommandWrapper Create(Func<Task> execute)
         {
             return Create(execute, Observable.Return(true).Concat(Observable.Never<bool>()));
         }
-        
+
         public static CommandWrapper Create<TParam>(Func<TParam, Task> execute, IObservable<bool> canExecute)
         {
             return FromReactiveCommand(ReactiveCommand.CreateFromTask(execute, canExecute));
@@ -141,23 +140,30 @@ namespace PoeShared.Scaffolding.WPF
         {
             return Create(execute, Observable.Return(true).Concat(Observable.Never<bool>()));
         }
-        
+
         public static CommandWrapper Create(Action execute, Func<bool> canExecute)
         {
             return Create(new DelegateCommand(execute, canExecute));
         }
-        
+
         public static CommandWrapper Create<T>(Action<T> execute, Func<T, bool> canExecute)
         {
             return Create(new DelegateCommand<T>(execute, canExecute));
         }
-        
+
         public static CommandWrapper Create<T>(Action<T> execute)
         {
             return Create(new DelegateCommand<T>(execute));
         }
 
-        public CommandWrapper RaiseCanExecuteChangedWhen(IObservable<Unit> eventSource)
+        public CommandWrapper RaiseCanExecuteChangedWhen<T>(IObservable<T> eventSource)
+        {
+            Guard.ArgumentNotNull(() => eventSource);
+
+            return RaiseCanExecuteChangedWhen(eventSource.ToUnit());
+        }
+
+        private CommandWrapper RaiseCanExecuteChangedWhen(IObservable<Unit> eventSource)
         {
             Guard.ArgumentNotNull(() => eventSource);
 
