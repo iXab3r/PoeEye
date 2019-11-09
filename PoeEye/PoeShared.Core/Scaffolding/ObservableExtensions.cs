@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Linq.Expressions;
 using System.Reactive;
+using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using JetBrains.Annotations;
+using ReactiveUI;
 
 namespace PoeShared.Scaffolding
 {
@@ -66,6 +69,16 @@ namespace PoeShared.Scaffolding
             }
 
             return source.Catch(Observable.Timer(timeSpan).SelectMany(_ => source).Retry());
+        }
+        
+        public static ObservableAsPropertyHelper<TSourceProperty> ToPropertyHelper<TSource, TSourceProperty>(
+            [NotNull] this IObservable<TSourceProperty> sourceObservable,
+            [NotNull] TSource instance,
+            [NotNull] Expression<Func<TSource, TSourceProperty>> instancePropertyExtractor,
+            [CanBeNull] IScheduler scheduler = null)
+            where TSource : IDisposableReactiveObject
+        {
+            return instance.ToPropertyHelper(instancePropertyExtractor, sourceObservable, default, false, scheduler);
         }
     }
 }

@@ -93,7 +93,7 @@ namespace PoeShared.Modularity
         public void Reload()
         {
             Interlocked.Increment(ref loadCommandCounter);
-            Log.Info($"[ConfigProvider.Reload] Current stat: { new { saveCommandCounter, loadCommandCounter } }");
+            Log.Info($"Current stat: { new { saveCommandCounter, loadCommandCounter } }");
 
             configProvider.Reload();
         }
@@ -103,7 +103,7 @@ namespace PoeShared.Modularity
             Guard.ArgumentNotNull(config, nameof(config));
 
             Interlocked.Increment(ref saveCommandCounter);
-            Log.Info($"[ConfigProvider.Save] Current stat: { new { saveCommandCounter, loadCommandCounter } }");
+            Log.Info($"Current stat: { new { saveCommandCounter, loadCommandCounter } }");
 
             configProvider.Save(config);
         }
@@ -121,13 +121,13 @@ namespace PoeShared.Modularity
         private void LogConfigChange(TConfig config, ComparisonResult result)
         {
             Log.Debug(
-                $"[GenericConfigProvider.{typeof(TConfig).Name}] Config has changed:{config.DumpToTextRaw()}\nTime spent by comparer: {result.ElapsedMilliseconds}ms\n{result.DifferencesString}");
+                $"[{typeof(TConfig).Name}] Config has changed:{config.DumpToTextRaw()}\nTime spent by comparer: {result.ElapsedMilliseconds}ms\n{result.DifferencesString}");
         }
         
         private void LogActualConfigChange(TConfig previousConfig, TConfig currentConfig, ComparisonResult result)
         {
             Log.Debug(
-                $"[GenericConfigProvider.{typeof(TConfig).Name}] Actual config updated(areEqual: {result.AreEqual})\nPrevious: {(previousConfig == null ? "NULL" : previousConfig.DumpToTextRaw())}\nCurrent: {(currentConfig == null ? "NULL" : currentConfig.DumpToTextRaw())}\nTime spent by comparer: {result.ElapsedMilliseconds}ms\n{result.DifferencesString}");
+                $"[{typeof(TConfig).Name}] Actual config updated(areEqual: {result.AreEqual})\nPrevious: {(previousConfig == null ? "NULL" : previousConfig.DumpToTextRaw())}\nCurrent: {(currentConfig == null ? "NULL" : currentConfig.DumpToTextRaw())}\nTime spent by comparer: {result.ElapsedMilliseconds}ms\n{result.DifferencesString}");
         }
 
         private void ReloadInternal()

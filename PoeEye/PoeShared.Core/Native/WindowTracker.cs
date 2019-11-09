@@ -1,6 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reactive.Linq;
-
+using System.Windows.Forms;
 using JetBrains.Annotations;
 using log4net;
 using PoeShared.Scaffolding;
@@ -82,24 +83,35 @@ namespace PoeShared.Native
             return $"#Tracker{Name}";
         }
 
-        private void WindowActivated(IntPtr activeWindowHandle)
+        private void WindowActivated(IntPtr activeHwnd)
         {
-            this.activeWindowHandle = activeWindowHandle;
-            activeWindowTitle = UnsafeNative.GetWindowTitle(activeWindowHandle);
+            var previousState = new {IsActive, MatchingWindowHandle, ActiveWindowTitle, ActiveWindowHandle, ActiveProcessId};
+            activeWindowHandle = activeHwnd;
+            activeWindowTitle = UnsafeNative.GetWindowTitle(activeHwnd);
 
             isActive = titleMatcher.IsMatch(activeWindowTitle);
 
-            windowHandle = IsActive ? activeWindowHandle : IntPtr.Zero;
-            activeProcessId = UnsafeNative.GetProcessIdByWindowHandle(this.activeWindowHandle); 
+            windowHandle = IsActive ? activeHwnd : IntPtr.Zero;
+            activeProcessId = UnsafeNative.GetProcessIdByWindowHandle(this.activeWindowHandle);
 
-            Log.Debug(
-                $@"[#{Name}] Target window is {(isActive ? string.Empty : "NOT ")}ACTIVE (hwnd 0x{activeWindowHandle.ToInt64():X8}, active title '{activeWindowTitle}')");
+            if (previousState.ActiveWindowHandle != ActiveWindowHandle)
+            {
+                Log.Debug($"[#{Name}] Target window is {(isActive ? string.Empty : "NOT ")}ACTIVE (0x{activeHwnd.ToInt64():X8}, title '{activeWindowTitle}')");
+            }
 
-            this.RaisePropertyChanged(nameof(IsActive));
-            this.RaisePropertyChanged(nameof(MatchingWindowHandle));
-            this.RaisePropertyChanged(nameof(ActiveWindowTitle));
-            this.RaisePropertyChanged(nameof(ActiveWindowHandle));
-            this.RaisePropertyChanged(nameof(ActiveProcessId));
+            RaiseIfChanged(previousState.IsActive, IsActive, nameof(IsActive));
+            RaiseIfChanged(previousState.MatchingWindowHandle, MatchingWindowHandle, nameof(MatchingWindowHandle));
+            RaiseIfChanged(previousState.ActiveWindowTitle, ActiveWindowTitle, nameof(ActiveWindowTitle));
+            RaiseIfChanged(previousState.ActiveWindowHandle, ActiveWindowHandle, nameof(ActiveWindowHandle));
+            RaiseIfChanged(previousState.ActiveProcessId, ActiveProcessId, nameof(ActiveProcessId));
+        }
+
+        private void RaiseIfChanged<TRet>(TRet previous, TRet current, string propertyName)
+        {
+            if (!EqualityComparer<TRet>.Default.Equals(previous, current))
+            {
+                RaisePropertyChanged(propertyName);
+            }
         }
     }
 }

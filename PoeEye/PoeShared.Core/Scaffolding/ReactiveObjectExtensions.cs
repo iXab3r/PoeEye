@@ -6,6 +6,7 @@ using JetBrains.Annotations;
 using log4net;
 using ReactiveUI;
 using System.Reactive;
+using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 
 namespace PoeShared.Scaffolding
@@ -24,6 +25,36 @@ namespace PoeShared.Scaffolding
         {
             // backward compatibility
             return BindPropertyTo(instance, instancePropertyExtractor, source, sourcePropertyExtractor);
+        }
+        
+        public static ObservableAsPropertyHelper<TSourceProperty> ToPropertyHelper<TSource, TSourceProperty>(
+            [NotNull] this TSource instance,
+            [NotNull] Expression<Func<TSource, TSourceProperty>> instancePropertyExtractor,
+            [NotNull] IObservable<TSourceProperty> sourceObservable,
+            [CanBeNull] IScheduler scheduler = null)
+            where TSource : IDisposableReactiveObject
+        {
+            return ToPropertyHelper(instance, instancePropertyExtractor, sourceObservable, default, false, scheduler);
+        }
+        
+        public static ObservableAsPropertyHelper<TSourceProperty> ToPropertyHelper<TSource, TSourceProperty>(
+            [NotNull] this TSource instance,
+            [NotNull] Expression<Func<TSource, TSourceProperty>> instancePropertyExtractor,
+            [NotNull] IObservable<TSourceProperty> sourceObservable,
+            [CanBeNull] TSourceProperty initialValue,
+            bool deferSubscription,
+            [CanBeNull] IScheduler scheduler)
+            where TSource : IDisposableReactiveObject
+        {
+            var instancePropertyName = new Lazy<string>(() => Reflection.ExpressionToPropertyNames(instancePropertyExtractor.Body));
+
+            var result = new ObservableAsPropertyHelper<TSourceProperty>(
+                observable: sourceObservable,
+                onChanged: x => instance.RaisePropertyChanged(instancePropertyName.Value),
+                initialValue: initialValue,
+                deferSubscription: deferSubscription,
+                scheduler);
+            return result;
         }
 
         [Obsolete("Use RaiseWhenSourceValue instead")]
