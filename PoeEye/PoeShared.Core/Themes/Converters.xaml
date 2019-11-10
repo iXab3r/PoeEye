@@ -13,6 +13,10 @@
     <system:Boolean x:Key="FalseValue">False</system:Boolean>
     <system:Boolean x:Key="TrueValue">True</system:Boolean>
 
+    <blue:ThicknessConverter x:Key="ThicknessConverter" UseBottom="True" UseLeft="True" UseRight="True" UseTop="True" />
+    <eyeConverters:ColorToSolidColorBrushConverter x:Key="ColorToSolidColorBrushConverter"/>
+    <eyeConverters:ColorToStringConverter x:Key="ColorToStringConverter"/>
+    
     <blue:BoolToVisibilityConverter x:Key="TrueToVisibleFalseToCollapsedConverter"
                                     TrueValue="Visible"
                                     FalseValue="Collapsed" />
