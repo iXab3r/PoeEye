@@ -236,10 +236,10 @@
         </Border>
         
         <Grid Visibility="{Binding Content.IsLocked, Converter={StaticResource TrueToCollapsedFalseToVisibleConverter}}">
-            <Thumb Style="{StaticResource OverlayThumbBottomLeftStyle}" />
-            <Thumb Style="{StaticResource OverlayThumbBottomRightStyle}"/>
-            <Thumb Style="{StaticResource OverlayThumbTopLeftStyle}"/>
-            <Thumb Style="{StaticResource OverlayThumbTopRightStyle}"/>
+            <Thumb Style="{StaticResource OverlayThumbBottomLeftStyle}" IsHitTestVisible="False"/>
+            <Thumb Style="{StaticResource OverlayThumbBottomRightStyle}" IsHitTestVisible="False"/>
+            <Thumb Style="{StaticResource OverlayThumbTopLeftStyle}" IsHitTestVisible="False"/>
+            <Thumb Style="{StaticResource OverlayThumbTopRightStyle}" IsHitTestVisible="False"/>
         </Grid>
     </Grid>
 
