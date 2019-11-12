@@ -6,7 +6,6 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:native="clr-namespace:PoeShared.Native"
     xmlns:wpf="clr-namespace:PoeShared.Scaffolding.WPF"
-    xmlns:converters="http://schemas.kent.boogaart.com/converters"
     mc:Ignorable="d"
     d:DataContext="{d:DesignInstance native:OverlayWindowViewModel}"
     WindowStartupLocation="Manual"
@@ -146,6 +145,7 @@
 
                 <!-- Body -->
                 <native:ContentControlEx Grid.Row="1" 
+                                         Focusable="False" IsTabStop="False"
                                          Location="{Binding Content.ViewModelLocation, Mode=OneWayToSource}"
                                          Content="{Binding Content}"
                                          ContentTemplate="{Binding ContentTemplate}" />

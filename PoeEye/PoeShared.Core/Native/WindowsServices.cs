@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Drawing;
 using System.Runtime.InteropServices;
 using log4net;
 using PoeShared.Scaffolding;
@@ -91,6 +92,12 @@ namespace PoeShared.Native
             }
         }
 
+        public static bool SetWindowRect(IntPtr hwnd, Rectangle rect)
+        {
+            Log.Debug($"[{hwnd.ToHexadecimal()}] Setting window bounds: {rect}");
+            return SetWindowPos(hwnd, 0, rect.X, rect.Y, rect.Width, rect.Height, SWP_NOACTIVATE);
+        }
+
         public static void HideSystemMenu(IntPtr hwnd)
         {
             Log.Debug($"[{hwnd.ToHexadecimal()}] Hiding SystemMenu");
@@ -103,8 +110,6 @@ namespace PoeShared.Native
             var dpi = GetDisplayScaleFactor(handle);
             Log.Debug($"[{handle.ToHexadecimal()}] Showing window X:{left} Y:{top} Width:{width} Height:{height}, scaleFactor: {dpi}");
             ShowWindow(handle, SW_SHOWNOACTIVATE);
-
-            Debug.WriteLine($"[{handle.ToHexadecimal()}] Showing window X:{left} Y:{top} Width:{width} Height:{height}, scaleFactor: {dpi}");
             SetWindowPos(handle, HWND_TOPMOST, left, top, (int) (width * dpi), (int) (height * dpi), SWP_NOACTIVATE);
         }
 

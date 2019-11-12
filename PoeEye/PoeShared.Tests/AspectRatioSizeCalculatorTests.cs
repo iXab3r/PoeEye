@@ -31,10 +31,17 @@ namespace PoeShared.Tests
         {
             yield return new TestCaseData(true, 1d, Rectangle.Empty, Rectangle.Empty);
             yield return new TestCaseData(true, 1d, new Rectangle(), new Rectangle());
-            yield return new TestCaseData(true, 1d, new Rectangle(0, 0, 15, 15), new Rectangle(0, 0, 15, 15)) { TestName = "Basic scaling x1" };
+            
+            yield return new TestCaseData(true, 1d, new Rectangle(0, 0, 10, 10), new Rectangle(0, 0, 10, 10)) { TestName = "In-place scaling x1 - prioritize height" };
+            yield return new TestCaseData(true, 2d, new Rectangle(0, 0, 10, 10), new Rectangle(0, 0, 10, 5)) { TestName = "In-place scaling x2 - prioritize height" };
+            yield return new TestCaseData(true, 1/2d, new Rectangle(0, 0, 10, 10), new Rectangle(0, 0, 10, 20)) { TestName = "In-place scaling x1/2 - prioritize height" };
+            yield return new TestCaseData(false, 2d, new Rectangle(0, 0, 10, 10), new Rectangle(0, 0, 20, 10)) { TestName = "In-place scaling x2 - prioritize width" };
+            yield return new TestCaseData(false, 1/2d, new Rectangle(0, 0, 10, 10), new Rectangle(0, 0, 5, 10)) { TestName = "In-place scaling x1/2 - prioritize width" };
+            
+            yield return new TestCaseData(true, 1d, new Rectangle(0, 0, 15, 15), new Rectangle(0, 0, 15, 15)) { TestName = "Basic scaling x1 - prioritize height" };
             yield return new TestCaseData(true, 2d, new Rectangle(0, 0, 15, 15), new Rectangle(0, 0, 15, 7)) { TestName = "Basic scaling x2 - prioritize height" };
-            yield return new TestCaseData(false, 2d, new Rectangle(0, 0, 15, 15), new Rectangle(0, 0, 30, 15)) { TestName = "Basic scaling x2 - prioritize width" };
             yield return new TestCaseData(true, 1/2d, new Rectangle(0, 0, 15, 15), new Rectangle(0, 0, 15, 30)) { TestName = "Basic scaling x1/2 - prioritize height" };
+            yield return new TestCaseData(false, 2d, new Rectangle(0, 0, 15, 15), new Rectangle(0, 0, 30, 15)) { TestName = "Basic scaling x2 - prioritize width" };
             yield return new TestCaseData(false, 1/2d, new Rectangle(0, 0, 15, 15), new Rectangle(0, 0, 7, 15)) { TestName = "Basic scaling x1/2 - prioritize width" };
             
             yield return new TestCaseData(true, 1d, new Rectangle(0, 0, 10, 10), new Rectangle(0, 0, 10, 10)) { TestName = "Initial assignment" };

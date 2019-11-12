@@ -50,7 +50,7 @@ namespace PoeShared.Native
         private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
 
         [DllImport("user32.dll")]
-        public static extern bool GetWindowRect(IntPtr hwnd, ref Rect rectangle);
+        public static extern bool GetWindowRect(IntPtr hwnd, ref RECT rectangle);
 
         [DllImport("user32.dll", EntryPoint = "GetDC")]
         private static extern IntPtr GetDC(IntPtr ptr);
@@ -67,6 +67,15 @@ namespace PoeShared.Native
         {
             public int X;
             public int Y;
+        }
+        
+        [StructLayout(LayoutKind.Sequential)]
+        public struct RECT
+        {
+            public int Left;        // x position of upper-left corner
+            public int Top;         // y position of upper-left corner
+            public int Right;       // x position of lower-right corner
+            public int Bottom;      // y position of lower-right corner
         }
         
         public static Point GetMousePosition() // mouse position relative to screen
@@ -103,14 +112,14 @@ namespace PoeShared.Native
 
         public static Rectangle GetWindowRect(IntPtr hwnd)
         {
-            var result = new Rect();
+            var result = new RECT();
             if (!GetWindowRect(hwnd, ref result))
             {
-                Log.Warn($"Failed to get size of Window by HWND {hwnd.ToInt64():x8}");
+                Log.Warn($"Failed to get size of Window by HWND 0x{hwnd.ToInt64():x8}");
                 return Rectangle.Empty;
             }
 
-            return new Rectangle((int) result.X, (int) result.Y, (int) result.Width, (int) result.Height);
+            return new Rectangle(result.Left, result.Top, result.Right - result.Left, result.Bottom - result.Top);
         }
         
         public static Rect GetActiveMonitorBounds(Window window)

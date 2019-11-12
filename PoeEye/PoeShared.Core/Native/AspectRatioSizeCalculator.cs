@@ -11,7 +11,7 @@ namespace PoeShared.Native
         {
             Guard.ArgumentIsTrue(desiredAspectRatio > 0, nameof(desiredAspectRatio));
 
-            if (initialBounds.IsEmpty || initialBounds == currentBounds)
+            if (initialBounds.IsEmpty)
             {
                 return currentBounds;
             }
@@ -87,6 +87,17 @@ namespace PoeShared.Native
             } else if (delta.Y != 0 || delta.Height != 0)
             {
                 result.Width = GetWidth(currentBounds, desiredAspectRatio);
+            }
+            else if (initialBounds == currentBounds)
+            {
+                if (prioritizeHeight)
+                {
+                    result.Height = GetHeight(currentBounds, desiredAspectRatio);
+                }
+                else
+                {
+                    result.Width = GetWidth(currentBounds, desiredAspectRatio);
+                }
             }
             else
             {
