@@ -5,6 +5,7 @@ using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls.Primitives;
 using System.Windows.Forms;
+using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Threading;
 using log4net;
@@ -77,77 +78,7 @@ namespace PoeShared.Native
                     break;
             }
         }
-
-        private void ThumbResize_OnDragDelta(object sender, DragDeltaEventArgs e)
-        {
-            var thumb = sender as Thumb;
-            var window = thumb?.Tag as Window;
-            
-            if (thumb == null || window == null || e == null)
-            {
-                return;
-            }
-
-            try
-            {
-                UpdateBounds(0, 0, e.HorizontalChange, e.VerticalChange);
-            }
-            catch (Exception exception)
-            {
-                Log.HandleUiException(exception);
-            }
-        }
-
-        public void UpdateBounds(double leftChange, double topChange, double widthChange, double heightChange)
-        {
-            var window = this;
-            var windowViewModel = window?.DataContext as OverlayWindowViewModel;
-            var overlayViewModel = windowViewModel?.Content as OverlayViewModelBase;
-            if (overlayViewModel == null)
-            {
-                return;
-            }
-            if (overlayViewModel.TargetAspectRatio != null && SizeToContent == SizeToContent.Manual)
-            {
-                var newWidth = window.Width + widthChange;
-                newWidth = Math.Min(newWidth, window.MaxWidth);
-                newWidth = Math.Max(newWidth, window.MinWidth);
-                
-                var newHeight = window.Height + heightChange;
-                newHeight = Math.Min(newHeight, window.MaxHeight);
-                newHeight = Math.Max(newHeight, window.MinHeight);
-
-                if (heightChange > widthChange)
-                {
-                    window.Width = newHeight * overlayViewModel.TargetAspectRatio.Value;
-                    window.Height = newHeight;
-                }
-                else
-                {
-                    window.Width = newWidth;
-                    window.Height = newWidth / overlayViewModel.TargetAspectRatio.Value;
-                }
-            }
-            else
-            {
-                if (SizeToContent != SizeToContent.Width)
-                {
-                    var newWidth = window.Width + widthChange;
-                    newWidth = Math.Min(newWidth, window.MaxWidth);
-                    newWidth = Math.Max(newWidth, window.MinWidth);
-                    window.Width = newWidth;
-                }
-
-                if (SizeToContent != SizeToContent.Height)
-                {
-                    var newHeight = window.Height + heightChange;
-                    newHeight = Math.Min(newHeight, window.MaxHeight);
-                    newHeight = Math.Max(newHeight, window.MinHeight);
-                    window.Height = newHeight;
-                }
-            }
-        }
-
+        
         private void OverlayChildWindow_OnSizeChanged(object sender, SizeChangedEventArgs sizeInfo)
         {
             var window = sender as Window;
@@ -175,6 +106,6 @@ namespace PoeShared.Native
                 Log.HandleUiException(exception);
             }
         }
-        
     }
+    
 }

@@ -58,6 +58,24 @@ namespace PoeShared.Native
         [DllImport("user32.dll")]
         public static extern IntPtr GetDesktopWindow();
         
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool GetCursorPos(ref Win32Point pt);
+        
+        [StructLayout(LayoutKind.Sequential)]
+        public struct Win32Point
+        {
+            public int X;
+            public int Y;
+        }
+        
+        public static Point GetMousePosition() // mouse position relative to screen
+        {
+            var w32Mouse = new UnsafeNative.Win32Point();
+            UnsafeNative.GetCursorPos(ref w32Mouse);
+            return new Point(w32Mouse.X, w32Mouse.Y);
+        }
+        
         public static bool IsElevated()
         {
             using (var identity = WindowsIdentity.GetCurrent())

@@ -104,6 +104,7 @@ namespace PoeShared.Native
             Log.Debug($"[{handle.ToHexadecimal()}] Showing window X:{left} Y:{top} Width:{width} Height:{height}, scaleFactor: {dpi}");
             ShowWindow(handle, SW_SHOWNOACTIVATE);
 
+            Debug.WriteLine($"[{handle.ToHexadecimal()}] Showing window X:{left} Y:{top} Width:{width} Height:{height}, scaleFactor: {dpi}");
             SetWindowPos(handle, HWND_TOPMOST, left, top, (int) (width * dpi), (int) (height * dpi), SWP_NOACTIVATE);
         }
 

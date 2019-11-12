@@ -4,12 +4,17 @@
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Colors.xaml" />
     </ResourceDictionary.MergedDictionaries>
-
-    <Style TargetType="{x:Type Thumb}" x:Key="OverlayThumbStyleKey">
+    
+    <Style TargetType="{x:Type Thumb}" x:Key="OverlayThumbStyle">
         <Setter Property="Foreground" Value="{StaticResource OverlayTitleBackgroundBrushKey}" />
         <Setter Property="Background" Value="{StaticResource OverlayWindowTextBrushKey}" />
         <Setter Property="BorderBrush" Value="{StaticResource OverlayBorderBrushKey}" />
         <Setter Property="Cursor" Value="{x:Static Cursors.AppStarting}" />
+        <Setter Property="Width" Value="20"/>
+        <Setter Property="Height" Value="20"/>
+        <Setter Property="RenderTransformOrigin" Value="0.5 0.5"/>
+        <Setter Property="Tag" Value="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}"/>
+        
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Thumb}">
@@ -31,16 +36,54 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
-
+        
         <Style.Triggers>
-            <Trigger Property="IsDragging" Value="True">
-                <Setter Property="Cursor" Value="{x:Static Cursors.SizeNWSE}" />
-            </Trigger>
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Cursor" Value="{x:Static Cursors.SizeNWSE}" />
                 <Setter Property="Background" Value="{StaticResource MouseOverAccentBrushKey}" />
             </Trigger>
         </Style.Triggers>
 
     </Style>
+    
+    <Style TargetType="{x:Type Thumb}" BasedOn="{StaticResource OverlayThumbStyle}" x:Key="OverlayThumbTopRightStyle">
+        <Setter Property="HorizontalAlignment" Value="Right"/>
+        <Setter Property="VerticalAlignment" Value="Top"/>
+        <Setter Property="Cursor" Value="{x:Static Cursors.SizeNESW}"/>
+        <Setter Property="RenderTransform">
+            <Setter.Value>
+                <RotateTransform Angle="270" CenterX="0.5" CenterY="0.5"/>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    
+    <Style TargetType="{x:Type Thumb}" BasedOn="{StaticResource OverlayThumbStyle}" x:Key="OverlayThumbBottomRightStyle">
+        <Setter Property="HorizontalAlignment" Value="Right"/>
+        <Setter Property="VerticalAlignment" Value="Bottom"/>
+        <Setter Property="Cursor" Value="{x:Static Cursors.SizeNWSE}"/>
+    </Style>
+    
+    
+    <Style TargetType="{x:Type Thumb}" BasedOn="{StaticResource OverlayThumbStyle}" x:Key="OverlayThumbTopLeftStyle">
+        <Setter Property="HorizontalAlignment" Value="Left"/>
+        <Setter Property="VerticalAlignment" Value="Top"/>
+        <Setter Property="Cursor" Value="{x:Static Cursors.SizeNWSE}"/>
+
+        <Setter Property="RenderTransform">
+            <Setter.Value>
+                <RotateTransform Angle="180" CenterX="0.5" CenterY="0.5"/>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type Thumb}" BasedOn="{StaticResource OverlayThumbStyle}" x:Key="OverlayThumbBottomLeftStyle">
+        <Setter Property="HorizontalAlignment" Value="Left"/>
+        <Setter Property="VerticalAlignment" Value="Bottom"/>
+        <Setter Property="Cursor" Value="{x:Static Cursors.SizeNESW}"/>
+        <Setter Property="RenderTransform">
+            <Setter.Value>
+                <RotateTransform Angle="90" CenterX="0.5" CenterY="0.5"/>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
 </ResourceDictionary>

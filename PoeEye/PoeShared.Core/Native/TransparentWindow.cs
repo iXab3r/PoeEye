@@ -4,7 +4,7 @@ using System.Windows.Interop;
 
 namespace PoeShared.Native
 {
-    public class TransparentWindow : Window
+    public class TransparentWindow : ConstantAspectRatioWindow
     {
         protected override void OnSourceInitialized(EventArgs e)
         {
