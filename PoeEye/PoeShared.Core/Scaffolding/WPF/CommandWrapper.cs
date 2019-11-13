@@ -120,6 +120,11 @@ namespace PoeShared.Scaffolding.WPF
 
             return result;
         }
+        
+        public static CommandWrapper Create(Action execute, IObservable<bool> canExecute)
+        {
+            return FromReactiveCommand(ReactiveCommand.Create(execute, canExecute));
+        }
 
         public static CommandWrapper Create(Func<Task> execute, IObservable<bool> canExecute)
         {
