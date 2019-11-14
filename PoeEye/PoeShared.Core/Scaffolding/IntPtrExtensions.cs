@@ -6,7 +6,8 @@ namespace PoeShared.Scaffolding
     {
         public static string ToHexadecimal(this IntPtr value)
         {
-            return $"0x{value.ToInt64():x8}";
+            var handle = value.ToInt64();
+            return $"0x{handle:x8} ({value})";
         }
     }
 }

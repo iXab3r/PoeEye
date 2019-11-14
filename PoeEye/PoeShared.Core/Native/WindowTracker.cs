@@ -96,7 +96,7 @@ namespace PoeShared.Native
 
             if (previousState.ActiveWindowHandle != ActiveWindowHandle)
             {
-                Log.Debug($"[#{Name}] Target window is {(isActive ? string.Empty : "NOT ")}ACTIVE (0x{activeHwnd.ToInt64():X8}, title '{activeWindowTitle}')");
+                Log.Debug($"[#{Name}] Target window is {(isActive ? string.Empty : "NOT ")}ACTIVE ({activeHwnd.ToHexadecimal()}, title '{activeWindowTitle}')");
             }
 
             this.RaiseIfChanged(nameof(IsActive), previousState.IsActive, IsActive);

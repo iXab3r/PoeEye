@@ -4,4 +4,9 @@ namespace PoeShared.Native
     {
         void Close();
     }
+    
+    public interface ICloseController<in TValue>
+    {
+        void Close(TValue value);
+    }
 }

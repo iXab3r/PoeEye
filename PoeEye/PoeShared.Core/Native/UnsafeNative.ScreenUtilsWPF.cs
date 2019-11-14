@@ -34,7 +34,7 @@ namespace PoeShared.Native
             
                 var graphics = Graphics.FromHdc(screenDc.DangerousGetHandle());
                 var dpi = GetDpi(graphics);
-                Log.Debug($"Monitor for window 0x{windowHandle.ToInt64():X8}: {GetMonitorInfo(windowHandle)}");
+                Log.Debug($"Monitor for window {windowHandle.ToHexadecimal()}: {GetMonitorInfo(windowHandle)}");
                 return CalculateScreenBounds(screen, dpi);
             }
         }

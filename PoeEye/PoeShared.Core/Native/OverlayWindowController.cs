@@ -148,7 +148,7 @@ namespace PoeShared.Native
 
             Observable.Merge(
                     this.WhenAnyValue(x => x.IsVisible).WithPrevious((prev, curr) => new {prev, curr}).Do(x => Log.Debug($"[#{overlayName}] [IsVisible {IsVisible}] Processing IsVisible change, {x.prev} => {x.curr}")).ToUnit(), 
-                    windowTracker.WhenAnyValue(x => x.ActiveWindowHandle).WithPrevious((prev, curr) => new {prev, curr}).Do(x => Log.Debug($"[#{overlayName}] [IsVisible {IsVisible}] Processing ActiveWindowHandle change, {x.prev.ToInt64():x8} => {x.curr.ToInt64():x8}")).ToUnit(),
+                    windowTracker.WhenAnyValue(x => x.ActiveWindowHandle).WithPrevious((prev, curr) => new {prev, curr}).Do(x => Log.Debug($"[#{overlayName}] [IsVisible {IsVisible}] Processing ActiveWindowHandle change, {x.prev.ToHexadecimal()} => {x.curr.ToHexadecimal()}")).ToUnit(),
                     overlayWindow.WhenLoaded.Do(x => Log.Debug($"[#{overlayName}] [IsVisible {IsVisible}] Processing WhenLoaded event")).ToUnit())
                 .ObserveOn(uiScheduler)
                 .Subscribe(() => HandleVisibilityChange(overlayWindow, viewModel))

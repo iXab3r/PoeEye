@@ -49,10 +49,10 @@ namespace PoeShared.Native
                             return;
                         }
 
-                        Log.Debug($"Setting initial window {this} size (0x{thisWindow.ToInt64():x8}), TargetAspectRatio: {targetAspectRatio}, current bounds: {bounds}, target bounds: {newBounds}");
+                        Log.Debug($"Setting initial window {this} size ({thisWindow.ToHexadecimal()}), TargetAspectRatio: {targetAspectRatio}, current bounds: {bounds}, target bounds: {newBounds}");
                         if (!WindowsServices.SetWindowRect(thisWindow, newBounds))
                         {
-                            Log.Warn($"Failed to assign initial window {this} (0x{thisWindow.ToInt64():x8}) size, TargetAspectRatio: {targetAspectRatio}, initial bounds: {bounds}, target bounds: {newBounds}");
+                            Log.Warn($"Failed to assign initial window {this} ({thisWindow.ToHexadecimal()}) size, TargetAspectRatio: {targetAspectRatio}, initial bounds: {bounds}, target bounds: {newBounds}");
                         } 
                     })
                 .AddTo(anchors);

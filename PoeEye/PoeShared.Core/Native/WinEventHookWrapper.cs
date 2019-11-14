@@ -27,7 +27,8 @@ namespace PoeShared.Native
             eventDelegate = WinEventDelegateProc;
             Log.Debug($"New WinEvent hook created, args: {hookArgs}");
 
-            Task.Factory.StartNew(Run, TaskCreationOptions.LongRunning);
+            Disposable.Create(() => Log.Info($"Disposing WinEventHookWrapper")).AddTo(Anchors);
+            var hookEventLoopTask = Task.Factory.StartNew(Run, TaskCreationOptions.LongRunning).AddTo(Anchors);
         }
 
         public IObservable<IntPtr> WhenWindowEventTriggered => whenWindowEventTriggered;

@@ -273,7 +273,7 @@ namespace PoeShared.Native
             }
             OverlayWindow = owner;
             var interopHelper = new WindowInteropHelper(OverlayWindow);
-            Log.Debug($"[#{this}] Loaded overlay window: {OverlayWindow} (0x{interopHelper.Handle.ToInt64():x8})");
+            Log.Debug($"[#{this}] Loaded overlay window: {OverlayWindow} ({interopHelper.Handle.ToHexadecimal()})");
         }
 
         protected void ApplyConfig(IOverlayConfig config)

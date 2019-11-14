@@ -64,7 +64,7 @@ namespace PoeShared.Native
             var newStyle = existingStyle & ~User32.SetWindowLongFlags.WS_SYSMENU;
             if (User32.SetWindowLong(hwnd, User32.WindowLongIndexFlags.GWL_STYLE, newStyle) == 0)
             {
-                Log.Warn($"Failed to SetWindowLong to {newStyle} (previously {existingStyle}) of Window by HWND 0x{hwnd.ToInt64():x8}");
+                Log.Warn($"Failed to SetWindowLong to {newStyle} (previously {existingStyle}) of Window by HWND {hwnd.ToHexadecimal()}");
             }
         }
         
@@ -79,7 +79,7 @@ namespace PoeShared.Native
             newStyle |= User32.SetWindowLongFlags.WS_EX_TRANSPARENT;
             if (User32.SetWindowLong(hwnd, User32.WindowLongIndexFlags.GWL_EXSTYLE, newStyle) == 0)
             {
-                Log.Warn($"Failed to SetWindowLong to {newStyle} (previously {existingStyle}) of Window by HWND 0x{hwnd.ToInt64():x8}");
+                Log.Warn($"Failed to SetWindowLong to {newStyle} (previously {existingStyle}) of Window by HWND {hwnd.ToHexadecimal()}");
                 return false;
             }
 
@@ -97,7 +97,7 @@ namespace PoeShared.Native
             newStyle |= User32.SetWindowLongFlags.WS_EX_LAYERED;
             if (User32.SetWindowLong(hwnd, User32.WindowLongIndexFlags.GWL_EXSTYLE, newStyle) == 0)
             {
-                Log.Warn($"Failed to SetWindowLong to {newStyle} (previously {existingStyle}) of Window by HWND 0x{hwnd.ToInt64():x8}");
+                Log.Warn($"Failed to SetWindowLong to {newStyle} (previously {existingStyle}) of Window by HWND {hwnd.ToHexadecimal()}");
                 return false;
             }
             return true;
@@ -111,7 +111,7 @@ namespace PoeShared.Native
             newStyle |= User32.SetWindowLongFlags.WS_EX_NOACTIVATE;
             if (User32.SetWindowLong(hwnd, User32.WindowLongIndexFlags.GWL_EXSTYLE, newStyle) == 0)
             {
-                Log.Warn($"Failed to SetWindowLong to {newStyle} (previously {existingStyle}) of Window by HWND 0x{hwnd.ToInt64():x8}");
+                Log.Warn($"Failed to SetWindowLong to {newStyle} (previously {existingStyle}) of Window by HWND {hwnd.ToHexadecimal()}");
                 return false;
             }
 
