@@ -298,7 +298,7 @@ namespace PoeShared.Native
             {
                 MonitorCount = SystemInformation.MonitorCount, 
                 VirtualScreen = SystemInformation.VirtualScreen,
-                MonitorBounds = UnsafeNative.GetActiveMonitorBounds(OverlayWindow),
+                MonitorBounds = UnsafeNative.GetMonitorBounds(OverlayWindow),
                 MonitorInfo = UnsafeNative.GetMonitorInfo(OverlayWindow)
             };
 

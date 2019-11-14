@@ -2,6 +2,7 @@ using System;
 using System.Text;
 using System.Windows.Forms;
 using System.Windows.Input;
+using PInvoke;
 using PoeShared.Native;
 
 namespace PoeShared.UI.Hotkeys
@@ -101,19 +102,19 @@ namespace PoeShared.UI.Hotkeys
 
             if ((ModifierKeys & ModifierKeys.Control) == ModifierKeys.Control)
             {
-                sb.Append(GetLocalizedKeyStringUnsafe(UnsafeNative.Constants.VK_CONTROL));
+                sb.Append(GetLocalizedKeyStringUnsafe(User32.VirtualKey.VK_CONTROL));
                 sb.Append("+");
             }
 
             if ((ModifierKeys & ModifierKeys.Alt) == ModifierKeys.Alt)
             {
-                sb.Append(GetLocalizedKeyStringUnsafe(UnsafeNative.Constants.VK_MENU));
+                sb.Append(GetLocalizedKeyStringUnsafe(User32.VirtualKey.VK_MENU));
                 sb.Append("+");
             }
 
             if ((ModifierKeys & ModifierKeys.Shift) == ModifierKeys.Shift)
             {
-                sb.Append(GetLocalizedKeyStringUnsafe(UnsafeNative.Constants.VK_SHIFT));
+                sb.Append(GetLocalizedKeyStringUnsafe(User32.VirtualKey.VK_SHIFT));
                 sb.Append("+");
             }
 
@@ -147,20 +148,19 @@ namespace PoeShared.UI.Hotkeys
                 return key.ToString();
             }
 
-            var vkey = KeyInterop.VirtualKeyFromKey(key);
-            return GetLocalizedKeyStringUnsafe(vkey) ?? key.ToString();
+            var virtualKey = (User32.VirtualKey)KeyInterop.VirtualKeyFromKey(key);
+            return GetLocalizedKeyStringUnsafe(virtualKey) ?? key.ToString();
         }
 
-        private static string GetLocalizedKeyStringUnsafe(int key)
+        private static string GetLocalizedKeyStringUnsafe(User32.VirtualKey key)
         {
             // strip any modifier keys
-            long keyCode = key & 0xffff;
+            var keyCode = (int)key & 0xffff;
 
             var sb = new StringBuilder(256);
+            var scanCode = User32.MapVirtualKey(keyCode, User32.MapVirtualKeyTranslation.MAPVK_VK_TO_VSC);
 
-            long scanCode = UnsafeNative.MapVirtualKey((uint) keyCode, UnsafeNative.Constants.MAPVK_VK_TO_VSC);
-
-            // shift the scancode to the high word
+            // shift the scan code to the high word
             scanCode = scanCode << 16;
             if (keyCode == 45 ||
                 keyCode == 46 ||
@@ -171,7 +171,7 @@ namespace PoeShared.UI.Hotkeys
                 scanCode |= 0x1000000;
             }
 
-            var resultLength = UnsafeNative.GetKeyNameText((int) scanCode, sb, 256);
+            var resultLength = UnsafeNative.GetKeyNameText(scanCode, sb, 256);
             return resultLength > 0 ? sb.ToString() : null;
         }
 
@@ -199,7 +199,7 @@ namespace PoeShared.UI.Hotkeys
         {
             unchecked
             {
-                var hashCode = (int) MouseButton;
+                var hashCode = MouseButton?.GetHashCode() ?? 0;
                 hashCode = (hashCode * 397) ^ (int) Key;
                 hashCode = (hashCode * 397) ^ (int) ModifierKeys;
                 return hashCode;

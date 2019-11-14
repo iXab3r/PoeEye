@@ -31,6 +31,9 @@
     <PackageReference Include="MouseKeyHook" Version="5.6.0" />
     <PackageReference Include="NAudio" Version="1.8.5" />
     <PackageReference Include="Newtonsoft.Json" Version="8.0.3" />
+    <PackageReference Include="PInvoke.DwmApi" Version="0.6.6" />
+    <PackageReference Include="PInvoke.Kernel32" Version="0.6.6" />
+    <PackageReference Include="PInvoke.User32" Version="0.6.6" />
     <PackageReference Include="Prism.Core" Version="7.2.0.1367" />
     <PackageReference Include="Prism.Unity" Version="7.2.0.1367" />
     <PackageReference Include="Prism.Wpf" Version="7.2.0.1367" />

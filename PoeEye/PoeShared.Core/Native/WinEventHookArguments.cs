@@ -1,12 +1,14 @@
-﻿namespace PoeShared.Native
+﻿using PInvoke;
+
+namespace PoeShared.Native
 {
     public struct WinEventHookArguments
     {
-        public uint EventMin { get; set; }
-        public uint EventMax { get; set; }
-        public uint ProcessId { get; set; }
-        public uint ThreadId { get; set; }
-        public uint Flags { get; set; }
+        public User32.WindowsEventHookType EventMin { get; set; }
+        public User32.WindowsEventHookType EventMax { get; set; }
+        public int ProcessId { get; set; }
+        public int ThreadId { get; set; }
+        public User32.WindowsEventHookFlags Flags { get; set; }
 
         public override string ToString()
         {

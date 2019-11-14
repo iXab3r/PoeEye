@@ -1,22 +1,25 @@
 ﻿using System;
-using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Reactive.Disposables;
 using System.Reactive.Subjects;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using log4net;
+using PInvoke;
 using PoeShared.Scaffolding;
+using Win32Exception = System.ComponentModel.Win32Exception;
 
 namespace PoeShared.Native
 {
+    [SuppressMessage("ReSharper", "IdentifierTypo")]
     public sealed class WinEventHookWrapper : DisposableReactiveObject, IWinEventHookWrapper
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(WinEventHookWrapper));
-        private readonly UnsafeNative.WinEventDelegate eventDelegate;
 
         private readonly WinEventHookArguments hookArgs;
         private readonly ISubject<IntPtr> whenWindowEventTriggered = new Subject<IntPtr>();
+        private readonly User32.WinEventProc eventDelegate;
 
         public WinEventHookWrapper(WinEventHookArguments hookArgs)
         {
@@ -29,13 +32,18 @@ namespace PoeShared.Native
 
         public IObservable<IntPtr> WhenWindowEventTriggered => whenWindowEventTriggered;
 
-        private void WinEventDelegateProc(IntPtr hWinEventHook, uint eventType, IntPtr hwnd, int idObject,
-            int idChild, uint dwEventThread, uint dwmsEventTime)
+        private void WinEventDelegateProc(User32.SafeEventHookHandle hWinEventHook,
+            User32.WindowsEventHookType @event,
+            IntPtr hwnd,
+            int idObject,
+            int idChild,
+            int dwEventThread,
+            uint dwmsEventTime)
         {
             if (Log.IsDebugEnabled)
             {
                 Log.Debug(
-                    $"[{hookArgs}] Event hook triggered, hWinEventHook: 0x{hWinEventHook.ToInt64():x8}, eventType: {eventType}, hwnd: 0x{hwnd.ToInt64():x8}, idObject: {idObject}, idChild: {idChild}, dwEventThread: {dwEventThread}, dwmsEventTime: {dwmsEventTime}");
+                    $"[{hookArgs}] Event hook triggered, hWinEventHook: {hWinEventHook.DangerousGetHandle().ToHexadecimal()}, eventType: {@event}, hwnd: {hwnd.ToHexadecimal()}, idObject: {idObject}, idChild: {idChild}, dwEventThread: {dwEventThread}, dwmsEventTime: {dwmsEventTime}");
             }
 
             whenWindowEventTriggered.OnNext(hwnd);
@@ -53,7 +61,8 @@ namespace PoeShared.Native
         private IDisposable RegisterHook()
         {
             Log.Debug($"Registering hook, args: {hookArgs}");
-            var hook = UnsafeNative.SetWinEventHook(
+            
+            var hook = User32.SetWinEventHook(
                 hookArgs.EventMin,
                 hookArgs.EventMax,
                 IntPtr.Zero,
@@ -61,18 +70,17 @@ namespace PoeShared.Native
                 hookArgs.ProcessId,
                 hookArgs.ThreadId,
                 hookArgs.Flags);
-            Log.Debug($"Hook handle(args: {hookArgs}): {hook.ToInt64():x8}");
+            Log.Debug($"Hook handle(args: {hookArgs}): {hook.DangerousGetHandle().ToHexadecimal()}");
 
-            if (hook == IntPtr.Zero)
+            if (hook.IsInvalid)
             {
                 throw new Win32Exception(Marshal.GetLastWin32Error());
             }
 
             return Disposable.Create(() =>
             {
-                Log.Debug($"Unregistering hook (args: {hookArgs}) {hook.ToInt64():x8}");
-
-                UnsafeNative.UnhookWinEvent(hook);
+                Log.Debug($"Unregistering hook (args: {hookArgs}) {hook.DangerousGetHandle().ToHexadecimal()}");
+                hook.DangerousRelease();
             });
         }
 

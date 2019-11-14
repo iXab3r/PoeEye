@@ -21,7 +21,7 @@ namespace PoeShared.Native
         private bool isActive;
         private string name;
         private IntPtr windowHandle;
-        private uint activeProcessId;
+        private int activeProcessId;
 
         public WindowTracker(
             [NotNull] IStringMatcher titleMatcher)
@@ -72,7 +72,7 @@ namespace PoeShared.Native
             private set => this.RaiseAndSetIfChanged(ref activeWindowHandle, value);
         }
 
-        public uint ActiveProcessId
+        public int ActiveProcessId
         {
             get => activeProcessId;
             private set => this.RaiseAndSetIfChanged(ref activeProcessId, value);

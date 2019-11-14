@@ -7,6 +7,7 @@ using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
@@ -17,7 +18,6 @@ using log4net;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
 using ReactiveUI;
-using Unity;
 using Point = System.Windows.Point;
 
 namespace PoeShared.Native
@@ -41,7 +41,7 @@ namespace PoeShared.Native
         public OverlayWindowController(
             [NotNull] IWindowTracker windowTracker,
             [NotNull] IKeyboardEventsSource keyboardMouseEvents,
-            [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
+            [NotNull] [Unity.Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {
             Guard.ArgumentNotNull(windowTracker, nameof(windowTracker));
             Guard.ArgumentNotNull(keyboardMouseEvents, nameof(keyboardMouseEvents));
@@ -204,7 +204,7 @@ namespace PoeShared.Native
                 return;
             }
 
-            WindowsServices.SetForegroundWindow(windowHandle);
+            UnsafeNative.SetForegroundWindow(windowHandle);
         }
 
         private void HandleVisibilityChange(OverlayWindowView overlayWindow, IOverlayViewModel viewModel)
@@ -278,7 +278,7 @@ namespace PoeShared.Native
             public void Activate()
             {
                 var overlayWindowHandle = new WindowInteropHelper(overlayWindow).Handle;
-                WindowsServices.SetForegroundWindow(overlayWindowHandle);
+                UnsafeNative.SetForegroundWindow(overlayWindowHandle);
             }
         }
     }

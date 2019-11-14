@@ -3,6 +3,7 @@ using System.Windows.Controls;
 using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Interop;
+using PInvoke;
 using PoeShared.Native;
 using Control = System.Windows.Controls.Control;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
@@ -201,11 +202,11 @@ namespace PoeShared.UI.Hotkeys
             ComponentDispatcher.ThreadPreprocessMessage += ComponentDispatcherOnThreadPreprocessMessage;
         }
 
-        private void ComponentDispatcherOnThreadPreprocessMessage(ref MSG msg, ref bool handled)
+        private void ComponentDispatcherOnThreadPreprocessMessage(ref MSG msgRaw, ref bool handled)
         {
-            if (msg.message == UnsafeNative.Constants.WM_HOTKEY)
+            var msg = (User32.WindowMessage) msgRaw.message;
+            if (msg == User32.WindowMessage.WM_HOTKEY)
             {
-                // swallow all hotkeys, so our control can catch the key strokes
                 handled = true;
             }
         }
