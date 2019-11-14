@@ -18,9 +18,24 @@ namespace PoeShared.Native
         [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
         private static extern int GetWindowText(IntPtr hWnd, StringBuilder text, int count);
         
+        [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+        static extern bool AdjustWindowRectEx(ref RECT lpRect, User32.WindowStyles dwStyle, bool bMenu, User32.WindowStylesEx dwExStyle); 
+        
+        
+        [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+        static extern bool AdjustWindowRectExForDpi(ref RECT lpRect, User32.WindowStyles dwStyle, bool bMenu, User32.WindowStylesEx dwExStyle, int dpi); 
+        
         public static string GetWindowClass(IntPtr hwnd)
         {
-            return User32.GetClassName(hwnd);
+            try
+            {
+                return User32.GetClassName(hwnd);
+            }
+            catch (Win32Exception e)
+            {
+                Log.Warn($"Failed to get GetWindowClass({hwnd.ToHexadecimal()}) - {e}");
+                return null;
+            }
         }
         
         public static Point GetMousePosition() 
@@ -43,7 +58,7 @@ namespace PoeShared.Native
             catch (Win32Exception e)
             {
                 Log.Warn($"Failed to get GetWindowText({hwnd.ToHexadecimal()}) - {e}");
-                return string.Empty;
+                return null;
             }
         }
 

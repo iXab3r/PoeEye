@@ -21,9 +21,9 @@ namespace PoeShared.Native
             UnsafeNative.HideSystemMenu(hwnd);
         }
 
-        public static void ShowInactiveTopmost(IntPtr handle, int left, int top, int width, int height)
+        public static void ShowInactiveTopmost(IntPtr handle, Rectangle windowBounds)
         {
-            UnsafeNative.ShowInactiveTopmost(handle, left, top, width, height);
+            UnsafeNative.ShowInactiveTopmost(handle, windowBounds);
         }
 
         public static void ShowWindow(IntPtr handle)

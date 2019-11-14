@@ -21,5 +21,7 @@ namespace PoeShared.Native
         IObservable<MouseEventArgs> WhenMouseUp { [NotNull] get; }
 
         IObservable<MouseEventArgs> WhenMouseDown { [NotNull] get; }
+        
+        IObservable<MouseEventArgs> WhenMouseMove { [NotNull] get; }
     }
 }

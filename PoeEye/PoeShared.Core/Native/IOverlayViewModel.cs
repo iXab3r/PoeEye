@@ -1,15 +1,17 @@
-using System;
-using System.Reactive;
 using System.Windows;
 using System.Windows.Input;
 using JetBrains.Annotations;
 using PoeShared.Scaffolding;
+using Point = System.Windows.Point;
+using Size = System.Windows.Size;
 
 namespace PoeShared.Native
 {
     public interface IOverlayViewModel : IDisposableReactiveObject
     {
         Rect Bounds { get; }
+        
+        System.Drawing.Rectangle NativeBounds { get; }
     
         double Left { get; set; }
 
@@ -54,6 +56,8 @@ namespace PoeShared.Native
         double? TargetAspectRatio { get; set; }
         
         Point ViewModelLocation { get; }
+        
+        Window OverlayWindow { [CanBeNull] get; }
 
         void ResetToDefault();
 

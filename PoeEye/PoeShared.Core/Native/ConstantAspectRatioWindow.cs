@@ -29,7 +29,7 @@ namespace PoeShared.Native
 
         protected ConstantAspectRatioWindow()
         {
-            SourceInitialized += Window_SourceInitialized;
+            Loaded += HandleWindowLoaded;
             this.Observe(TargetAspectRatioProperty)
                 .Select(() => TargetAspectRatio)
                 .DistinctUntilChanged()
@@ -72,7 +72,7 @@ namespace PoeShared.Native
             base.OnClosed(e);
         }
 
-        private void Window_SourceInitialized(object sender, EventArgs ea)
+        private void HandleWindowLoaded(object sender, EventArgs ea)
         {
             Log.Debug($"Initializing windowSource, source: {this}");
             var hwndSource = (HwndSource) PresentationSource.FromVisual(this);

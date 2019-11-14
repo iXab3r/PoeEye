@@ -49,6 +49,13 @@ namespace PoeShared.UI.Hotkeys
             ModifierKeys = modifierKeys;
         }
 
+        public HotkeyGesture(HotkeyGesture keys, ModifierKeys modifierKeys = ModifierKeys.None) : this()
+        {
+            MouseButton = keys.MouseButton;
+            Key = keys.Key;
+            ModifierKeys = modifierKeys;
+        }
+        
         public HotkeyGesture(MouseButtons mouseButton, ModifierKeys modifierKeys = ModifierKeys.None) : this()
         {
             var button = default(MouseButton?);

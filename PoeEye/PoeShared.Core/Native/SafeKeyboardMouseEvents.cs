@@ -32,6 +32,7 @@ namespace PoeShared.Native
         private readonly ISubject<KeyPressEventArgs> whenKeyPress = new Subject<KeyPressEventArgs>();
         private readonly ISubject<KeyEventArgs> whenKeyUp = new Subject<KeyEventArgs>();
         private readonly ISubject<MouseEventArgs> whenMouseDown = new Subject<MouseEventArgs>();
+        private readonly ISubject<MouseEventArgs> whenMouseMove = new Subject<MouseEventArgs>();
         private readonly ISubject<MouseEventArgs> whenMouseUp = new Subject<MouseEventArgs>();
 
         private bool realtimeMode = false;
@@ -88,6 +89,8 @@ namespace PoeShared.Native
         public IObservable<KeyEventArgs> WhenKeyUp => whenKeyUp;
 
         public IObservable<MouseEventArgs> WhenMouseDown => whenMouseDown.OfType<MouseEventArgs>();
+        
+        public IObservable<MouseEventArgs> WhenMouseMove => whenMouseMove.OfType<MouseEventArgs>();
 
         public IObservable<MouseEventArgs> WhenMouseUp => whenMouseUp.OfType<MouseEventArgs>();
 
@@ -186,6 +189,9 @@ namespace PoeShared.Native
                         case InputEventType.MouseUp:
                             whenMouseUp.OnNext(args);
                             break;
+                        case InputEventType.MouseMove:
+                            whenMouseMove.OnNext(args);
+                            break;
                         default:
                             throw new ArgumentOutOfRangeException(nameof(nextEvent), nextEvent.EventType,
                                 $"Invalid enum value for type {args.GetType().Name}, data: {nextEvent.DumpToTextRaw()}");
@@ -251,6 +257,15 @@ namespace PoeShared.Native
                 .Do(LogEvent)
                 .Subscribe(x => EnqueueEvent(x, InputEventType.MouseUp), Log.HandleException)
                 .AddTo(anchors);
+            
+            Observable
+                .FromEventPattern<EventHandler<MouseEventExtArgs>, MouseEventExtArgs>(
+                    h => mouseEvents.MouseMoveExt += h,
+                    h => mouseEvents.MouseMoveExt -= h)
+                .Select(x => x.EventArgs)
+                .Do(LogEvent)
+                .Subscribe(x => EnqueueEvent(x, InputEventType.MouseMove), Log.HandleException)
+                .AddTo(anchors);
 
             return anchors;
         }
@@ -295,7 +310,8 @@ namespace PoeShared.Native
             KeyUp,
             KeyPress,
             MouseDown,
-            MouseUp
+            MouseUp,
+            MouseMove
         }
     }
 }

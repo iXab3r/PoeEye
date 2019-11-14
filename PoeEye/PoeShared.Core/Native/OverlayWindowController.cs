@@ -142,10 +142,23 @@ namespace PoeShared.Native
                 Name = $"{overlayName}_OverlayView"
             };
             Log.Debug($"[#{overlayName}] Created Overlay window({windowTracker})");
+            var overlayWindowHandle = new WindowInteropHelper(overlayWindow).EnsureHandle();
+            Log.Debug($"[#{overlayName}] Overlay window({windowTracker}) handle: {overlayWindowHandle.ToHexadecimal()}");
 
+            
             var activationController = new ActivationController(overlayWindow);
             viewModel.SetActivationController(activationController);
 
+            this.WhenAnyValue(x => x.ShowWireframes)
+                .ObserveOn(uiScheduler)
+                .Subscribe(() => overlayWindowViewModel.ShowWireframes = showWireframes)
+                .AddTo(childAnchors);
+
+            overlayWindow.WhenLoaded
+                .Do(args => Log.Debug($"[#{overlayWindow.Name}] Overlay is loaded, window: {args.Sender}"))
+                .Subscribe(() => viewModel.SetOverlayWindow(overlayWindow))
+                .AddTo(childAnchors);
+            
             Observable.Merge(
                     this.WhenAnyValue(x => x.IsVisible).WithPrevious((prev, curr) => new {prev, curr}).Do(x => Log.Debug($"[#{overlayName}] [IsVisible {IsVisible}] Processing IsVisible change, {x.prev} => {x.curr}")).ToUnit(), 
                     windowTracker.WhenAnyValue(x => x.ActiveWindowHandle).WithPrevious((prev, curr) => new {prev, curr}).Do(x => Log.Debug($"[#{overlayName}] [IsVisible {IsVisible}] Processing ActiveWindowHandle change, {x.prev.ToHexadecimal()} => {x.curr.ToHexadecimal()}")).ToUnit(),
@@ -154,20 +167,12 @@ namespace PoeShared.Native
                 .Subscribe(() => HandleVisibilityChange(overlayWindow, viewModel))
                 .AddTo(childAnchors);
 
-            this.WhenAnyValue(x => x.ShowWireframes)
-                .ObserveOn(uiScheduler)
-                .Subscribe(() => overlayWindowViewModel.ShowWireframes = showWireframes)
-                .AddTo(childAnchors);
-
-            viewModel
-                .WhenAnyValue(x => x.OverlayMode)
+            overlayWindow
+                .WhenLoaded
+                .Select(() => viewModel.WhenAnyValue(x => x.OverlayMode))
+                .Switch()
                 .ObserveOn(uiScheduler)
                 .Subscribe(overlayWindow.SetOverlayMode)
-                .AddTo(childAnchors);
-            
-            overlayWindow.WhenLoaded
-                .Do(args => Log.Debug($"[#{overlayWindow.Name}] Overlay is loaded, window: {args.Sender}"))
-                .Subscribe(() => viewModel.SetOverlayWindow(overlayWindow))
                 .AddTo(childAnchors);
 
             overlayWindow
@@ -211,7 +216,6 @@ namespace PoeShared.Native
         {
             var overlayWindowHandle = new WindowInteropHelper(overlayWindow).Handle;
            
-            
             if (isVisible)
             {
                 Log.Debug($"[#{overlayWindow.Name}] Showing overlay {overlayWindow}");
@@ -221,22 +225,7 @@ namespace PoeShared.Native
                     overlayWindow.Visibility = Visibility.Visible;
                 }
 
-                Point location;
-                if (overlayWindow.IsVisible)
-                {
-                    location = overlayWindow.PointToScreen(new System.Windows.Point(0, 0));
-                }
-                else
-                {
-                    location = new Point(overlayWindow.Left, overlayWindow.Top);
-                }
-                
-                WindowsServices.ShowInactiveTopmost(
-                    overlayWindowHandle,
-                    (int) location.X,
-                    (int) location.Y,
-                    (int) viewModel.Width,
-                    (int) viewModel.Height);
+                WindowsServices.ShowInactiveTopmost(overlayWindowHandle, viewModel.NativeBounds);
             } else if (overlayWindowHandle == IntPtr.Zero)
             {
                 Log.Debug($"[#{overlayWindow.Name}] Overlay is not initialized yet");

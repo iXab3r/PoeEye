@@ -4,6 +4,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Interop;
+using System.Windows.Media;
 using PInvoke;
 using PoeShared.Scaffolding;
 
@@ -80,8 +81,10 @@ namespace PoeShared.Native
                     Log.Warn($"Failed to GetDC for desktop {desktopWindow.ToInt64()}, error: {error}");
                     return PointF.Empty;
                 }
-                var graphics = Graphics.FromHdc(desktopDc.DangerousGetHandle());
-                return GetDpi(graphics);
+                using ( var graphics = Graphics.FromHdc(desktopDc.DangerousGetHandle()))
+                {
+                    return GetDpi(graphics);
+                }
             }
         }
         
@@ -96,8 +99,17 @@ namespace PoeShared.Native
             if (!User32.GetClientRect(hwnd, out rect))
             {
                 Log.Warn($"Failed to GetClientRect({hwnd}), LastError: {Kernel32.GetLastError()}");
+                return Rectangle.Empty;
             }
-            return new Rectangle(rect.left, rect.top, rect.bottom - rect.top, rect.right - rect.left);
+
+            var windowBounds = GetWindowRect(hwnd);
+            var clientSize = new System.Drawing.Size(rect.right - rect.left, rect.bottom - rect.top);
+            
+            return new Rectangle(
+                windowBounds.Left, 
+                windowBounds.Top,
+                clientSize.Width,
+                clientSize.Height);
         }
         
         public static bool IsWindowsXP()

@@ -47,10 +47,10 @@ namespace PoeShared.Native
         public static bool SetWindowRect(IntPtr hwnd, Rectangle rect)
         {
             Log.Debug($"[{hwnd.ToHexadecimal()}] Setting window bounds: {rect}");
-            
-            if (!User32.SetWindowPos(hwnd, User32.SpecialWindowHandles.HWND_TOP, rect.X, rect.Y, rect.Width, rect.Height, User32.SetWindowPosFlags.SWP_NOACTIVATE))
+            Win32ErrorCode error;
+            if (!User32.SetWindowPos(hwnd, User32.SpecialWindowHandles.HWND_TOP, rect.X, rect.Y, rect.Width, rect.Height, User32.SetWindowPosFlags.SWP_NOACTIVATE) && (error = Kernel32.GetLastError()) != Win32ErrorCode.NERR_Success)
             {
-                Log.Warn($"Failed to SetWindowPos({hwnd.ToHexadecimal()}, {User32.SpecialWindowHandles.HWND_TOPMOST}), error: {Kernel32.GetLastError()}");
+                Log.Warn($"Failed to SetWindowPos({hwnd.ToHexadecimal()}, {User32.SpecialWindowHandles.HWND_TOPMOST}), error: {error}");
                 return false;
             }
             return true;
@@ -58,6 +58,8 @@ namespace PoeShared.Native
 
         public static void HideSystemMenu(IntPtr hwnd)
         {
+            Guard.ArgumentIsTrue(hwnd != IntPtr.Zero, "Handle must be non-zero");
+
             Log.Debug($"[{hwnd.ToHexadecimal()}] Hiding SystemMenu");
 
             var existingStyle = (User32.SetWindowLongFlags)User32.GetWindowLong(hwnd, User32.WindowLongIndexFlags.GWL_STYLE);
@@ -70,6 +72,8 @@ namespace PoeShared.Native
         
         public static bool SetWindowExTransparent(IntPtr hwnd)
         {
+            Guard.ArgumentIsTrue(hwnd != IntPtr.Zero, "Handle must be non-zero");
+
             Log.Debug($"[{hwnd.ToHexadecimal()}] Reconfiguring window to Transparent");
 
             var existingStyle = (User32.SetWindowLongFlags)User32.GetWindowLong(hwnd, User32.WindowLongIndexFlags.GWL_EXSTYLE);
@@ -88,6 +92,8 @@ namespace PoeShared.Native
 
         public static bool SetWindowExLayered(IntPtr hwnd)
         {
+            Guard.ArgumentIsTrue(hwnd != IntPtr.Zero, "Handle must be non-zero");
+
             Log.Debug($"[{hwnd.ToHexadecimal()}] Reconfiguring window to Layered");
 
             var existingStyle = (User32.SetWindowLongFlags)User32.GetWindowLong(hwnd, User32.WindowLongIndexFlags.GWL_EXSTYLE);
@@ -105,6 +111,8 @@ namespace PoeShared.Native
 
         public static bool SetWindowExNoActivate(IntPtr hwnd)
         {
+            Guard.ArgumentIsTrue(hwnd != IntPtr.Zero, "Handle must be non-zero");
+
             Log.Debug($"[{hwnd.ToHexadecimal()}] Reconfiguring window to NoActivate");
             var existingStyle = (User32.SetWindowLongFlags)User32.GetWindowLong(hwnd, User32.WindowLongIndexFlags.GWL_EXSTYLE);
             var newStyle = existingStyle;
@@ -118,42 +126,63 @@ namespace PoeShared.Native
             return true;
         }
 
-        public static void ShowInactiveTopmost(IntPtr handle, int left, int top, int width, int height)
+        public static void ShowInactiveTopmost(IntPtr handle, Rectangle windowBounds)
         {
-            var dpi = GetDisplayScaleFactor(handle);
-            Log.Debug($"[{handle.ToHexadecimal()}] Showing window X:{left} Y:{top} Width:{width} Height:{height}, scaleFactor: {dpi}");
-            if (!User32.ShowWindow(handle, User32.WindowShowStyle.SW_SHOWNOACTIVATE))
+            Log.Debug($"[{handle.ToHexadecimal()}] Showing window at {windowBounds}");
+            Win32ErrorCode error;
+            if (!User32.ShowWindow(handle, User32.WindowShowStyle.SW_SHOWNOACTIVATE) && (error = Kernel32.GetLastError()) != Win32ErrorCode.NERR_Success)
             {
-                Log.Warn($"Failed to ShowWindow({handle.ToHexadecimal()}), error: {Kernel32.GetLastError()}");
+                Log.Warn($"Failed to ShowWindow({handle.ToHexadecimal()}), error: {error}");
                 return;
             }
-            
-            var rect = new Rectangle(left, top, (int) (width * dpi), (int) (height * dpi));
-            if (!User32.SetWindowPos(handle, User32.SpecialWindowHandles.HWND_TOPMOST, rect.X, rect.Y, rect.Width, rect.Height, User32.SetWindowPosFlags.SWP_NOACTIVATE))
+
+            if (!User32.SetWindowPos(handle, User32.SpecialWindowHandles.HWND_TOPMOST, windowBounds.X, windowBounds.Y, windowBounds.Width, windowBounds.Height, User32.SetWindowPosFlags.SWP_NOACTIVATE))
             {
                 Log.Warn($"Failed to SetWindowPos({handle.ToHexadecimal()}, {User32.SpecialWindowHandles.HWND_TOPMOST}), error: {Kernel32.GetLastError()}");
             }
         }
 
+        public static void ShowInactiveTopmost(IntPtr handle, System.Windows.Rect windowBounds)
+        {
+            Guard.ArgumentIsTrue(handle != IntPtr.Zero, "Handle must be non-zero");
+
+            var dpi = GetDisplayScaleFactor(handle);
+            Log.Debug($"[{handle.ToHexadecimal()}] Showing window {windowBounds}, scaleFactor: {dpi}");
+
+            var rect = windowBounds.ScaleToScreen().ToWinRectangle();
+            ShowInactiveTopmost(handle, rect);
+        }
+
         public static bool ShowWindow(IntPtr handle)
         {
+            Guard.ArgumentIsTrue(handle != IntPtr.Zero, "Handle must be non-zero");
+
             Log.Debug($"[{handle.ToHexadecimal()}] Showing window");
-            if (!User32.ShowWindow(handle, User32.WindowShowStyle.SW_SHOWNORMAL))
+            Win32ErrorCode error;
+            if (!User32.ShowWindow(handle, User32.WindowShowStyle.SW_SHOWNORMAL) && (error = Kernel32.GetLastError()) != Win32ErrorCode.NERR_Success)
             {
-                Log.Warn($"Failed to ShowWindow({handle.ToHexadecimal()}), error: {Kernel32.GetLastError()}");
+                Log.Warn($"Failed to ShowWindow({handle.ToHexadecimal()}), error: {error}");
                 return false;
             }
 
             return true;
         }
 
+        public static bool WindowIsVisible(IntPtr hwnd)
+        {
+            return User32.IsWindowVisible(hwnd);
+        }
+        
         public static bool HideWindow(IntPtr handle)
         {
+            Guard.ArgumentIsTrue(handle != IntPtr.Zero, "Handle must be non-zero");
+
             Log.Debug($"[{handle.ToHexadecimal()}] Hiding window");
-            
-            if (!User32.ShowWindow(handle, User32.WindowShowStyle.SW_HIDE))
+
+            Win32ErrorCode error;
+            if (!User32.ShowWindow(handle, User32.WindowShowStyle.SW_HIDE) && (error = Kernel32.GetLastError()) != Win32ErrorCode.NERR_Success)
             {
-                Log.Warn($"Failed to HideWindow({handle.ToHexadecimal()}), error: {Kernel32.GetLastError()}");
+                Log.Warn($"Failed to HideWindow({handle.ToHexadecimal()}), error: {error}");
                 return false;
             }
             return true;

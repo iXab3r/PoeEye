@@ -32,7 +32,8 @@ namespace PoeShared.Native
         private readonly CommandWrapper makeTransparentCommand;
         private readonly ISubject<Unit> whenLoaded = new ReplaySubject<Unit>(1);
         private readonly ObservableAsPropertyHelper<Rect> bounds;
-        
+        private readonly ObservableAsPropertyHelper<System.Drawing.Rectangle> nativeBounds;
+
         private double actualHeight;
 
         private double actualWidth;
@@ -95,6 +96,11 @@ namespace PoeShared.Native
                 .Select(x => new Rect {X = Left, Y = Top, Width = Width, Height = Height})
                 .ToPropertyHelper(this, x => x.Bounds)
                 .AddTo(Anchors);
+
+            nativeBounds = this.WhenAnyValue(x => x.Bounds)
+                .Select(x => x.ScaleToScreen().ToWinRectangle())
+                .ToPropertyHelper(this, x => x.NativeBounds)
+                .AddTo(Anchors);
         }
 
         protected IObservable<Unit> WhenLoaded => whenLoaded;
@@ -140,7 +146,7 @@ namespace PoeShared.Native
         public Window OverlayWindow
         {
             get => overlayWindow;
-            set => this.RaiseAndSetIfChanged(ref overlayWindow, value);
+            private set => this.RaiseAndSetIfChanged(ref overlayWindow, value);
         }
         
         public double ActualWidth
@@ -150,7 +156,9 @@ namespace PoeShared.Native
         }
 
         public Rect Bounds => bounds.Value;
-
+        
+        public Rectangle NativeBounds => nativeBounds.Value;
+        
         public double Left
         {
             get => left;
