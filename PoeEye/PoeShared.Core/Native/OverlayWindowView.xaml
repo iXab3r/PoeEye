@@ -53,8 +53,8 @@
                 <DataTrigger Binding="{Binding Content.IsLocked}" Value="False">
                     <Setter Property="WindowChrome.WindowChrome">
                         <Setter.Value>
-                            <WindowChrome GlassFrameThickness="10" CornerRadius="0" CaptionHeight="0" 
-                                          ResizeBorderThickness="10" />
+                            <WindowChrome GlassFrameThickness="15" CornerRadius="0" CaptionHeight="0" 
+                                          ResizeBorderThickness="15" />
                         </Setter.Value>
                     </Setter>
                 </DataTrigger>
