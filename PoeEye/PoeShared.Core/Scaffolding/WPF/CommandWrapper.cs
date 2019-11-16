@@ -28,15 +28,15 @@ namespace PoeShared.Scaffolding.WPF
             InnerCommand = command;
             Observable.FromEventPattern<EventHandler, EventArgs>(x => command.IsActiveChanged += x, x => command.IsActiveChanged -= x)
                 .Select(x => command.IsActive)
-                .Subscribe(x => IsBusy = x)
+                .Subscribe(x => IsBusy = x, Log.HandleUiException)
                 .AddTo(Anchors);
 
             isExecuting
-                .Subscribe(x => command.IsActive = x)
+                .Subscribe(x => command.IsActive = x, Log.HandleUiException)
                 .AddTo(Anchors);
 
             raiseCanExecuteChangedRequests
-                .Subscribe(command.RaiseCanExecuteChanged)
+                .Subscribe(command.RaiseCanExecuteChanged, Log.HandleUiException)
                 .AddTo(Anchors);
         }
 
@@ -67,7 +67,14 @@ namespace PoeShared.Scaffolding.WPF
 
         public bool CanExecute(object parameter)
         {
-            return InnerCommand.CanExecute(parameter);
+            try
+            {
+                return InnerCommand.CanExecute(parameter);
+            }
+            catch (Exception e)
+            {
+                throw new ApplicationException($"CommandWrapper.CanExecute exception, parameter: {parameter}", e);
+            }
         }
 
         public void Execute(object parameter)

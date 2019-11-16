@@ -11,12 +11,12 @@
         <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/materialdesigncolor.lightblue.named.xaml" />
 
     </ResourceDictionary.MergedDictionaries>
-    
+
     <Style x:Key="CommandWrapperIconButton" TargetType="{x:Type ButtonBase}" BasedOn="{StaticResource MaterialDesignFlatButton}">
-        <Setter Property="Padding" Value="0"/>
+        <Setter Property="Padding" Value="0" />
         <Setter Property="Width" Value="48" />
         <Setter Property="Height" Value="48" />
-        
+
         <Setter Property="materialDesign:ButtonProgressAssist.IsIndicatorVisible" Value="False" />
         <Setter Property="materialDesign:ButtonProgressAssist.Opacity" Value=".8" />
         <Setter Property="materialDesign:ButtonProgressAssist.IndicatorForeground" Value="{DynamicResource PrimaryHueMidForegroundBrush}" />
@@ -27,10 +27,10 @@
                     <Grid>
                         <ContentPresenter Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" Focusable="False"
                                           x:Name="ButtonContent"
-                                         SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" 
-                                         HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                         VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
-                        
+                                          SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+
                         <ProgressBar x:Name="ProgressBar"
                                      Style="{StaticResource MaterialDesignCircularProgressBar}"
                                      Minimum="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(materialDesign:ButtonProgressAssist.Minimum)}"
@@ -44,11 +44,11 @@
                                      Width="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ButtonBase}}, Path=ActualWidth}"
                                      Opacity="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(materialDesign:ButtonProgressAssist.Opacity)}"
                                      HorizontalAlignment="Left"
-                                     VerticalAlignment="Center"/>
+                                     VerticalAlignment="Center" />
                     </Grid>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsEnabled" Value="false">
-                            <Setter Property="Opacity" Value="0.23" TargetName="ButtonContent"/>
+                            <Setter Property="Opacity" Value="0.23" TargetName="ButtonContent" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -56,9 +56,52 @@
         </Setter>
     </Style>
     
+    <Style x:Key="CommandWrapperButton" TargetType="{x:Type ButtonBase}" BasedOn="{StaticResource MaterialDesignFlatButton}">
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="Padding" Value="16 4 16 4"/>
+        <Setter Property="Height" Value="22" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ButtonBase}">
+                    <Grid>
+                        <Border Background="{TemplateBinding Background}" x:Name="border" 
+                                CornerRadius="{Binding Path=(materialDesign:ButtonAssist.CornerRadius), RelativeSource={RelativeSource TemplatedParent}}"
+                                BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+                            <materialDesign:Ripple Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" Focusable="False"
+                                        HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                        VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                        Padding="{TemplateBinding Padding}"
+                                        SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}">
+                                <materialDesign:Ripple.Clip>
+                                    <MultiBinding Converter="{StaticResource BorderClipConverter}">
+                                        <Binding ElementName="border" Path="ActualWidth" />
+                                        <Binding ElementName="border" Path="ActualHeight" />
+                                        <Binding ElementName="border" Path="CornerRadius" />
+                                        <Binding ElementName="border" Path="BorderThickness" />
+                                    </MultiBinding>
+                                </materialDesign:Ripple.Clip>
+                            </materialDesign:Ripple>
+                        </Border>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="true">
+                            <Setter Property="BorderBrush" TargetName="border" Value="{DynamicResource MaterialDesignFlatButtonClick}" />
+                            <Setter Property="Background" TargetName="border" Value="{DynamicResource MaterialDesignFlatButtonClick}" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="false">
+                            <Setter Property="Opacity" Value="0.23"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <Style TargetType="{x:Type materialDesign:PackIcon}"
            x:Key="CommandWrapperErrorIndicatorErrorStyleKey">
-        
+
         <Setter Property="Visibility" Value="Collapsed" />
         <Setter Property="Opacity" Value="1" />
         <Setter Property="Foreground" Value="{StaticResource NegativeBrush}" />
@@ -104,7 +147,7 @@
 
     <Style TargetType="{x:Type materialDesign:PackIcon}"
            x:Key="CommandWrapperErrorIndicatorSuccessStyleKey">
-        
+
         <Setter Property="Visibility" Value="Collapsed" />
         <Setter Property="Opacity" Value="1" />
         <Setter Property="Foreground" Value="{StaticResource PositiveBrush}" />
@@ -152,11 +195,11 @@
             </MultiDataTrigger>
         </Style.Triggers>
     </Style>
-    
+
     <Style TargetType="{x:Type Grid}" x:Key="CommandWrapperGridStyleKey">
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="TextElement.Foreground" Value="{StaticResource MouseOverAccentBrushKey}"></Setter>
+                <Setter Property="TextElement.Foreground" Value="{StaticResource MouseOverAccentBrushKey}" />
             </Trigger>
         </Style.Triggers>
     </Style>
@@ -164,23 +207,23 @@
     <DataTemplate DataType="{x:Type s:CommandWrapper}" x:Key="CommandWrapperIcon">
         <Grid x:Name="CommandWrapperGrid" Style="{StaticResource CommandWrapperGridStyleKey}">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <Button Grid.Column="0"
-                Style="{StaticResource CommandWrapperIconButton}"
-                Height="24" Width="24"
-                Background="Transparent"
-                BorderBrush="{x:Null}"
-                Command="{Binding}"
-                Focusable="False"
-                IsTabStop="False"
-                IsDefault="{Binding Path=(s:CommandWrapperHelper.IsDefault), RelativeSource={RelativeSource Self}}"
-                CommandParameter="{Binding Path=(s:CommandWrapperHelper.CommandParameter), RelativeSource={RelativeSource Self}}"
-                materialDesign:ButtonProgressAssist.IndicatorForeground="{StaticResource PositiveBrush}"
-                materialDesign:ButtonProgressAssist.IsIndicatorVisible="{Binding IsBusy}"
-                materialDesign:ButtonProgressAssist.IsIndeterminate="True"
-                >
+                    x:Name="CommandWrapperIconButton"
+                    Style="{StaticResource CommandWrapperIconButton}"
+                    Height="24" Width="24"
+                    Background="Transparent"
+                    BorderBrush="{x:Null}"
+                    Command="{Binding}"
+                    Focusable="False"
+                    IsTabStop="False"
+                    IsDefault="{Binding Path=(s:CommandWrapperHelper.IsDefault), RelativeSource={RelativeSource Self}}"
+                    CommandParameter="{Binding Path=(s:CommandWrapperHelper.CommandParameter), RelativeSource={RelativeSource Self}}"
+                    materialDesign:ButtonProgressAssist.IndicatorForeground="{StaticResource PositiveBrush}"
+                    materialDesign:ButtonProgressAssist.IsIndicatorVisible="{Binding IsBusy}"
+                    materialDesign:ButtonProgressAssist.IsIndeterminate="True">
                 <Button.Content>
                     <Label Style="{StaticResource IconLabel}"
                            Foreground="{Binding ElementName=CommandWrapperGrid, Path=(TextElement.Foreground), Mode=OneWay}"
@@ -189,9 +232,9 @@
                 </Button.Content>
             </Button>
 
-            
-            <materialDesign:PackIcon Grid.Column="0" x:Name="ErrorIcon" Kind="AlertCircleOutline" Style="{StaticResource CommandWrapperErrorIndicatorErrorStyleKey}"/>
-            
+
+            <materialDesign:PackIcon Grid.Column="0" x:Name="ErrorIcon" Kind="AlertCircleOutline" Style="{StaticResource CommandWrapperErrorIndicatorErrorStyleKey}" />
+
             <Label Grid.Column="1" Margin="10,0,0,0"
                    Foreground="{Binding ElementName=CommandWrapperGrid, Path=(TextElement.Foreground), Mode=OneWay}"
                    Content="{Binding Path=(s:CommandWrapperHelper.Text), RelativeSource={RelativeSource Self}}"
@@ -200,8 +243,9 @@
     </DataTemplate>
 
     <DataTemplate DataType="{x:Type s:CommandWrapper}">
-        <Grid x:Name="CommandWrapperGrid"  Style="{StaticResource CommandWrapperGridStyleKey}">
-            <Button Height="22"
+        <Grid x:Name="CommandWrapperGrid" Style="{StaticResource CommandWrapperGridStyleKey}">
+            <Button x:Name="CommandWrapperButton"
+                    Style="{StaticResource CommandWrapperButton}"
                     Command="{Binding}"
                     Focusable="False"
                     IsDefault="{Binding Path=(s:CommandWrapperHelper.IsDefault), RelativeSource={RelativeSource Self}}"
@@ -227,11 +271,11 @@
                          HorizontalAlignment="Right" VerticalAlignment="Center"
                          Visibility="{Binding IsBusy, Converter={StaticResource TrueToVisibleFalseToCollapsedConverter}}"
                          IsIndeterminate="True" />
-            
-            <materialDesign:PackIcon x:Name="ErrorIcon" Kind="AlertCircleOutline"  HorizontalAlignment="Right" 
-                                     Style="{StaticResource CommandWrapperErrorIndicatorErrorStyleKey}"/>
-            <materialDesign:PackIcon x:Name="SuccessIcon" Kind="CheckboxMarked"  HorizontalAlignment="Right" 
-                                     Style="{StaticResource CommandWrapperErrorIndicatorSuccessStyleKey}"/>
+
+            <materialDesign:PackIcon x:Name="ErrorIcon" Kind="AlertCircleOutline" HorizontalAlignment="Right"
+                                     Style="{StaticResource CommandWrapperErrorIndicatorErrorStyleKey}" />
+            <materialDesign:PackIcon x:Name="SuccessIcon" Kind="CheckboxMarked" HorizontalAlignment="Right"
+                                     Style="{StaticResource CommandWrapperErrorIndicatorSuccessStyleKey}" />
         </Grid>
     </DataTemplate>
 

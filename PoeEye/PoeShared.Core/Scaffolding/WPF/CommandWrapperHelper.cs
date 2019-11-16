@@ -1,4 +1,9 @@
-﻿using System.Windows;
+﻿using System.Diagnostics;
+using System.Windows;
+using System.Windows.Controls;
+using System;
+using System.Reactive.Linq;
+using System.Windows.Controls.Primitives;
 
 namespace PoeShared.Scaffolding.WPF
 {
@@ -14,7 +19,21 @@ namespace PoeShared.Scaffolding.WPF
 
         public static readonly DependencyProperty CommandParameterProperty = DependencyProperty.RegisterAttached(
             "CommandParameter", typeof(object), typeof(CommandWrapperHelper),
-            new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender | FrameworkPropertyMetadataOptions.Inherits));
+            new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender | FrameworkPropertyMetadataOptions.Inherits, PropertyChangedCallback));
+
+        private static void PropertyChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is Button)
+            {
+                d.Observe<DependencyObject, CommandWrapper>(ButtonBase.CommandProperty)
+                    .Take(1)
+                    .Where(x => x != null)
+                    .Subscribe(x => x.RaiseCanExecuteChanged());
+            } else if (d is MenuItem)
+            {
+                d.SetCurrentValue(MenuItem.CommandParameterProperty, e.NewValue);
+            }
+        }
 
         public static readonly DependencyProperty IsDefaultProperty = DependencyProperty.RegisterAttached(
             "IsDefault", typeof(bool), typeof(CommandWrapperHelper),

@@ -18,6 +18,13 @@ namespace PoeShared.Modularity
     public sealed class GenericConfigProvider<TConfig> : DisposableReactiveObject, IConfigProvider<TConfig> where TConfig : class, IPoeEyeConfig, new()
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(GenericConfigProvider<TConfig>));
+        
+        private readonly CompareLogic diffLogic = new CompareLogic(
+            new ComparisonConfig
+            {
+                DoublePrecision = 0.01,
+                MaxDifferences = byte.MaxValue
+            });
 
         private readonly IConfigProvider configProvider;
         private TConfig actualConfig;
@@ -50,7 +57,7 @@ namespace PoeShared.Modularity
                         throw new ApplicationException($"Previous config instance is equal to the current one ! Instance: {x.DumpToTextRaw()}");
                     }
                 })
-                .Select(x => new {Config = x.curr, PreviousConfig = x.prev, ComparisonResult = Compare(x.curr, x.prev)})
+                .Select(x => new {Config = x.curr, PreviousConfig = x.prev, ComparisonResult = diffLogic.Compare(x.curr, x.prev)})
                 .Do(x => { LogActualConfigChange(x.PreviousConfig, x.Config, x.ComparisonResult); })
                 .Where(x => !x.ComparisonResult.AreEqual)
                 .Select(x => x.Config)
@@ -94,7 +101,7 @@ namespace PoeShared.Modularity
         {
             Guard.ArgumentNotNull(config, nameof(config));
 
-            var compare = Compare(ActualConfig, config);
+            var compare = diffLogic.Compare(ActualConfig, config);
 
             if (compare.AreEqual)
             {
@@ -106,16 +113,6 @@ namespace PoeShared.Modularity
             Log.Debug($"ConfigProvider Save/Load stat: { new { saveCommandCounter, loadCommandCounter } }");
 
             configProvider.Save(config);
-        }
-
-        private ComparisonResult Compare(TConfig x, TConfig y)
-        {
-            return new CompareLogic(
-                new ComparisonConfig
-                {
-                    DoublePrecision = 0.01,
-                    MaxDifferences = byte.MaxValue
-                }).Compare(x, y);
         }
         
         private void LogActualConfigChange(TConfig previousConfig, TConfig currentConfig, ComparisonResult result)

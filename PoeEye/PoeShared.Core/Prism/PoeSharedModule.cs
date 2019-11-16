@@ -2,11 +2,12 @@
 using JetBrains.Annotations;
 using PoeShared.Modularity;
 using Prism.Ioc;
+using Prism.Modularity;
 using Unity;
 
 namespace PoeShared.Prism
 {
-    public sealed class PoeSharedModule : IPoeEyeModule
+    public sealed class PoeSharedModule : IModule
     {
         private readonly IUnityContainer container;
 

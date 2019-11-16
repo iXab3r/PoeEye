@@ -1,4 +1,7 @@
 ﻿using System;
+using System.IO;
+using System.Linq;
+using System.Reflection;
 using JetBrains.Annotations;
 using log4net;
 
@@ -19,6 +22,7 @@ namespace PoeShared
             Guard.ArgumentNotNull(exception, nameof(exception));
 
             logger.Error("UI Exception occurred", exception);
+            SharedLog.Instance.Errors.OnNext(exception);
         }
     }
 }
