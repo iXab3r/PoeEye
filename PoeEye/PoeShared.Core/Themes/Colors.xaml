@@ -32,6 +32,14 @@
     
     <SolidColorBrush x:Key="MouseOverAccentBrushKey" Color="{StaticResource MouseOverAccentColorKey}"/>
     
+    <Color x:Key="PositiveColor">LimeGreen</Color>
+    <Color x:Key="WarningColor">Orange</Color>
+    <Color x:Key="NegativeColor">IndianRed</Color>
+    
+    <SolidColorBrush x:Key="NegativeBrush" Color="{StaticResource NegativeColor}"/>
+    <SolidColorBrush x:Key="PositiveBrush" Color="{StaticResource PositiveColor}"/>
+    <SolidColorBrush x:Key="WarningBrush" Color="{StaticResource WarningColor}"/>
+    
     <Color x:Key="PoeShallow">#11FFFFFF</Color>
     <Color x:Key="PoeFontColor">#FFFEEAC5</Color>
     <Color x:Key="PoeBgColor">#AA030303</Color>

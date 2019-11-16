@@ -61,7 +61,7 @@
         
         <Setter Property="Visibility" Value="Collapsed" />
         <Setter Property="Opacity" Value="1" />
-        <Setter Property="Foreground" Value="IndianRed" />
+        <Setter Property="Foreground" Value="{StaticResource NegativeBrush}" />
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="ToolTip" Value="{Binding Error}" />
         <Setter Property="HorizontalAlignment" Value="Center" />
@@ -107,7 +107,7 @@
         
         <Setter Property="Visibility" Value="Collapsed" />
         <Setter Property="Opacity" Value="1" />
-        <Setter Property="Foreground" Value="LimeGreen" />
+        <Setter Property="Foreground" Value="{StaticResource PositiveBrush}" />
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="HorizontalAlignment" Value="Center" />
         <Setter Property="VerticalAlignment" Value="Center" />
@@ -177,7 +177,7 @@
                 IsTabStop="False"
                 IsDefault="{Binding Path=(s:CommandWrapperHelper.IsDefault), RelativeSource={RelativeSource Self}}"
                 CommandParameter="{Binding Path=(s:CommandWrapperHelper.CommandParameter), RelativeSource={RelativeSource Self}}"
-                materialDesign:ButtonProgressAssist.IndicatorForeground="LimeGreen"
+                materialDesign:ButtonProgressAssist.IndicatorForeground="{StaticResource PositiveBrush}"
                 materialDesign:ButtonProgressAssist.IsIndicatorVisible="{Binding IsBusy}"
                 materialDesign:ButtonProgressAssist.IsIndeterminate="True"
                 >

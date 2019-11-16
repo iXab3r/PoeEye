@@ -36,10 +36,15 @@ namespace PoeShared.Modularity
             configHasChanged.OnNext(Unit.Default);
         }
 
+        public void Save()
+        {
+            configHasChanged.OnNext(Unit.Default);
+        }
+
         public void Save<TConfig>(TConfig config) where TConfig : IPoeEyeConfig, new()
         {
             loadedConfigs[typeof(TConfig)] = config;
-            configHasChanged.OnNext(Unit.Default);
+            Save();
         }
 
         public TConfig GetActualConfig<TConfig>() where TConfig : IPoeEyeConfig, new()

@@ -26,6 +26,8 @@ namespace PoeShared.Modularity
         
         void Reload();
 
+        void Save();
+        
         void Save<TConfig>([NotNull] TConfig config) where TConfig : IPoeEyeConfig, new();
 
         TConfig GetActualConfig<TConfig>() where TConfig : IPoeEyeConfig, new();

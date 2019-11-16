@@ -6,10 +6,13 @@ namespace PoeShared.Native
 {
     public class TransparentWindow : ConstantAspectRatioWindow
     {
-        protected override void OnSourceInitialized(EventArgs e)
+        protected TransparentWindow()
         {
-            base.OnSourceInitialized(e);
+            this.Loaded += OnLoaded;
+        }
 
+        private void OnLoaded(object sender, RoutedEventArgs e)
+        {
             var hwnd = new WindowInteropHelper(this).Handle;
             WindowsServices.HideSystemMenu(hwnd);
         }
