@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <CefSharpAnyCpuSupport>true</CefSharpAnyCpuSupport>
     <ProjectGuid>{12DF53DD-7144-4D2D-B7A1-B4BC5BBDFB69}</ProjectGuid>
@@ -56,20 +56,6 @@
     <PackageReference Include="Unity.Container" Version="5.10.3" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="PresentationCore" />
-    <Reference Include="PresentationFramework" />
-    <Reference Include="System.Configuration" />
-    <Reference Include="System.Runtime.Caching" />
-    <Reference Include="System.Security" />
-    <Reference Include="System.Web" />
-    <Reference Include="System.Windows" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xaml" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="WindowsBase" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="FodyWeavers.xml" />
     <EmbeddedResource Include="Resources\Notifications\mercury.wav" />
     <EmbeddedResource Include="Resources\Notifications\wob.wav" />
@@ -84,5 +70,8 @@
     <Resource Include="Resources\mainIcon.png" />
     <Resource Include="Resources\mouse-device-left-click-control.png" />
     <Resource Include="Resources\mouse-device-right-click-control.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System.Web" />
   </ItemGroup>
 </Project>

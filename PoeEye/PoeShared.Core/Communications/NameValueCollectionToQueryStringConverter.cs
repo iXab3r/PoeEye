@@ -2,7 +2,6 @@
 using System.Collections.Specialized;
 using System.Linq;
 using System.Web;
-
 using TypeConverter;
 
 namespace PoeShared.Communications

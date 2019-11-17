@@ -14,7 +14,6 @@ using ReactiveUI;
 using TypeConverter;
 using Unity;
 using Unity.Extension;
-using Unity.Injection;
 using Unity.Lifetime;
 using Unity.Resolution;
 
@@ -41,8 +40,8 @@ namespace PoeShared.Prism
                 .RegisterSingleton<IFactory<IWinEventHookWrapper, WinEventHookArguments>, WinEventHookWrapperFactory>();
 
             Container
-                .RegisterType<IScheduler>(WellKnownSchedulers.UI, new InjectionFactory(x => RxApp.MainThreadScheduler))
-                .RegisterType<IScheduler>(WellKnownSchedulers.Background, new InjectionFactory(x => RxApp.TaskpoolScheduler))
+                .RegisterFactory<IScheduler>(WellKnownSchedulers.UI, x => RxApp.MainThreadScheduler)
+                .RegisterFactory<IScheduler>(WellKnownSchedulers.Background, x => RxApp.TaskpoolScheduler)
                 .RegisterType<IHttpClient, GenericHttpClient>()
                 .RegisterType(typeof(IFactory<,,>), typeof(Factory<,,>))
                 .RegisterType(typeof(IFactory<,>), typeof(Factory<,>))
@@ -62,20 +61,15 @@ namespace PoeShared.Prism
             });
             Container.RegisterWindowTracker(WellKnownWindows.PathOfExileWindow, () => "^Path of Exile$");
             
-            
-            Container
-                .RegisterType<ISoundLibrarySource>(
-                    new ContainerControlledLifetimeManager(),
-                    new InjectionFactory(
-                        unity => unity.Resolve<ComplexSoundLibrary>(
-                            new DependencyOverride<ISoundLibrarySource[]>(
-                                new ISoundLibrarySource[]
-                                {
-                                    unity.Resolve<FileSoundLibrarySource>(),
-                                    unity.Resolve<EmbeddedSoundLibrarySource>()
-                                }
-                            )
-                        )));
+            Container.RegisterFactory<ISoundLibrarySource>(
+                unity => unity.Resolve<ComplexSoundLibrary>(
+                    new DependencyOverride<ISoundLibrarySource[]>(
+                        new ISoundLibrarySource[]
+                        {
+                            unity.Resolve<FileSoundLibrarySource>(),
+                            unity.Resolve<EmbeddedSoundLibrarySource>()
+                        }
+                    )),new ContainerControlledLifetimeManager());
         }
     }
 }

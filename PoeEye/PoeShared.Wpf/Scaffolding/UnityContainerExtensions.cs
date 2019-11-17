@@ -1,6 +1,5 @@
 using PoeShared.Native;
 using Unity;
-using Unity.Injection;
 using Unity.Lifetime;
 using Unity.Resolution;
 
@@ -14,12 +13,12 @@ namespace PoeShared.Wpf.Scaffolding
             string windowTrackerDependencyName)
         {
             instance
-                .RegisterType<IOverlayWindowController>(
+                .RegisterFactory<IOverlayWindowController>(
                     dependencyName,
-                    new ContainerControlledLifetimeManager(),
-                    new InjectionFactory(unity => unity.Resolve<OverlayWindowController>(
+                    unity => unity.Resolve<OverlayWindowController>(
                         new DependencyOverride<IWindowTracker>(
-                            unity.Resolve<IWindowTracker>(windowTrackerDependencyName)))));
+                            unity.Resolve<IWindowTracker>(windowTrackerDependencyName))), 
+                    new ContainerControlledLifetimeManager());
 
             return instance;
         }
