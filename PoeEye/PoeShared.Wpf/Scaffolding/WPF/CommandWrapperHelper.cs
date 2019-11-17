@@ -1,8 +1,7 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Reactive.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using System;
-using System.Reactive.Linq;
 using System.Windows.Controls.Primitives;
 
 namespace PoeShared.Scaffolding.WPF
@@ -10,16 +9,63 @@ namespace PoeShared.Scaffolding.WPF
     public sealed class CommandWrapperHelper
     {
         public static readonly DependencyProperty TextProperty = DependencyProperty.RegisterAttached(
-            "Text", typeof(object), typeof(CommandWrapperHelper),
+            "Text",
+            typeof(object),
+            typeof(CommandWrapperHelper),
             new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender | FrameworkPropertyMetadataOptions.Inherits));
 
         public static readonly DependencyProperty IconProperty = DependencyProperty.RegisterAttached(
-            "Icon", typeof(object), typeof(CommandWrapperHelper),
+            "Icon",
+            typeof(object),
+            typeof(CommandWrapperHelper),
             new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender | FrameworkPropertyMetadataOptions.Inherits));
 
         public static readonly DependencyProperty CommandParameterProperty = DependencyProperty.RegisterAttached(
-            "CommandParameter", typeof(object), typeof(CommandWrapperHelper),
-            new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender | FrameworkPropertyMetadataOptions.Inherits, PropertyChangedCallback));
+            "CommandParameter",
+            typeof(object),
+            typeof(CommandWrapperHelper),
+            new FrameworkPropertyMetadata(
+                null,
+                FrameworkPropertyMetadataOptions.AffectsRender | FrameworkPropertyMetadataOptions.Inherits,
+                PropertyChangedCallback));
+
+        public static readonly DependencyProperty DataContextProperty = DependencyProperty.RegisterAttached(
+            "DataContext",
+            typeof(object),
+            typeof(CommandWrapperHelper),
+            new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.Inherits));
+
+        public static readonly DependencyProperty IsDefaultProperty = DependencyProperty.RegisterAttached(
+            "IsDefault",
+            typeof(bool),
+            typeof(CommandWrapperHelper),
+            new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.AffectsRender | FrameworkPropertyMetadataOptions.Inherits));
+
+        public static readonly DependencyProperty ProgressProperty = DependencyProperty.RegisterAttached(
+            "Progress",
+            typeof(int),
+            typeof(CommandWrapperHelper),
+            new FrameworkPropertyMetadata(0, FrameworkPropertyMetadataOptions.AffectsRender | FrameworkPropertyMetadataOptions.Inherits));
+
+        public static void SetProgress(DependencyObject element, int value)
+        {
+            element.SetValue(ProgressProperty, value);
+        }
+
+        public static int GetProgress(DependencyObject element)
+        {
+            return (int) element.GetValue(ProgressProperty);
+        }
+
+        public static void SetDataContext(DependencyObject element, object value)
+        {
+            element.SetValue(DataContextProperty, value);
+        }
+
+        public static object GetDataContext(DependencyObject element)
+        {
+            return element.GetValue(DataContextProperty);
+        }
 
         private static void PropertyChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -29,15 +75,12 @@ namespace PoeShared.Scaffolding.WPF
                     .Take(1)
                     .Where(x => x != null)
                     .Subscribe(x => x.RaiseCanExecuteChanged());
-            } else if (d is MenuItem)
+            }
+            else if (d is MenuItem)
             {
                 d.SetCurrentValue(MenuItem.CommandParameterProperty, e.NewValue);
             }
         }
-
-        public static readonly DependencyProperty IsDefaultProperty = DependencyProperty.RegisterAttached(
-            "IsDefault", typeof(bool), typeof(CommandWrapperHelper),
-            new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.AffectsRender | FrameworkPropertyMetadataOptions.Inherits));
 
         public static void SetIcon(DependencyObject element, object value)
         {
@@ -56,7 +99,7 @@ namespace PoeShared.Scaffolding.WPF
 
         public static object GetText(DependencyObject element)
         {
-            return (object) element.GetValue(TextProperty);
+            return element.GetValue(TextProperty);
         }
 
         public static void SetCommandParameter(DependencyObject element, object value)

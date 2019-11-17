@@ -5,17 +5,31 @@
                     xmlns:kent="http://schemas.kent.boogaart.com/converters"
                     xmlns:global="clr-namespace:"
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
-    <eyeConverters:NullToBoolConverter x:Key="IsNullOrEmptyConverter" NullValue="True" />
-    <eyeConverters:NullToBoolConverter x:Key="IsNotNullOrEmptyConverter" NullValue="False" />
-    <eyeConverters:MultiBooleanConverter x:Key="MultiBooleanOrConverter" />
-    <eyeConverters:MultiDoubleSumConverter x:Key="MultiDoubleSumConverter" />
-
     <system:Boolean x:Key="FalseValue">False</system:Boolean>
     <system:Boolean x:Key="TrueValue">True</system:Boolean>
+    
+    <eyeConverters:NullToBoolConverter x:Key="IsNullOrEmptyConverter" NullValue="True" />
+    <eyeConverters:NullToBoolConverter x:Key="IsNotNullOrEmptyConverter" NullValue="False" />
+    
+    <eyeConverters:MultiBooleanOrConverter x:Key="MultiBooleanOrConverter" TrueValue="{StaticResource TrueValue}" FalseValue="{StaticResource FalseValue}" />
+    <eyeConverters:MultiBooleanAndConverter x:Key="MultiBooleanAndConverter" TrueValue="{StaticResource TrueValue}" FalseValue="{StaticResource FalseValue}" />
+    
+    <eyeConverters:MultiBooleanAndConverter x:Key="MultiBooleanAllTrueToVisibleFalseToCollapsedConverter" TrueValue="{x:Static Visibility.Visible}" FalseValue="{x:Static Visibility.Collapsed}" />
+    
+    <eyeConverters:MultiDoubleSumConverter x:Key="MultiDoubleSumConverter" />
 
     <blue:ThicknessConverter x:Key="ThicknessConverter" UseBottom="True" UseLeft="True" UseRight="True" UseTop="True" />
     <eyeConverters:ColorToSolidColorBrushConverter x:Key="ColorToSolidColorBrushConverter"/>
     <eyeConverters:ColorToStringConverter x:Key="ColorToStringConverter"/>
+    
+    <kent:MapConverter x:Key="ZeroToTrueConverter" FallbackValue="{StaticResource FalseValue}" FallbackBehavior="ReturnFallbackValue">
+        <kent:Mapping To="{StaticResource TrueValue}">
+            <kent:Mapping.From>
+                <system:Int32>0</system:Int32>
+            </kent:Mapping.From>
+        </kent:Mapping>
+    </kent:MapConverter>
+
     
     <blue:BoolToVisibilityConverter x:Key="TrueToVisibleFalseToCollapsedConverter"
                                     TrueValue="Visible"
@@ -43,7 +57,7 @@
     <eyeConverters:BoolInversionConverter x:Key="NotConverter" />
 
     <eyeConverters:ObjectToTypeConverter x:Key="ObjectToTypeConverter" />
-
+    
     <blue:Int32ToVisibilityConverter x:Key="GreaterThanZeroToVisibleConverter" TrueValue="Visible" FalseValue="Collapsed">
         <blue:Int32ToVisibilityConverter.ComparisonStrategy>
             <blue:Int32ComparisonStrategy Mode="GreaterThan" Comparand="0" />
@@ -71,5 +85,7 @@
     <eyeConverters:TimeSpanToHumanReadableStringConverter x:Key="TimeSpanToHumanReadableStringConverter" />
     <eyeConverters:EqualityConverter x:Key="EqualToVisibleConverter" TrueValue="{x:Static Visibility.Visible}" FalseValue="{x:Static Visibility.Collapsed}" />
     <eyeConverters:PropagatingMultiValueConverter x:Key="PropagatingMultiValueConverter" />
+    <eyeConverters:NullToBoolConverter x:Key="NullToTrueConverter" NullValue="True" />
+    <eyeConverters:NullToBoolConverter x:Key="NullToFalseConverter" NullValue="False" />
 
 </ResourceDictionary>
