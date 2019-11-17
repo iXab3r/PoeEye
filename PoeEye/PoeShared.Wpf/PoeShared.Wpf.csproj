@@ -1,12 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
   <PropertyGroup>
-    <CefSharpAnyCpuSupport>true</CefSharpAnyCpuSupport>
-    <ProjectGuid>{12DF53DD-7144-4D2D-B7A1-B4BC5BBDFB69}</ProjectGuid>
+    <ProjectGuid>{38C9EBE2-2AC9-465F-8A2A-49DFB1CB9383}</ProjectGuid>
     <TargetFramework>net461</TargetFramework>
-    <AssemblyTitle>PoeShared</AssemblyTitle>
-    <Product>PoeShared</Product>
-    <Description>PoeEye Shared classes</Description>
-    <Copyright>Copyright © Xab3r 2015</Copyright>
+    <AssemblyTitle>PoeShared.Wpf</AssemblyTitle>
+    <Product>PoeShared.Wpf</Product>
+    <Description>PoeEye Shared Wpf classes</Description>
+    <Copyright>Copyright © Xab3r 2019</Copyright>
     <OutputPath>bin\$(Configuration)\</OutputPath>
   </PropertyGroup>
   <ItemGroup>
@@ -70,19 +69,42 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="FodyWeavers.xml" />
-    <EmbeddedResource Include="Resources\Notifications\mercury.wav" />
-    <EmbeddedResource Include="Resources\Notifications\wob.wav" />
-    <EmbeddedResource Include="Resources\Notifications\whistle.wav" />
-    <EmbeddedResource Include="Resources\Notifications\whisper.wav" />
-    <EmbeddedResource Include="Resources\Notifications\pizzicato.wav" />
-    <EmbeddedResource Include="Resources\Notifications\ping.wav" />
-    <EmbeddedResource Include="Resources\Notifications\minions.wav" />
-    <EmbeddedResource Include="Resources\Notifications\keyboard.wav" />
-    <EmbeddedResource Include="Resources\Notifications\dingdong.wav" />
-    <EmbeddedResource Include="Resources\Notifications\bell.wav" />
-    <Resource Include="Resources\mainIcon.png" />
-    <Resource Include="Resources\mouse-device-left-click-control.png" />
-    <Resource Include="Resources\mouse-device-right-click-control.png" />
+    <Page Include="Audio\Views\AudioNotificationTypeSelectorView.xaml" />
+    <Page Include="Native\OverlayWindowView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\Colors.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Themes\CommandWrapperView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Themes\Converters.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Themes\Generic.shared.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Themes\Generic.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Themes\SlimScrollbar.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Themes\Styles.default.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Themes\Styles.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Themes\Thumb.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Hotkeys\HotKeyBox.xaml" />
+    <Page Include="UI\RangeSlider.xaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\PoeShared.Core\PoeShared.csproj" />
   </ItemGroup>
 </Project>

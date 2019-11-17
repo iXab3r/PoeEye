@@ -4,14 +4,12 @@ using System.Diagnostics;
 using System.Reactive.Concurrency;
 using System.Text.RegularExpressions;
 using PoeShared.Audio.Services;
-using PoeShared.Audio.ViewModels;
 using PoeShared.Communications;
 using PoeShared.Modularity;
 using PoeShared.Native;
 using PoeShared.Resources.Notifications;
 using PoeShared.Scaffolding;
 using PoeShared.Services;
-using PoeShared.UI.Hotkeys;
 using ReactiveUI;
 using TypeConverter;
 using Unity;
@@ -38,7 +36,6 @@ namespace PoeShared.Prism
                 .RegisterSingleton<ISchedulerProvider, SchedulerProvider>()
                 .RegisterSingleton<IClipboardManager, ClipboardManager>()
                 .RegisterSingleton<IConfigSerializer, JsonConfigSerializer>()
-                .RegisterSingleton<IHotkeyConverter, HotkeyConverter>()
                 .RegisterSingleton<IAudioNotificationsManager, AudioNotificationsManager>()
                 .RegisterSingleton<IAudioPlayer, AudioPlayer>()
                 .RegisterSingleton<IFactory<IWinEventHookWrapper, WinEventHookArguments>, WinEventHookWrapperFactory>();
@@ -47,7 +44,6 @@ namespace PoeShared.Prism
                 .RegisterType<IScheduler>(WellKnownSchedulers.UI, new InjectionFactory(x => RxApp.MainThreadScheduler))
                 .RegisterType<IScheduler>(WellKnownSchedulers.Background, new InjectionFactory(x => RxApp.TaskpoolScheduler))
                 .RegisterType<IHttpClient, GenericHttpClient>()
-                .RegisterType<IAudioNotificationSelectorViewModel, AudioNotificationSelectorViewModel>()
                 .RegisterType(typeof(IFactory<,,>), typeof(Factory<,,>))
                 .RegisterType(typeof(IFactory<,>), typeof(Factory<,>))
                 .RegisterType(typeof(IFactory<>), typeof(Factory<>));
