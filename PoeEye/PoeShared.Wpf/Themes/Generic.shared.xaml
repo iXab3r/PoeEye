@@ -1,14 +1,14 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Converters.xaml" />
-        <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Colors.xaml" />
-        <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/SlimScrollbar.xaml" />
-        <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Thumb.xaml" />
-        <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Styles.xaml" />
-        <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/Styles.default.xaml" />
-        <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Themes/CommandWrapperView.xaml" />
-        <ResourceDictionary Source="pack://application:,,,/PoeShared;component/UI/Hotkeys/HotKeyBox.xaml" />
-        <ResourceDictionary Source="pack://application:,,,/PoeShared;component/Audio/Views/AudioNotificationTypeSelectorView.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Converters.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Colors.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/SlimScrollbar.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Thumb.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Styles.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Styles.default.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/CommandWrapperView.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/UI/Hotkeys/HotKeyBox.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Audio/Views/AudioNotificationTypeSelectorView.xaml" />
     </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>
