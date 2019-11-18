@@ -8,6 +8,8 @@
     <Description>PoeEye Shared classes</Description>
     <Copyright>Copyright © Xab3r 2015</Copyright>
     <OutputPath>bin\$(Configuration)\</OutputPath>
+    <Configurations>Debug</Configurations>
+    <Platforms>AnyCPU</Platforms>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="AvalonEdit" Version="5.0.3" />
