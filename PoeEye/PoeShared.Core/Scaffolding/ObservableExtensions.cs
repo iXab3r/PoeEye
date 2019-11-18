@@ -53,6 +53,11 @@ namespace PoeShared.Scaffolding
 
         public static IObservable<T> RetryWithDelay<T>(this IObservable<T> source, TimeSpan timeSpan)
         {
+            return RetryWithDelay(source, timeSpan, Scheduler.Default);
+        }
+        
+        public static IObservable<T> RetryWithDelay<T>(this IObservable<T> source, TimeSpan timeSpan, IScheduler scheduler)
+        {
             if (source == null)
             {
                 throw new ArgumentNullException("source");
@@ -62,13 +67,12 @@ namespace PoeShared.Scaffolding
             {
                 throw new ArgumentOutOfRangeException("timeSpan");
             }
-
             if (timeSpan == TimeSpan.Zero)
             {
                 return source.Retry();
             }
 
-            return source.Catch(Observable.Timer(timeSpan).SelectMany(_ => source).Retry());
+            return source.Catch(source.SubscribeOn(scheduler).DelaySubscription(timeSpan).Retry());
         }
         
         public static ObservableAsPropertyHelper<TSourceProperty> ToPropertyHelper<TSource, TSourceProperty>(
