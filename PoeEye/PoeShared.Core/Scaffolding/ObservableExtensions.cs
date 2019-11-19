@@ -12,6 +12,11 @@ namespace PoeShared.Scaffolding
             return observable.Subscribe(_ => onNext());
         }
 
+        public static IDisposable SubscribeToErrors<T>(this IObservable<T> observable, [NotNull] Action<Exception> onError)
+        {
+            return observable.Subscribe(_ => { }, onError);
+        }
+        
         public static IDisposable Subscribe<T>(this IObservable<T> observable, [NotNull] Action onNext, [NotNull] Action<Exception> onError)
         {
             return observable.Subscribe(_ => onNext(), onError);
