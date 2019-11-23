@@ -110,6 +110,11 @@ namespace PoeShared.Scaffolding
         {
             return new System.Drawing.Size((int) sourceSize.Width, (int) sourceSize.Height);
         }
+        
+        public static WinPoint ToScreen(this Point source, Visual owner)
+        {
+            return owner.PointToScreen(source).ToWinPoint();
+        }
 
         public static Rectangle ToScreen(this Rect sourceSize, Visual owner)
         {
