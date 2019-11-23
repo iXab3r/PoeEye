@@ -6,6 +6,9 @@ using System.Windows.Media;
 using PoeShared.Native;
 using Point = System.Windows.Point;
 using Size = System.Windows.Size;
+using WinSize = System.Drawing.Size;
+using WinPoint = System.Drawing.Point;
+using WinRectangle = System.Drawing.Rectangle;
 
 namespace PoeShared.Scaffolding
 {
@@ -46,6 +49,24 @@ namespace PoeShared.Scaffolding
                 X = x,
                 Y = y
             };
+        }
+        
+        /// <summary>
+        ///     Computes the effective region representing the bounds inside a source thumbnail of a certain size.
+        /// </summary>
+        public static WinSize FitToSize(this WinRectangle desiredBounds, WinSize sourceSize)
+        {
+            try
+            {
+                var result = desiredBounds;
+                var sourceBounds = new Rectangle(result.X, result.Y, sourceSize.Width, sourceSize.Height);
+                result.Intersect(sourceBounds);
+                return result.Size;
+            }
+            catch (Exception e)
+            {
+                throw new ApplicationException($"Failed to compute Region size, sourceSize: {sourceSize}, current state: {new { desiredBounds, sourceSize }}", e);
+            }
         }
 
         public static bool IsNotEmpty(this Rectangle rect)
