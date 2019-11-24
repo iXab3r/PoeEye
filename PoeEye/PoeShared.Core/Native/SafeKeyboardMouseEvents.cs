@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
@@ -11,282 +12,187 @@ using JetBrains.Annotations;
 using log4net;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using PoeShared.Prism;
 using PoeShared.Scaffolding;
+using Unity;
+using KeyEventArgs = System.Windows.Forms.KeyEventArgs;
+using KeyEventHandler = System.Windows.Forms.KeyEventHandler;
+using MouseEventArgs = System.Windows.Forms.MouseEventArgs;
 
 namespace PoeShared.Native
 {
     internal sealed class KeyboardEventsSource : DisposableReactiveObject, IKeyboardEventsSource
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(KeyboardEventsSource));
+        private readonly TimeSpan hookDisconnectDelay = TimeSpan.FromSeconds(10);
 
         private readonly IClock clock;
 
-        private readonly BlockingCollection<InputEventData> eventQueue = new BlockingCollection<InputEventData>();
-        private readonly SerialDisposable keyboardSubscription = new SerialDisposable();
-        private readonly SerialDisposable mouseSubscription = new SerialDisposable();
-        private readonly ISubject<KeyEventArgs> whenKeyDown = new Subject<KeyEventArgs>();
-
-        private readonly ISubject<KeyPressEventArgs> whenKeyPress = new Subject<KeyPressEventArgs>();
-        private readonly ISubject<KeyEventArgs> whenKeyUp = new Subject<KeyEventArgs>();
-        private readonly ISubject<MouseEventArgs> whenMouseDown = new Subject<MouseEventArgs>();
-        private readonly ISubject<MouseEventArgs> whenMouseMove = new Subject<MouseEventArgs>();
-        private readonly ISubject<MouseEventArgs> whenMouseUp = new Subject<MouseEventArgs>();
-
-        private bool realtimeMode;
-
-        public KeyboardEventsSource([NotNull] IClock clock)
+        public KeyboardEventsSource(
+            [NotNull] IClock clock,
+            [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler,
+            [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler)
         {
             Guard.ArgumentNotNull(clock, nameof(clock));
             Log.Debug("Mouse&keyboard event source initialization started");
 
             this.clock = clock;
-
-            mouseSubscription.AddTo(Anchors);
-            InitializeConsumer().AddTo(Anchors);
+            
+            var mouseHookSource = Observable
+                .Using(Hook.GlobalEvents, HookMouse)
+                .SubscribeOn(uiScheduler)
+                .Publish()
+                .RefCount(hookDisconnectDelay);
+            WhenMouseMove = mouseHookSource
+                .Where(x => x.EventType == InputEventType.MouseMove && x.EventArgs is MouseEventArgs)
+                .Select(x => x.EventArgs as MouseEventArgs);
+            WhenMouseUp = mouseHookSource
+                .Where(x => x.EventType == InputEventType.MouseUp && x.EventArgs is MouseEventArgs)
+                .Select(x => x.EventArgs as MouseEventArgs);
+            WhenMouseDown = mouseHookSource
+                .Where(x => x.EventType == InputEventType.MouseDown && x.EventArgs is MouseEventArgs)
+                .Select(x => x.EventArgs as MouseEventArgs);
+            
+            var keyboardHook = Observable
+                .Using(Hook.GlobalEvents, HookKeyboard)
+                .SubscribeOn(uiScheduler)
+                .Publish()
+                .RefCount(hookDisconnectDelay);
+            WhenKeyDown = keyboardHook
+                .Where(x => x.EventType == InputEventType.KeyDown && x.EventArgs is KeyEventArgs)
+                .Select(x => x.EventArgs as KeyEventArgs);
+            WhenKeyUp = keyboardHook
+                .Where(x => x.EventType == InputEventType.KeyUp && x.EventArgs is KeyEventArgs)
+                .Select(x => x.EventArgs as KeyEventArgs);
+            WhenKeyPress = keyboardHook
+                .Where(x => x.EventType == InputEventType.KeyPress && x.EventArgs is KeyPressEventArgs)
+                .Select(x => x.EventArgs as KeyPressEventArgs);
         }
 
-        public IDisposable InitializeMouseHook()
+        public IObservable<KeyPressEventArgs> WhenKeyPress { get; }
+
+        public IObservable<KeyEventArgs> WhenKeyDown { get; }
+
+        public IObservable<KeyEventArgs> WhenKeyUp { get; }
+
+        public IObservable<MouseEventArgs> WhenMouseDown { get; }
+
+        public IObservable<MouseEventArgs> WhenMouseMove { get; }
+
+        public IObservable<MouseEventArgs> WhenMouseUp { get; }
+
+        public bool RealtimeMode { get; } = true;
+
+        private IObservable<InputEventData> HookMouse(IKeyboardMouseEvents source)
         {
-            Log.Info("Configuring Mouse hook...");
-            var sw = Stopwatch.StartNew();
-
-            var anchors = new CompositeDisposable();
-            mouseSubscription.Disposable = anchors;
-
-            Disposable.Create(() => Log.Debug("Disposing Mouse hook")).AddTo(anchors);
-            var hook = Hook.GlobalEvents().AddTo(anchors);
-            InitializeMouseHook(hook).AddTo(anchors);
-
-            sw.Stop();
-            Log.Debug($"Mouse hook configuration took {sw.ElapsedMilliseconds:F0}ms");
-            return anchors;
-        }
-
-        public IDisposable InitializeKeyboardHook()
-        {
-            Log.Info("Configuring Keyboard hook...");
-            var sw = Stopwatch.StartNew();
-
-            var anchors = new CompositeDisposable();
-            keyboardSubscription.Disposable = anchors;
-
-            Disposable.Create(() => Log.Debug("Disposing Keyboard hook")).AddTo(anchors);
-            var hook = Hook.GlobalEvents().AddTo(anchors);
-            InitializeKeyboardHook(hook).AddTo(anchors);
-
-            sw.Stop();
-            Log.Debug($"Keyboard hook configuration took {sw.ElapsedMilliseconds:F0}ms");
-            return anchors;
-        }
-
-        public IObservable<KeyPressEventArgs> WhenKeyPress => whenKeyPress;
-
-        public IObservable<KeyEventArgs> WhenKeyDown => whenKeyDown;
-
-        public IObservable<KeyEventArgs> WhenKeyUp => whenKeyUp;
-
-        public IObservable<MouseEventArgs> WhenMouseDown => whenMouseDown.OfType<MouseEventArgs>();
-
-        public IObservable<MouseEventArgs> WhenMouseMove => whenMouseMove.OfType<MouseEventArgs>();
-
-        public IObservable<MouseEventArgs> WhenMouseUp => whenMouseUp.OfType<MouseEventArgs>();
-
-        public bool RealtimeMode
-        {
-            get => realtimeMode;
-            set => RaiseAndSetIfChanged(ref realtimeMode, value);
-        }
-
-        private IDisposable InitializeConsumer()
-        {
-            Log.Debug("Creating new event consumer thread");
-            var consumer = new CancellationTokenSource();
-            var consumerThread = new Thread(InitializeConsumerThread)
+            return Observable.Create<InputEventData>(subscriber =>
             {
-                Name = "Input",
-                IsBackground = true
-            };
-            consumerThread.SetApartmentState(ApartmentState.STA);
-            consumerThread.Start(consumer.Token);
+                Log.Info("Configuring Mouse hook...");
+                var sw = Stopwatch.StartNew();
+                var activeAnchors = new CompositeDisposable();
+                Disposable.Create(() => Log.Info("Disposing Mouse hook")).AddTo(activeAnchors);
 
-            return Disposable.Create(() =>
-            {
-                Log.Debug("Cancelling consumer thread");
-                consumer.Cancel();
-                Log.Debug("Sent Cancel to consumer thread");
+                InitializeMouseHook(source)
+                    .Do(LogEvent, Log.HandleException, () => Log.Debug("Mouse event loop completed"))
+                    .Subscribe(subscriber)
+                    .AddTo(activeAnchors);
+                
+                sw.Stop();
+                Log.Debug($"Mouse hook configuration took {sw.ElapsedMilliseconds:F0}ms");
+                
+                return activeAnchors;
             });
         }
-
-        private void InitializeConsumerThread(object arg)
+        
+        private IObservable<InputEventData> HookKeyboard(IKeyboardMouseEvents source)
         {
-            var consumer = (CancellationToken) arg;
-            InitializeConsumerThread(consumer);
+            return Observable.Create<InputEventData>(subscriber =>
+            {
+                Log.Info("Configuring Keyboard hook...");
+                var sw = Stopwatch.StartNew();
+                var activeAnchors = new CompositeDisposable();
+                Disposable.Create(() => Log.Info("Disposing Keyboard hook")).AddTo(activeAnchors);
+
+                InitializeKeyboardHook(source)
+                    .Do(LogEvent, Log.HandleException, () => Log.Debug("Keyboard event loop completed"))
+                    .Subscribe(subscriber)
+                    .AddTo(activeAnchors);
+                
+                sw.Stop();
+                Log.Debug($"Keyboard hook configuration took {sw.ElapsedMilliseconds:F0}ms");
+                
+                return activeAnchors;
+            });
         }
-
-        private void InitializeConsumerThread(CancellationToken cancellationToken)
+        
+        private IObservable<InputEventData> InitializeKeyboardHook(IKeyboardEvents keyboardEvents)
         {
-            try
-            {
-                Log.Debug("Input event consumer started");
-                while (!cancellationToken.IsCancellationRequested)
-                {
-                    var nextEvent = eventQueue.Take(cancellationToken);
-                    ProcessEvent(nextEvent);
-                }
-            }
-            catch (OperationCanceledException)
-            {
-                Log.Debug("Input event consumer received Cancellation request");
-            }
-            catch (Exception e)
-            {
-                Log.HandleException(e);
-            }
-            finally
-            {
-                Log.Debug("Input event consumer completed");
-            }
-        }
-
-        private void ProcessEvent(InputEventData nextEvent)
-        {
-            switch (nextEvent.EventArgs)
-            {
-                case KeyEventArgs args:
-                    switch (nextEvent.EventType)
-                    {
-                        case InputEventType.KeyDown:
-                            whenKeyDown.OnNext(args);
-                            break;
-                        case InputEventType.KeyUp:
-                            whenKeyUp.OnNext(args);
-                            break;
-                        default:
-                            throw new ArgumentOutOfRangeException(nameof(nextEvent), nextEvent.EventType,
-                                $"Invalid enum value for type {args.GetType().Name}, data: {nextEvent.DumpToTextRaw()}");
-                    }
-
-                    break;
-                case KeyPressEventArgs args:
-                    switch (nextEvent.EventType)
-                    {
-                        case InputEventType.KeyPress:
-                            whenKeyPress.OnNext(args);
-                            break;
-                        default:
-                            throw new ArgumentOutOfRangeException(nameof(nextEvent), nextEvent.EventType,
-                                $"Invalid enum value for type {args.GetType().Name}, data: {nextEvent.DumpToTextRaw()}");
-                    }
-
-                    break;
-                case MouseEventArgs args:
-                    switch (nextEvent.EventType)
-                    {
-                        case InputEventType.MouseDown:
-                            whenMouseDown.OnNext(args);
-                            break;
-                        case InputEventType.MouseUp:
-                            whenMouseUp.OnNext(args);
-                            break;
-                        case InputEventType.MouseMove:
-                            whenMouseMove.OnNext(args);
-                            break;
-                        default:
-                            throw new ArgumentOutOfRangeException(nameof(nextEvent), nextEvent.EventType,
-                                $"Invalid enum value for type {args.GetType().Name}, data: {nextEvent.DumpToTextRaw()}");
-                    }
-
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(nextEvent), nextEvent.EventType,
-                        $"Invalid argument type: {nextEvent.EventArgs.GetType().Name}, data: {nextEvent.DumpToTextRaw()}");
-            }
-        }
-
-        private IDisposable InitializeKeyboardHook(IKeyboardEvents keyboardEvents)
-        {
-            var anchors = new CompositeDisposable();
-            Log.Debug($"Hook: {keyboardEvents}");
-            Observable
+            Log.Debug($"Hooking Keyboard: {keyboardEvents}");
+            var keyDown = Observable
                 .FromEventPattern<KeyEventHandler, KeyEventArgs>(
                     h => keyboardEvents.KeyDown += h,
                     h => keyboardEvents.KeyDown -= h)
                 .Select(x => x.EventArgs)
-                .Subscribe(x => EnqueueEvent(x, InputEventType.KeyDown), Log.HandleException)
-                .AddTo(anchors);
+                .Select(x => ToInputEventData(x, InputEventType.KeyDown));
 
-            Observable
+            var keyUp = Observable
                 .FromEventPattern<KeyEventHandler, KeyEventArgs>(
                     h => keyboardEvents.KeyUp += h,
                     h => keyboardEvents.KeyUp -= h)
                 .Select(x => x.EventArgs)
-                .Subscribe(x => EnqueueEvent(x, InputEventType.KeyUp), Log.HandleException)
-                .AddTo(anchors);
+                .Select(x => ToInputEventData(x, InputEventType.KeyUp));
 
-            Observable
+            var keyPress = Observable
                 .FromEventPattern<KeyPressEventHandler, KeyPressEventArgs>(
                     h => keyboardEvents.KeyPress += h,
                     h => keyboardEvents.KeyPress -= h)
                 .Select(x => x.EventArgs)
-                .Subscribe(x => EnqueueEvent(x, InputEventType.KeyPress), Log.HandleException)
-                .AddTo(anchors);
+                .Select(x => ToInputEventData(x, InputEventType.KeyPress));
 
-            return anchors;
+            return Observable.Merge(keyDown, keyUp, keyPress);
         }
 
-        private IDisposable InitializeMouseHook(IMouseEvents mouseEvents)
+        private IObservable<InputEventData> InitializeMouseHook(IMouseEvents mouseEvents)
         {
-            var anchors = new CompositeDisposable();
-            Observable
+            Log.Debug($"Hooking Mouse: {mouseEvents}");
+
+            var mouseDown = Observable
                 .FromEventPattern<EventHandler<MouseEventExtArgs>, MouseEventExtArgs>(
                     h => mouseEvents.MouseDownExt += h,
                     h => mouseEvents.MouseDownExt -= h)
                 .Select(x => x.EventArgs)
-                .Subscribe(x => EnqueueEvent(x, InputEventType.MouseDown), Log.HandleException, () => Log.Debug($"MouseDownExt event loop completed"))
-                .AddTo(anchors);
+                .Select(x => ToInputEventData(x, InputEventType.MouseDown));
 
-            Observable
+            var mouseUp = Observable
                 .FromEventPattern<EventHandler<MouseEventExtArgs>, MouseEventExtArgs>(
                     h => mouseEvents.MouseUpExt += h,
                     h => mouseEvents.MouseUpExt -= h)
                 .Select(x => x.EventArgs)
-                .Subscribe(x => EnqueueEvent(x, InputEventType.MouseUp), Log.HandleException, () => Log.Debug($"MouseUpExt event loop completed"))
-                .AddTo(anchors);
+                .Select(x => ToInputEventData(x, InputEventType.MouseUp));
 
-            Observable
+            var mouseMove = Observable
                 .FromEventPattern<EventHandler<MouseEventExtArgs>, MouseEventExtArgs>(
                     h => mouseEvents.MouseMoveExt += h,
                     h => mouseEvents.MouseMoveExt -= h)
                 .Select(x => x.EventArgs)
                 .Select(EnrichMouseMove)
-                .Subscribe(x => EnqueueEvent(x, InputEventType.MouseMove), Log.HandleException, () => Log.Debug($"MouseMoveExt event loop completed"))
-                .AddTo(anchors);
+                .Select(x => ToInputEventData(x, InputEventType.MouseMove));
 
-            return anchors;
+            return Observable.Merge(mouseDown, mouseMove, mouseUp);
         }
-
-        private void EnqueueEvent(InputEventData eventData)
+        
+        private InputEventData ToInputEventData(EventArgs args, InputEventType eventType)
+        {
+            return new InputEventData {EventArgs = args, EventType = eventType, Timestamp = clock.Now};
+        }
+        
+        private static void LogEvent(InputEventData arg)
         {
             if (Log.IsDebugEnabled)
             {
                 Log.Debug(
-                    $"Sending event for processing(in queue: {eventQueue.Count}, realtimeMode: {realtimeMode}): {eventData.DumpToTextRaw()}");
+                    $"Keyboard/Mouse event: {arg.DumpToTextRaw()}");
             }
-
-            if (realtimeMode)
-            {
-                ProcessEvent(eventData);
-            }
-            else
-            {
-                eventQueue.Add(eventData);
-            }
-        }
-
-        private void EnqueueEvent(EventArgs args, InputEventType eventType)
-        {
-            var eventData = new InputEventData {EventArgs = args, EventType = eventType, Timestamp = clock.Now};
-            EnqueueEvent(eventData);
         }
 
         private static MouseEventArgs EnrichMouseMove(MouseEventExtArgs args)
