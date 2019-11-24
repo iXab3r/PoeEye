@@ -4,17 +4,14 @@ using System.Diagnostics;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using System.Reactive.Threading.Tasks;
-using System.Runtime.CompilerServices;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using Gma.System.MouseKeyHook;
-
 using JetBrains.Annotations;
 using log4net;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using PoeShared.Scaffolding;
-using ReactiveUI;
 
 namespace PoeShared.Native
 {
@@ -35,7 +32,7 @@ namespace PoeShared.Native
         private readonly ISubject<MouseEventArgs> whenMouseMove = new Subject<MouseEventArgs>();
         private readonly ISubject<MouseEventArgs> whenMouseUp = new Subject<MouseEventArgs>();
 
-        private bool realtimeMode = false;
+        private bool realtimeMode;
 
         public KeyboardEventsSource([NotNull] IClock clock)
         {
@@ -56,12 +53,12 @@ namespace PoeShared.Native
             var anchors = new CompositeDisposable();
             mouseSubscription.Disposable = anchors;
 
-            Disposable.Create(() => Log.Info("Disposing Mouse hook")).AddTo(anchors);
+            Disposable.Create(() => Log.Debug("Disposing Mouse hook")).AddTo(anchors);
             var hook = Hook.GlobalEvents().AddTo(anchors);
             InitializeMouseHook(hook).AddTo(anchors);
 
             sw.Stop();
-            Log.Info($"Mouse hook configuration took {sw.ElapsedMilliseconds:F0}ms");
+            Log.Debug($"Mouse hook configuration took {sw.ElapsedMilliseconds:F0}ms");
             return anchors;
         }
 
@@ -73,12 +70,12 @@ namespace PoeShared.Native
             var anchors = new CompositeDisposable();
             keyboardSubscription.Disposable = anchors;
 
-            Disposable.Create(() => Log.Info("Disposing Keyboard hook")).AddTo(anchors);
+            Disposable.Create(() => Log.Debug("Disposing Keyboard hook")).AddTo(anchors);
             var hook = Hook.GlobalEvents().AddTo(anchors);
             InitializeKeyboardHook(hook).AddTo(anchors);
 
             sw.Stop();
-            Log.Info($"Keyboard hook configuration took {sw.ElapsedMilliseconds:F0}ms");
+            Log.Debug($"Keyboard hook configuration took {sw.ElapsedMilliseconds:F0}ms");
             return anchors;
         }
 
@@ -89,7 +86,7 @@ namespace PoeShared.Native
         public IObservable<KeyEventArgs> WhenKeyUp => whenKeyUp;
 
         public IObservable<MouseEventArgs> WhenMouseDown => whenMouseDown.OfType<MouseEventArgs>();
-        
+
         public IObservable<MouseEventArgs> WhenMouseMove => whenMouseMove.OfType<MouseEventArgs>();
 
         public IObservable<MouseEventArgs> WhenMouseUp => whenMouseUp.OfType<MouseEventArgs>();
@@ -97,7 +94,7 @@ namespace PoeShared.Native
         public bool RealtimeMode
         {
             get => realtimeMode;
-            set => this.RaiseAndSetIfChanged(ref realtimeMode, value);
+            set => RaiseAndSetIfChanged(ref realtimeMode, value);
         }
 
         private IDisposable InitializeConsumer()
@@ -168,6 +165,7 @@ namespace PoeShared.Native
                             throw new ArgumentOutOfRangeException(nameof(nextEvent), nextEvent.EventType,
                                 $"Invalid enum value for type {args.GetType().Name}, data: {nextEvent.DumpToTextRaw()}");
                     }
+
                     break;
                 case KeyPressEventArgs args:
                     switch (nextEvent.EventType)
@@ -179,6 +177,7 @@ namespace PoeShared.Native
                             throw new ArgumentOutOfRangeException(nameof(nextEvent), nextEvent.EventType,
                                 $"Invalid enum value for type {args.GetType().Name}, data: {nextEvent.DumpToTextRaw()}");
                     }
+
                     break;
                 case MouseEventArgs args:
                     switch (nextEvent.EventType)
@@ -196,6 +195,7 @@ namespace PoeShared.Native
                             throw new ArgumentOutOfRangeException(nameof(nextEvent), nextEvent.EventType,
                                 $"Invalid enum value for type {args.GetType().Name}, data: {nextEvent.DumpToTextRaw()}");
                     }
+
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(nextEvent), nextEvent.EventType,
@@ -212,7 +212,6 @@ namespace PoeShared.Native
                     h => keyboardEvents.KeyDown += h,
                     h => keyboardEvents.KeyDown -= h)
                 .Select(x => x.EventArgs)
-                .Do(LogEvent)
                 .Subscribe(x => EnqueueEvent(x, InputEventType.KeyDown), Log.HandleException)
                 .AddTo(anchors);
 
@@ -221,7 +220,6 @@ namespace PoeShared.Native
                     h => keyboardEvents.KeyUp += h,
                     h => keyboardEvents.KeyUp -= h)
                 .Select(x => x.EventArgs)
-                .Do(LogEvent)
                 .Subscribe(x => EnqueueEvent(x, InputEventType.KeyUp), Log.HandleException)
                 .AddTo(anchors);
 
@@ -230,7 +228,6 @@ namespace PoeShared.Native
                     h => keyboardEvents.KeyPress += h,
                     h => keyboardEvents.KeyPress -= h)
                 .Select(x => x.EventArgs)
-                .Do(LogEvent)
                 .Subscribe(x => EnqueueEvent(x, InputEventType.KeyPress), Log.HandleException)
                 .AddTo(anchors);
 
@@ -245,8 +242,7 @@ namespace PoeShared.Native
                     h => mouseEvents.MouseDownExt += h,
                     h => mouseEvents.MouseDownExt -= h)
                 .Select(x => x.EventArgs)
-                .Do(LogEvent)
-                .Subscribe(x => EnqueueEvent(x, InputEventType.MouseDown), Log.HandleException)
+                .Subscribe(x => EnqueueEvent(x, InputEventType.MouseDown), Log.HandleException, () => Log.Debug($"MouseDownExt event loop completed"))
                 .AddTo(anchors);
 
             Observable
@@ -254,17 +250,16 @@ namespace PoeShared.Native
                     h => mouseEvents.MouseUpExt += h,
                     h => mouseEvents.MouseUpExt -= h)
                 .Select(x => x.EventArgs)
-                .Do(LogEvent)
-                .Subscribe(x => EnqueueEvent(x, InputEventType.MouseUp), Log.HandleException)
+                .Subscribe(x => EnqueueEvent(x, InputEventType.MouseUp), Log.HandleException, () => Log.Debug($"MouseUpExt event loop completed"))
                 .AddTo(anchors);
-            
+
             Observable
                 .FromEventPattern<EventHandler<MouseEventExtArgs>, MouseEventExtArgs>(
                     h => mouseEvents.MouseMoveExt += h,
                     h => mouseEvents.MouseMoveExt -= h)
                 .Select(x => x.EventArgs)
-                .Do(LogEvent)
-                .Subscribe(x => EnqueueEvent(x, InputEventType.MouseMove), Log.HandleException)
+                .Select(EnrichMouseMove)
+                .Subscribe(x => EnqueueEvent(x, InputEventType.MouseMove), Log.HandleException, () => Log.Debug($"MouseMoveExt event loop completed"))
                 .AddTo(anchors);
 
             return anchors;
@@ -273,13 +268,19 @@ namespace PoeShared.Native
         private void EnqueueEvent(InputEventData eventData)
         {
             if (Log.IsDebugEnabled)
+            {
                 Log.Debug(
                     $"Sending event for processing(in queue: {eventQueue.Count}, realtimeMode: {realtimeMode}): {eventData.DumpToTextRaw()}");
+            }
 
             if (realtimeMode)
+            {
                 ProcessEvent(eventData);
+            }
             else
+            {
                 eventQueue.Add(eventData);
+            }
         }
 
         private void EnqueueEvent(EventArgs args, InputEventType eventType)
@@ -288,18 +289,17 @@ namespace PoeShared.Native
             EnqueueEvent(eventData);
         }
 
-        private void LogEvent(object arg)
+        private static MouseEventArgs EnrichMouseMove(MouseEventExtArgs args)
         {
-            if (!Log.IsDebugEnabled) return;
-
-            Log.Debug($"Keyboard/mouse event: {arg.DumpToTextRaw()}");
+            return new MouseEventArgs(Control.MouseButtons, args.Clicks, args.X, args.Y, args.Delta);
         }
 
         private struct InputEventData
         {
-            public EventArgs EventArgs { get; set; }
-
+            [JsonConverter(typeof(StringEnumConverter))]
             public InputEventType EventType { get; set; }
+            
+            public EventArgs EventArgs { get; set; }
 
             public DateTime Timestamp { get; set; }
         }

@@ -165,6 +165,15 @@ namespace PoeShared.Scaffolding
                 Height = (int) sourceSize.Height
             };
         }
+        
+        public static Point ToWpfPoint(this System.Drawing.Point source)
+        {
+            return new Point
+            {
+                X = source.X,
+                Y = source.Y
+            };
+        }
 
         public static System.Drawing.Point ToWinPoint(this Point source)
         {
