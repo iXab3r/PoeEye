@@ -73,4 +73,7 @@
   <ItemGroup>
     <ProjectReference Include="..\PoeShared.Core\PoeShared.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Modularity" />
+  </ItemGroup>
 </Project>
