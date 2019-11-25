@@ -43,5 +43,10 @@ namespace PoeShared.Scaffolding
             this.RaisePropertyChanged(nameof(Value));
             this.RaisePropertyChanged(nameof(HasValue));
         }
+
+        public override string ToString()
+        {
+            return $"{Value} (default {DefaultValue}, hasValue: {HasValue})";
+        }
     }
 }
