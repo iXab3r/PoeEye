@@ -4,14 +4,13 @@ using System.Diagnostics;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Reactive.Subjects;
-using System.Threading;
 using System.Windows.Forms;
 using Gma.System.MouseKeyHook;
 using JetBrains.Annotations;
 using log4net;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using PoeShared.Modularity;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
 using Unity;
@@ -24,28 +23,25 @@ namespace PoeShared.Native
     internal sealed class KeyboardEventsSource : DisposableReactiveObject, IKeyboardEventsSource
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(KeyboardEventsSource));
-        private readonly TimeSpan hookDisconnectDelay = TimeSpan.FromSeconds(10);
-
+        
         private readonly IClock clock;
 
-        public KeyboardEventsSource(
-            [NotNull] IClock clock,
-            [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler,
-            [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler)
+        public KeyboardEventsSource([NotNull] IClock clock)
         {
             Guard.ArgumentNotNull(clock, nameof(clock));
             Log.Debug("Mouse&keyboard event source initialization started");
 
             this.clock = clock;
-            
+
             var mouseHookSource = Observable
                 .Using(Hook.GlobalEvents, HookMouse)
-                .SubscribeOn(uiScheduler)
                 .Publish()
-                .RefCount(hookDisconnectDelay);
+                .RefCount();
             WhenMouseMove = mouseHookSource
                 .Where(x => x.EventType == InputEventType.MouseMove && x.EventArgs is MouseEventArgs)
-                .Select(x => x.EventArgs as MouseEventArgs);
+                .Select(x => x.EventArgs as MouseEventArgs)
+                .DistinctUntilChanged(args => new { args.X, args.Y, args.Button, args.Clicks });
+            
             WhenMouseUp = mouseHookSource
                 .Where(x => x.EventType == InputEventType.MouseUp && x.EventArgs is MouseEventArgs)
                 .Select(x => x.EventArgs as MouseEventArgs);
@@ -55,9 +51,8 @@ namespace PoeShared.Native
             
             var keyboardHook = Observable
                 .Using(Hook.GlobalEvents, HookKeyboard)
-                .SubscribeOn(uiScheduler)
                 .Publish()
-                .RefCount(hookDisconnectDelay);
+                .RefCount();
             WhenKeyDown = keyboardHook
                 .Where(x => x.EventType == InputEventType.KeyDown && x.EventArgs is KeyEventArgs)
                 .Select(x => x.EventArgs as KeyEventArgs);
