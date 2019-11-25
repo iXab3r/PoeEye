@@ -28,7 +28,7 @@
                     <ItemsControl ItemsSource="{Binding ModulesSettings}" Focusable="False">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate DataType="{x:Type modularity:ISettingsViewModel}">
-                                <ContentPresenter Margin="0,10,0,10" Content="{Binding}" />
+                                <ContentPresenter Margin="0,0,0,0" Content="{Binding}" />
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>    
