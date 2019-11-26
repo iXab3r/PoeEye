@@ -61,7 +61,6 @@
             </Style.Triggers>
         </Style>
     </native:TransparentWindow.Style>
-    
 
     <Grid>
         <Border>

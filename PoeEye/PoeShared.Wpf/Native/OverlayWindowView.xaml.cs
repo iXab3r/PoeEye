@@ -20,9 +20,11 @@ namespace PoeShared.Native
 
         public OverlayWindowView()
         {
+            using var sw = new BenchmarkTimer("View initialization", Log, nameof(OverlayWindowView));
             InitializeComponent();
-
+            sw.Step("Components initialized");
             WhenLoaded.Subscribe(OnLoaded);
+            sw.Step("WhenLoaded routine executed");
             SizeChanged += OnSizeChanged;
         }
 

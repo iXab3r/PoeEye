@@ -120,6 +120,8 @@ namespace PoeShared.Native
 
         public IDisposable RegisterChild(IOverlayViewModel viewModel)
         {
+            using var sw = new BenchmarkTimer($"Registering viewModel {viewModel}", Log);
+
             Guard.ArgumentNotNull(viewModel, nameof(viewModel));
 
             var childAnchors = new CompositeDisposable();
@@ -131,20 +133,24 @@ namespace PoeShared.Native
                 Content = viewModel
             };
             overlayWindowViewModel.AddTo(childAnchors);
+            sw.Step($"Initialized {nameof(OverlayWindowViewModel)}");
 
             var overlayName = $"{viewModel.GetType().Name}";
             var overlayWindow = new OverlayWindowView
             {
-                DataContext = overlayWindowViewModel,
                 Title = $"[PoeEye.Overlay] {uniqueControllerId} {windowTracker} #{overlayName} #{windows.Count + 1}",
                 Visibility = Visibility.Collapsed,
                 Topmost = true,
                 Name = $"{overlayName}_OverlayView"
             };
             Log.Debug($"[#{overlayName}] Created Overlay window({windowTracker})");
+            sw.Step($"Initialized overlay window: {overlayWindow.Title}");
+            overlayWindow.DataContext = overlayWindowViewModel;
+            sw.Step($"Initialized overlay data context: {overlayWindowViewModel}");
+
             var overlayWindowHandle = new WindowInteropHelper(overlayWindow).EnsureHandle();
             Log.Debug($"[#{overlayName}] Overlay window({windowTracker}) handle: {overlayWindowHandle.ToHexadecimal()}");
-
+            sw.Step($"Initialized overlay window handle: {overlayWindowHandle.ToHexadecimal()}");
             
             var activationController = new ActivationController(overlayWindow);
             viewModel.SetActivationController(activationController);
@@ -197,6 +203,7 @@ namespace PoeShared.Native
             childAnchors.AddTo(Anchors);
 
             Log.Info($"Overlay #{overlayName} initialized");
+            sw.Step($"Registration completed");
 
             return childAnchors;
         }
