@@ -142,17 +142,6 @@ namespace PoeShared.Native
             }
         }
 
-        public static void ShowInactiveTopmost(IntPtr handle, System.Windows.Rect windowBounds)
-        {
-            Guard.ArgumentIsTrue(handle != IntPtr.Zero, "Handle must be non-zero");
-
-            var dpi = GetDisplayScaleFactor(handle);
-            Log.Debug($"[{handle.ToHexadecimal()}] Showing window {windowBounds}, scaleFactor: {dpi}");
-
-            var rect = windowBounds.ScaleToScreen().ToWinRectangle();
-            ShowInactiveTopmost(handle, rect);
-        }
-
         public static bool ShowWindow(IntPtr handle)
         {
             Guard.ArgumentIsTrue(handle != IntPtr.Zero, "Handle must be non-zero");

@@ -98,7 +98,7 @@ namespace PoeShared.Native
                 .AddTo(Anchors);
 
             nativeBounds = this.WhenAnyValue(x => x.Bounds)
-                .Select(x => x.ScaleToScreen().ToWinRectangle())
+                .Select(x => x.ScaleToScreen())
                 .ToPropertyHelper(this, x => x.NativeBounds)
                 .AddTo(Anchors);
         }

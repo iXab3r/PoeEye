@@ -10,6 +10,7 @@ using WinSize = System.Drawing.Size;
 using WinPoint = System.Drawing.Point;
 using WinRectangle = System.Drawing.Rectangle;
 
+
 namespace PoeShared.Scaffolding
 {
     /// <summary>
@@ -106,9 +107,9 @@ namespace PoeShared.Scaffolding
             return new Size(sourceSize.Width, sourceSize.Height);
         }
 
-        public static System.Drawing.Size ToWinSize(this Size sourceSize)
+        public static WinSize ToWinSize(this Size sourceSize)
         {
-            return new System.Drawing.Size((int) sourceSize.Width, (int) sourceSize.Height);
+            return new WinSize((int) sourceSize.Width, (int) sourceSize.Height);
         }
         
         public static WinPoint ToScreen(this Point source, Visual owner)
@@ -124,33 +125,37 @@ namespace PoeShared.Scaffolding
             return relative.ToWinRectangle();
         }
         
-        public static Rect FromScreen(this Rectangle sourceSize, Visual owner)
-        {
-            var topLeft = new Point(sourceSize.Left, sourceSize.Top);
-            var bottomRight = new Point(sourceSize.Right, sourceSize.Bottom);
-            var relative = new Rect(owner.PointFromScreen(topLeft), owner.PointFromScreen(bottomRight));
-            return relative;
-        }
-
-        public static Rect FromScreen(this Rectangle sourceSize)
-        {
-            return ToWpfRectangle(sourceSize).ScaleToWpf();
-        }
-
-        public static Rect ScaleToScreen(this Rect sourceSize)
+        public static WinPoint ScaleToScreen(this Point sourceSize)
         {
             var dpi = UnsafeNative.GetDesktopDpi();
 
-            var result = sourceSize;
-            result.Scale(dpi.X, dpi.Y);
+            var result = new WinPoint((int)(sourceSize.X * dpi.X), (int)(sourceSize.Y * dpi.Y));
             return result;
         }
 
-        public static Rect ScaleToWpf(this Rect sourceSize)
+        public static WinRectangle ScaleToScreen(this Rect sourceSize)
+        {
+            if (sourceSize.IsEmpty)
+            {
+                return WinRectangle.Empty;
+            }
+            var dpi = UnsafeNative.GetDesktopDpi();
+
+            return new WinRectangle((int)(sourceSize.X * dpi.X), (int)(sourceSize.Y * dpi.Y), (int)(sourceSize.Width * dpi.X), (int)(sourceSize.Height * dpi.Y));
+        }
+        
+        public static WinSize ScaleToScreen(this Size sourceSize)
         {
             var dpi = UnsafeNative.GetDesktopDpi();
 
-            var result = sourceSize;
+            return new WinSize((int)(sourceSize.Width * dpi.X), (int)(sourceSize.Height * dpi.Y));
+        }
+
+        public static Rect ScaleToWpf(this WinRectangle sourceSize)
+        {
+            var dpi = UnsafeNative.GetDesktopDpi();
+
+            var result = sourceSize.ToWpfRectangle();
             result.Scale(1 / dpi.X, 1 / dpi.Y);
             return result;
         }
