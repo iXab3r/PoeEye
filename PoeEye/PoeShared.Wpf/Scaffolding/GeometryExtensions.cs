@@ -150,6 +150,11 @@ namespace PoeShared.Scaffolding
 
             return new WinSize((int)(sourceSize.Width * dpi.X), (int)(sourceSize.Height * dpi.Y));
         }
+        
+        public static WinSize Scale(this WinSize sourceSize, float dpi)
+        {
+            return new WinSize((int)(sourceSize.Width / dpi), (int)(sourceSize.Height / dpi));
+        }
 
         public static Rect ScaleToWpf(this WinRectangle sourceSize)
         {
@@ -158,6 +163,11 @@ namespace PoeShared.Scaffolding
             var result = sourceSize.ToWpfRectangle();
             result.Scale(1 / dpi.X, 1 / dpi.Y);
             return result;
+        }
+        
+        public static WinRectangle Scale(this WinRectangle sourceSize, float dpi)
+        {
+            return new WinRectangle((int)(sourceSize.X / dpi), (int)(sourceSize.Y / dpi), (int)(sourceSize.Width / dpi), (int)(sourceSize.Height / dpi));
         }
 
         public static Rectangle ToWinRectangle(this Rect sourceSize)
