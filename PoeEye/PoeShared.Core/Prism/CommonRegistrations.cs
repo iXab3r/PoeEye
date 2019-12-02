@@ -43,6 +43,7 @@ namespace PoeShared.Prism
                 .RegisterFactory<IScheduler>(WellKnownSchedulers.UI, x => RxApp.MainThreadScheduler)
                 .RegisterFactory<IScheduler>(WellKnownSchedulers.Background, x => RxApp.TaskpoolScheduler)
                 .RegisterType<IHttpClient, GenericHttpClient>()
+                .RegisterType(typeof(IFactory<,,,>), typeof(Factory<,,,>))
                 .RegisterType(typeof(IFactory<,,>), typeof(Factory<,,>))
                 .RegisterType(typeof(IFactory<,>), typeof(Factory<,>))
                 .RegisterType(typeof(IFactory<>), typeof(Factory<>));
