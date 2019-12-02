@@ -46,9 +46,9 @@ namespace PoeShared.Scaffolding
         public void Dispose()
         {
             sw.Stop();
-            if (logger.IsInfoEnabled)
+            if (logger.IsDebugEnabled)
             {
-                logger.Info($"[{propertyName}] [{sw.Elapsed.TotalMilliseconds:F0}ms] {benchmarkName}{(operations.Count <= 0 ? string.Empty : $"\n\t{string.Join("\n\t", operations)}")}");
+                logger.Debug($"[{propertyName}] [{sw.Elapsed.TotalMilliseconds:F0}ms] {benchmarkName}{(operations.Count <= 0 ? string.Empty : $"\n\t{string.Join("\n\t", operations)}")}");
             }
         }
     }
