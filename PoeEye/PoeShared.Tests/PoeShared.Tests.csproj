@@ -2,12 +2,10 @@
 
     <PropertyGroup>
         <TargetFramework>net461</TargetFramework>
-
         <IsPackable>false</IsPackable>
-
         <Configurations>Debug</Configurations>
-
         <Platforms>AnyCPU</Platforms>
+        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     </PropertyGroup>
 
     <ItemGroup>

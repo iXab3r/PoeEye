@@ -11,6 +11,7 @@
     <Configurations>Debug</Configurations>
     <Platforms>AnyCPU</Platforms>
     <LangVersion>8</LangVersion>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Blue.MVVM.Converter" Version="1.5.0" />
@@ -73,8 +74,5 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\PoeShared.Core\PoeShared.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Modularity" />
   </ItemGroup>
 </Project>

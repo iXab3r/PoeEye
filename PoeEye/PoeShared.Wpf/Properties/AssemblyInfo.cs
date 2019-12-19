@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Markup;
@@ -12,6 +13,8 @@ using RestEase;
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 
+[assembly: AssemblyVersion("0.0.0.1")]
+[assembly: AssemblyFileVersion("0.0.0.1")]
 [assembly: Guid("6079CD25-FF46-4BEE-BC14-02AE4BDC7BB0")]
 [assembly: InternalsVisibleTo("PoeEye.Tests")]
 [assembly: InternalsVisibleTo("PoeShared.Tests")]
