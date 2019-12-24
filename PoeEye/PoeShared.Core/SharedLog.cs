@@ -68,7 +68,6 @@ namespace PoeShared
                 $"Logging for app {GlobalContext.Properties["APPNAME"]} in '{GlobalContext.Properties["CONFIGURATION"]}' mode initialized";
             Console.WriteLine(startupInfo);
             Trace.WriteLine(startupInfo);
-            Log.Info(startupInfo);
         }
 
         public void SwitchLoggingLevel(Level loggingLevel)
