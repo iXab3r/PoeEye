@@ -13,8 +13,8 @@ using RestEase;
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 
-[assembly: AssemblyVersion("0.0")]
-[assembly: AssemblyFileVersion("0.0")]
+[assembly: AssemblyVersion("0.0.0.0")]
+[assembly: AssemblyFileVersion("0.0.0.0")]
 
 [assembly: Guid("12df53dd-7144-4d2d-b7a1-b4bc5bbdfb69")]
 [assembly: InternalsVisibleTo("PoeEye.Tests")]
