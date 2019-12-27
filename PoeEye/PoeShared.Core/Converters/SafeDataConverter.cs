@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Security;
 using System.Security.Cryptography;
 using System.Text;
 
 using Newtonsoft.Json;
+using PoeShared.Scaffolding;
 
 namespace PoeShared.Converters
 {
@@ -10,11 +12,11 @@ namespace PoeShared.Converters
     {
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            Guard.ArgumentIsTrue(() => value is string);
+            Guard.ArgumentIsTrue(() => value is SecureString);
 
-            var bytesToEncode = Encoding.Default.GetBytes(value as string);
+            var secureString = value as SecureString;
+            var bytesToEncode = Encoding.Default.GetBytes(secureString.ToUnsecuredString());
             var encodedBytes = ProtectedData.Protect(bytesToEncode, null, DataProtectionScope.LocalMachine);
-
             var serializedBytes = JsonConvert.SerializeObject(encodedBytes);
             writer.WriteRawValue(serializedBytes);
         }
@@ -27,7 +29,7 @@ namespace PoeShared.Converters
             {
                 var decodedBytes = ProtectedData.Unprotect(deserializedBytes, null, DataProtectionScope.LocalMachine);
                 var resultString = Encoding.Default.GetString(decodedBytes);
-                return resultString;
+                return resultString.ToSecuredString();
             }
 
             return null;
@@ -35,7 +37,7 @@ namespace PoeShared.Converters
 
         public override bool CanConvert(Type objectType)
         {
-            return objectType == typeof(string);
+            return objectType == typeof(SecureString);
         }
     }
 }

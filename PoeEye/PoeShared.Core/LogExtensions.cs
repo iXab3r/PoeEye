@@ -27,8 +27,6 @@ namespace PoeShared
             SharedLog.Instance.Errors.OnNext(exception);
         }
         
-        
-
         public static void LogIfThrows(this ILog This, LogLevel level, string message, Action block)
         {
             try

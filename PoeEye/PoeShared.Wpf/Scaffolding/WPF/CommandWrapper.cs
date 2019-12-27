@@ -185,7 +185,7 @@ namespace PoeShared.Scaffolding.WPF
 
         private void HandleException(Exception exception)
         {
-            Log.HandleUiException(exception);
+            Log.HandleException(exception);
             Error = exception.Message;
         }
 
