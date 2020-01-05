@@ -15,6 +15,34 @@ namespace PoeShared.Scaffolding
             return observable.Subscribe(_ => onNext());
         }
 
+        public static IObservable<TOut> SelectSafeOrDefault<TIn, TOut>(
+            this IObservable<TIn> observable,
+            [NotNull] Func<TIn, TOut> onNext)
+        {
+            return observable.SelectSafe<TIn, TOut, Exception>(onNext, ex => default);
+        }
+
+        public static IObservable<TOut> SelectSafe<TIn, TOut, TException>(
+            this IObservable<TIn> observable, 
+            [NotNull] Func<TIn, TOut> onNext,
+            [NotNull] Func<TException, TOut> onError)
+        where TException : Exception
+        {
+            return observable.Select(input =>
+            {
+                try
+                {
+                    return onNext(input);
+                }
+                catch (TException e)
+                {
+                    return onError(e);
+                }
+            });
+        }
+
+
+
         public static IDisposable SubscribeToErrors<T>(this IObservable<T> observable, [NotNull] Action<Exception> onError)
         {
             return observable.Subscribe(_ => { }, onError);
