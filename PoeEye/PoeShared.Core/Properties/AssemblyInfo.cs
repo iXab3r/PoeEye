@@ -17,7 +17,9 @@ using RestEase;
 [assembly: AssemblyFileVersion("0.0.0.0")]
 
 [assembly: Guid("12df53dd-7144-4d2d-b7a1-b4bc5bbdfb69")]
+[assembly: InternalsVisibleTo("EyeAuras.Tests")]
 [assembly: InternalsVisibleTo("PoeEye.Tests")]
+[assembly: InternalsVisibleTo("PoeShared.Tests")]
 [assembly: InternalsVisibleTo(RestClient.FactoryAssemblyName)]
 [assembly:
     InternalsVisibleTo(

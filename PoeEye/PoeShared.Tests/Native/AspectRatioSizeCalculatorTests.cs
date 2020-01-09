@@ -1,12 +1,10 @@
 using System.Collections.Generic;
 using System.Drawing;
-using System.Windows;
 using NUnit.Framework;
 using PoeShared.Native;
 using Shouldly;
-using Splat;
 
-namespace PoeShared.Tests
+namespace PoeShared.Tests.Native
 {
     [TestFixture]
     public class AspectRatioSizeCalculatorTests

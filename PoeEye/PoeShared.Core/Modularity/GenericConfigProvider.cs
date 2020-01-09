@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reactive;
 using System.Reactive.Concurrency;
@@ -8,6 +9,8 @@ using System.Threading;
 using JetBrains.Annotations;
 using KellermanSoftware.CompareNetObjects;
 using log4net;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
 using ReactiveUI;
@@ -23,7 +26,11 @@ namespace PoeShared.Modularity
             new ComparisonConfig
             {
                 DoublePrecision = 0.01,
-                MaxDifferences = byte.MaxValue
+                MaxDifferences = byte.MaxValue,
+                ClassTypesToIgnore = new List<Type> { typeof(JToken), typeof(JValue), typeof(JProperty), typeof(JArray), typeof(JConstructor), typeof(JObject), typeof(JRaw) },
+                ShowBreadcrumb = true,
+                CompareStaticFields = false,
+                CompareStaticProperties = false,
             });
 
         private readonly IConfigProvider configProvider;

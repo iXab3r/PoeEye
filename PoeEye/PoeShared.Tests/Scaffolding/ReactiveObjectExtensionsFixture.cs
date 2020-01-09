@@ -3,7 +3,7 @@ using Moq;
 using NUnit.Framework;
 using PoeShared.Scaffolding;
 
-namespace PoeShared.Tests
+namespace PoeShared.Tests.Scaffolding
 {
     [TestFixture]
     public class ReactiveObjectExtensionsFixture

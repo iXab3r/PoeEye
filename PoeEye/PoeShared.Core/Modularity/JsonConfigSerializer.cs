@@ -2,18 +2,20 @@
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using System.Runtime.Serialization.Formatters;
 using DynamicData;
 
 using log4net;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using PoeShared.Converters;
 using PoeShared.Scaffolding;
 using ReactiveUI;
 
 namespace PoeShared.Modularity
 {
-    internal class JsonConfigSerializer : IConfigSerializer
+    internal sealed class JsonConfigSerializer : IConfigSerializer
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(JsonConfigSerializer));
 
@@ -21,6 +23,7 @@ namespace PoeShared.Modularity
         private readonly int MaxCharsToLog = 1024;
 
         private JsonSerializerSettings jsonSerializerSettings;
+        private readonly ISubject<ErrorContext> thrownExceptions = new Subject<ErrorContext>();
 
         public JsonConfigSerializer()
         {
@@ -30,6 +33,8 @@ namespace PoeShared.Modularity
                 .StartWith(Unit.Default)
                 .Subscribe(ReinitializeSerializerSettings);
         }
+
+        public IObservable<ErrorContext> ThrownExceptions => thrownExceptions;
 
         public void RegisterConverter(JsonConverter converter)
         {
@@ -80,9 +85,8 @@ namespace PoeShared.Modularity
             jsonSerializerSettings = new JsonSerializerSettings
             {
                 Formatting = Formatting.Indented,
-                TypeNameHandling = TypeNameHandling.All,
-                TypeNameAssemblyFormat = FormatterAssemblyStyle.Simple,
-                Error = HandleSerializerError
+                TypeNameHandling = TypeNameHandling.Auto,
+                Error = HandleSerializerError,
             };
 
             converters.Items.ForEach(jsonSerializerSettings.Converters.Add);
@@ -94,12 +98,7 @@ namespace PoeShared.Modularity
             {
                 return;
             }
-
-            //FIXME Serializer errors should be treated appropriately, e.g. load value from default config on error
-            Log.Warn(
-                $"[PoeEyeConfigProviderFromFile.SerializerError] Suppresing serializer error ! Path: {args.ErrorContext.Path}, Member: {args.ErrorContext.Member}, Handled: {args.ErrorContext.Handled}",
-                args.ErrorContext.Error);
-            args.ErrorContext.Handled = true;
+            thrownExceptions.OnNext(args.ErrorContext);
         }
     }
 }
