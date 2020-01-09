@@ -25,6 +25,8 @@ namespace PoeShared.Prism
 
         public void OnInitialized(IContainerProvider containerProvider)
         {
+            var configSerializer = container.Resolve<IConfigSerializer>();
+            configSerializer.RegisterConverter(new PoeConfigConverter());
         }
     }
 }

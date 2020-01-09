@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Subjects;
+using System.Runtime.CompilerServices;
 using System.Text;
 using log4net;
 using PoeShared.Scaffolding;
@@ -56,6 +57,7 @@ namespace PoeShared.Modularity
 
         public IObservable<Unit> ConfigHasChanged => configHasChanged;
 
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public void Reload()
         {
             Log.Debug("Reloading configuration...");
@@ -67,7 +69,15 @@ namespace PoeShared.Modularity
                 .ToList()
                 .ForEach(x =>
                 {
-                    var configType = x.GetType().FullName;
+                    string configType;
+                    if (x is PoeConfigMetadata metadata)
+                    {
+                        configType = metadata.TypeName;
+                    }
+                    else
+                    {
+                        configType = x.GetType().FullName;
+                    }
                     if (string.IsNullOrEmpty(configType))
                     {
                         throw new ApplicationException($"Could not determine FullName for config {config.GetType()}");
@@ -79,6 +89,7 @@ namespace PoeShared.Modularity
             configHasChanged.OnNext(Unit.Default);
         }
 
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public void Save<TConfig>(TConfig config) where TConfig : IPoeEyeConfig, new()
         {
             var configType = config.GetType().FullName;
@@ -90,6 +101,7 @@ namespace PoeShared.Modularity
             Save();
         }
 
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public void Save()
         {
             var metaConfig = new PoeEyeCombinedConfig();
@@ -99,6 +111,7 @@ namespace PoeShared.Modularity
             SaveInternal(metaConfig);
         }
 
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public TConfig GetActualConfig<TConfig>() where TConfig : IPoeEyeConfig, new()
         {
             if (loadedConfigsByType.IsEmpty)
@@ -106,7 +119,23 @@ namespace PoeShared.Modularity
                 Reload();
             }
 
-            return (TConfig) loadedConfigsByType.GetOrAdd(typeof(TConfig).FullName, key => (TConfig) Activator.CreateInstance(typeof(TConfig)));
+            var configType = typeof(TConfig).FullName;
+            var config = loadedConfigsByType.GetOrAdd(configType, key => (TConfig) Activator.CreateInstance(typeof(TConfig)));
+
+            if (config is PoeConfigMetadata metadata)
+            {
+                Log.Warn($"Trying to re-serialize metadata type {metadata.TypeName} (v{metadata.Version}) {metadata.AssemblyName}...");
+                var serialized = configSerializer.Serialize(metadata);
+                if (string.IsNullOrEmpty(serialized))
+                {
+                    throw new ApplicationException($"Something went wrong when re-serializing metadata: {metadata}\n{metadata.ConfigValue}");
+                }
+                var deserialized = configSerializer.Deserialize<TConfig>(serialized);
+                loadedConfigsByType[configType] = deserialized;
+                return deserialized;
+            }
+            
+            return (TConfig) config;
         }
 
         private void SaveInternal(PoeEyeCombinedConfig config)

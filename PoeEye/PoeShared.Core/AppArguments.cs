@@ -15,6 +15,7 @@ namespace PoeShared
         public static AppArguments Instance => InstanceProducer.Value;
 
         private bool isDebugMode;
+        private bool isLazyMode;
         private bool isAutostart;
 
         private const string AutostartFlagValue = "autostart";
@@ -62,6 +63,13 @@ namespace PoeShared
         {
             get => isDebugMode;
             set => this.RaiseAndSetIfChanged(ref isDebugMode, value);
+        }
+        
+        [Option('l', "lazyMode", DefaultValue = false, HelpText = "Lazy mode - Prism modules will be loaded on-demand")]
+        public bool IsLazyMode
+        {
+            get => isLazyMode;
+            set => this.RaiseAndSetIfChanged(ref isLazyMode, value);
         }
 
         public static bool Parse(string[] args)
