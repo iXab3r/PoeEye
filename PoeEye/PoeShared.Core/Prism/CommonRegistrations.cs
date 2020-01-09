@@ -34,6 +34,7 @@ namespace PoeShared.Prism
                 .RegisterSingleton<IKeyboardEventsSource, KeyboardEventsSource>()
                 .RegisterSingleton<ISchedulerProvider, SchedulerProvider>()
                 .RegisterSingleton<IClipboardManager, ClipboardManager>()
+                .RegisterSingleton<IComparisonService, ComparisonService>()
                 .RegisterSingleton<IConfigSerializer, JsonConfigSerializer>()
                 .RegisterSingleton<IAudioNotificationsManager, AudioNotificationsManager>()
                 .RegisterSingleton<IAudioPlayer, AudioPlayer>()

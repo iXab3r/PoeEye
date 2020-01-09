@@ -13,6 +13,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
+using PoeShared.Services;
 using ReactiveUI;
 using Unity;
 
@@ -21,18 +22,8 @@ namespace PoeShared.Modularity
     public sealed class GenericConfigProvider<TConfig> : DisposableReactiveObject, IConfigProvider<TConfig> where TConfig : class, IPoeEyeConfig, new()
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(GenericConfigProvider<TConfig>));
-        
-        private readonly CompareLogic diffLogic = new CompareLogic(
-            new ComparisonConfig
-            {
-                DoublePrecision = 0.01,
-                MaxDifferences = byte.MaxValue,
-                ClassTypesToIgnore = new List<Type> { typeof(JToken), typeof(JValue), typeof(JProperty), typeof(JArray), typeof(JConstructor), typeof(JObject), typeof(JRaw) },
-                ShowBreadcrumb = true,
-                CompareStaticFields = false,
-                CompareStaticProperties = false,
-            });
 
+        private readonly IComparisonService comparisonService;
         private readonly IConfigProvider configProvider;
         private TConfig actualConfig;
         
@@ -40,12 +31,15 @@ namespace PoeShared.Modularity
         private int loadCommandCounter = 0;
 
         public GenericConfigProvider(
+            [NotNull] IComparisonService comparisonService,
             [NotNull] IConfigProvider configProvider,
             [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {
+            Guard.ArgumentNotNull(comparisonService, nameof(comparisonService));
             Guard.ArgumentNotNull(configProvider, nameof(configProvider));
             Guard.ArgumentNotNull(uiScheduler, nameof(uiScheduler));
 
+            this.comparisonService = comparisonService;
             this.configProvider = configProvider;
             configProvider.ConfigHasChanged
                 .ObserveOn(uiScheduler)
@@ -64,7 +58,7 @@ namespace PoeShared.Modularity
                         throw new ApplicationException($"Previous config instance is equal to the current one ! Instance: {x.DumpToTextRaw()}");
                     }
                 })
-                .Select(x => new {Config = x.curr, PreviousConfig = x.prev, ComparisonResult = diffLogic.Compare(x.curr, x.prev)})
+                .Select(x => new {Config = x.curr, PreviousConfig = x.prev, ComparisonResult = comparisonService.Compare(x.curr, x.prev)})
                 .Do(x => { LogActualConfigChange(x.PreviousConfig, x.Config, x.ComparisonResult); })
                 .Where(x => !x.ComparisonResult.AreEqual)
                 .Select(x => x.Config)
@@ -108,7 +102,7 @@ namespace PoeShared.Modularity
         {
             Guard.ArgumentNotNull(config, nameof(config));
 
-            var compare = diffLogic.Compare(ActualConfig, config);
+            var compare = comparisonService.Compare(ActualConfig, config);
 
             if (compare.AreEqual)
             {
