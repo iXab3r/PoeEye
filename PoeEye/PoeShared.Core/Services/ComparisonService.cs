@@ -13,7 +13,6 @@ namespace PoeShared.Services
                 DoublePrecision = 0.01,
                 MaxDifferences = byte.MaxValue,
                 ClassTypesToIgnore = new List<Type> { typeof(JToken), typeof(JValue), typeof(JProperty), typeof(JArray), typeof(JConstructor), typeof(JObject), typeof(JRaw) },
-                ShowBreadcrumb = true,
                 CompareStaticFields = false,
                 CompareStaticProperties = false,
                 DecimalPrecision = 0.01m,
