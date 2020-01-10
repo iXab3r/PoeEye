@@ -1,13 +1,18 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using PoeShared.Services;
 
 namespace PoeShared.Modularity
 {
     public class PoeConfigMetadata : IPoeEyeConfig
     {
         public string AssemblyName { get; set; }
+        
         public string TypeName { get; set; }
+        
         public int? Version { get; set; }
+        
+        [ComparisonIgnore]
         public JToken ConfigValue { get; set; }
 
         public override string ToString()
