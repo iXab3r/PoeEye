@@ -12,7 +12,7 @@ namespace PoeShared.Services
             {
                 DoublePrecision = 0.01,
                 MaxDifferences = byte.MaxValue,
-                ClassTypesToIgnore = new List<Type> { typeof(JToken), typeof(JValue), typeof(JProperty), typeof(JArray), typeof(JConstructor), typeof(JObject), typeof(JRaw) },
+                AttributesToIgnore = new List<Type> { typeof(ComparisonIgnoreAttribute) },
                 CompareStaticFields = false,
                 CompareStaticProperties = false,
                 DecimalPrecision = 0.01m,
@@ -20,7 +20,8 @@ namespace PoeShared.Services
         
         public ComparisonResult Compare(object first, object second)
         {
-            return diffLogic.Compare(first, second);
+            var result = diffLogic.Compare(first, second);
+            return result;
         }
     }
 }
