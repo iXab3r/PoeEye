@@ -33,18 +33,22 @@ namespace PoeShared.Modularity
         public GenericConfigProvider(
             [NotNull] IComparisonService comparisonService,
             [NotNull] IConfigProvider configProvider,
+            [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler,
             [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {
             Guard.ArgumentNotNull(comparisonService, nameof(comparisonService));
             Guard.ArgumentNotNull(configProvider, nameof(configProvider));
+            Guard.ArgumentNotNull(bgScheduler, nameof(bgScheduler));
             Guard.ArgumentNotNull(uiScheduler, nameof(uiScheduler));
 
             this.comparisonService = comparisonService;
             this.configProvider = configProvider;
+            
             configProvider.ConfigHasChanged
-                .ObserveOn(uiScheduler)
                 .StartWith(Unit.Default)
-                .Subscribe(ReloadInternal)
+                .ObserveOn(uiScheduler)
+                .Select(x => configProvider.GetActualConfig<TConfig>())
+                .Subscribe(x => ActualConfig = x)
                 .AddTo(Anchors);
 
             //FIXME Use ReplaySubject for propagating active config
@@ -71,6 +75,9 @@ namespace PoeShared.Modularity
 
             WhenChanged = changes;
             changes.Connect().AddTo(Anchors);
+            
+            Log.Debug($"Initial re-save of config to update format using {configProvider}");
+            configProvider.Save();
         }
 
         public TConfig ActualConfig
@@ -120,11 +127,6 @@ namespace PoeShared.Modularity
         {
             Log.Debug(
                 $"[{typeof(TConfig).Name}] Actual config updated(areEqual: {result.AreEqual})\nPrevious: {(previousConfig == null ? "NULL" : previousConfig.DumpToTextRaw())}\nCurrent: {(currentConfig == null ? "NULL" : currentConfig.DumpToTextRaw())}\nTime spent by comparer: {result.ElapsedMilliseconds}ms\n{result.DifferencesString}");
-        }
-
-        private void ReloadInternal()
-        {
-            ActualConfig = configProvider.GetActualConfig<TConfig>();
         }
     }
 }

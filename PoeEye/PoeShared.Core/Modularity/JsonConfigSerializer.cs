@@ -27,6 +27,7 @@ namespace PoeShared.Modularity
 
         public JsonConfigSerializer()
         {
+            RegisterConverter(new PoeConfigConverter());
             converters
                 .Connect()
                 .ToUnit()
