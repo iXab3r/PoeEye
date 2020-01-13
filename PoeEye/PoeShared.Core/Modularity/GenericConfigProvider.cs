@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reactive;
 using System.Reactive.Concurrency;
@@ -9,8 +8,6 @@ using System.Threading;
 using JetBrains.Annotations;
 using KellermanSoftware.CompareNetObjects;
 using log4net;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
 using PoeShared.Services;
@@ -44,14 +41,18 @@ namespace PoeShared.Modularity
             this.comparisonService = comparisonService;
             this.configProvider = configProvider;
             
-            configProvider.ConfigHasChanged
-                .StartWith(Unit.Default)
-                .ObserveOn(uiScheduler)
-                .Select(x => configProvider.GetActualConfig<TConfig>())
+            Observable.Merge(
+                    configProvider.ConfigHasChanged.ObserveOn(uiScheduler).ToUnit(),
+                    Observable.Return(Unit.Default))
+                .Select(
+                    x =>
+                    {
+                        Log.Debug("Reloading ActualConfig...");
+                        return configProvider.GetActualConfig<TConfig>();
+                    })
                 .Subscribe(x => ActualConfig = x)
                 .AddTo(Anchors);
 
-            //FIXME Use ReplaySubject for propagating active config
             var changes = this
                 .WhenAnyValue(x => x.ActualConfig)
                 .WithPrevious((prev, curr) => new {prev, curr})
