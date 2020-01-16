@@ -21,8 +21,6 @@ namespace PoeShared.Modularity
         private static readonly string DebugConfigFileName = @"configDebugMode.cfg";
         private static readonly string ReleaseConfigFileName = @"config.cfg";
 
-        private readonly string configFilePath;
-
         private readonly ISubject<Unit> configHasChanged = new Subject<Unit>();
         private readonly IConfigSerializer configSerializer;
 
@@ -31,15 +29,38 @@ namespace PoeShared.Modularity
         public ConfigProviderFromFile(IConfigSerializer configSerializer)
         {
             this.configSerializer = configSerializer;
+
+            string configFileName;
             if (AppArguments.Instance.IsDebugMode)
             {
                 Log.Info("Debug mode detected");
-                configFilePath = Path.Combine(ConfigFileDirectory, DebugConfigFileName);
+                configFileName = DebugConfigFileName;
             }
             else
             {
-                Log.Info("Release mode detected");
-                configFilePath = Path.Combine(ConfigFileDirectory, ReleaseConfigFileName);
+                Log.Info($"Release mode detected");
+                configFileName = ReleaseConfigFileName;
+            }
+
+            var candidates = new[]
+            {
+                AppDomain.CurrentDomain.BaseDirectory,
+                ConfigFileDirectory
+            }
+                .Select(x => Path.Combine(x, configFileName))
+                .Select(x => new { Path = x, Exists = File.Exists(x) })
+                .ToArray();
+            Log.Debug($"Configuration matrix, configuration file name: {configFileName}:\n\t{candidates.DumpToTable()}");
+            var existingFilePath = candidates.FirstOrDefault(x => x.Exists);
+            if (existingFilePath != null)
+            {
+                ConfigFilePath = existingFilePath.Path;
+                Log.Info($"Using existing configuration file @ {ConfigFilePath}");
+            }
+            else
+            {
+                ConfigFilePath = candidates.Last().Path;
+                Log.Info($"Configuration file not found, using path {ConfigFilePath}");
             }
 
             configSerializer.ThrownExceptions
@@ -48,12 +69,14 @@ namespace PoeShared.Modularity
                     {
                         //FIXME Serializer errors should be treated appropriately, e.g. load value from default config on error
                         Log.Warn(
-                            $"[PoeEyeConfigProviderFromFile.SerializerError] Suppresing serializer error ! Path: {errorContext.Path}, Member: {errorContext.Member}, Handled: {errorContext.Handled}",
+                            $"[PoeEyeConfigProviderFromFile.SerializerError] Suppressing serializer error ! Path: {errorContext.Path}, Member: {errorContext.Member}, Handled: {errorContext.Handled}",
                             errorContext.Error);
                         errorContext.Handled = true;
                     })
                 .AddTo(Anchors);
         }
+        
+        public string ConfigFilePath { get; }
 
         public IObservable<Unit> ConfigHasChanged => configHasChanged;
 
@@ -142,23 +165,23 @@ namespace PoeShared.Modularity
         {
             try
             {
-                Log.Debug($"Saving config to file '{configFilePath}'");
-                Log.Info($"Saving config to '{Path.GetFileName(configFilePath)}'");
+                Log.Debug($"Saving config to file '{ConfigFilePath}'");
+                Log.Info($"Saving config to '{Path.GetFileName(ConfigFilePath)}'");
 
                 Log.Debug("Serializing config data...");
                 var serializedData = configSerializer.Serialize(config);
 
                 Log.Debug($"Successfully serialized config, got {serializedData.Length} chars");
 
-                Log.Debug($"Writing config data to file '{configFilePath}'...");
+                Log.Debug($"Writing config data to file '{ConfigFilePath}'...");
 
-                var directoryPath = Path.GetDirectoryName(configFilePath);
+                var directoryPath = Path.GetDirectoryName(ConfigFilePath);
                 if (directoryPath != null && !Directory.Exists(directoryPath))
                 {
                     Directory.CreateDirectory(directoryPath);
                 }
 
-                File.WriteAllText(configFilePath, serializedData, Encoding.Unicode);
+                File.WriteAllText(ConfigFilePath, serializedData, Encoding.Unicode);
 
                 configHasChanged.OnNext(Unit.Default);
             }
@@ -170,20 +193,20 @@ namespace PoeShared.Modularity
 
         private PoeEyeCombinedConfig LoadInternal()
         {
-            Log.Debug($"Loading config from file '{configFilePath}'");
-            Log.Info($"Loading config from '{Path.GetFileName(configFilePath)}'");
+            Log.Debug($"Loading config from file '{ConfigFilePath}'");
+            Log.Info($"Loading config from '{Path.GetFileName(ConfigFilePath)}'");
             loadedConfigsByType.Clear();
 
-            if (!File.Exists(configFilePath))
+            if (!File.Exists(ConfigFilePath))
             {
-                Log.Debug($"File not found, fileName: '{configFilePath}'");
+                Log.Debug($"File not found, fileName: '{ConfigFilePath}'");
                 return new PoeEyeCombinedConfig();
             }
 
             PoeEyeCombinedConfig result = null;
             try
             {
-                var fileData = File.ReadAllText(configFilePath);
+                var fileData = File.ReadAllText(ConfigFilePath);
                 Log.Debug($"Successfully read {fileData.Length} chars, deserializing...");
 
                 result = configSerializer.Deserialize<PoeEyeCombinedConfig>(fileData);
@@ -202,16 +225,16 @@ namespace PoeShared.Modularity
         {
             try
             {
-                if (!File.Exists(configFilePath))
+                if (!File.Exists(ConfigFilePath))
                 {
                     return;
                 }
 
                 var backupFileName = Path.Combine(
-                    Path.GetDirectoryName(configFilePath),
-                    $"{Path.GetFileNameWithoutExtension(configFilePath)}.bak{Path.GetExtension(configFilePath)}");
-                Log.Debug($"Creating a backup of existing config data '{configFilePath}' to '{backupFileName}'");
-                File.Copy(configFilePath, backupFileName);
+                    Path.GetDirectoryName(ConfigFilePath),
+                    $"{Path.GetFileNameWithoutExtension(ConfigFilePath)}.bak{Path.GetExtension(ConfigFilePath)}");
+                Log.Debug($"Creating a backup of existing config data '{ConfigFilePath}' to '{backupFileName}'");
+                File.Copy(ConfigFilePath, backupFileName);
             }
             catch (Exception ex)
             {
