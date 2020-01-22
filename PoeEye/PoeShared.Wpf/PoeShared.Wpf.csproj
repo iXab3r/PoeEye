@@ -8,7 +8,7 @@
     <Copyright>Copyright © Xab3r 2019</Copyright>
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <UseWpf>true</UseWpf>
-    <Configurations>Debug</Configurations>
+    <Configurations>Debug;Release</Configurations>
     <Platforms>AnyCPU</Platforms>
     <LangVersion>8</LangVersion>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
