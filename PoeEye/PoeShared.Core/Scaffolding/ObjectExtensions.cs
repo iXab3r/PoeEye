@@ -38,22 +38,12 @@ namespace PoeShared.Scaffolding
             return instance == null ? $"null<{typeof(T).Name}>" : JsonConvert.SerializeObject(instance, settings);
         }
         
-        
         public static TItem AddTo<TItem, TCollection>(this TItem instance, ISourceList<TCollection> parent) where TItem : TCollection
         {
             Guard.ArgumentNotNull(instance, nameof(instance));
             Guard.ArgumentNotNull(parent, nameof(parent));
 
             parent.Add(instance);
-            return instance;
-        }
-        
-        public static TItem AddTo<TItem>(this TItem instance, IAddChild parent)
-        {
-            Guard.ArgumentNotNull(instance, nameof(instance));
-            Guard.ArgumentNotNull(parent, nameof(parent));
-
-            parent.AddChild(instance);
             return instance;
         }
         
