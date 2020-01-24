@@ -30,7 +30,13 @@ namespace PoeShared
         private AppArguments()
         {
             ProcessId = Process.GetCurrentProcess().Id;
-            IsElevated = UnsafeNative.IsElevated();
+            if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows))
+            {
+                IsElevated = UnsafeNative.IsElevated();
+            } else
+            {
+                IsElevated = true;
+            }
             var args = Environment.GetCommandLineArgs();
             StartupArgs = args.Skip(1)
                 .Where(x => !string.Equals(AutostartFlagValue, x, StringComparison.OrdinalIgnoreCase))
