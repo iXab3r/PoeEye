@@ -29,20 +29,16 @@ namespace PoeShared.Modularity
 
         public GenericConfigProvider(
             [NotNull] IComparisonService comparisonService,
-            [NotNull] IConfigProvider configProvider,
-            [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler,
-            [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
+            [NotNull] IConfigProvider configProvider)
         {
             Guard.ArgumentNotNull(comparisonService, nameof(comparisonService));
             Guard.ArgumentNotNull(configProvider, nameof(configProvider));
-            Guard.ArgumentNotNull(bgScheduler, nameof(bgScheduler));
-            Guard.ArgumentNotNull(uiScheduler, nameof(uiScheduler));
 
             this.comparisonService = comparisonService;
             this.configProvider = configProvider;
             
             Observable.Merge(
-                    configProvider.ConfigHasChanged.ObserveOn(uiScheduler).ToUnit(),
+                    configProvider.ConfigHasChanged.ToUnit(),
                     Observable.Return(Unit.Default))
                 .Select(
                     x =>

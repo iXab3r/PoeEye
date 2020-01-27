@@ -1,7 +1,7 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:viewModels="clr-namespace:PoeShared.Audio.ViewModels"
-                    xmlns:services="clr-namespace:PoeShared.Audio.Services;assembly=PoeShared">
+                    xmlns:services="clr-namespace:PoeShared.Audio.Services;assembly=PoeShared.Native">
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Converters.xaml" />

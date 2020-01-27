@@ -3,8 +3,7 @@ using System.Collections;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq.Expressions;
-
-using Guards.Extensions;
+using System.Reflection;
 using PoeShared.Scaffolding;
 
 namespace PoeShared

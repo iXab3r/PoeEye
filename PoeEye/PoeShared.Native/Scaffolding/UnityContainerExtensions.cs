@@ -5,22 +5,10 @@ using Unity.Injection;
 using Unity.Lifetime;
 using Unity.Resolution;
 
-namespace PoeShared.Scaffolding
+namespace PoeShared.Native.Scaffolding
 {
     public static class UnityContainerExtensions
     {
-        public static IUnityContainer RegisterSingleton<TTo>(this IUnityContainer instance, params Type[] types)
-        {
-            instance.RegisterSingleton(typeof(TTo));
-            
-            foreach (var type in types)
-            {
-                instance.RegisterFactory(type, container => container.Resolve(typeof(TTo)), new ContainerControlledLifetimeManager());
-            }
-
-            return instance;
-        }
-
         public static IUnityContainer RegisterWindowTracker(this IUnityContainer instance, string dependencyName,
             Func<string> windowNameFunc)
         {

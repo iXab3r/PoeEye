@@ -58,7 +58,6 @@
     <PackageReference Include="Unity.Container" Version="5.10.3" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="FodyWeavers.xml" />
     <EmbeddedResource Include="Resources\Notifications\mercury.wav" />
     <EmbeddedResource Include="Resources\Notifications\wob.wav" />
     <EmbeddedResource Include="Resources\Notifications\whistle.wav" />
@@ -76,5 +75,8 @@
   <ItemGroup>
     <Reference Include="System.Web" />
     <Reference Include="System.Security" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\PoeShared\PoeShared.csproj" />
   </ItemGroup>
 </Project>

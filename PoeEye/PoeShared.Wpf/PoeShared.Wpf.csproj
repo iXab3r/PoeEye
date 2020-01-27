@@ -72,6 +72,10 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\PoeShared.Core\PoeShared.csproj" />
+    <ProjectReference Include="..\PoeShared\PoeShared.csproj" />
+    <ProjectReference Include="..\PoeShared.Native\PoeShared.Native.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Services" />
   </ItemGroup>
 </Project>

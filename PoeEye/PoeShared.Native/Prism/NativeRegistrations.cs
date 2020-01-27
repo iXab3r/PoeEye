@@ -7,6 +7,7 @@ using PoeShared.Audio.Services;
 using PoeShared.Communications;
 using PoeShared.Modularity;
 using PoeShared.Native;
+using PoeShared.Native.Scaffolding;
 using PoeShared.Resources.Notifications;
 using PoeShared.Scaffolding;
 using PoeShared.Services;
@@ -19,35 +20,37 @@ using Unity.Resolution;
 
 namespace PoeShared.Prism
 {
-    public sealed class CommonRegistrations : UnityContainerExtension
+    public sealed class NativeRegistrations : UnityContainerExtension
     {
         protected override void Initialize()
         {
             Container
-                .RegisterSingleton<IClock, Clock>()
                 .RegisterSingleton<IStartupManager, StartupManager>()
-                .RegisterSingleton<PoeEyeModulesRegistrator>(typeof(IPoeEyeModulesRegistrator), typeof(IPoeEyeModulesEnumerator))
-                .RegisterSingleton(typeof(IConfigProvider<>), typeof(GenericConfigProvider<>))
                 .RegisterSingleton<IConverter<NameValueCollection, string>, NameValueCollectionToQueryStringConverter>()
                 .RegisterSingleton<IConverter<NameValueCollection, IEnumerable<KeyValuePair<string, string>>>, NameValueCollectionToQueryStringConverter>()
-                .RegisterSingleton<IRandomNumberGenerator, RandomNumberGenerator>()
                 .RegisterSingleton<IKeyboardEventsSource, KeyboardEventsSource>()
-                .RegisterSingleton<ISchedulerProvider, SchedulerProvider>()
                 .RegisterSingleton<IClipboardManager, ClipboardManager>()
                 .RegisterSingleton<IComparisonService, ComparisonService>()
-                .RegisterSingleton<IConfigSerializer, JsonConfigSerializer>()
                 .RegisterSingleton<IAudioNotificationsManager, AudioNotificationsManager>()
                 .RegisterSingleton<IAudioPlayer, AudioPlayer>()
+                .RegisterSingleton<IConfigSerializer, JsonConfigSerializer>()
+                .RegisterSingleton<IConverter<NameValueCollection, string>, NameValueCollectionToQueryStringConverter>()
+                .RegisterSingleton<IConverter<NameValueCollection, IEnumerable<KeyValuePair<string, string>>>, NameValueCollectionToQueryStringConverter>()
+                .RegisterSingleton(typeof(IConfigProvider<>), typeof(GenericConfigProvider<>))
                 .RegisterSingleton<IFactory<IWinEventHookWrapper, WinEventHookArguments>, WinEventHookWrapperFactory>();
 
             Container
-                .RegisterFactory<IScheduler>(WellKnownSchedulers.UI, x => RxApp.MainThreadScheduler)
-                .RegisterFactory<IScheduler>(WellKnownSchedulers.Background, x => RxApp.TaskpoolScheduler)
-                .RegisterType<IHttpClient, GenericHttpClient>()
-                .RegisterType(typeof(IFactory<,,,>), typeof(Factory<,,,>))
-                .RegisterType(typeof(IFactory<,,>), typeof(Factory<,,>))
-                .RegisterType(typeof(IFactory<,>), typeof(Factory<,>))
-                .RegisterType(typeof(IFactory<>), typeof(Factory<>));
+                .RegisterType<IHttpClient, GenericHttpClient>();
+            
+            Container.RegisterFactory<ISoundLibrarySource>(
+                unity => unity.Resolve<ComplexSoundLibrary>(
+                    new DependencyOverride<ISoundLibrarySource[]>(
+                        new ISoundLibrarySource[]
+                        {
+                            unity.Resolve<FileSoundLibrarySource>(),
+                            unity.Resolve<EmbeddedSoundLibrarySource>()
+                        }
+                    )),new ContainerControlledLifetimeManager());
 
             Container.RegisterWindowTracker(WellKnownWindows.AllWindows, () => ".*");
             Container.RegisterWindowTracker(WellKnownWindows.MainWindow, () =>
@@ -62,16 +65,6 @@ namespace PoeShared.Prism
                 return regex;
             });
             Container.RegisterWindowTracker(WellKnownWindows.PathOfExileWindow, () => "^Path of Exile$");
-            
-            Container.RegisterFactory<ISoundLibrarySource>(
-                unity => unity.Resolve<ComplexSoundLibrary>(
-                    new DependencyOverride<ISoundLibrarySource[]>(
-                        new ISoundLibrarySource[]
-                        {
-                            unity.Resolve<FileSoundLibrarySource>(),
-                            unity.Resolve<EmbeddedSoundLibrarySource>()
-                        }
-                    )),new ContainerControlledLifetimeManager());
         }
     }
 }

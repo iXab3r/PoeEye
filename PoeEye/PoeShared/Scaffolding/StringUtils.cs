@@ -237,24 +237,6 @@ namespace PoeShared.Scaffolding
         }
 
         /// <summary>
-        ///     Конвертирует указанную строку в C#-овый литерал, к примеру, заменяет переводы каретки на строку '\r'
-        /// </summary>
-        /// <param name="_input"></param>
-        /// <returns></returns>
-        public static string ToLiteral(string _input)
-        {
-            if (_input == null) throw new ArgumentNullException("_input");
-            using (var writer = new StringWriter())
-            {
-                using (var provider = CodeDomProvider.CreateProvider("CSharp"))
-                {
-                    provider.GenerateCodeFromExpression(new CodePrimitiveExpression(_input), writer, null);
-                    return writer.ToString();
-                }
-            }
-        }
-
-        /// <summary>
         ///     Склеивает указанные строки с использованием ListDelimiter'а в качестве разделителя элементов
         /// </summary>
         /// <param name="_list"></param>
