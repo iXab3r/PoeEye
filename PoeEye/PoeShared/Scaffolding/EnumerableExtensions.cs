@@ -61,7 +61,7 @@ namespace PoeShared.Scaffolding
             return enumerable;
         }
 
-        public static IEnumerable<T> ForEach<T>(this T[] enumerable, Action<T> action)
+        public static T[] ForEach<T>(this T[] enumerable, Action<T> action)
         {
             Guard.ArgumentNotNull(enumerable, nameof(enumerable));
 

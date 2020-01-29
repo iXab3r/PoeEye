@@ -41,6 +41,8 @@ namespace PoeShared.Prism
 
             Container
                 .RegisterType<IHttpClient, GenericHttpClient>();
+
+            Container.RegisterFactory<IAppArguments>(container => AppArguments.Instance);
             
             Container.RegisterFactory<ISoundLibrarySource>(
                 unity => unity.Resolve<ComplexSoundLibrary>(

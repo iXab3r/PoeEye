@@ -4,12 +4,13 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using CommandLine;
+using PoeShared.Modularity;
 using PoeShared.Native;
 using PoeShared.Scaffolding;
 
 namespace PoeShared
 {
-    public class AppArguments : DisposableReactiveObject
+    public class AppArguments : DisposableReactiveObject, IAppArguments
     {
         private static readonly Lazy<AppArguments> InstanceProducer = new Lazy<AppArguments>(() => new AppArguments());
         public static AppArguments Instance => InstanceProducer.Value;
