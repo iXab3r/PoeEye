@@ -184,7 +184,7 @@ namespace PoeShared.Communications
                 return;
             }
 
-            throw new HttpException((int) response.StatusCode, $"Wrong status code, expected 200 OK, got {response.StatusCode}");
+            throw new ArgumentException($"Wrong status code, expected 200 OK, got {response.StatusCode} ({response.StatusDescription})");
         }
     }
 }

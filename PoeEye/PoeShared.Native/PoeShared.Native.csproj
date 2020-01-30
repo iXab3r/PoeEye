@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <CefSharpAnyCpuSupport>true</CefSharpAnyCpuSupport>
-    <ProjectGuid>{12DF53DD-7144-4D2D-B7A1-B4BC5BBDFB69}</ProjectGuid>
-    <TargetFramework>net461</TargetFramework>
+    <ProjectGuid>{9AAA9005-0177-4F4C-B6DE-EB09037DB155}</ProjectGuid>
+    <TargetFrameworks>net461;netcoreapp3.0</TargetFrameworks>
     <AssemblyTitle>PoeShared</AssemblyTitle>
     <Product>PoeShared</Product>
     <Description>PoeEye Shared classes</Description>
@@ -29,7 +29,7 @@
     <PackageReference Include="MahApps.Metro" Version="1.4.3" />
     <PackageReference Include="MaterialDesignColors" Version="1.2.0" />
     <PackageReference Include="MaterialDesignThemes" Version="3.0.0-ci683" />
-    <PackageReference Include="Microsoft.CSharp" Version="4.0.1" />
+    <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
     <PackageReference Include="MouseKeyHook" Version="5.6.0" />
     <PackageReference Include="NAudio" Version="1.8.5" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
