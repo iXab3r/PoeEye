@@ -1,9 +1,9 @@
 using System.Windows.Input;
-using MicSwitch.WPF.Hotkeys;
 using NUnit.Framework;
+using PoeShared.UI.Hotkeys;
 using Shouldly;
 
-namespace MicSwitch.Tests.WPF.Hotkeys
+namespace PoeShared.Tests.WPF.Hotkeys
 {
     [TestFixture]
     public class HotkeyConverterTests
