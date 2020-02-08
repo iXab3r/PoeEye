@@ -7,6 +7,7 @@ using System.Reactive;
 using System.Reactive.Subjects;
 using System.Runtime.CompilerServices;
 using System.Text;
+using JetBrains.Annotations;
 using log4net;
 using PoeShared.Scaffolding;
 
@@ -23,6 +24,7 @@ namespace PoeShared.Modularity
         private readonly IConfigSerializer configSerializer;
 
         private readonly ConcurrentDictionary<string, IPoeEyeConfig> loadedConfigsByType = new ConcurrentDictionary<string, IPoeEyeConfig>();
+        private string loadedConfigurationFile;
 
         public ConfigProviderFromFile(
             IConfigSerializer configSerializer,
@@ -63,6 +65,11 @@ namespace PoeShared.Modularity
                 Log.Info($"Configuration file not found, using path {ConfigFilePath}");
             }
 
+            if (string.IsNullOrEmpty(ConfigFilePath))
+            {
+                throw new ApplicationException($"Failed to get configuration file path");
+            }
+
             configSerializer.ThrownExceptions
                 .Subscribe(
                     errorContext =>
@@ -76,7 +83,7 @@ namespace PoeShared.Modularity
                 .AddTo(Anchors);
         }
         
-        public string ConfigFilePath { get; }
+        public string ConfigFilePath { [NotNull] get; }
 
         public IObservable<Unit> ConfigHasChanged => configHasChanged;
 
@@ -86,7 +93,6 @@ namespace PoeShared.Modularity
             Log.Debug("Reloading configuration...");
 
             var config = LoadInternal();
-            loadedConfigsByType.Clear();
 
             config.Items
                 .ToList()
@@ -137,12 +143,18 @@ namespace PoeShared.Modularity
         [MethodImpl(MethodImplOptions.Synchronized)]
         public TConfig GetActualConfig<TConfig>() where TConfig : IPoeEyeConfig, new()
         {
-            if (loadedConfigsByType.IsEmpty)
+            var configType = typeof(TConfig).FullName;
+            if (string.IsNullOrEmpty(configType))
             {
+                throw new ApplicationException($"Failed to get {nameof(Type.FullName)} of type {typeof(TConfig)}");
+            }
+
+            if (loadedConfigurationFile == null)
+            {
+                Log.Info($"Forcing to load initial configuration from file");
                 Reload();
             }
 
-            var configType = typeof(TConfig).FullName;
             var config = loadedConfigsByType.GetOrAdd(configType, key => (TConfig) Activator.CreateInstance(typeof(TConfig)));
 
             if (config is PoeConfigMetadata metadata)
@@ -196,6 +208,7 @@ namespace PoeShared.Modularity
             Log.Debug($"Loading config from file '{ConfigFilePath}'");
             Log.Info($"Loading config from '{Path.GetFileName(ConfigFilePath)}'");
             loadedConfigsByType.Clear();
+            loadedConfigurationFile = string.Empty;
 
             if (!File.Exists(ConfigFilePath))
             {
@@ -208,6 +221,7 @@ namespace PoeShared.Modularity
             {
                 var fileData = File.ReadAllText(ConfigFilePath);
                 Log.Debug($"Successfully read {fileData.Length} chars, deserializing...");
+                loadedConfigurationFile = fileData;
 
                 result = configSerializer.Deserialize<PoeEyeCombinedConfig>(fileData);
                 Log.Debug("Successfully deserialized config data");
@@ -230,11 +244,16 @@ namespace PoeShared.Modularity
                     return;
                 }
 
-                var backupFileName = Path.Combine(
+                var backupFilePath = Path.Combine(
                     Path.GetDirectoryName(ConfigFilePath),
-                    $"{Path.GetFileNameWithoutExtension(ConfigFilePath)}.bak{Path.GetExtension(ConfigFilePath)}");
-                Log.Debug($"Creating a backup of existing config data '{ConfigFilePath}' to '{backupFileName}'");
-                File.Copy(ConfigFilePath, backupFileName);
+                    $"{ConfigFilePath}.bak");
+                Log.Debug($"Creating a backup of existing config data '{ConfigFilePath}' to '{backupFilePath}' (backup exists: {File.Exists(backupFilePath)})");
+                if (File.Exists(backupFilePath))
+                {
+                    Log.Debug($"Removing backup file {backupFilePath}...");
+                    File.Delete(backupFilePath);
+                }
+                File.Move(ConfigFilePath, backupFilePath);
             }
             catch (Exception ex)
             {

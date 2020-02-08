@@ -79,11 +79,17 @@ namespace PoeShared.Modularity
                 metadata = serializer.Deserialize<PoeConfigMetadata>(reader);
             }
 
+            if (metadata == null)
+            {
+                Log.Warn($"Failed to convert type {objectType}, returning empty object instead");
+                return null;
+            }
+
             if (typeof(PoeConfigMetadata) == objectType)
             {
                 return metadata;
             }
-
+            
             if (!loadedAssemblyByName.TryGetValue(metadata.AssemblyName, out var assembly))
             {
                 assembly = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(x => x.GetName().Name == metadata.AssemblyName);
