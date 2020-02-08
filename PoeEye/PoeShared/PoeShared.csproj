@@ -4,32 +4,8 @@
         <TargetFrameworks>netstandard2.1;net461;netcoreapp3.0</TargetFrameworks>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="CommandLineParser" Version="1.9.71" />
-        <PackageReference Include="CommonServiceLocator" Version="2.0.4" />
-        <PackageReference Include="DynamicData" Version="6.13.13" />
-        <PackageReference Include="JetBrains.Annotations" Version="2019.1.3" />
-        <PackageReference Include="JsonFx" Version="2.0.1209.2802" />
-        <PackageReference Include="log4net" Version="2.0.8" />
-        <PackageReference Include="CompareNETObjects" Version="4.65.0" />
 
         <PackageReference Include="ReactiveUI" Version="10.4.1" />
-        <PackageReference Include="Splat.Drawing" Version="9.1.1" />
-        <PackageReference Include="Splat" Version="9.1.1" />
-        
-        <PackageReference Include="PInvoke.DwmApi" Version="0.6.6" />
-        <PackageReference Include="PInvoke.Kernel32" Version="0.6.6" />
-        <PackageReference Include="PInvoke.User32" Version="0.6.6" />
-
-
-        <PackageReference Include="Unity" Version="5.10.3" />
-        <PackageReference Include="Unity.Abstractions" Version="4.1.3" />
-        <PackageReference Include="Unity.Container" Version="5.10.3" />
-
-
-        <PackageReference Include="System.Reactive" Version="4.2.0" />
-        <PackageReference Include="System.Reflection.Emit" Version="4.3.0" />
-        <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.3" />
-        <PackageReference Include="System.ValueTuple" Version="4.5.0" />
 
         <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
     </ItemGroup>
