@@ -10,6 +10,8 @@ namespace PoeShared.Modularity
         
         bool IsDebugMode { get; }
         
+        bool IsElevated { get; }
+        
         string AutostartFlag { [CanBeNull] get; }
         
         string ApplicationExecutableName { [CanBeNull] get; }

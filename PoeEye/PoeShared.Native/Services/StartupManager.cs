@@ -4,6 +4,7 @@ using System.Windows.Forms;
 
 using JetBrains.Annotations;
 using log4net;
+using PoeShared.Modularity;
 using PoeShared.Scaffolding;
 using ReactiveUI;
 using StartupHelper;
@@ -13,13 +14,16 @@ namespace PoeShared.Services
     internal sealed class StartupManager : DisposableReactiveObject, IStartupManager
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(StartupManager));
+        private readonly IAppArguments appArguments;
         private readonly StartupManagerArgs args;
 
         private readonly StartupHelper.StartupManager manager;
         
         public StartupManager(
+            [NotNull] IAppArguments appArguments,
             [NotNull] StartupManagerArgs args)
         {
+            Guard.ArgumentNotNull(appArguments, nameof(appArguments));
             Guard.ArgumentNotNull(args, nameof(args));
             Log.Debug($"Creating startup helper using args: {args.DumpToTextRaw()}...");
 
@@ -27,6 +31,7 @@ namespace PoeShared.Services
             Guard.ArgumentNotNull(args.UniqueAppName, nameof(args.UniqueAppName));
             Guard.ArgumentNotNull(args.CommandLineArgs, nameof(args.CommandLineArgs));
 
+            this.appArguments = appArguments;
             this.args = args;
             manager = new StartupHelper.StartupManager(
                 args.ExecutablePath,
@@ -36,13 +41,30 @@ namespace PoeShared.Services
                 args.AutostartFlag ?? AppArguments.Instance.AutostartFlag);    
             
             Log.Debug($"Manager parameters: {new { ArgsCommandLine = args.CommandLineArgs, manager.IsRegistered, manager.Name, manager.ApplicationImage, manager.RegistrationScope, manager.IsStartedUp, manager.NeedsAdministrativePrivileges, manager.Provider, manager.WorkingDirectory, CommandLineArgs = String.Join(" ", manager.CommandLineArguments), manager.StartupSpecialArgument }}");
-            Reregister();
+
+            if (IsElevated)
+            {
+                Log.Warn($"Application has Admin privileges, initializing startup manager");
+
+                Reregister();
+            }
+            else
+            {
+                Log.Warn($"Manager is not available due to lack of Admin privileges");
+            }
         }
 
         public bool IsRegistered => manager.IsRegistered;
 
+        public bool IsElevated => appArguments.IsElevated;
+
         public bool Register()
         {
+            if (!IsElevated)
+            {
+                throw new InvalidOperationException("Operation is not available without Admin permissions");
+            }
+            
             Log.Debug($"Registering application as {manager.Name} (dir {manager.WorkingDirectory})");
             var result = manager.Register(args.CommandLineArgs);
             if (!result)
@@ -60,6 +82,11 @@ namespace PoeShared.Services
         
         public bool Unregister()
         {
+            if (!IsElevated)
+            {
+                throw new InvalidOperationException("Operation is not available without Admin permissions");
+            }
+            
             Log.Debug($"Unregistering application as {manager.Name} (dir {manager.WorkingDirectory})");
 
             var result = manager.Unregister();
