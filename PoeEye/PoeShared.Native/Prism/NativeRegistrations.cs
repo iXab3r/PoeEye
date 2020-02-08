@@ -12,7 +12,6 @@ using PoeShared.Resources.Notifications;
 using PoeShared.Scaffolding;
 using PoeShared.Services;
 using ReactiveUI;
-using TypeConverter;
 using Unity;
 using Unity.Extension;
 using Unity.Lifetime;

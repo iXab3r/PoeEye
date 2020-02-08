@@ -2,7 +2,7 @@
 using System.Collections.Specialized;
 using System.Linq;
 using System.Web;
-using TypeConverter;
+using PoeShared.Prism;
 
 namespace PoeShared.Communications
 {

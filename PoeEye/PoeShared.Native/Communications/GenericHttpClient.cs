@@ -7,13 +7,12 @@ using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Text;
-using System.Web;
 using CsQuery.ExtensionMethods.Internal;
 
 using JetBrains.Annotations;
 using log4net;
+using PoeShared.Prism;
 using PoeShared.Scaffolding;
-using TypeConverter;
 
 namespace PoeShared.Communications
 {
