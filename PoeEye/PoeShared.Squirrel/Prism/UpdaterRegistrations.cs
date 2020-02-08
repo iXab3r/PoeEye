@@ -9,6 +9,7 @@ namespace PoeShared.Squirrel.Prism
         protected override void Initialize()
         {
             Container
+                .RegisterSingleton<IUpdateSourceProvider, UpdateSourceProviderFromConfig>()
                 .RegisterType<IApplicationUpdaterViewModel, ApplicationUpdaterViewModel>()
                 .RegisterType<IApplicationUpdaterModel, ApplicationUpdaterModel>();
         }

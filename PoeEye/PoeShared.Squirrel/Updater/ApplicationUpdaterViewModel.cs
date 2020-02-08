@@ -27,18 +27,18 @@ namespace PoeShared.Squirrel.Updater
         public ApplicationUpdaterViewModel(
             [NotNull] IApplicationUpdaterModel updaterModel,
             [NotNull] IConfigProvider<UpdateSettingsConfig> configProvider,
+            [NotNull] IUpdateSourceProvider updateSourceProvider,
             [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler,
             [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler)
         {
             Guard.ArgumentNotNull(updaterModel, nameof(updaterModel));
             Guard.ArgumentNotNull(uiScheduler, nameof(uiScheduler));
             Guard.ArgumentNotNull(bgScheduler, nameof(bgScheduler));
-            Guard.ArgumentNotNull(configProvider, nameof(configProvider));
 
             this.updaterModel = updaterModel;
 
             CheckForUpdatesCommand = CommandWrapper
-                .Create(CheckForUpdatesCommandExecuted);
+                .Create(CheckForUpdatesCommandExecuted, updaterModel.WhenAnyValue(x => x.UpdateSource).Select(x => x.IsValid));
 
             CheckForUpdatesCommand
                 .ThrownExceptions
@@ -59,8 +59,8 @@ namespace PoeShared.Squirrel.Updater
                 .Subscribe(ex => SetError($"Restart error: {ex.Message}"))
                 .AddTo(Anchors);
 
-            configProvider
-                .ListenTo(x => x.UpdateSource)
+            updateSourceProvider
+                .WhenAnyValue(x => x.UpdateSource)
                 .Subscribe(x => updaterModel.UpdateSource = x)
                 .AddTo(Anchors);
 
@@ -77,6 +77,7 @@ namespace PoeShared.Squirrel.Updater
                         .ToUnit(),
                     updaterModel.WhenAnyProperty(x => x.UpdateSource).ToUnit())
                 .ObserveOn(uiScheduler)
+                .Where(x => CheckForUpdatesCommand.CanExecute(null))
                 .Subscribe(() => CheckForUpdatesCommand.Execute(null), Log.HandleException)
                 .AddTo(Anchors);
 
