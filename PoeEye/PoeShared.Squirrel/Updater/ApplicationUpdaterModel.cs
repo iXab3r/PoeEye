@@ -20,7 +20,7 @@ namespace PoeShared.Squirrel.Updater
         private readonly IAppArguments appArguments;
         private static readonly ILog Log = LogManager.GetLogger(typeof(ApplicationUpdaterModel));
 
-        private static readonly string ApplicationName = Process.GetCurrentProcess().ProcessName + ".exe";
+        private static readonly string DotnetCoreRunnerName = "dotnet.exe";
         private static readonly string UpdaterExecutableName = "update.exe";
         
         private UpdateInfo latestVersion;
@@ -41,7 +41,30 @@ namespace PoeShared.Squirrel.Updater
 
             MostRecentVersionAppFolder = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
             UpdatedVersion = null;
+            
+            var currentProcessName = Process.GetCurrentProcess().ProcessName + ".exe";
+            Log.Debug($"Initializing ApplicationName, processName: {currentProcessName}, appArguments executable: {appArguments.ApplicationExecutableName}");
+            if (string.Equals(DotnetCoreRunnerName, currentProcessName, StringComparison.OrdinalIgnoreCase))
+            {
+                Log.Debug($"Detected that Application is running using .net core runner ({DotnetCoreRunnerName})");
+
+                if (string.IsNullOrEmpty(appArguments.ApplicationExecutableName) || Path.GetExtension(appArguments.ApplicationExecutableName) != ".dll")
+                {
+                    throw new NotSupportedException("Could not determine application name, expected either .dll with .net runner or raw executable (.exe)");
+                }
+                
+                Log.Debug($"Extracting application executable name from {appArguments.ApplicationExecutableName}");
+                var executableName = Path.ChangeExtension(appArguments.ApplicationExecutableName, ".exe");
+                ApplicationExecutableFileName = executableName;
+            }
+            else
+            {
+                ApplicationExecutableFileName = currentProcessName;
+            }
+            Log.Debug($"Application will be restarted via executing {ApplicationExecutableFileName}");
         }
+        
+        public string ApplicationExecutableFileName { get; }
 
         public DirectoryInfo MostRecentVersionAppFolder
         {
@@ -163,7 +186,7 @@ namespace PoeShared.Squirrel.Updater
             
             var executableArgs = GetRestartApplicationArgs();
             Log.Debug(
-                $"Restarting app, folder: {mostRecentVersionAppFolder}, appName: {ApplicationName}, {executableArgs}...");
+                $"Restarting app, folder: {mostRecentVersionAppFolder}, appName: {ApplicationExecutableFileName}, {executableArgs}...");
 
             var squirrelUpdater = GetSquirrelUpdateExeOrThrow();
             var squirrelArgs = $"--processStartAndWait {executableArgs.exePath}";
@@ -307,8 +330,8 @@ namespace PoeShared.Squirrel.Updater
         
         public (string exePath, string exeArgs) GetRestartApplicationArgs()
         {
-            var appExecutable = new FileInfo(Path.Combine(mostRecentVersionAppFolder.FullName, appArguments.ApplicationExecutableName));
-            Log.Debug($"[ApplicationUpdaterModel] Restarting app, folder: {mostRecentVersionAppFolder}, appName: { appArguments.ApplicationExecutableName}, exePath: {appExecutable}(exists: {appExecutable.Exists})...");
+            var appExecutable = new FileInfo(Path.Combine(mostRecentVersionAppFolder.FullName, ApplicationExecutableFileName));
+            Log.Debug($"[ApplicationUpdaterModel] Restarting app, folder: {mostRecentVersionAppFolder}, appName: { ApplicationExecutableFileName}, exePath: {appExecutable}(exists: {appExecutable.Exists})...");
 
             if (!appExecutable.Exists)
             {
