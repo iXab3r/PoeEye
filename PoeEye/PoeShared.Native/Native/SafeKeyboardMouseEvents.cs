@@ -32,15 +32,19 @@ namespace PoeShared.Native
             Log.Debug("Mouse&keyboard event source initialization started");
 
             this.clock = clock;
-
-            var mouseHookSource = Observable
-                .Using(Hook.GlobalEvents, HookMouse)
+            
+            WhenMouseMove = Observable
+                .Using(Hook.GlobalEvents, HookMouseMove)
                 .Publish()
-                .RefCount();
-            WhenMouseMove = mouseHookSource
+                .RefCount()
                 .Where(x => x.EventType == InputEventType.MouseMove && x.EventArgs is MouseEventArgs)
                 .Select(x => x.EventArgs as MouseEventArgs)
                 .DistinctUntilChanged(args => new { args.X, args.Y, args.Button, args.Clicks });
+            
+            var mouseHookSource = Observable
+                .Using(Hook.GlobalEvents, HookMouseButtons)
+                .Publish()
+                .RefCount();
             
             WhenMouseUp = mouseHookSource
                 .Where(x => x.EventType == InputEventType.MouseUp && x.EventArgs is MouseEventArgs)
@@ -78,43 +82,37 @@ namespace PoeShared.Native
 
         public bool RealtimeMode { get; } = true;
 
-        private IObservable<InputEventData> HookMouse(IKeyboardMouseEvents source)
+        private IObservable<InputEventData> HookMouseButtons(IKeyboardMouseEvents source)
         {
-            return Observable.Create<InputEventData>(subscriber =>
-            {
-                Log.Info("Configuring Mouse hook...");
-                var sw = Stopwatch.StartNew();
-                var activeAnchors = new CompositeDisposable();
-                Disposable.Create(() => Log.Info("Disposing Mouse hook")).AddTo(activeAnchors);
-
-                InitializeMouseHook(source)
-                    .Do(LogEvent, Log.HandleException, () => Log.Debug("Mouse event loop completed"))
-                    .Subscribe(subscriber)
-                    .AddTo(activeAnchors);
-                
-                sw.Stop();
-                Log.Debug($"Mouse hook configuration took {sw.ElapsedMilliseconds:F0}ms");
-                
-                return activeAnchors;
-            });
+            return PrepareHook( "MouseButtons", () => InitializeMouseButtonsHook(source));
+        }
+        
+        private IObservable<InputEventData> HookMouseMove(IKeyboardMouseEvents source)
+        {
+            return PrepareHook( "MouseMove", () => InitializeMouseMoveHook(source));
         }
         
         private IObservable<InputEventData> HookKeyboard(IKeyboardMouseEvents source)
         {
+            return PrepareHook( "Keyboard", () => InitializeKeyboardHook(source));
+        }
+        
+        private static IObservable<InputEventData> PrepareHook(string hookName, Func<IObservable<InputEventData>> hookMethod)
+        {
             return Observable.Create<InputEventData>(subscriber =>
             {
-                Log.Info("Configuring Keyboard hook...");
+                Log.Info($"Configuring {hookName} hook...");
                 var sw = Stopwatch.StartNew();
                 var activeAnchors = new CompositeDisposable();
-                Disposable.Create(() => Log.Info("Disposing Keyboard hook")).AddTo(activeAnchors);
+                Disposable.Create(() => Log.Info($"Disposing {hookName} hook")).AddTo(activeAnchors);
 
-                InitializeKeyboardHook(source)
-                    .Do(LogEvent, Log.HandleException, () => Log.Debug("Keyboard event loop completed"))
+                hookMethod()
+                    .Do(LogEvent, Log.HandleException, () => Log.Debug($"{hookName} event loop completed"))
                     .Subscribe(subscriber)
                     .AddTo(activeAnchors);
                 
                 sw.Stop();
-                Log.Debug($"Keyboard hook configuration took {sw.ElapsedMilliseconds:F0}ms");
+                Log.Debug($"{hookName} hook configuration took {sw.ElapsedMilliseconds:F0}ms");
                 
                 return activeAnchors;
             });
@@ -146,10 +144,10 @@ namespace PoeShared.Native
 
             return Observable.Merge(keyDown, keyUp, keyPress);
         }
-
-        private IObservable<InputEventData> InitializeMouseHook(IMouseEvents mouseEvents)
+        
+        private IObservable<InputEventData> InitializeMouseButtonsHook(IMouseEvents mouseEvents)
         {
-            Log.Debug($"Hooking Mouse: {mouseEvents}");
+            Log.Debug($"Hooking Mouse buttons: {mouseEvents}");
 
             var mouseDown = Observable
                 .FromEventPattern<EventHandler<MouseEventExtArgs>, MouseEventExtArgs>(
@@ -165,6 +163,13 @@ namespace PoeShared.Native
                 .Select(x => x.EventArgs)
                 .Select(x => ToInputEventData(x, InputEventType.MouseUp));
 
+            return Observable.Merge(mouseDown, mouseUp);
+        }
+
+        private IObservable<InputEventData> InitializeMouseMoveHook(IMouseEvents mouseEvents)
+        {
+            Log.Debug($"Hooking Mouse Move (possible performance hit !): {mouseEvents}");
+
             var mouseMove = Observable
                 .FromEventPattern<EventHandler<MouseEventExtArgs>, MouseEventExtArgs>(
                     h => mouseEvents.MouseMoveExt += h,
@@ -173,7 +178,7 @@ namespace PoeShared.Native
                 .Select(EnrichMouseMove)
                 .Select(x => ToInputEventData(x, InputEventType.MouseMove));
 
-            return Observable.Merge(mouseDown, mouseMove, mouseUp);
+            return mouseMove;
         }
         
         private InputEventData ToInputEventData(EventArgs args, InputEventType eventType)
