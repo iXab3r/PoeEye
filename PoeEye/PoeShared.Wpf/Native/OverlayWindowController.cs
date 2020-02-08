@@ -35,7 +35,7 @@ namespace PoeShared.Native
         private readonly string uniqueControllerId = Guid.NewGuid().ToString();
 
         private bool isVisible;
-        private bool isEnabled;
+        private bool isEnabled = true;
         private bool showWireframes;
 
         public OverlayWindowController(

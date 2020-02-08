@@ -10,9 +10,8 @@
     </ResourceDictionary.MergedDictionaries>
 
     <DataTemplate DataType="{x:Type viewModels:AudioNotificationSelectorViewModel}">
-        <Grid>
+        <Viewbox>
             <ToggleButton IsChecked="{Binding AudioEnabled}"
-                          Width="40" Height="40"
                           FontFamily="{StaticResource FontAwesome}"
                           ToolTipService.HorizontalOffset="10" ToolTipService.VerticalOffset="10"
                           Focusable="False">
@@ -34,13 +33,12 @@
                     <ContextMenu ItemsSource="{Binding Items}">
                         <ContextMenu.ItemTemplate>
                             <DataTemplate>
-                                <StackPanel Orientation="Horizontal">
+                                <StackPanel Orientation="Horizontal" Margin="1">
                                     <Button Command="{Binding PlayNotificationCommand}" CommandParameter="{Binding}"
                                             Content="&#xf144;"
                                             Width="30" Height="30"
                                             BorderThickness="1"
                                             FontFamily="{StaticResource FontAwesome}"
-                                            BorderBrush="{StaticResource MouseOverAccentBrushKey}"
                                             Style="{StaticResource CircleButton}" />
                                     <CheckBox IsEnabled="False" IsChecked="{Binding IsSelected, Mode=OneWay}" />
                                     <TextBlock Style="{StaticResource IconTextBlock}" Text="{Binding Name}" />
@@ -58,6 +56,6 @@
                     </ContextMenu>
                 </ToggleButton.ContextMenu>
             </ToggleButton>
-        </Grid>
+        </Viewbox>
     </DataTemplate>
 </ResourceDictionary>

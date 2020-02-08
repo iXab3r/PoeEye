@@ -59,7 +59,7 @@ namespace PoeShared.Native
         {
             var downscaledFrame = frame;
             // downscaling frame as we do not require for FULL frame to be visible, only top-left part of it
-            downscaledFrame.Size = frame.Size.Scale(0.5);
+            downscaledFrame.Size = frame.Size.Scale(0.25);
 
             return double.IsNaN(frame.X) ||
                    double.IsNaN(frame.Y) ||

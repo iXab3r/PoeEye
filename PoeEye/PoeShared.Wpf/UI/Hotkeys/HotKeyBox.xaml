@@ -5,6 +5,7 @@
                     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.textbox.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.textblock.xaml" />
     </ResourceDictionary.MergedDictionaries>
     
     <Style TargetType="{x:Type hotkeys1:HotKeyBox}">
@@ -21,6 +22,7 @@
         <Setter Property="SnapsToDevicePixels" Value="True" />
         <Setter Property="AcceptsReturn" Value="True"/>
         <Setter Property="AcceptsTab" Value="True"/>
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
         <Setter Property="ToolTip" Value="Press Backspace to clear Hotkey"/>
         <Setter Property="Template">
             <Setter.Value>

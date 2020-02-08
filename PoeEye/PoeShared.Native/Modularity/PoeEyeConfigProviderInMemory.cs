@@ -13,9 +13,11 @@ namespace PoeShared.Modularity
         private readonly ISubject<Unit> configHasChanged = new Subject<Unit>();
         private readonly ConcurrentDictionary<Type, IPoeEyeConfig> loadedConfigs = new ConcurrentDictionary<Type, IPoeEyeConfig>();
 
-        public PoeEyeConfigProviderInMemory()
+        public PoeEyeConfigProviderInMemory(IAppArguments appArguments)
         {
-            if (AppArguments.Instance.IsDebugMode)
+            Guard.ArgumentNotNull(appArguments, nameof(appArguments));
+            
+            if (appArguments.IsDebugMode)
             {
                 Log.Debug("[PoeEyeConfigProviderInMemory..ctor] Debug mode detected");
             }
@@ -49,11 +51,6 @@ namespace PoeShared.Modularity
 
         public TConfig GetActualConfig<TConfig>() where TConfig : IPoeEyeConfig, new()
         {
-            if (loadedConfigs.IsEmpty)
-            {
-                Reload();
-            }
-
             return (TConfig) loadedConfigs.GetOrAdd(typeof(TConfig), key => (TConfig) Activator.CreateInstance(typeof(TConfig)));
         }
     }

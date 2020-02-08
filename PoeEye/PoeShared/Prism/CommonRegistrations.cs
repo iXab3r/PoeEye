@@ -1,4 +1,5 @@
-﻿using Unity;
+﻿using PoeShared.Modularity;
+using Unity;
 using Unity.Extension;
 
 namespace PoeShared.Prism
