@@ -58,8 +58,6 @@
     <EmbeddedResource Include="Resources\Notifications\dingdong.wav" />
     <EmbeddedResource Include="Resources\Notifications\bell.wav" />
     <Resource Include="Resources\mainIcon.png" />
-    <Resource Include="Resources\mouse-device-left-click-control.png" />
-    <Resource Include="Resources\mouse-device-right-click-control.png" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System.Web" />

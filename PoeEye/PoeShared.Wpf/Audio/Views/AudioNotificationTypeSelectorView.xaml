@@ -2,7 +2,8 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:viewModels="clr-namespace:PoeShared.Audio.ViewModels"
                     xmlns:services="clr-namespace:PoeShared.Audio.Services;assembly=PoeShared.Native"
-                    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
+                    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+                    xmlns:ui="clr-namespace:PoeShared.UI">
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Converters.xaml" />
@@ -12,12 +13,12 @@
     </ResourceDictionary.MergedDictionaries>
 
     <DataTemplate DataType="{x:Type viewModels:AudioNotificationSelectorViewModel}">
-        <Viewbox ToolTipService.HorizontalOffset="10" ToolTipService.VerticalOffset="10"
-                 ToolTip="{Binding SelectedValue, Mode=OneWay}">
+        <Viewbox >
             <ToggleButton IsChecked="{Binding AudioEnabled}"
                           FontFamily="{StaticResource FontAwesome}"
                           Focusable="False"
                           Content="&#xf05e;"
+                          ToolTipService.HorizontalOffset="10" ToolTipService.VerticalOffset="10"
                           materialDesign:ToggleButtonAssist.OnContent="&#xf028;">
                 <ToggleButton.Style>
                     <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource ToggleCircleButton}">
@@ -59,6 +60,16 @@
 
                     </ContextMenu>
                 </ToggleButton.ContextMenu>
+                
+                <ToggleButton.ToolTip>
+                    <ui:MouseButtonsTooltip
+                        LeftButton="Enable/Disable Audio notification"
+                        RightButton="Select Audio notification">
+                        <ui:MouseButtonsTooltip.MouseToolTip>
+                            <TextBlock Text="{Binding SelectedValue, Mode=OneWay, StringFormat='Notification: {0}'}"></TextBlock>
+                        </ui:MouseButtonsTooltip.MouseToolTip>
+                    </ui:MouseButtonsTooltip>
+                </ToggleButton.ToolTip>
             </ToggleButton>
         </Viewbox>
     </DataTemplate>

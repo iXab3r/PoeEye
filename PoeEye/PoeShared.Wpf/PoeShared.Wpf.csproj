@@ -58,6 +58,7 @@
     <ProjectReference Include="..\PoeShared.Native\PoeShared.Native.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Services" />
+    <Resource Include="Resources\mouse-device-left-click-control.png" />
+    <Resource Include="Resources\mouse-device-right-click-control.png" />
   </ItemGroup>
 </Project>
