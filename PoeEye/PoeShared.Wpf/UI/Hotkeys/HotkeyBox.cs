@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Forms;
@@ -15,6 +17,7 @@ namespace PoeShared.UI.Hotkeys
     public class HotKeyBox : Control
     {
         private const string PART_TextBox = "PART_TextBox";
+        public static readonly ISet<Key> EscapeKeys = new HashSet<Key> { Key.Escape, Key.Back };
 
         public static readonly DependencyProperty HotKeyProperty = DependencyProperty.Register(
             "HotKey",
@@ -231,15 +234,15 @@ namespace PoeShared.UI.Hotkeys
                 case Key.RightAlt:
                 case Key.RWin:
                 case Key.LWin:
-                case Key keyTab when keyTab == Key.Tab && !AcceptsTab:
-                case Key keyReturn when keyReturn == Key.Return && !AcceptsReturn:
+                case { } keyTab when keyTab == Key.Tab && !AcceptsTab:
+                case { } keyReturn when keyReturn == Key.Return && !AcceptsReturn:
                     return;
             }
 
             e.Handled = true;
 
             var currentModifierKeys = GetCurrentModifierKeys();
-            if (currentModifierKeys == ModifierKeys.None && key == Key.Back)
+            if (currentModifierKeys == ModifierKeys.None && EscapeKeys.Contains(key))
             {
                 HotKey = null;
             }

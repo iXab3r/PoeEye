@@ -51,7 +51,7 @@
                         </ContextMenu.ItemTemplate>
 
                         <ContextMenu.ItemContainerStyle>
-                            <Style TargetType="{x:Type MenuItem}">
+                            <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource MaterialDesignMenuItem}">
                                 <Setter Property="Command" Value="{Binding SelectNotificationCommand}" />
                                 <Setter Property="CommandParameter" Value="{Binding}" />
                             </Style>

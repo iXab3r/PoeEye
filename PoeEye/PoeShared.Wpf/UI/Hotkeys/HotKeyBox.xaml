@@ -1,38 +1,27 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:hotkeys1="clr-namespace:PoeShared.UI.Hotkeys"
+                    xmlns:hotkeys="clr-namespace:PoeShared.UI.Hotkeys"
                     xmlns:eye="clr-namespace:PoeShared.Scaffolding.WPF"
                     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.textbox.xaml" />
         <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.textblock.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.menu.xaml" />
     </ResourceDictionary.MergedDictionaries>
     
-    <Style TargetType="{x:Type hotkeys1:HotKeyBox}">
-        <Setter Property="Background" Value="Transparent" />
-        <Setter Property="BorderBrush" Value="{DynamicResource TextBoxBorderBrush}" />
-        <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="FontFamily" Value="{DynamicResource ContentFontFamily}" />
-        <Setter Property="FontSize" Value="{DynamicResource ContentFontSize}" />
-        <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
-        <Setter Property="MinHeight" Value="26" />
-        <Setter Property="Padding" Value="0" />
+    <Style TargetType="{x:Type hotkeys:HotKeyBox}">
         <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Hidden" />
         <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Hidden" />
-        <Setter Property="SnapsToDevicePixels" Value="True" />
         <Setter Property="AcceptsReturn" Value="True"/>
-        <Setter Property="AcceptsTab" Value="True"/>
+        <Setter Property="AcceptsTab" Value="False"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
         <Setter Property="HorizontalContentAlignment" Value="Center"/>
         <Setter Property="ToolTip" Value="Press Backspace to clear Hotkey"/>
         <Setter Property="Template">
             <Setter.Value>
-                <ControlTemplate TargetType="{x:Type hotkeys1:HotKeyBox}">
-
+                <ControlTemplate TargetType="{x:Type hotkeys:HotKeyBox}">
                     <!-- to compensate MaterialDesignTextBox padding we have to add -4 -->
                     <TextBox x:Name="PART_TextBox"
-                             Style="{StaticResource MaterialDesignOutlinedTextFieldTextBox}"
-                             Padding="-4" 
-                             materialDesign:HintAssist.IsFloating="False"
                              MinHeight="{TemplateBinding MinHeight}"
                              HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"    
                              VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
@@ -62,7 +51,7 @@
                         MethodName="GetValuesAndDescriptions"
                         ObjectType="eye:EnumHelper">
         <ObjectDataProvider.MethodParameters>
-            <x:TypeExtension TypeName="hotkeys1:HotkeyMode" />
+            <x:TypeExtension TypeName="hotkeys:HotkeyMode" />
         </ObjectDataProvider.MethodParameters>
     </ObjectDataProvider>
 </ResourceDictionary>

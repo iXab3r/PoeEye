@@ -88,6 +88,8 @@ namespace PoeShared.UI.Hotkeys
 
         public ModifierKeys ModifierKeys { get; }
 
+        public bool IsEmpty => MouseButton == null && Key == Key.None && ModifierKeys == ModifierKeys.None;
+
         public bool Equals(HotkeyGesture other)
         {
             if (ReferenceEquals(null, other))

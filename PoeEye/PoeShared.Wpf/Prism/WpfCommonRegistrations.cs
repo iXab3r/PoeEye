@@ -24,6 +24,7 @@ namespace PoeShared.Prism
                 .RegisterSingleton<IHotkeyConverter, HotkeyConverter>();
 
             Container
+                .RegisterType<IHotkeyTracker, HotkeyTracker>()
                 .RegisterType<IGenericSettingsViewModel, GenericSettingsViewModel>()
                 .RegisterType<IAudioNotificationSelectorViewModel, AudioNotificationSelectorViewModel>();
         }
