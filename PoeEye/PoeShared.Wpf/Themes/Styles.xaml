@@ -27,7 +27,7 @@
         </Setter>
     </Style>
 
-    <Style TargetType="{x:Type ToggleButton}" x:Key="ToggleCircleButton" BasedOn="{StaticResource MaterialDesignFlatPrimaryToggleButton}" >
+    <Style TargetType="{x:Type ToggleButton}" x:Key="ToggleCircleButton" BasedOn="{StaticResource MaterialDesignActionLightToggleButton}" >
         <Setter Property="FontSize" Value="14" />
         <Setter Property="HorizontalContentAlignment" Value="Center" />
         <Setter Property="VerticalContentAlignment" Value="Center" />

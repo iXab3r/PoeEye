@@ -2,7 +2,6 @@
 using System.IO;
 using System.Reflection;
 using log4net;
-using PoeShared.Resources.Notifications;
 using PoeShared.Scaffolding;
 
 

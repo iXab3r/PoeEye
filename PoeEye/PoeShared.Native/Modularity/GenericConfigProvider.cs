@@ -42,7 +42,7 @@ namespace PoeShared.Modularity
                 .Select(
                     x =>
                     {
-                        Log.Debug("Reloading ActualConfig...");
+                        Log.Debug($"Refreshing ActualConfig of type {typeof(TConfig)}...");
                         return configProvider.GetActualConfig<TConfig>();
                     })
                 .Subscribe(x => ActualConfig = x)

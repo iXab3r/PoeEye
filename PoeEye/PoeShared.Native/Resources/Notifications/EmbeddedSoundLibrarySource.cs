@@ -7,7 +7,7 @@ using log4net;
 using PoeShared.Audio.Services;
 using PoeShared.Scaffolding;
 
-namespace PoeShared.Resources.Notifications
+namespace PoeShared.Native.Resources.Notifications
 {
     internal class EmbeddedSoundLibrarySource : SoundLibrarySourceBase
     {
