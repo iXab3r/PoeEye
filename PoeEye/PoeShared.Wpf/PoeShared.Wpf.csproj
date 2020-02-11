@@ -5,7 +5,7 @@
     <AssemblyTitle>PoeShared.Wpf</AssemblyTitle>
     <Product>PoeShared.Wpf</Product>
     <Description>PoeEye Shared Wpf classes</Description>
-    <Copyright>Copyright © Xab3r 2019</Copyright>
+    <Copyright>Copyright © Xab3r 2020</Copyright>
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <UseWpf>true</UseWpf>
     <Configurations>Debug;Release</Configurations>

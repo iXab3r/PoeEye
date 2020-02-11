@@ -6,7 +6,7 @@
     <AssemblyTitle>PoeShared</AssemblyTitle>
     <Product>PoeShared</Product>
     <Description>PoeEye Shared classes</Description>
-    <Copyright>Copyright © Xab3r 2015</Copyright>
+    <Copyright>Copyright © Xab3r 2020</Copyright>
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <Configurations>Debug;Release</Configurations>
     <Platforms>AnyCPU</Platforms>
