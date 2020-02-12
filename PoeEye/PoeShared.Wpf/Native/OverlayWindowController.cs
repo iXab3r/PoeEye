@@ -1,15 +1,11 @@
 using System;
 using System.Collections.ObjectModel;
-using System.Drawing;
 using System.Linq;
-using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using System.Runtime.CompilerServices;
 using System.Windows;
-using System.Windows.Input;
 using System.Windows.Interop;
 using DynamicData;
 
@@ -18,7 +14,6 @@ using log4net;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
 using ReactiveUI;
-using Point = System.Windows.Point;
 
 namespace PoeShared.Native
 {
@@ -40,11 +35,9 @@ namespace PoeShared.Native
 
         public OverlayWindowController(
             [NotNull] IWindowTracker windowTracker,
-            [NotNull] IKeyboardEventsSource keyboardMouseEvents,
             [NotNull] [Unity.Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {
             Guard.ArgumentNotNull(windowTracker, nameof(windowTracker));
-            Guard.ArgumentNotNull(keyboardMouseEvents, nameof(keyboardMouseEvents));
             Guard.ArgumentNotNull(uiScheduler, nameof(uiScheduler));
 
             this.windowTracker = windowTracker;
@@ -79,15 +72,6 @@ namespace PoeShared.Native
                 .WhenAnyValue(x => x.MatchingWindowHandle)
                 .Where(x => x != IntPtr.Zero && !IsPairedOverlay(windowTracker.ActiveWindowHandle))
                 .Subscribe(lastActiveWindowHandle)
-                .AddTo(Anchors);
-
-            keyboardMouseEvents
-                .WhenKeyDown
-                .Where(x => IsVisible)
-                .Where(x => new KeyGesture(Key.F9, ModifierKeys.Control | ModifierKeys.Shift | ModifierKeys.Alt).MatchesHotkey(x))
-                .Do(x => x.Handled = true)
-                .ObserveOn(uiScheduler)
-                .Subscribe(() => ShowWireframes = !ShowWireframes)
                 .AddTo(Anchors);
         }
 

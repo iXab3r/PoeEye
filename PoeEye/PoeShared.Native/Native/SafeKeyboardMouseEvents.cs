@@ -1,19 +1,15 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Diagnostics;
-using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using System.Windows.Forms;
 using Gma.System.MouseKeyHook;
 using JetBrains.Annotations;
 using log4net;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using PoeShared.Modularity;
-using PoeShared.Prism;
 using PoeShared.Scaffolding;
-using Unity;
 using KeyEventArgs = System.Windows.Forms.KeyEventArgs;
 using KeyEventHandler = System.Windows.Forms.KeyEventHandler;
 using MouseEventArgs = System.Windows.Forms.MouseEventArgs;
@@ -29,7 +25,7 @@ namespace PoeShared.Native
         public KeyboardEventsSource([NotNull] IClock clock)
         {
             Guard.ArgumentNotNull(clock, nameof(clock));
-            Log.Debug("Mouse&keyboard event source initialization started");
+            Log.Info("Mouse&keyboard event source initialization started");
 
             this.clock = clock;
             

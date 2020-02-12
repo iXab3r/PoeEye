@@ -40,12 +40,18 @@ namespace PoeShared.UI.Hotkeys
 
             this.WhenAnyValue(x => x.Hotkey)
                 .WithPrevious((prev, curr) => new { prev, curr })
-                .Where(x => x.curr?.IsEmpty ?? true)
                 .Subscribe(
                     x =>
                     {
-                        Log.Debug($"Hotkey tracking disabled (hotkey gesture {x.prev} => {x.curr})");
-                        IsActive = false;
+                        if (x.curr == null || x.curr.IsEmpty)
+                        {
+                            Log.Debug($"Hotkey tracking disabled (hotkey gesture {x.prev} => {x.curr})");
+                            IsActive = false;
+                        }
+                        else
+                        {
+                            Log.Debug($"Tracking hotkey changed (hotkey gesture {x.prev} => {x.curr})");
+                        }
                     })
                 .AddTo(Anchors);
 
