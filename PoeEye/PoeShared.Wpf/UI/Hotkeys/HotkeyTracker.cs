@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Windows.Input;
+using Gma.System.MouseKeyHook;
 using JetBrains.Annotations;
 using log4net;
 using PoeShared.Native;
@@ -177,6 +178,11 @@ namespace PoeShared.UI.Hotkeys
                 if (KeyEventArgs != null)
                 {
                     KeyEventArgs.Handled = true;
+                }
+
+                if (MouseEventArgs is MouseEventExtArgs mouseEventExtArgs)
+                {
+                    mouseEventExtArgs.Handled = true;
                 }
 
                 return this;
