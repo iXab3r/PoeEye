@@ -79,7 +79,7 @@ namespace PoeShared.Scaffolding.WPF
 
         public void Execute(object parameter)
         {
-            Error = null;
+            ResetError();
             try
             {
                 isExecuting.OnNext(true);
@@ -93,6 +93,11 @@ namespace PoeShared.Scaffolding.WPF
             {
                 isExecuting.OnNext(false);
             }
+        }
+
+        public void ResetError()
+        {
+            Error = null;
         }
 
         public event EventHandler CanExecuteChanged
