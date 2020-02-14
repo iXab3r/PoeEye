@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
@@ -23,6 +24,7 @@ namespace PoeShared.Squirrel.Updater
         private bool isOpen;
         private string statusText;
         private bool isInErrorStatus;
+        private bool checkForUpdates;
 
         public ApplicationUpdaterViewModel(
             [NotNull] IApplicationUpdaterModel updaterModel,
@@ -43,6 +45,28 @@ namespace PoeShared.Squirrel.Updater
             CheckForUpdatesCommand
                 .ThrownExceptions
                 .Subscribe(ex => SetError($"Update error: {ex.Message}"))
+                .AddTo(Anchors);
+
+            configProvider.ListenTo(x => x.AutoUpdateTimeout)
+                .ObserveOn(uiScheduler)
+                .Subscribe(x => CheckForUpdates = x > TimeSpan.Zero)
+                .AddTo(Anchors);
+
+            this.ObservableForProperty(x => x.CheckForUpdates, skipInitial: true).ToUnit()
+                .ObserveOn(uiScheduler)
+                .Subscribe(() =>
+                {
+                    var updateConfig = configProvider.ActualConfig.CloneJson();
+                    if (CheckForUpdates && updateConfig.AutoUpdateTimeout <= TimeSpan.Zero)
+                    {
+                        updateConfig.AutoUpdateTimeout = UpdateSettingsConfig.DefaultAutoUpdateTimeout;
+                    }
+                    else if (!CheckForUpdates)
+                    {
+                        updateConfig.AutoUpdateTimeout = TimeSpan.Zero;
+                    }
+                    configProvider.Save(updateConfig);
+                }, Log.HandleUiException)
                 .AddTo(Anchors);
 
             this.RaiseWhenSourceValue(x => x.UpdatedVersion, updaterModel, x => x.UpdatedVersion, uiScheduler).AddTo(Anchors);
@@ -68,15 +92,19 @@ namespace PoeShared.Squirrel.Updater
                     configProvider
                         .ListenTo(x => x.AutoUpdateTimeout)
                         .WithPrevious((prev, curr) => new {prev, curr})
-                        .Do(timeout => Log.Debug($"[ApplicationUpdaterViewModel] AutoUpdate timeout changed: {timeout.prev} => {timeout.curr}"))
+                        .Do(timeout => Log.Debug($"AutoUpdate timeout changed: {timeout.prev} => {timeout.curr}"))
                         .Select(
                             timeout => timeout.curr <= TimeSpan.Zero
                                 ? Observable.Never<long>()
                                 : Observable.Timer(DateTimeOffset.MinValue, timeout.curr, bgScheduler))
                         .Switch()
-                        .ToUnit(),
-                    updaterModel.WhenAnyProperty(x => x.UpdateSource).ToUnit())
+                        .Select(() => $"auto-update timer tick(timeout: {configProvider.ActualConfig.AutoUpdateTimeout})"),
+                    updaterModel
+                        .ObservableForProperty(x => x.UpdateSource, skipInitial: true)
+                        .Do(source => Log.Debug($"Update source changed: {source}"))
+                        .Select(x => $"update source change"))
                 .ObserveOn(uiScheduler)
+                .Do(reason => Log.Debug($"Checking for updates, reason: {reason}"))
                 .Where(x => CheckForUpdatesCommand.CanExecute(null))
                 .Subscribe(() => CheckForUpdatesCommand.Execute(null), Log.HandleException)
                 .AddTo(Anchors);
@@ -84,6 +112,18 @@ namespace PoeShared.Squirrel.Updater
             ApplyUpdate = CommandWrapper.Create(
                 ApplyUpdateCommandExecuted,
                 this.updaterModel.WhenAnyValue(x => x.LatestVersion).ObserveOn(uiScheduler).Select(x => x != null));
+
+            OpenUri = CommandWrapper.Create<string>(OpenUriCommandExecuted);
+        }
+
+        private async Task OpenUriCommandExecuted(string uri)
+        {
+            if (string.IsNullOrEmpty(uri))
+            {
+                return;
+            }
+
+            await Task.Run(() => Process.Start(uri));
         }
 
         public CommandWrapper CheckForUpdatesCommand { get; }
@@ -110,6 +150,12 @@ namespace PoeShared.Squirrel.Updater
             set => RaiseAndSetIfChanged(ref isOpen, value);
         }
 
+        public bool CheckForUpdates
+        {
+            get => checkForUpdates;
+            set => this.RaiseAndSetIfChanged(ref checkForUpdates, value);
+        }
+
         [CanBeNull] public Version UpdatedVersion => updaterModel.UpdatedVersion;
 
         [CanBeNull] public Version LatestVersion => updaterModel.LatestVersion?.FutureReleaseEntry?.Version?.Version;
@@ -119,7 +165,9 @@ namespace PoeShared.Squirrel.Updater
         public int ProgressPercent => updaterModel.ProgressPercent;
         
         public bool IsBusy => updaterModel.IsBusy;
-        
+
+        public CommandWrapper OpenUri { get; }
+
         public (string exePath, string exeArgs) GetRestartApplicationArgs()
         {
             return updaterModel.GetRestartApplicationArgs();
@@ -127,10 +175,10 @@ namespace PoeShared.Squirrel.Updater
 
         private async Task CheckForUpdatesCommandExecuted()
         {
-            Log.Debug($"[ApplicationUpdaterViewModel] Update check requested, source: {updaterModel.UpdateSource}");
+            Log.Debug($"Update check requested, source: {updaterModel.UpdateSource}");
             if (CheckForUpdatesCommand.IsBusy || ApplyUpdate.IsBusy)
             {
-                Log.Debug("[ApplicationUpdaterViewModel] Already in progress");
+                Log.Debug("Update is already in progress");
                 IsOpen = true;
                 return;
             }
@@ -165,10 +213,10 @@ namespace PoeShared.Squirrel.Updater
 
         private async Task ApplyUpdateCommandExecuted()
         {
-            Log.Debug($"[ApplicationUpdaterViewModel] Applying latest update {LatestVersion} (updated: {UpdatedVersion})");
+            Log.Debug($"Applying latest update {LatestVersion} (updated: {UpdatedVersion})");
             if (CheckForUpdatesCommand.IsBusy || ApplyUpdate.IsBusy)
             {
-                Log.Debug("[ApplicationUpdaterViewModel] Already in progress");
+                Log.Debug("Already in progress");
                 IsOpen = true;
                 return;
             }
@@ -211,7 +259,7 @@ namespace PoeShared.Squirrel.Updater
         
         private async Task RestartCommandExecuted()
         {
-            Log.Debug("[ApplicationUpdaterViewModel] Restart application requested");
+            Log.Debug("Restart application requested");
 
             try
             {

@@ -1,4 +1,5 @@
 using System;
+using System.Windows.Input;
 using JetBrains.Annotations;
 using PoeShared.Scaffolding;
 using PoeShared.Scaffolding.WPF;
@@ -26,6 +27,10 @@ namespace PoeShared.Squirrel.Updater
         Version UpdatedVersion { get; }
 
         Version LatestVersion { get; }
+
+        bool CheckForUpdates { get; set; }
+
+        [NotNull] CommandWrapper OpenUri { get; }
 
         (string exePath, string exeArgs) GetRestartApplicationArgs();
     }
