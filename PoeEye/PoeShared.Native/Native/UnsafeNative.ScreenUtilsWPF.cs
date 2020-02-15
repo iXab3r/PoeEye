@@ -94,5 +94,46 @@ namespace PoeShared.Native
             var monitorBounds = GetMonitorBounds(window);
             return GetPositionAtTheCenter(monitorBounds, new Size(window.Width, window.Height));
         }
+
+        public static void ShowWindow(Window mainWindow)
+        {
+            Guard.ArgumentNotNull(() => mainWindow);
+            Log.Debug($"ShowWindow command executed, windowState: {mainWindow.WindowState}");
+
+            Log.Debug($"Activating main window, title: '{mainWindow.Title}' {new Point(mainWindow.Left, mainWindow.Top)}, isActive: {mainWindow.IsActive}, state: {mainWindow.WindowState}, topmost: {mainWindow.Topmost}, style:{mainWindow.WindowStyle}");
+            
+
+            var initialTopmost = mainWindow.Topmost;
+            mainWindow.Topmost = !initialTopmost;
+            mainWindow.Topmost = initialTopmost;
+
+            var mainWindowHelper = new WindowInteropHelper(mainWindow);
+            var mainWindowHandle = mainWindowHelper.EnsureHandle();
+
+            Log.Debug($"Showing main window, hWnd: {mainWindowHandle.ToHexadecimal()}, windowState: {mainWindow.WindowState}");
+            mainWindow.Show();
+
+            if (mainWindow.WindowState == WindowState.Minimized)
+            {
+                mainWindow.WindowState = WindowState.Normal;
+            }
+
+            if (mainWindowHandle != IntPtr.Zero && UnsafeNative.GetForegroundWindow() != mainWindowHandle)
+            {
+                Log.Debug($"Setting foreground window, hWnd: {mainWindowHandle.ToHexadecimal()}, windowState: {mainWindow.WindowState}");
+                if (!UnsafeNative.SetForegroundWindow(mainWindowHandle))
+                {
+                    Log.Debug($"Failed to set foreground window, hWnd: {mainWindowHandle.ToHexadecimal()}");
+                }
+            }
+        }
+
+        public static void HideWindow(Window mainWindow)
+        {
+            Guard.ArgumentNotNull(() => mainWindow);
+
+            Log.Debug($"HideWindow command executed, windowState: {mainWindow.WindowState}");
+            mainWindow.Hide();
+        }
     }
 }
