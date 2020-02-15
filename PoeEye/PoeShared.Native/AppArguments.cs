@@ -41,6 +41,7 @@ namespace PoeShared
             var args = Environment.GetCommandLineArgs();
             StartupArgs = args.Skip(1)
                 .Where(x => !string.Equals(AutostartFlagValue, x, StringComparison.OrdinalIgnoreCase))
+                .Where(x => !string.Equals(AutostartFlag, x, StringComparison.OrdinalIgnoreCase))
                 .JoinStrings(" ");
             ApplicationExecutablePath = args.First();
             ApplicationExecutableName = Path.GetFileName(ApplicationExecutablePath);
