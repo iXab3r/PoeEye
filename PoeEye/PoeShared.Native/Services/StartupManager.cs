@@ -37,9 +37,9 @@ namespace PoeShared.Services
                 args.ExecutablePath,
                 args.UniqueAppName, 
                 RegistrationScope.Local,
-                false,
-                StartupProviders.Registry,
-                args.AutostartFlag ?? AppArguments.Instance.AutostartFlag);    
+                true,
+                StartupProviders.Task,
+                args.AutostartFlag ?? appArguments.AutostartFlag);    
             
             Log.Debug($"Manager parameters: {new { ArgsCommandLine = args.CommandLineArgs, manager.IsRegistered, manager.Name, manager.ApplicationImage, manager.RegistrationScope, manager.IsStartedUp, manager.NeedsAdministrativePrivileges, manager.Provider, manager.WorkingDirectory, CommandLineArgs = String.Join(" ", manager.CommandLineArguments), manager.StartupSpecialArgument }}");
 

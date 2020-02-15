@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using PoeShared.Scaffolding;
@@ -32,6 +33,6 @@ namespace PoeShared.Squirrel.Updater
 
         void Reset();
 
-        (string exePath, string exeArgs) GetRestartApplicationArgs();
+        FileInfo GetLatestExecutable();
     }
 }

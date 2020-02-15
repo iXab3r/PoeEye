@@ -17,7 +17,6 @@ namespace PoeShared.Squirrel.Updater
 {
     internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IApplicationUpdaterModel
     {
-        private readonly IAppArguments appArguments;
         private static readonly ILog Log = LogManager.GetLogger(typeof(ApplicationUpdaterModel));
 
         private static readonly string DotnetCoreRunnerName = "dotnet.exe";
@@ -32,7 +31,6 @@ namespace PoeShared.Squirrel.Updater
 
         public ApplicationUpdaterModel(IAppArguments appArguments)
         {
-            this.appArguments = appArguments;
             SquirrelAwareApp.HandleEvents(
                 OnInitialInstall,
                 OnAppUpdate,
@@ -184,12 +182,12 @@ namespace PoeShared.Squirrel.Updater
         {
             using var unused = CreateIsBusyAnchor();
             
-            var executableArgs = GetRestartApplicationArgs();
+            var executable = GetLatestExecutable();
             Log.Debug(
-                $"Restarting app, folder: {mostRecentVersionAppFolder}, appName: {ApplicationExecutableFileName}, {executableArgs}...");
+                $"Restarting app, folder: {mostRecentVersionAppFolder}, appName: {ApplicationExecutableFileName}, {executable}...");
 
             var squirrelUpdater = GetSquirrelUpdateExeOrThrow();
-            var squirrelArgs = $"--processStartAndWait {executableArgs.exePath}";
+            var squirrelArgs = $"--processStartAndWait {executable.FullName}";
 
             Log.Debug($"Starting Squirrel updater @ '{squirrelUpdater}', args: {squirrelArgs} ...");
             var updaterProcess = Process.Start(squirrelUpdater, squirrelArgs);
@@ -328,7 +326,7 @@ namespace PoeShared.Squirrel.Updater
                 });
         }
         
-        public (string exePath, string exeArgs) GetRestartApplicationArgs()
+        public FileInfo GetLatestExecutable()
         {
             var appExecutable = new FileInfo(Path.Combine(mostRecentVersionAppFolder.FullName, ApplicationExecutableFileName));
             Log.Debug($"[ApplicationUpdaterModel] Restarting app, folder: {mostRecentVersionAppFolder}, appName: { ApplicationExecutableFileName}, exePath: {appExecutable}(exists: {appExecutable.Exists})...");
@@ -337,21 +335,7 @@ namespace PoeShared.Squirrel.Updater
             {
                 throw new FileNotFoundException("Application executable was not found", appExecutable.FullName);
             }
-
-            var squirrelUpdater = GetSquirrelUpdateExe();
-            
-            if (!File.Exists(squirrelUpdater))
-            {
-                Log.Warn($"{UpdaterExecutableName} not found(path: {appExecutable.FullName}), not a Squirrel-installed app?");
-            }
-            else
-            {
-                Log.Warn($"{UpdaterExecutableName} is running in DEBUG MODE, restart path will be exactly the same as launch path");
-            }
-            var executableToStart = appExecutable.FullName;
-            var startupArgs = appArguments.StartupArgs ?? string.Empty;
-
-            return (executableToStart, startupArgs);
+            return appExecutable;
         }
     }
 }

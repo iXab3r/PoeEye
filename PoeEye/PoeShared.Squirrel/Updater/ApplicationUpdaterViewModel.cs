@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
@@ -168,9 +169,9 @@ namespace PoeShared.Squirrel.Updater
 
         public CommandWrapper OpenUri { get; }
 
-        public (string exePath, string exeArgs) GetRestartApplicationArgs()
+        public FileInfo GetLatestExecutable()
         {
-            return updaterModel.GetRestartApplicationArgs();
+            return updaterModel.GetLatestExecutable();
         }
 
         private async Task CheckForUpdatesCommandExecuted()
