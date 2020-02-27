@@ -6,27 +6,27 @@ namespace PoeShared.Native
 {
     public class TransparentWindow : ConstantAspectRatioWindow
     {
+        private readonly Lazy<IntPtr> windowHandleSupplier;
+        
         protected TransparentWindow()
         {
+            windowHandleSupplier = new Lazy<IntPtr>(() => new WindowInteropHelper(this).EnsureHandle());
             this.Loaded += OnLoaded;
         }
 
         private void OnLoaded(object sender, RoutedEventArgs e)
         {
-            var hwnd = new WindowInteropHelper(this).Handle;
-            WindowsServices.HideSystemMenu(hwnd);
+            UnsafeNative.HideSystemMenu(windowHandleSupplier.Value);
         }
 
         protected void MakeTransparent()
         {
-            var hwnd = new WindowInteropHelper(this).Handle;
-            WindowsServices.SetWindowExTransparent(hwnd);
+            UnsafeNative.SetWindowExTransparent(windowHandleSupplier.Value);
         }
 
         protected void MakeLayered()
         {
-            var hwnd = new WindowInteropHelper(this).Handle;
-            WindowsServices.SetWindowExLayered(hwnd);
+            UnsafeNative.SetWindowExLayered(windowHandleSupplier.Value);
         }
     }
 }
