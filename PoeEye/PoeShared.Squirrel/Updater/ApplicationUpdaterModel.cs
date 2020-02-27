@@ -17,6 +17,7 @@ namespace PoeShared.Squirrel.Updater
 {
     internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IApplicationUpdaterModel
     {
+        private readonly IAppArguments appArguments;
         private static readonly ILog Log = LogManager.GetLogger(typeof(ApplicationUpdaterModel));
 
         private static readonly string DotnetCoreRunnerName = "dotnet.exe";
@@ -31,6 +32,7 @@ namespace PoeShared.Squirrel.Updater
 
         public ApplicationUpdaterModel(IAppArguments appArguments)
         {
+            this.appArguments = appArguments;
             SquirrelAwareApp.HandleEvents(
                 OnInitialInstall,
                 OnAppUpdate,
@@ -218,7 +220,7 @@ namespace PoeShared.Squirrel.Updater
             var appName = Process.GetCurrentProcess().ProcessName;
             var rootDirectory = default(string);
 
-            if (AppArguments.Instance.IsDebugMode || string.IsNullOrWhiteSpace(GetSquirrelUpdateExe()))
+            if (appArguments.IsDebugMode || string.IsNullOrWhiteSpace(GetSquirrelUpdateExe()))
             {
                 rootDirectory = AppDomain.CurrentDomain.BaseDirectory;
             }

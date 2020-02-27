@@ -3,6 +3,7 @@ using PoeShared.Audio.ViewModels;
 using PoeShared.Modularity;
 using PoeShared.Scaffolding;
 using PoeShared.UI.Hotkeys;
+using PoeShared.Wpf.UI.ExceptionViewer;
 using PoeShared.Wpf.UI.Settings;
 using ReactiveUI;
 using Unity;
@@ -20,6 +21,7 @@ namespace PoeShared.Prism
 
             Container
                 .RegisterSingleton<PoeEyeModulesRegistrator>(typeof(IPoeEyeModulesRegistrator), typeof(IPoeEyeModulesEnumerator))
+                .RegisterSingleton<IExceptionDialogDisplayer, ExceptionDialogDisplayer>()
                 .RegisterSingleton<ISchedulerProvider, SchedulerProvider>()
                 .RegisterSingleton<IHotkeyConverter, HotkeyConverter>();
 

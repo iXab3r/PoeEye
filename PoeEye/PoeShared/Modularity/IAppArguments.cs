@@ -12,6 +12,8 @@ namespace PoeShared.Modularity
         
         bool IsElevated { get; }
         
+        int ProcessId { get; }
+        
         string AutostartFlag { [CanBeNull] get; }
         
         string ApplicationExecutableName { [CanBeNull] get; }
