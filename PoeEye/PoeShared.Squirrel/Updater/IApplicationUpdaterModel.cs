@@ -7,7 +7,7 @@ using Squirrel;
 
 namespace PoeShared.Squirrel.Updater
 {
-    internal interface IApplicationUpdaterModel : IDisposableReactiveObject
+    public interface IApplicationUpdaterModel : IDisposableReactiveObject
     {
         UpdateSourceInfo UpdateSource { get; set; }
 

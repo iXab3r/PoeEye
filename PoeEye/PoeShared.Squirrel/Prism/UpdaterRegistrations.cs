@@ -10,8 +10,8 @@ namespace PoeShared.Squirrel.Prism
         {
             Container
                 .RegisterSingleton<IUpdateSourceProvider, UpdateSourceProviderFromConfig>()
-                .RegisterType<IApplicationUpdaterViewModel, ApplicationUpdaterViewModel>()
-                .RegisterType<IApplicationUpdaterModel, ApplicationUpdaterModel>();
+                .RegisterSingleton<IApplicationUpdaterViewModel, ApplicationUpdaterViewModel>()
+                .RegisterSingleton<IApplicationUpdaterModel, ApplicationUpdaterModel>();
         }
     }
 }
