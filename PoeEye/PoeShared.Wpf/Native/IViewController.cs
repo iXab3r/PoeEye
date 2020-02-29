@@ -6,8 +6,6 @@ namespace PoeShared.Native
 {
     public interface IViewController
     {
-        IObservable<Unit> WhenLoaded { get; }
-
         void Hide();
 
         void Show();

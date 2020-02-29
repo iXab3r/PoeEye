@@ -9,32 +9,35 @@ using PoeShared.Wpf.Scaffolding;
 
 namespace PoeShared.Native
 {
-    public sealed class WindowViewController : DisposableReactiveObject, IViewController
+    public sealed class WindowViewController : DisposableReactiveObject, IWindowViewController
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(WindowViewController));
 
         private readonly Window owner;
-        private readonly ISubject<Unit> whenLoaded = new ReplaySubject<Unit>(1);
 
         public WindowViewController(Window owner)
         {
             this.owner = owner;
-            Observable.Merge(
-                    Observable.FromEventPattern<RoutedEventHandler, RoutedEventArgs>(h => owner.Loaded += h, h => owner.Loaded -= h).ToUnit(),
-                    Observable.Return(Unit.Default).Where(x => owner.IsLoaded))
-                .Take(1)
-                .Subscribe(x => OnLoaded())
-                .AddTo(Anchors);
-            
-            Observable
-                .FromEventPattern<RoutedEventHandler, RoutedEventArgs>(h => owner.Unloaded += h, h => owner.Unloaded -= h).ToUnit()
-                .Take(1)
-                .Subscribe(x => OnUnloaded())
-                .AddTo(Anchors);
+            Log.Debug($"[{owner}.{owner.Title}] Binding ViewController to window, {new {owner.IsLoaded, owner.RenderSize, owner.Title, owner.WindowState, owner.ShowInTaskbar}}");
+
+            WhenRendered = Observable
+                .FromEventPattern<EventHandler, EventArgs>(h => owner.ContentRendered += h, h => owner.ContentRendered -= h)
+                .ToUnit();
+            WhenUnloaded = Observable
+                .FromEventPattern<RoutedEventHandler, RoutedEventArgs>(h => owner.Unloaded += h, h => owner.Unloaded -= h)
+                .ToUnit();
+            WhenLoaded = Observable.Merge(
+                Observable.FromEventPattern<RoutedEventHandler, RoutedEventArgs>(h => owner.Loaded += h, h => owner.Loaded -= h).ToUnit(),
+                Observable.Return(Unit.Default).Where(x => owner.IsLoaded).ToUnit())
+                .Take(1);
         }
 
-        public IObservable<Unit> WhenLoaded => whenLoaded;
+        public IObservable<Unit> WhenLoaded { get; }
         
+        public IObservable<Unit> WhenUnloaded { get; }
+
+        public IObservable<Unit> WhenRendered { get; }
+
         public void Hide()
         {
             Log.Debug($"[{owner}.{owner.Title}] Hiding window");
@@ -45,17 +48,6 @@ namespace PoeShared.Native
         {
             Log.Debug($"[{owner}.{owner.Title}] Showing window");
             UnsafeNative.ShowWindow(owner);
-        }
-
-        private void OnUnloaded()
-        {
-            Log.Debug($"[{owner}.{owner.Title}] Window unloaded");
-        }
-
-        private void OnLoaded()
-        {
-            Log.Debug($"[{owner}.{owner.Title}] Window loaded");
-            whenLoaded.OnNext(Unit.Default);
         }
     }
 }
