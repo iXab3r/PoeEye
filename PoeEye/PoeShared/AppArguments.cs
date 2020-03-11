@@ -31,7 +31,7 @@ namespace PoeShared
         public string AppDataDirectory => Environment.ExpandEnvironmentVariables($@"%APPDATA%\{AppName}");
         public string LocalAppDataDirectory => Environment.ExpandEnvironmentVariables($@"%LOCALAPPDATA%\{AppName}");
 
-        protected AppArguments()
+        public AppArguments()
         {
             ProcessId = Process.GetCurrentProcess().Id;
             IsElevated = true;
