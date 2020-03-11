@@ -2,7 +2,7 @@
   <PropertyGroup>
     <CefSharpAnyCpuSupport>true</CefSharpAnyCpuSupport>
     <ProjectGuid>{9AAA9005-0177-4F4C-B6DE-EB09037DB155}</ProjectGuid>
-    <TargetFrameworks>net461;netcoreapp3.0</TargetFrameworks>
+    <TargetFrameworks>net461;netcoreapp3.0;</TargetFrameworks>
     <AssemblyTitle>PoeShared</AssemblyTitle>
     <Product>PoeShared</Product>
     <Description>PoeEye Shared classes</Description>
@@ -13,7 +13,6 @@
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="CommandLineParser" Version="1.9.71" />
     <PackageReference Include="CommonServiceLocator" Version="2.0.4" />
     <PackageReference Include="CompareNETObjects" Version="4.65.0" />
     <PackageReference Include="CsQuery" Version="1.3.4" />

@@ -40,8 +40,16 @@ namespace PoeShared.Prism
 
             Container
                 .RegisterType<IHttpClient, GenericHttpClient>();
+            
+            if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows))
+            {
+                Container.RegisterSingleton<IAppArguments, AppArgumentsForWindows>();
+            }
+            else
+            {
+                Container.RegisterFactory<IAppArguments>(container => AppArguments.Instance);
+            }
 
-            Container.RegisterFactory<IAppArguments>(container => AppArguments.Instance);
             
             Container.RegisterFactory<ISoundLibrarySource>(
                 unity => unity.Resolve<ComplexSoundLibrary>(
