@@ -1,17 +1,13 @@
 ﻿using System;
-using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using System.Runtime.Serialization.Formatters;
 using DynamicData;
 
 using log4net;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-using PoeShared.Converters;
 using PoeShared.Scaffolding;
-using ReactiveUI;
 
 namespace PoeShared.Modularity
 {

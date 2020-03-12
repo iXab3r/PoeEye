@@ -29,13 +29,10 @@ namespace PoeShared.Prism
                 .RegisterSingleton<IConverter<NameValueCollection, IEnumerable<KeyValuePair<string, string>>>, NameValueCollectionToQueryStringConverter>()
                 .RegisterSingleton<IKeyboardEventsSource, KeyboardEventsSource>()
                 .RegisterSingleton<IClipboardManager, ClipboardManager>()
-                .RegisterSingleton<IComparisonService, ComparisonService>()
                 .RegisterSingleton<IAudioNotificationsManager, AudioNotificationsManager>()
                 .RegisterSingleton<IAudioPlayer, AudioPlayer>()
-                .RegisterSingleton<IConfigSerializer, JsonConfigSerializer>()
                 .RegisterSingleton<IConverter<NameValueCollection, string>, NameValueCollectionToQueryStringConverter>()
                 .RegisterSingleton<IConverter<NameValueCollection, IEnumerable<KeyValuePair<string, string>>>, NameValueCollectionToQueryStringConverter>()
-                .RegisterSingleton(typeof(IConfigProvider<>), typeof(GenericConfigProvider<>))
                 .RegisterSingleton<IFactory<IWinEventHookWrapper, WinEventHookArguments>, WinEventHookWrapperFactory>();
 
             Container
@@ -45,11 +42,6 @@ namespace PoeShared.Prism
             {
                 Container.RegisterSingleton<IAppArguments, AppArgumentsForWindows>();
             }
-            else
-            {
-                Container.RegisterFactory<IAppArguments>(container => AppArguments.Instance);
-            }
-
             
             Container.RegisterFactory<ISoundLibrarySource>(
                 unity => unity.Resolve<ComplexSoundLibrary>(
