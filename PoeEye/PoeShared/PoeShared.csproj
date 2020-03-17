@@ -3,6 +3,7 @@
     <PropertyGroup>
         <TargetFrameworks>netstandard2.1;net461;netcoreapp3.0</TargetFrameworks>
         <NoWarn>NU1605</NoWarn>
+        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     </PropertyGroup>
     <ItemGroup>
 
