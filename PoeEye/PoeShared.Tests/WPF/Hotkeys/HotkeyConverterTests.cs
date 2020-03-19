@@ -8,7 +8,70 @@ namespace PoeShared.Tests.WPF.Hotkeys
     [TestFixture]
     public class HotkeyConverterTests
     {
+        [Test]
+        public void ShouldSerializeAllKeyboardToString([Values] Key key)
+        {
+            // Given
+            var instance = CreateInstance();
+            var empty = new HotkeyGesture(Key.None).ToString();
+            var hotkey = new HotkeyGesture(key, ModifierKeys.None);
+
+            // When
+            var result = hotkey.ToString();
+
+            // Then
+            if (key != Key.None)
+            {
+                result.ShouldNotBe(empty);
+            }
+        }
+        
+        [Test]
+        public void ShouldConvertAllKeyboard([Values] Key key)
+        {
+            // Given
+            var instance = CreateInstance();
+            var hotkey = new HotkeyGesture(key, ModifierKeys.None);
+
+            // When
+            var result = instance.ConvertFrom(hotkey.ToString());
+
+            // Then
+            result.ShouldNotBeNull();
+            result.ShouldBeOfType<HotkeyGesture>();
+            var resultHotkey = (HotkeyGesture) result;
+            var expectedModifier = ModifierKeys.None;
+            switch (key)
+            {
+                case Key.LWin:
+                case Key.RWin:
+                    expectedModifier = ModifierKeys.Windows;
+                    break;
+                case Key.LeftAlt:
+                case Key.RightAlt:
+                    expectedModifier = ModifierKeys.Alt;
+                    break;
+                case Key.LeftCtrl:
+                case Key.RightCtrl:
+                    expectedModifier = ModifierKeys.Control;
+                    break;
+                case Key.LeftShift:
+                case Key.RightShift:
+                    expectedModifier = ModifierKeys.Shift;
+                    break;
+            }
+            resultHotkey.ModifierKeys.ShouldBe(expectedModifier);
+            if (expectedModifier == ModifierKeys.None && key != Key.None)
+            {
+                resultHotkey.Key.ShouldNotBe(Key.None);
+            }
+        }
+
         [TestCase(Key.None, ModifierKeys.None, "None")]
+        [TestCase(Key.OemPlus, ModifierKeys.None, "+")]
+        [TestCase(Key.OemMinus, ModifierKeys.None, "-")]
+        [TestCase(Key.Divide, ModifierKeys.None, "/")]
+        [TestCase(Key.Multiply, ModifierKeys.None, "*")]
         [TestCase(Key.A, ModifierKeys.None, "A")]
         [TestCase(Key.None, ModifierKeys.Control, "Ctrl")]
         [TestCase(Key.A, ModifierKeys.Control, "Ctrl+A")]
@@ -38,9 +101,10 @@ namespace PoeShared.Tests.WPF.Hotkeys
         [TestCase("=", Key.OemPlus, ModifierKeys.None)]
         [TestCase("/", Key.Divide, ModifierKeys.None)]
         [TestCase("*", Key.Multiply, ModifierKeys.None)]
-        [TestCase("Numpad0", Key.NumPad0, ModifierKeys.None)]
         [TestCase("+", Key.OemPlus, ModifierKeys.None)]
         [TestCase("Ctrl+-", Key.OemMinus, ModifierKeys.Control)]
+        [TestCase("Num -", Key.Subtract, ModifierKeys.None)]
+        [TestCase("Num +", Key.Add, ModifierKeys.None)]
         public void ShouldDeserializeKeyboard(string input, Key expected, ModifierKeys expectedModifiers)
         {
             //Given

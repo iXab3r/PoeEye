@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Linq;
 using System.Windows.Input;
 using log4net;
+using PoeShared.Scaffolding;
 
 namespace PoeShared.UI.Hotkeys
 {
@@ -16,36 +17,28 @@ namespace PoeShared.UI.Hotkeys
         private static readonly HotkeyGesture NoneHotkey = new HotkeyGesture(Key.None); 
 
         private readonly IDictionary<string, HotkeyGesture> mouseKeys;
-        private readonly CultureInfo[] knownCultures;
         private readonly IDictionary<string, Key> knownSpecialKeys = new Dictionary<string, Key>(StringComparer.OrdinalIgnoreCase);
+        private readonly IDictionary<string, Key> knownKeys = new Dictionary<string, Key>();
 
         public HotkeyConverter()
         {
+            Enum
+                .GetValues(typeof(Key))
+                .OfType<Key>()
+                .ForEach(x => knownKeys[new HotkeyGesture(x).ToString()] = x);
+            
             mouseKeys = Enum
                 .GetValues(typeof(MouseButton))
                 .OfType<MouseButton>()
                 .Select(x => new HotkeyGesture(x))
                 .ToDictionary(x => x.ToString(), x => x, StringComparer.OrdinalIgnoreCase);
 
-            this.knownCultures = new[]
-            {
-                CultureInfo.GetCultureInfo("en-US"),
-                CultureInfo.GetCultureInfo("en-GB"),
-                CultureInfo.GetCultureInfo("ru-RU"),
-                CultureInfo.CurrentCulture,
-                CultureInfo.CurrentUICulture,
-                CultureInfo.InvariantCulture,
-                CultureInfo.InstalledUICulture,
-                CultureInfo.DefaultThreadCurrentCulture,
-                CultureInfo.DefaultThreadCurrentUICulture,
-            }.Where(x => x != null).Distinct().ToArray();
-
-            knownSpecialKeys["`"] = Key.OemTilde;
-            knownSpecialKeys["-"] = Key.OemMinus;
-            knownSpecialKeys["+"] = Key.OemPlus;
-            knownSpecialKeys["="] = Key.OemPlus;
-            knownSpecialKeys["/"] = Key.Divide;
             knownSpecialKeys["*"] = Key.Multiply;
+            knownSpecialKeys["+"] = Key.OemPlus;
+            knownSpecialKeys["-"] = Key.OemMinus;
+            knownSpecialKeys["/"] = Key.Divide;
+            knownSpecialKeys["+"] = Key.OemPlus;
+            knownSpecialKeys["NUM +"] = Key.Add;
         }
 
         public string ConvertToString(HotkeyGesture hotkeyGesture)
@@ -88,7 +81,7 @@ namespace PoeShared.UI.Hotkeys
             var source = ((string) sourceRaw).Trim();
             if (string.IsNullOrWhiteSpace(source))
             {
-                return new HotkeyGesture(Key.None);
+                return NoneHotkey;
             }
             if (knownSpecialKeys.TryGetValue(source, out var specialKey))
             {
@@ -118,36 +111,12 @@ namespace PoeShared.UI.Hotkeys
                 return new HotkeyGesture(mouseKey.MouseButton.Value, modifiers);
             }
 
-            var keyParses = new[] { culture }.Concat(this.knownCultures)
-                .Distinct()
-                .ToDictionary(x => x, x => ConvertFromKeySafe(context, x, hotkeyPartRaw));
-
-            var key = keyParses.Values.FirstOrDefault(x => x != null);
-            if (key == null)
+            if (!knownKeys.TryGetValue(hotkeyPartRaw, out var key))
             {
-                throw new NotSupportedException($"Cannon convert from {sourceRaw}");
+                return NoneHotkey;
             }
 
-            return new HotkeyGesture((Key) key, modifiers);
-        }
-
-        private object ConvertFromKeySafe(ITypeDescriptorContext context, CultureInfo culture, string source)
-        {
-            object key;
-            try
-            {
-                if (knownSpecialKeys.TryGetValue(source, out var specialKey))
-                {
-                    return specialKey;
-                }
-                key = KeyConverter.ConvertFrom(context, culture, source);
-            }
-            catch (Exception)
-            {
-                key = null;
-            }
-
-            return key;
+            return new HotkeyGesture(key, modifiers);
         }
 
         public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)

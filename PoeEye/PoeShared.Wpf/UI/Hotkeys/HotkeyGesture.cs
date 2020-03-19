@@ -1,9 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.Text;
 using System.Windows.Forms;
 using System.Windows.Input;
 using PInvoke;
 using PoeShared.Native;
+using PoeShared.Scaffolding;
 
 namespace PoeShared.UI.Hotkeys
 {
@@ -107,47 +109,43 @@ namespace PoeShared.UI.Hotkeys
 
         public override string ToString()
         {
-            var sb = new StringBuilder();
-
+            var keys = new List<string>();
             if ((ModifierKeys & ModifierKeys.Control) == ModifierKeys.Control)
             {
-                sb.Append(GetLocalizedKeyStringUnsafe(User32.VirtualKey.VK_CONTROL));
-                sb.Append("+");
+                GetLocalizedKeyStringUnsafe(User32.VirtualKey.VK_CONTROL).AddTo(keys);
             }
 
             if ((ModifierKeys & ModifierKeys.Alt) == ModifierKeys.Alt)
             {
-                sb.Append(GetLocalizedKeyStringUnsafe(User32.VirtualKey.VK_MENU));
-                sb.Append("+");
+                GetLocalizedKeyStringUnsafe(User32.VirtualKey.VK_MENU).AddTo(keys);
             }
 
             if ((ModifierKeys & ModifierKeys.Shift) == ModifierKeys.Shift)
             {
-                sb.Append(GetLocalizedKeyStringUnsafe(User32.VirtualKey.VK_SHIFT));
-                sb.Append("+");
+                GetLocalizedKeyStringUnsafe(User32.VirtualKey.VK_SHIFT).AddTo(keys);
             }
 
             if ((ModifierKeys & ModifierKeys.Windows) == ModifierKeys.Windows)
             {
-                sb.Append("Windows+");
+                "Windows".AddTo(keys);
             }
 
             if (Key != Key.None)
             {
-                sb.Append(GetLocalizedKeyString(Key));
+                GetLocalizedKeyString(Key).AddTo(keys);
             }
 
             if (MouseButton != null)
             {
-                sb.Append($"Mouse{MouseButton}");
+                $"Mouse{MouseButton}".AddTo(keys);
             }
 
-            if (sb.Length == 0)
+            if (keys.Count == 0)
             {
                 return "None";
             }
 
-            return sb.ToString().Trim('+');
+            return string.Join("+", keys);
         }
 
         private static string GetLocalizedKeyString(Key key)
