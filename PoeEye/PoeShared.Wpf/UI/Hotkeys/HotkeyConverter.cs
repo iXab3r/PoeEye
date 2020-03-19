@@ -41,6 +41,11 @@ namespace PoeShared.UI.Hotkeys
             }.Where(x => x != null).Distinct().ToArray();
 
             knownSpecialKeys["`"] = Key.OemTilde;
+            knownSpecialKeys["-"] = Key.OemMinus;
+            knownSpecialKeys["+"] = Key.OemPlus;
+            knownSpecialKeys["="] = Key.OemPlus;
+            knownSpecialKeys["/"] = Key.Divide;
+            knownSpecialKeys["*"] = Key.Multiply;
         }
 
         public string ConvertToString(HotkeyGesture hotkeyGesture)
@@ -84,6 +89,10 @@ namespace PoeShared.UI.Hotkeys
             if (string.IsNullOrWhiteSpace(source))
             {
                 return new HotkeyGesture(Key.None);
+            }
+            if (knownSpecialKeys.TryGetValue(source, out var specialKey))
+            {
+                return new HotkeyGesture(specialKey);
             }
 
             var modifiersPartLength = source.LastIndexOf(ModifiersDelimiter);
@@ -131,7 +140,6 @@ namespace PoeShared.UI.Hotkeys
                 {
                     return specialKey;
                 }
-                
                 key = KeyConverter.ConvertFrom(context, culture, source);
             }
             catch (Exception)
