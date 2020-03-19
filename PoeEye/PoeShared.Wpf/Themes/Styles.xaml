@@ -45,6 +45,7 @@
         <Setter Property="TextAlignment" Value="Left" />
         <Setter Property="VerticalAlignment" Value="Center" />
         <Setter Property="Height" Value="NaN" />
+        <Setter Property="IsHitTestVisible" Value="False" />
         <Style.Triggers>
             <Trigger Property="IsEnabled" Value="False">
                 <Setter Property="Opacity" Value="0.77"></Setter>
