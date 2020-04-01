@@ -6,6 +6,7 @@ using System.Windows;
 using log4net;
 using PoeShared.Scaffolding;
 using PoeShared.Wpf.Scaffolding;
+using ReactiveUI;
 
 namespace PoeShared.Native
 {
@@ -14,6 +15,7 @@ namespace PoeShared.Native
         private static readonly ILog Log = LogManager.GetLogger(typeof(WindowViewController));
 
         private readonly Window owner;
+        private bool topmost;
 
         public WindowViewController(Window owner)
         {
@@ -30,6 +32,10 @@ namespace PoeShared.Native
                 Observable.FromEventPattern<RoutedEventHandler, RoutedEventArgs>(h => owner.Loaded += h, h => owner.Loaded -= h).ToUnit(),
                 Observable.Return(Unit.Default).Where(x => owner.IsLoaded).ToUnit())
                 .Take(1);
+
+            this.WhenAnyValue(x => x.Topmost)
+                .Subscribe(x => owner.Topmost = x)
+                .AddTo(Anchors);
         }
 
         public IObservable<Unit> WhenLoaded { get; }
@@ -37,6 +43,12 @@ namespace PoeShared.Native
         public IObservable<Unit> WhenUnloaded { get; }
 
         public IObservable<Unit> WhenRendered { get; }
+
+        public bool Topmost
+        {
+            get => topmost;
+            set => this.RaiseAndSetIfChanged(ref topmost, value);
+        }
 
         public void Hide()
         {
@@ -48,6 +60,14 @@ namespace PoeShared.Native
         {
             Log.Debug($"[{owner}.{owner.Title}] Showing window");
             UnsafeNative.ShowWindow(owner);
+            //FIXME Mahapps window resets topmost after minimize/maximize operations
+            owner.Topmost = topmost;
+        }
+
+        public void Minimize()
+        {
+            Log.Debug($"[{owner}.{owner.Title}] Minimizing window");
+            owner.WindowState = WindowState.Minimized;
         }
     }
 }

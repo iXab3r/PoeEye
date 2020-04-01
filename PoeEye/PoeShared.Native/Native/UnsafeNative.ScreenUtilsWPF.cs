@@ -101,12 +101,13 @@ namespace PoeShared.Native
             Log.Debug($"ShowWindow command executed, windowState: {mainWindow.WindowState}");
 
             Log.Debug($"Activating main window, title: '{mainWindow.Title}' {new Point(mainWindow.Left, mainWindow.Top)}, isActive: {mainWindow.IsActive}, state: {mainWindow.WindowState}, topmost: {mainWindow.Topmost}, style:{mainWindow.WindowStyle}");
+
+            if (mainWindow.Topmost)
+            {
+                mainWindow.Topmost = false;
+                mainWindow.Topmost = true;
+            }
             
-
-            var initialTopmost = mainWindow.Topmost;
-            mainWindow.Topmost = !initialTopmost;
-            mainWindow.Topmost = initialTopmost;
-
             var mainWindowHelper = new WindowInteropHelper(mainWindow);
             var mainWindowHandle = mainWindowHelper.EnsureHandle();
 

@@ -10,5 +10,9 @@ namespace PoeShared.Native
         IObservable<Unit> WhenUnloaded { get; }
         
         IObservable<Unit> WhenRendered { get; }
+        
+        void Minimize();
+        
+        bool Topmost { get; set; }
     }
 }
