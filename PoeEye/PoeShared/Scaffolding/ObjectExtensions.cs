@@ -10,6 +10,11 @@ namespace PoeShared.Scaffolding
 {
     public static class ObjectExtensions
     {
+        public static string Dump<T>(this T instance)
+        {
+            return DumpToText(instance);
+        }
+        
         public static string DumpToText<T>(this T instance)
         {
             return DumpToText(instance, Formatting.Indented);
