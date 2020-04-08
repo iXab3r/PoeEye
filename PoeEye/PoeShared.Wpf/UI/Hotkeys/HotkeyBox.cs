@@ -184,14 +184,27 @@ namespace PoeShared.UI.Hotkeys
             if (e.XButton1 == MouseButtonState.Pressed)
             {
                 HotKey = new HotkeyGesture(MouseButton.XButton1, currentModifierKeys);
+                e.Handled = true;
             }
             else if (e.XButton2 == MouseButtonState.Pressed)
             {
                 HotKey = new HotkeyGesture(MouseButton.XButton2, currentModifierKeys);
+                e.Handled = true;
             }
             else if (e.MiddleButton == MouseButtonState.Pressed)
             {
                 HotKey = new HotkeyGesture(MouseButton.Middle, currentModifierKeys);
+                e.Handled = true;
+            }
+            else if (e.LeftButton == MouseButtonState.Pressed && e.ClickCount == 2)
+            {
+                HotKey = new HotkeyGesture(MouseButton.Left, currentModifierKeys);
+                e.Handled = true;
+            }
+            else if (e.RightButton == MouseButtonState.Pressed)
+            {
+                HotKey = new HotkeyGesture(MouseButton.Right, currentModifierKeys);
+                e.Handled = true;
             }
         }
 

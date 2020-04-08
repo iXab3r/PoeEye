@@ -48,7 +48,7 @@
         <Setter Property="IsHitTestVisible" Value="False" />
         <Style.Triggers>
             <Trigger Property="IsEnabled" Value="False">
-                <Setter Property="Opacity" Value="0.77"></Setter>
+                <Setter Property="Opacity" Value="0.66"></Setter>
             </Trigger>
         </Style.Triggers>
     </Style>

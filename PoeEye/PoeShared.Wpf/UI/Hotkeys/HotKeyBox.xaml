@@ -16,6 +16,7 @@
         <Setter Property="AcceptsTab" Value="False"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
         <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="Background" Value="Transparent"/>
         <Setter Property="ToolTip" Value="Press Backspace to clear Hotkey"/>
         <Setter Property="Template">
             <Setter.Value>
@@ -40,7 +41,11 @@
                              VerticalScrollBarVisibility="{TemplateBinding ScrollViewer.VerticalScrollBarVisibility}"
                              AcceptsReturn="{TemplateBinding AcceptsReturn}"
                              AcceptsTab="{TemplateBinding AcceptsTab}"
-                             ToolTip="{TemplateBinding ToolTip}"/>
+                             ToolTip="{TemplateBinding ToolTip}">
+                        <TextBox.ContextMenu>
+                            <ContextMenu IsEnabled="False"/>
+                        </TextBox.ContextMenu>
+                    </TextBox>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
