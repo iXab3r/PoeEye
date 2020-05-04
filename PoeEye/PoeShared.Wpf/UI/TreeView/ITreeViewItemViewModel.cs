@@ -10,13 +10,12 @@ namespace PoeShared.UI.TreeView
         
         bool IsSelected { get; set; }
         
-        ITreeViewItemViewModel Parent { [CanBeNull] get; }
+        ITreeViewItemViewModel Parent { [CanBeNull] get; [CanBeNull] set; }
+
+        ReadOnlyObservableCollection<ITreeViewItemViewModel> Children { [NotNull] get; }
     }
     
     public interface IDirectoryTreeViewItemViewModel : ITreeViewItemViewModel
     {
-        string Name { get; set; }
-        
-        ObservableCollection<ITreeViewItemViewModel> Children { [NotNull] get; }
     }
 }
