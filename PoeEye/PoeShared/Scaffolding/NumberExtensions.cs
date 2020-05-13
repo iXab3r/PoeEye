@@ -4,7 +4,7 @@ namespace PoeShared.Scaffolding
     {
         public static string ToHexadecimal(this long value)
         {
-            return $"0x{value:x8} ({value})";
+            return $"0x{value:x8}";
         }
         
         public static string ToHexadecimal(this int value)

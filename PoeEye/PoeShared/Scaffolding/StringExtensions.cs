@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -30,6 +31,21 @@ namespace PoeShared.Scaffolding
         public static int? ToIntOrDefault(this string str)
         {
             int result;
+
+            if (string.IsNullOrEmpty(str))
+            {
+                return null;
+            }
+            
+            if (str.StartsWith("0x", StringComparison.CurrentCultureIgnoreCase) ||
+                str.StartsWith("&H", StringComparison.CurrentCultureIgnoreCase)) 
+            {
+                str = str.Substring(2);
+                if (int.TryParse(str, NumberStyles.HexNumber, null, out result))
+                {
+                    return result;
+                }
+            }
 
             if (int.TryParse(str, out result))
             {
