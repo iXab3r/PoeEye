@@ -19,7 +19,8 @@
     <eyeConverters:MultiBooleanAndConverter x:Key="MultiBooleanAllTrueToVisibleFalseToCollapsedConverter" TrueValue="{x:Static Visibility.Visible}" FalseValue="{x:Static Visibility.Collapsed}" />
     
     <eyeConverters:MultiDoubleSumConverter x:Key="MultiDoubleSumConverter" />
-
+    <eyeConverters:TimeSpanToMillisecondsConverter x:Key="TimeSpanToMillisecondsConverter"/>
+    <eyeConverters:TimeSpanToSecondsConverter x:Key="TimeSpanToSecondsConverter"/>
     <blue:ThicknessConverter x:Key="ThicknessConverter" UseBottom="True" UseLeft="True" UseRight="True" UseTop="True" />
     <eyeConverters:ColorToSolidColorBrushConverter x:Key="ColorToSolidColorBrushConverter"/>
     <eyeConverters:ColorToStringConverter x:Key="ColorToStringConverter"/>
