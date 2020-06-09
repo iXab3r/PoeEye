@@ -29,6 +29,12 @@ namespace PoeShared.Scaffolding
         {
             return instance == null ? $"null<{typeof(T).Name}>" : string.Join(separator, instance.Select(x => x.DumpToTextRaw()));
         }
+        
+        public static string DumpToTable<T>(this IEnumerable<T> instance, string tableName, string separator = "\n\t")
+        {
+            var header = instance == null ? $"{tableName} (null)" : $"{tableName} ({instance.Count()})";
+            return header + separator + DumpToTable(instance, separator);
+        }
 
         public static string DumpToText<T>(this T instance, Formatting formatting)
         {

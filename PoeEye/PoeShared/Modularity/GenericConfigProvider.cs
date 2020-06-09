@@ -42,7 +42,7 @@ namespace PoeShared.Modularity
                 .Select(
                     x =>
                     {
-                        Log.Debug($"Refreshing ActualConfig of type {typeof(TConfig)}...");
+                        Log.Debug($"[{typeof(TConfig)}] Refreshing ActualConfig...");
                         return configProvider.GetActualConfig<TConfig>();
                     })
                 .Subscribe(x => ActualConfig = x)
@@ -72,7 +72,7 @@ namespace PoeShared.Modularity
             WhenChanged = changes;
             changes.Connect().AddTo(Anchors);
             
-            Log.Debug($"Initial re-save of config to update format using {configProvider}");
+            Log.Debug($"[{typeof(TConfig)}] Initial re-save of config to update format using {configProvider}");
             configProvider.Save();
         }
 
@@ -96,7 +96,7 @@ namespace PoeShared.Modularity
         public void Reload()
         {
             Interlocked.Increment(ref loadCommandCounter);
-            Log.Debug($"ConfigProvider Save/Load stat: { new { saveCommandCounter, loadCommandCounter } }");
+            Log.Debug($"[{typeof(TConfig)}] ConfigProvider Save/Load stat: { new { saveCommandCounter, loadCommandCounter } }");
 
             configProvider.Reload();
         }
@@ -109,12 +109,12 @@ namespace PoeShared.Modularity
 
             if (compare.AreEqual)
             {
-                Log.Debug($"Attempted to save config that is an exact duplicate of an Actual config, skipping request");
+                Log.Debug($"[{typeof(TConfig)}] Attempted to save config that is an exact duplicate of an Actual config, skipping request");
                 return;
             }
 
             Interlocked.Increment(ref saveCommandCounter);
-            Log.Debug($"ConfigProvider Save/Load stat: { new { saveCommandCounter, loadCommandCounter } }");
+            Log.Debug($"[{typeof(TConfig)}] ConfigProvider Save/Load stat: { new { saveCommandCounter, loadCommandCounter } }");
 
             configProvider.Save(config);
         }
@@ -122,7 +122,7 @@ namespace PoeShared.Modularity
         private void LogActualConfigChange(TConfig previousConfig, TConfig currentConfig, ComparisonResult result)
         {
             Log.Debug(
-                $"[{typeof(TConfig).Name}] Actual config updated(areEqual: {result.AreEqual})\nPrevious: {(previousConfig == null ? "NULL" : previousConfig.DumpToTextRaw())}\nCurrent: {(currentConfig == null ? "NULL" : currentConfig.DumpToTextRaw())}\nTime spent by comparer: {result.ElapsedMilliseconds}ms\n{result.DifferencesString}");
+                $"[{typeof(TConfig)}] Actual config updated(areEqual: {result.AreEqual})\nPrevious: {(previousConfig == null ? "NULL" : previousConfig.DumpToTextRaw())}\nCurrent: {(currentConfig == null ? "NULL" : currentConfig.DumpToTextRaw())}\nTime spent by comparer: {result.ElapsedMilliseconds}ms\n{result.DifferencesString}");
         }
     }
 }
