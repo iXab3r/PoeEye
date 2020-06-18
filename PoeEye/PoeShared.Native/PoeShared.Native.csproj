@@ -37,6 +37,7 @@
     <PackageReference Include="System.Reactive" Version="4.2.0" />
     <PackageReference Include="System.Reflection.Emit" Version="4.3.0" />
     <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.5.2" />
+    <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="5.0.0-preview.5.20278.1" />
     <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.3" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
     <PackageReference Include="TaskScheduler" Version="2.5.19"><NoWarn>NU1701</NoWarn></PackageReference>
@@ -56,10 +57,6 @@
     <EmbeddedResource Include="Resources\Notifications\dingdong.wav" />
     <EmbeddedResource Include="Resources\Notifications\bell.wav" />
     <Resource Include="Resources\mainIcon.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="System.Web" />
-    <Reference Include="System.Security" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\PoeShared\PoeShared.csproj" />

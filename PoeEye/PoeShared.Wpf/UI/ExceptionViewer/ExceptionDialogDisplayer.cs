@@ -34,39 +34,23 @@ namespace PoeShared.Wpf.UI.ExceptionViewer
         public void ShowDialog(ExceptionDialogConfig config, Exception exception)
         {
             Guard.ArgumentNotNull(exception, nameof(exception));
-            
-            var windowAnchors = new CompositeDisposable();
 
-            var window = new ExceptionDialogView();
-
-            var appWindow = Application.Current.MainWindow;
-            if (appWindow != null && appWindow.IsLoaded && appWindow.IsVisible)
+            try
             {
-                window.WindowStartupLocation = WindowStartupLocation.CenterOwner;
-                window.Owner = appWindow;
+                ShowExceptionViewer(config, exception);
             }
-            else
+            catch (Exception e)
             {
-                window.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+                Log.Error($"Failed to show ExceptionViewer, falling back to MessageBox", e);
+                try
+                {
+                    ShowMessageBox(config, exception);
+                }
+                catch (Exception e1)
+                {
+                    Log.Error($"Failed to show MessageBox with exception", e1);
+                }
             }
-            
-            Disposable.Create(
-                    () =>
-                    {
-                        Log.Debug($"Closing ExceptionViewer, value: {exception}");
-                        window.Close();
-                    })
-                .AddTo(windowAnchors);
-            
-            var closeController = new CloseController(windowAnchors.Dispose);
-
-            var dialogViewModel = dialogViewModelFactory.Create(closeController);
-            dialogViewModel.Config = config;
-            dialogViewModel.ExceptionSource = exception;
-
-            Log.Debug($"Showing ExceptionViewer, exception: {exception}, config: {config.DumpToTextRaw()}");
-            window.DataContext = dialogViewModel;
-            window.ShowDialog();
         }
 
         public void ShowDialogAndTerminate(Exception exception)
@@ -114,6 +98,70 @@ namespace PoeShared.Wpf.UI.ExceptionViewer
             {
                 Log.HandleException(new ApplicationException("Exception in ExceptionReporter :-(", e));
             }
+        }
+
+        private void ShowMessageBox(ExceptionDialogConfig config, Exception exception)
+        {
+            Log.Debug($"Showing MessageBox, exception: {exception}, config: {config.DumpToTextRaw()}");
+
+            Window owner = null;
+            var appWindow = Application.Current.MainWindow;
+            if (appWindow != null && appWindow.IsLoaded && appWindow.IsVisible)
+            {
+                owner = appWindow;
+            }
+
+            if (owner != null)
+            {
+                System.Windows.MessageBox.Show(
+                    owner, 
+                    exception.ToString(), 
+                    config.Title, 
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+            else
+            {
+                System.Windows.MessageBox.Show(
+                    exception.ToString(), 
+                    config.Title, 
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+        }
+
+        private void ShowExceptionViewer(ExceptionDialogConfig config, Exception exception)
+        {
+            Log.Debug($"Showing custom ExceptionViewer, exception: {exception}, config: {config.DumpToTextRaw()}");
+
+            var windowAnchors = new CompositeDisposable();
+            var window = new ExceptionDialogView();
+            var appWindow = Application.Current.MainWindow;
+            if (appWindow != null && appWindow.IsLoaded && appWindow.IsVisible)
+            {
+                window.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+                window.Owner = appWindow;
+            }
+            else
+            {
+                window.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+            }
+            
+            Disposable.Create(
+                    () =>
+                    {
+                        Log.Debug($"Closing ExceptionViewer, value: {exception}");
+                        window.Close();
+                    })
+                .AddTo(windowAnchors);
+            
+            var closeController = new CloseController(windowAnchors.Dispose);
+
+            var dialogViewModel = dialogViewModelFactory.Create(closeController);
+            dialogViewModel.Config = config;
+            dialogViewModel.ExceptionSource = exception;
+            window.DataContext = dialogViewModel;
+            window.ShowDialog();
         }
     }
 }
