@@ -1,12 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
   <PropertyGroup>
     <ProjectGuid>{38C9EBE2-2AC9-465F-8A2A-49DFB1CB9383}</ProjectGuid>
-    <TargetFrameworks>net461;netcoreapp3.0</TargetFrameworks>
+    <TargetFrameworks>net461;netcoreapp3.0;netcoreapp5.0</TargetFrameworks>
     <AssemblyTitle>PoeShared.Wpf</AssemblyTitle>
     <Product>PoeShared.Wpf</Product>
     <Description>PoeEye Shared Wpf classes</Description>
     <Copyright>Copyright © Xab3r 2020</Copyright>
-    <OutputPath>bin\$(Configuration)\</OutputPath>
     <UseWpf>true</UseWpf>
     <Configurations>Debug;Release</Configurations>
     <Platforms>AnyCPU</Platforms>

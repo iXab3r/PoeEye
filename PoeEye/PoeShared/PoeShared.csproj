@@ -1,12 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>netstandard2.1;net461;netcoreapp3.0</TargetFrameworks>
-        <NoWarn>NU1605</NoWarn>
+        <TargetFrameworks>netstandard2.1;net461;netcoreapp3.0;netcoreapp5.0</TargetFrameworks>
         <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     </PropertyGroup>
     <ItemGroup>
-
         <PackageReference Include="CommandLineParser" Version="2.7.82" />
         <PackageReference Include="JetBrains.Annotations" Version="2019.1.3" />
         <PackageReference Include="log4net" Version="2.0.8" />
