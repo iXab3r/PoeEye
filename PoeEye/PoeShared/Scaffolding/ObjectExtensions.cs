@@ -120,7 +120,7 @@ namespace PoeShared.Scaffolding
             {
                 ObjectCreationHandling = ObjectCreationHandling.Replace,
                 TypeNameHandling = TypeNameHandling.All,
-                TypeNameAssemblyFormat = FormatterAssemblyStyle.Full
+                TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Full
             };
             var serializedObject = JsonConvert.SerializeObject(source, deserializeSettings);
             JsonConvert.PopulateObject(serializedObject, target, deserializeSettings);
@@ -148,7 +148,7 @@ namespace PoeShared.Scaffolding
             {
                 ObjectCreationHandling = ObjectCreationHandling.Replace,
                 TypeNameHandling = TypeNameHandling.All,
-                TypeNameAssemblyFormat = FormatterAssemblyStyle.Full,
+                TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Full,
             };
             var json = JsonConvert.SerializeObject(source, deserializeSettings);
             return JsonConvert.DeserializeObject<T>(json, deserializeSettings);
