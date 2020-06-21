@@ -33,7 +33,7 @@ namespace PoeShared.Native
 
         public IObservable<IntPtr> WhenWindowEventTriggered => whenWindowEventTriggered;
 
-        private void WinEventDelegateProc(User32.SafeEventHookHandle hWinEventHook,
+        private void WinEventDelegateProc(IntPtr hWinEventHook,
             User32.WindowsEventHookType @event,
             IntPtr hwnd,
             int idObject,
@@ -44,7 +44,7 @@ namespace PoeShared.Native
             if (Log.IsDebugEnabled)
             {
                 Log.Debug(
-                    $"[{hookArgs}] Event hook triggered, hWinEventHook: {hWinEventHook.DangerousGetHandle().ToHexadecimal()}, eventType: {@event}, hwnd: {hwnd.ToHexadecimal()}, idObject: {idObject}, idChild: {idChild}, dwEventThread: {dwEventThread}, dwmsEventTime: {dwmsEventTime}");
+                    $"[{hookArgs}] Event hook triggered, hWinEventHook: {hWinEventHook.ToHexadecimal()}, eventType: {@event}, hwnd: {hwnd.ToHexadecimal()}, idObject: {idObject}, idChild: {idChild}, dwEventThread: {dwEventThread}, dwmsEventTime: {dwmsEventTime}");
             }
 
             whenWindowEventTriggered.OnNext(hwnd);
