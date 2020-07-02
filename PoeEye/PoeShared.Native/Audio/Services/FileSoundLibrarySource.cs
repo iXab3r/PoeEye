@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using log4net;
 using PoeShared.Scaffolding;
 
@@ -12,7 +13,7 @@ namespace PoeShared.Audio.Services
         private static readonly ILog Log = LogManager.GetLogger(typeof(FileSoundLibrarySource));
 
         private static readonly DirectoryInfo ResourceDirectory =
-            new DirectoryInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "Notifications"));
+            new DirectoryInfo(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? AppDomain.CurrentDomain.BaseDirectory, "Resources", "Notifications"));
 
         public FileSoundLibrarySource()
         {
