@@ -8,7 +8,18 @@ namespace PoeShared.Scaffolding.WPF
 {
     public class BindableSelectedItemBehavior : Behavior<TreeView>
     {
+        public static readonly DependencyProperty SelectedItemProperty =
+            DependencyProperty.Register("SelectedItem", typeof(object), typeof(BindableSelectedItemBehavior),
+                new UIPropertyMetadata(null));
+
+        
         private readonly SerialDisposable attachmentAnchor = new SerialDisposable();
+
+        public object SelectedItem
+        {
+            get => GetValue(SelectedItemProperty);
+            set => SetValue(SelectedItemProperty, value);
+        }
         
         protected override void OnAttached()
         {
@@ -33,19 +44,5 @@ namespace PoeShared.Scaffolding.WPF
         {
             SelectedItem = newValue;
         }
-
-        #region SelectedItem Property
-
-        public object SelectedItem
-        {
-            get => GetValue(SelectedItemProperty);
-            set => SetValue(SelectedItemProperty, value);
-        }
-
-        public static readonly DependencyProperty SelectedItemProperty =
-            DependencyProperty.Register("SelectedItem", typeof(object), typeof(BindableSelectedItemBehavior),
-                new UIPropertyMetadata(null));
-
-        #endregion
     }
 }
