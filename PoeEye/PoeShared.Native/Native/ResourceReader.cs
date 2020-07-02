@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using log4net;
 using PoeShared.Scaffolding;
 
@@ -39,6 +42,22 @@ namespace PoeShared.Native
                 {
                     return streamReader.ReadToEnd();
                 }
+            }
+        }
+
+        public static IEnumerable<byte[]> TryToLoadResourcesByName(Assembly assembly, Regex pattern)
+        {
+            var resourcesList = assembly.GetManifestResourceNames();
+            var matches = resourcesList.Where(x => pattern.IsMatch(x)).ToArray();
+            foreach (var match in matches)
+            {
+                if (!TryToLoadResourceByName(assembly, match, out var resourceData))
+                {
+                    Log.Debug($"Failed to load resource resource '{match}'");
+                    continue;
+                }
+
+                yield return resourceData;
             }
         }
         
