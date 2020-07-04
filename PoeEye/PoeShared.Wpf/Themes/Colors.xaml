@@ -78,5 +78,18 @@
     <SolidColorBrush x:Key="PoeItemRarityUniqueBrush" Color="{StaticResource PoeItemRarityUniqueColor}" />
     <SolidColorBrush x:Key="PoeItemRarityRelicBrush" Color="{StaticResource PoeItemRarityRelicColor}" />
 
-
+    <DrawingBrush x:Key="DashedAccentBorderBrush" Viewport="0,0,8,8" ViewportUnits="Absolute" TileMode="Tile">
+        <DrawingBrush.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="{StaticResource MouseOverAccentBrushKey}">
+                    <GeometryDrawing.Geometry>
+                        <GeometryGroup>
+                            <RectangleGeometry Rect="0,0,50,50" />
+                            <RectangleGeometry Rect="50,50,50,50" />
+                        </GeometryGroup>
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingBrush.Drawing>
+    </DrawingBrush>
 </ResourceDictionary>
