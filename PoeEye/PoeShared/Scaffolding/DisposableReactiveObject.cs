@@ -60,6 +60,11 @@ namespace PoeShared.Scaffolding
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+        
+        public void RaisePropertyChanged(params string[] properties)
+        {
+            properties.ForEach(RaisePropertyChanged);
+        }
 
         public void RaisingPropertyChanging(string propertyName)
         {

@@ -22,6 +22,7 @@
     <Color x:Key="OverlayWindowBackgroundColorKey">#292C2A</Color>
     <Color x:Key="OverlayWindowTextColorKey">#EEC64C</Color>
     <Color x:Key="MouseOverAccentColorKey">#80d8ff</Color>
+    <Color x:Key="ButtonTextAccentColorKey">#EEC64C</Color>
 
     <SolidColorBrush x:Key="OverlayWindowTextBrushKey" Color="{StaticResource OverlayWindowTextColorKey}" />
     <SolidColorBrush x:Key="OverlayWindowBorderBrushKey" Color="{StaticResource OverlayWindowBorderColorKey}" />
