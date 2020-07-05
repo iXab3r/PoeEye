@@ -284,7 +284,7 @@ namespace PoeShared.Native
             Log.Debug($"[#{this}] Loaded overlay window: {OverlayWindow} ({interopHelper.Handle.ToHexadecimal()})");
         }
 
-        protected void ApplyConfig(IOverlayConfig config)
+        protected virtual void ApplyConfig(IOverlayConfig config)
         {
             Log.Debug($"[{OverlayDescription}] Applying configuration of type ({config.GetType().FullName}): {config.DumpToTextRaw()}");
             if (config.OverlaySize.Height <= 0 ||
