@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
+using DynamicData;
+using DynamicData.Binding;
 using log4net;
+using PoeShared.Scaffolding;
 
 namespace PoeShared.Audio.Services
 {
-    internal class ComplexSoundLibrary : ISoundLibrarySource
+    internal class ComplexSoundLibrary : DisposableReactiveObject, ISoundLibrarySource
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(ComplexSoundLibrary));
 
@@ -15,6 +19,13 @@ namespace PoeShared.Audio.Services
         public ComplexSoundLibrary(ISoundLibrarySource[] sources)
         {
             this.sources = sources;
+            
+            new SourceList<string>().Connect()
+                .Or(sources.Select(x => x.SourceName.ToObservableChangeSet()).ToArray())
+                .Bind(out var sourceNames)
+                .Subscribe()
+                .AddTo(Anchors);
+            SourceName = sourceNames;
         }
 
         public static ComplexSoundLibrary Instance => InstanceSupplier.Value;
@@ -33,6 +44,6 @@ namespace PoeShared.Audio.Services
             return false;
         }
 
-        public IEnumerable<string> SourceName => sources.SelectMany(x => x.SourceName);
+        public ReadOnlyObservableCollection<string> SourceName { get; }
     }
 }

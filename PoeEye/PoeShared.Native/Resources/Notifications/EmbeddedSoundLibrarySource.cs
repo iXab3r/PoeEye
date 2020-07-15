@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -26,12 +27,12 @@ namespace PoeShared.Native.Resources.Notifications
                 .Where(x => extensions.Any(ext => string.Equals(ext, Path.GetExtension(x.InternalResourceName), StringComparison.OrdinalIgnoreCase)))
                 .Select(x => x.SourceName)
                 .ToArray();
-            SourceName = sources;
+            SourceName = new ReadOnlyObservableCollection<string>(new ObservableCollection<string>(sources));
 
             Log.Debug($"Source name list(namespace: {namespaceName}):\r\n {sources.DumpToText()}");
         }
 
-        public override IEnumerable<string> SourceName { get; }
+        public override ReadOnlyObservableCollection<string> SourceName { get; }
 
         public override bool TryToLoadSourceByName(string name, out byte[] resourceData)
         {

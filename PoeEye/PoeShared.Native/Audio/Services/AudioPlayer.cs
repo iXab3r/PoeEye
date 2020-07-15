@@ -24,9 +24,9 @@ namespace PoeShared.Audio.Services
             this.bgScheduler = bgScheduler;
         }
 
-        public IDisposable Play(Stream rawStream)
+        public IDisposable Play(byte[] waveData)
         {
-            return PlayInternal(rawStream);
+            return PlayInternal(waveData);
         }
 
         private IDisposable PlayInternalMedia(Stream rawStream)
@@ -41,17 +41,17 @@ namespace PoeShared.Audio.Services
             return Disposable.Empty;
         }
 
-        private IDisposable PlayInternal(Stream rawStream)
+        private IDisposable PlayInternal(byte[] soundData)
         {
-            Log.Debug($"Queueing audio stream({rawStream.Length})...");
+            Log.Debug($"Queueing audio stream({soundData.Length})...");
             return bgScheduler.Schedule(() =>
             {
                 try
                 {
+                    using (var rawStream = new MemoryStream(soundData))
                     using (var waveStream = new WaveFileReader(rawStream))
                     using (WaveStream blockAlignedStream = new BlockAlignReductionStream(waveStream))
                     using (var waveOut = new WaveOut(WaveCallbackInfo.FunctionCallback()))
-                    using (rawStream)
                     {
                         {
                             Log.Debug($"Initializing waveOut device {waveOut}");
@@ -78,7 +78,7 @@ namespace PoeShared.Audio.Services
                 }
                 catch (Exception e)
                 {
-                    Log.Error($"Failed to play audio stream {rawStream}", e);
+                    Log.Error($"Failed to play audio stream of length {soundData.Length}b", e);
                 }
             });
         }

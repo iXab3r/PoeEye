@@ -1,5 +1,7 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Reactive.Concurrency;
@@ -19,10 +21,12 @@ namespace PoeShared.Audio.Services
 
         private readonly ConcurrentDictionary<string, byte[]> knownNotifications = new ConcurrentDictionary<string, byte[]>();
         private readonly ISoundLibrarySource soundLibrarySource;
+        private readonly IFileSoundLibrarySource fileSoundLibrarySource;
 
         public AudioNotificationsManager(
             [NotNull] IAudioPlayer audioPlayer,
             [NotNull] ISoundLibrarySource soundLibrarySource,
+            [NotNull] IFileSoundLibrarySource fileSoundLibrarySource,
             [NotNull] IConfigProvider<PoeEyeSharedConfig> poeEyeConfigProvider,
             [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler)
         {
@@ -31,6 +35,7 @@ namespace PoeShared.Audio.Services
             Guard.ArgumentNotNull(soundLibrarySource, nameof(soundLibrarySource));
             this.audioPlayer = audioPlayer;
             this.soundLibrarySource = soundLibrarySource;
+            this.fileSoundLibrarySource = fileSoundLibrarySource;
 
             Log.Info("Initializing sound subsystem...");
             knownNotifications[AudioNotificationType.Silence.ToString()] = new byte[0];
@@ -38,7 +43,7 @@ namespace PoeShared.Audio.Services
             bgScheduler.Schedule(Initialize).AddTo(Anchors);
         }
 
-        public IEnumerable<string> Notifications => soundLibrarySource.SourceName;
+        public ReadOnlyObservableCollection<string> Notifications => soundLibrarySource.SourceName;
 
         public void PlayNotification(AudioNotificationType notificationType)
         {
@@ -64,7 +69,13 @@ namespace PoeShared.Audio.Services
             }
 
             Log.Debug($"Starting playback of {notificationName} ({notificationData.Length}b)...");
-            audioPlayer.Play(new MemoryStream(notificationData));
+
+            audioPlayer.Play(notificationData);
+        }
+        
+        public void AddFromFile(FileInfo soundFile)
+        {
+            fileSoundLibrarySource.AddFromFile(soundFile);
         }
 
         private bool TryToLoadNotification(string notificationName, out byte[] waveData)
