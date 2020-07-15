@@ -13,6 +13,6 @@ namespace PoeShared.Audio.Services
 
         void PlayNotification([NotNull] string notificationName);
 
-        void AddFromFile([NotNull] FileInfo soundFile);
+        string AddFromFile([NotNull] FileInfo soundFile);
     }
 }

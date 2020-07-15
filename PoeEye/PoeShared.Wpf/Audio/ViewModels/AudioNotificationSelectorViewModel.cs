@@ -59,9 +59,8 @@ namespace PoeShared.Audio.ViewModels
                 .Or(
                     new ObservableCollection<string>(preconfiguredNotifications).ToObservableChangeSet(),
                     dynamicNotifications)
-                .Transform(x => x.Pascalize())
                 .Distinct()
-                .Transform(x => (object) new NotificationTypeWrapper(this, x, x.ToString()))
+                .Transform(x => (object) new NotificationTypeWrapper(this, x, x.Pascalize()))
                 .Bind(out var notificationsSource)
                 .Subscribe()
                 .AddTo(Anchors);
@@ -152,7 +151,7 @@ namespace PoeShared.Audio.ViewModels
             public bool IsSelected => owner.SelectedValue == Value;
 
             public string Value { get; }
-
+            
             public ICommand PlayNotificationCommand => owner.PlayNotificationCommand;
 
             public ICommand SelectNotificationCommand => owner.SelectNotificationCommand;

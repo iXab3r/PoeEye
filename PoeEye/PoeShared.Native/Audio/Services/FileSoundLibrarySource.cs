@@ -68,7 +68,7 @@ namespace PoeShared.Audio.Services
         }
 
 
-        public void AddFromFile(FileInfo soundFile)
+        public string AddFromFile(FileInfo soundFile)
         {
             Guard.ArgumentNotNull(soundFile, nameof(soundFile));
             if (!soundFile.Exists)
@@ -92,6 +92,7 @@ namespace PoeShared.Audio.Services
                 WaveFileWriter.CreateWaveFile(filePath, pcmStream);
             }
             Reload();
+            return Path.GetFileNameWithoutExtension(soundFile.Name);
         }
 
         private void Reload()

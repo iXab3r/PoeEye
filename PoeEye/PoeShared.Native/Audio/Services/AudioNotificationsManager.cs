@@ -73,9 +73,9 @@ namespace PoeShared.Audio.Services
             audioPlayer.Play(notificationData);
         }
         
-        public void AddFromFile(FileInfo soundFile)
+        public string AddFromFile(FileInfo soundFile)
         {
-            fileSoundLibrarySource.AddFromFile(soundFile);
+            return fileSoundLibrarySource.AddFromFile(soundFile);
         }
 
         private bool TryToLoadNotification(string notificationName, out byte[] waveData)
