@@ -41,7 +41,6 @@
     <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="5.0.0-preview.5.20278.1" />
     <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.3" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
-    <PackageReference Include="TaskScheduler" Version="2.5.19"><NoWarn>NU1701</NoWarn></PackageReference>
     <PackageReference Include="Unity" Version="5.10.3" />
     <PackageReference Include="Unity.Abstractions" Version="4.1.3" />
     <PackageReference Include="Unity.Container" Version="5.10.3" />
