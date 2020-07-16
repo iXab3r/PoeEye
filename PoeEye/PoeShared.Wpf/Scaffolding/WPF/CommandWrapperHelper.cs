@@ -69,16 +69,23 @@ namespace PoeShared.Scaffolding.WPF
 
         private static void PropertyChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            if (d is Button)
+            try
             {
-                d.Observe<DependencyObject, CommandWrapper>(ButtonBase.CommandProperty)
-                    .Take(1)
-                    .Where(x => x != null)
-                    .Subscribe(x => x.RaiseCanExecuteChanged());
+                if (d is Button)
+                {
+                    d.Observe<DependencyObject, CommandWrapper>(ButtonBase.CommandProperty)
+                        .Take(1)
+                        .Where(x => x != null)
+                        .Subscribe(x => x.RaiseCanExecuteChanged());
+                }
+                else if (d is MenuItem)
+                {
+                    d.SetCurrentValue(MenuItem.CommandParameterProperty, e.NewValue);
+                }
             }
-            else if (d is MenuItem)
+            catch (Exception exception)
             {
-                d.SetCurrentValue(MenuItem.CommandParameterProperty, e.NewValue);
+                throw new ApplicationException($"Failed to process callback for DependencyObject {d}", exception);
             }
         }
 
