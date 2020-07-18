@@ -3,11 +3,14 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Interactivity;
 using System;
+using log4net;
 
 namespace PoeShared.Scaffolding.WPF
 {
     public class BindableSelectedItemBehavior : Behavior<TreeView>
     {
+        private static readonly ILog Log = LogManager.GetLogger(typeof(BindableSelectedItemBehavior));
+
         public static readonly DependencyProperty SelectedItemProperty =
             DependencyProperty.Register("SelectedItem", typeof(object), typeof(BindableSelectedItemBehavior),
                 new UIPropertyMetadata(null));
@@ -30,7 +33,9 @@ namespace PoeShared.Scaffolding.WPF
 
             AssociatedObject
                 .Observe(TreeView.SelectedItemProperty)
-                .Subscribe(x => OnTreeViewSelectedItemChanged(AssociatedObject.SelectedItem))
+                .Select(() => AssociatedObject.SelectedItem)
+                .WithPrevious((prev, curr) => new { prev, curr })
+                .Subscribe(x => OnTreeViewSelectedItemChanged(x.prev, x.curr))
                 .AddTo(anchors);
         }
 
@@ -40,9 +45,11 @@ namespace PoeShared.Scaffolding.WPF
             attachmentAnchor.Disposable = null;
         }
 
-        private void OnTreeViewSelectedItemChanged(object newValue)
+        private void OnTreeViewSelectedItemChanged(object previousValue, object currentValue)
         {
-            SelectedItem = newValue;
+            Log.Debug($"[{AssociatedObject}({AssociatedObject.Name})] Changing {SelectedItem} => {currentValue}");
+            SelectedItem = currentValue;
+            Log.Debug($"[{AssociatedObject}({AssociatedObject.Name})] Selected item changed {previousValue} => {SelectedItem}");
         }
     }
 }

@@ -12,9 +12,9 @@ namespace PoeShared.Scaffolding
             
             foreach (var type in types)
             {
-                instance.RegisterFactory(type, container => container.Resolve(typeof(TTo)), new ContainerControlledLifetimeManager());
+                instance.RegisterType(type, typeof(TTo), new ContainerControlledLifetimeManager());
             }
-
+            
             return instance;
         }
     }

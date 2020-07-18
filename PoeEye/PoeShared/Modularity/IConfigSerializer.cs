@@ -18,6 +18,9 @@ namespace PoeShared.Modularity
         T Deserialize<T>(string serializedData);
 
         [NotNull]
+        T[] DeserializeSingleOrList<T>(string serializedData);
+
+        [NotNull]
         string Compress(object data);
 
         [NotNull]

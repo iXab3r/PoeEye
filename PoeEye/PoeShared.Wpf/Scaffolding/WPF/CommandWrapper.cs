@@ -127,7 +127,7 @@ namespace PoeShared.Scaffolding.WPF
             command.IsExecuting.Subscribe(x => result.IsBusy = x).AddTo(result.Anchors);
             command.ThrownExceptions.Subscribe(x => result.HandleException(x)).AddTo(result.Anchors);
             result.raiseCanExecuteChangedRequests
-                .Subscribe(() => throw new NotSupportedException($"RaiseCanExecuteChanged is not supported for commands of type {command}"))
+                .Subscribe(() => Log.Warn($"RaiseCanExecuteChanged is not supported for commands of type {command}"))
                 .AddTo(result.Anchors);
 
             return result;

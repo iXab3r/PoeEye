@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
@@ -8,6 +10,7 @@ using log4net;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using PoeShared.Scaffolding;
+using ErrorEventArgs = Newtonsoft.Json.Serialization.ErrorEventArgs;
 
 namespace PoeShared.Modularity
 {
@@ -59,6 +62,28 @@ namespace PoeShared.Modularity
             }
 
             return (T) result;
+        }
+
+        public T[] DeserializeSingleOrList<T>(string serializedData)
+        {
+            using (var textReader = new StringReader(serializedData))
+            using (var jsonReader = new JsonTextReader(textReader))
+            {
+                if (jsonReader.Read())
+                {
+                    switch (jsonReader.TokenType)
+                    {
+                        case JsonToken.StartArray:
+                            return JsonConvert.DeserializeObject<T[]>(serializedData, jsonSerializerSettings);
+
+                        case JsonToken.StartObject:
+                            var instance = JsonConvert.DeserializeObject<T>(serializedData, jsonSerializerSettings);
+                            return new [] { instance };
+                    }
+                }
+                throw new FormatException(
+                    $"Operation failed, could not deserialize data to instance of type {typeof(T)}, serialized data: \n{serializedData.Substring(0, Math.Min(MaxCharsToLog, serializedData.Length))}");
+            }
         }
 
         public string Compress(object data)

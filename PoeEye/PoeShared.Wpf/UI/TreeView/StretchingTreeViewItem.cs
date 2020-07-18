@@ -7,7 +7,7 @@ namespace PoeShared.UI.TreeView
     {
         public StretchingTreeViewItem()
         {
-            this.Loaded += new RoutedEventHandler(StretchingTreeViewItem_Loaded);
+            this.Loaded += StretchingTreeViewItem_Loaded;
         }
 
         private void StretchingTreeViewItem_Loaded(object sender, RoutedEventArgs e)

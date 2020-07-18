@@ -65,7 +65,7 @@ namespace PoeShared.Scaffolding.WPF
 
             element.IsVisibleChanged += ElementOnIsVisibleChanged;
         }
-
+        
         private static bool ApplyFocus(FrameworkElement element)
         {
             element.Loaded -= ElementOnLoaded;
@@ -74,6 +74,8 @@ namespace PoeShared.Scaffolding.WPF
             {
                 var targetElement = element
                     .FindVisualChildren<TextBox>()
+                    .FirstOrDefault(x => x.Focusable) ?? element
+                    .FindVisualChildren<Control>()
                     .FirstOrDefault(x => x.Focusable);
                 if (targetElement == null)
                 {
