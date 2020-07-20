@@ -41,7 +41,22 @@ namespace PoeShared.Scaffolding
                 {
                     return newValue;
                 }
+            }
+            catch (Exception e)
+            {
+                thrownExceptions.OnNext(e);
+                throw;
+            }
 
+            return RaiseAndSet(ref backingField, newValue, propertyName);
+        }
+        
+        public TRet RaiseAndSet<TRet>(ref TRet backingField,
+            TRet newValue,
+            [CallerMemberName] string propertyName = null)
+        {
+            try
+            {
                 RaisingPropertyChanging(propertyName);
                 backingField = newValue;
                 RaisePropertyChanged(propertyName);
