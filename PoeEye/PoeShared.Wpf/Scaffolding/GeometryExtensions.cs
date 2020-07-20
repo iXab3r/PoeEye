@@ -169,6 +169,13 @@ namespace PoeShared.Scaffolding
         {
             return new WinRectangle((int)(sourceSize.X / dpi), (int)(sourceSize.Y / dpi), (int)(sourceSize.Width / dpi), (int)(sourceSize.Height / dpi));
         }
+        
+        public static WinRectangle InflateScale(this WinRectangle sourceSize, float widthMultiplier, float heightMultiplier)
+        {
+            var result = sourceSize;
+            result.Inflate((int)(result.Width * widthMultiplier), (int)(result.Height * heightMultiplier));
+            return result;
+        }
 
         public static Rectangle ToWinRectangle(this Rect sourceSize)
         {
