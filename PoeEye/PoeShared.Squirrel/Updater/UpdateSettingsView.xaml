@@ -12,7 +12,9 @@
             </Grid.ColumnDefinitions>
 
             <TextBlock Grid.Row="0" Grid.Column="0" Text="Check for updates: " HorizontalAlignment="Right" />
-            <CheckBox Grid.Row="0" Grid.Column="1" IsChecked="{Binding CheckForUpdates}" ToolTip="{Binding UpdateSource}"/>
+            <CheckBox Grid.Row="0" Grid.Column="1" 
+                          HorizontalAlignment="Left" Margin="5,0,0,0" 
+                          IsChecked="{Binding CheckForUpdates}" ToolTip="{Binding UpdateSource}"/>
         </Grid>
     </DataTemplate>
 </ResourceDictionary>
