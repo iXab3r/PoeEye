@@ -41,8 +41,6 @@ namespace PoeShared.Scaffolding
             });
         }
 
-
-
         public static IDisposable SubscribeToErrors<T>(this IObservable<T> observable, [NotNull] Action<Exception> onError)
         {
             return observable.Subscribe(_ => { }, onError);
@@ -74,6 +72,16 @@ namespace PoeShared.Scaffolding
         {
             return WithPrevious(source)
                 .Select(t => resultSelector(t.Item1, t.Item2));
+        }
+        
+        public static IObservable<TSource> DisposePrevious<TSource>(
+            this IObservable<TSource> source) where TSource : IDisposable
+        {
+            return WithPrevious(source).Select(x =>
+            {
+                x.Item1?.Dispose();
+                return x.Item2;
+            });
         }
 
         public static IObservable<Tuple<TSource, TSource>> WithPrevious<TSource>(
