@@ -17,6 +17,7 @@ namespace PoeShared.Scaffolding
         private readonly ConcurrentQueue<string> operations = new ConcurrentQueue<string>();
         private TimeSpan previousOperationTimestamp;
         private readonly Stopwatch sw;
+        private TimeSpan loggingElapsedThreshold = TimeSpan.Zero;
 
         public BenchmarkTimer(string benchmarkName, ILog logger = null, [CallerMemberName] string propertyName = null)
         {
@@ -31,11 +32,27 @@ namespace PoeShared.Scaffolding
             previousOperationTimestamp = sw.Elapsed;
         }
 
+        public BenchmarkTimer WithMinElapsedThreshold(TimeSpan minElapsedThreshold)
+        {
+            loggingElapsedThreshold = minElapsedThreshold;
+            return this;
+        }
+
         public void Step(string message)
         {
             var timestamp = sw.Elapsed;
             AddStep(message);
             previousOperationTimestamp = timestamp;
+        }
+        
+        public void StepIf(string message, TimeSpan elapsedThreshold)
+        {
+            if (sw.Elapsed < elapsedThreshold)
+            {
+                return;
+            }
+
+            Step(message);
         }
 
         private void AddStep(string message)
@@ -46,7 +63,7 @@ namespace PoeShared.Scaffolding
         public void Dispose()
         {
             sw.Stop();
-            if (logger.IsDebugEnabled)
+            if (logger.IsDebugEnabled && sw.Elapsed > loggingElapsedThreshold)
             {
                 logger.Debug($"[{propertyName}] [{sw.Elapsed.TotalMilliseconds:F0}ms] {benchmarkName}{(operations.Count <= 0 ? string.Empty : $"\n\t{string.Join("\n\t", operations)}")}");
             }
