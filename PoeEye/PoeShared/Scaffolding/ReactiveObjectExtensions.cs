@@ -20,7 +20,7 @@ namespace PoeShared.Scaffolding
             [NotNull] Expression<Func<TTarget, TTargetProperty>> instancePropertyExtractor,
             [NotNull] TSource source,
             [NotNull] Expression<Func<TSource, TSourceProperty>> sourcePropertyExtractor,
-            [NotNull] IScheduler scheduler)
+            [CanBeNull] IScheduler scheduler = null)
             where TSource : INotifyPropertyChanged
             where TTarget : IDisposableReactiveObject
         {
@@ -28,14 +28,19 @@ namespace PoeShared.Scaffolding
             Guard.ArgumentNotNull(instancePropertyExtractor, nameof(instancePropertyExtractor));
             Guard.ArgumentNotNull(sourcePropertyExtractor, nameof(sourcePropertyExtractor));
             Guard.ArgumentNotNull(source, nameof(source));
-            Guard.ArgumentNotNull(scheduler, nameof(scheduler));
 
             var instancePropertyName = new Lazy<string>(() => Reflection.ExpressionToPropertyNames(instancePropertyExtractor.Body));
             var sourcePropertyName = new Lazy<string>(() => Reflection.ExpressionToPropertyNames(sourcePropertyExtractor.Body));
 
-            return source
-                .WhenAnyValue(sourcePropertyExtractor)
-                .ObserveOn(scheduler)
+            var result = source
+                .WhenAnyValue(sourcePropertyExtractor);
+
+            if (scheduler != null)
+            {
+                result = result.ObserveOn(scheduler);
+            }
+            
+            return result
                 .Subscribe(x =>
                 {
                     if (Log.IsDebugEnabled)
@@ -43,20 +48,8 @@ namespace PoeShared.Scaffolding
                         Log.Debug(
                             $"[{typeof(TSource).Name}.{sourcePropertyName.Value} => {typeof(TTarget).Name}.{instancePropertyName.Value}] Bound property '{sourcePropertyName.Value}' (source {source}) fired, raising {instancePropertyName.Value} on {instance}");
                     }
-
                     instance.RaisePropertyChanged(instancePropertyName.Value);
                 }, Log.HandleException);
-        }
-
-        public static IDisposable RaiseWhenSourceValue<TSource, TTarget, TSourceProperty, TTargetProperty>(
-            [NotNull] this TTarget instance,
-            [NotNull] Expression<Func<TTarget, TTargetProperty>> instancePropertyExtractor,
-            [NotNull] TSource source,
-            [NotNull] Expression<Func<TSource, TSourceProperty>> sourcePropertyExtractor)
-            where TSource : INotifyPropertyChanged
-            where TTarget : IDisposableReactiveObject
-        {
-            return RaiseWhenSourceValue(instance, instancePropertyExtractor, source, sourcePropertyExtractor, Scheduler.Default);
         }
 
         public static ObservableAsPropertyHelper<TSourceProperty> ToPropertyHelper<TSource, TSourceProperty>(

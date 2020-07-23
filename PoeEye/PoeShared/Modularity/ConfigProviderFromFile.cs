@@ -178,8 +178,6 @@ namespace PoeShared.Modularity
             try
             {
                 Log.Debug($"Saving config to file '{ConfigFilePath}'");
-                Log.Info($"Saving config to '{Path.GetFileName(ConfigFilePath)}'");
-
                 Log.Debug("Serializing config data...");
                 var serializedData = configSerializer.Serialize(config);
 
@@ -206,7 +204,6 @@ namespace PoeShared.Modularity
         private PoeEyeCombinedConfig LoadInternal()
         {
             Log.Debug($"Loading config from file '{ConfigFilePath}'");
-            Log.Info($"Loading config from '{Path.GetFileName(ConfigFilePath)}'");
             loadedConfigsByType.Clear();
             loadedConfigurationFile = string.Empty;
 

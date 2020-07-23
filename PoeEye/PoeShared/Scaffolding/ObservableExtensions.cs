@@ -3,6 +3,7 @@ using System.Linq.Expressions;
 using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
+using System.Threading;
 using JetBrains.Annotations;
 using ReactiveUI;
 
@@ -115,7 +116,7 @@ namespace PoeShared.Scaffolding
 
             return source.Catch(source.SubscribeOn(scheduler).DelaySubscription(timeSpan).Retry());
         }
-        
+
         public static ObservableAsPropertyHelper<TSourceProperty> ToPropertyHelper<TSource, TSourceProperty>(
             [NotNull] this IObservable<TSourceProperty> sourceObservable,
             [NotNull] TSource instance,

@@ -6,6 +6,7 @@ using JetBrains.Annotations;
 using log4net;
 using PoeShared.Scaffolding;
 using ReactiveUI;
+using ObservableEx = PoeShared.Scaffolding.ObservableEx;
 
 namespace PoeShared.Native
 {
@@ -30,8 +31,8 @@ namespace PoeShared.Native
 
             this.titleMatcher = titleMatcher;
 
-            var timerObservable = Observable
-                .Timer(DateTimeOffset.Now, RecheckPeriod)
+            var timerObservable = ObservableEx
+                .BlockingTimer(RecheckPeriod)
                 .ToUnit();
 
             timerObservable
