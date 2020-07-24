@@ -57,7 +57,7 @@ namespace PoeShared.Scaffolding
 
         private void AddStep(string message)
         {
-            operations.Enqueue($"[{propertyName}] [{(sw.Elapsed - previousOperationTimestamp).TotalMilliseconds:F0}ms] {message}");
+            operations.Enqueue($"[{propertyName}] [{(sw.Elapsed - previousOperationTimestamp).TotalMilliseconds:F1}ms] {message}");
         }
         
         public void Dispose()
@@ -65,7 +65,7 @@ namespace PoeShared.Scaffolding
             sw.Stop();
             if (logger.IsDebugEnabled && sw.Elapsed > loggingElapsedThreshold)
             {
-                logger.Debug($"[{propertyName}] [{sw.Elapsed.TotalMilliseconds:F0}ms] {benchmarkName}{(operations.Count <= 0 ? string.Empty : $"\n\t{string.Join("\n\t", operations)}")}");
+                logger.Debug($"[{propertyName}] [{sw.Elapsed.TotalMilliseconds:F1}ms] {benchmarkName}{(operations.Count <= 0 ? string.Empty : $"\n\t{string.Join("\n\t", operations)}")}");
             }
         }
     }
