@@ -5,6 +5,11 @@
                     xmlns:kent="http://schemas.kent.boogaart.com/converters"
                     xmlns:global="clr-namespace:"
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
+    
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Colors.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+    
     <system:Boolean x:Key="FalseValue">False</system:Boolean>
     <system:Boolean x:Key="TrueValue">True</system:Boolean>
     
@@ -32,7 +37,14 @@
             </kent:Mapping.From>
         </kent:Mapping>
     </kent:MapConverter>
-
+    
+    <kent:MapConverter x:Key="TrueToPositiveFalseToNegativeBrushConverter" FallbackValue="{StaticResource NegativeBrush}" FallbackBehavior="ReturnFallbackValue">
+        <kent:Mapping To="{StaticResource PositiveBrush}">
+            <kent:Mapping.From>
+                <StaticResource ResourceKey="TrueValue"></StaticResource>
+            </kent:Mapping.From>
+        </kent:Mapping>
+    </kent:MapConverter>
     
     <blue:BoolToVisibilityConverter x:Key="TrueToVisibleFalseToCollapsedConverter"
                                     TrueValue="Visible"
