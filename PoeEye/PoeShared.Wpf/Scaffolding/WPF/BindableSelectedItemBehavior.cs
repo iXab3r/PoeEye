@@ -13,7 +13,7 @@ namespace PoeShared.Scaffolding.WPF
 
         public static readonly DependencyProperty SelectedItemProperty =
             DependencyProperty.Register("SelectedItem", typeof(object), typeof(BindableSelectedItemBehavior),
-                new UIPropertyMetadata(null));
+                new UIPropertyMetadata(null, OnSelectedItemChanged));
 
         
         private readonly SerialDisposable attachmentAnchor = new SerialDisposable();
@@ -43,6 +43,14 @@ namespace PoeShared.Scaffolding.WPF
         {
             base.OnDetaching();
             attachmentAnchor.Disposable = null;
+        }
+        
+        private static void OnSelectedItemChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
+        {
+            if (e.NewValue is TreeViewItem item)
+            {
+                item.SetValue(TreeViewItem.IsSelectedProperty, true);
+            }
         }
 
         private void OnTreeViewSelectedItemChanged(object previousValue, object currentValue)
