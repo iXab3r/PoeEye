@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 
 namespace PoeShared.Audio.Services
@@ -9,9 +10,9 @@ namespace PoeShared.Audio.Services
     {
         ReadOnlyObservableCollection<string> Notifications { get; }
 
-        void PlayNotification(AudioNotificationType notificationType);
+        Task PlayNotification(AudioNotificationType notificationType);
 
-        void PlayNotification([NotNull] string notificationName);
+        Task PlayNotification([NotNull] string notificationName);
 
         string AddFromFile([NotNull] FileInfo soundFile);
     }

@@ -22,9 +22,9 @@ namespace PoeShared.Services
             timer = new Timer(Callback, null, dueTime, TimeSpan.FromMilliseconds(-1));
             Disposable.Create(() =>
             {
-                lock (timer)
+                lock (padlock)
                 {
-                    timer.Dispose();
+                    timer?.Dispose();
                     timer = null;
                 }
             }).AddTo(Anchors);

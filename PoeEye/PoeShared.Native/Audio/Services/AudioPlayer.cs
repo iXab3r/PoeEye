@@ -4,6 +4,7 @@ using System.Media;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Threading;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 using log4net;
 using NAudio.Wave;
@@ -24,7 +25,7 @@ namespace PoeShared.Audio.Services
             this.bgScheduler = bgScheduler;
         }
 
-        public IDisposable Play(byte[] waveData)
+        public Task Play(byte[] waveData)
         {
             return PlayInternal(waveData);
         }
@@ -41,10 +42,10 @@ namespace PoeShared.Audio.Services
             return Disposable.Empty;
         }
 
-        private IDisposable PlayInternal(byte[] soundData)
+        private Task PlayInternal(byte[] soundData)
         {
             Log.Debug($"Queueing audio stream({soundData.Length})...");
-            return bgScheduler.Schedule(() =>
+            return Task.Factory.StartNew(() =>
             {
                 try
                 {

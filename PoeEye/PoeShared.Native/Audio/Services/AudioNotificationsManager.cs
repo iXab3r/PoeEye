@@ -5,6 +5,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Reactive.Concurrency;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 using log4net;
 using PoeShared.Modularity;
@@ -45,12 +46,12 @@ namespace PoeShared.Audio.Services
 
         public ReadOnlyObservableCollection<string> Notifications => soundLibrarySource.SourceName;
 
-        public void PlayNotification(AudioNotificationType notificationType)
+        public Task PlayNotification(AudioNotificationType notificationType)
         {
-            PlayNotification(notificationType.ToString());
+            return PlayNotification(notificationType.ToString());
         }
 
-        public void PlayNotification(string notificationName)
+        public Task PlayNotification(string notificationName)
         {
             Guard.ArgumentNotNull(notificationName, nameof(notificationName));
             Log.Debug($"Notification of type {notificationName} requested...");
@@ -59,18 +60,18 @@ namespace PoeShared.Audio.Services
             {
                 Log.Warn(
                     $"Unknown notification type - {notificationName}, known notifications: {string.Join(", ", knownNotifications.Keys.Select(x => x.ToString()))}");
-                return;
+                return Task.CompletedTask;
             }
 
             if (!notificationData.Any())
             {
                 Log.Debug($"No sound data loaded for notification of type {notificationData}");
-                return;
+                return Task.CompletedTask;
             }
 
             Log.Debug($"Starting playback of {notificationName} ({notificationData.Length}b)...");
 
-            audioPlayer.Play(notificationData);
+            return audioPlayer.Play(notificationData);
         }
         
         public string AddFromFile(FileInfo soundFile)
