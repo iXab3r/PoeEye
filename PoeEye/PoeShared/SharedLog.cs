@@ -9,6 +9,7 @@ using log4net;
 using log4net.Appender;
 using log4net.Config;
 using log4net.Core;
+using log4net.Layout;
 using log4net.Repository.Hierarchy;
 using PoeShared.Scaffolding;
 
@@ -109,6 +110,19 @@ namespace PoeShared
                 root.RemoveAppender(appender);
                 repository.RaiseConfigurationChanged(EventArgs.Empty);
             });
+        }
+
+        public IDisposable AddConsoleAppender()
+        {
+            var consoleAppender = new ConsoleAppender()
+            {
+                Threshold = Level.All,
+                Layout = new PatternLayout()
+                {
+                    ConversionPattern = "%date [%-2thread] %-5level %message [%logger]%newline"
+                }
+            };
+            return AddAppender(consoleAppender);
         }
         
         private sealed class Log4NetTraceListener : System.Diagnostics.TraceListener

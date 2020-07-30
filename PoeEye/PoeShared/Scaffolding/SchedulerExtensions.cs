@@ -7,13 +7,20 @@ namespace PoeShared.Scaffolding
 {
     public static class SchedulerExtensions
     {
-        public static IDisposable Schedule(this IScheduler scheduler, Action action, ManualResetEvent resetEvent)
+        public static IDisposable Schedule(this IScheduler scheduler, Action action, EventWaitHandle resetEvent)
         {
             return scheduler.Schedule(
                 () =>
                 {
-                    action();
-                    resetEvent.Set();
+
+                    try
+                    {
+                        action();
+                    }
+                    finally
+                    {
+                        resetEvent.Set();
+                    }
                 });
         }
     }
