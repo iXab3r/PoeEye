@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using log4net;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -10,6 +11,7 @@ using PoeShared.Scaffolding;
 
 namespace PoeShared.Modularity
 {
+    //FIXME This whole PoeConfigConverter is an awful mess that must be rewritten at some point
     internal sealed class PoeConfigConverter : JsonConverter
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(PoeConfigConverter));
@@ -25,8 +27,21 @@ namespace PoeShared.Modularity
         private readonly ConcurrentDictionary<Type, MethodInfo> getMetadataValueByType = new ConcurrentDictionary<Type, MethodInfo>();
         private readonly ConcurrentDictionary<Type, MethodInfo> setMetadataValueByType = new ConcurrentDictionary<Type, MethodInfo>();
         
-        private bool skipNext = false;
+        private volatile bool skipNext;
+        
+        [MethodImpl(MethodImplOptions.Synchronized)]
+        public override bool CanConvert(Type objectType)
+        {
+            var result = typeof(IPoeEyeConfig).IsAssignableFrom(objectType);
+            if (result && skipNext)
+            {
+                skipNext = false;
+                return false;
+            }
+            return result;
+        }
 
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
             if (value == null)
@@ -41,7 +56,6 @@ namespace PoeShared.Modularity
                 metadata = (PoeConfigMetadata)value;
                 if (objectType.IsGenericType)
                 {
-                    var innerValueType = objectType.GetGenericArguments().Single();
                     var innerValue = GetMetadataValue(metadata);
                     if (innerValue != null)
                     {
@@ -50,11 +64,13 @@ namespace PoeShared.Modularity
                 }
             } else if (value is IPoeEyeConfig valueToSerialize)
             {
-                metadata = new PoeConfigMetadata();
-                metadata.AssemblyName = valueToSerialize.GetType().Assembly.GetName().Name;
-                metadata.TypeName = valueToSerialize.GetType().FullName;
-                metadata.Version = (value as IPoeEyeConfigVersioned)?.Version;
-                metadata.ConfigValue = SerializeToToken(serializer, valueToSerialize);
+                metadata = new PoeConfigMetadata
+                {
+                    AssemblyName = valueToSerialize.GetType().Assembly.GetName().Name,
+                    TypeName = valueToSerialize.GetType().FullName,
+                    Version = (value as IPoeEyeConfigVersioned)?.Version,
+                    ConfigValue = SerializeToToken(serializer, valueToSerialize)
+                };
             }
             else
             {
@@ -65,6 +81,7 @@ namespace PoeShared.Modularity
             serializer.Serialize(writer, metadata);
         }
         
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
             Guard.ArgumentIsTrue(() => typeof(IPoeEyeConfig).IsAssignableFrom(objectType));
@@ -88,6 +105,11 @@ namespace PoeShared.Modularity
             if (typeof(PoeConfigMetadata) == objectType)
             {
                 return metadata;
+            }
+
+            if (string.IsNullOrEmpty(metadata.AssemblyName))
+            {
+                throw new FormatException($"Metadata is not valid(assembly is not defined), returning empty object instead, metadata: {metadata}");
             }
             
             if (!loadedAssemblyByName.TryGetValue(metadata.AssemblyName, out var assembly))
@@ -134,7 +156,7 @@ namespace PoeShared.Modularity
                     return valueFactory();
                 }
             }
-            
+
             return Deserialize(metadata.ConfigValue.ToString(), serializer, innerType);
         }
         
@@ -162,17 +184,6 @@ namespace PoeShared.Modularity
                 var serializedValue = textWriter.ToString();
                 return JToken.Parse(serializedValue);
             }
-        }
-
-        public override bool CanConvert(Type objectType)
-        {
-            var result = typeof(IPoeEyeConfig).IsAssignableFrom(objectType);
-            if (result && skipNext)
-            {
-                skipNext = false;
-                return false;
-            }
-            return result;
         }
         
         private object GetMetadataValue(PoeConfigMetadata metadata)
