@@ -11,6 +11,7 @@ using PoeShared.Wpf.UI.Settings;
 using ReactiveUI;
 using Unity;
 using Unity.Extension;
+using Unity.Lifetime;
 
 namespace PoeShared.Prism
 {
@@ -23,20 +24,20 @@ namespace PoeShared.Prism
             var dispatcher = Dispatcher.CurrentDispatcher;
             Log.Debug($"Capturing {dispatcher} as {WellKnownDispatchers.UI}");
             Container
-                .RegisterFactory<Dispatcher>(WellKnownDispatchers.UI, x => dispatcher)
+                .RegisterFactory<Dispatcher>(WellKnownDispatchers.UI, x => dispatcher, new ContainerControlledLifetimeManager())
                 .RegisterFactory<IScheduler>(WellKnownSchedulers.UI, x =>
                 {
                     var uiDispatcher = x.Resolve<Dispatcher>(WellKnownDispatchers.UI);
                     Log.Debug($"Initializing {WellKnownSchedulers.UI} scheduler on {uiDispatcher}");
                     return new DispatcherScheduler(uiDispatcher, DispatcherPriority.Normal);
-                })
+                }, new ContainerControlledLifetimeManager())
                 .RegisterFactory<IScheduler>(WellKnownSchedulers.UIIdle, x =>
                 {
                     var uiDispatcher = x.Resolve<Dispatcher>(WellKnownDispatchers.UI);
                     Log.Debug($"Initializing {WellKnownSchedulers.UIIdle} scheduler on {uiDispatcher}");
                     return new DispatcherScheduler(uiDispatcher, DispatcherPriority.ApplicationIdle);
-                })
-                .RegisterFactory<IScheduler>(WellKnownSchedulers.Background, x => RxApp.TaskpoolScheduler);
+                }, new ContainerControlledLifetimeManager())
+                .RegisterFactory<IScheduler>(WellKnownSchedulers.Background, x => RxApp.TaskpoolScheduler, new ContainerControlledLifetimeManager());
             
             Container
                 .RegisterSingleton<PoeEyeModulesRegistrator>(typeof(IPoeEyeModulesRegistrator), typeof(IPoeEyeModulesEnumerator))
