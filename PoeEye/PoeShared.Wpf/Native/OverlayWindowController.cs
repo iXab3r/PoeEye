@@ -30,7 +30,7 @@ namespace PoeShared.Native
         private readonly string uniqueControllerId = Guid.NewGuid().ToString();
 
         private bool isVisible;
-        private bool isEnabled = true;
+        private bool isEnabled;
         private bool showWireframes;
 
         public OverlayWindowController(
@@ -46,7 +46,7 @@ namespace PoeShared.Native
             windows
                 .Connect()
                 .ObserveOn(uiScheduler)
-                .Transform(x => new WindowInteropHelper(x).Handle)
+                .Transform(x => new WindowInteropHelper(x).EnsureHandle())
                 .Bind(out childWindows)
                 .Subscribe()
                 .AddTo(Anchors);
@@ -64,6 +64,7 @@ namespace PoeShared.Native
                 .Do(x => Log.Debug($"Active window has changed: {x}"))
                 .Select(x => (x.WindowIsActive || x.OverlayIsActive) && IsEnabled)
                 .DistinctUntilChanged()
+                .Do(x => Log.Debug($"Sending SetVisibility({x}) to window scheduler"))
                 .ObserveOn(uiScheduler)
                 .Subscribe(SetVisibility, Log.HandleUiException)
                 .AddTo(Anchors);
