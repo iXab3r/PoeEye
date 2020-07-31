@@ -117,7 +117,7 @@ namespace PoeShared.Modularity
                 assembly = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(x => x.GetName().Name == metadata.AssemblyName);
                 if (assembly == null)
                 {
-                    Log.Warn($"Assembly {metadata.AssemblyName} is not loaded, could not convert type {metadata.TypeName} (version {(metadata.Version == null ? "is not set" : metadata.Version.ToString())}), returning wrapper object {metadata}");
+                    Log.Debug($"Assembly {metadata.AssemblyName} is not loaded, could not convert type {metadata.TypeName} (version {(metadata.Version == null ? "is not set" : metadata.Version.ToString())}), returning wrapper object {metadata}");
                     return metadata;
                 }
 

@@ -159,7 +159,7 @@ namespace PoeShared.Modularity
 
             if (config is PoeConfigMetadata metadata)
             {
-                Log.Warn($"Trying to re-serialize metadata type {metadata.TypeName} (v{metadata.Version}) {metadata.AssemblyName}...");
+                Log.Debug($"Trying to re-serialize metadata type {metadata.TypeName} (v{metadata.Version}) {metadata.AssemblyName}...");
                 var serialized = configSerializer.Serialize(metadata);
                 if (string.IsNullOrEmpty(serialized))
                 {
