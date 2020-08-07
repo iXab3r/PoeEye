@@ -39,6 +39,15 @@
         </kent:Mapping>
     </kent:MapConverter>
     
+    
+    <kent:MapConverter x:Key="ZeroToFalseConverter" FallbackValue="{StaticResource TrueValue}" FallbackBehavior="ReturnFallbackValue">
+        <kent:Mapping To="{StaticResource FalseValue}">
+            <kent:Mapping.From>
+                <system:Int32>0</system:Int32>
+            </kent:Mapping.From>
+        </kent:Mapping>
+    </kent:MapConverter>
+    
     <kent:MapConverter x:Key="TrueToPositiveFalseToNegativeBrushConverter" FallbackValue="{StaticResource NegativeBrush}" FallbackBehavior="ReturnFallbackValue">
         <kent:Mapping To="{StaticResource PositiveBrush}">
             <kent:Mapping.From>
