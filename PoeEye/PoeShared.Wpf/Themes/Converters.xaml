@@ -13,6 +13,9 @@
     <system:Boolean x:Key="FalseValue">False</system:Boolean>
     <system:Boolean x:Key="TrueValue">True</system:Boolean>
     
+    <eyeConverters:StaticResourceConverter x:Key="StaticResourceOrNullConverter" ThrowWhenNotFound="False" DefaultValue="{x:Null}" />
+    <eyeConverters:StaticResourceConverter x:Key="StaticResourceConverter" ThrowWhenNotFound="True" />
+    
     <eyeConverters:NullToBoolConverter x:Key="IsNullOrEmptyConverter" NullValue="True" />
     <eyeConverters:NullToBoolConverter x:Key="IsNotNullOrEmptyConverter" NullValue="False" />
     
