@@ -93,6 +93,7 @@ namespace PoeShared.Tests.WPF.Hotkeys
         }
 
         [Test]
+        [TestCase("a", Key.A, ModifierKeys.None)]
         [TestCase("A", Key.A, ModifierKeys.None)]
         [TestCase("Enter", Key.Enter, ModifierKeys.None)]
         [TestCase("Ctrl+Enter", Key.Enter, ModifierKeys.Control)]

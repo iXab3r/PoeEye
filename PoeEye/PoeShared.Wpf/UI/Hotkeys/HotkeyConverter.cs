@@ -18,7 +18,7 @@ namespace PoeShared.UI.Hotkeys
 
         private readonly IDictionary<string, HotkeyGesture> mouseKeys;
         private readonly IDictionary<string, Key> knownSpecialKeys = new Dictionary<string, Key>(StringComparer.OrdinalIgnoreCase);
-        private readonly IDictionary<string, Key> knownKeys = new Dictionary<string, Key>();
+        private readonly IDictionary<string, Key> knownKeys = new Dictionary<string, Key>(StringComparer.OrdinalIgnoreCase);
 
         public HotkeyConverter()
         {
@@ -78,7 +78,7 @@ namespace PoeShared.UI.Hotkeys
                 throw GetConvertFromException(sourceRaw);
             }
 
-            var source = ((string) sourceRaw).Trim();
+            var source = ((string) sourceRaw).Trim().ToUpper();
             if (string.IsNullOrWhiteSpace(source))
             {
                 return NoneHotkey;

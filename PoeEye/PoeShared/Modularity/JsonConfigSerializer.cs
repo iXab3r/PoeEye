@@ -108,6 +108,8 @@ namespace PoeShared.Modularity
                 Formatting = Formatting.Indented,
                 TypeNameHandling = TypeNameHandling.Auto,
                 Error = HandleSerializerError,
+                DefaultValueHandling = DefaultValueHandling.Ignore,
+                NullValueHandling = NullValueHandling.Ignore,
             };
 
             converters.Items.ForEach(jsonSerializerSettings.Converters.Add);
