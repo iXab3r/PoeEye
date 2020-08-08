@@ -108,7 +108,6 @@ namespace PoeShared.Modularity
                 Formatting = Formatting.Indented,
                 TypeNameHandling = TypeNameHandling.Auto,
                 Error = HandleSerializerError,
-                DefaultValueHandling = DefaultValueHandling.Ignore,
                 NullValueHandling = NullValueHandling.Ignore,
             };
 
