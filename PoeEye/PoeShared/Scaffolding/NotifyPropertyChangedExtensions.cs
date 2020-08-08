@@ -88,5 +88,20 @@ namespace PoeShared.Scaffolding
                 Reflection.ExpressionToPropertyNames(ex4.Body),
                 Reflection.ExpressionToPropertyNames(ex5.Body));
         }
+
+        public static void WaitForValue<TObject, T1>(
+            this TObject instance, 
+            Expression<Func<TObject, T1>> ex1,
+            Predicate<T1> condition,
+            TimeSpan timeout)
+            where TObject : INotifyPropertyChanged
+        {
+            instance
+                .WhenAnyValue(ex1)
+                .Where(x => condition(x))
+                .Take(1)
+                .Timeout(timeout)
+                .Wait();
+        }
     }
 }
