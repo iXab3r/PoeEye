@@ -47,6 +47,11 @@ namespace PoeShared.Converters
                 return $"{timeSpan.TotalMinutes:F0}m";
             }
 
+            if (timeSpan.TotalSeconds < 10)
+            {
+                return $"{timeSpan.TotalSeconds:F1}s";
+            }
+
             return $"{timeSpan.TotalSeconds:F0}s";
         }
 
