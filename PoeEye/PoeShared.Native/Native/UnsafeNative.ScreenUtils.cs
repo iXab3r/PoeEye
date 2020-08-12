@@ -162,9 +162,16 @@ namespace PoeShared.Native
             return User32.GetDesktopWindow();
         }
 
-        public static bool SetForegroundWindow(in IntPtr windowHandle)
+        public static bool SetForegroundWindow(IntPtr hwnd)
         {
-            return User32.SetForegroundWindow(windowHandle);
+            Log.Debug($"[{hwnd.ToHexadecimal()}] Setting foreground window");
+            Win32ErrorCode error;
+            if (!User32.SetForegroundWindow(hwnd) && (error = Kernel32.GetLastError()) != Win32ErrorCode.NERR_Success)
+            {
+                Log.Warn($"Failed to SetForegroundWindow({hwnd.ToHexadecimal()}), error: {error}");
+                return false;
+            }
+            return true;
         }
     }
 }

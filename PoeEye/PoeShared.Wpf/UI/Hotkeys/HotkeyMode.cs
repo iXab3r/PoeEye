@@ -7,9 +7,9 @@ namespace PoeShared.UI.Hotkeys
     [JsonConverter(typeof(StringEnumConverter))]
     public enum HotkeyMode
     {
-        [Description("Click/Toggle - trigger state will be toggled on each click")]
+        [Description("Click/Toggle")]
         Click,
-        [Description("Hold - button must be held to activate trigger")]
+        [Description("Hold")]
         Hold,
     }
 }
