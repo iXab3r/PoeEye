@@ -10,6 +10,7 @@ using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Interop;
+using System.Windows.Threading;
 using DynamicData.Binding;
 
 using log4net;
@@ -63,9 +64,12 @@ namespace PoeShared.Native
         private Window overlayWindow;
         private Point viewModelLocation;
 
+        private readonly Dispatcher uiDispatcher;
+
         protected OverlayViewModelBase()
         {
             Title = GetType().ToString();
+            uiDispatcher = Dispatcher.CurrentDispatcher;
 
             lockWindowCommand = CommandWrapper.Create(LockWindowCommandExecuted, LockWindowCommandCanExecute);
             unlockWindowCommand = CommandWrapper.Create(UnlockWindowCommandExecuted, UnlockWindowCommandCanExecute);
@@ -168,7 +172,7 @@ namespace PoeShared.Native
         public double Top
         {
             get => top;
-            set => this.RaiseAndSetIfChanged(ref top, value);
+            set => RaiseAndSetIfChanged(ref top, value);
         }
 
         public double Width
@@ -282,6 +286,11 @@ namespace PoeShared.Native
             OverlayWindow = owner;
             var interopHelper = new WindowInteropHelper(OverlayWindow);
             Log.Debug($"[#{this}] Loaded overlay window: {OverlayWindow} ({interopHelper.Handle.ToHexadecimal()})");
+        }
+
+        public void Invoke(Action dispatcherAction)
+        {
+            uiDispatcher.Invoke(dispatcherAction);
         }
 
         protected virtual void ApplyConfig(IOverlayConfig config)
@@ -407,6 +416,14 @@ namespace PoeShared.Native
             }
             Log.Debug($"[{OverlayDescription}] Making overlay Transparent");
             OverlayMode = OverlayMode.Transparent;
+        }
+
+        protected TRet RaiseAndSetIfChangedOnDispatcher<TRet>(ref TRet backingField,
+            TRet newValue,
+            [CallerMemberName] string propertyName = null)
+        {
+            uiDispatcher.VerifyAccess();
+            return RaiseAndSetIfChanged<TRet>(ref backingField, newValue, propertyName);
         }
     }
 }

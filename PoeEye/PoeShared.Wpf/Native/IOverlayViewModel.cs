@@ -1,3 +1,4 @@
+using System;
 using System.Windows;
 using System.Windows.Input;
 using JetBrains.Annotations;
@@ -64,5 +65,12 @@ namespace PoeShared.Native
         void SetActivationController([NotNull] IActivationController controller);
 
         void SetOverlayWindow([NotNull] Window owner);
+
+        /// <summary>
+        ///  Invokes action on UI Dispatcher
+        ///  FIXME It would be much better to automatically reschedule invocations if needed
+        /// </summary>
+        /// <param name="dispatcherAction"></param>
+        void Invoke(Action dispatcherAction);
     }
 }

@@ -151,11 +151,12 @@ namespace PoeShared.Native
                 .AddTo(childAnchors);
             
             Observable.Merge(
-                    this.WhenAnyValue(x => x.IsVisible).WithPrevious((prev, curr) => new {prev, curr}).Do(x => Log.Debug($"[#{overlayName}] [IsVisible {IsVisible}] Processing IsVisible change, {x.prev} => {x.curr}")).ToUnit(), 
-                    windowTracker.WhenAnyValue(x => x.ActiveWindowHandle).WithPrevious((prev, curr) => new {prev, curr}).Do(x => Log.Debug($"[#{overlayName}] [IsVisible {IsVisible}] Processing ActiveWindowHandle change, {x.prev.ToHexadecimal()} => {x.curr.ToHexadecimal()}")).ToUnit(),
-                    overlayWindow.WhenLoaded.Do(x => Log.Debug($"[#{overlayName}] [IsVisible {IsVisible}] Processing WhenLoaded event")).ToUnit())
+                    this.WhenAnyValue(x => x.IsVisible).WithPrevious((prev, curr) => new {prev, curr}).Select(x => $"[IsVisible {IsVisible}] Processing IsVisible change, {x.prev} => {x.curr}"), 
+                    windowTracker.WhenAnyValue(x => x.ActiveWindowHandle).WithPrevious((prev, curr) => new {prev, curr}).Select(x => $"[IsVisible {IsVisible}] Processing ActiveWindowHandle change, {UnsafeNative.GetWindowTitle(x.prev)} {x.prev.ToHexadecimal()} => {UnsafeNative.GetWindowTitle(x.curr)} {x.curr.ToHexadecimal()}"),
+                    overlayWindow.WhenLoaded.Select(x => $"[IsVisible {IsVisible}] Processing WhenLoaded event"))
+                .Do(reason => Log.Debug($"[{overlayName}] {reason}"))
                 .ObserveOn(uiScheduler)
-                .Subscribe(() => HandleVisibilityChange(overlayWindow, viewModel))
+                .Subscribe(reason => HandleVisibilityChange(overlayWindow, viewModel))
                 .AddTo(childAnchors);
 
             overlayWindow
