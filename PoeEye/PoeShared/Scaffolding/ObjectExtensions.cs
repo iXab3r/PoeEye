@@ -10,6 +10,18 @@ namespace PoeShared.Scaffolding
 {
     public static class ObjectExtensions
     {
+        private static JsonSerializerSettings SerializationIndented = new JsonSerializerSettings()
+        {
+            ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+            Formatting = Formatting.Indented
+        }; 
+        
+        private static JsonSerializerSettings SerializationNone = new JsonSerializerSettings()
+        {
+            ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+            Formatting = Formatting.None
+        }; 
+        
         public static string Dump<T>(this T instance)
         {
             return DumpToText(instance);
@@ -17,12 +29,12 @@ namespace PoeShared.Scaffolding
         
         public static string DumpToText<T>(this T instance)
         {
-            return DumpToText(instance, Formatting.Indented);
+            return DumpToText(instance, SerializationIndented);
         }
 
         public static string DumpToTextRaw<T>(this T instance)
         {
-            return DumpToText(instance, Formatting.None);
+            return DumpToText(instance, SerializationNone);
         }
 
         public static string DumpToTable<T>(this IEnumerable<T> instance, string separator = "\n\t")
@@ -34,11 +46,6 @@ namespace PoeShared.Scaffolding
         {
             var header = instance == null ? $"{tableName} (null)" : $"{tableName} ({instance.Count()})";
             return header + separator + DumpToTable(instance, separator);
-        }
-
-        public static string DumpToText<T>(this T instance, Formatting formatting)
-        {
-            return instance == null ? $"null<{typeof(T).Name}>" : JsonConvert.SerializeObject(instance, formatting);
         }
 
         public static string DumpToText<T>(this T instance, JsonSerializerSettings settings)
