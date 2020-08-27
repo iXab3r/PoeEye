@@ -13,6 +13,7 @@
     IsTabStop="False"
     ShowInTaskbar="{Binding Content.ShowInTaskbar, Mode=TwoWay}"
     ShowActivated="False"
+    DpiAware="True"
     SizeChanged="OverlayChildWindow_OnSizeChanged">
 
     <Window.Resources>

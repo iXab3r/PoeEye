@@ -1,4 +1,5 @@
 using System;
+using System.Drawing;
 using System.Windows;
 using System.Windows.Input;
 using JetBrains.Annotations;
@@ -13,6 +14,8 @@ namespace PoeShared.Native
         Rect Bounds { get; }
         
         System.Drawing.Rectangle NativeBounds { get; }
+        
+        PointF Dpi { get; }
     
         double Left { get; set; }
 
@@ -58,13 +61,13 @@ namespace PoeShared.Native
         
         Point ViewModelLocation { get; }
         
-        Window OverlayWindow { [CanBeNull] get; }
+        TransparentWindow OverlayWindow { [CanBeNull] get; }
 
         void ResetToDefault();
 
         void SetActivationController([NotNull] IActivationController controller);
 
-        void SetOverlayWindow([NotNull] Window owner);
+        void SetOverlayWindow([NotNull] TransparentWindow owner);
 
         /// <summary>
         ///  Invokes action on UI Dispatcher

@@ -1,11 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Input;
@@ -14,6 +13,7 @@ using System.Windows.Threading;
 using DynamicData.Binding;
 
 using log4net;
+using PInvoke;
 using PoeShared.Scaffolding;
 using PoeShared.Scaffolding.WPF;
 using ReactiveUI;
@@ -33,7 +33,8 @@ namespace PoeShared.Native
         private readonly CommandWrapper makeTransparentCommand;
         private readonly ISubject<Unit> whenLoaded = new ReplaySubject<Unit>(1);
         private readonly ObservableAsPropertyHelper<Rect> bounds;
-        private readonly ObservableAsPropertyHelper<System.Drawing.Rectangle> nativeBounds;
+        private readonly ObservableAsPropertyHelper<Rectangle> nativeBounds;
+        private readonly ObservableAsPropertyHelper<PointF> dpi;
 
         private double actualHeight;
 
@@ -61,7 +62,7 @@ namespace PoeShared.Native
         private double? targetAspectRatio;
 
         private double width;
-        private Window overlayWindow;
+        private TransparentWindow overlayWindow;
         private Point viewModelLocation;
 
         private readonly Dispatcher uiDispatcher;
@@ -75,12 +76,30 @@ namespace PoeShared.Native
             unlockWindowCommand = CommandWrapper.Create(UnlockWindowCommandExecuted, UnlockWindowCommandCanExecute);
             makeLayeredCommand = CommandWrapper.Create(MakeLayeredCommandExecuted, MakeLayeredCommandCanExecute);
             makeTransparentCommand = CommandWrapper.Create(MakeTransparentCommandExecuted, MakeTransparentCommandCanExecute);
+            
+            bounds = this.WhenAnyValue(x => x.Left, x => x.Top, x => x.Width, x => x.Height)
+                .Select(x => new Rect {X = Left, Y = Top, Width = Width, Height = Height})
+                .ToPropertyHelper(this, x => x.Bounds)
+                .AddTo(Anchors);
+
+            dpi = this.WhenAnyValue(x => x.OverlayWindow).Select(x => x == null ? Observable.Return(new PointF(1, 1)) : x.Observe(ConstantAspectRatioWindow.DpiProperty).Select(x => overlayWindow.Dpi).StartWith(overlayWindow.Dpi))
+                .Switch()
+                .Do(x => Log.Debug($"[{this}] DPI updated to {x}"))
+                .ToPropertyHelper(this, x => x.Dpi)
+                .AddTo(Anchors);
+            
+            nativeBounds = this.WhenAnyValue(x => x.Bounds, x => x.Dpi)
+                .Select(x => new { Bounds, Dpi })
+                .Select(x => x.Bounds.ScaleToScreen(Dpi))
+                .ToPropertyHelper(this, x => x.NativeBounds)
+                .AddTo(Anchors);
+            
             this.WhenAnyValue(x => x.IsLocked, x => x.IsUnlockable)
                 .Subscribe(() =>
                 {
                     lockWindowCommand.RaiseCanExecuteChanged();
                     unlockWindowCommand.RaiseCanExecuteChanged();
-                })
+                }, Log.HandleUiException)
                 .AddTo(Anchors);
             
             this.WhenAnyValue(x => x.OverlayMode)
@@ -88,22 +107,12 @@ namespace PoeShared.Native
                 {
                     makeLayeredCommand.RaiseCanExecuteChanged();
                     makeTransparentCommand.RaiseCanExecuteChanged();
-                })
+                }, Log.HandleUiException)
                 .AddTo(Anchors);
 
             this.WhenValueChanged(x => x.OverlayWindow, false)
                 .ToUnit()
                 .Subscribe(whenLoaded)
-                .AddTo(Anchors);
-
-            bounds = this.WhenAnyValue(x => x.Left, x => x.Top, x => x.Width, x => x.Height)
-                .Select(x => new Rect {X = Left, Y = Top, Width = Width, Height = Height})
-                .ToPropertyHelper(this, x => x.Bounds)
-                .AddTo(Anchors);
-
-            nativeBounds = this.WhenAnyValue(x => x.Bounds)
-                .Select(x => x.ScaleToScreen())
-                .ToPropertyHelper(this, x => x.NativeBounds)
                 .AddTo(Anchors);
         }
 
@@ -147,7 +156,7 @@ namespace PoeShared.Native
             set => this.RaiseAndSetIfChanged(ref actualHeight, value);
         }
 
-        public Window OverlayWindow
+        public TransparentWindow OverlayWindow
         {
             get => overlayWindow;
             private set => this.RaiseAndSetIfChanged(ref overlayWindow, value);
@@ -160,7 +169,9 @@ namespace PoeShared.Native
         }
 
         public Rect Bounds => bounds.Value;
-        
+
+        public PointF Dpi => dpi.Value;
+
         public Rectangle NativeBounds => nativeBounds.Value;
         
         public double Left
@@ -275,7 +286,7 @@ namespace PoeShared.Native
             Guard.ArgumentNotNull(controller, nameof(controller));
         }
 
-        public void SetOverlayWindow(Window owner)
+        public void SetOverlayWindow(TransparentWindow owner)
         {
             Guard.ArgumentNotNull(owner, nameof(owner));
             

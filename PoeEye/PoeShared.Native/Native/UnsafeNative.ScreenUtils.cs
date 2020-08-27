@@ -7,6 +7,7 @@ using System.Windows.Interop;
 using System.Windows.Media;
 using PInvoke;
 using PoeShared.Scaffolding;
+using Point = System.Drawing.Point;
 
 namespace PoeShared.Native
 {
@@ -73,14 +74,47 @@ namespace PoeShared.Native
         public static PointF GetDesktopDpi()
         {
             var desktopWindow = User32.GetDesktopWindow();
-            using (var desktopDc = User32.GetDC(desktopWindow))
+            return GetDesktopDpi(desktopWindow);
+        }
+        
+        public static PointF GetDesktopDpiFromPoint(Point location)
+        {
+            var desktopWindow = User32.MonitorFromPoint(new POINT { x = location.X, y = location.Y}, User32.MonitorOptions.MONITOR_DEFAULTTONULL);
+            return desktopWindow == IntPtr.Zero ? PointF.Empty : GetDesktopDpi(desktopWindow);
+        }
+        
+        public static PointF GetDesktopDpiFromWindow(Window window)
+        {
+            if (window == null)
             {
-                if (desktopDc.IsInvalid)
+                return GetDesktopDpi();
+            }
+            var desktopWindow = new WindowInteropHelper(window).EnsureHandle();
+            var desktop = User32.MonitorFromWindow(desktopWindow, User32.MonitorOptions.MONITOR_DEFAULTTONULL);
+            return desktopWindow == IntPtr.Zero ? PointF.Empty : GetDesktopDpi(desktop);
+        }
+        
+        public static PointF GetSystemDpi()
+        {
+            using(var screenHandle = User32.GetDC(IntPtr.Zero))
+            {
+                return new PointF(
+                    Gdi32.GetDeviceCaps(screenHandle, Gdi32.DeviceCap.LOGPIXELSX), 
+                    Gdi32.GetDeviceCaps(screenHandle, Gdi32.DeviceCap.LOGPIXELSY));
+            }
+        }
+        
+        public static PointF GetDesktopDpi(IntPtr hDesktop)
+        {
+            using (var desktopDc = User32.GetDC(hDesktop))
+            {
+                if (desktopDc == null || desktopDc.IsInvalid)
                 {
                     var error = Kernel32.GetLastError();
-                    Log.Warn($"Failed to GetDC for desktop {desktopWindow.ToInt64()}, error: {error}");
+                    Log.Warn($"Failed to GetDC for desktop {hDesktop.ToInt64()}, error: {error}");
                     return PointF.Empty;
                 }
+                
                 using ( var graphics = Graphics.FromHdc(desktopDc.DangerousGetHandle()))
                 {
                     return GetDpi(graphics);

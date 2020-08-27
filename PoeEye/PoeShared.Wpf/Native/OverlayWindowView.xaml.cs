@@ -61,7 +61,7 @@ namespace PoeShared.Native
 
         public override string ToString()
         {
-            return $"[OverlayWindow] DataContext: {DataContext} (X:{Left} Y:{Top} Width: {Width} Height: {Height})";
+            return $"[OverlayWindow] DataContext: {DataContext} (X:{Left:F0} Y:{Top:F0} Width: {Width:F0} Height: {Height:F0})";
         }
 
         public void SetOverlayMode(OverlayMode mode)

@@ -135,12 +135,21 @@ namespace PoeShared.Scaffolding
 
         public static WinRectangle ScaleToScreen(this Rect sourceSize)
         {
+            return ScaleToScreen(sourceSize, UnsafeNative.GetDesktopWindow());
+        }
+        
+        public static WinRectangle ScaleToScreen(this Rect sourceSize, IntPtr hDesktop)
+        {
             if (sourceSize.IsEmpty)
             {
                 return WinRectangle.Empty;
             }
-            var dpi = UnsafeNative.GetDesktopDpi();
-
+            var dpi = UnsafeNative.GetDesktopDpi(hDesktop);
+            return ScaleToScreen(sourceSize, dpi);
+        }
+        
+        public static WinRectangle ScaleToScreen(this Rect sourceSize, PointF dpi)
+        {
             return new WinRectangle((int)(sourceSize.X * dpi.X), (int)(sourceSize.Y * dpi.Y), (int)(sourceSize.Width * dpi.X), (int)(sourceSize.Height * dpi.Y));
         }
         

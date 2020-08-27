@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using System.Drawing;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
@@ -7,6 +6,7 @@ using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
 using log4net;
+using PInvoke;
 using PoeShared.Scaffolding;
 using Point = System.Drawing.Point;
 
@@ -14,14 +14,21 @@ namespace PoeShared.Native
 {
     public class ConstantAspectRatioWindow : Window
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(ConstantAspectRatioWindow));
-
         public static readonly DependencyProperty TargetAspectRatioProperty = DependencyProperty.Register(
             "TargetAspectRatio",
             typeof(double?),
             typeof(ConstantAspectRatioWindow),
             new PropertyMetadata(default(double?)));
 
+        public static readonly DependencyProperty DpiProperty = DependencyProperty.Register(
+            "Dpi", typeof(PointF), typeof(ConstantAspectRatioWindow), new PropertyMetadata(default(PointF)));
+
+        public static readonly DependencyProperty DpiAwareProperty = DependencyProperty.Register(
+            "DpiAware", typeof(bool), typeof(ConstantAspectRatioWindow), new PropertyMetadata(default(bool)));
+
+        private static readonly ILog Log = LogManager.GetLogger(typeof(ConstantAspectRatioWindow));
+        private const float DefaultPixelsPerInch = 96.0F;
+       
         private readonly CompositeDisposable anchors = new CompositeDisposable();
 
         private readonly AspectRatioSizeCalculator aspectRatioSizeCalculator = new AspectRatioSizeCalculator();
@@ -56,12 +63,25 @@ namespace PoeShared.Native
                         } 
                     })
                 .AddTo(anchors);
+            Dpi = new PointF(1, 1);
         }
 
         public double? TargetAspectRatio
         {
             get => (double?) GetValue(TargetAspectRatioProperty);
             set => SetValue(TargetAspectRatioProperty, value);
+        }
+        
+        public PointF Dpi
+        {
+            get { return (PointF) GetValue(DpiProperty); }
+            set { SetValue(DpiProperty, value); }
+        }
+        
+        public bool DpiAware
+        {
+            get { return (bool) GetValue(DpiAwareProperty); }
+            set { SetValue(DpiAwareProperty, value); }
         }
 
         protected override void OnClosed(EventArgs e)
@@ -80,7 +100,8 @@ namespace PoeShared.Native
             {
                 throw new ApplicationException("HwndSource must be initialized at this point");
             }
-            
+
+            Dpi = GetDpiFromHwndSource(hwndSource);
             hwndSource.AddHook(DragHook);
         }
 
@@ -91,10 +112,10 @@ namespace PoeShared.Native
                 return IntPtr.Zero;
             }
 
-            var msg = (WM) msgRaw;
+            var msg = (User32.WindowMessage) msgRaw;
             switch (msg)
             {
-                case WM.ENTERSIZEMOVE:
+                case User32.WindowMessage.WM_ENTERSIZEMOVE:
                 {
                     var thisWindow = new WindowInteropHelper(this).Handle;
                     var bounds = UnsafeNative.GetWindowRect(thisWindow);
@@ -111,14 +132,14 @@ namespace PoeShared.Native
                     Log.Debug($"Entering Drag mode for window {this}, initialBounds: {bounds}, adjustingHeight: {dragParams.Value.AdjustingHeight}");
                     break;
                 }
-                case WM.EXITSIZEMOVE:
+                case User32.WindowMessage.WM_EXITSIZEMOVE:
                 {
                     Log.Debug(
                         $"Drag mode completed for window {this}, initialBounds: {dragParams?.InitialBounds} => {new Rectangle((int) Left, (int) Top, (int) Width, (int) Height)}");
                     dragParams = null;
                     break;
                 }
-                case WM.WINDOWPOSCHANGING:
+                case User32.WindowMessage.WM_WINDOWPOSCHANGING:
                 {
                     if (dragParams == null)
                     {
@@ -131,8 +152,6 @@ namespace PoeShared.Native
                         break;
                     }
                     var bounds = new Rectangle(pos.x, pos.y, pos.cx, pos.cy);
-
-                   
 
                     var newBounds = aspectRatioSizeCalculator.Calculate(TargetAspectRatio.Value, bounds, dragParams.Value.InitialBounds);
                     if (newBounds == bounds)
@@ -149,23 +168,50 @@ namespace PoeShared.Native
                     handled = true;
                     break;
                 }
+                case User32.WindowMessage.WM_DPICHANGED:
+                    Dpi = GetDpiFromHwndSource(PresentationSource.FromVisual(this) as HwndSource);
+                    if (DpiAware)
+                    {
+                        handled = true;
+                    }
+                    break;
             }
 
             return IntPtr.Zero;
+        }
+        
+        private static PointF GetDpiFromHwndSource(HwndSource targetSource)
+        {
+            if (targetSource == null)
+            {
+                throw new ArgumentNullException(nameof(targetSource));
+            }
+
+            if (!UnsafeNative.IsWindows8OrGreater())
+            {
+                return default;
+            }
+
+            var handleMonitor = User32.MonitorFromWindow(
+                targetSource.Handle,
+                User32.MonitorOptions.MONITOR_DEFAULTTONEAREST);
+
+            if (handleMonitor == IntPtr.Zero)
+            {
+                return default;
+            }
+
+            var dpiResult = SHCore.GetDpiForMonitor(handleMonitor, MONITOR_DPI_TYPE.MDT_DEFAULT, out var dpiX, out var dpiY);
+            if (dpiResult.Failed)
+            {
+                return default;
+            }
+            return new PointF(dpiX / DefaultPixelsPerInch, dpiY / DefaultPixelsPerInch);
         }
 
         private enum SWP
         {
             NOMOVE = 0x0002
-        }
-
-        private enum WM
-        {
-            SIZE = 0x0005,
-            NCCALCSIZE = 0x0083,
-            WINDOWPOSCHANGING = 0x0046,
-            EXITSIZEMOVE = 0x0232,
-            ENTERSIZEMOVE = 0x0231
         }
 
         [StructLayout(LayoutKind.Sequential)]
