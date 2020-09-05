@@ -1,6 +1,7 @@
 using System;
 using System.Drawing;
 using System.Linq;
+using System.Reactive.Disposables;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Interop;
@@ -199,13 +200,55 @@ namespace PoeShared.Native
         public static bool SetForegroundWindow(IntPtr hwnd)
         {
             Log.Debug($"[{hwnd.ToHexadecimal()}] Setting foreground window");
-            Win32ErrorCode error;
-            if (!User32.SetForegroundWindow(hwnd) && (error = Kernel32.GetLastError()) != Win32ErrorCode.NERR_Success)
+            
+            var foregroundWindow = GetForegroundWindow();
+            if (hwnd == foregroundWindow)
             {
-                Log.Warn($"Failed to SetForegroundWindow({hwnd.ToHexadecimal()}), error: {error}");
+                Log.Debug($"[{hwnd.ToHexadecimal()}] Window is already foreground");
+                return true;
+            }
+            
+            var foregroundThreadId = User32.GetWindowThreadProcessId(foregroundWindow, out var foregroundProcessId);
+            if (foregroundThreadId <= 0)
+            {
+                Log.Warn($"[{hwnd.ToHexadecimal()}] Failed to retrieve foreground thread({foregroundWindow.ToHexadecimal()}) of process {foregroundProcessId} for window {foregroundWindow.ToHexadecimal()} ({GetWindowTitle(foregroundWindow)}), last error: {Kernel32.GetLastError()}");
                 return false;
             }
-            return true;
+            var appThread = Kernel32.GetCurrentThreadId();
+
+            try
+            {
+                if (foregroundThreadId != appThread)
+                {
+                    Log.Debug($"[{hwnd.ToHexadecimal()}] Attaching thread input of thread {appThread} to thread {foregroundThreadId} of process {foregroundProcessId}");
+                    User32.AttachThreadInput( appThread, foregroundThreadId, true);
+                }
+                
+                Log.Debug($"[{hwnd.ToHexadecimal()}] Requesting window activation");
+
+                Win32ErrorCode error;
+                if (!BringWindowToTop(hwnd) && (error = Kernel32.GetLastError()) != Win32ErrorCode.NERR_Success)
+                {
+                    Log.Warn($"Failed to SetForegroundWindow.BringWindowToTop({hwnd.ToHexadecimal()}), error: {error}");
+                    return false;
+                }
+
+                if (!User32.SetForegroundWindow(hwnd))
+                {
+                    Log.Warn($"[{hwnd.ToHexadecimal()}] Failed to SetForegroundWindow({hwnd.ToHexadecimal()})");
+                    return false;
+                }
+                
+                return true;
+            }
+            finally
+            {
+                if (foregroundThreadId != appThread)
+                {
+                    Log.Debug($"[{hwnd.ToHexadecimal()}] Detaching thread input of thread {appThread} to thread {foregroundThreadId} of process {foregroundProcessId}");
+                    User32.AttachThreadInput(appThread, foregroundThreadId, false);
+                }
+            }
         }
     }
 }

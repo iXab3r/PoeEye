@@ -32,10 +32,9 @@ namespace PoeShared.Native
             try
             {
                 Log.Debug($"Calling AllowSetForegroundWindow(pid: {CurrentProcessId})");
-                var result = AllowSetForegroundWindow(CurrentProcessId);
-                if (!result)
+                Win32ErrorCode error;
+                if (!AllowSetForegroundWindow(CurrentProcessId) && (error = Kernel32.GetLastError()) != Win32ErrorCode.NERR_Success)
                 {
-                    var error = Kernel32.GetLastError();
                     Log.Error($"AllowSetForegroundWindow has failed for process {CurrentProcessId}, error - {error}!");
                     throw new ApplicationException($"AllowSetForegroundWindow has failed - {error} !");
                 }
