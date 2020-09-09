@@ -16,5 +16,10 @@ namespace PoeShared.Scaffolding
         {
             return ToHexadecimal((long)value);
         }
+        
+        public static string ToHexadecimal(this ushort value)
+        {
+            return ToHexadecimal((long)value);
+        }
     }
 }
