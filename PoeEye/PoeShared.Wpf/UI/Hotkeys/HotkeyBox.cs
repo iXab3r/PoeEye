@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Windows;
@@ -5,6 +6,7 @@ using System.Windows.Controls;
 using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Interop;
+using log4net.Util;
 using PInvoke;
 using PoeShared.Native;
 using Control = System.Windows.Controls.Control;
@@ -16,8 +18,8 @@ namespace PoeShared.UI.Hotkeys
     [TemplatePart(Name = PART_TextBox, Type = typeof(TextBox))]
     public class HotKeyBox : Control
     {
-        private const string PART_TextBox = "PART_TextBox";
-        public static readonly ISet<Key> EscapeKeys = new HashSet<Key> { Key.Escape, Key.Back };
+        public const string PART_TextBox = "PART_TextBox";
+        private static readonly ISet<Key> EscapeKeys = new HashSet<Key> { Key.Escape, Key.Back, Key.Delete };
 
         public static readonly DependencyProperty HotKeyProperty = DependencyProperty.Register(
             "HotKey",
@@ -59,6 +61,8 @@ namespace PoeShared.UI.Hotkeys
         public static readonly DependencyProperty TextProperty = TextPropertyKey.DependencyProperty;
 
         private TextBox textBox;
+        private DateTime lastKeyDownTimestamp; 
+        private HotkeyGesture lastKeyDown; 
 
         static HotKeyBox()
         {
@@ -255,16 +259,21 @@ namespace PoeShared.UI.Hotkeys
             e.Handled = true;
 
             var currentModifierKeys = GetCurrentModifierKeys();
-            if (currentModifierKeys == ModifierKeys.None && EscapeKeys.Contains(key))
+            var currentHotKey = new HotkeyGesture(key, currentModifierKeys);
+
+            var isClearHotKey = EscapeKeys.Contains(key) && currentModifierKeys == ModifierKeys.None;
+            var isDoubleClick = DateTime.Now - lastKeyDownTimestamp < TimeSpan.FromMilliseconds(SystemInformation.DoubleClickTime) && currentHotKey.Equals(lastKeyDown);
+            if (isClearHotKey && !isDoubleClick)
             {
                 HotKey = null;
             }
             else if (currentModifierKeys != ModifierKeys.None || !AreModifierKeysRequired)
             {
-                HotKey = new HotkeyGesture(key, currentModifierKeys);
+                HotKey = currentHotKey;
             }
-
             UpdateText();
+            lastKeyDown = currentHotKey;
+            lastKeyDownTimestamp = DateTime.Now;
         }
 
         private static ModifierKeys GetCurrentModifierKeys()
