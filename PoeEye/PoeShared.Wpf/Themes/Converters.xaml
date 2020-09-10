@@ -94,6 +94,12 @@
             <blue:Int32ComparisonStrategy Mode="GreaterThan" Comparand="0" />
         </blue:Int32ToVisibilityConverter.ComparisonStrategy>
     </blue:Int32ToVisibilityConverter>
+    
+    <blue:Int32ToVisibilityConverter x:Key="LessThanOneToVisibleConverter" TrueValue="Visible" FalseValue="Collapsed">
+        <blue:Int32ToVisibilityConverter.ComparisonStrategy>
+            <blue:Int32ComparisonStrategy Mode="LessThan" Comparand="1" />
+        </blue:Int32ToVisibilityConverter.ComparisonStrategy>
+    </blue:Int32ToVisibilityConverter>
 
     <blue:Int32ToVisibilityConverter x:Key="GreaterThanOneToVisibleConverter" TrueValue="Visible" FalseValue="Collapsed">
         <blue:Int32ToVisibilityConverter.ComparisonStrategy>
