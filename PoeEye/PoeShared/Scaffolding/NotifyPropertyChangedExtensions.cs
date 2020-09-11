@@ -103,5 +103,23 @@ namespace PoeShared.Scaffolding
                 .Timeout(timeout)
                 .Wait();
         }
+        
+        public static bool TryWaitForValue<TObject, T1>(
+            this TObject instance, 
+            Expression<Func<TObject, T1>> ex1,
+            Predicate<T1> condition,
+            TimeSpan timeout)
+            where TObject : INotifyPropertyChanged
+        {
+            try
+            {
+                WaitForValue(instance, ex1, condition, timeout);
+                return true;
+            }
+            catch (TimeoutException)
+            {
+                return false;
+            };
+        }
     }
 }

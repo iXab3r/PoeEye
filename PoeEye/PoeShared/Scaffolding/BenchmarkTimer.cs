@@ -26,6 +26,8 @@ namespace PoeShared.Scaffolding
             this.propertyName = propertyName ?? "unknown";
             sw = Stopwatch.StartNew();
         }
+        
+        public TimeSpan Elapsed => sw.Elapsed;
 
         public void ResetStep()
         {
