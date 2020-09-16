@@ -4,6 +4,8 @@ using System.Reactive.Linq;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reactive;
+using System.Reactive.Threading.Tasks;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 using ReactiveUI;
 
@@ -96,12 +98,22 @@ namespace PoeShared.Scaffolding
             TimeSpan timeout)
             where TObject : INotifyPropertyChanged
         {
-            instance
+            WaitForValueAsync(instance, ex1, condition, timeout).Wait();
+        }
+        
+        public static Task WaitForValueAsync<TObject, T1>(
+            this TObject instance, 
+            Expression<Func<TObject, T1>> ex1,
+            Predicate<T1> condition,
+            TimeSpan timeout)
+            where TObject : INotifyPropertyChanged
+        {
+            return instance
                 .WhenAnyValue(ex1)
                 .Where(x => condition(x))
                 .Take(1)
                 .Timeout(timeout)
-                .Wait();
+                .ToTask();
         }
         
         public static bool TryWaitForValue<TObject, T1>(
