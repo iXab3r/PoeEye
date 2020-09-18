@@ -299,9 +299,9 @@ namespace PoeShared.Native
             Log.Debug($"[#{this}] Loaded overlay window: {OverlayWindow} ({interopHelper.Handle.ToHexadecimal()})");
         }
 
-        public void Invoke(Action dispatcherAction)
+        public DispatcherOperation BeginInvoke(Action dispatcherAction)
         {
-            uiDispatcher.Invoke(dispatcherAction);
+            return uiDispatcher.BeginInvoke(dispatcherAction);
         }
 
         protected virtual void ApplyConfig(IOverlayConfig config)

@@ -2,6 +2,7 @@ using System;
 using System.Drawing;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Threading;
 using JetBrains.Annotations;
 using PoeShared.Scaffolding;
 using Point = System.Windows.Point;
@@ -74,6 +75,6 @@ namespace PoeShared.Native
         ///  FIXME It would be much better to automatically reschedule invocations if needed
         /// </summary>
         /// <param name="dispatcherAction"></param>
-        void Invoke(Action dispatcherAction);
+        DispatcherOperation BeginInvoke(Action dispatcherAction);
     }
 }
