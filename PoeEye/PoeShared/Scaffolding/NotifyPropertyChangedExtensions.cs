@@ -128,6 +128,10 @@ namespace PoeShared.Scaffolding
                 WaitForValue(instance, ex1, condition, timeout);
                 return true;
             }
+            catch (AggregateException)
+            {
+                return false;
+            }
             catch (TimeoutException)
             {
                 return false;

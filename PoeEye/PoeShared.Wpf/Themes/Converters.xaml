@@ -15,6 +15,7 @@
     
     <blue:MultiplyDoubleConverter x:Key="DoubleToPercentConverter" Factor="100" />
     <blue:MultiplyDoubleConverter x:Key="DoubleFromPercentConverter" Factor="0.01" />
+    <eyeConverters:PathCombineMultiValueConverter x:Key="PathCombineMultiValueConverter"/>
     
     <eyeConverters:StaticResourceConverter x:Key="StaticResourceOrNullConverter" ThrowWhenNotFound="False" DefaultValue="{x:Null}" />
     <eyeConverters:StaticResourceConverter x:Key="StaticResourceConverter" ThrowWhenNotFound="True" />
