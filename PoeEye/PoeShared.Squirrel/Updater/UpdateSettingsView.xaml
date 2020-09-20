@@ -1,20 +1,11 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:viewModels="clr-namespace:PoeShared.Squirrel.Updater">
+                    xmlns:viewModels="clr-namespace:PoeShared.Squirrel.Updater"
+                    xmlns:st="http://schemas.spicytaco.io/">
     <DataTemplate DataType="{x:Type viewModels:UpdateSettingsViewModel}">
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" MinHeight="40" />
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" SharedSizeGroup="LabelColumn" />
-                <ColumnDefinition Width="*" SharedSizeGroup="DataColumn" />
-            </Grid.ColumnDefinitions>
-
-            <TextBlock Grid.Row="0" Grid.Column="0" Text="Check for updates: " HorizontalAlignment="Right" />
-            <CheckBox Grid.Row="0" Grid.Column="1" 
-                          HorizontalAlignment="Left" Margin="5,0,0,0" 
-                          IsChecked="{Binding CheckForUpdates}" ToolTip="{Binding UpdateSource}"/>
-        </Grid>
+        <st:AutoGrid Columns="170, *" ChildMargin="5">
+            <TextBlock Text="Check for updates: " HorizontalAlignment="Right" />
+            <CheckBox IsChecked="{Binding CheckForUpdates}" ToolTip="{Binding UpdateSource}"/>
+        </st:AutoGrid>
     </DataTemplate>
 </ResourceDictionary>
