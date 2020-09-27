@@ -119,10 +119,21 @@ namespace PoeShared.Scaffolding
 
         public static Rectangle ToScreen(this Rect sourceSize, Visual owner)
         {
+            var ownerTopLeft = owner.PointToScreen(new Point(0, 0));
             var topLeft = owner.PointToScreen(sourceSize.TopLeft);
+            topLeft.Offset(-ownerTopLeft.X, -ownerTopLeft.Y);
             var bottomRight = owner.PointToScreen(sourceSize.BottomRight);
+            bottomRight.Offset(-ownerTopLeft.X, -ownerTopLeft.Y);
             var relative = new Rect(topLeft, bottomRight);
             return relative.ToWinRectangle();
+        }
+        
+        public static WinSize ToScreen(this Size sourceSize, Visual owner)
+        {
+            var ownerTopLeft = owner.PointToScreen(new Point(0, 0));
+            var bottomRight = owner.PointToScreen(new Point(sourceSize.Width, sourceSize.Height));
+            var relative = new Size(bottomRight.X - ownerTopLeft.X, bottomRight.Y - ownerTopLeft.Y);
+            return relative.ToWinSize();
         }
         
         public static WinPoint ScaleToScreen(this Point sourceSize)
