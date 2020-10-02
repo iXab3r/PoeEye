@@ -27,6 +27,11 @@ namespace PoeShared.Scaffolding
         {
             return String.Join(separator, obj);
         }
+        
+        public static bool IsSurroundedWith(this string input, string value)
+        {
+            return input != null && value != null && input.StartsWith(value) && input.EndsWith(value);
+        }
 
         public static int? ToIntOrDefault(this string str)
         {
