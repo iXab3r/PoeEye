@@ -60,11 +60,11 @@
 
                     <ControlTemplate.Triggers>
                         <Trigger SourceName="Thumb" Property="IsMouseOver" Value="true">
-                            <Setter Value="{DynamicResource ButtonMouseOverBorderBrush}" TargetName="Thumb"
+                            <Setter Value="{StaticResource AccentBrush}" TargetName="Thumb"
                                     Property="Background" />
                         </Trigger>
                         <Trigger SourceName="Thumb" Property="IsDragging" Value="true">
-                            <Setter Value="{DynamicResource AccentSelectedColorBrush}" TargetName="Thumb"
+                            <Setter Value="{StaticResource AccentBrush}" TargetName="Thumb"
                                     Property="Background" />
                         </Trigger>
 

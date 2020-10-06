@@ -6,7 +6,6 @@
         <ResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Converters.xaml" />
         <ResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Colors.xaml" />
         <ResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Styles.xaml" />
-        <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/materialdesigncolor.lightblue.named.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
     <Style x:Key="CommandWrapperIconButton" TargetType="{x:Type ButtonBase}" BasedOn="{StaticResource MaterialDesignFlatButton}">
@@ -16,7 +15,7 @@
 
         <Setter Property="materialDesign:ButtonProgressAssist.IsIndicatorVisible" Value="False" />
         <Setter Property="materialDesign:ButtonProgressAssist.Opacity" Value=".8" />
-        <Setter Property="materialDesign:ButtonProgressAssist.IndicatorForeground" Value="{DynamicResource PrimaryHueMidForegroundBrush}" />
+        <Setter Property="materialDesign:ButtonProgressAssist.IndicatorForeground" Value="{StaticResource WarningColor}" />
 
         <Setter Property="Template">
             <Setter.Value>
