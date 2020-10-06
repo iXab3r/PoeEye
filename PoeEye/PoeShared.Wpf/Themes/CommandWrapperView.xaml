@@ -6,8 +6,6 @@
         <ResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Converters.xaml" />
         <ResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Colors.xaml" />
         <ResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Styles.xaml" />
-        <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.button.xaml" />
-        <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.togglebutton.xaml" />
         <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/materialdesigncolor.lightblue.named.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
@@ -104,16 +102,13 @@
         </Setter>
     </Style>
 
-    <Style TargetType="{x:Type materialDesign:PackIcon}"
-           x:Key="CommandWrapperErrorIndicatorErrorStyleKey">
+    <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource ErrorIconTextBlock}"
+           x:Key="CommandWrapperIndicatorErrorStyleKey">
 
         <Setter Property="Visibility" Value="Collapsed" />
         <Setter Property="Opacity" Value="1" />
-        <Setter Property="Foreground" Value="{StaticResource NegativeBrush}" />
-        <Setter Property="Background" Value="Transparent" />
         <Setter Property="ToolTip" Value="{Binding Error}" />
         <Setter Property="HorizontalAlignment" Value="Center" />
-        <Setter Property="VerticalAlignment" Value="Center" />
 
         <Style.Triggers>
             <MultiDataTrigger>
@@ -148,19 +143,18 @@
                 </MultiDataTrigger.ExitActions>
             </MultiDataTrigger>
         </Style.Triggers>
-
     </Style>
 
-    <Style TargetType="{x:Type materialDesign:PackIcon}"
-           x:Key="CommandWrapperErrorIndicatorSuccessStyleKey">
+    <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource ErrorIconTextBlock}"
+           x:Key="CommandWrapperIndicatorSuccessStyleKey">
 
         <Setter Property="Visibility" Value="Collapsed" />
         <Setter Property="Opacity" Value="1" />
-        <Setter Property="Foreground" Value="{StaticResource PositiveBrush}" />
-        <Setter Property="Background" Value="Transparent" />
         <Setter Property="HorizontalAlignment" Value="Center" />
         <Setter Property="VerticalAlignment" Value="Center" />
-
+        <Setter Property="Foreground" Value="{StaticResource PositiveBrush}"/>
+        <Setter Property="Text" Value="&#xf00c;"/>
+        
         <Style.Triggers>
             <MultiDataTrigger>
                 <MultiDataTrigger.Conditions>
@@ -255,8 +249,8 @@
                     </Grid>
                 </Button.Content>
             </Button>
-
-            <materialDesign:PackIcon Grid.Column="0" x:Name="ErrorIcon" Kind="AlertCircleOutline" Style="{StaticResource CommandWrapperErrorIndicatorErrorStyleKey}" />
+            
+            <TextBlock Grid.Column="0" x:Name="ErrorIcon" Style="{StaticResource CommandWrapperIndicatorErrorStyleKey}"/>
 
             <Label Grid.Column="1" Margin="10,0,0,0"
                    Foreground="{Binding ElementName=CommandWrapperGrid, Path=(TextElement.Foreground), Mode=OneWay}"
@@ -297,10 +291,9 @@
                          Visibility="{Binding IsBusy, Converter={StaticResource TrueToVisibleFalseToCollapsedConverter}}"
                          IsIndeterminate="True" />
 
-            <materialDesign:PackIcon x:Name="ErrorIcon" Kind="AlertCircleOutline" HorizontalAlignment="Right"
-                                     Style="{StaticResource CommandWrapperErrorIndicatorErrorStyleKey}" />
-            <materialDesign:PackIcon x:Name="SuccessIcon" Kind="CheckboxMarked" HorizontalAlignment="Right"
-                                     Style="{StaticResource CommandWrapperErrorIndicatorSuccessStyleKey}" />
+            <TextBlock HorizontalAlignment="Right" x:Name="ErrorIcon" Style="{StaticResource CommandWrapperIndicatorErrorStyleKey}"/>
+
+            <TextBlock HorizontalAlignment="Right" x:Name="SuccessIcon" Style="{StaticResource CommandWrapperIndicatorSuccessStyleKey}"/>
         </Grid>
     </DataTemplate>
 

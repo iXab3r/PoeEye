@@ -56,7 +56,7 @@
             </Trigger>
         </Style.Triggers>
     </Style>
-
+    
     <Style TargetType="{x:Type TextBlock}" x:Key="IconTextBlock" BasedOn="{StaticResource DefaultTextBlockStyleKey}">
         <Setter Property="FontFamily" Value="{StaticResource FontAwesome}" />
         <Setter Property="FontSize" Value="14" />
@@ -69,6 +69,12 @@
         <Setter Property="Foreground" Value="{StaticResource MouseOverAccentBrushKey}"/>
     </Style>
     
+    <Style TargetType="{x:Type TextBlock}" x:Key="ErrorIconTextBlock" BasedOn="{StaticResource IconTextBlock}">
+        <Setter Property="Text" Value="&#xf06a;"/>
+        <Setter Property="Foreground" Value="{StaticResource NegativeBrush}"/>
+        <Setter Property="Background" Value="Transparent"/>
+    </Style>
+
     <Style TargetType="{x:Type Button}" x:Key="FlatButton"
            BasedOn="{StaticResource MaterialDesignFlatButton}">
         <Setter Property="FontSize" Value="14" />

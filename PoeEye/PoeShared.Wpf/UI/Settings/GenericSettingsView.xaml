@@ -13,6 +13,9 @@
 
     <DataTemplate DataType="{x:Type settings:GenericSettingsViewModel}">
         <DockPanel LastChildFill="True">
+            <DockPanel.InputBindings>
+                <KeyBinding Gesture="Escape" Command="{Binding CancelCommand}" />
+            </DockPanel.InputBindings>
             <Border DockPanel.Dock="Bottom" VerticalAlignment="Bottom" Margin="0,5,0,0" BorderBrush="{StaticResource MaterialDesignTextBoxBorder}" BorderThickness="0,2,0,0">
                 <DockPanel>
                     <Button DockPanel.Dock="Right" Margin="5,5" Width="120" Height="22" Content="Cancel" HorizontalAlignment="Right"
