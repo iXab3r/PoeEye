@@ -2,7 +2,7 @@
   <PropertyGroup>
     <CefSharpAnyCpuSupport>true</CefSharpAnyCpuSupport>
     <ProjectGuid>{9AAA9005-0177-4F4C-B6DE-EB09037DB155}</ProjectGuid>
-    <TargetFrameworks>net461;netcoreapp3.0;netcoreapp5.0</TargetFrameworks>
+    <TargetFramework>net5.0-windows7</TargetFramework>
     <AssemblyTitle>PoeShared</AssemblyTitle>
     <Product>PoeShared</Product>
     <Description>PoeEye Shared classes</Description>
@@ -10,6 +10,7 @@
     <Configurations>Debug;Release</Configurations>
     <Platforms>AnyCPU</Platforms>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="CommonServiceLocator" Version="2.0.4" />
@@ -36,9 +37,7 @@
     <PackageReference Include="System.Drawing.Primitives" Version="4.3.0" />
     <PackageReference Include="System.Reactive" Version="4.2.0" />
     <PackageReference Include="System.Reflection.Emit" Version="4.3.0" />
-    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.5.2" />
     <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="5.0.0-preview.5.20278.1" />
-    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.3" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
     <PackageReference Include="Unity" Version="5.10.3" />
     <PackageReference Include="Unity.Abstractions" Version="4.1.3" />

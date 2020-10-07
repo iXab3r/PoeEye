@@ -3,7 +3,6 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
 using CommandLine;
 using log4net;
 using PoeShared.Modularity;
@@ -26,14 +25,14 @@ namespace PoeShared
             get => isAutostart;
             set => this.RaiseAndSetIfChanged(ref isAutostart, value);
         }
-        
+
         [Option('d', "debugMode", Default = false)]
         public bool IsDebugMode
         {
             get => isDebugMode;
             set => this.RaiseAndSetIfChanged(ref isDebugMode, value);
         }
-        
+
         [Option('l', "lazyMode", Default = false, HelpText = "Lazy mode - Prism modules will be loaded on-demand")]
         public bool IsLazyMode
         {
@@ -59,11 +58,11 @@ namespace PoeShared
         }
 
         public string AppSupportMail { get; set; } = "";
-        
+
         public string AppDomainDirectory => AppDomain.CurrentDomain.BaseDirectory;
-        
+
         public string AppDataDirectory => IsWindows ? Environment.ExpandEnvironmentVariables($@"%APPDATA%\{AppName}") : $"~/{AppName}";
-        
+
         public string LocalAppDataDirectory => IsWindows ? Environment.ExpandEnvironmentVariables($@"%LOCALAPPDATA%\{AppName}") : $"~/.{AppName}";
 
         public AppArguments()
@@ -77,26 +76,31 @@ namespace PoeShared
                 .JoinStrings(" ");
             ApplicationExecutablePath = args.First();
             ApplicationExecutableName = Path.GetFileName(ApplicationExecutablePath);
-            IsWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-            IsLinux = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
+#if NET5_0
+            IsWindows = OperatingSystem.IsWindows();
+            IsLinux = OperatingSystem.IsLinux();
+#else
+            IsWindows = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows);
+            IsLinux = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Linux);
+#endif
         }
-        
+
         public bool IsWindows { get; }
-        
+
         public bool IsLinux { get; }
-        
+
         public string StartupArgs { get; }
-        
+
         public int ProcessId { get; }
-        
+
         public bool IsElevated
         {
             get => isElevated;
             set => this.RaiseAndSetIfChanged(ref isElevated, value);
         }
-        
+
         public string ApplicationExecutablePath { get; }
-        
+
         public string ApplicationExecutableName { get; }
 
         public static bool Parse(string[] args)
@@ -117,9 +121,10 @@ namespace PoeShared
                 parsedResult.Value.CopyPropertiesTo(Instance);
                 return true;
             }
+
             return false;
         }
-        
+
         public override string ToString()
         {
             return new

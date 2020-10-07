@@ -45,7 +45,7 @@
                         <Track x:Name="PART_Track" Grid.Row="0" IsDirectionReversed="true" Focusable="false">
                             <Track.Thumb>
                                 <Thumb x:Name="Thumb" Background="{TemplateBinding Foreground}"
-                                       Style="{DynamicResource ScrollThumbsStyleKey}" />
+                                       Style="{StaticResource ScrollThumbsStyleKey}" />
                             </Track.Thumb>
                             <Track.IncreaseRepeatButton>
                                 <RepeatButton x:Name="PageUp" Command="ScrollBar.PageDownCommand" Opacity="0"
