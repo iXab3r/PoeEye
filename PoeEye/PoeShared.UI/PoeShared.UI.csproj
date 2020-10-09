@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <ProjectGuid>{B477A982-DF35-499C-A7B5-86A0AB7D7BBA}</ProjectGuid>
+        <AssemblyTitle>PoeShared.UI</AssemblyTitle>
+        <Product>PoeShared.UI</Product>
+        <Description>PoeEye Shared UI classes</Description>
+        <Copyright>Copyright © Xab3r 2020</Copyright>
+        <Configurations>Debug;Release</Configurations>
+        <Platforms>AnyCPU</Platforms>
+        <LangVersion>8</LangVersion>
+        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+        <TargetFramework>net5.0</TargetFramework>
+    </PropertyGroup>
+    
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <UseWPF>true</UseWPF>
+    </PropertyGroup>
+    
+    <ItemGroup>
+      <ProjectReference Include="..\PoeShared.Native\PoeShared.Native.csproj" />
+      <ProjectReference Include="..\PoeShared.Wpf\PoeShared.Wpf.csproj" />
+      <ProjectReference Include="..\PoeShared\PoeShared.csproj" />
+    </ItemGroup>
+    
+    <ItemGroup>
+      <PackageReference Include="ReactiveUI" Version="10.4.1" />
+      <PackageReference Include="SpicyTaco.AutoGrid" Version="1.2.29" />
+    </ItemGroup>
+</Project>

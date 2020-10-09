@@ -1,0 +1,23 @@
+﻿<Window x:Class="PoeShared.UI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:PoeShared.UI"
+        xmlns:ui="clr-namespace:PoeShared.UI;assembly=PoeShared.Wpf"
+        mc:Ignorable="d"
+        WindowStartupLocation="CenterScreen"
+        Title="MainWindow" Height="450" Width="800" d:DataContext="{d:DesignInstance local:MainWindowViewModel}">
+    <Grid>
+        <StackPanel>
+            <ui:ButtonEx Content="OK"
+                         Icon="&#xf1fb;"
+                         Command="{Binding LongCommand}"/>
+
+            <ui:ButtonEx Content="Error"  Command="{Binding ErrorCommand}"/>
+            <ui:ButtonEx Icon="&#xf00d;" Content="With Icon"  Command="{Binding LongCommand}"/>
+            <ui:ButtonEx Icon="&#xf00d;" Command="{Binding LongCommand}"/>
+            <ui:ButtonEx Icon="&#xf00d;" Command="{Binding LongCommand}"/>
+        </StackPanel>
+    </Grid>
+</Window>
