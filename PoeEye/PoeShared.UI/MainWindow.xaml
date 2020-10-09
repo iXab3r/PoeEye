@@ -14,10 +14,11 @@
                          Icon="&#xf1fb;"
                          Command="{Binding LongCommand}"/>
 
-            <ui:ButtonEx Content="Error"  Command="{Binding ErrorCommand}"/>
             <ui:ButtonEx Icon="&#xf00d;" Content="With Icon"  Command="{Binding LongCommand}"/>
             <ui:ButtonEx Icon="&#xf00d;" Command="{Binding LongCommand}"/>
-            <ui:ButtonEx Icon="&#xf00d;" Command="{Binding LongCommand}"/>
+            
+            <ui:ButtonEx Content="Error"  Command="{Binding ErrorCommand}"/>
+            <ui:ButtonEx Icon="&#xf00d;"   Command="{Binding ErrorCommand}"/>
         </StackPanel>
     </Grid>
 </Window>

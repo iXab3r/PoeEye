@@ -42,6 +42,7 @@
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Margin" Value="2.5"></Setter>
         <Setter Property="HorizontalContentAlignment" Value="Center" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="FontFamily" Value="{StaticResource FontAwesome}" />
@@ -72,6 +73,11 @@
                                            HorizontalAlignment="Center"
                                            Text="{Binding Icon, RelativeSource={RelativeSource TemplatedParent}}"
                                            Visibility="{Binding Icon, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource NullToCollapsedConverter}}" />
+                                <TextBlock x:Name="ErrorIcon"
+                                           ToolTip="{Binding Command.Error, RelativeSource={RelativeSource TemplatedParent}}"
+                                           Style="{StaticResource CommandWrapperIndicatorErrorStyleKey}" />
+                                <TextBlock x:Name="SuccessIcon"
+                                           Style="{StaticResource CommandWrapperIndicatorSuccessStyleKey}" />
                                 <ProgressBar Style="{StaticResource MaterialDesignCircularProgressBar}" x:Name="CommandProgressBar"
                                              Value="0" Width="22"
                                              HorizontalAlignment="Center" VerticalAlignment="Center"
@@ -84,11 +90,6 @@
                                                  FallbackValue="{x:Static Visibility.Collapsed}"/>
                                     </ProgressBar.Visibility>
                                 </ProgressBar>
-                                <TextBlock x:Name="ErrorIcon" Margin="0,2,0,0"
-                                           ToolTip="{Binding Command.Error, RelativeSource={RelativeSource TemplatedParent}}"
-                                           Style="{StaticResource CommandWrapperIndicatorErrorStyleKey}" />
-                                <TextBlock x:Name="SuccessIcon"
-                                           Style="{StaticResource CommandWrapperIndicatorSuccessStyleKey}" />
                             </Grid>
                             <ContentPresenter x:Name="ContentLabel"
                                               TextElement.Foreground="{TemplateBinding Foreground}"
@@ -174,6 +175,12 @@
                         </Trigger>
                         <Trigger Property="Command" Value="{x:Null}">
                             <Setter TargetName="CommandProgressBar" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                        <Trigger SourceName="SuccessIcon" Property="Visibility" Value="Visible">
+                            <Setter TargetName="IconLabel" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                        <Trigger SourceName="ErrorIcon" Property="Visibility" Value="Visible">
+                            <Setter TargetName="IconLabel" Property="Visibility" Value="Collapsed" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
