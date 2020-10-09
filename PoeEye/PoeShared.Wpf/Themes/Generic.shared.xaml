@@ -9,6 +9,7 @@
         <ResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Thumb.xaml" />
         <ResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/CommandWrapperView.xaml" />
         <ResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/UI/Hotkeys/HotKeyBox.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/UI/ButtonEx.xaml" />
         <ResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/UI/Settings/GenericSettingsView.xaml" />
         <ResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Audio/Views/AudioNotificationTypeSelectorView.xaml" />
     </ResourceDictionary.MergedDictionaries>

@@ -75,7 +75,7 @@ namespace PoeShared.Scaffolding.WPF
                 var targetElement = element
                     .FindVisualChildren<TextBox>()
                     .FirstOrDefault(x => x.Focusable) ?? element
-                    .FindVisualChildren<Control>()
+                    .FindVisualChildren<FrameworkElement>()
                     .FirstOrDefault(x => x.Focusable);
                 if (targetElement == null)
                 {

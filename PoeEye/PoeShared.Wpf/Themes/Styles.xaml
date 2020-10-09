@@ -34,8 +34,7 @@
         <Setter Property="VerticalContentAlignment" Value="Center" />
     </Style>
 
-    <Style TargetType="{x:Type Label}" x:Key="IconLabel"
-           BasedOn="{StaticResource {x:Type Label}}">
+    <Style TargetType="{x:Type Label}" x:Key="IconLabel">
         <Setter Property="FontFamily" Value="{StaticResource FontAwesome}" />
         <Setter Property="FontSize" Value="14" />
         <Setter Property="VerticalContentAlignment" Value="Center" />

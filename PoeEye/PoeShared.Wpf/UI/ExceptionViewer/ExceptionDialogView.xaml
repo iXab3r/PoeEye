@@ -6,6 +6,7 @@
         xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
         xmlns:wpf="clr-namespace:PoeShared.Scaffolding.WPF"
         xmlns:exceptionViewer="clr-namespace:PoeShared.Wpf.UI.ExceptionViewer"
+        xmlns:ui="clr-namespace:PoeShared.UI"
         mc:Ignorable="d"
         TextElement.FontWeight="Regular"
         TextOptions.TextFormattingMode="Ideal"
@@ -37,8 +38,9 @@
                  Text="{Binding ExceptionText, Mode=OneWay}" />
 
         <DockPanel Grid.Row="1" DockPanel.Dock="Bottom" Margin="5">
-            <ContentControl DockPanel.Dock="Right"
-                            Content="{Binding CloseCommand}" wpf:CommandWrapperHelper.Text="Close" />
+            <ui:ButtonEx DockPanel.Dock="Right"
+                         Command="{Binding CloseCommand}" 
+                         Content="Close" />
         </DockPanel>
     </Grid>
 </mah:MetroWindow>
