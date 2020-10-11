@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 using System.Security.Principal;
 using System.Text;
 using log4net;
@@ -18,6 +19,7 @@ namespace PoeShared.Native
         private static readonly int CurrentProcessId = Process.GetCurrentProcess().Id;
         private static readonly Version OSVersion = Environment.OSVersion.Version;
 
+        [SupportedOSPlatform("windows")]
         public static bool IsElevated()
         {
             using (var identity = WindowsIdentity.GetCurrent())

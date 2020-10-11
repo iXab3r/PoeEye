@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <ProjectGuid>{38C9EBE2-2AC9-465F-8A2A-49DFB1CB9383}</ProjectGuid>
     <TargetFramework>net5.0</TargetFramework>
@@ -29,7 +29,7 @@
     <PackageReference Include="Prism.Unity" Version="7.2.0.1367" />
     <PackageReference Include="Prism.Wpf" Version="7.2.0.1367" />
     <PackageReference Include="ReactiveUI" Version="10.4.1" />
-    <PackageReference Include="SpicyTaco.AutoGrid" Version="1.2.29" />
+    <PackageReference Include="SpicyTaco.AutoGrid" Version="1.2.29"><NoWarn>NU1701</NoWarn></PackageReference>
     <PackageReference Include="Splat" Version="9.1.1" />
     <PackageReference Include="Splat.Drawing" Version="9.1.1" />
     <PackageReference Include="StartupHelper" Version="1.0.2.0"><NoWarn>NU1701</NoWarn></PackageReference>

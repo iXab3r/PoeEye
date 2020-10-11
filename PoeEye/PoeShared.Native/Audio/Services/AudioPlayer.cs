@@ -3,6 +3,7 @@ using System.IO;
 using System.Media;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
+using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
@@ -14,6 +15,7 @@ using Unity;
 
 namespace PoeShared.Audio.Services
 {
+    [SupportedOSPlatform("windows")]
     internal sealed class AudioPlayer : DisposableReactiveObject, IAudioPlayer
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(AudioPlayer));

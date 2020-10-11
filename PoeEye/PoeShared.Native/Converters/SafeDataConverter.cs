@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.Versioning;
 using System.Security;
 using System.Security.Cryptography;
 using System.Text;
@@ -8,6 +9,7 @@ using PoeShared.Scaffolding;
 
 namespace PoeShared.Converters
 {
+    [SupportedOSPlatform("windows")]
     public sealed class SafeDataConverter : JsonConverter
     {
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)

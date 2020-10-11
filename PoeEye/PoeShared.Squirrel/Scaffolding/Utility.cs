@@ -449,7 +449,7 @@ namespace PoeShared.Squirrel.Scaffolding
             if (ModeDetector.InUnitTestRunner())
             {
                 var vendorDir = Path.Combine(
-                    Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase.Replace("file:///", "")),
+                    Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location.Replace("file:///", "")) ?? throw new InvalidOperationException(),
                     "..",
                     "..",
                     "..",
