@@ -72,6 +72,7 @@
         <Setter Property="Text" Value="&#xf06a;"/>
         <Setter Property="Foreground" Value="{StaticResource NegativeBrush}"/>
         <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="IsHitTestVisible" Value="True" />
     </Style>
 
     <Style TargetType="{x:Type Button}" x:Key="FlatButton"
