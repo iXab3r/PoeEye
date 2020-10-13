@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Linq;
 
 namespace PoeShared.Converters
@@ -20,6 +21,10 @@ namespace PoeShared.Converters
             {
                 isNull = IsNull(value as IEnumerable);
             }
+            else if (value is TimeSpan timeSpan)
+            {
+                isNull = timeSpan == TimeSpan.Zero;
+            }
             else
             {
                 isNull = value == null;
@@ -28,6 +33,7 @@ namespace PoeShared.Converters
             return isNull;
         }
 
+        
         private static bool IsNull(string value)
         {
             return string.IsNullOrWhiteSpace(value);
