@@ -1,5 +1,6 @@
 using System;
 using System.Globalization;
+using System.Windows;
 using System.Windows.Data;
 
 namespace PoeShared.Converters
@@ -10,7 +11,7 @@ namespace PoeShared.Converters
         {
             if (!(value is TimeSpan))
             {
-                return value;
+                return DependencyProperty.UnsetValue;
             }
 
             var timeSpan = (TimeSpan)value;
@@ -20,17 +21,14 @@ namespace PoeShared.Converters
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is int)
+            try
             {
-                return TimeSpan.FromMilliseconds((int)value);
+                return TimeSpan.FromMilliseconds(System.Convert.ToDouble(value));
             }
-
-            if (value is double)
+            catch (Exception)
             {
-                return TimeSpan.FromMilliseconds((double)value);
+                return DependencyProperty.UnsetValue;
             }
-
-            return Binding.DoNothing;
         }
     }
 }

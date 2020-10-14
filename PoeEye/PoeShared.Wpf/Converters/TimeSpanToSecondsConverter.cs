@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Windows;
 using System.Windows.Data;
 
 namespace PoeShared.Converters
@@ -10,7 +11,7 @@ namespace PoeShared.Converters
         {
             if (!(value is TimeSpan))
             {
-                return value;
+                return DependencyProperty.UnsetValue;
             }
 
             var timeSpan = (TimeSpan)value;
@@ -30,7 +31,7 @@ namespace PoeShared.Converters
                 return TimeSpan.FromSeconds((double)value);
             }
 
-            return Binding.DoNothing;
+            return DependencyProperty.UnsetValue;
         }
     }
 }
