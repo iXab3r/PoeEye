@@ -106,16 +106,18 @@ namespace PoeShared.Wpf.UI.ExceptionViewer
 
             Window owner = null;
             var appWindow = Application.Current.MainWindow;
-            if (appWindow != null && appWindow.IsLoaded && appWindow.IsVisible)
+            if (appWindow != null && !(appWindow is ExceptionDialogView) && appWindow.IsLoaded && appWindow.IsVisible)
             {
                 owner = appWindow;
             }
+
+            var content = exception.Message.ToString();
 
             if (owner != null)
             {
                 System.Windows.MessageBox.Show(
                     owner, 
-                    exception.ToString(), 
+                    content, 
                     config.Title, 
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
@@ -123,10 +125,12 @@ namespace PoeShared.Wpf.UI.ExceptionViewer
             else
             {
                 System.Windows.MessageBox.Show(
-                    exception.ToString(), 
+                    exception.Message, 
                     config.Title, 
                     MessageBoxButton.OK,
-                    MessageBoxImage.Error);
+                    MessageBoxImage.Error,
+                    MessageBoxResult.OK, 
+                    MessageBoxOptions.DefaultDesktopOnly);
             }
         }
 
@@ -135,33 +139,42 @@ namespace PoeShared.Wpf.UI.ExceptionViewer
             Log.Debug($"Showing custom ExceptionViewer, exception: {exception}, config: {config.DumpToTextRaw()}");
 
             var windowAnchors = new CompositeDisposable();
-            var window = new ExceptionDialogView();
-            var appWindow = Application.Current.MainWindow;
-            if (appWindow != null && appWindow.IsLoaded && appWindow.IsVisible)
+            Window window = null;
+            try
             {
-                window.WindowStartupLocation = WindowStartupLocation.CenterOwner;
-                window.Owner = appWindow;
-            }
-            else
-            {
-                window.WindowStartupLocation = WindowStartupLocation.CenterScreen;
-            }
+                window = new ExceptionDialogView();
+                var appWindow = Application.Current.MainWindow;
+                if (appWindow != null && appWindow.IsLoaded && appWindow.IsVisible)
+                {
+                    window.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+                    window.Owner = appWindow;
+                }
+                else
+                {
+                    window.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+                }
             
-            Disposable.Create(
-                    () =>
-                    {
-                        Log.Debug($"Closing ExceptionViewer, value: {exception}");
-                        window.Close();
-                    })
-                .AddTo(windowAnchors);
+                Disposable.Create(
+                        () =>
+                        {
+                            Log.Debug($"Closing ExceptionViewer, value: {exception}");
+                            window.Close();
+                        })
+                    .AddTo(windowAnchors);
             
-            var closeController = new CloseController(windowAnchors.Dispose);
+                var closeController = new CloseController(windowAnchors.Dispose);
 
-            var dialogViewModel = dialogViewModelFactory.Create(closeController);
-            dialogViewModel.Config = config;
-            dialogViewModel.ExceptionSource = exception;
-            window.DataContext = dialogViewModel;
-            window.ShowDialog();
+                var dialogViewModel = dialogViewModelFactory.Create(closeController);
+                dialogViewModel.Config = config;
+                dialogViewModel.ExceptionSource = exception;
+                window.DataContext = dialogViewModel;
+                window.ShowDialog();
+            }
+            catch (Exception e)
+            {
+                window?.Close();
+                throw;
+            }
         }
     }
 }

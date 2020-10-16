@@ -23,6 +23,8 @@ namespace PoeShared.Modularity
     public interface IConfigProvider
     {
         IObservable<Unit> ConfigHasChanged { [NotNull] get; }
+
+        IDisposable RegisterStrategy([NotNull] IConfigProviderStrategy strategy);
         
         void Reload();
 

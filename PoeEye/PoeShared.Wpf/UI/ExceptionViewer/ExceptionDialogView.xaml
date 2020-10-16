@@ -6,7 +6,6 @@
         xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
         xmlns:wpf="clr-namespace:PoeShared.Scaffolding.WPF"
         xmlns:exceptionViewer="clr-namespace:PoeShared.Wpf.UI.ExceptionViewer"
-        xmlns:ui="clr-namespace:PoeShared.UI"
         mc:Ignorable="d"
         TextElement.FontWeight="Regular"
         TextOptions.TextFormattingMode="Ideal"
@@ -18,6 +17,22 @@
         WindowState="Normal"
         SizeToContent="WidthAndHeight"
         Title="{Binding Title}" Width="600" d:DataContext="{d:DesignInstance exceptionViewer:ExceptionDialogViewModel}">
+     <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/styles/themes/dark.blue.xaml" />
+
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.dark.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />
+
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/materialdesigncolor.bluegrey.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Accent/materialdesigncolor.lightblue.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Generic.shared.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+    
     <Grid Margin="5">
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
@@ -38,9 +53,9 @@
                  Text="{Binding ExceptionText, Mode=OneWay}" />
 
         <DockPanel Grid.Row="1" DockPanel.Dock="Bottom" Margin="5">
-            <ui:ButtonEx DockPanel.Dock="Right"
-                         Command="{Binding CloseCommand}" 
-                         Content="Close" />
+            <Button DockPanel.Dock="Right"
+                     Command="{Binding CloseCommand}" 
+                     Content="Close" />
         </DockPanel>
     </Grid>
 </mah:MetroWindow>

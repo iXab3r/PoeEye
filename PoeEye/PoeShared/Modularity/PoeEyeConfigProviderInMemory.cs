@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Reactive;
+using System.Reactive.Disposables;
 using System.Reactive.Subjects;
 using log4net;
 
@@ -28,6 +29,11 @@ namespace PoeShared.Modularity
         }
 
         public IObservable<Unit> ConfigHasChanged => configHasChanged;
+
+        public IDisposable RegisterStrategy(IConfigProviderStrategy strategy)
+        {
+            return Disposable.Empty;
+        }
 
         public void Reload()
         {

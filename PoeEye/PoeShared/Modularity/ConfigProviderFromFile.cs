@@ -4,9 +4,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reactive;
+using System.Reactive.Disposables;
 using System.Reactive.Subjects;
 using System.Runtime.CompilerServices;
 using System.Text;
+using DynamicData;
 using JetBrains.Annotations;
 using log4net;
 using PoeShared.Scaffolding;
@@ -24,6 +26,7 @@ namespace PoeShared.Modularity
         private readonly IConfigSerializer configSerializer;
 
         private readonly ConcurrentDictionary<string, IPoeEyeConfig> loadedConfigsByType = new ConcurrentDictionary<string, IPoeEyeConfig>();
+        private readonly SourceList<IConfigProviderStrategy> strategies = new SourceList<IConfigProviderStrategy>();
         private string loadedConfigurationFile;
 
         public ConfigProviderFromFile(
@@ -45,12 +48,12 @@ namespace PoeShared.Modularity
             }
 
             var candidates = new[]
-            {
-                AppDomain.CurrentDomain.BaseDirectory,
-                appArguments.AppDataDirectory
-            }
+                {
+                    AppDomain.CurrentDomain.BaseDirectory,
+                    appArguments.AppDataDirectory
+                }
                 .Select(x => Path.Combine(x, configFileName))
-                .Select(x => new { Path = x, Exists = File.Exists(x) })
+                .Select(x => new {Path = x, Exists = File.Exists(x)})
                 .ToArray();
             Log.Debug($"Configuration matrix, configuration file name: {configFileName}:\n\t{candidates.DumpToTable()}");
             var existingFilePath = candidates.FirstOrDefault(x => x.Exists);
@@ -82,10 +85,17 @@ namespace PoeShared.Modularity
                     })
                 .AddTo(Anchors);
         }
-        
+
         public string ConfigFilePath { [NotNull] get; }
 
         public IObservable<Unit> ConfigHasChanged => configHasChanged;
+
+        public IDisposable RegisterStrategy(IConfigProviderStrategy strategy)
+        {
+            Log.Debug($"Registering strategy {strategy}, existing strategies: {strategies.Items.DumpToTextRaw()}");
+            strategies.Insert(0, strategy);
+            return Disposable.Create(() => strategies.Remove(strategy));
+        }
 
         [MethodImpl(MethodImplOptions.Synchronized)]
         public void Reload()
@@ -107,11 +117,12 @@ namespace PoeShared.Modularity
                     {
                         configType = x.GetType().FullName;
                     }
+
                     if (string.IsNullOrEmpty(configType))
                     {
                         throw new ApplicationException($"Could not determine FullName for config {config.GetType()}");
                     }
-                    
+
                     loadedConfigsByType[configType] = x;
                 });
 
@@ -126,6 +137,7 @@ namespace PoeShared.Modularity
             {
                 throw new ApplicationException($"Could not determine FullName for config {config.GetType()}");
             }
+
             loadedConfigsByType[configType] = config;
             Save();
         }
@@ -135,7 +147,7 @@ namespace PoeShared.Modularity
         {
             var metaConfig = new PoeEyeCombinedConfig();
             loadedConfigsByType.Values.ToList().ForEach(x => metaConfig.Add(x));
-            Log.Debug($"Saving all configs, metadata: { ObjectExtensions.DumpToTextRaw(metaConfig) }");
+            Log.Debug($"Saving all configs, metadata: {ObjectExtensions.DumpToTextRaw(metaConfig)}");
 
             SaveInternal(metaConfig);
         }
@@ -165,11 +177,12 @@ namespace PoeShared.Modularity
                 {
                     throw new ApplicationException($"Something went wrong when re-serializing metadata: {metadata}\n{metadata.ConfigValue}");
                 }
+
                 var deserialized = configSerializer.Deserialize<TConfig>(serialized);
                 loadedConfigsByType[configType] = deserialized;
                 return deserialized;
             }
-            
+
             return (TConfig) config;
         }
 
@@ -183,16 +196,50 @@ namespace PoeShared.Modularity
 
                 Log.Debug($"Successfully serialized config, got {serializedData.Length} chars");
 
-                Log.Debug($"Writing config data to file '{ConfigFilePath}'...");
-
                 var directoryPath = Path.GetDirectoryName(ConfigFilePath);
                 if (directoryPath != null && !Directory.Exists(directoryPath))
                 {
                     Directory.CreateDirectory(directoryPath);
                 }
 
-                File.WriteAllText(ConfigFilePath, serializedData, Encoding.Unicode);
+                var temporaryConfigPath = Path.ChangeExtension(ConfigFilePath, ".new");
+                var backupConfigPath = Path.ChangeExtension(ConfigFilePath, ".bak");
+                if (string.IsNullOrEmpty(temporaryConfigPath) || string.IsNullOrEmpty(backupConfigPath))
+                {
+                    throw new ApplicationException($"Failed to prepare path for a temporary config file, file path: {ConfigFilePath}");
+                }
+                var configFile = new FileInfo(ConfigFilePath);
+                var temporaryFile = new FileInfo(temporaryConfigPath);
+                var backupFile = new FileInfo(backupConfigPath);
 
+                Log.Debug($"Preparing temporary file '{temporaryFile}'...");
+                if (temporaryFile.Exists)
+                {
+                    Log.Debug($"Removing previous temporary file '{temporaryFile}'...");
+                    temporaryFile.Delete();
+                }
+
+                Log.Debug($"Writing configuration({serializedData.Length}) to temporary file '{temporaryFile}'...");
+                File.WriteAllText(temporaryConfigPath, serializedData, Encoding.Unicode);
+                temporaryFile.Refresh();
+                Log.Debug($"Flushing configuration '{temporaryConfigPath}' => '{ConfigFilePath}'");
+
+                if (backupFile.Exists)
+                {
+                    Log.Debug($"Removing previous backup file {backupFile}");
+                    backupFile.Delete();
+                }
+
+                if (configFile.Exists)
+                {
+                    Log.Debug($"Moving previous config to backup {configFile.FullName} => {backupFile.FullName}");
+                    configFile.MoveTo(backupConfigPath);   
+                }
+                
+                Log.Debug($"Moving temporary config to default {temporaryFile.FullName} => {configFile.FullName}");
+                temporaryFile.MoveTo(ConfigFilePath);
+                
+                strategies.Items.ForEach(x => x.HandleConfigSave(new FileInfo(ConfigFilePath)));
                 configHasChanged.OnNext(Unit.Default);
             }
             catch (Exception ex)
@@ -225,40 +272,35 @@ namespace PoeShared.Modularity
             }
             catch (Exception ex)
             {
-                Log.Warn("Could not deserialize config data, default config will be used", ex);
-                CreateBackupOfConfig();
-            }
+                Log.Warn("Could not deserialize config data", ex);
 
-            return result ?? new PoeEyeCombinedConfig();
-        }
-
-        private void CreateBackupOfConfig()
-        {
-            try
-            {
-                if (!File.Exists(ConfigFilePath))
+                foreach (var strategy in strategies.Items)
                 {
-                    return;
+                    if (strategy.TryHandleConfigLoadException(new FileInfo(ConfigFilePath), out var strategyResult) && strategyResult != null)
+                    {
+                        Log.Debug($"Strategy {strategy} has handled exception");
+                        result = strategyResult;
+                        break;
+                    }
                 }
 
-                var backupFilePath = Path.Combine(
-                    Path.GetDirectoryName(ConfigFilePath),
-                    $"{ConfigFilePath}.bak");
-                Log.Debug($"Creating a backup of existing config data '{ConfigFilePath}' to '{backupFilePath}' (backup exists: {File.Exists(backupFilePath)})");
-                if (File.Exists(backupFilePath))
+                if (result == null)
                 {
-                    Log.Debug($"Removing backup file {backupFilePath}...");
-                    File.Delete(backupFilePath);
+                    Log.Warn($"Strategies were not able to handle config load exception");
+                    throw;
                 }
-                File.Move(ConfigFilePath, backupFilePath);
             }
-            catch (Exception ex)
+
+            if (result == null)
             {
-                Log.Warn("Failed to create a backup", ex);
+                throw new ApplicationException($"Could not load configuration from {ConfigFilePath}");
             }
+
+            return result;
         }
 
-        private sealed class PoeEyeCombinedConfig : IPoeEyeConfigVersioned
+
+        public sealed class PoeEyeCombinedConfig : IPoeEyeConfigVersioned
         {
             private readonly ICollection<IPoeEyeConfig> items = new List<IPoeEyeConfig>();
 

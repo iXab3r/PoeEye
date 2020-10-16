@@ -69,13 +69,13 @@
                             <Grid>
                                 <TextBlock Style="{StaticResource IconTextBlock}" x:Name="IconLabel"
                                            Foreground="{TemplateBinding Foreground}"
-                                           HorizontalAlignment="Center"
+                                           HorizontalAlignment="Center" FontSize="{TemplateBinding FontSize}"
                                            Text="{Binding Icon, RelativeSource={RelativeSource TemplatedParent}}"
                                            Visibility="{Binding Icon, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource NullToCollapsedConverter}}" />
-                                <TextBlock x:Name="ErrorIcon"
+                                <TextBlock x:Name="ErrorIcon" FontSize="{TemplateBinding FontSize}"
                                            ToolTip="{Binding Command.Error, RelativeSource={RelativeSource TemplatedParent}}"
                                            Style="{StaticResource CommandWrapperIndicatorErrorStyleKey}" />
-                                <TextBlock x:Name="SuccessIcon"
+                                <TextBlock x:Name="SuccessIcon" FontSize="{TemplateBinding FontSize}"
                                            Style="{StaticResource CommandWrapperIndicatorSuccessStyleKey}" />
                                 <ProgressBar Style="{StaticResource MaterialDesignCircularProgressBar}" x:Name="CommandProgressBar"
                                              Value="0" Width="22"
