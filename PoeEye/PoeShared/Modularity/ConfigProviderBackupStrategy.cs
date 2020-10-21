@@ -89,7 +89,7 @@ namespace PoeShared.Modularity
             }
             catch (Exception e)
             {
-                Log.Error($"Failed to perform config backup, config file: {configFile}, backup: {backupConfigPath}", e);
+                Log.Error($"Failed to perform config backup, config file: {configFile.FullName}, backup: {backupConfigPath}", e);
             }
 
             try
@@ -104,7 +104,7 @@ namespace PoeShared.Modularity
 
         public bool TryHandleConfigLoadException(FileInfo configFile, out ConfigProviderFromFile.PoeEyeCombinedConfig replacementConfig)
         {
-            Log.Debug($"Creating backup of config {configFile}");
+            Log.Debug($"Creating backup of config {configFile.FullName}");
             CreateBackupOfConfig(configFile, clock.Now);
             replacementConfig = null;
             return false;
@@ -131,7 +131,7 @@ namespace PoeShared.Modularity
                 .ToArray();
             Log.Debug($"Backup storage contains {obsoleteBackups.Length} obsolete backups, min storage size: {backupStorageMinSize}");
             obsoleteBackups = obsoleteBackups.Skip((int)backupStorageMinSize).ToArray();
-            Log.Debug($"Cleaning up {obsoleteBackups.Length} obsolete backups:\r\n\t{obsoleteBackups.DumpToTable()}");
+            Log.Debug($"Cleaning up {obsoleteBackups.Length} obsolete backups:\r\n\t{obsoleteBackups.Select(x => x.FullName).DumpToTable()}");
             foreach (var obsoleteFile in obsoleteBackups)
             {
                 Log.Debug($"Removing file {obsoleteFile}");

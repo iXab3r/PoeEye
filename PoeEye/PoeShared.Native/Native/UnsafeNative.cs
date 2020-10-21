@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+using System.Management;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using System.Security.Principal;
@@ -81,9 +83,9 @@ namespace PoeShared.Native
             }
         }
 
-        private static Kernel32.SafeObjectHandle OpenProcess(int processId)
+        private static Kernel32.SafeObjectHandle OpenProcess(int processId, uint access = Kernel32.ProcessAccess.PROCESS_QUERY_INFORMATION)
         {
-            var openProcessHandle = Kernel32.OpenProcess(Kernel32.ProcessAccess.PROCESS_QUERY_INFORMATION, false, processId);
+            var openProcessHandle = Kernel32.OpenProcess(access, false, processId);
             if (openProcessHandle == null || openProcessHandle.IsInvalid || openProcessHandle.IsClosed)
             {
                 var lastError = Kernel32.GetLastError();
@@ -91,6 +93,47 @@ namespace PoeShared.Native
             }
 
             return openProcessHandle;
+        }
+        
+        [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
+        [DllImport("shell32.dll", EntryPoint = "CommandLineToArgvW", CharSet = CharSet.Unicode, SetLastError = true)]
+        private static extern IntPtr _CommandLineToArgvW([MarshalAs(UnmanagedType.LPWStr)] string cmdLine, out int numArgs);
+
+        [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
+        public static string[] CommandLineToArgvW(string cmdLine)
+        {
+            if (string.IsNullOrWhiteSpace(cmdLine))
+            {
+                return Array.Empty<string>();
+            }
+            
+            var argv = IntPtr.Zero;
+            try
+            {
+                argv = _CommandLineToArgvW(cmdLine, out var numArgs);
+                if (argv == IntPtr.Zero)
+                {
+                    var lastError = Kernel32.GetLastError();
+                    throw new Win32Exception(lastError, $"Failed parse command line {cmdLine}, error code: {lastError}");
+                }
+                
+                var result = new string[numArgs];
+
+                for (var i = 0; i < numArgs; i++)
+                {
+                    var currArg = Marshal.ReadIntPtr(argv, i * Marshal.SizeOf(typeof(IntPtr)));
+                    result[i] = Marshal.PtrToStringUni(currArg);
+                }
+
+                return result;
+            }
+            finally
+            {
+                if (argv != IntPtr.Zero)
+                {
+                    Kernel32.LocalFree(argv);
+                }
+            }
         }
     }
 }
