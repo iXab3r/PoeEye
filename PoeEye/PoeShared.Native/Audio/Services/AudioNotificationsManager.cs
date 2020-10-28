@@ -28,10 +28,8 @@ namespace PoeShared.Audio.Services
             [NotNull] IAudioPlayer audioPlayer,
             [NotNull] ISoundLibrarySource soundLibrarySource,
             [NotNull] IFileSoundLibrarySource fileSoundLibrarySource,
-            [NotNull] IConfigProvider<PoeEyeSharedConfig> poeEyeConfigProvider,
             [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler)
         {
-            Guard.ArgumentNotNull(poeEyeConfigProvider, nameof(poeEyeConfigProvider));
             Guard.ArgumentNotNull(bgScheduler, nameof(bgScheduler));
             Guard.ArgumentNotNull(soundLibrarySource, nameof(soundLibrarySource));
             this.audioPlayer = audioPlayer;

@@ -46,7 +46,6 @@
         </kent:Mapping>
     </kent:MapConverter>
     
-    
     <kent:MapConverter x:Key="ZeroToFalseConverter" FallbackValue="{StaticResource TrueValue}" FallbackBehavior="ReturnFallbackValue">
         <kent:Mapping To="{StaticResource FalseValue}">
             <kent:Mapping.From>
