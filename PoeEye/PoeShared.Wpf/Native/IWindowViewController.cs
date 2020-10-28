@@ -8,6 +8,8 @@ namespace PoeShared.Native
         IObservable<Unit> WhenLoaded { get; }
         
         IObservable<Unit> WhenUnloaded { get; }
+
+        IObservable<Unit> WhenClosed { get; }
         
         IObservable<Unit> WhenRendered { get; }
         

@@ -32,6 +32,8 @@ namespace PoeShared.Native
                 Observable.FromEventPattern<RoutedEventHandler, RoutedEventArgs>(h => owner.Loaded += h, h => owner.Loaded -= h).ToUnit(),
                 Observable.Return(Unit.Default).Where(x => owner.IsLoaded).ToUnit())
                 .Take(1);
+            
+            WhenClosed = Observable.FromEventPattern<EventHandler, EventArgs>(h => owner.Closed += h, h => owner.Closed -= h).ToUnit();
 
             this.WhenAnyValue(x => x.Topmost)
                 .Subscribe(x => owner.Topmost = x)
@@ -41,6 +43,8 @@ namespace PoeShared.Native
         public IObservable<Unit> WhenLoaded { get; }
         
         public IObservable<Unit> WhenUnloaded { get; }
+        
+        public IObservable<Unit> WhenClosed { get; }
 
         public IObservable<Unit> WhenRendered { get; }
 

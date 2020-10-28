@@ -14,9 +14,10 @@ namespace PoeShared.Converters
     {
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            Guard.ArgumentIsTrue(() => value is SecureString);
-
-            var secureString = value as SecureString;
+            if (!(value is SecureString secureString))
+            {
+                throw new ArgumentException($"Expected instance of {nameof(SecureString)}, got {value?.GetType()}");
+            }
             var bytesToEncode = Encoding.Default.GetBytes(secureString.ToUnsecuredString());
             var encodedBytes = ProtectedData.Protect(bytesToEncode, null, DataProtectionScope.LocalMachine);
             var serializedBytes = JsonConvert.SerializeObject(encodedBytes);
