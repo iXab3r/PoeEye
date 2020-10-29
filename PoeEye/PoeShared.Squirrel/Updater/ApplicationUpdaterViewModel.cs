@@ -41,7 +41,7 @@ namespace PoeShared.Squirrel.Updater
             this.updaterModel = updaterModel;
 
             CheckForUpdatesCommand = CommandWrapper
-                .Create(CheckForUpdatesCommandExecuted, updaterModel.WhenAnyValue(x => x.UpdateSource).Select(x => x.IsValid));
+                .Create(CheckForUpdatesCommandExecuted, updaterModel.WhenAnyValue(x => x.UpdateSource).Select(x => x.IsValid).ObserveOn(uiScheduler));
 
             CheckForUpdatesCommand
                 .ThrownExceptions
