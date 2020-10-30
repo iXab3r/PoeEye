@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Interactivity;
 using System;
+using System.Reactive.Linq;
 using log4net;
 
 namespace PoeShared.Scaffolding.WPF
@@ -33,7 +34,7 @@ namespace PoeShared.Scaffolding.WPF
 
             AssociatedObject
                 .Observe(TreeView.SelectedItemProperty)
-                .Select(() => AssociatedObject.SelectedItem)
+                .Select(_ => AssociatedObject.SelectedItem)
                 .WithPrevious((prev, curr) => new { prev, curr })
                 .Subscribe(x => OnTreeViewSelectedItemChanged(x.prev, x.curr))
                 .AddTo(anchors);

@@ -99,7 +99,7 @@ namespace PoeShared.Squirrel.Updater
                                 ? Observable.Never<long>()
                                 : Observable.Timer(DateTimeOffset.MinValue, timeout.curr, bgScheduler))
                         .Switch()
-                        .Select(() => $"auto-update timer tick(timeout: {configProvider.ActualConfig.AutoUpdateTimeout})"),
+                        .Select(_ => $"auto-update timer tick(timeout: {configProvider.ActualConfig.AutoUpdateTimeout})"),
                     updaterModel
                         .ObservableForProperty(x => x.UpdateSource, skipInitial: true)
                         .Do(source => Log.Debug($"Update source changed: {source}"))

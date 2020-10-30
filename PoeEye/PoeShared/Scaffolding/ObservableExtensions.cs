@@ -1,9 +1,13 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 using System.Linq.Expressions;
 using System.Reactive;
 using System.Reactive.Concurrency;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading;
+using DynamicData;
+using DynamicData.Binding;
 using JetBrains.Annotations;
 using ReactiveUI;
 
@@ -62,7 +66,7 @@ namespace PoeShared.Scaffolding
             return observable.StartWith(default(T));
         }
 
-        public static IObservable<Y> Select<T, Y>(this IObservable<T> observable, Func<Y> selector)
+        public static IObservable<Y> SelectTo<T, Y>(this IObservable<T> observable, Func<Y> selector)
         {
             return observable.Select(_ => selector());
         }

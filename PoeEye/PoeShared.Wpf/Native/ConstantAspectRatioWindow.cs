@@ -38,7 +38,7 @@ namespace PoeShared.Native
         {
             Loaded += HandleWindowLoaded;
             this.Observe(TargetAspectRatioProperty)
-                .Select(() => TargetAspectRatio)
+                .Select(_ => TargetAspectRatio)
                 .DistinctUntilChanged()
                 .Subscribe(
                     targetAspectRatio =>

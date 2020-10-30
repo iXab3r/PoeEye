@@ -161,7 +161,7 @@ namespace PoeShared.Native
 
             overlayWindow
                 .WhenLoaded
-                .Select(() => viewModel.WhenAnyValue(x => x.OverlayMode))
+                .Select(_ => viewModel.WhenAnyValue(x => x.OverlayMode))
                 .Switch()
                 .ObserveOn(uiScheduler)
                 .Subscribe(overlayWindow.SetOverlayMode)

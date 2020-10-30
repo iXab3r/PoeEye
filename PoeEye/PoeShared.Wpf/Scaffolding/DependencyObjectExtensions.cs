@@ -28,7 +28,7 @@ namespace PoeShared.Scaffolding
         public static IObservable<TValue> Observe<T, TValue>(this T component, DependencyProperty dependencyProperty)
             where T : DependencyObject
         {
-            return Observe(component, dependencyProperty).Select(() => component.GetValue(dependencyProperty)).OfType<TValue>();
+            return Observe(component, dependencyProperty).Select(_ => component.GetValue(dependencyProperty)).OfType<TValue>();
         }
 
         public static IEnumerable<T> FindVisualChildren<T>(this DependencyObject depObj) where T : DependencyObject
