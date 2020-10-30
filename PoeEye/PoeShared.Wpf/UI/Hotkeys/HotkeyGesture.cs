@@ -150,11 +150,11 @@ namespace PoeShared.UI.Hotkeys
 
         private static string GetLocalizedKeyString(Key key)
         {
-            if (key >= Key.BrowserBack && key <= Key.LaunchApplication2)
+            if (key >= Key.BrowserBack)
             {
                 return key.ToString();
             }
-
+            
             var virtualKey = (User32.VirtualKey)KeyInterop.VirtualKeyFromKey(key);
             return GetLocalizedKeyStringUnsafe(virtualKey) ?? key.ToString();
         }
