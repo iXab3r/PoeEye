@@ -18,6 +18,11 @@ namespace PoeShared.Modularity
         T Deserialize<T>(string serializedData);
 
         [NotNull]
+        T DeserializeOrDefault<T>(
+            PoeConfigMetadata<T> metadata,
+            Func<PoeConfigMetadata<T>, T> defaultItemFactory) where T : IPoeEyeConfig;
+
+        [NotNull]
         T[] DeserializeSingleOrList<T>(string serializedData);
 
         [NotNull]

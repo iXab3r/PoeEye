@@ -122,5 +122,37 @@ namespace PoeShared.Modularity
             }
             thrownExceptions.OnNext(args.ErrorContext);
         }
+        
+        public T DeserializeOrDefault<T>(
+            PoeConfigMetadata<T> metadata, 
+            Func<PoeConfigMetadata<T>, T> defaultItemFactory) where T : IPoeEyeConfig
+        {
+            if (metadata.Value == null)
+            {
+                Log.Debug($"Trying to re-serialize metadata type {metadata.TypeName} (v{metadata.Version}) {metadata.AssemblyName}...");
+                var serialized = Serialize(metadata);
+                if (string.IsNullOrEmpty(serialized))
+                {
+                    throw new ApplicationException($"Something went wrong when re-serializing metadata: {metadata}\n{metadata.ConfigValue}");
+                }
+                var deserialized = Deserialize<PoeConfigMetadata<T>>(serialized);
+                if (deserialized.Value != null)
+                {
+                    Log.Debug($"Successfully restored type {metadata.TypeName} (v{metadata.Version}) {metadata.AssemblyName}: {deserialized.Value}");
+                    metadata = deserialized;
+                }
+                else
+                {
+                    Log.Warn($"Failed to restore type {metadata.TypeName} (v{metadata.Version}) {metadata.AssemblyName}");
+                }
+            }
+            
+            if (metadata.Value == null)
+            {
+                return defaultItemFactory(metadata);
+            }
+
+            return metadata.Value;
+        }
     }
 }

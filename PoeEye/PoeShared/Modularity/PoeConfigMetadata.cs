@@ -22,6 +22,26 @@ namespace PoeShared.Modularity
 
     public sealed class PoeConfigMetadata<T> : PoeConfigMetadata where T : IPoeEyeConfig
     {
+        public PoeConfigMetadata()
+        {
+        }
+
+        public PoeConfigMetadata(T value) : this()
+        {
+            if (value == null)
+            {
+                return;
+            }
+            
+            Value = value;
+            AssemblyName = value.GetType().Assembly.GetName().Name;
+            TypeName = value.GetType().FullName;
+            if (value is IPoeEyeConfigVersioned configVersioned)
+            {
+                Version = configVersioned.Version;
+            }
+        }
+
         [JsonIgnore]
         public T Value { get; set; }
     }

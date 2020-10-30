@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Reactive;
 using DynamicData;
 using DynamicData.Binding;
+using DynamicData.Kernel;
 using JetBrains.Annotations;
 
 
@@ -15,6 +16,21 @@ namespace PoeShared.Scaffolding
             Guard.ArgumentNotNull(source, nameof(source));
 
             return new SourceList<T>(source);
+        }
+        
+        public static Optional<T> ComputeIfAbsent<T, TKey>(this ISourceCache<T, TKey> source, TKey key, Func<TKey, T> factory)
+        {
+            Guard.ArgumentNotNull(source, nameof(source));
+
+            var current = source.Lookup(key);
+            if (current.HasValue)
+            {
+                return current;
+            }
+
+            var newValue = factory(key);
+            source.AddOrUpdate(newValue);
+            return Optional<T>.Create(newValue);
         }
         
         /// <summary>
