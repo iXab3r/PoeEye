@@ -11,6 +11,19 @@ namespace PoeShared.UI.Hotkeys
 {
     public class HotkeyGesture : IEquatable<HotkeyGesture>
     {
+        private static readonly IDictionary<Key, string> KnownSpecialKeys = new Dictionary<Key, string>();
+
+        static HotkeyGesture()
+        {
+            KnownSpecialKeys[Key.OemPlus] = "+";
+            KnownSpecialKeys[Key.OemMinus] = "-";
+            KnownSpecialKeys[Key.OemTilde] = "`";
+            KnownSpecialKeys[Key.Divide] = "/";
+            KnownSpecialKeys[Key.Add] = "Num +";
+            KnownSpecialKeys[Key.Multiply] = "Num *";
+            KnownSpecialKeys[Key.Subtract] = "Num -";
+        }
+        
         public HotkeyGesture()
         {
         }
@@ -130,7 +143,10 @@ namespace PoeShared.UI.Hotkeys
                 "Windows".AddTo(keys);
             }
 
-            if (Key != Key.None)
+            if (KnownSpecialKeys.ContainsKey(Key))
+            {
+                KnownSpecialKeys[Key].AddTo(keys);
+            } else  if (Key != Key.None)
             {
                 GetLocalizedKeyString(Key).AddTo(keys);
             }

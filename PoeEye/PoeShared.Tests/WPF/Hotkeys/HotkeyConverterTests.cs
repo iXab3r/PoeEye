@@ -106,6 +106,9 @@ namespace PoeShared.Tests.WPF.Hotkeys
         [TestCase("Ctrl+-", Key.OemMinus, ModifierKeys.Control)]
         [TestCase("Num -", Key.Subtract, ModifierKeys.None)]
         [TestCase("Num +", Key.Add, ModifierKeys.None)]
+        [TestCase("Num *", Key.Multiply, ModifierKeys.None)]
+        [TestCase("Ctrl+Shift+Num *", Key.Multiply, ModifierKeys.Control | ModifierKeys.Shift)]
+        [TestCase("Ctrl+Shift+Num +", Key.Add, ModifierKeys.Control | ModifierKeys.Shift)]
         public void ShouldDeserializeKeyboard(string input, Key expected, ModifierKeys expectedModifiers)
         {
             //Given
