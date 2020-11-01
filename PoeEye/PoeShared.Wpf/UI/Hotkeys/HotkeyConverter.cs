@@ -12,12 +12,11 @@ namespace PoeShared.UI.Hotkeys
     public class HotkeyConverter : System.ComponentModel.TypeConverter, IHotkeyConverter
     {
         private const char ModifiersDelimiter = '+';
-        private static readonly KeyConverter KeyConverter = new KeyConverter();
         private static readonly ModifierKeysConverter ModifierKeysConverter = new ModifierKeysConverter();
         private static readonly HotkeyGesture NoneHotkey = new HotkeyGesture(Key.None); 
 
+        private readonly IDictionary<string, Key> knownSpecialKeys = new Dictionary<string, Key>();
         private readonly IDictionary<string, HotkeyGesture> mouseKeys;
-        private readonly IDictionary<string, Key> knownSpecialKeys = new Dictionary<string, Key>(StringComparer.OrdinalIgnoreCase);
         private readonly IDictionary<string, Key> knownKeys = new Dictionary<string, Key>(StringComparer.OrdinalIgnoreCase);
 
         public HotkeyConverter()
@@ -32,13 +31,10 @@ namespace PoeShared.UI.Hotkeys
                 .OfType<MouseButton>()
                 .Select(x => new HotkeyGesture(x))
                 .ToDictionary(x => x.ToString(), x => x, StringComparer.OrdinalIgnoreCase);
-
+            
             knownSpecialKeys["*"] = Key.Multiply;
             knownSpecialKeys["+"] = Key.OemPlus;
-            knownSpecialKeys["-"] = Key.OemMinus;
-            knownSpecialKeys["/"] = Key.Divide;
-            knownSpecialKeys["+"] = Key.OemPlus;
-            knownSpecialKeys["NUM +"] = Key.Add;
+            knownSpecialKeys["="] = Key.OemPlus;
         }
 
         public string ConvertToString(HotkeyGesture hotkeyGesture)
@@ -88,10 +84,22 @@ namespace PoeShared.UI.Hotkeys
                 return new HotkeyGesture(specialKey);
             }
 
-            var modifiersPartLength = source.LastIndexOf(ModifiersDelimiter);
             string modifiersPartRaw;
             string hotkeyPartRaw;
-            if (modifiersPartLength >= 0)
+
+            var nextModifier = 0;
+            var modifiersPartLength = 0;
+            while (nextModifier < source.Length && (nextModifier = source.IndexOf(ModifiersDelimiter, nextModifier)) >= 0)
+            {
+                if (source.Length - (nextModifier + 1) <= 0)
+                {
+                    break;
+                }
+                modifiersPartLength = nextModifier;
+                nextModifier++;
+            }
+            
+            if (modifiersPartLength > 0)
             {
                 modifiersPartRaw = source.Substring(0, modifiersPartLength);
                 hotkeyPartRaw = source.Substring(modifiersPartLength + 1);

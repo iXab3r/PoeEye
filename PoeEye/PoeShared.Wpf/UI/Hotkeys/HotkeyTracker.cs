@@ -58,7 +58,6 @@ namespace PoeShared.UI.Hotkeys
             this.WhenAnyValue(x => x.Hotkey)
                 .Select(hotkey => hotkey == null ? Observable.Empty<HotkeyData>() : BuildHotkeySubscription(eventSource))
                 .Switch()
-                .DistinctUntilChanged(x => new { x.Hotkey, x.KeyDown })
                 .Where(
                     hotkeyData =>
                     {
@@ -79,6 +78,7 @@ namespace PoeShared.UI.Hotkeys
                         Log.Debug($"Application is active, skipping hotkey {hotkeyData.Hotkey} (isDown: {hotkeyData.KeyDown}, suppressKey: {suppressKey},  configuredKey: {Hotkey}, mode: {HotkeyMode})");
                         return false;
                     })
+                .DistinctUntilChanged(x => new { x.Hotkey, x.KeyDown })
                 .Subscribe(
                     hotkeyData =>
                     {

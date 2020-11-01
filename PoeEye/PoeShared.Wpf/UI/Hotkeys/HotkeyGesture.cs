@@ -1,14 +1,29 @@
 using System;
+using System.Collections.Generic;
 using System.Text;
 using System.Windows.Forms;
 using System.Windows.Input;
 using PInvoke;
 using PoeShared.Native;
+using PoeShared.Scaffolding;
 
 namespace PoeShared.UI.Hotkeys
 {
     public class HotkeyGesture : IEquatable<HotkeyGesture>
     {
+        private static readonly IDictionary<Key, string> KnownSpecialKeys = new Dictionary<Key, string>();
+
+        static HotkeyGesture()
+        {
+            KnownSpecialKeys[Key.OemPlus] = "+";
+            KnownSpecialKeys[Key.OemMinus] = "-";
+            KnownSpecialKeys[Key.OemTilde] = "`";
+            KnownSpecialKeys[Key.Divide] = "/";
+            KnownSpecialKeys[Key.Add] = "Num +";
+            KnownSpecialKeys[Key.Multiply] = "Num *";
+            KnownSpecialKeys[Key.Subtract] = "Num -";
+        }
+        
         public HotkeyGesture()
         {
         }
@@ -107,56 +122,55 @@ namespace PoeShared.UI.Hotkeys
 
         public override string ToString()
         {
-            var sb = new StringBuilder();
-
+            var keys = new List<string>();
             if ((ModifierKeys & ModifierKeys.Control) == ModifierKeys.Control)
             {
-                sb.Append(GetLocalizedKeyStringUnsafe(User32.VirtualKey.VK_CONTROL));
-                sb.Append("+");
+                GetLocalizedKeyStringUnsafe(User32.VirtualKey.VK_CONTROL).AddTo(keys);
             }
 
             if ((ModifierKeys & ModifierKeys.Alt) == ModifierKeys.Alt)
             {
-                sb.Append(GetLocalizedKeyStringUnsafe(User32.VirtualKey.VK_MENU));
-                sb.Append("+");
+                GetLocalizedKeyStringUnsafe(User32.VirtualKey.VK_MENU).AddTo(keys);
             }
 
             if ((ModifierKeys & ModifierKeys.Shift) == ModifierKeys.Shift)
             {
-                sb.Append(GetLocalizedKeyStringUnsafe(User32.VirtualKey.VK_SHIFT));
-                sb.Append("+");
+                GetLocalizedKeyStringUnsafe(User32.VirtualKey.VK_SHIFT).AddTo(keys);
             }
 
             if ((ModifierKeys & ModifierKeys.Windows) == ModifierKeys.Windows)
             {
-                sb.Append("Windows+");
+                "Windows".AddTo(keys);
             }
 
-            if (Key != Key.None)
+            if (KnownSpecialKeys.ContainsKey(Key))
             {
-                sb.Append(GetLocalizedKeyString(Key));
+                KnownSpecialKeys[Key].AddTo(keys);
+            } else  if (Key != Key.None)
+            {
+                GetLocalizedKeyString(Key).AddTo(keys);
             }
 
             if (MouseButton != null)
             {
-                sb.Append($"Mouse{MouseButton}");
+                $"Mouse{MouseButton}".AddTo(keys);
             }
 
-            if (sb.Length == 0)
+            if (keys.Count == 0)
             {
                 return "None";
             }
 
-            return sb.ToString().Trim('+');
+            return string.Join("+", keys);
         }
 
         private static string GetLocalizedKeyString(Key key)
         {
-            if (key >= Key.BrowserBack && key <= Key.LaunchApplication2)
+            if (key >= Key.BrowserBack)
             {
                 return key.ToString();
             }
-
+            
             var virtualKey = (User32.VirtualKey)KeyInterop.VirtualKeyFromKey(key);
             return GetLocalizedKeyStringUnsafe(virtualKey) ?? key.ToString();
         }
