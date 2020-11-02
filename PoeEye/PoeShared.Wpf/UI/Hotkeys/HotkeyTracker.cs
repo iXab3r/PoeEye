@@ -86,14 +86,14 @@ namespace PoeShared.UI.Hotkeys
 
                         if (HotkeyMode == HotkeyMode.Click)
                         {
-                            if (hotkeyData.KeyDown)
+                            if (!hotkeyData.KeyDown)
                             {
                                 IsActive = !IsActive;
                             }
                         }
                         else
                         {
-                            IsActive = !IsActive;
+                            IsActive = hotkeyData.KeyDown;
                         }
                     },
                     Log.HandleUiException)
