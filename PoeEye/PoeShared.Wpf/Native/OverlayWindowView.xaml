@@ -6,6 +6,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:native="clr-namespace:PoeShared.Native"
     xmlns:wpf="clr-namespace:PoeShared.Scaffolding.WPF"
+    xmlns:eye="clr-namespace:PoeShared.Scaffolding"
     mc:Ignorable="d"
     d:DataContext="{d:DesignInstance native:OverlayWindowViewModel}"
     WindowStartupLocation="Manual"
@@ -55,7 +56,7 @@
                     <Setter Property="WindowChrome.WindowChrome">
                         <Setter.Value>
                             <WindowChrome GlassFrameThickness="15" CornerRadius="0" CaptionHeight="0" 
-                                          ResizeBorderThickness="15" />
+                                          ResizeBorderThickness="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type native:OverlayWindowView}}, Path=ResizeThumbSize, Mode=OneWay, Converter={StaticResource DoubleDivideByTwoConverter}}" />
                         </Setter.Value>
                     </Setter>
                 </DataTrigger>
@@ -236,11 +237,19 @@
         </Border>
         
         <Grid Visibility="{Binding Content.IsLocked, Converter={StaticResource TrueToCollapsedFalseToVisibleConverter}}">
-            <Thumb Style="{StaticResource OverlayThumbBottomLeftStyle}" IsHitTestVisible="False"/>
+            <Thumb Style="{StaticResource OverlayThumbBottomLeftStyle}" IsHitTestVisible="False" x:Name="ThumbSW" />
             <Thumb Style="{StaticResource OverlayThumbBottomRightStyle}" IsHitTestVisible="False"/>
             <Thumb Style="{StaticResource OverlayThumbTopLeftStyle}" IsHitTestVisible="False"/>
             <Thumb Style="{StaticResource OverlayThumbTopRightStyle}" IsHitTestVisible="False"/>
         </Grid>
+        
+        <eye:DataPiping.DataPipes>
+            <eye:DataPipeCollection>
+                <eye:DataPipe
+                    Source="{Binding ElementName=ThumbSW, Path=ActualWidth}"
+                    Target="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type native:OverlayWindowView}}, Path=ResizeThumbSize, Mode=OneWayToSource}" />
+            </eye:DataPipeCollection>
+        </eye:DataPiping.DataPipes>
     </Grid>
 
 </native:TransparentWindow>

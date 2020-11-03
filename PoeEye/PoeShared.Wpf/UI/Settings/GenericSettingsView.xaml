@@ -2,8 +2,7 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:settings="clr-namespace:PoeShared.Wpf.UI.Settings"
                     xmlns:modularity="clr-namespace:PoeShared.Modularity"
-                    xmlns:ui="clr-namespace:PoeShared.UI"
-                    xmlns:eye="http://coderush.net/poeeye/">
+                    xmlns:ui="clr-namespace:PoeShared.UI">
     <ResourceDictionary.MergedDictionaries>
 
         <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/recommended/accent/materialdesigncolor.lightblue.xaml" />

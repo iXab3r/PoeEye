@@ -187,7 +187,7 @@
         <Setter Property="VerticalContentAlignment" Value="Stretch"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="wpf:ShadowAssist.ShadowDepth" Value="Depth0" />
-        <Setter Property="wpf:ToggleButtonAssist.OnContent" Value="{StaticResource CheckMarkIcon}" />
+        <Setter Property="wpf:ToggleButtonAssist.OnContent" Value="{DynamicResource CheckMarkIcon}" />
         <Setter Property="Cursor" Value="Hand" />
         <Setter Property="Template">
             <Setter.Value>

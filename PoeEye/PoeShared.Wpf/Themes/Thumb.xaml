@@ -3,22 +3,32 @@
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Colors.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Converters.xaml" />
     </ResourceDictionary.MergedDictionaries>
+    
+    
     
     <Style TargetType="{x:Type Thumb}" x:Key="OverlayThumbStyle">
         <Setter Property="Foreground" Value="{StaticResource OverlayTitleBackgroundBrushKey}" />
         <Setter Property="Background" Value="{StaticResource OverlayWindowTextBrushKey}" />
         <Setter Property="BorderBrush" Value="{StaticResource OverlayBorderBrushKey}" />
         <Setter Property="Cursor" Value="{x:Static Cursors.AppStarting}" />
-        <Setter Property="Width" Value="20"/>
-        <Setter Property="Height" Value="20"/>
+        <Setter Property="MaxWidth" Value="30"/>
+        <Setter Property="MaxHeight" Value="30"/>
+        <Setter Property="MinWidth" Value="10"/>
+        <Setter Property="MinHeight" Value="10"/>
+        
+        <Setter Property="Width" Value="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=ActualWidth, Converter={StaticResource DoubleDivideByFiveConverter}}"/>
+        <Setter Property="Height" Value="{Binding RelativeSource={RelativeSource Self}, Path=Width}"/>
         <Setter Property="RenderTransformOrigin" Value="0.5 0.5"/>
         <Setter Property="Tag" Value="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}"/>
         
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Thumb}">
-                    <Viewbox Width="{TemplateBinding Width}" Height="{TemplateBinding Height}">
+                    <Viewbox Width="{TemplateBinding Width}" Height="{TemplateBinding Height}"
+                             MinWidth="{TemplateBinding MinWidth}" MinHeight="{TemplateBinding MinHeight}"
+                             MaxWidth="{TemplateBinding MaxWidth}" MaxHeight="{TemplateBinding MaxHeight}">
                         <Canvas Width="50" Height="50" Background="Transparent">
                             <Path Data="M50,0 V50 H0 L50,0"
                                   StrokeThickness="{TemplateBinding BorderThickness}"
@@ -33,16 +43,14 @@
                                   Stroke="{TemplateBinding BorderBrush}" />
                         </Canvas>
                     </Viewbox>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="{StaticResource MouseOverAccentBrushKey}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
-        
-        <Style.Triggers>
-            <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Background" Value="{StaticResource MouseOverAccentBrushKey}" />
-            </Trigger>
-        </Style.Triggers>
-
     </Style>
     
     <Style TargetType="{x:Type Thumb}" BasedOn="{StaticResource OverlayThumbStyle}" x:Key="OverlayThumbTopRightStyle">

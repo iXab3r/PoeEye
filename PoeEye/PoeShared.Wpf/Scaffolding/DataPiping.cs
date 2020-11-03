@@ -4,8 +4,6 @@ namespace PoeShared.Scaffolding
 {
     public class DataPiping
     {
-        #region DataPipes (Attached DependencyProperty)
-
         public static readonly DependencyProperty DataPipesProperty =
             DependencyProperty.RegisterAttached(
                 "DataPipes",
@@ -22,7 +20,5 @@ namespace PoeShared.Scaffolding
         {
             return (DataPipeCollection) o.GetValue(DataPipesProperty);
         }
-
-        #endregion
     }
 }
