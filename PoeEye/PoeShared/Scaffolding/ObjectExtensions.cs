@@ -5,21 +5,29 @@ using System.Reflection;
 using System.Runtime.Serialization.Formatters;
 using DynamicData;
 using Newtonsoft.Json;
+using PoeShared.Modularity;
 
 namespace PoeShared.Scaffolding
 {
     public static class ObjectExtensions
     {
-        private static JsonSerializerSettings SerializationIndented = new JsonSerializerSettings()
+        private static readonly List<JsonConverter> JsonConverters = new List<JsonConverter>()
+        {
+            new FileSystemInfoConverter()
+        };
+        
+        private static readonly JsonSerializerSettings SerializationIndented = new JsonSerializerSettings()
         {
             ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-            Formatting = Formatting.Indented
+            Formatting = Formatting.Indented,
+            Converters = JsonConverters
         }; 
         
-        private static JsonSerializerSettings SerializationNone = new JsonSerializerSettings()
+        private static readonly JsonSerializerSettings SerializationNone = new JsonSerializerSettings()
         {
             ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-            Formatting = Formatting.None
+            Formatting = Formatting.None,
+            Converters = JsonConverters
         }; 
         
         public static string Dump<T>(this T instance)
