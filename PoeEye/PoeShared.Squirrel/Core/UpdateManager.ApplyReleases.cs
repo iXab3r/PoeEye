@@ -397,7 +397,7 @@ namespace PoeShared.Squirrel.Core
                     return null;
                 }
                 
-                Log.Debug($"Applying delta-releases to {new { currentVersion.PackageName, currentVersion.Version }}, chain: {string.Join(" => ", releasesToApply.Select(x => new { x.Filename, x.Version, x.IsDelta }))}");
+                Log.Debug($"Applying delta-releases to {new { currentVersion?.PackageName, currentVersion?.Version }}, chain: {string.Join(" => ", releasesToApply.Select(x => new { x.Filename, x.Version, x.IsDelta }))}");
                 // If there are no deltas in our list, we're already done
                 if (releasesToApply.All(x => !x.IsDelta))
                 {
