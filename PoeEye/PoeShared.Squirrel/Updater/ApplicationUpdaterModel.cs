@@ -168,7 +168,7 @@ namespace PoeShared.Squirrel.Updater
             using var mgr = await CreateManager();
             Log.Debug("Checking for updates...");
 
-            var updateInfo = await mgr.CheckForUpdate(true, CheckUpdateProgress);
+            var updateInfo = await mgr.CheckForUpdate(ignoreDeltaUpdates: false, CheckUpdateProgress);
 
             Log.Debug($"UpdateInfo:\r\n{updateInfo?.DumpToText()}");
             if (updateInfo == null || updateInfo.ReleasesToApply.Count == 0)
