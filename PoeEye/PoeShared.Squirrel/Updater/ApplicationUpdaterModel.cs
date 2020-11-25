@@ -29,6 +29,7 @@ namespace PoeShared.Squirrel.Updater
         private UpdateSourceInfo updateSource;
         private int progressPercent;
         private bool isBusy;
+        private bool ignoreDeltaUpdates;
 
         public ApplicationUpdaterModel(IAppArguments appArguments)
         {
@@ -76,6 +77,12 @@ namespace PoeShared.Squirrel.Updater
         {
             get => updateSource;
             set => RaiseAndSetIfChanged(ref updateSource, value);
+        }
+
+        public bool IgnoreDeltaUpdates
+        {
+            get => ignoreDeltaUpdates;
+            set => RaiseAndSetIfChanged(ref ignoreDeltaUpdates, value);
         }
 
         public Version UpdatedVersion
@@ -166,9 +173,9 @@ namespace PoeShared.Squirrel.Updater
             Reset();
 
             using var mgr = await CreateManager();
-            Log.Debug("Checking for updates...");
+            Log.Debug($"Checking for updates @ {updateSource}, {nameof(IgnoreDeltaUpdates)}: {ignoreDeltaUpdates}...");
 
-            var updateInfo = await mgr.CheckForUpdate(ignoreDeltaUpdates: false, CheckUpdateProgress);
+            var updateInfo = await mgr.CheckForUpdate(ignoreDeltaUpdates, CheckUpdateProgress);
 
             Log.Debug($"UpdateInfo:\r\n{updateInfo?.DumpToText()}");
             if (updateInfo == null || updateInfo.ReleasesToApply.Count == 0)

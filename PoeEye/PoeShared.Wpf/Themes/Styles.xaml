@@ -74,6 +74,13 @@
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="IsHitTestVisible" Value="True" />
     </Style>
+    
+    <Style TargetType="{x:Type TextBlock}" x:Key="WarningIconTextBlock" BasedOn="{StaticResource IconTextBlock}">
+        <Setter Property="Text" Value="&#xf071;"/>
+        <Setter Property="Foreground" Value="{StaticResource WarningBrush}"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="IsHitTestVisible" Value="True" />
+    </Style>
 
     <Style TargetType="{x:Type Button}" x:Key="FlatButton"
            BasedOn="{StaticResource MaterialDesignFlatButton}">

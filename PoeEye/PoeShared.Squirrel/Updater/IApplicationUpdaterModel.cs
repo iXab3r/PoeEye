@@ -11,6 +11,8 @@ namespace PoeShared.Squirrel.Updater
     {
         UpdateSourceInfo UpdateSource { get; set; }
 
+        bool IgnoreDeltaUpdates { get; set; }
+
         [CanBeNull] Version UpdatedVersion { get; }
 
         [CanBeNull] UpdateInfo LatestVersion { get; }
@@ -18,7 +20,7 @@ namespace PoeShared.Squirrel.Updater
         int ProgressPercent { get; }
         
         bool IsBusy { get; }
-
+        
         /// <summary>
         ///     Checks whether update exist and if so, downloads it
         /// </summary>

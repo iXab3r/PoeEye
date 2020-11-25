@@ -74,6 +74,7 @@ namespace PoeShared.Squirrel.Updater
             this.RaiseWhenSourceValue(x => x.UpdatedVersion, updaterModel, x => x.UpdatedVersion, uiScheduler).AddTo(Anchors);
             this.RaiseWhenSourceValue(x => x.LatestVersion, updaterModel, x => x.LatestVersion, uiScheduler).AddTo(Anchors);
             this.RaiseWhenSourceValue(x => x.UpdateInfo, updaterModel, x => x.LatestVersion, uiScheduler).AddTo(Anchors);
+            this.RaiseWhenSourceValue(x => x.IgnoreDeltaUpdates, updaterModel, x => x.IgnoreDeltaUpdates, uiScheduler).AddTo(Anchors);
             this.RaiseWhenSourceValue(x => x.ProgressPercent, updaterModel, x => x.ProgressPercent, uiScheduler).AddTo(Anchors);
             this.RaiseWhenSourceValue(x => x.IsBusy, updaterModel, x => x.IsBusy, uiScheduler).AddTo(Anchors);
             this.RaiseWhenSourceValue(x => x.UpdateSource, updaterModel, x => x.UpdateSource, uiScheduler).AddTo(Anchors);
@@ -89,6 +90,11 @@ namespace PoeShared.Squirrel.Updater
             updateSourceProvider
                 .WhenAnyValue(x => x.UpdateSource)
                 .Subscribe(x => updaterModel.UpdateSource = x)
+                .AddTo(Anchors);
+            
+            configProvider
+                .ListenTo(x => x.IgnoreDeltaUpdates)
+                .Subscribe(x => updaterModel.IgnoreDeltaUpdates = x)
                 .AddTo(Anchors);
 
             Observable.Merge(
@@ -166,11 +172,13 @@ namespace PoeShared.Squirrel.Updater
         [CanBeNull] public string UpdateInfo => updaterModel.LatestVersion?.ReleasesToApply.EmptyIfNull().Select(x => $"{x.Version} (delta: {x.IsDelta})").JoinStrings(" => ");
         
         public UpdateSourceInfo UpdateSource => updaterModel.UpdateSource;
+
+        public bool IgnoreDeltaUpdates => updaterModel.IgnoreDeltaUpdates;
         
         public int ProgressPercent => updaterModel.ProgressPercent;
         
         public bool IsBusy => updaterModel.IsBusy;
-
+        
         public CommandWrapper OpenUri { get; }
 
         public FileInfo GetLatestExecutable()

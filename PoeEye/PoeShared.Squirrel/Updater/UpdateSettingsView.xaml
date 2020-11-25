@@ -2,10 +2,18 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:viewModels="clr-namespace:PoeShared.Squirrel.Updater"
                     xmlns:st="http://schemas.spicytaco.io/">
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Generic.shared.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+    
     <DataTemplate DataType="{x:Type viewModels:UpdateSettingsViewModel}">
         <st:AutoGrid Columns="170, *" ChildMargin="5">
             <TextBlock Text="Check for updates: " HorizontalAlignment="Right" />
             <CheckBox IsChecked="{Binding CheckForUpdates}" ToolTip="{Binding UpdateSource}"/>
+            <TextBlock Text="Disable delta-updates: " HorizontalAlignment="Right" />
+            <CheckBox IsChecked="{Binding IgnoreDeltaUpdates}" 
+                      IsEnabled="{Binding CheckForUpdates}" 
+                      ToolTip="Download full application updates instead of small patches. Enable this option if you encounter any problems during update process"/>
         </st:AutoGrid>
     </DataTemplate>
 </ResourceDictionary>
