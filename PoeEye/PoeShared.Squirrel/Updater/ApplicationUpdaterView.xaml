@@ -68,6 +68,8 @@
                                     Content="{Binding ApplyUpdate}"
                                     Focusable="False"
                                     IsTabStop="False"
+                                    Background="Transparent"
+                                    ToolTip="{Binding UpdateInfo}"
                                     eye:CommandWrapperHelper.DataContext="{Binding}"
                                     eye:CommandWrapperHelper.Icon="&#xF0ED;">
                         <eye:CommandWrapperHelper.Text>

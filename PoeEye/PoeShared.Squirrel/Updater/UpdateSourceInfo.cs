@@ -18,6 +18,7 @@ namespace PoeShared.Squirrel.Updater
         [JsonConverter(typeof(SafeDataConverter))]
         public SecureString Password { get; set; }
 
+        [JsonIgnore]
         public bool IsValid => !string.IsNullOrEmpty(Uri);
 
         public bool Equals(UpdateSourceInfo other)

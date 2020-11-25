@@ -198,19 +198,19 @@ namespace PoeShared.Squirrel.Updater
                 throw new FileNotFoundException($"Failed to start updater @ '{squirrelUpdater}'");
             }
 
-            Log.Debug($"[ApplicationUpdaterModel] Process spawned, PID: {updaterProcess.Id}");
+            Log.Debug($"Process spawned, PID: {updaterProcess.Id}");
             await Task.Delay(2000);
 
             var app = Application.Current;
-            Log.Debug($"[ApplicationUpdaterModel] Terminating application (shutdownMode: {app.ShutdownMode}, window: {app.MainWindow})...");
+            Log.Debug($"Terminating application (shutdownMode: {app.ShutdownMode}, window: {app.MainWindow})...");
             if (app.MainWindow != null && app.ShutdownMode == ShutdownMode.OnMainWindowClose)
             {
-                Log.Debug($"[ApplicationUpdaterModel] Closing main window {app.MainWindow}...");
+                Log.Debug($"Closing main window {app.MainWindow}...");
                 app.MainWindow.Close();
             }
             else
             {
-                Log.Debug($"[ApplicationUpdaterModel] Closing app forcefully");
+                Log.Debug($"Closing app forcefully");
                 Application.Current.Shutdown(0);
             }
         }
@@ -253,33 +253,33 @@ namespace PoeShared.Squirrel.Updater
 
         private void UpdateProgress(int progressPercent, string taskName)
         {
-            Log.Debug($"[ApplicationUpdaterModel.UpdateProgress] {taskName} is in progress: {progressPercent}%");
+            Log.Debug($"{taskName} is in progress: {progressPercent}%");
             ProgressPercent = progressPercent;
         }
 
         private void CheckUpdateProgress(int progressPercent)
         {
-            Log.Debug($"[ApplicationUpdaterModel.CheckUpdateProgress] Check update is in progress: {progressPercent}%");
+            Log.Debug($"Check update is in progress: {progressPercent}%");
         }
 
         private void OnAppUninstall(Version appVersion)
         {
-            Log.Debug($"[ApplicationUpdaterModel.OnAppUninstall] Uninstalling v{appVersion}...");
+            Log.Debug($"Uninstalling v{appVersion}...");
         }
 
         private void OnAppUpdate(Version appVersion)
         {
-            Log.Debug($"[ApplicationUpdaterModel.OnAppUpdate] Updating v{appVersion}...");
+            Log.Debug($"Updating v{appVersion}...");
         }
 
         private void OnInitialInstall(Version appVersion)
         {
-            Log.Debug($"[ApplicationUpdaterModel.OnInitialInstall] App v{appVersion} installed");
+            Log.Debug($"App v{appVersion} installed");
         }
 
         private void OnFirstRun()
         {
-            Log.Debug("[ApplicationUpdaterModel.OnFirstRun] App started for the first time");
+            Log.Debug("App started for the first time");
         }
         
         private static string GetSquirrelUpdateExe()
@@ -331,7 +331,7 @@ namespace PoeShared.Squirrel.Updater
         public FileInfo GetLatestExecutable()
         {
             var appExecutable = new FileInfo(Path.Combine(mostRecentVersionAppFolder.FullName, ApplicationExecutableFileName));
-            Log.Debug($"[ApplicationUpdaterModel] Restarting app, folder: {mostRecentVersionAppFolder}, appName: { ApplicationExecutableFileName}, exePath: {appExecutable}(exists: {appExecutable.Exists})...");
+            Log.Debug($"Restarting app, folder: {mostRecentVersionAppFolder}, appName: { ApplicationExecutableFileName}, exePath: {appExecutable}(exists: {appExecutable.Exists})...");
 
             if (!appExecutable.Exists)
             {

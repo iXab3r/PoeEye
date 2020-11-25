@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
@@ -72,6 +73,7 @@ namespace PoeShared.Squirrel.Updater
 
             this.RaiseWhenSourceValue(x => x.UpdatedVersion, updaterModel, x => x.UpdatedVersion, uiScheduler).AddTo(Anchors);
             this.RaiseWhenSourceValue(x => x.LatestVersion, updaterModel, x => x.LatestVersion, uiScheduler).AddTo(Anchors);
+            this.RaiseWhenSourceValue(x => x.UpdateInfo, updaterModel, x => x.LatestVersion, uiScheduler).AddTo(Anchors);
             this.RaiseWhenSourceValue(x => x.ProgressPercent, updaterModel, x => x.ProgressPercent, uiScheduler).AddTo(Anchors);
             this.RaiseWhenSourceValue(x => x.IsBusy, updaterModel, x => x.IsBusy, uiScheduler).AddTo(Anchors);
             this.RaiseWhenSourceValue(x => x.UpdateSource, updaterModel, x => x.UpdateSource, uiScheduler).AddTo(Anchors);
@@ -161,6 +163,8 @@ namespace PoeShared.Squirrel.Updater
 
         [CanBeNull] public Version LatestVersion => updaterModel.LatestVersion?.FutureReleaseEntry?.Version?.Version;
         
+        [CanBeNull] public string UpdateInfo => updaterModel.LatestVersion?.ReleasesToApply.EmptyIfNull().Select(x => $"{x.Version} (delta: {x.IsDelta})").JoinStrings(" => ");
+        
         public UpdateSourceInfo UpdateSource => updaterModel.UpdateSource;
         
         public int ProgressPercent => updaterModel.ProgressPercent;
@@ -197,7 +201,7 @@ namespace PoeShared.Squirrel.Updater
                 if (newVersion != null)
                 {
                     IsOpen = true;
-                    SetStatus($"New version available is available");
+                    SetStatus($"New version is available");
                 }
                 else
                 {

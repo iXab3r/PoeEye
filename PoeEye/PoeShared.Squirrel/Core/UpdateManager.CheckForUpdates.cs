@@ -14,7 +14,7 @@ namespace PoeShared.Squirrel.Core
 {
     public sealed partial class PoeUpdateManager
     {
-        internal class CheckForUpdateImpl : IEnableLogger
+        private class CheckForUpdateImpl : IEnableLogger
         {
             private static readonly ILog Log = LogManager.GetLogger(typeof(CheckForUpdateImpl));
 
@@ -32,15 +32,15 @@ namespace PoeShared.Squirrel.Core
                 Action<int> progress = null,
                 IFileDownloader urlDownloader = null)
             {
-                progress = progress ?? (_ => { });
+                progress ??= _ => { };
 
-                var localReleases = Enumerable.Empty<ReleaseEntry>();
+                var localReleases = Array.Empty<ReleaseEntry>();
                 var stagingId = GetOrCreateStagedUserId();
 
                 var shouldInitialize = false;
                 try
                 {
-                    localReleases = Utility.LoadLocalReleases(localReleaseFile);
+                    localReleases = Utility.LoadLocalReleases(localReleaseFile).ToArray();
                 }
                 catch (Exception ex)
                 {
@@ -56,7 +56,7 @@ namespace PoeShared.Squirrel.Core
 
                 string releaseFile;
 
-                var latestLocalRelease = localReleases.Count() > 0
+                var latestLocalRelease = localReleases.Any()
                     ? localReleases.MaxBy(x => x.Version).First()
                     : default;
 
@@ -143,12 +143,11 @@ namespace PoeShared.Squirrel.Core
                             fi.FullName);
                     }
 
-                    releaseFile = File.ReadAllText(fi.FullName, Encoding.UTF8);
+                    releaseFile = await File.ReadAllTextAsync(fi.FullName, Encoding.UTF8);
                     progress(33);
                 }
 
-                var ret = default(UpdateInfo);
-                var remoteReleases = ReleaseEntry.ParseReleaseFileAndApplyStaging(releaseFile, stagingId);
+                var remoteReleases = ReleaseEntry.ParseReleaseFileAndApplyStaging(releaseFile, stagingId).ToArray();
                 progress(66);
 
                 if (!remoteReleases.Any())
@@ -156,7 +155,7 @@ namespace PoeShared.Squirrel.Core
                     throw new Exception("Remote release File is empty or corrupted");
                 }
 
-                ret = DetermineUpdateInfo(localReleases, remoteReleases, ignoreDeltaUpdates);
+                var ret = DetermineUpdateInfo(localReleases, remoteReleases, ignoreDeltaUpdates);
 
                 progress(100);
                 return ret;
@@ -174,10 +173,10 @@ namespace PoeShared.Squirrel.Core
                 Directory.CreateDirectory(pkgDir);
             }
 
-            private UpdateInfo DetermineUpdateInfo(IEnumerable<ReleaseEntry> localReleases, IEnumerable<ReleaseEntry> remoteReleases, bool ignoreDeltaUpdates)
+            private UpdateInfo DetermineUpdateInfo(ReleaseEntry[] localReleases, ReleaseEntry[] remoteReleases, bool ignoreDeltaUpdates)
             {
                 var packageDirectory = Utility.PackageDirectoryForAppDir(rootAppDirectory);
-                localReleases = localReleases ?? Enumerable.Empty<ReleaseEntry>();
+                localReleases ??= Array.Empty<ReleaseEntry>();
 
                 if (remoteReleases == null)
                 {
@@ -198,7 +197,7 @@ namespace PoeShared.Squirrel.Core
 
                 if (ignoreDeltaUpdates)
                 {
-                    remoteReleases = remoteReleases.Where(x => !x.IsDelta);
+                    remoteReleases = remoteReleases.Where(x => !x.IsDelta).ToArray();
                 }
 
                 if (!localReleases.Any())
@@ -216,10 +215,10 @@ namespace PoeShared.Squirrel.Core
                 return UpdateInfo.Create(currentRelease, remoteReleases, packageDirectory);
             }
 
-            internal Guid? GetOrCreateStagedUserId()
+            private Guid? GetOrCreateStagedUserId()
             {
                 var stagedUserIdFile = Path.Combine(rootAppDirectory, "packages", ".betaId");
-                var ret = default(Guid);
+                Guid ret;
 
                 try
                 {

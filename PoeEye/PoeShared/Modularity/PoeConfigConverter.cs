@@ -151,8 +151,8 @@ namespace PoeShared.Modularity
                 Log.Debug($"Validating config of type {innerType}, metadata version: {metadata.Version}, loaded in-memory version: {innerTypeSample.Version}");
                 if (innerTypeSample.Version != metadata.Version)
                 {
-                    Log.Warn($"Config version mismatch (expected: {innerTypeSample.Version}, got: {metadata.Version})");
-                    Log.Debug($"[ConfigProviderFromFile.ValidateConfigVersion] Loaded config:\n{metadata.DumpToText()}\n\nTemplate config:\n{innerTypeSample.DumpToText()}");
+                    Log.Warn($"Config {metadata.TypeName} version mismatch (expected: {innerTypeSample.Version}, got: {metadata.Version})");
+                    Log.Debug($"Loaded config:\n{metadata.DumpToText()}\n\nTemplate config:\n{innerTypeSample.DumpToText()}");
                     return valueFactory();
                 }
             }
