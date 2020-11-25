@@ -312,10 +312,9 @@ namespace PoeShared.Squirrel.Scaffolding
             return prefix + DirectoryChars.Value[index % DirectoryChars.Value.Length] + TempNameForIndex(index / DirectoryChars.Value.Length, "");
         }
 
-        public static DirectoryInfo GetTempDirectory(string localAppDirectory)
+        private static DirectoryInfo GetTempDirectory(string localAppDirectory)
         {
-            var tempDir = Environment.GetEnvironmentVariable("SQUIRREL_TEMP");
-            tempDir = tempDir ?? Path.Combine(localAppDirectory ?? Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SquirrelTemp");
+            var tempDir = Path.Combine(localAppDirectory ?? Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SquirrelTemp");
 
             var di = new DirectoryInfo(tempDir);
             if (!di.Exists)

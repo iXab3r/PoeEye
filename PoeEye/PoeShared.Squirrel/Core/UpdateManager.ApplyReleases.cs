@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.Contracts;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -38,7 +37,7 @@ namespace PoeShared.Squirrel.Core
                 progress = progress ?? (_ => { });
 
                 progress(0);
-                var release = await CreateFullPackagesFromDeltas(updateInfo.ReleasesToApply, updateInfo.CurrentlyInstalledVersion);
+                var release = await CreateFullPackagesFromDeltas(updateInfo.ReleasesToApply.ToArray(), updateInfo.CurrentlyInstalledVersion);
                 progress(10);
 
                 if (release == null)
@@ -387,16 +386,18 @@ namespace PoeShared.Squirrel.Core
                     });
             }
 
-            private async Task<ReleaseEntry> CreateFullPackagesFromDeltas(IEnumerable<ReleaseEntry> releasesToApply, ReleaseEntry currentVersion)
+            private async Task<ReleaseEntry> CreateFullPackagesFromDeltas(ReleaseEntry[] releasesToApply, ReleaseEntry currentVersion)
             {
                 Guard.ArgumentIsTrue(releasesToApply != null, "releasesToApply != null");
 
                 // If there are no remote releases at all, bail
-                if (!releasesToApply.Any())
+                if (releasesToApply == null || !releasesToApply.Any())
                 {
+                    Log.Debug("Releases to apply is empty");
                     return null;
                 }
-
+                
+                Log.Debug($"Applying delta-releases to {new { currentVersion.PackageName, currentVersion.Version }}, chain: {string.Join(" => ", releasesToApply.Select(x => new { x.Filename, x.Version, x.IsDelta }))}");
                 // If there are no deltas in our list, we're already done
                 if (releasesToApply.All(x => !x.IsDelta))
                 {
@@ -415,12 +416,21 @@ namespace PoeShared.Squirrel.Core
                         var basePkg = new ReleasePackage(Path.Combine(rootAppDirectory, "packages", currentVersion.Filename));
                         var deltaPkg = new ReleasePackage(Path.Combine(rootAppDirectory, "packages", releasesToApply.First().Filename));
 
-                        var deltaBuilder = new DeltaPackageBuilder(Directory.GetParent(rootAppDirectory).FullName);
+                        using var tempDirectoryAnchor = Utility.WithTempDirectory(out var parentDirectory, rootAppDirectory);
+                        Log.Debug($"Preparing delta-package in {parentDirectory}, base: {basePkg}, delta: {deltaPkg}");
+                        var deltaBuilder = new DeltaPackageBuilder(parentDirectory);
 
+                        var finalPkgPath = Regex.Replace(deltaPkg.InputPackageFile, @"-delta.nupkg$", ".nupkg", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+                        if (File.Exists(finalPkgPath))
+                        {
+                            Log.Debug($"Final package already exists @ {finalPkgPath}, removing it");
+                            File.Delete(finalPkgPath);
+                        }
+                        
                         return deltaBuilder.ApplyDeltaPackage(
                             basePkg,
                             deltaPkg,
-                            Regex.Replace(deltaPkg.InputPackageFile, @"-delta.nupkg$", ".nupkg", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant));
+                            finalPkgPath);
                     });
 
                 if (releasesToApply.Count() == 1)
@@ -432,7 +442,7 @@ namespace PoeShared.Squirrel.Core
                 var entry = ReleaseEntry.GenerateFromFile(fi.OpenRead(), fi.Name);
 
                 // Recursively combine the rest of them
-                return await CreateFullPackagesFromDeltas(releasesToApply.Skip(1), entry);
+                return await CreateFullPackagesFromDeltas(releasesToApply.Skip(1).ToArray(), entry);
             }
 
             private void ExecuteSelfUpdate(SemanticVersion currentVersion)
