@@ -109,6 +109,24 @@
             <blue:Int32ComparisonStrategy Mode="GreaterThan" Comparand="1" />
         </blue:Int32ToVisibilityConverter.ComparisonStrategy>
     </blue:Int32ToVisibilityConverter>
+    
+    <blue:Int64ToVisibilityConverter x:Key="GreaterThanZero64BitToVisibleConverter" TrueValue="Visible" FalseValue="Collapsed">
+        <blue:Int64ToVisibilityConverter.ComparisonStrategy>
+            <blue:Int64ComparisonStrategy Mode="GreaterThan" Comparand="0" />
+        </blue:Int64ToVisibilityConverter.ComparisonStrategy>
+    </blue:Int64ToVisibilityConverter>
+    
+    <blue:Int64ToVisibilityConverter x:Key="LessThanOne64BitToVisibleConverter" TrueValue="Visible" FalseValue="Collapsed">
+        <blue:Int64ToVisibilityConverter.ComparisonStrategy>
+            <blue:Int64ComparisonStrategy Mode="LessThan" Comparand="1" />
+        </blue:Int64ToVisibilityConverter.ComparisonStrategy>
+    </blue:Int64ToVisibilityConverter>
+
+    <blue:Int64ToVisibilityConverter x:Key="GreaterThanOne64BitToVisibleConverter" TrueValue="Visible" FalseValue="Collapsed">
+        <blue:Int64ToVisibilityConverter.ComparisonStrategy>
+            <blue:Int64ComparisonStrategy Mode="GreaterThan" Comparand="1" />
+        </blue:Int64ToVisibilityConverter.ComparisonStrategy>
+    </blue:Int64ToVisibilityConverter>
 
     <blue:DoubleToVisibilityConverter x:Key="DoubleGreaterThanZeroToVisibleConverter" TrueValue="Visible" FalseValue="Collapsed">
         <blue:DoubleToVisibilityConverter.ComparisonStrategy>
@@ -123,6 +141,7 @@
     <eyeConverters:NullToVisibilityConverter x:Key="NotNullToHiddenConverter" NullValue="Visible" NotNullValue="Hidden" />
     <eyeConverters:ExceptionToMessageConverter x:Key="ExceptionToMessageConverter" />
     <eyeConverters:TimeSpanToHumanReadableStringConverter x:Key="TimeSpanToHumanReadableStringConverter" />
+    <eyeConverters:DataSizeToHumanReadableStringConverter x:Key="DataSizeToHumanReadableStringConverter" />
     <eyeConverters:EqualityConverter x:Key="EqualToVisibleConverter" TrueValue="{x:Static Visibility.Visible}" FalseValue="{x:Static Visibility.Collapsed}" />
     <eyeConverters:EqualityConverter x:Key="EqualToCollapsedConverter" TrueValue="{x:Static Visibility.Collapsed}" FalseValue="{x:Static Visibility.Visible}" />
     <eyeConverters:PropagatingMultiValueConverter x:Key="PropagatingMultiValueConverter" />

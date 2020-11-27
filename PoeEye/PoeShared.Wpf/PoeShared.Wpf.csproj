@@ -9,7 +9,7 @@
     <UseWpf>true</UseWpf>
     <Configurations>Debug;Release</Configurations>
     <Platforms>AnyCPU</Platforms>
-    <LangVersion>8</LangVersion>
+    <LangVersion>9</LangVersion>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
   <ItemGroup>

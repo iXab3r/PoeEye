@@ -3,7 +3,8 @@
                     xmlns:fa="http://schemas.fontawesome.io/icons/"
                     xmlns:eye="http://coderush.net/poeeye/"
                     xmlns:updater1="clr-namespace:PoeShared.Squirrel.Updater"
-                    xmlns:converters="http://schemas.kent.boogaart.com/converters">
+                    xmlns:converters="http://schemas.kent.boogaart.com/converters"
+                    xmlns:ui="clr-namespace:PoeShared.UI;assembly=PoeShared.Wpf">
     <ResourceDictionary.MergedDictionaries>
 
         <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/recommended/accent/materialdesigncolor.lightblue.xaml" />
@@ -45,45 +46,54 @@
             <DockPanel>
 
                 <Grid Margin="10,0" DockPanel.Dock="Bottom">
-                    <ContentControl MinHeight="30"
-                                    Content="{Binding RestartCommand}"
-                                    Focusable="False"
-                                    IsTabStop="False" 
-                                    eye:CommandWrapperHelper.DataContext="{Binding}"
-                                    eye:CommandWrapperHelper.Icon="&#xf2d0;">
-                        <eye:CommandWrapperHelper.Text>
-                            <TextBlock Text="{Binding UpdatedVersion, StringFormat='Restart application to migrate to v{0}'}"/>
-                        </eye:CommandWrapperHelper.Text>
-                        <ContentControl.Visibility>
+                    <ui:ButtonEx
+                        MinHeight="30"
+                        Command="{Binding RestartCommand}"
+                        Icon="&#xf2d0;"
+                        Content="{Binding UpdatedVersion, StringFormat='Restart application to migrate to v{0}'}">
+                        <ui:ButtonEx.Visibility>
                             <MultiBinding Converter="{StaticResource MultiBooleanAllTrueToVisibleFalseToCollapsedConverter}">
                                 <MultiBinding.Bindings>
                                     <Binding Path="UpdatedVersion" Converter="{StaticResource NullToFalseConverter}" />
                                     <Binding Path="IsBusy" Converter="{StaticResource NotConverter}" />
                                 </MultiBinding.Bindings>
                             </MultiBinding>
-                        </ContentControl.Visibility>
-                    </ContentControl>
-
-                    <ContentControl MinHeight="30"
-                                    Content="{Binding ApplyUpdate}"
-                                    Focusable="False"
-                                    IsTabStop="False"
-                                    Background="Transparent"
-                                    ToolTip="{Binding UpdateInfo}"
-                                    eye:CommandWrapperHelper.DataContext="{Binding}"
-                                    eye:CommandWrapperHelper.Icon="&#xF0ED;">
-                        <eye:CommandWrapperHelper.Text>
-                            <TextBlock Text="{Binding LatestVersion, StringFormat='Download and apply v{0}'}"/>
-                        </eye:CommandWrapperHelper.Text>
-                        <ContentControl.Visibility>
+                        </ui:ButtonEx.Visibility>
+                    </ui:ButtonEx>
+                    
+                    <ui:ButtonEx
+                        MinHeight="30"
+                        Command="{Binding ApplyUpdate}"
+                        Icon="&#xF0ED;"
+                        ToolTip="{Binding UpdateInfo}">
+                        <ui:ButtonEx.Content>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{Binding LatestVersion, StringFormat='Download and apply v{0}'}"/>
+                                <StackPanel Orientation="Horizontal" Margin="15,0,0,0"
+                                            Visibility="{Binding TotalUpdateSize, Converter={StaticResource GreaterThanZero64BitToVisibleConverter}}">
+                                    <fa:FontAwesome Icon="Download"
+                                                    Margin="5,0"
+                                                    VerticalAlignment="Center"
+                                                    FontSize="14" />
+                                    <TextBlock Text="{Binding TotalUpdateSize, Converter={StaticResource DataSizeToHumanReadableStringConverter}}"/>
+                                </StackPanel>
+                                <fa:FontAwesome Icon="Certificate"
+                                                Margin="5,0"
+                                                Foreground="{StaticResource PositiveBrush}"
+                                                VerticalAlignment="Center"
+                                                Visibility="{Binding IsDeltaUpdate, Converter={StaticResource TrueToVisibleFalseToCollapsedConverter}}"
+                                                FontSize="10" />
+                            </StackPanel>
+                        </ui:ButtonEx.Content>
+                        <ui:ButtonEx.Visibility>
                             <MultiBinding Converter="{StaticResource MultiBooleanAllTrueToVisibleFalseToCollapsedConverter}">
                                 <MultiBinding.Bindings>
                                     <Binding Path="LatestVersion" Converter="{StaticResource NullToFalseConverter}" />
                                     <Binding Path="IsBusy" Converter="{StaticResource NotConverter}" />
                                 </MultiBinding.Bindings>
                             </MultiBinding>
-                        </ContentControl.Visibility>
-                    </ContentControl>
+                        </ui:ButtonEx.Visibility>
+                    </ui:ButtonEx>
 
                     <ProgressBar Margin="5, 10" 
                                  VerticalAlignment="Center" 
