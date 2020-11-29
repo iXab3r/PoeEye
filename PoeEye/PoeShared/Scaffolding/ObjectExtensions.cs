@@ -78,6 +78,18 @@ namespace PoeShared.Scaffolding
             collection.Add(instance);
             return instance;
         }
+        
+        public static IEnumerable<PropertyInfo> GetAllProperties(this Type type, BindingFlags flags)
+        {
+            if (!type.IsInterface)
+            {
+                return type.GetProperties(flags);
+            }
+
+            return new[] { type }
+                .Concat(type.GetInterfaces())
+                .SelectMany(i => i.GetProperties(flags));
+        }
 
         public static void TransferPropertiesTo<TSource, TTarget>(this TSource source, TTarget target)
             where TTarget : class, TSource
@@ -85,24 +97,24 @@ namespace PoeShared.Scaffolding
             Guard.ArgumentNotNull(source, nameof(source));
             Guard.ArgumentNotNull(target, nameof(target));
 
-            var settableProperties = typeof(TTarget)
-                .GetProperties(BindingFlags.Instance | BindingFlags.Public)
+            var targetProperties = typeof(TTarget)
+                .GetAllProperties(BindingFlags.Instance | BindingFlags.Public)
                 .Where(x => x.CanRead && x.CanWrite)
                 .ToArray();
 
-            var propertiesToSet = typeof(TSource)
-                .GetProperties(BindingFlags.Instance | BindingFlags.Public)
+            var sourceProperties = typeof(TSource)
+                .GetAllProperties(BindingFlags.Instance | BindingFlags.Public)
                 .Where(x => x.CanRead)
                 .ToArray();
 
             var skippedProperties = new List<PropertyInfo>();
-            foreach (var property in propertiesToSet)
+            foreach (var property in sourceProperties)
             {
                 try
                 {
                     var currentValue = property.GetValue(source);
 
-                    var settableProperty = settableProperties.FirstOrDefault(x => x.Name == property.Name);
+                    var settableProperty = targetProperties.FirstOrDefault(x => x.Equals(property));
                     if (settableProperty == null)
                     {
                         skippedProperties.Add(property);
@@ -115,8 +127,8 @@ namespace PoeShared.Scaffolding
                 {
                     throw new ApplicationException(
                         $"Exception occurred, property: {property}\r\n" +
-                        $"Settable properties: {settableProperties.Select(x => $"{x.PropertyType} {x.Name}").DumpToText()}\r\n" +
-                        $"PropertiesToSet: {propertiesToSet.Select(x => $"{x.PropertyType} {x.Name}").DumpToText()}",
+                        $"Target properties: {targetProperties.Select(x => $"{x.PropertyType} {x.Name}").DumpToText()}\r\n" +
+                        $"Source properties: {sourceProperties.Select(x => $"{x.PropertyType} {x.Name}").DumpToText()}",
                         ex);
                 }
             }

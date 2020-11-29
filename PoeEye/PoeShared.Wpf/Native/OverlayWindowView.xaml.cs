@@ -1,16 +1,11 @@
 ﻿using System;
 using System.Reactive;
 using System.Reactive.Linq;
-using System.Runtime.InteropServices;
 using System.Windows;
-using System.Windows.Controls.Primitives;
-using System.Windows.Forms;
-using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Threading;
 using log4net;
 using PoeShared.Scaffolding;
-using ReactiveUI;
 
 namespace PoeShared.Native
 {

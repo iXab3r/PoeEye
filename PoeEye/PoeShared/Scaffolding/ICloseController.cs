@@ -1,4 +1,4 @@
-namespace PoeShared.Native
+namespace PoeShared.Scaffolding
 {
     public interface ICloseController
     {
