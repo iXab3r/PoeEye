@@ -1,5 +1,5 @@
 using System;
-using System.IO;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 using PoeShared.Scaffolding;
 
@@ -8,6 +8,6 @@ namespace PoeShared.Audio.Services
     internal interface IAudioPlayer : IDisposableReactiveObject
     {
         [NotNull]
-        IDisposable Play([NotNull] Stream rawStream);
+        Task Play([NotNull] byte[] waveData);
     }
 }

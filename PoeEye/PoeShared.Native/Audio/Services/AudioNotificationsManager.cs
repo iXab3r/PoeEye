@@ -1,8 +1,11 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Reactive.Concurrency;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 using log4net;
 using PoeShared.Modularity;
@@ -19,18 +22,19 @@ namespace PoeShared.Audio.Services
 
         private readonly ConcurrentDictionary<string, byte[]> knownNotifications = new ConcurrentDictionary<string, byte[]>();
         private readonly ISoundLibrarySource soundLibrarySource;
+        private readonly IFileSoundLibrarySource fileSoundLibrarySource;
 
         public AudioNotificationsManager(
             [NotNull] IAudioPlayer audioPlayer,
             [NotNull] ISoundLibrarySource soundLibrarySource,
-            [NotNull] IConfigProvider<PoeEyeSharedConfig> poeEyeConfigProvider,
+            [NotNull] IFileSoundLibrarySource fileSoundLibrarySource,
             [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler)
         {
-            Guard.ArgumentNotNull(poeEyeConfigProvider, nameof(poeEyeConfigProvider));
             Guard.ArgumentNotNull(bgScheduler, nameof(bgScheduler));
             Guard.ArgumentNotNull(soundLibrarySource, nameof(soundLibrarySource));
             this.audioPlayer = audioPlayer;
             this.soundLibrarySource = soundLibrarySource;
+            this.fileSoundLibrarySource = fileSoundLibrarySource;
 
             Log.Info("Initializing sound subsystem...");
             knownNotifications[AudioNotificationType.Silence.ToString()] = new byte[0];
@@ -38,14 +42,14 @@ namespace PoeShared.Audio.Services
             bgScheduler.Schedule(Initialize).AddTo(Anchors);
         }
 
-        public IEnumerable<string> Notifications => soundLibrarySource.SourceName;
+        public ReadOnlyObservableCollection<string> Notifications => soundLibrarySource.SourceName;
 
-        public void PlayNotification(AudioNotificationType notificationType)
+        public Task PlayNotification(AudioNotificationType notificationType)
         {
-            PlayNotification(notificationType.ToString());
+            return PlayNotification(notificationType.ToString());
         }
 
-        public void PlayNotification(string notificationName)
+        public Task PlayNotification(string notificationName)
         {
             Guard.ArgumentNotNull(notificationName, nameof(notificationName));
             Log.Debug($"Notification of type {notificationName} requested...");
@@ -54,17 +58,23 @@ namespace PoeShared.Audio.Services
             {
                 Log.Warn(
                     $"Unknown notification type - {notificationName}, known notifications: {string.Join(", ", knownNotifications.Keys.Select(x => x.ToString()))}");
-                return;
+                return Task.CompletedTask;
             }
 
             if (!notificationData.Any())
             {
                 Log.Debug($"No sound data loaded for notification of type {notificationData}");
-                return;
+                return Task.CompletedTask;
             }
 
             Log.Debug($"Starting playback of {notificationName} ({notificationData.Length}b)...");
-            audioPlayer.Play(new MemoryStream(notificationData));
+
+            return audioPlayer.Play(notificationData);
+        }
+        
+        public string AddFromFile(FileInfo soundFile)
+        {
+            return fileSoundLibrarySource.AddFromFile(soundFile);
         }
 
         private bool TryToLoadNotification(string notificationName, out byte[] waveData)

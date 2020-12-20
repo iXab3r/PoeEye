@@ -3,6 +3,8 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Windows.Input;
+using DynamicData;
+using DynamicData.Binding;
 using JetBrains.Annotations;
 using PoeShared.Audio.Services;
 using PoeShared.Scaffolding;
@@ -20,8 +22,6 @@ namespace PoeShared.Audio.ViewModels
         private bool audioEnabled;
         private string selectedValue;
 
-        private ObservableCollection<object> items = new ObservableCollection<object>();
-
         public AudioNotificationSelectorViewModel([NotNull] IAudioNotificationsManager notificationsManager)
         {
             this.notificationsManager = notificationsManager;
@@ -34,29 +34,25 @@ namespace PoeShared.Audio.ViewModels
             {
                 AudioNotificationType.Disabled,
                 AudioNotificationType.Silence
-            }.Select(x => x.ToString());
+            }.Select(x => x.ToString()).ToArray();
 
-            var defaultNotifications = new[]
-            {
-                AudioNotificationType.Whistle,
-                AudioNotificationType.Bell,
-                AudioNotificationType.Mercury,
-                AudioNotificationType.DingDong,
-                AudioNotificationType.Ping,
-                AudioNotificationType.Minions,
-                AudioNotificationType.Wob
-            }.Select(x => x.ToString());
+            var dynamicNotifications = new SourceList<string>()
+                .Connect()
+                .Or(
+                    notificationsManager.Notifications.ToObservableChangeSet())
+                .Sort(StringComparer.OrdinalIgnoreCase);
 
-            var notifications = defaultNotifications.Concat(notificationsManager.Notifications)
-                .Select(x => x.Pascalize())
-                .Distinct()
-                .OrderBy(x => x);
-            
-            items.AddRange(
-                preconfiguredNotifications
-                    .Concat(notifications)
-                    .Select(x => new NotificationTypeWrapper(this, x, x.ToString())));
-            Items = new ReadOnlyObservableCollection<object>(items);
+            new SourceList<string>()
+                .Connect()
+                .Or(
+                    new ObservableCollection<string>(preconfiguredNotifications).ToObservableChangeSet(),
+                    dynamicNotifications)
+                .DistinctValues(x => x)
+                .Transform(x => (object) new NotificationTypeWrapper(this, x, x.Pascalize()))
+                .Bind(out var notificationsSource)
+                .Subscribe()
+                .AddTo(Anchors);
+            Items = notificationsSource;
 
             this.WhenAnyValue(x => x.AudioEnabled)
                 .DistinctUntilChanged()
@@ -137,13 +133,14 @@ namespace PoeShared.Audio.ViewModels
 
                 this.owner
                     .WhenAnyValue(x => x.SelectedValue)
-                    .Subscribe(() => this.RaisePropertyChanged(nameof(IsSelected)));
+                    .Subscribe(() => this.RaisePropertyChanged(nameof(IsSelected)))
+                    .AddTo(this.owner.Anchors);
             }
 
-            public bool IsSelected => owner.SelectedValue == Value;
+            public bool IsSelected => string.Compare(owner.SelectedValue, Value, StringComparison.OrdinalIgnoreCase) == 0;
 
             public string Value { get; }
-
+            
             public ICommand PlayNotificationCommand => owner.PlayNotificationCommand;
 
             public ICommand SelectNotificationCommand => owner.SelectNotificationCommand;

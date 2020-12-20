@@ -1,12 +1,14 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using PoeShared.Scaffolding;
 
 namespace PoeShared.Audio.Services
 {
-    internal abstract class SoundLibrarySourceBase : ISoundLibrarySource
+    internal abstract class SoundLibrarySourceBase : DisposableReactiveObject, ISoundLibrarySource
     {
-        public abstract IEnumerable<string> SourceName { get; }
+        public abstract ReadOnlyObservableCollection<string> SourceName { get; }
 
         public abstract bool TryToLoadSourceByName(string name, out byte[] waveData);
 

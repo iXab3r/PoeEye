@@ -1,76 +1,151 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+using DynamicData;
 using log4net;
+using NAudio.Wave;
+using PoeShared.Modularity;
 using PoeShared.Scaffolding;
 
 namespace PoeShared.Audio.Services
 {
-    internal class FileSoundLibrarySource : SoundLibrarySourceBase
+    internal class FileSoundLibrarySource : SoundLibrarySourceBase, IFileSoundLibrarySource
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(FileSoundLibrarySource));
 
-        private static readonly DirectoryInfo ResourceDirectory =
-            new DirectoryInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "Notifications"));
+        private readonly DirectoryInfo[] knownDirectories;
+        
+        private readonly SourceCache<FileSource, string> sources = new SourceCache<FileSource, string>(x => x.SourceName.ToLowerInvariant());
 
-        public FileSoundLibrarySource()
+        public FileSoundLibrarySource(IAppArguments appArguments)
         {
-            var extensions = GetSupportedExtensions();
-            var sources = ResourceDirectory.Exists
-                ? ResourceDirectory
-                    .EnumerateFiles()
-                    .Select(x => new {FilePath = x.FullName, SourceName = Path.GetFileNameWithoutExtension(x.Name)})
-                    .Where(x => extensions.Any(ext => string.Equals(ext, Path.GetExtension(x.FilePath), StringComparison.OrdinalIgnoreCase)))
-                    .Select(x => x.SourceName)
-                    .ToArray()
-                : new string[0];
-            SourceName = sources;
+            knownDirectories = new[]
+                {
+                    Path.Combine(appArguments.AppDataDirectory, "Resources", "Notifications"),
+                    Path.Combine(AppDomain.CurrentDomain.BaseDirectory ?? Assembly.GetExecutingAssembly().Location, "Resources", "Notifications"),
+                }
+                .Distinct()
+                .Select(x => new DirectoryInfo(x)).ToArray();
 
-            Log.Debug($"Source name list(directory: {ResourceDirectory.FullName}):\r\n {sources.DumpToText()}");
+            sources
+                .Connect()
+                .Transform(x => x.SourceName)
+                .Bind(out var sourceNames)
+                .Subscribe()
+                .AddTo(Anchors);
+            SourceName = sourceNames;
+            
+            Reload();
         }
 
-        public override IEnumerable<string> SourceName { get; }
+        public override ReadOnlyObservableCollection<string> SourceName { get; }
 
         public override bool TryToLoadSourceByName(string name, out byte[] resourceData)
         {
-            var filePaths = FormatFileName(name)
-                .Select(FormatSourceFileName)
-                .ToArray();
-            Log.Debug($"Looking up files '{filePaths.DumpToTextRaw()}'...");
-            var soundFile = filePaths.FirstOrDefault(File.Exists);
-            if (string.IsNullOrEmpty(soundFile))
+            var source = sources.Lookup(name.ToLowerInvariant());
+            if (!source.HasValue)
             {
-                Log.Debug($"File was not found '{name}', candidates: {filePaths.DumpToTextRaw()}");
+                Log.Debug($"Source was not found '{name}', loaded files: {sources.Items.Select(x => new {x.SourceName, x.File.FullName}).DumpToTextRaw()}");
                 resourceData = null;
                 return false;
             }
 
             try
             {
-                resourceData = LoadAudioStream(soundFile);
-
-                Log.Debug($"Loaded file '{soundFile}' : {resourceData.Length}b");
+                resourceData = LoadFileData(source.Value.File);
+                Log.Debug($"Loaded file '{source.Value}': {resourceData.Length}b");
                 return true;
             }
             catch (Exception e)
             {
-                Log.Error($"Failed to load source {soundFile}", e);
+                Log.Error($"Failed to load source {source.Value}", e);
                 resourceData = null;
                 return false;
             }
         }
 
-        private string FormatSourceFileName(string fileName)
+
+        public string AddFromFile(FileInfo soundFile)
         {
-            return Path.Combine(ResourceDirectory.FullName, fileName);
+            Guard.ArgumentNotNull(soundFile, nameof(soundFile));
+            if (!soundFile.Exists)
+            {
+                throw new FileNotFoundException("File not found", soundFile.FullName);
+            }
+            Log.Debug($"Trying to add source {soundFile} ({soundFile.Length}b)");
+
+            var directory = knownDirectories.First();
+            if (!directory.Exists)
+            {
+                Log.Debug($"Directory {directory} does not exist, creating it");
+                directory.Create();
+                directory.Refresh();
+            }
+
+            var filePath = Path.Combine(directory.FullName, $"{Path.GetFileNameWithoutExtension(soundFile.Name)}.wav");
+            using (var reader = new MediaFoundationReader(soundFile.FullName))
+            using (WaveStream pcmStream = WaveFormatConversionStream.CreatePcmStream(reader))
+            {
+                WaveFileWriter.CreateWaveFile(filePath, pcmStream);
+            }
+            Reload();
+            return Path.GetFileNameWithoutExtension(soundFile.Name);
         }
 
-        private byte[] LoadAudioStream(string fileName)
+        private void Reload()
         {
-            using (var mediaStream = File.Open(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+            Log.Debug($"Updating sound sources, directories:\r\n {knownDirectories.Select(x => new { x.FullName, x.Exists }).DumpToText()}");
+
+            var extensions = GetSupportedExtensions();
+
+            var fileSources =
+                (from sourceDirectory in knownDirectories
+                 where sourceDirectory.Exists
+                 let files = sourceDirectory.EnumerateFiles()
+                 from sourceFile in files
+                 where extensions.Any(ext => string.Equals(ext, sourceFile.Extension, StringComparison.OrdinalIgnoreCase))
+                 select sourceFile).ToArray();
+
+            var sourcesToRemove = sources.Items.Select(x => x.File).Where(x => !fileSources.Contains(x)).ToArray();
+            foreach (var source in sourcesToRemove)
+            {
+                sources.RemoveKey(new FileSource(source).SourceName);
+            }
+            
+            foreach (var source in fileSources)
+            {
+                sources.AddOrUpdate(new FileSource(source));
+            }
+            
+            Log.Debug($"Source name list(count: {sources.Count}):\r\n {sources.Items.Select(x => new {x.SourceName, x.File.FullName}).DumpToText()}");
+        }
+
+        private static byte[] LoadFileData(FileInfo file)
+        {
+            using (var mediaStream = File.Open(file.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
             {
                 return mediaStream.ReadToEnd();
+            }
+        }
+        
+        private readonly struct FileSource
+        {
+            public FileInfo File { get; }
+            
+            public string SourceName { get; }
+            
+            public FileSource(FileInfo file) : this()
+            {
+                File = file;
+                SourceName = Path.GetFileNameWithoutExtension(file.Name);
+            }
+
+            public override string ToString()
+            {
+                return $"{File} (exists: {File.Exists})";
             }
         }
     }

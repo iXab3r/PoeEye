@@ -3,7 +3,9 @@ using System.IO;
 using System.Media;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
+using System.Runtime.Versioning;
 using System.Threading;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 using log4net;
 using NAudio.Wave;
@@ -24,9 +26,9 @@ namespace PoeShared.Audio.Services
             this.bgScheduler = bgScheduler;
         }
 
-        public IDisposable Play(Stream rawStream)
+        public Task Play(byte[] waveData)
         {
-            return PlayInternal(rawStream);
+            return PlayInternal(waveData);
         }
 
         private IDisposable PlayInternalMedia(Stream rawStream)
@@ -41,17 +43,17 @@ namespace PoeShared.Audio.Services
             return Disposable.Empty;
         }
 
-        private IDisposable PlayInternal(Stream rawStream)
+        private Task PlayInternal(byte[] soundData)
         {
-            Log.Debug($"Queueing audio stream({rawStream.Length})...");
-            return bgScheduler.Schedule(() =>
+            Log.Debug($"Queueing audio stream({soundData.Length})...");
+            return Task.Factory.StartNew(() =>
             {
                 try
                 {
+                    using (var rawStream = new MemoryStream(soundData))
                     using (var waveStream = new WaveFileReader(rawStream))
                     using (WaveStream blockAlignedStream = new BlockAlignReductionStream(waveStream))
                     using (var waveOut = new WaveOut(WaveCallbackInfo.FunctionCallback()))
-                    using (rawStream)
                     {
                         {
                             Log.Debug($"Initializing waveOut device {waveOut}");
@@ -78,7 +80,7 @@ namespace PoeShared.Audio.Services
                 }
                 catch (Exception e)
                 {
-                    Log.Error($"Failed to play audio stream {rawStream}", e);
+                    Log.Error($"Failed to play audio stream of length {soundData.Length}b", e);
                 }
             });
         }
