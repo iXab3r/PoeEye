@@ -203,16 +203,8 @@ namespace PoeShared.Squirrel.Updater
 
             var app = Application.Current;
             Log.Debug($"[ApplicationUpdaterModel] Terminating application (shutdownMode: {app.ShutdownMode}, window: {app.MainWindow})...");
-            if (app.MainWindow != null && app.ShutdownMode == ShutdownMode.OnMainWindowClose)
-            {
-                Log.Debug($"[ApplicationUpdaterModel] Closing main window {app.MainWindow}...");
-                app.MainWindow.Close();
-            }
-            else
-            {
-                Log.Debug($"[ApplicationUpdaterModel] Closing app forcefully");
-                Application.Current.Shutdown(0);
-            }
+            Log.Debug($"[ApplicationUpdaterModel] Closing app forcefully");
+            Application.Current.Shutdown(0);
         }
 
         private async Task<IUpdateManager> CreateManager()
