@@ -313,12 +313,17 @@ namespace PoeShared.Native
             Log.Debug($"[{OverlayDescription}] Current SystemInformation: {systemInformation.DumpToTextRaw()}");
             
             var overlayBounds = new Rect(config.OverlayLocation, config.OverlaySize);
-            if (UnsafeNative.IsOutOfBounds(overlayBounds, systemInformation.MonitorBounds))
+            
+            Log.Debug($"Trying to restore window position, bounds: {overlayBounds}, virtual screen: {systemInformation.VirtualScreen}");
+            if (overlayBounds.Size.IsEmpty || UnsafeNative.IsOutOfBounds(overlayBounds.ToWinRectangle(), systemInformation.VirtualScreen))
             {
-                var screenCenter = UnsafeNative.GetPositionAtTheCenter(OverlayWindow);
-                Log.Warn($"[{OverlayDescription}] Overlay is out of screen bounds(screen: {systemInformation.MonitorBounds}, overlay: {overlayBounds}) , resetting to {screenCenter}, systemInfo: {systemInformation.DumpToTextRaw()}, config: {config.DumpToTextRaw()}");
+                var size = overlayBounds.Size.IsNotEmpty()
+                    ? overlayBounds.Size
+                    : MinSize;
+                var screenCenter = UnsafeNative.GetPositionAtTheCenter(systemInformation.MonitorBounds, size);
+                Log.Warn(
+                    $"Overlay is out of screen bounds(screen: {systemInformation.MonitorBounds}, overlay bounds: {overlayBounds}, using size {size}), resetting Location to {screenCenter}");
                 config.OverlayLocation = screenCenter;
-                
                 if (UnlockWindowCommand.CanExecute(null))
                 {
                     UnlockWindowCommand.Execute(null);
