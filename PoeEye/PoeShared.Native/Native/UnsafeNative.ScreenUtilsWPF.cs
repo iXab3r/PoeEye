@@ -20,6 +20,20 @@ namespace PoeShared.Native
             return GetMonitorBounds(handle);
         }
 
+        public Screen GetScreen(Window window)
+        {
+            var handle = window != null
+                ? new WindowInteropHelper(window).Handle
+                : IntPtr.Zero;
+            return Screen.FromHandle(handle);
+        }
+
+        public IntPtr GetMonitorFromRect(Rectangle rect)
+        {
+            var result = new RECT { top = rect.Top, left = rect.Left, bottom = rect.Bottom, right = rect.Right };
+            return User32.MonitorFromRect(ref result, User32.MonitorOptions.MONITOR_DEFAULTTONEAREST);
+        }
+
         public static Rect GetMonitorBounds(IntPtr windowHandle)
         {
             var screen = Screen.FromHandle(windowHandle);
@@ -65,11 +79,22 @@ namespace PoeShared.Native
                    double.IsNaN(frame.Y) ||
                    double.IsNaN(frame.Width) ||
                    double.IsNaN(frame.Height) ||
-                   downscaledFrame.X <= 1 ||
-                   downscaledFrame.Y <= 1 ||
+                   downscaledFrame.X <= bounds.X ||
+                   downscaledFrame.Y <= bounds.Y ||
                    !bounds.Contains(downscaledFrame);
         }
 
+        public static bool IsOutOfBounds(Rectangle frame, Rectangle bounds)
+        {
+            var downscaledFrame = frame;
+            // downscaling frame as we do not require for FULL frame to be visible, only top-left part of it
+            downscaledFrame.Size = new System.Drawing.Size((int)(frame.Width * 0.25), (int)(frame.Height * 0.25));
+            return downscaledFrame.X <= bounds.X ||
+                   downscaledFrame.Y <= bounds.Y ||
+                   !bounds.Contains(downscaledFrame);
+        }
+
+        
         public static bool IsOutOfBounds(Point point, Rect bounds)
         {
             return double.IsNaN(point.X) ||
@@ -101,12 +126,13 @@ namespace PoeShared.Native
             Log.Debug($"ShowWindow command executed, windowState: {mainWindow.WindowState}");
 
             Log.Debug($"Activating main window, title: '{mainWindow.Title}' {new Point(mainWindow.Left, mainWindow.Top)}, isActive: {mainWindow.IsActive}, state: {mainWindow.WindowState}, topmost: {mainWindow.Topmost}, style:{mainWindow.WindowStyle}");
+
+            if (mainWindow.Topmost)
+            {
+                mainWindow.Topmost = false;
+                mainWindow.Topmost = true;
+            }
             
-
-            var initialTopmost = mainWindow.Topmost;
-            mainWindow.Topmost = !initialTopmost;
-            mainWindow.Topmost = initialTopmost;
-
             var mainWindowHelper = new WindowInteropHelper(mainWindow);
             var mainWindowHandle = mainWindowHelper.EnsureHandle();
 
