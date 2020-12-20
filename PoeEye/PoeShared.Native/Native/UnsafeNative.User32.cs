@@ -21,9 +21,14 @@ namespace PoeShared.Native
         [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
         static extern bool AdjustWindowRectEx(ref RECT lpRect, User32.WindowStyles dwStyle, bool bMenu, User32.WindowStylesEx dwExStyle); 
         
-        
         [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
         static extern bool AdjustWindowRectExForDpi(ref RECT lpRect, User32.WindowStyles dwStyle, bool bMenu, User32.WindowStylesEx dwExStyle, int dpi); 
+        
+        [DllImport("user32.dll")]
+        static extern bool SetWindowRgn(IntPtr hWnd, IntPtr hRgn, bool bRedraw);
+        
+        [DllImport("gdi32.dll")]
+        static extern IntPtr CreateRoundRectRgn(int x1, int y1, int x2, int y2,int cx, int cy);
         
         public static string GetWindowClass(IntPtr hwnd)
         {
@@ -66,6 +71,17 @@ namespace PoeShared.Native
         {
             User32.GetWindowThreadProcessId(hwnd, out var processId);
             return processId;
+        }
+
+        public static bool SetWindowRgn(IntPtr hwnd, Rectangle rect)
+        {
+            var hRect = CreateRoundRectRgn(rect.X, rect.Y, rect.X + rect.Width, rect.Y + rect.Height, 0, 0);
+            if (hRect == IntPtr.Zero)
+            {
+                throw new Win32Exception();
+            }
+
+            return SetWindowRgn(hwnd, hRect, bRedraw: true);
         }
     }
 }
