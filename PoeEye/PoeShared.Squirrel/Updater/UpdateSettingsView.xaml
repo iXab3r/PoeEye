@@ -10,7 +10,7 @@
         <st:AutoGrid Columns="170, *" ChildMargin="5">
             <TextBlock Text="Check for updates: " HorizontalAlignment="Right" />
             <CheckBox IsChecked="{Binding CheckForUpdates}" ToolTip="{Binding UpdateSource}"/>
-            <TextBlock Text="Disable delta-updates: " HorizontalAlignment="Right" />
+            <TextBlock Text="Download full updates: " HorizontalAlignment="Right" />
             <CheckBox IsChecked="{Binding IgnoreDeltaUpdates}" 
                       IsEnabled="{Binding CheckForUpdates}" 
                       ToolTip="Download full application updates instead of small patches. Enable this option if you encounter any problems during update process"/>

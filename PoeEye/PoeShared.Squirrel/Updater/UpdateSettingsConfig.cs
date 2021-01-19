@@ -10,10 +10,10 @@ namespace PoeShared.Squirrel.Updater
 
         public TimeSpan AutoUpdateTimeout { get; set; } = DefaultAutoUpdateTimeout;
 
-        public UpdateSourceInfo UpdateSource { get; set; } 
-        
-        public bool IgnoreDeltaUpdates { get; set; }
+        public UpdateSourceInfo UpdateSource { get; set; }
 
-        public int Version { get; set; } = 10;
+        public bool IgnoreDeltaUpdates { get; set; } = true;
+
+        public int Version { get; set; } = 11;
     }
 }
