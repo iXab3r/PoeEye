@@ -201,6 +201,11 @@ namespace PoeShared.Native
                 return default;
             }
 
+            if (!UnsafeNative.IsWindows10OrGreater())
+            {
+                // SHCore is supported only on Win8.1+, it's safer to fallback to Win10
+                return default;
+            }
             var dpiResult = SHCore.GetDpiForMonitor(handleMonitor, MONITOR_DPI_TYPE.MDT_DEFAULT, out var dpiX, out var dpiY);
             if (dpiResult.Failed)
             {
