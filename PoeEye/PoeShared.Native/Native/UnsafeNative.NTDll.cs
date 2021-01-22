@@ -341,5 +341,8 @@ namespace PoeShared.Native
 
         [DllImport("kernel32.dll", EntryPoint = "CloseHandle", SetLastError = true)]
         private static extern bool CloseHandle(IntPtr handle);
+        
+        [DllImport("Kernel32", EntryPoint = "GetCurrentThreadId", ExactSpelling = true)]
+        public static extern int GetCurrentThreadId();
     }
 }

@@ -2,6 +2,7 @@ using System;
 using System.Drawing;
 using System.Linq;
 using System.Reactive.Disposables;
+using System.Threading;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Interop;
@@ -214,8 +215,7 @@ namespace PoeShared.Native
                 Log.Warn($"[{hwnd.ToHexadecimal()}] Failed to retrieve foreground thread({foregroundWindow.ToHexadecimal()}) of process {foregroundProcessId} for window {foregroundWindow.ToHexadecimal()} ({GetWindowTitle(foregroundWindow)}), last error: {Kernel32.GetLastError()}");
                 return false;
             }
-            var appThread = Kernel32.GetCurrentThreadId();
-
+            var appThread = GetCurrentThreadId();
             try
             {
                 if (foregroundThreadId != appThread)
@@ -223,10 +223,9 @@ namespace PoeShared.Native
                     Log.Debug($"[{hwnd.ToHexadecimal()}] Attaching thread input of thread {appThread} to thread {foregroundThreadId} of process {foregroundProcessId}");
                     User32.AttachThreadInput( appThread, foregroundThreadId, true);
                 }
-                
                 Log.Debug($"[{hwnd.ToHexadecimal()}] Requesting window activation");
-
                 Win32ErrorCode error;
+                
                 if (!BringWindowToTop(hwnd) && (error = Kernel32.GetLastError()) != Win32ErrorCode.NERR_Success)
                 {
                     Log.Warn($"Failed to SetForegroundWindow.BringWindowToTop({hwnd.ToHexadecimal()}), error: {error}");
