@@ -15,6 +15,7 @@ namespace PoeShared.Prism
                 .RegisterSingleton<IConfigSerializer, JsonConfigSerializer>()
                 .RegisterSingleton(typeof(IConfigProvider<>), typeof(GenericConfigProvider<>))
                 .RegisterFactory<IAppArguments>(container => AppArguments.Instance)
+                .RegisterSingleton<IFolderCleanerService, FolderCleanerService>()
                 .RegisterSingleton<IRandomNumberGenerator, RandomNumberGenerator>();
 
             Container
