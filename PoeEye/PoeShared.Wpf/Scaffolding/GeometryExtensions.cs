@@ -176,13 +176,17 @@ namespace PoeShared.Scaffolding
             return new WinSize((int)(sourceSize.Width / dpi), (int)(sourceSize.Height / dpi));
         }
 
-        public static Rect ScaleToWpf(this WinRectangle sourceSize)
+        public static Rect ScaleToWpf(this WinRectangle sourceSize, PointF dpi)
         {
-            var dpi = UnsafeNative.GetDesktopDpi();
-
             var result = sourceSize.ToWpfRectangle();
             result.Scale(1 / dpi.X, 1 / dpi.Y);
             return result;
+        }
+        
+        public static Rect ScaleToWpf(this WinRectangle sourceSize)
+        {
+            var dpi = UnsafeNative.GetDesktopDpi();
+            return ScaleToWpf(sourceSize, dpi);
         }
         
         public static Point ScaleToWpf(this WinPoint source)

@@ -31,6 +31,18 @@ namespace PoeShared.Native
         [DllImport("user32.dll", SetLastError=true)]
         static extern bool BringWindowToTop(HandleRef hWnd);
         
+        [StructLayout(LayoutKind.Sequential)]
+        public struct WINDOWPOS
+        {
+            public readonly IntPtr hwnd;
+            public readonly IntPtr hwndInsertAfter;
+            public int x;
+            public int y;
+            public int cx;
+            public int cy;
+            public readonly int flags;
+        }
+        
         public static string GetWindowClass(IntPtr hwnd)
         {
             try

@@ -10,6 +10,7 @@ namespace PoeShared.Native
 
         public IWinEventHookWrapper Create(WinEventHookArguments param1)
         {
+            //FIXME These hooks are never disposed
             return hooks.GetOrAdd(param1, arg => new WinEventHookWrapper(arg));
         }
     }

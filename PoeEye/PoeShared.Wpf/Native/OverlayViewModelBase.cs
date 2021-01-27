@@ -5,6 +5,7 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Input;
@@ -32,17 +33,15 @@ namespace PoeShared.Native
         private readonly CommandWrapper makeLayeredCommand;
         private readonly CommandWrapper makeTransparentCommand;
         private readonly ISubject<Unit> whenLoaded = new ReplaySubject<Unit>(1);
+        private readonly ISubject<Rectangle> windowPositionSource = new ReplaySubject<Rectangle>(1);
         private readonly ObservableAsPropertyHelper<Rect> bounds;
-        private readonly ObservableAsPropertyHelper<Rectangle> nativeBounds;
         private readonly ObservableAsPropertyHelper<PointF> dpi;
+        private readonly object gate = new();
 
         private double actualHeight;
-
         private double actualWidth;
-
         private bool growUpwards;
         private bool showInTaskbar;
-
         private double height;
         private bool isLocked = true;
         private bool isUnlockable;
@@ -52,6 +51,7 @@ namespace PoeShared.Native
         private Size maxSize = new Size(Int16.MaxValue, Int16.MaxValue);
         private Size minSize = new Size(0, 0);
         private float opacity;
+        private Rectangle nativeBounds;
 
         private OverlayMode overlayMode;
 
@@ -82,16 +82,10 @@ namespace PoeShared.Native
                 .ToPropertyHelper(this, x => x.Bounds)
                 .AddTo(Anchors);
 
-            dpi = this.WhenAnyValue(x => x.OverlayWindow).Select(x => x == null ? Observable.Return(new PointF(1, 1)) : x.Observe(ConstantAspectRatioWindow.DpiProperty).Select(x => overlayWindow.Dpi).StartWith(overlayWindow.Dpi))
+            dpi = this.WhenAnyValue(x => x.OverlayWindow).Select(x => x == null ? Observable.Return(new PointF(1, 1)) : x.Observe(ConstantAspectRatioWindow.DpiProperty).Select(_ => overlayWindow.Dpi).StartWith(overlayWindow.Dpi))
                 .Switch()
                 .Do(x => Log.Debug($"[{this}] DPI updated to {x}"))
                 .ToPropertyHelper(this, x => x.Dpi)
-                .AddTo(Anchors);
-            
-            nativeBounds = this.WhenAnyValue(x => x.Bounds, x => x.Dpi)
-                .Select(x => new { Bounds, Dpi })
-                .Select(x => x.Bounds.ScaleToScreen(Dpi))
-                .ToPropertyHelper(this, x => x.NativeBounds)
                 .AddTo(Anchors);
             
             this.WhenAnyValue(x => x.IsLocked, x => x.IsUnlockable)
@@ -114,6 +108,55 @@ namespace PoeShared.Native
                 .ToUnit()
                 .Subscribe(whenLoaded)
                 .AddTo(Anchors);
+
+            this.WhenAnyValue(x => x.NativeBounds)
+                .CombineLatest(this.WhenAnyValue(x => x.OverlayWindow).Select(x => x?.WindowHandle), (targetBounds, hwnd) => new { nativeBounds = targetBounds, hwnd })
+                .Subscribe(x =>
+                {
+                    if (x.hwnd == null)
+                    {
+                        // window is not yet initialized
+                        return;
+                    }
+                    
+                    // WARNING - SetWindowRect is blocking as it awaits for WndProc to process the corresponding WM_* messages
+                    UnsafeNative.SetWindowRect(x.hwnd.Value, x.nativeBounds);
+                })
+                .AddTo(Anchors);
+
+            windowPositionSource
+                .Where(x => x != nativeBounds)
+                .ObserveOnDispatcher(DispatcherPriority.DataBind)
+                .Subscribe(x =>
+                {
+                    NativeBounds = x;
+                })
+                .AddTo(Anchors);
+
+            this.WhenAnyValue(x => x.OverlayWindow)
+                .Where(x => x != null)
+                .Subscribe(x =>
+                {
+                    var hwndSource = HwndSource.FromHwnd(x.WindowHandle).AddTo(Anchors);
+                    //Callback will happen on a OverlayWindow UI thread, usually it's app main UI thread
+                    hwndSource.AddHook(WndProc);
+                })
+                .AddTo(Anchors);
+        }
+        
+        private IntPtr WndProc(IntPtr hwnd, int msgRaw, IntPtr wParam, IntPtr lParam, ref bool handled)
+        {
+            var msg = (User32.WindowMessage)msgRaw;
+            if (msg == User32.WindowMessage.WM_WINDOWPOSCHANGED && lParam != IntPtr.Zero)
+            {
+                var nativeStruct = Marshal.PtrToStructure(lParam, typeof(UnsafeNative.WINDOWPOS));
+                if (nativeStruct != null)
+                {
+                    var wp = (UnsafeNative.WINDOWPOS)nativeStruct;
+                    windowPositionSource.OnNext(new Rectangle(wp.x, wp.y, wp.cx, wp.cy));
+                }
+            }
+            return IntPtr.Zero;
         }
 
         protected IObservable<Unit> WhenLoaded => whenLoaded;
@@ -172,7 +215,11 @@ namespace PoeShared.Native
 
         public PointF Dpi => dpi.Value;
 
-        public Rectangle NativeBounds => nativeBounds.Value;
+        public Rectangle NativeBounds
+        {
+            get => nativeBounds;
+            set => RaiseAndSetIfChanged(ref nativeBounds, value);
+        }
         
         public double Left
         {

@@ -146,7 +146,7 @@ namespace PoeShared.Native
                         break;
                     } 
                     
-                    var pos = (WINDOWPOS) Marshal.PtrToStructure(lParam, typeof(WINDOWPOS));
+                    var pos = (UnsafeNative.WINDOWPOS) Marshal.PtrToStructure(lParam, typeof(UnsafeNative.WINDOWPOS));
                     if ((pos.flags & (int) SWP.NOMOVE) != 0)
                     {
                         break;
@@ -217,18 +217,6 @@ namespace PoeShared.Native
         private enum SWP
         {
             NOMOVE = 0x0002
-        }
-
-        [StructLayout(LayoutKind.Sequential)]
-        private struct WINDOWPOS
-        {
-            public readonly IntPtr hwnd;
-            public readonly IntPtr hwndInsertAfter;
-            public int x;
-            public int y;
-            public int cx;
-            public int cy;
-            public readonly int flags;
         }
 
         private struct DragParams

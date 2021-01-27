@@ -14,6 +14,8 @@ namespace PoeShared.Native
             this.Loaded += OnLoaded;
         }
 
+        public IntPtr WindowHandle => windowHandleSupplier.Value;
+
         private void OnLoaded(object sender, RoutedEventArgs e)
         {
             UnsafeNative.HideSystemMenu(windowHandleSupplier.Value);

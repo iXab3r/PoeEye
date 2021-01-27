@@ -14,21 +14,21 @@ namespace PoeShared.Native
     {
         Rect Bounds { get; }
         
-        System.Drawing.Rectangle NativeBounds { get; }
+        System.Drawing.Rectangle NativeBounds { get; set; }
         
         PointF Dpi { get; }
     
-        double Left { get; set; }
+        double Left { get; }
 
-        double Top { get; set; }
+        double Top { get; }
 
-        double Width { get; set; }
+        double Width { get; }
 
-        double Height { get; set; }
+        double Height { get; }
 
-        double ActualWidth { get; set; }
+        double ActualWidth { get; }
 
-        double ActualHeight { get; set; }
+        double ActualHeight { get; }
 
         float Opacity { get; set; }
 

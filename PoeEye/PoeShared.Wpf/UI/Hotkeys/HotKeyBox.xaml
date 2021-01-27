@@ -7,6 +7,7 @@
         <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.textbox.xaml" />
         <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.textblock.xaml" />
         <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.menu.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Colors.xaml" />
     </ResourceDictionary.MergedDictionaries>
     
     <Style TargetType="{x:Type hotkeys:HotKeyBox}">
@@ -17,6 +18,7 @@
         <Setter Property="VerticalContentAlignment" Value="Center"/>
         <Setter Property="HorizontalContentAlignment" Value="Center"/>
         <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Foreground" Value="{StaticResource PositiveBrush}"/>
         <Setter Property="ToolTip" Value="Press Backspace, Delete or Escape to reset. Double-click respective keys to assign them as HotKeys"/>
         <Setter Property="Template">
             <Setter.Value>

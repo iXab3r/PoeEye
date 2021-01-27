@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Reactive.Disposables;
 using System.Reactive.Subjects;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using log4net;
@@ -18,7 +19,20 @@ namespace PoeShared.Native
         private static readonly ILog Log = LogManager.GetLogger(typeof(WinEventHookWrapper));
 
         private readonly WinEventHookArguments hookArgs;
-        private readonly ISubject<IntPtr> whenWindowEventTriggered = new Subject<IntPtr>();
+        private readonly ISubject<(IntPtr hWinEventHook,
+            User32.WindowsEventHookType @event,
+            IntPtr hwnd,
+            int idObject,
+            int idChild,
+            int dwEventThread,
+            uint dwmsEventTime)> whenWindowEventTriggered = new Subject<(IntPtr hWinEventHook,
+            User32.WindowsEventHookType @event,
+            IntPtr hwnd,
+            int idObject,
+            int idChild,
+            int dwEventThread,
+            uint dwmsEventTime)>();
+        
         private readonly User32.WinEventProc eventDelegate;
 
         public WinEventHookWrapper(WinEventHookArguments hookArgs)
@@ -31,7 +45,13 @@ namespace PoeShared.Native
             var hookEventLoopTask = Task.Factory.StartNew(Run, TaskCreationOptions.LongRunning).AddTo(Anchors);
         }
 
-        public IObservable<IntPtr> WhenWindowEventTriggered => whenWindowEventTriggered;
+        public IObservable<(IntPtr hWinEventHook,
+            User32.WindowsEventHookType @event,
+            IntPtr hwnd,
+            int idObject,
+            int idChild,
+            int dwEventThread,
+            uint dwmsEventTime)> WhenWindowEventTriggered => whenWindowEventTriggered;
 
         private void WinEventDelegateProc(IntPtr hWinEventHook,
             User32.WindowsEventHookType @event,
@@ -41,13 +61,20 @@ namespace PoeShared.Native
             int dwEventThread,
             uint dwmsEventTime)
         {
-            if (Log.IsDebugEnabled)
+            try
             {
-                Log.Debug(
-                    $"[{hookArgs}] Event hook triggered, hWinEventHook: {hWinEventHook.ToHexadecimal()}, eventType: {@event}, hwnd: {hwnd.ToHexadecimal()}, idObject: {idObject}, idChild: {idChild}, dwEventThread: {dwEventThread}, dwmsEventTime: {dwmsEventTime}");
-            }
+                if (Log.IsDebugEnabled)
+                {
+                    Log.Debug(
+                        $"[{hookArgs}] Event hook triggered, hWinEventHook: {hWinEventHook.ToHexadecimal()}, eventType: {@event}, hwnd: {hwnd.ToHexadecimal()}, idObject: {idObject}, idChild: {idChild}, dwEventThread: {dwEventThread}, dwmsEventTime: {dwmsEventTime}");
+                }
 
-            whenWindowEventTriggered.OnNext(hwnd);
+                whenWindowEventTriggered.OnNext((hWinEventHook, @event, hwnd, idObject, idChild, dwEventThread, dwmsEventTime));
+            }
+            catch (Exception e)
+            {
+                Log.Warn($"Exception in window hook, args: {hookArgs}", e);
+            }
         }
 
         private void Run()
@@ -95,24 +122,31 @@ namespace PoeShared.Native
 
             public static void Run()
             {
-                MSG msg;
-
-                while (true)
+                try
                 {
-                    if (PeekMessage(out msg, IntPtr.Zero, 0, 0, PM_REMOVE))
-                    {
-                        if (msg.Message == WM_QUIT)
-                        {
-                            break;
-                        }
+                    MSG msg;
 
-                        TranslateMessage(ref msg);
-                        DispatchMessage(ref msg);
-                    }
-                    else
+                    while (true)
                     {
-                        WaitMessage();
+                        if (PeekMessage(out msg, IntPtr.Zero, 0, 0, PM_REMOVE))
+                        {
+                            if (msg.Message == WM_QUIT)
+                            {
+                                break;
+                            }
+
+                            TranslateMessage(ref msg);
+                            DispatchMessage(ref msg);
+                        }
+                        else
+                        {
+                            WaitMessage();
+                        }
                     }
+                }
+                catch (Exception e)
+                {
+                    Log.Warn("Exception in EventLoop handler", e);
                 }
             }
 
