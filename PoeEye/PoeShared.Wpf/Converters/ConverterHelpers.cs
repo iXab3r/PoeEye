@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Drawing;
 using System.Linq;
 
 namespace PoeShared.Converters
@@ -8,43 +9,38 @@ namespace PoeShared.Converters
     {
         public static bool IsNullOrEmpty(object value)
         {
-            bool isNull;
-            if (value is string)
+            if (value == null)
             {
-                isNull = IsNull(value as string);
+                return true;
             }
-            else if (value is IList)
+            
+            return value switch
             {
-                isNull = IsNull(value as IList);
-            }
-            else if (value is IEnumerable)
-            {
-                isNull = IsNull(value as IEnumerable);
-            }
-            else if (value is TimeSpan timeSpan)
-            {
-                isNull = timeSpan == TimeSpan.Zero;
-            }
-            else
-            {
-                isNull = value == null;
-            }
-
-            return isNull;
+                string s => IsNullOrDefault(s),
+                IList list => IsNullOrDefault(list),
+                IEnumerable enumerable => IsNullOrDefault(enumerable),
+                TimeSpan timeSpan => timeSpan == TimeSpan.Zero,
+                Rectangle rectangle => IsNullOrDefault(rectangle),
+                _ => false
+            };
         }
-
         
-        private static bool IsNull(string value)
+        private static bool IsNullOrDefault<T>(T value) 
+        {
+            return value == null || value.Equals(default(T));
+        }
+        
+        private static bool IsNullOrDefault(string value)
         {
             return string.IsNullOrWhiteSpace(value);
         }
 
-        private static bool IsNull(IList collection)
+        private static bool IsNullOrDefault(IList collection)
         {
             return collection == null || collection.Count <= 0;
         }
 
-        private static bool IsNull(IEnumerable collection)
+        private static bool IsNullOrDefault(IEnumerable collection)
         {
             return collection == null
                 ? true
