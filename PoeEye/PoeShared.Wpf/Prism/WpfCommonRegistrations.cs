@@ -6,6 +6,7 @@ using PoeShared.Modularity;
 using PoeShared.Scaffolding;
 using PoeShared.Services;
 using PoeShared.UI.Hotkeys;
+using PoeShared.Wpf.Services;
 using PoeShared.Wpf.UI.ExceptionViewer;
 using PoeShared.Wpf.UI.Settings;
 using ReactiveUI;
@@ -43,6 +44,7 @@ namespace PoeShared.Prism
                 .RegisterSingleton<PoeEyeModulesRegistrator>(typeof(IPoeEyeModulesRegistrator), typeof(IPoeEyeModulesEnumerator))
                 .RegisterSingleton<IExceptionDialogDisplayer, ExceptionDialogDisplayer>()
                 .RegisterSingleton<ISchedulerProvider, SchedulerProvider>()
+                .RegisterSingleton<IUserInputFilterConfigurator, UserInputFilterConfigurator>()
                 .RegisterSingleton<IApplicationAccessor, ApplicationAccessor>()
                 .RegisterSingleton<IHotkeyConverter, HotkeyConverter>();
 
