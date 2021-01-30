@@ -348,7 +348,17 @@ namespace PoeShared.Native
 
         public DispatcherOperation BeginInvoke(Action dispatcherAction)
         {
-            return uiDispatcher.BeginInvoke(dispatcherAction);
+            return uiDispatcher.BeginInvoke(() =>
+            {
+                try
+                {
+                    dispatcherAction();
+                }
+                catch (Exception e)
+                {
+                    Log.Warn($"[{this}] Failed to execute operation on dispatcher", e);
+                }
+            });
         }
 
         protected virtual void ApplyConfig(IOverlayConfig config)
