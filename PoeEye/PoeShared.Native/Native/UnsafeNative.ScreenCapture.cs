@@ -1,5 +1,6 @@
 using System;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 using WindowsFormsAero;
 using PInvoke;
@@ -17,14 +18,40 @@ namespace PoeShared.Native
         [DllImport("gdi32.dll", SetLastError = true)]
         public static extern IntPtr GetCurrentObject(IntPtr hdc, ushort objectType);
 
-        public static Bitmap CaptureDesktop()
-        {
-            return GetWindowImageViaPrintWindow(GetDesktopWindow());
-        }
 
         public static Bitmap GetWindowImageViaPrintWindow(IntPtr hwnd)
         {
             return GetWindowImageViaPrintWindow(hwnd, Rectangle.Empty);
+        }
+
+        public static Bitmap GetDesktopImageViaCopyFromScreen(Rectangle region)
+        {
+            if (region.Width <= 0 || region.Height <= 0)
+            {
+                return null;
+            }
+            
+            var sourceBmp = new Bitmap(region.Width, region.Height, PixelFormat.Format32bppArgb);;
+            using var captureGraphics = Graphics.FromImage(sourceBmp);
+            captureGraphics.CopyFromScreen(region.Left,region.Top,0,0,region.Size);
+            return sourceBmp;
+        }
+        
+        public static Bitmap GetWindowImageViaCopyFromScreen(IntPtr hwnd, Rectangle region)
+        {
+            var sourceRegion = GetAbsoluteClientRect(hwnd);
+            if (sourceRegion.Width <= 0 || sourceRegion.Height <= 0)
+            {
+                return null;
+            }
+                
+            var captureRegion = sourceRegion;
+            if (!region.IsEmpty)
+            {
+                captureRegion.Intersect(region);
+            }
+
+            return GetDesktopImageViaCopyFromScreen(captureRegion);
         }
 
         public static Bitmap GetWindowImageViaPrintWindow(IntPtr hwnd, Rectangle region)
