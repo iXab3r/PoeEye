@@ -41,6 +41,7 @@
     <PackageReference Include="Unity" Version="5.10.3" />
     <PackageReference Include="Unity.Abstractions" Version="4.1.3" />
     <PackageReference Include="Unity.Container" Version="5.10.3" />
+    <PackageReference Include="Windows-Forms-Aero" Version="3.1.1" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Notifications\mercury.wav" />

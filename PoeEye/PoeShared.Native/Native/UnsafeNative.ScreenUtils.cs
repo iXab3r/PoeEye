@@ -1,16 +1,13 @@
 using System;
-using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
-using System.Reactive.Disposables;
-using System.Threading;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Interop;
-using System.Windows.Media;
 using PInvoke;
 using PoeShared.Scaffolding;
 using Point = System.Drawing.Point;
+using Size = System.Drawing.Size;
 
 namespace PoeShared.Native
 {
@@ -65,6 +62,7 @@ namespace PoeShared.Native
                     Log.Warn($"Failed to GetDC for screen {windowHandle.ToInt64()}, error: {error}");
                     return $"ERROR: {error}";
                 }
+
                 var graphics = Graphics.FromHdc(screenDc.DangerousGetHandle());
                 var scaledBounds = CalculateScreenBounds(screen, new PointF(graphics.DpiX, graphics.DpiY));
                 return new
@@ -79,34 +77,35 @@ namespace PoeShared.Native
             var desktopWindow = User32.GetDesktopWindow();
             return GetDesktopDpi(desktopWindow);
         }
-        
+
         public static PointF GetDesktopDpiFromPoint(Point location)
         {
-            var desktopWindow = User32.MonitorFromPoint(new POINT { x = location.X, y = location.Y}, User32.MonitorOptions.MONITOR_DEFAULTTONULL);
+            var desktopWindow = User32.MonitorFromPoint(new POINT {x = location.X, y = location.Y}, User32.MonitorOptions.MONITOR_DEFAULTTONULL);
             return desktopWindow == IntPtr.Zero ? PointF.Empty : GetDesktopDpi(desktopWindow);
         }
-        
+
         public static PointF GetDesktopDpiFromWindow(Window window)
         {
             if (window == null)
             {
                 return GetDesktopDpi();
             }
+
             var desktopWindow = new WindowInteropHelper(window).EnsureHandle();
             var desktop = User32.MonitorFromWindow(desktopWindow, User32.MonitorOptions.MONITOR_DEFAULTTONULL);
             return desktopWindow == IntPtr.Zero ? PointF.Empty : GetDesktopDpi(desktop);
         }
-        
+
         public static PointF GetSystemDpi()
         {
-            using(var screenHandle = User32.GetDC(IntPtr.Zero))
+            using (var screenHandle = User32.GetDC(IntPtr.Zero))
             {
                 return new PointF(
-                    Gdi32.GetDeviceCaps(screenHandle, Gdi32.DeviceCap.LOGPIXELSX), 
+                    Gdi32.GetDeviceCaps(screenHandle, Gdi32.DeviceCap.LOGPIXELSX),
                     Gdi32.GetDeviceCaps(screenHandle, Gdi32.DeviceCap.LOGPIXELSY));
             }
         }
-        
+
         public static PointF GetDesktopDpi(IntPtr hDesktop)
         {
             using (var desktopDc = User32.GetDC(hDesktop))
@@ -117,17 +116,17 @@ namespace PoeShared.Native
                     Log.Warn($"Failed to GetDC for desktop {hDesktop.ToInt64()}, error: {error}");
                     return PointF.Empty;
                 }
-                
-                using ( var graphics = Graphics.FromHdc(desktopDc.DangerousGetHandle()))
+
+                using (var graphics = Graphics.FromHdc(desktopDc.DangerousGetHandle()))
                 {
                     return GetDpi(graphics);
                 }
             }
         }
-        
+
         private static PointF GetDpi(Graphics graphics)
         {
-            return new PointF(graphics.DpiX / 96f, graphics.DpiY / 96f);
+            return new(graphics.DpiX / 96f, graphics.DpiY / 96f);
         }
 
         public static Rectangle GetClientRect(IntPtr hwnd)
@@ -140,15 +139,15 @@ namespace PoeShared.Native
             }
 
             var windowBounds = GetWindowRect(hwnd);
-            var clientSize = new System.Drawing.Size(rect.right - rect.left, rect.bottom - rect.top);
-            
+            var clientSize = new Size(rect.right - rect.left, rect.bottom - rect.top);
+
             return new Rectangle(
-                windowBounds.Left, 
+                windowBounds.Left,
                 windowBounds.Top,
                 clientSize.Width,
                 clientSize.Height);
         }
-        
+
         public static bool IsWindowsXP()
         {
             return OSVersion.Major == 5 && OSVersion.Minor == 1;
@@ -156,7 +155,7 @@ namespace PoeShared.Native
 
         public static bool IsWindowsXPOrGreater()
         {
-            return (OSVersion.Major == 5 && OSVersion.Minor >= 1) || OSVersion.Major > 5;
+            return OSVersion.Major == 5 && OSVersion.Minor >= 1 || OSVersion.Major > 5;
         }
 
         public static bool IsWindowsVista()
@@ -176,7 +175,7 @@ namespace PoeShared.Native
 
         public static bool IsWindows7OrGreater()
         {
-            return (OSVersion.Major == 6 && OSVersion.Minor >= 1) || OSVersion.Major > 6;
+            return OSVersion.Major == 6 && OSVersion.Minor >= 1 || OSVersion.Major > 6;
         }
 
         public static bool IsWindows8()
@@ -186,14 +185,14 @@ namespace PoeShared.Native
 
         public static bool IsWindows8OrGreater()
         {
-            return (OSVersion.Major == 6 && OSVersion.Minor >= 2) || OSVersion.Major > 6;
+            return OSVersion.Major == 6 && OSVersion.Minor >= 2 || OSVersion.Major > 6;
         }
 
         public static bool IsWindows10OrGreater(int build = -1)
         {
             return OSVersion.Major >= 10 && OSVersion.Build >= build;
         }
-        
+
         public static IntPtr GetDesktopWindow()
         {
             return User32.GetDesktopWindow();
@@ -202,31 +201,34 @@ namespace PoeShared.Native
         public static bool SetForegroundWindow(IntPtr hwnd)
         {
             Log.Debug($"[{hwnd.ToHexadecimal()}] Setting foreground window");
-            
+
             var foregroundWindow = GetForegroundWindow();
             if (hwnd == foregroundWindow)
             {
                 Log.Debug($"[{hwnd.ToHexadecimal()}] Window is already foreground");
                 return true;
             }
-            
+
             var foregroundThreadId = User32.GetWindowThreadProcessId(foregroundWindow, out var foregroundProcessId);
             if (foregroundThreadId <= 0)
             {
-                Log.Warn($"[{hwnd.ToHexadecimal()}] Failed to retrieve foreground thread({foregroundWindow.ToHexadecimal()}) of process {foregroundProcessId} for window {foregroundWindow.ToHexadecimal()} ({GetWindowTitle(foregroundWindow)}), last error: {Kernel32.GetLastError()}");
+                Log.Warn(
+                    $"[{hwnd.ToHexadecimal()}] Failed to retrieve foreground thread({foregroundWindow.ToHexadecimal()}) of process {foregroundProcessId} for window {foregroundWindow.ToHexadecimal()} ({GetWindowTitle(foregroundWindow)}), last error: {Kernel32.GetLastError()}");
                 return false;
             }
+
             var appThread = GetCurrentThreadId();
             try
             {
                 if (foregroundThreadId != appThread)
                 {
                     Log.Debug($"[{hwnd.ToHexadecimal()}] Attaching thread input of thread {appThread} to thread {foregroundThreadId} of process {foregroundProcessId}");
-                    User32.AttachThreadInput( appThread, foregroundThreadId, true);
+                    User32.AttachThreadInput(appThread, foregroundThreadId, true);
                 }
+
                 Log.Debug($"[{hwnd.ToHexadecimal()}] Requesting window activation");
                 Win32ErrorCode error;
-                
+
                 if (!BringWindowToTop(hwnd) && (error = Kernel32.GetLastError()) != Win32ErrorCode.NERR_Success)
                 {
                     Log.Warn($"Failed to SetForegroundWindow.BringWindowToTop({hwnd.ToHexadecimal()}), error: {error}");
@@ -238,7 +240,7 @@ namespace PoeShared.Native
                     Log.Warn($"[{hwnd.ToHexadecimal()}] Failed to SetForegroundWindow({hwnd.ToHexadecimal()})");
                     return false;
                 }
-                
+
                 return true;
             }
             finally
@@ -249,34 +251,6 @@ namespace PoeShared.Native
                     User32.AttachThreadInput(appThread, foregroundThreadId, false);
                 }
             }
-        }
-        
-        public static Bitmap CaptureDesktop()
-        {
-            return CaptureWindow(GetDesktopWindow());
-        }
-
-        public static Bitmap CaptureWindow(IntPtr hwnd)
-        {
-            var bounds = GetWindowRect(hwnd);
-            if (bounds.Width == 0 || bounds.Height == 0)
-            {
-                throw new PInvoke.Win32Exception();
-            }
-            
-            var result = new Bitmap(bounds.Width, bounds.Height);
-            using var graphics = Graphics.FromImage(result);
-            
-            var dc = graphics.GetHdc();
-            var success = User32.PrintWindow(hwnd, dc, (User32.PrintWindowFlags) 0x00000002); // PW_RENDERFULLCONTENT
-            if (!success)
-            {
-                var error = Kernel32.GetLastError();
-                Log.Warn($"Failed to PrintWindow content of HWND {hwnd.ToHexadecimal()} (title: {UnsafeNative.GetWindowTitle(hwnd)}, rect: {UnsafeNative.GetWindowRect(hwnd)})");
-                throw new PInvoke.Win32Exception(error);
-            }
-
-            return result;
         }
     }
 }
