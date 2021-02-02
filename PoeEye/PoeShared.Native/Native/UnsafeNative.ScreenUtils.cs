@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
 using System.Reactive.Disposables;
@@ -248,6 +249,34 @@ namespace PoeShared.Native
                     User32.AttachThreadInput(appThread, foregroundThreadId, false);
                 }
             }
+        }
+        
+        public static Bitmap CaptureDesktop()
+        {
+            return CaptureWindow(GetDesktopWindow());
+        }
+
+        public static Bitmap CaptureWindow(IntPtr hwnd)
+        {
+            var bounds = GetWindowRect(hwnd);
+            if (bounds.Width == 0 || bounds.Height == 0)
+            {
+                throw new PInvoke.Win32Exception();
+            }
+            
+            var result = new Bitmap(bounds.Width, bounds.Height);
+            using var graphics = Graphics.FromImage(result);
+            
+            var dc = graphics.GetHdc();
+            var success = User32.PrintWindow(hwnd, dc, (User32.PrintWindowFlags) 0x00000002); // PW_RENDERFULLCONTENT
+            if (!success)
+            {
+                var error = Kernel32.GetLastError();
+                Log.Warn($"Failed to PrintWindow content of HWND {hwnd.ToHexadecimal()} (title: {UnsafeNative.GetWindowTitle(hwnd)}, rect: {UnsafeNative.GetWindowRect(hwnd)})");
+                throw new PInvoke.Win32Exception(error);
+            }
+
+            return result;
         }
     }
 }
