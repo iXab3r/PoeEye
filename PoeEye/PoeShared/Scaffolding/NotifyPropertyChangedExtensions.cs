@@ -108,9 +108,18 @@ namespace PoeShared.Scaffolding
             TimeSpan timeout)
             where TObject : INotifyPropertyChanged
         {
-            return instance
-                .WhenAnyValue(ex1)
-                .Where(x => condition(x))
+            var source = instance
+                .WhenAnyValue(ex1);
+            
+            if (timeout <= TimeSpan.Zero)
+            {
+                return source
+                    .Select(x => condition(x) == false ? throw new TimeoutException($"Value {x} does not satisfy condition") : x)
+                    .Take(1)
+                    .ToTask();
+            }
+
+            return source.Where(x => condition(x))
                 .Take(1)
                 .Timeout(timeout)
                 .ToTask();
