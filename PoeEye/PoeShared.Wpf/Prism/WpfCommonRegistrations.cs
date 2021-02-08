@@ -5,6 +5,7 @@ using PoeShared.Audio.ViewModels;
 using PoeShared.Modularity;
 using PoeShared.Scaffolding;
 using PoeShared.Services;
+using PoeShared.UI;
 using PoeShared.UI.Hotkeys;
 using PoeShared.Wpf.Services;
 using PoeShared.Wpf.UI.ExceptionViewer;
@@ -51,6 +52,7 @@ namespace PoeShared.Prism
             Container
                 .RegisterType<IHotkeyTracker, HotkeyTracker>()
                 .RegisterType<IGenericSettingsViewModel, GenericSettingsViewModel>()
+                .RegisterType<IRandomPeriodSelector, RandomPeriodSelector>()
                 .RegisterType<IAudioNotificationSelectorViewModel, AudioNotificationSelectorViewModel>();
         }
     }

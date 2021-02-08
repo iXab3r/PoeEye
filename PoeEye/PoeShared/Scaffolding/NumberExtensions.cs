@@ -1,3 +1,5 @@
+using System;
+
 namespace PoeShared.Scaffolding
 {
     public static class NumberExtensions
@@ -20,6 +22,17 @@ namespace PoeShared.Scaffolding
         public static string ToHexadecimal(this ushort value)
         {
             return ToHexadecimal((long)value);
+        }
+        
+        public static TimeSpan EnsureInRange(this TimeSpan value, TimeSpan min, TimeSpan max)
+        {
+            return TimeSpan.FromMilliseconds(EnsureInRange(value.TotalMilliseconds, min.TotalMilliseconds,
+                max.TotalMilliseconds));
+        }
+
+        public static double EnsureInRange(this double value, double min, double max)
+        {
+            return Math.Max(Math.Min(value, max), min);
         }
     }
 }
