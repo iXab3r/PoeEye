@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Reactive.Linq;
+using log4net;
 using PoeShared.Scaffolding;
 
 namespace PoeShared.UI
 {
     internal sealed class RandomPeriodSelector : DisposableReactiveObject, IRandomPeriodSelector
     {
+        private static readonly ILog Log = LogManager.GetLogger(typeof(RandomPeriodSelector));
+
         private readonly IRandomNumberGenerator rng;
 
         private TimeSpan upperValue;
@@ -21,17 +24,17 @@ namespace PoeShared.UI
             
             this.WhenAnyProperty(x => x.UpperValue)
                 .Where(_ => !randomizeValue && upperValue != lowerValue)
-                .Subscribe(() => RandomizeValue = true)
+                .SubscribeSafe(() => RandomizeValue = true, Log.HandleUiException)
                 .AddTo(Anchors);
             
             this.WhenAnyProperty(x => x.UpperValue, x => x.RandomizeValue)
                 .Where(x => lowerValue > upperValue || !randomizeValue)
-                .Subscribe(x => LowerValue = upperValue)
+                .SubscribeSafe(x => LowerValue = upperValue, Log.HandleUiException)
                 .AddTo(Anchors);
             
             this.WhenAnyProperty(x => x.LowerValue, x => x.RandomizeValue)
                 .Where(x => upperValue < lowerValue || !randomizeValue)
-                .Subscribe(x => UpperValue = lowerValue)
+                .SubscribeSafe(x => UpperValue = lowerValue, Log.HandleUiException)
                 .AddTo(Anchors);
         }
 

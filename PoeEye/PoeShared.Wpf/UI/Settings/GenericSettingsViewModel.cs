@@ -54,14 +54,14 @@ namespace PoeShared.Wpf.UI.Settings
                         .Take(1),
                     (unit, b) => Unit.Default)
                 .Select(x => modulesEnumerator.Settings.ToArray())
-                .Subscribe(ReloadModulesList)
+                .SubscribeSafe(ReloadModulesList, Log.HandleUiException)
                 .AddTo(Anchors);
 
             this.WhenAnyValue(x => x.IsOpen)
                 .WithPrevious((prev, curr) => new {prev, curr})
                 .DistinctUntilChanged()
                 .Where(x => x.curr && x.prev == false)
-                .Subscribe(ReloadConfigs)
+                .SubscribeSafe(ReloadConfigs, Log.HandleUiException)
                 .AddTo(Anchors);
 
             SaveConfigCommand = new DelegateCommand(
@@ -76,7 +76,7 @@ namespace PoeShared.Wpf.UI.Settings
             moduleSettings
                 .Connect()
                 .Bind(out var moduleSettingsSource)
-                .Subscribe()
+                .SubscribeSafe(Log.HandleUiException)
                 .AddTo(Anchors);
             ModulesSettings = moduleSettingsSource;
         }

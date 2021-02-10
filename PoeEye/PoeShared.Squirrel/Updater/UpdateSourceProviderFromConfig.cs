@@ -24,20 +24,20 @@ namespace PoeShared.Squirrel.Updater
 
             configProvider
                 .ListenTo(x => x.UpdateSource)
-                .Subscribe(x => UpdateSource = x)
+                .SubscribeSafe(x => UpdateSource = x, Log.HandleUiException)
                 .AddTo(Anchors);
 
             this.WhenAnyValue(x => x.UpdateSource)
                 .DistinctUntilChanged()
                 .Where(x => !x.Equals(configProvider.ActualConfig.UpdateSource))
-                .Subscribe(
+                .SubscribeSafe(
                     x =>
                     {
                         Log.Debug($"Saving UpdateSource into config {configProvider.ActualConfig.UpdateSource} => {x}");
                         var newConfig = configProvider.ActualConfig.CloneJson();
                         newConfig.UpdateSource = x;
                         configProvider.Save(newConfig);
-                    })
+                    }, Log.HandleUiException)
                 .AddTo(Anchors);
         }
 

@@ -46,17 +46,17 @@ namespace PoeShared.Squirrel.Updater
 
             CheckForUpdatesCommand
                 .ThrownExceptions
-                .Subscribe(ex => SetError($"Update error: {ex.Message}"))
+                .SubscribeSafe(ex => SetError($"Update error: {ex.Message}"))
                 .AddTo(Anchors);
 
             configProvider.ListenTo(x => x.AutoUpdateTimeout)
                 .ObserveOn(uiScheduler)
-                .Subscribe(x => CheckForUpdates = x > TimeSpan.Zero)
+                .SubscribeSafe(x => CheckForUpdates = x > TimeSpan.Zero, Log.HandleUiException)
                 .AddTo(Anchors);
 
             this.ObservableForProperty(x => x.CheckForUpdates, skipInitial: true).ToUnit()
                 .ObserveOn(uiScheduler)
-                .Subscribe(() =>
+                .SubscribeSafe(() =>
                 {
                     var updateConfig = configProvider.ActualConfig.CloneJson();
                     if (CheckForUpdates && updateConfig.AutoUpdateTimeout <= TimeSpan.Zero)
@@ -86,17 +86,17 @@ namespace PoeShared.Squirrel.Updater
 
             RestartCommand
                 .ThrownExceptions
-                .Subscribe(ex => SetError($"Restart error: {ex.Message}"))
+                .SubscribeSafe(ex => SetError($"Restart error: {ex.Message}"))
                 .AddTo(Anchors);
 
             updateSourceProvider
                 .WhenAnyValue(x => x.UpdateSource)
-                .Subscribe(x => updaterModel.UpdateSource = x)
+                .SubscribeSafe(x => updaterModel.UpdateSource = x, Log.HandleUiException)
                 .AddTo(Anchors);
             
             configProvider
                 .ListenTo(x => x.IgnoreDeltaUpdates)
-                .Subscribe(x => updaterModel.IgnoreDeltaUpdates = x)
+                .SubscribeSafe(x => updaterModel.IgnoreDeltaUpdates = x, Log.HandleUiException)
                 .AddTo(Anchors);
 
             Observable.Merge(
@@ -117,7 +117,7 @@ namespace PoeShared.Squirrel.Updater
                 .ObserveOn(uiScheduler)
                 .Do(reason => Log.Debug($"Checking for updates, reason: {reason}"))
                 .Where(x => CheckForUpdatesCommand.CanExecute(null))
-                .Subscribe(() => CheckForUpdatesCommand.Execute(null), Log.HandleException)
+                .SubscribeSafe(() => CheckForUpdatesCommand.Execute(null), Log.HandleException)
                 .AddTo(Anchors);
 
             ApplyUpdate = CommandWrapper.Create(

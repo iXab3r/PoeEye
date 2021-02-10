@@ -32,7 +32,7 @@ namespace PoeShared.Squirrel.Updater
                         h => wc.DownloadProgressChanged -= h)
                     .Where(x => progress != null)
                     .Sample(UiConstants.ArtificialShortDelay)
-                    .Subscribe(x => progress(x.EventArgs.ProgressPercentage))
+                    .SubscribeSafe(x => progress(x.EventArgs.ProgressPercentage), Log.HandleUiException)
                     .AddTo(progressAnchors);
                 try
                 {

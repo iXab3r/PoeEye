@@ -7,6 +7,7 @@ using System.Reactive.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Markup;
+using log4net;
 
 namespace PoeShared.Scaffolding.WPF
 {
@@ -21,6 +22,8 @@ namespace PoeShared.Scaffolding.WPF
     [ContentProperty("DataTemplates")]
     public class MappingTemplateSelector : DataTemplateSelector
     {
+        private static readonly ILog Log = LogManager.GetLogger(typeof(MappingTemplateSelector));
+
         private readonly Dictionary<string, DataTemplate> templateLookup;
 
         public MappingTemplateSelector()
@@ -88,13 +91,13 @@ namespace PoeShared.Scaffolding.WPF
                         handler => reactiveItem.PropertyChanged += handler, handler => reactiveItem.PropertyChanged -= handler)
                     .Where(x => x.EventArgs.PropertyName == KeyPropertyPath)
                     .Take(1)
-                    .Subscribe(
+                    .SubscribeSafe(
                         () =>
                         {
                             var presenter = (ContentPresenter) container;
                             presenter.ContentTemplateSelector = null;
                             presenter.ContentTemplateSelector = this;
-                        });
+                        }, Log.HandleUiException);
             }
 
             return templateLookup.TryGetValue(key, out var templateKey)

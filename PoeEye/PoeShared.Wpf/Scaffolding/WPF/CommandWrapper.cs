@@ -28,15 +28,15 @@ namespace PoeShared.Scaffolding.WPF
             InnerCommand = command;
             Observable.FromEventPattern<EventHandler, EventArgs>(x => command.IsActiveChanged += x, x => command.IsActiveChanged -= x)
                 .Select(x => command.IsActive)
-                .Subscribe(x => IsBusy = x, Log.HandleUiException)
+                .SubscribeSafe(x => IsBusy = x, Log.HandleUiException)
                 .AddTo(Anchors);
 
             isExecuting
-                .Subscribe(x => command.IsActive = x, Log.HandleUiException)
+                .SubscribeSafe(x => command.IsActive = x, Log.HandleUiException)
                 .AddTo(Anchors);
 
             raiseCanExecuteChangedRequests
-                .Subscribe(command.RaiseCanExecuteChanged, Log.HandleUiException)
+                .SubscribeSafe(command.RaiseCanExecuteChanged, Log.HandleUiException)
                 .AddTo(Anchors);
         }
 
@@ -124,10 +124,10 @@ namespace PoeShared.Scaffolding.WPF
         private static CommandWrapper FromReactiveCommand<T, TResult>(ReactiveCommand<T, TResult> command)
         {
             var result = new CommandWrapper(command);
-            command.IsExecuting.Subscribe(x => result.IsBusy = x).AddTo(result.Anchors);
-            command.ThrownExceptions.Subscribe(x => result.HandleException(x)).AddTo(result.Anchors);
+            command.IsExecuting.SubscribeSafe(x => result.IsBusy = x, Log.HandleUiException).AddTo(result.Anchors);
+            command.ThrownExceptions.SubscribeSafe(x => result.HandleException(x)).AddTo(result.Anchors);
             result.raiseCanExecuteChangedRequests
-                .Subscribe(() => Log.Warn($"RaiseCanExecuteChanged is not supported for commands of type {command}"))
+                .SubscribeSafe(() => Log.Warn($"RaiseCanExecuteChanged is not supported for commands of type {command}"), Log.HandleUiException)
                 .AddTo(result.Anchors);
 
             return result;
@@ -184,7 +184,7 @@ namespace PoeShared.Scaffolding.WPF
         {
             Guard.ArgumentNotNull(() => eventSource);
 
-            eventSource.Subscribe(RaiseCanExecuteChanged).AddTo(Anchors);
+            eventSource.SubscribeSafe(RaiseCanExecuteChanged, Log.HandleUiException).AddTo(Anchors);
             return this;
         }
 

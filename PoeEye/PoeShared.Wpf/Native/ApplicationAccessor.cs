@@ -18,7 +18,7 @@ namespace PoeShared.Services
                 .Select(x => x.EventArgs)
                 .ToUnit();
 
-            WhenExit.Subscribe(() => Log.Info($"Application exit requested"), Log.HandleException).AddTo(Anchors);
+            WhenExit.SubscribeSafe(() => Log.Info($"Application exit requested"), Log.HandleException).AddTo(Anchors);
         }
 
         public IObservable<Unit> WhenExit { get; }

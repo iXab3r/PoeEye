@@ -89,7 +89,7 @@ namespace PoeShared.Native
                 .AddTo(Anchors);
             
             this.WhenAnyValue(x => x.IsLocked, x => x.IsUnlockable)
-                .Subscribe(() =>
+                .SubscribeSafe(() =>
                 {
                     lockWindowCommand.RaiseCanExecuteChanged();
                     unlockWindowCommand.RaiseCanExecuteChanged();
@@ -97,7 +97,7 @@ namespace PoeShared.Native
                 .AddTo(Anchors);
             
             this.WhenAnyValue(x => x.OverlayMode)
-                .Subscribe(() =>
+                .SubscribeSafe(() =>
                 {
                     makeLayeredCommand.RaiseCanExecuteChanged();
                     makeTransparentCommand.RaiseCanExecuteChanged();
@@ -106,12 +106,12 @@ namespace PoeShared.Native
 
             this.WhenValueChanged(x => x.OverlayWindow, false)
                 .ToUnit()
-                .Subscribe(whenLoaded)
+                .SubscribeSafe(whenLoaded)
                 .AddTo(Anchors);
 
             this.WhenAnyValue(x => x.NativeBounds)
                 .CombineLatest(this.WhenAnyValue(x => x.OverlayWindow).Select(x => x?.WindowHandle), (targetBounds, hwnd) => new { nativeBounds = targetBounds, hwnd })
-                .Subscribe(x =>
+                .SubscribeSafe(x =>
                 {
                     if (x.hwnd == null)
                     {
@@ -121,26 +121,26 @@ namespace PoeShared.Native
                     
                     // WARNING - SetWindowRect is blocking as it awaits for WndProc to process the corresponding WM_* messages
                     UnsafeNative.SetWindowRect(x.hwnd.Value, x.nativeBounds);
-                })
+                }, Log.HandleUiException)
                 .AddTo(Anchors);
 
             windowPositionSource
                 .Where(x => x != nativeBounds)
                 .ObserveOnDispatcher(DispatcherPriority.DataBind)
-                .Subscribe(x =>
+                .SubscribeSafe(x =>
                 {
                     NativeBounds = x;
-                })
+                }, Log.HandleUiException)
                 .AddTo(Anchors);
 
             this.WhenAnyValue(x => x.OverlayWindow)
                 .Where(x => x != null)
-                .Subscribe(x =>
+                .SubscribeSafe(x =>
                 {
                     var hwndSource = HwndSource.FromHwnd(x.WindowHandle).AddTo(Anchors);
                     //Callback will happen on a OverlayWindow UI thread, usually it's app main UI thread
                     hwndSource.AddHook(WndProc);
-                })
+                }, Log.HandleUiException)
                 .AddTo(Anchors);
         }
         

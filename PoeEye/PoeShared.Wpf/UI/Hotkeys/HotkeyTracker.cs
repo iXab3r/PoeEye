@@ -40,7 +40,7 @@ namespace PoeShared.UI.Hotkeys
 
             this.WhenAnyValue(x => x.Hotkey)
                 .WithPrevious((prev, curr) => new { prev, curr })
-                .Subscribe(
+                .SubscribeSafe(
                     x =>
                     {
                         if (x.curr == null || x.curr.IsEmpty)
@@ -52,7 +52,7 @@ namespace PoeShared.UI.Hotkeys
                         {
                             Log.Debug($"Tracking hotkey changed (hotkey gesture {x.prev} => {x.curr})");
                         }
-                    })
+                    }, Log.HandleUiException)
                 .AddTo(Anchors);
 
             this.WhenAnyValue(x => x.Hotkey)
@@ -79,7 +79,7 @@ namespace PoeShared.UI.Hotkeys
                         Log.Debug($"Application is active, skipping hotkey {hotkeyData.Hotkey} (isDown: {hotkeyData.KeyDown}, suppressKey: {suppressKey},  configuredKey: {Hotkey}, mode: {HotkeyMode})");
                         return false;
                     })
-                .Subscribe(
+                .SubscribeSafe(
                     hotkeyData =>
                     {
                         Log.Debug($"Hotkey {hotkeyData.Hotkey} pressed, state: {(hotkeyData.KeyDown ? "down" : "up")}, suppressed: {suppressKey}");

@@ -36,7 +36,7 @@ namespace PoeShared.Scaffolding.WPF
                 .Observe(TreeView.SelectedItemProperty)
                 .Select(_ => AssociatedObject.SelectedItem)
                 .WithPrevious((prev, curr) => new { prev, curr })
-                .Subscribe(x => OnTreeViewSelectedItemChanged(x.prev, x.curr))
+                .SubscribeSafe(x => OnTreeViewSelectedItemChanged(x.prev, x.curr), Log.HandleUiException)
                 .AddTo(anchors);
         }
 

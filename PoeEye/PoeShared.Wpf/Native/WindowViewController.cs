@@ -36,7 +36,7 @@ namespace PoeShared.Native
             WhenClosed = Observable.FromEventPattern<EventHandler, EventArgs>(h => owner.Closed += h, h => owner.Closed -= h).ToUnit();
 
             this.WhenAnyValue(x => x.Topmost)
-                .Subscribe(x => owner.Topmost = x)
+                .SubscribeSafe(x => owner.Topmost = x, Log.HandleUiException)
                 .AddTo(Anchors);
         }
 

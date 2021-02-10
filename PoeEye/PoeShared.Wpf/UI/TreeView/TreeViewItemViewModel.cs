@@ -5,11 +5,14 @@ using System;
 using System.Collections.Generic;
 using System.Reactive.Linq;
 using DynamicData;
+using log4net;
 
 namespace PoeShared.UI.TreeView
 {
     public abstract class TreeViewItemViewModel : DisposableReactiveObject, ITreeViewItemViewModel
     {
+        private static readonly ILog Log = LogManager.GetLogger(typeof(TreeViewItemViewModel));
+
         private bool isExpanded = true;
         private static readonly Predicate<ITreeViewItemViewModel> TRUE = model => true;
 
@@ -25,14 +28,14 @@ namespace PoeShared.UI.TreeView
                 .Connect()
                 .Transform(x => (ITreeViewItemViewModel)x)
                 .Bind(out var chld)
-                .Subscribe()
+                .SubscribeSafe(Log.HandleUiException)
                 .AddTo(Anchors);
             Children = chld;
             Parent = parent;
             this.WhenAnyValue(x => x.Parent)
                 .Cast<TreeViewItemViewModel>()
                 .WithPrevious((prev, curr) => new { prev, curr })
-                .Subscribe(x =>
+                .SubscribeSafe(x =>
                 {
                     if (x.prev == x.curr)
                     {
@@ -41,7 +44,7 @@ namespace PoeShared.UI.TreeView
                     
                     x.prev?.children.Remove(this);
                     x.curr?.children.Add(this);
-                })
+                }, Log.HandleUiException)
                 .AddTo(Anchors);
         }
 

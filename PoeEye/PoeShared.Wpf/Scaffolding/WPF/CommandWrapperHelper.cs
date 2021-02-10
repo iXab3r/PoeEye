@@ -3,11 +3,14 @@ using System.Reactive.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using log4net;
 
 namespace PoeShared.Scaffolding.WPF
 {
     public sealed class CommandWrapperHelper
     {
+        private static readonly ILog Log = LogManager.GetLogger(typeof(CommandWrapperHelper));
+
         public static readonly DependencyProperty TextProperty = DependencyProperty.RegisterAttached(
             "Text",
             typeof(object),
@@ -76,7 +79,7 @@ namespace PoeShared.Scaffolding.WPF
                     d.Observe<DependencyObject, CommandWrapper>(ButtonBase.CommandProperty)
                         .Take(1)
                         .Where(x => x != null)
-                        .Subscribe(x => x.RaiseCanExecuteChanged());
+                        .SubscribeSafe(x => x.RaiseCanExecuteChanged(), Log.HandleUiException);
                 }
                 else if (d is MenuItem)
                 {

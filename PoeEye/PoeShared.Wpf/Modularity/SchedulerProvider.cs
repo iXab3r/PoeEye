@@ -22,10 +22,8 @@ namespace PoeShared.Modularity
         private readonly IScheduler uiScheduler;
 
         public SchedulerProvider(
-            [NotNull] [Dependency(WellKnownSchedulers.Background)]
-            IScheduler bgScheduler,
-            [NotNull] [Dependency(WellKnownSchedulers.UI)]
-            IScheduler uiScheduler)
+            [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler,
+            [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {
             this.uiScheduler = uiScheduler;
             Guard.ArgumentNotNull(bgScheduler, nameof(bgScheduler));
@@ -86,31 +84,31 @@ namespace PoeShared.Modularity
                     .FromEventPattern<DispatcherHookEventHandler, DispatcherHookEventArgs>(
                         h => scheduler.Dispatcher.Hooks.OperationStarted += h,
                         h => scheduler.Dispatcher.Hooks.OperationStarted -= h)
-                    .Subscribe(eventArgs => LogEvent("OperationStarted", eventArgs.EventArgs))
+                    .SubscribeSafe(eventArgs => LogEvent("OperationStarted", eventArgs.EventArgs), Log.HandleUiException)
                     .AddTo(Anchors);
                 Observable
                     .FromEventPattern<DispatcherHookEventHandler, DispatcherHookEventArgs>(
                         h => scheduler.Dispatcher.Hooks.OperationPriorityChanged += h,
                         h => scheduler.Dispatcher.Hooks.OperationPriorityChanged -= h)
-                    .Subscribe(eventArgs => LogEvent("OperationPriorityChanged", eventArgs.EventArgs))
+                    .SubscribeSafe(eventArgs => LogEvent("OperationPriorityChanged", eventArgs.EventArgs), Log.HandleUiException)
                     .AddTo(Anchors);
                 Observable
                     .FromEventPattern<DispatcherHookEventHandler, DispatcherHookEventArgs>(
                         h => scheduler.Dispatcher.Hooks.OperationAborted += h,
                         h => scheduler.Dispatcher.Hooks.OperationAborted -= h)
-                    .Subscribe(eventArgs => LogEvent("OperationAborted", eventArgs.EventArgs))
+                    .SubscribeSafe(eventArgs => LogEvent("OperationAborted", eventArgs.EventArgs), Log.HandleUiException)
                     .AddTo(Anchors);
                 Observable
                     .FromEventPattern<DispatcherHookEventHandler, DispatcherHookEventArgs>(
                         h => scheduler.Dispatcher.Hooks.OperationPriorityChanged += h,
                         h => scheduler.Dispatcher.Hooks.OperationPriorityChanged -= h)
-                    .Subscribe(eventArgs => LogEvent("OperationPriorityChanged", eventArgs.EventArgs))
+                    .SubscribeSafe(eventArgs => LogEvent("OperationPriorityChanged", eventArgs.EventArgs), Log.HandleUiException)
                     .AddTo(Anchors);
                 Observable
                     .FromEventPattern<DispatcherHookEventHandler, DispatcherHookEventArgs>(
                         h => scheduler.Dispatcher.Hooks.OperationPosted += h,
                         h => scheduler.Dispatcher.Hooks.OperationPosted -= h)
-                    .Subscribe(eventArgs => LogEvent("OperationPosted", eventArgs.EventArgs))
+                    .SubscribeSafe(eventArgs => LogEvent("OperationPosted", eventArgs.EventArgs), Log.HandleUiException)
                     .AddTo(Anchors);
                 Log.Debug($"Scheduler: {dispatcher}");
                 consumer.TrySetResult(scheduler);

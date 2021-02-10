@@ -6,6 +6,7 @@ using System.Windows.Input;
 using DynamicData;
 using DynamicData.Binding;
 using JetBrains.Annotations;
+using log4net;
 using PoeShared.Audio.Services;
 using PoeShared.Scaffolding;
 using PoeShared.Scaffolding.WPF;
@@ -14,9 +15,10 @@ using ReactiveUI;
 
 namespace PoeShared.Audio.ViewModels
 {
-    internal sealed class AudioNotificationSelectorViewModel : DisposableReactiveObject,
-        IAudioNotificationSelectorViewModel
+    internal sealed class AudioNotificationSelectorViewModel : DisposableReactiveObject, IAudioNotificationSelectorViewModel
     {
+        private static readonly ILog Log = LogManager.GetLogger(typeof(AudioNotificationSelectorViewModel));
+
         private static readonly string DefaultNotification = AudioNotificationType.Whistle.ToString();
         private readonly IAudioNotificationsManager notificationsManager;
         private bool audioEnabled;
@@ -62,7 +64,7 @@ namespace PoeShared.Audio.ViewModels
                 .Distinct()
                 .Transform(x => (object) new NotificationTypeWrapper(this, x, x.Pascalize()))
                 .Bind(out var notificationsSource)
-                .Subscribe()
+                .SubscribeSafe(Log.HandleUiException)
                 .AddTo(Anchors);
             Items = notificationsSource;
 
@@ -70,17 +72,17 @@ namespace PoeShared.Audio.ViewModels
                 .DistinctUntilChanged()
                 .Where(x => x)
                 .Where(x => selectedValue == AudioNotificationType.Disabled.ToString())
-                .Subscribe(() => SelectedValue = DefaultNotification)
+                .SubscribeSafe(() => SelectedValue = DefaultNotification, Log.HandleUiException)
                 .AddTo(Anchors);
 
             this.WhenAnyValue(x => x.AudioEnabled)
                 .DistinctUntilChanged()
                 .Where(x => !x)
-                .Subscribe(() => SelectedValue = AudioNotificationType.Disabled.ToString())
+                .SubscribeSafe(() => SelectedValue = AudioNotificationType.Disabled.ToString(), Log.HandleUiException)
                 .AddTo(Anchors);
 
             this.WhenAnyValue(x => x.SelectedValue)
-                .Subscribe(x => AudioEnabled = x != AudioNotificationType.Disabled.ToString())
+                .SubscribeSafe(x => AudioEnabled = x != AudioNotificationType.Disabled.ToString(), Log.HandleUiException)
                 .AddTo(Anchors);
         }
 
@@ -145,7 +147,7 @@ namespace PoeShared.Audio.ViewModels
 
                 this.owner
                     .WhenAnyValue(x => x.SelectedValue)
-                    .Subscribe(() => this.RaisePropertyChanged(nameof(IsSelected)));
+                    .SubscribeSafe(() => this.RaisePropertyChanged(nameof(IsSelected)), Log.HandleUiException);
             }
 
             public bool IsSelected => owner.SelectedValue == Value;

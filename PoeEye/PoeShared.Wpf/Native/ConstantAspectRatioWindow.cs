@@ -40,7 +40,7 @@ namespace PoeShared.Native
             this.Observe(TargetAspectRatioProperty)
                 .Select(_ => TargetAspectRatio)
                 .DistinctUntilChanged()
-                .Subscribe(
+                .SubscribeSafe(
                     targetAspectRatio =>
                     {
                         if (targetAspectRatio == null)
@@ -61,7 +61,7 @@ namespace PoeShared.Native
                         {
                             Log.Warn($"Failed to assign initial window {this} ({thisWindow.ToHexadecimal()}) size, TargetAspectRatio: {targetAspectRatio}, initial bounds: {bounds}, target bounds: {newBounds}");
                         } 
-                    })
+                    }, Log.HandleUiException)
                 .AddTo(anchors);
             Dpi = new PointF(1, 1);
         }
