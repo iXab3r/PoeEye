@@ -28,7 +28,7 @@ namespace PoeShared.UI.TreeView
                 .Connect()
                 .Transform(x => (ITreeViewItemViewModel)x)
                 .Bind(out var chld)
-                .SubscribeSafe(Log.HandleUiException)
+                .SubscribeToErrors(Log.HandleUiException)
                 .AddTo(Anchors);
             Children = chld;
             Parent = parent;

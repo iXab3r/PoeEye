@@ -48,7 +48,7 @@ namespace PoeShared.Native
                 .ObserveOn(uiScheduler)
                 .Transform(x => new WindowInteropHelper(x).EnsureHandle())
                 .Bind(out childWindows)
-                .SubscribeSafe(Log.HandleUiException)
+                .SubscribeToErrors(Log.HandleUiException)
                 .AddTo(Anchors);
 
             Observable.Merge(windowTracker.WhenAnyValue(x => x.ActiveWindowHandle).ToUnit(), this.WhenAnyValue(x => x.IsEnabled).ToUnit())
@@ -170,7 +170,7 @@ namespace PoeShared.Native
             overlayWindow
                 .WhenRendered
                 .Do(_ => { Log.Debug($"[#{overlayWindow.Name}] Overlay is rendered"); })
-                .SubscribeSafe(Log.HandleUiException)
+                .SubscribeToErrors(Log.HandleUiException)
                 .AddTo(childAnchors);
 
             windows.Add(overlayWindow);

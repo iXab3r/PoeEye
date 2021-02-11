@@ -76,7 +76,7 @@ namespace PoeShared.Wpf.UI.Settings
             moduleSettings
                 .Connect()
                 .Bind(out var moduleSettingsSource)
-                .SubscribeSafe(Log.HandleUiException)
+                .SubscribeToErrors(Log.HandleUiException)
                 .AddTo(Anchors);
             ModulesSettings = moduleSettingsSource;
         }

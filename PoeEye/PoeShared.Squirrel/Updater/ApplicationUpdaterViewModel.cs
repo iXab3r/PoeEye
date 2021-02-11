@@ -46,7 +46,7 @@ namespace PoeShared.Squirrel.Updater
 
             CheckForUpdatesCommand
                 .ThrownExceptions
-                .SubscribeSafe(ex => SetError($"Update error: {ex.Message}"))
+                .SubscribeToErrors(ex => SetError($"Update error: {ex.Message}"))
                 .AddTo(Anchors);
 
             configProvider.ListenTo(x => x.AutoUpdateTimeout)
@@ -86,7 +86,7 @@ namespace PoeShared.Squirrel.Updater
 
             RestartCommand
                 .ThrownExceptions
-                .SubscribeSafe(ex => SetError($"Restart error: {ex.Message}"))
+                .SubscribeSafe(ex => SetError($"Restart error: {ex.Message}"), Log.HandleUiException)
                 .AddTo(Anchors);
 
             updateSourceProvider

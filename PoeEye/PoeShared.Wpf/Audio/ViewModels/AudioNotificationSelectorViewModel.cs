@@ -64,7 +64,7 @@ namespace PoeShared.Audio.ViewModels
                 .Distinct()
                 .Transform(x => (object) new NotificationTypeWrapper(this, x, x.Pascalize()))
                 .Bind(out var notificationsSource)
-                .SubscribeSafe(Log.HandleUiException)
+                .SubscribeToErrors(Log.HandleUiException)
                 .AddTo(Anchors);
             Items = notificationsSource;
 
