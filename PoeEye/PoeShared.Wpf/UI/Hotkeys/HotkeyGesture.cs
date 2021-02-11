@@ -92,9 +92,14 @@ namespace PoeShared.UI.Hotkeys
                     button = System.Windows.Input.MouseButton.XButton2;
                     break;
             }
-
             MouseButton = button;
             ModifierKeys = modifierKeys;
+        }
+        
+        public HotkeyGesture(MouseWheelAction mouseWheel, ModifierKeys modifierKeys = ModifierKeys.None) : this()
+        {
+            ModifierKeys = modifierKeys;
+            MouseWheel = mouseWheel;
         }
 
         public MouseButton? MouseButton { get; }
@@ -102,8 +107,18 @@ namespace PoeShared.UI.Hotkeys
         public Key Key { get; }
 
         public ModifierKeys ModifierKeys { get; }
+        
+        public MouseWheelAction MouseWheel { get; }
+        
+        public bool IsKeyboard => Key != Key.None;
+        
+        public bool IsMouseButton => MouseButton != null;
+        
+        public bool IsMouseWheel => MouseWheel != MouseWheelAction.None;
 
-        public bool IsEmpty => MouseButton == null && Key == Key.None && ModifierKeys == ModifierKeys.None;
+        public bool IsMouse => IsMouseButton || IsMouseWheel;
+        
+        public bool IsEmpty => MouseButton == null && Key == Key.None && ModifierKeys == ModifierKeys.None && MouseWheel == MouseWheelAction.None;
 
         public bool Equals(HotkeyGesture other)
         {
@@ -117,7 +132,7 @@ namespace PoeShared.UI.Hotkeys
                 return true;
             }
 
-            return MouseButton == other.MouseButton && Key == other.Key && ModifierKeys == other.ModifierKeys;
+            return MouseButton == other.MouseButton && Key == other.Key && ModifierKeys == other.ModifierKeys && MouseWheel == other.MouseWheel;
         }
 
         public override string ToString()
@@ -154,6 +169,11 @@ namespace PoeShared.UI.Hotkeys
             if (MouseButton != null)
             {
                 $"Mouse{MouseButton}".AddTo(keys);
+            }
+
+            if (MouseWheel != MouseWheelAction.None)
+            {
+                $"{MouseWheel}".AddTo(keys);
             }
 
             if (keys.Count == 0)

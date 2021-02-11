@@ -12,7 +12,6 @@ namespace PoeShared.Tests.WPF.Hotkeys
         public void ShouldSerializeAllKeyboardToString([Values] Key key)
         {
             // Given
-            var instance = CreateInstance();
             var empty = new HotkeyGesture(Key.None).ToString();
             var hotkey = new HotkeyGesture(key, ModifierKeys.None);
 
@@ -21,6 +20,23 @@ namespace PoeShared.Tests.WPF.Hotkeys
 
             // Then
             if (key != Key.None)
+            {
+                result.ShouldNotBe(empty);
+            }
+        }
+        
+        [Test]
+        public void ShouldSerializeAllMouseWheelStatesToString([Values] MouseWheelAction wheel)
+        {
+            // Given
+            var empty = new HotkeyGesture().ToString();
+            var hotkey = new HotkeyGesture(wheel);
+
+            // When
+            var result = hotkey.ToString();
+
+            // Then
+            if (wheel != MouseWheelAction.None)
             {
                 result.ShouldNotBe(empty);
             }
@@ -119,6 +135,45 @@ namespace PoeShared.Tests.WPF.Hotkeys
 
             //Then
             result.Key.ShouldBe(expected);
+            result.ModifierKeys.ShouldBe(expectedModifiers);
+        }
+        
+        [TestCase(MouseWheelAction.WheelDown, ModifierKeys.None, "WheelDown")]
+        [TestCase(MouseWheelAction.WheelUp, ModifierKeys.None, "WheelUp")]
+        [TestCase(MouseWheelAction.WheelDown, ModifierKeys.Control | ModifierKeys.Shift | ModifierKeys.Alt | ModifierKeys.Windows, "Ctrl+Alt+Shift+Windows+WheelDown")]
+        [TestCase(MouseWheelAction.WheelUp, ModifierKeys.Control | ModifierKeys.Shift | ModifierKeys.Alt | ModifierKeys.Windows, "Ctrl+Alt+Shift+Windows+WheelDown")]
+        public void ShouldSerializeMouseWheel(MouseWheelAction mouseWheel, ModifierKeys modifierKeys, string expected)
+        {
+            // Given
+            var instance = CreateInstance();
+            var hotkey = new HotkeyGesture(mouseWheel, modifierKeys);
+
+            // When
+            var result = instance.ConvertFrom(hotkey.ToString());
+
+            // Then
+            result.ShouldNotBeNull();
+            result.ShouldBeOfType<HotkeyGesture>();
+            result.ShouldBe(hotkey);
+            result.ToString().ShouldBe(hotkey.ToString());
+        }
+        
+        [TestCase("", MouseWheelAction.None, ModifierKeys.None)]
+        [TestCase("WheelDown", MouseWheelAction.WheelDown, ModifierKeys.None)]
+        [TestCase("WheelUp", MouseWheelAction.WheelUp, ModifierKeys.None)]
+        [TestCase("Ctrl+WheelUp", MouseWheelAction.WheelUp, ModifierKeys.Control)]
+        [TestCase("Ctrl+Shift+Num +", MouseWheelAction.None, ModifierKeys.Control | ModifierKeys.Shift)]
+        [TestCase("Ctrl+Alt+Shift+Windows+WheelDown", MouseWheelAction.WheelDown, ModifierKeys.Control | ModifierKeys.Shift | ModifierKeys.Alt | ModifierKeys.Windows)]
+        public void ShouldDeserializeKeyboard(string input, MouseWheelAction expected, ModifierKeys expectedModifiers)
+        {
+            //Given
+            var instance = CreateInstance();
+
+            //When
+            var result = instance.ConvertFromString(input);
+
+            //Then
+            result.MouseWheel.ShouldBe(expected);
             result.ModifierKeys.ShouldBe(expectedModifiers);
         }
 

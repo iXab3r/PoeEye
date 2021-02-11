@@ -5,6 +5,7 @@ using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using System.Security.Principal;
 using System.Text;
+using System.Windows.Input;
 using log4net;
 using PInvoke;
 
@@ -132,6 +133,32 @@ namespace PoeShared.Native
                     Kernel32.LocalFree(argv);
                 }
             }
+        }
+        
+        public static ModifierKeys GetCurrentModifierKeys()
+        {
+            var modifier = ModifierKeys.None;
+            if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
+            {
+                modifier |= ModifierKeys.Control;
+            }
+
+            if (Keyboard.IsKeyDown(Key.LeftAlt) || Keyboard.IsKeyDown(Key.RightAlt))
+            {
+                modifier |= ModifierKeys.Alt;
+            }
+
+            if (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift))
+            {
+                modifier |= ModifierKeys.Shift;
+            }
+
+            if (Keyboard.IsKeyDown(Key.LWin) || Keyboard.IsKeyDown(Key.RWin))
+            {
+                modifier |= ModifierKeys.Windows;
+            }
+
+            return modifier;
         }
     }
 }

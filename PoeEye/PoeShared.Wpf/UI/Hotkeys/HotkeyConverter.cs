@@ -18,6 +18,7 @@ namespace PoeShared.UI.Hotkeys
 
         private readonly IDictionary<string, Key> knownSpecialKeys = new Dictionary<string, Key>();
         private readonly IDictionary<string, HotkeyGesture> mouseKeys;
+        private readonly IDictionary<string, MouseWheelAction> mouseWheelEvents;
         private readonly IDictionary<string, Key> knownKeys = new Dictionary<string, Key>(StringComparer.OrdinalIgnoreCase);
 
         public HotkeyConverter()
@@ -31,6 +32,11 @@ namespace PoeShared.UI.Hotkeys
                 .GetValues(typeof(MouseButton))
                 .OfType<MouseButton>()
                 .Select(x => new HotkeyGesture(x))
+                .ToDictionary(x => x.ToString(), x => x, StringComparer.OrdinalIgnoreCase);
+            
+            mouseWheelEvents = Enum
+                .GetValues(typeof(MouseWheelAction))
+                .OfType<MouseWheelAction>()
                 .ToDictionary(x => x.ToString(), x => x, StringComparer.OrdinalIgnoreCase);
             
             knownSpecialKeys["*"] = Key.Multiply;
@@ -114,10 +120,14 @@ namespace PoeShared.UI.Hotkeys
             var modifiersRaw = ModifierKeysConverter.ConvertFrom(context, culture, modifiersPartRaw);
             var modifiers = (ModifierKeys) modifiersRaw;
 
-            if (mouseKeys.ContainsKey(hotkeyPartRaw))
+            if (mouseKeys.TryGetValue(hotkeyPartRaw, out var mouseKey) && mouseKey.MouseButton != null)
             {
-                var mouseKey = mouseKeys[hotkeyPartRaw];
                 return new HotkeyGesture(mouseKey.MouseButton.Value, modifiers);
+            }
+
+            if (mouseWheelEvents.TryGetValue(hotkeyPartRaw, out var mouseWheel))
+            {
+                return new HotkeyGesture(mouseWheel, modifiers);
             }
 
             if (!knownKeys.TryGetValue(hotkeyPartRaw, out var key))

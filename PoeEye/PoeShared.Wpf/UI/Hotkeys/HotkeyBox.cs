@@ -50,6 +50,9 @@ namespace PoeShared.UI.Hotkeys
             typeof(bool),
             typeof(HotKeyBox),
             new PropertyMetadata(false));
+
+        public static readonly DependencyProperty AcceptsMouseWheelProperty = DependencyProperty.Register(
+            "AcceptsMouseWheel", typeof(bool), typeof(HotKeyBox), new PropertyMetadata(default(bool)));
         
         /// <summary>Identifies the <see cref="P:System.Windows.Controls.Primitives.TextBoxBase.AcceptsReturn" /> dependency property. </summary>
         /// <returns>The identifier for the <see cref="P:System.Windows.Controls.Primitives.TextBoxBase.AcceptsReturn" /> dependency property.</returns>
@@ -68,6 +71,12 @@ namespace PoeShared.UI.Hotkeys
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(HotKeyBox), new FrameworkPropertyMetadata(typeof(HotKeyBox)));
             EventManager.RegisterClassHandler(typeof(HotKeyBox), GotFocusEvent, new RoutedEventHandler(OnGotFocus));
+        }
+
+        public bool AcceptsMouseWheel
+        {
+            get { return (bool) GetValue(AcceptsMouseWheelProperty); }
+            set { SetValue(AcceptsMouseWheelProperty, value); }
         }
         
         public bool AcceptsReturn
@@ -171,11 +180,26 @@ namespace PoeShared.UI.Hotkeys
 
             textBox.PreviewKeyDown += TextBoxOnPreviewKeyDown;
             textBox.PreviewMouseDown += TextBoxOnPreviewMouseDown;
+            textBox.PreviewMouseWheel += TextBoxOnPreviewMouseWheel;
 
             textBox.GotFocus += TextBoxOnGotFocus;
             textBox.LostFocus += TextBoxOnLostFocus;
             textBox.TextChanged += TextBoxOnTextChanged;
             UpdateText();
+        }
+
+        private void TextBoxOnPreviewMouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            if (!AcceptsMouseWheel)
+            {
+                return;
+            }
+            var currentModifierKeys = UnsafeNative.GetCurrentModifierKeys();
+            if (e.Delta != 0)
+            {
+                HotKey = new HotkeyGesture(e.Delta > 0 ? MouseWheelAction.WheelUp : MouseWheelAction.WheelDown, currentModifierKeys);
+                e.Handled = true;
+            }
         }
 
         private void TextBoxOnPreviewMouseDown(object sender, MouseButtonEventArgs e)
@@ -184,7 +208,7 @@ namespace PoeShared.UI.Hotkeys
             {
                 return;
             }
-            var currentModifierKeys = GetCurrentModifierKeys();
+            var currentModifierKeys = UnsafeNative.GetCurrentModifierKeys();
             if (e.XButton1 == MouseButtonState.Pressed)
             {
                 HotKey = new HotkeyGesture(MouseButton.XButton1, currentModifierKeys);
@@ -258,7 +282,7 @@ namespace PoeShared.UI.Hotkeys
 
             e.Handled = true;
 
-            var currentModifierKeys = GetCurrentModifierKeys();
+            var currentModifierKeys = UnsafeNative.GetCurrentModifierKeys();
             var currentHotKey = new HotkeyGesture(key, currentModifierKeys);
 
             var isClearHotKey = EscapeKeys.Contains(key) && currentModifierKeys == ModifierKeys.None;
@@ -274,32 +298,6 @@ namespace PoeShared.UI.Hotkeys
             UpdateText();
             lastKeyDown = currentHotKey;
             lastKeyDownTimestamp = DateTime.Now;
-        }
-
-        private static ModifierKeys GetCurrentModifierKeys()
-        {
-            var modifier = ModifierKeys.None;
-            if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
-            {
-                modifier |= ModifierKeys.Control;
-            }
-
-            if (Keyboard.IsKeyDown(Key.LeftAlt) || Keyboard.IsKeyDown(Key.RightAlt))
-            {
-                modifier |= ModifierKeys.Alt;
-            }
-
-            if (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift))
-            {
-                modifier |= ModifierKeys.Shift;
-            }
-
-            if (Keyboard.IsKeyDown(Key.LWin) || Keyboard.IsKeyDown(Key.RWin))
-            {
-                modifier |= ModifierKeys.Windows;
-            }
-
-            return modifier;
         }
 
         private void UpdateText()
