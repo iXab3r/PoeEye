@@ -29,7 +29,18 @@ namespace PoeShared.Audio.Services
 
         public Task Play(byte[] waveData)
         {
-            return PlayInternal(waveData);
+            return Play(waveData, volume: 1);
+        }
+
+        /// <summary>
+        /// Plays specified wave data
+        /// </summary>
+        /// <param name="waveData">WAV data to play</param>
+        /// <param name="volume">Volume, 1.0 is full scale</param>
+        /// <returns></returns>
+        public Task Play(byte[] waveData, float volume)
+        {
+            return PlayInternal(waveData, volume);
         }
 
         private IDisposable PlayInternalMedia(Stream rawStream)
@@ -44,9 +55,9 @@ namespace PoeShared.Audio.Services
             return Disposable.Empty;
         }
 
-        private Task PlayInternal(byte[] soundData)
+        private Task PlayInternal(byte[] soundData, float volume)
         {
-            Log.Debug($"Queueing audio stream({soundData.Length})...");
+            Log.Debug($"Queueing audio stream({soundData.Length}), volume: {volume}...");
             return Task.Factory.StartNew(() =>
             {
                 try
@@ -65,8 +76,8 @@ namespace PoeShared.Audio.Services
                             try
                             {
                                 waveOut.PlaybackStopped += playbackStoppedHandler;
-
-                                Log.Debug($"Starting to play audio stream({rawStream.Length}) using waveOut {waveOut}...");
+                                Log.Debug($"Starting to play audio stream({rawStream.Length}) using waveOut {waveOut}, volume: {volume}...");
+                                waveOut.Volume = volume;
                                 waveOut.Play();
 
                                 playbackAnchor.WaitOne();

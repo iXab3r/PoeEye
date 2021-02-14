@@ -51,6 +51,11 @@ namespace PoeShared.Audio.Services
 
         public Task PlayNotification(string notificationName)
         {
+            return PlayNotification(notificationName, 1);
+        }
+
+        public Task PlayNotification(string notificationName, float volume)
+        {
             Guard.ArgumentNotNull(notificationName, nameof(notificationName));
             Log.Debug($"Notification of type {notificationName} requested...");
 
@@ -68,10 +73,9 @@ namespace PoeShared.Audio.Services
             }
 
             Log.Debug($"Starting playback of {notificationName} ({notificationData.Length}b)...");
-
-            return audioPlayer.Play(notificationData);
+            return audioPlayer.Play(notificationData, volume);
         }
-        
+
         public string AddFromFile(FileInfo soundFile)
         {
             return fileSoundLibrarySource.AddFromFile(soundFile);
