@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.Windows.Forms;
 using PoeShared.Scaffolding;
 using WpfRect = System.Windows.Rect;
 using WinRect = System.Drawing.Rectangle;
@@ -77,6 +78,26 @@ namespace PoeShared.Native
 
             var destinationRect = destinationRegion.ToWinRectangle();
             return destinationRect;
+        }
+
+        public static Point ToScreenCoordinates(double absoluteX, double absoluteY)
+        {
+            var screenBounds = SystemInformation.VirtualScreen;
+            return new Point(
+                (int)(absoluteX / 65535 * screenBounds.Width + screenBounds.X), (int)(absoluteY / 65535 * screenBounds.Height + screenBounds.Y));
+        }
+        
+        public static Point ToScreenCoordinates(PointF winInputCoordinates)
+        {
+            return ToScreenCoordinates(winInputCoordinates.X, winInputCoordinates.Y);
+        }
+        
+        public static PointF ToWinInputCoordinates(Point screenCoordinates)
+        {
+            var screenBounds = SystemInformation.VirtualScreen;
+            return new PointF(
+                (float) (screenCoordinates.X - screenBounds.X) / screenBounds.Width * 65535, 
+                (float) (screenCoordinates.Y - screenBounds.Y) / screenBounds.Height * 65535);
         }
     }
 }

@@ -43,6 +43,23 @@ namespace PoeShared.Native
             public readonly int flags;
         }
         
+        /// <summary>
+        ///     Indicates whether various virtual keys are down. This parameter can be one or more of the following values.
+        ///     https://docs.microsoft.com/en-us/windows/win32/inputdev/wm-lbuttonup
+        /// </summary>
+        [Flags]
+        public enum WmMouseParam
+        {
+            NONE = 0x0000,
+            MK_LBUTTON = 0x0001,
+            MK_RBUTTON = 0x0002,
+            MK_SHIFT = 0x0004,
+            MK_CONTROL = 0x0008,
+            MK_MBUTTON = 0x0010,
+            MK_XBUTTON1 = 0x0020,
+            MK_XBUTTON2 = 0x0040,
+        }
+        
         public static string GetWindowClass(IntPtr hwnd)
         {
             try

@@ -7,6 +7,11 @@ namespace PoeShared.Native
 {
     public partial class UnsafeNative
     {
+        public static IntPtr MakeLParam(int loWord, int hiWord)
+        {
+            return new IntPtr((hiWord << 16) | (loWord & 0xffff));
+        }
+        
         /// <summary>
         /// Gets the z-order for one or more windows atomically with respect to each other. In Windows, smaller z-order is higher. If the window is not top level, the z order is returned as -1. 
         /// </summary>
