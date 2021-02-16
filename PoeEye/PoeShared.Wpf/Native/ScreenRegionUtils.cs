@@ -92,12 +92,12 @@ namespace PoeShared.Native
             return ToScreenCoordinates(winInputCoordinates.X, winInputCoordinates.Y);
         }
         
-        public static PointF ToWinInputCoordinates(Point screenCoordinates)
+        public static (double X, double Y) ToWinInputCoordinates(Point screenCoordinates)
         {
             var screenBounds = SystemInformation.VirtualScreen;
-            return new PointF(
-                (float) (screenCoordinates.X - screenBounds.X) / screenBounds.Width * 65535, 
-                (float) (screenCoordinates.Y - screenBounds.Y) / screenBounds.Height * 65535);
+            return (
+                 ((double)screenCoordinates.X - screenBounds.X) / screenBounds.Width * 65535, 
+                ((double)screenCoordinates.Y - screenBounds.Y) / screenBounds.Height * 65535);
         }
     }
 }
