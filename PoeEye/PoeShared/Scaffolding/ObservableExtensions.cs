@@ -2,6 +2,7 @@
 using System.Linq.Expressions;
 using System.Reactive;
 using System.Reactive.Concurrency;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using JetBrains.Annotations;
 using ReactiveUI;
@@ -10,6 +11,8 @@ namespace PoeShared.Scaffolding
 {
     public static class ObservableExtensions
     {
+        private static readonly Action NoOperation = () => { };
+        
         public static IDisposable Subscribe<T>(this IObservable<T> observable, [NotNull] Action onNext)
         {
             return observable.Subscribe(_ => onNext());
@@ -20,6 +23,51 @@ namespace PoeShared.Scaffolding
             [NotNull] Func<TIn, TOut> onNext)
         {
             return observable.SelectSafe<TIn, TOut, Exception>(onNext, ex => default);
+        }
+
+        public static IDisposable SubscribeSafe<T>(this IObservable<T> source, Action<Exception> onError)
+        {
+            return SubscribeSafe(source, x => { }, onError);
+        }
+
+        public static IDisposable SubscribeSafe<T>(this IObservable<T> source, Action onNext, Action<Exception> onError)
+        {
+            return SubscribeSafe(source, x => onNext(), onError);
+        }
+        
+        public static IDisposable SubscribeSafe<T>(this IObservable<T> source, Action<T> onNext, Action<Exception> onError)
+        {
+            return SubscribeSafe(source, onNext, onError, NoOperation);
+        }
+        
+        public static IDisposable SubscribeSafe<T>(this IObservable<T> source, Action<T> onNext, Action<Exception> onError, Action onCompleted)
+        {
+            if (source == null) throw new ArgumentNullException(nameof(source));
+            if (onNext == null) throw new ArgumentNullException(nameof(onNext));
+            if (onError == null) throw new ArgumentNullException(nameof(onError));
+            if (onCompleted == null) throw new ArgumentNullException(nameof(onCompleted));
+
+            return source.Subscribe(x =>
+            {
+                try
+                {
+                    onNext(x);
+                }
+                catch (Exception e)
+                {
+                    onError(e);
+                }
+            }, onError, () =>
+            {
+                try
+                {
+                    onCompleted();
+                }
+                catch (Exception e)
+                {
+                    onError(e);
+                }
+            });
         }
 
         public static IObservable<TOut> SelectSafe<TIn, TOut, TException>(
@@ -40,8 +88,6 @@ namespace PoeShared.Scaffolding
                 }
             });
         }
-
-
 
         public static IDisposable SubscribeToErrors<T>(this IObservable<T> observable, [NotNull] Action<Exception> onError)
         {

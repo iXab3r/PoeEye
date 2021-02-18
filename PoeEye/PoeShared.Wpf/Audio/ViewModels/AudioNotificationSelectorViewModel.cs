@@ -1,31 +1,38 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Windows.Input;
 using DynamicData;
 using DynamicData.Binding;
 using JetBrains.Annotations;
+using log4net;
 using PoeShared.Audio.Services;
+using PoeShared.Prism;
 using PoeShared.Scaffolding;
 using PoeShared.Scaffolding.WPF;
 using Prism.Commands;
 using ReactiveUI;
+using Unity;
 
 namespace PoeShared.Audio.ViewModels
 {
     internal sealed class AudioNotificationSelectorViewModel : DisposableReactiveObject,
         IAudioNotificationSelectorViewModel
     {
+        private static readonly ILog Log = LogManager.GetLogger(typeof(AudioNotificationSelectorViewModel));
+
         private static readonly string DefaultNotification = AudioNotificationType.Whistle.ToString();
         private readonly IAudioNotificationsManager notificationsManager;
         private bool audioEnabled;
         private string selectedValue;
 
-        public AudioNotificationSelectorViewModel([NotNull] IAudioNotificationsManager notificationsManager)
+        public AudioNotificationSelectorViewModel(
+            [NotNull] IAudioNotificationsManager notificationsManager,
+            [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {
             this.notificationsManager = notificationsManager;
-            Guard.ArgumentNotNull(notificationsManager, nameof(notificationsManager));
 
             SelectNotificationCommand = new DelegateCommand<object>(SelectNotificationCommandExecuted);
             PlayNotificationCommand = new DelegateCommand<object>(PlayNotificationCommandExecuted);
@@ -49,8 +56,9 @@ namespace PoeShared.Audio.ViewModels
                     dynamicNotifications)
                 .DistinctValues(x => x)
                 .Transform(x => (object) new NotificationTypeWrapper(this, x, x.Pascalize()))
+                .ObserveOn(uiScheduler)
                 .Bind(out var notificationsSource)
-                .Subscribe()
+                .SubscribeToErrors(Log.HandleUiException)
                 .AddTo(Anchors);
             Items = notificationsSource;
 
@@ -58,17 +66,18 @@ namespace PoeShared.Audio.ViewModels
                 .DistinctUntilChanged()
                 .Where(x => x)
                 .Where(x => selectedValue == AudioNotificationType.Disabled.ToString())
-                .Subscribe(() => SelectedValue = DefaultNotification)
+                .SubscribeSafe(() => SelectedValue = DefaultNotification, Log.HandleUiException)
                 .AddTo(Anchors);
 
             this.WhenAnyValue(x => x.AudioEnabled)
                 .DistinctUntilChanged()
                 .Where(x => !x)
-                .Subscribe(() => SelectedValue = AudioNotificationType.Disabled.ToString())
+                .SubscribeSafe(() => SelectedValue = AudioNotificationType.Disabled.ToString(), Log.HandleUiException)
                 .AddTo(Anchors);
 
             this.WhenAnyValue(x => x.SelectedValue)
-                .Subscribe(x => AudioEnabled = x != AudioNotificationType.Disabled.ToString())
+                .DistinctUntilChanged()
+                .SubscribeSafe(x => AudioEnabled = x != AudioNotificationType.Disabled.ToString(), Log.HandleUiException)
                 .AddTo(Anchors);
         }
 
