@@ -548,14 +548,9 @@ namespace PoeShared.Squirrel.Scaffolding
             }
         }
 
-        public static ReleaseEntry FindCurrentVersion(IEnumerable<ReleaseEntry> localReleases)
+        public static T FindCurrentVersion<T>(IEnumerable<T> localReleases) where T : IReleaseEntry
         {
-            if (!localReleases.Any())
-            {
-                return null;
-            }
-
-            return localReleases.OrderByDescending(x => x.Version).FirstOrDefault(x => !x.IsDelta);
+            return !localReleases.Any() ? default : localReleases.OrderByDescending(x => x.Version).FirstOrDefault(x => !x.IsDelta);
         }
 
         private static TAcc Scan<T, TAcc>(this IEnumerable<T> This, TAcc initialValue, Func<TAcc, T, TAcc> accFunc)

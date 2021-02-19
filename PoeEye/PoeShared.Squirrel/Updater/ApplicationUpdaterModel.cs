@@ -222,7 +222,7 @@ namespace PoeShared.Squirrel.Updater
             }
         }
 
-        private async Task<IUpdateManager> CreateManager()
+        private async Task<PoeUpdateManager> CreateManager()
         {
             var appName = Process.GetCurrentProcess().ProcessName;
             var rootDirectory = default(string);

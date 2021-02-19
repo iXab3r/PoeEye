@@ -10,6 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Win32;
 using NuGet;
+using PoeShared.Scaffolding;
 using PoeShared.Squirrel.Scaffolding;
 using Splat;
 using Squirrel;
@@ -17,7 +18,7 @@ using Squirrel.Shell;
 
 namespace PoeShared.Squirrel.Core
 {
-    public sealed partial class PoeUpdateManager : IUpdateManager
+    public sealed partial class PoeUpdateManager : DisposableReactiveObject
     {
         private static bool Exiting;
         private readonly string updateUrlOrPath;
@@ -60,7 +61,7 @@ namespace PoeShared.Squirrel.Core
                 urlDownloader);
         }
 
-        public async Task DownloadReleases(IEnumerable<ReleaseEntry> releasesToDownload, Action<int> progress = null)
+        public async Task DownloadReleases(IReadOnlyCollection<IReleaseEntry> releasesToDownload, Action<int> progress = null)
         {
             var downloadReleases = new DownloadReleasesImpl(RootAppDirectory);
             await AcquireUpdateLock();
@@ -130,8 +131,7 @@ namespace PoeShared.Squirrel.Core
 
         public SemanticVersion CurrentlyInstalledVersion(string executable = null)
         {
-            executable = executable ??
-                         Path.GetDirectoryName(typeof(PoeUpdateManager).Assembly.Location);
+            executable ??= Path.GetDirectoryName(typeof(PoeUpdateManager).Assembly.Location);
 
             if (!executable.StartsWith(RootAppDirectory, StringComparison.OrdinalIgnoreCase))
             {
