@@ -48,7 +48,7 @@ namespace PoeShared.Squirrel.Core
 
         public bool IsInstalledApp => Assembly.GetExecutingAssembly().Location.StartsWith(RootAppDirectory, StringComparison.OrdinalIgnoreCase);
 
-        public async Task<UpdateInfo> CheckForUpdate(bool ignoreDeltaUpdates, Action<int> progress = null)
+        public async Task<IPoeUpdateInfo> CheckForUpdate(bool ignoreDeltaUpdates, Action<int> progress = null)
         {
             var checkForUpdate = new CheckForUpdateImpl(RootAppDirectory);
 
@@ -69,7 +69,7 @@ namespace PoeShared.Squirrel.Core
             await downloadReleases.DownloadReleases(updateUrlOrPath, releasesToDownload, progress, urlDownloader);
         }
 
-        public async Task<string> ApplyReleases(UpdateInfo updateInfo, Action<int> progress = null)
+        public async Task<string> ApplyReleases(IPoeUpdateInfo updateInfo, Action<int> progress = null)
         {
             var applyReleases = new ApplyReleasesImpl(RootAppDirectory);
             AcquireUpdateLock();

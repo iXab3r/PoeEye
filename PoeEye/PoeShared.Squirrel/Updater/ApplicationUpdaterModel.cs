@@ -23,7 +23,7 @@ namespace PoeShared.Squirrel.Updater
         private static readonly string DotnetCoreRunnerName = "dotnet.exe";
         private static readonly string UpdaterExecutableName = "update.exe";
         
-        private UpdateInfo latestVersion;
+        private IPoeUpdateInfo latestVersion;
         private Version mostRecentVersion;
         private DirectoryInfo mostRecentVersionAppFolder;
         private UpdateSourceInfo updateSource;
@@ -91,7 +91,7 @@ namespace PoeShared.Squirrel.Updater
             private set => RaiseAndSetIfChanged(ref mostRecentVersion, value);
         }
 
-        public UpdateInfo LatestVersion
+        public IPoeUpdateInfo LatestVersion
         {
             get => latestVersion;
             private set => RaiseAndSetIfChanged(ref latestVersion, value);
@@ -109,7 +109,7 @@ namespace PoeShared.Squirrel.Updater
             private set => RaiseAndSetIfChanged(ref isBusy, value);
         }
 
-        public async Task ApplyRelease(UpdateInfo updateInfo)
+        public async Task ApplyRelease(IPoeUpdateInfo updateInfo)
         {
             Guard.ArgumentNotNull(updateInfo, nameof(updateInfo));
 
@@ -166,7 +166,7 @@ namespace PoeShared.Squirrel.Updater
         ///     Checks whether update exist and if so, downloads it
         /// </summary>
         /// <returns>True if application was updated</returns>
-        public async Task<UpdateInfo> CheckForUpdates()
+        public async Task<IPoeUpdateInfo> CheckForUpdates()
         {
             Log.Debug("Update check requested");
             using var unused = CreateIsBusyAnchor();

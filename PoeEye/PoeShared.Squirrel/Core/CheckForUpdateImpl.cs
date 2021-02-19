@@ -23,7 +23,7 @@ namespace PoeShared.Squirrel.Core
             this.rootAppDirectory = rootAppDirectory;
         }
 
-        public async Task<UpdateInfo> CheckForUpdate(
+        public async Task<IPoeUpdateInfo> CheckForUpdate(
             string localReleaseFile,
             string updateUrlOrPath,
             bool ignoreDeltaUpdates = false,
@@ -184,7 +184,7 @@ namespace PoeShared.Squirrel.Core
             Directory.CreateDirectory(pkgDir);
         }
 
-        private UpdateInfo DetermineUpdateInfo(ReleaseEntry[] localReleases, ReleaseEntry[] remoteReleases,
+        private IPoeUpdateInfo DetermineUpdateInfo(IReadOnlyCollection<IReleaseEntry> localReleases, IReadOnlyCollection<IReleaseEntry> remoteReleases,
             bool ignoreDeltaUpdates)
         {
             if (ignoreDeltaUpdates)
@@ -195,7 +195,7 @@ namespace PoeShared.Squirrel.Core
             return DetermineUpdateInfo(localReleases, remoteReleases);
         }
             
-        private UpdateInfo DetermineUpdateInfo(ReleaseEntry[] localReleases, IReadOnlyCollection<ReleaseEntry> remoteReleases)
+        private IPoeUpdateInfo DetermineUpdateInfo(IReadOnlyCollection<IReleaseEntry> localReleases, IReadOnlyCollection<IReleaseEntry> remoteReleases)
         {
             var packageDirectory = Utility.PackageDirectoryForAppDir(rootAppDirectory);
             localReleases ??= Array.Empty<ReleaseEntry>();
@@ -212,7 +212,7 @@ namespace PoeShared.Squirrel.Core
             if (latestFullRelease == currentRelease)
             {
                 Log.Info("No updates, remote and local are the same");
-                var info = UpdateInfo.Create(currentRelease, new[] {latestFullRelease}, packageDirectory);
+                var info = PoeUpdateInfo.Create(currentRelease, new[] {latestFullRelease}, packageDirectory);
                 return info;
             }
 
@@ -221,17 +221,17 @@ namespace PoeShared.Squirrel.Core
             if (latestLocal == null)
             {
                 Log.Warn("First run or local directory is corrupt, starting from scratch");
-                return UpdateInfo.Create(null, new[] {latestFullRelease}, packageDirectory);
+                return PoeUpdateInfo.Create(null, new[] {latestFullRelease}, packageDirectory);
             }
 
             var latestRemote = remoteReleases.OrderByDescending(x => x.Version).First();
             if (latestRemote.Version < latestLocal.Version)
             {
                 Log.Warn($"Local release {latestLocal} is greater than remote release {remoteReleases}");
-                return UpdateInfo.Create(currentRelease, new[] {latestFullRelease}, packageDirectory);
+                return PoeUpdateInfo.Create(currentRelease, new[] {latestFullRelease}, packageDirectory);
             }
 
-            return UpdateInfo.Create(currentRelease, remoteReleases, packageDirectory);
+            return PoeUpdateInfo.Create(currentRelease, remoteReleases, packageDirectory);
         }
 
         private Guid? GetOrCreateStagedUserId()

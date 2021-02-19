@@ -3,6 +3,7 @@ using System.IO;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using PoeShared.Scaffolding;
+using PoeShared.Squirrel.Core;
 using Squirrel;
 
 namespace PoeShared.Squirrel.Updater
@@ -15,7 +16,7 @@ namespace PoeShared.Squirrel.Updater
 
         [CanBeNull] Version UpdatedVersion { get; }
 
-        [CanBeNull] UpdateInfo LatestVersion { get; }
+        [CanBeNull] IPoeUpdateInfo LatestVersion { get; }
         
         int ProgressPercent { get; }
         
@@ -26,12 +27,12 @@ namespace PoeShared.Squirrel.Updater
         /// </summary>
         /// <returns>True if application was updated</returns>
         [NotNull]
-        Task<UpdateInfo> CheckForUpdates();
+        Task<IPoeUpdateInfo> CheckForUpdates();
 
         [NotNull]
         Task RestartApplication();
 
-        Task ApplyRelease([NotNull] UpdateInfo updateInfo);
+        Task ApplyRelease([NotNull] IPoeUpdateInfo updateInfo);
 
         void Reset();
 

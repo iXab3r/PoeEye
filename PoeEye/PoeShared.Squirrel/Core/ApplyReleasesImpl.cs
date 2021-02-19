@@ -30,7 +30,7 @@ namespace PoeShared.Squirrel.Core
             this.rootAppDirectory = rootAppDirectory;
         }
 
-        public async Task<string> ApplyReleases(UpdateInfo updateInfo, bool silentInstall, bool attemptingFullInstall, Action<int> progress = null)
+        public async Task<string> ApplyReleases(IPoeUpdateInfo updateInfo, bool silentInstall, bool attemptingFullInstall, Action<int> progress = null)
         {
             progress = progress ?? (_ => { });
 
@@ -358,7 +358,7 @@ namespace PoeShared.Squirrel.Core
             FixPinnedExecutables(zf.Version);
         }
 
-        private Task<string> InstallPackageToAppDir(UpdateInfo updateInfo, ReleaseEntry release)
+        private Task<string> InstallPackageToAppDir(IPoeUpdateInfo updateInfo, IReleaseEntry release)
         {
             return Task.Run(
                 async () =>
@@ -384,7 +384,7 @@ namespace PoeShared.Squirrel.Core
                 });
         }
 
-        private async Task<ReleaseEntry> CreateFullPackagesFromDeltas(ReleaseEntry[] releasesToApply, ReleaseEntry currentVersion)
+        private async Task<IReleaseEntry> CreateFullPackagesFromDeltas(IReleaseEntry[] releasesToApply, IReleaseEntry currentVersion)
         {
             Guard.ArgumentIsTrue(releasesToApply != null, "releasesToApply != null");
 

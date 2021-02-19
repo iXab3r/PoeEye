@@ -517,7 +517,7 @@ namespace PoeShared.Squirrel.Scaffolding
             }
         }
 
-        public static string AppDirForRelease(string rootAppDirectory, ReleaseEntry entry)
+        public static string AppDirForRelease(string rootAppDirectory, IReleaseEntry entry)
         {
             return Path.Combine(rootAppDirectory, "app-" + entry.Version);
         }
