@@ -31,15 +31,6 @@ namespace PoeShared.Squirrel.Scaffolding
         
         public string ReleasePackageFile { get; }
 
-        public string SuggestedReleaseFileName
-        {
-            get
-            {
-                var zp = new ZipPackage(InputPackageFile);
-                return $"{zp.Id}-{zp.Version}-full.nupkg";
-            }
-        }
-
         public override string ToString()
         {
             return new { InputPackageFile, ReleasePackageFile, Version }.ToString();

@@ -7,7 +7,5 @@ namespace PoeShared.Squirrel.Scaffolding
         string InputPackageFile { get; }
         
         string ReleasePackageFile { get; }
-        
-        string SuggestedReleaseFileName { get; }
     }
 }
