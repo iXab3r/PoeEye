@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using CommandLine;
 using log4net;
 using PoeShared.Modularity;
@@ -45,9 +46,6 @@ namespace PoeShared
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(AppArguments));
 
-        private static readonly Lazy<AppArguments> InstanceProducer = new Lazy<AppArguments>(() => new AppArguments());
-        public static AppArguments Instance => InstanceProducer.Value;
-
         private bool isElevated;
         private string appName;
 
@@ -67,6 +65,8 @@ namespace PoeShared
 
         public AppArguments()
         {
+            var entryAssembly = Assembly.GetEntryAssembly() ?? throw new InvalidOperationException("Entry assembly is not specified");
+            AppName = (entryAssembly.GetCustomAttribute<AssemblyProductAttribute>() ?? throw new InvalidOperationException($"{nameof(AssemblyProductAttribute)} is not specified on assembly {entryAssembly}")).Product;
             ProcessId = Process.GetCurrentProcess().Id;
             IsElevated = true;
             var args = Environment.GetCommandLineArgs();
@@ -76,7 +76,7 @@ namespace PoeShared
                 .JoinStrings(" ");
             ApplicationExecutablePath = args.First();
             ApplicationExecutableName = Path.GetFileName(ApplicationExecutablePath);
-#if NET5_0
+#if NET5_0_OR_GREATER
             IsWindows = OperatingSystem.IsWindows();
             IsLinux = OperatingSystem.IsLinux();
 #else
@@ -103,7 +103,12 @@ namespace PoeShared
 
         public string ApplicationExecutableName { get; }
 
-        public static bool Parse(string[] args)
+        public bool Parse(string[] args)
+        {
+            return Parse(this, args);
+        }
+
+        private static bool Parse(AppOptions instance, string[] args)
         {
             Log.Debug($"Parsing command line args: {args.DumpToTextRaw()}");
             var parser = new Parser(
@@ -118,7 +123,7 @@ namespace PoeShared
             Log.Debug($"Command line parsing result: {result.Tag}, type: {result}");
             if (result.Tag == ParserResultType.Parsed && result is Parsed<AppOptions> parsedResult)
             {
-                parsedResult.Value.CopyPropertiesTo(Instance);
+                parsedResult.Value.CopyPropertiesTo(instance);
                 return true;
             }
 

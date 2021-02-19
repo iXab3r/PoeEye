@@ -4,6 +4,7 @@ using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Subjects;
 using log4net;
+using PoeShared.Scaffolding;
 
 namespace PoeShared.Modularity
 {
@@ -24,7 +25,7 @@ namespace PoeShared.Modularity
             }
             else
             {
-                throw new ApplicationException("InMemory config must be used only in debug mode");
+                throw new ApplicationException($"InMemory config must be used only in debug mode, args: {appArguments.DumpToTextRaw()}");
             }
         }
 

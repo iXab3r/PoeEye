@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
@@ -33,6 +34,7 @@ namespace PoeShared.Native
                 Observable.Return(Unit.Default).Where(x => owner.IsLoaded).ToUnit())
                 .Take(1);
             
+            WhenClosing = Observable.FromEventPattern<CancelEventHandler, CancelEventArgs>(h => owner.Closing += h, h => owner.Closing -= h).Select(x => x.EventArgs);
             WhenClosed = Observable.FromEventPattern<EventHandler, EventArgs>(h => owner.Closed += h, h => owner.Closed -= h).ToUnit();
 
             this.WhenAnyValue(x => x.Topmost)
@@ -45,6 +47,8 @@ namespace PoeShared.Native
         public IObservable<Unit> WhenUnloaded { get; }
         
         public IObservable<Unit> WhenClosed { get; }
+        
+        public IObservable<CancelEventArgs> WhenClosing { get; }
 
         public IObservable<Unit> WhenRendered { get; }
 

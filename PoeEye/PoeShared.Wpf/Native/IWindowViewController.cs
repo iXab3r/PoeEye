@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel;
 using System.Reactive;
 
 namespace PoeShared.Native
@@ -10,6 +11,8 @@ namespace PoeShared.Native
         IObservable<Unit> WhenUnloaded { get; }
 
         IObservable<Unit> WhenClosed { get; }
+        
+        IObservable<CancelEventArgs> WhenClosing { get; }
         
         IObservable<Unit> WhenRendered { get; }
         

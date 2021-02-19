@@ -50,9 +50,4 @@
     <Resource Include="Resources\mouse-device-left-click-control.png" />
     <Resource Include="Resources\mouse-device-right-click-control.png" />
   </ItemGroup>
-  <ItemGroup>
-    <Reference Include="SpicyTaco.AutoGrid, Version=1.2.29.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>C:\Users\Xab3r\.nuget\packages\spicytaco.autogrid\1.2.29\lib\net40\SpicyTaco.AutoGrid.dll</HintPath>
-    </Reference>
-  </ItemGroup>
 </Project>

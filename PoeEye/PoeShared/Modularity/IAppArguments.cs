@@ -22,5 +22,7 @@ namespace PoeShared.Modularity
         string AutostartFlag { [CanBeNull] get; }
         
         string StartupArgs { [CanBeNull] get; }
+
+        bool Parse(string[] args);
     }
 }

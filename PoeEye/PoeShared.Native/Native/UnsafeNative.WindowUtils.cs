@@ -117,7 +117,6 @@ namespace PoeShared.Native
         public static bool SetWindowExNoActivate(IntPtr hwnd)
         {
             Guard.ArgumentIsTrue(hwnd != IntPtr.Zero, "Handle must be non-zero");
-
             Log.Debug($"[{hwnd.ToHexadecimal()}] Reconfiguring window to NoActivate");
             var existingStyle = (User32.SetWindowLongFlags)User32.GetWindowLong(hwnd, User32.WindowLongIndexFlags.GWL_EXSTYLE);
             var newStyle = existingStyle;
