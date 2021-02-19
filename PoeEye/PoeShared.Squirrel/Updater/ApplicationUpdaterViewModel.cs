@@ -134,7 +134,17 @@ namespace PoeShared.Squirrel.Updater
                 return;
             }
 
-            await Task.Run(() => Process.Start(uri));
+            Log.Debug($"Preparing to open uri {uri}");
+            var processStart = new ProcessStartInfo
+            {
+                FileName = uri,
+                UseShellExecute = true
+            };
+            await Task.Run(() =>
+            {
+                Log.Debug($"Starting new process, args: {processStart.DumpToTextRaw()}");
+                Process.Start(processStart);
+            });
         }
 
         public CommandWrapper CheckForUpdatesCommand { get; }

@@ -8,6 +8,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 using Microsoft.Win32;
 using NuGet;
 using PoeShared.Scaffolding;
@@ -20,11 +21,9 @@ namespace PoeShared.Squirrel.Core
 {
     public sealed partial class PoeUpdateManager : DisposableReactiveObject
     {
-        private static bool Exiting;
         private readonly string updateUrlOrPath;
         private readonly IFileDownloader urlDownloader;
-
-        private IDisposable updateLock;
+        private readonly SerialDisposable updateLock = new SerialDisposable();
 
         public PoeUpdateManager(string urlOrPath,
             string applicationName = null,
@@ -35,6 +34,7 @@ namespace PoeShared.Squirrel.Core
             Guard.ArgumentIsTrue(!string.IsNullOrEmpty(urlOrPath), "!string.IsNullOrEmpty(urlOrPath)");
             Guard.ArgumentIsTrue(!string.IsNullOrEmpty(applicationName), "!string.IsNullOrEmpty(applicationName)");
 
+            updateLock.AddTo(Anchors);
             updateUrlOrPath = urlOrPath;
             ApplicationName = applicationName ?? GetApplicationName();
             this.urlDownloader = urlDownloader ?? new FileDownloader();
@@ -52,7 +52,7 @@ namespace PoeShared.Squirrel.Core
         {
             var checkForUpdate = new CheckForUpdateImpl(RootAppDirectory);
 
-            await AcquireUpdateLock();
+            AcquireUpdateLock();
             return await checkForUpdate.CheckForUpdate(
                 Utility.LocalReleaseFileForAppDir(RootAppDirectory),
                 updateUrlOrPath,
@@ -64,7 +64,7 @@ namespace PoeShared.Squirrel.Core
         public async Task DownloadReleases(IReadOnlyCollection<IReleaseEntry> releasesToDownload, Action<int> progress = null)
         {
             var downloadReleases = new DownloadReleasesImpl(RootAppDirectory);
-            await AcquireUpdateLock();
+            AcquireUpdateLock();
 
             await downloadReleases.DownloadReleases(updateUrlOrPath, releasesToDownload, progress, urlDownloader);
         }
@@ -72,7 +72,7 @@ namespace PoeShared.Squirrel.Core
         public async Task<string> ApplyReleases(UpdateInfo updateInfo, Action<int> progress = null)
         {
             var applyReleases = new ApplyReleasesImpl(RootAppDirectory);
-            await AcquireUpdateLock();
+            AcquireUpdateLock();
 
             return await applyReleases.ApplyReleases(updateInfo, false, false, progress);
         }
@@ -83,7 +83,7 @@ namespace PoeShared.Squirrel.Core
             await DownloadReleases(updateInfo.ReleasesToApply);
 
             var applyReleases = new ApplyReleasesImpl(RootAppDirectory);
-            await AcquireUpdateLock();
+            AcquireUpdateLock();
 
             await applyReleases.ApplyReleases(updateInfo, silentInstall, true, progress);
         }
@@ -91,7 +91,7 @@ namespace PoeShared.Squirrel.Core
         public async Task FullUninstall()
         {
             var applyReleases = new ApplyReleasesImpl(RootAppDirectory);
-            await AcquireUpdateLock();
+            AcquireUpdateLock();
 
             KillAllExecutablesBelongingToPackage();
             await applyReleases.FullUninstall();
@@ -143,13 +143,7 @@ namespace PoeShared.Squirrel.Core
 
             return appDirName?.ToSemanticVersion();
         }
-
-        public void Dispose()
-        {
-            var disp = Interlocked.Exchange(ref updateLock, null);
-            disp?.Dispose();
-        }
-
+        
         public Dictionary<ShortcutLocation, ShellLink> GetShortcutsForExecutable(string exeName, ShortcutLocation locations, string programArguments = null)
         {
             var installHelpers = new ApplyReleasesImpl(RootAppDirectory);
@@ -181,8 +175,6 @@ namespace PoeShared.Squirrel.Core
                 ? $"-a \"{arguments}\""
                 : "";
 
-            Exiting = true;
-
             Process.Start(GetUpdateExe(), $"--processStartAndWait {exeToStart} {argsArg}");
 
             // NB: We have to give update.exe some time to grab our PID, but
@@ -209,8 +201,6 @@ namespace PoeShared.Squirrel.Core
             var argsArg = arguments != null
                 ? $"-a \"{arguments}\""
                 : "";
-
-            Exiting = true;
 
             var updateProcess = Process.Start(GetUpdateExe(), $"--processStartAndWait {exeToStart} {argsArg}");
 
@@ -248,47 +238,24 @@ namespace PoeShared.Squirrel.Core
             return Path.GetFullPath(twoFoldersUpFromAppFolder);
         }
 
-        ~PoeUpdateManager()
+        private async void AcquireUpdateLock()
         {
-            if (updateLock != null && !Exiting)
-            {
-                throw new Exception("You must dispose UpdateManager!");
-            }
+            var update = await AcquireUpdateLock(RootAppDirectory);
+            update.AssignTo(updateLock);
         }
-
-        private Task<IDisposable> AcquireUpdateLock()
+        
+        private static Task<IDisposable> AcquireUpdateLock(string key)
         {
-            if (updateLock != null)
-            {
-                return Task.FromResult(updateLock);
-            }
-
             return Task.Run(
                 () =>
                 {
-                    var key = Utility.CalculateStreamSha1(new MemoryStream(Encoding.UTF8.GetBytes(RootAppDirectory)));
+                    var keyBytes = Encoding.UTF8.GetBytes(key);
+                    using var keyStream = new MemoryStream(keyBytes);
+                    var keyHash = Utility.CalculateStreamSha1(keyStream);
 
-                    IDisposable theLock;
-                    try
-                    {
-                        theLock = ModeDetector.InUnitTestRunner()
-                            ? Disposable.Create(() => { })
-                            : new SingleGlobalInstance(key, TimeSpan.FromMilliseconds(2000));
-                    }
-                    catch (TimeoutException)
-                    {
-                        throw new TimeoutException("Couldn't acquire update lock, another instance may be running updates");
-                    }
-
-                    var ret = Disposable.Create(
-                        () =>
-                        {
-                            theLock.Dispose();
-                            updateLock = null;
-                        });
-
-                    updateLock = ret;
-                    return ret;
+                    return ModeDetector.InUnitTestRunner()
+                        ? Disposable.Create(() => { })
+                        : new SingleGlobalInstance(keyHash, TimeSpan.FromMilliseconds(2000));
                 });
         }
 
