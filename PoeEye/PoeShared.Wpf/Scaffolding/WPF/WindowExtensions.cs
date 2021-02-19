@@ -1,0 +1,37 @@
+using System;
+using System.Reactive.Disposables;
+using System.Windows;
+using System.Windows.Interop;
+using log4net;
+using PInvoke;
+
+namespace PoeShared.Scaffolding.WPF
+{
+    public static class WindowExtensions {
+        private static readonly ILog Log = LogManager.GetLogger(typeof(WindowExtensions));
+
+        public static IDisposable RegisterWndProc(this Window instance, HwndSourceHook hook)
+        {
+            var hwnd = new WindowInteropHelper(instance).EnsureHandle();
+            var hwndSource = HwndSource.FromHwnd(hwnd) ?? throw new ApplicationException($"Something went wrong - failed to create {nameof(HwndSource)} for handle {hwnd.ToHexadecimal()}");
+            Log.Debug($"Adding hook to {instance}");
+            hwndSource.AddHook(hook);
+            return Disposable.Create(() =>
+            {
+                Log.Debug($"Removing hook from {instance}");
+                hwndSource.RemoveHook(hook);
+            });
+        }
+
+        public static IDisposable LogWndProc(this Window instance, string prefix)
+        {
+            return RegisterWndProc(instance,
+                (IntPtr hwnd, int msgRaw, IntPtr param, IntPtr lParam, ref bool handled) =>
+                {
+                    var msg = (User32.WindowMessage) msgRaw;
+                    Log.Info($"[{prefix}] Message: {msg} ({msgRaw.ToHexadecimal()} = {msgRaw})");
+                    return IntPtr.Zero;
+                });
+        }
+    }
+}

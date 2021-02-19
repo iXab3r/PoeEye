@@ -135,11 +135,15 @@ namespace PoeShared.Scaffolding
             var relative = new Size(bottomRight.X - ownerTopLeft.X, bottomRight.Y - ownerTopLeft.Y);
             return relative.ToWinSize();
         }
-        
+
         public static WinPoint ScaleToScreen(this Point sourceSize)
         {
             var dpi = UnsafeNative.GetDesktopDpi();
-
+            return ScaleToScreen(sourceSize, dpi);
+        }
+        
+        public static WinPoint ScaleToScreen(this Point sourceSize, PointF dpi)
+        {
             var result = new WinPoint((int)(sourceSize.X * dpi.X), (int)(sourceSize.Y * dpi.Y));
             return result;
         }
@@ -163,11 +167,15 @@ namespace PoeShared.Scaffolding
         {
             return new WinRectangle((int)(sourceSize.X * dpi.X), (int)(sourceSize.Y * dpi.Y), (int)(sourceSize.Width * dpi.X), (int)(sourceSize.Height * dpi.Y));
         }
-        
+
         public static WinSize ScaleToScreen(this Size sourceSize)
         {
             var dpi = UnsafeNative.GetDesktopDpi();
-
+            return ScaleToScreen(sourceSize, dpi);
+        }
+        
+        public static WinSize ScaleToScreen(this Size sourceSize, PointF dpi)
+        {
             return new WinSize((int)(sourceSize.Width * dpi.X), (int)(sourceSize.Height * dpi.Y));
         }
         

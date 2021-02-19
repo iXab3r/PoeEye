@@ -89,8 +89,8 @@ namespace PoeShared.Native
             var downscaledFrame = frame;
             // downscaling frame as we do not require for FULL frame to be visible, only top-left part of it
             downscaledFrame.Size = new System.Drawing.Size((int)(frame.Width * 0.25), (int)(frame.Height * 0.25));
-            return downscaledFrame.X <= bounds.X ||
-                   downscaledFrame.Y <= bounds.Y ||
+            return downscaledFrame.X < bounds.X ||
+                   downscaledFrame.Y < bounds.Y ||
                    !bounds.Contains(downscaledFrame);
         }
 

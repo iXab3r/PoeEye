@@ -12,19 +12,9 @@ namespace PoeShared.Native
 {
     public interface IOverlayViewModel : IDisposableReactiveObject
     {
-        Rect Bounds { get; }
-        
         System.Drawing.Rectangle NativeBounds { get; set; }
         
         PointF Dpi { get; }
-    
-        double Left { get; }
-
-        double Top { get; }
-
-        double Width { get; }
-
-        double Height { get; }
 
         double ActualWidth { get; }
 
@@ -69,12 +59,5 @@ namespace PoeShared.Native
         void SetActivationController([NotNull] IActivationController controller);
 
         void SetOverlayWindow([NotNull] TransparentWindow owner);
-
-        /// <summary>
-        ///  Invokes action on UI Dispatcher
-        ///  FIXME It would be much better to automatically reschedule invocations if needed
-        /// </summary>
-        /// <param name="dispatcherAction"></param>
-        DispatcherOperation BeginInvoke(Action dispatcherAction);
     }
 }

@@ -34,7 +34,6 @@ namespace PoeShared.Native
         private readonly CommandWrapper makeTransparentCommand;
         private readonly ISubject<Unit> whenLoaded = new ReplaySubject<Unit>(1);
         private readonly ISubject<Rectangle> windowPositionSource = new ReplaySubject<Rectangle>(1);
-        private readonly ObservableAsPropertyHelper<Rect> bounds;
         private readonly ObservableAsPropertyHelper<PointF> dpi;
         private readonly object gate = new();
 
@@ -42,12 +41,10 @@ namespace PoeShared.Native
         private double actualWidth;
         private bool growUpwards;
         private bool showInTaskbar;
-        private double height;
         private bool isLocked = true;
         private bool isUnlockable;
         private bool enableHeader = true;
 
-        private double left;
         private Size maxSize = new Size(Int16.MaxValue, Int16.MaxValue);
         private Size minSize = new Size(0, 0);
         private float opacity;
@@ -58,10 +55,8 @@ namespace PoeShared.Native
         private SizeToContent sizeToContent = SizeToContent.Manual;
         private string title;
 
-        private double top;
         private double? targetAspectRatio;
 
-        private double width;
         private TransparentWindow overlayWindow;
         private Point viewModelLocation;
 
@@ -76,11 +71,6 @@ namespace PoeShared.Native
             unlockWindowCommand = CommandWrapper.Create(UnlockWindowCommandExecuted, UnlockWindowCommandCanExecute);
             makeLayeredCommand = CommandWrapper.Create(MakeLayeredCommandExecuted, MakeLayeredCommandCanExecute);
             makeTransparentCommand = CommandWrapper.Create(MakeTransparentCommandExecuted, MakeTransparentCommandCanExecute);
-            
-            bounds = this.WhenAnyValue(x => x.Left, x => x.Top, x => x.Width, x => x.Height)
-                .Select(x => new Rect {X = Left, Y = Top, Width = Width, Height = Height})
-                .ToPropertyHelper(this, x => x.Bounds)
-                .AddTo(Anchors);
 
             dpi = this.WhenAnyValue(x => x.OverlayWindow).Select(x => x == null ? Observable.Return(new PointF(1, 1)) : x.Observe(ConstantAspectRatioWindow.DpiProperty).Select(_ => overlayWindow.Dpi).StartWith(overlayWindow.Dpi))
                 .Switch()
@@ -211,38 +201,12 @@ namespace PoeShared.Native
             set => this.RaiseAndSetIfChanged(ref actualWidth, value);
         }
 
-        public Rect Bounds => bounds.Value;
-
         public PointF Dpi => dpi.Value;
 
         public Rectangle NativeBounds
         {
             get => nativeBounds;
             set => RaiseAndSetIfChanged(ref nativeBounds, value);
-        }
-        
-        public double Left
-        {
-            get => left;
-            set => this.RaiseAndSetIfChanged(ref left, value);
-        }
-
-        public double Top
-        {
-            get => top;
-            set => RaiseAndSetIfChanged(ref top, value);
-        }
-
-        public double Width
-        {
-            get => width;
-            set => this.RaiseAndSetIfChanged(ref width, value);
-        }
-
-        public double Height
-        {
-            get => height;
-            set => this.RaiseAndSetIfChanged(ref height, value);
         }
 
         public Size MinSize
@@ -313,14 +277,15 @@ namespace PoeShared.Native
         {
             var activeMonitor = UnsafeNative.GetMonitorInfo(OverlayWindow);
 
-            Log.Warn($"Resetting overlay bounds (screen: {activeMonitor}, currently @ {new Rect(left, top, width, height)})");
+            Log.Warn($"Resetting overlay bounds (screen: {activeMonitor}, currently @ {nativeBounds})");
+            var center = UnsafeNative.GetPositionAtTheCenter(OverlayWindow).ScaleToScreen(Dpi);
 
-            Width = MinSize.Width;
-            Height = MinSize.Height;
-            var center = UnsafeNative.GetPositionAtTheCenter(OverlayWindow);
-            Left = center.X;
-            Top = center.Y;
-            Log.Info($"Reconfigured overlay bounds (screen: {activeMonitor}, new @ {new Rect(left, top, width, height)})");
+            var bounds = nativeBounds.Size;
+            var size = bounds.IsNotEmpty()
+                ? bounds
+                : MinSize.ScaleToScreen(Dpi);
+            NativeBounds = new Rectangle(center, size);
+            Log.Info($"Reconfigured overlay bounds (screen: {activeMonitor}, new @ {nativeBounds})");
 
             if (UnlockWindowCommand.CanExecute(null))
             {
@@ -363,47 +328,37 @@ namespace PoeShared.Native
 
         protected virtual void ApplyConfig(IOverlayConfig config)
         {
-            Log.Debug($"[{OverlayDescription}] Applying configuration of type ({config.GetType().FullName}): {config.DumpToTextRaw()}");
-            if (config.OverlaySize.Height <= 0 ||
-                config.OverlaySize.Width <= 0 ||
-                double.IsNaN(config.OverlaySize.Height) ||
-                double.IsNaN(config.OverlaySize.Width))
-            {
-                Log.Warn($"[{OverlayDescription}] Overlay size is invalid, resetting to {MinSize}, config: {config.DumpToTextRaw()}");
-                config.OverlaySize = MinSize;
-                if (UnlockWindowCommand.CanExecute(null))
-                {
-                    UnlockWindowCommand.Execute(null);
-                }
-            }
-            Width = config.OverlaySize.Width;
-            Height = config.OverlaySize.Height;
-            
+            Log.Debug($"[{OverlayDescription}] Applying configuration of type ({config.GetType().FullName})");
+           
+            var desktopHandle = UnsafeNative.GetDesktopWindow();
             var systemInformation = new
             {
                 MonitorCount = SystemInformation.MonitorCount, 
                 VirtualScreen = SystemInformation.VirtualScreen,
-                MonitorBounds = UnsafeNative.GetMonitorBounds(OverlayWindow),
-                MonitorInfo = UnsafeNative.GetMonitorInfo(OverlayWindow)
+                MonitorBounds = UnsafeNative.GetMonitorBounds(desktopHandle).ToWinRectangle(),
+                MonitorInfo = UnsafeNative.GetMonitorInfo(desktopHandle)
             };
 
             Log.Debug($"[{OverlayDescription}] Current SystemInformation: {systemInformation.DumpToTextRaw()}");
+
+
+            Rectangle overlayBounds;
+            if (!config.OverlayLocation.Equals(default) || !config.OverlaySize.IsEmpty)
+            {
+                overlayBounds = new System.Windows.Rect(config.OverlayLocation, config.OverlaySize).ScaleToScreen(Dpi);
+            }
+            else
+            {
+                overlayBounds = config.OverlayBounds;
+            }
             
-            var overlayBounds = new Rect(config.OverlayLocation, config.OverlaySize);
             if (UnsafeNative.IsOutOfBounds(overlayBounds, systemInformation.MonitorBounds))
             {
-                var screenCenter = UnsafeNative.GetPositionAtTheCenter(OverlayWindow);
-                Log.Warn($"[{OverlayDescription}] Overlay is out of screen bounds(screen: {systemInformation.MonitorBounds}, overlay: {overlayBounds}) , resetting to {screenCenter}, systemInfo: {systemInformation.DumpToTextRaw()}, config: {config.DumpToTextRaw()}");
-                config.OverlayLocation = screenCenter;
-                
-                if (UnlockWindowCommand.CanExecute(null))
-                {
-                    UnlockWindowCommand.Execute(null);
-                }
+                Log.Warn($"[{OverlayDescription}] Overlay is out of screen bounds(screen: {systemInformation.MonitorBounds}, overlay: {overlayBounds}) , resetting to position to screen center, systemInfo: {systemInformation.DumpToTextRaw()}, config: {config.DumpToTextRaw()}");
+                ResetToDefault();
             }
 
-            Left = config.OverlayLocation.X;
-            Top = config.OverlayLocation.Y;
+            NativeBounds = config.OverlayBounds;
 
             if (config.OverlayOpacity <= 0.01)
             {
@@ -421,8 +376,9 @@ namespace PoeShared.Native
 
         protected void SavePropertiesToConfig(IOverlayConfig config)
         {
-            config.OverlayLocation = new Point(Left, Top);
-            config.OverlaySize = new Size(Width, Height);
+            config.OverlayBounds = nativeBounds;
+            config.OverlayLocation = default;
+            config.OverlaySize = default;
             config.OverlayOpacity = Opacity;
         }
 
@@ -432,7 +388,7 @@ namespace PoeShared.Native
             {
                 throw new InvalidOperationException($"[{OverlayDescription}] Unsupported operation in this state, overlay(IsLocked: {IsLocked}, IsUnlockable: {IsUnlockable}): {this.DumpToTextRaw()}");
             }
-            Log.Debug($"[{OverlayDescription}] Unlocking window @ position {new Point(Left, Top)}");
+            Log.Debug($"[{OverlayDescription}] Unlocking window @ {nativeBounds}");
             IsLocked = false;
         }
 
@@ -447,7 +403,7 @@ namespace PoeShared.Native
             {
                 throw new InvalidOperationException($"[{OverlayDescription}] Unsupported operation in this state, overlay(IsLocked: {IsLocked}): {this.DumpToTextRaw()}");
             }
-            Log.Debug($"[{OverlayDescription}] Locking window @ position {new Point(Left, Top)}");
+            Log.Debug($"[{OverlayDescription}] Locking window @ {nativeBounds}");
             IsLocked = true;
         }
 
