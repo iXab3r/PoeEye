@@ -6,8 +6,9 @@ using System.Text;
 using System.Threading.Tasks;
 using log4net;
 using PoeShared.Scaffolding;
+using PoeShared.Squirrel.Core;
+using PoeShared.Squirrel.Scaffolding;
 using PoeShared.UI;
-using Squirrel;
 
 namespace PoeShared.Squirrel.Updater
 {
@@ -54,6 +55,21 @@ namespace PoeShared.Squirrel.Updater
 
                 return await wc.DownloadDataTaskAsync(url);
             }
+        }
+
+        public Task<long> GetSize(string url)
+        {
+            if (!string.IsNullOrEmpty(credentials.UserName))
+            {
+                throw new NotSupportedException("Operation is not supported for BasicAuth client with credentials");
+            }
+
+            if (!Uri.TryCreate(url, UriKind.Absolute, out var uri))
+            {
+                throw new FormatException($"Failed to parse URI: {uri}");
+            }
+
+            return Utility.GetRemoteFileSize(uri);
         }
 
         private WebClient CreateClient()

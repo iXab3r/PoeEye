@@ -245,15 +245,15 @@ namespace PoeShared.Squirrel.Updater
 
                 var mgr = PoeUpdateManager.GitHubUpdateManager(
                     updateSource.Uri,
+                    downloader,
                     appName,
-                    rootDirectory,
-                    downloader);
+                    rootDirectory);
                 return await mgr;
             }
             else
             {
                 Log.Debug($"Using BasicHTTP source: {updateSource.DumpToTextRaw()}");
-                var mgr = new PoeUpdateManager(updateSource.Uri, appName, rootDirectory, downloader);
+                var mgr = new PoeUpdateManager(updateSource.Uri, downloader, appName, rootDirectory);
                 return mgr;
             }
         }

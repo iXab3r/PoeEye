@@ -25,10 +25,11 @@ namespace PoeShared.Squirrel.Core
         private readonly IFileDownloader urlDownloader;
         private readonly SerialDisposable updateLock = new SerialDisposable();
 
-        public PoeUpdateManager(string urlOrPath,
+        public PoeUpdateManager(
+            string urlOrPath,
+            IFileDownloader urlDownloader,
             string applicationName = null,
-            string rootDirectory = null,
-            IFileDownloader urlDownloader = null)
+            string rootDirectory = null)
         {
             Guard.ArgumentIsTrue(!string.IsNullOrEmpty(urlOrPath), nameof(urlOrPath));
             Guard.ArgumentIsTrue(!string.IsNullOrEmpty(urlOrPath), "!string.IsNullOrEmpty(urlOrPath)");
@@ -36,8 +37,8 @@ namespace PoeShared.Squirrel.Core
 
             updateLock.AddTo(Anchors);
             updateUrlOrPath = urlOrPath;
+            this.urlDownloader = urlDownloader;
             ApplicationName = applicationName ?? GetApplicationName();
-            this.urlDownloader = urlDownloader ?? new FileDownloader();
 
             RootAppDirectory = Path.Combine(rootDirectory ?? GetLocalAppDataDirectory(), ApplicationName);
         }
@@ -50,51 +51,30 @@ namespace PoeShared.Squirrel.Core
 
         public async Task<IPoeUpdateInfo> CheckForUpdate(bool ignoreDeltaUpdates, Action<int> progress = null)
         {
-            var checkForUpdate = new CheckForUpdateImpl(RootAppDirectory);
-
             AcquireUpdateLock();
+
+            var checkForUpdate = new CheckForUpdateImpl(urlDownloader, RootAppDirectory);
             return await checkForUpdate.CheckForUpdate(
                 Utility.LocalReleaseFileForAppDir(RootAppDirectory),
                 updateUrlOrPath,
                 ignoreDeltaUpdates,
-                progress,
-                urlDownloader);
+                progress);
         }
 
         public async Task DownloadReleases(IReadOnlyCollection<IReleaseEntry> releasesToDownload, Action<int> progress = null)
         {
-            var downloadReleases = new DownloadReleasesImpl(RootAppDirectory);
             AcquireUpdateLock();
 
-            await downloadReleases.DownloadReleases(updateUrlOrPath, releasesToDownload, progress, urlDownloader);
+            var downloadReleases = new DownloadReleasesImpl(urlDownloader, RootAppDirectory);
+            await downloadReleases.DownloadReleases(updateUrlOrPath, releasesToDownload, progress);
         }
 
         public async Task<string> ApplyReleases(IPoeUpdateInfo updateInfo, Action<int> progress = null)
         {
-            var applyReleases = new ApplyReleasesImpl(RootAppDirectory);
             AcquireUpdateLock();
 
+            var applyReleases = new ApplyReleasesImpl(RootAppDirectory);
             return await applyReleases.ApplyReleases(updateInfo, false, false, progress);
-        }
-
-        public async Task FullInstall(bool silentInstall = false, Action<int> progress = null)
-        {
-            var updateInfo = await CheckForUpdate(true);
-            await DownloadReleases(updateInfo.ReleasesToApply);
-
-            var applyReleases = new ApplyReleasesImpl(RootAppDirectory);
-            AcquireUpdateLock();
-
-            await applyReleases.ApplyReleases(updateInfo, silentInstall, true, progress);
-        }
-
-        public async Task FullUninstall()
-        {
-            var applyReleases = new ApplyReleasesImpl(RootAppDirectory);
-            AcquireUpdateLock();
-
-            KillAllExecutablesBelongingToPackage();
-            await applyReleases.FullUninstall();
         }
 
         public Task<RegistryKey> CreateUninstallerRegistryEntry(string uninstallCmd, string quietSwitch)

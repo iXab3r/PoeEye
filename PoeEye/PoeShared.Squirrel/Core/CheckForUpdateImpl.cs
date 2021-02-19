@@ -16,10 +16,14 @@ namespace PoeShared.Squirrel.Core
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(CheckForUpdateImpl));
 
+        private readonly IFileDownloader urlDownloader;
         private readonly string rootAppDirectory;
 
-        public CheckForUpdateImpl(string rootAppDirectory)
+        public CheckForUpdateImpl(
+            IFileDownloader urlDownloader,
+            string rootAppDirectory)
         {
+            this.urlDownloader = urlDownloader;
             this.rootAppDirectory = rootAppDirectory;
         }
 
@@ -27,8 +31,7 @@ namespace PoeShared.Squirrel.Core
             string localReleaseFile,
             string updateUrlOrPath,
             bool ignoreDeltaUpdates = false,
-            Action<int> progress = null,
-            IFileDownloader urlDownloader = null)
+            Action<int> progress = null)
         {
             progress ??= _ => { };
 
@@ -52,38 +55,37 @@ namespace PoeShared.Squirrel.Core
                 await InitializeClientAppDirectory();
             }
 
-            string releaseFile;
 
             var latestLocalRelease = localReleases.Any()
                 ? localReleases.MaxBy(x => x.Version).First()
                 : default;
 
+            var isRemoteRepository = Utility.IsHttpUrl(updateUrlOrPath);
+
             // Fetch the remote RELEASES file, whether it's a local dir or an
-            if (Utility.IsHttpUrl(updateUrlOrPath))
+            string releaseFile;
+            if (isRemoteRepository)
             {
                 releaseFile = await LoadRemoteReleases(updateUrlOrPath, urlDownloader, latestLocalRelease);
-                progress(33);
             }
             else
             {
                 releaseFile = await LoadLocalReleases(updateUrlOrPath);
-                progress(33);
             }
+            progress(33);
 
-            var remoteReleases = ReleaseEntry.ParseReleaseFileAndApplyStaging(releaseFile, stagingId).ToArray();
+            var parsedReleases = ReleaseEntry.ParseReleaseFileAndApplyStaging(releaseFile, stagingId).ToArray();
             progress(55);
 
-            if (!remoteReleases.Any())
+            if (!parsedReleases.Any())
             {
                 throw new Exception("Remote release File is empty or corrupted");
             }
-                
-                
 
-            var ret = DetermineUpdateInfo(localReleases, remoteReleases, ignoreDeltaUpdates);
+            var result = DetermineUpdateInfo(localReleases, parsedReleases, ignoreDeltaUpdates);
 
             progress(100);
-            return ret;
+            return result;
         }
 
         private static async Task<string> LoadRemoteReleases(
@@ -184,7 +186,9 @@ namespace PoeShared.Squirrel.Core
             Directory.CreateDirectory(pkgDir);
         }
 
-        private IPoeUpdateInfo DetermineUpdateInfo(IReadOnlyCollection<IReleaseEntry> localReleases, IReadOnlyCollection<IReleaseEntry> remoteReleases,
+        private IPoeUpdateInfo DetermineUpdateInfo(
+            IReadOnlyCollection<IReleaseEntry> localReleases, 
+            IReadOnlyCollection<IReleaseEntry> remoteReleases,
             bool ignoreDeltaUpdates)
         {
             if (ignoreDeltaUpdates)
@@ -195,7 +199,9 @@ namespace PoeShared.Squirrel.Core
             return DetermineUpdateInfo(localReleases, remoteReleases);
         }
             
-        private IPoeUpdateInfo DetermineUpdateInfo(IReadOnlyCollection<IReleaseEntry> localReleases, IReadOnlyCollection<IReleaseEntry> remoteReleases)
+        private IPoeUpdateInfo DetermineUpdateInfo(
+            IReadOnlyCollection<IReleaseEntry> localReleases, 
+            IReadOnlyCollection<IReleaseEntry> remoteReleases)
         {
             var packageDirectory = Utility.PackageDirectoryForAppDir(rootAppDirectory);
             localReleases ??= Array.Empty<ReleaseEntry>();
@@ -203,7 +209,7 @@ namespace PoeShared.Squirrel.Core
             if (remoteReleases == null || remoteReleases.Count == 0)
             {
                 Log.Warn("Release information couldn't be determined due to remote corrupt RELEASES file");
-                throw new Exception("Corrupt remote RELEASES file");
+                throw new Exception("Corrupted remote RELEASES file");
             }
 
             var latestFullRelease = Utility.FindCurrentVersion(remoteReleases);
@@ -212,8 +218,7 @@ namespace PoeShared.Squirrel.Core
             if (latestFullRelease == currentRelease)
             {
                 Log.Info("No updates, remote and local are the same");
-                var info = PoeUpdateInfo.Create(currentRelease, new[] {latestFullRelease}, packageDirectory);
-                return info;
+                return PoeUpdateInfo.Create(currentRelease, new[] {latestFullRelease}, packageDirectory);
             }
 
             var latestLocal =

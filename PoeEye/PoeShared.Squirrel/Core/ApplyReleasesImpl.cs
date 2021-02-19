@@ -30,11 +30,15 @@ namespace PoeShared.Squirrel.Core
             this.rootAppDirectory = rootAppDirectory;
         }
 
-        public async Task<string> ApplyReleases(IPoeUpdateInfo updateInfo, bool silentInstall, bool attemptingFullInstall, Action<int> progress = null)
+        public async Task<string> ApplyReleases(
+            IPoeUpdateInfo updateInfo,
+            bool silentInstall, 
+            bool attemptingFullInstall, 
+            Action<int> progress = null)
         {
-            progress = progress ?? (_ => { });
+            progress ??= _ => { };
 
-            progress(0);
+            progress(5);
             var release = await CreateFullPackagesFromDeltas(updateInfo.ReleasesToApply.ToArray(), updateInfo.CurrentlyInstalledVersion);
             progress(10);
 
@@ -60,7 +64,7 @@ namespace PoeShared.Squirrel.Core
                 "Failed to update local releases file");
             progress(50);
 
-            var newVersion = currentReleases.MaxBy(x => x.Version).First().Version;
+            var newVersion = currentReleases.OrderByDescending(x => x.Version).First().Version;
             ExecuteSelfUpdate(newVersion);
 
             await Log.ErrorIfThrows(
@@ -85,9 +89,7 @@ namespace PoeShared.Squirrel.Core
 
             try
             {
-                var currentVersion = updateInfo.CurrentlyInstalledVersion != null
-                    ? updateInfo.CurrentlyInstalledVersion.Version
-                    : null;
+                var currentVersion = updateInfo.CurrentlyInstalledVersion?.Version;
 
                 await CleanDeadVersions(currentVersion, newVersion);
             }

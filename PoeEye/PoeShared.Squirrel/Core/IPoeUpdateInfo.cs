@@ -11,7 +11,7 @@ namespace PoeShared.Squirrel.Core
 
         public IReadOnlyCollection<IReleaseEntry> ReleasesToApply { get; }
 
-        public bool IsBootstrapping => CurrentlyInstalledVersion == null;
+        public bool IsDelta { get; }
 
         public string PackageDirectory { get; }
     }

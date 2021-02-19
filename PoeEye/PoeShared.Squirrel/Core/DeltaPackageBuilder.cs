@@ -30,69 +30,6 @@ namespace PoeShared.Squirrel.Core
             localAppDirectory = localAppDataOverride;
         }
 
-        public ReleasePackage CreateDeltaPackage(ReleasePackage basePackage, ReleasePackage newPackage, string outputFile)
-        {
-            Guard.ArgumentIsTrue(basePackage != null, "basePackage != null");
-            Guard.ArgumentIsTrue(!string.IsNullOrEmpty(outputFile) && !File.Exists(outputFile), "!string.IsNullOrEmpty(outputFile) && !File.Exists(outputFile)");
-
-            if (basePackage.Version > newPackage.Version)
-            {
-                var message = $"You cannot create a delta package based on version {basePackage.Version} as it is a later version than {newPackage.Version}";
-                throw new InvalidOperationException(message);
-            }
-
-            if (basePackage.ReleasePackageFile == null)
-            {
-                throw new ArgumentException("The base package's release file is null", "basePackage");
-            }
-
-            if (!File.Exists(basePackage.ReleasePackageFile))
-            {
-                throw new FileNotFoundException("The base package release does not exist", basePackage.ReleasePackageFile);
-            }
-
-            if (!File.Exists(newPackage.ReleasePackageFile))
-            {
-                throw new FileNotFoundException("The new package release does not exist", newPackage.ReleasePackageFile);
-            }
-
-            using (Utility.WithTempDirectory(out var baseTempPath))
-            using (Utility.WithTempDirectory(out var tempPath))
-            {
-                var baseTempInfo = new DirectoryInfo(baseTempPath);
-                var tempInfo = new DirectoryInfo(tempPath);
-
-                Log.InfoFormat(
-                        "Extracting {0} and {1} into {2}",
-                        basePackage.ReleasePackageFile,
-                        newPackage.ReleasePackageFile,
-                        tempPath);
-
-                Utility.ExtractZipToDirectory(basePackage.ReleasePackageFile, baseTempInfo.FullName).Wait();
-                Utility.ExtractZipToDirectory(newPackage.ReleasePackageFile, tempInfo.FullName).Wait();
-
-                // Collect a list of relative paths under 'lib' and map them
-                // to their full name. We'll use this later to determine in
-                // the new version of the package whether the file exists or
-                // not.
-                var baseLibFiles = baseTempInfo.GetAllFilesRecursively()
-                    .Where(x => x.FullName.ToLowerInvariant().Contains("lib" + Path.DirectorySeparatorChar))
-                    .ToDictionary(k => k.FullName.Replace(baseTempInfo.FullName, ""), v => v.FullName);
-
-                var newLibDir = tempInfo.GetDirectories().First(x => x.Name.ToLowerInvariant() == "lib");
-
-                foreach (var libFile in newLibDir.GetAllFilesRecursively())
-                {
-                    CreateDeltaForSingleFile(libFile, tempInfo, baseLibFiles);
-                }
-
-                ReleasePackage.AddDeltaFilesToContentTypes(tempInfo.FullName);
-                Utility.CreateZipFromDirectory(outputFile, tempInfo.FullName).Wait();
-            }
-
-            return new ReleasePackage(outputFile);
-        }
-
         public ReleasePackage ApplyDeltaPackage(ReleasePackage basePackage, ReleasePackage deltaPackage, string outputFile)
         {
             Guard.ArgumentIsTrue(deltaPackage != null, "deltaPackage != null");

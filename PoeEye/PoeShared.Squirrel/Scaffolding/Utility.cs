@@ -6,15 +6,11 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reactive.Disposables;
-using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using log4net;
-using NuGet;
-using Splat;
 using Squirrel;
 using HttpUtility = System.Web.HttpUtility;
 
@@ -39,111 +35,16 @@ namespace PoeShared.Squirrel.Scaffolding
                                });
             });
 
-        private static readonly string[] PeExtensions = {".exe", ".dll", ".node"};
-
-        /// <summary>
-        ///     The namespace for fully-qualified domain names (from RFC 4122, Appendix C).
-        /// </summary>
-        public static readonly Guid DnsNamespace = new Guid("6ba7b810-9dad-11d1-80b4-00c04fd430c8");
-
-        /// <summary>
-        ///     The namespace for URLs (from RFC 4122, Appendix C).
-        /// </summary>
-        public static readonly Guid UrlNamespace = new Guid("6ba7b811-9dad-11d1-80b4-00c04fd430c8");
-
         /// <summary>
         ///     The namespace for ISO OIDs (from RFC 4122, Appendix C).
         /// </summary>
         public static readonly Guid IsoOidNamespace = new Guid("6ba7b812-9dad-11d1-80b4-00c04fd430c8");
-
-        public static string RemoveByteOrderMarkerIfPresent(string content)
-        {
-            return string.IsNullOrEmpty(content)
-                ? string.Empty
-                : RemoveByteOrderMarkerIfPresent(Encoding.UTF8.GetBytes(content));
-        }
-
-        public static string RemoveByteOrderMarkerIfPresent(byte[] content)
-        {
-            byte[] output = { };
-
-            if (content == null)
-            {
-                goto done;
-            }
-
-            Func<byte[], byte[], bool> matches = (bom, src) =>
-            {
-                if (src.Length < bom.Length)
-                {
-                    return false;
-                }
-
-                return !bom.Where((chr, index) => src[index] != chr).Any();
-            };
-
-            var utf32Be = new byte[] {0x00, 0x00, 0xFE, 0xFF};
-            var utf32Le = new byte[] {0xFF, 0xFE, 0x00, 0x00};
-            var utf16Be = new byte[] {0xFE, 0xFF};
-            var utf16Le = new byte[] {0xFF, 0xFE};
-            var utf8 = new byte[] {0xEF, 0xBB, 0xBF};
-
-            if (matches(utf32Be, content))
-            {
-                output = new byte[content.Length - utf32Be.Length];
-            }
-            else if (matches(utf32Le, content))
-            {
-                output = new byte[content.Length - utf32Le.Length];
-            }
-            else if (matches(utf16Be, content))
-            {
-                output = new byte[content.Length - utf16Be.Length];
-            }
-            else if (matches(utf16Le, content))
-            {
-                output = new byte[content.Length - utf16Le.Length];
-            }
-            else if (matches(utf8, content))
-            {
-                output = new byte[content.Length - utf8.Length];
-            }
-            else
-            {
-                output = content;
-            }
-
-            done:
-            if (output.Length > 0)
-            {
-                Buffer.BlockCopy(content, content.Length - output.Length, output, 0, output.Length);
-            }
-
-            return Encoding.UTF8.GetString(output);
-        }
 
         public static IEnumerable<FileInfo> GetAllFilesRecursively(this DirectoryInfo rootPath)
         {
             Guard.ArgumentIsTrue(rootPath != null, "rootPath != null");
 
             return rootPath.EnumerateFiles("*", SearchOption.AllDirectories);
-        }
-
-        public static IEnumerable<string> GetAllFilePathsRecursively(string rootPath)
-        {
-            Guard.ArgumentIsTrue(rootPath != null, "rootPath != null");
-
-            return Directory.EnumerateFiles(rootPath, "*", SearchOption.AllDirectories);
-        }
-
-        public static string CalculateFileSha1(string filePath)
-        {
-            Guard.ArgumentIsTrue(filePath != null, "filePath != null");
-
-            using (var stream = File.OpenRead(filePath))
-            {
-                return CalculateStreamSha1(stream);
-            }
         }
 
         public static string CalculateStreamSha1(Stream file)
@@ -172,23 +73,6 @@ namespace PoeShared.Squirrel.Scaffolding
             return ret;
         }
 
-        public static async Task CopyToAsync(string from, string to)
-        {
-            Guard.ArgumentIsTrue(!string.IsNullOrEmpty(from) && File.Exists(from), "!string.IsNullOrEmpty(from) && File.Exists(from)");
-            Guard.ArgumentIsTrue(!string.IsNullOrEmpty(to), "!string.IsNullOrEmpty(to)");
-
-            if (!File.Exists(from))
-            {
-                Log.WarnFormat("The file {0} does not exist", from);
-
-                // TODO: should we fail this operation?
-                return;
-            }
-
-            // XXX: SafeCopy
-            await Task.Run(() => File.Copy(from, to, true));
-        }
-
         public static void Retry(this Action block, int retries = 2)
         {
             Guard.ArgumentIsTrue(retries > 0, "retries > 0");
@@ -200,6 +84,22 @@ namespace PoeShared.Squirrel.Scaffolding
             };
 
             thunk.Retry(retries);
+        }
+        
+        public static async Task<long> GetRemoteFileSize(Uri uriPath)
+        {
+            var webRequest = WebRequest.Create(uriPath);
+            webRequest.Method = "HEAD";
+
+            using var webResponse = await webRequest.GetResponseAsync();
+            
+            var contentLength = webResponse.Headers.Get("Content-Length");
+            if (long.TryParse(contentLength, out var fileSize))
+            {
+                return fileSize;
+            }
+
+            throw new ApplicationException($"Failed to get file size from {uriPath}, content headers: {webRequest.Headers}");
         }
 
         public static T Retry<T>(this Func<T> block, int retries = 2)
@@ -245,7 +145,7 @@ namespace PoeShared.Squirrel.Scaffolding
             return InvokeProcessAsync(psi, ct);
         }
 
-        public static async Task<Tuple<int, string>> InvokeProcessAsync(ProcessStartInfo psi, CancellationToken ct)
+        private static async Task<Tuple<int, string>> InvokeProcessAsync(ProcessStartInfo psi, CancellationToken ct)
         {
             var pi = Process.Start(psi);
             await Task.Run(
@@ -302,7 +202,7 @@ namespace PoeShared.Squirrel.Scaffolding
                     }));
         }
 
-        internal static string TempNameForIndex(int index, string prefix)
+        private static string TempNameForIndex(int index, string prefix)
         {
             if (index < DirectoryChars.Value.Length)
             {
@@ -430,101 +330,9 @@ namespace PoeShared.Squirrel.Scaffolding
             }
         }
 
-        public static string FindHelperExecutable(string toFind, IEnumerable<string> additionalDirs = null)
-        {
-            additionalDirs = additionalDirs ?? Enumerable.Empty<string>();
-            var dirs = new[] {Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)}
-                .Concat(additionalDirs ?? Enumerable.Empty<string>());
-
-            var exe = @".\" + toFind;
-            return dirs
-                       .Select(x => Path.Combine(x, toFind))
-                       .FirstOrDefault(x => File.Exists(x)) ??
-                   exe;
-        }
-
-        private static string Find7Zip()
-        {
-            if (ModeDetector.InUnitTestRunner())
-            {
-                var vendorDir = Path.Combine(
-                    Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location.Replace("file:///", "")) ?? throw new InvalidOperationException(),
-                    "..",
-                    "..",
-                    "..",
-                    "vendor",
-                    "7zip"
-                );
-                return FindHelperExecutable("7z.exe", new[] {vendorDir});
-            }
-
-            return FindHelperExecutable("7z.exe");
-        }
-
-        public static async Task ExtractZipToDirectory(string zipFilePath, string outFolder)
-        {
-            var sevenZip = Find7Zip();
-            var result = default(Tuple<int, string>);
-
-            try
-            {
-                var cmd = sevenZip;
-                var args = $"x \"{zipFilePath}\" -tzip -mmt on -aoa -y -o\"{outFolder}\" *";
-                if (Environment.OSVersion.Platform != PlatformID.Win32NT)
-                {
-                    cmd = "wine";
-                    args = sevenZip + " " + args;
-                }
-
-                result = await InvokeProcessAsync(cmd, args, CancellationToken.None);
-                if (result.Item1 != 0)
-                {
-                    throw new Exception(result.Item2);
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.Error($"Failed to extract file {zipFilePath} to {outFolder}", ex);
-                throw;
-            }
-        }
-
-        public static async Task CreateZipFromDirectory(string zipFilePath, string inFolder)
-        {
-            var sevenZip = Find7Zip();
-            var result = default(Tuple<int, string>);
-
-            try
-            {
-                var cmd = sevenZip;
-                var args = $"a \"{zipFilePath}\" -tzip -aoa -y -mmt on *";
-                if (Environment.OSVersion.Platform != PlatformID.Win32NT)
-                {
-                    cmd = "wine";
-                    args = sevenZip + " " + args;
-                }
-
-                result = await InvokeProcessAsync(cmd, args, CancellationToken.None, inFolder);
-                if (result.Item1 != 0)
-                {
-                    throw new Exception(result.Item2);
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.Error($"Failed to extract file {zipFilePath} to {inFolder}", ex);
-                throw;
-            }
-        }
-
         public static string AppDirForRelease(string rootAppDirectory, IReleaseEntry entry)
         {
             return Path.Combine(rootAppDirectory, "app-" + entry.Version);
-        }
-
-        public static string AppDirForVersion(string rootAppDirectory, SemanticVersion version)
-        {
-            return Path.Combine(rootAppDirectory, "app-" + version);
         }
 
         public static string PackageDirectoryForAppDir(string rootAppDirectory)
@@ -551,18 +359,6 @@ namespace PoeShared.Squirrel.Scaffolding
         public static T FindCurrentVersion<T>(IEnumerable<T> localReleases) where T : IReleaseEntry
         {
             return !localReleases.Any() ? default : localReleases.OrderByDescending(x => x.Version).FirstOrDefault(x => !x.IsDelta);
-        }
-
-        private static TAcc Scan<T, TAcc>(this IEnumerable<T> This, TAcc initialValue, Func<TAcc, T, TAcc> accFunc)
-        {
-            var acc = initialValue;
-
-            foreach (var x in This)
-            {
-                acc = accFunc(acc, x);
-            }
-
-            return acc;
         }
 
         public static bool IsHttpUrl(string urlOrPath)
@@ -637,61 +433,6 @@ namespace PoeShared.Squirrel.Scaffolding
             }
         }
 
-        // http://stackoverflow.com/questions/3111669/how-can-i-determine-the-subsystem-used-by-a-given-net-assembly
-        public static bool ExecutableUsesWin32Subsystem(string peImage)
-        {
-            using (var s = new FileStream(peImage, FileMode.Open, FileAccess.Read))
-            {
-                var rawPeSignatureOffset = new byte[4];
-                s.Seek(0x3c, SeekOrigin.Begin);
-                s.Read(rawPeSignatureOffset, 0, 4);
-
-                int peSignatureOffset = rawPeSignatureOffset[0];
-                peSignatureOffset |= rawPeSignatureOffset[1] << 8;
-                peSignatureOffset |= rawPeSignatureOffset[2] << 16;
-                peSignatureOffset |= rawPeSignatureOffset[3] << 24;
-
-                var coffHeader = new byte[24];
-                s.Seek(peSignatureOffset, SeekOrigin.Begin);
-                s.Read(coffHeader, 0, 24);
-
-                byte[] signature = {(byte) 'P', (byte) 'E', (byte) '\0', (byte) '\0'};
-                for (var index = 0; index < 4; index++)
-                {
-                    if (coffHeader[index] != signature[index])
-                    {
-                        throw new Exception("File is not a PE image");
-                    }
-                }
-
-                var subsystemBytes = new byte[2];
-                s.Seek(68, SeekOrigin.Current);
-                s.Read(subsystemBytes, 0, 2);
-
-                var subSystem = subsystemBytes[0] | (subsystemBytes[1] << 8);
-                return subSystem == 2; /*IMAGE_SUBSYSTEM_WINDOWS_GUI*/
-            }
-        }
-
-        public static bool FileIsLikelyPeImage(string name)
-        {
-            var ext = Path.GetExtension(name);
-            return PeExtensions.Any(x => ext.Equals(x, StringComparison.OrdinalIgnoreCase));
-        }
-
-        public static bool IsFileTopLevelInPackage(string fullName, string pkgPath)
-        {
-            var fn = fullName.ToLowerInvariant();
-            var pkg = pkgPath.ToLowerInvariant();
-            var relativePath = fn.Replace(pkg, "");
-
-            // NB: We want to match things like `/lib/net45/foo.exe` but not `/lib/net45/bar/foo.exe`
-            return relativePath.Split(Path.DirectorySeparatorChar).Length == 4;
-        }
-
-        [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-        private static extern bool MoveFileEx(string lpExistingFileName, string lpNewFileName, MoveFileFlags dwFlags);
-
         public static Guid CreateGuidFromHash(string text)
         {
             return CreateGuidFromHash(text, IsoOidNamespace);
@@ -702,12 +443,12 @@ namespace PoeShared.Squirrel.Scaffolding
             return CreateGuidFromHash(data, IsoOidNamespace);
         }
 
-        public static Guid CreateGuidFromHash(string text, Guid namespaceId)
+        private static Guid CreateGuidFromHash(string text, Guid namespaceId)
         {
             return CreateGuidFromHash(Encoding.UTF8.GetBytes(text), namespaceId);
         }
 
-        public static Guid CreateGuidFromHash(byte[] nameBytes, Guid namespaceId)
+        private static Guid CreateGuidFromHash(byte[] nameBytes, Guid namespaceId)
         {
             // convert the namespace UUID to network order (step 3)
             var namespaceBytes = namespaceId.ToByteArray();
@@ -757,17 +498,6 @@ namespace PoeShared.Squirrel.Scaffolding
             var temp = guid[left];
             guid[left] = guid[right];
             guid[right] = temp;
-        }
-
-        [Flags]
-        private enum MoveFileFlags
-        {
-            MOVEFILE_REPLACE_EXISTING = 0x00000001,
-            MOVEFILE_COPY_ALLOWED = 0x00000002,
-            MOVEFILE_DELAY_UNTIL_REBOOT = 0x00000004,
-            MOVEFILE_WRITE_THROUGH = 0x00000008,
-            MOVEFILE_CREATE_HARDLINK = 0x00000010,
-            MOVEFILE_FAIL_IF_NOT_TRACKABLE = 0x00000020
         }
     }
 }

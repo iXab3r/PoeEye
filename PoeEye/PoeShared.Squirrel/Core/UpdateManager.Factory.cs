@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -9,7 +8,6 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 using PoeShared.Squirrel.Scaffolding;
-using Squirrel;
 
 namespace PoeShared.Squirrel.Core
 {
@@ -17,9 +15,9 @@ namespace PoeShared.Squirrel.Core
     {
         public static async Task<PoeUpdateManager> GitHubUpdateManager(
             string repoUrl,
+            IFileDownloader urlDownloader,
             string applicationName = null,
             string rootDirectory = null,
-            IFileDownloader urlDownloader = null,
             bool prerelease = false,
             string accessToken = null)
         {
@@ -77,7 +75,7 @@ namespace PoeShared.Squirrel.Core
                 
                 var latestReleaseUrl = latestRelease.HtmlUrl.Replace("/tag/", "/download/");
 
-                return new PoeUpdateManager(latestReleaseUrl, applicationName, rootDirectory, urlDownloader);
+                return new PoeUpdateManager(latestReleaseUrl, urlDownloader, applicationName, rootDirectory);
             }
         }
 

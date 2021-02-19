@@ -13,22 +13,22 @@ namespace PoeShared.Squirrel.Core
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(DownloadReleasesImpl));
 
+        private readonly IFileDownloader urlDownloader;
         private readonly string rootAppDirectory;
 
-        public DownloadReleasesImpl(string rootAppDirectory)
+        public DownloadReleasesImpl(IFileDownloader urlDownloader, string rootAppDirectory)
         {
+            this.urlDownloader = urlDownloader;
             this.rootAppDirectory = rootAppDirectory;
         }
 
         public async Task DownloadReleases(
-            string updateUrlOrPath, 
-            IReadOnlyCollection<IReleaseEntry> releasesToDownload, 
-            Action<int> progress = null,
-            IFileDownloader urlDownloader = null)
+            string updateUrlOrPath,
+            IReadOnlyCollection<IReleaseEntry> releasesToDownload,
+            Action<int> progress = null)
         {
             progress ??= (_ => { });
-            urlDownloader ??= new FileDownloader();
-                
+
             var packagesDirectory = Path.Combine(rootAppDirectory, "packages");
 
             double current = 0;
@@ -41,7 +41,7 @@ namespace PoeShared.Squirrel.Core
                     async x =>
                     {
                         var targetFile = Path.Combine(packagesDirectory, x.Filename);
-                            
+
                         double component = 0;
                         await DownloadRelease(
                             updateUrlOrPath,
@@ -57,7 +57,6 @@ namespace PoeShared.Squirrel.Core
                                     progress((int) Math.Round(current += component));
                                 }
                             });
-
                         ChecksumPackage(x);
                     });
             }
@@ -85,8 +84,8 @@ namespace PoeShared.Squirrel.Core
         }
 
         private static Task DownloadRelease(
-            string updateBaseUrl, 
-            IReleaseEntry releaseEntry, 
+            string updateBaseUrl,
+            IReleaseEntry releaseEntry,
             IFileDownloader urlDownloader, string targetFile,
             Action<int> progressConsumer)
         {
@@ -96,7 +95,7 @@ namespace PoeShared.Squirrel.Core
             {
                 throw new ApplicationException($"Release entry: {releaseEntry} is not downloadable");
             }
-                
+
             var releaseEntryUrl = rawReleaseEntry.BaseUrl + rawReleaseEntry.Filename + rawReleaseEntry.Query;
             var sourceFileUrl = new Uri(baseUri, releaseEntryUrl).AbsoluteUri;
             File.Delete(targetFile);
@@ -130,7 +129,7 @@ namespace PoeShared.Squirrel.Core
             {
                 return;
             }
-                    
+
             Log.ErrorFormat("File SHA1 should be {0}, is {1}", downloadedRelease.SHA1, hash);
             targetPackage.Delete();
             throw new Exception("Checksum doesn't match: " + targetPackage.FullName);
