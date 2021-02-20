@@ -51,7 +51,7 @@ namespace PoeShared
             Guard.ArgumentIsTrue(() => logConfig.Exists);
 
             var repository = (Hierarchy)  LogManager.GetRepository(Assembly.GetEntryAssembly());
-            XmlConfigurator.Configure(repository, logConfig);
+            XmlConfigurator.ConfigureAndWatch(repository, logConfig);
             Log.Info($"Logging settings loaded from {logConfig}");
         }
 

@@ -55,6 +55,8 @@ namespace PoeShared
             set => appName = value ?? throw new ApplicationException($"{nameof(AppName)} must be set");
         }
 
+        public Version Version { get; }
+
         public string AppSupportMail { get; set; } = "";
 
         public string AppDomainDirectory => AppDomain.CurrentDomain.BaseDirectory;
@@ -67,6 +69,7 @@ namespace PoeShared
         {
             var entryAssembly = Assembly.GetEntryAssembly() ?? throw new InvalidOperationException("Entry assembly is not specified");
             AppName = (entryAssembly.GetCustomAttribute<AssemblyProductAttribute>() ?? throw new InvalidOperationException($"{nameof(AssemblyProductAttribute)} is not specified on assembly {entryAssembly}")).Product;
+            Version = entryAssembly.GetName().Version;
             ProcessId = Process.GetCurrentProcess().Id;
             IsElevated = true;
             var args = Environment.GetCommandLineArgs();

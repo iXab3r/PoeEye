@@ -1,3 +1,4 @@
+using System;
 using JetBrains.Annotations;
 
 namespace PoeShared.Modularity
@@ -5,6 +6,8 @@ namespace PoeShared.Modularity
     public interface IAppConfig
     {
         string AppName { [NotNull] get; }
+        
+        Version Version { get; }
         
         string AppDataDirectory { [CanBeNull] get; }
         

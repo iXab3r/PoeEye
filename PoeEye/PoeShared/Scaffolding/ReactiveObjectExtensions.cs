@@ -41,6 +41,7 @@ namespace PoeShared.Scaffolding
             }
             
             return result
+                .DistinctUntilChanged()
                 .Subscribe(x =>
                 {
                     if (Log.IsDebugEnabled)
