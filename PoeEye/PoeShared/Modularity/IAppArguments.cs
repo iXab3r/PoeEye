@@ -20,6 +20,8 @@ namespace PoeShared.Modularity
     {
         bool IsDebugMode { get; }
         
+        bool IsLazyMode { get; }
+        
         bool IsElevated { get; }
         
         string AutostartFlag { [CanBeNull] get; }
