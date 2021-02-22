@@ -220,7 +220,7 @@ namespace PoeShared.Squirrel.Updater
 
             try
             {
-                var newVersion = await Task.Run(updaterModel.CheckForUpdates);
+                var newVersion = await updaterModel.CheckForUpdates();
 
                 if (newVersion != null)
                 {

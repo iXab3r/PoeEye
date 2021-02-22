@@ -59,7 +59,12 @@ namespace PoeShared.Scaffolding
 
         private void AddStep(string message)
         {
-            operations.Enqueue($"[{propertyName}] [{(sw.Elapsed - previousOperationTimestamp).TotalMilliseconds:F1}ms] {message}");
+            var logMessage = $"[{propertyName}] [{(sw.Elapsed - previousOperationTimestamp).TotalMilliseconds:F1}ms] {message}";
+            operations.Enqueue(logMessage);
+            if (logger.IsDebugEnabled)
+            {
+                logger.Debug(logMessage);
+            }
         }
         
         public void Dispose()

@@ -26,6 +26,7 @@ namespace PoeShared.Squirrel.Scaffolding
             var st = new Stopwatch();
             st.Start();
 
+            Log.Debug($"Acquiring update lock @ {path}");
             var fh = default(FileStream);
             while (st.Elapsed < timeOut)
             {
@@ -52,6 +53,7 @@ namespace PoeShared.Squirrel.Scaffolding
             handle = Disposable.Create(
                 () =>
                 {
+                    Log.Debug($"Releasing update lock @ {path}");
                     fh.Dispose();
                     File.Delete(path);
                 });

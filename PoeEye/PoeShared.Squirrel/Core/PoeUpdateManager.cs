@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Controls;
+using log4net;
 using Microsoft.Win32;
 using NuGet;
 using PoeShared.Scaffolding;
@@ -21,9 +22,10 @@ namespace PoeShared.Squirrel.Core
 {
     public sealed partial class PoeUpdateManager : DisposableReactiveObject
     {
+        private static readonly ILog Log = LogManager.GetLogger(typeof(PoeUpdateManager));
+
         private readonly string updateUrlOrPath;
         private readonly IFileDownloader urlDownloader;
-        private readonly SerialDisposable updateLock = new SerialDisposable();
 
         public PoeUpdateManager(
             string urlOrPath,
@@ -35,7 +37,6 @@ namespace PoeShared.Squirrel.Core
             Guard.ArgumentIsTrue(!string.IsNullOrEmpty(urlOrPath), "!string.IsNullOrEmpty(urlOrPath)");
             Guard.ArgumentIsTrue(!string.IsNullOrEmpty(applicationName), "!string.IsNullOrEmpty(applicationName)");
 
-            updateLock.AddTo(Anchors);
             updateUrlOrPath = urlOrPath;
             this.urlDownloader = urlDownloader;
             ApplicationName = applicationName ?? GetApplicationName();
@@ -51,30 +52,41 @@ namespace PoeShared.Squirrel.Core
 
         public async Task<IPoeUpdateInfo> CheckForUpdate(bool ignoreDeltaUpdates, Action<int> progress = null)
         {
-            AcquireUpdateLock();
-
+            using var sw = new BenchmarkTimer($"Checking for updates, ignore delta: {ignoreDeltaUpdates}", Log);
+            using var updateLock = AcquireUpdateLock();
+            
+            sw.Step("Update lock acquired");
             var checkForUpdate = new CheckForUpdateImpl(urlDownloader, RootAppDirectory);
-            return await checkForUpdate.CheckForUpdate(
+            var result = await checkForUpdate.CheckForUpdate(
                 Utility.LocalReleaseFileForAppDir(RootAppDirectory),
                 updateUrlOrPath,
                 ignoreDeltaUpdates,
                 progress);
+            sw.Step("Update check completed");
+            return result;
         }
 
         public async Task DownloadReleases(IReadOnlyCollection<IReleaseEntry> releasesToDownload, Action<int> progress = null)
         {
-            AcquireUpdateLock();
-
+            using var sw = new BenchmarkTimer($"Download releases: {releasesToDownload.Select(x => new { x.Version, x.IsDelta, x.Filesize }).DumpToTextRaw()}", Log);
+            using var updateLock = AcquireUpdateLock();
+            
+            sw.Step("Update lock acquired");
             var downloadReleases = new DownloadReleasesImpl(urlDownloader, RootAppDirectory);
             await downloadReleases.DownloadReleases(updateUrlOrPath, releasesToDownload, progress);
+            sw.Step("Download completed");
         }
 
         public async Task<string> ApplyReleases(IPoeUpdateInfo updateInfo, Action<int> progress = null)
         {
-            AcquireUpdateLock();
-
+            using var sw = new BenchmarkTimer($"Apply releases: {updateInfo.ReleasesToApply.Select(x => new { x.Version, x.IsDelta, x.Filename })}", Log);
+            using var updateLock = AcquireUpdateLock();
+            
+            sw.Step("Update lock acquired");
             var applyReleases = new ApplyReleasesImpl(RootAppDirectory);
-            return await applyReleases.ApplyReleases(updateInfo, false, false, progress);
+            var result = await applyReleases.ApplyReleases(updateInfo, false, false, progress);
+            sw.Step("All releases successfully applied");
+            return result;
         }
 
         public Task<RegistryKey> CreateUninstallerRegistryEntry(string uninstallCmd, string quietSwitch)
@@ -218,25 +230,20 @@ namespace PoeShared.Squirrel.Core
             return Path.GetFullPath(twoFoldersUpFromAppFolder);
         }
 
-        private async void AcquireUpdateLock()
+        private IDisposable AcquireUpdateLock()
         {
-            var update = await AcquireUpdateLock(RootAppDirectory);
-            update.AssignTo(updateLock);
+            return AcquireUpdateLock(RootAppDirectory);
         }
         
-        private static Task<IDisposable> AcquireUpdateLock(string key)
+        private static IDisposable AcquireUpdateLock(string key)
         {
-            return Task.Run(
-                () =>
-                {
-                    var keyBytes = Encoding.UTF8.GetBytes(key);
-                    using var keyStream = new MemoryStream(keyBytes);
-                    var keyHash = Utility.CalculateStreamSha1(keyStream);
+            var keyBytes = Encoding.UTF8.GetBytes(key);
+            using var keyStream = new MemoryStream(keyBytes);
+            var keyHash = Utility.CalculateStreamSha1(keyStream);
 
-                    return ModeDetector.InUnitTestRunner()
-                        ? Disposable.Create(() => { })
-                        : new SingleGlobalInstance(keyHash, TimeSpan.FromMilliseconds(2000));
-                });
+            return ModeDetector.InUnitTestRunner()
+                ? Disposable.Create(() => { })
+                : new SingleGlobalInstance(keyHash, TimeSpan.FromMilliseconds(2000));
         }
 
         private static string GetApplicationName()
