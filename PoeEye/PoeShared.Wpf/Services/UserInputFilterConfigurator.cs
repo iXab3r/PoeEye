@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Reactive.Disposables;
+using JetBrains.Annotations;
 using log4net;
 using PoeShared.UI.Hotkeys;
 
@@ -12,8 +13,13 @@ namespace PoeShared.Wpf.Services
 
         private readonly ConcurrentDictionary<HotkeyGesture, int> whitelist = new();
         
-        public IDisposable AddToWhitelist(HotkeyGesture hotkey)
+        public IDisposable AddToWhitelist([NotNull] HotkeyGesture hotkey)
         {
+            if (hotkey == null)
+            {
+                throw new ArgumentNullException(nameof(hotkey));
+            }
+
             lock (whitelist)
             {
                 whitelist.AddOrUpdate(hotkey, key =>

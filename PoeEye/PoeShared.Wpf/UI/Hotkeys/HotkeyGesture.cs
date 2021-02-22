@@ -11,6 +11,7 @@ namespace PoeShared.UI.Hotkeys
 {
     public class HotkeyGesture : IEquatable<HotkeyGesture>
     {
+        public static readonly HotkeyGesture Empty = new HotkeyGesture();
         private static readonly IDictionary<Key, string> KnownSpecialKeys = new Dictionary<Key, string>();
 
         static HotkeyGesture()
