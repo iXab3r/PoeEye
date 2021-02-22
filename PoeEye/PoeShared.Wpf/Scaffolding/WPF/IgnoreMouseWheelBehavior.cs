@@ -1,7 +1,6 @@
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interactivity;
-using System.Windows.Media;
 
 namespace PoeShared.Scaffolding.WPF
 {
@@ -18,6 +17,7 @@ namespace PoeShared.Scaffolding.WPF
             get { return (bool) GetValue(IsEnabledProperty); }
             set { SetValue(IsEnabledProperty, value); }
         }
+
         
         protected override void OnAttached()
         {
@@ -38,19 +38,7 @@ namespace PoeShared.Scaffolding.WPF
                 return;
             }
 
-            DependencyObject parent = VisualTreeHelper.GetParent((DependencyObject) sender);
-            if (!(parent is UIElement))
-            {
-                return;
-            }
-
-            ((UIElement) parent).RaiseEvent(
-                new MouseWheelEventArgs(e.MouseDevice, e.Timestamp, e.Delta) { RoutedEvent = UIElement.MouseWheelEvent });
-
-            if (IsEnabled)
-            {
-                e.Handled = true;
-            }
+            MouseWheelHelper.HandlePreviewMouseWheel(dependencyObject, e, IsEnabled);
         }
     }
 }

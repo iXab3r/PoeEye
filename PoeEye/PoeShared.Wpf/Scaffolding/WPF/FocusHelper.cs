@@ -35,8 +35,7 @@ namespace PoeShared.Scaffolding.WPF
             bool? newValue = null;
             if (valueToSet.NewValue is string)
             {
-                bool newBool;
-                if (bool.TryParse(valueToSet.NewValue as string, out newBool))
+                if (bool.TryParse(valueToSet.NewValue as string, out var newBool))
                 {
                     newValue = newBool;
                 }
