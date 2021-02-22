@@ -60,17 +60,20 @@
                         HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
                         VerticalAlignment="{TemplateBinding VerticalAlignment}"
                         IsHitTestVisible="{TemplateBinding IsHitTestVisible}"
-                        Padding="{TemplateBinding Margin}">
+                        Padding="{TemplateBinding Margin}"
+                        ToolTip="{TemplateBinding ToolTip}">
                         <st:StackPanel Margin="2.5"
                             MarginBetweenChildren="5"
                             HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                             VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
                             Orientation="Horizontal">
                             <Grid>
-                                <TextBlock Style="{StaticResource IconTextBlock}" x:Name="IconLabel"
-                                           Foreground="{TemplateBinding Foreground}"
-                                           HorizontalAlignment="Center" FontSize="{TemplateBinding FontSize}"
-                                           Text="{Binding Icon, RelativeSource={RelativeSource TemplatedParent}}"
+                                <ContentPresenter x:Name="IconLabel"
+                                           TextBlock.Foreground="{TemplateBinding Foreground}"
+                                           TextBlock.FontSize="{TemplateBinding FontSize}"
+                                           TextBlock.FontFamily="{StaticResource FontAwesome}"
+                                           HorizontalAlignment="Center" 
+                                           Content="{Binding Icon, RelativeSource={RelativeSource TemplatedParent}}"
                                            Visibility="{Binding Icon, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource NullToCollapsedConverter}}" />
                                 <TextBlock x:Name="ErrorIcon" FontSize="{TemplateBinding FontSize}"
                                            ToolTip="{Binding Command.Error, RelativeSource={RelativeSource TemplatedParent}}"
@@ -168,7 +171,9 @@
                                 </BeginStoryboard>
                             </MultiDataTrigger.ExitActions>
                         </MultiDataTrigger>
-
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.66"/>
+                        </Trigger>
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter Property="Foreground" Value="{StaticResource MouseOverAccentBrushKey}" />
                         </Trigger>
