@@ -4,7 +4,7 @@ using System.Reactive;
 
 namespace PoeShared.Native
 {
-    public interface IWindowViewController : IViewController
+    public interface IWindowViewController : INotifyPropertyChanged, IViewController
     {
         IObservable<Unit> WhenLoaded { get; }
         

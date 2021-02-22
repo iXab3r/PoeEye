@@ -2,11 +2,9 @@ using System;
 using System.ComponentModel;
 using System.Reactive;
 using System.Reactive.Linq;
-using System.Reactive.Subjects;
 using System.Windows;
 using log4net;
 using PoeShared.Scaffolding;
-using PoeShared.Wpf.Scaffolding;
 using ReactiveUI;
 
 namespace PoeShared.Native
@@ -36,9 +34,20 @@ namespace PoeShared.Native
             
             WhenClosing = Observable.FromEventPattern<CancelEventHandler, CancelEventArgs>(h => owner.Closing += h, h => owner.Closing -= h).Select(x => x.EventArgs);
             WhenClosed = Observable.FromEventPattern<EventHandler, EventArgs>(h => owner.Closed += h, h => owner.Closed -= h).ToUnit();
+            WhenDeactivated = Observable.FromEventPattern<EventHandler, EventArgs>(h => owner.Deactivated += h, h => owner.Deactivated -= h).ToUnit();
 
             this.WhenAnyValue(x => x.Topmost)
                 .SubscribeSafe(x => owner.Topmost = x, Log.HandleUiException)
+                .AddTo(Anchors);
+
+            WhenDeactivated
+                .Where(_ => topmost)
+                .SubscribeSafe(() =>
+                {
+                    Log.Debug($"[{owner}.{owner.Title}] Window is deactivated, reactivating {nameof(Topmost)} style");
+                    owner.Topmost = false;
+                    owner.Topmost = true;
+                }, Log.HandleUiException)
                 .AddTo(Anchors);
         }
 
@@ -47,6 +56,8 @@ namespace PoeShared.Native
         public IObservable<Unit> WhenUnloaded { get; }
         
         public IObservable<Unit> WhenClosed { get; }
+ 
+        public IObservable<Unit> WhenDeactivated { get; }
         
         public IObservable<CancelEventArgs> WhenClosing { get; }
 

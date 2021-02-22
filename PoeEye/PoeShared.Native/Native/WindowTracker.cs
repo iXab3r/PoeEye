@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Windows.Forms;
 using JetBrains.Annotations;
 using log4net;
+using PInvoke;
+using PoeShared.Prism;
 using PoeShared.Scaffolding;
 using ReactiveUI;
 using ObservableEx = PoeShared.Scaffolding.ObservableEx;
@@ -15,6 +18,7 @@ namespace PoeShared.Native
         private static readonly ILog Log = LogManager.GetLogger(typeof(WindowTracker));
 
         private static readonly TimeSpan RecheckPeriod = TimeSpan.FromMilliseconds(250);
+        private static readonly TimeSpan SamplePeriod = TimeSpan.FromMilliseconds(100);
         private readonly IStringMatcher titleMatcher;
 
         private IntPtr activeWindowHandle;
@@ -25,7 +29,9 @@ namespace PoeShared.Native
         private int activeProcessId;
 
         public WindowTracker(
-            [NotNull] IStringMatcher titleMatcher)
+            IFactory<IWinEventHookWrapper, WinEventHookArguments> hookFactory,
+            IStringMatcher titleMatcher,
+            [Unity.Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler)
         {
             Guard.ArgumentNotNull(titleMatcher, nameof(titleMatcher));
 
@@ -34,12 +40,22 @@ namespace PoeShared.Native
             var timerObservable = ObservableEx
                 .BlockingTimer(RecheckPeriod)
                 .ToUnit();
+            
+            var objectFocusHook = hookFactory.Create(new WinEventHookArguments
+            {
+                Flags = User32.WindowsEventHookFlags.WINEVENT_OUTOFCONTEXT,
+                EventMin = User32.WindowsEventHookType.EVENT_OBJECT_FOCUS,
+                EventMax = User32.WindowsEventHookType.EVENT_OBJECT_FOCUS,
+            });
 
             timerObservable
+                .Select(_ => "Timer")
+                .Merge(objectFocusHook.WhenWindowEventTriggered.Select(_ => $"{nameof( User32.WindowsEventHookType.EVENT_OBJECT_FOCUS)}"))
+                .Sample(SamplePeriod, bgScheduler)
                 .Select(_ => UnsafeNative.GetForegroundWindow())
-                .StartWithDefault()
+                .Select(hwnd => new { ActiveWindow = hwnd, Title = UnsafeNative.GetWindowTitle(hwnd), ProcessId = UnsafeNative.GetProcessIdByWindowHandle(this.activeWindowHandle) })
                 .DistinctUntilChanged()
-                .Subscribe(WindowActivated, Log.HandleUiException)
+                .SubscribeSafe(x => WindowActivated(x.ActiveWindow, x.Title, x.ProcessId), Log.HandleUiException)
                 .AddTo(Anchors);
         }
 
@@ -84,20 +100,18 @@ namespace PoeShared.Native
             return $"#Tracker{Name}";
         }
 
-        private void WindowActivated(IntPtr activeHwnd)
+        private void WindowActivated(IntPtr hwnd, string title, int processId)
         {
             var previousState = new {IsActive, MatchingWindowHandle, ActiveWindowTitle, ActiveWindowHandle, ActiveProcessId};
-            activeWindowHandle = activeHwnd;
-            activeWindowTitle = UnsafeNative.GetWindowTitle(activeHwnd);
-
+            activeWindowHandle = hwnd;
+            activeWindowTitle = title;
+            activeProcessId = processId;
             isActive = titleMatcher.IsMatch(activeWindowTitle);
-
-            windowHandle = IsActive ? activeHwnd : IntPtr.Zero;
-            activeProcessId = UnsafeNative.GetProcessIdByWindowHandle(this.activeWindowHandle);
+            windowHandle = isActive ? hwnd : IntPtr.Zero;
 
             if (previousState.ActiveWindowHandle != ActiveWindowHandle)
             {
-                Log.Debug($"[#{Name}] Target window is {(isActive ? string.Empty : "NOT ")}ACTIVE ({activeHwnd.ToHexadecimal()}, title '{activeWindowTitle}')");
+                Log.Debug($"[#{Name}] Target window is {(isActive ? string.Empty : "NOT ")}ACTIVE ({hwnd.ToHexadecimal()}, title '{activeWindowTitle}')");
             }
 
             this.RaiseIfChanged(nameof(IsActive), previousState.IsActive, IsActive);

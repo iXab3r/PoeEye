@@ -176,21 +176,21 @@
                 <StackPanel Orientation="Horizontal">
                     <TextBlock
                         Margin="5,0"
-                        Text="{Binding Content.Left, StringFormat='X: {0:F0}'}" />
+                        Text="{Binding Content.NativeBounds.X, StringFormat='X: {0:F0}'}" />
 
                     <TextBlock
                         Margin="5,0"
-                        Text="{Binding Content.Top, StringFormat='Y: {0:F0}'}" />
+                        Text="{Binding Content.NativeBounds.Y, StringFormat='Y: {0:F0}'}" />
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal">
                     <TextBlock
                         Margin="5,0"
-                        Text="{Binding Content.Width, StringFormat='Width: {0:F0}'}" />
+                        Text="{Binding Content.NativeBounds.Width, StringFormat='Width: {0:F0}'}" />
 
                     <TextBlock
                         Margin="5,0"
-                        Text="{Binding Content.Height, StringFormat='Height: {0:F0}'}" />
+                        Text="{Binding Content.NativeBounds.Height, StringFormat='Height: {0:F0}'}" />
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal">

@@ -5,8 +5,7 @@ namespace PoeShared.Native
 {
     internal sealed class WinEventHookWrapperFactory : IFactory<IWinEventHookWrapper, WinEventHookArguments>
     {
-        private readonly ConcurrentDictionary<WinEventHookArguments, IWinEventHookWrapper> hooks =
-            new ConcurrentDictionary<WinEventHookArguments, IWinEventHookWrapper>();
+        private readonly ConcurrentDictionary<WinEventHookArguments, IWinEventHookWrapper> hooks = new();
 
         public IWinEventHookWrapper Create(WinEventHookArguments param1)
         {
