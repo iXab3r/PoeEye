@@ -45,13 +45,14 @@ namespace PoeShared.Prism
             }
 
             Container.RegisterSingleton<IFileSoundLibrarySource, FileSoundLibrarySource>();
+            Container.RegisterSingleton<IEmbeddedSoundLibrarySource, EmbeddedSoundLibrarySource>();
             Container.RegisterFactory<ISoundLibrarySource>(
                 unity => unity.Resolve<ComplexSoundLibrary>(
                     new DependencyOverride<ISoundLibrarySource[]>(
                         new ISoundLibrarySource[]
                         {
                             unity.Resolve<IFileSoundLibrarySource>(),
-                            unity.Resolve<EmbeddedSoundLibrarySource>()
+                            unity.Resolve<IEmbeddedSoundLibrarySource>()
                         }
                     )),new ContainerControlledLifetimeManager());
 

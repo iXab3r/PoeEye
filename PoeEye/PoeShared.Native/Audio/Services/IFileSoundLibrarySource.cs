@@ -2,8 +2,10 @@
 
 namespace PoeShared.Audio.Services
 {
-    internal interface IFileSoundLibrarySource : ISoundLibrarySource
+    public interface IFileSoundLibrarySource : ISoundLibrarySource
     {
         string AddFromFile(FileInfo soundFile);
+
+        string AddFromWaveData(string notification, byte[] waveData);
     }
 }

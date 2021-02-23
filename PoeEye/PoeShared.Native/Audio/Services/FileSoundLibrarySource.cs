@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using DynamicData;
 using log4net;
+using NAudio.MediaFoundation;
 using NAudio.Wave;
 using PoeShared.Modularity;
 using PoeShared.Scaffolding;
@@ -67,6 +68,17 @@ namespace PoeShared.Audio.Services
             }
         }
 
+        public string AddFromWaveData(string notification, byte[] waveData)
+        {
+            Guard.ArgumentNotNull(notification, nameof(notification));
+            Guard.ArgumentNotNull(waveData, nameof(waveData));
+
+            var directory = GetKnownDirectory();
+            var filePath = Path.Combine(directory.FullName, $"{Path.GetFileNameWithoutExtension(notification)}.wav");
+            File.WriteAllBytes(filePath, waveData);
+            Reload();
+            return notification;
+        }
 
         public string AddFromFile(FileInfo soundFile)
         {
@@ -77,14 +89,7 @@ namespace PoeShared.Audio.Services
             }
             Log.Debug($"Trying to add source {soundFile} ({soundFile.Length}b)");
 
-            var directory = knownDirectories.First();
-            if (!directory.Exists)
-            {
-                Log.Debug($"Directory {directory} does not exist, creating it");
-                directory.Create();
-                directory.Refresh();
-            }
-
+            var directory = GetKnownDirectory();
             var filePath = Path.Combine(directory.FullName, $"{Path.GetFileNameWithoutExtension(soundFile.Name)}.wav");
             using (var reader = new MediaFoundationReader(soundFile.FullName))
             using (WaveStream pcmStream = WaveFormatConversionStream.CreatePcmStream(reader))
@@ -93,6 +98,19 @@ namespace PoeShared.Audio.Services
             }
             Reload();
             return Path.GetFileNameWithoutExtension(soundFile.Name);
+        }
+
+        private DirectoryInfo GetKnownDirectory()
+        {
+            var directory = knownDirectories.First();
+            if (!directory.Exists)
+            {
+                Log.Debug($"Directory {directory} does not exist, creating it");
+                directory.Create();
+                directory.Refresh();
+            }
+
+            return directory;
         }
 
         private void Reload()

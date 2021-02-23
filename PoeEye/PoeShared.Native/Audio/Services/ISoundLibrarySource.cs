@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 
 namespace PoeShared.Audio.Services
 {
-    internal interface ISoundLibrarySource
+    public interface ISoundLibrarySource
     {
         ReadOnlyObservableCollection<string> SourceName { [NotNull] get; }
 

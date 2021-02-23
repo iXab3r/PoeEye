@@ -10,7 +10,7 @@ using PoeShared.Scaffolding;
 
 namespace PoeShared.Native.Resources.Notifications
 {
-    internal class EmbeddedSoundLibrarySource : SoundLibrarySourceBase
+    internal class EmbeddedSoundLibrarySource : SoundLibrarySourceBase, IEmbeddedSoundLibrarySource
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(EmbeddedSoundLibrarySource));
 

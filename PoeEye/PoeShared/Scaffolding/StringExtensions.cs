@@ -33,6 +33,16 @@ namespace PoeShared.Scaffolding
             return input != null && value != null && input.StartsWith(value) && input.EndsWith(value);
         }
 
+        public static string SurroundWith(this string input, char c)
+        {
+            return c + input + c;
+        }
+        
+        public static string SurroundWith(this string input, string value)
+        {
+            return value + input + value;
+        }
+
         public static int? ToIntOrDefault(this string str)
         {
             int result;
