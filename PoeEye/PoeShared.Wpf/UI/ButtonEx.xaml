@@ -24,11 +24,11 @@
 
     <Style TargetType="{x:Type TextBlock}"
            BasedOn="{StaticResource ErrorIconTextBlock}"
-           x:Key="CommandWrapperIndicatorErrorStyleKey" />
+           x:Key="CommandWrapperIndicatorErrorStyleKey">
+    </Style>
 
     <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource ErrorIconTextBlock}"
            x:Key="CommandWrapperIndicatorSuccessStyleKey">
-
         <Setter Property="Visibility" Value="Collapsed" />
         <Setter Property="Opacity" Value="1" />
         <Setter Property="HorizontalAlignment" Value="Center" />
@@ -45,6 +45,7 @@
         <Setter Property="Margin" Value="2.5"></Setter>
         <Setter Property="HorizontalContentAlignment" Value="Center" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Padding" Value="-5,0,0,0" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type ui:ButtonEx}">
@@ -74,16 +75,21 @@
                                            TextBlock.FontFamily="{StaticResource FontAwesome}"
                                            HorizontalAlignment="Center" 
                                            Content="{Binding Icon, RelativeSource={RelativeSource TemplatedParent}}"
-                                           Visibility="{Binding Icon, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource NullToCollapsedConverter}}" />
+                                           Visibility="{Binding Icon, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource NullToCollapsedConverter}}" 
+                                           MinWidth="20"/>
                                 <TextBlock x:Name="ErrorIcon" FontSize="{TemplateBinding FontSize}"
                                            ToolTip="{Binding Command.Error, RelativeSource={RelativeSource TemplatedParent}}"
-                                           Style="{StaticResource CommandWrapperIndicatorErrorStyleKey}" />
+                                           Style="{StaticResource CommandWrapperIndicatorErrorStyleKey}" 
+                                           MinWidth="20"/>
                                 <TextBlock x:Name="SuccessIcon" FontSize="{TemplateBinding FontSize}"
-                                           Style="{StaticResource CommandWrapperIndicatorSuccessStyleKey}" />
+                                           Style="{StaticResource CommandWrapperIndicatorSuccessStyleKey}" 
+                                           MinWidth="20"/>
                                 <ProgressBar Style="{StaticResource MaterialDesignCircularProgressBar}" x:Name="CommandProgressBar"
-                                             Value="0" Width="22"
+                                             Value="0" Width="16" Height="16"
                                              HorizontalAlignment="Center" VerticalAlignment="Center"
-                                             IsIndeterminate="True">
+                                             Foreground="{StaticResource PositiveBrush}"
+                                             IsIndeterminate="True"
+                                             Margin="-5,0,0,0">
                                     <ProgressBar.Visibility>
                                         <Binding Path="Command.IsBusy" 
                                                  RelativeSource="{RelativeSource TemplatedParent}" 
@@ -95,6 +101,7 @@
                             </Grid>
                             <ContentPresenter x:Name="ContentLabel"
                                               TextElement.Foreground="{TemplateBinding Foreground}"
+                                              Margin="{TemplateBinding Padding}"
                                               Content="{Binding Path=Content, RelativeSource={RelativeSource TemplatedParent}}"
                                               Visibility="{Binding Path=Content, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource NullToCollapsedConverter}}" />
                         </st:StackPanel>
