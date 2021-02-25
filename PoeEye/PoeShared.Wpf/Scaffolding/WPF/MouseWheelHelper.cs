@@ -20,7 +20,10 @@ namespace PoeShared.Scaffolding.WPF
             return (bool) element.GetValue(IgnoreMouseWheelProperty);
         }
         
-        public static void HandlePreviewMouseWheel(DependencyObject sender, MouseWheelEventArgs e, bool ignoreWheel)
+        public static void HandlePreviewMouseWheel(
+            DependencyObject sender, 
+            MouseWheelEventArgs e, 
+            bool ignoreWheel)
         {
             var parent = VisualTreeHelper.GetParent(sender);
             if (!(parent is UIElement))

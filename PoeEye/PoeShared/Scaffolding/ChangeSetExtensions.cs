@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Reactive;
 using DynamicData;
@@ -16,6 +17,16 @@ namespace PoeShared.Scaffolding
             Guard.ArgumentNotNull(source, nameof(source));
 
             return new SourceList<T>(source);
+        }
+        
+        public static ISourceList<T> ToSourceList<T>(this IEnumerable<ISourceList<T>> lists)
+        {
+            Guard.ArgumentNotNull(lists, nameof(lists));
+
+            var result = new SourceList<ISourceList<T>>();
+            lists.ForEach(result.Add);
+
+            return result.Or().ToSourceList();
         }
         
         public static Optional<T> ComputeIfAbsent<T, TKey>(this ISourceCache<T, TKey> source, TKey key, Func<TKey, T> factory)

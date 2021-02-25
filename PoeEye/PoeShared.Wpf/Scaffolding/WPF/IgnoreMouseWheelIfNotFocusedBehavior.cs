@@ -1,16 +1,14 @@
+﻿using System;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interactivity;
 
 namespace PoeShared.Scaffolding.WPF
 {
-    public sealed class IgnoreMouseWheelBehavior : Behavior<UIElement>
+    public sealed class IgnoreMouseWheelIfNotFocusedBehavior : Behavior<UIElement>
     {
         public static readonly DependencyProperty IsEnabledProperty = DependencyProperty.Register(
-            "IsEnabled",
-            typeof(bool),
-            typeof(IgnoreMouseWheelBehavior),
-            new PropertyMetadata(true));
+            "IsEnabled", typeof(bool), typeof(IgnoreMouseWheelIfNotFocusedBehavior), new PropertyMetadata(default(bool)));
 
         public bool IsEnabled
         {
@@ -37,7 +35,17 @@ namespace PoeShared.Scaffolding.WPF
                 return;
             }
 
-            MouseWheelHelper.HandlePreviewMouseWheel(dependencyObject, e, IsEnabled);
+            if (!(dependencyObject.GetValue(UIElement.IsKeyboardFocusWithinProperty) is bool isFocused))
+            {
+                throw new InvalidOperationException($"Associated object {AssociatedObject} does not provide {UIElement.IsKeyboardFocusWithinProperty} value");
+            }
+
+            if (isFocused)
+            {
+                return;
+            }
+            
+            MouseWheelHelper.HandlePreviewMouseWheel(dependencyObject, e, true);
         }
     }
 }
