@@ -6,13 +6,15 @@ namespace PoeShared.UI.TreeView
 {
     public interface ITreeViewItemViewModel : IDisposableReactiveObject
     {
-        bool IsExpanded { get; set; }
-        
-        bool IsSelected { get; set; }
-        
-        ITreeViewItemViewModel Parent { [CanBeNull] get; [CanBeNull] set; }
+        public bool IsExpanded { get; set; }
 
-        ReadOnlyObservableCollection<ITreeViewItemViewModel> Children { [NotNull] get; }
+        public bool IsSelected { get; set; }
+
+        public ITreeViewItemViewModel Parent { [CanBeNull] get; [CanBeNull] set; }
+
+        public ReadOnlyObservableCollection<ITreeViewItemViewModel> Children { [NotNull] get; }
+
+        void Clear();
     }
     
     public interface IDirectoryTreeViewItemViewModel : ITreeViewItemViewModel

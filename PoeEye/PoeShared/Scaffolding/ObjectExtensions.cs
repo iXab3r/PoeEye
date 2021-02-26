@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -91,36 +92,41 @@ namespace PoeShared.Scaffolding
                 .SelectMany(i => i.GetProperties(flags));
         }
 
+        private static readonly ConcurrentDictionary<Type, IReadOnlyCollection<PropertyInfo>> ReadablePropertiesMapByType = new ConcurrentDictionary<Type, IReadOnlyCollection<PropertyInfo>>();
+        private static readonly ConcurrentDictionary<Type, IReadOnlyCollection<PropertyInfo>> WriteablePropertiesMapByType = new ConcurrentDictionary<Type, IReadOnlyCollection<PropertyInfo>>();
+
         public static void TransferPropertiesTo<TSource, TTarget>(this TSource source, TTarget target)
             where TTarget : class, TSource
         {
             Guard.ArgumentNotNull(source, nameof(source));
             Guard.ArgumentNotNull(target, nameof(target));
 
-            var targetProperties = typeof(TTarget)
-                .GetAllProperties(BindingFlags.Instance | BindingFlags.Public)
-                .Where(x => x.CanRead && x.CanWrite)
-                .ToArray();
-
-            var sourceProperties = typeof(TSource)
-                .GetAllProperties(BindingFlags.Instance | BindingFlags.Public)
-                .Where(x => x.CanRead)
-                .ToArray();
+            var targetProperties = WriteablePropertiesMapByType
+                .GetOrAdd(typeof(TTarget), type => type
+                    .GetAllProperties(BindingFlags.Instance | BindingFlags.Public)
+                    .Where(x => x.CanRead && x.CanWrite)
+                    .ToArray());
+            
+            var sourceProperties = ReadablePropertiesMapByType
+                .GetOrAdd(typeof(TSource), type => type
+                    .GetAllProperties(BindingFlags.Instance | BindingFlags.Public)
+                    .Where(x => x.CanRead)
+                    .ToArray());
 
             var skippedProperties = new List<PropertyInfo>();
             foreach (var property in sourceProperties)
             {
                 try
                 {
-                    var currentValue = property.GetValue(source);
-
-                    var settableProperty = targetProperties.FirstOrDefault(x => x.Equals(property));
+                    var settableProperty = targetProperties
+                        .FirstOrDefault(x => x.Name == property.Name && x.PropertyType.IsAssignableFrom(property.PropertyType));
                     if (settableProperty == null)
                     {
                         skippedProperties.Add(property);
                         continue;
                     }
 
+                    var currentValue = property.GetValue(source);
                     settableProperty.SetValue(target, currentValue);
                 }
                 catch (Exception ex)
@@ -135,8 +141,10 @@ namespace PoeShared.Scaffolding
 
             if (skippedProperties.Any())
             {
-                SharedLog.Instance.Log.Debug(
-                    $"Skipped following properties: {skippedProperties.Select(x => $"{x.PropertyType} {x.Name}").DumpToTextRaw()}");
+                if (SharedLog.Instance.Log.IsDebugEnabled)
+                {
+                    SharedLog.Instance.Log.Debug($"Skipped following properties: {skippedProperties.Select(x => $"{x.PropertyType} {x.Name}").DumpToTextRaw()}");
+                }
             }
         }
 
