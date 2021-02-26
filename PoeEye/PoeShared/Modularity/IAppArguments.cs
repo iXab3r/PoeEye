@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using JetBrains.Annotations;
 
 namespace PoeShared.Modularity
@@ -14,6 +15,8 @@ namespace PoeShared.Modularity
         int ProcessId { get; }
 
         string ApplicationExecutableName { [CanBeNull] get; }
+        
+        DirectoryInfo ApplicationDirectory { get; }
     }
 
     public interface IAppArguments : IAppConfig

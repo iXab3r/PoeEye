@@ -79,6 +79,7 @@ namespace PoeShared
                 .JoinStrings(" ");
             ApplicationExecutablePath = args.First();
             ApplicationExecutableName = Path.GetFileName(ApplicationExecutablePath);
+            ApplicationDirectory = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
 #if NET5_0_OR_GREATER
             IsWindows = OperatingSystem.IsWindows();
             IsLinux = OperatingSystem.IsLinux();
@@ -105,6 +106,8 @@ namespace PoeShared
         public string ApplicationExecutablePath { get; }
 
         public string ApplicationExecutableName { get; }
+        
+        public DirectoryInfo ApplicationDirectory { get; }
 
         public bool Parse(string[] args)
         {
