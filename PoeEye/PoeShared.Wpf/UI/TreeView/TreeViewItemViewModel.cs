@@ -1,4 +1,7 @@
+using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Reactive;
 using PoeShared.Scaffolding;
 using ReactiveUI;
 using System.Reactive.Linq;
@@ -16,12 +19,26 @@ namespace PoeShared.UI.TreeView
         private bool isExpanded = true;
         private bool isSelected;
         private ITreeViewItemViewModel parent;
+        private IComparer<ITreeViewItemViewModel> sortComparer;
+        private Func<ITreeViewItemViewModel, IObservable<Unit>> resortWhen;
 
         protected TreeViewItemViewModel()
         {
+            this.WhenAnyValue(x => x.Parent.ResortWhen)
+                .SubscribeSafe(x => ResortWhen = x, Log.HandleUiException)
+                .AddTo(Anchors);
+            
+            this.WhenAnyValue(x => x.Parent.SortComparer)
+                .SubscribeSafe(x => SortComparer = x, Log.HandleUiException)
+                .AddTo(Anchors);
+
+            var resort = this.WhenAnyValue(x => x.ResortWhen)
+                .Select(x => x != null ? x(this) : Observable.Return(Unit.Default))
+                .Switch();
             children
                 .Connect()
                 .Transform(x => (ITreeViewItemViewModel)x)
+                .Sort(this.WhenAnyValue(x => x.SortComparer), SortOptions.None, resort)
                 .Bind(out var chld)
                 .SubscribeToErrors(Log.HandleUiException)
                 .AddTo(Anchors);
@@ -61,6 +78,18 @@ namespace PoeShared.UI.TreeView
         {
             get => parent;
             set => RaiseAndSetIfChanged(ref parent, value);
+        }
+
+        public IComparer<ITreeViewItemViewModel> SortComparer 
+        {
+            get => sortComparer;
+            set => RaiseAndSetIfChanged(ref sortComparer, value);
+        }
+
+        public Func<ITreeViewItemViewModel, IObservable<Unit>> ResortWhen
+        {
+            get => resortWhen;
+            set => RaiseAndSetIfChanged(ref resortWhen, value);
         }
 
         public void Clear()
