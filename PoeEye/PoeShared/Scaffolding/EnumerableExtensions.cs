@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
+using Combinatorics.Collections;
 
 
 namespace PoeShared.Scaffolding
@@ -28,7 +29,7 @@ namespace PoeShared.Scaffolding
                 yield return enumerable[idx];
             }
         }
-        
+
         public static IEnumerable<IEnumerable<T>> Transpose<T>(
             this IEnumerable<IEnumerable<T>> source)
         {
@@ -89,5 +90,25 @@ namespace PoeShared.Scaffolding
 
             return enumerable;
         }
+
+        public static bool IsUnique<T>(this IEnumerable<T> list)
+        {
+            var hs = new HashSet<T>();
+            return list.All(hs.Add);
+        }
+
+        public static IList<IList<T>> ToPermutations<T>(this IList<T> source)
+        {
+            var permutations = new Permutations<T>(source);
+            return permutations.ToList();
+        }
+
+        public static IEnumerable<IEnumerable<T>> ToVariations<T>(this IEnumerable<T> source)
+        {
+            var permutations = Enumerable.Range(1, source.Count()).Select(x => new Variations<T>(source.ToList(), x));
+            return permutations.SelectMany(x => x);
+        }
+
+        
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Windows.Input;
 using NUnit.Framework;
 using PoeShared.UI.Hotkeys;
@@ -29,10 +30,15 @@ namespace PoeShared.Tests.WPF.Hotkeys
         }
 
         [TestCase(Key.None, ModifierKeys.None, Key.None, ModifierKeys.None)]
-        [TestCase(Key.LeftAlt, ModifierKeys.None, Key.None, ModifierKeys.Alt)]
-        [TestCase(Key.LeftAlt, ModifierKeys.Control, Key.None, ModifierKeys.Control | ModifierKeys.Alt)]
-        [TestCase(Key.LeftCtrl, ModifierKeys.Alt, Key.None, ModifierKeys.Alt | ModifierKeys.Control)]
-        [TestCase(Key.LeftCtrl, ModifierKeys.Control, Key.None, ModifierKeys.Control)]
+        [TestCase(Key.LeftCtrl, ModifierKeys.Alt, Key.LeftCtrl, ModifierKeys.Alt)]
+        [TestCase(Key.LeftCtrl, ModifierKeys.Control, Key.LeftCtrl, ModifierKeys.None)]
+        [TestCase(Key.LeftAlt, ModifierKeys.None, Key.LeftAlt, ModifierKeys.None)]
+        [TestCase(Key.LeftAlt, ModifierKeys.Control, Key.LeftAlt, ModifierKeys.Control)]
+        [TestCase(Key.LeftAlt, ModifierKeys.Alt, Key.LeftAlt, ModifierKeys.None)]
+        [TestCase(Key.None, ModifierKeys.Alt, Key.LeftAlt, ModifierKeys.None)]
+        [TestCase(Key.None, ModifierKeys.Control, Key.LeftCtrl, ModifierKeys.None)]
+        [TestCase(Key.None, ModifierKeys.Shift, Key.LeftShift, ModifierKeys.None)]
+        [TestCase(Key.None, ModifierKeys.Windows, Key.LWin, ModifierKeys.None)]
         public void ShouldNormalize(Key key, ModifierKeys modifierKeys, Key expectedKey, ModifierKeys expectedModifierKeys)
         {
             // Given
@@ -42,6 +48,19 @@ namespace PoeShared.Tests.WPF.Hotkeys
             // Then
             hotkey.Key.ShouldBe(expectedKey, () => hotkey.ToString());
             hotkey.ModifierKeys.ShouldBe(expectedModifierKeys, () => hotkey.ToString());
+        }
+
+        [Test]
+        [TestCase(Key.None, ModifierKeys.Windows | ModifierKeys.Control)]
+        [TestCase(Key.None, ModifierKeys.Alt | ModifierKeys.Control)]
+        public void ShouldThrowWhenCouldNotNormalize(Key key, ModifierKeys modifierKeys)
+        {
+            //Given
+            //When
+            Action action = () => new HotkeyGesture(key, modifierKeys);
+
+            //Then
+            action.ShouldThrow<ArgumentOutOfRangeException>();
         }
 
         [TestCase(MouseButton.Left, ModifierKeys.None, "MouseLeft")]

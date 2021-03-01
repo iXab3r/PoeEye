@@ -11,7 +11,9 @@ namespace PoeShared.UI.Hotkeys
 {
     public class HotkeyGesture : IEquatable<HotkeyGesture>
     {
-        public static readonly HotkeyGesture Empty = new HotkeyGesture();
+        public static readonly HotkeyGesture Empty = new();
+        public const char ModifiersDelimiter = '+';
+
         private static readonly IDictionary<Key, string> KnownSpecialKeys = new Dictionary<Key, string>();
 
         static HotkeyGesture()
@@ -31,27 +33,35 @@ namespace PoeShared.UI.Hotkeys
 
         public HotkeyGesture(Key key, ModifierKeys modifierKeys = ModifierKeys.None) : this()
         {
+            if (key == Key.None && modifierKeys != ModifierKeys.None)
+            {
+                key = modifierKeys switch
+                {
+                    ModifierKeys.Alt => Key.LeftAlt,
+                    ModifierKeys.Control => Key.LeftCtrl,
+                    ModifierKeys.Shift => Key.LeftShift,
+                    ModifierKeys.Windows => Key.LWin,
+                    _ => throw new ArgumentOutOfRangeException(nameof(modifierKeys), modifierKeys, $"Failed to substitute modifier: {modifierKeys}")
+                };
+            }
+            
             switch (key)
             {
                 case Key.LeftCtrl:
                 case Key.RightCtrl:
-                    modifierKeys = modifierKeys | ModifierKeys.Control;
-                    key = Key.None;
+                    modifierKeys &= ~ModifierKeys.Control;
                     break;
                 case Key.LeftAlt:
                 case Key.RightAlt:
-                    modifierKeys = modifierKeys | ModifierKeys.Alt;
-                    key = Key.None;
+                    modifierKeys &= ~ModifierKeys.Alt;
                     break;
                 case Key.LeftShift:
                 case Key.RightShift:
-                    modifierKeys = modifierKeys | ModifierKeys.Shift;
-                    key = Key.None;
+                    modifierKeys &= ~ModifierKeys.Shift;
                     break;
                 case Key.LWin:
                 case Key.RWin:
-                    modifierKeys = modifierKeys | ModifierKeys.Windows;
-                    key = Key.None;
+                    modifierKeys &= ~ModifierKeys.Windows;
                     break;
             }
 

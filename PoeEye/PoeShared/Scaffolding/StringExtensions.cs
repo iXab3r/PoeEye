@@ -23,9 +23,14 @@ namespace PoeShared.Scaffolding
                 .ToArray();
         }
 
+        public static string JoinStrings(this IEnumerable<string> obj, char separator)
+        {
+            return string.Join(separator, obj);
+        }
+        
         public static string JoinStrings(this IEnumerable<string> obj, string separator)
         {
-            return String.Join(separator, obj);
+            return string.Join(separator, obj);
         }
         
         public static bool IsSurroundedWith(this string input, string value)

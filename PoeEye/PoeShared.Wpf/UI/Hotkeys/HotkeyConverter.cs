@@ -12,43 +12,136 @@ namespace PoeShared.UI.Hotkeys
 {
     public class HotkeyConverter : System.ComponentModel.TypeConverter, IHotkeyConverter
     {
-        private const char ModifiersDelimiter = '+';
-        private static readonly ModifierKeysConverter ModifierKeysConverter = new ModifierKeysConverter();
-        private static readonly HotkeyGesture NoneHotkey = new HotkeyGesture(Key.None); 
+        private static readonly HotkeyGesture NoneHotkey = new HotkeyGesture(Key.None);
+        private static readonly string NoneHotkeyName = NoneHotkey.ToString();
 
-        private readonly IDictionary<string, Key> knownSpecialKeys = new Dictionary<string, Key>();
-        private readonly IDictionary<string, HotkeyGesture> mouseKeys;
-        private readonly IDictionary<string, MouseWheelAction> mouseWheelEvents;
-        private readonly IDictionary<string, Key> knownKeys = new Dictionary<string, Key>(StringComparer.OrdinalIgnoreCase);
+        private readonly IDictionary<Key, string> knownSpecialKeys = new Dictionary<Key, string>();
+        private readonly IDictionary<string, Key> knownSpecialKeysByName = new Dictionary<string, Key>(StringComparer.InvariantCultureIgnoreCase);
+
+        private readonly IDictionary<MouseButton, string> mouseKeys = new Dictionary<MouseButton, string>();
+        private readonly IDictionary<string, MouseButton> mouseKeysByName = new Dictionary<string, MouseButton>(StringComparer.InvariantCultureIgnoreCase);
+
+        private readonly IDictionary<MouseWheelAction, string> mouseWheelEvents = new Dictionary<MouseWheelAction, string>();
+        private readonly IDictionary<string, MouseWheelAction> mouseWheelEventsByName = new Dictionary<string, MouseWheelAction>(StringComparer.InvariantCultureIgnoreCase);
+
+        private readonly IDictionary<Key, string> knownKeys = new Dictionary<Key, string>();
+        private readonly IDictionary<string, Key> knownKeysByName = new Dictionary<string, Key>(StringComparer.InvariantCultureIgnoreCase);
+
+        private readonly IDictionary<ModifierKeys, string> knownModifiers = new Dictionary<ModifierKeys, string>();
+        private readonly IDictionary<string, ModifierKeys> knownModifiersByName = new Dictionary<string, ModifierKeys>(StringComparer.InvariantCultureIgnoreCase);
 
         public HotkeyConverter()
         {
             Enum
                 .GetValues(typeof(Key))
                 .OfType<Key>()
-                .ForEach(x => knownKeys[new HotkeyGesture(x).ToString()] = x);
-            
-            mouseKeys = Enum
+                .ForEach(x =>
+                {
+                    var keyName = x.ToString();
+                    knownKeys[x] = keyName;
+                    knownKeysByName[keyName] = x;
+                });
+
+            var allModifiers = Enum
+                .GetValues(typeof(ModifierKeys))
+                .OfType<ModifierKeys>()
+                .Select(x => new {ModifierKey = x, Name = x.ToString()})
+                .Concat(new[] { new { ModifierKey = ModifierKeys.Control, Name = "CTRL" } })
+                .Concat(new[] { new { ModifierKey = ModifierKeys.Windows, Name = "WIN" } })
+                .ToArray();
+
+            allModifiers
+                .ToVariations()
+                .ForEach(x =>
+                {
+                    if (!x.Select(x => x.ModifierKey).IsUnique())
+                    {
+                        return;
+                    }
+                    var modifier = x.Aggregate(ModifierKeys.None, (x, newKey) => x | newKey.ModifierKey);
+                    var modifiersName = x.Where(y => y.ModifierKey != ModifierKeys.None).Select(x => x.Name.ToUpper()).JoinStrings(HotkeyGesture.ModifiersDelimiter);
+                    if (!knownModifiers.ContainsKey(modifier))
+                    {
+                        knownModifiers[modifier] = modifiersName;
+                    }
+                    knownModifiersByName[modifiersName] = modifier;
+                });
+
+            Enum
                 .GetValues(typeof(MouseButton))
                 .OfType<MouseButton>()
-                .Select(x => new HotkeyGesture(x))
-                .ToDictionary(x => x.ToString(), x => x, StringComparer.OrdinalIgnoreCase);
-            
-            mouseWheelEvents = Enum
+                .ForEach(x =>
+                {
+                    var mouseButtonName = "Mouse" + x.ToString();
+                    mouseKeys[x] = mouseButtonName;
+                    mouseKeysByName[mouseButtonName] = x;
+                });
+
+            Enum
                 .GetValues(typeof(MouseWheelAction))
                 .OfType<MouseWheelAction>()
-                .ToDictionary(x => x.ToString(), x => x, StringComparer.OrdinalIgnoreCase);
-            
-            knownSpecialKeys["*"] = Key.Multiply;
-            knownSpecialKeys["+"] = Key.OemPlus;
-            knownSpecialKeys["="] = Key.OemPlus;
+                .ForEach(x =>
+                {
+                    var wheelName = x.ToString();
+                    mouseWheelEventsByName[wheelName] = x;
+                    mouseWheelEvents[x] = wheelName;
+                });
+
+            knownSpecialKeysByName["*"] = Key.Multiply;
+            knownSpecialKeysByName["+"] = Key.OemPlus;
+            knownSpecialKeysByName["="] = Key.OemPlus;
+            knownSpecialKeysByName["-"] = Key.OemMinus;
+            knownSpecialKeysByName["/"] = Key.Divide;
+            knownSpecialKeysByName["`"] = Key.OemTilde;
+            knownSpecialKeysByName["ENTER"] = Key.Return;
+            knownSpecialKeysByName["Num *"] = Key.Multiply;
+            knownSpecialKeysByName["Num +"] = Key.Add;
+            knownSpecialKeysByName["Num -"] = Key.Subtract;
+            knownSpecialKeysByName.ForEach(x => knownSpecialKeys[x.Value] = x.Key);
         }
 
         public string ConvertToString(HotkeyGesture hotkeyGesture)
         {
-            return hotkeyGesture == null ? NoneHotkey.ToString() : (string)ConvertTo(hotkeyGesture, typeof(string)) ?? NoneHotkey.ToString();
+            if (hotkeyGesture == null)
+            {
+                return NoneHotkey.ToString();
+            }
+
+            var keys = new List<string>();
+            if (hotkeyGesture.ModifierKeys != ModifierKeys.None)
+            {
+                knownModifiers[hotkeyGesture.ModifierKeys].AddTo(keys);
+            }
+
+            if (hotkeyGesture.Key != Key.None)
+            {
+                if (knownSpecialKeys.ContainsKey(hotkeyGesture.Key))
+                {
+                    knownSpecialKeys[hotkeyGesture.Key].AddTo(keys);
+                }
+                else 
+                {
+                    knownKeys[hotkeyGesture.Key].AddTo(keys);
+                }
+            }
+
+            if (hotkeyGesture.MouseButton != null)
+            {
+               mouseKeys[hotkeyGesture.MouseButton.Value].AddTo(keys);
+            }
+            else if (hotkeyGesture.MouseWheel != MouseWheelAction.None)
+            {
+                mouseWheelEvents[hotkeyGesture.MouseWheel].AddTo(keys);
+            }
+
+            if (keys.Count == 0)
+            {
+                return NoneHotkeyName;
+            }
+
+            return string.Join(HotkeyGesture.ModifiersDelimiter, keys);
         }
-        
+
         public new HotkeyGesture ConvertFromString(string source)
         {
             return (HotkeyGesture) ConvertFrom(source ?? string.Empty) ?? NoneHotkey;
@@ -81,14 +174,10 @@ namespace PoeShared.UI.Hotkeys
                 throw GetConvertFromException(sourceRaw);
             }
 
-            var source = ((string) sourceRaw).Trim().ToUpper();
+            var source = ((string) sourceRaw).Trim().ToUpper(culture);
             if (string.IsNullOrWhiteSpace(source))
             {
                 return NoneHotkey;
-            }
-            if (knownSpecialKeys.TryGetValue(source, out var specialKey))
-            {
-                return new HotkeyGesture(specialKey);
             }
 
             string modifiersPartRaw;
@@ -96,16 +185,17 @@ namespace PoeShared.UI.Hotkeys
 
             var nextModifier = 0;
             var modifiersPartLength = 0;
-            while (nextModifier < source.Length && (nextModifier = source.IndexOf(ModifiersDelimiter, nextModifier)) >= 0)
+            while (nextModifier < source.Length && (nextModifier = source.IndexOf(HotkeyGesture.ModifiersDelimiter, nextModifier)) >= 0)
             {
                 if (source.Length - (nextModifier + 1) <= 0)
                 {
                     break;
                 }
+
                 modifiersPartLength = nextModifier;
                 nextModifier++;
             }
-            
+
             if (modifiersPartLength > 0)
             {
                 modifiersPartRaw = source.Substring(0, modifiersPartLength);
@@ -117,25 +207,29 @@ namespace PoeShared.UI.Hotkeys
                 hotkeyPartRaw = source;
             }
 
-            var modifiersRaw = ModifierKeysConverter.ConvertFrom(context, culture, modifiersPartRaw);
-            var modifiers = (ModifierKeys) modifiersRaw;
+            var modifiers = string.IsNullOrEmpty(modifiersPartRaw) ? ModifierKeys.None : knownModifiersByName[modifiersPartRaw];
 
-            if (mouseKeys.TryGetValue(hotkeyPartRaw, out var mouseKey) && mouseKey.MouseButton != null)
+            if (mouseKeysByName.TryGetValue(hotkeyPartRaw, out var mouseKey))
             {
-                return new HotkeyGesture(mouseKey.MouseButton.Value, modifiers);
+                return new HotkeyGesture(mouseKey, modifiers);
             }
 
-            if (mouseWheelEvents.TryGetValue(hotkeyPartRaw, out var mouseWheel))
+            if (mouseWheelEventsByName.TryGetValue(hotkeyPartRaw, out var mouseWheel))
             {
                 return new HotkeyGesture(mouseWheel, modifiers);
             }
-
-            if (!knownKeys.TryGetValue(hotkeyPartRaw, out var key))
+            
+            if (knownSpecialKeysByName.TryGetValue(hotkeyPartRaw, out var specialKey))
             {
-                return NoneHotkey;
+                return new HotkeyGesture(specialKey, modifiers);
             }
 
-            return new HotkeyGesture(key, modifiers);
+            if (knownKeysByName.TryGetValue(hotkeyPartRaw, out var key))
+            {
+                return new HotkeyGesture(key, modifiers);
+            }
+            
+            throw new ArgumentException($"Unknown key: {hotkeyPartRaw}, modifiers: {modifiers}, source string: {source}");
         }
 
         public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
