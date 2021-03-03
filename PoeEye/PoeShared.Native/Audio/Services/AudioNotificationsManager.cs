@@ -18,9 +18,9 @@ namespace PoeShared.Audio.Services
     internal sealed class AudioNotificationsManager : DisposableReactiveObject, IAudioNotificationsManager
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(AudioNotificationsManager));
-        private readonly IAudioPlayer audioPlayer;
 
-        private readonly ConcurrentDictionary<string, byte[]> knownNotifications = new ConcurrentDictionary<string, byte[]>();
+        private readonly IAudioPlayer audioPlayer;
+        private readonly ConcurrentDictionary<string, byte[]> knownNotifications = new(StringComparer.OrdinalIgnoreCase);
         private readonly ISoundLibrarySource soundLibrarySource;
         private readonly IFileSoundLibrarySource fileSoundLibrarySource;
 

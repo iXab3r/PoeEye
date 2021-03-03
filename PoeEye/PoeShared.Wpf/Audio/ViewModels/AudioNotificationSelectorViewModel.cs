@@ -33,8 +33,8 @@ namespace PoeShared.Audio.ViewModels
             IAudioNotificationsManager notificationsManager,
             [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {
-            this.notificationsManager = notificationsManager;
             Guard.ArgumentNotNull(notificationsManager, nameof(notificationsManager));
+            this.notificationsManager = notificationsManager;
 
             SelectNotificationCommand = new DelegateCommand<object>(SelectNotificationCommandExecuted);
             PlayNotificationCommand = new DelegateCommand<object>(PlayNotificationCommandExecuted);
@@ -61,17 +61,18 @@ namespace PoeShared.Audio.ViewModels
                 .Or(
                     new ObservableCollection<string>(defaultNotifications).ToObservableChangeSet(),
                     notificationsManager.Notifications.ToObservableChangeSet())
-                .Sort(StringComparer.OrdinalIgnoreCase);
+                .Transform(x => x.ToLowerInvariant())
+                .DistinctValues(x => x)
+                .Sort(StringComparer.OrdinalIgnoreCase)
+                .ToSourceList();
 
-            new SourceList<string>()
+            new[] { 
+                    new ObservableCollection<string>(preconfiguredNotifications).ToObservableChangeSet().ToSourceList(),
+                    dynamicNotifications 
+                }.ToSourceList()
                 .Connect()
-                .Or(
-                    new ObservableCollection<string>(preconfiguredNotifications).ToObservableChangeSet(),
-                    dynamicNotifications)
-                .Distinct()
                 .Transform(x => new NotificationTypeWrapperViewModel(this, x, x.Pascalize()))
                 .DisposeMany()
-                .ObserveOn(uiScheduler)
                 .Bind(out var notificationsSource)
                 .SubscribeToErrors(Log.HandleUiException)
                 .AddTo(Anchors);

@@ -13,10 +13,10 @@
     </ResourceDictionary.MergedDictionaries>
 
     <DataTemplate DataType="{x:Type viewModels:AudioNotificationSelectorViewModel}">
-        <DataTemplate.Resources>
-            <viewModels:AudioNotificationSelectorProxy x:Key="NotificationSelectorProxy" DataContext="{Binding}" />
-        </DataTemplate.Resources>
         <Viewbox>
+            <Viewbox.Resources>
+                <viewModels:AudioNotificationSelectorProxy x:Key="NotificationSelectorProxy" DataContext="{Binding}" />
+            </Viewbox.Resources>
             <ToggleButton IsChecked="{Binding AudioEnabled}"
                           FontFamily="{StaticResource FontAwesome}"
                           Focusable="False"

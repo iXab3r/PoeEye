@@ -22,6 +22,8 @@ namespace PoeShared.Audio.Services
             
             new SourceList<string>().Connect()
                 .Or(sources.Select(x => x.SourceName.ToObservableChangeSet()).ToArray())
+                .Transform(x => x.ToLowerInvariant())
+                .AddKey(x => x)
                 .Bind(out var sourceNames)
                 .Subscribe()
                 .AddTo(Anchors);
