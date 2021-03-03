@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Windows.Input;
 using DynamicData;
@@ -8,23 +9,29 @@ using DynamicData.Binding;
 using JetBrains.Annotations;
 using log4net;
 using PoeShared.Audio.Services;
+using PoeShared.Prism;
 using PoeShared.Scaffolding;
-using PoeShared.Scaffolding.WPF;
 using Prism.Commands;
 using ReactiveUI;
+using Unity;
 
 namespace PoeShared.Audio.ViewModels
 {
     internal sealed class AudioNotificationSelectorViewModel : DisposableReactiveObject, IAudioNotificationSelectorViewModel
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(AudioNotificationSelectorViewModel));
-
         private static readonly string DefaultNotification = AudioNotificationType.Whistle.ToString();
+        private static readonly string DisabledNotification = AudioNotificationType.Disabled.ToString();
+        
         private readonly IAudioNotificationsManager notificationsManager;
+        private readonly ObservableAsPropertyHelper<string> previousSelectedValueSupplier;
+
         private bool audioEnabled;
         private string selectedValue;
 
-        public AudioNotificationSelectorViewModel([NotNull] IAudioNotificationsManager notificationsManager)
+        public AudioNotificationSelectorViewModel(
+            IAudioNotificationsManager notificationsManager,
+            [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {
             this.notificationsManager = notificationsManager;
             Guard.ArgumentNotNull(notificationsManager, nameof(notificationsManager));
@@ -62,27 +69,35 @@ namespace PoeShared.Audio.ViewModels
                     new ObservableCollection<string>(preconfiguredNotifications).ToObservableChangeSet(),
                     dynamicNotifications)
                 .Distinct()
-                .Transform(x => (object) new NotificationTypeWrapper(this, x, x.Pascalize()))
+                .Transform(x => new NotificationTypeWrapperViewModel(this, x, x.Pascalize()))
+                .DisposeMany()
+                .ObserveOn(uiScheduler)
                 .Bind(out var notificationsSource)
                 .SubscribeToErrors(Log.HandleUiException)
                 .AddTo(Anchors);
             Items = notificationsSource;
 
+            previousSelectedValueSupplier = this.WhenAnyValue(x => x.SelectedValue)
+                .Where(x => !string.IsNullOrEmpty(SelectedValue) && !DisabledNotification.Equals(x, StringComparison.OrdinalIgnoreCase))
+                .Select(x => selectedValue)
+                .ToPropertyHelper(this, x => x.PreviousSelectedValue)
+                .AddTo(Anchors);
+
             this.WhenAnyValue(x => x.AudioEnabled)
                 .DistinctUntilChanged()
                 .Where(x => x)
-                .Where(x => selectedValue == AudioNotificationType.Disabled.ToString())
-                .SubscribeSafe(() => SelectedValue = DefaultNotification, Log.HandleUiException)
+                .Where(x => DisabledNotification.Equals(selectedValue, StringComparison.OrdinalIgnoreCase))
+                .SubscribeSafe(() => SelectedValue = PreviousSelectedValue ?? DefaultNotification, Log.HandleUiException)
                 .AddTo(Anchors);
 
             this.WhenAnyValue(x => x.AudioEnabled)
                 .DistinctUntilChanged()
                 .Where(x => !x)
-                .SubscribeSafe(() => SelectedValue = AudioNotificationType.Disabled.ToString(), Log.HandleUiException)
+                .SubscribeSafe(() => SelectedValue = DisabledNotification, Log.HandleUiException)
                 .AddTo(Anchors);
 
             this.WhenAnyValue(x => x.SelectedValue)
-                .SubscribeSafe(x => AudioEnabled = x != AudioNotificationType.Disabled.ToString(), Log.HandleUiException)
+                .SubscribeSafe(x => AudioEnabled = !DisabledNotification.Equals(x, StringComparison.OrdinalIgnoreCase), Log.HandleUiException)
                 .AddTo(Anchors);
         }
 
@@ -102,17 +117,13 @@ namespace PoeShared.Audio.ViewModels
             set => this.RaiseAndSetIfChanged(ref selectedValue, value);
         }
 
-        public AudioNotificationType SelectedItem
-        {
-            get => SelectedValue.ParseEnumSafe<AudioNotificationType>();
-            set => SelectedValue = value.ToString();
-        }
+        public string PreviousSelectedValue => previousSelectedValueSupplier.Value;
 
-        public ReadOnlyObservableCollection<object> Items { get; }
+        public ReadOnlyObservableCollection<NotificationTypeWrapperViewModel> Items { get; }
 
         private void SelectNotificationCommandExecuted(object arg)
         {
-            var notification = arg as NotificationTypeWrapper;
+            var notification = arg as NotificationTypeWrapperViewModel;
             if (notification == null)
             {
                 return;
@@ -123,42 +134,13 @@ namespace PoeShared.Audio.ViewModels
 
         private void PlayNotificationCommandExecuted(object arg)
         {
-            var notification = arg as NotificationTypeWrapper;
+            var notification = arg as NotificationTypeWrapperViewModel;
             if (notification == null)
             {
                 return;
             }
 
             notificationsManager.PlayNotification(notification.Value);
-        }
-
-        public sealed class NotificationTypeWrapper : ReactiveObject
-        {
-            private readonly AudioNotificationSelectorViewModel owner;
-
-            public NotificationTypeWrapper(
-                AudioNotificationSelectorViewModel owner,
-                string value,
-                string name)
-            {
-                this.owner = owner;
-                Value = value;
-                Name = name;
-
-                this.owner
-                    .WhenAnyValue(x => x.SelectedValue)
-                    .SubscribeSafe(() => this.RaisePropertyChanged(nameof(IsSelected)), Log.HandleUiException);
-            }
-
-            public bool IsSelected => owner.SelectedValue == Value;
-
-            public string Value { get; }
-            
-            public ICommand PlayNotificationCommand => owner.PlayNotificationCommand;
-
-            public ICommand SelectNotificationCommand => owner.SelectNotificationCommand;
-
-            public string Name { get; }
         }
     }
 }
