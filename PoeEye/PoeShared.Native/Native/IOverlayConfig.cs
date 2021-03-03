@@ -7,10 +7,10 @@ namespace PoeShared.Native
     public interface IOverlayConfig : IPoeEyeConfig
     {
         [Obsolete]
-        System.Windows.Point OverlayLocation { get; set; }
+        System.Windows.Point? OverlayLocation { get; set; }
 
         [Obsolete]
-        System.Windows.Size OverlaySize { get; set; }
+        System.Windows.Size? OverlaySize { get; set; }
         
         Rectangle OverlayBounds { get; set; }
 

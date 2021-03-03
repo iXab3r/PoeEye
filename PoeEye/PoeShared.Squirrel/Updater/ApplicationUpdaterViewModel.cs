@@ -135,15 +135,18 @@ namespace PoeShared.Squirrel.Updater
             }
 
             Log.Debug($"Preparing to open uri {uri}");
-            var processStart = new ProcessStartInfo
-            {
-                FileName = uri,
-                UseShellExecute = true
-            };
             await Task.Run(() =>
             {
-                Log.Debug($"Starting new process, args: {processStart.DumpToTextRaw()}");
-                Process.Start(processStart);
+                Log.Debug($"Starting new process for uri: {uri}");
+                var result = new Process {StartInfo = {FileName = uri, UseShellExecute = true}};
+                if (!result.Start())
+                {
+                    Log.Warn($"Failed to start process");
+                }
+                else
+                {
+                    Log.Debug($"Started new process for uri {uri}: { new { result.Id, result.ProcessName } }");
+                }
             });
         }
 

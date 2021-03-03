@@ -1,9 +1,7 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:fa="http://schemas.fontawesome.io/icons/"
-                    xmlns:eye="http://coderush.net/poeeye/"
                     xmlns:updater1="clr-namespace:PoeShared.Squirrel.Updater"
-                    xmlns:converters="http://schemas.kent.boogaart.com/converters"
                     xmlns:ui="clr-namespace:PoeShared.UI;assembly=PoeShared.Wpf">
     <ResourceDictionary.MergedDictionaries>
 

@@ -44,6 +44,7 @@ namespace PoeShared.Native
         private bool isLocked = true;
         private bool isUnlockable;
         private bool enableHeader = true;
+        private Size defaultSize;
 
         private Size maxSize = new Size(Int16.MaxValue, Int16.MaxValue);
         private Size minSize = new Size(0, 0);
@@ -221,6 +222,12 @@ namespace PoeShared.Native
             set => this.RaiseAndSetIfChanged(ref maxSize, value);
         }
 
+        public Size DefaultSize
+        {
+            get => defaultSize;
+            set => RaiseAndSetIfChanged(ref defaultSize, value);
+        }
+
         public bool IsLocked
         {
             get => isLocked;
@@ -275,15 +282,15 @@ namespace PoeShared.Native
 
         public virtual void ResetToDefault()
         {
-            var activeMonitor = UnsafeNative.GetMonitorInfo(OverlayWindow);
+            if (overlayWindow == null)
+            {
+                throw new InvalidOperationException("Overlay window is not loaded yet");
+            }
+            var activeMonitor = UnsafeNative.GetMonitorInfo(overlayWindow);
 
             Log.Warn($"Resetting overlay bounds (screen: {activeMonitor}, currently @ {nativeBounds})");
-            var center = UnsafeNative.GetPositionAtTheCenter(OverlayWindow).ScaleToScreen(Dpi);
-
-            var bounds = nativeBounds.Size;
-            var size = bounds.IsNotEmpty()
-                ? bounds
-                : MinSize.ScaleToScreen(Dpi);
+            var center = UnsafeNative.GetPositionAtTheCenter(overlayWindow).ScaleToScreen(Dpi);
+            var size = (defaultSize.IsNotEmpty() ? defaultSize : minSize).ScaleToScreen(Dpi);
             NativeBounds = new Rectangle(center, size);
             Log.Info($"Reconfigured overlay bounds (screen: {activeMonitor}, new @ {nativeBounds})");
 
@@ -343,22 +350,24 @@ namespace PoeShared.Native
 
 
             Rectangle overlayBounds;
-            if (!config.OverlayLocation.Equals(default) || !config.OverlaySize.IsEmpty)
+            if (config.OverlayLocation != null && config.OverlaySize != null)
             {
-                overlayBounds = new System.Windows.Rect(config.OverlayLocation, config.OverlaySize).ScaleToScreen(Dpi);
+                overlayBounds = new System.Windows.Rect(config.OverlayLocation.Value, config.OverlaySize.Value).ScaleToScreen(Dpi);
             }
             else
             {
                 overlayBounds = config.OverlayBounds;
             }
             
-            if (UnsafeNative.IsOutOfBounds(overlayBounds, systemInformation.MonitorBounds))
+            if (!overlayBounds.IsNotEmpty() || overlayBounds.IsNotEmpty() && UnsafeNative.IsOutOfBounds(overlayBounds, systemInformation.MonitorBounds))
             {
                 Log.Warn($"[{OverlayDescription}] Overlay is out of screen bounds(screen: {systemInformation.MonitorBounds}, overlay: {overlayBounds}) , resetting to position to screen center, systemInfo: {systemInformation.DumpToTextRaw()}, config: {config.DumpToTextRaw()}");
                 ResetToDefault();
             }
-
-            NativeBounds = config.OverlayBounds;
+            else
+            {
+                NativeBounds = overlayBounds;
+            }
 
             if (config.OverlayOpacity <= 0.01)
             {
