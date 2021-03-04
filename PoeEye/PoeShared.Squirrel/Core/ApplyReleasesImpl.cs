@@ -47,11 +47,11 @@ namespace PoeShared.Squirrel.Core
                 if (attemptingFullInstall)
                 {
                     Log.InfoFormat("No release to install, running the app");
-                    await InvokePostInstall(updateInfo.CurrentlyInstalledVersion.Version, false, true, silentInstall);
+                    await InvokePostInstall(updateInfo.CurrentlyInstalledVersion?.Version, false, true, silentInstall);
                 }
 
                 progress(100);
-                return GetDirectoryForRelease(updateInfo.CurrentlyInstalledVersion.Version).FullName;
+                return GetDirectoryForRelease(updateInfo.CurrentlyInstalledVersion?.Version).FullName;
             }
 
             var ret = await Log.ErrorIfThrows(
