@@ -6,6 +6,7 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using log4net;
+using PoeShared.Scaffolding;
 using PoeShared.Squirrel.Scaffolding;
 using Splat;
 using Squirrel;
@@ -82,6 +83,7 @@ namespace PoeShared.Squirrel.Core
                 throw new Exception("Remote release File is empty or corrupted");
             }
 
+            Log.Debug($"Remote releases: \n\t{parsedReleases.DumpToTable()}");
             var result = DetermineUpdateInfo(localReleases, parsedReleases, ignoreDeltaUpdates);
 
             progress(100);
@@ -232,7 +234,7 @@ namespace PoeShared.Squirrel.Core
             var latestRemote = remoteReleases.OrderByDescending(x => x.Version).First();
             if (latestRemote.Version < latestLocal.Version)
             {
-                Log.Warn($"Local release {latestLocal} is greater than remote release {remoteReleases}");
+                Log.Warn($"Local release {latestLocal.DumpToTextRaw()} is greater than remote release {latestRemote.DumpToTextRaw()}");
                 return PoeUpdateInfo.Create(currentRelease, new[] {latestFullRelease}, packageDirectory);
             }
 
