@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using CommandLine;
 using log4net;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -82,64 +83,75 @@ namespace PoeShared.Modularity
         }
         
         [MethodImpl(MethodImplOptions.Synchronized)]
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        public override object ReadJson(JsonReader reader, Type serializedType, object existingValue, JsonSerializer serializer)
         {
-            Guard.ArgumentIsTrue(() => typeof(IPoeEyeConfig).IsAssignableFrom(objectType));
+            Guard.ArgumentIsTrue(() => typeof(IPoeEyeConfig).IsAssignableFrom(serializedType));
 
-            PoeConfigMetadata metadata;
-            if (typeof(PoeConfigMetadata).IsAssignableFrom(objectType))
-            {
-                metadata = (PoeConfigMetadata)Deserialize(reader, serializer, objectType);
-            }
-            else
-            {
-                metadata = serializer.Deserialize<PoeConfigMetadata>(reader);
-            }
+            var isMetadataType = typeof(PoeConfigMetadata).IsAssignableFrom(serializedType);
+            var metadata = isMetadataType
+                ? (PoeConfigMetadata) Deserialize(reader, serializer, serializedType)
+                : serializer.Deserialize<PoeConfigMetadata>(reader);
 
             if (metadata == null)
             {
-                Log.Warn($"Failed to convert type {objectType}, returning empty object instead");
+                Log.Warn($"Failed to convert type {serializedType}, returning empty object instead");
                 return null;
             }
 
-            if (typeof(PoeConfigMetadata) == objectType)
+            if (isMetadataType)
             {
                 return metadata;
             }
 
-            if (string.IsNullOrEmpty(metadata.AssemblyName))
-            {
-                throw new FormatException($"Metadata is not valid(assembly is not defined), returning empty object instead, metadata: {metadata}");
-            }
-            
-            if (!loadedAssemblyByName.TryGetValue(metadata.AssemblyName, out var assembly))
-            {
-                assembly = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(x => x.GetName().Name == metadata.AssemblyName);
-                if (assembly == null)
-                {
-                    Log.Debug($"Assembly {metadata.AssemblyName} is not loaded, could not convert type {metadata.TypeName} (version {(metadata.Version == null ? "is not set" : metadata.Version.ToString())}), returning wrapper object {metadata}");
-                    return metadata;
-                }
-
-                loadedAssemblyByName[metadata.AssemblyName] = assembly;
-            }
-            
-            var innerType = assembly.GetType(metadata.TypeName, throwOnError: false);
+            var innerType = ResolveType(metadata);
             if (innerType == null)
             {
-                Log.Warn($"Failed to load Type {metadata.TypeName} (version {(metadata.Version == null ? "is not set" : metadata.Version.ToString())}) from assembly {assembly}, returning wrapper object {metadata}");
+                Log.Warn($"Failed to load Type {metadata.TypeName} (version {(metadata.Version == null ? "is not set" : metadata.Version.ToString())}) from assembly {metadata.AssemblyName}, returning wrapper object {metadata}");
                 return metadata;
             }
-
-            var value = DeserializeInnerValue(metadata, serializer, innerType);
             
-            if (typeof(PoeConfigMetadata).IsAssignableFrom(objectType) && objectType.IsGenericType)
+            var value = DeserializeInnerValue(metadata, serializer, innerType);
+            if (typeof(PoeConfigMetadata).IsAssignableFrom(serializedType) && serializedType.IsGenericType)
             {
                 SetMetadataValue(metadata, value);
                 return metadata;
             }
 
             return value;
+        }
+
+        private Type ResolveType(PoeConfigMetadata metadata)
+        {
+            var loadedType = Type.GetType(metadata.TypeName, false);
+            if (loadedType != null)
+            {
+                return loadedType;
+            }
+            
+            if (string.IsNullOrEmpty(metadata.AssemblyName))
+            {
+                throw new FormatException($"Metadata is not valid(assembly is not defined), returning empty object instead, metadata: {metadata}");
+            }
+            
+            Log.Debug($"Type {metadata.TypeName} is not loaded, trying to read type from assembly {metadata.AssemblyName}");
+            if (!loadedAssemblyByName.TryGetValue(metadata.AssemblyName, out var assembly))
+            {
+                assembly = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(x => x.GetName().Name == metadata.AssemblyName);
+                if (assembly == null)
+                {
+                    Log.Warn($"Assembly {metadata.AssemblyName} is not loaded, could not convert type {metadata.TypeName} (version {(metadata.Version == null ? "is not set" : metadata.Version.ToString())})");
+                    return null;
+                }
+
+                loadedAssemblyByName[metadata.AssemblyName] = assembly;
+            }
+            
+            loadedType = assembly.GetType(metadata.TypeName, throwOnError: false);
+            if (loadedType == null)
+            {
+                Log.Warn($"Assembly {metadata.AssemblyName} is loaded but does not contain type {metadata.TypeName}, (version {(metadata.Version == null ? "is not set" : metadata.Version.ToString())})");
+            }
+            return loadedType;
         }
 
         private object DeserializeInnerValue(PoeConfigMetadata metadata, JsonSerializer serializer, Type innerType)

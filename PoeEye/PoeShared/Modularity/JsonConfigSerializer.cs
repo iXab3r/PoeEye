@@ -57,7 +57,12 @@ namespace PoeShared.Modularity
             if (result == null)
             {
                 throw new FormatException(
-                    $"Operation failed, could not deserialize data to instance of type {typeof(T)}, serialized data: \n{serializedData.Substring(0, Math.Min(MaxCharsToLog, serializedData.Length))}");
+                    $"Could not deserialize data to instance of type {typeof(T)}, serialized data: \n{serializedData.Substring(0, Math.Min(MaxCharsToLog, serializedData.Length))}");
+            }
+
+            if (!(result is T))
+            {
+                throw new InvalidCastException($"Deserialized result of type {result.GetType()} is not assignable to type {typeof(T)}, result: {result}");
             }
 
             return (T) result;
