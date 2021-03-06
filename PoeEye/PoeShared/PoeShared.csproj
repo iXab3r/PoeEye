@@ -14,5 +14,6 @@
         <PackageReference Include="System.Reactive" Version="4.2.0" />
         <PackageReference Include="Unity" Version="5.10.3" />
         <PackageReference Include="CompareNETObjects" Version="4.65.0" />
+        <PackageReference Include="Microsoft.NETCore.Targets" Version="5.0.0" />
     </ItemGroup>
 </Project>
