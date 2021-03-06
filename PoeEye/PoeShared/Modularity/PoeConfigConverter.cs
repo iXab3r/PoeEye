@@ -87,8 +87,9 @@ namespace PoeShared.Modularity
         {
             Guard.ArgumentIsTrue(() => typeof(IPoeEyeConfig).IsAssignableFrom(serializedType));
 
-            var isMetadataType = typeof(PoeConfigMetadata).IsAssignableFrom(serializedType);
-            var metadata = isMetadataType
+            var isDerivedFromMetadataType = typeof(PoeConfigMetadata).IsAssignableFrom(serializedType);
+            var isExactlyMetadataType = typeof(PoeConfigMetadata) == serializedType;
+            var metadata = isDerivedFromMetadataType
                 ? (PoeConfigMetadata) Deserialize(reader, serializer, serializedType)
                 : serializer.Deserialize<PoeConfigMetadata>(reader);
 
@@ -98,7 +99,7 @@ namespace PoeShared.Modularity
                 return null;
             }
 
-            if (isMetadataType)
+            if (isExactlyMetadataType)
             {
                 return metadata;
             }

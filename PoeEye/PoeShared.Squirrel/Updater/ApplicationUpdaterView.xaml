@@ -5,7 +5,6 @@
                     xmlns:ui="clr-namespace:PoeShared.UI;assembly=PoeShared.Wpf">
     <ResourceDictionary.MergedDictionaries>
 
-        <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/recommended/accent/materialdesigncolor.lightblue.xaml" />
         <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />
         <ResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Converters.xaml" />
         <ResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Colors.xaml" />
@@ -24,14 +23,14 @@
             <fa:FontAwesome Icon="Refresh"
                             Margin="5,0"
                             Visibility="{Binding CheckForUpdatesCommand.IsBusy, Converter={StaticResource TrueToVisibleFalseToCollapsedConverter}}"
-                            Foreground="{StaticResource SecondaryAccentBrush}"
+                            Foreground="{StaticResource MouseOverAccentBrushKey}"
                             VerticalAlignment="Center"
                             FontSize="32" />
 
             <fa:FontAwesome Icon="ArrowCircleUp"
                             Margin="5,0"
                             Visibility="{Binding LatestVersion, Converter={StaticResource NullToCollapsedConverter}}"
-                            Foreground="{StaticResource SecondaryAccentBrush}"
+                            Foreground="{StaticResource MouseOverAccentBrushKey}"
                             VerticalAlignment="Center"
                             FontSize="32" />
 

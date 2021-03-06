@@ -4,8 +4,6 @@
                     xmlns:modularity="clr-namespace:PoeShared.Modularity"
                     xmlns:ui="clr-namespace:PoeShared.UI">
     <ResourceDictionary.MergedDictionaries>
-
-        <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/recommended/accent/materialdesigncolor.lightblue.xaml" />
         <ResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Converters.xaml" />
         <ResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Colors.xaml" />
         <ResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/CommandWrapperView.xaml" />
@@ -16,7 +14,7 @@
             <DockPanel.InputBindings>
                 <KeyBinding Gesture="Escape" Command="{Binding CancelCommand}" />
             </DockPanel.InputBindings>
-            <Border DockPanel.Dock="Bottom" VerticalAlignment="Bottom" Margin="0,5,0,0" BorderBrush="{StaticResource MaterialDesignTextBoxBorder}" BorderThickness="0,2,0,0">
+            <Border DockPanel.Dock="Bottom" VerticalAlignment="Bottom" Margin="0,5,0,0" BorderThickness="0,2,0,0">
                 <DockPanel>
                     <ui:ButtonEx
                         DockPanel.Dock="Right"
