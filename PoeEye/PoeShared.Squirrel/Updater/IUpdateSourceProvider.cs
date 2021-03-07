@@ -9,6 +9,8 @@ namespace PoeShared.Squirrel.Updater
     {
         UpdateSourceInfo UpdateSource { get; set; }
         
-        HashSet<UpdateSourceInfo> KnownSources { [NotNull] get; }
+        ReadOnlyObservableCollection<UpdateSourceInfo> KnownSources { [NotNull] get; }
+
+        void AddSource(UpdateSourceInfo sourceInfo);
     }
 }

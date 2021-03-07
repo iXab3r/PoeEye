@@ -1,3 +1,4 @@
+using System;
 using System.Security;
 using Newtonsoft.Json;
 using PoeShared.Converters;
@@ -12,35 +13,25 @@ namespace PoeShared.Squirrel.Updater
 
         public bool RequiresAuthentication { get; set; }
 
-        [JsonConverter(typeof(SafeDataConverter))]
-        public SecureString Username { get; set; }
+        [JsonConverter(typeof(SafeDataConverter))] public SecureString Username { get; set; }
 
-        [JsonConverter(typeof(SafeDataConverter))]
-        public SecureString Password { get; set; }
+        [JsonConverter(typeof(SafeDataConverter))] public SecureString Password { get; set; }
 
-        [JsonIgnore]
-        public bool IsValid => !string.IsNullOrEmpty(Uri);
+        [JsonIgnore] public bool IsValid => !string.IsNullOrEmpty(Uri);
 
         public bool Equals(UpdateSourceInfo other)
         {
-            return string.Equals(Uri, other.Uri);
+            return Uri == other.Uri && Description == other.Description && RequiresAuthentication == other.RequiresAuthentication;
         }
 
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(null, obj))
-            {
-                return false;
-            }
-
-            return obj is UpdateSourceInfo && Equals((UpdateSourceInfo) obj);
+            return obj is UpdateSourceInfo other && Equals(other);
         }
 
         public override int GetHashCode()
         {
-            return Uri != null
-                ? Uri.GetHashCode()
-                : 0;
+            return HashCode.Combine(Uri, Description, RequiresAuthentication);
         }
 
         public static bool operator ==(UpdateSourceInfo left, UpdateSourceInfo right)

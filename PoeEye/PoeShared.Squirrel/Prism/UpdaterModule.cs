@@ -1,5 +1,6 @@
 ﻿using log4net;
 using PoeShared.Modularity;
+using PoeShared.Scaffolding;
 using PoeShared.Squirrel.Updater;
 using PoeShared.Wpf.Scaffolding;
 using Prism.Ioc;
@@ -23,7 +24,7 @@ namespace PoeShared.Squirrel.Prism
 
         public void RegisterTypes(IContainerRegistry containerRegistry)
         {
-            container.AddExtension(new UpdaterRegistrations());
+            container.AddNewExtensionIfNotExists<UpdaterRegistrations>();
         }
 
         public void OnInitialized(IContainerProvider containerProvider)

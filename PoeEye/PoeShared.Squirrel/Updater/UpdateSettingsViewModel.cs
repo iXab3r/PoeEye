@@ -1,6 +1,9 @@
 using System;
+using System.Collections.ObjectModel;
 using System.Threading.Tasks;
+using DynamicData;
 using JetBrains.Annotations;
+using log4net;
 using PoeShared.Modularity;
 using PoeShared.Scaffolding;
 
@@ -9,15 +12,22 @@ namespace PoeShared.Squirrel.Updater
     [UsedImplicitly]
     internal sealed class UpdateSettingsViewModel : DisposableReactiveObject, ISettingsViewModel<UpdateSettingsConfig>
     {
+        private static readonly ILog Log = LogManager.GetLogger(typeof(UpdateSettingsViewModel));
+
+        private readonly IUpdateSourceProvider updateSourceProvider;
         private readonly IConfigProvider<UpdateSettingsConfig> configProvider;
         private bool checkForUpdates;
         private UpdateSourceInfo updateSource;
         private bool ignoreDeltaUpdates;
 
         public UpdateSettingsViewModel(
-            [NotNull] IConfigProvider<UpdateSettingsConfig> configProvider)
+            IUpdateSourceProvider updateSourceProvider,
+            IConfigProvider<UpdateSettingsConfig> configProvider)
         {
+            this.updateSourceProvider = updateSourceProvider;
             this.configProvider = configProvider;
+
+            KnownSources = updateSourceProvider.KnownSources;
         }
 
         public string ModuleName { get; } = "Update Settings";
@@ -39,6 +49,8 @@ namespace PoeShared.Squirrel.Updater
             get => ignoreDeltaUpdates;
             set => RaiseAndSetIfChanged(ref ignoreDeltaUpdates, value);
         }
+        
+        public ReadOnlyObservableCollection<UpdateSourceInfo> KnownSources { get; }
         
         public Task Load(UpdateSettingsConfig config)
         {

@@ -3,8 +3,10 @@ using System.Collections.ObjectModel;
 using log4net;
 using PoeShared.Modularity;
 using PoeShared.Scaffolding;
-using System;
+using System.Linq;
 using System.Reactive.Linq;
+using DynamicData;
+using DynamicData.Kernel;
 using ReactiveUI;
 
 namespace PoeShared.Squirrel.Updater
@@ -14,30 +16,67 @@ namespace PoeShared.Squirrel.Updater
         private static readonly ILog Log = LogManager.GetLogger(typeof(UpdateSourceProviderFromConfig));
 
         private readonly IConfigProvider<UpdateSettingsConfig> configProvider;
+        private readonly ISourceCache<UpdateSourceInfo, string> knownSources = new SourceCache<UpdateSourceInfo, string>(x => x.Uri);
         private UpdateSourceInfo updateSource;
 
         public UpdateSourceProviderFromConfig(IConfigProvider<UpdateSettingsConfig> configProvider)
         {
             Log.Debug($"Initializing update sources using configProvider {configProvider}");
             this.configProvider = configProvider;
-            GetKnownSources().ForEach(x => KnownSources.Add(x));
-
+            knownSources
+                .Connect()
+                .Bind(out var known)
+                .SubscribeToErrors(Log.HandleUiException)
+                .AddTo(Anchors);
+            KnownSources = known;
+            
+            GetKnownSources().ForEach(x => knownSources.AddOrUpdate(x));
             configProvider
                 .ListenTo(x => x.UpdateSource)
-                .SubscribeSafe(x => UpdateSource = x, Log.HandleUiException)
+                .SubscribeSafe(configSource =>
+                {
+                    // remapping config source to known source, some details may differ
+                    var knownSource = knownSources.Lookup(configSource.Uri);
+                    if (!knownSource.HasValue)
+                    {
+                        Log.Warn($"UpdateSource that was loaded from config is now known: {configSource}, resetting to first of known sources:\r\n\t{KnownSources.DumpToTable()}");
+                        knownSource = Optional<UpdateSourceInfo>.Create(KnownSources.FirstOrDefault());
+                    }
+
+                    Log.Debug($"Setting UpdateSource to {configSource}");
+                    UpdateSource = knownSource.Value;
+                }, Log.HandleUiException)
                 .AddTo(Anchors);
 
             this.WhenAnyValue(x => x.UpdateSource)
                 .DistinctUntilChanged()
-                .Where(x => !x.Equals(configProvider.ActualConfig.UpdateSource))
-                .SubscribeSafe(
-                    x =>
+                .Where(x => x != default)
+                .Where(x => configProvider.ActualConfig.UpdateSource != x)
+                .SubscribeSafe(x =>
+                {
+                    Log.Debug($"Updating UpdateSource {configProvider.ActualConfig.UpdateSource} => {x}");
+                    var config = configProvider.ActualConfig with
                     {
-                        Log.Debug($"Saving UpdateSource into config {configProvider.ActualConfig.UpdateSource} => {x}");
-                        var newConfig = configProvider.ActualConfig.CloneJson();
-                        newConfig.UpdateSource = x;
-                        configProvider.Save(newConfig);
-                    }, Log.HandleUiException)
+                        UpdateSource = x
+                    };
+                    configProvider.Save(config);
+                }, Log.HandleUiException)
+                .AddTo(Anchors);
+
+            knownSources
+                .Connect()
+                .OnItemUpdated((curr, prev) =>
+                {
+                    Log.Debug($"UpdateSource updated(duh): {prev} => {curr}");
+                    if (curr.Uri != updateSource.Uri)
+                    {
+                        return;
+                    }
+
+                    Log.Debug($"Replacing current update source: {updateSource} => {curr}");
+                    UpdateSource = curr;
+                })
+                .SubscribeToErrors(Log.HandleUiException)
                 .AddTo(Anchors);
         }
 
@@ -47,7 +86,17 @@ namespace PoeShared.Squirrel.Updater
             set => this.RaiseAndSetIfChanged(ref updateSource, value);
         }
 
-        public HashSet<UpdateSourceInfo> KnownSources { get; } = new HashSet<UpdateSourceInfo>();
+        public ReadOnlyObservableCollection<UpdateSourceInfo> KnownSources { get; }
+        
+        public void AddSource(UpdateSourceInfo sourceInfo)
+        {
+            var existingSource = knownSources.Lookup(sourceInfo.Uri);
+            if (existingSource.HasValue)
+            {
+                Log.Debug($"Updating source {existingSource.Value} => {sourceInfo}");
+            }
+            knownSources.AddOrUpdate(sourceInfo);
+        }
 
         private IEnumerable<UpdateSourceInfo> GetKnownSources()
         {
