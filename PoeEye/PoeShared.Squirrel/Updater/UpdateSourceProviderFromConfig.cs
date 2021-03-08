@@ -35,8 +35,17 @@ namespace PoeShared.Squirrel.Updater
                 .ListenTo(x => x.UpdateSource)
                 .SubscribeSafe(configSource =>
                 {
+                    if (!configSource.IsValid)
+                    {
+                        Log.Warn($"UpdateSource loaded from configuration is not valid or not set: {configSource}");
+                    }
+                    else
+                    {
+                        Log.Debug($"UpdateSource in config has changed to {configSource}");
+                    }
+                    
                     // remapping config source to known source, some details may differ
-                    var knownSource = knownSources.Lookup(configSource.Uri);
+                    var knownSource = knownSources.Lookup(configSource.Uri ?? string.Empty);
                     if (!knownSource.HasValue)
                     {
                         Log.Warn($"UpdateSource that was loaded from config is now known: {configSource}, resetting to first of known sources:\r\n\t{KnownSources.DumpToTable()}");
