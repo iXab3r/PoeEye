@@ -39,6 +39,7 @@
                              IsTabStop="{TemplateBinding IsTabStop}"
                              SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
                              Text="{TemplateBinding Text}"
+                             materialDesign:HintAssist.IsFloating="False"
                              Validation.ErrorTemplate="{TemplateBinding Validation.ErrorTemplate}"
                              VerticalScrollBarVisibility="{TemplateBinding ScrollViewer.VerticalScrollBarVisibility}"
                              AcceptsReturn="{TemplateBinding AcceptsReturn}"
