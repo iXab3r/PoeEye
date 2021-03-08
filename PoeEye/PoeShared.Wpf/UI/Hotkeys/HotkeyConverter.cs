@@ -39,7 +39,11 @@ namespace PoeShared.UI.Hotkeys
                 {
                     var keyName = x.ToString();
                     knownKeys[x] = keyName;
+                    
                     knownKeysByName[keyName] = x;
+
+                    var hotkey = new HotkeyGesture(x);
+                    knownKeysByName[hotkey.ToString()] = x;
                 });
 
             var allModifiers = Enum
@@ -86,7 +90,7 @@ namespace PoeShared.UI.Hotkeys
                     mouseWheelEventsByName[wheelName] = x;
                     mouseWheelEvents[x] = wheelName;
                 });
-
+            
             knownSpecialKeysByName["*"] = Key.Multiply;
             knownSpecialKeysByName["+"] = Key.OemPlus;
             knownSpecialKeysByName["="] = Key.OemPlus;
