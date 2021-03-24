@@ -166,6 +166,7 @@ namespace PoeShared.UI.Hotkeys
                 return false;
             }
             
+            Log.Debug($"Hotkey {(data.KeyDown ? "pressed" : "released")}: {data.Hotkey}");
             return data.Hotkey.Equals(hotkey) || hotkeysSource.Items.Any(x => data.Hotkey.Equals(x));
         }
 
@@ -176,15 +177,15 @@ namespace PoeShared.UI.Hotkeys
                 Observable.Merge(
                         eventSource.WhenMouseDown.Select(x => HotkeyData.FromEvent(x, clock.UtcNow)),
                         eventSource.WhenKeyDown.Select(x => HotkeyData.FromEvent(x, clock.UtcNow)))
-                    .Where(IsConfiguredHotkey)
-                    .Select(x => x.SetKeyDown(true));
+                    .Select(x => x.SetKeyDown(true))
+                    .Where(IsConfiguredHotkey);
             
             var hotkeyUp =
                 Observable.Merge(
                         eventSource.WhenMouseUp.Select(x => HotkeyData.FromEvent(x, clock.UtcNow)),
                         eventSource.WhenKeyUp.Select(x => HotkeyData.FromEvent(x, clock.UtcNow)))
-                    .Where(IsConfiguredHotkey)
-                    .Select(x => x.SetKeyDown(false));
+                    .Select(x => x.SetKeyDown(false))
+                    .Where(IsConfiguredHotkey);
 
             return hotkeyDown
                 .Merge(hotkeyUp);

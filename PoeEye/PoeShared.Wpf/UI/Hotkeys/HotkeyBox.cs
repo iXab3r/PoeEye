@@ -273,8 +273,6 @@ namespace PoeShared.UI.Hotkeys
                 case Key.RightCtrl:
                 case Key.LeftAlt:
                 case Key.RightAlt:
-                case Key.RWin:
-                case Key.LWin:
                 case { } keyTab when keyTab == Key.Tab && !AcceptsTab:
                 case { } keyReturn when keyReturn == Key.Return && !AcceptsReturn:
                     return;
