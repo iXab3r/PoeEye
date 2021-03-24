@@ -170,6 +170,11 @@ namespace PoeShared.UI.Hotkeys
             return data.Hotkey.Equals(hotkey) || hotkeysSource.Items.Any(x => data.Hotkey.Equals(x));
         }
 
+        public override string ToString()
+        {
+            return $"HotkeyTracker for {hotkeysSource.Items.Concat(new []{ hotkey }).DumpToTextRaw()}";
+        }
+
         private IObservable<HotkeyData> BuildHotkeySubscription(
             IKeyboardEventsSource eventSource)
         {
