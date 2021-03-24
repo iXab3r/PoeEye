@@ -1,8 +1,12 @@
 using System;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Windows.Input;
+using System.Windows.Media.Animation;
+using DynamicData;
 using Gma.System.MouseKeyHook;
 using JetBrains.Annotations;
 using log4net;
@@ -20,7 +24,9 @@ namespace PoeShared.UI.Hotkeys
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(HotkeyTracker));
         private static readonly int CurrentProcessId = Process.GetCurrentProcess().Id;
-        private readonly IHotkeyConverter hotkeyConverter;
+
+        private readonly SourceCache<HotkeyGesture, HotkeyGesture> hotkeysSource = new(x => x);
+        private readonly IClock clock;
 
         private HotkeyGesture hotkey;
         private HotkeyMode hotkeyMode;
@@ -28,15 +34,22 @@ namespace PoeShared.UI.Hotkeys
         private bool isActive;
 
         public HotkeyTracker(
-            [NotNull] IHotkeyConverter hotkeyConverter,
-            [NotNull] IKeyboardEventsSource eventSource,
-            [NotNull] [Dependency(WellKnownWindows.MainWindow)] IWindowTracker mainWindowTracker)
+           IClock clock,
+           IKeyboardEventsSource eventSource,
+           [Dependency(WellKnownWindows.MainWindow)] IWindowTracker mainWindowTracker)
         {
-            this.hotkeyConverter = hotkeyConverter;
+            this.clock = clock;
             Disposable
                 .Create(() => Log.Debug($"Disposing HotkeyTracker, gesture: {Hotkey} (mode: {HotkeyMode})"))
                 .AddTo(Anchors);
             IsActive = true;
+
+            hotkeysSource
+                .Connect()
+                .Bind(out var hotkeys)
+                .Subscribe()
+                .AddTo(Anchors);
+            Hotkeys = hotkeys;
 
             this.WhenAnyValue(x => x.Hotkey)
                 .WithPrevious((prev, curr) => new { prev, curr })
@@ -58,7 +71,7 @@ namespace PoeShared.UI.Hotkeys
             this.WhenAnyValue(x => x.Hotkey)
                 .Select(hotkey => hotkey == null ? Observable.Empty<HotkeyData>() : BuildHotkeySubscription(eventSource))
                 .Switch()
-                .DistinctUntilChanged(x => new { x.Hotkey, x.KeyDown })
+                .DistinctUntilChanged(x => new { x.Hotkey, x.KeyDown, x.Timestamp }) // removed possible duplicates from multiple sources
                 .Where(
                     hotkeyData =>
                     {
@@ -79,6 +92,7 @@ namespace PoeShared.UI.Hotkeys
                         Log.Debug($"Application is active, skipping hotkey {hotkeyData.Hotkey} (isDown: {hotkeyData.KeyDown}, suppressKey: {suppressKey},  configuredKey: {Hotkey}, mode: {HotkeyMode})");
                         return false;
                     })
+                .DistinctUntilChanged(x => new { x.Hotkey, x.KeyDown }) // disables "blinking" when hotkey is held
                 .SubscribeSafe(
                     hotkeyData =>
                     {
@@ -112,6 +126,8 @@ namespace PoeShared.UI.Hotkeys
             set => RaiseAndSetIfChanged(ref hotkey, value);
         }
 
+        public ReadOnlyObservableCollection<HotkeyGesture> Hotkeys { get; }
+
         public HotkeyMode HotkeyMode
         {
             get => hotkeyMode;
@@ -124,22 +140,33 @@ namespace PoeShared.UI.Hotkeys
             set => RaiseAndSetIfChanged(ref suppressKey, value);
         }
 
+        public void Add(HotkeyGesture hotkeyToAdd)
+        {
+            Log.Debug($"Registering hotkey {hotkeyToAdd}, current list: {Hotkeys.DumpToTextRaw()}");
+            hotkeysSource.AddOrUpdate(hotkeyToAdd);
+        }
+
+        public void Remove(HotkeyGesture hotkeyToRemove)
+        {
+            Log.Debug($"Unregistering hotkey {hotkeyToRemove}, current list: {Hotkeys.DumpToTextRaw()}");
+            hotkeysSource.RemoveKey(hotkeyToRemove);
+        }
+
+        public void Clear()
+        {
+            Log.Debug($"Unregistering all hotkeys, hotkey: {hotkey}, current list: {Hotkeys.DumpToTextRaw()}");
+            Hotkey = HotkeyGesture.Empty;
+            hotkeysSource.Clear();
+        }
+
         private bool IsConfiguredHotkey(HotkeyData data)
         {
-            if (data.Hotkey == null || hotkey == null)
+            if (data.Hotkey == null || data.Hotkey.IsEmpty)
             {
                 return false;
             }
-
-            if (data.Hotkey.Key == Key.None && data.Hotkey.MouseButton == null)
-            {
-                return false;
-            }
-
-            var pressedHotkey = data.Hotkey.ToString();
-            var result = pressedHotkey.Equals(hotkey.ToString());
-
-            return result;
+            
+            return data.Hotkey.Equals(hotkey) || hotkeysSource.Items.Any(x => data.Hotkey.Equals(x));
         }
 
         private IObservable<HotkeyData> BuildHotkeySubscription(
@@ -147,15 +174,15 @@ namespace PoeShared.UI.Hotkeys
         {
             var hotkeyDown =
                 Observable.Merge(
-                        eventSource.WhenMouseDown.Select(HotkeyData.FromEvent),
-                        eventSource.WhenKeyDown.Select(HotkeyData.FromEvent))
+                        eventSource.WhenMouseDown.Select(x => HotkeyData.FromEvent(x, clock.UtcNow)),
+                        eventSource.WhenKeyDown.Select(x => HotkeyData.FromEvent(x, clock.UtcNow)))
                     .Where(IsConfiguredHotkey)
                     .Select(x => x.SetKeyDown(true));
             
             var hotkeyUp =
                 Observable.Merge(
-                        eventSource.WhenMouseUp.Select(HotkeyData.FromEvent),
-                        eventSource.WhenKeyUp.Select(HotkeyData.FromEvent))
+                        eventSource.WhenMouseUp.Select(x => HotkeyData.FromEvent(x, clock.UtcNow)),
+                        eventSource.WhenKeyUp.Select(x => HotkeyData.FromEvent(x, clock.UtcNow)))
                     .Where(IsConfiguredHotkey)
                     .Select(x => x.SetKeyDown(false));
 
@@ -172,6 +199,8 @@ namespace PoeShared.UI.Hotkeys
             public HotkeyGesture Hotkey { get; set; }
 
             public bool KeyDown { get; set; }
+            
+            public DateTime Timestamp { get; set; }
 
             public HotkeyData SetKeyDown(bool value)
             {
@@ -194,21 +223,23 @@ namespace PoeShared.UI.Hotkeys
                 return this;
             }
 
-            public static HotkeyData FromEvent(MouseEventArgs args)
+            public static HotkeyData FromEvent(MouseEventArgs args, DateTime timestamp)
             {
                 return new HotkeyData
                 {
                     Hotkey = new HotkeyGesture(args.Button),
-                    MouseEventArgs = args
+                    MouseEventArgs = args,
+                    Timestamp = timestamp
                 };
             }
 
-            public static HotkeyData FromEvent(KeyEventArgs args)
+            public static HotkeyData FromEvent(KeyEventArgs args, DateTime timestamp)
             {
                 return new HotkeyData
                 {
                     Hotkey = new HotkeyGesture(args.KeyCode.ToInputKey(), args.Modifiers.ToModifiers()),
-                    KeyEventArgs = args
+                    KeyEventArgs = args,
+                    Timestamp = timestamp
                 };
             }
         }
