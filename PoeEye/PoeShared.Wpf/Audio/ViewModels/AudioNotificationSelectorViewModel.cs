@@ -28,6 +28,7 @@ namespace PoeShared.Audio.ViewModels
 
         private bool audioEnabled;
         private string selectedValue;
+        private float volume = 1;
 
         public AudioNotificationSelectorViewModel(
             IAudioNotificationsManager notificationsManager,
@@ -118,6 +119,12 @@ namespace PoeShared.Audio.ViewModels
             set => this.RaiseAndSetIfChanged(ref selectedValue, value);
         }
 
+        public float Volume
+        {
+            get => volume;
+            set => RaiseAndSetIfChanged(ref volume, value);
+        }
+
         public string PreviousSelectedValue => previousSelectedValueSupplier.Value;
 
         public ReadOnlyObservableCollection<NotificationTypeWrapperViewModel> Items { get; }
@@ -141,7 +148,7 @@ namespace PoeShared.Audio.ViewModels
                 return;
             }
 
-            notificationsManager.PlayNotification(notification.Value);
+            notificationsManager.PlayNotification(notification.Value, volume);
         }
     }
 }

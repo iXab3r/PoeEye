@@ -10,6 +10,8 @@ namespace PoeShared.Audio.ViewModels
     {
         string SelectedValue { get; set; }
         
+        float Volume { get; set; }
+        
         ICommand PlayNotificationCommand { get; }
         
         ICommand SelectNotificationCommand { get; }
