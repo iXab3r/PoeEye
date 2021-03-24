@@ -41,7 +41,7 @@ namespace PoeShared.UI.Hotkeys
                     ModifierKeys.Control => Key.LeftCtrl,
                     ModifierKeys.Shift => Key.LeftShift,
                     ModifierKeys.Windows => Key.LWin,
-                    _ => throw new ArgumentOutOfRangeException(nameof(modifierKeys), modifierKeys, $"Failed to substitute modifier: {modifierKeys}")
+                    _ => Key.None
                 };
             }
             

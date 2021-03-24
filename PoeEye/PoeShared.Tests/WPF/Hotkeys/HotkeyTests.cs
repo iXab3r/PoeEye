@@ -12,6 +12,7 @@ namespace PoeShared.Tests.WPF.Hotkeys
         [TestCase(Key.None, ModifierKeys.None, "None")]
         [TestCase(Key.A, ModifierKeys.None, "A")]
         [TestCase(Key.None, ModifierKeys.Control, "Ctrl")]
+        [TestCase(Key.None, ModifierKeys.Control | ModifierKeys.Alt, "Ctrl+Alt")]
         [TestCase(Key.LeftCtrl, ModifierKeys.None, "Ctrl")]
         [TestCase(Key.RightCtrl, ModifierKeys.None, "Ctrl")]
         [TestCase(Key.RightCtrl, ModifierKeys.Control, "Ctrl")]
@@ -48,19 +49,6 @@ namespace PoeShared.Tests.WPF.Hotkeys
             // Then
             hotkey.Key.ShouldBe(expectedKey, () => hotkey.ToString());
             hotkey.ModifierKeys.ShouldBe(expectedModifierKeys, () => hotkey.ToString());
-        }
-
-        [Test]
-        [TestCase(Key.None, ModifierKeys.Windows | ModifierKeys.Control)]
-        [TestCase(Key.None, ModifierKeys.Alt | ModifierKeys.Control)]
-        public void ShouldThrowWhenCouldNotNormalize(Key key, ModifierKeys modifierKeys)
-        {
-            //Given
-            //When
-            Action action = () => new HotkeyGesture(key, modifierKeys);
-
-            //Then
-            action.ShouldThrow<ArgumentOutOfRangeException>();
         }
 
         [TestCase(MouseButton.Left, ModifierKeys.None, "MouseLeft")]
