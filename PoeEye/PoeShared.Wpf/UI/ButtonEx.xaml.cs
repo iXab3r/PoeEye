@@ -8,11 +8,11 @@ namespace PoeShared.UI
     public partial class ButtonEx : Button
     {
         public static readonly DependencyProperty IconProperty = DependencyProperty.Register(
-            "Icon", typeof(object), typeof(ButtonEx), new PropertyMetadata(default(object)));
+            "Icon", typeof(string), typeof(ButtonEx), new PropertyMetadata(default(string)));
 
-        public object Icon
+        public string Icon
         {
-            get { return (object) GetValue(IconProperty); }
+            get { return (string) GetValue(IconProperty); }
             set { SetValue(IconProperty, value); }
         }
     }
