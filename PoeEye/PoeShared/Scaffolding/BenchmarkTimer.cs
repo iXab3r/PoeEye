@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using JetBrains.Annotations;
 using log4net;
 
 namespace PoeShared.Scaffolding
@@ -18,6 +19,7 @@ namespace PoeShared.Scaffolding
         private TimeSpan previousOperationTimestamp;
         private readonly Stopwatch sw;
         private TimeSpan loggingElapsedThreshold = TimeSpan.Zero;
+        private Func<bool> predicate = () => true;
 
         public BenchmarkTimer(string benchmarkName, ILog logger = null, [CallerMemberName] string propertyName = null)
         {
@@ -32,6 +34,12 @@ namespace PoeShared.Scaffolding
         public void ResetStep()
         {
             previousOperationTimestamp = sw.Elapsed;
+        }
+        
+        public BenchmarkTimer WithCondition([NotNull] Func<bool> predicate)
+        {
+            this.predicate = predicate ?? throw new ArgumentNullException(nameof(predicate));
+            return this;
         }
 
         public BenchmarkTimer WithMinElapsedThreshold(TimeSpan minElapsedThreshold)
@@ -59,6 +67,10 @@ namespace PoeShared.Scaffolding
 
         private void AddStep(string message)
         {
+            if (predicate != null && !predicate())
+            {
+                return;
+            }
             var logMessage = $"[{propertyName}] [{(sw.Elapsed - previousOperationTimestamp).TotalMilliseconds:F1}ms] {message}";
             operations.Enqueue(logMessage);
             if (logger.IsDebugEnabled)
@@ -70,7 +82,7 @@ namespace PoeShared.Scaffolding
         public void Dispose()
         {
             sw.Stop();
-            if (logger.IsDebugEnabled && sw.Elapsed > loggingElapsedThreshold)
+            if (logger.IsDebugEnabled && !operations.IsEmpty && sw.Elapsed > loggingElapsedThreshold)
             {
                 logger.Debug($"[{propertyName}] [{sw.Elapsed.TotalMilliseconds:F1}ms] {benchmarkName}{(operations.Count <= 0 ? string.Empty : $"\n\t{string.Join("\n\t", operations)}")}");
             }

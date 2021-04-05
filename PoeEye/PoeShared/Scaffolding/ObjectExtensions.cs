@@ -3,8 +3,8 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.Serialization.Formatters;
 using DynamicData;
+using log4net;
 using Newtonsoft.Json;
 using PoeShared.Modularity;
 
@@ -12,6 +12,8 @@ namespace PoeShared.Scaffolding
 {
     public static class ObjectExtensions
     {
+        private static readonly ILog Log = LogManager.GetLogger(typeof(ObjectExtensions));
+
         private static readonly List<JsonConverter> JsonConverters = new List<JsonConverter>()
         {
             new FileSystemInfoConverter()
@@ -141,9 +143,9 @@ namespace PoeShared.Scaffolding
 
             if (skippedProperties.Any())
             {
-                if (SharedLog.Instance.Log.IsDebugEnabled)
+                if (Log.IsDebugEnabled)
                 {
-                    SharedLog.Instance.Log.Debug($"Skipped following properties: {skippedProperties.Select(x => $"{x.PropertyType} {x.Name}").DumpToTextRaw()}");
+                    Log.Debug($"Skipped following properties: {skippedProperties.Select(x => $"{x.PropertyType} {x.Name}").DumpToTextRaw()}");
                 }
             }
         }
