@@ -31,9 +31,10 @@ namespace PoeShared.Scaffolding
         
         public TimeSpan Elapsed => sw.Elapsed;
 
-        public void ResetStep()
+        public BenchmarkTimer ResetStep()
         {
             previousOperationTimestamp = sw.Elapsed;
+            return this;
         }
         
         public BenchmarkTimer WithCondition([NotNull] Func<bool> predicate)
@@ -48,21 +49,22 @@ namespace PoeShared.Scaffolding
             return this;
         }
 
-        public void Step(string message)
+        public BenchmarkTimer Step(string message)
         {
             var timestamp = sw.Elapsed;
             AddStep(message);
             previousOperationTimestamp = timestamp;
+            return this;
         }
         
-        public void StepIf(string message, TimeSpan elapsedThreshold)
+        public BenchmarkTimer StepIf(string message, TimeSpan elapsedThreshold)
         {
             if (sw.Elapsed < elapsedThreshold)
             {
-                return;
+                return this;
             }
 
-            Step(message);
+            return Step(message);
         }
 
         private void AddStep(string message)

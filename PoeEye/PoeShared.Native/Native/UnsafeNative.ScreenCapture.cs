@@ -31,7 +31,7 @@ namespace PoeShared.Native
                 return null;
             }
             
-            var sourceBmp = new Bitmap(region.Width, region.Height, PixelFormat.Format32bppArgb);;
+            var sourceBmp = new Bitmap(region.Width, region.Height, PixelFormat.Format32bppRgb); // Format32bppRgb is used because in most cases PrintWindow/CopyDeviceContext returns 32bppRgb
             using var captureGraphics = Graphics.FromImage(sourceBmp);
             captureGraphics.CopyFromScreen(region.Left,region.Top,0,0,region.Size);
             return sourceBmp;
