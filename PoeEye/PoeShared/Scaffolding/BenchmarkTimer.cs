@@ -20,6 +20,7 @@ namespace PoeShared.Scaffolding
         private readonly Stopwatch sw;
         private TimeSpan loggingElapsedThreshold = TimeSpan.Zero;
         private Func<bool> predicate = () => true;
+        private bool logEachStep = true;
 
         public BenchmarkTimer(string benchmarkName, ILog logger = null, [CallerMemberName] string propertyName = null)
         {
@@ -36,6 +37,18 @@ namespace PoeShared.Scaffolding
             previousOperationTimestamp = sw.Elapsed;
             return this;
         }
+
+        public BenchmarkTimer WithoutLoggingEachStep()
+        {
+            logEachStep = false;
+            return this;
+        }
+
+        public BenchmarkTimer WithLoggingEachStep()
+        {
+            logEachStep = true;
+            return this;
+        }
         
         public BenchmarkTimer WithCondition([NotNull] Func<bool> predicate)
         {
@@ -49,36 +62,32 @@ namespace PoeShared.Scaffolding
             return this;
         }
 
-        public BenchmarkTimer Step(string message)
+        public BenchmarkTimer Step(Func<string> messageFactory)
         {
-            var timestamp = sw.Elapsed;
-            AddStep(message);
-            previousOperationTimestamp = timestamp;
+            AddStep(messageFactory);
             return this;
         }
         
-        public BenchmarkTimer StepIf(string message, TimeSpan elapsedThreshold)
+        public BenchmarkTimer Step(string message)
         {
-            if (sw.Elapsed < elapsedThreshold)
-            {
-                return this;
-            }
-
-            return Step(message);
+            return Step(() => message);
         }
-
-        private void AddStep(string message)
+        
+        private void AddStep(Func<string> messageFactory)
         {
             if (predicate != null && !predicate())
             {
                 return;
             }
-            var logMessage = $"[{propertyName}] [{(sw.Elapsed - previousOperationTimestamp).TotalMilliseconds:F1}ms] {message}";
+            var timestamp = sw.Elapsed;
+
+            var logMessage = $"[{propertyName}] [{(sw.Elapsed - previousOperationTimestamp).TotalMilliseconds:F1}ms] {messageFactory()}";
             operations.Enqueue(logMessage);
-            if (logger.IsDebugEnabled)
+            if (logEachStep && logger.IsDebugEnabled)
             {
                 logger.Debug(logMessage);
             }
+            previousOperationTimestamp = timestamp;
         }
         
         public void Dispose()
