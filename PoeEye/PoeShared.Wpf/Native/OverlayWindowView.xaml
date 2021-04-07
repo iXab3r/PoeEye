@@ -7,6 +7,7 @@
     xmlns:native="clr-namespace:PoeShared.Native"
     xmlns:wpf="clr-namespace:PoeShared.Scaffolding.WPF"
     xmlns:eye="clr-namespace:PoeShared.Scaffolding"
+    xmlns:ui="clr-namespace:PoeShared.UI"
     mc:Ignorable="d"
     d:DataContext="{d:DesignInstance native:OverlayWindowViewModel}"
     WindowStartupLocation="Manual"
@@ -18,11 +19,11 @@
     SizeChanged="OverlayChildWindow_OnSizeChanged">
 
     <Window.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Generic.xaml" />
-            </ResourceDictionary.MergedDictionaries>
-        </ResourceDictionary>
+        <ui:SharedResourceDictionary>
+            <ui:SharedResourceDictionary.MergedDictionaries>
+                <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Generic.xaml" />
+            </ui:SharedResourceDictionary.MergedDictionaries>
+        </ui:SharedResourceDictionary>
     </Window.Resources>
 
     <native:TransparentWindow.Style>

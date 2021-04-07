@@ -1,14 +1,14 @@
-﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+﻿<ui:SharedResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:fa="http://schemas.fontawesome.io/icons/"
                     xmlns:updater1="clr-namespace:PoeShared.Squirrel.Updater"
                     xmlns:ui="clr-namespace:PoeShared.UI;assembly=PoeShared.Wpf">
-    <ResourceDictionary.MergedDictionaries>
+    <ui:SharedResourceDictionary.MergedDictionaries>
 
-        <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />
-        <ResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Converters.xaml" />
-        <ResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Colors.xaml" />
-    </ResourceDictionary.MergedDictionaries>
+        <ui:SharedResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />
+        <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Converters.xaml" />
+        <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Colors.xaml" />
+    </ui:SharedResourceDictionary.MergedDictionaries>
 
     <DataTemplate DataType="{x:Type updater1:ApplicationUpdaterViewModel}">
         <DockPanel>
@@ -119,4 +119,4 @@
             </DockPanel>
         </DockPanel>
     </DataTemplate>
-</ResourceDictionary>
+</ui:SharedResourceDictionary>

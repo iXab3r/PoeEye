@@ -6,6 +6,7 @@
         xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
         xmlns:wpf="clr-namespace:PoeShared.Scaffolding.WPF"
         xmlns:exceptionViewer="clr-namespace:PoeShared.Wpf.UI.ExceptionViewer"
+        xmlns:ui="clr-namespace:PoeShared.UI"
         mc:Ignorable="d"
         TextElement.FontWeight="Regular"
         TextOptions.TextFormattingMode="Ideal"
@@ -18,13 +19,13 @@
         SizeToContent="WidthAndHeight"
         Title="{Binding Title}" Width="600" d:DataContext="{d:DesignInstance exceptionViewer:ExceptionDialogViewModel}">
      <Window.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/styles/themes/dark.blue.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Generic.shared.xaml" />
-            </ResourceDictionary.MergedDictionaries>
-        </ResourceDictionary>
+        <ui:SharedResourceDictionary>
+            <ui:SharedResourceDictionary.MergedDictionaries>
+                <ui:SharedResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
+                <ui:SharedResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/styles/themes/dark.blue.xaml" />
+                <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Generic.shared.xaml" />
+            </ui:SharedResourceDictionary.MergedDictionaries>
+        </ui:SharedResourceDictionary>
     </Window.Resources>
     
     <Grid Margin="5">

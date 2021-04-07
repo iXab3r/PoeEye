@@ -1,10 +1,11 @@
-﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+﻿<ui:SharedResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:viewModels="clr-namespace:PoeShared.Squirrel.Updater"
-                    xmlns:st="http://schemas.spicytaco.io/">
-    <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Generic.shared.xaml" />
-    </ResourceDictionary.MergedDictionaries>
+                    xmlns:st="http://schemas.spicytaco.io/"
+                    xmlns:ui="clr-namespace:PoeShared.UI;assembly=PoeShared.Wpf">
+    <ui:SharedResourceDictionary.MergedDictionaries>
+        <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Generic.shared.xaml" />
+    </ui:SharedResourceDictionary.MergedDictionaries>
 
     <DataTemplate DataType="{x:Type viewModels:UpdateSettingsViewModel}">
         <st:AutoGrid Columns="170, *" ChildMargin="5" x:Name="UpdateSettingsRoot">
@@ -47,4 +48,4 @@
                       ToolTip="Download full application updates instead of small patches. Enable this option if you encounter any problems during update process" />
         </st:AutoGrid>
     </DataTemplate>
-</ResourceDictionary>
+</ui:SharedResourceDictionary>
