@@ -68,13 +68,12 @@
                             VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
                             Orientation="Horizontal">
                             <Grid>
-                                <TextBlock x:Name="IconLabel"
+                                <ContentControl x:Name="IconLabel"
                                            Foreground="{TemplateBinding Foreground}"
                                            FontSize="{TemplateBinding FontSize}"
                                            FontFamily="{StaticResource FontAwesome}"
                                            HorizontalAlignment="Stretch" 
-                                           TextAlignment="Center"
-                                           Text="{Binding Icon, RelativeSource={RelativeSource TemplatedParent}}"
+                                           Content="{Binding Icon, RelativeSource={RelativeSource TemplatedParent}}"
                                            Visibility="{Binding Icon, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource NullToCollapsedConverter}}" 
                                            MinWidth="20"/>
                                 <TextBlock x:Name="ErrorIcon" FontSize="{TemplateBinding FontSize}"
