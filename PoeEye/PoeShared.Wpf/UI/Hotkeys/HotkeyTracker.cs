@@ -295,6 +295,12 @@ namespace PoeShared.UI.Hotkeys
                 Hotkey = newHotkey;
                 return this;
             }
+            
+            public HotkeyData SetTimestamp(DateTime value)
+            {
+                Timestamp = value;
+                return this;
+            }
 
             public HotkeyData MarkAsHandled()
             {
