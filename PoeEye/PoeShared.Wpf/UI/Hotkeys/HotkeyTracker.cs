@@ -1,9 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using System.Windows.Input;
 using System.Windows.Media.Animation;
 using DynamicData;
@@ -27,6 +29,8 @@ namespace PoeShared.UI.Hotkeys
 
         private readonly SourceCache<HotkeyGesture, HotkeyGesture> hotkeysSource = new(x => x);
         private readonly IClock clock;
+        private readonly ISubject<HotkeyData> hotkeyLog = new Subject<HotkeyData>();
+        private readonly ISet<HotkeyGesture> pressedKeys = new HashSet<HotkeyGesture>(); 
 
         private HotkeyGesture hotkey;
         private HotkeyMode hotkeyMode;
@@ -47,9 +51,17 @@ namespace PoeShared.UI.Hotkeys
             hotkeysSource
                 .Connect()
                 .Bind(out var hotkeys)
-                .Subscribe()
+                .SubscribeToErrors(Log.HandleException)
                 .AddTo(Anchors);
             Hotkeys = hotkeys;
+
+            hotkeyLog
+                .Synchronize()
+                .Where(x => Log.IsDebugEnabled)
+                .Select(data => $"Hotkey {(data.KeyDown ? "pressed" : "released")}: {data.Hotkey}, key: {data.Hotkey.Key}, mouse: {data.Hotkey.MouseButton}, wheel: {data.Hotkey.MouseWheel}, modifiers: {data.Hotkey.ModifierKeys}")
+                .DistinctUntilChanged()
+                .SubscribeSafe(data => Log.Debug(data), Log.HandleException)
+                .AddTo(Anchors);
 
             this.WhenAnyValue(x => x.Hotkey)
                 .WithPrevious((prev, curr) => new { prev, curr })
@@ -84,7 +96,15 @@ namespace PoeShared.UI.Hotkeys
                             Log.Debug($"Application is NOT active, processing hotkey {hotkeyData.Hotkey} (isDown: {hotkeyData.KeyDown}, suppressKey: {suppressKey},  configuredKey: {Hotkey}, mode: {HotkeyMode})");
                             if (suppressKey)
                             {
-                                hotkeyData.MarkAsHandled();
+                                if (KeyToModifier(hotkeyData.Hotkey.Key) != ModifierKeys.None)
+                                {
+                                    Log.Debug($"Supplied key is a modifier, skipping suppression");
+                                }
+                                else
+                                {
+                                    Log.Debug($"Marking hotkey {hotkeyData.Hotkey} as handled");
+                                    hotkeyData.MarkAsHandled();
+                                }
                             }
                             return true;
                         }
@@ -166,13 +186,69 @@ namespace PoeShared.UI.Hotkeys
                 return false;
             }
             
-            Log.Debug($"Hotkey {(data.KeyDown ? "pressed" : "released")}: {data.Hotkey}");
-            return data.Hotkey.Equals(hotkey) || hotkeysSource.Items.Any(x => data.Hotkey.Equals(x));
+            hotkeyLog.OnNext(data);
+            
+            var isExactMatch = data.Hotkey.Equals(hotkey) || hotkeysSource.Items.Any(x => data.Hotkey.Equals(x));
+            if (isExactMatch)
+            {
+                if (data.KeyDown)
+                {
+                    pressedKeys.Add(data.Hotkey);
+                }
+                else
+                {
+                    pressedKeys.Remove(data.Hotkey);
+                }
+                return true;
+            }
+
+            if (data.KeyDown || data.Hotkey.IsMouse || pressedKeys.Count == 0)
+            {
+                return false;
+            }
+
+            var keyAsModifier = KeyToModifier(data.Hotkey.Key);
+            if (keyAsModifier == ModifierKeys.None)
+            {
+                return false;
+            }
+
+            var pressed = pressedKeys.Where(x => x.ModifierKeys.HasFlag(keyAsModifier)).ToArray();
+            if (pressed.Length == 0)
+            {
+                return false;
+            }   
+
+            if (pressed.Length > 1)
+            {
+                Log.Warn($"Probably something went wrong - there shouldn't be 2+ pressed hotkeys at once, pressed hotkeys: {pressed.DumpToTextRaw()}");
+                return false;
+            }
+
+            var newData = data.ReplaceKey(pressed[0]);
+            Log.Debug($"Replaced hotkey {data} => {newData}");
+            return IsConfiguredHotkey(newData);
         }
 
         public override string ToString()
         {
             return $"HotkeyTracker for {hotkeysSource.Items.Concat(new []{ hotkey }).DumpToTextRaw()}";
+        }
+
+        private static ModifierKeys KeyToModifier(Key key)
+        {
+            return key switch
+            {
+                Key.LeftAlt => ModifierKeys.Alt,
+                Key.RightAlt => ModifierKeys.Alt,
+                Key.LeftCtrl => ModifierKeys.Control,
+                Key.RightCtrl => ModifierKeys.Control,
+                Key.LeftShift => ModifierKeys.Shift,
+                Key.RightShift => ModifierKeys.Shift,
+                Key.LWin => ModifierKeys.Windows,
+                Key.RWin => ModifierKeys.Windows,
+                _ => ModifierKeys.None
+            };
         }
 
         private IObservable<HotkeyData> BuildHotkeySubscription(
@@ -211,6 +287,12 @@ namespace PoeShared.UI.Hotkeys
             public HotkeyData SetKeyDown(bool value)
             {
                 KeyDown = value;
+                return this;
+            }
+            
+            public HotkeyData ReplaceKey(HotkeyGesture newHotkey)
+            {
+                Hotkey = newHotkey;
                 return this;
             }
 
