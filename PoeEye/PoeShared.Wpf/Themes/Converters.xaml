@@ -147,6 +147,10 @@
     <eyeConverters:EqualityConverter x:Key="EqualToFalseConverter" TrueValue="{StaticResource FalseValue}" FalseValue="{StaticResource TrueValue}" />
     <eyeConverters:EqualityConverter x:Key="EqualToVisibleConverter" TrueValue="{x:Static Visibility.Visible}" FalseValue="{x:Static Visibility.Collapsed}" />
     <eyeConverters:EqualityConverter x:Key="EqualToCollapsedConverter" TrueValue="{x:Static Visibility.Collapsed}" FalseValue="{x:Static Visibility.Visible}" />
+    <eyeConverters:FlagsConverter x:Key="HasFlagToTrueConverter" TrueValue="{StaticResource TrueValue}" FalseValue="{StaticResource FalseValue}" />
+    <eyeConverters:FlagsConverter x:Key="HasFlagToFalseConverter" TrueValue="{StaticResource FalseValue}" FalseValue="{StaticResource TrueValue}" />
+    <eyeConverters:FlagsConverter x:Key="HasFlagToVisibleConverter"  TrueValue="{x:Static Visibility.Visible}" FalseValue="{x:Static Visibility.Collapsed}" />
+    <eyeConverters:FlagsConverter x:Key="HasFlagToCollapsedConverter" TrueValue="{x:Static Visibility.Collapsed}" FalseValue="{x:Static Visibility.Visible}"/>
     <eyeConverters:PropagatingMultiValueConverter x:Key="PropagatingMultiValueConverter" />
     <eyeConverters:NullToBoolConverter x:Key="NullToTrueConverter" NullValue="True" />
     <eyeConverters:NullToBoolConverter x:Key="NullToFalseConverter" NullValue="False" />
