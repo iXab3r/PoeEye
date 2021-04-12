@@ -21,6 +21,7 @@ namespace PoeShared.Scaffolding
         private TimeSpan loggingElapsedThreshold = TimeSpan.Zero;
         private Func<bool> predicate = () => true;
         private bool logEachStep = true;
+        private bool logOnDisposal = true;
 
         public BenchmarkTimer(string benchmarkName, ILog logger = null, [CallerMemberName] string propertyName = null)
         {
@@ -47,6 +48,18 @@ namespace PoeShared.Scaffolding
         public BenchmarkTimer WithLoggingEachStep()
         {
             logEachStep = true;
+            return this;
+        }
+        
+        public BenchmarkTimer WithoutLoggingOnDisposal()
+        {
+            logOnDisposal = false;
+            return this;
+        }
+
+        public BenchmarkTimer WithLoggingOnDisposal()
+        {
+            logOnDisposal = true;
             return this;
         }
         
@@ -93,7 +106,7 @@ namespace PoeShared.Scaffolding
         public void Dispose()
         {
             sw.Stop();
-            if (logger.IsDebugEnabled && !operations.IsEmpty && sw.Elapsed > loggingElapsedThreshold)
+            if (logOnDisposal && logger.IsDebugEnabled && sw.Elapsed > loggingElapsedThreshold)
             {
                 logger.Debug($"[{propertyName}] [{sw.Elapsed.TotalMilliseconds:F1}ms] {benchmarkName}{(operations.Count <= 0 ? string.Empty : $"\n\t{string.Join("\n\t", operations)}")}");
             }

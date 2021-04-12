@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Markup;
+using log4net;
+using PoeShared.Scaffolding;
 
 namespace PoeShared.UI
 {
@@ -13,6 +15,8 @@ namespace PoeShared.UI
     /// </summary>
     public class SharedResourceDictionary : ResourceDictionary
     {
+        private static readonly ILog Log = LogManager.GetLogger(typeof(SharedResourceDictionary));
+
         /// <summary>
         /// Internal cache of loaded dictionaries 
         /// </summary>
@@ -34,10 +38,10 @@ namespace PoeShared.UI
                 sourceUri = value;
                 if (!SharedDictionaries.ContainsKey(value))
                 {
+                    using var sw = new BenchmarkTimer($"Loading {nameof(SharedResourceDictionary)} from {value}", Log);
                     // If the dictionary is not yet loaded, load it by setting
                     // the source of the base class
                     base.Source = value;
- 
                     // add it to the cache
                     SharedDictionaries.Add(value, this);
                 }
