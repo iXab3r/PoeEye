@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using DynamicData;
 using log4net;
 using Newtonsoft.Json;
@@ -51,6 +52,11 @@ namespace PoeShared.Scaffolding
         public static string DumpToTable<T>(this IEnumerable<T> instance, string separator = "\n\t")
         {
             return instance == null ? $"null<{typeof(T).Name}>" : string.Join(separator, instance.Select(x => x.DumpToTextRaw()));
+        }
+        
+        public static string ToStringTable<T>(this IEnumerable<T> instance, string separator = "\n\t")
+        {
+            return instance == null ? $"null<{typeof(T).Name}>" : string.Join(separator, instance.Select(x => x.ToString()));
         }
         
         public static string DumpToTable<T>(this IEnumerable<T> instance, string tableName, string separator = "\n\t")

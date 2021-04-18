@@ -47,7 +47,14 @@ namespace PoeShared.Squirrel.Core
             catch (Exception ex)
             {
                 // Something has gone pear-shaped, let's start from scratch
-                Log.Warn("Failed to load local releases, starting from scratch", ex);
+                if (ex is FileNotFoundException fileNotFoundException)
+                {
+                    Log.Warn($"There are not local releases file {fileNotFoundException.FileName}, starting from scratch");
+                }
+                else
+                {
+                    Log.Warn("Failed to load local releases, starting from scratch", ex);
+                }
                 shouldInitialize = true;
             }
 
@@ -83,7 +90,14 @@ namespace PoeShared.Squirrel.Core
                 throw new Exception("Remote release File is empty or corrupted");
             }
 
-            Log.Debug($"Remote releases: \n\t{parsedReleases.DumpToTable()}");
+            if (Log.IsDebugEnabled)
+            {
+                const int maxReleasesToLog = 5;
+                Log.Debug(parsedReleases.Length > maxReleasesToLog
+                    ? $"Remote releases(latest {maxReleasesToLog} of {parsedReleases.Length}): \n\t{parsedReleases.OrderByDescending(x => x.Version).Take(maxReleasesToLog).DumpToTable()}"
+                    : $"Remote releases({parsedReleases.Length}): \n\t{parsedReleases.DumpToTable()}");
+            }
+            
             var result = DetermineUpdateInfo(localReleases, parsedReleases, ignoreDeltaUpdates);
 
             progress(100);
@@ -258,7 +272,14 @@ namespace PoeShared.Squirrel.Core
             }
             catch (Exception ex)
             {
-                Log.Debug("Couldn't read staging user ID, creating a blank one", ex);
+                if (ex is FileNotFoundException fileNotFoundException)
+                {
+                    Log.Warn($"There are not staging user ID file {fileNotFoundException.FileName}, creating a blank one");
+                }
+                else
+                {
+                    Log.Warn("Couldn't read staging user ID, creating a blank one", ex);
+                }
             }
 
             var prng = new Random();
