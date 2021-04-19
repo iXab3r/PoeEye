@@ -48,7 +48,7 @@ namespace PoeShared.Squirrel.Updater
                     var knownSource = knownSources.Lookup(configSource.Uri ?? string.Empty);
                     if (!knownSource.HasValue)
                     {
-                        Log.Warn($"UpdateSource that was loaded from config is now known: {configSource}, resetting to first of known sources:\r\n\t{KnownSources.DumpToTable()}");
+                        Log.Warn($"UpdateSource that was loaded from config is not known: {configSource}, resetting to first of known sources:\r\n\t{KnownSources.DumpToTable()}");
                         knownSource = Optional<UpdateSourceInfo>.Create(KnownSources.FirstOrDefault());
                     }
 
@@ -69,6 +69,19 @@ namespace PoeShared.Squirrel.Updater
                         UpdateSource = x
                     };
                     configProvider.Save(config);
+                }, Log.HandleUiException)
+                .AddTo(Anchors);
+
+            this.WhenAnyValue(x => x.UpdateSource)
+                .ToUnit()
+                .Merge(knownSources.CountChanged.ToUnit())
+                .Merge(knownSources.Connect().ToUnit())
+                .Where(_ => knownSources.Items.Any(x => x.IsValid))
+                .Where(_ => !updateSource.IsValid)
+                .SubscribeSafe(() =>
+                {
+                    Log.Debug($"Update source is not set - loading first available our of {knownSources.Items.DumpToTextRaw()}");
+                    UpdateSource = knownSources.Items.FirstOrDefault(x => x.IsValid);
                 }, Log.HandleUiException)
                 .AddTo(Anchors);
 
@@ -100,10 +113,7 @@ namespace PoeShared.Squirrel.Updater
         public void AddSource(UpdateSourceInfo sourceInfo)
         {
             var existingSource = knownSources.Lookup(sourceInfo.Uri);
-            if (existingSource.HasValue)
-            {
-                Log.Debug($"Updating source {existingSource.Value} => {sourceInfo}");
-            }
+            Log.Debug(existingSource.HasValue ? $"Updating source {existingSource.Value} => {sourceInfo}" : $"Adding new update source {sourceInfo}");
             knownSources.AddOrUpdate(sourceInfo);
         }
 

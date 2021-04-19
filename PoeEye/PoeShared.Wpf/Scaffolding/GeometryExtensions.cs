@@ -88,6 +88,11 @@ namespace PoeShared.Scaffolding
                 IsFinite(rect.Height);
         }
         
+        public static bool IsEmpty(this Point point)
+        {
+            return point.X == 0 && point.Y == 0;
+        }
+        
         public static bool IsNotEmpty(this System.Drawing.Size size)
         {
             return size.Width > 0 &&
