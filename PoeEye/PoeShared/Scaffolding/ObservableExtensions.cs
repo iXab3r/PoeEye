@@ -121,6 +121,14 @@ namespace PoeShared.Scaffolding
                 .Select(t => resultSelector(t.Item1, t.Item2));
         }
         
+        public static IObservable<(TSource Previous, TSource Current)> WithPrevious<TSource>(
+            this IObservable<TSource> source)
+        {
+            return source.Scan(
+                (default(TSource), default(TSource)),
+                (previous, current) => (previous.Item2, current));
+        }
+        
         public static IObservable<TSource> DisposePrevious<TSource>(
             this IObservable<TSource> source) where TSource : IDisposable
         {
@@ -129,14 +137,6 @@ namespace PoeShared.Scaffolding
                 x.Item1?.Dispose();
                 return x.Item2;
             });
-        }
-
-        public static IObservable<Tuple<TSource, TSource>> WithPrevious<TSource>(
-            this IObservable<TSource> source)
-        {
-            return source.Scan(
-                Tuple.Create(default(TSource), default(TSource)),
-                (previous, current) => Tuple.Create(previous.Item2, current));
         }
 
         public static IObservable<T> RetryWithDelay<T>(this IObservable<T> source, TimeSpan timeSpan)
