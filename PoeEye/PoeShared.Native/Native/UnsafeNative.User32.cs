@@ -21,7 +21,6 @@ namespace PoeShared.Native
         [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
         static extern bool AdjustWindowRectEx(ref RECT lpRect, User32.WindowStyles dwStyle, bool bMenu, User32.WindowStylesEx dwExStyle); 
         
-        
         [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
         static extern bool AdjustWindowRectExForDpi(ref RECT lpRect, User32.WindowStyles dwStyle, bool bMenu, User32.WindowStylesEx dwExStyle, int dpi); 
         

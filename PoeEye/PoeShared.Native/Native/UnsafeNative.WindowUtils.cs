@@ -1,5 +1,6 @@
 using System;
 using System.Drawing;
+using System.Runtime.InteropServices;
 using PInvoke;
 using PoeShared.Scaffolding;
 
@@ -7,6 +8,9 @@ namespace PoeShared.Native
 {
     public partial class UnsafeNative
     {
+        [DllImport("dwmapi.dll")]
+        private static extern HResult DwmGetWindowAttribute(IntPtr hwnd, DwmApi.DWMWINDOWATTRIBUTE dwAttribute, out RECT pvAttribute, int cbAttribute);
+        
         public static IntPtr MakeLParam(int loWord, int hiWord)
         {
             return new IntPtr((hiWord << 16) | (loWord & 0xffff));
@@ -37,6 +41,20 @@ namespace PoeShared.Native
 
             return z;
         }
+        
+        public static Rectangle GetWindowBoundsWithFrame(IntPtr hwnd)
+        {
+            //FIXME On Win10 GetWindowRect works not as expected - it includes invisible borders around the frame
+            var windowRect = GetWindowRect(hwnd);
+            return windowRect;
+        }
+        
+        public static Rectangle GetClientRectWithinMonitor(IntPtr hwnd)
+        {
+            var windowRect = GetWindowBoundsWithFrame(hwnd);
+            var monitorRect = System.Windows.Forms.Screen.FromHandle(hwnd).Bounds;
+            return new Rectangle(windowRect.X - monitorRect.X, windowRect.Y - monitorRect.Y, windowRect.Width, windowRect.Height);
+        }
 
         public static Rectangle GetWindowRect(IntPtr hwnd)
         {
@@ -47,6 +65,21 @@ namespace PoeShared.Native
             }
 
             return new Rectangle(result.left, result.top, result.right - result.left, result.bottom - result.top);
+        }
+        
+        public static Rectangle DwmGetWindowFrameBounds(IntPtr hwnd)
+        {
+            if (!IsWindows10OrGreater())
+            {
+                return Rectangle.Empty;
+            }
+            var result = DwmGetWindowAttribute(hwnd, DwmApi.DWMWINDOWATTRIBUTE.DWMWA_EXTENDED_FRAME_BOUNDS, out var frame, Marshal.SizeOf<RECT>());
+            if (!result.Succeeded)
+            {
+                Log.Warn($"Failed to DwmGetWindowAttribute by HWND {hwnd.ToHexadecimal()}, error: {result}");
+                return Rectangle.Empty;
+            }
+            return new Rectangle(frame.left, frame.top, frame.right - frame.left, frame.bottom - frame.top);
         }
 
         public static bool SetWindowRect(IntPtr hwnd, Rectangle rect)

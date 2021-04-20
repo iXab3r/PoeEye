@@ -39,7 +39,7 @@ namespace PoeShared.Native
         
         public static Bitmap GetWindowImageViaCopyFromScreen(IntPtr hwnd, Rectangle region)
         {
-            var sourceRegion = GetAbsoluteClientRect(hwnd);
+            var sourceRegion = GetWindowBoundsWithFrame(hwnd);
             if (sourceRegion.Width <= 0 || sourceRegion.Height <= 0)
             {
                 return null;
@@ -63,7 +63,7 @@ namespace PoeShared.Native
 
             try
             {
-                var sourceRegion = GetAbsoluteClientRect(hwnd);
+                var sourceRegion = GetWindowBoundsWithFrame(hwnd);
                 if (sourceRegion.Width <= 0 || sourceRegion.Height <= 0)
                 {
                     return null;
@@ -156,23 +156,6 @@ namespace PoeShared.Native
             }
 
             return null;
-        }
-
-        public static Rectangle GetAbsoluteClientRect(IntPtr hWnd)
-        {
-            var windowRect = GetWindowRect(hWnd);
-            var clientRect = GetClientRect(hWnd);
-            // This gives us the width of the left, right and bottom chrome - we can then determine the top height
-            var chromeWidth = (windowRect.Width - clientRect.Width) / 2;
-
-            return new Rectangle(new Point(windowRect.X + chromeWidth, windowRect.Y + (windowRect.Height - clientRect.Height - chromeWidth)), clientRect.Size);
-        }
-        
-        public static Rectangle GetClientRectWithinMonitor(IntPtr hWnd)
-        {
-            var windowRect = GetAbsoluteClientRect(hWnd);
-            var monitorRect = System.Windows.Forms.Screen.FromHandle(hWnd).Bounds;
-            return new Rectangle(windowRect.X - monitorRect.X, windowRect.Y - monitorRect.Y, windowRect.Width, windowRect.Height);
         }
 
         public static Bitmap GetWindowImageViaDeviceContext(IntPtr hwnd)
