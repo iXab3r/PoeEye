@@ -12,6 +12,13 @@ namespace PoeShared.Scaffolding
 {
     public static class DependencyObjectExtensions
     {
+        public static IObservable<TValue> Observe<T, TValue>(this T component, DependencyProperty dependencyProperty, Func<T, TValue> selector)
+            where T : DependencyObject
+        {
+            return Observe(component, dependencyProperty)
+                .Select(_ => selector(component));
+        }
+        
         public static IObservable<EventArgs> Observe<T>(this T component, DependencyProperty dependencyProperty)
             where T : DependencyObject
         {

@@ -20,7 +20,7 @@
     <blue:MultiplyDoubleConverter x:Key="DoubleDivideByTwoConverter" Factor="0.5" />
     <blue:MultiplyDoubleConverter x:Key="DoubleMultiplyByTwoConverter" Factor="2" />
     <eyeConverters:PathCombineMultiValueConverter x:Key="PathCombineMultiValueConverter"/>
-    
+    <eyeConverters:RectangleConverter x:Key="RectangleConverter"/>
     <eyeConverters:StaticResourceConverter x:Key="StaticResourceOrNullConverter" ThrowWhenNotFound="False" DefaultValue="{x:Null}" />
     <eyeConverters:StaticResourceConverter x:Key="StaticResourceConverter" ThrowWhenNotFound="True" />
     
