@@ -16,6 +16,7 @@
     ShowInTaskbar="{Binding Content.ShowInTaskbar, Mode=TwoWay}"
     ShowActivated="False"
     DpiAware="True"
+    UseLayoutRounding="True"
     SizeChanged="OverlayChildWindow_OnSizeChanged">
 
     <Window.Resources>

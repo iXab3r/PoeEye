@@ -14,10 +14,10 @@
         <Setter Property="Cursor" Value="{x:Static Cursors.AppStarting}" />
         <Setter Property="MaxWidth" Value="30"/>
         <Setter Property="MaxHeight" Value="30"/>
-        <Setter Property="MinWidth" Value="10"/>
-        <Setter Property="MinHeight" Value="10"/>
+        <Setter Property="MinWidth" Value="7"/>
+        <Setter Property="MinHeight" Value="7"/>
         
-        <Setter Property="Width" Value="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=ActualWidth, Converter={StaticResource DoubleDivideByFiveConverter}}"/>
+        <Setter Property="Width" Value="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=ActualWidth, Converter={StaticResource DoubleDivideByTwentyFiveConverter}}"/>
         <Setter Property="Height" Value="{Binding RelativeSource={RelativeSource Self}, Path=Width}"/>
         <Setter Property="RenderTransformOrigin" Value="0.5 0.5"/>
         <Setter Property="Tag" Value="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}"/>

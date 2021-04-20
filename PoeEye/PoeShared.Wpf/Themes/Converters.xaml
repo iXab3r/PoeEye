@@ -16,6 +16,8 @@
     
     <blue:MultiplyDoubleConverter x:Key="DoubleToPercentConverter" Factor="100" />
     <blue:MultiplyDoubleConverter x:Key="DoubleFromPercentConverter" Factor="0.01" />
+    <blue:MultiplyDoubleConverter x:Key="DoubleDivideByTwentyFiveConverter" Factor="0.04" />
+    <blue:MultiplyDoubleConverter x:Key="DoubleDivideByTenConverter" Factor="0.1" />
     <blue:MultiplyDoubleConverter x:Key="DoubleDivideByFiveConverter" Factor="0.2" />
     <blue:MultiplyDoubleConverter x:Key="DoubleDivideByTwoConverter" Factor="0.5" />
     <blue:MultiplyDoubleConverter x:Key="DoubleMultiplyByTwoConverter" Factor="2" />

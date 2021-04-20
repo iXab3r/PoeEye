@@ -32,10 +32,12 @@ namespace PoeShared.Native
         private readonly CompositeDisposable anchors = new CompositeDisposable();
 
         private readonly AspectRatioSizeCalculator aspectRatioSizeCalculator = new AspectRatioSizeCalculator();
+        private readonly Lazy<IntPtr> windowHandle;
         private DragParams? dragParams;
 
         protected ConstantAspectRatioWindow()
         {
+            windowHandle = new Lazy<IntPtr>(() => new WindowInteropHelper(this).EnsureHandle());
             Loaded += HandleWindowLoaded;
             this.Observe(TargetAspectRatioProperty)
                 .Select(_ => TargetAspectRatio)
@@ -102,6 +104,7 @@ namespace PoeShared.Native
             }
 
             Dpi = GetDpiFromHwndSource(hwndSource);
+            
             hwndSource.AddHook(DragHook);
         }
 
@@ -117,8 +120,7 @@ namespace PoeShared.Native
             {
                 case User32.WindowMessage.WM_ENTERSIZEMOVE:
                 {
-                    var thisWindow = new WindowInteropHelper(this).Handle;
-                    var bounds = UnsafeNative.GetWindowRect(thisWindow);
+                    var bounds = UnsafeNative.GetWindowRect(windowHandle.Value);
                     var p = UnsafeNative.GetMousePosition();
                     var diffWidth = Math.Min(Math.Abs(p.X - bounds.X), Math.Abs(p.X - bounds.X - bounds.Width));
                     var diffHeight = Math.Min(Math.Abs(p.Y - bounds.Y), Math.Abs(p.Y - bounds.Y - bounds.Height));
@@ -152,13 +154,16 @@ namespace PoeShared.Native
                         break;
                     }
                     var bounds = new Rectangle(pos.x, pos.y, pos.cx, pos.cy);
-
                     var newBounds = aspectRatioSizeCalculator.Calculate(TargetAspectRatio.Value, bounds, dragParams.Value.InitialBounds);
+                    newBounds.Width = (int)Math.Max(MinWidth, Math.Min(MaxWidth, newBounds.Width));
+                    newBounds.Height = (int)Math.Max(MinHeight, Math.Min(MaxHeight, newBounds.Height));
+                    Log.Debug(
+                        $"Window pos changing, window: {this}, initialBounds: {dragParams?.InitialBounds} => {new Rectangle((int) Left, (int) Top, (int) Width, (int) Height)}, resize bounds: {bounds}, desired bounds: {newBounds}");
+
                     if (newBounds == bounds)
                     {
                         break;
                     }
-
                     pos.x = newBounds.X;
                     pos.y = newBounds.Y;
                     pos.cx = newBounds.Width;
