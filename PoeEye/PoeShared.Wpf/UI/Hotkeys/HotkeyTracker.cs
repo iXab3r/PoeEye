@@ -12,6 +12,7 @@ using DynamicData;
 using Gma.System.MouseKeyHook;
 using JetBrains.Annotations;
 using log4net;
+using PoeShared.Modularity;
 using PoeShared.Native;
 using PoeShared.Prism;
 using ReactiveUI;
@@ -39,6 +40,7 @@ namespace PoeShared.UI.Hotkeys
 
         public HotkeyTracker(
            IClock clock,
+           IAppArguments appArguments,
            IKeyboardEventsSource eventSource,
            [Dependency(WellKnownWindows.MainWindow)] IWindowTracker mainWindowTracker)
         {
@@ -57,7 +59,7 @@ namespace PoeShared.UI.Hotkeys
 
             hotkeyLog
                 .Synchronize()
-                .Where(x => Log.IsDebugEnabled)
+                .Where(x => Log.IsDebugEnabled && appArguments.IsDebugMode)
                 .Select(data => $"Hotkey {(data.KeyDown ? "pressed" : "released")}: {data.Hotkey}, key: {data.Hotkey.Key}, mouse: {data.Hotkey.MouseButton}, wheel: {data.Hotkey.MouseWheel}, modifiers: {data.Hotkey.ModifierKeys}")
                 .DistinctUntilChanged()
                 .SubscribeSafe(data => Log.Debug(data), Log.HandleException)
