@@ -1,15 +1,17 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Reactive.Subjects;
 using System.Windows.Forms;
 using Gma.System.MouseKeyHook;
 using JetBrains.Annotations;
 using log4net;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using PoeShared.Prism;
 using PoeShared.Scaffolding;
+using Unity;
 using KeyEventArgs = System.Windows.Forms.KeyEventArgs;
 using KeyEventHandler = System.Windows.Forms.KeyEventHandler;
 using MouseEventArgs = System.Windows.Forms.MouseEventArgs;
@@ -19,14 +21,18 @@ namespace PoeShared.Native
     internal sealed class KeyboardEventsSource : DisposableReactiveObject, IKeyboardEventsSource
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(KeyboardEventsSource));
-        
+
+        private readonly IScheduler inputScheduler;
         private readonly IClock clock;
 
-        public KeyboardEventsSource([NotNull] IClock clock)
+        public KeyboardEventsSource(
+            [Dependency(WellKnownSchedulers.InputHook)] IScheduler inputScheduler,
+            [NotNull] IClock clock)
         {
             Guard.ArgumentNotNull(clock, nameof(clock));
             Log.Info("Mouse&keyboard event source initialization started");
 
+            this.inputScheduler = inputScheduler;
             this.clock = clock;
             
             WhenMouseMove = Observable
@@ -89,25 +95,28 @@ namespace PoeShared.Native
 
         private IObservable<InputEventData> HookMouseButtons(IKeyboardMouseEvents source)
         {
-            return PrepareHook( "MouseButtons", () => InitializeMouseButtonsHook(source));
+            return PrepareHook( "MouseButtons", () => InitializeMouseButtonsHook(source), inputScheduler);
         }
         
         private IObservable<InputEventData> HookMouseWheel(IKeyboardMouseEvents source)
         {
-            return PrepareHook( "MouseWheel", () => InitializeMouseWheelHook(source));
+            return PrepareHook( "MouseWheel", () => InitializeMouseWheelHook(source), inputScheduler);
         }
         
         private IObservable<InputEventData> HookMouseMove(IKeyboardMouseEvents source)
         {
-            return PrepareHook( "MouseMove", () => InitializeMouseMoveHook(source));
+            return PrepareHook( "MouseMove", () => InitializeMouseMoveHook(source), inputScheduler);
         }
         
         private IObservable<InputEventData> HookKeyboard(IKeyboardMouseEvents source)
         {
-            return PrepareHook( "Keyboard", () => InitializeKeyboardHook(source));
+            return PrepareHook( "Keyboard", () => InitializeKeyboardHook(source), inputScheduler);
         }
         
-        private static IObservable<InputEventData> PrepareHook(string hookName, Func<IObservable<InputEventData>> hookMethod)
+        private static IObservable<InputEventData> PrepareHook(
+            string hookName, 
+            Func<IObservable<InputEventData>> hookMethod,
+            IScheduler scheduler)
         {
             return Observable.Create<InputEventData>(subscriber =>
             {
@@ -116,13 +125,17 @@ namespace PoeShared.Native
                 var activeAnchors = new CompositeDisposable();
                 Disposable.Create(() => Log.Info($"Disposing {hookName} hook")).AddTo(activeAnchors);
 
-                hookMethod()
-                    .Do(LogEvent, Log.HandleException, () => Log.Debug($"{hookName} event loop completed"))
-                    .Subscribe(subscriber)
-                    .AddTo(activeAnchors);
-                
-                sw.Stop();
-                Log.Debug($"{hookName} hook configuration took {sw.ElapsedMilliseconds:F0}ms");
+                Log.Info($"Sending subscription to {scheduler}");
+                scheduler.Schedule(() =>
+                {
+                    Log.Info($"{hookName} subscribing");
+                    hookMethod()
+                        .Do(LogEvent, Log.HandleException, () => Log.Debug($"{hookName} event loop completed"))
+                        .Subscribe(subscriber)
+                        .AddTo(activeAnchors);
+                    sw.Stop();
+                    Log.Debug($"{hookName} hook configuration took {sw.ElapsedMilliseconds:F0}ms");
+                }).AddTo(activeAnchors);
                 
                 return activeAnchors;
             });

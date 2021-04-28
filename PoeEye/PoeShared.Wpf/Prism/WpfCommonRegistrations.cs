@@ -40,7 +40,10 @@ namespace PoeShared.Prism
                     return new DispatcherScheduler(uiDispatcher, DispatcherPriority.ApplicationIdle);
                 }, new ContainerControlledLifetimeManager())
                 .RegisterFactory<IScheduler>(WellKnownSchedulers.Background, x => RxApp.TaskpoolScheduler, new ContainerControlledLifetimeManager());
-            
+
+            Container
+                .RegisterFactory<IScheduler>(WellKnownSchedulers.InputHook, x => x.Resolve<ISchedulerProvider>().GetOrCreate(WellKnownSchedulers.InputHook));
+
             Container
                 .RegisterSingleton<PoeEyeModulesRegistrator>(typeof(IPoeEyeModulesRegistrator), typeof(IPoeEyeModulesEnumerator))
                 .RegisterSingleton<IExceptionDialogDisplayer, ExceptionDialogDisplayer>()

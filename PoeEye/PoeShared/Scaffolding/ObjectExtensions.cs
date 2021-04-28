@@ -54,6 +54,11 @@ namespace PoeShared.Scaffolding
             return instance == null ? $"null<{typeof(T).Name}>" : string.Join(separator, instance.Select(x => x.DumpToTextRaw()));
         }
         
+        public static string DumpToString<T>(this IEnumerable<T> instance)
+        {
+            return ToStringTable(instance, ", ");
+        }
+        
         public static string ToStringTable<T>(this IEnumerable<T> instance, string separator = "\n\t")
         {
             return instance == null ? $"null<{typeof(T).Name}>" : string.Join(separator, instance.Select(x => x.ToString()));
