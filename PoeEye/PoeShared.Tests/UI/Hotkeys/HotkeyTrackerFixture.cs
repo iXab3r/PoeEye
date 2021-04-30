@@ -2,6 +2,7 @@
 using System.Windows.Forms;
 using Moq;
 using NUnit.Framework;
+using PoeShared.Modularity;
 using PoeShared.Native;
 using PoeShared.Tests.Helpers;
 using PoeShared.UI.Hotkeys;
@@ -14,6 +15,7 @@ namespace PoeShared.Tests.UI.Hotkeys
         private Mock<IClock> clock;
         private Mock<IKeyboardEventsSource> eventSource;
         private Mock<IWindowTracker> mainWindowTracker;
+        private Mock<IAppArguments> appArguments;
 
         private ISubject<KeyEventArgs> whenKeyDown;
         private ISubject<KeyEventArgs> whenKeyUp;
@@ -28,6 +30,8 @@ namespace PoeShared.Tests.UI.Hotkeys
         {
             clock = new Mock<IClock>();
 
+            appArguments = new Mock<IAppArguments>();
+            
             eventSource = new Mock<IKeyboardEventsSource>();
             whenKeyDown = eventSource.SetupGet(x => x.WhenKeyDown).ReturnsPublisher();
             whenKeyUp = eventSource.SetupGet(x => x.WhenKeyUp).ReturnsPublisher();
@@ -51,10 +55,9 @@ namespace PoeShared.Tests.UI.Hotkeys
 
         }
         
-        
         public HotkeyTracker CreateInstance()
         {
-            return new HotkeyTracker(clock.Object, eventSource.Object, mainWindowTracker.Object);
+            return new HotkeyTracker(clock.Object, appArguments.Object, eventSource.Object, mainWindowTracker.Object);
         }
     }
 }
