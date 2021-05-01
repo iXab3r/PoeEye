@@ -12,6 +12,11 @@ namespace PoeShared.Services
             {
                 return false;
             }
+
+            if (string.IsNullOrEmpty(expression) && string.IsNullOrEmpty(input))
+            {
+                return true;
+            }
             expression = expression.Trim(' ', '\t');
             var isRegexExpression = expression.IsSurroundedWith("/");
             var isExactExpression = expression.IsSurroundedWith("\"") || expression.IsSurroundedWith("'");
