@@ -27,12 +27,19 @@ namespace PoeShared.Scaffolding
                 )
                 .Where(x => propertiesToMonitor == null || propertiesToMonitor.Length == 0 || propertiesToMonitor.Contains(x.EventArgs.PropertyName));
         }
+        
+        public static string GetPropertyName<TObject, T1>([NotNull] this TObject instance,
+            Expression<Func<TObject, T1>> instancePropertyExtractor)
+            where TObject : INotifyPropertyChanged
+        {
+            return Reflection.ExpressionToPropertyNames(instancePropertyExtractor.Body);
+        }
 
         public static IObservable<EventPattern<PropertyChangedEventArgs>> WhenAnyProperty<TObject, T1>([NotNull] this TObject instance,
             Expression<Func<TObject, T1>> instancePropertyExtractor)
             where TObject : INotifyPropertyChanged
         {
-            return WhenAnyProperty(instance, Reflection.ExpressionToPropertyNames(instancePropertyExtractor.Body));
+            return WhenAnyProperty(instance, GetPropertyName(instance, instancePropertyExtractor));
         }
         
         public static IObservable<EventPattern<PropertyChangedEventArgs>> WhenAnyProperty<TObject, T1, T2>([NotNull] this TObject instance,
