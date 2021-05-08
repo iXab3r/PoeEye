@@ -26,5 +26,6 @@ namespace PoeShared.UI.TreeView
     
     public interface IDirectoryTreeViewItemViewModel : ITreeViewItemViewModel
     {
+        public bool ParentIsExpanded { get; }
     }
 }
