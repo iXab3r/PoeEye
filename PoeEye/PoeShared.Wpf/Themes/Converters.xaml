@@ -30,6 +30,7 @@
     <eyeConverters:NullToBoolConverter x:Key="IsNotNullOrEmptyConverter" NullValue="False" />
     
     <eyeConverters:IntPtrToHexadecimalConverter x:Key="IntPtrToHexadecimalConverter"/>
+    <eyeConverters:StringFormatConverter x:Key="StringFormatConverter"/>
     
     <eyeConverters:MultiBooleanOrConverter x:Key="MultiBooleanOrConverter" TrueValue="{StaticResource TrueValue}" FalseValue="{StaticResource FalseValue}" />
     <eyeConverters:MultiBooleanAndConverter x:Key="MultiBooleanAndConverter" TrueValue="{StaticResource TrueValue}" FalseValue="{StaticResource FalseValue}" />

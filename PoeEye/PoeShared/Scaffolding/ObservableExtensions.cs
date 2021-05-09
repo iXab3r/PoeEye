@@ -162,6 +162,17 @@ namespace PoeShared.Scaffolding
 
             return source.Catch(source.SubscribeOn(scheduler).DelaySubscription(timeSpan).Retry());
         }
+        
+        public static void AddPropertyHelper<TSource, TSourceProperty>(
+            [NotNull] this IObservable<TSourceProperty> sourceObservable,
+            out ObservableAsPropertyHelper<TSourceProperty> result,
+            [NotNull] TSource instance,
+            [NotNull] Expression<Func<TSource, TSourceProperty>> instancePropertyExtractor,
+            [CanBeNull] IScheduler scheduler = null)
+            where TSource : DisposableReactiveObject
+        {
+            result = instance.ToPropertyHelper(instancePropertyExtractor, sourceObservable, default, false, scheduler).AddTo(instance.Anchors);
+        }
 
         public static ObservableAsPropertyHelper<TSourceProperty> ToPropertyHelper<TSource, TSourceProperty>(
             [NotNull] this IObservable<TSourceProperty> sourceObservable,
