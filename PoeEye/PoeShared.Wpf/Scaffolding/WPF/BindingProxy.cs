@@ -18,4 +18,6 @@ namespace PoeShared.Scaffolding.WPF
             return new BindingProxy();
         }
     }
+    
+    
 }
