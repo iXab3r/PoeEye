@@ -1,3 +1,5 @@
+using System;
+using log4net;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -34,8 +36,9 @@ namespace PoeShared.Modularity
             }
             
             Value = value;
-            AssemblyName = value.GetType().Assembly.GetName().Name;
-            TypeName = value.GetType().FullName;
+            var valueType = value.GetType();
+            AssemblyName = valueType.Assembly.GetName().Name;
+            TypeName = valueType.FullName;
             if (value is IPoeEyeConfigVersioned configVersioned)
             {
                 Version = configVersioned.Version;
