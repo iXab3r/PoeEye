@@ -165,7 +165,7 @@ namespace PoeShared.Modularity
                 if (innerTypeSample.Version != metadata.Version)
                 {
                     Log.Warn($"Config {metadata.TypeName} version mismatch (expected: {innerTypeSample.Version}, got: {metadata.Version})");
-                    Log.Debug($"Loaded config:\n{metadata.DumpToText()}\n\nTemplate config:\n{innerTypeSample.DumpToText()}");
+                    Log.Debug($"Loaded config:\n{metadata}\n\nTemplate config:\n{innerTypeSample.DumpToText()}");
                     return valueFactory();
                 }
             }

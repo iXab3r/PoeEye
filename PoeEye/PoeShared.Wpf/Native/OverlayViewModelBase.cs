@@ -346,7 +346,7 @@ namespace PoeShared.Native
                 MonitorInfo = UnsafeNative.GetMonitorInfo(desktopHandle)
             };
 
-            Log.Debug($"[{OverlayDescription}] Current SystemInformation: {systemInformation.DumpToTextRaw()}");
+            Log.Debug($"[{OverlayDescription}] Current SystemInformation: {systemInformation}");
 
 
             Rectangle overlayBounds;
@@ -371,7 +371,7 @@ namespace PoeShared.Native
 
             if (config.OverlayOpacity <= 0.01)
             {
-                Log.Warn($"[{OverlayDescription}] Overlay is fully invisible(screen: {systemInformation.MonitorBounds}, overlay: {overlayBounds}), systemInfo: {systemInformation.DumpToTextRaw()}, config: {config.DumpToTextRaw()}");
+                Log.Warn($"[{OverlayDescription}] Overlay is fully invisible(screen: {systemInformation.MonitorBounds}, overlay: {overlayBounds}), systemInfo: {systemInformation}, config: {config.DumpToTextRaw()}");
 
                 config.OverlayOpacity = 1;
                 if (UnlockWindowCommand.CanExecute(null))
@@ -395,7 +395,7 @@ namespace PoeShared.Native
         {
             if (!UnlockWindowCommandCanExecute())
             {
-                throw new InvalidOperationException($"[{OverlayDescription}] Unsupported operation in this state, overlay(IsLocked: {IsLocked}, IsUnlockable: {IsUnlockable}): {this.DumpToTextRaw()}");
+                throw new InvalidOperationException($"[{OverlayDescription}] Unsupported operation in this state, overlay(IsLocked: {IsLocked}, IsUnlockable: {IsUnlockable}): {this}");
             }
             Log.Debug($"[{OverlayDescription}] Unlocking window @ {nativeBounds}");
             IsLocked = false;
@@ -410,7 +410,7 @@ namespace PoeShared.Native
         {
             if (!LockWindowCommandCanExecute())
             {
-                throw new InvalidOperationException($"[{OverlayDescription}] Unsupported operation in this state, overlay(IsLocked: {IsLocked}): {this.DumpToTextRaw()}");
+                throw new InvalidOperationException($"[{OverlayDescription}] Unsupported operation in this state, overlay(IsLocked: {IsLocked}): {this}");
             }
             Log.Debug($"[{OverlayDescription}] Locking window @ {nativeBounds}");
             IsLocked = true;
@@ -430,7 +430,7 @@ namespace PoeShared.Native
         {
             if (!MakeLayeredCommandCanExecute())
             {
-                throw new InvalidOperationException($"[{OverlayDescription}] Unsupported operation in this state, overlay(OverlayMode: {OverlayMode}): {this.DumpToTextRaw()}");
+                throw new InvalidOperationException($"[{OverlayDescription}] Unsupported operation in this state, overlay(OverlayMode: {OverlayMode}): {this}");
             }
             Log.Debug($"[{OverlayDescription}] Making overlay Layered");
             OverlayMode = OverlayMode.Layered;
@@ -445,7 +445,7 @@ namespace PoeShared.Native
         {
             if (!MakeTransparentCommandCanExecute())
             {
-                throw new InvalidOperationException($"[{OverlayDescription}] Unsupported operation in this state, overlay(OverlayMode: {OverlayMode}): {this.DumpToTextRaw()}");
+                throw new InvalidOperationException($"[{OverlayDescription}] Unsupported operation in this state, overlay(OverlayMode: {OverlayMode}): {this}");
             }
             Log.Debug($"[{OverlayDescription}] Making overlay Transparent");
             OverlayMode = OverlayMode.Transparent;

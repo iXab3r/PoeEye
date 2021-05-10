@@ -68,7 +68,7 @@ namespace PoeShared.Squirrel.Core
 
         public async Task DownloadReleases(IReadOnlyCollection<IReleaseEntry> releasesToDownload, Action<int> progress = null)
         {
-            using var sw = new BenchmarkTimer($"Download releases: {releasesToDownload.Select(x => new { x.Version, x.IsDelta, x.Filesize }).DumpToTextRaw()}", Log);
+            using var sw = new BenchmarkTimer($"Download releases: {releasesToDownload.Select(x => new { x.Version, x.IsDelta, x.Filesize }).DumpToString()}", Log);
             using var updateLock = AcquireUpdateLock();
             
             sw.Step("Update lock acquired");
@@ -79,7 +79,7 @@ namespace PoeShared.Squirrel.Core
 
         public async Task<string> ApplyReleases(IPoeUpdateInfo updateInfo, Action<int> progress = null)
         {
-            using var sw = new BenchmarkTimer($"Apply releases: {updateInfo.ReleasesToApply.Select(x => new { x.Version, x.IsDelta, x.Filename })}", Log);
+            using var sw = new BenchmarkTimer($"Apply releases: {updateInfo.ReleasesToApply.Select(x => new { x.Version, x.IsDelta, x.Filename }).DumpToString()}", Log);
             using var updateLock = AcquireUpdateLock();
             
             sw.Step("Update lock acquired");

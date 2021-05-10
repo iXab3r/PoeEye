@@ -113,7 +113,7 @@ namespace PoeShared.Squirrel.Updater
         {
             Guard.ArgumentNotNull(updateInfo, nameof(updateInfo));
 
-            Log.Debug($"Applying update {updateInfo.DumpToTextRaw()}");
+            Log.Debug($"Applying update {updateInfo}");
 
             using var unused = CreateIsBusyAnchor();
             using var mgr = await CreateManager();

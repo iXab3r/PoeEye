@@ -54,7 +54,7 @@ namespace PoeShared.Services
                     return;
                 }
 
-                sw.Step($"Starting cleanup cycle, TTL :{ttl.TotalDays:F0} days, directory list: {directories.DumpToTextRaw()}");
+                sw.Step($"Starting cleanup cycle, TTL :{ttl.TotalDays:F0} days, directory list: {directories.DumpToString()}");
                 foreach (var directoryInfo in directories)
                 {
                     sw.Step($"[{directoryInfo}] Processing directory...");
@@ -137,11 +137,11 @@ namespace PoeShared.Services
 
         public IDisposable AddDirectory(DirectoryInfo directoryInfo)
         {
-            Log.Debug($"Adding directory {directoryInfo} to directory list: {directoriesSource.DumpToTextRaw()}");
+            Log.Debug($"Adding directory {directoryInfo} to directory list: {directoriesSource.Items.DumpToString()}");
             directoriesSource.Add(directoryInfo);
             return Disposable.Create(() =>
             {
-                Log.Debug($"Removing directory {directoryInfo} from directory list: {directoriesSource.DumpToTextRaw()}");
+                Log.Debug($"Removing directory {directoryInfo} from directory list: {directoriesSource.Items.DumpToString()}");
                 directoriesSource.Remove(directoryInfo);
             });
         }

@@ -68,7 +68,7 @@ namespace PoeShared.Native
                 return new
                 {
                     screen.DeviceName, screen.Primary, graphics.PageScale, SystemBounds = screen.Bounds, ScaledBounds = scaledBounds, graphics.DpiX, graphics.DpiY
-                }.DumpToTextRaw();
+                }.ToString();
             }
         }
 

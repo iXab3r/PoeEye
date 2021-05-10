@@ -49,7 +49,7 @@ namespace PoeShared.Audio.Services
             var source = sources.Lookup(name.ToLowerInvariant());
             if (!source.HasValue)
             {
-                Log.Debug($"Source was not found '{name}', loaded files: {sources.Items.Select(x => new {x.SourceName, x.File.FullName}).DumpToTextRaw()}");
+                Log.Debug($"Source was not found '{name}', loaded files: {sources.Items.Select(x => new {x.SourceName, x.File.FullName}).DumpToString()}");
                 resourceData = null;
                 return false;
             }
@@ -115,7 +115,7 @@ namespace PoeShared.Audio.Services
 
         private void Reload()
         {
-            Log.Debug($"Updating sound sources, directories:\r\n {knownDirectories.Select(x => new { x.FullName, x.Exists }).DumpToText()}");
+            Log.Debug($"Updating sound sources, directories:\r\n {knownDirectories.Select(x => new { x.FullName, x.Exists }).DumpToString()}");
 
             var extensions = GetSupportedExtensions();
 
@@ -138,7 +138,7 @@ namespace PoeShared.Audio.Services
                 sources.AddOrUpdate(new FileSource(source));
             }
             
-            Log.Debug($"Source name list(count: {sources.Count}):\r\n {sources.Items.Select(x => new {x.SourceName, x.File.FullName}).DumpToText()}");
+            Log.Debug($"Source name list(count: {sources.Count}):\r\n {sources.Items.Select(x => new {x.SourceName, x.File.FullName}).DumpToString()}");
         }
 
         private static byte[] LoadFileData(FileInfo file)

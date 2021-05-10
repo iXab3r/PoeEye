@@ -116,7 +116,7 @@ namespace PoeShared
 
         private static bool Parse(AppOptions instance, string[] args)
         {
-            Log.Debug($"Parsing command line args: {args.DumpToTextRaw()}");
+            Log.Debug($"Parsing command line args: {args.DumpToString()}");
             var parser = new Parser(
                 settings =>
                 {

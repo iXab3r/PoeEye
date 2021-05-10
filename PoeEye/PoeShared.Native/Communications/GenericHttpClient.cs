@@ -105,7 +105,7 @@ namespace PoeShared.Communications
             Log.Debug($"[HttpClient] Querying uri '{uri}', args: \r\nPOST: {postData}");
             if (Log.IsDebugEnabled)
             {
-                Log.Debug($"[HttpClient] POST data dump: {postData.SplitTrim('&').DumpToText()}");
+                Log.Debug($"[HttpClient] POST data dump: {postData.SplitTrim('&').DumpToString()}");
             }
 
             var httpClient = WebRequest.CreateHttp(uri);

@@ -48,7 +48,7 @@ namespace PoeShared.Squirrel.Updater
                     var knownSource = knownSources.Lookup(configSource.Uri ?? string.Empty);
                     if (!knownSource.HasValue)
                     {
-                        Log.Warn($"UpdateSource that was loaded from config is not known: {configSource}, resetting to first of known sources:\r\n\t{KnownSources.DumpToTable()}");
+                        Log.Warn($"UpdateSource that was loaded from config is not known: {configSource}, resetting to first of known sources:\r\n\t{KnownSources.ToStringTable()}");
                         knownSource = Optional<UpdateSourceInfo>.Create(KnownSources.FirstOrDefault());
                     }
 
@@ -80,7 +80,7 @@ namespace PoeShared.Squirrel.Updater
                 .Where(_ => !updateSource.IsValid)
                 .SubscribeSafe(() =>
                 {
-                    Log.Debug($"Update source is not set - loading first available our of {knownSources.Items.DumpToTextRaw()}");
+                    Log.Debug($"Update source is not set - loading first available our of {knownSources.Items.DumpToString()}");
                     UpdateSource = knownSources.Items.FirstOrDefault(x => x.IsValid);
                 }, Log.HandleUiException)
                 .AddTo(Anchors);

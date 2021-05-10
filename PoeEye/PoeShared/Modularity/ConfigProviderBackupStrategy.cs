@@ -131,7 +131,7 @@ namespace PoeShared.Modularity
                 .ToArray();
             Log.Debug($"Backup storage contains {obsoleteBackups.Length} obsolete backups, min storage size: {backupStorageMinSize}");
             obsoleteBackups = obsoleteBackups.Skip((int)backupStorageMinSize).ToArray();
-            Log.Debug($"Cleaning up {obsoleteBackups.Length} obsolete backups:\r\n\t{obsoleteBackups.Select(x => x.FullName).DumpToTable()}");
+            Log.Debug($"Cleaning up {obsoleteBackups.Length} obsolete backups:\r\n\t{obsoleteBackups.Select(x => x.FullName).DumpToString()}");
             foreach (var obsoleteFile in obsoleteBackups)
             {
                 Log.Debug($"Removing file {obsoleteFile}");

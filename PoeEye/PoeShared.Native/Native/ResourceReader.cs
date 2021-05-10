@@ -79,7 +79,7 @@ namespace PoeShared.Native
             if (resourceStream == null)
             {
                 var resourcesList = assembly.GetManifestResourceNames();
-                Log.Debug($"Resource was not found '{internalResourceName}', embedded res.list: {resourcesList.DumpToTextRaw()}");
+                Log.Debug($"Resource was not found '{internalResourceName}', embedded res.list: {resourcesList.DumpToString()}");
                 resourceData = null;
                 return false;
             }

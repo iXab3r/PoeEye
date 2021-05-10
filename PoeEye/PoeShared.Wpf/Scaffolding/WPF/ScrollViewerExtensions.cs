@@ -49,7 +49,7 @@ namespace PoeShared.Scaffolding.WPF
             if (scrollViewer == null)
             {
                 var childs = dependencyObject.GetChildObjects().ToArray();
-                throw new InvalidOperationException($"Failed to find ScrollViewer for property {nameof(AutoScrollToTopProperty)}, root object: {sender}, childs:\n\t{childs.DumpToTable()}");
+                throw new InvalidOperationException($"Failed to find ScrollViewer for property {nameof(AutoScrollToTopProperty)}, root object: {sender}, childs:\n\t{childs.DumpToString()}");
             }
 
             if (Log.IsDebugEnabled)

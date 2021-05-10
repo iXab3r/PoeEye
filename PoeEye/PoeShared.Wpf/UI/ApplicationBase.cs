@@ -44,7 +44,7 @@ namespace PoeShared.UI
                 }
                 InitializeLogging();
 
-                Log.Debug($"Arguments: {arguments.DumpToText()}");
+                Log.Debug($"Arguments: {arguments.DumpToString()}");
                 Log.Debug($"Parsed args: {appArguments.DumpToText()}");
                 Log.Debug($"OS: { new { Environment.OSVersion, Environment.Is64BitProcess, Environment.Is64BitOperatingSystem }})");
                 Log.Debug($"Environment: {new { Environment.MachineName, Environment.UserName, Environment.WorkingSet, Environment.SystemDirectory, Environment.UserInteractive }})");

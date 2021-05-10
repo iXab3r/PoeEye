@@ -146,8 +146,8 @@ namespace PoeShared.Scaffolding
                 {
                     throw new ApplicationException(
                         $"Exception occurred, property: {property}\r\n" +
-                        $"Target properties: {targetProperties.Select(x => $"{x.PropertyType} {x.Name}").DumpToText()}\r\n" +
-                        $"Source properties: {sourceProperties.Select(x => $"{x.PropertyType} {x.Name}").DumpToText()}",
+                        $"Target properties: {targetProperties.Select(x => $"{x.PropertyType} {x.Name}").DumpToString()}\r\n" +
+                        $"Source properties: {sourceProperties.Select(x => $"{x.PropertyType} {x.Name}").DumpToString()}",
                         ex);
                 }
             }
@@ -156,7 +156,7 @@ namespace PoeShared.Scaffolding
             {
                 if (Log.IsDebugEnabled)
                 {
-                    Log.Debug($"Skipped following properties: {skippedProperties.Select(x => $"{x.PropertyType} {x.Name}").DumpToTextRaw()}");
+                    Log.Debug($"Skipped following properties: {skippedProperties.Select(x => $"{x.PropertyType} {x.Name}").DumpToString()}");
                 }
             }
         }

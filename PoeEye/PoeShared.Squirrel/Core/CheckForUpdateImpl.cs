@@ -94,8 +94,8 @@ namespace PoeShared.Squirrel.Core
             {
                 const int maxReleasesToLog = 5;
                 Log.Debug(parsedReleases.Length > maxReleasesToLog
-                    ? $"Remote releases(latest {maxReleasesToLog} of {parsedReleases.Length}): \n\t{parsedReleases.OrderByDescending(x => x.Version).Take(maxReleasesToLog).DumpToTable()}"
-                    : $"Remote releases({parsedReleases.Length}): \n\t{parsedReleases.DumpToTable()}");
+                    ? $"Remote releases(latest {maxReleasesToLog} of {parsedReleases.Length}): \n\t{parsedReleases.OrderByDescending(x => x.Version).Take(maxReleasesToLog).DumpToString()}"
+                    : $"Remote releases({parsedReleases.Length}): \n\t{parsedReleases.DumpToString()}");
             }
             
             var result = DetermineUpdateInfo(localReleases, parsedReleases, ignoreDeltaUpdates);

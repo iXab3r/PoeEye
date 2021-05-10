@@ -18,7 +18,7 @@ namespace PoeShared.Native.Resources.Notifications
 
         public EmbeddedSoundLibrarySource()
         {
-            Log.Debug($"Embedded resources list:\r\n {EmbeddedResourceNames.DumpToText()}");
+            Log.Debug($"Embedded resources list:\r\n {EmbeddedResourceNames.DumpToString()}");
 
             var namespaceName = typeof(EmbeddedSoundLibrarySource).Namespace;
             var extensions = GetSupportedExtensions();
@@ -29,7 +29,7 @@ namespace PoeShared.Native.Resources.Notifications
                 .ToArray();
             SourceName = new ReadOnlyObservableCollection<string>(new ObservableCollection<string>(sources));
 
-            Log.Debug($"Source name list(namespace: {namespaceName}):\r\n {sources.DumpToText()}");
+            Log.Debug($"Source name list(namespace: {namespaceName}):\r\n {sources.DumpToString()}");
         }
 
         public override ReadOnlyObservableCollection<string> SourceName { get; }
@@ -42,7 +42,7 @@ namespace PoeShared.Native.Resources.Notifications
             var resourceNameCandidates = FormatFileName(name)
                 .Select(x => $"{namespaceName}.{x}")
                 .ToArray();
-            Log.Debug($"Trying to find resource using names '{resourceNameCandidates.DumpToTextRaw()}'...");
+            Log.Debug($"Trying to find resource using names '{resourceNameCandidates.DumpToString()}'...");
 
             string resourceName = null;
             foreach (var embeddedResourceName in EmbeddedResourceNames)
@@ -76,7 +76,7 @@ namespace PoeShared.Native.Resources.Notifications
             if (resourceStream == null)
             {
                 var resourcesList = assembly.GetManifestResourceNames();
-                Log.Debug($"Resource was not found '{resourceName}', embedded res.list: {resourcesList.DumpToTextRaw()}");
+                Log.Debug($"Resource was not found '{resourceName}', embedded res.list: {resourcesList.DumpToString()}");
                 resourceData = null;
                 return false;
             }

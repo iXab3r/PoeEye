@@ -20,7 +20,7 @@ namespace PoeShared.Scaffolding
                 {
                     var assemblyResources = assembly.GetManifestResourceNames();
                     throw new MissingManifestResourceException(
-                        $"Could not find resource '{resourcePath}'. Assembly '{assemblyName}' resources list:\n\t{assemblyResources.DumpToText()}");
+                        $"Could not find resource '{resourcePath}'. Assembly '{assemblyName}' resources list:\n\t{assemblyResources.DumpToString()}");
                 }
 
                 using (var streamReader = new StreamReader(stream))

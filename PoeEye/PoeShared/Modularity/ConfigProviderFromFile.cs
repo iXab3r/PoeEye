@@ -55,7 +55,7 @@ namespace PoeShared.Modularity
                 .Select(x => Path.Combine(x, configFileName))
                 .Select(x => new {Path = x, Exists = File.Exists(x)})
                 .ToArray();
-            Log.Debug($"Configuration matrix, configuration file name: {configFileName}:\n\t{candidates.DumpToTable()}");
+            Log.Debug($"Configuration matrix, configuration file name: {configFileName}:\n\t{candidates.DumpToString()}");
             var existingFilePath = candidates.FirstOrDefault(x => x.Exists);
             if (existingFilePath != null)
             {
@@ -92,7 +92,7 @@ namespace PoeShared.Modularity
 
         public IDisposable RegisterStrategy(IConfigProviderStrategy strategy)
         {
-            Log.Debug($"Registering strategy {strategy}, existing strategies: {strategies.Items.DumpToTextRaw()}");
+            Log.Debug($"Registering strategy {strategy}, existing strategies: {strategies.Items.DumpToString()}");
             strategies.Insert(0, strategy);
             return Disposable.Create(() => strategies.Remove(strategy));
         }
@@ -147,7 +147,7 @@ namespace PoeShared.Modularity
         {
             var metaConfig = new PoeEyeCombinedConfig();
             loadedConfigsByType.Values.ToList().ForEach(x => metaConfig.Add(x));
-            Log.Debug($"Saving all configs, metadata: {ObjectExtensions.DumpToTextRaw(metaConfig)}");
+            Log.Debug($"Saving all configs, metadata: {metaConfig.DumpToTextRaw()}");
 
             SaveInternal(metaConfig);
         }

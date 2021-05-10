@@ -164,19 +164,19 @@ namespace PoeShared.UI.Hotkeys
 
         public void Add(HotkeyGesture hotkeyToAdd)
         {
-            Log.Debug($"Registering hotkey {hotkeyToAdd}, current list: {Hotkeys.DumpToTextRaw()}");
+            Log.Debug($"Registering hotkey {hotkeyToAdd}, current list: {Hotkeys.DumpToString()}");
             hotkeysSource.AddOrUpdate(hotkeyToAdd);
         }
 
         public void Remove(HotkeyGesture hotkeyToRemove)
         {
-            Log.Debug($"Unregistering hotkey {hotkeyToRemove}, current list: {Hotkeys.DumpToTextRaw()}");
+            Log.Debug($"Unregistering hotkey {hotkeyToRemove}, current list: {Hotkeys.DumpToString()}");
             hotkeysSource.RemoveKey(hotkeyToRemove);
         }
 
         public void Clear()
         {
-            Log.Debug($"Unregistering all hotkeys, hotkey: {hotkey}, current list: {Hotkeys.DumpToTextRaw()}");
+            Log.Debug($"Unregistering all hotkeys, hotkey: {hotkey}, current list: {Hotkeys.DumpToString()}");
             Hotkey = HotkeyGesture.Empty;
             hotkeysSource.Clear();
         }
@@ -223,7 +223,7 @@ namespace PoeShared.UI.Hotkeys
 
             if (pressed.Length > 1)
             {
-                Log.Warn($"Probably something went wrong - there shouldn't be 2+ pressed hotkeys at once, pressed hotkeys: {pressed.DumpToTextRaw()}");
+                Log.Warn($"Probably something went wrong - there shouldn't be 2+ pressed hotkeys at once, pressed hotkeys: {pressed.DumpToString()}");
                 return false;
             }
 
@@ -234,7 +234,7 @@ namespace PoeShared.UI.Hotkeys
 
         public override string ToString()
         {
-            return $"HotkeyTracker for {hotkeysSource.Items.Concat(new []{ hotkey }).DumpToTextRaw()}";
+            return $"HotkeyTracker for {hotkeysSource.Items.Concat(new []{ hotkey }).DumpToString()}";
         }
 
         private static ModifierKeys KeyToModifier(Key key)

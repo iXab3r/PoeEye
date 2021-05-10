@@ -55,7 +55,7 @@ namespace PoeShared.Modularity
                 {
                     if (ReferenceEquals(x.prev, x.curr))
                     {
-                        throw new ApplicationException($"Previous config instance is equal to the current one ! Instance: {x.DumpToTextRaw()}");
+                        throw new ApplicationException($"Previous config instance is equal to the current one ! Instance: {x}");
                     }
                 })
                 .Select(x => new {Config = x.curr, PreviousConfig = x.prev, ComparisonResult = comparisonService.Compare(x.curr, x.prev)})

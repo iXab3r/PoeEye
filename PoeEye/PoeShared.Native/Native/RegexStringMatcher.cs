@@ -28,7 +28,7 @@ namespace PoeShared.Native
             if (Log.IsDebugEnabled)
             {
                 Log.Debug(
-                    $"Matching value '{value}', whitelist: {whitelist.DumpToTextRaw()}, blacklist: {blacklist.DumpToTextRaw()}, lazyWhite: '{lazyWhiteListRegex?.Invoke()}'");
+                    $"Matching value '{value}', whitelist: {whitelist.DumpToString()}, blacklist: {blacklist.DumpToString()}, lazyWhite: '{lazyWhiteListRegex?.Invoke()}'");
             }
 
             var isInBlackList = blacklist.Any() && blacklist.Values.Any(x => x.IsMatch(value));
@@ -36,7 +36,7 @@ namespace PoeShared.Native
             {
                 if (Log.IsDebugEnabled)
                 {
-                    Log.Debug($"Value '{value}' was found in blacklist: {blacklist.DumpToTextRaw()}");
+                    Log.Debug($"Value '{value}' was found in blacklist: {blacklist.DumpToString()}");
                 }
 
                 return false;
@@ -48,7 +48,7 @@ namespace PoeShared.Native
             {
                 if (Log.IsDebugEnabled)
                 {
-                    Log.Debug($"Value '{value}' was found in whitelist: {whitelist.DumpToTextRaw()}");
+                    Log.Debug($"Value '{value}' was found in whitelist: {whitelist.DumpToString()}");
                 }
 
                 return true;
