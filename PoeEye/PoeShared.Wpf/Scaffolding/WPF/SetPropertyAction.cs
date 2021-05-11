@@ -4,7 +4,7 @@ using System.Reflection;
 using System.Windows;
 using System.Windows.Interactivity;
 
-namespace PoeShared.Wpf.Scaffolding.WPF
+namespace PoeShared.Scaffolding.WPF
 {
     /// <summary>
     ///     Sets the designated property to the supplied value. TargetObject

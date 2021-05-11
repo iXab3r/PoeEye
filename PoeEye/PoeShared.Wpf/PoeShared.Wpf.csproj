@@ -11,6 +11,7 @@
     <Platforms>AnyCPU</Platforms>
     <LangVersion>9</LangVersion>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <RootNamespace>PoeShared</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="BidirectionalMap" Version="1.0.0" />

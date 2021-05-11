@@ -1,7 +1,6 @@
 ﻿using System.Reactive.Concurrency;
-using System.Windows.Threading;
 
-namespace PoeShared.Wpf.Scaffolding.WPF
+namespace PoeShared.Scaffolding.WPF
 {
     public static class SchedulerHelper
     {

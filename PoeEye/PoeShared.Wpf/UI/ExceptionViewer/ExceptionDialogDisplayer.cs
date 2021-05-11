@@ -10,7 +10,6 @@ using PoeShared.Modularity;
 using PoeShared.Native;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
-using PoeShared.Scaffolding.WPF;
 using PoeShared.UI;
 
 namespace PoeShared.Wpf.UI.ExceptionViewer

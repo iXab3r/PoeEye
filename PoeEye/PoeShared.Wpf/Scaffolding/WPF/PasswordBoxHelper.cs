@@ -1,9 +1,8 @@
 using System.Security;
 using System.Windows;
 using System.Windows.Controls;
-using PoeShared.Scaffolding;
 
-namespace PoeShared.Wpf.Scaffolding.WPF
+namespace PoeShared.Scaffolding.WPF
 {
     /// <summary>
     /// Creates a bindable attached property for the <see cref="PasswordBox.SecurePassword"/> property.

@@ -1,8 +1,8 @@
 ﻿<ui:SharedResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-                    xmlns:s="clr-namespace:PoeShared.Scaffolding.WPF"
-                    xmlns:ui="clr-namespace:PoeShared.UI">
+                    xmlns:ui="clr-namespace:PoeShared.UI"
+                    xmlns:s="clr-namespace:PoeShared.Scaffolding.WPF">
     <ui:SharedResourceDictionary.MergedDictionaries>
         <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Converters.xaml" />
         <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Colors.xaml" />
