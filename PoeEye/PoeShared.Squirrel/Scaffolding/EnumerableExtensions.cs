@@ -11,30 +11,6 @@ namespace PoeShared.Squirrel.Scaffolding
         }
 
         /// <summary>
-        ///     Enumerates the sequence and invokes the given action for each value in the sequence.
-        /// </summary>
-        /// <typeparam name="TSource">Source sequence element type.</typeparam>
-        /// <param name="source">Source sequence.</param>
-        /// <param name="onNext">Action to invoke for each element.</param>
-        public static void ForEach<TSource>(this IEnumerable<TSource> source, Action<TSource> onNext)
-        {
-            if (source == null)
-            {
-                throw new ArgumentNullException(nameof(source));
-            }
-
-            if (onNext == null)
-            {
-                throw new ArgumentNullException(nameof(onNext));
-            }
-
-            foreach (var item in source)
-            {
-                onNext(item);
-            }
-        }
-
-        /// <summary>
         ///     Returns the elements with the maximum key value by using the default comparer to compare key values.
         /// </summary>
         /// <typeparam name="TSource">Source sequence element type.</typeparam>

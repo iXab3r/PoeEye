@@ -15,6 +15,7 @@ using PoeShared.Squirrel.Scaffolding;
 using Splat;
 using Squirrel;
 using Squirrel.Shell;
+using PoeShared.Scaffolding;
 using ReleasePackage = PoeShared.Squirrel.Scaffolding.ReleasePackage;
 
 namespace PoeShared.Squirrel.Core

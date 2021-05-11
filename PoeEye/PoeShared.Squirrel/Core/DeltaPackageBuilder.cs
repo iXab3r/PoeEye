@@ -7,6 +7,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using DeltaCompressionDotNet.MsDelta;
 using log4net;
+using PoeShared.Scaffolding;
 using PoeShared.Squirrel.Scaffolding;
 using SharpCompress.Archives;
 using SharpCompress.Archives.Zip;

@@ -39,9 +39,17 @@ namespace PoeShared.UI
                 if (!SharedDictionaries.ContainsKey(value))
                 {
                     using var sw = new BenchmarkTimer($"Loading {nameof(SharedResourceDictionary)} from {value}", Log);
-                    // If the dictionary is not yet loaded, load it by setting
-                    // the source of the base class
-                    base.Source = value;
+                    try
+                    {
+                        // If the dictionary is not yet loaded, load it by setting
+                        // the source of the base class
+                        base.Source = value;
+                    }
+                    catch (Exception e)
+                    {
+                        throw new ApplicationException($"Failed to load resource from {value}", e);
+                    }
+                   
                     // add it to the cache
                     SharedDictionaries.Add(value, this);
                 }

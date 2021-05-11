@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using log4net;
 using Microsoft.Win32;
 using NuGet;
+using PoeShared.Scaffolding;
 using PoeShared.Squirrel.Scaffolding;
 using Splat;
 using Squirrel;
