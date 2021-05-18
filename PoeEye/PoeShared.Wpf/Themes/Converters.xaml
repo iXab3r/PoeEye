@@ -35,6 +35,8 @@
     <eyeConverters:MultiBooleanOrConverter x:Key="MultiBooleanOrConverter" TrueValue="{StaticResource TrueValue}" FalseValue="{StaticResource FalseValue}" />
     <eyeConverters:MultiBooleanAndConverter x:Key="MultiBooleanAndConverter" TrueValue="{StaticResource TrueValue}" FalseValue="{StaticResource FalseValue}" />
     
+    <eyeConverters:MultiBooleanOrConverter x:Key="MultiBooleanAnyTrueToVisibleFalseToHiddenConverter" TrueValue="{x:Static Visibility.Visible}" FalseValue="{x:Static Visibility.Hidden}" />
+    <eyeConverters:MultiBooleanAndConverter x:Key="MultiBooleanAllTrueToVisibleFalseToHiddenConverter" TrueValue="{x:Static Visibility.Visible}" FalseValue="{x:Static Visibility.Hidden}" />
     <eyeConverters:MultiBooleanOrConverter x:Key="MultiBooleanAnyTrueToVisibleFalseToCollapsedConverter" TrueValue="{x:Static Visibility.Visible}" FalseValue="{x:Static Visibility.Collapsed}" />
     <eyeConverters:MultiBooleanAndConverter x:Key="MultiBooleanAllTrueToVisibleFalseToCollapsedConverter" TrueValue="{x:Static Visibility.Visible}" FalseValue="{x:Static Visibility.Collapsed}" />
     
