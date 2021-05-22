@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Reactive;
+using System.Reactive.Linq;
 using DynamicData;
 using DynamicData.Aggregation;
 using DynamicData.Binding;
@@ -33,6 +34,12 @@ namespace PoeShared.Scaffolding
         public static IObservable<int> CountIf<T>(this IObservable<IChangeSet<T>> source)
         {
             return source.Count();
+        }
+
+        public static void AddOrUpdateIfNeeded<T, TKey>(this ISourceCache<T, TKey> source, IEnumerable<T> items)
+        {
+            Guard.ArgumentNotNull(source, nameof(source));
+            source.EditDiff(items, EqualityComparer<T>.Default);
         }
         
         public static Optional<T> ComputeIfAbsent<T, TKey>(this ISourceCache<T, TKey> source, TKey key, Func<TKey, T> factory)
