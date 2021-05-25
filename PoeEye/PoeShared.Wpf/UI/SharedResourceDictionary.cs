@@ -44,6 +44,7 @@ namespace PoeShared.UI
                         // If the dictionary is not yet loaded, load it by setting
                         // the source of the base class
                         base.Source = value;
+                        sw.Step($"Loaded resources from {value}");
                     }
                     catch (Exception e)
                     {
@@ -52,6 +53,7 @@ namespace PoeShared.UI
                    
                     // add it to the cache
                     SharedDictionaries.Add(value, this);
+                    sw.Step($"Added resource {value} to cache, size: {SharedDictionaries.Count}");
                 }
                 else
                 {

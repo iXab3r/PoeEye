@@ -10,7 +10,7 @@ using PoeShared.Scaffolding;
 
 namespace PoeShared.UI.Hotkeys
 {
-    public class HotkeyConverter : System.ComponentModel.TypeConverter, IHotkeyConverter
+    internal sealed class HotkeyConverter : System.ComponentModel.TypeConverter, IHotkeyConverter
     {
         private static readonly HotkeyGesture NoneHotkey = new HotkeyGesture(Key.None);
         private static readonly string NoneHotkeyName = NoneHotkey.ToString();
