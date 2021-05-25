@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
@@ -8,7 +7,7 @@ using log4net;
 using PoeShared.Audio.Services;
 using PoeShared.Scaffolding;
 
-namespace PoeShared.Native.Resources.Notifications
+namespace PoeShared.Resources.Notifications
 {
     internal class EmbeddedSoundLibrarySource : SoundLibrarySourceBase, IEmbeddedSoundLibrarySource
     {
