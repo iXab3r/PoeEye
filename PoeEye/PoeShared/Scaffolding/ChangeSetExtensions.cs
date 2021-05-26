@@ -36,6 +36,11 @@ namespace PoeShared.Scaffolding
             return source.Count();
         }
 
+        public static void AddOrUpdateIfNeeded<T, TKey>(this ISourceCache<T, TKey> source, T item)
+        {
+            AddOrUpdateIfNeeded(source, new[] { item });
+        }
+        
         public static void AddOrUpdateIfNeeded<T, TKey>(this ISourceCache<T, TKey> source, IEnumerable<T> items)
         {
             Guard.ArgumentNotNull(source, nameof(source));

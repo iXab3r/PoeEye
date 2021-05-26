@@ -6,6 +6,7 @@ using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using DynamicData;
 using DynamicData.Binding;
 using JetBrains.Annotations;
@@ -65,6 +66,29 @@ namespace PoeShared.Scaffolding
                     onError(e);
                 }
             });
+        }
+        
+        public static IDisposable SubscribeSafe<T>(this IObservable<T> source, 
+            Func<Task> asyncAction, Action<Exception> handler)
+        {
+            async Task<Unit> Wrapped(T t)
+            {
+                await asyncAction();
+                return Unit.Default;
+            }
+
+            return source.SelectMany(Wrapped).SubscribeSafe(_ => { }, handler);
+        }
+
+        public static IDisposable SubscribeSafe<T>(this IObservable<T> source, 
+            Func<T,Task> asyncAction, Action<Exception> handler)
+        {
+            async Task<Unit> Wrapped(T t)
+            {
+                await asyncAction(t);
+                return Unit.Default;
+            }
+            return source.SelectMany(Wrapped).SubscribeSafe(_ => { }, handler);
         }
 
         public static IObservable<TOut> SelectSafeOrDefault<TIn, TOut>(
