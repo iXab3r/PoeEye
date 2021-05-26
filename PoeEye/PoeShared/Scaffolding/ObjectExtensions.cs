@@ -61,7 +61,16 @@ namespace PoeShared.Scaffolding
         
         public static string ToStringTable<T>(this IEnumerable<T> instance, string separator = "\n\t")
         {
-            return instance == null ? $"null<{typeof(T).Name}>" : string.Join(separator, instance.Select(x => x.ToString()));
+            return instance == null ? $"null<{typeof(T).Name}>" : string.Join(separator, instance.Select(x => x.ToHumanReadable()));
+        }
+        
+        public static string ToHumanReadable<T>(this T item)
+        {
+            if (item is IntPtr ptr)
+            {
+                return ptr.ToHexadecimal();
+            }
+            return item.ToString();
         }
         
         public static string DumpToTable<T>(this IEnumerable<T> instance, string tableName, string separator = "\n\t")

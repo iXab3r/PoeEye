@@ -1,5 +1,6 @@
 using System;
 using System.Drawing;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using PInvoke;
@@ -23,6 +24,18 @@ namespace PoeShared.Native
         
         [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
         static extern bool AdjustWindowRectExForDpi(ref RECT lpRect, User32.WindowStyles dwStyle, bool bMenu, User32.WindowStylesEx dwExStyle, int dpi); 
+        
+        [DllImport("user32.dll")]
+        static extern int GetKeyboardLayoutList(int nBuff, [Out] IntPtr[] lpList);
+        
+        [DllImport("user32.dll", SetLastError = true)]
+        static extern IntPtr ActivateKeyboardLayout(IntPtr hkl, uint flags);
+        
+        [DllImport("user32.dll")]
+        static extern bool GetKeyboardLayoutName([Out] StringBuilder klId);
+        
+        [DllImport("user32.dll")]
+        static extern IntPtr GetKeyboardLayout(uint idThread);
         
         [DllImport("user32.dll")]
         static extern bool SetWindowRgn(IntPtr hWnd, IntPtr hRgn, bool bRedraw);
@@ -117,6 +130,41 @@ namespace PoeShared.Native
             }
 
             return SetWindowRgn(hwnd, hRect, bRedraw: true);
+        }
+
+        /// <summary>
+        /// Retrieves the input locale identifiers (formerly called keyboard layout handles) corresponding to the current set of input locales in the system.
+        /// </summary>
+        /// <returns></returns>
+        public static IntPtr[] GetKeyboardLayoutList()
+        {
+            var buffer = new IntPtr[256];
+            var itemCount = GetKeyboardLayoutList(buffer.Length, buffer);
+            return buffer.Take(itemCount).Where(x => x != IntPtr.Zero).ToArray();
+        }
+
+        public static string GetKeyboardLayoutName(IntPtr hkl)
+        {
+            var currentKeyboardLayout = GetKeyboardLayout(0);
+            try
+            {
+                var previous = ActivateKeyboardLayout(hkl, 0);
+                if (previous == IntPtr.Zero)
+                {
+                    throw new Win32Exception(Kernel32.GetLastError(), $"Failed to activate KHL {hkl.ToHexadecimal()}, got {previous.ToHexadecimal()}");
+                };
+                
+                var result = new StringBuilder(256);
+                if (!GetKeyboardLayoutName(result))
+                {
+                    throw new Win32Exception(Kernel32.GetLastError(), $"Failed to GetKeyboardLayoutName");
+                }
+                return result.ToString();
+            }
+            finally
+            {
+                ActivateKeyboardLayout(currentKeyboardLayout, 0);
+            }
         }
     }
 }

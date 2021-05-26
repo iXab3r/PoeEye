@@ -7,17 +7,16 @@ using Shouldly;
 namespace PoeShared.Tests.WPF.Hotkeys
 {
     [TestFixture]
-    internal class CharToKeyConverterFixture
+    internal class CharToKeysConverterFixture
     {
+        private const string RussianLayoutId = "00000419";
+        private const string EnglishLayoutId = "00000409";
+        
         [Test]
         [TestCase('a', Keys.A)]
         [TestCase('z', Keys.Z)]
         [TestCase('Z', Keys.Z | Keys.Shift)]
         [TestCase('A', Keys.A | Keys.Shift)]
-        [TestCase('а', Keys.F)]
-        [TestCase('А', Keys.F | Keys.Shift)]
-        [TestCase('я', Keys.Z)]
-        [TestCase('Я', Keys.Z | Keys.Shift)]
         [TestCase(' ', Keys.Space)]
         public void ShouldConvert(char c, Keys key)
         {
@@ -29,6 +28,24 @@ namespace PoeShared.Tests.WPF.Hotkeys
 
             //Then
             result.ShouldBe(key);
+        }
+        
+        [Test]
+        [TestCase('a', EnglishLayoutId, Keys.A)]
+        [TestCase('z', EnglishLayoutId, Keys.Z)]
+        [TestCase('Z', EnglishLayoutId, Keys.Z | Keys.Shift)]
+        [TestCase('A', EnglishLayoutId, Keys.A | Keys.Shift)]
+        [TestCase(' ', EnglishLayoutId, Keys.Space)]
+        public void ShouldConvertWithLayout(char c, string keyboardLayoutId, Keys expected)
+        {
+            //Given
+            var instance = CreateInstance();
+
+            //When
+            var result = instance.Convert((c,keyboardLayoutId));
+
+            //Then
+            result.ShouldBe(expected);
         }
 
         [Test]
