@@ -23,9 +23,9 @@ namespace PoeShared.Scaffolding
                 result |= ModifierKeys.Alt;
             }
 
-            if (keys.HasFlag(Keys.LWin) || keys.HasFlag(Keys.LWin))
+            if (keys.HasFlag(Keys.LWin) || keys.HasFlag(Keys.RWin))
             {
-                result |= ModifierKeys.Control;
+                result |= ModifierKeys.Windows;
             }
 
             return result;

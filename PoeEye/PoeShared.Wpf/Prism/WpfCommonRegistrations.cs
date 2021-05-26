@@ -1,4 +1,5 @@
 ﻿using System.Reactive.Concurrency;
+using System.Windows.Forms;
 using System.Windows.Threading;
 using log4net;
 using PoeShared.Audio.ViewModels;
@@ -50,6 +51,8 @@ namespace PoeShared.Prism
                 .RegisterSingleton<ISchedulerProvider, SchedulerProvider>()
                 .RegisterSingleton<IUserInputFilterConfigurator, UserInputFilterConfigurator>()
                 .RegisterSingleton<IApplicationAccessor, ApplicationAccessor>()
+                .RegisterSingleton<IConverter<char, Keys>, CharToKeysConverter>()
+                .RegisterSingleton<IConverter<Keys, HotkeyGesture>, KeysToHotkeyGestureConverter>()
                 .RegisterSingleton<IHotkeyConverter, HotkeyConverter>();
 
             Container

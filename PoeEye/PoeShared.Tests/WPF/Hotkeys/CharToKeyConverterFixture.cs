@@ -14,6 +14,10 @@ namespace PoeShared.Tests.WPF.Hotkeys
         [TestCase('z', Keys.Z)]
         [TestCase('Z', Keys.Z | Keys.Shift)]
         [TestCase('A', Keys.A | Keys.Shift)]
+        [TestCase('а', Keys.F)]
+        [TestCase('А', Keys.F | Keys.Shift)]
+        [TestCase('я', Keys.Z)]
+        [TestCase('Я', Keys.Z | Keys.Shift)]
         [TestCase(' ', Keys.Space)]
         public void ShouldConvert(char c, Keys key)
         {
@@ -52,9 +56,9 @@ namespace PoeShared.Tests.WPF.Hotkeys
             }
         }
         
-        public CharToKeyConverter CreateInstance()
+        public CharToKeysConverter CreateInstance()
         {
-            return new CharToKeyConverter();
+            return new CharToKeysConverter();
         }
     }
 }

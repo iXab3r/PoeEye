@@ -3,7 +3,7 @@ using PoeShared.Prism;
 
 namespace PoeShared.UI.Hotkeys
 {
-    internal sealed class CharToKeyConverter : IConverter<char, Keys>
+    internal sealed class CharToKeysConverter : IConverter<char, Keys>
     {
         public Keys Convert(char value)
         {
