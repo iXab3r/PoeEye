@@ -143,6 +143,12 @@ namespace PoeShared.Native
             return buffer.Take(itemCount).Where(x => x != IntPtr.Zero).ToArray();
         }
 
+        public static string GetActiveKeyboardLayoutName()
+        {
+            var currentKeyboardLayout = GetKeyboardLayout(0);
+            return GetKeyboardLayoutName(currentKeyboardLayout);
+        }
+        
         public static string GetKeyboardLayoutName(IntPtr hkl)
         {
             var currentKeyboardLayout = GetKeyboardLayout(0);

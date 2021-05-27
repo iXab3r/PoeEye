@@ -43,7 +43,7 @@ namespace PoeShared.UI.Hotkeys
         }
         
         private static Keys ConvertScanToKeys(short scanCode) {
-            Keys retval = (Keys)(scanCode & 0xff);
+            Keys retval = (Keys)(scanCode & 0xff);  
             int modifiers = scanCode >> 8;
 
             if ((modifiers & 1) != 0) retval |= Keys.Shift;

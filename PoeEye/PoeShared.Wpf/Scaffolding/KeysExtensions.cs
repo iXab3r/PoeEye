@@ -33,7 +33,7 @@ namespace PoeShared.Scaffolding
 
         public static Key ToInputKey(this Keys keys)
         {
-            return KeyInterop.KeyFromVirtualKey((int) keys);
+            return KeyInterop.KeyFromVirtualKey((int) keys.RemoveFlag(Keys.Control, Keys.Alt, Keys.Shift));
         }
     }
 }
