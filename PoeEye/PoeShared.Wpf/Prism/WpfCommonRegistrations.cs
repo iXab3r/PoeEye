@@ -1,4 +1,6 @@
 ﻿using System.Reactive.Concurrency;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Threading;
 using log4net;
@@ -25,6 +27,13 @@ namespace PoeShared.Prism
         protected override void Initialize()
         {
             var dispatcher = Dispatcher.CurrentDispatcher;
+            Log.Debug($"Dispatcher set to: {dispatcher}");
+            var syncContext = new DispatcherSynchronizationContext(dispatcher);
+            Log.Debug($"Synchronization context: {syncContext}");
+            SynchronizationContext.SetSynchronizationContext(syncContext);
+            var taskScheduler = TaskScheduler.FromCurrentSynchronizationContext();
+            Log.Debug($"Task scheduler: {taskScheduler}");
+            
             Log.Debug($"Capturing {dispatcher} as {WellKnownDispatchers.UI}");
             Container
                 .RegisterFactory<Dispatcher>(WellKnownDispatchers.UI, x => dispatcher, new ContainerControlledLifetimeManager())
@@ -40,7 +49,8 @@ namespace PoeShared.Prism
                     Log.Debug($"Initializing {WellKnownSchedulers.UIIdle} scheduler on {uiDispatcher}");
                     return new DispatcherScheduler(uiDispatcher, DispatcherPriority.ApplicationIdle);
                 }, new ContainerControlledLifetimeManager())
-                .RegisterFactory<IScheduler>(WellKnownSchedulers.Background, x => RxApp.TaskpoolScheduler, new ContainerControlledLifetimeManager());
+                .RegisterFactory<IScheduler>(WellKnownSchedulers.Background, x => RxApp.TaskpoolScheduler, new ContainerControlledLifetimeManager())
+                .RegisterFactory<TaskScheduler>(WellKnownSchedulers.UI, x => taskScheduler, new ContainerControlledLifetimeManager());
 
             Container
                 .RegisterFactory<IScheduler>(WellKnownSchedulers.InputHook, x => x.Resolve<ISchedulerProvider>().GetOrCreate(WellKnownSchedulers.InputHook));
