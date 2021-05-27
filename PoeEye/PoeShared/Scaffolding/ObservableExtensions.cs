@@ -73,7 +73,14 @@ namespace PoeShared.Scaffolding
         {
             async Task<Unit> Wrapped(T t)
             {
-                await asyncAction();
+                try
+                {
+                    await asyncAction();
+                }
+                catch (Exception e)
+                {
+                    handler(e);
+                }
                 return Unit.Default;
             }
 
@@ -85,7 +92,14 @@ namespace PoeShared.Scaffolding
         {
             async Task<Unit> Wrapped(T t)
             {
-                await asyncAction(t);
+                try
+                {
+                    await asyncAction(t);
+                }
+                catch (Exception e)
+                {
+                    handler(e);
+                }
                 return Unit.Default;
             }
             return source.SelectMany(Wrapped).SubscribeSafe(_ => { }, handler);
