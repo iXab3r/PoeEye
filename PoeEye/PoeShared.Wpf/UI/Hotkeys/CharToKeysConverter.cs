@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 using log4net;
@@ -12,15 +12,17 @@ namespace PoeShared.UI.Hotkeys
     internal sealed class CharToKeysConverter : IConverter<char, Keys>, IConverter<(char ch, string keyboardLayoutId), Keys>
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(CharToKeysConverter));
-        private readonly ConcurrentDictionary<string, IntPtr> keyboardHandleByKeyboardLayoutId;
+        private readonly ICollection<KeyboardLayout> keyboardHandleByKeyboardLayoutId;
         
         public CharToKeysConverter()
         {
-            keyboardHandleByKeyboardLayoutId = 
-                new ConcurrentDictionary<string, IntPtr>(
-                    UnsafeNative.GetKeyboardLayoutList()
-                        .Select(x => (x, UnsafeNative.GetKeyboardLayoutName(x)))
-                        .ToDictionary(x => x.Item2, x => x.x));
+            keyboardHandleByKeyboardLayoutId = UnsafeNative.GetKeyboardLayoutList()
+                .Select(x => new KeyboardLayout
+                {
+                    KeyboardLayoutHandle = x,
+                    LayoutName = UnsafeNative.GetKeyboardLayoutName(x),
+                })
+                .ToReadOnlyObservableCollection();
             
             Log.Debug($"Known layouts: {keyboardHandleByKeyboardLayoutId.DumpToString()}");
         }
@@ -33,12 +35,13 @@ namespace PoeShared.UI.Hotkeys
         
         public Keys Convert(char ch, string keyboardLayoutId)
         {
-            if (!keyboardHandleByKeyboardLayoutId.TryGetValue(keyboardLayoutId, out var hkl))
+            var keyboardLayout = keyboardHandleByKeyboardLayoutId.FirstOrDefault(x => x.LayoutName == keyboardLayoutId);
+            if (!keyboardLayout.IsValid)
             {
                 return Keys.None;
             }
 
-            var scanCode = VkKeyScanEx(ch, hkl);
+            var scanCode = VkKeyScanEx(ch, keyboardLayout.KeyboardLayoutHandle);
             return ConvertScanToKeys(scanCode);
         }
         
@@ -62,6 +65,15 @@ namespace PoeShared.UI.Hotkeys
         public Keys Convert((char ch, string keyboardLayoutId) value)
         {
             return Convert(value.ch, value.keyboardLayoutId);
+        }
+
+        private struct KeyboardLayout
+        {
+            public bool IsValid => KeyboardLayoutHandle != IntPtr.Zero;
+            
+            public string LayoutName { get; set; }
+            
+            public IntPtr KeyboardLayoutHandle { get; set; }
         }
     }
 }
