@@ -1,8 +1,9 @@
 using JetBrains.Annotations;
+using PoeShared.Prism;
 
 namespace PoeShared.UI.Hotkeys
 {
-    public interface IHotkeyConverter
+    public interface IHotkeyConverter : IConverter<string, HotkeyGesture>, IConverter<HotkeyGesture, string>
     {
         [NotNull] 
         string ConvertToString([CanBeNull] HotkeyGesture hotkeyGesture);

@@ -7,6 +7,7 @@
         xmlns:ui="clr-namespace:PoeShared.UI;assembly=PoeShared.Wpf"
         xmlns:hotkeys="clr-namespace:PoeShared.UI.Hotkeys;assembly=PoeShared.Wpf"
         xmlns:st="http://schemas.spicytaco.io/"
+        xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
         mc:Ignorable="d"
         WindowStartupLocation="CenterScreen"
         Title="PoeShared Demo" Height="450" Width="800" d:DataContext="{d:DesignInstance local:MainWindowViewModel}">
@@ -14,7 +15,31 @@
         <TabControl>
             <TabItem Header="HotkeySequence">
                 <st:StackPanel Fill="Fill" Orientation="Vertical" MarginBetweenChildren="5" VerticalAlignment="Stretch">
-                    <CheckBox IsChecked="{Binding ElementName=SequenceEditor, Path=HideKeypressDelays}">Hide keypress delays</CheckBox>
+                    
+                    <st:AutoGrid Columns="150,Auto" Rows="*" ChildMargin="5">
+                        
+                        <TextBlock Text="Hide keypress delays"/>
+                        <CheckBox  IsChecked="{Binding ElementName=SequenceEditor, Path=HideKeypressDelays}"></CheckBox>
+                        <TextBlock Text="Mouse position recording"/>
+                        <CheckBox IsChecked="{Binding ElementName=SequenceEditor, Path=EnableMousePositionRecording}" Style="{StaticResource MaterialDesignCheckBox}"></CheckBox>
+                        
+                        <TextBlock Text="Total duration"/>
+                        <TextBlock Text=""/>
+
+                        <TextBlock Text="Item count"/>
+                        <TextBlock Text="{Binding ElementName=SequenceEditor, Path=ItemsSource.Count}"/>
+                        
+                        <TextBlock Text="MaxRecordingDuration"/>
+                        <mah:NumericUpDown 
+                            Interval="1000"
+                            Value="{Binding ElementName=SequenceEditor, Path=MaxRecordingDuration, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource TimeSpanToMillisecondsConverter}}"/>
+                        
+                        <TextBlock Text="MousePositionRecordingResolution"/>
+                        <mah:NumericUpDown 
+                            Interval="100"
+                            Value="{Binding ElementName=SequenceEditor, Path=MousePositionRecordingResolution, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource TimeSpanToMillisecondsConverter}}"/>
+                    </st:AutoGrid>
+                    
                     <hotkeys:HotkeySequenceEditor Background="#303030" x:Name="SequenceEditor"
                                                   KeyboardEventsSource="{Binding EventsSource}"/>
                 </st:StackPanel>

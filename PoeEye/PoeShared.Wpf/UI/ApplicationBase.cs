@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
@@ -124,11 +125,15 @@ namespace PoeShared.UI
             var logFileConfigPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "log4net.config");
             SharedLog.Instance.LoadLogConfiguration(new FileInfo(logFileConfigPath));
             SharedLog.Instance.AddTraceAppender().AddTo(anchors);
-            SharedLog.Instance.Errors.SubscribeToErrors(
+            SharedLog.Instance.Errors.SubscribeSafe(
                 ex =>
                 {
+                    if (appArguments.IsDebugMode || Debugger.IsAttached)
+                    {
+                        Debugger.Break();
+                    }
                     ReportCrash(ex);
-                }).AddTo(anchors);
+                }, Log.HandleException).AddTo(anchors);
         }
         
         protected override void OnExit(ExitEventArgs e)

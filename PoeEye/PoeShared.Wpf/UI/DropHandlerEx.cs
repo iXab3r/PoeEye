@@ -10,7 +10,7 @@ using GongSolutions.Wpf.DragDrop;
 using GongSolutions.Wpf.DragDrop.Utilities;
 using DragDrop = GongSolutions.Wpf.DragDrop.DragDrop;
 
-namespace PoeShared.UI.Hotkeys
+namespace PoeShared.UI
 {
     internal sealed class DropHandlerEx : DefaultDropHandler
     {

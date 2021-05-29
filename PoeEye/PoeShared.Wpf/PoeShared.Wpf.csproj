@@ -59,6 +59,9 @@
     <Resource Include="Resources\stop-1.1s-200px.svg" />
     <None Remove="Resources\record-1.1s-47px.svg" />
     <Resource Include="Resources\record-1.1s-47px.svg" />
+    <None Remove="Resources\cursor-1.1s-200px.svg" />
+    <None Remove="Resources\cursor-1.1s-200px.png" />
+    <Resource Include="Resources\cursor-1.1s-200px.png" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="UI\Hotkeys\HotkeyBox.cs">
@@ -83,6 +86,9 @@
       <DependentUpon>HotkeySequenceEditor.xaml</DependentUpon>
     </Compile>
     <Compile Update="UI\Hotkeys\HotkeySequenceText.cs">
+      <DependentUpon>HotkeySequenceEditor.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="UI\Hotkeys\HotkeySequenceEditorItemVisibilityConverter.cs">
       <DependentUpon>HotkeySequenceEditor.xaml</DependentUpon>
     </Compile>
   </ItemGroup>

@@ -29,7 +29,7 @@ namespace PoeShared.Scaffolding
                 var property = DependencyPropertyDescriptor.FromProperty(dependencyProperty, typeof(T));
                 property.AddValueChanged(component, update);
                 return Disposable.Create(() => property.RemoveValueChanged(component, update));
-            });
+            }).StartWithDefault();
         }
         
         public static IObservable<TValue> Observe<T, TValue>(this T component, DependencyProperty dependencyProperty)

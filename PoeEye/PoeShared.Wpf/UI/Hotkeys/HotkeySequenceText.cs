@@ -4,10 +4,6 @@
     {
         private string text;
 
-        public HotkeySequenceText()
-        {
-        }
-
         public string Text
         {
             get => text;

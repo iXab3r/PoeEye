@@ -36,7 +36,7 @@
         <Setter Property="Text" Value="&#xf00c;" />
     </Style>
 
-    <Style TargetType="{x:Type ui:ButtonEx}">
+    <Style x:Key="DefaultButtonExStyle" TargetType="{x:Type ui:ButtonEx}">
         <Setter Property="BorderBrush" Value="{x:Null}" />
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="BorderThickness" Value="1" />
@@ -198,5 +198,6 @@
             </Setter.Value>
         </Setter>
     </Style>
-
+    
+    <Style TargetType="{x:Type ui:ButtonEx}" BasedOn="{StaticResource DefaultButtonExStyle}"/>
 </ui:SharedResourceDictionary>

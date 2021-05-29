@@ -270,5 +270,15 @@ namespace PoeShared.UI.Hotkeys
 
             return false;
         }
+
+        public HotkeyGesture Convert(string value)
+        {
+            return ConvertFromString(value);
+        }
+
+        public string Convert(HotkeyGesture value)
+        {
+            return ConvertToString(value);
+        }
     }
 }
