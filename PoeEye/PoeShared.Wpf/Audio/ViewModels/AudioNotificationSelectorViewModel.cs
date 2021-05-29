@@ -82,7 +82,7 @@ namespace PoeShared.Audio.ViewModels
             previousSelectedValueSupplier = this.WhenAnyValue(x => x.SelectedValue)
                 .Where(x => !string.IsNullOrEmpty(SelectedValue) && !DisabledNotification.Equals(x, StringComparison.OrdinalIgnoreCase))
                 .Select(x => selectedValue)
-                .ToPropertyHelper(this, x => x.PreviousSelectedValue)
+                .ToProperty(this, x => x.PreviousSelectedValue)
                 .AddTo(Anchors);
 
             this.WhenAnyValue(x => x.AudioEnabled)

@@ -23,7 +23,7 @@ namespace PoeShared.Audio.ViewModels
             isSelectedSupplier = owner
                 .WhenAnyValue(x => x.SelectedValue)
                 .Select(x => Value.Equals(x, StringComparison.OrdinalIgnoreCase))
-                .ToPropertyHelper(this, x => x.IsSelected)
+                .ToProperty(this, x => x.IsSelected)
                 .AddTo(Anchors);
         }
 

@@ -50,6 +50,7 @@
                 <ControlTemplate TargetType="{x:Type ui:ButtonEx}">
                     <Border
                         Focusable="False"
+                        CornerRadius="{TemplateBinding CornerRadius}"
                         Width="{TemplateBinding Width}"
                         Height="{TemplateBinding Height}"
                         MinWidth="{TemplateBinding MinWidth}"

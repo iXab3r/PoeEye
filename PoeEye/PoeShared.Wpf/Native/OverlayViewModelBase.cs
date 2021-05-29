@@ -76,7 +76,7 @@ namespace PoeShared.Native
             dpi = this.WhenAnyValue(x => x.OverlayWindow).Select(x => x == null ? Observable.Return(new PointF(1, 1)) : x.Observe(ConstantAspectRatioWindow.DpiProperty).Select(_ => overlayWindow.Dpi).StartWith(overlayWindow.Dpi))
                 .Switch()
                 .Do(x => Log.Debug($"[{this}] DPI updated to {x}"))
-                .ToPropertyHelper(this, x => x.Dpi)
+                .ToProperty(this, x => x.Dpi)
                 .AddTo(Anchors);
             
             this.WhenAnyValue(x => x.IsLocked, x => x.IsUnlockable)

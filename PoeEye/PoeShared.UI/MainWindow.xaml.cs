@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using PoeShared.Native;
 using PoeShared.Scaffolding;
 using PoeShared.Scaffolding.WPF;
 
@@ -25,14 +26,14 @@ namespace PoeShared.UI
         public MainWindow()
         {
             InitializeComponent();
-            DataContext = new MainWindowViewModel();
         }
     }
 
     internal sealed class MainWindowViewModel : DisposableReactiveObject
     {
-        public MainWindowViewModel()
+        public MainWindowViewModel(IKeyboardEventsSource eventsSource)
         {
+            EventsSource = eventsSource;
             LongCommand = CommandWrapper.Create(async () =>
             {
                 await Task.Delay(3000);
@@ -44,6 +45,8 @@ namespace PoeShared.UI
                 throw new ApplicationException("Error");
             });
         }
+        
+        public IKeyboardEventsSource EventsSource { get; }
 
         public CommandWrapper LongCommand { get; }
         

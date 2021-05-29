@@ -60,10 +60,10 @@ namespace PoeShared.Scaffolding
             [CanBeNull] IScheduler scheduler = null)
             where TSource : IDisposableReactiveObject
         {
-            return ToPropertyHelper(instance, instancePropertyExtractor, sourceObservable, default, false, scheduler);
+            return ToProperty(instance, instancePropertyExtractor, sourceObservable, default, false, scheduler);
         }
         
-        public static ObservableAsPropertyHelper<TSourceProperty> ToPropertyHelper<TSource, TSourceProperty>(
+        public static ObservableAsPropertyHelper<TSourceProperty> ToProperty<TSource, TSourceProperty>(
             [NotNull] this TSource instance,
             [NotNull] Expression<Func<TSource, TSourceProperty>> instancePropertyExtractor,
             [NotNull] IObservable<TSourceProperty> sourceObservable,

@@ -201,7 +201,7 @@ namespace PoeShared.Scaffolding
             return source.Catch(source.SubscribeOn(scheduler).DelaySubscription(timeSpan).Retry());
         }
         
-        public static ObservableAsPropertyHelper<TSourceProperty> ToPropertyHelper<TSource, TSourceProperty>(
+        public static ObservableAsPropertyHelper<TSourceProperty> ToProperty<TSource, TSourceProperty>(
             [NotNull] this IObservable<TSourceProperty> sourceObservable,
             out ObservableAsPropertyHelper<TSourceProperty> result,
             [NotNull] TSource instance,
@@ -209,18 +209,18 @@ namespace PoeShared.Scaffolding
             [CanBeNull] IScheduler scheduler = null)
             where TSource : IDisposableReactiveObject
         {
-            result = instance.ToPropertyHelper(instancePropertyExtractor, sourceObservable, default, false, scheduler);
+            result = instance.ToProperty(instancePropertyExtractor, sourceObservable, default, false, scheduler);
             return result;
         }
 
-        public static ObservableAsPropertyHelper<TSourceProperty> ToPropertyHelper<TSource, TSourceProperty>(
+        public static ObservableAsPropertyHelper<TSourceProperty> ToProperty<TSource, TSourceProperty>(
             [NotNull] this IObservable<TSourceProperty> sourceObservable,
             [NotNull] TSource instance,
             [NotNull] Expression<Func<TSource, TSourceProperty>> instancePropertyExtractor,
             [CanBeNull] IScheduler scheduler = null)
             where TSource : IDisposableReactiveObject
         {
-            return instance.ToPropertyHelper(instancePropertyExtractor, sourceObservable, default, false, scheduler);
+            return instance.ToProperty(instancePropertyExtractor, sourceObservable, default, false, scheduler);
         }
     }
 }

@@ -14,6 +14,7 @@
     <system:Boolean x:Key="FalseValue">False</system:Boolean>
     <system:Boolean x:Key="TrueValue">True</system:Boolean>
     
+    
     <blue:MultiplyDoubleConverter x:Key="DoubleToPercentConverter" Factor="100" />
     <blue:MultiplyDoubleConverter x:Key="DoubleFromPercentConverter" Factor="0.01" />
     <blue:MultiplyDoubleConverter x:Key="DoubleDivideByTwentyFiveConverter" Factor="0.04" />
@@ -26,6 +27,8 @@
     <eyeConverters:SizeToStringConverter x:Key="SizeToStringConverter"/>
     <eyeConverters:StaticResourceConverter x:Key="StaticResourceOrNullConverter" ThrowWhenNotFound="False" DefaultValue="{x:Null}" />
     <eyeConverters:StaticResourceConverter x:Key="StaticResourceConverter" ThrowWhenNotFound="True" />
+    <eyeConverters:CompositeCollectionConverter x:Key="CompositeCollectionConverter"/>
+    <eyeConverters:MultilineToSinglelineConverter x:Key="MultilineToSinglelineConverter"/>
     
     <eyeConverters:NullToBoolConverter x:Key="IsNullOrEmptyConverter" NullValue="True" />
     <eyeConverters:NullToBoolConverter x:Key="IsNotNullOrEmptyConverter" NullValue="False" />

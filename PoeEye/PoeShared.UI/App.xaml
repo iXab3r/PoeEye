@@ -1,14 +1,15 @@
-﻿<Application x:Class="PoeShared.UI.App"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:ui="clr-namespace:PoeShared.UI;assembly=PoeShared.Wpf"
-             StartupUri="MainWindow.xaml">
-    <Application.Resources>
-        <ui:SharedResourceDictionary>
-            <ui:SharedResourceDictionary.MergedDictionaries>
-                <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Generic.xaml" />
-                <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/UI/ButtonEx.xaml" />
-            </ui:SharedResourceDictionary.MergedDictionaries>
-        </ui:SharedResourceDictionary>
-    </Application.Resources>
-</Application>
+﻿<ui:ApplicationBase x:Class="PoeShared.UI.App"
+                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:ui="clr-namespace:PoeShared.UI;assembly=PoeShared.Wpf">
+     <Application.Resources>
+          <ui:SharedResourceDictionary>
+               <ui:SharedResourceDictionary.MergedDictionaries>
+                    <ui:SharedResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
+                    <ui:SharedResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/styles/themes/dark.blue.xaml" />
+                    <ui:SharedResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />
+                    <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Generic.shared.xaml" />
+               </ui:SharedResourceDictionary.MergedDictionaries>
+          </ui:SharedResourceDictionary>
+     </Application.Resources>
+</ui:ApplicationBase>

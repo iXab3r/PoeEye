@@ -87,6 +87,8 @@ namespace PoeShared.UI
             }
         }
 
+        public IUnityContainer Container => container;
+
         private static ILog Log => SharedLog.Instance.Log;
 
         private void CurrentDomainOnUnhandledException(object sender, UnhandledExceptionEventArgs e)

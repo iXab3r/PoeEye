@@ -5,20 +5,33 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PoeShared.UI"
         xmlns:ui="clr-namespace:PoeShared.UI;assembly=PoeShared.Wpf"
+        xmlns:hotkeys="clr-namespace:PoeShared.UI.Hotkeys;assembly=PoeShared.Wpf"
+        xmlns:st="http://schemas.spicytaco.io/"
         mc:Ignorable="d"
         WindowStartupLocation="CenterScreen"
-        Title="MainWindow" Height="450" Width="800" d:DataContext="{d:DesignInstance local:MainWindowViewModel}">
+        Title="PoeShared Demo" Height="450" Width="800" d:DataContext="{d:DesignInstance local:MainWindowViewModel}">
     <Grid>
-        <StackPanel>
-            <ui:ButtonEx Content="OK"
-                         Icon="&#xf1fb;"
-                         Command="{Binding LongCommand}"/>
+        <TabControl>
+            <TabItem Header="HotkeySequence">
+                <st:StackPanel Fill="Fill" Orientation="Vertical" MarginBetweenChildren="5" VerticalAlignment="Stretch">
+                    <CheckBox IsChecked="{Binding ElementName=SequenceEditor, Path=HideKeypressDelays}">Hide keypress delays</CheckBox>
+                    <hotkeys:HotkeySequenceEditor Background="#303030" x:Name="SequenceEditor"
+                                                  KeyboardEventsSource="{Binding EventsSource}"/>
+                </st:StackPanel>
+            </TabItem>
+            <TabItem Header="ButtonEx">
+                <StackPanel>
+                    <ui:ButtonEx Content="OK"
+                                 Icon="&#xf1fb;"
+                                 Command="{Binding LongCommand}"/>
 
-            <ui:ButtonEx Icon="&#xf00d;" Content="With Icon"  Command="{Binding LongCommand}"/>
-            <ui:ButtonEx Icon="&#xf00d;" Command="{Binding LongCommand}"/>
+                    <ui:ButtonEx Icon="&#xf00d;" Content="With Icon"  Command="{Binding LongCommand}"/>
+                    <ui:ButtonEx Icon="&#xf00d;" Command="{Binding LongCommand}"/>
             
-            <ui:ButtonEx Content="Error"  Command="{Binding ErrorCommand}"/>
-            <ui:ButtonEx Icon="&#xf00d;"   Command="{Binding ErrorCommand}"/>
-        </StackPanel>
+                    <ui:ButtonEx Content="Error"  Command="{Binding ErrorCommand}"/>
+                    <ui:ButtonEx Icon="&#xf00d;"   Command="{Binding ErrorCommand}"/>
+                </StackPanel>
+            </TabItem>
+        </TabControl>
     </Grid>
 </Window>

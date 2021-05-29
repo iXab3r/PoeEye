@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using DynamicData;
@@ -30,7 +31,19 @@ namespace PoeShared.Scaffolding
 
             return result.Or().ToSourceList();
         }
+        
+        public static ISourceList<T> Concat<T>(this ISourceList<T> list, params T[] items)
+        {
+            var newList = new SourceList<T>();
+            newList.AddRange(items);
+            return list.Concat(newList);
+        }
 
+        public static ISourceList<T> Concat<T>(this ISourceList<T> list, params ISourceList<T>[] lists)
+        {
+            return new[] { list }.Concat(lists).ToSourceList();
+        }
+        
         public static IObservable<int> CountIf<T>(this IObservable<IChangeSet<T>> source)
         {
             return source.Count();
