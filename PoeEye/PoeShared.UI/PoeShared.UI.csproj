@@ -27,4 +27,10 @@
       <PackageReference Include="ReactiveUI" Version="10.4.1" />
       <PackageReference Include="SpicyTaco.AutoGrid" Version="1.2.29" />
     </ItemGroup>
+    
+    <ItemGroup>
+      <None Update="log4net.config">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
 </Project>
