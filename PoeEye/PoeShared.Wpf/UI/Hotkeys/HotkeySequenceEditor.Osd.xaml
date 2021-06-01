@@ -8,14 +8,17 @@
         <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/UI/Hotkeys/HotkeySequenceEditor.Defaults.xaml" />
     </ui:SharedResourceDictionary.MergedDictionaries>
 
-    <Style TargetType="{x:Type ButtonBase}" x:Key="HotkeySequenceEditorOsdButton">
+    <Style TargetType="{x:Type ui:ButtonEx}" x:Key="HotkeySequenceEditorOsdButton" BasedOn="{StaticResource ButtonExStyleBase}">
         <Setter Property="Focusable" Value="false" />
         <Setter Property="Foreground" Value="{StaticResource SequenceEditorTextForeground}" />
         <Setter Property="Background" Value="{StaticResource SequenceEditorKeyBackground}" />
         <Setter Property="FontWeight" Value="Medium" />
         <Setter Property="MinWidth" Value="32" />
         <Setter Property="Height" Value="32" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="VerticalAlignment" Value="Stretch" />
         <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="5" />
         <Setter Property="Padding" Value="10,0" />
         <Setter Property="CommandParameter" Value="{Binding}" />
         <Setter Property="ClickMode" Value="Release" />
@@ -25,12 +28,40 @@
         <Setter Property="dd:DragDrop.DragDropCopyKeyState" Value="LeftMouseButton" />
         <Setter Property="Content" Value="{Binding RelativeSource={RelativeSource Self}, Path=CommandParameter, Converter={StaticResource KeyToStringConverter}}" />
         <Setter Property="Command" Value="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type hotkeys:HotkeySequenceEditor}}, Path=Actions.AddItem}" />
-
-        <Style.Triggers>
-            <Trigger Property="IsMouseOver" Value="true">
-                <Setter Property="BorderBrush" Value="{StaticResource SequenceEditorAccent}" />
-            </Trigger>
-        </Style.Triggers>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ui:ButtonEx}">
+                    <Border
+                        Focusable="{TemplateBinding Focusable}"
+                        CornerRadius="{TemplateBinding CornerRadius}"
+                        Width="{TemplateBinding Width}"
+                        Height="{TemplateBinding Height}"
+                        MinWidth="{TemplateBinding MinWidth}"
+                        MinHeight="{TemplateBinding MinHeight}"
+                        Background="{TemplateBinding Background}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        IsHitTestVisible="{TemplateBinding IsHitTestVisible}"
+                        HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
+                        VerticalAlignment="{TemplateBinding VerticalAlignment}"
+                        Padding="{TemplateBinding Margin}"
+                        ToolTip="{TemplateBinding ToolTip}">
+                        <ContentPresenter x:Name="ContentLabel"
+                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                          TextElement.Foreground="{TemplateBinding Foreground}"
+                                          Margin="{TemplateBinding Padding}"
+                                          Content="{Binding Path=Content, RelativeSource={RelativeSource TemplatedParent}}"
+                                          Visibility="{Binding Path=Content, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource NullToCollapsedConverter}}" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="true">
+                            <Setter Property="BorderBrush" Value="{StaticResource SequenceEditorAccent}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
 
     <Style TargetType="{x:Type Border}" x:Key="HotkeySequenceOsdBorder">
@@ -42,40 +73,40 @@
 
     <DataTemplate x:Key="OnScreenKeyboardSpecialsBlock">
         <DataTemplate.Resources>
-            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource HotkeySequenceEditorOsdButton}" />
+            <Style TargetType="{x:Type ui:ButtonEx}" BasedOn="{StaticResource HotkeySequenceEditorOsdButton}" />
         </DataTemplate.Resources>
         <Border Style="{StaticResource HotkeySequenceOsdBorder}">
             <st:StackPanel Orientation="Vertical" MarginBetweenChildren="10" Margin="0"
                            Focusable="False">
                 <st:AutoGrid Columns="*,*,*,*" ChildMargin="2.5">
-                    <Button CommandParameter="{x:Static Key.F13}" />
-                    <Button CommandParameter="{x:Static Key.F14}" />
-                    <Button CommandParameter="{x:Static Key.F15}" />
-                    <Button CommandParameter="{x:Static Key.F16}" />
-                    <Button CommandParameter="{x:Static Key.F17}" />
-                    <Button CommandParameter="{x:Static Key.F18}" />
-                    <Button CommandParameter="{x:Static Key.F19}" />
-                    <Button CommandParameter="{x:Static Key.F20}" />
-                    <Button CommandParameter="{x:Static Key.F21}" />
-                    <Button CommandParameter="{x:Static Key.F22}" />
-                    <Button CommandParameter="{x:Static Key.F23}" />
-                    <Button CommandParameter="{x:Static Key.F24}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.F13}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.F14}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.F15}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.F16}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.F17}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.F18}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.F19}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.F20}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.F21}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.F22}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.F23}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.F24}" />
                 </st:AutoGrid>
                 <st:AutoGrid Columns="*,*,*" ChildMargin="2.5">
-                    <Button CommandParameter="{x:Static Key.Separator}" />
-                    <Button CommandParameter="{x:Static Key.Help}" />
-                    <Button CommandParameter="{x:Static Key.Clear}" />
-                    <Button CommandParameter="{x:Static Key.OemClear}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.Separator}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.Help}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.Clear}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.OemClear}" />
                 </st:AutoGrid>
                 <st:AutoGrid Columns="*,*,*" ChildMargin="2.5">
-                    <Button CommandParameter="{x:Static Key.VolumeMute}" />
-                    <Button CommandParameter="{x:Static Key.VolumeUp}" />
-                    <Button CommandParameter="{x:Static Key.VolumeDown}" />
-                    <Button CommandParameter="{x:Static Key.MediaPreviousTrack}" />
-                    <Button CommandParameter="{x:Static Key.MediaNextTrack}" />
-                    <Button CommandParameter="{x:Static Key.MediaPlayPause}" />
-                    <Button CommandParameter="{x:Static Key.MediaStop}" />
-                    <Button CommandParameter="{x:Static Key.SelectMedia}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.VolumeMute}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.VolumeUp}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.VolumeDown}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.MediaPreviousTrack}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.MediaNextTrack}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.MediaPlayPause}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.MediaStop}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.SelectMedia}" />
                 </st:AutoGrid>
             </st:StackPanel>
         </Border>
@@ -83,47 +114,47 @@
 
     <DataTemplate x:Key="OnScreenKeyboardArrowsAndNumpadBlock">
         <DataTemplate.Resources>
-            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource HotkeySequenceEditorOsdButton}" />
+            <Style TargetType="{x:Type ui:ButtonEx}" BasedOn="{StaticResource HotkeySequenceEditorOsdButton}" />
         </DataTemplate.Resources>
 
         <Border Style="{StaticResource HotkeySequenceOsdBorder}">
-            <st:StackPanel Orientation="Horizontal" MarginBetweenChildren="10"  Margin="0" Focusable="False">
+            <st:StackPanel Orientation="Horizontal" MarginBetweenChildren="10" Margin="0" Focusable="False">
                 <st:AutoGrid Columns="*,*,*" ChildMargin="2.5">
-                    <Button CommandParameter="{x:Static Key.Snapshot}" />
-                    <Button CommandParameter="{x:Static Key.Scroll}" />
-                    <Button CommandParameter="{x:Static Key.Pause}" />
-                    <Button CommandParameter="{x:Static Key.Insert}" />
-                    <Button CommandParameter="{x:Static Key.Home}" />
-                    <Button CommandParameter="{x:Static Key.PageUp}" />
-                    <Button CommandParameter="{x:Static Key.Delete}" />
-                    <Button CommandParameter="{x:Static Key.End}" />
-                    <Button CommandParameter="{x:Static Key.PageDown}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.Snapshot}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.Scroll}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.Pause}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.Insert}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.Home}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.PageUp}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.Delete}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.End}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.PageDown}" />
                     <Border />
-                    <Button CommandParameter="{x:Static Key.Up}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.Up}" />
                     <Border />
-                    <Button CommandParameter="{x:Static Key.Left}" />
-                    <Button CommandParameter="{x:Static Key.Down}" />
-                    <Button CommandParameter="{x:Static Key.Right}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.Left}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.Down}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.Right}" />
                 </st:AutoGrid>
 
                 <st:AutoGrid Columns="*,*,*,*" ChildMargin="2.5">
-                    <Button CommandParameter="{x:Static Key.NumLock}" />
-                    <Button CommandParameter="{x:Static Key.Divide}" />
-                    <Button CommandParameter="{x:Static Key.Multiply}" />
-                    <Button CommandParameter="{x:Static Key.Subtract}" />
-                    <Button CommandParameter="{x:Static Key.NumPad7}" />
-                    <Button CommandParameter="{x:Static Key.NumPad8}" />
-                    <Button CommandParameter="{x:Static Key.NumPad9}" />
-                    <Button CommandParameter="{x:Static Key.Add}" Grid.RowSpan="2" Height="NaN" />
-                    <Button CommandParameter="{x:Static Key.NumPad4}" />
-                    <Button CommandParameter="{x:Static Key.NumPad5}" />
-                    <Button CommandParameter="{x:Static Key.NumPad6}" />
-                    <Button CommandParameter="{x:Static Key.NumPad1}" />
-                    <Button CommandParameter="{x:Static Key.NumPad2}" />
-                    <Button CommandParameter="{x:Static Key.NumPad3}" />
-                    <Button CommandParameter="{x:Static Key.NumPad0}" Grid.ColumnSpan="2" />
-                    <Button CommandParameter="{x:Static Key.Decimal}" />
-                    <Button CommandParameter="{x:Static Key.Return}" Grid.RowSpan="2" Height="NaN" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.NumLock}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.Divide}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.Multiply}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.Subtract}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.NumPad7}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.NumPad8}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.NumPad9}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.Add}" Grid.RowSpan="2" Height="NaN" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.NumPad4}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.NumPad5}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.NumPad6}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.NumPad1}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.NumPad2}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.NumPad3}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.NumPad0}" Grid.ColumnSpan="2" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.Decimal}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.Return}" Grid.RowSpan="2" Height="NaN" />
                 </st:AutoGrid>
             </st:StackPanel>
         </Border>
@@ -131,100 +162,100 @@
 
     <DataTemplate x:Key="OnScreenKeyboard">
         <DataTemplate.Resources>
-            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource HotkeySequenceEditorOsdButton}" />
+            <Style TargetType="{x:Type ui:ButtonEx}" BasedOn="{StaticResource HotkeySequenceEditorOsdButton}" />
         </DataTemplate.Resources>
 
         <Border Style="{StaticResource HotkeySequenceOsdBorder}">
-            <st:StackPanel Orientation="Vertical" MarginBetweenChildren="5"  Margin="0" Focusable="False">
+            <st:StackPanel Orientation="Vertical" MarginBetweenChildren="5" Margin="0" Focusable="False">
                 <st:StackPanel MarginBetweenChildren="5" Orientation="Horizontal">
-                    <Button CommandParameter="{x:Static Key.Escape}" />
-                    <Button CommandParameter="{x:Static Key.F1}" Margin="10,0,0,0" />
-                    <Button CommandParameter="{x:Static Key.F2}" />
-                    <Button CommandParameter="{x:Static Key.F3}" />
-                    <Button CommandParameter="{x:Static Key.F4}" />
-                    <Button CommandParameter="{x:Static Key.F5}" Margin="10,0,0,0" />
-                    <Button CommandParameter="{x:Static Key.F6}" />
-                    <Button CommandParameter="{x:Static Key.F7}" />
-                    <Button CommandParameter="{x:Static Key.F8}" />
-                    <Button CommandParameter="{x:Static Key.F9}" Margin="10,0,0,0" />
-                    <Button CommandParameter="{x:Static Key.F10}" />
-                    <Button CommandParameter="{x:Static Key.F11}" />
-                    <Button CommandParameter="{x:Static Key.F12}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.Escape}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.F1}" Margin="10,0,0,0" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.F2}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.F3}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.F4}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.F5}" Margin="10,0,0,0" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.F6}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.F7}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.F8}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.F9}" Margin="10,0,0,0" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.F10}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.F11}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.F12}" />
                 </st:StackPanel>
 
                 <st:StackPanel MarginBetweenChildren="5" Orientation="Horizontal">
-                    <Button CommandParameter="{x:Static Key.OemTilde}" />
-                    <Button CommandParameter="{x:Static Key.D1}" />
-                    <Button CommandParameter="{x:Static Key.D2}" />
-                    <Button CommandParameter="{x:Static Key.D3}" />
-                    <Button CommandParameter="{x:Static Key.D4}" />
-                    <Button CommandParameter="{x:Static Key.D5}" />
-                    <Button CommandParameter="{x:Static Key.D6}" />
-                    <Button CommandParameter="{x:Static Key.D7}" />
-                    <Button CommandParameter="{x:Static Key.D8}" />
-                    <Button CommandParameter="{x:Static Key.D9}" />
-                    <Button CommandParameter="{x:Static Key.D0}" />
-                    <Button CommandParameter="{x:Static Key.OemMinus}" />
-                    <Button CommandParameter="{x:Static Key.OemPlus}" />
-                    <Button CommandParameter="{x:Static Key.Back}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.OemTilde}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.D1}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.D2}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.D3}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.D4}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.D5}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.D6}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.D7}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.D8}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.D9}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.D0}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.OemMinus}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.OemPlus}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.Back}" />
                 </st:StackPanel>
 
                 <st:StackPanel MarginBetweenChildren="5" Orientation="Horizontal">
-                    <Button CommandParameter="{x:Static Key.Tab}" />
-                    <Button CommandParameter="{x:Static Key.Q}" />
-                    <Button CommandParameter="{x:Static Key.W}" />
-                    <Button CommandParameter="{x:Static Key.E}" />
-                    <Button CommandParameter="{x:Static Key.R}" />
-                    <Button CommandParameter="{x:Static Key.T}" />
-                    <Button CommandParameter="{x:Static Key.Y}" />
-                    <Button CommandParameter="{x:Static Key.U}" />
-                    <Button CommandParameter="{x:Static Key.I}" />
-                    <Button CommandParameter="{x:Static Key.O}" />
-                    <Button CommandParameter="{x:Static Key.Oem4}" />
-                    <Button CommandParameter="{x:Static Key.Oem6}" />
-                    <Button CommandParameter="{x:Static Key.Oem5}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.Tab}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.Q}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.W}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.E}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.R}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.T}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.Y}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.U}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.I}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.O}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.Oem4}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.Oem6}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.Oem5}" />
                 </st:StackPanel>
 
                 <st:StackPanel MarginBetweenChildren="5" Orientation="Horizontal">
-                    <Button CommandParameter="{x:Static Key.CapsLock}" />
-                    <Button CommandParameter="{x:Static Key.A}" />
-                    <Button CommandParameter="{x:Static Key.S}" />
-                    <Button CommandParameter="{x:Static Key.D}" />
-                    <Button CommandParameter="{x:Static Key.F}" />
-                    <Button CommandParameter="{x:Static Key.G}" />
-                    <Button CommandParameter="{x:Static Key.H}" />
-                    <Button CommandParameter="{x:Static Key.J}" />
-                    <Button CommandParameter="{x:Static Key.K}" />
-                    <Button CommandParameter="{x:Static Key.L}" />
-                    <Button CommandParameter="{x:Static Key.Oem1}" />
-                    <Button CommandParameter="{x:Static Key.Oem7}" />
-                    <Button CommandParameter="{x:Static Key.Return}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.CapsLock}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.A}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.S}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.D}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.F}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.G}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.H}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.J}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.K}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.L}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.Oem1}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.Oem7}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.Return}" />
                 </st:StackPanel>
 
                 <st:StackPanel MarginBetweenChildren="5" Orientation="Horizontal">
-                    <Button CommandParameter="{x:Static Key.LeftShift}" />
-                    <Button CommandParameter="{x:Static Key.Z}" />
-                    <Button CommandParameter="{x:Static Key.X}" />
-                    <Button CommandParameter="{x:Static Key.C}" />
-                    <Button CommandParameter="{x:Static Key.V}" />
-                    <Button CommandParameter="{x:Static Key.B}" />
-                    <Button CommandParameter="{x:Static Key.N}" />
-                    <Button CommandParameter="{x:Static Key.M}" />
-                    <Button CommandParameter="{x:Static Key.OemComma}" />
-                    <Button CommandParameter="{x:Static Key.OemPeriod}" />
-                    <Button CommandParameter="{x:Static Key.Oem2}" />
-                    <Button CommandParameter="{x:Static Key.RightShift}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.LeftShift}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.Z}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.X}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.C}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.V}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.B}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.N}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.M}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.OemComma}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.OemPeriod}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.Oem2}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.RightShift}" />
                 </st:StackPanel>
 
                 <st:StackPanel MarginBetweenChildren="5" Orientation="Horizontal">
-                    <Button CommandParameter="{x:Static Key.LeftCtrl}" />
-                    <Button CommandParameter="{x:Static Key.LWin}" />
-                    <Button CommandParameter="{x:Static Key.LeftAlt}" />
-                    <Button CommandParameter="{x:Static Key.Space}" st:StackPanel.Fill="Fill" />
-                    <Button CommandParameter="{x:Static Key.RightAlt}" />
-                    <Button CommandParameter="{x:Static Key.RWin}" />
-                    <Button CommandParameter="{x:Static Key.Apps}" />
-                    <Button CommandParameter="{x:Static Key.RightCtrl}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.LeftCtrl}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.LWin}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.LeftAlt}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.Space}" st:StackPanel.Fill="Fill" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.RightAlt}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.RWin}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.Apps}" />
+                    <ui:ButtonEx CommandParameter="{x:Static Key.RightCtrl}" />
                 </st:StackPanel>
             </st:StackPanel>
         </Border>

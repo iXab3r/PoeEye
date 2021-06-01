@@ -33,6 +33,7 @@
                 <materialDesign:PopupBox VerticalContentAlignment="Stretch"
                                          x:Name="EditPopup"
                                          Visibility="Collapsed"
+                                         Padding="0"
                                          PopupMode="Click"
                                          StaysOpen="True"
                                          PlacementMode="LeftAndAlignMiddles">
@@ -43,14 +44,12 @@
                     </materialDesign:PopupBox.ToggleContent>
                     <TextBox Width="300" Height="150"
                              TextWrapping="Wrap"
-                             Background="Black"
+                             Padding="4"
                              AcceptsReturn="True"
                              Foreground="{StaticResource SequenceEditorTextForeground}"
                              VerticalContentAlignment="Stretch"
                              HorizontalContentAlignment="Stretch"
                              eye:FocusHelper.IsFocused="True"
-                             BorderBrush="{StaticResource SequenceEditorTextBackground}"
-                             BorderThickness="1"
                              Text="{Binding Text, UpdateSourceTrigger=PropertyChanged}">
                         <i:Interaction.Behaviors>
                             <eye:SelectAllOnFocusBehavior />

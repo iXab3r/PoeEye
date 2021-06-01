@@ -176,6 +176,7 @@
                             ScrollViewer.HorizontalScrollBarVisibility="{TemplateBinding ScrollViewer.HorizontalScrollBarVisibility}"
                             HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
                             VerticalAlignment="{TemplateBinding VerticalAlignment}"
+                            FocusVisualStyle="{x:Null}"
                             dd:DragDrop.DropHandler="{TemplateBinding DropTarget}"
                             dd:DragDrop.IsDragSource="True"
                             dd:DragDrop.IsDropTarget="True"
@@ -183,17 +184,19 @@
                             dd:DragDrop.UseDefaultEffectDataTemplate="True"
                             dd:DragDrop.DragDropCopyKeyState="ControlKey"
                             HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"
+                            
                             ItemsSource="{TemplateBinding CollectionView}">
                             <ListView.ItemTemplateSelector>
                                 <ui:PlaceholderTemplateSelector
                                     PlaceholderTemplate="{StaticResource HotkeySequenceActionsTemplate}" />
                             </ListView.ItemTemplateSelector>
                             <ListView.Style>
-                                <Style TargetType="{x:Type ListView}" />
+                                <Style TargetType="{x:Type ListView}"></Style>
                             </ListView.Style>
                             <ListView.ItemContainerStyle>
                                 <Style TargetType="{x:Type ListViewItem}">
                                     <Setter Property="OverridesDefaultStyle" Value="True" />
+                                    <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
                                     <Setter Property="Height" Value="64" />
                                     <Setter Property="MinWidth" Value="36" />
                                     <Setter Property="Padding" Value="0" />
