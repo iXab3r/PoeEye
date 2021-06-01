@@ -1,0 +1,254 @@
+﻿<ui:SharedResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                             xmlns:hotkeys="clr-namespace:PoeShared.UI.Hotkeys"
+                             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+                             xmlns:ui="clr-namespace:PoeShared.UI"
+                             xmlns:eye="clr-namespace:PoeShared.Scaffolding.WPF"
+                             xmlns:dd="urn:gong-wpf-dragdrop"
+                             xmlns:st="http://schemas.spicytaco.io/"
+                             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+                             xmlns:b="http://schemas.microsoft.com/xaml/behaviors">
+    <ui:SharedResourceDictionary.MergedDictionaries>
+        <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/UI/Hotkeys/HotkeySequenceEditor.Defaults.xaml" />
+    </ui:SharedResourceDictionary.MergedDictionaries>
+
+    <DataTemplate DataType="{x:Type hotkeys:HotkeySequenceText}">
+        <Border x:Name="TextItem"
+                BorderThickness="1"
+                BorderBrush="{x:Null}"
+                Background="{StaticResource SequenceEditorTextBackground}"
+                Cursor="Hand"
+                ToolTip="{Binding Text}"
+                TextBlock.Foreground="{StaticResource SequenceEditorTextForeground}"
+                Height="36" MinWidth="64" VerticalAlignment="Center"
+                CornerRadius="5"
+                Padding="5,0">
+            <st:StackPanel Orientation="Horizontal" MarginBetweenChildren="5">
+                <TextBlock Text="{Binding Text, Converter={StaticResource MultilineToSinglelineConverter}}"
+                           MaxWidth="128"
+                           TextTrimming="CharacterEllipsis"
+                           st:StackPanel.Fill="Fill"
+                           HorizontalAlignment="Center"
+                           Foreground="{StaticResource SequenceEditorTextForeground}" />
+                <materialDesign:PopupBox VerticalContentAlignment="Stretch"
+                                         x:Name="EditPopup"
+                                         Visibility="Collapsed"
+                                         PopupMode="Click"
+                                         StaysOpen="True"
+                                         PlacementMode="LeftAndAlignMiddles">
+                    <materialDesign:PopupBox.ToggleContent>
+                        <TextBlock Style="{StaticResource IconTextBlock}"
+                                   Text="&#xf044;"
+                                   Foreground="{StaticResource SequenceEditorTextForeground}" />
+                    </materialDesign:PopupBox.ToggleContent>
+                    <TextBox Width="300" Height="150"
+                             TextWrapping="Wrap"
+                             Background="Black"
+                             AcceptsReturn="True"
+                             Foreground="{StaticResource SequenceEditorTextForeground}"
+                             VerticalContentAlignment="Stretch"
+                             HorizontalContentAlignment="Stretch"
+                             eye:FocusHelper.IsFocused="True"
+                             BorderBrush="{StaticResource SequenceEditorTextBackground}"
+                             BorderThickness="1"
+                             Text="{Binding Text, UpdateSourceTrigger=PropertyChanged}">
+                        <i:Interaction.Behaviors>
+                            <eye:SelectAllOnFocusBehavior />
+                        </i:Interaction.Behaviors>
+                    </TextBox>
+                </materialDesign:PopupBox>
+
+            </st:StackPanel>
+
+        </Border>
+
+        <DataTemplate.Triggers>
+            <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}, Path=IsSelected}"
+                         Value="True">
+                <Setter TargetName="TextItem" Property="TextBlock.Foreground" Value="{StaticResource SequenceEditorAccent}" />
+                <Setter TargetName="EditPopup" Property="Visibility" Value="Visible" />
+                <Setter TargetName="TextItem" Property="BorderBrush" Value="{StaticResource SequenceEditorAccent}" />
+                <Setter TargetName="TextItem" Property="Background" Value="{StaticResource SequenceEditorBackground}" />
+            </DataTrigger>
+        </DataTemplate.Triggers>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type hotkeys:HotkeySequenceDelay}">
+        <Border x:Name="DelayItem"
+                Background="Transparent"
+                Cursor="Hand"
+                BorderThickness="1"
+                BorderBrush="{x:Null}"
+                MinWidth="36"
+                TextBlock.Foreground="{StaticResource SequenceEditorTextForeground}"
+                VerticalAlignment="Center"
+                CornerRadius="5"
+                Padding="5,0">
+            <st:StackPanel Orientation="Vertical">
+                <TextBox Text="{Binding Delay, Converter={StaticResource TimeSpanToMillisecondsConverter}}"
+                         FontSize="16" FontWeight="Bold" Padding="0"
+                         HorizontalAlignment="Center" />
+                <Separator />
+                <TextBlock Text="ms"
+                           FontWeight="Bold"
+                           HorizontalAlignment="Center" />
+            </st:StackPanel>
+        </Border>
+        <DataTemplate.Triggers>
+            <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}, Path=IsSelected}"
+                         Value="True">
+                <Setter TargetName="DelayItem" Property="TextBlock.Foreground" Value="{StaticResource SequenceEditorAccent}" />
+            </DataTrigger>
+        </DataTemplate.Triggers>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type hotkeys:HotkeySequenceHotkey}">
+        <st:StackPanel x:Name="HotkeyContainer" Orientation="Vertical" MarginBetweenChildren="0"
+                       TextBlock.Foreground="{StaticResource SequenceEditorTextForeground}"
+                       Cursor="Hand">
+            <TextBlock x:Name="KeyUp" Style="{StaticResource IconTextBlock}" Text="&#xf106;" HorizontalAlignment="Center" VerticalAlignment="Bottom"
+                       Visibility="Hidden" />
+            <Border x:Name="KeyItem"
+                    BorderThickness="1"
+                    BorderBrush="{x:Null}"
+                    Background="{StaticResource SequenceEditorKeyBackground}"
+                    Visibility="Collapsed"
+                    Height="36" MinWidth="36" VerticalAlignment="Center"
+                    CornerRadius="5" Padding="5,0">
+                <TextBlock Text="{Binding Hotkey.Key, Converter={StaticResource KeyToStringConverter}}"
+                           FontWeight="Bold"
+                           FontSize="16"
+                           HorizontalAlignment="Center" />
+            </Border>
+            <Border x:Name="MouseItem"
+                    BorderThickness="1"
+                    BorderBrush="{x:Null}"
+                    Visibility="Collapsed"
+                    Height="36" MinWidth="36"
+                    VerticalAlignment="Center"
+                    CornerRadius="5" Padding="5,0">
+                <Image x:Name="MouseImage" />
+            </Border>
+            <TextBlock x:Name="KeyDown" Style="{StaticResource IconTextBlock}" Text="&#xf107;" HorizontalAlignment="Center" VerticalAlignment="Top"
+                       Visibility="Hidden" />
+        </st:StackPanel>
+        <DataTemplate.Triggers>
+            <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}, Path=IsSelected}"
+                         Value="True">
+                <Setter TargetName="HotkeyContainer" Property="TextBlock.Foreground" Value="{StaticResource SequenceEditorAccent}" />
+                <Setter TargetName="KeyItem" Property="BorderBrush" Value="{StaticResource SequenceEditorAccent}" />
+                <Setter TargetName="KeyItem" Property="Background" Value="{StaticResource SequenceEditorBackground}" />
+                <Setter TargetName="MouseItem" Property="BorderBrush" Value="{StaticResource SequenceEditorAccent}" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding IsDown}" Value="True">
+                <Setter TargetName="KeyDown" Property="Visibility" Value="Visible" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding IsDown}" Value="False">
+                <Setter TargetName="KeyUp" Property="Visibility" Value="Visible" />
+            </DataTrigger>
+
+            <DataTrigger Binding="{Binding IsMouse}" Value="True">
+                <Setter TargetName="MouseItem" Property="Visibility" Value="Visible" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding IsMouse}" Value="False">
+                <Setter TargetName="KeyItem" Property="Visibility" Value="Visible" />
+            </DataTrigger>
+
+            <DataTrigger Binding="{Binding Hotkey.MouseButton}" Value="{x:Static MouseButton.Left}">
+                <Setter TargetName="MouseImage" Property="Source" Value="../../Resources/mouse-device-left-click-control.png" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Hotkey.MouseButton}" Value="{x:Static MouseButton.Right}">
+                <Setter TargetName="MouseImage" Property="Source" Value="../../Resources/mouse-device-right-click-control.png" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Hotkey.MouseButton}" Value="{x:Static MouseButton.Middle}">
+                <Setter TargetName="MouseImage" Property="Source" Value="../../Resources/mouse-device-middle-click-control.png" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding HasMousePosition}" Value="True">
+                <Setter TargetName="MouseImage" Property="Source" Value="../../Resources/cursor-1.1s-200px.png" />
+                <Setter TargetName="MouseImage" Property="ToolTip" Value="{Binding MousePosition}" />
+            </DataTrigger>
+        </DataTemplate.Triggers>
+    </DataTemplate>
+
+
+    <DataTemplate DataType="{x:Type hotkeys:HotkeySequenceActions}" x:Key="HotkeySequenceActionsButton">
+        <st:StackPanel Fill="Fill" Orientation="Vertical" MarginBetweenChildren="2.5" VerticalAlignment="Center">
+            <Button
+                x:Name="StopRecordingButton"
+                Foreground="{StaticResource NegativeBrush}"
+                Width="32" Height="32"
+                BorderBrush="Transparent" BorderThickness="1"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch"
+                materialDesign:ButtonProgressAssist.IsIndicatorVisible="True"
+                materialDesign:ButtonProgressAssist.IsIndeterminate="False"
+                materialDesign:ButtonProgressAssist.Maximum="{Binding MaxDuration.TotalMilliseconds, Mode=OneWay}"
+                materialDesign:ButtonProgressAssist.Value="{Binding TotalDuration.TotalMilliseconds, Mode=OneWay}"
+                RenderTransformOrigin="0.5,0.5">
+                <Button.RenderTransform>
+                    <ScaleTransform CenterX="0.5" CenterY="0.5" />
+                </Button.RenderTransform>
+                <Button.Style>
+                    <Style TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialDesignFloatingActionButton}">
+                        <Style.Triggers>
+                            <Trigger Property="Visibility" Value="Visible">
+                                <Trigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard AutoReverse="True" RepeatBehavior="Forever">
+                                            <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)" From="0.9" To="1.1"
+                                                             Duration="00:00:00.5" />
+                                            <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)" From="0.9" To="1.1"
+                                                             Duration="00:00:00.5" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.EnterActions>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+                <Button.Content>
+                    <TextBlock x:Name="RecordingIcon" Style="{StaticResource IconTextBlock}" Text="&#xf04d;" FontSize="20" />
+                </Button.Content>
+                <b:Interaction.Triggers>
+                    <b:EventTrigger EventName="PreviewMouseLeftButtonDown">
+                        <b:InvokeCommandAction Command="{Binding StopRecording}" />
+                    </b:EventTrigger>
+                </b:Interaction.Triggers>
+            </Button>
+            <Button
+                x:Name="StartRecordingButton"
+                Height="32" Width="32"
+                materialDesign:ButtonProgressAssist.IsIndicatorVisible="True"
+                materialDesign:ButtonProgressAssist.IsIndeterminate="False"
+                materialDesign:ButtonProgressAssist.Maximum="{Binding MaxDuration.TotalMilliseconds, Mode=OneWay}"
+                materialDesign:ButtonProgressAssist.Value="{Binding TotalDuration.TotalMilliseconds, Mode=OneWay}"
+                Style="{StaticResource MaterialDesignFloatingActionButton}"
+                Command="{Binding StartRecording}"
+                Foreground="{StaticResource SequenceEditorTextForeground}"
+                BorderBrush="{StaticResource SequenceEditorAccent}" BorderThickness="1"
+                ToolTip="Start recording">
+                <Button.Content>
+                    <Ellipse Width="16" Height="16" Fill="{StaticResource NegativeBrush}" Stroke="{StaticResource SequenceEditorTextForeground}" />
+                </Button.Content>
+            </Button>
+        </st:StackPanel>
+
+        <DataTemplate.Triggers>
+            <DataTrigger Binding="{Binding IsRecording}" Value="True">
+                <Setter TargetName="StopRecordingButton" Property="Visibility" Value="Visible" />
+                <Setter TargetName="StartRecordingButton" Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding IsRecording}" Value="False">
+                <Setter TargetName="StopRecordingButton" Property="Visibility" Value="Collapsed" />
+                <Setter TargetName="StartRecordingButton" Property="Visibility" Value="Visible" />
+            </DataTrigger>
+        </DataTemplate.Triggers>
+    </DataTemplate>
+
+    <DataTemplate x:Key="HotkeySequenceActionsTemplate">
+        <ContentPresenter
+            dd:DragDrop.DragSourceIgnore="True"
+            ContentTemplate="{StaticResource HotkeySequenceActionsButton}"
+            Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type hotkeys:HotkeySequenceEditor}}, Path=Actions}" />
+    </DataTemplate>
+</ui:SharedResourceDictionary>

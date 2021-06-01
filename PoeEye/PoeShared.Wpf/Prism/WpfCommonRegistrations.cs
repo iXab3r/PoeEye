@@ -1,4 +1,5 @@
-﻿using System.Reactive.Concurrency;
+﻿using System;
+using System.Reactive.Concurrency;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -63,7 +64,7 @@ namespace PoeShared.Prism
                 .RegisterSingleton<IApplicationAccessor, ApplicationAccessor>()
                 .RegisterSingleton<IConverter<char, Keys>, CharToKeysConverter>()
                 .RegisterSingleton<IConverter<Keys, HotkeyGesture>, KeysToHotkeyGestureConverter>()
-                .RegisterSingleton<IHotkeyConverter, HotkeyConverter>();
+                .RegisterInstance<IHotkeyConverter>(HotkeyConverter.Instance, new ContainerControlledLifetimeManager());
 
             Container
                 .RegisterType<IHotkeyTracker, HotkeyTracker>()

@@ -3,13 +3,14 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Drawing;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Forms.VisualStyles;
 using System.Windows.Input;
+using System.Windows.Interop;
 using DynamicData;
 using DynamicData.Aggregation;
 using DynamicData.Binding;
@@ -17,10 +18,11 @@ using PoeShared.Native;
 using PoeShared.Scaffolding;
 using PoeShared.Scaffolding.WPF;
 using ReactiveUI;
+using Point = System.Drawing.Point;
 
 namespace PoeShared.UI.Hotkeys
 {
-    internal sealed class HotkeySequenceActions : HotkeySequenceItem
+    internal sealed class HotkeySequenceActions : DisposableReactiveObject
     {
         private readonly HotkeySequenceEditor owner;
         private bool isRecording;
@@ -36,6 +38,7 @@ namespace PoeShared.UI.Hotkeys
         private readonly ObservableAsPropertyHelper<TimeSpan> totalItemsDuration;
         private readonly ObservableAsPropertyHelper<DateTimeOffset?> recordStartTime;
         private readonly ObservableAsPropertyHelper<bool> atLeastOneRecordingTypeEnabled;
+        private readonly ObservableAsPropertyHelper<HotkeySequenceDelay> defaultItemDelay;
 
         public HotkeySequenceActions(
             HotkeySequenceEditor owner)
@@ -55,6 +58,12 @@ namespace PoeShared.UI.Hotkeys
             owner.Observe(HotkeySequenceEditor.MaxItemsCountProperty)
                 .Select(x => owner.MaxItemsCount)
                 .ToProperty(out maxItems, this, x => x.MaxItemsCount)
+                .AddTo(Anchors);
+
+            owner.Observe(HotkeySequenceEditor.DefaultKeyPressDurationProperty)
+                .Select(x => owner.DefaultKeyPressDuration)
+                .Select(x => new HotkeySequenceDelay() {Delay = x, IsKeypress = false})
+                .ToProperty(out defaultItemDelay, this, x => x.DefaultItemDelay)
                 .AddTo(Anchors);
             
             this.WhenAnyValue(x => x.ItemsSource)
@@ -121,12 +130,33 @@ namespace PoeShared.UI.Hotkeys
                 .ToProperty(out canAddItem, this, x => x.CanAddItem)
                 .AddTo(Anchors);
             
-            AddDelayItem = CommandWrapper.Create(() => ItemsSource.Add(new HotkeySequenceDelay()));
-            AddTextItem = CommandWrapper.Create(() => ItemsSource.Add(new HotkeySequenceText {  Text = "text" }));
+            AddItem = CommandWrapper.Create<object>(AddItemExecuted);
             StartRecording = CommandWrapper.Create(AddRecordingExecuted, this.WhenAnyValue(x => x.CanAddItem).ObserveOnDispatcher());
             StopRecording = CommandWrapper.Create(StopRecordingExecuted);
             ClearItems = CommandWrapper.Create(() => ItemsSource.Clear(), this.WhenAnyValue(x => x.ItemsSource).Select(x => x != null).ObserveOnDispatcher());
         }
+
+        private void AddItemExecuted(object arg)
+        {
+            var itemsToAdd = arg switch
+            {
+                HotkeySequenceItem item => new[] { item },
+                Key key => new HotkeySequenceItem[]
+                {
+                    new HotkeySequenceHotkey() { Hotkey = new HotkeyGesture(key), IsDown = true},
+                    new HotkeySequenceDelay() { Delay = owner.DefaultKeyPressDuration },
+                    new HotkeySequenceHotkey() { Hotkey = new HotkeyGesture(key), IsDown = false}
+                },
+                _ => throw new ArgumentOutOfRangeException(nameof(arg), arg, "Unknown item type")
+            };
+            ItemsSource.AddRange(itemsToAdd);
+        }
+
+        public ICommand AddItem { get; }
+
+        public HotkeySequenceDelay DefaultItemDelay => defaultItemDelay.Value;
+        
+        public HotkeySequenceText DefaultItemText { get; } = new() { Text = "text" };
 
         public bool AtLeastOneRecordingTypeEnabled => atLeastOneRecordingTypeEnabled.Value;
 
@@ -151,6 +181,16 @@ namespace PoeShared.UI.Hotkeys
         public DateTimeOffset? RecordStartTime => recordStartTime.Value;
 
         public ObservableCollection<HotkeySequenceItem> ItemsSource => itemsSource.Value;
+        
+        public bool IsRecording
+        {
+            get => isRecording;
+            private set => RaiseAndSetIfChanged(ref isRecording, value);
+        }
+
+        public ICommand StartRecording { get; }
+        public ICommand StopRecording { get; }
+        public ICommand ClearItems { get; }
         
         private void StopRecordingExecuted()
         {
@@ -185,11 +225,11 @@ namespace PoeShared.UI.Hotkeys
             if (owner.EnableMousePositionRecording)
             {
                 owner.KeyboardEventsSource.WhenMouseMove
-                    .TakeUntil(cancel)
                     .Sample(owner.MousePositionRecordingResolution)
                     .Select(x => new Point(x.X, x.Y))
                     .DistinctUntilChanged()
                     .ObserveOnDispatcher()
+                    .TakeUntil(cancel)
                     .Subscribe(x =>
                     {
                         ItemsSource.Add( new HotkeySequenceDelay
@@ -211,9 +251,9 @@ namespace PoeShared.UI.Hotkeys
                         owner.KeyboardEventsSource.WhenKeyDown.Select(x => new { x.KeyCode, IsDown = true }),
                         owner.KeyboardEventsSource.WhenKeyUp.Select(x => new { x.KeyCode, IsDown = false })
                     )
-                    .TakeUntil(cancel)
                     .DistinctUntilChanged()
                     .ObserveOnDispatcher()
+                    .TakeUntil(cancel)
                     .Subscribe(x =>
                     {
                         ItemsSource.Add( new HotkeySequenceDelay
@@ -231,20 +271,43 @@ namespace PoeShared.UI.Hotkeys
                     });
             }
 
+            var parentWindow = this.owner.FindVisualAncestor<Window>();
+            if (parentWindow == null)
+            {
+                throw new InvalidOperationException($"Failed to find parent window of control {owner}");
+            }
+            var ownerWindowHandle = new WindowInteropHelper(parentWindow).EnsureHandle();
+            var defaultDuration = owner.DefaultKeyPressDuration;
+
             if (owner.EnableMouseClicksRecording)
             {
                 Observable.Merge(
                         owner.KeyboardEventsSource.WhenMouseDown.Select(x => new { x.Button, x.X, x.Y, IsDown = true }),
                         owner.KeyboardEventsSource.WhenMouseUp.Select(x => new { x.Button,  x.X, x.Y, IsDown = false })
                     )
-                    .TakeUntil(cancel)
                     .DistinctUntilChanged()
                     .ObserveOnDispatcher()
+                    .TakeUntil(cancel)
                     .Subscribe(x =>
                     {
+                        if (UnsafeNative.GetForegroundWindow() == ownerWindowHandle)
+                        {
+                            var windowCoords = owner.PointFromScreen(new System.Windows.Point(x.X, x.Y));
+                            var hitElement = owner.InputHitTest(windowCoords);
+                            if (hitElement is UIElement uiElement)
+                            {
+                                var editor = uiElement.FindVisualAncestor<HotkeySequenceEditor>();
+                                if (editor != null)
+                                {
+                                    // clicked inside SequenceEditor control, ignoring
+                                    return;
+                                }
+                            }
+                        }
+                        
                         ItemsSource.Add(new HotkeySequenceDelay
                         {
-                            Delay = TimeSpan.FromMilliseconds(sw.ElapsedMilliseconds),
+                            Delay = defaultDuration,
                             IsKeypress = true,
                         });
                         sw.Restart();
@@ -257,19 +320,5 @@ namespace PoeShared.UI.Hotkeys
                     });
             }
         }
-
-        public bool IsRecording
-        {
-            get => isRecording;
-            set => RaiseAndSetIfChanged(ref isRecording, value);
-        }
-
-        public override bool IsDragDropSource => false;
-
-        public ICommand StartRecording { get; }
-        public ICommand StopRecording { get; }
-        public ICommand AddDelayItem { get; }
-        public ICommand AddTextItem { get; }
-        public ICommand ClearItems { get; }
     }
 }

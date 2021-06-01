@@ -3,334 +3,155 @@
                              xmlns:hotkeys="clr-namespace:PoeShared.UI.Hotkeys"
                              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
                              xmlns:ui="clr-namespace:PoeShared.UI"
-                             xmlns:eye="clr-namespace:PoeShared.Scaffolding.WPF"
                              xmlns:dd="urn:gong-wpf-dragdrop"
-                             xmlns:st="http://schemas.spicytaco.io/"
-                             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
-                             xmlns:b="http://schemas.microsoft.com/xaml/behaviors">
+                             xmlns:st="http://schemas.spicytaco.io/">
     <ui:SharedResourceDictionary.MergedDictionaries>
-        <ui:SharedResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.textbox.xaml" />
-        <ui:SharedResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.textblock.xaml" />
-        <ui:SharedResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.menu.xaml" />
-        <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Colors.xaml" />
-        <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Converters.xaml" />
-        <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Styles.xaml" />
-        <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/UI/ButtonEx.xaml" />
+        <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/UI/Hotkeys/HotkeySequenceEditor.Defaults.xaml" />
+        <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/UI/Hotkeys/HotkeySequenceEditor.Osd.xaml" />
+        <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/UI/Hotkeys/HotkeySequenceEditor.Items.xaml" />
     </ui:SharedResourceDictionary.MergedDictionaries>
-    
-    <SolidColorBrush x:Key="SequenceEditorTextBackground" Color="#664C00"/>
-    <SolidColorBrush x:Key="SequenceEditorKeyBackground" Color="#660019"/>
-    <SolidColorBrush x:Key="SequenceEditorAccent" Color="#00A9E0"/>
-    <SolidColorBrush x:Key="SequenceEditorBackground" Color="#00222D"/>
-    <SolidColorBrush x:Key="SequenceEditorDefaultBackground" Color="Gray"/>
-    <SolidColorBrush x:Key="SequenceEditorTextForeground" Color="White"/>
-
-    <DataTemplate DataType="{x:Type hotkeys:HotkeySequenceText}">
-        <Border x:Name="TextItem"
-                BorderThickness="1"
-                BorderBrush="{x:Null}"
-                Background="{StaticResource SequenceEditorTextBackground}"
-                Cursor="Hand"
-                ToolTip="{Binding Text}"
-                TextBlock.Foreground="{StaticResource SequenceEditorTextForeground}"
-                Height="36" MinWidth="64" VerticalAlignment="Center"
-                CornerRadius="5"
-                Padding="5,0">
-            <st:StackPanel Orientation="Horizontal" MarginBetweenChildren="5">
-                <TextBlock Text="{Binding Text, Converter={StaticResource MultilineToSinglelineConverter}}"
-                           MaxWidth="128"
-                           TextTrimming="CharacterEllipsis"
-                           st:StackPanel.Fill="Fill"
-                           HorizontalAlignment="Center"
-                           Foreground="{StaticResource SequenceEditorTextForeground}" />
-                <materialDesign:PopupBox VerticalContentAlignment="Stretch"
-                                         x:Name="EditPopup"
-                                         Visibility="Collapsed"
-                                         PopupMode="Click"
-                                         StaysOpen="True"
-                                         PlacementMode="LeftAndAlignMiddles">
-                    <materialDesign:PopupBox.ToggleContent>
-                        <TextBlock Style="{StaticResource IconTextBlock}"
-                                   Text="&#xf044;"
-                                   Foreground="{StaticResource SequenceEditorTextForeground}" />
-                    </materialDesign:PopupBox.ToggleContent>
-                    <TextBox Width="300" Height="150"
-                             TextWrapping="Wrap"
-                             Background="Black"
-                             AcceptsReturn="True"
-                             Foreground="{StaticResource SequenceEditorTextForeground}"
-                             VerticalContentAlignment="Stretch"
-                             HorizontalContentAlignment="Stretch"
-                             eye:FocusHelper.IsFocused="True"
-                             BorderBrush="{StaticResource SequenceEditorTextBackground}"
-                             BorderThickness="1"
-                             Text="{Binding Text, UpdateSourceTrigger=PropertyChanged}">
-                        <i:Interaction.Behaviors>
-                            <eye:SelectAllOnFocusBehavior />
-                        </i:Interaction.Behaviors>
-                    </TextBox>
-                </materialDesign:PopupBox>
-
-            </st:StackPanel>
-
-        </Border>
-
-        <DataTemplate.Triggers>
-            <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}, Path=IsSelected}"
-                         Value="True">
-                <Setter TargetName="TextItem" Property="TextBlock.Foreground" Value="{StaticResource SequenceEditorAccent}" />
-                <Setter TargetName="EditPopup" Property="Visibility" Value="Visible" />
-                <Setter TargetName="TextItem" Property="BorderBrush" Value="{StaticResource SequenceEditorAccent}" />
-                <Setter TargetName="TextItem" Property="Background" Value="{StaticResource SequenceEditorBackground}" />
-            </DataTrigger>
-        </DataTemplate.Triggers>
-    </DataTemplate>
-
-    <DataTemplate DataType="{x:Type hotkeys:HotkeySequenceDelay}">
-        <Border x:Name="DelayItem"
-                Background="Transparent"
-                Cursor="Hand"
-                BorderThickness="1"
-                BorderBrush="{x:Null}"
-                MinWidth="36"
-                TextBlock.Foreground="{StaticResource SequenceEditorTextForeground}"
-                VerticalAlignment="Center"
-                CornerRadius="5"
-                Padding="5,0">
-            <st:StackPanel Orientation="Vertical">
-                <TextBox Text="{Binding Delay, Converter={StaticResource TimeSpanToMillisecondsConverter}}"
-                         FontSize="16" FontWeight="Bold" Padding="0"
-                         HorizontalAlignment="Center" />
-                <Separator />
-                <TextBlock Text="ms"
-                           FontWeight="Bold"
-                           HorizontalAlignment="Center" />
-            </st:StackPanel>
-        </Border>
-        <DataTemplate.Triggers>
-            <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}, Path=IsSelected}"
-                         Value="True">
-                <Setter TargetName="DelayItem" Property="TextBlock.Foreground" Value="{StaticResource SequenceEditorAccent}" />
-            </DataTrigger>
-        </DataTemplate.Triggers>
-    </DataTemplate>
-
-    <DataTemplate DataType="{x:Type hotkeys:HotkeySequenceHotkey}">
-        <st:StackPanel x:Name="HotkeyContainer" Orientation="Vertical" MarginBetweenChildren="0" 
-                       TextBlock.Foreground="{StaticResource SequenceEditorTextForeground}"
-                       Cursor="Hand">
-            <TextBlock x:Name="KeyUp" Style="{StaticResource IconTextBlock}" Text="&#xf106;" HorizontalAlignment="Center" VerticalAlignment="Bottom"
-                       Visibility="Hidden" />
-            <Border x:Name="KeyItem"
-                    BorderThickness="1"
-                    BorderBrush="{x:Null}"
-                    Background="{StaticResource SequenceEditorKeyBackground}"
-                    Visibility="Collapsed"
-                    Height="36" MinWidth="36" VerticalAlignment="Center"
-                    CornerRadius="5" Padding="5,0">
-                <TextBlock Text="{Binding Hotkey}"
-                           FontWeight="Bold"
-                           FontSize="16"
-                           HorizontalAlignment="Center" />
-            </Border>
-            <Border x:Name="MouseItem"
-                    BorderThickness="1"
-                    BorderBrush="{x:Null}"
-                    Visibility="Collapsed"
-                    Height="36" MinWidth="36"
-                    VerticalAlignment="Center"
-                    CornerRadius="5" Padding="5,0">
-                <Image x:Name="MouseImage" />
-            </Border>
-            <TextBlock x:Name="KeyDown" Style="{StaticResource IconTextBlock}" Text="&#xf107;" HorizontalAlignment="Center" VerticalAlignment="Top"
-                       Visibility="Hidden" />
-        </st:StackPanel>
-        <DataTemplate.Triggers>
-            <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}, Path=IsSelected}"
-                         Value="True">
-                <Setter TargetName="HotkeyContainer" Property="TextBlock.Foreground" Value="{StaticResource SequenceEditorAccent}" />
-                <Setter TargetName="KeyItem" Property="BorderBrush" Value="{StaticResource SequenceEditorAccent}" />
-                <Setter TargetName="KeyItem" Property="Background" Value="{StaticResource SequenceEditorBackground}" />
-                <Setter TargetName="MouseItem" Property="BorderBrush" Value="{StaticResource SequenceEditorAccent}" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding IsDown}" Value="True">
-                <Setter TargetName="KeyDown" Property="Visibility" Value="Visible" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding IsDown}" Value="False">
-                <Setter TargetName="KeyUp" Property="Visibility" Value="Visible" />
-            </DataTrigger>
-
-            <DataTrigger Binding="{Binding IsMouse}" Value="True">
-                <Setter TargetName="MouseItem" Property="Visibility" Value="Visible" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding IsMouse}" Value="False">
-                <Setter TargetName="KeyItem" Property="Visibility" Value="Visible" />
-            </DataTrigger>
-
-            <DataTrigger Binding="{Binding Hotkey.MouseButton}" Value="{x:Static MouseButton.Left}">
-                <Setter TargetName="MouseImage" Property="Source" Value="../../Resources/mouse-device-left-click-control.png" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding Hotkey.MouseButton}" Value="{x:Static MouseButton.Right}">
-                <Setter TargetName="MouseImage" Property="Source" Value="../../Resources/mouse-device-right-click-control.png" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding Hotkey.MouseButton}" Value="{x:Static MouseButton.Middle}">
-                <Setter TargetName="MouseImage" Property="Source" Value="../../Resources/mouse-device-middle-click-control.png" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding HasMousePosition}" Value="True">
-                <Setter TargetName="MouseImage" Property="Source" Value="../../Resources/cursor-1.1s-200px.png" />
-                <Setter TargetName="MouseImage" Property="ToolTip" Value="{Binding MousePosition}" />
-            </DataTrigger>
-        </DataTemplate.Triggers>
-    </DataTemplate>
-    
-    <Style x:Key="HotkeySequenceEditorButtonStyle" TargetType="{x:Type ui:ButtonEx}" BasedOn="{StaticResource DefaultButtonExStyle}">
-        <Style.Triggers>
-           <Trigger Property="IsMouseOver" Value="True">
-               <Setter Property="BorderBrush" Value="{StaticResource SequenceEditorAccent}"/>
-           </Trigger>
-       </Style.Triggers>
-    </Style>
 
     <DataTemplate DataType="{x:Type hotkeys:HotkeySequenceActions}">
-        <st:StackPanel Fill="Fill" Orientation="Vertical" MarginBetweenChildren="2.5">
-            <TextBlock HorizontalAlignment="Center"
+        <st:StackPanel MarginBetweenChildren="5" Orientation="Horizontal">
+            <ui:ButtonEx
+                Command="{Binding StartRecording}"
+                Style="{StaticResource HotkeySequenceEditorButtonStyle}"
+                HorizontalAlignment="Left" CornerRadius="5"
+                Foreground="{StaticResource SequenceEditorTextForeground}"
+                Visibility="{Binding IsRecording, Converter={StaticResource TrueToCollapsedFalseToVisibleConverter}}"
+                Width="80"
+                Background="{StaticResource SequenceEditorKeyBackground}">
+                RECORD
+                <ui:ButtonEx.Icon>
+                    <Ellipse Width="10" Height="10" Fill="{StaticResource NegativeBrush}" Stroke="{StaticResource SequenceEditorTextForeground}" />
+                </ui:ButtonEx.Icon>
+            </ui:ButtonEx>
+            <ui:ButtonEx
+                Command="{Binding StopRecording}"
+                Style="{StaticResource HotkeySequenceEditorButtonStyle}"
+                HorizontalAlignment="Left" CornerRadius="5"
+                Width="80"
+                Foreground="{StaticResource NegativeBrush}"
+                Visibility="{Binding IsRecording, Converter={StaticResource TrueToVisibleFalseToCollapsedConverter}}">
+                STOP
+                <ui:ButtonEx.Icon>
+                    &#xf04d;
+                </ui:ButtonEx.Icon>
+            </ui:ButtonEx>
+            <ui:ButtonEx
+                Command="{Binding AddItem}"
+                CommandParameter="{Binding DefaultItemDelay}"
+                Style="{StaticResource HotkeySequenceEditorButtonStyle}"
+                Icon="&#xf017;" HorizontalAlignment="Left" CornerRadius="5"
+                dd:DragDrop.IsDragSource="True"
+                Foreground="{StaticResource SequenceEditorTextForeground}" 
+                Background="{StaticResource SequenceEditorDefaultBackground}">
+                DELAY
+            </ui:ButtonEx>
+            <ui:ButtonEx
+                Command="{Binding AddItem}"
+                CommandParameter="{Binding DefaultItemText}"
+                dd:DragDrop.IsDragSource="True"
+                Style="{StaticResource HotkeySequenceEditorButtonStyle}"
+                Icon="&#xf040;" HorizontalAlignment="Left" CornerRadius="5"
+                Foreground="{StaticResource SequenceEditorTextForeground}" 
+                Background="{StaticResource SequenceEditorTextBackground}">
+                TEXT
+            </ui:ButtonEx>
+            <Separator />
+            <ui:ButtonEx
+                Command="{Binding ClearItems}"
+                Style="{StaticResource HotkeySequenceEditorButtonStyle}"
+                HorizontalAlignment="Left" CornerRadius="5"
+                Icon="&#xf12d;"
+                Foreground="{StaticResource SequenceEditorTextForeground}" 
+                Background="{StaticResource SequenceEditorTextBackground}">
+                CLEAR
+            </ui:ButtonEx>
+            <CheckBox
+                x:Name="KeyboardPopupToggle">
+                <TextBlock Style="{StaticResource IconTextBlock}" Text="&#xf11c; KEYBOARD" />
+            </CheckBox>
+            <CheckBox
+                x:Name="KeyboardArrowBlockPopupToggle">
+                <TextBlock Style="{StaticResource IconTextBlock}" Text="&#xf11c; ARROWS" />
+            </CheckBox>
+            <CheckBox
+                x:Name="KeyboardSpecialsBlockPopupToggle">
+                <TextBlock Style="{StaticResource IconTextBlock}" Text="&#xf11c; SPECIALS" />
+            </CheckBox>
+
+            <TextBlock HorizontalAlignment="Right" st:StackPanel.Fill="Fill"
                        x:Name="DurationLabel">
+                <TextBlock.ToolTip>
+                    <TextBlock HorizontalAlignment="Center">
+                        <TextBlock.Text>
+                            <MultiBinding Converter="{StaticResource StringFormatConverter}"
+                                          ConverterParameter="{}Current duration: {0} / Max duration of macros: {1}">
+                                <Binding Path="TotalDuration"
+                                         Converter="{StaticResource TimeSpanToHumanReadableStringConverter}" />
+                                <Binding Path="MaxDuration"
+                                         Converter="{StaticResource TimeSpanToHumanReadableStringConverter}" />
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+                </TextBlock.ToolTip>
                 <TextBlock.Text>
-                    <MultiBinding Converter="{StaticResource StringFormatConverter}" ConverterParameter="{}{0}">
-                        <Binding Path="TotalDuration" Converter="{StaticResource TimeSpanToHumanReadableStringConverter}" />
+                    <MultiBinding Converter="{StaticResource StringFormatConverter}" ConverterParameter="{}{0} / {1}">
+                        <Binding Path="TotalDuration"
+                                 Converter="{StaticResource TimeSpanToHumanReadableStringConverter}" />
+                        <Binding Path="MaxDuration"
+                                 Converter="{StaticResource TimeSpanToHumanReadableStringConverter}" />
                     </MultiBinding>
                 </TextBlock.Text>
             </TextBlock>
-            <Button
-                x:Name="StopRecordingButton"
-                Foreground="{StaticResource NegativeBrush}" Width="32" Height="32"
-                BorderBrush="{StaticResource SequenceEditorDefaultBackground}" BorderThickness="1"
-                HorizontalAlignment="Stretch"
-                VerticalAlignment="Stretch"
-                RenderTransformOrigin="0.5,0.5">
-                <Button.RenderTransform>
-                    <ScaleTransform CenterX="0.5" CenterY="0.5" />
-                </Button.RenderTransform>
-                <Button.Style>
-                    <Style TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialDesignFloatingActionButton}">
-                        <Style.Triggers>
-                            <Trigger Property="Visibility" Value="Visible">
-                                <Trigger.EnterActions>
-                                    <BeginStoryboard>
-                                        <Storyboard AutoReverse="True" RepeatBehavior="Forever">
-                                            <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)" From="0.9" To="1.1"
-                                                             Duration="00:00:00.5" />
-                                            <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)" From="0.9" To="1.1"
-                                                             Duration="00:00:00.5" />
-                                        </Storyboard>
-                                    </BeginStoryboard>
-                                </Trigger.EnterActions>
 
-                            </Trigger>
-
-                        </Style.Triggers>
-                    </Style>
-                </Button.Style>
-                <Button.Content>
-                    <TextBlock x:Name="RecordingIcon" Style="{StaticResource IconTextBlock}" Text="&#xf04d;" FontSize="20" />
-                </Button.Content>
-                <b:Interaction.Triggers>
-                    <b:EventTrigger EventName="PreviewMouseLeftButtonDown">
-                        <b:InvokeCommandAction Command="{Binding StopRecording}" />
-                    </b:EventTrigger>
-                </b:Interaction.Triggers>
-            </Button>
-            <materialDesign:PopupBox
-                x:Name="AddItemButton"
+            <materialDesign:PopupEx
+                x:Name="KeyboardPopup"
+                PlacementTarget="{Binding ElementName=KeyboardPopupToggle}"
+                Placement="Top"
+                StaysOpen="False"
+                IsOpen="{Binding ElementName=KeyboardPopupToggle, Path=IsChecked}"
                 HorizontalAlignment="Stretch"
-                VerticalAlignment="Stretch"
-                Foreground="{StaticResource SequenceEditorTextForeground}"
-                BorderBrush="{StaticResource SequenceEditorAccent}" BorderThickness="1"
-                Background="Transparent" Width="32" Height="32"
-                Style="{StaticResource MaterialDesignMultiFloatingActionPopupBox}"
-                PlacementMode="RightAndAlignMiddles"
-                ToolTipService.Placement="Right">
-                <materialDesign:PopupBox.ToggleContentTemplate>
-                    <DataTemplate DataType="{x:Type hotkeys:HotkeySequenceActions}">
-                        <TextBlock x:Name="AddItemLabel" Style="{StaticResource IconTextBlock}" Text="&#xf067;" FontSize="20" />
-                    </DataTemplate>
-                </materialDesign:PopupBox.ToggleContentTemplate>
-                <StackPanel>
-                    <ui:ButtonEx Command="{Binding StartRecording}"
-                                 Style="{StaticResource HotkeySequenceEditorButtonStyle}"
-                                 HorizontalAlignment="Left" CornerRadius="5"
-                                 Foreground="{StaticResource SequenceEditorTextForeground}" 
-                                 Background="{StaticResource SequenceEditorKeyBackground}">
-                        RECORD KEYSTROKES
-                        <ui:ButtonEx.Icon>
-                            <Ellipse Width="10" Height="10" Fill="{StaticResource NegativeBrush}" Stroke="{StaticResource SequenceEditorTextForeground}" />
-                        </ui:ButtonEx.Icon>
-                    </ui:ButtonEx>
-                    <ui:ButtonEx
-                        Command="{Binding AddDelayItem}"
-                        Style="{StaticResource HotkeySequenceEditorButtonStyle}"
-                        Icon="&#xf017;" HorizontalAlignment="Left" CornerRadius="5"
-                        Foreground="{StaticResource SequenceEditorTextForeground}" Background="{StaticResource SequenceEditorDefaultBackground}">
-                        DELAY
-                    </ui:ButtonEx>
-                    <ui:ButtonEx
-                        Command="{Binding AddTextItem}"
-                        Style="{StaticResource HotkeySequenceEditorButtonStyle}"
-                        Icon="&#xf040;" HorizontalAlignment="Left" CornerRadius="5"
-                        Foreground="{StaticResource SequenceEditorTextForeground}" Background="{StaticResource SequenceEditorTextBackground}">
-                        TEXT
-                    </ui:ButtonEx>
-                    <Separator />
-                    <ui:ButtonEx
-                        Command="{Binding ClearItems}"
-                        Style="{StaticResource HotkeySequenceEditorButtonStyle}"
-                        HorizontalAlignment="Left" CornerRadius="5"
-                        Foreground="{StaticResource SequenceEditorTextForeground}" Background="{StaticResource SequenceEditorTextBackground}">
-                        CLEAR
-                    </ui:ButtonEx>
-                </StackPanel>
-            </materialDesign:PopupBox>
-            <Grid>
-                <ProgressBar
-                    BorderBrush="{StaticResource SequenceEditorAccent}"
-                    BorderThickness="1"
-                    Background="{StaticResource SequenceEditorDefaultBackground}"
-                    Maximum="{Binding MaxDuration.TotalMilliseconds, Mode=OneWay}"
-                    Value="{Binding TotalDuration.TotalMilliseconds, Mode=OneWay}"
-                    Height="10">
-                    <ProgressBar.ToolTip>
-                        <TextBlock HorizontalAlignment="Center">
-                            <TextBlock.Text>
-                                <MultiBinding Converter="{StaticResource StringFormatConverter}" ConverterParameter="{}Current duration: {0} / Max duration of macros: {1}">
-                                    <Binding Path="TotalDuration" Converter="{StaticResource TimeSpanToHumanReadableStringConverter}" />
-                                    <Binding Path="MaxDuration" Converter="{StaticResource TimeSpanToHumanReadableStringConverter}" />
-                                </MultiBinding>
-                            </TextBlock.Text>
-                        </TextBlock>
-                    </ProgressBar.ToolTip>
-                </ProgressBar>
-            </Grid>
+                VerticalAlignment="Stretch">
+                <ContentPresenter ContentTemplate="{StaticResource OnScreenKeyboard}" Content="{Binding}" />
+            </materialDesign:PopupEx>
+            <materialDesign:PopupEx
+                x:Name="KeyboardArrowBlockPopup"
+                PlacementTarget="{Binding ElementName=KeyboardArrowBlockPopupToggle}"
+                Placement="Top"
+                StaysOpen="False"
+                IsOpen="{Binding ElementName=KeyboardArrowBlockPopupToggle, Path=IsChecked}"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch">
+                <ContentPresenter ContentTemplate="{StaticResource OnScreenKeyboardArrowsAndNumpadBlock}" Content="{Binding}" />
+            </materialDesign:PopupEx>
+            <materialDesign:PopupEx
+                x:Name="KeyboardSpecialsBlockPopup"
+                PlacementTarget="{Binding ElementName=KeyboardArrowBlockPopupToggle}"
+                Placement="Top"
+                StaysOpen="False"
+                IsOpen="{Binding ElementName=KeyboardSpecialsBlockPopupToggle, Path=IsChecked}"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch">
+                <ContentPresenter ContentTemplate="{StaticResource OnScreenKeyboardSpecialsBlock}" Content="{Binding}" />
+            </materialDesign:PopupEx>
         </st:StackPanel>
-
+        
         <DataTemplate.Triggers>
-            <DataTrigger Binding="{Binding IsRecording}" Value="True">
-                <Setter TargetName="StopRecordingButton" Property="Visibility" Value="Visible" />
-                <Setter TargetName="AddItemButton" Property="Visibility" Value="Collapsed" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding IsRecording}" Value="False">
-                <Setter TargetName="StopRecordingButton" Property="Visibility" Value="Collapsed" />
-                <Setter TargetName="AddItemButton" Property="Visibility" Value="Visible" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding MaxDurationExceeded}" Value="True">
+            <DataTrigger
+                Binding="{Binding MaxDurationExceeded}"
+                Value="True">
                 <Setter TargetName="DurationLabel" Property="Foreground" Value="{StaticResource NegativeBrush}" />
                 <Setter TargetName="DurationLabel" Property="FontWeight" Value="Bold" />
             </DataTrigger>
         </DataTemplate.Triggers>
     </DataTemplate>
 
-    <hotkeys:HotkeySequenceEditorItemVisibilityConverter x:Key="HotkeySequenceEditorItemVisibilityConverter" />
-
-    <Style TargetType="{x:Type hotkeys:HotkeySequenceEditor}">
+    <Style x:Key="DefaultHotkeySequenceEditorStyle" TargetType="{x:Type hotkeys:HotkeySequenceEditor}">
+        <Style.Resources>
+            <Style TargetType="{x:Type CheckBox}" BasedOn="{StaticResource HotkeySequenceCheckBoxStyle}" />
+        </Style.Resources>
         <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
         <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Disabled" />
         <Setter Property="Background" Value="Transparent" />
@@ -338,71 +159,78 @@
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="VerticalAlignment" Value="Top" />
         <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="Focusable" Value="False" />
+        <Setter Property="dd:DragDrop.DropHandler" Value="{Binding DropTarget, RelativeSource={RelativeSource Self}}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type hotkeys:HotkeySequenceEditor}">
-                    <ListView
-                        x:Name="PART_ListBox"
-                        Background="{TemplateBinding Background}"
-                        BorderBrush="{TemplateBinding BorderBrush}"
-                        BorderThickness="{TemplateBinding BorderThickness}"
-                        dd:DragDrop.DropHandler="{x:Static ui:DropHandlerEx.Instance}"
-                        ScrollViewer.VerticalScrollBarVisibility="{TemplateBinding ScrollViewer.VerticalScrollBarVisibility}"
-                        ScrollViewer.HorizontalScrollBarVisibility="{TemplateBinding ScrollViewer.HorizontalScrollBarVisibility}"
-                        HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
-                        VerticalAlignment="{TemplateBinding VerticalAlignment}"
-                        dd:DragDrop.IsDragSource="True"
-                        dd:DragDrop.IsDropTarget="True"
-                        dd:DragDrop.UseDefaultDragAdorner="True"
-                        dd:DragDrop.UseDefaultEffectDataTemplate="True"
-                        HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
-                        <ListView.Style>
-                            <Style TargetType="{x:Type ListView}" />
-                        </ListView.Style>
-                        <ListView.ItemsSource>
-                            <MultiBinding Converter="{StaticResource CompositeCollectionConverter}">
-                                <Binding RelativeSource="{RelativeSource TemplatedParent}" Path="ItemsSource" />
-                                <Binding RelativeSource="{RelativeSource TemplatedParent}" Path="Actions" />
-                            </MultiBinding>
-                        </ListView.ItemsSource>
-                        <ListView.ItemContainerStyle>
-                            <Style TargetType="{x:Type ListViewItem}">
-                                <Setter Property="OverridesDefaultStyle" Value="True" />
-                                <Setter Property="dd:DragDrop.DragSourceIgnore" Value="{Binding IsDragDropSource, Converter={StaticResource NotConverter}}" />
-                                <Setter Property="Height" Value="64" />
-                                <Setter Property="MinWidth" Value="36" />
-                                <Setter Property="Padding" Value="0" />
-                                <Setter Property="Margin" Value="10,0" />
-                                <Setter Property="Visibility">
-                                    <Setter.Value>
-                                        <MultiBinding Converter="{StaticResource HotkeySequenceEditorItemVisibilityConverter}">
-                                            <Binding Path="IsKeypress" />
-                                            <Binding Path="HideKeypressDelays" RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type hotkeys:HotkeySequenceEditor}}" />
-                                        </MultiBinding>
-                                    </Setter.Value>
-                                </Setter>
-                                <Setter Property="Template">
-                                    <Setter.Value>
-                                        <ControlTemplate TargetType="{x:Type ListViewItem}">
-                                            <Border Name="Bd"
-                                                    Margin="{TemplateBinding Padding}">
-                                                <ContentPresenter />
-                                            </Border>
-                                        </ControlTemplate>
-                                    </Setter.Value>
-                                </Setter>
-                            </Style>
-                        </ListView.ItemContainerStyle>
-                        <ListView.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <WrapPanel HorizontalAlignment="Left" />
-                            </ItemsPanelTemplate>
-                        </ListView.ItemsPanel>
-                    </ListView>
+                    <st:StackPanel MarginBetweenChildren="10">
+                        <ContentControl Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type hotkeys:HotkeySequenceEditor}}, Path=Actions}"/>
+                        <ListView
+                            x:Name="PART_ListBox"
+                            Focusable="{TemplateBinding Focusable}"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            ScrollViewer.VerticalScrollBarVisibility="{TemplateBinding ScrollViewer.VerticalScrollBarVisibility}"
+                            ScrollViewer.HorizontalScrollBarVisibility="{TemplateBinding ScrollViewer.HorizontalScrollBarVisibility}"
+                            HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
+                            VerticalAlignment="{TemplateBinding VerticalAlignment}"
+                            dd:DragDrop.DropHandler="{TemplateBinding DropTarget}"
+                            dd:DragDrop.IsDragSource="True"
+                            dd:DragDrop.IsDropTarget="True"
+                            dd:DragDrop.UseDefaultDragAdorner="True"
+                            dd:DragDrop.UseDefaultEffectDataTemplate="True"
+                            dd:DragDrop.DragDropCopyKeyState="ControlKey"
+                            HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"
+                            ItemsSource="{TemplateBinding CollectionView}">
+                            <ListView.ItemTemplateSelector>
+                                <ui:PlaceholderTemplateSelector
+                                    PlaceholderTemplate="{StaticResource HotkeySequenceActionsTemplate}" />
+                            </ListView.ItemTemplateSelector>
+                            <ListView.Style>
+                                <Style TargetType="{x:Type ListView}" />
+                            </ListView.Style>
+                            <ListView.ItemContainerStyle>
+                                <Style TargetType="{x:Type ListViewItem}">
+                                    <Setter Property="OverridesDefaultStyle" Value="True" />
+                                    <Setter Property="Height" Value="64" />
+                                    <Setter Property="MinWidth" Value="36" />
+                                    <Setter Property="Padding" Value="0" />
+                                    <Setter Property="Margin" Value="10,0" />
+                                    <Setter Property="Visibility">
+                                        <Setter.Value>
+                                            <MultiBinding Converter="{StaticResource HotkeySequenceEditorItemVisibilityConverter}">
+                                                <Binding Path="IsKeypress" />
+                                                <Binding Path="HideKeypressDelays"
+                                                         RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type hotkeys:HotkeySequenceEditor}}" />
+                                            </MultiBinding>
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="{x:Type ListViewItem}">
+                                                <Border Name="Bd"
+                                                        Margin="{TemplateBinding Padding}">
+                                                    <ContentPresenter />
+                                                </Border>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </ListView.ItemContainerStyle>
+                            <ListView.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel HorizontalAlignment="Left" />
+                                </ItemsPanelTemplate>
+                            </ListView.ItemsPanel>
+                        </ListView>
+                    </st:StackPanel>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
         <Setter Property="Validation.ErrorTemplate" Value="{DynamicResource ValidationErrorTemplate}" />
     </Style>
 
+    <Style TargetType="{x:Type hotkeys:HotkeySequenceEditor}" BasedOn="{StaticResource DefaultHotkeySequenceEditorStyle}" />
 </ui:SharedResourceDictionary>

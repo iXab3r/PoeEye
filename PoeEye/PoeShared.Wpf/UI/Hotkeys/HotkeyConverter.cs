@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Windows.Forms;
 using System.Windows.Input;
 using log4net;
 using PoeShared.Scaffolding;
@@ -12,6 +13,7 @@ namespace PoeShared.UI.Hotkeys
 {
     internal sealed class HotkeyConverter : System.ComponentModel.TypeConverter, IHotkeyConverter
     {
+        public static readonly HotkeyConverter Instance = new();
         private static readonly HotkeyGesture NoneHotkey = new HotkeyGesture(Key.None);
         private static readonly string NoneHotkeyName = NoneHotkey.ToString();
 
@@ -95,12 +97,14 @@ namespace PoeShared.UI.Hotkeys
             knownSpecialKeysByName["+"] = Key.OemPlus;
             knownSpecialKeysByName["="] = Key.OemPlus;
             knownSpecialKeysByName["-"] = Key.OemMinus;
-            knownSpecialKeysByName["/"] = Key.Divide;
             knownSpecialKeysByName["`"] = Key.OemTilde;
-            knownSpecialKeysByName["ENTER"] = Key.Return;
             knownSpecialKeysByName["Num *"] = Key.Multiply;
             knownSpecialKeysByName["Num +"] = Key.Add;
             knownSpecialKeysByName["Num -"] = Key.Subtract;
+            knownSpecialKeysByName["RETURN"] = Key.Return;
+            knownSpecialKeysByName["/"] = Key.Divide;
+            knownSpecialKeysByName["Num /"] = Key.Divide;
+            Enumerable.Range(0, 10).ForEach(x => knownSpecialKeysByName[x.ToString()] = Key.D0 + x);
             knownSpecialKeysByName.ForEach(x => knownSpecialKeys[x.Value] = x.Key);
         }
 

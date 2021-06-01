@@ -60,12 +60,44 @@ namespace PoeShared.Tests.WPF.Hotkeys
             result.ShouldBe(hotkey);
         }
 
+        [TestCase(Key.None, ModifierKeys.None, "None")]
+        [TestCase(Key.OemPlus, ModifierKeys.None, "=")]
+        [TestCase(Key.OemMinus, ModifierKeys.None, "-")]
+        [TestCase(Key.Multiply, ModifierKeys.None, "Num *")]
+        [TestCase(Key.Add, ModifierKeys.None, "Num +")]
+        [TestCase(Key.Subtract, ModifierKeys.None, "Num -")]
+        [TestCase(Key.Divide, ModifierKeys.None, "Num /")]
+        [TestCase(Key.Decimal, ModifierKeys.None, "Decimal")]
+        [TestCase(Key.Return, ModifierKeys.None, "RETURN")]
+        [TestCase(Key.D0, ModifierKeys.None, "0")]
+        [TestCase(Key.D9, ModifierKeys.None, "9")]
+        [TestCase(Key.A, ModifierKeys.None, "A")]
+        [TestCase(Key.Z, ModifierKeys.None, "Z")]
+        [TestCase(Key.A, ModifierKeys.Control, "CONTROL+A")]
+        [TestCase(Key.A, ModifierKeys.Control | ModifierKeys.Shift | ModifierKeys.Alt | ModifierKeys.Windows, "ALT+CONTROL+SHIFT+WINDOWS+A")]
+        public void ShouldSerializeKeyboard(Key key, ModifierKeys modifierKeys, string expected)
+        {
+            // Given
+            var instance = CreateInstance();
+            var hotkey = new HotkeyGesture(key, modifierKeys);
+
+            // When
+            var result = instance.ConvertToString(hotkey);
+
+            // Then
+            result.ShouldNotBeNull();
+            result.ShouldBe(expected);
+        }
+
         [TestCase(Key.None, ModifierKeys.None)]
         [TestCase(Key.OemPlus, ModifierKeys.None)]
         [TestCase(Key.OemMinus, ModifierKeys.None)]
         [TestCase(Key.Divide, ModifierKeys.None)]
         [TestCase(Key.Multiply, ModifierKeys.None)]
+        [TestCase(Key.D0, ModifierKeys.None)]
+        [TestCase(Key.D9, ModifierKeys.None)]
         [TestCase(Key.A, ModifierKeys.None)]
+        [TestCase(Key.Z, ModifierKeys.None)]
         [TestCase(Key.A, ModifierKeys.Control)]
         [TestCase(Key.A, ModifierKeys.Control | ModifierKeys.Shift | ModifierKeys.Alt | ModifierKeys.Windows)]
         public void ShouldSerializeKeyboard(Key key, ModifierKeys modifierKeys)
@@ -96,6 +128,9 @@ namespace PoeShared.Tests.WPF.Hotkeys
         [TestCase("*", Key.Multiply, ModifierKeys.None)]
         [TestCase("+", Key.OemPlus, ModifierKeys.None)]
         [TestCase("Ctrl+-", Key.OemMinus, ModifierKeys.Control)]
+        [TestCase("D0", Key.D0, ModifierKeys.None)]
+        [TestCase("D9", Key.D9, ModifierKeys.None)]
+        [TestCase("9", Key.D9, ModifierKeys.None)]
         [TestCase("Num -", Key.Subtract, ModifierKeys.None)]
         [TestCase("Num +", Key.Add, ModifierKeys.None)]
         [TestCase("Num *", Key.Multiply, ModifierKeys.None)]

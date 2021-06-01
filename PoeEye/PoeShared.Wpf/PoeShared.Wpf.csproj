@@ -91,5 +91,22 @@
     <Compile Update="UI\Hotkeys\HotkeySequenceEditorItemVisibilityConverter.cs">
       <DependentUpon>HotkeySequenceEditor.xaml</DependentUpon>
     </Compile>
+    <Compile Update="UI\Hotkeys\HotkeyDropHandler.cs">
+      <DependentUpon>HotkeySequenceEditor.xaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="UI\Hotkeys\HotkeySequenceEditor.Defaults.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <DependentUpon>HotkeySequenceEditor.xaml</DependentUpon>
+    </Page>
+    <Page Update="UI\Hotkeys\HotkeySequenceEditor.Osd.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <DependentUpon>HotkeySequenceEditor.xaml</DependentUpon>
+    </Page>
+    <Page Update="UI\Hotkeys\HotkeySequenceEditor.Items.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <DependentUpon>HotkeySequenceEditor.xaml</DependentUpon>
+    </Page>
   </ItemGroup>
 </Project>

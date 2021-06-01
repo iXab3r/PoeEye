@@ -9,7 +9,7 @@ using PoeShared.Scaffolding;
 
 namespace PoeShared.UI.Hotkeys
 {
-    public class HotkeyGesture : IEquatable<HotkeyGesture>
+    public sealed record HotkeyGesture
     {
         public static readonly HotkeyGesture Empty = new();
         public const char ModifiersDelimiter = '+';
@@ -113,13 +113,13 @@ namespace PoeShared.UI.Hotkeys
             MouseWheel = mouseWheel;
         }
 
-        public MouseButton? MouseButton { get; }
+        public MouseButton? MouseButton { get; init; }
 
-        public Key Key { get; }
+        public Key Key { get; init;}
 
-        public ModifierKeys ModifierKeys { get; }
+        public ModifierKeys ModifierKeys { get; init;}
         
-        public MouseWheelAction MouseWheel { get; }
+        public MouseWheelAction MouseWheel { get; init;}
         
         public bool IsKeyboard => Key != Key.None;
         
@@ -130,21 +130,6 @@ namespace PoeShared.UI.Hotkeys
         public bool IsMouse => IsMouseButton || IsMouseWheel;
         
         public bool IsEmpty => MouseButton == null && Key == Key.None && ModifierKeys == ModifierKeys.None && MouseWheel == MouseWheelAction.None;
-
-        public bool Equals(HotkeyGesture other)
-        {
-            if (ReferenceEquals(null, other))
-            {
-                return false;
-            }
-
-            if (ReferenceEquals(this, other))
-            {
-                return true;
-            }
-
-            return MouseButton == other.MouseButton && Key == other.Key && ModifierKeys == other.ModifierKeys && MouseWheel == other.MouseWheel;
-        }
 
         public override string ToString()
         {
@@ -227,37 +212,6 @@ namespace PoeShared.UI.Hotkeys
 
             var resultLength = UnsafeNative.GetKeyNameText(scanCode, sb, 256);
             return resultLength > 0 ? sb.ToString() : null;
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj))
-            {
-                return false;
-            }
-
-            if (ReferenceEquals(this, obj))
-            {
-                return true;
-            }
-
-            if (obj.GetType() != GetType())
-            {
-                return false;
-            }
-
-            return Equals((HotkeyGesture) obj);
-        }
-
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                var hashCode = MouseButton?.GetHashCode() ?? 0;
-                hashCode = (hashCode * 397) ^ (int) Key;
-                hashCode = (hashCode * 397) ^ (int) ModifierKeys;
-                return hashCode;
-            }
         }
     }
 }

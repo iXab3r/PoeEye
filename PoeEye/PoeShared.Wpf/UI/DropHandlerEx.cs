@@ -37,15 +37,19 @@ namespace PoeShared.UI
 
         public override void Drop(IDropInfo dropInfo)
         {
-            Console.WriteLine($"{new { dropInfo.VisualTarget, dropInfo.TargetItem, dropInfo.VisualTargetItem, dropInfo.InsertPosition, dropInfo.TargetCollection, dropInfo.InsertIndex }}");
             var targetList = FindList(dropInfo.TargetCollection);
             var sourceList = FindList(dropInfo.DragInfo.SourceCollection);
-            if (sourceList == null || targetList == null || !ReferenceEquals(targetList, sourceList))
+            if (targetList == null)
             {
                 return;
             }
 
-            if (dropInfo.InsertIndex > targetList.Count)
+            if (sourceList == null && dropInfo.Effects.HasFlag(DragDropEffects.Move))
+            {
+                return;
+            }
+
+            if (dropInfo.InsertIndex < 0 || dropInfo.InsertIndex -1 > targetList.Count)
             {
                 return;
             }
@@ -78,7 +82,10 @@ namespace PoeShared.UI
             }
 
             var destinationList = FindList(dropInfo.TargetCollection);
-            var data = ExtractData(dropInfo.Data).OfType<object>().ToList();
+            var data = ExtractData(dropInfo.Data)
+                .OfType<object>()
+                .SelectMany(x => (x is IEnumerable enumerable) ? enumerable.OfType<object>() : new[] { x })
+                .ToList();
 
             if (!ShouldCopyData(dropInfo))
             {

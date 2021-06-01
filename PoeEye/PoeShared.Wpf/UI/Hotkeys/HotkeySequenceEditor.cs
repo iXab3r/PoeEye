@@ -1,11 +1,17 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Reactive.Linq;
-using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Forms;
 using System.Windows.Input;
+using GongSolutions.Wpf.DragDrop.Utilities;
+using Microsoft.VisualBasic;
 using PoeShared.Scaffolding;
+using IDropTarget = GongSolutions.Wpf.DragDrop.IDropTarget;
+using KeyEventArgs = System.Windows.Input.KeyEventArgs;
+using ListBox = System.Windows.Controls.ListBox;
 
 namespace PoeShared.UI.Hotkeys
 {
@@ -16,6 +22,18 @@ namespace PoeShared.UI.Hotkeys
         public HotkeySequenceEditor()
         {
             Actions = new HotkeySequenceActions(this);
+            DropTarget = new HotkeyDropHandler(this);
+
+            this.Observe(ItemsSourceProperty)
+                .Select(x => ItemsSource)
+                .Select(x => x != null
+                    ? new ListCollectionView(x)
+                    {
+                        NewItemPlaceholderPosition = NewItemPlaceholderPosition.AtEnd
+                    }
+                    : new ListCollectionView(new Collection()))
+                .Subscribe(x => CollectionView = x)
+                .AddTo(Anchors);
         }
 
         public override void OnApplyTemplate()
@@ -38,11 +56,11 @@ namespace PoeShared.UI.Hotkeys
 
         private void ListBoxOnKeyDown(object sender, KeyEventArgs e)
         {
-            var selectedItems = listBox.SelectedItems.OfType<HotkeySequenceItem>().ToArray();
-            var itemsSource = (IList)ItemsSource;
-            if (selectedItems.Any())
+            if (e.Key == Key.Delete)
             {
-                if (e.Key == Key.Delete)
+                var selectedItems = listBox.SelectedItems.OfType<HotkeySequenceItem>().ToArray();
+                var itemsSource = ItemsSource;
+                if (selectedItems.Any())
                 {
                     selectedItems.ForEach(itemsSource.Remove);
                     e.Handled = true;

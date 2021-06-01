@@ -1,11 +1,13 @@
-﻿using System.Reactive.Linq;
+﻿using System;
 using PoeShared.Scaffolding;
-using ReactiveUI;
 
 namespace PoeShared.UI.Hotkeys
 {
-    public abstract class HotkeySequenceItem : DisposableReactiveObject
+    public abstract class HotkeySequenceItem : ICloneable
     {
-        public virtual bool IsDragDropSource { get; } = true;
+        public object Clone()
+        {
+            return this.CloneJson();
+        }
     }
 }

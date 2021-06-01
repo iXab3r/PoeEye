@@ -3,7 +3,6 @@
                     xmlns:blue="http://www.nuget.org/Blue.MVVM"
                     xmlns:eyeConverters="clr-namespace:PoeShared.Converters"
                     xmlns:kent="http://schemas.kent.boogaart.com/converters"
-                    xmlns:global="clr-namespace:"
                     xmlns:system="clr-namespace:System;assembly=mscorlib"
                     xmlns:ui="clr-namespace:PoeShared.UI">
     
@@ -29,6 +28,7 @@
     <eyeConverters:StaticResourceConverter x:Key="StaticResourceConverter" ThrowWhenNotFound="True" />
     <eyeConverters:CompositeCollectionConverter x:Key="CompositeCollectionConverter"/>
     <eyeConverters:MultilineToSinglelineConverter x:Key="MultilineToSinglelineConverter"/>
+    <eyeConverters:KeyToStringConverter x:Key="KeyToStringConverter"/>
     
     <eyeConverters:NullToBoolConverter x:Key="IsNullOrEmptyConverter" NullValue="True" />
     <eyeConverters:NullToBoolConverter x:Key="IsNotNullOrEmptyConverter" NullValue="False" />

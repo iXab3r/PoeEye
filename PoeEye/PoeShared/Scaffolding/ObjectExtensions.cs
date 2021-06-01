@@ -103,6 +103,15 @@ namespace PoeShared.Scaffolding
             return instance;
         }
         
+        public static TItem InsertTo<TItem, TCollection>(this TItem instance, IList<TCollection> collection, int index) where TItem : TCollection
+        {
+            Guard.ArgumentNotNull(instance, nameof(instance));
+            Guard.ArgumentNotNull(collection, nameof(collection));
+
+            collection.Insert(index, instance);
+            return instance;
+        }
+        
         public static IEnumerable<PropertyInfo> GetAllProperties(this Type type, BindingFlags flags)
         {
             if (!type.IsInterface)

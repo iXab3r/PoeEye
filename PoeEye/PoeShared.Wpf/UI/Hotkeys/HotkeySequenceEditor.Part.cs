@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
+using GongSolutions.Wpf.DragDrop;
 using PoeShared.Native;
 using PoeShared.Scaffolding;
 
@@ -17,7 +19,10 @@ namespace PoeShared.UI.Hotkeys
             "KeyboardEventsSource", typeof(IKeyboardEventsSource), typeof(HotkeySequenceEditor), new PropertyMetadata(default(IKeyboardEventsSource)));
 
         public static readonly DependencyProperty ItemsSourceProperty = DependencyProperty.Register(
-            "ItemsSource", typeof(IEnumerable), typeof(HotkeySequenceEditor), new PropertyMetadata(new ObservableCollection<HotkeySequenceItem>()));
+            "ItemsSource", typeof(IList), typeof(HotkeySequenceEditor), new PropertyMetadata(new ObservableCollection<HotkeySequenceItem>()));
+
+        internal static readonly DependencyProperty CollectionViewProperty = DependencyProperty.Register(
+            "CollectionView", typeof(ListCollectionView), typeof(HotkeySequenceEditor), new PropertyMetadata(default(ListCollectionView)));
 
         public static readonly DependencyProperty HideKeypressDelaysProperty = DependencyProperty.Register(
             "HideKeypressDelays", typeof(bool), typeof(HotkeySequenceEditor), new PropertyMetadata(default(bool)));
@@ -39,6 +44,15 @@ namespace PoeShared.UI.Hotkeys
         
         public static readonly DependencyProperty EnableMouseClicksRecordingProperty = DependencyProperty.Register(
             "EnableMouseClicksRecording", typeof(bool), typeof(HotkeySequenceEditor), new PropertyMetadata(true));
+        
+        public static readonly DependencyProperty DefaultKeyPressDurationProperty = DependencyProperty.Register(
+            "DefaultKeyPressDuration", typeof(TimeSpan), typeof(HotkeySequenceEditor), new PropertyMetadata(TimeSpan.FromMilliseconds(50)));
+
+        internal static readonly DependencyProperty ActionsProperty = DependencyProperty.Register(
+            "Actions", typeof(HotkeySequenceActions), typeof(HotkeySequenceEditor), new PropertyMetadata(default(HotkeySequenceActions)));
+
+        internal static readonly DependencyProperty DropTargetProperty = DependencyProperty.Register(
+            "DropTarget", typeof(IDropTarget), typeof(HotkeySequenceEditor), new PropertyMetadata(default(IDropTarget)));
         
         public bool HideKeypressDelays
         {
@@ -74,15 +88,22 @@ namespace PoeShared.UI.Hotkeys
             get { return (TimeSpan) GetValue(MaxRecordingDurationProperty); }
             set { SetValue(MaxRecordingDurationProperty, value); }
         }
+
+        public TimeSpan DefaultKeyPressDuration
+        {
+            get { return (TimeSpan) GetValue(DefaultKeyPressDurationProperty); }
+            set { SetValue(DefaultKeyPressDurationProperty, value); }
+        }
+        
         public TimeSpan MousePositionRecordingResolution
         {
             get { return (TimeSpan) GetValue(MousePositionRecordingResolutionProperty); }
             set { SetValue(MousePositionRecordingResolutionProperty, value); }
         }
         
-        public IEnumerable ItemsSource
+        public IList ItemsSource
         {
-            get { return (IEnumerable) GetValue(ItemsSourceProperty); }
+            get { return (IList) GetValue(ItemsSourceProperty); }
             set { SetValue(ItemsSourceProperty, value); }
         }
 
@@ -91,14 +112,23 @@ namespace PoeShared.UI.Hotkeys
             get { return (IKeyboardEventsSource) GetValue(KeyboardEventsSourceProperty); }
             set { SetValue(KeyboardEventsSourceProperty, value); }
         }
-
-        internal static readonly DependencyProperty ActionsProperty = DependencyProperty.Register(
-            "Actions", typeof(HotkeySequenceActions), typeof(HotkeySequenceEditor), new PropertyMetadata(default(HotkeySequenceActions)));
+        
+        internal ListCollectionView CollectionView
+        {
+            get { return (ListCollectionView) GetValue(CollectionViewProperty); }
+            set { SetValue(CollectionViewProperty, value); }
+        }
 
         internal HotkeySequenceActions Actions
         {
             get { return (HotkeySequenceActions) GetValue(ActionsProperty); }
             private set { SetValue(ActionsProperty, value); }
+        }
+
+        internal IDropTarget DropTarget
+        {
+            get { return (IDropTarget) GetValue(DropTargetProperty); }
+            private set { SetValue(DropTargetProperty, value); }
         }
         
         static HotkeySequenceEditor()
