@@ -40,7 +40,7 @@
                             Value="{Binding ElementName=SequenceEditor, Path=MousePositionRecordingResolution, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource TimeSpanToMillisecondsConverter}}"/>
                     </st:AutoGrid>
                     
-                    <hotkeys:HotkeySequenceEditor Background="#303030" x:Name="SequenceEditor"
+                    <hotkeys:HotkeySequenceEditor Background="#303030" x:Name="SequenceEditor" Margin="10"
                                                   KeyboardEventsSource="{Binding EventsSource}"/>
                 </st:StackPanel>
             </TabItem>

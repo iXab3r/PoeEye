@@ -13,6 +13,7 @@
 
     <DataTemplate DataType="{x:Type hotkeys:HotkeySequenceActions}">
         <st:StackPanel MarginBetweenChildren="5" Orientation="Horizontal">
+            <Image Source="pack://application:,,,/PoeShared.Wpf;component/Resources/DragDropWhite.png" ToolTip="Drag and drop items" Height="32" Width="32"/>
             <ui:ButtonEx
                 Command="{Binding StartRecording}"
                 Style="{StaticResource HotkeySequenceEditorButtonStyle}"
@@ -200,7 +201,7 @@
                                     <Setter Property="Height" Value="64" />
                                     <Setter Property="MinWidth" Value="36" />
                                     <Setter Property="Padding" Value="0" />
-                                    <Setter Property="Margin" Value="10,0" />
+                                    <Setter Property="Margin" Value="0,0, 10, 0" />
                                     <Setter Property="Visibility">
                                         <Setter.Value>
                                             <MultiBinding Converter="{StaticResource HotkeySequenceEditorItemVisibilityConverter}">

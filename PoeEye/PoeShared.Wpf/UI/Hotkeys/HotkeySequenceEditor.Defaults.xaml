@@ -29,6 +29,7 @@
     <Style x:Key="HotkeySequenceCheckBoxStyle" TargetType="{x:Type CheckBox}">
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="VerticalAlignment" Value="Stretch" />
+        <Setter Property="Cursor" Value="Hand" />
         <Setter Property="Focusable" Value="False" />
         <Setter Property="Padding" Value="10,0" />
         <Setter Property="Template">

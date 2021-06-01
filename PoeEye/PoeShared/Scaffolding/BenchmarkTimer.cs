@@ -29,6 +29,7 @@ namespace PoeShared.Scaffolding
             this.logger = logger ?? DefaultLogger;
             this.propertyName = propertyName ?? "unknown";
             sw = Stopwatch.StartNew();
+            Step("Starting operation");
         }
         
         public TimeSpan Elapsed => sw.Elapsed;
