@@ -19,29 +19,32 @@
                     <st:AutoGrid Columns="150,Auto" Rows="*" ChildMargin="5">
                         
                         <TextBlock Text="Hide keypress delays"/>
-                        <CheckBox  IsChecked="{Binding ElementName=SequenceEditor, Path=HideKeypressDelays}"></CheckBox>
+                        <CheckBox  IsChecked="{Binding HotkeySequenceEditor.HideKeypressDelays}"></CheckBox>
                         <TextBlock Text="Mouse position recording"/>
-                        <CheckBox IsChecked="{Binding ElementName=SequenceEditor, Path=EnableMousePositionRecording}"></CheckBox>
-                        
+                        <CheckBox IsChecked="{Binding HotkeySequenceEditor.EnableMousePositionRecording}"></CheckBox>
+                        <TextBlock Text="Mouse clicks recording"/>
+                        <CheckBox IsChecked="{Binding HotkeySequenceEditor.EnableMouseClicksRecording}"></CheckBox>
+                        <TextBlock Text="Key clicks recording"/>
+                        <CheckBox IsChecked="{Binding HotkeySequenceEditor.EnableKeyboardRecording}"></CheckBox>
+
                         <TextBlock Text="Total duration"/>
                         <TextBlock Text=""/>
 
                         <TextBlock Text="Item count"/>
-                        <TextBlock Text="{Binding ElementName=SequenceEditor, Path=ItemsSource.Count}"/>
+                        <TextBlock Text="{Binding HotkeySequenceEditor.Items.Count}"/>
                         
-                        <TextBlock Text="MaxRecordingDuration"/>
+                        <TextBlock Text="MaxDuration"/>
                         <mah:NumericUpDown 
                             Interval="1000"
-                            Value="{Binding ElementName=SequenceEditor, Path=MaxRecordingDuration, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource TimeSpanToMillisecondsConverter}}"/>
+                            Value="{Binding HotkeySequenceEditor.MaxDuration, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource TimeSpanToMillisecondsConverter}}"/>
                         
                         <TextBlock Text="MousePositionRecordingResolution"/>
                         <mah:NumericUpDown 
                             Interval="100"
-                            Value="{Binding ElementName=SequenceEditor, Path=MousePositionRecordingResolution, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource TimeSpanToMillisecondsConverter}}"/>
+                            Value="{Binding HotkeySequenceEditor.MousePositionRecordingResolution, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource TimeSpanToMillisecondsConverter}}"/>
                     </st:AutoGrid>
                     
-                    <hotkeys:HotkeySequenceEditor Background="#303030" x:Name="SequenceEditor" Margin="10"
-                                                  KeyboardEventsSource="{Binding EventsSource}"/>
+                    <ContentControl Content="{Binding HotkeySequenceEditor}" Margin="10"></ContentControl>
                 </st:StackPanel>
             </TabItem>
             <TabItem Header="ButtonEx">

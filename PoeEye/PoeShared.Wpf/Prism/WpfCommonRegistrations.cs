@@ -70,6 +70,7 @@ namespace PoeShared.Prism
                 .RegisterType<IHotkeyTracker, HotkeyTracker>()
                 .RegisterType<IGenericSettingsViewModel, GenericSettingsViewModel>()
                 .RegisterType<IRandomPeriodSelector, RandomPeriodSelector>()
+                .RegisterType<IHotkeySequenceEditorViewModel, HotkeySequenceEditorViewModel>()
                 .RegisterType<IAudioNotificationSelectorViewModel, AudioNotificationSelectorViewModel>();
         }
     }

@@ -16,6 +16,7 @@ using MahApps.Metro.Controls;
 using PoeShared.Native;
 using PoeShared.Scaffolding;
 using PoeShared.Scaffolding.WPF;
+using PoeShared.UI.Hotkeys;
 
 namespace PoeShared.UI
 {
@@ -32,9 +33,9 @@ namespace PoeShared.UI
 
     internal sealed class MainWindowViewModel : DisposableReactiveObject
     {
-        public MainWindowViewModel(IKeyboardEventsSource eventsSource)
+        public MainWindowViewModel(IHotkeySequenceEditorViewModel hotkeySequenceEditor)
         {
-            EventsSource = eventsSource;
+            HotkeySequenceEditor = hotkeySequenceEditor;
             LongCommand = CommandWrapper.Create(async () =>
             {
                 await Task.Delay(3000);
@@ -47,7 +48,7 @@ namespace PoeShared.UI
             });
         }
         
-        public IKeyboardEventsSource EventsSource { get; }
+        public IHotkeySequenceEditorViewModel HotkeySequenceEditor { get; }
 
         public CommandWrapper LongCommand { get; }
         

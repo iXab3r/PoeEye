@@ -9,12 +9,12 @@ namespace PoeShared.UI.Hotkeys
     {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
-            if (values == null || values.Length != 2 || values[0] is not bool keyPress || values[1] is not bool hideKeyPress)
+            if (values == null || values.Length != 2 || values[0] is not HotkeySequenceDelay delay || values[1] is not bool hideKeyPress)
             {
                 return Visibility.Visible;
             }
             
-            return !keyPress || !hideKeyPress? Visibility.Visible : Visibility.Collapsed;
+            return !delay.IsKeypress || !hideKeyPress? Visibility.Visible : Visibility.Collapsed;
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)

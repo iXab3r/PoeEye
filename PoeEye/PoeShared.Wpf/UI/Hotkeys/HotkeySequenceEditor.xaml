@@ -4,16 +4,99 @@
                              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
                              xmlns:ui="clr-namespace:PoeShared.UI"
                              xmlns:dd="urn:gong-wpf-dragdrop"
-                             xmlns:st="http://schemas.spicytaco.io/">
+                             xmlns:st="http://schemas.spicytaco.io/"
+                             xmlns:eye="clr-namespace:PoeShared.Scaffolding"
+                             xmlns:b="http://schemas.microsoft.com/xaml/behaviors">
     <ui:SharedResourceDictionary.MergedDictionaries>
         <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/UI/Hotkeys/HotkeySequenceEditor.Defaults.xaml" />
         <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/UI/Hotkeys/HotkeySequenceEditor.Osd.xaml" />
         <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/UI/Hotkeys/HotkeySequenceEditor.Items.xaml" />
     </ui:SharedResourceDictionary.MergedDictionaries>
 
-    <DataTemplate DataType="{x:Type hotkeys:HotkeySequenceActions}">
+    <DataTemplate DataType="{x:Type hotkeys:HotkeySequenceEditorViewModel}" x:Key="HotkeySequenceActionsButton">
+        <st:StackPanel Fill="Fill" Orientation="Vertical" MarginBetweenChildren="2.5" VerticalAlignment="Center">
+            <Button
+                x:Name="StopRecordingButton"
+                Foreground="{StaticResource NegativeBrush}"
+                Width="32" Height="32"
+                BorderBrush="Transparent" BorderThickness="1"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch"
+                materialDesign:ButtonProgressAssist.IsIndicatorVisible="True"
+                materialDesign:ButtonProgressAssist.IsIndeterminate="False"
+                materialDesign:ButtonProgressAssist.Maximum="{Binding MaxDuration.TotalMilliseconds, Mode=OneWay}"
+                materialDesign:ButtonProgressAssist.Value="{Binding TotalDuration.TotalMilliseconds, Mode=OneWay}"
+                RenderTransformOrigin="0.5,0.5">
+                <Button.RenderTransform>
+                    <ScaleTransform CenterX="0.5" CenterY="0.5" />
+                </Button.RenderTransform>
+                <Button.Style>
+                    <Style TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialDesignFloatingActionButton}">
+                        <Style.Triggers>
+                            <Trigger Property="Visibility" Value="Visible">
+                                <Trigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard AutoReverse="True" RepeatBehavior="Forever">
+                                            <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)" From="0.9" To="1.1"
+                                                             Duration="00:00:00.5" />
+                                            <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)" From="0.9" To="1.1"
+                                                             Duration="00:00:00.5" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.EnterActions>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+                <Button.Content>
+                    <TextBlock x:Name="RecordingIcon" Style="{StaticResource IconTextBlock}" Text="&#xf04d;" FontSize="20" />
+                </Button.Content>
+                <b:Interaction.Triggers>
+                    <b:EventTrigger EventName="PreviewMouseLeftButtonDown">
+                        <b:InvokeCommandAction Command="{Binding StopRecording}" />
+                    </b:EventTrigger>
+                </b:Interaction.Triggers>
+            </Button>
+            <Button
+                x:Name="StartRecordingButton"
+                Height="32" Width="32"
+                materialDesign:ButtonProgressAssist.IsIndicatorVisible="True"
+                materialDesign:ButtonProgressAssist.IsIndeterminate="False"
+                materialDesign:ButtonProgressAssist.Maximum="{Binding MaxDuration.TotalMilliseconds, Mode=OneWay}"
+                materialDesign:ButtonProgressAssist.Value="{Binding TotalDuration.TotalMilliseconds, Mode=OneWay}"
+                Style="{StaticResource MaterialDesignFloatingActionButton}"
+                Command="{Binding StartRecording}"
+                Foreground="{StaticResource SequenceEditorTextForeground}"
+                BorderBrush="{StaticResource SequenceEditorAccent}" BorderThickness="1"
+                ToolTip="Start recording">
+                <Button.Content>
+                    <Ellipse Width="16" Height="16" Fill="{StaticResource NegativeBrush}" Stroke="{StaticResource SequenceEditorTextForeground}" />
+                </Button.Content>
+            </Button>
+        </st:StackPanel>
+
+        <DataTemplate.Triggers>
+            <DataTrigger Binding="{Binding IsRecording}" Value="True">
+                <Setter TargetName="StopRecordingButton" Property="Visibility" Value="Visible" />
+                <Setter TargetName="StartRecordingButton" Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding IsRecording}" Value="False">
+                <Setter TargetName="StopRecordingButton" Property="Visibility" Value="Collapsed" />
+                <Setter TargetName="StartRecordingButton" Property="Visibility" Value="Visible" />
+            </DataTrigger>
+        </DataTemplate.Triggers>
+    </DataTemplate>
+
+    <DataTemplate x:Key="HotkeySequenceActionsTemplate">
+        <ContentPresenter
+            dd:DragDrop.DragSourceIgnore="True"
+            ContentTemplate="{StaticResource HotkeySequenceActionsButton}"
+            Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type hotkeys:HotkeySequenceEditor}}, Path=ViewModel}" />
+    </DataTemplate>
+
+    <DataTemplate x:Key="HotkeySequenceEditorMenuTemplate" DataType="{x:Type hotkeys:HotkeySequenceEditorViewModel}">
         <st:StackPanel MarginBetweenChildren="5" Orientation="Horizontal">
-            <Image Source="pack://application:,,,/PoeShared.Wpf;component/Resources/DragDropWhite.png" ToolTip="Drag and drop items" Height="32" Width="32"/>
+            <Image Source="pack://application:,,,/PoeShared.Wpf;component/Resources/DragDropWhite.png" ToolTip="Drag and drop items" Height="32" Width="32" />
             <ui:ButtonEx
                 Command="{Binding StartRecording}"
                 Style="{StaticResource HotkeySequenceEditorButtonStyle}"
@@ -45,7 +128,7 @@
                 Style="{StaticResource HotkeySequenceEditorButtonStyle}"
                 Icon="&#xf017;" HorizontalAlignment="Left" CornerRadius="5"
                 dd:DragDrop.IsDragSource="True"
-                Foreground="{StaticResource SequenceEditorTextForeground}" 
+                Foreground="{StaticResource SequenceEditorTextForeground}"
                 Background="{StaticResource SequenceEditorDefaultBackground}">
                 DELAY
             </ui:ButtonEx>
@@ -55,7 +138,7 @@
                 dd:DragDrop.IsDragSource="True"
                 Style="{StaticResource HotkeySequenceEditorButtonStyle}"
                 Icon="&#xf040;" HorizontalAlignment="Left" CornerRadius="5"
-                Foreground="{StaticResource SequenceEditorTextForeground}" 
+                Foreground="{StaticResource SequenceEditorTextForeground}"
                 Background="{StaticResource SequenceEditorTextBackground}">
                 TEXT
             </ui:ButtonEx>
@@ -65,7 +148,7 @@
                 Style="{StaticResource HotkeySequenceEditorButtonStyle}"
                 HorizontalAlignment="Left" CornerRadius="5"
                 Icon="&#xf12d;"
-                Foreground="{StaticResource SequenceEditorTextForeground}" 
+                Foreground="{StaticResource SequenceEditorTextForeground}"
                 Background="{StaticResource SequenceEditorTextBackground}">
                 CLEAR
             </ui:ButtonEx>
@@ -152,7 +235,7 @@
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Stretch">
                 <ContentPresenter ContentTemplate="{StaticResource OnScreenKeyboardSpecialsBlock}" Content="{Binding}" />
-            </materialDesign:PopupEx>  
+            </materialDesign:PopupEx>
             <materialDesign:PopupEx
                 x:Name="KeyboardMouseBlockPopup"
                 PlacementTarget="{Binding ElementName=KeyboardMouseBlockPopupToggle}"
@@ -164,7 +247,7 @@
                 <ContentPresenter ContentTemplate="{StaticResource OnScreenKeyboardMouseBlock}" Content="{Binding}" />
             </materialDesign:PopupEx>
         </st:StackPanel>
-        
+
         <DataTemplate.Triggers>
             <DataTrigger
                 Binding="{Binding MaxDurationExceeded}"
@@ -192,7 +275,9 @@
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type hotkeys:HotkeySequenceEditor}">
                     <st:StackPanel MarginBetweenChildren="10">
-                        <ContentControl Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type hotkeys:HotkeySequenceEditor}}, Path=Actions}"/>
+                        <ContentControl
+                            ContentTemplate="{StaticResource HotkeySequenceEditorMenuTemplate}"
+                            Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type hotkeys:HotkeySequenceEditor}}, Path=ViewModel}" />
                         <ListView
                             x:Name="PART_ListBox"
                             Focusable="{TemplateBinding Focusable}"
@@ -211,19 +296,19 @@
                             dd:DragDrop.UseDefaultEffectDataTemplate="True"
                             dd:DragDrop.DragDropCopyKeyState="ControlKey"
                             HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"
-                            
+
                             ItemsSource="{TemplateBinding CollectionView}">
                             <ListView.ItemTemplateSelector>
                                 <ui:PlaceholderTemplateSelector
                                     PlaceholderTemplate="{StaticResource HotkeySequenceActionsTemplate}" />
                             </ListView.ItemTemplateSelector>
                             <ListView.Style>
-                                <Style TargetType="{x:Type ListView}"></Style>
+                                <Style TargetType="{x:Type ListView}" />
                             </ListView.Style>
                             <ListView.ItemContainerStyle>
                                 <Style TargetType="{x:Type ListViewItem}">
                                     <Setter Property="OverridesDefaultStyle" Value="True" />
-                                    <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+                                    <Setter Property="FocusVisualStyle" Value="{x:Null}" />
                                     <Setter Property="Height" Value="64" />
                                     <Setter Property="MinWidth" Value="36" />
                                     <Setter Property="Padding" Value="0" />
@@ -231,8 +316,8 @@
                                     <Setter Property="Visibility">
                                         <Setter.Value>
                                             <MultiBinding Converter="{StaticResource HotkeySequenceEditorItemVisibilityConverter}">
-                                                <Binding Path="IsKeypress" />
-                                                <Binding Path="HideKeypressDelays"
+                                                <Binding />
+                                                <Binding Path="ViewModel.HideKeypressDelays"
                                                          RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type hotkeys:HotkeySequenceEditor}}" />
                                             </MultiBinding>
                                         </Setter.Value>
@@ -263,4 +348,17 @@
     </Style>
 
     <Style TargetType="{x:Type hotkeys:HotkeySequenceEditor}" BasedOn="{StaticResource DefaultHotkeySequenceEditorStyle}" />
+    <DataTemplate DataType="{x:Type hotkeys:HotkeySequenceEditorViewModel}">
+        <Grid>
+            <hotkeys:HotkeySequenceEditor x:Name="HotkeySequenceEditor" ViewModel="{Binding}"/>
+        
+            <eye:DataPiping.DataPipes>
+                <eye:DataPipeCollection>
+                    <eye:DataPipe
+                        Source="{Binding ElementName=HotkeySequenceEditor}"
+                        Target="{Binding Owner, Mode=OneWayToSource}" />
+                </eye:DataPipeCollection>
+            </eye:DataPiping.DataPipes>
+        </Grid>
+    </DataTemplate>
 </ui:SharedResourceDictionary>

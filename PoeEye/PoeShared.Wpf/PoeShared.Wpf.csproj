@@ -84,9 +84,6 @@
     <Compile Update="UI\Hotkeys\HotkeySequenceItem.cs">
       <DependentUpon>HotkeySequenceEditor.xaml</DependentUpon>
     </Compile>
-    <Compile Update="UI\Hotkeys\HotkeySequenceActions.cs">
-      <DependentUpon>HotkeySequenceEditor.xaml</DependentUpon>
-    </Compile>
     <Compile Update="UI\Hotkeys\HotkeySequenceDelay.cs">
       <DependentUpon>HotkeySequenceEditor.xaml</DependentUpon>
     </Compile>
@@ -100,6 +97,12 @@
       <DependentUpon>HotkeySequenceEditor.xaml</DependentUpon>
     </Compile>
     <Compile Update="UI\Hotkeys\HotkeyDropHandler.cs">
+      <DependentUpon>HotkeySequenceEditor.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="UI\Hotkeys\IHotkeySequenceEditorViewModel.cs">
+      <DependentUpon>HotkeySequenceEditor.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="UI\Hotkeys\HotkeySequenceEditorViewModel.cs">
       <DependentUpon>HotkeySequenceEditor.xaml</DependentUpon>
     </Compile>
   </ItemGroup>

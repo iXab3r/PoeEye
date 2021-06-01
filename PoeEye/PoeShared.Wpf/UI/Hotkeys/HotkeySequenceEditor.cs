@@ -1,31 +1,30 @@
 ﻿using System;
-using System.Collections;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Windows.Data;
-using System.Windows.Forms;
 using System.Windows.Input;
-using GongSolutions.Wpf.DragDrop.Utilities;
 using Microsoft.VisualBasic;
 using PoeShared.Scaffolding;
-using IDropTarget = GongSolutions.Wpf.DragDrop.IDropTarget;
+using ReactiveUI;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using ListBox = System.Windows.Controls.ListBox;
 
 namespace PoeShared.UI.Hotkeys
 {
-    public partial class HotkeySequenceEditor
+    internal partial class HotkeySequenceEditor
     {
         private ListBox listBox;
 
         public HotkeySequenceEditor()
         {
-            Actions = new HotkeySequenceActions(this);
             DropTarget = new HotkeyDropHandler(this);
 
-            this.Observe(ItemsSourceProperty)
-                .Select(x => ItemsSource)
+            this.Observe(ViewModelProperty)
+                .Select(x => ViewModel)
+                .Select(x => x != null ? x.WhenAnyValue(y => y.Items) : Observable.Empty<ObservableCollection<HotkeySequenceItem>>())
+                .Switch()
                 .Select(x => x != null
                     ? new ListCollectionView(x)
                     {
@@ -59,10 +58,10 @@ namespace PoeShared.UI.Hotkeys
             if (e.Key == Key.Delete)
             {
                 var selectedItems = listBox.SelectedItems.OfType<HotkeySequenceItem>().ToArray();
-                var itemsSource = ItemsSource;
-                if (selectedItems.Any())
+                var itemsSource = ViewModel?.Items;
+                if (itemsSource != null && selectedItems.Any())
                 {
-                    selectedItems.ForEach(itemsSource.Remove);
+                    selectedItems.ForEach(x => itemsSource.Remove(x));
                     e.Handled = true;
                 }
             }

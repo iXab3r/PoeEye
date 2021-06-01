@@ -27,7 +27,7 @@
         <Setter Property="dd:DragDrop.UseDefaultEffectDataTemplate" Value="True" />
         <Setter Property="dd:DragDrop.DragDropCopyKeyState" Value="LeftMouseButton" />
         <Setter Property="Content" Value="{Binding RelativeSource={RelativeSource Self}, Path=CommandParameter, Converter={StaticResource KeyToStringConverter}}" />
-        <Setter Property="Command" Value="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type hotkeys:HotkeySequenceEditor}}, Path=Actions.AddItem}" />
+        <Setter Property="Command" Value="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type hotkeys:HotkeySequenceEditor}}, Path=ViewModel.AddItem}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type ui:ButtonEx}">

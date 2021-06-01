@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -22,7 +21,7 @@ namespace PoeShared.UI.Hotkeys
             if (dropInfo.DragInfo.VisualSource is Button button && button.CommandParameter != null)
             {
                 var dropIndex = GetIndex(dropInfo);
-                var itemsSource = owner.ItemsSource as ObservableCollection<HotkeySequenceItem> ?? throw new InvalidOperationException($"Owner's item source is not set or invalid: {owner.ItemsSource}");
+                var itemsSource = owner.ViewModel ?? throw new InvalidOperationException($"Owner's item source is not set or invalid: {owner.ViewModel}");
                 switch (button.CommandParameter)
                 {
                     case Key key:
@@ -30,39 +29,39 @@ namespace PoeShared.UI.Hotkeys
                         {
                             Hotkey = new HotkeyGesture(key),
                             IsDown = true
-                        }.InsertTo(itemsSource, dropIndex++);
+                        }.InsertTo(itemsSource.Items, dropIndex++);
                         new HotkeySequenceDelay
                         {
                             IsKeypress = true,
-                            Delay = TimeSpan.FromMilliseconds(50)
-                        }.InsertTo(itemsSource, dropIndex++);
+                            Delay = itemsSource.DefaultKeyPressDuration
+                        }.InsertTo(itemsSource.Items, dropIndex++);
                         new HotkeySequenceHotkey
                         {
                             Hotkey = new HotkeyGesture(key),
                             IsDown = false
-                        }.InsertTo(itemsSource,  dropIndex);
+                        }.InsertTo(itemsSource.Items,  dropIndex);
                         break;
                     case MouseButton mouseButton:
                         new HotkeySequenceHotkey
                         {
                             Hotkey = new HotkeyGesture(mouseButton),
                             IsDown = true
-                        }.InsertTo(itemsSource, dropIndex++);
+                        }.InsertTo(itemsSource.Items, dropIndex++);
                         new HotkeySequenceDelay
                         {
                             IsKeypress = true,
-                            Delay = TimeSpan.FromMilliseconds(50)
-                        }.InsertTo(itemsSource, dropIndex++);
+                            Delay = itemsSource.DefaultKeyPressDuration
+                        }.InsertTo(itemsSource.Items, dropIndex++);
                         new HotkeySequenceHotkey
                         {
                             Hotkey = new HotkeyGesture(mouseButton),
                             IsDown = false
-                        }.InsertTo(itemsSource,  dropIndex);
+                        }.InsertTo(itemsSource.Items,  dropIndex);
                         break;
                     case HotkeySequenceItem item:
                     {
                         var clone = item.Clone() as HotkeySequenceItem;
-                        clone.InsertTo(itemsSource, dropIndex);
+                        clone.InsertTo(itemsSource.Items, dropIndex);
                         break;
                     }
                 }

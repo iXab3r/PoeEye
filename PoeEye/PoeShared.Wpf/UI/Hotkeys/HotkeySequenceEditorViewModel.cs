@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
@@ -8,7 +6,6 @@ using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Forms;
-using System.Windows.Forms.VisualStyles;
 using System.Windows.Input;
 using System.Windows.Interop;
 using DynamicData;
@@ -18,63 +15,53 @@ using PoeShared.Native;
 using PoeShared.Scaffolding;
 using PoeShared.Scaffolding.WPF;
 using ReactiveUI;
+using IDropTarget = GongSolutions.Wpf.DragDrop.IDropTarget;
 using Point = System.Drawing.Point;
 
 namespace PoeShared.UI.Hotkeys
 {
-    internal sealed class HotkeySequenceActions : DisposableReactiveObject
+    internal sealed class HotkeySequenceEditorViewModel : DisposableReactiveObject, IHotkeySequenceEditorViewModel
     {
-        private readonly HotkeySequenceEditor owner;
-        private bool isRecording;
-        private readonly ObservableAsPropertyHelper<ObservableCollection<HotkeySequenceItem>> itemsSource;
-        private readonly ObservableAsPropertyHelper<TimeSpan> totalDuration;
-        private readonly ObservableAsPropertyHelper<TimeSpan> maxDuration;
-        private readonly ObservableAsPropertyHelper<int> maxItems;
+        private readonly IKeyboardEventsSource keyboardEventsSource;
         private readonly ObservableAsPropertyHelper<int> totalItemsCount;
         private readonly ObservableAsPropertyHelper<bool> canAddItem;
         private readonly ObservableAsPropertyHelper<bool> maxItemsExceeded;
         private readonly ObservableAsPropertyHelper<bool> maxDurationExceeded;
+        private readonly ObservableAsPropertyHelper<TimeSpan> totalDuration;
         private readonly ObservableAsPropertyHelper<TimeSpan> recordDuration;
         private readonly ObservableAsPropertyHelper<TimeSpan> totalItemsDuration;
         private readonly ObservableAsPropertyHelper<DateTimeOffset?> recordStartTime;
         private readonly ObservableAsPropertyHelper<bool> atLeastOneRecordingTypeEnabled;
         private readonly ObservableAsPropertyHelper<HotkeySequenceDelay> defaultItemDelay;
 
-        public HotkeySequenceActions(
-            HotkeySequenceEditor owner)
+        private bool enableMouseClicksRecording = true;
+        private bool enableMousePositionRecording;
+        private bool enableKeyboardRecording = true;
+        private bool hideKeypressDelays;
+        private TimeSpan defaultKeyPressDuration = TimeSpan.FromMilliseconds(50);
+        private TimeSpan mousePositionRecordingResolution = TimeSpan.FromMilliseconds(250);
+        private TimeSpan maxDuration = TimeSpan.FromSeconds(10);
+        private bool isRecording;
+        private int maxItemsCount = 250;
+        private UIElement owner;
+
+        public HotkeySequenceEditorViewModel(IKeyboardEventsSource keyboardEventsSource)
         {
-            this.owner = owner;
-            owner.Observe(HotkeySequenceEditor.ItemsSourceProperty)
-                .Select(x => owner.ItemsSource)
-                .OfType<ObservableCollection<HotkeySequenceItem>>()
-                .ToProperty(out itemsSource, this, x => x.ItemsSource)
-                .AddTo(Anchors);
+            var items = new ObservableCollectionExtended<HotkeySequenceItem>();
+            Items = items;
 
-            owner.Observe(HotkeySequenceEditor.MaxRecordingDurationProperty)
-                .Select(x => owner.MaxRecordingDuration)
-                .ToProperty(out maxDuration, this, x => x.MaxDuration)
-                .AddTo(Anchors);
+            this.keyboardEventsSource = keyboardEventsSource;
 
-            owner.Observe(HotkeySequenceEditor.MaxItemsCountProperty)
-                .Select(x => owner.MaxItemsCount)
-                .ToProperty(out maxItems, this, x => x.MaxItemsCount)
-                .AddTo(Anchors);
-
-            owner.Observe(HotkeySequenceEditor.DefaultKeyPressDurationProperty)
-                .Select(x => owner.DefaultKeyPressDuration)
+            this.WhenAnyValue(x => x.DefaultKeyPressDuration)
                 .Select(x => new HotkeySequenceDelay() {Delay = x, IsKeypress = false})
                 .ToProperty(out defaultItemDelay, this, x => x.DefaultItemDelay)
                 .AddTo(Anchors);
-            
-            this.WhenAnyValue(x => x.ItemsSource)
-                .Select(x => x != null
-                    ? SumEx.Sum(x.ToObservableChangeSet(), y => y is HotkeySequenceDelay delay ? delay.Delay.TotalMilliseconds : 0)
-                    : Observable.Return(0d))
-                .Switch()
+
+            SumEx.Sum(items.ToObservableChangeSet(), y => y is HotkeySequenceDelay delay ? delay.Delay.TotalMilliseconds : 0)
                 .Select(TimeSpan.FromMilliseconds)
                 .ToProperty(out totalItemsDuration, this, x => x.TotalItemsDuration)
                 .AddTo(Anchors);
-            
+
             this.WhenAnyValue(x => x.IsRecording)
                 .Select(x =>
                 {
@@ -84,20 +71,17 @@ namespace PoeShared.UI.Hotkeys
                 .Switch()
                 .ToProperty(out totalDuration, this, x => x.TotalDuration)
                 .AddTo(Anchors);
-            
+
             this.WhenAnyValue(x => x.TotalDuration, x => x.MaxDuration)
                 .Select(x => Math.Round(MaxDuration.TotalSeconds - TotalDuration.TotalSeconds) <= 0.5)
                 .ToProperty(out maxDurationExceeded, this, x => x.MaxDurationExceeded)
                 .AddTo(Anchors);
-            
-            this.WhenAnyValue(x => x.ItemsSource)
-                .Select(x => x != null
-                    ? x.ToObservableChangeSet().CountIf()
-                    : Observable.Return(0))
-                .Switch()
+
+            items.ToObservableChangeSet()
+                .CountIf()
                 .ToProperty(out totalItemsCount, this, x => x.TotalItemsCount)
                 .AddTo(Anchors);
-            
+
             this.WhenAnyValue(x => x.TotalItemsCount, x => x.MaxItemsCount)
                 .Select(x => TotalItemsCount >= MaxItemsCount)
                 .ToProperty(out maxItemsExceeded, this, x => x.MaxItemsExceeded)
@@ -108,19 +92,19 @@ namespace PoeShared.UI.Hotkeys
                 .Select(x => x ? DateTime.UtcNow : default(DateTimeOffset?))
                 .ToProperty(out recordStartTime, this, x => x.RecordStartTime)
                 .AddTo(Anchors);
-            
+
             this.WhenAnyValue(x => x.RecordStartTime)
                 .DistinctUntilChanged()
                 .Select(x => x != null ? Observable.Interval(TimeSpan.FromMilliseconds(250)) : Observable.Return(0L))
                 .Switch()
-                .Select(x =>  DateTime.UtcNow - RecordStartTime ?? TimeSpan.Zero)
+                .Select(x => DateTime.UtcNow - RecordStartTime ?? TimeSpan.Zero)
                 .ToProperty(out recordDuration, this, x => x.RecordingDuration)
                 .AddTo(Anchors);
 
             Observable.CombineLatest(
-                    owner.Observe(HotkeySequenceEditor.EnableKeyboardRecordingProperty).Select(_ => owner.EnableKeyboardRecording),
-                    owner.Observe(HotkeySequenceEditor.EnableMouseClicksRecordingProperty).Select(_ => owner.EnableMouseClicksRecording),
-                    owner.Observe(HotkeySequenceEditor.EnableMousePositionRecordingProperty).Select(_ => owner.EnableMousePositionRecording))
+                    this.WhenAnyValue(x => x.EnableKeyboardRecording),
+                    this.WhenAnyValue(x => x.EnableMouseClicksRecording),
+                    this.WhenAnyValue(x => x.EnableMousePositionRecording))
                 .Select(x => x.Any(y => y))
                 .ToProperty(out atLeastOneRecordingTypeEnabled, this, x => x.AtLeastOneRecordingTypeEnabled)
                 .AddTo(Anchors);
@@ -129,34 +113,50 @@ namespace PoeShared.UI.Hotkeys
                 .Select(_ => !MaxDurationExceeded && !MaxItemsExceeded && AtLeastOneRecordingTypeEnabled)
                 .ToProperty(out canAddItem, this, x => x.CanAddItem)
                 .AddTo(Anchors);
-            
+
             AddItem = CommandWrapper.Create<object>(AddItemExecuted);
-            StartRecording = CommandWrapper.Create(AddRecordingExecuted, this.WhenAnyValue(x => x.CanAddItem).ObserveOnDispatcher());
+            RemoveItem = CommandWrapper.Create<object>(RemoveItemExecuted);
+            StartRecording = CommandWrapper.Create(StartRecordingExecuted, this.WhenAnyValue(x => x.CanAddItem).ObserveOnDispatcher());
             StopRecording = CommandWrapper.Create(StopRecordingExecuted);
-            ClearItems = CommandWrapper.Create(() => ItemsSource.Clear(), this.WhenAnyValue(x => x.ItemsSource).Select(x => x != null).ObserveOnDispatcher());
+            ClearItems = CommandWrapper.Create(() => items.Clear());
+        }
+
+        private void RemoveItemExecuted(object arg)
+        {
+            var itemsToRemove = arg switch
+            {
+                HotkeySequenceItem item => new[] {item},
+                _ => throw new ArgumentOutOfRangeException(nameof(arg), arg, "Unknown item type")
+            };
+            Items.RemoveMany(itemsToRemove);
         }
 
         private void AddItemExecuted(object arg)
         {
             var itemsToAdd = arg switch
             {
-                HotkeySequenceItem item => new[] { item },
+                HotkeySequenceItem item => new[] {item},
                 Key key => new HotkeySequenceItem[]
                 {
-                    new HotkeySequenceHotkey() { Hotkey = new HotkeyGesture(key), IsDown = true},
-                    new HotkeySequenceDelay() { Delay = owner.DefaultKeyPressDuration },
-                    new HotkeySequenceHotkey() { Hotkey = new HotkeyGesture(key), IsDown = false}
+                    new HotkeySequenceHotkey() {Hotkey = new HotkeyGesture(key), IsDown = true},
+                    new HotkeySequenceDelay() {Delay = this.DefaultKeyPressDuration},
+                    new HotkeySequenceHotkey() {Hotkey = new HotkeyGesture(key), IsDown = false}
                 },
+                
                 _ => throw new ArgumentOutOfRangeException(nameof(arg), arg, "Unknown item type")
             };
-            ItemsSource.AddRange(itemsToAdd);
+            Items.AddRange(itemsToAdd);
         }
+
+        public ObservableCollection<HotkeySequenceItem> Items { get; }
 
         public ICommand AddItem { get; }
 
+        public ICommand RemoveItem { get; }
+
         public HotkeySequenceDelay DefaultItemDelay => defaultItemDelay.Value;
-        
-        public HotkeySequenceText DefaultItemText { get; } = new() { Text = "text" };
+
+        public HotkeySequenceText DefaultItemText { get; } = new() {Text = "text"};
 
         public bool AtLeastOneRecordingTypeEnabled => atLeastOneRecordingTypeEnabled.Value;
 
@@ -168,9 +168,59 @@ namespace PoeShared.UI.Hotkeys
 
         public int TotalItemsCount => totalItemsCount.Value;
 
-        public int MaxItemsCount => maxItems.Value;
+        public bool EnableMouseClicksRecording
+        {
+            get => enableMouseClicksRecording;
+            set => RaiseAndSetIfChanged(ref enableMouseClicksRecording, value);
+        }
 
-        public TimeSpan MaxDuration => maxDuration.Value;
+        public bool EnableMousePositionRecording
+        {
+            get => enableMousePositionRecording;
+            set => RaiseAndSetIfChanged(ref enableMousePositionRecording, value);
+        }
+
+        public bool EnableKeyboardRecording
+        {
+            get => enableKeyboardRecording;
+            set => RaiseAndSetIfChanged(ref enableKeyboardRecording, value);
+        }
+
+        public bool HideKeypressDelays
+        {
+            get => hideKeypressDelays;
+            set => RaiseAndSetIfChanged(ref hideKeypressDelays, value);
+        }
+
+        public int MaxItemsCount
+        {
+            get => maxItemsCount;
+            set => RaiseAndSetIfChanged(ref maxItemsCount, value);
+        }
+
+        public TimeSpan DefaultKeyPressDuration
+        {
+            get => defaultKeyPressDuration;
+            set => RaiseAndSetIfChanged(ref defaultKeyPressDuration, value);
+        }
+
+        public TimeSpan MousePositionRecordingResolution
+        {
+            get => mousePositionRecordingResolution;
+            set => RaiseAndSetIfChanged(ref mousePositionRecordingResolution, value);
+        }
+
+        public TimeSpan MaxDuration
+        {
+            get => maxDuration;
+            set => RaiseAndSetIfChanged(ref maxDuration, value);
+        }
+
+        public UIElement Owner
+        {
+            get => owner;
+            set => RaiseAndSetIfChanged(ref owner, value);
+        }
 
         public TimeSpan TotalDuration => totalDuration.Value;
 
@@ -180,8 +230,6 @@ namespace PoeShared.UI.Hotkeys
 
         public DateTimeOffset? RecordStartTime => recordStartTime.Value;
 
-        public ObservableCollection<HotkeySequenceItem> ItemsSource => itemsSource.Value;
-        
         public bool IsRecording
         {
             get => isRecording;
@@ -189,21 +237,18 @@ namespace PoeShared.UI.Hotkeys
         }
 
         public ICommand StartRecording { get; }
+
         public ICommand StopRecording { get; }
+
         public ICommand ClearItems { get; }
-        
+
         private void StopRecordingExecuted()
         {
             IsRecording = false;
         }
 
-        private async Task AddRecordingExecuted()
+        private async Task StartRecordingExecuted()
         {
-            if (owner.KeyboardEventsSource == null)
-            {
-                throw new InvalidOperationException("Keyboard event source is not initialized");
-            }
-
             if (IsRecording)
             {
                 return;
@@ -215,54 +260,54 @@ namespace PoeShared.UI.Hotkeys
             );
 
             Observable.Merge(
-                    owner.KeyboardEventsSource.WhenKeyDown.Where(x => x.KeyCode == Keys.Escape).ToUnit(),
+                    keyboardEventsSource.WhenKeyDown.Where(x => x.KeyCode == Keys.Escape).ToUnit(),
                     this.WhenAnyValue(x => x.CanAddItem).Where(x => !x).ToUnit())
                 .Take(1)
                 .Subscribe(StopRecordingExecuted);
 
             var sw = Stopwatch.StartNew();
 
-            if (owner.EnableMousePositionRecording)
+            if (EnableMousePositionRecording && MousePositionRecordingResolution > TimeSpan.Zero)
             {
-                owner.KeyboardEventsSource.WhenMouseMove
-                    .Sample(owner.MousePositionRecordingResolution)
+                keyboardEventsSource.WhenMouseMove
+                    .Sample(MousePositionRecordingResolution)
                     .Select(x => new Point(x.X, x.Y))
                     .DistinctUntilChanged()
                     .ObserveOnDispatcher()
                     .TakeUntil(cancel)
                     .Subscribe(x =>
                     {
-                        ItemsSource.Add( new HotkeySequenceDelay
+                        Items.Add(new HotkeySequenceDelay
                         {
                             Delay = TimeSpan.FromMilliseconds(sw.ElapsedMilliseconds),
                             IsKeypress = true,
                         });
                         sw.Restart();
-                        ItemsSource.Add(new HotkeySequenceHotkey
+                        Items.Add(new HotkeySequenceHotkey
                         {
                             MousePosition = x
                         });
                     });
             }
 
-            if (owner.EnableKeyboardRecording)
+            if (EnableKeyboardRecording)
             {
                 Observable.Merge(
-                        owner.KeyboardEventsSource.WhenKeyDown.Select(x => new { x.KeyCode, IsDown = true }),
-                        owner.KeyboardEventsSource.WhenKeyUp.Select(x => new { x.KeyCode, IsDown = false })
+                        keyboardEventsSource.WhenKeyDown.Select(x => new {x.KeyCode, IsDown = true}),
+                        keyboardEventsSource.WhenKeyUp.Select(x => new {x.KeyCode, IsDown = false})
                     )
                     .DistinctUntilChanged()
                     .ObserveOnDispatcher()
                     .TakeUntil(cancel)
                     .Subscribe(x =>
                     {
-                        ItemsSource.Add( new HotkeySequenceDelay
+                        Items.Add(new HotkeySequenceDelay
                         {
                             Delay = TimeSpan.FromMilliseconds(sw.ElapsedMilliseconds),
                             IsKeypress = true,
                         });
                         sw.Restart();
-                        ItemsSource.Add(new HotkeySequenceHotkey
+                        Items.Add(new HotkeySequenceHotkey
                         {
                             Hotkey = new HotkeyGesture(x.KeyCode.ToInputKey()),
                             IsDown = x.IsDown,
@@ -276,14 +321,16 @@ namespace PoeShared.UI.Hotkeys
             {
                 throw new InvalidOperationException($"Failed to find parent window of control {owner}");
             }
-            var ownerWindowHandle = new WindowInteropHelper(parentWindow).EnsureHandle();
-            var defaultDuration = owner.DefaultKeyPressDuration;
 
-            if (owner.EnableMouseClicksRecording)
+            var ownerWindowHandle = new WindowInteropHelper(parentWindow).EnsureHandle();
+            
+            var defaultDuration = DefaultKeyPressDuration;
+
+            if (EnableMouseClicksRecording)
             {
                 Observable.Merge(
-                        owner.KeyboardEventsSource.WhenMouseDown.Select(x => new { x.Button, x.X, x.Y, IsDown = true }),
-                        owner.KeyboardEventsSource.WhenMouseUp.Select(x => new { x.Button,  x.X, x.Y, IsDown = false })
+                        keyboardEventsSource.WhenMouseDown.Select(x => new {x.Button, x.X, x.Y, IsDown = true}),
+                        keyboardEventsSource.WhenMouseUp.Select(x => new {x.Button, x.X, x.Y, IsDown = false})
                     )
                     .DistinctUntilChanged()
                     .ObserveOnDispatcher()
@@ -304,14 +351,14 @@ namespace PoeShared.UI.Hotkeys
                                 }
                             }
                         }
-                        
-                        ItemsSource.Add(new HotkeySequenceDelay
+
+                        Items.Add(new HotkeySequenceDelay
                         {
                             Delay = defaultDuration,
                             IsKeypress = true,
                         });
                         sw.Restart();
-                        ItemsSource.Add(new HotkeySequenceHotkey
+                        Items.Add(new HotkeySequenceHotkey
                         {
                             Hotkey = new HotkeyGesture(x.Button),
                             IsDown = x.IsDown,
