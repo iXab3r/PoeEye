@@ -10,13 +10,12 @@ namespace PoeShared.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is not Key key)
+            return value switch
             {
-                return Binding.DoNothing;
-            }
-
-            var gesture = new HotkeyGesture(key);
-            return HotkeyConverter.Instance.ConvertToString(gesture);
+                Key key => HotkeyConverter.Instance.ConvertToString( new HotkeyGesture(key)),
+                MouseButton mouseButton => HotkeyConverter.Instance.ConvertToString( new HotkeyGesture(mouseButton)),
+                _ => Binding.DoNothing
+            };
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

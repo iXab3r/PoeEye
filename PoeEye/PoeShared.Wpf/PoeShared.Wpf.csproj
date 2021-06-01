@@ -66,6 +66,10 @@
     <Resource Include="Resources\DragDrop.png" />
     <None Remove="Resources\DragDropWhite.png" />
     <Resource Include="Resources\DragDropWhite.png" />
+    <None Remove="Resources\mouse-device-xbutton1-click-control.png" />
+    <Resource Include="Resources\mouse-device-xbutton1-click-control.png" />
+    <None Remove="Resources\mouse-device-xbutton2-click-control.png" />
+    <Resource Include="Resources\mouse-device-xbutton2-click-control.png" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="UI\Hotkeys\HotkeyBox.cs">

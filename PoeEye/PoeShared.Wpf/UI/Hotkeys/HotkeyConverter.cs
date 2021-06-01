@@ -101,7 +101,7 @@ namespace PoeShared.UI.Hotkeys
             knownSpecialKeysByName["Num *"] = Key.Multiply;
             knownSpecialKeysByName["Num +"] = Key.Add;
             knownSpecialKeysByName["Num -"] = Key.Subtract;
-            knownSpecialKeysByName["RETURN"] = Key.Return;
+            knownSpecialKeysByName["ENTER"] = Key.Enter;
             knownSpecialKeysByName["/"] = Key.Divide;
             knownSpecialKeysByName["Num /"] = Key.Divide;
             Enumerable.Range(0, 10).ForEach(x => knownSpecialKeysByName[x.ToString()] = Key.D0 + x);

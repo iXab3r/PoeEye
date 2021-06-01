@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Reactive.Linq;
 using System.Windows.Controls;
 using System.Windows.Input;
 using GongSolutions.Wpf.DragDrop;
 using PoeShared.Scaffolding;
-using PoeShared.Wpf.Scaffolding;
-using ReactiveUI;
 
 namespace PoeShared.UI.Hotkeys
 {
@@ -29,19 +26,36 @@ namespace PoeShared.UI.Hotkeys
                 switch (button.CommandParameter)
                 {
                     case Key key:
-                        new HotkeySequenceHotkey()
+                        new HotkeySequenceHotkey
                         {
                             Hotkey = new HotkeyGesture(key),
                             IsDown = true
                         }.InsertTo(itemsSource, dropIndex++);
-                        new HotkeySequenceDelay()
+                        new HotkeySequenceDelay
                         {
                             IsKeypress = true,
                             Delay = TimeSpan.FromMilliseconds(50)
                         }.InsertTo(itemsSource, dropIndex++);
-                        new HotkeySequenceHotkey()
+                        new HotkeySequenceHotkey
                         {
                             Hotkey = new HotkeyGesture(key),
+                            IsDown = false
+                        }.InsertTo(itemsSource,  dropIndex);
+                        break;
+                    case MouseButton mouseButton:
+                        new HotkeySequenceHotkey
+                        {
+                            Hotkey = new HotkeyGesture(mouseButton),
+                            IsDown = true
+                        }.InsertTo(itemsSource, dropIndex++);
+                        new HotkeySequenceDelay
+                        {
+                            IsKeypress = true,
+                            Delay = TimeSpan.FromMilliseconds(50)
+                        }.InsertTo(itemsSource, dropIndex++);
+                        new HotkeySequenceHotkey
+                        {
+                            Hotkey = new HotkeyGesture(mouseButton),
                             IsDown = false
                         }.InsertTo(itemsSource,  dropIndex);
                         break;
@@ -57,12 +71,7 @@ namespace PoeShared.UI.Hotkeys
             base.Drop(dropInfo);
         }
 
-        public override void DragOver(IDropInfo dropInfo)
-        {
-            base.DragOver(dropInfo);
-        }
-
-        private int GetIndex(IDropInfo dropInfo)
+        private static int GetIndex(IDropInfo dropInfo)
         {
             var insertIndex = dropInfo.UnfilteredInsertIndex;
 

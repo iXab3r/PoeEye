@@ -10,7 +10,7 @@ namespace PoeShared.UI.Hotkeys
 
         public Point? MousePosition { get; init; }
 
-        public bool IsMouse => (Hotkey?.MouseButton is MouseButton.Left or MouseButton.Right or MouseButton.Middle) || HasMousePosition;
+        public bool IsMouse => Hotkey?.MouseButton != null || HasMousePosition;
 
         public bool HasMousePosition => MousePosition != null && !MousePosition.Value.IsEmpty;
 

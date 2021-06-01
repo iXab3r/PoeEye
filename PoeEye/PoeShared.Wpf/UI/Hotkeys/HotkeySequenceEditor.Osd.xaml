@@ -70,6 +70,24 @@
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Padding" Value="2.5" />
     </Style>
+    
+    <DataTemplate x:Key="OnScreenKeyboardMouseBlock">
+        <DataTemplate.Resources>
+            <Style TargetType="{x:Type ui:ButtonEx}" BasedOn="{StaticResource HotkeySequenceEditorOsdButton}" />
+        </DataTemplate.Resources>
+        <Border Style="{StaticResource HotkeySequenceOsdBorder}">
+            <st:StackPanel Orientation="Vertical" MarginBetweenChildren="10" Margin="0"
+                           Focusable="False">
+                <st:AutoGrid Columns="*,*,*" ChildMargin="2.5">
+                    <ui:ButtonEx CommandParameter="{x:Static MouseButton.Left}" />
+                    <ui:ButtonEx CommandParameter="{x:Static MouseButton.Right}" />
+                    <ui:ButtonEx CommandParameter="{x:Static MouseButton.Middle}" />
+                    <ui:ButtonEx CommandParameter="{x:Static MouseButton.XButton1}" />
+                    <ui:ButtonEx CommandParameter="{x:Static MouseButton.XButton2}" />
+                </st:AutoGrid>
+            </st:StackPanel>
+        </Border>
+    </DataTemplate>
 
     <DataTemplate x:Key="OnScreenKeyboardSpecialsBlock">
         <DataTemplate.Resources>

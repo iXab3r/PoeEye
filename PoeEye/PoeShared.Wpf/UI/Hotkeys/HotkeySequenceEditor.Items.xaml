@@ -162,6 +162,12 @@
             <DataTrigger Binding="{Binding Hotkey.MouseButton}" Value="{x:Static MouseButton.Middle}">
                 <Setter TargetName="MouseImage" Property="Source" Value="../../Resources/mouse-device-middle-click-control.png" />
             </DataTrigger>
+            <DataTrigger Binding="{Binding Hotkey.MouseButton}" Value="{x:Static MouseButton.XButton1}">
+                <Setter TargetName="MouseImage" Property="Source" Value="../../Resources/mouse-device-xbutton1-click-control.png" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Hotkey.MouseButton}" Value="{x:Static MouseButton.XButton2}">
+                <Setter TargetName="MouseImage" Property="Source" Value="../../Resources/mouse-device-xbutton2-click-control.png" />
+            </DataTrigger>
             <DataTrigger Binding="{Binding HasMousePosition}" Value="True">
                 <Setter TargetName="MouseImage" Property="Source" Value="../../Resources/cursor-1.1s-200px.png" />
                 <Setter TargetName="MouseImage" Property="ToolTip" Value="{Binding MousePosition}" />

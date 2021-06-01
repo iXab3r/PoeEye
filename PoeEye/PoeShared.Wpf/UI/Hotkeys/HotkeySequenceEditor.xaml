@@ -71,15 +71,31 @@
             </ui:ButtonEx>
             <CheckBox
                 x:Name="KeyboardPopupToggle">
-                <TextBlock Style="{StaticResource IconTextBlock}" Text="&#xf11c; KEYBOARD" />
+                <st:StackPanel MarginBetweenChildren="2.5" Orientation="Horizontal">
+                    <materialDesign:PackIcon Kind="Keyboard" />
+                    <TextBlock Text="KEYBOARD" />
+                </st:StackPanel>
             </CheckBox>
             <CheckBox
                 x:Name="KeyboardArrowBlockPopupToggle">
-                <TextBlock Style="{StaticResource IconTextBlock}" Text="&#xf11c; ARROWS" />
+                <st:StackPanel MarginBetweenChildren="2.5" Orientation="Horizontal">
+                    <materialDesign:PackIcon Kind="NumericSevenBoxMultipleOutline" />
+                    <TextBlock Text="NUMPAD" />
+                </st:StackPanel>
             </CheckBox>
             <CheckBox
                 x:Name="KeyboardSpecialsBlockPopupToggle">
-                <TextBlock Style="{StaticResource IconTextBlock}" Text="&#xf11c; SPECIALS" />
+                <st:StackPanel MarginBetweenChildren="2.5" Orientation="Horizontal">
+                    <materialDesign:PackIcon Kind="Function" />
+                    <TextBlock Text="FN" />
+                </st:StackPanel>
+            </CheckBox>
+            <CheckBox
+                x:Name="KeyboardMouseBlockPopupToggle">
+                <st:StackPanel MarginBetweenChildren="2.5" Orientation="Horizontal">
+                    <materialDesign:PackIcon Kind="Mouse" />
+                    <TextBlock Text="MOUSE" />
+                </st:StackPanel>
             </CheckBox>
 
             <TextBlock HorizontalAlignment="Right" st:StackPanel.Fill="Fill"
@@ -136,6 +152,16 @@
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Stretch">
                 <ContentPresenter ContentTemplate="{StaticResource OnScreenKeyboardSpecialsBlock}" Content="{Binding}" />
+            </materialDesign:PopupEx>  
+            <materialDesign:PopupEx
+                x:Name="KeyboardMouseBlockPopup"
+                PlacementTarget="{Binding ElementName=KeyboardMouseBlockPopupToggle}"
+                Placement="Top"
+                StaysOpen="False"
+                IsOpen="{Binding ElementName=KeyboardMouseBlockPopupToggle, Path=IsChecked}"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch">
+                <ContentPresenter ContentTemplate="{StaticResource OnScreenKeyboardMouseBlock}" Content="{Binding}" />
             </materialDesign:PopupEx>
         </st:StackPanel>
         
