@@ -31,22 +31,7 @@
                     <ScaleTransform CenterX="0.5" CenterY="0.5" />
                 </Button.RenderTransform>
                 <Button.Style>
-                    <Style TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialDesignFloatingActionButton}">
-                        <Style.Triggers>
-                            <Trigger Property="Visibility" Value="Visible">
-                                <Trigger.EnterActions>
-                                    <BeginStoryboard>
-                                        <Storyboard AutoReverse="True" RepeatBehavior="Forever">
-                                            <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)" From="0.9" To="1.1"
-                                                             Duration="00:00:00.5" />
-                                            <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)" From="0.9" To="1.1"
-                                                             Duration="00:00:00.5" />
-                                        </Storyboard>
-                                    </BeginStoryboard>
-                                </Trigger.EnterActions>
-                            </Trigger>
-                        </Style.Triggers>
-                    </Style>
+                    <Style TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialDesignFloatingActionButton}" />
                 </Button.Style>
                 <Button.Content>
                     <TextBlock x:Name="RecordingIcon" Style="{StaticResource IconTextBlock}" Text="&#xf04d;" FontSize="20" />
@@ -261,6 +246,8 @@
     <Style x:Key="DefaultHotkeySequenceEditorStyle" TargetType="{x:Type hotkeys:HotkeySequenceEditor}">
         <Style.Resources>
             <Style TargetType="{x:Type CheckBox}" BasedOn="{StaticResource HotkeySequenceCheckBoxStyle}" />
+            <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource HotkeySequenceTextBoxStyle}" />
+            <Style TargetType="{x:Type ui:ButtonEx}" BasedOn="{StaticResource FastButtonExStyle}" />
         </Style.Resources>
         <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
         <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Disabled" />
@@ -296,7 +283,6 @@
                             dd:DragDrop.UseDefaultEffectDataTemplate="True"
                             dd:DragDrop.DragDropCopyKeyState="ControlKey"
                             HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"
-
                             ItemsSource="{TemplateBinding CollectionView}">
                             <ListView.ItemTemplateSelector>
                                 <ui:PlaceholderTemplateSelector
@@ -325,10 +311,7 @@
                                     <Setter Property="Template">
                                         <Setter.Value>
                                             <ControlTemplate TargetType="{x:Type ListViewItem}">
-                                                <Border Name="Bd"
-                                                        Margin="{TemplateBinding Padding}">
-                                                    <ContentPresenter />
-                                                </Border>
+                                                <ContentPresenter />
                                             </ControlTemplate>
                                         </Setter.Value>
                                     </Setter>
@@ -350,8 +333,8 @@
     <Style TargetType="{x:Type hotkeys:HotkeySequenceEditor}" BasedOn="{StaticResource DefaultHotkeySequenceEditorStyle}" />
     <DataTemplate DataType="{x:Type hotkeys:HotkeySequenceEditorViewModel}">
         <Grid>
-            <hotkeys:HotkeySequenceEditor x:Name="HotkeySequenceEditor" ViewModel="{Binding}"/>
-        
+            <hotkeys:HotkeySequenceEditor x:Name="HotkeySequenceEditor" ViewModel="{Binding}" />
+
             <eye:DataPiping.DataPipes>
                 <eye:DataPipeCollection>
                     <eye:DataPipe

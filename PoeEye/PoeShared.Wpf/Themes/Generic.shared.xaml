@@ -5,6 +5,7 @@
         <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/UI/ButtonEx.xaml" />
         <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Converters.xaml" />
         <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/CommandWrapperView.xaml" />
+        <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Native/OverlayContainerView.xaml" />
         <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/UI/Hotkeys/HotKeyBox.xaml" />
         <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/UI/Hotkeys/HotkeySequenceEditor.xaml" />
         <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/UI/Settings/GenericSettingsView.xaml" />

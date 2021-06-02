@@ -77,6 +77,16 @@ namespace PoeShared.Native
             MK_XBUTTON1 = 0x0020,
             MK_XBUTTON2 = 0x0040,
         }
+
+        public static IntPtr WindowFromPoint(Point point)
+        {
+            var pt = new POINT()
+            {
+                x = point.X,
+                y = point.Y
+            };
+            return User32.WindowFromPoint(pt);
+        }
         
         public static string GetWindowClass(IntPtr hwnd)
         {

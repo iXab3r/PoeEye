@@ -24,6 +24,20 @@ namespace PoeShared.Wpf.Scaffolding
         }
         
         public static IUnityContainer RegisterOverlayController(
+            this IUnityContainer instance,
+            string windowTrackerDependencyName)
+        {
+            instance
+                .RegisterFactory<IOverlayWindowController>(
+                    unity => unity.Resolve<OverlayWindowController>(
+                        new DependencyOverride<IWindowTracker>(
+                            unity.Resolve<IWindowTracker>(windowTrackerDependencyName))), 
+                    new ContainerControlledLifetimeManager());
+
+            return instance;
+        }
+        
+        public static IUnityContainer RegisterOverlayController(
             this IUnityContainer instance)
         {
             instance

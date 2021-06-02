@@ -1,0 +1,41 @@
+﻿<ui:SharedResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                             xmlns:ui="clr-namespace:PoeShared.UI"
+                             xmlns:native="clr-namespace:PoeShared.Native"
+                             xmlns:st="http://schemas.spicytaco.io/">
+
+    <ui:SharedResourceDictionary.MergedDictionaries>
+        <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Styles.xaml" />
+    </ui:SharedResourceDictionary.MergedDictionaries>
+
+    <DataTemplate DataType="{x:Type native:TextNotificationViewModel}">
+        <Grid>
+            <Label Style="{StaticResource IconLabel}" Content="{Binding Icon}"
+                   Visibility="{Binding Icon, Converter={StaticResource NullToCollapsedConverter}}" />
+            <st:StackPanel Orientation="Vertical" MarginBetweenChildren="5" Margin="2.5">
+                <TextBlock Text="{Binding Title}" st:StackPanel.Fill="Fill"
+                           Visibility="{Binding Title, Converter={StaticResource NullToCollapsedConverter}}" />
+                <TextBlock Text="{Binding Text}" FontSize="20" />
+            </st:StackPanel>
+            <ui:ButtonEx Command="{Binding CloseCommand}" HorizontalAlignment="Right" VerticalAlignment="Top"
+                         Width="16" Height="16" Margin="0"
+                         ToolTip="Close"
+                         Icon="&#xf00d;" />
+        </Grid>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type native:OverlayNotificationsContainerViewModel}">
+        <ItemsControl ItemsSource="{Binding Items}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate DataType="{x:Type native:NotificationViewModelBase}">
+                    <ContentControl Content="{Binding}" />
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <st:StackPanel Orientation="Vertical" MarginBetweenChildren="5" />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+        </ItemsControl>
+    </DataTemplate>
+</ui:SharedResourceDictionary>

@@ -7,10 +7,12 @@ using System.Windows.Threading;
 using log4net;
 using PoeShared.Audio.ViewModels;
 using PoeShared.Modularity;
+using PoeShared.Native;
 using PoeShared.Scaffolding;
 using PoeShared.Services;
 using PoeShared.UI;
 using PoeShared.UI.Hotkeys;
+using PoeShared.Wpf.Scaffolding;
 using PoeShared.Wpf.Services;
 using PoeShared.Wpf.UI.ExceptionViewer;
 using PoeShared.Wpf.UI.Settings;
@@ -62,10 +64,13 @@ namespace PoeShared.Prism
                 .RegisterSingleton<ISchedulerProvider, SchedulerProvider>()
                 .RegisterSingleton<IUserInputFilterConfigurator, UserInputFilterConfigurator>()
                 .RegisterSingleton<IApplicationAccessor, ApplicationAccessor>()
+                .RegisterSingleton<INotificationsService, NotificationsService>()
                 .RegisterSingleton<IConverter<char, Keys>, CharToKeysConverter>()
                 .RegisterSingleton<IConverter<Keys, HotkeyGesture>, KeysToHotkeyGestureConverter>()
                 .RegisterInstance<IHotkeyConverter>(HotkeyConverter.Instance, new ContainerControlledLifetimeManager());
 
+            Container.RegisterOverlayController(WellKnownWindows.AllWindows, WellKnownWindows.AllWindows);
+            
             Container
                 .RegisterType<IHotkeyTracker, HotkeyTracker>()
                 .RegisterType<IGenericSettingsViewModel, GenericSettingsViewModel>()

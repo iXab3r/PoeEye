@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows;
@@ -11,10 +12,15 @@ using System.Windows.Interop;
 using DynamicData;
 using DynamicData.Aggregation;
 using DynamicData.Binding;
+using log4net;
+using PInvoke;
+using PoeShared.Modularity;
 using PoeShared.Native;
+using PoeShared.Prism;
 using PoeShared.Scaffolding;
 using PoeShared.Scaffolding.WPF;
 using ReactiveUI;
+using Unity;
 using IDropTarget = GongSolutions.Wpf.DragDrop.IDropTarget;
 using Point = System.Drawing.Point;
 
@@ -22,6 +28,11 @@ namespace PoeShared.UI.Hotkeys
 {
     internal sealed class HotkeySequenceEditorViewModel : DisposableReactiveObject, IHotkeySequenceEditorViewModel
     {
+        private static readonly ILog Log = LogManager.GetLogger(typeof(HotkeySequenceEditorViewModel));
+
+        private readonly IAppArguments appArguments;
+        private readonly NotificationsService notificationsService;
+        private readonly IFactory<IHotkeyTracker> hotkeyFactory;
         private readonly IKeyboardEventsSource keyboardEventsSource;
         private readonly ObservableAsPropertyHelper<int> totalItemsCount;
         private readonly ObservableAsPropertyHelper<bool> canAddItem;
@@ -33,6 +44,7 @@ namespace PoeShared.UI.Hotkeys
         private readonly ObservableAsPropertyHelper<DateTimeOffset?> recordStartTime;
         private readonly ObservableAsPropertyHelper<bool> atLeastOneRecordingTypeEnabled;
         private readonly ObservableAsPropertyHelper<HotkeySequenceDelay> defaultItemDelay;
+        private readonly SerialDisposable recordingAnchors;
 
         private bool enableMouseClicksRecording = true;
         private bool enableMousePositionRecording;
@@ -44,12 +56,21 @@ namespace PoeShared.UI.Hotkeys
         private bool isRecording;
         private int maxItemsCount = 250;
         private UIElement owner;
-
-        public HotkeySequenceEditorViewModel(IKeyboardEventsSource keyboardEventsSource)
+        private HotkeyGesture stopRecordingHotkey = new(Key.Escape);
+        
+        public HotkeySequenceEditorViewModel(
+            IAppArguments appArguments,
+            NotificationsService notificationsService,
+            IFactory<IHotkeyTracker> hotkeyFactory,
+            IKeyboardEventsSource keyboardEventsSource)
         {
+            recordingAnchors = new SerialDisposable().AddTo(Anchors);
             var items = new ObservableCollectionExtended<HotkeySequenceItem>();
             Items = items;
 
+            this.appArguments = appArguments;
+            this.notificationsService = notificationsService;
+            this.hotkeyFactory = hotkeyFactory;
             this.keyboardEventsSource = keyboardEventsSource;
 
             this.WhenAnyValue(x => x.DefaultKeyPressDuration)
@@ -120,7 +141,7 @@ namespace PoeShared.UI.Hotkeys
             StopRecording = CommandWrapper.Create(StopRecordingExecuted);
             ClearItems = CommandWrapper.Create(() => items.Clear());
         }
-
+        
         private void RemoveItemExecuted(object arg)
         {
             var itemsToRemove = arg switch
@@ -148,6 +169,12 @@ namespace PoeShared.UI.Hotkeys
             Items.AddRange(itemsToAdd);
         }
 
+        public HotkeyGesture StopRecordingHotkey
+        {
+            get => stopRecordingHotkey;
+            set => RaiseAndSetIfChanged(ref stopRecordingHotkey, value);
+        }
+        
         public ObservableCollection<HotkeySequenceItem> Items { get; }
 
         public ICommand AddItem { get; }
@@ -244,29 +271,50 @@ namespace PoeShared.UI.Hotkeys
 
         private void StopRecordingExecuted()
         {
-            IsRecording = false;
+            if (!IsRecording)
+            {
+                throw new InvalidOperationException("Not recording");
+            }
+            
+            Log.Debug($"Stopping recording, isRecording: {isRecording}");
+            recordingAnchors.Disposable = null;
         }
 
         private async Task StartRecordingExecuted()
         {
             if (IsRecording)
             {
-                return;
+                throw new InvalidOperationException("Already recording");
             }
-
             IsRecording = true;
+            
+            var anchors = new CompositeDisposable().AssignTo(recordingAnchors);
+            Disposable.Create(() => IsRecording = false).AddTo(anchors);
             var cancel = Observable.Merge(
                 this.WhenAnyValue(x => x.IsRecording).Where(x => x == false).ToUnit()
             );
 
+            var notification = new RecordingNotificationViewModel(this).AddTo(anchors);
+            notificationsService.AddNotification(notification).AddTo(anchors);
+
+            var tracker = hotkeyFactory.Create().AddTo(anchors);
+            tracker.HotkeyMode = HotkeyMode.Hold;
+            tracker.SuppressKey = true;
+            tracker.Hotkey = stopRecordingHotkey;
+            tracker.HandleApplicationKeys = true;
+
             Observable.Merge(
-                    keyboardEventsSource.WhenKeyDown.Where(x => x.KeyCode == Keys.Escape).ToUnit(),
-                    this.WhenAnyValue(x => x.CanAddItem).Where(x => !x).ToUnit())
+                    tracker.WhenAnyValue(x => x.IsActive).Where(x => x).Select(x => $"Hotkey {tracker} detected"),
+                    this.WhenAnyValue(x => x.CanAddItem).Where(x => !x).Select(x => $"Cannot add more items: {totalDuration.Value} / {maxDuration}, {totalItemsCount.Value} / {maxItemsCount}"))
                 .Take(1)
-                .Subscribe(StopRecordingExecuted);
+                .Subscribe(reason =>
+                {
+                    Log.Debug($"Stopping recording, reason: {reason}");
+                    StopRecordingExecuted();
+                })
+                .AddTo(anchors);
 
             var sw = Stopwatch.StartNew();
-
             if (EnableMousePositionRecording && MousePositionRecordingResolution > TimeSpan.Zero)
             {
                 keyboardEventsSource.WhenMouseMove
@@ -287,7 +335,8 @@ namespace PoeShared.UI.Hotkeys
                         {
                             MousePosition = x
                         });
-                    });
+                    })
+                    .AddTo(anchors);
             }
 
             if (EnableKeyboardRecording)
@@ -313,17 +362,11 @@ namespace PoeShared.UI.Hotkeys
                             IsDown = x.IsDown,
                         });
                         sw.Restart();
-                    });
+                    })
+                    .AddTo(anchors);
             }
 
-            var parentWindow = this.owner.FindVisualAncestor<Window>();
-            if (parentWindow == null)
-            {
-                throw new InvalidOperationException($"Failed to find parent window of control {owner}");
-            }
 
-            var ownerWindowHandle = new WindowInteropHelper(parentWindow).EnsureHandle();
-            
             var defaultDuration = DefaultKeyPressDuration;
 
             if (EnableMouseClicksRecording)
@@ -337,19 +380,11 @@ namespace PoeShared.UI.Hotkeys
                     .TakeUntil(cancel)
                     .Subscribe(x =>
                     {
-                        if (UnsafeNative.GetForegroundWindow() == ownerWindowHandle)
+                        var windowHandle = UnsafeNative.WindowFromPoint(new Point(x.X, x.Y));
+                        var processId = UnsafeNative.GetProcessIdByWindowHandle(windowHandle);
+                        if (processId == appArguments.ProcessId)
                         {
-                            var windowCoords = owner.PointFromScreen(new System.Windows.Point(x.X, x.Y));
-                            var hitElement = owner.InputHitTest(windowCoords);
-                            if (hitElement is UIElement uiElement)
-                            {
-                                var editor = uiElement.FindVisualAncestor<HotkeySequenceEditor>();
-                                if (editor != null)
-                                {
-                                    // clicked inside SequenceEditor control, ignoring
-                                    return;
-                                }
-                            }
+                            return;
                         }
 
                         Items.Add(new HotkeySequenceDelay
@@ -364,7 +399,7 @@ namespace PoeShared.UI.Hotkeys
                             IsDown = x.IsDown,
                         });
                         sw.Restart();
-                    });
+                    }).AddTo(anchors);
             }
         }
     }

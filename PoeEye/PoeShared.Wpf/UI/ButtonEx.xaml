@@ -1,7 +1,7 @@
 ﻿<ui:SharedResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:ui="clr-namespace:PoeShared.UI"
-                    xmlns:st="http://schemas.spicytaco.io/">
+                             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                             xmlns:ui="clr-namespace:PoeShared.UI"
+                             xmlns:st="http://schemas.spicytaco.io/">
     <ui:SharedResourceDictionary.MergedDictionaries>
         <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Converters.xaml" />
         <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Colors.xaml" />
@@ -11,8 +11,7 @@
 
     <Style TargetType="{x:Type TextBlock}"
            BasedOn="{StaticResource ErrorIconTextBlock}"
-           x:Key="CommandWrapperIndicatorErrorStyleKey">
-    </Style>
+           x:Key="CommandWrapperIndicatorErrorStyleKey" />
 
     <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource ErrorIconTextBlock}"
            x:Key="CommandWrapperIndicatorSuccessStyleKey">
@@ -23,16 +22,57 @@
         <Setter Property="Foreground" Value="{StaticResource PositiveBrush}" />
         <Setter Property="Text" Value="&#xf00c;" />
     </Style>
-    
+
     <Style x:Key="ButtonExStyleBase" TargetType="{x:Type ui:ButtonEx}">
         <Setter Property="BorderBrush" Value="{x:Null}" />
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Cursor" Value="Hand" />
-        <Setter Property="Margin" Value="2.5"></Setter>
+        <Setter Property="Margin" Value="2.5" />
         <Setter Property="HorizontalContentAlignment" Value="Center" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="Padding" Value="-5,0,0,0" />
+    </Style>
+
+    <Style x:Key="FastButtonExStyle" TargetType="{x:Type ui:ButtonEx}" BasedOn="{StaticResource ButtonExStyleBase}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ui:ButtonEx}">
+                    <Border
+                        Focusable="False"
+                        CornerRadius="{TemplateBinding CornerRadius}"
+                        Width="{TemplateBinding Width}"
+                        Height="{TemplateBinding Height}"
+                        MinWidth="{TemplateBinding MinWidth}"
+                        MinHeight="{TemplateBinding MinHeight}"
+                        Background="{TemplateBinding Background}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
+                        VerticalAlignment="{TemplateBinding VerticalAlignment}"
+                        IsHitTestVisible="{TemplateBinding IsHitTestVisible}"
+                        Padding="{TemplateBinding Margin}"
+                        ToolTip="{TemplateBinding ToolTip}">
+                        <ContentPresenter x:Name="ContentLabel"
+                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                          TextElement.Foreground="{TemplateBinding Foreground}"
+                                          Margin="{TemplateBinding Padding}"
+                                          Content="{Binding Path=Content, RelativeSource={RelativeSource TemplatedParent}}"
+                                          Visibility="{Binding Path=Content, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource NullToCollapsedConverter}}" />
+                    </Border>
+
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.66" />
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Foreground" Value="{StaticResource MouseOverAccentBrushKey}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
 
     <Style x:Key="DefaultButtonExStyle" TargetType="{x:Type ui:ButtonEx}" BasedOn="{StaticResource ButtonExStyleBase}">
@@ -55,26 +95,26 @@
                         Padding="{TemplateBinding Margin}"
                         ToolTip="{TemplateBinding ToolTip}">
                         <st:StackPanel Margin="2.5"
-                            MarginBetweenChildren="5"
-                            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                            Orientation="Horizontal">
+                                       MarginBetweenChildren="5"
+                                       HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                       VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                       Orientation="Horizontal">
                             <Grid>
                                 <ContentControl x:Name="IconLabel"
-                                           Foreground="{TemplateBinding Foreground}"
-                                           FontSize="{TemplateBinding FontSize}"
-                                           FontFamily="{StaticResource FontAwesome}"
-                                           HorizontalAlignment="Stretch" 
-                                           Content="{Binding Icon, RelativeSource={RelativeSource TemplatedParent}}"
-                                           Visibility="{Binding Icon, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource NullToCollapsedConverter}}" 
-                                           MinWidth="20"/>
+                                                Foreground="{TemplateBinding Foreground}"
+                                                FontSize="{TemplateBinding FontSize}"
+                                                FontFamily="{StaticResource FontAwesome}"
+                                                HorizontalAlignment="Stretch"
+                                                Content="{Binding Icon, RelativeSource={RelativeSource TemplatedParent}}"
+                                                Visibility="{Binding Icon, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource NullToCollapsedConverter}}"
+                                                MinWidth="20" />
                                 <TextBlock x:Name="ErrorIcon" FontSize="{TemplateBinding FontSize}"
                                            ToolTip="{Binding Command.Error, RelativeSource={RelativeSource TemplatedParent}}"
-                                           Style="{StaticResource CommandWrapperIndicatorErrorStyleKey}" 
-                                           MinWidth="20"/>
+                                           Style="{StaticResource CommandWrapperIndicatorErrorStyleKey}"
+                                           MinWidth="20" />
                                 <TextBlock x:Name="SuccessIcon" FontSize="{TemplateBinding FontSize}"
-                                           Style="{StaticResource CommandWrapperIndicatorSuccessStyleKey}" 
-                                           MinWidth="20"/>
+                                           Style="{StaticResource CommandWrapperIndicatorSuccessStyleKey}"
+                                           MinWidth="20" />
                                 <ProgressBar Style="{StaticResource MaterialDesignCircularProgressBar}" x:Name="CommandProgressBar"
                                              Value="0" Width="16" Height="16"
                                              HorizontalAlignment="Center" VerticalAlignment="Center"
@@ -82,11 +122,11 @@
                                              IsIndeterminate="True"
                                              Margin="-5,0,0,0">
                                     <ProgressBar.Visibility>
-                                        <Binding Path="Command.IsBusy" 
-                                                 RelativeSource="{RelativeSource TemplatedParent}" 
+                                        <Binding Path="Command.IsBusy"
+                                                 RelativeSource="{RelativeSource TemplatedParent}"
                                                  Converter="{StaticResource TrueToVisibleFalseToCollapsedConverter}"
                                                  TargetNullValue="{x:Static Visibility.Collapsed}"
-                                                 FallbackValue="{x:Static Visibility.Collapsed}"/>
+                                                 FallbackValue="{x:Static Visibility.Collapsed}" />
                                     </ProgressBar.Visibility>
                                 </ProgressBar>
                             </Grid>
@@ -142,7 +182,7 @@
                                         </MultiBinding>
                                     </Condition.Binding>
                                 </Condition>
-                            </MultiDataTrigger.Conditions>  
+                            </MultiDataTrigger.Conditions>
                             <MultiDataTrigger.EnterActions>
                                 <BeginStoryboard>
                                     <Storyboard TargetName="SuccessIcon">
@@ -170,7 +210,7 @@
                             </MultiDataTrigger.ExitActions>
                         </MultiDataTrigger>
                         <Trigger Property="IsEnabled" Value="False">
-                            <Setter Property="Opacity" Value="0.66"/>
+                            <Setter Property="Opacity" Value="0.66" />
                         </Trigger>
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter Property="Foreground" Value="{StaticResource MouseOverAccentBrushKey}" />
@@ -189,6 +229,6 @@
             </Setter.Value>
         </Setter>
     </Style>
-    
-    <Style TargetType="{x:Type ui:ButtonEx}" BasedOn="{StaticResource DefaultButtonExStyle}"/>
+
+    <Style TargetType="{x:Type ui:ButtonEx}" BasedOn="{StaticResource DefaultButtonExStyle}" />
 </ui:SharedResourceDictionary>

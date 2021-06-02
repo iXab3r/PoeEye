@@ -37,6 +37,7 @@ namespace PoeShared.UI.Hotkeys
         private HotkeyMode hotkeyMode;
         private bool suppressKey;
         private bool isActive;
+        private bool handleApplicationKeys;
 
         public HotkeyTracker(
            IClock clock,
@@ -93,9 +94,10 @@ namespace PoeShared.UI.Hotkeys
                          * This method MUST be executed on the same thread which emitted Key/Mouse event
                          * otherwise .Handled value will be ignored due to obvious concurrency reasons
                          */
-                        if (mainWindowTracker.ActiveProcessId != CurrentProcessId)
+                        if (handleApplicationKeys || mainWindowTracker.ActiveProcessId != CurrentProcessId)
                         {
-                            Log.Debug($"Application is NOT active, processing hotkey {hotkeyData.Hotkey} (isDown: {hotkeyData.KeyDown}, suppressKey: {suppressKey},  configuredKey: {Hotkey}, mode: {HotkeyMode})");
+                            Log.Debug($"Processing hotkey {hotkeyData.Hotkey} (isDown: {hotkeyData.KeyDown}, suppressKey: {suppressKey},  configuredKey: {Hotkey}, mode: {HotkeyMode})");
+
                             if (suppressKey)
                             {
                                 if (KeyToModifier(hotkeyData.Hotkey.Key) != ModifierKeys.None)
@@ -160,6 +162,12 @@ namespace PoeShared.UI.Hotkeys
         {
             get => suppressKey;
             set => RaiseAndSetIfChanged(ref suppressKey, value);
+        }
+
+        public bool HandleApplicationKeys
+        {
+            get => handleApplicationKeys;
+            set => RaiseAndSetIfChanged(ref handleApplicationKeys, value);
         }
 
         public void Add(HotkeyGesture hotkeyToAdd)

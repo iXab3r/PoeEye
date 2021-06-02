@@ -33,8 +33,13 @@ namespace PoeShared.UI
 
     internal sealed class MainWindowViewModel : DisposableReactiveObject
     {
-        public MainWindowViewModel(IHotkeySequenceEditorViewModel hotkeySequenceEditor)
+        private readonly INotificationsService notificationsService;
+
+        public MainWindowViewModel(
+            INotificationsService notificationsService,
+            IHotkeySequenceEditorViewModel hotkeySequenceEditor)
         {
+            this.notificationsService = notificationsService;
             HotkeySequenceEditor = hotkeySequenceEditor;
             LongCommand = CommandWrapper.Create(async () =>
             {
@@ -46,12 +51,36 @@ namespace PoeShared.UI
                 await Task.Delay(3000);
                 throw new ApplicationException("Error");
             });
+            
+            AddTextNotification = CommandWrapper.Create(AddTextNotificationExecuted);
         }
-        
+
+        private void AddTextNotificationExecuted()
+        {
+            var rng = new Random();
+            var notification = new TextNotificationViewModel()
+            {
+                Text = Enumerable.Repeat("a", (int)rng.Next(10, 60)).JoinStrings(" "),
+                TimeLeft = NotificationTimeout
+            };
+
+            notificationsService.AddNotification(notification);
+        }
+
         public IHotkeySequenceEditorViewModel HotkeySequenceEditor { get; }
 
         public CommandWrapper LongCommand { get; }
         
         public CommandWrapper ErrorCommand { get; }
+        
+        public CommandWrapper AddTextNotification { get; }
+
+        private TimeSpan notificationTimeout = TimeSpan.Zero;
+
+        public TimeSpan NotificationTimeout
+        {
+            get => notificationTimeout;
+            set => RaiseAndSetIfChanged(ref notificationTimeout, value);
+        }
     }
 }

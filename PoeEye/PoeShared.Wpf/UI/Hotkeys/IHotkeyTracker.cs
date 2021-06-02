@@ -16,6 +16,8 @@ namespace PoeShared.UI.Hotkeys
         HotkeyMode HotkeyMode { get; set; }
         
         bool SuppressKey { get; set; }
+        
+        bool HandleApplicationKeys { get; set; }
 
         void Add(HotkeyGesture hotkeyToAdd);
 

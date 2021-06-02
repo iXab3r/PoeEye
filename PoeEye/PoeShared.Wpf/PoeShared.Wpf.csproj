@@ -105,6 +105,9 @@
     <Compile Update="UI\Hotkeys\HotkeySequenceEditorViewModel.cs">
       <DependentUpon>HotkeySequenceEditor.xaml</DependentUpon>
     </Compile>
+    <Compile Update="UI\Hotkeys\RecordingNotificationViewModel.cs">
+      <DependentUpon>HotkeySequenceEditor.xaml</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Page Update="UI\Hotkeys\HotkeySequenceEditor.Defaults.xaml">

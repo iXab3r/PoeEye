@@ -11,11 +11,13 @@ namespace PoeShared.UI.Hotkeys
         bool EnableMousePositionRecording { get; set; }
         bool EnableKeyboardRecording { get; set; }
         bool HideKeypressDelays { get; set; }
+        bool IsRecording { get; }
         int MaxItemsCount { get; set; }
         TimeSpan MaxDuration { get; }
         TimeSpan DefaultKeyPressDuration { get; set; }
         TimeSpan MousePositionRecordingResolution { get; set; }
         ObservableCollection<HotkeySequenceItem> Items { get; }
+        HotkeyGesture StopRecordingHotkey { get; set; }
         ICommand AddItem { get; }
         ICommand RemoveItem { get; }
         ICommand ClearItems { get; }

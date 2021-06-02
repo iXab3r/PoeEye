@@ -73,30 +73,24 @@
     </DataTemplate>
 
     <DataTemplate DataType="{x:Type hotkeys:HotkeySequenceDelay}">
-        <Border x:Name="DelayItem"
-                Background="Transparent"
-                Cursor="Hand"
-                BorderThickness="1"
-                BorderBrush="{x:Null}"
-                MinWidth="36"
-                TextBlock.Foreground="{StaticResource SequenceEditorTextForeground}"
-                VerticalAlignment="Center"
-                CornerRadius="5"
-                Padding="5,0">
-            <st:StackPanel Orientation="Vertical">
-                <TextBox Text="{Binding Delay, Converter={StaticResource TimeSpanToMillisecondsConverter}}"
-                         FontSize="16" FontWeight="Bold" Padding="0"
-                         HorizontalAlignment="Center" />
-                <Separator />
-                <TextBlock Text="ms"
-                           FontWeight="Bold"
-                           HorizontalAlignment="Center" />
-            </st:StackPanel>
-        </Border>
+        <st:StackPanel Orientation="Vertical" Cursor="Hand" Background="Transparent" VerticalAlignment="Center" MinWidth="36">
+            <TextBox Text="{Binding Delay, Converter={StaticResource TimeSpanToMillisecondsConverter}}"
+                     x:Name="FirstLineText"
+                     Foreground="{StaticResource SequenceEditorTextForeground}"
+                     FontSize="16" FontWeight="Bold" Padding="0"
+                     HorizontalAlignment="Center" />
+            <Separator />
+            <TextBlock Text="ms"
+                       x:Name="SecondLineText"
+                       Foreground="{StaticResource SequenceEditorTextForeground}"
+                       FontWeight="Bold"
+                       HorizontalAlignment="Center" />
+        </st:StackPanel>
         <DataTemplate.Triggers>
             <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}, Path=IsSelected}"
                          Value="True">
-                <Setter TargetName="DelayItem" Property="TextBlock.Foreground" Value="{StaticResource SequenceEditorAccent}" />
+                <Setter TargetName="FirstLineText" Property="TextBlock.Foreground" Value="{StaticResource SequenceEditorAccent}" />
+                <Setter TargetName="SecondLineText" Property="TextBlock.Foreground" Value="{StaticResource SequenceEditorAccent}" />
             </DataTrigger>
         </DataTemplate.Triggers>
     </DataTemplate>
@@ -131,6 +125,7 @@
             <TextBlock x:Name="KeyDown" Style="{StaticResource IconTextBlock}" Text="&#xf107;" HorizontalAlignment="Center" VerticalAlignment="Top"
                        Visibility="Hidden" />
         </st:StackPanel>
+        
         <DataTemplate.Triggers>
             <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}, Path=IsSelected}"
                          Value="True">

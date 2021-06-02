@@ -13,6 +13,18 @@
         Title="PoeShared Demo" Height="750" Width="800" d:DataContext="{d:DesignInstance local:MainWindowViewModel}">
     <Grid>
         <TabControl>
+            <TabItem Header="Notifications">
+                <st:AutoGrid Columns="150,Auto" Rows="*" ChildMargin="5" VerticalAlignment="Top">
+                        
+                    <TextBlock Text="Show notification: Text"/>
+                    <ui:ButtonEx Content="Show text notification" Command="{Binding AddTextNotification}"/>
+                    
+                    <TextBlock Text="Timeout"/>
+                    <mah:NumericUpDown 
+                        Interval="1000"
+                        Value="{Binding NotificationTimeout, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource TimeSpanToMillisecondsConverter}}"/>
+                </st:AutoGrid>
+            </TabItem>
             <TabItem Header="HotkeySequence">
                 <st:StackPanel Fill="Fill" Orientation="Vertical" MarginBetweenChildren="5" VerticalAlignment="Stretch">
                     
@@ -32,6 +44,10 @@
 
                         <TextBlock Text="Item count"/>
                         <TextBlock Text="{Binding HotkeySequenceEditor.Items.Count}"/>
+                        
+                        
+                        <TextBlock Text="Stop recording hotkey"/>
+                        <hotkeys:HotKeyBox HotKey="{Binding HotkeySequenceEditor.StopRecordingHotkey}"/>
                         
                         <TextBlock Text="MaxDuration"/>
                         <mah:NumericUpDown 
