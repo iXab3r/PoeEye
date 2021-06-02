@@ -1,21 +1,14 @@
-﻿using System.Windows.Input;
-using PoeShared.Native;
-using PoeShared.Scaffolding;
+﻿using PoeShared.Native;
 
 namespace PoeShared.UI.Hotkeys
 {
     internal sealed class RecordingNotificationViewModel : NotificationViewModelBase
     {
-        private readonly HotkeySequenceEditorViewModel owner;
-
-        public RecordingNotificationViewModel(HotkeySequenceEditorViewModel owner)
+        public RecordingNotificationViewModel(IHotkeySequenceEditorViewModel owner)
         {
-            this.owner = owner;
-            this.RaiseWhenSourceValue(x => x.StopRecordingHotkey, owner, x => x.StopRecordingHotkey).AddTo(Anchors);
+            Owner = owner;
         }
 
-        public HotkeyGesture StopRecordingHotkey => owner.StopRecordingHotkey;
-
-        public ICommand StopRecordingCommand => owner.StopRecording;
+        public IHotkeySequenceEditorViewModel Owner { get; }
     }
 }

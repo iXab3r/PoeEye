@@ -20,23 +20,27 @@
     <hotkeys:HotkeySequenceEditorItemVisibilityConverter x:Key="HotkeySequenceEditorItemVisibilityConverter" />
 
     <DataTemplate DataType="{x:Type hotkeys:RecordingNotificationViewModel}">
-        <ui:ButtonEx
-            Opacity="0.5"
-            x:Name="Container"
-            CornerRadius="5"
-            Background="{StaticResource SequenceEditorBackground}"
-            BorderBrush="{StaticResource SequenceEditorAccent}"
-            BorderThickness="1"
-            Foreground="{StaticResource SequenceEditorTextForeground}"
-            Command="{Binding StopRecordingCommand}">
-            <ui:ButtonEx.Content>
-                <st:StackPanel MarginBetweenChildren="5" Orientation="Horizontal">
-                    <TextBlock x:Name="RecordingIcon" Style="{StaticResource IconTextBlock}" Text="&#xf04d;" FontSize="20"
-                               Foreground="{StaticResource NegativeBrush}" />
-                    <TextBlock Text="{Binding StopRecordingHotkey, StringFormat='Press {0} to stop recording'}" />
-                </st:StackPanel>
-            </ui:ButtonEx.Content>
-        </ui:ButtonEx>
+        <st:StackPanel Orientation="Vertical" MarginBetweenChildren="5">
+            <ProgressBar Minimum="0" Value="{Binding Owner.TotalItemsCount, Mode=OneWay}" Maximum="{Binding Owner.MaxItemsCount, Mode=OneWay}"></ProgressBar>
+            <ui:ButtonEx
+                Opacity="0.5"
+                x:Name="Container"
+                CornerRadius="5"
+                Background="{StaticResource SequenceEditorBackground}"
+                BorderBrush="{StaticResource SequenceEditorAccent}"
+                BorderThickness="1"
+                Foreground="{StaticResource SequenceEditorTextForeground}"
+                Command="{Binding Owner.StopRecording}">
+                <ui:ButtonEx.Content>
+                    <st:StackPanel MarginBetweenChildren="5" Orientation="Horizontal">
+                        <TextBlock x:Name="RecordingIcon" Style="{StaticResource IconTextBlock}" Text="&#xf04d;" FontSize="20"
+                                   Foreground="{StaticResource NegativeBrush}" />
+                        <TextBlock Text="{Binding Owner.StopRecordingHotkey, StringFormat='Press {0} to stop recording'}" />
+                    </st:StackPanel>
+                </ui:ButtonEx.Content>
+            </ui:ButtonEx>
+            <ProgressBar Minimum="0" Value="{Binding Owner.TotalDuration.TotalMilliseconds, Mode=OneWay}" Maximum="{Binding Owner.MaxDuration.TotalMilliseconds, Mode=OneWay}"></ProgressBar>
+        </st:StackPanel>
         <DataTemplate.Triggers>
             <Trigger SourceName="Container" Property="IsMouseOver" Value="True">
                 <Setter TargetName="Container" Property="BorderBrush" Value="{StaticResource SequenceEditorAccent}" />
