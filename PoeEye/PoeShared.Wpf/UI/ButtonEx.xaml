@@ -68,6 +68,7 @@
                         </Trigger>
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter Property="Foreground" Value="{StaticResource MouseOverAccentBrushKey}" />
+                            <Setter Property="BorderBrush" Value="{StaticResource MouseOverAccentBrushKey}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
