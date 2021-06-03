@@ -34,12 +34,15 @@ namespace PoeShared.UI
     internal sealed class MainWindowViewModel : DisposableReactiveObject
     {
         private readonly INotificationsService notificationsService;
+        private TimeSpan randomPeriod;
 
         public MainWindowViewModel(
+            IRandomPeriodSelector randomPeriodSelector,
             INotificationsService notificationsService,
             IHotkeySequenceEditorViewModel hotkeySequenceEditor)
         {
             this.notificationsService = notificationsService;
+            RandomPeriodSelector = randomPeriodSelector;
             HotkeySequenceEditor = hotkeySequenceEditor;
             LongCommand = CommandWrapper.Create(async () =>
             {
@@ -53,6 +56,7 @@ namespace PoeShared.UI
             });
             
             AddTextNotification = CommandWrapper.Create(AddTextNotificationExecuted);
+            NextRandomPeriodCommand = CommandWrapper.Create(() => RandomPeriod = randomPeriodSelector.GetValue());
         }
 
         private void AddTextNotificationExecuted()
@@ -67,11 +71,14 @@ namespace PoeShared.UI
             notificationsService.AddNotification(notification);
         }
 
+        public IRandomPeriodSelector RandomPeriodSelector { get; }
         public IHotkeySequenceEditorViewModel HotkeySequenceEditor { get; }
 
         public CommandWrapper LongCommand { get; }
         
         public CommandWrapper ErrorCommand { get; }
+        
+        public ICommand NextRandomPeriodCommand { get; }
         
         public CommandWrapper AddTextNotification { get; }
 
@@ -81,6 +88,12 @@ namespace PoeShared.UI
         {
             get => notificationTimeout;
             set => RaiseAndSetIfChanged(ref notificationTimeout, value);
+        }
+
+        public TimeSpan RandomPeriod
+        {
+            get => randomPeriod;
+            set => RaiseAndSetIfChanged(ref randomPeriod, value);
         }
     }
 }

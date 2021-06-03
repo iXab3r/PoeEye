@@ -16,7 +16,7 @@ namespace PoeShared.Converters
 
             var timeSpan = (TimeSpan)value;
 
-            return (int)timeSpan.TotalMilliseconds;
+            return timeSpan.TotalMilliseconds;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

@@ -8,6 +8,7 @@
         <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Native/OverlayContainerView.xaml" />
         <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/UI/Hotkeys/HotKeyBox.xaml" />
         <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/UI/Hotkeys/HotkeySequenceEditor.xaml" />
+        <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/UI/RandomPeriodSelector.xaml" />
         <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/UI/Settings/GenericSettingsView.xaml" />
         <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Audio/Views/AudioNotificationTypeSelectorView.xaml" />
         <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Styles.xaml" />

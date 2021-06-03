@@ -173,6 +173,30 @@
             </Trigger>
         </Style.Triggers>
     </Style>
+    
+    <ControlTemplate x:Key="IconErrorValidationTemplate">
+        <Border BorderBrush="{StaticResource NegativeBrush}" BorderThickness="0 0 0 2">
+            <Grid>
+                <TextBlock Style="{StaticResource IconTextBlock}" FontSize="14"
+                           Background="Transparent"
+                           HorizontalAlignment="Left"
+                           IsHitTestVisible="True"
+                           Text="&#xf06a;" Foreground="{StaticResource NegativeBrush}"
+                           Margin="-15,0,0,0" VerticalAlignment="Center">
+                    <TextBlock.ToolTip>
+                        <ItemsControl ItemsSource="{Binding}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate DataType="{x:Type ValidationError}">
+                                    <TextBlock Text="{Binding ErrorContent}"  />
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </TextBlock.ToolTip>
+                </TextBlock>
+                <AdornedElementPlaceholder />
+            </Grid>
+        </Border>
+    </ControlTemplate>
 
     <Style x:Key="DefaultToggleButton" TargetType="{x:Type ToggleButton}">
         <Setter Property="Foreground" Value="{DynamicResource PrimaryHueMidForegroundBrush}" />

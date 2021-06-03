@@ -6,6 +6,10 @@
     <ui:SharedResourceDictionary.MergedDictionaries>
         <ui:SharedResourceDictionary Source="Styles.xaml" />
     </ui:SharedResourceDictionary.MergedDictionaries>
+    
+    <Style TargetType="{x:Type ContentControl}">
+        <Setter Property="Focusable" Value="False"/>
+    </Style>
 
     <Style TargetType="{x:Type TextBlock}"
            BasedOn="{StaticResource DefaultTextBlockStyleKey}">

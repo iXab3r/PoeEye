@@ -13,6 +13,17 @@
         Title="PoeShared Demo" Height="750" Width="800" d:DataContext="{d:DesignInstance local:MainWindowViewModel}">
     <Grid>
         <TabControl>
+            <TabItem Header="Misc">
+                <st:AutoGrid Columns="150,Auto" Rows="*" ChildMargin="5" VerticalAlignment="Top">
+                        
+                    <TextBlock Text="Random period selector"/>
+                    <ContentControl Content="{Binding RandomPeriodSelector}"/>
+                    
+                    <ui:ButtonEx Content="Next" Command="{Binding NextRandomPeriodCommand}"/>
+                    <TextBlock Text="{Binding RandomPeriod}"/>
+                   
+                </st:AutoGrid>
+            </TabItem>
             <TabItem Header="Notifications">
                 <st:AutoGrid Columns="150,Auto" Rows="*" ChildMargin="5" VerticalAlignment="Top">
                         

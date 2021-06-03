@@ -1,11 +1,18 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Reactive.Linq;
 using log4net;
 using PoeShared.Scaffolding;
+using PoeShared.Wpf.Scaffolding;
+using ReactiveUI;
+using ReactiveUI.Validation.Abstractions;
+using ReactiveUI.Validation.Components.Abstractions;
+using ReactiveUI.Validation.Contexts;
+using ReactiveUI.Validation.Extensions;
 
 namespace PoeShared.UI
 {
-    internal sealed class RandomPeriodSelector : DisposableReactiveObject, IRandomPeriodSelector
+    internal sealed class RandomPeriodSelector : ValidatableReactiveObject<RandomPeriodSelector>, IRandomPeriodSelector, IValidatableViewModel
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(RandomPeriodSelector));
 
@@ -15,7 +22,7 @@ namespace PoeShared.UI
         private TimeSpan lowerValue;
         private bool randomizeValue;
 
-        private TimeSpan minimum = TimeSpan.MinValue;
+        private TimeSpan minimum = TimeSpan.Zero;
         private TimeSpan maximum = TimeSpan.MaxValue;
         
         public RandomPeriodSelector(IRandomNumberGenerator rng)
@@ -27,15 +34,21 @@ namespace PoeShared.UI
                 .SubscribeSafe(() => RandomizeValue = true, Log.HandleUiException)
                 .AddTo(Anchors);
             
-            this.WhenAnyProperty(x => x.UpperValue, x => x.RandomizeValue)
-                .Where(x => lowerValue > upperValue || !randomizeValue)
-                .SubscribeSafe(x => LowerValue = upperValue, Log.HandleUiException)
+            this.WhenAnyValue(x => x.RandomizeValue)
+                .WithPrevious()
+                .Where(x => x.Previous == false && x.Current == true)
+                .Where(x => upperValue < lowerValue)
+                .SubscribeSafe(() => UpperValue = lowerValue, Log.HandleUiException)
                 .AddTo(Anchors);
+
+            this.ValidationRule(x => x.UpperValue,
+                x => !randomizeValue || x >= lowerValue, x => $"Must be greater than {lowerValue}");
+            this.ValidationRule(x => x.LowerValue,
+                x => !randomizeValue || x <= upperValue, x => $"Must be less than {upperValue}");
             
-            this.WhenAnyProperty(x => x.LowerValue, x => x.RandomizeValue)
-                .Where(x => upperValue < lowerValue || !randomizeValue)
-                .SubscribeSafe(x => UpperValue = lowerValue, Log.HandleUiException)
-                .AddTo(Anchors);
+            this.ValidationRule(x => this.WhenAnyValue(x => x.UpperValue, x => x.LowerValue)
+                    .Select(_ => !randomizeValue || LowerValue >= UpperValue),
+                (x, isValid) => isValid ? "test" : "abc");
         }
 
         public TimeSpan Minimum
@@ -70,6 +83,10 @@ namespace PoeShared.UI
 
         public TimeSpan GetValue()
         {
+            if (randomizeValue && upperValue < lowerValue)
+            {
+                throw new InvalidOperationException($"Invalid range: [{lowerValue}; {upperValue}]");
+            }
             return randomizeValue ? rng.GenerateDelay(lowerValue, upperValue) : lowerValue;
         }
     }
