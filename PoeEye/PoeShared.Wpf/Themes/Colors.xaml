@@ -41,6 +41,7 @@
     <SolidColorBrush x:Key="NegativeBrush" Color="{StaticResource NegativeColor}" ice:Freeze="True"/>
     <SolidColorBrush x:Key="PositiveBrush" Color="{StaticResource PositiveColor}" ice:Freeze="True"/>
     <SolidColorBrush x:Key="WarningBrush" Color="{StaticResource WarningColor}" ice:Freeze="True"/>
+    <SolidColorBrush x:Key="NegativePositiveBrush" Color="{StaticResource PositiveColor}" ice:Freeze="True" />
     
     <Color x:Key="PoeShallow">#11FFFFFF</Color>
     <Color x:Key="PoeFontColor">#FFFEEAC5</Color>
