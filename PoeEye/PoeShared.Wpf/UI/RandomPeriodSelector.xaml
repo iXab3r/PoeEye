@@ -35,6 +35,11 @@
         <DataTemplate.Triggers>
             <DataTrigger Binding="{Binding RandomizeValue}" Value="False">
                 <Setter TargetName="Lower" Property="materialDesign:HintAssist.Hint" Value=""/>
+                <Setter TargetName="Lower" Property="materialDesign:HintAssist.IsFloating" Value="False"/>
+            </DataTrigger>
+            <DataTrigger Binding="{Binding RandomizeValue}" Value="True">
+                <Setter TargetName="Lower" Property="Margin" Value="0 -7.5 0 0"/>
+                <Setter TargetName="Upper" Property="Margin" Value="0 -7.5 0 0"/>
             </DataTrigger>
         </DataTemplate.Triggers>
     </DataTemplate>
