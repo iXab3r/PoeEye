@@ -12,7 +12,6 @@
        <st:StackPanel Orientation="Horizontal" MarginBetweenChildren="10">
            <mah:NumericUpDown MinWidth="60" Interval="100"
                               x:Name="Lower"
-                              Style="{StaticResource FastNumericUpDown}"
                               Minimum="{Binding Minimum, Mode=OneWay, Converter={StaticResource TimeSpanToMillisecondsConverter}}"
                               Maximum="{Binding Maximum, Mode=OneWay, Converter={StaticResource TimeSpanToMillisecondsConverter}}"
                               materialDesign:HintAssist.Hint="Min" materialDesign:HintAssist.IsFloating="True"
@@ -27,7 +26,6 @@
                               Minimum="{Binding  Minimum, Mode=OneWay, Converter={StaticResource TimeSpanToMillisecondsConverter}}"
                               Maximum="{Binding Maximum, Mode=OneWay, Converter={StaticResource TimeSpanToMillisecondsConverter}}"
                               materialDesign:HintAssist.Hint="Max" materialDesign:HintAssist.IsFloating="True"
-                              Style="{StaticResource FastNumericUpDown}"
                               Value="{Binding UpperValue, Converter={StaticResource TimeSpanToMillisecondsConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
            </mah:NumericUpDown>
            <CheckBox IsChecked="{Binding RandomizeValue}" Content="Randomize" />

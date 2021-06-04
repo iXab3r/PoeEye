@@ -4,6 +4,7 @@
                     xmlns:ui="clr-namespace:PoeShared.UI">
     <ui:SharedResourceDictionary.MergedDictionaries>
         <ui:SharedResourceDictionary Source="Styles.xaml" />
+        <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/UI/NumericUpDown.xaml" />
     </ui:SharedResourceDictionary.MergedDictionaries>
     
     <Style TargetType="{x:Type ContentControl}">
@@ -51,4 +52,6 @@
     
     <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource DefaultTextBoxStyle}">
     </Style>
+    
+    <Style TargetType="{x:Type controls:NumericUpDown}" BasedOn="{StaticResource FastNumericUpDown}"/>
 </ui:SharedResourceDictionary>
