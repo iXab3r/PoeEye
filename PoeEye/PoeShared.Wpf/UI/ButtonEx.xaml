@@ -32,9 +32,12 @@
         <Setter Property="HorizontalContentAlignment" Value="Center" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="Padding" Value="-5,0,0,0" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
     </Style>
-
-    <Style x:Key="FastButtonExStyle" TargetType="{x:Type ui:ButtonEx}" BasedOn="{StaticResource ButtonExStyleBase}">
+    
+     <Style x:Key="FastButtonExStyle" TargetType="{x:Type ui:ButtonEx}" BasedOn="{StaticResource ButtonExStyleBase}">
+        <Setter Property="Content" Value="{Binding RelativeSource={RelativeSource Self}, Path=Icon}"/>
+        <Setter Property="FontFamily" Value="{StaticResource FontAwesome}"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type ui:ButtonEx}">
@@ -56,6 +59,7 @@
                         <ContentPresenter x:Name="ContentLabel"
                                           VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
                                           HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                          TextElement.FontFamily="{TemplateBinding FontFamily}"
                                           TextElement.Foreground="{TemplateBinding Foreground}"
                                           Margin="{TemplateBinding Padding}"
                                           Content="{Binding Path=Content, RelativeSource={RelativeSource TemplatedParent}}"
@@ -67,8 +71,7 @@
                             <Setter Property="Opacity" Value="0.66" />
                         </Trigger>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Foreground" Value="{StaticResource MouseOverAccentBrushKey}" />
-                            <Setter Property="BorderBrush" Value="{StaticResource MouseOverAccentBrushKey}" />
+                            <Setter TargetName="ContentLabel" Property="TextElement.Foreground" Value="{StaticResource MouseOverAccentBrushKey}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
