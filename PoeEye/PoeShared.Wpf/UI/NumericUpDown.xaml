@@ -1,11 +1,11 @@
 <ui:SharedResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-                    xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
-                    xmlns:mdix="http://materialdesigninxaml.net/winfx/xaml/themes"
-                    xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
-                    xmlns:ui="clr-namespace:PoeShared.UI"
-                    xmlns:wpf="clr-namespace:PoeShared.Scaffolding.WPF">
+                             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+                             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+                             xmlns:mdix="http://materialdesigninxaml.net/winfx/xaml/themes"
+                             xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+                             xmlns:ui="clr-namespace:PoeShared.UI"
+                             xmlns:wpf="clr-namespace:PoeShared.Scaffolding.WPF">
 
     <ui:SharedResourceDictionary.MergedDictionaries>
         <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Styles.xaml" />
@@ -18,148 +18,96 @@
     <Style TargetType="{x:Type mah:NumericUpDown}" x:Key="FastNumericUpDown">
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="BorderBrush" Value="{DynamicResource MaterialDesignTextBoxBorder}" />
-        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="BorderThickness" Value="0" />
         <Setter Property="ContextMenu" Value="{StaticResource MaterialDesignDefaultContextMenu}" />
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
-        <Setter Property="FontFamily" Value="{DynamicResource MahApps.Fonts.Family.Control}" />
-        <Setter Property="FontSize" Value="{DynamicResource MahApps.Font.Size.Content}" />
-        <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.Text}" />
         <Setter Property="VerticalAlignment" Value="Stretch" />
         <Setter Property="HorizontalAlignment" Value="Stretch" />
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
-        <Setter Property="MinHeight" Value="26" />
         <Setter Property="MinWidth" Value="30" />
+        <Setter Property="MinHeight" Value="0" />
         <Setter Property="Padding" Value="0" />
+        <Setter Property="UpDownButtonsWidth" Value="14" />
         <Setter Property="Validation.ErrorTemplate" Value="{StaticResource IconErrorValidationTemplate}" />
         <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Hidden" />
         <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Hidden" />
         <Setter Property="SnapsToDevicePixels" Value="true" />
         <Setter Property="mdix:TextFieldAssist.UnderlineBrush" Value="{DynamicResource PrimaryHueMidBrush}" />
-        <Setter Property="InterceptMouseWheel" Value="False"/>
+        <Setter Property="InterceptMouseWheel" Value="False" />
         <Setter Property="TextAlignment" Value="Left" />
-        <Setter Property="UpDownButtonsWidth" Value="14" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type mah:NumericUpDown}">
-                    <Grid SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
-                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}">
-                        <AdornerDecorator>
-                            <Border x:Name="Base"
-                                    BorderBrush="{TemplateBinding BorderBrush}"
-                                    BorderThickness="{TemplateBinding BorderThickness}"
-                                    SnapsToDevicePixels="True"
-                                    Background="{TemplateBinding Background}"
-                                    CornerRadius="{TemplateBinding mah:ControlsHelper.CornerRadius}"
-                                    mdix:BottomDashedLineAdorner.Brush="{TemplateBinding BorderBrush}"
-                                    mdix:BottomDashedLineAdorner.Thickness="{TemplateBinding BorderThickness}">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition x:Name="PART_LeftColumn" Width="*" />
-                                        <ColumnDefinition x:Name="PART_RightColumn" Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="*" />
-                                        <RowDefinition Height="*" />
-                                    </Grid.RowDefinitions>
-                                    <TextBox x:Name="PART_TextBox"
-                                             Grid.Column="0"
-                                             Grid.Row="0"
-                                             Grid.RowSpan="2"
-                                             MinWidth="20"
-                                             MinHeight="0"
-                                             mdix:TextFieldAssist.DecorationVisibility="Collapsed"
-                                             mdix:TextFieldAssist.SuffixText="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(mdix:TextFieldAssist.SuffixText)}"
-                                             Background="{x:Null}"
-                                             BorderThickness="0"
-                                             ContextMenu="{TemplateBinding ContextMenu}"
-                                             FocusVisualStyle="{x:Null}"
-                                             Focusable="{TemplateBinding Focusable}"
-                                             FontFamily="{TemplateBinding FontFamily}"
-                                             FontSize="{TemplateBinding FontSize}"
-                                             Foreground="{TemplateBinding Foreground}"
-                                             HorizontalScrollBarVisibility="{TemplateBinding ScrollViewer.HorizontalScrollBarVisibility}"
-                                             IsReadOnly="{TemplateBinding IsReadOnly}"
-                                             IsTabStop="{TemplateBinding IsTabStop}"
-                                             SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
-                                             TabIndex="{TemplateBinding TabIndex}"
-                                             VerticalScrollBarVisibility="{TemplateBinding ScrollViewer.VerticalScrollBarVisibility}">
-                                        <Validation.ErrorTemplate>
-                                            <ControlTemplate>
-                                                <StackPanel>
-                                                    <AdornedElementPlaceholder x:Name="textBox" />
-                                                    <ItemsControl ItemsSource="{Binding}">
-                                                        <ItemsControl.ItemTemplate>
-                                                            <DataTemplate>
-                                                                <TextBlock Text="{Binding ErrorContent}" Foreground="Red" />
-                                                            </DataTemplate>
-                                                        </ItemsControl.ItemTemplate>
-                                                    </ItemsControl>
-                                                </StackPanel>
-                                            </ControlTemplate>
-                                        </Validation.ErrorTemplate>
-                                    </TextBox>
-                                    <RepeatButton x:Name="PART_NumericUp"
-                                                  Grid.Column="1"
-                                                  Grid.Row="0"
-                                                  Width="{TemplateBinding UpDownButtonsWidth}"
-                                                  Margin="0"
-                                                  Delay="{TemplateBinding Delay}"
-                                                  Focusable="{TemplateBinding UpDownButtonsFocusable}"
-                                                  Foreground="{TemplateBinding Foreground}"
-                                                  IsTabStop="False"
-                                                  Style="{DynamicResource MahApps.Styles.Button.Chromeless}">
-                                        <Path x:Name="PolygonUp" Fill="{TemplateBinding Foreground}" Data="{StaticResource UpArrowGeometry}" />
-                                    </RepeatButton>
-                                    <RepeatButton x:Name="PART_NumericDown"
-                                                  Grid.Column="1"
-                                                  Grid.Row="1"
-                                                  Width="{TemplateBinding UpDownButtonsWidth}"
-                                                  Margin="0"
-                                                  VerticalContentAlignment="Center"
-                                                  Delay="{TemplateBinding Delay}"
-                                                  Focusable="{TemplateBinding UpDownButtonsFocusable}"
-                                                  Foreground="{TemplateBinding Foreground}"
-                                                  IsTabStop="False"
-                                                  Style="{DynamicResource MahApps.Styles.Button.Chromeless}">
-                                        <Path x:Name="PolygonDown" Fill="{TemplateBinding Foreground}" Data="{StaticResource DownArrowGeometry}" />
-                                    </RepeatButton>
-                                </Grid>
-                            </Border>
-                        </AdornerDecorator>
-                        
-                        <Border
-                            x:Name="borderUnderline"
-                            Height="2"
-                            HorizontalAlignment="Stretch"
-                            VerticalAlignment="Bottom"
-                            SnapsToDevicePixels="True" />
+                    <Grid VerticalAlignment="{TemplateBinding VerticalContentAlignment}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition x:Name="PART_TextColumn" Width="*" />
+                            <ColumnDefinition x:Name="PART_RightColumn" Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <TextBox x:Name="PART_TextBox"
+                                 Grid.Column="0"
+                                 Grid.Row="0"
+                                 Grid.RowSpan="2"
+                                 MinWidth="20"
+                                 MinHeight="0"
+                                 Margin="{TemplateBinding Padding}"
+                                 mdix:TextFieldAssist.DecorationVisibility="Collapsed"
+                                 Background="{TemplateBinding Background}"
+                                 HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                 HorizontalContentAlignment="Stretch"
+                                 VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                 VerticalContentAlignment="Center"
+                                 BorderThickness="0"
+                                 ContextMenu="{TemplateBinding ContextMenu}"
+                                 Focusable="{TemplateBinding Focusable}"
+                                 FontFamily="{TemplateBinding FontFamily}"
+                                 FontSize="{TemplateBinding FontSize}"
+                                 Foreground="{TemplateBinding Foreground}"
+                                 HorizontalScrollBarVisibility="{TemplateBinding ScrollViewer.HorizontalScrollBarVisibility}"
+                                 IsReadOnly="{TemplateBinding IsReadOnly}"
+                                 IsTabStop="{TemplateBinding IsTabStop}"
+                                 SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                                 TabIndex="{TemplateBinding TabIndex}"
+                                 VerticalScrollBarVisibility="{TemplateBinding ScrollViewer.VerticalScrollBarVisibility}" />
+                        <RepeatButton x:Name="PART_NumericUp"
+                                      Grid.Column="1"
+                                      Grid.Row="0"
+                                      Width="{TemplateBinding UpDownButtonsWidth}"
+                                      Margin="0"
+                                      Delay="{TemplateBinding Delay}"
+                                      Focusable="{TemplateBinding UpDownButtonsFocusable}"
+                                      Foreground="{TemplateBinding Foreground}"
+                                      IsTabStop="False"
+                                      Style="{DynamicResource MahApps.Styles.Button.Chromeless}">
+                            <Path x:Name="PolygonUp" Fill="{TemplateBinding Foreground}" Data="{StaticResource UpArrowGeometry}" />
+                        </RepeatButton>
+                        <RepeatButton x:Name="PART_NumericDown"
+                                      Grid.Column="1"
+                                      Grid.Row="1"
+                                      Width="{TemplateBinding UpDownButtonsWidth}"
+                                      Margin="0"
+                                      VerticalContentAlignment="Center"
+                                      Delay="{TemplateBinding Delay}"
+                                      Focusable="{TemplateBinding UpDownButtonsFocusable}"
+                                      Foreground="{TemplateBinding Foreground}"
+                                      IsTabStop="False"
+                                      Style="{DynamicResource MahApps.Styles.Button.Chromeless}">
+                            <Path x:Name="PolygonDown" Fill="{TemplateBinding Foreground}" Data="{StaticResource DownArrowGeometry}" />
+                        </RepeatButton>
                         <i:Interaction.Behaviors>
                             <wpf:IgnoreMouseWheelBehavior IsEnabled="True" />
                         </i:Interaction.Behaviors>
                     </Grid>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="False">
-                            <Setter TargetName="PART_NumericUp" Property="Visibility" Value="Hidden"/>
-                            <Setter TargetName="PART_NumericDown" Property="Visibility" Value="Hidden"/>
+                            <Setter TargetName="PART_NumericUp" Property="Visibility" Value="Hidden" />
+                            <Setter TargetName="PART_NumericDown" Property="Visibility" Value="Hidden" />
                         </Trigger>
-                        <Trigger Property="IsEnabled" Value="False">
-                            <Setter TargetName="Base" Property="Opacity" Value="0.42" />
-                            <Setter TargetName="Base" Property="BorderBrush" Value="Transparent" />
-                            <Setter Property="materialDesign:BottomDashedLineAdorner.IsAttached" TargetName="Base" Value="True" />
-                            <Setter TargetName="borderUnderline" Property="Background" Value="Transparent" />
-                        </Trigger> 
-                        
-                        <MultiTrigger>
-                            <MultiTrigger.Conditions>
-                                <Condition Property="IsEnabled" Value="True" />
-                            </MultiTrigger.Conditions>
-                            <Setter TargetName="borderUnderline" Property="BorderThickness" Value="0 0 0 1" />
-                            <Setter TargetName="borderUnderline" Property="BorderBrush" Value="{DynamicResource MaterialDesignTextBoxBorder}" />
-                        </MultiTrigger>
-                        
-                        <!-- IsKeyboardFocused -->
-                        
+
                         <Trigger Property="IsReadOnly" Value="True">
                             <Setter Property="InterceptArrowKeys" Value="False" />
                             <Setter Property="InterceptManualEnter" Value="False" />
@@ -190,13 +138,6 @@
                             <Setter TargetName="PART_NumericDown" Property="Background" Value="{DynamicResource MahApps.Brushes.ThemeForeground}" />
                             <Setter TargetName="PolygonDown" Property="Fill" Value="{DynamicResource MahApps.Brushes.ThemeBackground}" />
                         </Trigger>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="borderUnderline" Property="BorderBrush" Value="{DynamicResource PrimaryHueMidBrush}" />
-                        </Trigger>
-                        <Trigger Property="IsKeyboardFocusWithin" Value="True">
-                            <Setter TargetName="borderUnderline" Property="BorderThickness" Value="0 0 0 2" />
-                            <Setter TargetName="borderUnderline" Property="BorderBrush" Value="{DynamicResource PrimaryHueMidBrush}" />
-                        </Trigger>
                         <Trigger Property="HideUpDownButtons" Value="True">
                             <Setter TargetName="PART_NumericDown" Property="Visibility" Value="Collapsed" />
                             <Setter TargetName="PART_NumericUp" Property="Visibility" Value="Collapsed" />
@@ -207,4 +148,5 @@
         </Setter>
     </Style>
 
+    <Style TargetType="{x:Type mah:NumericUpDown}" BasedOn="{StaticResource FastNumericUpDown}" />
 </ui:SharedResourceDictionary>

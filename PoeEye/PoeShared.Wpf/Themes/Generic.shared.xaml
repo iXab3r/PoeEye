@@ -2,10 +2,11 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:ui="clr-namespace:PoeShared.UI">
     <ui:SharedResourceDictionary.MergedDictionaries>
-        <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/UI/ButtonEx.xaml" />
         <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Converters.xaml" />
+        <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Colors.xaml" />
         <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/CommandWrapperView.xaml" />
         <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Native/OverlayContainerView.xaml" />
+        <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/UI/ButtonEx.xaml" />
         <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/UI/Hotkeys/HotKeyBox.xaml" />
         <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/UI/Hotkeys/HotkeySequenceEditor.xaml" />
         <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/UI/RandomPeriodSelector.xaml" />
@@ -13,9 +14,7 @@
         <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Audio/Views/AudioNotificationTypeSelectorView.xaml" />
         <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Styles.xaml" />
         <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Styles.TreeView.xaml" />
-        <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Colors.xaml" />
         <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/SlimScrollbar.xaml" />
         <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Thumb.xaml" />
-        <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Styles.default.xaml" />
     </ui:SharedResourceDictionary.MergedDictionaries>
 </ui:SharedResourceDictionary>

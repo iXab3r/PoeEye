@@ -3,7 +3,6 @@
                     xmlns:ui="clr-namespace:PoeShared.UI;assembly=PoeShared.Wpf">
 
     <ui:SharedResourceDictionary.MergedDictionaries>
-        <ui:SharedResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />
         <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Squirrel;component/Updater/ApplicationUpdaterView.xaml" />
         <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Squirrel;component/Updater/UpdateSettingsView.xaml" />
     </ui:SharedResourceDictionary.MergedDictionaries>

@@ -5,9 +5,6 @@
                     xmlns:ui="clr-namespace:PoeShared.UI"
                     xmlns:eye="clr-namespace:PoeShared.Scaffolding.WPF">
     <ui:SharedResourceDictionary.MergedDictionaries>
-        <ui:SharedResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.textbox.xaml" />
-        <ui:SharedResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.textblock.xaml" />
-        <ui:SharedResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.menu.xaml" />
         <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Colors.xaml" />
     </ui:SharedResourceDictionary.MergedDictionaries>
     

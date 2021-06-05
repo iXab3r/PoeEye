@@ -4,8 +4,6 @@
                     xmlns:updater1="clr-namespace:PoeShared.Squirrel.Updater"
                     xmlns:ui="clr-namespace:PoeShared.UI;assembly=PoeShared.Wpf">
     <ui:SharedResourceDictionary.MergedDictionaries>
-
-        <ui:SharedResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />
         <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Converters.xaml" />
         <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Colors.xaml" />
     </ui:SharedResourceDictionary.MergedDictionaries>

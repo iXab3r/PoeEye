@@ -8,6 +8,7 @@
         xmlns:hotkeys="clr-namespace:PoeShared.UI.Hotkeys;assembly=PoeShared.Wpf"
         xmlns:st="http://schemas.spicytaco.io/"
         xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         mc:Ignorable="d"
         WindowStartupLocation="CenterScreen"
         Title="PoeShared Demo" Height="750" Width="800" d:DataContext="{d:DesignInstance local:MainWindowViewModel}">
@@ -17,11 +18,18 @@
                 <st:AutoGrid Columns="150,Auto" Rows="*" ChildMargin="5" VerticalAlignment="Top">
                         
                     <TextBlock Text="Random period selector"/>
-                    <ContentControl Content="{Binding RandomPeriodSelector}"/>
+                    <st:StackPanel MarginBetweenChildren="5">
+                        <ContentControl Content="{Binding RandomPeriodSelector}"/>
+                        <ui:ButtonEx Content="Next" Command="{Binding NextRandomPeriodCommand}"/>
+                        <TextBlock Text="{Binding RandomPeriod}"/>
+                    </st:StackPanel>
                     
-                    <ui:ButtonEx Content="Next" Command="{Binding NextRandomPeriodCommand}"/>
-                    <TextBlock Text="{Binding RandomPeriod}"/>
-                   
+                    <TextBlock Text="Box with hint"/>
+                    <TextBox materialDesign:HintAssist.Hint="With hint"/>
+                    <TextBlock Text="Box without hint"/>
+                    <TextBox />
+                    <ContentControl Content="{Binding RandomPeriodSelector}"/>
+
                 </st:AutoGrid>
             </TabItem>
             <TabItem Header="Notifications">

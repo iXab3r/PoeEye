@@ -29,7 +29,7 @@ namespace PoeShared.Scaffolding
             this.logger = logger ?? DefaultLogger;
             this.propertyName = propertyName ?? "unknown";
             sw = Stopwatch.StartNew();
-            Step("Starting operation");
+            Step($"=> {benchmarkName}");
         }
         
         public TimeSpan Elapsed => sw.Elapsed;
@@ -109,7 +109,7 @@ namespace PoeShared.Scaffolding
             sw.Stop();
             if (logOnDisposal && logger.IsDebugEnabled && sw.Elapsed > loggingElapsedThreshold)
             {
-                logger.Debug($"[{propertyName}] [{sw.Elapsed.TotalMilliseconds:F1}ms] {benchmarkName}{(operations.Count <= 0 ? string.Empty : $"\n\t{string.Join("\n\t", operations)}")}");
+                logger.Debug($"[{propertyName}] [{sw.Elapsed.TotalMilliseconds:F1}ms] <= {benchmarkName}{(operations.Count <= 0 ? string.Empty : $"\n\t{string.Join("\n\t", operations)}")}");
             }
         }
     }

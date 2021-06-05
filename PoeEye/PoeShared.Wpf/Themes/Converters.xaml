@@ -21,6 +21,7 @@
     <blue:MultiplyDoubleConverter x:Key="DoubleDivideByFiveConverter" Factor="0.2" />
     <blue:MultiplyDoubleConverter x:Key="DoubleDivideByTwoConverter" Factor="0.5" />
     <blue:MultiplyDoubleConverter x:Key="DoubleMultiplyByTwoConverter" Factor="2" />
+    <eyeConverters:MultiplicationConverter x:Key="MultiplicationConverter" />
     <eyeConverters:PathCombineMultiValueConverter x:Key="PathCombineMultiValueConverter"/>
     <eyeConverters:RectangleConverter x:Key="RectangleConverter"/>
     <eyeConverters:SizeToStringConverter x:Key="SizeToStringConverter"/>
@@ -163,5 +164,6 @@
     <eyeConverters:PropagatingMultiValueConverter x:Key="PropagatingMultiValueConverter" />
     <eyeConverters:NullToBoolConverter x:Key="NullToTrueConverter" NullValue="True" />
     <eyeConverters:NullToBoolConverter x:Key="NullToFalseConverter" NullValue="False" />
+    <eyeConverters:PointToThicknessConverter x:Key="PointToThicknessConverter" />
 
 </ui:SharedResourceDictionary>

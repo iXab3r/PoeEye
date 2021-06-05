@@ -2,12 +2,12 @@
                              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                              xmlns:wpf="http://materialdesigninxaml.net/winfx/xaml/themes"
                              xmlns:system="clr-namespace:System;assembly=System.Runtime"
-                             xmlns:ui="clr-namespace:PoeShared.UI">
+                             xmlns:ui="clr-namespace:PoeShared.UI"
+                             xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls">
     <ui:SharedResourceDictionary.MergedDictionaries>
         <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Converters.xaml" />
         <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Colors.xaml" />
         <ui:SharedResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.defaults.xaml" />
-        <ui:SharedResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.popupbox.xaml" />
     </ui:SharedResourceDictionary.MergedDictionaries>
 
     <Style TargetType="{x:Type Button}" x:Key="InvisibleButtonStyleKey">
@@ -173,7 +173,7 @@
             </Trigger>
         </Style.Triggers>
     </Style>
-    
+
     <ControlTemplate x:Key="IconErrorValidationTemplate">
         <Border BorderBrush="{StaticResource NegativeBrush}" BorderThickness="0 0 0 2">
             <Grid>
@@ -187,7 +187,7 @@
                         <ItemsControl ItemsSource="{Binding}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate DataType="{x:Type ValidationError}">
-                                    <TextBlock Text="{Binding ErrorContent}"  />
+                                    <TextBlock Text="{Binding ErrorContent}" />
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
@@ -297,263 +297,147 @@
         </Setter>
     </Style>
 
+    <Style x:Key="FastTextBoxStyle" TargetType="{x:Type TextBox}">
+        <Setter Property="OverridesDefaultStyle" Value="True" />
+        <Setter Property="CaretBrush" Value="White" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type TextBoxBase}">
+                    <Border x:Name="PART_ContentHost"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                            Margin="{TemplateBinding Padding}" />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
 
-    <Style TargetType="{x:Type TextBox}" x:Key="DefaultTextBoxStyle">
+
+    <Style x:Key="MinimalTextBoxStyle" TargetType="{x:Type TextBox}" BasedOn="{StaticResource FastTextBoxStyle}" />
+
+    <Style x:Key="DefaultTextBoxStyle" TargetType="{x:Type TextBox}">
         <Setter Property="Foreground" Value="{Binding RelativeSource={RelativeSource AncestorType={x:Type FrameworkElement}}, Path=(TextElement.Foreground)}" />
         <Setter Property="BorderBrush" Value="{DynamicResource MaterialDesignTextBoxBorder}" />
-        <Setter Property="BorderThickness" Value="0" />
-        <Setter Property="wpf:TextFieldAssist.TextBoxViewMargin" Value="{x:Static wpf:Constants.DefaultTextBoxViewMargin}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0 0 0 1" />
         <Setter Property="CaretBrush" Value="{DynamicResource PrimaryHueMidBrush}" />
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="AllowDrop" Value="true" />
-        <Setter Property="Padding" Value="{x:Static wpf:Constants.TextBoxDefaultPadding}" />
+        <Setter Property="Padding" Value="0, 4" />
+        <Setter Property="Height" Value="32" />
+        <Setter Property="wpf:TextFieldAssist.TextBoxViewMargin" Value="0" />
         <Setter Property="ScrollViewer.PanningMode" Value="VerticalFirst" />
         <Setter Property="Stylus.IsFlicksEnabled" Value="False" />
         <Setter Property="Validation.ErrorTemplate" Value="{DynamicResource MaterialDesignValidationErrorTemplate}" />
         <Setter Property="wpf:HintAssist.Foreground" Value="{DynamicResource PrimaryHueMidBrush}" />
-        <Setter Property="wpf:TextFieldAssist.DecorationVisibility" Value="Visible" />
         <Setter Property="wpf:HintAssist.IsFloating" Value="True" />
+        <Setter Property="wpf:HintAssist.FloatingOffset" Value="1, -24" />
+        <Setter Property="wpf:HintAssist.HintOpacity" Value="1" />
+        <Setter Property="wpf:HintAssist.FontFamily" Value="{Binding RelativeSource={RelativeSource Self}, Path=FontFamily}" />
+        <Setter Property="wpf:HintAssist.HelperTextFontSize">
+            <Setter.Value>
+                <MultiBinding Converter="{StaticResource MultiplicationConverter}">
+                    <Binding RelativeSource="{RelativeSource Self}" Path="FontSize" />
+                    <Binding RelativeSource="{RelativeSource Self}" Path="(wpf:HintAssist.FloatingScale)" />
+                </MultiBinding>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="wpf:TextFieldAssist.DecorationVisibility" Value="Visible" />
+        <Setter Property="wpf:TextFieldAssist.HasFilledTextField" Value="{Binding RelativeSource={RelativeSource Self}, Path=Text, Converter={StaticResource NullToFalseConverter}}" />
         <Setter Property="ContextMenu" Value="{StaticResource MaterialDesignDefaultContextMenu}" />
         <Setter Property="Cursor" Value="IBeam" />
         <Setter Property="KeyboardNavigation.TabNavigation" Value="Local" />
         <Setter Property="Template">
             <Setter.Value>
-                <ControlTemplate TargetType="{x:Type TextBoxBase}">
-                    <Grid x:Name="TextBoxRoot" VerticalAlignment="{TemplateBinding VerticalContentAlignment}">
-                        <VisualStateManager.VisualStateGroups>
-                            <VisualStateGroup x:Name="FocusStates">
-                                <VisualState x:Name="Focused">
-                                    <Storyboard TargetName="RippleOnFocusScaleTransform">
-                                        <DoubleAnimation Storyboard.TargetProperty="ScaleX" From="0" To="1" Duration="0:0:0.3">
-                                            <DoubleAnimation.EasingFunction>
-                                                <SineEase EasingMode="EaseOut" />
-                                            </DoubleAnimation.EasingFunction>
-                                        </DoubleAnimation>
-                                        <DoubleAnimation Storyboard.TargetProperty="ScaleY" From="0" To="1" Duration="0:0:0.3">
-                                            <DoubleAnimation.EasingFunction>
-                                                <SineEase EasingMode="EaseOut" />
-                                            </DoubleAnimation.EasingFunction>
-                                        </DoubleAnimation>
-                                        <DoubleAnimation Storyboard.TargetProperty="ScaleX" To="0" BeginTime="0:0:0.45" Duration="0" />
-                                        <DoubleAnimation Storyboard.TargetProperty="ScaleY" To="0" BeginTime="0:0:0.45" Duration="0" />
-                                    </Storyboard>
-                                </VisualState>
-                                <VisualState x:Name="Unfocused">
-                                    <Storyboard TargetName="RippleOnFocusScaleTransform">
-                                        <DoubleAnimation Storyboard.TargetProperty="ScaleX" To="0" Duration="0" />
-                                        <DoubleAnimation Storyboard.TargetProperty="ScaleY" To="0" Duration="0" />
-                                    </Storyboard>
-                                </VisualState>
-                            </VisualStateGroup>
-                        </VisualStateManager.VisualStateGroups>
-                        <Border
-                            HorizontalAlignment="Stretch"
-                            VerticalAlignment="Stretch"
-                            Background="{DynamicResource MaterialDesignTextFieldBoxHoverBackground}"
-                            CornerRadius="{TemplateBinding wpf:TextFieldAssist.TextFieldCornerRadius}"
-                            Visibility="{TemplateBinding wpf:TextFieldAssist.RippleOnFocusEnabled, Converter={StaticResource BooleanToVisibilityConverter}}"
-                            RenderTransformOrigin="0.5,0.5">
-                            <Border.RenderTransform>
-                                <ScaleTransform x:Name="RippleOnFocusScaleTransform" ScaleX="0" ScaleY="0" />
-                            </Border.RenderTransform>
-                        </Border>
-                        <AdornerDecorator>
-                            <Border
-                                x:Name="border"
-                                Padding="{TemplateBinding Padding}"
+                <ControlTemplate TargetType="{x:Type TextBox}">
+                    <Grid
+                        x:Name="TextBoxRoot"
+                        MinWidth="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <Border x:Name="PART_ContentHost"
+                                Grid.Column="0"
+                                Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
-                                Background="{TemplateBinding Background}"
-                                CornerRadius="{TemplateBinding wpf:TextFieldAssist.TextFieldCornerRadius}"
-                                SnapsToDevicePixels="True"
                                 VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                wpf:BottomDashedLineAdorner.Brush="{TemplateBinding BorderBrush}"
-                                wpf:BottomDashedLineAdorner.Thickness="{TemplateBinding BorderThickness}">
-                                <Grid
-                                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto" />
-                                        <ColumnDefinition />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <wpf:PackIcon
-                                        Grid.Column="0"
-                                        x:Name="LeadingPackIcon"
-                                        Margin="0 0 6 0"
-                                        VerticalAlignment="Center"
-                                        Height="{TemplateBinding wpf:TextFieldAssist.LeadingIconSize}"
-                                        Width="{TemplateBinding wpf:TextFieldAssist.LeadingIconSize}"
-                                        Opacity="{TemplateBinding wpf:HintAssist.HintOpacity}"
-                                        Visibility="{TemplateBinding wpf:TextFieldAssist.HasLeadingIcon, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                        Kind="{TemplateBinding wpf:TextFieldAssist.LeadingIcon}" />
+                                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                Padding="{TemplateBinding Padding}" />
 
-                                    <Grid
-                                        Grid.Column="1"
-                                        x:Name="grid"
-                                        MinWidth="1">
-                                        <Grid
-                                            Grid.Column="0">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="Auto" />
-                                                <ColumnDefinition Width="*" />
-                                                <ColumnDefinition Width="Auto" />
-                                            </Grid.ColumnDefinitions>
-
-                                            <TextBlock
-                                                Grid.Column="0"
-                                                x:Name="PrefixTextBlock"
-                                                Margin="0 0 2 0"
-                                                FontSize="{TemplateBinding FontSize}"
-                                                Opacity="{TemplateBinding wpf:HintAssist.HintOpacity}"
-                                                Text="{TemplateBinding wpf:TextFieldAssist.PrefixText}">
-                                                <TextBlock.Visibility>
-                                                    <MultiBinding Converter="{StaticResource PrefixTextVisibilityConverter}">
-                                                        <Binding ElementName="Hint" Path="IsHintInFloatingPosition" />
-                                                        <Binding RelativeSource="{RelativeSource TemplatedParent}" Path="(wpf:TextFieldAssist.PrefixText)" />
-                                                    </MultiBinding>
-                                                </TextBlock.Visibility>
-                                            </TextBlock>
-
-                                            <ScrollViewer
-                                                Grid.Column="1"
-                                                x:Name="PART_ContentHost"
-                                                Panel.ZIndex="1"
-                                                Focusable="false"
-                                                HorizontalScrollBarVisibility="Hidden"
-                                                VerticalScrollBarVisibility="Hidden"
-                                                SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
-                                                UseLayoutRounding="{TemplateBinding UseLayoutRounding}"
-                                                wpf:ScrollViewerAssist.IgnorePadding="True" />
-
-                                            <TextBlock
-                                                x:Name="SuffixTextBlock"
-                                                Grid.Column="2"
-                                                FontSize="{TemplateBinding FontSize}"
-                                                Opacity="{TemplateBinding wpf:HintAssist.HintOpacity}"
-                                                Text="{TemplateBinding wpf:TextFieldAssist.SuffixText}" />
-                                        </Grid>
-
-                                        <wpf:SmartHint
-                                            x:Name="Hint"
-                                            Grid.Column="0"
-                                            HintProxy="{Binding RelativeSource={RelativeSource TemplatedParent}, Converter={x:Static wpf:HintProxyFabricConverter.Instance}}"
-                                            FontSize="{TemplateBinding FontSize}"
-                                            FontFamily="{TemplateBinding wpf:HintAssist.FontFamily}"
-                                            HintOpacity="{TemplateBinding wpf:HintAssist.HintOpacity}"
-                                            UseFloating="{TemplateBinding wpf:HintAssist.IsFloating}"
-                                            FloatingScale="{TemplateBinding wpf:HintAssist.FloatingScale}"
-                                            FloatingOffset="{TemplateBinding wpf:HintAssist.FloatingOffset}"
-                                            Margin="{TemplateBinding wpf:TextFieldAssist.TextBoxViewMargin}">
-                                            <wpf:SmartHint.Hint>
-                                                <Border
-                                                    x:Name="HintBackgroundBorder"
-                                                    Background="{TemplateBinding wpf:HintAssist.Background}"
-                                                    CornerRadius="2">
-                                                    <ContentPresenter
-                                                        x:Name="HintWrapper"
-                                                        Content="{TemplateBinding wpf:HintAssist.Hint}" />
-                                                </Border>
-                                            </wpf:SmartHint.Hint>
-                                        </wpf:SmartHint>
-                                    </Grid>
-                                </Grid>
-                            </Border>
-                        </AdornerDecorator>
-                        <Border
-                            x:Name="borderUnderline"
-                            Height="2"
-                            HorizontalAlignment="Stretch"
-                            VerticalAlignment="Bottom"
-                            SnapsToDevicePixels="True" />
+                        <TextBlock
+                            x:Name="SuffixTextBlock"
+                            Grid.Column="1"
+                            FontSize="{TemplateBinding FontSize}"
+                            Visibility="{TemplateBinding wpf:TextFieldAssist.SuffixText, Converter={StaticResource NullToCollapsedConverter}}"
+                            Opacity="{TemplateBinding wpf:HintAssist.HintOpacity}"
+                            Text="{TemplateBinding wpf:TextFieldAssist.SuffixText}" />
+                        
+                        <TextBlock
+                            Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2"
+                            x:Name="FloatingHint"
+                            Margin="{TemplateBinding wpf:HintAssist.FloatingOffset, Converter={StaticResource PointToThicknessConverter}}"
+                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                            Opacity="{TemplateBinding wpf:HintAssist.HintOpacity}"
+                            Foreground="{TemplateBinding wpf:HintAssist.Foreground}"
+                            FontFamily="{TemplateBinding wpf:HintAssist.FontFamily}"
+                            FontSize="{TemplateBinding wpf:HintAssist.HelperTextFontSize}"
+                            FontWeight="Bold"
+                            Text="{TemplateBinding wpf:HintAssist.Hint}"/>
                     </Grid>
                     <ControlTemplate.Triggers>
-                        <MultiTrigger>
-                            <MultiTrigger.Conditions>
-                                <Condition Property="wpf:HintAssist.IsFloating" Value="True" />
-                                <Condition Property="IsKeyboardFocused" Value="True" />
-                            </MultiTrigger.Conditions>
-                            <Setter TargetName="Hint" Property="Foreground" Value="{Binding Path=(wpf:HintAssist.Foreground), RelativeSource={RelativeSource TemplatedParent}}" />
-                            <Setter TargetName="Hint" Property="HintOpacity" Value="1" />
-                        </MultiTrigger>
-                        <MultiTrigger>
-                            <MultiTrigger.Conditions>
-                                <Condition Property="wpf:HintAssist.IsFloating" Value="True" />
-                            </MultiTrigger.Conditions>
-                            <Setter TargetName="Hint" Property="FloatingOffset">
+                        <Trigger Property="wpf:TextFieldAssist.HasFilledTextField" Value="False">
+                            <Setter Property="wpf:HintAssist.FloatingOffset" Value="1,0"/>
+                            <Setter Property="wpf:HintAssist.HelperTextFontSize">
                                 <Setter.Value>
-                                    <MultiBinding Converter="{StaticResource FloatingHintOffsetCalculationConverter}">
-                                        <Binding RelativeSource="{RelativeSource TemplatedParent}" Path="FontFamily" />
-                                        <Binding RelativeSource="{RelativeSource TemplatedParent}" Path="FontSize" />
-                                        <Binding RelativeSource="{RelativeSource TemplatedParent}" Path="(wpf:HintAssist.FloatingScale)" />
-                                    </MultiBinding>
+                                    <Binding RelativeSource="{RelativeSource Self}" Path="FontSize" />
                                 </Setter.Value>
                             </Setter>
-                        </MultiTrigger>
-                        <Trigger Property="wpf:TextFieldAssist.HasFilledTextField" Value="True">
-                            <Setter Property="Padding" Value="16 8 12 8" />
-                            <Setter Property="Background" Value="{DynamicResource MaterialDesignTextFieldBoxBackground}" />
-                            <Setter Property="wpf:TextFieldAssist.TextBoxViewMargin" Value="{x:Static wpf:Constants.DefaultTextBoxViewMarginEmbedded}" />
                         </Trigger>
-                        <DataTrigger Value="0">
-                            <DataTrigger.Binding>
-                                <PriorityBinding>
-                                    <Binding Path="MaxLength" RelativeSource="{RelativeSource Self}" FallbackValue="0" />
-                                    <Binding Source="0" />
-                                </PriorityBinding>
-                            </DataTrigger.Binding>
-                        </DataTrigger>
-
+                        
                         <!-- IsEnabled -->
                         <MultiTrigger>
                             <MultiTrigger.Conditions>
                                 <Condition Property="IsEnabled" Value="False" />
                             </MultiTrigger.Conditions>
-                            <Setter TargetName="borderUnderline" Property="Background" Value="Transparent" />
+                            <Setter TargetName="PART_ContentHost" Property="BorderBrush" Value="Transparent" />
                         </MultiTrigger>
 
                         <MultiTrigger>
                             <MultiTrigger.Conditions>
                                 <Condition Property="IsEnabled" Value="True" />
-                                <Condition Property="wpf:TextFieldAssist.DecorationVisibility" Value="Visible" />
                             </MultiTrigger.Conditions>
-                            <Setter TargetName="borderUnderline" Property="BorderThickness" Value="0 0 0 1" />
-                            <Setter TargetName="borderUnderline" Property="BorderBrush" Value="{DynamicResource MaterialDesignTextBoxBorder}" />
+                            <Setter TargetName="PART_ContentHost" Property="BorderThickness" Value="0 0 0 1" />
+                            <Setter TargetName="PART_ContentHost" Property="BorderBrush" Value="{DynamicResource MaterialDesignTextBoxBorder}" />
                         </MultiTrigger>
 
                         <!-- IsKeyboardFocused -->
                         <MultiTrigger>
                             <MultiTrigger.Conditions>
                                 <Condition Property="IsKeyboardFocused" Value="True" />
-                                <Condition Property="wpf:TextFieldAssist.DecorationVisibility" Value="Visible" />
                             </MultiTrigger.Conditions>
-                            <Setter TargetName="borderUnderline" Property="BorderThickness" Value="0 0 0 2" />
-                            <Setter TargetName="borderUnderline" Property="BorderBrush" Value="{DynamicResource PrimaryHueMidBrush}" />
+                            <Setter TargetName="PART_ContentHost" Property="BorderThickness" Value="0 0 0 2" />
+                            <Setter TargetName="PART_ContentHost" Property="BorderBrush" Value="{DynamicResource PrimaryHueMidBrush}" />
                         </MultiTrigger>
 
                         <!-- IsMouseOver -->
                         <MultiTrigger>
                             <MultiTrigger.Conditions>
                                 <Condition Property="IsMouseOver" Value="True" />
-                                <Condition Property="wpf:TextFieldAssist.HasFilledTextField" Value="False" />
                             </MultiTrigger.Conditions>
-                            <Setter TargetName="borderUnderline" Property="BorderBrush" Value="{DynamicResource PrimaryHueMidBrush}" />
+                            <Setter TargetName="PART_ContentHost" Property="BorderBrush" Value="{DynamicResource PrimaryHueMidBrush}" />
                         </MultiTrigger>
-                        <MultiTrigger>
-                            <MultiTrigger.Conditions>
-                                <Condition Property="IsMouseOver" Value="True" />
-                                <Condition Property="wpf:TextFieldAssist.HasFilledTextField" Value="True" />
-                            </MultiTrigger.Conditions>
-                            <Setter Property="Background" Value="{DynamicResource MaterialDesignTextFieldBoxHoverBackground}" />
-                        </MultiTrigger>
-
-                        <!-- Validation.HasError -->
-                        <Trigger Property="Validation.HasError" Value="true">
-                            <Setter Property="BorderBrush" Value="{DynamicResource MaterialDesignValidationErrorBrush}" />
-                            <Setter TargetName="borderUnderline" Property="BorderBrush" Value="{DynamicResource MaterialDesignValidationErrorBrush}" />
-                        </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
@@ -568,21 +452,109 @@
             </MultiTrigger>
         </Style.Triggers>
     </Style>
-    
-    
-    <Style x:Key="FastTextBoxStyle" TargetType="{x:Type TextBox}">
-        <Setter Property="OverridesDefaultStyle" Value="True" />
-        <Setter Property="CaretBrush" Value="White"/>
-        <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+
+
+    <Style TargetType="{x:Type ContentControl}">
+        <Setter Property="Focusable" Value="False" />
+    </Style>
+
+    <Style TargetType="{x:Type TextBlock}"
+           BasedOn="{StaticResource DefaultTextBlockStyleKey}" />
+
+    <Style TargetType="{x:Type controls:WindowCommandsItem}">
+        <Setter Property="FontFamily" Value="{StaticResource FontAwesome}" />
+    </Style>
+
+    <Style TargetType="{x:Type ContextMenu}" BasedOn="{StaticResource MaterialDesignContextMenu}">
+        <Setter Property="FontFamily" Value="{StaticResource FontAwesome}" />
+    </Style>
+
+    <Style TargetType="{x:Type ToggleButton}"
+           BasedOn="{StaticResource DefaultToggleButton}">
+        <Setter Property="FontSize" Value="16" />
+        <Setter Property="Margin" Value="0,4,0,0" />
+    </Style>
+
+    <Style TargetType="{x:Type Button}"
+           BasedOn="{StaticResource MaterialDesignRaisedDarkButton}">
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="Height" Value="24" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{DynamicResource PrimaryHueMidBrush}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style TargetType="{x:Type CheckBox}">
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="VerticalAlignment" Value="Stretch" />
+        <Setter Property="HorizontalContentAlignment" Value="Left" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="Background" Value="{DynamicResource PrimaryHueMidBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource PrimaryHueMidBrush}"/>
+        <Setter Property="Foreground" Value="{Binding RelativeSource={RelativeSource AncestorType={x:Type FrameworkElement}}, Path=(TextElement.Foreground)}"/>
+        <Setter Property="Validation.ErrorTemplate" Value="{StaticResource MaterialDesignValidationErrorTemplate}"/>
         <Setter Property="Template">
             <Setter.Value>
-                <ControlTemplate TargetType="{x:Type TextBoxBase}">
-                    <Decorator Margin="0" 
-                               VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                               HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                               x:Name="PART_ContentHost" />
+                <ControlTemplate TargetType="{x:Type CheckBox}">
+                    <Grid x:Name="templateRoot" Background="Transparent" SnapsToDevicePixels="True">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Viewbox Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(wpf:CheckBoxAssist.CheckBoxSize)}"
+                                 Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(wpf:CheckBoxAssist.CheckBoxSize)}"
+                                 VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                 FlowDirection="LeftToRight">
+                            <Canvas Width="24" Height="24">
+                                <Path x:Name="Graphic"
+                                      Data="M19,3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.1,3 19,3M19,5V19H5V5H19Z" 
+                                      Fill="{DynamicResource MaterialDesignCheckBoxOff}" />
+                                <Ellipse x:Name="InteractionEllipse" Fill="{TemplateBinding Foreground}" Width="0" Height="0" Canvas.Top="12" Canvas.Left="12" Opacity="0" RenderTransformOrigin="0.5,0.5"
+                                         IsHitTestVisible="False">
+                                    <Ellipse.RenderTransform>
+                                        <TransformGroup>
+                                            <ScaleTransform/>
+                                            <SkewTransform/>
+                                            <RotateTransform/>
+                                            <TranslateTransform/>
+                                        </TransformGroup>
+                                    </Ellipse.RenderTransform>
+                                </Ellipse>
+                            </Canvas>
+                        </Viewbox>
+                        <ContentPresenter x:Name="contentPresenter" Grid.Column="1" Focusable="False" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsPressed" Value="true"/>
+                        <Trigger Property="IsChecked" Value="true">
+                            <Setter Property="Data" TargetName="Graphic" Value="M10,17L5,12L6.41,10.58L10,14.17L17.59,6.58L19,8M19,3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.1,3 19,3Z" />
+                            <Setter Property="Fill" TargetName="Graphic" Value="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Background}" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="false">
+                            <Setter Property="Fill" TargetName="Graphic" Value="{DynamicResource MaterialDesignCheckBoxDisabled}" />
+                            <Setter Property="Opacity" Value="0.56"/>
+                        </Trigger>
+                        <Trigger Property="IsChecked" Value="{x:Null}">
+                            <Setter Property="Data" TargetName="Graphic" Value="M6,13L6,11L18,11L18,13M19,3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.1,3 19,3Z" />
+                            <Setter Property="Fill" TargetName="Graphic" Value="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Background}" />
+                        </Trigger>
+                        <Trigger Property="Validation.HasError" Value="true">
+                            <Setter Property="Fill" TargetName="Graphic" Value="{DynamicResource MaterialDesignValidationErrorBrush}" />
+                            <Setter Property="Control.Foreground" TargetName="contentPresenter" Value="{DynamicResource MaterialDesignValidationErrorBrush}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
     </Style>
+
+    <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource DefaultTextBoxStyle}" />
+
 </ui:SharedResourceDictionary>

@@ -53,15 +53,6 @@
                 </Grid>
             </Border>
         </ControlTemplate>
-
-        <ui:SharedResourceDictionary x:Key="MyResources">
-            <ui:SharedResourceDictionary.MergedDictionaries>
-                <ui:SharedResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.ComboBox.xaml" />
-                <ui:SharedResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Slider.xaml" />
-                <ui:SharedResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.TextBox.xaml" />
-            </ui:SharedResourceDictionary.MergedDictionaries>
-        </ui:SharedResourceDictionary>
-
     </UserControl.Resources>
 
     <Grid>
