@@ -71,6 +71,10 @@ namespace PoeShared.Scaffolding.WPF
             {
                 return InnerCommand.CanExecute(parameter);
             }
+            catch (InvalidCastException)
+            {
+                return false;
+            }
             catch (Exception e)
             {
                 throw new ApplicationException($"CommandWrapper.CanExecute exception, parameter: {parameter}", e);

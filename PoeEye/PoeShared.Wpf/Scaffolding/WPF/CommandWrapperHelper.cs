@@ -3,6 +3,7 @@ using System.Reactive.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Input;
 using log4net;
 
 namespace PoeShared.Scaffolding.WPF
@@ -49,6 +50,21 @@ namespace PoeShared.Scaffolding.WPF
             typeof(int),
             typeof(CommandWrapperHelper),
             new FrameworkPropertyMetadata(0, FrameworkPropertyMetadataOptions.AffectsRender | FrameworkPropertyMetadataOptions.Inherits));
+
+        public static readonly DependencyProperty CommandProperty = DependencyProperty.RegisterAttached(
+            "Command", typeof(ICommand), typeof(CommandWrapperHelper),   new FrameworkPropertyMetadata(
+                null,
+                FrameworkPropertyMetadataOptions.AffectsRender | FrameworkPropertyMetadataOptions.Inherits));
+
+        public static void SetCommand(DependencyObject element, ICommand value)
+        {
+            element.SetValue(CommandProperty, value);
+        }
+
+        public static ICommand GetCommand(DependencyObject element)
+        {
+            return (ICommand) element.GetValue(CommandProperty);
+        }
 
         public static void SetProgress(DependencyObject element, int value)
         {

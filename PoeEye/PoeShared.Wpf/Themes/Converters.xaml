@@ -30,6 +30,7 @@
     <eyeConverters:CompositeCollectionConverter x:Key="CompositeCollectionConverter"/>
     <eyeConverters:MultilineToSinglelineConverter x:Key="MultilineToSinglelineConverter"/>
     <eyeConverters:KeyToStringConverter x:Key="KeyToStringConverter"/>
+    <eyeConverters:FirstOrDefaultMultiValueConverter x:Key="FirstOrDefaultMultiValueConverter"/>
     
     <eyeConverters:NullToBoolConverter x:Key="IsNullOrEmptyConverter" NullValue="True" />
     <eyeConverters:NullToBoolConverter x:Key="IsNotNullOrEmptyConverter" NullValue="False" />
