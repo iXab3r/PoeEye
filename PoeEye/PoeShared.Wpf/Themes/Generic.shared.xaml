@@ -13,8 +13,6 @@
         <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/UI/Settings/GenericSettingsView.xaml" />
         <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Audio/Views/AudioNotificationTypeSelectorView.xaml" />
         <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Styles.xaml" />
-        <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Styles.TreeView.xaml" />
-        <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/SlimScrollbar.xaml" />
         <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Thumb.xaml" />
     </ui:SharedResourceDictionary.MergedDictionaries>
 </ui:SharedResourceDictionary>

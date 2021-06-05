@@ -9,7 +9,6 @@
 
     <ui:SharedResourceDictionary.MergedDictionaries>
         <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Styles.xaml" />
-        <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/SlimScrollbar.xaml" />
     </ui:SharedResourceDictionary.MergedDictionaries>
 
     <Geometry x:Key="DownArrowGeometry">M 0 0 L 3.5 4 L 7 0 Z</Geometry>

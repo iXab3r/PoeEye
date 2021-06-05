@@ -1,67 +1,96 @@
 ﻿<ui:SharedResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:viewModels="clr-namespace:PoeShared.Audio.ViewModels"
-                    xmlns:services="clr-namespace:PoeShared.Audio.Services;assembly=PoeShared.Native"
                     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-                    xmlns:ui="clr-namespace:PoeShared.UI">
+                    xmlns:ui="clr-namespace:PoeShared.UI"
+                    xmlns:st="http://schemas.spicytaco.io/"
+                    xmlns:wpf="clr-namespace:PoeShared.Scaffolding.WPF">
 
     <ui:SharedResourceDictionary.MergedDictionaries>
         <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Converters.xaml" />
-
         <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Colors.xaml" />
         <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Styles.xaml" />
+        <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/UI/ButtonEx.xaml" />
     </ui:SharedResourceDictionary.MergedDictionaries>
-
+    
+    <DataTemplate DataType="{x:Type viewModels:NotificationTypeWrapperViewModel}">
+        <StackPanel Orientation="Horizontal">
+            <ui:ButtonEx Command="{Binding Owner.PlayNotificationCommand}" 
+                         CommandParameter="{Binding}"
+                         Width="26" Height="26" FontSize="22"
+                         Style="{StaticResource FastButtonExStyle}"
+                         Padding="0" 
+                         Icon="&#xf144;"/>
+            <TextBlock Margin="5,0" Style="{StaticResource IconTextBlock}" Text="{Binding Name}" />
+        </StackPanel>
+    </DataTemplate>
+    
+    
+    <DataTemplate x:Key="NotificationTypeWrapperTextBlock" DataType="{x:Type viewModels:NotificationTypeWrapperViewModel}">
+        <TextBlock Text="{Binding Name}" />
+    </DataTemplate>
+    
+    <DataTemplate x:Key="NotificationTypeWrapperCheckBox" DataType="{x:Type viewModels:NotificationTypeWrapperViewModel}">
+        <StackPanel Orientation="Horizontal" MinWidth="150">
+            <ui:ButtonEx Command="{Binding Owner.PlayNotificationCommand}" 
+                         CommandParameter="{Binding}"
+                         Width="26" Height="26" FontSize="22"
+                         Style="{StaticResource FastButtonExStyle}"
+                         Padding="0" 
+                         Icon="&#xf144;"/>
+            <CheckBox Margin="5,0,0,0" IsHitTestVisible="False"
+                      IsChecked="{Binding IsSelected, Mode=OneWay}" Content="{Binding Name}" />
+        </StackPanel>
+    </DataTemplate>
+    
     <DataTemplate DataType="{x:Type viewModels:AudioNotificationSelectorViewModel}">
+         <st:StackPanel Orientation="Horizontal" MarginBetweenChildren="5">
+             <ComboBox ItemsSource="{Binding Items}" 
+                       SelectedItem="{Binding SelectedItem}" 
+                       IsSynchronizedWithCurrentItem="True"
+                       MinWidth="200"
+                       IsTextSearchCaseSensitive="False"
+                       ItemTemplate="{StaticResource NotificationTypeWrapperTextBlock}">
+             </ComboBox>
+            
+            <ui:ButtonEx Command="{Binding AddSoundCommand}"
+                         ToolTip="Load from file"
+                         Icon="&#xf115;" 
+                         Content="Load..."/>
+
+            <DockPanel>
+                <TextBlock DockPanel.Dock="Left" Text="Volume" />
+                <TextBlock DockPanel.Dock="Right" MinWidth="20"
+                           Text="{Binding Volume, Converter={StaticResource DoubleToPercentConverter},  StringFormat='{}{0:F2}%'}" />
+                <Slider DockPanel.Dock="Left"
+                        Margin="5,0,0,0"
+                        Value="{Binding Volume, Converter={StaticResource DoubleToPercentConverter}}"
+                        Minimum="0"
+                        Maximum="100"
+                        TickFrequency="0.5"
+                        IsSnapToTickEnabled="True"
+                        MinWidth="140"
+                        VerticalAlignment="Center" />
+            </DockPanel>
+        </st:StackPanel>
+    </DataTemplate>
+    
+    <DataTemplate x:Key="AudioNotificationSelectorButtonTemplate" DataType="{x:Type viewModels:AudioNotificationSelectorViewModel}">
         <Viewbox>
-            <Viewbox.Resources>
-                <viewModels:AudioNotificationSelectorProxy x:Key="NotificationSelectorProxy" DataContext="{Binding}" />
-            </Viewbox.Resources>
             <ToggleButton IsChecked="{Binding AudioEnabled}"
                           FontFamily="{StaticResource FontAwesome}"
                           Focusable="False"
                           Content="&#xf05e;"
                           ToolTipService.HorizontalOffset="10" ToolTipService.VerticalOffset="10"
-                          materialDesign:ToggleButtonAssist.OnContent="&#xf028;">
-                <ToggleButton.Style>
-                    <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource ToggleCircleButton}">
-                        <Style.Triggers>
-                            <Trigger Property="IsChecked" Value="True">
-                                <Setter Property="BorderBrush" Value="{StaticResource PositiveBrush}"/>
-                                <Setter Property="BorderThickness" Value="1"/>
-                            </Trigger>
-                            <DataTrigger Binding="{Binding SelectedValue}"
-                                         Value="{x:Static services:AudioNotificationType.Silence}">
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </ToggleButton.Style>
+                          materialDesign:ToggleButtonAssist.OnContent="&#xf028;"
+                          Width="24" Height="24"
+                          Style="{StaticResource ToggleCircleButton}">
 
                 <ToggleButton.ContextMenu>
-                    <ContextMenu ItemsSource="{Binding Items}">
-                        <ContextMenu.ItemTemplate>
-                            <DataTemplate DataType="{x:Type viewModels:NotificationTypeWrapperViewModel}">
-                                <StackPanel Orientation="Horizontal" MinWidth="150">
-                                    <Button Command="{Binding DataContext.PlayNotificationCommand, Source={StaticResource NotificationSelectorProxy}}" CommandParameter="{Binding}"
-                                            Content="&#xf144;" FontSize="24"
-                                            Height="24" Width="24"
-                                            BorderThickness="1"
-                                            FontFamily="{StaticResource FontAwesome}"
-                                            Style="{StaticResource CircleButton}" />
-                                    <CheckBox Margin="5,0,0,0" IsHitTestVisible="False"
-                                              IsChecked="{Binding IsSelected, Mode=OneWay}" Content="{Binding Name}" />
-                                </StackPanel>
-                            </DataTemplate>
-                        </ContextMenu.ItemTemplate>
-
-                        <ContextMenu.ItemContainerStyle>
-                            <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource MaterialDesignMenuItem}">
-                                <Setter Property="Command" Value="{Binding DataContext.SelectNotificationCommand, Source={StaticResource NotificationSelectorProxy}}" />
-                                <Setter Property="CommandParameter" Value="{Binding}" />
-                            </Style>
-                        </ContextMenu.ItemContainerStyle>
-
-                    </ContextMenu>
+                    <ContextMenu ItemsSource="{Binding Items}"
+                                 ItemTemplate="{StaticResource NotificationTypeWrapperCheckBox}"
+                                 wpf:CommandWrapperHelper.Command="{Binding SelectNotificationCommand}"
+                                 wpf:ContextMenuServiceExtensions.BindDataContextToMenuItemCommandParameter="True"/>
                 </ToggleButton.ContextMenu>
                 
                 <ToggleButton.ToolTip>

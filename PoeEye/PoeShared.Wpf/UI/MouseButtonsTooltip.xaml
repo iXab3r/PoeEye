@@ -10,7 +10,7 @@
     <UserControl.Resources>
         <ui:SharedResourceDictionary>
             <ui:SharedResourceDictionary.MergedDictionaries>
-                <ui:SharedResourceDictionary Source="../../Themes/Converters.xaml" />
+                <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Converters.xaml" />
             </ui:SharedResourceDictionary.MergedDictionaries>
         </ui:SharedResourceDictionary>
     </UserControl.Resources>

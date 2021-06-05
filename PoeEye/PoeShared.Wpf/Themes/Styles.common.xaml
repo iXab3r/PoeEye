@@ -1,0 +1,32 @@
+﻿<ui:SharedResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                             xmlns:ui="clr-namespace:PoeShared.UI">
+    <ui:SharedResourceDictionary.MergedDictionaries>
+        <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Colors.xaml" />
+        <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Styles.text.xaml" />
+    </ui:SharedResourceDictionary.MergedDictionaries>
+
+    <ControlTemplate x:Key="IconErrorValidationTemplate">
+        <Border BorderBrush="{StaticResource NegativeBrush}" BorderThickness="0 0 0 2">
+            <Grid>
+                <TextBlock Style="{StaticResource IconTextBlock}" FontSize="14"
+                           Background="Transparent"
+                           HorizontalAlignment="Left"
+                           IsHitTestVisible="True"
+                           Text="&#xf06a;" Foreground="{StaticResource NegativeBrush}"
+                           Margin="-15,0,0,0" VerticalAlignment="Center">
+                    <TextBlock.ToolTip>
+                        <ItemsControl ItemsSource="{Binding}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate DataType="{x:Type ValidationError}">
+                                    <TextBlock Text="{Binding ErrorContent}" />
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </TextBlock.ToolTip>
+                </TextBlock>
+                <AdornedElementPlaceholder />
+            </Grid>
+        </Border>
+    </ControlTemplate>
+</ui:SharedResourceDictionary>

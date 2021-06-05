@@ -1,19 +1,18 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
-using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Windows.Input;
 using DynamicData;
 using DynamicData.Binding;
-using JetBrains.Annotations;
 using log4net;
+using Microsoft.Win32;
 using PoeShared.Audio.Services;
-using PoeShared.Prism;
 using PoeShared.Scaffolding;
+using PoeShared.Scaffolding.WPF;
 using Prism.Commands;
 using ReactiveUI;
-using Unity;
 
 namespace PoeShared.Audio.ViewModels
 {
@@ -27,18 +26,19 @@ namespace PoeShared.Audio.ViewModels
         private readonly ObservableAsPropertyHelper<string> previousSelectedValueSupplier;
 
         private bool audioEnabled;
-        private string selectedValue;
         private float volume = 1;
+        private string lastOpenedDirectory;
+        private NotificationTypeWrapperViewModel selectedItem;
+        private string selectedValue;
 
-        public AudioNotificationSelectorViewModel(
-            IAudioNotificationsManager notificationsManager,
-            [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
+        public AudioNotificationSelectorViewModel(IAudioNotificationsManager notificationsManager)
         {
             Guard.ArgumentNotNull(notificationsManager, nameof(notificationsManager));
             this.notificationsManager = notificationsManager;
 
             SelectNotificationCommand = new DelegateCommand<object>(SelectNotificationCommandExecuted);
             PlayNotificationCommand = new DelegateCommand<object>(PlayNotificationCommandExecuted);
+            AddSoundCommand = CommandWrapper.Create(AddSoundCommandExecuted);
 
             var preconfiguredNotifications = new[]
             {
@@ -72,17 +72,24 @@ namespace PoeShared.Audio.ViewModels
                     dynamicNotifications 
                 }.ToSourceList()
                 .Connect()
-                .Transform(x => new NotificationTypeWrapperViewModel(this, x, x.Pascalize()))
+                .Transform(x => new NotificationTypeWrapperViewModel(this, value: x, name: x.Pascalize()))
                 .DisposeMany()
                 .Bind(out var notificationsSource)
                 .SubscribeToErrors(Log.HandleUiException)
                 .AddTo(Anchors);
             Items = notificationsSource;
 
-            previousSelectedValueSupplier = this.WhenAnyValue(x => x.SelectedValue)
+            this.WhenAnyValue(x => x.SelectedValue)
                 .Where(x => !string.IsNullOrEmpty(SelectedValue) && !DisabledNotification.Equals(x, StringComparison.OrdinalIgnoreCase))
-                .Select(x => selectedValue)
-                .ToProperty(this, x => x.PreviousSelectedValue)
+                .ToProperty(out previousSelectedValueSupplier, this, x => x.PreviousSelectedValue)
+                .AddTo(Anchors);
+            
+            this.WhenAnyValue(x => x.SelectedValue)
+                .SubscribeSafe(value => SelectedItem = Items.FirstOrDefault(x => string.Equals(value, x.Value, StringComparison.OrdinalIgnoreCase)), Log.HandleUiException)
+                .AddTo(Anchors);
+            
+            this.WhenAnyValue(x => x.SelectedItem)
+                .SubscribeSafe(x => SelectedValue = x?.Value ?? DisabledNotification, Log.HandleUiException)
                 .AddTo(Anchors);
 
             this.WhenAnyValue(x => x.AudioEnabled)
@@ -100,7 +107,7 @@ namespace PoeShared.Audio.ViewModels
 
             this.WhenAnyValue(x => x.SelectedValue)
                 .SubscribeSafe(x => AudioEnabled = !DisabledNotification.Equals(x, StringComparison.OrdinalIgnoreCase), Log.HandleUiException)
-                .AddTo(Anchors);
+                .AddTo(Anchors);        
         }
 
         public bool AudioEnabled
@@ -112,17 +119,31 @@ namespace PoeShared.Audio.ViewModels
         public ICommand SelectNotificationCommand { get; }
 
         public ICommand PlayNotificationCommand { get; }
+        
+        public ICommand AddSoundCommand { get; }
 
-        public string SelectedValue
+        public string LastOpenedDirectory
         {
-            get => selectedValue;
-            set => this.RaiseAndSetIfChanged(ref selectedValue, value);
+            get => lastOpenedDirectory;
+            private set => RaiseAndSetIfChanged(ref lastOpenedDirectory, value);
         }
 
         public float Volume
         {
             get => volume;
             set => RaiseAndSetIfChanged(ref volume, value);
+        }
+        
+        public NotificationTypeWrapperViewModel SelectedItem
+        {
+            get => selectedItem;
+            set => RaiseAndSetIfChanged(ref selectedItem, value);
+        }
+
+        public string SelectedValue
+        {
+            get => selectedValue;
+            set => RaiseAndSetIfChanged(ref selectedValue, value);
         }
 
         public string PreviousSelectedValue => previousSelectedValueSupplier.Value;
@@ -131,13 +152,17 @@ namespace PoeShared.Audio.ViewModels
 
         private void SelectNotificationCommandExecuted(object arg)
         {
-            var notification = arg as NotificationTypeWrapperViewModel;
-            if (notification == null)
+            switch (arg)
             {
-                return;
+                case NotificationTypeWrapperViewModel notificationTypeWrapper:
+                    SelectedItem = notificationTypeWrapper;
+                    break;
+                case string value:
+                    SelectedValue = value;
+                    break;
+                default:
+                    throw new ArgumentException($"Unknown notification: {arg}");
             }
-
-            SelectedValue = notification.Value;
         }
 
         private void PlayNotificationCommandExecuted(object arg)
@@ -149,6 +174,32 @@ namespace PoeShared.Audio.ViewModels
             }
 
             notificationsManager.PlayNotification(notification.Value, volume);
+        }
+        
+        private void AddSoundCommandExecuted()
+        {
+            Log.Info($"Showing OpenFileDialog to user");
+
+            var op = new OpenFileDialog
+            {
+                Title = "Select an image", 
+                InitialDirectory = !string.IsNullOrEmpty(lastOpenedDirectory) && Directory.Exists(lastOpenedDirectory) 
+                    ? lastOpenedDirectory
+                    : Environment.GetFolderPath(Environment.SpecialFolder.CommonMusic),
+                CheckPathExists = true,
+                Multiselect = false,
+                Filter = "All supported sound files|*.wav;*.mp3|All files|*.*"
+            };
+
+            if (op.ShowDialog() != true)
+            {
+                return;
+            }
+
+            Log.Debug($"Adding notification {op.FileName}");
+            LastOpenedDirectory = Path.GetDirectoryName(op.FileName);
+            var notification = notificationsManager.AddFromFile(new FileInfo(op.FileName));
+            SelectedValue = notification;
         }
     }
 }

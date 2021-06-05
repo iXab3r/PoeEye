@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using MahApps.Metro.Controls;
+using PoeShared.Audio.ViewModels;
 using PoeShared.Native;
 using PoeShared.Scaffolding;
 using PoeShared.Scaffolding.WPF;
@@ -37,13 +38,15 @@ namespace PoeShared.UI
         private TimeSpan randomPeriod;
 
         public MainWindowViewModel(
+            IAudioNotificationSelectorViewModel audioNotificationSelector,
             IRandomPeriodSelector randomPeriodSelector,
             INotificationsService notificationsService,
             IHotkeySequenceEditorViewModel hotkeySequenceEditor)
         {
             this.notificationsService = notificationsService;
-            RandomPeriodSelector = randomPeriodSelector;
-            HotkeySequenceEditor = hotkeySequenceEditor;
+            AudioNotificationSelector = audioNotificationSelector.AddTo(Anchors);
+            RandomPeriodSelector = randomPeriodSelector.AddTo(Anchors);
+            HotkeySequenceEditor = hotkeySequenceEditor.AddTo(Anchors);
             LongCommand = CommandWrapper.Create(async () =>
             {
                 await Task.Delay(3000);
@@ -71,6 +74,7 @@ namespace PoeShared.UI
             notificationsService.AddNotification(notification);
         }
 
+        public IAudioNotificationSelectorViewModel AudioNotificationSelector { get; }
         public IRandomPeriodSelector RandomPeriodSelector { get; }
         public IHotkeySequenceEditorViewModel HotkeySequenceEditor { get; }
 

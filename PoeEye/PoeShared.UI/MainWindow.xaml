@@ -1,98 +1,125 @@
 ﻿<mah:MetroWindow x:Class="PoeShared.UI.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:PoeShared.UI"
-        xmlns:ui="clr-namespace:PoeShared.UI;assembly=PoeShared.Wpf"
-        xmlns:hotkeys="clr-namespace:PoeShared.UI.Hotkeys;assembly=PoeShared.Wpf"
-        xmlns:st="http://schemas.spicytaco.io/"
-        xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
-        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-        mc:Ignorable="d"
-        WindowStartupLocation="CenterScreen"
-        Title="PoeShared Demo" Height="750" Width="800" d:DataContext="{d:DesignInstance local:MainWindowViewModel}">
+                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                 xmlns:local="clr-namespace:PoeShared.UI"
+                 xmlns:ui="clr-namespace:PoeShared.UI;assembly=PoeShared.Wpf"
+                 xmlns:hotkeys="clr-namespace:PoeShared.UI.Hotkeys;assembly=PoeShared.Wpf"
+                 xmlns:st="http://schemas.spicytaco.io/"
+                 xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+                 xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+                 mc:Ignorable="d"
+                 WindowStartupLocation="CenterScreen"
+                 Title="PoeShared Demo" Height="750" Width="800" d:DataContext="{d:DesignInstance local:MainWindowViewModel}">
     <Grid>
         <TabControl>
             <TabItem Header="Misc">
                 <st:AutoGrid Columns="150,Auto" Rows="*" ChildMargin="5" VerticalAlignment="Top">
-                        
-                    <TextBlock Text="Random period selector"/>
+
+                    <TextBlock Text="Random period selector" />
                     <st:StackPanel MarginBetweenChildren="5">
-                        <ContentControl Content="{Binding RandomPeriodSelector}"/>
-                        <ui:ButtonEx Content="Next" Command="{Binding NextRandomPeriodCommand}"/>
-                        <TextBlock Text="{Binding RandomPeriod}"/>
+                        <ContentControl Content="{Binding RandomPeriodSelector}" />
+                        <ui:ButtonEx Content="Next" Command="{Binding NextRandomPeriodCommand}" />
+                        <TextBlock Text="{Binding RandomPeriod}" />
+                    </st:StackPanel>
+
+                    <TextBlock Text="Box with hint" />
+                    <TextBox materialDesign:HintAssist.Hint="With hint" />
+                    <TextBlock Text="Box without hint" />
+                    <TextBox />
+                    
+                    <TextBlock Text="Audio notification selector" />
+                    <st:StackPanel Orientation="Horizontal" MarginBetweenChildren="5">
+                        <ContentControl Content="{Binding AudioNotificationSelector}" ContentTemplate="{StaticResource AudioNotificationSelectorButtonTemplate}"/>
+                        <ContentControl Content="{Binding AudioNotificationSelector}"/>
                     </st:StackPanel>
                     
-                    <TextBlock Text="Box with hint"/>
-                    <TextBox materialDesign:HintAssist.Hint="With hint"/>
-                    <TextBlock Text="Box without hint"/>
-                    <TextBox />
-                    <ContentControl Content="{Binding RandomPeriodSelector}"/>
+                    <TextBlock Text="Combobox" />
+                    <ComboBox>
+                        <ComboBoxItem>Item 1</ComboBoxItem>
+                        <ComboBoxItem>Item 2</ComboBoxItem>
+                        <ComboBoxItem>Item 3</ComboBoxItem>
+                        <ComboBoxItem>Item 4</ComboBoxItem>
+                        <ComboBoxItem>Item 5</ComboBoxItem>
+                        <ComboBoxItem>Item 6</ComboBoxItem>
+                        <ComboBoxItem>Item 7</ComboBoxItem>
+                        <ComboBoxItem>Item 8</ComboBoxItem>
+                        <ComboBoxItem>Item 9</ComboBoxItem>
+                        <ComboBoxItem>Item 10</ComboBoxItem>
+                        <ComboBoxItem>Item 11</ComboBoxItem>
+                        <ComboBoxItem>Item 12</ComboBoxItem>
+                        <ComboBoxItem>Item 13</ComboBoxItem>
+                        <ComboBoxItem>Item 14</ComboBoxItem>
+                        <ComboBoxItem>Item 15</ComboBoxItem>
+                        <ComboBoxItem>Item 16</ComboBoxItem>
+                        <ComboBoxItem>Item 17</ComboBoxItem>
+                        <ComboBoxItem>Item 18</ComboBoxItem>
+                    </ComboBox>
 
                 </st:AutoGrid>
             </TabItem>
             <TabItem Header="Notifications">
                 <st:AutoGrid Columns="150,Auto" Rows="*" ChildMargin="5" VerticalAlignment="Top">
-                        
-                    <TextBlock Text="Show notification: Text"/>
-                    <ui:ButtonEx Content="Show text notification" Command="{Binding AddTextNotification}"/>
-                    
-                    <TextBlock Text="Timeout"/>
-                    <mah:NumericUpDown 
+
+                    <TextBlock Text="Show notification: Text" />
+                    <ui:ButtonEx Content="Show text notification" Command="{Binding AddTextNotification}" />
+
+                    <TextBlock Text="Timeout" />
+                    <mah:NumericUpDown
                         Interval="1000"
-                        Value="{Binding NotificationTimeout, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource TimeSpanToMillisecondsConverter}}"/>
+                        Value="{Binding NotificationTimeout, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource TimeSpanToMillisecondsConverter}}" />
                 </st:AutoGrid>
             </TabItem>
             <TabItem Header="HotkeySequence">
                 <st:StackPanel Fill="Fill" Orientation="Vertical" MarginBetweenChildren="5" VerticalAlignment="Stretch">
-                    
+
                     <st:AutoGrid Columns="150,Auto" Rows="*" ChildMargin="5">
-                        
-                        <TextBlock Text="Hide keypress delays"/>
-                        <CheckBox  IsChecked="{Binding HotkeySequenceEditor.HideKeypressDelays}"></CheckBox>
-                        <TextBlock Text="Mouse position recording"/>
-                        <CheckBox IsChecked="{Binding HotkeySequenceEditor.EnableMousePositionRecording}"></CheckBox>
-                        <TextBlock Text="Mouse clicks recording"/>
-                        <CheckBox IsChecked="{Binding HotkeySequenceEditor.EnableMouseClicksRecording}"></CheckBox>
-                        <TextBlock Text="Key clicks recording"/>
-                        <CheckBox IsChecked="{Binding HotkeySequenceEditor.EnableKeyboardRecording}"></CheckBox>
 
-                        <TextBlock Text="Total duration"/>
-                        <TextBlock Text=""/>
+                        <TextBlock Text="Hide keypress delays" />
+                        <CheckBox IsChecked="{Binding HotkeySequenceEditor.HideKeypressDelays}" />
+                        <TextBlock Text="Mouse position recording" />
+                        <CheckBox IsChecked="{Binding HotkeySequenceEditor.EnableMousePositionRecording}" />
+                        <TextBlock Text="Mouse clicks recording" />
+                        <CheckBox IsChecked="{Binding HotkeySequenceEditor.EnableMouseClicksRecording}" />
+                        <TextBlock Text="Key clicks recording" />
+                        <CheckBox IsChecked="{Binding HotkeySequenceEditor.EnableKeyboardRecording}" />
 
-                        <TextBlock Text="Item count"/>
-                        <TextBlock Text="{Binding HotkeySequenceEditor.Items.Count}"/>
-                        
-                        
-                        <TextBlock Text="Stop recording hotkey"/>
-                        <hotkeys:HotKeyBox HotKey="{Binding HotkeySequenceEditor.StopRecordingHotkey}"/>
-                        
-                        <TextBlock Text="MaxDuration"/>
-                        <mah:NumericUpDown 
+                        <TextBlock Text="Total duration" />
+                        <TextBlock Text="" />
+
+                        <TextBlock Text="Item count" />
+                        <TextBlock Text="{Binding HotkeySequenceEditor.Items.Count}" />
+
+
+                        <TextBlock Text="Stop recording hotkey" />
+                        <hotkeys:HotKeyBox HotKey="{Binding HotkeySequenceEditor.StopRecordingHotkey}" />
+
+                        <TextBlock Text="MaxDuration" />
+                        <mah:NumericUpDown
                             Interval="1000"
-                            Value="{Binding HotkeySequenceEditor.MaxDuration, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource TimeSpanToMillisecondsConverter}}"/>
-                        
-                        <TextBlock Text="MousePositionRecordingResolution"/>
-                        <mah:NumericUpDown 
+                            Value="{Binding HotkeySequenceEditor.MaxDuration, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource TimeSpanToMillisecondsConverter}}" />
+
+                        <TextBlock Text="MousePositionRecordingResolution" />
+                        <mah:NumericUpDown
                             Interval="100"
-                            Value="{Binding HotkeySequenceEditor.MousePositionRecordingResolution, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource TimeSpanToMillisecondsConverter}}"/>
+                            Value="{Binding HotkeySequenceEditor.MousePositionRecordingResolution, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource TimeSpanToMillisecondsConverter}}" />
                     </st:AutoGrid>
-                    
-                    <ContentControl Content="{Binding HotkeySequenceEditor}" Margin="10"></ContentControl>
+
+                    <ContentControl Content="{Binding HotkeySequenceEditor}" Margin="10" />
                 </st:StackPanel>
             </TabItem>
             <TabItem Header="ButtonEx">
                 <StackPanel>
                     <ui:ButtonEx Content="OK"
                                  Icon="&#xf1fb;"
-                                 Command="{Binding LongCommand}"/>
+                                 Command="{Binding LongCommand}" />
 
-                    <ui:ButtonEx Icon="&#xf00d;" Content="With Icon"  Command="{Binding LongCommand}"/>
-                    <ui:ButtonEx Icon="&#xf00d;" Command="{Binding LongCommand}"/>
-            
-                    <ui:ButtonEx Content="Error"  Command="{Binding ErrorCommand}"/>
-                    <ui:ButtonEx Icon="&#xf00d;"   Command="{Binding ErrorCommand}"/>
+                    <ui:ButtonEx Icon="&#xf00d;" Content="With Icon" Command="{Binding LongCommand}" />
+                    <ui:ButtonEx Icon="&#xf00d;" Command="{Binding LongCommand}" />
+
+                    <ui:ButtonEx Content="Error" Command="{Binding ErrorCommand}" />
+                    <ui:ButtonEx Icon="&#xf00d;" Command="{Binding ErrorCommand}" />
                 </StackPanel>
             </TabItem>
         </TabControl>
