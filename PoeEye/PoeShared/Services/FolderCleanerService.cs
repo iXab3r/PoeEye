@@ -36,7 +36,7 @@ namespace PoeShared.Services
                 .Select(_ =>
                 {
                     Log.Debug($"Cleanup period updated to {cleanupTimeout} with TTL set to {fileTimeToLive} with {directoriesSource.Count} target directories");
-                    return cleanupTimeout > TimeSpan.Zero && fileTimeToLive > TimeSpan.Zero && directoriesSource.Count > 0 ? ObservableEx.BlockingTimer(cleanupTimeout.Value) : Observable.Never<long>();
+                    return cleanupTimeout > TimeSpan.Zero && fileTimeToLive > TimeSpan.Zero && directoriesSource.Count > 0 ? ObservableEx.BlockingTimer(cleanupTimeout.Value, timerName: "Housekeeping") : Observable.Never<long>();
                 })
                 .Switch()
                 .Subscribe(() => HandleCleanupTimerTick(clock, fileTimeToLive ?? TimeSpan.MaxValue, directoriesSource.Items.ToArray()))

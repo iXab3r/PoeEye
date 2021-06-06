@@ -49,7 +49,7 @@ namespace PoeShared.Squirrel.Core
                 // Something has gone pear-shaped, let's start from scratch
                 if (ex is FileNotFoundException fileNotFoundException)
                 {
-                    Log.Warn($"There are not local releases file {fileNotFoundException.FileName}, starting from scratch");
+                    Log.Warn($"There are no local releases file {fileNotFoundException.FileName}, starting from scratch");
                 }
                 else
                 {
@@ -274,7 +274,7 @@ namespace PoeShared.Squirrel.Core
             {
                 if (ex is FileNotFoundException fileNotFoundException)
                 {
-                    Log.Warn($"There are not staging user ID file {fileNotFoundException.FileName}, creating a blank one");
+                    Log.Warn($"There are no staging user ID file {fileNotFoundException.FileName}, creating a blank one");
                 }
                 else
                 {

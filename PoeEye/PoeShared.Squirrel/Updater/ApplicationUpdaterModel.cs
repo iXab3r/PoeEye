@@ -338,7 +338,7 @@ namespace PoeShared.Squirrel.Updater
         public FileInfo GetLatestExecutable()
         {
             var appExecutable = new FileInfo(Path.Combine(mostRecentVersionAppFolder.FullName, ApplicationExecutableFileName));
-            Log.Debug($"Restarting app, folder: {mostRecentVersionAppFolder}, appName: { ApplicationExecutableFileName}, exePath: {appExecutable}(exists: {appExecutable.Exists})...");
+            Log.Debug($"Most recent version folder: {mostRecentVersionAppFolder}, appName: { ApplicationExecutableFileName}, exePath: {appExecutable}(exists: {appExecutable.Exists})...");
 
             if (!appExecutable.Exists)
             {

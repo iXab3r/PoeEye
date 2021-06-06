@@ -38,7 +38,7 @@ namespace PoeShared.Native
             this.titleMatcher = titleMatcher;
 
             var timerObservable = ObservableEx
-                .BlockingTimer(RecheckPeriod)
+                .BlockingTimer(RecheckPeriod, timerName: "WndTracker")
                 .ToUnit();
             
             var objectFocusHook = hookFactory.Create(new WinEventHookArguments

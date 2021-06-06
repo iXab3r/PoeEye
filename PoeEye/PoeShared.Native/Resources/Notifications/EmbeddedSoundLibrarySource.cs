@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using log4net;
 using PoeShared.Audio.Services;
 using PoeShared.Scaffolding;
@@ -33,6 +34,7 @@ namespace PoeShared.Resources.Notifications
 
         public override ReadOnlyObservableCollection<string> SourceName { get; }
 
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public override bool TryToLoadSourceByName(string name, out byte[] resourceData)
         {
             var assembly = Assembly.GetExecutingAssembly();

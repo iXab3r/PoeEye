@@ -13,7 +13,7 @@ namespace PoeShared.Audio.Services
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(ComplexSoundLibrary));
 
-        private static readonly Lazy<ComplexSoundLibrary> InstanceSupplier = new Lazy<ComplexSoundLibrary>();
+        private static readonly Lazy<ComplexSoundLibrary> InstanceSupplier = new();
         private readonly ISoundLibrarySource[] sources;
 
         public ComplexSoundLibrary(ISoundLibrarySource[] sources)
