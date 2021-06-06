@@ -75,7 +75,7 @@ namespace PoeShared.Scaffolding
             var instancePropertyName = new Lazy<string>(() => Reflection.ExpressionToPropertyNames(instancePropertyExtractor.Body));
 
             var result = new ObservableAsPropertyHelper<TSourceProperty>(
-                observable: sourceObservable.DistinctUntilChanged(),
+                observable: sourceObservable, // will be chained with DistinctUntilChanged() inside
                 onChanged: x => instance.RaisePropertyChanged(instancePropertyName.Value),
                 initialValue: initialValue,
                 deferSubscription: deferSubscription,

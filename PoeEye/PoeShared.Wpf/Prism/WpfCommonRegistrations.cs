@@ -9,6 +9,7 @@ using PoeShared.Audio.ViewModels;
 using PoeShared.Modularity;
 using PoeShared.Native;
 using PoeShared.Scaffolding;
+using PoeShared.Scaffolding.WPF;
 using PoeShared.Services;
 using PoeShared.UI;
 using PoeShared.Wpf.Scaffolding;
@@ -50,7 +51,13 @@ namespace PoeShared.Prism
                     return new DispatcherScheduler(uiDispatcher, DispatcherPriority.ApplicationIdle);
                 }, new ContainerControlledLifetimeManager())
                 .RegisterFactory<IScheduler>(WellKnownSchedulers.Background, x => RxApp.TaskpoolScheduler, new ContainerControlledLifetimeManager())
-                .RegisterFactory<TaskScheduler>(WellKnownSchedulers.UI, x => taskScheduler, new ContainerControlledLifetimeManager());
+                .RegisterFactory<TaskScheduler>(WellKnownSchedulers.UI, x => taskScheduler, new ContainerControlledLifetimeManager())
+                .RegisterFactory<IUiSharedResourceLatch>(container =>
+                {
+                    var result = container.Resolve<UiSharedResourceLatch>();
+                    result.Name = "Ui";
+                    return result;
+                }, new ContainerControlledLifetimeManager());
 
             Container
                 .RegisterFactory<IScheduler>(WellKnownSchedulers.InputHook, x => x.Resolve<ISchedulerProvider>().GetOrCreate(WellKnownSchedulers.InputHook));

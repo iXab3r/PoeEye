@@ -21,7 +21,7 @@ namespace PoeShared.Scaffolding
         private TimeSpan loggingElapsedThreshold = TimeSpan.Zero;
         private Func<bool> predicate = () => true;
         private bool logEachStep = true;
-        private bool logOnDisposal = true;
+        private bool logOnDisposal = false;
 
         public BenchmarkTimer(string benchmarkName, ILog logger = null, [CallerMemberName] string propertyName = null)
         {

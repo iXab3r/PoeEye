@@ -22,6 +22,7 @@ namespace PoeShared.Prism
                 .RegisterType(typeof(IFactory<,,,>), typeof(Factory<,,,>))
                 .RegisterType(typeof(IFactory<,,>), typeof(Factory<,,>))
                 .RegisterType(typeof(IFactory<,>), typeof(Factory<,>))
+                .RegisterType<ISharedResourceLatch, SharedResourceLatch>()
                 .RegisterType(typeof(IFactory<>), typeof(Factory<>));
         }
     }

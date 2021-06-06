@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media.Animation;
 using PoeShared.Scaffolding;
 
 namespace PoeShared.UI
@@ -58,7 +57,9 @@ namespace PoeShared.UI
                     });
 
                 if (!decorator.IsEnabledWhenBusy)
+                {
                     decorator.SetCurrentValue(IsEnabledProperty, false);
+                }
             }
             else
             {
@@ -67,26 +68,6 @@ namespace PoeShared.UI
                 if (!decorator.IsEnabledWhenBusy)
                     decorator.SetCurrentValue(IsEnabledProperty, true);
             }
-
-            var child = decorator.Child;
-            if (child != null)
-            {
-                AnimateChildOpacity(isShowing, child, decorator.FadeTime);
-            }
-        }
-
-        private static void AnimateChildOpacity(bool isShowing, UIElement child, TimeSpan fadeTime)
-        {
-            var busyOpacity = GetOpacityWhenBusy(child);
-            if (!busyOpacity.HasValue) return;
-
-            var animation = new DoubleAnimation();
-            animation.Duration = new Duration(fadeTime);
-
-            if (isShowing)
-                animation.To = busyOpacity;
-
-            child.BeginAnimation(UIElement.OpacityProperty, animation);
         }
 
         public static readonly DependencyProperty IsEnabledWhenBusyProperty = DependencyProperty.Register(
@@ -193,23 +174,6 @@ namespace PoeShared.UI
             set { SetValue(BusyMarginProperty, value); }
         }
 
-        public static readonly DependencyProperty OpacityWhenBusyProperty = DependencyProperty.RegisterAttached(
-          "OpacityWhenBusy",
-          typeof(double?),
-          typeof(BusyDecorator),
-          new FrameworkPropertyMetadata(.5));
-
-        [AttachedPropertyBrowsableForChildren]
-        public static double? GetOpacityWhenBusy(UIElement obj)
-        {
-            return (double?)obj.GetValue(OpacityWhenBusyProperty);
-        }
-
-        public static void SetOpacityWhenBusy(UIElement obj, double? value)
-        {
-            obj.SetValue(OpacityWhenBusyProperty, value);
-        }
-
         public static readonly DependencyProperty FadeTimeProperty = DependencyProperty.Register(
            "FadeTime",
            typeof(TimeSpan),
@@ -235,14 +199,6 @@ namespace PoeShared.UI
         public BusyDecorator()
         {
             Loaded += (o, e) => UpdateWindowPosition();
-        }
-
-        protected override void OnVisualChildrenChanged(DependencyObject visualAdded, DependencyObject visualRemoved)
-        {
-            base.OnVisualChildrenChanged(visualAdded, visualRemoved);
-
-            if (visualAdded != null && visualAdded is UIElement)
-                AnimateChildOpacity(IsBusyIndicatorShowing, (UIElement)visualAdded, FadeTime);
         }
 
         protected override Size ArrangeOverride(Size arrangeSize)
