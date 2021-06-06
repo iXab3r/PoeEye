@@ -1,14 +1,14 @@
-﻿<ui:SharedResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+﻿<eye:SharedResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:ui="clr-namespace:PoeShared.UI"
+                    xmlns:eye="clr-namespace:PoeShared.UI"
                     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
                     xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
                     xmlns:st="http://schemas.spicytaco.io/">
-    <ui:SharedResourceDictionary.MergedDictionaries>
-        <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/UI/NumericUpDown.xaml" />
-    </ui:SharedResourceDictionary.MergedDictionaries>
+    <eye:SharedResourceDictionary.MergedDictionaries>
+        <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/UI/NumericUpDown.xaml" />
+    </eye:SharedResourceDictionary.MergedDictionaries>
     
-    <DataTemplate DataType="{x:Type ui:RandomPeriodSelector}">
+    <DataTemplate DataType="{x:Type eye:RandomPeriodSelector}">
        <st:StackPanel Orientation="Horizontal" MarginBetweenChildren="10">
            <mah:NumericUpDown MinWidth="60" Interval="100"
                               x:Name="Lower"
@@ -16,8 +16,7 @@
                               Maximum="{Binding Maximum, Mode=OneWay, Converter={StaticResource TimeSpanToMillisecondsConverter}}"
                               materialDesign:HintAssist.Hint="Min" materialDesign:HintAssist.IsFloating="True"
                               materialDesign:TextFieldAssist.SuffixText="ms"
-                              Value="{Binding LowerValue, Converter={StaticResource TimeSpanToMillisecondsConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-           </mah:NumericUpDown>
+                              Value="{Binding LowerValue, Converter={StaticResource TimeSpanToMillisecondsConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
            <mah:NumericUpDown MinWidth="60" DockPanel.Dock="Right"
                               x:Name="Upper"
                               Visibility="{Binding RandomizeValue, Converter={StaticResource TrueToVisibleFalseToCollapsedConverter}}"
@@ -26,8 +25,7 @@
                               Minimum="{Binding  Minimum, Mode=OneWay, Converter={StaticResource TimeSpanToMillisecondsConverter}}"
                               Maximum="{Binding Maximum, Mode=OneWay, Converter={StaticResource TimeSpanToMillisecondsConverter}}"
                               materialDesign:HintAssist.Hint="Max" materialDesign:HintAssist.IsFloating="True"
-                              Value="{Binding UpperValue, Converter={StaticResource TimeSpanToMillisecondsConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-           </mah:NumericUpDown>
+                              Value="{Binding UpperValue, Converter={StaticResource TimeSpanToMillisecondsConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
            <CheckBox IsChecked="{Binding RandomizeValue}" Content="Randomize" />
        </st:StackPanel>
         <DataTemplate.Triggers>
@@ -37,4 +35,4 @@
             </DataTrigger>
         </DataTemplate.Triggers>
     </DataTemplate>
-</ui:SharedResourceDictionary>
+</eye:SharedResourceDictionary>

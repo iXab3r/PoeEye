@@ -17,7 +17,7 @@ using Prism.Modularity;
 using ReactiveUI;
 using Unity;
 
-namespace PoeShared.Wpf.UI.Settings
+namespace PoeShared.UI
 {
     internal sealed class GenericSettingsViewModel : DisposableReactiveObject, IGenericSettingsViewModel
     {

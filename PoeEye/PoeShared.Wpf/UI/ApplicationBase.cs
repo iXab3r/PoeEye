@@ -14,7 +14,6 @@ using PoeShared.Modularity;
 using PoeShared.Native;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
-using PoeShared.Wpf.UI.ExceptionViewer;
 using ReactiveUI;
 using Unity;
 

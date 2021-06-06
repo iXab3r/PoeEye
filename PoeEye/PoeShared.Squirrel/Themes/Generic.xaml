@@ -1,9 +1,9 @@
-<ui:SharedResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+<eye:SharedResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:ui="clr-namespace:PoeShared.UI;assembly=PoeShared.Wpf">
+                    xmlns:eye="http://coderush.net/poeeye/">
 
-    <ui:SharedResourceDictionary.MergedDictionaries>
-        <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Squirrel;component/Updater/ApplicationUpdaterView.xaml" />
-        <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Squirrel;component/Updater/UpdateSettingsView.xaml" />
-    </ui:SharedResourceDictionary.MergedDictionaries>
-</ui:SharedResourceDictionary>
+    <eye:SharedResourceDictionary.MergedDictionaries>
+        <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Squirrel;component/Updater/ApplicationUpdaterView.xaml" />
+        <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Squirrel;component/Updater/UpdateSettingsView.xaml" />
+    </eye:SharedResourceDictionary.MergedDictionaries>
+</eye:SharedResourceDictionary>

@@ -1,4 +1,4 @@
-namespace PoeShared.Wpf.UI.ExceptionViewer
+namespace PoeShared.UI
 {
     public partial class ExceptionDialogView
     {

@@ -1,11 +1,10 @@
-<mah:MetroWindow x:Class="PoeShared.Wpf.UI.ExceptionViewer.ExceptionDialogView"
+<mah:MetroWindow x:Class="PoeShared.UI.ExceptionDialogView"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
-        xmlns:exceptionViewer="clr-namespace:PoeShared.Wpf.UI.ExceptionViewer"
-        xmlns:ui="clr-namespace:PoeShared.UI"
+        xmlns:eye="clr-namespace:PoeShared.UI"
         xmlns:wpf="clr-namespace:PoeShared.Scaffolding.WPF"
         mc:Ignorable="d"
         TextElement.FontWeight="Regular"
@@ -17,15 +16,15 @@
         WindowStartupLocation="CenterOwner"
         WindowState="Normal"
         SizeToContent="WidthAndHeight"
-        Title="{Binding Title}" Width="600" d:DataContext="{d:DesignInstance exceptionViewer:ExceptionDialogViewModel}">
+        Title="{Binding Title}" Width="600" d:DataContext="{d:DesignInstance eye:ExceptionDialogViewModel}">
      <Window.Resources>
-        <ui:SharedResourceDictionary>
-            <ui:SharedResourceDictionary.MergedDictionaries>
-                <ui:SharedResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
-                <ui:SharedResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/styles/themes/dark.blue.xaml" />
-                <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Generic.shared.xaml" />
-            </ui:SharedResourceDictionary.MergedDictionaries>
-        </ui:SharedResourceDictionary>
+        <eye:SharedResourceDictionary>
+            <eye:SharedResourceDictionary.MergedDictionaries>
+                <eye:SharedResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
+                <eye:SharedResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/styles/themes/dark.blue.xaml" />
+                <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Generic.shared.xaml" />
+            </eye:SharedResourceDictionary.MergedDictionaries>
+        </eye:SharedResourceDictionary>
     </Window.Resources>
     
     <Grid Margin="5">

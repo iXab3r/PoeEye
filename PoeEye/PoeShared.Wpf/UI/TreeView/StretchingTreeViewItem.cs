@@ -1,7 +1,7 @@
 using System.Windows;
 using System.Windows.Controls;
 
-namespace PoeShared.UI.TreeView
+namespace PoeShared.UI
 {
     public class StretchingTreeViewItem : TreeViewItem
     {

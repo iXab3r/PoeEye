@@ -3,7 +3,7 @@ using System.Collections.ObjectModel;
 using System.Windows.Input;
 using PoeShared.Scaffolding;
 
-namespace PoeShared.UI.Hotkeys
+namespace PoeShared.UI
 {
     public interface IHotkeySequenceEditorViewModel : IDisposableReactiveObject
     {

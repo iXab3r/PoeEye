@@ -3,13 +3,10 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
-using System.Text;
-using System.Windows.Forms;
 using System.Windows.Input;
-using log4net;
 using PoeShared.Scaffolding;
 
-namespace PoeShared.UI.Hotkeys
+namespace PoeShared.UI
 {
     internal sealed class HotkeyConverter : System.ComponentModel.TypeConverter, IHotkeyConverter
     {

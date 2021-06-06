@@ -1,11 +1,9 @@
 using System;
-using System.Reactive.Disposables;
 using System.Windows.Input;
-using PoeShared.Native;
 using PoeShared.Scaffolding;
 using PoeShared.Scaffolding.WPF;
 
-namespace PoeShared.Wpf.UI.ExceptionViewer
+namespace PoeShared.UI
 {
     internal sealed class ExceptionDialogViewModel : DisposableReactiveObject
     {

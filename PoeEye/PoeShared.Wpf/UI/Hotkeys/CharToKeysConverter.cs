@@ -7,7 +7,7 @@ using PoeShared.Native;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
 
-namespace PoeShared.UI.Hotkeys
+namespace PoeShared.UI
 {
     internal sealed class CharToKeysConverter : IConverter<char, Keys>, IConverter<(char ch, string keyboardLayoutId), Keys>
     {

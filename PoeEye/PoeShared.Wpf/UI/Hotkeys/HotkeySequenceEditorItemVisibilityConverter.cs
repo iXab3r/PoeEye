@@ -3,7 +3,7 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
 
-namespace PoeShared.UI.Hotkeys
+namespace PoeShared.UI
 {
     public sealed class HotkeySequenceEditorItemVisibilityConverter : IMultiValueConverter
     {

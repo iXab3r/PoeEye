@@ -7,21 +7,19 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Windows.Input;
-using System.Windows.Media.Animation;
 using DynamicData;
 using Gma.System.MouseKeyHook;
-using JetBrains.Annotations;
 using log4net;
 using PoeShared.Modularity;
 using PoeShared.Native;
 using PoeShared.Prism;
+using PoeShared.Scaffolding;
 using ReactiveUI;
 using Unity;
 using KeyEventArgs = System.Windows.Forms.KeyEventArgs;
 using MouseEventArgs = System.Windows.Forms.MouseEventArgs;
-using PoeShared.Scaffolding;
 
-namespace PoeShared.UI.Hotkeys
+namespace PoeShared.UI
 {
     internal sealed class HotkeyTracker : DisposableReactiveObject, IHotkeyTracker
     {

@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 using PoeShared.Modularity;
 using PoeShared.Scaffolding;
 
-namespace PoeShared.Wpf.UI.Settings
+namespace PoeShared.UI
 {
     public interface IGenericSettingsViewModel : IDisposableReactiveObject
     {

@@ -2,7 +2,7 @@
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
 
-namespace PoeShared.UI.Hotkeys
+namespace PoeShared.UI
 {
     internal sealed class KeysToHotkeyGestureConverter : IConverter<Keys, HotkeyGesture>
     {

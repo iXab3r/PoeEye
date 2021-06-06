@@ -3,16 +3,13 @@ using System.IO;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Windows;
-using System.Windows.Input;
 using System.Windows.Threading;
 using log4net;
 using PoeShared.Modularity;
-using PoeShared.Native;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
-using PoeShared.UI;
 
-namespace PoeShared.Wpf.UI.ExceptionViewer
+namespace PoeShared.UI
 {
     internal sealed class ExceptionDialogDisplayer : DisposableReactiveObject, IExceptionDialogDisplayer
     {

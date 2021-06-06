@@ -1,6 +1,6 @@
 using JetBrains.Annotations;
 
-namespace PoeShared.Wpf.UI.ExceptionViewer
+namespace PoeShared.UI
 {
     public struct ExceptionDialogConfig
     {

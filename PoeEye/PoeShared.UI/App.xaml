@@ -1,18 +1,17 @@
-﻿<ui:ApplicationBase x:Class="PoeShared.UI.App"
+﻿<eye:ApplicationBase x:Class="PoeShared.UI.App"
                  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                 xmlns:ui="clr-namespace:PoeShared.UI;assembly=PoeShared.Wpf">
+                 xmlns:eye="http://coderush.net/poeeye/">
      <Application.Resources>
-          <ui:SharedResourceDictionary>
-               <ui:SharedResourceDictionary.MergedDictionaries>
-                    <ui:SharedResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
-                    <ui:SharedResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/styles/themes/dark.blue.xaml" />
-                    <ui:SharedResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Dark.xaml" />
-                    <ui:SharedResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/materialdesigncolor.bluegrey.xaml" />
-                    <ui:SharedResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Accent/MaterialDesignColor.LightBlue.xaml" />
-                    <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Generic.shared.xaml" />
-                    
-               </ui:SharedResourceDictionary.MergedDictionaries>
-          </ui:SharedResourceDictionary>
+          <eye:SharedResourceDictionary>
+               <eye:SharedResourceDictionary.MergedDictionaries>
+                    <eye:SharedResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
+                    <eye:SharedResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/styles/themes/dark.blue.xaml" />
+                    <eye:SharedResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Dark.xaml" />
+                    <eye:SharedResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/materialdesigncolor.bluegrey.xaml" />
+                    <eye:SharedResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Accent/MaterialDesignColor.LightBlue.xaml" />
+                    <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Generic.shared.xaml" />
+               </eye:SharedResourceDictionary.MergedDictionaries>
+          </eye:SharedResourceDictionary>
      </Application.Resources>
-</ui:ApplicationBase>
+</eye:ApplicationBase>

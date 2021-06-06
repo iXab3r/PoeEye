@@ -3,7 +3,7 @@ using System.Windows.Input;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
 
-namespace PoeShared.UI.Hotkeys
+namespace PoeShared.UI
 {
     internal sealed class KeysToKeyConverter : IConverter<Keys, Key>
     {

@@ -3,7 +3,7 @@ using System.Collections.Concurrent;
 using System.Reactive.Disposables;
 using JetBrains.Annotations;
 using log4net;
-using PoeShared.UI.Hotkeys;
+using PoeShared.UI;
 
 namespace PoeShared.Wpf.Services
 {

@@ -2,13 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Reactive;
-using PoeShared.Scaffolding;
-using ReactiveUI;
 using System.Reactive.Linq;
 using DynamicData;
 using log4net;
+using PoeShared.Scaffolding;
+using ReactiveUI;
 
-namespace PoeShared.UI.TreeView
+namespace PoeShared.UI
 {
     public abstract class TreeViewItemViewModel : DisposableReactiveObject, ITreeViewItemViewModel
     {

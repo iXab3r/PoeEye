@@ -5,7 +5,7 @@ using System.Windows.Input;
 using GongSolutions.Wpf.DragDrop;
 using PoeShared.Scaffolding;
 
-namespace PoeShared.UI.Hotkeys
+namespace PoeShared.UI
 {
     internal sealed class HotkeyDropHandler : DefaultDropHandler
     {

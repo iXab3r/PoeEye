@@ -1,7 +1,7 @@
-﻿<ui:SharedResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+﻿<eye:SharedResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                              xmlns:wpf="http://materialdesigninxaml.net/winfx/xaml/themes"
-                             xmlns:ui="clr-namespace:PoeShared.UI">
+                             xmlns:eye="clr-namespace:PoeShared.UI">
     <Style TargetType="{x:Type CheckBox}">
         <Setter Property="HorizontalAlignment" Value="Stretch" />
         <Setter Property="VerticalAlignment" Value="Stretch" />
@@ -72,4 +72,4 @@
             </Setter.Value>
         </Setter>
     </Style>
-</ui:SharedResourceDictionary>
+</eye:SharedResourceDictionary>

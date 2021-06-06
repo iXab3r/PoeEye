@@ -2,7 +2,7 @@ using System;
 using System.Collections.ObjectModel;
 using PoeShared.Scaffolding;
 
-namespace PoeShared.UI.Hotkeys
+namespace PoeShared.UI
 {
     public interface IHotkeyTracker : IDisposableReactiveObject
     {

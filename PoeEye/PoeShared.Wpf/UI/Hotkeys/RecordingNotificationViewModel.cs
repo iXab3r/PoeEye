@@ -1,6 +1,6 @@
 ﻿using PoeShared.Native;
 
-namespace PoeShared.UI.Hotkeys
+namespace PoeShared.UI
 {
     internal sealed class RecordingNotificationViewModel : NotificationViewModelBase
     {

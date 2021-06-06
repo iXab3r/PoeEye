@@ -1,7 +1,7 @@
 ﻿using System;
 using PoeShared.Scaffolding;
 
-namespace PoeShared.UI.Hotkeys
+namespace PoeShared.UI
 {
     public abstract class HotkeySequenceItem : ICloneable
     {

@@ -37,3 +37,4 @@ using RestEase;
 [assembly: XmlnsDefinition("http://coderush.net/poeeye/", "PoeShared.Converters")]
 [assembly: XmlnsDefinition("http://coderush.net/poeeye/", "PoeShared.Scaffolding")]
 [assembly: XmlnsDefinition("http://coderush.net/poeeye/", "PoeShared.Scaffolding.WPF")]
+[assembly: XmlnsDefinition("http://coderush.net/poeeye/", "PoeShared.UI")]

@@ -3,7 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using log4net;
 
-namespace PoeShared.Wpf.UI
+namespace PoeShared.UI
 {
     public partial class FakeDelayControl : UserControl
     {

@@ -17,7 +17,6 @@ using PoeShared.Audio.ViewModels;
 using PoeShared.Native;
 using PoeShared.Scaffolding;
 using PoeShared.Scaffolding.WPF;
-using PoeShared.UI.Hotkeys;
 
 namespace PoeShared.UI
 {

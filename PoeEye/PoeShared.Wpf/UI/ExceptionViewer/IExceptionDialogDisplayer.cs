@@ -1,7 +1,7 @@
 using System;
 using JetBrains.Annotations;
 
-namespace PoeShared.Wpf.UI.ExceptionViewer
+namespace PoeShared.UI
 {
     public interface IExceptionDialogDisplayer
     {

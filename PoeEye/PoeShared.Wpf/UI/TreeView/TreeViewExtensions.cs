@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace PoeShared.UI.TreeView
+namespace PoeShared.UI
 {
     public static class TreeViewExtensions
     {

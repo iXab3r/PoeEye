@@ -1,14 +1,13 @@
-<ui:SharedResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+<eye:SharedResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:hotkeys="clr-namespace:PoeShared.UI.Hotkeys"
                     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-                    xmlns:ui="clr-namespace:PoeShared.UI"
-                    xmlns:eye="clr-namespace:PoeShared.Scaffolding.WPF">
-    <ui:SharedResourceDictionary.MergedDictionaries>
-        <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Colors.xaml" />
-    </ui:SharedResourceDictionary.MergedDictionaries>
+                    xmlns:eye="clr-namespace:PoeShared.UI"
+                    xmlns:wpf="clr-namespace:PoeShared.Scaffolding.WPF">
+    <eye:SharedResourceDictionary.MergedDictionaries>
+        <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Colors.xaml" />
+    </eye:SharedResourceDictionary.MergedDictionaries>
     
-    <Style TargetType="{x:Type hotkeys:HotKeyBox}">
+    <Style TargetType="{x:Type eye:HotKeyBox}">
         <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Hidden" />
         <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Hidden" />
         <Setter Property="AcceptsReturn" Value="True"/>
@@ -20,7 +19,7 @@
         <Setter Property="ToolTip" Value="Press Backspace, Delete or Escape to reset. Double-click respective keys to assign them as HotKeys"/>
         <Setter Property="Template">
             <Setter.Value>
-                <ControlTemplate TargetType="{x:Type hotkeys:HotKeyBox}">
+                <ControlTemplate TargetType="{x:Type eye:HotKeyBox}">
                     <!-- to compensate MaterialDesignTextBox padding we have to add -4 -->
                     <TextBox x:Name="PART_TextBox"
                              MinHeight="{TemplateBinding MinHeight}"
@@ -55,9 +54,9 @@
     
     <ObjectDataProvider x:Key="HotkeyModeEnumDataProvider"
                         MethodName="GetValuesAndDescriptions"
-                        ObjectType="eye:EnumHelper">
+                        ObjectType="wpf:EnumHelper">
         <ObjectDataProvider.MethodParameters>
-            <x:TypeExtension TypeName="hotkeys:HotkeyMode" />
+            <x:TypeExtension TypeName="eye:HotkeyMode" />
         </ObjectDataProvider.MethodParameters>
     </ObjectDataProvider>
-</ui:SharedResourceDictionary>
+</eye:SharedResourceDictionary>

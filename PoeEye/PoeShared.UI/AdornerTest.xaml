@@ -1,0 +1,188 @@
+﻿<UserControl x:Class="PoeShared.UI.AdornerTest"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:eye="http://coderush.net/poeeye/">
+
+    <UserControl.Resources>
+
+        <Style x:Key="busyStyle" TargetType="{x:Type Control}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Control}">
+                        <ControlTemplate.Resources>
+                            <Style TargetType="{x:Type Rectangle}">
+                                <Setter Property="Width" Value="8" />
+                                <Setter Property="Height" Value="16" />
+                                <Setter Property="Stroke" Value="Black" />
+                                <Setter Property="StrokeThickness" Value="1" />
+                                <Setter Property="RadiusX" Value="2" />
+                                <Setter Property="RadiusY" Value="2" />
+                                <Setter Property="RenderTransformOrigin" Value=".5,.5" />
+                            </Style>
+                        </ControlTemplate.Resources>
+                        <Canvas Width="64" Height="64">
+                            <Rectangle Canvas.Left="24">
+                                <Rectangle.Fill>
+                                    <SolidColorBrush x:Name="top" Color="#DFDFDF" />
+                                </Rectangle.Fill>
+                            </Rectangle>
+                            <Rectangle Canvas.Left="10" Canvas.Top="6">
+                                <Rectangle.RenderTransform>
+                                    <RotateTransform Angle="-45" />
+                                </Rectangle.RenderTransform>
+                                <Rectangle.Fill>
+                                    <SolidColorBrush x:Name="topLeft" Color="#DFDFDF" />
+                                </Rectangle.Fill>
+                            </Rectangle>
+                            <Rectangle Canvas.Top="24" Width="16" Height="8">
+                                <Rectangle.Fill>
+                                    <SolidColorBrush x:Name="left" Color="#DFDFDF" />
+                                </Rectangle.Fill>
+                            </Rectangle>
+                            <Rectangle Canvas.Left="10" Canvas.Top="34">
+                                <Rectangle.RenderTransform>
+                                    <RotateTransform Angle="45" />
+                                </Rectangle.RenderTransform>
+                                <Rectangle.Fill>
+                                    <SolidColorBrush x:Name="bottomLeft" Color="#DFDFDF" />
+                                </Rectangle.Fill>
+                            </Rectangle>
+                            <Rectangle Canvas.Left="24" Canvas.Top="40">
+                                <Rectangle.Fill>
+                                    <SolidColorBrush x:Name="bottom" Color="#DFDFDF" />
+                                </Rectangle.Fill>
+                            </Rectangle>
+                            <Rectangle Canvas.Left="38" Canvas.Top="34">
+                                <Rectangle.RenderTransform>
+                                    <RotateTransform Angle="-45" />
+                                </Rectangle.RenderTransform>
+                                <Rectangle.Fill>
+                                    <SolidColorBrush x:Name="bottomRight" Color="#DFDFDF" />
+                                </Rectangle.Fill>
+                            </Rectangle>
+                            <Rectangle Canvas.Top="24" Canvas.Left="38" Width="16" Height="8">
+                                <Rectangle.Fill>
+                                    <SolidColorBrush x:Name="right" Color="#DFDFDF" />
+                                </Rectangle.Fill>
+                            </Rectangle>
+                            <Rectangle Canvas.Left="38" Canvas.Top="6">
+                                <Rectangle.RenderTransform>
+                                    <RotateTransform Angle="45" />
+                                </Rectangle.RenderTransform>
+                                <Rectangle.Fill>
+                                    <SolidColorBrush x:Name="topRight" Color="#DFDFDF" />
+                                </Rectangle.Fill>
+                            </Rectangle>
+                        </Canvas>
+
+                        <ControlTemplate.Triggers>
+                            <EventTrigger RoutedEvent="Loaded">
+                                <EventTrigger.Actions>
+                                    <BeginStoryboard>
+                                        <Storyboard RepeatBehavior="Forever" Duration="0:0:1.6">
+                                            <ColorAnimation Storyboard.TargetName="top"
+                                                            Storyboard.TargetProperty="Color"
+                                                            To="#606060"
+                                                            BeginTime="0:0:0"
+                                                            Duration="0:0:0" />
+                                            <ColorAnimation Storyboard.TargetName="topRight"
+                                                            Storyboard.TargetProperty="Color"
+                                                            To="#606060"
+                                                            BeginTime="0:0:0.2"
+                                                            Duration="0:0:0" />
+                                            <ColorAnimation Storyboard.TargetName="right"
+                                                            Storyboard.TargetProperty="Color"
+                                                            To="#606060"
+                                                            BeginTime="0:0:0.4"
+                                                            Duration="0:0:0" />
+                                            <ColorAnimation Storyboard.TargetName="bottomRight"
+                                                            Storyboard.TargetProperty="Color"
+                                                            To="#606060"
+                                                            BeginTime="0:0:0.6"
+                                                            Duration="0:0:0" />
+                                            <ColorAnimation Storyboard.TargetName="bottom"
+                                                            Storyboard.TargetProperty="Color"
+                                                            To="#606060"
+                                                            BeginTime="0:0:0.8"
+                                                            Duration="0:0:0" />
+                                            <ColorAnimation Storyboard.TargetName="bottomLeft"
+                                                            Storyboard.TargetProperty="Color"
+                                                            To="#606060"
+                                                            BeginTime="0:0:1"
+                                                            Duration="0:0:0" />
+                                            <ColorAnimation Storyboard.TargetName="left"
+                                                            Storyboard.TargetProperty="Color"
+                                                            To="#606060"
+                                                            BeginTime="0:0:1.2"
+                                                            Duration="0:0:0" />
+                                            <ColorAnimation Storyboard.TargetName="topLeft"
+                                                            Storyboard.TargetProperty="Color"
+                                                            To="#606060"
+                                                            BeginTime="0:0:1.4"
+                                                            Duration="0:0:0" />
+
+                                            <ColorAnimation Storyboard.TargetName="top"
+                                                            Storyboard.TargetProperty="Color"
+                                                            BeginTime="0:0:0.1"
+                                                            Duration="0:0:0.4" />
+                                            <ColorAnimation Storyboard.TargetName="topRight"
+                                                            Storyboard.TargetProperty="Color"
+                                                            BeginTime="0:0:0.3"
+                                                            Duration="0:0:0.4" />
+                                            <ColorAnimation Storyboard.TargetName="right"
+                                                            Storyboard.TargetProperty="Color"
+                                                            BeginTime="0:0:0.5"
+                                                            Duration="0:0:0.4" />
+                                            <ColorAnimation Storyboard.TargetName="bottomRight"
+                                                            Storyboard.TargetProperty="Color"
+                                                            BeginTime="0:0:0.7"
+                                                            Duration="0:0:0.4" />
+                                            <ColorAnimation Storyboard.TargetName="bottom"
+                                                            Storyboard.TargetProperty="Color"
+                                                            BeginTime="0:0:0.9"
+                                                            Duration="0:0:0.4" />
+                                            <ColorAnimation Storyboard.TargetName="bottomLeft"
+                                                            Storyboard.TargetProperty="Color"
+                                                            BeginTime="0:0:1.1"
+                                                            Duration="0:0:0.4" />
+                                            <ColorAnimation Storyboard.TargetName="left"
+                                                            Storyboard.TargetProperty="Color"
+                                                            BeginTime="0:0:1.3"
+                                                            Duration="0:0:0.4" />
+                                            <ColorAnimation Storyboard.TargetName="topLeft"
+                                                            Storyboard.TargetProperty="Color"
+                                                            BeginTime="0:0:1.5"
+                                                            Duration="0:0:0.4" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger.Actions>
+                            </EventTrigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        
+    </UserControl.Resources>
+
+    <eye:BusyDecorator x:Name="busy" BusyStyle="{StaticResource busyStyle}">
+        <DockPanel LastChildFill="True">
+
+            <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Background="#F0F0F0">
+                <Button Content="Begin Long Task in UI thread" Click="DoBlockingTask" Margin="4" />
+                <Button Content="Begin Long Task in UI thread and fade out content" Click="DoBlockingTaskWithFadeOut" Margin="4" />
+                <Button Content="Begin Long Task in background thread" Click="DoBackgroundTask" Margin="4" />
+                <ToggleButton x:Name="toggle" Content="Show Adorner in Popup" Margin="4" />
+                <Popup PlacementTarget="{Binding ElementName=toggle}" Placement="Bottom" IsOpen="{Binding IsChecked, ElementName=toggle}">
+                    <Border Width="200" Height="200" Background="White" BorderBrush="Black" BorderThickness="1">
+                        <eye:BusyDecorator BusyStyle="{StaticResource busyStyle}" IsBusyIndicatorShowing="{Binding IsChecked, ElementName=toggle}" />
+                    </Border>
+                </Popup>
+            </StackPanel>
+
+            <Grid Background="Beige" />
+
+        </DockPanel>
+    </eye:BusyDecorator>
+    
+</UserControl>

@@ -1,21 +1,21 @@
-﻿<ui:SharedResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+﻿<eye:SharedResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:viewModels="clr-namespace:PoeShared.Audio.ViewModels"
                     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-                    xmlns:ui="clr-namespace:PoeShared.UI"
                     xmlns:st="http://schemas.spicytaco.io/"
-                    xmlns:wpf="clr-namespace:PoeShared.Scaffolding.WPF">
+                    xmlns:wpf="clr-namespace:PoeShared.Scaffolding.WPF"
+                    xmlns:eye="clr-namespace:PoeShared.UI">
 
-    <ui:SharedResourceDictionary.MergedDictionaries>
-        <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Converters.xaml" />
-        <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Colors.xaml" />
-        <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Styles.xaml" />
-        <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/UI/ButtonEx.xaml" />
-    </ui:SharedResourceDictionary.MergedDictionaries>
+    <eye:SharedResourceDictionary.MergedDictionaries>
+        <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Converters.xaml" />
+        <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Colors.xaml" />
+        <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Styles.xaml" />
+        <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/UI/ButtonEx.xaml" />
+    </eye:SharedResourceDictionary.MergedDictionaries>
     
     <DataTemplate DataType="{x:Type viewModels:NotificationTypeWrapperViewModel}">
         <StackPanel Orientation="Horizontal">
-            <ui:ButtonEx Command="{Binding Owner.PlayNotificationCommand}" 
+            <eye:ButtonEx Command="{Binding Owner.PlayNotificationCommand}" 
                          CommandParameter="{Binding}"
                          Width="26" Height="26" FontSize="22"
                          Style="{StaticResource FastButtonExStyle}"
@@ -32,7 +32,7 @@
     
     <DataTemplate x:Key="NotificationTypeWrapperCheckBox" DataType="{x:Type viewModels:NotificationTypeWrapperViewModel}">
         <StackPanel Orientation="Horizontal" MinWidth="150">
-            <ui:ButtonEx Command="{Binding Owner.PlayNotificationCommand}" 
+            <eye:ButtonEx Command="{Binding Owner.PlayNotificationCommand}" 
                          CommandParameter="{Binding}"
                          Width="26" Height="26" FontSize="22"
                          Style="{StaticResource FastButtonExStyle}"
@@ -50,13 +50,12 @@
                        IsSynchronizedWithCurrentItem="True"
                        MinWidth="200"
                        IsTextSearchCaseSensitive="False"
-                       ItemTemplate="{StaticResource NotificationTypeWrapperTextBlock}">
-             </ComboBox>
-            
-            <ui:ButtonEx Command="{Binding AddSoundCommand}"
-                         ToolTip="Load from file"
-                         Icon="&#xf115;" 
-                         Content="Load..."/>
+                       ItemTemplate="{StaticResource NotificationTypeWrapperTextBlock}" />
+
+             <eye:ButtonEx Command="{Binding AddSoundCommand}"
+                           ToolTip="Load from file"
+                           Icon="&#xf115;" 
+                           Content="Load..."/>
 
             <DockPanel>
                 <TextBlock DockPanel.Dock="Left" Text="Volume" />
@@ -94,15 +93,15 @@
                 </ToggleButton.ContextMenu>
                 
                 <ToggleButton.ToolTip>
-                    <ui:MouseButtonsTooltip
+                    <eye:MouseButtonsTooltip
                         LeftButton="Enable/Disable Audio notification"
                         RightButton="Select Audio notification">
-                        <ui:MouseButtonsTooltip.MouseToolTip>
-                            <TextBlock Text="{Binding SelectedValue, Mode=OneWay, StringFormat='Notification: {0}'}"></TextBlock>
-                        </ui:MouseButtonsTooltip.MouseToolTip>
-                    </ui:MouseButtonsTooltip>
+                        <eye:MouseButtonsTooltip.MouseToolTip>
+                            <TextBlock Text="{Binding SelectedValue, Mode=OneWay, StringFormat='Notification: {0}'}" />
+                        </eye:MouseButtonsTooltip.MouseToolTip>
+                    </eye:MouseButtonsTooltip>
                 </ToggleButton.ToolTip>
             </ToggleButton>
         </Viewbox>
     </DataTemplate>
-</ui:SharedResourceDictionary>
+</eye:SharedResourceDictionary>

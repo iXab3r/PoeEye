@@ -12,6 +12,34 @@ namespace PoeShared.Scaffolding
 {
     public static class DependencyObjectExtensions
     {
+        public static IEnumerable<DependencyObject> VisualDescendants(this DependencyObject d)
+        {
+            var tree = new Queue<DependencyObject>();
+            tree.Enqueue(d);
+
+            while (tree.Count > 0)
+            {
+                var item = tree.Dequeue();
+                var count = VisualTreeHelper.GetChildrenCount(item);
+                for (int i = 0; i < count; ++i)
+                {
+                    var child = VisualTreeHelper.GetChild(item, i);
+                    tree.Enqueue(child);
+                    yield return child;
+                }
+            }
+        }
+
+        public static IEnumerable<DependencyObject> VisualAncestors(this DependencyObject d)
+        {
+            var parent = VisualTreeHelper.GetParent(d);
+            while (parent != null)
+            {
+                yield return parent;
+                parent = VisualTreeHelper.GetParent(parent);
+            }
+        }
+        
         public static IObservable<TValue> Observe<T, TValue>(this T component, DependencyProperty dependencyProperty, Func<T, TValue> selector)
             where T : DependencyObject
         {

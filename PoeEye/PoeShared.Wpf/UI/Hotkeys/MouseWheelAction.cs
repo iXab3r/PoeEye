@@ -2,7 +2,7 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace PoeShared.UI.Hotkeys
+namespace PoeShared.UI
 {
     [JsonConverter(typeof(StringEnumConverter))]
     public enum MouseWheelAction

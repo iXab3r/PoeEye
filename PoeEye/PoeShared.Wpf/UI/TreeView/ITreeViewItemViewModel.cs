@@ -5,7 +5,7 @@ using System.Reactive;
 using JetBrains.Annotations;
 using PoeShared.Scaffolding;
 
-namespace PoeShared.UI.TreeView
+namespace PoeShared.UI
 {
     public interface ITreeViewItemViewModel : IDisposableReactiveObject
     {

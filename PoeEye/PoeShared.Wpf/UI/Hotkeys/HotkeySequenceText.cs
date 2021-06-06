@@ -1,4 +1,4 @@
-﻿namespace PoeShared.UI.Hotkeys
+﻿namespace PoeShared.UI
 {
     public sealed class HotkeySequenceText : HotkeySequenceItem
     {

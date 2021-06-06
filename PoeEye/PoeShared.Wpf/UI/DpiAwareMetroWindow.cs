@@ -3,7 +3,7 @@ using System.Windows;
 using System.Windows.Media;
 using MahApps.Metro.Controls;
 
-namespace PoeShared.Wpf.UI
+namespace PoeShared.UI
 {
     public class DpiAwareMetroWindow : MetroWindow
     {

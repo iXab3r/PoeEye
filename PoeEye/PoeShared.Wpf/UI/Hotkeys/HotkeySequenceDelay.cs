@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace PoeShared.UI.Hotkeys
+namespace PoeShared.UI
 {
     public sealed class HotkeySequenceDelay : HotkeySequenceItem
     {

@@ -1,7 +1,7 @@
 ﻿using System.Windows.Forms;
 using System.Windows.Input;
 using NUnit.Framework;
-using PoeShared.UI.Hotkeys;
+using PoeShared.UI;
 using Shouldly;
 
 namespace PoeShared.Tests.WPF.Hotkeys

@@ -3,7 +3,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using GongSolutions.Wpf.DragDrop;
 
-namespace PoeShared.UI.Hotkeys
+namespace PoeShared.UI
 {
     [TemplatePart(Name = PART_ListBox, Type = typeof(ListBox))]
     internal partial class HotkeySequenceEditor : ReactiveControl

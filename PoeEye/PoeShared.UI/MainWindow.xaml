@@ -4,23 +4,25 @@
                  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                  xmlns:local="clr-namespace:PoeShared.UI"
-                 xmlns:ui="clr-namespace:PoeShared.UI;assembly=PoeShared.Wpf"
-                 xmlns:hotkeys="clr-namespace:PoeShared.UI.Hotkeys;assembly=PoeShared.Wpf"
                  xmlns:st="http://schemas.spicytaco.io/"
                  xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
                  xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
                  mc:Ignorable="d"
+                 xmlns:eye="http://coderush.net/poeeye/"
                  WindowStartupLocation="CenterScreen"
                  Title="PoeShared Demo" Height="750" Width="800" d:DataContext="{d:DesignInstance local:MainWindowViewModel}">
     <Grid>
         <TabControl>
+            <TabItem Header="Busy indicator">
+                <local:AdornerTest/>
+            </TabItem>
             <TabItem Header="Misc">
                 <st:AutoGrid Columns="150,Auto" Rows="*" ChildMargin="5" VerticalAlignment="Top">
 
                     <TextBlock Text="Random period selector" />
                     <st:StackPanel MarginBetweenChildren="5">
                         <ContentControl Content="{Binding RandomPeriodSelector}" />
-                        <ui:ButtonEx Content="Next" Command="{Binding NextRandomPeriodCommand}" />
+                        <eye:ButtonEx Content="Next" Command="{Binding NextRandomPeriodCommand}" />
                         <TextBlock Text="{Binding RandomPeriod}" />
                     </st:StackPanel>
 
@@ -63,7 +65,7 @@
                 <st:AutoGrid Columns="150,Auto" Rows="*" ChildMargin="5" VerticalAlignment="Top">
 
                     <TextBlock Text="Show notification: Text" />
-                    <ui:ButtonEx Content="Show text notification" Command="{Binding AddTextNotification}" />
+                    <eye:ButtonEx Content="Show text notification" Command="{Binding AddTextNotification}" />
 
                     <TextBlock Text="Timeout" />
                     <mah:NumericUpDown
@@ -93,7 +95,7 @@
 
 
                         <TextBlock Text="Stop recording hotkey" />
-                        <hotkeys:HotKeyBox HotKey="{Binding HotkeySequenceEditor.StopRecordingHotkey}" />
+                        <eye:HotKeyBox HotKey="{Binding HotkeySequenceEditor.StopRecordingHotkey}" />
 
                         <TextBlock Text="MaxDuration" />
                         <mah:NumericUpDown
@@ -111,15 +113,15 @@
             </TabItem>
             <TabItem Header="ButtonEx">
                 <StackPanel>
-                    <ui:ButtonEx Content="OK"
+                    <eye:ButtonEx Content="OK"
                                  Icon="&#xf1fb;"
                                  Command="{Binding LongCommand}" />
 
-                    <ui:ButtonEx Icon="&#xf00d;" Content="With Icon" Command="{Binding LongCommand}" />
-                    <ui:ButtonEx Icon="&#xf00d;" Command="{Binding LongCommand}" />
+                    <eye:ButtonEx Icon="&#xf00d;" Content="With Icon" Command="{Binding LongCommand}" />
+                    <eye:ButtonEx Icon="&#xf00d;" Command="{Binding LongCommand}" />
 
-                    <ui:ButtonEx Content="Error" Command="{Binding ErrorCommand}" />
-                    <ui:ButtonEx Icon="&#xf00d;" Command="{Binding ErrorCommand}" />
+                    <eye:ButtonEx Content="Error" Command="{Binding ErrorCommand}" />
+                    <eye:ButtonEx Icon="&#xf00d;" Command="{Binding ErrorCommand}" />
                 </StackPanel>
             </TabItem>
         </TabControl>

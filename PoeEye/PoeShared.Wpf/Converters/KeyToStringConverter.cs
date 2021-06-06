@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.Windows.Data;
 using System.Windows.Input;
-using PoeShared.UI.Hotkeys;
+using PoeShared.UI;
 
 namespace PoeShared.Converters
 {

@@ -6,25 +6,20 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Forms;
 using System.Windows.Input;
-using System.Windows.Interop;
 using DynamicData;
 using DynamicData.Aggregation;
 using DynamicData.Binding;
 using log4net;
-using PInvoke;
 using PoeShared.Modularity;
 using PoeShared.Native;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
 using PoeShared.Scaffolding.WPF;
 using ReactiveUI;
-using Unity;
-using IDropTarget = GongSolutions.Wpf.DragDrop.IDropTarget;
 using Point = System.Drawing.Point;
 
-namespace PoeShared.UI.Hotkeys
+namespace PoeShared.UI
 {
     internal sealed class HotkeySequenceEditorViewModel : DisposableReactiveObject, IHotkeySequenceEditorViewModel
     {

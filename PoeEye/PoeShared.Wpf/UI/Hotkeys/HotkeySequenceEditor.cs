@@ -11,7 +11,7 @@ using ReactiveUI;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using ListBox = System.Windows.Controls.ListBox;
 
-namespace PoeShared.UI.Hotkeys
+namespace PoeShared.UI
 {
     internal partial class HotkeySequenceEditor
     {

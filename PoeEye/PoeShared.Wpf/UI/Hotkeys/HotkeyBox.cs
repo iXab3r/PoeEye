@@ -1,19 +1,17 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Interop;
-using log4net.Util;
 using PInvoke;
 using PoeShared.Native;
 using Control = System.Windows.Controls.Control;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using TextBox = System.Windows.Controls.TextBox;
 
-namespace PoeShared.UI.Hotkeys
+namespace PoeShared.UI
 {
     [TemplatePart(Name = PART_TextBox, Type = typeof(TextBox))]
     public class HotKeyBox : Control

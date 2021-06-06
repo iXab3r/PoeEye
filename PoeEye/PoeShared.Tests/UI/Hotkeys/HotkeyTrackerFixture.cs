@@ -5,7 +5,7 @@ using NUnit.Framework;
 using PoeShared.Modularity;
 using PoeShared.Native;
 using PoeShared.Tests.Helpers;
-using PoeShared.UI.Hotkeys;
+using PoeShared.UI;
 
 namespace PoeShared.Tests.UI.Hotkeys
 {

@@ -1,5 +1,5 @@
 ﻿using System;
-using PoeShared.UI.Hotkeys;
+using PoeShared.UI;
 
 namespace PoeShared.Wpf.Services
 {

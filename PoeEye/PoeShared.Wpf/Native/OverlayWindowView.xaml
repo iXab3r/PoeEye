@@ -5,9 +5,9 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:native="clr-namespace:PoeShared.Native"
-    xmlns:eye="clr-namespace:PoeShared.Scaffolding"
-    xmlns:ui="clr-namespace:PoeShared.UI"
+    xmlns:eye="clr-namespace:PoeShared.UI"
     xmlns:wpf="clr-namespace:PoeShared.Scaffolding.WPF"
+    xmlns:scaffolding="clr-namespace:PoeShared.Scaffolding"
     mc:Ignorable="d"
     d:DataContext="{d:DesignInstance native:OverlayWindowViewModel}"
     WindowStartupLocation="Manual"
@@ -20,11 +20,11 @@
     SizeChanged="OverlayChildWindow_OnSizeChanged">
 
     <Window.Resources>
-        <ui:SharedResourceDictionary>
-            <ui:SharedResourceDictionary.MergedDictionaries>
-                <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Generic.xaml" />
-            </ui:SharedResourceDictionary.MergedDictionaries>
-        </ui:SharedResourceDictionary>
+        <eye:SharedResourceDictionary>
+            <eye:SharedResourceDictionary.MergedDictionaries>
+                <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Generic.xaml" />
+            </eye:SharedResourceDictionary.MergedDictionaries>
+        </eye:SharedResourceDictionary>
     </Window.Resources>
 
     <native:TransparentWindow.Style>
@@ -241,13 +241,13 @@
             <Thumb Style="{StaticResource OverlayThumbTopRightStyle}" IsHitTestVisible="False"/>
         </Grid>
         
-        <eye:DataPiping.DataPipes>
-            <eye:DataPipeCollection>
-                <eye:DataPipe
+        <scaffolding:DataPiping.DataPipes>
+            <scaffolding:DataPipeCollection>
+                <scaffolding:DataPipe
                     Source="{Binding ElementName=ThumbSW, Path=ActualWidth}"
                     Target="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type native:OverlayWindowView}}, Path=ResizeThumbSize, Mode=OneWayToSource}" />
-            </eye:DataPipeCollection>
-        </eye:DataPiping.DataPipes>
+            </scaffolding:DataPipeCollection>
+        </scaffolding:DataPiping.DataPipes>
     </Grid>
 
 </native:TransparentWindow>

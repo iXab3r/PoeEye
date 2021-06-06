@@ -1,14 +1,13 @@
-﻿<ui:SharedResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+﻿<eye:SharedResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                             xmlns:hotkeys="clr-namespace:PoeShared.UI.Hotkeys"
-                             xmlns:ui="clr-namespace:PoeShared.UI"
-                             xmlns:st="http://schemas.spicytaco.io/">
-    <ui:SharedResourceDictionary.MergedDictionaries>
-        <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Colors.xaml" />
-        <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Converters.xaml" />
-        <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Styles.xaml" />
-        <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/UI/ButtonEx.xaml" />
-    </ui:SharedResourceDictionary.MergedDictionaries>
+                             xmlns:st="http://schemas.spicytaco.io/"
+                             xmlns:eye="clr-namespace:PoeShared.UI">
+    <eye:SharedResourceDictionary.MergedDictionaries>
+        <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Colors.xaml" />
+        <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Converters.xaml" />
+        <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Styles.xaml" />
+        <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/UI/ButtonEx.xaml" />
+    </eye:SharedResourceDictionary.MergedDictionaries>
 
     <SolidColorBrush x:Key="SequenceEditorTextBackground" Color="#664C00" />
     <SolidColorBrush x:Key="SequenceEditorKeyBackground" Color="#660019" />
@@ -17,12 +16,12 @@
     <SolidColorBrush x:Key="SequenceEditorDefaultBackground" Color="Gray" />
     <SolidColorBrush x:Key="SequenceEditorTextForeground" Color="White" />
 
-    <hotkeys:HotkeySequenceEditorItemVisibilityConverter x:Key="HotkeySequenceEditorItemVisibilityConverter" />
+    <eye:HotkeySequenceEditorItemVisibilityConverter x:Key="HotkeySequenceEditorItemVisibilityConverter" />
 
-    <DataTemplate DataType="{x:Type hotkeys:RecordingNotificationViewModel}">
+    <DataTemplate DataType="{x:Type eye:RecordingNotificationViewModel}">
         <st:StackPanel Orientation="Vertical" MarginBetweenChildren="5">
-            <ProgressBar Minimum="0" Value="{Binding Owner.TotalItemsCount, Mode=OneWay}" Maximum="{Binding Owner.MaxItemsCount, Mode=OneWay}"></ProgressBar>
-            <ui:ButtonEx
+            <ProgressBar Minimum="0" Value="{Binding Owner.TotalItemsCount, Mode=OneWay}" Maximum="{Binding Owner.MaxItemsCount, Mode=OneWay}" />
+            <eye:ButtonEx
                 Opacity="0.5"
                 x:Name="Container"
                 CornerRadius="5"
@@ -31,15 +30,15 @@
                 BorderThickness="1"
                 Foreground="{StaticResource SequenceEditorTextForeground}"
                 Command="{Binding Owner.StopRecording}">
-                <ui:ButtonEx.Content>
+                <eye:ButtonEx.Content>
                     <st:StackPanel MarginBetweenChildren="5" Orientation="Horizontal">
                         <TextBlock x:Name="RecordingIcon" Style="{StaticResource IconTextBlock}" Text="&#xf04d;" FontSize="20"
                                    Foreground="{StaticResource NegativeBrush}" />
                         <TextBlock Text="{Binding Owner.StopRecordingHotkey, StringFormat='Press {0} to stop recording'}" />
                     </st:StackPanel>
-                </ui:ButtonEx.Content>
-            </ui:ButtonEx>
-            <ProgressBar Minimum="0" Value="{Binding Owner.TotalDuration.TotalMilliseconds, Mode=OneWay}" Maximum="{Binding Owner.MaxDuration.TotalMilliseconds, Mode=OneWay}"></ProgressBar>
+                </eye:ButtonEx.Content>
+            </eye:ButtonEx>
+            <ProgressBar Minimum="0" Value="{Binding Owner.TotalDuration.TotalMilliseconds, Mode=OneWay}" Maximum="{Binding Owner.MaxDuration.TotalMilliseconds, Mode=OneWay}" />
         </st:StackPanel>
         <DataTemplate.Triggers>
             <Trigger SourceName="Container" Property="IsMouseOver" Value="True">
@@ -50,7 +49,7 @@
         </DataTemplate.Triggers>
     </DataTemplate>
 
-    <Style x:Key="HotkeySequenceEditorButtonStyle" TargetType="{x:Type ui:ButtonEx}" BasedOn="{StaticResource DefaultButtonExStyle}">
+    <Style x:Key="HotkeySequenceEditorButtonStyle" TargetType="{x:Type eye:ButtonEx}" BasedOn="{StaticResource DefaultButtonExStyle}">
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
                 <Setter Property="BorderBrush" Value="{StaticResource SequenceEditorAccent}" />
@@ -99,4 +98,4 @@
             </Setter.Value>
         </Setter>
     </Style>
-</ui:SharedResourceDictionary>
+</eye:SharedResourceDictionary>
