@@ -93,7 +93,8 @@
                                       Delay="{TemplateBinding Delay}"
                                       Focusable="{TemplateBinding UpDownButtonsFocusable}"
                                       Foreground="{TemplateBinding Foreground}"
-                                      IsTabStop="False">
+                                      IsTabStop="False"
+                                      Style="{DynamicResource MahApps.Styles.Button.Chromeless}">
                             <Path x:Name="PolygonDown" Fill="{TemplateBinding Foreground}" Data="{StaticResource DownArrowGeometry}" />
                         </RepeatButton>
                         <i:Interaction.Behaviors>
