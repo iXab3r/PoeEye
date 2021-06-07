@@ -49,7 +49,6 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
-        <Setter Property="Validation.ErrorTemplate" Value="{DynamicResource ValidationErrorTemplate}" />
     </Style>
     
     <ObjectDataProvider x:Key="HotkeyModeEnumDataProvider"

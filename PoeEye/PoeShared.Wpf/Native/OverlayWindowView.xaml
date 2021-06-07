@@ -19,6 +19,11 @@
     UseLayoutRounding="True"
     SizeChanged="OverlayChildWindow_OnSizeChanged">
 
+    <WindowChrome.WindowChrome>
+        <WindowChrome GlassFrameThickness="{Binding GlassFrameThickness, Mode=OneWay}" 
+                      CornerRadius="0" CaptionHeight="0" 
+                      ResizeBorderThickness="{Binding ResizeThumbSize, Mode=OneWay, Converter={StaticResource DoubleDivideByTwoConverter}}" />
+    </WindowChrome.WindowChrome>
     <Window.Resources>
         <eye:SharedResourceDictionary>
             <eye:SharedResourceDictionary.MergedDictionaries>
@@ -42,23 +47,6 @@
             <Setter Property="ResizeMode" Value="NoResize" />
             <Setter Property="WindowStyle" Value="None" />
             <Setter Property="AllowsTransparency" Value="True" />
-            
-            <Setter Property="WindowChrome.WindowChrome">
-                <Setter.Value>
-                    <WindowChrome GlassFrameThickness="0" CornerRadius="0" CaptionHeight="0" ResizeBorderThickness="0" />
-                </Setter.Value>
-            </Setter>
-
-            <Style.Triggers>
-                <DataTrigger Binding="{Binding Content.IsLocked}" Value="False">
-                    <Setter Property="WindowChrome.WindowChrome">
-                        <Setter.Value>
-                            <WindowChrome GlassFrameThickness="15" CornerRadius="0" CaptionHeight="0" 
-                                          ResizeBorderThickness="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type native:OverlayWindowView}}, Path=ResizeThumbSize, Mode=OneWay, Converter={StaticResource DoubleDivideByTwoConverter}}" />
-                        </Setter.Value>
-                    </Setter>
-                </DataTrigger>
-            </Style.Triggers>
         </Style>
     </native:TransparentWindow.Style>
 
@@ -245,7 +233,7 @@
             <scaffolding:DataPipeCollection>
                 <scaffolding:DataPipe
                     Source="{Binding ElementName=ThumbSW, Path=ActualWidth}"
-                    Target="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type native:OverlayWindowView}}, Path=ResizeThumbSize, Mode=OneWayToSource}" />
+                    Target="{Binding ResizeThumbSize, Mode=OneWayToSource}" />
             </scaffolding:DataPipeCollection>
         </scaffolding:DataPiping.DataPipes>
     </Grid>

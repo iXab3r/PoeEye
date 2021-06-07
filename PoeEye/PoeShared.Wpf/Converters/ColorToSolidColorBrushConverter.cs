@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -8,11 +10,21 @@ namespace PoeShared.Converters
 {
     public class ColorToSolidColorBrushConverter : IValueConverter
     {
+        private static readonly ConcurrentDictionary<Color, SolidColorBrush> BrushesByColor = new();
+        
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return value != null
-                ? new SolidColorBrush((Color) value)
-                : null;
+            if (value is not Color color)
+            {
+                return Binding.DoNothing;
+            }
+
+            return BrushesByColor.GetOrAdd(color, x =>
+            {
+                var result = new SolidColorBrush(x);
+                result.Freeze();
+                return result;
+            });
         }
 
         public object ConvertBack(

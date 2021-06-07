@@ -13,14 +13,36 @@
                  Title="PoeShared Demo" Height="750" Width="800" d:DataContext="{d:DesignInstance local:MainWindowViewModel}">
     <Grid>
         <TabControl>
-            <TabItem Header="Busy indicator">
-                <local:AdornerTest/>
+            <TabItem Header="Colors">
+                <st:StackPanel MarginBetweenChildren="5" Orientation="Vertical">
+                    <Label Background="{DynamicResource MaterialDesignBody}" Content="Body"></Label>
+                    <Label Background="{DynamicResource MaterialDesignDivider}" Content="Divider"></Label>
+                    <Label Background="{DynamicResource PrimaryHueDarkForegroundBrush}" Content="PrimaryHueDarkForegroundBrush"></Label>
+                    <Label Background="{DynamicResource SecondaryAccentForegroundBrush}" Content="SecondaryAccentForegroundBrush"></Label>
+                    <Label Background="{DynamicResource PrimaryHueLightForegroundBrush}" Content="PrimaryHueLightForegroundBrush"></Label>
+                    <Label Background="{DynamicResource PrimaryHueMidForegroundBrush}" Content="PrimaryHueMidForegroundBrush"></Label>
+                    <Label Background="{DynamicResource PrimaryHueDarkForegroundBrush}" Content="PrimaryHueDarkForegroundBrush"></Label>
+                    <Label Background="{DynamicResource PrimaryHueLightBrush}" Content="PrimaryHueLightBrush"></Label>
+                    <Label Background="{DynamicResource PrimaryHueMidBrush}" Content="PrimaryHueMidBrush"></Label>
+                    <Label Background="{DynamicResource PrimaryHueDarkBrush}" Content="PrimaryHueDarkBrush"></Label>
+                    <Label Background="{DynamicResource MaterialDesignPaper}" Content="MaterialDesignPaper"></Label>
+                    <Label Background="{DynamicResource MaterialDesignTextBoxBorder}" Content="MaterialDesignTextBoxBorder"></Label>
+                    <Label Background="{DynamicResource MaterialDesignSelection}" Content="MaterialDesignSelection"></Label>
+                    <Label Background="{DynamicResource MaterialDesignCheckBoxOff}" Content="MaterialDesignCheckBoxOff"></Label>
+                    <Label Background="{DynamicResource MaterialDesignFlatButtonClick}" Content="MaterialDesignFlatButtonClick"></Label>
+                    <Label Background="{DynamicResource MaterialDesignValidationErrorBrush}" Content="MaterialDesignValidationErrorBrush"></Label>
+                    <Label Background="{DynamicResource MahApps.Brushes.Accent}" Content="MahApps.Brushes.Accent"></Label>
+                    <Label Background="{DynamicResource MahApps.Brushes.ThemeForeground}" Content="MahApps.Brushes.ThemeForeground"></Label>
+                    <Label Background="{DynamicResource MahApps.Brushes.ThemeBackground}" Content="MahApps.Brushes.ThemeBackground"></Label>
+                    <Label Background="{DynamicResource MahApps.Brushes.Gray8}" Content="MahApps.Brushes.Gray8"></Label>
+                    <Label Background="{DynamicResource {x:Static SystemColors.InactiveSelectionHighlightBrushKey}}" Content="InactiveSelectionHighlightBrushKey"></Label>
+                </st:StackPanel>
+                
             </TabItem>
             <TabItem Header="Misc">
                 <st:AutoGrid Columns="150,Auto" Rows="*" ChildMargin="5" VerticalAlignment="Top">
-
                     <TextBlock Text="Random period selector" />
-                    <st:StackPanel MarginBetweenChildren="5">
+                    <st:StackPanel MarginBetweenChildren="5" Orientation="Horizontal">
                         <ContentControl Content="{Binding RandomPeriodSelector}" />
                         <eye:ButtonEx Content="Next" Command="{Binding NextRandomPeriodCommand}" />
                         <TextBlock Text="{Binding RandomPeriod}" />
@@ -58,7 +80,7 @@
                         <ComboBoxItem>Item 17</ComboBoxItem>
                         <ComboBoxItem>Item 18</ComboBoxItem>
                     </ComboBox>
-
+                    <local:AdornerTest/>
                 </st:AutoGrid>
             </TabItem>
             <TabItem Header="Notifications">

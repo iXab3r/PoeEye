@@ -13,9 +13,6 @@ namespace PoeShared.Native
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(OverlayWindowView));
         
-        public static readonly DependencyProperty ResizeThumbSizeProperty = DependencyProperty.Register(
-            "ResizeThumbSize", typeof(double), typeof(OverlayWindowView), new PropertyMetadata(default(double)));
-
         public OverlayWindowView()
         {
             using var sw = new BenchmarkTimer("View initialization", Log, nameof(OverlayWindowView));
@@ -24,11 +21,6 @@ namespace PoeShared.Native
             WhenLoaded.SubscribeSafe(OnLoaded, Log.HandleUiException);
             sw.Step("WhenLoaded routine executed");
             SizeChanged += OnSizeChanged;
-        }
-        public double ResizeThumbSize
-        {
-            get { return (double) GetValue(ResizeThumbSizeProperty); }
-            set { SetValue(ResizeThumbSizeProperty, value); }
         }
 
         public IObservable<EventPattern<RoutedEventArgs>> WhenLoaded => Observable

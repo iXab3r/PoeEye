@@ -328,7 +328,6 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
-        <Setter Property="Validation.ErrorTemplate" Value="{DynamicResource ValidationErrorTemplate}" />
     </Style>
 
     <Style TargetType="{x:Type eye:HotkeySequenceEditor}" BasedOn="{StaticResource DefaultHotkeySequenceEditorStyle}" />
