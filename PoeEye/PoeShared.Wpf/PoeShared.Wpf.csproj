@@ -40,7 +40,6 @@
     <PackageReference Include="StartupHelper" Version="1.0.2.0"><NoWarn>NU1701</NoWarn></PackageReference>
     <PackageReference Include="System.Drawing.Primitives" Version="4.3.0" />
     <PackageReference Include="System.Reactive.Windows.Threading" Version="5.0.0-preview.16" />
-    <PackageReference Include="System.Reflection.Emit" Version="4.3.0" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
     <PackageReference Include="System.Reactive" Version="4.2.0" />
     <PackageReference Include="Unity" Version="5.10.3" />
