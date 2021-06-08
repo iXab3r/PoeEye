@@ -7,9 +7,10 @@
     <NoWarn>CS0414</NoWarn>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="BenchmarkDotNet" Version="0.13.0" />
     <PackageReference Include="Moq" Version="4.13.1" />
     <PackageReference Include="nunit" Version="3.12.0" />
-    <PackageReference Include="NUnit3TestAdapter" Version="3.13.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.17.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.2.0" />
     <PackageReference Include="Shouldly" Version="4.0.0-beta0002" />
   </ItemGroup>
@@ -17,6 +18,7 @@
     <ProjectReference Include="..\PoeShared.Wpf\PoeShared.Wpf.csproj" />
     <ProjectReference Include="..\PoeShared\PoeShared.csproj" />
     <ProjectReference Include="..\PoeShared.Native\PoeShared.Native.csproj" />
+    <ProjectReference Include="..\PropertyBinder\PropertyBinder.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="log4net.tests.config">

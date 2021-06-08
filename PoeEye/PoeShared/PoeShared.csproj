@@ -17,4 +17,7 @@
         <PackageReference Include="CompareNETObjects" Version="4.65.0" />
         <PackageReference Include="Microsoft.NETCore.Targets" Version="5.0.0" />
     </ItemGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\PropertyBinder\PropertyBinder.csproj" />
+    </ItemGroup>
 </Project>
