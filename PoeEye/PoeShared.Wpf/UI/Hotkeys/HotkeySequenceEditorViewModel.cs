@@ -16,6 +16,7 @@ using PoeShared.Native;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
 using PoeShared.Scaffolding.WPF;
+using PropertyBinder;
 using ReactiveUI;
 using Point = System.Drawing.Point;
 
@@ -23,6 +24,8 @@ namespace PoeShared.UI
 {
     internal sealed class HotkeySequenceEditorViewModel : DisposableReactiveObject, IHotkeySequenceEditorViewModel
     {
+        private static readonly Binder<HotkeySequenceEditorViewModel> Binder = new();
+
         private static readonly ILog Log = LogManager.GetLogger(typeof(HotkeySequenceEditorViewModel));
 
         private readonly IAppArguments appArguments;
@@ -30,16 +33,11 @@ namespace PoeShared.UI
         private readonly IFactory<IHotkeyTracker> hotkeyFactory;
         private readonly IKeyboardEventsSource keyboardEventsSource;
         private readonly ObservableAsPropertyHelper<int> totalItemsCount;
-        private readonly ObservableAsPropertyHelper<bool> canAddItem;
-        private readonly ObservableAsPropertyHelper<bool> maxItemsExceeded;
-        private readonly ObservableAsPropertyHelper<bool> maxDurationExceeded;
-        private readonly ObservableAsPropertyHelper<TimeSpan> totalDuration;
         private readonly ObservableAsPropertyHelper<TimeSpan> recordDuration;
-        private readonly ObservableAsPropertyHelper<TimeSpan> totalItemsDuration;
         private readonly ObservableAsPropertyHelper<DateTimeOffset?> recordStartTime;
-        private readonly ObservableAsPropertyHelper<bool> atLeastOneRecordingTypeEnabled;
-        private readonly ObservableAsPropertyHelper<HotkeySequenceDelay> defaultItemDelay;
         private readonly SerialDisposable recordingAnchors;
+        private readonly ObservableAsPropertyHelper<TimeSpan> totalItemsDuration;
+        private readonly ObservableAsPropertyHelper<TimeSpan> totalDuration;
 
         private bool enableMouseClicksRecording = true;
         private bool enableMousePositionRecording;
@@ -52,7 +50,21 @@ namespace PoeShared.UI
         private int maxItemsCount = 250;
         private UIElement owner;
         private HotkeyGesture stopRecordingHotkey = new(Key.Escape);
-        
+        private HotkeySequenceDelay defaultItemDelay;
+        private bool maxDurationExceeded;
+        private bool maxItemsExceeded;
+        private bool canAddItem;
+        private bool atLeastOneRecordingTypeEnabled;
+
+        static HotkeySequenceEditorViewModel()
+        {
+            Binder.Bind(x => new HotkeySequenceDelay() {Delay = x.DefaultKeyPressDuration, IsKeypress = false}).To(x => x.DefaultItemDelay);
+            Binder.Bind(x => Math.Round(x.MaxDuration.TotalSeconds - x.TotalDuration.TotalSeconds) <= 0.5).To(x => x.MaxDurationExceeded);
+            Binder.Bind(x => x.TotalItemsCount >= x.MaxItemsCount).To(x => x.MaxItemsExceeded);
+            Binder.Bind(x => !x.MaxDurationExceeded && !x.MaxItemsExceeded && x.AtLeastOneRecordingTypeEnabled).To(x => x.CanAddItem);
+            Binder.Bind(x => x.EnableKeyboardRecording || x.EnableMouseClicksRecording || x.EnableMousePositionRecording).To(x => x.AtLeastOneRecordingTypeEnabled);
+        }
+
         public HotkeySequenceEditorViewModel(
             IAppArguments appArguments,
             NotificationsService notificationsService,
@@ -68,16 +80,10 @@ namespace PoeShared.UI
             this.hotkeyFactory = hotkeyFactory;
             this.keyboardEventsSource = keyboardEventsSource;
 
-            this.WhenAnyValue(x => x.DefaultKeyPressDuration)
-                .Select(x => new HotkeySequenceDelay() {Delay = x, IsKeypress = false})
-                .ToProperty(out defaultItemDelay, this, x => x.DefaultItemDelay)
-                .AddTo(Anchors);
-
             SumEx.Sum(items.ToObservableChangeSet(), y => y is HotkeySequenceDelay delay ? delay.Delay.TotalMilliseconds : 0)
                 .Select(TimeSpan.FromMilliseconds)
                 .ToProperty(out totalItemsDuration, this, x => x.TotalItemsDuration)
                 .AddTo(Anchors);
-
             this.WhenAnyValue(x => x.IsRecording)
                 .Select(x =>
                 {
@@ -88,19 +94,9 @@ namespace PoeShared.UI
                 .ToProperty(out totalDuration, this, x => x.TotalDuration)
                 .AddTo(Anchors);
 
-            this.WhenAnyValue(x => x.TotalDuration, x => x.MaxDuration)
-                .Select(x => Math.Round(MaxDuration.TotalSeconds - TotalDuration.TotalSeconds) <= 0.5)
-                .ToProperty(out maxDurationExceeded, this, x => x.MaxDurationExceeded)
-                .AddTo(Anchors);
-
             items.ToObservableChangeSet()
                 .CountIf()
                 .ToProperty(out totalItemsCount, this, x => x.TotalItemsCount)
-                .AddTo(Anchors);
-
-            this.WhenAnyValue(x => x.TotalItemsCount, x => x.MaxItemsCount)
-                .Select(x => TotalItemsCount >= MaxItemsCount)
-                .ToProperty(out maxItemsExceeded, this, x => x.MaxItemsExceeded)
                 .AddTo(Anchors);
 
             this.WhenAnyValue(x => x.IsRecording)
@@ -116,19 +112,7 @@ namespace PoeShared.UI
                 .Select(x => DateTime.UtcNow - RecordStartTime ?? TimeSpan.Zero)
                 .ToProperty(out recordDuration, this, x => x.RecordingDuration)
                 .AddTo(Anchors);
-
-            Observable.CombineLatest(
-                    this.WhenAnyValue(x => x.EnableKeyboardRecording),
-                    this.WhenAnyValue(x => x.EnableMouseClicksRecording),
-                    this.WhenAnyValue(x => x.EnableMousePositionRecording))
-                .Select(x => x.Any(y => y))
-                .ToProperty(out atLeastOneRecordingTypeEnabled, this, x => x.AtLeastOneRecordingTypeEnabled)
-                .AddTo(Anchors);
-
-            this.WhenAnyValue(x => x.MaxDurationExceeded, x => x.MaxItemsExceeded, x => x.AtLeastOneRecordingTypeEnabled)
-                .Select(_ => !MaxDurationExceeded && !MaxItemsExceeded && AtLeastOneRecordingTypeEnabled)
-                .ToProperty(out canAddItem, this, x => x.CanAddItem)
-                .AddTo(Anchors);
+            Binder.Attach(this).AddTo(Anchors);
 
             AddItem = CommandWrapper.Create<object>(AddItemExecuted);
             RemoveItem = CommandWrapper.Create<object>(RemoveItemExecuted);
@@ -176,17 +160,37 @@ namespace PoeShared.UI
 
         public ICommand RemoveItem { get; }
 
-        public HotkeySequenceDelay DefaultItemDelay => defaultItemDelay.Value;
+        public HotkeySequenceDelay DefaultItemDelay
+        {
+            get => defaultItemDelay;
+            private set => RaiseAndSetIfChanged(ref defaultItemDelay, value);
+        }
 
         public HotkeySequenceText DefaultItemText { get; } = new() {Text = "text"};
 
-        public bool AtLeastOneRecordingTypeEnabled => atLeastOneRecordingTypeEnabled.Value;
+        public bool AtLeastOneRecordingTypeEnabled
+        {
+            get => atLeastOneRecordingTypeEnabled;
+            private set => RaiseAndSetIfChanged(ref atLeastOneRecordingTypeEnabled, value);
+        }
 
-        public bool MaxItemsExceeded => maxItemsExceeded.Value;
+        public bool MaxItemsExceeded
+        {
+            get => maxItemsExceeded;
+            private set => RaiseAndSetIfChanged(ref maxItemsExceeded, value);
+        }
 
-        public bool MaxDurationExceeded => maxDurationExceeded.Value;
+        public bool MaxDurationExceeded
+        {
+            get => maxDurationExceeded;
+            private set => RaiseAndSetIfChanged(ref maxDurationExceeded, value);
+        }
 
-        public bool CanAddItem => canAddItem.Value;
+        public bool CanAddItem
+        {
+            get => canAddItem;
+            private set => RaiseAndSetIfChanged(ref canAddItem, value);
+        }
 
         public int TotalItemsCount => totalItemsCount.Value;
 

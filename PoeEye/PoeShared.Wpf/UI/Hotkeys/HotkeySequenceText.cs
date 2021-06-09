@@ -2,6 +2,12 @@
 {
     public sealed class HotkeySequenceText : HotkeySequenceItem
     {
-        public string Text { get; init; }
+        private string text;
+
+        public string Text
+        {
+            get => text;
+            set => RaiseAndSetIfChanged(ref text, value);
+        }
     }
 }

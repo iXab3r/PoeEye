@@ -115,7 +115,6 @@
                         <TextBlock Text="Item count" />
                         <TextBlock Text="{Binding HotkeySequenceEditor.Items.Count}" />
 
-
                         <TextBlock Text="Stop recording hotkey" />
                         <eye:HotKeyBox HotKey="{Binding HotkeySequenceEditor.StopRecordingHotkey}" />
 
@@ -123,6 +122,11 @@
                         <mah:NumericUpDown
                             Interval="1000"
                             Value="{Binding HotkeySequenceEditor.MaxDuration, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource TimeSpanToMillisecondsConverter}}" />
+                        
+                        <TextBlock Text="Key Press Duration" />
+                        <mah:NumericUpDown
+                            Interval="50"
+                            Value="{Binding HotkeySequenceEditor.DefaultKeyPressDuration, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource TimeSpanToMillisecondsConverter}}" />
 
                         <TextBlock Text="MousePositionRecordingResolution" />
                         <mah:NumericUpDown
