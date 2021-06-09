@@ -27,6 +27,7 @@ namespace PoeShared.Prism
                 .RegisterSingleton<IStartupManager, StartupManager>()
                 .RegisterSingleton<IConverter<NameValueCollection, string>, NameValueCollectionToQueryStringConverter>()
                 .RegisterSingleton<IConverter<NameValueCollection, IEnumerable<KeyValuePair<string, string>>>, NameValueCollectionToQueryStringConverter>()
+                .RegisterFactory<IKeyboardMouseEventsProvider>(x => new KeyboardMouseEventsProvider(), new ContainerControlledLifetimeManager())
                 .RegisterSingleton<IKeyboardEventsSource, KeyboardEventsSource>()
                 .RegisterSingleton<IClipboardManager, ClipboardManager>()
                 .RegisterSingleton<IAudioNotificationsManager, AudioNotificationsManager>()

@@ -26,6 +26,7 @@ namespace PoeShared.Native
         private readonly IClock clock;
 
         public KeyboardEventsSource(
+            IKeyboardMouseEventsProvider keyboardMouseEventsProvider,
             [Dependency(WellKnownSchedulers.InputHook)] IScheduler inputScheduler,
             [NotNull] IClock clock)
         {
@@ -34,36 +35,41 @@ namespace PoeShared.Native
 
             this.inputScheduler = inputScheduler;
             this.clock = clock;
-            
-            WhenMouseMove = Observable
-                .Using(Hook.GlobalEvents, HookMouseMove)
-                .Publish()
-                .RefCount()
+
+            WhenMouseMove = keyboardMouseEventsProvider.System
+                .Select(x => x)
+                .Select(HookMouseMove)
+                .Switch()
                 .Where(x => x.EventType == InputEventType.MouseMove && x.EventArgs is MouseEventArgs)
                 .Select(x => x.EventArgs as MouseEventArgs)
-                .DistinctUntilChanged(args => new { args.X, args.Y, args.Button, args.Clicks, args.Delta });
-            
-            WhenMouseWheel = Observable
-                .Using(Hook.GlobalEvents, HookMouseWheel)
-                .Publish()
-                .RefCount()
-                .Where(x => (x.EventType == InputEventType.WheelDown || x.EventType == InputEventType.WheelUp) && x.EventArgs is MouseEventArgs)
-                .Select(x => x.EventArgs as MouseEventArgs);
-            
-            var mouseHookSource = Observable
-                .Using(Hook.GlobalEvents, HookMouseButtons)
+                .DistinctUntilChanged(args => new {args.X, args.Y, args.Button, args.Clicks, args.Delta});
+
+            WhenMouseWheel =
+                keyboardMouseEventsProvider.System
+                    .Select(HookMouseWheel)
+                    .Switch()
+                    .Publish()
+                    .RefCount()
+                    .Where(x => (x.EventType == InputEventType.WheelDown || x.EventType == InputEventType.WheelUp) && x.EventArgs is MouseEventArgs)
+                    .Select(x => x.EventArgs as MouseEventArgs);
+
+            var mouseHookSource = keyboardMouseEventsProvider.System
+                .Select(HookMouseButtons)
+                .Switch()
                 .Publish()
                 .RefCount();
-            
+
             WhenMouseUp = mouseHookSource
                 .Where(x => x.EventType == InputEventType.MouseUp && x.EventArgs is MouseEventArgs)
                 .Select(x => x.EventArgs as MouseEventArgs);
             WhenMouseDown = mouseHookSource
                 .Where(x => x.EventType == InputEventType.MouseDown && x.EventArgs is MouseEventArgs)
                 .Select(x => x.EventArgs as MouseEventArgs);
-            
-            var keyboardHook = Observable
-                .Using(Hook.GlobalEvents, HookKeyboard)
+
+            var keyboardHook = keyboardMouseEventsProvider.System
+                .Select(x => x)
+                .Select(HookKeyboard)
+                .Switch()
                 .Publish()
                 .RefCount();
             WhenKeyDown = keyboardHook
@@ -88,62 +94,62 @@ namespace PoeShared.Native
         public IObservable<MouseEventArgs> WhenMouseMove { get; }
 
         public IObservable<MouseEventArgs> WhenMouseUp { get; }
-        
+
         public IObservable<MouseEventArgs> WhenMouseWheel { get; }
 
         public bool RealtimeMode { get; } = true;
 
         private IObservable<InputEventData> HookMouseButtons(IKeyboardMouseEvents source)
         {
-            return PrepareHook( "MouseButtons", () => InitializeMouseButtonsHook(source), inputScheduler);
+            return PrepareHook("MouseButtons", () => InitializeMouseButtonsHook(source), inputScheduler);
         }
-        
+
         private IObservable<InputEventData> HookMouseWheel(IKeyboardMouseEvents source)
         {
-            return PrepareHook( "MouseWheel", () => InitializeMouseWheelHook(source), inputScheduler);
+            return PrepareHook("MouseWheel", () => InitializeMouseWheelHook(source), inputScheduler);
         }
-        
+
         private IObservable<InputEventData> HookMouseMove(IKeyboardMouseEvents source)
         {
-            return PrepareHook( "MouseMove", () => InitializeMouseMoveHook(source), inputScheduler);
+            return PrepareHook("MouseMove", () => InitializeMouseMoveHook(source), inputScheduler);
         }
-        
+
         private IObservable<InputEventData> HookKeyboard(IKeyboardMouseEvents source)
         {
-            return PrepareHook( "Keyboard", () => InitializeKeyboardHook(source), inputScheduler);
+            return PrepareHook("Keyboard", () => InitializeKeyboardHook(source), inputScheduler);
         }
-        
+
         private static IObservable<InputEventData> PrepareHook(
-            string hookName, 
+            string hookName,
             Func<IObservable<InputEventData>> hookMethod,
             IScheduler scheduler)
         {
             return Observable.Create<InputEventData>(subscriber =>
             {
-                Log.Info($"Configuring {hookName} hook...");
+                Log.Info($"[{hookName}] Configuring hook...");
                 var sw = Stopwatch.StartNew();
                 var activeAnchors = new CompositeDisposable();
-                Disposable.Create(() => Log.Info($"Disposing {hookName} hook")).AddTo(activeAnchors);
+                Disposable.Create(() => Log.Info($"[{hookName}] Disposing hook")).AddTo(activeAnchors);
 
                 Log.Info($"Sending subscription to {scheduler}");
                 scheduler.Schedule(() =>
                 {
-                    Log.Info($"{hookName} subscribing");
+                    Log.Info($"[{hookName}] Subscribing...");
                     hookMethod()
                         .Do(LogEvent, Log.HandleException, () => Log.Debug($"{hookName} event loop completed"))
                         .Subscribe(subscriber)
                         .AddTo(activeAnchors);
                     sw.Stop();
-                    Log.Debug($"{hookName} hook configuration took {sw.ElapsedMilliseconds:F0}ms");
+                    Log.Debug($"[{hookName}] Configuration took {sw.ElapsedMilliseconds:F0}ms");
                 }).AddTo(activeAnchors);
-                
+
                 return activeAnchors;
             });
         }
-        
+
         private IObservable<InputEventData> InitializeKeyboardHook(IKeyboardEvents keyboardEvents)
         {
-            Log.Debug($"Hooking Keyboard: {keyboardEvents}");
+            Log.Info($"Hooking Keyboard using {keyboardEvents}");
             var keyDown = Observable
                 .FromEventPattern<KeyEventHandler, KeyEventArgs>(
                     h => keyboardEvents.KeyDown += h,
@@ -167,10 +173,10 @@ namespace PoeShared.Native
 
             return Observable.Merge(keyDown, keyUp, keyPress);
         }
-        
+
         private IObservable<InputEventData> InitializeMouseButtonsHook(IMouseEvents mouseEvents)
         {
-            Log.Debug($"Hooking Mouse buttons: {mouseEvents}");
+            Log.Info($"Hooking Mouse buttons using {mouseEvents}");
 
             var mouseDown = Observable
                 .FromEventPattern<EventHandler<MouseEventExtArgs>, MouseEventExtArgs>(
@@ -188,17 +194,17 @@ namespace PoeShared.Native
 
             return Observable.Merge(mouseDown, mouseUp);
         }
-        
+
         private IObservable<InputEventData> InitializeMouseWheelHook(IMouseEvents mouseEvents)
         {
-            Log.Debug($"Hooking Mouse buttons: {mouseEvents}");
+            Log.Info($"Hooking Mouse Wheel using {mouseEvents}");
 
             var mouseWheel = Observable
                 .FromEventPattern<EventHandler<MouseEventExtArgs>, MouseEventExtArgs>(
                     h => mouseEvents.MouseWheelExt += h,
                     h => mouseEvents.MouseWheelExt -= h)
                 .Select(x => x.EventArgs)
-                .Where(x =>x.WheelScrolled)
+                .Where(x => x.WheelScrolled)
                 .Select(x => ToInputEventData(x, x.Delta > 0 ? InputEventType.WheelDown : InputEventType.WheelUp));
 
             return mouseWheel;
@@ -206,7 +212,7 @@ namespace PoeShared.Native
 
         private IObservable<InputEventData> InitializeMouseMoveHook(IMouseEvents mouseEvents)
         {
-            Log.Debug($"Hooking Mouse Move (possible performance hit !): {mouseEvents}");
+            Log.Info($"Hooking Mouse Move (possible performance hit !) using {mouseEvents}");
 
             var mouseMove = Observable
                 .FromEventPattern<EventHandler<MouseEventExtArgs>, MouseEventExtArgs>(
@@ -215,15 +221,15 @@ namespace PoeShared.Native
                 .Select(x => x.EventArgs)
                 .Select(EnrichMouseMove)
                 .Select(x => ToInputEventData(x, InputEventType.MouseMove));
-            
+
             return mouseMove;
         }
-        
+
         private InputEventData ToInputEventData(EventArgs args, InputEventType eventType)
         {
             return new InputEventData {EventArgs = args, EventType = eventType, Timestamp = clock.Now};
         }
-        
+
         private static void LogEvent(InputEventData arg)
         {
             if (Log.IsDebugEnabled)
@@ -240,9 +246,8 @@ namespace PoeShared.Native
 
         private struct InputEventData
         {
-            [JsonConverter(typeof(StringEnumConverter))]
-            public InputEventType EventType { get; set; }
-            
+            [JsonConverter(typeof(StringEnumConverter))] public InputEventType EventType { get; set; }
+
             public EventArgs EventArgs { get; set; }
 
             public DateTime Timestamp { get; set; }
