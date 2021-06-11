@@ -7,6 +7,10 @@ namespace PoeShared.Scaffolding.WPF
     {
         bool IsBusy { get; }
         
+        bool IsPaused { get; }
+        
         IDisposable Rent();
+
+        IDisposable Pause();
     }
 }

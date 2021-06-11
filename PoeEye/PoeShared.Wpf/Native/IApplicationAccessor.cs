@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reactive;
+using System.Windows;
 
 namespace PoeShared.Services
 {

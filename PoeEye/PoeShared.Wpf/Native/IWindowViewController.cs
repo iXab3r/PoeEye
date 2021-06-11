@@ -16,7 +16,13 @@ namespace PoeShared.Native
         
         IObservable<Unit> WhenRendered { get; }
         
+        IntPtr Handle { get; }
+
+        void TakeScreenshot(string fileName);
+        
         void Minimize();
+
+        void Close();
         
         bool Topmost { get; set; }
     }

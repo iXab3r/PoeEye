@@ -1,11 +1,17 @@
 using System;
 using System.ComponentModel;
+using System.Drawing;
+using System.IO;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Windows;
+using System.Windows.Interop;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using log4net;
 using PoeShared.Scaffolding;
 using ReactiveUI;
+using Point = Hardcodet.Wpf.TaskbarNotification.Interop.Point;
 
 namespace PoeShared.Native
 {
@@ -20,6 +26,7 @@ namespace PoeShared.Native
         {
             this.owner = owner;
             Log.Debug($"[{owner}.{owner.Title}] Binding ViewController to window, {new {owner.IsLoaded, owner.RenderSize, owner.Title, owner.WindowState, owner.ShowInTaskbar}}");
+            Handle = new WindowInteropHelper(owner).EnsureHandle();
 
             WhenRendered = Observable
                 .FromEventPattern<EventHandler, EventArgs>(h => owner.ContentRendered += h, h => owner.ContentRendered -= h)
@@ -62,6 +69,14 @@ namespace PoeShared.Native
         public IObservable<CancelEventArgs> WhenClosing { get; }
 
         public IObservable<Unit> WhenRendered { get; }
+        
+        public IntPtr Handle { get; }
+
+        public void Close()
+        {
+            Log.Debug($"[{owner}.{owner.Title}] Closing window");
+            owner.Close();
+        }
 
         public bool Topmost
         {
@@ -83,10 +98,43 @@ namespace PoeShared.Native
             owner.Topmost = topmost;
         }
 
+        public void TakeScreenshot(string fileName)
+        {
+            CreateBitmapFromVisual(owner, fileName);
+        }
+
         public void Minimize()
         {
             Log.Debug($"[{owner}.{owner.Title}] Minimizing window");
             owner.WindowState = WindowState.Minimized;
+        }
+        
+        public static void CreateBitmapFromVisual(Visual target, string fileName)
+        {
+            if (target == null || string.IsNullOrEmpty(fileName))
+            {
+                return;
+            }
+
+            var bounds = VisualTreeHelper.GetDescendantBounds(target);
+
+            var renderTarget = new RenderTargetBitmap((int)bounds.Width, (int)bounds.Height, 96, 96, PixelFormats.Pbgra32);
+
+            var visual = new DrawingVisual();
+
+            using (var context = visual.RenderOpen())
+            {
+                var visualBrush = new VisualBrush(target);
+                context.DrawRectangle(visualBrush, null, new Rect(new System.Windows.Point(0, 0), bounds.Size));
+            }
+
+            renderTarget.Render(visual);
+            var bitmapEncoder = new PngBitmapEncoder();
+            bitmapEncoder.Frames.Add(BitmapFrame.Create(renderTarget));
+            using (Stream stm = File.Create(fileName))
+            {
+                bitmapEncoder.Save(stm);
+            }
         }
     }
 }

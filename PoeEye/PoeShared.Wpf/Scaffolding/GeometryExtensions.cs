@@ -10,7 +10,6 @@ using WinSize = System.Drawing.Size;
 using WinPoint = System.Drawing.Point;
 using WinRectangle = System.Drawing.Rectangle;
 
-
 namespace PoeShared.Scaffolding
 {
     /// <summary>
@@ -33,6 +32,16 @@ namespace PoeShared.Scaffolding
                 X = x,
                 Y = y
             };
+        }
+
+        public static Point Center(this Rect rect)
+        {
+            return new(rect.Left + (float)rect.Width / 2, rect.Top + (float)rect.Height / 2);
+        }
+        
+        public static WinPoint Center(this WinRectangle rect)
+        {
+            return new((int)Math.Round(rect.Left + (float)rect.Width / 2), (int)Math.Round(rect.Top + (float)rect.Height / 2));
         }
 
         public static Rectangle Normalize(this Rectangle rect)

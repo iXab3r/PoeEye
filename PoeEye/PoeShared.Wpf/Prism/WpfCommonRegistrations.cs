@@ -18,6 +18,7 @@ using ReactiveUI;
 using Unity;
 using Unity.Extension;
 using Unity.Lifetime;
+using Application = System.Windows.Application;
 
 namespace PoeShared.Prism
 {
@@ -72,6 +73,9 @@ namespace PoeShared.Prism
                 .RegisterSingleton<IConverter<char, Keys>, CharToKeysConverter>()
                 .RegisterSingleton<IConverter<Keys, HotkeyGesture>, KeysToHotkeyGestureConverter>()
                 .RegisterInstance<IHotkeyConverter>(HotkeyConverter.Instance, new ContainerControlledLifetimeManager());
+            Log.Debug($"Initializing application: {Application.Current}");
+            var accessor = Container.Resolve<IApplicationAccessor>();
+            Log.Debug($"Application accessor: {accessor}");
 
             Container.RegisterOverlayController(WellKnownWindows.AllWindows, WellKnownWindows.AllWindows);
             
