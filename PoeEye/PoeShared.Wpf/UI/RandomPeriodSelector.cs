@@ -4,6 +4,7 @@ using System.Reactive.Linq;
 using log4net;
 using PoeShared.Scaffolding;
 using PoeShared.Wpf.Scaffolding;
+using PropertyBinder;
 using ReactiveUI;
 using ReactiveUI.Validation.Abstractions;
 using ReactiveUI.Validation.Components.Abstractions;
@@ -12,7 +13,7 @@ using ReactiveUI.Validation.Extensions;
 
 namespace PoeShared.UI
 {
-    internal sealed class RandomPeriodSelector : ValidatableReactiveObject<RandomPeriodSelector>, IRandomPeriodSelector, IValidatableViewModel
+    internal sealed class RandomPeriodSelector : ValidatableReactiveObject<RandomPeriodSelector>, IRandomPeriodSelector
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(RandomPeriodSelector));
 
@@ -24,12 +25,12 @@ namespace PoeShared.UI
 
         private TimeSpan minimum = TimeSpan.Zero;
         private TimeSpan maximum = TimeSpan.MaxValue;
-        
+
         public RandomPeriodSelector(IRandomNumberGenerator rng)
         {
             this.rng = rng;
             
-            this.WhenAnyProperty(x => x.UpperValue)
+            this.WhenAnyValue(x => x.UpperValue)
                 .Where(_ => !randomizeValue && upperValue != lowerValue)
                 .SubscribeSafe(() => RandomizeValue = true, Log.HandleUiException)
                 .AddTo(Anchors);
@@ -45,10 +46,6 @@ namespace PoeShared.UI
                 x => !randomizeValue || x >= lowerValue, x => $"Must be greater than {lowerValue}");
             this.ValidationRule(x => x.LowerValue,
                 x => !randomizeValue || x <= upperValue, x => $"Must be less than {upperValue}");
-            
-            this.ValidationRule(x => this.WhenAnyValue(x => x.UpperValue, x => x.LowerValue)
-                    .Select(_ => !randomizeValue || LowerValue >= UpperValue),
-                (x, isValid) => isValid ? "test" : "abc");
         }
 
         public TimeSpan Minimum

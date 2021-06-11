@@ -140,8 +140,8 @@
             <TabItem Header="ButtonEx">
                 <StackPanel>
                     <eye:ButtonEx Content="OK"
-                                 Icon="&#xf1fb;"
-                                 Command="{Binding LongCommand}" />
+                                  Icon="&#xf1fb;"
+                                  Command="{Binding LongCommand}" />
 
                     <eye:ButtonEx Icon="&#xf00d;" Content="With Icon" Command="{Binding LongCommand}" />
                     <eye:ButtonEx Icon="&#xf00d;" Command="{Binding LongCommand}" />

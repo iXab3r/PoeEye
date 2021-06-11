@@ -58,6 +58,8 @@ namespace PoeShared.UI
             });
             
             AddTextNotification = CommandWrapper.Create(AddTextNotificationExecuted);
+            RandomPeriodSelector.LowerValue = TimeSpan.FromSeconds(3);
+            RandomPeriodSelector.UpperValue = TimeSpan.FromSeconds(3);
             NextRandomPeriodCommand = CommandWrapper.Create(() => RandomPeriod = randomPeriodSelector.GetValue());
         }
 
