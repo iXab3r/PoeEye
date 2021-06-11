@@ -112,6 +112,9 @@
     <Compile Update="UI\RandomPeriodSelector.cs">
       <DependentUpon>RandomPeriodSelector.xaml</DependentUpon>
     </Compile>
+    <Compile Update="UI\Hotkeys\HotkeyDragHandler.cs">
+      <DependentUpon>HotkeySequenceEditor.xaml</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Page Update="UI\Hotkeys\HotkeySequenceEditor.Defaults.xaml">

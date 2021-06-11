@@ -259,6 +259,7 @@
         <Setter Property="HorizontalAlignment" Value="Stretch" />
         <Setter Property="Focusable" Value="False" />
         <Setter Property="dd:DragDrop.DropHandler" Value="{Binding DropTarget, RelativeSource={RelativeSource Self}}" />
+        <Setter Property="dd:DragDrop.DragHandler" Value="{Binding DragSource, RelativeSource={RelativeSource Self}}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type eye:HotkeySequenceEditor}">
@@ -278,6 +279,7 @@
                             VerticalAlignment="{TemplateBinding VerticalAlignment}"
                             FocusVisualStyle="{x:Null}"
                             dd:DragDrop.DropHandler="{TemplateBinding DropTarget}"
+                            dd:DragDrop.DragHandler="{TemplateBinding DragSource}"
                             dd:DragDrop.IsDragSource="True"
                             dd:DragDrop.IsDropTarget="True"
                             dd:DragDrop.UseDefaultDragAdorner="True"

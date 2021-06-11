@@ -15,12 +15,7 @@ namespace PoeShared.UI
         {
             this.owner = owner;
         }
-
-        public override void DragOver(IDropInfo dropInfo)
-        {
-            base.DragOver(dropInfo);
-        }
-
+        
         public override void Drop(IDropInfo dropInfo)
         {
             if (dropInfo.DragInfo.VisualSource is Button button && button.CommandParameter != null)

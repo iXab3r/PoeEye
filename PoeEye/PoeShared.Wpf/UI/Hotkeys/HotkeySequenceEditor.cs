@@ -20,6 +20,7 @@ namespace PoeShared.UI
         public HotkeySequenceEditor()
         {
             DropTarget = new HotkeyDropHandler(this);
+            DragSource = new HotkeyDragHandler();
 
             this.Observe(ViewModelProperty)
                 .Select(x => ViewModel)

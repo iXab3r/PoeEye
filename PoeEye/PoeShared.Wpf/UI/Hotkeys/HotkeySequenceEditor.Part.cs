@@ -19,6 +19,9 @@ namespace PoeShared.UI
         internal static readonly DependencyProperty DropTargetProperty = DependencyProperty.Register(
             "DropTarget", typeof(IDropTarget), typeof(HotkeySequenceEditor), new PropertyMetadata(default(IDropTarget)));
         
+        internal static readonly DependencyProperty DragSourceProperty = DependencyProperty.Register(
+            "DragSource", typeof(IDragSource), typeof(HotkeySequenceEditor), new PropertyMetadata(default(IDragSource)));
+
         public IHotkeySequenceEditorViewModel ViewModel
         {
             get { return (IHotkeySequenceEditorViewModel) GetValue(ViewModelProperty); }
@@ -35,6 +38,12 @@ namespace PoeShared.UI
         {
             get { return (IDropTarget) GetValue(DropTargetProperty); }
             private set { SetValue(DropTargetProperty, value); }
+        }
+
+        internal IDragSource DragSource
+        {
+            get { return (IDragSource) GetValue(DragSourceProperty); }
+            private set { SetValue(DragSourceProperty, value); }
         }
         
         static HotkeySequenceEditor()
