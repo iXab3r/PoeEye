@@ -17,9 +17,7 @@ namespace PoeShared.Scaffolding
         
         public static T AssignTo<T>(this T instance, SerialDisposable anchor) where T : IDisposable
         {
-            Guard.ArgumentNotNull(instance, nameof(instance));
             Guard.ArgumentNotNull(anchor, nameof(anchor));
-
             anchor.Disposable = instance;
             return instance;
         }

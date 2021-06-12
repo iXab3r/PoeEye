@@ -18,6 +18,7 @@ namespace PoeShared.UI
 
         private bool isExpanded = true;
         private bool isSelected;
+        private bool isEnabled = true;
         private ITreeViewItemViewModel parent;
         private IComparer<ITreeViewItemViewModel> sortComparer;
         private Func<ITreeViewItemViewModel, IObservable<Unit>> resortWhen;
@@ -72,6 +73,12 @@ namespace PoeShared.UI
         {
             get => isExpanded;
             set => RaiseAndSetIfChanged(ref isExpanded, value);
+        }
+
+        public bool IsEnabled
+        {
+            get => isEnabled;
+            set => RaiseAndSetIfChanged(ref isEnabled, value);
         }
 
         public ITreeViewItemViewModel Parent
