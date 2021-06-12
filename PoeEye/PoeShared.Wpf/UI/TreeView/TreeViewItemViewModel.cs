@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Reactive;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using DynamicData;
 using log4net;
@@ -19,6 +20,7 @@ namespace PoeShared.UI
         private bool isExpanded = true;
         private bool isSelected;
         private bool isEnabled = true;
+        private bool isVisible = true;
         private ITreeViewItemViewModel parent;
         private IComparer<ITreeViewItemViewModel> sortComparer;
         private Func<ITreeViewItemViewModel, IObservable<Unit>> resortWhen;
@@ -44,6 +46,11 @@ namespace PoeShared.UI
                 .SubscribeToErrors(Log.HandleUiException)
                 .AddTo(Anchors);
             Children = chld;
+
+            Disposable.Create(() =>
+            {
+                this.Parent = null;
+            }).AddTo(Anchors);
             
             this.WhenAnyValue(x => x.Parent)
                 .Cast<TreeViewItemViewModel>()
@@ -79,6 +86,12 @@ namespace PoeShared.UI
         {
             get => isEnabled;
             set => RaiseAndSetIfChanged(ref isEnabled, value);
+        }
+
+        public bool IsVisible
+        {
+            get => isVisible;
+            set => RaiseAndSetIfChanged(ref isVisible, value);
         }
 
         public ITreeViewItemViewModel Parent
