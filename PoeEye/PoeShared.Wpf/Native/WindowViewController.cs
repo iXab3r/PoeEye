@@ -116,19 +116,11 @@ namespace PoeShared.Native
                 return;
             }
 
-            var bounds = VisualTreeHelper.GetDescendantBounds(target);
+            var bounds = target is FrameworkElement frameworkElement ? new Rect(0, 0, frameworkElement.ActualWidth, frameworkElement.ActualHeight) : VisualTreeHelper.GetDescendantBounds(target);
+            var dpi = VisualTreeHelper.GetDpi(target);
+            var renderTarget = new RenderTargetBitmap((int)bounds.Width, (int)bounds.Height, dpi.PixelsPerInchX, dpi.PixelsPerInchY, PixelFormats.Pbgra32);
+            renderTarget.Render(target);
 
-            var renderTarget = new RenderTargetBitmap((int)bounds.Width, (int)bounds.Height, 96, 96, PixelFormats.Pbgra32);
-
-            var visual = new DrawingVisual();
-
-            using (var context = visual.RenderOpen())
-            {
-                var visualBrush = new VisualBrush(target);
-                context.DrawRectangle(visualBrush, null, new Rect(new System.Windows.Point(0, 0), bounds.Size));
-            }
-
-            renderTarget.Render(visual);
             var bitmapEncoder = new PngBitmapEncoder();
             bitmapEncoder.Frames.Add(BitmapFrame.Create(renderTarget));
             using (Stream stm = File.Create(fileName))
