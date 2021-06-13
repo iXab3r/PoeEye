@@ -29,6 +29,21 @@
             <eye:SharedResourceDictionary.MergedDictionaries>
                 <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Generic.xaml" />
             </eye:SharedResourceDictionary.MergedDictionaries>
+            
+            <Style x:Key="OverlayCloseButtonStyle" TargetType="{x:Type Button}"
+                   BasedOn="{StaticResource OverlayWindowCircleButtonStyleKey}">
+                <Setter Property="Content" Value="&#xf09c;" />
+                <Setter Property="Foreground" Value="Red" />
+                <Setter Property="Padding" Value="0,2,0,0" />
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding Content.IsLocked}" Value="True" />
+
+                    <Trigger Property="IsMouseOver" Value="True">
+                        <Setter Property="Content" Value="&#xf023;" />
+                        <Setter Property="Foreground" Value="GreenYellow" />
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
         </eye:SharedResourceDictionary>
     </Window.Resources>
 
@@ -68,24 +83,8 @@
                         Visibility="{Binding Content.IsLocked, Converter={StaticResource TrueToHiddenFalseToVisibleConverter}}"
                         Margin="3,3,3,8">
                         <StackPanel Orientation="Horizontal">
-                            <Button Command="{Binding Content.LockWindowCommand}" Width="30" Height="30" FontFamily="{StaticResource FontAwesome}">
-                                <Button.Style>
-                                    <Style TargetType="{x:Type Button}"
-                                           BasedOn="{StaticResource OverlayWindowCircleButtonStyleKey}">
-                                        <Setter Property="Content" Value="&#xf09c;" />
-                                        <Setter Property="Foreground" Value="Red" />
-                                        <Setter Property="Padding" Value="0,2,0,0" />
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding Content.IsLocked}" Value="True" />
-
-                                            <Trigger Property="IsMouseOver" Value="True">
-                                                <Setter Property="Content" Value="&#xf023;" />
-                                                <Setter Property="Foreground" Value="GreenYellow" />
-                                            </Trigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </Button.Style>
-
+                            <Button Command="{Binding Content.LockWindowCommand}" Width="30" Height="30" FontFamily="{StaticResource FontAwesome}"
+                                    Style="{StaticResource OverlayCloseButtonStyle}">
                                 <Button.Triggers>
                                     <EventTrigger RoutedEvent="Mouse.MouseEnter">
                                         <EventTrigger.EnterActions>

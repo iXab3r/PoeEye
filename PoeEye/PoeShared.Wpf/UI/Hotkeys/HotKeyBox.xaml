@@ -12,8 +12,10 @@
         <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Hidden" />
         <Setter Property="AcceptsReturn" Value="True"/>
         <Setter Property="AcceptsTab" Value="False"/>
-        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="VerticalContentAlignment" Value="Stretch"/>
         <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+        <Setter Property="VerticalAlignment" Value="Stretch"/>
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="Foreground" Value="{StaticResource PositiveBrush}"/>
         <Setter Property="ToolTip" Value="Press Backspace, Delete or Escape to reset. Double-click respective keys to assign them as HotKeys"/>
@@ -22,6 +24,8 @@
                 <ControlTemplate TargetType="{x:Type eye:HotKeyBox}">
                     <!-- to compensate MaterialDesignTextBox padding we have to add -4 -->
                     <TextBox x:Name="PART_TextBox"
+                             VerticalAlignment="{TemplateBinding VerticalAlignment}"
+                             HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
                              MinHeight="{TemplateBinding MinHeight}"
                              HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"    
                              VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
