@@ -60,6 +60,11 @@ namespace PoeShared.Audio.Services
 
         public Task PlayNotification(string notificationName, float volume, CancellationToken cancellationToken)
         {
+            return PlayNotification(notificationName, volume, WaveOutDevice.DefaultDevice, CancellationToken.None);
+        }
+
+        public Task PlayNotification(string notificationName, float volume, WaveOutDevice waveOutDevice, CancellationToken cancellationToken)
+        {
             Guard.ArgumentNotNull(notificationName, nameof(notificationName));
             Log.Debug($"Notification of type {notificationName} requested...");
 
@@ -81,7 +86,8 @@ namespace PoeShared.Audio.Services
             {
                 Volume = volume,
                 CancellationToken = cancellationToken,
-                WaveData = notificationData
+                WaveData = notificationData,
+                OutputDevice = waveOutDevice
             });
         }
 

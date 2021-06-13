@@ -1,12 +1,16 @@
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using PoeShared.Scaffolding;
 
 namespace PoeShared.Audio.Services
 {
-    internal interface IAudioPlayer : IDisposableReactiveObject
+    public interface IAudioPlayer : IDisposableReactiveObject
     {
+        IEnumerable<WaveOutDevice> GetDevices();
+        
         [NotNull]
         Task Play([NotNull] byte[] waveData);
         

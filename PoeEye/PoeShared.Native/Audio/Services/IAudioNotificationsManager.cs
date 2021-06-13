@@ -18,6 +18,7 @@ namespace PoeShared.Audio.Services
         /// <param name="volume">Volume, 1.0 is full scale</param>
         Task PlayNotification([NotNull] string notificationName, float volume);
         Task PlayNotification([NotNull] string notificationName, float volume, CancellationToken cancellationToken);
+        Task PlayNotification([NotNull] string notificationName, float volume, WaveOutDevice waveOutDevice, CancellationToken cancellationToken);
         string AddFromFile([NotNull] FileInfo soundFile);
     }
 }

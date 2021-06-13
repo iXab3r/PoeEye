@@ -66,6 +66,34 @@ namespace PoeShared.Scaffolding
         {
             return new ReadOnlyObservableCollection<T>(enumerable.ToObservableCollection());
         }
+        
+        public static IDictionary<TKey, TValue> ToDictionaryWithThrow<T, TKey, TValue>(this IEnumerable<T> enumerable,
+            Func<T, TKey> keyExtractor,
+            Func<T, TValue> valueExtractor)
+        {
+            return ToDictionary(enumerable, keyExtractor, valueExtractor, tuple => throw new ArgumentException($"Dictionary already contains item with key {tuple.key}: {tuple.existingValue}, tried to add value: {tuple.newValue}"));
+        }
+        
+        public static IDictionary<TKey, TValue> ToDictionary<T, TKey, TValue>(
+            this IEnumerable<T> enumerable, 
+            Func<T, TKey> keyExtractor, 
+            Func<T, TValue> valueExtractor,
+            Func<(TKey key, TValue existingValue, TValue newValue), TValue> conflictSolver)
+        {
+            var result = new Dictionary<TKey, TValue>();
+            foreach (var item in enumerable)
+            {
+                var key = keyExtractor(item);
+                var newValue = valueExtractor(item);
+                if (result.TryGetValue(key, out var existingValue))
+                {
+                    newValue = conflictSolver((key, existingValue, newValue: newValue));
+                }
+
+                result[key] = newValue;
+            }
+            return result;
+        }
 
         public static IEnumerable<T> ForEach<T>(this IEnumerable<T> enumerable, Action<T> action)
         {

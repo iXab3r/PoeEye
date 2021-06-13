@@ -1,17 +1,20 @@
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 using System.Media;
-using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
+using System.Reactive.Linq;
 using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
-using JetBrains.Annotations;
+using DynamicData;
 using log4net;
+using NAudio.CoreAudioApi;
 using NAudio.Wave;
-using PoeShared.Prism;
 using PoeShared.Scaffolding;
-using Unity;
+using ObservableEx = PoeShared.Scaffolding.ObservableEx;
 
 namespace PoeShared.Audio.Services
 {
@@ -19,12 +22,31 @@ namespace PoeShared.Audio.Services
     internal sealed class AudioPlayer : DisposableReactiveObject, IAudioPlayer
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(AudioPlayer));
+        private readonly MMDeviceEnumerator deviceEnumerator = new();
 
-        private readonly IScheduler bgScheduler;
-
-        public AudioPlayer([NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler)
+        public AudioPlayer()
         {
-            this.bgScheduler = bgScheduler;
+        }
+
+        public IEnumerable<WaveOutDevice> GetDevices()
+        {
+            Log.Debug($"Retrieving MMDevices");
+            var mmDevices = deviceEnumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active);
+            Log.Debug($"Retrieving WaveOut devices, count: {WaveOut.DeviceCount}");
+
+            var waveOutDevices = Enumerable.Range(0, WaveOut.DeviceCount).Select(x =>
+            {
+                var waveOutCapabilities = WaveOut.GetCapabilities(x);
+                var matchingMmDevice = string.IsNullOrEmpty(waveOutCapabilities.ProductName) ? null : mmDevices.FirstOrDefault(x => x.FriendlyName?.StartsWith(waveOutCapabilities.ProductName) ?? false);
+                return new WaveOutDevice
+                {
+                    DeviceNumber = x,
+                    WaveOutCapabilities = waveOutCapabilities,
+                    MultimediaDeviceName = matchingMmDevice?.FriendlyName
+                };
+            });
+
+            return waveOutDevices;
         }
 
         public Task Play(byte[] waveData)
@@ -73,7 +95,11 @@ namespace PoeShared.Audio.Services
                     using (var waveOut = new WaveOut(WaveCallbackInfo.FunctionCallback()))
                     {
                         {
-                            Log.Debug($"Initializing waveOut device {waveOut}");
+                            Log.Debug($"Initializing waveOut device {waveOut}, output: {request.OutputDevice}");
+                            if (request.OutputDevice != null && request.OutputDevice != WaveOutDevice.DefaultDevice)
+                            {
+                                waveOut.DeviceNumber = request.OutputDevice.DeviceNumber;
+                            }
                             waveOut.Init(blockAlignedStream);
 
                             var playbackAnchor = new ManualResetEvent(false);
@@ -82,7 +108,10 @@ namespace PoeShared.Audio.Services
                             {
                                 waveOut.PlaybackStopped += playbackStoppedHandler;
                                 Log.Debug($"Starting to play audio stream({rawStream.Length}) using waveOut {waveOut}, volume: {request.Volume}...");
-                                waveOut.Volume = request.Volume;
+                                if (request.Volume != null)
+                                {
+                                    waveOut.Volume = request.Volume.Value;
+                                }
                                 waveOut.Play();
                                 WaitHandle.WaitAny(new []{(WaitHandle)playbackAnchor, request.CancellationToken.WaitHandle});
                                 if (request.CancellationToken.IsCancellationRequested)
