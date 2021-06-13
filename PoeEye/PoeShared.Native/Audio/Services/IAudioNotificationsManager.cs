@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 
@@ -16,7 +17,7 @@ namespace PoeShared.Audio.Services
         
         /// <param name="volume">Volume, 1.0 is full scale</param>
         Task PlayNotification([NotNull] string notificationName, float volume);
-
+        Task PlayNotification([NotNull] string notificationName, float volume, CancellationToken cancellationToken);
         string AddFromFile([NotNull] FileInfo soundFile);
     }
 }

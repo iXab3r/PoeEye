@@ -40,7 +40,12 @@ namespace PoeShared.Audio.Services
         /// <returns></returns>
         public Task Play(byte[] waveData, float volume)
         {
-            return PlayInternal(waveData, volume);
+            return PlayInternal(new AudioPlayerRequest(){ WaveData = waveData, Volume = volume, CancellationToken = CancellationToken.None });
+        }
+
+        public Task Play(AudioPlayerRequest request)
+        {
+            return PlayInternal(request);
         }
 
         private IDisposable PlayInternalMedia(Stream rawStream)
@@ -55,14 +60,14 @@ namespace PoeShared.Audio.Services
             return Disposable.Empty;
         }
 
-        private Task PlayInternal(byte[] soundData, float volume)
+        private Task PlayInternal(AudioPlayerRequest request)
         {
-            Log.Debug($"Queueing audio stream({soundData.Length}), volume: {volume}...");
+            Log.Debug($"Queueing audio stream, request: {request}");
             return Task.Factory.StartNew(() =>
             {
                 try
                 {
-                    using (var rawStream = new MemoryStream(soundData))
+                    using (var rawStream = new MemoryStream(request.WaveData))
                     using (var waveStream = new WaveFileReader(rawStream))
                     using (WaveStream blockAlignedStream = new BlockAlignReductionStream(waveStream))
                     using (var waveOut = new WaveOut(WaveCallbackInfo.FunctionCallback()))
@@ -76,12 +81,20 @@ namespace PoeShared.Audio.Services
                             try
                             {
                                 waveOut.PlaybackStopped += playbackStoppedHandler;
-                                Log.Debug($"Starting to play audio stream({rawStream.Length}) using waveOut {waveOut}, volume: {volume}...");
-                                waveOut.Volume = volume;
+                                Log.Debug($"Starting to play audio stream({rawStream.Length}) using waveOut {waveOut}, volume: {request.Volume}...");
+                                waveOut.Volume = request.Volume;
                                 waveOut.Play();
-
-                                playbackAnchor.WaitOne();
-                                Log.Debug($"Successfully played audio stream({rawStream.Length})...");
+                                WaitHandle.WaitAny(new []{(WaitHandle)playbackAnchor, request.CancellationToken.WaitHandle});
+                                if (request.CancellationToken.IsCancellationRequested)
+                                {
+                                    Log.Debug($"Cancelling audio stream");
+                                    waveOut.Stop();
+                                    Log.Debug($"Stopped waveOut device");
+                                }
+                                else
+                                {
+                                    Log.Debug($"Successfully played audio stream({rawStream.Length}), token: {new { request.CancellationToken.IsCancellationRequested, request.CancellationToken.CanBeCanceled }}...");
+                                }
                             }
                             finally
                             {
@@ -92,9 +105,9 @@ namespace PoeShared.Audio.Services
                 }
                 catch (Exception e)
                 {
-                    Log.Error($"Failed to play audio stream of length {soundData.Length}b", e);
+                    Log.Error($"Failed to play audio stream, data: {request}", e);
                 }
-            });
+            }, request.CancellationToken);
         }
     }
 }

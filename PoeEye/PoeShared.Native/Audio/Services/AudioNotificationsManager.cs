@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Reactive.Concurrency;
+using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using log4net;
-using PoeShared.Modularity;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
 using Unity;
@@ -56,6 +55,11 @@ namespace PoeShared.Audio.Services
 
         public Task PlayNotification(string notificationName, float volume)
         {
+            return PlayNotification(notificationName, volume, CancellationToken.None);
+        }
+
+        public Task PlayNotification(string notificationName, float volume, CancellationToken cancellationToken)
+        {
             Guard.ArgumentNotNull(notificationName, nameof(notificationName));
             Log.Debug($"Notification of type {notificationName} requested...");
 
@@ -73,7 +77,12 @@ namespace PoeShared.Audio.Services
             }
 
             Log.Debug($"Starting playback of {notificationName} ({notificationData.Length}b)...");
-            return audioPlayer.Play(notificationData, volume);
+            return audioPlayer.Play(new AudioPlayerRequest()
+            {
+                Volume = volume,
+                CancellationToken = cancellationToken,
+                WaveData = notificationData
+            });
         }
 
         public string AddFromFile(FileInfo soundFile)

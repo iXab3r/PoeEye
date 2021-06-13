@@ -12,5 +12,7 @@ namespace PoeShared.Audio.Services
         
         [NotNull]
         Task Play([NotNull] byte[] waveData, float volume);
+        
+        Task Play(AudioPlayerRequest request);
     }
 }
