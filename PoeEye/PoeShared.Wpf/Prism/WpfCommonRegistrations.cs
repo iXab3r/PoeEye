@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Threading;
 using log4net;
+using PoeShared.Audio.Models;
 using PoeShared.Audio.ViewModels;
 using PoeShared.Modularity;
 using PoeShared.Native;
@@ -71,6 +72,7 @@ namespace PoeShared.Prism
                 .RegisterSingleton<IApplicationAccessor, ApplicationAccessor>()
                 .RegisterSingleton<INotificationsService, NotificationsService>()
                 .RegisterSingleton<IConverter<char, Keys>, CharToKeysConverter>()
+                .RegisterSingleton<IMicrophoneProvider, MicrophoneProvider>()
                 .RegisterSingleton<IConverter<Keys, HotkeyGesture>, KeysToHotkeyGestureConverter>()
                 .RegisterInstance<IHotkeyConverter>(HotkeyConverter.Instance, new ContainerControlledLifetimeManager());
             Log.Debug($"Initializing application: {Application.Current}");
@@ -81,6 +83,7 @@ namespace PoeShared.Prism
             
             Container
                 .RegisterType<IHotkeyTracker, HotkeyTracker>()
+                .RegisterType<IWaveOutDeviceSelectorViewModel, WaveOutDeviceSelectorViewModel>()
                 .RegisterType<IGenericSettingsViewModel, GenericSettingsViewModel>()
                 .RegisterType<IRandomPeriodSelector, RandomPeriodSelector>()
                 .RegisterType<IHotkeySequenceEditorViewModel, HotkeySequenceEditorViewModel>()
