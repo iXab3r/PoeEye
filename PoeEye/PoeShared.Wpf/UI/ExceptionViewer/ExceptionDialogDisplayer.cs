@@ -66,7 +66,7 @@ namespace PoeShared.UI
                 var config = new ExceptionDialogConfig
                 {
                     AppName = appArguments.AppName,
-                    Title = $"{appArguments.AppName} Error Report"
+                    Title = $"{appArguments.AppTitle} Error Report"
                 };
 
                 var configurationFilesToInclude = Directory

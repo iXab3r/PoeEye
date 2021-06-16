@@ -8,6 +8,8 @@ namespace PoeShared.Modularity
     {
         string AppName { [NotNull] get; }
         
+        string AppTitle { [NotNull] get; }
+        
         Version Version { get; }
         
         string AppDataDirectory { [CanBeNull] get; }

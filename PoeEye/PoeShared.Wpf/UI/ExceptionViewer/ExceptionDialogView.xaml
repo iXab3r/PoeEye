@@ -16,6 +16,10 @@
         WindowStartupLocation="CenterOwner"
         WindowState="Normal"
         SizeToContent="WidthAndHeight"
+        MaxHeight="600"
+        MaxWidth="800"
+        MinWidth="400"
+        MinHeight="200"
         Title="{Binding Title}" Width="600" d:DataContext="{d:DesignInstance eye:ExceptionDialogViewModel}">
      <Window.Resources>
         <eye:SharedResourceDictionary>
@@ -33,18 +37,16 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <TextBox Grid.Row="0"
-                 wpf:FocusHelper.IsFocused="True"
-                 DockPanel.Dock="Top"
-                 MinWidth="400"
-                 MaxWidth="700"
-                 MinHeight="200"
-                 MaxHeight="400"
-                 HorizontalScrollBarVisibility="Auto"
-                 VerticalScrollBarVisibility="Auto"
-                 IsReadOnly="True"
-                 IsReadOnlyCaretVisible="True"
-                 Text="{Binding ExceptionText, Mode=OneWay}" />
+        <ScrollViewer Grid.Row="0" CanContentScroll="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+            <TextBox 
+                     wpf:FocusHelper.IsFocused="True"
+                     Height="NaN"
+                     HorizontalAlignment="Stretch"
+                     VerticalAlignment="Stretch"
+                     IsReadOnly="True"
+                     IsReadOnlyCaretVisible="True"
+                     Text="{Binding ExceptionText, Mode=OneWay}" />
+        </ScrollViewer>
 
         <DockPanel Grid.Row="1" DockPanel.Dock="Bottom" Margin="5">
             <Button DockPanel.Dock="Right"

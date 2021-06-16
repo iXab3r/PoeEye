@@ -125,6 +125,8 @@ namespace PoeShared.Native
             {
                 Title = $"[PoeEye.Overlay] {uniqueControllerId} {windowTracker} #{overlayName} #{windows.Count + 1}",
                 Visibility = Visibility.Collapsed,
+                ShowInTaskbar = false,
+                ShowActivated = false,
                 Topmost = true,
                 Name = $"{overlayName}_OverlayView"
             };

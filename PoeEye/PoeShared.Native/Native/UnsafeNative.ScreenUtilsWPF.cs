@@ -19,6 +19,11 @@ namespace PoeShared.Native
                 : IntPtr.Zero;
             return GetMonitorBounds(handle);
         }
+        
+        public static Rectangle GetMonitorBounds(Rectangle rect)
+        {
+            return System.Windows.Forms.Screen.GetBounds(rect);
+        }
 
         public Screen GetScreen(Window window)
         {

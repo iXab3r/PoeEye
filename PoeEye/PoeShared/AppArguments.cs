@@ -55,6 +55,8 @@ namespace PoeShared
             set => appName = value ?? throw new ApplicationException($"{nameof(AppName)} must be set");
         }
 
+        public string AppTitle => $"{(IsDebugMode ? "[DEBUG] " : "")}{AppName} v{Version}".ToUpper();
+
         public Version Version { get; }
 
         public string AppSupportMail { get; set; } = "";
