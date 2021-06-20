@@ -31,7 +31,6 @@ namespace PoeShared.RegionSelector.ViewModels
         
         UIElement Owner { [CanBeNull] get; }
         
-        [NotNull]
         IObservable<Rect> StartSelection();
     }
 }

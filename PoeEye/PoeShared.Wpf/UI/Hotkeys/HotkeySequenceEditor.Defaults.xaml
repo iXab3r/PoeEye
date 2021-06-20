@@ -49,7 +49,8 @@
         </DataTemplate.Triggers>
     </DataTemplate>
 
-    <Style x:Key="HotkeySequenceEditorButtonStyle" TargetType="{x:Type eye:ButtonEx}" BasedOn="{StaticResource DefaultButtonExStyle}">
+    <Style x:Key="HotkeySequenceEditorButtonStyle" TargetType="{x:Type eye:ButtonEx}" BasedOn="{StaticResource FastButtonExStyle}">
+        <Setter Property="Padding" Value="5,2.5" />
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
                 <Setter Property="BorderBrush" Value="{StaticResource SequenceEditorAccent}" />

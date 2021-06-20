@@ -121,6 +121,20 @@ namespace PoeShared.RegionSelector.Views
                 .AddTo(anchors);
         }
 
+        public void SelectScreenCoordinates()
+        {
+            viewModel
+                .SelectScreenCoordinates()
+                .SubscribeSafe(
+                    result =>
+                    {
+                        CloseController.Close(result);
+                    },
+                    Log.HandleException,
+                    () => { closeWindowRequest.OnNext("region selection cancelled"); })
+                .AddTo(anchors);
+        }
+        
         public void SelectWindow(System.Drawing.Size minSelection)
         {
             viewModel

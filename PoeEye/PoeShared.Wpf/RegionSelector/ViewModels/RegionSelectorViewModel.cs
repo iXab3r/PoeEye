@@ -20,7 +20,7 @@ using PoeShared.WindowSeekers;
 using ReactiveUI;
 using Unity;
 using Point = System.Drawing.Point;
-
+using Size = System.Windows.Size;
 using WinSize = System.Drawing.Size;
 using WinPoint = System.Drawing.Point;
 using WinRectangle = System.Drawing.Rectangle;
@@ -76,24 +76,28 @@ namespace PoeShared.RegionSelector.ViewModels
         public IObservable<RegionSelectorResult> SelectWindow(WinSize minSelection)
         {
             return SelectionAdorner.StartSelection()
-                .Select(x => new Rect(SelectionAdorner.Owner.PointToScreen(x.Location), x.Size).ToWinRectangle())
-                .Do(x => Log.Debug($"Selected region: {x} (min size: {minSelection})"))
-                .Select(selection =>
+                .Select(x =>
                 {
+                    var selection = new Rect(SelectionAdorner.Owner.PointToScreen(x.Location), x.Size).ToWinRectangle();
                     if (selection.Width >= minSelection.Width && selection.Height >= minSelection.Height)
                     {
+                        Log.Debug($"Selected region: {x} (screen: {selection}) (min size: {minSelection})");
                         return selection;
                     }
                     else
                     {
                         var result = new WinRectangle(selection.X, selection.Y, 0, 0);
-                        Log.Debug($"Selected region is less than required({minSelection}, converting selection {selection} to {result}");
+                        Log.Debug($"Selected region({x}, screen: {selection}) is less than required({minSelection}, converting selection {selection} to {result}");
                         return result;
                     }
-                    
                 })
                 .Select(ToRegionResult)
                 .Do(x => Log.Debug($"Selection Result: {x}"));
+        }
+
+        public IObservable<RegionSelectorResult> SelectScreenCoordinates()
+        {
+            return SelectWindow(WinSize.Empty);
         }
 
         public RegionSelectorResult SelectionCandidate

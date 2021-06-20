@@ -1,7 +1,6 @@
 ﻿<eye:SharedResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:eye="clr-namespace:PoeShared.UI"
-                    xmlns:viewModels1="clr-namespace:EyeAuras.UI.RegionSelector.ViewModels"
                     xmlns:viewModels="clr-namespace:PoeShared.RegionSelector.ViewModels"
                     xmlns:scaffolding="clr-namespace:PoeShared.Scaffolding">
     <eye:SharedResourceDictionary.MergedDictionaries>

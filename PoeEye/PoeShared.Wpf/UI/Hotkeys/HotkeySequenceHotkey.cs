@@ -15,7 +15,7 @@ namespace PoeShared.UI
 
         static HotkeySequenceHotkey()
         {
-            Binder.Bind(x => x.MousePosition != null && !x.MousePosition.Value.IsEmpty).To(x => x.HasMousePosition);
+            Binder.Bind(x => x.MousePosition != null).To(x => x.HasMousePosition);
             Binder.Bind(x => x.HasMousePosition || x.Hotkey != null && x.Hotkey.MouseButton != null).To(x => x.IsMouse);
         }
 

@@ -14,6 +14,7 @@ using log4net;
 using PoeShared.Modularity;
 using PoeShared.Native;
 using PoeShared.Prism;
+using PoeShared.RegionSelector.Views;
 using PoeShared.Scaffolding;
 using PoeShared.Scaffolding.WPF;
 using PropertyBinder;
@@ -29,6 +30,7 @@ namespace PoeShared.UI
         private static readonly ILog Log = LogManager.GetLogger(typeof(HotkeySequenceEditorViewModel));
 
         private readonly IAppArguments appArguments;
+        private readonly IFactory<RegionSelectorWindow> regionSelectorWindowFactory;
         private readonly NotificationsService notificationsService;
         private readonly IFactory<IHotkeyTracker> hotkeyFactory;
         private readonly IKeyboardEventsSource keyboardEventsSource;
@@ -67,6 +69,7 @@ namespace PoeShared.UI
 
         public HotkeySequenceEditorViewModel(
             IAppArguments appArguments,
+            IFactory<RegionSelectorWindow> regionSelectorWindowFactory,
             NotificationsService notificationsService,
             IFactory<IHotkeyTracker> hotkeyFactory,
             IKeyboardEventsSource keyboardEventsSource)
@@ -76,6 +79,7 @@ namespace PoeShared.UI
             Items = items;
 
             this.appArguments = appArguments;
+            this.regionSelectorWindowFactory = regionSelectorWindowFactory;
             this.notificationsService = notificationsService;
             this.hotkeyFactory = hotkeyFactory;
             this.keyboardEventsSource = keyboardEventsSource;
@@ -119,8 +123,32 @@ namespace PoeShared.UI
             StartRecording = CommandWrapper.Create(StartRecordingExecuted, this.WhenAnyValue(x => x.CanAddItem).ObserveOnDispatcher());
             StopRecording = CommandWrapper.Create(StopRecordingExecuted);
             ClearItems = CommandWrapper.Create(() => items.Clear());
+            MouseMoveCommand = CommandWrapper.Create(HandleMouseMoveExecuted);
         }
-        
+
+        private async Task HandleMouseMoveExecuted()
+        {
+            using var windowAnchors = new CompositeDisposable();
+
+            var window = regionSelectorWindowFactory.Create().AddTo(windowAnchors);
+            Disposable.Create(() => Log.Debug("Disposed selector window: {window}")).AddTo(windowAnchors);
+            Log.Debug($"Showing new selector window: {window}");
+            window.Show();
+            window.SelectScreenCoordinates();
+            Log.Debug($"Awaiting for selection result from {window}");
+            var result = await Observable.FromEventPattern<EventHandler, EventArgs>(h => window.Closed += h, h => window.Closed -= h)
+                .Select(x => window.Result)
+                .Take(1);
+            if (result.IsValid)
+            {
+                var newItem = new HotkeySequenceHotkey()
+                {
+                    MousePosition = result.AbsoluteSelection.Location
+                };
+                AddItemExecuted(newItem);
+            }
+        }
+
         private void RemoveItemExecuted(object arg)
         {
             var itemsToRemove = arg switch
@@ -159,6 +187,8 @@ namespace PoeShared.UI
         public ICommand AddItem { get; }
 
         public ICommand RemoveItem { get; }
+        
+        public ICommand MouseMoveCommand { get; }
 
         public HotkeySequenceDelay DefaultItemDelay
         {

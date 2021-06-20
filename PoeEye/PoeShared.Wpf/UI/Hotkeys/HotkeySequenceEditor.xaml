@@ -1,11 +1,11 @@
 <eye:SharedResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-                             xmlns:dd="urn:gong-wpf-dragdrop"
-                             xmlns:st="http://schemas.spicytaco.io/"
-                             xmlns:eye="clr-namespace:PoeShared.UI"
-                             xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
-                             xmlns:scaffolding="clr-namespace:PoeShared.Scaffolding">
+                              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+                              xmlns:dd="urn:gong-wpf-dragdrop"
+                              xmlns:st="http://schemas.spicytaco.io/"
+                              xmlns:eye="clr-namespace:PoeShared.UI"
+                              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+                              xmlns:scaffolding="clr-namespace:PoeShared.Scaffolding">
     <eye:SharedResourceDictionary.MergedDictionaries>
         <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Converters.xaml" />
         <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Colors.xaml" />
@@ -129,15 +129,6 @@
                 TEXT
             </eye:ButtonEx>
             <Separator />
-            <eye:ButtonEx
-                Command="{Binding ClearItems}"
-                Style="{StaticResource HotkeySequenceEditorButtonStyle}"
-                HorizontalAlignment="Left" CornerRadius="5"
-                Icon="&#xf12d;"
-                Foreground="{StaticResource SequenceEditorTextForeground}"
-                Background="{StaticResource SequenceEditorTextBackground}">
-                CLEAR
-            </eye:ButtonEx>
             <CheckBox
                 x:Name="KeyboardPopupToggle">
                 <st:StackPanel MarginBetweenChildren="2.5" Orientation="Horizontal">
@@ -166,6 +157,27 @@
                     <TextBlock Text="MOUSE" />
                 </st:StackPanel>
             </CheckBox>
+            <eye:ButtonEx
+                Command="{Binding MouseMoveCommand}"
+                Style="{StaticResource HotkeySequenceEditorButtonStyle}"
+                ToolTip="Select screen coordinates"
+                HorizontalAlignment="Left" CornerRadius="5"
+                Foreground="{StaticResource SequenceEditorTextForeground}">
+                <eye:ButtonEx.Icon>
+                    <materialDesign:PackIcon Kind="TargetVariant" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                </eye:ButtonEx.Icon>
+            </eye:ButtonEx>
+            <Separator />
+            <eye:ButtonEx
+                Command="{Binding ClearItems}"
+                Style="{StaticResource HotkeySequenceEditorButtonStyle}"
+                HorizontalAlignment="Left" CornerRadius="5"
+                Icon="&#xf12d;"
+                Foreground="{StaticResource SequenceEditorTextForeground}"
+                Background="{StaticResource SequenceEditorTextBackground}">
+                CLEAR
+            </eye:ButtonEx>
+            <Separator />
 
             <TextBlock HorizontalAlignment="Right" st:StackPanel.Fill="Fill"
                        x:Name="DurationLabel">

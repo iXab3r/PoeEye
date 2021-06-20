@@ -31,13 +31,13 @@
         <Setter Property="Margin" Value="2.5" />
         <Setter Property="HorizontalContentAlignment" Value="Center" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
-        <Setter Property="Padding" Value="-5,0,0,0" />
         <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
     </Style>
     
      <Style x:Key="FastButtonExStyle" TargetType="{x:Type eye:ButtonEx}" BasedOn="{StaticResource ButtonExStyleBase}">
         <Setter Property="Content" Value="{Binding RelativeSource={RelativeSource Self}, Path=Icon}"/>
         <Setter Property="FontFamily" Value="{StaticResource FontAwesome}"/>
+        <Setter Property="Padding" Value="0"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type eye:ButtonEx}">
@@ -54,7 +54,6 @@
                         HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
                         VerticalAlignment="{TemplateBinding VerticalAlignment}"
                         IsHitTestVisible="{TemplateBinding IsHitTestVisible}"
-                        Padding="{TemplateBinding Margin}"
                         ToolTip="{TemplateBinding ToolTip}">
                         <ContentPresenter x:Name="ContentLabel"
                                           VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
@@ -80,6 +79,7 @@
     </Style>
 
     <Style x:Key="DefaultButtonExStyle" TargetType="{x:Type eye:ButtonEx}" BasedOn="{StaticResource ButtonExStyleBase}">
+        <Setter Property="Padding" Value="-5,0,0,0" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type eye:ButtonEx}">

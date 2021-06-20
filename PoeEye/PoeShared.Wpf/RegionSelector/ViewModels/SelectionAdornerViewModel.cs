@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
@@ -25,7 +26,7 @@ namespace PoeShared.RegionSelector.ViewModels
     internal sealed class SelectionAdornerViewModel : DisposableReactiveObject, ISelectionAdornerViewModel
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(SelectionAdornerViewModel));
-        private static readonly TimeSpan MousePositionCaptureInterval = TimeSpan.FromMilliseconds(1000 / 30f);
+        private static readonly TimeSpan MousePositionCaptureInterval = TimeSpan.FromMilliseconds(1000 / 60f);
         private static readonly int CurrentProcessId = Process.GetCurrentProcess().Id;
 
         private readonly IKeyboardEventsSource keyboardEventsSource;
@@ -73,13 +74,17 @@ namespace PoeShared.RegionSelector.ViewModels
                 .ToProperty(this, x => x.SelectionIsNotEmpty)
                 .AddTo(Anchors);
 
-            Observable.Merge(
+            Observable.CombineLatest(
                     this.WhenAnyValue(x => x.ScreenSelection).ToUnit(), 
                     this.WhenAnyValue(x => x.MousePosition).ToUnit(), 
+                    this.WhenAnyValue(x => x.OwnerIsVisible).ToUnit(), 
                     this.WhenAnyValue(x => x.Owner).ToUnit())
-                .Where(x => OwnerIsVisible)
                 .SubscribeSafe(x =>
                 {
+                    if (owner == null || !OwnerIsVisible)
+                    {
+                        return;
+                    }
                     var topLeft = owner.PointToScreen(new Point(0, 0));
                     var absoluteMousePosition = owner.PointToScreen(mousePosition);
                     absoluteMousePosition.Offset(-topLeft.X, -topLeft.Y);
@@ -166,7 +171,7 @@ namespace PoeShared.RegionSelector.ViewModels
             get => isVisible;
             private set => RaiseAndSetIfChanged(ref isVisible, value);
         }
-        
+
         public IObservable<Rect> StartSelection()
         {
             //FIXME Remove side-effects, code became too complicated
@@ -192,7 +197,6 @@ namespace PoeShared.RegionSelector.ViewModels
                     
                     keyboardEventsSource.WhenMouseMove
                         .Where(x => OwnerIsVisible)
-                        .Sample(MousePositionCaptureInterval, bgScheduler)
                         .ObserveOn(uiScheduler)
                         .SubscribeSafe(HandleMouseMove, Log.HandleUiException)
                         .AddTo(selectionAnchors);
@@ -207,17 +211,17 @@ namespace PoeShared.RegionSelector.ViewModels
                         {
                             var coords = x.GetPosition(owner);
                             AnchorPoint = coords;
-                            Selection = new Rect(anchorPoint.X, anchorPoint.Y, 1, 1);
-                            return keyboardEventsSource.WhenMouseUp.Where(y => y.Button == MouseButtons.Left);
+                            var region = new Rect(anchorPoint.X, anchorPoint.Y, 1, 1);
+                            Selection = region;
+                            return keyboardEventsSource.WhenMouseUp.Where(y => y.Button == MouseButtons.Left).ObserveOn(uiScheduler);
                         })
                         .Switch()
-                        .ObserveOn(uiScheduler)
                         .Select(
-                            x =>
+                            _ =>
                             {
-                                var result = Selection;
+                                var selectedRegion = Selection;
                                 Selection = Rect.Empty;
-                                return result;
+                                return selectedRegion;
                             })
                         .SubscribeSafe(subscriber)
                         .AddTo(selectionAnchors);
@@ -226,14 +230,19 @@ namespace PoeShared.RegionSelector.ViewModels
                 });
         }
 
-        private void HandleMouseMove(MouseEventArgs e)
+        private void UpdatePosition(Point pt)
         {
-            var coords = owner.PointFromScreen(new Point(e.X, e.Y));
+            var coords = owner.PointFromScreen(pt);
             var renderSize = owner.RenderSize;
             MousePosition = new Point(
                 Math.Max(0, Math.Min(coords.X, renderSize.Width)),
                 Math.Max(0, Math.Min(coords.Y, renderSize.Height)));
-            
+        }
+
+        private void HandleMouseMove(MouseEventArgs e)
+        {
+            UpdatePosition(e.Location.ToWpfPoint());
+            var renderSize = owner.RenderSize;
             if (e.Button == MouseButtons.Left)
             {
                 var destinationRect = new Rect(0, 0, renderSize.Width, renderSize.Height);

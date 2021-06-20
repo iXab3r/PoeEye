@@ -2,6 +2,7 @@ using System;
 using System.Drawing;
 using JetBrains.Annotations;
 using PoeShared.Scaffolding;
+using WinPoint = System.Drawing.Point;
 
 namespace PoeShared.RegionSelector.ViewModels
 {
@@ -13,5 +14,7 @@ namespace PoeShared.RegionSelector.ViewModels
 
         [NotNull]
         IObservable<RegionSelectorResult> SelectWindow(Size minSelection);
+        
+        IObservable<RegionSelectorResult> SelectScreenCoordinates();
     }
 }
