@@ -274,8 +274,4 @@ namespace PoeShared.UI
             ShowOrHideAdornerInternal();
         }
     }
-    
-     //
-    // This class is an adorner that allows a FrameworkElement derived class to adorn another FrameworkElement.
-    //
 }

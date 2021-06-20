@@ -13,6 +13,30 @@
                  Title="PoeShared Demo" Height="750" Width="800" d:DataContext="{d:DesignInstance local:MainWindowViewModel}">
     <Grid>
         <TabControl>
+             <TabItem Header="SelectionAdorner">
+                <st:StackPanel MarginBetweenChildren="5" Orientation="Vertical" Fill="Fill">
+                    <st:StackPanel Orientation="Horizontal" MarginBetweenChildren="5">
+                        <eye:ButtonEx Command="{Binding StartSelectionCommand}">Start selection</eye:ButtonEx>
+                        <CheckBox IsChecked="{Binding SelectionAdorner.ShowCrosshair}">Show crosshair</CheckBox>
+                        <CheckBox IsChecked="{Binding SelectionAdorner.ShowBackground}">Show background</CheckBox>
+                        <TextBlock Text="Rect"></TextBlock>
+                        <TextBlock Text="{Binding SelectionRect}"></TextBlock>
+                        <TextBlock Text="Rectangle"></TextBlock>
+                        <TextBlock Text="{Binding SelectionRectangle}"></TextBlock>
+                    </st:StackPanel>
+                    <eye:AdornedControl 
+                        IsAdornerVisible="True" >
+                        <eye:AdornedControl.AdornerContent>
+                            <Grid>
+                                <ContentControl Content="{Binding SelectionAdorner}" />
+                            </Grid>
+                        </eye:AdornedControl.AdornerContent>
+                        <Grid>
+                            <Rectangle Fill="Gray" Stroke="Red" MinHeight="600" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                        </Grid>
+                    </eye:AdornedControl>
+                </st:StackPanel>
+            </TabItem>
             <TabItem Header="Colors">
                 <st:StackPanel MarginBetweenChildren="5" Orientation="Vertical">
                     <Label Background="{DynamicResource MaterialDesignBody}" Content="Body"></Label>
@@ -37,7 +61,6 @@
                     <Label Background="{DynamicResource MahApps.Brushes.Gray8}" Content="MahApps.Brushes.Gray8"></Label>
                     <Label Background="{DynamicResource {x:Static SystemColors.InactiveSelectionHighlightBrushKey}}" Content="InactiveSelectionHighlightBrushKey"></Label>
                 </st:StackPanel>
-                
             </TabItem>
             <TabItem Header="Misc">
                 <st:AutoGrid Columns="150,Auto" Rows="*" ChildMargin="5" VerticalAlignment="Top">
