@@ -9,6 +9,7 @@ using PoeShared.Audio.Models;
 using PoeShared.Audio.ViewModels;
 using PoeShared.Modularity;
 using PoeShared.Native;
+using PoeShared.RegionSelector.ViewModels;
 using PoeShared.Scaffolding;
 using PoeShared.Scaffolding.WPF;
 using PoeShared.Services;
@@ -84,6 +85,9 @@ namespace PoeShared.Prism
             Container
                 .RegisterType<IHotkeyTracker, HotkeyTracker>()
                 .RegisterType<IWaveOutDeviceSelectorViewModel, WaveOutDeviceSelectorViewModel>()
+                .RegisterType<ISelectionAdornerViewModel, SelectionAdornerViewModel>()
+                .RegisterType<ISelectionAdornerViewModel, SelectionAdornerViewModel>()
+                .RegisterType<IRegionSelectorViewModel, RegionSelectorViewModel>()
                 .RegisterType<IGenericSettingsViewModel, GenericSettingsViewModel>()
                 .RegisterType<IRandomPeriodSelector, RandomPeriodSelector>()
                 .RegisterType<IHotkeySequenceEditorViewModel, HotkeySequenceEditorViewModel>()

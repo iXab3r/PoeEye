@@ -130,4 +130,7 @@
       <DependentUpon>HotkeySequenceEditor.xaml</DependentUpon>
     </Page>
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="RegionSelector\Services" />
+  </ItemGroup>
 </Project>

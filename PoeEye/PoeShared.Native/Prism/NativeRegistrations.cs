@@ -11,6 +11,7 @@ using PoeShared.Native.Scaffolding;
 using PoeShared.Resources.Notifications;
 using PoeShared.Scaffolding;
 using PoeShared.Services;
+using PoeShared.WindowSeekers;
 using ReactiveUI;
 using Unity;
 using Unity.Extension;
@@ -33,11 +34,13 @@ namespace PoeShared.Prism
                 .RegisterSingleton<IAudioNotificationsManager, AudioNotificationsManager>()
                 .RegisterSingleton<IAudioPlayer, AudioPlayer>()
                 .RegisterSingleton<IUserInputBlocker, UserInputBlocker>()
+                .RegisterSingleton<IWindowHandleProvider, WindowHandleProvider>()
                 .RegisterSingleton<IConverter<NameValueCollection, string>, NameValueCollectionToQueryStringConverter>()
                 .RegisterSingleton<IConverter<NameValueCollection, IEnumerable<KeyValuePair<string, string>>>, NameValueCollectionToQueryStringConverter>()
                 .RegisterSingleton<IFactory<IWinEventHookWrapper, WinEventHookArguments>, WinEventHookWrapperFactory>();
 
             Container
+                .RegisterType<IWindowSeeker, TaskWindowSeeker>()
                 .RegisterType<IHttpClient, GenericHttpClient>();
             
             if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows))

@@ -49,6 +49,27 @@ namespace PoeShared.Native
         [DllImport("gdi32.dll")]
         static extern IntPtr CreateRoundRectRgn(int x1, int y1, int x2, int y2,int cx, int cy);
         
+        [DllImport("user32.dll", EntryPoint = "GetWindowLong")]
+        private static extern int GetWindowLong32(IntPtr hWnd, WindowLong nIndex);
+
+        [DllImport("user32.dll", EntryPoint = "GetWindowLongPtr")]
+        private static extern IntPtr GetWindowLongPtr64(IntPtr hWnd, WindowLong nIndex);
+
+        [DllImport("user32.dll")]
+        public static extern IntPtr GetMenu(IntPtr hwnd);
+
+        [DllImport("user32.dll", EntryPoint = "GetClassLongPtrW")]
+        private static extern IntPtr GetClassLong64(IntPtr hWnd, int nIndex);
+
+        [DllImport("user32.dll", EntryPoint = "GetClassLongW")]
+        private static extern int GetClassLong32(IntPtr hWnd, int nIndex);
+        
+        [DllImport("user32.dll", CharSet = CharSet.Auto)]
+        public static extern IntPtr GetParent(IntPtr hWnd);
+
+        [DllImport("User32", CharSet = CharSet.Auto)]
+        public static extern IntPtr SetParent(IntPtr hWndChild, IntPtr hWndParent);
+        
         [StructLayout(LayoutKind.Sequential)]
         public struct WINDOWPOS
         {
@@ -76,6 +97,56 @@ namespace PoeShared.Native
             MK_MBUTTON = 0x0010,
             MK_XBUTTON1 = 0x0020,
             MK_XBUTTON2 = 0x0040,
+        }
+
+        [Flags]
+        public enum WindowExStyles : long
+        {
+            AppWindow = 0x40000,
+            ToolWindow = 0x80,
+        }
+
+        public enum WindowLong
+        {
+            ExStyle = -20,
+        }
+
+        public enum ClassLong
+        {
+            Icon = -14,
+            IconSmall = -34
+        }
+        
+        /// <summary>
+        ///     Checks whether a window is a top-level window (has no owner nor parent window).
+        /// </summary>
+        /// <param name="hwnd">Handle to the window to check.</param>
+        public static bool IsTopLevel(IntPtr hwnd)
+        {
+            var hasParent = UnsafeNative.GetParent(hwnd).ToInt64() != 0;
+            var hasOwner = User32.GetWindow(hwnd, User32.GetWindowCommands.GW_OWNER).ToInt64() != 0;
+
+            return !hasParent && !hasOwner;
+        }
+        
+        public static IntPtr GetClassLong(IntPtr hWnd, ClassLong i)
+        {
+            if (IntPtr.Size == 8)
+            {
+                return GetClassLong64(hWnd, (int) i);
+            }
+
+            return new IntPtr(GetClassLong32(hWnd, (int) i));
+        }
+        
+        public static IntPtr GetWindowLong(IntPtr hWnd, WindowLong i)
+        {
+            if (IntPtr.Size == 8)
+            {
+                return GetWindowLongPtr64(hWnd, i);
+            }
+
+            return new IntPtr(GetWindowLong32(hWnd, i));
         }
 
         public static IntPtr WindowFromPoint(Point point)
