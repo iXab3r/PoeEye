@@ -163,12 +163,6 @@
                                     x:Name="ItemsPanel"
                                     Margin="-5 0 0 0"
                                     Grid.ColumnSpan="2">
-                            <StackPanel.Height>
-                                <MultiBinding Converter="{StaticResource MathMlpMultipleConverter}">
-                                    <Binding ElementName="ItemsHost" Path="ActualHeight"/>
-                                    <Binding ElementName="ScaleHost" Path="Scale"/>
-                                </MultiBinding>
-                            </StackPanel.Height>
                             <ItemsPresenter x:Name="ItemsHost"
                                             VerticalAlignment="Top"
                                             Opacity="0"
