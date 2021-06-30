@@ -6,7 +6,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Threading;
 
-using JetBrains.Annotations;
 using log4net;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
@@ -14,23 +13,20 @@ using Unity;
 
 namespace PoeShared.Modularity
 {
-    internal class SchedulerProvider : DisposableReactiveObject, ISchedulerProvider
+    public sealed class SchedulerProvider : DisposableReactiveObject, ISchedulerProvider
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(SchedulerProvider));
 
-        private readonly ConcurrentDictionary<string, IScheduler> schedulers = new ConcurrentDictionary<string, IScheduler>();
-        private readonly IScheduler uiScheduler;
+        private static readonly Lazy<SchedulerProvider> InstanceSupplier = new();
 
-        public SchedulerProvider(
-            [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler,
-            [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
+        private readonly ConcurrentDictionary<string, IScheduler> schedulers = new();
+        
+        public static ISchedulerProvider Instance => InstanceSupplier.Value;
+
+        public void Initialize(IUnityContainer container)
         {
-            this.uiScheduler = uiScheduler;
-            Guard.ArgumentNotNull(bgScheduler, nameof(bgScheduler));
-            Guard.ArgumentNotNull(uiScheduler, nameof(uiScheduler));
-
-            schedulers[WellKnownSchedulers.Background] = bgScheduler;
-            schedulers[WellKnownSchedulers.UI] = uiScheduler;
+            schedulers[WellKnownSchedulers.Background] = container.Resolve<IScheduler>(WellKnownSchedulers.Background);
+            schedulers[WellKnownSchedulers.UI] = container.Resolve<IScheduler>(WellKnownSchedulers.UI);
         }
 
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.Synchronized)]
@@ -52,31 +48,27 @@ namespace PoeShared.Modularity
                 IsBackground = true
             };
             dispatcherThread.SetApartmentState(ApartmentState.STA);
-
-            Log.Debug($"[{name}] Thread started");
-
+            Log.Debug($"[{name}] Starting dispatcher thread");
             dispatcherThread.Start(consumer);
+            Log.Debug($"[{name}] Dispatcher thread started");
             return consumer.Task.Result;
         }
 
         private void InitializeDispatcherThread(object arg)
         {
-            var consumer = arg as TaskCompletionSource<IScheduler>;
-            if (consumer != null)
+            if (arg is not TaskCompletionSource<IScheduler> consumer)
             {
-                InitializeDispatcherThread(consumer);
+                throw new InvalidOperationException($"Wrong args: {arg}");
             }
-            else
-            {
-                Log.Debug($"Wrong args: {arg}");
-            }
+            
+            InitializeDispatcherThread(consumer);
         }
 
         private void InitializeDispatcherThread(TaskCompletionSource<IScheduler> consumer)
         {
             try
             {
-                Log.Debug("Thread started");
+                Log.Debug("Dispatcher thread started");
                 var dispatcher = Dispatcher.CurrentDispatcher;
                 Log.Debug($"Dispatcher: {dispatcher}");
                 var scheduler = new DispatcherScheduler(dispatcher);
@@ -123,11 +115,11 @@ namespace PoeShared.Modularity
             }
             finally
             {
-                Log.Debug("Thread completed");
+                Log.Debug("Dispatcher thread completed");
             }
         }
 
-        private void LogEvent(string eventName, DispatcherHookEventArgs eventArgs)
+        private static void LogEvent(string eventName, DispatcherHookEventArgs eventArgs)
         {
             if (Log.IsDebugEnabled)
             {

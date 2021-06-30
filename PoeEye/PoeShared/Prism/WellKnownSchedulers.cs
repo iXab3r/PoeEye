@@ -6,5 +6,6 @@
         public const string UIIdle = "UiIdleScheduler";
         public const string Background = "BackgroundScheduler";
         public const string InputHook = "InputHook";
+        public const string SharedThread = "SharedThread";
     }
 }

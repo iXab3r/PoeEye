@@ -22,6 +22,16 @@ namespace PoeShared.Scaffolding
             
             return instance;
         }
+
+        public static IUnityContainer RegisterSingleton<TTo>(this IUnityContainer instance, Func<IUnityContainer, object> func)
+        {
+            return instance.RegisterFactory<TTo>(func, new ContainerControlledLifetimeManager());
+        }
+        
+        public static IUnityContainer RegisterSingleton<TTo>(this IUnityContainer instance, string name, Func<IUnityContainer, object> func)
+        {
+            return instance.RegisterFactory<TTo>(name, func, new ContainerControlledLifetimeManager());
+        }
         
         public static IUnityContainer AddNewExtensionIfNotExists<TExtension>(this IUnityContainer container)
             where TExtension : UnityContainerExtension
