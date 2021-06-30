@@ -33,10 +33,18 @@ namespace PoeShared.Modularity
         public IScheduler GetOrCreate(string name)
         {
             Log.Debug($"[{name}] Retrieving scheduler...");
-            return schedulers.GetOrAdd(name, Create);
+            return schedulers.GetOrAdd(name, CreateEnforcedThreadScheduler);
+        }
+        
+        private IScheduler CreateEnforcedThreadScheduler(string name)
+        {
+            Guard.ArgumentNotNull(name, nameof(name));
+
+            Log.Debug($"[{name}] Creating new enforced thread scheduler");
+            return new EnforcedThreadScheduler(name);
         }
 
-        private IScheduler Create(string name)
+        private IScheduler CreateDispatcherScheduler(string name)
         {
             Guard.ArgumentNotNull(name, nameof(name));
 
