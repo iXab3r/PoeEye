@@ -38,7 +38,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type mah:NumericUpDown}">
-                    <Grid VerticalAlignment="{TemplateBinding VerticalContentAlignment}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}">
+                    <Grid Background="Transparent" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition x:Name="PART_TextColumn" Width="*" />
                             <ColumnDefinition x:Name="PART_RightColumn" Width="Auto" />
@@ -71,7 +71,10 @@
                                  IsTabStop="{TemplateBinding IsTabStop}"
                                  SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
                                  TabIndex="{TemplateBinding TabIndex}"
-                                 VerticalScrollBarVisibility="{TemplateBinding ScrollViewer.VerticalScrollBarVisibility}" />
+                                 VerticalScrollBarVisibility="{TemplateBinding ScrollViewer.VerticalScrollBarVisibility}" 
+                                 mdix:TextFieldAssist.SuffixText="{Binding Path=(mdix:TextFieldAssist.SuffixText), RelativeSource={RelativeSource TemplatedParent}}"
+                                 mdix:TextFieldAssist.PrefixText="{Binding Path=(mdix:TextFieldAssist.PrefixText), RelativeSource={RelativeSource TemplatedParent}}"
+                                 MaxLength="16"/>
                         <RepeatButton x:Name="PART_NumericUp"
                                       Grid.Column="1"
                                       Grid.Row="0"

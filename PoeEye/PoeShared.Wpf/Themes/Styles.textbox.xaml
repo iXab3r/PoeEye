@@ -15,6 +15,7 @@
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="BorderBrush" Value="{DynamicResource MaterialDesignTextBoxBorder}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type TextBoxBase}">
@@ -25,6 +26,50 @@
                             VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
                             HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                             Margin="{TemplateBinding Padding}" />
+                     <ControlTemplate.Triggers>
+                        <Trigger Property="wpf:TextFieldAssist.HasFilledTextField" Value="False">
+                            <Setter Property="wpf:HintAssist.FloatingOffset" Value="1,0" />
+                            <Setter Property="wpf:HintAssist.HelperTextFontSize">
+                                <Setter.Value>
+                                    <Binding RelativeSource="{RelativeSource Self}" Path="FontSize" />
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+
+                        <!-- IsEnabled -->
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsEnabled" Value="False" />
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="PART_ContentHost" Property="BorderBrush" Value="Transparent" />
+                        </MultiTrigger>
+
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsEnabled" Value="True" />
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="PART_ContentHost" Property="BorderThickness" Value="0 0 0 1" />
+                            <Setter TargetName="PART_ContentHost" Property="BorderBrush" Value="{DynamicResource MaterialDesignTextBoxBorder}" />
+                        </MultiTrigger>
+
+                        <!-- IsKeyboardFocused -->
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsKeyboardFocused" Value="True" />
+                            </MultiTrigger.Conditions>
+                            <Setter Property="wpf:TextFieldAssist.TextBoxViewMargin" Value="0, 2,0,0" />
+                            <Setter TargetName="PART_ContentHost" Property="BorderThickness" Value="0 0 0 2" />
+                            <Setter TargetName="PART_ContentHost" Property="BorderBrush" Value="{DynamicResource PrimaryHueMidBrush}" />
+                        </MultiTrigger>
+
+                        <!-- IsMouseOver -->
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsMouseOver" Value="True" />
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="PART_ContentHost" Property="BorderBrush" Value="{DynamicResource PrimaryHueMidBrush}" />
+                        </MultiTrigger>
+                    </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
@@ -42,9 +87,9 @@
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="AllowDrop" Value="true" />
-        <Setter Property="Padding" Value="0, 4" />
+        <Setter Property="Padding" Value="0" />
         <Setter Property="Height" Value="32" />
-        <Setter Property="wpf:TextFieldAssist.TextBoxViewMargin" Value="0" />
+        <Setter Property="wpf:TextFieldAssist.TextBoxViewMargin" Value="0, 1,0,0" />
         <Setter Property="ScrollViewer.PanningMode" Value="VerticalFirst" />
         <Setter Property="Stylus.IsFlicksEnabled" Value="False" />
         <Setter Property="Validation.ErrorTemplate" Value="{StaticResource IconErrorValidationTemplate}" />
@@ -84,12 +129,14 @@
                                 BorderThickness="{TemplateBinding BorderThickness}"
                                 VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
                                 HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                Margin="{Binding Path=(wpf:TextFieldAssist.TextBoxViewMargin), RelativeSource={RelativeSource TemplatedParent}}"
                                 Padding="{TemplateBinding Padding}" />
 
                         <TextBlock
                             x:Name="SuffixTextBlock"
                             Grid.Column="1"
                             FontSize="{TemplateBinding FontSize}"
+                            IsHitTestVisible="True"
                             Visibility="{TemplateBinding wpf:TextFieldAssist.SuffixText, Converter={StaticResource NullToCollapsedConverter}}"
                             Opacity="{TemplateBinding wpf:HintAssist.HintOpacity}"
                             Text="{TemplateBinding wpf:TextFieldAssist.SuffixText}" />
@@ -138,6 +185,7 @@
                             <MultiTrigger.Conditions>
                                 <Condition Property="IsKeyboardFocused" Value="True" />
                             </MultiTrigger.Conditions>
+                            <Setter Property="wpf:TextFieldAssist.TextBoxViewMargin" Value="0, 2,0,0" />
                             <Setter TargetName="PART_ContentHost" Property="BorderThickness" Value="0 0 0 2" />
                             <Setter TargetName="PART_ContentHost" Property="BorderBrush" Value="{DynamicResource PrimaryHueMidBrush}" />
                         </MultiTrigger>
