@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Interactivity;
 
@@ -31,6 +32,7 @@ namespace PoeShared.Scaffolding.WPF
                 return;
             }
 
+            AssociatedObject.ContextMenu.Placement = PlacementMode.Bottom;
             AssociatedObject.ContextMenu.PlacementTarget = AssociatedObject;
             AssociatedObject.ContextMenu.IsOpen = true;
             e.Handled = true;

@@ -87,7 +87,7 @@
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="AllowDrop" Value="true" />
-        <Setter Property="Padding" Value="0" />
+        <Setter Property="Padding" Value="0 4" />
         <Setter Property="Height" Value="32" />
         <Setter Property="wpf:TextFieldAssist.TextBoxViewMargin" Value="0, 1,0,0" />
         <Setter Property="ScrollViewer.PanningMode" Value="VerticalFirst" />
