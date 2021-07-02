@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 
 namespace PoeShared
 {
@@ -7,5 +8,11 @@ namespace PoeShared
         public DateTime UtcNow => DateTime.UtcNow;
         
         public DateTime Now => DateTime.Now;
+
+        public long Ticks => Stopwatch.GetTimestamp();
+        
+        public long Frequency => Stopwatch.Frequency;
+
+        public TimeSpan Elapsed => TimeSpan.FromMilliseconds(Ticks / (double) Frequency);
     }
 }

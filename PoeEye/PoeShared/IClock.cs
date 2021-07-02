@@ -7,5 +7,7 @@ namespace PoeShared
         DateTime UtcNow { get; }
         
         DateTime Now { get; }
+        
+        TimeSpan Elapsed { get; }
     }
 }
