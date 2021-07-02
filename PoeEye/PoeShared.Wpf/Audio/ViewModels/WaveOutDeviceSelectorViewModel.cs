@@ -51,7 +51,8 @@ namespace PoeShared.Audio.ViewModels
                     notificationClient.WhenDeviceStateChanged.Do(x => Log.Debug($"[Notification] Device state changed, id: {x.deviceId}, state: {x.newState}")).ToUnit(),
                     notificationClient.WhenDeviceRemoved.Do(deviceId => Log.Debug($"[Notification] Device removed, id: {deviceId}")).ToUnit())
                 .Throttle(ThrottlingTimeout)
-                .SubscribeSafe(HandleDevicesUpdate, Log.HandleUiException)
+                .RetryWithDelay(RetryTimeout)
+                .SubscribeSafe(HandleDevicesUpdate, Log.HandleException)
                 .AddTo(Anchors);
             
             Observable
@@ -66,7 +67,7 @@ namespace PoeShared.Audio.ViewModels
                     Log.Debug($"Successfully subscribed to Notifications using {deviceEnumerator}");
                 })
                 .RetryWithDelay(RetryTimeout)
-                .SubscribeToErrors(Log.HandleUiException)
+                .SubscribeToErrors(Log.HandleException)
                 .AddTo(Anchors);
 
             this.WhenAnyValue(x => x.SelectedItem)
@@ -97,7 +98,6 @@ namespace PoeShared.Audio.ViewModels
 
         private void HandleDevicesUpdate()
         {
-            
             var devices = new[] {WaveOutDevice.DefaultDevice}.Concat(audioPlayer.GetDevices())
                 .ToDictionary(x => x.Id, x => x, tuple =>
                 {

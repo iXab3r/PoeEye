@@ -1,20 +1,16 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Media;
 using System.Reactive.Disposables;
-using System.Reactive.Linq;
 using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
-using DynamicData;
 using log4net;
 using NAudio.CoreAudioApi;
 using NAudio.Wave;
 using PoeShared.Scaffolding;
-using ObservableEx = PoeShared.Scaffolding.ObservableEx;
 
 namespace PoeShared.Audio.Services
 {
@@ -34,17 +30,25 @@ namespace PoeShared.Audio.Services
             var mmDevices = deviceEnumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active);
             Log.Debug($"Retrieving WaveOut devices, count: {WaveOut.DeviceCount}");
 
-            var waveOutDevices = Enumerable.Range(0, WaveOut.DeviceCount).Select(x =>
+            var waveOutDevices = Enumerable.Range(0, WaveOut.DeviceCount).Select(idx =>
             {
-                var waveOutCapabilities = WaveOut.GetCapabilities(x);
-                var matchingMmDevice = string.IsNullOrEmpty(waveOutCapabilities.ProductName) ? null : mmDevices.FirstOrDefault(x => x.FriendlyName?.StartsWith(waveOutCapabilities.ProductName) ?? false);
-                return new WaveOutDevice
+                try
                 {
-                    DeviceNumber = x,
-                    WaveOutCapabilities = waveOutCapabilities,
-                    MultimediaDeviceName = matchingMmDevice?.FriendlyName
-                };
-            });
+                    var waveOutCapabilities = WaveOut.GetCapabilities(idx);
+                    var matchingMmDevice = string.IsNullOrEmpty(waveOutCapabilities.ProductName) ? null : mmDevices.FirstOrDefault(x => x.FriendlyName?.StartsWith(waveOutCapabilities.ProductName) ?? false);
+                    return new WaveOutDevice
+                    {
+                        DeviceNumber = idx,
+                        WaveOutCapabilities = waveOutCapabilities,
+                        MultimediaDeviceName = matchingMmDevice?.FriendlyName
+                    };
+                }
+                catch (Exception e)
+                {
+                    Log.Warn($"Failed to get WaveOut capabilities for device #{idx}");
+                    return null;
+                }
+            }).Where(x => x != null);
 
             return waveOutDevices;
         }
@@ -62,7 +66,7 @@ namespace PoeShared.Audio.Services
         /// <returns></returns>
         public Task Play(byte[] waveData, float volume)
         {
-            return PlayInternal(new AudioPlayerRequest(){ WaveData = waveData, Volume = volume, CancellationToken = CancellationToken.None });
+            return PlayInternal(new AudioPlayerRequest() {WaveData = waveData, Volume = volume, CancellationToken = CancellationToken.None});
         }
 
         public Task Play(AudioPlayerRequest request)
@@ -100,6 +104,7 @@ namespace PoeShared.Audio.Services
                             {
                                 waveOut.DeviceNumber = request.OutputDevice.DeviceNumber;
                             }
+
                             waveOut.Init(blockAlignedStream);
 
                             var playbackAnchor = new ManualResetEvent(false);
@@ -112,8 +117,9 @@ namespace PoeShared.Audio.Services
                                 {
                                     waveOut.Volume = request.Volume.Value;
                                 }
+
                                 waveOut.Play();
-                                WaitHandle.WaitAny(new []{(WaitHandle)playbackAnchor, request.CancellationToken.WaitHandle});
+                                WaitHandle.WaitAny(new[] {(WaitHandle) playbackAnchor, request.CancellationToken.WaitHandle});
                                 if (request.CancellationToken.IsCancellationRequested)
                                 {
                                     Log.Debug($"Cancelling audio stream");
@@ -122,7 +128,7 @@ namespace PoeShared.Audio.Services
                                 }
                                 else
                                 {
-                                    Log.Debug($"Successfully played audio stream({rawStream.Length}), token: {new { request.CancellationToken.IsCancellationRequested, request.CancellationToken.CanBeCanceled }}...");
+                                    Log.Debug($"Successfully played audio stream({rawStream.Length}), token: {new {request.CancellationToken.IsCancellationRequested, request.CancellationToken.CanBeCanceled}}...");
                                 }
                             }
                             finally
