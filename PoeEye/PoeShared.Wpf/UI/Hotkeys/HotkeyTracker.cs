@@ -129,7 +129,7 @@ namespace PoeShared.UI
                         }
                         else
                         {
-                            IsActive = !IsActive;
+                            IsActive = hotkeyData.KeyDown;
                         }
                     },
                     Log.HandleUiException)
