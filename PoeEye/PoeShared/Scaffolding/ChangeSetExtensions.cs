@@ -84,7 +84,7 @@ namespace PoeShared.Scaffolding
         /// <returns></returns>
         /// <exception cref="System.ArgumentNullException">
         /// </exception>
-        public static IObservable<EventPattern<PropertyChangedEventArgs>> WhenPropertyChanged<TObject>([NotNull] this IObservable<IChangeSet<TObject>> source, params string[] propertiesToMonitor)
+        public static IObservable<EventPattern<PropertyChangedEventArgs>> WhenNestedPropertyChanged<TObject>([NotNull] this IObservable<IChangeSet<TObject>> source, params string[] propertiesToMonitor)
             where TObject : INotifyPropertyChanged
         {
             if (source == null)

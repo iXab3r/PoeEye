@@ -8,7 +8,7 @@ namespace PoeShared.Native
     {
         private readonly Lazy<IntPtr> windowHandleSupplier;
         
-        protected TransparentWindow()
+        public TransparentWindow()
         {
             windowHandleSupplier = new Lazy<IntPtr>(() => new WindowInteropHelper(this).EnsureHandle());
             this.Loaded += OnLoaded;
