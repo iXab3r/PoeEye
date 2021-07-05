@@ -8,6 +8,7 @@
         
         public static MessageBoxElement Close = new MessageBoxElement() { Caption = "Close" };
         public static MessageBoxElement Cancel = new MessageBoxElement() { Caption = "Cancel" };
+        public static MessageBoxElement Ok = new MessageBoxElement() { Caption = "OK" };
         public static MessageBoxElement Yes = new MessageBoxElement() { Caption = "Yes" };
         public static MessageBoxElement No = new MessageBoxElement() { Caption = "No" };
     }

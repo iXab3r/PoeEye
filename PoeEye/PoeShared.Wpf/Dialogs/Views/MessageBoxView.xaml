@@ -9,7 +9,7 @@
         <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/CommandWrapperView.xaml" />
     </ui:SharedResourceDictionary.MergedDictionaries>
     
-    <DataTemplate x:Key="MessageBoxTemplate" DataType="{x:Type viewModels11:MessageBoxWithContentViewModelBase}">
+    <DataTemplate DataType="{x:Type viewModels11:MessageBoxWithContentViewModelBase}">
         <Grid x:Name="MessageBoxRoot" Margin="10">
             <Grid.InputBindings>
                 <KeyBinding Gesture="Escape" Command="{Binding CloseMessageBoxCommand}" />
