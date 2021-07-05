@@ -7,6 +7,7 @@ using System.Windows.Threading;
 using log4net;
 using PoeShared.Audio.Models;
 using PoeShared.Audio.ViewModels;
+using PoeShared.Dialogs.Services;
 using PoeShared.Modularity;
 using PoeShared.Native;
 using PoeShared.RegionSelector.ViewModels;
@@ -46,6 +47,7 @@ namespace PoeShared.Prism
                 .RegisterSingleton<INotificationsService, NotificationsService>()
                 .RegisterSingleton<IConverter<char, Keys>, CharToKeysConverter>()
                 .RegisterSingleton<IMicrophoneProvider, MicrophoneProvider>()
+                .RegisterSingleton<IMessageBoxService, MessageBoxService>()
                 .RegisterSingleton<IConverter<Keys, HotkeyGesture>, KeysToHotkeyGestureConverter>()
                 .RegisterSingleton<IHotkeyConverter>(_ => HotkeyConverter.Instance);
             
