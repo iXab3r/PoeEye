@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Windows.Forms;
@@ -16,7 +17,6 @@ namespace PoeShared.Native
     public class WindowTracker : DisposableReactiveObject, IWindowTracker
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(WindowTracker));
-
         private static readonly TimeSpan RecheckPeriod = TimeSpan.FromMilliseconds(250);
         private static readonly TimeSpan SamplePeriod = TimeSpan.FromMilliseconds(100);
         private readonly IStringMatcher titleMatcher;
@@ -58,6 +58,8 @@ namespace PoeShared.Native
                 .SubscribeSafe(x => WindowActivated(x.ActiveWindow, x.Title, x.ProcessId), Log.HandleUiException)
                 .AddTo(Anchors);
         }
+
+        public int ExecutingProcessId => Environment.ProcessId;
 
         public string Name
         {

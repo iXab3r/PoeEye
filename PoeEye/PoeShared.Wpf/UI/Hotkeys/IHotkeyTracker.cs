@@ -1,4 +1,3 @@
-using System;
 using System.Collections.ObjectModel;
 using PoeShared.Scaffolding;
 
@@ -6,9 +5,11 @@ namespace PoeShared.UI
 {
     public interface IHotkeyTracker : IDisposableReactiveObject
     {
-        bool IsActive { get; set; }
+        bool IsActive { get; }
         
-        [Obsolete("Replaced with Hotkeys that supports multiple keys")]
+        /// <summary>
+        ///   Could be used in conjunction with Hotkeys collection to support multiple hotkeys
+        /// </summary>
         HotkeyGesture Hotkey { get; set; }
         
         ReadOnlyObservableCollection<HotkeyGesture> Hotkeys { get; }
@@ -16,8 +17,14 @@ namespace PoeShared.UI
         HotkeyMode HotkeyMode { get; set; }
         
         bool SuppressKey { get; set; }
+
+        bool IgnoreModifiers { get; set; }
+        
+        bool IsEnabled { get; set; }
         
         bool HandleApplicationKeys { get; set; }
+        
+        bool HasModifiers { get; }
 
         void Add(HotkeyGesture hotkeyToAdd);
 
