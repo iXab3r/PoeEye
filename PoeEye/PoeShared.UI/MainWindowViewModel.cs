@@ -23,6 +23,7 @@ namespace PoeShared.UI
 
         private Rectangle selectionRectangle;
         private Rect selectionRect;
+        private DisposableReactiveObject fakeDelay;
 
         public MainWindowViewModel(
             IAudioNotificationSelectorViewModel audioNotificationSelector,
@@ -52,6 +53,21 @@ namespace PoeShared.UI
             RandomPeriodSelector.UpperValue = TimeSpan.FromSeconds(3);
             NextRandomPeriodCommand = CommandWrapper.Create(() => RandomPeriod = randomPeriodSelector.GetValue());
             StartSelectionCommand = CommandWrapper.Create(HandleSelectionCommandExecuted);
+            SetCachedControlContentCommand = CommandWrapper.Create<object>(arg =>
+            {
+                if (arg is string name)
+                {
+                    FakeDelay = new FakeDelayStringViewModel() { Name = name };
+                }
+                else if (arg is int num)
+                {
+                    FakeDelay = new FakeDelayNumberViewModel() { Number = num };
+                }
+                else
+                {
+                    FakeDelay = null;
+                }
+            });
         }
 
         public ICommand StartSelectionCommand { get; }
@@ -81,8 +97,11 @@ namespace PoeShared.UI
         }
         
         public ISelectionAdornerViewModel SelectionAdorner { get; }
+        
         public IAudioNotificationSelectorViewModel AudioNotificationSelector { get; }
+        
         public IRandomPeriodSelector RandomPeriodSelector { get; }
+        
         public IHotkeySequenceEditorViewModel HotkeySequenceEditor { get; }
 
         public CommandWrapper LongCommand { get; }
@@ -92,6 +111,14 @@ namespace PoeShared.UI
         public ICommand NextRandomPeriodCommand { get; }
         
         public CommandWrapper AddTextNotification { get; }
+        
+        public ICommand SetCachedControlContentCommand { get; }
+
+        public DisposableReactiveObject FakeDelay
+        {
+            get => fakeDelay;
+            set => RaiseAndSetIfChanged(ref fakeDelay, value);
+        }
 
         private TimeSpan notificationTimeout = TimeSpan.Zero;
 

@@ -11,6 +11,8 @@
                     <eye:SharedResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/materialdesigncolor.bluegrey.xaml" />
                     <eye:SharedResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Accent/MaterialDesignColor.LightBlue.xaml" />
                     <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Generic.shared.xaml" />
+                    <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.UI;component/FakeDelayStringView.xaml" />
+                    <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.UI;component/FakeDelayNumberView.xaml" />
                </eye:SharedResourceDictionary.MergedDictionaries>
           </eye:SharedResourceDictionary>
      </Application.Resources>

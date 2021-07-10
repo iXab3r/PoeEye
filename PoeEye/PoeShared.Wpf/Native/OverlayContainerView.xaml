@@ -28,7 +28,7 @@
         <ItemsControl ItemsSource="{Binding Items}">
             <ItemsControl.ItemTemplate>
                 <DataTemplate DataType="{x:Type native:NotificationViewModelBase}">
-                    <ContentControl Content="{Binding}" />
+                    <eye:CachedContentControl Content="{Binding}" />
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
             <ItemsControl.ItemsPanel>

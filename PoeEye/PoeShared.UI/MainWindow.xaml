@@ -9,11 +9,79 @@
                  xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
                  mc:Ignorable="d"
                  xmlns:eye="http://coderush.net/poeeye/"
+                 xmlns:system="clr-namespace:System;assembly=System.Runtime"
                  WindowStartupLocation="CenterScreen"
                  Title="PoeShared Demo" Height="750" Width="800" d:DataContext="{d:DesignInstance local:MainWindowViewModel}">
     <Grid>
         <TabControl>
-             <TabItem Header="SelectionAdorner">
+            <TabItem Header="Misc">
+                <st:AutoGrid Columns="150,Auto" Rows="*" ChildMargin="5" VerticalAlignment="Top">
+                    <TextBlock Text="Random period selector" />
+                    <st:StackPanel MarginBetweenChildren="5" Orientation="Horizontal">
+                        <eye:CachedContentControl Content="{Binding RandomPeriodSelector}" />
+                        <eye:ButtonEx Content="Next" Command="{Binding NextRandomPeriodCommand}" />
+                        <TextBlock Text="{Binding RandomPeriod}" />
+                    </st:StackPanel>
+
+                    <TextBlock Text="Box with hint" />
+                    <TextBox materialDesign:HintAssist.Hint="With hint" />
+                    <TextBlock Text="Box without hint" />
+                    <TextBox />
+                    
+                    <TextBlock Text="Audio notification selector" />
+                    <st:StackPanel Orientation="Horizontal" MarginBetweenChildren="5">
+                        <eye:CachedContentControl Content="{Binding AudioNotificationSelector}" ContentTemplate="{StaticResource AudioNotificationSelectorButtonTemplate}"/>
+                        <eye:CachedContentControl Content="{Binding AudioNotificationSelector}"/>
+                    </st:StackPanel>
+                    
+                    <TextBlock Text="Cached content control" />
+                    <st:StackPanel Orientation="Horizontal" MarginBetweenChildren="5">
+                        <TextBlock Text="LOADED" Visibility="{Binding FakeDelay, Converter={StaticResource NullToCollapsedConverter}}"/>
+                        <TextBlock Text="NOT LOADED" Visibility="{Binding FakeDelay, Converter={StaticResource NotNullToCollapsedConverter}}"/>
+                        <eye:CachedContentControl Content="{Binding FakeDelay}"/>
+                        <eye:ButtonEx Content="NULL" Command="{Binding SetCachedControlContentCommand}" CommandParameter="{x:Null}"/>
+                        <eye:ButtonEx Content="Alpha" Command="{Binding SetCachedControlContentCommand}" CommandParameter="Alpha"/>
+                        <eye:ButtonEx Content="Beta" Command="{Binding SetCachedControlContentCommand}" CommandParameter="Beta"/>
+                        <eye:ButtonEx Content="#1" Command="{Binding SetCachedControlContentCommand}">
+                            <eye:ButtonEx.CommandParameter>
+                                <system:Int32>
+                                    1
+                                </system:Int32>
+                            </eye:ButtonEx.CommandParameter>
+                        </eye:ButtonEx>
+                        <eye:ButtonEx Content="#2" Command="{Binding SetCachedControlContentCommand}">
+                            <eye:ButtonEx.CommandParameter>
+                                <system:Int32>
+                                    2
+                                </system:Int32>
+                            </eye:ButtonEx.CommandParameter>
+                        </eye:ButtonEx>
+                    </st:StackPanel>
+                    
+                    <TextBlock Text="Combobox" />
+                    <ComboBox>
+                        <ComboBoxItem>Item 1</ComboBoxItem>
+                        <ComboBoxItem>Item 2</ComboBoxItem>
+                        <ComboBoxItem>Item 3</ComboBoxItem>
+                        <ComboBoxItem>Item 4</ComboBoxItem>
+                        <ComboBoxItem>Item 5</ComboBoxItem>
+                        <ComboBoxItem>Item 6</ComboBoxItem>
+                        <ComboBoxItem>Item 7</ComboBoxItem>
+                        <ComboBoxItem>Item 8</ComboBoxItem>
+                        <ComboBoxItem>Item 9</ComboBoxItem>
+                        <ComboBoxItem>Item 10</ComboBoxItem>
+                        <ComboBoxItem>Item 11</ComboBoxItem>
+                        <ComboBoxItem>Item 12</ComboBoxItem>
+                        <ComboBoxItem>Item 13</ComboBoxItem>
+                        <ComboBoxItem>Item 14</ComboBoxItem>
+                        <ComboBoxItem>Item 15</ComboBoxItem>
+                        <ComboBoxItem>Item 16</ComboBoxItem>
+                        <ComboBoxItem>Item 17</ComboBoxItem>
+                        <ComboBoxItem>Item 18</ComboBoxItem>
+                    </ComboBox>
+                </st:AutoGrid>
+            </TabItem>
+            <TabItem Header="SelectionAdorner">
                 <st:StackPanel MarginBetweenChildren="5" Orientation="Vertical" Fill="Fill">
                     <st:StackPanel Orientation="Horizontal" MarginBetweenChildren="5">
                         <eye:ButtonEx Command="{Binding StartSelectionCommand}">Start selection</eye:ButtonEx>
@@ -28,7 +96,7 @@
                         IsAdornerVisible="True" >
                         <eye:AdornedControl.AdornerContent>
                             <Grid>
-                                <ContentControl Content="{Binding SelectionAdorner}" />
+                                <eye:CachedContentControl Content="{Binding SelectionAdorner}" />
                             </Grid>
                         </eye:AdornedControl.AdornerContent>
                         <Grid>
@@ -62,49 +130,8 @@
                     <Label Background="{DynamicResource {x:Static SystemColors.InactiveSelectionHighlightBrushKey}}" Content="InactiveSelectionHighlightBrushKey"></Label>
                 </st:StackPanel>
             </TabItem>
-            <TabItem Header="Misc">
-                <st:AutoGrid Columns="150,Auto" Rows="*" ChildMargin="5" VerticalAlignment="Top">
-                    <TextBlock Text="Random period selector" />
-                    <st:StackPanel MarginBetweenChildren="5" Orientation="Horizontal">
-                        <ContentControl Content="{Binding RandomPeriodSelector}" />
-                        <eye:ButtonEx Content="Next" Command="{Binding NextRandomPeriodCommand}" />
-                        <TextBlock Text="{Binding RandomPeriod}" />
-                    </st:StackPanel>
-
-                    <TextBlock Text="Box with hint" />
-                    <TextBox materialDesign:HintAssist.Hint="With hint" />
-                    <TextBlock Text="Box without hint" />
-                    <TextBox />
-                    
-                    <TextBlock Text="Audio notification selector" />
-                    <st:StackPanel Orientation="Horizontal" MarginBetweenChildren="5">
-                        <ContentControl Content="{Binding AudioNotificationSelector}" ContentTemplate="{StaticResource AudioNotificationSelectorButtonTemplate}"/>
-                        <ContentControl Content="{Binding AudioNotificationSelector}"/>
-                    </st:StackPanel>
-                    
-                    <TextBlock Text="Combobox" />
-                    <ComboBox>
-                        <ComboBoxItem>Item 1</ComboBoxItem>
-                        <ComboBoxItem>Item 2</ComboBoxItem>
-                        <ComboBoxItem>Item 3</ComboBoxItem>
-                        <ComboBoxItem>Item 4</ComboBoxItem>
-                        <ComboBoxItem>Item 5</ComboBoxItem>
-                        <ComboBoxItem>Item 6</ComboBoxItem>
-                        <ComboBoxItem>Item 7</ComboBoxItem>
-                        <ComboBoxItem>Item 8</ComboBoxItem>
-                        <ComboBoxItem>Item 9</ComboBoxItem>
-                        <ComboBoxItem>Item 10</ComboBoxItem>
-                        <ComboBoxItem>Item 11</ComboBoxItem>
-                        <ComboBoxItem>Item 12</ComboBoxItem>
-                        <ComboBoxItem>Item 13</ComboBoxItem>
-                        <ComboBoxItem>Item 14</ComboBoxItem>
-                        <ComboBoxItem>Item 15</ComboBoxItem>
-                        <ComboBoxItem>Item 16</ComboBoxItem>
-                        <ComboBoxItem>Item 17</ComboBoxItem>
-                        <ComboBoxItem>Item 18</ComboBoxItem>
-                    </ComboBox>
-                    <local:AdornerTest/>
-                </st:AutoGrid>
+            <TabItem Header="BusyIndicator">
+                <local:AdornerTest/>
             </TabItem>
             <TabItem Header="Notifications">
                 <st:AutoGrid Columns="150,Auto" Rows="*" ChildMargin="5" VerticalAlignment="Top">
@@ -157,7 +184,7 @@
                             Value="{Binding HotkeySequenceEditor.MousePositionRecordingResolution, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource TimeSpanToMillisecondsConverter}}" />
                     </st:AutoGrid>
 
-                    <ContentControl Content="{Binding HotkeySequenceEditor}" Margin="10" />
+                    <eye:CachedContentControl Content="{Binding HotkeySequenceEditor}" Margin="10" />
                 </st:StackPanel>
             </TabItem>
             <TabItem Header="ButtonEx">

@@ -276,7 +276,7 @@
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type eye:HotkeySequenceEditor}">
                     <st:StackPanel MarginBetweenChildren="10">
-                        <ContentControl
+                        <eye:CachedContentControl
                             ContentTemplate="{StaticResource HotkeySequenceEditorMenuTemplate}"
                             Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type eye:HotkeySequenceEditor}}, Path=ViewModel}" />
                         <ListView

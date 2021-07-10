@@ -1,0 +1,20 @@
+﻿<ui:SharedResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                              xmlns:ui="clr-namespace:PoeShared.UI">
+    <ui:SharedResourceDictionary.MergedDictionaries>
+        <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Converters.xaml" />
+    </ui:SharedResourceDictionary.MergedDictionaries>
+
+    <Style x:Key="DefaultCachedContentControlStyle" TargetType="{x:Type ui:CachedContentControl}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ui:CachedContentControl}">
+                        <ContentControl Content="{TemplateBinding CachedContent}" ContentTemplate="{TemplateBinding ContentTemplate}"
+                                        Visibility="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Content, Converter={StaticResource NullToCollapsedConverter}}"></ContentControl>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type ui:CachedContentControl}" BasedOn="{StaticResource DefaultCachedContentControlStyle}" />
+</ui:SharedResourceDictionary>

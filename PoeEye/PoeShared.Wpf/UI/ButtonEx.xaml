@@ -104,14 +104,14 @@
                                        VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
                                        Orientation="Horizontal">
                             <Grid>
-                                <ContentControl x:Name="IconLabel"
-                                                Foreground="{TemplateBinding Foreground}"
-                                                FontSize="{TemplateBinding FontSize}"
-                                                FontFamily="{StaticResource FontAwesome}"
-                                                HorizontalAlignment="Stretch"
-                                                Content="{Binding Icon, RelativeSource={RelativeSource TemplatedParent}}"
-                                                Visibility="{Binding Icon, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource NullToCollapsedConverter}}"
-                                                MinWidth="20" />
+                                <eye:CachedContentControl x:Name="IconLabel"
+                                                          Foreground="{TemplateBinding Foreground}"
+                                                          FontSize="{TemplateBinding FontSize}"
+                                                          FontFamily="{StaticResource FontAwesome}"
+                                                          HorizontalAlignment="Stretch"
+                                                          Content="{Binding Icon, RelativeSource={RelativeSource TemplatedParent}}"
+                                                          Visibility="{Binding Icon, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource NullToCollapsedConverter}}"
+                                                          MinWidth="20" />
                                 <TextBlock x:Name="ErrorIcon" FontSize="{TemplateBinding FontSize}"
                                            ToolTip="{Binding Command.Error, RelativeSource={RelativeSource TemplatedParent}}"
                                            Style="{StaticResource CommandWrapperIndicatorErrorStyleKey}"

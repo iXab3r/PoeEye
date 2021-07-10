@@ -1,0 +1,13 @@
+﻿<eye:SharedResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                              xmlns:eye="http://coderush.net/poeeye/"
+                              xmlns:ui="clr-namespace:PoeShared.UI"
+                              xmlns:st="http://schemas.spicytaco.io/">
+    <DataTemplate DataType="{x:Type ui:FakeDelayNumberViewModel}">
+        <st:StackPanel Orientation="Horizontal" MarginBetweenChildren="5">
+            <eye:FakeDelayControl/>
+            <TextBlock Text="NUM"/>
+            <TextBlock Text="{Binding Number}"/>
+        </st:StackPanel>
+    </DataTemplate>
+</eye:SharedResourceDictionary>

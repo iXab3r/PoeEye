@@ -10,6 +10,7 @@
         <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/UI/Hotkeys/HotKeyBox.xaml" />
         <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/UI/Hotkeys/HotkeySequenceEditor.xaml" />
         <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/UI/RandomPeriodSelector.xaml" />
+        <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/UI/CachedContentControl.xaml" />
         <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/UI/Settings/GenericSettingsView.xaml" />
         <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Audio/Views/AudioNotificationTypeSelectorView.xaml" />
         <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Audio/Views/WaveOutDeviceSelectorView.xaml" />

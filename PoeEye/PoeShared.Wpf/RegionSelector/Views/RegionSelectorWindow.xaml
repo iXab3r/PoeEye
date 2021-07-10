@@ -28,7 +28,7 @@
     <eye:AdornedControl IsAdornerVisible="True">
         <eye:AdornedControl.AdornerContent>
             <Grid>
-                <ContentControl Content="{Binding SelectionAdorner}"/>
+                <eye:CachedContentControl Content="{Binding SelectionAdorner}"/>
             </Grid>
         </eye:AdornedControl.AdornerContent>
                     

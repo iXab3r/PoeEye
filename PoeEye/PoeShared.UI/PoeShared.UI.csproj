@@ -38,5 +38,11 @@
       <Compile Update="MainWindowViewModel.cs">
         <DependentUpon>MainWindow.xaml</DependentUpon>
       </Compile>
+      <Compile Update="FakeDelayStringViewModel.cs">
+        <DependentUpon>FakeDelayStringView.xaml</DependentUpon>
+      </Compile>
+      <Compile Update="FakeDelayNumberViewModel.cs">
+        <DependentUpon>FakeDelayNumberView.xaml</DependentUpon>
+      </Compile>
     </ItemGroup>
 </Project>
