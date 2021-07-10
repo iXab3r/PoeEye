@@ -5,7 +5,6 @@
                     xmlns:wpf="clr-namespace:PoeShared.Scaffolding.WPF"
                     xmlns:viewModels11="clr-namespace:PoeShared.Dialogs.ViewModels">
     <ui:SharedResourceDictionary.MergedDictionaries>
-        <ui:SharedResourceDictionary Source="pack://application:,,,/EyeAuras;component/Themes/Converters.xaml" />
         <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/CommandWrapperView.xaml" />
     </ui:SharedResourceDictionary.MergedDictionaries>
     
