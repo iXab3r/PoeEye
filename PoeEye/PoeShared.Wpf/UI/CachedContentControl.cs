@@ -1,8 +1,12 @@
-﻿using System;
+﻿using System.ComponentModel;
 using System.Windows;
+using System.Windows.Markup;
 
 namespace PoeShared.UI
 {
+    [DefaultProperty("Content")]
+    [ContentProperty("Content")]
+    [Localizability(LocalizationCategory.None, Readability = Readability.Unreadable)]
     public class CachedContentControl : ReactiveControl
     {
         public static readonly DependencyProperty ContentProperty = DependencyProperty.Register(
@@ -39,7 +43,7 @@ namespace PoeShared.UI
 
         private static void OnContentChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var ctrl = (CachedContentControl)d;
+            var ctrl = (CachedContentControl) d;
             if (e.NewValue != null)
             {
                 d.SetValue(CachedContentProperty, e.NewValue);
