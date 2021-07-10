@@ -5,7 +5,8 @@ using System.Reflection;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using log4net;
-using Splat;
+using PoeShared.Logging;
+using LogLevel = Splat.LogLevel;
 
 namespace PoeShared
 {
@@ -24,6 +25,22 @@ namespace PoeShared
             Guard.ArgumentNotNull(exception, nameof(exception));
 
             logger.Error("UI Exception occurred", exception);
+            SharedLog.Instance.Errors.OnNext(exception);
+        }
+        
+        public static void HandleException(this IFluentLog logger, [NotNull] Exception exception)
+        {
+            Guard.ArgumentNotNull(logger, nameof(logger));
+            Guard.ArgumentNotNull(exception, nameof(exception));
+
+            logger.Error($"Exception occurred", exception);
+        }
+
+        public static void HandleUiException(this IFluentLog logger, [NotNull] Exception exception)
+        {
+            Guard.ArgumentNotNull(exception, nameof(exception));
+
+            logger.Error($"UI Exception occurred", exception);
             SharedLog.Instance.Errors.OnNext(exception);
         }
         

@@ -7,6 +7,8 @@ using System.Reactive.Disposables;
 using System.Reactive.Subjects;
 using System.Runtime.CompilerServices;
 using JetBrains.Annotations;
+using log4net;
+using PoeShared.Logging;
 using ReactiveUI;
 
 namespace PoeShared.Scaffolding
@@ -83,7 +85,6 @@ namespace PoeShared.Scaffolding
 
         public void RaisingPropertyChanging(string propertyName)
         {
-            
         }
     }
 }

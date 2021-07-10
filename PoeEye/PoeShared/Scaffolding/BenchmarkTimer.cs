@@ -5,15 +5,16 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using JetBrains.Annotations;
 using log4net;
+using PoeShared.Logging;
 
 namespace PoeShared.Scaffolding
 {
     public sealed class BenchmarkTimer : IDisposable
     {
-        private static readonly ILog DefaultLogger = LogManager.GetLogger(typeof(BenchmarkTimer));
+        private static readonly IFluentLog DefaultLogger = LogManager.GetLogger(typeof(BenchmarkTimer)).ToFluent();
 
         private readonly string benchmarkName;
-        private readonly ILog logger;
+        private readonly IFluentLog logger;
         private readonly string propertyName;
         private readonly ConcurrentQueue<string> operations = new ConcurrentQueue<string>();
         private TimeSpan previousOperationTimestamp;
@@ -23,7 +24,10 @@ namespace PoeShared.Scaffolding
         private bool logEachStep = true;
         private bool logOnDisposal = false;
 
-        public BenchmarkTimer(string benchmarkName, ILog logger = null, [CallerMemberName] string propertyName = null)
+        public BenchmarkTimer(string benchmarkName, ILog logger, [CallerMemberName] string propertyName = null) : this(benchmarkName, logger?.ToFluent(), propertyName)
+        {
+        }
+        public BenchmarkTimer(string benchmarkName, IFluentLog logger = null, [CallerMemberName] string propertyName = null)
         {
             this.benchmarkName = benchmarkName;
             this.logger = logger ?? DefaultLogger;
@@ -99,7 +103,7 @@ namespace PoeShared.Scaffolding
             operations.Enqueue(logMessage);
             if (logEachStep && logger.IsDebugEnabled)
             {
-                logger.Debug(logMessage);
+                logger.Debug(FormattableStringFactory.Create(logMessage));
             }
             previousOperationTimestamp = timestamp;
         }
