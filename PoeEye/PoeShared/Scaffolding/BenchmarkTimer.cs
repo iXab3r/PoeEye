@@ -103,7 +103,7 @@ namespace PoeShared.Scaffolding
             operations.Enqueue(logMessage);
             if (logEachStep && logger.IsDebugEnabled)
             {
-                logger.Debug(FormattableStringFactory.Create(logMessage));
+                logger.Debug(() => logMessage);
             }
             previousOperationTimestamp = timestamp;
         }
