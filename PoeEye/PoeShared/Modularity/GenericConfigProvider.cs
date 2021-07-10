@@ -7,8 +7,10 @@ using System.Threading;
 using JetBrains.Annotations;
 using KellermanSoftware.CompareNetObjects;
 using log4net;
+using PoeShared.Logging;
 using PoeShared.Prism;
-using PoeShared.Scaffolding;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 using PoeShared.Services;
 using ReactiveUI;
 using Unity;
@@ -17,7 +19,7 @@ namespace PoeShared.Modularity
 {
     public sealed class GenericConfigProvider<TConfig> : DisposableReactiveObject, IConfigProvider<TConfig> where TConfig : class, IPoeEyeConfig, new()
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(GenericConfigProvider<TConfig>));
+        private static readonly IFluentLog Log = typeof(GenericConfigProvider<TConfig>).PrepareLogger();
 
         private readonly IComparisonService comparisonService;
         private readonly IConfigProvider configProvider;

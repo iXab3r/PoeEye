@@ -7,13 +7,14 @@ using System.Windows.Threading;
 using log4net;
 using PoeShared.Modularity;
 using PoeShared.Prism;
-using PoeShared.Scaffolding;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 
 namespace PoeShared.UI
 {
     internal sealed class ExceptionDialogDisplayer : DisposableReactiveObject, IExceptionDialogDisplayer
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(ExceptionDialogDisplayer));
+        private static readonly IFluentLog Log = typeof(ExceptionDialogDisplayer).PrepareLogger();
         private readonly IAppArguments appArguments;
         private readonly IFactory<ExceptionDialogViewModel, ICloseController> dialogViewModelFactory;
         private readonly SerialDisposable activeWindowAnchors = new SerialDisposable();

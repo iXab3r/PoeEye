@@ -6,14 +6,15 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using DynamicData;
 using log4net;
-using PoeShared.Scaffolding;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 using ReactiveUI;
 
 namespace PoeShared.UI
 {
     public abstract class TreeViewItemViewModel : DisposableReactiveObject, ITreeViewItemViewModel
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(TreeViewItemViewModel));
+        private static readonly IFluentLog Log = typeof(TreeViewItemViewModel).PrepareLogger();
 
         private readonly SourceList<TreeViewItemViewModel> children = new();
 

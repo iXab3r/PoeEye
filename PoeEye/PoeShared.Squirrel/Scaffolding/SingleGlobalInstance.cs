@@ -4,13 +4,15 @@ using System.IO;
 using System.Reactive.Disposables;
 using System.Threading;
 using log4net;
+using PoeShared.Logging;
+using PoeShared.Scaffolding;
 using Splat;
 
 namespace PoeShared.Squirrel.Scaffolding
 {
     internal sealed class SingleGlobalInstance : IDisposable, IEnableLogger
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(SingleGlobalInstance));
+        private static readonly IFluentLog Log = typeof(SingleGlobalInstance).PrepareLogger();
 
         private IDisposable handle;
 

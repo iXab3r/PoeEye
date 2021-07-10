@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Globalization;
 using System.Windows.Data;
-using PoeShared.Scaffolding;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 
 namespace PoeShared.Converters
 {

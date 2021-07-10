@@ -13,7 +13,8 @@ using PInvoke;
 using PoeShared.Modularity;
 using PoeShared.Native;
 using PoeShared.Prism;
-using PoeShared.Scaffolding;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 using ReactiveUI;
 using Unity;
 

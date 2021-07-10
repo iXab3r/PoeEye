@@ -8,7 +8,7 @@ namespace PoeShared.Logging
     /// <summary>
     ///     A class holding log data before being written.
     /// </summary>
-    public struct LogData
+    internal struct LogData
     {
         /// <summary>
         ///     Gets or sets the trace level.
@@ -16,7 +16,7 @@ namespace PoeShared.Logging
         /// <value>
         ///     The trace level.
         /// </value>
-        public LogLevel LogLevel { get; set; }
+        public FluentLogLevel LogLevel { get; set; }
 
         /// <summary>
         ///     Gets or sets the message.
@@ -121,7 +121,7 @@ namespace PoeShared.Logging
         /// </summary>
         internal void Reset()
         {
-            LogLevel = LogLevel.Trace;
+            LogLevel = FluentLogLevel.Trace;
             Message = null;
             PrefixProvider = null;
             Exception = null;

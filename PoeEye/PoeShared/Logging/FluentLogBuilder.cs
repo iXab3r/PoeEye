@@ -1,13 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace PoeShared.Logging
 {
     internal sealed class FluentLogBuilder : IFluentLog
     {
-        private readonly ILogWriter logWriter;
         private readonly LogData logData;
+        private readonly ILogWriter logWriter;
 
         public FluentLogBuilder(ILogWriter logWriter, LogData logData = new LogData())
         {
@@ -15,27 +13,195 @@ namespace PoeShared.Logging
             this.logData = logData;
         }
 
-        public IFluentLog WithPrefix(object prefix)
+        public bool IsDebugEnabled => logWriter.IsDebugEnabled;
+
+        public bool IsInfoEnabled => logWriter.IsInfoEnabled;
+
+        public bool IsWarnEnabled => logWriter.IsWarnEnabled;
+
+        public bool IsErrorEnabled => logWriter.IsErrorEnabled;
+
+        LogData IFluentLog.Data => logData;
+
+        IFluentLog IFluentLog.WithLogData(LogData newLogData)
         {
-            var newLogData = logData.WithPrefix(() => $"[{prefix}] ");
             return new FluentLogBuilder(logWriter, newLogData);
         }
 
-        public IFluentLog WithTable<T>(IEnumerable<T> items, string separator = "\n\t")
+        public void Debug(string message)
         {
-            var newLogData = logData.WithSuffix(() =>
+            if (!IsDebugEnabled)
             {
-                var result = new StringBuilder();
-                var count = 0;
-                foreach (var item in items)
-                {
-                    result.Append(separator);
-                    count++;
-                    result.Append($"#{count} {item}");
-                }
-                return $"{separator}Items: {count}{result}";
-            });
-            return new FluentLogBuilder(logWriter, newLogData);
+                return;
+            }
+
+            Debug(message, default);
+        }
+
+        public void Debug(string message, Exception exception)
+        {
+            if (!IsDebugEnabled)
+            {
+                return;
+            }
+
+            var newLogData = logData;
+            newLogData.LogLevel = FluentLogLevel.Debug;
+            newLogData.Message = message;
+            newLogData.Exception = exception;
+            logWriter.WriteLog(newLogData);
+        }
+
+        public void Info(string message)
+        {
+            if (!IsInfoEnabled)
+            {
+                return;
+            }
+
+            Info(message, default);
+        }
+
+        public void Info(string message, Exception exception)
+        {
+            if (!IsInfoEnabled)
+            {
+                return;
+            }
+
+            var newLogData = logData;
+            newLogData.LogLevel = FluentLogLevel.Info;
+            newLogData.Message = message;
+            newLogData.Exception = exception;
+            logWriter.WriteLog(newLogData);
+        }
+
+        public void Warn(string message)
+        {
+            if (!IsWarnEnabled)
+            {
+                return;
+            }
+
+            Warn(message, default);
+        }
+
+        public void Warn(string message, Exception exception)
+        {
+            if (!IsWarnEnabled)
+            {
+                return;
+            }
+
+            var newLogData = logData;
+            newLogData.LogLevel = FluentLogLevel.Warn;
+            newLogData.Message = message;
+            newLogData.Exception = exception;
+            logWriter.WriteLog(newLogData);
+        }
+
+        public void Error(string message)
+        {
+            if (!IsErrorEnabled)
+            {
+                return;
+            }
+
+            Error(message, default);
+        }
+
+        public void Error(string message, Exception exception)
+        {
+            if (!IsErrorEnabled)
+            {
+                return;
+            }
+
+            var newLogData = logData;
+            newLogData.LogLevel = FluentLogLevel.Error;
+            newLogData.Message = message;
+            newLogData.Exception = exception;
+            logWriter.WriteLog(newLogData);
+        }
+
+        public void Debug(Func<string> message)
+        {
+            if (!IsDebugEnabled)
+            {
+                return;
+            }
+
+            Debug(message, default);
+        }
+
+        public void Debug(Func<string> message, Exception exception)
+        {
+            if (!IsDebugEnabled)
+            {
+                return;
+            }
+
+            Debug(message(), exception);
+        }
+
+        public void Info(Func<string> message)
+        {
+            if (!IsInfoEnabled)
+            {
+                return;
+            }
+
+            Info(message, default);
+        }
+
+        public void Info(Func<string> message, Exception exception)
+        {
+            if (!IsInfoEnabled)
+            {
+                return;
+            }
+
+            Info(message(), exception);
+        }
+
+        public void Warn(Func<string> message)
+        {
+            if (!IsWarnEnabled)
+            {
+                return;
+            }
+
+            Warn(message, default);
+        }
+
+        public void Warn(Func<string> message, Exception exception)
+        {
+            if (!IsWarnEnabled)
+            {
+                return;
+            }
+
+            Warn(message(), default);
+        }
+
+        public void Error(Func<string> message)
+        {
+            if (!IsErrorEnabled)
+            {
+                return;
+            }
+
+            Error(message, default);
+        }
+
+        public void Error(Func<string> message, Exception exception)
+        {
+            if (!IsErrorEnabled)
+            {
+                return;
+            }
+
+            Error(message(), default);
         }
 
         public void Debug(FormattableString message)
@@ -44,9 +210,8 @@ namespace PoeShared.Logging
             {
                 return;
             }
-            var newLogData = logData;
-            newLogData.Message = message.ToString();
-            logWriter.WriteLog(newLogData);
+
+            Debug(message.ToString);
         }
 
         public void Debug(FormattableString message, Exception exception)
@@ -55,11 +220,8 @@ namespace PoeShared.Logging
             {
                 return;
             }
-            var newLogData = logData;
-            newLogData.LogLevel = LogLevel.Debug;
-            newLogData.Message = message.ToString();
-            newLogData.Exception = exception;
-            logWriter.WriteLog(newLogData);
+
+            Debug(message.ToString, exception);
         }
 
         public void Info(FormattableString message)
@@ -68,10 +230,8 @@ namespace PoeShared.Logging
             {
                 return;
             }
-            var newLogData = logData;
-            newLogData.LogLevel = LogLevel.Info;
-            newLogData.Message = message.ToString();
-            logWriter.WriteLog(newLogData);
+
+            Info(message.ToString);
         }
 
         public void Info(FormattableString message, Exception exception)
@@ -80,11 +240,8 @@ namespace PoeShared.Logging
             {
                 return;
             }
-            var newLogData = logData;
-            newLogData.LogLevel = LogLevel.Info;
-            newLogData.Message = message.ToString();
-            newLogData.Exception = exception;
-            logWriter.WriteLog(newLogData);
+
+            Info(message.ToString);
         }
 
         public void Warn(FormattableString message)
@@ -93,10 +250,8 @@ namespace PoeShared.Logging
             {
                 return;
             }
-            var newLogData = logData;
-            newLogData.LogLevel = LogLevel.Warn;
-            newLogData.Message = message.ToString();
-            logWriter.WriteLog(newLogData);
+
+            Warn(message.ToString);
         }
 
         public void Warn(FormattableString message, Exception exception)
@@ -105,11 +260,8 @@ namespace PoeShared.Logging
             {
                 return;
             }
-            var newLogData = logData;
-            newLogData.LogLevel = LogLevel.Warn;
-            newLogData.Message = message.ToString();
-            newLogData.Exception = exception;
-            logWriter.WriteLog(newLogData);
+
+            Warn(message.ToString);
         }
 
         public void Error(FormattableString message)
@@ -118,10 +270,8 @@ namespace PoeShared.Logging
             {
                 return;
             }
-            var newLogData = logData;
-            newLogData.LogLevel = LogLevel.Warn;
-            newLogData.Message = message.ToString();
-            logWriter.WriteLog(newLogData);
+
+            Error(message.ToString);
         }
 
         public void Error(FormattableString message, Exception exception)
@@ -130,19 +280,8 @@ namespace PoeShared.Logging
             {
                 return;
             }
-            var newLogData = logData;
-            newLogData.LogLevel = LogLevel.Warn;
-            newLogData.Message = message.ToString();
-            newLogData.Exception = exception;
-            logWriter.WriteLog(newLogData);
+
+            Error(message.ToString);
         }
-
-        public bool IsDebugEnabled => logWriter.IsDebugEnabled;
-
-        public bool IsInfoEnabled =>  logWriter.IsInfoEnabled;
-
-        public bool IsWarnEnabled =>  logWriter.IsWarnEnabled;
-
-        public bool IsErrorEnabled =>  logWriter.IsErrorEnabled;
     }
 }

@@ -7,12 +7,14 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using log4net;
 using PInvoke;
+using PoeShared.Logging;
+using PoeShared.Scaffolding;
 
 namespace PoeShared.Native
 {
     public class ApplicationUtils
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(ApplicationUtils));
+        private static readonly IFluentLog Log = typeof(ApplicationUtils).PrepareLogger();
 
         static ApplicationUtils()
         {

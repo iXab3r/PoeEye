@@ -1,6 +1,7 @@
 ﻿using log4net;
 using PoeShared.Modularity;
-using PoeShared.Scaffolding;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 using PoeShared.Squirrel.Updater;
 using PoeShared.Wpf.Scaffolding;
 using Prism.Ioc;
@@ -11,7 +12,7 @@ namespace PoeShared.Squirrel.Prism
 {
     public sealed class UpdaterModule : IModule
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(UpdaterModule));
+        private static readonly IFluentLog Log = typeof(UpdaterModule).PrepareLogger();
 
         private readonly IUnityContainer container;
 

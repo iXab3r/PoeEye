@@ -7,7 +7,8 @@ using System.Text;
 using System.Text.RegularExpressions;
 using DeltaCompressionDotNet.MsDelta;
 using log4net;
-using PoeShared.Scaffolding;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 using PoeShared.Squirrel.Scaffolding;
 using SharpCompress.Archives;
 using SharpCompress.Archives.Zip;
@@ -22,7 +23,7 @@ namespace PoeShared.Squirrel.Core
 {
     public class DeltaPackageBuilder : IEnableLogger, IDeltaPackageBuilder
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(DeltaPackageBuilder));
+        private static readonly IFluentLog Log = typeof(DeltaPackageBuilder).PrepareLogger();
 
         private readonly string localAppDirectory;
 
@@ -83,7 +84,7 @@ namespace PoeShared.Squirrel.Core
                     .ForEach(
                         x =>
                         {
-                            Log.InfoFormat("{0} was in old package but not in new one, deleting", x);
+                            Log.Info($"{x} was in old package but not in new one, deleting");
                             File.Delete(Path.Combine(workingPath, x));
                         });
 
@@ -94,11 +95,11 @@ namespace PoeShared.Squirrel.Core
                     .ForEach(
                         x =>
                         {
-                            Log.InfoFormat("Updating metadata file: {0}", x);
+                            Log.Info($"Updating metadata file: {x}");
                             File.Copy(Path.Combine(deltaPath, x), Path.Combine(workingPath, x), true);
                         });
 
-                Log.InfoFormat("Repacking into full package: {0}", outputFile);
+                Log.Info($"Repacking into full package: {outputFile}");
                 using (var za = ZipArchive.Create())
                 using (var tgt = File.OpenWrite(outputFile ?? throw new ArgumentNullException(nameof(outputFile))))
                 {
@@ -126,7 +127,7 @@ namespace PoeShared.Squirrel.Core
 
             if (!baseFileListing.ContainsKey(relativePath))
             {
-                Log.InfoFormat("{0} not found in base package, marking as new", relativePath);
+                Log.Info($"{relativePath} not found in base package, marking as new");
                 return;
             }
 
@@ -135,7 +136,7 @@ namespace PoeShared.Squirrel.Core
 
             if (BytesAreIdentical(oldData, newData))
             {
-                Log.InfoFormat("{0} hasn't changed, writing dummy file", relativePath);
+                Log.Info($"{relativePath} hasn't changed, writing dummy file");
 
                 File.Create(targetFile.FullName + ".diff").Dispose();
                 File.Create(targetFile.FullName + ".shasum").Dispose();
@@ -143,7 +144,7 @@ namespace PoeShared.Squirrel.Core
                 return;
             }
 
-            Log.InfoFormat("Delta patching {0} => {1}", baseFileListing[relativePath], targetFile.FullName);
+            Log.Info($"Delta patching {baseFileListing[relativePath]} => {targetFile.FullName}");
             var msDelta = new MsDeltaCompression();
 
             if (targetFile.Extension.Equals(".exe", StringComparison.OrdinalIgnoreCase) ||
@@ -157,7 +158,7 @@ namespace PoeShared.Squirrel.Core
                 }
                 catch (Exception)
                 {
-                    Log.WarnFormat("We couldn't create a delta for {0}, attempting to create bsdiff", targetFile.Name);
+                    Log.Warn($"We couldn't create a delta for {targetFile.Name}, attempting to create bsdiff");
                 }
             }
 
@@ -204,7 +205,7 @@ namespace PoeShared.Squirrel.Core
                 // NB: Zero-length diffs indicate the file hasn't actually changed
                 if (new FileInfo(inputFile).Length == 0)
                 {
-                    Log.InfoFormat("{0} exists unchanged, skipping", relativeFilePath);
+                    Log.Info($"{relativeFilePath} exists unchanged, skipping");
                     return;
                 }
 
@@ -213,7 +214,7 @@ namespace PoeShared.Squirrel.Core
                     using (var of = File.OpenWrite(tempTargetFile))
                     using (var inf = File.OpenRead(finalTarget))
                     {
-                        Log.InfoFormat("Applying BSDiff to {0}", relativeFilePath);
+                        Log.Info($"Applying BSDiff to {relativeFilePath}");
                         BinaryPatchUtility.Apply(inf, () => File.OpenRead(inputFile), of);
                     }
 
@@ -221,7 +222,7 @@ namespace PoeShared.Squirrel.Core
                 }
                 else if (relativeFilePath.EndsWith(".diff", StringComparison.InvariantCultureIgnoreCase))
                 {
-                    Log.InfoFormat("Applying MSDiff to {0}", relativeFilePath);
+                    Log.Info($"Applying MSDiff to {relativeFilePath}");
                     var msDelta = new MsDeltaCompression();
                     msDelta.ApplyDelta(inputFile, finalTarget, tempTargetFile);
 
@@ -232,7 +233,7 @@ namespace PoeShared.Squirrel.Core
                     using (var of = File.OpenWrite(tempTargetFile))
                     using (var inf = File.OpenRead(inputFile))
                     {
-                        Log.InfoFormat("Adding new file: {0}", relativeFilePath);
+                        Log.Info($"Adding new file: {relativeFilePath}");
                         inf.CopyTo(of);
                     }
                 }
@@ -267,21 +268,14 @@ namespace PoeShared.Squirrel.Core
 
             if (expectedReleaseEntry.Filesize != actualReleaseEntry.Filesize)
             {
-                Log.WarnFormat(
-                        "Patched file {0} has incorrect size, expected {1}, got {2}",
-                        relativeFilePath,
-                        expectedReleaseEntry.Filesize,
-                        actualReleaseEntry.Filesize);
+                Log.Warn($"Patched file {relativeFilePath} has incorrect size, expected {expectedReleaseEntry.Filesize}, got {actualReleaseEntry.Filesize}");
                 throw new ChecksumFailedException {Filename = relativeFilePath};
             }
 
             if (expectedReleaseEntry.SHA1 != actualReleaseEntry.SHA1)
             {
-                Log.WarnFormat(
-                        "Patched file {0} has incorrect SHA1, expected {1}, got {2}",
-                        relativeFilePath,
-                        expectedReleaseEntry.SHA1,
-                        actualReleaseEntry.SHA1);
+                Log.Warn(
+                        $"Patched file {relativeFilePath} has incorrect SHA1, expected {expectedReleaseEntry.SHA1}, got {actualReleaseEntry.SHA1}");
                 throw new ChecksumFailedException {Filename = relativeFilePath};
             }
         }

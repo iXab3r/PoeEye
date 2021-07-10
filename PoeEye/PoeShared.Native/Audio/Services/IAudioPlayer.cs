@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
-using PoeShared.Scaffolding;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 
 namespace PoeShared.Audio.Services
 {

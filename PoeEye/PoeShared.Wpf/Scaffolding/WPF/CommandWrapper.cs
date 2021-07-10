@@ -5,6 +5,7 @@ using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using log4net;
+using PoeShared.Logging;
 using Prism.Commands;
 using ReactiveUI;
 
@@ -12,7 +13,7 @@ namespace PoeShared.Scaffolding.WPF
 {
     public sealed class CommandWrapper : DisposableReactiveObject, ICommand
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(CommandWrapper));
+        private static readonly IFluentLog Log = typeof(CommandWrapper).PrepareLogger();
 
         private readonly ISubject<bool> isExecuting = new Subject<bool>();
 

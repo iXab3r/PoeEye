@@ -1,7 +1,8 @@
 using System.ComponentModel;
 using Moq;
 using NUnit.Framework;
-using PoeShared.Scaffolding;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 
 namespace PoeShared.Tests.Scaffolding
 {

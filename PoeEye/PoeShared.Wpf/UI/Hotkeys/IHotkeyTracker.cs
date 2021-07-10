@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
-using PoeShared.Scaffolding;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 
 namespace PoeShared.UI
 {

@@ -2,12 +2,13 @@
 using System.ComponentModel;
 using System.Linq;
 using log4net;
+using PoeShared.Logging;
 
 namespace PoeShared.Scaffolding.WPF
 {
     public static class EnumHelper
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(EnumHelper));
+        private static readonly IFluentLog Log = typeof(EnumHelper).PrepareLogger();
 
         public static TEnum ParseEnumSafe<TEnum>(this string instance, TEnum defaultValue = default(TEnum)) where TEnum : struct
         {

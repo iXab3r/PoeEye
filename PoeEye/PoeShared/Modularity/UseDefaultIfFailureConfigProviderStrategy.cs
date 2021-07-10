@@ -1,11 +1,14 @@
 ﻿using System.IO;
 using log4net;
+using PoeShared.Logging;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 
 namespace PoeShared.Modularity
 {
     public sealed class UseDefaultIfFailureConfigProviderStrategy : IConfigProviderStrategy
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(UseDefaultIfFailureConfigProviderStrategy));
+        private static readonly IFluentLog Log = typeof(UseDefaultIfFailureConfigProviderStrategy).PrepareLogger();
 
         public void HandleConfigSave(FileInfo configFile)
         {

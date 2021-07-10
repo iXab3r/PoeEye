@@ -12,7 +12,8 @@ using System.Threading.Tasks;
 using log4net;
 using PInvoke;
 using PoeShared.Prism;
-using PoeShared.Scaffolding;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 using Unity;
 using Win32Exception = System.ComponentModel.Win32Exception;
 
@@ -21,7 +22,7 @@ namespace PoeShared.Native
     [SuppressMessage("ReSharper", "IdentifierTypo")]
     public sealed class WinEventHookWrapper : DisposableReactiveObject, IWinEventHookWrapper
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(WinEventHookWrapper));
+        private static readonly IFluentLog Log = typeof(WinEventHookWrapper).PrepareLogger();
 
         private readonly WinEventHookArguments hookArgs;
         private readonly IScheduler bgScheduler;
@@ -121,7 +122,7 @@ namespace PoeShared.Native
             {
                 try
                 {
-                    Log.Info("Event loop started");
+                    Log.Info($"Event loop started");
                     while(GetMessage(out var msg, IntPtr.Zero, 0, 0 ))
                     { 
                         try
@@ -136,18 +137,18 @@ namespace PoeShared.Native
                         }
                         catch (Exception e)
                         {
-                            Log.Warn("Exception in EventLoop", e);
+                            Log.Warn($"Exception in EventLoop", e);
                         }
                         
                     } 
                 }
                 catch (Exception e)
                 {
-                    Log.Error("Unhandled exception in EventLoop thread", e);
+                    Log.Error($"Unhandled exception in EventLoop thread", e);
                 }
                 finally
                 {
-                    Log.Info("");
+                    Log.Info($"Event loop completed");
                 }
             }
             

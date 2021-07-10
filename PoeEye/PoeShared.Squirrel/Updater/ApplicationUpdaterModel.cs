@@ -9,7 +9,8 @@ using System.Threading.Tasks;
 using System.Windows;
 using log4net;
 using PoeShared.Modularity;
-using PoeShared.Scaffolding;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 using PoeShared.Squirrel.Core;
 using Squirrel;
 
@@ -18,7 +19,7 @@ namespace PoeShared.Squirrel.Updater
     internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IApplicationUpdaterModel
     {
         private readonly IAppArguments appArguments;
-        private static readonly ILog Log = LogManager.GetLogger(typeof(ApplicationUpdaterModel));
+        private static readonly IFluentLog Log = typeof(ApplicationUpdaterModel).PrepareLogger();
 
         private static readonly string DotnetCoreRunnerName = "dotnet.exe";
         private static readonly string UpdaterExecutableName = "update.exe";

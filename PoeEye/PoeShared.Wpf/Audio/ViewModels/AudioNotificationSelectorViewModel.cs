@@ -9,7 +9,8 @@ using DynamicData.Binding;
 using log4net;
 using Microsoft.Win32;
 using PoeShared.Audio.Services;
-using PoeShared.Scaffolding;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 using PoeShared.Scaffolding.WPF;
 using Prism.Commands;
 using ReactiveUI;
@@ -18,7 +19,7 @@ namespace PoeShared.Audio.ViewModels
 {
     internal sealed class AudioNotificationSelectorViewModel : DisposableReactiveObject, IAudioNotificationSelectorViewModel
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(AudioNotificationSelectorViewModel));
+        private static readonly IFluentLog Log = typeof(AudioNotificationSelectorViewModel).PrepareLogger();
         private static readonly string DefaultNotification = AudioNotificationType.Whistle.ToString();
         private static readonly string DisabledNotification = AudioNotificationType.Disabled.ToString();
         

@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using PoeShared.Dialogs.ViewModels;
-using PoeShared.Scaffolding;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 
 namespace PoeShared.Dialogs.Services
 {

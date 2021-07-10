@@ -4,13 +4,15 @@ using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Subjects;
 using log4net;
-using PoeShared.Scaffolding;
+using PoeShared.Logging;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 
 namespace PoeShared.Modularity
 {
     public sealed class PoeEyeConfigProviderInMemory : IConfigProvider
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(PoeEyeConfigProviderInMemory));
+        private static readonly IFluentLog Log = typeof(PoeEyeConfigProviderInMemory).PrepareLogger();
 
         private readonly ISubject<Unit> configHasChanged = new Subject<Unit>();
         private readonly ConcurrentDictionary<Type, IPoeEyeConfig> loadedConfigs = new ConcurrentDictionary<Type, IPoeEyeConfig>();
@@ -21,7 +23,7 @@ namespace PoeShared.Modularity
             
             if (appArguments.IsDebugMode)
             {
-                Log.Debug("[PoeEyeConfigProviderInMemory..ctor] Debug mode detected");
+                Log.Debug($"[PoeEyeConfigProviderInMemory..ctor] Debug mode detected");
             }
             else
             {
@@ -38,7 +40,7 @@ namespace PoeShared.Modularity
 
         public void Reload()
         {
-            Log.Debug("[PoeEyeConfigProviderInMemory.Reload] Reloading configuration...");
+            Log.Debug($"[PoeEyeConfigProviderInMemory.Reload] Reloading configuration...");
 
             loadedConfigs.Clear();
 

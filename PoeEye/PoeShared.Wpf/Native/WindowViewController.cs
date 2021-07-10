@@ -9,7 +9,8 @@ using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using log4net;
-using PoeShared.Scaffolding;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 using ReactiveUI;
 using Point = Hardcodet.Wpf.TaskbarNotification.Interop.Point;
 
@@ -17,7 +18,7 @@ namespace PoeShared.Native
 {
     public sealed class WindowViewController : DisposableReactiveObject, IWindowViewController
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(WindowViewController));
+        private static readonly IFluentLog Log = typeof(WindowViewController).PrepareLogger();
 
         private readonly Window owner;
         private bool topmost;

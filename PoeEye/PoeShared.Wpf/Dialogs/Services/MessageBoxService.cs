@@ -5,14 +5,15 @@ using DynamicData;
 using log4net;
 using PoeShared.Dialogs.ViewModels;
 using PoeShared.Prism;
-using PoeShared.Scaffolding;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 using ReactiveUI;
 
 namespace PoeShared.Dialogs.Services
 {
     internal sealed class MessageBoxService : DisposableReactiveObject, IMessageBoxService
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(MessageBoxService));
+        private static readonly IFluentLog Log = typeof(MessageBoxService).PrepareLogger();
 
         private readonly IFactory<TextMessageBoxViewModel> textMessageBoxFactory;
         private readonly IFactory<MessageBoxWithContentViewModelBase> messageBoxFactory;

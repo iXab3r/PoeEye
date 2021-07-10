@@ -2,7 +2,8 @@ using System;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using PInvoke;
-using PoeShared.Scaffolding;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 
 namespace PoeShared.Native
 {

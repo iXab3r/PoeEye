@@ -12,7 +12,8 @@ using log4net;
 using PoeShared.Native;
 using PoeShared.Prism;
 using PoeShared.RegionSelector.ViewModels;
-using PoeShared.Scaffolding;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 using PoeShared.UI;
 using ReactiveUI;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
@@ -23,7 +24,7 @@ namespace PoeShared.RegionSelector.Views
     public partial class RegionSelectorWindow : IDisposable
     {
         private readonly IRegionSelectorViewModel viewModel;
-        private static readonly ILog Log = LogManager.GetLogger(typeof(RegionSelectorWindow));
+        private static readonly IFluentLog Log = typeof(RegionSelectorWindow).PrepareLogger();
 
         private readonly CompositeDisposable anchors = new CompositeDisposable();
         private readonly ISubject<string> closeWindowRequest = new Subject<string>();

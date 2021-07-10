@@ -4,6 +4,8 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using log4net;
 using NuGet;
+using PoeShared.Logging;
+using PoeShared.Scaffolding;
 using SharpCompress.Archives.Zip;
 using SharpCompress.Readers;
 using Splat;
@@ -13,7 +15,7 @@ namespace PoeShared.Squirrel.Scaffolding
 {
     public class ReleasePackage : IEnableLogger, IReleasePackage
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(ReleasePackage));
+        private static readonly IFluentLog Log = typeof(ReleasePackage).PrepareLogger();
 
         public ReleasePackage(string inputPackageFile, bool isReleasePackage = false)
         {

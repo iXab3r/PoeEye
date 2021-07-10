@@ -4,13 +4,15 @@ using System.Linq;
 using System.Text.RegularExpressions;
 
 using log4net;
-using PoeShared.Scaffolding;
+using PoeShared.Logging;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 
 namespace PoeShared.Native
 {
     public sealed class RegexStringMatcher : IRegexStringMatcher
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(RegexStringMatcher));
+        private static readonly IFluentLog Log = typeof(RegexStringMatcher).PrepareLogger();
         private readonly ConcurrentDictionary<string, Regex> blacklist = new ConcurrentDictionary<string, Regex>();
 
         private readonly ConcurrentDictionary<string, Regex> whitelist = new ConcurrentDictionary<string, Regex>();
@@ -21,7 +23,7 @@ namespace PoeShared.Native
         {
             if (value == null)
             {
-                Log.Debug("Provided Value is not set, resetting to default - empty string");
+                Log.Debug($"Provided Value is not set, resetting to default - empty string");
                 value = string.Empty;
             }
 

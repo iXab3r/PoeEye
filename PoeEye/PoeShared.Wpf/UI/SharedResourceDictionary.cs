@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Markup;
 using log4net;
-using PoeShared.Scaffolding;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 
 namespace PoeShared.UI
 {
@@ -15,7 +16,7 @@ namespace PoeShared.UI
     /// </summary>
     public class SharedResourceDictionary : ResourceDictionary
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(SharedResourceDictionary));
+        private static readonly IFluentLog Log = typeof(SharedResourceDictionary).PrepareLogger();
 
         /// <summary>
         /// Internal cache of loaded dictionaries 

@@ -15,7 +15,8 @@ using PoeShared.Modularity;
 using PoeShared.Native;
 using PoeShared.Prism;
 using PoeShared.RegionSelector.Views;
-using PoeShared.Scaffolding;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 using PoeShared.Scaffolding.WPF;
 using PropertyBinder;
 using ReactiveUI;
@@ -27,7 +28,7 @@ namespace PoeShared.UI
     {
         private static readonly Binder<HotkeySequenceEditorViewModel> Binder = new();
 
-        private static readonly ILog Log = LogManager.GetLogger(typeof(HotkeySequenceEditorViewModel));
+        private static readonly IFluentLog Log = typeof(HotkeySequenceEditorViewModel).PrepareLogger();
 
         private readonly IAppArguments appArguments;
         private readonly IFactory<RegionSelectorWindow> regionSelectorWindowFactory;

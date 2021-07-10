@@ -11,6 +11,8 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using log4net;
+using PoeShared.Logging;
+using PoeShared.Scaffolding;
 using Squirrel;
 using HttpUtility = System.Web.HttpUtility;
 
@@ -18,7 +20,7 @@ namespace PoeShared.Squirrel.Scaffolding
 {
     internal static class Utility
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(Utility));
+        private static readonly IFluentLog Log = typeof(Utility).PrepareLogger();
 
         private static readonly Lazy<string> DirectoryChars = new Lazy<string>(
             () =>
@@ -273,11 +275,11 @@ namespace PoeShared.Squirrel.Scaffolding
         {
             Guard.ArgumentIsTrue(!string.IsNullOrEmpty(directoryPath), "!string.IsNullOrEmpty(directoryPath)");
 
-            Log.DebugFormat("Starting to delete folder: {0}", directoryPath);
+            Log.Debug($"Starting to delete folder: {directoryPath}");
 
             if (!Directory.Exists(directoryPath))
             {
-                Log.WarnFormat("DeleteDirectory: does not exist - {0}", directoryPath);
+                Log.Warn($"DeleteDirectory: does not exist - {directoryPath}");
                 return;
             }
 
@@ -290,7 +292,7 @@ namespace PoeShared.Squirrel.Scaffolding
             catch (UnauthorizedAccessException ex)
             {
                 var message = $"The files inside {directoryPath} could not be read";
-                Log.WarnFormat(message, ex);
+                Log.Warn(message, ex);
             }
 
             var dirs = new string[0];
@@ -301,7 +303,7 @@ namespace PoeShared.Squirrel.Scaffolding
             catch (UnauthorizedAccessException ex)
             {
                 var message = $"The directories inside {directoryPath} could not be read";
-                Log.WarnFormat(message, ex);
+                Log.Warn(message, ex);
             }
 
             var fileOperations = files.ForEachAsync(
@@ -316,7 +318,7 @@ namespace PoeShared.Squirrel.Scaffolding
 
             await Task.WhenAll(fileOperations, directoryOperations);
 
-            Log.DebugFormat("Now deleting folder: {0}", directoryPath);
+            Log.Debug($"Now deleting folder: {directoryPath}");
             File.SetAttributes(directoryPath, FileAttributes.Normal);
 
             try

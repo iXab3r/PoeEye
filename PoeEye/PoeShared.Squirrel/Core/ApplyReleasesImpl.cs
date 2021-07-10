@@ -15,14 +15,15 @@ using PoeShared.Squirrel.Scaffolding;
 using Splat;
 using Squirrel;
 using Squirrel.Shell;
-using PoeShared.Scaffolding;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 using ReleasePackage = PoeShared.Squirrel.Scaffolding.ReleasePackage;
 
 namespace PoeShared.Squirrel.Core
 {
     internal class ApplyReleasesImpl : IEnableLogger
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(ApplyReleasesImpl));
+        private static readonly IFluentLog Log = typeof(ApplyReleasesImpl).PrepareLogger();
             
         private readonly string rootAppDirectory;
 
@@ -47,7 +48,7 @@ namespace PoeShared.Squirrel.Core
             {
                 if (attemptingFullInstall)
                 {
-                    Log.InfoFormat("No release to install, running the app");
+                    Log.Info("No release to install, running the app");
                     await InvokePostInstall(updateInfo.CurrentlyInstalledVersion?.Version, false, true, silentInstall);
                 }
 
@@ -73,10 +74,10 @@ namespace PoeShared.Squirrel.Core
                 "Failed to invoke post-install");
             progress(75);
 
-            Log.InfoFormat("Starting fixPinnedExecutables");
+            Log.Info("Starting fixPinnedExecutables");
             Log.ErrorIfThrows(() => FixPinnedExecutables(updateInfo.FutureReleaseEntry.Version));
 
-            Log.InfoFormat("Fixing up tray icons");
+            Log.Info("Fixing up tray icons");
 
             var trayFixer = new TrayStateChanger();
             var appDir = new DirectoryInfo(Utility.AppDirForRelease(rootAppDirectory, updateInfo.FutureReleaseEntry));
@@ -108,7 +109,7 @@ namespace PoeShared.Squirrel.Core
         {
             var currentRelease = GetReleases().MaxBy(x => x.Name.ToSemanticVersion()).First();
 
-            Log.InfoFormat("Starting full uninstall");
+            Log.Info("Starting full uninstall");
             if (currentRelease.Exists)
             {
                 var version = currentRelease.Name.ToSemanticVersion();
@@ -187,7 +188,7 @@ namespace PoeShared.Squirrel.Core
 
         public Dictionary<ShortcutLocation, ShellLink> GetShortcutsForExecutable(string exeName, ShortcutLocation locations, string programArguments)
         {
-            Log.InfoFormat("About to create shortcuts for {0}, rootAppDir {1}", exeName, rootAppDirectory);
+            Log.Info($"About to create shortcuts for {exeName}, rootAppDir {rootAppDirectory}");
 
             var releases = Utility.LoadLocalReleases(Utility.LocalReleaseFileForAppDir(rootAppDirectory));
             var thisRelease = Utility.FindCurrentVersion(releases);
@@ -212,8 +213,8 @@ namespace PoeShared.Squirrel.Core
                 var appUserModelId = $"com.squirrel.{zf.Id.Replace(" ", "")}.{exeName.Replace(".exe", "").Replace(" ", "")}";
                 var toastActivatorClsdid = Utility.CreateGuidFromHash(appUserModelId).ToString();
 
-                Log.InfoFormat("Creating shortcut for {0} => {1}", exeName, file);
-                Log.InfoFormat("appUserModelId: {0} | toastActivatorCLSID: {1}", appUserModelId, toastActivatorClsdid);
+                Log.Info($"Creating shortcut for {exeName} => {file}");
+                Log.Info($"appUserModelId: {appUserModelId} | toastActivatorCLSID: {toastActivatorClsdid}");
 
                 var target = Path.Combine(rootAppDirectory, exeName);
                 var sl = new ShellLink
@@ -241,7 +242,7 @@ namespace PoeShared.Squirrel.Core
 
         public void CreateShortcutsForExecutable(string exeName, ShortcutLocation locations, bool updateOnly, string programArguments, string icon)
         {
-            Log.InfoFormat("About to create shortcuts for {0}, rootAppDir {1}", exeName, rootAppDirectory);
+            Log.Info($"About to create shortcuts for {exeName}, rootAppDir {rootAppDirectory}");
 
             var releases = Utility.LoadLocalReleases(Utility.LocalReleaseFileForAppDir(rootAppDirectory));
             var thisRelease = Utility.FindCurrentVersion(releases);
@@ -270,11 +271,11 @@ namespace PoeShared.Squirrel.Core
                 // annoy them by recreating it.
                 if (!fileExists && updateOnly)
                 {
-                    Log.WarnFormat("Wanted to update shortcut {0} but it appears user deleted it", file);
+                    Log.Warn($"Wanted to update shortcut {file} but it appears user deleted it");
                     continue;
                 }
 
-                Log.InfoFormat("Creating shortcut for {0} => {1}", exeName, file);
+                Log.Info($"Creating shortcut for {exeName} => {file}");
 
                 ShellLink sl;
                 Log.ErrorIfThrows(
@@ -304,13 +305,7 @@ namespace PoeShared.Squirrel.Core
                             sl.SetAppUserModelId(appUserModelId);
                             sl.SetToastActivatorCLSID(toastActivatorClsid);
 
-                            Log.InfoFormat(
-                                "About to save shortcut: {0} (target {1}, workingDir {2}, args {3}, toastActivatorCSLID {4})",
-                                file,
-                                sl.Target,
-                                sl.WorkingDirectory,
-                                sl.Arguments,
-                                toastActivatorClsid);
+                            Log.Info($"About to save shortcut: {file} (target {sl.Target}, workingDir {sl.WorkingDirectory}, args {sl.Arguments}, toastActivatorCSLID {toastActivatorClsid})");
                             if (ModeDetector.InUnitTestRunner() == false)
                             {
                                 sl.Save(file);
@@ -345,7 +340,7 @@ namespace PoeShared.Squirrel.Core
 
                 var file = LinkTargetForVersionInfo(f, zf, fileVerInfo);
 
-                Log.InfoFormat("Removing shortcut for {0} => {1}", exeName, file);
+                Log.Info($"Removing shortcut for {exeName} => {file}");
 
                 Log.ErrorIfThrows(
                     () =>
@@ -371,13 +366,13 @@ namespace PoeShared.Squirrel.Core
                     // NB: This might happen if we got killed partially through applying the release
                     if (target.Exists)
                     {
-                        Log.WarnFormat("Found partially applied release folder, killing it: " + target.FullName);
+                        Log.Warn("Found partially applied release folder, killing it: " + target.FullName);
                         await Utility.DeleteDirectory(target.FullName);
                     }
 
                     target.Create();
 
-                    Log.InfoFormat("Writing files to app directory: {0}", target.FullName);
+                    Log.Info($"Writing files to app directory: {target.FullName}");
                     await ReleasePackage.ExtractZipForInstall(
                         Path.Combine(updateInfo.PackageDirectory, release.Filename),
                         target.FullName,
@@ -488,7 +483,7 @@ namespace PoeShared.Squirrel.Core
 
             var squirrelApps = SquirrelAwareExecutableDetector.GetAllSquirrelAwareApps(targetDir.FullName);
 
-            Log.InfoFormat("Squirrel Enabled Apps: [{0}]", string.Join(",", squirrelApps));
+            Log.Info($"Squirrel Enabled Apps: [{string.Join(",", squirrelApps)}]");
 
             // For each app, run the install command in-order and wait
             if (!firstRunOnly)
@@ -517,7 +512,7 @@ namespace PoeShared.Squirrel.Core
             // *don't* wait for them, since they're probably the main EXE
             if (squirrelApps.Count == 0)
             {
-                Log.WarnFormat("No apps are marked as Squirrel-aware! Going to run them all");
+                Log.Warn("No apps are marked as Squirrel-aware! Going to run them all");
 
                 squirrelApps = targetDir.EnumerateFiles()
                     .Where(x => x.Name.EndsWith(".exe", StringComparison.OrdinalIgnoreCase))
@@ -553,7 +548,7 @@ namespace PoeShared.Squirrel.Core
         {
             if (Environment.OSVersion.Version < new Version(6, 1))
             {
-                Log.WarnFormat("fixPinnedExecutables: Found OS Version '{0}', exiting...", Environment.OSVersion.VersionString);
+                Log.Warn($"fixPinnedExecutables: Found OS Version '{Environment.OSVersion.VersionString}', exiting...");
                 return;
             }
 
@@ -566,7 +561,7 @@ namespace PoeShared.Squirrel.Core
 
             if (!Directory.Exists(taskbarPath))
             {
-                Log.InfoFormat("fixPinnedExecutables: PinnedExecutables directory doesn't exitsts, skiping...");
+                Log.Info("fixPinnedExecutables: PinnedExecutables directory doesn't exitsts, skiping...");
                 return;
             }
 
@@ -575,7 +570,7 @@ namespace PoeShared.Squirrel.Core
                 {
                     try
                     {
-                        Log.InfoFormat("Examining Pin: " + file);
+                        Log.Info("Examining Pin: " + file);
                         return new ShellLink(file.FullName);
                     }
                     catch (Exception ex)
@@ -626,12 +621,12 @@ namespace PoeShared.Squirrel.Core
 
         private void UpdateLink(ShellLink shortcut, string newAppPath)
         {
-            Log.InfoFormat("Processing shortcut '{0}'", shortcut.ShortCutFile);
+            Log.Info($"Processing shortcut '{shortcut.ShortCutFile}'");
 
             var target = Environment.ExpandEnvironmentVariables(shortcut.Target);
             var targetIsUpdateDotExe = target.EndsWith("update.exe", StringComparison.OrdinalIgnoreCase);
 
-            Log.InfoFormat("Old shortcut target: '{0}'", target);
+            Log.Info($"Old shortcut target: '{target}'");
 
             // NB: In 1.5.0 we accidentally fixed the target of pinned shortcuts but left the arguments,
             // so if we find a shortcut with --processStart in the args, we're gonna stomp it even though
@@ -650,17 +645,17 @@ namespace PoeShared.Squirrel.Core
                 target = Path.Combine(rootAppDirectory, Path.GetFileName(shortcut.IconPath));
             }
 
-            Log.InfoFormat("New shortcut target: '{0}'", target);
+            Log.Info($"New shortcut target: '{target}'");
 
             shortcut.WorkingDirectory = newAppPath;
             shortcut.Target = target;
 
-            Log.InfoFormat("Old iconPath is: '{0}'", shortcut.IconPath);
+            Log.Info($"Old iconPath is: '{shortcut.IconPath}'");
             shortcut.IconPath = target;
             shortcut.IconIndex = 0;
 
             Log.ErrorIfThrows(() => Utility.Retry(() => shortcut.Save()), "Couldn't write shortcut " + shortcut.ShortCutFile);
-            Log.InfoFormat("Finished shortcut successfully");
+            Log.Info("Finished shortcut successfully");
         }
 
         internal void UnshimOurselves()
@@ -725,20 +720,20 @@ namespace PoeShared.Squirrel.Core
                 return;
             }
 
-            Log.InfoFormat("cleanDeadVersions: for version {0}", currentVersion);
+            Log.Info($"cleanDeadVersions: for version {currentVersion}");
 
             string originalVersionFolder = null;
             if (originalVersion != null)
             {
                 originalVersionFolder = GetDirectoryForRelease(originalVersion).Name;
-                Log.InfoFormat("cleanDeadVersions: exclude folder {0}", originalVersionFolder);
+                Log.Info($"cleanDeadVersions: exclude folder {originalVersionFolder}");
             }
 
             string currentVersionFolder = null;
             if (currentVersion != null)
             {
                 currentVersionFolder = GetDirectoryForRelease(currentVersion).Name;
-                Log.InfoFormat("cleanDeadVersions: exclude folder {0}", currentVersionFolder);
+                Log.Info($"cleanDeadVersions: exclude folder {currentVersionFolder}");
             }
 
             // NB: If we try to access a directory that has already been 

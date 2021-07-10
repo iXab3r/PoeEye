@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
-using PoeShared.Scaffolding;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 using PoeShared.Scaffolding.WPF;
 
 namespace PoeShared.Dialogs.ViewModels

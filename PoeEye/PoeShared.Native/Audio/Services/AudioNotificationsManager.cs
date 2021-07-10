@@ -8,15 +8,17 @@ using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using log4net;
+using PoeShared.Logging;
 using PoeShared.Prism;
-using PoeShared.Scaffolding;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 using Unity;
 
 namespace PoeShared.Audio.Services
 {
     internal sealed class AudioNotificationsManager : DisposableReactiveObject, IAudioNotificationsManager
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(AudioNotificationsManager));
+        private static readonly IFluentLog Log = typeof(AudioNotificationsManager).PrepareLogger();
 
         private readonly IAudioPlayer audioPlayer;
         private readonly ConcurrentDictionary<string, byte[]> knownNotifications = new(StringComparer.OrdinalIgnoreCase);
@@ -35,7 +37,7 @@ namespace PoeShared.Audio.Services
             this.soundLibrarySource = soundLibrarySource;
             this.fileSoundLibrarySource = fileSoundLibrarySource;
 
-            Log.Info("Initializing sound subsystem...");
+            Log.Info($"Initializing sound subsystem...");
             knownNotifications[AudioNotificationType.Silence.ToString()] = new byte[0];
 
             bgScheduler.Schedule(Initialize).AddTo(Anchors);

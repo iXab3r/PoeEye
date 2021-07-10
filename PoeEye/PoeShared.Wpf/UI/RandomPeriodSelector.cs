@@ -2,7 +2,8 @@
 using System.ComponentModel;
 using System.Reactive.Linq;
 using log4net;
-using PoeShared.Scaffolding;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 using PoeShared.Wpf.Scaffolding;
 using PropertyBinder;
 using ReactiveUI;
@@ -15,7 +16,7 @@ namespace PoeShared.UI
 {
     internal sealed class RandomPeriodSelector : ValidatableReactiveObject<RandomPeriodSelector>, IRandomPeriodSelector
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(RandomPeriodSelector));
+        private static readonly IFluentLog Log = typeof(RandomPeriodSelector).PrepareLogger();
 
         private readonly IRandomNumberGenerator rng;
 

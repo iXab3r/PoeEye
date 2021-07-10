@@ -1,5 +1,6 @@
 ﻿using System;
-using PoeShared.Scaffolding;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 
 namespace PoeShared.Services
 {

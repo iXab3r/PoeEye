@@ -2,7 +2,8 @@ using System;
 using System.IO;
 using System.Windows.Input;
 using JetBrains.Annotations;
-using PoeShared.Scaffolding;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 using PoeShared.Scaffolding.WPF;
 
 namespace PoeShared.Squirrel.Updater

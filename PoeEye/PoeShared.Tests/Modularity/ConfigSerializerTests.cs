@@ -1,6 +1,8 @@
 using log4net;
 using NUnit.Framework;
+using PoeShared.Logging;
 using PoeShared.Modularity;
+using PoeShared.Scaffolding;
 using Shouldly;
 
 namespace PoeShared.Tests.Modularity
@@ -8,7 +10,7 @@ namespace PoeShared.Tests.Modularity
     [TestFixture]
     public class ConfigSerializerTests
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(ConfigSerializerTests));
+        private static readonly IFluentLog Log = typeof(ConfigSerializerTests).PrepareLogger();
         
         private static readonly string SerializedUnknown = @"{
   'TypeName': 'Unknown',

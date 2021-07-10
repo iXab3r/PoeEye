@@ -13,7 +13,8 @@ using Moq;
 using NUnit.Framework;
 using PoeShared.Native;
 using PoeShared.Prism;
-using PoeShared.Scaffolding;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 using Shouldly;
 
 namespace PoeShared.Tests.Native
@@ -21,7 +22,7 @@ namespace PoeShared.Tests.Native
     [TestFixture]
     public class KeyboardMouseEventsProviderFixture
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(KeyboardMouseEventsProviderFixture));
+        private static readonly IFluentLog Log = typeof(KeyboardMouseEventsProviderFixture).PrepareLogger();
 
         private Mock<IFactory<IKeyboardMouseEvents>> globalEventsFactory;
         private Mock<IFactory<IKeyboardMouseEvents>> appEventsFactory;

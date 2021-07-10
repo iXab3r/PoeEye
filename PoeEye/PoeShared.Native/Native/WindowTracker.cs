@@ -7,8 +7,10 @@ using System.Windows.Forms;
 using JetBrains.Annotations;
 using log4net;
 using PInvoke;
+using PoeShared.Logging;
 using PoeShared.Prism;
-using PoeShared.Scaffolding;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 using ReactiveUI;
 using ObservableEx = PoeShared.Scaffolding.ObservableEx;
 
@@ -16,7 +18,7 @@ namespace PoeShared.Native
 {
     public class WindowTracker : DisposableReactiveObject, IWindowTracker
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(WindowTracker));
+        private static readonly IFluentLog Log = typeof(WindowTracker).PrepareLogger();
         private static readonly TimeSpan RecheckPeriod = TimeSpan.FromMilliseconds(250);
         private static readonly TimeSpan SamplePeriod = TimeSpan.FromMilliseconds(100);
         private readonly IStringMatcher titleMatcher;

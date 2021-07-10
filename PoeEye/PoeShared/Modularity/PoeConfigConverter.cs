@@ -8,14 +8,16 @@ using CommandLine;
 using log4net;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using PoeShared.Scaffolding;
+using PoeShared.Logging;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 
 namespace PoeShared.Modularity
 {
     //FIXME This whole PoeConfigConverter is an awful mess that must be rewritten at some point
     internal sealed class PoeConfigConverter : JsonConverter
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(PoeConfigConverter));
+        private static readonly IFluentLog Log = typeof(PoeConfigConverter).PrepareLogger();
 
         private static readonly MethodInfo ReloadConfigMethod = typeof(PoeConfigConverter)
             .GetMethod(nameof(GetMetadataTypedValue), BindingFlags.Instance | BindingFlags.NonPublic);

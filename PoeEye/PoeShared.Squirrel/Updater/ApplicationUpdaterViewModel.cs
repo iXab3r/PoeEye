@@ -9,7 +9,8 @@ using JetBrains.Annotations;
 using log4net;
 using PoeShared.Modularity;
 using PoeShared.Prism;
-using PoeShared.Scaffolding;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 using PoeShared.Scaffolding.WPF;
 using PoeShared.UI;
 using ReactiveUI;
@@ -19,7 +20,7 @@ namespace PoeShared.Squirrel.Updater
 {
     internal sealed class ApplicationUpdaterViewModel : DisposableReactiveObject, IApplicationUpdaterViewModel
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(ApplicationUpdaterViewModel));
+        private static readonly IFluentLog Log = typeof(ApplicationUpdaterViewModel).PrepareLogger();
 
         private readonly IApplicationUpdaterModel updaterModel;
 

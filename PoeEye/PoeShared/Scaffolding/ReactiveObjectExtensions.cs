@@ -8,12 +8,13 @@ using log4net;
 using ReactiveUI;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
+using PoeShared.Logging;
 
 namespace PoeShared.Scaffolding
 {
     public static class ReactiveObjectExtensions
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(ReactiveObjectExtensions));
+        private static readonly IFluentLog Log = typeof(ReactiveObjectExtensions).PrepareLogger();
 
         public static IDisposable RaiseWhenSourceValue<TSource, TTarget, TSourceProperty, TTargetProperty>(
             [NotNull] this TTarget instance,

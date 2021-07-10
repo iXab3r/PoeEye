@@ -1,7 +1,8 @@
 ﻿using System.Reactive.Linq;
 using System.Windows;
 using DynamicData.Annotations;
-using PoeShared.Scaffolding;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 using ReactiveUI;
 
 namespace PoeShared.Native

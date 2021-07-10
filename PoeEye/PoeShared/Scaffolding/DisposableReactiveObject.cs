@@ -1,15 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq.Expressions;
-using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Subjects;
 using System.Runtime.CompilerServices;
-using JetBrains.Annotations;
-using log4net;
-using PoeShared.Logging;
-using ReactiveUI;
 
 namespace PoeShared.Scaffolding
 {

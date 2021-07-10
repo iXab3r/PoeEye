@@ -30,8 +30,8 @@ namespace PoeShared.Tests.Logging
             instance.Warn($"warn");
 
             //Then
-            logWriter.Verify(x => x.WriteLog(It.Is<LogData>(y => y.ToString() == "info" &&  y.LogLevel == LogLevel.Info)));
-            logWriter.Verify(x => x.WriteLog(It.Is<LogData>(y => y.ToString() == "warn" && y.LogLevel == LogLevel.Warn)));
+            logWriter.Verify(x => x.WriteLog(It.Is<LogData>(y => y.ToString() == "info" &&  y.LogLevel == FluentLogLevel.Info)));
+            logWriter.Verify(x => x.WriteLog(It.Is<LogData>(y => y.ToString() == "warn" && y.LogLevel == FluentLogLevel.Warn)));
         }
 
         [Test]
@@ -45,7 +45,7 @@ namespace PoeShared.Tests.Logging
 
 
             //Then
-            logWriter.Verify(x => x.WriteLog(It.Is<LogData>(y => y.ToString() == "[test1] [test2] info" &&  y.LogLevel == LogLevel.Info)));
+            logWriter.Verify(x => x.WriteLog(It.Is<LogData>(y => y.ToString() == "[test1] [test2] info" &&  y.LogLevel == FluentLogLevel.Info)));
         }
 
         [Test]
@@ -59,7 +59,7 @@ namespace PoeShared.Tests.Logging
             instance.Info($"info");
 
             //Then
-            logWriter.Verify(x => x.WriteLog(It.Is<LogData>(y => y.ToString() == "[test1] [test2] info" &&  y.LogLevel == LogLevel.Info)));
+            logWriter.Verify(x => x.WriteLog(It.Is<LogData>(y => y.ToString() == "[test1] [test2] info" &&  y.LogLevel == FluentLogLevel.Info)));
         }
     }
 }

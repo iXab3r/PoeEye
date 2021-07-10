@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using log4net;
+using PoeShared.Logging;
 using Unity;
 using Unity.Extension;
 using Unity.Lifetime;
@@ -9,7 +10,7 @@ namespace PoeShared.Scaffolding
 {
     public static class UnityContainerExtensions
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(UnityContainerExtensions));
+        private static readonly IFluentLog Log = typeof(UnityContainerExtensions).PrepareLogger();
 
         public static IUnityContainer RegisterSingleton<TTo>(this IUnityContainer instance, params Type[] types)
         {

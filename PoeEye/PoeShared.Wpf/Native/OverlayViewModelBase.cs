@@ -15,7 +15,8 @@ using DynamicData.Binding;
 
 using log4net;
 using PInvoke;
-using PoeShared.Scaffolding;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 using PoeShared.Scaffolding.WPF;
 using ReactiveUI;
 using Point = System.Windows.Point;
@@ -25,7 +26,7 @@ namespace PoeShared.Native
 {
     public abstract class OverlayViewModelBase : DisposableReactiveObject, IOverlayViewModel
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(OverlayViewModelBase));
+        private static readonly IFluentLog Log = typeof(OverlayViewModelBase).PrepareLogger();
 
         private readonly CommandWrapper lockWindowCommand;
         private readonly CommandWrapper unlockWindowCommand;

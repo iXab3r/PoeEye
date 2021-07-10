@@ -5,7 +5,8 @@ using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Text;
 using PInvoke;
-using PoeShared.Scaffolding;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedMember.Local
 // ReSharper disable FieldCanBeMadeReadOnly.Local

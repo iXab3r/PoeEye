@@ -2,7 +2,8 @@
 using System.Windows.Input;
 using JetBrains.Annotations;
 using PoeShared.Modularity;
-using PoeShared.Scaffolding;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 
 namespace PoeShared.UI
 {

@@ -5,14 +5,15 @@ using DynamicData;
 using JetBrains.Annotations;
 using log4net;
 using PoeShared.Modularity;
-using PoeShared.Scaffolding;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 
 namespace PoeShared.Squirrel.Updater
 {
     [UsedImplicitly]
     internal sealed class UpdateSettingsViewModel : DisposableReactiveObject, ISettingsViewModel<UpdateSettingsConfig>
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(UpdateSettingsViewModel));
+        private static readonly IFluentLog Log = typeof(UpdateSettingsViewModel).PrepareLogger();
 
         private readonly IUpdateSourceProvider updateSourceProvider;
         private readonly IConfigProvider<UpdateSettingsConfig> configProvider;

@@ -4,7 +4,8 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Windows.Input;
-using PoeShared.Scaffolding;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 
 namespace PoeShared.UI
 {

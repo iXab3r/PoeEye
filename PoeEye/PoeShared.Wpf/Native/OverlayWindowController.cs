@@ -12,14 +12,15 @@ using DynamicData;
 using JetBrains.Annotations;
 using log4net;
 using PoeShared.Prism;
-using PoeShared.Scaffolding;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 using ReactiveUI;
 
 namespace PoeShared.Native
 {
     internal sealed class OverlayWindowController : DisposableReactiveObject, IOverlayWindowController
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(OverlayWindowController));
+        private static readonly IFluentLog Log = typeof(OverlayWindowController).PrepareLogger();
         private readonly BehaviorSubject<IntPtr> lastActiveWindowHandle = new BehaviorSubject<IntPtr>(IntPtr.Zero);
 
         private readonly IScheduler uiScheduler;

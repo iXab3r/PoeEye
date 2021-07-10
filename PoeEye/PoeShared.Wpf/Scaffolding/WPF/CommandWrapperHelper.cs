@@ -5,12 +5,13 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using log4net;
+using PoeShared.Logging;
 
 namespace PoeShared.Scaffolding.WPF
 {
     public sealed class CommandWrapperHelper
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(CommandWrapperHelper));
+        private static readonly IFluentLog Log = typeof(CommandWrapperHelper).PrepareLogger();
 
         public static readonly DependencyProperty TextProperty = DependencyProperty.RegisterAttached(
             "Text",

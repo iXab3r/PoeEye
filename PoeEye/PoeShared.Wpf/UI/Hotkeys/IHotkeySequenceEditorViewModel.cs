@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
-using PoeShared.Scaffolding;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 
 namespace PoeShared.UI
 {

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using log4net;
+using PoeShared.Scaffolding;
+using PoeShared.Logging;
 using PoeShared.Squirrel.Scaffolding;
 using Splat;
 using Squirrel;
@@ -11,7 +13,7 @@ namespace PoeShared.Squirrel.Core
 {
     internal class DownloadReleasesImpl : IEnableLogger
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(DownloadReleasesImpl));
+        private static readonly IFluentLog Log = typeof(DownloadReleasesImpl).PrepareLogger();
 
         private readonly IFileDownloader urlDownloader;
         private readonly string rootAppDirectory;
@@ -110,14 +112,14 @@ namespace PoeShared.Squirrel.Core
 
             if (!targetPackage.Exists)
             {
-                Log.ErrorFormat("File {0} should exist but doesn't", targetPackage.FullName);
+                Log.Error($"File {targetPackage.FullName} should exist but doesn't");
 
                 throw new Exception("Checksum file doesn't exist: " + targetPackage.FullName);
             }
 
             if (targetPackage.Length != downloadedRelease.Filesize)
             {
-                Log.ErrorFormat("File Length should be {0}, is {1}", downloadedRelease.Filesize, targetPackage.Length);
+                Log.Error($"File Length should be {downloadedRelease.Filesize}, is {targetPackage.Length}");
                 targetPackage.Delete();
 
                 throw new Exception("Checksum file size doesn't match: " + targetPackage.FullName);
@@ -130,7 +132,7 @@ namespace PoeShared.Squirrel.Core
                 return;
             }
 
-            Log.ErrorFormat("File SHA1 should be {0}, is {1}", downloadedRelease.SHA1, hash);
+            Log.Error($"File SHA1 should be {downloadedRelease.SHA1}, is {hash}");
             targetPackage.Delete();
             throw new Exception("Checksum doesn't match: " + targetPackage.FullName);
         }

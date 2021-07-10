@@ -10,14 +10,16 @@ using System.Threading.Tasks;
 using log4net;
 using NAudio.CoreAudioApi;
 using NAudio.Wave;
-using PoeShared.Scaffolding;
+using PoeShared.Logging;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 
 namespace PoeShared.Audio.Services
 {
     [SupportedOSPlatform("windows")]
     internal sealed class AudioPlayer : DisposableReactiveObject, IAudioPlayer
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(AudioPlayer));
+        private static readonly IFluentLog Log = typeof(AudioPlayer).PrepareLogger();
         private readonly MMDeviceEnumerator deviceEnumerator = new();
 
         public AudioPlayer()

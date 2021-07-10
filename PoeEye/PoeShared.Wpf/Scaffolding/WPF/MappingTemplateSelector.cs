@@ -8,6 +8,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Markup;
 using log4net;
+using PoeShared.Logging;
 
 namespace PoeShared.Scaffolding.WPF
 {
@@ -22,7 +23,7 @@ namespace PoeShared.Scaffolding.WPF
     [ContentProperty("DataTemplates")]
     public class MappingTemplateSelector : DataTemplateSelector
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(MappingTemplateSelector));
+        private static readonly IFluentLog Log = typeof(MappingTemplateSelector).PrepareLogger();
 
         private readonly Dictionary<string, DataTemplate> templateLookup;
 

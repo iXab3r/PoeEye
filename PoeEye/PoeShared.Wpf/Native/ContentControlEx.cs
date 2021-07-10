@@ -1,7 +1,8 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using PoeShared.Scaffolding;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 
 namespace PoeShared.Native
 {

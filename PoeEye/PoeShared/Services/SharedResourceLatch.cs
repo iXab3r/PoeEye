@@ -2,13 +2,15 @@
 using System.Reactive.Disposables;
 using System.Threading;
 using log4net;
-using PoeShared.Scaffolding;
+using PoeShared.Logging;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 
 namespace PoeShared.Services
 {
     internal sealed class SharedResourceLatch : DisposableReactiveObject, ISharedResourceLatch
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(SharedResourceLatch));
+        private static readonly IFluentLog Log = typeof(SharedResourceLatch).PrepareLogger();
 
         private long counter = 0;
         private string name;

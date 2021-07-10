@@ -3,13 +3,15 @@ using System.Reactive.Disposables;
 using System.Runtime.InteropServices;
 using System.Threading;
 using log4net;
-using PoeShared.Scaffolding;
+using PoeShared.Logging;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 
 namespace PoeShared.Services
 {
     internal sealed class UserInputBlocker : DisposableReactiveObject, IUserInputBlocker
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(UserInputBlocker));
+        private static readonly IFluentLog Log = typeof(UserInputBlocker).PrepareLogger();
         private static readonly object UserInputMonitor = new object();
 
         private TimeSpan userInputBlockTimeout = TimeSpan.FromSeconds(5);

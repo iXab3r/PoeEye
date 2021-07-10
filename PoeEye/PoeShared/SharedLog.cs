@@ -11,7 +11,8 @@ using log4net.Config;
 using log4net.Core;
 using log4net.Layout;
 using log4net.Repository.Hierarchy;
-using PoeShared.Scaffolding;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 
 namespace PoeShared
 {

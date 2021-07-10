@@ -1,5 +1,6 @@
 ﻿using NUnit.Framework;
-using PoeShared.Scaffolding;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 using PropertyBinder;
 using ReactiveUI;
 using Shouldly;

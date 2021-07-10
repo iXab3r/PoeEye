@@ -8,14 +8,15 @@ using System.Windows.Threading;
 
 using log4net;
 using PoeShared.Prism;
-using PoeShared.Scaffolding;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 using Unity;
 
 namespace PoeShared.Modularity
 {
     public sealed class SchedulerProvider : DisposableReactiveObject, ISchedulerProvider
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(SchedulerProvider));
+        private static readonly IFluentLog Log = typeof(SchedulerProvider).PrepareLogger();
 
         private static readonly Lazy<SchedulerProvider> InstanceSupplier = new();
 

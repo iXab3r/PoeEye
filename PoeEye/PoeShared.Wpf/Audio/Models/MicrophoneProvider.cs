@@ -7,13 +7,14 @@ using DynamicData;
 using log4net;
 using NAudio.CoreAudioApi;
 using NAudio.Utils;
-using PoeShared.Scaffolding;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 
 namespace PoeShared.Audio.Models
 {
     internal sealed class MicrophoneProvider : DisposableReactiveObject, IMicrophoneProvider
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(MicrophoneProvider));
+        private static readonly IFluentLog Log = typeof(MicrophoneProvider).PrepareLogger();
         private static readonly TimeSpan ThrottlingTimeout = TimeSpan.FromMilliseconds(100);
         private static readonly TimeSpan RetryTimeout = TimeSpan.FromSeconds(60);
 

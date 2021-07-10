@@ -1,6 +1,7 @@
 using System;
 using PoeShared.Native;
-using PoeShared.Scaffolding;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 
 namespace PoeShared.UI
 {

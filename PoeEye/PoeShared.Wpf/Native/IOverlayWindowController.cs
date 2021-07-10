@@ -1,6 +1,7 @@
 using System;
 using JetBrains.Annotations;
-using PoeShared.Scaffolding;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 
 namespace PoeShared.Native
 {

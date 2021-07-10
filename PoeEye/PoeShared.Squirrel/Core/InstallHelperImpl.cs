@@ -9,7 +9,8 @@ using System.Threading.Tasks;
 using log4net;
 using Microsoft.Win32;
 using NuGet;
-using PoeShared.Scaffolding;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 using PoeShared.Squirrel.Scaffolding;
 using Splat;
 using Squirrel;
@@ -18,7 +19,7 @@ namespace PoeShared.Squirrel.Core
 {
     internal class InstallHelperImpl : IEnableLogger
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(InstallHelperImpl));
+        private static readonly IFluentLog Log = typeof(InstallHelperImpl).PrepareLogger();
 
         private const string CurrentVersionRegSubKey = @"Software\Microsoft\Windows\CurrentVersion\Uninstall";
         private const string UninstallRegSubKey = @"Software\Microsoft\Windows\CurrentVersion\Uninstall";

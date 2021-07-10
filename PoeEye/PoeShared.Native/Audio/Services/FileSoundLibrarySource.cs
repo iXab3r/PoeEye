@@ -9,13 +9,14 @@ using log4net;
 using NAudio.MediaFoundation;
 using NAudio.Wave;
 using PoeShared.Modularity;
-using PoeShared.Scaffolding;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 
 namespace PoeShared.Audio.Services
 {
     internal class FileSoundLibrarySource : SoundLibrarySourceBase, IFileSoundLibrarySource
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(FileSoundLibrarySource));
+        private static readonly IFluentLog Log = typeof(FileSoundLibrarySource).PrepareLogger();
 
         private readonly DirectoryInfo[] knownDirectories;
         

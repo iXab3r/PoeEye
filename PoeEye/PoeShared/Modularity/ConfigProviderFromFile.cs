@@ -11,13 +11,15 @@ using System.Text;
 using DynamicData;
 using JetBrains.Annotations;
 using log4net;
-using PoeShared.Scaffolding;
+using PoeShared.Logging;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 
 namespace PoeShared.Modularity
 {
     public sealed class ConfigProviderFromFile : DisposableReactiveObject, IConfigProvider
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(ConfigProviderFromFile));
+        private static readonly IFluentLog Log = typeof(ConfigProviderFromFile).PrepareLogger();
 
         private static readonly string DebugConfigFileName = @"configDebugMode.cfg";
         private static readonly string ReleaseConfigFileName = @"config.cfg";
@@ -38,7 +40,7 @@ namespace PoeShared.Modularity
             string configFileName;
             if (appArguments.IsDebugMode)
             {
-                Log.Info("Debug mode detected");
+                Log.Info($"Debug mode detected");
                 configFileName = DebugConfigFileName;
             }
             else
@@ -100,7 +102,7 @@ namespace PoeShared.Modularity
         [MethodImpl(MethodImplOptions.Synchronized)]
         public void Reload()
         {
-            Log.Debug("Reloading configuration...");
+            Log.Debug($"Reloading configuration...");
 
             var config = LoadInternal();
 
@@ -191,7 +193,7 @@ namespace PoeShared.Modularity
             try
             {
                 Log.Debug($"Saving config to file '{ConfigFilePath}'");
-                Log.Debug("Serializing config data...");
+                Log.Debug($"Serializing config data...");
                 var serializedData = configSerializer.Serialize(config);
 
                 Log.Debug($"Successfully serialized config, got {serializedData.Length} chars");
@@ -244,7 +246,7 @@ namespace PoeShared.Modularity
             }
             catch (Exception ex)
             {
-                Log.Warn("Exception occurred, config was not saved correctly", ex);
+                Log.Warn($"Exception occurred, config was not saved correctly", ex);
             }
         }
 
@@ -268,11 +270,11 @@ namespace PoeShared.Modularity
                 loadedConfigurationFile = fileData;
 
                 result = configSerializer.Deserialize<PoeEyeCombinedConfig>(fileData);
-                Log.Debug("Successfully deserialized config data");
+                Log.Debug($"Successfully deserialized config data");
             }
             catch (Exception ex)
             {
-                Log.Warn("Could not deserialize config data", ex);
+                Log.Warn($"Could not deserialize config data", ex);
 
                 foreach (var strategy in strategies.Items)
                 {

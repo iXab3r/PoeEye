@@ -6,7 +6,8 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using log4net;
-using PoeShared.Scaffolding;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging; 
 using PoeShared.Squirrel.Scaffolding;
 using Splat;
 using Squirrel;
@@ -15,7 +16,7 @@ namespace PoeShared.Squirrel.Core
 {
     internal class CheckForUpdateImpl : IEnableLogger
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(CheckForUpdateImpl));
+        private static readonly IFluentLog Log = typeof(CheckForUpdateImpl).PrepareLogger();
 
         private readonly IFileDownloader urlDownloader;
         private readonly string rootAppDirectory;
@@ -114,7 +115,7 @@ namespace PoeShared.Squirrel.Core
                 updateUrlOrPath = updateUrlOrPath.Substring(0, updateUrlOrPath.Length - 1);
             }
 
-            Log.InfoFormat("Downloading RELEASES file from {0}", updateUrlOrPath);
+            Log.Info($"Downloading RELEASES file from {updateUrlOrPath}");
 
             var retries = 3;
 
@@ -159,7 +160,7 @@ namespace PoeShared.Squirrel.Core
             
         private static async Task<string> LoadLocalReleases(string updateUrlOrPath)
         {
-            Log.InfoFormat("Reading RELEASES file from {0}", updateUrlOrPath);
+            Log.Info($"Reading RELEASES file from {updateUrlOrPath}");
 
             if (!Directory.Exists(updateUrlOrPath))
             {
@@ -173,7 +174,7 @@ namespace PoeShared.Squirrel.Core
             {
                 var message = $"The file {fi.FullName} does not exist, something is probably broken with your application";
 
-                Log.WarnFormat(message);
+                Log.Warn(message);
 
                 var packages = new DirectoryInfo(updateUrlOrPath).GetFiles("*.nupkg");
                 if (packages.Length == 0)

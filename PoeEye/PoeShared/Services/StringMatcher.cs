@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text.RegularExpressions;
-using PoeShared.Scaffolding;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 
 namespace PoeShared.Services
 {

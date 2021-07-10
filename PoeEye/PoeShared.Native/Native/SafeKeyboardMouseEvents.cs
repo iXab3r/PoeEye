@@ -10,7 +10,8 @@ using log4net;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using PoeShared.Prism;
-using PoeShared.Scaffolding;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 using Unity;
 using KeyEventArgs = System.Windows.Forms.KeyEventArgs;
 using KeyEventHandler = System.Windows.Forms.KeyEventHandler;
@@ -20,7 +21,7 @@ namespace PoeShared.Native
 {
     internal sealed class KeyboardEventsSource : DisposableReactiveObject, IKeyboardEventsSource
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(KeyboardEventsSource));
+        private static readonly IFluentLog Log = typeof(KeyboardEventsSource).PrepareLogger();
 
         private readonly IScheduler inputScheduler;
         private readonly IClock clock;
@@ -31,7 +32,7 @@ namespace PoeShared.Native
             [NotNull] IClock clock)
         {
             Guard.ArgumentNotNull(clock, nameof(clock));
-            Log.Info("Mouse&keyboard event source initialization started");
+            Log.Info($"Mouse&keyboard event source initialization started");
 
             this.inputScheduler = inputScheduler;
             this.clock = clock;

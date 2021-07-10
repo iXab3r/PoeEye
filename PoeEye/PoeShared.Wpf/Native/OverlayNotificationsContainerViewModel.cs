@@ -11,7 +11,8 @@ using DynamicData;
 using DynamicData.Binding;
 using log4net;
 using PoeShared.Prism;
-using PoeShared.Scaffolding;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 using PoeShared.Scaffolding.WPF;
 using PoeShared.UI;
 using ReactiveUI;
@@ -23,7 +24,7 @@ namespace PoeShared.Native
 {
     internal sealed class OverlayNotificationsContainerViewModel : OverlayViewModelBase
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(OverlayNotificationsContainerViewModel));
+        private static readonly IFluentLog Log = typeof(OverlayNotificationsContainerViewModel).PrepareLogger();
 
         private ReadOnlyObservableCollection<NotificationViewModelBase> items;
 
@@ -130,7 +131,7 @@ namespace PoeShared.Native
 
     internal sealed class NotificationsService : DisposableReactiveObject, INotificationsService
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(NotificationsService));
+        private static readonly IFluentLog Log = typeof(NotificationsService).PrepareLogger();
 
         private readonly OverlayNotificationsContainerViewModel overlayNotificationsContainer;
         private readonly ISourceList<NotificationViewModelBase> itemsSource;

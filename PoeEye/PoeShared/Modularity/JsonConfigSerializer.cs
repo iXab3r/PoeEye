@@ -8,14 +8,16 @@ using DynamicData;
 using log4net;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-using PoeShared.Scaffolding;
+using PoeShared.Logging;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 using ErrorEventArgs = Newtonsoft.Json.Serialization.ErrorEventArgs;
 
 namespace PoeShared.Modularity
 {
     internal sealed class JsonConfigSerializer : IConfigSerializer
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(JsonConfigSerializer));
+        private static readonly IFluentLog Log = typeof(JsonConfigSerializer).PrepareLogger();
 
         private readonly SourceList<JsonConverter> converters = new SourceList<JsonConverter>();
         private readonly int MaxCharsToLog = 1024;

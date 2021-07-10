@@ -12,7 +12,8 @@ using JetBrains.Annotations;
 using log4net;
 using PoeShared.Native;
 using PoeShared.Prism;
-using PoeShared.Scaffolding;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 using ReactiveUI;
 using Unity;
 using Control = System.Windows.Forms.Control;
@@ -25,7 +26,7 @@ namespace PoeShared.RegionSelector.ViewModels
 {
     internal sealed class SelectionAdornerViewModel : DisposableReactiveObject, ISelectionAdornerViewModel
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(SelectionAdornerViewModel));
+        private static readonly IFluentLog Log = typeof(SelectionAdornerViewModel).PrepareLogger();
         private static readonly TimeSpan MousePositionCaptureInterval = TimeSpan.FromMilliseconds(1000 / 60f);
         private static readonly int CurrentProcessId = Process.GetCurrentProcess().Id;
 

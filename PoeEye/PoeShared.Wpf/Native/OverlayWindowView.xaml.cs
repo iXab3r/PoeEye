@@ -5,13 +5,14 @@ using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Threading;
 using log4net;
-using PoeShared.Scaffolding;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 
 namespace PoeShared.Native
 {
     public partial class OverlayWindowView
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(OverlayWindowView));
+        private static readonly IFluentLog Log = typeof(OverlayWindowView).PrepareLogger();
         
         public OverlayWindowView()
         {

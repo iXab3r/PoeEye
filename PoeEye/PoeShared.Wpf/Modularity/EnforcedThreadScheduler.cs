@@ -3,12 +3,14 @@ using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Threading;
 using log4net;
+using PoeShared.Logging;
+using PoeShared.Scaffolding;
 
 namespace PoeShared.Modularity
 {
     public sealed class EnforcedThreadScheduler : IScheduler
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(EnforcedThreadScheduler));
+        private static readonly IFluentLog Log = typeof(EnforcedThreadScheduler).PrepareLogger();
 
         private readonly EventLoopScheduler threadScheduler;
         private Thread schedulerThread;

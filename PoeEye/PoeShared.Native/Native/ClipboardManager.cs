@@ -2,12 +2,15 @@
 using System.Windows.Forms;
 
 using log4net;
+using PoeShared.Logging;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 
 namespace PoeShared.Native
 {
     internal sealed class ClipboardManager : IClipboardManager
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(ClipboardManager));
+        private static readonly IFluentLog Log = typeof(ClipboardManager).PrepareLogger();
 
         public TimeSpan ClipboardRestorationTimeout { get; } = TimeSpan.FromMilliseconds(200);
 

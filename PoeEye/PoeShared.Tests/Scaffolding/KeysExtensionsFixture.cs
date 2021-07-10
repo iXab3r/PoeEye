@@ -1,7 +1,8 @@
 ﻿using System.Windows.Forms;
 using System.Windows.Input;
 using NUnit.Framework;
-using PoeShared.Scaffolding;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 using Shouldly;
 
 namespace PoeShared.Tests.Scaffolding

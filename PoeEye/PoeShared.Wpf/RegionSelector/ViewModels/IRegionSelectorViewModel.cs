@@ -1,7 +1,8 @@
 using System;
 using System.Drawing;
 using JetBrains.Annotations;
-using PoeShared.Scaffolding;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 using WinPoint = System.Drawing.Point;
 
 namespace PoeShared.RegionSelector.ViewModels

@@ -4,7 +4,8 @@ using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Interop;
 using PInvoke;
-using PoeShared.Scaffolding;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 using Point = System.Windows.Point;
 using Size = System.Windows.Size;
 

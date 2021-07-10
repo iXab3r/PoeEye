@@ -6,13 +6,14 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using log4net;
 using PoeShared.Audio.Services;
-using PoeShared.Scaffolding;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 
 namespace PoeShared.Resources.Notifications
 {
     internal class EmbeddedSoundLibrarySource : SoundLibrarySourceBase, IEmbeddedSoundLibrarySource
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(EmbeddedSoundLibrarySource));
+        private static readonly IFluentLog Log = typeof(EmbeddedSoundLibrarySource).PrepareLogger();
 
         private static readonly string[] EmbeddedResourceNames = Assembly.GetExecutingAssembly().GetManifestResourceNames();
 

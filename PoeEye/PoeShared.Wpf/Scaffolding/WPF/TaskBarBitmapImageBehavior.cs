@@ -5,12 +5,13 @@ using System.Windows;
 using System.Windows.Interactivity;
 using Hardcodet.Wpf.TaskbarNotification;
 using log4net;
+using PoeShared.Logging;
 
 namespace PoeShared.Scaffolding.WPF
 {
     public sealed class TaskBarBitmapImageBehavior : Behavior<TaskbarIcon>
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(TaskBarBitmapImageBehavior));
+        private static readonly IFluentLog Log = typeof(TaskBarBitmapImageBehavior).PrepareLogger();
 
         public static readonly DependencyProperty IconProperty = DependencyProperty.Register(
             "Icon", typeof(Icon), typeof(TaskBarBitmapImageBehavior), new PropertyMetadata(default(Icon)));

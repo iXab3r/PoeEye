@@ -5,7 +5,8 @@ using System.Reactive.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using log4net;
-using PoeShared.Scaffolding;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 using PoeShared.Squirrel.Core;
 using PoeShared.Squirrel.Scaffolding;
 using PoeShared.UI;
@@ -14,7 +15,7 @@ namespace PoeShared.Squirrel.Updater
 {
     internal sealed class BasicAuthFileDownloader : IFileDownloader
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(BasicAuthFileDownloader));
+        private static readonly IFluentLog Log = typeof(BasicAuthFileDownloader).PrepareLogger();
 
         private readonly NetworkCredential credentials;
 

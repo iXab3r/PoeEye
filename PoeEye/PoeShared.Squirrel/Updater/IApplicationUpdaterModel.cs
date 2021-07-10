@@ -2,7 +2,8 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
-using PoeShared.Scaffolding;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 using PoeShared.Squirrel.Core;
 using Squirrel;
 

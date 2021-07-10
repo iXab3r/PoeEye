@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Drawing;
 using System.Windows.Forms;
-using PoeShared.Scaffolding;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 using WpfRect = System.Windows.Rect;
 using WinRect = System.Drawing.Rectangle;
 using WinSize = System.Drawing.Size;

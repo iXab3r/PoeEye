@@ -3,7 +3,7 @@
     /// <summary>
     /// Defines available log levels.
     /// </summary>
-    public enum LogLevel
+    public enum FluentLogLevel
     {
         /// <summary>Trace log level.</summary>
         Trace = 0,

@@ -13,7 +13,8 @@ using log4net;
 using PoeShared.Modularity;
 using PoeShared.Native;
 using PoeShared.Prism;
-using PoeShared.Scaffolding;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 using PoeShared.Wpf.Services;
 using PropertyBinder;
 using ReactiveUI;
@@ -25,7 +26,7 @@ namespace PoeShared.UI
 {
     internal sealed class HotkeyTracker : DisposableReactiveObject, IHotkeyTracker
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(HotkeyTracker));
+        private static readonly IFluentLog Log = typeof(HotkeyTracker).PrepareLogger();
         private static readonly Binder<HotkeyTracker> Binder = new();
 
         private readonly SourceCache<HotkeyGesture, HotkeyGesture> hotkeysSource = new(x => x);

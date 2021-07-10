@@ -8,13 +8,14 @@ using System.Text;
 using DynamicData;
 using log4net;
 using Newtonsoft.Json;
+using PoeShared.Logging;
 using PoeShared.Modularity;
 
 namespace PoeShared.Scaffolding
 {
     public static class ObjectExtensions
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(ObjectExtensions));
+        private static readonly IFluentLog Log = typeof(ObjectExtensions).PrepareLogger();
 
         private static readonly List<JsonConverter> JsonConverters = new List<JsonConverter>()
         {

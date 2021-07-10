@@ -2,7 +2,8 @@ using System;
 using System.Reactive.Linq;
 using System.Windows.Input;
 using log4net;
-using PoeShared.Scaffolding;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 using ReactiveUI;
 
 namespace PoeShared.Audio.ViewModels

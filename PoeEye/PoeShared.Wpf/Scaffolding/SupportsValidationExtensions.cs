@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq.Expressions;
-using PoeShared.Scaffolding;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 using ReactiveUI.Validation.Abstractions;
 using ReactiveUI.Validation.Components;
 using ReactiveUI.Validation.Helpers;

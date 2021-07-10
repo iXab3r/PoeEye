@@ -3,7 +3,8 @@ using System.ComponentModel;
 using System.Windows.Controls;
 using System.Windows.Input;
 using GongSolutions.Wpf.DragDrop;
-using PoeShared.Scaffolding;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 
 namespace PoeShared.UI
 {

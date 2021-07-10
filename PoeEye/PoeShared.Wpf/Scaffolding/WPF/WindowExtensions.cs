@@ -4,11 +4,12 @@ using System.Windows;
 using System.Windows.Interop;
 using log4net;
 using PInvoke;
+using PoeShared.Logging;
 
 namespace PoeShared.Scaffolding.WPF
 {
     public static class WindowExtensions {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(WindowExtensions));
+        private static readonly IFluentLog Log = typeof(WindowExtensions).PrepareLogger();
 
         public static IDisposable RegisterWndProc(this Window instance, HwndSourceHook hook)
         {

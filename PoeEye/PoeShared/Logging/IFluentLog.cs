@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace PoeShared.Logging
 {
@@ -8,10 +7,50 @@ namespace PoeShared.Logging
     /// </summary>
     public interface IFluentLog
     {
-        IFluentLog WithPrefix(object prefix);
-        
-        IFluentLog WithTable<T>(IEnumerable<T> items, string separator = "\n\t");
-        
+        internal LogData Data { get; }
+
+        bool IsDebugEnabled { get; }
+
+        bool IsInfoEnabled { get; }
+
+        bool IsWarnEnabled { get; }
+
+        bool IsErrorEnabled { get; }
+
+        internal IFluentLog WithLogData(LogData newLogData);
+
+        void Debug(string message);
+
+        void Debug(string message, Exception exception);
+
+        void Info(string message);
+
+        void Info(string message, Exception exception);
+
+        void Warn(string message);
+
+        void Warn(string message, Exception exception);
+
+        void Error(string message);
+
+        void Error(string message, Exception exception);
+
+        void Debug(Func<string> message);
+
+        void Debug(Func<string> message, Exception exception);
+
+        void Info(Func<string> message);
+
+        void Info(Func<string> message, Exception exception);
+
+        void Warn(Func<string> message);
+
+        void Warn(Func<string> message, Exception exception);
+
+        void Error(Func<string> message);
+
+        void Error(Func<string> message, Exception exception);
+
         void Debug(FormattableString message);
 
         void Debug(FormattableString message, Exception exception);
@@ -27,13 +66,5 @@ namespace PoeShared.Logging
         void Error(FormattableString message);
 
         void Error(FormattableString message, Exception exception);
-
-        bool IsDebugEnabled { get; }
-
-        bool IsInfoEnabled { get; }
-
-        bool IsWarnEnabled { get; }
-
-        bool IsErrorEnabled { get; }
     }
 }

@@ -2,12 +2,14 @@
 using System.Windows;
 using System.Windows.Controls;
 using log4net;
+using PoeShared.Logging;
+using PoeShared.Scaffolding;
 
 namespace PoeShared.UI
 {
     public partial class FakeDelayControl : UserControl
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(FakeDelayControl));
+        private static readonly IFluentLog Log = typeof(FakeDelayControl).PrepareLogger();
 
         public FakeDelayControl()
         {

@@ -2,13 +2,15 @@
 using System.IO;
 using System.Linq;
 using log4net;
-using PoeShared.Scaffolding;
+using PoeShared.Logging;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 
 namespace PoeShared.Modularity
 {
     public sealed class ConfigProviderBackupStrategy : DisposableReactiveObject, IConfigProviderStrategy
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(ConfigProviderBackupStrategy));
+        private static readonly IFluentLog Log = typeof(ConfigProviderBackupStrategy).PrepareLogger();
 
         private readonly IClock clock;
         private DateTime lastBackup;
@@ -31,17 +33,17 @@ namespace PoeShared.Modularity
         {
             if (properties == null)
             {
-                Log.Warn("Properties are not set");
+                Log.Warn($"Properties are not set");
                 return;
             }
             if (properties.BackupTimeout <= TimeSpan.Zero)
             {
-                Log.Warn("Backup timeout is not set");
+                Log.Warn($"Backup timeout is not set");
                 return;
             }
             if (string.IsNullOrEmpty(properties.BackupDirectoryName))
             {
-                Log.Warn("Backup directory is not set");
+                Log.Warn($"Backup directory is not set");
                 return;
             }
             if (!configFile.Exists)
@@ -98,7 +100,7 @@ namespace PoeShared.Modularity
             }
             catch (Exception e)
             {
-                Log.Error("Failed to perform backup storage cleanup", e);
+                Log.Error($"Failed to perform backup storage cleanup", e);
             }
         }
 
@@ -118,7 +120,7 @@ namespace PoeShared.Modularity
         {
             if (backupStoragePeriod <= TimeSpan.Zero)
             {
-                Log.Warn("Backup cleanup period is not set");
+                Log.Warn($"Backup cleanup period is not set");
                 return;
             }
 
@@ -174,7 +176,7 @@ namespace PoeShared.Modularity
             }
             catch (Exception ex)
             {
-                Log.Warn("Failed to create a backup", ex);
+                Log.Warn($"Failed to create a backup", ex);
             }
         }
     }

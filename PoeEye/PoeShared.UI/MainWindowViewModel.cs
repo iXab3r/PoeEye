@@ -9,7 +9,8 @@ using Microsoft.VisualBasic.Logging;
 using PoeShared.Audio.ViewModels;
 using PoeShared.Native;
 using PoeShared.RegionSelector.ViewModels;
-using PoeShared.Scaffolding;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 using PoeShared.Scaffolding.WPF;
 using PoeShared.Wpf.Scaffolding;
 

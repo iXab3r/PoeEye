@@ -11,7 +11,8 @@ using DynamicData.Binding;
 using JetBrains.Annotations;
 using log4net;
 using PoeShared.Modularity;
-using PoeShared.Scaffolding;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 using Prism.Commands;
 using Prism.Modularity;
 using ReactiveUI;
@@ -21,7 +22,7 @@ namespace PoeShared.UI
 {
     internal sealed class GenericSettingsViewModel : DisposableReactiveObject, IGenericSettingsViewModel
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(GenericSettingsViewModel));
+        private static readonly IFluentLog Log = typeof(GenericSettingsViewModel).PrepareLogger();
 
         private static readonly MethodInfo ReloadConfigMethod = typeof(GenericSettingsViewModel)
             .GetMethod(nameof(ReloadTypedConfig), BindingFlags.Instance | BindingFlags.NonPublic);

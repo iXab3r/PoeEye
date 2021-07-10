@@ -5,13 +5,15 @@ using System.Linq;
 using DynamicData;
 using DynamicData.Binding;
 using log4net;
-using PoeShared.Scaffolding;
+using PoeShared.Logging;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 
 namespace PoeShared.Audio.Services
 {
     internal class ComplexSoundLibrary : DisposableReactiveObject, ISoundLibrarySource
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(ComplexSoundLibrary));
+        private static readonly IFluentLog Log = typeof(ComplexSoundLibrary).PrepareLogger();
 
         private static readonly Lazy<ComplexSoundLibrary> InstanceSupplier = new();
         private readonly ISoundLibrarySource[] sources;

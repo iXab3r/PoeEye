@@ -6,8 +6,10 @@ using System.Linq;
 using System.Reflection;
 using CommandLine;
 using log4net;
+using PoeShared.Logging;
 using PoeShared.Modularity;
-using PoeShared.Scaffolding;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 
 namespace PoeShared
 {
@@ -44,7 +46,7 @@ namespace PoeShared
 
     public class AppArguments : AppOptions, IAppArguments
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(AppArguments));
+        private static readonly IFluentLog Log = typeof(AppArguments).PrepareLogger();
 
         private bool isElevated;
         private string appName;

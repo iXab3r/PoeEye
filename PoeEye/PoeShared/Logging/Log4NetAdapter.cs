@@ -28,19 +28,19 @@ namespace PoeShared.Logging
         {
             switch (logData.LogLevel)
             {
-                case LogLevel.Info:
+                case FluentLogLevel.Info:
                     if (logger.IsInfoEnabled)
                     {
                         WriteLog(logData, logger.Info, logger.Info);
                     }
                     break;
-                case LogLevel.Warn:
+                case FluentLogLevel.Warn:
                     if (logger.IsWarnEnabled)
                     {
                         WriteLog(logData, logger.Warn, logger.Warn);
                     }
                     break;
-                case LogLevel.Error:
+                case FluentLogLevel.Error:
                     if (logger.IsErrorEnabled)
                     {
                         WriteLog(logData, logger.Error, logger.Error);

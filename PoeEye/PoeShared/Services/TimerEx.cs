@@ -6,13 +6,15 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading;
 using log4net;
-using PoeShared.Scaffolding;
+using PoeShared.Logging;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 
 namespace PoeShared.Services
 {
     internal sealed class TimerEx : DisposableReactiveObject, IObservable<long>
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(TimerEx));
+        private static readonly IFluentLog Log = typeof(TimerEx).PrepareLogger();
 
         private readonly TimeSpan period;
         private readonly bool amendPeriod;

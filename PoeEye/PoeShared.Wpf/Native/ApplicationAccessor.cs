@@ -3,13 +3,14 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Windows;
 using log4net;
-using PoeShared.Scaffolding;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 
 namespace PoeShared.Services
 {
     internal sealed class ApplicationAccessor : DisposableReactiveObject, IApplicationAccessor
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(ApplicationAccessor));
+        private static readonly IFluentLog Log = typeof(ApplicationAccessor).PrepareLogger();
 
         public ApplicationAccessor()
         {

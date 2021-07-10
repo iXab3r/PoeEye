@@ -4,8 +4,10 @@ using System.Windows.Forms;
 
 using JetBrains.Annotations;
 using log4net;
+using PoeShared.Logging;
 using PoeShared.Modularity;
-using PoeShared.Scaffolding;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 using ReactiveUI;
 using StartupHelper;
 
@@ -13,7 +15,7 @@ namespace PoeShared.Services
 {
     internal sealed class StartupManager : DisposableReactiveObject, IStartupManager
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(StartupManager));
+        private static readonly IFluentLog Log = typeof(StartupManager).PrepareLogger();
         private readonly IAppArguments appArguments;
         private readonly StartupManagerArgs args;
 
@@ -70,12 +72,12 @@ namespace PoeShared.Services
             var result = manager.Register(args.CommandLineArgs);
             if (!result)
             {
-                Log.Warn("Failed to register application startup");
+                Log.Warn($"Failed to register application startup");
             }
 
             if (result && !IsRegistered)
             {
-                Log.Warn("Register returned success, but IsRegistered is still false");
+                Log.Warn($"Register returned success, but IsRegistered is still false");
             }
             this.RaisePropertyChanged(nameof(IsRegistered));
             return result;
@@ -93,12 +95,12 @@ namespace PoeShared.Services
             var result = manager.Unregister();
             if (!result)
             {
-                Log.Warn("Failed to unregister application startup");
+                Log.Warn($"Failed to unregister application startup");
             }
 
             if (result && IsRegistered)
             {
-                Log.Warn("Unregister returned success, but IsRegistered is still true");
+                Log.Warn($"Unregister returned success, but IsRegistered is still true");
             }
             this.RaisePropertyChanged(nameof(IsRegistered));
             return result;
@@ -108,13 +110,13 @@ namespace PoeShared.Services
         {
             if (manager.IsRegistered)
             {
-                Log.Debug("Reregistering application startup");
+                Log.Debug($"Reregistering application startup");
                 Unregister();
                 Register();
             }
             else
             {
-                Log.Debug("Application startup is not registered");
+                Log.Debug($"Application startup is not registered");
             }
             
         }

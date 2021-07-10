@@ -4,12 +4,13 @@ using System.Windows;
 using System.Windows.Controls;
 using log4net;
 using MahApps.Metro.Controls;
+using PoeShared.Logging;
 
 namespace PoeShared.Scaffolding.WPF
 {
     public class ScrollViewerExtensions
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(ScrollViewerExtensions));
+        private static readonly IFluentLog Log = typeof(ScrollViewerExtensions).PrepareLogger();
 
         public static readonly DependencyProperty AutoScrollToTopProperty =
             DependencyProperty.RegisterAttached(

@@ -4,7 +4,8 @@ using System.Drawing;
 using System.Linq;
 using System.Windows;
 using PoeShared.Native;
-using PoeShared.Scaffolding;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 using System;
 using System.Reactive;
 using System.Reactive.Concurrency;
@@ -29,7 +30,7 @@ namespace PoeShared.RegionSelector.ViewModels
 {
     internal sealed class RegionSelectorViewModel : DisposableReactiveObject, IRegionSelectorViewModel
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(RegionSelectorViewModel));
+        private static readonly IFluentLog Log = typeof(RegionSelectorViewModel).PrepareLogger();
         private static readonly TimeSpan ThrottlingPeriod = TimeSpan.FromMilliseconds(250);
         private static readonly int CurrentProcessId = Process.GetCurrentProcess().Id;
         private static readonly double MinSelectionArea = 20;

@@ -10,7 +10,8 @@ using NAudio.Utils;
 using PoeShared.Audio.Models;
 using PoeShared.Audio.Services;
 using PoeShared.Prism;
-using PoeShared.Scaffolding;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 using ReactiveUI;
 using Unity;
 
@@ -18,7 +19,7 @@ namespace PoeShared.Audio.ViewModels
 {
     internal sealed class WaveOutDeviceSelectorViewModel : DisposableReactiveObject, IWaveOutDeviceSelectorViewModel
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(WaveOutDeviceSelectorViewModel));
+        private static readonly IFluentLog Log = typeof(WaveOutDeviceSelectorViewModel).PrepareLogger();
         
         private static readonly TimeSpan ThrottlingTimeout = TimeSpan.FromMilliseconds(100);
         private static readonly TimeSpan RetryTimeout = TimeSpan.FromSeconds(60);

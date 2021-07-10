@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows.Threading;
 using log4net;
+using PoeShared.Logging;
 using PoeShared.Prism;
 using PoeShared.Services;
 using PropertyBinder;
@@ -20,7 +21,7 @@ namespace PoeShared.Scaffolding.WPF
             Binder.Bind(x => x.pauseLatch.IsBusy).To(x => x.IsPaused);
         }
 
-        private static readonly ILog Log = LogManager.GetLogger(typeof(UiSharedResourceLatch));
+        private static readonly IFluentLog Log = typeof(UiSharedResourceLatch).PrepareLogger();
 
         private readonly ISharedResourceLatch isBusyLatch;
         private readonly ISharedResourceLatch pauseLatch;

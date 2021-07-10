@@ -7,7 +7,9 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using DynamicData;
 using log4net;
-using PoeShared.Scaffolding;
+using PoeShared.Logging;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 using ReactiveUI;
 using ObservableEx = PoeShared.Scaffolding.ObservableEx;
 
@@ -15,7 +17,7 @@ namespace PoeShared.Services
 {
     internal sealed class FolderCleanerService : DisposableReactiveObject, IFolderCleanerService
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(FolderCleanerService));
+        private static readonly IFluentLog Log = typeof(FolderCleanerService).PrepareLogger();
 
         private readonly SourceList<DirectoryInfo> directoriesSource = new SourceList<DirectoryInfo>();
         private TimeSpan? fileTimeToLive;
@@ -100,7 +102,7 @@ namespace PoeShared.Services
             }
             catch (Exception e)
             {
-                Log.Warn("Exception in cleanup thread", e);
+                Log.Warn($"Exception in cleanup thread", e);
                 sw.Step($"Exception occurred - {e.Message}");
             }
             finally{

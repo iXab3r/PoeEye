@@ -2,7 +2,8 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using log4net;
 using PoeShared.Modularity;
-using PoeShared.Scaffolding;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 using System.Linq;
 using System.Reactive.Linq;
 using DynamicData;
@@ -13,7 +14,7 @@ namespace PoeShared.Squirrel.Updater
 {
     internal sealed class UpdateSourceProviderFromConfig : DisposableReactiveObject, IUpdateSourceProvider
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(UpdateSourceProviderFromConfig));
+        private static readonly IFluentLog Log = typeof(UpdateSourceProviderFromConfig).PrepareLogger();
 
         private readonly IConfigProvider<UpdateSettingsConfig> configProvider;
         private readonly ISourceCache<UpdateSourceInfo, string> knownSources = new SourceCache<UpdateSourceInfo, string>(x => x.Uri);

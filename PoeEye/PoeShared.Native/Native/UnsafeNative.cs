@@ -8,6 +8,8 @@ using System.Text;
 using System.Windows.Input;
 using log4net;
 using PInvoke;
+using PoeShared.Logging;
+using PoeShared.Scaffolding;
 
 namespace PoeShared.Native
 {
@@ -15,7 +17,7 @@ namespace PoeShared.Native
     [SuppressMessage("ReSharper", "IdentifierTypo", Justification = "Trying to comply to WinAPI naming")]
     public partial class UnsafeNative
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(UnsafeNative));
+        private static readonly IFluentLog Log = typeof(UnsafeNative).PrepareLogger();
 
         private static readonly int CurrentProcessId = Process.GetCurrentProcess().Id;
         private static readonly Version OSVersion = Environment.OSVersion.Version;

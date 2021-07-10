@@ -5,13 +5,14 @@ using System.Windows.Forms;
 using log4net;
 using PoeShared.Native;
 using PoeShared.Prism;
-using PoeShared.Scaffolding;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 
 namespace PoeShared.UI
 {
     internal sealed class CharToKeysConverter : IConverter<char, Keys>, IConverter<(char ch, string keyboardLayoutId), Keys>
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(CharToKeysConverter));
+        private static readonly IFluentLog Log = typeof(CharToKeysConverter).PrepareLogger();
         private readonly ICollection<KeyboardLayout> keyboardHandleByKeyboardLayoutId;
         
         public CharToKeysConverter()

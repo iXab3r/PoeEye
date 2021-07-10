@@ -5,7 +5,8 @@ using System.Security.Cryptography;
 using System.Text;
 
 using Newtonsoft.Json;
-using PoeShared.Scaffolding;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 
 namespace PoeShared.Converters
 {

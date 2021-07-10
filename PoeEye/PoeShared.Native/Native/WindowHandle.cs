@@ -11,7 +11,9 @@ using System.Windows.Media.Imaging;
 using log4net;
 using Newtonsoft.Json;
 using PInvoke;
-using PoeShared.Scaffolding;
+using PoeShared.Logging;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 using Win32Exception = System.ComponentModel.Win32Exception;
 // ReSharper disable CA1416
 
@@ -19,7 +21,7 @@ namespace PoeShared.Native
 {
     internal sealed class WindowHandle : IWindowHandle
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(WindowHandle));
+        private static readonly IFluentLog Log = typeof(WindowHandle).PrepareLogger();
 
         private readonly Lazy<string> classSupplier;
         private readonly Lazy<Rectangle> windowBoundsSupplier;

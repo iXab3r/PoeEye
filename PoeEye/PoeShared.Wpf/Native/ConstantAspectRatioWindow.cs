@@ -7,7 +7,8 @@ using System.Windows;
 using System.Windows.Interop;
 using log4net;
 using PInvoke;
-using PoeShared.Scaffolding;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 using Point = System.Drawing.Point;
 
 namespace PoeShared.Native
@@ -26,7 +27,7 @@ namespace PoeShared.Native
         public static readonly DependencyProperty DpiAwareProperty = DependencyProperty.Register(
             "DpiAware", typeof(bool), typeof(ConstantAspectRatioWindow), new PropertyMetadata(default(bool)));
 
-        private static readonly ILog Log = LogManager.GetLogger(typeof(ConstantAspectRatioWindow));
+        private static readonly IFluentLog Log = typeof(ConstantAspectRatioWindow).PrepareLogger();
         private const float DefaultPixelsPerInch = 96.0F;
        
         private readonly CompositeDisposable anchors = new CompositeDisposable();

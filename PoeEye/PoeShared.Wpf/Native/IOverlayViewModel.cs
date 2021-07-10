@@ -4,7 +4,8 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
 using JetBrains.Annotations;
-using PoeShared.Scaffolding;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 using Point = System.Windows.Point;
 using Size = System.Windows.Size;
 

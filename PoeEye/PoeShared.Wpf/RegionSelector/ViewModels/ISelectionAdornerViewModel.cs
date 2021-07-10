@@ -2,7 +2,8 @@
 using System.Windows;
 using System.Windows.Media;
 using JetBrains.Annotations;
-using PoeShared.Scaffolding;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 using WinSize = System.Drawing.Size;
 
 namespace PoeShared.RegionSelector.ViewModels

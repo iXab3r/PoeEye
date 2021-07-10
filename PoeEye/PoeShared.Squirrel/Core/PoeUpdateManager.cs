@@ -12,7 +12,8 @@ using System.Windows.Controls;
 using log4net;
 using Microsoft.Win32;
 using NuGet;
-using PoeShared.Scaffolding;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 using PoeShared.Squirrel.Scaffolding;
 using Splat;
 using Squirrel;
@@ -22,7 +23,7 @@ namespace PoeShared.Squirrel.Core
 {
     public sealed partial class PoeUpdateManager : DisposableReactiveObject
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(PoeUpdateManager));
+        private static readonly IFluentLog Log = typeof(PoeUpdateManager).PrepareLogger();
 
         private readonly string updateUrlOrPath;
         private readonly IFileDownloader urlDownloader;

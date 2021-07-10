@@ -3,13 +3,15 @@ using System.Collections.Concurrent;
 using System.Reactive.Disposables;
 using JetBrains.Annotations;
 using log4net;
+using PoeShared.Logging;
+using PoeShared.Scaffolding;
 using PoeShared.UI;
 
 namespace PoeShared.Wpf.Services
 {
     internal sealed class UserInputFilterConfigurator : IUserInputFilterConfigurator
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(UserInputFilterConfigurator));
+        private static readonly IFluentLog Log = typeof(UserInputFilterConfigurator).PrepareLogger();
 
         private readonly ConcurrentDictionary<HotkeyGesture, int> whitelist = new();
         

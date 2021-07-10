@@ -5,14 +5,16 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using log4net;
-using PoeShared.Scaffolding;
+using PoeShared.Logging;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 
 
 namespace PoeShared.Native
 {
     public static class ResourceReader
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(ResourceReader));
+        private static readonly IFluentLog Log = typeof(ResourceReader).PrepareLogger();
 
         public static string ReadResourceAsString(string path)
         {

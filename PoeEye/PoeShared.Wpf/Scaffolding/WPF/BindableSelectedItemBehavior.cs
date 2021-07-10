@@ -4,12 +4,13 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Interactivity;
 using log4net;
+using PoeShared.Logging;
 
 namespace PoeShared.Scaffolding.WPF
 {
     public class BindableSelectedItemBehavior : Behavior<TreeView>
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(BindableSelectedItemBehavior));
+        private static readonly IFluentLog Log = typeof(BindableSelectedItemBehavior).PrepareLogger();
 
         public static readonly DependencyProperty SelectedItemProperty =
             DependencyProperty.Register("SelectedItem", typeof(object), typeof(BindableSelectedItemBehavior),

@@ -11,7 +11,8 @@ using PoeShared.Dialogs.Services;
 using PoeShared.Modularity;
 using PoeShared.Native;
 using PoeShared.RegionSelector.ViewModels;
-using PoeShared.Scaffolding;
+using PoeShared.Scaffolding; 
+using PoeShared.Logging;
 using PoeShared.Scaffolding.WPF;
 using PoeShared.Services;
 using PoeShared.UI;
@@ -26,7 +27,7 @@ namespace PoeShared.Prism
 {
     public sealed class WpfCommonRegistrations : UnityContainerExtension
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(WpfCommonRegistrations));
+        private static readonly IFluentLog Log = typeof(WpfCommonRegistrations).PrepareLogger();
 
         protected override void Initialize()
         {
