@@ -17,7 +17,7 @@ namespace PoeShared.UI
     public class HotKeyBox : Control
     {
         public const string PART_TextBox = "PART_TextBox";
-        private static readonly ISet<Key> EscapeKeys = new HashSet<Key> { Key.Escape, Key.Back, Key.Delete };
+        private static readonly ISet<Key> EscapeKeys = new HashSet<Key> {Key.Escape, Key.Back, Key.Delete};
 
         public static readonly DependencyProperty HotKeyProperty = DependencyProperty.Register(
             "HotKey",
@@ -49,21 +49,25 @@ namespace PoeShared.UI
             typeof(HotKeyBox),
             new PropertyMetadata(false));
 
+        public static readonly DependencyProperty AcceptsModifiersProperty = DependencyProperty.Register(
+            "AcceptsModifiers", typeof(bool), typeof(HotKeyBox), new PropertyMetadata(true));
+
         public static readonly DependencyProperty AcceptsMouseWheelProperty = DependencyProperty.Register(
             "AcceptsMouseWheel", typeof(bool), typeof(HotKeyBox), new PropertyMetadata(default(bool)));
-        
+
         /// <summary>Identifies the <see cref="P:System.Windows.Controls.Primitives.TextBoxBase.AcceptsReturn" /> dependency property. </summary>
         /// <returns>The identifier for the <see cref="P:System.Windows.Controls.Primitives.TextBoxBase.AcceptsReturn" /> dependency property.</returns>
-        public static readonly DependencyProperty AcceptsReturnProperty = KeyboardNavigation.AcceptsReturnProperty.AddOwner(typeof (HotKeyBox));
+        public static readonly DependencyProperty AcceptsReturnProperty = KeyboardNavigation.AcceptsReturnProperty.AddOwner(typeof(HotKeyBox));
+
         /// <summary>Identifies the <see cref="P:System.Windows.Controls.Primitives.TextBoxBase.AcceptsTab" /> dependency property. </summary>
         /// <returns>The identifier for the <see cref="P:System.Windows.Controls.Primitives.TextBoxBase.AcceptsTab" /> dependency property.</returns>
-        public static readonly DependencyProperty AcceptsTabProperty = DependencyProperty.Register(nameof (TextBoxBase.AcceptsTab), typeof (bool), typeof (HotKeyBox), new FrameworkPropertyMetadata(false));
+        public static readonly DependencyProperty AcceptsTabProperty = DependencyProperty.Register(nameof(TextBoxBase.AcceptsTab), typeof(bool), typeof(HotKeyBox), new FrameworkPropertyMetadata(false));
 
         public static readonly DependencyProperty TextProperty = TextPropertyKey.DependencyProperty;
+        private HotkeyGesture lastKeyDown;
+        private DateTime lastKeyDownTimestamp;
 
         private TextBox textBox;
-        private DateTime lastKeyDownTimestamp; 
-        private HotkeyGesture lastKeyDown; 
 
         static HotKeyBox()
         {
@@ -71,22 +75,28 @@ namespace PoeShared.UI
             EventManager.RegisterClassHandler(typeof(HotKeyBox), GotFocusEvent, new RoutedEventHandler(OnGotFocus));
         }
 
+        public bool AcceptsModifiers
+        {
+            get => (bool) GetValue(AcceptsModifiersProperty);
+            set => SetValue(AcceptsModifiersProperty, value);
+        }
+
         public bool AcceptsMouseWheel
         {
-            get { return (bool) GetValue(AcceptsMouseWheelProperty); }
-            set { SetValue(AcceptsMouseWheelProperty, value); }
+            get => (bool) GetValue(AcceptsMouseWheelProperty);
+            set => SetValue(AcceptsMouseWheelProperty, value);
         }
-        
+
         public bool AcceptsReturn
         {
-            get => (bool) this.GetValue(AcceptsReturnProperty);
-            set => this.SetValue(AcceptsReturnProperty, value);
+            get => (bool) GetValue(AcceptsReturnProperty);
+            set => SetValue(AcceptsReturnProperty, value);
         }
-        
+
         public bool AcceptsTab
         {
-            get => (bool) this.GetValue(AcceptsTabProperty);
-            set => this.SetValue(AcceptsTabProperty, value);
+            get => (bool) GetValue(AcceptsTabProperty);
+            set => SetValue(AcceptsTabProperty, value);
         }
 
         public bool AcceptsMouseKeys
@@ -192,7 +202,12 @@ namespace PoeShared.UI
             {
                 return;
             }
-            var currentModifierKeys = UnsafeNative.GetCurrentModifierKeys();
+
+            if (!TryGetModifiers(out var currentModifierKeys))
+            {
+                return;
+            }
+            
             if (e.Delta != 0)
             {
                 HotKey = new HotkeyGesture(e.Delta > 0 ? MouseWheelAction.WheelUp : MouseWheelAction.WheelDown, currentModifierKeys);
@@ -206,7 +221,12 @@ namespace PoeShared.UI
             {
                 return;
             }
-            var currentModifierKeys = UnsafeNative.GetCurrentModifierKeys();
+
+            if (!TryGetModifiers(out var currentModifierKeys))
+            {
+                return;
+            }
+            
             if (e.XButton1 == MouseButtonState.Pressed)
             {
                 HotKey = new HotkeyGesture(MouseButton.XButton1, currentModifierKeys);
@@ -278,7 +298,11 @@ namespace PoeShared.UI
 
             e.Handled = true;
 
-            var currentModifierKeys = UnsafeNative.GetCurrentModifierKeys();
+            if (!TryGetModifiers(out var currentModifierKeys))
+            {
+                return;
+            }
+
             var currentHotKey = new HotkeyGesture(key, currentModifierKeys);
 
             var isClearHotKey = EscapeKeys.Contains(key) && currentModifierKeys == ModifierKeys.None;
@@ -291,6 +315,7 @@ namespace PoeShared.UI
             {
                 HotKey = currentHotKey;
             }
+
             UpdateText();
             lastKeyDown = currentHotKey;
             lastKeyDownTimestamp = DateTime.Now;
@@ -300,6 +325,20 @@ namespace PoeShared.UI
         {
             var hotkey = HotKey ?? new HotkeyGesture(Key.None);
             Text = hotkey.ToString();
+        }
+
+        private bool TryGetModifiers(out ModifierKeys modifierKeys)
+        {
+            var currentModifierKeys = UnsafeNative.GetCurrentModifierKeys();
+
+            if (AcceptsModifiers)
+            {
+                modifierKeys = currentModifierKeys;
+                return true;
+            }
+            
+            modifierKeys = ModifierKeys.None;
+            return currentModifierKeys == ModifierKeys.None;
         }
     }
 }

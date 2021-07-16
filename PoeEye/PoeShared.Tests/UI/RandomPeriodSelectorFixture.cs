@@ -18,6 +18,40 @@ namespace PoeShared.Tests.UI
         }
 
         [Test]
+        public void ShouldKeepUpperSyncedWithLowerIfNotRandomized()
+        {
+            //Given
+            var instance = CreateInstance();
+            instance.RandomizeValue = true;
+            instance.LowerValue = TimeSpan.FromSeconds(5);
+            instance.UpperValue = TimeSpan.FromSeconds(7);
+
+            //When
+            instance.RandomizeValue = false;
+
+            //Then
+            instance.UpperValue.ShouldBe(TimeSpan.FromSeconds(5));
+        }
+
+        [Test]
+        [TestCase(10, 10, 10)]
+        [TestCase(10, 11, 10)]
+        [TestCase(11, 10, 11)]
+        public void ShouldSetUpperToLowerWhenRandomizationIsDisabled(int lower, int upper, int upperExpected)
+        {
+            //Given
+            var instance = CreateInstance();
+            instance.RandomizeValue = false;
+            instance.UpperValue = TimeSpan.FromSeconds(upper);
+
+            //When
+            instance.LowerValue = TimeSpan.FromSeconds(lower);
+
+            //Then
+            instance.UpperValue.ShouldBe(TimeSpan.FromSeconds(upperExpected));
+        }
+
+        [Test]
         [TestCase(0, -10, 10, 0, null)]
         [TestCase(10, -10, 10, 11, null)]
         [TestCase(-10, -10, 10, -11, null)]

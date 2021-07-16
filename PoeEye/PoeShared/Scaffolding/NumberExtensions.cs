@@ -29,6 +29,11 @@ namespace PoeShared.Scaffolding
             return TimeSpan.FromMilliseconds(EnsureInRange(value.TotalMilliseconds, min.TotalMilliseconds,
                 max.TotalMilliseconds));
         }
+        
+        public static bool IsInRange(this TimeSpan value, TimeSpan min, TimeSpan max)
+        {
+            return value >= min && value <= max;
+        }
 
         public static double EnsureInRange(this double value, double min, double max)
         {

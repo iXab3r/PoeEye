@@ -376,6 +376,7 @@ namespace PoeShared.UI
                         keyboardEventsSource.WhenKeyUp.Select(x => new {x.KeyCode, IsDown = false})
                     )
                     .DistinctUntilChanged()
+                    .Where(x => !stopRecordingHotkey.Contains(x.KeyCode))
                     .ObserveOnDispatcher()
                     .TakeUntil(cancel)
                     .Subscribe(x =>

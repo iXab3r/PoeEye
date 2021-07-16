@@ -166,7 +166,12 @@
                         <TextBlock Text="{Binding HotkeySequenceEditor.Items.Count}" />
 
                         <TextBlock Text="Stop recording hotkey" />
-                        <eye:HotKeyBox HotKey="{Binding HotkeySequenceEditor.StopRecordingHotkey}" />
+                        <eye:HotKeyBox 
+                            AcceptsModifiers="False"
+                            AcceptsTab="False"
+                            AcceptsMouseKeys="False"
+                            AcceptsMouseWheel="False"
+                            HotKey="{Binding HotkeySequenceEditor.StopRecordingHotkey}" />
 
                         <TextBlock Text="MaxDuration" />
                         <mah:NumericUpDown

@@ -68,7 +68,7 @@ namespace PoeShared.Wpf.Scaffolding
                 viewModelProperty,
                 isPropertyValid,
                 message);
-
+            
             viewModel.ValidationContext.Add(propValidation);
 
             return new ValidationHelper(propValidation);
