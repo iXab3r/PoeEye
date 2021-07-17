@@ -134,16 +134,7 @@
                 <local:AdornerTest/>
             </TabItem>
             <TabItem Header="Notifications">
-                <st:AutoGrid Columns="150,Auto" Rows="*" ChildMargin="5" VerticalAlignment="Top">
-
-                    <TextBlock Text="Show notification: Text" />
-                    <eye:ButtonEx Content="Show text notification" Command="{Binding AddTextNotification}" />
-
-                    <TextBlock Text="Timeout" />
-                    <mah:NumericUpDown
-                        Interval="1000"
-                        Value="{Binding NotificationTimeout, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource TimeSpanToMillisecondsConverter}}" />
-                </st:AutoGrid>
+                <eye:CachedContentControl Content="{Binding NotificationSandbox}"/>
             </TabItem>
             <TabItem Header="HotkeySequence">
                 <st:StackPanel Fill="Fill" Orientation="Vertical" MarginBetweenChildren="5" VerticalAlignment="Stretch">

@@ -1,0 +1,32 @@
+﻿<eye:SharedResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                              xmlns:eye="http://coderush.net/poeeye/"
+                              xmlns:ui="clr-namespace:PoeShared.UI"
+                              xmlns:st="http://schemas.spicytaco.io/"
+                              xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+                              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
+    <DataTemplate DataType="{x:Type ui:NotificationSandboxViewModel}">
+        <st:AutoGrid Columns="150,Auto" Rows="*" ChildMargin="5" VerticalAlignment="Top">
+            <TextBlock Text="ALL"/>
+            <eye:ButtonEx Content="Close" Command="{Binding CloseAllNotifications}" />
+
+            <TextBlock Text="Show notification: Text" />
+            <eye:ButtonEx Content="Show text notification" Command="{Binding AddTextNotification}" />
+
+            <TextBlock Text="Timeout" />
+            <mah:NumericUpDown
+                Interval="1000"
+                materialDesign:TextFieldAssist.SuffixText="ms"
+                Value="{Binding NotificationTimeout, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource TimeSpanToMillisecondsConverter}}" />
+            
+            <TextBlock Text="Title" />
+            <TextBox Text="{Binding NotificationTitle}"/>
+            
+            <TextBlock Text="Text" />
+            <TextBox Text="{Binding NotificationText}"/>
+            
+            <TextBlock Text="With Image" />
+            <CheckBox IsChecked="{Binding WithIcon}"/>
+        </st:AutoGrid>
+    </DataTemplate>
+</eye:SharedResourceDictionary>

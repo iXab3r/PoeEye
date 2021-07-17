@@ -27,6 +27,7 @@ namespace PoeShared.Native
         }
         
         public static ImageSource AppIconSource { get; }
+        
         public static Icon AppIcon { get; }
 
         public static ImageSource GetAppIcon(FileInfo path)

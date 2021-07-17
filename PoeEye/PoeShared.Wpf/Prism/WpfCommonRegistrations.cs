@@ -13,6 +13,9 @@ using PoeShared.Native;
 using PoeShared.RegionSelector.ViewModels;
 using PoeShared.Scaffolding; 
 using PoeShared.Logging;
+using PoeShared.Notifications;
+using PoeShared.Notifications.Services;
+using PoeShared.Notifications.ViewModels;
 using PoeShared.Scaffolding.WPF;
 using PoeShared.Services;
 using PoeShared.UI;
@@ -67,6 +70,7 @@ namespace PoeShared.Prism
                 .RegisterType<IGenericSettingsViewModel, GenericSettingsViewModel>()
                 .RegisterType<IRandomPeriodSelector, RandomPeriodSelector>()
                 .RegisterType<IHotkeySequenceEditorViewModel, HotkeySequenceEditorViewModel>()
+                .RegisterType<INotificationContainerViewModel, NotificationContainerViewModel>()
                 .RegisterType<IAudioNotificationSelectorViewModel, AudioNotificationSelectorViewModel>();
         }
 

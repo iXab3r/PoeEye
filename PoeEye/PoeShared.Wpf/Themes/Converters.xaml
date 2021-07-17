@@ -13,6 +13,8 @@
     <system:Boolean x:Key="FalseValue">False</system:Boolean>
     <system:Boolean x:Key="TrueValue">True</system:Boolean>
     
+    <eyeConverters:BitmapImageOrNullConverter x:Key="NonBitmapImageToNullConverter" />
+    <eyeConverters:BitmapImageOrNullConverter x:Key="BitmapImageToNullConverter" IsInverted="True" />
     
     <blue:MultiplyDoubleConverter x:Key="DoubleToPercentConverter" Factor="100" />
     <blue:MultiplyDoubleConverter x:Key="DoubleFromPercentConverter" Factor="0.01" />

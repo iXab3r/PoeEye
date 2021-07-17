@@ -1,4 +1,6 @@
 ﻿using PoeShared.Native;
+using PoeShared.Notifications;
+using PoeShared.Notifications.ViewModels;
 
 namespace PoeShared.UI
 {

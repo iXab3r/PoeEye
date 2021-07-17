@@ -17,6 +17,8 @@ using PoeShared.Prism;
 using PoeShared.RegionSelector.Views;
 using PoeShared.Scaffolding; 
 using PoeShared.Logging;
+using PoeShared.Notifications;
+using PoeShared.Notifications.Services;
 using PoeShared.Scaffolding.WPF;
 using PropertyBinder;
 using ReactiveUI;

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Drawing;
-using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows;
@@ -11,6 +10,7 @@ using PoeShared.Native;
 using PoeShared.RegionSelector.ViewModels;
 using PoeShared.Scaffolding; 
 using PoeShared.Logging;
+using PoeShared.Notifications;
 using PoeShared.Scaffolding.WPF;
 using PoeShared.Wpf.Scaffolding;
 
@@ -18,22 +18,21 @@ namespace PoeShared.UI
 {
     internal sealed class MainWindowViewModel : DisposableReactiveObject
     {
-        private readonly INotificationsService notificationsService;
+        private DisposableReactiveObject fakeDelay;
         private TimeSpan randomPeriod;
+        private Rect selectionRect;
 
         private Rectangle selectionRectangle;
-        private Rect selectionRect;
-        private DisposableReactiveObject fakeDelay;
 
         public MainWindowViewModel(
             IAudioNotificationSelectorViewModel audioNotificationSelector,
             IRandomPeriodSelector randomPeriodSelector,
-            INotificationsService notificationsService,
             ISelectionAdornerViewModel selectionAdorner,
+            NotificationSandboxViewModel notificationSandbox,
             IHotkeySequenceEditorViewModel hotkeySequenceEditor)
         {
+            NotificationSandbox = notificationSandbox;
             SelectionAdorner = selectionAdorner.AddTo(Anchors);
-            this.notificationsService = notificationsService;
             AudioNotificationSelector = audioNotificationSelector.AddTo(Anchors);
             RandomPeriodSelector = randomPeriodSelector.AddTo(Anchors);
             HotkeySequenceEditor = hotkeySequenceEditor.AddTo(Anchors);
@@ -48,7 +47,6 @@ namespace PoeShared.UI
                 throw new ApplicationException("Error");
             });
             
-            AddTextNotification = CommandWrapper.Create(AddTextNotificationExecuted);
             RandomPeriodSelector.LowerValue = TimeSpan.FromSeconds(3);
             RandomPeriodSelector.UpperValue = TimeSpan.FromSeconds(3);
             NextRandomPeriodCommand = CommandWrapper.Create(() => RandomPeriod = randomPeriodSelector.GetValue());
@@ -70,20 +68,11 @@ namespace PoeShared.UI
             });
         }
 
+        public NotificationSandboxViewModel NotificationSandbox { get; }
+
         public ICommand StartSelectionCommand { get; }
 
-        private void AddTextNotificationExecuted()
-        {
-            var rng = new Random();
-            var notification = new TextNotificationViewModel()
-            {
-                Text = Enumerable.Repeat("a", (int)rng.Next(10, 60)).JoinStrings(" "),
-                TimeLeft = NotificationTimeout
-            };
 
-            notificationsService.AddNotification(notification);
-        }
-        
         public Rectangle SelectionRectangle
         {
             get => selectionRectangle;
@@ -95,23 +84,21 @@ namespace PoeShared.UI
             get => selectionRect;
             set => RaiseAndSetIfChanged(ref selectionRect, value);
         }
-        
+
         public ISelectionAdornerViewModel SelectionAdorner { get; }
-        
+
         public IAudioNotificationSelectorViewModel AudioNotificationSelector { get; }
-        
+
         public IRandomPeriodSelector RandomPeriodSelector { get; }
-        
+
         public IHotkeySequenceEditorViewModel HotkeySequenceEditor { get; }
 
         public CommandWrapper LongCommand { get; }
-        
+
         public CommandWrapper ErrorCommand { get; }
-        
+
         public ICommand NextRandomPeriodCommand { get; }
-        
-        public CommandWrapper AddTextNotification { get; }
-        
+
         public ICommand SetCachedControlContentCommand { get; }
 
         public DisposableReactiveObject FakeDelay
@@ -120,20 +107,12 @@ namespace PoeShared.UI
             set => RaiseAndSetIfChanged(ref fakeDelay, value);
         }
 
-        private TimeSpan notificationTimeout = TimeSpan.Zero;
-
-        public TimeSpan NotificationTimeout
-        {
-            get => notificationTimeout;
-            set => RaiseAndSetIfChanged(ref notificationTimeout, value);
-        }
-
         public TimeSpan RandomPeriod
         {
             get => randomPeriod;
             set => RaiseAndSetIfChanged(ref randomPeriod, value);
         }
-        
+
         private async Task HandleSelectionCommandExecuted()
         {
             var selection = await SelectionAdorner.StartSelection()
