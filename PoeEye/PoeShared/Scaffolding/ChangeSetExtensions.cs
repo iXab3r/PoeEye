@@ -32,6 +32,32 @@ namespace PoeShared.Scaffolding
             return result.Or().ToSourceList();
         }
         
+        public static void MoveItemToTop<T>(this ISourceList<T> collection, T item)
+        {
+            collection.Edit(list =>
+            {
+                var idx = list.IndexOf(item);
+                if (idx < 0 || idx == 0)
+                {
+                    return;
+                }
+                list.Move(idx, 0);
+            });
+        }
+        
+        public static void MoveItemToBottom<T>(this ISourceList<T> collection, T item)
+        {
+            collection.Edit(list =>
+            {
+                var idx = list.IndexOf(item);
+                if (idx < 0 || idx == list.Count - 1)
+                {
+                    return;
+                }
+                list.Move(idx, list.Count - 1);
+            });
+        }
+        
         public static void MoveItemDown<T>(this ISourceList<T> collection, T item)
         {
             collection.Edit(list =>
