@@ -447,8 +447,17 @@ namespace PoeShared
                 throw new ArgumentException(string.Format(ExceptionMessages.ArgumentHasMinLength, minLength, length), paramName);
             }
         }
+
+        public static void ArgumentMustBeOfType<T>(object value, string paramName)
+        {
+            ArgumentNotNull(value, nameof(value));
+            if (!(value is T))
+            {
+                throw new ArgumentException($"Value must be of type {typeof(T)}, but was {value.GetType()}");
+            }
+        }
         
-        static class ExceptionMessages
+        private static class ExceptionMessages
         {
             public const string ArgumentMustBeInterface = "Type must be an interface.";
             public const string ArgumentMustNotBeInterface = "Type must not be an interface.";

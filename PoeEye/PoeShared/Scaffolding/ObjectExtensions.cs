@@ -72,7 +72,7 @@ namespace PoeShared.Scaffolding
             {
                 return ptr.ToHexadecimal();
             }
-            return item.ToString();
+            return item == null ? "null" : item.ToString();
         }
         
         public static string DumpToTable<T>(this IEnumerable<T> instance, string tableName, string separator = "\n\t")

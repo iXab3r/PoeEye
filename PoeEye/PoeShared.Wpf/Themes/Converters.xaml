@@ -21,6 +21,7 @@
     <blue:MultiplyDoubleConverter x:Key="DoubleDivideByFiveConverter" Factor="0.2" />
     <blue:MultiplyDoubleConverter x:Key="DoubleDivideByTwoConverter" Factor="0.5" />
     <blue:MultiplyDoubleConverter x:Key="DoubleMultiplyByTwoConverter" Factor="2" />
+    <eyeConverters:MultiValueToTupleConverter x:Key="MultiValueToTupleConverter" />
     <eyeConverters:MultiplicationConverter x:Key="MultiplicationConverter" />
     <eyeConverters:PathCombineMultiValueConverter x:Key="PathCombineMultiValueConverter"/>
     <eyeConverters:RectangleConverter x:Key="RectangleConverter"/>
