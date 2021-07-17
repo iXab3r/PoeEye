@@ -9,6 +9,8 @@ namespace PoeShared.UI
         public RecordingNotificationViewModel(IHotkeySequenceEditorViewModel owner)
         {
             Owner = owner;
+            Closeable = false;
+            Interactive = false;
         }
 
         public IHotkeySequenceEditorViewModel Owner { get; }

@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.Drawing;
 using System.Reactive.Linq;
 using System.Windows;
@@ -9,6 +10,8 @@ using PoeShared.Scaffolding;
 using ReactiveUI;
 using Point = System.Windows.Point;
 using Size = System.Windows.Size;
+using WinPoint = System.Drawing.Point;
+using WinSize = System.Drawing.Size;
 
 namespace PoeShared.Notifications.ViewModels
 {
@@ -18,18 +21,21 @@ namespace PoeShared.Notifications.ViewModels
 
         private ReadOnlyObservableCollection<INotificationContainerViewModel> items;
 
+        private WinPoint offset;
+
         public OverlayNotificationsContainerViewModel()
         {
             SizeToContent = SizeToContent.WidthAndHeight;
             ShowInTaskbar = false;
             IsUnlockable = false;
-            OverlayMode = OverlayMode.Transparent;
+            EnableHeader = false;
 
-            this.WhenAnyValue(x => x.ActualWidth, x => x.ActualHeight)
-                .Select(x => new Size(ActualWidth, ActualHeight))
+            this.WhenAnyValue(x => x.ActualWidth, x => x.ActualHeight, x => x.Offset, x => x.NativeBounds)
+                .Select(x => new { ActualSize = new Size(ActualWidth, ActualHeight).ScaleToScreen(Dpi), Offset, NativeBounds })
                 .DistinctUntilChanged()
                 .ObserveOnDispatcher()
-                .SubscribeSafe(HandleSizeChange, Log.HandleUiException)
+                .Select(x => CalculateBounds(x.NativeBounds, x.ActualSize, x.Offset))
+                .SubscribeSafe(x => NativeBounds = x, Log.HandleUiException)
                 .AddTo(Anchors);
         }
 
@@ -39,14 +45,21 @@ namespace PoeShared.Notifications.ViewModels
             set => RaiseAndSetIfChanged(ref items, value);
         }
 
-        private void HandleSizeChange(Size actualSize)
+        public WinPoint Offset
+        {
+            get => offset;
+            set => RaiseAndSetIfChanged(ref offset, value);
+        }
+
+        private static Rectangle CalculateBounds(Rectangle currentBounds, WinSize actualSize, WinPoint offset)
         {
             var primaryMonitorSize = SystemInformation.PrimaryMonitorSize;
 
-            var anchorPoint = new Point((float)primaryMonitorSize.Width / 2, 0);
-            var offset = new Point(- (float)actualSize.Width / 2, 0);
-            var topLeft = new Point(anchorPoint.X + offset.X, anchorPoint.Y + offset.Y).ToWinPoint();
-            NativeBounds = new Rectangle(topLeft, NativeBounds.Size);
+            var anchorPoint = new Point((float)primaryMonitorSize.Width / 2, (float) primaryMonitorSize.Height / 16);
+            var anchorOffset = new Point(- (float)actualSize.Width / 2, 0);
+            var topLeft = new Point(anchorPoint.X + anchorOffset.X + offset.X, anchorPoint.Y + anchorOffset.Y + offset.Y).ToWinPoint();
+
+            return new Rectangle(topLeft, currentBounds.Size);
         }
     }
 }

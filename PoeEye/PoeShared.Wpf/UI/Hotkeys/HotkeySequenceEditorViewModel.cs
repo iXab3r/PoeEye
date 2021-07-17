@@ -34,7 +34,7 @@ namespace PoeShared.UI
 
         private readonly IAppArguments appArguments;
         private readonly IFactory<RegionSelectorWindow> regionSelectorWindowFactory;
-        private readonly NotificationsService notificationsService;
+        private readonly INotificationsService notificationsService;
         private readonly IFactory<IHotkeyTracker> hotkeyFactory;
         private readonly IKeyboardEventsSource keyboardEventsSource;
         private readonly ObservableAsPropertyHelper<int> totalItemsCount;
@@ -73,7 +73,7 @@ namespace PoeShared.UI
         public HotkeySequenceEditorViewModel(
             IAppArguments appArguments,
             IFactory<RegionSelectorWindow> regionSelectorWindowFactory,
-            NotificationsService notificationsService,
+            INotificationsService notificationsService,
             IFactory<IHotkeyTracker> hotkeyFactory,
             IKeyboardEventsSource keyboardEventsSource)
         {

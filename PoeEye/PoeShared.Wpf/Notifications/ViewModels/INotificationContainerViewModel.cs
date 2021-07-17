@@ -14,5 +14,7 @@ namespace PoeShared.Notifications.ViewModels
         string Title { get; }
         
         ImageSource Icon { get; }
+        
+        INotificationViewModel Notification { get; }
     }
 }

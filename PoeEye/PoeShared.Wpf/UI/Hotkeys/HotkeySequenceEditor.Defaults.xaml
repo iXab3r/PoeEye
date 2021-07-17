@@ -25,10 +25,11 @@
                 Opacity="0.5"
                 x:Name="Container"
                 CornerRadius="5"
+                Padding="5"
                 Background="{StaticResource SequenceEditorBackground}"
                 BorderBrush="{StaticResource SequenceEditorAccent}"
-                BorderThickness="1"
                 Foreground="{StaticResource SequenceEditorTextForeground}"
+                Style="{StaticResource FastButtonExStyle}"
                 Command="{Binding Owner.StopRecording}">
                 <eye:ButtonEx.Content>
                     <st:StackPanel MarginBetweenChildren="5" Orientation="Horizontal">

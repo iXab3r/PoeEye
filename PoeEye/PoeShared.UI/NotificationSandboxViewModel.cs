@@ -13,6 +13,10 @@ namespace PoeShared.UI
     {
         private readonly INotificationsService notificationsService;
 
+        private bool closeable;
+
+        private bool interactive = true;
+
         private BitmapImage notificationImage;
 
         private string notificationText;
@@ -65,6 +69,18 @@ namespace PoeShared.UI
             set => RaiseAndSetIfChanged(ref withIcon, value);
         }
 
+        public bool Interactive
+        {
+            get => interactive;
+            set => RaiseAndSetIfChanged(ref interactive, value);
+        }
+
+        public bool Closeable
+        {
+            get => closeable;
+            set => RaiseAndSetIfChanged(ref closeable, value);
+        }
+
         private void AddTextNotificationExecuted()
         {
             var rng = new Random();
@@ -74,6 +90,8 @@ namespace PoeShared.UI
                 TimeToLive = NotificationTimeout,
                 Title = notificationTitle,
                 Icon = withIcon ? NotificationImage : default,
+                Interactive = interactive,
+                Closeable = closeable
             };
 
             notificationsService.AddNotification(notification);

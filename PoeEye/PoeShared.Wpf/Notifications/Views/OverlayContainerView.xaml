@@ -34,13 +34,18 @@
                                    Visibility="{Binding Title, Converter={StaticResource NullToCollapsedConverter}}" />
                         <eye:CachedContentControl Content="{Binding Notification}" 
                                                   st:StackPanel.Fill="Fill"/>
-                    
                     </st:StackPanel>
                     <eye:ButtonEx Command="{Binding CloseCommand}" HorizontalAlignment="Right" VerticalAlignment="Top"
-                                  Visibility="Collapsed"
                                   Width="16" Height="16" Margin="0"
                                   ToolTip="Close"
-                                  Icon="&#xf00d;" />
+                                  Icon="&#xf00d;">
+                        <eye:ButtonEx.Visibility>
+                            <MultiBinding Converter="{StaticResource MultiBooleanAllTrueToVisibleFalseToCollapsedConverter}">
+                                <Binding Path="Notification.Interactive"/>
+                                <Binding Path="Notification.Closeable"/>
+                            </MultiBinding>
+                        </eye:ButtonEx.Visibility>
+                    </eye:ButtonEx>
                 </st:StackPanel>
                 
                 <ProgressBar Minimum="0"

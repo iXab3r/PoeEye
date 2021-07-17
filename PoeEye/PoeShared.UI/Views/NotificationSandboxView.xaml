@@ -9,6 +9,12 @@
         <st:AutoGrid Columns="150,Auto" Rows="*" ChildMargin="5" VerticalAlignment="Top">
             <TextBlock Text="ALL"/>
             <eye:ButtonEx Content="Close" Command="{Binding CloseAllNotifications}" />
+            
+            <TextBlock Text="Interactive" />
+            <CheckBox IsChecked="{Binding Interactive}"/>
+            
+            <TextBlock Text="Closeable" />
+            <CheckBox IsChecked="{Binding Closeable}"/>
 
             <TextBlock Text="Show notification: Text" />
             <eye:ButtonEx Content="Show text notification" Command="{Binding AddTextNotification}" />

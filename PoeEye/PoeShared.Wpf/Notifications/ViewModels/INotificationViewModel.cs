@@ -11,5 +11,9 @@ namespace PoeShared.Notifications.ViewModels
         ImageSource Icon { get; set; }
         
         TimeSpan TimeToLive { get; set; }
+        
+        bool Closeable { get; }
+        
+        bool Interactive { get; }
     }
 }
