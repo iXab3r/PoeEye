@@ -22,10 +22,11 @@ namespace PoeShared.UI
 
         static RandomPeriodSelector()
         {
-            Binder.BindIf( x => !x.LowerValue.IsInRange(x.Minimum, x.Maximum), x => x.LowerValue.EnsureInRange(x.Minimum, x.Maximum)).To(x => x.LowerValue);
+            Binder
+                .BindIf( x => !x.LowerValue.IsInRange(x.Minimum, x.Maximum), x => x.LowerValue.EnsureInRange(x.Minimum, x.Maximum))
+                .To(x => x.LowerValue);
             Binder
                 .BindIf( x => !x.UpperValue.IsInRange(x.Minimum, x.Maximum),x => x.UpperValue.EnsureInRange(x.Minimum, x.Maximum))
-                .ElseIf(x => x.RandomizeValue == false, x => x.LowerValue)
                 .ElseIf(x => x.RandomizeValue == true && x.LowerValue > x.UpperValue, x => x.LowerValue)
                 .To(x => x.UpperValue);
         }
