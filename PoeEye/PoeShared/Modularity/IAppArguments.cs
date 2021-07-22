@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using JetBrains.Annotations;
 
@@ -26,6 +27,8 @@ namespace PoeShared.Modularity
         bool IsDebugMode { get; }
         
         bool IsLazyMode { get; }
+        
+        IEnumerable<string> PrismModules { get; }
         
         bool IsElevated { get; }
         

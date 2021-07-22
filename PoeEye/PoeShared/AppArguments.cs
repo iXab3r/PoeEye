@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -20,6 +21,7 @@ namespace PoeShared
         private bool isDebugMode;
         private bool isLazyMode;
         private bool isAutostart;
+        private IEnumerable<string> prismModules;
         public string AutostartFlag => $"--{AutostartFlagValue}";
 
         [Option(AutostartFlagValue, Default = false)]
@@ -41,6 +43,13 @@ namespace PoeShared
         {
             get => isLazyMode;
             set => this.RaiseAndSetIfChanged(ref isLazyMode, value);
+        }
+        
+        [Option('m', "modules", HelpText = "Prism modules - Comma-separated list of modules that will be loaded")]
+        public IEnumerable<string> PrismModules
+        {
+            get => prismModules;
+            set => this.RaiseAndSetIfChanged(ref prismModules, value);
         }
     }
 
