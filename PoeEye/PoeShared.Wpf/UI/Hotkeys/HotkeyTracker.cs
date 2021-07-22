@@ -103,8 +103,7 @@ namespace PoeShared.UI
             Observable.CombineLatest(
                     hotkeysSource.Connect().Select(x => hotkeysSource.Items.Select(x => x.ToString()).JoinStrings(", ")),
                     this.WhenAnyValue(x => x.HotkeyMode),
-                    this.WhenAnyValue(x => x.IsEnabled),
-                    (hotkeys, mode, isEnabled) => new {Hotkeys = hotkeys, HotkeyMode = mode, IsEnabled = isEnabled})
+                    (hotkeys, mode) => new {Hotkeys = hotkeys, HotkeyMode = mode})
                 .DistinctUntilChanged()
                 .WithPrevious()
                 .SubscribeSafe(

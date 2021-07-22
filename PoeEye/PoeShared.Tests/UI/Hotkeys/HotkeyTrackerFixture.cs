@@ -308,21 +308,41 @@ namespace PoeShared.Tests.UI.Hotkeys
         }
 
         [Test]
-        public void ShouldNotProcessKeysWhenNotEnabled()
+        public void ShouldNotProcessKeysWhenNotEnabledWhenModeIsClick()
         {
             //Given
             var instance = CreateInstance();
+            instance.HotkeyMode = HotkeyMode.Click;
             instance.Add(new HotkeyGesture(Key.A));
             whenKeyUp.OnNext(new KeyEventArgs(Keys.A));
             instance.IsActive.ShouldBe(true);
 
             //When
             instance.IsEnabled = false;
-            instance.IsActive.ShouldBe(false);
+            instance.IsActive.ShouldBe(true);
             whenKeyUp.OnNext(new KeyEventArgs(Keys.A));
 
             //Then
-            instance.IsActive.ShouldBe(false);
+            instance.IsActive.ShouldBe(true);
+        }
+        
+        [Test]
+        public void ShouldNotProcessKeysWhenNotEnabledWhenModeIsHold()
+        {
+            //Given
+            var instance = CreateInstance();
+            instance.HotkeyMode = HotkeyMode.Hold;
+            instance.Add(new HotkeyGesture(Key.A));
+            whenKeyDown.OnNext(new KeyEventArgs(Keys.A));
+            instance.IsActive.ShouldBe(true);
+
+            //When
+            instance.IsEnabled = false;
+            instance.IsActive.ShouldBe(true);
+            whenKeyUp.OnNext(new KeyEventArgs(Keys.A));
+
+            //Then
+            instance.IsActive.ShouldBe(true);
         }
 
         [Test]
