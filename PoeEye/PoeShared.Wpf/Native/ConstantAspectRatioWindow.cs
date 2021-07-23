@@ -89,7 +89,7 @@ namespace PoeShared.Native
 
         protected override void OnClosed(EventArgs e)
         {
-            Log.Debug($"Window is closed, source: {this}");
+            Log.Info($"Window is closed, source: {this}");
 
             anchors.Dispose();
             base.OnClosed(e);
@@ -97,7 +97,7 @@ namespace PoeShared.Native
 
         private void HandleWindowLoaded(object sender, EventArgs ea)
         {
-            Log.Debug($"Initializing windowSource, source: {this}");
+            Log.Info($"Initializing windowSource, source: {this}");
             var hwndSource = (HwndSource) PresentationSource.FromVisual(this);
             if (hwndSource == null)
             {
