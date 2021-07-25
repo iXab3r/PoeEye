@@ -21,8 +21,14 @@ using Shouldly;
 namespace PoeShared.Tests.PropertyBinder
 {
     [TestFixture]
-    public class BinderPerformanceCollectionsFixture
+    public class BinderPerformanceCollectionsFixture : BenchmarkBase
     {
+        [Test]
+        public void RunCollectionsBenchmarks()
+        {
+            BenchmarkRunner.Run<BinderPerformanceCollectionsFixture>(Config);
+        }
+        
         [ParamsSource(nameof(GetModels))]
         public TestCollectionBase ViewModel { get; set; }
         

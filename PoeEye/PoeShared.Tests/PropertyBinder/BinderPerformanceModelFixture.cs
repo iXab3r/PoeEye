@@ -9,12 +9,19 @@ using System.Collections.Generic;
 using System.Reactive.Linq;
 using System.Runtime.CompilerServices;
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Running;
 
 namespace PoeShared.Tests.PropertyBinder
 {
     [TestFixture]
-    public class BinderPerformanceModelFixture
+    public class BinderPerformanceModelFixture : BenchmarkBase
     {
+        [Test]
+        public void RunModelBenchmarks()
+        {
+            BenchmarkRunner.Run<BinderPerformanceModelFixture>(Config);
+        }
+        
         [Test]
         [TestCaseSource(nameof(GetModels))]
         public void ShouldCreate(BaseViewModel viewModel)

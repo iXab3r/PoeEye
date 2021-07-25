@@ -2,6 +2,7 @@
 using PoeShared.Services;
 using Unity;
 using Unity.Extension;
+using Unity.Lifetime;
 
 namespace PoeShared.Prism
 {
@@ -16,7 +17,8 @@ namespace PoeShared.Prism
                 .RegisterSingleton(typeof(IConfigProvider<>), typeof(GenericConfigProvider<>))
                 .RegisterSingleton<IAppArguments, AppArguments>()
                 .RegisterSingleton<IFolderCleanerService, FolderCleanerService>()
-                .RegisterSingleton<IRandomNumberGenerator, RandomNumberGenerator>();
+                .RegisterSingleton<IRandomNumberGenerator, RandomNumberGenerator>()
+                .RegisterFactory<IMemoryPool>(x => MemoryPool.Shared, new ContainerControlledLifetimeManager());
 
             Container
                 .RegisterType(typeof(IFactory<,,,>), typeof(Factory<,,,>))
