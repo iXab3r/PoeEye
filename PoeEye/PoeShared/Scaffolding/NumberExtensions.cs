@@ -35,6 +35,11 @@ namespace PoeShared.Scaffolding
             return value >= min && value <= max;
         }
 
+        public static int EnsureInRange(this int value, int min, int max)
+        {
+            return Math.Max(Math.Min(value, max), min);
+        }
+        
         public static double EnsureInRange(this double value, double min, double max)
         {
             return Math.Max(Math.Min(value, max), min);

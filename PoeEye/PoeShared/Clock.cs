@@ -5,14 +5,16 @@ namespace PoeShared
 {
     internal sealed class Clock : IClock
     {
+        private readonly Stopwatch sw = Stopwatch.StartNew();
+        
         public DateTime UtcNow => DateTime.UtcNow;
         
         public DateTime Now => DateTime.Now;
 
-        public long Ticks => Stopwatch.GetTimestamp();
+        public long Ticks => sw.ElapsedTicks;
         
         public long Frequency => Stopwatch.Frequency;
 
-        public TimeSpan Elapsed => TimeSpan.FromMilliseconds(Ticks / (double) Frequency);
+        public TimeSpan Elapsed => sw.Elapsed;
     }
 }

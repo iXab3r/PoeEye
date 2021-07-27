@@ -25,6 +25,7 @@ namespace PoeShared.Notifications.ViewModels
 
         public OverlayNotificationsContainerViewModel()
         {
+            Title = "NotificationsContainer";
             SizeToContent = SizeToContent.WidthAndHeight;
             ShowInTaskbar = false;
             IsUnlockable = false;

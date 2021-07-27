@@ -1,4 +1,5 @@
 ﻿using System;
+using PoeShared.Scaffolding;
 
 namespace PoeShared.Logging
 {
@@ -141,7 +142,8 @@ namespace PoeShared.Logging
                 return;
             }
 
-            Debug(message(), exception);
+            var messageString = SafeExtract(message);
+            Debug(messageString, exception);
         }
 
         public void Info(Func<string> message)
@@ -161,7 +163,8 @@ namespace PoeShared.Logging
                 return;
             }
 
-            Info(message(), exception);
+            var messageString = SafeExtract(message);
+            Info(messageString, exception);
         }
 
         public void Warn(Func<string> message)
@@ -181,7 +184,8 @@ namespace PoeShared.Logging
                 return;
             }
 
-            Warn(message(), default);
+            var messageString = SafeExtract(message);
+            Warn(messageString, exception);
         }
 
         public void Error(Func<string> message)
@@ -201,7 +205,8 @@ namespace PoeShared.Logging
                 return;
             }
 
-            Error(message(), default);
+            var messageString = SafeExtract(message);
+            Error(messageString, exception);
         }
 
         public void Debug(FormattableString message)
@@ -211,7 +216,7 @@ namespace PoeShared.Logging
                 return;
             }
 
-            Debug(message.ToString);
+            Debug(message, default);
         }
 
         public void Debug(FormattableString message, Exception exception)
@@ -220,8 +225,9 @@ namespace PoeShared.Logging
             {
                 return;
             }
-
-            Debug(message.ToString, exception);
+            
+            var messageString = SafeExtract(message);
+            Debug(messageString, exception);
         }
 
         public void Info(FormattableString message)
@@ -231,7 +237,7 @@ namespace PoeShared.Logging
                 return;
             }
 
-            Info(message.ToString);
+            Info(message, default);
         }
 
         public void Info(FormattableString message, Exception exception)
@@ -241,7 +247,8 @@ namespace PoeShared.Logging
                 return;
             }
 
-            Info(message.ToString);
+            var messageString = SafeExtract(message);
+            Info(messageString, exception);
         }
 
         public void Warn(FormattableString message)
@@ -251,7 +258,7 @@ namespace PoeShared.Logging
                 return;
             }
 
-            Warn(message.ToString);
+            Warn(message, default);
         }
 
         public void Warn(FormattableString message, Exception exception)
@@ -261,7 +268,8 @@ namespace PoeShared.Logging
                 return;
             }
 
-            Warn(message.ToString);
+            var messageString = SafeExtract(message);
+            Warn(messageString, exception);
         }
 
         public void Error(FormattableString message)
@@ -271,7 +279,7 @@ namespace PoeShared.Logging
                 return;
             }
 
-            Error(message.ToString);
+            Error(message, default);
         }
 
         public void Error(FormattableString message, Exception exception)
@@ -280,8 +288,36 @@ namespace PoeShared.Logging
             {
                 return;
             }
+            
+            var messageString = SafeExtract(message);
+            Error(messageString, exception);
+        }
+        
+        private string SafeExtract(FormattableString supplier)
+        {
+            try
+            {
+                return supplier.ToString();
+            }
+            catch (Exception e)
+            {
+                var errorMessage = $"Failed to write formatted log message, message: {supplier.Format}, argsCount: {supplier.ArgumentCount}, args: {supplier.GetArguments().DumpToString()}";
+                Error(errorMessage, e);
+                return default;
+            }
+        }
 
-            Error(message.ToString);
+        private string SafeExtract(Func<string> supplier)
+        {
+            try
+            {
+                return supplier();
+            }
+            catch (Exception e)
+            {
+                Warn("Failed to write log message", e);
+                return $"Internal logger error: {e.Message}";
+            }
         }
     }
 }
