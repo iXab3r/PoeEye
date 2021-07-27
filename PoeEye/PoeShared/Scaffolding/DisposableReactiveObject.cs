@@ -9,39 +9,21 @@ namespace PoeShared.Scaffolding
 {
     public abstract class DisposableReactiveObject : IDisposableReactiveObject
     {
-        private readonly Subject<Exception> thrownExceptions = new Subject<Exception>();
-        
         public CompositeDisposable Anchors { get; } = new CompositeDisposable();
-
-        public IObservable<Exception> ThrownExceptions => thrownExceptions;
 
         public virtual void Dispose()
         {
-            try
-            {
-                Anchors.Dispose();
-            }
-            catch (Exception e)
-            {
-                thrownExceptions.OnNext(e);
-            }
+            Anchors.Dispose();
+            GC.SuppressFinalize(this);
         }
 
         public TRet RaiseAndSetIfChanged<TRet>(ref TRet backingField,
             TRet newValue,
             [CallerMemberName] string propertyName = null)
         {
-            try
+            if (EqualityComparer<TRet>.Default.Equals(backingField, newValue))
             {
-                if (EqualityComparer<TRet>.Default.Equals(backingField, newValue))
-                {
-                    return newValue;
-                }
-            }
-            catch (Exception e)
-            {
-                thrownExceptions.OnNext(e);
-                throw;
+                return newValue;
             }
 
             return RaiseAndSet(ref backingField, newValue, propertyName);
@@ -51,18 +33,10 @@ namespace PoeShared.Scaffolding
             TRet newValue,
             [CallerMemberName] string propertyName = null)
         {
-            try
-            {
-                RaisingPropertyChanging(propertyName);
-                backingField = newValue;
-                RaisePropertyChanged(propertyName);
-                return newValue;
-            }
-            catch (Exception e)
-            {
-                thrownExceptions.OnNext(e);
-                throw;
-            }
+            RaisingPropertyChanging(propertyName);
+            backingField = newValue;
+            RaisePropertyChanged(propertyName);
+            return newValue;
         }
         
         public event PropertyChangedEventHandler PropertyChanged;

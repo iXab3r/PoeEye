@@ -16,7 +16,7 @@ namespace PoeShared.Scaffolding.WPF
         private static readonly IFluentLog Log = typeof(CommandWrapper).PrepareLogger();
 
         private readonly ISubject<bool> isExecuting = new Subject<bool>();
-
+        private readonly Subject<Exception> thrownExceptions = new Subject<Exception>();
         private readonly ISubject<Unit> raiseCanExecuteChangedRequests = new Subject<Unit>();
         private string description;
         private string error;
@@ -40,6 +40,8 @@ namespace PoeShared.Scaffolding.WPF
                 .SubscribeSafe(command.RaiseCanExecuteChanged, Log.HandleUiException)
                 .AddTo(Anchors);
         }
+        
+        public IObservable<Exception> ThrownExceptions => thrownExceptions;
 
         private CommandWrapper(ICommand command)
         {
