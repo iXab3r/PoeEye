@@ -3,6 +3,7 @@ using System.Drawing;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Windows;
 using System.Windows.Interop;
 using log4net;
@@ -26,7 +27,7 @@ namespace PoeShared.Native
 
         public static readonly DependencyProperty DpiAwareProperty = DependencyProperty.Register(
             "DpiAware", typeof(bool), typeof(ConstantAspectRatioWindow), new PropertyMetadata(default(bool)));
-
+        private static int GlobalWindowIdx = 0;
         private static readonly IFluentLog Log = typeof(ConstantAspectRatioWindow).PrepareLogger();
         private const float DefaultPixelsPerInch = 96.0F;
        
@@ -38,6 +39,10 @@ namespace PoeShared.Native
 
         protected ConstantAspectRatioWindow()
         {
+            WindowIdx = Interlocked.Increment(ref GlobalWindowIdx);
+            Title = $"Window {WindowIdx}";
+            Tag = $"Tag of Window {WindowIdx}";
+            
             windowHandle = new Lazy<IntPtr>(() => new WindowInteropHelper(this).EnsureHandle());
             Loaded += HandleWindowLoaded;
             this.Observe(TargetAspectRatioProperty)
@@ -68,6 +73,8 @@ namespace PoeShared.Native
                 .AddTo(anchors);
             Dpi = new PointF(1, 1);
         }
+        
+        public int WindowIdx { get; }
 
         public double? TargetAspectRatio
         {

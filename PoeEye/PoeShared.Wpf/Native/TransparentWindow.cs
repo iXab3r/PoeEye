@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Windows;
 using System.Windows.Interop;
 
@@ -6,8 +7,9 @@ namespace PoeShared.Native
 {
     public class TransparentWindow : ConstantAspectRatioWindow
     {
+
         private readonly Lazy<IntPtr> windowHandleSupplier;
-        
+
         public TransparentWindow()
         {
             windowHandleSupplier = new Lazy<IntPtr>(() => new WindowInteropHelper(this).EnsureHandle());
