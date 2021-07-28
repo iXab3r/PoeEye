@@ -11,8 +11,12 @@ namespace PoeShared.Scaffolding
             builder.To((x, v) =>
             {
                 var scheduler = schedulerSelector(x);
+                if (scheduler == null)
+                {
+                    throw new ArgumentException($"Failed to get {typeof(IScheduler)} from context {x}");
+                }
                 scheduler.Schedule(() => action(x, v));
             });
-        } 
+        }
     }
 }
