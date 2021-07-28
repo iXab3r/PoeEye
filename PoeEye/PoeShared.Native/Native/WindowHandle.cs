@@ -19,16 +19,20 @@ using Win32Exception = System.ComponentModel.Win32Exception;
 
 namespace PoeShared.Native
 {
-    internal sealed class WindowHandle : IWindowHandle
+    internal sealed class WindowHandle : IWindowHandle  
     {
         private static readonly IFluentLog Log = typeof(WindowHandle).PrepareLogger();
 
         private readonly Lazy<string> classSupplier;
+        private readonly Lazy<bool> isIconic;
+        private readonly Lazy<bool> isVisible;
         private readonly Lazy<Rectangle> windowBoundsSupplier;
         private readonly Lazy<Rectangle> dwmWindowBoundsSupplier;
         private readonly Lazy<Rectangle> clientBoundsSupplier;
         private readonly Lazy<Icon> iconSupplier;
         private readonly Lazy<BitmapSource> iconBitmapSupplier;
+        private readonly Lazy<User32.WindowStyles> windowStyle;
+        private readonly Lazy<User32.WindowStylesEx> windowStyleEx;
         private readonly Lazy<(string processName, string processPath, string commandLine, string processArgs, DateTime createdAt)> processDataSupplier;
         
         public WindowHandle(IntPtr handle)
@@ -42,6 +46,10 @@ namespace PoeShared.Native
             dwmWindowBoundsSupplier = new Lazy<Rectangle>(() => UnsafeNative.DwmGetWindowFrameBounds(handle), LazyThreadSafetyMode.ExecutionAndPublication);
             clientBoundsSupplier = new Lazy<Rectangle>(() => UnsafeNative.GetClientRect(handle), LazyThreadSafetyMode.ExecutionAndPublication);
             iconSupplier = new Lazy<Icon>(() => GetWindowIcon(handle), LazyThreadSafetyMode.ExecutionAndPublication);
+            windowStyle = new Lazy<User32.WindowStyles>(() => (User32.WindowStyles)User32.GetWindowLong(handle, User32.WindowLongIndexFlags.GWL_STYLE));
+            windowStyleEx = new Lazy<User32.WindowStylesEx>(() => (User32.WindowStylesEx)User32.GetWindowLong(handle, User32.WindowLongIndexFlags.GWL_EXSTYLE));
+            isIconic = new Lazy<bool>(() => User32.IsIconic(handle));
+            isVisible = new Lazy<bool>(() => User32.IsWindowVisible(handle));
             iconBitmapSupplier = new Lazy<BitmapSource>(() =>
             {
                 try
@@ -194,6 +202,14 @@ namespace PoeShared.Native
         public string CommandLine => processDataSupplier.Value.commandLine;
         
         public int ZOrder { get; set; }
+
+        public User32.WindowStyles WindowStyle => windowStyle.Value;
+
+        public User32.WindowStylesEx WindowStylesEx => windowStyleEx.Value;
+
+        public bool IsVisible => isVisible.Value;
+
+        public bool IsIconic => isIconic.Value;
 
         private static Icon GetWindowIcon(IntPtr handle)
         {

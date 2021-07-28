@@ -3,6 +3,7 @@ using System.Drawing;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
 using JetBrains.Annotations;
+using PInvoke;
 
 namespace PoeShared.Native
 {
@@ -35,5 +36,13 @@ namespace PoeShared.Native
         string CommandLine { [CanBeNull] get; }
         
         int ZOrder { get; set; }
+        
+        User32.WindowStyles WindowStyle { get; }
+        
+        User32.WindowStylesEx WindowStylesEx { get; }
+        
+        bool IsVisible { get; }
+        
+        bool IsIconic { get; }
     }
 }
