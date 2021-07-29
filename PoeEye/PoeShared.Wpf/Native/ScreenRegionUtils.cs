@@ -83,7 +83,11 @@ namespace PoeShared.Native
 
         public static Point ToScreenCoordinates(double absoluteX, double absoluteY)
         {
-            var screenBounds = SystemInformation.VirtualScreen;
+            return ToScreenCoordinates(absoluteX, absoluteY, SystemInformation.VirtualScreen);
+        }
+        
+        public static Point ToScreenCoordinates(double absoluteX, double absoluteY, Rectangle screenBounds)
+        {
             return new Point(
                 ToScreenCoordinates(absoluteX, screenBounds.X, screenBounds.Width),
                 ToScreenCoordinates(absoluteY, screenBounds.Y, screenBounds.Height));
@@ -94,17 +98,19 @@ namespace PoeShared.Native
             return ToScreenCoordinates(winInputCoordinates.X, winInputCoordinates.Y);
         }
 
+        public static (double X, double Y) ToWinInputCoordinates(Point screenCoordinates, Rectangle screenBounds)
+        {
+            return (ToWinInputCoordinates(screenCoordinates.X, screenBounds.X, screenBounds.Width), ToWinInputCoordinates(screenCoordinates.Y, screenBounds.Y, screenBounds.Height));
+        }
+        
         public static (double X, double Y) ToWinInputCoordinates(Point screenCoordinates)
         {
-            var screenBounds = SystemInformation.VirtualScreen; 
-            return (
-                ToWinInputCoordinates(screenCoordinates.X, screenBounds.X, screenBounds.Width), 
-                ToWinInputCoordinates(screenCoordinates.Y, screenBounds.Y, screenBounds.Height));
+            return ToWinInputCoordinates(screenCoordinates, SystemInformation.VirtualScreen);
         }
 
         private static int ToScreenCoordinates(double absolute, int offset, int size)
         {
-            return (int)(absolute / 65535 * size + offset - (absolute < 0 ? -1 : 1));
+            return (int)Math.Round(absolute / 65535 * size + offset - (absolute < 0 ? -1 : 1));
         }
         
         private static double ToWinInputCoordinates(int coord, int offset, int size)
