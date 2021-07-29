@@ -35,7 +35,7 @@
                     <st:StackPanel MarginBetweenChildren="5" Orientation="Horizontal">
                         <TextBlock x:Name="RecordingIcon" Style="{StaticResource IconTextBlock}" Text="&#xf04d;" FontSize="20"
                                    Foreground="{StaticResource NegativeBrush}" />
-                        <TextBlock Text="{Binding Owner.StopRecordingHotkey, StringFormat='Press {0} to stop recording'}" />
+                        <TextBlock Text="{Binding Owner.ToggleRecordingHotkey, StringFormat='Press {0} to stop recording'}" />
                     </st:StackPanel>
                 </eye:ButtonEx.Content>
             </eye:ButtonEx>

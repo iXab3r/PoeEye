@@ -162,7 +162,7 @@
                             AcceptsTab="False"
                             AcceptsMouseKeys="False"
                             AcceptsMouseWheel="False"
-                            HotKey="{Binding HotkeySequenceEditor.StopRecordingHotkey}" />
+                            HotKey="{Binding HotkeySequenceEditor.ToggleRecordingHotkey}" />
 
                         <TextBlock Text="MaxDuration" />
                         <mah:NumericUpDown

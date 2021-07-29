@@ -1,6 +1,5 @@
 using System.Collections.ObjectModel;
 using PoeShared.Scaffolding; 
-using PoeShared.Logging;
 
 namespace PoeShared.UI
 {
@@ -32,5 +31,7 @@ namespace PoeShared.UI
         void Remove(HotkeyGesture hotkeyToRemove);
 
         void Clear();
+
+        void Reset();
     }
 }

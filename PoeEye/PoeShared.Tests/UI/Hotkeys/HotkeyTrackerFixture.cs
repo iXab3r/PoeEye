@@ -400,6 +400,7 @@ namespace PoeShared.Tests.UI.Hotkeys
             //Given
             var instance = CreateInstance();
             instance.HotkeyMode = HotkeyMode.Click;
+            instance.Hotkey = new HotkeyGesture(Key.A);
             instance.SuppressKey = true;
 
             //When
@@ -408,6 +409,78 @@ namespace PoeShared.Tests.UI.Hotkeys
 
             //Then
             keyDown.Handled.ShouldBe(true);
+        }
+
+        [Test]
+        public void ShouldNotResetIsActiveWhenDisabledWhenModeIsHold()
+        {
+            //Given
+            var instance = CreateInstance();
+            instance.HotkeyMode = HotkeyMode.Hold;
+            instance.Hotkey = new HotkeyGesture(Key.A);
+            var keyDown = new KeyEventArgs(Keys.A);
+            whenKeyDown.OnNext(keyDown);
+            instance.IsActive.ShouldBe(true);
+
+            //When
+            instance.IsEnabled = false;
+
+            //Then
+            instance.IsActive.ShouldBe(true);
+        }
+        
+        [Test]
+        public void ShouldNotResetIsActiveWhenDisabledWhenModeIsClick()
+        {
+            //Given
+            var instance = CreateInstance();
+            instance.HotkeyMode = HotkeyMode.Click;
+            instance.Hotkey = new HotkeyGesture(Key.A);
+            whenKeyUp.OnNext(new KeyEventArgs(Keys.A));
+            instance.IsActive.ShouldBe(true);
+
+            //When
+            instance.IsEnabled = false;
+
+            //Then
+            instance.IsActive.ShouldBe(true);
+        }
+
+        [Test]
+        public void ShouldResubscribeToKeyDownWhenReenabledWhenModeIsHold()
+        {
+            //Given
+            var instance = CreateInstance();
+            instance.HotkeyMode = HotkeyMode.Hold;
+            instance.Hotkey = new HotkeyGesture(Key.A);
+            whenKeyDown.OnNext(new KeyEventArgs(Keys.A));
+            instance.IsActive.ShouldBe(true);
+            instance.IsEnabled = false;
+            instance.Reset();
+
+            //When
+            instance.IsEnabled = true;
+            whenKeyDown.OnNext(new KeyEventArgs(Keys.A));
+            
+            //Then
+            instance.IsActive.ShouldBe(true);
+        }
+
+        [Test]
+        public void ShouldResetIsActive()
+        {
+            //Given
+            var instance = CreateInstance();
+            instance.HotkeyMode = HotkeyMode.Hold;
+            instance.Hotkey = new HotkeyGesture(Key.A);
+            whenKeyDown.OnNext(new KeyEventArgs(Keys.A));
+            instance.IsActive.ShouldBe(true);
+
+            //When
+            instance.Reset();
+
+            //Then
+            instance.IsActive.ShouldBe(false);
         }
         
         private static HotkeyGesture CreateGesture(Key? key, MouseButton? mouseButton, MouseWheelAction? mouseWheelAction, ModifierKeys modifierKeys)

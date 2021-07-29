@@ -20,7 +20,7 @@ namespace PoeShared.UI
         TimeSpan DefaultKeyPressDuration { get; set; }
         TimeSpan MousePositionRecordingResolution { get; set; }
         ObservableCollection<HotkeySequenceItem> Items { get; }
-        HotkeyGesture StopRecordingHotkey { get; set; }
+        HotkeyGesture ToggleRecordingHotkey { get; set; }
         ICommand AddItem { get; }
         ICommand RemoveItem { get; }
         ICommand ClearItems { get; }

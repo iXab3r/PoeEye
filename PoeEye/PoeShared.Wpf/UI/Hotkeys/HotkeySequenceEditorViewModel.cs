@@ -54,7 +54,7 @@ namespace PoeShared.UI
         private bool isRecording;
         private int maxItemsCount = 250;
         private UIElement owner;
-        private HotkeyGesture stopRecordingHotkey = new(Key.Escape);
+        private HotkeyGesture toggleRecordingHotkey = new(Key.Escape);
         private HotkeySequenceDelay defaultItemDelay;
         private bool maxDurationExceeded;
         private bool maxItemsExceeded;
@@ -179,10 +179,10 @@ namespace PoeShared.UI
             Items.AddRange(itemsToAdd);
         }
 
-        public HotkeyGesture StopRecordingHotkey
+        public HotkeyGesture ToggleRecordingHotkey
         {
-            get => stopRecordingHotkey;
-            set => RaiseAndSetIfChanged(ref stopRecordingHotkey, value);
+            get => toggleRecordingHotkey;
+            set => RaiseAndSetIfChanged(ref toggleRecordingHotkey, value);
         }
         
         public ObservableCollection<HotkeySequenceItem> Items { get; }
@@ -332,7 +332,7 @@ namespace PoeShared.UI
             var tracker = hotkeyFactory.Create().AddTo(anchors);
             tracker.HotkeyMode = HotkeyMode.Hold;
             tracker.SuppressKey = true;
-            tracker.Hotkey = stopRecordingHotkey;
+            tracker.Hotkey = toggleRecordingHotkey;
             tracker.HandleApplicationKeys = true;
 
             Observable.Merge(
@@ -378,7 +378,7 @@ namespace PoeShared.UI
                         keyboardEventsSource.WhenKeyUp.Select(x => new {x.KeyCode, IsDown = false})
                     )
                     .DistinctUntilChanged()
-                    .Where(x => !stopRecordingHotkey.Contains(x.KeyCode))
+                    .Where(x => !toggleRecordingHotkey.Contains(x.KeyCode))
                     .ObserveOnDispatcher()
                     .TakeUntil(cancel)
                     .Subscribe(x =>

@@ -28,12 +28,12 @@ namespace PoeShared.Logging
             return WithPrefix(log, () => $"{prefix}");
         }
         
-        public static IFluentLog WithSuffix(this IFluentLog log, Func<string> prefixSupplier)
+        public static IFluentLog WithSuffix(this IFluentLog log, Func<string> suffixSupplier)
         {
             var newLogData = log.Data.WithSuffix(() =>
             {
-                var prefix = prefixSupplier() ;
-                return string.IsNullOrEmpty(prefix) ? null : $"[{prefix}] ";
+                var suffix = suffixSupplier() ;
+                return string.IsNullOrEmpty(suffix) ? null : $" [{suffix}]";
             });
             return log.WithLogData(newLogData);
         }

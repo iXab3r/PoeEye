@@ -26,24 +26,23 @@ namespace PoeShared.UI
 {
     internal sealed class HotkeyTracker : DisposableReactiveObject, IHotkeyTracker
     {
-        private static readonly IFluentLog Log = typeof(HotkeyTracker).PrepareLogger();
         private static readonly Binder<HotkeyTracker> Binder = new();
+        private readonly IAppArguments appArguments;
+        private readonly IClock clock;
+        private readonly ISubject<HotkeyData> hotkeyLog = new Subject<HotkeyData>();
 
         private readonly SourceCache<HotkeyGesture, HotkeyGesture> hotkeysSource = new(x => x);
-        private readonly IClock clock;
-        private readonly IAppArguments appArguments;
-        private readonly IUserInputFilterConfigurator userInputFilterConfigurator;
-        private readonly ISubject<HotkeyData> hotkeyLog = new Subject<HotkeyData>();
         private readonly ISet<HotkeyGesture> pressedKeys = new HashSet<HotkeyGesture>();
+        private readonly IUserInputFilterConfigurator userInputFilterConfigurator;
+        private bool handleApplicationKeys;
+        private bool hasModifiers;
 
         private HotkeyGesture hotkey;
         private HotkeyMode hotkeyMode;
-        private bool suppressKey;
-        private bool isActive;
-        private bool handleApplicationKeys;
         private bool ignoreModifiers;
-        private bool hasModifiers;
+        private bool isActive;
         private bool isEnabled = true;
+        private bool suppressKey;
 
         static HotkeyTracker()
         {
@@ -60,13 +59,14 @@ namespace PoeShared.UI
             IUserInputFilterConfigurator userInputFilterConfigurator,
             [Dependency(WellKnownWindows.MainWindow)] IWindowTracker mainWindowTracker)
         {
+            Log = typeof(HotkeyTracker).PrepareLogger().WithSuffix(this);
             var scheduler = schedulerProvider.GetOrCreate(nameof(HotkeyTracker));
             this.clock = clock;
             this.appArguments = appArguments;
             this.userInputFilterConfigurator = userInputFilterConfigurator;
             
             Disposable
-                .Create(() => Log.Debug($"Disposing HotkeyTracker {this}"))
+                .Create(() => Log.Debug($"Disposing HotkeyTracker"))
                 .AddTo(Anchors);
 
             hotkeysSource
@@ -109,20 +109,20 @@ namespace PoeShared.UI
                 .SubscribeSafe(
                     x =>
                     {
-                        Log.Debug($"Tracking hotkey changed (hotkey gesture {x.Previous} => {x.Current})");
-                        IsActive = false;
+                        Log.Debug($"Tracking hotkey changed, {x.Previous} => {x.Current}");
+                        Reset();
                     }, Log.HandleUiException)
                 .AddTo(Anchors);
-
+            
             Observable.CombineLatest(
                 hotkeysSource.Connect(),
                 this.WhenAnyValue(x => x.IsEnabled),
                 (_, isEnabled) => new {Hotkeys = hotkeysSource.Items.ToArray(), IsEnabled = isEnabled})
                 .Select(x => x.Hotkeys.Length > 0 && x.IsEnabled)
                 .ObserveOn(scheduler)
-                .Select(shouldSubscribe => !shouldSubscribe ? Observable.Empty<HotkeyData>() : BuildHotkeySubscription(eventSource))
+                .Select(shouldSubscribe => !shouldSubscribe ? Observable.Return(default(HotkeyData)) : BuildHotkeySubscription(eventSource))
                 .Switch()
-                .DistinctUntilChanged(x => new {x.Hotkey, x.KeyDown, x.Timestamp}) // removed possible duplicates from multiple sources
+                .DistinctUntilChanged(x => new {x?.Hotkey, x?.KeyDown, x?.Timestamp}) // removed possible duplicates from multiple sources
                 .Where(
                     hotkeyData =>
                     {
@@ -130,64 +130,85 @@ namespace PoeShared.UI
                          * This method MUST be executed on the same thread which emitted Key/Mouse event
                          * otherwise .Handled value will be ignored due to obvious concurrency reasons
                          */
+
+                        if (hotkeyData == null)
+                        {
+                            Log.Debug("Received empty hotkey data event, propagating it");
+                            return true;
+                        }
                         
                         var mainWindowIsActive = mainWindowTracker.ActiveProcessId == mainWindowTracker.ExecutingProcessId;
-                        if (mainWindowIsActive && !handleApplicationKeys)
+                        if (mainWindowIsActive)
                         {
-                            if (HotkeyMode == HotkeyMode.Click)
+                            if (!handleApplicationKeys)
                             {
-                                Log.Debug($"[{this}] Skipping hotkey {hotkeyData.Hotkey} (isDown: {hotkeyData.KeyDown}, suppressKey: {suppressKey}, ignoreModifiers: {ignoreModifiers}, configuredKey: {Hotkey}, mode: {HotkeyMode})");
-                                return false;
-                            }
+                                if (HotkeyMode == HotkeyMode.Click)
+                                {
+                                    Log.Debug($"Skipping hotkey {hotkeyData.Hotkey} (isDown: {hotkeyData.KeyDown}, suppressKey: {suppressKey}, ignoreModifiers: {ignoreModifiers}, configuredKey: {Hotkey}, mode: {HotkeyMode})");
+                                    return false;
+                                }
 
-                            Log.Debug($"[{this}] Processing hotkey {hotkeyData.Hotkey} (isDown: {hotkeyData.KeyDown}, suppressKey: {suppressKey}, ignoreModifiers: {ignoreModifiers}, configuredKey: {Hotkey}, mode: {HotkeyMode})");
+                                Log.Debug($"Application is active, but mode is {hotkeyMode}, processing hotkey {hotkeyData.Hotkey} (isDown: {hotkeyData.KeyDown}, suppressKey: {suppressKey}, ignoreModifiers: {ignoreModifiers}, configuredKey: {Hotkey}, mode: {HotkeyMode})");
+                            }
+                            else
+                            {
+                                Log.Debug($"Application is active, but {nameof(HandleApplicationKeys)} is set to true, processing hotkey {hotkeyData.Hotkey} (isDown: {hotkeyData.KeyDown}, suppressKey: {suppressKey}, ignoreModifiers: {ignoreModifiers}, configuredKey: {Hotkey}, mode: {HotkeyMode})");
+                            }
                         }
                         else
                         {
-                            Log.Debug($"[{this}] Application is NOT active, processing hotkey {hotkeyData.Hotkey} (isDown: {hotkeyData.KeyDown}, suppressKey: {suppressKey}, ignoreModifiers: {ignoreModifiers}, configuredKey: {Hotkey}, mode: {HotkeyMode})");
+                            Log.Debug($"Application is NOT active, processing hotkey {hotkeyData.Hotkey} (isDown: {hotkeyData.KeyDown}, suppressKey: {suppressKey}, ignoreModifiers: {ignoreModifiers}, configuredKey: {Hotkey}, mode: {HotkeyMode})");
                         }
 
                         if (suppressKey)
                         {
                             if (KeyToModifier(hotkeyData.Hotkey.Key) != ModifierKeys.None)
                             {
-                                Log.Debug($"Supplied key is a modifier, skipping suppression");
+                                Log.Debug($"Supplied key {hotkeyData.Hotkey} (isDown: {hotkeyData.KeyDown}) is a modifier, skipping suppression");
                             }
                             else
                             {
-                                Log.Debug($"Marking hotkey {hotkeyData.Hotkey} as handled");
+                                Log.Debug($"Marking hotkey {hotkeyData.Hotkey} (isDown: {hotkeyData.KeyDown}) as handled");
                                 hotkeyData.MarkAsHandled();
                             }
                         }
 
                         return true;
                     })
-                .DistinctUntilChanged(x => new {x.Hotkey, x.KeyDown}) // disables "blinking" when hotkey is held
                 .WithPrevious()
                 .ObserveOn(scheduler)
                 .SubscribeSafe(
                     hotkeysPair =>
                     {
-                        var sameHotkey = hotkeysPair.Previous.Hotkey?.Equals(hotkeysPair.Current.Hotkey) ?? false;
-                        var sameState = hotkeysPair.Current.KeyDown == hotkeysPair.Previous.KeyDown;
-                        var isMouseWheelEvent = (hotkeysPair.Current.Hotkey?.MouseWheel ?? MouseWheelAction.None) != MouseWheelAction.None;
+                        if (hotkeysPair.Current == null)
+                        {
+                            Log.Debug($"Skipping event, hotkey data is null: {hotkeysPair}");
+                            return;
+                        }
+                        
+                        var sameHotkey = hotkeysPair.Previous?.Hotkey?.Equals(hotkeysPair.Current?.Hotkey) ?? false;
+                        var sameState = hotkeysPair.Current?.KeyDown == hotkeysPair.Previous?.KeyDown;
+                        var isMouseWheelEvent = (hotkeysPair.Current?.Hotkey?.MouseWheel ?? MouseWheelAction.None) != MouseWheelAction.None;
                         
                         if (sameHotkey && sameState && !isMouseWheelEvent)
                         {
+                            Log.Debug($"Skipping duplicate event: {hotkeysPair}");
                             return;
                         }
 
                         var hotkeyData = hotkeysPair.Current;
-                        Log.Debug($"[{this}] Hotkey {hotkeyData.Hotkey} pressed(isMouseWheel: {isMouseWheelEvent}), state: {(hotkeyData.KeyDown ? "down" : "up")}, suppressed: {suppressKey}, ignoreModifiers: {ignoreModifiers}");
+                        Log.Debug($"Updating tracker state, hotkey {hotkeyData.Hotkey} pressed(isMouseWheel: {isMouseWheelEvent}), state: {(hotkeyData.KeyDown ? "down" : "up")}, suppressed: {suppressKey}, ignoreModifiers: {ignoreModifiers}");
 
                         if (isMouseWheelEvent)
                         {
                             if (HotkeyMode == HotkeyMode.Click)
                             {
+                                Log.Debug($"Toggling hotkey state for Wheel event");
                                 IsActive = !IsActive;
                             }
                             else
                             {
+                                Log.Debug($"Blinking hotkey state");
                                 IsActive = true;
                                 IsActive = false;
                             }
@@ -198,20 +219,29 @@ namespace PoeShared.UI
                             {
                                 if (!hotkeyData.KeyDown)
                                 {
+                                    Log.Debug($"Toggling hotkey state");
                                     IsActive = !IsActive;
                                 }
                             }
                             else
                             {
+                                Log.Debug($"Setting state to KeyDown: {hotkeyData.KeyDown}");
                                 IsActive = hotkeyData.KeyDown;
                             }
                         }
                     },
                     Log.HandleUiException)
                 .AddTo(Anchors);
+
+            this.WhenAnyValue(x => x.IsActive)
+                .WithPrevious()
+                .SubscribeSafe(x => Log.Debug($"Hotkey state changed: {x}"), Log.HandleException)
+                .AddTo(Anchors);
             
             Binder.Attach(this).AddTo(Anchors);
         }
+
+        private IFluentLog Log { get; }
 
         public bool IsActive
         {
@@ -265,21 +295,27 @@ namespace PoeShared.UI
 
         public void Add(HotkeyGesture hotkeyToAdd)
         {
-            Log.Debug($"Registering hotkey {hotkeyToAdd}, tracker: {this}");
+            Log.Debug($"Registering hotkey {hotkeyToAdd}");
             hotkeysSource.AddOrUpdate(hotkeyToAdd);
         }
 
         public void Remove(HotkeyGesture hotkeyToRemove)
         {
-            Log.Debug($"Unregistering hotkey {hotkeyToRemove}, tracker: {this}");
+            Log.Debug($"Unregistering hotkey {hotkeyToRemove}");
             hotkeysSource.RemoveKey(hotkeyToRemove);
         }
 
         public void Clear()
         {
-            Log.Debug($"Unregistering all hotkeys, tracker: {this}");
+            Log.Debug($"Unregistering all hotkeys");
             Hotkey = HotkeyGesture.Empty;
             hotkeysSource.Clear();
+        }
+
+        public void Reset()
+        {
+            Log.Debug("Resetting state");
+            IsActive = false;
         }
 
         private bool IsConfiguredHotkey(HotkeyData data)
@@ -351,14 +387,14 @@ namespace PoeShared.UI
         {
             if (hotkeysSource.Count == 0)
             {
-                Log.Debug($"[{this}] Hotkey is not set");
+                Log.Debug($"Hotkey is not set");
                 return Observable.Empty<HotkeyData>();
             }
 
             var result = new List<IObservable<HotkeyData>>();
             if (hotkeysSource.Items.Any(x => x.IsKeyboard))
             {
-                Log.Debug($"[{this}] Subscribing to Keyboard events");
+                Log.Debug($"Subscribing to Keyboard events");
                 eventSource.WhenKeyDown.Select(x => HotkeyData.FromEvent(x, clock))
                     .Select(x => x.SetKeyDown(true))
                     .Where(IsConfiguredHotkey)
@@ -372,7 +408,7 @@ namespace PoeShared.UI
 
             if (hotkeysSource.Items.Any(x => x.IsMouse))
             {
-                Log.Debug($"[{this}] Subscribing to Mouse events");
+                Log.Debug($"Subscribing to Mouse events");
                 eventSource.WhenMouseDown.Select(x => HotkeyData.FromEvent(x, clock))
                     .Select(x => x.SetKeyDown(true))
                     .Where(IsConfiguredHotkey)
@@ -386,7 +422,7 @@ namespace PoeShared.UI
 
             if (hotkeysSource.Items.Any(x => x.IsMouseWheel))
             {
-                Log.Debug($"[{this}] Subscribing to Mouse Wheel events");
+                Log.Debug($"Subscribing to Mouse Wheel events");
                 eventSource.WhenMouseWheel.Select(x => HotkeyData.FromEvent(x, clock))
                     .Select(x => x.SetKeyDown(false))
                     .Where(IsConfiguredHotkey)
@@ -395,7 +431,7 @@ namespace PoeShared.UI
 
             if (result.Count == 0)
             {
-                Log.Debug($"[{this}] Could not find correct subscription for hotkeys, tracker: {this}");
+                Log.Debug($"Could not find correct subscription for hotkeys");
                 return Observable.Empty<HotkeyData>();
             }
 
@@ -404,7 +440,7 @@ namespace PoeShared.UI
 
         public override string ToString()
         {
-            return $"HotkeyTracker {hotkeyMode} {hotkeysSource.Items.Select(x => x.ToString()).JoinStrings(" OR ")}";
+            return $"{(IsEnabled ? default : "DISABLED ")}Hotkey {hotkeyMode} {hotkeysSource.Items.Select(x => x.ToString()).JoinStrings(" OR ")}{(IsActive ? " Active" : default)}";
         }
 
         private static bool HotkeysAreEqual(HotkeyGesture key1, HotkeyGesture key2, bool ignoreModifiers)
@@ -443,11 +479,11 @@ namespace PoeShared.UI
             };
         }
 
-        private struct HotkeyData
+        private sealed record HotkeyData
         {
-            public KeyEventArgs KeyEventArgs { get; set; }
+            public KeyEventArgs KeyEventArgs { get; init; }
 
-            public MouseEventArgs MouseEventArgs { get; set; }
+            public MouseEventArgs MouseEventArgs { get; init; }
 
             public HotkeyGesture Hotkey { get; set; }
 
