@@ -119,7 +119,12 @@ namespace PoeShared.Native
 
             var bounds = target is FrameworkElement frameworkElement ? new Rect(0, 0, frameworkElement.ActualWidth, frameworkElement.ActualHeight) : VisualTreeHelper.GetDescendantBounds(target);
             var dpi = VisualTreeHelper.GetDpi(target);
-            var renderTarget = new RenderTargetBitmap((int)bounds.Width, (int)bounds.Height, dpi.PixelsPerInchX, dpi.PixelsPerInchY, PixelFormats.Pbgra32);
+            var renderTarget = new RenderTargetBitmap(
+                (int)(bounds.Width / 96d * dpi.PixelsPerInchX), 
+                (int)(bounds.Height / 96d * dpi.PixelsPerInchY), 
+                dpi.PixelsPerInchX, 
+                dpi.PixelsPerInchY, 
+                PixelFormats.Pbgra32);
             renderTarget.Render(target);
 
             var bitmapEncoder = new PngBitmapEncoder();
