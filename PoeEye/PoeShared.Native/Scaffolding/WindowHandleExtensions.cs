@@ -26,7 +26,7 @@ namespace PoeShared.Scaffolding
                 return false;
             }
 
-            if (windowHandle.WindowStyle.HasFlag(User32.WindowStyles.WS_CHILD) || windowHandle.WindowStyle.HasFlag(User32.WindowStyles.WS_POPUP) || windowHandle.WindowStyle.HasFlag(User32.WindowStyles.WS_POPUPWINDOW))
+            if (windowHandle.WindowStyle.HasFlag(User32.WindowStyles.WS_CHILD))
             {
                 return false;
             }
