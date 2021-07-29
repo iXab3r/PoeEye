@@ -45,7 +45,7 @@ namespace PoeShared
             set => this.RaiseAndSetIfChanged(ref isLazyMode, value);
         }
         
-        [Option('m', "modules", HelpText = "Prism modules - Comma-separated list of modules that will be loaded")]
+        [Option('m', "modules", HelpText = "Prism modules - Space-separated list of modules that will be loaded")]
         public IEnumerable<string> PrismModules
         {
             get => prismModules;
