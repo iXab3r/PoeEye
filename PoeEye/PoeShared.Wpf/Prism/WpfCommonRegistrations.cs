@@ -69,6 +69,7 @@ namespace PoeShared.Prism
                 .RegisterType<IRegionSelectorViewModel, RegionSelectorViewModel>()
                 .RegisterType<IGenericSettingsViewModel, GenericSettingsViewModel>()
                 .RegisterType<IRandomPeriodSelector, RandomPeriodSelector>()
+                .RegisterType<IHotkeySequenceEditorController, HotkeySequenceEditorController>()
                 .RegisterType<IHotkeySequenceEditorViewModel, HotkeySequenceEditorViewModel>()
                 .RegisterType<INotificationContainerViewModel, NotificationContainerViewModel>()
                 .RegisterType<IAudioNotificationSelectorViewModel, AudioNotificationSelectorViewModel>();

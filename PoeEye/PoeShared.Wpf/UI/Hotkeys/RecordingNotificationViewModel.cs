@@ -1,18 +1,16 @@
-﻿using PoeShared.Native;
-using PoeShared.Notifications;
-using PoeShared.Notifications.ViewModels;
+﻿using PoeShared.Notifications.ViewModels;
 
 namespace PoeShared.UI
 {
     internal sealed class RecordingNotificationViewModel : NotificationViewModelBase
     {
-        public RecordingNotificationViewModel(IHotkeySequenceEditorViewModel owner)
+        public RecordingNotificationViewModel(IHotkeySequenceEditorController controller)
         {
-            Owner = owner;
+            Controller = controller;
             Closeable = false;
             Interactive = false;
         }
 
-        public IHotkeySequenceEditorViewModel Owner { get; }
+        public IHotkeySequenceEditorController Controller { get; }
     }
 }

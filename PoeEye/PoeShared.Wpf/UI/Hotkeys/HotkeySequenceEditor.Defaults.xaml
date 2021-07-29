@@ -20,7 +20,7 @@
 
     <DataTemplate DataType="{x:Type eye:RecordingNotificationViewModel}">
         <st:StackPanel Orientation="Vertical" MarginBetweenChildren="5">
-            <ProgressBar Minimum="0" Value="{Binding Owner.TotalItemsCount, Mode=OneWay}" Maximum="{Binding Owner.MaxItemsCount, Mode=OneWay}" />
+            <ProgressBar Minimum="0" Value="{Binding Controller.Owner.TotalCount, Mode=OneWay}" Maximum="{Binding Controller.Owner.MaxItemsCount, Mode=OneWay}" />
             <eye:ButtonEx
                 Opacity="0.5"
                 x:Name="Container"
@@ -30,18 +30,29 @@
                 BorderBrush="{StaticResource SequenceEditorAccent}"
                 Foreground="{StaticResource SequenceEditorTextForeground}"
                 Style="{StaticResource FastButtonExStyle}"
-                Command="{Binding Owner.StopRecording}">
+                Command="{Binding Controller.StopRecording}">
                 <eye:ButtonEx.Content>
                     <st:StackPanel MarginBetweenChildren="5" Orientation="Horizontal">
-                        <TextBlock x:Name="RecordingIcon" Style="{StaticResource IconTextBlock}" Text="&#xf04d;" FontSize="20"
-                                   Foreground="{StaticResource NegativeBrush}" />
-                        <TextBlock Text="{Binding Owner.ToggleRecordingHotkey, StringFormat='Press {0} to stop recording'}" />
+                        <TextBlock x:Name="RecordingIcon" Style="{StaticResource IconTextBlock}" Text="" FontSize="20" />
+                        <TextBlock x:Name="RecordingText" />
                     </st:StackPanel>
                 </eye:ButtonEx.Content>
             </eye:ButtonEx>
-            <ProgressBar Minimum="0" Value="{Binding Owner.TotalDuration.TotalMilliseconds, Mode=OneWay}" Maximum="{Binding Owner.MaxDuration.TotalMilliseconds, Mode=OneWay}" />
+            <ProgressBar Minimum="0" Value="{Binding Controller.TotalDuration.TotalMilliseconds, Mode=OneWay}" Maximum="{Binding Controller.Owner.MaxDuration.TotalMilliseconds, Mode=OneWay}" />
         </st:StackPanel>
+        
         <DataTemplate.Triggers>
+            <DataTrigger Binding="{Binding Controller.IsRecording}" Value="True">
+                <Setter TargetName="RecordingText" Property="Text" Value="{Binding Controller.ToggleRecordingHotkey, StringFormat='Press {0} to STOP  recording'}"></Setter>
+                <Setter TargetName="RecordingIcon" Property="Text" Value="&#xf04d;"></Setter>
+                <Setter TargetName="RecordingIcon" Property="Foreground" Value="{StaticResource NegativeBrush}"/>
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Controller.IsRecording}" Value="False">
+                <Setter TargetName="RecordingText" Property="Text" Value="{Binding Controller.ToggleRecordingHotkey, StringFormat='Press {0} to START recording'}"></Setter>
+                <Setter TargetName="RecordingIcon" Property="Text" Value="&#xf01d;"></Setter>
+                <Setter TargetName="RecordingIcon" Property="Foreground" Value="{StaticResource PositiveBrush}"/>
+            </DataTrigger>
+            
             <Trigger SourceName="Container" Property="IsMouseOver" Value="True">
                 <Setter TargetName="Container" Property="BorderBrush" Value="{StaticResource SequenceEditorAccent}" />
                 <Setter TargetName="Container" Property="Foreground" Value="{StaticResource SequenceEditorAccent}" />

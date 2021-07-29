@@ -144,11 +144,11 @@
                         <TextBlock Text="Hide keypress delays" />
                         <CheckBox IsChecked="{Binding HotkeySequenceEditor.HideKeypressDelays}" />
                         <TextBlock Text="Mouse position recording" />
-                        <CheckBox IsChecked="{Binding HotkeySequenceEditor.EnableMousePositionRecording}" />
+                        <CheckBox IsChecked="{Binding HotkeySequenceEditor.Controller.EnableMousePositionRecording}" />
                         <TextBlock Text="Mouse clicks recording" />
-                        <CheckBox IsChecked="{Binding HotkeySequenceEditor.EnableMouseClicksRecording}" />
+                        <CheckBox IsChecked="{Binding HotkeySequenceEditor.Controller.EnableMouseClicksRecording}" />
                         <TextBlock Text="Key clicks recording" />
-                        <CheckBox IsChecked="{Binding HotkeySequenceEditor.EnableKeyboardRecording}" />
+                        <CheckBox IsChecked="{Binding HotkeySequenceEditor.Controller.EnableKeyboardRecording}" />
 
                         <TextBlock Text="Total duration" />
                         <TextBlock Text="" />
@@ -162,7 +162,7 @@
                             AcceptsTab="False"
                             AcceptsMouseKeys="False"
                             AcceptsMouseWheel="False"
-                            HotKey="{Binding HotkeySequenceEditor.ToggleRecordingHotkey}" />
+                            HotKey="{Binding HotkeySequenceEditor.Controller.ToggleRecordingHotkey}" />
 
                         <TextBlock Text="MaxDuration" />
                         <mah:NumericUpDown
@@ -177,7 +177,7 @@
                         <TextBlock Text="MousePositionRecordingResolution" />
                         <mah:NumericUpDown
                             Interval="100"
-                            Value="{Binding HotkeySequenceEditor.MousePositionRecordingResolution, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource TimeSpanToMillisecondsConverter}}" />
+                            Value="{Binding HotkeySequenceEditor.Controller.MousePositionRecordingResolution, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource TimeSpanToMillisecondsConverter}}" />
                     </st:AutoGrid>
 
                     <eye:CachedContentControl Content="{Binding HotkeySequenceEditor}" Margin="10" />

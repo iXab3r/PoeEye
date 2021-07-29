@@ -106,7 +106,7 @@
       <DependentUpon>HotkeySequenceEditor.xaml</DependentUpon>
     </Compile>
     <Compile Update="UI\Hotkeys\HotkeySequenceEditorViewModel.cs">
-      <DependentUpon>HotkeySequenceEditor.xaml</DependentUpon>
+      <DependentUpon>IHotkeySequenceEditorViewModel.cs</DependentUpon>
     </Compile>
     <Compile Update="UI\Hotkeys\RecordingNotificationViewModel.cs">
       <DependentUpon>HotkeySequenceEditor.xaml</DependentUpon>
@@ -115,6 +115,12 @@
       <DependentUpon>RandomPeriodSelector.xaml</DependentUpon>
     </Compile>
     <Compile Update="UI\Hotkeys\HotkeyDragHandler.cs">
+      <DependentUpon>HotkeySequenceEditor.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="UI\Hotkeys\HotkeySequenceEditorController.cs">
+      <DependentUpon>IHotkeySequenceEditorController.cs</DependentUpon>
+    </Compile>
+    <Compile Update="UI\Hotkeys\IHotkeySequenceEditorController.cs">
       <DependentUpon>HotkeySequenceEditor.xaml</DependentUpon>
     </Compile>
   </ItemGroup>

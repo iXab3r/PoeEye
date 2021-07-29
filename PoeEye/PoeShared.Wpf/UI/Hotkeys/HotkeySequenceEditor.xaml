@@ -39,7 +39,7 @@
                 </Button.Content>
                 <b:Interaction.Triggers>
                     <b:EventTrigger EventName="PreviewMouseLeftButtonDown">
-                        <b:InvokeCommandAction Command="{Binding StopRecording}" />
+                        <b:InvokeCommandAction Command="{Binding Controller.StopRecording}" />
                     </b:EventTrigger>
                 </b:Interaction.Triggers>
             </Button>
@@ -51,7 +51,7 @@
                 materialDesign:ButtonProgressAssist.Maximum="{Binding MaxDuration.TotalMilliseconds, Mode=OneWay}"
                 materialDesign:ButtonProgressAssist.Value="{Binding TotalDuration.TotalMilliseconds, Mode=OneWay}"
                 Style="{StaticResource MaterialDesignFloatingActionButton}"
-                Command="{Binding StartRecording}"
+                Command="{Binding Controller.StartRecording}"
                 Foreground="{StaticResource SequenceEditorTextForeground}"
                 BorderBrush="{StaticResource SequenceEditorAccent}" BorderThickness="1"
                 ToolTip="Start recording">
@@ -62,11 +62,11 @@
         </st:StackPanel>
 
         <DataTemplate.Triggers>
-            <DataTrigger Binding="{Binding IsRecording}" Value="True">
+            <DataTrigger Binding="{Binding Controller.IsRecording}" Value="True">
                 <Setter TargetName="StopRecordingButton" Property="Visibility" Value="Visible" />
                 <Setter TargetName="StartRecordingButton" Property="Visibility" Value="Collapsed" />
             </DataTrigger>
-            <DataTrigger Binding="{Binding IsRecording}" Value="False">
+            <DataTrigger Binding="{Binding Controller.IsRecording}" Value="False">
                 <Setter TargetName="StopRecordingButton" Property="Visibility" Value="Collapsed" />
                 <Setter TargetName="StartRecordingButton" Property="Visibility" Value="Visible" />
             </DataTrigger>
@@ -84,11 +84,11 @@
         <st:StackPanel MarginBetweenChildren="5" Orientation="Horizontal">
             <Image Source="pack://application:,,,/PoeShared.Wpf;component/Resources/DragDropWhite.png" ToolTip="Drag and drop items" Height="32" Width="32" />
             <eye:ButtonEx
-                Command="{Binding StartRecording}"
+                Command="{Binding Controller.StartRecording}"
                 Style="{StaticResource HotkeySequenceEditorButtonStyle}"
                 HorizontalAlignment="Left" CornerRadius="5"
                 Foreground="{StaticResource SequenceEditorTextForeground}"
-                Visibility="{Binding IsRecording, Converter={StaticResource TrueToCollapsedFalseToVisibleConverter}}"
+                Visibility="{Binding Controller.IsRecording, Converter={StaticResource TrueToCollapsedFalseToVisibleConverter}}"
                 Width="80"
                 Background="{StaticResource SequenceEditorKeyBackground}">
                 RECORD
@@ -97,12 +97,12 @@
                 </eye:ButtonEx.Icon>
             </eye:ButtonEx>
             <eye:ButtonEx
-                Command="{Binding StopRecording}"
+                Command="{Binding Controller.StopRecording}"
                 Style="{StaticResource HotkeySequenceEditorButtonStyle}"
                 HorizontalAlignment="Left" CornerRadius="5"
                 Width="80"
                 Foreground="{StaticResource NegativeBrush}"
-                Visibility="{Binding IsRecording, Converter={StaticResource TrueToVisibleFalseToCollapsedConverter}}">
+                Visibility="{Binding Controller.IsRecording, Converter={StaticResource TrueToVisibleFalseToCollapsedConverter}}">
                 STOP
                 <eye:ButtonEx.Icon>
                     &#xf04d;
