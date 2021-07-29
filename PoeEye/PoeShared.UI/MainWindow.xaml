@@ -144,7 +144,20 @@
                         <TextBlock Text="Hide keypress delays" />
                         <CheckBox IsChecked="{Binding HotkeySequenceEditor.HideKeypressDelays}" />
                         <TextBlock Text="Mouse position recording" />
-                        <CheckBox IsChecked="{Binding HotkeySequenceEditor.Controller.EnableMousePositionRecording}" />
+                        <st:StackPanel Orientation="Horizontal" MarginBetweenChildren="5">
+                            <RadioButton
+                                IsChecked="{Binding HotkeySequenceEditor.Controller.MousePositionRecording, Converter={StaticResource EqualToTrueConverter}, ConverterParameter={x:Static eye:MousePositionRecordingType.None}}"
+                                Content="{x:Static eye:MousePositionRecordingType.None}">
+                            </RadioButton>
+                            <RadioButton
+                                IsChecked="{Binding Path=HotkeySequenceEditor.Controller.MousePositionRecording, Converter={StaticResource EqualToTrueConverter}, ConverterParameter={x:Static eye:MousePositionRecordingType.Absolute}}"
+                                Content="{x:Static eye:MousePositionRecordingType.Absolute}">
+                            </RadioButton>
+                            <RadioButton
+                                IsChecked="{Binding Path=HotkeySequenceEditor.Controller.MousePositionRecording, Converter={StaticResource EqualToTrueConverter}, ConverterParameter={x:Static eye:MousePositionRecordingType.Relative}}"
+                                Content="{x:Static eye:MousePositionRecordingType.Relative}">
+                            </RadioButton>
+                        </st:StackPanel>
                         <TextBlock Text="Mouse clicks recording" />
                         <CheckBox IsChecked="{Binding HotkeySequenceEditor.Controller.EnableMouseClicksRecording}" />
                         <TextBlock Text="Key clicks recording" />

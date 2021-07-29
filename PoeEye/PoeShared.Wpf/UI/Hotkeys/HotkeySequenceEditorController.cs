@@ -34,7 +34,7 @@ namespace PoeShared.UI
         private bool canAddItem;
         private bool enableKeyboardRecording = true;
         private bool enableMouseClicksRecording = true;
-        private bool enableMousePositionRecording;
+        private MousePositionRecordingType enableMousePositionRecording;
 
         private bool isBusy;
         private bool isRecording;
@@ -51,7 +51,7 @@ namespace PoeShared.UI
                 .Bind(x => x.RecordingDuration + x.Owner.TotalDuration < x.Owner.MaxDuration && !x.Owner.MaxDurationExceeded && !x.Owner.MaxItemsExceeded && x.AtLeastOneRecordingTypeEnabled)
                 .To(x => x.CanAddItem);
             Binder
-                .Bind(x => x.EnableKeyboardRecording || x.EnableMouseClicksRecording || x.EnableMousePositionRecording)
+                .Bind(x => x.EnableKeyboardRecording || x.EnableMouseClicksRecording || x.MousePositionRecording != MousePositionRecordingType.None)
                 .To(x => x.AtLeastOneRecordingTypeEnabled);
             
             Binder.BindIf(x => x.IsRecording, x => x.Owner.TotalDuration + x.RecordingDuration)
@@ -129,7 +129,7 @@ namespace PoeShared.UI
             set => RaiseAndSetIfChanged(ref enableMouseClicksRecording, value);
         }
 
-        public bool EnableMousePositionRecording
+        public MousePositionRecordingType MousePositionRecording
         {
             get => enableMousePositionRecording;
             set => RaiseAndSetIfChanged(ref enableMousePositionRecording, value);
@@ -214,16 +214,22 @@ namespace PoeShared.UI
                 .AddTo(anchors);
 
             var sw = new Stopwatch();
-            if (EnableMousePositionRecording && MousePositionRecordingResolution > TimeSpan.Zero)
+            if (enableMousePositionRecording != MousePositionRecordingType.None && MousePositionRecordingResolution > TimeSpan.Zero)
             {
                 keyboardEventsSource.WhenMouseMove
                     .Sample(MousePositionRecordingResolution)
-                    .Select(x => new Point(x.X, x.Y))
+                    .Select(x => (Point?)new Point(x.X, x.Y))
                     .DistinctUntilChanged()
                     .ObserveOnDispatcher()
                     .TakeUntil(cancel)
+                    .WithPrevious()
                     .Subscribe(x =>
                     {
+                        if (x.Previous == null || x.Current == null)
+                        {
+                            return;
+                        }
+                        
                         if (sw.ElapsedMilliseconds > 0)
                         {
                             Owner.AddItem.Execute(new HotkeySequenceDelay
@@ -233,9 +239,15 @@ namespace PoeShared.UI
                             });
                         }
                         sw.Restart();
+
+                        var isRelative = enableMousePositionRecording == MousePositionRecordingType.Relative;
+                        var position = isRelative
+                            ? new Point(x.Current.Value.X - x.Previous.Value.X, x.Current.Value.Y - x.Previous.Value.Y)
+                            : x.Current; 
                         Owner.AddItem.Execute(new HotkeySequenceHotkey
                         {
-                            MousePosition = x
+                            MousePosition = position,
+                            IsRelative = isRelative
                         });
                     })
                     .AddTo(anchors);

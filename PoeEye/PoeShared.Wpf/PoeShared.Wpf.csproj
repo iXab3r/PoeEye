@@ -64,7 +64,6 @@
     <Resource Include="Resources\record-1.1s-47px.svg" />
     <None Remove="Resources\cursor-1.1s-200px.svg" />
     <None Remove="Resources\cursor-1.1s-200px.png" />
-    <Resource Include="Resources\cursor-1.1s-200px.png" />
     <None Remove="Resources\DragDrop.png" />
     <Resource Include="Resources\DragDrop.png" />
     <None Remove="Resources\DragDropWhite.png" />
@@ -73,6 +72,10 @@
     <Resource Include="Resources\mouse-device-xbutton1-click-control.png" />
     <None Remove="Resources\mouse-device-xbutton2-click-control.png" />
     <Resource Include="Resources\mouse-device-xbutton2-click-control.png" />
+    <None Remove="Resources\CursorAbsolute.png" />
+    <Resource Include="Resources\CursorAbsolute.png" />
+    <None Remove="Resources\CursorRelative.png" />
+    <Resource Include="Resources\CursorRelative.png" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="UI\Hotkeys\HotkeyBox.cs">

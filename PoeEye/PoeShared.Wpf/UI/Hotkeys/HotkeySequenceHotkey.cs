@@ -9,10 +9,12 @@ namespace PoeShared.UI
     {
         private static readonly Binder<HotkeySequenceHotkey> Binder = new();
         private bool hasMousePosition;
-        private bool isMouse;
-        private bool? isDown;
-        private Point? mousePosition;
         private HotkeyGesture hotkey;
+        private bool? isDown;
+        private bool isMouse;
+
+        private bool isRelative;
+        private Point? mousePosition;
 
         static HotkeySequenceHotkey()
         {
@@ -29,6 +31,12 @@ namespace PoeShared.UI
         {
             get => hotkey;
             set => RaiseAndSetIfChanged(ref hotkey, value);
+        }
+
+        public bool IsRelative
+        {
+            get => isRelative;
+            set => RaiseAndSetIfChanged(ref isRelative, value);
         }
 
         public Point? MousePosition
