@@ -13,12 +13,14 @@ namespace PoeShared.Native
     internal sealed class KeyboardMouseEventsProvider : IKeyboardMouseEventsProvider
     {
         private static readonly IFluentLog Log = typeof(KeyboardMouseEventsProvider).PrepareLogger();
-
+        private static readonly IKeyboardMouseEvents AppEvents = Gma.System.MouseKeyHook.Hook.AppEvents();
+        private static readonly IKeyboardMouseEvents GlobalEvents = Gma.System.MouseKeyHook.Hook.GlobalEvents();
+        
         private static readonly object HookGate = new(); //GMA HookHelper uses static variable to temporarily store HookProcedure
 
         public KeyboardMouseEventsProvider() : this(
-            globalEventsFactory: new LambdaFactory<IKeyboardMouseEvents>(Gma.System.MouseKeyHook.Hook.GlobalEvents),
-            appEventsFactory: new LambdaFactory<IKeyboardMouseEvents>(Gma.System.MouseKeyHook.Hook.AppEvents))
+            globalEventsFactory: new LambdaFactory<IKeyboardMouseEvents>(() => GlobalEvents),
+            appEventsFactory: new LambdaFactory<IKeyboardMouseEvents>(() => AppEvents))
         {
         }
         
@@ -26,10 +28,8 @@ namespace PoeShared.Native
         {
             System = Observable
                 .Using(() => Hook("global", globalEventsFactory),x => Observable.Return(x).Concat(Observable.Never<IKeyboardMouseEvents>()))
-                .Do(x => Log.Debug($"Test"), ex => { },() => Log.Debug($"Completed"))
                 .Replay(1)
-                .RefCount()
-                .Do(x => Log.Debug($"Test 1"), ex => { },() => Log.Debug($"Completed 1"));
+                .RefCount();
             
             Application = Observable
                 .Using(() => Hook("app", appEventsFactory), x => Observable.Return(x).Concat(Observable.Never<IKeyboardMouseEvents>()))
