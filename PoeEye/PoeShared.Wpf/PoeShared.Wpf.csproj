@@ -9,7 +9,7 @@
     <UseWpf>true</UseWpf>
     <Configurations>Debug;Release</Configurations>
     <Platforms>AnyCPU</Platforms>
-    <LangVersion>10</LangVersion>
+    <LangVersion>latest</LangVersion>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <RootNamespace>PoeShared</RootNamespace>
   </PropertyGroup>
