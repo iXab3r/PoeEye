@@ -87,7 +87,7 @@ namespace PoeShared.Audio.ViewModels
         
         public void SelectById(string deviceId)
         {
-            if (selectedItem?.Id == deviceId)
+            if (string.IsNullOrEmpty(deviceId) || selectedItem?.Id == deviceId)
             {
                 return;
             }

@@ -22,7 +22,7 @@
     <PackageReference Include="log4net" Version="2.0.8" />
     <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
     <PackageReference Include="MouseKeyHook" Version="5.6.0"><NoWarn>NU1701</NoWarn></PackageReference>
-    <PackageReference Include="NAudio" Version="1.8.5"><NoWarn>NU1701</NoWarn></PackageReference>
+    <PackageReference Include="NAudio" Version="2.0.1"><NoWarn>NU1701</NoWarn></PackageReference>
     <PackageReference Include="PInvoke.DwmApi" Version="0.6.49" />
     <PackageReference Include="PInvoke.Kernel32" Version="0.6.49" />
     <PackageReference Include="PInvoke.User32" Version="0.6.49" />

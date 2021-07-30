@@ -100,6 +100,7 @@ namespace PoeShared.Audio.Services
                     using (WaveStream blockAlignedStream = new BlockAlignReductionStream(waveStream))
                     using (var waveOut = new WaveOut(WaveCallbackInfo.FunctionCallback()))
                     {
+                        try
                         {
                             Log.Debug($"Initializing waveOut device {waveOut}, output: {request.OutputDevice}");
                             if (request.OutputDevice != null && request.OutputDevice != WaveOutDevice.DefaultDevice)
@@ -130,13 +131,18 @@ namespace PoeShared.Audio.Services
                                 }
                                 else
                                 {
-                                    Log.Debug($"Successfully played audio stream({rawStream.Length}), token: {new {request.CancellationToken.IsCancellationRequested, request.CancellationToken.CanBeCanceled}}...");
+                                    Log.Debug(
+                                        $"Successfully played audio stream({rawStream.Length}), token: {new {request.CancellationToken.IsCancellationRequested, request.CancellationToken.CanBeCanceled}}...");
                                 }
                             }
                             finally
                             {
                                 waveOut.PlaybackStopped -= playbackStoppedHandler;
                             }
+                        }
+                        catch (Exception e)
+                        {
+                            Log.Error($"Exception in audio player, request: {request}", e);
                         }
                     }
                 }
