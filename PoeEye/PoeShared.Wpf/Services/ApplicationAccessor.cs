@@ -61,10 +61,11 @@ namespace PoeShared.Services
                 }
                 IsExiting = true;
             }
-            Shutdown();
 
             try
             {
+                Shutdown();
+
                 Log.Info($"Awaiting for application termination for {TerminationTimeout}");
                 var closeEvent = await whenExit.Take(1).Timeout(TerminationTimeout);
                 
@@ -85,9 +86,7 @@ namespace PoeShared.Services
         {
             if (!application.CheckAccess())
             {
-                Log.Debug("Rescheduling to Application dispatcher");
-                application.Dispatcher.BeginInvoke(Shutdown, DispatcherPriority.Send);
-                return;
+                throw new InvalidOperationException($"{nameof(Shutdown)} invoked on non-main thread");
             }
             
             Log.Debug($"Terminating application (shutdownMode: {application.ShutdownMode}, window: {application.MainWindow})...");
