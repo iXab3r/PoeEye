@@ -32,7 +32,6 @@ namespace PoeShared.Squirrel.Updater
         public ApplicationUpdaterViewModel(
             [NotNull] IApplicationUpdaterModel updaterModel,
             [NotNull] IConfigProvider<UpdateSettingsConfig> configProvider,
-            [NotNull] IUpdateSourceProvider updateSourceProvider,
             [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler,
             [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler)
         {
@@ -88,11 +87,6 @@ namespace PoeShared.Squirrel.Updater
             RestartCommand
                 .ThrownExceptions
                 .SubscribeSafe(ex => SetError($"Restart error: {ex.Message}"), Log.HandleUiException)
-                .AddTo(Anchors);
-
-            updateSourceProvider
-                .WhenAnyValue(x => x.UpdateSource)
-                .SubscribeSafe(x => updaterModel.UpdateSource = x, Log.HandleUiException)
                 .AddTo(Anchors);
             
             configProvider

@@ -14,6 +14,7 @@ using PoeShared.Scaffolding;
 using PoeShared.Logging;
 using PoeShared.Services;
 using PoeShared.Squirrel.Core;
+using ReactiveUI;
 using Squirrel;
 
 namespace PoeShared.Squirrel.Updater
@@ -37,18 +38,24 @@ namespace PoeShared.Squirrel.Updater
 
         public ApplicationUpdaterModel(
             IApplicationAccessor applicationAccessor,
+            IUpdateSourceProvider updateSourceProvider,
             IAppArguments appArguments)
         {
             this.applicationAccessor = applicationAccessor;
             this.appArguments = appArguments;
-            SquirrelAwareApp.HandleEvents(
-                OnInitialInstall,
-                OnAppUpdate,
-                onAppUninstall: OnAppUninstall,
-                onFirstRun: OnFirstRun);
 
             MostRecentVersionAppFolder = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
             UpdatedVersion = null;
+            
+            updateSourceProvider
+                .WhenAnyValue(x => x.UpdateSource)
+                .WithPrevious()
+                .SubscribeSafe(x =>
+                {
+                    Log.Debug($"Update source changed: {x}");
+                    UpdateSource = x.Current;
+                }, Log.HandleUiException)
+                .AddTo(Anchors);
             
             var currentProcessName = Process.GetCurrentProcess().ProcessName + ".exe";
             Log.Debug($"Initializing ApplicationName, processName: {currentProcessName}, appArguments executable: {appArguments.ApplicationExecutableName}");
@@ -69,7 +76,7 @@ namespace PoeShared.Squirrel.Updater
             {
                 ApplicationExecutableFileName = currentProcessName;
             }
-            Log.Debug($"Application will be restarted via executing {ApplicationExecutableFileName}");
+            Log.Debug($"Application will be started via executing {ApplicationExecutableFileName}");
         }
 
         public string ApplicationExecutableFileName { get; }
@@ -167,6 +174,17 @@ namespace PoeShared.Squirrel.Updater
             UpdatedVersion = null;
             IsBusy = false;
             ProgressPercent = 0;
+        }
+
+        public void HandleSquirrelEvents()
+        {
+            Log.Debug("Handling Squirrel events");
+            SquirrelAwareApp.HandleEvents(
+                x => Task.Run(async () => await OnInitialInstall(x)).Wait(),
+                x => Task.Run(async () => await OnAppUpdate(x)).Wait(),
+                onAppUninstall: x => Task.Run(async () => await OnAppUninstall(x)).Wait(),
+                onFirstRun: () => Task.Run(async () => await OnFirstRun()).Wait());
+            Log.Debug("Squirrel were handled successfully events");
         }
 
         /// <summary>
@@ -296,22 +314,39 @@ namespace PoeShared.Squirrel.Updater
             Log.Debug($"Check update is in progress: {progressPercent}%");
         }
 
-        private void OnAppUninstall(Version appVersion)
+        private async Task OnAppUninstall(Version appVersion)
         {
             Log.Debug($"Uninstalling v{appVersion}...");
+            using var mgr = await CreateManager();
+            mgr.RemoveShortcutsForExecutable(
+                ApplicationExecutableFileName, 
+                ShortcutLocation.StartMenu | ShortcutLocation.Desktop | ShortcutLocation.AppRoot | ShortcutLocation.StartMenu);
+            await applicationAccessor.Exit();
         }
 
-        private void OnAppUpdate(Version appVersion)
+        private async Task OnAppUpdate(Version appVersion)
         {
             Log.Debug($"Updating v{appVersion}...");
+            using var mgr = await CreateManager();
+            mgr.CreateShortcutsForExecutable(
+                ApplicationExecutableFileName, 
+                ShortcutLocation.StartMenu | ShortcutLocation.Desktop, 
+                updateOnly: false);
+            await applicationAccessor.Exit();
         }
 
-        private void OnInitialInstall(Version appVersion)
+        private async Task OnInitialInstall(Version appVersion)
         {
             Log.Debug($"App v{appVersion} installed");
+            using var mgr = await CreateManager();
+            mgr.CreateShortcutsForExecutable(
+                ApplicationExecutableFileName, 
+                ShortcutLocation.StartMenu | ShortcutLocation.Desktop, 
+                updateOnly: false);
+            await applicationAccessor.Exit();
         }
 
-        private void OnFirstRun()
+        private async Task OnFirstRun()
         {
             Log.Debug("App started for the first time");
         }

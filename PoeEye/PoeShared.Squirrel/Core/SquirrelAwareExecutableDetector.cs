@@ -82,6 +82,11 @@ namespace PoeShared.Squirrel.Core
             }
             catch (BadImageFormatException)
             {
+                var dllFile = new FileInfo(Path.ChangeExtension(executable, "dll"));
+                if (dllFile.Exists)
+                {
+                    return GetPeSquirrelAwareVersion(dllFile.FullName);
+                }
                 return null;
             }
         }

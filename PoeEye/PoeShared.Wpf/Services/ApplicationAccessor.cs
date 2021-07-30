@@ -4,6 +4,7 @@ using System.Reactive.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Threading;
 using log4net;
 using PoeShared.Scaffolding; 
 using PoeShared.Logging;
@@ -22,6 +23,7 @@ namespace PoeShared.Services
 
         public ApplicationAccessor()
         {
+            Log.Debug("Initializing Application accessor");
             application = Application.Current;
             if (application == null)
             {
@@ -49,19 +51,17 @@ namespace PoeShared.Services
 
         public async Task Exit()
         {
-            Log.Debug($"Terminating application (shutdownMode: {application.ShutdownMode}, window: {application.MainWindow})...");
-            IsExiting = true;
-
-            if (application.MainWindow != null && application.ShutdownMode == ShutdownMode.OnMainWindowClose)
+            Log.Debug($"Attempting to gracefully shutdown application, IsExiting: {isExiting}");
+            lock (application)
             {
-                Log.Debug($"Closing main window {application.MainWindow}...");
-                application.MainWindow.Close();
+                if (isExiting)
+                {
+                    Log.Warn("Shutdown is already in progress");
+                    return;
+                }
+                IsExiting = true;
             }
-            else
-            {
-                Log.Debug($"Closing app via Shutdown");
-                application.Shutdown(0);
-            }
+            Shutdown();
 
             try
             {
@@ -78,6 +78,28 @@ namespace PoeShared.Services
             {
                 Log.Warn("Failed to terminate app gracefully, forcing Environment.Exit", e);
                 Environment.Exit(0);
+            }
+        }
+
+        private void Shutdown()
+        {
+            if (!application.CheckAccess())
+            {
+                Log.Debug("Rescheduling to Application dispatcher");
+                application.Dispatcher.BeginInvoke(Shutdown, DispatcherPriority.Send);
+                return;
+            }
+            
+            Log.Debug($"Terminating application (shutdownMode: {application.ShutdownMode}, window: {application.MainWindow})...");
+            if (application.MainWindow != null && application.ShutdownMode == ShutdownMode.OnMainWindowClose)
+            {
+                Log.Debug($"Closing main window {application.MainWindow}...");
+                application.MainWindow.Close();
+            }
+            else
+            {
+                Log.Debug($"Closing app via Shutdown");
+                application.Shutdown(0);
             }
         }
     }

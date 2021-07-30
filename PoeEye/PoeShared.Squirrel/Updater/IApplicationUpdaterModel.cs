@@ -37,6 +37,8 @@ namespace PoeShared.Squirrel.Updater
 
         void Reset();
 
+        void HandleSquirrelEvents();
+
         FileInfo GetLatestExecutable();
     }
 }

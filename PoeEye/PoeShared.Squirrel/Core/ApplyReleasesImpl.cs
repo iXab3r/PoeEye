@@ -881,7 +881,7 @@ namespace PoeShared.Squirrel.Core
             var possibleCompanyNames = new[]
             {
                 versionInfo.CompanyName,
-                package.Authors.FirstOrDefault() ?? package.Id
+                package.Id ?? package.Authors.FirstOrDefault()
             };
 
             var prodName = possibleCompanyNames.First(x => !string.IsNullOrWhiteSpace(x));
