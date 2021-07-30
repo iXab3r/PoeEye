@@ -5,12 +5,14 @@ using System.Linq;
 using System.Net;
 using System.Reactive.Disposables;
 using System.Reflection;
+using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using log4net;
 using PoeShared.Modularity;
 using PoeShared.Scaffolding; 
 using PoeShared.Logging;
+using PoeShared.Services;
 using PoeShared.Squirrel.Core;
 using Squirrel;
 
@@ -18,22 +20,26 @@ namespace PoeShared.Squirrel.Updater
 {
     internal sealed class ApplicationUpdaterModel : DisposableReactiveObject, IApplicationUpdaterModel
     {
-        private readonly IAppArguments appArguments;
         private static readonly IFluentLog Log = typeof(ApplicationUpdaterModel).PrepareLogger();
 
         private static readonly string DotnetCoreRunnerName = "dotnet.exe";
         private static readonly string UpdaterExecutableName = "update.exe";
-        
+        private readonly IAppArguments appArguments;
+        private readonly IApplicationAccessor applicationAccessor;
+        private bool ignoreDeltaUpdates;
+        private bool isBusy;
+
         private IPoeUpdateInfo latestVersion;
         private Version mostRecentVersion;
         private DirectoryInfo mostRecentVersionAppFolder;
-        private UpdateSourceInfo updateSource;
         private int progressPercent;
-        private bool isBusy;
-        private bool ignoreDeltaUpdates;
+        private UpdateSourceInfo updateSource;
 
-        public ApplicationUpdaterModel(IAppArguments appArguments)
+        public ApplicationUpdaterModel(
+            IApplicationAccessor applicationAccessor,
+            IAppArguments appArguments)
         {
+            this.applicationAccessor = applicationAccessor;
             this.appArguments = appArguments;
             SquirrelAwareApp.HandleEvents(
                 OnInitialInstall,
@@ -65,7 +71,7 @@ namespace PoeShared.Squirrel.Updater
             }
             Log.Debug($"Application will be restarted via executing {ApplicationExecutableFileName}");
         }
-        
+
         public string ApplicationExecutableFileName { get; }
 
         public DirectoryInfo MostRecentVersionAppFolder
@@ -190,6 +196,17 @@ namespace PoeShared.Squirrel.Updater
 
         public async Task RestartApplication()
         {
+            // NB: Here's how this method works:
+            //
+            // 1. We're going to pass the *name* of our EXE and the params to 
+            //    Update.exe
+            // 2. Update.exe is going to grab our PID (via getting its parent), 
+            //    then wait for us to exit.
+            // 3. We exit cleanly, dropping any single-instance mutexes or 
+            //    whatever.
+            // 4. Update.exe unblocks, then we launch the app again, possibly 
+            //    launching a different version than we started with (this is why
+            //    we take the app's *name* rather than a full path)
             using var unused = CreateIsBusyAnchor();
             
             var executable = GetLatestExecutable();
@@ -197,30 +214,39 @@ namespace PoeShared.Squirrel.Updater
                 $"Restarting app, folder: {mostRecentVersionAppFolder}, appName: {ApplicationExecutableFileName}, {executable}...");
 
             var squirrelUpdater = GetSquirrelUpdateExeOrThrow();
-            var squirrelArgs = $"--processStartAndWait {executable.FullName}";
+            var squirrelArgs = new StringBuilder($"--processStartAndWait {executable.FullName}");
+            if (appArguments.IsDebugMode)
+            {
+                squirrelArgs.Append($" --process-start-args=-d");
+            }
 
             Log.Debug($"Starting Squirrel updater @ '{squirrelUpdater}', args: {squirrelArgs} ...");
-            var updaterProcess = Process.Start(squirrelUpdater, squirrelArgs);
+            var updaterProcess = Process.Start(squirrelUpdater, squirrelArgs.ToString());
             if (updaterProcess == null)
             {
                 throw new FileNotFoundException($"Failed to start updater @ '{squirrelUpdater}'");
             }
-
+            
+            //FIXME Rewrite this pile of mess.PID should be send via args along with a mutex name, that way it will be fully controllable
+            
+            // NB: We have to give update.exe some time to grab our PID, but
+            // we can't use WaitForInputIdle because we probably don't have
+            // whatever WaitForInputIdle considers a message loop.
             Log.Debug($"Process spawned, PID: {updaterProcess.Id}");
             await Task.Delay(2000);
+            await applicationAccessor.Exit();
+        }
 
-            var app = Application.Current;
-            Log.Debug($"Terminating application (shutdownMode: {app.ShutdownMode}, window: {app.MainWindow})...");
-            if (app.MainWindow != null && app.ShutdownMode == ShutdownMode.OnMainWindowClose)
+        public FileInfo GetLatestExecutable()
+        {
+            var appExecutable = new FileInfo(Path.Combine(mostRecentVersionAppFolder.FullName, ApplicationExecutableFileName));
+            Log.Debug($"Most recent version folder: {mostRecentVersionAppFolder}, appName: { ApplicationExecutableFileName}, exePath: {appExecutable}(exists: {appExecutable.Exists})...");
+
+            if (!appExecutable.Exists)
             {
-                Log.Debug($"Closing main window {app.MainWindow}...");
-                app.MainWindow.Close();
+                throw new FileNotFoundException("Application executable was not found", appExecutable.FullName);
             }
-            else
-            {
-                Log.Debug($"Closing app forcefully");
-                Application.Current.Shutdown(0);
-            }
+            return appExecutable;
         }
 
         private async Task<PoeUpdateManager> CreateManager()
@@ -289,7 +315,7 @@ namespace PoeShared.Squirrel.Updater
         {
             Log.Debug("App started for the first time");
         }
-        
+
         private static string GetSquirrelUpdateExe()
         {
             var entryAssembly = Assembly.GetEntryAssembly();
@@ -310,7 +336,7 @@ namespace PoeShared.Squirrel.Updater
 
             return Path.Combine(executingAssembly, "..", UpdaterExecutableName);
         }
-        
+
         private static string GetSquirrelUpdateExeOrThrow()
         {
             var squirrelUpdateExe = GetSquirrelUpdateExe();
@@ -322,7 +348,7 @@ namespace PoeShared.Squirrel.Updater
 
             return squirrelUpdateExe;
         }
-        
+
         private IDisposable CreateIsBusyAnchor()
         {
             IsBusy = true;
@@ -334,18 +360,6 @@ namespace PoeShared.Squirrel.Updater
                     IsBusy = false;
                     ProgressPercent = 0;
                 });
-        }
-        
-        public FileInfo GetLatestExecutable()
-        {
-            var appExecutable = new FileInfo(Path.Combine(mostRecentVersionAppFolder.FullName, ApplicationExecutableFileName));
-            Log.Debug($"Most recent version folder: {mostRecentVersionAppFolder}, appName: { ApplicationExecutableFileName}, exePath: {appExecutable}(exists: {appExecutable.Exists})...");
-
-            if (!appExecutable.Exists)
-            {
-                throw new FileNotFoundException("Application executable was not found", appExecutable.FullName);
-            }
-            return appExecutable;
         }
     }
 }
