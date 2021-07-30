@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
@@ -34,6 +35,7 @@ namespace PoeShared.UI
         private readonly SourceCache<HotkeyGesture, HotkeyGesture> hotkeysSource = new(x => x);
         private readonly ISet<HotkeyGesture> pressedKeys = new HashSet<HotkeyGesture>();
         private readonly IUserInputFilterConfigurator userInputFilterConfigurator;
+        private readonly IScheduler uiScheduler;
         private bool handleApplicationKeys;
         private bool hasModifiers;
 
@@ -48,7 +50,9 @@ namespace PoeShared.UI
         {
             Binder.Bind(x => x.Hotkeys.Any(x => x.ModifierKeys != ModifierKeys.None)).To(x => x.HasModifiers);
             Binder.BindIf(x => x.HasModifiers, x => false).To(x => x.IgnoreModifiers);
-            Binder.BindIf(x => x.Hotkeys.Any(x => x.IsMouse), x => false).To(x => x.SuppressKey);
+            Binder
+                .BindIf(x => x.Hotkeys.Any(x => x.IsMouse && (x.MouseButton == MouseButton.Left || x.MouseButton == MouseButton.Right)), x => false)
+                .To((x,v) => x.SuppressKey = v, x => x.uiScheduler);
         }
 
         public HotkeyTracker(
@@ -57,14 +61,16 @@ namespace PoeShared.UI
             ISchedulerProvider schedulerProvider,
             IKeyboardEventsSource eventSource,
             IUserInputFilterConfigurator userInputFilterConfigurator,
-            [Dependency(WellKnownWindows.MainWindow)] IWindowTracker mainWindowTracker)
+            [Dependency(WellKnownWindows.MainWindow)] IWindowTracker mainWindowTracker,
+            [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {
             Log = typeof(HotkeyTracker).PrepareLogger().WithSuffix(this);
             var scheduler = schedulerProvider.GetOrCreate(nameof(HotkeyTracker));
             this.clock = clock;
             this.appArguments = appArguments;
             this.userInputFilterConfigurator = userInputFilterConfigurator;
-            
+            this.uiScheduler = uiScheduler;
+
             Disposable
                 .Create(() => Log.Debug($"Disposing HotkeyTracker"))
                 .AddTo(Anchors);
@@ -343,9 +349,9 @@ namespace PoeShared.UI
                 {
                     pressedKeys.Add(data.Hotkey);
                 }
-                else
+                else if (!pressedKeys.Remove(data.Hotkey))
                 {
-                    pressedKeys.Remove(data.Hotkey);
+                    return false;
                 }
 
                 return true;

@@ -138,6 +138,7 @@ namespace PoeShared.Native
                     Log.Info($"[{hookName}] Subscribing...");
                     hookMethod()
                         .Do(LogEvent, Log.HandleException, () => Log.Debug($"{hookName} event loop completed"))
+                        .RetryWithDelay(TimeSpan.FromSeconds(1))
                         .Subscribe(subscriber)
                         .AddTo(activeAnchors);
                     sw.Stop();

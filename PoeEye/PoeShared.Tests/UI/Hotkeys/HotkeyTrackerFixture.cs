@@ -86,6 +86,7 @@ namespace PoeShared.Tests.UI.Hotkeys
             instance.IsActive.ShouldBe(false);
 
             //When
+            whenKeyDown.OnNext(new KeyEventArgs(Keys.A));
             whenKeyUp.OnNext(new KeyEventArgs(Keys.A));
 
             //Then
@@ -102,11 +103,29 @@ namespace PoeShared.Tests.UI.Hotkeys
             instance.HotkeyMode = HotkeyMode.Click;
 
             //When
+            whenKeyDown.OnNext(new KeyEventArgs(Keys.A));
             whenKeyUp.OnNext(new KeyEventArgs(Keys.A));
             instance.IsActive.ShouldBe(true);
 
             //Then
+            whenKeyDown.OnNext(new KeyEventArgs(Keys.B));
             whenKeyUp.OnNext(new KeyEventArgs(Keys.B));
+            instance.IsActive.ShouldBe(false);
+        }
+        
+        [Test]
+        [Theory]
+        public void ShouldNotHandleKeyUpIfThereWereNoKeyDownBefore(HotkeyMode hotkeyMode)
+        {
+            //Given
+            var instance = CreateInstance();
+            instance.Add(new HotkeyGesture(Key.A));
+            instance.HotkeyMode = hotkeyMode;
+
+            //When
+            whenKeyUp.OnNext(new KeyEventArgs(Keys.A));
+
+            //Then
             instance.IsActive.ShouldBe(false);
         }
         
@@ -176,6 +195,7 @@ namespace PoeShared.Tests.UI.Hotkeys
             var instance = CreateInstance();
             instance.Hotkey = new HotkeyGesture(Key.A);
             instance.HotkeyMode = HotkeyMode.Click;
+            whenKeyDown.OnNext(new KeyEventArgs(Keys.A));
             whenKeyUp.OnNext(new KeyEventArgs(Keys.A));
             instance.IsActive.ShouldBe(true);
 
@@ -193,6 +213,7 @@ namespace PoeShared.Tests.UI.Hotkeys
             var instance = CreateInstance();
             instance.Hotkey = new HotkeyGesture(Key.A);
             instance.HotkeyMode = HotkeyMode.Click;
+            whenKeyDown.OnNext(new KeyEventArgs(Keys.A));
             whenKeyUp.OnNext(new KeyEventArgs(Keys.A));
             instance.IsActive.ShouldBe(true);
 
@@ -212,6 +233,7 @@ namespace PoeShared.Tests.UI.Hotkeys
             instance.Hotkey = new HotkeyGesture(Key.A, ModifierKeys.Control | ModifierKeys.Alt);
 
             //When
+            whenKeyDown.OnNext(new KeyEventArgs(Keys.Control | Keys.A | Keys.Alt));
             whenKeyUp.OnNext(new KeyEventArgs(Keys.Control | Keys.A | Keys.Alt));
 
             //Then
@@ -292,7 +314,40 @@ namespace PoeShared.Tests.UI.Hotkeys
             //Then
             instance.IgnoreModifiers.ShouldBe(false);
         }
+        
+        [Test]
+        public void ShouldProcessKeyWithIgnoreModifiersWhenModeIsClick()
+        {
+            //Given
+            var instance = CreateInstance();
+            instance.HotkeyMode = HotkeyMode.Click;
+            instance.IgnoreModifiers = true;
+            instance.Add(new HotkeyGesture(Key.A));
 
+            //When
+            whenKeyDown.OnNext(new KeyEventArgs(Keys.A | Keys.Control));
+            whenKeyUp.OnNext(new KeyEventArgs(Keys.A | Keys.Control));
+
+            //Then
+            instance.IsActive.ShouldBe(true);
+        }
+        
+        [Test]
+        public void ShouldProcessKeyWithIgnoreModifiersWhenModeIsHold()
+        {
+            //Given
+            var instance = CreateInstance();
+            instance.HotkeyMode = HotkeyMode.Hold;
+            instance.IgnoreModifiers = true;
+            instance.Add(new HotkeyGesture(Key.A));
+
+            //When
+            whenKeyDown.OnNext(new KeyEventArgs(Keys.A | Keys.Control));
+
+            //Then
+            instance.IsActive.ShouldBe(true);
+        }
+        
         [Test]
         public void ShouldResetSuppressKeyWhenMouseHotkeyIsAdded()
         {
@@ -314,12 +369,14 @@ namespace PoeShared.Tests.UI.Hotkeys
             var instance = CreateInstance();
             instance.HotkeyMode = HotkeyMode.Click;
             instance.Add(new HotkeyGesture(Key.A));
+            whenKeyDown.OnNext(new KeyEventArgs(Keys.A));
             whenKeyUp.OnNext(new KeyEventArgs(Keys.A));
             instance.IsActive.ShouldBe(true);
 
             //When
             instance.IsEnabled = false;
             instance.IsActive.ShouldBe(true);
+            whenKeyDown.OnNext(new KeyEventArgs(Keys.A));
             whenKeyUp.OnNext(new KeyEventArgs(Keys.A));
 
             //Then
@@ -364,6 +421,7 @@ namespace PoeShared.Tests.UI.Hotkeys
             }
 
             //When
+            whenKeyDown.OnNext(new KeyEventArgs(Keys.A));
             whenKeyUp.OnNext(new KeyEventArgs(Keys.A));
 
             //Then
@@ -436,6 +494,7 @@ namespace PoeShared.Tests.UI.Hotkeys
             var instance = CreateInstance();
             instance.HotkeyMode = HotkeyMode.Click;
             instance.Hotkey = new HotkeyGesture(Key.A);
+            whenKeyDown.OnNext(new KeyEventArgs(Keys.A));
             whenKeyUp.OnNext(new KeyEventArgs(Keys.A));
             instance.IsActive.ShouldBe(true);
 
