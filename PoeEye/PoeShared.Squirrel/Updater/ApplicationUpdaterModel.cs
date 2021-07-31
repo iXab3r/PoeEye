@@ -180,10 +180,10 @@ namespace PoeShared.Squirrel.Updater
         {
             Log.Debug("Handling Squirrel events");
             SquirrelAwareApp.HandleEvents(
-                x => Task.Run(async () => await OnInitialInstall(x)).Wait(),
-                x => Task.Run(async () => await OnAppUpdate(x)).Wait(),
-                onAppUninstall: x => Task.Run(async () => await OnAppUninstall(x)).Wait(),
-                onFirstRun: () => Task.Run(async () => await OnFirstRun()).Wait());
+                OnInitialInstall,
+                OnAppUpdate,
+                onAppUninstall: OnAppUninstall,
+                onFirstRun: OnFirstRun);
             Log.Debug("Squirrel were handled successfully events");
         }
 
@@ -314,39 +314,25 @@ namespace PoeShared.Squirrel.Updater
             Log.Debug($"Check update is in progress: {progressPercent}%");
         }
 
-        private async Task OnAppUninstall(Version appVersion)
+        private void OnAppUninstall(Version appVersion)
         {
             Log.Debug($"Uninstalling v{appVersion}...");
-            using var mgr = await CreateManager();
-            mgr.RemoveShortcutsForExecutable(
-                ApplicationExecutableFileName, 
-                ShortcutLocation.StartMenu | ShortcutLocation.Desktop | ShortcutLocation.AppRoot | ShortcutLocation.StartMenu);
-            await applicationAccessor.Exit();
+            throw new NotSupportedException("Should never be invoked");
         }
 
-        private async Task OnAppUpdate(Version appVersion)
+        private void OnAppUpdate(Version appVersion)
         {
             Log.Debug($"Updating v{appVersion}...");
-            using var mgr = await CreateManager();
-            mgr.CreateShortcutsForExecutable(
-                ApplicationExecutableFileName, 
-                ShortcutLocation.StartMenu | ShortcutLocation.Desktop, 
-                updateOnly: false);
-            await applicationAccessor.Exit();
+            throw new NotSupportedException("Should never be invoked");
         }
 
-        private async Task OnInitialInstall(Version appVersion)
+        private void OnInitialInstall(Version appVersion)
         {
             Log.Debug($"App v{appVersion} installed");
-            using var mgr = await CreateManager();
-            mgr.CreateShortcutsForExecutable(
-                ApplicationExecutableFileName, 
-                ShortcutLocation.StartMenu | ShortcutLocation.Desktop, 
-                updateOnly: false);
-            await applicationAccessor.Exit();
+            throw new NotSupportedException("Should never be invoked");
         }
 
-        private async Task OnFirstRun()
+        private void OnFirstRun()
         {
             Log.Debug("App started for the first time");
         }
