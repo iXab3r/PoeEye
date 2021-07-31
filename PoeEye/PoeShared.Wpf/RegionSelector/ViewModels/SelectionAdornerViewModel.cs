@@ -256,8 +256,8 @@ namespace PoeShared.RegionSelector.ViewModels
                     Y = mousePosition.Y < anchorPoint.Y
                         ? mousePosition.Y
                         : anchorPoint.Y,
-                    Width = Math.Abs(mousePosition.X - anchorPoint.X),
-                    Height = Math.Abs(mousePosition.Y - anchorPoint.Y)
+                    Width = Math.Max(1, Math.Abs(mousePosition.X - anchorPoint.X)),
+                    Height = Math.Max(1, Math.Abs(mousePosition.Y - anchorPoint.Y))
                 };
                 newSelection.Intersect(destinationRect);
                 Selection = newSelection;
