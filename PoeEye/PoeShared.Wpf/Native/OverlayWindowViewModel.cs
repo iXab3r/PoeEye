@@ -49,5 +49,10 @@ namespace PoeShared.Native
             get => contentTemplate;
             set => RaiseAndSetIfChanged(ref contentTemplate, value);
         }
+
+        public override string ToString()
+        {
+            return $"{Content} {Content?.OverlayMode}";
+        }
     }
 }

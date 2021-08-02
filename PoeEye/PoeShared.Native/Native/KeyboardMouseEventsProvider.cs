@@ -2,40 +2,40 @@
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using Gma.System.MouseKeyHook;
-using log4net;
 using PoeShared.Logging;
 using PoeShared.Prism;
-using PoeShared.Scaffolding; 
-using PoeShared.Logging;
+using PoeShared.Scaffolding;
 
 namespace PoeShared.Native
 {
     internal sealed class KeyboardMouseEventsProvider : IKeyboardMouseEventsProvider
     {
         private static readonly IFluentLog Log = typeof(KeyboardMouseEventsProvider).PrepareLogger();
-        private static readonly IKeyboardMouseEvents AppEvents = Gma.System.MouseKeyHook.Hook.AppEvents();
-        private static readonly IKeyboardMouseEvents GlobalEvents = Gma.System.MouseKeyHook.Hook.GlobalEvents();
-        
+
         private static readonly object HookGate = new(); //GMA HookHelper uses static variable to temporarily store HookProcedure
 
         public KeyboardMouseEventsProvider() : this(
-            globalEventsFactory: new LambdaFactory<IKeyboardMouseEvents>(() => GlobalEvents),
-            appEventsFactory: new LambdaFactory<IKeyboardMouseEvents>(() => AppEvents))
+            globalEventsFactory: new LambdaFactory<IKeyboardMouseEvents>(() => Gma.System.MouseKeyHook.Hook.GlobalEvents()),
+            appEventsFactory: new LambdaFactory<IKeyboardMouseEvents>(() => Gma.System.MouseKeyHook.Hook.AppEvents()))
         {
         }
-        
+
         internal KeyboardMouseEventsProvider(IFactory<IKeyboardMouseEvents> globalEventsFactory, IFactory<IKeyboardMouseEvents> appEventsFactory)
         {
             System = Observable
-                .Using(() => Hook("global", globalEventsFactory),x => Observable.Return(x).Concat(Observable.Never<IKeyboardMouseEvents>()))
+                .Using(() => Hook("global", globalEventsFactory), x => Observable.Return(x).Concat(Observable.Never<IKeyboardMouseEvents>()))
                 .Replay(1)
                 .RefCount();
-            
+
             Application = Observable
                 .Using(() => Hook("app", appEventsFactory), x => Observable.Return(x).Concat(Observable.Never<IKeyboardMouseEvents>()))
                 .Publish()
                 .RefCount();
         }
+
+        public IObservable<IKeyboardMouseEvents> System { get; }
+
+        public IObservable<IKeyboardMouseEvents> Application { get; }
 
         private static IKeyboardMouseEvents Hook(string name, IFactory<IKeyboardMouseEvents> factory)
         {
@@ -48,9 +48,5 @@ namespace PoeShared.Native
                 return events;
             }
         }
-
-        public IObservable<IKeyboardMouseEvents> System { get; }
-
-        public IObservable<IKeyboardMouseEvents> Application { get; }
     }
 }

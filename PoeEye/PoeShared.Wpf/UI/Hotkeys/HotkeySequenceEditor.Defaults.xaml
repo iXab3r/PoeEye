@@ -42,12 +42,12 @@
         </st:StackPanel>
         
         <DataTemplate.Triggers>
-            <DataTrigger Binding="{Binding Controller.IsRecording}" Value="True">
+            <DataTrigger Binding="{Binding Controller.RecordStartTime, Converter={StaticResource NullToTrueConverter}}" Value="False">
                 <Setter TargetName="RecordingText" Property="Text" Value="{Binding Controller.ToggleRecordingHotkey, StringFormat='Press {0} to STOP  recording'}"></Setter>
                 <Setter TargetName="RecordingIcon" Property="Text" Value="&#xf04d;"></Setter>
                 <Setter TargetName="RecordingIcon" Property="Foreground" Value="{StaticResource NegativeBrush}"/>
             </DataTrigger>
-            <DataTrigger Binding="{Binding Controller.IsRecording}" Value="False">
+            <DataTrigger Binding="{Binding Controller.RecordStartTime, Converter={StaticResource NullToTrueConverter}}" Value="True">
                 <Setter TargetName="RecordingText" Property="Text" Value="{Binding Controller.ToggleRecordingHotkey, StringFormat='Press {0} to START recording'}"></Setter>
                 <Setter TargetName="RecordingIcon" Property="Text" Value="&#xf01d;"></Setter>
                 <Setter TargetName="RecordingIcon" Property="Foreground" Value="{StaticResource PositiveBrush}"/>

@@ -84,6 +84,11 @@
             <TabItem Header="SelectionAdorner">
                 <st:StackPanel MarginBetweenChildren="5" Orientation="Vertical" Fill="Fill">
                     <st:StackPanel Orientation="Horizontal" MarginBetweenChildren="5">
+                        <eye:ButtonEx Command="{Binding SelectRegionCommnad}">Select Window</eye:ButtonEx>
+                        <TextBlock Text="{Binding SelectedRegion}"></TextBlock>
+                    </st:StackPanel>
+                    
+                    <st:StackPanel Orientation="Horizontal" MarginBetweenChildren="5">
                         <eye:ButtonEx Command="{Binding StartSelectionCommand}">Start selection</eye:ButtonEx>
                         <CheckBox IsChecked="{Binding SelectionAdorner.ShowCrosshair}">Show crosshair</CheckBox>
                         <CheckBox IsChecked="{Binding SelectionAdorner.ShowBackground}">Show background</CheckBox>

@@ -1,6 +1,8 @@
 using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.Runtime.InteropServices;
+using System.Threading;
 using PInvoke;
 using PoeShared.Scaffolding; 
 using PoeShared.Logging;
@@ -182,11 +184,16 @@ namespace PoeShared.Native
 
         public static bool ShowWindow(IntPtr handle)
         {
+            return ShowWindow(handle, User32.WindowShowStyle.SW_SHOWNORMAL);
+        }
+        
+        public static bool ShowWindow(IntPtr handle, User32.WindowShowStyle showStyle)
+        {
             Guard.ArgumentIsTrue(handle != IntPtr.Zero, "Handle must be non-zero");
 
-            Log.Debug($"[{handle.ToHexadecimal()}] Showing window");
+            Log.Debug($"[{handle.ToHexadecimal()}] Showing window with {showStyle}");
             Win32ErrorCode error;
-            if (!User32.ShowWindow(handle, User32.WindowShowStyle.SW_SHOWNORMAL) && (error = Kernel32.GetLastError()) != Win32ErrorCode.NERR_Success)
+            if (!User32.ShowWindow(handle, showStyle) && (error = Kernel32.GetLastError()) != Win32ErrorCode.NERR_Success)
             {
                 Log.Warn($"Failed to ShowWindow({handle.ToHexadecimal()}), error: {error}");
                 return false;
@@ -231,6 +238,48 @@ namespace PoeShared.Native
         public static IntPtr GetForegroundWindow()
         {
             return User32.GetForegroundWindow();
+        }
+
+        public static void ActivateWindow(IntPtr window)
+        {
+            ActivateWindow(window, TimeSpan.FromMilliseconds(500));    
+        }
+        
+        public static void ActivateWindow(IntPtr window, TimeSpan timeout)
+        {
+            if (window == IntPtr.Zero)
+            {
+                return;
+            }
+            if (window == GetForegroundWindow())
+            {
+                return;
+            }
+            
+            var placement = User32.GetWindowPlacement(window);
+            if (placement.showCmd == User32.WindowShowStyle.SW_SHOWMINIMIZED)
+            {
+                Log.Debug($"Restoring minimized window {window.ToHexadecimal()}");
+                ShowWindow(window, User32.WindowShowStyle.SW_SHOWNORMAL);
+            }
+            
+            Log.Debug($"Bringing window {window.ToHexadecimal()} to foreground");
+            SetForegroundWindow(window);
+            if (timeout <= TimeSpan.Zero)
+            {
+                return;
+            }
+            
+            var sw = Stopwatch.StartNew();
+            IntPtr foregroundWindow;
+            while ((foregroundWindow = GetForegroundWindow()) != window)
+            {
+                if (sw.Elapsed > timeout)
+                {
+                    throw new ApplicationException($"Failed to switch to window {UnsafeNative.GetWindowTitle(window)} (${window.ToHexadecimal()}) in {timeout.TotalMilliseconds:F0}ms, foreground window: {UnsafeNative.GetWindowTitle(foregroundWindow)} {foregroundWindow.ToHexadecimal()}");
+                }
+                Thread.Sleep(10);
+            }
         }
     }
 }

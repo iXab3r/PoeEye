@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Drawing;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
@@ -12,9 +13,14 @@ using PoeShared.Prism;
 using PoeShared.RegionSelector.Views;
 using PoeShared.Scaffolding; 
 using PoeShared.Logging;
+using PoeShared.Native;
+using PoeShared.RegionSelector.Services;
+using PoeShared.RegionSelector.ViewModels;
 using PoeShared.Scaffolding.WPF;
 using PropertyBinder;
 using ReactiveUI;
+using Point = System.Drawing.Point;
+using Size = System.Drawing.Size;
 
 namespace PoeShared.UI
 {
@@ -23,10 +29,10 @@ namespace PoeShared.UI
         private static readonly Binder<HotkeySequenceEditorViewModel> Binder = new();
 
         private static readonly IFluentLog Log = typeof(HotkeySequenceEditorViewModel).PrepareLogger();
+        private readonly IScreenRegionSelectorService screenRegionSelectorService;
 
-        private readonly IFactory<RegionSelectorWindow> regionSelectorWindowFactory;
-        private readonly ObservableAsPropertyHelper<int> totalItemsCount;
         private readonly ObservableAsPropertyHelper<TimeSpan> totalDuration;
+        private readonly ObservableAsPropertyHelper<int> totalItemsCount;
 
         private HotkeySequenceDelay defaultItemDelay;
         private TimeSpan defaultKeyPressDuration = TimeSpan.FromMilliseconds(50);
@@ -47,12 +53,11 @@ namespace PoeShared.UI
 
         public HotkeySequenceEditorViewModel(
             IFactory<IHotkeySequenceEditorController, IHotkeySequenceEditorViewModel> controllerFactory,
-            IFactory<RegionSelectorWindow> regionSelectorWindowFactory)
+            IScreenRegionSelectorService screenRegionSelectorService)
         {
+            this.screenRegionSelectorService = screenRegionSelectorService;
             var items = new ObservableCollectionExtended<HotkeySequenceItem>();
             Items = items;
-
-            this.regionSelectorWindowFactory = regionSelectorWindowFactory;
 
             SumEx.Sum(items.ToObservableChangeSet(), y => y is HotkeySequenceDelay delay ? delay.Delay.TotalMilliseconds : 0)
                 .Select(TimeSpan.FromMilliseconds)
@@ -143,20 +148,28 @@ namespace PoeShared.UI
         {
             using var windowAnchors = new CompositeDisposable();
 
-            var window = regionSelectorWindowFactory.Create().AddTo(windowAnchors);
-            Disposable.Create(() => Log.Debug("Disposed selector window: {window}")).AddTo(windowAnchors);
-            Log.Debug($"Showing new selector window: {window}");
-            window.Show();
-            window.SelectScreenCoordinates();
-            Log.Debug($"Awaiting for selection result from {window}");
-            var result = await Observable.FromEventPattern<EventHandler, EventArgs>(h => window.Closed += h, h => window.Closed -= h)
-                .Select(x => window.Result)
-                .Take(1);
+            var windowToRecord = Controller.TargetWindow;
+            var initialWindow = UnsafeNative.GetForegroundWindow();
+            if (windowToRecord != null)
+            {
+                UnsafeNative.ActivateWindow(windowToRecord.Handle);
+                Disposable.Create(() => UnsafeNative.ActivateWindow(initialWindow)).AddTo(windowAnchors);
+            }
+
+            var result = await screenRegionSelectorService.SelectRegion(Size.Empty);
             if (result.IsValid)
             {
+                var selectedLocation = result.AbsoluteSelection.Location;
+                if (windowToRecord != null && !windowToRecord.ClientBounds.Contains(selectedLocation))
+                {
+                    throw new InvalidOperationException($"Click must be inside window {windowToRecord.Title}, bounds: {windowToRecord.ClientBounds}, click location: {selectedLocation}");
+                }
+                var position = windowToRecord == null
+                    ? selectedLocation
+                    : new Point(selectedLocation.X - windowToRecord.ClientBounds.X, selectedLocation.Y - windowToRecord.ClientBounds.Y);
                 var newItem = new HotkeySequenceHotkey
                 {
-                    MousePosition = result.AbsoluteSelection.Location
+                    MousePosition = position
                 };
                 AddItemExecuted(newItem);
             }

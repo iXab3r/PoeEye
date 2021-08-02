@@ -154,7 +154,8 @@ namespace PoeShared.Native
                 .AddTo(childAnchors);
             
             Observable.Merge(
-                    this.WhenAnyValue(x => x.IsVisible).WithPrevious((prev, curr) => new {prev, curr}).Select(x => $"[IsVisible {IsVisible}] Processing IsVisible change, {x.prev} => {x.curr}"), 
+                    this.WhenAnyValue(x => x.IsVisible).WithPrevious((prev, curr) => new {prev, curr}).Select(x => $"[IsVisible {IsVisible}] Processing Controller IsVisible change, {x.prev} => {x.curr}"), 
+                    viewModel.WhenAnyValue(x => x.IsVisible).WithPrevious((prev, curr) => new {prev, curr}).Select(x => $"[IsVisible {IsVisible}] Processing Overlay IsVisible change, {x.prev} => {x.curr}"), 
                     windowTracker.WhenAnyValue(x => x.ActiveWindowHandle).WithPrevious((prev, curr) => new {prev, curr}).Select(x => $"[IsVisible {IsVisible}] Processing ActiveWindowHandle change, {UnsafeNative.GetWindowTitle(x.prev)} {x.prev.ToHexadecimal()} => {UnsafeNative.GetWindowTitle(x.curr)} {x.curr.ToHexadecimal()}"),
                     overlayWindow.WhenLoaded.Select(x => $"[IsVisible {IsVisible}] Processing WhenLoaded event"))
                 .Do(reason => Log.Debug($"[{overlayName}] {reason}"))
@@ -212,7 +213,7 @@ namespace PoeShared.Native
         {
             var overlayWindowHandle = new WindowInteropHelper(overlayWindow).Handle;
            
-            if (isVisible)
+            if (isVisible && viewModel.IsVisible)
             {
                 Log.Debug($"[#{overlayWindow.Name}] Showing overlay {overlayWindow}");
                 if (overlayWindow.Visibility != Visibility.Visible)

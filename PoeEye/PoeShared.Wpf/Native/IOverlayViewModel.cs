@@ -34,6 +34,8 @@ namespace PoeShared.Native
         bool IsLocked { get; }
 
         bool IsUnlockable { get; }
+        
+        bool IsVisible { get; set; }
 
         OverlayMode OverlayMode { get; set; }
         

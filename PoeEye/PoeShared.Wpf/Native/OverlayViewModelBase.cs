@@ -28,41 +28,35 @@ namespace PoeShared.Native
     {
         private static readonly IFluentLog Log = typeof(OverlayViewModelBase).PrepareLogger();
 
-        private readonly CommandWrapper lockWindowCommand;
-        private readonly CommandWrapper unlockWindowCommand;
-        
-        private readonly CommandWrapper makeLayeredCommand;
-        private readonly CommandWrapper makeTransparentCommand;
-        private readonly ISubject<Unit> whenLoaded = new ReplaySubject<Unit>(1);
-        private readonly ISubject<Rectangle> windowPositionSource = new ReplaySubject<Rectangle>(1);
         private readonly ObservableAsPropertyHelper<PointF> dpi;
         private readonly object gate = new();
+        private readonly CommandWrapper lockWindowCommand;
+        private readonly CommandWrapper makeLayeredCommand;
+        private readonly CommandWrapper makeTransparentCommand;
+        private readonly Dispatcher uiDispatcher;
+        private readonly CommandWrapper unlockWindowCommand;
+        private readonly ISubject<Unit> whenLoaded = new ReplaySubject<Unit>(1);
+        private readonly ISubject<Rectangle> windowPositionSource = new ReplaySubject<Rectangle>(1);
 
         private double actualHeight;
         private double actualWidth;
+        private Size defaultSize;
+        private bool enableHeader = true;
         private bool growUpwards;
-        private bool showInTaskbar;
         private bool isLocked = true;
         private bool isUnlockable;
-        private bool enableHeader = true;
-        private Size defaultSize;
-
+        private bool isVisible = true;
         private Size maxSize = new Size(Int16.MaxValue, Int16.MaxValue);
         private Size minSize = new Size(0, 0);
-        private float opacity;
         private Rectangle nativeBounds;
-
+        private float opacity;
         private OverlayMode overlayMode;
-
-        private SizeToContent sizeToContent = SizeToContent.Manual;
-        private string title;
-
-        private double? targetAspectRatio;
-
         private TransparentWindow overlayWindow;
+        private bool showInTaskbar;
+        private SizeToContent sizeToContent = SizeToContent.Manual;
+        private double? targetAspectRatio;
+        private string title;
         private Point viewModelLocation;
-
-        private readonly Dispatcher uiDispatcher;
 
         protected OverlayViewModelBase()
         {
@@ -135,21 +129,6 @@ namespace PoeShared.Native
                 }, Log.HandleUiException)
                 .AddTo(Anchors);
         }
-        
-        private IntPtr WndProc(IntPtr hwnd, int msgRaw, IntPtr wParam, IntPtr lParam, ref bool handled)
-        {
-            var msg = (User32.WindowMessage)msgRaw;
-            if (msg == User32.WindowMessage.WM_WINDOWPOSCHANGED && lParam != IntPtr.Zero)
-            {
-                var nativeStruct = Marshal.PtrToStructure(lParam, typeof(UnsafeNative.WINDOWPOS));
-                if (nativeStruct != null)
-                {
-                    var wp = (UnsafeNative.WINDOWPOS)nativeStruct;
-                    windowPositionSource.OnNext(new Rectangle(wp.x, wp.y, wp.cx, wp.cy));
-                }
-            }
-            return IntPtr.Zero;
-        }
 
         protected IObservable<Unit> WhenLoaded => whenLoaded;
 
@@ -158,6 +137,14 @@ namespace PoeShared.Native
             get => growUpwards;
             set => this.RaiseAndSetIfChanged(ref growUpwards, value);
         }
+
+        public Size DefaultSize
+        {
+            get => defaultSize;
+            set => RaiseAndSetIfChanged(ref defaultSize, value);
+        }
+
+        public string OverlayDescription => $"{(overlayWindow == null ? "NOWINDOW" : overlayWindow.Name)}";
 
         public float Opacity
         {
@@ -176,11 +163,11 @@ namespace PoeShared.Native
             get => viewModelLocation;
             set => this.RaiseAndSetIfChanged(ref viewModelLocation, value);
         }
-        
+
         public ICommand UnlockWindowCommand => unlockWindowCommand;
-        
+
         public ICommand MakeLayeredCommand => makeLayeredCommand;
-        
+
         public ICommand MakeTransparentCommand => makeTransparentCommand;
 
         public ICommand LockWindowCommand => lockWindowCommand;
@@ -196,7 +183,13 @@ namespace PoeShared.Native
             get => overlayWindow;
             private set => this.RaiseAndSetIfChanged(ref overlayWindow, value);
         }
-        
+
+        public bool IsVisible
+        {
+            get => isVisible;
+            set => RaiseAndSetIfChanged(ref isVisible, value);
+        }
+
         public double ActualWidth
         {
             get => actualWidth;
@@ -221,12 +214,6 @@ namespace PoeShared.Native
         {
             get => maxSize;
             set => this.RaiseAndSetIfChanged(ref maxSize, value);
-        }
-
-        public Size DefaultSize
-        {
-            get => defaultSize;
-            set => RaiseAndSetIfChanged(ref defaultSize, value);
         }
 
         public bool IsLocked
@@ -279,8 +266,6 @@ namespace PoeShared.Native
             protected set => this.RaiseAndSetIfChanged(ref title, value);
         }
 
-        public string OverlayDescription => $"{(overlayWindow == null ? "NOWINDOW" : overlayWindow.Name)}";
-
         public virtual void ResetToDefault()
         {
             if (overlayWindow == null)
@@ -317,6 +302,26 @@ namespace PoeShared.Native
             OverlayWindow = owner;
             var interopHelper = new WindowInteropHelper(OverlayWindow);
             Log.Debug($"[#{this}] Loaded overlay window: {OverlayWindow} ({interopHelper.Handle.ToHexadecimal()})");
+        }
+
+        private IntPtr WndProc(IntPtr hwnd, int msgRaw, IntPtr wParam, IntPtr lParam, ref bool handled)
+        {
+            var msg = (User32.WindowMessage)msgRaw;
+            if (msg == User32.WindowMessage.WM_WINDOWPOSCHANGED && lParam != IntPtr.Zero)
+            {
+                var nativeStruct = Marshal.PtrToStructure(lParam, typeof(UnsafeNative.WINDOWPOS));
+                if (nativeStruct != null)
+                {
+                    var wp = (UnsafeNative.WINDOWPOS)nativeStruct;
+                    windowPositionSource.OnNext(new Rectangle(wp.x, wp.y, wp.cx, wp.cy));
+                }
+            }
+            return IntPtr.Zero;
+        }
+
+        public override string ToString()
+        {
+            return $"{Title}";
         }
 
         public DispatcherOperation BeginInvoke(Action dispatcherAction)
@@ -421,7 +426,7 @@ namespace PoeShared.Native
         {
             return !IsLocked;
         }
-        
+
         protected virtual bool MakeLayeredCommandCanExecute()
         {
             return OverlayMode == OverlayMode.Transparent;
@@ -436,7 +441,7 @@ namespace PoeShared.Native
             Log.Debug($"[{OverlayDescription}] Making overlay Layered");
             OverlayMode = OverlayMode.Layered;
         }
-        
+
         protected virtual bool MakeTransparentCommandCanExecute()
         {
             return OverlayMode == OverlayMode.Layered;

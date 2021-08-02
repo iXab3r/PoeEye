@@ -11,6 +11,8 @@ namespace PoeShared.Native
         
         bool IsEnabled { get; set; }
         
+        bool ShowWireframes { get; set; }
+        
         IDisposable RegisterChild([NotNull] IOverlayViewModel viewModel);
 
         void ActivateLastActiveWindow();

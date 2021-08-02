@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using System.Windows.Forms;
 using Gma.System.MouseKeyHook;
 using JetBrains.Annotations;
@@ -41,6 +42,8 @@ namespace PoeShared.Native
                 .Select(x => x)
                 .Select(HookMouseMove)
                 .Switch()
+                .Publish()
+                .RefCount()
                 .Where(x => x.EventType == InputEventType.MouseMove && x.EventArgs is MouseEventArgs)
                 .Select(x => x.EventArgs as MouseEventArgs)
                 .DistinctUntilChanged(args => new {args.X, args.Y, args.Button, args.Clicks, args.Delta});
@@ -133,16 +136,19 @@ namespace PoeShared.Native
                 Disposable.Create(() => Log.Info($"[{hookName}] Disposing hook")).AddTo(activeAnchors);
 
                 Log.Info($"Sending subscription to {scheduler}");
+
+                var result = new Subject<InputEventData>();
+                result.Synchronize().ObserveOn(scheduler).Subscribe(subscriber).AddTo(activeAnchors);
+                
                 scheduler.Schedule(() =>
                 {
                     Log.Info($"[{hookName}] Subscribing...");
                     hookMethod()
                         .Do(LogEvent, Log.HandleException, () => Log.Debug($"{hookName} event loop completed"))
-                        .RetryWithDelay(TimeSpan.FromSeconds(1))
-                        .Subscribe(subscriber)
+                        .Subscribe(result)
                         .AddTo(activeAnchors);
                     sw.Stop();
-                    Log.Debug($"[{hookName}] Configuration took {sw.ElapsedMilliseconds:F0}ms");
+                    Log.Info($"[{hookName}] Configuration took {sw.ElapsedMilliseconds:F0}ms");
                 }).AddTo(activeAnchors);
 
                 return activeAnchors;

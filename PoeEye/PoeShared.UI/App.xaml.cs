@@ -1,6 +1,10 @@
 ﻿using System;
 using System.Windows;
+using PoeShared.Native;
+using PoeShared.Prism;
+using PoeShared.Wpf.Scaffolding;
 using Unity;
+using Unity.Lifetime;
 
 namespace PoeShared.UI
 {
@@ -14,6 +18,9 @@ namespace PoeShared.UI
             base.OnStartup(e);
             
             var window = new MainWindow();
+            Container.RegisterOverlayController();
+            var viewController = new WindowViewController(window);
+            Container.RegisterInstance<IWindowViewController>(WellKnownWindows.MainWindow, viewController, new ContainerControlledLifetimeManager());
             window.DataContext = Container.Resolve<MainWindowViewModel>();
             window.Show();
         }

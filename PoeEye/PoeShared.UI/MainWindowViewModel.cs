@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows;
@@ -11,15 +12,21 @@ using PoeShared.RegionSelector.ViewModels;
 using PoeShared.Scaffolding; 
 using PoeShared.Logging;
 using PoeShared.Notifications;
+using PoeShared.RegionSelector;
+using PoeShared.RegionSelector.Services;
 using PoeShared.Scaffolding.WPF;
 using PoeShared.Wpf.Scaffolding;
+using Size = System.Drawing.Size;
 
 namespace PoeShared.UI
 {
     internal sealed class MainWindowViewModel : DisposableReactiveObject
     {
+        private readonly IScreenRegionSelectorService regionSelectorService;
         private DisposableReactiveObject fakeDelay;
         private TimeSpan randomPeriod;
+
+        private RegionSelectorResult selectedRegion;
         private Rect selectionRect;
 
         private Rectangle selectionRectangle;
@@ -28,9 +35,11 @@ namespace PoeShared.UI
             IAudioNotificationSelectorViewModel audioNotificationSelector,
             IRandomPeriodSelector randomPeriodSelector,
             ISelectionAdornerViewModel selectionAdorner,
+            IScreenRegionSelectorService regionSelectorService,
             NotificationSandboxViewModel notificationSandbox,
             IHotkeySequenceEditorViewModel hotkeySequenceEditor)
         {
+            this.regionSelectorService = regionSelectorService;
             NotificationSandbox = notificationSandbox;
             SelectionAdorner = selectionAdorner.AddTo(Anchors);
             AudioNotificationSelector = audioNotificationSelector.AddTo(Anchors);
@@ -66,6 +75,13 @@ namespace PoeShared.UI
                     FakeDelay = null;
                 }
             });
+            
+            SelectRegionCommnad = CommandWrapper.Create(SelectRegionExecuted);
+        }
+
+        private async Task SelectRegionExecuted()
+        {
+            SelectedRegion = await regionSelectorService.SelectRegion(new Size(20, 20));
         }
 
         public NotificationSandboxViewModel NotificationSandbox { get; }
@@ -101,6 +117,14 @@ namespace PoeShared.UI
 
         public ICommand SetCachedControlContentCommand { get; }
 
+        public ICommand SelectRegionCommnad { get; }
+
+        public RegionSelectorResult SelectedRegion
+        {
+            get => selectedRegion;
+            private set => RaiseAndSetIfChanged(ref selectedRegion, value);
+        }
+
         public DisposableReactiveObject FakeDelay
         {
             get => fakeDelay;
@@ -115,9 +139,7 @@ namespace PoeShared.UI
 
         private async Task HandleSelectionCommandExecuted()
         {
-            var selection = await SelectionAdorner.StartSelection()
-                .Take(1);
-            SelectionRect = selection;
+            SelectionRect = await SelectionAdorner.StartSelection().Take(1);
         }
     }
 }

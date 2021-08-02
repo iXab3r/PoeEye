@@ -1,0 +1,45 @@
+﻿<ui:SharedResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                             xmlns:viewModels="clr-namespace:PoeShared.RegionSelector.ViewModels"
+                             xmlns:blue="http://www.nuget.org/Blue.MVVM"
+                             xmlns:ui="clr-namespace:PoeShared.UI">
+    <ui:SharedResourceDictionary.MergedDictionaries>
+        <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Converters.xaml" />
+    </ui:SharedResourceDictionary.MergedDictionaries>
+
+    
+    <blue:MultiplyDoubleConverter x:Key="MultiplyDoubleDivideByThreeConverter" Factor="0.33" />
+
+    <DataTemplate DataType="{x:Type viewModels:RegionSelectorViewModel}">
+        <ui:AdornedControl IsAdornerVisible="True">
+            <ui:AdornedControl.AdornerContent>
+                <Grid>
+                    <ui:CachedContentControl Content="{Binding SelectionAdorner}" />
+                </Grid>
+            </ui:AdornedControl.AdornerContent>
+
+            <Grid x:Name="RegionSelectorRoot">
+                <Canvas>
+                    <Rectangle x:Name="RegionCandidate" Stroke="Red" StrokeThickness="1" 
+                               Canvas.Left="{Binding SelectionCandidateBounds.Left}"
+                               Canvas.Top="{Binding SelectionCandidateBounds.Top}"
+                               Width="{Binding SelectionCandidateBounds.Width}"
+                               Height="{Binding SelectionCandidateBounds.Height}"
+                               Visibility="{Binding SelectionCandidate, Converter={StaticResource NullToCollapsedConverter}}"/>
+                </Canvas>
+                <TextBlock VerticalAlignment="Center"
+                           FontSize="20"
+                           Foreground="Aqua"
+                           TextTrimming="CharacterEllipsis"
+                           MaxWidth="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=ActualWidth, Converter={StaticResource MultiplyDoubleDivideByThreeConverter}}"
+                           HorizontalAlignment="Center">
+                    <TextBlock.Inlines>
+                        <Run Text="{Binding SelectionCandidate.Window.Title, Mode=OneWay}" /><LineBreak />
+                        Window bounds: <Run Text="{Binding SelectionCandidate.Window.WindowBounds, Mode=OneWay}" /><LineBreak />
+                        Selection bounds: <Run Text="{Binding SelectionCandidate.Selection, Mode=OneWay}" />
+                    </TextBlock.Inlines>
+                </TextBlock>
+            </Grid>
+        </ui:AdornedControl>
+    </DataTemplate>
+</ui:SharedResourceDictionary>

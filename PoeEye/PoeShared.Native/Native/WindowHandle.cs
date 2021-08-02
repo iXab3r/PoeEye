@@ -26,9 +26,6 @@ namespace PoeShared.Native
         private readonly Lazy<string> classSupplier;
         private readonly Lazy<bool> isIconic;
         private readonly Lazy<bool> isVisible;
-        private readonly Lazy<Rectangle> windowBoundsSupplier;
-        private readonly Lazy<Rectangle> dwmWindowBoundsSupplier;
-        private readonly Lazy<Rectangle> clientBoundsSupplier;
         private readonly Lazy<Icon> iconSupplier;
         private readonly Lazy<BitmapSource> iconBitmapSupplier;
         private readonly Lazy<User32.WindowStyles> windowStyle;
@@ -42,9 +39,6 @@ namespace PoeShared.Native
             ProcessId = UnsafeNative.GetProcessIdByWindowHandle(handle);
             
             classSupplier = new Lazy<string>(() => UnsafeNative.GetWindowClass(handle), LazyThreadSafetyMode.ExecutionAndPublication);
-            windowBoundsSupplier = new Lazy<Rectangle>(() => UnsafeNative.GetWindowRect(handle), LazyThreadSafetyMode.ExecutionAndPublication);
-            dwmWindowBoundsSupplier = new Lazy<Rectangle>(() => UnsafeNative.DwmGetWindowFrameBounds(handle), LazyThreadSafetyMode.ExecutionAndPublication);
-            clientBoundsSupplier = new Lazy<Rectangle>(() => UnsafeNative.GetClientRect(handle), LazyThreadSafetyMode.ExecutionAndPublication);
             iconSupplier = new Lazy<Icon>(() => GetWindowIcon(handle), LazyThreadSafetyMode.ExecutionAndPublication);
             windowStyle = new Lazy<User32.WindowStyles>(() => (User32.WindowStyles)User32.GetWindowLong(handle, User32.WindowLongIndexFlags.GWL_STYLE));
             windowStyleEx = new Lazy<User32.WindowStylesEx>(() => (User32.WindowStylesEx)User32.GetWindowLong(handle, User32.WindowLongIndexFlags.GWL_EXSTYLE));
@@ -181,11 +175,11 @@ namespace PoeShared.Native
 
         public DateTime CreatedAt => processDataSupplier.Value.createdAt;
 
-        public Rectangle WindowBounds => windowBoundsSupplier.Value;
+        public Rectangle WindowBounds => UnsafeNative.GetWindowRect(Handle);
 
-        public Rectangle ClientBounds => clientBoundsSupplier.Value;
+        public Rectangle ClientBounds => UnsafeNative.GetClientRect(Handle);
 
-        public Rectangle DwmWindowBounds => dwmWindowBoundsSupplier.Value;
+        public Rectangle DwmWindowBounds => UnsafeNative.DwmGetWindowFrameBounds(Handle);
 
         [JsonIgnore] public Icon Icon => iconSupplier.Value;
 

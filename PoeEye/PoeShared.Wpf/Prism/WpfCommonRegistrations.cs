@@ -16,6 +16,7 @@ using PoeShared.Logging;
 using PoeShared.Notifications;
 using PoeShared.Notifications.Services;
 using PoeShared.Notifications.ViewModels;
+using PoeShared.RegionSelector.Services;
 using PoeShared.Scaffolding.WPF;
 using PoeShared.Services;
 using PoeShared.UI;
@@ -52,6 +53,7 @@ namespace PoeShared.Prism
                 .RegisterSingleton<IConverter<char, Keys>, CharToKeysConverter>()
                 .RegisterSingleton<IMicrophoneProvider, MicrophoneProvider>()
                 .RegisterSingleton<IMessageBoxService, MessageBoxService>()
+                .RegisterSingleton<IScreenRegionSelectorService, ScreenRegionSelectorService>()
                 .RegisterSingleton<IConverter<Keys, HotkeyGesture>, KeysToHotkeyGestureConverter>()
                 .RegisterSingleton<IHotkeyConverter>(_ => HotkeyConverter.Instance);
             

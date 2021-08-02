@@ -21,34 +21,5 @@
                           ShowActivated="True"
                           WindowState="Normal" 
                           d:DataContext="{d:DesignInstance viewModels:RegionSelectorViewModel}">
-    <Window.Resources>
-        <blue:MultiplyDoubleConverter x:Key="MultiplyDoubleDivideByThreeConverter" Factor="0.33" />
-    </Window.Resources>
-    
-    <eye:AdornedControl IsAdornerVisible="True">
-        <eye:AdornedControl.AdornerContent>
-            <Grid>
-                <eye:CachedContentControl Content="{Binding SelectionAdorner}"/>
-            </Grid>
-        </eye:AdornedControl.AdornerContent>
-                    
-        <Grid x:Name="RegionSelectorRoot">
-            <Canvas>
-                <Rectangle x:Name="RegionCandidate" Stroke="Red" StrokeThickness="1"/>
-            </Canvas>
-            <TextBlock VerticalAlignment="Center"
-                       FontSize="20"
-                       Foreground="Aqua"
-                       TextTrimming="CharacterEllipsis"
-                       MaxWidth="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=ActualWidth, Converter={StaticResource MultiplyDoubleDivideByThreeConverter}}"
-                       HorizontalAlignment="Center">
-                <TextBlock.Inlines>
-                    <Run Text="{Binding SelectionCandidate.Window.Title, Mode=OneWay}" /><LineBreak/>
-                    Window bounds: <Run Text="{Binding SelectionCandidate.Window.WindowBounds, Mode=OneWay}"/><LineBreak/>
-                    Selection bounds: <Run Text="{Binding SelectionCandidate.Selection, Mode=OneWay}"/>
-                
-                </TextBlock.Inlines>
-            </TextBlock>
-        </Grid>
-    </eye:AdornedControl>
+ 
 </native:TransparentWindow>

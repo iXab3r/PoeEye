@@ -33,7 +33,6 @@ namespace PoeShared.RegionSelector.ViewModels
         private readonly IKeyboardEventsSource keyboardEventsSource;
         private readonly IWindowTracker mainWindowTracker;
         private readonly IScheduler uiScheduler;
-        private readonly IScheduler bgScheduler;
 
         private readonly ObservableAsPropertyHelper<bool> ownerIsVisibleSource;
         private readonly ObservableAsPropertyHelper<bool> selectionIsNotEmptySource;
@@ -53,14 +52,12 @@ namespace PoeShared.RegionSelector.ViewModels
         public SelectionAdornerViewModel(
             [NotNull] IKeyboardEventsSource keyboardEventsSource,
             [NotNull] [Dependency(WellKnownWindows.MainWindow)] IWindowTracker mainWindowTracker,
-            [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler,
-            [NotNull] [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler)
+            [NotNull] [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {
             this.keyboardEventsSource = keyboardEventsSource;
             this.mainWindowTracker = mainWindowTracker;
             this.uiScheduler = uiScheduler;
-            this.bgScheduler = bgScheduler;
-            
+
             ownerIsVisibleSource = this.WhenAnyValue(x => x.Owner)
                 .Select(x => x == null ? Observable.Return(false) : x.Observe(UIElement.IsVisibleProperty, x => x.IsVisible))
                 .Switch()
@@ -198,6 +195,7 @@ namespace PoeShared.RegionSelector.ViewModels
                     
                     keyboardEventsSource.WhenMouseMove
                         .Where(x => OwnerIsVisible)
+                        .StartWith(new MouseEventArgs(MouseButtons.None, 0, System.Windows.Forms.Cursor.Position.X, System.Windows.Forms.Cursor.Position.Y, 0))
                         .ObserveOn(uiScheduler)
                         .SubscribeSafe(HandleMouseMove, Log.HandleUiException)
                         .AddTo(selectionAnchors);
@@ -214,9 +212,10 @@ namespace PoeShared.RegionSelector.ViewModels
                             AnchorPoint = coords;
                             var region = new Rect(anchorPoint.X, anchorPoint.Y, 1, 1);
                             Selection = region;
-                            return keyboardEventsSource.WhenMouseUp.Where(y => y.Button == MouseButtons.Left).ObserveOn(uiScheduler);
+                            return keyboardEventsSource.WhenMouseUp.Where(y => y.Button == MouseButtons.Left).ToUnit();
                         })
                         .Switch()
+                        .ObserveOn(uiScheduler)
                         .Select(
                             _ =>
                             {

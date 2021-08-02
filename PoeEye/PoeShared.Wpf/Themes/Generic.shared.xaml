@@ -14,6 +14,7 @@
         <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/UI/Settings/GenericSettingsView.xaml" />
         <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Audio/Views/AudioNotificationTypeSelectorView.xaml" />
         <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Audio/Views/WaveOutDeviceSelectorView.xaml" />
+        <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/RegionSelector/Views/RegionSelectorView.xaml" />
         <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/RegionSelector/Views/SelectionAdornerView.xaml" />
         <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Dialogs/Views/MessageBoxView.xaml" />
         <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Styles.xaml" />

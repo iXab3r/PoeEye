@@ -21,6 +21,7 @@ using KeyEventHandler = System.Windows.Input.KeyEventHandler;
 
 namespace PoeShared.RegionSelector.Views
 {
+    /*
     public partial class RegionSelectorWindow : IDisposable
     {
         private readonly IRegionSelectorViewModel viewModel;
@@ -154,5 +155,5 @@ namespace PoeShared.RegionSelector.Views
         {
             Dispose();
         }
-    }
+    }*/
 }

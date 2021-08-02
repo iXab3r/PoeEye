@@ -1,21 +1,18 @@
 using System;
 using System.Drawing;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 using PoeShared.Scaffolding; 
 using PoeShared.Logging;
+using PoeShared.Native;
 using WinPoint = System.Drawing.Point;
 
 namespace PoeShared.RegionSelector.ViewModels
 {
-    public interface IRegionSelectorViewModel : IDisposableReactiveObject
+    public interface IRegionSelectorViewModel : IOverlayViewModel
     {
         RegionSelectorResult SelectionCandidate { [CanBeNull] get; }
         
-        ISelectionAdornerViewModel SelectionAdorner { [NotNull] get; }
-
-        [NotNull]
-        IObservable<RegionSelectorResult> SelectWindow(Size minSelection);
-        
-        IObservable<RegionSelectorResult> SelectScreenCoordinates();
+        Task<RegionSelectorResult> StartSelection(Size minSelection);
     }
 }
