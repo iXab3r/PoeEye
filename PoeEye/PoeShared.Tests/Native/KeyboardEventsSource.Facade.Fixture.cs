@@ -115,7 +115,7 @@ namespace PoeShared.Tests.Native
         
         private KeyboardEventsSource CreateInstance()
         {
-            return new KeyboardEventsSource(eventsFactory.Object, clock.Object);
+            return new KeyboardEventsSource(eventsFactory.Object, clock.Object, Scheduler.Immediate);
         }
     }
 }

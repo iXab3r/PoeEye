@@ -1,4 +1,5 @@
-﻿using Moq;
+﻿using System;
+using Moq;
 using NUnit.Framework;
 using PoeShared.Logging;
 
@@ -53,13 +54,14 @@ namespace PoeShared.Tests.Logging
         {
             //Given
             var items = new[] {"a", "b", "c"};
-            var instance = new FluentLogBuilder(logWriter.Object).WithPrefix("test1").WithTable(items);
+            var instance = new FluentLogBuilder(logWriter.Object).WithPrefix("test1").WithTable(items, ", ");
 
             //When
             instance.Info($"info");
 
             //Then
-            logWriter.Verify(x => x.WriteLog(It.Is<LogData>(y => y.ToString() == "[test1] [test2] info" &&  y.LogLevel == FluentLogLevel.Info)));
+            var expectedTable = @$"[test1] info, Items: 3, #1 a, #2 b, #3 c";
+            logWriter.Verify(x => x.WriteLog(It.Is<LogData>(y => y.ToString() == expectedTable &&  y.LogLevel == FluentLogLevel.Info)));
         }
     }
 }

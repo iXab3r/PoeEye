@@ -29,8 +29,8 @@ namespace PoeShared.Native
 
         public KeyboardEventsSource(
             IKeyboardMouseEventsProvider keyboardMouseEventsProvider,
-            [Dependency(WellKnownSchedulers.InputHook)] IScheduler inputScheduler,
-            [NotNull] IClock clock)
+            IClock clock,
+            [Dependency(WellKnownSchedulers.InputHook)] IScheduler inputScheduler)
         {
             Guard.ArgumentNotNull(clock, nameof(clock));
             Log.Info($"Mouse&keyboard event source initialization started");
