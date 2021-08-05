@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading;
@@ -276,7 +277,7 @@ namespace PoeShared.Tests.Native
 
         private KeyboardMouseEventsProvider CreateInstance()
         {
-            return new(globalEventsFactory: globalEventsFactory.Object, appEventsFactory: appEventsFactory.Object);
+            return new(globalEventsFactory: globalEventsFactory.Object, appEventsFactory: appEventsFactory.Object, Scheduler.Immediate);
         }
     }
 }

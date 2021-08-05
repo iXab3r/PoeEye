@@ -40,7 +40,7 @@ namespace PoeShared.Tests.Native
         {
             inputScheduler = Scheduler.Immediate;
             clock = new Mock<IClock>();
-            eventsFactory = new KeyboardMouseEventsProvider();
+            eventsFactory = new KeyboardMouseEventsProvider(inputScheduler);
         }
 
         [Test]
@@ -207,7 +207,7 @@ namespace PoeShared.Tests.Native
 
         private KeyboardEventsSource CreateInstance()
         {
-            return new KeyboardEventsSource(eventsFactory, inputScheduler, clock.Object);
+            return new KeyboardEventsSource(eventsFactory, clock.Object);
         }
     }
 }
