@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Reactive.Concurrency;
-using Gma.System.MouseKeyHook;
+using WindowsHook;
 
 namespace PoeShared.Native
 {

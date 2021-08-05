@@ -13,7 +13,7 @@ using System.Windows.Forms;
 using System.Windows.Interop;
 using WindowsInput;
 using WindowsInput.Native;
-using Gma.System.MouseKeyHook;
+using WindowsHook;
 using log4net;
 using Moq;
 using NUnit.Framework;

@@ -5,7 +5,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Windows.Forms;
-using Gma.System.MouseKeyHook;
+using WindowsHook;
 using JetBrains.Annotations;
 using log4net;
 using Newtonsoft.Json;

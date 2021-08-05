@@ -6,11 +6,9 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using CommandLine;
-using log4net;
 using PoeShared.Logging;
 using PoeShared.Modularity;
 using PoeShared.Scaffolding; 
-using PoeShared.Logging;
 
 namespace PoeShared
 {

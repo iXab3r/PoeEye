@@ -10,10 +10,8 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using DynamicData;
 using JetBrains.Annotations;
-using log4net;
 using PoeShared.Logging;
 using PoeShared.Scaffolding; 
-using PoeShared.Logging;
 
 namespace PoeShared.Modularity
 {

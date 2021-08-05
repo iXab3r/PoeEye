@@ -3,14 +3,12 @@ using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading;
-using System.Windows.Forms;
-using Gma.System.MouseKeyHook;
+using WindowsHook;
 using log4net;
 using PInvoke;
 using PoeShared.Logging;
 using PoeShared.Prism;
 using PoeShared.Scaffolding;
-using PoeShared.Logging;
 using Unity;
 
 namespace PoeShared.Native
@@ -24,8 +22,8 @@ namespace PoeShared.Native
         [InjectionConstructor]
         public KeyboardMouseEventsProvider([Dependency(WellKnownSchedulers.InputHook)]
             IScheduler inputScheduler) : this(
-            globalEventsFactory: new LambdaFactory<IKeyboardMouseEvents>(Gma.System.MouseKeyHook.Hook.GlobalEvents),
-            appEventsFactory: new LambdaFactory<IKeyboardMouseEvents>(Gma.System.MouseKeyHook.Hook.AppEvents),
+            globalEventsFactory: new LambdaFactory<IKeyboardMouseEvents>(() => Hook.GlobalEvents()),
+            appEventsFactory: new LambdaFactory<IKeyboardMouseEvents>(() => Hook.AppEvents()),
             inputScheduler)
         {
         }

@@ -8,7 +8,7 @@ using System.Reactive.Subjects;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Gma.System.MouseKeyHook;
+using WindowsHook;
 using log4net;
 using Microsoft.Reactive.Testing;
 using Moq;

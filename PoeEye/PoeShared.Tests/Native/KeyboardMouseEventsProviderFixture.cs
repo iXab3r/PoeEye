@@ -7,7 +7,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Gma.System.MouseKeyHook;
+using WindowsHook;
 using log4net;
 using Microsoft.VisualBasic.Logging;
 using Moq;

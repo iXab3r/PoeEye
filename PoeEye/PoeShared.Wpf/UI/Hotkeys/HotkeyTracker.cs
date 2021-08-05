@@ -9,7 +9,7 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Windows.Input;
 using DynamicData;
-using Gma.System.MouseKeyHook;
+using WindowsHook;
 using log4net;
 using PoeShared.Modularity;
 using PoeShared.Native;
