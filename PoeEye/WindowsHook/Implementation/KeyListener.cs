@@ -13,6 +13,7 @@ namespace WindowsHook.Implementation
         protected KeyListener(Subscribe subscribe)
             : base(subscribe)
         {
+            IsReady = true;
         }
 
         public event KeyEventHandler KeyDown;

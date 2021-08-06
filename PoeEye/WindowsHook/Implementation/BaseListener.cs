@@ -11,14 +11,26 @@ namespace WindowsHook.Implementation
     {
         protected BaseListener(Subscribe subscribe)
         {
-            Handle = subscribe(Callback);
+            Handle = subscribe(CallbackHook);
         }
 
         protected HookResult Handle { get; set; }
+        
+        protected bool IsReady { get; init; }
 
         public void Dispose()
         {
             Handle.Dispose();
+        }
+
+        private bool CallbackHook(CallbackData data)
+        {
+            if (!IsReady)
+            {
+                return false;
+            }
+
+            return Callback(data);
         }
 
         protected abstract bool Callback(CallbackData data);

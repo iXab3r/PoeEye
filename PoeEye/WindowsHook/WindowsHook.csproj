@@ -14,4 +14,7 @@
     <PackageId>WindowsHook</PackageId>
     <PackageLicenseFile>README.md</PackageLicenseFile>
   </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\PoeShared\PoeShared.csproj" />
+  </ItemGroup>
 </Project>

@@ -7,67 +7,66 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using WindowsHook.Implementation;
+using PoeShared.Logging;
+using PoeShared.Scaffolding;
 
 namespace WindowsHook.WinApi
 {
     internal static class HookHelper
     {
-        private static HookProcedure _appHookProc;
-        private static HookProcedure _globalHookProc;
+        private static readonly IFluentLog Log = typeof(HookHelper).PrepareLogger();
+
+        private static readonly IntPtr BaseAddress;
+
+        static HookHelper()
+        {
+            Log.Debug("Initializing HookHelper");
+            BaseAddress = Process.GetCurrentProcess().MainModule.BaseAddress;
+            Log.Debug($"Application base address: {BaseAddress.ToHexadecimal()}");
+        }
 
         public static HookResult HookAppMouse(Callback callback)
         {
-            return HookApp(HookIds.WH_MOUSE, callback);
+            return SetHook(HookIds.WH_MOUSE,IntPtr.Zero,  callback);
         }
 
         public static HookResult HookAppKeyboard(Callback callback)
         {
-            return HookApp(HookIds.WH_KEYBOARD, callback);
+            return SetHook(HookIds.WH_KEYBOARD, IntPtr.Zero,  callback);
         }
 
         public static HookResult HookGlobalMouse(Callback callback)
         {
-            return HookGlobal(HookIds.WH_MOUSE_LL, callback);
+            return SetHook(HookIds.WH_MOUSE_LL, BaseAddress, callback);
         }
 
         public static HookResult HookGlobalKeyboard(Callback callback)
         {
-            return HookGlobal(HookIds.WH_KEYBOARD_LL, callback);
+            return SetHook(HookIds.WH_KEYBOARD_LL, BaseAddress, callback);
         }
 
-        private static HookResult HookApp(int hookId, Callback callback)
+        private static HookResult SetHook(int hookId, IntPtr baseAddress, Callback callback)
         {
-            _appHookProc = (code, param, lParam) => HookProcedure(code, param, lParam, callback);
-
+            Log.Debug($"Creating a new hook with id {hookId}");
+            HookProcedure newHook = (code, param, lParam) => HandleHook(code, param, lParam, callback);
+            Log.Debug($"Setting new hook with id {hookId}");
             var hookHandle = HookNativeMethods.SetWindowsHookEx(
                 hookId,
-                _appHookProc,
-                IntPtr.Zero,
-                ThreadNativeMethods.GetCurrentThreadId());
+                newHook,
+                baseAddress,
+                baseAddress == IntPtr.Zero ? ThreadNativeMethods.GetCurrentThreadId() : 0);
 
             if (hookHandle.IsInvalid)
+            {
+                Log.Warn($"Failed to set new hook with id {hookId}, result: {hookHandle}");
                 ThrowLastUnmanagedErrorAsException();
-
-            return new HookResult(hookHandle, _appHookProc);
+            }
+            var result = new HookResult(hookHandle, newHook);
+            Log.Debug($"Successfully set new hook with id {hookId}, hook result: {result}");
+            return result;
         }
 
-        private static HookResult HookGlobal(int hookId, Callback callback)
-        {
-            _globalHookProc = (code, param, lParam) => HookProcedure(code, param, lParam, callback);
-
-            var hookHandle = HookNativeMethods.SetWindowsHookEx(
-                hookId,
-                _globalHookProc,
-                Process.GetCurrentProcess().MainModule.BaseAddress,
-                0);
-
-            if (hookHandle.IsInvalid)
-                ThrowLastUnmanagedErrorAsException();
-
-            return new HookResult(hookHandle, _globalHookProc);
-        }
-
-        private static IntPtr HookProcedure(int nCode, IntPtr wParam, IntPtr lParam, Callback callback)
+        private static IntPtr HandleHook(int nCode, IntPtr wParam, IntPtr lParam, Callback callback)
         {
             var passThrough = nCode != 0;
             if (passThrough)
@@ -77,7 +76,9 @@ namespace WindowsHook.WinApi
             var continueProcessing = callback(callbackData);
 
             if (!continueProcessing)
+            {
                 return new IntPtr(-1);
+            }
 
             return CallNextHookEx(nCode, wParam, lParam);
         }

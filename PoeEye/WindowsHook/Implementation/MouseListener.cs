@@ -57,6 +57,7 @@ namespace WindowsHook.Implementation
 
             m_DoubleDown = new ButtonSet();
             m_SingleDown = new ButtonSet();
+            IsReady = true;
         }
 
         public event MouseEventHandler MouseMove;
