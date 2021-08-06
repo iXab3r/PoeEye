@@ -47,6 +47,7 @@
                              VerticalContentAlignment="Stretch"
                              HorizontalContentAlignment="Stretch"
                              wpf:FocusHelper.IsFocused="True"
+                             Style="{StaticResource HotkeySequenceTextBoxStyle}"
                              Text="{Binding Text, UpdateSourceTrigger=PropertyChanged}">
                         <i:Interaction.Behaviors>
                             <wpf:SelectAllOnFocusBehavior />
@@ -73,6 +74,7 @@
         <st:StackPanel Orientation="Vertical" Cursor="Hand" Background="Transparent" VerticalAlignment="Center" MinWidth="36">
             <TextBox Text="{Binding Delay, Converter={StaticResource TimeSpanToMillisecondsConverter}}"
                      x:Name="FirstLineText"
+                     Style="{StaticResource HotkeySequenceTextBoxStyle}"
                      Foreground="{StaticResource SequenceEditorTextForeground}"
                      FontSize="16" FontWeight="Bold" Padding="0"
                      HorizontalAlignment="Center" />

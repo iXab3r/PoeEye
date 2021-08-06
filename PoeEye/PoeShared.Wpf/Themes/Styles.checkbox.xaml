@@ -6,7 +6,7 @@
         <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Styles.text.xaml" />
     </eye:SharedResourceDictionary.MergedDictionaries>
     
-    <Style TargetType="{x:Type CheckBox}">
+    <Style TargetType="{x:Type CheckBox}" x:Key="DefaultCheckBoxStyle">
         <Setter Property="HorizontalAlignment" Value="Stretch" />
         <Setter Property="VerticalAlignment" Value="Stretch" />
         <Setter Property="HorizontalContentAlignment" Value="Left" />
@@ -16,6 +16,7 @@
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="Background" Value="{DynamicResource PrimaryHueMidBrush}" />
         <Setter Property="BorderBrush" Value="{DynamicResource PrimaryHueMidBrush}" />
+        <Setter Property="wpf:CheckBoxAssist.CheckBoxSize" Value="15" />
         <Setter Property="Foreground" Value="{Binding RelativeSource={RelativeSource AncestorType={x:Type FrameworkElement}}, Path=(TextElement.Foreground)}" />
         <Setter Property="Template">
             <Setter.Value>
@@ -25,7 +26,7 @@
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
-                        <Viewbox Width="15" Height="15" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                        <Viewbox Width="{TemplateBinding wpf:CheckBoxAssist.CheckBoxSize}" Height="{TemplateBinding wpf:CheckBoxAssist.CheckBoxSize}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                  Margin="0,0,2,0"
                                  VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
                                  FlowDirection="LeftToRight">

@@ -7,7 +7,7 @@ namespace PoeShared.UI
 {
     public interface IHotkeySequenceEditorController : IDisposableReactiveObject
     {
-        HotkeyGesture ToggleRecordingHotkey { get; set; }
+        Fallback<HotkeyGesture> ToggleRecordingHotkey { get; set; }
         bool IsRecording { get; }
         bool IsBusy { get; }
         bool EnableMouseClicksRecording { get; set; }

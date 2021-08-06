@@ -22,17 +22,15 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type eye:HotKeyBox}">
-                    <!-- to compensate MaterialDesignTextBox padding we have to add -4 -->
-                    <TextBox x:Name="PART_TextBox"
-                             VerticalAlignment="{TemplateBinding VerticalAlignment}"
-                             HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
-                             MinHeight="{TemplateBinding MinHeight}"
-                             HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"    
-                             VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
-                             Background="{TemplateBinding Background}"
-                             BorderBrush="{TemplateBinding BorderBrush}"
-                             BorderThickness="{TemplateBinding BorderThickness}"
-                             Focusable="{TemplateBinding Focusable}"
+                    <Border MinHeight="{TemplateBinding MinHeight}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            Focusable="{TemplateBinding Focusable}"
+                            Background="{TemplateBinding Background}"
+                            ToolTip="{TemplateBinding ToolTip}">
+                        <TextBox x:Name="PART_TextBox"
+                             HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"    
+                             VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
                              FontFamily="{TemplateBinding FontFamily}"
                              FontSize="{TemplateBinding FontSize}"
                              Foreground="{TemplateBinding Foreground}"
@@ -44,12 +42,12 @@
                              Validation.ErrorTemplate="{TemplateBinding Validation.ErrorTemplate}"
                              VerticalScrollBarVisibility="{TemplateBinding ScrollViewer.VerticalScrollBarVisibility}"
                              AcceptsReturn="{TemplateBinding AcceptsReturn}"
-                             AcceptsTab="{TemplateBinding AcceptsTab}"
-                             ToolTip="{TemplateBinding ToolTip}">
+                             AcceptsTab="{TemplateBinding AcceptsTab}">
                         <TextBox.ContextMenu>
                             <ContextMenu IsEnabled="False"/>
                         </TextBox.ContextMenu>
                     </TextBox>
+                    </Border>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>

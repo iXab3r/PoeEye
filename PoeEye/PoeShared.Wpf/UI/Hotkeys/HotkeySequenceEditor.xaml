@@ -108,6 +108,11 @@
                     &#xf04d;
                 </eye:ButtonEx.Icon>
             </eye:ButtonEx>
+            <CheckBox ToolTip="Record settings"
+                x:Name="RecordSettingsToggle"
+                Style="{StaticResource HotkeySequenceCheckBoxStyle}">
+                <materialDesign:PackIcon Kind="Cog" />
+            </CheckBox>
             <eye:ButtonEx
                 Command="{Binding AddItem}"
                 CommandParameter="{Binding DefaultItemDelay}"
@@ -130,28 +135,32 @@
             </eye:ButtonEx>
             <Separator />
             <CheckBox
-                x:Name="KeyboardPopupToggle">
+                x:Name="KeyboardPopupToggle"
+                Style="{StaticResource HotkeySequenceCheckBoxStyle}">
                 <st:StackPanel MarginBetweenChildren="2.5" Orientation="Horizontal">
                     <materialDesign:PackIcon Kind="Keyboard" />
                     <TextBlock Text="KEYBOARD" />
                 </st:StackPanel>
             </CheckBox>
             <CheckBox
-                x:Name="KeyboardArrowBlockPopupToggle">
+                x:Name="KeyboardArrowBlockPopupToggle"
+                Style="{StaticResource HotkeySequenceCheckBoxStyle}">
                 <st:StackPanel MarginBetweenChildren="2.5" Orientation="Horizontal">
                     <materialDesign:PackIcon Kind="NumericSevenBoxMultipleOutline" />
                     <TextBlock Text="NUMPAD" />
                 </st:StackPanel>
             </CheckBox>
             <CheckBox
-                x:Name="KeyboardSpecialsBlockPopupToggle">
+                x:Name="KeyboardSpecialsBlockPopupToggle"
+                Style="{StaticResource HotkeySequenceCheckBoxStyle}">
                 <st:StackPanel MarginBetweenChildren="2.5" Orientation="Horizontal">
                     <materialDesign:PackIcon Kind="Function" />
                     <TextBlock Text="FN" />
                 </st:StackPanel>
             </CheckBox>
             <CheckBox
-                x:Name="KeyboardMouseBlockPopupToggle">
+                x:Name="KeyboardMouseBlockPopupToggle"
+                Style="{StaticResource HotkeySequenceCheckBoxStyle}">
                 <st:StackPanel MarginBetweenChildren="2.5" Orientation="Horizontal">
                     <materialDesign:PackIcon Kind="Mouse" />
                     <TextBlock Text="MOUSE" />
@@ -203,7 +212,16 @@
                     </MultiBinding>
                 </TextBlock.Text>
             </TextBlock>
-
+            <materialDesign:PopupEx
+                x:Name="OnScreenRecordSettingsPopup"
+                PlacementTarget="{Binding ElementName=RecordSettingsToggle}"
+                Placement="Top"
+                StaysOpen="False"
+                IsOpen="{Binding ElementName=RecordSettingsToggle, Path=IsChecked}"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch">
+                <ContentPresenter ContentTemplate="{StaticResource OnScreenRecordSettings}" Content="{Binding}" />
+            </materialDesign:PopupEx>
             <materialDesign:PopupEx
                 x:Name="KeyboardPopup"
                 PlacementTarget="{Binding ElementName=KeyboardPopupToggle}"
@@ -258,8 +276,6 @@
 
     <Style x:Key="DefaultHotkeySequenceEditorStyle" TargetType="{x:Type eye:HotkeySequenceEditor}">
         <Style.Resources>
-            <Style TargetType="{x:Type CheckBox}" BasedOn="{StaticResource HotkeySequenceCheckBoxStyle}" />
-            <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource HotkeySequenceTextBoxStyle}" />
             <Style TargetType="{x:Type eye:ButtonEx}" BasedOn="{StaticResource FastButtonExStyle}" />
         </Style.Resources>
         <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />

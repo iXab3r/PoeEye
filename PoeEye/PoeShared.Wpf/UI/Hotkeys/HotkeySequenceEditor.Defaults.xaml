@@ -34,7 +34,10 @@
                 <eye:ButtonEx.Content>
                     <st:StackPanel MarginBetweenChildren="5" Orientation="Horizontal">
                         <TextBlock x:Name="RecordingIcon" Style="{StaticResource IconTextBlock}" Text="" FontSize="20" />
-                        <TextBlock x:Name="RecordingText" />
+                        <st:StackPanel Orientation="Vertical" MarginBetweenChildren="5" VerticalAlignment="Center">
+                            <TextBlock x:Name="RecordingText" Visibility="{Binding RelativeSource={RelativeSource Self}, Path=Text, Converter={StaticResource NullToCollapsedConverter}}" />
+                            <TextBlock x:Name="RecordingHotkeyText" Visibility="{Binding RelativeSource={RelativeSource Self}, Path=Text, Converter={StaticResource NullToCollapsedConverter}}" />
+                        </st:StackPanel>
                     </st:StackPanel>
                 </eye:ButtonEx.Content>
             </eye:ButtonEx>
@@ -43,12 +46,11 @@
         
         <DataTemplate.Triggers>
             <DataTrigger Binding="{Binding Controller.RecordStartTime, Converter={StaticResource NullToTrueConverter}}" Value="False">
-                <Setter TargetName="RecordingText" Property="Text" Value="{Binding Controller.ToggleRecordingHotkey, StringFormat='Press {0} to STOP  recording'}"></Setter>
+                <Setter TargetName="RecordingText" Property="Text" Value="Recording..."></Setter>
                 <Setter TargetName="RecordingIcon" Property="Text" Value="&#xf04d;"></Setter>
                 <Setter TargetName="RecordingIcon" Property="Foreground" Value="{StaticResource NegativeBrush}"/>
             </DataTrigger>
             <DataTrigger Binding="{Binding Controller.RecordStartTime, Converter={StaticResource NullToTrueConverter}}" Value="True">
-                <Setter TargetName="RecordingText" Property="Text" Value="{Binding Controller.ToggleRecordingHotkey, StringFormat='Press {0} to START recording'}"></Setter>
                 <Setter TargetName="RecordingIcon" Property="Text" Value="&#xf01d;"></Setter>
                 <Setter TargetName="RecordingIcon" Property="Foreground" Value="{StaticResource PositiveBrush}"/>
             </DataTrigger>
@@ -58,6 +60,26 @@
                 <Setter TargetName="Container" Property="Foreground" Value="{StaticResource SequenceEditorAccent}" />
                 <Setter TargetName="Container" Property="Opacity" Value="1" />
             </Trigger>
+             
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding Controller.RecordStartTime, Converter={StaticResource NullToTrueConverter}}" Value="False"/>
+                    <Condition Binding="{Binding Controller.ToggleRecordingHotkey.Value.IsEmpty}" Value="False"/>
+                </MultiDataTrigger.Conditions>
+                <MultiDataTrigger.Setters>
+                    <Setter TargetName="RecordingHotkeyText" Property="Text" Value="{Binding Controller.ToggleRecordingHotkey.Value, StringFormat='Press {0} to STOP  recording'}"></Setter>
+                </MultiDataTrigger.Setters>
+            </MultiDataTrigger>
+            
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding Controller.RecordStartTime, Converter={StaticResource NullToTrueConverter}}" Value="True"/>
+                    <Condition Binding="{Binding Controller.ToggleRecordingHotkey.Value.IsEmpty}" Value="False"/>
+                </MultiDataTrigger.Conditions>
+                <MultiDataTrigger.Setters>
+                    <Setter TargetName="RecordingHotkeyText" Property="Text" Value="{Binding Controller.ToggleRecordingHotkey.Value, StringFormat='Press {0} to START recording'}"></Setter>
+                </MultiDataTrigger.Setters>
+            </MultiDataTrigger>
         </DataTemplate.Triggers>
     </DataTemplate>
 

@@ -35,6 +35,7 @@
 
     <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource FastMenuItem}" />
     <Style TargetType="{x:Type ContextMenu}" BasedOn="{StaticResource FastContextMenuStyle}" />
+    <Style TargetType="{x:Type CheckBox}" BasedOn="{StaticResource DefaultCheckBoxStyle}"></Style>
 
     <PopupAnimation x:Key="{x:Static SystemParameters.MenuPopupAnimationKey}">None</PopupAnimation>
 

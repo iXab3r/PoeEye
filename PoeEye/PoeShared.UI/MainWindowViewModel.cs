@@ -4,6 +4,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Forms;
 using System.Windows.Input;
 using Microsoft.VisualBasic.Logging;
 using PoeShared.Audio.ViewModels;
@@ -106,6 +107,8 @@ namespace PoeShared.UI
         public IAudioNotificationSelectorViewModel AudioNotificationSelector { get; }
 
         public IRandomPeriodSelector RandomPeriodSelector { get; }
+
+        public Fallback<string> FallbackValue { get; } = new Fallback<string>(string.IsNullOrWhiteSpace);
 
         public IHotkeySequenceEditorViewModel HotkeySequenceEditor { get; }
 

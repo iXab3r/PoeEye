@@ -22,6 +22,15 @@
                         <eye:ButtonEx Content="Next" Command="{Binding NextRandomPeriodCommand}" />
                         <TextBlock Text="{Binding RandomPeriod}" />
                     </st:StackPanel>
+                    <TextBlock Text="Fallback" />
+                    <st:StackPanel MarginBetweenChildren="5" Orientation="Horizontal">
+                        <TextBox MinWidth="120" Text="{Binding FallbackValue.Value}" materialDesign:TextFieldAssist.SuffixText="value" />
+                        <TextBox MinWidth="120" Text="{Binding FallbackValue.DefaultValue}" materialDesign:TextFieldAssist.SuffixText="default" />
+                        <TextBlock Text="{Binding FallbackValue.Value, StringFormat='Value: {0}'}" />
+                        <TextBlock Text="{Binding FallbackValue.ActualValue, StringFormat='Actual: {0}'}" />
+                        <TextBlock Text="{Binding FallbackValue.HasActualValue, StringFormat='HasValue: {0}'}" />
+                        <TextBlock Text="{Binding FallbackValue.DefaultValue, StringFormat='Default: {0}'}" />
+                    </st:StackPanel>
 
                     <TextBlock Text="Box with hint" />
                     <TextBox materialDesign:HintAssist.Hint="With hint" />
@@ -180,7 +189,7 @@
                             AcceptsTab="False"
                             AcceptsMouseKeys="False"
                             AcceptsMouseWheel="False"
-                            HotKey="{Binding HotkeySequenceEditor.Controller.ToggleRecordingHotkey}" />
+                            HotKey="{Binding HotkeySequenceEditor.Controller.ToggleRecordingHotkey.DefaultValue}" />
 
                         <TextBlock Text="MaxDuration" />
                         <mah:NumericUpDown

@@ -46,7 +46,7 @@ namespace PoeShared.UI
         private DateTimeOffset? recordStartTime;
 
         private IWindowHandle targetWindow;
-        private HotkeyGesture toggleRecordingHotkey = new(Key.Escape);
+        private Fallback<HotkeyGesture> toggleRecordingHotkey = new((actualHotkey, defaultHotkey) => actualHotkey == null || actualHotkey.IsEmpty || actualHotkey.Equals(defaultHotkey) );
 
         private TimeSpan totalDuration;
 
@@ -165,7 +165,7 @@ namespace PoeShared.UI
             set => RaiseAndSetIfChanged(ref isBusy, value);
         }
 
-        public HotkeyGesture ToggleRecordingHotkey
+        public Fallback<HotkeyGesture> ToggleRecordingHotkey
         {
             get => toggleRecordingHotkey;
             set => RaiseAndSetIfChanged(ref toggleRecordingHotkey, value);
@@ -203,23 +203,26 @@ namespace PoeShared.UI
             var cancel = Observable.Merge(
                 this.WhenAnyValue(x => x.IsRecording).Where(x => x == false).ToUnit()
             );
-
-            var notification = new RecordingNotificationViewModel(this).AddTo(recordingAnchors);
-            notificationsService.AddNotification(notification).AddTo(recordingAnchors);
             
             if (windowToRecord != null)
             {
                 Log.Debug($"Activating window before recording: {windowToRecord}, previously active: {initialWindow}");
                 UnsafeNative.ActivateWindow(windowToRecord.Handle);
             }
+            using var notification = new RecordingNotificationViewModel(this).AddTo(recordingAnchors);
+            notificationsService.AddNotification(notification).AddTo(recordingAnchors);
 
+            var hotkey = toggleRecordingHotkey.Value ?? HotkeyGesture.Empty;
             var tracker = hotkeyFactory.Create().AddTo(recordingAnchors);
             tracker.HotkeyMode = HotkeyMode.Hold;
             tracker.SuppressKey = true;
-            tracker.Hotkey = toggleRecordingHotkey;
+            tracker.Hotkey = hotkey;
             tracker.HandleApplicationKeys = true;
-            await tracker.WhenAnyValue(x => x.IsActive).Where(x => x).ToUnit().Merge(cancel).Take(1);
-            tracker.Reset();
+            if (hotkey != HotkeyGesture.Empty)
+            {
+                await tracker.WhenAnyValue(x => x.IsActive).Where(x => x).ToUnit().Merge(cancel).Take(1);
+                tracker.Reset();
+            }
 
             if (!IsRecording)
             {
@@ -304,7 +307,7 @@ namespace PoeShared.UI
                         keyboardEventsSource.WhenKeyUp.Select(x => new {x.KeyCode, IsDown = false})
                     )
                     .DistinctUntilChanged()
-                    .Where(x => !toggleRecordingHotkey.Contains(x.KeyCode))
+                    .Where(x => !hotkey.Contains(x.KeyCode))
                     .ObserveOnDispatcher()
                     .TakeUntil(cancel)
                     .Subscribe(x =>
