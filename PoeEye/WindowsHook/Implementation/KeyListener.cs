@@ -24,7 +24,10 @@ namespace WindowsHook.Implementation
         {
             var handler = KeyDown;
             if (handler == null || e.Handled || !e.IsKeyDown)
+            {
                 return;
+            }
+
             handler(this, e);
         }
 
@@ -32,7 +35,10 @@ namespace WindowsHook.Implementation
         {
             var handler = KeyPress;
             if (handler == null || e.Handled || e.IsNonChar)
+            {
                 return;
+            }
+
             handler(this, e);
         }
 
@@ -40,29 +46,39 @@ namespace WindowsHook.Implementation
         {
             var handler = KeyUp;
             if (handler == null || e.Handled || !e.IsKeyUp)
+            {
                 return;
+            }
+
             handler(this, e);
         }
 
         protected override bool Callback(CallbackData data)
         {
-            var eDownUp = GetDownUpEventArgs(data);
+            var e = GetDownUpEventArgs(data);
+            if (e == null)
+            {
+                return false;
+            }
 
-            InvokeKeyDown(eDownUp);
+            InvokeKeyDown(e);
 
             if (KeyPress != null)
             {
                 var pressEventArgs = GetPressEventArgs(data);
                 foreach (var pressEventArg in pressEventArgs)
+                {
                     InvokeKeyPress(pressEventArg);
+                }
             }
 
-            InvokeKeyUp(eDownUp);
+            InvokeKeyUp(e);
 
-            return !eDownUp.Handled;
+            return !e.Handled;
         }
 
         protected abstract IEnumerable<KeyPressEventArgsExt> GetPressEventArgs(CallbackData data);
+        
         protected abstract KeyEventArgsExt GetDownUpEventArgs(CallbackData data);
     }
 }

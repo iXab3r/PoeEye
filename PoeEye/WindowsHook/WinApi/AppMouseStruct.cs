@@ -14,12 +14,12 @@ namespace WindowsHook.WinApi
     ///     See full documentation at http://globalmousekeyhook.codeplex.com/wikipage?title=MouseStruct
     /// </remarks>
     [StructLayout(LayoutKind.Explicit)]
-    internal struct AppMouseStruct
+    internal readonly struct AppMouseStruct
     {
         /// <summary>
         ///     Specifies a Point structure that contains the X- and Y-coordinates of the cursor, in screen coordinates.
         /// </summary>
-        [FieldOffset(0x00)] public Point Point;
+        [FieldOffset(0x00)] public readonly Point Point;
 
         /// <summary>
         ///     Specifies information associated with the message.
@@ -44,9 +44,9 @@ namespace WindowsHook.WinApi
         ///         </item>
         ///     </list>
         /// </remarks>
-        [FieldOffset(0x16)] public short MouseData_x86;
+        [FieldOffset(0x16)] public readonly short MouseData_x86;
 
-        [FieldOffset(0x22)] public short MouseData_x64;
+        [FieldOffset(0x22)] public readonly short MouseData_x64;
 
         /// <summary>
         ///     Converts the current <see cref="AppMouseStruct" /> into a <see cref="MouseStruct" />.
@@ -57,10 +57,12 @@ namespace WindowsHook.WinApi
         /// </remarks>
         public MouseStruct ToMouseStruct()
         {
-            var tmp = new MouseStruct();
-            tmp.Point = Point;
-            tmp.MouseData = IntPtr.Size == 4 ? MouseData_x86 : MouseData_x64;
-            tmp.Timestamp = Environment.TickCount;
+            var tmp = new MouseStruct
+            {
+                Point = Point,
+                MouseData = IntPtr.Size == 4 ? MouseData_x86 : MouseData_x64,
+                Timestamp = Environment.TickCount
+            };
             return tmp;
         }
     }

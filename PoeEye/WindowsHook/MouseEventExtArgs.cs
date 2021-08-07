@@ -42,18 +42,12 @@ namespace WindowsHook
         /// <summary>
         ///     True if event contains information about wheel scroll.
         /// </summary>
-        public bool WheelScrolled
-        {
-            get { return Delta != 0; }
-        }
+        public bool WheelScrolled => Delta != 0;
 
         /// <summary>
         ///     True if event signals a click. False if it was only a move or wheel scroll.
         /// </summary>
-        public bool Clicked
-        {
-            get { return Clicks > 0; }
-        }
+        public bool Clicked => Clicks > 0;
 
         /// <summary>
         ///     True if event signals mouse button down.
@@ -72,28 +66,32 @@ namespace WindowsHook
 
         /// <summary>
         /// </summary>
-        internal Point Point
-        {
-            get { return new Point(X, Y); }
-        }
+        internal Point Point => new Point(X, Y);
 
         internal static MouseEventExtArgs FromRawDataApp(CallbackData data)
         {
             var wParam = data.WParam;
             var lParam = data.LParam;
-
-            var marshalledMouseStruct =
-                (AppMouseStruct) Marshal.PtrToStructure(lParam, typeof(AppMouseStruct));
-            return FromRawDataUniversal(wParam, marshalledMouseStruct.ToMouseStruct());
+            if (lParam == IntPtr.Zero)
+            {
+                return default;
+            }
+            
+            var marshalledMouseStruct = Marshal.PtrToStructure(lParam, typeof(AppMouseStruct));
+            return marshalledMouseStruct == null ? default : FromRawDataUniversal(wParam, ((AppMouseStruct)marshalledMouseStruct).ToMouseStruct());
         }
 
         internal static MouseEventExtArgs FromRawDataGlobal(CallbackData data)
         {
             var wParam = data.WParam;
             var lParam = data.LParam;
+            if (lParam == IntPtr.Zero)
+            {
+                return default;
+            }
 
-            var marshalledMouseStruct = (MouseStruct) Marshal.PtrToStructure(lParam, typeof(MouseStruct));
-            return FromRawDataUniversal(wParam, marshalledMouseStruct);
+            var marshalledMouseStruct = Marshal.PtrToStructure(lParam, typeof(MouseStruct));
+            return marshalledMouseStruct == null ? default : FromRawDataUniversal(wParam, ((MouseStruct)marshalledMouseStruct));
         }
 
         /// <summary>
@@ -112,7 +110,7 @@ namespace WindowsHook
             var isMouseButtonUp = false;
 
 
-            switch ((long) wParam)
+            switch ((long)wParam)
             {
                 case Messages.WM_LBUTTONDOWN:
                     isMouseButtonDown = true;

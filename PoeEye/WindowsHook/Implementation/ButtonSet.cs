@@ -8,26 +8,26 @@ namespace WindowsHook.Implementation
 {
     internal class ButtonSet
     {
-        private MouseButtons m_Set;
+        private MouseButtons values;
 
         public ButtonSet()
         {
-            m_Set = MouseButtons.None;
+            values = MouseButtons.None;
         }
 
         public void Add(MouseButtons element)
         {
-            m_Set |= element;
+            values |= element;
         }
 
         public void Remove(MouseButtons element)
         {
-            m_Set &= ~element;
+            values &= ~element;
         }
 
         public bool Contains(MouseButtons element)
         {
-            return (m_Set & element) != MouseButtons.None;
+            return (values & element) != MouseButtons.None;
         }
     }
 }

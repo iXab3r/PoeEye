@@ -25,7 +25,7 @@ namespace WindowsHook
         {
         }
 
-        internal KeyEventArgsExt(Keys keyData, int scanCode, int timestamp, bool isKeyDown, bool isKeyUp,
+        public KeyEventArgsExt(Keys keyData, int scanCode, int timestamp, bool isKeyDown, bool isKeyUp,
             bool isExtendedKey)
             : this(keyData)
         {
@@ -74,7 +74,7 @@ namespace WindowsHook
 
             var timestamp = Environment.TickCount;
 
-            var flags = (uint) lParam.ToInt64();
+            var flags = (uint)lParam.ToInt64();
 
             //bit 30 Specifies the previous key state. The value is 1 if the key is down before the message is sent; it is 0 if the key is up.
             var wasKeyDown = (flags & maskKeydown) > 0;
@@ -84,10 +84,10 @@ namespace WindowsHook
             var isExtendedKey = (flags & maskExtendedKey) > 0;
 
 
-            var keyData = AppendModifierStates((Keys) wParam);
-            var scanCode = (int) (((flags & 0x10000) | (flags & 0x20000) | (flags & 0x40000) | (flags & 0x80000) |
-                                   (flags & 0x100000) | (flags & 0x200000) | (flags & 0x400000) | (flags & 0x800000)) >>
-                                  16);
+            var keyData = AppendModifierStates((Keys)wParam);
+            var scanCode = (int)(((flags & 0x10000) | (flags & 0x20000) | (flags & 0x40000) | (flags & 0x80000) |
+                                  (flags & 0x100000) | (flags & 0x200000) | (flags & 0x400000) | (flags & 0x800000)) >>
+                                 16);
 
             var isKeyDown = !isKeyReleased;
             var isKeyUp = wasKeyDown && isKeyReleased;
@@ -100,11 +100,11 @@ namespace WindowsHook
             var wParam = data.WParam;
             var lParam = data.LParam;
             var keyboardHookStruct =
-                (KeyboardHookStruct) Marshal.PtrToStructure(lParam, typeof(KeyboardHookStruct));
+                (KeyboardHookStruct)Marshal.PtrToStructure(lParam, typeof(KeyboardHookStruct));
 
-            var keyData = AppendModifierStates((Keys) keyboardHookStruct.VirtualKeyCode);
+            var keyData = AppendModifierStates((Keys)keyboardHookStruct.VirtualKeyCode);
 
-            var keyCode = (int) wParam;
+            var keyCode = (int)wParam;
             var isKeyDown = keyCode == Messages.WM_KEYDOWN || keyCode == Messages.WM_SYSKEYDOWN;
             var isKeyUp = keyCode == Messages.WM_KEYUP || keyCode == Messages.WM_SYSKEYUP;
 

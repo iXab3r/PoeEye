@@ -22,8 +22,8 @@ namespace PoeShared.Native
         [InjectionConstructor]
         public KeyboardMouseEventsProvider([Dependency(WellKnownSchedulers.InputHook)]
             IScheduler inputScheduler) : this(
-            globalEventsFactory: new LambdaFactory<IKeyboardMouseEvents>(() => Hook.GlobalEvents()),
-            appEventsFactory: new LambdaFactory<IKeyboardMouseEvents>(() => Hook.AppEvents()),
+            globalEventsFactory: new LambdaFactory<IKeyboardMouseEvents>(() => Hook.CreateGlobalEvents()),
+            appEventsFactory: new LambdaFactory<IKeyboardMouseEvents>(() => Hook.CreateAppEvents()),
             inputScheduler)
         {
         }

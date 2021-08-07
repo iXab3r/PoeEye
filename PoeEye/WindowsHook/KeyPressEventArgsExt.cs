@@ -16,10 +16,10 @@ namespace WindowsHook
     /// </summary>
     public class KeyPressEventArgsExt : KeyPressEventArgs
     {
-        internal KeyPressEventArgsExt(char keyChar, int timestamp)
+        public KeyPressEventArgsExt(char keyChar, int timestamp)
             : base(keyChar)
         {
-            IsNonChar = keyChar == (char) 0x0;
+            IsNonChar = keyChar == (char)0x0;
             Timestamp = timestamp;
         }
 
@@ -30,7 +30,7 @@ namespace WindowsHook
         ///     Character corresponding to the key pressed. 0 char if represents a system or functional non char
         ///     key.
         /// </param>
-        public KeyPressEventArgsExt(char keyChar)
+        private KeyPressEventArgsExt(char keyChar)
             : this(keyChar, Environment.TickCount)
         {
         }
@@ -56,7 +56,7 @@ namespace WindowsHook
             const uint maskKeyup = 0x80000000; // for bit 31
             const uint maskScanCode = 0xff0000; // for bit 23-16
 
-            var flags = (uint) lParam.ToInt64();
+            var flags = (uint)lParam.ToInt64();
 
             //bit 30 Specifies the previous key state. The value is 1 if the key is down before the message is sent; it is 0 if the key is up.
             var wasKeyDown = (flags & maskKeydown) > 0;
@@ -64,18 +64,24 @@ namespace WindowsHook
             var isKeyReleased = (flags & maskKeyup) > 0;
 
             if (!wasKeyDown && !isKeyReleased)
+            {
                 yield break;
+            }
 
-            var virtualKeyCode = (int) wParam;
-            var scanCode = checked((int) (flags & maskScanCode));
+            var virtualKeyCode = (int)wParam;
+            var scanCode = checked((int)(flags & maskScanCode));
             const int fuState = 0;
 
-            char[] chars;
+            KeyboardNativeMethods.TryGetCharFromKeyboardState(virtualKeyCode, scanCode, fuState, out var chars);
+            if (chars == null)
+            {
+                yield break;
+            }
 
-            KeyboardNativeMethods.TryGetCharFromKeyboardState(virtualKeyCode, scanCode, fuState, out chars);
-            if (chars == null) yield break;
             foreach (var ch in chars)
+            {
                 yield return new KeyPressEventArgsExt(ch);
+            }
         }
 
         internal static IEnumerable<KeyPressEventArgsExt> FromRawDataGlobal(CallbackData data)
@@ -83,11 +89,13 @@ namespace WindowsHook
             var wParam = data.WParam;
             var lParam = data.LParam;
 
-            if ((int) wParam != Messages.WM_KEYDOWN && (int) wParam != Messages.WM_SYSKEYDOWN)
+            if ((int)wParam != Messages.WM_KEYDOWN && (int)wParam != Messages.WM_SYSKEYDOWN)
+            {
                 yield break;
+            }
 
             var keyboardHookStruct =
-                (KeyboardHookStruct) Marshal.PtrToStructure(lParam, typeof(KeyboardHookStruct));
+                (KeyboardHookStruct)Marshal.PtrToStructure(lParam, typeof(KeyboardHookStruct));
 
             var virtualKeyCode = keyboardHookStruct.VirtualKeyCode;
             var scanCode = keyboardHookStruct.ScanCode;
@@ -95,16 +103,22 @@ namespace WindowsHook
 
             if (virtualKeyCode == KeyboardNativeMethods.VK_PACKET)
             {
-                var ch = (char) scanCode;
+                var ch = (char)scanCode;
                 yield return new KeyPressEventArgsExt(ch, keyboardHookStruct.Time);
             }
             else
             {
                 char[] chars;
                 KeyboardNativeMethods.TryGetCharFromKeyboardState(virtualKeyCode, scanCode, fuState, out chars);
-                if (chars == null) yield break;
+                if (chars == null)
+                {
+                    yield break;
+                }
+
                 foreach (var current in chars)
+                {
                     yield return new KeyPressEventArgsExt(current, keyboardHookStruct.Time);
+                }
             }
         }
     }

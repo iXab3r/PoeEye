@@ -15,7 +15,7 @@ namespace WindowsHook.Implementation
         }
 
         protected HookResult Handle { get; set; }
-        
+
         protected bool IsReady { get; init; }
 
         public void Dispose()

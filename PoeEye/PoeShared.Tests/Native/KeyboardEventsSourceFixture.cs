@@ -189,7 +189,7 @@ namespace PoeShared.Tests.Native
 
             public void Start()
             {
-                var hook = Hook.GlobalEvents().AddTo(Anchors);
+                var hook = Hook.CreateGlobalEvents().AddTo(Anchors);
                 hook.KeyDown += Hook2OnKeyDown;
             }
 

@@ -13,17 +13,17 @@ namespace WindowsHook.WinApi
     ///     http://msdn.microsoft.com/library/default.asp?url=/library/en-us/gdi/rectangl_0tiq.asp
     /// </remarks>
     [StructLayout(LayoutKind.Sequential)]
-    internal struct Point
+    internal readonly struct Point
     {
         /// <summary>
         ///     Specifies the X-coordinate of the point.
         /// </summary>
-        public int X;
+        public readonly int X;
 
         /// <summary>
         ///     Specifies the Y-coordinate of the point.
         /// </summary>
-        public int Y;
+        public readonly int Y;
 
         public Point(int x, int y)
         {
@@ -48,9 +48,17 @@ namespace WindowsHook.WinApi
 
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(null, obj)) return false;
-            if (obj.GetType() != typeof(Point)) return false;
-            return Equals((Point) obj);
+            if (ReferenceEquals(null, obj))
+            {
+                return false;
+            }
+
+            if (obj.GetType() != typeof(Point))
+            {
+                return false;
+            }
+
+            return Equals((Point)obj);
         }
 
         public override int GetHashCode()

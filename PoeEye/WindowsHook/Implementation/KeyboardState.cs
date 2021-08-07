@@ -20,11 +20,11 @@ namespace WindowsHook.Implementation
     /// </remarks>
     public class KeyboardState
     {
-        private readonly byte[] m_KeyboardStateNative;
+        private readonly byte[] nativeKeyboardState;
 
-        private KeyboardState(byte[] keyboardStateNative)
+        private KeyboardState(byte[] keyboardKeyboardState)
         {
-            m_KeyboardStateNative = keyboardStateNative;
+            nativeKeyboardState = keyboardKeyboardState;
         }
 
         /// <summary>
@@ -41,7 +41,7 @@ namespace WindowsHook.Implementation
 
         internal byte[] GetNativeState()
         {
-            return m_KeyboardStateNative;
+            return nativeKeyboardState;
         }
 
         /// <summary>
@@ -51,11 +51,18 @@ namespace WindowsHook.Implementation
         /// <returns><b>true</b> if key was down, <b>false</b> - if key was up.</returns>
         public bool IsDown(Keys key)
         {
-            if ((int)key < 256) return IsDownRaw(key);
-            if (key == Keys.Alt) return IsDownRaw(Keys.LMenu) || IsDownRaw(Keys.RMenu);
-            if (key == Keys.Shift) return IsDownRaw(Keys.LShiftKey) || IsDownRaw(Keys.RShiftKey);
-            if (key == Keys.Control) return IsDownRaw(Keys.LControlKey) || IsDownRaw(Keys.RControlKey);
-            return false;
+            if ((int)key < 256)
+            {
+                return IsDownRaw(key);
+            }
+
+            return key switch
+            {
+                Keys.Alt => IsDownRaw(Keys.LMenu) || IsDownRaw(Keys.RMenu),
+                Keys.Shift => IsDownRaw(Keys.LShiftKey) || IsDownRaw(Keys.RShiftKey),
+                Keys.Control => IsDownRaw(Keys.LControlKey) || IsDownRaw(Keys.RControlKey),
+                _ => false
+            };
         }
 
         private bool IsDownRaw(Keys key)
@@ -93,10 +100,13 @@ namespace WindowsHook.Implementation
 
         private byte GetKeyState(Keys key)
         {
-            var virtualKeyCode = (int) key;
+            var virtualKeyCode = (int)key;
             if (virtualKeyCode < 0 || virtualKeyCode > 255)
+            {
                 throw new ArgumentOutOfRangeException("key", key, "The value must be between 0 and 255.");
-            return m_KeyboardStateNative[virtualKeyCode];
+            }
+
+            return nativeKeyboardState[virtualKeyCode];
         }
 
         private static bool GetHighBit(byte value)

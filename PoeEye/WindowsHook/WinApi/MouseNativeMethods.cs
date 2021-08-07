@@ -27,6 +27,5 @@ namespace WindowsHook.WinApi
         [DllImport("user32.dll")]
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool GetCursorPos(ref Point pt);
-
     }
 }

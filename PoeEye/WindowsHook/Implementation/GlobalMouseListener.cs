@@ -23,18 +23,25 @@ namespace WindowsHook.Implementation
         protected override void ProcessDown(ref MouseEventExtArgs e)
         {
             if (IsDoubleClick(e))
+            {
                 e = e.ToDoubleClickEventArgs();
+            }
+
             base.ProcessDown(ref e);
         }
 
         protected override void ProcessUp(ref MouseEventExtArgs e)
         {
             base.ProcessUp(ref e);
-            if (e.Clicks == 2)
-                StopDoubleClickWaiting();
-
-            if (e.Clicks == 1)
-                StartDoubleClickWaiting(e);
+            switch (e.Clicks)
+            {
+                case 2:
+                    StopDoubleClickWaiting();
+                    break;
+                case 1:
+                    StartDoubleClickWaiting(e);
+                    break;
+            }
         }
 
         private void StartDoubleClickWaiting(MouseEventExtArgs e)

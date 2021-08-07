@@ -18,7 +18,7 @@ namespace WindowsHook
         ///     Returned instance is used for event subscriptions.
         ///     You can refetch it (you will get the same instance anyway).
         /// </returns>
-        public static IKeyboardMouseEvents AppEvents()
+        public static IKeyboardMouseEvents CreateAppEvents()
         {
             return new AppEventFacade();
         }
@@ -30,7 +30,7 @@ namespace WindowsHook
         ///     Returned instance is used for event subscriptions.
         ///     You can refetch it (you will get the same instance anyway).
         /// </returns>
-        public static IKeyboardMouseEvents GlobalEvents()
+        public static IKeyboardMouseEvents CreateGlobalEvents()
         {
             return new GlobalEventFacade();
         }

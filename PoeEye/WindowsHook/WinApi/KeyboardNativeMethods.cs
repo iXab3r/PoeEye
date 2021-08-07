@@ -54,7 +54,7 @@ namespace WindowsHook.WinApi
         internal static void TryGetCharFromKeyboardState(int virtualKeyCode, int fuState, out char[] chars)
         {
             var dwhkl = GetActiveKeyboard();
-            var scanCode = MapVirtualKeyEx(virtualKeyCode, (int) MapType.MAPVK_VK_TO_VSC, dwhkl);
+            var scanCode = MapVirtualKeyEx(virtualKeyCode, (int)MapType.MAPVK_VK_TO_VSC, dwhkl);
             TryGetCharFromKeyboardState(virtualKeyCode, scanCode, fuState, dwhkl, out chars);
         }
 
@@ -82,7 +82,7 @@ namespace WindowsHook.WinApi
         /// <param name="dwhkl"></param>
         /// <param name="chars"></param>
         /// <returns></returns>
-        internal static void TryGetCharFromKeyboardState(int virtualKeyCode, int scanCode, int fuState, IntPtr dwhkl,
+        private static void TryGetCharFromKeyboardState(int virtualKeyCode, int scanCode, int fuState, IntPtr dwhkl,
             out char[] chars)
         {
             var pwszBuff = new StringBuilder(64);
@@ -91,10 +91,14 @@ namespace WindowsHook.WinApi
             var isDead = false;
 
             if (keyboardState.IsDown(Keys.ShiftKey))
-                currentKeyboardState[(byte) Keys.ShiftKey] = 0x80;
+            {
+                currentKeyboardState[(byte)Keys.ShiftKey] = 0x80;
+            }
 
             if (keyboardState.IsToggled(Keys.CapsLock))
-                currentKeyboardState[(byte) Keys.CapsLock] = 0x01;
+            {
+                currentKeyboardState[(byte)Keys.CapsLock] = 0x01;
+            }
 
             var relevantChars = ToUnicodeEx(virtualKeyCode, scanCode, currentKeyboardState, pwszBuff, pwszBuff.Capacity,
                 fuState, dwhkl);
@@ -112,14 +116,28 @@ namespace WindowsHook.WinApi
                     break;
 
                 case 1:
-                    if (pwszBuff.Length > 0) chars = new[] {pwszBuff[0]};
-                    else chars = null;
+                    if (pwszBuff.Length > 0)
+                    {
+                        chars = new[] { pwszBuff[0] };
+                    }
+                    else
+                    {
+                        chars = null;
+                    }
+
                     break;
 
                 // Two or more (only two of them is relevant)
                 default:
-                    if (pwszBuff.Length > 1) chars = new[] {pwszBuff[0], pwszBuff[1]};
-                    else chars = new[] {pwszBuff[0]};
+                    if (pwszBuff.Length > 1)
+                    {
+                        chars = new[] { pwszBuff[0], pwszBuff[1] };
+                    }
+                    else
+                    {
+                        chars = new[] { pwszBuff[0] };
+                    }
+
                     break;
             }
 
@@ -139,7 +157,7 @@ namespace WindowsHook.WinApi
             lastScanCode = scanCode;
             lastVirtualKeyCode = virtualKeyCode;
             lastIsDead = isDead;
-            lastKeyState = (byte[]) currentKeyboardState.Clone();
+            lastKeyState = (byte[])currentKeyboardState.Clone();
         }
 
 

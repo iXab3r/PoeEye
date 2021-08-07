@@ -6,7 +6,7 @@ using System;
 
 namespace WindowsHook.WinApi
 {
-    internal struct CallbackData
+    internal readonly struct CallbackData
     {
         public CallbackData(IntPtr wParam, IntPtr lParam)
         {

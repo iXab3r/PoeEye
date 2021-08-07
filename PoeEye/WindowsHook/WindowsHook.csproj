@@ -1,20 +1,20 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <UseWindowsForms>True</UseWindowsForms>
-    <AssemblyName>WindowsHook</AssemblyName>
-    <RootNamespace>WindowsHook</RootNamespace>
-    <TargetFramework>net5-windows7</TargetFramework>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <PackageProjectUrl>https://github.com/iXab3r/WindowsHook</PackageProjectUrl>
-    <PackageIcon>mouse-keyboard-hook-logo64x64.png</PackageIcon>
-    <PackageIconUrl />
-    <RepositoryUrl>https://github.com/topstarai/WindowsHook</RepositoryUrl>
-    <Authors>Mark Kang</Authors>
-    <PackageTags>hook, .net core, wpf, winform, global, spy,event, mouse, keyboard</PackageTags>
-    <PackageId>WindowsHook</PackageId>
-    <PackageLicenseFile>README.md</PackageLicenseFile>
-  </PropertyGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\PoeShared\PoeShared.csproj" />
-  </ItemGroup>
+    <PropertyGroup>
+        <UseWindowsForms>True</UseWindowsForms>
+        <AssemblyName>WindowsHook</AssemblyName>
+        <RootNamespace>WindowsHook</RootNamespace>
+        <TargetFramework>net5-windows7</TargetFramework>
+        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+        <PackageProjectUrl>https://github.com/iXab3r/WindowsHook</PackageProjectUrl>
+        <PackageIcon>mouse-keyboard-hook-logo64x64.png</PackageIcon>
+        <PackageIconUrl />
+        <RepositoryUrl>https://github.com/topstarai/WindowsHook</RepositoryUrl>
+        <Authors>Mark Kang</Authors>
+        <PackageTags>hook, .net core, wpf, winform, global, spy,event, mouse, keyboard</PackageTags>
+        <PackageId>WindowsHook</PackageId>
+        <PackageLicenseFile>README.md</PackageLicenseFile>
+    </PropertyGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\PoeShared\PoeShared.csproj" />
+    </ItemGroup>
 </Project>
