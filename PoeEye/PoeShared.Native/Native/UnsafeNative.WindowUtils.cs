@@ -14,6 +14,9 @@ namespace PoeShared.Native
         [DllImport("dwmapi.dll")]
         private static extern HResult DwmGetWindowAttribute(IntPtr hwnd, DwmApi.DWMWINDOWATTRIBUTE dwAttribute, out RECT pvAttribute, int cbAttribute);
         
+        [DllImport("dwmapi.dll")]
+        private static extern HResult DwmGetWindowAttribute(IntPtr hwnd, DwmApi.DWMWINDOWATTRIBUTE dwAttribute, out bool pvAttribute, int cbAttribute);
+        
         public static IntPtr MakeLParam(int loWord, int hiWord)
         {
             return new IntPtr((hiWord << 16) | (loWord & 0xffff));
@@ -69,6 +72,18 @@ namespace PoeShared.Native
 
             return new Rectangle(result.left, result.top, result.right - result.left, result.bottom - result.top);
         }
+
+        public static bool DwmGetWindowAttribute(IntPtr hwnd, DwmApi.DWMWINDOWATTRIBUTE flags)
+        {
+            var result = DwmGetWindowAttribute(hwnd, flags, out bool resultValue, Marshal.SizeOf<bool>());
+            if (!result.Succeeded)
+            {
+                Log.Warn($"Failed to DwmGetWindowAttribute by HWND {hwnd.ToHexadecimal()}, error: {result}");
+                throw new Win32Exception();
+            }
+
+            return resultValue;
+        }
         
         public static Rectangle DwmGetWindowFrameBounds(IntPtr hwnd)
         {
@@ -76,7 +91,8 @@ namespace PoeShared.Native
             {
                 return Rectangle.Empty;
             }
-            var result = DwmGetWindowAttribute(hwnd, DwmApi.DWMWINDOWATTRIBUTE.DWMWA_EXTENDED_FRAME_BOUNDS, out var frame, Marshal.SizeOf<RECT>());
+
+            var result = DwmGetWindowAttribute(hwnd, DwmApi.DWMWINDOWATTRIBUTE.DWMWA_EXTENDED_FRAME_BOUNDS, out RECT frame, Marshal.SizeOf<RECT>());
             if (!result.Succeeded)
             {
                 Log.Warn($"Failed to DwmGetWindowAttribute by HWND {hwnd.ToHexadecimal()}, error: {result}");

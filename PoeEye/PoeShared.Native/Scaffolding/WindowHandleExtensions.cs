@@ -1,4 +1,6 @@
-﻿using PInvoke;
+﻿using System;
+using System.Runtime.InteropServices;
+using PInvoke;
 using PoeShared.Native;
 
 namespace PoeShared.Scaffolding
@@ -11,6 +13,21 @@ namespace PoeShared.Scaffolding
         /// <returns></returns>
         public static bool IsVisibleAndValid(this IWindowHandle windowHandle, bool excludeMinimized = false)
         {
+            if (windowHandle.Handle == IntPtr.Zero)
+            {
+                return false;
+            }
+
+            if (windowHandle.Handle == User32.GetShellWindow())
+            {
+                return false;
+            }
+            
+            if (User32.GetAncestor(windowHandle.Handle, User32.GetAncestorFlags.GA_ROOT) != windowHandle.Handle)
+            {
+                return false;
+            }
+            
             if (!windowHandle.IsVisible || excludeMinimized && windowHandle.IsIconic)
             {
                 return false;
@@ -26,7 +43,12 @@ namespace PoeShared.Scaffolding
                 return false;
             }
 
-            if (windowHandle.WindowStyle.HasFlag(User32.WindowStyles.WS_CHILD))
+            if (windowHandle.WindowStyle.HasFlag(User32.WindowStyles.WS_CHILD) || windowHandle.WindowStyle.HasFlag(User32.WindowStyles.WS_DISABLED))
+            {
+                return false;
+            }
+            
+            if (UnsafeNative.DwmGetWindowAttribute(windowHandle.Handle, DwmApi.DWMWINDOWATTRIBUTE.DWMWA_CLOAKED))
             {
                 return false;
             }

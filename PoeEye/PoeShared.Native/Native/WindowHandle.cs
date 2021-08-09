@@ -24,8 +24,6 @@ namespace PoeShared.Native
         private static readonly IFluentLog Log = typeof(WindowHandle).PrepareLogger();
 
         private readonly Lazy<string> classSupplier;
-        private readonly Lazy<bool> isIconic;
-        private readonly Lazy<bool> isVisible;
         private readonly Lazy<Icon> iconSupplier;
         private readonly Lazy<BitmapSource> iconBitmapSupplier;
         private readonly Lazy<User32.WindowStyles> windowStyle;
@@ -42,8 +40,6 @@ namespace PoeShared.Native
             iconSupplier = new Lazy<Icon>(() => GetWindowIcon(handle), LazyThreadSafetyMode.ExecutionAndPublication);
             windowStyle = new Lazy<User32.WindowStyles>(() => (User32.WindowStyles)User32.GetWindowLong(handle, User32.WindowLongIndexFlags.GWL_STYLE));
             windowStyleEx = new Lazy<User32.WindowStylesEx>(() => (User32.WindowStylesEx)User32.GetWindowLong(handle, User32.WindowLongIndexFlags.GWL_EXSTYLE));
-            isIconic = new Lazy<bool>(() => User32.IsIconic(handle));
-            isVisible = new Lazy<bool>(() => User32.IsWindowVisible(handle));
             iconBitmapSupplier = new Lazy<BitmapSource>(() =>
             {
                 try
@@ -201,9 +197,9 @@ namespace PoeShared.Native
 
         public User32.WindowStylesEx WindowStylesEx => windowStyleEx.Value;
 
-        public bool IsVisible => isVisible.Value;
+        public bool IsVisible => User32.IsWindowVisible(Handle);
 
-        public bool IsIconic => isIconic.Value;
+        public bool IsIconic => User32.IsIconic(Handle);
 
         private static Icon GetWindowIcon(IntPtr handle)
         {
