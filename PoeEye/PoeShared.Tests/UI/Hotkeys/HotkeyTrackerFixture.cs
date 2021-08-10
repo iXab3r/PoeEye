@@ -65,7 +65,7 @@ namespace PoeShared.Tests.UI.Hotkeys
             mainWindowTracker.SetupGet(x => x.ExecutingProcessId).Returns(2);
             
             schedulerProvider = fixture.Freeze<ISchedulerProvider>().GetMock();
-            schedulerProvider.Setup(x => x.GetOrCreate(nameof(HotkeyTracker))).Returns(fixture.Create<IScheduler>());
+            schedulerProvider.Setup(x => x.GetOrCreate(It.IsAny<string>())).Returns(fixture.Create<IScheduler>());
         }
 
         [Test]
@@ -259,6 +259,62 @@ namespace PoeShared.Tests.UI.Hotkeys
 
             //Then
             instance.IsActive.ShouldBe(false);
+        }
+        
+        [Test]
+        public void ShouldProcessHotkeyUpDownWhenModifierReleased()
+        {
+            // The problem was the following:
+            // Hotkey is Shift+E, user presses Shift+E, activates hotkey. SendInput is linked to this tracker and starts to spam some other key, e.g. W
+            // then the following events are generated: Shift+W DOWN, SHIFT UP(this breaks Shift+E), SHIFT+W UP
+            // inner logic processed Shift release as Shift+E release and suppressed it
+            // and in the end we got permanent Shift DOWN state even though pressed combination had nothing to do with Shift+E aside from sharing a modifier
+            
+            //Given
+            var instance = CreateInstance();
+            instance.HotkeyMode = HotkeyMode.Click;
+            instance.Hotkey = new HotkeyGesture(Key.E, ModifierKeys.Shift);
+            instance.SuppressKey = true;
+
+            // user started with pressing down modifier key
+            var keyDown0 = new KeyEventArgs(Keys.ShiftKey);
+            whenKeyDown.OnNext(keyDown0);
+            instance.IsActive.ShouldBe(false);
+            keyDown0.Handled.ShouldBe(false);
+
+            // then user pressed and released additional key, now it's (modifier + key)
+            var keyDown1 = new KeyEventArgs(Keys.Shift | Keys.E);
+            whenKeyDown.OnNext(keyDown1);
+            instance.IsActive.ShouldBe(false);
+            keyDown1.Handled.ShouldBe(true);
+            var keyUp1 = new KeyEventArgs(Keys.Shift | Keys.E);
+            whenKeyUp.OnNext(keyUp1);
+            instance.IsActive.ShouldBe(true);
+            keyUp1.Handled.ShouldBe(true);
+            
+            // then user pressed some other key still holding the modifier 
+            var keyDown2 = new KeyEventArgs(Keys.Shift | Keys.W);
+            whenKeyDown.OnNext(keyDown2);
+            instance.IsActive.ShouldBe(true);
+            keyDown2.Handled.ShouldBe(false);
+            var keyUp2 = new KeyEventArgs(Keys.Shift | Keys.W);
+            whenKeyUp.OnNext(keyUp2);
+            instance.IsActive.ShouldBe(true);
+            keyUp2.Handled.ShouldBe(false);
+            
+            // then presses the same key again still holding the same modifier
+            var keyDown3 = new KeyEventArgs(Keys.Shift | Keys.E);
+            whenKeyDown.OnNext(keyDown3);
+            instance.IsActive.ShouldBe(true);
+            keyDown3.Handled.ShouldBe(true);
+            
+            //When user releases modifier
+            var keyUp3 = new KeyEventArgs(Keys.ShiftKey);
+            whenKeyUp.OnNext(keyUp3);
+            
+            //Then tracker should NOT suppress this modifier
+            instance.IsActive.ShouldBe(false);
+            keyUp3.Handled.ShouldBe(false);
         }
 
         [Test]

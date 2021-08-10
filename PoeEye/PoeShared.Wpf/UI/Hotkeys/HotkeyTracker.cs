@@ -65,7 +65,7 @@ namespace PoeShared.UI
             [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {
             Log = typeof(HotkeyTracker).PrepareLogger().WithSuffix(this);
-            var scheduler = schedulerProvider.GetOrCreate(nameof(HotkeyTracker));
+            var scheduler = schedulerProvider.GetOrCreate("Hotkey");
             this.clock = clock;
             this.appArguments = appArguments;
             this.userInputFilterConfigurator = userInputFilterConfigurator;
@@ -99,7 +99,6 @@ namespace PoeShared.UI
                 .AddTo(Anchors);
 
             hotkeyLog
-                .Synchronize()
                 .Where(x => Log.IsDebugEnabled && appArguments.IsDebugMode)
                 .Select(data => $"Hotkey {(data.KeyDown ? "pressed" : "released")}: {data.Hotkey}, key: {data.Hotkey.Key}, mouse: {data.Hotkey.MouseButton}, wheel: {data.Hotkey.MouseWheel}, modifiers: {data.Hotkey.ModifierKeys}")
                 .DistinctUntilChanged()
@@ -326,11 +325,6 @@ namespace PoeShared.UI
 
         private bool IsConfiguredHotkey(HotkeyData data)
         {
-            if (Log.IsDebugEnabled && appArguments.IsDebugMode)
-            {
-                hotkeyLog.OnNext(data);
-            }
-            
             if (data.Hotkey == null || data.Hotkey.IsEmpty)
             {
                 // should never happen, hotkey data always contains something
@@ -383,9 +377,9 @@ namespace PoeShared.UI
             }
 
             // if user releases one of modifiers we simulate "release" of the button itself
-            var newData = data.ReplaceKey(pressed[0]);
-            Log.Debug($"Replaced hotkey {data} => {newData}");
-            return IsConfiguredHotkey(newData);
+            var newHotkey = pressed[0];
+            Log.Debug($"Replacing hotkey {data.Hotkey} => {newHotkey} in {data}");
+            return IsConfiguredHotkey(data with { Hotkey = newHotkey});
         }
 
         private IObservable<HotkeyData> BuildHotkeySubscription(
@@ -403,11 +397,13 @@ namespace PoeShared.UI
                 Log.Debug($"Subscribing to Keyboard events");
                 eventSource.WhenKeyDown.Select(x => HotkeyData.FromEvent(x, clock))
                     .Select(x => x.SetKeyDown(true))
+                    .Do(LogHotkey)
                     .Where(IsConfiguredHotkey)
                     .AddTo(result);
 
                 eventSource.WhenKeyUp.Select(x => HotkeyData.FromEvent(x, clock))
                     .Select(x => x.SetKeyDown(false))
+                    .Do(LogHotkey)
                     .Where(IsConfiguredHotkey)
                     .AddTo(result);
             }
@@ -417,11 +413,13 @@ namespace PoeShared.UI
                 Log.Debug($"Subscribing to Mouse events");
                 eventSource.WhenMouseDown.Select(x => HotkeyData.FromEvent(x, clock))
                     .Select(x => x.SetKeyDown(true))
+                    .Do(LogHotkey)
                     .Where(IsConfiguredHotkey)
                     .AddTo(result);
 
                 eventSource.WhenMouseUp.Select(x => HotkeyData.FromEvent(x, clock))
                     .Select(x => x.SetKeyDown(false))
+                    .Do(LogHotkey)
                     .Where(IsConfiguredHotkey)
                     .AddTo(result);
             }
@@ -431,6 +429,7 @@ namespace PoeShared.UI
                 Log.Debug($"Subscribing to Mouse Wheel events");
                 eventSource.WhenMouseWheel.Select(x => HotkeyData.FromEvent(x, clock))
                     .Select(x => x.SetKeyDown(false))
+                    .Do(LogHotkey)
                     .Where(IsConfiguredHotkey)
                     .AddTo(result);
             }
@@ -442,6 +441,14 @@ namespace PoeShared.UI
             }
 
             return result.Merge();
+        }
+
+        private void LogHotkey(HotkeyData data)
+        {
+            if (Log.IsDebugEnabled && appArguments.IsDebugMode)
+            {
+                hotkeyLog.OnNext(data);
+            }
         }
 
         public override string ToString()
@@ -500,12 +507,6 @@ namespace PoeShared.UI
             public HotkeyData SetKeyDown(bool value)
             {
                 KeyDown = value;
-                return this;
-            }
-
-            public HotkeyData ReplaceKey(HotkeyGesture newHotkey)
-            {
-                Hotkey = newHotkey;
                 return this;
             }
 

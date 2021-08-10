@@ -32,7 +32,7 @@ namespace PoeShared.Modularity
                 }
                 schedulerThread = new Thread(start)
                 {
-                    Name = $"ST-{name}",
+                    Name = $"{name}",
                     IsBackground = true,
                     Priority = ThreadPriority.Normal
                 };
