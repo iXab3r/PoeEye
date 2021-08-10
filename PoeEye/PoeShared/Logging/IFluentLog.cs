@@ -8,6 +8,8 @@ namespace PoeShared.Logging
     public interface IFluentLog
     {
         internal LogData Data { get; }
+        
+        internal ILogWriter Writer { get; }
 
         bool IsDebugEnabled { get; }
 
@@ -16,7 +18,7 @@ namespace PoeShared.Logging
         bool IsWarnEnabled { get; }
 
         bool IsErrorEnabled { get; }
-
+        
         internal IFluentLog WithLogData(LogData newLogData);
 
         void Debug(string message);

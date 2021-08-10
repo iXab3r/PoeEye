@@ -2,12 +2,28 @@
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text;
+using DynamicData;
 using PoeShared.Scaffolding;
 
 namespace PoeShared.Logging
 {
     public static class FluentLogExtensions
     {
+        public static IFluentLog CreateChildCollectionLogWriter(this IFluentLog log, ISourceList<string> collection)
+        {
+            var writerAdapter = new LogWriterAdapter<string>(logData =>
+            {
+                log.Writer.WriteLog(logData);
+                var message = logData.ToString();
+                if (logData.Exception != null)
+                {
+                    message += Environment.NewLine + logData.Exception.Message + Environment.NewLine + logData.Exception.StackTrace;
+                }
+                collection.Add(message);
+            });
+            return new FluentLogBuilder(writerAdapter);
+        }
+        
         public static BenchmarkTimer CreateProfiler(this IFluentLog log, string benchmarkName, [CallerMemberName] string propertyName = null)
         {
             return new BenchmarkTimer(benchmarkName, log, propertyName);

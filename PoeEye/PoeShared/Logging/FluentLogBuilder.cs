@@ -14,6 +14,8 @@ namespace PoeShared.Logging
             this.logData = logData;
         }
 
+        ILogWriter IFluentLog.Writer => logWriter;
+
         public bool IsDebugEnabled => logWriter.IsDebugEnabled;
 
         public bool IsInfoEnabled => logWriter.IsInfoEnabled;
@@ -225,7 +227,7 @@ namespace PoeShared.Logging
             {
                 return;
             }
-            
+
             var messageString = SafeExtract(message);
             Debug(messageString, exception);
         }
@@ -288,11 +290,11 @@ namespace PoeShared.Logging
             {
                 return;
             }
-            
+
             var messageString = SafeExtract(message);
             Error(messageString, exception);
         }
-        
+
         private string SafeExtract(FormattableString supplier)
         {
             try

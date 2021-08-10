@@ -14,7 +14,7 @@ namespace PoeShared.Logging
         bool IsWarnEnabled { get; }
 
         bool IsErrorEnabled { get; }
-        
+
         /// <summary>
         /// Writes the specified <see cref="LogData"/> to the underlying logger.
         /// </summary>
