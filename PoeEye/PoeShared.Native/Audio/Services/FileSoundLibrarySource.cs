@@ -19,8 +19,8 @@ namespace PoeShared.Audio.Services
         private static readonly IFluentLog Log = typeof(FileSoundLibrarySource).PrepareLogger();
 
         private readonly DirectoryInfo[] knownDirectories;
-        
-        private readonly SourceCache<FileSource, string> sources = new SourceCache<FileSource, string>(x => x.SourceName.ToLowerInvariant());
+
+        private readonly SourceCache<FileSource, string> sources = new(x => x.SourceName.ToLowerInvariant());
 
         public FileSoundLibrarySource(IAppArguments appArguments)
         {
@@ -149,7 +149,7 @@ namespace PoeShared.Audio.Services
                 return mediaStream.ReadToEnd();
             }
         }
-        
+
         private readonly struct FileSource
         {
             public FileInfo File { get; }
