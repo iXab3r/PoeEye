@@ -182,7 +182,6 @@ namespace PoeShared.RegionSelector.ViewModels
                     Disposable.Create(() => Log.Debug($"Disposing SelectionAnchors")).AddTo(selectionAnchors);
                     Disposable.Create(() => IsVisible = false).AddTo(selectionAnchors);
                     Selection = Rect.Empty;
-                    MousePosition = owner.PointFromScreen(Control.MousePosition.ToWpfPoint());
 
                     Observable.Merge(
                             mainWindowTracker.WhenAnyValue(x => x.ActiveProcessId).Where(x => StopWhenFocusLost).Where(x => x != CurrentProcessId).Select(x => $"main window lost focus - processId changed"),
@@ -193,20 +192,27 @@ namespace PoeShared.RegionSelector.ViewModels
                         .SubscribeSafe(subscriber.OnCompleted, Log.HandleUiException)
                         .AddTo(selectionAnchors);
                     
-                    keyboardEventsSource.WhenMouseMove
-                        .Where(x => OwnerIsVisible)
-                        .StartWith(new MouseEventArgs(MouseButtons.None, 0, System.Windows.Forms.Cursor.Position.X, System.Windows.Forms.Cursor.Position.Y, 0))
+                    this.WhenAnyValue(x => x.Owner, x => x.OwnerIsVisible)
+                        .Select(x => x.Item1 != null && x.Item2
+                                ? keyboardEventsSource.WhenMouseMove
+                                    .StartWith(new MouseEventArgs(MouseButtons.None, 0, System.Windows.Forms.Cursor.Position.X, System.Windows.Forms.Cursor.Position.Y, 0))
+                                    : Observable.Empty<MouseEventArgs>())
+                        .Switch()
                         .ObserveOn(uiScheduler)
                         .SubscribeSafe(HandleMouseMove, Log.HandleUiException)
                         .AddTo(selectionAnchors);
 
-                    Observable
-                        .FromEventPattern<MouseButtonEventHandler, MouseButtonEventArgs>(
-                            h => owner.MouseDown += h,
-                            h => owner.MouseDown -= h)
-                        .Select(x => x.EventArgs)
+                    this.WhenAnyValue(x => x.Owner, x => x.OwnerIsVisible)
+                        .Select(x => x.Item1 != null && x.Item2 
+                            ? Observable
+                                .FromEventPattern<MouseButtonEventHandler, MouseButtonEventArgs>(
+                                    h => x.Item1.MouseDown += h,
+                                    h => x.Item1.MouseDown -= h)
+                                .Select(x => x.EventArgs)
+                            : Observable.Empty<MouseButtonEventArgs>())
+                        .Switch()
                         .Where(x => x.LeftButton == MouseButtonState.Pressed)
-                        .Select(x =>
+                        .SelectSafeOrDefault(x =>
                         {
                             var coords = x.GetPosition(owner);
                             AnchorPoint = coords;
