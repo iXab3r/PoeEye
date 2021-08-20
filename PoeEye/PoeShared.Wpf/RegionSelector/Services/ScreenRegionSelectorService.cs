@@ -29,6 +29,7 @@ namespace PoeShared.RegionSelector.Services
             this.viewController = viewController;
             this.overlayController = overlayController;
             regionSelector = regionSelectorWindowFactory.Create();
+            regionSelector.IsVisible = false;
             overlayController.RegisterChild(regionSelector).AddTo(Anchors);
         }
 
