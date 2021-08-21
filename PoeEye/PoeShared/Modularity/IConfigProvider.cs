@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq.Expressions;
 using System.Reactive;
 using JetBrains.Annotations;
@@ -31,6 +32,8 @@ namespace PoeShared.Modularity
         void Save();
         
         void Save<TConfig>([NotNull] TConfig config) where TConfig : IPoeEyeConfig, new();
+
+        void SaveToFile(FileInfo file);
 
         TConfig GetActualConfig<TConfig>() where TConfig : IPoeEyeConfig, new();
     }

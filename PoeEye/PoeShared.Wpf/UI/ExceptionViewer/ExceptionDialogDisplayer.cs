@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Reactive.Disposables;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 using log4net;
@@ -28,20 +29,18 @@ namespace PoeShared.UI
             this.dialogViewModelFactory = dialogViewModelFactory;
         }
 
-        public void ShowDialog(ExceptionDialogConfig config, Exception exception)
+        public void ShowDialog(ExceptionDialogConfig config)
         {
-            Guard.ArgumentNotNull(exception, nameof(exception));
-
             try
             {
-                ShowExceptionViewer(config, exception);
+                ShowExceptionViewer(config);
             }
             catch (Exception e)
             {
                 Log.Error($"Failed to show ExceptionViewer, falling back to MessageBox", e);
                 try
                 {
-                    ShowMessageBox(config, exception);
+                    ShowMessageBox(config);
                 }
                 catch (Exception e1)
                 {
@@ -50,56 +49,14 @@ namespace PoeShared.UI
             }
         }
 
-        public void ShowDialogAndTerminate(Exception exception)
+        public Task<ExceptionReportItem[]> PrepareReportItems()
         {
-            
-            var appDispatcher = Application.Current?.Dispatcher;
-            if (appDispatcher != null && Dispatcher.CurrentDispatcher != appDispatcher)
-            {
-                Log.Warn("Exception occurred on non-UI thread, rescheduling to UI");
-                appDispatcher.BeginInvoke(new Action(() => ShowDialogAndTerminate(exception)), DispatcherPriority.Send);
-                Log.Debug($"Sent signal to UI thread to report crash related to exception {exception.Message}");
-                return;
-            }
-            
-            try
-            {
-                var config = new ExceptionDialogConfig
-                {
-                    AppName = appArguments.AppName,
-                    Title = $"{appArguments.AppTitle} Error Report"
-                };
-
-                var configurationFilesToInclude = Directory
-                    .EnumerateFiles(appArguments.AppDataDirectory, "*.cfg", SearchOption.TopDirectoryOnly);
-
-                var logFilesToInclude = new DirectoryInfo(appArguments.AppDataDirectory)
-                    .GetFiles("*.log", SearchOption.AllDirectories)
-                    .OrderByDescending(x => x.LastWriteTime)
-                    .Take(2)
-                    .Select(x => x.FullName)
-                    .ToArray();
-
-                config.FilesToAttach = new[]
-                    {
-                        logFilesToInclude,
-                        configurationFilesToInclude
-                    }.SelectMany(x => x)
-                    .ToArray();
-                ShowDialog(config, exception);
-                
-                Log.Warn($"Forcefully terminating Environment due to unrecoverable error");
-                Environment.Exit(-1);
-            }
-            catch (Exception e)
-            {
-                Log.HandleException(new ApplicationException("Exception in ExceptionReporter :-(", e));
-            }
+            throw new NotImplementedException();
         }
 
-        private void ShowMessageBox(ExceptionDialogConfig config, Exception exception)
+        private void ShowMessageBox(ExceptionDialogConfig config)
         {
-            Log.Debug($"Showing MessageBox, exception: {exception}, config: {config.DumpToTextRaw()}");
+            Log.Debug($"Showing MessageBox, exception: {config.Exception}, config: {config.DumpToTextRaw()}");
 
             Window owner = null;
             var appWindow = Application.Current.MainWindow;
@@ -108,7 +65,7 @@ namespace PoeShared.UI
                 owner = appWindow;
             }
 
-            var content = exception.Message.ToString();
+            var content = config.Exception.Message;
 
             if (owner != null)
             {
@@ -122,7 +79,7 @@ namespace PoeShared.UI
             else
             {
                 System.Windows.MessageBox.Show(
-                    exception.Message, 
+                    config.Exception.Message, 
                     config.Title, 
                     MessageBoxButton.OK,
                     MessageBoxImage.Error,
@@ -131,46 +88,61 @@ namespace PoeShared.UI
             }
         }
 
-        private void ShowExceptionViewer(ExceptionDialogConfig config, Exception exception)
+        private void ShowExceptionViewer(ExceptionDialogConfig config)
         {
-            Log.Debug($"Showing custom ExceptionViewer, exception: {exception}, config: {config.DumpToTextRaw()}");
-
-            var windowAnchors = new CompositeDisposable();
-            Window window = null;
             try
             {
-                window = new ExceptionDialogView();
-                var appWindow = Application.Current.MainWindow;
-                if (appWindow != null && appWindow.IsLoaded && appWindow.IsVisible)
+                var appDispatcher = Application.Current?.Dispatcher;
+                if (appDispatcher != null && Dispatcher.CurrentDispatcher != appDispatcher)
                 {
-                    window.WindowStartupLocation = WindowStartupLocation.CenterOwner;
-                    window.Owner = appWindow;
+                    Log.Warn("Exception occurred on non-UI thread, rescheduling to UI");
+                    appDispatcher.BeginInvoke(new Action(() => ShowExceptionViewer(config)), DispatcherPriority.Send);
+                    Log.Debug($"Sent signal to UI thread to report crash related to exception {config.Exception.Message}");
+                    return;
                 }
-                else
-                {
-                    window.WindowStartupLocation = WindowStartupLocation.CenterScreen;
-                }
-            
-                Disposable.Create(
-                        () =>
-                        {
-                            Log.Debug($"Closing ExceptionViewer, value: {exception}");
-                            window.Close();
-                        })
-                    .AddTo(windowAnchors);
-            
-                var closeController = new CloseController(windowAnchors.Dispose);
+                
+                Log.Debug($"Showing custom ExceptionViewer, exception: {config.Exception}, config: {config.DumpToTextRaw()}");
 
-                var dialogViewModel = dialogViewModelFactory.Create(closeController);
-                dialogViewModel.Config = config;
-                dialogViewModel.ExceptionSource = exception;
-                window.DataContext = dialogViewModel;
-                window.ShowDialog();
+                var windowAnchors = new CompositeDisposable();
+                Window window = null;
+                try
+                {
+                    window = new ExceptionDialogView();
+                    var appWindow = Application.Current?.MainWindow;
+                    if (appWindow != null && appWindow.IsLoaded && appWindow.IsVisible)
+                    {
+                        window.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+                        window.Owner = appWindow;
+                    }
+                    else
+                    {
+                        window.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+                    }
+            
+                    Disposable.Create(
+                            () =>
+                            {
+                                Log.Debug($"Closing ExceptionViewer, value: {config.Exception}");
+                                window.Close();
+                            })
+                        .AddTo(windowAnchors);
+            
+                    var closeController = new CloseController(windowAnchors.Dispose);
+
+                    var dialogViewModel = dialogViewModelFactory.Create(closeController);
+                    dialogViewModel.Config = config;
+                    window.DataContext = dialogViewModel;
+                    window.ShowDialog();
+                }
+                catch (Exception)
+                {
+                    window?.Close();
+                    throw;
+                }
             }
             catch (Exception e)
             {
-                window?.Close();
-                throw;
+                Log.HandleException(new ApplicationException("Exception in ExceptionReporter :-(", e));
             }
         }
     }

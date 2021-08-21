@@ -15,35 +15,37 @@ using PoeShared.Native;
 using PoeShared.Prism;
 using PoeShared.Scaffolding; 
 using PoeShared.Logging;
+using PoeShared.Services;
+using PoeShared.Wpf.Scaffolding;
 using ReactiveUI;
+using SevenZip;
 using Unity;
 
 namespace PoeShared.UI
 {
     public abstract class ApplicationBase : Application
     {
-        private readonly CompositeDisposable anchors = new CompositeDisposable();
-        private readonly IUnityContainer container;
         private readonly IAppArguments appArguments;
 
         protected ApplicationBase()
         {
             try
             {
-                container = new UnityContainer();
-                container.AddNewExtensionIfNotExists<Diagnostic>();
-                container.AddNewExtensionIfNotExists<WpfCommonRegistrations>();
-                container.AddNewExtensionIfNotExists<NativeRegistrations>();
-                container.AddNewExtensionIfNotExists<CommonRegistrations>();
+                Container = new UnityContainer();
+                Container.AddNewExtensionIfNotExists<Diagnostic>();
+                Container.AddNewExtensionIfNotExists<WpfCommonRegistrations>();
+                Container.AddNewExtensionIfNotExists<NativeRegistrations>();
+                Container.AddNewExtensionIfNotExists<CommonRegistrations>();
 
                 var arguments = Environment.GetCommandLineArgs();
-                appArguments = container.Resolve<IAppArguments>();
+                appArguments = Container.Resolve<IAppArguments>();
                 if (!appArguments.Parse(arguments))
                 {
                     SharedLog.Instance.InitializeLogging("Startup", appArguments.AppName);
                     throw new ApplicationException($"Failed to parse command line args: {string.Join(" ", arguments)}");
                 }
                 InitializeLogging();
+                InitializeSevenZip();
 
                 Log.Debug($"Arguments: {arguments.DumpToString()}");
                 Log.Debug($"Parsed args: {appArguments.DumpToText()}");
@@ -54,11 +56,17 @@ namespace PoeShared.UI
                 Log.Debug($"Is Elevated: {appArguments.IsElevated}");
                 
                 Log.Debug($"UI Scheduler: {RxApp.MainThreadScheduler}");
-                RxApp.MainThreadScheduler = container.Resolve<IScheduler>(WellKnownSchedulers.UI);
+                RxApp.MainThreadScheduler = Container.Resolve<IScheduler>(WellKnownSchedulers.UI);
                 RxApp.TaskpoolScheduler = TaskPoolScheduler.Default;
                 Current.ShutdownMode = ShutdownMode.OnMainWindowClose;
                 Log.Debug($"New UI Scheduler: {RxApp.MainThreadScheduler}");
                 Log.Debug($"BG Scheduler: {RxApp.TaskpoolScheduler}");
+                
+                Log.Debug("Initializing housekeeping");
+                var cleanupService = Container.Resolve<IFolderCleanerService>();
+                cleanupService.AddDirectory(new DirectoryInfo(Path.Combine(appArguments.AppDataDirectory, "logs"))).AddTo(Anchors);
+                cleanupService.CleanupTimeout = TimeSpan.FromHours(12);
+                cleanupService.FileTimeToLive = TimeSpan.FromDays(14);
                 
                 Log.Debug($"Trying to configure DpiAwareness, OS version: {Environment.OSVersion}");
                 if (UnsafeNative.IsWindows10OrGreater())
@@ -78,40 +86,49 @@ namespace PoeShared.UI
                 {
                     Log.Warn("DpiAwareness is supported only on Windows 10 or greater");
                 }
+                
+                Log.Debug("Configuring process priority");
+                try
+                {
+                    Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.High;
+                }
+                catch (Exception e)
+                {
+                    Log.Warn("Failed to upgrade process priority class", e);
+                }
+                
                 Log.Debug($"Configuring AllowSetForegroundWindow permissions");
                 UnsafeNative.AllowSetForegroundWindow();
+
             }
             catch (Exception ex)
             {
-                ReportCrash(ex);
+                Log.Error("Unhandled application exception", ex);
                 throw;
             }
         }
 
-        public IUnityContainer Container => container;
+        public IUnityContainer Container { get; }
+
+        public CompositeDisposable Anchors { get; } = new();
 
         private static ILog Log => SharedLog.Instance.Log;
 
-        private void CurrentDomainOnUnhandledException(object sender, UnhandledExceptionEventArgs e)
+        private void InitializeSevenZip()
         {
-            ReportCrash(e.ExceptionObject as Exception, "CurrentDomainUnhandledException");
-        }
+            Log.Debug($"Initializing 7z wrapper, {nameof(Environment.Is64BitProcess)}: {Environment.Is64BitProcess}");
+            var sevenZipDllPath = Path.Combine(appArguments.ApplicationDirectory.FullName, Environment.Is64BitProcess ? "x64" : "x86", "7z.dll");
+            Log.Debug($"Setting 7z library path to {sevenZipDllPath}");
+            if (!File.Exists(sevenZipDllPath))
+            {
+                throw new FileNotFoundException("7z library not found", sevenZipDllPath);
+            }
 
-        private void DispatcherOnUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
-        {
-            ReportCrash(e.Exception, "DispatcherUnhandledException");
-        }
-
-        private void TaskSchedulerOnUnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e)
-        {
-            ReportCrash(e.Exception, "TaskSchedulerUnobservedTaskException");
+            SevenZipBase.SetLibraryPath(sevenZipDllPath);
         }
 
         private void InitializeLogging()
         {
-            AppDomain.CurrentDomain.UnhandledException += CurrentDomainOnUnhandledException;
-            Dispatcher.CurrentDispatcher.UnhandledException += DispatcherOnUnhandledException;
-            TaskScheduler.UnobservedTaskException += TaskSchedulerOnUnobservedTaskException;
             RxApp.DefaultExceptionHandler = SharedLog.Instance.Errors;
             if (appArguments.IsDebugMode)
             {
@@ -124,23 +141,15 @@ namespace PoeShared.UI
 
             var logFileConfigPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "log4net.config");
             SharedLog.Instance.LoadLogConfiguration(new FileInfo(logFileConfigPath));
-            SharedLog.Instance.AddTraceAppender().AddTo(anchors);
-            SharedLog.Instance.Errors.SubscribeSafe(
-                ex =>
-                {
-                    if (appArguments.IsDebugMode || Debugger.IsAttached)
-                    {
-                        Debugger.Break();
-                    }
-                    ReportCrash(ex);
-                }, Log.HandleException).AddTo(anchors);
+            SharedLog.Instance.AddTraceAppender().AddTo(Anchors);
+            Container.Resolve<ExceptionReportingService>().AddTo(Anchors);
         }
         
         protected override void OnExit(ExitEventArgs e)
         {
             Log.Debug("Application exit detected");
             base.OnExit(e);
-            anchors.Dispose();
+            Anchors.Dispose();
         }
 
         private void ShowShutdownWarning()
@@ -160,18 +169,6 @@ namespace PoeShared.UI
 
             Log.Warn("Shutting down...");
             Environment.Exit(0);
-        }
-        
-        private void ReportCrash(Exception exception, string developerMessage = "")
-        {
-            Log.Error($"Unhandled application exception({developerMessage})", exception);
-
-            AppDomain.CurrentDomain.UnhandledException -= CurrentDomainOnUnhandledException;
-            TaskScheduler.UnobservedTaskException -= TaskSchedulerOnUnobservedTaskException;
-            Dispatcher.CurrentDispatcher.UnhandledException -= DispatcherOnUnhandledException;
-            
-            var reporter = container.Resolve<IExceptionDialogDisplayer>();
-            reporter.ShowDialogAndTerminate(exception);
         }
     }
 }

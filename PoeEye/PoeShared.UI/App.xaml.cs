@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows;
+using PoeShared.Modularity;
 using PoeShared.Native;
 using PoeShared.Prism;
 using PoeShared.Wpf.Scaffolding;
@@ -16,6 +17,9 @@ namespace PoeShared.UI
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
+            
+            Container
+                .RegisterSingleton<IConfigProvider, ConfigProviderFromFile>();
             
             var window = new MainWindow();
             Container.RegisterOverlayController();

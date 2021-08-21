@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Concurrent;
+using System.IO;
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Subjects;
@@ -56,6 +57,11 @@ namespace PoeShared.Modularity
         {
             loadedConfigs[typeof(TConfig)] = config;
             Save();
+        }
+
+        public void SaveToFile(FileInfo file)
+        {
+            throw new NotSupportedException();
         }
 
         public TConfig GetActualConfig<TConfig>() where TConfig : IPoeEyeConfig, new()

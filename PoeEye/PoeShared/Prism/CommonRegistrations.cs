@@ -16,7 +16,6 @@ namespace PoeShared.Prism
                 .RegisterSingleton<IConfigSerializer, JsonConfigSerializer>()
                 .RegisterSingleton(typeof(IConfigProvider<>), typeof(GenericConfigProvider<>))
                 .RegisterSingleton<IAppArguments, AppArguments>()
-                .RegisterSingleton<IFolderCleanerService, FolderCleanerService>()
                 .RegisterSingleton<IRandomNumberGenerator, RandomNumberGenerator>()
                 .RegisterFactory<IMemoryPool>(x => MemoryPool.Shared, new ContainerControlledLifetimeManager());
 
@@ -24,6 +23,7 @@ namespace PoeShared.Prism
                 .RegisterType(typeof(IFactory<,,,>), typeof(Factory<,,,>))
                 .RegisterType(typeof(IFactory<,,>), typeof(Factory<,,>))
                 .RegisterType(typeof(IFactory<,>), typeof(Factory<,>))
+                .RegisterType<IFolderCleanerService, FolderCleanerService>()
                 .RegisterType<ISharedResourceLatch, SharedResourceLatch>()
                 .RegisterType(typeof(IFactory<>), typeof(Factory<>));
         }

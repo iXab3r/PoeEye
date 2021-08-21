@@ -143,13 +143,20 @@ namespace PoeShared.Modularity
         }
 
         [MethodImpl(MethodImplOptions.Synchronized)]
-        public void Save()
+        public void SaveToFile(FileInfo file)
         {
             var metaConfig = new PoeEyeCombinedConfig();
             loadedConfigsByType.Values.ToList().ForEach(x => metaConfig.Add(x));
             Log.Debug($"Saving all configs, metadata: {metaConfig.DumpToTextRaw()}");
 
-            SaveInternal(metaConfig);
+            SaveInternal(configSerializer, strategies.Items, file.FullName, metaConfig);
+        }
+
+        [MethodImpl(MethodImplOptions.Synchronized)]
+        public void Save()
+        {
+            SaveToFile(new FileInfo(ConfigFilePath));
+            configHasChanged.OnNext(Unit.Default);
         }
 
         [MethodImpl(MethodImplOptions.Synchronized)]
@@ -186,29 +193,33 @@ namespace PoeShared.Modularity
             return (TConfig) config;
         }
 
-        private void SaveInternal(PoeEyeCombinedConfig config)
+        private static void SaveInternal(
+            IConfigSerializer configSerializer,
+            IEnumerable<IConfigProviderStrategy> strategies,
+            string configFilePath, 
+            PoeEyeCombinedConfig config)
         {
             try
             {
-                Log.Debug($"Saving config to file '{ConfigFilePath}'");
+                Log.Debug($"Saving config to file '{configFilePath}'");
                 Log.Debug($"Serializing config data...");
                 var serializedData = configSerializer.Serialize(config);
 
                 Log.Debug($"Successfully serialized config, got {serializedData.Length} chars");
 
-                var directoryPath = Path.GetDirectoryName(ConfigFilePath);
+                var directoryPath = Path.GetDirectoryName(configFilePath);
                 if (directoryPath != null && !Directory.Exists(directoryPath))
                 {
                     Directory.CreateDirectory(directoryPath);
                 }
 
-                var temporaryConfigPath = Path.ChangeExtension(ConfigFilePath, ".new");
-                var backupConfigPath = Path.ChangeExtension(ConfigFilePath, ".bak");
+                var temporaryConfigPath = Path.ChangeExtension(configFilePath, ".new");
+                var backupConfigPath = Path.ChangeExtension(configFilePath, ".bak");
                 if (string.IsNullOrEmpty(temporaryConfigPath) || string.IsNullOrEmpty(backupConfigPath))
                 {
-                    throw new ApplicationException($"Failed to prepare path for a temporary config file, file path: {ConfigFilePath}");
+                    throw new ApplicationException($"Failed to prepare path for a temporary config file, file path: {configFilePath}");
                 }
-                var configFile = new FileInfo(ConfigFilePath);
+                var configFile = new FileInfo(configFilePath);
                 var temporaryFile = new FileInfo(temporaryConfigPath);
                 var backupFile = new FileInfo(backupConfigPath);
 
@@ -222,7 +233,7 @@ namespace PoeShared.Modularity
                 Log.Debug($"Writing configuration({serializedData.Length}) to temporary file '{temporaryFile}'...");
                 File.WriteAllText(temporaryConfigPath, serializedData, Encoding.Unicode);
                 temporaryFile.Refresh();
-                Log.Debug($"Flushing configuration '{temporaryConfigPath}' => '{ConfigFilePath}'");
+                Log.Debug($"Flushing configuration '{temporaryConfigPath}' => '{configFilePath}'");
 
                 if (backupFile.Exists)
                 {
@@ -237,10 +248,9 @@ namespace PoeShared.Modularity
                 }
                 
                 Log.Debug($"Moving temporary config to default {temporaryFile.FullName} => {configFile.FullName}");
-                temporaryFile.MoveTo(ConfigFilePath);
+                temporaryFile.MoveTo(configFilePath);
                 
-                strategies.Items.ForEach(x => x.HandleConfigSave(new FileInfo(ConfigFilePath)));
-                configHasChanged.OnNext(Unit.Default);
+                strategies.ForEach(x => x.HandleConfigSave(new FileInfo(configFilePath)));
             }
             catch (Exception ex)
             {

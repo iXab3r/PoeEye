@@ -38,10 +38,12 @@ namespace PoeShared.UI
             ISelectionAdornerViewModel selectionAdorner,
             IScreenRegionSelectorService regionSelectorService,
             NotificationSandboxViewModel notificationSandbox,
+            ExceptionSandboxViewModel exceptionSandbox,
             IHotkeySequenceEditorViewModel hotkeySequenceEditor)
         {
             this.regionSelectorService = regionSelectorService;
-            NotificationSandbox = notificationSandbox;
+            NotificationSandbox = notificationSandbox.AddTo(Anchors);
+            ExceptionSandbox = exceptionSandbox.AddTo(Anchors);
             SelectionAdorner = selectionAdorner.AddTo(Anchors);
             AudioNotificationSelector = audioNotificationSelector.AddTo(Anchors);
             RandomPeriodSelector = randomPeriodSelector.AddTo(Anchors);
@@ -86,6 +88,7 @@ namespace PoeShared.UI
         }
 
         public NotificationSandboxViewModel NotificationSandbox { get; }
+        public ExceptionSandboxViewModel ExceptionSandbox { get; }
 
         public ICommand StartSelectionCommand { get; }
 

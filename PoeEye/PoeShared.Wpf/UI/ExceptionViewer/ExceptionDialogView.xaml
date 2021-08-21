@@ -1,57 +1,131 @@
 <mah:MetroWindow x:Class="PoeShared.UI.ExceptionDialogView"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
-        xmlns:eye="clr-namespace:PoeShared.UI"
-        xmlns:wpf="clr-namespace:PoeShared.Scaffolding.WPF"
-        mc:Ignorable="d"
-        TextElement.FontWeight="Regular"
-        TextOptions.TextFormattingMode="Ideal"
-        TextOptions.TextRenderingMode="Auto"
-        ResizeMode="CanResize"
-        WindowStyle="ToolWindow"
-        ShowActivated="True"
-        WindowStartupLocation="CenterOwner"
-        WindowState="Normal"
-        SizeToContent="WidthAndHeight"
-        MaxHeight="600"
-        MaxWidth="800"
-        MinWidth="400"
-        MinHeight="200"
-        Title="{Binding Title}" Width="600" d:DataContext="{d:DesignInstance eye:ExceptionDialogViewModel}">
-     <Window.Resources>
+                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                 xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+                 xmlns:eye="clr-namespace:PoeShared.UI"
+                 xmlns:wpf="clr-namespace:PoeShared.Scaffolding.WPF"
+                 xmlns:st="http://schemas.spicytaco.io/"
+                 xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+                 xmlns:gif="http://wpfanimatedgif.codeplex.com"
+                 mc:Ignorable="d"
+                 TextElement.FontWeight="Regular"
+                 TextOptions.TextFormattingMode="Ideal"
+                 TextOptions.TextRenderingMode="Auto"
+                 ResizeMode="CanResize"
+                 WindowStyle="ToolWindow"
+                 ShowActivated="True"
+                 WindowStartupLocation="CenterOwner"
+                 WindowState="Normal"
+                 SizeToContent="Manual"
+                 MinWidth="400"
+                 MinHeight="200"
+                 Width="700"
+                 Height="400"
+                 Title="{Binding Title}" d:DataContext="{d:DesignInstance eye:ExceptionDialogViewModel}">
+    <Window.Resources>
         <eye:SharedResourceDictionary>
             <eye:SharedResourceDictionary.MergedDictionaries>
                 <eye:SharedResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
                 <eye:SharedResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/styles/themes/dark.blue.xaml" />
                 <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Generic.shared.xaml" />
             </eye:SharedResourceDictionary.MergedDictionaries>
+    
+            <DataTemplate x:Key="ExceptionDialogItemPreview" DataType="{x:Type eye:ExceptionDialogSelectableItem}">
+                <Grid>
+                    <ScrollViewer CanContentScroll="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"
+                                  x:Name="SelectedItemDescription">
+                        <TextBox
+                            Height="NaN"
+                            VerticalContentAlignment="Stretch"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Stretch"
+                            IsReadOnly="True"
+                            IsReadOnlyCaretVisible="True"
+                            Text="{Binding Item.Description, Mode=OneWay}" />
+                    </ScrollViewer>
+                    
+                    <Image Margin="1" MinWidth="128" MinHeight="128" x:Name="SelectedItemImage" />
+                </Grid>
+                <DataTemplate.Triggers>
+                    <DataTrigger Binding="{Binding IsImage}" Value="True">
+                        <Setter TargetName="SelectedItemImage" Property="Source" Value="{Binding Item.Attachment.FullName}"></Setter>
+                        <Setter TargetName="SelectedItemDescription" Property="Visibility" Value="Collapsed"/>
+                        <Setter TargetName="SelectedItemImage" Property="Visibility" Value="Visible"/>
+                    </DataTrigger>
+                </DataTemplate.Triggers>
+            </DataTemplate>
         </eye:SharedResourceDictionary>
     </Window.Resources>
-    
+
     <Grid Margin="5">
         <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" MinHeight="55" />
+            <RowDefinition Height="*" MinHeight="120" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <ScrollViewer Grid.Row="0" CanContentScroll="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
-            <TextBox 
-                     wpf:FocusHelper.IsFocused="True"
+        <st:StackPanel Orientation="Horizontal">
+            <TextBlock Text="Comment on what were you doing when the problem occurred"/>
+            <TextBlock st:StackPanel.Fill="Fill"
+                       Text="{Binding Config.Timestamp}"
+                       HorizontalAlignment="Right" />
+        </st:StackPanel>
+
+        <Border Grid.Row="1" BorderBrush="{StaticResource AccentBrush}" BorderThickness="1" Margin="0,5">
+            <TextBox wpf:FocusHelper.IsFocused="True"
                      Height="NaN"
+                     AcceptsReturn="True"
                      HorizontalAlignment="Stretch"
                      VerticalAlignment="Stretch"
-                     IsReadOnly="True"
-                     IsReadOnlyCaretVisible="True"
-                     Text="{Binding ExceptionText, Mode=OneWay}" />
-        </ScrollViewer>
+                     VerticalContentAlignment="Stretch"
+                     Text="{Binding Comment, Mode=TwoWay}" />
+        </Border>
 
-        <DockPanel Grid.Row="1" DockPanel.Dock="Bottom" Margin="5">
-            <Button DockPanel.Dock="Right"
-                     Command="{Binding CloseCommand}" 
-                     Content="Close" />
-        </DockPanel>
+        <Grid Grid.Row="2" IsEnabled="{Binding PrepareReportCommand.IsBusy, Converter={StaticResource NotConverter}}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" MinWidth="100" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <ListBox Grid.Column="0" ItemsSource="{Binding Attachments}"
+                     SelectedItem="{Binding SelectedItem}"
+                     Grid.IsSharedSizeScope="True">
+                <ListBox.ItemTemplate>
+                    <DataTemplate DataType="{x:Type eye:ExceptionDialogSelectableItem}">
+                        <Grid Background="Transparent" ToolTip="{Binding Item.Attachment.Length, Converter={StaticResource DataSizeToHumanReadableStringConverter}}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" SharedSizeGroup="FileName" />
+                            </Grid.ColumnDefinitions>
+
+                            <CheckBox Grid.Column="0" IsChecked="{Binding IsChecked}" />
+                            <TextBlock Grid.Column="1" Text="{Binding Item.Attachment.Name}" />
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
+            <Border Grid.Column="1"  BorderBrush="{StaticResource AccentBrush}" BorderThickness="1">
+                <eye:CachedContentControl Content="{Binding SelectedItem}"
+                                          ContentTemplate="{StaticResource ExceptionDialogItemPreview}"></eye:CachedContentControl>
+            </Border>
+        </Grid>
+        
+        <st:StackPanel Grid.Row="3"  Orientation="Horizontal" MarginBetweenChildren="5" Margin="5">
+            <ProgressBar Style="{StaticResource MaterialDesignCircularProgressBar}"
+                         Value="0"
+                         st:StackPanel.Fill="Fill"
+                         Visibility="{Binding PrepareReportCommand.IsBusy, Converter={StaticResource TrueToVisibleFalseToHiddenConverter}}"
+                         HorizontalAlignment="Left" VerticalAlignment="Center"
+                         IsIndeterminate="True" />
+            <Button 
+                    Command="{Binding PrepareReportCommand}"
+                    Content="Save Report..." />
+            <Button  Command="{Binding CloseCommand}"
+                           Content="Close" />
+        </st:StackPanel>
     </Grid>
 </mah:MetroWindow>

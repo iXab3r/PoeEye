@@ -1,0 +1,16 @@
+﻿<eye:SharedResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                              xmlns:eye="http://coderush.net/poeeye/"
+                              xmlns:ui="clr-namespace:PoeShared.UI"
+                              xmlns:st="http://schemas.spicytaco.io/">
+    <DataTemplate DataType="{x:Type ui:ExceptionSandboxViewModel}">
+        <st:AutoGrid Columns="140, *">
+            <TextBlock Text="Throw inside command"/>
+            <eye:ButtonEx Command="{Binding ThrowInsideCommand}" Content="Throw"/>
+            <TextBlock Text="Throw on UI scheduler"/>
+            <eye:ButtonEx Command="{Binding ThrowOnUiSchedulerCommand}" Content="Throw"/>
+            <TextBlock Text="Throw on BG scheduler"/>
+            <eye:ButtonEx Command="{Binding ThrowOnBgSchedulerCommand}" Content="Throw"/>
+        </st:AutoGrid>
+    </DataTemplate>
+</eye:SharedResourceDictionary>

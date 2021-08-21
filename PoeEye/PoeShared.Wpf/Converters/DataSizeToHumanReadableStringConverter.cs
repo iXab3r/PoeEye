@@ -20,7 +20,7 @@ namespace PoeShared.Converters
                 (> Terabyte) => $"{valueToConvert / Terabyte:F3} TB",
                 (> Gigabyte) => $"{valueToConvert / Gigabyte:F2} GB",
                 (> Megabyte) => $"{valueToConvert / Megabyte:F1} MB",
-                (> Kilobyte) => $"{valueToConvert / Kilobyte} KB",
+                (> Kilobyte) => $"{valueToConvert / Kilobyte:F0} KB",
                 _ =>  $"{valueToConvert}B"
             };
         }

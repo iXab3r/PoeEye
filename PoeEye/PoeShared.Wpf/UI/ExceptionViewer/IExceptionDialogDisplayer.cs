@@ -5,8 +5,6 @@ namespace PoeShared.UI
 {
     public interface IExceptionDialogDisplayer
     {
-        void ShowDialog(ExceptionDialogConfig config, [NotNull] Exception exception);
-
-        void ShowDialogAndTerminate([NotNull] Exception exception);
+        void ShowDialog(ExceptionDialogConfig config);
     }
 }

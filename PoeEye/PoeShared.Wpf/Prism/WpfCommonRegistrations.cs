@@ -47,6 +47,7 @@ namespace PoeShared.Prism
             Container
                 .RegisterSingleton<PoeEyeModulesRegistrator>(typeof(IPoeEyeModulesRegistrator), typeof(IPoeEyeModulesEnumerator))
                 .RegisterSingleton<IExceptionDialogDisplayer, ExceptionDialogDisplayer>()
+                .RegisterSingleton<IExceptionReportingService, ExceptionReportingService>()
                 .RegisterSingleton<IUserInputFilterConfigurator, UserInputFilterConfigurator>()
                 .RegisterSingleton<IApplicationAccessor, ApplicationAccessor>()
                 .RegisterSingleton<INotificationsService, NotificationsService>()

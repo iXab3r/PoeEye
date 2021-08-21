@@ -36,10 +36,12 @@
     <PackageReference Include="Prism.Wpf" Version="7.2.0.1367" />
     <PackageReference Include="ReactiveUI" Version="10.4.1" />
     <PackageReference Include="ReactiveUI.Validation" Version="1.4.1" />
+    <PackageReference Include="SevenZipSharp.Interop" Version="19.0.1" />
     <PackageReference Include="SpicyTaco.AutoGrid" Version="1.2.29"><NoWarn>NU1701</NoWarn></PackageReference>
     <PackageReference Include="Splat" Version="9.1.1" />
     <PackageReference Include="Splat.Drawing" Version="9.1.1" />
     <PackageReference Include="StartupHelper" Version="1.0.2.0"><NoWarn>NU1701</NoWarn></PackageReference>
+    <PackageReference Include="Syroot.Windows.IO.KnownFolders" Version="1.2.3" />
     <PackageReference Include="System.Drawing.Primitives" Version="4.3.0" />
     <PackageReference Include="System.Reactive.Windows.Threading" Version="5.0.0-preview.16" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
