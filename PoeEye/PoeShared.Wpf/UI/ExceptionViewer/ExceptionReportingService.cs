@@ -149,6 +149,8 @@ namespace PoeShared.UI
 
         private void TryToCopyLogs(DirectoryInfo outputDirectory, IList<ExceptionReportItem> reportItems)
         {
+            const int logsToInclude = 5;
+            const int logsToAttach = 2;
             try
             {
                 Log.Debug("Preparing log files for crash report...");
@@ -156,11 +158,12 @@ namespace PoeShared.UI
                 var logFilesToInclude = new DirectoryInfo(logFilesRoot)
                     .GetFiles("*.log", SearchOption.AllDirectories)
                     .OrderByDescending(x => x.LastWriteTime)
-                    .Take(2)
+                    .Take(logsToInclude)
                     .ToArray();
 
-                foreach (var logFile in logFilesToInclude)
+                for (var idx = 0; idx < logFilesToInclude.Length; idx++)
                 {
+                    var logFile = logFilesToInclude[idx];
                     var logFileName = logFile.FullName.Substring(logFilesRoot.Length).TrimStart('\\', '/');
                     var destinationFileName = Path.Combine(outputDirectory.FullName, logFileName);
                     try
@@ -173,12 +176,14 @@ namespace PoeShared.UI
                             Log.Warn($"Failed to get directory path from destination file name {destinationFileName}");
                             continue;
                         }
+
                         Directory.CreateDirectory(destinationDirectory);
                         logFile.CopyTo(destinationFileName, true);
-                        reportItems.Add(new ExceptionReportItem()
+                        reportItems.Add(new ExceptionReportItem
                         {
                             Description = $"Created: {logFile.CreationTime}\nLast Modified: {logFile.LastWriteTime}",
-                            Attachment = new FileInfo(destinationFileName)
+                            Attachment = new FileInfo(destinationFileName),
+                            Attached = idx < logsToAttach
                         });
                     }
                     catch (Exception e)
@@ -231,7 +236,7 @@ namespace PoeShared.UI
                 {
                     Description = $"Desktop screenshot",
                     Attachment = new FileInfo(destinationFileName),
-                    IncludeByDefault = false
+                    Attached = false
                 });
             }
             catch (Exception e)

@@ -11,7 +11,7 @@ namespace PoeShared.UI
         public ExceptionDialogSelectableItem(ExceptionReportItem item)
         {
             Item = item;
-            IsChecked = item.IncludeByDefault;
+            IsChecked = item.Attached;
         }
 
         public ExceptionReportItem Item { get; }

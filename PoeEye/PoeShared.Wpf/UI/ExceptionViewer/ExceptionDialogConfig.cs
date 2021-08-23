@@ -21,7 +21,7 @@ namespace PoeShared.UI
     {
         public string Description { get; init; }
 
-        public bool IncludeByDefault { get; init; } = true;
+        public bool Attached { get; init; } = true;
         
         public FileInfo Attachment { get; init; }
     }
