@@ -13,6 +13,8 @@ namespace PoeShared.Converters
     [SupportedOSPlatform("windows")]
     public sealed class SafeDataConverter : JsonConverter
     {
+        private static readonly IFluentLog Log = typeof(SafeDataConverter).PrepareLogger();
+
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
             if (!(value is SecureString secureString))
@@ -29,11 +31,18 @@ namespace PoeShared.Converters
         {
             var deserializedBytes = serializer.Deserialize<byte[]>(reader);
 
-            if (deserializedBytes != null)
+            try
             {
-                var decodedBytes = ProtectedData.Unprotect(deserializedBytes, null, DataProtectionScope.LocalMachine);
-                var resultString = Encoding.Default.GetString(decodedBytes);
-                return resultString.ToSecuredString();
+                if (deserializedBytes != null)
+                {
+                    var decodedBytes = ProtectedData.Unprotect(deserializedBytes, null, DataProtectionScope.LocalMachine);
+                    var resultString = Encoding.Default.GetString(decodedBytes);
+                    return resultString.ToSecuredString();
+                }
+            }
+            catch (CryptographicException e)
+            {
+                Log.Warn($"Failed to decrypt value {existingValue} into type {objectType}", e);
             }
 
             return null;
