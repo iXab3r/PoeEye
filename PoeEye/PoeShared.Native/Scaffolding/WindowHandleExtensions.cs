@@ -22,18 +22,26 @@ namespace PoeShared.Scaffolding
             {
                 return false;
             }
+
+            if (excludeMinimized)
+            {
+                if (!windowHandle.IsVisible)
+                {
+                    return false;
+                }
+            
+                if (windowHandle.IsIconic)
+                {
+                    return false;
+                }
+            
+                if (windowHandle.ClientBounds.Width <= 0 || windowHandle.ClientBounds.Height <= 0)
+                {
+                    return false;
+                }
+            }
             
             if (User32.GetAncestor(windowHandle.Handle, User32.GetAncestorFlags.GA_ROOT) != windowHandle.Handle)
-            {
-                return false;
-            }
-            
-            if (!windowHandle.IsVisible || excludeMinimized && windowHandle.IsIconic)
-            {
-                return false;
-            }
-            
-            if (excludeMinimized && windowHandle.ClientBounds.Width <= 0 || windowHandle.ClientBounds.Height <= 0)
             {
                 return false;
             }
