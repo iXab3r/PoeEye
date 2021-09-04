@@ -9,7 +9,7 @@ namespace PoeShared.UI
     public enum HotkeyMode
     {
         [EnumMember(Value = nameof(Click))]
-        [Description("Click/Toggle")]
+        [Description("Toggle")]
         Click,
         [EnumMember(Value = nameof(Hold))]
         [Description("Hold")]

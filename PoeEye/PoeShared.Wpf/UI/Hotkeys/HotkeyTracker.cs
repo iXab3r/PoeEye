@@ -34,8 +34,9 @@ namespace PoeShared.UI
 
         private readonly SourceCache<HotkeyGesture, HotkeyGesture> hotkeysSource = new(x => x);
         private readonly ISet<HotkeyGesture> pressedKeys = new HashSet<HotkeyGesture>();
-        private readonly IUserInputFilterConfigurator userInputFilterConfigurator;
         private readonly IScheduler uiScheduler;
+        private readonly IUserInputFilterConfigurator userInputFilterConfigurator;
+        private bool canSuppressHotkey;
         private bool handleApplicationKeys;
         private bool hasModifiers;
 
@@ -48,10 +49,11 @@ namespace PoeShared.UI
 
         static HotkeyTracker()
         {
+            Binder.Bind(x => x.Hotkeys.All(CanBeSuppressed)).To(x => x.CanSuppressHotkey);
             Binder.Bind(x => x.Hotkeys.Any(x => x.ModifierKeys != ModifierKeys.None)).To(x => x.HasModifiers);
             Binder.BindIf(x => x.HasModifiers, x => false).To(x => x.IgnoreModifiers);
             Binder
-                .BindIf(x => x.Hotkeys.Any(x => x.IsMouse && (x.MouseButton == MouseButton.Left || x.MouseButton == MouseButton.Right)), x => false)
+                .BindIf(x => x.CanSuppressHotkey == false, x => false)
                 .To((x,v) => x.SuppressKey = v, x => x.uiScheduler);
         }
 
@@ -292,6 +294,12 @@ namespace PoeShared.UI
             set => RaiseAndSetIfChanged(ref suppressKey, value);
         }
 
+        public bool CanSuppressHotkey
+        {
+            get => canSuppressHotkey;
+            private set => RaiseAndSetIfChanged(ref canSuppressHotkey, value);
+        }
+
         public bool HandleApplicationKeys
         {
             get => handleApplicationKeys;
@@ -323,6 +331,11 @@ namespace PoeShared.UI
             IsActive = false;
         }
 
+        private static bool CanBeSuppressed(HotkeyGesture hotkey)
+        {
+            return hotkey.IsKeyboard || hotkey.IsMouseButton && hotkey.MouseButton != MouseButton.Left && hotkey.MouseButton != MouseButton.Right;
+        }
+
         private bool IsConfiguredHotkey(HotkeyData data)
         {
             if (data.Hotkey == null || data.Hotkey.IsEmpty)
@@ -343,7 +356,7 @@ namespace PoeShared.UI
                 {
                     pressedKeys.Add(data.Hotkey);
                 }
-                else if (!pressedKeys.Remove(data.Hotkey))
+                else if (!data.Hotkey.IsMouseWheel && !pressedKeys.Remove(data.Hotkey))
                 {
                     return false;
                 }

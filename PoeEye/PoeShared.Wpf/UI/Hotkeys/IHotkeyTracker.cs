@@ -17,6 +17,8 @@ namespace PoeShared.UI
         HotkeyMode HotkeyMode { get; set; }
         
         bool SuppressKey { get; set; }
+        
+        bool CanSuppressHotkey { get; }
 
         bool IgnoreModifiers { get; set; }
         
