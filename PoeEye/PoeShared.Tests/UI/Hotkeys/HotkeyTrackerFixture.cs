@@ -404,6 +404,26 @@ namespace PoeShared.Tests.UI.Hotkeys
             instance.IsActive.ShouldBe(true);
         }
         
+        [TestCase(true, HotkeyMode.Hold, false)]
+        [TestCase(false, HotkeyMode.Hold, false)]
+        [TestCase(false, HotkeyMode.Click, false)]
+        [TestCase(true, HotkeyMode.Click, true)]
+        public void ShouldProcessKeyIfReleasedWithModifierWithIgnoreModifiersWhenModeIsHold(bool ignoreModifiers, HotkeyMode mode, bool expected)
+        {
+            //Given
+            var instance = CreateInstance();
+            instance.HotkeyMode = mode;
+            instance.IgnoreModifiers = ignoreModifiers;
+            instance.Add(new HotkeyGesture(Key.A));
+
+            //When
+            whenKeyDown.OnNext(new KeyEventArgs(Keys.A));
+            whenKeyUp.OnNext(new KeyEventArgs(Keys.A | Keys.Shift));
+
+            //Then
+            instance.IsActive.ShouldBe(expected);
+        }
+        
         [Test]
         public void ShouldResetSuppressKeyWhenMouseHotkeyIsAdded()
         {

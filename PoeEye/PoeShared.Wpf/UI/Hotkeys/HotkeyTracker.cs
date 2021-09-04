@@ -346,26 +346,52 @@ namespace PoeShared.UI
             
             if (userInputFilterConfigurator.IsInWhitelist(data.Hotkey))
             {
+                Log.Debug($"Pressed hotkey {data} is in whitelist, skipping it");
                 return false;
             }
 
-            var isExactMatch = hotkeysSource.Items.Any(x => HotkeysAreEqual(x, data.Hotkey, ignoreModifiers));
-            if (isExactMatch)
+            var isMatch = hotkeysSource.Items.Any(x => HotkeysAreEqual(x, data.Hotkey, ignoreModifiers || hotkeyMode == HotkeyMode.Hold && !data.KeyDown));
+            if (isMatch)
             {
                 if (data.KeyDown)
                 {
+                    Log.Debug($"Adding hotkey {data.Hotkey} to pressed keys");
                     pressedKeys.Add(data.Hotkey);
                 }
-                else if (!data.Hotkey.IsMouseWheel && !pressedKeys.Remove(data.Hotkey))
+                else
                 {
-                    return false;
+                    var isPressed = pressedKeys.FirstOrDefault(x => HotkeysAreEqual(x, data.Hotkey, true));
+                    if (isPressed == null && !data.Hotkey.IsMouseWheel)
+                    {
+                        Log.Debug($"Released hotkey {data.Hotkey} is not in pressed keys or is not a mouse wheel event list skipping it");
+                        return false;
+                    }
+                    else
+                    {
+                        Log.Debug($"Removing released hotkey {data.Hotkey} from pressed keys");
+                        pressedKeys.Remove(isPressed);
+                    }
                 }
 
+                Log.Debug($"Processing matching hotkey {data}");
                 return true;
             }
-
-            if (data.KeyDown || data.Hotkey.IsMouse || pressedKeys.Count == 0)
+            
+            if (data.KeyDown)
             {
+                Log.Debug($"Skipping key down event for {data} - not a match");
+                return false;
+            }
+            
+            if (data.Hotkey.IsMouse)
+            {
+                Log.Debug($"Pressed hotkey {data} is mouse key, skipping it");
+                return false;
+            }
+
+            if (pressedKeys.Count == 0)
+            {
+                Log.Debug($"Pressed hotkeys list is empty, skipping hotkey {data}");
                 return false;
             }
 
@@ -373,6 +399,7 @@ namespace PoeShared.UI
             if (keyAsModifier == ModifierKeys.None)
             {
                 // released key is not Modifier - not interested
+                Log.Debug($"Pressed hotkey {data} is not a modifier, skipping it");
                 return false;
             }
 
@@ -380,6 +407,7 @@ namespace PoeShared.UI
             if (pressed.Length == 0)
             {
                 // released key was NOT detected before release
+                Log.Debug($"There are no pressed keys with modifier {keyAsModifier}");
                 return false;
             }
 
