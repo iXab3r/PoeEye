@@ -2,26 +2,31 @@
 // Copyright (c) 2015 George Mamaladze
 // See license.txt or https://mit-license.org/
 
-using System;
+using System.Reactive.Disposables;
+using PoeShared.Logging;
+using PoeShared.Scaffolding;
 using WindowsHook.WinApi;
 
 namespace WindowsHook.Implementation
 {
-    internal abstract class BaseListener : IDisposable
+    internal abstract class BaseListener : DisposableReactiveObject
     {
+        private static readonly IFluentLog SharedLog = typeof(BaseListener).PrepareLogger();
+
         protected BaseListener(Subscribe subscribe)
         {
-            Handle = subscribe(CallbackHook);
+            Handle = subscribe(CallbackHook).AddTo(Anchors);
+            Log = SharedLog.WithSuffix(ToString);
+            Disposable.Create(() => Log.Debug("Disposing listener...")).AddTo(Anchors);
+            Log.Debug($"Created new listener of type {GetType()}");
+            Disposable.Create(() => Log.Debug("Disposed listener")).AddTo(Anchors);
         }
 
-        protected HookResult Handle { get; set; }
+        private HookResult Handle { get; }
 
         protected bool IsReady { get; init; }
-
-        public void Dispose()
-        {
-            Handle.Dispose();
-        }
+        
+        protected IFluentLog Log { get; }
 
         private bool CallbackHook(CallbackData data)
         {
@@ -34,5 +39,10 @@ namespace WindowsHook.Implementation
         }
 
         protected abstract bool Callback(CallbackData data);
+
+        public override string ToString()
+        {
+            return $"Listener Hook: {Handle}, IsReady: {IsReady}, ";
+        }
     }
 }

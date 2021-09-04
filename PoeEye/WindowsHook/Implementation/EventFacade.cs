@@ -3,20 +3,46 @@
 // See license.txt or https://mit-license.org/
 
 using System;
+using System.Reactive.Disposables;
+using System.Text;
 using System.Windows.Forms;
+using PoeShared.Logging;
+using PoeShared.Scaffolding;
 
 namespace WindowsHook.Implementation
 {
-    internal abstract class EventFacade : IKeyboardMouseEvents
+    internal abstract class EventFacade : DisposableReactiveObject, IKeyboardMouseEvents
     {
+        private static readonly IFluentLog SharedLog = typeof(EventFacade).PrepareLogger();
+
         private readonly Lazy<KeyListener> keyListener;
         private readonly Lazy<MouseListener> mouseListener;
 
         protected EventFacade()
         {
-            keyListener = new Lazy<KeyListener>(CreateKeyListener);
-            mouseListener = new Lazy<MouseListener>(CreateMouseListener);
+            Log = SharedLog.WithSuffix(ToString);
+            keyListener = new Lazy<KeyListener>(() =>
+            {
+                if (Anchors.IsDisposed)
+                {
+                    throw new ObjectDisposedException("Facade");
+                }
+
+                return CreateKeyListener().AddTo(Anchors);
+            });
+            mouseListener = new Lazy<MouseListener>(() =>
+            {
+                if (Anchors.IsDisposed)
+                {
+                    throw new ObjectDisposedException("Facade");
+                }
+                return CreateMouseListener().AddTo(Anchors);
+            });
+            Log.Debug("Created event facade");
+            Disposable.Create(() => Log.Debug("Disposed event facade")).AddTo(Anchors);
         }
+        
+        protected IFluentLog Log { get; }
 
         public event KeyEventHandler KeyDown
         {
@@ -120,20 +146,29 @@ namespace WindowsHook.Implementation
             remove => mouseListener.Value.MouseDragFinishedExt -= value;
         }
 
-        public void Dispose()
+        protected abstract MouseListener CreateMouseListener();
+        protected abstract KeyListener CreateKeyListener();
+
+        public override string ToString()
         {
+            var result = new StringBuilder("Facade");
+
+            if (Anchors.IsDisposed)
+            {
+                result.Append(" Disposed");
+            }
+
             if (mouseListener.IsValueCreated)
             {
-                mouseListener.Value.Dispose();
+                result.Append($" Mouse: {mouseListener.Value}");
             }
 
             if (keyListener.IsValueCreated)
             {
-                keyListener.Value.Dispose();
+                result.Append($" Keyboard: {keyListener.Value}");
             }
-        }
 
-        protected abstract MouseListener CreateMouseListener();
-        protected abstract KeyListener CreateKeyListener();
+            return result.ToString();
+        }
     }
 }

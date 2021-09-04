@@ -15,5 +15,10 @@ namespace WindowsHook.Implementation
         {
             return new GlobalKeyListener();
         }
+
+        public override string ToString()
+        {
+            return $"Global {base.ToString()}";
+        }
     }
 }

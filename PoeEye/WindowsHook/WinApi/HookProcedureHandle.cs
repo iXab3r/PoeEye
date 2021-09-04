@@ -25,6 +25,7 @@ namespace WindowsHook.WinApi
         public HookProcedureHandle()
             : base(true)
         {
+            Log.Debug("Creating hook handle");
         }
         
         protected override bool ReleaseHandle()

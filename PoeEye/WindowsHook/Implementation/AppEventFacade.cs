@@ -15,5 +15,10 @@ namespace WindowsHook.Implementation
         {
             return new AppKeyListener();
         }
+        
+        public override string ToString()
+        {
+            return $"App {base.ToString()}";
+        }
     }
 }

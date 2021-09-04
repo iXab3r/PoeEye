@@ -5,6 +5,7 @@
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Reactive.Disposables;
 using System.Runtime.InteropServices;
 using System.Threading;
 using PoeShared.Logging;
@@ -35,6 +36,7 @@ namespace WindowsHook.WinApi
         {
             Log = SharedLog.WithSuffix(ToString);
 
+            Disposable.Create(() => Log.Debug("Disposing hook")).AddTo(Anchors);
             HookType = hookType;
             Callback = callback;
             NativeThreadId = ThreadNativeMethods.GetCurrentThreadId();
@@ -55,7 +57,22 @@ namespace WindowsHook.WinApi
                 (int)hookType,
                 hookProcedure,
                 baseAddress,
-                baseAddress == IntPtr.Zero ? NativeThreadId : 0).AddTo(Anchors);
+                baseAddress == IntPtr.Zero ? NativeThreadId : 0);
+            Disposable.Create(() =>
+            {
+                Log.Debug("Unhooking...");
+                var currentThreadId = ThreadNativeMethods.GetCurrentThreadId();
+                var currentManagedThreadId = $"{Thread.CurrentThread.ManagedThreadId}-{Thread.CurrentThread.Name}";
+                if (currentThreadId != NativeThreadId)
+                {
+                    throw new InvalidOperationException($"Hook is disposed not on the same thread it was created on, initial: {NativeThreadId} ({ManagedThreadId}), current: {currentThreadId} ({currentManagedThreadId})");
+                }
+                Handle.Dispose();
+                Log.Debug("Unhooked");
+            }).AddTo(Anchors);
+            
+            
+            Disposable.Create(() => Log.Debug("Disposed hook")).AddTo(Anchors);
 
             if (!Handle.IsInvalid)
             {
@@ -83,10 +100,10 @@ namespace WindowsHook.WinApi
 
         private IntPtr HandleHookCallback(int ncode, IntPtr wparam, IntPtr lparam)
         {
-            return HandleHook(ncode, wparam, lparam, Callback);
+            return HandleHook(ncode, wparam, lparam, this);
         }
 
-        private static IntPtr HandleHook(int nCode, IntPtr wParam, IntPtr lParam, Callback callback)
+        private static IntPtr HandleHook(int nCode, IntPtr wParam, IntPtr lParam, HookResult owner)
         {
             var passThrough = nCode != 0;
             if (passThrough)
@@ -95,14 +112,16 @@ namespace WindowsHook.WinApi
             }
 
             var callbackData = new CallbackData(wParam, lParam);
-            var continueProcessing = callback(callbackData);
+            
+            var continueProcessing = owner.Callback(callbackData);
 
             if (!continueProcessing)
             {
                 return new IntPtr(-1);
             }
 
-            return CallNextHookEx(nCode, wParam, lParam);
+            var lastHookResult = CallNextHookEx(nCode, wParam, lParam);
+            return lastHookResult;
         }
 
         private static IntPtr CallNextHookEx(int nCode, IntPtr wParam, IntPtr lParam)
@@ -112,7 +131,7 @@ namespace WindowsHook.WinApi
 
         public override string ToString()
         {
-            return $"HookResult#{HookId}({HookType}) @ thread {NativeThreadId}(managed {ManagedThreadId})";
+            return $"HookResult#{HookId}({HookType}){(Anchors.IsDisposed ? " Disposed" : string.Empty)} @ thread {NativeThreadId}(managed {ManagedThreadId})";
         }
     }
 }

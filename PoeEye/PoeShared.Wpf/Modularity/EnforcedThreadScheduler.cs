@@ -2,7 +2,6 @@
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Threading;
-using log4net;
 using PoeShared.Logging;
 using PoeShared.Scaffolding;
 
@@ -14,13 +13,10 @@ namespace PoeShared.Modularity
 
         private readonly EventLoopScheduler threadScheduler;
         private Thread schedulerThread;
-        
+
         public EnforcedThreadScheduler(string name)
         {
-            if (name == null)
-            {
-                throw new ArgumentNullException(nameof(name));
-            }
+            Name = name ?? throw new ArgumentNullException(nameof(name));
 
             Log.Info($"Initializing new scheduler {name}");
             threadScheduler = new EventLoopScheduler(start =>
@@ -43,7 +39,11 @@ namespace PoeShared.Modularity
             });
         }
 
+        public string Name { get; }
+
         public bool IsOnSchedulerThread => Thread.CurrentThread == schedulerThread;
+
+        public DateTimeOffset Now => threadScheduler.Now;
 
         public IDisposable Schedule<TState>(TState state, Func<IScheduler, TState, IDisposable> action)
         {
@@ -77,6 +77,9 @@ namespace PoeShared.Modularity
             return threadScheduler.Schedule(state, dueTime, action);
         }
 
-        public DateTimeOffset Now => threadScheduler.Now;
+        public override string ToString()
+        {
+            return $"EnforcedThreadScheduler {Name}({(schedulerThread == null ? "No thread yet" : $"with thread {schedulerThread.Name} (Id #{schedulerThread.ManagedThreadId})")})";
+        }
     }
 }
