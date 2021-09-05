@@ -1,4 +1,4 @@
-<mah:MetroWindow x:Class="PoeShared.UI.ExceptionDialogView"
+<Window x:Class="PoeShared.UI.ExceptionDialogView"
                  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -13,8 +13,9 @@
                  TextElement.FontWeight="Regular"
                  TextOptions.TextFormattingMode="Ideal"
                  TextOptions.TextRenderingMode="Auto"
+                 Foreground="White"
                  ResizeMode="CanResize"
-                 WindowStyle="ToolWindow"
+                 WindowStyle="SingleBorderWindow"
                  ShowActivated="True"
                  WindowStartupLocation="CenterOwner"
                  WindowState="Normal"
@@ -24,11 +25,12 @@
                  Width="700"
                  Height="400"
                  Title="{Binding Title}" d:DataContext="{d:DesignInstance eye:ExceptionDialogViewModel}">
+    <Window.Icon>
+        <BitmapImage UriSource="pack://application:,,,/PoeShared.Wpf;component/Resources/exception.png"/>
+    </Window.Icon>
     <Window.Resources>
         <eye:SharedResourceDictionary>
             <eye:SharedResourceDictionary.MergedDictionaries>
-                <eye:SharedResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
-                <eye:SharedResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/styles/themes/dark.blue.xaml" />
                 <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Generic.shared.xaml" />
             </eye:SharedResourceDictionary.MergedDictionaries>
     
@@ -128,4 +130,4 @@
                            Content="Close" />
         </st:StackPanel>
     </Grid>
-</mah:MetroWindow>
+</Window>

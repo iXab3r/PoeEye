@@ -78,6 +78,8 @@
     <Resource Include="Resources\CursorAbsolute.png" />
     <None Remove="Resources\CursorRelative.png" />
     <Resource Include="Resources\CursorRelative.png" />
+    <None Remove="Resources\exception.png" />
+    <Resource Include="Resources\exception.png" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="UI\Hotkeys\HotkeyBox.cs">
