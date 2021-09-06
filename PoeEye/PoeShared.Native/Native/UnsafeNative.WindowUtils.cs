@@ -11,6 +11,12 @@ namespace PoeShared.Native
 {
     public partial class UnsafeNative
     {
+        /// <summary>
+        /// In some cases GetForegroundWindow returns NULL, that means that "future" foreground window is still activating
+        /// If system returns NULL we want to give a chance for window to activate. This is max timeout we'll wait for to GetForegroundWindow to return non-null value
+        /// </summary>
+        private static readonly TimeSpan MaxWindowActivationTimeout = TimeSpan.FromSeconds(10);
+
         [DllImport("dwmapi.dll")]
         private static extern HResult DwmGetWindowAttribute(IntPtr hwnd, DwmApi.DWMWINDOWATTRIBUTE dwAttribute, out RECT pvAttribute, int cbAttribute);
         
@@ -292,7 +298,16 @@ namespace PoeShared.Native
             {
                 if (sw.Elapsed > timeout)
                 {
-                    throw new ApplicationException($"Failed to switch to window {UnsafeNative.GetWindowTitle(window)} (${window.ToHexadecimal()}) in {timeout.TotalMilliseconds:F0}ms, foreground window: {UnsafeNative.GetWindowTitle(foregroundWindow)} {foregroundWindow.ToHexadecimal()}");
+                    if (foregroundWindow == IntPtr.Zero)
+                    {
+                        if (sw.Elapsed > MaxWindowActivationTimeout)
+                        {
+                            throw new ApplicationException($"Failed to switch to window {UnsafeNative.GetWindowTitle(window)} (${window.ToHexadecimal()}) in {sw.ElapsedMilliseconds:F0}ms, foreground window is not found, still activating ?");
+                        }
+                        continue;
+                    }
+                    
+                    throw new ApplicationException($"Failed to switch to window {UnsafeNative.GetWindowTitle(window)} (${window.ToHexadecimal()}) in {sw.ElapsedMilliseconds:F0}ms, foreground window: {UnsafeNative.GetWindowTitle(foregroundWindow)} {foregroundWindow.ToHexadecimal()}");
                 }
                 Thread.Sleep(10);
             }
