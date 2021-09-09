@@ -131,6 +131,36 @@ namespace PoeShared.UI
         
         public bool IsEmpty => MouseButton == null && Key == Key.None && ModifierKeys == ModifierKeys.None && MouseWheel == MouseWheelAction.None;
 
+        public bool Equals(HotkeyGesture other, bool ignoreModifiers)
+        {
+            if (!ignoreModifiers)
+            {
+                return Equals(other);
+            }
+
+            return HotkeysAreEqual(this, other, true);
+        }
+
+        private static bool HotkeysAreEqual(HotkeyGesture key1, HotkeyGesture key2, bool ignoreModifiers)
+        {
+            return !ignoreModifiers ? key1.ToString().Equals(key2.ToString()) : ExtractKeyWithoutModifiers(key1).Equals(ExtractKeyWithoutModifiers(key2));
+        }
+
+        private static string ExtractKeyWithoutModifiers(HotkeyGesture key)
+        {
+            if (key.MouseButton != null)
+            {
+                return key.MouseButton.ToString();
+            } else if (key.Key != Key.None)
+            {
+                return key.Key.ToString();
+            } else if (key.MouseWheel != MouseWheelAction.None)
+            {
+                return key.MouseWheel.ToString();
+            }
+            return string.Empty;
+        }
+
         public override string ToString()
         {
             var keys = new List<string>();

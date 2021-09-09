@@ -21,5 +21,9 @@ namespace PoeShared.Native
         IObservable<MouseEventArgs> WhenMouseMove { [NotNull] get; }
         
         IObservable<MouseEventArgs> WhenMouseWheel { [NotNull] get; }
+
+        IDisposable AddKeyboardFilter(IKeyboardEventFilter filter);
+        
+        IDisposable AddMouseFilter(IMouseEventFilter filter);
     }
 }

@@ -1,13 +1,14 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Windows.Forms;
+using DynamicData;
 using WindowsHook;
-using JetBrains.Annotations;
-using log4net;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using PoeShared.Prism;
@@ -23,10 +24,12 @@ namespace PoeShared.Native
     internal sealed class KeyboardEventsSource : DisposableReactiveObject, IKeyboardEventsSource
     {
         private static readonly IFluentLog Log = typeof(KeyboardEventsSource).PrepareLogger();
+        private readonly IClock clock;
+        private readonly IScheduler inputScheduler;
+        private readonly SourceList<IKeyboardEventFilter> keyboardEventFilters = new();
 
         private readonly IKeyboardMouseEventsProvider keyboardMouseEventsProvider;
-        private readonly IScheduler inputScheduler;
-        private readonly IClock clock;
+        private readonly SourceList<IMouseEventFilter> mouseEventFilters = new();
 
         public KeyboardEventsSource(
             IKeyboardMouseEventsProvider keyboardMouseEventsProvider,
@@ -95,30 +98,53 @@ namespace PoeShared.Native
 
         public bool RealtimeMode { get; } = true;
 
+        public IDisposable AddKeyboardFilter(IKeyboardEventFilter filter)
+        {
+            Log.Debug($"Adding keyboard filter {filter} to list({mouseEventFilters.Count} items)");
+            keyboardEventFilters.Add(filter);
+            return Disposable.Create(() =>
+            {
+                Log.Debug($"Removing keyboard filter {filter} from list({mouseEventFilters.Count} items)");
+                keyboardEventFilters.Remove(filter);
+            });
+        }
+
+        public IDisposable AddMouseFilter(IMouseEventFilter filter)
+        {
+            Log.Debug($"Adding  mouse filter {filter} to list({mouseEventFilters.Count} items)");
+            mouseEventFilters.Add(filter);
+            return Disposable.Create(() =>
+            {
+                Log.Debug($"Removing mouse filter {filter} from list({mouseEventFilters.Count} items)");
+                mouseEventFilters.Remove(filter);
+            });
+        }
+
         private IObservable<InputEventData> HookMouseButtons()
         {
-            return PrepareHook("MouseButtons", keyboardMouseEventsProvider.System, InitializeMouseButtonsHook, inputScheduler);
+            return PrepareHook("MouseButtons", keyboardMouseEventsProvider.System, InitializeMouseButtonsHook, ShouldProcess, inputScheduler);
         }
 
         private IObservable<InputEventData> HookMouseWheel()
         {
-            return PrepareHook("MouseWheel", keyboardMouseEventsProvider.System, InitializeMouseWheelHook, inputScheduler);
+            return PrepareHook("MouseWheel", keyboardMouseEventsProvider.System, InitializeMouseWheelHook, ShouldProcess, inputScheduler);
         }
 
         private IObservable<InputEventData> HookMouseMove()
         {
-            return PrepareHook("MouseMove", keyboardMouseEventsProvider.System, InitializeMouseMoveHook, inputScheduler);
+            return PrepareHook("MouseMove", keyboardMouseEventsProvider.System, InitializeMouseMoveHook, ShouldProcess, inputScheduler);
         }
 
         private IObservable<InputEventData> HookKeyboard()
         {
-            return PrepareHook("Keyboard", keyboardMouseEventsProvider.System, InitializeKeyboardHook, inputScheduler);
+            return PrepareHook("Keyboard", keyboardMouseEventsProvider.System, InitializeKeyboardHook, ShouldProcess, inputScheduler);
         }
 
         private static IObservable<InputEventData> PrepareHook(
             string hookName,
             IObservable<IKeyboardMouseEvents> keyboardMouseEvents,
             Func<IKeyboardMouseEvents, IObservable<InputEventData>> hookMethod,
+            Predicate<InputEventData> filter,
             IScheduler scheduler)
         {
             return Observable.Create<InputEventData>(subscriber =>
@@ -140,6 +166,7 @@ namespace PoeShared.Native
                         .Select(hookMethod)
                         .Switch()
                         .Do(LogEvent, Log.HandleException, () => Log.Debug($"{hookName} event loop completed"))
+                        .Where(x => filter(x))
                         .Subscribe(result)
                         .AddTo(activeAnchors);
                     sw.Stop();
@@ -231,6 +258,23 @@ namespace PoeShared.Native
         private InputEventData ToInputEventData(EventArgs args, InputEventType eventType)
         {
             return new InputEventData {EventArgs = args, EventType = eventType, Timestamp = clock.Now};
+        }
+
+        private bool ShouldProcess(InputEventData inputEventData)
+        {
+            var result = inputEventData.EventArgs switch
+            {
+                KeyEventArgsExt keyEventArgs => keyboardEventFilters.Count <= 0 || keyboardEventFilters.Items.All(x => x.ShouldProcess(keyEventArgs)),
+                MouseEventExtArgs mouseEventArgs => mouseEventFilters.Count <= 0 || mouseEventFilters.Items.All(x => x.ShouldProcess(mouseEventArgs)),
+                _ => true
+            };
+
+            if (!result && Log.IsDebugEnabled)
+            {
+                Log.Debug($"Input event data {inputEventData} is filtered");
+            }
+
+            return result;
         }
 
         private static void LogEvent(InputEventData arg)

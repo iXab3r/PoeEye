@@ -1,12 +1,10 @@
 ﻿using System;
 using PoeShared.UI;
 
-namespace PoeShared.Wpf.Services
+namespace PoeShared.Services
 {
     public interface IUserInputFilterConfigurator
     {
         IDisposable AddToWhitelist(HotkeyGesture hotkey);
-
-        bool IsInWhitelist(HotkeyGesture hotkey);
     }
 }

@@ -184,7 +184,7 @@ namespace PoeShared.Squirrel.Updater
                 OnAppUpdate,
                 onAppUninstall: OnAppUninstall,
                 onFirstRun: OnFirstRun);
-            Log.Debug("Squirrel were handled successfully events");
+            Log.Debug("Squirrel events were handled successfully");
         }
 
         /// <summary>

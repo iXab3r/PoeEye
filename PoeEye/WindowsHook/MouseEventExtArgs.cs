@@ -5,7 +5,9 @@
 using System;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
+using System.Windows.Input;
 using WindowsHook.WinApi;
+using MouseEventArgs = System.Windows.Forms.MouseEventArgs;
 
 namespace WindowsHook
 {
@@ -24,13 +26,15 @@ namespace WindowsHook
         /// <param name="timestamp">The system tick count when the event occurred.</param>
         /// <param name="isMouseButtonDown">True if event signals mouse button down.</param>
         /// <param name="isMouseButtonUp">True if event signals mouse button up.</param>
+        /// <param name="modifiers">CTRL, ALT, SHIFT, etc</param>
         internal MouseEventExtArgs(MouseButtons buttons, int clicks, Point point, int delta, int timestamp,
-            bool isMouseButtonDown, bool isMouseButtonUp)
+            bool isMouseButtonDown, bool isMouseButtonUp, Keys modifiers)
             : base(buttons, clicks, point.X, point.Y, delta)
         {
             IsMouseButtonDown = isMouseButtonDown;
             IsMouseButtonUp = isMouseButtonUp;
             Timestamp = timestamp;
+            Modifiers = modifiers;
         }
 
         /// <summary>
@@ -67,6 +71,8 @@ namespace WindowsHook
         /// <summary>
         /// </summary>
         internal Point Point => new Point(X, Y);
+        
+        public Keys Modifiers { get; }
 
         internal static MouseEventExtArgs FromRawDataApp(CallbackData data)
         {
@@ -189,6 +195,7 @@ namespace WindowsHook
                     break;
             }
 
+            var modifiers = GetCurrentModifierKeys();
             var e = new MouseEventExtArgs(
                 button,
                 clickCount,
@@ -196,14 +203,36 @@ namespace WindowsHook
                 mouseDelta,
                 mouseInfo.Timestamp,
                 isMouseButtonDown,
-                isMouseButtonUp);
+                isMouseButtonUp,
+                modifiers);
 
             return e;
+        }
+        
+        private static Keys GetCurrentModifierKeys()
+        {
+            var modifier = Keys.None;
+            if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
+            {
+                modifier |= Keys.Control;
+            }
+
+            if (Keyboard.IsKeyDown(Key.LeftAlt) || Keyboard.IsKeyDown(Key.RightAlt))
+            {
+                modifier |= Keys.Alt;
+            }
+
+            if (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift))
+            {
+                modifier |= Keys.Shift;
+            }
+
+            return modifier;
         }
 
         internal MouseEventExtArgs ToDoubleClickEventArgs()
         {
-            return new MouseEventExtArgs(Button, 2, Point, Delta, Timestamp, IsMouseButtonDown, IsMouseButtonUp);
+            return new MouseEventExtArgs(Button, 2, Point, Delta, Timestamp, IsMouseButtonDown, IsMouseButtonUp, Modifiers);
         }
     }
 }

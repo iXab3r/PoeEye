@@ -1,22 +1,17 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Reactive.Subjects;
 using System.Windows.Input;
 using DynamicData;
 using WindowsHook;
-using log4net;
-using PoeShared.Modularity;
 using PoeShared.Native;
 using PoeShared.Prism;
 using PoeShared.Scaffolding; 
 using PoeShared.Logging;
-using PoeShared.Wpf.Services;
 using PropertyBinder;
 using ReactiveUI;
 using Unity;
@@ -28,14 +23,11 @@ namespace PoeShared.UI
     internal sealed class HotkeyTracker : DisposableReactiveObject, IHotkeyTracker
     {
         private static readonly Binder<HotkeyTracker> Binder = new();
-        private readonly IAppArguments appArguments;
         private readonly IClock clock;
-        private readonly ISubject<HotkeyData> hotkeyLog = new Subject<HotkeyData>();
 
         private readonly SourceCache<HotkeyGesture, HotkeyGesture> hotkeysSource = new(x => x);
         private readonly ISet<HotkeyGesture> pressedKeys = new HashSet<HotkeyGesture>();
         private readonly IScheduler uiScheduler;
-        private readonly IUserInputFilterConfigurator userInputFilterConfigurator;
         private bool canSuppressHotkey;
         private bool handleApplicationKeys;
         private bool hasModifiers;
@@ -59,18 +51,13 @@ namespace PoeShared.UI
 
         public HotkeyTracker(
             IClock clock,
-            IAppArguments appArguments,
-            ISchedulerProvider schedulerProvider,
             IKeyboardEventsSource eventSource,
-            IUserInputFilterConfigurator userInputFilterConfigurator,
             [Dependency(WellKnownWindows.MainWindow)] IWindowTracker mainWindowTracker,
+            [Dependency(WellKnownSchedulers.InputHook)] IScheduler inputScheduler,
             [Dependency(WellKnownSchedulers.UI)] IScheduler uiScheduler)
         {
             Log = typeof(HotkeyTracker).PrepareLogger().WithSuffix(this);
-            var scheduler = schedulerProvider.GetOrCreate("Hotkey");
             this.clock = clock;
-            this.appArguments = appArguments;
-            this.userInputFilterConfigurator = userInputFilterConfigurator;
             this.uiScheduler = uiScheduler;
 
             Disposable
@@ -100,19 +87,13 @@ namespace PoeShared.UI
                 }, Log.HandleUiException)
                 .AddTo(Anchors);
 
-            hotkeyLog
-                .Where(x => Log.IsDebugEnabled && appArguments.IsDebugMode)
-                .Select(data => $"Hotkey {(data.KeyDown ? "pressed" : "released")}: {data.Hotkey}, key: {data.Hotkey.Key}, mouse: {data.Hotkey.MouseButton}, wheel: {data.Hotkey.MouseWheel}, modifiers: {data.Hotkey.ModifierKeys}")
-                .DistinctUntilChanged()
-                .SubscribeSafe(data => Log.Debug(data), Log.HandleException)
-                .AddTo(Anchors);
-
             Observable.CombineLatest(
                     hotkeysSource.Connect().Select(x => hotkeysSource.Items.Select(x => x.ToString()).JoinStrings(", ")),
                     this.WhenAnyValue(x => x.HotkeyMode),
                     (hotkeys, mode) => new {Hotkeys = hotkeys, HotkeyMode = mode})
                 .DistinctUntilChanged()
                 .WithPrevious()
+                .ObserveOn(inputScheduler)
                 .SubscribeSafe(
                     x =>
                     {
@@ -126,7 +107,7 @@ namespace PoeShared.UI
                 this.WhenAnyValue(x => x.IsEnabled),
                 (_, isEnabled) => new {Hotkeys = hotkeysSource.Items.ToArray(), IsEnabled = isEnabled})
                 .Select(x => x.Hotkeys.Length > 0 && x.IsEnabled)
-                .ObserveOn(scheduler)
+                .ObserveOn(inputScheduler)
                 .Select(shouldSubscribe => !shouldSubscribe ? Observable.Return(default(HotkeyData)) : BuildHotkeySubscription(eventSource))
                 .Switch()
                 .DistinctUntilChanged(x => new {x?.Hotkey, x?.KeyDown, x?.Timestamp}) // removed possible duplicates from multiple sources
@@ -183,7 +164,7 @@ namespace PoeShared.UI
                         return true;
                     })
                 .WithPrevious()
-                .ObserveOn(scheduler)
+                .ObserveOn(inputScheduler)
                 .SubscribeSafe(
                     hotkeysPair =>
                     {
@@ -343,49 +324,49 @@ namespace PoeShared.UI
                 // should never happen, hotkey data always contains something
                 return false;
             }
-            
-            if (userInputFilterConfigurator.IsInWhitelist(data.Hotkey))
-            {
-                Log.Debug($"Pressed hotkey {data} is in whitelist, skipping it");
-                return false;
-            }
 
-            var isMatch = hotkeysSource.Items.Any(x => HotkeysAreEqual(x, data.Hotkey, ignoreModifiers || hotkeyMode == HotkeyMode.Hold && !data.KeyDown));
+            var isMatch = hotkeysSource.Items.Any(x => x.Equals(data.Hotkey, ignoreModifiers || hotkeyMode == HotkeyMode.Hold && !data.KeyDown));
             if (isMatch)
             {
+                if (data.IsHandled)
+                {
+                    Log.Debug(() => $"Hotkey {data} is already handled, skipping it");
+                    return false;
+                }
+                
                 if (data.KeyDown)
                 {
-                    Log.Debug($"Adding hotkey {data.Hotkey} to pressed keys");
+                    Log.Debug(() => $"Adding hotkey {data.Hotkey} to pressed keys");
                     pressedKeys.Add(data.Hotkey);
                 }
                 else
                 {
-                    var isPressed = pressedKeys.FirstOrDefault(x => HotkeysAreEqual(x, data.Hotkey, true));
+                    var isPressed = pressedKeys.FirstOrDefault(x => x.Equals(data.Hotkey, true));
                     if (isPressed == null && !data.Hotkey.IsMouseWheel)
                     {
-                        Log.Debug($"Released hotkey {data.Hotkey} is not in pressed keys or is not a mouse wheel event list skipping it");
+                        Log.Debug(() => $"Released hotkey {data.Hotkey} is not in pressed keys or is not a mouse wheel event list skipping it");
                         return false;
                     }
                     else
                     {
-                        Log.Debug($"Removing released hotkey {data.Hotkey} from pressed keys");
+                        Log.Debug(() => $"Removing released hotkey {data.Hotkey} from pressed keys");
                         pressedKeys.Remove(isPressed);
                     }
                 }
 
-                Log.Debug($"Processing matching hotkey {data}");
+                Log.Debug(() => $"Processing matching hotkey {data}");
                 return true;
             }
             
             if (data.KeyDown)
             {
-                Log.Debug($"Skipping key down event for {data} - not a match");
+                Log.Debug(() => $"Skipping key down event for {data}");
                 return false;
             }
             
             if (data.Hotkey.IsMouse)
             {
-                Log.Debug($"Pressed hotkey {data} is mouse key, skipping it");
+                Log.Debug(() => $"Pressed hotkey {data} is mouse key, skipping it");
                 return false;
             }
 
@@ -399,7 +380,7 @@ namespace PoeShared.UI
             if (keyAsModifier == ModifierKeys.None)
             {
                 // released key is not Modifier - not interested
-                Log.Debug($"Pressed hotkey {data} is not a modifier, skipping it");
+                Log.Debug(() => $"Pressed hotkey {data} is not a modifier, skipping it");
                 return false;
             }
 
@@ -407,19 +388,19 @@ namespace PoeShared.UI
             if (pressed.Length == 0)
             {
                 // released key was NOT detected before release
-                Log.Debug($"There are no pressed keys with modifier {keyAsModifier}");
+                Log.Debug(() => $"There are no pressed keys with modifier {keyAsModifier}");
                 return false;
             }
 
             if (pressed.Length > 1)
             {
-                Log.Warn($"Probably something went wrong - there shouldn't be 2+ pressed hotkeys at once, pressed hotkeys: {pressed.DumpToString()}");
+                Log.Warn(() => $"Probably something went wrong - there shouldn't be 2+ pressed hotkeys at once, pressed hotkeys: {pressed.DumpToString()}");
                 return false;
             }
 
             // if user releases one of modifiers we simulate "release" of the button itself
             var newHotkey = pressed[0];
-            Log.Debug($"Replacing hotkey {data.Hotkey} => {newHotkey} in {data}");
+            Log.Debug(() => $"Replacing hotkey {data.Hotkey} => {newHotkey} in {data}");
             return IsConfiguredHotkey(data with { Hotkey = newHotkey});
         }
 
@@ -438,13 +419,11 @@ namespace PoeShared.UI
                 Log.Debug($"Subscribing to Keyboard events");
                 eventSource.WhenKeyDown.Select(x => HotkeyData.FromEvent(x, clock))
                     .Select(x => x.SetKeyDown(true))
-                    .Do(LogHotkey)
                     .Where(IsConfiguredHotkey)
                     .AddTo(result);
 
                 eventSource.WhenKeyUp.Select(x => HotkeyData.FromEvent(x, clock))
                     .Select(x => x.SetKeyDown(false))
-                    .Do(LogHotkey)
                     .Where(IsConfiguredHotkey)
                     .AddTo(result);
             }
@@ -454,13 +433,11 @@ namespace PoeShared.UI
                 Log.Debug($"Subscribing to Mouse events");
                 eventSource.WhenMouseDown.Select(x => HotkeyData.FromEvent(x, clock))
                     .Select(x => x.SetKeyDown(true))
-                    .Do(LogHotkey)
                     .Where(IsConfiguredHotkey)
                     .AddTo(result);
 
                 eventSource.WhenMouseUp.Select(x => HotkeyData.FromEvent(x, clock))
                     .Select(x => x.SetKeyDown(false))
-                    .Do(LogHotkey)
                     .Where(IsConfiguredHotkey)
                     .AddTo(result);
             }
@@ -470,7 +447,6 @@ namespace PoeShared.UI
                 Log.Debug($"Subscribing to Mouse Wheel events");
                 eventSource.WhenMouseWheel.Select(x => HotkeyData.FromEvent(x, clock))
                     .Select(x => x.SetKeyDown(false))
-                    .Do(LogHotkey)
                     .Where(IsConfiguredHotkey)
                     .AddTo(result);
             }
@@ -484,37 +460,9 @@ namespace PoeShared.UI
             return result.Merge();
         }
 
-        private void LogHotkey(HotkeyData data)
-        {
-            if (Log.IsDebugEnabled && appArguments.IsDebugMode)
-            {
-                hotkeyLog.OnNext(data);
-            }
-        }
-
         public override string ToString()
         {
             return $"{(IsEnabled ? default : "DISABLED ")}Hotkey {hotkeyMode} {hotkeysSource.Items.Select(x => x.ToString()).JoinStrings(" OR ")}{(IsActive ? " Active" : default)}";
-        }
-
-        private static bool HotkeysAreEqual(HotkeyGesture key1, HotkeyGesture key2, bool ignoreModifiers)
-        {
-            return !ignoreModifiers ? key1.ToString().Equals(key2.ToString()) : ExtractKeyWithoutModifiers(key1).Equals(ExtractKeyWithoutModifiers(key2));
-        }
-
-        private static string ExtractKeyWithoutModifiers(HotkeyGesture key)
-        {
-            if (key.MouseButton != null)
-            {
-                return key.MouseButton.ToString();
-            } else if (key.Key != Key.None)
-            {
-                return key.Key.ToString();
-            } else if (key.MouseWheel != MouseWheelAction.None)
-            {
-                return key.MouseWheel.ToString();
-            }
-            return string.Empty;
         }
 
         private static ModifierKeys KeyToModifier(Key key)
@@ -535,15 +483,33 @@ namespace PoeShared.UI
 
         private sealed record HotkeyData
         {
-            public KeyEventArgs KeyEventArgs { get; init; }
+            private KeyEventArgs KeyEventArgs { get; init; }
 
-            public MouseEventArgs MouseEventArgs { get; init; }
+            private MouseEventArgs MouseEventArgs { get; init; }
 
             public HotkeyGesture Hotkey { get; set; }
 
             public bool KeyDown { get; set; }
 
             public DateTime Timestamp { get; set; }
+
+            public bool IsHandled
+            {
+                get
+                {
+                    if (KeyEventArgs != null)
+                    {
+                        return KeyEventArgs.Handled;
+                    }
+
+                    if (MouseEventArgs is MouseEventExtArgs mouseEventExtArgs)
+                    {
+                        return mouseEventExtArgs.Handled;
+                    }
+
+                    return false;
+                }
+            }
 
             public HotkeyData SetKeyDown(bool value)
             {
@@ -574,7 +540,7 @@ namespace PoeShared.UI
 
             public static HotkeyData FromEvent(MouseEventArgs args, IClock clock)
             {
-                var modifiers = UnsafeNative.GetCurrentModifierKeys();
+                var modifiers = args is MouseEventExtArgs mouseEventExtArgs ? mouseEventExtArgs.Modifiers.ToModifiers() : UnsafeNative.GetCurrentModifierKeys();
                 return new HotkeyData
                 {
                     Hotkey = args.Delta != 0 ? new HotkeyGesture(args.Delta > 0 ? MouseWheelAction.WheelUp : MouseWheelAction.WheelDown, modifiers) : new HotkeyGesture(args.Button, modifiers),

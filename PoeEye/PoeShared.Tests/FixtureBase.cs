@@ -1,6 +1,7 @@
 ﻿using NUnit.Framework;
 using AutoFixture;
 using System;
+using AutoFixture.AutoMoq;
 using Shouldly;
 
 namespace PoeShared.Tests
@@ -13,6 +14,7 @@ namespace PoeShared.Tests
         public void SetUpTest()
         {
             Container = new Fixture();
+            Container.Customize(new AutoMoqCustomization());
             Container.OmitAutoProperties = true;
             SetUp();
         }

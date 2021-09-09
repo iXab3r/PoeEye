@@ -24,7 +24,6 @@ namespace PoeShared.Tests.UI.Hotkeys
         private Mock<IClock> clock;
         private Mock<IKeyboardEventsSource> eventSource;
         private Mock<IWindowTracker> mainWindowTracker;
-        private Mock<ISchedulerProvider> schedulerProvider;
         private Mock<IAppArguments> appArguments;
 
         private ISubject<KeyEventArgs> whenKeyDown;
@@ -63,9 +62,6 @@ namespace PoeShared.Tests.UI.Hotkeys
             mainWindowTracker = fixture.Freeze<IWindowTracker>().GetMock();
             mainWindowTracker.SetupGet(x => x.ActiveProcessId).Returns(1);
             mainWindowTracker.SetupGet(x => x.ExecutingProcessId).Returns(2);
-            
-            schedulerProvider = fixture.Freeze<ISchedulerProvider>().GetMock();
-            schedulerProvider.Setup(x => x.GetOrCreate(It.IsAny<string>())).Returns(fixture.Create<IScheduler>());
         }
 
         [Test]
