@@ -51,7 +51,7 @@ namespace PoeShared.Prism
                 .RegisterSingleton<IUserInputFilterConfigurator, UserInputFilterConfigurator>()
                 .RegisterSingleton<IApplicationAccessor, ApplicationAccessor>()
                 .RegisterSingleton<INotificationsService, NotificationsService>()
-                .RegisterSingleton<IConverter<char, Keys>, CharToKeysConverter>()
+                .RegisterSingleton<CharToKeysConverter>(typeof(IConverter<(char ch, KeyboardLayout layout), Keys>), typeof(IConverter<char, Keys>))
                 .RegisterSingleton<IMicrophoneProvider, MicrophoneProvider>()
                 .RegisterSingleton<IMessageBoxService, MessageBoxService>()
                 .RegisterSingleton<IScreenRegionSelectorService, ScreenRegionSelectorService>()

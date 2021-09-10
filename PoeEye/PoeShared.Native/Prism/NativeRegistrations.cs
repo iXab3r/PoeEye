@@ -36,6 +36,7 @@ namespace PoeShared.Prism
                 .RegisterSingleton<IAudioPlayer, AudioPlayer>()
                 .RegisterSingleton<IUserInputBlocker, UserInputBlocker>()
                 .RegisterSingleton<IWindowHandleProvider, WindowHandleProvider>()
+                .RegisterSingleton<IKeyboardLayoutManager, KeyboardLayoutManager>()
                 .RegisterSingleton<IConverter<NameValueCollection, string>, NameValueCollectionToQueryStringConverter>()
                 .RegisterSingleton<IConverter<NameValueCollection, IEnumerable<KeyValuePair<string, string>>>, NameValueCollectionToQueryStringConverter>()
                 .RegisterSingleton<IFactory<IWinEventHookWrapper, WinEventHookArguments>, WinEventHookWrapperFactory>();

@@ -1,31 +1,21 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
-using log4net;
-using PoeShared.Native;
+using PInvoke;
 using PoeShared.Prism;
 using PoeShared.Scaffolding; 
 using PoeShared.Logging;
+using PoeShared.Services;
 
 namespace PoeShared.UI
 {
-    internal sealed class CharToKeysConverter : IConverter<char, Keys>, IConverter<(char ch, string keyboardLayoutId), Keys>
+    internal sealed class CharToKeysConverter : IConverter<char, Keys>, IConverter<(char ch, KeyboardLayout layout), Keys>
     {
         private static readonly IFluentLog Log = typeof(CharToKeysConverter).PrepareLogger();
-        private readonly ICollection<KeyboardLayout> keyboardHandleByKeyboardLayoutId;
-        
-        public CharToKeysConverter()
+
+        public Keys Convert((char ch, KeyboardLayout layout) value)
         {
-            keyboardHandleByKeyboardLayoutId = UnsafeNative.GetKeyboardLayoutList()
-                .Select(x => new KeyboardLayout
-                {
-                    KeyboardLayoutHandle = x,
-                    LayoutName = UnsafeNative.GetKeyboardLayoutName(x),
-                })
-                .ToReadOnlyObservableCollection();
-            
-            Log.Debug($"Known layouts: {keyboardHandleByKeyboardLayoutId.DumpToString()}");
+            return Convert(value.ch, value.layout);
         }
 
         public Keys Convert(char value)
@@ -33,22 +23,28 @@ namespace PoeShared.UI
             var vkey = VkKeyScan(value);
             return ConvertScanToKeys(vkey);
         }
-        
-        public Keys Convert(char ch, string keyboardLayoutId)
+
+        private Keys Convert(char ch, KeyboardLayout layout)
         {
-            var keyboardLayout = keyboardHandleByKeyboardLayoutId.FirstOrDefault(x => x.LayoutName == keyboardLayoutId);
-            if (!keyboardLayout.IsValid)
+            if (layout == default)
             {
-                return Keys.None;
+                return Convert(ch);
             }
 
-            var scanCode = VkKeyScanEx(ch, keyboardLayout.KeyboardLayoutHandle);
+            var scanCode = VkKeyScanEx(ch, layout.LayoutId);
             return ConvertScanToKeys(scanCode);
         }
-        
+
         private static Keys ConvertScanToKeys(short scanCode) {
             Keys retval = (Keys)(scanCode & 0xff);  
             int modifiers = scanCode >> 8;
+
+            if ((modifiers & 0x38) != 0)
+            {
+                // "The Hankaku key is pressed" or either of the "Reserved" state bits (for instance, used by Neo2 keyboard layout).
+                // Callers expect failure in this case so that a fallback method can be used.
+                return 0;
+            }
 
             if ((modifiers & 1) != 0) retval |= Keys.Shift;
             if ((modifiers & 2) != 0) retval |= Keys.Control;
@@ -56,25 +52,11 @@ namespace PoeShared.UI
 
             return retval;
         }
-        
-        [System.Runtime.InteropServices.DllImport("user32.dll")]
+
+        [DllImport("user32.dll", CharSet = CharSet.Unicode)]
         private static extern short VkKeyScan(char ch);
 
-        [System.Runtime.InteropServices.DllImport("user32.dll")]
-        private static extern short VkKeyScanEx(char ch, IntPtr hkl);
-        
-        public Keys Convert((char ch, string keyboardLayoutId) value)
-        {
-            return Convert(value.ch, value.keyboardLayoutId);
-        }
-
-        private struct KeyboardLayout
-        {
-            public bool IsValid => KeyboardLayoutHandle != IntPtr.Zero;
-            
-            public string LayoutName { get; set; }
-            
-            public IntPtr KeyboardLayoutHandle { get; set; }
-        }
+        [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+        private static extern short VkKeyScanEx(char ch, uint hkl);
     }
 }

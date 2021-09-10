@@ -27,16 +27,10 @@ namespace PoeShared.Native
         static extern bool AdjustWindowRectExForDpi(ref RECT lpRect, User32.WindowStyles dwStyle, bool bMenu, User32.WindowStylesEx dwExStyle, int dpi); 
         
         [DllImport("user32.dll")]
-        static extern int GetKeyboardLayoutList(int nBuff, [Out] IntPtr[] lpList);
-        
-        [DllImport("user32.dll", SetLastError = true)]
-        static extern IntPtr ActivateKeyboardLayout(IntPtr hkl, uint flags);
+        static extern int GetKeyboardLayoutList(int nBuff, [Out] uint[] lpList);
         
         [DllImport("user32.dll")]
         static extern bool GetKeyboardLayoutName([Out] StringBuilder klId);
-        
-        [DllImport("user32.dll")]
-        static extern IntPtr GetKeyboardLayout(uint idThread);
         
         [DllImport("user32.dll")]
         static extern bool SetWindowRgn(IntPtr hWnd, IntPtr hRgn, bool bRedraw);
@@ -71,6 +65,30 @@ namespace PoeShared.Native
         [DllImport("User32", CharSet = CharSet.Auto)]
         public static extern IntPtr SetParent(IntPtr hWndChild, IntPtr hWndParent);
         
+        [DllImport("user32.dll", 
+            CallingConvention = CallingConvention.StdCall, 
+            CharSet = CharSet.Unicode, 
+            EntryPoint = "LoadKeyboardLayout", 
+            SetLastError = true, 
+            ThrowOnUnmappableChar = false)]
+        public static extern uint LoadKeyboardLayout(StringBuilder pwszKLID, KeyboardLayoutFlags flags);
+
+        [DllImport("user32.dll", 
+            CallingConvention = CallingConvention.StdCall,
+            CharSet = CharSet.Unicode, 
+            EntryPoint = "GetKeyboardLayout", 
+            SetLastError = true, 
+            ThrowOnUnmappableChar = false)]
+        public static extern uint GetKeyboardLayout(uint idThread);
+
+        [DllImport("user32.dll", 
+            CallingConvention = CallingConvention.StdCall, 
+            CharSet = CharSet.Unicode, 
+            EntryPoint = "ActivateKeyboardLayout", 
+            SetLastError = true, 
+            ThrowOnUnmappableChar = false)]
+        public static extern uint ActivateKeyboardLayout(uint hkl, KeyboardLayoutFlags flags);
+        
         [StructLayout(LayoutKind.Sequential)]
         public struct WINDOWPOS
         {
@@ -81,6 +99,14 @@ namespace PoeShared.Native
             public int cx;
             public int cy;
             public readonly int flags;
+        }
+
+        [Flags]
+        public enum KeyboardLayoutFlags : uint
+        {
+            KLF_NONE = 0,
+            KLF_ACTIVATE = 0x00000001,
+            KLF_SETFORPROCESS = 0x00000100
         }
         
         /// <summary>
@@ -218,11 +244,11 @@ namespace PoeShared.Native
         /// Retrieves the input locale identifiers (formerly called keyboard layout handles) corresponding to the current set of input locales in the system.
         /// </summary>
         /// <returns></returns>
-        public static IntPtr[] GetKeyboardLayoutList()
+        public static uint[] GetKeyboardLayoutList()
         {
-            var buffer = new IntPtr[256];
+            var buffer = new uint[256];
             var itemCount = GetKeyboardLayoutList(buffer.Length, buffer);
-            return buffer.Take(itemCount).Where(x => x != IntPtr.Zero).ToArray();
+            return buffer.Take(itemCount).Where(x => x != 0).ToArray();
         }
 
         public static string GetActiveKeyboardLayoutName()
@@ -231,13 +257,13 @@ namespace PoeShared.Native
             return GetKeyboardLayoutName(currentKeyboardLayout);
         }
         
-        public static string GetKeyboardLayoutName(IntPtr hkl)
+        public static string GetKeyboardLayoutName(uint hkl)
         {
             var currentKeyboardLayout = GetKeyboardLayout(0);
             try
             {
-                var previous = ActivateKeyboardLayout(hkl, 0);
-                if (previous == IntPtr.Zero)
+                var previous = ActivateKeyboardLayout(hkl, KeyboardLayoutFlags.KLF_NONE);
+                if (previous == 0)
                 {
                     throw new Win32Exception(Kernel32.GetLastError(), $"Failed to activate KHL {hkl.ToHexadecimal()}, got {previous.ToHexadecimal()}");
                 };
@@ -251,7 +277,7 @@ namespace PoeShared.Native
             }
             finally
             {
-                ActivateKeyboardLayout(currentKeyboardLayout, 0);
+                ActivateKeyboardLayout(currentKeyboardLayout, KeyboardLayoutFlags.KLF_NONE);
             }
         }
     }
