@@ -83,42 +83,6 @@ namespace PoeShared.Tests.Services
         }
 
         [Test]
-        [TestCase("en")]
-        [TestCase("en-US")]
-        [TestCase("en-GB")]
-        [TestCase("ru-RU")]
-        [TestCase("fr")]
-        public void ShouldResolveByCulture(string cultureName)
-        {
-            //Given
-            var instance = CreateInstance();
-
-            //When
-            var result = instance.ResolveByCulture(new CultureInfo(cultureName));
-
-            //Then
-            result.IsValid.ShouldBe(true);
-        }
-
-        [Test]
-        [TestCase("fi")]
-        [TestCase("de")]
-        [TestCase("zh")]
-        public void ShouldActivateNotKnownLayout(string cultureName)
-        {
-            //Given
-            var instance = CreateInstance();
-            var layout = instance.ResolveByCulture(new CultureInfo(cultureName));
-
-            //When
-            instance.Activate(layout);
-
-            //Then
-            var current = instance.GetCurrent();
-            current.ShouldBe(layout);
-        }
-
-        [Test]
         public void ShouldResolveCultureByLayout()
         {
             //Given

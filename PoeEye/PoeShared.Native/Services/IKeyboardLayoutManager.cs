@@ -13,13 +13,16 @@ namespace PoeShared.Services
         /// <param name="keyboardLayoutName"></param>
         /// <returns></returns>
         KeyboardLayout ResolveByLayoutName(string keyboardLayoutName);
-
-        KeyboardLayout ResolveByCulture(CultureInfo culture);
+        
+        /// <summary>
+        ///   Resolved layout by looking for layout with specific culture(e.g. en-US, en-UK) or more generic if specific was not found (e.g. en-US will match en-GB)
+        /// </summary>
+        /// <param name="cultureInfo"></param>
+        /// <returns></returns>
+        KeyboardLayout ResolveByCulture(CultureInfo cultureInfo);
 
         void Activate(KeyboardLayout layout);
 
-        void Activate(CultureInfo cultureInfo);
-        
         ReadOnlyObservableCollection<KeyboardLayout> KnownLayouts { get; }
     }
 }

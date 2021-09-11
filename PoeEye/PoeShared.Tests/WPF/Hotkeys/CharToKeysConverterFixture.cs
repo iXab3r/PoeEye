@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Globalization;
 using System.Windows.Forms;
 using AutoFixture;
 using NUnit.Framework;
@@ -11,8 +12,8 @@ namespace PoeShared.Tests.WPF.Hotkeys
     [TestFixture]
     internal class CharToKeysConverterFixture : FixtureBase
     {
-        private const string RussianLayoutId = "00000419";
-        private const string EnglishLayoutId = "00000409";
+        private const string RussianCultureISO = "ru";
+        private const string EnglishCultureISO = "en";
 
         private IKeyboardLayoutManager keyboardLayoutManager;
 
@@ -26,6 +27,8 @@ namespace PoeShared.Tests.WPF.Hotkeys
 
         [Test]
         [TestCase('a', Keys.A)]
+        [TestCase('0', Keys.D0)]
+        [TestCase('9', Keys.D9)]
         [TestCase('z', Keys.Z)]
         [TestCase('Z', Keys.Z | Keys.Shift)]
         [TestCase('A', Keys.A | Keys.Shift)]
@@ -34,7 +37,7 @@ namespace PoeShared.Tests.WPF.Hotkeys
         {
             //Given
             var instance = CreateInstance();
-            var layout = keyboardLayoutManager.ResolveByLayoutName(EnglishLayoutId);
+            var layout = keyboardLayoutManager.ResolveByCulture(new CultureInfo(EnglishCultureISO));
             keyboardLayoutManager.Activate(layout);
 
             //When
@@ -45,49 +48,24 @@ namespace PoeShared.Tests.WPF.Hotkeys
         }
         
         [Test]
-        [TestCase('a', EnglishLayoutId, Keys.A)]
-        [TestCase('z', EnglishLayoutId, Keys.Z)]
-        [TestCase('Z', EnglishLayoutId, Keys.Z | Keys.Shift)]
-        [TestCase('A', EnglishLayoutId, Keys.A | Keys.Shift)]
-        [TestCase(' ', EnglishLayoutId, Keys.Space)]
-        [TestCase(' ', RussianLayoutId, Keys.Space)]
-        [TestCase('ф', RussianLayoutId, Keys.A)]
-        public void ShouldConvertWithLayout(char c, string keyboardLayoutName, Keys expected)
+        [TestCase('a', EnglishCultureISO, Keys.A)]
+        [TestCase('z', EnglishCultureISO, Keys.Z)]
+        [TestCase('Z', EnglishCultureISO, Keys.Z | Keys.Shift)]
+        [TestCase('A', EnglishCultureISO, Keys.A | Keys.Shift)]
+        [TestCase(' ', EnglishCultureISO, Keys.Space)]
+        [TestCase(' ', RussianCultureISO, Keys.Space)]
+        [TestCase('ф', RussianCultureISO, Keys.A)]
+        public void ShouldConvertWithLayout(char c, string cultureIso, Keys expected)
         {
             //Given
             var instance = CreateInstance();
-            var layout = keyboardLayoutManager.ResolveByLayoutName(keyboardLayoutName);
+            var layout = keyboardLayoutManager.ResolveByCulture(new CultureInfo(cultureIso));
 
             //When
             var result = instance.Convert((c,layout));
 
             //Then
             result.ShouldBe(expected);
-        }
-
-        [Test]
-        [TestCaseSource(nameof(ShouldConvertCases))]
-        public void ShouldConvertAll(char c)
-        {
-            //Given
-            var instance = CreateInstance();
-
-            //When
-            var result = instance.Convert(c);
-
-            //Then
-            result.ShouldNotBe(Keys.None);
-        }
-
-        public static IEnumerable<TestCaseData> ShouldConvertCases()
-        {
-            for (char c = char.MinValue; c < char.MaxValue; c++)
-            {
-                if (char.IsDigit(c) || char.IsNumber(c))
-                {
-                    yield return new TestCaseData(c);
-                }
-            }
         }
         
         public CharToKeysConverter CreateInstance()

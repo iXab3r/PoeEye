@@ -1,14 +1,19 @@
 ﻿using System.Globalization;
+using System.Windows.Forms;
 using PoeShared.Native;
 
 namespace PoeShared.Services
 {
     public sealed record KeyboardLayout
     {
-        public KeyboardLayout(uint hkl)
+        internal KeyboardLayout(InputLanguage inputLanguage) : this((uint)inputLanguage.Handle, inputLanguage.LayoutName)
+        {
+        }
+        
+        public KeyboardLayout(uint hkl, string layoutName)
         {
             LayoutId = hkl;
-            LayoutName = UnsafeNative.GetKeyboardLayoutName(hkl);
+            LayoutName = layoutName;
             LCID = (ushort)(LayoutId >> 16);
             PrimaryLanguageId = (byte)(LCID << 8 >> 8);
             SubLanguageId = (byte)(LCID >> 8);

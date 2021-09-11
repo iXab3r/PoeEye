@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Text;
 using System.Threading;
+using System.Windows.Forms;
 using DynamicData;
 using PoeShared.Logging;
 using PoeShared.Native;
@@ -35,20 +37,17 @@ namespace PoeShared.Services
 
         private void HandleKeyboardListUpdateRequest()
         {
-            var layouts = UnsafeNative.GetKeyboardLayoutList().Select(x => new KeyboardLayout(x)).Where(x => x.IsValid).ToArray();
+            var layouts = new List<KeyboardLayout>();
+            for (var i = 0; i < InputLanguage.InstalledInputLanguages.Count; i++)
+            {
+                var layout = new KeyboardLayout(InputLanguage.InstalledInputLanguages[i]);
+                layouts.Add(layout);
+            }
+            
             var addedLayouts = layouts.Where(x => !layoutByLocaleId.Lookup(x.LayoutId).HasValue).ToArray();
             if (addedLayouts.Any())
             {
                 Log.Info($"Adding new keyboard layouts from known layouts list: {addedLayouts.DumpToString()}, known layouts: {layoutByLocaleId.Items.DumpToString()}");
-
-                foreach (var keyboardLayout in addedLayouts)
-                {
-                    var loadedLayout = UnsafeNative.LoadKeyboardLayout(new StringBuilder(keyboardLayout.LayoutName), UnsafeNative.KeyboardLayoutFlags.KLF_ACTIVATE);
-                    if (loadedLayout != keyboardLayout.LayoutId)
-                    {
-                        Log.Warn($"Something went wrong - loaded locate should have same id as retrieved initially, loaded: {loadedLayout}, retrieved: {keyboardLayout}");
-                    }
-                }
                 layoutByLocaleId.AddOrUpdateIfNeeded(addedLayouts);
             }
             
@@ -58,6 +57,17 @@ namespace PoeShared.Services
                 Log.Info($"Removing keyboard layouts from known layouts list: {removedLayouts.DumpToString()}, known layouts: {layoutByLocaleId.Items.DumpToString()}");
                 layoutByLocaleId.RemoveKeys(removedLayouts.Select(x => x.LayoutId));
             }
+        }
+
+        public KeyboardLayout ResolveByCulture(CultureInfo cultureInfo)
+        {
+            var exactMatch = layoutByLocaleId.Items.FirstOrDefault(x => Equals(x.Culture.LCID, cultureInfo.LCID));
+            if (exactMatch != null)
+            {
+                return exactMatch;
+            }
+
+            return layoutByLocaleId.Items.FirstOrDefault(x => Equals(x.Culture.TwoLetterISOLanguageName, cultureInfo.TwoLetterISOLanguageName));
         }
 
         public void Activate(KeyboardLayout layout)
@@ -77,20 +87,12 @@ namespace PoeShared.Services
             }
         }
 
-        public void Activate(CultureInfo cultureInfo)
-        {
-            var layout = ResolveByCulture(cultureInfo);
-            Activate(layout);
-        }
-
         public KeyboardLayout GetCurrent()
         {
-            var currentThreadId = UnsafeNative.GetCurrentThreadId();
-            var current = UnsafeNative.GetKeyboardLayout((uint)currentThreadId);
-            var result = new KeyboardLayout(current);
+            var result = new KeyboardLayout(InputLanguage.CurrentInputLanguage);
             if (!result.IsValid)
             {
-                throw new ApplicationException($"Failed to get current keyboard layout for thread {currentThreadId}");
+                throw new ApplicationException($"Failed to get current keyboard layout");
             }
 
             return result;
@@ -99,19 +101,6 @@ namespace PoeShared.Services
         public KeyboardLayout ResolveByLayoutName(string keyboardLayoutName)
         {
             return layoutByLocaleId.Items.FirstOrDefault(x => string.Equals(keyboardLayoutName, x.LayoutName, StringComparison.OrdinalIgnoreCase));
-        }
-
-        public KeyboardLayout ResolveByCulture(CultureInfo culture)
-        {
-            var cultureId = culture.LCID.ToString("x8");
-            var keyboardLayout = UnsafeNative.LoadKeyboardLayout(new StringBuilder(cultureId), UnsafeNative.KeyboardLayoutFlags.KLF_ACTIVATE);
-            var result = new KeyboardLayout(keyboardLayout);
-            if (!result.IsValid)
-            {
-                throw new ApplicationException($"Failed to resolve keyboard layout by culture {culture}");
-            }
-
-            return result;
         }
         
         public ReadOnlyObservableCollection<KeyboardLayout> KnownLayouts { get; }
