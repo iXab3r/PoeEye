@@ -79,7 +79,7 @@ namespace PoeShared.Native
             EntryPoint = "GetKeyboardLayout", 
             SetLastError = true, 
             ThrowOnUnmappableChar = false)]
-        public static extern uint GetKeyboardLayout(uint idThread);
+        public static extern IntPtr GetKeyboardLayout(uint idThread);
 
         [DllImport("user32.dll", 
             CallingConvention = CallingConvention.StdCall, 
@@ -87,7 +87,7 @@ namespace PoeShared.Native
             EntryPoint = "ActivateKeyboardLayout", 
             SetLastError = true, 
             ThrowOnUnmappableChar = false)]
-        public static extern uint ActivateKeyboardLayout(uint hkl, KeyboardLayoutFlags flags);
+        public static extern IntPtr ActivateKeyboardLayout(IntPtr hkl, KeyboardLayoutFlags flags);
         
         [StructLayout(LayoutKind.Sequential)]
         public struct WINDOWPOS
@@ -257,13 +257,13 @@ namespace PoeShared.Native
             return GetKeyboardLayoutName(currentKeyboardLayout);
         }
         
-        public static string GetKeyboardLayoutName(uint hkl)
+        public static string GetKeyboardLayoutName(IntPtr hkl)
         {
             var currentKeyboardLayout = GetKeyboardLayout(0);
             try
             {
                 var previous = ActivateKeyboardLayout(hkl, KeyboardLayoutFlags.KLF_NONE);
-                if (previous == 0)
+                if (previous == IntPtr.Zero)
                 {
                     throw new Win32Exception(Kernel32.GetLastError(), $"Failed to activate KHL {hkl.ToHexadecimal()}, got {previous.ToHexadecimal()}");
                 };

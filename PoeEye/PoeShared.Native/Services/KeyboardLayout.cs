@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
 using System.Windows.Forms;
 using PoeShared.Native;
 
@@ -6,18 +7,15 @@ namespace PoeShared.Services
 {
     public sealed record KeyboardLayout
     {
-        internal KeyboardLayout(InputLanguage inputLanguage) : this((uint)inputLanguage.Handle, inputLanguage.LayoutName)
+        public KeyboardLayout(InputLanguage inputLanguage)
         {
-        }
-        
-        public KeyboardLayout(uint hkl, string layoutName)
-        {
-            LayoutId = hkl;
-            LayoutName = layoutName;
-            LCID = (ushort)(LayoutId >> 16);
+            InputLanguage = inputLanguage;
+            Handle = inputLanguage.Handle;
+            LayoutName = inputLanguage.LayoutName;
+            LCID = (ushort)((uint)Handle >> 16);
             PrimaryLanguageId = (byte)(LCID << 8 >> 8);
             SubLanguageId = (byte)(LCID >> 8);
-            Culture = System.Globalization.CultureInfo.GetCultureInfo(LCID);
+            Culture = CultureInfo.GetCultureInfo(LCID);
         }
 
         public string LayoutName { get; }
@@ -28,10 +26,12 @@ namespace PoeShared.Services
         
         public byte SubLanguageId { get; }
 
-        public uint LayoutId { get; }
+        public IntPtr Handle { get; }
+        
+        public InputLanguage InputLanguage { get; }
         
         public CultureInfo Culture { get; }
 
-        public bool IsValid => LayoutId > 0 && !string.IsNullOrEmpty(LayoutName);
+        public bool IsValid => Handle != IntPtr.Zero && !string.IsNullOrEmpty(LayoutName);
     }
 }

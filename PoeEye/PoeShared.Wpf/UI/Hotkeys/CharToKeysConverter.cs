@@ -31,7 +31,7 @@ namespace PoeShared.UI
                 return Convert(ch);
             }
 
-            var scanCode = VkKeyScanEx(ch, layout.LayoutId);
+            var scanCode = VkKeyScanEx(ch, layout.Handle);
             return ConvertScanToKeys(scanCode);
         }
 
@@ -57,6 +57,6 @@ namespace PoeShared.UI
         private static extern short VkKeyScan(char ch);
 
         [DllImport("user32.dll", CharSet = CharSet.Unicode)]
-        private static extern short VkKeyScanEx(char ch, uint hkl);
+        private static extern short VkKeyScanEx(char ch, IntPtr hkl);
     }
 }

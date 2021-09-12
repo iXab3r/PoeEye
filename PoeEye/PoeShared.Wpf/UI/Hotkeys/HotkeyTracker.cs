@@ -330,7 +330,6 @@ namespace PoeShared.UI
             {
                 if (data.IsHandled)
                 {
-                    Log.Debug(() => $"Hotkey {data} is already handled, skipping it");
                     return false;
                 }
                 
@@ -360,19 +359,16 @@ namespace PoeShared.UI
             
             if (data.KeyDown)
             {
-                Log.Debug(() => $"Skipping key down event for {data}");
                 return false;
             }
             
             if (data.Hotkey.IsMouse)
             {
-                Log.Debug(() => $"Pressed hotkey {data} is mouse key, skipping it");
                 return false;
             }
 
             if (pressedKeys.Count == 0)
             {
-                Log.Debug($"Pressed hotkeys list is empty, skipping hotkey {data}");
                 return false;
             }
 
@@ -380,7 +376,6 @@ namespace PoeShared.UI
             if (keyAsModifier == ModifierKeys.None)
             {
                 // released key is not Modifier - not interested
-                Log.Debug(() => $"Pressed hotkey {data} is not a modifier, skipping it");
                 return false;
             }
 
@@ -388,7 +383,6 @@ namespace PoeShared.UI
             if (pressed.Length == 0)
             {
                 // released key was NOT detected before release
-                Log.Debug(() => $"There are no pressed keys with modifier {keyAsModifier}");
                 return false;
             }
 
