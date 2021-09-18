@@ -10,6 +10,7 @@ using log4net;
 using PInvoke;
 using PoeShared.Scaffolding; 
 using PoeShared.Logging;
+using PoeShared.UI;
 using Point = System.Drawing.Point;
 
 namespace PoeShared.Native
@@ -116,6 +117,11 @@ namespace PoeShared.Native
             hwndSource.AddHook(DragHook);
         }
 
+        protected override System.Windows.Automation.Peers.AutomationPeer OnCreateAutomationPeer()
+        {
+            return new NoopWindowAutomationPeer(this);
+        }
+        
         private IntPtr DragHook(IntPtr hwnd, int msgRaw, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
             if (TargetAspectRatio == null)

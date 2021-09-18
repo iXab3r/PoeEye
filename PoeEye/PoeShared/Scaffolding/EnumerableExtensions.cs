@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Combinatorics.Collections;
 
@@ -93,6 +94,26 @@ namespace PoeShared.Scaffolding
                 result[key] = newValue;
             }
             return result;
+        }
+
+        public static void DisposeAll<T>(this IEnumerable<T> enumerable, Action<T, Exception> onError = null) where T : IDisposable
+        {
+            foreach (var disposable in enumerable)
+            {
+                try
+                {
+                    disposable.Dispose();
+                }
+                catch (Exception e)
+                {
+                    if (onError == null)
+                    {
+                        throw;
+                    }
+
+                    onError(disposable, e);
+                }
+            }
         }
 
         public static IEnumerable<T> ForEach<T>(this IEnumerable<T> enumerable, Action<T> action)

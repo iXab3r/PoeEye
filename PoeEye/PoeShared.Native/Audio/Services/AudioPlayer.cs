@@ -20,7 +20,6 @@ namespace PoeShared.Audio.Services
     internal sealed class AudioPlayer : DisposableReactiveObject, IAudioPlayer
     {
         private static readonly IFluentLog Log = typeof(AudioPlayer).PrepareLogger();
-        private readonly MMDeviceEnumerator deviceEnumerator = new();
 
         public AudioPlayer()
         {
@@ -29,30 +28,39 @@ namespace PoeShared.Audio.Services
         public IEnumerable<WaveOutDevice> GetDevices()
         {
             Log.Debug($"Retrieving MMDevices");
+
+            using var deviceEnumerator = new MMDeviceEnumerator();
             var mmDevices = deviceEnumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active);
-            Log.Debug($"Retrieving WaveOut devices, count: {WaveOut.DeviceCount}");
-
-            var waveOutDevices = Enumerable.Range(0, WaveOut.DeviceCount).Select(idx =>
+            try
             {
-                try
+                Log.Debug($"Retrieving WaveOut devices, count: {WaveOut.DeviceCount}");
+                var waveOutDevices = Enumerable.Range(0, WaveOut.DeviceCount).Select(idx =>
                 {
-                    var waveOutCapabilities = WaveOut.GetCapabilities(idx);
-                    var matchingMmDevice = string.IsNullOrEmpty(waveOutCapabilities.ProductName) ? null : mmDevices.FirstOrDefault(x => x.FriendlyName?.StartsWith(waveOutCapabilities.ProductName) ?? false);
-                    return new WaveOutDevice
+                    try
                     {
-                        DeviceNumber = idx,
-                        WaveOutCapabilities = waveOutCapabilities,
-                        MultimediaDeviceName = matchingMmDevice?.FriendlyName
-                    };
-                }
-                catch (Exception e)
-                {
-                    Log.Warn($"Failed to get WaveOut capabilities for device #{idx}");
-                    return null;
-                }
-            }).Where(x => x != null);
-
-            return waveOutDevices;
+                        var waveOutCapabilities = WaveOut.GetCapabilities(idx);
+                        var matchingMmDevice = string.IsNullOrEmpty(waveOutCapabilities.ProductName) ? null : mmDevices.FirstOrDefault(x => x.FriendlyName?.StartsWith(waveOutCapabilities.ProductName) ?? false);
+                        return new WaveOutDevice
+                        {
+                            DeviceNumber = idx,
+                            WaveOutCapabilities = waveOutCapabilities,
+                            MultimediaDeviceName = matchingMmDevice?.FriendlyName
+                        };
+                    }
+                    catch (Exception e)
+                    {
+                        Log.Warn($"Failed to get WaveOut capabilities for device #{idx}");
+                        return null;
+                    }
+                }).Where(x => x != null);
+            
+                return waveOutDevices;
+            }
+            finally
+            {
+                Log.Debug($"Releasing {mmDevices.Count} MMDevices");
+                mmDevices.DisposeAll((device, ex) => Log.Warn($"Failed to dispose device { new { device, device.FriendlyName }}", ex));
+            }
         }
 
         public Task Play(byte[] waveData)

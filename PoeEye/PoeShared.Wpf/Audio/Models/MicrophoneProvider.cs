@@ -18,17 +18,21 @@ namespace PoeShared.Audio.Models
         private static readonly TimeSpan ThrottlingTimeout = TimeSpan.FromMilliseconds(100);
         private static readonly TimeSpan RetryTimeout = TimeSpan.FromSeconds(60);
 
-        private readonly SourceList<MicrophoneLineData> microphoneLines = new SourceList<MicrophoneLineData>();
-        private readonly MultimediaNotificationClient notificationClient = new MultimediaNotificationClient();
-        private readonly MMDeviceEnumerator deviceEnumerator = new MMDeviceEnumerator();
+        private readonly SourceList<MicrophoneLineData> microphoneLines = new();
+        private readonly MultimediaNotificationClient notificationClient = new();
+        private readonly MMDeviceEnumerator deviceEnumerator;
 
         public MMDevice GetMixerControl(string lineId)
         {
-            return EnumerateLinesInternal().FirstOrDefault(x => x.ID == lineId);
+            var lines = EnumerateLinesInternal();
+            var result = lines.FirstOrDefault(x => x.ID == lineId);
+            lines.Except(result == null ? Array.Empty<MMDevice>() : new[] { result }).DisposeAll((device, ex) => Log.Warn($"Failed to dispose device { new { device, device.FriendlyName }}", ex));
+            return result;
         }
 
         public MicrophoneProvider()
         {
+            deviceEnumerator = new MMDeviceEnumerator().AddTo(Anchors);
             microphoneLines
                 .Connect()
                 .Bind(out var microphones)
@@ -86,16 +90,22 @@ namespace PoeShared.Audio.Models
             yield return MicrophoneLineData.All;
 
             var devices = EnumerateLinesInternal();
-            foreach (var device in devices)
+            try
             {
-                yield return new MicrophoneLineData(lineId: device.ID, name: device.FriendlyName);
+                foreach (var device in devices)
+                {
+                    yield return new MicrophoneLineData(lineId: device.ID, name: device.FriendlyName);
+                }
+            }
+            finally
+            {
+                devices.DisposeAll((device, ex) => Log.Warn($"Failed to dispose device { new { device, device.FriendlyName }}", ex));
             }
         }
 
-        private IEnumerable<MMDevice> EnumerateLinesInternal()
+        private MMDevice[] EnumerateLinesInternal()
         {
-            var devices = deviceEnumerator.EnumerateAudioEndPoints(DataFlow.Capture, DeviceState.Active);
-            return devices;
+            return deviceEnumerator.EnumerateAudioEndPoints(DataFlow.Capture, DeviceState.Active).ToArray();
         }
     }
 }

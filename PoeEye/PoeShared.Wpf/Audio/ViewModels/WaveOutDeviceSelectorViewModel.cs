@@ -27,7 +27,7 @@ namespace PoeShared.Audio.ViewModels
         private readonly IAudioPlayer audioPlayer;
         private readonly ISourceCache<WaveOutDevice, string> devicesSource = new SourceCache<WaveOutDevice, string>(x => x.Id);
         private readonly MultimediaNotificationClient notificationClient = new MultimediaNotificationClient();
-        private readonly MMDeviceEnumerator deviceEnumerator = new MMDeviceEnumerator();
+        private readonly MMDeviceEnumerator deviceEnumerator;
         private WaveOutDevice selectedItem;
 
         public WaveOutDeviceSelectorViewModel(
@@ -56,6 +56,7 @@ namespace PoeShared.Audio.ViewModels
                 .SubscribeSafe(HandleDevicesUpdate, Log.HandleException)
                 .AddTo(Anchors);
             
+            deviceEnumerator = new MMDeviceEnumerator().AddTo(Anchors);
             Observable
                 .Start(() =>
                 {
