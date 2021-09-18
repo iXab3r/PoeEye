@@ -13,7 +13,7 @@
                  TextElement.FontWeight="Regular"
                  TextOptions.TextFormattingMode="Ideal"
                  TextOptions.TextRenderingMode="Auto"
-                 Foreground="White"
+                 Foreground="{DynamicResource PrimaryHueMidBrush}"
                  ResizeMode="CanResize"
                  WindowStyle="SingleBorderWindow"
                  ShowActivated="True"
