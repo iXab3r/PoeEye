@@ -314,6 +314,10 @@ namespace PoeShared.UI
 
         private static bool CanBeSuppressed(HotkeyGesture hotkey)
         {
+            if (hotkey.IsEmpty)
+            {
+                return true;
+            }
             return hotkey.IsKeyboard || hotkey.IsMouseButton && hotkey.MouseButton != MouseButton.Left && hotkey.MouseButton != MouseButton.Right;
         }
 

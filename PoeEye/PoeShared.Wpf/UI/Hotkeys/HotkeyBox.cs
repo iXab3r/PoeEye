@@ -247,7 +247,7 @@ namespace PoeShared.UI
                 HotKey = new HotkeyGesture(MouseButton.Left, currentModifierKeys);
                 e.Handled = true;
             }
-            else if (e.RightButton == MouseButtonState.Pressed)
+            else if (e.RightButton == MouseButtonState.Pressed && e.ClickCount == 2)
             {
                 HotKey = new HotkeyGesture(MouseButton.Right, currentModifierKeys);
                 e.Handled = true;

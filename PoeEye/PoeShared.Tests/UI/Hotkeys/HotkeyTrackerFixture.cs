@@ -613,6 +613,47 @@ namespace PoeShared.Tests.UI.Hotkeys
             //Then
             instance.IsActive.ShouldBe(false);
         }
+
+        [Test]
+        [TestCase(Key.None, null, null, ModifierKeys.None, true)]
+        [TestCase(Key.Back, null, null, ModifierKeys.None, true)]
+        [TestCase(Key.Back, null, null, ModifierKeys.Control, true)]
+        [TestCase(null, MouseButton.XButton1, null, ModifierKeys.None, true)]
+        [TestCase(null, MouseButton.XButton2, null, ModifierKeys.None, true)]
+        [TestCase(null, MouseButton.Left, null, ModifierKeys.None, false)]
+        [TestCase(null, MouseButton.Right, null, ModifierKeys.None, false)]
+        [TestCase(null, MouseButton.Middle, null, ModifierKeys.None, true)]
+        [TestCase(null, MouseButton.XButton1, null, ModifierKeys.Control, true)]
+        public void ShouldCalculateCanSuppressForHotkeys(Key? key, MouseButton? mouseButton, MouseWheelAction? mouseWheelAction, ModifierKeys modifierKeys, bool expectedCanSuppress)
+        {
+            //Given
+            var instance = CreateInstance();
+            instance.CanSuppressHotkey.ShouldBe(true); // by default can suppress
+
+            //When
+            instance.Add(CreateGesture(key, mouseButton, mouseWheelAction, modifierKeys));
+
+            //Then
+            instance.CanSuppressHotkey.ShouldBe(expectedCanSuppress);
+        }
+
+        [Test]
+        public void ShouldResetSuppressIfCannotSuppressNewHotkey()
+        {
+            //Given
+            var instance = CreateInstance();
+            instance.Hotkey = new HotkeyGesture(Key.A);
+            instance.SuppressKey = true;
+            instance.SuppressKey.ShouldBe(true);
+            instance.CanSuppressHotkey.ShouldBe(true);
+
+            //When
+            instance.Hotkey = new HotkeyGesture(MouseButton.Left);
+
+            //Then
+            instance.CanSuppressHotkey.ShouldBe(false);
+            instance.SuppressKey.ShouldBe(false);
+        }
         
         private static HotkeyGesture CreateGesture(Key? key, MouseButton? mouseButton, MouseWheelAction? mouseWheelAction, ModifierKeys modifierKeys)
         {
