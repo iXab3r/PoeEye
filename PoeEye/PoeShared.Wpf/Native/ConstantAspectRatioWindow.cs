@@ -59,7 +59,7 @@ namespace PoeShared.Native
                         // Update window size
                         var thisWindow = new WindowInteropHelper(this).Handle;
                         var bounds = UnsafeNative.GetWindowRect(thisWindow);
-                        var newBounds = aspectRatioSizeCalculator.Calculate(targetAspectRatio.Value, bounds, bounds);
+                        var newBounds = aspectRatioSizeCalculator.Calculate(targetAspectRatio.Value, bounds, bounds, prioritizeHeight: targetAspectRatio.Value >= 1);
                         if (newBounds == bounds)
                         {
                             return;
@@ -129,6 +129,11 @@ namespace PoeShared.Native
                 return IntPtr.Zero;
             }
 
+            if (handled)
+            {
+                return IntPtr.Zero;
+            }
+
             var msg = (User32.WindowMessage) msgRaw;
             switch (msg)
             {
@@ -142,7 +147,8 @@ namespace PoeShared.Native
                     dragParams = new DragParams
                     {
                         AdjustingHeight = diffHeight > diffWidth,
-                        InitialBounds = bounds
+                        InitialBounds = bounds,
+                        InitialAspectRatio = (double)bounds.Width / bounds.Height,
                     };
 
                     Log.Debug($"Entering Drag mode for window {this}, initialBounds: {bounds}, adjustingHeight: {dragParams.Value.AdjustingHeight}");
@@ -168,16 +174,17 @@ namespace PoeShared.Native
                         break;
                     }
                     var bounds = new Rectangle(pos.x, pos.y, pos.cx, pos.cy);
-                    var newBounds = aspectRatioSizeCalculator.Calculate(TargetAspectRatio.Value, bounds, dragParams.Value.InitialBounds);
+                    var newBounds = aspectRatioSizeCalculator.Calculate(TargetAspectRatio.Value, bounds, dragParams.Value.InitialBounds, prioritizeHeight: TargetAspectRatio.Value >= 1);
                     newBounds.Width = (int)Math.Max(MinWidth, Math.Min(MaxWidth, newBounds.Width));
                     newBounds.Height = (int)Math.Max(MinHeight, Math.Min(MaxHeight, newBounds.Height));
-                    Log.Debug(
-                        $"Window pos changing, window: {this}, initialBounds: {dragParams?.InitialBounds} => {new Rectangle((int) Left, (int) Top, (int) Width, (int) Height)}, resize bounds: {bounds}, desired bounds: {newBounds}");
-
                     if (newBounds == bounds)
                     {
                         break;
                     }
+                    
+                    Log.Debug(
+                        $"In scope of resize to {bounds} of window: {this}( initial drag bounds: {dragParams?.InitialBounds}), targetAspectRatio: {TargetAspectRatio.Value} resizing to these bounds instead: {newBounds}");
+
                     pos.x = newBounds.X;
                     pos.y = newBounds.Y;
                     pos.cx = newBounds.Width;
@@ -241,6 +248,7 @@ namespace PoeShared.Native
         private struct DragParams
         {
             public Rectangle InitialBounds { get; set; }
+            public double InitialAspectRatio { get; set; }
             public Point InitialMousePosition { get; set; }
             public bool AdjustingHeight { get; set; }
         }

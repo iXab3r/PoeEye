@@ -70,7 +70,7 @@ namespace PoeShared.Native
 
             dpi = this.WhenAnyValue(x => x.OverlayWindow).Select(x => x == null ? Observable.Return(new PointF(1, 1)) : x.Observe(ConstantAspectRatioWindow.DpiProperty).Select(_ => overlayWindow.Dpi).StartWith(overlayWindow.Dpi))
                 .Switch()
-                .Do(x => Log.Debug($"[{this}] DPI updated to {x}"))
+                .Do(x => Log.Debug(() => $"[{this}] DPI updated to {x}"))
                 .ToProperty(this, x => x.Dpi)
                 .AddTo(Anchors);
             
@@ -106,6 +106,7 @@ namespace PoeShared.Native
                     }
                     
                     // WARNING - SetWindowRect is blocking as it awaits for WndProc to process the corresponding WM_* messages
+                    Log.Debug(() => $"[#{this}] Native bounds changed to {nativeBounds}, setting windows rect");
                     UnsafeNative.SetWindowRect(x.hwnd.Value, x.nativeBounds);
                 }, Log.HandleUiException)
                 .AddTo(Anchors);
@@ -115,6 +116,7 @@ namespace PoeShared.Native
                 .ObserveOnDispatcher(DispatcherPriority.DataBind)
                 .SubscribeSafe(x =>
                 {
+                    Log.Debug(() => $"[#{this}] Updating native bounds {nativeBounds} => {x}");
                     NativeBounds = x;
                 }, Log.HandleUiException)
                 .AddTo(Anchors);
@@ -301,7 +303,7 @@ namespace PoeShared.Native
             }
             OverlayWindow = owner;
             var interopHelper = new WindowInteropHelper(OverlayWindow);
-            Log.Debug($"[#{this}] Loaded overlay window: {OverlayWindow} ({interopHelper.Handle.ToHexadecimal()})");
+            Log.Debug(() => $"[#{this}] Loaded overlay window: {OverlayWindow} ({interopHelper.Handle.ToHexadecimal()})");
         }
 
         private IntPtr WndProc(IntPtr hwnd, int msgRaw, IntPtr wParam, IntPtr lParam, ref bool handled)
@@ -313,7 +315,9 @@ namespace PoeShared.Native
                 if (nativeStruct != null)
                 {
                     var wp = (UnsafeNative.WINDOWPOS)nativeStruct;
-                    windowPositionSource.OnNext(new Rectangle(wp.x, wp.y, wp.cx, wp.cy));
+                    var bounds = new Rectangle(wp.x, wp.y, wp.cx, wp.cy);
+                    Log.Debug(() => $"[#{this}] Windows position changed to {bounds}, notifying position source, native bounds: {nativeBounds}");
+                    windowPositionSource.OnNext(bounds);
                 }
             }
             return IntPtr.Zero;
@@ -341,7 +345,7 @@ namespace PoeShared.Native
 
         protected virtual void ApplyConfig(IOverlayConfig config)
         {
-            Log.Debug($"[{OverlayDescription}] Applying configuration of type ({config.GetType().FullName})");
+            Log.Debug(() => $"[{OverlayDescription}] Applying configuration of type ({config.GetType().FullName})");
            
             var desktopHandle = UnsafeNative.GetDesktopWindow();
             var systemInformation = new
@@ -352,7 +356,7 @@ namespace PoeShared.Native
                 MonitorInfo = UnsafeNative.GetMonitorInfo(desktopHandle)
             };
 
-            Log.Debug($"[{OverlayDescription}] Current SystemInformation: {systemInformation}");
+            Log.Debug(() => $"[{OverlayDescription}] Current SystemInformation: {systemInformation}");
 
 
             Rectangle overlayBounds;
@@ -403,7 +407,7 @@ namespace PoeShared.Native
             {
                 throw new InvalidOperationException($"[{OverlayDescription}] Unsupported operation in this state, overlay(IsLocked: {IsLocked}, IsUnlockable: {IsUnlockable}): {this}");
             }
-            Log.Debug($"[{OverlayDescription}] Unlocking window @ {nativeBounds}");
+            Log.Debug(() => $"[{OverlayDescription}] Unlocking window @ {nativeBounds}");
             IsLocked = false;
         }
 
@@ -418,7 +422,7 @@ namespace PoeShared.Native
             {
                 throw new InvalidOperationException($"[{OverlayDescription}] Unsupported operation in this state, overlay(IsLocked: {IsLocked}): {this}");
             }
-            Log.Debug($"[{OverlayDescription}] Locking window @ {nativeBounds}");
+            Log.Debug(() => $"[{OverlayDescription}] Locking window @ {nativeBounds}");
             IsLocked = true;
         }
 
@@ -438,7 +442,7 @@ namespace PoeShared.Native
             {
                 throw new InvalidOperationException($"[{OverlayDescription}] Unsupported operation in this state, overlay(OverlayMode: {OverlayMode}): {this}");
             }
-            Log.Debug($"[{OverlayDescription}] Making overlay Layered");
+            Log.Debug(() => $"[{OverlayDescription}] Making overlay Layered");
             OverlayMode = OverlayMode.Layered;
         }
 
@@ -453,7 +457,7 @@ namespace PoeShared.Native
             {
                 throw new InvalidOperationException($"[{OverlayDescription}] Unsupported operation in this state, overlay(OverlayMode: {OverlayMode}): {this}");
             }
-            Log.Debug($"[{OverlayDescription}] Making overlay Transparent");
+            Log.Debug(() => $"[{OverlayDescription}] Making overlay Transparent");
             OverlayMode = OverlayMode.Transparent;
         }
 
