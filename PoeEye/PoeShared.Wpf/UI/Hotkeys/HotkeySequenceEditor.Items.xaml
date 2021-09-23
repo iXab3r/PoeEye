@@ -148,19 +148,19 @@
             </DataTrigger>
 
             <DataTrigger Binding="{Binding Hotkey.MouseButton}" Value="{x:Static MouseButton.Left}">
-                <Setter TargetName="MouseImage" Property="Source" Value="../../Resources/mouse-device-left-click-control.png" />
+                <Setter TargetName="MouseImage" Property="Source" Value="{StaticResource MouseDeviceLeftImage}" />
             </DataTrigger>
             <DataTrigger Binding="{Binding Hotkey.MouseButton}" Value="{x:Static MouseButton.Right}">
-                <Setter TargetName="MouseImage" Property="Source" Value="../../Resources/mouse-device-right-click-control.png" />
+                <Setter TargetName="MouseImage" Property="Source" Value="{StaticResource MouseDeviceRightImage}" />
             </DataTrigger>
             <DataTrigger Binding="{Binding Hotkey.MouseButton}" Value="{x:Static MouseButton.Middle}">
-                <Setter TargetName="MouseImage" Property="Source" Value="../../Resources/mouse-device-middle-click-control.png" />
+                <Setter TargetName="MouseImage" Property="Source" Value="{StaticResource MouseDeviceMiddleImage}" />
             </DataTrigger>
             <DataTrigger Binding="{Binding Hotkey.MouseButton}" Value="{x:Static MouseButton.XButton1}">
-                <Setter TargetName="MouseImage" Property="Source" Value="../../Resources/mouse-device-xbutton1-click-control.png" />
+                <Setter TargetName="MouseImage" Property="Source" Value="{StaticResource MouseDeviceXButton1Image}" />
             </DataTrigger>
             <DataTrigger Binding="{Binding Hotkey.MouseButton}" Value="{x:Static MouseButton.XButton2}">
-                <Setter TargetName="MouseImage" Property="Source" Value="../../Resources/mouse-device-xbutton2-click-control.png" />
+                <Setter TargetName="MouseImage" Property="Source" Value="{StaticResource MouseDeviceXButton2Image}" />
             </DataTrigger>
             <MultiDataTrigger>
                 <MultiDataTrigger.Conditions>
@@ -168,7 +168,7 @@
                     <Condition Binding="{Binding IsRelative}" Value="False"/>
                 </MultiDataTrigger.Conditions>
                 <MultiDataTrigger.Setters>
-                    <Setter TargetName="MouseImage" Property="Source" Value="../../Resources/CursorAbsolute.png" />
+                    <Setter TargetName="MouseImage" Property="Source" Value="{StaticResource CursorAbsoluteImage}" />
                     <Setter TargetName="MouseImage" Property="ToolTip" Value="{Binding MousePosition}" />
                 </MultiDataTrigger.Setters>
             </MultiDataTrigger>
@@ -178,7 +178,7 @@
                     <Condition Binding="{Binding IsRelative}" Value="True"/>
                 </MultiDataTrigger.Conditions>
                 <MultiDataTrigger.Setters>
-                    <Setter TargetName="MouseImage" Property="Source" Value="../../Resources/CursorRelative.png" />
+                    <Setter TargetName="MouseImage" Property="Source" Value="{StaticResource CursorRelativeImage}" />
                     <Setter TargetName="MouseImage" Property="ToolTip" Value="{Binding MousePosition}" />
                 </MultiDataTrigger.Setters>
             </MultiDataTrigger>

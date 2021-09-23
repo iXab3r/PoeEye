@@ -20,6 +20,7 @@ using PoeShared.RegionSelector.Services;
 using PoeShared.Scaffolding.WPF;
 using PoeShared.Services;
 using PoeShared.UI;
+using PoeShared.UI.Bindings;
 using PoeShared.Wpf.Scaffolding;
 using PoeShared.Wpf.Services;
 using ReactiveUI;
@@ -68,7 +69,7 @@ namespace PoeShared.Prism
                 .RegisterType<IHotkeyTracker, HotkeyTracker>()
                 .RegisterType<IWaveOutDeviceSelectorViewModel, WaveOutDeviceSelectorViewModel>()
                 .RegisterType<ISelectionAdornerViewModel, SelectionAdornerViewModel>()
-                .RegisterType<ISelectionAdornerViewModel, SelectionAdornerViewModel>()
+                .RegisterType<IBindingsEditorViewModel, BindingsEditorViewModel>()
                 .RegisterType<IRegionSelectorViewModel, RegionSelectorViewModel>()
                 .RegisterType<IGenericSettingsViewModel, GenericSettingsViewModel>()
                 .RegisterType<IRandomPeriodSelector, RandomPeriodSelector>()

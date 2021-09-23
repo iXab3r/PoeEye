@@ -14,6 +14,9 @@
                  Title="PoeShared Demo" Height="750" Width="800" d:DataContext="{d:DesignInstance local:MainWindowViewModel}">
     <Grid>
         <TabControl>
+            <TabItem Header="Bindings">
+                <eye:CachedContentControl Content="{Binding BindingsSandbox}"/>
+            </TabItem>
             <TabItem Header="Exceptions">
                 <eye:CachedContentControl Content="{Binding ExceptionSandbox}"/>
             </TabItem>

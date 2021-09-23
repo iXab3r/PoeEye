@@ -95,4 +95,15 @@
             </DrawingGroup>
         </DrawingBrush.Drawing>
     </DrawingBrush>
+    
+    <BitmapImage x:Key="MouseDeviceLeftImage" UriSource="../Resources/mouse-device-left-click-control.png" />
+    <BitmapImage x:Key="MouseDeviceRightImage" UriSource="../Resources/mouse-device-right-click-control.png" />
+    <BitmapImage x:Key="MouseDeviceMiddleImage" UriSource="../Resources/mouse-device-middle-click-control.png" />
+    <BitmapImage x:Key="MouseDeviceXButton1Image" UriSource="../Resources/mouse-device-xbutton1-click-control.png" />
+    <BitmapImage x:Key="MouseDeviceXButton2Image" UriSource="../Resources/mouse-device-xbutton2-click-control.png" />
+    <BitmapImage x:Key="CursorAbsoluteImage" UriSource="../Resources/CursorAbsolute.png" />
+    <BitmapImage x:Key="CursorRelativeImage" UriSource="../Resources/CursorRelative.png" />
+    <BitmapImage x:Key="DragDropImage" UriSource="../Resources/DragDrop.png" />
+    <BitmapImage x:Key="DragDropWhiteImage" UriSource="../Resources/DragDropWhite.png" />
+    <BitmapImage x:Key="ExceptionImage" UriSource="../Resources/exception.png" />
 </eye:SharedResourceDictionary>

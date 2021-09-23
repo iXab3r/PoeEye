@@ -12,6 +12,7 @@
         <PackageReference Include="log4net" Version="2.0.8" />
         <PackageReference Include="ReactiveUI" Version="10.4.1" />
         <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+        <PackageReference Include="System.Linq.Dynamic.Core" Version="1.2.12" />
         <PackageReference Include="System.Reactive" Version="4.2.0" />
         <PackageReference Include="Unity" Version="5.10.3" />
         <PackageReference Include="CompareNETObjects" Version="4.65.0" />

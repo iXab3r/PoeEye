@@ -82,7 +82,7 @@
 
     <DataTemplate x:Key="HotkeySequenceEditorMenuTemplate" DataType="{x:Type eye:HotkeySequenceEditorViewModel}">
         <st:StackPanel MarginBetweenChildren="5" Orientation="Horizontal">
-            <Image Source="pack://application:,,,/PoeShared.Wpf;component/Resources/DragDropWhite.png" ToolTip="Drag and drop items" Height="32" Width="32" />
+            <Image Source="{StaticResource DragDropWhiteImage}" ToolTip="Drag and drop items" Height="32" Width="32" />
             <eye:ButtonEx
                 Command="{Binding Controller.StartRecording}"
                 Style="{StaticResource HotkeySequenceEditorButtonStyle}"

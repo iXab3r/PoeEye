@@ -1,0 +1,83 @@
+﻿<ui:SharedResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                             xmlns:bindings="clr-namespace:PoeShared.UI.Bindings"
+                             xmlns:scaffolding="clr-namespace:PoeShared.Scaffolding;assembly=PoeShared"
+                             xmlns:st="http://schemas.spicytaco.io/"
+                             xmlns:ui="clr-namespace:PoeShared.UI">
+
+    <ui:SharedResourceDictionary.MergedDictionaries>
+        <ui:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Converters.xaml" />
+    </ui:SharedResourceDictionary.MergedDictionaries>
+
+    <DataTemplate DataType="{x:Type bindings:BindingsEditorViewModel}">
+        <st:StackPanel Orientation="Vertical" MarginBetweenChildren="5" Grid.IsSharedSizeScope="True">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" SharedSizeGroup="TargetProperty" MinWidth="200" />
+                    <ColumnDefinition Width="*" MinWidth="30" />
+                    <ColumnDefinition Width="Auto" SharedSizeGroup="TargetPropertyValue" />
+                    <ColumnDefinition Width="Auto" SharedSizeGroup="Commands" MinWidth="60" />
+                </Grid.ColumnDefinitions>
+
+                <ComboBox Grid.Column="0" Margin="5,0,0,0"  ItemsSource="{Binding BindableProperties}"
+                          DisplayMemberPath="Name"
+                          SelectedValue="{Binding TargetProperty}"
+                          SelectedValuePath="Name" />
+
+                <TextBox Grid.Column="1" Margin="5,0,0,0" Text="{Binding ValueSourceExpression, UpdateSourceTrigger=PropertyChanged}" />
+
+                <ui:ButtonEx Grid.Column="3" Margin="5,0,0,0" 
+                             Content="Add"
+                             Command="{Binding AddBindingCommand}" />
+            </Grid>
+
+            <ItemsControl ItemsSource="{Binding Source.Bindings}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="{x:Type scaffolding:BinderConfig}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition SharedSizeGroup="TargetProperty" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition SharedSizeGroup="TargetPropertyValue" />
+                                <ColumnDefinition SharedSizeGroup="Commands" />
+                            </Grid.ColumnDefinitions>
+                            
+                            <st:StackPanel Grid.Column="0" Margin="5,0,0,0" MarginBetweenChildren="5" Orientation="Horizontal"
+                                           HorizontalAlignment="Right">
+                                <Border Margin="5,0,0,0"
+                                        HorizontalAlignment="Right" Height="18"
+                                        CornerRadius="2" Background="Green" BorderBrush="GreenYellow" BorderThickness="1"
+                                        Padding="5,0">
+                                    <Border.ToolTip>
+                                        <TextBlock Text="{Binding TargetPropertyType.FullName}" />
+                                    </Border.ToolTip>
+                                    <TextBlock FontSize="10" Text="{Binding TargetPropertyType.Name}" />
+                                </Border>
+                                <TextBlock Text="{Binding TargetPropertyName, StringFormat='{}{0} = '}" />
+                            </st:StackPanel>
+
+                            <TextBlock Grid.Column="1" Margin="5,0,0,0" Text="{Binding SourcePath}" x:Name="SourceExpressionEditor" />
+
+                            <Border Grid.Column="2" Margin="5,0,0,0"
+                                    Height="18" MinWidth="30"
+                                    CornerRadius="2" Background="DimGray" BorderBrush="LightGray" BorderThickness="1"
+                                    Padding="5,0">
+                                <TextBlock Text="{Binding PropertyValue}" x:Name="PropertyValueViewer" />
+                            </Border>
+
+                            <ui:ButtonEx Grid.Column="3" Margin="5,0,0,0"
+                                         Content="Unbind"
+                                         Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ItemsControl}}, Path=DataContext.RemoveBindingCommand}"
+                                         CommandParameter="{Binding TargetPropertyName}" />
+                        </Grid>
+                        <DataTemplate.Triggers>
+                            <DataTrigger Binding="{Binding PropertyValue}" Value="{x:Null}">
+                                <Setter TargetName="PropertyValueViewer" Property="Text" Value="NULL"></Setter>
+                            </DataTrigger>
+                        </DataTemplate.Triggers>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </st:StackPanel>
+    </DataTemplate>
+</ui:SharedResourceDictionary>

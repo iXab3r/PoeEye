@@ -16,6 +16,7 @@ using PoeShared.Notifications;
 using PoeShared.RegionSelector;
 using PoeShared.RegionSelector.Services;
 using PoeShared.Scaffolding.WPF;
+using PoeShared.UI.Bindings;
 using PoeShared.Wpf.Scaffolding;
 using Size = System.Drawing.Size;
 
@@ -39,9 +40,11 @@ namespace PoeShared.UI
             IScreenRegionSelectorService regionSelectorService,
             NotificationSandboxViewModel notificationSandbox,
             ExceptionSandboxViewModel exceptionSandbox,
-            IHotkeySequenceEditorViewModel hotkeySequenceEditor)
+            IHotkeySequenceEditorViewModel hotkeySequenceEditor,
+            BindingsSandboxViewModel bindingsSandbox)
         {
             this.regionSelectorService = regionSelectorService;
+            BindingsSandbox = bindingsSandbox.AddTo(Anchors);
             NotificationSandbox = notificationSandbox.AddTo(Anchors);
             ExceptionSandbox = exceptionSandbox.AddTo(Anchors);
             SelectionAdorner = selectionAdorner.AddTo(Anchors);
@@ -89,6 +92,7 @@ namespace PoeShared.UI
 
         public NotificationSandboxViewModel NotificationSandbox { get; }
         public ExceptionSandboxViewModel ExceptionSandbox { get; }
+        public BindingsSandboxViewModel BindingsSandbox { get; }
 
         public ICommand StartSelectionCommand { get; }
 

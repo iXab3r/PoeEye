@@ -1,0 +1,30 @@
+﻿<eye:SharedResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                              xmlns:eye="http://coderush.net/poeeye/"
+                              xmlns:bindings="clr-namespace:PoeShared.UI.Bindings"
+                              xmlns:st="http://schemas.spicytaco.io/"
+                              xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls">
+    <DataTemplate DataType="{x:Type bindings:StubViewModel}">
+        <st:AutoGrid Columns="Auto,*">
+            <TextBlock Text="Int" VerticalAlignment="Top"/>
+            <mah:NumericUpDown
+                Value="{Binding IntProperty}" Interval="1" />
+            <TextBlock Text="Double" VerticalAlignment="Top"/>
+            <mah:NumericUpDown
+                Value="{Binding DoubleProperty}" Interval="0.1" />
+            <TextBlock Text="String" VerticalAlignment="Top"/>
+            <TextBox Text="{Binding StringProperty}"/>
+        </st:AutoGrid>
+    </DataTemplate>
+    
+    <DataTemplate DataType="{x:Type bindings:BindingsSandboxViewModel}">
+        <st:AutoGrid Rows="Auto,Auto,*" Columns="Auto, *" ChildMargin="5,10">
+            <TextBlock Text="Source"/>
+            <eye:CachedContentControl Content="{Binding Path=Source}"/>
+            <TextBlock Text="Target"/>
+            <eye:CachedContentControl Content="{Binding Path=Target}"/>
+            <TextBlock Text="Bindings"/>
+            <eye:CachedContentControl Content="{Binding Path=BindingsEditor}"/>
+        </st:AutoGrid>
+    </DataTemplate>
+</eye:SharedResourceDictionary>

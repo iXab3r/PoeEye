@@ -2,7 +2,10 @@
 using AutoFixture;
 using System;
 using System.Collections.Generic;
+using System.Linq.Dynamic.Core;
+using System.Linq.Expressions;
 using PoeShared.Scaffolding;
+using PropertyBinder;
 using ReactiveUI;
 using Shouldly;
 
@@ -45,7 +48,7 @@ namespace PoeShared.Tests.Scaffolding
             //Then
             values.ShouldBe(new[] { 0, 1 });
         }
-        
+
         [Test]
         public void ShouldSubscribeToInnerClassPropertyChange()
         {
@@ -62,7 +65,7 @@ namespace PoeShared.Tests.Scaffolding
             //Then
             values.ShouldBe(new[] { 0, 1 });
         }
-        
+
         [Test]
         public void ShouldSubscribeToInnerClassIfSetAfterSubscriptionOnPropertyChange()
         {
@@ -81,7 +84,7 @@ namespace PoeShared.Tests.Scaffolding
             //Then
             values.ShouldBe(new[] { 1, 2 });
         }
-        
+
         [Test]
         public void ShouldSubscribeToInnerClassIfNullOnPropertyChange()
         {
@@ -103,21 +106,94 @@ namespace PoeShared.Tests.Scaffolding
             values.ShouldBe(new int?[] { 0, 1 });
         }
 
-        private TestClass CreateInstance()
+        [Test]
+        public void ShouldCreateCustomBinder()
         {
-            return fixture.Build<TestClass>().OmitAutoProperties().Create();
+            //Given
+            var object1 = new TestStub();
+            var object2 = new TestStub();
+
+            var sourceExprText = @"x => x.IntProperty";
+            var sourceParameter = Expression.Parameter(typeof(TestStub), "x");
+            var sourceBinderExpr = System.Linq.Dynamic.Core.DynamicExpressionParser.ParseLambda<TestStub, int>(ParsingConfig.Default, false, sourceExprText, sourceParameter);
+            
+            var targetExprText = @"x => x.OtherIntProperty";
+            var targetParameter = Expression.Parameter(typeof(TestStub), "x");
+            var targetBinderExpr = System.Linq.Dynamic.Core.DynamicExpressionParser.ParseLambda<TestStub, int>(ParsingConfig.Default, false, targetExprText, targetParameter);
+            
+            var binder = new Binder<TestStub>();
+            binder.Bind(sourceBinderExpr).To(targetBinderExpr);
+            
+            //When
+            using var binderAnchor = binder.Attach(object1);
+            object1.IntProperty = 1;
+
+            //Then
+            object1.OtherIntProperty.ShouldBe(1);
         }
 
-        private sealed class TestClass : DisposableReactiveObject
+        [Test]
+        public void ShouldBindOnDifferentObjects()
         {
-            private TestClass innerValue;
+            //Given
+            var object1 = new TestStub();
+            var object2 = new OtherStub();
+
+            var sourceExprText = @"x => x.IntProperty";
+            var sourceParameter = Expression.Parameter(typeof(TestStub), "x");
+            var sourceBinderExpr = System.Linq.Dynamic.Core.DynamicExpressionParser.ParseLambda<TestStub, int>(ParsingConfig.Default, false, sourceExprText, sourceParameter);
+            
+            var binder = new Binder<TestStub>();
+            binder.Bind(sourceBinderExpr).To((x,v) => object2.DoubleProperty = v);
+            
+            //When
+            using var binderAnchor = binder.Attach(object1);
+            object1.IntProperty = 1;
+
+            //Then
+            object2.DoubleProperty.ShouldBe(1);
+        }
+
+        private TestStub CreateInstance()
+        {
+            return fixture.Build<TestStub>().OmitAutoProperties().Create();
+        }
+
+        private sealed class OtherStub : DisposableReactiveObject
+        {
             private int intProperty;
+            private double doubleProperty;
+
+            public int IntProperty
+            {
+                get => intProperty;
+                set => RaiseAndSetIfChanged(ref intProperty, value);
+            }
+            
+            public double DoubleProperty
+            {
+                get => doubleProperty;
+                set => RaiseAndSetIfChanged(ref doubleProperty, value);
+            }
+        }
+
+        private sealed class TestStub : DisposableReactiveObject
+        {
+            private TestStub innerValue;
+            private int intProperty;
+            private int otherIntProperty;
             private string stringProperty;
 
             public int IntProperty
             {
                 get => intProperty;
                 set => RaiseAndSetIfChanged(ref intProperty, value);
+            }
+            
+            public int OtherIntProperty
+            {
+                get => otherIntProperty;
+                set => RaiseAndSetIfChanged(ref otherIntProperty, value);
             }
 
             public string StringProperty
@@ -126,7 +202,7 @@ namespace PoeShared.Tests.Scaffolding
                 set => RaiseAndSetIfChanged(ref stringProperty, value);
             }
 
-            public TestClass InnerValue
+            public TestStub InnerValue
             {
                 get => innerValue;
                 set => RaiseAndSetIfChanged(ref innerValue, value);

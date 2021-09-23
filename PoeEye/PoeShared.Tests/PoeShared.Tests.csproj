@@ -16,6 +16,7 @@
     <PackageReference Include="NUnit3TestAdapter" Version="3.17.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.2.0" />
     <PackageReference Include="Shouldly" Version="4.0.0-beta0002" />
+    <PackageReference Include="System.Linq.Dynamic.Core" Version="1.2.12" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\PoeShared.Wpf\PoeShared.Wpf.csproj" />

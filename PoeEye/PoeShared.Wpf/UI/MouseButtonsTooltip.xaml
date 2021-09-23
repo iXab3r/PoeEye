@@ -10,6 +10,7 @@
     <UserControl.Resources>
         <eye:SharedResourceDictionary>
             <eye:SharedResourceDictionary.MergedDictionaries>
+                <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Colors.xaml" />
                 <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Converters.xaml" />
             </eye:SharedResourceDictionary.MergedDictionaries>
         </eye:SharedResourceDictionary>
@@ -29,7 +30,7 @@
                     Orientation="Horizontal" Margin="1"
                     Visibility="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}},  
                                      Path=LeftButton, Converter={StaticResource NullToCollapsedConverter}}">
-            <Image Source="../Resources/mouse-device-left-click-control.png" Width="16" Height="18" />
+            <Image Source="{StaticResource MouseDeviceLeftImage}" Width="16" Height="18" />
             <TextBlock
                 Margin="5,0,0,0"
                 VerticalAlignment="Center"
@@ -40,7 +41,7 @@
                     Orientation="Horizontal" Margin="1"
                     Visibility="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}},  
                                      Path=RightButton, Converter={StaticResource NullToCollapsedConverter}}">
-            <Image Source="../Resources/mouse-device-right-click-control.png" Width="16" Height="18" />
+            <Image Source="{StaticResource MouseDeviceLeftImage}" Width="16" Height="18" />
             <TextBlock
                 Margin="5,0,0,0"
                 VerticalAlignment="Center"

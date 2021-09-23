@@ -65,7 +65,7 @@ namespace PoeShared.Native
                             return;
                         }
 
-                        Log.Debug($"Setting initial window {this} size ({thisWindow.ToHexadecimal()}), TargetAspectRatio: {targetAspectRatio}, current bounds: {bounds}, target bounds: {newBounds}");
+                        Log.Debug(() => $"Setting initial window {this} size ({thisWindow.ToHexadecimal()}), TargetAspectRatio: {targetAspectRatio}, current bounds: {bounds}, target bounds: {newBounds}");
                         if (!WindowsServices.SetWindowRect(thisWindow, newBounds))
                         {
                             Log.Warn($"Failed to assign initial window {this} ({thisWindow.ToHexadecimal()}) size, TargetAspectRatio: {targetAspectRatio}, initial bounds: {bounds}, target bounds: {newBounds}");
@@ -151,13 +151,12 @@ namespace PoeShared.Native
                         InitialAspectRatio = (double)bounds.Width / bounds.Height,
                     };
 
-                    Log.Debug($"Entering Drag mode for window {this}, initialBounds: {bounds}, adjustingHeight: {dragParams.Value.AdjustingHeight}");
+                    Log.Debug(() => $"Entering Drag mode for window {this}, initialBounds: {bounds}, adjustingHeight: {dragParams.Value.AdjustingHeight}");
                     break;
                 }
                 case User32.WindowMessage.WM_EXITSIZEMOVE:
                 {
-                    Log.Debug(
-                        $"Drag mode completed for window {this}, initialBounds: {dragParams?.InitialBounds} => {new Rectangle((int) Left, (int) Top, (int) Width, (int) Height)}");
+                    Log.Debug(() => $"Drag mode completed for window {this}, initialBounds: {dragParams?.InitialBounds} => {new Rectangle((int) Left, (int) Top, (int) Width, (int) Height)}");
                     dragParams = null;
                     break;
                 }
@@ -182,8 +181,7 @@ namespace PoeShared.Native
                         break;
                     }
                     
-                    Log.Debug(
-                        $"In scope of resize to {bounds} of window: {this}( initial drag bounds: {dragParams?.InitialBounds}), targetAspectRatio: {TargetAspectRatio.Value} resizing to these bounds instead: {newBounds}");
+                    Log.Debug(() => $"In scope of resize to {bounds} of window: {this}( initial drag bounds: {dragParams?.InitialBounds}), targetAspectRatio: {TargetAspectRatio.Value} resizing to these bounds instead: {newBounds}");
 
                     pos.x = newBounds.X;
                     pos.y = newBounds.Y;

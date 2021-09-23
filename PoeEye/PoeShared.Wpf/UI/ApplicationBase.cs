@@ -151,24 +151,5 @@ namespace PoeShared.UI
             base.OnExit(e);
             Anchors.Dispose();
         }
-
-        private void ShowShutdownWarning()
-        {
-            var assemblyName = Assembly.GetExecutingAssembly().GetName();
-            var window = MainWindow;
-            var title = $"{assemblyName.Name} v{assemblyName.Version}";
-            var message = "Application is already running !";
-            if (window != null)
-            {
-                MessageBox.Show(window, message, title, MessageBoxButton.OK, MessageBoxImage.Warning);
-            }
-            else
-            {
-                MessageBox.Show(message, title, MessageBoxButton.OK, MessageBoxImage.Warning);
-            }
-
-            Log.Warn("Shutting down...");
-            Environment.Exit(0);
-        }
     }
 }
