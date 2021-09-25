@@ -41,7 +41,7 @@
                     Orientation="Horizontal" Margin="1"
                     Visibility="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}},  
                                      Path=RightButton, Converter={StaticResource NullToCollapsedConverter}}">
-            <Image Source="{StaticResource MouseDeviceLeftImage}" Width="16" Height="18" />
+            <Image Source="{StaticResource MouseDeviceRightImage}" Width="16" Height="18" />
             <TextBlock
                 Margin="5,0,0,0"
                 VerticalAlignment="Center"
