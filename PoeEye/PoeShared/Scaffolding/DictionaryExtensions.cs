@@ -7,22 +7,30 @@ namespace PoeShared.Scaffolding
     public static class DictionaryExtensions
     {
         public static TValue AddOrUpdate<TKey, TValue>(
-            this IDictionary<TKey, TValue> enumerable,
+            this IDictionary<TKey, TValue> dictionary,
             TKey key,
             TValue newValue,
             Func<TKey, TValue, TValue> updateValueFactory)
         {
-            Guard.ArgumentNotNull(enumerable, nameof(enumerable));
+            Guard.ArgumentNotNull(dictionary, nameof(dictionary));
             Guard.ArgumentNotNull(key, nameof(key));
             Guard.ArgumentNotNull(newValue, nameof(newValue));
             Guard.ArgumentNotNull(updateValueFactory, nameof(updateValueFactory));
 
-            if (enumerable.TryGetValue(key, out var existing))
+            if (dictionary.TryGetValue(key, out var existing))
             {
-                return enumerable[key] = updateValueFactory(key, existing);
+                return dictionary[key] = updateValueFactory(key, existing);
             }
 
-            return enumerable[key] = newValue;
+            return dictionary[key] = newValue;
+        }
+
+        public static bool TryRemove<TKey, TValue>(
+            this IDictionary<TKey, TValue> dictionary,
+            TKey key,
+            out TValue value)
+        {
+            return dictionary.Remove(key, out value);
         }
     }
 }

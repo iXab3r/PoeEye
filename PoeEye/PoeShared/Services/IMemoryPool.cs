@@ -4,6 +4,10 @@
     {
         byte[] Rent(int minimumLength);
 
-        void Return(byte[] array, bool clearArray = false);
+        /// <summary>
+        ///   Returns array to memory pool, DOES NOT CLEAR ARRAY
+        /// </summary>
+        /// <param name="array"></param>
+        void Return(byte[] array);
     }
 }
