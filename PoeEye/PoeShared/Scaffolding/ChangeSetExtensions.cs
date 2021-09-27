@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Reactive;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using DynamicData;
 using DynamicData.Aggregation;
@@ -21,7 +22,7 @@ namespace PoeShared.Scaffolding
 
             return new SourceList<T>(source);
         }
-        
+
         public static ISourceList<T> ToSourceList<T>(this IEnumerable<ISourceList<T>> lists)
         {
             Guard.ArgumentNotNull(lists, nameof(lists));
@@ -31,7 +32,7 @@ namespace PoeShared.Scaffolding
 
             return result.Or().ToSourceList();
         }
-        
+
         public static void MoveItemToTop<T>(this ISourceList<T> collection, T item)
         {
             collection.Edit(list =>
@@ -44,7 +45,7 @@ namespace PoeShared.Scaffolding
                 list.Move(idx, 0);
             });
         }
-        
+
         public static void MoveItemToBottom<T>(this ISourceList<T> collection, T item)
         {
             collection.Edit(list =>
@@ -57,7 +58,7 @@ namespace PoeShared.Scaffolding
                 list.Move(idx, list.Count - 1);
             });
         }
-        
+
         public static void MoveItemDown<T>(this ISourceList<T> collection, T item)
         {
             collection.Edit(list =>
@@ -70,7 +71,7 @@ namespace PoeShared.Scaffolding
                 list.Move(idx, idx + 1);
             });
         }
-        
+
         public static void MoveItemUp<T>(this ISourceList<T> collection, T item)
         {
             collection.Edit(list =>
@@ -83,7 +84,7 @@ namespace PoeShared.Scaffolding
                 list.Move(idx, idx - 1);
             });
         }
-        
+
         public static ISourceList<T> Concat<T>(this ISourceList<T> list, params T[] items)
         {
             var newList = new SourceList<T>();
@@ -95,7 +96,7 @@ namespace PoeShared.Scaffolding
         {
             return new[] { list }.Concat(lists).ToSourceList();
         }
-        
+
         public static IObservable<int> CountIf<T>(this IObservable<IChangeSet<T>> source)
         {
             return source.Count();
@@ -105,13 +106,13 @@ namespace PoeShared.Scaffolding
         {
             AddOrUpdateIfNeeded(source, new[] { item });
         }
-        
+
         public static void AddOrUpdateIfNeeded<T, TKey>(this ISourceCache<T, TKey> source, IEnumerable<T> items)
         {
             Guard.ArgumentNotNull(source, nameof(source));
             source.EditDiff(items, EqualityComparer<T>.Default);
         }
-        
+
         public static Optional<T> ComputeIfAbsent<T, TKey>(this ISourceCache<T, TKey> source, TKey key, Func<TKey, T> factory)
         {
             Guard.ArgumentNotNull(source, nameof(source));
@@ -126,7 +127,7 @@ namespace PoeShared.Scaffolding
             source.AddOrUpdate(newValue);
             return Optional<T>.Create(newValue);
         }
-        
+
         /// <summary>
         /// Watches each item in the collection and notifies when any of them has changed
         /// </summary>
@@ -145,6 +146,62 @@ namespace PoeShared.Scaffolding
             }
 
             return source.MergeMany(t => t.WhenAnyProperty(propertiesToMonitor));
+        }
+        
+        public static IDisposable PopulateFrom<T, TKey, T1>(this ISourceCache<T, TKey> instance, params ISourceList<T1>[] lists)
+            where T1 : T
+        {
+            var anchors = new CompositeDisposable();
+            lists.ForEach(x => SyncListWithCache(x, instance).AddTo(anchors));
+            return anchors;
+        }
+        
+        public static IDisposable PopulateFrom<T, TKey, T1, T2>(this ISourceCache<T, TKey> instance, IObservableList<T1> list1, IObservableList<T2> list2)
+            where T1 : T
+            where T2 : T
+        {
+            var anchors = new CompositeDisposable();
+            SyncListWithCache(list1, instance).AddTo(anchors);
+            SyncListWithCache(list2, instance).AddTo(anchors);
+            return anchors;
+        }
+        
+        public static IDisposable PopulateFrom<T, TKey, T1, T2, T3>(this ISourceCache<T, TKey> instance, IObservableList<T1> list1, IObservableList<T2> list2, IObservableList<T3> list3)
+            where T1 : T
+            where T2 : T
+            where T3 : T
+        {
+            var anchors = new CompositeDisposable();
+            SyncListWithCache(list1, instance).AddTo(anchors);
+            SyncListWithCache(list2, instance).AddTo(anchors);
+            SyncListWithCache(list3, instance).AddTo(anchors);
+            return anchors;
+        }
+        
+        public static IDisposable PopulateFrom<T, TKey, T1, T2, T3, T4>(this ISourceCache<T, TKey> instance, IObservableList<T1> list1, IObservableList<T2> list2, IObservableList<T3> list3, IObservableList<T4> list4)
+            where T1 : T
+            where T2 : T
+            where T3 : T
+            where T4 : T
+        {
+            var anchors = new CompositeDisposable();
+            SyncListWithCache(list1, instance).AddTo(anchors);
+            SyncListWithCache(list2, instance).AddTo(anchors);
+            SyncListWithCache(list3, instance).AddTo(anchors);
+            SyncListWithCache(list4, instance).AddTo(anchors);
+            return anchors;
+        }
+
+        private static IDisposable SyncListWithCache<TSrc, TDst, TKey>(IObservableList<TSrc> list, ISourceCache<TDst, TKey> destination) where TSrc : TDst
+        {
+            var anchors = new CompositeDisposable();
+            list.Connect().OnItemAdded(newObject => destination.AddOrUpdate(newObject)).Subscribe().AddTo(anchors);
+            list.Connect().OnItemRemoved(newObject => destination.Remove(newObject)).Subscribe().AddTo(anchors);
+            Disposable.Create(() =>
+            {
+                list.Items.ForEach(x => destination.Remove(x));
+            }).AddTo(anchors);
+            return anchors;
         }
     }
 }
