@@ -169,5 +169,11 @@
     <eyeConverters:NullToBoolConverter x:Key="NullToTrueConverter" NullValue="True" />
     <eyeConverters:NullToBoolConverter x:Key="NullToFalseConverter" NullValue="False" />
     <eyeConverters:PointToThicknessConverter x:Key="PointToThicknessConverter" />
-
+    
+    <kent:MapConverter x:Key="TrueToPositiveFalseToWarningBrushConverter">
+        <kent:MapConverter.Mappings>
+            <kent:Mapping From="{StaticResource TrueValue}" To="{StaticResource PositiveBrush}" />
+            <kent:Mapping From="{StaticResource FalseValue}" To="{StaticResource WarningBrush}" />
+        </kent:MapConverter.Mappings>
+    </kent:MapConverter>
 </eye:SharedResourceDictionary>

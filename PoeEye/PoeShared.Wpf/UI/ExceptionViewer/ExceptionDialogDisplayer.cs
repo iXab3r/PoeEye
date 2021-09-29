@@ -134,15 +134,17 @@ namespace PoeShared.UI
                     window.DataContext = dialogViewModel;
                     window.ShowDialog();
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
+                    Log.HandleException(new ApplicationException("Exception in ExceptionReporter :-(", e));
                     window?.Close();
                     throw;
                 }
             }
             catch (Exception e)
             {
-                Log.HandleException(new ApplicationException("Exception in ExceptionReporter :-(", e));
+                Log.HandleException(new ApplicationException("Failed to show exception viewer :-(", e));
+                throw;
             }
         }
     }
