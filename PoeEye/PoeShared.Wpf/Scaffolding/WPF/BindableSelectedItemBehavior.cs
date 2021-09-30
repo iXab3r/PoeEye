@@ -1,3 +1,4 @@
+using System;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Windows;
@@ -5,6 +6,7 @@ using System.Windows.Controls;
 using System.Windows.Interactivity;
 using log4net;
 using PoeShared.Logging;
+using PoeShared.UI;
 
 namespace PoeShared.Scaffolding.WPF
 {
@@ -13,15 +15,15 @@ namespace PoeShared.Scaffolding.WPF
         private static readonly IFluentLog Log = typeof(BindableSelectedItemBehavior).PrepareLogger();
 
         public static readonly DependencyProperty SelectedItemProperty =
-            DependencyProperty.Register("SelectedItem", typeof(object), typeof(BindableSelectedItemBehavior),
-                new UIPropertyMetadata(null, OnSelectedItemChanged));
+            DependencyProperty.Register("SelectedItem", typeof(ITreeViewItemViewModel), typeof(BindableSelectedItemBehavior),
+                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnSelectedItemChanged));
 
         
         private readonly SerialDisposable attachmentAnchor = new SerialDisposable();
 
-        public object SelectedItem
+        public ITreeViewItemViewModel SelectedItem
         {
-            get => GetValue(SelectedItemProperty);
+            get => (ITreeViewItemViewModel)GetValue(SelectedItemProperty);
             set => SetValue(SelectedItemProperty, value);
         }
         
@@ -35,6 +37,14 @@ namespace PoeShared.Scaffolding.WPF
             AssociatedObject
                 .Observe(TreeView.SelectedItemProperty)
                 .Select(_ => AssociatedObject.SelectedItem)
+                .Select(x =>
+                {
+                    if (x != null && x is not ITreeViewItemViewModel)
+                    {
+                        throw new ArgumentException($"{nameof(BindableSelectedItemBehavior)} supports only items of type {nameof(ITreeViewItemViewModel)}, got {x}");
+                    }
+                    return (ITreeViewItemViewModel)x;
+                })
                 .WithPrevious((prev, curr) => new { prev, curr })
                 .SubscribeSafe(x => OnTreeViewSelectedItemChanged(x.prev, x.curr), Log.HandleUiException)
                 .AddTo(anchors);
@@ -48,17 +58,23 @@ namespace PoeShared.Scaffolding.WPF
         
         private static void OnSelectedItemChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
         {
-            if (e.NewValue is TreeViewItem item)
+            if (e.NewValue is ITreeViewItemViewModel newItem)
             {
-                item.SetValue(TreeViewItem.IsSelectedProperty, true);
+                newItem.IsSelected = true;
+            }
+
+            if (e.OldValue is ITreeViewItemViewModel oldItem)
+            {
+                oldItem.IsSelected = false;
             }
         }
 
-        private void OnTreeViewSelectedItemChanged(object previousValue, object currentValue)
+        private void OnTreeViewSelectedItemChanged(ITreeViewItemViewModel previousValue, ITreeViewItemViewModel currentValue)
         {
-            Log.Debug($"[{AssociatedObject}({AssociatedObject.Name})] Changing {SelectedItem} => {currentValue}");
+            var previousSelectedItem = SelectedItem;
+            Log.Debug($"[{AssociatedObject}({AssociatedObject.Name})] Changing {previousValue} => {currentValue}, SelectedItem: {previousSelectedItem}");
             SelectedItem = currentValue;
-            Log.Debug($"[{AssociatedObject}({AssociatedObject.Name})] Selected item changed {previousValue} => {SelectedItem}");
+            Log.Debug($"[{AssociatedObject}({AssociatedObject.Name})] Selected item changed {previousSelectedItem} => {SelectedItem}");
         }
     }
 }
