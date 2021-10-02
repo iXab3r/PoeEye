@@ -3,8 +3,12 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using System.Windows.Threading;
+using log4net.Appender;
+using log4net.Core;
 using Microsoft.VisualBasic.Logging;
 using PoeShared.Logging;
 using PoeShared.Modularity;
@@ -24,6 +28,7 @@ namespace PoeShared.UI
         private readonly IClock clock;
         private readonly IFactory<IConfigProvider> configProviderFactory;
         private readonly IFactory<IExceptionDialogDisplayer> exceptionDialogDisplayer;
+        private readonly CircularBuffer<LoggingEvent> lastEvents = new(1000);
 
         public ExceptionReportingService(
             IClock clock,
@@ -45,6 +50,17 @@ namespace PoeShared.UI
             AppDomain.CurrentDomain.UnhandledException += CurrentDomainOnUnhandledException;
             Dispatcher.CurrentDispatcher.UnhandledException += DispatcherOnUnhandledException;
             TaskScheduler.UnobservedTaskException += TaskSchedulerOnUnobservedTaskException;
+            
+            var appender = new ObservableAppender();
+            appender.Events
+                .SubscribeSafe(
+                    evt =>
+                    {
+                        lastEvents.PushBack(evt);
+                    }, Log.HandleUiException)
+                .AddTo(Anchors);
+
+            SharedLog.Instance.AddAppender(appender).AddTo(Anchors);
 
             SharedLog.Instance.Errors.SubscribeSafe(
                 ex =>
@@ -154,7 +170,7 @@ namespace PoeShared.UI
             try
             {
                 Log.Debug("Preparing log files for crash report...");
-                var logFilesRoot = appArguments.AppDataDirectory;
+                var logFilesRoot = Path.Combine(appArguments.AppDataDirectory, "logs");
                 var logFilesToInclude = new DirectoryInfo(logFilesRoot)
                     .GetFiles("*.log", SearchOption.AllDirectories)
                     .OrderByDescending(x => x.LastWriteTime)
@@ -195,6 +211,48 @@ namespace PoeShared.UI
             catch (Exception e)
             {
                 Log.Warn("Failed to prepare log files", e);
+            }
+        }
+        
+        private void TryToSaveLastLogEvents(DirectoryInfo outputDirectory, IList<ExceptionReportItem> reportItems)
+        {
+            try
+            {
+                var configProvider = configProviderFactory.Create();
+                if (configProvider is not ConfigProviderFromFile configProviderFromFile)
+                {
+                    return;
+                }
+
+                Log.Debug("Preparing log dump for crash report...");
+                if (lastEvents.IsEmpty)
+                {
+                    Log.Debug("Log is empty");
+                    return;
+                }
+                var lastLogEvents = new FileInfo(Path.Combine(outputDirectory.FullName, "logDump.log"));
+
+                var head = lastEvents.Front();
+                var tail = lastEvents.Back();
+                Log.Debug($"Saving log dump to {lastLogEvents} [{head.TimeStamp};{tail.TimeStamp}]");
+                using (var rw = lastLogEvents.OpenWrite())
+                using (var writer = new StreamWriter(rw))
+                {
+                    foreach (var loggingEvent in lastEvents)
+                    {
+                        writer.WriteLine(loggingEvent.RenderedMessage);
+                    }
+                }
+                
+                reportItems.Add(new ExceptionReportItem()
+                {
+                    Description = $"Last {lastEvents.Size} log records\nFirst: {head.TimeStamp}\nLast: {tail.TimeStamp}",
+                    Attachment = lastLogEvents
+                });
+            }
+            catch (Exception e)
+            {
+                Log.Warn("Failed to perform log dump", e);
             }
         }
 
@@ -304,11 +362,26 @@ namespace PoeShared.UI
             {
                 TryToFormatException(crashReportDirectoryPath, itemsToAttach, exception);
             }
+
+            TryToSaveLastLogEvents(crashReportDirectoryPath, itemsToAttach);
             TryToCopyConfigFromMemory(crashReportDirectoryPath, itemsToAttach);
             TryToCopyExistingConfig(crashReportDirectoryPath, itemsToAttach);
             TryToCopyLogs(crashReportDirectoryPath, itemsToAttach);
             TryToScreenshotDesktop(crashReportDirectoryPath, itemsToAttach);
             return itemsToAttach;
+        }
+        
+        
+        internal class ObservableAppender : AppenderSkeleton
+        {
+            private readonly ISubject<LoggingEvent> events = new Subject<LoggingEvent>();
+
+            public IObservable<LoggingEvent> Events => events;
+
+            protected override void Append(LoggingEvent loggingEvent)
+            {
+                events.OnNext(loggingEvent);
+            }
         }
     }
 }

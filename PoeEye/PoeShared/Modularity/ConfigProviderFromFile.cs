@@ -147,7 +147,7 @@ namespace PoeShared.Modularity
         {
             var metaConfig = new PoeEyeCombinedConfig();
             loadedConfigsByType.Values.ToList().ForEach(x => metaConfig.Add(x));
-            Log.Debug($"Saving all configs, metadata: {metaConfig.DumpToTextRaw()}");
+            Log.Debug($"Saving all configs, metadata: {metaConfig.DumpToTextRaw().TakeChars(500)}");
 
             SaveInternal(configSerializer, strategies.Items, file.FullName, metaConfig);
         }

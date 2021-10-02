@@ -22,19 +22,18 @@ namespace PoeShared.Native
     [SuppressMessage("ReSharper", "IdentifierTypo")]
     public sealed class WinEventHookWrapper : DisposableReactiveObject, IWinEventHookWrapper
     {
-        private static readonly IFluentLog Log = typeof(WinEventHookWrapper).PrepareLogger();
-
-        private readonly WinEventHookArguments hookArgs;
         private readonly IScheduler bgScheduler;
 
-        private readonly ISubject<WinEventHookData> whenWindowEventTriggered = new Subject<WinEventHookData>();
-        
         private readonly User32.WinEventProc eventDelegate;
+        private readonly WinEventHookArguments hookArgs;
+
+        private readonly ISubject<WinEventHookData> whenWindowEventTriggered = new Subject<WinEventHookData>();
 
         public WinEventHookWrapper(
             WinEventHookArguments hookArgs,
             [Dependency(WellKnownSchedulers.Background)] IScheduler bgScheduler)
         {
+            Log = typeof(WinEventHookWrapper).PrepareLogger().WithSuffix(hookArgs.ToString());
             this.hookArgs = hookArgs;
             this.bgScheduler = bgScheduler;
             eventDelegate = WinEventDelegateProc;
@@ -44,6 +43,8 @@ namespace PoeShared.Native
             Task.Factory.StartNew(Run, TaskCreationOptions.LongRunning).AddTo(Anchors);
             Disposable.Create(() => Log.Info($"Disposed {nameof(WinEventHookWrapper)}")).AddTo(Anchors);
         }
+
+        private IFluentLog Log { get; }
 
         public IObservable<WinEventHookData> WhenWindowEventTriggered => whenWindowEventTriggered.Synchronize().ObserveOn(bgScheduler);
 
@@ -85,7 +86,7 @@ namespace PoeShared.Native
             Log.Info($"Starting up event sink, args: {hookArgs}");
             RegisterHook().AddTo(Anchors);
             Log.Debug($"Initializing event sink, args: {hookArgs}");
-            EventLoop.RunWindowEventLoop();
+            EventLoop.RunWindowEventLoop(Log);
         }
 
         private IDisposable RegisterHook()
@@ -118,18 +119,18 @@ namespace PoeShared.Native
         {
             private const uint WM_QUIT = 0x0012;
 
-            public static void RunWindowEventLoop()
+            public static void RunWindowEventLoop(IFluentLog log)
             {
                 try
                 {
-                    Log.Info($"Event loop started");
+                    log.Info($"Event loop started");
                     while(GetMessage(out var msg, IntPtr.Zero, 0, 0 ))
                     { 
                         try
                         {
                             if (msg.Message == WM_QUIT)
                             {
-                                Log.Info($"Received {nameof(WM_QUIT)}, breaking event loop");
+                                log.Info($"Received {nameof(WM_QUIT)}, breaking event loop");
                                 break;
                             }
                             TranslateMessage(ref msg); 
@@ -137,24 +138,24 @@ namespace PoeShared.Native
                         }
                         catch (Exception e)
                         {
-                            Log.Warn($"Exception in EventLoop", e);
+                            log.Warn($"Exception in EventLoop", e);
                         }
                         
                     } 
                 }
                 catch (Exception e)
                 {
-                    Log.Error($"Unhandled exception in EventLoop thread", e);
+                    log.Error($"Unhandled exception in EventLoop thread", e);
                 }
                 finally
                 {
-                    Log.Info($"Event loop completed");
+                    log.Info($"Event loop completed");
                 }
             }
             
             [DllImport("user32.dll")]
             private static extern bool GetMessage(out MSG lpMsg, IntPtr hwnd, uint wMsgFilterMin, uint wMsgFilterMax);
-            
+
             [DllImport("user32.dll")]
             private static extern bool TranslateMessage(ref MSG lpMsg);
 

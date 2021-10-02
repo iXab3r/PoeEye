@@ -33,7 +33,7 @@ namespace PoeShared.Logging
         {
             var newLogData = log.Data.WithPrefix(() =>
             {
-                var prefix = prefixSupplier() ;
+                var prefix = SafeInvoke(log, prefixSupplier);
                 return string.IsNullOrEmpty(prefix) ? null : $"[{prefix}] ";
             });
             return log.WithLogData(newLogData);
@@ -48,7 +48,7 @@ namespace PoeShared.Logging
         {
             var newLogData = log.Data.WithSuffix(() =>
             {
-                var suffix = suffixSupplier() ;
+                var suffix = SafeInvoke(log, suffixSupplier);
                 return string.IsNullOrEmpty(suffix) ? null : $" [{suffix}]";
             });
             return log.WithLogData(newLogData);
@@ -75,6 +75,19 @@ namespace PoeShared.Logging
                 return $"{separator}Items: {count}{result}";
             });
             return log.WithLogData(newLogData);
+        }
+
+        private static string SafeInvoke(IFluentLog log, Func<string> supplier)
+        {
+            try
+            {
+                return supplier();
+            }
+            catch (Exception e)
+            {
+                SharedLog.Instance.Log.Warn($"Failed to format log string for logger {log}, data: {new { log.Data.LogLevel, log.Data.Message, log.Data.Exception }}", e);
+                return $"FORMATTING ERROR - {e.Message}";
+            }
         }
     }
 }

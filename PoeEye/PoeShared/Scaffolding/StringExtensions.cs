@@ -23,6 +23,16 @@ namespace PoeShared.Scaffolding
                 .ToArray();
         }
 
+        public static string TakeChars(this string str, int maxChars)
+        {
+            if (str == null || str.Length <= maxChars)
+            {
+                return str;
+            }
+
+            return str[..maxChars] + $"... ({maxChars} chars, omitted {str.Length - maxChars} chars)";
+        }
+
         public static string JoinStrings(this IEnumerable<string> obj, char separator)
         {
             return string.Join(separator, obj);
