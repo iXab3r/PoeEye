@@ -41,6 +41,8 @@ namespace PoeShared.UI
 
         private bool isBusy;
         private bool isRecording;
+
+        private Point? mouseLocation;
         private TimeSpan mousePositionRecordingResolution = TimeSpan.FromMilliseconds(250);
 
         private DateTimeOffset? recordStartTime;
@@ -177,6 +179,12 @@ namespace PoeShared.UI
             set => RaiseAndSetIfChanged(ref targetWindow, value);
         }
 
+        public Point? MouseLocation
+        {
+            get => mouseLocation;
+            private set => RaiseAndSetIfChanged(ref mouseLocation, value);
+        }
+
         private void StopRecordingExecuted()
         {
             if (!IsRecording)
@@ -212,6 +220,22 @@ namespace PoeShared.UI
             using var notification = new RecordingNotificationViewModel(this).AddTo(recordingAnchors);
             notificationsService.AddNotification(notification).AddTo(recordingAnchors);
 
+            var mouseLocationSource = keyboardEventsSource.WhenMouseMove
+                .Select(x => (Point?)new Point(x.X, x.Y))
+                .StartWith(System.Windows.Forms.Cursor.Position)
+                .Publish();
+
+            if (enableMousePositionRecording != MousePositionRecordingType.None && MousePositionRecordingResolution > TimeSpan.Zero)
+            {
+                mouseLocationSource
+                    .Sample(UiConstants.UiThrottlingDelay)
+                    .ObserveOnDispatcher()
+                    .Finally(() => MouseLocation = default)
+                    .SubscribeSafe(x => MouseLocation = x, Log.HandleUiException)
+                    .AddTo(recordingAnchors);
+            }
+            mouseLocationSource.Connect().AddTo(recordingAnchors);
+
             var hotkey = toggleRecordingHotkey.Value ?? HotkeyGesture.Empty;
             var tracker = hotkeyFactory.Create().AddTo(recordingAnchors);
             tracker.HotkeyMode = HotkeyMode.Hold;
@@ -245,25 +269,23 @@ namespace PoeShared.UI
                     tracker.WhenAnyValue(x => x.IsActive).Where(x => x).Select(x => $"Hotkey {tracker} detected"),
                     this.WhenAnyValue(x => x.CanAddItem).Where(x => !x).Select(x => $"Cannot add more items: {totalDuration} / {Owner.MaxDuration}, {Owner.TotalCount} / {Owner.MaxItemsCount}"))
                 .Take(1)
-                .Subscribe(reason =>
+                .SubscribeSafe(reason =>
                 {
                     Log.Debug($"Stopping recording, reason: {reason}");
                     StopRecordingExecuted();
-                })
+                }, Log.HandleUiException)
                 .AddTo(recordingAnchors);
 
             var sw = new Stopwatch();
             if (enableMousePositionRecording != MousePositionRecordingType.None && MousePositionRecordingResolution > TimeSpan.Zero)
             {
-                keyboardEventsSource.WhenMouseMove
+                mouseLocationSource
                     .Sample(MousePositionRecordingResolution)
-                    .Select(x => (Point?)new Point(x.X, x.Y))
-                    .StartWith(System.Windows.Forms.Cursor.Position)
                     .DistinctUntilChanged()
                     .ObserveOnDispatcher()
                     .TakeUntil(cancel)
                     .WithPrevious()
-                    .Subscribe(x =>
+                    .SubscribeSafe(x =>
                     {
                         if (x.Current == null)
                         {
@@ -296,7 +318,7 @@ namespace PoeShared.UI
                             MousePosition = position,
                             IsRelative = isRelative
                         });
-                    })
+                    }, Log.HandleUiException)
                     .AddTo(recordingAnchors);
             }
 
@@ -310,7 +332,7 @@ namespace PoeShared.UI
                     .Where(x => !hotkey.Contains(x.KeyCode))
                     .ObserveOnDispatcher()
                     .TakeUntil(cancel)
-                    .Subscribe(x =>
+                    .SubscribeSafe(x =>
                     {
                         if (sw.ElapsedMilliseconds > 0)
                         {
@@ -327,7 +349,7 @@ namespace PoeShared.UI
                             IsDown = x.IsDown,
                         });
                         sw.Restart();
-                    })
+                    }, Log.HandleUiException)
                     .AddTo(recordingAnchors);
             }
 
@@ -340,7 +362,7 @@ namespace PoeShared.UI
                     .DistinctUntilChanged()
                     .ObserveOnDispatcher()
                     .TakeUntil(cancel)
-                    .Subscribe(x =>
+                    .SubscribeSafe(x =>
                     {
                         var windowHandle = UnsafeNative.WindowFromPoint(new Point(x.X, x.Y));
                         var processId = UnsafeNative.GetProcessIdByWindowHandle(windowHandle);
@@ -364,7 +386,7 @@ namespace PoeShared.UI
                             IsDown = x.IsDown,
                         });
                         sw.Restart();
-                    }).AddTo(recordingAnchors);
+                    }, Log.HandleUiException).AddTo(recordingAnchors);
             }
 
             Log.Debug("Awaiting for recording to stop");

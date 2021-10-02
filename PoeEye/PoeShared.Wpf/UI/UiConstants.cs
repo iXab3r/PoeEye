@@ -4,13 +4,14 @@ namespace PoeShared.UI
 {
     public static class UiConstants
     {
-        public static TimeSpan ArtificialVeryLongDelay = TimeSpan.FromSeconds(30);
-        public static TimeSpan ArtificialLongDelay = TimeSpan.FromSeconds(5);
-        public static TimeSpan ArtificialShortDelay = TimeSpan.FromSeconds(2);
-        public static TimeSpan ArtificialVeryShortDelay = TimeSpan.FromMilliseconds(500);
-        public static TimeSpan UiThrottlingDelay = TimeSpan.FromMilliseconds(250);
-        public static TimeSpan Day = TimeSpan.FromDays(1);
-        public static TimeSpan Week = TimeSpan.FromDays(7);
-        public static double WeekInMilliseconds = Week.TotalMilliseconds;
+        public static readonly TimeSpan ArtificialVeryLongDelay = TimeSpan.FromSeconds(30);
+        public static readonly TimeSpan ArtificialLongDelay = TimeSpan.FromSeconds(5);
+        public static readonly TimeSpan ArtificialShortDelay = TimeSpan.FromSeconds(2);
+        public static readonly TimeSpan ArtificialVeryShortDelay = TimeSpan.FromMilliseconds(500);
+        public static readonly TimeSpan UiThrottlingDelay = TimeSpan.FromMilliseconds(250);
+        public static readonly TimeSpan UiAnimationDelay = TimeSpan.FromMilliseconds(1000 / 60f);
+        public static readonly TimeSpan Day = TimeSpan.FromDays(1);
+        public static readonly TimeSpan Week = TimeSpan.FromDays(7);
+        public static readonly double WeekInMilliseconds = Week.TotalMilliseconds;
     }
 }

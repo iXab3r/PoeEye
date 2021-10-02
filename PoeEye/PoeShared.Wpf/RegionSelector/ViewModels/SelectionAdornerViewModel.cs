@@ -27,7 +27,6 @@ namespace PoeShared.RegionSelector.ViewModels
     internal sealed class SelectionAdornerViewModel : DisposableReactiveObject, ISelectionAdornerViewModel
     {
         private static readonly IFluentLog Log = typeof(SelectionAdornerViewModel).PrepareLogger();
-        private static readonly TimeSpan MousePositionCaptureInterval = TimeSpan.FromMilliseconds(1000 / 60f);
         private static readonly int CurrentProcessId = Process.GetCurrentProcess().Id;
 
         private readonly IKeyboardEventsSource keyboardEventsSource;

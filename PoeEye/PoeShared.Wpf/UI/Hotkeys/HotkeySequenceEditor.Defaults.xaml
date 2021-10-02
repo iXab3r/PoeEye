@@ -33,11 +33,15 @@
                 Command="{Binding Controller.StopRecording}">
                 <eye:ButtonEx.Content>
                     <st:StackPanel MarginBetweenChildren="5" Orientation="Horizontal">
-                        <TextBlock x:Name="RecordingIcon" Style="{StaticResource IconTextBlock}" Text="" FontSize="20" />
+                        <TextBlock x:Name="RecordingIcon" Style="{StaticResource IconTextBlock}" Text="" FontSize="20" Width="40" TextAlignment="Right" />
                         <st:StackPanel Orientation="Vertical" MarginBetweenChildren="5" VerticalAlignment="Center">
                             <TextBlock x:Name="RecordingText" Visibility="{Binding RelativeSource={RelativeSource Self}, Path=Text, Converter={StaticResource NullToCollapsedConverter}}" />
                             <TextBlock x:Name="RecordingHotkeyText" Visibility="{Binding RelativeSource={RelativeSource Self}, Path=Text, Converter={StaticResource NullToCollapsedConverter}}" />
                         </st:StackPanel>
+                        <TextBlock FontWeight="Bold" TextAlignment="Right"
+                                   Width="120"
+                                   Visibility="{Binding Controller.MouseLocation, Converter={StaticResource NullToCollapsedConverter}}"
+                                   Text="{Binding Controller.MouseLocation, Converter={StaticResource StringFormatConverter}, ConverterParameter='{}{0}', TargetNullValue=''}" />
                     </st:StackPanel>
                 </eye:ButtonEx.Content>
             </eye:ButtonEx>
