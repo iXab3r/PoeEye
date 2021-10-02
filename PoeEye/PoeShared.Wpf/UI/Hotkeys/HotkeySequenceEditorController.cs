@@ -48,7 +48,7 @@ namespace PoeShared.UI
         private DateTimeOffset? recordStartTime;
 
         private IWindowHandle targetWindow;
-        private Fallback<HotkeyGesture> toggleRecordingHotkey = new((actualHotkey, defaultHotkey) => actualHotkey == null || actualHotkey.IsEmpty || actualHotkey.Equals(defaultHotkey) );
+        private Fallback<HotkeyGesture> toggleRecordingHotkey = new((actualHotkey, defaultHotkey) => actualHotkey == null || actualHotkey.IsEmpty || actualHotkey.Equals(defaultHotkey));
 
         private TimeSpan totalDuration;
 
@@ -60,11 +60,11 @@ namespace PoeShared.UI
             Binder
                 .Bind(x => x.EnableKeyboardRecording || x.EnableMouseClicksRecording || x.MousePositionRecording != MousePositionRecordingType.None)
                 .To(x => x.AtLeastOneRecordingTypeEnabled);
-            
+
             Binder.BindIf(x => x.IsRecording, x => x.Owner.TotalDuration + x.RecordingDuration)
                 .Else(x => x.Owner.TotalDuration)
                 .To(x => x.TotalDuration);
-            
+
             Binder.Bind(x => x.stopRecording.IsBusy || x.startRecording.IsBusy || x.IsRecording).To(x => x.IsBusy);
         }
 
@@ -84,7 +84,7 @@ namespace PoeShared.UI
             this.notificationsService = notificationsService;
             this.hotkeyFactory = hotkeyFactory;
             this.keyboardEventsSource = keyboardEventsSource;
-            
+
             this.WhenAnyValue(x => x.RecordStartTime)
                 .DistinctUntilChanged()
                 .Select(x => x != null ? Observable.Interval(TimeSpan.FromMilliseconds(250)) : Observable.Return(0L))
@@ -92,10 +92,10 @@ namespace PoeShared.UI
                 .Select(x => DateTime.UtcNow - RecordStartTime ?? TimeSpan.Zero)
                 .ToProperty(out recordDuration, this, x => x.RecordingDuration)
                 .AddTo(Anchors);
-            
+
             startRecording = CommandWrapper.Create(StartRecordingExecuted, this.WhenAnyValue(x => x.CanAddItem).ObserveOnDispatcher());
             stopRecording = CommandWrapper.Create(StopRecordingExecuted);
-            
+
             Binder.Attach(this).AddTo(Anchors);
         }
 
@@ -201,27 +201,29 @@ namespace PoeShared.UI
             {
                 throw new InvalidOperationException("Already recording");
             }
+
             IsRecording = true;
 
             var initialWindow = UnsafeNative.GetForegroundWindow();
             var windowToRecord = targetWindow;
             using var recordingAnchors = new CompositeDisposable();
             Disposable.Create(StopRecordingExecuted).AddTo(recordingAnchors);
-            
+
             var cancel = Observable.Merge(
                 this.WhenAnyValue(x => x.IsRecording).Where(x => x == false).ToUnit()
             );
-            
+
             if (windowToRecord != null)
             {
                 Log.Debug($"Activating window before recording: {windowToRecord}, previously active: {initialWindow}");
                 UnsafeNative.ActivateWindow(windowToRecord.Handle);
             }
+
             using var notification = new RecordingNotificationViewModel(this).AddTo(recordingAnchors);
             notificationsService.AddNotification(notification).AddTo(recordingAnchors);
 
             var mouseLocationSource = keyboardEventsSource.WhenMouseMove
-                .Select(x => (Point?)new Point(x.X, x.Y))
+                .Select(x => new Point(x.X, x.Y))
                 .StartWith(System.Windows.Forms.Cursor.Position)
                 .Publish();
 
@@ -234,6 +236,7 @@ namespace PoeShared.UI
                     .SubscribeSafe(x => MouseLocation = x, Log.HandleUiException)
                     .AddTo(recordingAnchors);
             }
+
             mouseLocationSource.Connect().AddTo(recordingAnchors);
 
             var hotkey = toggleRecordingHotkey.Value ?? HotkeyGesture.Empty;
@@ -277,56 +280,124 @@ namespace PoeShared.UI
                 .AddTo(recordingAnchors);
 
             var sw = new Stopwatch();
-            if (enableMousePositionRecording != MousePositionRecordingType.None && MousePositionRecordingResolution > TimeSpan.Zero)
-            {
-                mouseLocationSource
-                    .Sample(MousePositionRecordingResolution)
-                    .DistinctUntilChanged()
-                    .ObserveOnDispatcher()
-                    .TakeUntil(cancel)
-                    .WithPrevious()
-                    .SubscribeSafe(x =>
-                    {
-                        if (x.Current == null)
-                        {
-                            return;
-                        }
-                        
-                        var isRelative = enableMousePositionRecording == MousePositionRecordingType.Relative;
-                        if (x.Previous == null && isRelative)
-                        {
-                            return;
-                        }
-                        
-                        if (sw.ElapsedMilliseconds > 0)
-                        {
-                            Owner.AddItem.Execute(new HotkeySequenceDelay
-                            {
-                                Delay = TimeSpan.FromMilliseconds(sw.ElapsedMilliseconds),
-                                IsKeypress = true,
-                            });
-                        }
-                        sw.Restart();
 
-                        var position = isRelative
-                            ? new Point(x.Current.Value.X - x.Previous.Value.X, x.Current.Value.Y - x.Previous.Value.Y)
-                            : windowToRecord == null 
-                                ? x.Current
-                                : new Point(x.Current.Value.X - windowToRecord.ClientBounds.X, x.Current.Value.Y - windowToRecord.ClientBounds.Y); 
-                        Owner.AddItem.Execute(new HotkeySequenceHotkey
-                        {
-                            MousePosition = position,
-                            IsRelative = isRelative
-                        });
-                    }, Log.HandleUiException)
-                    .AddTo(recordingAnchors);
+            void AddDelayStep()
+            {
+                if (sw.ElapsedMilliseconds <= 0)
+                {
+                    return;
+                }
+
+                AddActionDelay(sw.ElapsedMilliseconds, isKeyPress: true);
+                sw.Restart();
             }
+
+            if (MousePositionRecordingResolution > TimeSpan.Zero)
+            {
+                if (enableMousePositionRecording == MousePositionRecordingType.Absolute)
+                {
+                    mouseLocationSource
+                        .Sample(MousePositionRecordingResolution)
+                        .DistinctUntilChanged()
+                        .ObserveOnDispatcher()
+                        .TakeUntil(cancel)
+                        .SubscribeSafe(x =>
+                        {
+                            AddDelayStep();
+                            var position = windowToRecord == null
+                                ? x
+                                : new Point(x.X - windowToRecord.ClientBounds.X, x.Y - windowToRecord.ClientBounds.Y);
+                            AddMouseMove(position, isRelative: false);
+                        }, Log.HandleUiException)
+                        .AddTo(recordingAnchors);
+                } else if (enableMousePositionRecording == MousePositionRecordingType.Relative)
+                {
+                    var recordMouseAbsolutePosition = true; // relative recording still need improvements, it's a bit off
+                    if (recordMouseAbsolutePosition)
+                    {
+                        mouseLocationSource
+                            .Select(x => (Point?)x)
+                            .Sample(MousePositionRecordingResolution)
+                            .DistinctUntilChanged()
+                            .ObserveOnDispatcher()
+                            .TakeUntil(cancel)
+                            .WithPrevious()
+                            .SubscribeSafe(x =>
+                            {
+                                if (x.Current == null)
+                                {
+                                    return;
+                                }
+                        
+                                if (x.Previous == null)
+                                {
+                                    return;
+                                }
+                        
+                                AddDelayStep();
+                                var position = new Point(x.Current.Value.X - x.Previous.Value.X, x.Current.Value.Y - x.Previous.Value.Y);
+                                AddMouseMove(position, isRelative: true);
+                            }, Log.HandleUiException)
+                            .AddTo(recordingAnchors);
+                    }
+                    else
+                    {
+                        Point? initialLocation = default;
+                        mouseLocationSource
+                            .Buffer(MousePositionRecordingResolution)
+                            .Select(positions =>
+                            {
+                                if (positions.Count == 0)
+                                {
+                                    return default(Point?);
+                                }
+
+                                if (initialLocation == null)
+                                {
+                                    initialLocation = positions[0];
+                                }
+
+                                if (positions.Count == 1)
+                                {
+                                    return default;
+                                }
+
+                                var resultX = 0;
+                                var resultY = 0;
+                                foreach (var point in positions)
+                                {
+                                    resultX += point.X - initialLocation.Value.X;
+                                    resultY += point.Y - initialLocation.Value.Y;
+                                    initialLocation = point;
+                                }
+
+                                return new Point(resultX, resultY);
+                            })
+                            .DistinctUntilChanged()
+                            .Where(x => x != default && !x.Value.IsEmpty)
+                            .ObserveOnDispatcher()
+                            .TakeUntil(cancel)
+                            .SubscribeSafe(x =>
+                            {
+                                if (x == null)
+                                {
+                                    return;
+                                }
+
+                                AddDelayStep();
+                                AddMouseMove(x.Value, isRelative: true);
+                            }, Log.HandleUiException)
+                            .AddTo(recordingAnchors);
+                    }
+                }
+            }
+
 
             if (EnableKeyboardRecording)
             {
                 Observable.Merge(
-                        keyboardEventsSource.WhenKeyDown.Select(x => new {x.KeyCode, IsDown = true}),
-                        keyboardEventsSource.WhenKeyUp.Select(x => new {x.KeyCode, IsDown = false})
+                        keyboardEventsSource.WhenKeyDown.Select(x => new { x.KeyCode, IsDown = true }),
+                        keyboardEventsSource.WhenKeyUp.Select(x => new { x.KeyCode, IsDown = false })
                     )
                     .DistinctUntilChanged()
                     .Where(x => !hotkey.Contains(x.KeyCode))
@@ -334,15 +405,7 @@ namespace PoeShared.UI
                     .TakeUntil(cancel)
                     .SubscribeSafe(x =>
                     {
-                        if (sw.ElapsedMilliseconds > 0)
-                        {
-                            Owner.AddItem.Execute(new HotkeySequenceDelay
-                            {
-                                Delay = TimeSpan.FromMilliseconds(sw.ElapsedMilliseconds),
-                                IsKeypress = true,
-                            });
-                        }
-                        sw.Restart();
+                        AddDelayStep();
                         Owner.AddItem.Execute(new HotkeySequenceHotkey
                         {
                             Hotkey = new HotkeyGesture(x.KeyCode.ToInputKey()),
@@ -356,8 +419,8 @@ namespace PoeShared.UI
             if (EnableMouseClicksRecording)
             {
                 Observable.Merge(
-                        keyboardEventsSource.WhenMouseDown.Select(x => new {x.Button, x.X, x.Y, IsDown = true}),
-                        keyboardEventsSource.WhenMouseUp.Select(x => new {x.Button, x.X, x.Y, IsDown = false})
+                        keyboardEventsSource.WhenMouseDown.Select(x => new { x.Button, x.X, x.Y, IsDown = true }),
+                        keyboardEventsSource.WhenMouseUp.Select(x => new { x.Button, x.X, x.Y, IsDown = false })
                     )
                     .DistinctUntilChanged()
                     .ObserveOnDispatcher()
@@ -371,15 +434,8 @@ namespace PoeShared.UI
                             return;
                         }
 
-                        if (sw.ElapsedMilliseconds > 0)
-                        {
-                            Owner.AddItem.Execute(new HotkeySequenceDelay
-                            {
-                                Delay = TimeSpan.FromMilliseconds(sw.ElapsedMilliseconds),
-                                IsKeypress = true,
-                            });
-                        }
-                        sw.Restart();
+                        AddDelayStep();
+
                         Owner.AddItem.Execute(new HotkeySequenceHotkey
                         {
                             Hotkey = new HotkeyGesture(x.Button),
@@ -391,6 +447,29 @@ namespace PoeShared.UI
 
             Log.Debug("Awaiting for recording to stop");
             await this.WhenAnyValue(x => x.IsRecording).Where(x => x == false).Take(1);
+        }
+
+        private void AddMouseMove(Point? position, bool isRelative)
+        {
+            Owner.AddItem.Execute(new HotkeySequenceHotkey
+            {
+                MousePosition = position,
+                IsRelative = isRelative
+            });
+        }
+
+        private void AddActionDelay(double delayInMs, bool isKeyPress)
+        {
+            AddActionDelay(TimeSpan.FromMilliseconds(delayInMs), isKeyPress);
+        }
+
+        private void AddActionDelay(TimeSpan delay, bool isKeyPress)
+        {
+            Owner.AddItem.Execute(new HotkeySequenceDelay
+            {
+                Delay = delay,
+                IsKeypress = true,
+            });
         }
     }
 }
