@@ -6,5 +6,5 @@ using WindowsHook.WinApi;
 
 namespace WindowsHook.Implementation
 {
-    internal delegate HookResult Subscribe(Callback callbck);
+    internal delegate HookResult Subscribe(WinHookCallback callbck);
 }

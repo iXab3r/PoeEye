@@ -43,7 +43,6 @@ namespace PoeShared.Native
             Task.Factory.StartNew(Run, TaskCreationOptions.LongRunning).AddTo(Anchors);
             Disposable.Create(() => Log.Info($"Disposed {nameof(WinEventHookWrapper)}")).AddTo(Anchors);
         }
-
         private IFluentLog Log { get; }
 
         public IObservable<WinEventHookData> WhenWindowEventTriggered => whenWindowEventTriggered.Synchronize().ObserveOn(bgScheduler);

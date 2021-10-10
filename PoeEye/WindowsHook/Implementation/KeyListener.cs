@@ -2,6 +2,7 @@
 // Copyright (c) 2015 George Mamaladze
 // See license.txt or https://mit-license.org/
 
+using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
 using WindowsHook.WinApi;
@@ -16,6 +17,7 @@ namespace WindowsHook.Implementation
             IsReady = true;
         }
 
+        public event KeyEventHandler KeyRaw;
         public event KeyEventHandler KeyDown;
         public event KeyPressEventHandler KeyPress;
         public event KeyEventHandler KeyUp;
@@ -53,13 +55,15 @@ namespace WindowsHook.Implementation
             handler(this, e);
         }
 
-        protected override bool Callback(CallbackData data)
+        protected override bool Callback(WinHookCallbackData data)
         {
             var e = GetDownUpEventArgs(data);
             if (e == null)
             {
                 return false;
             }
+
+            KeyRaw?.Invoke(this, e);
 
             InvokeKeyDown(e);
 
@@ -77,8 +81,8 @@ namespace WindowsHook.Implementation
             return !e.Handled;
         }
 
-        protected abstract IEnumerable<KeyPressEventArgsExt> GetPressEventArgs(CallbackData data);
+        protected abstract IEnumerable<KeyPressEventArgsExt> GetPressEventArgs(WinHookCallbackData data);
         
-        protected abstract KeyEventArgsExt GetDownUpEventArgs(CallbackData data);
+        protected abstract KeyEventArgsExt GetDownUpEventArgs(WinHookCallbackData data);
     }
 }

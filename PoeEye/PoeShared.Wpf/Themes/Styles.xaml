@@ -1,7 +1,8 @@
 ﻿<eye:SharedResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                              xmlns:eye="clr-namespace:PoeShared.UI"
-                             xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls">
+                             xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
+                             xmlns:wpf="clr-namespace:PoeShared.Scaffolding.WPF">
     <eye:SharedResourceDictionary.MergedDictionaries>
         <eye:SharedResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.defaults.xaml" />
         <eye:SharedResourceDictionary Source="pack://application:,,,/PoeShared.Wpf;component/Themes/Converters.xaml" />
@@ -65,4 +66,12 @@
          <Setter Property="ItemContainerStyle" Value="{StaticResource FastComboBoxItemStyle}" />
          <Setter Property="VerticalContentAlignment" Value="Center"/>
      </Style>
+    
+    <ObjectDataProvider x:Key="UserInputBlockTypeEnumDataProvider"
+                        MethodName="GetValuesAndDescriptions"
+                        ObjectType="wpf:EnumHelper">
+        <ObjectDataProvider.MethodParameters>
+            <x:TypeExtension TypeName="eye:UserInputBlockType" />
+        </ObjectDataProvider.MethodParameters>
+    </ObjectDataProvider>
 </eye:SharedResourceDictionary>

@@ -12,6 +12,11 @@ namespace WindowsHook
     public interface IKeyboardEvents
     {
         /// <summary>
+        ///   Occurs when any mouse event arrives before all other events are invoked
+        /// </summary>
+        event KeyEventHandler KeyRaw;
+        
+        /// <summary>
         ///     Occurs when a key is pressed.
         /// </summary>
         event KeyEventHandler KeyDown;

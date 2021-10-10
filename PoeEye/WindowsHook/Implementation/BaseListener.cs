@@ -28,7 +28,7 @@ namespace WindowsHook.Implementation
         
         protected IFluentLog Log { get; }
 
-        private bool CallbackHook(CallbackData data)
+        private bool CallbackHook(WinHookCallbackData data)
         {
             if (!IsReady)
             {
@@ -38,7 +38,7 @@ namespace WindowsHook.Implementation
             return Callback(data);
         }
 
-        protected abstract bool Callback(CallbackData data);
+        protected abstract bool Callback(WinHookCallbackData data);
 
         public override string ToString()
         {

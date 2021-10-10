@@ -13,7 +13,7 @@ namespace WindowsHook.Implementation
         {
         }
 
-        protected override MouseEventExtArgs GetEventArgs(CallbackData data)
+        protected override MouseEventExtArgs GetEventArgs(WinHookCallbackData data)
         {
             return MouseEventExtArgs.FromRawDataApp(data);
         }

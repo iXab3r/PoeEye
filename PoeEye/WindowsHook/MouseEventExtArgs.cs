@@ -3,6 +3,7 @@
 // See license.txt or https://mit-license.org/
 
 using System;
+using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using System.Windows.Input;
@@ -14,7 +15,7 @@ namespace WindowsHook
     /// <summary>
     ///     Provides extended data for the MouseClickExt and MouseMoveExt events.
     /// </summary>
-    public class MouseEventExtArgs : MouseEventArgs
+    public sealed class MouseEventExtArgs : MouseEventArgs
     {
         /// <summary>
         ///     Initializes a new instance of the <see cref="MouseEventExtArgs" /> class.
@@ -27,14 +28,15 @@ namespace WindowsHook
         /// <param name="isMouseButtonDown">True if event signals mouse button down.</param>
         /// <param name="isMouseButtonUp">True if event signals mouse button up.</param>
         /// <param name="modifiers">CTRL, ALT, SHIFT, etc</param>
-        internal MouseEventExtArgs(MouseButtons buttons, int clicks, Point point, int delta, int timestamp,
-            bool isMouseButtonDown, bool isMouseButtonUp, Keys modifiers)
+        public MouseEventExtArgs(MouseButtons buttons, int clicks, Point point, int delta, int timestamp,
+            bool isMouseButtonDown, bool isMouseButtonUp, Keys modifiers, bool isInjected)
             : base(buttons, clicks, point.X, point.Y, delta)
         {
             IsMouseButtonDown = isMouseButtonDown;
             IsMouseButtonUp = isMouseButtonUp;
             Timestamp = timestamp;
             Modifiers = modifiers;
+            IsInjected = isInjected;
         }
 
         /// <summary>
@@ -73,8 +75,9 @@ namespace WindowsHook
         internal Point Point => new Point(X, Y);
         
         public Keys Modifiers { get; }
+        public bool IsInjected { get; }
 
-        internal static MouseEventExtArgs FromRawDataApp(CallbackData data)
+        internal static MouseEventExtArgs FromRawDataApp(WinHookCallbackData data)
         {
             var wParam = data.WParam;
             var lParam = data.LParam;
@@ -87,7 +90,7 @@ namespace WindowsHook
             return marshalledMouseStruct == null ? default : FromRawDataUniversal(wParam, ((AppMouseStruct)marshalledMouseStruct).ToMouseStruct());
         }
 
-        internal static MouseEventExtArgs FromRawDataGlobal(CallbackData data)
+        internal static MouseEventExtArgs FromRawDataGlobal(WinHookCallbackData data)
         {
             var wParam = data.WParam;
             var lParam = data.LParam;
@@ -194,6 +197,10 @@ namespace WindowsHook
                     mouseDelta = mouseInfo.MouseData;
                     break;
             }
+            
+            const uint maskInjected = 0x00000010; // for bit 4
+
+            var isInjected = mouseInfo.Flags.HasFlag(MouseHookLowLevelFlags.LLMHF_INJECTED) || mouseInfo.Flags.HasFlag(MouseHookLowLevelFlags.LLMHF_LOWER_IL_INJECTED);
 
             var modifiers = GetCurrentModifierKeys();
             var e = new MouseEventExtArgs(
@@ -204,7 +211,8 @@ namespace WindowsHook
                 mouseInfo.Timestamp,
                 isMouseButtonDown,
                 isMouseButtonUp,
-                modifiers);
+                modifiers,
+                isInjected);
 
             return e;
         }
@@ -232,7 +240,12 @@ namespace WindowsHook
 
         internal MouseEventExtArgs ToDoubleClickEventArgs()
         {
-            return new MouseEventExtArgs(Button, 2, Point, Delta, Timestamp, IsMouseButtonDown, IsMouseButtonUp, Modifiers);
+            return new MouseEventExtArgs(Button, 2, Point, Delta, Timestamp, IsMouseButtonDown, IsMouseButtonUp, Modifiers, IsInjected);
+        }
+
+        public override string ToString()
+        {
+            return $"{nameof(Location)}: {Location}, {nameof(Button)}: {Button}, {nameof(Delta)}: {Delta}, {nameof(Modifiers)}: {Modifiers}, {nameof(Handled)}: {Handled}, {nameof(IsInjected)}: {IsInjected}";
         }
     }
 }

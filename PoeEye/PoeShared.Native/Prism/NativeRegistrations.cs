@@ -34,7 +34,6 @@ namespace PoeShared.Prism
                 .RegisterSingleton<IClipboardManager, ClipboardManager>()
                 .RegisterSingleton<IAudioNotificationsManager, AudioNotificationsManager>()
                 .RegisterSingleton<IAudioPlayer, AudioPlayer>()
-                .RegisterSingleton<IUserInputBlocker, UserInputBlocker>()
                 .RegisterSingleton<IWindowHandleProvider, WindowHandleProvider>()
                 .RegisterSingleton<IKeyboardLayoutManager, KeyboardLayoutManager>()
                 .RegisterSingleton<IConverter<NameValueCollection, string>, NameValueCollectionToQueryStringConverter>()

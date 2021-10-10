@@ -3,6 +3,7 @@
 // See license.txt or https://mit-license.org/
 
 using System;
+using System.Drawing;
 using System.Windows.Forms;
 using WindowsHook.WinApi;
 
@@ -20,7 +21,7 @@ namespace WindowsHook.Implementation
         private bool m_IsDragging;
 
         private Point m_PreviousPosition;
-
+        
         protected MouseListener(Subscribe subscribe)
             : base(subscribe)
         {
@@ -37,6 +38,7 @@ namespace WindowsHook.Implementation
         }
 
         public event MouseEventHandler MouseMove;
+        public event EventHandler<MouseEventExtArgs> MouseRaw;
         public event EventHandler<MouseEventExtArgs> MouseMoveExt;
         public event MouseEventHandler MouseClick;
         public event MouseEventHandler MouseDown;
@@ -51,13 +53,15 @@ namespace WindowsHook.Implementation
         public event MouseEventHandler MouseDragFinished;
         public event EventHandler<MouseEventExtArgs> MouseDragFinishedExt;
 
-        protected override bool Callback(CallbackData data)
+        protected override bool Callback(WinHookCallbackData data)
         {
             var e = GetEventArgs(data);
             if (e == null)
             {
                 return false;
             }
+
+            MouseRaw?.Invoke(this, e);
 
             if (e.IsMouseButtonDown)
             {
@@ -74,17 +78,18 @@ namespace WindowsHook.Implementation
                 ProcessWheel(ref e);
             }
 
-            if (HasMoved(e.Point))
+            var hasMoved = HasMoved(e.Point);
+            if (hasMoved)
             {
                 ProcessMove(ref e);
             }
 
             ProcessDrag(ref e);
-
+            
             return !e.Handled;
         }
 
-        protected abstract MouseEventExtArgs GetEventArgs(CallbackData data);
+        protected abstract MouseEventExtArgs GetEventArgs(WinHookCallbackData data);
 
         protected virtual void ProcessWheel(ref MouseEventExtArgs e)
         {

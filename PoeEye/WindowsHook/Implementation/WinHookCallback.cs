@@ -6,5 +6,8 @@ using WindowsHook.WinApi;
 
 namespace WindowsHook.Implementation
 {
-    internal delegate bool Callback(CallbackData data);
+    /// <summary>
+    ///  Returns: True = continue processing, False = stop callback chain
+    /// </summary>
+    public delegate bool WinHookCallback(WinHookCallbackData data);
 }

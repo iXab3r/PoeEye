@@ -55,6 +55,7 @@ namespace PoeShared.Prism
                 .RegisterSingleton<CharToKeysConverter>(typeof(IConverter<(char ch, KeyboardLayout layout), Keys>), typeof(IConverter<char, Keys>))
                 .RegisterSingleton<IMicrophoneProvider, MicrophoneProvider>()
                 .RegisterSingleton<IMessageBoxService, MessageBoxService>()
+                .RegisterSingleton<IUserInputBlocker, UserInputBlocker>()
                 .RegisterSingleton<IScreenRegionSelectorService, ScreenRegionSelectorService>()
                 .RegisterSingleton<IConverter<Keys, HotkeyGesture>, KeysToHotkeyGestureConverter>()
                 .RegisterSingleton<IHotkeyConverter>(_ => HotkeyConverter.Instance);

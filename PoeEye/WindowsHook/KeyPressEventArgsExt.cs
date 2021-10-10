@@ -45,7 +45,7 @@ namespace WindowsHook
         /// </summary>
         public int Timestamp { get; }
 
-        internal static IEnumerable<KeyPressEventArgsExt> FromRawDataApp(CallbackData data)
+        internal static IEnumerable<KeyPressEventArgsExt> FromRawDataApp(WinHookCallbackData data)
         {
             var wParam = data.WParam;
             var lParam = data.LParam;
@@ -84,7 +84,7 @@ namespace WindowsHook
             }
         }
 
-        internal static IEnumerable<KeyPressEventArgsExt> FromRawDataGlobal(CallbackData data)
+        internal static IEnumerable<KeyPressEventArgsExt> FromRawDataGlobal(WinHookCallbackData data)
         {
             var wParam = data.WParam;
             var lParam = data.LParam;

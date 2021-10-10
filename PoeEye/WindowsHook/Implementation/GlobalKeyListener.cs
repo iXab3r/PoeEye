@@ -14,12 +14,12 @@ namespace WindowsHook.Implementation
         {
         }
 
-        protected override IEnumerable<KeyPressEventArgsExt> GetPressEventArgs(CallbackData data)
+        protected override IEnumerable<KeyPressEventArgsExt> GetPressEventArgs(WinHookCallbackData data)
         {
             return KeyPressEventArgsExt.FromRawDataGlobal(data);
         }
 
-        protected override KeyEventArgsExt GetDownUpEventArgs(CallbackData data)
+        protected override KeyEventArgsExt GetDownUpEventArgs(WinHookCallbackData data)
         {
             return KeyEventArgsExt.FromRawDataGlobal(data);
         }

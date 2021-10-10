@@ -2,6 +2,7 @@
 // Copyright (c) 2015 George Mamaladze
 // See license.txt or https://mit-license.org/
 
+using System.Drawing;
 using System.Windows.Forms;
 using WindowsHook.WinApi;
 
@@ -66,7 +67,7 @@ namespace WindowsHook.Implementation
                 e.Timestamp - m_PreviousClickedTime <= m_SystemDoubleClickTime;
         }
 
-        protected override MouseEventExtArgs GetEventArgs(CallbackData data)
+        protected override MouseEventExtArgs GetEventArgs(WinHookCallbackData data)
         {
             return MouseEventExtArgs.FromRawDataGlobal(data);
         }

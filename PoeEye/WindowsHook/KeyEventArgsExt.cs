@@ -25,8 +25,20 @@ namespace WindowsHook
         {
         }
 
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="KeyEventArgsExt" /> class.
+        /// </summary>
+        /// <param name="keyData"></param>
+        /// <param name="isKeyDown"></param>
+        public KeyEventArgsExt(Keys keyData, bool isKeyDown)
+            : this(keyData)
+        {
+            IsKeyDown = isKeyDown;
+            IsKeyUp = !IsKeyDown;
+        }
+
         public KeyEventArgsExt(Keys keyData, int scanCode, int timestamp, bool isKeyDown, bool isKeyUp,
-            bool isExtendedKey)
+            bool isExtendedKey, bool isInjected)
             : this(keyData)
         {
             ScanCode = scanCode;
@@ -34,6 +46,7 @@ namespace WindowsHook
             IsKeyDown = isKeyDown;
             IsKeyUp = isKeyUp;
             IsExtendedKey = isExtendedKey;
+            IsInjected = isInjected;
         }
 
         /// <summary>
@@ -61,11 +74,13 @@ namespace WindowsHook
         /// </summary>
         public bool IsExtendedKey { get; }
 
-        internal static KeyEventArgsExt FromRawDataApp(CallbackData data)
+        public bool IsInjected { get; }
+
+        internal static KeyEventArgsExt FromRawDataApp(WinHookCallbackData data)
         {
             var wParam = data.WParam;
             var lParam = data.LParam;
-
+            
             //http://msdn.microsoft.com/en-us/library/ms644984(v=VS.85).aspx
 
             const uint maskKeydown = 0x40000000; // for bit 30
@@ -91,11 +106,12 @@ namespace WindowsHook
 
             var isKeyDown = !isKeyReleased;
             var isKeyUp = wasKeyDown && isKeyReleased;
+            var isInjected = false; // for app-level hook there is no such info
 
-            return new KeyEventArgsExt(keyData, scanCode, timestamp, isKeyDown, isKeyUp, isExtendedKey);
+            return new KeyEventArgsExt(keyData, scanCode, timestamp, isKeyDown, isKeyUp, isExtendedKey, isInjected);
         }
 
-        internal static KeyEventArgsExt FromRawDataGlobal(CallbackData data)
+        internal static KeyEventArgsExt FromRawDataGlobal(WinHookCallbackData data)
         {
             var wParam = data.WParam;
             var lParam = data.LParam;
@@ -109,10 +125,11 @@ namespace WindowsHook
             var isKeyUp = keyCode == Messages.WM_KEYUP || keyCode == Messages.WM_SYSKEYUP;
 
             const uint maskExtendedKey = 0x1;
-            var isExtendedKey = (keyboardHookStruct.Flags & maskExtendedKey) > 0;
+            var isExtendedKey = ((int)keyboardHookStruct.Flags & maskExtendedKey) > 0;
+            var isInjected = keyboardHookStruct.Flags.HasFlag(KeyboardHookLowLevelFlags.LLKHF_INJECTED) || keyboardHookStruct.Flags.HasFlag(KeyboardHookLowLevelFlags.LLKHF_LOWER_IL_INJECTED); 
 
             return new KeyEventArgsExt(keyData, keyboardHookStruct.ScanCode, keyboardHookStruct.Time, isKeyDown,
-                isKeyUp, isExtendedKey);
+                isKeyUp, isExtendedKey, isInjected);
         }
 
         // # It is not possible to distinguish Keys.LControlKey and Keys.RControlKey when they are modifiers
@@ -148,6 +165,11 @@ namespace WindowsHook
                    (control ? Keys.Control : Keys.None) |
                    (shift ? Keys.Shift : Keys.None) |
                    (alt ? Keys.Alt : Keys.None);
+        }
+
+        public override string ToString()
+        {
+            return $"{nameof(KeyCode)}: {KeyCode}, {nameof(Modifiers)}: {Modifiers}, {nameof(ScanCode)}: {ScanCode}, {nameof(Handled)}: {Handled}, {nameof(IsInjected)}: {IsInjected}";
         }
     }
 }

@@ -43,6 +43,18 @@ namespace PoeShared.Native
             this.inputScheduler = inputScheduler;
             this.clock = clock;
 
+            WhenMouseRaw = HookMouseRaw()
+                .Publish()
+                .RefCount()
+                .Where(x => x.EventType == InputEventType.Mouse)
+                .Select(x => x.EventArgs as MouseEventExtArgs);
+            
+            WhenKeyRaw = HookKeyboardRaw()
+                .Publish()
+                .RefCount()
+                .Where(x => x.EventType == InputEventType.Keyboard)
+                .Select(x => x.EventArgs as KeyEventArgsExt);
+
             WhenMouseMove = HookMouseMove()
                 .Publish()
                 .RefCount()
@@ -82,6 +94,8 @@ namespace PoeShared.Native
                 .Select(x => x.EventArgs as KeyPressEventArgs);
         }
 
+        public IObservable<MouseEventExtArgs> WhenMouseRaw { get; }
+        
         public IObservable<KeyPressEventArgs> WhenKeyPress { get; }
 
         public IObservable<KeyEventArgs> WhenKeyDown { get; }
@@ -97,6 +111,8 @@ namespace PoeShared.Native
         public IObservable<MouseEventArgs> WhenMouseWheel { get; }
 
         public bool RealtimeMode { get; } = true;
+        
+        public IObservable<KeyEventArgsExt> WhenKeyRaw { get; }
 
         public IDisposable AddKeyboardFilter(IKeyboardEventFilter filter)
         {
@@ -138,6 +154,16 @@ namespace PoeShared.Native
         private IObservable<InputEventData> HookKeyboard()
         {
             return PrepareHook("Keyboard", keyboardMouseEventsProvider.System, InitializeKeyboardHook, ShouldProcess, inputScheduler);
+        }
+        
+        private IObservable<InputEventData> HookKeyboardRaw()
+        {
+            return PrepareHook("KeyboardRaw", keyboardMouseEventsProvider.System, InitializeKeyboardRaw, ShouldProcess, inputScheduler);
+        }
+        
+        private IObservable<InputEventData> HookMouseRaw()
+        {
+            return PrepareHook("MouseRaw", keyboardMouseEventsProvider.System, InitializeMouseRaw, ShouldProcess, inputScheduler);
         }
 
         private static IObservable<InputEventData> PrepareHook(
@@ -249,8 +275,35 @@ namespace PoeShared.Native
                     h => mouseEvents.MouseMoveExt += h,
                     h => mouseEvents.MouseMoveExt -= h)
                 .Select(x => x.EventArgs)
-                .Select(EnrichMouseMove)
                 .Select(x => ToInputEventData(x, InputEventType.MouseMove));
+
+            return mouseMove;
+        }
+        
+        private IObservable<InputEventData> InitializeMouseRaw(IMouseEvents mouseEvents)
+        {
+            Log.Info($"Hooking Mouse Raw (possible performance hit !) using {mouseEvents}");
+
+            var mouseMove = Observable
+                .FromEventPattern<EventHandler<MouseEventExtArgs>, MouseEventExtArgs>(
+                    h => mouseEvents.MouseRaw += h,
+                    h => mouseEvents.MouseRaw -= h)
+                .Select(x => x.EventArgs)
+                .Select(x => ToInputEventData(x, InputEventType.Mouse));
+
+            return mouseMove;
+        }
+        
+        private IObservable<InputEventData> InitializeKeyboardRaw(IKeyboardEvents keyboardEvents)
+        {
+            Log.Info($"Hooking Keyboard Raw (possible performance hit !) using {keyboardEvents}");
+
+            var mouseMove = Observable
+                .FromEventPattern<KeyEventHandler, KeyEventArgs>(
+                    h => keyboardEvents.KeyRaw += h,
+                    h => keyboardEvents.KeyRaw -= h)
+                .Select(x => x.EventArgs)
+                .Select(x => ToInputEventData(x, InputEventType.Keyboard));
 
             return mouseMove;
         }
@@ -286,11 +339,6 @@ namespace PoeShared.Native
             }
         }
 
-        private static MouseEventArgs EnrichMouseMove(MouseEventExtArgs args)
-        {
-            return new MouseEventArgs(Control.MouseButtons, args.Clicks, args.X, args.Y, args.Delta);
-        }
-
         private struct InputEventData
         {
             [JsonConverter(typeof(StringEnumConverter))] public InputEventType EventType { get; set; }
@@ -302,9 +350,11 @@ namespace PoeShared.Native
 
         private enum InputEventType
         {
+            Keyboard,
             KeyDown,
             KeyUp,
             KeyPress,
+            Mouse,
             MouseDown,
             MouseUp,
             MouseMove,

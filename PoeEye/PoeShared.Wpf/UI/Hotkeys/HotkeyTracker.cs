@@ -538,10 +538,9 @@ namespace PoeShared.UI
 
             public static HotkeyData FromEvent(MouseEventArgs args, IClock clock)
             {
-                var modifiers = args is MouseEventExtArgs mouseEventExtArgs ? mouseEventExtArgs.Modifiers.ToModifiers() : UnsafeNative.GetCurrentModifierKeys();
                 return new HotkeyData
                 {
-                    Hotkey = args.Delta != 0 ? new HotkeyGesture(args.Delta > 0 ? MouseWheelAction.WheelUp : MouseWheelAction.WheelDown, modifiers) : new HotkeyGesture(args.Button, modifiers),
+                    Hotkey = args.ToGesture(),
                     MouseEventArgs = args,
                     Timestamp = clock.UtcNow
                 };
@@ -551,7 +550,7 @@ namespace PoeShared.UI
             {
                 return new()
                 {
-                    Hotkey = new HotkeyGesture(args.KeyCode.ToInputKey(), args.Modifiers.ToModifiers()),
+                    Hotkey = args.ToGesture(),
                     KeyEventArgs = args,
                     Timestamp = clock.UtcNow
                 };

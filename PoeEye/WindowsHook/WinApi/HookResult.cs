@@ -3,25 +3,82 @@
 // See license.txt or https://mit-license.org/
 
 using System;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Reactive.Disposables;
 using System.Runtime.InteropServices;
 using System.Threading;
+using PInvoke;
 using PoeShared.Logging;
 using PoeShared.Scaffolding;
 using WindowsHook.Implementation;
+using Win32Exception = System.ComponentModel.Win32Exception;
 
 namespace WindowsHook.WinApi
 {
-    internal class HookResult : DisposableReactiveObject
+    public sealed class HookResultWithCallback : HookResult
+    {
+        // ReSharper disable once NotAccessedField.Local
+        // ReSharper disable once PrivateFieldCanBeConvertedToLocalVariable
+        private readonly User32.WindowsHookDelegate hookProcedure;
+
+        public HookResultWithCallback(User32.WindowsHookType hookType, WinHookCallback callback) : base(hookType)
+        {
+            Callback = callback;
+            hookProcedure = HandleHookCallback;
+            Handle = PrepareHandle(Log, hookType, NativeThreadId, hookProcedure);
+        }
+
+        public WinHookCallback Callback { get; }
+
+        private int HandleHookCallback(int ncode, IntPtr wparam, IntPtr lparam)
+        {
+            return HandleHook(ncode, wparam, lparam, this);
+        }
+
+        private static int HandleHook(int nCode, IntPtr wParam, IntPtr lParam, HookResultWithCallback owner)
+        {
+            // If nCode is less than zero, the hook procedure must return the value returned by CallNextHookEx.
+            // If nCode is greater than or equal to zero, and the hook procedure did not process the message, it is highly recommended that you call CallNextHookEx and return the value it returns;
+            // otherwise, other applications that have installed WH_KEYBOARD_LL hooks will not receive hook notifications and may behave incorrectly as a result.
+            // If the hook procedure processed the message, it may return a nonzero value to prevent the system from passing the message to the rest of the hook chain or the target window procedure.
+            // https://docs.microsoft.com/en-us/previous-versions/windows/desktop/legacy/ms644985(v=vs.85)
+            if (nCode != 0)
+            {
+                return CallNextHookEx(nCode, wParam, lParam);
+            }
+
+            var callbackData = new WinHookCallbackData(nCode, wParam, lParam);
+            
+            var continueProcessing = owner.Callback(callbackData);
+
+            if (!continueProcessing)
+            {
+                return -1;
+            }
+
+            var lastHookResult = CallNextHookEx(nCode, wParam, lParam);
+            return lastHookResult;
+        }
+    }
+
+    public sealed class HookResultWithProcedure : HookResult
+    {
+        // ReSharper disable once NotAccessedField.Local
+        // ReSharper disable once PrivateFieldCanBeConvertedToLocalVariable
+        private readonly User32.WindowsHookDelegate hookProcedure;
+
+        public HookResultWithProcedure(User32.WindowsHookType hookType, User32.WindowsHookDelegate hookProcedure) : base(hookType)
+        {
+            this.hookProcedure = hookProcedure;
+            Handle = PrepareHandle(Log, hookType, NativeThreadId, hookProcedure);
+        }
+    }
+    
+    public abstract class HookResult : DisposableReactiveObject
     {
         private static readonly IFluentLog SharedLog = typeof(HookResult).PrepareLogger();
         private static readonly IntPtr BaseAddress;
         private static long GlobalHookResultId;
-
-        // ReSharper disable once PrivateFieldCanBeConvertedToLocalVariable
-        private readonly HookProcedure hookProcedure;
 
         static HookResult()
         {
@@ -32,34 +89,23 @@ namespace WindowsHook.WinApi
             SharedLog.Debug($"Application base address: {BaseAddress.ToHexadecimal()}");
         }
 
-        public HookResult(WindowsHookType hookType, Callback callback)
+        protected HookResult(User32.WindowsHookType hookType)
         {
             Log = SharedLog.WithSuffix(ToString);
 
             Disposable.Create(() => Log.Debug("Disposing hook")).AddTo(Anchors);
             HookType = hookType;
-            Callback = callback;
             NativeThreadId = ThreadNativeMethods.GetCurrentThreadId();
             ManagedThreadId = $"{Thread.CurrentThread.ManagedThreadId}-{Thread.CurrentThread.Name}";
-            hookProcedure = HandleHookCallback;
             Log.Debug($"Initializing new hook of type {hookType}");
-
-            var baseAddress = hookType switch
-            {
-                WindowsHookType.WH_MOUSE => IntPtr.Zero,
-                WindowsHookType.WH_KEYBOARD => IntPtr.Zero,
-                WindowsHookType.WH_MOUSE_LL => BaseAddress,
-                WindowsHookType.WH_KEYBOARD_LL => BaseAddress,
-                _ => throw new ArgumentOutOfRangeException(nameof(hookType), hookType, null)
-            };
             
-            Handle = HookNativeMethods.SetWindowsHookEx(
-                (int)hookType,
-                hookProcedure,
-                baseAddress,
-                baseAddress == IntPtr.Zero ? NativeThreadId : 0);
             Disposable.Create(() =>
             {
+                if (Handle == null)
+                {
+                    Log.Warn("Hook is not installed, no need to perform unhooking");
+                    return;
+                }
                 Log.Debug("Unhooking...");
                 var currentThreadId = ThreadNativeMethods.GetCurrentThreadId();
                 var currentManagedThreadId = $"{Thread.CurrentThread.ManagedThreadId}-{Thread.CurrentThread.Name}";
@@ -70,63 +116,53 @@ namespace WindowsHook.WinApi
                 Handle.Dispose();
                 Log.Debug("Unhooked");
             }).AddTo(Anchors);
-            
-            
             Disposable.Create(() => Log.Debug("Disposed hook")).AddTo(Anchors);
-
-            if (!Handle.IsInvalid)
-            {
-                return;
-            }
-
-            Log.Warn($"Failed to set new hook with id {hookType}, result: {Handle}");
-            var errorCode = Marshal.GetLastWin32Error();
-            throw new Win32Exception(errorCode);
         }
 
         public long HookId { get; } = Interlocked.Increment(ref GlobalHookResultId);
 
-        private IFluentLog Log { get; }
+        protected IFluentLog Log { get; }
 
-        public HookProcedureHandle Handle { get; }
+        public HookProcedureHandle Handle { get; protected set; }
 
-        public WindowsHookType HookType { get; }
-
-        public Callback Callback { get; }
+        public User32.WindowsHookType HookType { get; }
 
         public int NativeThreadId { get; }
-        
+
         public string ManagedThreadId { get; }
 
-        private IntPtr HandleHookCallback(int ncode, IntPtr wparam, IntPtr lparam)
+        protected static HookProcedureHandle PrepareHandle(IFluentLog log, User32.WindowsHookType hookType, int nativeThreadId, User32.WindowsHookDelegate hookProcedure)
         {
-            return HandleHook(ncode, wparam, lparam, this);
-        }
-
-        private static IntPtr HandleHook(int nCode, IntPtr wParam, IntPtr lParam, HookResult owner)
-        {
-            var passThrough = nCode != 0;
-            if (passThrough)
+            var baseAddress = hookType switch
             {
-                return CallNextHookEx(nCode, wParam, lParam);
-            }
+                User32.WindowsHookType.WH_MOUSE => IntPtr.Zero,
+                User32.WindowsHookType.WH_KEYBOARD => IntPtr.Zero,
+                User32.WindowsHookType.WH_JOURNALPLAYBACK => BaseAddress,
+                User32.WindowsHookType.WH_MOUSE_LL => BaseAddress,
+                User32.WindowsHookType.WH_KEYBOARD_LL => BaseAddress,
+                _ => throw new ArgumentOutOfRangeException(nameof(hookType), hookType, $"Unsupported hook type")
+            };
 
-            var callbackData = new CallbackData(wParam, lParam);
+            var hookThreadId = baseAddress == IntPtr.Zero ? nativeThreadId : 0;
+            var result = User32.SetWindowsHookEx(
+                hookType,
+                hookProcedure,
+                baseAddress,
+                hookThreadId);
             
-            var continueProcessing = owner.Callback(callbackData);
-
-            if (!continueProcessing)
+            if (result.IsInvalid)
             {
-                return new IntPtr(-1);
+                log.Warn($"Failed to set new hook with id {hookType}, result: {result}");
+                var errorCode = Marshal.GetLastWin32Error();
+                throw new Win32Exception(errorCode);
             }
 
-            var lastHookResult = CallNextHookEx(nCode, wParam, lParam);
-            return lastHookResult;
+            return new HookProcedureHandle(result);
         }
 
-        private static IntPtr CallNextHookEx(int nCode, IntPtr wParam, IntPtr lParam)
+        protected static int CallNextHookEx(int nCode, IntPtr wParam, IntPtr lParam)
         {
-            return HookNativeMethods.CallNextHookEx(IntPtr.Zero, nCode, wParam, lParam);
+            return User32.CallNextHookEx(IntPtr.Zero, nCode, wParam, lParam);
         }
 
         public override string ToString()

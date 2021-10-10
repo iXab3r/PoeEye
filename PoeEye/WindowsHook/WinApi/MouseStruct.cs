@@ -2,6 +2,7 @@
 // Copyright (c) 2015 George Mamaladze
 // See license.txt or https://mit-license.org/
 
+using System.Drawing;
 using System.Runtime.InteropServices;
 
 namespace WindowsHook.WinApi
@@ -44,6 +45,8 @@ namespace WindowsHook.WinApi
         ///     </list>
         /// </remarks>
         [FieldOffset(0x0A)] public short MouseData;
+        
+        [FieldOffset(0x0C)] public MouseHookLowLevelFlags Flags;
 
         /// <summary>
         ///     Returns a Timestamp associated with the input, in System Ticks.

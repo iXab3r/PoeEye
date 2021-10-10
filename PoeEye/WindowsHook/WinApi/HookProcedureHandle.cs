@@ -4,15 +4,17 @@
 
 using System.Windows.Forms;
 using Microsoft.Win32.SafeHandles;
+using PInvoke;
 using PoeShared.Logging;
 using PoeShared.Scaffolding;
 
 namespace WindowsHook.WinApi
 {
-    internal class HookProcedureHandle : SafeHandleZeroOrMinusOneIsInvalid
+    public sealed class HookProcedureHandle : SafeHandleZeroOrMinusOneIsInvalid
     {
         private static readonly IFluentLog Log = typeof(HookProcedureHandle).PrepareLogger();
         private static volatile bool ApplicationIsClosing;
+        private readonly User32.SafeHookHandle hookHandle;
 
         static HookProcedureHandle()
         {
@@ -22,12 +24,13 @@ namespace WindowsHook.WinApi
             };
         }
 
-        public HookProcedureHandle()
+        public HookProcedureHandle(User32.SafeHookHandle hookHandle)
             : base(true)
         {
+            this.hookHandle = hookHandle;
             Log.Debug("Creating hook handle");
         }
-        
+
         protected override bool ReleaseHandle()
         {
             //NOTE Calling Unhook during processexit causes deley
@@ -37,11 +40,23 @@ namespace WindowsHook.WinApi
                 return true;
             }
 
+            if (hookHandle.IsInvalid)
+            {
+                Log.Debug($"Hook is invalid");
+                return false;
+            }
+            
+            if (hookHandle.IsClosed)
+            {
+                Log.Debug($"Hook is already disposed");
+                return true;
+            }
+            
             Log.Debug("Releasing hook...");
             //The hook procedure can be in the state of being called by another thread even after UnhookWindowsHookEx returns.
             //If the hook procedure is not being called concurrently, the hook procedure is removed immediately before UnhookWindowsHookEx returns.
-            var result = HookNativeMethods.UnhookWindowsHookEx(handle);
-            if (result != 0)
+            hookHandle.Dispose();
+            if (hookHandle.IsClosed)
             {
                 Log.Debug($"Successfully removed hook");
                 return true;

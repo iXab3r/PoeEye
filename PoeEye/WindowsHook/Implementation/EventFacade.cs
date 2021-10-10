@@ -44,6 +44,12 @@ namespace WindowsHook.Implementation
         
         protected IFluentLog Log { get; }
 
+        event KeyEventHandler IKeyboardEvents.KeyRaw
+        {
+            add => keyListener.Value.KeyRaw += value;
+            remove => keyListener.Value.KeyRaw += value;
+        }
+
         public event KeyEventHandler KeyDown
         {
             add => keyListener.Value.KeyDown += value;
@@ -66,6 +72,12 @@ namespace WindowsHook.Implementation
         {
             add => mouseListener.Value.MouseMove += value;
             remove => mouseListener.Value.MouseMove -= value;
+        }
+
+        event EventHandler<MouseEventExtArgs> IMouseEvents.MouseRaw
+        {
+            add => mouseListener.Value.MouseRaw += value;
+            remove => mouseListener.Value.MouseRaw += value;
         }
 
         public event EventHandler<MouseEventExtArgs> MouseMoveExt

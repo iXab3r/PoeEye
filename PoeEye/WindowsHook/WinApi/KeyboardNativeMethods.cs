@@ -51,7 +51,7 @@ namespace WindowsHook.WinApi
         /// <param name="fuState"></param>
         /// <param name="chars"></param>
         /// <returns></returns>
-        internal static void TryGetCharFromKeyboardState(int virtualKeyCode, int fuState, out char[] chars)
+        internal static void TryGetCharFromKeyboardState(int virtualKeyCode, KeyboardHookLowLevelFlags fuState, out char[] chars)
         {
             var dwhkl = GetActiveKeyboard();
             var scanCode = MapVirtualKeyEx(virtualKeyCode, (int)MapType.MAPVK_VK_TO_VSC, dwhkl);
@@ -66,7 +66,7 @@ namespace WindowsHook.WinApi
         /// <param name="fuState"></param>
         /// <param name="chars"></param>
         /// <returns></returns>
-        internal static void TryGetCharFromKeyboardState(int virtualKeyCode, int scanCode, int fuState,
+        internal static void TryGetCharFromKeyboardState(int virtualKeyCode, int scanCode, KeyboardHookLowLevelFlags fuState,
             out char[] chars)
         {
             var dwhkl = GetActiveKeyboard(); //get the active keyboard layout
@@ -82,7 +82,7 @@ namespace WindowsHook.WinApi
         /// <param name="dwhkl"></param>
         /// <param name="chars"></param>
         /// <returns></returns>
-        private static void TryGetCharFromKeyboardState(int virtualKeyCode, int scanCode, int fuState, IntPtr dwhkl,
+        private static void TryGetCharFromKeyboardState(int virtualKeyCode, int scanCode, KeyboardHookLowLevelFlags fuState, IntPtr dwhkl,
             out char[] chars)
         {
             var pwszBuff = new StringBuilder(64);
@@ -288,7 +288,7 @@ namespace WindowsHook.WinApi
             byte[] lpKeyState,
             [Out] [MarshalAs(UnmanagedType.LPWStr, SizeConst = 64)] StringBuilder pwszBuff,
             int cchBuff,
-            int wFlags,
+            KeyboardHookLowLevelFlags wFlags,
             IntPtr dwhkl);
 
         /// <summary>

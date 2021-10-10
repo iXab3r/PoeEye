@@ -28,7 +28,7 @@ namespace WindowsHook.WinApi
         /// <summary>
         ///     Specifies the extended-key flag, event-injected flag, context code, and transition-state flag.
         /// </summary>
-        public readonly int Flags;
+        public readonly KeyboardHookLowLevelFlags Flags;
 
         /// <summary>
         ///     Specifies the Time stamp for this message.

@@ -6,14 +6,17 @@ using System;
 
 namespace WindowsHook.WinApi
 {
-    internal readonly struct CallbackData
+    public readonly struct WinHookCallbackData
     {
-        public CallbackData(IntPtr wParam, IntPtr lParam)
+        public WinHookCallbackData(int code, IntPtr wParam, IntPtr lParam)
         {
+            Code = code;
             WParam = wParam;
             LParam = lParam;
         }
 
+        public int Code { get; }
+        
         public IntPtr WParam { get; }
 
         public IntPtr LParam { get; }

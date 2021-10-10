@@ -17,4 +17,7 @@
     <ItemGroup>
         <ProjectReference Include="..\PoeShared\PoeShared.csproj" />
     </ItemGroup>
+    <ItemGroup>
+      <PackageReference Include="PInvoke.User32" Version="0.6.49" />
+    </ItemGroup>
 </Project>

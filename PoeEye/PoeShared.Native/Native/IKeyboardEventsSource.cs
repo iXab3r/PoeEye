@@ -1,13 +1,18 @@
 using System;
 using System.Windows.Forms;
 using JetBrains.Annotations;
+using WindowsHook;
 
 namespace PoeShared.Native
 {
-    public interface IKeyboardEventsSource
+    public interface IKeyboardEventsSource : ISupportsKeyboardFilter, ISupportsMouseFilter
     {
         bool RealtimeMode { get; }
 
+        IObservable<KeyEventArgsExt> WhenKeyRaw { [NotNull] get; }
+        
+        IObservable<MouseEventExtArgs> WhenMouseRaw { [NotNull] get; }
+        
         IObservable<KeyPressEventArgs> WhenKeyPress { [NotNull] get; }
 
         IObservable<KeyEventArgs> WhenKeyDown { [NotNull] get; }
@@ -21,9 +26,5 @@ namespace PoeShared.Native
         IObservable<MouseEventArgs> WhenMouseMove { [NotNull] get; }
         
         IObservable<MouseEventArgs> WhenMouseWheel { [NotNull] get; }
-
-        IDisposable AddKeyboardFilter(IKeyboardEventFilter filter);
-        
-        IDisposable AddMouseFilter(IMouseEventFilter filter);
     }
 }

@@ -12,7 +12,7 @@ namespace PoeShared.UI
         [Description("Toggle")]
         Click,
         [EnumMember(Value = nameof(Hold))]
-        [Description("Hold")]
+        [Description("Click/Hold")]
         Hold,
     }
 }

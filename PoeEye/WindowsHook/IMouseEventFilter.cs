@@ -1,7 +1,4 @@
-﻿using System.Windows.Forms;
-using WindowsHook;
-
-namespace PoeShared.Native
+﻿namespace WindowsHook
 {
     public interface IMouseEventFilter
     {
