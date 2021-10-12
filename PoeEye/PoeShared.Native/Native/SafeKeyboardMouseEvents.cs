@@ -15,9 +15,7 @@ using PoeShared.Prism;
 using PoeShared.Scaffolding; 
 using PoeShared.Logging;
 using Unity;
-using KeyEventArgs = System.Windows.Forms.KeyEventArgs;
 using KeyEventHandler = System.Windows.Forms.KeyEventHandler;
-using MouseEventArgs = System.Windows.Forms.MouseEventArgs;
 
 namespace PoeShared.Native
 {
@@ -58,37 +56,37 @@ namespace PoeShared.Native
             WhenMouseMove = HookMouseMove()
                 .Publish()
                 .RefCount()
-                .Where(x => x.EventType == InputEventType.MouseMove && x.EventArgs is MouseEventArgs)
-                .Select(x => x.EventArgs as MouseEventArgs)
+                .Where(x => x.EventType == InputEventType.MouseMove && x.EventArgs is MouseEventExtArgs)
+                .Select(x => x.EventArgs as MouseEventExtArgs)
                 .DistinctUntilChanged(args => new {args.X, args.Y, args.Button, args.Clicks, args.Delta});
 
             WhenMouseWheel =
                 HookMouseWheel()
                     .Publish()
                     .RefCount()
-                    .Where(x => (x.EventType == InputEventType.WheelDown || x.EventType == InputEventType.WheelUp) && x.EventArgs is MouseEventArgs)
-                    .Select(x => x.EventArgs as MouseEventArgs);
+                    .Where(x => (x.EventType == InputEventType.WheelDown || x.EventType == InputEventType.WheelUp) && x.EventArgs is MouseEventExtArgs)
+                    .Select(x => x.EventArgs as MouseEventExtArgs);
 
             var mouseHookSource = HookMouseButtons()
                 .Publish()
                 .RefCount();
 
             WhenMouseUp = mouseHookSource
-                .Where(x => x.EventType == InputEventType.MouseUp && x.EventArgs is MouseEventArgs)
-                .Select(x => x.EventArgs as MouseEventArgs);
+                .Where(x => x.EventType == InputEventType.MouseUp && x.EventArgs is MouseEventExtArgs)
+                .Select(x => x.EventArgs as MouseEventExtArgs);
             WhenMouseDown = mouseHookSource
-                .Where(x => x.EventType == InputEventType.MouseDown && x.EventArgs is MouseEventArgs)
-                .Select(x => x.EventArgs as MouseEventArgs);
+                .Where(x => x.EventType == InputEventType.MouseDown && x.EventArgs is MouseEventExtArgs)
+                .Select(x => x.EventArgs as MouseEventExtArgs);
 
             var keyboardHook = HookKeyboard()
                 .Publish()
                 .RefCount();
             WhenKeyDown = keyboardHook
-                .Where(x => x.EventType == InputEventType.KeyDown && x.EventArgs is KeyEventArgs)
-                .Select(x => x.EventArgs as KeyEventArgs);
+                .Where(x => x.EventType == InputEventType.KeyDown && x.EventArgs is KeyEventArgsExt)
+                .Select(x => x.EventArgs as KeyEventArgsExt);
             WhenKeyUp = keyboardHook
-                .Where(x => x.EventType == InputEventType.KeyUp && x.EventArgs is KeyEventArgs)
-                .Select(x => x.EventArgs as KeyEventArgs);
+                .Where(x => x.EventType == InputEventType.KeyUp && x.EventArgs is KeyEventArgsExt)
+                .Select(x => x.EventArgs as KeyEventArgsExt);
             WhenKeyPress = keyboardHook
                 .Where(x => x.EventType == InputEventType.KeyPress && x.EventArgs is KeyPressEventArgs)
                 .Select(x => x.EventArgs as KeyPressEventArgs);
@@ -98,17 +96,17 @@ namespace PoeShared.Native
         
         public IObservable<KeyPressEventArgs> WhenKeyPress { get; }
 
-        public IObservable<KeyEventArgs> WhenKeyDown { get; }
+        public IObservable<KeyEventArgsExt> WhenKeyDown { get; }
 
-        public IObservable<KeyEventArgs> WhenKeyUp { get; }
+        public IObservable<KeyEventArgsExt> WhenKeyUp { get; }
 
-        public IObservable<MouseEventArgs> WhenMouseDown { get; }
+        public IObservable<MouseEventExtArgs> WhenMouseDown { get; }
 
-        public IObservable<MouseEventArgs> WhenMouseMove { get; }
+        public IObservable<MouseEventExtArgs> WhenMouseMove { get; }
 
-        public IObservable<MouseEventArgs> WhenMouseUp { get; }
+        public IObservable<MouseEventExtArgs> WhenMouseUp { get; }
 
-        public IObservable<MouseEventArgs> WhenMouseWheel { get; }
+        public IObservable<MouseEventExtArgs> WhenMouseWheel { get; }
 
         public bool RealtimeMode { get; } = true;
         

@@ -21,7 +21,7 @@ namespace WindowsHook.Implementation
         private bool m_IsDragging;
 
         private Point m_PreviousPosition;
-        
+
         protected MouseListener(Subscribe subscribe)
             : base(subscribe)
         {
@@ -37,20 +37,12 @@ namespace WindowsHook.Implementation
             IsReady = true;
         }
 
-        public event MouseEventHandler MouseMove;
         public event EventHandler<MouseEventExtArgs> MouseRaw;
         public event EventHandler<MouseEventExtArgs> MouseMoveExt;
-        public event MouseEventHandler MouseClick;
-        public event MouseEventHandler MouseDown;
         public event EventHandler<MouseEventExtArgs> MouseDownExt;
-        public event MouseEventHandler MouseUp;
         public event EventHandler<MouseEventExtArgs> MouseUpExt;
-        public event MouseEventHandler MouseWheel;
         public event EventHandler<MouseEventExtArgs> MouseWheelExt;
-        public event MouseEventHandler MouseDoubleClick;
-        public event MouseEventHandler MouseDragStarted;
         public event EventHandler<MouseEventExtArgs> MouseDragStartedExt;
-        public event MouseEventHandler MouseDragFinished;
         public event EventHandler<MouseEventExtArgs> MouseDragFinishedExt;
 
         protected override bool Callback(WinHookCallbackData data)
@@ -85,21 +77,25 @@ namespace WindowsHook.Implementation
             }
 
             ProcessDrag(ref e);
-            
+
             return !e.Handled;
+        }
+
+        private MouseEventExtArgs EnrichWithButtons(MouseEventExtArgs args)
+        {
+            var buttons = args.Button | m_SingleDown.Values;
+            return new MouseEventExtArgs(args, buttons);
         }
 
         protected abstract MouseEventExtArgs GetEventArgs(WinHookCallbackData data);
 
         protected virtual void ProcessWheel(ref MouseEventExtArgs e)
         {
-            OnWheel(e);
             OnWheelExt(e);
         }
 
         protected virtual void ProcessDown(ref MouseEventExtArgs e)
         {
-            OnDown(e);
             OnDownExt(e);
             if (e.Handled)
             {
@@ -119,7 +115,6 @@ namespace WindowsHook.Implementation
 
         protected virtual void ProcessUp(ref MouseEventExtArgs e)
         {
-            OnUp(e);
             OnUpExt(e);
             if (e.Handled)
             {
@@ -128,28 +123,29 @@ namespace WindowsHook.Implementation
 
             if (m_SingleDown.Contains(e.Button))
             {
-                OnClick(e);
                 m_SingleDown.Remove(e.Button);
             }
 
             if (m_DoubleDown.Contains(e.Button))
             {
                 e = e.ToDoubleClickEventArgs();
-                OnDoubleClick(e);
                 m_DoubleDown.Remove(e.Button);
             }
         }
 
         private void ProcessMove(ref MouseEventExtArgs e)
         {
+            e = EnrichWithButtons(e);
             m_PreviousPosition = e.Point;
-
-            OnMove(e);
             OnMoveExt(e);
         }
 
         private void ProcessDrag(ref MouseEventExtArgs e)
         {
+            if (e.Handled)
+            {
+                return;
+            }
             if (m_SingleDown.Contains(MouseButtons.Left))
             {
                 if (m_DragStartPosition.Equals(m_UninitialisedPoint))
@@ -168,25 +164,33 @@ namespace WindowsHook.Implementation
 
         private void ProcessDragStarted(ref MouseEventExtArgs e)
         {
-            if (!m_IsDragging)
+            if (e.Handled)
             {
-                var isXDragging = Math.Abs(e.Point.X - m_DragStartPosition.X) > m_xDragThreshold;
-                var isYDragging = Math.Abs(e.Point.Y - m_DragStartPosition.Y) > m_yDragThreshold;
-                m_IsDragging = isXDragging || isYDragging;
+                return;
+            }
+            if (m_IsDragging)
+            {
+                return;
+            }
 
-                if (m_IsDragging)
-                {
-                    OnDragStarted(e);
-                    OnDragStartedExt(e);
-                }
+            var isXDragging = Math.Abs(e.Point.X - m_DragStartPosition.X) > m_xDragThreshold;
+            var isYDragging = Math.Abs(e.Point.Y - m_DragStartPosition.Y) > m_yDragThreshold;
+            m_IsDragging = isXDragging || isYDragging;
+
+            if (m_IsDragging)
+            {
+                OnDragStartedExt(e);
             }
         }
 
         private void ProcessDragFinished(ref MouseEventExtArgs e)
         {
+            if (e.Handled)
+            {
+                return;
+            }
             if (m_IsDragging)
             {
-                OnDragFinished(e);
                 OnDragFinishedExt(e);
                 m_IsDragging = false;
             }
@@ -197,36 +201,9 @@ namespace WindowsHook.Implementation
             return m_PreviousPosition != actualPoint;
         }
 
-        protected virtual void OnMove(MouseEventArgs e)
-        {
-            var handler = MouseMove;
-            if (handler != null)
-            {
-                handler(this, e);
-            }
-        }
-
         protected virtual void OnMoveExt(MouseEventExtArgs e)
         {
             var handler = MouseMoveExt;
-            if (handler != null)
-            {
-                handler(this, e);
-            }
-        }
-
-        protected virtual void OnClick(MouseEventArgs e)
-        {
-            var handler = MouseClick;
-            if (handler != null)
-            {
-                handler(this, e);
-            }
-        }
-
-        protected virtual void OnDown(MouseEventArgs e)
-        {
-            var handler = MouseDown;
             if (handler != null)
             {
                 handler(this, e);
@@ -242,27 +219,9 @@ namespace WindowsHook.Implementation
             }
         }
 
-        protected virtual void OnUp(MouseEventArgs e)
-        {
-            var handler = MouseUp;
-            if (handler != null)
-            {
-                handler(this, e);
-            }
-        }
-
         protected virtual void OnUpExt(MouseEventExtArgs e)
         {
             var handler = MouseUpExt;
-            if (handler != null)
-            {
-                handler(this, e);
-            }
-        }
-
-        protected virtual void OnWheel(MouseEventArgs e)
-        {
-            var handler = MouseWheel;
             if (handler != null)
             {
                 handler(this, e);
@@ -278,36 +237,9 @@ namespace WindowsHook.Implementation
             }
         }
 
-        protected virtual void OnDoubleClick(MouseEventArgs e)
-        {
-            var handler = MouseDoubleClick;
-            if (handler != null)
-            {
-                handler(this, e);
-            }
-        }
-
-        protected virtual void OnDragStarted(MouseEventArgs e)
-        {
-            var handler = MouseDragStarted;
-            if (handler != null)
-            {
-                handler(this, e);
-            }
-        }
-
         protected virtual void OnDragStartedExt(MouseEventExtArgs e)
         {
             var handler = MouseDragStartedExt;
-            if (handler != null)
-            {
-                handler(this, e);
-            }
-        }
-
-        protected virtual void OnDragFinished(MouseEventArgs e)
-        {
-            var handler = MouseDragFinished;
             if (handler != null)
             {
                 handler(this, e);

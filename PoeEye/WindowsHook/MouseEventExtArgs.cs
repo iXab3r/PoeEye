@@ -39,6 +39,15 @@ namespace WindowsHook
             IsInjected = isInjected;
         }
 
+        public MouseEventExtArgs(MouseEventExtArgs args, MouseButtons buttons) : this(buttons, args.Clicks, args.Point, args.Delta, args.Timestamp, args.IsMouseButtonDown, args.IsMouseButtonUp, args.Modifiers, args.IsInjected)
+        {
+            Handled = args.Handled;
+        }
+
+        public MouseEventExtArgs(MouseButtons buttons, int clicks, int positionX, int positionY, int timestamp) : base(buttons, clicks, positionX, positionY, timestamp)
+        {
+        }
+
         /// <summary>
         ///     Set this property to <b>true</b> inside your event handler to prevent further processing of the event in other
         ///     applications.
@@ -198,8 +207,6 @@ namespace WindowsHook
                     break;
             }
             
-            const uint maskInjected = 0x00000010; // for bit 4
-
             var isInjected = mouseInfo.Flags.HasFlag(MouseHookLowLevelFlags.LLMHF_INJECTED) || mouseInfo.Flags.HasFlag(MouseHookLowLevelFlags.LLMHF_LOWER_IL_INJECTED);
 
             var modifiers = GetCurrentModifierKeys();
@@ -209,10 +216,10 @@ namespace WindowsHook
                 mouseInfo.Point,
                 mouseDelta,
                 mouseInfo.Timestamp,
-                isMouseButtonDown,
-                isMouseButtonUp,
-                modifiers,
-                isInjected);
+                isMouseButtonDown: isMouseButtonDown,
+                isMouseButtonUp: isMouseButtonUp,
+                modifiers: modifiers,
+                isInjected: isInjected);
 
             return e;
         }

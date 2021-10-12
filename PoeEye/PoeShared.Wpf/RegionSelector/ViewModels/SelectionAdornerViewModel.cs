@@ -16,8 +16,7 @@ using PoeShared.Scaffolding;
 using PoeShared.Logging;
 using ReactiveUI;
 using Unity;
-using Control = System.Windows.Forms.Control;
-using MouseEventArgs = System.Windows.Forms.MouseEventArgs;
+using WindowsHook;
 using WinSize = System.Drawing.Size;
 using WinPoint = System.Drawing.Point;
 using WinRectangle = System.Drawing.Rectangle;
@@ -194,8 +193,8 @@ namespace PoeShared.RegionSelector.ViewModels
                     this.WhenAnyValue(x => x.Owner, x => x.OwnerIsVisible)
                         .Select(x => x.Item1 != null && x.Item2
                                 ? keyboardEventsSource.WhenMouseMove
-                                    .StartWith(new MouseEventArgs(MouseButtons.None, 0, System.Windows.Forms.Cursor.Position.X, System.Windows.Forms.Cursor.Position.Y, 0))
-                                    : Observable.Empty<MouseEventArgs>())
+                                    .StartWith(new MouseEventExtArgs(MouseButtons.None, 0, System.Windows.Forms.Cursor.Position.X, System.Windows.Forms.Cursor.Position.Y, 0))
+                                    : Observable.Empty<MouseEventExtArgs>())
                         .Switch()
                         .ObserveOn(uiScheduler)
                         .SubscribeSafe(HandleMouseMove, Log.HandleUiException)
@@ -244,7 +243,7 @@ namespace PoeShared.RegionSelector.ViewModels
                 Math.Max(0, Math.Min(coords.Y, renderSize.Height)));
         }
 
-        private void HandleMouseMove(MouseEventArgs e)
+        private void HandleMouseMove(MouseEventExtArgs e)
         {
             UpdatePosition(e.Location.ToWpfPoint());
             var renderSize = owner.RenderSize;

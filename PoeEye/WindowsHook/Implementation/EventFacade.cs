@@ -68,12 +68,6 @@ namespace WindowsHook.Implementation
             remove => keyListener.Value.KeyUp -= value;
         }
 
-        public event MouseEventHandler MouseMove
-        {
-            add => mouseListener.Value.MouseMove += value;
-            remove => mouseListener.Value.MouseMove -= value;
-        }
-
         event EventHandler<MouseEventExtArgs> IMouseEvents.MouseRaw
         {
             add => mouseListener.Value.MouseRaw += value;
@@ -86,28 +80,10 @@ namespace WindowsHook.Implementation
             remove => mouseListener.Value.MouseMoveExt -= value;
         }
 
-        public event MouseEventHandler MouseClick
-        {
-            add => mouseListener.Value.MouseClick += value;
-            remove => mouseListener.Value.MouseClick -= value;
-        }
-
-        public event MouseEventHandler MouseDown
-        {
-            add => mouseListener.Value.MouseDown += value;
-            remove => mouseListener.Value.MouseDown -= value;
-        }
-
         public event EventHandler<MouseEventExtArgs> MouseDownExt
         {
             add => mouseListener.Value.MouseDownExt += value;
             remove => mouseListener.Value.MouseDownExt -= value;
-        }
-
-        public event MouseEventHandler MouseUp
-        {
-            add => mouseListener.Value.MouseUp += value;
-            remove => mouseListener.Value.MouseUp -= value;
         }
 
         public event EventHandler<MouseEventExtArgs> MouseUpExt
@@ -116,40 +92,16 @@ namespace WindowsHook.Implementation
             remove => mouseListener.Value.MouseUpExt -= value;
         }
 
-        public event MouseEventHandler MouseWheel
-        {
-            add => mouseListener.Value.MouseWheel += value;
-            remove => mouseListener.Value.MouseWheel -= value;
-        }
-
         public event EventHandler<MouseEventExtArgs> MouseWheelExt
         {
             add => mouseListener.Value.MouseWheelExt += value;
             remove => mouseListener.Value.MouseWheelExt -= value;
         }
 
-        public event MouseEventHandler MouseDoubleClick
-        {
-            add => mouseListener.Value.MouseDoubleClick += value;
-            remove => mouseListener.Value.MouseDoubleClick -= value;
-        }
-
-        public event MouseEventHandler MouseDragStarted
-        {
-            add => mouseListener.Value.MouseDragStarted += value;
-            remove => mouseListener.Value.MouseDragStarted -= value;
-        }
-
         public event EventHandler<MouseEventExtArgs> MouseDragStartedExt
         {
             add => mouseListener.Value.MouseDragStartedExt += value;
             remove => mouseListener.Value.MouseDragStartedExt -= value;
-        }
-
-        public event MouseEventHandler MouseDragFinished
-        {
-            add => mouseListener.Value.MouseDragFinished += value;
-            remove => mouseListener.Value.MouseDragFinished -= value;
         }
 
         public event EventHandler<MouseEventExtArgs> MouseDragFinishedExt

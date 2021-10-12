@@ -15,16 +15,16 @@ namespace PoeShared.Native
         
         IObservable<KeyPressEventArgs> WhenKeyPress { [NotNull] get; }
 
-        IObservable<KeyEventArgs> WhenKeyDown { [NotNull] get; }
+        IObservable<KeyEventArgsExt> WhenKeyDown { [NotNull] get; }
 
-        IObservable<KeyEventArgs> WhenKeyUp { [NotNull] get; }
+        IObservable<KeyEventArgsExt> WhenKeyUp { [NotNull] get; }
 
-        IObservable<MouseEventArgs> WhenMouseUp { [NotNull] get; }
+        IObservable<MouseEventExtArgs> WhenMouseUp { [NotNull] get; }
 
-        IObservable<MouseEventArgs> WhenMouseDown { [NotNull] get; }
+        IObservable<MouseEventExtArgs> WhenMouseDown { [NotNull] get; }
         
-        IObservable<MouseEventArgs> WhenMouseMove { [NotNull] get; }
+        IObservable<MouseEventExtArgs> WhenMouseMove { [NotNull] get; }
         
-        IObservable<MouseEventArgs> WhenMouseWheel { [NotNull] get; }
+        IObservable<MouseEventExtArgs> WhenMouseWheel { [NotNull] get; }
     }
 }

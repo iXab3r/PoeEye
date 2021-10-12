@@ -16,7 +16,6 @@ using PropertyBinder;
 using ReactiveUI;
 using Unity;
 using KeyEventArgs = System.Windows.Forms.KeyEventArgs;
-using MouseEventArgs = System.Windows.Forms.MouseEventArgs;
 
 namespace PoeShared.UI
 {
@@ -483,7 +482,7 @@ namespace PoeShared.UI
         {
             private KeyEventArgs KeyEventArgs { get; init; }
 
-            private MouseEventArgs MouseEventArgs { get; init; }
+            private MouseEventExtArgs MouseEventArgs { get; init; }
 
             public HotkeyGesture Hotkey { get; set; }
 
@@ -500,9 +499,9 @@ namespace PoeShared.UI
                         return KeyEventArgs.Handled;
                     }
 
-                    if (MouseEventArgs is MouseEventExtArgs mouseEventExtArgs)
+                    if (MouseEventArgs != null)
                     {
-                        return mouseEventExtArgs.Handled;
+                        return MouseEventArgs.Handled;
                     }
 
                     return false;
@@ -528,15 +527,15 @@ namespace PoeShared.UI
                     KeyEventArgs.Handled = true;
                 }
 
-                if (MouseEventArgs is MouseEventExtArgs mouseEventExtArgs)
+                if (MouseEventArgs != null)
                 {
-                    mouseEventExtArgs.Handled = true;
+                    MouseEventArgs.Handled = true;
                 }
 
                 return this;
             }
 
-            public static HotkeyData FromEvent(MouseEventArgs args, IClock clock)
+            public static HotkeyData FromEvent(MouseEventExtArgs args, IClock clock)
             {
                 return new HotkeyData
                 {
