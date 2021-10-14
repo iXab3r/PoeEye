@@ -13,9 +13,6 @@ namespace PoeShared.UI
 
         private readonly IRandomNumberGenerator rng;
 
-        private TimeSpan minimum = TimeSpan.Zero;
-        private TimeSpan maximum = TimeSpan.MaxValue;
-
         static RandomPeriodSelector()
         {
             Binder
@@ -37,17 +34,9 @@ namespace PoeShared.UI
             Binder.Attach(this).AddTo(Anchors);
         }
 
-        public TimeSpan Minimum
-        {
-            get => minimum;
-            set => RaiseAndSetIfChanged(ref minimum, value);
-        }
+        public TimeSpan Minimum { get; set; } = TimeSpan.Zero;
 
-        public TimeSpan Maximum
-        {
-            get => maximum;
-            set => RaiseAndSetIfChanged(ref maximum, value);
-        }
+        public TimeSpan Maximum { get; set; } = TimeSpan.MaxValue;
 
         public TimeSpan LowerValue { get; set; }
 

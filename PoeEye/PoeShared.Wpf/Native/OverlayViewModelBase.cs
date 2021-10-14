@@ -18,6 +18,7 @@ using PInvoke;
 using PoeShared.Scaffolding; 
 using PoeShared.Logging;
 using PoeShared.Scaffolding.WPF;
+using PropertyChanged;
 using ReactiveUI;
 using Point = System.Windows.Point;
 using Size = System.Windows.Size;
@@ -37,12 +38,8 @@ namespace PoeShared.Native
         private readonly CommandWrapper unlockWindowCommand;
         private readonly ISubject<Unit> whenLoaded = new ReplaySubject<Unit>(1);
         private readonly ISubject<Rectangle> windowPositionSource = new ReplaySubject<Rectangle>(1);
-        private bool enableHeader = true;
         private bool isLocked = true;
-        private bool isVisible = true;
-        private Size maxSize = new Size(Int16.MaxValue, Int16.MaxValue);
-        private Size minSize = new Size(0, 0);
-        private SizeToContent sizeToContent = SizeToContent.Manual;
+ 
 
         protected OverlayViewModelBase()
         {
@@ -144,11 +141,7 @@ namespace PoeShared.Native
 
         public TransparentWindow OverlayWindow { get; private set; }
 
-        public bool IsVisible
-        {
-            get => isVisible;
-            set => RaiseAndSetIfChanged(ref isVisible, value);
-        }
+        public bool IsVisible { get; set; } = true;
 
         public double ActualWidth { get; set; }
 
@@ -156,18 +149,11 @@ namespace PoeShared.Native
 
         public Rectangle NativeBounds { get; set; }
 
-        public Size MinSize
-        {
-            get => minSize;
-            set => this.RaiseAndSetIfChanged(ref minSize, value);
-        }
+        public Size MinSize { get; set; } = new Size(0, 0);
 
-        public Size MaxSize
-        {
-            get => maxSize;
-            set => this.RaiseAndSetIfChanged(ref maxSize, value);
-        }
+        public Size MaxSize { get; set; } = new Size(Int16.MaxValue, Int16.MaxValue);
 
+        [DoNotNotify]
         public bool IsLocked
         {
             get => isLocked;
@@ -182,11 +168,7 @@ namespace PoeShared.Native
             }
         }
 
-        public bool EnableHeader
-        {
-            get => enableHeader;
-            set => this.RaiseAndSetIfChanged(ref enableHeader, value);
-        }
+        public bool EnableHeader { get; set; } = true;
 
         public bool IsUnlockable { get; protected set; }
 
@@ -194,11 +176,7 @@ namespace PoeShared.Native
 
         public OverlayMode OverlayMode { get; set; }
 
-        public SizeToContent SizeToContent
-        {
-            get => sizeToContent;
-            protected set => this.RaiseAndSetIfChanged(ref sizeToContent, value);
-        }
+        public SizeToContent SizeToContent { get; protected set; } = SizeToContent.Manual;
 
         public string Title { get; protected set; }
 
@@ -212,7 +190,7 @@ namespace PoeShared.Native
 
             Log.Warn($"Resetting overlay bounds (screen: {activeMonitor}, currently @ {NativeBounds})");
             var center = UnsafeNative.GetPositionAtTheCenter(OverlayWindow).ScaleToScreen(Dpi);
-            var size = (DefaultSize.IsNotEmpty() ? DefaultSize : minSize).ScaleToScreen(Dpi);
+            var size = (DefaultSize.IsNotEmpty() ? DefaultSize : MinSize).ScaleToScreen(Dpi);
             NativeBounds = new Rectangle(center, size);
             Log.Info($"Reconfigured overlay bounds (screen: {activeMonitor}, new @ {NativeBounds})");
 

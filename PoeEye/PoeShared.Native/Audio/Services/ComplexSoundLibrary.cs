@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using DynamicData;
 using DynamicData.Binding;
-using log4net;
 using PoeShared.Logging;
 using PoeShared.Scaffolding; 
-using PoeShared.Logging;
 
 namespace PoeShared.Audio.Services
 {

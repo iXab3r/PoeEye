@@ -17,11 +17,7 @@ namespace PoeShared.UI
         private static readonly IFluentLog Log = typeof(TreeViewItemViewModel).PrepareLogger();
 
         private readonly SourceList<TreeViewItemViewModel> children = new();
-
-        private bool isExpanded = true;
-        private bool isEnabled = true;
-        private bool isVisible = true;
-        private Func<ITreeViewItemViewModel, IObservable<Unit>> resortWhen;
+ 
 
         protected TreeViewItemViewModel()
         {
@@ -70,33 +66,17 @@ namespace PoeShared.UI
 
         public bool IsSelected { get; set; }
 
-        public bool IsExpanded
-        {
-            get => isExpanded;
-            set => RaiseAndSetIfChanged(ref isExpanded, value);
-        }
+        public bool IsExpanded { get; set; } = true;
 
-        public bool IsEnabled
-        {
-            get => isEnabled;
-            set => RaiseAndSetIfChanged(ref isEnabled, value);
-        }
+        public bool IsEnabled { get; set; } = true;
 
-        public bool IsVisible
-        {
-            get => isVisible;
-            set => RaiseAndSetIfChanged(ref isVisible, value);
-        }
+        public bool IsVisible { get; set; } = true;
 
         public ITreeViewItemViewModel Parent { get; set; }
 
         public IComparer<ITreeViewItemViewModel> SortComparer { get; set; }
 
-        public Func<ITreeViewItemViewModel, IObservable<Unit>> ResortWhen
-        {
-            get => resortWhen;
-            set => RaiseAndSetIfChanged(ref resortWhen, value);
-        }
+        public Func<ITreeViewItemViewModel, IObservable<Unit>> ResortWhen { get; set; }
 
         public void Clear()
         {

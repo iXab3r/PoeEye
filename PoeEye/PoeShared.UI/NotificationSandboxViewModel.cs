@@ -13,10 +13,6 @@ namespace PoeShared.UI
     {
         private readonly INotificationsService notificationsService;
 
-        private bool interactive = true;
-
-        private TimeSpan notificationTimeout = TimeSpan.Zero;
-
         public NotificationSandboxViewModel(INotificationsService notificationsService)
         {
             this.notificationsService = notificationsService;
@@ -29,11 +25,7 @@ namespace PoeShared.UI
 
         public CommandWrapper CloseAllNotifications { get; }
 
-        public TimeSpan NotificationTimeout
-        {
-            get => notificationTimeout;
-            set => RaiseAndSetIfChanged(ref notificationTimeout, value);
-        }
+        public TimeSpan NotificationTimeout { get; set; } = TimeSpan.Zero;
 
         public string NotificationTitle { get; set; }
 
@@ -43,11 +35,7 @@ namespace PoeShared.UI
 
         public bool WithIcon { get; set; }
 
-        public bool Interactive
-        {
-            get => interactive;
-            set => RaiseAndSetIfChanged(ref interactive, value);
-        }
+        public bool Interactive { get; set; } = true;
 
         public bool Closeable { get; set; }
 
@@ -60,7 +48,7 @@ namespace PoeShared.UI
                 TimeToLive = NotificationTimeout,
                 Title = NotificationTitle,
                 Icon = WithIcon ? NotificationImage : default,
-                Interactive = interactive,
+                Interactive = Interactive,
                 Closeable = Closeable
             };
 

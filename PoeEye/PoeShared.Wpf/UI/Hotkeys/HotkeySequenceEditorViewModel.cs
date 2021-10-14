@@ -30,9 +30,6 @@ namespace PoeShared.UI
 
         private readonly ObservableAsPropertyHelper<TimeSpan> totalDuration;
         private readonly ObservableAsPropertyHelper<int> totalItemsCount;
-        private TimeSpan defaultKeyPressDuration = TimeSpan.FromMilliseconds(50);
-        private TimeSpan maxDuration = TimeSpan.FromSeconds(10);
-        private int maxItemsCount = 250;
 
         static HotkeySequenceEditorViewModel()
         {
@@ -92,23 +89,11 @@ namespace PoeShared.UI
 
         public bool HideKeypressDelays { get; set; }
 
-        public int MaxItemsCount
-        {
-            get => maxItemsCount;
-            set => RaiseAndSetIfChanged(ref maxItemsCount, value);
-        }
+        public int MaxItemsCount { get; set; } = 250;
 
-        public TimeSpan DefaultKeyPressDuration
-        {
-            get => defaultKeyPressDuration;
-            set => RaiseAndSetIfChanged(ref defaultKeyPressDuration, value);
-        }
+        public TimeSpan DefaultKeyPressDuration { get; set; } = TimeSpan.FromMilliseconds(50);
 
-        public TimeSpan MaxDuration
-        {
-            get => maxDuration;
-            set => RaiseAndSetIfChanged(ref maxDuration, value);
-        }
+        public TimeSpan MaxDuration { get; set; } = TimeSpan.FromSeconds(10);
 
         public ICommand ClearItems { get; }
 

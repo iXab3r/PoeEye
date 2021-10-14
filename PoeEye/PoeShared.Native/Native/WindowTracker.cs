@@ -22,7 +22,6 @@ namespace PoeShared.Native
         private static readonly TimeSpan RecheckPeriod = TimeSpan.FromMilliseconds(250);
         private static readonly TimeSpan SamplePeriod = TimeSpan.FromMilliseconds(100);
         private readonly IStringMatcher titleMatcher;
-        private IntPtr windowHandle;
  
 
         public WindowTracker(
@@ -62,11 +61,7 @@ namespace PoeShared.Native
 
         public bool IsActive { get; private set; }
 
-        public IntPtr MatchingWindowHandle
-        {
-            get => windowHandle;
-            private set => this.RaiseAndSetIfChanged(ref windowHandle, value);
-        }
+        public IntPtr MatchingWindowHandle { get; private set; }
 
         public string ActiveWindowTitle { get; private set; }
 
@@ -86,7 +81,7 @@ namespace PoeShared.Native
             ActiveWindowTitle = title;
             ActiveProcessId = processId;
             IsActive = titleMatcher.IsMatch(ActiveWindowTitle);
-            windowHandle = IsActive ? hwnd : IntPtr.Zero;
+            MatchingWindowHandle = IsActive ? hwnd : IntPtr.Zero;
 
             if (previousState.ActiveWindowHandle != ActiveWindowHandle)
             {

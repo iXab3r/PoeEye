@@ -27,7 +27,6 @@ namespace PoeShared.UI
         private readonly SourceCache<HotkeyGesture, HotkeyGesture> hotkeysSource = new(x => x);
         private readonly ISet<HotkeyGesture> pressedKeys = new HashSet<HotkeyGesture>();
         private readonly IScheduler uiScheduler;
-        private bool isEnabled = true;
 
         static HotkeyTracker()
         {
@@ -229,11 +228,7 @@ namespace PoeShared.UI
 
         public HotkeyMode HotkeyMode { get; set; }
 
-        public bool IsEnabled
-        {
-            get => isEnabled;
-            set => RaiseAndSetIfChanged(ref isEnabled, value);
-        }
+        public bool IsEnabled { get; set; } = true;
 
         public bool IgnoreModifiers { get; set; }
 

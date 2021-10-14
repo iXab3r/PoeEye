@@ -122,13 +122,8 @@ namespace PoeShared.Tests.PropertyBinder
         
         public abstract class BaseViewModel : DisposableReactiveObject
         {
-            private int? data = 3;
 
-            public int? Data
-            {
-                get => data;
-                set => RaiseAndSetIfChanged(ref data, value);
-            }
+            public int? Data { get; set; } = 3;
 
             public abstract int? DataPlusOne { get; protected set; }
 

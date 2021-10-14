@@ -7,19 +7,12 @@ namespace PoeShared.Notifications.ViewModels
 {
     public abstract class NotificationViewModelBase : DisposableReactiveObject, INotificationViewModel
     {
-        private bool closeable = true;
-
-        private bool interactive = true;
 
         protected NotificationViewModelBase()
         {
         }
 
-        public bool Interactive
-        {
-            get => interactive;
-            set => RaiseAndSetIfChanged(ref interactive, value);
-        }
+        public bool Interactive { get; set; } = true;
 
         public ICloseController CloseController { get; set; }
 
@@ -29,10 +22,6 @@ namespace PoeShared.Notifications.ViewModels
 
         public TimeSpan TimeToLive { get; set; }
 
-        public bool Closeable
-        {
-            get => closeable;
-            set => RaiseAndSetIfChanged(ref closeable, value);
-        }
+        public bool Closeable { get; set; } = true;
     }
 }

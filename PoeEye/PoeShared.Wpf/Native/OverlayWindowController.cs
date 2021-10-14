@@ -29,7 +29,6 @@ namespace PoeShared.Native
         private readonly ReadOnlyObservableCollection<IntPtr> childWindows;
         private readonly IWindowTracker windowTracker;
         private readonly string uniqueControllerId = Guid.NewGuid().ToString();
-        private bool isEnabled = true;
 
         public OverlayWindowController(
             [NotNull] IWindowTracker windowTracker,
@@ -78,11 +77,7 @@ namespace PoeShared.Native
 
         public bool IsVisible { get; private set; }
 
-        public bool IsEnabled
-        {
-            get => isEnabled;
-            set => this.RaiseAndSetIfChanged(ref isEnabled, value);
-        }
+        public bool IsEnabled { get; set; } = true;
 
         public IOverlayViewModel[] GetChildren()
         {

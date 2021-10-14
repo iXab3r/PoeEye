@@ -2,14 +2,13 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Reactive.Disposables;
-using System.Reactive.Subjects;
 using System.Runtime.CompilerServices;
 
 namespace PoeShared.Scaffolding
 {
     public abstract class DisposableReactiveObject : IDisposableReactiveObject
     {
-        public CompositeDisposable Anchors { get; } = new CompositeDisposable();
+        public CompositeDisposable Anchors { get; } = new();
 
         public virtual void Dispose()
         {
@@ -17,7 +16,7 @@ namespace PoeShared.Scaffolding
             GC.SuppressFinalize(this);
         }
 
-        public TRet RaiseAndSetIfChanged<TRet>(ref TRet backingField,
+        protected TRet RaiseAndSetIfChanged<TRet>(ref TRet backingField,
             TRet newValue,
             [CallerMemberName] string propertyName = null)
         {
@@ -28,12 +27,11 @@ namespace PoeShared.Scaffolding
 
             return RaiseAndSet(ref backingField, newValue, propertyName);
         }
-        
-        public TRet RaiseAndSet<TRet>(ref TRet backingField,
+
+        private TRet RaiseAndSet<TRet>(ref TRet backingField,
             TRet newValue,
             [CallerMemberName] string propertyName = null)
         {
-            RaisingPropertyChanging(propertyName);
             backingField = newValue;
             RaisePropertyChanged(propertyName);
             return newValue;
@@ -49,10 +47,6 @@ namespace PoeShared.Scaffolding
         public void RaisePropertyChanged(params string[] properties)
         {
             properties.ForEach(RaisePropertyChanged);
-        }
-
-        public void RaisingPropertyChanging(string propertyName)
-        {
         }
     }
 }

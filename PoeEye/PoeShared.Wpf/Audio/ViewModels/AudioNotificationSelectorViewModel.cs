@@ -25,7 +25,6 @@ namespace PoeShared.Audio.ViewModels
         
         private readonly IAudioNotificationsManager notificationsManager;
         private readonly ObservableAsPropertyHelper<string> previousSelectedValueSupplier;
-        private float volume = 1;
 
         public AudioNotificationSelectorViewModel(IAudioNotificationsManager notificationsManager)
         {
@@ -116,11 +115,7 @@ namespace PoeShared.Audio.ViewModels
 
         public string LastOpenedDirectory { get; private set; }
 
-        public float Volume
-        {
-            get => volume;
-            set => RaiseAndSetIfChanged(ref volume, value);
-        }
+        public float Volume { get; set; } = 1;
         
         public NotificationTypeWrapperViewModel SelectedItem { get; set; }
 
@@ -153,7 +148,7 @@ namespace PoeShared.Audio.ViewModels
                 return;
             }
 
-            notificationsManager.PlayNotification(notification.Value, volume);
+            notificationsManager.PlayNotification(notification.Value, Volume);
         }
         
         private void AddSoundCommandExecuted()

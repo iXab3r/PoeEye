@@ -7,12 +7,10 @@ using System.Reactive.Disposables;
 using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
-using log4net;
 using NAudio.CoreAudioApi;
 using NAudio.Wave;
 using PoeShared.Logging;
 using PoeShared.Scaffolding; 
-using PoeShared.Logging;
 
 namespace PoeShared.Audio.Services
 {

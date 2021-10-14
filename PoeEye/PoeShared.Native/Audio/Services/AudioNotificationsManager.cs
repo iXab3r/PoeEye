@@ -7,11 +7,9 @@ using System.Reactive.Concurrency;
 using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
-using log4net;
 using PoeShared.Logging;
 using PoeShared.Prism;
 using PoeShared.Scaffolding; 
-using PoeShared.Logging;
 using Unity;
 
 namespace PoeShared.Audio.Services

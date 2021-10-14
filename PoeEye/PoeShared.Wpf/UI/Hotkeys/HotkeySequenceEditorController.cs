@@ -32,12 +32,7 @@ namespace PoeShared.UI
         private readonly ObservableAsPropertyHelper<TimeSpan> recordDuration;
         private readonly CommandWrapper startRecording;
         private readonly CommandWrapper stopRecording;
-        private bool enableKeyboardRecording = true;
-        private bool enableMouseClicksRecording = true;
-        private MousePositionRecordingType enableMousePositionRecording;
 
-        private TimeSpan mousePositionRecordingResolution = TimeSpan.FromMilliseconds(250);
-        private Fallback<HotkeyGesture> toggleRecordingHotkey = new((actualHotkey, defaultHotkey) => actualHotkey == null || actualHotkey.IsEmpty || actualHotkey.Equals(defaultHotkey));
 
         static HotkeySequenceEditorController()
         {
@@ -102,39 +97,19 @@ namespace PoeShared.UI
 
         public ICommand StopRecording => stopRecording;
 
-        public bool EnableMouseClicksRecording
-        {
-            get => enableMouseClicksRecording;
-            set => RaiseAndSetIfChanged(ref enableMouseClicksRecording, value);
-        }
+        public bool EnableMouseClicksRecording { get; set; } = true;
 
-        public MousePositionRecordingType MousePositionRecording
-        {
-            get => enableMousePositionRecording;
-            set => RaiseAndSetIfChanged(ref enableMousePositionRecording, value);
-        }
+        public MousePositionRecordingType MousePositionRecording { get; set; }
 
-        public bool EnableKeyboardRecording
-        {
-            get => enableKeyboardRecording;
-            set => RaiseAndSetIfChanged(ref enableKeyboardRecording, value);
-        }
+        public bool EnableKeyboardRecording { get; set; } = true;
 
         public bool IsRecording { get; private set; }
 
-        public TimeSpan MousePositionRecordingResolution
-        {
-            get => mousePositionRecordingResolution;
-            set => RaiseAndSetIfChanged(ref mousePositionRecordingResolution, value);
-        }
+        public TimeSpan MousePositionRecordingResolution { get; set; } = TimeSpan.FromMilliseconds(250);
 
         public bool IsBusy { get; set; }
 
-        public Fallback<HotkeyGesture> ToggleRecordingHotkey
-        {
-            get => toggleRecordingHotkey;
-            set => RaiseAndSetIfChanged(ref toggleRecordingHotkey, value);
-        }
+        public Fallback<HotkeyGesture> ToggleRecordingHotkey { get; set; } = new((actualHotkey, defaultHotkey) => actualHotkey == null || actualHotkey.IsEmpty || actualHotkey.Equals(defaultHotkey));
 
         public IWindowHandle TargetWindow { get; set; }
 
@@ -182,7 +157,7 @@ namespace PoeShared.UI
                 .StartWith(System.Windows.Forms.Cursor.Position)
                 .Publish();
 
-            if (enableMousePositionRecording != MousePositionRecordingType.None && MousePositionRecordingResolution > TimeSpan.Zero)
+            if (MousePositionRecording != MousePositionRecordingType.None && MousePositionRecordingResolution > TimeSpan.Zero)
             {
                 mouseLocationSource
                     .Sample(UiConstants.UiThrottlingDelay)
@@ -194,7 +169,7 @@ namespace PoeShared.UI
 
             mouseLocationSource.Connect().AddTo(recordingAnchors);
 
-            var hotkey = toggleRecordingHotkey.Value ?? HotkeyGesture.Empty;
+            var hotkey = ToggleRecordingHotkey.Value ?? HotkeyGesture.Empty;
             var tracker = hotkeyFactory.Create().AddTo(recordingAnchors);
             tracker.HotkeyMode = HotkeyMode.Hold;
             tracker.SuppressKey = true;
@@ -249,7 +224,7 @@ namespace PoeShared.UI
 
             if (MousePositionRecordingResolution > TimeSpan.Zero)
             {
-                if (enableMousePositionRecording == MousePositionRecordingType.Absolute)
+                if (MousePositionRecording == MousePositionRecordingType.Absolute)
                 {
                     mouseLocationSource
                         .Sample(MousePositionRecordingResolution)
@@ -265,7 +240,7 @@ namespace PoeShared.UI
                             AddMouseMove(position, isRelative: false);
                         }, Log.HandleUiException)
                         .AddTo(recordingAnchors);
-                } else if (enableMousePositionRecording == MousePositionRecordingType.Relative)
+                } else if (MousePositionRecording == MousePositionRecordingType.Relative)
                 {
                     var recordMouseAbsolutePosition = true; // relative recording still need improvements, it's a bit off
                     if (recordMouseAbsolutePosition)

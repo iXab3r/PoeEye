@@ -21,7 +21,6 @@ namespace PoeShared.Notifications.ViewModels
         private static readonly Binder<NotificationContainerViewModel> Binder = new();
         private readonly IClock clock;
         private readonly IScheduler uiScheduler;
-        private double opacity = 1;
 
         static NotificationContainerViewModel()
         {
@@ -98,11 +97,7 @@ namespace PoeShared.Notifications.ViewModels
 
         public ImageSource Icon { get; private set; }
 
-        public double Opacity
-        {
-            get => opacity;
-            set => RaiseAndSetIfChanged(ref opacity, value);
-        }
+        public double Opacity { get; set; } = 1;
 
         public ICommand CloseCommand { get; }
     }

@@ -34,9 +34,6 @@ namespace PoeShared.RegionSelector.ViewModels
 
         private readonly ObservableAsPropertyHelper<bool> OwnerIsVisibleSource;
         private readonly ObservableAsPropertyHelper<bool> selectionIsNotEmptySource;
-        private bool showCrosshair = false;
-        private bool showBackground = true;
-        private double backgroundOpacity = 0.5;
 
         public SelectionAdornerViewModel(
             [NotNull] IKeyboardEventsSource keyboardEventsSource,
@@ -91,23 +88,11 @@ namespace PoeShared.RegionSelector.ViewModels
 
         public bool StopWhenFocusLost { get; set; }
         
-        public bool ShowCrosshair
-        {
-            get => showCrosshair;
-            set => RaiseAndSetIfChanged(ref showCrosshair, value);
-        }
+        public bool ShowCrosshair { get; set; } = false;
 
-        public bool ShowBackground
-        {
-            get => showBackground;
-            set => RaiseAndSetIfChanged(ref showBackground, value);
-        }
+        public bool ShowBackground { get; set; } = true;
 
-        public double BackgroundOpacity
-        {
-            get => backgroundOpacity;
-            set => RaiseAndSetIfChanged(ref backgroundOpacity, value);
-        }
+        public double BackgroundOpacity { get; set; } = 0.5;
 
         public double StrokeThickness { get; } = 2;
 

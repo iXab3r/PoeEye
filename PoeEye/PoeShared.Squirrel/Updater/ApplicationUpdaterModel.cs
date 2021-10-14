@@ -27,7 +27,6 @@ namespace PoeShared.Squirrel.Updater
         private static readonly string UpdaterExecutableName = "update.exe";
         private readonly IAppArguments appArguments;
         private readonly IApplicationAccessor applicationAccessor;
-        private Version mostRecentVersion;
  
 
         public ApplicationUpdaterModel(
@@ -81,11 +80,7 @@ namespace PoeShared.Squirrel.Updater
 
         public bool IgnoreDeltaUpdates { get; set; }
 
-        public Version UpdatedVersion
-        {
-            get => mostRecentVersion;
-            private set => RaiseAndSetIfChanged(ref mostRecentVersion, value);
-        }
+        public Version UpdatedVersion { get; private set; }
 
         public IPoeUpdateInfo LatestVersion { get; private set; }
 
