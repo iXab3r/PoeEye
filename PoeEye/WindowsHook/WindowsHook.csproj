@@ -19,5 +19,6 @@
     </ItemGroup>
     <ItemGroup>
       <PackageReference Include="PInvoke.User32" Version="0.6.49" />
+      <PackageReference Include="PropertyChanged.Fody" Version="3.4.0" />
     </ItemGroup>
 </Project>
