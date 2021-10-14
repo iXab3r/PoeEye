@@ -8,7 +8,7 @@ namespace PoeShared.Scaffolding
 {
     public abstract class DisposableReactiveObject : IDisposableReactiveObject
     {
-        public CompositeDisposable Anchors { get; } = new();
+        public CompositeDisposable Anchors { get; } = new CompositeDisposable();
 
         public virtual void Dispose()
         {
