@@ -28,7 +28,7 @@ namespace PoeShared.Scaffolding
             return RaiseAndSet(ref backingField, newValue, propertyName);
         }
 
-        private TRet RaiseAndSet<TRet>(ref TRet backingField,
+        protected TRet RaiseAndSet<TRet>(ref TRet backingField,
             TRet newValue,
             [CallerMemberName] string propertyName = null)
         {
